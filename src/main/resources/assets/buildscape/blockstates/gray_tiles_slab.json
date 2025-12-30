@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "buildscape:block/gray_tiles_slab"
+    },
+    "type=top": {
+      "model": "buildscape:block/gray_tiles_slab_top"
+    },
+    "type=double": {
+      "model": "buildscape:block/gray_tiles"
+    }
+  }
+}

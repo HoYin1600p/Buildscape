@@ -1,0 +1,6 @@
+﻿{
+  "textures": {
+    "wall": "minecraft:block/stripped_jungle_log"
+  },
+  "parent": "minecraft:block/wall_inventory"
+}

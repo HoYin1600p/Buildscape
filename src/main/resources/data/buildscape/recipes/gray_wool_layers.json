@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "###"
+  ],
+  "key": {
+    "#": {
+      "item": "minecraft:gray_wool"
+    }
+  },
+  "result": {
+    "item": "buildscape:gray_carpet_layers",
+    "count": 8
+  }
+}
+

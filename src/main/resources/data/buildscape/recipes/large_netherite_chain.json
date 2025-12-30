@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " I ",
+    " N ",
+    " I "
+  ],
+  "key": {
+    "I": {
+      "item": "minecraft:netherite_scrap"
+    },
+    "N": {
+      "item": "minecraft:iron_nugget"
+    }
+  },
+  "result": {
+    "item": "buildscape:large_netherite_chain"
+  }
+}

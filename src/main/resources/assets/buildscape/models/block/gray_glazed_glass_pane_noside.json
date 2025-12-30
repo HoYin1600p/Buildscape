@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/template_glass_pane_noside",
+  "textures": {
+    "pane": "buildscape:block/gray_glazed_glass"
+  },
+  "render_type": "translucent"
+}

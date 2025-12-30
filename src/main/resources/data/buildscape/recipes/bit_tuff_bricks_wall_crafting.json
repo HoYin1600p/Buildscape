@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "key": {
+    "T": {
+      "item": "buildscape:bit_tuff_bricks"
+    }
+  },
+  "pattern": [
+    "   ",
+    "TTT",
+    "TTT"
+  ],
+  "result": {
+    "count": 6,
+    "item": "buildscape:bit_tuff_bricks_wall"
+  }
+}

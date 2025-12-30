@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/template_glass_pane_noside_alt",
+  "textures": {
+    "pane": "buildscape:block/magenta_mosaic_glass"
+  },
+  "render_type": "translucent"
+}

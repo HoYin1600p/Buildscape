@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/cube_bottom_top",
+  "textures": {
+    "side": "buildscape:block/bit_chiseled_tuff_bricks",
+    "top": "buildscape:block/bit_chiseled_tuff_bricks_top",
+    "bottom": "buildscape:block/bit_chiseled_tuff_bricks_top"
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/cross",
+  "textures": {
+    "cross": "buildscape:block/snow_tall_grass_top"
+  }
+}

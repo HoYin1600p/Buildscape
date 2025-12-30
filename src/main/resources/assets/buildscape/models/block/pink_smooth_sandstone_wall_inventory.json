@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/wall_inventory",
+  "textures": {
+    "wall": "buildscape:block/pink_smooth_sandstone"
+  }
+}

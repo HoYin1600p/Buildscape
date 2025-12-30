@@ -1,8 +1,0 @@
-{
-  "parent": "minecraft:block/outer_stairs",
-  "textures": {
-    "bottom": "buildscape:block/orange_smooth_sandstone",
-    "top": "buildscape:block/orange_smooth_sandstone",
-    "side": "buildscape:block/orange_smooth_sandstone"
-  }
-}

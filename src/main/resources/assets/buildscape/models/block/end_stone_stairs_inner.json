@@ -1,8 +1,0 @@
-{
-  "parent": "minecraft:block/inner_stairs",
-  "textures": {
-    "bottom": "buildscape:block/end_stone",
-    "top": "buildscape:block/end_stone",
-    "side": "buildscape:block/end_stone"
-  }
-}

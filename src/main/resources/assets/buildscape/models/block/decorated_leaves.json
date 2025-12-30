@@ -1,7 +1,0 @@
-{
-  "parent": "minecraft:block/leaves",
-  "textures": {
-    "all": "buildscape:block/decorated_leaves"
-  }
-}
-

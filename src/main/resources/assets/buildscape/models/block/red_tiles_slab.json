@@ -1,8 +1,0 @@
-{
-  "parent": "minecraft:block/slab",
-  "textures": {
-    "bottom": "buildscape:block/red_tiles",
-    "top": "buildscape:block/red_tiles",
-    "side": "buildscape:block/red_tiles"
-  }
-}

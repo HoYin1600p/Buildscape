@@ -1,8 +1,0 @@
-{
-  "parent": "block/slab",
-  "textures": {
-    "bottom": "buildscape:block/mud",
-    "top": "buildscape:block/mud",
-    "side": "buildscape:block/mud"
-  }
-}

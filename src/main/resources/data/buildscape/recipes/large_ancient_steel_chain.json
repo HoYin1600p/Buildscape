@@ -1,8 +1,0 @@
-{
-  "type": "minecraft:stonecutting",
-  "ingredient": {
-    "item": "buildscape:large_iron_chain"
-  },
-  "result": "buildscape:large_ancient_steel_chain",
-  "count": 1
-}

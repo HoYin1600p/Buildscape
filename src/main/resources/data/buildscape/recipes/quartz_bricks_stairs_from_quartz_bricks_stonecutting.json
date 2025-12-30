@@ -1,9 +1,0 @@
-{
-  "type": "minecraft:stonecutting",
-  "ingredient": {
-    "item": "minecraft:quartz_bricks"
-  },
-  "result": "buildscape:quartz_bricks_stairs",
-  "count": 2
-}
-

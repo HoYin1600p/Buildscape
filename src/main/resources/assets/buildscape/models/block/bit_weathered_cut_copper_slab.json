@@ -1,8 +1,0 @@
-{
-  "parent": "minecraft:block/slab",
-  "textures": {
-    "bottom": "buildscape:block/bit_weathered_cut_copper",
-    "top": "buildscape:block/bit_weathered_cut_copper",
-    "side": "buildscape:block/bit_weathered_cut_copper"
-  }
-}

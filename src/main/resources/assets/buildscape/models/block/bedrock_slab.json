@@ -1,8 +1,0 @@
-{
-  "parent": "minecraft:block/slab",
-  "textures": {
-    "bottom": "buildscape:block/bedrock",
-    "top": "buildscape:block/bedrock",
-    "side": "buildscape:block/bedrock"
-  }
-}

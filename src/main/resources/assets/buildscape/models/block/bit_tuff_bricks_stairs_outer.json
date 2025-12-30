@@ -1,8 +1,0 @@
-{
-  "parent": "minecraft:block/outer_stairs",
-  "textures": {
-    "bottom": "buildscape:block/bit_tuff_bricks",
-    "top": "buildscape:block/bit_tuff_bricks",
-    "side": "buildscape:block/bit_tuff_bricks"
-  }
-}

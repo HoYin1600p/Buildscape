@@ -1,9 +1,0 @@
-{
-  "type": "minecraft:stonecutting",
-  "ingredient": {
-    "item": "buildscape:bit_weathered_copper_grate"
-  },
-  "result": "buildscape:bit_weathered_copper_bulb",
-  "count": 1
-}
-

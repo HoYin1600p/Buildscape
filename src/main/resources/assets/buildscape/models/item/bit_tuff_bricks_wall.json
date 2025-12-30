@@ -1,6 +1,0 @@
-{
-  "parent": "minecraft:block/wall_inventory",
-  "textures": {
-    "wall": "buildscape:block/bit_tuff_bricks"
-  }
-}

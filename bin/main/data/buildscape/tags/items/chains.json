@@ -1,0 +1,21 @@
+{
+  "values": [
+    "buildscape:copper_chain",
+    "buildscape:exposed_copper_chain",
+    "buildscape:weathered_copper_chain",
+    "buildscape:oxidized_copper_chain",
+    "buildscape:gold_chain",
+    "buildscape:diamond_chain",
+    "buildscape:emerald_chain",
+    "buildscape:netherite_chain",
+    "buildscape:ancient_steel_chain",
+    "buildscape:large_iron_chain",
+    "buildscape:large_gold_chain",
+    "buildscape:large_diamond_chain",
+    "buildscape:large_emerald_chain",
+    "buildscape:large_netherite_chain",
+    "buildscape:large_ancient_steel_chain"
+  ]
+}
+
+

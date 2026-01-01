@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "buildscape:block/podzol_slab"
+    },
+    "type=top": {
+      "model": "buildscape:block/podzol_slab_top"
+    },
+    "type=double": {
+      "model": "buildscape:block/podzol_slab_double"
+    }
+  }
+}

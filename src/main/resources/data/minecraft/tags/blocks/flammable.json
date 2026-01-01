@@ -1,0 +1,13 @@
+{
+  "replace": false,
+  "values": [
+    "#buildscape:hedges",
+    "#buildscape:ashpen_variants",
+    "#buildscape:bamboo_variants",
+    "#buildscape:wood_walls",
+    "#buildscape:leaf_layers",
+    "buildscape:hay_bale_slab",
+    "buildscape:bamboo_door",
+    "buildscape:bamboo_trapdoor"
+  ]
+}

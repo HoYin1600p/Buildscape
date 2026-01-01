@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "buildscape:icicle_block"
+    }
+  ],
+  "result": {
+    "item": "buildscape:icicle",
+    "count": 4
+  }
+}
+

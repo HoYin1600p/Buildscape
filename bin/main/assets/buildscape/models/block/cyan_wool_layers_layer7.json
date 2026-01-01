@@ -1,0 +1,7 @@
+﻿{
+  "textures": {
+    "particle": "minecraft:block/cyan_wool",
+    "texture": "minecraft:block/cyan_wool"
+  },
+  "parent": "minecraft:block/snow_height14"
+}

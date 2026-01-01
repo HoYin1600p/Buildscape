@@ -1,0 +1,30 @@
+{
+  "values": [
+    "buildscape:moss_layers",
+    "buildscape:oak_leaf_layers",
+    "buildscape:spruce_leaf_layers",
+    "buildscape:birch_leaf_layers",
+    "buildscape:jungle_leaf_layers",
+    "buildscape:acacia_leaf_layers",
+    "buildscape:dark_oak_leaf_layers",
+    "buildscape:azalea_leaf_layers",
+    "buildscape:flowering_azalea_leaf_layers",
+    "buildscape:white_carpet_layers",
+    "buildscape:orange_carpet_layers",
+    "buildscape:magenta_carpet_layers",
+    "buildscape:light_blue_carpet_layers",
+    "buildscape:yellow_carpet_layers",
+    "buildscape:lime_carpet_layers",
+    "buildscape:pink_carpet_layers",
+    "buildscape:gray_carpet_layers",
+    "buildscape:light_gray_carpet_layers",
+    "buildscape:cyan_carpet_layers",
+    "buildscape:purple_carpet_layers",
+    "buildscape:blue_carpet_layers",
+    "buildscape:brown_carpet_layers",
+    "buildscape:green_carpet_layers",
+    "buildscape:red_carpet_layers",
+    "buildscape:black_carpet_layers"
+  ]
+}
+

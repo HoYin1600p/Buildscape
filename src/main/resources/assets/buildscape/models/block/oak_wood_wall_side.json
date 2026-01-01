@@ -1,0 +1,6 @@
+﻿{
+  "textures": {
+    "wall": "minecraft:block/oak_log"
+  },
+  "parent": "minecraft:block/template_wall_side"
+}

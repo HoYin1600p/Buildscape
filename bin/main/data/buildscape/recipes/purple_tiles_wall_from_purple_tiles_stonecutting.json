@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "buildscape:purple_tiles"
+  },
+  "result": "buildscape:purple_tiles_wall",
+  "count": 1
+}

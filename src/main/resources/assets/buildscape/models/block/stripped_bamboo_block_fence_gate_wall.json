@@ -1,0 +1,6 @@
+{
+  "parent": "block/template_fence_gate_wall",
+  "textures": {
+    "texture": "buildscape:block/stripped_bamboo_block"
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/leaves",
+  "textures": {
+    "all": "buildscape:block/snowy_oak_leaves"
+  }
+}

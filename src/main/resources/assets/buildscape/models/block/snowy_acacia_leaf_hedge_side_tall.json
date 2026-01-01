@@ -1,0 +1,7 @@
+{
+  "parent": "buildscape:block/template_wall_side_tall_tinted",
+  "textures": {
+    "wall": "buildscape:block/snowy_acacia_leaves",
+    "tint": "buildscape:block/snowy_acacia_leaves"
+  }
+}

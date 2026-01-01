@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/pointed_dripstone_up_frustum",
+  "textures": {
+    "cross": "buildscape:block/icicle_up_frustum"
+  },
+  "render_type": "minecraft:cutout_mipped"
+}
+

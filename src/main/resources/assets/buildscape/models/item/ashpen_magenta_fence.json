@@ -1,0 +1,6 @@
+{
+  "parent": "block/fence_inventory",
+  "textures": {
+    "texture": "buildscape:block/ashpen_magenta_planks"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/slab_top",
+  "textures": {
+    "bottom": "buildscape:block/dripstone_block",
+    "top": "buildscape:block/dripstone_block",
+    "side": "buildscape:block/dripstone_block"
+  }
+}

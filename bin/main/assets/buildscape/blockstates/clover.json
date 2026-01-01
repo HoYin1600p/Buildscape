@@ -1,0 +1,65 @@
+{
+  "variants": {
+    "facing=north,flower_amount=1": {
+      "model": "buildscape:block/clover_1",
+      "y": 180
+    },
+    "facing=south,flower_amount=1": {
+      "model": "buildscape:block/clover_1"
+    },
+    "facing=west,flower_amount=1": {
+      "model": "buildscape:block/clover_1",
+      "y": 90
+    },
+    "facing=east,flower_amount=1": {
+      "model": "buildscape:block/clover_1",
+      "y": 270
+    },
+    "facing=north,flower_amount=2": {
+      "model": "buildscape:block/clover_2",
+      "y": 180
+    },
+    "facing=south,flower_amount=2": {
+      "model": "buildscape:block/clover_2"
+    },
+    "facing=west,flower_amount=2": {
+      "model": "buildscape:block/clover_2",
+      "y": 90
+    },
+    "facing=east,flower_amount=2": {
+      "model": "buildscape:block/clover_2",
+      "y": 270
+    },
+    "facing=north,flower_amount=3": {
+      "model": "buildscape:block/clover_3",
+      "y": 180
+    },
+    "facing=south,flower_amount=3": {
+      "model": "buildscape:block/clover_3"
+    },
+    "facing=west,flower_amount=3": {
+      "model": "buildscape:block/clover_3",
+      "y": 90
+    },
+    "facing=east,flower_amount=3": {
+      "model": "buildscape:block/clover_3",
+      "y": 270
+    },
+    "facing=north,flower_amount=4": {
+      "model": "buildscape:block/clover_4",
+      "y": 180
+    },
+    "facing=south,flower_amount=4": {
+      "model": "buildscape:block/clover_4"
+    },
+    "facing=west,flower_amount=4": {
+      "model": "buildscape:block/clover_4",
+      "y": 90
+    },
+    "facing=east,flower_amount=4": {
+      "model": "buildscape:block/clover_4",
+      "y": 270
+    }
+  }
+}
+

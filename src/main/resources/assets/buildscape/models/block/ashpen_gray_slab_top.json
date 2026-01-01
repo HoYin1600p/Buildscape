@@ -1,0 +1,8 @@
+{
+  "parent": "block/slab_top",
+  "textures": {
+    "bottom": "buildscape:block/ashpen_gray_planks",
+    "top": "buildscape:block/ashpen_gray_planks",
+    "side": "buildscape:block/ashpen_gray_planks"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "buildscape:bit_weathered_cut_copper"
+  },
+  "result": "minecraft:copper_block",
+  "count": 1
+}
+

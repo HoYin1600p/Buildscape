@@ -1,0 +1,7 @@
+﻿{
+  "textures": {
+    "particle": "minecraft:block/lime_wool",
+    "all": "minecraft:block/lime_wool"
+  },
+  "parent": "minecraft:block/cube_all"
+}

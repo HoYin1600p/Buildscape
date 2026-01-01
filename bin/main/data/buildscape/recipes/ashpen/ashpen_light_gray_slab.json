@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "###"
+  ],
+  "key": {
+    "#": {
+      "item": "buildscape:ashpen_light_gray_planks"
+    }
+  },
+  "result": {
+    "item": "buildscape:ashpen_light_gray_slab",
+    "count": 6
+  }
+}

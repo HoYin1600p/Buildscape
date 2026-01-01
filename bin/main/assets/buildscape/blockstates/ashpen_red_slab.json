@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "buildscape:block/ashpen_red_slab"
+    },
+    "type=top": {
+      "model": "buildscape:block/ashpen_red_slab_top"
+    },
+    "type=double": {
+      "model": "buildscape:block/ashpen_red_planks"
+    }
+  }
+}

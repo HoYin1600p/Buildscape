@@ -1,0 +1,12 @@
+{
+  "replace": false,
+  "values": [
+    "#buildscape:hedges",
+    "#buildscape:leaf_layers",
+    "#buildscape:moss_variants",
+    "#buildscape:layers",
+    "#buildscape:flowers",
+    "#buildscape:spore_blossoms"
+  ]
+}
+

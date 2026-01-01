@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "buildscape:block/smooth_basalt_slab"
+    },
+    "type=top": {
+      "model": "buildscape:block/smooth_basalt_slab_top"
+    },
+    "type=double": {
+      "model": "minecraft:block/smooth_basalt"
+    }
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "values": [
+    "buildscape:black_tiles_wall",
+    "buildscape:blue_tiles_wall",
+    "buildscape:brown_tiles_wall",
+    "buildscape:cyan_tiles_wall",
+    "buildscape:gray_tiles_wall",
+    "buildscape:green_tiles_wall",
+    "buildscape:light_blue_tiles_wall",
+    "buildscape:light_gray_tiles_wall",
+    "buildscape:lime_tiles_wall",
+    "buildscape:magenta_tiles_wall",
+    "buildscape:orange_tiles_wall",
+    "buildscape:pink_tiles_wall",
+    "buildscape:purple_tiles_wall",
+    "buildscape:red_tiles_wall",
+    "buildscape:white_tiles_wall",
+    "buildscape:yellow_tiles_wall"
+  ]
+}
+

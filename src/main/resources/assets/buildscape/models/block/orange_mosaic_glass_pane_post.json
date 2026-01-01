@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/template_glass_pane_post",
+  "textures": {
+    "pane": "buildscape:block/orange_mosaic_glass",
+    "edge": "buildscape:block/orange_mosaic_glass"
+  },
+  "render_type": "translucent"
+}

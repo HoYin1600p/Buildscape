@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "buildscape:bit_copper_grate"
+  },
+  "result": "buildscape:bit_chiseled_copper",
+  "count": 1
+}
+

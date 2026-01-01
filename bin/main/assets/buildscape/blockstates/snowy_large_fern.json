@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "half=lower": {
+      "model": "buildscape:block/snowy_large_fern_bottom"
+    },
+    "half=upper": {
+      "model": "buildscape:block/snowy_large_fern_top"
+    }
+  }
+}

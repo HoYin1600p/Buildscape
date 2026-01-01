@@ -1,0 +1,6 @@
+{
+  "textures": {
+    "wall": "buildscape:block/mangrove_log"
+  },
+  "parent": "minecraft:block/wall_inventory"
+}

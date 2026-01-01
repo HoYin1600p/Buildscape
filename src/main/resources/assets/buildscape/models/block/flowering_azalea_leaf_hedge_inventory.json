@@ -1,0 +1,7 @@
+{
+  "parent": "buildscape:block/template_wall_inventory_tinted",
+  "textures": {
+    "wall": "minecraft:block/flowering_azalea_leaves",
+    "tint": "minecraft:block/flowering_azalea_leaves"
+  }
+}

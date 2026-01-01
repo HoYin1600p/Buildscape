@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "key": {
+    "B": {
+      "item": "buildscape:stripped_bamboo_block"
+    }
+  },
+  "pattern": [
+    "BB",
+    "BB",
+    "BB"
+  ],
+  "result": {
+    "count": 3,
+    "item": "buildscape:bamboo_door"
+  }
+}
+

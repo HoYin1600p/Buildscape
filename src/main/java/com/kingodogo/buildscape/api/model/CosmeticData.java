@@ -2,16 +2,6 @@ package com.kingodogo.buildscape.api.model;
 
 import java.util.List;
 
-/**
- * Response model for cosmetics API endpoint.
- * GET /api/v1/supporters/cosmetics/{uuid}
- * 
- * Arrays contain cosmetic IDs in format:
- * - "item:namespace:item_id" (e.g., "item:minecraft:diamond_sword")
- * - "block:namespace:block_id" (e.g., "block:minecraft:gold_block")
- * - "nbt:custom_data" - NBT-based cosmetic
- * - "type:armor_set_1" - Type-based cosmetic
- */
 public class CosmeticData {
     private List<String> unlocked;
     private List<String> locked;

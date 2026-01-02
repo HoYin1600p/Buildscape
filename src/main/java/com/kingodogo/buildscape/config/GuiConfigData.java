@@ -4,15 +4,8 @@ import com.google.gson.annotations.SerializedName;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Data class for storing GUI element configuration.
- * Stores position, size, and scale information for GUI elements.
- */
 public class GuiConfigData {
     
-    /**
-     * Configuration for a single GUI element/widget.
-     */
     public static class ElementConfig {
         @SerializedName("x")
         public int x = 0;
@@ -32,10 +25,6 @@ public class GuiConfigData {
         @SerializedName("visible")
         public boolean visible = true;
         
-        /**
-         * Percentage-based positioning (0.0 to 1.0, e.g., 0.2 = 20%)
-         * If set, these override x/y/width/height when calculating positions
-         */
         @SerializedName("percentX")
         public Double percentX = null;
         
@@ -48,9 +37,6 @@ public class GuiConfigData {
         @SerializedName("percentHeight")
         public Double percentHeight = null;
         
-        /**
-         * Additional custom properties that can be stored for extensibility
-         */
         @SerializedName("properties")
         public Map<String, Object> properties = new HashMap<>();
         
@@ -68,9 +54,6 @@ public class GuiConfigData {
             this.scale = scale;
         }
         
-        /**
-         * Copy constructor
-         */
         public ElementConfig(ElementConfig other) {
             this.x = other.x;
             this.y = other.y;
@@ -82,29 +65,19 @@ public class GuiConfigData {
         }
     }
     
-    /**
-     * Screen-level configuration
-     */
     @SerializedName("screen")
     public ScreenConfig screen = new ScreenConfig();
     
-    /**
-     * Map of element IDs to their configurations
-     * Element IDs are widget names or identifiers like "itemSelectionWidget", "searchBox", etc.
-     */
     @SerializedName("elements")
     public Map<String, ElementConfig> elements = new HashMap<>();
     
-    /**
-     * Screen-level configuration
-     */
     public static class ScreenConfig {
         @SerializedName("width")
-        public int width = 0; // 0 means use default/screen width
-        
+        public int width = 0;
+
         @SerializedName("height")
-        public int height = 0; // 0 means use default/screen height
-        
+        public int height = 0;
+
         @SerializedName("scale")
         public float scale = 1.0f;
         
@@ -115,45 +88,30 @@ public class GuiConfigData {
         public int contentY = 0;
         
         @SerializedName("contentWidth")
-        public int contentWidth = 0; // 0 means use default
-        
+        public int contentWidth = 0;
+
         @SerializedName("contentHeight")
-        public int contentHeight = 0; // 0 means use default
+        public int contentHeight = 0;
     }
     
     public GuiConfigData() {}
     
-    /**
-     * Get configuration for an element, creating a default if it doesn't exist
-     */
     public ElementConfig getElementConfig(String elementId, int defaultX, int defaultY, int defaultWidth, int defaultHeight) {
         return elements.computeIfAbsent(elementId, k -> new ElementConfig(defaultX, defaultY, defaultWidth, defaultHeight));
     }
     
-    /**
-     * Get configuration for an element, returning null if it doesn't exist
-     */
     public ElementConfig getElementConfig(String elementId) {
         return elements.get(elementId);
     }
     
-    /**
-     * Set configuration for an element
-     */
     public void setElementConfig(String elementId, ElementConfig config) {
         elements.put(elementId, config);
     }
     
-    /**
-     * Remove configuration for an element
-     */
     public void removeElementConfig(String elementId) {
         elements.remove(elementId);
     }
     
-    /**
-     * Check if an element configuration exists
-     */
     public boolean hasElementConfig(String elementId) {
         return elements.containsKey(elementId);
     }

@@ -19,21 +19,17 @@ import net.minecraftforge.fml.common.Mod;
 
 import java.util.Map;
 
-/**
- * Renders blinking borders around marked pillars in the world.
- */
 @Mod.EventBusSubscriber(
         modid = BuildScape.MODID,
         bus = Mod.EventBusSubscriber.Bus.FORGE,
         value = Dist.CLIENT
 )
 public class PillarMarkerRenderer {
-    private static final double MAX_RENDER_DISTANCE = 64.0; // Only render within 64 blocks
-    
+    private static final double MAX_RENDER_DISTANCE = 64.0;
+
     @SubscribeEvent
     public static void onRenderLevelStage(RenderLevelStageEvent event) {
         try {
-            // Only render after particles (which happens after entities)
             if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_PARTICLES) {
                 return;
             }
@@ -64,16 +60,14 @@ public class PillarMarkerRenderer {
             Vec3 cameraPos = camera.getPosition();
             PoseStack poseStack = event.getPoseStack();
             MultiBufferSource.BufferSource bufferSource = mc.renderBuffers().bufferSource();
-            
-            // Render bounding boxes for marked pillars
+
             for (PillarMarkerManager.MarkedPillar marked : markedPillars.values()) {
                 if (marked == null || marked.pos == null) {
                     continue;
                 }
                 
                 BlockPos pos = marked.pos;
-                
-                // Check distance
+
                 double dx = pos.getX() + 0.5 - cameraPos.x;
                 double dy = pos.getY() + 0.5 - cameraPos.y;
                 double dz = pos.getZ() + 0.5 - cameraPos.z;
@@ -82,16 +76,13 @@ public class PillarMarkerRenderer {
                 if (distance > MAX_RENDER_DISTANCE) {
                     continue;
                 }
-                
-                // Find the full pillar stack (connected pillars above and below)
+
                 BlockPos bottomPos = findPillarStackBottom(level, pos);
                 BlockPos topPos = findPillarStackTop(level, pos);
-                
-                // Render bounding box for the entire stack
+
                 renderPillarStackBoundingBox(poseStack, bufferSource, cameraPos, bottomPos, topPos, marked);
             }
         } catch (Exception e) {
-            // Silently catch any rendering errors to prevent crashes
             BuildScape.getLogger().debug("Error rendering pillar markers: " + e.getMessage());
         }
     }
@@ -138,52 +129,43 @@ public class PillarMarkerRenderer {
             Vec3 cameraPos, BlockPos bottomPos, BlockPos topPos, PillarMarkerManager.MarkedPillar marked) {
         float alpha = marked.getBlinkAlpha();
         if (alpha < 0.1f) {
-            return; // Don't render if too transparent
+            return;
         }
         
         poseStack.pushPose();
-        
-        // Calculate the bounding box for the entire stack
+
         double minX = bottomPos.getX();
         double minY = bottomPos.getY();
         double minZ = bottomPos.getZ();
         double maxX = topPos.getX() + 1.0;
         double maxY = topPos.getY() + 1.0;
         double maxZ = topPos.getZ() + 1.0;
-        
-        // Offset by camera position for rendering
+
         double offsetX = -cameraPos.x;
         double offsetY = -cameraPos.y;
         double offsetZ = -cameraPos.z;
-        
-        // Calculate color with yellow-red gradient and alpha (blinking effect)
-        float gradientProgress = marked.getGradientProgress(); // 0.0 = yellow, 1.0 = red
-        // Yellow: RGB(255, 255, 0), Red: RGB(255, 0, 0)
+
+        float gradientProgress = marked.getGradientProgress();
         int r = 255;
         int g = (int)(255 * (1.0f - gradientProgress));
         int b = 0;
-        // Apply alpha
         r = (int)(r * alpha);
         g = (int)(g * alpha);
         b = (int)(b * alpha);
         int color = (r << 24) | (g << 16) | (b << 8) | 0xFF;
         
         VertexConsumer buffer = bufferSource.getBuffer(RenderType.lines());
-        
-        // Draw the 12 edges of the bounding box
-        // Bottom face (4 edges)
+
         drawLine(buffer, poseStack, minX + offsetX, minY + offsetY, minZ + offsetZ, maxX + offsetX, minY + offsetY, minZ + offsetZ, color);
         drawLine(buffer, poseStack, maxX + offsetX, minY + offsetY, minZ + offsetZ, maxX + offsetX, minY + offsetY, maxZ + offsetZ, color);
         drawLine(buffer, poseStack, maxX + offsetX, minY + offsetY, maxZ + offsetZ, minX + offsetX, minY + offsetY, maxZ + offsetZ, color);
         drawLine(buffer, poseStack, minX + offsetX, minY + offsetY, maxZ + offsetZ, minX + offsetX, minY + offsetY, minZ + offsetZ, color);
-        
-        // Top face (4 edges)
+
         drawLine(buffer, poseStack, minX + offsetX, maxY + offsetY, minZ + offsetZ, maxX + offsetX, maxY + offsetY, minZ + offsetZ, color);
         drawLine(buffer, poseStack, maxX + offsetX, maxY + offsetY, minZ + offsetZ, maxX + offsetX, maxY + offsetY, maxZ + offsetZ, color);
         drawLine(buffer, poseStack, maxX + offsetX, maxY + offsetY, maxZ + offsetZ, minX + offsetX, maxY + offsetY, maxZ + offsetZ, color);
         drawLine(buffer, poseStack, minX + offsetX, maxY + offsetY, maxZ + offsetZ, minX + offsetX, maxY + offsetY, minZ + offsetZ, color);
-        
-        // Vertical edges (4 edges)
+
         drawLine(buffer, poseStack, minX + offsetX, minY + offsetY, minZ + offsetZ, minX + offsetX, maxY + offsetY, minZ + offsetZ, color);
         drawLine(buffer, poseStack, maxX + offsetX, minY + offsetY, minZ + offsetZ, maxX + offsetX, maxY + offsetY, minZ + offsetZ, color);
         drawLine(buffer, poseStack, maxX + offsetX, minY + offsetY, maxZ + offsetZ, maxX + offsetX, maxY + offsetY, maxZ + offsetZ, color);

@@ -11,10 +11,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-/**
- * Configuration manager for equipped cosmetics.
- * Persists equipped cosmetics per player UUID.
- */
 public class CosmeticsConfig {
     private static final Gson GSON = new GsonBuilder()
         .setPrettyPrinting()
@@ -22,12 +18,8 @@ public class CosmeticsConfig {
     
     private static CosmeticsConfig INSTANCE;
     
-    // Map of player UUID to their equipped cosmetics by slot
-    // Slot: 0=head, 1=chest, 2=legs, 3=feet
     private Map<String, Map<Integer, String>> playerCosmetics = new HashMap<>();
     
-    // Map of player UUID to cosmetic colors (cosmeticId -> hex color string)
-    // Stores custom colors for particle trails and other colorable cosmetics
     private Map<String, Map<String, String>> playerCosmeticColors = new HashMap<>();
     
     private CosmeticsConfig() {
@@ -50,9 +42,6 @@ public class CosmeticsConfig {
         return new File(dir, "equipped-cosmetics.json");
     }
     
-    /**
-     * Load equipped cosmetics from config file.
-     */
     public void load() {
         File file = getConfigFile();
         if (!file.exists()) {
@@ -72,8 +61,7 @@ public class CosmeticsConfig {
                     if (value instanceof Map) {
                         @SuppressWarnings("unchecked")
                         Map<String, Object> playerData = (Map<String, Object>) value;
-                        
-                        // Load equipped cosmetics by slot
+
                         Object cosmeticsObj = playerData.get("cosmetics");
                         if (cosmeticsObj instanceof Map) {
                             @SuppressWarnings("unchecked")
@@ -86,13 +74,11 @@ public class CosmeticsConfig {
                                         cosmeticsBySlot.put(slot, (String) slotEntry.getValue());
                                     }
                                 } catch (NumberFormatException e) {
-                                    // Skip invalid slot
                                 }
                             }
                             playerCosmetics.put(playerUuid, cosmeticsBySlot);
                         }
-                        
-                        // Load cosmetic colors
+
                         Object colorsObj = playerData.get("colors");
                         if (colorsObj instanceof Map) {
                             @SuppressWarnings("unchecked")
@@ -106,7 +92,6 @@ public class CosmeticsConfig {
                             playerCosmeticColors.put(playerUuid, cosmeticColors);
                         }
                     } else {
-                        // Legacy format: just slot map
                         @SuppressWarnings("unchecked")
                         Map<String, Object> slotMap = (Map<String, Object>) value;
                         Map<Integer, String> cosmeticsBySlot = new HashMap<>();
@@ -117,7 +102,6 @@ public class CosmeticsConfig {
                                     cosmeticsBySlot.put(slot, (String) slotEntry.getValue());
                                 }
                             } catch (NumberFormatException e) {
-                                // Skip invalid slot
                             }
                         }
                         playerCosmetics.put(playerUuid, cosmeticsBySlot);
@@ -131,9 +115,6 @@ public class CosmeticsConfig {
         }
     }
     
-    /**
-     * Save equipped cosmetics to config file.
-     */
     public void save() {
         File file = getConfigFile();
         try {
@@ -141,8 +122,7 @@ public class CosmeticsConfig {
             if (parentDir != null && !parentDir.exists()) {
                 parentDir.mkdirs();
             }
-            
-            // Combine cosmetics and colors into a single structure
+
             Map<String, Object> combined = new HashMap<>();
             for (String uuid : playerCosmetics.keySet()) {
                 Map<String, Object> playerData = new HashMap<>();
@@ -164,10 +144,6 @@ public class CosmeticsConfig {
         }
     }
     
-    /**
-     * Get equipped cosmetics for a player.
-     * Fallback to "global" if UUID not found.
-     */
     public Map<Integer, String> getEquippedCosmetics(UUID playerUuid) {
         if (playerUuid == null) {
             return playerCosmetics.getOrDefault("global", new HashMap<>());
@@ -175,30 +151,20 @@ public class CosmeticsConfig {
         String uuidStr = playerUuid.toString();
         Map<Integer, String> cosmetics = playerCosmetics.get(uuidStr);
         if (cosmetics == null || cosmetics.isEmpty()) {
-            // Fallback to global profile
             cosmetics = playerCosmetics.get("global");
         }
         return cosmetics != null ? new HashMap<>(cosmetics) : new HashMap<>();
     }
     
-    /**
-     * Set equipped cosmetics for a player.
-     * Also updates "global" profile.
-     */
     public void setEquippedCosmetics(UUID playerUuid, Map<Integer, String> cosmeticsBySlot) {
         if (playerUuid != null) {
             String uuidStr = playerUuid.toString();
             playerCosmetics.put(uuidStr, new HashMap<>(cosmeticsBySlot));
         }
-        // Always update global profile for persistence across different UUIDs/SP
         playerCosmetics.put("global", new HashMap<>(cosmeticsBySlot));
         save();
     }
     
-    /**
-     * Equip a cosmetic to a specific slot for a player.
-     * Also updates "global" profile.
-     */
     public void equipCosmetic(UUID playerUuid, int slotIndex, String cosmeticId) {
         if (playerUuid != null) {
             String uuidStr = playerUuid.toString();
@@ -209,8 +175,7 @@ public class CosmeticsConfig {
                 cosmetics.put(slotIndex, cosmeticId);
             }
         }
-        
-        // Update global profile
+
         Map<Integer, String> globalCosmetics = playerCosmetics.computeIfAbsent("global", k -> new HashMap<>());
         globalCosmetics.values().remove(cosmeticId);
         globalCosmetics.remove(slotIndex);
@@ -221,10 +186,6 @@ public class CosmeticsConfig {
         save();
     }
     
-    /**
-     * Unequip cosmetic from a specific slot for a player.
-     * Also updates "global" profile.
-     */
     public void unequipCosmetic(UUID playerUuid, int slotIndex) {
         if (playerUuid != null) {
             String uuidStr = playerUuid.toString();
@@ -236,8 +197,7 @@ public class CosmeticsConfig {
                 }
             }
         }
-        
-        // Update global profile
+
         Map<Integer, String> globalCosmetics = playerCosmetics.get("global");
         if (globalCosmetics != null) {
             globalCosmetics.remove(slotIndex);
@@ -249,10 +209,6 @@ public class CosmeticsConfig {
         save();
     }
     
-    /**
-     * Get color for a cosmetic (hex string like "#FF0000").
-     * Fallback to "global" if UUID not found.
-     */
     public String getCosmeticColor(UUID playerUuid, String cosmeticId) {
         if (cosmeticId == null) return null;
         
@@ -263,8 +219,7 @@ public class CosmeticsConfig {
                 return colors.get(cosmeticId);
             }
         }
-        
-        // Fallback to global profile
+
         Map<String, String> globalColors = playerCosmeticColors.get("global");
         if (globalColors != null) {
             return globalColors.get(cosmeticId);
@@ -273,10 +228,6 @@ public class CosmeticsConfig {
         return null;
     }
     
-    /**
-     * Set color for a cosmetic (hex string like "#FF0000").
-     * Also updates "global" profile.
-     */
     public void setCosmeticColor(UUID playerUuid, String cosmeticId, String hexColor) {
         if (cosmeticId == null) return;
         
@@ -289,8 +240,7 @@ public class CosmeticsConfig {
                 colors.remove(cosmeticId);
             }
         }
-        
-        // Update global profile
+
         Map<String, String> globalColors = playerCosmeticColors.computeIfAbsent("global", k -> new HashMap<>());
         if (hexColor != null && !hexColor.isEmpty()) {
             globalColors.put(cosmeticId, hexColor);
@@ -301,15 +251,11 @@ public class CosmeticsConfig {
         save();
     }
     
-    /**
-     * Check if a cosmetic supports color customization.
-     */
     public boolean supportsColor(String cosmeticId) {
         if (cosmeticId == null || cosmeticId.isEmpty()) {
             return false;
         }
         String idLower = cosmeticId.toLowerCase();
-        // Particle trails support colors
         return idLower.contains("particle") && idLower.contains("trail");
     }
 }

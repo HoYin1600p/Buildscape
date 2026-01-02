@@ -968,7 +968,6 @@ public class BuildScape {
     private void commonSetup(final FMLCommonSetupEvent event) {
         LOGGER.info("Buildscape mod initialized!");
 
-        // Register custom gamerules
         com.kingodogo.buildscape.world.ModGameRules.register();
 
         event.enqueueWork(() -> {
@@ -1015,8 +1014,6 @@ public class BuildScape {
 
     @SubscribeEvent
     public void onRegisterCommands(net.minecraftforge.event.RegisterCommandsEvent event) {
-        // Gamerules are automatically available through /gamerule command once registered
-        // This event handler ensures commands are properly initialized
         LOGGER.debug("Commands registered - fastLeafDelay gamerule should be available");
     }
 
@@ -2072,10 +2069,7 @@ public class BuildScape {
                 com.kingodogo.buildscape.block.ModWoodTypes.MANGROVE.getClass();
                 com.kingodogo.buildscape.block.ModWoodTypes.BAMBOO.getClass();
             });
-            
-            // Note: Model layers for entity models are registered when EntityRenderers are created
-            // For custom cosmetic models, we'll bake the layer on-demand in the render method
-            
+
             LOGGER.info("Buildscape mod client setup complete");
 
             event.enqueueWork(() -> {

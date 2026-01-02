@@ -1,9 +1,5 @@
 package com.kingodogo.buildscape.api.model;
 
-/**
- * Generic API response wrapper.
- * Used for error responses and success confirmations.
- */
 public class ApiResponse {
     private boolean success;
     private String message;

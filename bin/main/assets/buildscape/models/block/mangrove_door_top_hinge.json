@@ -1,8 +1,0 @@
-{
-  "parent": "block/door_top_rh",
-  "textures": {
-    "bottom": "buildscape:block/mangrove_door_bottom",
-    "top": "buildscape:block/mangrove_door_top"
-  }
-}
-

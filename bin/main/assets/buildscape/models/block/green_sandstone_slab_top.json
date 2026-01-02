@@ -1,8 +1,0 @@
-{
-  "parent": "minecraft:block/slab_top",
-  "textures": {
-    "bottom": "buildscape:block/green_sandstone_bottom",
-    "top": "buildscape:block/green_sandstone_top",
-    "side": "buildscape:block/green_sandstone"
-  }
-}

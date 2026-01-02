@@ -1,8 +1,0 @@
-{
-  "parent": "buildscape:block/mushroom_shelves",
-  "textures": {
-    "1": "buildscape:block/red_mushroom_shelves",
-    "particle": "buildscape:block/red_mushroom_shelves"
-  }
-}
-

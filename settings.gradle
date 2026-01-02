@@ -8,8 +8,10 @@ pluginManagement {
     }
 }
 
-plugins {
-    id 'org.gradle.toolchains.foojay-resolver-convention' version '0.7.0'
-}
+// Commented out foojay-resolver plugin due to SSL certificate issues
+// Java toolchain is already specified in build.gradle (Java 17)
+// plugins {
+//     id 'org.gradle.toolchains.foojay-resolver-convention' version '0.7.0'
+// }
 
 rootProject.name = 'buildscape'

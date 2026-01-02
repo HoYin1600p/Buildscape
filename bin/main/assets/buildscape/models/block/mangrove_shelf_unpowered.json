@@ -1,7 +1,0 @@
-{
-  "parent": "minecraft:block/template_shelf_unpowered",
-  "textures": {
-    "all": "buildscape:block/mangrove_shelf",
-    "particle": "buildscape:block/stripped_mangrove_log"
-  }
-}

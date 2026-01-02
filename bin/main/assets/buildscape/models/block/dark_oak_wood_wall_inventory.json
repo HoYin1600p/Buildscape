@@ -1,6 +1,0 @@
-﻿{
-  "textures": {
-    "wall": "minecraft:block/dark_oak_log"
-  },
-  "parent": "minecraft:block/wall_inventory"
-}

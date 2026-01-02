@@ -1,9 +1,0 @@
-﻿{
-  "parent": "buildscape:block/decorated_pot",
-  "textures": {
-    "particle": "buildscape:block/decoratedpots/light_blue_side",
-    "texture": "buildscape:block/decoratedpots/light_blue_side",
-    "base": "buildscape:block/decoratedpots/light_blue_base",
-    "pattern": "buildscape:block/decoratedpots/light_blue_side"
-  }
-}

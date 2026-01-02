@@ -1,8 +1,0 @@
-{
-  "parent": "minecraft:block/stairs",
-  "textures": {
-    "bottom": "buildscape:block/light_blue_tiles",
-    "top": "buildscape:block/light_blue_tiles",
-    "side": "buildscape:block/light_blue_tiles"
-  }
-}

@@ -1,8 +1,0 @@
-{
-  "parent": "minecraft:block/template_glass_pane_side_alt",
-  "textures": {
-    "edge": "buildscape:block/lime_glazed_glass",
-    "pane": "buildscape:block/lime_glazed_glass"
-  },
-  "render_type": "translucent"
-}

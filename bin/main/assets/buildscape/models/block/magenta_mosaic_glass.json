@@ -1,7 +1,0 @@
-{
-  "parent": "block/cube_all",
-  "textures": {
-    "all": "buildscape:block/magenta_mosaic_glass"
-  },
-  "render_type": "translucent"
-}

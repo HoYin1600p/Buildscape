@@ -1,7 +1,0 @@
-﻿{
-  "textures": {
-    "particle": "minecraft:block/magenta_wool",
-    "all": "minecraft:block/magenta_wool"
-  },
-  "parent": "minecraft:block/cube_all"
-}

@@ -1,8 +1,0 @@
-{
-  "parent": "minecraft:block/outer_stairs",
-  "textures": {
-    "bottom": "buildscape:block/mossy_calcite",
-    "top": "buildscape:block/mossy_calcite",
-    "side": "buildscape:block/mossy_calcite"
-  }
-}

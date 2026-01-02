@@ -19,37 +19,21 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
-/**
- * Secure API client for communicating with buildscape.online.
- * 
- * Security features:
- * - HTTPS only (rejects HTTP connections)
- * - No credentials in code (all authentication server-side)
- * - UUID validation before API calls
- * - Rate limiting (max 1 request per 2 seconds per UUID)
- * - Input sanitization
- * - Certificate validation (uses default Java trust store)
- * 
- * Base URL: https://buildscape.online/api/v1
- */
 public class SupportersApiClient {
     private static final String BASE_URL = "https://buildscape.online/api/v1";
     private static final int TIMEOUT_SECONDS = 10;
-    private static final long RATE_LIMIT_MS = 2000; // 2 seconds between requests per UUID
-    
+    private static final long RATE_LIMIT_MS = 2000;
+
     private final HttpClient httpClient;
     private final Gson gson;
     
-    // Rate limiting: track last request time per UUID
     private final ConcurrentHashMap<UUID, Long> lastRequestTime = new ConcurrentHashMap<>();
     
     private SupportersApiClient() {
-        // Create HTTP client with HTTPS-only configuration
         this.httpClient = HttpClient.newBuilder()
             .connectTimeout(Duration.ofSeconds(TIMEOUT_SECONDS))
             .build();
-        
-        // Gson for JSON parsing
+
         this.gson = new GsonBuilder()
             .setPrettyPrinting()
             .create();
@@ -61,12 +45,6 @@ public class SupportersApiClient {
         return INSTANCE;
     }
     
-    /**
-     * Validate UUID format.
-     * 
-     * @param uuidString UUID string to validate
-     * @return true if valid UUID format
-     */
     private boolean isValidUUID(String uuidString) {
         if (uuidString == null || uuidString.isEmpty()) {
             return false;
@@ -79,12 +57,6 @@ public class SupportersApiClient {
         }
     }
     
-    /**
-     * Check rate limit for a UUID.
-     * 
-     * @param uuid UUID to check
-     * @return true if request is allowed (not rate limited)
-     */
     private boolean checkRateLimit(UUID uuid) {
         long now = System.currentTimeMillis();
         Long lastTime = lastRequestTime.get(uuid);
@@ -104,31 +76,16 @@ public class SupportersApiClient {
         return true;
     }
     
-    /**
-     * Sanitize input string to prevent injection attacks.
-     * 
-     * @param input Input string
-     * @return Sanitized string
-     */
     private String sanitizeInput(String input) {
         if (input == null) {
             return null;
         }
-        // Remove any potentially dangerous characters
         return input.replaceAll("[^a-zA-Z0-9_\\-.:]", "");
     }
     
-    /**
-     * Make an HTTP GET request.
-     * 
-     * @param endpoint Endpoint path (e.g., "/supporters/status/")
-     * @param responseClass Response class for JSON deserialization
-     * @return CompletableFuture with response
-     */
     private <T> CompletableFuture<T> getRequest(String endpoint, Class<T> responseClass) {
         String url = BASE_URL + endpoint;
-        
-        // Ensure HTTPS
+
         if (!url.startsWith("https://")) {
             BuildScape.getLogger().error("Rejected non-HTTPS URL: " + url);
             return CompletableFuture.failedFuture(new SecurityException("HTTPS required"));
@@ -169,18 +126,9 @@ public class SupportersApiClient {
             });
     }
     
-    /**
-     * Make an HTTP POST request.
-     * 
-     * @param endpoint Endpoint path
-     * @param body Request body object (will be serialized to JSON)
-     * @param responseClass Response class for JSON deserialization
-     * @return CompletableFuture with response
-     */
     private <T> CompletableFuture<T> postRequest(String endpoint, Object body, Class<T> responseClass) {
         String url = BASE_URL + endpoint;
-        
-        // Ensure HTTPS
+
         if (!url.startsWith("https://")) {
             BuildScape.getLogger().error("Rejected non-HTTPS URL: " + url);
             return CompletableFuture.failedFuture(new SecurityException("HTTPS required"));
@@ -224,13 +172,6 @@ public class SupportersApiClient {
             });
     }
     
-    /**
-     * Get supporter status for a UUID.
-     * GET /api/v1/supporters/status/{uuid}
-     * 
-     * @param uuid Player UUID
-     * @return CompletableFuture with SupporterStatus
-     */
     public CompletableFuture<SupporterStatus> getSupporterStatus(UUID uuid) {
         if (uuid == null) {
             return CompletableFuture.failedFuture(new IllegalArgumentException("UUID cannot be null"));
@@ -246,13 +187,6 @@ public class SupportersApiClient {
         return getRequest(endpoint, SupporterStatus.class);
     }
     
-    /**
-     * Get cosmetics data for a UUID.
-     * GET /api/v1/supporters/cosmetics/{uuid}
-     * 
-     * @param uuid Player UUID
-     * @return CompletableFuture with CosmeticData
-     */
     public CompletableFuture<CosmeticData> getCosmetics(UUID uuid) {
         if (uuid == null) {
             return CompletableFuture.failedFuture(new IllegalArgumentException("UUID cannot be null"));
@@ -268,14 +202,6 @@ public class SupportersApiClient {
         return getRequest(endpoint, CosmeticData.class);
     }
     
-    /**
-     * Connect account (initiate connection process).
-     * POST /api/v1/supporters/connect/{uuid}
-     * 
-     * @param uuid Player UUID
-     * @param verificationCode Optional verification code (can be null)
-     * @return CompletableFuture with ApiResponse
-     */
     public CompletableFuture<ApiResponse> connectAccount(UUID uuid, String verificationCode) {
         if (uuid == null) {
             return CompletableFuture.failedFuture(new IllegalArgumentException("UUID cannot be null"));
@@ -292,20 +218,10 @@ public class SupportersApiClient {
         return postRequest(endpoint, request, ApiResponse.class);
     }
     
-    /**
-     * Get all membership tiers.
-     * GET /api/v1/supporters/tiers
-     * 
-     * @return CompletableFuture with TiersResponse
-     */
     public CompletableFuture<TiersResponse> getTiers() {
-        // Tiers endpoint doesn't require UUID, so no rate limiting needed
         return getRequest("/supporters/tiers", TiersResponse.class);
     }
     
-    /**
-     * Request body for connect endpoint.
-     */
     private static class ConnectRequest {
         private String verificationCode;
         
@@ -318,9 +234,6 @@ public class SupportersApiClient {
         }
     }
     
-    /**
-     * Custom exception for API errors.
-     */
     public static class ApiException extends RuntimeException {
         public ApiException(String message) {
             super(message);
@@ -331,9 +244,6 @@ public class SupportersApiClient {
         }
     }
     
-    /**
-     * Exception for rate limit violations.
-     */
     public static class RateLimitException extends RuntimeException {
         public RateLimitException(String message) {
             super(message);

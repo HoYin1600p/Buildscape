@@ -1,8 +1,0 @@
-{
-  "parent": "minecraft:block/slab_top",
-  "textures": {
-    "bottom": "buildscape:block/amethyst_block",
-    "top": "buildscape:block/amethyst_block",
-    "side": "buildscape:block/amethyst_block"
-  }
-}

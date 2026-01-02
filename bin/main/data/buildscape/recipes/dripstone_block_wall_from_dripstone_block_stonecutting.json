@@ -1,9 +1,0 @@
-{
-  "type": "minecraft:stonecutting",
-  "ingredient": {
-    "item": "minecraft:dripstone_block"
-  },
-  "result": "buildscape:dripstone_block_wall",
-  "count": 1
-}
-

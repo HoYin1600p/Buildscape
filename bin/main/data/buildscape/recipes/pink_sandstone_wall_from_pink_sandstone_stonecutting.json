@@ -1,9 +1,0 @@
-{
-  "type": "minecraft:stonecutting",
-  "ingredient": {
-    "item": "buildscape:pink_sandstone"
-  },
-  "result": "buildscape:pink_sandstone_wall",
-  "count": 1
-}
-

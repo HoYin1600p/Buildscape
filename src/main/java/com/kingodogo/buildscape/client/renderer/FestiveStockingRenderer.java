@@ -139,4 +139,3 @@ public class FestiveStockingRenderer
         return getTextureForColor(entity.getColorVariant());
     }
 }
-// Kingodogo Finished this File on 2025-12-10 20-50-05

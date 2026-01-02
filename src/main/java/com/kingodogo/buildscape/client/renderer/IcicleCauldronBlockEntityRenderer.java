@@ -39,7 +39,6 @@ public class IcicleCauldronBlockEntityRenderer
             return;
         }
 
-        // Render the cauldron block using vanilla cauldron model
         poseStack.pushPose();
         BlockState cauldronState = Blocks.CAULDRON.defaultBlockState();
         BakedModel model = blockRenderer.getBlockModel(cauldronState);
@@ -63,7 +62,6 @@ public class IcicleCauldronBlockEntityRenderer
                 );
         poseStack.popPose();
 
-        // Render the icicle block inside the cauldron if present
         ItemStack storedIcicle = blockEntity.getStoredIcicle();
         if (
                 !storedIcicle.isEmpty() &&
@@ -74,13 +72,9 @@ public class IcicleCauldronBlockEntityRenderer
             BlockState icicleBlockState = blockItem.getBlock().defaultBlockState();
 
             poseStack.pushPose();
-            // Cauldron interior: x/z from 0.0625 to 0.9375 (14 pixels wide), y from 0.25 to 1.0 (12 pixels tall)
-            // Block should be 1 pixel short on all sides: 12 pixels wide (0.75 scale), 10 pixels tall (0.625 scale)
-            // Transformations: translate first (applies second), scale second (applies first)
             poseStack.translate(0.125, 0.3125, 0.125);
             poseStack.scale(0.75f, 0.625f, 0.75f);
 
-            // Render the icicle block
             BakedModel icicleModel = blockRenderer.getBlockModel(icicleBlockState);
             RenderType icicleRenderType = ItemBlockRenderTypes.getRenderType(
                     icicleBlockState,
@@ -110,4 +104,3 @@ public class IcicleCauldronBlockEntityRenderer
         return false;
     }
 }
-// Kingodogo Finished this File on 2025-12-10 20-50-05

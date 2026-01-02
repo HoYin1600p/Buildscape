@@ -35,4 +35,3 @@ public class MangroveBoatRenderer extends BoatRenderer {
         return MANGROVE_BOAT_TEXTURE;
     }
 }
-// Kingodogo Finished this File on 2025-12-10 20-50-05

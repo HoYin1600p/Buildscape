@@ -63,13 +63,12 @@ public class PillarIdManager {
         public long createdTime;
         public long modifiedTime;
         
-        // Per-pillar config options (optional, defaults to global config if not set)
-        public Boolean use_pattern = null; // null means use global config
-        public String pattern = null; // null means use global config
+        public Boolean use_pattern = null;
+        public String pattern = null;
         public Double pattern_speed = null;
         public Double pattern_spread = null;
         public Double pattern_intensity = null;
-        public Integer max_particle_color = null; // Max number of colors for this pillar (1-5)
+        public Integer max_particle_color = null;
 
         public PillarData() {
         }

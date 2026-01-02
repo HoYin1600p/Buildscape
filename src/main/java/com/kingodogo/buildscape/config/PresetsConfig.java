@@ -36,8 +36,8 @@ public class PresetsConfig {
     }
     
     private Map<String, Preset> presets = new HashMap<>();
-    private String lastAppliedPreset = "default"; // Track last applied preset
-    private static final String UNNAMED_PRESET_KEY = "_unnamed"; // Special key for unsaved changes
+    private String lastAppliedPreset = "default";
+    private static final String UNNAMED_PRESET_KEY = "_unnamed";
     public static final int MAX_PRESETS = 5;
     
     private File getConfigDir() {
@@ -71,23 +71,19 @@ public class PresetsConfig {
             Type type = new TypeToken<Map<String, Object>>(){}.getType();
             Map<String, Object> loaded = GSON.fromJson(reader, type);
             if (loaded != null) {
-                // Load presets
                 presets = new HashMap<>();
                 for (Map.Entry<String, Object> entry : loaded.entrySet()) {
                     if (entry.getKey().equals("_lastApplied")) {
-                        // Load last applied preset key
                         if (entry.getValue() instanceof String) {
                             lastAppliedPreset = (String) entry.getValue();
                         }
                     } else if (!entry.getKey().equals(UNNAMED_PRESET_KEY)) {
-                        // Load preset (skip unnamed as it's temporary)
                         try {
                             Preset preset = GSON.fromJson(GSON.toJson(entry.getValue()), Preset.class);
                             if (preset != null) {
                                 presets.put(entry.getKey(), preset);
                             }
                         } catch (Exception e) {
-                            // Skip invalid preset
                         }
                     }
                 }
@@ -96,24 +92,19 @@ public class PresetsConfig {
             com.kingodogo.buildscape.BuildScape.getLogger().error("Failed to load presets: " + e.getMessage());
             initializeDefaults();
         }
-        
-        // Ensure default preset exists
+
         if (!presets.containsKey("default")) {
             initializeDefaults();
         }
-        
-        // Initialize lastAppliedPreset if not set
+
         if (lastAppliedPreset == null || lastAppliedPreset.isEmpty()) {
             lastAppliedPreset = "default";
         }
     }
     
-    // Call this after PillarParticleConfig has loaded to apply default preset
     public void applyPresetOnStartup() {
-        // Always apply default preset on startup if items are empty
         PillarParticleConfig itemConfig = PillarParticleConfig.get();
         if (itemConfig.items.isEmpty()) {
-            // First time - apply default preset
             applyPreset("default");
         }
     }
@@ -127,7 +118,6 @@ public class PresetsConfig {
             }
             
             try (FileWriter writer = new FileWriter(file)) {
-                // Save presets and last applied preset (but not unnamed preset)
                 Map<String, Object> toSave = new HashMap<>();
                 for (Map.Entry<String, Preset> entry : presets.entrySet()) {
                     if (!entry.getKey().equals(UNNAMED_PRESET_KEY)) {
@@ -144,8 +134,7 @@ public class PresetsConfig {
     
     private void initializeDefaults() {
         presets.clear();
-        
-        // Create default preset with default items
+
         Preset defaultPreset = new Preset("Default", getDefaultItems());
         presets.put("default", defaultPreset);
     }
@@ -212,16 +201,12 @@ public class PresetsConfig {
     
     public List<Preset> getPresets() {
         List<Preset> presetList = new ArrayList<>();
-        // Always include default first
         if (presets.containsKey("default")) {
             presetList.add(presets.get("default"));
         }
-        // Include unnamed preset if it exists (for display)
         if (presets.containsKey(UNNAMED_PRESET_KEY)) {
             presetList.add(presets.get(UNNAMED_PRESET_KEY));
         }
-        // Then add custom presets (up to 5 total including default)
-        // Sort by key to maintain consistent order
         List<String> sortedKeys = new ArrayList<>(presets.keySet());
         sortedKeys.remove("default");
         sortedKeys.remove(UNNAMED_PRESET_KEY);
@@ -242,11 +227,9 @@ public class PresetsConfig {
         if (presets.containsKey("default")) {
             keys.add("default");
         }
-        // Include unnamed preset if it exists
         if (presets.containsKey(UNNAMED_PRESET_KEY)) {
             keys.add(UNNAMED_PRESET_KEY);
         }
-        // Add custom preset keys in sorted order
         List<String> sortedKeys = new ArrayList<>(presets.keySet());
         sortedKeys.remove("default");
         sortedKeys.remove(UNNAMED_PRESET_KEY);
@@ -268,18 +251,16 @@ public class PresetsConfig {
     
     public boolean savePreset(String key, String name, Set<String> items) {
         if (key.equals("default") || key.equals(UNNAMED_PRESET_KEY)) {
-            return false; // Can't modify default or unnamed
+            return false;
         }
-        
-        // Check if we're at max presets (exclude default and unnamed from count)
+
         int customPresetCount = 0;
         for (String k : presets.keySet()) {
             if (!k.equals("default") && !k.equals(UNNAMED_PRESET_KEY)) {
                 customPresetCount++;
             }
         }
-        
-        // If this is a new preset and we're at max, don't allow
+
         if (!presets.containsKey(key) && customPresetCount >= MAX_PRESETS - 1) {
             return false;
         }
@@ -291,7 +272,7 @@ public class PresetsConfig {
     
     public boolean deletePreset(String key) {
         if (key.equals("default") || key.equals(UNNAMED_PRESET_KEY)) {
-            return false; // Can't delete default or unnamed
+            return false;
         }
         if (presets.remove(key) != null) {
             save();
@@ -308,8 +289,8 @@ public class PresetsConfig {
             config.items.addAll(preset.items);
             config.saveItems();
             if (!key.equals(UNNAMED_PRESET_KEY)) {
-                lastAppliedPreset = key; // Track last applied preset (but not unnamed)
-                save(); // Save the last applied preset info
+                lastAppliedPreset = key;
+                save();
             }
         }
     }
@@ -319,9 +300,7 @@ public class PresetsConfig {
     }
     
     public void saveUnnamedPreset(Set<String> items) {
-        // Save current items as unnamed preset (unsaved changes)
         presets.put(UNNAMED_PRESET_KEY, new Preset("", items));
-        // Don't save to file - this is temporary
     }
     
     public Preset getUnnamedPreset() {
@@ -337,13 +316,11 @@ public class PresetsConfig {
     }
     
     public void autoApplyOnLoad() {
-        // Auto-apply unnamed preset if it exists, otherwise apply last applied preset
         if (hasUnnamedPreset()) {
             applyPreset(UNNAMED_PRESET_KEY);
         } else if (lastAppliedPreset != null && presets.containsKey(lastAppliedPreset)) {
             applyPreset(lastAppliedPreset);
         } else {
-            // First time - apply default
             applyPreset("default");
             lastAppliedPreset = "default";
             save();
@@ -351,7 +328,6 @@ public class PresetsConfig {
     }
     
     public String generatePresetKey() {
-        // Generate a unique key for a new preset
         int index = 1;
         while (presets.containsKey("preset_" + index)) {
             index++;

@@ -1113,7 +1113,7 @@ public class PillarParticleConfig {
 
     public void saveItems() {
         if (isClientConnectedToServer() && SERVER_CONFIG != null) {
-            return; // Don't save on client when connected to server
+            return;
         }
         File file = getItemsFile();
         try {
@@ -1145,7 +1145,7 @@ public class PillarParticleConfig {
 
     public void saveProperties() {
         if (isClientConnectedToServer() && SERVER_CONFIG != null) {
-            return; // Don't save on client when connected to server
+            return;
         }
         File file = getPropertiesFile();
         try {

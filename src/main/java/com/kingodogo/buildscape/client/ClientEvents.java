@@ -201,11 +201,9 @@ public class ClientEvents {
         lastHedgeStep = -1;
 
         wasZoomKeyPressed = false;
-        
-        // Reset SupportersTabState on logout
+
         com.kingodogo.buildscape.client.screen.tabs.supporters.SupportersTabState.getInstance().setPlayerUuid(null);
-        
-        // Clear particle trail tracking
+
         com.kingodogo.buildscape.client.ParticleTrailHandler.clearTracking();
 
         com.kingodogo.buildscape.config.PillarParticleConfig.clearServerConfig();
@@ -213,14 +211,11 @@ public class ClientEvents {
     
     @SubscribeEvent
     public static void onClientJoin(ClientPlayerNetworkEvent.LoggedInEvent event) {
-        // LoggedInEvent is good for triggering, but we might need mc.player to be ready
-        // We'll also check in onClientTick or use another event to be sure
     }
     
     @SubscribeEvent
     public static void onEntityJoinWorld(net.minecraftforge.event.entity.EntityJoinWorldEvent event) {
         if (event.getWorld().isClientSide && event.getEntity() == Minecraft.getInstance().player) {
-            // Local player has joined the world - initialize cosmetics
             Minecraft mc = Minecraft.getInstance();
             if (mc.player != null) {
                 com.kingodogo.buildscape.client.screen.tabs.supporters.SupportersTabState.getInstance()
@@ -236,8 +231,7 @@ public class ClientEvents {
         wasPressed = false;
         wasZoomKeyPressed = false;
         lastHedgeStep = -1;
-        
-        // Clear particle trail tracking
+
         com.kingodogo.buildscape.client.ParticleTrailHandler.clearTracking();
 
         try {

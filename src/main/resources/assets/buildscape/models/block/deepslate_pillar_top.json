@@ -1,0 +1,9 @@
+{
+  "parent": "buildscape:block/pillar_top",
+  "textures": {
+    "2": "buildscape:block/deepslate_pillar_top",
+    "particle": "buildscape:block/deepslate_pillar_top"
+  }
+}
+
+

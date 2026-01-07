@@ -1,0 +1,6 @@
+{
+  "parent": "buildscape:block/chain_block",
+  "textures": {
+    "texture": "buildscape:block/diamond_chain"
+  }
+}

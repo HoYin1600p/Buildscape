@@ -1,0 +1,16 @@
+﻿{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "buildscape:big_candle"
+    },
+    {
+      "item": "minecraft:light_gray_dye"
+    }
+  ],
+  "result": {
+    "count": 1,
+    "item": "buildscape:big_light_gray_candle"
+  }
+}

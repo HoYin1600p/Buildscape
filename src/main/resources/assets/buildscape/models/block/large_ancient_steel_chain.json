@@ -1,0 +1,6 @@
+{
+  "parent": "buildscape:block/large_chain",
+  "textures": {
+    "texture": "buildscape:block/large_ancient_steel_chain"
+  }
+}

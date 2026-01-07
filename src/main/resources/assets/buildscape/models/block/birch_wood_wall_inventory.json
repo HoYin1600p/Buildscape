@@ -1,0 +1,7 @@
+{
+  "textures": {
+    "wall": "minecraft:block/birch_log"
+  },
+  "parent": "minecraft:block/wall_inventory"
+}
+

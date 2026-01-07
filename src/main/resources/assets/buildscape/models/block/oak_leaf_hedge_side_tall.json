@@ -1,0 +1,7 @@
+{
+  "parent": "buildscape:block/template_wall_side_tall_tinted",
+  "textures": {
+    "wall": "minecraft:block/oak_leaves",
+    "tint": "minecraft:block/oak_leaves"
+  }
+}

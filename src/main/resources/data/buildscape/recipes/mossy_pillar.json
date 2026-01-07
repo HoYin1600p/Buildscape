@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "S",
+    "V"
+  ],
+  "key": {
+    "S": {
+      "item": "buildscape:stone_pillar"
+    },
+    "V": {
+      "item": "minecraft:vine"
+    }
+  },
+  "result": {
+    "item": "buildscape:mossy_pillar"
+  }
+}

@@ -1,8 +1,0 @@
-{
-  "parent": "minecraft:block/slab",
-  "textures": {
-    "bottom": "buildscape:block/red_smooth_sandstone",
-    "top": "buildscape:block/red_smooth_sandstone",
-    "side": "buildscape:block/red_smooth_sandstone"
-  }
-}

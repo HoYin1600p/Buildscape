@@ -1,9 +1,0 @@
-{
-  "type": "minecraft:stonecutting",
-  "ingredient": {
-    "item": "buildscape:bit_oxidized_copper_block"
-  },
-  "result": "buildscape:bit_oxidized_cut_copper_slab",
-  "count": 2
-}
-

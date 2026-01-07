@@ -1,8 +1,0 @@
-{
-  "parent": "minecraft:block/slab",
-  "textures": {
-    "bottom": "buildscape:block/moss_block",
-    "top": "buildscape:block/moss_block",
-    "side": "buildscape:block/moss_block"
-  }
-}

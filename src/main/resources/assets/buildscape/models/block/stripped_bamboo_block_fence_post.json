@@ -1,6 +1,0 @@
-{
-  "parent": "block/fence_post",
-  "textures": {
-    "texture": "buildscape:block/stripped_bamboo_block"
-  }
-}

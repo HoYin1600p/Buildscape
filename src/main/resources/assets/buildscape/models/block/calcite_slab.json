@@ -1,8 +1,0 @@
-{
-  "parent": "minecraft:block/slab",
-  "textures": {
-    "bottom": "buildscape:block/calcite",
-    "top": "buildscape:block/calcite",
-    "side": "buildscape:block/calcite"
-  }
-}

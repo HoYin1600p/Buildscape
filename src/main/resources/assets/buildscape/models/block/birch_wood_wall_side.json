@@ -1,7 +1,0 @@
-{
-  "textures": {
-    "wall": "minecraft:block/birch_log"
-  },
-  "parent": "minecraft:block/template_wall_side"
-}
-

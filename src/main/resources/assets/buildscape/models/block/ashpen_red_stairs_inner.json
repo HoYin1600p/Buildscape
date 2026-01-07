@@ -1,8 +1,0 @@
-{
-  "parent": "minecraft:block/inner_stairs",
-  "textures": {
-    "bottom": "buildscape:block/ashpen_red_planks",
-    "top": "buildscape:block/ashpen_red_planks",
-    "side": "buildscape:block/ashpen_red_planks"
-  }
-}

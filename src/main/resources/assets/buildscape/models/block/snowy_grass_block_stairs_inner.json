@@ -1,9 +1,0 @@
-{
-  "parent": "minecraft:block/inner_stairs",
-  "textures": {
-    "bottom": "minecraft:block/dirt",
-    "top": "buildscape:block/snowy_grass_block_top",
-    "side": "buildscape:block/snowy_grass_block_snow"
-  }
-}
-

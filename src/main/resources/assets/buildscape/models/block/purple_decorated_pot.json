@@ -1,9 +1,0 @@
-﻿{
-  "parent": "buildscape:block/decorated_pot",
-  "textures": {
-    "particle": "buildscape:block/decoratedpots/purple_side",
-    "texture": "buildscape:block/decoratedpots/purple_side",
-    "base": "buildscape:block/decoratedpots/purple_base",
-    "pattern": "buildscape:block/decoratedpots/purple_side"
-  }
-}

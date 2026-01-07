@@ -1,6 +1,0 @@
-{
-  "parent": "buildscape:block/chain_block",
-  "textures": {
-    "texture": "buildscape:block/gold_chain"
-  }
-}

@@ -1,6 +1,0 @@
-﻿{
-  "textures": {
-    "wall": "buildscape:block/stripped_bamboo_block"
-  },
-  "parent": "minecraft:block/wall_inventory"
-}

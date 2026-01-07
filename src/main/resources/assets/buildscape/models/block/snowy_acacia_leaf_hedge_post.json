@@ -1,7 +1,0 @@
-{
-  "parent": "buildscape:block/template_wall_post_tinted",
-  "textures": {
-    "wall": "buildscape:block/snowy_acacia_leaves",
-    "tint": "buildscape:block/snowy_acacia_leaves"
-  }
-}

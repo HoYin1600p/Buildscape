@@ -1,7 +1,0 @@
-﻿{
-  "textures": {
-    "particle": "minecraft:block/black_wool",
-    "texture": "minecraft:block/black_wool"
-  },
-  "parent": "minecraft:block/snow_height2"
-}

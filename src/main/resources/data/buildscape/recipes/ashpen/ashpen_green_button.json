@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "buildscape:ashpen_green_planks"
+    }
+  ],
+  "result": {
+    "item": "buildscape:ashpen_green_button",
+    "count": 1
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "parent": "block/pressure_plate_up",
+  "textures": {
+    "texture": "buildscape:block/ashpen_blue_planks"
+  }
+}

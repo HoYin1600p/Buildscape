@@ -1,0 +1,10 @@
+{
+  "parent": "buildscape:block/rose_vines",
+  "textures": {
+    "0": "buildscape:block/rose_vines",
+    "1": "buildscape:block/blue_roses",
+    "2": "buildscape:block/rose_vines2",
+    "particle": "buildscape:block/blue_roses"
+  }
+}
+

@@ -1,0 +1,8 @@
+{
+  "parent": "block/stairs_outer",
+  "textures": {
+    "bottom": "buildscape:block/ashpen_blue_planks",
+    "top": "buildscape:block/ashpen_blue_planks",
+    "side": "buildscape:block/ashpen_blue_planks"
+  }
+}

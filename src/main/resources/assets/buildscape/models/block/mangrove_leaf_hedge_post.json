@@ -1,0 +1,7 @@
+{
+  "parent": "buildscape:block/template_wall_post_tinted",
+  "textures": {
+    "wall": "buildscape:block/mangrove_leaves",
+    "tint": "buildscape:block/mangrove_leaves"
+  }
+}

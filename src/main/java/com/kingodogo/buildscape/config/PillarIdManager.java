@@ -460,7 +460,12 @@ public class PillarIdManager {
         String id = generatePillarId(expectedPrefix);
         PillarData newData = new PillarData(id, dimension, pos);
         pillarData.put(id, newData);
-        saveImmediate();
+        
+        // IMPORTANT: Don't save during recovery - recovery will save once at the end
+        // This prevents saving empty colors repeatedly during recovery
+        if (!recoveryInProgress) {
+            saveImmediate();
+        }
         return newData;
     }
 
@@ -726,41 +731,68 @@ public class PillarIdManager {
 
     private void loadFileAsync(MinecraftServer server) {
         try {
-            // IMPORTANT: Try backup file first (preferred for config tab)
-            // Backup file is never cleared on world load, so it preserves colors/settings
-            File backupFile = getBackupDataFile();
+            // IMPORTANT: Load from main file only (pillar-ids.dat)
+            // Backup file is separate and only saved on world save/server close
             File file = getDataFile();
             
             Map<String, PillarData> loadedData = null;
             File sourceFile = null;
             
-            // Try backup file first
-            if (backupFile.exists() && backupFile.length() > 0) {
-                try {
-                    loadedData = loadFromFile(backupFile);
-                    if (loadedData != null && !loadedData.isEmpty()) {
-                        sourceFile = backupFile;
-                        System.out.println("BuildScape: Loaded from backup file (preserved colors/settings)");
-                    }
-                } catch (Exception e) {
-                    System.err.println("BuildScape: Error loading backup file: " + e.getMessage());
-                }
-            }
-            
-            // If backup didn't work, try main file
-            if (loadedData == null && file.exists() && file.length() > 0) {
+            // Load from main file first
+            if (file.exists() && file.length() > 0) {
                 try {
                     loadedData = loadFromFile(file);
                     if (loadedData != null && !loadedData.isEmpty()) {
                         sourceFile = file;
-                        System.out.println("BuildScape: Loaded from main file");
+                        System.out.println("BuildScape: Loaded from main file (pillar-ids.dat)");
                     }
                 } catch (Exception e) {
                     System.err.println("BuildScape: Error loading main file: " + e.getMessage());
                 }
             }
             
-            // If both files failed or don't exist, start fresh
+            // CRITICAL: If main file has empty colors, try backup file (backup is preferred for GUI)
+            // Check if main file has colors
+            boolean mainFileHasColors = false;
+            if (loadedData != null) {
+                for (PillarData data : loadedData.values()) {
+                    if (data != null && data.hasColors()) {
+                        mainFileHasColors = true;
+                        break;
+                    }
+                }
+            }
+            
+            // If main file has no colors, try backup file
+            if (!mainFileHasColors) {
+                File backupFile = getBackupDataFile();
+                if (backupFile.exists() && backupFile.length() > 0) {
+                    try {
+                        Map<String, PillarData> backupData = loadFromFile(backupFile);
+                        if (backupData != null && !backupData.isEmpty()) {
+                            // Check if backup has colors
+                            boolean backupHasColors = false;
+                            for (PillarData data : backupData.values()) {
+                                if (data != null && data.hasColors()) {
+                                    backupHasColors = true;
+                                    break;
+                                }
+                            }
+                            
+                            // If backup has colors, use it (backup is preferred for GUI)
+                            if (backupHasColors) {
+                                loadedData = backupData;
+                                sourceFile = backupFile;
+                                System.out.println("BuildScape: Loaded from backup file (pillar-ids.bak.dat) - has colors");
+                            }
+                        }
+                    } catch (Exception e) {
+                        System.err.println("BuildScape: Error loading backup file: " + e.getMessage());
+                    }
+                }
+            }
+            
+            // If file failed or doesn't exist, start fresh
             if (loadedData == null || loadedData.isEmpty()) {
                 fileWasDeleted = true;
                 pillarData.clear();
@@ -814,16 +846,6 @@ public class PillarIdManager {
                 // If file has empty colors but manager has colors, preserve manager colors
                 Map<String, PillarData> existingData = new HashMap<>(pillarData);
                 
-                int existingCount = existingData.size();
-                int existingColorsCount = 0;
-                for (PillarData data : existingData.values()) {
-                    if (data != null && data.hasColors()) {
-                        existingColorsCount++;
-                    }
-                }
-                
-                System.out.println("BuildScape: Loading pillar data from file - existing in memory: " + existingCount + " entries, " + existingColorsCount + " with colors");
-                
                 pillarData.clear();
                 if (loaded != null && !loaded.isEmpty()) {
                     int migrated = 0;
@@ -846,23 +868,34 @@ public class PillarIdManager {
                                 needsMigration = true;
                             }
 
-                            if (data.dyeColors == null) {
-                                data.dyeColors = new ArrayList<>();
-                                needsMigration = true;
+                            // CRITICAL: Preserve colors from file - file is the source of truth for GUI
+                            // GSON should have populated data.dyeColors from JSON
+                            // Save the original GSON-deserialized colors IMMEDIATELY
+                            List<String> originalFileColors = null;
+                            if (data.dyeColors != null) {
+                                // GSON deserialized something - preserve it exactly as-is
+                                originalFileColors = new ArrayList<>(data.dyeColors);
                             }
-
-                            // IMPORTANT: ALWAYS preserve manager colors if they exist
-                            // File might have empty colors due to recovery or other issues
+                            
                             PillarData existing = existingData.get(id);
-                            if (existing != null && existing.hasColors()) {
-                                // Manager has colors - ALWAYS use them, even if file has colors
-                                // This ensures colors synced from NBT are never lost
-                                data.dyeColors = new ArrayList<>(existing.dyeColors);
-                                if (data.dyeColors.size() != (existing.dyeColors == null ? 0 : existing.dyeColors.size())) {
-                                    System.out.println("BuildScape: Preserved " + data.dyeColors.size() + 
-                                        " colors from manager for " + id + " (overriding file colors)");
+                            
+                            // CRITICAL: File colors take absolute priority - use them if they exist
+                            if (originalFileColors != null && !originalFileColors.isEmpty()) {
+                                // File has colors - ALWAYS use them, ignore everything else
+                                data.dyeColors = originalFileColors;
+                            } else {
+                                // File is empty or null - initialize and check manager
+                                if (data.dyeColors == null) {
+                                    data.dyeColors = new ArrayList<>();
+                                    needsMigration = true;
+                                }
+                                
+                                // Use manager colors if they exist
+                                if (existing != null && existing.hasColors() && existing.dyeColors != null) {
+                                    data.dyeColors = new ArrayList<>(existing.dyeColors);
                                 }
                             }
+                            // If both are empty, keep empty (will sync from NBT later)
 
                             try {
                                 BlockPos pos = data.getBlockPos();
@@ -878,6 +911,17 @@ public class PillarIdManager {
                             if (!id.matches("^[MSDQ]-P[a-z0-9]{4}$")) {
                                 skipped++;
                                 continue;
+                            }
+
+                            // FINAL SAFEGUARD: Ensure colors are preserved before putting into map
+                            // Double-check that colors are set (file colors take priority)
+                            if (data.dyeColors == null || data.dyeColors.isEmpty()) {
+                                // If colors are empty, check if we have original file colors
+                                if (originalFileColors != null && !originalFileColors.isEmpty()) {
+                                    data.dyeColors = new ArrayList<>(originalFileColors);
+                                } else if (data.dyeColors == null) {
+                                    data.dyeColors = new ArrayList<>();
+                                }
                             }
 
                             pillarData.put(id, data);
@@ -922,7 +966,6 @@ public class PillarIdManager {
                             colorsCount++;
                         }
                     }
-                    System.out.println("BuildScape: Loaded " + loadedCount + " pillar entries from file, " + colorsCount + " with colors");
                     
                     // Track if we had colors when we loaded
                     hadColorsOnLoad = (colorsCount > 0);
@@ -947,12 +990,11 @@ public class PillarIdManager {
 
                 updateCachedWorldDir();
                 
-                // IMPORTANT: Don't load colors from NBT immediately after file load
-                // Block entities might not be loaded yet, which would clear colors
-                // Colors are loaded from file and will be synced from NBT when needed
-                // (e.g., when GUI opens or when colors are added)
+                // IMPORTANT: Don't sync from NBT here - block entities might not be loaded yet
+                // Colors will be synced from NBT during recovery or when GUI opens
+                // This prevents clearing colors before block entities are ready
                 
-                // Schedule recovery to run after world load (to add any missing pillars)
+                // Schedule recovery to run after world load (to add any missing pillars and sync colors)
                 scheduleRecoveryAfterLoad();
 
         } catch (Exception e) {
@@ -1399,72 +1441,45 @@ public class PillarIdManager {
                 }
             }
             
-            // SAFEGUARD: If we had colors on load but now all colors are empty, don't save
-            // This prevents accidentally overwriting the file with empty colors
-            if (hadColorsOnLoad && colorsCount == 0 && saveCount > 0) {
-                System.err.println("BuildScape: WARNING - Attempted to save empty colors when file had colors! Reloading from file to restore colors...");
-                // Reload from backup file first (preferred), then main file
+            // SAFEGUARD: NEVER save empty colors if the file has colors
+            // This prevents recovery or other operations from clearing colors
+            if (colorsCount == 0 && saveCount > 0) {
+                // Check the file directly to see if it has colors
+                boolean fileHasColors = false;
                 try {
-                    File fileToLoad = null;
-                    File backupFile = getBackupDataFile();
                     File mainFile = getDataFile();
-                    
-                    // Try backup file first
-                    if (backupFile.exists() && backupFile.length() > 0) {
-                        fileToLoad = backupFile;
-                    } else if (mainFile.exists() && mainFile.length() > 0) {
-                        fileToLoad = mainFile;
-                    }
-                    
-                    if (fileToLoad != null) {
-                        // Reload from file
-                        try (FileInputStream fis = new FileInputStream(fileToLoad);
+                    if (mainFile.exists() && mainFile.length() > 0) {
+                        try (FileInputStream fis = new FileInputStream(mainFile);
                              InputStreamReader isr = new InputStreamReader(fis, StandardCharsets.UTF_8);
                              BufferedReader reader = new BufferedReader(isr)) {
                             Type type = new TypeToken<Map<String, PillarData>>() {}.getType();
-                            Map<String, PillarData> loaded = GSON.fromJson(reader, type);
-                            
-                            if (loaded != null && !loaded.isEmpty()) {
-                                // Restore colors from file
-                                for (Map.Entry<String, PillarData> entry : loaded.entrySet()) {
-                                    String id = entry.getKey();
-                                    PillarData fileData = entry.getValue();
-                                    PillarData currentData = pillarData.get(id);
-                                    
-                                    if (currentData != null && fileData != null && 
-                                        fileData.hasColors() && !currentData.hasColors()) {
-                                        // Restore colors from file
-                                        currentData.clearColors();
-                                        for (String color : fileData.dyeColors) {
-                                            if (color != null && !color.isEmpty()) {
-                                                currentData.addColor(color);
-                                            }
-                                        }
-                                        System.out.println("BuildScape: Restored colors for " + id + " from file");
-                                    }
-                                }
-                                
-                                // Recalculate colors count
-                                colorsCount = 0;
-                                for (PillarData data : pillarData.values()) {
+                            Map<String, PillarData> fileData = GSON.fromJson(reader, type);
+                            if (fileData != null) {
+                                for (PillarData data : fileData.values()) {
                                     if (data != null && data.hasColors()) {
-                                        colorsCount++;
+                                        fileHasColors = true;
+                                        break;
                                     }
                                 }
-                                System.out.println("BuildScape: Restored colors - now have " + colorsCount + " entries with colors");
                             }
                         }
                     }
                 } catch (Exception e) {
-                    System.err.println("BuildScape: Error reloading colors from file: " + e.getMessage());
+                    // Ignore - allow save to proceed if we can't check file
+                }
+                
+                // NEVER save empty colors if file has colors - this prevents data loss
+                if (fileHasColors) {
+                    // Reload from file to restore colors
+                    load();
+                    return; // Don't save empty colors - this prevents overwriting file with empty colors
                 }
             }
             
             System.out.println("BuildScape: Saving " + saveCount + " pillar entries to file, " + colorsCount + " with colors");
 
-            // Save to both main file and backup file
+            // Save to main file only (backup file is saved separately on world save/server close)
             saveToFile(getDataFile(), FILE_NAME);
-            saveToFile(getBackupDataFile(), BACKUP_FILE_NAME);
             
             // Update timestamps from main file
             File mainFile = getDataFile();
@@ -1536,18 +1551,46 @@ public class PillarIdManager {
     }
 
     public void checkAndReload() {
-        // Check backup file first (preferred for config tab)
-        File backupFile = getBackupDataFile();
+        // Check main file only (backup file is separate, only saved on world save/server close)
         File mainFile = getDataFile();
         
-        File fileToCheck = backupFile.exists() ? backupFile : mainFile;
-        
-        if (fileToCheck.exists()) {
-            long currentModified = fileToCheck.lastModified();
-            long currentSize = fileToCheck.length();
+        if (mainFile.exists()) {
+            long currentModified = mainFile.lastModified();
+            long currentSize = mainFile.length();
             if (currentModified != lastLoadedTime || currentSize != lastFileSize) {
                 load();
             }
+        }
+    }
+    
+    /**
+     * Save the backup file (only called on world save/server close).
+     */
+    public void saveBackupFile() {
+        try {
+            MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
+            if (server == null || !server.isRunning()) {
+                return;
+            }
+            
+            if (!hasLoaded) {
+                return;
+            }
+            
+            int saveCount = pillarData.size();
+            int colorsCount = 0;
+            for (PillarData data : pillarData.values()) {
+                if (data != null && data.hasColors()) {
+                    colorsCount++;
+                }
+            }
+            
+            System.out.println("BuildScape: Saving backup file with " + saveCount + " pillar entries, " + colorsCount + " with colors");
+            
+            // Save to backup file only
+            saveToFile(getBackupDataFile(), BACKUP_FILE_NAME);
+        } catch (Throwable t) {
+            System.err.println("BuildScape: Error saving backup file: " + t.getMessage());
         }
     }
 
@@ -1981,7 +2024,35 @@ public class PillarIdManager {
     }
     
     public Map<String, PillarData> copyDataSnapshot() {
-        return new HashMap<>(pillarData);
+        // Create a deep copy to ensure colors are preserved
+        Map<String, PillarData> snapshot = new HashMap<>();
+        for (Map.Entry<String, PillarData> entry : pillarData.entrySet()) {
+            PillarData original = entry.getValue();
+            if (original != null) {
+                PillarData copy = new PillarData();
+                copy.id = original.id;
+                copy.dimension = original.dimension;
+                copy.x = original.x;
+                copy.y = original.y;
+                copy.z = original.z;
+                copy.createdTime = original.createdTime;
+                copy.modifiedTime = original.modifiedTime;
+                copy.pattern = original.pattern;
+                copy.pattern_speed = original.pattern_speed;
+                copy.pattern_spread = original.pattern_spread;
+                copy.pattern_intensity = original.pattern_intensity;
+                copy.max_particle_color = original.max_particle_color;
+                copy.use_pattern = original.use_pattern;
+                // Deep copy colors list
+                if (original.dyeColors != null && !original.dyeColors.isEmpty()) {
+                    copy.dyeColors = new ArrayList<>(original.dyeColors);
+                } else {
+                    copy.dyeColors = new ArrayList<>();
+                }
+                snapshot.put(entry.getKey(), copy);
+            }
+        }
+        return snapshot;
     }
 
     public void replaceAllPillarData(Map<String, PillarData> newData) {

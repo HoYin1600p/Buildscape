@@ -23,6 +23,7 @@ public class PillarBlockEntity extends BlockEntity {
     private Double patternSpeed = null;
     private Double patternSpread = null;
     private Double patternIntensity = null;
+    private Integer maxParticleColor = null; // Max number of colors for this pillar (1-5, null means use global config)
 
     private String pillarId = null;
 
@@ -191,8 +192,9 @@ public class PillarBlockEntity extends BlockEntity {
             }
         } else {
             // Data is null - pillar ID was removed from manager OR doesn't exist yet
-            // If colors exist in NBT and pillarId matches, sync colors TO manager
-            // This ensures manager has all colors from NBT after world load
+            // IMPORTANT: NEVER clear colors that exist in NBT
+            // Colors loaded from NBT are the source of truth for rendering
+            // Only sync colors TO manager if they exist in NBT
             if (this.pillarId != null && this.pillarId.equals(idToSync) && 
                 this.particleColors != null && !this.particleColors.isEmpty()) {
                 // Colors exist in NBT but manager doesn't have them - sync TO manager
@@ -204,18 +206,43 @@ public class PillarBlockEntity extends BlockEntity {
                 }
                 // If the ID matches, sync colors FROM NBT TO manager
                 if (newData != null && newData.id.equals(idToSync)) {
-                    // Clear manager colors and add all colors from NBT
-                    newData.clearColors();
-                    for (String color : this.particleColors) {
-                        if (color != null && !color.isEmpty()) {
-                            newData.addColor(color);
+                    // Only sync if manager doesn't have colors or has different colors
+                    boolean needsSync = false;
+                    if (!newData.hasColors()) {
+                        needsSync = true;
+                    } else {
+                        // Check if colors differ
+                        java.util.List<String> managerColors = newData.getColors();
+                        if (managerColors.size() != this.particleColors.size()) {
+                            needsSync = true;
+                        } else {
+                            for (int i = 0; i < this.particleColors.size(); i++) {
+                                String nbtColor = this.particleColors.get(i);
+                                String managerColor = i < managerColors.size() ? managerColors.get(i) : null;
+                                if (nbtColor == null || managerColor == null || !nbtColor.equals(managerColor)) {
+                                    needsSync = true;
+                                    break;
+                                }
+                            }
                         }
                     }
-                    manager.saveImmediate();
+                    
+                    if (needsSync) {
+                        // Sync colors FROM NBT TO manager
+                        newData.clearColors();
+                        for (String color : this.particleColors) {
+                            if (color != null && !color.isEmpty()) {
+                                newData.addColor(color);
+                            }
+                        }
+                        // Don't save immediately during sync - let recovery or explicit saves handle it
+                        System.out.println("BuildScape: Synced " + this.particleColors.size() + 
+                            " colors from NBT to manager for " + idToSync);
+                    }
                 }
             }
-            // DO NOT clear colors here - only the reset handler should clear colors
-            // This preserves colors loaded from NBT on world load
+            // DO NOT clear colors here - colors loaded from NBT are preserved
+            // Only the reset handler should clear colors
         }
     }
     
@@ -339,6 +366,8 @@ public class PillarBlockEntity extends BlockEntity {
             PillarIdManager manager = PillarIdManager.get();
             try {
                 manager.load();
+                // Colors are loaded from NBT for rendering - no need to sync to manager here
+                // Manager file is only updated when colors are changed via GUI or world save
             } catch (Exception e) {
                 // Ignore errors during load, recovery will handle it
             }
@@ -476,6 +505,15 @@ public class PillarBlockEntity extends BlockEntity {
     
     public void setPatternIntensity(Double intensity) {
         this.patternIntensity = intensity;
+        this.setChanged();
+    }
+    
+    public Integer getMaxParticleColor() {
+        return maxParticleColor;
+    }
+    
+    public void setMaxParticleColor(Integer maxColor) {
+        this.maxParticleColor = maxColor;
         this.setChanged();
     }
 
@@ -1360,6 +1398,13 @@ public class PillarBlockEntity extends BlockEntity {
         this.particleColorCounter = 0;
         this.lastParticleTick = 0;
         this.colorsInitialized = true;
+        
+        // Auto-update maxParticleColor to match current color count
+        int currentColorCount = this.particleColors.size();
+        if (this.maxParticleColor == null || this.maxParticleColor < currentColorCount) {
+            this.maxParticleColor = Math.min(currentColorCount, MAX_DYE_COLORS);
+        }
+        
         this.setChanged();
 
         return true;
@@ -1601,6 +1646,12 @@ public class PillarBlockEntity extends BlockEntity {
         } else {
             this.patternIntensity = null;
         }
+        
+        if (tag.contains("MaxParticleColor", 3)) {
+            this.maxParticleColor = tag.getInt("MaxParticleColor");
+        } else {
+            this.maxParticleColor = null;
+        }
 
         try {
             if (tag.contains("ParticleColors", 9)) {
@@ -1723,6 +1774,10 @@ public class PillarBlockEntity extends BlockEntity {
         }
         if (patternIntensity != null) {
             tag.putDouble("PatternIntensity", patternIntensity);
+        }
+        
+        if (maxParticleColor != null) {
+            tag.putInt("MaxParticleColor", maxParticleColor);
         }
 
         if (particleColors != null && !particleColors.isEmpty()) {

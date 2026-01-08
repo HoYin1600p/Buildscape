@@ -472,6 +472,15 @@ public class PillarIdDetailConfigTab extends AbstractConfigTab {
                     }
                 }
                 
+                // Update max particle color
+                if (pillarData.max_particle_color != null) {
+                    if (bottomPillarBE.getMaxParticleColor() == null || 
+                        !bottomPillarBE.getMaxParticleColor().equals(pillarData.max_particle_color)) {
+                        bottomPillarBE.setMaxParticleColor(pillarData.max_particle_color);
+                        needsUpdate = true;
+                    }
+                }
+                
                 // Update colors
                 if (pillarData.dyeColors != null && !pillarData.dyeColors.isEmpty()) {
                     java.util.List<String> nbtColors = bottomPillarBE.getParticleColors();

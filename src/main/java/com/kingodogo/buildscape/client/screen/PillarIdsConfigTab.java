@@ -119,6 +119,15 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
             manager.checkAndReload();
         } catch (Exception ignored) {}
         
+        // Sync colors FROM NBT TO manager before reading data
+        // This ensures GUI displays colors that exist in NBT but weren't in manager file
+        try {
+            net.minecraft.server.MinecraftServer server = net.minecraftforge.server.ServerLifecycleHooks.getCurrentServer();
+            if (server != null && server.isRunning() && manager.hasLoaded()) {
+                manager.syncColorsFromNBTToManager(server);
+            }
+        } catch (Exception ignored) {}
+        
         Map<String, PillarIdManager.PillarData> snapshot = manager.copyDataSnapshot();
         applySnapshot(snapshot);
         lastSignature = computeSignature(snapshot);
@@ -403,7 +412,9 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
         for (PillarRow row : rows) {
             if (row.visible) visibleRows++;
         }
-        maxScroll = Math.max(0, visibleRows * rowHeight - (tableHeight - headerHeight - BuildScapeConfigScreen.scaleSize(4)));
+        // Calculate available height for rows (from rowsStartY to bottom of content)
+        int availableRowHeight = tableHeight - headerHeight - headerSpacing;
+        maxScroll = Math.max(0, visibleRows * rowHeight - availableRowHeight);
         scrollOffset = Mth.clamp(scrollOffset, 0, maxScroll);
         
         // Header background - removed
@@ -418,13 +429,16 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
         for (int col : columns) {
             actualTableWidth += col;
         }
-        actualTableWidth += columnGap * 4; // 4 gaps between 5 columns
+        int colGap = getColumnGap();
+        actualTableWidth += colGap * 4; // 4 gaps between 5 columns
         
-        // Enable scissoring to prevent rows from rendering above the header
+        // Enable scissoring to prevent rows from rendering above the header or below the visible area
         int scissorX = tableX;
         int scissorY = rowsStartY;
         int scissorWidth = Math.min(actualTableWidth, tableWidth);
-        int scissorHeight = tableHeight - headerHeight - headerSpacing;
+        // Calculate available height for rows (from rowsStartY to bottom of table)
+        // Use the same calculation as maxScroll to ensure consistency
+        int scissorHeight = availableRowHeight;
         
         // Convert to screen coordinates for scissor (Minecraft uses bottom-left origin)
         Minecraft mc = Minecraft.getInstance();
@@ -437,15 +451,18 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
         
         com.mojang.blaze3d.systems.RenderSystem.enableScissor(scaledScissorX, scaledScissorY, scaledScissorWidth, scaledScissorHeight);
         
-        // Rows
+        // Rows - render all visible rows within the scissor area
         int rowIndex = 0;
+        int visibleAreaBottom = rowsStartY + scissorHeight; // Bottom of visible area
         for (PillarRow row : rows) {
             if (!row.visible) continue;
             int rowY = rowsStartY + rowIndex * rowHeight - (int)scrollOffset;
             
-            if (rowY + rowHeight < rowsStartY || rowY > tableY + tableHeight) {
+            // Only skip rows that are completely outside the visible area
+            // Allow rows that are partially visible (even if bottom is cut off, we want to see the top)
+            if (rowY + rowHeight < rowsStartY || rowY > visibleAreaBottom) {
                 rowIndex++;
-                continue; // Skip off-screen rows (updated to use rowsStartY instead of tableY)
+                continue; // Skip completely off-screen rows
             }
             
             // Store row bounds for double-click detection
@@ -463,7 +480,7 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
             int scrollbarGap = BuildScapeConfigScreen.scaleSize(8); // Gap between table and scrollbar
             int scrollbarX = tableX + actualTableWidth + scrollbarGap; // Position after the actual table width
             int scrollbarY = rowsStartY;
-            int scrollbarHeight = tableHeight - headerHeight - headerSpacing;
+            int scrollbarHeight = availableRowHeight; // Use same calculation as scissor
             
             // Scrollbar track
             GuiComponent.fill(poseStack, scrollbarX, scrollbarY, scrollbarX + scrollbarWidth, scrollbarY + scrollbarHeight, 0x80000000);
@@ -806,37 +823,144 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
             }
         }
         
+        /**
+         * Load colors directly from NBT/block entity for this pillar.
+         * This ensures colors show in GUI even if manager file doesn't have them.
+         * Works on both client and server side.
+         */
+        private List<String> loadColorsFromNBT(PillarIdManager.PillarData data) {
+            try {
+                Minecraft mc = Minecraft.getInstance();
+                if (mc.level == null) {
+                    return null;
+                }
+                
+                // Check if we're in the right dimension
+                String currentDimension = PillarIdManager.getDimensionKey(mc.level);
+                if (!currentDimension.equals(data.dimension)) {
+                    // Not in the right dimension - try server if available
+                    net.minecraft.server.MinecraftServer server = net.minecraftforge.server.ServerLifecycleHooks.getCurrentServer();
+                    if (server != null && server.isRunning()) {
+                        for (net.minecraft.server.level.ServerLevel level : server.getAllLevels()) {
+                            if (level == null) continue;
+                            
+                            String dimensionKey = PillarIdManager.getDimensionKey(level);
+                            if (!dimensionKey.equals(data.dimension)) {
+                                continue;
+                            }
+                            
+                            net.minecraft.core.BlockPos pos = new net.minecraft.core.BlockPos(data.x, data.y, data.z);
+                            
+                            if (!level.isLoaded(pos)) {
+                                continue;
+                            }
+                            
+                            net.minecraft.world.level.chunk.ChunkAccess chunk = level.getChunk(pos);
+                            if (!(chunk instanceof net.minecraft.world.level.chunk.LevelChunk)) {
+                                continue;
+                            }
+                            
+                            if (!chunk.getStatus().isOrAfter(net.minecraft.world.level.chunk.ChunkStatus.FULL)) {
+                                continue;
+                            }
+                            
+                            net.minecraft.world.level.block.entity.BlockEntity be = level.getBlockEntity(pos);
+                            if (!(be instanceof com.kingodogo.buildscape.block.PillarBlockEntity pillarBE)) {
+                                continue;
+                            }
+                            
+                            // Find the bottom of the stack to get the actual block entity with colors
+                            net.minecraft.core.BlockPos bottomPos = pillarBE.findStackBottom();
+                            net.minecraft.world.level.block.entity.BlockEntity bottomBE = level.getBlockEntity(bottomPos);
+                            
+                            if (!(bottomBE instanceof com.kingodogo.buildscape.block.PillarBlockEntity bottomPillarBE)) {
+                                continue;
+                            }
+                            
+                            // Get colors directly from NBT
+                            java.util.List<String> nbtColors = bottomPillarBE.getParticleColors();
+                            if (nbtColors != null && !nbtColors.isEmpty()) {
+                                return new ArrayList<>(nbtColors);
+                            }
+                        }
+                    }
+                    return null;
+                }
+                
+                // We're in the right dimension - use client world
+                net.minecraft.core.BlockPos pos = new net.minecraft.core.BlockPos(data.x, data.y, data.z);
+                
+                if (!mc.level.isLoaded(pos)) {
+                    return null;
+                }
+                
+                net.minecraft.world.level.block.entity.BlockEntity be = mc.level.getBlockEntity(pos);
+                if (!(be instanceof com.kingodogo.buildscape.block.PillarBlockEntity pillarBE)) {
+                    return null;
+                }
+                
+                // Find the bottom of the stack to get the actual block entity with colors
+                net.minecraft.core.BlockPos bottomPos = pillarBE.findStackBottom();
+                net.minecraft.world.level.block.entity.BlockEntity bottomBE = mc.level.getBlockEntity(bottomPos);
+                
+                if (!(bottomBE instanceof com.kingodogo.buildscape.block.PillarBlockEntity bottomPillarBE)) {
+                    return null;
+                }
+                
+                // Get colors directly from NBT
+                java.util.List<String> nbtColors = bottomPillarBE.getParticleColors();
+                if (nbtColors != null && !nbtColors.isEmpty()) {
+                    return new ArrayList<>(nbtColors);
+                }
+            } catch (Exception e) {
+                // Silently fail - will fall back to manager data
+                System.err.println("BuildScape: Error loading colors from NBT for " + (data != null ? data.id : "unknown") + ": " + e.getMessage());
+            }
+            
+            return null;
+        }
+        
         private void apply(PillarIdManager.PillarData data) {
             this.id = data.id;
             idField.setValue(data.id != null ? data.id : "");
             
-            // Update color swatches
-            List<String> colors = data.dyeColors != null ? data.dyeColors : Collections.emptyList();
-            // Remove excess swatches
-            while (colorSwatches.size() > colors.size()) {
-                colorSwatches.remove(colorSwatches.size() - 1);
+            // IMPORTANT: Load colors directly from NBT/block entity, not from manager file
+            // This ensures colors show even if file doesn't have them
+            List<String> colors = loadColorsFromNBT(data);
+            
+            // Debug logging
+            if (colors != null && !colors.isEmpty()) {
+                System.out.println("BuildScape: Loaded " + colors.size() + " colors from NBT for " + data.id);
+            } else {
+                // If NBT doesn't have colors, fall back to manager data
+                colors = data.dyeColors != null ? data.dyeColors : Collections.emptyList();
+                if (!colors.isEmpty()) {
+                    System.out.println("BuildScape: Using " + colors.size() + " colors from manager for " + data.id);
+                } else {
+                    System.out.println("BuildScape: No colors found for " + data.id + " (NBT or manager)");
+                }
             }
-            // Update existing swatches and add new ones
+            
+            // Clear all existing swatches first
+            colorSwatches.clear();
+            
+            // Create swatches for all colors
             for (int i = 0; i < colors.size(); i++) {
                 String colorCode = colors.get(i);
                 int color = 0xFFFFFF;
                 try {
-                    if (colorCode.startsWith("#") && colorCode.length() == 7) {
+                    if (colorCode != null && colorCode.startsWith("#") && colorCode.length() == 7) {
                         color = Integer.parseInt(colorCode.substring(1), 16);
                     }
                 } catch (NumberFormatException e) {
                     // Use default white
                 }
                 
-                if (i < colorSwatches.size()) {
-                    colorSwatches.get(i).setColor(color);
-                } else {
-                    ColorSwatchButton swatch = new ColorSwatchButton(
-                        0, 0, 20, 20, color,
-                        (btn) -> {} // Display-only, no click action
-                    );
-                    colorSwatches.add(swatch);
-                }
+                ColorSwatchButton swatch = new ColorSwatchButton(
+                    0, 0, BuildScapeConfigScreen.scaleSize(20), BuildScapeConfigScreen.scaleSize(20), color,
+                    (btn) -> {} // Display-only, no click action
+                );
+                colorSwatches.add(swatch);
             }
             
             dimensionField.setValue(data.dimension != null ? data.dimension : "minecraft:overworld");

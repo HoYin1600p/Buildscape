@@ -106,6 +106,12 @@ public class PillarBlockEntity extends BlockEntity {
         // (Original behavior preserved for performance, but now allows forced updates)
 
         PillarIdManager manager = PillarIdManager.get();
+        
+        // IMPORTANT: Don't sync (or clear colors) until manager has loaded
+        // Otherwise, colors loaded from NBT will be cleared before manager loads
+        if (!manager.hasLoaded()) {
+            return;
+        }
         String expectedPrefix = PillarIdManager.getVariantPrefix(
                 level,
                 worldPosition
@@ -139,28 +145,6 @@ public class PillarBlockEntity extends BlockEntity {
         }
 
         PillarIdManager.PillarData data = manager.getPillarData(idToSync);
-
-        // If the pillar ID was removed from the manager, reset this pillar to default state
-        if (data == null && this.pillarId != null && this.pillarId.equals(idToSync)) {
-            // Pillar ID exists locally but was removed from manager - reset to fresh state
-            this.particleColors = null;
-            this.particlePattern = null;
-            this.patternSpeed = null;
-            this.patternSpread = null;
-            this.patternIntensity = null;
-            this.pillarId = null;
-            this.colorsInitialized = false;
-            this.particleColorCounter = 0;
-            this.lastParticleTick = 0L;
-            this.setChanged();
-            level.sendBlockUpdated(
-                    worldPosition,
-                    getBlockState(),
-                    getBlockState(),
-                    3
-            );
-            return;
-        }
 
         if (data != null && data.hasColors()) {
             java.util.List<String> managerColors = data.getColors();
@@ -206,19 +190,32 @@ public class PillarBlockEntity extends BlockEntity {
                 );
             }
         } else {
-            if (this.particleColors == null || this.particleColors.isEmpty()) {
-                this.pillarId = null;
-                this.particleColors = null;
-                this.colorsInitialized = false;
-                this.particleColorCounter = 0;
-                this.setChanged();
-                level.sendBlockUpdated(
-                        worldPosition,
-                        getBlockState(),
-                        getBlockState(),
-                        3
-                );
+            // Data is null - pillar ID was removed from manager OR doesn't exist yet
+            // If colors exist in NBT and pillarId matches, sync colors TO manager
+            // This ensures manager has all colors from NBT after world load
+            if (this.pillarId != null && this.pillarId.equals(idToSync) && 
+                this.particleColors != null && !this.particleColors.isEmpty()) {
+                // Colors exist in NBT but manager doesn't have them - sync TO manager
+                BlockPos bottomPos = findStackBottom();
+                PillarIdManager.PillarData newData = manager.getPillarDataByPosition(level, bottomPos);
+                if (newData == null) {
+                    // Create new data entry at bottom position
+                    newData = manager.getOrCreatePillarData(level, bottomPos);
+                }
+                // If the ID matches, sync colors FROM NBT TO manager
+                if (newData != null && newData.id.equals(idToSync)) {
+                    // Clear manager colors and add all colors from NBT
+                    newData.clearColors();
+                    for (String color : this.particleColors) {
+                        if (color != null && !color.isEmpty()) {
+                            newData.addColor(color);
+                        }
+                    }
+                    manager.saveImmediate();
+                }
             }
+            // DO NOT clear colors here - only the reset handler should clear colors
+            // This preserves colors loaded from NBT on world load
         }
     }
     
@@ -260,6 +257,13 @@ public class PillarBlockEntity extends BlockEntity {
         }
 
         PillarIdManager manager = PillarIdManager.get();
+        
+        // IMPORTANT: Don't sync until manager has loaded
+        // Otherwise, patterns loaded from NBT might be overwritten
+        if (!manager.hasLoaded()) {
+            return;
+        }
+        
         String expectedPrefix = PillarIdManager.getVariantPrefix(
                 level,
                 worldPosition
@@ -330,6 +334,15 @@ public class PillarBlockEntity extends BlockEntity {
     @Override
     public void onLoad() {
         super.onLoad();
+        // Force manager to load when block entity loads to ensure removal detection works immediately
+        if (level != null && !level.isClientSide) {
+            PillarIdManager manager = PillarIdManager.get();
+            try {
+                manager.load();
+            } catch (Exception e) {
+                // Ignore errors during load, recovery will handle it
+            }
+        }
     }
 
     private void syncPatternFromStack() {
@@ -437,6 +450,33 @@ public class PillarBlockEntity extends BlockEntity {
         }
 
         return null;
+    }
+    
+    public Double getPatternSpeed() {
+        return patternSpeed;
+    }
+    
+    public Double getPatternSpread() {
+        return patternSpread;
+    }
+    
+    public Double getPatternIntensity() {
+        return patternIntensity;
+    }
+    
+    public void setPatternSpeed(Double speed) {
+        this.patternSpeed = speed;
+        this.setChanged();
+    }
+    
+    public void setPatternSpread(Double spread) {
+        this.patternSpread = spread;
+        this.setChanged();
+    }
+    
+    public void setPatternIntensity(Double intensity) {
+        this.patternIntensity = intensity;
+        this.setChanged();
     }
 
     public void setParticlePattern(String pattern) {
@@ -962,7 +1002,7 @@ public class PillarBlockEntity extends BlockEntity {
         return "#FFFFFF";
     }
 
-    private BlockPos findStackBottom() {
+    public BlockPos findStackBottom() {
         if (level == null) return worldPosition;
 
         if (
@@ -1286,6 +1326,18 @@ public class PillarBlockEntity extends BlockEntity {
                 }
             }
 
+            // IMPORTANT: Sync existing colors FROM NBT TO manager before adding new color
+            // This ensures manager has all colors that exist in NBT (from world load)
+            if (this.particleColors != null && !this.particleColors.isEmpty()) {
+                // Clear manager colors and add all colors from NBT
+                data.clearColors();
+                for (String existingColor : this.particleColors) {
+                    if (existingColor != null && !existingColor.isEmpty()) {
+                        data.addColor(existingColor);
+                    }
+                }
+            }
+
             if (data.getColorCount() >= MAX_DYE_COLORS) {
                 return false;
             }
@@ -1407,9 +1459,11 @@ public class PillarBlockEntity extends BlockEntity {
     }
 
     /**
-     * Resets the pillar to default appearance (clears colors and pattern) as if freshly placed.
-     * Used when a pillar ID is removed from the config to reset its visual state.
-     * Keeps the displayed item but clears all custom particle settings.
+     * Resets the pillar to default appearance (freshly placed state).
+     * Clears all custom particle colors, patterns, and settings.
+     * Removes the pillar ID association completely.
+     * Keeps the displayed item intact.
+     * This is called when a pillar ID is removed from the manager.
      */
     public void resetToDefaultAppearance() {
         // Clear all custom particle settings
@@ -1418,21 +1472,26 @@ public class PillarBlockEntity extends BlockEntity {
         this.patternSpeed = null;
         this.patternSpread = null;
         this.patternIntensity = null;
+        this.pillarId = null; // Remove pillar ID association - make it freshly placed
         this.particleColorCounter = 0;
         this.colorsInitialized = false;
-        this.pillarId = null; // Clear the pillar ID so it acts like a fresh pillar
         this.lastParticleTick = 0L; // Reset particle tick to restart particle effects immediately
         
-        // Mark as changed and sync to clients
+        // Mark as changed so NBT is saved
+        // When saveAdditional is called, it won't write null fields, effectively removing them from NBT
         this.setChanged();
         
+        // Force immediate save and sync
         if (level != null && !level.isClientSide) {
-            // Send update to clients - this triggers getUpdatePacket() which calls getUpdateTag()
+            // Mark chunk as needing save - this ensures NBT is written with cleared values
+            if (level.getChunkAt(worldPosition) != null) {
+                level.getChunkAt(worldPosition).setUnsaved(true);
+            }
+            
+            // Force block update to sync changes to clients immediately
+            // This sends the update packet which includes the cleared NBT
             BlockState state = getBlockState();
             level.sendBlockUpdated(worldPosition, state, state, 3);
-            
-            // Mark chunk as needing save
-            level.getChunkAt(worldPosition).setUnsaved(true);
         }
     }
 

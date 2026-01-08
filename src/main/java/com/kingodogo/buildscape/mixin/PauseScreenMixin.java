@@ -1,16 +1,26 @@
 package com.kingodogo.buildscape.mixin;
 
 import com.kingodogo.buildscape.client.screen.BuildScapeConfigScreen;
+import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.PauseScreen;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.TranslatableComponent;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(PauseScreen.class)
-public abstract class PauseScreenMixin {
+public abstract class PauseScreenMixin extends Screen {
+    protected PauseScreenMixin() {
+        super(null);
+    }
+    
+    @Shadow
+    protected abstract <T extends AbstractWidget> T addRenderableWidget(T widget);
+    
     @Inject(method = "init", at = @At("TAIL"))
     private void addBuildScapeConfigButton(CallbackInfo ci) {
         PauseScreen screen = (PauseScreen)(Object)this;
@@ -29,8 +39,8 @@ public abstract class PauseScreenMixin {
             (button) -> net.minecraft.client.Minecraft.getInstance().setScreen(new BuildScapeConfigScreen(screen))
         );
         
-        // Use Screen's helper to ensure the button is both rendered and clickable
-        ((ScreenAccessor)(Object)this).buildscape$addRenderableWidget(configButton);
+        // Add the button using shadow method
+        this.addRenderableWidget(configButton);
     }
 }
 

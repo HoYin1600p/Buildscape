@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "waterlogged=false": {
+      "model": "buildscape:block/muddy_mangrove_roots"
+    },
+    "waterlogged=true": {
+      "model": "buildscape:block/muddy_mangrove_roots"
+    }
+  }
+}

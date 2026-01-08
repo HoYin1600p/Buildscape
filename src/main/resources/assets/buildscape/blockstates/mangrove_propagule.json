@@ -1,0 +1,46 @@
+{
+  "variants": {
+    "age=0,stage=0,hanging=false,waterlogged=false": {
+      "model": "buildscape:block/mangrove_propagule"
+    },
+    "age=0,stage=0,hanging=false,waterlogged=true": {
+      "model": "buildscape:block/mangrove_propagule"
+    },
+    "age=0,stage=1,hanging=false,waterlogged=false": {
+      "model": "buildscape:block/mangrove_propagule"
+    },
+    "age=0,stage=1,hanging=false,waterlogged=true": {
+      "model": "buildscape:block/mangrove_propagule"
+    },
+    "age=0,stage=0,hanging=true,waterlogged=false": {
+      "model": "buildscape:block/mangrove_propagule_hanging_0"
+    },
+    "age=0,stage=0,hanging=true,waterlogged=true": {
+      "model": "buildscape:block/mangrove_propagule_hanging_0"
+    },
+    "age=1,stage=0,hanging=true,waterlogged=false": {
+      "model": "buildscape:block/mangrove_propagule_hanging_1"
+    },
+    "age=1,stage=0,hanging=true,waterlogged=true": {
+      "model": "buildscape:block/mangrove_propagule_hanging_1"
+    },
+    "age=2,stage=0,hanging=true,waterlogged=false": {
+      "model": "buildscape:block/mangrove_propagule_hanging_2"
+    },
+    "age=2,stage=0,hanging=true,waterlogged=true": {
+      "model": "buildscape:block/mangrove_propagule_hanging_2"
+    },
+    "age=3,stage=0,hanging=true,waterlogged=false": {
+      "model": "buildscape:block/mangrove_propagule_hanging_3"
+    },
+    "age=3,stage=0,hanging=true,waterlogged=true": {
+      "model": "buildscape:block/mangrove_propagule_hanging_3"
+    },
+    "age=4,stage=0,hanging=true,waterlogged=false": {
+      "model": "buildscape:block/mangrove_propagule_hanging_4"
+    },
+    "age=4,stage=0,hanging=true,waterlogged=true": {
+      "model": "buildscape:block/mangrove_propagule_hanging_4"
+    }
+  }
+}

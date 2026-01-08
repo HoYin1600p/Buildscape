@@ -417,14 +417,59 @@ public class PillarIdManager {
     }
 
     public void removePillar(String pillarId) {
-        if (pillarId != null && pillarData.remove(pillarId) != null) {
-            saveImmediate();
+        if (pillarId != null) {
+            PillarData data = pillarData.remove(pillarId);
+            if (data != null) {
+                // Reset the pillar block entity to default state
+                resetPillarBlock(data);
+                saveImmediate();
+            }
+        }
+    }
+    
+    /**
+     * Reset a pillar block entity to its default state (no custom colors).
+     * This is called when a pillar is removed from the manager.
+     */
+    private void resetPillarBlock(PillarData data) {
+        if (data == null) {
+            return;
+        }
+        
+        try {
+            // Get the server and level for the pillar's dimension
+            MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
+            if (server == null) {
+                return;
+            }
+            
+            // Find the level for this pillar's dimension
+            for (net.minecraft.server.level.ServerLevel level : server.getAllLevels()) {
+                if (level.dimension().location().toString().equals(data.dimension)) {
+                    BlockPos pos = data.getBlockPos();
+                    
+                    // Check if the block entity exists at this position
+                    if (level.getBlockEntity(pos) instanceof com.kingodogo.buildscape.block.PillarBlockEntity pillarBE) {
+                        // Clear the pillar's custom colors
+                        pillarBE.clearParticleColors();
+                        pillarBE.setChanged();
+                        
+                        // Notify clients of the change
+                        BlockState state = level.getBlockState(pos);
+                        level.sendBlockUpdated(pos, state, state, Block.UPDATE_ALL);
+                    }
+                    break;
+                }
+            }
+        } catch (Exception e) {
+            // Silently fail if we can't reset the block (e.g., world not loaded)
         }
     }
 
     public void removePillarByPosition(Level level, BlockPos pos) {
         String dimension = getDimensionKey(level);
         String idToRemove = null;
+        PillarData dataToReset = null;
 
         for (Map.Entry<String, PillarData> entry : pillarData.entrySet()) {
             PillarData data = entry.getValue();
@@ -435,12 +480,17 @@ public class PillarIdManager {
                             data.z == pos.getZ()
             ) {
                 idToRemove = entry.getKey();
+                dataToReset = data;
                 break;
             }
         }
 
         if (idToRemove != null) {
             pillarData.remove(idToRemove);
+            // Reset the pillar block entity to default state
+            if (dataToReset != null) {
+                resetPillarBlock(dataToReset);
+            }
             saveImmediate();
         }
     }

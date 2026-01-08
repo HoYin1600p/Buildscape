@@ -429,10 +429,11 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
             rowIndex++;
         }
         
-        // Draw scrollbar if needed
+        // Draw scrollbar if needed - position at the right edge of the table
         if (maxScroll > 0) {
             int scrollbarWidth = BuildScapeConfigScreen.scaleSize(6);
-            int scrollbarX = contentX + contentWidth - tableMargin - scrollbarWidth;
+            int scrollbarGap = BuildScapeConfigScreen.scaleSize(8); // Gap between table and scrollbar
+            int scrollbarX = tableX + tableWidth + scrollbarGap; // Position after the table
             int scrollbarY = rowsStartY;
             int scrollbarHeight = tableHeight - headerHeight - headerSpacing;
             

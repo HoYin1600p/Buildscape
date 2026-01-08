@@ -412,15 +412,40 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
         // drawTableBorder(poseStack, tableX, tableY, tableWidth, tableHeight);
         drawHeader(poseStack, tableX, tableY, columns);
         
+        // Calculate actual table width from columns for scrollbar positioning
+        // Sum all columns + gaps between them (4 gaps for 5 columns)
+        int actualTableWidth = 0;
+        for (int col : columns) {
+            actualTableWidth += col;
+        }
+        actualTableWidth += columnGap * 4; // 4 gaps between 5 columns
+        
+        // Enable scissoring to prevent rows from rendering above the header
+        int scissorX = tableX;
+        int scissorY = rowsStartY;
+        int scissorWidth = Math.min(actualTableWidth, tableWidth);
+        int scissorHeight = tableHeight - headerHeight - headerSpacing;
+        
+        // Convert to screen coordinates for scissor (Minecraft uses bottom-left origin)
+        Minecraft mc = Minecraft.getInstance();
+        double guiScale = mc.getWindow().getGuiScale();
+        int windowHeight = mc.getWindow().getHeight();
+        int scaledScissorX = (int)(scissorX * guiScale);
+        int scaledScissorY = (int)(windowHeight - (scissorY + scissorHeight) * guiScale);
+        int scaledScissorWidth = (int)(scissorWidth * guiScale);
+        int scaledScissorHeight = (int)(scissorHeight * guiScale);
+        
+        com.mojang.blaze3d.systems.RenderSystem.enableScissor(scaledScissorX, scaledScissorY, scaledScissorWidth, scaledScissorHeight);
+        
         // Rows
         int rowIndex = 0;
         for (PillarRow row : rows) {
             if (!row.visible) continue;
             int rowY = rowsStartY + rowIndex * rowHeight - (int)scrollOffset;
             
-            if (rowY + rowHeight < tableY || rowY > tableY + tableHeight) {
+            if (rowY + rowHeight < rowsStartY || rowY > tableY + tableHeight) {
                 rowIndex++;
-                continue; // Skip off-screen rows
+                continue; // Skip off-screen rows (updated to use rowsStartY instead of tableY)
             }
             
             // Store row bounds for double-click detection
@@ -429,11 +454,14 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
             rowIndex++;
         }
         
-        // Draw scrollbar if needed - position at the right edge of the table
+        // Disable scissoring after rendering rows
+        com.mojang.blaze3d.systems.RenderSystem.disableScissor();
+        
+        // Draw scrollbar if needed - position at the right edge of actual table
         if (maxScroll > 0) {
             int scrollbarWidth = BuildScapeConfigScreen.scaleSize(6);
             int scrollbarGap = BuildScapeConfigScreen.scaleSize(8); // Gap between table and scrollbar
-            int scrollbarX = tableX + tableWidth + scrollbarGap; // Position after the table
+            int scrollbarX = tableX + actualTableWidth + scrollbarGap; // Position after the actual table width
             int scrollbarY = rowsStartY;
             int scrollbarHeight = tableHeight - headerHeight - headerSpacing;
             

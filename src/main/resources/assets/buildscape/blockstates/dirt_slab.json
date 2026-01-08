@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "buildscape:block/dirt_slab"
+    },
+    "type=top": {
+      "model": "buildscape:block/dirt_slab_top"
+    },
+    "type=double": {
+      "model": "buildscape:block/dirt_slab_double"
+    }
+  }
+}

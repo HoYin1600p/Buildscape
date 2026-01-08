@@ -450,8 +450,8 @@ public class PillarIdManager {
                     
                     // Check if the block entity exists at this position
                     if (level.getBlockEntity(pos) instanceof com.kingodogo.buildscape.block.PillarBlockEntity pillarBE) {
-                        // Clear the pillar's custom colors
-                        pillarBE.clearParticleColors();
+                        // Reset the pillar's appearance to default (colors, pattern, etc.)
+                        pillarBE.resetToDefaultAppearance();
                         pillarBE.setChanged();
                         
                         // Notify clients of the change

@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "buildscape:block/bit_cut_copper_slab"
+    },
+    "type=top": {
+      "model": "buildscape:block/bit_cut_copper_slab_top"
+    },
+    "type=double": {
+      "model": "buildscape:block/bit_cut_copper"
+    }
+  }
+}

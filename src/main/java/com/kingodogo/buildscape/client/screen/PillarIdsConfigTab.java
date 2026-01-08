@@ -36,7 +36,6 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
     private static final int BASE_COLUMN_GAP = 8;
     private static final int AUTO_REFRESH_MS = 1500;
     private static final int MAX_COLORS = 5;
-    private static final double PILLAR_DISPLAY_RANGE = 64.0; // Only show pillars within 64 blocks
     
     // Helper methods to get scaled values
     private int getHeaderHeight() {
@@ -160,28 +159,6 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
      * Check if a pillar is within display range of the player.
      * Returns true if the pillar is in the same dimension and within 64 blocks.
      */
-    private boolean isPillarInRange(PillarIdManager.PillarData data) {
-        Minecraft mc = Minecraft.getInstance();
-        if (mc == null || mc.player == null || mc.level == null) {
-            return true; // Show all if no player/level (shouldn't happen in GUI)
-        }
-        
-        // Check if pillar is in the same dimension as the player
-        String playerDimension = mc.level.dimension().location().toString();
-        if (!playerDimension.equals(data.dimension)) {
-            return false; // Different dimension, don't show
-        }
-        
-        // Calculate distance to pillar
-        BlockPos playerPos = mc.player.blockPosition();
-        double dx = playerPos.getX() - data.x;
-        double dy = playerPos.getY() - data.y;
-        double dz = playerPos.getZ() - data.z;
-        double distanceSq = dx * dx + dy * dy + dz * dz;
-        
-        // Check if within range (using squared distance to avoid sqrt)
-        return distanceSq <= (PILLAR_DISPLAY_RANGE * PILLAR_DISPLAY_RANGE);
-    }
     
     private void applySnapshot(Map<String, PillarIdManager.PillarData> snapshot) {
         Set<String> seenIds = new HashSet<>();
@@ -191,11 +168,7 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
         entries.sort(Comparator.comparing(Map.Entry::getKey));
         
         for (Map.Entry<String, PillarIdManager.PillarData> entry : entries) {
-            // Filter out pillars that are not within range
-            if (!isPillarInRange(entry.getValue())) {
-                continue;
-            }
-            
+            // Show all pillars - no range filtering
             PillarRow row = findRow(entry.getKey());
             if (row == null) {
                 row = new PillarRow(entry.getValue());
@@ -369,7 +342,7 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
         int x = contentX + leftMargin;
         int y = contentY + topMargin;
         
-        // Reload button
+        // Reload button - set width and height directly for proper rendering
         reloadButton.x = x;
         reloadButton.y = y;
         reloadButton.setWidth(buttonWidth);
@@ -454,6 +427,25 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
             row.setBounds(tableX, rowY, tableWidth, rowHeight);
             row.render(poseStack, tableX, rowY, columns);
             rowIndex++;
+        }
+        
+        // Draw scrollbar if needed
+        if (maxScroll > 0) {
+            int scrollbarWidth = BuildScapeConfigScreen.scaleSize(6);
+            int scrollbarX = contentX + contentWidth - tableMargin - scrollbarWidth;
+            int scrollbarY = rowsStartY;
+            int scrollbarHeight = tableHeight - headerHeight - headerSpacing;
+            
+            // Scrollbar track
+            GuiComponent.fill(poseStack, scrollbarX, scrollbarY, scrollbarX + scrollbarWidth, scrollbarY + scrollbarHeight, 0x80000000);
+            
+            // Scrollbar thumb
+            double scrollRatio = scrollOffset / maxScroll;
+            int availableHeight = scrollbarHeight - BuildScapeConfigScreen.scaleSize(20);
+            int thumbY = scrollbarY + (int)(scrollRatio * availableHeight);
+            int thumbHeight = Math.max(BuildScapeConfigScreen.scaleSize(20), scrollbarHeight * scrollbarHeight / (visibleRows * rowHeight));
+            
+            GuiComponent.fill(poseStack, scrollbarX, thumbY, scrollbarX + scrollbarWidth, thumbY + thumbHeight, 0xFFAAAAAA);
         }
         
         // Status text

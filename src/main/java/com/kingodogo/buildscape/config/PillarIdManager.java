@@ -448,21 +448,27 @@ public class PillarIdManager {
                 if (level.dimension().location().toString().equals(data.dimension)) {
                     BlockPos pos = data.getBlockPos();
                     
+                    // Check if chunk is loaded
+                    if (!level.isLoaded(pos)) {
+                        return;
+                    }
+                    
                     // Check if the block entity exists at this position
-                    if (level.getBlockEntity(pos) instanceof com.kingodogo.buildscape.block.PillarBlockEntity pillarBE) {
+                    net.minecraft.world.level.block.entity.BlockEntity blockEntity = level.getBlockEntity(pos);
+                    if (blockEntity instanceof com.kingodogo.buildscape.block.PillarBlockEntity pillarBE) {
                         // Reset the pillar's appearance to default (colors, pattern, etc.)
                         pillarBE.resetToDefaultAppearance();
-                        pillarBE.setChanged();
                         
-                        // Notify clients of the change
+                        // Additional sync to ensure changes are propagated
                         BlockState state = level.getBlockState(pos);
-                        level.sendBlockUpdated(pos, state, state, Block.UPDATE_ALL);
+                        level.sendBlockUpdated(pos, state, state, 3);
+                        level.getChunkAt(pos).setUnsaved(true);
                     }
                     break;
                 }
             }
         } catch (Exception e) {
-            // Silently fail if we can't reset the block (e.g., world not loaded)
+            // Silently handle errors (e.g., world not loaded, chunk not available)
         }
     }
 

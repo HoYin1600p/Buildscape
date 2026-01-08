@@ -397,7 +397,129 @@ public class PillarIdDetailConfigTab extends AbstractConfigTab {
     }
     
     private void updateBlockEntityNBT() {
-        // Block entities will sync from PillarIdManager on next tick
+        if (pillarData == null) return;
+        
+        try {
+            net.minecraft.server.MinecraftServer server = net.minecraftforge.server.ServerLifecycleHooks.getCurrentServer();
+            if (server == null || !server.isRunning()) {
+                return;
+            }
+            
+            // Find the level for this pillar's dimension
+            for (net.minecraft.server.level.ServerLevel level : server.getAllLevels()) {
+                if (level == null) continue;
+                
+                String dimensionKey = PillarIdManager.getDimensionKey(level);
+                if (!dimensionKey.equals(pillarData.dimension)) {
+                    continue;
+                }
+                
+                net.minecraft.core.BlockPos pos = new net.minecraft.core.BlockPos(pillarData.x, pillarData.y, pillarData.z);
+                
+                if (!level.isLoaded(pos)) {
+                    continue;
+                }
+                
+                net.minecraft.world.level.block.entity.BlockEntity be = level.getBlockEntity(pos);
+                if (!(be instanceof com.kingodogo.buildscape.block.PillarBlockEntity pillarBE)) {
+                    continue;
+                }
+                
+                // Find the bottom of the stack
+                net.minecraft.core.BlockPos bottomPos = pillarBE.findStackBottom();
+                net.minecraft.world.level.block.entity.BlockEntity bottomBE = level.getBlockEntity(bottomPos);
+                
+                if (!(bottomBE instanceof com.kingodogo.buildscape.block.PillarBlockEntity bottomPillarBE)) {
+                    continue;
+                }
+                
+                // Update NBT with settings from manager
+                boolean needsUpdate = false;
+                
+                // Update pattern
+                if (pillarData.pattern != null && !pillarData.pattern.isEmpty()) {
+                    if (bottomPillarBE.getParticlePattern() == null || 
+                        !bottomPillarBE.getParticlePattern().equals(pillarData.pattern)) {
+                        bottomPillarBE.setParticlePattern(pillarData.pattern);
+                        needsUpdate = true;
+                    }
+                }
+                
+                // Update pattern speed
+                if (pillarData.pattern_speed != null) {
+                    if (bottomPillarBE.getPatternSpeed() == null || 
+                        !bottomPillarBE.getPatternSpeed().equals(pillarData.pattern_speed)) {
+                        bottomPillarBE.setPatternSpeed(pillarData.pattern_speed);
+                        needsUpdate = true;
+                    }
+                }
+                
+                // Update pattern spread
+                if (pillarData.pattern_spread != null) {
+                    if (bottomPillarBE.getPatternSpread() == null || 
+                        !bottomPillarBE.getPatternSpread().equals(pillarData.pattern_spread)) {
+                        bottomPillarBE.setPatternSpread(pillarData.pattern_spread);
+                        needsUpdate = true;
+                    }
+                }
+                
+                // Update pattern intensity
+                if (pillarData.pattern_intensity != null) {
+                    if (bottomPillarBE.getPatternIntensity() == null || 
+                        !bottomPillarBE.getPatternIntensity().equals(pillarData.pattern_intensity)) {
+                        bottomPillarBE.setPatternIntensity(pillarData.pattern_intensity);
+                        needsUpdate = true;
+                    }
+                }
+                
+                // Update colors
+                if (pillarData.dyeColors != null && !pillarData.dyeColors.isEmpty()) {
+                    java.util.List<String> nbtColors = bottomPillarBE.getParticleColors();
+                    boolean colorsChanged = false;
+                    
+                    if (nbtColors == null || nbtColors.size() != pillarData.dyeColors.size()) {
+                        colorsChanged = true;
+                    } else {
+                        for (int i = 0; i < pillarData.dyeColors.size(); i++) {
+                            String managerColor = pillarData.dyeColors.get(i);
+                            String nbtColor = i < nbtColors.size() ? nbtColors.get(i) : null;
+                            if (nbtColor == null || !nbtColor.equals(managerColor)) {
+                                colorsChanged = true;
+                                break;
+                            }
+                        }
+                    }
+                    
+                    if (colorsChanged) {
+                        // Clear and set colors
+                        if (bottomPillarBE.getParticleColors() != null) {
+                            bottomPillarBE.getParticleColors().clear();
+                        }
+                        for (String color : pillarData.dyeColors) {
+                            if (color != null && !color.isEmpty()) {
+                                bottomPillarBE.addParticleColor(color);
+                            }
+                        }
+                        needsUpdate = true;
+                    }
+                }
+                
+                if (needsUpdate) {
+                    bottomPillarBE.setChanged();
+                    level.sendBlockUpdated(
+                        bottomPos,
+                        level.getBlockState(bottomPos),
+                        level.getBlockState(bottomPos),
+                        3
+                    );
+                }
+                
+                break; // Found the pillar, done
+            }
+        } catch (Exception e) {
+            System.err.println("BuildScape: Error updating block entity NBT: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
     
     @Override

@@ -34,6 +34,7 @@ public class PillarIdManager {
             .setPrettyPrinting()
             .create();
     private static final String FILE_NAME = "pillar-ids.dat";
+    private static final String BACKUP_FILE_NAME = "pillar-ids.bak.dat";
     private static final String FOLDER_NAME = "buildscape";
     private static PillarIdManager INSTANCE;
 
@@ -43,6 +44,12 @@ public class PillarIdManager {
     private long lastFileSize = 0L;
 
     private boolean hasLoaded = false;
+    private boolean hadColorsOnLoad = false; // Track if we had colors when we loaded
+    
+    private static boolean recoveryScheduled = false;
+    private static long recoveryScheduledTime = 0L;
+    private static final long RECOVERY_DELAY_MS = 5000; // 5 seconds after world load
+    private static boolean recoveryInProgress = false; // Flag to prevent saving during recovery
 
     private static long worldLoadStartTime = 0L;
     private static final long MIN_WORLD_LOAD_TIME_MS = 15000;
@@ -200,19 +207,94 @@ public class PillarIdManager {
     private File getDataFile() {
         return new File(getDataDir(), FILE_NAME);
     }
+    
+    private File getBackupDataFile() {
+        return new File(getDataDir(), BACKUP_FILE_NAME);
+    }
 
+    /**
+     * Reset world cache directory only - does NOT clear pillar data.
+     * Called on world unload/player logout to reset cache, but preserves data.
+     */
     public static void resetWorldCache() {
+        System.out.println("BuildScape: resetWorldCache() called - preserving pillar data (not clearing)");
         cachedWorldSaveDir = null;
-
         worldLoadStartTime = System.currentTimeMillis();
-
+        recoveryScheduled = false;
+        recoveryScheduledTime = 0L;
+        
+        // IMPORTANT: Don't clear pillarData or reset hasLoaded here!
+        // Data should persist through world switches
+        // Only reset the cache directory, not the actual data
+    }
+    
+    /**
+     * Full reset - clears all data. Only called on server stop.
+     */
+    public static void fullReset() {
+        System.out.println("BuildScape: fullReset() called - clearing all pillar data from memory");
+        cachedWorldSaveDir = null;
+        worldLoadStartTime = System.currentTimeMillis();
+        recoveryScheduled = false;
+        recoveryScheduledTime = 0L;
+        
         if (INSTANCE != null) {
+            int dataCount = INSTANCE.pillarData.size();
             INSTANCE.pillarData.clear();
             INSTANCE.lastLoadedTime = 0L;
             INSTANCE.lastFileSize = 0L;
             INSTANCE.hasLoaded = false;
+            INSTANCE.hadColorsOnLoad = false;
             INSTANCE.fileWasDeleted = false;
+            System.out.println("BuildScape: Cleared " + dataCount + " pillar entries from memory");
         }
+    }
+    
+    /**
+     * Schedule recovery to run after world load.
+     * Recovery will run automatically after RECOVERY_DELAY_MS.
+     */
+    public static void scheduleRecoveryAfterLoad() {
+        recoveryScheduled = true;
+        recoveryScheduledTime = System.currentTimeMillis();
+        System.out.println("BuildScape: Scheduled pillar recovery to run after " + (RECOVERY_DELAY_MS / 1000) + " seconds");
+    }
+    
+    /**
+     * Check if scheduled recovery should run and execute it.
+     * Called from server tick event.
+     */
+    public static void checkAndRunScheduledRecovery() {
+        if (!recoveryScheduled) {
+            return;
+        }
+        
+        long elapsed = System.currentTimeMillis() - recoveryScheduledTime;
+        if (elapsed < RECOVERY_DELAY_MS) {
+            return;
+        }
+        
+        recoveryScheduled = false;
+        
+        MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
+        if (server == null || !server.isRunning()) {
+            System.out.println("BuildScape: Scheduled recovery skipped - server not running");
+            return;
+        }
+        
+        PillarIdManager manager = get();
+        if (manager == null) {
+            System.out.println("BuildScape: Scheduled recovery skipped - manager is null");
+            return;
+        }
+        
+        if (!manager.hasLoaded()) {
+            System.out.println("BuildScape: Scheduled recovery skipped - manager not loaded yet");
+            return;
+        }
+        
+        System.out.println("BuildScape: Running scheduled pillar recovery (preserving colors)...");
+        manager.recoverPillarsFromWorld(server, false); // false = don't clear colors
     }
 
     private static boolean isWorldReadyForRecovery() {
@@ -420,55 +502,11 @@ public class PillarIdManager {
         if (pillarId != null) {
             PillarData data = pillarData.remove(pillarId);
             if (data != null) {
-                // Reset the pillar block entity to default state
-                resetPillarBlock(data);
+                // Reset the pillar block entity to default state (freshly placed)
+                // This removes custom colors/patterns from NBT and resets the pillar
+                PillarResetHandler.resetPillarFromData(data);
                 saveImmediate();
             }
-        }
-    }
-    
-    /**
-     * Reset a pillar block entity to its default state (no custom colors).
-     * This is called when a pillar is removed from the manager.
-     */
-    private void resetPillarBlock(PillarData data) {
-        if (data == null) {
-            return;
-        }
-        
-        try {
-            // Get the server and level for the pillar's dimension
-            MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
-            if (server == null) {
-                return;
-            }
-            
-            // Find the level for this pillar's dimension
-            for (net.minecraft.server.level.ServerLevel level : server.getAllLevels()) {
-                if (level.dimension().location().toString().equals(data.dimension)) {
-                    BlockPos pos = data.getBlockPos();
-                    
-                    // Check if chunk is loaded
-                    if (!level.isLoaded(pos)) {
-                        return;
-                    }
-                    
-                    // Check if the block entity exists at this position
-                    net.minecraft.world.level.block.entity.BlockEntity blockEntity = level.getBlockEntity(pos);
-                    if (blockEntity instanceof com.kingodogo.buildscape.block.PillarBlockEntity pillarBE) {
-                        // Reset the pillar's appearance to default (colors, pattern, etc.)
-                        pillarBE.resetToDefaultAppearance();
-                        
-                        // Additional sync to ensure changes are propagated
-                        BlockState state = level.getBlockState(pos);
-                        level.sendBlockUpdated(pos, state, state, 3);
-                        level.getChunkAt(pos).setUnsaved(true);
-                    }
-                    break;
-                }
-            }
-        } catch (Exception e) {
-            // Silently handle errors (e.g., world not loaded, chunk not available)
         }
     }
 
@@ -493,9 +531,9 @@ public class PillarIdManager {
 
         if (idToRemove != null) {
             pillarData.remove(idToRemove);
-            // Reset the pillar block entity to default state
+            // Reset the pillar block entity to default state (freshly placed)
             if (dataToReset != null) {
-                resetPillarBlock(dataToReset);
+                PillarResetHandler.resetPillarFromData(dataToReset);
             }
             saveImmediate();
         }
@@ -688,69 +726,104 @@ public class PillarIdManager {
 
     private void loadFileAsync(MinecraftServer server) {
         try {
+            // IMPORTANT: Try backup file first (preferred for config tab)
+            // Backup file is never cleared on world load, so it preserves colors/settings
+            File backupFile = getBackupDataFile();
             File file = getDataFile();
-
-            if (!file.exists()) {
+            
+            Map<String, PillarData> loadedData = null;
+            File sourceFile = null;
+            
+            // Try backup file first
+            if (backupFile.exists() && backupFile.length() > 0) {
+                try {
+                    loadedData = loadFromFile(backupFile);
+                    if (loadedData != null && !loadedData.isEmpty()) {
+                        sourceFile = backupFile;
+                        System.out.println("BuildScape: Loaded from backup file (preserved colors/settings)");
+                    }
+                } catch (Exception e) {
+                    System.err.println("BuildScape: Error loading backup file: " + e.getMessage());
+                }
+            }
+            
+            // If backup didn't work, try main file
+            if (loadedData == null && file.exists() && file.length() > 0) {
+                try {
+                    loadedData = loadFromFile(file);
+                    if (loadedData != null && !loadedData.isEmpty()) {
+                        sourceFile = file;
+                        System.out.println("BuildScape: Loaded from main file");
+                    }
+                } catch (Exception e) {
+                    System.err.println("BuildScape: Error loading main file: " + e.getMessage());
+                }
+            }
+            
+            // If both files failed or don't exist, start fresh
+            if (loadedData == null || loadedData.isEmpty()) {
                 fileWasDeleted = true;
                 pillarData.clear();
                 lastLoadedTime = 0L;
                 lastFileSize = 0L;
                 hasLoaded = true;
                 System.out.println(
-                        "BuildScape: Pillar data file not found - will recover after world is fully loaded"
+                        "BuildScape: No valid pillar data file found - will recover after world is fully loaded"
                 );
                 return;
             }
+            
+            // Process loaded data
+            processLoadedData(loadedData, server, sourceFile);
+            
+        } catch (Throwable t) {
+            System.err.println(
+                    "BuildScape: Critical error in loadFileAsync() - will recover after world is fully loaded: " +
+                            t.getMessage()
+            );
+            t.printStackTrace();
+            fileWasDeleted = true;
+            pillarData.clear();
+            lastLoadedTime = 0L;
+            lastFileSize = 0L;
+            hasLoaded = true;
+        }
+    }
+    
+    /**
+     * Load data from a specific file.
+     */
+    private Map<String, PillarData> loadFromFile(File file) throws Exception {
+        try (
+                FileInputStream fis = new FileInputStream(file);
+                InputStreamReader isr = new InputStreamReader(fis, StandardCharsets.UTF_8);
+                BufferedReader reader = new BufferedReader(isr)
+        ) {
+            Type type = new TypeToken<Map<String, PillarData>>() {}.getType();
+            return GSON.fromJson(reader, type);
+        }
+    }
+    
+    /**
+     * Process loaded data and merge with existing data.
+     */
+    private void processLoadedData(Map<String, PillarData> loaded, MinecraftServer server, File sourceFile) {
+        try {
 
-            try {
-                long fileSize = file.length();
-                if (fileSize <= 0) {
-                    fileWasDeleted = true;
-                    pillarData.clear();
-                    lastLoadedTime = 0L;
-                    lastFileSize = 0L;
-                    hasLoaded = true;
-                    System.out.println(
-                            "BuildScape: Pillar data file is empty - will recover after world is fully loaded"
-                    );
-                    return;
+                // IMPORTANT: Preserve existing colors when reloading
+                // If file has empty colors but manager has colors, preserve manager colors
+                Map<String, PillarData> existingData = new HashMap<>(pillarData);
+                
+                int existingCount = existingData.size();
+                int existingColorsCount = 0;
+                for (PillarData data : existingData.values()) {
+                    if (data != null && data.hasColors()) {
+                        existingColorsCount++;
+                    }
                 }
-                if (fileSize > 10 * 1024 * 1024) {
-                    System.err.println(
-                            "BuildScape: Pillar data file is suspiciously large (" +
-                                    fileSize +
-                                    " bytes). Skipping load to prevent corruption."
-                    );
-                    handleCorruptedFile(
-                            file,
-                            new RuntimeException("File too large"),
-                            "file size validation"
-                    );
-                    return;
-                }
-            } catch (Exception e) {
-                System.err.println(
-                        "BuildScape: Cannot access pillar data file, starting fresh: " +
-                                e.getMessage()
-                );
-                pillarData.clear();
-                lastLoadedTime = 0L;
-                lastFileSize = 0L;
-                return;
-            }
-
-            try (
-                    FileInputStream fis = new FileInputStream(file);
-                    InputStreamReader isr = new InputStreamReader(
-                            fis,
-                            StandardCharsets.UTF_8
-                    );
-                    BufferedReader reader = new BufferedReader(isr)
-            ) {
-                Type type = new TypeToken<Map<String, PillarData>>() {
-                }.getType();
-                Map<String, PillarData> loaded = GSON.fromJson(reader, type);
-
+                
+                System.out.println("BuildScape: Loading pillar data from file - existing in memory: " + existingCount + " entries, " + existingColorsCount + " with colors");
+                
                 pillarData.clear();
                 if (loaded != null && !loaded.isEmpty()) {
                     int migrated = 0;
@@ -776,6 +849,19 @@ public class PillarIdManager {
                             if (data.dyeColors == null) {
                                 data.dyeColors = new ArrayList<>();
                                 needsMigration = true;
+                            }
+
+                            // IMPORTANT: ALWAYS preserve manager colors if they exist
+                            // File might have empty colors due to recovery or other issues
+                            PillarData existing = existingData.get(id);
+                            if (existing != null && existing.hasColors()) {
+                                // Manager has colors - ALWAYS use them, even if file has colors
+                                // This ensures colors synced from NBT are never lost
+                                data.dyeColors = new ArrayList<>(existing.dyeColors);
+                                if (data.dyeColors.size() != (existing.dyeColors == null ? 0 : existing.dyeColors.size())) {
+                                    System.out.println("BuildScape: Preserved " + data.dyeColors.size() + 
+                                        " colors from manager for " + id + " (overriding file colors)");
+                                }
                             }
 
                             try {
@@ -827,10 +913,24 @@ public class PillarIdManager {
                                         " invalid or outdated pillar entries"
                         );
                     }
+                    
+                    // Log how many entries were loaded and how many have colors
+                    int loadedCount = pillarData.size();
+                    int colorsCount = 0;
+                    for (PillarData data : pillarData.values()) {
+                        if (data != null && data.hasColors()) {
+                            colorsCount++;
+                        }
+                    }
+                    System.out.println("BuildScape: Loaded " + loadedCount + " pillar entries from file, " + colorsCount + " with colors");
+                    
+                    // Track if we had colors when we loaded
+                    hadColorsOnLoad = (colorsCount > 0);
                 }
 
                 if (pillarData.isEmpty()) {
                     fileWasDeleted = true;
+                    hadColorsOnLoad = false;
                     System.out.println(
                             "BuildScape: Pillar data file is empty (just {}) - will recover after world is fully loaded"
                     );
@@ -838,76 +938,33 @@ public class PillarIdManager {
                     fileWasDeleted = false;
                 }
 
-                lastLoadedTime = file.lastModified();
-                lastFileSize = file.length();
+                if (sourceFile != null) {
+                    lastLoadedTime = sourceFile.lastModified();
+                    lastFileSize = sourceFile.length();
+                }
 
                 hasLoaded = true;
 
                 updateCachedWorldDir();
+                
+                // IMPORTANT: Don't load colors from NBT immediately after file load
+                // Block entities might not be loaded yet, which would clear colors
+                // Colors are loaded from file and will be synced from NBT when needed
+                // (e.g., when GUI opens or when colors are added)
+                
+                // Schedule recovery to run after world load (to add any missing pillars)
+                scheduleRecoveryAfterLoad();
 
-            } catch (com.google.gson.JsonSyntaxException e) {
-                fileWasDeleted = true;
-                handleCorruptedFile(file, e, "JSON syntax error");
-                hasLoaded = true;
-                System.out.println(
-                        "BuildScape: Pillar data file corrupted - will recover after world is fully loaded"
-                );
-            } catch (com.google.gson.stream.MalformedJsonException e) {
-                fileWasDeleted = true;
-                handleCorruptedFile(file, e, "malformed JSON");
-                hasLoaded = true;
-                System.out.println(
-                        "BuildScape: Pillar data file corrupted - will recover after world is fully loaded"
-                );
-            } catch (java.io.IOException e) {
-                if (
-                        e instanceof com.google.gson.stream.MalformedJsonException ||
-                                (e.getMessage() != null &&
-                                        (e.getMessage().contains("JSON") ||
-                                                e.getMessage().contains("malformed")))
-                ) {
-                    fileWasDeleted = true;
-                    handleCorruptedFile(file, e, "JSON parsing error (IO)");
-                    System.out.println(
-                            "BuildScape: Pillar data file corrupted - will recover after world is fully loaded"
-                    );
-                } else {
-                    fileWasDeleted = true;
-                    System.err.println(
-                            "BuildScape: IO error loading pillar data - will recover after world is fully loaded: " +
-                                    e.getMessage()
-                    );
-                    pillarData.clear();
-                    lastLoadedTime = 0L;
-                    lastFileSize = 0L;
-                    hasLoaded = true;
-                }
-            } catch (Exception e) {
-                Throwable cause = e.getCause();
-                if (
-                        cause instanceof com.google.gson.JsonSyntaxException ||
-                                cause instanceof com.google.gson.stream.MalformedJsonException ||
-                                (e.getMessage() != null &&
-                                        (e.getMessage().contains("JSON") ||
-                                                e.getMessage().contains("malformed")))
-                ) {
-                    fileWasDeleted = true;
-                    handleCorruptedFile(file, e, "JSON parsing error (wrapped)");
-                    System.out.println(
-                            "BuildScape: Pillar data file corrupted - will recover after world is fully loaded"
-                    );
-                } else {
-                    fileWasDeleted = true;
-                    System.err.println(
-                            "BuildScape: Failed to load pillar data - will recover after world is fully loaded: " +
-                                    e.getMessage()
-                    );
-                    pillarData.clear();
-                    lastLoadedTime = 0L;
-                    lastFileSize = 0L;
-                    hasLoaded = true;
-                }
-            }
+        } catch (Exception e) {
+            fileWasDeleted = true;
+            System.err.println(
+                    "BuildScape: Error processing loaded data: " + e.getMessage()
+            );
+            e.printStackTrace();
+            pillarData.clear();
+            lastLoadedTime = 0L;
+            lastFileSize = 0L;
+            hasLoaded = true;
         } catch (Throwable t) {
             System.err.println(
                     "BuildScape: Critical error in loadFileAsync() - will recover after world is fully loaded: " +
@@ -1083,6 +1140,7 @@ public class PillarIdManager {
             }
 
             System.out.println("BuildScape: Starting pillar recovery from world...");
+            recoveryInProgress = true; // Prevent saves during recovery
             int recoveredCount = 0;
             int skippedCount = 0;
             int colorClearedCount = 0;
@@ -1174,39 +1232,68 @@ public class PillarIdManager {
 
                                 BlockPos pos = be.getBlockPos();
 
+                                // Check if pillar already exists in manager (by ID)
                                 PillarData existingData = pillarData.get(pillarId);
 
                                 if (existingData != null) {
-                                    if (
+                                    // Pillar exists - update it, don't create duplicate
+                                    boolean positionChanged = !(
                                             existingData.dimension.equals(dimensionKey) &&
                                                     existingData.x == pos.getX() &&
                                                     existingData.y == pos.getY() &&
                                                     existingData.z == pos.getZ()
-                                    ) {
-                                        if (clearColors && existingData.hasColors()) {
-                                            existingData.clearColors();
-                                            colorClearedCount++;
-                                        }
-                                        continue;
-                                    } else {
+                                    );
+                                    
+                                    if (positionChanged) {
                                         System.out.println(
-                                                "BuildScape: Warning - Pillar ID " +
-                                                        pillarId +
-                                                        " exists at different position. Updating position."
+                                                "BuildScape: Updating position for existing pillar " + pillarId
                                         );
                                         existingData.dimension = dimensionKey;
                                         existingData.x = pos.getX();
                                         existingData.y = pos.getY();
                                         existingData.z = pos.getZ();
-                                        if (clearColors && existingData.hasColors()) {
-                                            existingData.clearColors();
-                                            colorClearedCount++;
-                                        }
-                                        recoveredCount++;
-                                        continue;
                                     }
+                                    
+                                    // Update colors if NBT has colors (preserve manager colors if NBT is empty)
+                                    if (!clearColors) {
+                                        java.util.List<String> pillarColors =
+                                                pillarBE.getParticleColors();
+                                        if (pillarColors != null && !pillarColors.isEmpty()) {
+                                            // NBT has colors - sync them (only if different)
+                                            boolean colorsChanged = false;
+                                            if (existingData.dyeColors == null || existingData.dyeColors.size() != pillarColors.size()) {
+                                                colorsChanged = true;
+                                            } else {
+                                                for (int i = 0; i < pillarColors.size(); i++) {
+                                                    String nbtColor = pillarColors.get(i);
+                                                    String managerColor = i < existingData.dyeColors.size() ? existingData.dyeColors.get(i) : null;
+                                                    if (nbtColor == null || managerColor == null || !nbtColor.equals(managerColor)) {
+                                                        colorsChanged = true;
+                                                        break;
+                                                    }
+                                                }
+                                            }
+                                            
+                                            if (colorsChanged) {
+                                                existingData.clearColors();
+                                                for (String color : pillarColors) {
+                                                    if (color != null && !color.isEmpty()) {
+                                                        existingData.addColor(color);
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        // If NBT doesn't have colors, preserve manager colors (do nothing)
+                                    } else if (clearColors && existingData.hasColors()) {
+                                        existingData.clearColors();
+                                        colorClearedCount++;
+                                    }
+                                    
+                                    // Don't increment recoveredCount - this is an update, not a new recovery
+                                    continue;
                                 }
 
+                                // New pillar - create data
                                 PillarData data = new PillarData(pillarId, dimensionKey, pos);
 
                                 if (clearColors) {
@@ -1242,6 +1329,14 @@ public class PillarIdManager {
                 }
             }
 
+            // IMPORTANT: Sync colors from NBT BEFORE saving
+            // This ensures colors are loaded from NBT and saved to file
+            System.out.println("BuildScape: Syncing colors from NBT before saving recovery data...");
+            syncColorsFromNBTToManager(server);
+            
+            // Allow final save after syncing colors
+            recoveryInProgress = false;
+            
             if (recoveredCount > 0 || colorClearedCount > 0) {
                 saveImmediate();
                 System.out.println(
@@ -1259,12 +1354,15 @@ public class PillarIdManager {
                 );
             }
 
-            syncAllLoadedPillars(server);
+            // Don't call syncAllLoadedPillars here - we already synced colors above
         } catch (Exception e) {
             System.err.println(
                     "BuildScape: Error during pillar recovery: " + e.getMessage()
             );
             e.printStackTrace();
+        } finally {
+            // Always reset flag, even if recovery failed
+            recoveryInProgress = false;
         }
     }
 
@@ -1274,6 +1372,11 @@ public class PillarIdManager {
 
     public void saveImmediate() {
         try {
+            // IMPORTANT: Don't save during recovery - recovery will save once at the end after syncing colors
+            if (recoveryInProgress) {
+                return;
+            }
+            
             MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
             if (server == null || !server.isRunning()) {
                 return;
@@ -1286,73 +1389,162 @@ public class PillarIdManager {
             if (server.getPlayerList().getPlayerCount() == 0) {
                 return;
             }
-
-            File file = getDataFile();
-
-            try {
-                File parentDir = file.getParentFile();
-                if (parentDir != null && !parentDir.exists()) {
-                    parentDir.mkdirs();
+            
+            // Log what we're saving
+            int saveCount = pillarData.size();
+            int colorsCount = 0;
+            for (PillarData data : pillarData.values()) {
+                if (data != null && data.hasColors()) {
+                    colorsCount++;
                 }
-
-                File tempFile = new File(file.getParentFile(), FILE_NAME + ".tmp");
-
-                try (
-                        FileOutputStream fos = new FileOutputStream(tempFile);
-                        OutputStreamWriter osw = new OutputStreamWriter(
-                                fos,
-                                StandardCharsets.UTF_8
-                        );
-                        BufferedWriter writer = new BufferedWriter(osw)
-                ) {
-                    GSON.toJson(pillarData, writer);
-                    writer.flush();
-                    osw.flush();
-                    fos.flush();
-
-                    try {
-                        FileChannel channel = fos.getChannel();
-                        channel.force(true);
-                    } catch (Exception forceEx) {
-                    }
-                }
-
+            }
+            
+            // SAFEGUARD: If we had colors on load but now all colors are empty, don't save
+            // This prevents accidentally overwriting the file with empty colors
+            if (hadColorsOnLoad && colorsCount == 0 && saveCount > 0) {
+                System.err.println("BuildScape: WARNING - Attempted to save empty colors when file had colors! Reloading from file to restore colors...");
+                // Reload from backup file first (preferred), then main file
                 try {
-                    if (file.exists()) {
-                        file.delete();
+                    File fileToLoad = null;
+                    File backupFile = getBackupDataFile();
+                    File mainFile = getDataFile();
+                    
+                    // Try backup file first
+                    if (backupFile.exists() && backupFile.length() > 0) {
+                        fileToLoad = backupFile;
+                    } else if (mainFile.exists() && mainFile.length() > 0) {
+                        fileToLoad = mainFile;
                     }
-                    boolean renamed = tempFile.renameTo(file);
-
-                    if (renamed) {
-                        lastLoadedTime = file.lastModified();
-                        lastFileSize = file.length();
-                    } else {
-                        try {
-                            tempFile.delete();
-                        } catch (Exception cleanupEx) {
+                    
+                    if (fileToLoad != null) {
+                        // Reload from file
+                        try (FileInputStream fis = new FileInputStream(fileToLoad);
+                             InputStreamReader isr = new InputStreamReader(fis, StandardCharsets.UTF_8);
+                             BufferedReader reader = new BufferedReader(isr)) {
+                            Type type = new TypeToken<Map<String, PillarData>>() {}.getType();
+                            Map<String, PillarData> loaded = GSON.fromJson(reader, type);
+                            
+                            if (loaded != null && !loaded.isEmpty()) {
+                                // Restore colors from file
+                                for (Map.Entry<String, PillarData> entry : loaded.entrySet()) {
+                                    String id = entry.getKey();
+                                    PillarData fileData = entry.getValue();
+                                    PillarData currentData = pillarData.get(id);
+                                    
+                                    if (currentData != null && fileData != null && 
+                                        fileData.hasColors() && !currentData.hasColors()) {
+                                        // Restore colors from file
+                                        currentData.clearColors();
+                                        for (String color : fileData.dyeColors) {
+                                            if (color != null && !color.isEmpty()) {
+                                                currentData.addColor(color);
+                                            }
+                                        }
+                                        System.out.println("BuildScape: Restored colors for " + id + " from file");
+                                    }
+                                }
+                                
+                                // Recalculate colors count
+                                colorsCount = 0;
+                                for (PillarData data : pillarData.values()) {
+                                    if (data != null && data.hasColors()) {
+                                        colorsCount++;
+                                    }
+                                }
+                                System.out.println("BuildScape: Restored colors - now have " + colorsCount + " entries with colors");
+                            }
                         }
                     }
-                } catch (Exception renameEx) {
-                    try {
-                        tempFile.delete();
-                    } catch (Exception cleanupEx) {
-                    }
+                } catch (Exception e) {
+                    System.err.println("BuildScape: Error reloading colors from file: " + e.getMessage());
                 }
-            } catch (Exception e) {
+            }
+            
+            System.out.println("BuildScape: Saving " + saveCount + " pillar entries to file, " + colorsCount + " with colors");
+
+            // Save to both main file and backup file
+            saveToFile(getDataFile(), FILE_NAME);
+            saveToFile(getBackupDataFile(), BACKUP_FILE_NAME);
+            
+            // Update timestamps from main file
+            File mainFile = getDataFile();
+            if (mainFile.exists()) {
+                lastLoadedTime = mainFile.lastModified();
+                lastFileSize = mainFile.length();
             }
         } catch (Throwable t) {
         }
     }
 
+    /**
+     * Save pillar data to a specific file.
+     */
+    private void saveToFile(File file, String tempFileName) {
+        try {
+            File parentDir = file.getParentFile();
+            if (parentDir != null && !parentDir.exists()) {
+                parentDir.mkdirs();
+            }
+
+            File tempFile = new File(file.getParentFile(), tempFileName + ".tmp");
+
+            try (
+                    FileOutputStream fos = new FileOutputStream(tempFile);
+                    OutputStreamWriter osw = new OutputStreamWriter(
+                            fos,
+                            StandardCharsets.UTF_8
+                    );
+                    BufferedWriter writer = new BufferedWriter(osw)
+            ) {
+                GSON.toJson(pillarData, writer);
+                writer.flush();
+                osw.flush();
+                fos.flush();
+
+                try {
+                    FileChannel channel = fos.getChannel();
+                    channel.force(true);
+                } catch (Exception forceEx) {
+                }
+            }
+
+            try {
+                if (file.exists()) {
+                    file.delete();
+                }
+                boolean renamed = tempFile.renameTo(file);
+
+                if (!renamed) {
+                    try {
+                        tempFile.delete();
+                    } catch (Exception cleanupEx) {
+                    }
+                }
+            } catch (Exception renameEx) {
+                try {
+                    tempFile.delete();
+                } catch (Exception cleanupEx) {
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("BuildScape: Error saving to " + file.getName() + ": " + e.getMessage());
+        }
+    }
+    
     public void forceReload() {
         load();
     }
 
     public void checkAndReload() {
-        File file = getDataFile();
-        if (file.exists()) {
-            long currentModified = file.lastModified();
-            long currentSize = file.length();
+        // Check backup file first (preferred for config tab)
+        File backupFile = getBackupDataFile();
+        File mainFile = getDataFile();
+        
+        File fileToCheck = backupFile.exists() ? backupFile : mainFile;
+        
+        if (fileToCheck.exists()) {
+            long currentModified = fileToCheck.lastModified();
+            long currentSize = fileToCheck.length();
             if (currentModified != lastLoadedTime || currentSize != lastFileSize) {
                 load();
             }
@@ -1455,6 +1647,339 @@ public class PillarIdManager {
         }
     }
 
+    /**
+     * Loads colors directly from NBT for all loaded pillar block entities.
+     * This is called after loading the file to populate colors from the actual world data.
+     * Colors are loaded directly from NBT, not from the file.
+     */
+    public void loadColorsFromNBT(MinecraftServer server) {
+        if (server == null || !server.isRunning()) {
+            return;
+        }
+
+        if (server.getPlayerList().getPlayerCount() == 0) {
+            return;
+        }
+
+        try {
+            int loadedCount = 0;
+
+            for (net.minecraft.server.level.ServerLevel level : server.getAllLevels()) {
+                if (level == null) continue;
+
+                String dimensionKey = getDimensionKey(level);
+
+                // Iterate through all pillar data in manager
+                for (PillarData data : pillarData.values()) {
+                    if (data == null) continue;
+                    if (!data.dimension.equals(dimensionKey)) continue;
+
+                    try {
+                        BlockPos pos = data.getBlockPos();
+
+                        if (!level.isLoaded(pos)) {
+                            continue;
+                        }
+
+                        net.minecraft.world.level.chunk.ChunkAccess chunk = level.getChunk(pos);
+                        if (!(chunk instanceof net.minecraft.world.level.chunk.LevelChunk)) {
+                            continue;
+                        }
+
+                        if (!chunk.getStatus().isOrAfter(net.minecraft.world.level.chunk.ChunkStatus.FULL)) {
+                            continue;
+                        }
+
+                        net.minecraft.world.level.block.entity.BlockEntity be = level.getBlockEntity(pos);
+                        if (!(be instanceof com.kingodogo.buildscape.block.PillarBlockEntity pillarBE)) {
+                            continue;
+                        }
+
+                        // Find the bottom of the stack to get the actual block entity with colors
+                        BlockPos bottomPos = pillarBE.findStackBottom();
+                        net.minecraft.world.level.block.entity.BlockEntity bottomBE = level.getBlockEntity(bottomPos);
+                        
+                        if (!(bottomBE instanceof com.kingodogo.buildscape.block.PillarBlockEntity bottomPillarBE)) {
+                            continue;
+                        }
+
+                        // Get colors directly from NBT
+                        java.util.List<String> nbtColors = bottomPillarBE.getParticleColors();
+                        
+                        // Load colors from NBT into manager (if NBT has colors)
+                        // If NBT is empty, preserve colors from file
+                        if (nbtColors != null && !nbtColors.isEmpty()) {
+                            // NBT has colors - use them (overwrite file colors)
+                            data.clearColors();
+                            for (String color : nbtColors) {
+                                if (color != null && !color.isEmpty()) {
+                                    data.addColor(color);
+                                }
+                            }
+                            loadedCount++;
+                            System.out.println("BuildScape: Loaded " + nbtColors.size() + " colors from NBT for " + data.id);
+                        } else {
+                            // NBT is empty - preserve colors from file (if any)
+                            int fileColorCount = (data.dyeColors != null) ? data.dyeColors.size() : 0;
+                            if (fileColorCount > 0) {
+                                System.out.println("BuildScape: Preserving " + fileColorCount + " colors from file for " + data.id + " (NBT empty)");
+                            }
+                        }
+                    } catch (Exception e) {
+                        System.err.println(
+                                "BuildScape: Error loading colors from NBT for pillar " +
+                                        (data != null ? data.id : "unknown") +
+                                        ": " + e.getMessage()
+                        );
+                    }
+                }
+            }
+
+            // Only save if colors were actually loaded from NBT
+            // Don't save if no colors were loaded - this preserves file colors
+            if (loadedCount > 0) {
+                saveImmediate();
+                System.out.println(
+                        "BuildScape: Loaded colors from NBT for " + loadedCount + " pillars, saved to file"
+                );
+            } else {
+                System.out.println(
+                        "BuildScape: No colors loaded from NBT, preserving file colors (not saving)"
+                );
+            }
+        } catch (Exception e) {
+            System.err.println(
+                    "BuildScape: Error in loadColorsFromNBT: " + e.getMessage()
+            );
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Syncs ALL settings (colors, pattern, speed, spread, intensity, max_particle_color) 
+     * FROM block entity NBT TO manager for all loaded pillars.
+     * This ensures the manager has all settings that exist in NBT after world load,
+     * so the GUI can display them correctly.
+     */
+    public void syncColorsFromNBTToManager(MinecraftServer server) {
+        if (server == null || !server.isRunning()) {
+            return;
+        }
+
+        if (server.getPlayerList().getPlayerCount() == 0) {
+            return;
+        }
+
+        // IMPORTANT: Don't sync if manager hasn't loaded yet - this prevents clearing colors before load
+        if (!hasLoaded()) {
+            System.out.println("BuildScape: Skipping syncColorsFromNBTToManager - manager not loaded yet");
+            return;
+        }
+
+        try {
+            int syncedCount = 0;
+            int preservedCount = 0;
+
+            for (net.minecraft.server.level.ServerLevel level : server.getAllLevels()) {
+                if (level == null) continue;
+
+                String dimensionKey = getDimensionKey(level);
+
+                // Iterate through all pillar data in manager
+                for (PillarData data : pillarData.values()) {
+                    if (data == null) continue;
+                    if (!data.dimension.equals(dimensionKey)) continue;
+
+                    // Preserve existing colors count for logging
+                    int existingColorCount = (data.dyeColors != null) ? data.dyeColors.size() : 0;
+
+                    try {
+                        BlockPos pos = data.getBlockPos();
+
+                        if (!level.isLoaded(pos)) {
+                            // Chunk not loaded - preserve manager colors
+                            preservedCount++;
+                            continue;
+                        }
+
+                        net.minecraft.world.level.chunk.ChunkAccess chunk = level.getChunk(pos);
+                        if (!(chunk instanceof net.minecraft.world.level.chunk.LevelChunk)) {
+                            // Chunk not ready - preserve manager colors
+                            preservedCount++;
+                            continue;
+                        }
+
+                        if (!chunk.getStatus().isOrAfter(net.minecraft.world.level.chunk.ChunkStatus.FULL)) {
+                            // Chunk not fully loaded - preserve manager colors
+                            preservedCount++;
+                            continue;
+                        }
+
+                        net.minecraft.world.level.block.entity.BlockEntity be = level.getBlockEntity(pos);
+                        if (!(be instanceof com.kingodogo.buildscape.block.PillarBlockEntity pillarBE)) {
+                            // No block entity - preserve manager colors
+                            preservedCount++;
+                            continue;
+                        }
+
+                        // Find the bottom of the stack to get the actual block entity with colors
+                        BlockPos bottomPos = pillarBE.findStackBottom();
+                        net.minecraft.world.level.block.entity.BlockEntity bottomBE = level.getBlockEntity(bottomPos);
+                        
+                        if (!(bottomBE instanceof com.kingodogo.buildscape.block.PillarBlockEntity bottomPillarBE)) {
+                            // No bottom block entity - preserve manager colors
+                            preservedCount++;
+                            continue;
+                        }
+
+                        // Get colors from NBT (block entity at bottom of stack)
+                        java.util.List<String> nbtColors = bottomPillarBE.getParticleColors();
+                        
+                        // IMPORTANT: Only sync if NBT has colors
+                        // If NBT is empty or null, preserve manager colors (don't clear them)
+                        if (nbtColors != null && !nbtColors.isEmpty()) {
+                            // Check if manager colors match NBT colors
+                            boolean needsSync = false;
+                            if (data.dyeColors == null || data.dyeColors.isEmpty()) {
+                                // Manager has no colors, NBT has colors - sync
+                                needsSync = true;
+                            } else if (data.dyeColors.size() != nbtColors.size()) {
+                                // Different number of colors - sync
+                                needsSync = true;
+                            } else {
+                                // Compare colors
+                                for (int i = 0; i < nbtColors.size(); i++) {
+                                    String nbtColor = nbtColors.get(i);
+                                    String managerColor = i < data.dyeColors.size() ? data.dyeColors.get(i) : null;
+                                    if (nbtColor == null || managerColor == null || !nbtColor.equals(managerColor)) {
+                                        needsSync = true;
+                                        break;
+                                    }
+                                }
+                            }
+                            
+                            if (needsSync) {
+                                // Sync colors FROM NBT TO manager
+                                System.out.println("BuildScape: Syncing colors for " + data.id + 
+                                    " - NBT has " + nbtColors.size() + " colors, manager had " + existingColorCount);
+                                data.clearColors();
+                                for (String color : nbtColors) {
+                                    if (color != null && !color.isEmpty()) {
+                                        data.addColor(color);
+                                    }
+                                }
+                                syncedCount++;
+                            } else {
+                                // Colors already match - preserve
+                                preservedCount++;
+                            }
+                            
+                            // Also sync pattern settings from NBT
+                            syncPatternSettingsFromNBT(bottomPillarBE, data);
+                        } else {
+                            // NBT is empty or null - preserve manager colors (do nothing)
+                            if (existingColorCount > 0) {
+                                preservedCount++;
+                                System.out.println("BuildScape: Preserving " + existingColorCount + " colors for " + data.id + " (NBT empty)");
+                            }
+                            // Still try to sync pattern settings even if colors are empty
+                            syncPatternSettingsFromNBT(bottomPillarBE, data);
+                        }
+                    } catch (Exception e) {
+                        // Error accessing block entity - preserve manager colors
+                        preservedCount++;
+                        System.err.println(
+                                "BuildScape: Error syncing colors from NBT for pillar " +
+                                        (data != null ? data.id : "unknown") +
+                                        ": " + e.getMessage()
+                        );
+                    }
+                }
+            }
+
+            if (syncedCount > 0) {
+                saveImmediate();
+                System.out.println(
+                        "BuildScape: Synced " + syncedCount + " pillar colors from NBT to manager, preserved " + preservedCount
+                );
+            } else if (preservedCount > 0) {
+                System.out.println(
+                        "BuildScape: Preserved " + preservedCount + " pillar colors (NBT empty or not loaded)"
+                );
+            }
+        } catch (Exception e) {
+            System.err.println(
+                    "BuildScape: Error in syncColorsFromNBTToManager: " + e.getMessage()
+            );
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Syncs pattern settings (pattern, speed, spread, intensity, max_particle_color) 
+     * FROM block entity NBT TO manager.
+     */
+    private void syncPatternSettingsFromNBT(
+            com.kingodogo.buildscape.block.PillarBlockEntity pillarBE,
+            PillarData data
+    ) {
+        if (pillarBE == null || data == null) {
+            return;
+        }
+        
+        boolean needsSave = false;
+        
+        // Sync pattern
+        String nbtPattern = pillarBE.getParticlePattern();
+        if (nbtPattern != null && !nbtPattern.isEmpty()) {
+            if (data.pattern == null || !data.pattern.equals(nbtPattern)) {
+                data.pattern = nbtPattern;
+                needsSave = true;
+            }
+        }
+        
+        // Sync pattern speed
+        Double nbtSpeed = pillarBE.getPatternSpeed();
+        if (nbtSpeed != null) {
+            if (data.pattern_speed == null || !data.pattern_speed.equals(nbtSpeed)) {
+                data.pattern_speed = nbtSpeed;
+                needsSave = true;
+            }
+        }
+        
+        // Sync pattern spread
+        Double nbtSpread = pillarBE.getPatternSpread();
+        if (nbtSpread != null) {
+            if (data.pattern_spread == null || !data.pattern_spread.equals(nbtSpread)) {
+                data.pattern_spread = nbtSpread;
+                needsSave = true;
+            }
+        }
+        
+        // Sync pattern intensity
+        Double nbtIntensity = pillarBE.getPatternIntensity();
+        if (nbtIntensity != null) {
+            if (data.pattern_intensity == null || !data.pattern_intensity.equals(nbtIntensity)) {
+                data.pattern_intensity = nbtIntensity;
+                needsSave = true;
+            }
+        }
+        
+        // Sync max particle colors (from the number of colors in NBT)
+        java.util.List<String> nbtColors = pillarBE.getParticleColors();
+        if (nbtColors != null && !nbtColors.isEmpty()) {
+            int nbtColorCount = nbtColors.size();
+            if (data.max_particle_color == null || data.max_particle_color != nbtColorCount) {
+                data.max_particle_color = nbtColorCount;
+                needsSave = true;
+            }
+        }
+        
+        if (needsSave) {
+            data.modifiedTime = System.currentTimeMillis();
+        }
+    }
+    
     public Map<String, PillarData> copyDataSnapshot() {
         return new HashMap<>(pillarData);
     }

@@ -1018,6 +1018,65 @@ public class BuildScape {
         // Gamerules are automatically available through /gamerule command once registered
         // This event handler ensures commands are properly initialized
         LOGGER.debug("Commands registered - fastLeafDecay gamerule should be available");
+        
+        // Register /buildscape recover PillarData command
+        com.mojang.brigadier.builder.LiteralArgumentBuilder<net.minecraft.commands.CommandSourceStack> buildscapeCommand = 
+            com.mojang.brigadier.builder.LiteralArgumentBuilder.<net.minecraft.commands.CommandSourceStack>literal("buildscape")
+                .then(com.mojang.brigadier.builder.LiteralArgumentBuilder.<net.minecraft.commands.CommandSourceStack>literal("recover")
+                    .then(com.mojang.brigadier.builder.LiteralArgumentBuilder.<net.minecraft.commands.CommandSourceStack>literal("PillarData")
+                        .requires(source -> source.hasPermission(2)) // Requires OP level 2
+                        .executes(context -> {
+                            net.minecraft.commands.CommandSourceStack source = context.getSource();
+                            net.minecraft.server.MinecraftServer server = source.getServer();
+                            
+                            if (server == null || !server.isRunning()) {
+                                source.sendFailure(
+                                    new net.minecraft.network.chat.TextComponent("Server is not running")
+                                );
+                                return 0;
+                            }
+                            
+                            com.kingodogo.buildscape.config.PillarIdManager manager = 
+                                com.kingodogo.buildscape.config.PillarIdManager.get();
+                            
+                            if (manager == null) {
+                                source.sendFailure(
+                                    new net.minecraft.network.chat.TextComponent("PillarIdManager is not available")
+                                );
+                                return 0;
+                            }
+                            
+                            source.sendSuccess(
+                                new net.minecraft.network.chat.TextComponent("Starting pillar recovery..."), 
+                                true
+                            );
+                            
+                            // Schedule recovery on next server tick (don't clear colors)
+                            server.execute(() -> {
+                                try {
+                                    manager.recoverPillarsFromWorld(server, false); // false = don't clear colors
+                                    source.sendSuccess(
+                                        new net.minecraft.network.chat.TextComponent(
+                                            "Pillar recovery completed. Check console for details."
+                                        ), 
+                                        true
+                                    );
+                                } catch (Exception e) {
+                                    source.sendFailure(
+                                        new net.minecraft.network.chat.TextComponent(
+                                            "Error during recovery: " + e.getMessage()
+                                        )
+                                    );
+                                    e.printStackTrace();
+                                }
+                            });
+                            
+                            return 1;
+                        })
+                    )
+                );
+        
+        event.getDispatcher().register(buildscapeCommand);
     }
 
     @SubscribeEvent
@@ -1036,7 +1095,25 @@ public class BuildScape {
     public void onServerStopped(
             net.minecraftforge.event.server.ServerStoppedEvent event
     ) {
-        LOGGER.info("BuildScape: Server stopped - resetting pillar data state");
+        LOGGER.info("BuildScape: Server stopped - syncing colors and resetting pillar data state");
+        
+        // Try to sync and save before resetting (server might still be accessible)
+        try {
+            net.minecraft.server.MinecraftServer server = event.getServer();
+            if (server != null) {
+                com.kingodogo.buildscape.config.PillarIdManager manager = 
+                    com.kingodogo.buildscape.config.PillarIdManager.get();
+                if (manager != null && manager.hasLoaded()) {
+                    // Sync colors FROM NBT TO manager before resetting
+                    manager.syncColorsFromNBTToManager(server);
+                    // Force save to ensure colors are written to file
+                    manager.saveImmediate();
+                    LOGGER.info("BuildScape: Colors synced and saved on server stop");
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.error("BuildScape: Error syncing/saving colors on server stop: " + e.getMessage());
+        }
 
         serverFullyInitialized = false;
         pillarDataLoadStarted = false;
@@ -1044,7 +1121,9 @@ public class BuildScape {
         recoveryDelayTicks = 0;
         recoveryAttempted = false;
 
-        com.kingodogo.buildscape.config.PillarIdManager.resetWorldCache();
+        // Full reset on server stop - clear all data from memory
+        // File is already saved above, so this just clears memory
+        com.kingodogo.buildscape.config.PillarIdManager.fullReset();
     }
 
     public static boolean isServerFullyInitialized() {
@@ -1120,8 +1199,35 @@ public class BuildScape {
             net.minecraftforge.event.world.WorldEvent.Unload event
     ) {
         if (event.getWorld() instanceof net.minecraft.server.level.ServerLevel) {
-            LOGGER.info("BuildScape: World unloading - resetting cached data");
+            LOGGER.info("BuildScape: World unloading - saving manager data and syncing colors from NBT");
+            
+            // IMPORTANT: Save manager data FIRST, then sync colors FROM NBT TO manager
+            // This ensures colors are saved even if block entities are already unloaded
+            try {
+                net.minecraft.server.MinecraftServer server = net.minecraftforge.server.ServerLifecycleHooks.getCurrentServer();
+                if (server != null && server.isRunning()) {
+                    com.kingodogo.buildscape.config.PillarIdManager manager = 
+                        com.kingodogo.buildscape.config.PillarIdManager.get();
+                    if (manager != null && manager.hasLoaded()) {
+                        // Save manager data FIRST to preserve any existing colors
+                        manager.saveImmediate();
+                        LOGGER.info("BuildScape: Manager data saved before world unload");
+                        
+                        // Then try to sync colors FROM NBT TO manager (if block entities are still loaded)
+                        // This will only update if NBT has colors - it won't clear manager colors if NBT is empty
+                        manager.syncColorsFromNBTToManager(server);
+                        
+                        // Save again after sync (in case sync updated any colors)
+                        manager.saveImmediate();
+                        LOGGER.info("BuildScape: Colors synced and saved before world unload");
+                    }
+                }
+            } catch (Exception e) {
+                LOGGER.error("BuildScape: Error syncing/saving colors before world unload: " + e.getMessage());
+                e.printStackTrace();
+            }
 
+            LOGGER.info("BuildScape: World unloading - resetting cached data");
             com.kingodogo.buildscape.config.PillarIdManager.resetWorldCache();
 
             serverFullyInitialized = false;
@@ -1207,6 +1313,9 @@ public class BuildScape {
             }
         }
 
+        // Check and run scheduled recovery (runs after world load, preserves colors)
+        com.kingodogo.buildscape.config.PillarIdManager.checkAndRunScheduledRecovery();
+        
         recoveryDelayTicks++;
         if (
                 recoveryDelayTicks >= RECOVERY_DELAY_TICKS &&
@@ -1246,11 +1355,12 @@ public class BuildScape {
                         }
                     }
 
+                    // Automatic recovery disabled - use /buildscape recover PillarData command instead
+                    // This prevents colors from being cleared automatically
                     if (needsRecovery) {
                         System.out.println(
-                                "BuildScape: World stable for 30 seconds - attempting pillar recovery (file empty or missing)"
+                                "BuildScape: Pillar data file is empty or missing. Use /buildscape recover PillarData to recover pillars."
                         );
-                        manager.recoverPillarsFromWorld(server, true);
                     }
                 } catch (Exception e) {
                     System.err.println(

@@ -140,6 +140,28 @@ public class PillarBlockEntity extends BlockEntity {
 
         PillarIdManager.PillarData data = manager.getPillarData(idToSync);
 
+        // If the pillar ID was removed from the manager, reset this pillar to default state
+        if (data == null && this.pillarId != null && this.pillarId.equals(idToSync)) {
+            // Pillar ID exists locally but was removed from manager - reset to fresh state
+            this.particleColors = null;
+            this.particlePattern = null;
+            this.patternSpeed = null;
+            this.patternSpread = null;
+            this.patternIntensity = null;
+            this.pillarId = null;
+            this.colorsInitialized = false;
+            this.particleColorCounter = 0;
+            this.lastParticleTick = 0L;
+            this.setChanged();
+            level.sendBlockUpdated(
+                    worldPosition,
+                    getBlockState(),
+                    getBlockState(),
+                    3
+            );
+            return;
+        }
+
         if (data != null && data.hasColors()) {
             java.util.List<String> managerColors = data.getColors();
             boolean shouldSync = false;
@@ -1385,10 +1407,12 @@ public class PillarBlockEntity extends BlockEntity {
     }
 
     /**
-     * Resets the pillar to default appearance (clears colors and pattern) without removing from manager.
+     * Resets the pillar to default appearance (clears colors and pattern) as if freshly placed.
      * Used when a pillar ID is removed from the config to reset its visual state.
+     * Keeps the displayed item but clears all custom particle settings.
      */
     public void resetToDefaultAppearance() {
+        // Clear all custom particle settings
         this.particleColors = null;
         this.particlePattern = null;
         this.patternSpeed = null;
@@ -1396,15 +1420,19 @@ public class PillarBlockEntity extends BlockEntity {
         this.patternIntensity = null;
         this.particleColorCounter = 0;
         this.colorsInitialized = false;
+        this.pillarId = null; // Clear the pillar ID so it acts like a fresh pillar
+        this.lastParticleTick = 0L; // Reset particle tick to restart particle effects immediately
+        
+        // Mark as changed and sync to clients
         this.setChanged();
         
         if (level != null && !level.isClientSide) {
-            level.sendBlockUpdated(
-                    worldPosition,
-                    getBlockState(),
-                    getBlockState(),
-                    3
-            );
+            // Send update to clients - this triggers getUpdatePacket() which calls getUpdateTag()
+            BlockState state = getBlockState();
+            level.sendBlockUpdated(worldPosition, state, state, 3);
+            
+            // Mark chunk as needing save
+            level.getChunkAt(worldPosition).setUnsaved(true);
         }
     }
 

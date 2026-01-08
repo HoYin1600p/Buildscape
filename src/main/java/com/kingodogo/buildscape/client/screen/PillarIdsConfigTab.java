@@ -116,19 +116,14 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
     private void refreshFromManager() {
         PillarIdManager manager = PillarIdManager.get();
         try {
+            // Check and reload if file changed
             manager.checkAndReload();
         } catch (Exception ignored) {}
         
-        // Sync colors FROM NBT TO manager before reading data
-        // This ensures GUI displays colors that exist in NBT but weren't in manager file
-        try {
-            net.minecraft.server.MinecraftServer server = net.minecraftforge.server.ServerLifecycleHooks.getCurrentServer();
-            if (server != null && server.isRunning() && manager.hasLoaded()) {
-                manager.syncColorsFromNBTToManager(server);
-            }
-        } catch (Exception ignored) {}
-        
+        // IMPORTANT: Get snapshot from manager - this should have colors from file
         Map<String, PillarIdManager.PillarData> snapshot = manager.copyDataSnapshot();
+        
+        // Apply snapshot to GUI rows
         applySnapshot(snapshot);
         lastSignature = computeSignature(snapshot);
         
@@ -785,6 +780,7 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
                     0, 0, swatchSize, swatchSize, color,
                     (btn) -> {} // Display-only, no click action
                 );
+                swatch.visible = true;
                 colorSwatches.add(swatch);
             }
             
@@ -914,7 +910,6 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
                 }
             } catch (Exception e) {
                 // Silently fail - will fall back to manager data
-                System.err.println("BuildScape: Error loading colors from NBT for " + (data != null ? data.id : "unknown") + ": " + e.getMessage());
             }
             
             return null;
@@ -924,27 +919,20 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
             this.id = data.id;
             idField.setValue(data.id != null ? data.id : "");
             
-            // IMPORTANT: Load colors directly from NBT/block entity, not from manager file
-            // This ensures colors show even if file doesn't have them
-            List<String> colors = loadColorsFromNBT(data);
-            
-            // Debug logging
-            if (colors != null && !colors.isEmpty()) {
-                System.out.println("BuildScape: Loaded " + colors.size() + " colors from NBT for " + data.id);
+            // IMPORTANT: Use colors from manager file (pillar-ids.dat)
+            // File is the source of truth for GUI display
+            // Ensure we have a valid list (never null)
+            List<String> colors;
+            if (data.dyeColors != null && !data.dyeColors.isEmpty()) {
+                colors = new ArrayList<>(data.dyeColors);
             } else {
-                // If NBT doesn't have colors, fall back to manager data
-                colors = data.dyeColors != null ? data.dyeColors : Collections.emptyList();
-                if (!colors.isEmpty()) {
-                    System.out.println("BuildScape: Using " + colors.size() + " colors from manager for " + data.id);
-                } else {
-                    System.out.println("BuildScape: No colors found for " + data.id + " (NBT or manager)");
-                }
+                colors = Collections.emptyList();
             }
             
             // Clear all existing swatches first
             colorSwatches.clear();
             
-            // Create swatches for all colors
+            // Create swatches for all colors - this should create swatches if colors exist
             for (int i = 0; i < colors.size(); i++) {
                 String colorCode = colors.get(i);
                 int color = 0xFFFFFF;
@@ -960,6 +948,7 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
                     0, 0, BuildScapeConfigScreen.scaleSize(20), BuildScapeConfigScreen.scaleSize(20), color,
                     (btn) -> {} // Display-only, no click action
                 );
+                swatch.visible = true;
                 colorSwatches.add(swatch);
             }
             

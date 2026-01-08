@@ -1106,9 +1106,11 @@ public class BuildScape {
                 if (manager != null && manager.hasLoaded()) {
                     // Sync colors FROM NBT TO manager before resetting
                     manager.syncColorsFromNBTToManager(server);
-                    // Force save to ensure colors are written to file
+                    // Save main file (pillar-ids.dat)
                     manager.saveImmediate();
-                    LOGGER.info("BuildScape: Colors synced and saved on server stop");
+                    // Save backup file (pillar-ids.bak.dat) - only saved on world save/server close
+                    manager.saveBackupFile();
+                    LOGGER.info("BuildScape: Colors synced and saved (main + backup) on server stop");
                 }
             }
         } catch (Exception e) {
@@ -1209,17 +1211,16 @@ public class BuildScape {
                     com.kingodogo.buildscape.config.PillarIdManager manager = 
                         com.kingodogo.buildscape.config.PillarIdManager.get();
                     if (manager != null && manager.hasLoaded()) {
-                        // Save manager data FIRST to preserve any existing colors
-                        manager.saveImmediate();
-                        LOGGER.info("BuildScape: Manager data saved before world unload");
-                        
-                        // Then try to sync colors FROM NBT TO manager (if block entities are still loaded)
-                        // This will only update if NBT has colors - it won't clear manager colors if NBT is empty
+                        // Sync colors FROM NBT TO manager (in case NBT has colors not in manager)
                         manager.syncColorsFromNBTToManager(server);
                         
-                        // Save again after sync (in case sync updated any colors)
+                        // Save main file (pillar-ids.dat)
                         manager.saveImmediate();
-                        LOGGER.info("BuildScape: Colors synced and saved before world unload");
+                        
+                        // Save backup file (pillar-ids.bak.dat) - only saved on world save/server close
+                        manager.saveBackupFile();
+                        
+                        LOGGER.info("BuildScape: Colors synced and saved (main + backup) before world unload");
                     }
                 }
             } catch (Exception e) {

@@ -902,22 +902,8 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
             Minecraft mc = Minecraft.getInstance();
             int fontHeight = mc.font.lineHeight;
             
-            // Calculate total row width
+            // Calculate total row width (for layout purposes only, no border drawn)
             int totalRowWidth = columns[0] + columnGap + columns[1] + columnGap + columns[2] + columnGap + columns[3] + columnGap + columns[4];
-            
-            // Draw black bounding box around the entire row FIRST - this is the container for all pillar ID content
-            int rowBorderColor = 0xFF000000; // Black
-            int rowBorderThickness = Math.max(1, BuildScapeConfigScreen.scaleSize(1)); // Ensure at least 1 pixel
-            int rowBoxX = startX;
-            int rowBoxY = rowY;
-            int rowBoxWidth = totalRowWidth;
-            int rowBoxHeight = rowHeight;
-            
-            // Draw border rectangle around entire row - this ensures all content fits within this bounding box
-            GuiComponent.fill(poseStack, rowBoxX, rowBoxY, rowBoxX + rowBoxWidth, rowBoxY + rowBorderThickness, rowBorderColor); // Top
-            GuiComponent.fill(poseStack, rowBoxX, rowBoxY + rowBoxHeight - rowBorderThickness, rowBoxX + rowBoxWidth, rowBoxY + rowBoxHeight, rowBorderColor); // Bottom
-            GuiComponent.fill(poseStack, rowBoxX, rowBoxY, rowBoxX + rowBorderThickness, rowBoxY + rowBoxHeight, rowBorderColor); // Left
-            GuiComponent.fill(poseStack, rowBoxX + rowBoxWidth - rowBorderThickness, rowBoxY, rowBoxX + rowBoxWidth, rowBoxY + rowBoxHeight, rowBorderColor); // Right
             
             // Calculate EXACT center Y position for all elements - use ONE calculation for EVERYTHING
             // This ensures perfect horizontal alignment across all columns

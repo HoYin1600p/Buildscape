@@ -514,9 +514,13 @@ public class PillarItemsConfigTab extends AbstractConfigTab {
         int tagsLabelWidth = mc.font.width(tagsLabel);
         int tagsLabelSpacing = BuildScapeConfigScreen.scaleSize(5);
         
-        // Position tags search box after label, aligned with "All items" search box
+        // Position tags search box after label - align with bottom of presets scrollbar on higher GUI scales
+        // Calculate where the presets panel ends (presetsY + presetsHeight from init())
+        int presetsBottomY = topY + sectionHeight;
+        int tagsSearchBoxYOffset = Math.min(scaledOffset, Math.max(scaledOffset, presetsBottomY - tagsY));
+        
         if (tagsSearchBox != null) {
-            int tagsSearchBoxY = tagsY + scaledOffset; // Same Y as "All items" search box
+            int tagsSearchBoxY = tagsY + tagsSearchBoxYOffset; // Align with end of presets scrollbar on higher scales
             int tagsSearchBoxX = tagsX + leftPadding + tagsLabelWidth + tagsLabelSpacing;
             int tagsSearchBoxWidth = rightPanelWidth - tagsLabelWidth - tagsLabelSpacing - scaledButtonArea - leftPadding * 2;
             tagsSearchBox.x = tagsSearchBoxX;
@@ -526,7 +530,7 @@ public class PillarItemsConfigTab extends AbstractConfigTab {
         
         // Position tags buttons after tags search box
         if (tagsInventoryButton != null && tagsAllButton != null && tagsModOnlyButton != null) {
-            int buttonY = tagsY + scaledOffset;
+            int buttonY = tagsSearchBox != null ? tagsSearchBox.y : tagsY + scaledOffset;
             // Buttons start after tags search box (which is after label)
             int buttonsStartX = (tagsSearchBox != null ? tagsSearchBox.x + tagsSearchBox.getWidth() : tagsX + leftPadding) + BuildScapeConfigScreen.scaleSize(10);
             int tagsButtonSize = BuildScapeConfigScreen.scaleSize(20);
@@ -547,7 +551,7 @@ public class PillarItemsConfigTab extends AbstractConfigTab {
         
         // Update tags selector widget position below search box
         if (tagsSelectorWidget != null && tagsSearchBox != null) {
-            int tagsWidgetY = tagsY + scaledOffset + searchBoxHeight + BuildScapeConfigScreen.scaleSize(5);
+            int tagsWidgetY = tagsSearchBox.y + searchBoxHeight + BuildScapeConfigScreen.scaleSize(5);
             int tagsWidgetHeight = sectionHeight - (tagsWidgetY - tagsY) - bottomPadding;
             tagsSelectorWidget.x = tagsX;
             tagsSelectorWidget.y = tagsWidgetY;

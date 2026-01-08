@@ -36,6 +36,7 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
     private static final int BASE_COLUMN_GAP = 8;
     private static final int AUTO_REFRESH_MS = 1500;
     private static final int MAX_COLORS = 5;
+    private static final double PILLAR_DISPLAY_RANGE = 64.0; // Only show pillars within 64 blocks
     
     // Helper methods to get scaled values
     private int getHeaderHeight() {
@@ -155,6 +156,33 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
         }
     }
     
+    /**
+     * Check if a pillar is within display range of the player.
+     * Returns true if the pillar is in the same dimension and within 64 blocks.
+     */
+    private boolean isPillarInRange(PillarIdManager.PillarData data) {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc == null || mc.player == null || mc.level == null) {
+            return true; // Show all if no player/level (shouldn't happen in GUI)
+        }
+        
+        // Check if pillar is in the same dimension as the player
+        String playerDimension = mc.level.dimension().location().toString();
+        if (!playerDimension.equals(data.dimension)) {
+            return false; // Different dimension, don't show
+        }
+        
+        // Calculate distance to pillar
+        BlockPos playerPos = mc.player.blockPosition();
+        double dx = playerPos.getX() - data.x;
+        double dy = playerPos.getY() - data.y;
+        double dz = playerPos.getZ() - data.z;
+        double distanceSq = dx * dx + dy * dy + dz * dz;
+        
+        // Check if within range (using squared distance to avoid sqrt)
+        return distanceSq <= (PILLAR_DISPLAY_RANGE * PILLAR_DISPLAY_RANGE);
+    }
+    
     private void applySnapshot(Map<String, PillarIdManager.PillarData> snapshot) {
         Set<String> seenIds = new HashSet<>();
         
@@ -163,6 +191,11 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
         entries.sort(Comparator.comparing(Map.Entry::getKey));
         
         for (Map.Entry<String, PillarIdManager.PillarData> entry : entries) {
+            // Filter out pillars that are not within range
+            if (!isPillarInRange(entry.getValue())) {
+                continue;
+            }
+            
             PillarRow row = findRow(entry.getKey());
             if (row == null) {
                 row = new PillarRow(entry.getValue());
@@ -329,26 +362,36 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
         int buttonWidth = BuildScapeConfigScreen.scaleSize(100);
         int buttonHeight = BuildScapeConfigScreen.getScaledButtonHeight();
         int spacing = BuildScapeConfigScreen.scaleSize(8);
-        int startX = contentX + contentWidth - (buttonWidth * 4 + spacing * 3);
-        int y = contentY + BuildScapeConfigScreen.scaleSize(4);
+        int topMargin = BuildScapeConfigScreen.scaleSize(4);
+        int leftMargin = BuildScapeConfigScreen.scaleSize(4);
         
-        // Ensure all buttons have the same height and are aligned
-        reloadButton.x = startX;
+        // Position buttons from left to right with proper spacing
+        int x = contentX + leftMargin;
+        int y = contentY + topMargin;
+        
+        // Reload button
+        reloadButton.x = x;
         reloadButton.y = y;
         reloadButton.setWidth(buttonWidth);
         reloadButton.setHeight(buttonHeight);
+        x += buttonWidth + spacing;
         
-        selectAllButton.x = startX + buttonWidth + spacing;
+        // Select All button
+        selectAllButton.x = x;
         selectAllButton.y = y;
         selectAllButton.setWidth(buttonWidth);
         selectAllButton.setHeight(buttonHeight);
+        x += buttonWidth + spacing;
         
-        removeAllButton.x = startX + (buttonWidth + spacing) * 2;
+        // Remove All button
+        removeAllButton.x = x;
         removeAllButton.y = y;
         removeAllButton.setWidth(buttonWidth);
         removeAllButton.setHeight(buttonHeight);
+        x += buttonWidth + spacing;
         
-        removeButton.x = startX + (buttonWidth + spacing) * 3;
+        // Remove button
+        removeButton.x = x;
         removeButton.y = y;
         removeButton.setWidth(buttonWidth);
         removeButton.setHeight(buttonHeight);
@@ -430,10 +473,12 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
         Minecraft mc = Minecraft.getInstance();
         int fontHeight = mc.font.lineHeight;
         
-        // Calculate exact center for header text - same calculation as rows for perfect alignment
+        // Calculate exact center for header text - use SAME calculation as row text for perfect alignment
         int headerCenterY = tableY + headerHeight / 2;
-        // Use same calculation as rows for text centering
-        int textY = headerCenterY - fontHeight / 2 + fontHeight - 1;
+        // Headers should align with row content - use same simplified formula as rows
+        // Row text Y = rowCenterY + fontHeight/2 - 1
+        // For headers, use the same formula: headerCenterY + fontHeight/2 - 1
+        int headerTextY = headerCenterY + fontHeight / 2 - 1;
         
         // Checkbox column (no header text, just space)
         drawCell(poseStack, x, tableY, columns[0], headerHeight, true);
@@ -442,19 +487,19 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
         drawCell(poseStack, x, tableY, columns[1], headerHeight, true);
         Component idText = new TranslatableComponent("buildscape.config.ids.id");
         int idTextWidth = mc.font.width(idText);
-        mc.font.draw(poseStack, idText, x + (columns[1] - idTextWidth) / 2, textY, headerColor);
+        mc.font.draw(poseStack, idText, x + (columns[1] - idTextWidth) / 2, headerTextY, headerColor);
         x += columns[1] + columnGap;
         
         drawCell(poseStack, x, tableY, columns[2], headerHeight, true);
         Component colorsText = new TranslatableComponent("buildscape.config.ids.colors");
         int colorsTextWidth = mc.font.width(colorsText);
-        mc.font.draw(poseStack, colorsText, x + (columns[2] - colorsTextWidth) / 2, textY, headerColor);
+        mc.font.draw(poseStack, colorsText, x + (columns[2] - colorsTextWidth) / 2, headerTextY, headerColor);
         x += columns[2] + columnGap;
         
         drawCell(poseStack, x, tableY, columns[3], headerHeight, true);
         Component dimensionText = new TranslatableComponent("buildscape.config.ids.dimension");
         int dimensionTextWidth = mc.font.width(dimensionText);
-        mc.font.draw(poseStack, dimensionText, x + (columns[3] - dimensionTextWidth) / 2, textY, headerColor);
+        mc.font.draw(poseStack, dimensionText, x + (columns[3] - dimensionTextWidth) / 2, headerTextY, headerColor);
         x += columns[3] + columnGap;
         
         // Coordinates column - draw X, Y, Z separately aligned to their fields
@@ -477,14 +522,14 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
         int yLabelX = x + coordPadding + coordWidth + coordGap + coordWidth / 2;
         int zLabelX = x + coordPadding + (coordWidth + coordGap) * 2 + coordWidth / 2;
         
-        // Center text horizontally
+        // Center text horizontally - use SAME headerTextY as other headers
         int xLabelWidth = mc.font.width("X");
         int yLabelWidth = mc.font.width("Y");
         int zLabelWidth = mc.font.width("Z");
         
-        mc.font.draw(poseStack, "X", xLabelX - xLabelWidth / 2, textY, 0xFFFF0000); // Red
-        mc.font.draw(poseStack, "Y", yLabelX - yLabelWidth / 2, textY, 0xFF0000FF); // Blue
-        mc.font.draw(poseStack, "Z", zLabelX - zLabelWidth / 2, textY, 0xFF00FF00); // Green
+        mc.font.draw(poseStack, "X", xLabelX - xLabelWidth / 2, headerTextY, 0xFFFF0000); // Red
+        mc.font.draw(poseStack, "Y", yLabelX - yLabelWidth / 2, headerTextY, 0xFF0000FF); // Blue
+        mc.font.draw(poseStack, "Z", zLabelX - zLabelWidth / 2, headerTextY, 0xFF00FF00); // Green
     }
     
     private void drawCell(PoseStack poseStack, int x, int y, int width, int height, boolean header) {
@@ -708,7 +753,7 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
             dimensionField = new EditBox(mc.font, 0, 0, BuildScapeConfigScreen.scaleSize(90), editBoxHeight, new TranslatableComponent("buildscape.config.ids.dimension"));
             dimensionField.setValue(data.dimension != null ? data.dimension : "minecraft:overworld");
             dimensionField.setMaxLength(128);
-            dimensionField.setResponder((s) -> markDirty());
+            dimensionField.setEditable(false); // Dimension is not editable
             dimensionField.setBordered(false); // Remove white border
             
             int coordFieldWidth = BuildScapeConfigScreen.scaleSize(48);
@@ -718,17 +763,20 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
             xField.setBordered(false); // Remove white border
             yField.setBordered(false); // Remove white border
             zField.setBordered(false); // Remove white border
-            // Color coordinates: X=Red, Y=Blue, Z=Green
-            xField.setTextColor(0xFFFF0000); // Red
-            yField.setTextColor(0xFF0000FF); // Blue
-            zField.setTextColor(0xFF00FF00); // Green
+            // Make coordinate fields non-editable
+            xField.setEditable(false);
+            yField.setEditable(false);
+            zField.setEditable(false);
             
+            // Set values first
             xField.setValue(String.valueOf(data.x));
             yField.setValue(String.valueOf(data.y));
             zField.setValue(String.valueOf(data.z));
-            xField.setResponder((s) -> markDirty());
-            yField.setResponder((s) -> markDirty());
-            zField.setResponder((s) -> markDirty());
+            
+            // Color coordinates: X=Red, Y=Blue, Z=Green (set AFTER setting values to ensure colors persist)
+            xField.setTextColor(0xFFFF0000); // Red
+            yField.setTextColor(0xFF0000FF); // Blue
+            zField.setTextColor(0xFF00FF00); // Green
         }
         
         private void openPillarDetailTab(String pillarId) {
@@ -771,10 +819,11 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
             }
             
             dimensionField.setValue(data.dimension != null ? data.dimension : "minecraft:overworld");
+            // Set coordinate values first
             xField.setValue(String.valueOf(data.x));
             yField.setValue(String.valueOf(data.y));
             zField.setValue(String.valueOf(data.z));
-            // Ensure coordinate colors are set when applying data
+            // Ensure coordinate colors are set AFTER setting values to ensure colors persist
             xField.setTextColor(0xFFFF0000); // Red
             yField.setTextColor(0xFF0000FF); // Blue
             zField.setTextColor(0xFF00FF00); // Green
@@ -853,21 +902,56 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
             Minecraft mc = Minecraft.getInstance();
             int fontHeight = mc.font.lineHeight;
             
-            // Calculate EXACT center Y position for all elements - use the same calculation for everything
-            // This ensures perfect alignment across all columns
+            // Calculate total row width
+            int totalRowWidth = columns[0] + columnGap + columns[1] + columnGap + columns[2] + columnGap + columns[3] + columnGap + columns[4];
+            
+            // Draw black bounding box around the entire row FIRST - this is the container for all pillar ID content
+            int rowBorderColor = 0xFF000000; // Black
+            int rowBorderThickness = Math.max(1, BuildScapeConfigScreen.scaleSize(1)); // Ensure at least 1 pixel
+            int rowBoxX = startX;
+            int rowBoxY = rowY;
+            int rowBoxWidth = totalRowWidth;
+            int rowBoxHeight = rowHeight;
+            
+            // Draw border rectangle around entire row - this ensures all content fits within this bounding box
+            GuiComponent.fill(poseStack, rowBoxX, rowBoxY, rowBoxX + rowBoxWidth, rowBoxY + rowBorderThickness, rowBorderColor); // Top
+            GuiComponent.fill(poseStack, rowBoxX, rowBoxY + rowBoxHeight - rowBorderThickness, rowBoxX + rowBoxWidth, rowBoxY + rowBoxHeight, rowBorderColor); // Bottom
+            GuiComponent.fill(poseStack, rowBoxX, rowBoxY, rowBoxX + rowBorderThickness, rowBoxY + rowBoxHeight, rowBorderColor); // Left
+            GuiComponent.fill(poseStack, rowBoxX + rowBoxWidth - rowBorderThickness, rowBoxY, rowBoxX + rowBoxWidth, rowBoxY + rowBoxHeight, rowBorderColor); // Right
+            
+            // Calculate EXACT center Y position for all elements - use ONE calculation for EVERYTHING
+            // This ensures perfect horizontal alignment across all columns
             int rowCenterY = rowY + rowHeight / 2;
-            int centerY = rowCenterY - editBoxHeight / 2; // For edit boxes and buttons
-            // For text: center vertically by calculating from row center, accounting for font baseline
-            // Font baseline is typically at fontHeight - 1 from top of text
-            int textCenterY = rowCenterY - fontHeight / 2 + fontHeight - 1;
+            
+            // SIMPLIFIED CENTER ALIGNMENT:
+            // Calculate ONE center Y position for the entire row and align ALL elements to it
+            
+            int checkboxSize = BuildScapeConfigScreen.scaleSize(18);
+            int swatchSize = BuildScapeConfigScreen.scaleSize(20);
+            
+            // Use the row center as the reference point for ALL elements
+            int alignmentCenterY = rowCenterY;
+            
+            // Position checkboxes: vertically centered
+            int checkboxCenterY = alignmentCenterY - checkboxSize / 2;
+            
+            // Position color swatches: vertically centered
+            int swatchCenterY = alignmentCenterY - swatchSize / 2;
+            
+            // Position EditBoxes: vertically centered
+            int centerY = alignmentCenterY - editBoxHeight / 2;
+            
+            // Position text: align text baseline to be in line with checkboxes and swatches
+            // Text Y for font.draw() is the BASELINE, so we need to calculate where the baseline should be
+            // Move text up to align properly with checkboxes/swatches
+            int textY = alignmentCenterY + fontHeight / 2 - 6;
             
             int x = startX;
             
-            // Checkbox column - perfectly centered
+            // Checkbox column - perfectly centered vertically
             drawCell(poseStack, x, rowY, columns[0], rowHeight, false);
-            int checkboxSize = BuildScapeConfigScreen.scaleSize(18);
             selectCheckbox.x = x + (columns[0] - checkboxSize) / 2;
-            selectCheckbox.y = centerY;
+            selectCheckbox.y = checkboxCenterY; // Use calculated center for checkbox
             selectCheckbox.setWidth(checkboxSize);
             selectCheckbox.setHeight(checkboxSize);
             selectCheckbox.renderButton(poseStack, 0, 0, 0);
@@ -875,23 +959,29 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
             
             // ID column - perfectly centered
             drawCell(poseStack, x, rowY, columns[1], rowHeight, false);
+            // Render Pillar ID EditBox background
             idField.x = x + padding;
             idField.y = centerY;
             idField.setWidth(columns[1] - padding * 2);
+            // Clear text temporarily to draw it directly for alignment
+            String idValue = idField.getValue();
+            idField.setValue("");
             idField.render(poseStack, 0, 0, 0);
+            idField.setValue(idValue);
+            // Draw Pillar ID text directly using the textY calculated at the top
+            int idTextX = x + padding;
+            mc.font.draw(poseStack, idValue, idTextX, textY, 0xFFFFFFFF);
             x += columns[1] + columnGap;
             
             // Colors column - perfectly centered
             drawCell(poseStack, x, rowY, columns[2], rowHeight, false);
             // Render color swatches - perfectly centered vertically
-            int swatchSize = BuildScapeConfigScreen.scaleSize(20);
             int swatchSpacing = BuildScapeConfigScreen.scaleSize(4);
             int swatchStartX = x + padding;
-            int swatchY = centerY;
             for (int i = 0; i < colorSwatches.size(); i++) {
                 ColorSwatchButton swatch = colorSwatches.get(i);
                 swatch.x = swatchStartX + i * (swatchSize + swatchSpacing);
-                swatch.y = swatchY;
+                swatch.y = swatchCenterY; // Use calculated center for swatches
                 swatch.setWidth(swatchSize);
                 swatch.setHeight(swatchSize);
                 swatch.renderButton(poseStack, 0, 0, 0);
@@ -900,34 +990,33 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
             
             // Dimension column - perfectly centered
             drawCell(poseStack, x, rowY, columns[3], rowHeight, false);
-            // Render dimension text only (no icon)
-            String dimension = dimensionField.getValue();
+            // Format dimension name for display (remove modid prefix like "minecraft:" and show full name)
+            String originalDimension = dimensionField.getValue();
+            String displayDimension = formatDimensionName(originalDimension);
             
-            // Format dimension name for display (remove "minecraft:" prefix)
-            String displayDimension = dimension;
-            if (displayDimension != null && displayDimension.contains(":")) {
-                String[] parts = displayDimension.split(":");
-                if (parts.length > 1) {
-                    String dimName = parts[1];
-                    // Capitalize first letter
-                    displayDimension = dimName.substring(0, 1).toUpperCase() + dimName.substring(1);
-                }
-            }
+            // Render dimension EditBox background (no text)
+            dimensionField.x = x + padding;
+            dimensionField.y = centerY; // Use EXACT same centerY as all other EditBoxes
+            int dimensionWidth = columns[3] - padding * 2;
+            dimensionField.setWidth(Math.max(dimensionWidth, BuildScapeConfigScreen.scaleSize(100)));
             
-            // Render dimension text - perfectly centered both horizontally and vertically
-            // Ensure text stays within bounds
-            String displayText = displayDimension != null ? displayDimension : "";
-            int textWidth = mc.font.width(displayText);
-            int maxTextWidth = columns[3] - padding * 2;
-            if (textWidth > maxTextWidth) {
+            // Temporarily clear text to draw formatted version
+            String tempValue = dimensionField.getValue();
+            dimensionField.setValue("");
+            dimensionField.render(poseStack, 0, 0, 0);
+            dimensionField.setValue(tempValue);
+            
+            // Draw formatted dimension text directly using SAME textY as all other text
+            int dimTextWidth = mc.font.width(displayDimension);
+            int maxDimWidth = dimensionWidth - BuildScapeConfigScreen.scaleSize(4);
+            String finalDimText = displayDimension;
+            if (dimTextWidth > maxDimWidth) {
                 // Truncate with ellipsis if too long
-                displayText = mc.font.plainSubstrByWidth(displayText, maxTextWidth - mc.font.width("...")) + "...";
-                textWidth = mc.font.width(displayText);
+                finalDimText = mc.font.plainSubstrByWidth(displayDimension, maxDimWidth - mc.font.width("...")) + "...";
+                dimTextWidth = mc.font.width(finalDimText);
             }
-            // Center text horizontally within the column
-            int textX = x + (columns[3] - textWidth) / 2;
-            // Center text vertically using the same calculation as other text
-            mc.font.draw(poseStack, displayText, textX, textCenterY, 0xFFFFFFFF);
+            int dimTextX = x + padding + (dimensionWidth - dimTextWidth) / 2;
+            mc.font.draw(poseStack, finalDimText, dimTextX, textY, 0xFFFFFFFF);
             x += columns[3] + columnGap;
             
             // Coordinates column - perfectly centered with border
@@ -953,34 +1042,34 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
             int zFieldX = x + coordPadding + (coordWidth + coordGap) * 2;
             
             // Draw border around all coordinate fields as one component - BLACK border
-            int borderColor = 0xFF000000; // Black border
-            int borderThickness = BuildScapeConfigScreen.scaleSize(1);
-            int borderPadding = 2; // Space between border and fields
-            int coordGroupX = x + coordPadding - borderPadding;
-            int coordGroupY = centerY - borderPadding;
-            int coordGroupWidth = (coordWidth + coordGap) * 2 + coordWidth + borderPadding * 2;
-            int coordGroupHeight = editBoxHeight + borderPadding * 2;
+            int coordBorderColor = 0xFF000000; // Black border for coordinates
+            int coordBorderThickness = Math.max(1, BuildScapeConfigScreen.scaleSize(1)); // Ensure at least 1 pixel
+            int coordBorderPadding = 2; // Space between border and fields
+            int coordGroupX = x + coordPadding - coordBorderPadding;
+            int coordGroupY = centerY - coordBorderPadding;
+            int coordGroupWidth = (coordWidth + coordGap) * 2 + coordWidth + coordBorderPadding * 2;
+            int coordGroupHeight = editBoxHeight + coordBorderPadding * 2;
             
             // Draw outer border rectangle - ensure no overlap
             // Top border
-            GuiComponent.fill(poseStack, coordGroupX, coordGroupY, coordGroupX + coordGroupWidth, coordGroupY + borderThickness, borderColor);
+            GuiComponent.fill(poseStack, coordGroupX, coordGroupY, coordGroupX + coordGroupWidth, coordGroupY + coordBorderThickness, coordBorderColor);
             // Bottom border
-            GuiComponent.fill(poseStack, coordGroupX, coordGroupY + coordGroupHeight - borderThickness, coordGroupX + coordGroupWidth, coordGroupY + coordGroupHeight, borderColor);
+            GuiComponent.fill(poseStack, coordGroupX, coordGroupY + coordGroupHeight - coordBorderThickness, coordGroupX + coordGroupWidth, coordGroupY + coordGroupHeight, coordBorderColor);
             // Left border
-            GuiComponent.fill(poseStack, coordGroupX, coordGroupY, coordGroupX + borderThickness, coordGroupY + coordGroupHeight, borderColor);
+            GuiComponent.fill(poseStack, coordGroupX, coordGroupY, coordGroupX + coordBorderThickness, coordGroupY + coordGroupHeight, coordBorderColor);
             // Right border
-            GuiComponent.fill(poseStack, coordGroupX + coordGroupWidth - borderThickness, coordGroupY, coordGroupX + coordGroupWidth, coordGroupY + coordGroupHeight, borderColor);
+            GuiComponent.fill(poseStack, coordGroupX + coordGroupWidth - coordBorderThickness, coordGroupY, coordGroupX + coordGroupWidth, coordGroupY + coordGroupHeight, coordBorderColor);
             
             // Vertical dividers between fields - positioned to not overlap with outer border
             // Divider 1: between X and Y fields
-            int divider1X = x + coordPadding + coordWidth + coordGap / 2 - borderThickness / 2;
+            int divider1X = x + coordPadding + coordWidth + coordGap / 2 - coordBorderThickness / 2;
             // Divider 2: between Y and Z fields
-            int divider2X = x + coordPadding + coordWidth + coordGap + coordWidth + coordGap / 2 - borderThickness / 2;
+            int divider2X = x + coordPadding + coordWidth + coordGap + coordWidth + coordGap / 2 - coordBorderThickness / 2;
             // Draw dividers from inner border to inner border (not overlapping outer border)
-            int dividerTop = coordGroupY + borderThickness;
-            int dividerBottom = coordGroupY + coordGroupHeight - borderThickness;
-            GuiComponent.fill(poseStack, divider1X, dividerTop, divider1X + borderThickness, dividerBottom, borderColor);
-            GuiComponent.fill(poseStack, divider2X, dividerTop, divider2X + borderThickness, dividerBottom, borderColor);
+            int dividerTop = coordGroupY + coordBorderThickness;
+            int dividerBottom = coordGroupY + coordGroupHeight - coordBorderThickness;
+            GuiComponent.fill(poseStack, divider1X, dividerTop, divider1X + coordBorderThickness, dividerBottom, coordBorderColor);
+            GuiComponent.fill(poseStack, divider2X, dividerTop, divider2X + coordBorderThickness, dividerBottom, coordBorderColor);
             
             // Ensure all coordinates are perfectly aligned - centered vertically
             xField.x = xFieldX;
@@ -995,10 +1084,82 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
             zField.y = centerY;
             zField.setWidth(coordWidth);
             
-            // Render coordinates with consistent alignment
+            // Temporarily clear EditBox values to hide their text, then draw colored text directly
+            String xValue = xField.getValue();
+            String yValue = yField.getValue();
+            String zValue = zField.getValue();
+            
+            // Clear EditBox text temporarily so we can draw colored text
+            xField.setValue("");
+            yField.setValue("");
+            zField.setValue("");
+            
+            // Render the EditBoxes (background/border only, no text)
             xField.render(poseStack, 0, 0, 0);
             yField.render(poseStack, 0, 0, 0);
             zField.render(poseStack, 0, 0, 0);
+            
+            // Restore values
+            xField.setValue(xValue);
+            yField.setValue(yValue);
+            zField.setValue(zValue);
+            
+            // Draw coordinate text directly with colors using SAME textY as all other text
+            // Center text horizontally within each coordinate field
+            int xTextX = xFieldX + (coordWidth - mc.font.width(xValue)) / 2;
+            int yTextX = yFieldX + (coordWidth - mc.font.width(yValue)) / 2;
+            int zTextX = zFieldX + (coordWidth - mc.font.width(zValue)) / 2;
+            
+            // Draw colored coordinate text directly
+            mc.font.draw(poseStack, xValue, xTextX, textY, 0xFFFF0000); // Red
+            mc.font.draw(poseStack, yValue, yTextX, textY, 0xFF0000FF); // Blue
+            mc.font.draw(poseStack, zValue, zTextX, textY, 0xFF00FF00); // Green
+        }
+        
+        /**
+         * Format dimension name for display by removing modid prefix and capitalizing properly.
+         * Examples:
+         * - "minecraft:overworld" -> "Overworld"
+         * - "minecraft:the_nether" -> "The Nether"
+         * - "minecraft:the_end" -> "The End"
+         * - "overworld" -> "Overworld"
+         */
+        private String formatDimensionName(String dimension) {
+            if (dimension == null || dimension.isEmpty()) {
+                return "Overworld"; // Default
+            }
+            
+            String dimName = dimension;
+            
+            // Remove modid prefix (e.g., "minecraft:" or any other modid)
+            if (dimName.contains(":")) {
+                int colonIndex = dimName.lastIndexOf(":");
+                if (colonIndex >= 0 && colonIndex < dimName.length() - 1) {
+                    dimName = dimName.substring(colonIndex + 1);
+                }
+            }
+            
+            // Handle underscores and capitalize properly
+            // Replace underscores with spaces
+            dimName = dimName.replace("_", " ");
+            
+            // Capitalize first letter of each word
+            if (dimName.length() > 0) {
+                String[] words = dimName.split("\\s+");
+                StringBuilder formatted = new StringBuilder();
+                for (int i = 0; i < words.length; i++) {
+                    if (words[i].length() > 0) {
+                        if (i > 0) formatted.append(" ");
+                        formatted.append(words[i].substring(0, 1).toUpperCase());
+                        if (words[i].length() > 1) {
+                            formatted.append(words[i].substring(1).toLowerCase());
+                        }
+                    }
+                }
+                dimName = formatted.toString();
+            }
+            
+            return dimName.isEmpty() ? "Overworld" : dimName;
         }
         
         private void setBounds(int x, int y, int width, int height) {

@@ -1384,6 +1384,30 @@ public class PillarBlockEntity extends BlockEntity {
         this.setChanged();
     }
 
+    /**
+     * Resets the pillar to default appearance (clears colors and pattern) without removing from manager.
+     * Used when a pillar ID is removed from the config to reset its visual state.
+     */
+    public void resetToDefaultAppearance() {
+        this.particleColors = null;
+        this.particlePattern = null;
+        this.patternSpeed = null;
+        this.patternSpread = null;
+        this.patternIntensity = null;
+        this.particleColorCounter = 0;
+        this.colorsInitialized = false;
+        this.setChanged();
+        
+        if (level != null && !level.isClientSide) {
+            level.sendBlockUpdated(
+                    worldPosition,
+                    getBlockState(),
+                    getBlockState(),
+                    3
+            );
+        }
+    }
+
     public void clearParticleColors() {
         String idToRemove = this.pillarId;
 

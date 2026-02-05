@@ -101,6 +101,84 @@ public class BuildScape {
             items.add(new ItemStack(ModItems.WEATHERED_COPPER_CHAIN.get()));
             items.add(new ItemStack(ModItems.OXIDIZED_COPPER_CHAIN.get()));
 
+            items.add(new ItemStack(ModItems.STEEL_INGOT.get()));
+            items.add(new ItemStack(ModItems.STEEL_BLOCK.get()));
+            items.add(new ItemStack(ModItems.STEEL_BLOCK_STAIRS.get()));
+            items.add(new ItemStack(ModItems.STEEL_BLOCK_SLAB.get()));
+            items.add(new ItemStack(ModItems.STEEL_BLOCK_WALL.get()));
+            items.add(new ItemStack(ModItems.POLISHED_STEEL.get()));
+            items.add(new ItemStack(ModItems.POLISHED_STEEL_STAIRS.get()));
+            items.add(new ItemStack(ModItems.POLISHED_STEEL_SLAB.get()));
+            items.add(new ItemStack(ModItems.POLISHED_STEEL_WALL.get()));
+            items.add(new ItemStack(ModItems.PRESSED_STEEL.get()));
+            items.add(new ItemStack(ModItems.PRESSED_STEEL_STAIRS.get()));
+            items.add(new ItemStack(ModItems.PRESSED_STEEL_SLAB.get()));
+            items.add(new ItemStack(ModItems.PRESSED_STEEL_WALL.get()));
+            items.add(new ItemStack(ModItems.CUT_STEEL.get()));
+            items.add(new ItemStack(ModItems.CUT_STEEL_STAIRS.get()));
+            items.add(new ItemStack(ModItems.CUT_STEEL_SLAB.get()));
+            items.add(new ItemStack(ModItems.CUT_STEEL_WALL.get()));
+            items.add(new ItemStack(ModItems.FACTORY_STEEL_PANEL.get()));
+            items.add(new ItemStack(ModItems.STEEL_CASING.get()));
+            items.add(new ItemStack(ModItems.STEEL_TRIM.get()));
+            items.add(new ItemStack(ModItems.STEEL_PILLAR.get()));
+            items.add(new ItemStack(ModItems.BOLTED_STEEL_PILLAR.get()));
+            items.add(new ItemStack(ModItems.STEEL_GRATE.get()));
+            items.add(new ItemStack(ModItems.STEEL_FAN.get()));
+
+            // Caution Blocks
+            items.add(new ItemStack(ModItems.CAUTION_FACTORY.get()));
+            items.add(new ItemStack(ModItems.CAUTION_FACTORY_STAIRS.get()));
+            items.add(new ItemStack(ModItems.CAUTION_FACTORY_SLAB.get()));
+
+            items.add(new ItemStack(ModItems.FRAMED_CAUTION.get()));
+            items.add(new ItemStack(ModItems.FRAMED_CAUTION_STAIRS.get()));
+            items.add(new ItemStack(ModItems.FRAMED_CAUTION_SLAB.get()));
+
+            items.add(new ItemStack(ModItems.CAUTION_BLACK.get()));
+            items.add(new ItemStack(ModItems.CAUTION_BLACK_STAIRS.get()));
+            items.add(new ItemStack(ModItems.CAUTION_BLACK_SLAB.get()));
+
+            items.add(new ItemStack(ModItems.CAUTION_WHITE.get()));
+            items.add(new ItemStack(ModItems.CAUTION_WHITE_STAIRS.get()));
+            items.add(new ItemStack(ModItems.CAUTION_WHITE_SLAB.get()));
+
+            items.add(new ItemStack(ModItems.CAUTION_RED.get()));
+            items.add(new ItemStack(ModItems.CAUTION_RED_STAIRS.get()));
+            items.add(new ItemStack(ModItems.CAUTION_RED_SLAB.get()));
+
+            items.add(new ItemStack(ModItems.CAUTION_BLUE.get()));
+            items.add(new ItemStack(ModItems.CAUTION_BLUE_STAIRS.get()));
+            items.add(new ItemStack(ModItems.CAUTION_BLUE_SLAB.get()));
+
+            items.add(new ItemStack(ModItems.CAUTION_YELLOW.get()));
+            items.add(new ItemStack(ModItems.CAUTION_YELLOW_STAIRS.get()));
+            items.add(new ItemStack(ModItems.CAUTION_YELLOW_SLAB.get()));
+
+            items.add(new ItemStack(ModItems.CAUTION_LIME.get()));
+            items.add(new ItemStack(ModItems.CAUTION_LIME_STAIRS.get()));
+            items.add(new ItemStack(ModItems.CAUTION_LIME_SLAB.get()));
+
+            items.add(new ItemStack(ModItems.CAUTION_PINK.get()));
+            items.add(new ItemStack(ModItems.CAUTION_PINK_STAIRS.get()));
+            items.add(new ItemStack(ModItems.CAUTION_PINK_SLAB.get()));
+
+            items.add(new ItemStack(ModItems.CAUTION_CANDY.get()));
+            items.add(new ItemStack(ModItems.CAUTION_CANDY_STAIRS.get()));
+            items.add(new ItemStack(ModItems.CAUTION_CANDY_SLAB.get()));
+
+            items.add(new ItemStack(ModItems.CAUTION_COTTONCANDY.get()));
+            items.add(new ItemStack(ModItems.CAUTION_COTTONCANDY_STAIRS.get()));
+            items.add(new ItemStack(ModItems.CAUTION_COTTONCANDY_SLAB.get()));
+
+            items.add(new ItemStack(ModItems.CAUTION_MINTCANDY.get()));
+            items.add(new ItemStack(ModItems.CAUTION_MINTCANDY_STAIRS.get()));
+            items.add(new ItemStack(ModItems.CAUTION_MINTCANDY_SLAB.get()));
+
+            items.add(new ItemStack(ModItems.CAUTION_CITRUSCANDY.get()));
+            items.add(new ItemStack(ModItems.CAUTION_CITRUSCANDY_STAIRS.get()));
+            items.add(new ItemStack(ModItems.CAUTION_CITRUSCANDY_SLAB.get()));
+
             items.add(new ItemStack(Items.CHAIN));
             items.add(new ItemStack(ModItems.LARGE_IRON_CHAIN.get()));
             items.add(new ItemStack(ModItems.ANCIENT_STEEL_CHAIN.get()));
@@ -205,6 +283,87 @@ public class BuildScape {
             items.add(new ItemStack(ModItems.PINK_TILES_SLAB.get()));
             items.add(new ItemStack(ModItems.PINK_TILES_WALL.get()));
 
+            // Stained Bricks
+            items.add(new ItemStack(ModItems.WHITE_STAINED_BRICKS.get()));
+            items.add(new ItemStack(ModItems.WHITE_STAINED_BRICKS_STAIRS.get()));
+            items.add(new ItemStack(ModItems.WHITE_STAINED_BRICKS_SLAB.get()));
+            items.add(new ItemStack(ModItems.WHITE_STAINED_BRICKS_WALL.get()));
+
+            items.add(new ItemStack(ModItems.LIGHT_GRAY_STAINED_BRICKS.get()));
+            items.add(new ItemStack(ModItems.LIGHT_GRAY_STAINED_BRICKS_STAIRS.get()));
+            items.add(new ItemStack(ModItems.LIGHT_GRAY_STAINED_BRICKS_SLAB.get()));
+            items.add(new ItemStack(ModItems.LIGHT_GRAY_STAINED_BRICKS_WALL.get()));
+
+            items.add(new ItemStack(ModItems.GRAY_STAINED_BRICKS.get()));
+            items.add(new ItemStack(ModItems.GRAY_STAINED_BRICKS_STAIRS.get()));
+            items.add(new ItemStack(ModItems.GRAY_STAINED_BRICKS_SLAB.get()));
+            items.add(new ItemStack(ModItems.GRAY_STAINED_BRICKS_WALL.get()));
+
+            items.add(new ItemStack(ModItems.BLACK_STAINED_BRICKS.get()));
+            items.add(new ItemStack(ModItems.BLACK_STAINED_BRICKS_STAIRS.get()));
+            items.add(new ItemStack(ModItems.BLACK_STAINED_BRICKS_SLAB.get()));
+            items.add(new ItemStack(ModItems.BLACK_STAINED_BRICKS_WALL.get()));
+
+            items.add(new ItemStack(ModItems.BROWN_STAINED_BRICKS.get()));
+            items.add(new ItemStack(ModItems.BROWN_STAINED_BRICKS_STAIRS.get()));
+            items.add(new ItemStack(ModItems.BROWN_STAINED_BRICKS_SLAB.get()));
+            items.add(new ItemStack(ModItems.BROWN_STAINED_BRICKS_WALL.get()));
+
+            items.add(new ItemStack(ModItems.RED_STAINED_BRICKS.get()));
+            items.add(new ItemStack(ModItems.RED_STAINED_BRICKS_STAIRS.get()));
+            items.add(new ItemStack(ModItems.RED_STAINED_BRICKS_SLAB.get()));
+            items.add(new ItemStack(ModItems.RED_STAINED_BRICKS_WALL.get()));
+
+            items.add(new ItemStack(ModItems.ORANGE_STAINED_BRICKS.get()));
+            items.add(new ItemStack(ModItems.ORANGE_STAINED_BRICKS_STAIRS.get()));
+            items.add(new ItemStack(ModItems.ORANGE_STAINED_BRICKS_SLAB.get()));
+            items.add(new ItemStack(ModItems.ORANGE_STAINED_BRICKS_WALL.get()));
+
+            items.add(new ItemStack(ModItems.YELLOW_STAINED_BRICKS.get()));
+            items.add(new ItemStack(ModItems.YELLOW_STAINED_BRICKS_STAIRS.get()));
+            items.add(new ItemStack(ModItems.YELLOW_STAINED_BRICKS_SLAB.get()));
+            items.add(new ItemStack(ModItems.YELLOW_STAINED_BRICKS_WALL.get()));
+
+            items.add(new ItemStack(ModItems.LIME_STAINED_BRICKS.get()));
+            items.add(new ItemStack(ModItems.LIME_STAINED_BRICKS_STAIRS.get()));
+            items.add(new ItemStack(ModItems.LIME_STAINED_BRICKS_SLAB.get()));
+            items.add(new ItemStack(ModItems.LIME_STAINED_BRICKS_WALL.get()));
+
+            items.add(new ItemStack(ModItems.GREEN_STAINED_BRICKS.get()));
+            items.add(new ItemStack(ModItems.GREEN_STAINED_BRICKS_STAIRS.get()));
+            items.add(new ItemStack(ModItems.GREEN_STAINED_BRICKS_SLAB.get()));
+            items.add(new ItemStack(ModItems.GREEN_STAINED_BRICKS_WALL.get()));
+
+            items.add(new ItemStack(ModItems.CYAN_STAINED_BRICKS.get()));
+            items.add(new ItemStack(ModItems.CYAN_STAINED_BRICKS_STAIRS.get()));
+            items.add(new ItemStack(ModItems.CYAN_STAINED_BRICKS_SLAB.get()));
+            items.add(new ItemStack(ModItems.CYAN_STAINED_BRICKS_WALL.get()));
+
+            items.add(new ItemStack(ModItems.LIGHT_BLUE_STAINED_BRICKS.get()));
+            items.add(new ItemStack(ModItems.LIGHT_BLUE_STAINED_BRICKS_STAIRS.get()));
+            items.add(new ItemStack(ModItems.LIGHT_BLUE_STAINED_BRICKS_SLAB.get()));
+            items.add(new ItemStack(ModItems.LIGHT_BLUE_STAINED_BRICKS_WALL.get()));
+
+            items.add(new ItemStack(ModItems.BLUE_STAINED_BRICKS.get()));
+            items.add(new ItemStack(ModItems.BLUE_STAINED_BRICKS_STAIRS.get()));
+            items.add(new ItemStack(ModItems.BLUE_STAINED_BRICKS_SLAB.get()));
+            items.add(new ItemStack(ModItems.BLUE_STAINED_BRICKS_WALL.get()));
+
+            items.add(new ItemStack(ModItems.PURPLE_STAINED_BRICKS.get()));
+            items.add(new ItemStack(ModItems.PURPLE_STAINED_BRICKS_STAIRS.get()));
+            items.add(new ItemStack(ModItems.PURPLE_STAINED_BRICKS_SLAB.get()));
+            items.add(new ItemStack(ModItems.PURPLE_STAINED_BRICKS_WALL.get()));
+
+            items.add(new ItemStack(ModItems.MAGENTA_STAINED_BRICKS.get()));
+            items.add(new ItemStack(ModItems.MAGENTA_STAINED_BRICKS_STAIRS.get()));
+            items.add(new ItemStack(ModItems.MAGENTA_STAINED_BRICKS_SLAB.get()));
+            items.add(new ItemStack(ModItems.MAGENTA_STAINED_BRICKS_WALL.get()));
+
+            items.add(new ItemStack(ModItems.PINK_STAINED_BRICKS.get()));
+            items.add(new ItemStack(ModItems.PINK_STAINED_BRICKS_STAIRS.get()));
+            items.add(new ItemStack(ModItems.PINK_STAINED_BRICKS_SLAB.get()));
+            items.add(new ItemStack(ModItems.PINK_STAINED_BRICKS_WALL.get()));
+
             items.add(new ItemStack(ModItems.BAMBOO_BLOCK.get()));
             items.add(new ItemStack(ModItems.BAMBOO_BLOCK_STAIRS.get()));
             items.add(new ItemStack(ModItems.BAMBOO_BLOCK_SLAB.get()));
@@ -249,6 +408,7 @@ public class BuildScape {
             items.add(new ItemStack(ModItems.MANGROVE_SIGN.get()));
 
             items.add(new ItemStack(ModItems.STRIPPED_MANGROVE_WOOD_WALL.get()));
+            items.add(new ItemStack(ModItems.MANGROVE_BOAT.get()));
 
             items.add(new ItemStack(ModItems.OAK_WOOD_WALL.get()));
             items.add(new ItemStack(ModItems.STRIPPED_OAK_WOOD_WALL.get()));
@@ -583,6 +743,40 @@ public class BuildScape {
             items.add(new ItemStack(ModItems.PINK_MOSAIC_GLASS.get()));
             items.add(new ItemStack(ModItems.PINK_MOSAIC_GLASS_PANE.get()));
 
+            // Factory Glass
+            items.add(new ItemStack(ModItems.FACTORY_WHITE_GLASS.get()));
+            items.add(new ItemStack(ModItems.FACTORY_WHITE_GLASS_PANE.get()));
+            items.add(new ItemStack(ModItems.FACTORY_LIGHT_GRAY_GLASS.get()));
+            items.add(new ItemStack(ModItems.FACTORY_LIGHT_GRAY_GLASS_PANE.get()));
+            items.add(new ItemStack(ModItems.FACTORY_GRAY_GLASS.get()));
+            items.add(new ItemStack(ModItems.FACTORY_GRAY_GLASS_PANE.get()));
+            items.add(new ItemStack(ModItems.FACTORY_BLACK_GLASS.get()));
+            items.add(new ItemStack(ModItems.FACTORY_BLACK_GLASS_PANE.get()));
+            items.add(new ItemStack(ModItems.FACTORY_BROWN_GLASS.get()));
+            items.add(new ItemStack(ModItems.FACTORY_BROWN_GLASS_PANE.get()));
+            items.add(new ItemStack(ModItems.FACTORY_RED_GLASS.get()));
+            items.add(new ItemStack(ModItems.FACTORY_RED_GLASS_PANE.get()));
+            items.add(new ItemStack(ModItems.FACTORY_ORANGE_GLASS.get()));
+            items.add(new ItemStack(ModItems.FACTORY_ORANGE_GLASS_PANE.get()));
+            items.add(new ItemStack(ModItems.FACTORY_YELLOW_GLASS.get()));
+            items.add(new ItemStack(ModItems.FACTORY_YELLOW_GLASS_PANE.get()));
+            items.add(new ItemStack(ModItems.FACTORY_LIME_GLASS.get()));
+            items.add(new ItemStack(ModItems.FACTORY_LIME_GLASS_PANE.get()));
+            items.add(new ItemStack(ModItems.FACTORY_GREEN_GLASS.get()));
+            items.add(new ItemStack(ModItems.FACTORY_GREEN_GLASS_PANE.get()));
+            items.add(new ItemStack(ModItems.FACTORY_CYAN_GLASS.get()));
+            items.add(new ItemStack(ModItems.FACTORY_CYAN_GLASS_PANE.get()));
+            items.add(new ItemStack(ModItems.FACTORY_LIGHT_BLUE_GLASS.get()));
+            items.add(new ItemStack(ModItems.FACTORY_LIGHT_BLUE_GLASS_PANE.get()));
+            items.add(new ItemStack(ModItems.FACTORY_BLUE_GLASS.get()));
+            items.add(new ItemStack(ModItems.FACTORY_BLUE_GLASS_PANE.get()));
+            items.add(new ItemStack(ModItems.FACTORY_PURPLE_GLASS.get()));
+            items.add(new ItemStack(ModItems.FACTORY_PURPLE_GLASS_PANE.get()));
+            items.add(new ItemStack(ModItems.FACTORY_MAGENTA_GLASS.get()));
+            items.add(new ItemStack(ModItems.FACTORY_MAGENTA_GLASS_PANE.get()));
+            items.add(new ItemStack(ModItems.FACTORY_PINK_GLASS.get()));
+            items.add(new ItemStack(ModItems.FACTORY_PINK_GLASS_PANE.get()));
+
             items.add(new ItemStack(ModItems.WHITE_GLAZED_GLASS.get()));
             items.add(new ItemStack(ModItems.WHITE_GLAZED_GLASS_PANE.get()));
 
@@ -721,6 +915,24 @@ public class BuildScape {
             items.add(new ItemStack(ModItems.PURPLE_FESTIVE_STOCKING.get()));
             items.add(new ItemStack(ModItems.MAGENTA_FESTIVE_STOCKING.get()));
             items.add(new ItemStack(ModItems.PINK_FESTIVE_STOCKING.get()));
+
+            // Colored Item Frames
+            items.add(new ItemStack(ModItems.WHITE_ITEM_FRAME.get()));
+            items.add(new ItemStack(ModItems.LIGHT_GRAY_ITEM_FRAME.get()));
+            items.add(new ItemStack(ModItems.GRAY_ITEM_FRAME.get()));
+            items.add(new ItemStack(ModItems.BLACK_ITEM_FRAME.get()));
+            items.add(new ItemStack(ModItems.BROWN_ITEM_FRAME.get()));
+            items.add(new ItemStack(ModItems.RED_ITEM_FRAME.get()));
+            items.add(new ItemStack(ModItems.ORANGE_ITEM_FRAME.get()));
+            items.add(new ItemStack(ModItems.YELLOW_ITEM_FRAME.get()));
+            items.add(new ItemStack(ModItems.LIME_ITEM_FRAME.get()));
+            items.add(new ItemStack(ModItems.GREEN_ITEM_FRAME.get()));
+            items.add(new ItemStack(ModItems.CYAN_ITEM_FRAME.get()));
+            items.add(new ItemStack(ModItems.LIGHT_BLUE_ITEM_FRAME.get()));
+            items.add(new ItemStack(ModItems.BLUE_ITEM_FRAME.get()));
+            items.add(new ItemStack(ModItems.PURPLE_ITEM_FRAME.get()));
+            items.add(new ItemStack(ModItems.MAGENTA_ITEM_FRAME.get()));
+            items.add(new ItemStack(ModItems.PINK_ITEM_FRAME.get()));
 
             items.add(new ItemStack(ModItems.STONE_PILLAR.get()));
             items.add(new ItemStack(ModItems.MOSSY_PILLAR.get()));
@@ -2327,6 +2539,138 @@ public class BuildScape {
                         net.minecraft.client.renderer.RenderType.translucent()
                 );
 
+                // Factory Glass
+                net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
+                        ModBlocks.FACTORY_WHITE_GLASS.get(),
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
+                net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
+                        ModBlocks.FACTORY_LIGHT_GRAY_GLASS.get(),
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
+                net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
+                        ModBlocks.FACTORY_GRAY_GLASS.get(),
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
+                net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
+                        ModBlocks.FACTORY_BLACK_GLASS.get(),
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
+                net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
+                        ModBlocks.FACTORY_BROWN_GLASS.get(),
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
+                net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
+                        ModBlocks.FACTORY_RED_GLASS.get(),
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
+                net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
+                        ModBlocks.FACTORY_ORANGE_GLASS.get(),
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
+                net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
+                        ModBlocks.FACTORY_YELLOW_GLASS.get(),
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
+                net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
+                        ModBlocks.FACTORY_LIME_GLASS.get(),
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
+                net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
+                        ModBlocks.FACTORY_GREEN_GLASS.get(),
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
+                net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
+                        ModBlocks.FACTORY_CYAN_GLASS.get(),
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
+                net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
+                        ModBlocks.FACTORY_LIGHT_BLUE_GLASS.get(),
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
+                net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
+                        ModBlocks.FACTORY_BLUE_GLASS.get(),
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
+                net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
+                        ModBlocks.FACTORY_PURPLE_GLASS.get(),
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
+                net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
+                        ModBlocks.FACTORY_MAGENTA_GLASS.get(),
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
+                net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
+                        ModBlocks.FACTORY_PINK_GLASS.get(),
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
+
+                // Factory Glass Panes
+                net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
+                        ModBlocks.FACTORY_WHITE_GLASS_PANE.get(),
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
+                net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
+                        ModBlocks.FACTORY_LIGHT_GRAY_GLASS_PANE.get(),
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
+                net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
+                        ModBlocks.FACTORY_GRAY_GLASS_PANE.get(),
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
+                net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
+                        ModBlocks.FACTORY_BLACK_GLASS_PANE.get(),
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
+                net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
+                        ModBlocks.FACTORY_BROWN_GLASS_PANE.get(),
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
+                net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
+                        ModBlocks.FACTORY_RED_GLASS_PANE.get(),
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
+                net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
+                        ModBlocks.FACTORY_ORANGE_GLASS_PANE.get(),
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
+                net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
+                        ModBlocks.FACTORY_YELLOW_GLASS_PANE.get(),
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
+                net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
+                        ModBlocks.FACTORY_LIME_GLASS_PANE.get(),
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
+                net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
+                        ModBlocks.FACTORY_GREEN_GLASS_PANE.get(),
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
+                net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
+                        ModBlocks.FACTORY_CYAN_GLASS_PANE.get(),
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
+                net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
+                        ModBlocks.FACTORY_LIGHT_BLUE_GLASS_PANE.get(),
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
+                net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
+                        ModBlocks.FACTORY_BLUE_GLASS_PANE.get(),
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
+                net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
+                        ModBlocks.FACTORY_PURPLE_GLASS_PANE.get(),
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
+                net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
+                        ModBlocks.FACTORY_MAGENTA_GLASS_PANE.get(),
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
+                net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
+                        ModBlocks.FACTORY_PINK_GLASS_PANE.get(),
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
+
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.BLACK_GLAZED_GLASS.get(),
                         net.minecraft.client.renderer.RenderType.translucent()
@@ -2855,6 +3199,12 @@ public class BuildScape {
                         net.minecraft.client.renderer.RenderType.translucent()
                 );
 
+                // Steel Grate
+                net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
+                        ModBlocks.STEEL_GRATE.get(),
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
+
                 net.minecraft.client.renderer.blockentity.BlockEntityRenderers.register(
                         com.kingodogo.buildscape.block.ModBlockEntities.PILLAR_BLOCK_ENTITY.get(),
                         com.kingodogo.buildscape.client.renderer.PillarBlockEntityRenderer::new
@@ -2891,6 +3241,11 @@ public class BuildScape {
                 net.minecraft.client.renderer.entity.EntityRenderers.register(
                         com.kingodogo.buildscape.entity.ModEntities.MANGROVE_BOAT.get(),
                         com.kingodogo.buildscape.client.renderer.MangroveBoatRenderer::new
+                );
+
+                net.minecraft.client.renderer.entity.EntityRenderers.register(
+                        com.kingodogo.buildscape.entity.ModEntities.COLORED_ITEM_FRAME.get(),
+                        com.kingodogo.buildscape.client.renderer.ColoredItemFrameRenderer::new
                 );
 
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(

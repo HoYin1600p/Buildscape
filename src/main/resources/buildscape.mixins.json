@@ -14,7 +14,6 @@
     "LeavesBlockMixin"
   ],
   "client": [
-    "ScreenAccessor",
     "PauseScreenMixin"
   ],
   "injectors": {

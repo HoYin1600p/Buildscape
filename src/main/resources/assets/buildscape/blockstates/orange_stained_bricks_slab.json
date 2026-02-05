@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "type=bottom": { "model": "buildscape:block/orange_stained_bricks_slab" },
+    "type=double": { "model": "buildscape:block/orange_stained_bricks" },
+    "type=top": { "model": "buildscape:block/orange_stained_bricks_slab_top" }
+  }
+}

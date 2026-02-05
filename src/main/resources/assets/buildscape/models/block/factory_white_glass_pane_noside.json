@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/template_glass_pane_noside",
+  "textures": {
+    "pane": "buildscape:block/factory_white_glass"
+  },
+  "render_type": "translucent"
+}

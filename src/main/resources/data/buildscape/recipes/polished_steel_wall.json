@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "###",
+    "###"
+  ],
+  "key": {
+    "#": {
+      "item": "buildscape:polished_steel"
+    }
+  },
+  "result": {
+    "item": "buildscape:polished_steel_wall",
+    "count": 6
+  }
+}

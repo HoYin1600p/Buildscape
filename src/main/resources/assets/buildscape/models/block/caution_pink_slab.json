@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/slab",
+  "textures": {
+    "bottom": "buildscape:block/caution_pink",
+    "top": "buildscape:block/caution_pink",
+    "side": "buildscape:block/caution_pink"
+  }
+}

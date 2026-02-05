@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "buildscape:cut_steel"
+  },
+  "result": "buildscape:cut_steel_wall",
+  "count": 1
+}

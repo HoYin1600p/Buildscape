@@ -1,0 +1,1 @@
+{"type": "minecraft:block", "pools": [{"rolls": 1, "bonus_rolls": 0, "entries": [{"type": "minecraft:item", "name": "buildscape:polished_steel_wall"}], "conditions": [{"condition": "minecraft:survives_explosion"}]}]}

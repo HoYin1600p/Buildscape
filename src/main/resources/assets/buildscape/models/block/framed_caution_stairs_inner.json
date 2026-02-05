@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/inner_stairs",
+  "textures": {
+    "bottom": "buildscape:block/framed_caution",
+    "top": "buildscape:block/framed_caution",
+    "side": "buildscape:block/framed_caution"
+  }
+}

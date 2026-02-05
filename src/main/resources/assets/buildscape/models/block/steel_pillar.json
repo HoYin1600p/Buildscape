@@ -1,0 +1,7 @@
+{
+  "parent": "block/cube_column",
+  "textures": {
+    "end": "buildscape:block/steel_pillar",
+    "side": "buildscape:block/steel_pillar"
+  }
+}

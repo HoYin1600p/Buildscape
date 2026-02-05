@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "#  ",
+    "## ",
+    "###"
+  ],
+  "key": {
+    "#": {
+      "item": "buildscape:caution_cottoncandy"
+    }
+  },
+  "result": {
+    "item": "buildscape:caution_cottoncandy_stairs",
+    "count": 4
+  }
+}

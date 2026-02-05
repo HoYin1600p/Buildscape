@@ -10,99 +10,113 @@ import java.util.*;
  */
 public class CosmeticManager {
     private static final CosmeticManager INSTANCE = new CosmeticManager();
-    
+
     // All registered cosmetics
     private final Set<String> allCosmetics = new HashSet<>();
-    
+
     // Cosmetic metadata (name, description, tier, etc.)
     private final Map<String, CosmeticMetadata> cosmeticMetadata = new HashMap<>();
-    
+
     // Particle shape mapping (cosmeticId -> shape type)
     private final Map<String, String> particleShapes = new HashMap<>();
-    
+
     // Dev username for development access
     private static final String DEV_USERNAME = "Dev";
-    
+
     private CosmeticManager() {
         registerBuiltInCosmetics();
     }
-    
+
     public static CosmeticManager getInstance() {
         return INSTANCE;
     }
-    
+
     /**
      * Register all built-in cosmetics.
      */
     private void registerBuiltInCosmetics() {
         // Register particle trail cosmetics with different shapes
-        // Sparkle/Star shapes (colorable)
-        registerParticleTrail("buildscape:cosmatics/particle/star_trail", "Star Trail", "Golden stars follow behind you", 1, "sparkle");
-        registerParticleTrail("buildscape:cosmatics/particle/sparkle_trail", "Sparkle Trail", "Magical sparkles trail behind you", 1, "sparkle");
-        registerParticleTrail("buildscape:cosmatics/particle/emerald_trail", "Emerald Trail", "Emerald particles follow you", 2, "sparkle");
-        registerParticleTrail("buildscape:cosmatics/particle/diamond_trail", "Diamond Trail", "Diamond sparkles trail behind you", 2, "sparkle");
-        registerParticleTrail("buildscape:cosmatics/particle/netherite_trail", "Netherite Trail", "Dark netherite particles follow you", 3, "sparkle");
-        registerParticleTrail("buildscape:cosmatics/particle/rainbow_trail", "Rainbow Trail", "Colorful rainbow particles trail behind you", 3, "sparkle");
-        registerParticleTrail("buildscape:cosmatics/particle/flame_trail", "Flame Trail", "Fiery particles follow you", 2, "sparkle");
-        registerParticleTrail("buildscape:cosmatics/particle/ice_trail", "Ice Trail", "Frosty ice particles trail behind you", 2, "sparkle");
-        
-        // Different particle shapes (not just colors)
-        registerParticleTrail("buildscape:cosmatics/particle/heart_trail", "Heart Trail", "Hearts float behind you", 2, "heart");
-        registerParticleTrail("buildscape:cosmatics/particle/note_trail", "Note Trail", "Musical notes follow you", 1, "note");
-        registerParticleTrail("buildscape:cosmatics/particle/smoke_trail", "Smoke Trail", "Smoke billows behind you", 1, "smoke");
-        registerParticleTrail("buildscape:cosmatics/particle/cloud_trail", "Cloud Trail", "Fluffy clouds trail behind you", 2, "cloud");
-        registerParticleTrail("buildscape:cosmatics/particle/portal_trail", "Portal Trail", "Portal particles follow you", 3, "portal");
-        registerParticleTrail("buildscape:cosmatics/particle/enchant_trail", "Enchant Trail", "Enchantment particles trail behind you", 2, "enchant");
-        registerParticleTrail("buildscape:cosmatics/particle/totem_trail", "Totem Trail", "Totem particles follow you", 3, "totem");
-        registerParticleTrail("buildscape:cosmatics/particle/crit_trail", "Critical Trail", "Critical hit particles trail behind you", 2, "crit");
-        registerParticleTrail("buildscape:cosmatics/particle/snowflake_trail", "Snowflake Trail", "Snowflakes drift behind you", 2, "snowflake");
-        
+        // Default / Dyeable Particles
+        registerParticleTrail("buildscape:cosmatics/particle/heart_trail", "Heart Trail", "Hearts float behind you", 2,
+                "heart");
+        registerParticleTrail("buildscape:cosmatics/particle/sparkle_trail", "Sparkle Trail",
+                "Magical sparkles trail behind you", 1, "sparkle");
+
+        // Other Default Particles
+        registerParticleTrail("buildscape:cosmatics/particle/bubble_trail", "Bubble Trail", "Bubbles float behind you",
+                1, "bubble");
+        registerParticleTrail("buildscape:cosmatics/particle/cherry_leaves_trail", "Cherry Leaves Trail",
+                "Falling pink leaves trail behind you", 1, "cherry_leaves");
+        registerParticleTrail("buildscape:cosmatics/particle/note_trail", "Note Trail", "Musical notes follow you", 1,
+                "note");
+
+        // Custom Particles
+        registerParticleTrail("buildscape:cosmatics/particle/snowflake_trail", "Snowflake Trail",
+                "Snowflakes drift behind you", 2, "snowflake");
+        registerParticleTrail("buildscape:cosmatics/particle/firework_trail", "Firework Trail",
+                "Miniature fireworks trail behind you", 3, "firework");
+        registerParticleTrail("buildscape:cosmatics/particle/cake_trail", "Cake Trail",
+                "Sweet cake particles follow you", 3, "cake");
+
         // Register some item cosmetics for variety
-        registerItemCosmetic("buildscape:cosmatics/gear/diamond_sword", "Diamond Sword", "A sharp diamond blade", 1, "item:minecraft:diamond_sword");
-        registerItemCosmetic("buildscape:cosmatics/gear/golden_apple", "Golden Apple", "A golden apple", 1, "item:minecraft:golden_apple");
-        registerItemCosmetic("buildscape:cosmatics/wings/elytra", "Elytra Wings", "Wings for gliding", 2, "item:minecraft:elytra");
+        registerItemCosmetic("buildscape:cosmatics/gear/diamond_sword", "Diamond Sword", "A sharp diamond blade", 1,
+                "item:minecraft:diamond_sword");
+        registerItemCosmetic("buildscape:cosmatics/gear/golden_apple", "Golden Apple", "A golden apple", 1,
+                "item:minecraft:golden_apple");
+        registerItemCosmetic("buildscape:cosmatics/wings/elytra", "Elytra Wings", "Wings for gliding", 2,
+                "item:minecraft:elytra");
         registerHeadCosmetic("buildscape:cosmatics/gear/builders_hat", "Builder's Hat", "A stylish builder's hat", 1);
-        registerItemCosmetic("buildscape:cosmatics/gear/netherite_helmet", "Netherite Helmet", "Powerful netherite helmet", 3, "item:minecraft:netherite_helmet");
-        registerItemCosmetic("buildscape:cosmatics/gear/netherite_chestplate", "Netherite Chestplate", "Powerful netherite chestplate", 3, "item:minecraft:netherite_chestplate");
-        registerItemCosmetic("buildscape:cosmatics/gear/netherite_leggings", "Netherite Leggings", "Powerful netherite leggings", 3, "item:minecraft:netherite_leggings");
-        registerItemCosmetic("buildscape:cosmatics/gear/netherite_boots", "Netherite Boots", "Powerful netherite boots", 3, "item:minecraft:netherite_boots");
-        registerItemCosmetic("buildscape:cosmatics/gear/trident", "Trident", "A powerful trident", 2, "item:minecraft:trident");
+        registerItemCosmetic("buildscape:cosmatics/gear/netherite_helmet", "Netherite Helmet",
+                "Powerful netherite helmet", 3, "item:minecraft:netherite_helmet");
+        registerItemCosmetic("buildscape:cosmatics/gear/netherite_chestplate", "Netherite Chestplate",
+                "Powerful netherite chestplate", 3, "item:minecraft:netherite_chestplate");
+        registerItemCosmetic("buildscape:cosmatics/gear/netherite_leggings", "Netherite Leggings",
+                "Powerful netherite leggings", 3, "item:minecraft:netherite_leggings");
+        registerItemCosmetic("buildscape:cosmatics/gear/netherite_boots", "Netherite Boots", "Powerful netherite boots",
+                3, "item:minecraft:netherite_boots");
+        registerItemCosmetic("buildscape:cosmatics/gear/trident", "Trident", "A powerful trident", 2,
+                "item:minecraft:trident");
         registerItemCosmetic("buildscape:cosmatics/gear/bow", "Bow", "A sturdy bow", 1, "item:minecraft:bow");
-        
+
         // Register block cosmetics
-        registerBlockCosmetic("buildscape:cosmatics/gear/gold_block", "Gold Block", "A block of gold", 1, "block:minecraft:gold_block");
-        registerBlockCosmetic("buildscape:cosmatics/gear/diamond_block", "Diamond Block", "A block of diamonds", 2, "block:minecraft:diamond_block");
-        registerBlockCosmetic("buildscape:cosmatics/gear/emerald_block", "Emerald Block", "A block of emeralds", 2, "block:minecraft:emerald_block");
-        registerBlockCosmetic("buildscape:cosmatics/gear/netherite_block", "Netherite Block", "A block of netherite", 3, "block:minecraft:netherite_block");
-        
+        registerBlockCosmetic("buildscape:cosmatics/gear/gold_block", "Gold Block", "A block of gold", 1,
+                "block:minecraft:gold_block");
+        registerBlockCosmetic("buildscape:cosmatics/gear/diamond_block", "Diamond Block", "A block of diamonds", 2,
+                "block:minecraft:diamond_block");
+        registerBlockCosmetic("buildscape:cosmatics/gear/emerald_block", "Emerald Block", "A block of emeralds", 2,
+                "block:minecraft:emerald_block");
+        registerBlockCosmetic("buildscape:cosmatics/gear/netherite_block", "Netherite Block", "A block of netherite", 3,
+                "block:minecraft:netherite_block");
+
         BuildScape.getLogger().info("Registered " + allCosmetics.size() + " built-in cosmetics");
     }
-    
+
     /**
      * Register a particle trail cosmetic.
      */
     private void registerParticleTrail(String cosmeticId, String name, String description, int tier, String shape) {
         allCosmetics.add(cosmeticId);
-        cosmeticMetadata.put(cosmeticId, new CosmeticMetadata(name, description, tier, CosmeticType.PARTICLE_TRAIL, null));
+        cosmeticMetadata.put(cosmeticId,
+                new CosmeticMetadata(name, description, tier, CosmeticType.PARTICLE_TRAIL, null));
         particleShapes.put(cosmeticId, shape);
     }
-    
+
     /**
      * Get particle shape for a cosmetic.
      */
     public String getParticleShape(String cosmeticId) {
         return particleShapes.getOrDefault(cosmeticId, "sparkle");
     }
-    
+
     /**
      * Check if a particle trail supports color customization.
      */
     public boolean supportsColor(String cosmeticId) {
         String shape = getParticleShape(cosmeticId);
-        // Sparkle shapes support colors, others may not
-        return shape.equals("sparkle");
+        // Sparkle and Heart shapes support colors
+        return shape.equals("sparkle") || shape.equals("heart");
     }
-    
+
     /**
      * Register an item cosmetic.
      */
@@ -111,7 +125,7 @@ public class CosmeticManager {
         CosmeticType type = cosmeticId.contains("/wings/") ? CosmeticType.WINGS : CosmeticType.ITEM;
         cosmeticMetadata.put(cosmeticId, new CosmeticMetadata(name, description, tier, type, legacyId));
     }
-    
+
     /**
      * Register a block cosmetic.
      */
@@ -119,7 +133,7 @@ public class CosmeticManager {
         allCosmetics.add(cosmeticId);
         cosmeticMetadata.put(cosmeticId, new CosmeticMetadata(name, description, tier, CosmeticType.BLOCK, legacyId));
     }
-    
+
     /**
      * Register a custom head/armor cosmetic with a custom model.
      */
@@ -128,28 +142,28 @@ public class CosmeticManager {
         cosmeticMetadata.put(cosmeticId, new CosmeticMetadata(name, description, tier, CosmeticType.HEAD, null));
         BuildScape.getLogger().info("Registered HEAD cosmetic: " + cosmeticId + " (" + name + ")");
     }
-    
+
     /**
      * Get all registered cosmetics.
      */
     public Set<String> getAllCosmetics() {
         return new HashSet<>(allCosmetics);
     }
-    
+
     /**
      * Get metadata for a cosmetic.
      */
     public CosmeticMetadata getMetadata(String cosmeticId) {
         return cosmeticMetadata.get(cosmeticId);
     }
-    
+
     /**
      * Check if a cosmetic is registered.
      */
     public boolean isRegistered(String cosmeticId) {
         return allCosmetics.contains(cosmeticId);
     }
-    
+
     /**
      * Check if a player has access to a cosmetic (dev always has access).
      */
@@ -158,49 +172,50 @@ public class CosmeticManager {
         if (playerUsername != null && playerUsername.equalsIgnoreCase(DEV_USERNAME)) {
             return true;
         }
-        
+
         // For now, all cosmetics are accessible (will be replaced with API check)
         return isRegistered(cosmeticId);
     }
-    
+
     /**
      * Get unlocked cosmetics for a player (dev gets everything).
      */
     public Set<String> getUnlockedCosmetics(String playerUsername) {
         Set<String> unlocked = new HashSet<>();
-        
+
         // Dev gets everything
         if (playerUsername != null && playerUsername.equalsIgnoreCase(DEV_USERNAME)) {
             unlocked.addAll(allCosmetics);
             return unlocked;
         }
-        
+
         // For now, return empty (will be replaced with API check)
         // API will determine which cosmetics are unlocked
         return unlocked;
     }
-    
+
     /**
      * Check if a cosmetic ID is a particle trail.
      */
     public boolean isParticleTrail(String cosmeticId) {
-        if (cosmeticId == null || cosmeticId.isEmpty()) return false;
-        
+        if (cosmeticId == null || cosmeticId.isEmpty())
+            return false;
+
         // Check metadata type if available
         CosmeticMetadata metadata = cosmeticMetadata.get(cosmeticId);
         if (metadata != null && metadata.type == CosmeticType.PARTICLE_TRAIL) {
             return true;
         }
-        
+
         // Fallback to string check
         String idLower = cosmeticId.toLowerCase();
-        return idLower.contains("particle") && 
-               (idLower.contains("trail") || 
-                idLower.contains("star") || 
-                idLower.contains("sparkle") ||
-                idLower.contains("effect"));
+        return idLower.contains("particle") &&
+                (idLower.contains("trail") ||
+                        idLower.contains("star") ||
+                        idLower.contains("sparkle") ||
+                        idLower.contains("effect"));
     }
-    
+
     /**
      * Cosmetic metadata.
      */
@@ -210,7 +225,7 @@ public class CosmeticManager {
         public final int tier; // 1 = Bronze, 2 = Silver, 3 = Gold
         public final CosmeticType type;
         public final String legacyId; // For resolving to Item/Block
-        
+
         public CosmeticMetadata(String name, String description, int tier, CosmeticType type, String legacyId) {
             this.name = name;
             this.description = description;
@@ -219,7 +234,7 @@ public class CosmeticManager {
             this.legacyId = legacyId;
         }
     }
-    
+
     /**
      * Cosmetic type enum.
      */
@@ -232,4 +247,3 @@ public class CosmeticManager {
         HEAD // Custom head/armor model cosmetics
     }
 }
-

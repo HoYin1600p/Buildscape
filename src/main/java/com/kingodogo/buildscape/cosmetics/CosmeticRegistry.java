@@ -12,11 +12,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Registry for parsing and resolving cosmetic IDs to Minecraft registry entries.
+ * Registry for parsing and resolving cosmetic IDs to Minecraft registry
+ * entries.
  * 
  * Cosmetic IDs are strings in format:
- * - "item:namespace:item_id" - Item cosmetic (e.g., "item:minecraft:diamond_sword")
- * - "block:namespace:block_id" - Block cosmetic (e.g., "block:minecraft:gold_block")
+ * - "item:namespace:item_id" - Item cosmetic (e.g.,
+ * "item:minecraft:diamond_sword")
+ * - "block:namespace:block_id" - Block cosmetic (e.g.,
+ * "block:minecraft:gold_block")
  * - "nbt:custom_data" - NBT-based cosmetic (custom data stored in game)
  * - "type:armor_set_1" - Type-based cosmetic (armor sets, etc.)
  * 
@@ -25,28 +28,29 @@ import java.util.Map;
  */
 public class CosmeticRegistry {
     private static final CosmeticRegistry INSTANCE = new CosmeticRegistry();
-    
+
     // Cache for resolved items/blocks to avoid repeated lookups
     private final Map<String, Item> itemCache = new HashMap<>();
     private final Map<String, Block> blockCache = new HashMap<>();
     private final Map<String, ItemStack> itemStackCache = new HashMap<>();
-    
+
     // Custom cosmetic type definitions (can be extended)
     private final Map<String, CosmeticType> typeDefinitions = new HashMap<>();
-    
+
     private CosmeticRegistry() {
         // Initialize custom types if needed
         // Example: typeDefinitions.put("armor_set_1", new CosmeticType(...));
     }
-    
+
     public static CosmeticRegistry getInstance() {
         return INSTANCE;
     }
-    
+
     /**
      * Parse a cosmetic ID string and return the type and identifier.
      * 
-     * @param cosmeticId Cosmetic ID string (e.g., "buildscape:cosmatics/gear/diamond_sword")
+     * @param cosmeticId Cosmetic ID string (e.g.,
+     *                   "buildscape:cosmatics/gear/diamond_sword")
      * @return Parsed cosmetic info, or null if invalid format
      */
     @Nullable
@@ -54,7 +58,7 @@ public class CosmeticRegistry {
         if (cosmeticId == null || cosmeticId.isEmpty()) {
             return null;
         }
-        
+
         // Handle new format: buildscape:cosmatics/category/id
         if (cosmeticId.startsWith("buildscape:cosmatics/")) {
             String path = cosmeticId.substring("buildscape:cosmatics/".length());
@@ -62,15 +66,16 @@ public class CosmeticRegistry {
             if (parts.length == 2) {
                 String category = parts[0]; // e.g. "gear", "particle", "wings"
                 String id = parts[1];
-                
+
                 // Map new categories to internal types
                 String type = category;
-                if (category.equals("gear")) type = "item"; // Default to item for gear
-                
+                if (category.equals("gear"))
+                    type = "item"; // Default to item for gear
+
                 // Get legacy ID from CosmeticManager if possible for resolving
                 CosmeticManager.CosmeticMetadata metadata = CosmeticManager.getInstance().getMetadata(cosmeticId);
                 String legacyId = (metadata != null) ? metadata.legacyId : null;
-                
+
                 if (legacyId != null) {
                     // Parse legacy ID to get namespace and id
                     String[] legacyParts = legacyId.split(":", 3);
@@ -81,25 +86,25 @@ public class CosmeticRegistry {
                         return new CosmeticInfo(lType, namespace, lId, cosmeticId);
                     }
                 }
-                
+
                 return new CosmeticInfo(type, "buildscape", id, cosmeticId);
             }
         }
-        
+
         // Fallback to legacy format: type:namespace:id
         String[] parts = cosmeticId.split(":", 3);
         if (parts.length < 2) {
             BuildScape.getLogger().warn("Invalid cosmetic ID format: " + cosmeticId);
             return null;
         }
-        
+
         String type = parts[0];
         String namespace = parts.length >= 3 ? parts[1] : "minecraft";
         String id = parts.length >= 3 ? parts[2] : parts[1];
-        
+
         return new CosmeticInfo(type, namespace, id, cosmeticId);
     }
-    
+
     /**
      * Resolve a cosmetic ID to an Item.
      * 
@@ -111,29 +116,29 @@ public class CosmeticRegistry {
         if (cosmeticId == null || cosmeticId.isEmpty()) {
             return null;
         }
-        
+
         // Check cache first
         if (itemCache.containsKey(cosmeticId)) {
             return itemCache.get(cosmeticId);
         }
-        
+
         CosmeticInfo info = parseCosmeticId(cosmeticId);
         if (info == null || !info.type.equals("item")) {
             return null;
         }
-        
+
         ResourceLocation resourceLocation = new ResourceLocation(info.namespace + ":" + info.id);
         Item item = ForgeRegistries.ITEMS.getValue(resourceLocation);
-        
+
         if (item != null) {
             itemCache.put(cosmeticId, item);
         } else {
             BuildScape.getLogger().warn("Could not resolve cosmetic item: " + cosmeticId);
         }
-        
+
         return item;
     }
-    
+
     /**
      * Resolve a cosmetic ID to a Block.
      * 
@@ -145,29 +150,29 @@ public class CosmeticRegistry {
         if (cosmeticId == null || cosmeticId.isEmpty()) {
             return null;
         }
-        
+
         // Check cache first
         if (blockCache.containsKey(cosmeticId)) {
             return blockCache.get(cosmeticId);
         }
-        
+
         CosmeticInfo info = parseCosmeticId(cosmeticId);
         if (info == null || !info.type.equals("block")) {
             return null;
         }
-        
+
         ResourceLocation resourceLocation = new ResourceLocation(info.namespace + ":" + info.id);
         Block block = ForgeRegistries.BLOCKS.getValue(resourceLocation);
-        
+
         if (block != null) {
             blockCache.put(cosmeticId, block);
         } else {
             BuildScape.getLogger().warn("Could not resolve cosmetic block: " + cosmeticId);
         }
-        
+
         return block;
     }
-    
+
     /**
      * Resolve a cosmetic ID to an ItemStack.
      * Handles both item and block cosmetics (blocks are converted to ItemStacks).
@@ -180,28 +185,63 @@ public class CosmeticRegistry {
         if (cosmeticId == null || cosmeticId.isEmpty()) {
             return null;
         }
-        
-        // Check if this is a custom HEAD cosmetic - these should NOT resolve to ItemStacks
-        // Custom head cosmetics like builder's hat use custom models, not ItemStack models
+
+        // Check if this is a custom HEAD cosmetic - these should NOT resolve to
+        // ItemStacks
+        // Custom head cosmetics like builder's hat use custom models, not ItemStack
+        // models
         CosmeticManager.CosmeticMetadata meta = CosmeticManager.getInstance().getMetadata(cosmeticId);
         if (meta != null && meta.type == CosmeticManager.CosmeticType.HEAD) {
-            // Return null for custom head cosmetics - they use custom rendering
+            // For Builder's Hat, return actual item
+            if ("buildscape:cosmatics/gear/builders_hat".equals(cosmeticId)) {
+                return new ItemStack(com.kingodogo.buildscape.item.ModItems.BUILDERS_HAT.get());
+            }
+            // Return null for other custom head cosmetics - they use custom rendering
             return null;
         }
-        
+
         // Check cache first
         if (itemStackCache.containsKey(cosmeticId)) {
             ItemStack cached = itemStackCache.get(cosmeticId);
             return cached != null ? cached.copy() : null;
         }
-        
+
         ItemStack result = null;
-        
+
         CosmeticInfo info = parseCosmeticId(cosmeticId);
         if (info != null) {
-            // Check if it's a particle trail (use nether star as placeholder)
+            // Check if it's a particle trail
             if (info.type.equals("particle")) {
-                result = new ItemStack(net.minecraft.world.item.Items.NETHER_STAR);
+                Item item = net.minecraft.world.item.Items.NETHER_STAR; // Default
+
+                String idLower = info.id.toLowerCase();
+                if (idLower.contains("heart"))
+                    item = net.minecraft.world.item.Items.RED_DYE;
+                else if (idLower.contains("bubble"))
+                    item = net.minecraft.world.item.Items.PRISMARINE_CRYSTALS;
+                else if (idLower.contains("cherry"))
+                    item = net.minecraft.world.item.Items.PINK_WOOL;
+                else if (idLower.contains("note"))
+                    item = net.minecraft.world.item.Items.NOTE_BLOCK;
+                else if (idLower.contains("snowflake"))
+                    item = net.minecraft.world.item.Items.SNOWBALL;
+                else if (idLower.contains("firework"))
+                    item = net.minecraft.world.item.Items.FIREWORK_ROCKET;
+                else if (idLower.contains("cake"))
+                    item = net.minecraft.world.item.Items.CAKE;
+                else if (idLower.contains("slime"))
+                    item = net.minecraft.world.item.Items.SLIME_BALL;
+                else if (idLower.contains("cloud"))
+                    item = net.minecraft.world.item.Items.WHITE_WOOL;
+                else if (idLower.contains("smoke"))
+                    item = net.minecraft.world.item.Items.CAMPFIRE;
+
+                result = new ItemStack(item);
+
+                // Set custom name if available
+                if (meta != null && meta.name != null && !meta.name.isEmpty()) {
+                    result.setHoverName(new net.minecraft.network.chat.TextComponent(meta.name));
+                }
             } else if (info.type.equals("wings")) {
                 // For wings, try to resolve as item (usually elytra)
                 Item item = resolveToItem(cosmeticId);
@@ -213,7 +253,7 @@ public class CosmeticRegistry {
                 }
             } else {
                 // Try as item first
-                    Item item = resolveToItem(cosmeticId);
+                Item item = resolveToItem(cosmeticId);
                 if (item != null) {
                     result = new ItemStack(item);
                 } else {
@@ -248,13 +288,13 @@ public class CosmeticRegistry {
                 }
             }
         }
-        
+
         // Cache result (even if null to avoid repeated lookups)
         itemStackCache.put(cosmeticId, result != null ? result.copy() : null);
-        
+
         return result != null ? result.copy() : null;
     }
-    
+
     /**
      * Check if a cosmetic ID is valid and can be resolved.
      * 
@@ -265,12 +305,12 @@ public class CosmeticRegistry {
         if (cosmeticId == null || cosmeticId.isEmpty()) {
             return false;
         }
-        
+
         CosmeticInfo info = parseCosmeticId(cosmeticId);
         if (info == null) {
             return false;
         }
-        
+
         switch (info.type) {
             case "item":
                 return resolveToItem(cosmeticId) != null;
@@ -285,7 +325,7 @@ public class CosmeticRegistry {
                 return false;
         }
     }
-    
+
     /**
      * Clear all caches.
      * Useful for reloading or debugging.
@@ -295,7 +335,7 @@ public class CosmeticRegistry {
         blockCache.clear();
         itemStackCache.clear();
     }
-    
+
     /**
      * Internal class to hold parsed cosmetic information.
      */
@@ -304,7 +344,7 @@ public class CosmeticRegistry {
         public final String namespace;
         public final String id;
         public final String fullId;
-        
+
         public CosmeticInfo(String type, String namespace, String id, String fullId) {
             this.type = type;
             this.namespace = namespace;
@@ -312,7 +352,7 @@ public class CosmeticRegistry {
             this.fullId = fullId;
         }
     }
-    
+
     /**
      * Interface for custom cosmetic types.
      * Extend this to create custom cosmetic type definitions.
@@ -321,4 +361,3 @@ public class CosmeticRegistry {
         ItemStack createItemStack();
     }
 }
-

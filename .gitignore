@@ -44,3 +44,11 @@ Desktop.ini
 !gradle.properties
 !README.md
 !LICENSE
+
+
+bin/
+old_*.java
+temp_*.java
+recent_*.java
+/.qoder/
+/.vs/

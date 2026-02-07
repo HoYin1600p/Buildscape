@@ -1,15 +1,13 @@
 package com.kingodogo.buildscape.network;
 
-import com.kingodogo.buildscape.BuildScape;
 import com.kingodogo.buildscape.block.PillarBlockEntity;
-
-import java.util.function.Supplier;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.network.NetworkEvent;
+
+import java.util.function.Supplier;
 
 public class CyclePillarPatternPacket {
 
@@ -40,13 +38,15 @@ public class CyclePillarPatternPacket {
 
                     BlockEntity be = player.level.getBlockEntity(pillarPos);
 
-                    if (!(be instanceof PillarBlockEntity pillar)) {
+                    if (!(be instanceof PillarBlockEntity)) {
                         player.displayClientMessage(
                                 new net.minecraft.network.chat.TextComponent("Not a valid pillar!"),
                                 false
                         );
                         return;
                     }
+
+                    PillarBlockEntity pillar = (PillarBlockEntity) be;
 
                     if (!pillar.hasDisplayItem()) {
                         player.displayClientMessage(

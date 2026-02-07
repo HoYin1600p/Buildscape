@@ -1,7 +1,5 @@
 package com.kingodogo.buildscape.block;
 
-import java.util.Random;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
@@ -23,6 +21,8 @@ import net.minecraft.world.level.block.state.properties.DripstoneThickness;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+
+import java.util.Random;
 
 public class PointedIcicleBlock extends PointedDripstoneBlock {
 
@@ -162,7 +162,7 @@ public class PointedIcicleBlock extends PointedDripstoneBlock {
             }
 
             if (level instanceof ServerLevel) {
-                level.scheduleTick(pos, this, 2);
+                ((ServerLevel) level).scheduleTick(pos, this, 2);
             }
             updateDripstoneNeighbors(level, pos);
         }
@@ -213,7 +213,7 @@ public class PointedIcicleBlock extends PointedDripstoneBlock {
                 new com.kingodogo.buildscape.entity.FallingIcicleEntity(
                         level,
                         (double) pos.getX() + 0.5D,
-                        pos.getY(),
+                        (double) pos.getY(),
                         (double) pos.getZ() + 0.5D,
                         state
                 );
@@ -423,7 +423,7 @@ public class PointedIcicleBlock extends PointedDripstoneBlock {
                 aboveState.getBlock() instanceof PointedDripstoneBlock &&
                         !(aboveState.getBlock() instanceof PointedIcicleBlock)
         ) {
-            aboveState.getBlock().neighborChanged(
+            ((PointedDripstoneBlock) aboveState.getBlock()).neighborChanged(
                     aboveState,
                     level,
                     pos.above(),
@@ -437,7 +437,7 @@ public class PointedIcicleBlock extends PointedDripstoneBlock {
                 belowState.getBlock() instanceof PointedDripstoneBlock &&
                         !(belowState.getBlock() instanceof PointedIcicleBlock)
         ) {
-            belowState.getBlock().neighborChanged(
+            ((PointedDripstoneBlock) belowState.getBlock()).neighborChanged(
                     belowState,
                     level,
                     pos.below(),
@@ -467,7 +467,8 @@ public class PointedIcicleBlock extends PointedDripstoneBlock {
             );
             updatedState = updatedState.setValue(THICKNESS, correctThickness);
 
-            if (level instanceof Level world) {
+            if (level instanceof Level) {
+                Level world = (Level) level;
                 updateNeighborThickness(world, pos.above());
                 updateNeighborThickness(world, pos.below());
                 updateDripstoneNeighbors(world, pos);
@@ -499,13 +500,13 @@ public class PointedIcicleBlock extends PointedDripstoneBlock {
             if (neighborPos.equals(supportPos)) {
                 if (!canSurvive(state, level, pos)) {
                     if (level instanceof ServerLevel) {
-                        level.scheduleTick(pos, this, 2);
+                        ((ServerLevel) level).scheduleTick(pos, this, 2);
                     }
                 } else if (level instanceof ServerLevel) {
-                    level.scheduleTick(pos, this, 2);
+                    ((ServerLevel) level).scheduleTick(pos, this, 2);
                 }
             } else if (level instanceof ServerLevel) {
-                level.scheduleTick(pos, this, 2);
+                ((ServerLevel) level).scheduleTick(pos, this, 2);
             }
         }
 
@@ -834,7 +835,9 @@ public class PointedIcicleBlock extends PointedDripstoneBlock {
 
             net.minecraft.world.level.block.entity.BlockEntity blockEntity =
                     level.getBlockEntity(cauldronPos);
-            if (blockEntity instanceof IcicleCauldronBlockEntity cauldronEntity) {
+            if (blockEntity instanceof IcicleCauldronBlockEntity) {
+                IcicleCauldronBlockEntity cauldronEntity =
+                        (IcicleCauldronBlockEntity) blockEntity;
                 // Store Icicle Block in the cauldron (not Packed Icicle)
                 net.minecraft.world.item.Item icicleItem =
                         com.kingodogo.buildscape.item.ModItems.ICICLE_BLOCK.get();

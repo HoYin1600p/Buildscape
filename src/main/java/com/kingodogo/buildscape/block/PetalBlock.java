@@ -1,13 +1,8 @@
 package com.kingodogo.buildscape.block;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -20,12 +15,7 @@ import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.BonemealableBlock;
-import net.minecraft.world.level.block.BushBlock;
-import net.minecraft.world.level.block.Mirror;
-import net.minecraft.world.level.block.Rotation;
-import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
@@ -37,6 +27,10 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Random;
 
 public class PetalBlock extends BushBlock implements BonemealableBlock {
 
@@ -370,7 +364,8 @@ public class PetalBlock extends BushBlock implements BonemealableBlock {
     ) {
         ItemStack itemStack = player.getItemInHand(hand);
 
-        if (itemStack.getItem() instanceof BlockItem blockItem) {
+        if (itemStack.getItem() instanceof BlockItem) {
+            BlockItem blockItem = (BlockItem) itemStack.getItem();
             if (
                     blockItem.getBlock() instanceof PetalBlock &&
                             blockItem.getBlock() == this

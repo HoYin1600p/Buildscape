@@ -16,7 +16,6 @@ import net.minecraft.network.chat.TranslatableComponent;
 import java.net.URI;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 
 public class MembershipPanel extends BasePanel {
     private static final int PADDING = 10;
@@ -155,7 +154,7 @@ public class MembershipPanel extends BasePanel {
         }
         
         try {
-            String url = "https://buildscape.online/connect?uuid=" + playerUuid;
+            String url = "https://buildscape.online/connect?uuid=" + playerUuid.toString();
             java.awt.Desktop.getDesktop().browse(new URI(url));
             statusMessage = "Opening browser... Please complete the connection on the website.";
 
@@ -278,7 +277,10 @@ public class MembershipPanel extends BasePanel {
     
     @Override
     protected boolean handleMouseClicked(double mouseX, double mouseY, int button) {
-        return connectButton != null && connectButton.mouseClicked(mouseX, mouseY, button);
+        if (connectButton != null && connectButton.mouseClicked(mouseX, mouseY, button)) {
+            return true;
+        }
+        return false;
     }
 }
 

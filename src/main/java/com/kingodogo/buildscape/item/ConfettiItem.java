@@ -73,7 +73,7 @@ public class ConfettiItem extends Item {
             double pz = z + (level.random.nextDouble() - 0.5) * 0.3;
             
             // Spawn the particle
-            level.addParticle(ModParticles.CONFETTI.get(),
+            level.addParticle((SimpleParticleType) ModParticles.CONFETTI.get(), 
                 px, py, pz, vx, vy, vz);
         }
     }

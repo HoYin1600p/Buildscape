@@ -1,15 +1,9 @@
 package com.kingodogo.buildscape.block;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ShearsItem;
@@ -20,7 +14,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.VineBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
@@ -31,6 +24,10 @@ import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Random;
 
 public class RoseVinesBlock extends VineBlock {
 
@@ -318,7 +315,9 @@ public class RoseVinesBlock extends VineBlock {
             BooleanProperty property = getPropertyForFace(attachDirection);
 
             if (state.getBlock() == heldBlock) {
-                return !state.hasProperty(property) || !state.getValue(property);
+                if (state.hasProperty(property) && state.getValue(property)) {
+                    return false;
+                }
             }
 
             return true;

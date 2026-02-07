@@ -1,19 +1,18 @@
 package com.kingodogo.buildscape.block;
 
-import javax.annotation.Nullable;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
-import net.minecraft.world.Container;
 import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+
+import javax.annotation.Nullable;
 
 public class FestiveStockingBlockEntity
         extends BlockEntity
@@ -63,7 +62,9 @@ public class FestiveStockingBlockEntity
             ItemStack stack,
             @Nullable Direction direction
     ) {
-        if (stack.getItem() instanceof net.minecraft.world.item.BlockItem blockItem) {
+        if (stack.getItem() instanceof net.minecraft.world.item.BlockItem) {
+            net.minecraft.world.item.BlockItem blockItem =
+                    (net.minecraft.world.item.BlockItem) stack.getItem();
             if (blockItem.getBlock() instanceof FestiveStockingBlock) {
                 return false;
             }

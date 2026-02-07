@@ -3,11 +3,8 @@ package com.kingodogo.buildscape.client.screen.tabs.supporters;
 import com.kingodogo.buildscape.config.CosmeticsConfig;
 import com.kingodogo.buildscape.cosmetics.CosmeticManager;
 import com.kingodogo.buildscape.cosmetics.CosmeticRegistry;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+
+import java.util.*;
 
 public class SupportersTabState {
     private static SupportersTabState instance;
@@ -23,7 +20,7 @@ public class SupportersTabState {
     private String selectedCosmeticId;
     private Set<String> unlockedCosmetics = new HashSet<>();
     private Set<String> equippedCosmetics = new HashSet<>();
-    private final Map<Integer, String> equippedCosmeticsBySlot = new HashMap<>();
+    private Map<Integer, String> equippedCosmeticsBySlot = new HashMap<>();
     private UUID playerUuid;
     private Runnable onSelectionChanged;
     private Runnable onEquippedChanged;
@@ -155,7 +152,7 @@ public class SupportersTabState {
         if (manager.isParticleTrail(cosmeticId)) return SLOT_TRAIL;
         
         CosmeticManager.CosmeticMetadata metadata = manager.getMetadata(cosmeticId);
-        if (metadata != null && metadata.type() == CosmeticManager.CosmeticType.WINGS) return SLOT_WINGS;
+        if (metadata != null && metadata.type == CosmeticManager.CosmeticType.WINGS) return SLOT_WINGS;
         
         net.minecraft.world.item.ItemStack stack = registry.resolveToItemStack(cosmeticId);
         if (stack != null && !stack.isEmpty()) {

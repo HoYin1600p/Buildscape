@@ -3,6 +3,7 @@ package com.kingodogo.buildscape.config;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.kingodogo.buildscape.BuildScape;
+
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -29,10 +30,6 @@ public class CosmeticsConfig {
     // Map of player UUID to cosmetic colors (cosmeticId -> hex color string)
     // Stores custom colors for particle trails and other colorable cosmetics
     private Map<String, Map<String, String>> playerCosmeticColors = new HashMap<>();
-
-    // Color picker position (stored globally, persists across sessions)
-    private Integer colorPickerX = null;
-    private Integer colorPickerY = null;
 
     private CosmeticsConfig() {
         load();
@@ -70,28 +67,8 @@ public class CosmeticsConfig {
             if (loaded != null) {
                 playerCosmetics = new HashMap<>();
                 playerCosmeticColors = new HashMap<>();
-
-                // Load color picker position
-                Object pickerPosObj = loaded.get("colorPickerPosition");
-                if (pickerPosObj instanceof Map) {
-                    @SuppressWarnings("unchecked")
-                    Map<String, Object> posMap = (Map<String, Object>) pickerPosObj;
-                    Object xObj = posMap.get("x");
-                    Object yObj = posMap.get("y");
-                    if (xObj instanceof Number && yObj instanceof Number) {
-                        colorPickerX = ((Number) xObj).intValue();
-                        colorPickerY = ((Number) yObj).intValue();
-                    }
-                }
-
                 for (Map.Entry<String, Object> entry : loaded.entrySet()) {
                     String playerUuid = entry.getKey();
-
-                    // Skip special keys
-                    if (playerUuid.equals("colorPickerPosition")) {
-                        continue;
-                    }
-
                     Object value = entry.getValue();
                     if (value instanceof Map) {
                         @SuppressWarnings("unchecked")
@@ -168,25 +145,9 @@ public class CosmeticsConfig {
 
             // Combine cosmetics and colors into a single structure
             Map<String, Object> combined = new HashMap<>();
-
-            // Save color picker position
-            if (colorPickerX != null && colorPickerY != null) {
-                Map<String, Integer> pickerPos = new HashMap<>();
-                pickerPos.put("x", colorPickerX);
-                pickerPos.put("y", colorPickerY);
-                combined.put("colorPickerPosition", pickerPos);
-            }
-
-            // Collect all UUIDs that have data (cosmetics or colors)
-            java.util.Set<String> allUuids = new java.util.HashSet<>();
-            allUuids.addAll(playerCosmetics.keySet());
-            allUuids.addAll(playerCosmeticColors.keySet());
-
-            for (String uuid : allUuids) {
+            for (String uuid : playerCosmetics.keySet()) {
                 Map<String, Object> playerData = new HashMap<>();
-                if (playerCosmetics.containsKey(uuid)) {
-                    playerData.put("cosmetics", playerCosmetics.get(uuid));
-                }
+                playerData.put("cosmetics", playerCosmetics.get(uuid));
                 if (playerCosmeticColors.containsKey(uuid)) {
                     playerData.put("colors", playerCosmeticColors.get(uuid));
                 }
@@ -294,9 +255,8 @@ public class CosmeticsConfig {
      * Fallback to "global" if UUID not found.
      */
     public String getCosmeticColor(UUID playerUuid, String cosmeticId) {
-        if (cosmeticId == null)
-            return null;
-
+        if (cosmeticId == null) return null;
+        
         if (playerUuid != null) {
             String uuidStr = playerUuid.toString();
             Map<String, String> colors = playerCosmeticColors.get(uuidStr);
@@ -319,9 +279,8 @@ public class CosmeticsConfig {
      * Also updates "global" profile.
      */
     public void setCosmeticColor(UUID playerUuid, String cosmeticId, String hexColor) {
-        if (cosmeticId == null)
-            return;
-
+        if (cosmeticId == null) return;
+        
         if (playerUuid != null) {
             String uuidStr = playerUuid.toString();
             Map<String, String> colors = playerCosmeticColors.computeIfAbsent(uuidStr, k -> new HashMap<>());
@@ -351,47 +310,8 @@ public class CosmeticsConfig {
             return false;
         }
         String idLower = cosmeticId.toLowerCase();
-        // Only Sparkle and Heart trails support custom colors
-        boolean isTrail = idLower.contains("particle") && idLower.contains("trail");
-        if (!isTrail)
-            return false;
-
-        return idLower.contains("sparkle") || idLower.contains("heart");
-    }
-
-    /**
-     * Get saved color picker X position.
-     * Returns null if no position has been saved.
-     */
-    public Integer getColorPickerX() {
-        return colorPickerX;
-    }
-
-    /**
-     * Get saved color picker Y position.
-     * Returns null if no position has been saved.
-     */
-    public Integer getColorPickerY() {
-        return colorPickerY;
-    }
-
-    /**
-     * Save color picker position.
-     * Position persists across sessions.
-     */
-    public void setColorPickerPosition(int x, int y) {
-        this.colorPickerX = x;
-        this.colorPickerY = y;
-        save();
-    }
-
-    /**
-     * Clear saved color picker position.
-     * This will make the picker use default positioning next time it's opened.
-     */
-    public void clearColorPickerPosition() {
-        this.colorPickerX = null;
-        this.colorPickerY = null;
-        save();
+        // Particle trails support colors
+        return idLower.contains("particle") && idLower.contains("trail");
     }
 }
+

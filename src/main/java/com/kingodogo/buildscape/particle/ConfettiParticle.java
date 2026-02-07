@@ -1,11 +1,7 @@
 package com.kingodogo.buildscape.particle;
 
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.particle.Particle;
-import net.minecraft.client.particle.ParticleProvider;
-import net.minecraft.client.particle.ParticleRenderType;
-import net.minecraft.client.particle.SpriteSet;
-import net.minecraft.client.particle.TextureSheetParticle;
+import net.minecraft.client.particle.*;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -77,7 +73,7 @@ public class ConfettiParticle extends TextureSheetParticle {
         
         // Fade out near the end
         if (this.age > this.lifetime * 0.8F) {
-            float fadeProgress = (this.age - this.lifetime * 0.8F) / (this.lifetime * 0.2F);
+            float fadeProgress = (float) (this.age - this.lifetime * 0.8F) / (this.lifetime * 0.2F);
             this.alpha = 1.0F - fadeProgress;
         }
     }

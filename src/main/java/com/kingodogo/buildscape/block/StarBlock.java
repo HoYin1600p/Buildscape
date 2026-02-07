@@ -1,12 +1,8 @@
 package com.kingodogo.buildscape.block;
 
-import java.util.Collections;
-import java.util.List;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.tags.BlockTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
@@ -20,7 +16,6 @@ import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.BushBlock;
 import net.minecraft.world.level.block.SimpleWaterloggedBlock;
-import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
@@ -32,6 +27,9 @@ import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+
+import java.util.Collections;
+import java.util.List;
 
 public class StarBlock extends BushBlock implements SimpleWaterloggedBlock {
 
@@ -244,7 +242,8 @@ public class StarBlock extends BushBlock implements SimpleWaterloggedBlock {
             BlockPos pos,
             Entity entity
     ) {
-        if (entity instanceof Player player) {
+        if (entity instanceof Player) {
+            Player player = (Player) entity;
             if (player.isOnGround() && level.isClientSide) {
                 float stepInterval = 2.0f;
                 int currentStep = (int) (player.walkDist / stepInterval);

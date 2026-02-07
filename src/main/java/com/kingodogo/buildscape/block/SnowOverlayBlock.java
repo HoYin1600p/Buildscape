@@ -64,7 +64,10 @@ public class SnowOverlayBlock extends Block {
     @Override
     public boolean canSurvive(BlockState state, LevelReader level, BlockPos pos) {
         BlockState blockState = level.getBlockState(pos.below());
-        return !blockState.isAir() && !blockState.is(Blocks.BARRIER);
+        if (blockState.isAir() || blockState.is(Blocks.BARRIER)) {
+            return false;
+        }
+        return true;
     }
 
     @Override

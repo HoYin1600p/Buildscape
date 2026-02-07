@@ -51,4 +51,16 @@ public class ModEntities {
                     .build("mangrove_boat")
     );
 
+    public static final RegistryObject<
+            EntityType<ColoredItemFrameEntity>
+            > COLORED_ITEM_FRAME = ENTITIES.register("colored_item_frame", () ->
+            EntityType.Builder.<ColoredItemFrameEntity>of(
+                            ColoredItemFrameEntity::new,
+                            MobCategory.MISC
+                    )
+                    .sized(0.5F, 0.5F)
+                    .clientTrackingRange(10)
+                    .updateInterval(20)
+                    .build("colored_item_frame")
+    );
 }

@@ -1,11 +1,5 @@
 package com.kingodogo.buildscape.block;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import net.minecraft.core.BlockPos;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -16,9 +10,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
@@ -31,6 +22,11 @@ import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class FrostRoseBlock extends BushBlock implements BonemealableBlock {
 
@@ -144,7 +140,8 @@ public class FrostRoseBlock extends BushBlock implements BonemealableBlock {
             BlockState state,
             Entity entity
     ) {
-        if (!level.isClientSide && entity instanceof LivingEntity livingEntity) {
+        if (!level.isClientSide && entity instanceof LivingEntity) {
+            LivingEntity livingEntity = (LivingEntity) entity;
             String key =
                     pos.getX() +
                             "," +
@@ -188,7 +185,8 @@ public class FrostRoseBlock extends BushBlock implements BonemealableBlock {
             BlockPos pos,
             Entity entity
     ) {
-        if (!level.isClientSide && entity instanceof LivingEntity livingEntity) {
+        if (!level.isClientSide && entity instanceof LivingEntity) {
+            LivingEntity livingEntity = (LivingEntity) entity;
             String key =
                     pos.getX() +
                             "," +

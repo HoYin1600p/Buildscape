@@ -33,7 +33,7 @@ public class PillarBlockEntity extends BlockEntity {
 
     private int particleColorCounter = 0;
 
-    private static final int globalParticleColorCounter = 0;
+    private static final int MAX_SYNC_ATTEMPTS = 5;
 
     public static final int MAX_DYE_COLORS = 5;
 
@@ -64,187 +64,7 @@ public class PillarBlockEntity extends BlockEntity {
     public PillarBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.PILLAR_BLOCK_ENTITY.get(), pos, state);
     }
-
-    public void syncColorsFromManager() {
-        if (level == null || level.isClientSide) return;
-
-        if (
-                level.getServer() == null ||
-                        !level.getServer().isRunning() ||
-                        !com.kingodogo.buildscape.BuildScape.isServerFullyInitialized()
-        ) {
-            return;
-        }
-
-        if (level.getServer().getPlayerList().getPlayerCount() == 0) {
-            return;
-        }
-
-        if (!level.hasChunkAt(worldPosition)) {
-            return;
-        }
-
-        try {
-            net.minecraft.world.level.chunk.ChunkAccess chunk = level.getChunk(
-                    worldPosition
-            );
-            if (!(chunk instanceof net.minecraft.world.level.chunk.LevelChunk)) {
-                return;
-            }
-            if (
-                    !chunk
-                            .getStatus()
-                            .isOrAfter(net.minecraft.world.level.chunk.ChunkStatus.FULL)
-            ) {
-                return;
-            }
-        } catch (Exception e) {
-            return;
-        }
-
-        // Allow sync even if colors exist - this enables updates from config GUI
-        // Only skip if we're already synced and nothing changed
-        // (Original behavior preserved for performance, but now allows forced updates)
-
-        PillarIdManager manager = PillarIdManager.get();
-        
-        // IMPORTANT: Don't sync (or clear colors) until manager has loaded
-        // Otherwise, colors loaded from NBT will be cleared before manager loads
-        if (!manager.hasLoaded()) {
-            return;
-        }
-        String expectedPrefix = PillarIdManager.getVariantPrefix(
-                level,
-                worldPosition
-        );
-
-        String idToSync = this.pillarId;
-
-        if (idToSync == null || idToSync.isEmpty()) {
-            idToSync = getStackPillarId();
-        }
-
-        if (idToSync == null || idToSync.isEmpty()) {
-            return;
-        }
-
-        if (!idToSync.startsWith(expectedPrefix + "-P")) {
-            if (this.particleColors == null || this.particleColors.isEmpty()) {
-                this.pillarId = null;
-                this.particleColors = null;
-                this.colorsInitialized = false;
-                this.particleColorCounter = 0;
-                this.setChanged();
-                level.sendBlockUpdated(
-                        worldPosition,
-                        getBlockState(),
-                        getBlockState(),
-                        3
-                );
-            }
-            return;
-        }
-
-        PillarIdManager.PillarData data = manager.getPillarData(idToSync);
-
-        if (data != null && data.hasColors()) {
-            java.util.List<String> managerColors = data.getColors();
-            boolean shouldSync = false;
-
-            if (this.pillarId == null || this.pillarId.isEmpty()) {
-                shouldSync = true;
-            } else if (!this.pillarId.equals(idToSync)) {
-                // ID changed, need to sync
-                shouldSync = true;
-            } else if (this.particleColors == null || this.particleColors.isEmpty()) {
-                // No colors but manager has them
-                shouldSync = true;
-            } else {
-                // Check if colors have changed by comparing lists
-                if (managerColors.size() != this.particleColors.size()) {
-                    shouldSync = true;
-                } else {
-                    for (int i = 0; i < managerColors.size(); i++) {
-                        String managerColor = managerColors.get(i);
-                        String currentColor = this.particleColors.get(i);
-                        if (managerColor == null || !managerColor.equals(currentColor)) {
-                            shouldSync = true;
-                            break;
-                        }
-                    }
-                }
-            }
-
-            if (shouldSync) {
-                this.pillarId = idToSync;
-                this.particleColors = new java.util.ArrayList<>(managerColors);
-                this.colorsInitialized = true;
-                this.particleColorCounter = 0;
-                this.lastParticleTick = 0;
-                this.setChanged();
-
-                level.sendBlockUpdated(
-                        worldPosition,
-                        getBlockState(),
-                        getBlockState(),
-                        3
-                );
-            }
-        } else {
-            // Data is null - pillar ID was removed from manager OR doesn't exist yet
-            // IMPORTANT: NEVER clear colors that exist in NBT
-            // Colors loaded from NBT are the source of truth for rendering
-            // Only sync colors TO manager if they exist in NBT
-            if (this.pillarId != null && this.pillarId.equals(idToSync) && 
-                this.particleColors != null && !this.particleColors.isEmpty()) {
-                // Colors exist in NBT but manager doesn't have them - sync TO manager
-                BlockPos bottomPos = findStackBottom();
-                PillarIdManager.PillarData newData = manager.getPillarDataByPosition(level, bottomPos);
-                if (newData == null) {
-                    // Create new data entry at bottom position
-                    newData = manager.getOrCreatePillarData(level, bottomPos);
-                }
-                // If the ID matches, sync colors FROM NBT TO manager
-                if (newData != null && newData.id.equals(idToSync)) {
-                    // Only sync if manager doesn't have colors or has different colors
-                    boolean needsSync = false;
-                    if (!newData.hasColors()) {
-                        needsSync = true;
-                    } else {
-                        // Check if colors differ
-                        java.util.List<String> managerColors = newData.getColors();
-                        if (managerColors.size() != this.particleColors.size()) {
-                            needsSync = true;
-                        } else {
-                            for (int i = 0; i < this.particleColors.size(); i++) {
-                                String nbtColor = this.particleColors.get(i);
-                                String managerColor = i < managerColors.size() ? managerColors.get(i) : null;
-                                if (nbtColor == null || !nbtColor.equals(managerColor)) {
-                                    needsSync = true;
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                    
-                    if (needsSync) {
-                        // Sync colors FROM NBT TO manager
-                        newData.clearColors();
-                        for (String color : this.particleColors) {
-                            if (color != null && !color.isEmpty()) {
-                                newData.addColor(color);
-                            }
-                        }
-                        // Don't save immediately during sync - let recovery or explicit saves handle it
-                        System.out.println("BuildScape: Synced " + this.particleColors.size() + 
-                            " colors from NBT to manager for " + idToSync);
-                    }
-                }
-            }
-            // DO NOT clear colors here - colors loaded from NBT are preserved
-            // Only the reset handler should clear colors
-        }
-    }
+    private static final int SYNC_INTERVAL = 20; // Sync every 20 ticks (1 second)
     
     public void syncPatternFromManager() {
         if (level == null || level.isClientSide) return;
@@ -465,208 +285,9 @@ public class PillarBlockEntity extends BlockEntity {
     public boolean hasDisplayItem() {
         return !displayedItem.isEmpty();
     }
-
-    public String getParticlePattern() {
-        if (particlePattern != null) {
-            return particlePattern;
-        }
-
-        if (level != null) {
-            String stackPattern = getStackParticlePattern();
-            return stackPattern;
-        }
-
-        return null;
-    }
-    
-    public Double getPatternSpeed() {
-        return patternSpeed;
-    }
-    
-    public Double getPatternSpread() {
-        return patternSpread;
-    }
-    
-    public Double getPatternIntensity() {
-        return patternIntensity;
-    }
-    
-    public void setPatternSpeed(Double speed) {
-        this.patternSpeed = speed;
-        this.setChanged();
-    }
-    
-    public void setPatternSpread(Double spread) {
-        this.patternSpread = spread;
-        this.setChanged();
-    }
-    
-    public void setPatternIntensity(Double intensity) {
-        this.patternIntensity = intensity;
-        this.setChanged();
-    }
-    
-    public Integer getMaxParticleColor() {
-        return maxParticleColor;
-    }
-    
-    public void setMaxParticleColor(Integer maxColor) {
-        this.maxParticleColor = maxColor;
-        this.setChanged();
-    }
-
-    public void setParticlePattern(String pattern) {
-        this.particlePattern = pattern;
-        this.setChanged();
-        if (level != null && !level.isClientSide) {
-            propagatePatternToStack(pattern);
-            
-            // Update the pattern in PillarIdManager config
-            updatePatternInConfig(pattern);
-            
-            level.sendBlockUpdated(
-                    worldPosition,
-                    getBlockState(),
-                    getBlockState(),
-                    3
-            );
-        }
-    }
-    
-    private void updatePatternInConfig(String pattern) {
-        if (level == null || level.isClientSide) {
-            return;
-        }
-        
-        // Get the pillar ID for this block entity
-        String idToUpdate = this.pillarId;
-        if (idToUpdate == null || idToUpdate.isEmpty()) {
-            idToUpdate = getStackPillarId();
-        }
-        
-        if (idToUpdate == null || idToUpdate.isEmpty()) {
-            return;
-        }
-        
-        // Get the expected prefix to validate the ID
-        String expectedPrefix = PillarIdManager.getVariantPrefix(level, worldPosition);
-        if (!idToUpdate.startsWith(expectedPrefix + "-P")) {
-            return;
-        }
-        
-        // Update the pattern in PillarIdManager
-        PillarIdManager manager = PillarIdManager.get();
-        PillarIdManager.PillarData data = manager.getPillarData(idToUpdate);
-        
-        if (data != null) {
-            data.pattern = pattern;
-            data.modifiedTime = System.currentTimeMillis();
-            manager.saveImmediate();
-        }
-    }
-
-    public void cycleParticlePattern() {
-        PillarParticleConfig cfg = PillarParticleConfig.get();
-        String currentPattern = getParticlePattern();
-        if (currentPattern == null) {
-            currentPattern = cfg.pattern != null ? cfg.pattern : "default";
-        }
-
-        int currentIndex = -1;
-        for (int i = 0; i < PATTERNS.length; i++) {
-            if (PATTERNS[i].equals(currentPattern)) {
-                currentIndex = i;
-                break;
-            }
-        }
-
-        if (currentIndex == -1) {
-            currentIndex = 0;
-        }
-
-        int nextIndex = (currentIndex + 1) % PATTERNS.length;
-        setParticlePattern(PATTERNS[nextIndex]);
-    }
-
-    public void resetParticleTick() {
-        resetParticleTick(false);
-    }
-
-    public void resetParticleTick(boolean useConfigColors) {
-        this.lastParticleTick = 0L;
-        this.particleColorCounter = 0;
-        if (useConfigColors) {
-            if (particleColors != null && !colorsInitialized) {
-                this.particleColors = null;
-            }
-        }
-    }
-
-    private final int clientSyncAttempts = 0;
-    private static final int MAX_SYNC_ATTEMPTS = 5;
-
-    private record ParticleSpawnData(double sx, double sy, double sz, double vx, double vy, double vz, float size) {
-
-    }
-
+    private static int globalParticleColorCounter = 0;
+    private int clientSyncAttempts = 0;
     private int syncTickCounter = 0;
-    private static final int SYNC_INTERVAL = 20; // Sync every 20 ticks (1 second)
-    
-    public static void serverTick(
-            net.minecraft.world.level.Level level,
-            BlockPos pos,
-            BlockState state,
-            PillarBlockEntity be
-    ) {
-        // Sync colors and pattern from manager periodically to pick up config changes
-        be.syncTickCounter++;
-        if (be.syncTickCounter >= SYNC_INTERVAL) {
-            be.syncTickCounter = 0;
-            be.syncColorsFromManager();
-            be.syncPatternFromManager();
-        }
-    }
-
-    public static void clientTick(
-            net.minecraft.world.level.Level level,
-            BlockPos pos,
-            BlockState state,
-            PillarBlockEntity be
-    ) {
-        if (level == null || !level.isClientSide) return;
-        if (!be.hasDisplayItem()) return;
-        PillarParticleConfig cfg = PillarParticleConfig.get();
-        if (!cfg.matches(be.displayedItem)) return;
-        long time = level.getGameTime();
-        if ((time - be.lastParticleTick) < 5) return;
-        be.lastParticleTick = time;
-
-        int baseCount = cfg.particle_density;
-        int count = Math.max(
-                1,
-                cfg.use_pattern
-                        ? (int) Math.round(baseCount * cfg.pattern_intensity)
-                        : baseCount
-        );
-
-        java.util.Random rand = level.random;
-        double centerX = pos.getX() + 0.5;
-        double centerY = pos.getY() + 1.0;
-        double centerZ = pos.getZ() + 0.5;
-
-        spawnParticles(
-                level,
-                pos,
-                be,
-                cfg,
-                time,
-                count,
-                rand,
-                centerX,
-                centerY,
-                centerZ
-        );
-    }
 
     private static void spawnParticles(
             net.minecraft.world.level.Level level,
@@ -727,7 +348,7 @@ public class PillarBlockEntity extends BlockEntity {
                 }
 
                 level.addParticle(
-                        particleType,
+                        (SimpleParticleType) particleType,
                         particleX,
                         particleY,
                         particleZ,
@@ -829,7 +450,7 @@ public class PillarBlockEntity extends BlockEntity {
                     }
                 } catch (Exception e) {
                     level.addParticle(
-                            particleType,
+                            (SimpleParticleType) particleType,
                             particleX,
                             particleY,
                             particleZ,
@@ -840,7 +461,7 @@ public class PillarBlockEntity extends BlockEntity {
                 }
             } else {
                 level.addParticle(
-                        particleType,
+                        (SimpleParticleType) particleType,
                         particleX,
                         particleY,
                         particleZ,
@@ -849,6 +470,406 @@ public class PillarBlockEntity extends BlockEntity {
                         data.vz
                 );
             }
+        }
+    }
+
+    public static void serverTick(
+            net.minecraft.world.level.Level level,
+            BlockPos pos,
+            BlockState state,
+            PillarBlockEntity be
+    ) {
+        // Sync colors and pattern from manager periodically to pick up config changes
+        be.syncTickCounter++;
+        if (be.syncTickCounter >= SYNC_INTERVAL) {
+            be.syncTickCounter = 0;
+            be.syncColorsFromManager();
+            be.syncPatternFromManager();
+        }
+    }
+
+    public static void clientTick(
+            net.minecraft.world.level.Level level,
+            BlockPos pos,
+            BlockState state,
+            PillarBlockEntity be
+    ) {
+        if (level == null || !level.isClientSide) return;
+        if (!be.hasDisplayItem()) return;
+        PillarParticleConfig cfg = PillarParticleConfig.get();
+        if (!cfg.matches(be.displayedItem)) return;
+        long time = level.getGameTime();
+        if ((time - be.lastParticleTick) < 5) return;
+        be.lastParticleTick = time;
+
+        int baseCount = cfg.particle_density;
+        int count = Math.max(
+                1,
+                cfg.use_pattern
+                        ? (int) Math.round(baseCount * cfg.pattern_intensity)
+                        : baseCount
+        );
+
+        java.util.Random rand = level.random;
+        double centerX = pos.getX() + 0.5;
+        double centerY = pos.getY() + 1.0;
+        double centerZ = pos.getZ() + 0.5;
+
+        spawnParticles(
+                level,
+                pos,
+                be,
+                cfg,
+                time,
+                count,
+                rand,
+                centerX,
+                centerY,
+                centerZ
+        );
+    }
+
+    public Double getPatternSpeed() {
+        return patternSpeed;
+    }
+
+    public void setPatternSpeed(Double speed) {
+        this.patternSpeed = speed;
+        this.setChanged();
+    }
+
+    public Double getPatternSpread() {
+        return patternSpread;
+    }
+
+    public void setPatternSpread(Double spread) {
+        this.patternSpread = spread;
+        this.setChanged();
+    }
+
+    public Double getPatternIntensity() {
+        return patternIntensity;
+    }
+
+    public void setPatternIntensity(Double intensity) {
+        this.patternIntensity = intensity;
+        this.setChanged();
+    }
+
+    public Integer getMaxParticleColor() {
+        return maxParticleColor;
+    }
+
+    public void setMaxParticleColor(Integer maxColor) {
+        this.maxParticleColor = maxColor;
+        this.setChanged();
+    }
+
+    private void updatePatternInConfig(String pattern) {
+        if (level == null || level.isClientSide) {
+            return;
+        }
+
+        // Get the pillar ID for this block entity
+        String idToUpdate = this.pillarId;
+        if (idToUpdate == null || idToUpdate.isEmpty()) {
+            idToUpdate = getStackPillarId();
+        }
+
+        if (idToUpdate == null || idToUpdate.isEmpty()) {
+            return;
+        }
+
+        // Get the expected prefix to validate the ID
+        String expectedPrefix = PillarIdManager.getVariantPrefix(level, worldPosition);
+        if (!idToUpdate.startsWith(expectedPrefix + "-P")) {
+            return;
+        }
+
+        // Update the pattern in PillarIdManager
+        PillarIdManager manager = PillarIdManager.get();
+        PillarIdManager.PillarData data = manager.getPillarData(idToUpdate);
+
+        if (data != null) {
+            data.pattern = pattern;
+            data.modifiedTime = System.currentTimeMillis();
+            manager.saveImmediate();
+        }
+    }
+
+    public void cycleParticlePattern() {
+        PillarParticleConfig cfg = PillarParticleConfig.get();
+        String currentPattern = getParticlePattern();
+        if (currentPattern == null) {
+            currentPattern = cfg.pattern != null ? cfg.pattern : "default";
+        }
+
+        int currentIndex = -1;
+        for (int i = 0; i < PATTERNS.length; i++) {
+            if (PATTERNS[i].equals(currentPattern)) {
+                currentIndex = i;
+                break;
+            }
+        }
+
+        if (currentIndex == -1) {
+            currentIndex = 0;
+        }
+
+        int nextIndex = (currentIndex + 1) % PATTERNS.length;
+        setParticlePattern(PATTERNS[nextIndex]);
+    }
+
+    public void resetParticleTick() {
+        resetParticleTick(false);
+    }
+
+    public void resetParticleTick(boolean useConfigColors) {
+        this.lastParticleTick = 0L;
+        this.particleColorCounter = 0;
+        if (useConfigColors) {
+            if (particleColors != null && !colorsInitialized) {
+                this.particleColors = null;
+            }
+        }
+    }
+
+    public void syncColorsFromManager() {
+        if (level == null || level.isClientSide) return;
+
+        if (
+                level.getServer() == null ||
+                        !level.getServer().isRunning() ||
+                        !com.kingodogo.buildscape.BuildScape.isServerFullyInitialized()
+        ) {
+            return;
+        }
+
+        if (level.getServer().getPlayerList().getPlayerCount() == 0) {
+            return;
+        }
+
+        if (!level.hasChunkAt(worldPosition)) {
+            return;
+        }
+
+        try {
+            net.minecraft.world.level.chunk.ChunkAccess chunk = level.getChunk(
+                    worldPosition
+            );
+            if (!(chunk instanceof net.minecraft.world.level.chunk.LevelChunk)) {
+                return;
+            }
+            if (
+                    !chunk
+                            .getStatus()
+                            .isOrAfter(net.minecraft.world.level.chunk.ChunkStatus.FULL)
+            ) {
+                return;
+            }
+        } catch (Exception e) {
+            return;
+        }
+
+        // Allow sync even if colors exist - this enables updates from config GUI
+        // Only skip if we're already synced and nothing changed
+        // (Original behavior preserved for performance, but now allows forced updates)
+
+        PillarIdManager manager = PillarIdManager.get();
+
+        // IMPORTANT: Don't sync (or clear colors) until manager has loaded
+        // Otherwise, colors loaded from NBT will be cleared before manager loads
+        if (!manager.hasLoaded()) {
+            return;
+        }
+        String expectedPrefix = PillarIdManager.getVariantPrefix(
+                level,
+                worldPosition
+        );
+
+        String idToSync = this.pillarId;
+
+        if (idToSync == null || idToSync.isEmpty()) {
+            idToSync = getStackPillarId();
+        }
+
+        if (idToSync == null || idToSync.isEmpty()) {
+            return;
+        }
+
+        if (!idToSync.startsWith(expectedPrefix + "-P")) {
+            if (this.particleColors == null || this.particleColors.isEmpty()) {
+                this.pillarId = null;
+                this.particleColors = null;
+                this.colorsInitialized = false;
+                this.particleColorCounter = 0;
+                this.setChanged();
+                level.sendBlockUpdated(
+                        worldPosition,
+                        getBlockState(),
+                        getBlockState(),
+                        3
+                );
+            }
+            return;
+        }
+
+        PillarIdManager.PillarData data = manager.getPillarData(idToSync);
+
+        if (data != null && data.hasColors()) {
+            java.util.List<String> managerColors = data.getColors();
+            boolean shouldSync = false;
+
+            if (this.pillarId == null || this.pillarId.isEmpty()) {
+                shouldSync = true;
+            } else if (!this.pillarId.equals(idToSync)) {
+                // ID changed, need to sync
+                shouldSync = true;
+            } else if (this.particleColors == null || this.particleColors.isEmpty()) {
+                // No colors but manager has them
+                shouldSync = true;
+            } else {
+                // Check if colors have changed by comparing lists
+                if (managerColors.size() != this.particleColors.size()) {
+                    shouldSync = true;
+                } else {
+                    for (int i = 0; i < managerColors.size(); i++) {
+                        String managerColor = managerColors.get(i);
+                        String currentColor = this.particleColors.get(i);
+                        if (managerColor == null || currentColor == null || !managerColor.equals(currentColor)) {
+                            shouldSync = true;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if (shouldSync) {
+                this.pillarId = idToSync;
+                this.particleColors = new java.util.ArrayList<>(managerColors);
+                this.colorsInitialized = true;
+                this.particleColorCounter = 0;
+                this.lastParticleTick = 0;
+                this.setChanged();
+
+                level.sendBlockUpdated(
+                        worldPosition,
+                        getBlockState(),
+                        getBlockState(),
+                        3
+                );
+            }
+        } else {
+            // Data is null - pillar ID was removed from manager OR doesn't exist yet
+            // IMPORTANT: NEVER clear colors that exist in NBT
+            // Colors loaded from NBT are the source of truth for rendering
+            // Only sync colors TO manager if they exist in NBT
+            if (this.pillarId != null && this.pillarId.equals(idToSync) &&
+                    this.particleColors != null && !this.particleColors.isEmpty()) {
+                // Colors exist in NBT but manager doesn't have them - sync TO manager
+                BlockPos bottomPos = findStackBottom();
+                PillarIdManager.PillarData newData = manager.getPillarDataByPosition(level, bottomPos);
+                if (newData == null) {
+                    // Create new data entry at bottom position
+                    newData = manager.getOrCreatePillarData(level, bottomPos);
+                }
+                // If the ID matches, sync colors FROM NBT TO manager
+                if (newData != null && newData.id.equals(idToSync)) {
+                    // Only sync if manager doesn't have colors or has different colors
+                    boolean needsSync = false;
+                    if (!newData.hasColors()) {
+                        needsSync = true;
+                    } else {
+                        // Check if colors differ
+                        java.util.List<String> managerColors = newData.getColors();
+                        if (managerColors.size() != this.particleColors.size()) {
+                            needsSync = true;
+                        } else {
+                            for (int i = 0; i < this.particleColors.size(); i++) {
+                                String nbtColor = this.particleColors.get(i);
+                                String managerColor = i < managerColors.size() ? managerColors.get(i) : null;
+                                if (nbtColor == null || managerColor == null || !nbtColor.equals(managerColor)) {
+                                    needsSync = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+
+                    if (needsSync) {
+                        // Sync colors FROM NBT TO manager
+                        newData.clearColors();
+                        for (String color : this.particleColors) {
+                            if (color != null && !color.isEmpty()) {
+                                newData.addColor(color);
+                            }
+                        }
+                        // Don't save immediately during sync - let recovery or explicit saves handle it
+                        System.out.println("BuildScape: Synced " + this.particleColors.size() +
+                                " colors from NBT to manager for " + idToSync);
+                    }
+                }
+            }
+            // DO NOT clear colors here - colors loaded from NBT are preserved
+            // Only the reset handler should clear colors
+        }
+    }
+
+    public String getParticlePattern() {
+        if (particlePattern != null) {
+            return particlePattern;
+        }
+
+        if (level != null) {
+            String stackPattern = getStackParticlePattern();
+            if (stackPattern != null) {
+                return stackPattern;
+            }
+        }
+
+        return null;
+    }
+
+    public void setParticlePattern(String pattern) {
+        this.particlePattern = pattern;
+        this.setChanged();
+        if (level != null && !level.isClientSide) {
+            propagatePatternToStack(pattern);
+
+            // Update the pattern in PillarIdManager config
+            updatePatternInConfig(pattern);
+
+            level.sendBlockUpdated(
+                    worldPosition,
+                    getBlockState(),
+                    getBlockState(),
+                    3
+            );
+        }
+    }
+
+    private static class ParticleSpawnData {
+
+        final double sx, sy, sz;
+        final double vx, vy, vz;
+        final float size;
+
+        ParticleSpawnData(
+                double sx,
+                double sy,
+                double sz,
+                double vx,
+                double vy,
+                double vz,
+                float size
+        ) {
+            this.sx = sx;
+            this.sy = sy;
+            this.sz = sz;
+            this.vx = vx;
+            this.vy = vy;
+            this.vz = vz;
+            this.size = size;
         }
     }
 

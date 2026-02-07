@@ -59,10 +59,7 @@ public class CosmeticManager {
                 "Sweet cake particles follow you", 3, "cake");
 
         // Register some item cosmetics for variety
-        registerItemCosmetic("buildscape:cosmatics/gear/diamond_sword", "Diamond Sword", "A sharp diamond blade", 1,
-                "item:minecraft:diamond_sword");
-        registerItemCosmetic("buildscape:cosmatics/gear/golden_apple", "Golden Apple", "A golden apple", 1,
-                "item:minecraft:golden_apple");
+
         registerItemCosmetic("buildscape:cosmatics/wings/elytra", "Elytra Wings", "Wings for gliding", 2,
                 "item:minecraft:elytra");
         registerHeadCosmetic("buildscape:cosmatics/gear/builders_hat", "Builder's Hat", "A stylish builder's hat", 1);
@@ -74,19 +71,8 @@ public class CosmeticManager {
                 "Powerful netherite leggings", 3, "item:minecraft:netherite_leggings");
         registerItemCosmetic("buildscape:cosmatics/gear/netherite_boots", "Netherite Boots", "Powerful netherite boots",
                 3, "item:minecraft:netherite_boots");
-        registerItemCosmetic("buildscape:cosmatics/gear/trident", "Trident", "A powerful trident", 2,
-                "item:minecraft:trident");
-        registerItemCosmetic("buildscape:cosmatics/gear/bow", "Bow", "A sturdy bow", 1, "item:minecraft:bow");
 
         // Register block cosmetics
-        registerBlockCosmetic("buildscape:cosmatics/gear/gold_block", "Gold Block", "A block of gold", 1,
-                "block:minecraft:gold_block");
-        registerBlockCosmetic("buildscape:cosmatics/gear/diamond_block", "Diamond Block", "A block of diamonds", 2,
-                "block:minecraft:diamond_block");
-        registerBlockCosmetic("buildscape:cosmatics/gear/emerald_block", "Emerald Block", "A block of emeralds", 2,
-                "block:minecraft:emerald_block");
-        registerBlockCosmetic("buildscape:cosmatics/gear/netherite_block", "Netherite Block", "A block of netherite", 3,
-                "block:minecraft:netherite_block");
 
         BuildScape.getLogger().info("Registered " + allCosmetics.size() + " built-in cosmetics");
     }
@@ -112,6 +98,12 @@ public class CosmeticManager {
      * Check if a particle trail supports color customization.
      */
     public boolean supportsColor(String cosmeticId) {
+        // Only particle trails support color (and specifically only sparkle/heart
+        // types)
+        if (!isParticleTrail(cosmeticId)) {
+            return false;
+        }
+
         String shape = getParticleShape(cosmeticId);
         // Sparkle and Heart shapes support colors
         return shape.equals("sparkle") || shape.equals("heart");
@@ -124,14 +116,6 @@ public class CosmeticManager {
         allCosmetics.add(cosmeticId);
         CosmeticType type = cosmeticId.contains("/wings/") ? CosmeticType.WINGS : CosmeticType.ITEM;
         cosmeticMetadata.put(cosmeticId, new CosmeticMetadata(name, description, tier, type, legacyId));
-    }
-
-    /**
-     * Register a block cosmetic.
-     */
-    private void registerBlockCosmetic(String cosmeticId, String name, String description, int tier, String legacyId) {
-        allCosmetics.add(cosmeticId);
-        cosmeticMetadata.put(cosmeticId, new CosmeticMetadata(name, description, tier, CosmeticType.BLOCK, legacyId));
     }
 
     /**

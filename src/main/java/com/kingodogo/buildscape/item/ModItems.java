@@ -3529,7 +3529,733 @@ public class ModItems {
                                         ModBlocks.MULTICOLOR_GLOW_LIGHTS.get(),
                                         createBlockItemProperties()));
 
+        public static final RegistryObject<Item> BUILDERS_HAT = ITEMS.register("builders_hat",
+                        () -> new BuildersHatItem(new Item.Properties().tab(BuildScape.BUILDSCAPE_TAB).stacksTo(1)));
+
         public static final RegistryObject<Item> CONFETTI_ITEM = ITEMS.register(
                         "confetti",
                         () -> new ConfettiItem(new Item.Properties().tab(BuildScape.BUILDSCAPE_TAB)));
+
+        public static final RegistryObject<Item> STEEL_INGOT = ITEMS.register(
+                        "steel_ingot",
+                        () -> new Item(new Item.Properties().tab(BuildScape.BUILDSCAPE_TAB)));
+
+        public static final RegistryObject<Item> STEEL_BLOCK = ITEMS.register(
+                        "steel_block",
+                        () -> new BlockItem(ModBlocks.STEEL_BLOCK.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> PRESSED_STEEL = ITEMS.register(
+                        "pressed_steel",
+                        () -> new BlockItem(ModBlocks.PRESSED_STEEL.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> CUT_STEEL = ITEMS.register(
+                        "cut_steel",
+                        () -> new BlockItem(ModBlocks.CUT_STEEL.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> POLISHED_STEEL = ITEMS.register(
+                        "polished_steel",
+                        () -> new BlockItem(ModBlocks.POLISHED_STEEL.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> FACTORY_STEEL_PANEL = ITEMS.register(
+                        "factory_steel_panel",
+                        () -> new BlockItem(ModBlocks.FACTORY_STEEL_PANEL.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> STEEL_CASING = ITEMS.register(
+                        "steel_casing",
+                        () -> new BlockItem(ModBlocks.STEEL_CASING.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> STEEL_TRIM = ITEMS.register(
+                        "steel_trim",
+                        () -> new BlockItem(ModBlocks.STEEL_TRIM.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> STEEL_PILLAR = ITEMS.register(
+                        "steel_pillar",
+                        () -> new BlockItem(ModBlocks.STEEL_PILLAR.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> BOLTED_STEEL_PILLAR = ITEMS.register(
+                        "bolted_steel_pillar",
+                        () -> new BlockItem(ModBlocks.BOLTED_STEEL_PILLAR.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> STEEL_GRATE = ITEMS.register(
+                        "steel_grate",
+                        () -> new BlockItem(ModBlocks.STEEL_GRATE.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> STEEL_FAN = ITEMS.register(
+                        "steel_fan",
+                        () -> new BlockItem(ModBlocks.STEEL_FAN.get(), createBlockItemProperties()));
+
+        // Steel Block Variants
+        public static final RegistryObject<Item> STEEL_BLOCK_STAIRS = ITEMS.register(
+                        "steel_block_stairs",
+                        () -> new BlockItem(ModBlocks.STEEL_BLOCK_STAIRS.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> STEEL_BLOCK_SLAB = ITEMS.register(
+                        "steel_block_slab",
+                        () -> new BlockItem(ModBlocks.STEEL_BLOCK_SLAB.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> STEEL_BLOCK_WALL = ITEMS.register(
+                        "steel_block_wall",
+                        () -> new BlockItem(ModBlocks.STEEL_BLOCK_WALL.get(), createBlockItemProperties()));
+
+        // Polished Steel Variants
+        public static final RegistryObject<Item> POLISHED_STEEL_STAIRS = ITEMS.register(
+                        "polished_steel_stairs",
+                        () -> new BlockItem(ModBlocks.POLISHED_STEEL_STAIRS.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> POLISHED_STEEL_SLAB = ITEMS.register(
+                        "polished_steel_slab",
+                        () -> new BlockItem(ModBlocks.POLISHED_STEEL_SLAB.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> POLISHED_STEEL_WALL = ITEMS.register(
+                        "polished_steel_wall",
+                        () -> new BlockItem(ModBlocks.POLISHED_STEEL_WALL.get(), createBlockItemProperties()));
+
+        // Pressed Steel Variants
+        public static final RegistryObject<Item> PRESSED_STEEL_STAIRS = ITEMS.register(
+                        "pressed_steel_stairs",
+                        () -> new BlockItem(ModBlocks.PRESSED_STEEL_STAIRS.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> PRESSED_STEEL_SLAB = ITEMS.register(
+                        "pressed_steel_slab",
+                        () -> new BlockItem(ModBlocks.PRESSED_STEEL_SLAB.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> PRESSED_STEEL_WALL = ITEMS.register(
+                        "pressed_steel_wall",
+                        () -> new BlockItem(ModBlocks.PRESSED_STEEL_WALL.get(), createBlockItemProperties()));
+
+        // Cut Steel Variants
+        public static final RegistryObject<Item> CUT_STEEL_STAIRS = ITEMS.register(
+                        "cut_steel_stairs",
+                        () -> new BlockItem(ModBlocks.CUT_STEEL_STAIRS.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> CUT_STEEL_SLAB = ITEMS.register(
+                        "cut_steel_slab",
+                        () -> new BlockItem(ModBlocks.CUT_STEEL_SLAB.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> CUT_STEEL_WALL = ITEMS.register(
+                        "cut_steel_wall",
+                        () -> new BlockItem(ModBlocks.CUT_STEEL_WALL.get(), createBlockItemProperties()));
+
+        // Caution Blocks
+        public static final RegistryObject<Item> CAUTION_BLACK = ITEMS.register(
+                        "caution_black",
+                        () -> new BlockItem(ModBlocks.CAUTION_BLACK.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> CAUTION_BLUE = ITEMS.register(
+                        "caution_blue",
+                        () -> new BlockItem(ModBlocks.CAUTION_BLUE.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> CAUTION_FACTORY = ITEMS.register(
+                        "caution_factory",
+                        () -> new BlockItem(ModBlocks.CAUTION_FACTORY.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> CAUTION_RED = ITEMS.register(
+                        "caution_red",
+                        () -> new BlockItem(ModBlocks.CAUTION_RED.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> FRAMED_CAUTION = ITEMS.register(
+                        "framed_caution",
+                        () -> new BlockItem(ModBlocks.FRAMED_CAUTION.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> CAUTION_WHITE = ITEMS.register(
+                        "caution_white",
+                        () -> new BlockItem(ModBlocks.CAUTION_WHITE.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> CAUTION_LIME = ITEMS.register(
+                        "caution_lime",
+                        () -> new BlockItem(ModBlocks.CAUTION_LIME.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> CAUTION_PINK = ITEMS.register(
+                        "caution_pink",
+                        () -> new BlockItem(ModBlocks.CAUTION_PINK.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> CAUTION_YELLOW = ITEMS.register(
+                        "caution_yellow",
+                        () -> new BlockItem(ModBlocks.CAUTION_YELLOW.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> CAUTION_CANDY = ITEMS.register(
+                        "caution_candy",
+                        () -> new BlockItem(ModBlocks.CAUTION_CANDY.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> CAUTION_COTTONCANDY = ITEMS.register(
+                        "caution_cottoncandy",
+                        () -> new BlockItem(ModBlocks.CAUTION_COTTONCANDY.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> CAUTION_MINTCANDY = ITEMS.register(
+                        "caution_mintcandy",
+                        () -> new BlockItem(ModBlocks.CAUTION_MINTCANDY.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> CAUTION_CITRUSCANDY = ITEMS.register(
+                        "caution_citruscandy",
+                        () -> new BlockItem(ModBlocks.CAUTION_CITRUSCANDY.get(), createBlockItemProperties()));
+
+        // Caution Slabs
+        public static final RegistryObject<Item> CAUTION_BLACK_SLAB = ITEMS.register(
+                        "caution_black_slab",
+                        () -> new BlockItem(ModBlocks.CAUTION_BLACK_SLAB.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> CAUTION_BLUE_SLAB = ITEMS.register(
+                        "caution_blue_slab",
+                        () -> new BlockItem(ModBlocks.CAUTION_BLUE_SLAB.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> CAUTION_FACTORY_SLAB = ITEMS.register(
+                        "caution_factory_slab",
+                        () -> new BlockItem(ModBlocks.CAUTION_FACTORY_SLAB.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> CAUTION_RED_SLAB = ITEMS.register(
+                        "caution_red_slab",
+                        () -> new BlockItem(ModBlocks.CAUTION_RED_SLAB.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> FRAMED_CAUTION_SLAB = ITEMS.register(
+                        "framed_caution_slab",
+                        () -> new BlockItem(ModBlocks.FRAMED_CAUTION_SLAB.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> CAUTION_WHITE_SLAB = ITEMS.register(
+                        "caution_white_slab",
+                        () -> new BlockItem(ModBlocks.CAUTION_WHITE_SLAB.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> CAUTION_LIME_SLAB = ITEMS.register(
+                        "caution_lime_slab",
+                        () -> new BlockItem(ModBlocks.CAUTION_LIME_SLAB.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> CAUTION_PINK_SLAB = ITEMS.register(
+                        "caution_pink_slab",
+                        () -> new BlockItem(ModBlocks.CAUTION_PINK_SLAB.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> CAUTION_YELLOW_SLAB = ITEMS.register(
+                        "caution_yellow_slab",
+                        () -> new BlockItem(ModBlocks.CAUTION_YELLOW_SLAB.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> CAUTION_CANDY_SLAB = ITEMS.register(
+                        "caution_candy_slab",
+                        () -> new BlockItem(ModBlocks.CAUTION_CANDY_SLAB.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> CAUTION_COTTONCANDY_SLAB = ITEMS.register(
+                        "caution_cottoncandy_slab",
+                        () -> new BlockItem(ModBlocks.CAUTION_COTTONCANDY_SLAB.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> CAUTION_MINTCANDY_SLAB = ITEMS.register(
+                        "caution_mintcandy_slab",
+                        () -> new BlockItem(ModBlocks.CAUTION_MINTCANDY_SLAB.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> CAUTION_CITRUSCANDY_SLAB = ITEMS.register(
+                        "caution_citruscandy_slab",
+                        () -> new BlockItem(ModBlocks.CAUTION_CITRUSCANDY_SLAB.get(), createBlockItemProperties()));
+
+        // Caution Stairs
+        public static final RegistryObject<Item> CAUTION_BLACK_STAIRS = ITEMS.register(
+                        "caution_black_stairs",
+                        () -> new BlockItem(ModBlocks.CAUTION_BLACK_STAIRS.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> CAUTION_BLUE_STAIRS = ITEMS.register(
+                        "caution_blue_stairs",
+                        () -> new BlockItem(ModBlocks.CAUTION_BLUE_STAIRS.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> CAUTION_FACTORY_STAIRS = ITEMS.register(
+                        "caution_factory_stairs",
+                        () -> new BlockItem(ModBlocks.CAUTION_FACTORY_STAIRS.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> CAUTION_RED_STAIRS = ITEMS.register(
+                        "caution_red_stairs",
+                        () -> new BlockItem(ModBlocks.CAUTION_RED_STAIRS.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> FRAMED_CAUTION_STAIRS = ITEMS.register(
+                        "framed_caution_stairs",
+                        () -> new BlockItem(ModBlocks.FRAMED_CAUTION_STAIRS.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> CAUTION_WHITE_STAIRS = ITEMS.register(
+                        "caution_white_stairs",
+                        () -> new BlockItem(ModBlocks.CAUTION_WHITE_STAIRS.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> CAUTION_LIME_STAIRS = ITEMS.register(
+                        "caution_lime_stairs",
+                        () -> new BlockItem(ModBlocks.CAUTION_LIME_STAIRS.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> CAUTION_PINK_STAIRS = ITEMS.register(
+                        "caution_pink_stairs",
+                        () -> new BlockItem(ModBlocks.CAUTION_PINK_STAIRS.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> CAUTION_YELLOW_STAIRS = ITEMS.register(
+                        "caution_yellow_stairs",
+                        () -> new BlockItem(ModBlocks.CAUTION_YELLOW_STAIRS.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> CAUTION_CANDY_STAIRS = ITEMS.register(
+                        "caution_candy_stairs",
+                        () -> new BlockItem(ModBlocks.CAUTION_CANDY_STAIRS.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> CAUTION_COTTONCANDY_STAIRS = ITEMS.register(
+                        "caution_cottoncandy_stairs",
+                        () -> new BlockItem(ModBlocks.CAUTION_COTTONCANDY_STAIRS.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> CAUTION_MINTCANDY_STAIRS = ITEMS.register(
+                        "caution_mintcandy_stairs",
+                        () -> new BlockItem(ModBlocks.CAUTION_MINTCANDY_STAIRS.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> CAUTION_CITRUSCANDY_STAIRS = ITEMS.register(
+                        "caution_citruscandy_stairs",
+                        () -> new BlockItem(ModBlocks.CAUTION_CITRUSCANDY_STAIRS.get(), createBlockItemProperties()));
+
+        // Factory Glass Blocks
+        public static final RegistryObject<Item> FACTORY_WHITE_GLASS = ITEMS.register(
+                        "factory_white_glass",
+                        () -> new BlockItem(ModBlocks.FACTORY_WHITE_GLASS.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> FACTORY_LIGHT_GRAY_GLASS = ITEMS.register(
+                        "factory_light_gray_glass",
+                        () -> new BlockItem(ModBlocks.FACTORY_LIGHT_GRAY_GLASS.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> FACTORY_GRAY_GLASS = ITEMS.register(
+                        "factory_gray_glass",
+                        () -> new BlockItem(ModBlocks.FACTORY_GRAY_GLASS.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> FACTORY_BLACK_GLASS = ITEMS.register(
+                        "factory_black_glass",
+                        () -> new BlockItem(ModBlocks.FACTORY_BLACK_GLASS.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> FACTORY_BROWN_GLASS = ITEMS.register(
+                        "factory_brown_glass",
+                        () -> new BlockItem(ModBlocks.FACTORY_BROWN_GLASS.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> FACTORY_RED_GLASS = ITEMS.register(
+                        "factory_red_glass",
+                        () -> new BlockItem(ModBlocks.FACTORY_RED_GLASS.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> FACTORY_ORANGE_GLASS = ITEMS.register(
+                        "factory_orange_glass",
+                        () -> new BlockItem(ModBlocks.FACTORY_ORANGE_GLASS.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> FACTORY_YELLOW_GLASS = ITEMS.register(
+                        "factory_yellow_glass",
+                        () -> new BlockItem(ModBlocks.FACTORY_YELLOW_GLASS.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> FACTORY_LIME_GLASS = ITEMS.register(
+                        "factory_lime_glass",
+                        () -> new BlockItem(ModBlocks.FACTORY_LIME_GLASS.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> FACTORY_GREEN_GLASS = ITEMS.register(
+                        "factory_green_glass",
+                        () -> new BlockItem(ModBlocks.FACTORY_GREEN_GLASS.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> FACTORY_CYAN_GLASS = ITEMS.register(
+                        "factory_cyan_glass",
+                        () -> new BlockItem(ModBlocks.FACTORY_CYAN_GLASS.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> FACTORY_LIGHT_BLUE_GLASS = ITEMS.register(
+                        "factory_light_blue_glass",
+                        () -> new BlockItem(ModBlocks.FACTORY_LIGHT_BLUE_GLASS.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> FACTORY_BLUE_GLASS = ITEMS.register(
+                        "factory_blue_glass",
+                        () -> new BlockItem(ModBlocks.FACTORY_BLUE_GLASS.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> FACTORY_PURPLE_GLASS = ITEMS.register(
+                        "factory_purple_glass",
+                        () -> new BlockItem(ModBlocks.FACTORY_PURPLE_GLASS.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> FACTORY_MAGENTA_GLASS = ITEMS.register(
+                        "factory_magenta_glass",
+                        () -> new BlockItem(ModBlocks.FACTORY_MAGENTA_GLASS.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> FACTORY_PINK_GLASS = ITEMS.register(
+                        "factory_pink_glass",
+                        () -> new BlockItem(ModBlocks.FACTORY_PINK_GLASS.get(), createBlockItemProperties()));
+
+        // Factory Glass Panes
+        public static final RegistryObject<Item> FACTORY_WHITE_GLASS_PANE = ITEMS.register(
+                        "factory_white_glass_pane",
+                        () -> new BlockItem(ModBlocks.FACTORY_WHITE_GLASS_PANE.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> FACTORY_LIGHT_GRAY_GLASS_PANE = ITEMS.register(
+                        "factory_light_gray_glass_pane",
+                        () -> new BlockItem(ModBlocks.FACTORY_LIGHT_GRAY_GLASS_PANE.get(),
+                                        createBlockItemProperties()));
+
+        public static final RegistryObject<Item> FACTORY_GRAY_GLASS_PANE = ITEMS.register(
+                        "factory_gray_glass_pane",
+                        () -> new BlockItem(ModBlocks.FACTORY_GRAY_GLASS_PANE.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> FACTORY_BLACK_GLASS_PANE = ITEMS.register(
+                        "factory_black_glass_pane",
+                        () -> new BlockItem(ModBlocks.FACTORY_BLACK_GLASS_PANE.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> FACTORY_BROWN_GLASS_PANE = ITEMS.register(
+                        "factory_brown_glass_pane",
+                        () -> new BlockItem(ModBlocks.FACTORY_BROWN_GLASS_PANE.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> FACTORY_RED_GLASS_PANE = ITEMS.register(
+                        "factory_red_glass_pane",
+                        () -> new BlockItem(ModBlocks.FACTORY_RED_GLASS_PANE.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> FACTORY_ORANGE_GLASS_PANE = ITEMS.register(
+                        "factory_orange_glass_pane",
+                        () -> new BlockItem(ModBlocks.FACTORY_ORANGE_GLASS_PANE.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> FACTORY_YELLOW_GLASS_PANE = ITEMS.register(
+                        "factory_yellow_glass_pane",
+                        () -> new BlockItem(ModBlocks.FACTORY_YELLOW_GLASS_PANE.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> FACTORY_LIME_GLASS_PANE = ITEMS.register(
+                        "factory_lime_glass_pane",
+                        () -> new BlockItem(ModBlocks.FACTORY_LIME_GLASS_PANE.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> FACTORY_GREEN_GLASS_PANE = ITEMS.register(
+                        "factory_green_glass_pane",
+                        () -> new BlockItem(ModBlocks.FACTORY_GREEN_GLASS_PANE.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> FACTORY_CYAN_GLASS_PANE = ITEMS.register(
+                        "factory_cyan_glass_pane",
+                        () -> new BlockItem(ModBlocks.FACTORY_CYAN_GLASS_PANE.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> FACTORY_LIGHT_BLUE_GLASS_PANE = ITEMS.register(
+                        "factory_light_blue_glass_pane",
+                        () -> new BlockItem(ModBlocks.FACTORY_LIGHT_BLUE_GLASS_PANE.get(),
+                                        createBlockItemProperties()));
+
+        public static final RegistryObject<Item> FACTORY_BLUE_GLASS_PANE = ITEMS.register(
+                        "factory_blue_glass_pane",
+                        () -> new BlockItem(ModBlocks.FACTORY_BLUE_GLASS_PANE.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> FACTORY_PURPLE_GLASS_PANE = ITEMS.register(
+                        "factory_purple_glass_pane",
+                        () -> new BlockItem(ModBlocks.FACTORY_PURPLE_GLASS_PANE.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> FACTORY_MAGENTA_GLASS_PANE = ITEMS.register(
+                        "factory_magenta_glass_pane",
+                        () -> new BlockItem(ModBlocks.FACTORY_MAGENTA_GLASS_PANE.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> FACTORY_PINK_GLASS_PANE = ITEMS.register(
+                        "factory_pink_glass_pane",
+                        () -> new BlockItem(ModBlocks.FACTORY_PINK_GLASS_PANE.get(), createBlockItemProperties()));
+
+        // Stained Bricks
+        public static final RegistryObject<Item> WHITE_STAINED_BRICKS = ITEMS.register(
+                        "white_stained_bricks",
+                        () -> new BlockItem(ModBlocks.WHITE_STAINED_BRICKS.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> LIGHT_GRAY_STAINED_BRICKS = ITEMS.register(
+                        "light_gray_stained_bricks",
+                        () -> new BlockItem(ModBlocks.LIGHT_GRAY_STAINED_BRICKS.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> GRAY_STAINED_BRICKS = ITEMS.register(
+                        "gray_stained_bricks",
+                        () -> new BlockItem(ModBlocks.GRAY_STAINED_BRICKS.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> BLACK_STAINED_BRICKS = ITEMS.register(
+                        "black_stained_bricks",
+                        () -> new BlockItem(ModBlocks.BLACK_STAINED_BRICKS.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> BROWN_STAINED_BRICKS = ITEMS.register(
+                        "brown_stained_bricks",
+                        () -> new BlockItem(ModBlocks.BROWN_STAINED_BRICKS.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> RED_STAINED_BRICKS = ITEMS.register(
+                        "red_stained_bricks",
+                        () -> new BlockItem(ModBlocks.RED_STAINED_BRICKS.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> ORANGE_STAINED_BRICKS = ITEMS.register(
+                        "orange_stained_bricks",
+                        () -> new BlockItem(ModBlocks.ORANGE_STAINED_BRICKS.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> YELLOW_STAINED_BRICKS = ITEMS.register(
+                        "yellow_stained_bricks",
+                        () -> new BlockItem(ModBlocks.YELLOW_STAINED_BRICKS.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> LIME_STAINED_BRICKS = ITEMS.register(
+                        "lime_stained_bricks",
+                        () -> new BlockItem(ModBlocks.LIME_STAINED_BRICKS.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> GREEN_STAINED_BRICKS = ITEMS.register(
+                        "green_stained_bricks",
+                        () -> new BlockItem(ModBlocks.GREEN_STAINED_BRICKS.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> CYAN_STAINED_BRICKS = ITEMS.register(
+                        "cyan_stained_bricks",
+                        () -> new BlockItem(ModBlocks.CYAN_STAINED_BRICKS.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> LIGHT_BLUE_STAINED_BRICKS = ITEMS.register(
+                        "light_blue_stained_bricks",
+                        () -> new BlockItem(ModBlocks.LIGHT_BLUE_STAINED_BRICKS.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> BLUE_STAINED_BRICKS = ITEMS.register(
+                        "blue_stained_bricks",
+                        () -> new BlockItem(ModBlocks.BLUE_STAINED_BRICKS.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> PURPLE_STAINED_BRICKS = ITEMS.register(
+                        "purple_stained_bricks",
+                        () -> new BlockItem(ModBlocks.PURPLE_STAINED_BRICKS.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> MAGENTA_STAINED_BRICKS = ITEMS.register(
+                        "magenta_stained_bricks",
+                        () -> new BlockItem(ModBlocks.MAGENTA_STAINED_BRICKS.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> PINK_STAINED_BRICKS = ITEMS.register(
+                        "pink_stained_bricks",
+                        () -> new BlockItem(ModBlocks.PINK_STAINED_BRICKS.get(), createBlockItemProperties()));
+
+        // Stained Bricks Slabs
+        public static final RegistryObject<Item> WHITE_STAINED_BRICKS_SLAB = ITEMS.register(
+                        "white_stained_bricks_slab",
+                        () -> new BlockItem(ModBlocks.WHITE_STAINED_BRICKS_SLAB.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> LIGHT_GRAY_STAINED_BRICKS_SLAB = ITEMS.register(
+                        "light_gray_stained_bricks_slab",
+                        () -> new BlockItem(ModBlocks.LIGHT_GRAY_STAINED_BRICKS_SLAB.get(),
+                                        createBlockItemProperties()));
+
+        public static final RegistryObject<Item> GRAY_STAINED_BRICKS_SLAB = ITEMS.register(
+                        "gray_stained_bricks_slab",
+                        () -> new BlockItem(ModBlocks.GRAY_STAINED_BRICKS_SLAB.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> BLACK_STAINED_BRICKS_SLAB = ITEMS.register(
+                        "black_stained_bricks_slab",
+                        () -> new BlockItem(ModBlocks.BLACK_STAINED_BRICKS_SLAB.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> BROWN_STAINED_BRICKS_SLAB = ITEMS.register(
+                        "brown_stained_bricks_slab",
+                        () -> new BlockItem(ModBlocks.BROWN_STAINED_BRICKS_SLAB.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> RED_STAINED_BRICKS_SLAB = ITEMS.register(
+                        "red_stained_bricks_slab",
+                        () -> new BlockItem(ModBlocks.RED_STAINED_BRICKS_SLAB.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> ORANGE_STAINED_BRICKS_SLAB = ITEMS.register(
+                        "orange_stained_bricks_slab",
+                        () -> new BlockItem(ModBlocks.ORANGE_STAINED_BRICKS_SLAB.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> YELLOW_STAINED_BRICKS_SLAB = ITEMS.register(
+                        "yellow_stained_bricks_slab",
+                        () -> new BlockItem(ModBlocks.YELLOW_STAINED_BRICKS_SLAB.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> LIME_STAINED_BRICKS_SLAB = ITEMS.register(
+                        "lime_stained_bricks_slab",
+                        () -> new BlockItem(ModBlocks.LIME_STAINED_BRICKS_SLAB.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> GREEN_STAINED_BRICKS_SLAB = ITEMS.register(
+                        "green_stained_bricks_slab",
+                        () -> new BlockItem(ModBlocks.GREEN_STAINED_BRICKS_SLAB.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> CYAN_STAINED_BRICKS_SLAB = ITEMS.register(
+                        "cyan_stained_bricks_slab",
+                        () -> new BlockItem(ModBlocks.CYAN_STAINED_BRICKS_SLAB.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> LIGHT_BLUE_STAINED_BRICKS_SLAB = ITEMS.register(
+                        "light_blue_stained_bricks_slab",
+                        () -> new BlockItem(ModBlocks.LIGHT_BLUE_STAINED_BRICKS_SLAB.get(),
+                                        createBlockItemProperties()));
+
+        public static final RegistryObject<Item> BLUE_STAINED_BRICKS_SLAB = ITEMS.register(
+                        "blue_stained_bricks_slab",
+                        () -> new BlockItem(ModBlocks.BLUE_STAINED_BRICKS_SLAB.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> PURPLE_STAINED_BRICKS_SLAB = ITEMS.register(
+                        "purple_stained_bricks_slab",
+                        () -> new BlockItem(ModBlocks.PURPLE_STAINED_BRICKS_SLAB.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> MAGENTA_STAINED_BRICKS_SLAB = ITEMS.register(
+                        "magenta_stained_bricks_slab",
+                        () -> new BlockItem(ModBlocks.MAGENTA_STAINED_BRICKS_SLAB.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> PINK_STAINED_BRICKS_SLAB = ITEMS.register(
+                        "pink_stained_bricks_slab",
+                        () -> new BlockItem(ModBlocks.PINK_STAINED_BRICKS_SLAB.get(), createBlockItemProperties()));
+
+        // Stained Bricks Stairs
+        public static final RegistryObject<Item> WHITE_STAINED_BRICKS_STAIRS = ITEMS.register(
+                        "white_stained_bricks_stairs",
+                        () -> new BlockItem(ModBlocks.WHITE_STAINED_BRICKS_STAIRS.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> LIGHT_GRAY_STAINED_BRICKS_STAIRS = ITEMS.register(
+                        "light_gray_stained_bricks_stairs",
+                        () -> new BlockItem(ModBlocks.LIGHT_GRAY_STAINED_BRICKS_STAIRS.get(),
+                                        createBlockItemProperties()));
+
+        public static final RegistryObject<Item> GRAY_STAINED_BRICKS_STAIRS = ITEMS.register(
+                        "gray_stained_bricks_stairs",
+                        () -> new BlockItem(ModBlocks.GRAY_STAINED_BRICKS_STAIRS.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> BLACK_STAINED_BRICKS_STAIRS = ITEMS.register(
+                        "black_stained_bricks_stairs",
+                        () -> new BlockItem(ModBlocks.BLACK_STAINED_BRICKS_STAIRS.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> BROWN_STAINED_BRICKS_STAIRS = ITEMS.register(
+                        "brown_stained_bricks_stairs",
+                        () -> new BlockItem(ModBlocks.BROWN_STAINED_BRICKS_STAIRS.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> RED_STAINED_BRICKS_STAIRS = ITEMS.register(
+                        "red_stained_bricks_stairs",
+                        () -> new BlockItem(ModBlocks.RED_STAINED_BRICKS_STAIRS.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> ORANGE_STAINED_BRICKS_STAIRS = ITEMS.register(
+                        "orange_stained_bricks_stairs",
+                        () -> new BlockItem(ModBlocks.ORANGE_STAINED_BRICKS_STAIRS.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> YELLOW_STAINED_BRICKS_STAIRS = ITEMS.register(
+                        "yellow_stained_bricks_stairs",
+                        () -> new BlockItem(ModBlocks.YELLOW_STAINED_BRICKS_STAIRS.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> LIME_STAINED_BRICKS_STAIRS = ITEMS.register(
+                        "lime_stained_bricks_stairs",
+                        () -> new BlockItem(ModBlocks.LIME_STAINED_BRICKS_STAIRS.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> GREEN_STAINED_BRICKS_STAIRS = ITEMS.register(
+                        "green_stained_bricks_stairs",
+                        () -> new BlockItem(ModBlocks.GREEN_STAINED_BRICKS_STAIRS.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> CYAN_STAINED_BRICKS_STAIRS = ITEMS.register(
+                        "cyan_stained_bricks_stairs",
+                        () -> new BlockItem(ModBlocks.CYAN_STAINED_BRICKS_STAIRS.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> LIGHT_BLUE_STAINED_BRICKS_STAIRS = ITEMS.register(
+                        "light_blue_stained_bricks_stairs",
+                        () -> new BlockItem(ModBlocks.LIGHT_BLUE_STAINED_BRICKS_STAIRS.get(),
+                                        createBlockItemProperties()));
+
+        public static final RegistryObject<Item> BLUE_STAINED_BRICKS_STAIRS = ITEMS.register(
+                        "blue_stained_bricks_stairs",
+                        () -> new BlockItem(ModBlocks.BLUE_STAINED_BRICKS_STAIRS.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> PURPLE_STAINED_BRICKS_STAIRS = ITEMS.register(
+                        "purple_stained_bricks_stairs",
+                        () -> new BlockItem(ModBlocks.PURPLE_STAINED_BRICKS_STAIRS.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> MAGENTA_STAINED_BRICKS_STAIRS = ITEMS.register(
+                        "magenta_stained_bricks_stairs",
+                        () -> new BlockItem(ModBlocks.MAGENTA_STAINED_BRICKS_STAIRS.get(),
+                                        createBlockItemProperties()));
+
+        public static final RegistryObject<Item> PINK_STAINED_BRICKS_STAIRS = ITEMS.register(
+                        "pink_stained_bricks_stairs",
+                        () -> new BlockItem(ModBlocks.PINK_STAINED_BRICKS_STAIRS.get(), createBlockItemProperties()));
+
+        // Stained Bricks Walls
+        public static final RegistryObject<Item> WHITE_STAINED_BRICKS_WALL = ITEMS.register(
+                        "white_stained_bricks_wall",
+                        () -> new BlockItem(ModBlocks.WHITE_STAINED_BRICKS_WALL.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> LIGHT_GRAY_STAINED_BRICKS_WALL = ITEMS.register(
+                        "light_gray_stained_bricks_wall",
+                        () -> new BlockItem(ModBlocks.LIGHT_GRAY_STAINED_BRICKS_WALL.get(),
+                                        createBlockItemProperties()));
+
+        public static final RegistryObject<Item> GRAY_STAINED_BRICKS_WALL = ITEMS.register(
+                        "gray_stained_bricks_wall",
+                        () -> new BlockItem(ModBlocks.GRAY_STAINED_BRICKS_WALL.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> BLACK_STAINED_BRICKS_WALL = ITEMS.register(
+                        "black_stained_bricks_wall",
+                        () -> new BlockItem(ModBlocks.BLACK_STAINED_BRICKS_WALL.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> BROWN_STAINED_BRICKS_WALL = ITEMS.register(
+                        "brown_stained_bricks_wall",
+                        () -> new BlockItem(ModBlocks.BROWN_STAINED_BRICKS_WALL.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> RED_STAINED_BRICKS_WALL = ITEMS.register(
+                        "red_stained_bricks_wall",
+                        () -> new BlockItem(ModBlocks.RED_STAINED_BRICKS_WALL.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> ORANGE_STAINED_BRICKS_WALL = ITEMS.register(
+                        "orange_stained_bricks_wall",
+                        () -> new BlockItem(ModBlocks.ORANGE_STAINED_BRICKS_WALL.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> YELLOW_STAINED_BRICKS_WALL = ITEMS.register(
+                        "yellow_stained_bricks_wall",
+                        () -> new BlockItem(ModBlocks.YELLOW_STAINED_BRICKS_WALL.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> LIME_STAINED_BRICKS_WALL = ITEMS.register(
+                        "lime_stained_bricks_wall",
+                        () -> new BlockItem(ModBlocks.LIME_STAINED_BRICKS_WALL.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> GREEN_STAINED_BRICKS_WALL = ITEMS.register(
+                        "green_stained_bricks_wall",
+                        () -> new BlockItem(ModBlocks.GREEN_STAINED_BRICKS_WALL.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> CYAN_STAINED_BRICKS_WALL = ITEMS.register(
+                        "cyan_stained_bricks_wall",
+                        () -> new BlockItem(ModBlocks.CYAN_STAINED_BRICKS_WALL.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> LIGHT_BLUE_STAINED_BRICKS_WALL = ITEMS.register(
+                        "light_blue_stained_bricks_wall",
+                        () -> new BlockItem(ModBlocks.LIGHT_BLUE_STAINED_BRICKS_WALL.get(),
+                                        createBlockItemProperties()));
+
+        public static final RegistryObject<Item> BLUE_STAINED_BRICKS_WALL = ITEMS.register(
+                        "blue_stained_bricks_wall",
+                        () -> new BlockItem(ModBlocks.BLUE_STAINED_BRICKS_WALL.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> PURPLE_STAINED_BRICKS_WALL = ITEMS.register(
+                        "purple_stained_bricks_wall",
+                        () -> new BlockItem(ModBlocks.PURPLE_STAINED_BRICKS_WALL.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> MAGENTA_STAINED_BRICKS_WALL = ITEMS.register(
+                        "magenta_stained_bricks_wall",
+                        () -> new BlockItem(ModBlocks.MAGENTA_STAINED_BRICKS_WALL.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> PINK_STAINED_BRICKS_WALL = ITEMS.register(
+                        "pink_stained_bricks_wall",
+                        () -> new BlockItem(ModBlocks.PINK_STAINED_BRICKS_WALL.get(), createBlockItemProperties()));
+
+        // Colored Item Frames
+        public static final RegistryObject<Item> WHITE_ITEM_FRAME = ITEMS.register(
+                        "white_item_frame",
+                        () -> new ColoredItemFrameItem(createBlockItemProperties(), "white"));
+
+        public static final RegistryObject<Item> LIGHT_GRAY_ITEM_FRAME = ITEMS.register(
+                        "light_gray_item_frame",
+                        () -> new ColoredItemFrameItem(createBlockItemProperties(), "light_gray"));
+
+        public static final RegistryObject<Item> GRAY_ITEM_FRAME = ITEMS.register(
+                        "gray_item_frame",
+                        () -> new ColoredItemFrameItem(createBlockItemProperties(), "gray"));
+
+        public static final RegistryObject<Item> BLACK_ITEM_FRAME = ITEMS.register(
+                        "black_item_frame",
+                        () -> new ColoredItemFrameItem(createBlockItemProperties(), "black"));
+
+        public static final RegistryObject<Item> BROWN_ITEM_FRAME = ITEMS.register(
+                        "brown_item_frame",
+                        () -> new ColoredItemFrameItem(createBlockItemProperties(), "brown"));
+
+        public static final RegistryObject<Item> RED_ITEM_FRAME = ITEMS.register(
+                        "red_item_frame",
+                        () -> new ColoredItemFrameItem(createBlockItemProperties(), "red"));
+
+        public static final RegistryObject<Item> ORANGE_ITEM_FRAME = ITEMS.register(
+                        "orange_item_frame",
+                        () -> new ColoredItemFrameItem(createBlockItemProperties(), "orange"));
+
+        public static final RegistryObject<Item> YELLOW_ITEM_FRAME = ITEMS.register(
+                        "yellow_item_frame",
+                        () -> new ColoredItemFrameItem(createBlockItemProperties(), "yellow"));
+
+        public static final RegistryObject<Item> LIME_ITEM_FRAME = ITEMS.register(
+                        "lime_item_frame",
+                        () -> new ColoredItemFrameItem(createBlockItemProperties(), "lime"));
+
+        public static final RegistryObject<Item> GREEN_ITEM_FRAME = ITEMS.register(
+                        "green_item_frame",
+                        () -> new ColoredItemFrameItem(createBlockItemProperties(), "green"));
+
+        public static final RegistryObject<Item> CYAN_ITEM_FRAME = ITEMS.register(
+                        "cyan_item_frame",
+                        () -> new ColoredItemFrameItem(createBlockItemProperties(), "cyan"));
+
+        public static final RegistryObject<Item> LIGHT_BLUE_ITEM_FRAME = ITEMS.register(
+                        "light_blue_item_frame",
+                        () -> new ColoredItemFrameItem(createBlockItemProperties(), "light_blue"));
+
+        public static final RegistryObject<Item> BLUE_ITEM_FRAME = ITEMS.register(
+                        "blue_item_frame",
+                        () -> new ColoredItemFrameItem(createBlockItemProperties(), "blue"));
+
+        public static final RegistryObject<Item> PURPLE_ITEM_FRAME = ITEMS.register(
+                        "purple_item_frame",
+                        () -> new ColoredItemFrameItem(createBlockItemProperties(), "purple"));
+
+        public static final RegistryObject<Item> MAGENTA_ITEM_FRAME = ITEMS.register(
+                        "magenta_item_frame",
+                        () -> new ColoredItemFrameItem(createBlockItemProperties(), "magenta"));
+
+        public static final RegistryObject<Item> PINK_ITEM_FRAME = ITEMS.register(
+                        "pink_item_frame",
+                        () -> new ColoredItemFrameItem(createBlockItemProperties(), "pink"));
 }

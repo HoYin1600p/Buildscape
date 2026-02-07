@@ -413,6 +413,39 @@ public class CosmeticsDisplayPanel extends BasePanel {
                 startY + PADDING,
                 0xFFFFFF);
 
+        // Render Reset Color Picker button on the right side
+        int resetButtonWidth = 18;
+        int resetButtonHeight = 15;
+        int resetButtonX = endX - PADDING - resetButtonWidth;
+        int resetButtonY = startY + PADDING;
+        isHoveringResetButton = relativeMouseX >= (resetButtonX - startX)
+                && relativeMouseX < (resetButtonX - startX + resetButtonWidth)
+                && relativeMouseY >= (resetButtonY - startY)
+                && relativeMouseY < (resetButtonY - startY + resetButtonHeight);
+
+        // Draw button background
+        int resetBgColor = isHoveringResetButton ? 0xFF555555 : 0xFF333333;
+        GuiComponent.fill(poseStack, resetButtonX, resetButtonY,
+                resetButtonX + resetButtonWidth, resetButtonY + resetButtonHeight, resetBgColor);
+
+        // Draw button border
+        GuiComponent.fill(poseStack, resetButtonX - 1, resetButtonY - 1,
+                resetButtonX + resetButtonWidth + 1, resetButtonY, 0xFF666666); // Top
+        GuiComponent.fill(poseStack, resetButtonX - 1, resetButtonY + resetButtonHeight,
+                resetButtonX + resetButtonWidth + 1, resetButtonY + resetButtonHeight + 1, 0xFF666666); // Bottom
+        GuiComponent.fill(poseStack, resetButtonX - 1, resetButtonY - 1,
+                resetButtonX, resetButtonY + resetButtonHeight + 1, 0xFF666666); // Left
+        GuiComponent.fill(poseStack, resetButtonX + resetButtonWidth, resetButtonY - 1,
+                resetButtonX + resetButtonWidth + 1, resetButtonY + resetButtonHeight + 1, 0xFF666666); // Right
+
+        // Draw reset icon (↺) - centered
+        int iconColor = isHoveringResetButton ? 0xFFFFAA00 : 0xFFCCCCCC;
+        String resetIcon = "↺";
+        int iconWidth = mc.font.width(resetIcon);
+        int iconX = resetButtonX + (resetButtonWidth - iconWidth) / 2;
+        int iconY = resetButtonY + (resetButtonHeight - 8) / 2;
+        mc.font.draw(poseStack, resetIcon, iconX, iconY, iconColor);
+
         // Render filter buttons
         int buttonY = startY + PADDING + 15;
         int buttonX = startX + PADDING;
@@ -523,6 +556,16 @@ public class CosmeticsDisplayPanel extends BasePanel {
                 boolean isHovered = relativeMouseX >= (itemX - startX) && relativeMouseX < (itemX - startX + itemSize)
                         &&
                         relativeMouseY >= (rowY - startY) && relativeMouseY < (rowY - startY + itemSize);
+
+                // Block hover if over Color Picker
+                if (isHovered && colorPicker != null) {
+                    int headerHeight = 20;
+                    if (mouseX >= colorPicker.x && mouseX < colorPicker.x + colorPicker.getWidth() &&
+                            mouseY >= colorPicker.y - headerHeight
+                            && mouseY < colorPicker.y + colorPicker.getHeight()) {
+                        isHovered = false;
+                    }
+                }
 
                 // Check if unlocked
                 boolean isUnlocked = state.isUnlocked(cosmeticId);
@@ -659,6 +702,26 @@ public class CosmeticsDisplayPanel extends BasePanel {
                     GuiComponent.fill(poseStack, itemX + itemSize - 8, rowY, itemX + itemSize, rowY + 8, 0xFF000000);
                     mc.font.draw(poseStack, "🔒", itemX + itemSize - 7, rowY + 1, 0xFFFFFF);
                 }
+            }
+        }
+
+        // Render color indicator boxes AFTER all items to ensure they're on top
+        for (int row = startRow; row < endRow; row++) {
+            double rowYDouble = renderStartY + (row * rowHeight) - scrollOffset;
+            int rowY = (int) rowYDouble;
+
+            // Skip if row is outside visible area
+            if (rowY + itemSize < renderStartY - itemSize || rowY > renderStartY + renderHeight + itemSize) {
+                continue;
+            }
+
+            for (int col = 0; col < itemsPerRow; col++) {
+                int index = row * itemsPerRow + col;
+                if (index >= filteredCosmeticIds.size())
+                    break;
+
+                String cosmeticId = filteredCosmeticIds.get(index);
+                int itemX = startX + itemSpacing + col * (itemSize + itemSpacing);
 
                 // Render color indicator box if cosmetic supports color
                 CosmeticManager cosmeticManager = CosmeticManager.getInstance();
@@ -679,53 +742,28 @@ public class CosmeticsDisplayPanel extends BasePanel {
                         }
                     }
 
-                    // Draw color box in bottom right corner
+                    // Push pose stack and translate to high Z to render on top
+                    poseStack.pushPose();
+                    poseStack.translate(0, 0, 100); // Render on top of items
+
+                    // Draw color box in bottom right corner - LARGER and more visible
                     int colorBoxX = itemX + itemSize - COLOR_BOX_SIZE - 2;
                     int colorBoxY = rowY + itemSize - COLOR_BOX_SIZE - 2;
 
-                    // Draw border
+                    // Draw thinner border (1px)
                     GuiComponent.fill(poseStack, colorBoxX - 1, colorBoxY - 1,
                             colorBoxX + COLOR_BOX_SIZE + 1, colorBoxY + COLOR_BOX_SIZE + 1, 0xFF000000);
                     // Draw color
                     GuiComponent.fill(poseStack, colorBoxX, colorBoxY,
                             colorBoxX + COLOR_BOX_SIZE, colorBoxY + COLOR_BOX_SIZE, 0xFF000000 | color);
+
+                    poseStack.popPose();
                 }
             }
         }
 
-        // Render color picker if open
-        if (colorPicker != null && selectedCosmeticForColor != null) {
-            // Render header/title bar
-            int headerHeight = 20;
-            // Draw header background (Darker gray with better visibility)
-            GuiComponent.fill(poseStack, colorPicker.x, colorPicker.y - headerHeight,
-                    colorPicker.x + colorPicker.getWidth(), colorPicker.y, 0xFF222222);
-            // Draw border around header
-            GuiComponent.fill(poseStack, colorPicker.x - 1, colorPicker.y - headerHeight - 1,
-                    colorPicker.x + colorPicker.getWidth() + 1, colorPicker.y, 0xFFFFFFFF);
-
-            // Draw Title text in header
-            String headerTitle = "Color Picker";
-            mc.font.draw(poseStack, headerTitle, colorPicker.x + 5, colorPicker.y - headerHeight + 6, 0xFFE0E0E0);
-
-            // Draw drag handle icon (lines) on right side
-            int handleX = colorPicker.x + colorPicker.getWidth() - 25;
-            int handleY = colorPicker.y - headerHeight / 2 - 2;
-            GuiComponent.fill(poseStack, handleX, handleY, handleX + 15, handleY + 1, 0xFFAAAAAA);
-            GuiComponent.fill(poseStack, handleX, handleY + 3, handleX + 15, handleY + 4, 0xFFAAAAAA);
-            GuiComponent.fill(poseStack, handleX, handleY + 6, handleX + 15, handleY + 7, 0xFFAAAAAA);
-
-            // Draw window border for picker itself (connects to header)
-            GuiComponent.fill(poseStack, colorPicker.x - 1, colorPicker.y,
-                    colorPicker.x, colorPicker.y + colorPicker.getHeight(), 0xFFFFFFFF);
-            GuiComponent.fill(poseStack, colorPicker.x + colorPicker.getWidth(), colorPicker.y,
-                    colorPicker.x + colorPicker.getWidth() + 1, colorPicker.y + colorPicker.getHeight(), 0xFFFFFFFF);
-            GuiComponent.fill(poseStack, colorPicker.x - 1, colorPicker.y + colorPicker.getHeight(),
-                    colorPicker.x + colorPicker.getWidth() + 1, colorPicker.y + colorPicker.getHeight() + 1,
-                    0xFFFFFFFF);
-
-            colorPicker.renderButton(poseStack, (int) mouseX, (int) mouseY, partialTick);
-        }
+        // Color picker is now rendered separately at tab level to ensure it's on top
+        // See renderColorPickerOverlay() method
 
         // Render scrollbar if needed
         if (maxScroll > 0) {
@@ -764,6 +802,26 @@ public class CosmeticsDisplayPanel extends BasePanel {
         // Check if mouse is within panel bounds
         if (mouseX < startX || mouseX >= startX + width || mouseY < startY || mouseY >= startY + height) {
             return;
+        }
+
+        // Check if hovering over reset button and show tooltip
+        if (isHoveringResetButton) {
+            java.util.List<net.minecraft.network.chat.Component> tooltip = new java.util.ArrayList<>();
+            tooltip.add(new net.minecraft.network.chat.TextComponent("Reset Color Picker Position"));
+            mc.screen.renderComponentTooltip(poseStack, tooltip, (int) mouseX, (int) mouseY);
+            return;
+        }
+
+        // Check if mouse is over the color picker - if so, DO NOT render tooltips for
+        // underlying items
+        if (colorPicker != null) {
+            // Check widget bounds + header bounds
+            int headerHeight = 20;
+            boolean overPicker = mouseX >= colorPicker.x && mouseX < colorPicker.x + colorPicker.getWidth() &&
+                    mouseY >= colorPicker.y - headerHeight && mouseY < colorPicker.y + colorPicker.getHeight();
+            if (overPicker) {
+                return;
+            }
         }
 
         // Find which item is being hovered
@@ -891,6 +949,94 @@ public class CosmeticsDisplayPanel extends BasePanel {
             RenderSystem.depthMask(true);
             RenderSystem.enableDepthTest();
         }
+    }
+
+    /**
+     * Render color picker overlay on top of everything else.
+     * Called from tab level to ensure it's rendered last (on top).
+     */
+    public void renderColorPickerOverlay(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
+        if (colorPicker == null || selectedCosmeticForColor == null) {
+            return;
+        }
+
+        // CRITICAL: Disable scissor test to ensure popup renders on top of everything
+        // This prevents background items from clipping through the popup
+        RenderSystem.disableScissor();
+
+        // CRITICAL: Disable depth test to ensure popup renders on top of all 3D
+        // elements
+        RenderSystem.disableDepthTest();
+        RenderSystem.depthMask(false); // Disable depth writing to ensure we're always on top
+
+        // Clear depth buffer in popup area to ensure nothing can render behind it
+        // REMOVED: RenderSystem.clear(256, Minecraft.ON_OSX); // GL_DEPTH_BUFFER_BIT -
+        // This was causing issues
+
+        // Push pose stack and translate to high Z to ensure rendering on top
+        poseStack.pushPose();
+        poseStack.translate(0, 0, 500); // Move to high Z-level (500) to be on top, but not clipped (10000 was too high)
+
+        int headerHeight = 20;
+
+        // Overlay removed to fix "thick border" issue
+        // The opaque background of the header and body is sufficient to block content
+        // behind.
+
+        // Render header/title bar
+        // Draw header background (Darker gray with better visibility)
+        GuiComponent.fill(poseStack, colorPicker.x, colorPicker.y - headerHeight,
+                colorPicker.x + colorPicker.getWidth(), colorPicker.y, 0xFF222222);
+
+        // Draw window body background (Dark gray) - Added for visibility
+        GuiComponent.fill(poseStack, colorPicker.x, colorPicker.y,
+                colorPicker.x + colorPicker.getWidth(), colorPicker.y + colorPicker.getHeight(), 0xFF151515);
+
+        // Draw black border around entire window (header + body)
+        // Top border (header top)
+        GuiComponent.fill(poseStack, colorPicker.x - 1, colorPicker.y - headerHeight - 1,
+                colorPicker.x + colorPicker.getWidth() + 1, colorPicker.y - headerHeight, 0xFF000000);
+        // Left border (full height)
+        GuiComponent.fill(poseStack, colorPicker.x - 1, colorPicker.y - headerHeight,
+                colorPicker.x, colorPicker.y + colorPicker.getHeight() + 1, 0xFF000000);
+        // Right border (full height)
+        GuiComponent.fill(poseStack, colorPicker.x + colorPicker.getWidth(), colorPicker.y - headerHeight,
+                colorPicker.x + colorPicker.getWidth() + 1, colorPicker.y + colorPicker.getHeight() + 1, 0xFF000000);
+        // Bottom border
+        GuiComponent.fill(poseStack, colorPicker.x - 1, colorPicker.y + colorPicker.getHeight(),
+                colorPicker.x + colorPicker.getWidth() + 1, colorPicker.y + colorPicker.getHeight() + 1, 0xFF000000);
+        // Separator line between header and body
+        GuiComponent.fill(poseStack, colorPicker.x, colorPicker.y - 1,
+                colorPicker.x + colorPicker.getWidth(), colorPicker.y, 0xFF000000);
+
+        // Draw Title text in header
+        String headerTitle = "Color Picker";
+        mc.font.draw(poseStack, headerTitle, colorPicker.x + 5, colorPicker.y - headerHeight + 6, 0xFFE0E0E0);
+
+        // Draw drag handle icon (3 centered horizontal lines) - centered in header
+        int handleWidth = 15;
+        int lineThickness = 2;
+        int handleX = colorPicker.x + (colorPicker.getWidth() - handleWidth) / 2;
+        int handleY = colorPicker.y - headerHeight / 2 - 3;
+        GuiComponent.fill(poseStack, handleX, handleY, handleX + handleWidth, handleY + lineThickness, 0xFFAAAAAA);
+        GuiComponent.fill(poseStack, handleX, handleY + 4, handleX + handleWidth, handleY + 4 + lineThickness,
+                0xFFAAAAAA);
+        GuiComponent.fill(poseStack, handleX, handleY + 8, handleX + handleWidth, handleY + 8 + lineThickness,
+                0xFFAAAAAA);
+
+        // Draw Close Button 'X' - smaller clickable area
+        int closeX = colorPicker.x + colorPicker.getWidth() - 15;
+        int closeY = colorPicker.y - headerHeight + 5;
+        mc.font.draw(poseStack, "x", closeX, closeY, 0xFFFF5555);
+
+        colorPicker.renderButton(poseStack, (int) mouseX, (int) mouseY, partialTick);
+
+        // Pop pose stack to restore Z-level
+        poseStack.popPose();
+
+        // Re-enable depth test and depth mask after rendering popup
+        RenderSystem.depthMask(true);
+        RenderSystem.enableDepthTest();
     }
 
     /**
@@ -1335,51 +1481,104 @@ public class CosmeticsDisplayPanel extends BasePanel {
 
     @Override
     protected boolean handleMouseClicked(double mouseX, double mouseY, int button) {
+        // Check if clicking on reset button first
+        if (isHoveringResetButton && button == 0) {
+            // Reset the picker position
+            CosmeticsConfig config = CosmeticsConfig.get();
+            config.clearColorPickerPosition(); // Clear saved position
+
+            // If picker is currently open, reposition it to default location
+            if (colorPicker != null && selectedCosmeticForColor != null) {
+                // Find the cosmetic item that the picker is for
+                int itemIndex = filteredCosmeticIds.indexOf(selectedCosmeticForColor);
+                if (itemIndex >= 0) {
+                    int row = itemIndex / itemsPerRow;
+                    int col = itemIndex % itemsPerRow;
+                    int itemX = startX + itemSpacing + col * (itemSize + itemSpacing);
+
+                    int titleHeight = 15;
+                    int renderStartY = startY + PADDING + titleHeight + FILTER_BUTTON_AREA_HEIGHT
+                            + ITEM_AREA_TOP_SPACING;
+                    // CRITICAL: Subtract scrollOffset to match render method, not add
+                    int rowY = renderStartY + row * (itemSize + itemSpacing) - (int) scrollOffset;
+
+                    // Position to the right of item
+                    int pickerX = itemX + itemSize + itemSpacing;
+                    int pickerY = rowY;
+
+                    // Ensure it stays on screen
+                    if (pickerX + colorPicker.getWidth() > startX + width) {
+                        pickerX = itemX - colorPicker.getWidth() - itemSpacing;
+                    }
+                    if (pickerY + colorPicker.getHeight() > startY + height) {
+                        pickerY = startY + height - colorPicker.getHeight() - 10;
+                    }
+                    if (pickerX < startX) {
+                        pickerX = startX + itemSpacing;
+                    }
+                    if (pickerY < startY) {
+                        pickerY = startY + 10;
+                    }
+
+                    colorPicker.x = pickerX;
+                    colorPicker.y = pickerY;
+                    saveColorPickerPosition(pickerX, pickerY);
+                }
+            }
+            return true;
+        }
+
         // Check if clicking on color picker first
         if (colorPicker != null && selectedCosmeticForColor != null) {
             // Check if clicking on header (drag area)
             // Header is 20px high above the color picker
             int headerHeight = 20;
-            // Widen hit box significantly to ensure it catches clicks
-            // MouseX/Y are doubles, allow some margin
-            double hitMargin = 5.0;
-            if (mouseX >= colorPicker.x - hitMargin && mouseX < colorPicker.x + colorPicker.getWidth() + hitMargin &&
-                    mouseY >= colorPicker.y - headerHeight - hitMargin && mouseY < colorPicker.y + hitMargin) {
-                if (button == 0) {
-                    isDraggingColorPicker = true;
-                    pickerDragOffsetX = mouseX - colorPicker.x;
-                    pickerDragOffsetY = mouseY - colorPicker.y;
-                    return true;
-                }
-            }
 
-            // Check if clicking inside color picker content
-            boolean handled = colorPicker.mouseClicked(mouseX, mouseY, button);
+            // Check header bounds (drag area)
+            // Header is 20px above y
+            boolean insideHeader = mouseX >= colorPicker.x && mouseX < colorPicker.x + colorPicker.getWidth() &&
+                    mouseY >= colorPicker.y - headerHeight && mouseY < colorPicker.y;
 
-            // If internal widget handled it, return true
-            if (handled) {
+            // Check Close Button click FIRST - Small area (15px wide) on right of header
+            int closeButtonWidth = 15;
+            boolean overCloseButton = insideHeader
+                    && mouseX >= colorPicker.x + colorPicker.getWidth() - closeButtonWidth;
+
+            if (overCloseButton && button == 0) {
+                // Close the picker
+                colorPicker = null;
+                selectedCosmeticForColor = null;
+                isDraggingColorPicker = false;
                 return true;
             }
 
-            // Check if click was within color picker bounds (body or header)
-            // If so, CONSUME the click to prevent passthrough, even if the widget didn't do
-            // anything with it
+            // Enable dragging from header (excluding close button area)
+            if (insideHeader && !overCloseButton && button == 0) {
+                isDraggingColorPicker = true;
+                pickerDragOffsetX = mouseX - colorPicker.x;
+                pickerDragOffsetY = mouseY - colorPicker.y;
+                return true;
+            }
+
+            // Check if clicking inside color picker content body
             boolean insidePicker = mouseX >= colorPicker.x && mouseX < colorPicker.x + colorPicker.getWidth() &&
                     mouseY >= colorPicker.y && mouseY < colorPicker.y + colorPicker.getHeight();
 
-            // Check header bounds (drag area)
-            boolean insideHeader = mouseX >= colorPicker.x - 5 && mouseX < colorPicker.x + colorPicker.getWidth() + 5 &&
-                    mouseY >= colorPicker.y - headerHeight - 5 && mouseY < colorPicker.y + 5;
+            // Forward clicks to the color picker widget for internal controls
+            if (insidePicker) {
+                boolean handled = colorPicker.mouseClicked(mouseX, mouseY, button);
 
-            // If dragging, or inside picker/header, consume the event
-            if (isDraggingColorPicker || insidePicker || insideHeader) {
+                // If internal widget handled it, return true
+                if (handled) {
+                    return true;
+                }
+
+                // Otherwise, consume the click to prevent passthrough
                 return true;
             }
 
-            // If click is outside color picker AND header, close it (only if not dragging)
-            if (!insidePicker && !insideHeader) {
-                // closeColorPicker(); // Don't close automatically for now
-            }
+            // If click is outside color picker AND header, don't close (user can use X
+            // button)
         }
 
         if (button != 0)
@@ -1452,6 +1651,7 @@ public class CosmeticsDisplayPanel extends BasePanel {
                             String cosmeticId = filteredCosmeticIds.get(index);
                             CosmeticManager cosmeticManager = CosmeticManager.getInstance();
                             if (cosmeticManager.supportsColor(cosmeticId)) {
+                                // Check for color box click (bottom-right corner)
                                 int colorBoxX = itemX + itemSize - COLOR_BOX_SIZE - 2;
                                 int colorBoxY = rowY + itemSize - COLOR_BOX_SIZE - 2;
 
@@ -1590,16 +1790,19 @@ public class CosmeticsDisplayPanel extends BasePanel {
         }
 
         // Create or update color picker
-        if (colorPicker == null) {
-            colorPicker = new ColorPickerWidget(0, 0, 260, 220, color, (hexColor) -> {
-                // Save color when changed
-                if (selectedCosmeticForColor != null && playerUuid != null) {
-                    config.setCosmeticColor(playerUuid, selectedCosmeticForColor, hexColor);
-                }
-            });
-        } else {
-            colorPicker.setColor(color);
-        }
+        // Width: 2 cosmetic boxes + gap
+        // Height: 1 cosmetic box height - content will scale to fit
+        int pickerWidth = (itemSize * 2) + itemSpacing; // 2 boxes + 1 gap
+        int pickerHeight = itemSize; // 1 box height - ColorPickerWidget scales content to fit
+
+        // Always recreate the picker to ensure proper sizing based on current itemSize
+        // (which changes with GUI scale)
+        colorPicker = new ColorPickerWidget(0, 0, pickerWidth, pickerHeight, color, (hexColor) -> {
+            // Save color when changed
+            if (selectedCosmeticForColor != null && playerUuid != null) {
+                config.setCosmeticColor(playerUuid, selectedCosmeticForColor, hexColor);
+            }
+        });
 
         selectedCosmeticForColor = cosmeticId;
 
@@ -1615,24 +1818,46 @@ public class CosmeticsDisplayPanel extends BasePanel {
             // Calculate render start position (same as in render method)
             int titleHeight = 15;
             int renderStartY = startY + PADDING + titleHeight + FILTER_BUTTON_AREA_HEIGHT + ITEM_AREA_TOP_SPACING;
-            int rowY = renderStartY + (int) scrollOffset + row * (itemSize + itemSpacing);
+            // CRITICAL: Subtract scrollOffset to match render method, not add
+            int rowY = renderStartY + row * (itemSize + itemSpacing) - (int) scrollOffset;
 
-            // Position picker to the right of the item, or below if not enough space
-            int pickerX = itemX + itemSize + 10;
-            int pickerY = rowY;
+            // Check if we have a saved position
+            Integer savedX = config.getColorPickerX();
+            Integer savedY = config.getColorPickerY();
 
-            // Ensure picker doesn't go outside panel bounds
-            if (pickerX + 260 > startX + width) {
-                pickerX = itemX - 260 - 10; // Position to the left instead
-            }
-            if (pickerY + 220 > startY + height) {
-                pickerY = startY + height - 220 - 10;
-            }
-            if (pickerX < startX) {
-                pickerX = startX + 10;
-            }
-            if (pickerY < startY) {
-                pickerY = startY + 10;
+            int pickerX, pickerY;
+
+            if (savedX != null && savedY != null) {
+                // Use saved position
+                pickerX = savedX;
+                pickerY = savedY;
+            } else {
+                // Try to position picker to the right of the item first
+                pickerX = itemX + itemSize + itemSpacing;
+                pickerY = rowY;
+
+                // Check if picker fits to the right
+                if (pickerX + pickerWidth > startX + width) {
+                    // Try to the left instead
+                    pickerX = itemX - pickerWidth - itemSpacing;
+                }
+
+                // If still doesn't fit (too far left), center it in the panel
+                if (pickerX < startX) {
+                    pickerX = startX + (width - pickerWidth) / 2;
+                }
+
+                // Ensure picker stays within horizontal panel bounds
+                pickerX = Math.max(startX + 5, Math.min(pickerX, startX + width - pickerWidth - 5));
+
+                // Position vertically - try to align with item
+                if (pickerY + pickerHeight > startY + height) {
+                    // If doesn't fit below, position at bottom of panel
+                    pickerY = startY + height - pickerHeight - 10;
+                }
+
+                // Ensure picker stays within vertical panel bounds
+                pickerY = Math.max(startY + 30, Math.min(pickerY, startY + height - pickerHeight - 5));
             }
 
             colorPicker.x = pickerX;
@@ -1644,6 +1869,17 @@ public class CosmeticsDisplayPanel extends BasePanel {
     private boolean isDraggingColorPicker = false;
     private double pickerDragOffsetX = 0;
     private double pickerDragOffsetY = 0;
+
+    // Reset button state
+    private boolean isHoveringResetButton = false;
+
+    /**
+     * Save color picker position to config.
+     */
+    private void saveColorPickerPosition(int x, int y) {
+        CosmeticsConfig config = CosmeticsConfig.get();
+        config.setColorPickerPosition(x, y);
+    }
 
     /**
      * Close color picker.
@@ -1694,20 +1930,50 @@ public class CosmeticsDisplayPanel extends BasePanel {
      */
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
-        // Handle dragging color picker window
+        // CRITICAL: Handle color picker dragging FIRST, before any bounds checking
+        // This allows color picker dragging to continue even when mouse leaves the
+        // panel
         if (isDraggingColorPicker && colorPicker != null) {
-            colorPicker.x = (int) (mouseX - pickerDragOffsetX);
-            colorPicker.y = (int) (mouseY - pickerDragOffsetY);
+            // Calculate new position
+            int newX = (int) (mouseX - pickerDragOffsetX);
+            int newY = (int) (mouseY - pickerDragOffsetY);
+
+            // Clamp to screen bounds (keep entire picker visible)
+            int headerHeight = 20;
+            Minecraft mc = Minecraft.getInstance();
+            int screenWidth = mc.getWindow().getGuiScaledWidth();
+            int screenHeight = mc.getWindow().getGuiScaledHeight();
+
+            // Ensure picker stays within screen bounds
+            // Allow header to go slightly off-screen top, but keep most of it visible
+            newX = Math.max(0, Math.min(newX, screenWidth - colorPicker.getWidth()));
+            newY = Math.max(-headerHeight + 5, Math.min(newY, screenHeight - colorPicker.getHeight()));
+
+            colorPicker.x = newX;
+            colorPicker.y = newY;
+
+            // Save position to config
+            saveColorPickerPosition(newX, newY);
+
+            // Return true to indicate we handled this drag event
+            // This prevents other components from processing it
             return true;
         }
 
-        // Forward to color picker if open
-        if (colorPicker != null && selectedCosmeticForColor != null) {
+        // Forward to color picker widget for internal dragging (sliders, gradient)
+        // Only if we're not currently dragging the window itself
+        if (colorPicker != null && selectedCosmeticForColor != null && !isDraggingColorPicker) {
             if (colorPicker.mouseDragged(mouseX, mouseY, button, dragX, dragY)) {
                 return true;
             }
         }
-        return super.mouseDragged(mouseX, mouseY, button, dragX, dragY);
+
+        // Only call super if we're inside the panel bounds (for normal panel dragging)
+        if (isInside(mouseX, mouseY)) {
+            return super.mouseDragged(mouseX, mouseY, button, dragX, dragY);
+        }
+
+        return false;
     }
 
     @Override

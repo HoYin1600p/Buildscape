@@ -1,56 +1,46 @@
-# Gradle
-.gradle/
+/nul
+# Build outputs
 build/
-!gradle/wrapper/gradle-wrapper.jar
+run/
+out/
+.gradle/
 
-# IDE
+# Forge / MCP caches
+fg_cache/
+reobf/
+logs/
+
+# IDE files
 .idea/
 *.iml
-*.ipr
-*.iws
-.project
-.classpath
-.settings/
-*.launch
-.vscode/
 
-# Runtime directories
-run/
-run-data/
-runs/
-
-# Build outputs
-*.jar
-!gradle/wrapper/gradle-wrapper.jar
-
-# OS files
-.DS_Store
+# OS / Windows junk
+nul
 Thumbs.db
-desktop.ini
+Desktop.ini
 
-# Development/temp files
-imports/
-tools/
-scrap/
-unused/
-*.mp4
+# Claude / local tooling
+.claude/
+*.local.json
+
+# Gradle runtime files
+**/*.jar.input
+**/*.tsrg
+**/*.srg
+**/*.refmap.json
+
+# Logs & reports
 *.log
+*.html
 
-# Generated sources (optional - uncomment if you want to track generated data)
-# src/generated/
 
-# Temporary files
-*.tmp
-*.bak
-*.swp
-*~
-
-# Python cache (from generator scripts)
-__pycache__/
-*.pyc
-*.pyo
-
-# Text notes (development)
-*.txt
-!LICENSE.txt
-
+# Keep these (IMPORTANT)
+!src/
+!gradle/
+!gradlew
+!gradlew.bat
+!build.gradle
+!settings.gradle
+!gradle.properties
+!README.md
+!LICENSE

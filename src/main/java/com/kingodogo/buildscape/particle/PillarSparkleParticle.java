@@ -1,19 +1,13 @@
 package com.kingodogo.buildscape.particle;
 
 import com.kingodogo.buildscape.config.PillarParticleConfig;
-
-import java.util.Map;
-import java.util.Random;
-import java.util.concurrent.ConcurrentHashMap;
-
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.particle.Particle;
-import net.minecraft.client.particle.ParticleProvider;
-import net.minecraft.client.particle.ParticleRenderType;
-import net.minecraft.client.particle.SpriteSet;
-import net.minecraft.client.particle.TextureSheetParticle;
+import net.minecraft.client.particle.*;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.particles.SimpleParticleType;
+
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class PillarSparkleParticle extends TextureSheetParticle {
 
@@ -132,7 +126,7 @@ public class PillarSparkleParticle extends TextureSheetParticle {
         float fadeOut = 0.9F;
         if (this.age > this.lifetime * fadeOut) {
             float fadeProgress =
-                    (this.age - this.lifetime * fadeOut) /
+                    (float) (this.age - this.lifetime * fadeOut) /
                             (this.lifetime * (1.0F - fadeOut));
             this.alpha = 1.0F - fadeProgress;
         } else {

@@ -39,7 +39,7 @@ public class FallingSandBlock extends Block {
                 !level.isClientSide &&
                         level instanceof net.minecraft.server.level.ServerLevel
         ) {
-            level.scheduleTick(
+            ((net.minecraft.server.level.ServerLevel) level).scheduleTick(
                     pos,
                     this,
                     this.getDelayAfterPlace()
@@ -60,7 +60,7 @@ public class FallingSandBlock extends Block {
                 !level.isClientSide &&
                         level instanceof net.minecraft.server.level.ServerLevel
         ) {
-            level.scheduleTick(
+            ((net.minecraft.server.level.ServerLevel) level).scheduleTick(
                     pos,
                     this,
                     this.getDelayAfterPlace()

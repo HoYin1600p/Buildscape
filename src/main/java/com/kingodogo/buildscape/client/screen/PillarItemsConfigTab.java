@@ -1,19 +1,15 @@
 package com.kingodogo.buildscape.client.screen;
 
-import com.kingodogo.buildscape.client.screen.widget.ExistingItemsWidget;
-import com.kingodogo.buildscape.client.screen.widget.ItemSelectionWidget;
-import com.kingodogo.buildscape.client.screen.widget.PresetsWidget;
-import com.kingodogo.buildscape.client.screen.widget.SortToggleButton;
-import com.kingodogo.buildscape.client.screen.widget.TagsSelectorWidget;
+import com.kingodogo.buildscape.client.screen.widget.*;
 import com.kingodogo.buildscape.config.PillarParticleConfig;
 import com.kingodogo.buildscape.config.PresetsConfig;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.registries.ForgeRegistries;
-import com.mojang.blaze3d.vertex.PoseStack;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -1114,7 +1110,10 @@ public class PillarItemsConfigTab extends AbstractConfigTab {
         if (presetsWidget != null && presetsWidget.mouseClicked(mouseX, mouseY, button)) {
             return true;
         }
-        return tagsSelectorWidget != null && tagsSelectorWidget.mouseClicked(mouseX, mouseY, button);
+        if (tagsSelectorWidget != null && tagsSelectorWidget.mouseClicked(mouseX, mouseY, button)) {
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -1128,7 +1127,10 @@ public class PillarItemsConfigTab extends AbstractConfigTab {
         if (presetsWidget != null && presetsWidget.mouseScrolled(mouseX, mouseY, delta)) {
             return true;
         }
-        return tagsSelectorWidget != null && tagsSelectorWidget.mouseScrolled(mouseX, mouseY, delta);
+        if (tagsSelectorWidget != null && tagsSelectorWidget.mouseScrolled(mouseX, mouseY, delta)) {
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -1143,7 +1145,10 @@ public class PillarItemsConfigTab extends AbstractConfigTab {
         if (tagsSelectorWidget != null && tagsSelectorWidget.mouseDragged(mouseX, mouseY, button, dragX, dragY)) {
             return true;
         }
-        return presetsWidget != null && presetsWidget.mouseDragged(mouseX, mouseY, button, dragX, dragY);
+        if (presetsWidget != null && presetsWidget.mouseDragged(mouseX, mouseY, button, dragX, dragY)) {
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -1158,7 +1163,10 @@ public class PillarItemsConfigTab extends AbstractConfigTab {
         if (tagsSelectorWidget != null && tagsSelectorWidget.mouseReleased(mouseX, mouseY, button)) {
             return true;
         }
-        return presetsWidget != null && presetsWidget.mouseReleased(mouseX, mouseY, button);
+        if (presetsWidget != null && presetsWidget.mouseReleased(mouseX, mouseY, button)) {
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -1169,7 +1177,10 @@ public class PillarItemsConfigTab extends AbstractConfigTab {
         if (tagsSearchBox != null && tagsSearchBox.keyPressed(keyCode, scanCode, modifiers)) {
             return true;
         }
-        return presetsWidget != null && presetsWidget.keyPressed(keyCode, scanCode, modifiers);
+        if (presetsWidget != null && presetsWidget.keyPressed(keyCode, scanCode, modifiers)) {
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -1180,7 +1191,10 @@ public class PillarItemsConfigTab extends AbstractConfigTab {
         if (tagsSearchBox != null && tagsSearchBox.charTyped(codePoint, modifiers)) {
             return true;
         }
-        return presetsWidget != null && presetsWidget.charTyped(codePoint, modifiers);
+        if (presetsWidget != null && presetsWidget.charTyped(codePoint, modifiers)) {
+            return true;
+        }
+        return false;
     }
 
     @Override

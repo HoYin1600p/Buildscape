@@ -1,9 +1,6 @@
 package com.kingodogo.buildscape.block;
 
-import javax.annotation.Nullable;
-
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
@@ -11,7 +8,6 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -27,6 +23,8 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+
+import javax.annotation.Nullable;
 
 public class IcicleCauldronBlock extends CauldronBlock implements EntityBlock {
 
@@ -88,7 +86,9 @@ public class IcicleCauldronBlock extends CauldronBlock implements EntityBlock {
             BlockHitResult hit
     ) {
         BlockEntity blockEntity = level.getBlockEntity(pos);
-        if (blockEntity instanceof IcicleCauldronBlockEntity cauldronEntity) {
+        if (blockEntity instanceof IcicleCauldronBlockEntity) {
+            IcicleCauldronBlockEntity cauldronEntity =
+                    (IcicleCauldronBlockEntity) blockEntity;
             ItemStack heldItem = player.getItemInHand(hand);
             ItemStack storedIcicle = cauldronEntity.getStoredIcicle();
 
@@ -150,7 +150,9 @@ public class IcicleCauldronBlock extends CauldronBlock implements EntityBlock {
             BlockPos pos
     ) {
         BlockEntity blockEntity = level.getBlockEntity(pos);
-        if (blockEntity instanceof IcicleCauldronBlockEntity cauldronEntity) {
+        if (blockEntity instanceof IcicleCauldronBlockEntity) {
+            IcicleCauldronBlockEntity cauldronEntity =
+                    (IcicleCauldronBlockEntity) blockEntity;
             return cauldronEntity.hasIcicle() ? 15 : 0;
         }
         return 0;
@@ -166,7 +168,9 @@ public class IcicleCauldronBlock extends CauldronBlock implements EntityBlock {
     ) {
         if (!state.is(newState.getBlock()) && !level.isClientSide) {
             BlockEntity blockEntity = level.getBlockEntity(pos);
-            if (blockEntity instanceof IcicleCauldronBlockEntity cauldronEntity) {
+            if (blockEntity instanceof IcicleCauldronBlockEntity) {
+                IcicleCauldronBlockEntity cauldronEntity =
+                        (IcicleCauldronBlockEntity) blockEntity;
                 ItemStack storedIcicle = cauldronEntity.getStoredIcicle();
                 if (!storedIcicle.isEmpty()) {
                     ItemEntity itemEntity = new ItemEntity(

@@ -27,15 +27,9 @@ public class BuildScape {
         return LOGGER;
     }
 
-    private static final java.util.concurrent.ExecutorService ASYNC_POOL = java.util.concurrent.Executors
-            .newCachedThreadPool(r -> {
-                Thread t = new Thread(r, "BuildScape-Async");
-                t.setDaemon(true);
-                return t;
-            });
-
     public static final CreativeModeTab BUILDSCAPE_TAB = new CreativeModeTab(
-            "buildscape") {
+            "buildscape"
+    ) {
         @Override
         public ItemStack makeIcon() {
             return getModIcon();
@@ -70,7 +64,8 @@ public class BuildScape {
 
             items.add(new ItemStack(ModItems.BIT_WEATHERED_COPPER_BLOCK.get()));
             items.add(
-                    new ItemStack(ModItems.BIT_WEATHERED_COPPER_BLOCK_STAIRS.get()));
+                    new ItemStack(ModItems.BIT_WEATHERED_COPPER_BLOCK_STAIRS.get())
+            );
             items.add(new ItemStack(ModItems.BIT_WEATHERED_COPPER_BLOCK_SLAB.get()));
             items.add(new ItemStack(ModItems.BIT_WEATHERED_COPPER_BLOCK_WALL.get()));
             items.add(new ItemStack(ModItems.BIT_WEATHERED_CUT_COPPER.get()));
@@ -381,7 +376,8 @@ public class BuildScape {
             items.add(new ItemStack(ModItems.STRIPPED_BAMBOO_BLOCK_FENCE.get()));
             items.add(new ItemStack(ModItems.STRIPPED_BAMBOO_BLOCK_FENCE_GATE.get()));
             items.add(
-                    new ItemStack(ModItems.STRIPPED_BAMBOO_BLOCK_PRESSURE_PLATE.get()));
+                    new ItemStack(ModItems.STRIPPED_BAMBOO_BLOCK_PRESSURE_PLATE.get())
+            );
             items.add(new ItemStack(ModItems.STRIPPED_BAMBOO_BLOCK_BUTTON.get()));
 
             items.add(new ItemStack(ModItems.MANGROVE_LOG.get()));
@@ -913,6 +909,24 @@ public class BuildScape {
             items.add(new ItemStack(ModItems.MAGENTA_FESTIVE_STOCKING.get()));
             items.add(new ItemStack(ModItems.PINK_FESTIVE_STOCKING.get()));
 
+            // Colored Item Frames
+            items.add(new ItemStack(ModItems.WHITE_ITEM_FRAME.get()));
+            items.add(new ItemStack(ModItems.LIGHT_GRAY_ITEM_FRAME.get()));
+            items.add(new ItemStack(ModItems.GRAY_ITEM_FRAME.get()));
+            items.add(new ItemStack(ModItems.BLACK_ITEM_FRAME.get()));
+            items.add(new ItemStack(ModItems.BROWN_ITEM_FRAME.get()));
+            items.add(new ItemStack(ModItems.RED_ITEM_FRAME.get()));
+            items.add(new ItemStack(ModItems.ORANGE_ITEM_FRAME.get()));
+            items.add(new ItemStack(ModItems.YELLOW_ITEM_FRAME.get()));
+            items.add(new ItemStack(ModItems.LIME_ITEM_FRAME.get()));
+            items.add(new ItemStack(ModItems.GREEN_ITEM_FRAME.get()));
+            items.add(new ItemStack(ModItems.CYAN_ITEM_FRAME.get()));
+            items.add(new ItemStack(ModItems.LIGHT_BLUE_ITEM_FRAME.get()));
+            items.add(new ItemStack(ModItems.BLUE_ITEM_FRAME.get()));
+            items.add(new ItemStack(ModItems.PURPLE_ITEM_FRAME.get()));
+            items.add(new ItemStack(ModItems.MAGENTA_ITEM_FRAME.get()));
+            items.add(new ItemStack(ModItems.PINK_ITEM_FRAME.get()));
+
             items.add(new ItemStack(ModItems.STONE_PILLAR.get()));
             items.add(new ItemStack(ModItems.MOSSY_PILLAR.get()));
             items.add(new ItemStack(ModItems.DEEPSLATE_PILLAR.get()));
@@ -953,7 +967,8 @@ public class BuildScape {
             items.add(new ItemStack(ModItems.SNOWY_MANGROVE_LEAF_LAYERS.get()));
             items.add(new ItemStack(ModItems.SNOWY_AZALEA_LEAF_LAYERS.get()));
             items.add(
-                    new ItemStack(ModItems.SNOWY_FLOWERING_AZALEA_LEAF_LAYERS.get()));
+                    new ItemStack(ModItems.SNOWY_FLOWERING_AZALEA_LEAF_LAYERS.get())
+            );
 
             items.add(new ItemStack(ModItems.OAK_LEAF_HEDGE.get()));
             items.add(new ItemStack(ModItems.SPRUCE_LEAF_HEDGE.get()));
@@ -973,7 +988,8 @@ public class BuildScape {
             items.add(new ItemStack(ModItems.SNOWY_MANGROVE_LEAF_HEDGE.get()));
             items.add(new ItemStack(ModItems.SNOWY_AZALEA_LEAF_HEDGE.get()));
             items.add(
-                    new ItemStack(ModItems.SNOWY_FLOWERING_AZALEA_LEAF_HEDGE.get()));
+                    new ItemStack(ModItems.SNOWY_FLOWERING_AZALEA_LEAF_HEDGE.get())
+            );
 
             items.add(new ItemStack(ModItems.SNOWY_OAK_LEAVES.get()));
             items.add(new ItemStack(ModItems.SNOWY_SPRUCE_LEAVES.get()));
@@ -1107,6 +1123,12 @@ public class BuildScape {
             items.add(new ItemStack(ModItems.FESTIVE_LAMP.get()));
         }
     };
+    private static final java.util.concurrent.ExecutorService ASYNC_POOL =
+            java.util.concurrent.Executors.newCachedThreadPool(r -> {
+                Thread t = new Thread(r, "BuildScape-Async");
+                t.setDaemon(true);
+                return t;
+            });
 
     private static ItemStack getModIcon() {
         return new ItemStack(ModItems.BIT_OXIDIZED_COPPER_BLOCK.get());
@@ -1120,25 +1142,34 @@ public class BuildScape {
         ModBlocks.BLOCKS.register(modEventBus);
         ModItems.ITEMS.register(modEventBus);
         com.kingodogo.buildscape.particle.ModParticles.PARTICLES.register(
-                modEventBus);
+                modEventBus
+        );
         com.kingodogo.buildscape.block.ModBlockEntities.BLOCK_ENTITIES.register(
-                modEventBus);
+                modEventBus
+        );
         com.kingodogo.buildscape.entity.ModEntities.ENTITIES.register(modEventBus);
         com.kingodogo.buildscape.recipe.ModRecipeSerializers.RECIPE_SERIALIZERS.register(
-                modEventBus);
+                modEventBus
+        );
 
         com.kingodogo.buildscape.worldgen.ModBlockStateProviderTypes.BLOCK_STATE_PROVIDER_TYPES.register(
-                modEventBus);
+                modEventBus
+        );
         com.kingodogo.buildscape.worldgen.ModTrunkPlacerTypes.TRUNK_PLACER_TYPES.register(
-                modEventBus);
+                modEventBus
+        );
         com.kingodogo.buildscape.worldgen.ModFoliagePlacerTypes.FOLIAGE_PLACER_TYPES.register(
-                modEventBus);
+                modEventBus
+        );
         com.kingodogo.buildscape.worldgen.ModTreeDecoratorTypes.TREE_DECORATOR_TYPES.register(
-                modEventBus);
+                modEventBus
+        );
         com.kingodogo.buildscape.worldgen.ModConfiguredFeatures.CONFIGURED_FEATURES.register(
-                modEventBus);
+                modEventBus
+        );
         com.kingodogo.buildscape.worldgen.ModPlacementModifiers.PLACEMENT_MODIFIERS.register(
-                modEventBus);
+                modEventBus
+        );
 
         MinecraftForge.EVENT_BUS.register(this);
 
@@ -1195,83 +1226,77 @@ public class BuildScape {
 
     @SubscribeEvent
     public void onRegisterCommands(net.minecraftforge.event.RegisterCommandsEvent event) {
-        // Gamerules are automatically available through /gamerule command once
-        // registered
+        // Gamerules are automatically available through /gamerule command once registered
         // This event handler ensures commands are properly initialized
         LOGGER.debug("Commands registered - fastLeafDecay gamerule should be available");
 
         // Register /buildscape recover PillarData command
-        com.mojang.brigadier.builder.LiteralArgumentBuilder<net.minecraft.commands.CommandSourceStack> buildscapeCommand = com.mojang.brigadier.builder.LiteralArgumentBuilder.<net.minecraft.commands.CommandSourceStack>literal(
-                "buildscape")
-                .then(com.mojang.brigadier.builder.LiteralArgumentBuilder.<net.minecraft.commands.CommandSourceStack>literal(
-                        "recover")
-                        .then(com.mojang.brigadier.builder.LiteralArgumentBuilder.<net.minecraft.commands.CommandSourceStack>literal(
-                                "PillarData")
-                                .requires(source -> source.hasPermission(2)) // Requires
-                                // OP level
-                                // 2
+        com.mojang.brigadier.builder.LiteralArgumentBuilder<net.minecraft.commands.CommandSourceStack> buildscapeCommand =
+                com.mojang.brigadier.builder.LiteralArgumentBuilder.<net.minecraft.commands.CommandSourceStack>literal("buildscape")
+                        .then(com.mojang.brigadier.builder.LiteralArgumentBuilder.<net.minecraft.commands.CommandSourceStack>literal("recover")
+                                .then(com.mojang.brigadier.builder.LiteralArgumentBuilder.<net.minecraft.commands.CommandSourceStack>literal("PillarData")
+                                                .requires(source -> source.hasPermission(2)) // Requires OP level 2
                                 .executes(context -> {
-                                    net.minecraft.commands.CommandSourceStack source = context
-                                            .getSource();
-                                    net.minecraft.server.MinecraftServer server = source
-                                            .getServer();
+                                    net.minecraft.commands.CommandSourceStack source = context.getSource();
+                                    net.minecraft.server.MinecraftServer server = source.getServer();
 
                                     if (server == null || !server.isRunning()) {
                                         source.sendFailure(
-                                                new net.minecraft.network.chat.TextComponent(
-                                                        "Server is not running"));
+                                                new net.minecraft.network.chat.TextComponent("Server is not running")
+                                        );
                                         return 0;
                                     }
 
-                                    com.kingodogo.buildscape.config.PillarIdManager manager = com.kingodogo.buildscape.config.PillarIdManager
-                                            .get();
+                                    com.kingodogo.buildscape.config.PillarIdManager manager =
+                                            com.kingodogo.buildscape.config.PillarIdManager.get();
 
                                     if (manager == null) {
                                         source.sendFailure(
-                                                new net.minecraft.network.chat.TextComponent(
-                                                        "PillarIdManager is not available"));
+                                                new net.minecraft.network.chat.TextComponent("PillarIdManager is not available")
+                                        );
                                         return 0;
                                     }
 
                                     source.sendSuccess(
-                                            new net.minecraft.network.chat.TextComponent(
-                                                    "Starting pillar recovery..."),
-                                            true);
+                                            new net.minecraft.network.chat.TextComponent("Starting pillar recovery..."),
+                                            true
+                                    );
 
-                                    // Schedule recovery on next server tick (don't
-                                    // clear colors)
+                                    // Schedule recovery on next server tick (don't clear colors)
                                     server.execute(() -> {
                                         try {
-                                            manager.recoverPillarsFromWorld(
-                                                    server, false); // false
-                                            // =
-                                            // don't
-                                            // clear
-                                            // colors
+                                            manager.recoverPillarsFromWorld(server, false); // false = don't clear colors
                                             source.sendSuccess(
                                                     new net.minecraft.network.chat.TextComponent(
-                                                            "Pillar recovery completed. Check console for details."),
-                                                    true);
+                                                            "Pillar recovery completed. Check console for details."
+                                                    ),
+                                                    true
+                                            );
                                         } catch (Exception e) {
                                             source.sendFailure(
                                                     new net.minecraft.network.chat.TextComponent(
-                                                            "Error during recovery: "
-                                                            + e.getMessage()));
+                                                            "Error during recovery: " + e.getMessage()
+                                                    )
+                                            );
                                             e.printStackTrace();
                                         }
                                     });
 
                                     return 1;
-                                })));
+                                })
+                                )
+                        );
 
         event.getDispatcher().register(buildscapeCommand);
     }
 
     @SubscribeEvent
     public void onServerStarted(
-            net.minecraftforge.event.server.ServerStartedEvent event) {
+            net.minecraftforge.event.server.ServerStartedEvent event
+    ) {
         LOGGER.info(
-                "BuildScape: Server started - will load pillar data after world is fully loaded");
+                "BuildScape: Server started - will load pillar data after world is fully loaded"
+        );
 
         pillarDataLoadStarted = false;
         worldLoadWaitTicks = 0;
@@ -1279,15 +1304,16 @@ public class BuildScape {
 
     @SubscribeEvent
     public void onServerStopped(
-            net.minecraftforge.event.server.ServerStoppedEvent event) {
+            net.minecraftforge.event.server.ServerStoppedEvent event
+    ) {
         LOGGER.info("BuildScape: Server stopped - syncing colors and resetting pillar data state");
 
         // Try to sync and save before resetting (server might still be accessible)
         try {
             net.minecraft.server.MinecraftServer server = event.getServer();
             if (server != null) {
-                com.kingodogo.buildscape.config.PillarIdManager manager = com.kingodogo.buildscape.config.PillarIdManager
-                        .get();
+                com.kingodogo.buildscape.config.PillarIdManager manager =
+                        com.kingodogo.buildscape.config.PillarIdManager.get();
                 if (manager != null && manager.hasLoaded()) {
                     // Sync colors FROM NBT TO manager before resetting
                     manager.syncColorsFromNBTToManager(server);
@@ -1323,44 +1349,55 @@ public class BuildScape {
 
     @SubscribeEvent
     public void onPlayerJoin(
-            net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent event) {
-        if (event.getPlayer() instanceof net.minecraft.server.level.ServerPlayer serverPlayer) {
+            net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent event
+    ) {
+        if (event.getPlayer() instanceof net.minecraft.server.level.ServerPlayer) {
+            net.minecraft.server.level.ServerPlayer serverPlayer =
+                    (net.minecraft.server.level.ServerPlayer) event.getPlayer();
 
             if (!serverFullyInitialized) {
                 com.kingodogo.buildscape.config.PillarIdManager.resetWorldCache();
             }
 
-            com.kingodogo.buildscape.config.PillarIdManager manager = com.kingodogo.buildscape.config.PillarIdManager
-                    .get();
+            com.kingodogo.buildscape.config.PillarIdManager manager =
+                    com.kingodogo.buildscape.config.PillarIdManager.get();
             if (!manager.hasLoaded()) {
                 LOGGER.info(
-                        "BuildScape: First player joined - loading pillar data file asynchronously...");
+                        "BuildScape: First player joined - loading pillar data file asynchronously..."
+                );
                 manager.load();
             } else {
                 serverFullyInitialized = true;
             }
 
-            com.kingodogo.buildscape.config.PillarParticleConfig serverConfig = com.kingodogo.buildscape.config.PillarParticleConfig
-                    .get();
-            com.kingodogo.buildscape.network.SyncConfigPacket configPacket = new com.kingodogo.buildscape.network.SyncConfigPacket(
-                    serverConfig);
+            com.kingodogo.buildscape.config.PillarParticleConfig serverConfig =
+                    com.kingodogo.buildscape.config.PillarParticleConfig.get();
+            com.kingodogo.buildscape.network.SyncConfigPacket configPacket =
+                    new com.kingodogo.buildscape.network.SyncConfigPacket(serverConfig);
             com.kingodogo.buildscape.network.ModMessages.INSTANCE.send(
-                    net.minecraftforge.network.PacketDistributor.PLAYER.with(() -> serverPlayer),
-                    configPacket);
+                    net.minecraftforge.network.PacketDistributor.PLAYER.with(() ->
+                            serverPlayer
+                    ),
+                    configPacket
+            );
             LOGGER.debug(
                     "BuildScape: Sent server config to player {}",
-                    serverPlayer.getName().getString());
+                    serverPlayer.getName().getString()
+            );
 
             LOGGER.info(
-                    "BuildScape: Player joined - pillars will sync as chunks load");
+                    "BuildScape: Player joined - pillars will sync as chunks load"
+            );
         }
     }
 
     @SubscribeEvent
     public void onPlayerLogout(
-            net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedOutEvent event) {
+            net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedOutEvent event
+    ) {
         LOGGER.info(
-                "BuildScape: Player logged out - resetting state for world switch");
+                "BuildScape: Player logged out - resetting state for world switch"
+        );
 
         serverFullyInitialized = false;
         pillarDataLoadStarted = false;
@@ -1372,36 +1409,33 @@ public class BuildScape {
 
     @SubscribeEvent
     public void onWorldUnload(
-            net.minecraftforge.event.world.WorldEvent.Unload event) {
+            net.minecraftforge.event.world.WorldEvent.Unload event
+    ) {
         if (event.getWorld() instanceof net.minecraft.server.level.ServerLevel) {
             LOGGER.info("BuildScape: World unloading - saving manager data and syncing colors from NBT");
 
             // IMPORTANT: Save manager data FIRST, then sync colors FROM NBT TO manager
             // This ensures colors are saved even if block entities are already unloaded
             try {
-                net.minecraft.server.MinecraftServer server = net.minecraftforge.server.ServerLifecycleHooks
-                        .getCurrentServer();
+                net.minecraft.server.MinecraftServer server = net.minecraftforge.server.ServerLifecycleHooks.getCurrentServer();
                 if (server != null && server.isRunning()) {
-                    com.kingodogo.buildscape.config.PillarIdManager manager = com.kingodogo.buildscape.config.PillarIdManager
-                            .get();
+                    com.kingodogo.buildscape.config.PillarIdManager manager =
+                            com.kingodogo.buildscape.config.PillarIdManager.get();
                     if (manager != null && manager.hasLoaded()) {
-                        // Sync colors FROM NBT TO manager (in case NBT has colors not in
-                        // manager)
+                        // Sync colors FROM NBT TO manager (in case NBT has colors not in manager)
                         manager.syncColorsFromNBTToManager(server);
 
                         // Save main file (pillar-ids.dat)
                         manager.saveImmediate();
 
-                        // Save backup file (pillar-ids.bak.dat) - only saved on world
-                        // save/server close
+                        // Save backup file (pillar-ids.bak.dat) - only saved on world save/server close
                         manager.saveBackupFile();
 
                         LOGGER.info("BuildScape: Colors synced and saved (main + backup) before world unload");
                     }
                 }
             } catch (Exception e) {
-                LOGGER.error("BuildScape: Error syncing/saving colors before world unload: "
-                        + e.getMessage());
+                LOGGER.error("BuildScape: Error syncing/saving colors before world unload: " + e.getMessage());
                 e.printStackTrace();
             }
 
@@ -1419,8 +1453,11 @@ public class BuildScape {
 
     @SubscribeEvent
     public void onChunkLoad(
-            net.minecraftforge.event.world.ChunkEvent.Load event) {
-        if (event.getWorld() instanceof net.minecraft.server.level.ServerLevel serverLevel) {
+            net.minecraftforge.event.world.ChunkEvent.Load event
+    ) {
+        if (event.getWorld() instanceof net.minecraft.server.level.ServerLevel) {
+            net.minecraft.server.level.ServerLevel serverLevel =
+                    (net.minecraft.server.level.ServerLevel) event.getWorld();
 
             if (!serverFullyInitialized) {
                 return;
@@ -1435,11 +1472,18 @@ public class BuildScape {
                 return;
             }
 
-            if (event.getChunk() instanceof net.minecraft.world.level.chunk.LevelChunk chunk) {
+            if (
+                    event.getChunk() instanceof net.minecraft.world.level.chunk.LevelChunk
+            ) {
+                net.minecraft.world.level.chunk.LevelChunk chunk =
+                        (net.minecraft.world.level.chunk.LevelChunk) event.getChunk();
 
-                if (!chunk
+                if (
+                        !chunk
                         .getStatus()
-                        .isOrAfter(net.minecraft.world.level.chunk.ChunkStatus.FULL)) {
+                                .isOrAfter(net.minecraft.world.level.chunk.ChunkStatus.FULL)
+                ) {
+                    return;
                 }
             }
         }
@@ -1454,7 +1498,8 @@ public class BuildScape {
 
     @SubscribeEvent
     public void onServerTick(
-            net.minecraftforge.event.TickEvent.ServerTickEvent event) {
+            net.minecraftforge.event.TickEvent.ServerTickEvent event
+    ) {
         if (event.phase != net.minecraftforge.event.TickEvent.Phase.END) {
             return;
         }
@@ -1463,17 +1508,19 @@ public class BuildScape {
                 .getCurrentServer();
         if (server == null
                 || !server.isRunning()
-                || server.getPlayerList().getPlayerCount() == 0) {
+                || server.getPlayerList().getPlayerCount() == 0
+        ) {
             return;
         }
 
         if (!serverFullyInitialized) {
-            com.kingodogo.buildscape.config.PillarIdManager manager = com.kingodogo.buildscape.config.PillarIdManager
-                    .get();
+            com.kingodogo.buildscape.config.PillarIdManager manager =
+                    com.kingodogo.buildscape.config.PillarIdManager.get();
             if (manager != null && manager.hasLoaded()) {
                 serverFullyInitialized = true;
                 LOGGER.info(
-                        "BuildScape: Pillar data loaded - server fully initialized");
+                        "BuildScape: Pillar data loaded - server fully initialized"
+                );
             } else {
                 return;
             }
@@ -1485,14 +1532,16 @@ public class BuildScape {
         recoveryDelayTicks++;
         if (recoveryDelayTicks >= RECOVERY_DELAY_TICKS
                 && !recoveryAttempted
-                && serverFullyInitialized) {
+                && serverFullyInitialized
+        ) {
             recoveryAttempted = true;
-            com.kingodogo.buildscape.config.PillarIdManager manager = com.kingodogo.buildscape.config.PillarIdManager
-                    .get();
+            com.kingodogo.buildscape.config.PillarIdManager manager =
+                    com.kingodogo.buildscape.config.PillarIdManager.get();
             if (manager != null) {
                 try {
                     java.nio.file.Path worldPath = server.getWorldPath(
-                            net.minecraft.world.level.storage.LevelResource.ROOT);
+                            net.minecraft.world.level.storage.LevelResource.ROOT
+                    );
                     java.io.File dataFile = worldPath
                             .resolve("buildscape/pillar-ids.dat")
                             .toFile();
@@ -1518,16 +1567,17 @@ public class BuildScape {
                         }
                     }
 
-                    // Automatic recovery disabled - use /buildscape recover PillarData command
-                    // instead
+                    // Automatic recovery disabled - use /buildscape recover PillarData command instead
                     // This prevents colors from being cleared automatically
                     if (needsRecovery) {
                         System.out.println(
-                                "BuildScape: Pillar data file is empty or missing. Use /buildscape recover PillarData to recover pillars.");
+                                "BuildScape: Pillar data file is empty or missing. Use /buildscape recover PillarData to recover pillars."
+                        );
                     }
                 } catch (Exception e) {
                     System.err.println(
-                            "BuildScape: Error during delayed recovery: " + e.getMessage());
+                            "BuildScape: Error during delayed recovery: " + e.getMessage()
+                    );
                 }
             }
         }
@@ -1537,8 +1587,8 @@ public class BuildScape {
             pillarSyncTickCounter = 0;
 
             try {
-                com.kingodogo.buildscape.config.PillarIdManager manager = com.kingodogo.buildscape.config.PillarIdManager
-                        .get();
+                com.kingodogo.buildscape.config.PillarIdManager manager =
+                        com.kingodogo.buildscape.config.PillarIdManager.get();
 
                 for (net.minecraft.server.level.ServerLevel level : server.getAllLevels()) {
                     if (level == null) {
@@ -1549,9 +1599,10 @@ public class BuildScape {
                         continue;
                     }
 
-                    String dimensionKey = com.kingodogo.buildscape.config.PillarIdManager
-                            .getDimensionKey(
-                                    level);
+                    String dimensionKey =
+                            com.kingodogo.buildscape.config.PillarIdManager.getDimensionKey(
+                                    level
+                            );
 
                     for (String pillarId : manager.getAllPillarIds()) {
                         try {
@@ -1576,15 +1627,20 @@ public class BuildScape {
                                 continue;
                             }
 
-                            if (!chunk
+                            if (
+                                    !chunk
                                     .getStatus()
                                     .isOrAfter(net.minecraft.world.level.chunk.ChunkStatus.FULL)) {
                                 continue;
                             }
 
-                            net.minecraft.world.level.block.entity.BlockEntity be = level
-                                    .getBlockEntity(pos);
-                            if (be instanceof com.kingodogo.buildscape.block.PillarBlockEntity pillarBE) {
+                            net.minecraft.world.level.block.entity.BlockEntity be =
+                                    level.getBlockEntity(pos);
+                            if (
+                                    be instanceof com.kingodogo.buildscape.block.PillarBlockEntity
+                            ) {
+                                com.kingodogo.buildscape.block.PillarBlockEntity pillarBE =
+                                        (com.kingodogo.buildscape.block.PillarBlockEntity) be;
 
                                 if (pillarBE.getPillarId() == null
                                         || !pillarBE.getPillarId()
@@ -1594,13 +1650,14 @@ public class BuildScape {
                                     LOGGER.debug(
                                             "Force synced pillar {} with {} colors",
                                             data.id,
-                                            data.getColorCount());
+                                            data.getColorCount()
+                                    );
                                 }
                             }
                         } catch (Exception e) {
                             LOGGER.debug(
-                                    "Error syncing pillar " + pillarId + ": "
-                                    + e.getMessage());
+                                    "Error syncing pillar " + pillarId + ": " + e.getMessage()
+                            );
                         }
                     }
                 }
@@ -1612,234 +1669,321 @@ public class BuildScape {
 
     @SubscribeEvent
     public void onWandererTrades(
-            net.minecraftforge.event.village.WandererTradesEvent event) {
+            net.minecraftforge.event.village.WandererTradesEvent event
+    ) {
         event
                 .getGenericTrades()
-                .add((trader, rand) -> new net.minecraft.world.item.trading.MerchantOffer(
+                .add((trader, rand) ->
+                                new net.minecraft.world.item.trading.MerchantOffer(
                 new net.minecraft.world.item.ItemStack(
                         net.minecraft.world.item.Items.EMERALD,
-                        1),
+                        1
+                ),
                 new net.minecraft.world.item.ItemStack(ModItems.RED_MONETS.get(), 1),
                 2,
                 1,
-                0.05f));
+                                        0.05f
+                                )
+                );
 
         event
                 .getGenericTrades()
-                .add((trader, rand) -> new net.minecraft.world.item.trading.MerchantOffer(
+                .add((trader, rand) ->
+                                new net.minecraft.world.item.trading.MerchantOffer(
                 new net.minecraft.world.item.ItemStack(
                         net.minecraft.world.item.Items.EMERALD,
-                        1),
+                        1
+                ),
                 new net.minecraft.world.item.ItemStack(ModItems.BLUE_MONETS.get(), 1),
                 2,
                 1,
-                0.05f));
+                                        0.05f
+                                )
+                );
 
         event
                 .getGenericTrades()
-                .add((trader, rand) -> new net.minecraft.world.item.trading.MerchantOffer(
+                .add((trader, rand) ->
+                                new net.minecraft.world.item.trading.MerchantOffer(
                 new net.minecraft.world.item.ItemStack(
                         net.minecraft.world.item.Items.EMERALD,
-                        1),
+                        1
+                ),
                 new net.minecraft.world.item.ItemStack(
                         ModItems.PURPLE_MONETS.get(),
-                        1),
+                        1
+                ),
                 2,
                 1,
-                0.05f));
+                                        0.05f
+                                )
+                );
 
         event
                 .getGenericTrades()
-                .add((trader, rand) -> new net.minecraft.world.item.trading.MerchantOffer(
+                .add((trader, rand) ->
+                                new net.minecraft.world.item.trading.MerchantOffer(
                 new net.minecraft.world.item.ItemStack(
                         net.minecraft.world.item.Items.EMERALD,
-                        1),
+                        1
+                ),
                 new net.minecraft.world.item.ItemStack(
                         ModItems.LIGHT_BLUE_MONETS.get(),
-                        1),
+                        1
+                ),
                 2,
                 1,
-                0.05f));
+                                        0.05f
+                                )
+                );
 
         event
                 .getGenericTrades()
-                .add((trader, rand) -> new net.minecraft.world.item.trading.MerchantOffer(
+                .add((trader, rand) ->
+                                new net.minecraft.world.item.trading.MerchantOffer(
                 new net.minecraft.world.item.ItemStack(
                         net.minecraft.world.item.Items.EMERALD,
-                        1),
+                        1
+                ),
                 new net.minecraft.world.item.ItemStack(ModItems.PINK_MONETS.get(), 1),
                 2,
                 1,
-                0.05f));
+                                        0.05f
+                                )
+                );
 
         event
                 .getGenericTrades()
-                .add((trader, rand) -> new net.minecraft.world.item.trading.MerchantOffer(
+                .add((trader, rand) ->
+                                new net.minecraft.world.item.trading.MerchantOffer(
                 new net.minecraft.world.item.ItemStack(
                         net.minecraft.world.item.Items.EMERALD,
-                        1),
+                        1
+                ),
                 new net.minecraft.world.item.ItemStack(
                         ModItems.YELLOW_MONETS.get(),
-                        1),
+                        1
+                ),
                 2,
                 1,
-                0.05f));
+                                        0.05f
+                                )
+                );
 
         event
                 .getGenericTrades()
-                .add((trader, rand) -> new net.minecraft.world.item.trading.MerchantOffer(
+                .add((trader, rand) ->
+                                new net.minecraft.world.item.trading.MerchantOffer(
                 new net.minecraft.world.item.ItemStack(
                         net.minecraft.world.item.Items.EMERALD,
-                        1),
+                        1
+                ),
                 new net.minecraft.world.item.ItemStack(ModItems.CLOVER.get(), 4),
                 2,
                 1,
-                0.05f));
+                                        0.05f
+                                )
+                );
 
         event
                 .getGenericTrades()
-                .add((trader, rand) -> new net.minecraft.world.item.trading.MerchantOffer(
+                .add((trader, rand) ->
+                                new net.minecraft.world.item.trading.MerchantOffer(
                 new net.minecraft.world.item.ItemStack(
                         net.minecraft.world.item.Items.EMERALD,
-                        1),
+                        1
+                ),
                 new net.minecraft.world.item.ItemStack(
                         ModItems.RED_ROSE_VINES.get(),
-                        1),
+                        1
+                ),
                 2,
                 1,
-                0.05f));
+                                        0.05f
+                                )
+                );
 
         event
                 .getGenericTrades()
-                .add((trader, rand) -> new net.minecraft.world.item.trading.MerchantOffer(
+                .add((trader, rand) ->
+                                new net.minecraft.world.item.trading.MerchantOffer(
                 new net.minecraft.world.item.ItemStack(
                         net.minecraft.world.item.Items.EMERALD,
-                        1),
+                        1
+                ),
                 new net.minecraft.world.item.ItemStack(
                         ModItems.BLACK_ROSE_VINES.get(),
-                        1),
+                        1
+                ),
                 2,
                 1,
-                0.05f));
+                                        0.05f
+                                )
+                );
 
         event
                 .getGenericTrades()
-                .add((trader, rand) -> new net.minecraft.world.item.trading.MerchantOffer(
+                .add((trader, rand) ->
+                                new net.minecraft.world.item.trading.MerchantOffer(
                 new net.minecraft.world.item.ItemStack(
                         net.minecraft.world.item.Items.EMERALD,
-                        1),
+                        1
+                ),
                 new net.minecraft.world.item.ItemStack(
                         ModItems.BLUE_ROSE_VINES.get(),
-                        1),
+                        1
+                ),
                 2,
                 1,
-                0.05f));
+                                        0.05f
+                                )
+                );
 
         event
                 .getGenericTrades()
-                .add((trader, rand) -> new net.minecraft.world.item.trading.MerchantOffer(
+                .add((trader, rand) ->
+                                new net.minecraft.world.item.trading.MerchantOffer(
                 new net.minecraft.world.item.ItemStack(
                         net.minecraft.world.item.Items.EMERALD,
-                        1),
+                        1
+                ),
                 new net.minecraft.world.item.ItemStack(
                         ModItems.WHITE_ROSE_VINES.get(),
-                        1),
+                        1
+                ),
                 2,
                 1,
-                0.05f));
+                                        0.05f
+                                )
+                );
 
         event
                 .getGenericTrades()
-                .add((trader, rand) -> new net.minecraft.world.item.trading.MerchantOffer(
+                .add((trader, rand) ->
+                                new net.minecraft.world.item.trading.MerchantOffer(
                 new net.minecraft.world.item.ItemStack(
                         net.minecraft.world.item.Items.EMERALD,
-                        1),
+                        1
+                ),
                 new net.minecraft.world.item.ItemStack(
                         ModItems.SNOWY_GRASS_BLOCK.get(),
-                        1),
+                        1
+                ),
                 2,
                 1,
-                0.05f));
+                                        0.05f
+                                )
+                );
         event
                 .getGenericTrades()
-                .add((trader, rand) -> new net.minecraft.world.item.trading.MerchantOffer(
+                .add((trader, rand) ->
+                                new net.minecraft.world.item.trading.MerchantOffer(
                 new net.minecraft.world.item.ItemStack(
                         net.minecraft.world.item.Items.EMERALD,
-                        1),
+                        1
+                ),
                 new net.minecraft.world.item.ItemStack(
                         ModItems.RED_SPORE_BLOSSOM.get(),
-                        1),
+                        1
+                ),
                 2,
                 1,
-                0.05f));
+                                        0.05f
+                                )
+                );
 
         event
                 .getGenericTrades()
-                .add((trader, rand) -> new net.minecraft.world.item.trading.MerchantOffer(
+                .add((trader, rand) ->
+                                new net.minecraft.world.item.trading.MerchantOffer(
                 new net.minecraft.world.item.ItemStack(
                         net.minecraft.world.item.Items.EMERALD,
-                        1),
+                        1
+                ),
                 new net.minecraft.world.item.ItemStack(
                         ModItems.CYAN_SPORE_BLOSSOM.get(),
-                        1),
+                        1
+                ),
                 2,
                 1,
-                0.05f));
+                                        0.05f
+                                )
+                );
 
         event
                 .getGenericTrades()
-                .add((trader, rand) -> new net.minecraft.world.item.trading.MerchantOffer(
+                .add((trader, rand) ->
+                                new net.minecraft.world.item.trading.MerchantOffer(
                 new net.minecraft.world.item.ItemStack(
                         net.minecraft.world.item.Items.EMERALD,
-                        1),
+                        1
+                ),
                 new net.minecraft.world.item.ItemStack(
                         ModItems.BLUE_SPORE_BLOSSOM.get(),
-                        1),
+                        1
+                ),
                 2,
                 1,
-                0.05f));
+                                        0.05f
+                                )
+                );
 
         event
                 .getGenericTrades()
-                .add((trader, rand) -> new net.minecraft.world.item.trading.MerchantOffer(
+                .add((trader, rand) ->
+                                new net.minecraft.world.item.trading.MerchantOffer(
                 new net.minecraft.world.item.ItemStack(
                         net.minecraft.world.item.Items.EMERALD,
-                        1),
+                        1
+                ),
                 new net.minecraft.world.item.ItemStack(
                         ModItems.PURPLE_SPORE_BLOSSOM.get(),
-                        1),
+                        1
+                ),
                 2,
                 1,
-                0.05f));
+                                        0.05f
+                                )
+                );
 
         event
                 .getGenericTrades()
-                .add((trader, rand) -> new net.minecraft.world.item.trading.MerchantOffer(
+                .add((trader, rand) ->
+                                new net.minecraft.world.item.trading.MerchantOffer(
                 new net.minecraft.world.item.ItemStack(
                         net.minecraft.world.item.Items.EMERALD,
-                        1),
+                        1
+                ),
                 new net.minecraft.world.item.ItemStack(
                         ModItems.ORANGE_SPORE_BLOSSOM.get(),
-                        1),
+                        1
+                ),
                 2,
                 1,
-                0.05f));
+                                        0.05f
+                                )
+                );
 
         event
                 .getGenericTrades()
-                .add((trader, rand) -> new net.minecraft.world.item.trading.MerchantOffer(
+                .add((trader, rand) ->
+                                new net.minecraft.world.item.trading.MerchantOffer(
                 new net.minecraft.world.item.ItemStack(
                         net.minecraft.world.item.Items.EMERALD,
-                        1),
+                        1
+                ),
                 new net.minecraft.world.item.ItemStack(ModItems.ICICLE.get(), 2),
                 2,
                 1,
-                0.05f));
+                                        0.05f
+                                )
+                );
     }
 
     @SubscribeEvent
     public void onLeftClickBlock(
-            net.minecraftforge.event.entity.player.PlayerInteractEvent.LeftClickBlock event) {
+            net.minecraftforge.event.entity.player.PlayerInteractEvent.LeftClickBlock event
+    ) {
         net.minecraft.world.level.block.state.BlockState state = event
                 .getWorld()
                 .getBlockState(event.getPos());
@@ -1847,8 +1991,16 @@ public class BuildScape {
 
         if (block instanceof com.kingodogo.buildscape.block.PetalBlock
                 || block instanceof com.kingodogo.buildscape.block.CloverBlock
-                || block instanceof com.kingodogo.buildscape.block.RoseVinesBlock) {
-            if (block.getSoundType(state) instanceof com.kingodogo.buildscape.block.CustomSoundType customSound) {
+                || block instanceof com.kingodogo.buildscape.block.RoseVinesBlock
+        ) {
+            if (
+                    block.getSoundType(state) instanceof
+                            com.kingodogo.buildscape.block.CustomSoundType
+            ) {
+                com.kingodogo.buildscape.block.CustomSoundType customSound =
+                        (com.kingodogo.buildscape.block.CustomSoundType) block.getSoundType(
+                                state
+                        );
                 net.minecraft.core.BlockPos pos = event.getPos();
                 net.minecraft.world.level.Level level = event.getWorld();
 
@@ -1858,14 +2010,16 @@ public class BuildScape {
                         block.getSoundType(state).getHitSound(),
                         net.minecraft.sounds.SoundSource.BLOCKS,
                         customSound.getHitVolume(),
-                        customSound.getHitPitch());
+                        customSound.getHitPitch()
+                );
             }
         }
     }
 
     @SubscribeEvent
     public void onRightClickBlock(
-            net.minecraftforge.event.entity.player.PlayerInteractEvent.RightClickBlock event) {
+            net.minecraftforge.event.entity.player.PlayerInteractEvent.RightClickBlock event
+    ) {
         net.minecraft.world.level.block.state.BlockState state = event
                 .getWorld()
                 .getBlockState(event.getPos());
@@ -1874,7 +2028,8 @@ public class BuildScape {
                 .getItemInHand(event.getHand());
 
         if (state.getBlock() == ModBlocks.MANGROVE_LEAVES.get()
-                && heldItem.getItem() instanceof net.minecraft.world.item.BoneMealItem) {
+                && heldItem.getItem() instanceof net.minecraft.world.item.BoneMealItem
+        ) {
             if (event.getFace() != net.minecraft.core.Direction.DOWN) {
                 event.setCanceled(true);
                 event.setCancellationResult(net.minecraft.world.InteractionResult.FAIL);
@@ -1883,13 +2038,15 @@ public class BuildScape {
         }
 
         if (state.getBlock() == ModBlocks.BAMBOO_BLOCK.get()
-                && heldItem.getItem() instanceof net.minecraft.world.item.AxeItem) {
+                && heldItem.getItem() instanceof net.minecraft.world.item.AxeItem
+        ) {
             net.minecraft.core.BlockPos pos = event.getPos();
             net.minecraft.world.level.Level level = event.getWorld();
             net.minecraft.world.entity.player.Player player = event.getPlayer();
 
             net.minecraft.core.Direction.Axis axis = state.getValue(
-                    net.minecraft.world.level.block.RotatedPillarBlock.AXIS);
+                    net.minecraft.world.level.block.RotatedPillarBlock.AXIS
+            );
 
             level.setBlock(
                     pos,
@@ -1897,8 +2054,10 @@ public class BuildScape {
                             .defaultBlockState()
                             .setValue(
                                     net.minecraft.world.level.block.RotatedPillarBlock.AXIS,
-                                    axis),
-                    11);
+                                    axis
+                            ),
+                    11
+            );
 
             level.playSound(
                     null,
@@ -1906,26 +2065,32 @@ public class BuildScape {
                     net.minecraft.sounds.SoundEvents.AXE_STRIP,
                     net.minecraft.sounds.SoundSource.BLOCKS,
                     1.0f,
-                    1.0f);
+                    1.0f
+            );
 
             if (!player.getAbilities().instabuild) {
-                heldItem.hurtAndBreak(1, player, p -> p.broadcastBreakEvent(event.getHand()));
+                heldItem.hurtAndBreak(1, player, p ->
+                        p.broadcastBreakEvent(event.getHand())
+                );
             }
 
             event.setCanceled(true);
             event.setCancellationResult(
-                    net.minecraft.world.InteractionResult.SUCCESS);
+                    net.minecraft.world.InteractionResult.SUCCESS
+            );
             return;
         }
 
         if (state.getBlock() == ModBlocks.MANGROVE_LOG.get()
-                && heldItem.getItem() instanceof net.minecraft.world.item.AxeItem) {
+                && heldItem.getItem() instanceof net.minecraft.world.item.AxeItem
+        ) {
             net.minecraft.core.BlockPos pos = event.getPos();
             net.minecraft.world.level.Level level = event.getWorld();
             net.minecraft.world.entity.player.Player player = event.getPlayer();
 
             net.minecraft.core.Direction.Axis axis = state.getValue(
-                    net.minecraft.world.level.block.RotatedPillarBlock.AXIS);
+                    net.minecraft.world.level.block.RotatedPillarBlock.AXIS
+            );
 
             level.setBlock(
                     pos,
@@ -1933,8 +2098,10 @@ public class BuildScape {
                             .defaultBlockState()
                             .setValue(
                                     net.minecraft.world.level.block.RotatedPillarBlock.AXIS,
-                                    axis),
-                    11);
+                                    axis
+                            ),
+                    11
+            );
 
             level.playSound(
                     null,
@@ -1942,26 +2109,32 @@ public class BuildScape {
                     net.minecraft.sounds.SoundEvents.AXE_STRIP,
                     net.minecraft.sounds.SoundSource.BLOCKS,
                     1.0f,
-                    1.0f);
+                    1.0f
+            );
 
             if (!player.getAbilities().instabuild) {
-                heldItem.hurtAndBreak(1, player, p -> p.broadcastBreakEvent(event.getHand()));
+                heldItem.hurtAndBreak(1, player, p ->
+                        p.broadcastBreakEvent(event.getHand())
+                );
             }
 
             event.setCanceled(true);
             event.setCancellationResult(
-                    net.minecraft.world.InteractionResult.SUCCESS);
+                    net.minecraft.world.InteractionResult.SUCCESS
+            );
             return;
         }
 
         if (state.getBlock() == ModBlocks.MANGROVE_WOOD.get()
-                && heldItem.getItem() instanceof net.minecraft.world.item.AxeItem) {
+                && heldItem.getItem() instanceof net.minecraft.world.item.AxeItem
+        ) {
             net.minecraft.core.BlockPos pos = event.getPos();
             net.minecraft.world.level.Level level = event.getWorld();
             net.minecraft.world.entity.player.Player player = event.getPlayer();
 
             net.minecraft.core.Direction.Axis axis = state.getValue(
-                    net.minecraft.world.level.block.RotatedPillarBlock.AXIS);
+                    net.minecraft.world.level.block.RotatedPillarBlock.AXIS
+            );
 
             level.setBlock(
                     pos,
@@ -1969,8 +2142,10 @@ public class BuildScape {
                             .defaultBlockState()
                             .setValue(
                                     net.minecraft.world.level.block.RotatedPillarBlock.AXIS,
-                                    axis),
-                    11);
+                                    axis
+                            ),
+                    11
+            );
 
             level.playSound(
                     null,
@@ -1978,20 +2153,25 @@ public class BuildScape {
                     net.minecraft.sounds.SoundEvents.AXE_STRIP,
                     net.minecraft.sounds.SoundSource.BLOCKS,
                     1.0f,
-                    1.0f);
+                    1.0f
+            );
 
             if (!player.getAbilities().instabuild) {
-                heldItem.hurtAndBreak(1, player, p -> p.broadcastBreakEvent(event.getHand()));
+                heldItem.hurtAndBreak(1, player, p ->
+                        p.broadcastBreakEvent(event.getHand())
+                );
             }
 
             event.setCanceled(true);
             event.setCancellationResult(
-                    net.minecraft.world.InteractionResult.SUCCESS);
+                    net.minecraft.world.InteractionResult.SUCCESS
+            );
             return;
         }
 
         if (state.getBlock() == net.minecraft.world.level.block.Blocks.DIRT
-                && heldItem.getItem() == net.minecraft.world.item.Items.POTION) {
+                && heldItem.getItem() == net.minecraft.world.item.Items.POTION
+        ) {
             if (net.minecraft.world.item.alchemy.PotionUtils
                     .getPotion(heldItem) == net.minecraft.world.item.alchemy.Potions.WATER) {
                 net.minecraft.core.BlockPos pos = event.getPos();
@@ -2011,12 +2191,15 @@ public class BuildScape {
                         net.minecraft.sounds.SoundEvents.BOTTLE_EMPTY,
                         net.minecraft.sounds.SoundSource.BLOCKS,
                         1.0f,
-                        1.0f);
+                        1.0f
+                );
 
                 if (!player.getAbilities().instabuild) {
                     heldItem.shrink(1);
-                    net.minecraft.world.item.ItemStack emptyBottle = new net.minecraft.world.item.ItemStack(
-                            net.minecraft.world.item.Items.GLASS_BOTTLE);
+                    net.minecraft.world.item.ItemStack emptyBottle =
+                            new net.minecraft.world.item.ItemStack(
+                                    net.minecraft.world.item.Items.GLASS_BOTTLE
+                            );
                     if (heldItem.isEmpty()) {
                         player.setItemInHand(event.getHand(), emptyBottle);
                     } else if (!player.getInventory().add(emptyBottle)) {
@@ -2028,21 +2211,27 @@ public class BuildScape {
 
                 event.setCanceled(true);
                 event.setCancellationResult(
-                        net.minecraft.world.InteractionResult.SUCCESS);
+                        net.minecraft.world.InteractionResult.SUCCESS
+                );
             }
         }
     }
 
     @SubscribeEvent
     public void onItemCrafted(
-            net.minecraftforge.event.entity.player.PlayerEvent.ItemCraftedEvent event) {
+            net.minecraftforge.event.entity.player.PlayerEvent.ItemCraftedEvent event
+    ) {
         net.minecraft.world.item.ItemStack crafted = event.getCrafting();
 
         if (crafted.getItem() == net.minecraft.world.item.Items.SUSPICIOUS_STEW) {
             boolean hasFrostRose = false;
 
             net.minecraft.world.Container inventory = event.getInventory();
-            if (inventory instanceof net.minecraft.world.inventory.CraftingContainer container) {
+            if (
+                    inventory instanceof net.minecraft.world.inventory.CraftingContainer
+            ) {
+                net.minecraft.world.inventory.CraftingContainer container =
+                        (net.minecraft.world.inventory.CraftingContainer) inventory;
 
                 for (int i = 0; i < container.getContainerSize(); i++) {
                     net.minecraft.world.item.ItemStack stack = container.getItem(i);
@@ -2062,18 +2251,24 @@ public class BuildScape {
 
     @SubscribeEvent
     public void onItemUseFinish(
-            net.minecraftforge.event.entity.living.LivingEntityUseItemEvent.Finish event) {
-        if (!(event.getEntity() instanceof net.minecraft.world.entity.player.Player player)) {
+            net.minecraftforge.event.entity.living.LivingEntityUseItemEvent.Finish event
+    ) {
+        if (
+                !(event.getEntity() instanceof net.minecraft.world.entity.player.Player)
+        ) {
             return;
         }
 
+        net.minecraft.world.entity.player.Player player =
+                (net.minecraft.world.entity.player.Player) event.getEntity();
         net.minecraft.world.item.ItemStack itemStack = event.getItem();
 
         if (itemStack.getItem() == net.minecraft.world.item.Items.SUSPICIOUS_STEW) {
             net.minecraft.nbt.CompoundTag nbt = itemStack.getTag();
             if (nbt != null
                     && nbt.contains("FrostRoseStew")
-                    && nbt.getInt("FrostRoseStew") == 1) {
+                    && nbt.getInt("FrostRoseStew") == 1
+            ) {
                 if (!player.level.isClientSide) {
                     net.minecraft.nbt.CompoundTag playerData = player.getPersistentData();
                     playerData.putInt("FrostRoseStewDamageTicks", 120);
@@ -2084,7 +2279,8 @@ public class BuildScape {
 
     @SubscribeEvent
     public void onPlayerTick(
-            net.minecraftforge.event.TickEvent.PlayerTickEvent event) {
+            net.minecraftforge.event.TickEvent.PlayerTickEvent event
+    ) {
         if (event.phase != net.minecraftforge.event.TickEvent.Phase.END) {
             return;
         }
@@ -2100,7 +2296,8 @@ public class BuildScape {
 
             if (ticksRemaining > 0) {
                 if (ticksRemaining % 20 == 0 && player.isAlive()) {
-                    net.minecraft.world.damagesource.DamageSource freezeDamage = net.minecraft.world.damagesource.DamageSource.GENERIC;
+                    net.minecraft.world.damagesource.DamageSource freezeDamage =
+                            net.minecraft.world.damagesource.DamageSource.GENERIC;
                     player.hurt(freezeDamage, 1.0F);
 
                     net.minecraft.world.level.Level level = player.level;
@@ -2111,7 +2308,8 @@ public class BuildScape {
                             net.minecraft.sounds.SoundEvents.POWDER_SNOW_STEP,
                             net.minecraft.sounds.SoundSource.PLAYERS,
                             0.5f,
-                            1.0f);
+                            1.0f
+                    );
 
                     if (player.canFreeze()) {
                         player.setTicksFrozen(Math.min(player.getTicksFrozen() + 140, 300));
@@ -2130,19 +2328,26 @@ public class BuildScape {
 
     @SubscribeEvent
     public void onEntityJoinWorld(
-            net.minecraftforge.event.entity.EntityJoinWorldEvent event) {
-        if (event.getEntity() instanceof net.minecraft.world.entity.vehicle.Boat boat) {
+            net.minecraftforge.event.entity.EntityJoinWorldEvent event
+    ) {
+        if (event.getEntity() instanceof net.minecraft.world.entity.vehicle.Boat) {
+            net.minecraft.world.entity.vehicle.Boat boat =
+                    (net.minecraft.world.entity.vehicle.Boat) event.getEntity();
             net.minecraft.nbt.CompoundTag nbt = boat.getPersistentData();
             if (nbt.contains("MangroveBoatType")
-                    && nbt.getString("MangroveBoatType").equals("mangrove")) {
+                    && nbt.getString("MangroveBoatType").equals("mangrove")
+            ) {
             }
         }
     }
 
     private void spawnSplashParticles(
             net.minecraft.world.level.Level level,
-            net.minecraft.core.BlockPos pos) {
-        if (level instanceof net.minecraft.server.level.ServerLevel serverLevel) {
+            net.minecraft.core.BlockPos pos
+    ) {
+        if (level instanceof net.minecraft.server.level.ServerLevel) {
+            net.minecraft.server.level.ServerLevel serverLevel =
+                    (net.minecraft.server.level.ServerLevel) level;
             serverLevel.sendParticles(
                     net.minecraft.core.particles.ParticleTypes.SPLASH,
                     pos.getX() + 0.5,
@@ -2152,7 +2357,8 @@ public class BuildScape {
                     0.5,
                     0.3,
                     0.5,
-                    0.1);
+                    0.1
+            );
         } else if (level.isClientSide) {
             for (int i = 0; i < 8; ++i) {
                 double x = pos.getX() + 0.5 + (level.random.nextDouble() - 0.5) * 0.5;
@@ -2168,12 +2374,17 @@ public class BuildScape {
                         z,
                         vx,
                         vy,
-                        vz);
+                        vz
+                );
             }
         }
     }
 
-    @Mod.EventBusSubscriber(modid = MODID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
+    @Mod.EventBusSubscriber(
+            modid = MODID,
+            bus = Mod.EventBusSubscriber.Bus.MOD,
+            value = Dist.CLIENT
+    )
     public static class ClientModEvents {
 
         @SubscribeEvent
@@ -2184,9 +2395,9 @@ public class BuildScape {
             });
 
             // Note: Model layers for entity models are registered when EntityRenderers are
-            // created
+            created
             // For custom cosmetic models, we'll bake the layer on-demand in the render
-            // method
+                    method
             LOGGER.info("Buildscape mod client setup complete");
 
             event.enqueueWork(() -> {
@@ -2198,1012 +2409,1324 @@ public class BuildScape {
             });
 
             event.enqueueWork(() -> {
-
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.BLACK_MOSAIC_GLASS.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.BLUE_MOSAIC_GLASS.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.BROWN_MOSAIC_GLASS.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.CYAN_MOSAIC_GLASS.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.GRAY_MOSAIC_GLASS.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.GREEN_MOSAIC_GLASS.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.LIGHT_BLUE_MOSAIC_GLASS.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.LIGHT_GRAY_MOSAIC_GLASS.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.LIME_MOSAIC_GLASS.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.MAGENTA_MOSAIC_GLASS.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.ORANGE_MOSAIC_GLASS.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.PINK_MOSAIC_GLASS.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.PURPLE_MOSAIC_GLASS.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.RED_MOSAIC_GLASS.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.WHITE_MOSAIC_GLASS.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.YELLOW_MOSAIC_GLASS.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.BLACK_MOSAIC_GLASS_PANE.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.BLUE_MOSAIC_GLASS_PANE.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.BROWN_MOSAIC_GLASS_PANE.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.CYAN_MOSAIC_GLASS_PANE.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.GRAY_MOSAIC_GLASS_PANE.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.GREEN_MOSAIC_GLASS_PANE.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.LIGHT_BLUE_MOSAIC_GLASS_PANE.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.LIGHT_GRAY_MOSAIC_GLASS_PANE.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.LIME_MOSAIC_GLASS_PANE.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.MAGENTA_MOSAIC_GLASS_PANE.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.ORANGE_MOSAIC_GLASS_PANE.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.PINK_MOSAIC_GLASS_PANE.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.PURPLE_MOSAIC_GLASS_PANE.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.RED_MOSAIC_GLASS_PANE.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.WHITE_MOSAIC_GLASS_PANE.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.YELLOW_MOSAIC_GLASS_PANE.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
 
                 // Factory Glass
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.FACTORY_WHITE_GLASS.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.FACTORY_LIGHT_GRAY_GLASS.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.FACTORY_GRAY_GLASS.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.FACTORY_BLACK_GLASS.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.FACTORY_BROWN_GLASS.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.FACTORY_RED_GLASS.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.FACTORY_ORANGE_GLASS.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.FACTORY_YELLOW_GLASS.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.FACTORY_LIME_GLASS.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.FACTORY_GREEN_GLASS.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.FACTORY_CYAN_GLASS.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.FACTORY_LIGHT_BLUE_GLASS.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.FACTORY_BLUE_GLASS.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.FACTORY_PURPLE_GLASS.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.FACTORY_MAGENTA_GLASS.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.FACTORY_PINK_GLASS.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
 
                 // Factory Glass Panes
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.FACTORY_WHITE_GLASS_PANE.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.FACTORY_LIGHT_GRAY_GLASS_PANE.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.FACTORY_GRAY_GLASS_PANE.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.FACTORY_BLACK_GLASS_PANE.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.FACTORY_BROWN_GLASS_PANE.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.FACTORY_RED_GLASS_PANE.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.FACTORY_ORANGE_GLASS_PANE.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.FACTORY_YELLOW_GLASS_PANE.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.FACTORY_LIME_GLASS_PANE.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.FACTORY_GREEN_GLASS_PANE.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.FACTORY_CYAN_GLASS_PANE.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.FACTORY_LIGHT_BLUE_GLASS_PANE.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.FACTORY_BLUE_GLASS_PANE.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.FACTORY_PURPLE_GLASS_PANE.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.FACTORY_MAGENTA_GLASS_PANE.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.FACTORY_PINK_GLASS_PANE.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
 
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.BLACK_GLAZED_GLASS.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.BLUE_GLAZED_GLASS.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.BROWN_GLAZED_GLASS.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.CYAN_GLAZED_GLASS.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.GRAY_GLAZED_GLASS.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.GREEN_GLAZED_GLASS.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.LIGHT_BLUE_GLAZED_GLASS.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.LIGHT_GRAY_GLAZED_GLASS.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.LIME_GLAZED_GLASS.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.MAGENTA_GLAZED_GLASS.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.ORANGE_GLAZED_GLASS.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.PINK_GLAZED_GLASS.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.PURPLE_GLAZED_GLASS.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.RED_GLAZED_GLASS.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.WHITE_GLAZED_GLASS.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.YELLOW_GLAZED_GLASS.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
 
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.BLACK_GLAZED_GLASS_PANE.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.BLUE_GLAZED_GLASS_PANE.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.BROWN_GLAZED_GLASS_PANE.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.CYAN_GLAZED_GLASS_PANE.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.GRAY_GLAZED_GLASS_PANE.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.GREEN_GLAZED_GLASS_PANE.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.LIGHT_BLUE_GLAZED_GLASS_PANE.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.LIGHT_GRAY_GLAZED_GLASS_PANE.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.LIME_GLAZED_GLASS_PANE.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.MAGENTA_GLAZED_GLASS_PANE.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.ORANGE_GLAZED_GLASS_PANE.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.PINK_GLAZED_GLASS_PANE.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.PURPLE_GLAZED_GLASS_PANE.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.RED_GLAZED_GLASS_PANE.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.WHITE_GLAZED_GLASS_PANE.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.YELLOW_GLAZED_GLASS_PANE.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
 
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.DIAMOND_CHAIN.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.GOLD_CHAIN.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.EMERALD_CHAIN.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.ANCIENT_STEEL_CHAIN.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.NETHERITE_CHAIN.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.COPPER_CHAIN.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.EXPOSED_COPPER_CHAIN.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.WEATHERED_COPPER_CHAIN.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.OXIDIZED_COPPER_CHAIN.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
 
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.LARGE_IRON_CHAIN.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.LARGE_GOLD_CHAIN.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.LARGE_DIAMOND_CHAIN.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.LARGE_EMERALD_CHAIN.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.LARGE_ANCIENT_STEEL_CHAIN.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.LARGE_NETHERITE_CHAIN.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
 
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.WHITE_ORNAMENT.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.ORANGE_ORNAMENT.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.MAGENTA_ORNAMENT.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.LIGHT_BLUE_ORNAMENT.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.YELLOW_ORNAMENT.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.LIME_ORNAMENT.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.PINK_ORNAMENT.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.GRAY_ORNAMENT.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.LIGHT_GRAY_ORNAMENT.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.CYAN_ORNAMENT.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.PURPLE_ORNAMENT.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.BLUE_ORNAMENT.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.BROWN_ORNAMENT.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.GREEN_ORNAMENT.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.RED_ORNAMENT.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.BLACK_ORNAMENT.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.GLASS_ORNAMENT.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.TINTED_GLASS_ORNAMENT.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
 
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.WHITE_STRING_LIGHT.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.ORANGE_STRING_LIGHT.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.MAGENTA_STRING_LIGHT.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.LIGHT_BLUE_STRING_LIGHT.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.YELLOW_STRING_LIGHT.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.LIME_STRING_LIGHT.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.PINK_STRING_LIGHT.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.GRAY_STRING_LIGHT.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.LIGHT_GRAY_STRING_LIGHT.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.CYAN_STRING_LIGHT.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.PURPLE_STRING_LIGHT.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.BLUE_STRING_LIGHT.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.BROWN_STRING_LIGHT.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.GREEN_STRING_LIGHT.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.RED_STRING_LIGHT.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.BLACK_STRING_LIGHT.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.MULTICOLOR_STRING_LIGHT.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
 
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.DECORATED_OAK_LEAVES.get(),
-                        net.minecraft.client.renderer.RenderType.cutoutMipped());
+                        net.minecraft.client.renderer.RenderType.cutoutMipped()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.DECORATED_SPRUCE_LEAVES.get(),
-                        net.minecraft.client.renderer.RenderType.cutoutMipped());
+                        net.minecraft.client.renderer.RenderType.cutoutMipped()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.DECORATED_BIRCH_LEAVES.get(),
-                        net.minecraft.client.renderer.RenderType.cutoutMipped());
+                        net.minecraft.client.renderer.RenderType.cutoutMipped()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.DECORATED_JUNGLE_LEAVES.get(),
-                        net.minecraft.client.renderer.RenderType.cutoutMipped());
+                        net.minecraft.client.renderer.RenderType.cutoutMipped()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.DECORATED_ACACIA_LEAVES.get(),
-                        net.minecraft.client.renderer.RenderType.cutoutMipped());
+                        net.minecraft.client.renderer.RenderType.cutoutMipped()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.DECORATED_DARK_OAK_LEAVES.get(),
-                        net.minecraft.client.renderer.RenderType.cutoutMipped());
+                        net.minecraft.client.renderer.RenderType.cutoutMipped()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.DECORATED_MANGROVE_LEAVES.get(),
-                        net.minecraft.client.renderer.RenderType.cutoutMipped());
+                        net.minecraft.client.renderer.RenderType.cutoutMipped()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.DECORATED_AZALEA_LEAVES.get(),
-                        net.minecraft.client.renderer.RenderType.cutoutMipped());
+                        net.minecraft.client.renderer.RenderType.cutoutMipped()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.DECORATED_FLOWERING_AZALEA_LEAVES.get(),
-                        net.minecraft.client.renderer.RenderType.cutoutMipped());
+                        net.minecraft.client.renderer.RenderType.cutoutMipped()
+                );
 
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.SNOWY_LEAVES.get(),
-                        net.minecraft.client.renderer.RenderType.cutoutMipped());
+                        net.minecraft.client.renderer.RenderType.cutoutMipped()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.SNOWY_OAK_LEAVES.get(),
-                        net.minecraft.client.renderer.RenderType.cutoutMipped());
+                        net.minecraft.client.renderer.RenderType.cutoutMipped()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.SNOWY_SPRUCE_LEAVES.get(),
-                        net.minecraft.client.renderer.RenderType.cutoutMipped());
+                        net.minecraft.client.renderer.RenderType.cutoutMipped()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.SNOWY_BIRCH_LEAVES.get(),
-                        net.minecraft.client.renderer.RenderType.cutoutMipped());
+                        net.minecraft.client.renderer.RenderType.cutoutMipped()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.SNOWY_JUNGLE_LEAVES.get(),
-                        net.minecraft.client.renderer.RenderType.cutoutMipped());
+                        net.minecraft.client.renderer.RenderType.cutoutMipped()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.SNOWY_ACACIA_LEAVES.get(),
-                        net.minecraft.client.renderer.RenderType.cutoutMipped());
+                        net.minecraft.client.renderer.RenderType.cutoutMipped()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.SNOWY_DARK_OAK_LEAVES.get(),
-                        net.minecraft.client.renderer.RenderType.cutoutMipped());
+                        net.minecraft.client.renderer.RenderType.cutoutMipped()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.SNOWY_MANGROVE_LEAVES.get(),
-                        net.minecraft.client.renderer.RenderType.cutoutMipped());
+                        net.minecraft.client.renderer.RenderType.cutoutMipped()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.SNOWY_AZALEA_LEAVES.get(),
-                        net.minecraft.client.renderer.RenderType.cutoutMipped());
+                        net.minecraft.client.renderer.RenderType.cutoutMipped()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.SNOWY_FLOWERING_AZALEA_LEAVES.get(),
-                        net.minecraft.client.renderer.RenderType.cutoutMipped());
+                        net.minecraft.client.renderer.RenderType.cutoutMipped()
+                );
 
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.SNOWY_SHORT_GRASS.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.SNOWY_TALL_GRASS.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.SNOWY_FERN.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.SNOWY_LARGE_FERN.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.SNOWY_BUSH.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
 
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.WHITE_STAR.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.ORANGE_STAR.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.MAGENTA_STAR.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.LIGHT_BLUE_STAR.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.YELLOW_STAR.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.LIME_STAR.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.PINK_STAR.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.GRAY_STAR.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.LIGHT_GRAY_STAR.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.CYAN_STAR.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.PURPLE_STAR.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.BLUE_STAR.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.BROWN_STAR.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.GREEN_STAR.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.RED_STAR.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.BLACK_STAR.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.GLOW_STAR.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
 
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.GLOW_LIGHTS.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.MULTICOLOR_GLOW_LIGHTS.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
 
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.BIT_COPPER_GRATE.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.BIT_EXPOSED_COPPER_GRATE.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.BIT_WEATHERED_COPPER_GRATE.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.BIT_OXIDIZED_COPPER_GRATE.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
 
                 // Steel Grate
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.STEEL_GRATE.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
 
                 net.minecraft.client.renderer.blockentity.BlockEntityRenderers.register(
-                        com.kingodogo.buildscape.block.ModBlockEntities.PILLAR_BLOCK_ENTITY
-                                .get(),
-                        com.kingodogo.buildscape.client.renderer.PillarBlockEntityRenderer::new);
+                        com.kingodogo.buildscape.block.ModBlockEntities.PILLAR_BLOCK_ENTITY.get(),
+                        com.kingodogo.buildscape.client.renderer.PillarBlockEntityRenderer::new
+                );
                 net.minecraft.client.renderer.blockentity.BlockEntityRenderers.register(
-                        com.kingodogo.buildscape.block.ModBlockEntities.DECORATED_POT_BLOCK_ENTITY
-                                .get(),
-                        com.kingodogo.buildscape.client.renderer.DecoratedPotBlockEntityRenderer::new);
+                        com.kingodogo.buildscape.block.ModBlockEntities.DECORATED_POT_BLOCK_ENTITY.get(),
+                        com.kingodogo.buildscape.client.renderer.DecoratedPotBlockEntityRenderer::new
+                );
                 net.minecraft.client.renderer.blockentity.BlockEntityRenderers.register(
-                        com.kingodogo.buildscape.block.ModBlockEntities.ICICLE_CAULDRON_BLOCK_ENTITY
-                                .get(),
-                        com.kingodogo.buildscape.client.renderer.IcicleCauldronBlockEntityRenderer::new);
+                        com.kingodogo.buildscape.block.ModBlockEntities.ICICLE_CAULDRON_BLOCK_ENTITY.get(),
+                        com.kingodogo.buildscape.client.renderer.IcicleCauldronBlockEntityRenderer::new
+                );
 
                 net.minecraft.client.renderer.blockentity.BlockEntityRenderers.register(
-                        com.kingodogo.buildscape.block.ModBlockEntities.FESTIVE_STOCKING_BLOCK_ENTITY
-                                .get(),
-                        com.kingodogo.buildscape.client.renderer.FestiveStockingBlockEntityRenderer::new);
+                        com.kingodogo.buildscape.block.ModBlockEntities.FESTIVE_STOCKING_BLOCK_ENTITY.get(),
+                        com.kingodogo.buildscape.client.renderer.FestiveStockingBlockEntityRenderer::new
+                );
 
                 net.minecraft.client.renderer.blockentity.BlockEntityRenderers.register(
-                        com.kingodogo.buildscape.block.ModBlockEntities.MANGROVE_SIGN_BLOCK_ENTITY
-                                .get(),
-                        net.minecraft.client.renderer.blockentity.SignRenderer::new);
+                        com.kingodogo.buildscape.block.ModBlockEntities.MANGROVE_SIGN_BLOCK_ENTITY.get(),
+                        net.minecraft.client.renderer.blockentity.SignRenderer::new
+                );
 
                 net.minecraft.client.renderer.blockentity.BlockEntityRenderers.register(
-                        com.kingodogo.buildscape.block.ModBlockEntities.BAMBOO_SIGN_BLOCK_ENTITY
-                                .get(),
-                        net.minecraft.client.renderer.blockentity.SignRenderer::new);
+                        com.kingodogo.buildscape.block.ModBlockEntities.BAMBOO_SIGN_BLOCK_ENTITY.get(),
+                        net.minecraft.client.renderer.blockentity.SignRenderer::new
+                );
 
                 net.minecraft.client.renderer.entity.EntityRenderers.register(
                         com.kingodogo.buildscape.entity.ModEntities.FALLING_ICICLE.get(),
-                        com.kingodogo.buildscape.client.renderer.FallingIcicleRenderer::new);
+                        com.kingodogo.buildscape.client.renderer.FallingIcicleRenderer::new
+                );
 
                 net.minecraft.client.renderer.entity.EntityRenderers.register(
                         com.kingodogo.buildscape.entity.ModEntities.MANGROVE_BOAT.get(),
-                        com.kingodogo.buildscape.client.renderer.MangroveBoatRenderer::new);
+                        com.kingodogo.buildscape.client.renderer.MangroveBoatRenderer::new
+                );
+
+                net.minecraft.client.renderer.entity.EntityRenderers.register(
+                        com.kingodogo.buildscape.entity.ModEntities.COLORED_ITEM_FRAME.get(),
+                        com.kingodogo.buildscape.client.renderer.ColoredItemFrameRenderer::new
+                );
 
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.MANGROVE_SIGN.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.MANGROVE_WALL_SIGN.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
 
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.BAMBOO_SIGN.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.BAMBOO_WALL_SIGN.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
 
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.ICICLE.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
 
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.ICICLE_BLOCK.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.PACKED_ICICLE_BLOCK.get(),
-                        net.minecraft.client.renderer.RenderType.translucent());
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
 
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.DECORATED_POT.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.BLACK_DECORATED_POT.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.BLUE_DECORATED_POT.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.BROWN_DECORATED_POT.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.CYAN_DECORATED_POT.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.GRAY_DECORATED_POT.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.GREEN_DECORATED_POT.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.LIGHT_BLUE_DECORATED_POT.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.LIGHT_GRAY_DECORATED_POT.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.LIME_DECORATED_POT.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.MAGENTA_DECORATED_POT.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.ORANGE_DECORATED_POT.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.PINK_DECORATED_POT.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.PURPLE_DECORATED_POT.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.RED_DECORATED_POT.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.WHITE_DECORATED_POT.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.YELLOW_DECORATED_POT.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
 
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.BROWN_MUSHROOM_SHELVES.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.RED_MUSHROOM_SHELVES.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
 
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.RED_ROSE_VINES.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.BLACK_ROSE_VINES.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.BLUE_ROSE_VINES.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.WHITE_ROSE_VINES.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
 
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.FESTIVE_STOCKING.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.BLACK_FESTIVE_STOCKING.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.BLUE_FESTIVE_STOCKING.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.BROWN_FESTIVE_STOCKING.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.CYAN_FESTIVE_STOCKING.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.GRAY_FESTIVE_STOCKING.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.GREEN_FESTIVE_STOCKING.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.LIGHT_BLUE_FESTIVE_STOCKING.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.LIGHT_GRAY_FESTIVE_STOCKING.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.LIME_FESTIVE_STOCKING.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.MAGENTA_FESTIVE_STOCKING.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.ORANGE_FESTIVE_STOCKING.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.PINK_FESTIVE_STOCKING.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.PURPLE_FESTIVE_STOCKING.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.RED_FESTIVE_STOCKING.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.WHITE_FESTIVE_STOCKING.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.YELLOW_FESTIVE_STOCKING.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
 
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.BAMBOO_DOOR.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.BAMBOO_TRAPDOOR.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
 
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.MANGROVE_DOOR.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.MANGROVE_TRAPDOOR.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.MANGROVE_PROPAGULE.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.MANGROVE_ROOTS.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.MUDDY_MANGROVE_ROOTS.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.MANGROVE_LEAVES.get(),
-                        net.minecraft.client.renderer.RenderType.cutoutMipped());
+                        net.minecraft.client.renderer.RenderType.cutoutMipped()
+                );
 
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.RED_MONETS.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.BLUE_MONETS.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.PURPLE_MONETS.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.LIGHT_BLUE_MONETS.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.PINK_MONETS.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.YELLOW_MONETS.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
 
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.CLOVER.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
 
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.RED_PETAL.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.BLUE_PETAL.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.ORANGE_PETAL.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.PINK_PETAL.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.PURPLE_PETAL.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
 
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.RED_SPORE_BLOSSOM.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.CYAN_SPORE_BLOSSOM.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.BLUE_SPORE_BLOSSOM.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.PURPLE_SPORE_BLOSSOM.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.ORANGE_SPORE_BLOSSOM.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
 
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.PURPLE_PETAL.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
 
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.FROST_ROSE.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
 
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.OAK_LEAF_LAYERS.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.SPRUCE_LEAF_LAYERS.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.BIRCH_LEAF_LAYERS.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.JUNGLE_LEAF_LAYERS.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.ACACIA_LEAF_LAYERS.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.DARK_OAK_LEAF_LAYERS.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.AZALEA_LEAF_LAYERS.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.FLOWERING_AZALEA_LEAF_LAYERS.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.SNOWY_OAK_LEAF_LAYERS.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.SNOWY_SPRUCE_LEAF_LAYERS.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.SNOWY_BIRCH_LEAF_LAYERS.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.SNOWY_JUNGLE_LEAF_LAYERS.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.SNOWY_ACACIA_LEAF_LAYERS.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.SNOWY_DARK_OAK_LEAF_LAYERS.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.SNOWY_MANGROVE_LEAF_LAYERS.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.SNOWY_AZALEA_LEAF_LAYERS.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.SNOWY_FLOWERING_AZALEA_LEAF_LAYERS.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.MANGROVE_LEAF_LAYERS.get(),
-                        net.minecraft.client.renderer.RenderType.cutout());
+                        net.minecraft.client.renderer.RenderType.cutout()
+                );
 
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.OAK_LEAF_HEDGE.get(),
-                        net.minecraft.client.renderer.RenderType.cutoutMipped());
+                        net.minecraft.client.renderer.RenderType.cutoutMipped()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.SPRUCE_LEAF_HEDGE.get(),
-                        net.minecraft.client.renderer.RenderType.cutoutMipped());
+                        net.minecraft.client.renderer.RenderType.cutoutMipped()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.BIRCH_LEAF_HEDGE.get(),
-                        net.minecraft.client.renderer.RenderType.cutoutMipped());
+                        net.minecraft.client.renderer.RenderType.cutoutMipped()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.JUNGLE_LEAF_HEDGE.get(),
-                        net.minecraft.client.renderer.RenderType.cutoutMipped());
+                        net.minecraft.client.renderer.RenderType.cutoutMipped()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.ACACIA_LEAF_HEDGE.get(),
-                        net.minecraft.client.renderer.RenderType.cutoutMipped());
+                        net.minecraft.client.renderer.RenderType.cutoutMipped()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.DARK_OAK_LEAF_HEDGE.get(),
-                        net.minecraft.client.renderer.RenderType.cutoutMipped());
+                        net.minecraft.client.renderer.RenderType.cutoutMipped()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.AZALEA_LEAF_HEDGE.get(),
-                        net.minecraft.client.renderer.RenderType.cutoutMipped());
+                        net.minecraft.client.renderer.RenderType.cutoutMipped()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.FLOWERING_AZALEA_LEAF_HEDGE.get(),
-                        net.minecraft.client.renderer.RenderType.cutoutMipped());
+                        net.minecraft.client.renderer.RenderType.cutoutMipped()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.SNOWY_OAK_LEAF_HEDGE.get(),
-                        net.minecraft.client.renderer.RenderType.cutoutMipped());
+                        net.minecraft.client.renderer.RenderType.cutoutMipped()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.SNOWY_SPRUCE_LEAF_HEDGE.get(),
-                        net.minecraft.client.renderer.RenderType.cutoutMipped());
+                        net.minecraft.client.renderer.RenderType.cutoutMipped()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.SNOWY_BIRCH_LEAF_HEDGE.get(),
-                        net.minecraft.client.renderer.RenderType.cutoutMipped());
+                        net.minecraft.client.renderer.RenderType.cutoutMipped()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.SNOWY_JUNGLE_LEAF_HEDGE.get(),
-                        net.minecraft.client.renderer.RenderType.cutoutMipped());
+                        net.minecraft.client.renderer.RenderType.cutoutMipped()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.SNOWY_ACACIA_LEAF_HEDGE.get(),
-                        net.minecraft.client.renderer.RenderType.cutoutMipped());
+                        net.minecraft.client.renderer.RenderType.cutoutMipped()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.SNOWY_DARK_OAK_LEAF_HEDGE.get(),
-                        net.minecraft.client.renderer.RenderType.cutoutMipped());
+                        net.minecraft.client.renderer.RenderType.cutoutMipped()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.SNOWY_MANGROVE_LEAF_HEDGE.get(),
-                        net.minecraft.client.renderer.RenderType.cutoutMipped());
+                        net.minecraft.client.renderer.RenderType.cutoutMipped()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.SNOWY_AZALEA_LEAF_HEDGE.get(),
-                        net.minecraft.client.renderer.RenderType.cutoutMipped());
+                        net.minecraft.client.renderer.RenderType.cutoutMipped()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.SNOWY_FLOWERING_AZALEA_LEAF_HEDGE.get(),
-                        net.minecraft.client.renderer.RenderType.cutoutMipped());
+                        net.minecraft.client.renderer.RenderType.cutoutMipped()
+                );
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.MANGROVE_LEAF_HEDGE.get(),
-                        net.minecraft.client.renderer.RenderType.cutoutMipped());
+                        net.minecraft.client.renderer.RenderType.cutoutMipped()
+                );
 
-                net.minecraft.client.color.block.BlockColors blockColors = net.minecraft.client.Minecraft
-                        .getInstance().getBlockColors();
+                net.minecraft.client.color.block.BlockColors blockColors =
+                        net.minecraft.client.Minecraft.getInstance().getBlockColors();
                 blockColors.register(
                         (state, reader, pos, tintIndex) -> {
                             if (reader == null || pos == null) {
                                 return 0x7FA832;
                             }
                             if (tintIndex == 1) {
-                                if (reader instanceof net.minecraft.world.level.LevelReader levelReader) {
+                                if (reader instanceof net.minecraft.world.level.LevelReader) {
+                                    net.minecraft.world.level.LevelReader levelReader =
+                                            (net.minecraft.world.level.LevelReader) reader;
                                     return levelReader
                                             .getBiome(pos)
                                             .value()
-                                            .getGrassColor(pos.getX(),
-                                                    pos.getZ());
+                                            .getGrassColor(pos.getX(), pos.getZ());
                                 }
                                 return 0x7FA832;
                             }
                             return -1;
                         },
-                        ModBlocks.CLOVER.get());
+                        ModBlocks.CLOVER.get()
+                );
 
                 blockColors.register(
                         (state, reader, pos, tintIndex) -> {
@@ -3211,12 +3734,13 @@ public class BuildScape {
                                 return 0x7FA832;
                             }
                             if (tintIndex == 1) {
-                                if (reader instanceof net.minecraft.world.level.LevelReader levelReader) {
+                                if (reader instanceof net.minecraft.world.level.LevelReader) {
+                                    net.minecraft.world.level.LevelReader levelReader =
+                                            (net.minecraft.world.level.LevelReader) reader;
                                     return levelReader
                                             .getBiome(pos)
                                             .value()
-                                            .getGrassColor(pos.getX(),
-                                                    pos.getZ());
+                                            .getGrassColor(pos.getX(), pos.getZ());
                                 }
                                 return 0x7FA832;
                             }
@@ -3226,7 +3750,8 @@ public class BuildScape {
                         ModBlocks.BLUE_PETAL.get(),
                         ModBlocks.ORANGE_PETAL.get(),
                         ModBlocks.PINK_PETAL.get(),
-                        ModBlocks.PURPLE_PETAL.get());
+                        ModBlocks.PURPLE_PETAL.get()
+                );
 
                 blockColors.register(
                         (state, reader, pos, tintIndex) -> {
@@ -3234,11 +3759,15 @@ public class BuildScape {
                                 return -1;
                             }
 
-                            if (state.hasProperty(
-                                    com.kingodogo.buildscape.block.OrnamentBlock.STRING_COLOR)) {
-                                com.kingodogo.buildscape.block.OrnamentBlock.StringColor stringColor = state
-                                        .getValue(
-                                                com.kingodogo.buildscape.block.OrnamentBlock.STRING_COLOR);
+                            if (
+                                    state.hasProperty(
+                                            com.kingodogo.buildscape.block.OrnamentBlock.STRING_COLOR
+                                    )
+                            ) {
+                                com.kingodogo.buildscape.block.OrnamentBlock.StringColor stringColor =
+                                        state.getValue(
+                                                com.kingodogo.buildscape.block.OrnamentBlock.STRING_COLOR
+                                        );
                                 return stringColor.getColor();
                             }
 
@@ -3261,7 +3790,8 @@ public class BuildScape {
                         ModBlocks.RED_ORNAMENT.get(),
                         ModBlocks.BLACK_ORNAMENT.get(),
                         ModBlocks.GLASS_ORNAMENT.get(),
-                        ModBlocks.TINTED_GLASS_ORNAMENT.get());
+                        ModBlocks.TINTED_GLASS_ORNAMENT.get()
+                );
 
                 blockColors.register(
                         (state, reader, pos, tintIndex) -> {
@@ -3269,11 +3799,15 @@ public class BuildScape {
                                 return -1;
                             }
 
-                            if (state.hasProperty(
-                                    com.kingodogo.buildscape.block.StringLightBlock.STRING_COLOR)) {
-                                com.kingodogo.buildscape.block.StringLightBlock.StringColor stringColor = state
-                                        .getValue(
-                                                com.kingodogo.buildscape.block.StringLightBlock.STRING_COLOR);
+                            if (
+                                    state.hasProperty(
+                                            com.kingodogo.buildscape.block.StringLightBlock.STRING_COLOR
+                                    )
+                            ) {
+                                com.kingodogo.buildscape.block.StringLightBlock.StringColor stringColor =
+                                        state.getValue(
+                                                com.kingodogo.buildscape.block.StringLightBlock.STRING_COLOR
+                                        );
                                 return stringColor.getColor();
                             }
 
@@ -3295,7 +3829,8 @@ public class BuildScape {
                         ModBlocks.GREEN_STRING_LIGHT.get(),
                         ModBlocks.RED_STRING_LIGHT.get(),
                         ModBlocks.BLACK_STRING_LIGHT.get(),
-                        ModBlocks.MULTICOLOR_STRING_LIGHT.get());
+                        ModBlocks.MULTICOLOR_STRING_LIGHT.get()
+                );
 
                 blockColors.register(
                         (state, reader, pos, tintIndex) -> {
@@ -3305,7 +3840,10 @@ public class BuildScape {
 
                             if (reader != null
                             && pos != null
-                            && reader instanceof net.minecraft.world.level.LevelReader levelReader) {
+                                    && reader instanceof net.minecraft.world.level.LevelReader
+                            ) {
+                                net.minecraft.world.level.LevelReader levelReader =
+                                        (net.minecraft.world.level.LevelReader) reader;
                                 return levelReader.getBiome(pos).value()
                                         .getFoliageColor();
                             }
@@ -3319,7 +3857,8 @@ public class BuildScape {
                         ModBlocks.OAK_LEAF_HEDGE.get(),
                         ModBlocks.JUNGLE_LEAF_HEDGE.get(),
                         ModBlocks.ACACIA_LEAF_HEDGE.get(),
-                        ModBlocks.DARK_OAK_LEAF_HEDGE.get());
+                        ModBlocks.DARK_OAK_LEAF_HEDGE.get()
+                );
 
                 blockColors.register(
                         (state, reader, pos, tintIndex) -> {
@@ -3329,7 +3868,8 @@ public class BuildScape {
                             return 0x619961;
                         },
                         ModBlocks.SPRUCE_LEAF_LAYERS.get(),
-                        ModBlocks.SPRUCE_LEAF_HEDGE.get());
+                        ModBlocks.SPRUCE_LEAF_HEDGE.get()
+                );
 
                 blockColors.register(
                         (state, reader, pos, tintIndex) -> {
@@ -3339,7 +3879,8 @@ public class BuildScape {
                             return 0x80a755;
                         },
                         ModBlocks.BIRCH_LEAF_LAYERS.get(),
-                        ModBlocks.BIRCH_LEAF_HEDGE.get());
+                        ModBlocks.BIRCH_LEAF_HEDGE.get()
+                );
 
                 blockColors.register(
                         (state, reader, pos, tintIndex) -> {
@@ -3348,7 +3889,8 @@ public class BuildScape {
                         ModBlocks.AZALEA_LEAF_LAYERS.get(),
                         ModBlocks.FLOWERING_AZALEA_LEAF_LAYERS.get(),
                         ModBlocks.AZALEA_LEAF_HEDGE.get(),
-                        ModBlocks.FLOWERING_AZALEA_LEAF_HEDGE.get());
+                        ModBlocks.FLOWERING_AZALEA_LEAF_HEDGE.get()
+                );
 
                 blockColors.register(
                         (state, reader, pos, tintIndex) -> {
@@ -3371,7 +3913,8 @@ public class BuildScape {
                         ModBlocks.SNOWY_DARK_OAK_LEAF_HEDGE.get(),
                         ModBlocks.SNOWY_MANGROVE_LEAF_HEDGE.get(),
                         ModBlocks.SNOWY_AZALEA_LEAF_HEDGE.get(),
-                        ModBlocks.SNOWY_FLOWERING_AZALEA_LEAF_HEDGE.get());
+                        ModBlocks.SNOWY_FLOWERING_AZALEA_LEAF_HEDGE.get()
+                );
 
                 blockColors.register(
                         (state, reader, pos, tintIndex) -> {
@@ -3380,14 +3923,18 @@ public class BuildScape {
                             }
                             if (reader != null
                             && pos != null
-                            && reader instanceof net.minecraft.world.level.LevelReader levelReader) {
+                                    && reader instanceof net.minecraft.world.level.LevelReader
+                            ) {
+                                net.minecraft.world.level.LevelReader levelReader =
+                                        (net.minecraft.world.level.LevelReader) reader;
                                 return levelReader.getBiome(pos).value()
                                         .getFoliageColor();
                             }
                             return 0x92c648;
                         },
                         ModBlocks.MANGROVE_LEAF_LAYERS.get(),
-                        ModBlocks.MANGROVE_LEAF_HEDGE.get());
+                        ModBlocks.MANGROVE_LEAF_HEDGE.get()
+                );
 
                 blockColors.register(
                         (state, reader, pos, tintIndex) -> {
@@ -3396,13 +3943,17 @@ public class BuildScape {
                             }
                             if (reader != null
                             && pos != null
-                            && reader instanceof net.minecraft.world.level.LevelReader levelReader) {
+                                    && reader instanceof net.minecraft.world.level.LevelReader
+                            ) {
+                                net.minecraft.world.level.LevelReader levelReader =
+                                        (net.minecraft.world.level.LevelReader) reader;
                                 return levelReader.getBiome(pos).value()
                                         .getFoliageColor();
                             }
                             return 0x92c648;
                         },
-                        ModBlocks.MANGROVE_LEAVES.get());
+                        ModBlocks.MANGROVE_LEAVES.get()
+                );
 
                 blockColors.register(
                         (state, reader, pos, tintIndex) -> {
@@ -3411,7 +3962,10 @@ public class BuildScape {
                             }
                             if (reader != null
                             && pos != null
-                            && reader instanceof net.minecraft.world.level.LevelReader levelReader) {
+                                    && reader instanceof net.minecraft.world.level.LevelReader
+                            ) {
+                                net.minecraft.world.level.LevelReader levelReader =
+                                        (net.minecraft.world.level.LevelReader) reader;
                                 return levelReader.getBiome(pos).value()
                                         .getFoliageColor();
                             }
@@ -3425,7 +3979,8 @@ public class BuildScape {
                         ModBlocks.DECORATED_DARK_OAK_LEAVES.get(),
                         ModBlocks.DECORATED_MANGROVE_LEAVES.get(),
                         ModBlocks.DECORATED_AZALEA_LEAVES.get(),
-                        ModBlocks.DECORATED_FLOWERING_AZALEA_LEAVES.get());
+                        ModBlocks.DECORATED_FLOWERING_AZALEA_LEAVES.get()
+                );
 
                 blockColors.register(
                         (state, reader, pos, tintIndex) -> {
@@ -3434,24 +3989,26 @@ public class BuildScape {
                             }
 
                             if (reader != null && pos != null) {
-                                net.minecraft.world.level.block.entity.BlockEntity be = reader
-                                        .getBlockEntity(pos);
-                                if (be instanceof com.kingodogo.buildscape.block.GlowLightsBlockEntity glowBE) {
-                                    java.util.List<String> dyeColors = glowBE
-                                            .getDyeColors();
+                                net.minecraft.world.level.block.entity.BlockEntity be =
+                                        reader.getBlockEntity(pos);
+                                if (
+                                        be instanceof
+                                                com.kingodogo.buildscape.block.GlowLightsBlockEntity
+                                ) {
+                                    com.kingodogo.buildscape.block.GlowLightsBlockEntity glowBE =
+                                            (com.kingodogo.buildscape.block.GlowLightsBlockEntity) be;
+                                    java.util.List<String> dyeColors = glowBE.getDyeColors();
                                     if (dyeColors != null && !dyeColors.isEmpty()) {
-                                        int hash = pos.hashCode()
-                                        ^ state.hashCode();
-                                        int colorIndex = Math.abs(hash)
-                                        % dyeColors.size();
-                                        String colorCode = dyeColors
-                                                .get(colorIndex);
+                                        int hash = pos.hashCode() ^ state.hashCode();
+                                        int colorIndex = Math.abs(hash) % dyeColors.size();
+                                        String colorCode = dyeColors.get(colorIndex);
 
                                         try {
                                             if (colorCode != null
                                             && colorCode.startsWith(
                                                     "#")
-                                            && colorCode.length() == 7) {
+                                                    && colorCode.length() == 7
+                                            ) {
                                                 int color = Integer
                                                         .parseInt(colorCode
                                                                 .substring(1),
@@ -3466,12 +4023,13 @@ public class BuildScape {
 
                             return -1;
                         },
-                        ModBlocks.GLOW_LIGHTS.get());
+                        ModBlocks.GLOW_LIGHTS.get()
+                );
 
-                net.minecraft.client.color.item.ItemColors itemColors = net.minecraft.client.Minecraft
-                        .getInstance().getItemColors();
-                net.minecraft.client.color.item.ItemColors vanillaItemColors = net.minecraft.client.Minecraft
-                        .getInstance().getItemColors();
+                net.minecraft.client.color.item.ItemColors itemColors =
+                        net.minecraft.client.Minecraft.getInstance().getItemColors();
+                net.minecraft.client.color.item.ItemColors vanillaItemColors =
+                        net.minecraft.client.Minecraft.getInstance().getItemColors();
 
                 itemColors.register(
                         (stack, tintIndex) -> {
@@ -3481,50 +4039,58 @@ public class BuildScape {
 
                             net.minecraft.world.item.Item item = stack.getItem();
                             if (item instanceof net.minecraft.world.item.BlockItem) {
-                                net.minecraft.world.level.block.Block block = ((net.minecraft.world.item.BlockItem) item)
-                                        .getBlock();
+                                net.minecraft.world.level.block.Block block =
+                                        ((net.minecraft.world.item.BlockItem) item).getBlock();
 
                                 int color = -1;
                                 if (block == ModBlocks.OAK_LEAF_HEDGE.get()
-                                || block == ModBlocks.OAK_LEAF_LAYERS
-                                        .get()) {
+                                        || block == ModBlocks.OAK_LEAF_LAYERS.get()
+                                ) {
                                     color = vanillaItemColors.getColor(
                                             new net.minecraft.world.item.ItemStack(
-                                                    net.minecraft.world.item.Items.OAK_LEAVES),
-                                            0);
+                                                    net.minecraft.world.item.Items.OAK_LEAVES
+                                            ),
+                                            0
+                                    );
                                 } else if (block == ModBlocks.JUNGLE_LEAF_HEDGE.get()
                                 || block == ModBlocks.JUNGLE_LEAF_LAYERS
                                         .get()) {
                                     color = vanillaItemColors.getColor(
                                             new net.minecraft.world.item.ItemStack(
-                                                    net.minecraft.world.item.Items.JUNGLE_LEAVES),
-                                            0);
+                                                    net.minecraft.world.item.Items.JUNGLE_LEAVES
+                                            ),
+                                            0
+                                    );
                                 } else if (block == ModBlocks.ACACIA_LEAF_HEDGE.get()
                                 || block == ModBlocks.ACACIA_LEAF_LAYERS
                                         .get()) {
                                     color = vanillaItemColors.getColor(
                                             new net.minecraft.world.item.ItemStack(
-                                                    net.minecraft.world.item.Items.ACACIA_LEAVES),
-                                            0);
+                                                    net.minecraft.world.item.Items.ACACIA_LEAVES
+                                            ),
+                                            0
+                                    );
                                 } else if (block == ModBlocks.DARK_OAK_LEAF_HEDGE.get()
-                                || block == ModBlocks.DARK_OAK_LEAF_LAYERS
-                                        .get()) {
+                                        || block == ModBlocks.DARK_OAK_LEAF_LAYERS.get()
+                                ) {
                                     color = vanillaItemColors.getColor(
                                             new net.minecraft.world.item.ItemStack(
-                                                    net.minecraft.world.item.Items.DARK_OAK_LEAVES),
-                                            0);
+                                                    net.minecraft.world.item.Items.DARK_OAK_LEAVES
+                                            ),
+                                            0
+                                    );
                                 } else if (block == ModBlocks.SPRUCE_LEAF_HEDGE.get()
                                 || block == ModBlocks.SPRUCE_LEAF_LAYERS
                                         .get()) {
                                     color = 0x619961;
                                 } else if (block == ModBlocks.BIRCH_LEAF_HEDGE.get()
-                                || block == ModBlocks.BIRCH_LEAF_LAYERS
-                                        .get()) {
+                                        || block == ModBlocks.BIRCH_LEAF_LAYERS.get()
+                                ) {
                                     color = 0x80a755;
                                 } else if (block == ModBlocks.MANGROVE_LEAVES.get()
                                 || block == ModBlocks.MANGROVE_LEAF_LAYERS
-                                        .get()
-                                || block == ModBlocks.MANGROVE_LEAF_HEDGE
+                                        .get() ||
+                                        block == ModBlocks.MANGROVE_LEAF_HEDGE
                                         .get()) {
                                     color = 0x92c648;
                                 }
@@ -3569,182 +4135,269 @@ public class BuildScape {
                         ModItems.SNOWY_AZALEA_LEAF_HEDGE.get(),
                         ModItems.SNOWY_FLOWERING_AZALEA_LEAF_HEDGE.get(),
                         ModItems.MANGROVE_LEAF_HEDGE.get(),
-                        ModItems.MANGROVE_LEAVES.get());
+                        ModItems.MANGROVE_LEAVES.get()
+                );
             });
         }
 
 
     }
 
-    @Mod.EventBusSubscriber(modid = MODID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
+    @Mod.EventBusSubscriber(
+            modid = MODID,
+            bus = Mod.EventBusSubscriber.Bus.FORGE,
+            value = Dist.CLIENT
+    )
     public static class ClientForgeEvents {
 
         @SubscribeEvent
         public static void onModelBake(
-                net.minecraftforge.client.event.ModelBakeEvent event) {
+                net.minecraftforge.client.event.ModelBakeEvent event
+        ) {
             LOGGER.info("ModelBakeEvent fired - wrapping leaf hedge models");
-            java.util.Set<net.minecraft.resources.ResourceLocation> leafHedgeModels = new java.util.HashSet<>();
+            java.util.Set<net.minecraft.resources.ResourceLocation> leafHedgeModels =
+                    new java.util.HashSet<>();
             leafHedgeModels.add(
                     new net.minecraft.resources.ResourceLocation(
                             BuildScape.MODID,
-                            "block/oak_leaf_hedge_post"));
+                            "block/oak_leaf_hedge_post"
+                    )
+            );
             leafHedgeModels.add(
                     new net.minecraft.resources.ResourceLocation(
                             BuildScape.MODID,
-                            "block/oak_leaf_hedge_side"));
+                            "block/oak_leaf_hedge_side"
+                    )
+            );
             leafHedgeModels.add(
                     new net.minecraft.resources.ResourceLocation(
                             BuildScape.MODID,
-                            "block/oak_leaf_hedge_side_tall"));
+                            "block/oak_leaf_hedge_side_tall"
+                    )
+            );
             leafHedgeModels.add(
                     new net.minecraft.resources.ResourceLocation(
                             BuildScape.MODID,
-                            "block/oak_leaf_hedge_inventory"));
+                            "block/oak_leaf_hedge_inventory"
+                    )
+            );
             leafHedgeModels.add(
                     new net.minecraft.resources.ResourceLocation(
                             BuildScape.MODID,
-                            "block/spruce_leaf_hedge_post"));
+                            "block/spruce_leaf_hedge_post"
+                    )
+            );
             leafHedgeModels.add(
                     new net.minecraft.resources.ResourceLocation(
                             BuildScape.MODID,
-                            "block/spruce_leaf_hedge_side"));
+                            "block/spruce_leaf_hedge_side"
+                    )
+            );
             leafHedgeModels.add(
                     new net.minecraft.resources.ResourceLocation(
                             BuildScape.MODID,
-                            "block/spruce_leaf_hedge_side_tall"));
+                            "block/spruce_leaf_hedge_side_tall"
+                    )
+            );
             leafHedgeModels.add(
                     new net.minecraft.resources.ResourceLocation(
                             BuildScape.MODID,
-                            "block/spruce_leaf_hedge_inventory"));
+                            "block/spruce_leaf_hedge_inventory"
+                    )
+            );
             leafHedgeModels.add(
                     new net.minecraft.resources.ResourceLocation(
                             BuildScape.MODID,
-                            "block/birch_leaf_hedge_post"));
+                            "block/birch_leaf_hedge_post"
+                    )
+            );
             leafHedgeModels.add(
                     new net.minecraft.resources.ResourceLocation(
                             BuildScape.MODID,
-                            "block/birch_leaf_hedge_side"));
+                            "block/birch_leaf_hedge_side"
+                    )
+            );
             leafHedgeModels.add(
                     new net.minecraft.resources.ResourceLocation(
                             BuildScape.MODID,
-                            "block/birch_leaf_hedge_side_tall"));
+                            "block/birch_leaf_hedge_side_tall"
+                    )
+            );
             leafHedgeModels.add(
                     new net.minecraft.resources.ResourceLocation(
                             BuildScape.MODID,
-                            "block/birch_leaf_hedge_inventory"));
+                            "block/birch_leaf_hedge_inventory"
+                    )
+            );
             leafHedgeModels.add(
                     new net.minecraft.resources.ResourceLocation(
                             BuildScape.MODID,
-                            "block/jungle_leaf_hedge_post"));
+                            "block/jungle_leaf_hedge_post"
+                    )
+            );
             leafHedgeModels.add(
                     new net.minecraft.resources.ResourceLocation(
                             BuildScape.MODID,
-                            "block/jungle_leaf_hedge_side"));
+                            "block/jungle_leaf_hedge_side"
+                    )
+            );
             leafHedgeModels.add(
                     new net.minecraft.resources.ResourceLocation(
                             BuildScape.MODID,
-                            "block/jungle_leaf_hedge_side_tall"));
+                            "block/jungle_leaf_hedge_side_tall"
+                    )
+            );
             leafHedgeModels.add(
                     new net.minecraft.resources.ResourceLocation(
                             BuildScape.MODID,
-                            "block/jungle_leaf_hedge_inventory"));
+                            "block/jungle_leaf_hedge_inventory"
+                    )
+            );
             leafHedgeModels.add(
                     new net.minecraft.resources.ResourceLocation(
                             BuildScape.MODID,
-                            "block/acacia_leaf_hedge_post"));
+                            "block/acacia_leaf_hedge_post"
+                    )
+            );
             leafHedgeModels.add(
                     new net.minecraft.resources.ResourceLocation(
                             BuildScape.MODID,
-                            "block/acacia_leaf_hedge_side"));
+                            "block/acacia_leaf_hedge_side"
+                    )
+            );
             leafHedgeModels.add(
                     new net.minecraft.resources.ResourceLocation(
                             BuildScape.MODID,
-                            "block/acacia_leaf_hedge_side_tall"));
+                            "block/acacia_leaf_hedge_side_tall"
+                    )
+            );
             leafHedgeModels.add(
                     new net.minecraft.resources.ResourceLocation(
                             BuildScape.MODID,
-                            "block/acacia_leaf_hedge_inventory"));
+                            "block/acacia_leaf_hedge_inventory"
+                    )
+            );
             leafHedgeModels.add(
                     new net.minecraft.resources.ResourceLocation(
                             BuildScape.MODID,
-                            "block/dark_oak_leaf_hedge_post"));
+                            "block/dark_oak_leaf_hedge_post"
+                    )
+            );
             leafHedgeModels.add(
                     new net.minecraft.resources.ResourceLocation(
                             BuildScape.MODID,
-                            "block/dark_oak_leaf_hedge_side"));
+                            "block/dark_oak_leaf_hedge_side"
+                    )
+            );
             leafHedgeModels.add(
                     new net.minecraft.resources.ResourceLocation(
                             BuildScape.MODID,
-                            "block/dark_oak_leaf_hedge_side_tall"));
+                            "block/dark_oak_leaf_hedge_side_tall"
+                    )
+            );
             leafHedgeModels.add(
                     new net.minecraft.resources.ResourceLocation(
                             BuildScape.MODID,
-                            "block/dark_oak_leaf_hedge_inventory"));
+                            "block/dark_oak_leaf_hedge_inventory"
+                    )
+            );
             leafHedgeModels.add(
                     new net.minecraft.resources.ResourceLocation(
                             BuildScape.MODID,
-                            "block/azalea_leaf_hedge_post"));
+                            "block/azalea_leaf_hedge_post"
+                    )
+            );
             leafHedgeModels.add(
                     new net.minecraft.resources.ResourceLocation(
                             BuildScape.MODID,
-                            "block/azalea_leaf_hedge_side"));
+                            "block/azalea_leaf_hedge_side"
+                    )
+            );
             leafHedgeModels.add(
                     new net.minecraft.resources.ResourceLocation(
                             BuildScape.MODID,
-                            "block/azalea_leaf_hedge_side_tall"));
+                            "block/azalea_leaf_hedge_side_tall"
+                    )
+            );
             leafHedgeModels.add(
                     new net.minecraft.resources.ResourceLocation(
                             BuildScape.MODID,
-                            "block/azalea_leaf_hedge_inventory"));
+                            "block/azalea_leaf_hedge_inventory"
+                    )
+            );
             leafHedgeModels.add(
                     new net.minecraft.resources.ResourceLocation(
                             BuildScape.MODID,
-                            "block/flowering_azalea_leaf_hedge_post"));
+                            "block/flowering_azalea_leaf_hedge_post"
+                    )
+            );
             leafHedgeModels.add(
                     new net.minecraft.resources.ResourceLocation(
                             BuildScape.MODID,
-                            "block/flowering_azalea_leaf_hedge_side"));
+                            "block/flowering_azalea_leaf_hedge_side"
+                    )
+            );
             leafHedgeModels.add(
                     new net.minecraft.resources.ResourceLocation(
                             BuildScape.MODID,
-                            "block/flowering_azalea_leaf_hedge_side_tall"));
+                            "block/flowering_azalea_leaf_hedge_side_tall"
+                    )
+            );
             leafHedgeModels.add(
                     new net.minecraft.resources.ResourceLocation(
                             BuildScape.MODID,
-                            "block/flowering_azalea_leaf_hedge_inventory"));
+                            "block/flowering_azalea_leaf_hedge_inventory"
+                    )
+            );
 
             leafHedgeModels.add(
                     new net.minecraft.resources.ResourceLocation(
                             BuildScape.MODID,
-                            "item/oak_leaf_hedge"));
+                            "item/oak_leaf_hedge"
+                    )
+            );
             leafHedgeModels.add(
                     new net.minecraft.resources.ResourceLocation(
                             BuildScape.MODID,
-                            "item/spruce_leaf_hedge"));
+                            "item/spruce_leaf_hedge"
+                    )
+            );
             leafHedgeModels.add(
                     new net.minecraft.resources.ResourceLocation(
                             BuildScape.MODID,
-                            "item/birch_leaf_hedge"));
+                            "item/birch_leaf_hedge"
+                    )
+            );
             leafHedgeModels.add(
                     new net.minecraft.resources.ResourceLocation(
                             BuildScape.MODID,
-                            "item/jungle_leaf_hedge"));
+                            "item/jungle_leaf_hedge"
+                    )
+            );
             leafHedgeModels.add(
                     new net.minecraft.resources.ResourceLocation(
                             BuildScape.MODID,
-                            "item/acacia_leaf_hedge"));
+                            "item/acacia_leaf_hedge"
+                    )
+            );
             leafHedgeModels.add(
                     new net.minecraft.resources.ResourceLocation(
                             BuildScape.MODID,
-                            "item/dark_oak_leaf_hedge"));
+                            "item/dark_oak_leaf_hedge"
+                    )
+            );
             leafHedgeModels.add(
                     new net.minecraft.resources.ResourceLocation(
                             BuildScape.MODID,
-                            "item/azalea_leaf_hedge"));
+                            "item/azalea_leaf_hedge"
+                    )
+            );
             leafHedgeModels.add(
                     new net.minecraft.resources.ResourceLocation(
                             BuildScape.MODID,
-                            "item/flowering_azalea_leaf_hedge"));
+                            "item/flowering_azalea_leaf_hedge"
+                    )
+            );
 
             int wrappedCount = 0;
             int notFoundCount = 0;
@@ -3758,7 +4411,9 @@ public class BuildScape {
                             .put(
                                     modelLocation,
                                     new com.kingodogo.buildscape.client.model.TintedLeafHedgeModel(
-                                            originalModel));
+                                            originalModel
+                                    )
+                            );
                     wrappedCount++;
                     LOGGER.debug("Wrapped model: {}", modelLocation);
                 } else {
@@ -3769,55 +4424,66 @@ public class BuildScape {
             LOGGER.info(
                     "ModelBakeEvent: Wrapped {} leaf hedge models, {} not found",
                     wrappedCount,
-                    notFoundCount);
+                    notFoundCount
+            );
         }
     }
 
-    @Mod.EventBusSubscriber(modid = MODID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
+    @Mod.EventBusSubscriber(
+            modid = MODID,
+            bus = Mod.EventBusSubscriber.Bus.MOD,
+            value = Dist.CLIENT
+    )
     public static class ClientModEventsParticles {
 
         @SubscribeEvent
         public static void registerFactories(
-                net.minecraftforge.client.event.ParticleFactoryRegisterEvent event) {
-            net.minecraft.client.Minecraft.getInstance().particleEngine.register(
+                net.minecraftforge.client.event.ParticleFactoryRegisterEvent event
+        ) {
+            net.minecraft.client.Minecraft.getInstance()
+                    .particleEngine.register(
                     com.kingodogo.buildscape.particle.ModParticles.GLOW_LIME_SPARKLE.get(),
-                    sprites -> new com.kingodogo.buildscape.particle.PillarSparkleParticle.Provider(
-                            sprites));
+                            sprites ->
+                                    new com.kingodogo.buildscape.particle.PillarSparkleParticle.Provider(
+                                            sprites
+                                    )
+                    );
 
-            net.minecraft.client.Minecraft.getInstance().particleEngine.register(
+            net.minecraft.client.Minecraft.getInstance()
+                    .particleEngine.register(
                     com.kingodogo.buildscape.particle.ModParticles.TINTED_DRIP_FALL.get(),
-                    sprites -> new com.kingodogo.buildscape.particle.TintedDripParticle.Provider(
-                            sprites));
+                            sprites ->
+                                    new com.kingodogo.buildscape.particle.TintedDripParticle.Provider(
+                                            sprites
+                                    )
+                    );
 
-            net.minecraft.client.Minecraft.getInstance().particleEngine.register(
+            net.minecraft.client.Minecraft.getInstance()
+                    .particleEngine.register(
                     com.kingodogo.buildscape.particle.ModParticles.TINTED_SPORE.get(),
-                    sprites -> new com.kingodogo.buildscape.particle.TintedSporeParticle.Provider(
-                            sprites));
+                            sprites ->
+                                    new com.kingodogo.buildscape.particle.TintedSporeParticle.Provider(
+                                            sprites
+                                    )
+                    );
 
-            net.minecraft.client.Minecraft.getInstance().particleEngine.register(
+            net.minecraft.client.Minecraft.getInstance()
+                    .particleEngine.register(
                     com.kingodogo.buildscape.particle.ModParticles.SNOWFLAKE.get(),
-                    sprites -> new com.kingodogo.buildscape.particle.SnowflakeParticle.Provider(
-                            sprites));
+                            sprites ->
+                                    new com.kingodogo.buildscape.particle.SnowflakeParticle.Provider(
+                                            sprites
+                                    )
+                    );
 
-            net.minecraft.client.Minecraft.getInstance().particleEngine.register(
+            net.minecraft.client.Minecraft.getInstance()
+                    .particleEngine.register(
                     com.kingodogo.buildscape.particle.ModParticles.CONFETTI.get(),
-                    sprites -> new com.kingodogo.buildscape.particle.ConfettiParticle.Provider(
-                            sprites));
-
-            net.minecraft.client.Minecraft.getInstance().particleEngine.register(
-                    com.kingodogo.buildscape.particle.ModParticles.TINTABLE_HEART.get(),
-                    sprites -> new com.kingodogo.buildscape.particle.TintableHeartParticle.Provider(
-                            sprites));
-
-            net.minecraft.client.Minecraft.getInstance().particleEngine.register(
-                    com.kingodogo.buildscape.particle.ModParticles.CAKE.get(),
-                    sprites -> new com.kingodogo.buildscape.particle.CakeParticle.Provider(
-                            sprites));
-
-            net.minecraft.client.Minecraft.getInstance().particleEngine.register(
-                    com.kingodogo.buildscape.particle.ModParticles.CHERRY.get(),
-                    sprites -> new com.kingodogo.buildscape.particle.CherryParticle.Provider(
-                            sprites));
+                            sprites ->
+                                    new com.kingodogo.buildscape.particle.ConfettiParticle.Provider(
+                                            sprites
+                                    )
+                    );
 
             net.minecraft.client.Minecraft.getInstance().particleEngine.register(
                     com.kingodogo.buildscape.particle.ModParticles.BUBBLE.get(),

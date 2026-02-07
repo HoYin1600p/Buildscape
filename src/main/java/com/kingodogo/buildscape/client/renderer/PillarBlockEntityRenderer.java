@@ -3,11 +3,6 @@ package com.kingodogo.buildscape.client.renderer;
 import com.kingodogo.buildscape.block.PillarBlockEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Vector3f;
-
-import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.block.model.ItemTransforms;
@@ -21,6 +16,10 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.SpawnEggItem;
 import net.minecraft.world.level.Level;
+
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class PillarBlockEntityRenderer
         implements BlockEntityRenderer<PillarBlockEntity> {
@@ -218,6 +217,60 @@ public class PillarBlockEntityRenderer
         }
     }
 
+    public static void cleanupStaleEntities() {
+        entityCache
+                .entrySet()
+                .removeIf(entry -> {
+                    Entity entity = entry.getValue();
+                    if (entity == null || !entity.isAlive()) {
+                        return true;
+                    }
+                    // Remove entities that are too old (older than 5 minutes of game time)
+                    // This prevents memory leaks if blocks are removed without calling clearEntityCache
+                    return false; // For now, keep all alive entities
+                });
+    }
+
+    public static void clearEntityCache(BlockPos pos) {
+        // Remove all entities cached for this position
+        entityCache
+                .entrySet()
+                .removeIf(entry -> {
+                    if (
+                            entry
+                                    .getKey()
+                                    .startsWith(pos.getX() + "," + pos.getY() + "," + pos.getZ() + ":")
+                    ) {
+                        Entity entity = entry.getValue();
+                        if (entity != null && entity.isAlive()) {
+                            entity.remove(Entity.RemovalReason.DISCARDED);
+                        }
+                        return true;
+                    }
+                    return false;
+                });
+
+        // Also clear the client-side timer and item hash for this position
+        clientStartTimes.remove(pos);
+        itemHashes.remove(pos);
+    }
+
+    public static void clearEntityCache() {
+        // Remove all entities and discard them
+        entityCache
+                .values()
+                .forEach(entity -> {
+                    if (entity != null && entity.isAlive()) {
+                        entity.remove(Entity.RemovalReason.DISCARDED);
+                    }
+                });
+        entityCache.clear();
+
+        // Clear all client-side timers and item hashes
+        clientStartTimes.clear();
+        itemHashes.clear();
+    }
+
     private void renderMob(
             SpawnEggItem spawnEgg,
             ItemStack spawnEggStack,
@@ -295,7 +348,9 @@ public class PillarBlockEntityRenderer
                 // Set tickCount to 0 to prevent time-based animations (bees, blazes, cod, etc.)
                 entity.tickCount = 0;
 
-                if (entity instanceof net.minecraft.world.entity.LivingEntity livingEntity) {
+                if (entity instanceof net.minecraft.world.entity.LivingEntity) {
+                    net.minecraft.world.entity.LivingEntity livingEntity =
+                            (net.minecraft.world.entity.LivingEntity) entity;
                     // Disable AI to prevent any AI-driven animations (only available on Mob, not all LivingEntity)
                     if (entity instanceof net.minecraft.world.entity.Mob) {
                         ((net.minecraft.world.entity.Mob) entity).setNoAi(true);
@@ -323,7 +378,9 @@ public class PillarBlockEntityRenderer
 
                 // Entity-specific animation prevention
                 // Bees: prevent wing flapping and other animations
-                if (entity instanceof net.minecraft.world.entity.animal.Bee bee) {
+                if (entity instanceof net.minecraft.world.entity.animal.Bee) {
+                    net.minecraft.world.entity.animal.Bee bee =
+                            (net.minecraft.world.entity.animal.Bee) entity;
                     bee.setRemainingPersistentAngerTime(0);
                 }
 
@@ -359,7 +416,9 @@ public class PillarBlockEntityRenderer
             // Reset tickCount every frame to prevent time-based animations (bees, blazes, cod, etc.)
             entity.tickCount = 0;
 
-            if (entity instanceof net.minecraft.world.entity.LivingEntity livingEntity) {
+            if (entity instanceof net.minecraft.world.entity.LivingEntity) {
+                net.minecraft.world.entity.LivingEntity livingEntity =
+                        (net.minecraft.world.entity.LivingEntity) entity;
                 // Disable AI every frame to prevent any AI-driven animations (only available on Mob, not all LivingEntity)
                 if (entity instanceof net.minecraft.world.entity.Mob) {
                     ((net.minecraft.world.entity.Mob) entity).setNoAi(true);
@@ -387,7 +446,9 @@ public class PillarBlockEntityRenderer
 
             // Entity-specific animation prevention every frame
             // Bees: prevent wing flapping and other animations
-            if (entity instanceof net.minecraft.world.entity.animal.Bee bee) {
+            if (entity instanceof net.minecraft.world.entity.animal.Bee) {
+                net.minecraft.world.entity.animal.Bee bee =
+                        (net.minecraft.world.entity.animal.Bee) entity;
                 bee.setRemainingPersistentAngerTime(0);
             }
 
@@ -413,7 +474,9 @@ public class PillarBlockEntityRenderer
             entity.yRotO = prevYRot; // Previous rotation for smooth interpolation
 
             // Update head/body rotation for living entities to match the rotation
-            if (entity instanceof net.minecraft.world.entity.LivingEntity livingEntity) {
+            if (entity instanceof net.minecraft.world.entity.LivingEntity) {
+                net.minecraft.world.entity.LivingEntity livingEntity =
+                        (net.minecraft.world.entity.LivingEntity) entity;
                 // Update body and head rotation to match the rotation animation
                 float prevBodyRot = livingEntity.yBodyRot;
                 livingEntity.yBodyRot = finalYaw;
@@ -495,58 +558,6 @@ public class PillarBlockEntityRenderer
                 poseStack.popPose();
             }
         }
-    }
-
-    public static void clearEntityCache(BlockPos pos) {
-        // Remove all entities cached for this position
-        entityCache
-                .entrySet()
-                .removeIf(entry -> {
-                    if (
-                            entry
-                                    .getKey()
-                                    .startsWith(pos.getX() + "," + pos.getY() + "," + pos.getZ() + ":")
-                    ) {
-                        Entity entity = entry.getValue();
-                        if (entity != null && entity.isAlive()) {
-                            entity.remove(Entity.RemovalReason.DISCARDED);
-                        }
-                        return true;
-                    }
-                    return false;
-                });
-
-        // Also clear the client-side timer and item hash for this position
-        clientStartTimes.remove(pos);
-        itemHashes.remove(pos);
-    }
-
-    public static void clearEntityCache() {
-        // Remove all entities and discard them
-        entityCache
-                .values()
-                .forEach(entity -> {
-                    if (entity != null && entity.isAlive()) {
-                        entity.remove(Entity.RemovalReason.DISCARDED);
-                    }
-                });
-        entityCache.clear();
-
-        // Clear all client-side timers and item hashes
-        clientStartTimes.clear();
-        itemHashes.clear();
-    }
-
-    public static void cleanupStaleEntities() {
-        entityCache
-                .entrySet()
-                .removeIf(entry -> {
-                    Entity entity = entry.getValue();
-                    return entity == null || !entity.isAlive();
-                    // Remove entities that are too old (older than 5 minutes of game time)
-                    // This prevents memory leaks if blocks are removed without calling clearEntityCache
-// For now, keep all alive entities
-                });
     }
 
     private boolean hasSpinNameTag(ItemStack stack) {

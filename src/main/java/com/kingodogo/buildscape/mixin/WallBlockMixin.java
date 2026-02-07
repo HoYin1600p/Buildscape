@@ -1,7 +1,6 @@
 package com.kingodogo.buildscape.mixin;
 
 import com.kingodogo.buildscape.block.OrnamentBlock;
-import net.minecraft.tags.BlockTags;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
@@ -17,14 +16,18 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(WallBlock.class)
 public class WallBlockMixin {
 
-    private static final TagKey<Block> WALLS_TAG = BlockTags.WALLS;
+    private static final TagKey<Block> WALLS_TAG = TagKey.create(
+            Registry.BLOCK_REGISTRY,
+            new ResourceLocation("minecraft:walls")
+    );
 
     @Inject(method = "connectsTo", at = @At("HEAD"), cancellable = true)
     private void connectsTo(
             BlockState state,
             boolean sideSolidFullSquare,
             Direction direction,
-            CallbackInfoReturnable<Boolean> cir) {
+            CallbackInfoReturnable<Boolean> cir
+    ) {
         Block block = state.getBlock();
         if (block instanceof WallBlock) {
             cir.setReturnValue(true);
@@ -36,6 +39,7 @@ public class WallBlockMixin {
         }
         if (state.is(WALLS_TAG)) {
             cir.setReturnValue(true);
+            return;
         }
     }
 }

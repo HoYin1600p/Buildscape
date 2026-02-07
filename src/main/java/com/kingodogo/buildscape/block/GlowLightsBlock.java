@@ -1,7 +1,5 @@
 package com.kingodogo.buildscape.block;
 
-import javax.annotation.Nullable;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
@@ -27,6 +25,8 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+
+import javax.annotation.Nullable;
 
 public class GlowLightsBlock
         extends net.minecraft.world.level.block.VineBlock
@@ -523,7 +523,9 @@ public class GlowLightsBlock
             );
 
             if (property != null && state.getBlock() == heldBlock) {
-                return !state.hasProperty(property) || !state.getValue(property);
+                if (state.hasProperty(property) && state.getValue(property)) {
+                    return false;
+                }
             }
 
             return true;

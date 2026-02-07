@@ -3,23 +3,6 @@ package com.kingodogo.buildscape.config;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
-
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.lang.reflect.Type;
-import java.nio.channels.FileChannel;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.Level;
@@ -27,6 +10,15 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.LevelResource;
 import net.minecraftforge.server.ServerLifecycleHooks;
+
+import java.io.*;
+import java.lang.reflect.Type;
+import java.nio.channels.FileChannel;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class PillarIdManager {
 
@@ -390,7 +382,7 @@ public class PillarIdManager {
             char c2 = ALPHANUMERIC.charAt(random.nextInt(36));
             char c3 = ALPHANUMERIC.charAt(random.nextInt(36));
             char c4 = ALPHANUMERIC.charAt(random.nextInt(36));
-            String id = prefix + c1 + c2 + c3 + c4;
+            String id = prefix + "" + c1 + c2 + c3 + c4;
             if (!pillarData.containsKey(id)) {
                 return id;
             }
@@ -403,6 +395,7 @@ public class PillarIdManager {
                     for (int l = 0; l < 36; l++) {
                         String id =
                                 prefix +
+                                        "" +
                                         c1 +
                                         ALPHANUMERIC.charAt(j) +
                                         ALPHANUMERIC.charAt(k) +
@@ -1078,7 +1071,8 @@ public class PillarIdManager {
                                         level.getChunk(chunkX, chunkZ);
 
                                 if (
-                                        !(chunkAccess instanceof net.minecraft.world.level.chunk.LevelChunk chunk)
+                                        !(chunkAccess instanceof
+                                                net.minecraft.world.level.chunk.LevelChunk)
                                 ) {
                                     continue;
                                 }
@@ -1091,12 +1085,18 @@ public class PillarIdManager {
                                     continue;
                                 }
 
+                                net.minecraft.world.level.chunk.LevelChunk chunk =
+                                        (net.minecraft.world.level.chunk.LevelChunk) chunkAccess;
+
                                 for (net.minecraft.world.level.block.entity.BlockEntity be : chunk
                                         .getBlockEntities()
                                         .values()) {
                                     if (
-                                            be instanceof com.kingodogo.buildscape.block.PillarBlockEntity pillarBE
+                                            be instanceof
+                                                    com.kingodogo.buildscape.block.PillarBlockEntity
                                     ) {
+                                        com.kingodogo.buildscape.block.PillarBlockEntity pillarBE =
+                                                (com.kingodogo.buildscape.block.PillarBlockEntity) be;
 
                                         if (
                                                 pillarBE.getPillarId() != null &&
@@ -1217,7 +1217,8 @@ public class PillarIdManager {
                                         level.getChunk(chunkX, chunkZ);
 
                                 if (
-                                        !(chunkAccess instanceof net.minecraft.world.level.chunk.LevelChunk chunk)
+                                        !(chunkAccess instanceof
+                                                net.minecraft.world.level.chunk.LevelChunk)
                                 ) {
                                     continue;
                                 }
@@ -1229,6 +1230,9 @@ public class PillarIdManager {
                                 ) {
                                     continue;
                                 }
+
+                                net.minecraft.world.level.chunk.LevelChunk chunk =
+                                        (net.minecraft.world.level.chunk.LevelChunk) chunkAccess;
 
                                 for (net.minecraft.world.level.block.entity.BlockEntity be : chunk
                                         .getBlockEntities()
@@ -1248,9 +1252,11 @@ public class PillarIdManager {
 
                     for (net.minecraft.world.level.block.entity.BlockEntity be : allBlockEntities) {
                         if (
-                                be instanceof com.kingodogo.buildscape.block.PillarBlockEntity pillarBE
+                                be instanceof com.kingodogo.buildscape.block.PillarBlockEntity
                         ) {
                             try {
+                                com.kingodogo.buildscape.block.PillarBlockEntity pillarBE =
+                                        (com.kingodogo.buildscape.block.PillarBlockEntity) be;
 
                                 String pillarId = pillarBE.getPillarId();
                                 if (pillarId == null || pillarId.isEmpty()) {
@@ -1295,7 +1301,7 @@ public class PillarIdManager {
                                                 for (int i = 0; i < pillarColors.size(); i++) {
                                                     String nbtColor = pillarColors.get(i);
                                                     String managerColor = i < existingData.dyeColors.size() ? existingData.dyeColors.get(i) : null;
-                                                    if (nbtColor == null || !nbtColor.equals(managerColor)) {
+                                                    if (nbtColor == null || managerColor == null || !nbtColor.equals(managerColor)) {
                                                         colorsChanged = true;
                                                         break;
                                                     }
@@ -1640,8 +1646,10 @@ public class PillarIdManager {
                         net.minecraft.world.level.block.entity.BlockEntity be =
                                 level.getBlockEntity(pos);
                         if (
-                                be instanceof com.kingodogo.buildscape.block.PillarBlockEntity pillarBE
+                                be instanceof com.kingodogo.buildscape.block.PillarBlockEntity
                         ) {
+                            com.kingodogo.buildscape.block.PillarBlockEntity pillarBE =
+                                    (com.kingodogo.buildscape.block.PillarBlockEntity) be;
 
                             pillarBE.forceSetColors(data.getColors(), data.id);
                             syncedCount++;
@@ -1878,7 +1886,7 @@ public class PillarIdManager {
                                 for (int i = 0; i < nbtColors.size(); i++) {
                                     String nbtColor = nbtColors.get(i);
                                     String managerColor = i < data.dyeColors.size() ? data.dyeColors.get(i) : null;
-                                    if (nbtColor == null || !nbtColor.equals(managerColor)) {
+                                    if (nbtColor == null || managerColor == null || !nbtColor.equals(managerColor)) {
                                         needsSync = true;
                                         break;
                                     }

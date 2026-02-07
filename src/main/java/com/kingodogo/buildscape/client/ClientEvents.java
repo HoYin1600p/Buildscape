@@ -1,37 +1,29 @@
 package com.kingodogo.buildscape.client;
 
-import com.kingodogo.buildscape.block.BigCandleBlock;
 import com.kingodogo.buildscape.block.LeafHedgeBlock;
 import com.kingodogo.buildscape.block.PillarBlockEntity;
 import com.kingodogo.buildscape.config.PillarParticleConfig;
-import com.kingodogo.buildscape.network.CyclePillarPatternPacket;
-import com.kingodogo.buildscape.network.ModMessages;
-import com.mojang.math.Vector3f;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.HitResult;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
-import net.minecraftforge.client.event.EntityViewRenderEvent;
-import net.minecraftforge.client.event.FOVModifierEvent;
-import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
-import net.minecraftforge.client.event.RenderLevelStageEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
-@Mod.EventBusSubscriber(modid = com.kingodogo.buildscape.BuildScape.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
+@Mod.EventBusSubscriber(
+        modid = com.kingodogo.buildscape.BuildScape.MODID,
+        bus = Mod.EventBusSubscriber.Bus.FORGE,
+        value = Dist.CLIENT
+)
 public class ClientEvents {
 
     private static boolean wasPressed = false;
@@ -52,8 +44,7 @@ public class ClientEvents {
 
     public static void resetAllPillarParticles() {
         Minecraft mc = Minecraft.getInstance();
-        if (mc.level == null || mc.player == null)
-            return;
+        if (mc.level == null || mc.player == null) return;
 
         net.minecraft.core.BlockPos playerPos = mc.player.blockPosition();
         int chunkX = playerPos.getX() >> 4;
@@ -63,11 +54,14 @@ public class ClientEvents {
             for (int z = -8; z <= 8; z++) {
                 net.minecraft.world.level.chunk.LevelChunk chunk = mc.level.getChunk(
                         chunkX + x,
-                        chunkZ + z);
+                        chunkZ + z
+                );
                 if (chunk != null) {
                     for (BlockEntity be : chunk.getBlockEntities().values()) {
-                        if (be instanceof PillarBlockEntity pillarBE &&
-                                pillarBE.hasDisplayItem()) {
+                        if (
+                                be instanceof PillarBlockEntity pillarBE &&
+                                        pillarBE.hasDisplayItem()
+                        ) {
                             pillarBE.resetParticleTick(true);
                         }
                     }
@@ -89,12 +83,10 @@ public class ClientEvents {
 
     @SubscribeEvent
     public static void onRenderGameOverlay(RenderGameOverlayEvent.Post event) {
-        if (event.getType() != RenderGameOverlayEvent.ElementType.ALL)
-            return;
+        if (event.getType() != RenderGameOverlayEvent.ElementType.ALL) return;
 
         Minecraft mc = Minecraft.getInstance();
-        if (mc.player == null || mc.level == null)
-            return;
+        if (mc.player == null || mc.level == null) return;
 
         if (overlayMessage != null) {
             long currentTime = mc.level.getGameTime();
@@ -118,7 +110,8 @@ public class ClientEvents {
                     overlayMessage,
                     x,
                     y,
-                    0xFFFFFF);
+                    0xFFFFFF
+            );
         }
     }
 
@@ -147,7 +140,9 @@ public class ClientEvents {
                     float stepInterval = 2.0f;
                     int currentStep = (int) (player.walkDist / stepInterval);
 
-                    if (currentStep != lastHedgeStep && player.walkDist > player.walkDistO) {
+                    if (
+                            currentStep != lastHedgeStep && player.walkDist > player.walkDistO
+                    ) {
                         lastHedgeStep = currentStep;
 
                         SoundType sounds = blockBelow.getSoundType();
@@ -155,7 +150,11 @@ public class ClientEvents {
                         float volume = 0.15f;
                         float pitch = 1.0f;
 
-                        if (sounds instanceof com.kingodogo.buildscape.block.CustomSoundType customSounds) {
+                        if (
+                                sounds instanceof com.kingodogo.buildscape.block.CustomSoundType
+                        ) {
+                            com.kingodogo.buildscape.block.CustomSoundType customSounds =
+                                    (com.kingodogo.buildscape.block.CustomSoundType) sounds;
                             volume = customSounds.getStepVolume();
                             pitch = customSounds.getStepPitch();
                         }
@@ -168,7 +167,8 @@ public class ClientEvents {
                                 SoundSource.BLOCKS,
                                 volume,
                                 pitch,
-                                false);
+                                false
+                        );
                     }
                 }
             } else {
@@ -181,7 +181,8 @@ public class ClientEvents {
 
     @SubscribeEvent
     public static void onClientDisconnect(
-            ClientPlayerNetworkEvent.LoggedOutEvent event) {
+            ClientPlayerNetworkEvent.LoggedOutEvent event
+    ) {
         overlayMessage = null;
         overlayMessageTime = 0;
         wasPressed = false;
@@ -234,18 +235,8 @@ public class ClientEvents {
             com.kingodogo.buildscape.config.PillarParticleConfig.clearServerConfig();
         } catch (Exception e) {
             System.err.println(
-                    "BuildScape: Error clearing caches on world unload: " + e.getMessage());
-        }
-    }
-
-    @SubscribeEvent
-    public static void onRegisterLayers(net.minecraftforge.client.event.EntityRenderersEvent.AddLayers event) {
-        for (String skin : event.getSkins()) {
-            net.minecraft.client.renderer.entity.player.PlayerRenderer renderer = event.getSkin(skin);
-            if (renderer != null) {
-                renderer.addLayer(new com.kingodogo.buildscape.client.renderer.layer.CosmeticLayer(renderer,
-                        event.getEntityModels()));
-            }
+                    "BuildScape: Error clearing caches on world unload: " + e.getMessage()
+            );
         }
     }
 }

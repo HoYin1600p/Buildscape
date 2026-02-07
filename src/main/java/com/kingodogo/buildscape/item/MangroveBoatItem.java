@@ -1,8 +1,5 @@
 package com.kingodogo.buildscape.item;
 
-import java.util.List;
-import java.util.function.Predicate;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
@@ -19,6 +16,9 @@ import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+
+import java.util.List;
+import java.util.function.Predicate;
 
 public class MangroveBoatItem extends Item {
 
@@ -56,7 +56,7 @@ public class MangroveBoatItem extends Item {
                 for (Entity entity : list) {
                     AABB aabb = entity
                             .getBoundingBox()
-                            .inflate(entity.getPickRadius());
+                            .inflate((double) entity.getPickRadius());
                     if (aabb.contains(vec31)) {
                         return InteractionResultHolder.pass(itemstack);
                     }

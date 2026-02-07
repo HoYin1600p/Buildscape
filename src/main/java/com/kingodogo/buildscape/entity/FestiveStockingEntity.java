@@ -1,7 +1,5 @@
 package com.kingodogo.buildscape.entity;
 
-import javax.annotation.Nullable;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -11,7 +9,6 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
@@ -21,12 +18,12 @@ import net.minecraft.world.entity.decoration.HangingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.phys.Vec3;
+
+import javax.annotation.Nullable;
 
 public class FestiveStockingEntity extends HangingEntity {
 
@@ -165,17 +162,17 @@ public class FestiveStockingEntity extends HangingEntity {
             double d6, d7, d8;
 
             if (this.direction.getAxis() == Direction.Axis.Z) {
-                d6 = this.getWidth();
-                d7 = this.getHeight();
+                d6 = (double) this.getWidth();
+                d7 = (double) this.getHeight();
                 d8 = 2.0D;
             } else if (this.direction.getAxis() == Direction.Axis.X) {
                 d6 = 2.0D;
-                d7 = this.getHeight();
-                d8 = this.getWidth();
+                d7 = (double) this.getHeight();
+                d8 = (double) this.getWidth();
             } else {
-                d6 = this.getWidth();
+                d6 = (double) this.getWidth();
                 d7 = 2.0D;
-                d8 = this.getHeight();
+                d8 = (double) this.getHeight();
             }
 
             d6 /= 32.0D;
@@ -218,7 +215,8 @@ public class FestiveStockingEntity extends HangingEntity {
             ItemStack storedItem = this.getItem();
             boolean hasSilkTouch = false;
 
-            if (entity instanceof Player player) {
+            if (entity instanceof Player) {
+                Player player = (Player) entity;
                 ItemStack tool = player.getMainHandItem();
                 if (
                         EnchantmentHelper.getItemEnchantmentLevel(

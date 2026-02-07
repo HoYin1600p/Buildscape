@@ -3,11 +3,6 @@ package com.kingodogo.buildscape.event;
 import com.kingodogo.buildscape.BuildScape;
 import com.kingodogo.buildscape.config.PillarParticleConfig;
 import com.kingodogo.buildscape.particle.ModParticles;
-
-import java.util.Map;
-import java.util.Random;
-import java.util.concurrent.ConcurrentHashMap;
-
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.nbt.CompoundTag;
@@ -27,6 +22,10 @@ import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+
+import java.util.Map;
+import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Mod.EventBusSubscriber(
         modid = BuildScape.MODID,
@@ -72,9 +71,10 @@ public class ItemFrameParticleHandler {
     public static void onEntityInteract(
             PlayerInteractEvent.EntityInteract event
     ) {
-        if (!(event.getTarget() instanceof ItemFrame itemFrame)) {
+        if (!(event.getTarget() instanceof ItemFrame)) {
             return;
         }
+        ItemFrame itemFrame = (ItemFrame) event.getTarget();
 
         Player player = event.getPlayer();
         Level level = event.getWorld();
@@ -397,7 +397,7 @@ public class ItemFrameParticleHandler {
             );
 
             level.addParticle(
-                    ModParticles.GLOW_LIME_SPARKLE.get(),
+                    (SimpleParticleType) ModParticles.GLOW_LIME_SPARKLE.get(),
                     centerX + sx,
                     centerY + sy,
                     centerZ + sz,

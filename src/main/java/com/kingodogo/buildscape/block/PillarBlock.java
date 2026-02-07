@@ -1,7 +1,5 @@
 package com.kingodogo.buildscape.block;
 
-import java.util.List;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
@@ -29,6 +27,8 @@ import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+
+import java.util.List;
 
 public class PillarBlock
         extends Block
@@ -621,11 +621,12 @@ public class PillarBlock
         }
 
         BlockEntity blockEntity = level.getBlockEntity(pos);
-        if (!(blockEntity instanceof PillarBlockEntity pillarBE)) {
+        if (!(blockEntity instanceof PillarBlockEntity)) {
             return InteractionResult.PASS;
         }
 
         ItemStack heldItem = player.getItemInHand(hand);
+        PillarBlockEntity pillarBE = (PillarBlockEntity) blockEntity;
 
         if (!heldItem.isEmpty()) {
             java.util.Map.Entry<String, String> dyeInfo = getDyeColorAndName(

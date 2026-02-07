@@ -16,18 +16,8 @@ import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import java.util.Random;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.StringJoiner;
+import java.util.*;
 
 public class PillarIdsConfigTab extends AbstractConfigTab {
     private static final int BASE_HEADER_HEIGHT = 28;
@@ -1653,8 +1643,8 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
 
         // Horizontal edges - bottom
         for (int i = 0; i < 10; i++) {
-            double x = centerX - 0.5 + (random.nextDouble());
-            double z = centerZ - 0.5 + (random.nextDouble());
+            double x = centerX - 0.5 + (random.nextDouble() * 1.0);
+            double z = centerZ - 0.5 + (random.nextDouble() * 1.0);
             level.addParticle(ParticleTypes.END_ROD, x, pos.getY() + 0.1, centerZ - 0.5, 0, 0, 0);
             level.addParticle(ParticleTypes.END_ROD, x, pos.getY() + 0.1, centerZ + 0.5, 0, 0, 0);
             level.addParticle(ParticleTypes.END_ROD, centerX - 0.5, pos.getY() + 0.1, z, 0, 0, 0);
@@ -1663,8 +1653,8 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
 
         // Horizontal edges - top
         for (int i = 0; i < 10; i++) {
-            double x = centerX - 0.5 + (random.nextDouble());
-            double z = centerZ - 0.5 + (random.nextDouble());
+            double x = centerX - 0.5 + (random.nextDouble() * 1.0);
+            double z = centerZ - 0.5 + (random.nextDouble() * 1.0);
             level.addParticle(ParticleTypes.END_ROD, x, pos.getY() + 0.9, centerZ - 0.5, 0, 0, 0);
             level.addParticle(ParticleTypes.END_ROD, x, pos.getY() + 0.9, centerZ + 0.5, 0, 0, 0);
             level.addParticle(ParticleTypes.END_ROD, centerX - 0.5, pos.getY() + 0.9, z, 0, 0, 0);

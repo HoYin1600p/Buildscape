@@ -4,12 +4,10 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.WallBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
@@ -39,7 +37,8 @@ public class LeafHedgeBlock extends WallBlock {
             BlockState state,
             Entity entity
     ) {
-        if (entity instanceof Player player) {
+        if (entity instanceof Player) {
+            Player player = (Player) entity;
             if (player.isOnGround() && level.isClientSide) {
                 BlockPos playerBlockPos = entity.blockPosition();
                 BlockPos blockBelowPlayer = playerBlockPos.below();
@@ -59,7 +58,8 @@ public class LeafHedgeBlock extends WallBlock {
             BlockPos pos,
             Entity entity
     ) {
-        if (entity instanceof Player player) {
+        if (entity instanceof Player) {
+            Player player = (Player) entity;
             if (player.isOnGround() && level.isClientSide) {
                 BlockPos playerBlockPos = entity.blockPosition();
                 boolean isInside = playerBlockPos.getY() == pos.getY();
@@ -110,7 +110,8 @@ public class LeafHedgeBlock extends WallBlock {
             float volume = 0.15f;
             float pitch = 1.0f;
 
-            if (sounds instanceof CustomSoundType customSounds) {
+            if (sounds instanceof CustomSoundType) {
+                CustomSoundType customSounds = (CustomSoundType) sounds;
                 volume = customSounds.getStepVolume();
                 pitch = customSounds.getStepPitch();
             }

@@ -12,14 +12,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Registry for parsing and resolving cosmetic IDs to Minecraft registry
- * entries.
+ * Registry for parsing and resolving cosmetic IDs to Minecraft registry entries.
  * 
  * Cosmetic IDs are strings in format:
- * - "item:namespace:item_id" - Item cosmetic (e.g.,
- * "item:minecraft:diamond_sword")
- * - "block:namespace:block_id" - Block cosmetic (e.g.,
- * "block:minecraft:gold_block")
+ * - "item:namespace:item_id" - Item cosmetic (e.g., "item:minecraft:diamond_sword")
+ * - "block:namespace:block_id" - Block cosmetic (e.g., "block:minecraft:gold_block")
  * - "nbt:custom_data" - NBT-based cosmetic (custom data stored in game)
  * - "type:armor_set_1" - Type-based cosmetic (armor sets, etc.)
  * 
@@ -48,9 +45,8 @@ public class CosmeticRegistry {
 
     /**
      * Parse a cosmetic ID string and return the type and identifier.
-     * 
-     * @param cosmeticId Cosmetic ID string (e.g.,
-     *                   "buildscape:cosmatics/gear/diamond_sword")
+     *
+     * @param cosmeticId Cosmetic ID string (e.g., "buildscape:cosmatics/gear/diamond_sword")
      * @return Parsed cosmetic info, or null if invalid format
      */
     @Nullable
@@ -69,13 +65,12 @@ public class CosmeticRegistry {
 
                 // Map new categories to internal types
                 String type = category;
-                if (category.equals("gear"))
-                    type = "item"; // Default to item for gear
-
+                if (category.equals("gear")) type = "item"; // Default to item for gear
+                
                 // Get legacy ID from CosmeticManager if possible for resolving
                 CosmeticManager.CosmeticMetadata metadata = CosmeticManager.getInstance().getMetadata(cosmeticId);
-                String legacyId = (metadata != null) ? metadata.legacyId() : null;
-
+                String legacyId = (metadata != null) ? metadata.legacyId : null;
+                
                 if (legacyId != null) {
                     // Parse legacy ID to get namespace and id
                     String[] legacyParts = legacyId.split(":", 3);
@@ -186,17 +181,11 @@ public class CosmeticRegistry {
             return null;
         }
 
-        // Check if this is a custom HEAD cosmetic - these should NOT resolve to
-        // ItemStacks
-        // Custom head cosmetics like builder's hat use custom models, not ItemStack
-        // models
+        // Check if this is a custom HEAD cosmetic - these should NOT resolve to ItemStacks
+        // Custom head cosmetics like builder's hat use custom models, not ItemStack models
         CosmeticManager.CosmeticMetadata meta = CosmeticManager.getInstance().getMetadata(cosmeticId);
-        if (meta != null && meta.type() == CosmeticManager.CosmeticType.HEAD) {
-            // For Builder's Hat, return actual item
-            if ("buildscape:cosmatics/gear/builders_hat".equals(cosmeticId)) {
-                return new ItemStack(com.kingodogo.buildscape.item.ModItems.BUILDERS_HAT.get());
-            }
-            // Return null for other custom head cosmetics - they use custom rendering
+        if (meta != null && meta.type == CosmeticManager.CosmeticType.HEAD) {
+            // Return null for custom head cosmetics - they use custom rendering
             return null;
         }
 
@@ -210,38 +199,9 @@ public class CosmeticRegistry {
 
         CosmeticInfo info = parseCosmeticId(cosmeticId);
         if (info != null) {
-            // Check if it's a particle trail
+            // Check if it's a particle trail (use nether star as placeholder)
             if (info.type.equals("particle")) {
-                Item item = net.minecraft.world.item.Items.NETHER_STAR; // Default
-
-                String idLower = info.id.toLowerCase();
-                if (idLower.contains("heart"))
-                    item = net.minecraft.world.item.Items.RED_DYE;
-                else if (idLower.contains("bubble"))
-                    item = net.minecraft.world.item.Items.PRISMARINE_CRYSTALS;
-                else if (idLower.contains("cherry"))
-                    item = net.minecraft.world.item.Items.PINK_WOOL;
-                else if (idLower.contains("note"))
-                    item = net.minecraft.world.item.Items.NOTE_BLOCK;
-                else if (idLower.contains("snowflake"))
-                    item = net.minecraft.world.item.Items.SNOWBALL;
-                else if (idLower.contains("firework"))
-                    item = net.minecraft.world.item.Items.FIREWORK_ROCKET;
-                else if (idLower.contains("cake"))
-                    item = net.minecraft.world.item.Items.CAKE;
-                else if (idLower.contains("slime"))
-                    item = net.minecraft.world.item.Items.SLIME_BALL;
-                else if (idLower.contains("cloud"))
-                    item = net.minecraft.world.item.Items.WHITE_WOOL;
-                else if (idLower.contains("smoke"))
-                    item = net.minecraft.world.item.Items.CAMPFIRE;
-
-                result = new ItemStack(item);
-
-                // Set custom name if available
-                if (meta != null && meta.name() != null && !meta.name().isEmpty()) {
-                    result.setHoverName(new net.minecraft.network.chat.TextComponent(meta.name()));
-                }
+                result = new ItemStack(net.minecraft.world.item.Items.NETHER_STAR);
             } else if (info.type.equals("wings")) {
                 // For wings, try to resolve as item (usually elytra)
                 Item item = resolveToItem(cosmeticId);
@@ -271,11 +231,11 @@ public class CosmeticRegistry {
                         } else {
                             // Fallback: if cosmetic metadata has a legacyId, try resolving that
                             // Reuse the meta variable we already have from the HEAD check above
-                            if (meta != null && meta.legacyId() != null && !meta.legacyId().isEmpty()) {
-                                Item legacyItem = resolveToItem(meta.legacyId());
+                            if (meta != null && meta.legacyId != null && !meta.legacyId.isEmpty()) {
+                                Item legacyItem = resolveToItem(meta.legacyId);
                                 if (legacyItem == null) {
                                     // legacyId might be block:... or item:...
-                                    Block legacyBlock = resolveToBlock(meta.legacyId());
+                                    Block legacyBlock = resolveToBlock(meta.legacyId);
                                     if (legacyBlock != null) {
                                         result = new ItemStack(legacyBlock.asItem());
                                     }
@@ -337,9 +297,20 @@ public class CosmeticRegistry {
     }
 
     /**
-         * Internal class to hold parsed cosmetic information.
-         */
-        public record CosmeticInfo(String type, String namespace, String id, String fullId) {
+     * Internal class to hold parsed cosmetic information.
+     */
+    public static class CosmeticInfo {
+        public final String type;
+        public final String namespace;
+        public final String id;
+        public final String fullId;
+
+        public CosmeticInfo(String type, String namespace, String id, String fullId) {
+            this.type = type;
+            this.namespace = namespace;
+            this.id = id;
+            this.fullId = fullId;
+        }
     }
 
     /**
@@ -350,3 +321,4 @@ public class CosmeticRegistry {
         ItemStack createItemStack();
     }
 }
+

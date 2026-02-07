@@ -5,13 +5,13 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiComponent;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ElytraItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
 public class ArmorDisplayPanel extends BasePanel {
     private static final int PADDING = 5;
@@ -23,9 +23,9 @@ public class ArmorDisplayPanel extends BasePanel {
     private final CosmeticRegistry cosmeticRegistry = CosmeticRegistry.getInstance();
     private final SupportersTabState state = SupportersTabState.getInstance();
     
-    
+
     private static final String[] ARMOR_SLOTS = {"head", "chest", "legs", "feet"};
-    
+
     private int getArmorSlotIndex(ItemStack stack) {
         if (stack == null || stack.isEmpty()) {
             return -1;
@@ -37,7 +37,8 @@ public class ArmorDisplayPanel extends BasePanel {
             return 1;
         }
 
-        if (item instanceof ArmorItem armor) {
+        if (item instanceof ArmorItem) {
+            ArmorItem armor = (ArmorItem) item;
             switch (armor.getSlot()) {
                 case HEAD:
                     return 0;
@@ -140,7 +141,7 @@ public class ArmorDisplayPanel extends BasePanel {
         
         RenderSystem.disableScissor();
     }
-    
+
     public boolean handleDrop(double mouseX, double mouseY, String draggedCosmeticId) {
         if (draggedCosmeticId == null || draggedCosmeticId.isEmpty()) {
             return false;
@@ -176,7 +177,7 @@ public class ArmorDisplayPanel extends BasePanel {
         
         return false;
     }
-    
+
     public boolean canDropOnSlot(int slotIndex, String cosmeticId) {
         if (cosmeticId == null || cosmeticId.isEmpty()) {
             return false;

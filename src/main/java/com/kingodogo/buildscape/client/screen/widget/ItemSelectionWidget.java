@@ -1,5 +1,7 @@
 package com.kingodogo.buildscape.client.screen.widget;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
@@ -9,8 +11,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.registries.ForgeRegistries;
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.systems.RenderSystem;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -33,7 +34,7 @@ public class ItemSelectionWidget extends AbstractWidget {
 
     private final Consumer<String> onItemSelected;
     private final Predicate<String> isItemInConfig;
-    private final List<Item> allItems;
+    private List<Item> allItems;
     private List<Item> filteredItems;
     private String filter = "";
     private double scrollOffset = 0;

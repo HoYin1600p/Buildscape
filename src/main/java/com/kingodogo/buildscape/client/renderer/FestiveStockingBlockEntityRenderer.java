@@ -52,10 +52,11 @@ public class FestiveStockingBlockEntityRenderer
         }
 
         BlockState state = blockEntity.getBlockState();
-        if (!(state.getBlock() instanceof FestiveStockingBlock block)) {
+        if (!(state.getBlock() instanceof FestiveStockingBlock)) {
             return;
         }
 
+        FestiveStockingBlock block = (FestiveStockingBlock) state.getBlock();
         Direction facing = state.getValue(FestiveStockingBlock.FACING);
         boolean flipped = state.getValue(FestiveStockingBlock.FLIPPED);
 

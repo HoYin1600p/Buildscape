@@ -2,7 +2,6 @@ package com.kingodogo.buildscape.client.renderer;
 
 import com.kingodogo.buildscape.block.IcicleCauldronBlockEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
@@ -67,8 +66,10 @@ public class IcicleCauldronBlockEntityRenderer
         ItemStack storedIcicle = blockEntity.getStoredIcicle();
         if (
                 !storedIcicle.isEmpty() &&
-                        storedIcicle.getItem() instanceof net.minecraft.world.item.BlockItem blockItem
+                        storedIcicle.getItem() instanceof net.minecraft.world.item.BlockItem
         ) {
+            net.minecraft.world.item.BlockItem blockItem =
+                    (net.minecraft.world.item.BlockItem) storedIcicle.getItem();
             BlockState icicleBlockState = blockItem.getBlock().defaultBlockState();
 
             poseStack.pushPose();

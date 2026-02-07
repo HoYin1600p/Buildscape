@@ -242,6 +242,10 @@ public class MushroomShelvesBlock
             return false;
         }
 
-        return hasNoHorizontalShelves(level, pos);
+        if (!hasNoHorizontalShelves(level, pos)) {
+            return false;
+        }
+
+        return true;
     }
 }

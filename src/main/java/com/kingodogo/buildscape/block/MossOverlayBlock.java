@@ -64,7 +64,10 @@ public class MossOverlayBlock extends Block {
     @Override
     public boolean canSurvive(BlockState state, LevelReader level, BlockPos pos) {
         BlockState blockBelow = level.getBlockState(pos.below());
-        return !blockBelow.isAir() && !blockBelow.is(Blocks.BARRIER);
+        if (blockBelow.isAir() || blockBelow.is(Blocks.BARRIER)) {
+            return false;
+        }
+        return true;
     }
 
     @Override

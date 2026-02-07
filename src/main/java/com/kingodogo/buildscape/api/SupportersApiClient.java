@@ -8,7 +8,6 @@ import com.kingodogo.buildscape.api.model.CosmeticData;
 import com.kingodogo.buildscape.api.model.SupporterStatus;
 import com.kingodogo.buildscape.api.model.TiersResponse;
 
-import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -17,7 +16,6 @@ import java.time.Duration;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
 
 public class SupportersApiClient {
     private static final String BASE_URL = "https://buildscape.online/api/v1";
@@ -223,7 +221,7 @@ public class SupportersApiClient {
     }
     
     private static class ConnectRequest {
-        private final String verificationCode;
+        private String verificationCode;
         
         public ConnectRequest(String verificationCode) {
             this.verificationCode = verificationCode;

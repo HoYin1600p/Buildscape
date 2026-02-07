@@ -3,11 +3,6 @@ package com.kingodogo.buildscape.worldgen;
 import com.google.common.collect.Lists;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-
-import java.util.List;
-import java.util.Random;
-import java.util.function.BiConsumer;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.valueproviders.IntProvider;
@@ -17,6 +12,10 @@ import net.minecraft.world.level.levelgen.feature.configurations.TreeConfigurati
 import net.minecraft.world.level.levelgen.feature.foliageplacers.FoliagePlacer;
 import net.minecraft.world.level.levelgen.feature.trunkplacers.TrunkPlacer;
 import net.minecraft.world.level.levelgen.feature.trunkplacers.TrunkPlacerType;
+
+import java.util.List;
+import java.util.Random;
+import java.util.function.BiConsumer;
 
 public class MangroveUpwardsBranchingTrunkPlacer extends TrunkPlacer {
 
@@ -88,7 +87,7 @@ public class MangroveUpwardsBranchingTrunkPlacer extends TrunkPlacer {
             int y = elevatedStartY + i;
             mutablePos.set(pos.getX(), y, pos.getZ());
 
-            if (placeLog(level, blockSetter, random, mutablePos, config)) {
+            if (this.placeLog(level, blockSetter, random, mutablePos, config)) {
                 if (i > 0 && random.nextFloat() < placeBranchPerLogProbability) {
                     this.placeBranch(
                             level,
@@ -142,7 +141,7 @@ public class MangroveUpwardsBranchingTrunkPlacer extends TrunkPlacer {
 
         for (int i = 0; i < branchLength; i++) {
             branchEnd.move(branchDirection);
-            if (placeLog(level, blockSetter, random, branchEnd, config)) {
+            if (this.placeLog(level, blockSetter, random, branchEnd, config)) {
                 currentPos.set(branchEnd);
             } else {
                 break;
@@ -151,7 +150,7 @@ public class MangroveUpwardsBranchingTrunkPlacer extends TrunkPlacer {
 
         for (int i = 0; i < branchSteps; i++) {
             branchEnd.move(Direction.UP);
-            if (placeLog(level, blockSetter, random, branchEnd, config)) {
+            if (this.placeLog(level, blockSetter, random, branchEnd, config)) {
                 currentPos.set(branchEnd);
                 foliageAttachments.add(
                         new FoliagePlacer.FoliageAttachment(currentPos.immutable(), 0, false)

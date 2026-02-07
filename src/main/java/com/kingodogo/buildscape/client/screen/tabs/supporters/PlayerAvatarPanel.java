@@ -644,18 +644,26 @@ public class PlayerAvatarPanel extends BasePanel {
             
             // Render player (rotatable via mouse drag - 3D sphere rotation)
             try {
+                // CRITICAL: Set shader color to full white BEFORE rendering to prevent darkening
+                RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
+
                 // The entity renderer expects world coordinates, but we're in GUI space
                 // All rotations are applied in the pose stack, so pass 0.0f to renderer
                 // The pose stack handles all rotation (yaw and pitch) for sphere rotation
                 playerRenderer.render(player, 0.0f, partialTick, poseStack, bufferSource, lightLevel);
                 bufferSource.endBatch(); // Flush buffers
-                
+
+                // CRITICAL: Reset shader color AFTER rendering player to ensure brightness
+                RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
+
                 // Render particle trails around player in GUI
                 renderParticleTrails(poseStack, equippedCosmetics, player, partialTick);
             } catch (Exception e) {
                 BuildScape.getLogger().error("Error rendering player: " + e.getMessage());
                 // Don't print stack trace in production, just log
             } finally {
+                // CRITICAL: Always reset shader color to white to prevent darkening issues
+                RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
                 RenderSystem.disableDepthTest();
                 RenderSystem.disableBlend();
             }

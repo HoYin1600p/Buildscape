@@ -306,6 +306,12 @@ public class SupportersOnlyTab extends AbstractConfigTab {
         if (!mouseOverPanel1 && panel5 != null) {
             panel5.renderTooltips(poseStack, mouseX, mouseY);
         }
+
+        // CRITICAL: Render color picker LAST to ensure it's on top of everything
+        // This prevents the player avatar from rendering over the color picker
+        if (panel1 != null) {
+            panel1.renderColorPickerOverlay(poseStack, mouseX, mouseY, partialTick);
+        }
     }
     
     @Override
@@ -326,9 +332,13 @@ public class SupportersOnlyTab extends AbstractConfigTab {
     
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
-        // Delegate to panels (they check bounds internally)
-        // No drag functionality for cosmetics anymore - single click equip/unequip
+        // CRITICAL: Delegate to panel1 FIRST for color picker dragging
+        // The color picker needs to handle drag events even when mouse goes outside panel bounds
+        if (panel1 != null && panel1.mouseDragged(mouseX, mouseY, button, dragX, dragY)) return true;
+
+        // Then delegate to panel5 for avatar rotation
         if (panel5 != null && panel5.mouseDragged(mouseX, mouseY, button, dragX, dragY)) return true;
+
         return false;
     }
     

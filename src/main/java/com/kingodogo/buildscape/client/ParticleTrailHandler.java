@@ -63,14 +63,14 @@ public class ParticleTrailHandler {
             case "cherry_leaves":
                 return ParticleTypes.SPORE_BLOSSOM_AIR;
             case "heart":
-                return ParticleTypes.HEART;
+                return ModParticles.TINTABLE_HEART.get();
             case "note":
                 return ParticleTypes.NOTE;
             case "snowflake":
                 return ModParticles.SNOWFLAKE.get();
             case "firework":
-                // Placeholder until custom PNG is added
-                return ParticleTypes.FLASH;
+                // Use actual firework particle
+                return ParticleTypes.FIREWORK;
             case "cake":
                 // Placeholder until custom PNG is added
                 return ParticleTypes.FLAME;
@@ -262,6 +262,13 @@ public class ParticleTrailHandler {
                     (int) (color[1] * 255),
                     (int) (color[2] * 255));
             com.kingodogo.buildscape.particle.PillarSparkleParticle.queueColor(
+                    spawnPos.x, spawnPos.y, spawnPos.z, colorCode);
+        } else if (particleType == ModParticles.TINTABLE_HEART.get() && manager.supportsColor(particleTrailId)) {
+             String colorCode = String.format("#%02X%02X%02X",
+                    (int) (color[0] * 255),
+                    (int) (color[1] * 255),
+                    (int) (color[2] * 255));
+             com.kingodogo.buildscape.particle.TintableHeartParticle.queueColor(
                     spawnPos.x, spawnPos.y, spawnPos.z, colorCode);
         }
 

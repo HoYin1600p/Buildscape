@@ -310,18 +310,10 @@ public class BuildScapeConfigScreen extends Screen {
         );
         addRenderableWidget(supportersButton);
         
-        // Edit GUI button in sidebar (above Ko-fi button, at bottom)
-        // Position relative to screen height
-        int editGuiY = height - scaleSize(60);
-        editGuiButton = new ScaledTextButton(
-            sidebarX, editGuiY,
-            buttonWidth, getScaledButtonHeight(),
-            new TranslatableComponent("buildscape.config.editgui"),
-            (button) -> openGuiEditor()
-        );
-        addRenderableWidget(editGuiButton);
-        
-        // Ko-fi button in sidebar (at very bottom)
+        // Edit GUI button - DISABLED (hidden from users)
+        // Edit GUI button is intentionally not added to screen
+
+        // Ko-fi button in sidebar (at bottom)
         int kofiY = height - scaleSize(30);
         kofiButton = new ScaledTextButton(
             sidebarX, kofiY,
@@ -477,14 +469,36 @@ public class BuildScapeConfigScreen extends Screen {
     }
     
     private void openKofiLink() {
+        String kofiUrl = "https://ko-fi.com/itzmedga";
+
+        // Send clickable link in chat
+        if (Minecraft.getInstance().player != null) {
+            // Create clickable chat component
+            net.minecraft.network.chat.MutableComponent linkComponent = new net.minecraft.network.chat.TextComponent("Ko-fi: ");
+            net.minecraft.network.chat.MutableComponent urlComponent = new net.minecraft.network.chat.TextComponent(kofiUrl)
+                .withStyle(style -> style
+                    .withColor(net.minecraft.ChatFormatting.AQUA)
+                    .withUnderlined(true)
+                    .withClickEvent(new net.minecraft.network.chat.ClickEvent(
+                        net.minecraft.network.chat.ClickEvent.Action.OPEN_URL,
+                        kofiUrl
+                    ))
+                    .withHoverEvent(new net.minecraft.network.chat.HoverEvent(
+                        net.minecraft.network.chat.HoverEvent.Action.SHOW_TEXT,
+                        new net.minecraft.network.chat.TextComponent("Click to open Ko-fi link")
+                    ))
+                );
+
+            linkComponent.append(urlComponent);
+            Minecraft.getInstance().player.sendMessage(linkComponent, java.util.UUID.randomUUID());
+        }
+
+        // Also try to open in browser
         try {
-            URI uri = new URI("https://ko-fi.com/kingodogo");
+            URI uri = new URI(kofiUrl);
             java.awt.Desktop.getDesktop().browse(uri);
         } catch (Exception e) {
-            Minecraft.getInstance().player.sendMessage(
-                new TranslatableComponent("buildscape.config.kofi.error"),
-                java.util.UUID.randomUUID()
-            );
+            // Silently fail if browser opening doesn't work - user can still click the chat link
         }
     }
     

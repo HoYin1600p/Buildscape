@@ -4486,6 +4486,15 @@ public class BuildScape {
                                             sprites
                                     )
                     );
+            
+            net.minecraft.client.Minecraft.getInstance()
+                    .particleEngine.register(
+                            com.kingodogo.buildscape.particle.ModParticles.TINTABLE_HEART.get(),
+                            sprites ->
+                                    new com.kingodogo.buildscape.particle.TintableHeartParticle.Provider(
+                                            sprites
+                                    )
+                    );
         }
     }
 }

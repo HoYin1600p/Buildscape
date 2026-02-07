@@ -145,6 +145,13 @@ public class TagsSelectorWidget extends AbstractWidget {
     
     @Override
     public void renderButton(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
+        // Recalculate maxVisibleRows dynamically based on current height
+        // This ensures proper display at all GUI scales
+        int topPadding = 5;
+        int availableHeight = height - topPadding;
+        maxVisibleRows = availableHeight / (TAG_BUTTON_HEIGHT + TAG_BUTTON_SPACING);
+        maxVisibleRows = Math.max(1, maxVisibleRows); // At least 1 row visible
+
         // Enable scissor to clip tags to widget bounds
         poseStack.pushPose();
         Minecraft mc = Minecraft.getInstance();
@@ -155,17 +162,17 @@ public class TagsSelectorWidget extends AbstractWidget {
         int scissorWidth = (int)(width * guiScale);
         int scissorHeight = (int)(height * guiScale);
         RenderSystem.enableScissor(scissorX, scissorY, scissorWidth, scissorHeight);
-        
+
         // Background removed - too large
-        
+
         // Title is now rendered in PillarItemsConfigTab for proper alignment
         // Removed title rendering here
-        
+
         // Calculate visible tags (one per line)
         int startRow = (int) scrollOffset;
         int endRow = Math.min(startRow + maxVisibleRows, filteredTags.size());
-        
-        int tagY = y + 5; // Start tags closer to top since label is rendered elsewhere
+
+        int tagY = y + topPadding; // Start tags with top padding
         int tagWidth = width - 15; // Full width minus scrollbar space
         
         for (int row = startRow; row < endRow; row++) {
@@ -284,10 +291,16 @@ public class TagsSelectorWidget extends AbstractWidget {
         }
         
         // Check if clicking on a tag (one per line) - must match renderButton positions exactly
+        // Recalculate maxVisibleRows to match renderButton
+        int topPadding = 5;
+        int availableHeight = height - topPadding;
+        maxVisibleRows = availableHeight / (TAG_BUTTON_HEIGHT + TAG_BUTTON_SPACING);
+        maxVisibleRows = Math.max(1, maxVisibleRows);
+
         int startRow = (int) scrollOffset;
         int endRow = Math.min(startRow + maxVisibleRows, filteredTags.size());
-        
-        int tagY = y + 5; // Match renderButton tagY exactly
+
+        int tagY = y + topPadding; // Match renderButton tagY exactly
         int tagWidth = width - 15;
         
         for (int row = startRow; row < endRow; row++) {

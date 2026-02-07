@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/slab_top",
+  "textures": {
+    "bottom": "buildscape:block/caution_lime",
+    "top": "buildscape:block/caution_lime",
+    "side": "buildscape:block/caution_lime"
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "type=bottom": { "model": "buildscape:block/caution_factory_slab" },
+    "type=double": { "model": "buildscape:block/caution_factory" },
+    "type=top": { "model": "buildscape:block/caution_factory_slab_top" }
+  }
+}

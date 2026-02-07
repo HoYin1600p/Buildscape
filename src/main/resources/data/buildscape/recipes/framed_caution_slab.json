@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "###"
+  ],
+  "key": {
+    "#": {
+      "item": "buildscape:framed_caution"
+    }
+  },
+  "result": {
+    "item": "buildscape:framed_caution_slab",
+    "count": 6
+  }
+}

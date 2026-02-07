@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "axis=x": {
+      "model": "buildscape:block/steel_pillar",
+      "x": 90,
+      "y": 90
+    },
+    "axis=y": {
+      "model": "buildscape:block/steel_pillar"
+    },
+    "axis=z": {
+      "model": "buildscape:block/steel_pillar",
+      "x": 90
+    }
+  }
+}

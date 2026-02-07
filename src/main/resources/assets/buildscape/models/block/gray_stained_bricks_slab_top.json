@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/slab_top",
+  "textures": {
+    "bottom": "buildscape:block/gray_stained_bricks",
+    "top": "buildscape:block/gray_stained_bricks",
+    "side": "buildscape:block/gray_stained_bricks"
+  }
+}

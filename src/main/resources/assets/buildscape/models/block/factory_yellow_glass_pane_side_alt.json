@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/template_glass_pane_side_alt",
+  "textures": {
+    "pane": "buildscape:block/factory_yellow_glass",
+    "edge": "buildscape:block/factory_yellow_glass"
+  },
+  "render_type": "translucent"
+}

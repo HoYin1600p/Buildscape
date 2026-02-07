@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "buildscape:caution_blue"
+  },
+  "result": "buildscape:caution_cottoncandy",
+  "count": 1
+}

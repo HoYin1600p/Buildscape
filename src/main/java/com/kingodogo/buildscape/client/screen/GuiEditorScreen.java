@@ -28,9 +28,9 @@ public class GuiEditorScreen extends Screen {
     private final GuiConfigManager configManager;
     
     // Visual editing mode
-    private List<VisualElement> visualElements = new ArrayList<>();
+    private final List<VisualElement> visualElements = new ArrayList<>();
     private VisualElement selectedElement = null;
-    private List<VisualElement> selectedElements = new ArrayList<>(); // Multi-select support
+    private final List<VisualElement> selectedElements = new ArrayList<>(); // Multi-select support
     private String draggingElementId = null;
     private String resizingElementId = null;
     private ResizeHandle resizeHandle = null;
@@ -102,7 +102,7 @@ public class GuiEditorScreen extends Screen {
     private Button createSearchBarButton;
     private Button createTextBoxButton;
     private Button selectGroupToolButton;
-    private boolean toolboxExpanded = true; // Toolbox panel visibility
+    private final boolean toolboxExpanded = true; // Toolbox panel visibility
     
     // GUI scale support
     private int currentGuiScale = 2; // Default scale
@@ -176,8 +176,7 @@ public class GuiEditorScreen extends Screen {
         // Positions in config are relative to content area, but we need to convert to screen coordinates for editing
         int contentX = 0;
         int contentY = 0;
-        if (parent instanceof BuildScapeConfigScreen) {
-            BuildScapeConfigScreen configScreen = (BuildScapeConfigScreen) parent;
+        if (parent instanceof BuildScapeConfigScreen configScreen) {
             contentX = configScreen.getContentX();
             contentY = configScreen.getContentY();
         }
@@ -613,8 +612,7 @@ public class GuiEditorScreen extends Screen {
         }
         
         // Render the actual tab in the background (dimmed) so user can see what they're editing
-        if (sourceTab != null && parentScreen instanceof BuildScapeConfigScreen) {
-            BuildScapeConfigScreen configScreen = (BuildScapeConfigScreen) parentScreen;
+        if (sourceTab != null && parentScreen instanceof BuildScapeConfigScreen configScreen) {
             poseStack.pushPose();
             // Dim the background tab
             fill(poseStack, 0, 0, width, height, 0x80000000);
@@ -2342,8 +2340,7 @@ public class GuiEditorScreen extends Screen {
         currentGuiScale = scale;
         
         // Store scale in config for persistence
-        if (parentScreen instanceof BuildScapeConfigScreen) {
-            BuildScapeConfigScreen configScreen = (BuildScapeConfigScreen) parentScreen;
+        if (parentScreen instanceof BuildScapeConfigScreen configScreen) {
             config.screen.scale = scale;
         }
         
@@ -2456,7 +2453,7 @@ public class GuiEditorScreen extends Screen {
         element.config.properties.put("editorVisible", !currentVisible);
         
         // If hiding, deselect the element
-        if (!currentVisible == false) { // If we're hiding it
+        if (!!currentVisible) { // If we're hiding it
             element.selected = false;
             if (selectedElement == element) {
                 selectedElement = null;
@@ -2658,8 +2655,7 @@ public class GuiEditorScreen extends Screen {
         // Get content area offset
         int contentX = 0;
         int contentY = 0;
-        if (parentScreen instanceof BuildScapeConfigScreen) {
-            BuildScapeConfigScreen configScreen = (BuildScapeConfigScreen) parentScreen;
+        if (parentScreen instanceof BuildScapeConfigScreen configScreen) {
             contentX = configScreen.getContentX();
             contentY = configScreen.getContentY();
         }
@@ -2752,8 +2748,7 @@ public class GuiEditorScreen extends Screen {
         }
         
         // Refresh parent screen if it's a BuildScapeConfigScreen
-        if (parentScreen instanceof BuildScapeConfigScreen) {
-            BuildScapeConfigScreen configScreen = (BuildScapeConfigScreen) parentScreen;
+        if (parentScreen instanceof BuildScapeConfigScreen configScreen) {
             // Reinitialize the active tab to apply new positions
             if (configScreen.getActiveTab() != null && 
                 configScreen.getActiveTab().getTabName().equals(tabName)) {
@@ -2793,8 +2788,7 @@ public class GuiEditorScreen extends Screen {
             // Get content area for position conversion
             int contentX = 0;
             int contentY = 0;
-            if (parentScreen instanceof BuildScapeConfigScreen) {
-                BuildScapeConfigScreen configScreen = (BuildScapeConfigScreen) parentScreen;
+            if (parentScreen instanceof BuildScapeConfigScreen configScreen) {
                 contentX = configScreen.getContentX();
                 contentY = configScreen.getContentY();
             }
@@ -2812,10 +2806,8 @@ public class GuiEditorScreen extends Screen {
                 String elementId = field.getName();
                 GuiConfigData.ElementConfig elementConfig = null;
                 
-                if (value instanceof net.minecraft.client.gui.components.AbstractWidget) {
-                    net.minecraft.client.gui.components.AbstractWidget widget = 
-                        (net.minecraft.client.gui.components.AbstractWidget) value;
-                        // Skip if widget is not visible or has invalid position
+                if (value instanceof net.minecraft.client.gui.components.AbstractWidget widget) {
+                    // Skip if widget is not visible or has invalid position
                         if (!widget.visible || widget.x < 0 || widget.y < 0) continue;
                         // Convert to content-relative coordinates
                     elementConfig = new GuiConfigData.ElementConfig(
@@ -2827,9 +2819,8 @@ public class GuiEditorScreen extends Screen {
                         heightField.setAccessible(true);
                         elementConfig.height = heightField.getInt(widget);
                     } catch (Exception e) {}
-                } else if (value instanceof EditBox) {
-                    EditBox editBox = (EditBox) value;
-                        // Skip if edit box is not visible or has invalid position
+                } else if (value instanceof EditBox editBox) {
+                    // Skip if edit box is not visible or has invalid position
                         if (!editBox.visible || editBox.x < 0 || editBox.y < 0) continue;
                         // Convert to content-relative coordinates
                     elementConfig = new GuiConfigData.ElementConfig(
@@ -2840,10 +2831,9 @@ public class GuiEditorScreen extends Screen {
                         heightField.setAccessible(true);
                         elementConfig.height = heightField.getInt(editBox);
                     } catch (Exception e) {}
-                    } else if (value instanceof net.minecraft.client.gui.components.Button) {
+                    } else if (value instanceof Button button) {
                         // Also check Button specifically (it extends AbstractWidget but might be missed)
-                        net.minecraft.client.gui.components.Button button = (net.minecraft.client.gui.components.Button) value;
-                        if (!button.visible || button.x < 0 || button.y < 0) continue;
+                    if (!button.visible || button.x < 0 || button.y < 0) continue;
                         elementConfig = new GuiConfigData.ElementConfig(
                             button.x - contentX, button.y - contentY, button.getWidth(), 20
                         );
@@ -2872,9 +2862,7 @@ public class GuiEditorScreen extends Screen {
                 if (children != null) {
                     int index = 0;
                     for (net.minecraft.client.gui.components.events.GuiEventListener child : children) {
-                        if (child instanceof net.minecraft.client.gui.components.AbstractWidget) {
-                            net.minecraft.client.gui.components.AbstractWidget widget = 
-                                (net.minecraft.client.gui.components.AbstractWidget) child;
+                        if (child instanceof net.minecraft.client.gui.components.AbstractWidget widget) {
                             if (widget.visible && widget.x >= 0 && widget.y >= 0) {
                                 String elementId = "widget_" + index++;
                                 if (!discoveredWidgets.containsKey(elementId)) {

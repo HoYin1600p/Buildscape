@@ -39,8 +39,7 @@ public class LeafHedgeBlock extends WallBlock {
             BlockState state,
             Entity entity
     ) {
-        if (entity instanceof Player) {
-            Player player = (Player) entity;
+        if (entity instanceof Player player) {
             if (player.isOnGround() && level.isClientSide) {
                 BlockPos playerBlockPos = entity.blockPosition();
                 BlockPos blockBelowPlayer = playerBlockPos.below();
@@ -60,8 +59,7 @@ public class LeafHedgeBlock extends WallBlock {
             BlockPos pos,
             Entity entity
     ) {
-        if (entity instanceof Player) {
-            Player player = (Player) entity;
+        if (entity instanceof Player player) {
             if (player.isOnGround() && level.isClientSide) {
                 BlockPos playerBlockPos = entity.blockPosition();
                 boolean isInside = playerBlockPos.getY() == pos.getY();
@@ -112,8 +110,7 @@ public class LeafHedgeBlock extends WallBlock {
             float volume = 0.15f;
             float pitch = 1.0f;
 
-            if (sounds instanceof CustomSoundType) {
-                CustomSoundType customSounds = (CustomSoundType) sounds;
+            if (sounds instanceof CustomSoundType customSounds) {
                 volume = customSounds.getStepVolume();
                 pitch = customSounds.getStepPitch();
             }

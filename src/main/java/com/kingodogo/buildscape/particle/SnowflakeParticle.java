@@ -49,7 +49,7 @@ public class SnowflakeParticle extends TextureSheetParticle {
         
         // Fade out as it falls
         if (this.age > this.lifetime * 0.7F) {
-            float fadeProgress = (float)(this.age - this.lifetime * 0.7F) / (this.lifetime * 0.3F);
+            float fadeProgress = (this.age - this.lifetime * 0.7F) / (this.lifetime * 0.3F);
             this.alpha = (1.0F - fadeProgress) * 0.8F;
         }
     }

@@ -52,7 +52,7 @@ public class CosmeticLayer extends RenderLayer<AbstractClientPlayer, PlayerModel
         String headCosmeticId = equippedCosmetics.get(0); // Slot 0 is head
         if (headCosmeticId != null && !headCosmeticId.isEmpty()) {
             CosmeticManager.CosmeticMetadata metadata = cosmeticManager.getMetadata(headCosmeticId);
-            if (metadata != null && metadata.type == CosmeticManager.CosmeticType.HEAD) {
+            if (metadata != null && metadata.type() == CosmeticManager.CosmeticType.HEAD) {
                 // Render Builder's Hat (id: builders_hat)
                 if ("buildscape:cosmatics/gear/builders_hat".equals(headCosmeticId)) {
                     renderBuildersHat(poseStack, buffer, packedLight, player);

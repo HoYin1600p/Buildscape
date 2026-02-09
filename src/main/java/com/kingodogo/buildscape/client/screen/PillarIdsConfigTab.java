@@ -1477,8 +1477,8 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
         
         // Horizontal edges - bottom
         for (int i = 0; i < 10; i++) {
-            double x = centerX - 0.5 + (random.nextDouble() * 1.0);
-            double z = centerZ - 0.5 + (random.nextDouble() * 1.0);
+            double x = centerX - 0.5 + (random.nextDouble());
+            double z = centerZ - 0.5 + (random.nextDouble());
             level.addParticle(ParticleTypes.END_ROD, x, pos.getY() + 0.1, centerZ - 0.5, 0, 0, 0);
             level.addParticle(ParticleTypes.END_ROD, x, pos.getY() + 0.1, centerZ + 0.5, 0, 0, 0);
             level.addParticle(ParticleTypes.END_ROD, centerX - 0.5, pos.getY() + 0.1, z, 0, 0, 0);
@@ -1487,8 +1487,8 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
         
         // Horizontal edges - top
         for (int i = 0; i < 10; i++) {
-            double x = centerX - 0.5 + (random.nextDouble() * 1.0);
-            double z = centerZ - 0.5 + (random.nextDouble() * 1.0);
+            double x = centerX - 0.5 + (random.nextDouble());
+            double z = centerZ - 0.5 + (random.nextDouble());
             level.addParticle(ParticleTypes.END_ROD, x, pos.getY() + 0.9, centerZ - 0.5, 0, 0, 0);
             level.addParticle(ParticleTypes.END_ROD, x, pos.getY() + 0.9, centerZ + 0.5, 0, 0, 0);
             level.addParticle(ParticleTypes.END_ROD, centerX - 0.5, pos.getY() + 0.9, z, 0, 0, 0);

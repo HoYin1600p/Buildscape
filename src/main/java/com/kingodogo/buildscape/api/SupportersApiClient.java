@@ -223,7 +223,7 @@ public class SupportersApiClient {
     }
     
     private static class ConnectRequest {
-        private String verificationCode;
+        private final String verificationCode;
         
         public ConnectRequest(String verificationCode) {
             this.verificationCode = verificationCode;

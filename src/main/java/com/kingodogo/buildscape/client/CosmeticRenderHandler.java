@@ -9,8 +9,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.player.PlayerRenderer;
-import net.minecraft.client.model.geom.builders.LayerDefinition;
-import net.minecraft.client.model.geom.builders.PartDefinition;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RenderLevelStageEvent;
 import net.minecraftforge.client.event.RenderLivingEvent;
@@ -177,7 +175,7 @@ public class CosmeticRenderHandler {
             com.kingodogo.buildscape.cosmetics.CosmeticManager.CosmeticMetadata metadata = cosmeticManager
                     .getMetadata(cosmeticId);
             if (metadata != null
-                    && metadata.type == com.kingodogo.buildscape.cosmetics.CosmeticManager.CosmeticType.HEAD) {
+                    && metadata.type() == com.kingodogo.buildscape.cosmetics.CosmeticManager.CosmeticType.HEAD) {
                 if (entry.getKey() == 0) { // Slot 0 is head
                     customHeadCosmetic = cosmeticId;
                     // CRITICAL: Clear head slot IMMEDIATELY to prevent any helmet from rendering
@@ -197,7 +195,7 @@ public class CosmeticRenderHandler {
             com.kingodogo.buildscape.cosmetics.CosmeticManager.CosmeticMetadata metadata = cosmeticManager
                     .getMetadata(cosmeticId);
             if (metadata != null
-                    && metadata.type == com.kingodogo.buildscape.cosmetics.CosmeticManager.CosmeticType.HEAD) {
+                    && metadata.type() == com.kingodogo.buildscape.cosmetics.CosmeticManager.CosmeticType.HEAD) {
                 continue; // Skip ItemStack resolution for custom head cosmetics
             }
 
@@ -310,7 +308,7 @@ public class CosmeticRenderHandler {
     }
 
     // Cache for builders hat model part to avoid recreating it every frame
-    private static net.minecraft.client.model.geom.ModelPart buildersHatModelPart = null;
+    private static final net.minecraft.client.model.geom.ModelPart buildersHatModelPart = null;
 
     /**
      * Render a custom head cosmetic model.

@@ -370,8 +370,7 @@ public class PetalBlock extends BushBlock implements BonemealableBlock {
     ) {
         ItemStack itemStack = player.getItemInHand(hand);
 
-        if (itemStack.getItem() instanceof BlockItem) {
-            BlockItem blockItem = (BlockItem) itemStack.getItem();
+        if (itemStack.getItem() instanceof BlockItem blockItem) {
             if (
                     blockItem.getBlock() instanceof PetalBlock &&
                             blockItem.getBlock() == this

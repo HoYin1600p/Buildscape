@@ -20,12 +20,12 @@ public class PresetsWidget extends AbstractWidget {
     private List<PresetsConfig.Preset> presets;
     private List<String> presetKeys;
     private String selectedPresetKey = null;
-    private EditBox nameEditBox;
-    private Button createButton;
-    private Button saveButton;
-    private Button deleteButton;
-    private Button applyButton;
-    private Consumer<String> onPresetApplied;
+    private final EditBox nameEditBox;
+    private final Button createButton;
+    private final Button saveButton;
+    private final Button deleteButton;
+    private final Button applyButton;
+    private final Consumer<String> onPresetApplied;
     private int scrollOffset = 0;
     private boolean isDraggingScrollbar = false;
     private double scrollbarDragStartY = 0;
@@ -224,11 +224,7 @@ public class PresetsWidget extends AbstractWidget {
         }
         
         // Disable editing for default preset
-        if (key != null && key.equals("default")) {
-            nameEditBox.setEditable(false);
-        } else {
-            nameEditBox.setEditable(true);
-        }
+        nameEditBox.setEditable(key == null || !key.equals("default"));
     }
     
     public String getSelectedPresetKey() {
@@ -460,11 +456,7 @@ public class PresetsWidget extends AbstractWidget {
         if (deleteButton.mouseClicked(mouseX, mouseY, button)) {
             return true;
         }
-        if (applyButton.mouseClicked(mouseX, mouseY, button)) {
-            return true;
-        }
-        
-        return false;
+        return applyButton.mouseClicked(mouseX, mouseY, button);
     }
     
     @Override
@@ -537,18 +529,12 @@ public class PresetsWidget extends AbstractWidget {
     
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        if (nameEditBox.keyPressed(keyCode, scanCode, modifiers)) {
-            return true;
-        }
-        return false;
+        return nameEditBox.keyPressed(keyCode, scanCode, modifiers);
     }
     
     @Override
     public boolean charTyped(char codePoint, int modifiers) {
-        if (nameEditBox.charTyped(codePoint, modifiers)) {
-            return true;
-        }
-        return false;
+        return nameEditBox.charTyped(codePoint, modifiers);
     }
     
     @Override

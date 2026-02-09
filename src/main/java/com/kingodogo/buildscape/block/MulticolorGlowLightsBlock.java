@@ -348,9 +348,7 @@ public class MulticolorGlowLightsBlock
                                     (state.getBlock() instanceof MulticolorGlowLightsBlock &&
                                             heldBlock instanceof GlowLightsBlock))
             ) {
-                if (state.hasProperty(property) && state.getValue(property)) {
-                    return false;
-                }
+                return !state.hasProperty(property) || !state.getValue(property);
             }
 
             return true;

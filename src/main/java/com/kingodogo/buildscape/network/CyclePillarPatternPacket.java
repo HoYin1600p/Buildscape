@@ -40,15 +40,13 @@ public class CyclePillarPatternPacket {
 
                     BlockEntity be = player.level.getBlockEntity(pillarPos);
 
-                    if (!(be instanceof PillarBlockEntity)) {
+                    if (!(be instanceof PillarBlockEntity pillar)) {
                         player.displayClientMessage(
                                 new net.minecraft.network.chat.TextComponent("Not a valid pillar!"),
                                 false
                         );
                         return;
                     }
-
-                    PillarBlockEntity pillar = (PillarBlockEntity) be;
 
                     if (!pillar.hasDisplayItem()) {
                         player.displayClientMessage(

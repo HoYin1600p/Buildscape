@@ -288,9 +288,7 @@ public class FestiveStockingBlock
             BlockPos pos
     ) {
         BlockEntity be = level.getBlockEntity(pos);
-        if (be instanceof FestiveStockingBlockEntity) {
-            FestiveStockingBlockEntity stockingEntity =
-                    (FestiveStockingBlockEntity) be;
+        if (be instanceof FestiveStockingBlockEntity stockingEntity) {
             return stockingEntity.getComparatorOutput();
         }
         return 0;
@@ -306,9 +304,7 @@ public class FestiveStockingBlock
             BlockHitResult hit
     ) {
         BlockEntity be = level.getBlockEntity(pos);
-        if (be instanceof FestiveStockingBlockEntity) {
-            FestiveStockingBlockEntity stockingEntity =
-                    (FestiveStockingBlockEntity) be;
+        if (be instanceof FestiveStockingBlockEntity stockingEntity) {
             ItemStack heldItem = player.getItemInHand(hand);
 
             if (
@@ -395,9 +391,7 @@ public class FestiveStockingBlock
             }
 
             if (!heldItem.isEmpty()) {
-                if (heldItem.getItem() instanceof net.minecraft.world.item.BlockItem) {
-                    net.minecraft.world.item.BlockItem blockItem =
-                            (net.minecraft.world.item.BlockItem) heldItem.getItem();
+                if (heldItem.getItem() instanceof net.minecraft.world.item.BlockItem blockItem) {
                     if (blockItem.getBlock() instanceof FestiveStockingBlock) {
                         return InteractionResult.PASS;
                     }
@@ -484,9 +478,7 @@ public class FestiveStockingBlock
             Player player
     ) {
         BlockEntity be = level.getBlockEntity(pos);
-        if (be instanceof FestiveStockingBlockEntity) {
-            FestiveStockingBlockEntity stockingEntity =
-                    (FestiveStockingBlockEntity) be;
+        if (be instanceof FestiveStockingBlockEntity stockingEntity) {
             if (!stockingEntity.isEmpty()) {
                 ItemStack tool = player.getMainHandItem();
                 boolean hasSilkTouch =
@@ -539,10 +531,8 @@ public class FestiveStockingBlock
                         !tool.isEmpty() &&
                         EnchantmentHelper.getItemEnchantmentLevel(Enchantments.SILK_TOUCH, tool) >
                                 0 &&
-                        be instanceof FestiveStockingBlockEntity
+                        be instanceof FestiveStockingBlockEntity stockingEntity
         ) {
-            FestiveStockingBlockEntity stockingEntity =
-                    (FestiveStockingBlockEntity) be;
             if (!stockingEntity.isEmpty()) {
                 CompoundTag tag = result.getOrCreateTag();
                 CompoundTag storedTag = new CompoundTag();

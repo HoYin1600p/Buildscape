@@ -318,16 +318,14 @@ public class SupportersOnlyTab extends AbstractConfigTab {
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         // Delegate to panels (they check bounds internally)
         if (panel1 != null && panel1.mouseClicked(mouseX, mouseY, button)) return true;
-        if (panel5 != null && panel5.mouseClicked(mouseX, mouseY, button)) return true;
-        return false;
+        return panel5 != null && panel5.mouseClicked(mouseX, mouseY, button);
     }
     
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double delta) {
         // Delegate to panels (they check bounds internally)
         if (panel1 != null && panel1.mouseScrolled(mouseX, mouseY, delta)) return true;
-        if (panel5 != null && panel5.mouseScrolled(mouseX, mouseY, delta)) return true;
-        return false;
+        return panel5 != null && panel5.mouseScrolled(mouseX, mouseY, delta);
     }
     
     @Override
@@ -337,16 +335,14 @@ public class SupportersOnlyTab extends AbstractConfigTab {
         if (panel1 != null && panel1.mouseDragged(mouseX, mouseY, button, dragX, dragY)) return true;
 
         // Then delegate to panel5 for avatar rotation
-        if (panel5 != null && panel5.mouseDragged(mouseX, mouseY, button, dragX, dragY)) return true;
-
-        return false;
+        return panel5 != null && panel5.mouseDragged(mouseX, mouseY, button, dragX, dragY);
     }
     
     @Override
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
         // Delegate to panels for mouse release (e.g., to stop dragging)
         if (panel5 != null && panel5 instanceof PlayerAvatarPanel) {
-            ((PlayerAvatarPanel) panel5).mouseReleased(mouseX, mouseY, button);
+            panel5.mouseReleased(mouseX, mouseY, button);
         }
         
         // Also handle panel1's mouse release

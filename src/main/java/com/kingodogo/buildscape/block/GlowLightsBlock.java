@@ -523,9 +523,7 @@ public class GlowLightsBlock
             );
 
             if (property != null && state.getBlock() == heldBlock) {
-                if (state.hasProperty(property) && state.getValue(property)) {
-                    return false;
-                }
+                return !state.hasProperty(property) || !state.getValue(property);
             }
 
             return true;

@@ -67,10 +67,8 @@ public class IcicleCauldronBlockEntityRenderer
         ItemStack storedIcicle = blockEntity.getStoredIcicle();
         if (
                 !storedIcicle.isEmpty() &&
-                        storedIcicle.getItem() instanceof net.minecraft.world.item.BlockItem
+                        storedIcicle.getItem() instanceof net.minecraft.world.item.BlockItem blockItem
         ) {
-            net.minecraft.world.item.BlockItem blockItem =
-                    (net.minecraft.world.item.BlockItem) storedIcicle.getItem();
             BlockState icicleBlockState = blockItem.getBlock().defaultBlockState();
 
             poseStack.pushPose();

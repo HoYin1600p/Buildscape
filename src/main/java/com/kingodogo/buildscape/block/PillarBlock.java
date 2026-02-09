@@ -621,12 +621,11 @@ public class PillarBlock
         }
 
         BlockEntity blockEntity = level.getBlockEntity(pos);
-        if (!(blockEntity instanceof PillarBlockEntity)) {
+        if (!(blockEntity instanceof PillarBlockEntity pillarBE)) {
             return InteractionResult.PASS;
         }
 
         ItemStack heldItem = player.getItemInHand(hand);
-        PillarBlockEntity pillarBE = (PillarBlockEntity) blockEntity;
 
         if (!heldItem.isEmpty()) {
             java.util.Map.Entry<String, String> dyeInfo = getDyeColorAndName(

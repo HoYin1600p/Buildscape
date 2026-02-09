@@ -28,7 +28,7 @@ public class TagsSelectorWidget extends AbstractWidget {
     private String filter = "";
     private double scrollOffset = 0;
     private int maxVisibleRows;
-    private Consumer<String> onTagSelected;
+    private final Consumer<String> onTagSelected;
     private Set<String> selectedTags;
     private SortType sortType = SortType.ALL_ITEMS;
     private boolean isDraggingScrollbar = false;
@@ -179,7 +179,7 @@ public class TagsSelectorWidget extends AbstractWidget {
             if (row >= filteredTags.size()) break;
             
             TagKey<Item> tag = filteredTags.get(row);
-            String tagId = "#" + tag.location().toString();
+            String tagId = "#" + tag.location();
             int rowY = tagY + (row - startRow) * (TAG_BUTTON_HEIGHT + TAG_BUTTON_SPACING);
             
             // Skip rows that are completely outside the widget bounds
@@ -307,7 +307,7 @@ public class TagsSelectorWidget extends AbstractWidget {
             if (row >= filteredTags.size()) break;
             
             TagKey<Item> tag = filteredTags.get(row);
-            String tagId = "#" + tag.location().toString();
+            String tagId = "#" + tag.location();
             int rowY = tagY + (row - startRow) * (TAG_BUTTON_HEIGHT + TAG_BUTTON_SPACING);
             
             // Skip rows that are completely outside the widget bounds

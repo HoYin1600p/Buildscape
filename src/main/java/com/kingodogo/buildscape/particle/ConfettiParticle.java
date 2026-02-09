@@ -77,7 +77,7 @@ public class ConfettiParticle extends TextureSheetParticle {
         
         // Fade out near the end
         if (this.age > this.lifetime * 0.8F) {
-            float fadeProgress = (float)(this.age - this.lifetime * 0.8F) / (this.lifetime * 0.2F);
+            float fadeProgress = (this.age - this.lifetime * 0.8F) / (this.lifetime * 0.2F);
             this.alpha = 1.0F - fadeProgress;
         }
     }

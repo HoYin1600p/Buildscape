@@ -88,9 +88,7 @@ public class IcicleCauldronBlock extends CauldronBlock implements EntityBlock {
             BlockHitResult hit
     ) {
         BlockEntity blockEntity = level.getBlockEntity(pos);
-        if (blockEntity instanceof IcicleCauldronBlockEntity) {
-            IcicleCauldronBlockEntity cauldronEntity =
-                    (IcicleCauldronBlockEntity) blockEntity;
+        if (blockEntity instanceof IcicleCauldronBlockEntity cauldronEntity) {
             ItemStack heldItem = player.getItemInHand(hand);
             ItemStack storedIcicle = cauldronEntity.getStoredIcicle();
 
@@ -152,9 +150,7 @@ public class IcicleCauldronBlock extends CauldronBlock implements EntityBlock {
             BlockPos pos
     ) {
         BlockEntity blockEntity = level.getBlockEntity(pos);
-        if (blockEntity instanceof IcicleCauldronBlockEntity) {
-            IcicleCauldronBlockEntity cauldronEntity =
-                    (IcicleCauldronBlockEntity) blockEntity;
+        if (blockEntity instanceof IcicleCauldronBlockEntity cauldronEntity) {
             return cauldronEntity.hasIcicle() ? 15 : 0;
         }
         return 0;
@@ -170,9 +166,7 @@ public class IcicleCauldronBlock extends CauldronBlock implements EntityBlock {
     ) {
         if (!state.is(newState.getBlock()) && !level.isClientSide) {
             BlockEntity blockEntity = level.getBlockEntity(pos);
-            if (blockEntity instanceof IcicleCauldronBlockEntity) {
-                IcicleCauldronBlockEntity cauldronEntity =
-                        (IcicleCauldronBlockEntity) blockEntity;
+            if (blockEntity instanceof IcicleCauldronBlockEntity cauldronEntity) {
                 ItemStack storedIcicle = cauldronEntity.getStoredIcicle();
                 if (!storedIcicle.isEmpty()) {
                     ItemEntity itemEntity = new ItemEntity(

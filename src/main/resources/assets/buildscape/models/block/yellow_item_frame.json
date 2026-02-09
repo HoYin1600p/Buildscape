@@ -1,8 +1,0 @@
-{
-    "parent": "minecraft:block/item_frame",
-    "textures": {
-        "particle": "minecraft:block/birch_planks",
-        "wood": "minecraft:block/birch_planks",
-        "back": "minecraft:block/item_frame"
-    }
-}

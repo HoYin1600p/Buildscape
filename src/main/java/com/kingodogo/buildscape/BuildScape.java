@@ -365,6 +365,7 @@ public class BuildScape {
             items.add(new ItemStack(ModItems.BAMBOO_BLOCK_FENCE_GATE.get()));
             items.add(new ItemStack(ModItems.BAMBOO_BLOCK_PRESSURE_PLATE.get()));
             items.add(new ItemStack(ModItems.BAMBOO_BLOCK_BUTTON.get()));
+            items.add(new ItemStack(ModItems.BAMBOO_WOOD.get()));
             items.add(new ItemStack(ModItems.BAMBOO_DOOR.get()));
             items.add(new ItemStack(ModItems.BAMBOO_TRAPDOOR.get()));
             items.add(new ItemStack(ModItems.BAMBOO_SIGN.get()));
@@ -379,6 +380,7 @@ public class BuildScape {
                     new ItemStack(ModItems.STRIPPED_BAMBOO_BLOCK_PRESSURE_PLATE.get())
             );
             items.add(new ItemStack(ModItems.STRIPPED_BAMBOO_BLOCK_BUTTON.get()));
+            items.add(new ItemStack(ModItems.STRIPPED_BAMBOO_WOOD.get()));
 
             items.add(new ItemStack(ModItems.MANGROVE_LOG.get()));
             items.add(new ItemStack(ModItems.STRIPPED_MANGROVE_LOG.get()));
@@ -607,6 +609,86 @@ public class BuildScape {
             items.add(new ItemStack(ModItems.PINK_CONCRETE_SLAB.get()));
             items.add(new ItemStack(ModItems.PINK_CONCRETE_STAIRS.get()));
             items.add(new ItemStack(ModItems.PINK_CONCRETE_WALL.get()));
+
+            items.add(new ItemStack(ModItems.POLISHED_WHITE_CONCRETE.get()));
+            items.add(new ItemStack(ModItems.POLISHED_WHITE_CONCRETE_STAIRS.get()));
+            items.add(new ItemStack(ModItems.POLISHED_WHITE_CONCRETE_SLAB.get()));
+            items.add(new ItemStack(ModItems.POLISHED_WHITE_CONCRETE_WALL.get()));
+
+            items.add(new ItemStack(ModItems.POLISHED_LIGHT_GRAY_CONCRETE.get()));
+            items.add(new ItemStack(ModItems.POLISHED_LIGHT_GRAY_CONCRETE_STAIRS.get()));
+            items.add(new ItemStack(ModItems.POLISHED_LIGHT_GRAY_CONCRETE_SLAB.get()));
+            items.add(new ItemStack(ModItems.POLISHED_LIGHT_GRAY_CONCRETE_WALL.get()));
+
+            items.add(new ItemStack(ModItems.POLISHED_GRAY_CONCRETE.get()));
+            items.add(new ItemStack(ModItems.POLISHED_GRAY_CONCRETE_STAIRS.get()));
+            items.add(new ItemStack(ModItems.POLISHED_GRAY_CONCRETE_SLAB.get()));
+            items.add(new ItemStack(ModItems.POLISHED_GRAY_CONCRETE_WALL.get()));
+
+            items.add(new ItemStack(ModItems.POLISHED_BLACK_CONCRETE.get()));
+            items.add(new ItemStack(ModItems.POLISHED_BLACK_CONCRETE_STAIRS.get()));
+            items.add(new ItemStack(ModItems.POLISHED_BLACK_CONCRETE_SLAB.get()));
+            items.add(new ItemStack(ModItems.POLISHED_BLACK_CONCRETE_WALL.get()));
+
+            items.add(new ItemStack(ModItems.POLISHED_BROWN_CONCRETE.get()));
+            items.add(new ItemStack(ModItems.POLISHED_BROWN_CONCRETE_STAIRS.get()));
+            items.add(new ItemStack(ModItems.POLISHED_BROWN_CONCRETE_SLAB.get()));
+            items.add(new ItemStack(ModItems.POLISHED_BROWN_CONCRETE_WALL.get()));
+
+            items.add(new ItemStack(ModItems.POLISHED_RED_CONCRETE.get()));
+            items.add(new ItemStack(ModItems.POLISHED_RED_CONCRETE_STAIRS.get()));
+            items.add(new ItemStack(ModItems.POLISHED_RED_CONCRETE_SLAB.get()));
+            items.add(new ItemStack(ModItems.POLISHED_RED_CONCRETE_WALL.get()));
+
+            items.add(new ItemStack(ModItems.POLISHED_ORANGE_CONCRETE.get()));
+            items.add(new ItemStack(ModItems.POLISHED_ORANGE_CONCRETE_STAIRS.get()));
+            items.add(new ItemStack(ModItems.POLISHED_ORANGE_CONCRETE_SLAB.get()));
+            items.add(new ItemStack(ModItems.POLISHED_ORANGE_CONCRETE_WALL.get()));
+
+            items.add(new ItemStack(ModItems.POLISHED_YELLOW_CONCRETE.get()));
+            items.add(new ItemStack(ModItems.POLISHED_YELLOW_CONCRETE_STAIRS.get()));
+            items.add(new ItemStack(ModItems.POLISHED_YELLOW_CONCRETE_SLAB.get()));
+            items.add(new ItemStack(ModItems.POLISHED_YELLOW_CONCRETE_WALL.get()));
+
+            items.add(new ItemStack(ModItems.POLISHED_LIME_CONCRETE.get()));
+            items.add(new ItemStack(ModItems.POLISHED_LIME_CONCRETE_STAIRS.get()));
+            items.add(new ItemStack(ModItems.POLISHED_LIME_CONCRETE_SLAB.get()));
+            items.add(new ItemStack(ModItems.POLISHED_LIME_CONCRETE_WALL.get()));
+
+            items.add(new ItemStack(ModItems.POLISHED_GREEN_CONCRETE.get()));
+            items.add(new ItemStack(ModItems.POLISHED_GREEN_CONCRETE_STAIRS.get()));
+            items.add(new ItemStack(ModItems.POLISHED_GREEN_CONCRETE_SLAB.get()));
+            items.add(new ItemStack(ModItems.POLISHED_GREEN_CONCRETE_WALL.get()));
+
+            items.add(new ItemStack(ModItems.POLISHED_CYAN_CONCRETE.get()));
+            items.add(new ItemStack(ModItems.POLISHED_CYAN_CONCRETE_STAIRS.get()));
+            items.add(new ItemStack(ModItems.POLISHED_CYAN_CONCRETE_SLAB.get()));
+            items.add(new ItemStack(ModItems.POLISHED_CYAN_CONCRETE_WALL.get()));
+
+            items.add(new ItemStack(ModItems.POLISHED_LIGHT_BLUE_CONCRETE.get()));
+            items.add(new ItemStack(ModItems.POLISHED_LIGHT_BLUE_CONCRETE_STAIRS.get()));
+            items.add(new ItemStack(ModItems.POLISHED_LIGHT_BLUE_CONCRETE_SLAB.get()));
+            items.add(new ItemStack(ModItems.POLISHED_LIGHT_BLUE_CONCRETE_WALL.get()));
+
+            items.add(new ItemStack(ModItems.POLISHED_BLUE_CONCRETE.get()));
+            items.add(new ItemStack(ModItems.POLISHED_BLUE_CONCRETE_STAIRS.get()));
+            items.add(new ItemStack(ModItems.POLISHED_BLUE_CONCRETE_SLAB.get()));
+            items.add(new ItemStack(ModItems.POLISHED_BLUE_CONCRETE_WALL.get()));
+
+            items.add(new ItemStack(ModItems.POLISHED_PURPLE_CONCRETE.get()));
+            items.add(new ItemStack(ModItems.POLISHED_PURPLE_CONCRETE_STAIRS.get()));
+            items.add(new ItemStack(ModItems.POLISHED_PURPLE_CONCRETE_SLAB.get()));
+            items.add(new ItemStack(ModItems.POLISHED_PURPLE_CONCRETE_WALL.get()));
+
+            items.add(new ItemStack(ModItems.POLISHED_MAGENTA_CONCRETE.get()));
+            items.add(new ItemStack(ModItems.POLISHED_MAGENTA_CONCRETE_STAIRS.get()));
+            items.add(new ItemStack(ModItems.POLISHED_MAGENTA_CONCRETE_SLAB.get()));
+            items.add(new ItemStack(ModItems.POLISHED_MAGENTA_CONCRETE_WALL.get()));
+
+            items.add(new ItemStack(ModItems.POLISHED_PINK_CONCRETE.get()));
+            items.add(new ItemStack(ModItems.POLISHED_PINK_CONCRETE_STAIRS.get()));
+            items.add(new ItemStack(ModItems.POLISHED_PINK_CONCRETE_SLAB.get()));
+            items.add(new ItemStack(ModItems.POLISHED_PINK_CONCRETE_WALL.get()));
 
             items.add(new ItemStack(ModItems.WHITE_SAND.get()));
             items.add(new ItemStack(ModItems.WHITE_SANDSTONE.get()));
@@ -873,6 +955,9 @@ public class BuildScape {
             items.add(new ItemStack(ModItems.BLACK_STRING_LIGHT.get()));
             items.add(new ItemStack(ModItems.MULTICOLOR_STRING_LIGHT.get()));
 
+            items.add(new ItemStack(ModItems.GLOW_LIGHTS.get()));
+            items.add(new ItemStack(ModItems.MULTICOLOR_GLOW_LIGHTS.get()));
+
             items.add(new ItemStack(ModItems.DECORATED_POT.get()));
             items.add(new ItemStack(ModItems.WHITE_DECORATED_POT.get()));
             items.add(new ItemStack(ModItems.LIGHT_GRAY_DECORATED_POT.get()));
@@ -1084,13 +1169,17 @@ public class BuildScape {
             items.add(new ItemStack(ModItems.END_STONE_WALL.get()));
             items.add(new ItemStack(ModItems.QUARTZ_BLOCK_WALL.get()));
             items.add(new ItemStack(ModItems.SMOOTH_QUARTZ_WALL.get()));
-            items.add(new ItemStack(ModItems.SMOOTH_SANDSTONE_WALL.get()));
+            items.add(new ItemStack(ModItems.QUARTZ_PILLAR_STAIRS.get()));
+            items.add(new ItemStack(ModItems.QUARTZ_PILLAR_SLAB.get()));
+            items.add(new ItemStack(ModItems.QUARTZ_PILLAR_WALL.get()));
             items.add(new ItemStack(ModItems.QUARTZ_BRICKS_STAIRS.get()));
             items.add(new ItemStack(ModItems.QUARTZ_BRICKS_SLAB.get()));
             items.add(new ItemStack(ModItems.QUARTZ_BRICKS_WALL.get()));
+            items.add(new ItemStack(ModItems.SMOOTH_SANDSTONE_WALL.get()));
             items.add(new ItemStack(ModItems.PRISMARINE_BRICKS_WALL.get()));
             items.add(new ItemStack(ModItems.DARK_PRISMARINE_WALL.get()));
             items.add(new ItemStack(ModItems.STONE_WALL.get()));
+            items.add(new ItemStack(ModItems.SMOOTH_STONE_STAIRS.get()));
 
             items.add(new ItemStack(ModItems.BEDROCK_STAIRS.get()));
             items.add(new ItemStack(ModItems.BEDROCK_SLAB.get()));
@@ -1201,6 +1290,66 @@ public class BuildScape {
             LOGGER.info("Mangrove and Bamboo WoodTypes initialized for signs");
 
             LOGGER.info("Mangrove tree configured features registered in code");
+
+            // Composter recipes
+            // Rose Vines (0.5 - like vanilla vines)
+            net.minecraft.world.level.block.ComposterBlock.COMPOSTABLES.put(ModItems.RED_ROSE_VINES.get(), 0.5f);
+            net.minecraft.world.level.block.ComposterBlock.COMPOSTABLES.put(ModItems.BLACK_ROSE_VINES.get(), 0.5f);
+            net.minecraft.world.level.block.ComposterBlock.COMPOSTABLES.put(ModItems.BLUE_ROSE_VINES.get(), 0.5f);
+            net.minecraft.world.level.block.ComposterBlock.COMPOSTABLES.put(ModItems.WHITE_ROSE_VINES.get(), 0.5f);
+
+            // Frost Rose (0.65 - like flowers)
+            net.minecraft.world.level.block.ComposterBlock.COMPOSTABLES.put(ModItems.FROST_ROSE.get(), 0.65f);
+
+            // Monets (0.65 - like flowers)
+            net.minecraft.world.level.block.ComposterBlock.COMPOSTABLES.put(ModItems.RED_MONETS.get(), 0.65f);
+            net.minecraft.world.level.block.ComposterBlock.COMPOSTABLES.put(ModItems.BLUE_MONETS.get(), 0.65f);
+            net.minecraft.world.level.block.ComposterBlock.COMPOSTABLES.put(ModItems.PURPLE_MONETS.get(), 0.65f);
+            net.minecraft.world.level.block.ComposterBlock.COMPOSTABLES.put(ModItems.LIGHT_BLUE_MONETS.get(), 0.65f);
+            net.minecraft.world.level.block.ComposterBlock.COMPOSTABLES.put(ModItems.PINK_MONETS.get(), 0.65f);
+            net.minecraft.world.level.block.ComposterBlock.COMPOSTABLES.put(ModItems.YELLOW_MONETS.get(), 0.65f);
+
+            // Petals (0.65 - like pink petals)
+            net.minecraft.world.level.block.ComposterBlock.COMPOSTABLES.put(ModItems.RED_PETAL.get(), 0.65f);
+            net.minecraft.world.level.block.ComposterBlock.COMPOSTABLES.put(ModItems.BLUE_PETAL.get(), 0.65f);
+            net.minecraft.world.level.block.ComposterBlock.COMPOSTABLES.put(ModItems.ORANGE_PETAL.get(), 0.65f);
+            net.minecraft.world.level.block.ComposterBlock.COMPOSTABLES.put(ModItems.PINK_PETAL.get(), 0.65f);
+            net.minecraft.world.level.block.ComposterBlock.COMPOSTABLES.put(ModItems.PURPLE_PETAL.get(), 0.65f);
+
+            // Spore Blossoms (0.65 - like vanilla spore blossom)
+            net.minecraft.world.level.block.ComposterBlock.COMPOSTABLES.put(ModItems.RED_SPORE_BLOSSOM.get(), 0.65f);
+            net.minecraft.world.level.block.ComposterBlock.COMPOSTABLES.put(ModItems.CYAN_SPORE_BLOSSOM.get(), 0.65f);
+            net.minecraft.world.level.block.ComposterBlock.COMPOSTABLES.put(ModItems.BLUE_SPORE_BLOSSOM.get(), 0.65f);
+            net.minecraft.world.level.block.ComposterBlock.COMPOSTABLES.put(ModItems.PURPLE_SPORE_BLOSSOM.get(), 0.65f);
+            net.minecraft.world.level.block.ComposterBlock.COMPOSTABLES.put(ModItems.ORANGE_SPORE_BLOSSOM.get(), 0.65f);
+
+            // Snowy Foliage (0.3 - like grass/fern)
+            net.minecraft.world.level.block.ComposterBlock.COMPOSTABLES.put(ModItems.SNOWY_SHORT_GRASS.get(), 0.3f);
+            net.minecraft.world.level.block.ComposterBlock.COMPOSTABLES.put(ModItems.SNOWY_TALL_GRASS.get(), 0.3f);
+            net.minecraft.world.level.block.ComposterBlock.COMPOSTABLES.put(ModItems.SNOWY_FERN.get(), 0.3f);
+            net.minecraft.world.level.block.ComposterBlock.COMPOSTABLES.put(ModItems.SNOWY_LARGE_FERN.get(), 0.3f);
+            net.minecraft.world.level.block.ComposterBlock.COMPOSTABLES.put(ModItems.SNOWY_BUSH.get(), 0.3f);
+
+            // Mangrove Leaves (0.3 - like leaves)
+            net.minecraft.world.level.block.ComposterBlock.COMPOSTABLES.put(ModItems.MANGROVE_LEAVES.get(), 0.3f);
+
+            // Snowy Leaves (0.3 - like leaves)
+            net.minecraft.world.level.block.ComposterBlock.COMPOSTABLES.put(ModItems.SNOWY_LEAVES.get(), 0.3f);
+            net.minecraft.world.level.block.ComposterBlock.COMPOSTABLES.put(ModItems.SNOWY_OAK_LEAVES.get(), 0.3f);
+            net.minecraft.world.level.block.ComposterBlock.COMPOSTABLES.put(ModItems.SNOWY_SPRUCE_LEAVES.get(), 0.3f);
+            net.minecraft.world.level.block.ComposterBlock.COMPOSTABLES.put(ModItems.SNOWY_BIRCH_LEAVES.get(), 0.3f);
+            net.minecraft.world.level.block.ComposterBlock.COMPOSTABLES.put(ModItems.SNOWY_JUNGLE_LEAVES.get(), 0.3f);
+            net.minecraft.world.level.block.ComposterBlock.COMPOSTABLES.put(ModItems.SNOWY_ACACIA_LEAVES.get(), 0.3f);
+            net.minecraft.world.level.block.ComposterBlock.COMPOSTABLES.put(ModItems.SNOWY_DARK_OAK_LEAVES.get(), 0.3f);
+            net.minecraft.world.level.block.ComposterBlock.COMPOSTABLES.put(ModItems.SNOWY_MANGROVE_LEAVES.get(), 0.3f);
+            net.minecraft.world.level.block.ComposterBlock.COMPOSTABLES.put(ModItems.SNOWY_AZALEA_LEAVES.get(), 0.3f);
+            net.minecraft.world.level.block.ComposterBlock.COMPOSTABLES.put(ModItems.SNOWY_FLOWERING_AZALEA_LEAVES.get(), 0.3f);
+
+            // Mushroom Shelves (0.65 - like small mushrooms)
+            net.minecraft.world.level.block.ComposterBlock.COMPOSTABLES.put(ModItems.BROWN_MUSHROOM_SHELVES.get(), 0.65f);
+            net.minecraft.world.level.block.ComposterBlock.COMPOSTABLES.put(ModItems.RED_MUSHROOM_SHELVES.get(), 0.65f);
+
+            LOGGER.info("Composter recipes registered");
         });
     }
 
@@ -1351,9 +1500,7 @@ public class BuildScape {
     public void onPlayerJoin(
             net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent event
     ) {
-        if (event.getPlayer() instanceof net.minecraft.server.level.ServerPlayer) {
-            net.minecraft.server.level.ServerPlayer serverPlayer =
-                    (net.minecraft.server.level.ServerPlayer) event.getPlayer();
+        if (event.getPlayer() instanceof net.minecraft.server.level.ServerPlayer serverPlayer) {
 
             if (!serverFullyInitialized) {
                 com.kingodogo.buildscape.config.PillarIdManager.resetWorldCache();
@@ -1455,9 +1602,7 @@ public class BuildScape {
     public void onChunkLoad(
             net.minecraftforge.event.world.ChunkEvent.Load event
     ) {
-        if (event.getWorld() instanceof net.minecraft.server.level.ServerLevel) {
-            net.minecraft.server.level.ServerLevel serverLevel =
-                    (net.minecraft.server.level.ServerLevel) event.getWorld();
+        if (event.getWorld() instanceof net.minecraft.server.level.ServerLevel serverLevel) {
 
             if (!serverFullyInitialized) {
                 return;
@@ -1473,17 +1618,14 @@ public class BuildScape {
             }
 
             if (
-                    event.getChunk() instanceof net.minecraft.world.level.chunk.LevelChunk
+                    event.getChunk() instanceof net.minecraft.world.level.chunk.LevelChunk chunk
             ) {
-                net.minecraft.world.level.chunk.LevelChunk chunk =
-                        (net.minecraft.world.level.chunk.LevelChunk) event.getChunk();
 
                 if (
                         !chunk
                         .getStatus()
                                 .isOrAfter(net.minecraft.world.level.chunk.ChunkStatus.FULL)
                 ) {
-                    return;
                 }
             }
         }
@@ -1637,10 +1779,8 @@ public class BuildScape {
                             net.minecraft.world.level.block.entity.BlockEntity be =
                                     level.getBlockEntity(pos);
                             if (
-                                    be instanceof com.kingodogo.buildscape.block.PillarBlockEntity
+                                    be instanceof com.kingodogo.buildscape.block.PillarBlockEntity pillarBE
                             ) {
-                                com.kingodogo.buildscape.block.PillarBlockEntity pillarBE =
-                                        (com.kingodogo.buildscape.block.PillarBlockEntity) be;
 
                                 if (pillarBE.getPillarId() == null
                                         || !pillarBE.getPillarId()
@@ -1994,13 +2134,8 @@ public class BuildScape {
                 || block instanceof com.kingodogo.buildscape.block.RoseVinesBlock
         ) {
             if (
-                    block.getSoundType(state) instanceof
-                            com.kingodogo.buildscape.block.CustomSoundType
+                    block.getSoundType(state) instanceof com.kingodogo.buildscape.block.CustomSoundType customSound
             ) {
-                com.kingodogo.buildscape.block.CustomSoundType customSound =
-                        (com.kingodogo.buildscape.block.CustomSoundType) block.getSoundType(
-                                state
-                        );
                 net.minecraft.core.BlockPos pos = event.getPos();
                 net.minecraft.world.level.Level level = event.getWorld();
 
@@ -2228,10 +2363,8 @@ public class BuildScape {
 
             net.minecraft.world.Container inventory = event.getInventory();
             if (
-                    inventory instanceof net.minecraft.world.inventory.CraftingContainer
+                    inventory instanceof net.minecraft.world.inventory.CraftingContainer container
             ) {
-                net.minecraft.world.inventory.CraftingContainer container =
-                        (net.minecraft.world.inventory.CraftingContainer) inventory;
 
                 for (int i = 0; i < container.getContainerSize(); i++) {
                     net.minecraft.world.item.ItemStack stack = container.getItem(i);
@@ -2254,13 +2387,11 @@ public class BuildScape {
             net.minecraftforge.event.entity.living.LivingEntityUseItemEvent.Finish event
     ) {
         if (
-                !(event.getEntity() instanceof net.minecraft.world.entity.player.Player)
+                !(event.getEntity() instanceof net.minecraft.world.entity.player.Player player)
         ) {
             return;
         }
 
-        net.minecraft.world.entity.player.Player player =
-                (net.minecraft.world.entity.player.Player) event.getEntity();
         net.minecraft.world.item.ItemStack itemStack = event.getItem();
 
         if (itemStack.getItem() == net.minecraft.world.item.Items.SUSPICIOUS_STEW) {
@@ -2330,9 +2461,7 @@ public class BuildScape {
     public void onEntityJoinWorld(
             net.minecraftforge.event.entity.EntityJoinWorldEvent event
     ) {
-        if (event.getEntity() instanceof net.minecraft.world.entity.vehicle.Boat) {
-            net.minecraft.world.entity.vehicle.Boat boat =
-                    (net.minecraft.world.entity.vehicle.Boat) event.getEntity();
+        if (event.getEntity() instanceof net.minecraft.world.entity.vehicle.Boat boat) {
             net.minecraft.nbt.CompoundTag nbt = boat.getPersistentData();
             if (nbt.contains("MangroveBoatType")
                     && nbt.getString("MangroveBoatType").equals("mangrove")
@@ -2345,9 +2474,7 @@ public class BuildScape {
             net.minecraft.world.level.Level level,
             net.minecraft.core.BlockPos pos
     ) {
-        if (level instanceof net.minecraft.server.level.ServerLevel) {
-            net.minecraft.server.level.ServerLevel serverLevel =
-                    (net.minecraft.server.level.ServerLevel) level;
+        if (level instanceof net.minecraft.server.level.ServerLevel serverLevel) {
             serverLevel.sendParticles(
                     net.minecraft.core.particles.ParticleTypes.SPLASH,
                     pos.getX() + 0.5,
@@ -3713,9 +3840,7 @@ public class BuildScape {
                                 return 0x7FA832;
                             }
                             if (tintIndex == 1) {
-                                if (reader instanceof net.minecraft.world.level.LevelReader) {
-                                    net.minecraft.world.level.LevelReader levelReader =
-                                            (net.minecraft.world.level.LevelReader) reader;
+                                if (reader instanceof net.minecraft.world.level.LevelReader levelReader) {
                                     return levelReader
                                             .getBiome(pos)
                                             .value()
@@ -3734,9 +3859,7 @@ public class BuildScape {
                                 return 0x7FA832;
                             }
                             if (tintIndex == 1) {
-                                if (reader instanceof net.minecraft.world.level.LevelReader) {
-                                    net.minecraft.world.level.LevelReader levelReader =
-                                            (net.minecraft.world.level.LevelReader) reader;
+                                if (reader instanceof net.minecraft.world.level.LevelReader levelReader) {
                                     return levelReader
                                             .getBiome(pos)
                                             .value()
@@ -3840,10 +3963,8 @@ public class BuildScape {
 
                             if (reader != null
                             && pos != null
-                                    && reader instanceof net.minecraft.world.level.LevelReader
+                                    && reader instanceof net.minecraft.world.level.LevelReader levelReader
                             ) {
-                                net.minecraft.world.level.LevelReader levelReader =
-                                        (net.minecraft.world.level.LevelReader) reader;
                                 return levelReader.getBiome(pos).value()
                                         .getFoliageColor();
                             }
@@ -3923,10 +4044,8 @@ public class BuildScape {
                             }
                             if (reader != null
                             && pos != null
-                                    && reader instanceof net.minecraft.world.level.LevelReader
+                                    && reader instanceof net.minecraft.world.level.LevelReader levelReader
                             ) {
-                                net.minecraft.world.level.LevelReader levelReader =
-                                        (net.minecraft.world.level.LevelReader) reader;
                                 return levelReader.getBiome(pos).value()
                                         .getFoliageColor();
                             }
@@ -3943,10 +4062,8 @@ public class BuildScape {
                             }
                             if (reader != null
                             && pos != null
-                                    && reader instanceof net.minecraft.world.level.LevelReader
+                                    && reader instanceof net.minecraft.world.level.LevelReader levelReader
                             ) {
-                                net.minecraft.world.level.LevelReader levelReader =
-                                        (net.minecraft.world.level.LevelReader) reader;
                                 return levelReader.getBiome(pos).value()
                                         .getFoliageColor();
                             }
@@ -3962,10 +4079,8 @@ public class BuildScape {
                             }
                             if (reader != null
                             && pos != null
-                                    && reader instanceof net.minecraft.world.level.LevelReader
+                                    && reader instanceof net.minecraft.world.level.LevelReader levelReader
                             ) {
-                                net.minecraft.world.level.LevelReader levelReader =
-                                        (net.minecraft.world.level.LevelReader) reader;
                                 return levelReader.getBiome(pos).value()
                                         .getFoliageColor();
                             }
@@ -3992,11 +4107,8 @@ public class BuildScape {
                                 net.minecraft.world.level.block.entity.BlockEntity be =
                                         reader.getBlockEntity(pos);
                                 if (
-                                        be instanceof
-                                                com.kingodogo.buildscape.block.GlowLightsBlockEntity
+                                        be instanceof com.kingodogo.buildscape.block.GlowLightsBlockEntity glowBE
                                 ) {
-                                    com.kingodogo.buildscape.block.GlowLightsBlockEntity glowBE =
-                                            (com.kingodogo.buildscape.block.GlowLightsBlockEntity) be;
                                     java.util.List<String> dyeColors = glowBE.getDyeColors();
                                     if (dyeColors != null && !dyeColors.isEmpty()) {
                                         int hash = pos.hashCode() ^ state.hashCode();

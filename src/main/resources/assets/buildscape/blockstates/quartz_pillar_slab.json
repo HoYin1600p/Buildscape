@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "buildscape:block/quartz_pillar_slab"
+    },
+    "type=top": {
+      "model": "buildscape:block/quartz_pillar_slab_top"
+    },
+    "type=double": {
+      "model": "buildscape:block/quartz_pillar_slab_double"
+    }
+  }
+}

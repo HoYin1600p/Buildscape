@@ -115,7 +115,7 @@ public class MulticolorGlowLightsBlock
             BlockGetter level,
             BlockPos pos
     ) {
-        return state.getValue(LIT) ? 7 : 0;
+        return state.getValue(LIT) ? 15 : 0;
     }
 
     @Override
@@ -348,9 +348,7 @@ public class MulticolorGlowLightsBlock
                                     (state.getBlock() instanceof MulticolorGlowLightsBlock &&
                                             heldBlock instanceof GlowLightsBlock))
             ) {
-                if (state.hasProperty(property) && state.getValue(property)) {
-                    return false;
-                }
+                return !state.hasProperty(property) || !state.getValue(property);
             }
 
             return true;

@@ -3636,6 +3636,37 @@ public class ModBlocks {
                     )
     );
 
+    public static final RegistryObject<Block> QUARTZ_PILLAR_STAIRS =
+            BLOCKS.register("quartz_pillar_stairs", () ->
+                    new ModStairBlock(
+                            QUARTZ_PILLAR.get().defaultBlockState(),
+                            BlockBehaviour.Properties.of(Material.STONE, MaterialColor.QUARTZ)
+                                    .strength(0.8f)
+                                    .requiresCorrectToolForDrops()
+                                    .sound(net.minecraft.world.level.block.SoundType.STONE)
+                    )
+            );
+
+    public static final RegistryObject<Block> QUARTZ_PILLAR_SLAB =
+            BLOCKS.register("quartz_pillar_slab", () ->
+                    new SlabBlock(
+                            BlockBehaviour.Properties.of(Material.STONE, MaterialColor.QUARTZ)
+                                    .strength(0.8f)
+                                    .requiresCorrectToolForDrops()
+                                    .sound(net.minecraft.world.level.block.SoundType.STONE)
+                    )
+            );
+
+    public static final RegistryObject<Block> QUARTZ_PILLAR_WALL =
+            BLOCKS.register("quartz_pillar_wall", () ->
+                    new WallBlock(
+                            BlockBehaviour.Properties.of(Material.STONE, MaterialColor.QUARTZ)
+                                    .strength(0.8f)
+                                    .requiresCorrectToolForDrops()
+                                    .sound(net.minecraft.world.level.block.SoundType.STONE)
+                    )
+            );
+
     public static final RegistryObject<Block> STONE_PILLAR = BLOCKS.register(
             "stone_pillar",
             () ->
@@ -4464,15 +4495,27 @@ public class ModBlocks {
                             .sound(net.minecraft.world.level.block.SoundType.BAMBOO)
                     )
             );
-    public static final RegistryObject<Block> STRIPPED_BAMBOO_BLOCK_STAIRS =
-            BLOCKS.register("stripped_bamboo_block_stairs", () ->
-                    new ModStairBlock(
-                            STRIPPED_BAMBOO_BLOCK.get().defaultBlockState(),
+
+    public static final RegistryObject<Block> BAMBOO_WOOD = BLOCKS.register(
+            "bamboo_wood",
+            () ->
+                    new Block(
                             BlockBehaviour.Properties.of(Material.WOOD, MaterialColor.COLOR_YELLOW)
                                     .strength(2.0f)
                                     .sound(net.minecraft.world.level.block.SoundType.BAMBOO)
                     )
-            );
+    );
+
+    public static final RegistryObject<Block> STRIPPED_BAMBOO_WOOD = BLOCKS.register(
+            "stripped_bamboo_wood",
+            () ->
+                    new Block(
+                            BlockBehaviour.Properties.of(Material.WOOD, MaterialColor.COLOR_YELLOW)
+                                    .strength(2.0f)
+                                    .sound(net.minecraft.world.level.block.SoundType.BAMBOO)
+                    )
+    );
+
     public static final RegistryObject<Block> BAMBOO_BLOCK_SLAB = BLOCKS.register(
             "bamboo_block_slab",
             () ->
@@ -7461,8 +7504,8 @@ public class ModBlocks {
                     new GlowLightsBlock(
                     BlockBehaviour.Properties.of(Material.REPLACEABLE_PLANT)
                             .strength(0.2f)
-                            .sound(net.minecraft.world.level.block.SoundType.GRASS)
-                            .lightLevel(state -> state.getValue(GlowLightsBlock.LIT) ? 7 : 0)
+                            .sound(net.minecraft.world.level.block.SoundType.SLIME_BLOCK)
+                            .lightLevel(state -> state.getValue(GlowLightsBlock.LIT) ? 15 : 0)
                             .noOcclusion()
                             .noCollission()
                             .instabreak()
@@ -7474,9 +7517,9 @@ public class ModBlocks {
                     new MulticolorGlowLightsBlock(
                     BlockBehaviour.Properties.of(Material.REPLACEABLE_PLANT)
                             .strength(0.2f)
-                            .sound(net.minecraft.world.level.block.SoundType.GRASS)
+                            .sound(net.minecraft.world.level.block.SoundType.SLIME_BLOCK)
                             .lightLevel(state ->
-                                    state.getValue(MulticolorGlowLightsBlock.LIT) ? 7 : 0
+                                    state.getValue(MulticolorGlowLightsBlock.LIT) ? 15 : 0
                             )
                             .noOcclusion()
                             .noCollission()
@@ -9574,4 +9617,687 @@ public class ModBlocks {
                             .strength(2.0f, 6.0f)
                             .requiresCorrectToolForDrops()
                             .sound(SoundType.STONE)));
+
+    public static final RegistryObject<Block> SMOOTH_STONE_STAIRS =
+            BLOCKS.register("smooth_stone_stairs", () ->
+                    new ModStairBlock(
+                            net.minecraft.world.level.block.Blocks.SMOOTH_STONE.defaultBlockState(),
+                            BlockBehaviour.Properties.of(Material.STONE, MaterialColor.STONE)
+                                    .strength(2.0f, 6.0f)
+                                    .requiresCorrectToolForDrops()
+                                    .sound(SoundType.STONE)
+                    )
+            );
+
+    public static final RegistryObject<Block> POLISHED_WHITE_CONCRETE = BLOCKS.register(
+            "polished_white_concrete",
+            () -> new ModBlock(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.SNOW)
+                            .strength(1.8f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)
+            )
+    );
+
+    public static final RegistryObject<Block> POLISHED_ORANGE_CONCRETE = BLOCKS.register(
+            "polished_orange_concrete",
+            () -> new ModBlock(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_ORANGE)
+                            .strength(1.8f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)
+            )
+    );
+
+    public static final RegistryObject<Block> POLISHED_MAGENTA_CONCRETE = BLOCKS.register(
+            "polished_magenta_concrete",
+            () -> new ModBlock(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_MAGENTA)
+                            .strength(1.8f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)
+            )
+    );
+
+    public static final RegistryObject<Block> POLISHED_LIGHT_BLUE_CONCRETE = BLOCKS.register(
+            "polished_light_blue_concrete",
+            () -> new ModBlock(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_LIGHT_BLUE)
+                            .strength(1.8f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)
+            )
+    );
+
+    public static final RegistryObject<Block> POLISHED_YELLOW_CONCRETE = BLOCKS.register(
+            "polished_yellow_concrete",
+            () -> new ModBlock(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_YELLOW)
+                            .strength(1.8f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)
+            )
+    );
+
+    public static final RegistryObject<Block> POLISHED_LIME_CONCRETE = BLOCKS.register(
+            "polished_lime_concrete",
+            () -> new ModBlock(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_LIGHT_GREEN)
+                            .strength(1.8f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)
+            )
+    );
+
+    public static final RegistryObject<Block> POLISHED_PINK_CONCRETE = BLOCKS.register(
+            "polished_pink_concrete",
+            () -> new ModBlock(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_PINK)
+                            .strength(1.8f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)
+            )
+    );
+
+    public static final RegistryObject<Block> POLISHED_GRAY_CONCRETE = BLOCKS.register(
+            "polished_gray_concrete",
+            () -> new ModBlock(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_GRAY)
+                            .strength(1.8f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)
+            )
+    );
+
+    public static final RegistryObject<Block> POLISHED_LIGHT_GRAY_CONCRETE = BLOCKS.register(
+            "polished_light_gray_concrete",
+            () -> new ModBlock(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_LIGHT_GRAY)
+                            .strength(1.8f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)
+            )
+    );
+
+    public static final RegistryObject<Block> POLISHED_CYAN_CONCRETE = BLOCKS.register(
+            "polished_cyan_concrete",
+            () -> new ModBlock(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_CYAN)
+                            .strength(1.8f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)
+            )
+    );
+
+    public static final RegistryObject<Block> POLISHED_PURPLE_CONCRETE = BLOCKS.register(
+            "polished_purple_concrete",
+            () -> new ModBlock(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_PURPLE)
+                            .strength(1.8f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)
+            )
+    );
+
+    public static final RegistryObject<Block> POLISHED_BLUE_CONCRETE = BLOCKS.register(
+            "polished_blue_concrete",
+            () -> new ModBlock(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_BLUE)
+                            .strength(1.8f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)
+            )
+    );
+
+    public static final RegistryObject<Block> POLISHED_BROWN_CONCRETE = BLOCKS.register(
+            "polished_brown_concrete",
+            () -> new ModBlock(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_BROWN)
+                            .strength(1.8f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)
+            )
+    );
+
+    public static final RegistryObject<Block> POLISHED_GREEN_CONCRETE = BLOCKS.register(
+            "polished_green_concrete",
+            () -> new ModBlock(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_GREEN)
+                            .strength(1.8f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)
+            )
+    );
+
+    public static final RegistryObject<Block> POLISHED_RED_CONCRETE = BLOCKS.register(
+            "polished_red_concrete",
+            () -> new ModBlock(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_RED)
+                            .strength(1.8f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)
+            )
+    );
+
+    public static final RegistryObject<Block> POLISHED_BLACK_CONCRETE = BLOCKS.register(
+            "polished_black_concrete",
+            () -> new ModBlock(
+                    BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_BLACK)
+                            .strength(1.8f)
+                            .requiresCorrectToolForDrops()
+                            .sound(SoundType.STONE)
+            )
+    );
+
+    // Polished White Concrete Variants
+    public static final RegistryObject<Block> POLISHED_WHITE_CONCRETE_STAIRS =
+            BLOCKS.register("polished_white_concrete_stairs", () ->
+                    new ModStairBlock(
+                            POLISHED_WHITE_CONCRETE.get().defaultBlockState(),
+                            BlockBehaviour.Properties.of(Material.STONE, MaterialColor.SNOW)
+                                    .strength(1.8f)
+                                    .requiresCorrectToolForDrops()
+                                    .sound(SoundType.STONE)
+                    )
+            );
+
+    public static final RegistryObject<Block> POLISHED_WHITE_CONCRETE_SLAB =
+            BLOCKS.register("polished_white_concrete_slab", () ->
+                    new SlabBlock(
+                            BlockBehaviour.Properties.of(Material.STONE, MaterialColor.SNOW)
+                                    .strength(1.8f)
+                                    .requiresCorrectToolForDrops()
+                                    .sound(SoundType.STONE)
+                    )
+            );
+
+    public static final RegistryObject<Block> POLISHED_WHITE_CONCRETE_WALL =
+            BLOCKS.register("polished_white_concrete_wall", () ->
+                    new WallBlock(
+                            BlockBehaviour.Properties.of(Material.STONE, MaterialColor.SNOW)
+                                    .strength(1.8f)
+                                    .requiresCorrectToolForDrops()
+                                    .sound(SoundType.STONE)
+                    )
+            );
+
+    // Polished Orange Concrete Variants
+    public static final RegistryObject<Block> POLISHED_ORANGE_CONCRETE_STAIRS =
+            BLOCKS.register("polished_orange_concrete_stairs", () ->
+                    new ModStairBlock(
+                            POLISHED_ORANGE_CONCRETE.get().defaultBlockState(),
+                            BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_ORANGE)
+                                    .strength(1.8f)
+                                    .requiresCorrectToolForDrops()
+                                    .sound(SoundType.STONE)
+                    )
+            );
+
+    public static final RegistryObject<Block> POLISHED_ORANGE_CONCRETE_SLAB =
+            BLOCKS.register("polished_orange_concrete_slab", () ->
+                    new SlabBlock(
+                            BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_ORANGE)
+                                    .strength(1.8f)
+                                    .requiresCorrectToolForDrops()
+                                    .sound(SoundType.STONE)
+                    )
+            );
+
+    public static final RegistryObject<Block> POLISHED_ORANGE_CONCRETE_WALL =
+            BLOCKS.register("polished_orange_concrete_wall", () ->
+                    new WallBlock(
+                            BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_ORANGE)
+                                    .strength(1.8f)
+                                    .requiresCorrectToolForDrops()
+                                    .sound(SoundType.STONE)
+                    )
+            );
+
+    // Polished Magenta Concrete Variants
+    public static final RegistryObject<Block> POLISHED_MAGENTA_CONCRETE_STAIRS =
+            BLOCKS.register("polished_magenta_concrete_stairs", () ->
+                    new ModStairBlock(
+                            POLISHED_MAGENTA_CONCRETE.get().defaultBlockState(),
+                            BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_MAGENTA)
+                                    .strength(1.8f)
+                                    .requiresCorrectToolForDrops()
+                                    .sound(SoundType.STONE)
+                    )
+            );
+
+    public static final RegistryObject<Block> POLISHED_MAGENTA_CONCRETE_SLAB =
+            BLOCKS.register("polished_magenta_concrete_slab", () ->
+                    new SlabBlock(
+                            BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_MAGENTA)
+                                    .strength(1.8f)
+                                    .requiresCorrectToolForDrops()
+                                    .sound(SoundType.STONE)
+                    )
+            );
+
+    public static final RegistryObject<Block> POLISHED_MAGENTA_CONCRETE_WALL =
+            BLOCKS.register("polished_magenta_concrete_wall", () ->
+                    new WallBlock(
+                            BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_MAGENTA)
+                                    .strength(1.8f)
+                                    .requiresCorrectToolForDrops()
+                                    .sound(SoundType.STONE)
+                    )
+            );
+
+    // Polished Light Blue Concrete Variants
+    public static final RegistryObject<Block> POLISHED_LIGHT_BLUE_CONCRETE_STAIRS =
+            BLOCKS.register("polished_light_blue_concrete_stairs", () ->
+                    new ModStairBlock(
+                            POLISHED_LIGHT_BLUE_CONCRETE.get().defaultBlockState(),
+                            BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_LIGHT_BLUE)
+                                    .strength(1.8f)
+                                    .requiresCorrectToolForDrops()
+                                    .sound(SoundType.STONE)
+                    )
+            );
+
+    public static final RegistryObject<Block> POLISHED_LIGHT_BLUE_CONCRETE_SLAB =
+            BLOCKS.register("polished_light_blue_concrete_slab", () ->
+                    new SlabBlock(
+                            BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_LIGHT_BLUE)
+                                    .strength(1.8f)
+                                    .requiresCorrectToolForDrops()
+                                    .sound(SoundType.STONE)
+                    )
+            );
+
+    public static final RegistryObject<Block> POLISHED_LIGHT_BLUE_CONCRETE_WALL =
+            BLOCKS.register("polished_light_blue_concrete_wall", () ->
+                    new WallBlock(
+                            BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_LIGHT_BLUE)
+                                    .strength(1.8f)
+                                    .requiresCorrectToolForDrops()
+                                    .sound(SoundType.STONE)
+                    )
+            );
+
+    // Polished Yellow Concrete Variants
+    public static final RegistryObject<Block> POLISHED_YELLOW_CONCRETE_STAIRS =
+            BLOCKS.register("polished_yellow_concrete_stairs", () ->
+                    new ModStairBlock(
+                            POLISHED_YELLOW_CONCRETE.get().defaultBlockState(),
+                            BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_YELLOW)
+                                    .strength(1.8f)
+                                    .requiresCorrectToolForDrops()
+                                    .sound(SoundType.STONE)
+                    )
+            );
+
+    public static final RegistryObject<Block> POLISHED_YELLOW_CONCRETE_SLAB =
+            BLOCKS.register("polished_yellow_concrete_slab", () ->
+                    new SlabBlock(
+                            BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_YELLOW)
+                                    .strength(1.8f)
+                                    .requiresCorrectToolForDrops()
+                                    .sound(SoundType.STONE)
+                    )
+            );
+
+    public static final RegistryObject<Block> POLISHED_YELLOW_CONCRETE_WALL =
+            BLOCKS.register("polished_yellow_concrete_wall", () ->
+                    new WallBlock(
+                            BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_YELLOW)
+                                    .strength(1.8f)
+                                    .requiresCorrectToolForDrops()
+                                    .sound(SoundType.STONE)
+                    )
+            );
+
+    // Polished Lime Concrete Variants
+    public static final RegistryObject<Block> POLISHED_LIME_CONCRETE_STAIRS =
+            BLOCKS.register("polished_lime_concrete_stairs", () ->
+                    new ModStairBlock(
+                            POLISHED_LIME_CONCRETE.get().defaultBlockState(),
+                            BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_LIGHT_GREEN)
+                                    .strength(1.8f)
+                                    .requiresCorrectToolForDrops()
+                                    .sound(SoundType.STONE)
+                    )
+            );
+
+    public static final RegistryObject<Block> POLISHED_LIME_CONCRETE_SLAB =
+            BLOCKS.register("polished_lime_concrete_slab", () ->
+                    new SlabBlock(
+                            BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_LIGHT_GREEN)
+                                    .strength(1.8f)
+                                    .requiresCorrectToolForDrops()
+                                    .sound(SoundType.STONE)
+                    )
+            );
+
+    public static final RegistryObject<Block> POLISHED_LIME_CONCRETE_WALL =
+            BLOCKS.register("polished_lime_concrete_wall", () ->
+                    new WallBlock(
+                            BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_LIGHT_GREEN)
+                                    .strength(1.8f)
+                                    .requiresCorrectToolForDrops()
+                                    .sound(SoundType.STONE)
+                    )
+            );
+
+    // Polished Pink Concrete Variants
+    public static final RegistryObject<Block> POLISHED_PINK_CONCRETE_STAIRS =
+            BLOCKS.register("polished_pink_concrete_stairs", () ->
+                    new ModStairBlock(
+                            POLISHED_PINK_CONCRETE.get().defaultBlockState(),
+                            BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_PINK)
+                                    .strength(1.8f)
+                                    .requiresCorrectToolForDrops()
+                                    .sound(SoundType.STONE)
+                    )
+            );
+
+    public static final RegistryObject<Block> POLISHED_PINK_CONCRETE_SLAB =
+            BLOCKS.register("polished_pink_concrete_slab", () ->
+                    new SlabBlock(
+                            BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_PINK)
+                                    .strength(1.8f)
+                                    .requiresCorrectToolForDrops()
+                                    .sound(SoundType.STONE)
+                    )
+            );
+
+    public static final RegistryObject<Block> POLISHED_PINK_CONCRETE_WALL =
+            BLOCKS.register("polished_pink_concrete_wall", () ->
+                    new WallBlock(
+                            BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_PINK)
+                                    .strength(1.8f)
+                                    .requiresCorrectToolForDrops()
+                                    .sound(SoundType.STONE)
+                    )
+            );
+
+    // Polished Gray Concrete Variants
+    public static final RegistryObject<Block> POLISHED_GRAY_CONCRETE_STAIRS =
+            BLOCKS.register("polished_gray_concrete_stairs", () ->
+                    new ModStairBlock(
+                            POLISHED_GRAY_CONCRETE.get().defaultBlockState(),
+                            BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_GRAY)
+                                    .strength(1.8f)
+                                    .requiresCorrectToolForDrops()
+                                    .sound(SoundType.STONE)
+                    )
+            );
+
+    public static final RegistryObject<Block> POLISHED_GRAY_CONCRETE_SLAB =
+            BLOCKS.register("polished_gray_concrete_slab", () ->
+                    new SlabBlock(
+                            BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_GRAY)
+                                    .strength(1.8f)
+                                    .requiresCorrectToolForDrops()
+                                    .sound(SoundType.STONE)
+                    )
+            );
+
+    public static final RegistryObject<Block> POLISHED_GRAY_CONCRETE_WALL =
+            BLOCKS.register("polished_gray_concrete_wall", () ->
+                    new WallBlock(
+                            BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_GRAY)
+                                    .strength(1.8f)
+                                    .requiresCorrectToolForDrops()
+                                    .sound(SoundType.STONE)
+                    )
+            );
+
+    // Polished Light Gray Concrete Variants
+    public static final RegistryObject<Block> POLISHED_LIGHT_GRAY_CONCRETE_STAIRS =
+            BLOCKS.register("polished_light_gray_concrete_stairs", () ->
+                    new ModStairBlock(
+                            POLISHED_LIGHT_GRAY_CONCRETE.get().defaultBlockState(),
+                            BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_LIGHT_GRAY)
+                                    .strength(1.8f)
+                                    .requiresCorrectToolForDrops()
+                                    .sound(SoundType.STONE)
+                    )
+            );
+
+    public static final RegistryObject<Block> POLISHED_LIGHT_GRAY_CONCRETE_SLAB =
+            BLOCKS.register("polished_light_gray_concrete_slab", () ->
+                    new SlabBlock(
+                            BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_LIGHT_GRAY)
+                                    .strength(1.8f)
+                                    .requiresCorrectToolForDrops()
+                                    .sound(SoundType.STONE)
+                    )
+            );
+
+    public static final RegistryObject<Block> POLISHED_LIGHT_GRAY_CONCRETE_WALL =
+            BLOCKS.register("polished_light_gray_concrete_wall", () ->
+                    new WallBlock(
+                            BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_LIGHT_GRAY)
+                                    .strength(1.8f)
+                                    .requiresCorrectToolForDrops()
+                                    .sound(SoundType.STONE)
+                    )
+            );
+
+    // Polished Cyan Concrete Variants
+    public static final RegistryObject<Block> POLISHED_CYAN_CONCRETE_STAIRS =
+            BLOCKS.register("polished_cyan_concrete_stairs", () ->
+                    new ModStairBlock(
+                            POLISHED_CYAN_CONCRETE.get().defaultBlockState(),
+                            BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_CYAN)
+                                    .strength(1.8f)
+                                    .requiresCorrectToolForDrops()
+                                    .sound(SoundType.STONE)
+                    )
+            );
+
+    public static final RegistryObject<Block> POLISHED_CYAN_CONCRETE_SLAB =
+            BLOCKS.register("polished_cyan_concrete_slab", () ->
+                    new SlabBlock(
+                            BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_CYAN)
+                                    .strength(1.8f)
+                                    .requiresCorrectToolForDrops()
+                                    .sound(SoundType.STONE)
+                    )
+            );
+
+    public static final RegistryObject<Block> POLISHED_CYAN_CONCRETE_WALL =
+            BLOCKS.register("polished_cyan_concrete_wall", () ->
+                    new WallBlock(
+                            BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_CYAN)
+                                    .strength(1.8f)
+                                    .requiresCorrectToolForDrops()
+                                    .sound(SoundType.STONE)
+                    )
+            );
+
+    // Polished Purple Concrete Variants
+    public static final RegistryObject<Block> POLISHED_PURPLE_CONCRETE_STAIRS =
+            BLOCKS.register("polished_purple_concrete_stairs", () ->
+                    new ModStairBlock(
+                            POLISHED_PURPLE_CONCRETE.get().defaultBlockState(),
+                            BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_PURPLE)
+                                    .strength(1.8f)
+                                    .requiresCorrectToolForDrops()
+                                    .sound(SoundType.STONE)
+                    )
+            );
+
+    public static final RegistryObject<Block> POLISHED_PURPLE_CONCRETE_SLAB =
+            BLOCKS.register("polished_purple_concrete_slab", () ->
+                    new SlabBlock(
+                            BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_PURPLE)
+                                    .strength(1.8f)
+                                    .requiresCorrectToolForDrops()
+                                    .sound(SoundType.STONE)
+                    )
+            );
+
+    public static final RegistryObject<Block> POLISHED_PURPLE_CONCRETE_WALL =
+            BLOCKS.register("polished_purple_concrete_wall", () ->
+                    new WallBlock(
+                            BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_PURPLE)
+                                    .strength(1.8f)
+                                    .requiresCorrectToolForDrops()
+                                    .sound(SoundType.STONE)
+                    )
+            );
+
+    // Polished Blue Concrete Variants
+    public static final RegistryObject<Block> POLISHED_BLUE_CONCRETE_STAIRS =
+            BLOCKS.register("polished_blue_concrete_stairs", () ->
+                    new ModStairBlock(
+                            POLISHED_BLUE_CONCRETE.get().defaultBlockState(),
+                            BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_BLUE)
+                                    .strength(1.8f)
+                                    .requiresCorrectToolForDrops()
+                                    .sound(SoundType.STONE)
+                    )
+            );
+
+    public static final RegistryObject<Block> POLISHED_BLUE_CONCRETE_SLAB =
+            BLOCKS.register("polished_blue_concrete_slab", () ->
+                    new SlabBlock(
+                            BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_BLUE)
+                                    .strength(1.8f)
+                                    .requiresCorrectToolForDrops()
+                                    .sound(SoundType.STONE)
+                    )
+            );
+
+    public static final RegistryObject<Block> POLISHED_BLUE_CONCRETE_WALL =
+            BLOCKS.register("polished_blue_concrete_wall", () ->
+                    new WallBlock(
+                            BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_BLUE)
+                                    .strength(1.8f)
+                                    .requiresCorrectToolForDrops()
+                                    .sound(SoundType.STONE)
+                    )
+            );
+
+    // Polished Brown Concrete Variants
+    public static final RegistryObject<Block> POLISHED_BROWN_CONCRETE_STAIRS =
+            BLOCKS.register("polished_brown_concrete_stairs", () ->
+                    new ModStairBlock(
+                            POLISHED_BROWN_CONCRETE.get().defaultBlockState(),
+                            BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_BROWN)
+                                    .strength(1.8f)
+                                    .requiresCorrectToolForDrops()
+                                    .sound(SoundType.STONE)
+                    )
+            );
+
+    public static final RegistryObject<Block> POLISHED_BROWN_CONCRETE_SLAB =
+            BLOCKS.register("polished_brown_concrete_slab", () ->
+                    new SlabBlock(
+                            BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_BROWN)
+                                    .strength(1.8f)
+                                    .requiresCorrectToolForDrops()
+                                    .sound(SoundType.STONE)
+                    )
+            );
+
+    public static final RegistryObject<Block> POLISHED_BROWN_CONCRETE_WALL =
+            BLOCKS.register("polished_brown_concrete_wall", () ->
+                    new WallBlock(
+                            BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_BROWN)
+                                    .strength(1.8f)
+                                    .requiresCorrectToolForDrops()
+                                    .sound(SoundType.STONE)
+                    )
+            );
+
+    // Polished Green Concrete Variants
+    public static final RegistryObject<Block> POLISHED_GREEN_CONCRETE_STAIRS =
+            BLOCKS.register("polished_green_concrete_stairs", () ->
+                    new ModStairBlock(
+                            POLISHED_GREEN_CONCRETE.get().defaultBlockState(),
+                            BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_GREEN)
+                                    .strength(1.8f)
+                                    .requiresCorrectToolForDrops()
+                                    .sound(SoundType.STONE)
+                    )
+            );
+
+    public static final RegistryObject<Block> POLISHED_GREEN_CONCRETE_SLAB =
+            BLOCKS.register("polished_green_concrete_slab", () ->
+                    new SlabBlock(
+                            BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_GREEN)
+                                    .strength(1.8f)
+                                    .requiresCorrectToolForDrops()
+                                    .sound(SoundType.STONE)
+                    )
+            );
+
+    public static final RegistryObject<Block> POLISHED_GREEN_CONCRETE_WALL =
+            BLOCKS.register("polished_green_concrete_wall", () ->
+                    new WallBlock(
+                            BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_GREEN)
+                                    .strength(1.8f)
+                                    .requiresCorrectToolForDrops()
+                                    .sound(SoundType.STONE)
+                    )
+            );
+
+    // Polished Red Concrete Variants
+    public static final RegistryObject<Block> POLISHED_RED_CONCRETE_STAIRS =
+            BLOCKS.register("polished_red_concrete_stairs", () ->
+                    new ModStairBlock(
+                            POLISHED_RED_CONCRETE.get().defaultBlockState(),
+                            BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_RED)
+                                    .strength(1.8f)
+                                    .requiresCorrectToolForDrops()
+                                    .sound(SoundType.STONE)
+                    )
+            );
+
+    public static final RegistryObject<Block> POLISHED_RED_CONCRETE_SLAB =
+            BLOCKS.register("polished_red_concrete_slab", () ->
+                    new SlabBlock(
+                            BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_RED)
+                                    .strength(1.8f)
+                                    .requiresCorrectToolForDrops()
+                                    .sound(SoundType.STONE)
+                    )
+            );
+
+    public static final RegistryObject<Block> POLISHED_RED_CONCRETE_WALL =
+            BLOCKS.register("polished_red_concrete_wall", () ->
+                    new WallBlock(
+                            BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_RED)
+                                    .strength(1.8f)
+                                    .requiresCorrectToolForDrops()
+                                    .sound(SoundType.STONE)
+                    )
+            );
+
+    // Polished Black Concrete Variants
+    public static final RegistryObject<Block> POLISHED_BLACK_CONCRETE_STAIRS =
+            BLOCKS.register("polished_black_concrete_stairs", () ->
+                    new ModStairBlock(
+                            POLISHED_BLACK_CONCRETE.get().defaultBlockState(),
+                            BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_BLACK)
+                                    .strength(1.8f)
+                                    .requiresCorrectToolForDrops()
+                                    .sound(SoundType.STONE)
+                    )
+            );
+
+    public static final RegistryObject<Block> POLISHED_BLACK_CONCRETE_SLAB =
+            BLOCKS.register("polished_black_concrete_slab", () ->
+                    new SlabBlock(
+                            BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_BLACK)
+                                    .strength(1.8f)
+                                    .requiresCorrectToolForDrops()
+                                    .sound(SoundType.STONE)
+                    )
+            );
+
+    public static final RegistryObject<Block> POLISHED_BLACK_CONCRETE_WALL =
+            BLOCKS.register("polished_black_concrete_wall", () ->
+                    new WallBlock(
+                            BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_BLACK)
+                                    .strength(1.8f)
+                                    .requiresCorrectToolForDrops()
+                                    .sound(SoundType.STONE)
+                    )
+            );
 }

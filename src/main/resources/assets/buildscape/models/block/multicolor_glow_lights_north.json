@@ -1,6 +1,7 @@
 {
   "credit": "Made with Blockbench",
   "render_type": "cutout",
+  "ambientocclusion": false,
   "textures": {
     "0": "buildscape:block/multicolor_glow_lights",
     "particle": "buildscape:block/multicolor_glow_lights"
@@ -15,8 +16,9 @@
       "to": [
         16,
         16,
-        1
+        0.1
       ],
+      "shade": false,
       "faces": {
         "north": {
           "uv": [
@@ -26,7 +28,11 @@
             16
           ],
           "texture": "#0",
-          "tintindex": 0
+          "tintindex": 0,
+          "forge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
         },
         "south": {
           "uv": [
@@ -35,46 +41,13 @@
             16,
             16
           ],
-          "texture": "#0"
-        },
-        "east": {
-          "uv": [
-            0,
-            0,
-            1,
-            16
-          ],
-          "texture": "#0"
-        },
-        "west": {
-          "uv": [
-            0,
-            0,
-            1,
-            16
-          ],
-          "texture": "#0"
-        },
-        "up": {
-          "uv": [
-            0,
-            0,
-            16,
-            1
-          ],
-          "texture": "#0"
-        },
-        "down": {
-          "uv": [
-            0,
-            0,
-            16,
-            1
-          ],
-          "texture": "#0"
+          "texture": "#0",
+          "forge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
         }
       }
     }
   ]
 }
-

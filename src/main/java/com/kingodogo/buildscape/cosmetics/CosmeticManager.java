@@ -46,7 +46,7 @@ public class CosmeticManager {
         registerParticleTrail("buildscape:cosmatics/particle/bubble_trail", "Bubble Trail", "Bubbles float behind you",
                 1, "bubble");
         registerParticleTrail("buildscape:cosmatics/particle/cherry_leaves_trail", "Cherry Leaves Trail",
-                "Falling pink leaves trail behind you", 1, "cherry_leaves");
+                "Falling pink leaves trail behind you", 1, "cherry"); // Changed from "cherry_leaves" to "cherry" to use ModParticles.CHERRY
         registerParticleTrail("buildscape:cosmatics/particle/note_trail", "Note Trail", "Musical notes follow you", 1,
                 "note");
 
@@ -98,15 +98,15 @@ public class CosmeticManager {
      * Check if a particle trail supports color customization.
      */
     public boolean supportsColor(String cosmeticId) {
-        // Only particle trails support color (and specifically only sparkle/heart
+        // Only particle trails support color (and specifically only sparkle/heart/cake/cherry/snowflake
         // types)
         if (!isParticleTrail(cosmeticId)) {
             return false;
         }
 
         String shape = getParticleShape(cosmeticId);
-        // Sparkle and Heart shapes support colors
-        return shape.equals("sparkle") || shape.equals("heart");
+        // Sparkle, Heart, Cake, Cherry, Snowflake shapes support colors
+        return shape.equals("sparkle") || shape.equals("heart") || shape.equals("cake") || shape.equals("cherry") || shape.equals("snowflake");
     }
 
     /**

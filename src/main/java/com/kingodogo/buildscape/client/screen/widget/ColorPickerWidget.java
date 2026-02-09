@@ -1,12 +1,14 @@
 package com.kingodogo.buildscape.client.screen.widget;
 
+import java.util.function.Consumer;
+
+import com.mojang.blaze3d.vertex.PoseStack;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.TextComponent;
-import com.mojang.blaze3d.vertex.PoseStack;
-import java.util.function.Consumer;
 
 public class ColorPickerWidget extends AbstractWidget {
     private static final int GRADIENT_SIZE = 80;
@@ -435,7 +437,7 @@ public class ColorPickerWidget extends AbstractWidget {
         int fieldY = sliderY;
 
         // Draw value text first to measure its width
-        String valueStr = isHsb && !label.equals("H") ? String.format("%.1f", value) : String.valueOf(value);
+        String valueStr = isHsb && !label.equals("H") ? String.format("%.1f", (float) value) : String.valueOf(value);
         int textWidth = mc.font.width(valueStr);
 
         // Calculate field width based on text width with padding

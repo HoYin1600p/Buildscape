@@ -262,20 +262,30 @@ public class ParticleTrailHandler {
         // Queue color for the particle (if using PillarSparkleParticle and supports
         // color)
         CosmeticManager manager = CosmeticManager.getInstance();
-        if (particleType == ModParticles.GLOW_LIME_SPARKLE.get() && manager.supportsColor(particleTrailId)) {
+        // Queue color for the particle (if supported)
+        // Queue color for the particle (if supported)
+        if (manager.supportsColor(particleTrailId)) {
             String colorCode = String.format("#%02X%02X%02X",
                     (int) (color[0] * 255),
                     (int) (color[1] * 255),
                     (int) (color[2] * 255));
-            com.kingodogo.buildscape.particle.PillarSparkleParticle.queueColor(
-                    spawnPos.x, spawnPos.y, spawnPos.z, colorCode);
-        } else if (particleType == ModParticles.TINTABLE_HEART.get() && manager.supportsColor(particleTrailId)) {
-             String colorCode = String.format("#%02X%02X%02X",
-                    (int) (color[0] * 255),
-                    (int) (color[1] * 255),
-                    (int) (color[2] * 255));
-             com.kingodogo.buildscape.particle.TintableHeartParticle.queueColor(
-                    spawnPos.x, spawnPos.y, spawnPos.z, colorCode);
+
+            if (particleType == ModParticles.GLOW_LIME_SPARKLE.get()) {
+                com.kingodogo.buildscape.particle.PillarSparkleParticle.queueColor(
+                        spawnPos.x, spawnPos.y, spawnPos.z, colorCode);
+            } else if (particleType == ModParticles.TINTABLE_HEART.get()) {
+                com.kingodogo.buildscape.particle.TintableHeartParticle.queueColor(
+                        spawnPos.x, spawnPos.y, spawnPos.z, colorCode);
+            } else if (particleType == ModParticles.CAKE.get()) {
+                com.kingodogo.buildscape.particle.CakeParticle.queueColor(
+                        spawnPos.x, spawnPos.y, spawnPos.z, colorCode);
+            } else if (particleType == ModParticles.CHERRY.get()) {
+                com.kingodogo.buildscape.particle.CherryParticle.queueColor(
+                        spawnPos.x, spawnPos.y, spawnPos.z, colorCode);
+            } else if (particleType == ModParticles.SNOWFLAKE.get()) {
+                com.kingodogo.buildscape.particle.SnowflakeParticle.queueColor(
+                        spawnPos.x, spawnPos.y, spawnPos.z, colorCode);
+            }
         }
 
         // Spawn the particle(s)

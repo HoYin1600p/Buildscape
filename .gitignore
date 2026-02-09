@@ -52,3 +52,4 @@ temp_*.java
 recent_*.java
 /.qoder/
 /.vs/
+/imports/

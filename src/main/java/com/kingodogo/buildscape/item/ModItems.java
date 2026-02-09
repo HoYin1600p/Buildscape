@@ -2621,6 +2621,24 @@ public class ModItems {
                     new BlockItem(ModBlocks.QUARTZ_PILLAR.get(), createBlockItemProperties())
     );
 
+    public static final RegistryObject<Item> QUARTZ_PILLAR_STAIRS = ITEMS.register(
+            "quartz_pillar_stairs",
+            () ->
+                    new BlockItem(ModBlocks.QUARTZ_PILLAR_STAIRS.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> QUARTZ_PILLAR_SLAB = ITEMS.register(
+            "quartz_pillar_slab",
+            () ->
+                    new BlockItem(ModBlocks.QUARTZ_PILLAR_SLAB.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> QUARTZ_PILLAR_WALL = ITEMS.register(
+            "quartz_pillar_wall",
+            () ->
+                    new BlockItem(ModBlocks.QUARTZ_PILLAR_WALL.get(), createBlockItemProperties())
+    );
+
     public static final RegistryObject<Item> STONE_PILLAR = ITEMS.register(
             "stone_pillar",
             () ->
@@ -3300,6 +3318,21 @@ public class ModItems {
                             createBlockItemProperties()
                     )
             );
+
+    public static final RegistryObject<Item> BAMBOO_WOOD = ITEMS.register(
+            "bamboo_wood",
+            () ->
+                    new BlockItem(ModBlocks.BAMBOO_WOOD.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> STRIPPED_BAMBOO_WOOD = ITEMS.register(
+            "stripped_bamboo_wood",
+            () ->
+                    new BlockItem(
+                            ModBlocks.STRIPPED_BAMBOO_WOOD.get(),
+                            createBlockItemProperties()
+                    )
+    );
 
     public static final RegistryObject<Item> BAMBOO_BLOCK_SLAB = ITEMS.register(
             "bamboo_block_slab",
@@ -6513,5 +6546,331 @@ public class ModItems {
     public static final RegistryObject<Item> PINK_ITEM_FRAME = ITEMS.register(
             "pink_item_frame",
             () -> new ColoredItemFrameItem(createBlockItemProperties(), "pink")
+    );
+
+    public static final RegistryObject<Item> SMOOTH_STONE_STAIRS = ITEMS.register(
+            "smooth_stone_stairs",
+            () ->
+                    new BlockItem(ModBlocks.SMOOTH_STONE_STAIRS.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> POLISHED_WHITE_CONCRETE = ITEMS.register(
+            "polished_white_concrete",
+            () -> new BlockItem(ModBlocks.POLISHED_WHITE_CONCRETE.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> POLISHED_ORANGE_CONCRETE = ITEMS.register(
+            "polished_orange_concrete",
+            () -> new BlockItem(ModBlocks.POLISHED_ORANGE_CONCRETE.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> POLISHED_MAGENTA_CONCRETE = ITEMS.register(
+            "polished_magenta_concrete",
+            () -> new BlockItem(ModBlocks.POLISHED_MAGENTA_CONCRETE.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> POLISHED_LIGHT_BLUE_CONCRETE = ITEMS.register(
+            "polished_light_blue_concrete",
+            () -> new BlockItem(ModBlocks.POLISHED_LIGHT_BLUE_CONCRETE.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> POLISHED_YELLOW_CONCRETE = ITEMS.register(
+            "polished_yellow_concrete",
+            () -> new BlockItem(ModBlocks.POLISHED_YELLOW_CONCRETE.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> POLISHED_LIME_CONCRETE = ITEMS.register(
+            "polished_lime_concrete",
+            () -> new BlockItem(ModBlocks.POLISHED_LIME_CONCRETE.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> POLISHED_PINK_CONCRETE = ITEMS.register(
+            "polished_pink_concrete",
+            () -> new BlockItem(ModBlocks.POLISHED_PINK_CONCRETE.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> POLISHED_GRAY_CONCRETE = ITEMS.register(
+            "polished_gray_concrete",
+            () -> new BlockItem(ModBlocks.POLISHED_GRAY_CONCRETE.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> POLISHED_LIGHT_GRAY_CONCRETE = ITEMS.register(
+            "polished_light_gray_concrete",
+            () -> new BlockItem(ModBlocks.POLISHED_LIGHT_GRAY_CONCRETE.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> POLISHED_CYAN_CONCRETE = ITEMS.register(
+            "polished_cyan_concrete",
+            () -> new BlockItem(ModBlocks.POLISHED_CYAN_CONCRETE.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> POLISHED_PURPLE_CONCRETE = ITEMS.register(
+            "polished_purple_concrete",
+            () -> new BlockItem(ModBlocks.POLISHED_PURPLE_CONCRETE.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> POLISHED_BLUE_CONCRETE = ITEMS.register(
+            "polished_blue_concrete",
+            () -> new BlockItem(ModBlocks.POLISHED_BLUE_CONCRETE.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> POLISHED_BROWN_CONCRETE = ITEMS.register(
+            "polished_brown_concrete",
+            () -> new BlockItem(ModBlocks.POLISHED_BROWN_CONCRETE.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> POLISHED_GREEN_CONCRETE = ITEMS.register(
+            "polished_green_concrete",
+            () -> new BlockItem(ModBlocks.POLISHED_GREEN_CONCRETE.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> POLISHED_RED_CONCRETE = ITEMS.register(
+            "polished_red_concrete",
+            () -> new BlockItem(ModBlocks.POLISHED_RED_CONCRETE.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> POLISHED_BLACK_CONCRETE = ITEMS.register(
+            "polished_black_concrete",
+            () -> new BlockItem(ModBlocks.POLISHED_BLACK_CONCRETE.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> POLISHED_WHITE_CONCRETE_STAIRS = ITEMS.register(
+            "polished_white_concrete_stairs",
+            () -> new BlockItem(ModBlocks.POLISHED_WHITE_CONCRETE_STAIRS.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> POLISHED_WHITE_CONCRETE_SLAB = ITEMS.register(
+            "polished_white_concrete_slab",
+            () -> new BlockItem(ModBlocks.POLISHED_WHITE_CONCRETE_SLAB.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> POLISHED_WHITE_CONCRETE_WALL = ITEMS.register(
+            "polished_white_concrete_wall",
+            () -> new BlockItem(ModBlocks.POLISHED_WHITE_CONCRETE_WALL.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> POLISHED_ORANGE_CONCRETE_STAIRS = ITEMS.register(
+            "polished_orange_concrete_stairs",
+            () -> new BlockItem(ModBlocks.POLISHED_ORANGE_CONCRETE_STAIRS.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> POLISHED_ORANGE_CONCRETE_SLAB = ITEMS.register(
+            "polished_orange_concrete_slab",
+            () -> new BlockItem(ModBlocks.POLISHED_ORANGE_CONCRETE_SLAB.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> POLISHED_ORANGE_CONCRETE_WALL = ITEMS.register(
+            "polished_orange_concrete_wall",
+            () -> new BlockItem(ModBlocks.POLISHED_ORANGE_CONCRETE_WALL.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> POLISHED_MAGENTA_CONCRETE_STAIRS = ITEMS.register(
+            "polished_magenta_concrete_stairs",
+            () -> new BlockItem(ModBlocks.POLISHED_MAGENTA_CONCRETE_STAIRS.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> POLISHED_MAGENTA_CONCRETE_SLAB = ITEMS.register(
+            "polished_magenta_concrete_slab",
+            () -> new BlockItem(ModBlocks.POLISHED_MAGENTA_CONCRETE_SLAB.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> POLISHED_MAGENTA_CONCRETE_WALL = ITEMS.register(
+            "polished_magenta_concrete_wall",
+            () -> new BlockItem(ModBlocks.POLISHED_MAGENTA_CONCRETE_WALL.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> POLISHED_LIGHT_BLUE_CONCRETE_STAIRS = ITEMS.register(
+            "polished_light_blue_concrete_stairs",
+            () -> new BlockItem(ModBlocks.POLISHED_LIGHT_BLUE_CONCRETE_STAIRS.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> POLISHED_LIGHT_BLUE_CONCRETE_SLAB = ITEMS.register(
+            "polished_light_blue_concrete_slab",
+            () -> new BlockItem(ModBlocks.POLISHED_LIGHT_BLUE_CONCRETE_SLAB.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> POLISHED_LIGHT_BLUE_CONCRETE_WALL = ITEMS.register(
+            "polished_light_blue_concrete_wall",
+            () -> new BlockItem(ModBlocks.POLISHED_LIGHT_BLUE_CONCRETE_WALL.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> POLISHED_YELLOW_CONCRETE_STAIRS = ITEMS.register(
+            "polished_yellow_concrete_stairs",
+            () -> new BlockItem(ModBlocks.POLISHED_YELLOW_CONCRETE_STAIRS.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> POLISHED_YELLOW_CONCRETE_SLAB = ITEMS.register(
+            "polished_yellow_concrete_slab",
+            () -> new BlockItem(ModBlocks.POLISHED_YELLOW_CONCRETE_SLAB.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> POLISHED_YELLOW_CONCRETE_WALL = ITEMS.register(
+            "polished_yellow_concrete_wall",
+            () -> new BlockItem(ModBlocks.POLISHED_YELLOW_CONCRETE_WALL.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> POLISHED_LIME_CONCRETE_STAIRS = ITEMS.register(
+            "polished_lime_concrete_stairs",
+            () -> new BlockItem(ModBlocks.POLISHED_LIME_CONCRETE_STAIRS.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> POLISHED_LIME_CONCRETE_SLAB = ITEMS.register(
+            "polished_lime_concrete_slab",
+            () -> new BlockItem(ModBlocks.POLISHED_LIME_CONCRETE_SLAB.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> POLISHED_LIME_CONCRETE_WALL = ITEMS.register(
+            "polished_lime_concrete_wall",
+            () -> new BlockItem(ModBlocks.POLISHED_LIME_CONCRETE_WALL.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> POLISHED_PINK_CONCRETE_STAIRS = ITEMS.register(
+            "polished_pink_concrete_stairs",
+            () -> new BlockItem(ModBlocks.POLISHED_PINK_CONCRETE_STAIRS.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> POLISHED_PINK_CONCRETE_SLAB = ITEMS.register(
+            "polished_pink_concrete_slab",
+            () -> new BlockItem(ModBlocks.POLISHED_PINK_CONCRETE_SLAB.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> POLISHED_PINK_CONCRETE_WALL = ITEMS.register(
+            "polished_pink_concrete_wall",
+            () -> new BlockItem(ModBlocks.POLISHED_PINK_CONCRETE_WALL.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> POLISHED_GRAY_CONCRETE_STAIRS = ITEMS.register(
+            "polished_gray_concrete_stairs",
+            () -> new BlockItem(ModBlocks.POLISHED_GRAY_CONCRETE_STAIRS.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> POLISHED_GRAY_CONCRETE_SLAB = ITEMS.register(
+            "polished_gray_concrete_slab",
+            () -> new BlockItem(ModBlocks.POLISHED_GRAY_CONCRETE_SLAB.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> POLISHED_GRAY_CONCRETE_WALL = ITEMS.register(
+            "polished_gray_concrete_wall",
+            () -> new BlockItem(ModBlocks.POLISHED_GRAY_CONCRETE_WALL.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> POLISHED_LIGHT_GRAY_CONCRETE_STAIRS = ITEMS.register(
+            "polished_light_gray_concrete_stairs",
+            () -> new BlockItem(ModBlocks.POLISHED_LIGHT_GRAY_CONCRETE_STAIRS.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> POLISHED_LIGHT_GRAY_CONCRETE_SLAB = ITEMS.register(
+            "polished_light_gray_concrete_slab",
+            () -> new BlockItem(ModBlocks.POLISHED_LIGHT_GRAY_CONCRETE_SLAB.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> POLISHED_LIGHT_GRAY_CONCRETE_WALL = ITEMS.register(
+            "polished_light_gray_concrete_wall",
+            () -> new BlockItem(ModBlocks.POLISHED_LIGHT_GRAY_CONCRETE_WALL.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> POLISHED_CYAN_CONCRETE_STAIRS = ITEMS.register(
+            "polished_cyan_concrete_stairs",
+            () -> new BlockItem(ModBlocks.POLISHED_CYAN_CONCRETE_STAIRS.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> POLISHED_CYAN_CONCRETE_SLAB = ITEMS.register(
+            "polished_cyan_concrete_slab",
+            () -> new BlockItem(ModBlocks.POLISHED_CYAN_CONCRETE_SLAB.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> POLISHED_CYAN_CONCRETE_WALL = ITEMS.register(
+            "polished_cyan_concrete_wall",
+            () -> new BlockItem(ModBlocks.POLISHED_CYAN_CONCRETE_WALL.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> POLISHED_PURPLE_CONCRETE_STAIRS = ITEMS.register(
+            "polished_purple_concrete_stairs",
+            () -> new BlockItem(ModBlocks.POLISHED_PURPLE_CONCRETE_STAIRS.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> POLISHED_PURPLE_CONCRETE_SLAB = ITEMS.register(
+            "polished_purple_concrete_slab",
+            () -> new BlockItem(ModBlocks.POLISHED_PURPLE_CONCRETE_SLAB.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> POLISHED_PURPLE_CONCRETE_WALL = ITEMS.register(
+            "polished_purple_concrete_wall",
+            () -> new BlockItem(ModBlocks.POLISHED_PURPLE_CONCRETE_WALL.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> POLISHED_BLUE_CONCRETE_STAIRS = ITEMS.register(
+            "polished_blue_concrete_stairs",
+            () -> new BlockItem(ModBlocks.POLISHED_BLUE_CONCRETE_STAIRS.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> POLISHED_BLUE_CONCRETE_SLAB = ITEMS.register(
+            "polished_blue_concrete_slab",
+            () -> new BlockItem(ModBlocks.POLISHED_BLUE_CONCRETE_SLAB.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> POLISHED_BLUE_CONCRETE_WALL = ITEMS.register(
+            "polished_blue_concrete_wall",
+            () -> new BlockItem(ModBlocks.POLISHED_BLUE_CONCRETE_WALL.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> POLISHED_BROWN_CONCRETE_STAIRS = ITEMS.register(
+            "polished_brown_concrete_stairs",
+            () -> new BlockItem(ModBlocks.POLISHED_BROWN_CONCRETE_STAIRS.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> POLISHED_BROWN_CONCRETE_SLAB = ITEMS.register(
+            "polished_brown_concrete_slab",
+            () -> new BlockItem(ModBlocks.POLISHED_BROWN_CONCRETE_SLAB.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> POLISHED_BROWN_CONCRETE_WALL = ITEMS.register(
+            "polished_brown_concrete_wall",
+            () -> new BlockItem(ModBlocks.POLISHED_BROWN_CONCRETE_WALL.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> POLISHED_GREEN_CONCRETE_STAIRS = ITEMS.register(
+            "polished_green_concrete_stairs",
+            () -> new BlockItem(ModBlocks.POLISHED_GREEN_CONCRETE_STAIRS.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> POLISHED_GREEN_CONCRETE_SLAB = ITEMS.register(
+            "polished_green_concrete_slab",
+            () -> new BlockItem(ModBlocks.POLISHED_GREEN_CONCRETE_SLAB.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> POLISHED_GREEN_CONCRETE_WALL = ITEMS.register(
+            "polished_green_concrete_wall",
+            () -> new BlockItem(ModBlocks.POLISHED_GREEN_CONCRETE_WALL.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> POLISHED_RED_CONCRETE_STAIRS = ITEMS.register(
+            "polished_red_concrete_stairs",
+            () -> new BlockItem(ModBlocks.POLISHED_RED_CONCRETE_STAIRS.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> POLISHED_RED_CONCRETE_SLAB = ITEMS.register(
+            "polished_red_concrete_slab",
+            () -> new BlockItem(ModBlocks.POLISHED_RED_CONCRETE_SLAB.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> POLISHED_RED_CONCRETE_WALL = ITEMS.register(
+            "polished_red_concrete_wall",
+            () -> new BlockItem(ModBlocks.POLISHED_RED_CONCRETE_WALL.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> POLISHED_BLACK_CONCRETE_STAIRS = ITEMS.register(
+            "polished_black_concrete_stairs",
+            () -> new BlockItem(ModBlocks.POLISHED_BLACK_CONCRETE_STAIRS.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> POLISHED_BLACK_CONCRETE_SLAB = ITEMS.register(
+            "polished_black_concrete_slab",
+            () -> new BlockItem(ModBlocks.POLISHED_BLACK_CONCRETE_SLAB.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> POLISHED_BLACK_CONCRETE_WALL = ITEMS.register(
+            "polished_black_concrete_wall",
+            () -> new BlockItem(ModBlocks.POLISHED_BLACK_CONCRETE_WALL.get(), createBlockItemProperties())
     );
 }

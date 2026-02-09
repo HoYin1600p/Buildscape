@@ -1,4 +1,6 @@
 {
-  "parent": "buildscape:block/glow_lights"
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "buildscape:block/glow_lights"
+  }
 }
-

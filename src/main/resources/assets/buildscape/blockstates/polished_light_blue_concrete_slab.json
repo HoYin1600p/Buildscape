@@ -1,0 +1,13 @@
+﻿{
+  "variants": {
+    "type=bottom": {
+      "model": "buildscape:block/polished_light_blue_concrete_slab"
+    },
+    "type=top": {
+      "model": "buildscape:block/polished_light_blue_concrete_slab_top"
+    },
+    "type=double": {
+      "model": "buildscape:block/polished_light_blue_concrete_slab_double"
+    }
+  }
+}

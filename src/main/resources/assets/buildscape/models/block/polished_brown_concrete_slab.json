@@ -1,0 +1,8 @@
+﻿{
+  "parent": "minecraft:block/slab",
+  "textures": {
+    "bottom": "buildscape:block/polished_brown_concrete",
+    "top": "buildscape:block/polished_brown_concrete",
+    "side": "buildscape:block/polished_brown_concrete"
+  }
+}

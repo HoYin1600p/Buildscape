@@ -1,0 +1,8 @@
+﻿{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "buildscape:polished_blue_concrete"
+  },
+  "result": "buildscape:polished_blue_concrete_wall",
+  "count": 1
+}

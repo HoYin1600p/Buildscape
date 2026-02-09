@@ -115,7 +115,7 @@ public class GlowLightsBlock
             BlockGetter level,
             BlockPos pos
     ) {
-        return state.getValue(LIT) ? 7 : 0;
+        return state.getValue(LIT) ? 15 : 0;
     }
 
     @Override
@@ -523,9 +523,7 @@ public class GlowLightsBlock
             );
 
             if (property != null && state.getBlock() == heldBlock) {
-                if (state.hasProperty(property) && state.getValue(property)) {
-                    return false;
-                }
+                return !state.hasProperty(property) || !state.getValue(property);
             }
 
             return true;

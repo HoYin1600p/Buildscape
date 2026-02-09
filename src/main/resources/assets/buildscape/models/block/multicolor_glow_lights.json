@@ -1,53 +1,53 @@
 {
-  "multipart": [
+  "credit": "Made with Blockbench",
+  "render_type": "cutout",
+  "ambientocclusion": false,
+  "textures": {
+    "0": "buildscape:block/multicolor_glow_lights",
+    "particle": "buildscape:block/multicolor_glow_lights"
+  },
+  "elements": [
     {
-      "when": {
-        "north": true
-      },
-      "apply": {
-        "model": "buildscape:block/multicolor_glow_lights_north"
-      }
-    },
-    {
-      "when": {
-        "east": true
-      },
-      "apply": {
-        "model": "buildscape:block/multicolor_glow_lights_east"
-      }
-    },
-    {
-      "when": {
-        "south": true
-      },
-      "apply": {
-        "model": "buildscape:block/multicolor_glow_lights_south"
-      }
-    },
-    {
-      "when": {
-        "west": true
-      },
-      "apply": {
-        "model": "buildscape:block/multicolor_glow_lights_west"
-      }
-    },
-    {
-      "when": {
-        "up": true
-      },
-      "apply": {
-        "model": "buildscape:block/multicolor_glow_lights_up"
-      }
-    },
-    {
-      "when": {
-        "down": true
-      },
-      "apply": {
-        "model": "buildscape:block/multicolor_glow_lights_down"
+      "from": [
+        0,
+        15.9,
+        0
+      ],
+      "to": [
+        16,
+        16,
+        16
+      ],
+      "shade": false,
+      "faces": {
+        "up": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#0",
+          "tintindex": 0,
+          "forge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#0",
+          "forge_data": {
+            "block_light": 15,
+            "sky_light": 15
+          }
+        }
       }
     }
   ]
 }
-

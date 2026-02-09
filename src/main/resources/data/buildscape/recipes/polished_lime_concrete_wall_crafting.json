@@ -1,0 +1,18 @@
+﻿{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "key": {
+    "P": {
+      "item": "buildscape:polished_lime_concrete"
+    }
+  },
+  "pattern": [
+    "   ",
+    "PPP",
+    "PPP"
+  ],
+  "result": {
+    "count": 6,
+    "item": "buildscape:polished_lime_concrete_wall"
+  }
+}

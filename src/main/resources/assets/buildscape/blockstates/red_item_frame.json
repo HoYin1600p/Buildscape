@@ -1,8 +1,0 @@
-﻿{
-  "variants": {
-    "facing=north": { "model": "buildscape:block/red_item_frame" },
-    "facing=south": { "model": "buildscape:block/red_item_frame", "y": 180 },
-    "facing=west": { "model": "buildscape:block/red_item_frame", "y": 270 },
-    "facing=east": { "model": "buildscape:block/red_item_frame", "y": 90 }
-  }
-}

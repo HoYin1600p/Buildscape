@@ -107,6 +107,16 @@ public class ParticleTrailHandler {
             return new float[] { 1.0f, 0.0f, 0.0f }; // Red
         }
 
+        // Cherry/Cherry Leaves trail - Pink
+        if (idLower.contains("cherry")) {
+            return new float[] { 1.0f, 0.7f, 0.8f }; // Pink
+        }
+
+        // Cake trail - Cream/White
+        if (idLower.contains("cake")) {
+            return new float[] { 1.0f, 0.9f, 0.8f }; // Creamy White
+        }
+
         // Default - Blue sparkle (as requested)
         return new float[] { 0.2f, 0.5f, 1.0f }; // Blue
     }

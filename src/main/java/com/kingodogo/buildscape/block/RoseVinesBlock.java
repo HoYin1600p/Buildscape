@@ -318,9 +318,7 @@ public class RoseVinesBlock extends VineBlock {
             BooleanProperty property = getPropertyForFace(attachDirection);
 
             if (state.getBlock() == heldBlock) {
-                if (state.hasProperty(property) && state.getValue(property)) {
-                    return false;
-                }
+                return !state.hasProperty(property) || !state.getValue(property);
             }
 
             return true;

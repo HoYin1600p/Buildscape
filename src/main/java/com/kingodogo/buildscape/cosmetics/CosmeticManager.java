@@ -202,21 +202,11 @@ public class CosmeticManager {
 
     /**
      * Cosmetic metadata.
+     *
+     * @param tier     1 = Bronze, 2 = Silver, 3 = Gold
+     * @param legacyId For resolving to Item/Block
      */
-    public static class CosmeticMetadata {
-        public final String name;
-        public final String description;
-        public final int tier; // 1 = Bronze, 2 = Silver, 3 = Gold
-        public final CosmeticType type;
-        public final String legacyId; // For resolving to Item/Block
-
-        public CosmeticMetadata(String name, String description, int tier, CosmeticType type, String legacyId) {
-            this.name = name;
-            this.description = description;
-            this.tier = tier;
-            this.type = type;
-            this.legacyId = legacyId;
-        }
+        public record CosmeticMetadata(String name, String description, int tier, CosmeticType type, String legacyId) {
     }
 
     /**

@@ -1085,10 +1085,7 @@ public class PillarItemsConfigTab extends AbstractConfigTab {
         if (presetsWidget != null && presetsWidget.mouseClicked(mouseX, mouseY, button)) {
             return true;
         }
-        if (tagsSelectorWidget != null && tagsSelectorWidget.mouseClicked(mouseX, mouseY, button)) {
-            return true;
-        }
-        return false;
+        return tagsSelectorWidget != null && tagsSelectorWidget.mouseClicked(mouseX, mouseY, button);
     }
     
     @Override
@@ -1102,10 +1099,7 @@ public class PillarItemsConfigTab extends AbstractConfigTab {
         if (presetsWidget != null && presetsWidget.mouseScrolled(mouseX, mouseY, delta)) {
             return true;
         }
-        if (tagsSelectorWidget != null && tagsSelectorWidget.mouseScrolled(mouseX, mouseY, delta)) {
-            return true;
-        }
-        return false;
+        return tagsSelectorWidget != null && tagsSelectorWidget.mouseScrolled(mouseX, mouseY, delta);
     }
     
     @Override
@@ -1120,10 +1114,7 @@ public class PillarItemsConfigTab extends AbstractConfigTab {
         if (tagsSelectorWidget != null && tagsSelectorWidget.mouseDragged(mouseX, mouseY, button, dragX, dragY)) {
             return true;
         }
-        if (presetsWidget != null && presetsWidget.mouseDragged(mouseX, mouseY, button, dragX, dragY)) {
-            return true;
-        }
-        return false;
+        return presetsWidget != null && presetsWidget.mouseDragged(mouseX, mouseY, button, dragX, dragY);
     }
     
     @Override
@@ -1138,10 +1129,7 @@ public class PillarItemsConfigTab extends AbstractConfigTab {
         if (tagsSelectorWidget != null && tagsSelectorWidget.mouseReleased(mouseX, mouseY, button)) {
             return true;
         }
-        if (presetsWidget != null && presetsWidget.mouseReleased(mouseX, mouseY, button)) {
-            return true;
-        }
-        return false;
+        return presetsWidget != null && presetsWidget.mouseReleased(mouseX, mouseY, button);
     }
     
     @Override
@@ -1152,10 +1140,7 @@ public class PillarItemsConfigTab extends AbstractConfigTab {
         if (tagsSearchBox != null && tagsSearchBox.keyPressed(keyCode, scanCode, modifiers)) {
             return true;
         }
-        if (presetsWidget != null && presetsWidget.keyPressed(keyCode, scanCode, modifiers)) {
-            return true;
-        }
-        return false;
+        return presetsWidget != null && presetsWidget.keyPressed(keyCode, scanCode, modifiers);
     }
     
     @Override
@@ -1166,10 +1151,7 @@ public class PillarItemsConfigTab extends AbstractConfigTab {
         if (tagsSearchBox != null && tagsSearchBox.charTyped(codePoint, modifiers)) {
             return true;
         }
-        if (presetsWidget != null && presetsWidget.charTyped(codePoint, modifiers)) {
-            return true;
-        }
-        return false;
+        return presetsWidget != null && presetsWidget.charTyped(codePoint, modifiers);
     }
     
     @Override

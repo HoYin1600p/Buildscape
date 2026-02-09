@@ -54,8 +54,7 @@ public class ArmorDisplayPanel extends BasePanel {
         }
         
         // Check for armor items
-        if (item instanceof ArmorItem) {
-            ArmorItem armor = (ArmorItem) item;
+        if (item instanceof ArmorItem armor) {
             switch (armor.getSlot()) {
                 case HEAD:
                     return 0; // Head slot

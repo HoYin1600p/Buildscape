@@ -550,8 +550,7 @@ public class PillarParticleConfig {
             if (jsonMap != null && jsonMap.containsKey("items")) {
                 Object itemsObj = jsonMap.get("items");
                 this.items = new HashSet<>();
-                if (itemsObj instanceof List) {
-                    List<?> itemsList = (List<?>) itemsObj;
+                if (itemsObj instanceof List<?> itemsList) {
                     for (Object item : itemsList) {
                         if (item instanceof String) {
                             this.items.add((String) item);
@@ -699,7 +698,7 @@ public class PillarParticleConfig {
                 if (jsonMap != null) {
                     if (jsonMap.containsKey("items")) {
                         Object itemsObj = jsonMap.get("items");
-                        if (itemsObj instanceof List) {
+                        if (itemsObj instanceof List<?> itemsList) {
                             File newItemsFile = getItemsFile();
                             writeDefaultItems(newItemsFile);
 
@@ -709,7 +708,6 @@ public class PillarParticleConfig {
                                         "  // Item IDs that trigger particles when placed on pillars\n");
                                 writer.write("  // Migrated from old config file\n");
                                 writer.write("  \"items\": [\n");
-                                List<?> itemsList = (List<?>) itemsObj;
                                 for (int i = 0; i < itemsList.size(); i++) {
                                     Object item = itemsList.get(i);
                                     if (item instanceof String) {

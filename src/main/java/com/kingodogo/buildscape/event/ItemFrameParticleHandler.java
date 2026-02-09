@@ -72,10 +72,9 @@ public class ItemFrameParticleHandler {
     public static void onEntityInteract(
             PlayerInteractEvent.EntityInteract event
     ) {
-        if (!(event.getTarget() instanceof ItemFrame)) {
+        if (!(event.getTarget() instanceof ItemFrame itemFrame)) {
             return;
         }
-        ItemFrame itemFrame = (ItemFrame) event.getTarget();
 
         Player player = event.getPlayer();
         Level level = event.getWorld();
@@ -398,7 +397,7 @@ public class ItemFrameParticleHandler {
             );
 
             level.addParticle(
-                    (SimpleParticleType) ModParticles.GLOW_LIME_SPARKLE.get(),
+                    ModParticles.GLOW_LIME_SPARKLE.get(),
                     centerX + sx,
                     centerY + sy,
                     centerZ + sz,

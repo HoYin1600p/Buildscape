@@ -63,9 +63,7 @@ public class FestiveStockingBlockEntity
             ItemStack stack,
             @Nullable Direction direction
     ) {
-        if (stack.getItem() instanceof net.minecraft.world.item.BlockItem) {
-            net.minecraft.world.item.BlockItem blockItem =
-                    (net.minecraft.world.item.BlockItem) stack.getItem();
+        if (stack.getItem() instanceof net.minecraft.world.item.BlockItem blockItem) {
             if (blockItem.getBlock() instanceof FestiveStockingBlock) {
                 return false;
             }

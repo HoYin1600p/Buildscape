@@ -3,7 +3,6 @@ package com.kingodogo.buildscape.client;
 import com.kingodogo.buildscape.BuildScape;
 import com.kingodogo.buildscape.block.PillarBlock;
 import com.kingodogo.buildscape.block.PillarBlockEntity;
-import com.kingodogo.buildscape.event.ItemFrameParticleHandler;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 
@@ -14,13 +13,11 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.entity.decoration.ItemFrame;
 import net.minecraft.world.item.DyeItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
@@ -61,18 +58,6 @@ public class PillarOverlayHandler {
             return;
         }
 
-        if (hitResult.getType() == HitResult.Type.ENTITY) {
-            EntityHitResult entityHit = (EntityHitResult) hitResult;
-            if (entityHit.getEntity() instanceof ItemFrame) {
-                ItemFrame itemFrame = (ItemFrame) entityHit.getEntity();
-
-                if (ItemFrameParticleHandler.hasCustomColors(itemFrame)) {
-                    renderItemFrameOverlay(event.getMatrixStack(), mc, itemFrame);
-                }
-            }
-            return;
-        }
-
         if (hitResult.getType() != HitResult.Type.BLOCK) {
             return;
         }
@@ -95,43 +80,15 @@ public class PillarOverlayHandler {
         }
 
         BlockEntity be = mc.level.getBlockEntity(pos);
-        if (!(be instanceof PillarBlockEntity)) {
+        if (!(be instanceof PillarBlockEntity pillarBE)) {
             return;
         }
-        PillarBlockEntity pillarBE = (PillarBlockEntity) be;
 
         if (!pillarBE.hasCustomColors()) {
             return;
         }
 
         renderPillarOverlay(event.getMatrixStack(), mc, pillarBE);
-    }
-
-    private static void renderItemFrameOverlay(
-            PoseStack poseStack,
-            Minecraft mc,
-            ItemFrame itemFrame
-    ) {
-        Font font = mc.font;
-        int screenWidth = mc.getWindow().getGuiScaledWidth();
-        int screenHeight = mc.getWindow().getGuiScaledHeight();
-
-        String frameId = ItemFrameParticleHandler.getFrameId(itemFrame);
-        List<String> colors = ItemFrameParticleHandler.getParticleColors(itemFrame);
-
-        if (frameId == null && (colors == null || colors.isEmpty())) {
-            return;
-        }
-
-        renderOverlay(
-                poseStack,
-                font,
-                screenWidth,
-                screenHeight,
-                frameId != null ? frameId : "Unknown",
-                colors,
-                ItemFrameParticleHandler.MAX_DYE_COLORS
-        );
     }
 
     private static void renderPillarOverlay(

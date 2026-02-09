@@ -25,4 +25,8 @@ public class ModParticles {
             PARTICLES.register("confetti", () -> new SimpleParticleType(false));
     public static final RegistryObject<SimpleParticleType> TINTABLE_HEART =
             PARTICLES.register("tintable_heart", () -> new SimpleParticleType(false));
+    public static final RegistryObject<SimpleParticleType> CAKE =
+            PARTICLES.register("cake", () -> new SimpleParticleType(false));
+    public static final RegistryObject<SimpleParticleType> CHERRY =
+            PARTICLES.register("cherry", () -> new SimpleParticleType(false));
 }

@@ -189,7 +189,7 @@ public class MembershipPanel extends BasePanel {
         }
         
         try {
-            String url = "https://buildscape.online/connect?uuid=" + playerUuid.toString();
+            String url = "https://buildscape.online/connect?uuid=" + playerUuid;
             java.awt.Desktop.getDesktop().browse(new URI(url));
             statusMessage = "Opening browser... Please complete the connection on the website.";
             
@@ -328,10 +328,7 @@ public class MembershipPanel extends BasePanel {
     
     @Override
     protected boolean handleMouseClicked(double mouseX, double mouseY, int button) {
-        if (connectButton != null && connectButton.mouseClicked(mouseX, mouseY, button)) {
-            return true;
-        }
-        return false;
+        return connectButton != null && connectButton.mouseClicked(mouseX, mouseY, button);
     }
 }
 

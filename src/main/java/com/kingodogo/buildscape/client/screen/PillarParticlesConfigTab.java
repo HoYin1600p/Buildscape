@@ -513,7 +513,7 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
     private double colorSwatchesScrollbarDragStartOffset = 0;
     private double patternPropertiesScrollOffset = 0;
     private boolean isDraggingDefaultScrollbar = false;
-    private boolean isDraggingColorScrollbar = false;
+    private final boolean isDraggingColorScrollbar = false;
     private boolean isDraggingPatternScrollbar = false;
     private double scrollbarDragStartY = 0;
     private double scrollbarDragStartOffset = 0;
@@ -546,17 +546,17 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
         
         // Clamp scroll offset to prevent scrolling above header
         // The button should never go above headerBottom
-        int minScrollForHeader = Math.max(0, (int)(defaultBaseButtonY - headerBottom));
+        int minScrollForHeader = Math.max(0, defaultBaseButtonY - headerBottom);
         defaultPropertiesScrollOffset = Math.max(0, Math.min(maxScroll, defaultPropertiesScrollOffset));
         
         int scrollOffsetInt = (int)defaultPropertiesScrollOffset;
         
         // Apply scroll offset to positions - reduce spacing between fields
-        usePatternToggle.y = (int)(defaultBaseButtonY - scrollOffsetInt);
-        particleSpeedField.y = (int)(defaultBaseFirstFieldY - scrollOffsetInt);
-        particleSpreadField.y = (int)(defaultBaseFirstFieldY + fieldHeight + fieldSpacing - scrollOffsetInt);
-        particleLifetimeField.y = (int)(defaultBaseFirstFieldY + (fieldHeight + fieldSpacing) * 2 - scrollOffsetInt);
-        particleDensityField.y = (int)(defaultBaseFirstFieldY + (fieldHeight + fieldSpacing) * 3 - scrollOffsetInt);
+        usePatternToggle.y = defaultBaseButtonY - scrollOffsetInt;
+        particleSpeedField.y = defaultBaseFirstFieldY - scrollOffsetInt;
+        particleSpreadField.y = defaultBaseFirstFieldY + fieldHeight + fieldSpacing - scrollOffsetInt;
+        particleLifetimeField.y = defaultBaseFirstFieldY + (fieldHeight + fieldSpacing) * 2 - scrollOffsetInt;
+        particleDensityField.y = defaultBaseFirstFieldY + (fieldHeight + fieldSpacing) * 3 - scrollOffsetInt;
     }
     
     // Update pattern properties widget positions with scroll offset applied
@@ -580,18 +580,18 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
         
         // Clamp scroll offset to prevent scrolling above header
         // The button should never go above headerBottom - same logic as Default Properties
-        int minScrollForHeader = Math.max(0, (int)(patternBaseButtonY - headerBottom));
+        int minScrollForHeader = Math.max(0, patternBaseButtonY - headerBottom);
         patternPropertiesScrollOffset = Math.max(minScrollForHeader, Math.min(maxScroll, patternPropertiesScrollOffset));
         
         int scrollOffsetInt = (int)patternPropertiesScrollOffset;
         
         // Apply scroll offset to positions
         // Order: Pattern Selector, Max Particles, Pattern Speed, Pattern Spread, Pattern Intensity
-        patternSelector.y = (int)(patternBaseButtonY - scrollOffsetInt);
-        maxParticleColorSlider.y = (int)(patternBaseFirstFieldY - scrollOffsetInt);
-        patternSpeedField.y = (int)(patternBaseFirstFieldY + fieldHeight + fieldSpacing - scrollOffsetInt);
-        patternSpreadField.y = (int)(patternBaseFirstFieldY + (fieldHeight + fieldSpacing) * 2 - scrollOffsetInt);
-        patternIntensityField.y = (int)(patternBaseFirstFieldY + (fieldHeight + fieldSpacing) * 3 - scrollOffsetInt);
+        patternSelector.y = patternBaseButtonY - scrollOffsetInt;
+        maxParticleColorSlider.y = patternBaseFirstFieldY - scrollOffsetInt;
+        patternSpeedField.y = patternBaseFirstFieldY + fieldHeight + fieldSpacing - scrollOffsetInt;
+        patternSpreadField.y = patternBaseFirstFieldY + (fieldHeight + fieldSpacing) * 2 - scrollOffsetInt;
+        patternIntensityField.y = patternBaseFirstFieldY + (fieldHeight + fieldSpacing) * 3 - scrollOffsetInt;
     }
     
     /**

@@ -78,11 +78,7 @@ public class MossLayersBlock extends SnowLayerBlock {
             }
         }
 
-        if (i == 1) {
-            return true;
-        }
-
-        return false;
+        return i == 1;
     }
 
     @Override

@@ -295,9 +295,7 @@ public class PillarBlockEntityRenderer
                 // Set tickCount to 0 to prevent time-based animations (bees, blazes, cod, etc.)
                 entity.tickCount = 0;
 
-                if (entity instanceof net.minecraft.world.entity.LivingEntity) {
-                    net.minecraft.world.entity.LivingEntity livingEntity =
-                            (net.minecraft.world.entity.LivingEntity) entity;
+                if (entity instanceof net.minecraft.world.entity.LivingEntity livingEntity) {
                     // Disable AI to prevent any AI-driven animations (only available on Mob, not all LivingEntity)
                     if (entity instanceof net.minecraft.world.entity.Mob) {
                         ((net.minecraft.world.entity.Mob) entity).setNoAi(true);
@@ -325,9 +323,7 @@ public class PillarBlockEntityRenderer
 
                 // Entity-specific animation prevention
                 // Bees: prevent wing flapping and other animations
-                if (entity instanceof net.minecraft.world.entity.animal.Bee) {
-                    net.minecraft.world.entity.animal.Bee bee =
-                            (net.minecraft.world.entity.animal.Bee) entity;
+                if (entity instanceof net.minecraft.world.entity.animal.Bee bee) {
                     bee.setRemainingPersistentAngerTime(0);
                 }
 
@@ -363,9 +359,7 @@ public class PillarBlockEntityRenderer
             // Reset tickCount every frame to prevent time-based animations (bees, blazes, cod, etc.)
             entity.tickCount = 0;
 
-            if (entity instanceof net.minecraft.world.entity.LivingEntity) {
-                net.minecraft.world.entity.LivingEntity livingEntity =
-                        (net.minecraft.world.entity.LivingEntity) entity;
+            if (entity instanceof net.minecraft.world.entity.LivingEntity livingEntity) {
                 // Disable AI every frame to prevent any AI-driven animations (only available on Mob, not all LivingEntity)
                 if (entity instanceof net.minecraft.world.entity.Mob) {
                     ((net.minecraft.world.entity.Mob) entity).setNoAi(true);
@@ -393,9 +387,7 @@ public class PillarBlockEntityRenderer
 
             // Entity-specific animation prevention every frame
             // Bees: prevent wing flapping and other animations
-            if (entity instanceof net.minecraft.world.entity.animal.Bee) {
-                net.minecraft.world.entity.animal.Bee bee =
-                        (net.minecraft.world.entity.animal.Bee) entity;
+            if (entity instanceof net.minecraft.world.entity.animal.Bee bee) {
                 bee.setRemainingPersistentAngerTime(0);
             }
 
@@ -421,9 +413,7 @@ public class PillarBlockEntityRenderer
             entity.yRotO = prevYRot; // Previous rotation for smooth interpolation
 
             // Update head/body rotation for living entities to match the rotation
-            if (entity instanceof net.minecraft.world.entity.LivingEntity) {
-                net.minecraft.world.entity.LivingEntity livingEntity =
-                        (net.minecraft.world.entity.LivingEntity) entity;
+            if (entity instanceof net.minecraft.world.entity.LivingEntity livingEntity) {
                 // Update body and head rotation to match the rotation animation
                 float prevBodyRot = livingEntity.yBodyRot;
                 livingEntity.yBodyRot = finalYaw;
@@ -552,12 +542,10 @@ public class PillarBlockEntityRenderer
                 .entrySet()
                 .removeIf(entry -> {
                     Entity entity = entry.getValue();
-                    if (entity == null || !entity.isAlive()) {
-                        return true;
-                    }
+                    return entity == null || !entity.isAlive();
                     // Remove entities that are too old (older than 5 minutes of game time)
                     // This prevents memory leaks if blocks are removed without calling clearEntityCache
-                    return false; // For now, keep all alive entities
+// For now, keep all alive entities
                 });
     }
 

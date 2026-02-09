@@ -191,7 +191,7 @@ public class BuildScapeConfigScreen extends Screen {
         return (int)(windowHeight / guiScale);
     }
     
-    private Screen parentScreen;
+    private final Screen parentScreen;
     private ConfigCategoryButton pillarItemsButton;
     private ConfigCategoryButton pillarParticlesButton;
     private ConfigCategoryButton pillarIdsButton;

@@ -427,7 +427,7 @@ public class PlayerAvatarPanel extends BasePanel {
             float prevOAttackAnim = 0.0f;
             float prevSpeed = 0.0f;
             if (player instanceof net.minecraft.world.entity.LivingEntity) {
-                net.minecraft.world.entity.LivingEntity living = (net.minecraft.world.entity.LivingEntity) player;
+                net.minecraft.world.entity.LivingEntity living = player;
                 prevHurtTime = living.hurtTime;
                 prevDeathTime = living.deathTime;
                 prevSprinting = living.isSprinting();
@@ -531,7 +531,7 @@ public class PlayerAvatarPanel extends BasePanel {
                 player.yHeadRotO = 0.0f;
                 
                 if (player instanceof net.minecraft.world.entity.LivingEntity) {
-                    net.minecraft.world.entity.LivingEntity living = (net.minecraft.world.entity.LivingEntity) player;
+                    net.minecraft.world.entity.LivingEntity living = player;
                     living.setSprinting(false);
                     living.setShiftKeyDown(false);
                     
@@ -600,7 +600,7 @@ public class PlayerAvatarPanel extends BasePanel {
                 player.setDeltaMovement(0, 0, 0);
                 
                 if (player instanceof net.minecraft.world.entity.LivingEntity) {
-                    net.minecraft.world.entity.LivingEntity living = (net.minecraft.world.entity.LivingEntity) player;
+                    net.minecraft.world.entity.LivingEntity living = player;
                     // Reset hurt and death timers to prevent hurt/dying animations
                     living.hurtTime = 0;
                     living.deathTime = 0;
@@ -693,7 +693,7 @@ public class PlayerAvatarPanel extends BasePanel {
             player.tickCount = originalTickCount; // Restore original tick count
             // Restore animation state
             if (player instanceof net.minecraft.world.entity.LivingEntity) {
-                net.minecraft.world.entity.LivingEntity living = (net.minecraft.world.entity.LivingEntity) player;
+                net.minecraft.world.entity.LivingEntity living = player;
                 living.hurtTime = prevHurtTime;
                 living.deathTime = prevDeathTime;
                 living.setSprinting(prevSprinting);
@@ -796,8 +796,7 @@ public class PlayerAvatarPanel extends BasePanel {
         }
         
         // Check for armor items
-        if (item instanceof net.minecraft.world.item.ArmorItem) {
-            net.minecraft.world.item.ArmorItem armor = (net.minecraft.world.item.ArmorItem) item;
+        if (item instanceof net.minecraft.world.item.ArmorItem armor) {
             return armor.getSlot();
         }
         
@@ -964,7 +963,7 @@ public class PlayerAvatarPanel extends BasePanel {
             dummyPlayer.setSilent(true);
             // Prevent animations for offline player (same as online player)
             if (dummyPlayer instanceof net.minecraft.world.entity.LivingEntity) {
-                net.minecraft.world.entity.LivingEntity living = (net.minecraft.world.entity.LivingEntity) dummyPlayer;
+                net.minecraft.world.entity.LivingEntity living = dummyPlayer;
                 living.hurtTime = 0;
                 living.deathTime = 0;
                 living.setSprinting(false);
@@ -1394,8 +1393,8 @@ public class PlayerAvatarPanel extends BasePanel {
             if (tooltipText == null || tooltipText.isEmpty() || tooltipText.equals(hoveredCosmeticId)) {
                 CosmeticManager cosmeticManager = CosmeticManager.getInstance();
                 com.kingodogo.buildscape.cosmetics.CosmeticManager.CosmeticMetadata metadata = cosmeticManager.getMetadata(hoveredCosmeticId);
-                if (metadata != null && metadata.name != null && !metadata.name.isEmpty()) {
-                    tooltipText = metadata.name;
+                if (metadata != null && metadata.name() != null && !metadata.name().isEmpty()) {
+                    tooltipText = metadata.name();
                 } else {
                     String idPart = hoveredCosmeticId;
                     if (hoveredCosmeticId.startsWith("buildscape:cosmatics/")) {
@@ -1674,8 +1673,8 @@ public class PlayerAvatarPanel extends BasePanel {
                 float halfSize = size / 2.0f;
                 
                 // Draw a small cross
-                GuiComponent.fill(poseStack, (int)(-halfSize * 20), (int)(-1), (int)(halfSize * 20), (int)(1), 0xFFFFFFFF);
-                GuiComponent.fill(poseStack, (int)(-1), (int)(-halfSize * 20), (int)(1), (int)(halfSize * 20), 0xFFFFFFFF);
+                GuiComponent.fill(poseStack, (int)(-halfSize * 20), -1, (int)(halfSize * 20), 1, 0xFFFFFFFF);
+                GuiComponent.fill(poseStack, -1, (int)(-halfSize * 20), 1, (int)(halfSize * 20), 0xFFFFFFFF);
                 
                 poseStack.popPose();
             }

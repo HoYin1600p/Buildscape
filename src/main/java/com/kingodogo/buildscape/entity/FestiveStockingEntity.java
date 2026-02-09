@@ -165,17 +165,17 @@ public class FestiveStockingEntity extends HangingEntity {
             double d6, d7, d8;
 
             if (this.direction.getAxis() == Direction.Axis.Z) {
-                d6 = (double) this.getWidth();
-                d7 = (double) this.getHeight();
+                d6 = this.getWidth();
+                d7 = this.getHeight();
                 d8 = 2.0D;
             } else if (this.direction.getAxis() == Direction.Axis.X) {
                 d6 = 2.0D;
-                d7 = (double) this.getHeight();
-                d8 = (double) this.getWidth();
+                d7 = this.getHeight();
+                d8 = this.getWidth();
             } else {
-                d6 = (double) this.getWidth();
+                d6 = this.getWidth();
                 d7 = 2.0D;
-                d8 = (double) this.getHeight();
+                d8 = this.getHeight();
             }
 
             d6 /= 32.0D;
@@ -218,8 +218,7 @@ public class FestiveStockingEntity extends HangingEntity {
             ItemStack storedItem = this.getItem();
             boolean hasSilkTouch = false;
 
-            if (entity instanceof Player) {
-                Player player = (Player) entity;
+            if (entity instanceof Player player) {
                 ItemStack tool = player.getMainHandItem();
                 if (
                         EnchantmentHelper.getItemEnchantmentLevel(

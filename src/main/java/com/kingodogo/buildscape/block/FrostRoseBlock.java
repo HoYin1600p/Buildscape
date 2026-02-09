@@ -144,8 +144,7 @@ public class FrostRoseBlock extends BushBlock implements BonemealableBlock {
             BlockState state,
             Entity entity
     ) {
-        if (!level.isClientSide && entity instanceof LivingEntity) {
-            LivingEntity livingEntity = (LivingEntity) entity;
+        if (!level.isClientSide && entity instanceof LivingEntity livingEntity) {
             String key =
                     pos.getX() +
                             "," +
@@ -189,8 +188,7 @@ public class FrostRoseBlock extends BushBlock implements BonemealableBlock {
             BlockPos pos,
             Entity entity
     ) {
-        if (!level.isClientSide && entity instanceof LivingEntity) {
-            LivingEntity livingEntity = (LivingEntity) entity;
+        if (!level.isClientSide && entity instanceof LivingEntity livingEntity) {
             String key =
                     pos.getX() +
                             "," +

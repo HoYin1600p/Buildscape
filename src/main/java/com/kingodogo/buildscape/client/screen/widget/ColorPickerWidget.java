@@ -19,7 +19,7 @@ public class ColorPickerWidget extends AbstractWidget {
     private static final int VALUE_TEXT_WIDTH = 40; // Space for value text
 
     private int currentColor; // RGB color (0xRRGGBB)
-    private Consumer<String> onColorChanged;
+    private final Consumer<String> onColorChanged;
     private boolean draggingHue = false;
     private boolean draggingGradient = false;
     private boolean draggingR = false, draggingG = false, draggingB = false;
@@ -155,7 +155,8 @@ public class ColorPickerWidget extends AbstractWidget {
                         brightness = newB / 100.0f;
                         updateColorFromHsb();
                     }
-                } catch (NumberFormatException e) {}
+                } catch (NumberFormatException e) {
+                }
             }
         });
 
@@ -190,6 +191,10 @@ public class ColorPickerWidget extends AbstractWidget {
 
     public boolean isEnabled() {
         return enabled;
+    }
+
+    public float getCurrentScale() {
+        return currentScale;
     }
 
     private void updateRgbFromColor() {
@@ -430,7 +435,7 @@ public class ColorPickerWidget extends AbstractWidget {
         int fieldY = sliderY;
 
         // Draw value text first to measure its width
-        String valueStr = isHsb && !label.equals("H") ? String.format("%.1f", value / 1.0f) : String.valueOf(value);
+        String valueStr = isHsb && !label.equals("H") ? String.format("%.1f", value) : String.valueOf(value);
         int textWidth = mc.font.width(valueStr);
 
         // Calculate field width based on text width with padding
@@ -901,5 +906,6 @@ public class ColorPickerWidget extends AbstractWidget {
     }
 
     @Override
-    public void updateNarration(NarrationElementOutput narrationElementOutput) {}
+    public void updateNarration(NarrationElementOutput narrationElementOutput) {
+    }
 }

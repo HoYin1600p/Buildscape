@@ -271,7 +271,7 @@ public class OrnamentBlock
 
         if (!canSurvive(state, level, pos)) {
             if (level instanceof net.minecraft.server.level.ServerLevel) {
-                ((net.minecraft.server.level.ServerLevel) level).scheduleTick(
+                level.scheduleTick(
                         pos,
                         this,
                         1

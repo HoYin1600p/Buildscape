@@ -22,7 +22,6 @@ import net.minecraft.world.level.Level;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -189,9 +188,7 @@ public class CosmeticsDisplayPanel extends BasePanel {
         if (stack != null && !stack.isEmpty()) {
             Item item = stack.getItem();
             // Elytra is animated
-            if (item instanceof ElytraItem) {
-                return true;
-            }
+            return item instanceof ElytraItem;
         }
 
         return false;
@@ -260,20 +257,20 @@ public class CosmeticsDisplayPanel extends BasePanel {
         switch (currentFilter) {
             case WINGS:
                 if (metadata != null
-                        && metadata.type == com.kingodogo.buildscape.cosmetics.CosmeticManager.CosmeticType.WINGS) {
+                        && metadata.type() == com.kingodogo.buildscape.cosmetics.CosmeticManager.CosmeticType.WINGS) {
                     return true;
                 }
                 return idLower.contains("elytra") || idLower.contains("wing");
             case PARTICLES:
                 if (metadata != null
-                        && metadata.type == com.kingodogo.buildscape.cosmetics.CosmeticManager.CosmeticType.PARTICLE_TRAIL) {
+                        && metadata.type() == com.kingodogo.buildscape.cosmetics.CosmeticManager.CosmeticType.PARTICLE_TRAIL) {
                     return true;
                 }
                 return idLower.contains("particle") || idLower.contains("effect") || idLower.contains("trail");
             case GEAR:
                 // Check if it's a HEAD cosmetic (custom head models like builder's hat)
                 if (metadata != null
-                        && metadata.type == com.kingodogo.buildscape.cosmetics.CosmeticManager.CosmeticType.HEAD) {
+                        && metadata.type() == com.kingodogo.buildscape.cosmetics.CosmeticManager.CosmeticType.HEAD) {
                     return true;
                 }
                 // Gear includes armor, weapons, tools
@@ -346,7 +343,7 @@ public class CosmeticsDisplayPanel extends BasePanel {
             // Stagger start times slightly so items don't all rotate in sync
             if (!itemRotationTimes.containsKey(cosmeticId)) {
                 int index = filteredCosmeticIds.indexOf(cosmeticId);
-                int staggerOffset = (int) (index * 200); // 200ms stagger per item for variety
+                int staggerOffset = index * 200; // 200ms stagger per item for variety
                 itemRotationTimes.put(cosmeticId, currentTime - staggerOffset);
             }
         }
@@ -623,7 +620,7 @@ public class CosmeticsDisplayPanel extends BasePanel {
                 com.kingodogo.buildscape.cosmetics.CosmeticManager.CosmeticMetadata headMetadata = com.kingodogo.buildscape.cosmetics.CosmeticManager
                         .getInstance().getMetadata(cosmeticId);
                 boolean isHeadCosmetic = headMetadata != null &&
-                        headMetadata.type == com.kingodogo.buildscape.cosmetics.CosmeticManager.CosmeticType.HEAD;
+                        headMetadata.type() == com.kingodogo.buildscape.cosmetics.CosmeticManager.CosmeticType.HEAD;
 
                 ItemStack stack = cosmeticRegistry.resolveToItemStack(cosmeticId);
 
@@ -651,7 +648,7 @@ public class CosmeticsDisplayPanel extends BasePanel {
                             // variety
                             long baseTime = System.nanoTime() / 1000000L;
                             // Stagger by index to create wave effect
-                            int staggerOffset = (int) (index * 100); // 100ms stagger per item
+                            int staggerOffset = index * 100; // 100ms stagger per item
                             itemAnimationTimes.put(cosmeticId, baseTime - staggerOffset);
                         }
                     }
@@ -880,8 +877,8 @@ public class CosmeticsDisplayPanel extends BasePanel {
                 CosmeticManager cosmeticManager = CosmeticManager.getInstance();
                 com.kingodogo.buildscape.cosmetics.CosmeticManager.CosmeticMetadata metadata = cosmeticManager
                         .getMetadata(hoveredCosmeticId);
-                if (metadata != null && metadata.name != null && !metadata.name.isEmpty()) {
-                    tooltipText = metadata.name;
+                if (metadata != null && metadata.name() != null && !metadata.name().isEmpty()) {
+                    tooltipText = metadata.name();
                 } else {
                     String idPart = hoveredCosmeticId;
                     if (hoveredCosmeticId.startsWith("buildscape:cosmatics/")) {
@@ -1011,25 +1008,38 @@ public class CosmeticsDisplayPanel extends BasePanel {
 
         // Draw Title text in header
         String headerTitle = "Color Picker";
-        mc.font.draw(poseStack, headerTitle, colorPicker.x + 5, colorPicker.y - headerHeight + 6, 0xFFE0E0E0);
+        float scale = colorPicker.getCurrentScale();
+
+        poseStack.pushPose();
+        poseStack.translate(colorPicker.x + 5, colorPicker.y - headerHeight + 6, 0);
+        poseStack.scale(scale, scale, 1.0f);
+        mc.font.draw(poseStack, headerTitle, 0, 0, 0xFFE0E0E0);
+        poseStack.popPose();
 
         // Draw drag handle icon (3 centered horizontal lines) - centered in header
-        int handleWidth = 15;
-        int lineThickness = 2;
+        int handleWidth = (int) (15 * scale);
+        int lineThickness = (int) (2 * scale);
+        int lineSpacing = (int) (4 * scale);
         int handleX = colorPicker.x + (colorPicker.getWidth() - handleWidth) / 2;
-        int handleY = colorPicker.y - headerHeight / 2 - 3;
+        int handleY = colorPicker.y - headerHeight / 2 - (int) (3 * scale);
+
         GuiComponent.fill(poseStack, handleX, handleY, handleX + handleWidth, handleY + lineThickness, 0xFFAAAAAA);
-        GuiComponent.fill(poseStack, handleX, handleY + 4, handleX + handleWidth, handleY + 4 + lineThickness,
-                0xFFAAAAAA);
-        GuiComponent.fill(poseStack, handleX, handleY + 8, handleX + handleWidth, handleY + 8 + lineThickness,
-                0xFFAAAAAA);
+        GuiComponent.fill(poseStack, handleX, handleY + lineSpacing, handleX + handleWidth,
+                handleY + lineSpacing + lineThickness, 0xFFAAAAAA);
+        GuiComponent.fill(poseStack, handleX, handleY + lineSpacing * 2, handleX + handleWidth,
+                handleY + lineSpacing * 2 + lineThickness, 0xFFAAAAAA);
 
         // Draw Close Button 'X' - smaller clickable area
-        int closeX = colorPicker.x + colorPicker.getWidth() - 15;
-        int closeY = colorPicker.y - headerHeight + 5;
-        mc.font.draw(poseStack, "x", closeX, closeY, 0xFFFF5555);
+        int closeX = colorPicker.x + colorPicker.getWidth() - (int) (15 * scale);
+        int closeY = colorPicker.y - headerHeight + (int) (5 * scale);
 
-        colorPicker.renderButton(poseStack, (int) mouseX, (int) mouseY, partialTick);
+        poseStack.pushPose();
+        poseStack.translate(closeX, closeY, 0);
+        poseStack.scale(scale, scale, 1.0f);
+        mc.font.draw(poseStack, "x", 0, 0, 0xFFFF5555);
+        poseStack.popPose();
+
+        colorPicker.renderButton(poseStack, mouseX, mouseY, partialTick);
 
         // Pop pose stack to restore Z-level
         poseStack.popPose();
@@ -1906,8 +1916,7 @@ public class CosmeticsDisplayPanel extends BasePanel {
         }
 
         // Check for armor items
-        if (item instanceof net.minecraft.world.item.ArmorItem) {
-            net.minecraft.world.item.ArmorItem armor = (net.minecraft.world.item.ArmorItem) item;
+        if (item instanceof net.minecraft.world.item.ArmorItem armor) {
             switch (armor.getSlot()) {
                 case HEAD:
                     return 0; // Head slot
@@ -1982,9 +1991,7 @@ public class CosmeticsDisplayPanel extends BasePanel {
 
         // Forward to color picker if open
         if (colorPicker != null && selectedCosmeticForColor != null) {
-            if (colorPicker.mouseReleased(mouseX, mouseY, button)) {
-                return true;
-            }
+            return colorPicker.mouseReleased(mouseX, mouseY, button);
         }
         // No drag functionality, so nothing to do here
         return false;

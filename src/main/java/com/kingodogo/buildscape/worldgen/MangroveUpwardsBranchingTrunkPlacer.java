@@ -88,7 +88,7 @@ public class MangroveUpwardsBranchingTrunkPlacer extends TrunkPlacer {
             int y = elevatedStartY + i;
             mutablePos.set(pos.getX(), y, pos.getZ());
 
-            if (this.placeLog(level, blockSetter, random, mutablePos, config)) {
+            if (placeLog(level, blockSetter, random, mutablePos, config)) {
                 if (i > 0 && random.nextFloat() < placeBranchPerLogProbability) {
                     this.placeBranch(
                             level,
@@ -142,7 +142,7 @@ public class MangroveUpwardsBranchingTrunkPlacer extends TrunkPlacer {
 
         for (int i = 0; i < branchLength; i++) {
             branchEnd.move(branchDirection);
-            if (this.placeLog(level, blockSetter, random, branchEnd, config)) {
+            if (placeLog(level, blockSetter, random, branchEnd, config)) {
                 currentPos.set(branchEnd);
             } else {
                 break;
@@ -151,7 +151,7 @@ public class MangroveUpwardsBranchingTrunkPlacer extends TrunkPlacer {
 
         for (int i = 0; i < branchSteps; i++) {
             branchEnd.move(Direction.UP);
-            if (this.placeLog(level, blockSetter, random, branchEnd, config)) {
+            if (placeLog(level, blockSetter, random, branchEnd, config)) {
                 currentPos.set(branchEnd);
                 foliageAttachments.add(
                         new FoliagePlacer.FoliageAttachment(currentPos.immutable(), 0, false)

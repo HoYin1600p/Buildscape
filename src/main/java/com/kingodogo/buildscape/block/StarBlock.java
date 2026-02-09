@@ -244,8 +244,7 @@ public class StarBlock extends BushBlock implements SimpleWaterloggedBlock {
             BlockPos pos,
             Entity entity
     ) {
-        if (entity instanceof Player) {
-            Player player = (Player) entity;
+        if (entity instanceof Player player) {
             if (player.isOnGround() && level.isClientSide) {
                 float stepInterval = 2.0f;
                 int currentStep = (int) (player.walkDist / stepInterval);

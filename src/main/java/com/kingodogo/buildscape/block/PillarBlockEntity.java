@@ -33,7 +33,7 @@ public class PillarBlockEntity extends BlockEntity {
 
     private int particleColorCounter = 0;
 
-    private static int globalParticleColorCounter = 0;
+    private static final int globalParticleColorCounter = 0;
 
     public static final int MAX_DYE_COLORS = 5;
 
@@ -167,7 +167,7 @@ public class PillarBlockEntity extends BlockEntity {
                     for (int i = 0; i < managerColors.size(); i++) {
                         String managerColor = managerColors.get(i);
                         String currentColor = this.particleColors.get(i);
-                        if (managerColor == null || currentColor == null || !managerColor.equals(currentColor)) {
+                        if (managerColor == null || !managerColor.equals(currentColor)) {
                             shouldSync = true;
                             break;
                         }
@@ -219,7 +219,7 @@ public class PillarBlockEntity extends BlockEntity {
                             for (int i = 0; i < this.particleColors.size(); i++) {
                                 String nbtColor = this.particleColors.get(i);
                                 String managerColor = i < managerColors.size() ? managerColors.get(i) : null;
-                                if (nbtColor == null || managerColor == null || !nbtColor.equals(managerColor)) {
+                                if (nbtColor == null || !nbtColor.equals(managerColor)) {
                                     needsSync = true;
                                     break;
                                 }
@@ -473,9 +473,7 @@ public class PillarBlockEntity extends BlockEntity {
 
         if (level != null) {
             String stackPattern = getStackParticlePattern();
-            if (stackPattern != null) {
-                return stackPattern;
-            }
+            return stackPattern;
         }
 
         return null;
@@ -604,32 +602,11 @@ public class PillarBlockEntity extends BlockEntity {
         }
     }
 
-    private int clientSyncAttempts = 0;
+    private final int clientSyncAttempts = 0;
     private static final int MAX_SYNC_ATTEMPTS = 5;
 
-    private static class ParticleSpawnData {
+    private record ParticleSpawnData(double sx, double sy, double sz, double vx, double vy, double vz, float size) {
 
-        final double sx, sy, sz;
-        final double vx, vy, vz;
-        final float size;
-
-        ParticleSpawnData(
-                double sx,
-                double sy,
-                double sz,
-                double vx,
-                double vy,
-                double vz,
-                float size
-        ) {
-            this.sx = sx;
-            this.sy = sy;
-            this.sz = sz;
-            this.vx = vx;
-            this.vy = vy;
-            this.vz = vz;
-            this.size = size;
-        }
     }
 
     private int syncTickCounter = 0;
@@ -750,7 +727,7 @@ public class PillarBlockEntity extends BlockEntity {
                 }
 
                 level.addParticle(
-                        (SimpleParticleType) particleType,
+                        particleType,
                         particleX,
                         particleY,
                         particleZ,
@@ -852,7 +829,7 @@ public class PillarBlockEntity extends BlockEntity {
                     }
                 } catch (Exception e) {
                     level.addParticle(
-                            (SimpleParticleType) particleType,
+                            particleType,
                             particleX,
                             particleY,
                             particleZ,
@@ -863,7 +840,7 @@ public class PillarBlockEntity extends BlockEntity {
                 }
             } else {
                 level.addParticle(
-                        (SimpleParticleType) particleType,
+                        particleType,
                         particleX,
                         particleY,
                         particleZ,

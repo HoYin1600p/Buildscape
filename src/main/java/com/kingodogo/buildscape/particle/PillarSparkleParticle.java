@@ -132,7 +132,7 @@ public class PillarSparkleParticle extends TextureSheetParticle {
         float fadeOut = 0.9F;
         if (this.age > this.lifetime * fadeOut) {
             float fadeProgress =
-                    (float) (this.age - this.lifetime * fadeOut) /
+                    (this.age - this.lifetime * fadeOut) /
                             (this.lifetime * (1.0F - fadeOut));
             this.alpha = 1.0F - fadeProgress;
         } else {

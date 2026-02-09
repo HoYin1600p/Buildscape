@@ -155,8 +155,7 @@ public class ClientEvents {
                         float volume = 0.15f;
                         float pitch = 1.0f;
 
-                        if (sounds instanceof com.kingodogo.buildscape.block.CustomSoundType) {
-                            com.kingodogo.buildscape.block.CustomSoundType customSounds = (com.kingodogo.buildscape.block.CustomSoundType) sounds;
+                        if (sounds instanceof com.kingodogo.buildscape.block.CustomSoundType customSounds) {
                             volume = customSounds.getStepVolume();
                             pitch = customSounds.getStepPitch();
                         }

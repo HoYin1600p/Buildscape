@@ -4197,65 +4197,66 @@ public class ModItems {
         // Colored Item Frames
         public static final RegistryObject<Item> WHITE_ITEM_FRAME = ITEMS.register(
                         "white_item_frame",
-                        () -> new ColoredItemFrameItem(createBlockItemProperties(), "white"));
-
-        public static final RegistryObject<Item> LIGHT_GRAY_ITEM_FRAME = ITEMS.register(
-                        "light_gray_item_frame",
-                        () -> new ColoredItemFrameItem(createBlockItemProperties(), "light_gray"));
-
-        public static final RegistryObject<Item> GRAY_ITEM_FRAME = ITEMS.register(
-                        "gray_item_frame",
-                        () -> new ColoredItemFrameItem(createBlockItemProperties(), "gray"));
-
-        public static final RegistryObject<Item> BLACK_ITEM_FRAME = ITEMS.register(
-                        "black_item_frame",
-                        () -> new ColoredItemFrameItem(createBlockItemProperties(), "black"));
-
-        public static final RegistryObject<Item> BROWN_ITEM_FRAME = ITEMS.register(
-                        "brown_item_frame",
-                        () -> new ColoredItemFrameItem(createBlockItemProperties(), "brown"));
-
-        public static final RegistryObject<Item> RED_ITEM_FRAME = ITEMS.register(
-                        "red_item_frame",
-                        () -> new ColoredItemFrameItem(createBlockItemProperties(), "red"));
+                        () -> new BlockItem(ModBlocks.WHITE_ITEM_FRAME.get(), createBlockItemProperties()));
 
         public static final RegistryObject<Item> ORANGE_ITEM_FRAME = ITEMS.register(
                         "orange_item_frame",
-                        () -> new ColoredItemFrameItem(createBlockItemProperties(), "orange"));
-
-        public static final RegistryObject<Item> YELLOW_ITEM_FRAME = ITEMS.register(
-                        "yellow_item_frame",
-                        () -> new ColoredItemFrameItem(createBlockItemProperties(), "yellow"));
-
-        public static final RegistryObject<Item> LIME_ITEM_FRAME = ITEMS.register(
-                        "lime_item_frame",
-                        () -> new ColoredItemFrameItem(createBlockItemProperties(), "lime"));
-
-        public static final RegistryObject<Item> GREEN_ITEM_FRAME = ITEMS.register(
-                        "green_item_frame",
-                        () -> new ColoredItemFrameItem(createBlockItemProperties(), "green"));
-
-        public static final RegistryObject<Item> CYAN_ITEM_FRAME = ITEMS.register(
-                        "cyan_item_frame",
-                        () -> new ColoredItemFrameItem(createBlockItemProperties(), "cyan"));
-
-        public static final RegistryObject<Item> LIGHT_BLUE_ITEM_FRAME = ITEMS.register(
-                        "light_blue_item_frame",
-                        () -> new ColoredItemFrameItem(createBlockItemProperties(), "light_blue"));
-
-        public static final RegistryObject<Item> BLUE_ITEM_FRAME = ITEMS.register(
-                        "blue_item_frame",
-                        () -> new ColoredItemFrameItem(createBlockItemProperties(), "blue"));
-
-        public static final RegistryObject<Item> PURPLE_ITEM_FRAME = ITEMS.register(
-                        "purple_item_frame",
-                        () -> new ColoredItemFrameItem(createBlockItemProperties(), "purple"));
+                        () -> new BlockItem(ModBlocks.ORANGE_ITEM_FRAME.get(), createBlockItemProperties()));
 
         public static final RegistryObject<Item> MAGENTA_ITEM_FRAME = ITEMS.register(
                         "magenta_item_frame",
-                        () -> new ColoredItemFrameItem(createBlockItemProperties(), "magenta"));
+                        () -> new BlockItem(ModBlocks.MAGENTA_ITEM_FRAME.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> LIGHT_BLUE_ITEM_FRAME = ITEMS.register(
+                        "light_blue_item_frame",
+                        () -> new BlockItem(ModBlocks.LIGHT_BLUE_ITEM_FRAME.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> YELLOW_ITEM_FRAME = ITEMS.register(
+                        "yellow_item_frame",
+                        () -> new BlockItem(ModBlocks.YELLOW_ITEM_FRAME.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> LIME_ITEM_FRAME = ITEMS.register(
+                        "lime_item_frame",
+                        () -> new BlockItem(ModBlocks.LIME_ITEM_FRAME.get(), createBlockItemProperties()));
 
         public static final RegistryObject<Item> PINK_ITEM_FRAME = ITEMS.register(
                         "pink_item_frame",
-                        () -> new ColoredItemFrameItem(createBlockItemProperties(), "pink"));
+                        () -> new BlockItem(ModBlocks.PINK_ITEM_FRAME.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> GRAY_ITEM_FRAME = ITEMS.register(
+                        "gray_item_frame",
+                        () -> new BlockItem(ModBlocks.GRAY_ITEM_FRAME.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> LIGHT_GRAY_ITEM_FRAME = ITEMS.register(
+                        "light_gray_item_frame",
+                        () -> new BlockItem(ModBlocks.LIGHT_GRAY_ITEM_FRAME.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> CYAN_ITEM_FRAME = ITEMS.register(
+                        "cyan_item_frame",
+                        () -> new BlockItem(ModBlocks.CYAN_ITEM_FRAME.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> PURPLE_ITEM_FRAME = ITEMS.register(
+                        "purple_item_frame",
+                        () -> new BlockItem(ModBlocks.PURPLE_ITEM_FRAME.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> BLUE_ITEM_FRAME = ITEMS.register(
+                        "blue_item_frame",
+                        () -> new BlockItem(ModBlocks.BLUE_ITEM_FRAME.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> BROWN_ITEM_FRAME = ITEMS.register(
+                        "brown_item_frame",
+                        () -> new BlockItem(ModBlocks.BROWN_ITEM_FRAME.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> GREEN_ITEM_FRAME = ITEMS.register(
+                        "green_item_frame",
+                        () -> new BlockItem(ModBlocks.GREEN_ITEM_FRAME.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> RED_ITEM_FRAME = ITEMS.register(
+                        "red_item_frame",
+                        () -> new BlockItem(ModBlocks.RED_ITEM_FRAME.get(), createBlockItemProperties()));
+
+        public static final RegistryObject<Item> BLACK_ITEM_FRAME = ITEMS.register(
+                        "black_item_frame",
+                        () -> new BlockItem(ModBlocks.BLACK_ITEM_FRAME.get(), createBlockItemProperties()));
+
 }

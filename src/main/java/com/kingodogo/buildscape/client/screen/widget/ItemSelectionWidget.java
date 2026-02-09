@@ -29,7 +29,7 @@ public class ItemSelectionWidget extends AbstractWidget {
     
     private final Consumer<String> onItemSelected;
     private final Predicate<String> isItemInConfig;
-    private List<Item> allItems;
+    private final List<Item> allItems;
     private List<Item> filteredItems;
     private String filter = "";
     private double scrollOffset = 0;

@@ -1,7 +1,5 @@
 package com.kingodogo.buildscape.block;
 
-import java.util.Random;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -10,30 +8,21 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BoneMealItem;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.BonemealableBlock;
 import net.minecraft.world.level.block.LeavesBlock;
-import net.minecraft.world.level.block.SimpleWaterloggedBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraft.world.level.block.state.properties.BooleanProperty;
-import net.minecraft.world.level.material.FluidState;
-import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.BlockHitResult;
+
+import java.util.Random;
 
 public class MangroveLeavesBlock
         extends LeavesBlock
-        implements SimpleWaterloggedBlock, BonemealableBlock {
-
-    public static final BooleanProperty WATERLOGGED =
-            BlockStateProperties.WATERLOGGED;
+        implements BonemealableBlock {
 
     private static final ThreadLocal<Direction> BONEMEAL_DIRECTION =
             new ThreadLocal<>();
@@ -42,58 +31,10 @@ public class MangroveLeavesBlock
         super(properties);
         this.registerDefaultState(
                 this.stateDefinition.any()
-                        .setValue(WATERLOGGED, false)
+                        .setValue(BlockStateProperties.WATERLOGGED, false)
                         .setValue(DISTANCE, 7)
                         .setValue(PERSISTENT, false)
         );
-    }
-
-    @Override
-    protected void createBlockStateDefinition(
-            StateDefinition.Builder<Block, BlockState> builder
-    ) {
-        super.createBlockStateDefinition(builder);
-        builder.add(WATERLOGGED);
-    }
-
-    @Override
-    public BlockState getStateForPlacement(BlockPlaceContext context) {
-        FluidState fluidstate = context
-                .getLevel()
-                .getFluidState(context.getClickedPos());
-        return super.getStateForPlacement(context).setValue(
-                WATERLOGGED,
-                fluidstate.getType() == Fluids.WATER
-        );
-    }
-
-    @Override
-    public BlockState updateShape(
-            BlockState state,
-            Direction direction,
-            BlockState neighborState,
-            LevelAccessor level,
-            BlockPos pos,
-            BlockPos neighborPos
-    ) {
-        if (state.getValue(WATERLOGGED)) {
-            level.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
-        }
-        return super.updateShape(
-                state,
-                direction,
-                neighborState,
-                level,
-                pos,
-                neighborPos
-        );
-    }
-
-    @Override
-    public FluidState getFluidState(BlockState state) {
-        return state.getValue(WATERLOGGED)
-                ? Fluids.WATER.getSource(false)
-                : super.getFluidState(state);
     }
 
     @Override

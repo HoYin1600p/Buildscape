@@ -1405,61 +1405,7 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
         // render manually
         // Render shared color picker if a swatch is selected - hide from parent and
         // render manually
-        if (sharedColorPicker != null) {
-            // Always hide from parent to prevent duplicate rendering
-            sharedColorPicker.visible = false;
 
-            // Render manually if a swatch is selected - always render when
-            // selectedColorIndex is valid
-            if (selectedColorIndex >= 0 && selectedColorIndex < 7) {
-                // Recalculate position during render to ensure it's correct
-                int pickerPadding = 10;
-                int swatchSize = 20;
-                int rowSpacing = 4;
-                int numSwatches = 7;
-                int numRows = (numSwatches + 1) / 2; // 4 rows (3 full rows + 1 with 1 swatch)
-                int swatchAreaHeight = (numRows * swatchSize) + ((numRows - 1) * rowSpacing); // Swatch area height
-                int colorPadding = 10;
-
-                // Calculate available space for picker
-                int availableY = colorBoxY + colorPadding + swatchAreaHeight + 20; // Start below swatches
-                int pickerAvailableHeight = colorBoxY + colorBoxHeight - pickerPadding - availableY; // Remaining height
-                int pickerAvailableWidth = colorBoxWidth - pickerPadding * 2; // Available width
-
-                // Ideal picker size
-                int idealWidth = 250;
-                int idealHeight = 220;
-
-                // Calculate actual picker size - shrink to fit if needed
-                int pickerWidth = Math.min(idealWidth, pickerAvailableWidth);
-                int pickerHeight = Math.min(idealHeight, pickerAvailableHeight);
-
-                // If picker is smaller than ideal, it will scale internally
-                // Position picker below the swatches, centered horizontally
-                int pickerX = colorBoxX + (colorBoxWidth - pickerWidth) / 2; // Center horizontally
-                int pickerY = availableY; // Below swatches
-
-                // Ensure picker doesn't overflow panel
-                if (pickerX < colorBoxX + pickerPadding) {
-                    pickerX = colorBoxX + pickerPadding;
-                    pickerWidth = Math.min(pickerWidth, colorBoxX + colorBoxWidth - pickerPadding - pickerX);
-                }
-                if (pickerY + pickerHeight > colorBoxY + colorBoxHeight - pickerPadding) {
-                    pickerHeight = colorBoxY + colorBoxHeight - pickerPadding - pickerY;
-                }
-
-                // Set picker size and position
-                sharedColorPicker.x = pickerX;
-                sharedColorPicker.y = pickerY;
-                sharedColorPicker.setWidth(pickerWidth);
-                sharedColorPicker.setHeight(pickerHeight);
-
-                // Always render the picker - scissor test will clip it to panel bounds
-                sharedColorPicker.visible = true;
-                sharedColorPicker.renderButton(poseStack, mouseX, mouseY, partialTick);
-                sharedColorPicker.visible = false;
-            }
-        }
         RenderSystem.disableScissor();
 
         // Render colors reset button AFTER scissor (Text style)
@@ -1521,8 +1467,8 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
 
         int patternTitleHeight = 20;
         int patternButtonHeight = 20;
-        int patternButtonToFieldSpacing = 5; // Reduced spacing (matching user's changes)
-        int patternFieldSpacing = 2; // Reduced spacing (matching user's changes)
+        int patternButtonToFieldSpacing = 2; // Reduced spacing (matching user's changes)
+        int patternFieldSpacing = 1; // Reduced spacing (matching user's changes)
         int patternLabelYOffset = 6;
         int patternFieldHeight = 20;
         int patternSliderHeight = 20;
@@ -1642,7 +1588,7 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
             int scrollbarY = patternBoxY + padding + patternTitleHeight;
             // Extend scrollbar to the bottom offset
             bottomOffset = Math.max(5, (int) (windowHeight * 0.01 / guiScale));
-            int scrollbarHeight = patternBoxHeight - padding - patternTitleHeight - bottomOffset;
+            int scrollbarHeight = patternBoxHeight - padding - patternTitleHeight - padding - 2;
 
             double visibleRatio = patternAvailableHeight / (double) patternTotalContentHeight;
             patternScrollbarRenderer.renderScrollbar(poseStack, scrollbarX, scrollbarY, scrollbarHeight,
@@ -1653,6 +1599,68 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
 
         // Update config from current fields
         updateConfigFromFields();
+    }
+
+    @Override
+    public void renderTooltips(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
+        if (sharedColorPicker != null) {
+            // Always hide from parent to prevent duplicate rendering
+            sharedColorPicker.visible = false;
+
+            // Render manually if a swatch is selected - always render when
+            // selectedColorIndex is valid
+            if (selectedColorIndex >= 0 && selectedColorIndex < 7) {
+                // Recalculate position during render to ensure it's correct
+                int pickerPadding = 10;
+                int swatchSize = 20;
+                int rowSpacing = 4;
+                int numSwatches = 7;
+                int numRows = (numSwatches + 1) / 2; // 4 rows (3 full rows + 1 with 1 swatch)
+                int swatchAreaHeight = (numRows * swatchSize) + ((numRows - 1) * rowSpacing); // Swatch area height
+                int colorPadding = 10;
+
+                // Calculate available space for picker
+                int availableY = colorBoxY + colorPadding + swatchAreaHeight + 20; // Start below swatches
+                int pickerAvailableHeight = colorBoxY + colorBoxHeight - pickerPadding - availableY; // Remaining height
+                int pickerAvailableWidth = colorBoxWidth - pickerPadding * 2; // Available width
+
+                // Ideal picker size
+                int idealWidth = 250;
+                int idealHeight = 220;
+
+                // Calculate actual picker size - shrink to fit if needed
+                int pickerWidth = Math.min(idealWidth, pickerAvailableWidth);
+                int pickerHeight = Math.min(idealHeight, pickerAvailableHeight);
+
+                // If picker is smaller than ideal, it will scale internally
+                // Position picker below the swatches, centered horizontally
+                int pickerX = colorBoxX + (colorBoxWidth - pickerWidth) / 2; // Center horizontally
+                int pickerY = availableY; // Below swatches
+
+                // Ensure picker doesn't overflow panel
+                if (pickerX < colorBoxX + pickerPadding) {
+                    pickerX = colorBoxX + pickerPadding;
+                    pickerWidth = Math.min(pickerWidth, colorBoxX + colorBoxWidth - pickerPadding - pickerX);
+                }
+                if (pickerY + pickerHeight > colorBoxY + colorBoxHeight - pickerPadding) {
+                    pickerHeight = colorBoxY + colorBoxHeight - pickerPadding - pickerY;
+                }
+
+                // Set picker size and position
+                sharedColorPicker.x = pickerX;
+                sharedColorPicker.y = pickerY;
+                sharedColorPicker.setWidth(pickerWidth);
+                sharedColorPicker.setHeight(pickerHeight);
+
+                // Always render the picker - no scissor test here so it floats on top
+                poseStack.pushPose();
+                poseStack.translate(0, 0, 500);
+                sharedColorPicker.visible = true;
+                sharedColorPicker.renderButton(poseStack, mouseX, mouseY, partialTick);
+                sharedColorPicker.visible = false;
+                poseStack.popPose();
+            }
+        }
     }
 
     private void updateConfigFromFields() {

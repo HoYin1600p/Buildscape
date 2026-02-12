@@ -12,11 +12,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Registry for parsing and resolving cosmetic IDs to Minecraft registry entries.
+ * Registry for parsing and resolving cosmetic IDs to Minecraft registry
+ * entries.
  * 
  * Cosmetic IDs are strings in format:
- * - "item:namespace:item_id" - Item cosmetic (e.g., "item:minecraft:diamond_sword")
- * - "block:namespace:block_id" - Block cosmetic (e.g., "block:minecraft:gold_block")
+ * - "item:namespace:item_id" - Item cosmetic (e.g.,
+ * "item:minecraft:diamond_sword")
+ * - "block:namespace:block_id" - Block cosmetic (e.g.,
+ * "block:minecraft:gold_block")
  * - "nbt:custom_data" - NBT-based cosmetic (custom data stored in game)
  * - "type:armor_set_1" - Type-based cosmetic (armor sets, etc.)
  * 
@@ -46,7 +49,8 @@ public class CosmeticRegistry {
     /**
      * Parse a cosmetic ID string and return the type and identifier.
      *
-     * @param cosmeticId Cosmetic ID string (e.g., "buildscape:cosmatics/gear/diamond_sword")
+     * @param cosmeticId Cosmetic ID string (e.g.,
+     *                   "buildscape:cosmatics/gear/diamond_sword")
      * @return Parsed cosmetic info, or null if invalid format
      */
     @Nullable
@@ -65,12 +69,13 @@ public class CosmeticRegistry {
 
                 // Map new categories to internal types
                 String type = category;
-                if (category.equals("gear")) type = "item"; // Default to item for gear
-                
+                if (category.equals("gear"))
+                    type = "item"; // Default to item for gear
+
                 // Get legacy ID from CosmeticManager if possible for resolving
                 CosmeticManager.CosmeticMetadata metadata = CosmeticManager.getInstance().getMetadata(cosmeticId);
-                String legacyId = (metadata != null) ? metadata.legacyId : null;
-                
+                String legacyId = (metadata != null) ? metadata.legacyId() : null;
+
                 if (legacyId != null) {
                     // Parse legacy ID to get namespace and id
                     String[] legacyParts = legacyId.split(":", 3);
@@ -181,10 +186,12 @@ public class CosmeticRegistry {
             return null;
         }
 
-        // Check if this is a custom HEAD cosmetic - these should NOT resolve to ItemStacks
-        // Custom head cosmetics like builder's hat use custom models, not ItemStack models
+        // Check if this is a custom HEAD cosmetic - these should NOT resolve to
+        // ItemStacks
+        // Custom head cosmetics like builder's hat use custom models, not ItemStack
+        // models
         CosmeticManager.CosmeticMetadata meta = CosmeticManager.getInstance().getMetadata(cosmeticId);
-        if (meta != null && meta.type == CosmeticManager.CosmeticType.HEAD) {
+        if (meta != null && meta.type() == CosmeticManager.CosmeticType.HEAD) {
             // Return null for custom head cosmetics - they use custom rendering
             return null;
         }
@@ -231,11 +238,11 @@ public class CosmeticRegistry {
                         } else {
                             // Fallback: if cosmetic metadata has a legacyId, try resolving that
                             // Reuse the meta variable we already have from the HEAD check above
-                            if (meta != null && meta.legacyId != null && !meta.legacyId.isEmpty()) {
-                                Item legacyItem = resolveToItem(meta.legacyId);
+                            if (meta != null && meta.legacyId() != null && !meta.legacyId().isEmpty()) {
+                                Item legacyItem = resolveToItem(meta.legacyId());
                                 if (legacyItem == null) {
                                     // legacyId might be block:... or item:...
-                                    Block legacyBlock = resolveToBlock(meta.legacyId);
+                                    Block legacyBlock = resolveToBlock(meta.legacyId());
                                     if (legacyBlock != null) {
                                         result = new ItemStack(legacyBlock.asItem());
                                     }
@@ -321,4 +328,3 @@ public class CosmeticRegistry {
         ItemStack createItemStack();
     }
 }
-

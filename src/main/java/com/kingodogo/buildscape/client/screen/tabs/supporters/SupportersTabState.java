@@ -152,7 +152,7 @@ public class SupportersTabState {
         if (manager.isParticleTrail(cosmeticId)) return SLOT_TRAIL;
         
         CosmeticManager.CosmeticMetadata metadata = manager.getMetadata(cosmeticId);
-        if (metadata != null && metadata.type == CosmeticManager.CosmeticType.WINGS) return SLOT_WINGS;
+        if (metadata != null && metadata.type() == CosmeticManager.CosmeticType.WINGS) return SLOT_WINGS;
         
         net.minecraft.world.item.ItemStack stack = registry.resolveToItemStack(cosmeticId);
         if (stack != null && !stack.isEmpty()) {

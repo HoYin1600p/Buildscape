@@ -21,14 +21,10 @@ public class HayBaleSlabBlock extends SlabBlock {
             Entity entity,
             float fallDistance
     ) {
-        if (entity.isSuppressingBounce()) {
-            super.fallOn(level, state, pos, entity, fallDistance);
-        } else {
-            entity.causeFallDamage(
-                    fallDistance,
-                    0.2F,
-                    net.minecraft.world.damagesource.DamageSource.FALL
-            );
-        }
+        entity.causeFallDamage(
+                fallDistance,
+                0.2F,
+                net.minecraft.world.damagesource.DamageSource.FALL
+        );
     }
 }

@@ -5279,70 +5279,6 @@ public class ModItems {
                             )
             );
 
-    public static final RegistryObject<Item> DECORATED_OAK_LEAVES =
-            ITEMS.register("decorated_oak_leaves", () ->
-                    new BlockItem(
-                    ModBlocks.DECORATED_OAK_LEAVES.get(),
-                            createBlockItemProperties()
-                    )
-            );
-    public static final RegistryObject<Item> DECORATED_SPRUCE_LEAVES =
-            ITEMS.register("decorated_spruce_leaves", () ->
-                    new BlockItem(
-                    ModBlocks.DECORATED_SPRUCE_LEAVES.get(),
-                            createBlockItemProperties()
-                    )
-            );
-    public static final RegistryObject<Item> DECORATED_BIRCH_LEAVES =
-            ITEMS.register("decorated_birch_leaves", () ->
-                    new BlockItem(
-                    ModBlocks.DECORATED_BIRCH_LEAVES.get(),
-                            createBlockItemProperties()
-                    )
-            );
-    public static final RegistryObject<Item> DECORATED_JUNGLE_LEAVES =
-            ITEMS.register("decorated_jungle_leaves", () ->
-                    new BlockItem(
-                    ModBlocks.DECORATED_JUNGLE_LEAVES.get(),
-                            createBlockItemProperties()
-                    )
-            );
-    public static final RegistryObject<Item> DECORATED_ACACIA_LEAVES =
-            ITEMS.register("decorated_acacia_leaves", () ->
-                    new BlockItem(
-                    ModBlocks.DECORATED_ACACIA_LEAVES.get(),
-                            createBlockItemProperties()
-                    )
-            );
-    public static final RegistryObject<Item> DECORATED_DARK_OAK_LEAVES =
-            ITEMS.register("decorated_dark_oak_leaves", () ->
-                    new BlockItem(
-                    ModBlocks.DECORATED_DARK_OAK_LEAVES.get(),
-                            createBlockItemProperties()
-                    )
-            );
-    public static final RegistryObject<Item> DECORATED_MANGROVE_LEAVES =
-            ITEMS.register("decorated_mangrove_leaves", () ->
-                    new BlockItem(
-                    ModBlocks.DECORATED_MANGROVE_LEAVES.get(),
-                            createBlockItemProperties()
-                    )
-            );
-    public static final RegistryObject<Item> DECORATED_AZALEA_LEAVES =
-            ITEMS.register("decorated_azalea_leaves", () ->
-                    new BlockItem(
-                    ModBlocks.DECORATED_AZALEA_LEAVES.get(),
-                            createBlockItemProperties()
-                    )
-            );
-    public static final RegistryObject<Item> DECORATED_FLOWERING_AZALEA_LEAVES =
-            ITEMS.register("decorated_flowering_azalea_leaves", () ->
-                            new BlockItem(
-            ModBlocks.DECORATED_FLOWERING_AZALEA_LEAVES.get(),
-                                    createBlockItemProperties()
-                            )
-            );
-
     public static final RegistryObject<Item> SNOWY_SHORT_GRASS = ITEMS.register(
             "snowy_short_grass",
             () ->
@@ -6548,6 +6484,11 @@ public class ModItems {
             () -> new ColoredItemFrameItem(createBlockItemProperties(), "pink")
     );
 
+    public static final RegistryObject<Item> INVISIBLE_ITEM_FRAME = ITEMS.register(
+            "invisible_item_frame",
+            () -> new ColoredItemFrameItem(createBlockItemProperties(), "invisible")
+    );
+
     public static final RegistryObject<Item> SMOOTH_STONE_STAIRS = ITEMS.register(
             "smooth_stone_stairs",
             () ->
@@ -6872,5 +6813,10 @@ public class ModItems {
     public static final RegistryObject<Item> POLISHED_BLACK_CONCRETE_WALL = ITEMS.register(
             "polished_black_concrete_wall",
             () -> new BlockItem(ModBlocks.POLISHED_BLACK_CONCRETE_WALL.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> SMOKE_VENT = ITEMS.register(
+            "smoke_vent",
+            () -> new BlockItem(ModBlocks.SMOKE_VENT.get(), createBlockItemProperties())
     );
 }

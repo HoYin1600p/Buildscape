@@ -6,6 +6,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
@@ -13,7 +14,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.gameevent.GameEvent;
 
 public class ColoredItemFrameItem extends Item {
-
     private final String colorVariant;
 
     public ColoredItemFrameItem(Properties properties, String color) {
@@ -21,16 +21,12 @@ public class ColoredItemFrameItem extends Item {
         this.colorVariant = color;
     }
 
-    public String getColorVariant() {
-        return colorVariant;
-    }
-
     @Override
     public InteractionResult useOn(UseOnContext context) {
         BlockPos blockPos = context.getClickedPos();
         Direction direction = context.getClickedFace();
         BlockPos placePos = blockPos.relative(direction);
-        net.minecraft.world.entity.player.Player player = context.getPlayer();
+        Player player = context.getPlayer();
         ItemStack itemStack = context.getItemInHand();
 
         if (player != null && !this.canPlace(player, direction, itemStack, placePos)) {
@@ -59,8 +55,7 @@ public class ColoredItemFrameItem extends Item {
         }
     }
 
-    protected boolean canPlace(net.minecraft.world.entity.player.Player player, Direction direction,
-                               ItemStack stack, BlockPos pos) {
+    protected boolean canPlace(Player player, Direction direction, ItemStack stack, BlockPos pos) {
         return !player.level.isOutsideBuildHeight(pos) && player.mayUseItemAt(pos, direction, stack);
     }
 }

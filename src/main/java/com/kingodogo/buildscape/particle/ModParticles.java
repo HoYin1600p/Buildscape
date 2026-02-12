@@ -33,4 +33,6 @@ public class ModParticles {
             PARTICLES.register("bubble", () -> new SimpleParticleType(false));
     public static final RegistryObject<SimpleParticleType> TRAIL_NOTE =
             PARTICLES.register("trail_note", () -> new SimpleParticleType(false));
+    public static final RegistryObject<SimpleParticleType> COLORED_SMOKE =
+            PARTICLES.register("colored_smoke", () -> new SimpleParticleType(false));
 }

@@ -18,21 +18,26 @@ import net.minecraft.world.entity.decoration.HangingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.MapItem;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.DiodeBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
 import net.minecraft.world.phys.AABB;
+import org.apache.commons.lang3.Validate;
 
 import javax.annotation.Nullable;
 
 public class ColoredItemFrameEntity extends HangingEntity {
 
-    private static final EntityDataAccessor<ItemStack> DATA_ITEM =
-            SynchedEntityData.defineId(ColoredItemFrameEntity.class, EntityDataSerializers.ITEM_STACK);
-    private static final EntityDataAccessor<Integer> DATA_ROTATION =
-            SynchedEntityData.defineId(ColoredItemFrameEntity.class, EntityDataSerializers.INT);
-    private static final EntityDataAccessor<String> DATA_COLOR =
-            SynchedEntityData.defineId(ColoredItemFrameEntity.class, EntityDataSerializers.STRING);
+    private static final EntityDataAccessor<ItemStack> DATA_ITEM = SynchedEntityData
+            .defineId(ColoredItemFrameEntity.class, EntityDataSerializers.ITEM_STACK);
+    private static final EntityDataAccessor<Integer> DATA_ROTATION = SynchedEntityData
+            .defineId(ColoredItemFrameEntity.class, EntityDataSerializers.INT);
+    private static final EntityDataAccessor<String> DATA_COLOR = SynchedEntityData
+            .defineId(ColoredItemFrameEntity.class, EntityDataSerializers.STRING);
 
     private float dropChance = 1.0F;
     private boolean fixed = false;
@@ -41,19 +46,22 @@ public class ColoredItemFrameEntity extends HangingEntity {
         super(entityType, level);
     }
 
-    public ColoredItemFrameEntity(Level level, BlockPos pos, Direction direction) {
-        this(ModEntities.COLORED_ITEM_FRAME.get(), level, pos);
+    public ColoredItemFrameEntity(EntityType<? extends ColoredItemFrameEntity> entityType, Level level, BlockPos pos,
+                                  Direction direction) {
+        super(entityType, level, pos);
         this.setDirection(direction);
+    }
+
+    public ColoredItemFrameEntity(Level level, BlockPos pos, Direction direction) {
+        this(ModEntities.COLORED_ITEM_FRAME.get(), level, pos, direction);
     }
 
     public ColoredItemFrameEntity(Level level, BlockPos pos, Direction direction, String color) {
-        this(ModEntities.COLORED_ITEM_FRAME.get(), level, pos);
+        this(ModEntities.COLORED_ITEM_FRAME.get(), level, pos, direction);
         this.setColorVariant(color);
-        this.setDirection(direction);
-    }
-
-    public ColoredItemFrameEntity(EntityType<? extends ColoredItemFrameEntity> entityType, Level level, BlockPos pos) {
-        super(entityType, level, pos);
+        if ("invisible".equals(color)) {
+            this.setInvisible(true);
+        }
     }
 
     @Override
@@ -64,98 +72,54 @@ public class ColoredItemFrameEntity extends HangingEntity {
     }
 
     @Override
-    public void setPos(double x, double y, double z) {
-        super.setPos(x, y, z);
-        if (this.direction != null) {
-            this.recalculateBoundingBox();
+    protected void setDirection(Direction direction) {
+        Validate.notNull(direction);
+        this.direction = direction;
+        if (direction.getAxis().isHorizontal()) {
+            this.setXRot(0.0F);
+            this.setYRot((float) (this.direction.get2DDataValue() * 90));
+        } else {
+            this.setXRot((float) (-90 * direction.getAxisDirection().getStep()));
+            this.setYRot(0.0F);
         }
-    }
-
-    @Override
-    public void setDirection(Direction direction) {
-        if (direction != null) {
-            try {
-                java.lang.reflect.Field directionField = HangingEntity.class.getDeclaredField("direction");
-                directionField.setAccessible(true);
-                directionField.set(this, direction);
-            } catch (NoSuchFieldException | IllegalAccessException e) {
-                throw new RuntimeException("Failed to set direction for ColoredItemFrameEntity: " + e.getMessage(), e);
-            }
-
-            if (this.pos != null) {
-                this.recalculateBoundingBox();
-            }
-        }
+        this.xRotO = this.getXRot();
+        this.yRotO = this.getYRot();
+        this.recalculateBoundingBox();
     }
 
     @Override
     protected void recalculateBoundingBox() {
-        if (this.direction != null && this.pos != null) {
-            double d0 = (double) this.pos.getX() + 0.5D;
-            double d1 = (double) this.pos.getY() + 0.5D;
-            double d2 = (double) this.pos.getZ() + 0.5D;
-            double d4 = this.offs(this.getWidth());
-            double d5 = this.offs(this.getHeight());
-
-            d0 -= (double) this.direction.getStepX() * 0.46875D;
-            d1 -= (double) this.direction.getStepY() * 0.46875D;
-            d2 -= (double) this.direction.getStepZ() * 0.46875D;
-
-            Direction offsetDir;
-            if (this.direction.getAxis() == Direction.Axis.Y) {
-                offsetDir = Direction.NORTH;
-            } else {
-                switch (this.direction) {
-                    case NORTH:
-                        offsetDir = Direction.EAST;
-                        break;
-                    case SOUTH:
-                        offsetDir = Direction.WEST;
-                        break;
-                    case EAST:
-                        offsetDir = Direction.SOUTH;
-                        break;
-                    case WEST:
-                        offsetDir = Direction.NORTH;
-                        break;
-                    default:
-                        offsetDir = Direction.NORTH;
-                        break;
-                }
-            }
-
-            d0 += d4 * (double) offsetDir.getStepX();
-            d1 += d5 * (double) offsetDir.getStepY();
-            d2 += d4 * (double) offsetDir.getStepZ();
-
-            this.setPosRaw(d0, d1, d2);
-
-            double d6, d7, d8;
-
-            if (this.direction.getAxis() == Direction.Axis.Z) {
-                d6 = (double) this.getWidth();
-                d7 = (double) this.getHeight();
-                d8 = 2.0D;
-            } else if (this.direction.getAxis() == Direction.Axis.X) {
-                d6 = 2.0D;
-                d7 = (double) this.getHeight();
-                d8 = (double) this.getWidth();
-            } else {
-                d6 = (double) this.getWidth();
-                d7 = 2.0D;
-                d8 = (double) this.getHeight();
-            }
-
-            d6 /= 32.0D;
-            d7 /= 32.0D;
-            d8 /= 32.0D;
-
-            this.setBoundingBox(new AABB(d0 - d6, d1 - d7, d2 - d8, d0 + d6, d1 + d7, d2 + d8));
+        if (this.direction == null) {
+            return;
         }
-    }
 
-    private double offs(int size) {
-        return size % 32 == 0 ? 0.5D : 0.0D;
+        double x = (double) this.pos.getX() + 0.5D - (double) this.direction.getStepX() * 0.46875D;
+        double y = (double) this.pos.getY() + 0.5D - (double) this.direction.getStepY() * 0.46875D;
+        double z = (double) this.pos.getZ() + 0.5D - (double) this.direction.getStepZ() * 0.46875D;
+        this.setPosRaw(x, y, z);
+
+        double w = this.getWidth();
+        double h = this.getHeight();
+        double d = this.getWidth();
+
+        Direction.Axis axis = this.direction.getAxis();
+        switch (axis) {
+            case X:
+                w = 1.0D;
+                break;
+            case Y:
+                h = 1.0D;
+                break;
+            case Z:
+                d = 1.0D;
+                break;
+        }
+
+        w /= 32.0D;
+        h /= 32.0D;
+        d /= 32.0D;
+
+        this.setBoundingBox(new AABB(x - w, y - h, z - d, x + w, y + h, z + d));
     }
 
     @Override
@@ -222,36 +186,63 @@ public class ColoredItemFrameEntity extends HangingEntity {
         ItemStack heldItem = player.getItemInHand(hand);
         ItemStack frameItem = this.getItem();
         boolean hasItemInFrame = !frameItem.isEmpty();
+        boolean hasItemInHand = !heldItem.isEmpty();
 
-        if (!this.level.isClientSide) {
+        if (this.fixed) {
+            return InteractionResult.PASS;
+        } else if (!this.level.isClientSide) {
             if (!hasItemInFrame) {
-                if (!heldItem.isEmpty()) {
+                if (hasItemInHand && !this.isRemoved()) {
+                    if (heldItem.is(Items.FILLED_MAP)) {
+                        MapItemSavedData mapData = MapItem.getSavedData(heldItem, this.level);
+                        if (mapData != null && mapData.isTrackedCountOverLimit(256)) {
+                            return InteractionResult.FAIL;
+                        }
+                    }
                     this.setItem(heldItem);
                     if (!player.getAbilities().instabuild) {
                         heldItem.shrink(1);
                     }
                 }
             } else {
+                this.playSound(SoundEvents.ITEM_FRAME_ROTATE_ITEM, 1.0F, 1.0F);
                 this.setRotation(this.getRotation() + 1);
             }
+            return InteractionResult.CONSUME;
+        } else {
+            return !hasItemInFrame && !hasItemInHand ? InteractionResult.PASS : InteractionResult.SUCCESS;
         }
-
-        return InteractionResult.sidedSuccess(this.level.isClientSide);
     }
 
     @Override
     public boolean hurt(DamageSource source, float amount) {
-        if (this.isInvulnerableTo(source)) {
+        if (this.fixed) {
+            return (source == DamageSource.OUT_OF_WORLD || source.isCreativePlayer()) && super.hurt(source, amount);
+        } else if (this.isInvulnerableTo(source)) {
             return false;
         } else if (!source.isExplosion() && !this.getItem().isEmpty()) {
             if (!this.level.isClientSide) {
                 this.dropItem(source.getEntity(), false);
                 this.playSound(SoundEvents.ITEM_FRAME_REMOVE_ITEM, 1.0F, 1.0F);
+                this.gameEvent(net.minecraft.world.level.gameevent.GameEvent.BLOCK_CHANGE, source.getEntity());
             }
             return true;
         } else {
             return super.hurt(source, amount);
         }
+    }
+
+    @Override
+    public boolean isPickable() {
+        return true;
+    }
+
+    @Override
+    public boolean skipAttackInteraction(Entity entity) {
+        if (entity instanceof Player player) {
+            return !this.level.mayInteract(player, this.pos);
+        }
+        return false;
     }
 
     @Override
@@ -270,8 +261,7 @@ public class ColoredItemFrameEntity extends HangingEntity {
                     this.removeFramedMap(itemstack);
                 }
             } else {
-                if (entity instanceof Player) {
-                    Player player = (Player) entity;
+                if (entity instanceof Player player) {
                     if (player.getAbilities().instabuild) {
                         this.removeFramedMap(itemstack);
                         return;
@@ -285,7 +275,9 @@ public class ColoredItemFrameEntity extends HangingEntity {
                 if (!itemstack.isEmpty()) {
                     itemstack = itemstack.copy();
                     this.removeFramedMap(itemstack);
-                    this.spawnAtLocation(itemstack);
+                    if (this.random.nextFloat() < this.dropChance) {
+                        this.spawnAtLocation(itemstack);
+                    }
                 }
             }
         }
@@ -293,9 +285,13 @@ public class ColoredItemFrameEntity extends HangingEntity {
 
     private void removeFramedMap(ItemStack stack) {
         if (stack.is(Items.FILLED_MAP)) {
-            // Maps handle special framing logic, clear it
-            stack.setEntityRepresentation(null);
+            MapItemSavedData mapData = MapItem.getSavedData(stack, this.level);
+            if (mapData != null) {
+                mapData.removedFromFrame(this.pos, this.getId());
+                mapData.setDirty(true);
+            }
         }
+        stack.setEntityRepresentation(null);
     }
 
     @Override
@@ -305,13 +301,16 @@ public class ColoredItemFrameEntity extends HangingEntity {
 
     @Override
     public boolean survives() {
-        // Simplified check - just verify we have valid pos and direction
-        if (this.pos == null || this.direction == null) {
+        if (this.fixed) {
+            return true;
+        } else if (!this.level.noCollision(this)) {
             return false;
+        } else {
+            BlockState blockstate = this.level.getBlockState(this.pos.relative(this.direction.getOpposite()));
+            return (blockstate.getMaterial().isSolid()
+                    || (this.direction.getAxis().isHorizontal() && DiodeBlock.isDiode(blockstate)))
+                    && this.level.getEntities(this, this.getBoundingBox(), HANGING_ENTITY).isEmpty();
         }
-        // Check the block behind is solid
-        BlockPos blockpos = this.pos.relative(this.direction.getOpposite());
-        return this.level.getBlockState(blockpos).getMaterial().isSolid();
     }
 
     @Override
@@ -357,7 +356,7 @@ public class ColoredItemFrameEntity extends HangingEntity {
 
     @Override
     public Packet<?> getAddEntityPacket() {
-        return new ClientboundAddEntityPacket(this, this.direction != null ? this.direction.get3DDataValue() : Direction.NORTH.get3DDataValue());
+        return new ClientboundAddEntityPacket(this, this.getType(), this.direction.get3DDataValue(), this.getPos());
     }
 
     @Override
@@ -368,7 +367,8 @@ public class ColoredItemFrameEntity extends HangingEntity {
 
     @Override
     public ItemStack getPickResult() {
-        return this.getFrameItemForColor(this.getColorVariant());
+        ItemStack itemstack = this.getItem();
+        return itemstack.isEmpty() ? this.getFrameItemForColor(this.getColorVariant()) : itemstack.copy();
     }
 
     public int getAnalogOutput() {
@@ -409,6 +409,8 @@ public class ColoredItemFrameEntity extends HangingEntity {
                 return new ItemStack(com.kingodogo.buildscape.item.ModItems.WHITE_ITEM_FRAME.get());
             case "yellow":
                 return new ItemStack(com.kingodogo.buildscape.item.ModItems.YELLOW_ITEM_FRAME.get());
+            case "invisible":
+                return new ItemStack(com.kingodogo.buildscape.item.ModItems.INVISIBLE_ITEM_FRAME.get());
             default:
                 return new ItemStack(com.kingodogo.buildscape.item.ModItems.WHITE_ITEM_FRAME.get());
         }

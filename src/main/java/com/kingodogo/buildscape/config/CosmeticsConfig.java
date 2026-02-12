@@ -21,6 +21,10 @@ public class CosmeticsConfig {
             .setPrettyPrinting()
             .create();
 
+    // Color picker window position
+    private Integer colorPickerX = null;
+    private Integer colorPickerY = null;
+
     private static CosmeticsConfig INSTANCE;
 
     // Map of player UUID to their equipped cosmetics by slot
@@ -105,6 +109,17 @@ public class CosmeticsConfig {
                                 }
                             }
                             playerCosmeticColors.put(playerUuid, cosmeticColors);
+                            playerCosmeticColors.put(playerUuid, cosmeticColors);
+                        }
+
+                        // Load color picker position
+                        if (playerData.containsKey("colorPickerX")
+                                && playerData.get("colorPickerX") instanceof Number) {
+                            colorPickerX = ((Number) playerData.get("colorPickerX")).intValue();
+                        }
+                        if (playerData.containsKey("colorPickerY")
+                                && playerData.get("colorPickerY") instanceof Number) {
+                            colorPickerY = ((Number) playerData.get("colorPickerY")).intValue();
                         }
                     } else {
                         // Legacy format: just slot map
@@ -160,6 +175,14 @@ public class CosmeticsConfig {
             }
 
             BuildScape.getLogger().debug("Saved cosmetics config to " + file.getAbsolutePath());
+            // Add global settings
+            Map<String, Object> globalSettings = (Map<String, Object>) combined.computeIfAbsent("global_settings",
+                    k -> new HashMap<>());
+            if (colorPickerX != null)
+                globalSettings.put("colorPickerX", colorPickerX);
+            if (colorPickerY != null)
+                globalSettings.put("colorPickerY", colorPickerY);
+
         } catch (Exception e) {
             BuildScape.getLogger().error("Failed to save cosmetics config: " + e.getMessage());
         }
@@ -255,8 +278,9 @@ public class CosmeticsConfig {
      * Fallback to "global" if UUID not found.
      */
     public String getCosmeticColor(UUID playerUuid, String cosmeticId) {
-        if (cosmeticId == null) return null;
-        
+        if (cosmeticId == null)
+            return null;
+
         if (playerUuid != null) {
             String uuidStr = playerUuid.toString();
             Map<String, String> colors = playerCosmeticColors.get(uuidStr);
@@ -279,8 +303,9 @@ public class CosmeticsConfig {
      * Also updates "global" profile.
      */
     public void setCosmeticColor(UUID playerUuid, String cosmeticId, String hexColor) {
-        if (cosmeticId == null) return;
-        
+        if (cosmeticId == null)
+            return;
+
         if (playerUuid != null) {
             String uuidStr = playerUuid.toString();
             Map<String, String> colors = playerCosmeticColors.computeIfAbsent(uuidStr, k -> new HashMap<>());
@@ -313,5 +338,36 @@ public class CosmeticsConfig {
         // Particle trails support colors
         return idLower.contains("particle") && idLower.contains("trail");
     }
-}
 
+    /**
+     * Get saved X position of color picker window.
+     */
+    public Integer getColorPickerX() {
+        return colorPickerX;
+    }
+
+    /**
+     * Get saved Y position of color picker window.
+     */
+    public Integer getColorPickerY() {
+        return colorPickerY;
+    }
+
+    /**
+     * Set and save color picker window position.
+     */
+    public void setColorPickerPosition(int x, int y) {
+        this.colorPickerX = x;
+        this.colorPickerY = y;
+        save();
+    }
+
+    /**
+     * Clear saved color picker window position.
+     */
+    public void clearColorPickerPosition() {
+        this.colorPickerX = null;
+        this.colorPickerY = null;
+        save();
+    }
+}

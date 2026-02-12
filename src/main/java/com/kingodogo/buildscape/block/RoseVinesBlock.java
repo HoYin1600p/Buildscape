@@ -4,8 +4,13 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.ShearsItem;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.item.enchantment.Enchantments;
@@ -20,7 +25,9 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -32,6 +39,7 @@ import java.util.Random;
 public class RoseVinesBlock extends VineBlock {
 
     public static final BooleanProperty DOWN = BlockStateProperties.DOWN;
+    public static final BooleanProperty SHEARED = BooleanProperty.create("sheared");
 
     private static final VoxelShape UP_SHAPE = Block.box(
             0.0D,
@@ -39,48 +47,42 @@ public class RoseVinesBlock extends VineBlock {
             0.0D,
             16.0D,
             16.0D,
-            16.0D
-    );
+            16.0D);
     private static final VoxelShape DOWN_SHAPE = Block.box(
             0.0D,
             0.0D,
             0.0D,
             16.0D,
             1.0D,
-            16.0D
-    );
+            16.0D);
     private static final VoxelShape NORTH_SHAPE = Block.box(
             0.0D,
             0.0D,
             0.0D,
             16.0D,
             16.0D,
-            1.0D
-    );
+            1.0D);
     private static final VoxelShape SOUTH_SHAPE = Block.box(
             0.0D,
             0.0D,
             15.0D,
             16.0D,
             16.0D,
-            16.0D
-    );
+            16.0D);
     private static final VoxelShape EAST_SHAPE = Block.box(
             15.0D,
             0.0D,
             0.0D,
             16.0D,
             16.0D,
-            16.0D
-    );
+            16.0D);
     private static final VoxelShape WEST_SHAPE = Block.box(
             0.0D,
             0.0D,
             0.0D,
             1.0D,
             16.0D,
-            16.0D
-    );
+            16.0D);
 
     public RoseVinesBlock(BlockBehaviour.Properties properties) {
         super(properties);
@@ -92,14 +94,13 @@ public class RoseVinesBlock extends VineBlock {
                         .setValue(SOUTH, false)
                         .setValue(EAST, false)
                         .setValue(WEST, false)
-        );
+                        .setValue(SHEARED, false));
     }
 
     @Override
     protected void createBlockStateDefinition(
-            StateDefinition.Builder<Block, BlockState> builder
-    ) {
-        builder.add(UP, DOWN, NORTH, SOUTH, EAST, WEST);
+            StateDefinition.Builder<Block, BlockState> builder) {
+        builder.add(UP, DOWN, NORTH, SOUTH, EAST, WEST, SHEARED);
     }
 
     @Override
@@ -111,18 +112,14 @@ public class RoseVinesBlock extends VineBlock {
         Direction clickedFace = context.getClickedFace();
         Direction attachDirection = clickedFace.getOpposite();
 
-        if (
-                isExistingVine &&
-                        context.getPlayer() != null &&
-                        context.getPlayer().isShiftKeyDown()
-        ) {
+        if (isExistingVine &&
+                context.getPlayer() != null &&
+                context.getPlayer().isShiftKeyDown()) {
             return null;
         }
 
-        if (
-                isExistingVine &&
-                        !(context.getPlayer() != null && context.getPlayer().isShiftKeyDown())
-        ) {
+        if (isExistingVine &&
+                !(context.getPlayer() != null && context.getPlayer().isShiftKeyDown())) {
             if (blockState.getBlock() == this) {
                 BooleanProperty property = getPropertyForFace(attachDirection);
                 if (blockState.hasProperty(property) && blockState.getValue(property)) {
@@ -138,10 +135,8 @@ public class RoseVinesBlock extends VineBlock {
                 Direction attachToVine = clickedFace.getOpposite();
                 BooleanProperty attachProperty = getPropertyForFace(attachToVine);
 
-                if (
-                        originalState.hasProperty(attachProperty) &&
-                                originalState.getValue(attachProperty)
-                ) {
+                if (originalState.hasProperty(attachProperty) &&
+                        originalState.getValue(attachProperty)) {
                     return null;
                 }
 
@@ -160,30 +155,30 @@ public class RoseVinesBlock extends VineBlock {
                     state = blockState;
                 } else {
                     state = this.defaultBlockState();
-                    if (blockState.hasProperty(UP)) state = state.setValue(
-                            UP,
-                            blockState.getValue(UP)
-                    );
-                    if (blockState.hasProperty(DOWN)) state = state.setValue(
-                            DOWN,
-                            blockState.getValue(DOWN)
-                    );
-                    if (blockState.hasProperty(NORTH)) state = state.setValue(
-                            NORTH,
-                            blockState.getValue(NORTH)
-                    );
-                    if (blockState.hasProperty(SOUTH)) state = state.setValue(
-                            SOUTH,
-                            blockState.getValue(SOUTH)
-                    );
-                    if (blockState.hasProperty(EAST)) state = state.setValue(
-                            EAST,
-                            blockState.getValue(EAST)
-                    );
-                    if (blockState.hasProperty(WEST)) state = state.setValue(
-                            WEST,
-                            blockState.getValue(WEST)
-                    );
+                    if (blockState.hasProperty(UP))
+                        state = state.setValue(
+                                UP,
+                                blockState.getValue(UP));
+                    if (blockState.hasProperty(DOWN))
+                        state = state.setValue(
+                                DOWN,
+                                blockState.getValue(DOWN));
+                    if (blockState.hasProperty(NORTH))
+                        state = state.setValue(
+                                NORTH,
+                                blockState.getValue(NORTH));
+                    if (blockState.hasProperty(SOUTH))
+                        state = state.setValue(
+                                SOUTH,
+                                blockState.getValue(SOUTH));
+                    if (blockState.hasProperty(EAST))
+                        state = state.setValue(
+                                EAST,
+                                blockState.getValue(EAST));
+                    if (blockState.hasProperty(WEST))
+                        state = state.setValue(
+                                WEST,
+                                blockState.getValue(WEST));
                 }
             } else {
                 state = this.defaultBlockState();
@@ -200,30 +195,30 @@ public class RoseVinesBlock extends VineBlock {
                     state = blockState;
                 } else {
                     state = this.defaultBlockState();
-                    if (blockState.hasProperty(UP)) state = state.setValue(
-                            UP,
-                            blockState.getValue(UP)
-                    );
-                    if (blockState.hasProperty(DOWN)) state = state.setValue(
-                            DOWN,
-                            blockState.getValue(DOWN)
-                    );
-                    if (blockState.hasProperty(NORTH)) state = state.setValue(
-                            NORTH,
-                            blockState.getValue(NORTH)
-                    );
-                    if (blockState.hasProperty(SOUTH)) state = state.setValue(
-                            SOUTH,
-                            blockState.getValue(SOUTH)
-                    );
-                    if (blockState.hasProperty(EAST)) state = state.setValue(
-                            EAST,
-                            blockState.getValue(EAST)
-                    );
-                    if (blockState.hasProperty(WEST)) state = state.setValue(
-                            WEST,
-                            blockState.getValue(WEST)
-                    );
+                    if (blockState.hasProperty(UP))
+                        state = state.setValue(
+                                UP,
+                                blockState.getValue(UP));
+                    if (blockState.hasProperty(DOWN))
+                        state = state.setValue(
+                                DOWN,
+                                blockState.getValue(DOWN));
+                    if (blockState.hasProperty(NORTH))
+                        state = state.setValue(
+                                NORTH,
+                                blockState.getValue(NORTH));
+                    if (blockState.hasProperty(SOUTH))
+                        state = state.setValue(
+                                SOUTH,
+                                blockState.getValue(SOUTH));
+                    if (blockState.hasProperty(EAST))
+                        state = state.setValue(
+                                EAST,
+                                blockState.getValue(EAST));
+                    if (blockState.hasProperty(WEST))
+                        state = state.setValue(
+                                WEST,
+                                blockState.getValue(WEST));
                 }
             } else {
                 state = this.defaultBlockState();
@@ -246,30 +241,30 @@ public class RoseVinesBlock extends VineBlock {
                 state = blockState;
             } else {
                 state = this.defaultBlockState();
-                if (blockState.hasProperty(UP)) state = state.setValue(
-                        UP,
-                        blockState.getValue(UP)
-                );
-                if (blockState.hasProperty(DOWN)) state = state.setValue(
-                        DOWN,
-                        blockState.getValue(DOWN)
-                );
-                if (blockState.hasProperty(NORTH)) state = state.setValue(
-                        NORTH,
-                        blockState.getValue(NORTH)
-                );
-                if (blockState.hasProperty(SOUTH)) state = state.setValue(
-                        SOUTH,
-                        blockState.getValue(SOUTH)
-                );
-                if (blockState.hasProperty(EAST)) state = state.setValue(
-                        EAST,
-                        blockState.getValue(EAST)
-                );
-                if (blockState.hasProperty(WEST)) state = state.setValue(
-                        WEST,
-                        blockState.getValue(WEST)
-                );
+                if (blockState.hasProperty(UP))
+                    state = state.setValue(
+                            UP,
+                            blockState.getValue(UP));
+                if (blockState.hasProperty(DOWN))
+                    state = state.setValue(
+                            DOWN,
+                            blockState.getValue(DOWN));
+                if (blockState.hasProperty(NORTH))
+                    state = state.setValue(
+                            NORTH,
+                            blockState.getValue(NORTH));
+                if (blockState.hasProperty(SOUTH))
+                    state = state.setValue(
+                            SOUTH,
+                            blockState.getValue(SOUTH));
+                if (blockState.hasProperty(EAST))
+                    state = state.setValue(
+                            EAST,
+                            blockState.getValue(EAST));
+                if (blockState.hasProperty(WEST))
+                    state = state.setValue(
+                            WEST,
+                            blockState.getValue(WEST));
             }
 
             BooleanProperty property = getPropertyForFace(attachDirection);
@@ -296,11 +291,30 @@ public class RoseVinesBlock extends VineBlock {
     }
 
     @Override
+    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player,
+                                 InteractionHand hand, BlockHitResult hit) {
+        if (state.getValue(SHEARED)) {
+            return InteractionResult.PASS;
+        }
+
+        ItemStack heldItem = player.getItemInHand(hand);
+        if (heldItem.is(Items.SHEARS)) {
+            level.setBlockAndUpdate(pos, state.setValue(SHEARED, true));
+            level.playSound(null, pos, SoundEvents.VINE_BREAK, SoundSource.BLOCKS, 1.0F, 1.0F);
+            level.gameEvent(player, GameEvent.SHEAR, pos);
+            heldItem.hurtAndBreak(1, player, (p) -> p.broadcastBreakEvent(hand));
+            return InteractionResult.sidedSuccess(level.isClientSide);
+        }
+
+        return InteractionResult.PASS;
+    }
+
+    @Override
     public boolean canBeReplaced(BlockState state, BlockPlaceContext context) {
         net.minecraft.world.item.Item heldItem = context.getItemInHand().getItem();
         if (heldItem instanceof net.minecraft.world.item.BlockItem) {
-            net.minecraft.world.level.block.Block heldBlock =
-                    ((net.minecraft.world.item.BlockItem) heldItem).getBlock();
+            net.minecraft.world.level.block.Block heldBlock = ((net.minecraft.world.item.BlockItem) heldItem)
+                    .getBlock();
 
             if (!(heldBlock instanceof RoseVinesBlock)) {
                 return false;
@@ -315,9 +329,7 @@ public class RoseVinesBlock extends VineBlock {
             BooleanProperty property = getPropertyForFace(attachDirection);
 
             if (state.getBlock() == heldBlock) {
-                if (state.hasProperty(property) && state.getValue(property)) {
-                    return false;
-                }
+                return !state.hasProperty(property) || !state.getValue(property);
             }
 
             return true;
@@ -331,8 +343,7 @@ public class RoseVinesBlock extends VineBlock {
             BlockState state,
             BlockGetter level,
             BlockPos pos,
-            CollisionContext context
-    ) {
+            CollisionContext context) {
         VoxelShape shape = Shapes.empty();
 
         if (state.getValue(UP)) {
@@ -362,8 +373,7 @@ public class RoseVinesBlock extends VineBlock {
             BlockState state,
             BlockGetter level,
             BlockPos pos,
-            CollisionContext context
-    ) {
+            CollisionContext context) {
         return Shapes.empty();
     }
 
@@ -374,8 +384,7 @@ public class RoseVinesBlock extends VineBlock {
             BlockState neighborState,
             LevelAccessor level,
             BlockPos pos,
-            BlockPos neighborPos
-    ) {
+            BlockPos neighborPos) {
         return state;
     }
 
@@ -395,8 +404,7 @@ public class RoseVinesBlock extends VineBlock {
             BlockState state,
             LevelReader level,
             BlockPos pos,
-            LivingEntity entity
-    ) {
+            LivingEntity entity) {
         return this.hasAnyFace(state);
     }
 
@@ -406,21 +414,16 @@ public class RoseVinesBlock extends VineBlock {
             Level level,
             BlockPos pos,
             BlockState oldState,
-            boolean isMoving
-    ) {
-        if (
-                !oldState.is(state.getBlock()) &&
-                        this.getSoundType(state) instanceof
-                                com.kingodogo.buildscape.block.CustomSoundType customSound
-        ) {
+            boolean isMoving) {
+        if (!oldState.is(state.getBlock()) &&
+                this.getSoundType(state) instanceof com.kingodogo.buildscape.block.CustomSoundType customSound) {
             level.playSound(
                     null,
                     pos,
                     this.getSoundType(state).getPlaceSound(),
                     SoundSource.BLOCKS,
                     customSound.getPlaceVolume(),
-                    customSound.getPlacePitch()
-            );
+                    customSound.getPlacePitch());
         }
         super.onPlace(state, level, pos, oldState, isMoving);
     }
@@ -428,31 +431,23 @@ public class RoseVinesBlock extends VineBlock {
     @Override
     public List<ItemStack> getDrops(
             BlockState state,
-            LootContext.Builder builder
-    ) {
+            LootContext.Builder builder) {
         LootContext ctx = builder
                 .withParameter(
                         net.minecraft.world.level.storage.loot.parameters.LootContextParams.BLOCK_STATE,
-                        state
-                )
+                        state)
                 .create(
-                        net.minecraft.world.level.storage.loot.parameters.LootContextParamSets.BLOCK
-                );
+                        net.minecraft.world.level.storage.loot.parameters.LootContextParamSets.BLOCK);
         ItemStack tool = ctx.getParamOrNull(
-                net.minecraft.world.level.storage.loot.parameters.LootContextParams.TOOL
-        );
+                net.minecraft.world.level.storage.loot.parameters.LootContextParams.TOOL);
 
         if (tool != null && !tool.isEmpty()) {
             if (tool.getItem() instanceof ShearsItem) {
                 return Collections.singletonList(new ItemStack(this));
             }
-            if (
-                    net.minecraft.world.item.enchantment.EnchantmentHelper.getItemEnchantmentLevel(
-                            Enchantments.SILK_TOUCH,
-                            tool
-                    ) >
-                            0
-            ) {
+            if (net.minecraft.world.item.enchantment.EnchantmentHelper.getItemEnchantmentLevel(
+                    Enchantments.SILK_TOUCH,
+                    tool) > 0) {
                 return Collections.singletonList(new ItemStack(this));
             }
         }
@@ -461,21 +456,18 @@ public class RoseVinesBlock extends VineBlock {
     }
 
     private boolean hasAnyFace(BlockState state) {
-        return (
-                state.getValue(UP) ||
-                        state.getValue(DOWN) ||
-                        state.getValue(NORTH) ||
-                        state.getValue(SOUTH) ||
-                        state.getValue(EAST) ||
-                        state.getValue(WEST)
-        );
+        return (state.getValue(UP) ||
+                state.getValue(DOWN) ||
+                state.getValue(NORTH) ||
+                state.getValue(SOUTH) ||
+                state.getValue(EAST) ||
+                state.getValue(WEST));
     }
 
     private boolean canAttachTo(
             BlockGetter level,
             BlockPos pos,
-            Direction direction
-    ) {
+            Direction direction) {
         BlockPos attachedPos = pos.relative(direction);
         BlockState attachedState = level.getBlockState(attachedPos);
         Block block = attachedState.getBlock();
@@ -484,10 +476,8 @@ public class RoseVinesBlock extends VineBlock {
             return false;
         }
 
-        if (
-                block instanceof RoseVinesBlock ||
-                        block instanceof net.minecraft.world.level.block.VineBlock
-        ) {
+        if (block instanceof RoseVinesBlock ||
+                block instanceof net.minecraft.world.level.block.VineBlock) {
             return true;
         }
 
@@ -497,8 +487,7 @@ public class RoseVinesBlock extends VineBlock {
     private boolean isFullBlock(
             BlockGetter level,
             BlockPos pos,
-            Direction direction
-    ) {
+            Direction direction) {
         BlockPos checkPos = pos.relative(direction);
         BlockState checkState = level.getBlockState(checkPos);
         return checkState.isFaceSturdy(level, checkPos, direction.getOpposite());
@@ -506,7 +495,7 @@ public class RoseVinesBlock extends VineBlock {
 
     @Override
     public boolean isRandomlyTicking(BlockState state) {
-        return true;
+        return !state.getValue(SHEARED);
     }
 
     @Override
@@ -514,8 +503,11 @@ public class RoseVinesBlock extends VineBlock {
             BlockState state,
             ServerLevel level,
             BlockPos pos,
-            Random random
-    ) {
+            Random random) {
+        if (state.getValue(SHEARED)) {
+            return;
+        }
+
         if (random.nextInt(4) != 0) {
             return;
         }
@@ -538,14 +530,13 @@ public class RoseVinesBlock extends VineBlock {
             return;
         }
 
-        BlockState newState =
-                this.defaultBlockState()
-                        .setValue(UP, false)
-                        .setValue(DOWN, false)
-                        .setValue(NORTH, false)
-                        .setValue(SOUTH, false)
-                        .setValue(EAST, false)
-                        .setValue(WEST, false);
+        BlockState newState = this.defaultBlockState()
+                .setValue(UP, false)
+                .setValue(DOWN, false)
+                .setValue(NORTH, false)
+                .setValue(SOUTH, false)
+                .setValue(EAST, false)
+                .setValue(WEST, false);
 
         BooleanProperty facingProperty = getPropertyForFace(facingDir);
         if (newState.hasProperty(facingProperty)) {
@@ -572,12 +563,17 @@ public class RoseVinesBlock extends VineBlock {
     }
 
     private Direction getFacingDirection(BlockState state) {
-        if (state.getValue(NORTH)) return Direction.NORTH;
-        if (state.getValue(SOUTH)) return Direction.SOUTH;
-        if (state.getValue(EAST)) return Direction.EAST;
-        if (state.getValue(WEST)) return Direction.WEST;
+        if (state.getValue(NORTH))
+            return Direction.NORTH;
+        if (state.getValue(SOUTH))
+            return Direction.SOUTH;
+        if (state.getValue(EAST))
+            return Direction.EAST;
+        if (state.getValue(WEST))
+            return Direction.WEST;
 
-        if (state.getValue(DOWN)) return Direction.DOWN;
+        if (state.getValue(DOWN))
+            return Direction.DOWN;
 
         return null;
     }

@@ -113,7 +113,8 @@ public class CosmeticRenderHandler {
             return;
         }
 
-        // Prefer the current tab state (reflects immediate GUI equips); fall back to config
+        // Prefer the current tab state (reflects immediate GUI equips); fall back to
+        // config
         Map<Integer, String> equippedCosmetics = com.kingodogo.buildscape.client.screen.tabs.supporters.SupportersTabState
                 .getInstance()
                 .getEquippedCosmeticsBySlot();
@@ -132,7 +133,8 @@ public class CosmeticRenderHandler {
 
     /**
      * Render cosmetics as overlay using RenderLevelStageEvent.
-     * This happens after all entities are rendered, so we can render cosmetics on top.
+     * This happens after all entities are rendered, so we can render cosmetics on
+     * top.
      */
     @SubscribeEvent
     public static void onRenderLevelStage(RenderLevelStageEvent event) {
@@ -148,7 +150,8 @@ public class CosmeticRenderHandler {
         Minecraft mc = Minecraft.getInstance();
         net.minecraft.client.renderer.entity.EntityRenderDispatcher dispatcher = mc.getEntityRenderDispatcher();
         PlayerRenderer playerRenderer = (PlayerRenderer) dispatcher.getRenderer(player);
-        if (playerRenderer == null) return;
+        if (playerRenderer == null)
+            return;
 
         // Store current equipment (vanilla)
         ItemStack[] original = new ItemStack[4];
@@ -159,19 +162,24 @@ public class CosmeticRenderHandler {
 
         // Apply cosmetics into slots (temporarily)
         CosmeticRegistry registry = CosmeticRegistry.getInstance();
-        com.kingodogo.buildscape.cosmetics.CosmeticManager cosmeticManager = com.kingodogo.buildscape.cosmetics.CosmeticManager.getInstance();
+        com.kingodogo.buildscape.cosmetics.CosmeticManager cosmeticManager = com.kingodogo.buildscape.cosmetics.CosmeticManager
+                .getInstance();
 
         // Track custom head cosmetics to render separately
         String customHeadCosmetic = null;
 
-        // FIRST: Clear head slot if we have a custom HEAD cosmetic to prevent any helmet from showing
+        // FIRST: Clear head slot if we have a custom HEAD cosmetic to prevent any
+        // helmet from showing
         for (Map.Entry<Integer, String> entry : equippedCosmetics.entrySet()) {
             String cosmeticId = entry.getValue();
-            if (cosmeticId == null || cosmeticId.isEmpty()) continue;
+            if (cosmeticId == null || cosmeticId.isEmpty())
+                continue;
 
             // Check if this is a custom HEAD cosmetic
-            com.kingodogo.buildscape.cosmetics.CosmeticManager.CosmeticMetadata metadata = cosmeticManager.getMetadata(cosmeticId);
-            if (metadata != null && metadata.type == com.kingodogo.buildscape.cosmetics.CosmeticManager.CosmeticType.HEAD) {
+            com.kingodogo.buildscape.cosmetics.CosmeticManager.CosmeticMetadata metadata = cosmeticManager
+                    .getMetadata(cosmeticId);
+            if (metadata != null
+                    && metadata.type() == com.kingodogo.buildscape.cosmetics.CosmeticManager.CosmeticType.HEAD) {
                 if (entry.getKey() == 0) { // Slot 0 is head
                     customHeadCosmetic = cosmeticId;
                     // CRITICAL: Clear head slot IMMEDIATELY to prevent any helmet from rendering
@@ -184,16 +192,20 @@ public class CosmeticRenderHandler {
         // SECOND: Apply all other cosmetics (non-HEAD cosmetics)
         for (Map.Entry<Integer, String> entry : equippedCosmetics.entrySet()) {
             String cosmeticId = entry.getValue();
-            if (cosmeticId == null || cosmeticId.isEmpty()) continue;
+            if (cosmeticId == null || cosmeticId.isEmpty())
+                continue;
 
             // Skip custom HEAD cosmetics - they're handled separately
-            com.kingodogo.buildscape.cosmetics.CosmeticManager.CosmeticMetadata metadata = cosmeticManager.getMetadata(cosmeticId);
-            if (metadata != null && metadata.type == com.kingodogo.buildscape.cosmetics.CosmeticManager.CosmeticType.HEAD) {
+            com.kingodogo.buildscape.cosmetics.CosmeticManager.CosmeticMetadata metadata = cosmeticManager
+                    .getMetadata(cosmeticId);
+            if (metadata != null
+                    && metadata.type() == com.kingodogo.buildscape.cosmetics.CosmeticManager.CosmeticType.HEAD) {
                 continue; // Skip ItemStack resolution for custom head cosmetics
             }
 
             ItemStack cosmeticStack = registry.resolveToItemStack(cosmeticId);
-            if (cosmeticStack == null || cosmeticStack.isEmpty()) continue;
+            if (cosmeticStack == null || cosmeticStack.isEmpty())
+                continue;
             EquipmentSlot slot = getSlotForIndex(entry.getKey());
             if (slot != null) {
                 setItemSlotSilent(player, slot, cosmeticStack);
@@ -212,7 +224,8 @@ public class CosmeticRenderHandler {
 
             // Render as a second layer: keep depth test AND depth writes so the layer
             // correctly occludes with the world and particles. Blend stays enabled for
-            // semi-transparent pieces but we write depth to avoid "behind-screen" artifacts.
+            // semi-transparent pieces but we write depth to avoid "behind-screen"
+            // artifacts.
             com.mojang.blaze3d.systems.RenderSystem.enableDepthTest();
             com.mojang.blaze3d.systems.RenderSystem.depthMask(true);
             com.mojang.blaze3d.systems.RenderSystem.enableBlend();
@@ -222,7 +235,8 @@ public class CosmeticRenderHandler {
 
             // Render custom head cosmetics after player render
             if (customHeadCosmetic != null) {
-                com.kingodogo.buildscape.BuildScape.getLogger().debug("Rendering custom head cosmetic: " + customHeadCosmetic);
+                com.kingodogo.buildscape.BuildScape.getLogger()
+                        .debug("Rendering custom head cosmetic: " + customHeadCosmetic);
                 renderCustomHeadCosmetic(player, customHeadCosmetic, poseStack, bufferSource, packedLight, partialTick);
             }
 
@@ -233,7 +247,8 @@ public class CosmeticRenderHandler {
             com.mojang.blaze3d.systems.RenderSystem.disableDepthTest();
 
         } catch (Exception e) {
-            com.kingodogo.buildscape.BuildScape.getLogger().debug("Failed to render cosmetic overlay: " + e.getMessage());
+            com.kingodogo.buildscape.BuildScape.getLogger()
+                    .debug("Failed to render cosmetic overlay: " + e.getMessage());
         } finally {
             isRenderingCosmetics.remove();
             // Restore original vanilla equipment
@@ -267,7 +282,8 @@ public class CosmeticRenderHandler {
      * Directly modifies the inventory array to bypass sound triggers.
      */
     private static void setItemSlotSilent(AbstractClientPlayer player, EquipmentSlot slot, ItemStack stack) {
-        if (player == null) return;
+        if (player == null)
+            return;
 
         // Use direct inventory access to avoid triggering sounds
         net.minecraft.world.entity.player.Inventory inventory = player.getInventory();
@@ -303,8 +319,7 @@ public class CosmeticRenderHandler {
             com.mojang.blaze3d.vertex.PoseStack poseStack,
             MultiBufferSource bufferSource,
             int packedLight,
-            float partialTick
-    ) {
+            float partialTick) {
         try {
             // Get the model from the entity render dispatcher
             Minecraft mc = Minecraft.getInstance();
@@ -315,10 +330,11 @@ public class CosmeticRenderHandler {
                 com.kingodogo.buildscape.BuildScape.getLogger().info("Creating builders hat model part...");
                 try {
                     // In 1.18.2, we need to access EntityModels through a player renderer
-                    net.minecraft.client.renderer.entity.player.PlayerRenderer playerRenderer =
-                            (net.minecraft.client.renderer.entity.player.PlayerRenderer) dispatcher.getRenderer(player);
+                    net.minecraft.client.renderer.entity.player.PlayerRenderer playerRenderer = (net.minecraft.client.renderer.entity.player.PlayerRenderer) dispatcher
+                            .getRenderer(player);
                     if (playerRenderer != null) {
-                        com.kingodogo.buildscape.BuildScape.getLogger().info("PlayerRenderer found, attempting to create model...");
+                        com.kingodogo.buildscape.BuildScape.getLogger()
+                                .info("PlayerRenderer found, attempting to create model...");
                         // Try to bake the layer using the player renderer's EntityModels
                         // PlayerRenderer has access to EntityModels through its context
                         try {
@@ -340,8 +356,8 @@ public class CosmeticRenderHandler {
                             }
 
                             if (entityModelsField != null) {
-                                net.minecraft.client.model.geom.EntityModelSet entityModels =
-                                        (net.minecraft.client.model.geom.EntityModelSet) entityModelsField.get(playerRenderer);
+                                net.minecraft.client.model.geom.EntityModelSet entityModels = (net.minecraft.client.model.geom.EntityModelSet) entityModelsField
+                                        .get(playerRenderer);
                                 if (entityModels != null) {
                                     net.minecraft.client.model.geom.ModelPart root = entityModels.bakeLayer(
                                             com.kingodogo.buildscape.client.model.BuildersHatModel.LAYER_LOCATION);
@@ -351,12 +367,13 @@ public class CosmeticRenderHandler {
                                 }
                             }
 
-                            // If reflection failed, recreate the model structure directly from MeshDefinition
+                            // If reflection failed, recreate the model structure directly from
+                            // MeshDefinition
                             if (buildersHatModelPart == null) {
-                                // Recreate the MeshDefinition structure exactly as in BuildersHatModel.createBodyLayer()
+                                // Recreate the MeshDefinition structure exactly as in
+                                // BuildersHatModel.createBodyLayer()
                                 try {
-                                    net.minecraft.client.model.geom.builders.MeshDefinition meshdefinition =
-                                            new net.minecraft.client.model.geom.builders.MeshDefinition();
+                                    net.minecraft.client.model.geom.builders.MeshDefinition meshdefinition = new net.minecraft.client.model.geom.builders.MeshDefinition();
                                     PartDefinition partdefinition = meshdefinition.getRoot();
 
                                     PartDefinition Head = partdefinition.addOrReplaceChild("Head",
@@ -366,11 +383,14 @@ public class CosmeticRenderHandler {
                                     Head.addOrReplaceChild("bone",
                                             net.minecraft.client.model.geom.builders.CubeListBuilder.create()
                                                     .texOffs(0, 0).addBox(-14.0F, -5.0F, 0.0F, 11.0F, 0.0F, 16.0F,
-                                                            new net.minecraft.client.model.geom.builders.CubeDeformation(0.0F))
+                                                            new net.minecraft.client.model.geom.builders.CubeDeformation(
+                                                                    0.0F))
                                                     .texOffs(0, 17).addBox(-13.0F, -10.0F, 5.0F, 9.0F, 5.0F, 9.0F,
-                                                            new net.minecraft.client.model.geom.builders.CubeDeformation(0.0F))
+                                                            new net.minecraft.client.model.geom.builders.CubeDeformation(
+                                                                    0.0F))
                                                     .texOffs(0, 32).addBox(-10.0F, -11.0F, 4.0F, 3.0F, 6.0F, 11.0F,
-                                                            new net.minecraft.client.model.geom.builders.CubeDeformation(0.0F)),
+                                                            new net.minecraft.client.model.geom.builders.CubeDeformation(
+                                                                    0.0F)),
                                             net.minecraft.client.model.geom.PartPose.offset(8.5F, -1.0F, -9.75F));
 
                                     // Bake the root PartDefinition to get ModelPart
@@ -378,12 +398,15 @@ public class CosmeticRenderHandler {
                                     if (root != null) {
                                         buildersHatModelPart = root.getChild("Head");
                                         if (buildersHatModelPart != null) {
-                                            com.kingodogo.buildscape.BuildScape.getLogger().info("Successfully created builders hat model part!");
+                                            com.kingodogo.buildscape.BuildScape.getLogger()
+                                                    .info("Successfully created builders hat model part!");
                                         } else {
-                                            com.kingodogo.buildscape.BuildScape.getLogger().warn("Root ModelPart created but 'Head' child not found!");
+                                            com.kingodogo.buildscape.BuildScape.getLogger()
+                                                    .warn("Root ModelPart created but 'Head' child not found!");
                                         }
                                     } else {
-                                        com.kingodogo.buildscape.BuildScape.getLogger().warn("Failed to bake root ModelPart!");
+                                        com.kingodogo.buildscape.BuildScape.getLogger()
+                                                .warn("Failed to bake root ModelPart!");
                                     }
                                 } catch (Exception e3) {
                                     com.kingodogo.buildscape.BuildScape.getLogger().error(
@@ -400,7 +423,8 @@ public class CosmeticRenderHandler {
                     }
                 } catch (Exception e) {
                     com.kingodogo.buildscape.BuildScape.getLogger().debug(
-                            "Builders hat model layer not registered, cannot render custom head cosmetic: " + e.getMessage());
+                            "Builders hat model layer not registered, cannot render custom head cosmetic: "
+                                    + e.getMessage());
                     return;
                 }
             }
@@ -413,14 +437,12 @@ public class CosmeticRenderHandler {
             // Get texture location
             net.minecraft.resources.ResourceLocation texture = new net.minecraft.resources.ResourceLocation(
                     com.kingodogo.buildscape.BuildScape.MODID,
-                    "textures/cosmatics/builders_hat.png"
-            );
+                    "textures/cosmatics/builders_hat.png");
             com.kingodogo.buildscape.BuildScape.getLogger().debug("Rendering builders hat with texture: " + texture);
 
             // Get vertex consumer for the texture
             com.mojang.blaze3d.vertex.VertexConsumer vertexConsumer = bufferSource.getBuffer(
-                    net.minecraft.client.renderer.RenderType.entityCutoutNoCull(texture)
-            );
+                    net.minecraft.client.renderer.RenderType.entityCutoutNoCull(texture));
 
             // Position the model on the player's head
             poseStack.pushPose();
@@ -429,7 +451,8 @@ public class CosmeticRenderHandler {
             float headYaw = player.getYHeadRot();
             float headPitch = player.getXRot();
 
-            // Translate to head position (player head is at y=0.0, but model needs adjustment)
+            // Translate to head position (player head is at y=0.0, but model needs
+            // adjustment)
             poseStack.translate(0.0, 0.0, 0.0);
 
             // Apply head rotation
@@ -443,8 +466,8 @@ public class CosmeticRenderHandler {
 
             poseStack.popPose();
         } catch (Exception e) {
-            com.kingodogo.buildscape.BuildScape.getLogger().debug("Failed to render custom head cosmetic: " + e.getMessage());
+            com.kingodogo.buildscape.BuildScape.getLogger()
+                    .debug("Failed to render custom head cosmetic: " + e.getMessage());
         }
     }
 }
-

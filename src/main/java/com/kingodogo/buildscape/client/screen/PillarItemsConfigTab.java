@@ -1059,11 +1059,10 @@ public class PillarItemsConfigTab extends AbstractConfigTab {
         if (tagsSelectorWidget != null) {
             tagsSelectorWidget.render(poseStack, mouseX, mouseY, partialTick);
         }
+    }
 
-        // Render tooltips AFTER all widgets to ensure they're on top
-        // Disable any scissor tests that might clip tooltips
-        com.mojang.blaze3d.systems.RenderSystem.disableScissor();
-
+    @Override
+    public void renderTooltips(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
         // Render tooltips for item selection widget
         if (itemSelectionWidget != null) {
             itemSelectionWidget.renderTooltip(poseStack, mouseX, mouseY);

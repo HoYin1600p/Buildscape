@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "part=single": {
+      "model": "buildscape:block/smoke_vent_single"
+    },
+    "part=bottom": {
+      "model": "buildscape:block/smoke_vent_bottom"
+    },
+    "part=middle": {
+      "model": "buildscape:block/smoke_vent_middle"
+    },
+    "part=top": {
+      "model": "buildscape:block/smoke_vent_top"
+    }
+  }
+}

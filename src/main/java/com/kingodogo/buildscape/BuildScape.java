@@ -1374,7 +1374,7 @@ public class BuildScape {
                                 java.util.Random rand = new java.util.Random();
                                 for (int i = 0; i < 40; i++) {
                                     double x = cx + (rand.nextDouble() - 0.5) * 2.0;
-                                    double y = cy + (rand.nextDouble() - 0.5) * 1.0;
+                                    double y = cy + (rand.nextDouble() - 0.5);
                                     double z = cz + (rand.nextDouble() - 0.5) * 2.0;
 
                                     double xSpeed = (rand.nextDouble() - 0.5) * 0.2;
@@ -1508,6 +1508,7 @@ public class BuildScape {
         recoveryDelayTicks = 0;
         recoveryAttempted = false;
 
+        // Reset the in-memory cache - file data will be loaded when first player joins
         com.kingodogo.buildscape.config.PillarIdManager.resetWorldCache();
     }
 
@@ -1600,13 +1601,14 @@ public class BuildScape {
                 com.kingodogo.buildscape.config.PillarIdManager manager = com.kingodogo.buildscape.config.PillarIdManager
                         .get();
                 if (manager != null && manager.hasLoaded()) {
-                    manager.syncColorsFromNBTToManager(server);
-                    manager.saveImmediate();
+                    // Use forceSaveImmediate because at this point all players have left
+                    // and saveImmediate() would skip due to playerCount==0 guard
+                    manager.forceSaveImmediate();
                     manager.saveBackupFile();
                 }
             }
         } catch (Exception e) {
-            LOGGER.error("BuildScape: Error syncing/saving colors on server stop: " + e.getMessage());
+            LOGGER.error("BuildScape: Error saving pillar data on server stop: " + e.getMessage());
         }
 
         serverFullyInitialized = false;
@@ -1623,8 +1625,10 @@ public class BuildScape {
             net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent event) {
         if (event.getPlayer() instanceof net.minecraft.server.level.ServerPlayer serverPlayer) {
 
+            // REMOVED: Don't reset pillar data on player join - it clears saved pillar IDs!
+            // PillarIdJoinSyncHandler will load the data if needed
             if (!serverFullyInitialized) {
-                com.kingodogo.buildscape.config.PillarIdManager.resetWorldCache();
+                // com.kingodogo.buildscape.config.PillarIdManager.resetWorldCache();
 
                 com.kingodogo.buildscape.config.PillarParticleConfig.addConfigReloadCallback((isRemote) -> {
                     if (!isRemote) {
@@ -1661,8 +1665,75 @@ public class BuildScape {
                     net.minecraftforge.network.PacketDistributor.PLAYER.with(() -> serverPlayer),
                     configPacket);
 
+            // IMPORTANT: Sync pillar IDs to client so GUI works on servers
+            // Use a robust delayed sync that actually waits for manager to be ready
+            net.minecraft.server.MinecraftServer server = net.minecraftforge.server.ServerLifecycleHooks.getCurrentServer();
+            if (server != null && server.isRunning()) {
+                // Schedule pillar ID sync - try immediately, with retries if not loaded
+                schedulePillarIdSync(server, serverPlayer, manager, 0);
+            }
 
+        }
+    }
 
+    /**
+     * Schedule pillar ID sync to a player with retry logic.
+     * Uses the async pool to wait for the manager to load, then dispatches on the main thread.
+     */
+    private void schedulePillarIdSync(net.minecraft.server.MinecraftServer server,
+                                      net.minecraft.server.level.ServerPlayer player,
+                                      com.kingodogo.buildscape.config.PillarIdManager manager,
+                                      int attempt) {
+        final int MAX_ATTEMPTS = 10;
+        final int RETRY_DELAY_MS = 500;
+
+        if (attempt >= MAX_ATTEMPTS) {
+            // Give up after max attempts — send whatever we have 
+            server.execute(() -> {
+                if (player.hasDisconnected()) return;
+                sendPillarIdsToPlayer(server, player, manager);
+            });
+            return;
+        }
+
+        if (manager.hasLoaded()) {
+            // Manager ready — sync immediately on main thread
+            server.execute(() -> {
+                if (player.hasDisconnected()) return;
+                sendPillarIdsToPlayer(server, player, manager);
+            });
+        } else {
+            // Not loaded yet — wait on async pool and retry 
+            ASYNC_POOL.submit(() -> {
+                try {
+                    Thread.sleep(RETRY_DELAY_MS);
+                } catch (InterruptedException ignored) {
+                }
+                schedulePillarIdSync(server, player, manager, attempt + 1);
+            });
+        }
+    }
+
+    /**
+     * Sends all pillar ID data to a specific player.
+     */
+    private void sendPillarIdsToPlayer(net.minecraft.server.MinecraftServer server,
+                                       net.minecraft.server.level.ServerPlayer player,
+                                       com.kingodogo.buildscape.config.PillarIdManager manager) {
+        try {
+            // Ensure latest colors from NBT before sending
+            if (server.isRunning()) {
+                manager.syncColorsFromNBTToManager(server);
+            }
+
+            java.util.List<com.kingodogo.buildscape.config.PillarIdManager.PillarData> pillarDataList = manager.getAllPillarDataForSync();
+            com.kingodogo.buildscape.network.SyncPillarIdsPacket pillarIdsPacket = new com.kingodogo.buildscape.network.SyncPillarIdsPacket(
+                    pillarDataList);
+            com.kingodogo.buildscape.network.ModMessages.INSTANCE.send(
+                    net.minecraftforge.network.PacketDistributor.PLAYER.with(() -> player),
+                    pillarIdsPacket);
+        } catch (Exception e) {
+            LOGGER.error("BuildScape: Error sending pillar IDs to player: " + e.getMessage());
         }
     }
 
@@ -1687,16 +1758,13 @@ public class BuildScape {
             try {
                 net.minecraft.server.MinecraftServer server = net.minecraftforge.server.ServerLifecycleHooks
                         .getCurrentServer();
-                if (server != null && server.isRunning()) {
+                if (server != null) {
                     com.kingodogo.buildscape.config.PillarIdManager manager = com.kingodogo.buildscape.config.PillarIdManager
                             .get();
                     if (manager != null && manager.hasLoaded()) {
-                        manager.syncColorsFromNBTToManager(server);
-
-                        manager.saveImmediate();
-
+                        // Use forceSaveImmediate - players may have already left
+                        manager.forceSaveImmediate();
                         manager.saveBackupFile();
-
                     }
                 }
             } catch (Exception e) {

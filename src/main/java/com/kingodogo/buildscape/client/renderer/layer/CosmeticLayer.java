@@ -29,21 +29,31 @@ public class CosmeticLayer extends RenderLayer<AbstractClientPlayer, PlayerModel
             return;
 
         // Get equipped cosmetics
-        Map<Integer, String> equippedCosmetics = com.kingodogo.buildscape.client.screen.tabs.supporters.SupportersTabState
-                .getInstance()
-                .getEquippedCosmeticsBySlot();
+        Map<Integer, String> equippedCosmetics;
+        boolean isLocalPlayer = player.getUUID().equals(net.minecraft.client.Minecraft.getInstance().player.getUUID());
 
-        if (equippedCosmetics == null || equippedCosmetics.isEmpty()) {
+        if (isLocalPlayer) {
+            // For local player, use the UI state (which may have unsaved changes from the tab)
+            equippedCosmetics = com.kingodogo.buildscape.client.screen.tabs.supporters.SupportersTabState
+                    .getInstance()
+                    .getEquippedCosmeticsBySlot();
+
+            // If the UI state is empty, it might mean nothing is equipped OR the tab hasn't been opened yet
+            // However, we still want to check config if it's truly empty and not just "in-between" updates
+            if (equippedCosmetics.isEmpty()) {
+                equippedCosmetics = com.kingodogo.buildscape.config.CosmeticsConfig.get()
+                        .getEquippedCosmetics(player.getUUID());
+            }
+        } else {
+            // For other players, always use the config (which will eventually be synced via network)
             equippedCosmetics = com.kingodogo.buildscape.config.CosmeticsConfig.get()
                     .getEquippedCosmetics(player.getUUID());
         }
 
         CosmeticManager cosmeticManager = CosmeticManager.getInstance();
 
-
-
-        // Return early only if no armor cosmetics are equipped
-        if (equippedCosmetics.isEmpty())
+        // Return early if no cosmetics are equipped
+        if (equippedCosmetics == null || equippedCosmetics.isEmpty())
             return;
 
         // Check for head cosmetic (Slot 0)

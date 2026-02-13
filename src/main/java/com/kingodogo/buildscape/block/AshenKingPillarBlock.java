@@ -351,7 +351,7 @@ public class AshenKingPillarBlock extends PillarBlock {
                 com.kingodogo.buildscape.config.PillarParticleConfig cfg =
                         com.kingodogo.buildscape.config.PillarParticleConfig.get();
                 if (cfg.use_pattern && cfg.pattern != null) {
-                    pillarBE.setParticlePattern(cfg.pattern);
+                    // Intentionally removed: pillarBE.setParticlePattern(cfg.pattern);
                 }
             }
 

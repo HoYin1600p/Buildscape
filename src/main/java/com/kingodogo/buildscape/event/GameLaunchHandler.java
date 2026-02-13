@@ -10,7 +10,6 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 
 import java.util.HashSet;
-import java.util.Map;
 
 /**
  * Handles game launch events to trigger one-time cosmetic authentication.
@@ -77,18 +76,13 @@ public class GameLaunchHandler {
             unlocked.addAll(cosmeticManager.getDefaultCosmetics());
             state.setUnlockedCosmetics(unlocked);
 
-            if (cosmeticData != null && cosmeticData.getSelectedCosmetics() != null && !cosmeticData.getSelectedCosmetics().isEmpty()) {
-                state.setEquippedCosmetics(new HashSet<>(cosmeticData.getSelectedCosmetics().values()));
-                
-                for (Map.Entry<String, String> entry : cosmeticData.getSelectedCosmetics().entrySet()) {
-                    String type = entry.getKey();
-                    String cosmeticId = entry.getValue();
-                    int slot = getSlotFromType(type);
-                    if (slot != -100 && cosmeticId != null && !cosmeticId.isEmpty()) {
-                        state.equipCosmeticToSlot(slot, cosmeticId);
-                    }
-                }
+            // Mark that we got real unlock data from the API
+            if (cosmeticData != null) {
+                state.markApiUnlocksSet();
             }
+
+            // Equipped cosmetics come ONLY from local config (.dat file), loaded by setPlayerUuid().
+            // We never auto-equip from the API. The API is only used for unlock/access data.
 
 
 

@@ -45,5 +45,47 @@ public class ModMessages {
                 TreeChopPacket::decode,
                 TreeChopPacket::handle
         );
+        INSTANCE.registerMessage(
+                id++,
+                UpdatePillarDataPacket.class,
+                UpdatePillarDataPacket::encode,
+                UpdatePillarDataPacket::decode,
+                UpdatePillarDataPacket::handle
+        );
+        INSTANCE.registerMessage(
+                id++,
+                SyncPillarIdsPacket.class,
+                SyncPillarIdsPacket::encode,
+                SyncPillarIdsPacket::decode,
+                SyncPillarIdsPacket::handle
+        );
+        INSTANCE.registerMessage(
+                id++,
+                RequestPillarIdsPacket.class,
+                RequestPillarIdsPacket::encode,
+                RequestPillarIdsPacket::decode,
+                RequestPillarIdsPacket::handle
+        );
+        INSTANCE.registerMessage(
+                id++,
+                UpdateConfigPacket.class,
+                UpdateConfigPacket::encode,
+                UpdateConfigPacket::decode,
+                UpdateConfigPacket::handle
+        );
+        INSTANCE.registerMessage(
+                id++,
+                RemovePillarPacket.class,
+                RemovePillarPacket::encode,
+                RemovePillarPacket::decode,
+                RemovePillarPacket::handle
+        );
+        INSTANCE.registerMessage(
+                id++,
+                UpdateAllPillarIdsPacket.class,
+                UpdateAllPillarIdsPacket::encode,
+                UpdateAllPillarIdsPacket::decode,
+                UpdateAllPillarIdsPacket::handle
+        );
     }
 }

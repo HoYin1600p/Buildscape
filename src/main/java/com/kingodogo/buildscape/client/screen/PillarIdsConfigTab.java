@@ -49,6 +49,7 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
     private Button selectAllButton;
     private Button removeAllButton;
     private Button removeButton;
+    private Button applyButton;
     private Button headerSelectAllCheckbox;
     private double scrollOffset = 0;
     private double maxScroll = 0;
@@ -99,6 +100,14 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
         addTabWidget(removeAllButton);
         addTabWidget(removeButton);
 
+        com.kingodogo.buildscape.client.screen.widget.ScaledTextButton applyBtn = new com.kingodogo.buildscape.client.screen.widget.ScaledTextButton(
+                0, 0, buttonWidth, buttonHeight,
+                new TranslatableComponent("buildscape.config.apply"),
+                (btn) -> saveRows());
+        applyBtn.setCustomTextColors(0x55FF55, 0xAAFFAA); // Green for apply
+        applyButton = applyBtn;
+        addTabWidget(applyButton);
+
         // Header Checkbox
         int checkboxSize = BuildScapeConfigScreen.scaleSize(14);
         headerSelectAllCheckbox = new Button(0, 0, checkboxSize, checkboxSize, TextComponent.EMPTY, (btn) -> {
@@ -147,10 +156,20 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
 
         setButtonsVisible(true);
 
-        // Kick off a load to ensure the manager has data for the current world
-        try {
-            PillarIdManager.get().load();
-        } catch (Exception ignored) {
+        // IMPORTANT: Request fresh pillar data from server when opening the tab
+        // This ensures we always have the latest data, especially on multiplayer servers
+        net.minecraft.client.Minecraft mc = net.minecraft.client.Minecraft.getInstance();
+        if (mc.getCurrentServer() != null) {
+            // Multiplayer - request data from server
+            com.kingodogo.buildscape.network.ModMessages.INSTANCE.sendToServer(
+                    new com.kingodogo.buildscape.network.RequestPillarIdsPacket()
+            );
+        } else {
+            // Single-player - load locally
+            try {
+                PillarIdManager.get().load();
+            } catch (Exception ignored) {
+            }
         }
 
         refreshFromManager();
@@ -161,7 +180,7 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
         refreshFromManager();
     }
 
-    private void refreshFromManager() {
+    public void refreshFromManager() {
         PillarIdManager manager = PillarIdManager.get();
         try {
             // Check and reload if file changed
@@ -334,6 +353,12 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
 
         PillarIdManager manager = PillarIdManager.get();
         manager.replaceAllPillarData(toSave);
+
+        // Sync with server
+        com.kingodogo.buildscape.network.ModMessages.INSTANCE.sendToServer(
+                new com.kingodogo.buildscape.network.UpdateAllPillarIdsPacket(toSave)
+        );
+
         dirty = false;
         lastSignature = computeSignature(toSave);
         statusMessage = new TranslatableComponent("buildscape.config.ids.status.saved");
@@ -342,63 +367,40 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
     private int[] computeColumns(int tableWidth) {
         int columnGap = getColumnGap();
         int checkboxWidth = BuildScapeConfigScreen.scaleSize(20); // Space for selection checkbox
-        int usable = tableWidth - columnGap * 4 - checkboxWidth; // 4 gaps + checkbox column
+        int usable = tableWidth - columnGap * 5 - checkboxWidth; // 5 gaps + checkbox column
 
         // Minimum widths for readability at all scales
         int minCheckboxWidth = checkboxWidth;
-        int minIdWidth = BuildScapeConfigScreen.scaleSize(80);
+        int minIdWidth = BuildScapeConfigScreen.scaleSize(90);
+        int minItemWidth = BuildScapeConfigScreen.scaleSize(64); // Fits base pillar box + displayed item box + gap
         int minColorsWidth = BuildScapeConfigScreen.scaleSize(100);
-        int minDimensionWidth = BuildScapeConfigScreen.scaleSize(110); // Increased for "Overworld" text
-        int minCoordsWidth = BuildScapeConfigScreen.scaleSize(160); // Increased for coordinate fields
+        int minDimensionWidth = BuildScapeConfigScreen.scaleSize(110);
+        int minCoordsWidth = BuildScapeConfigScreen.scaleSize(160);
 
-        // Calculate desired widths based on percentages
-        // Checkbox: fixed, ID: 18%, Colors: 28%, Dimension: 22%, Coords: 32%
-        int desiredIdWidth = (int) (usable * 0.18f);
-        int desiredColorsWidth = (int) (usable * 0.28f);
-        int desiredDimensionWidth = (int) (usable * 0.22f);
-        int desiredCoordsWidth = usable - desiredIdWidth - desiredColorsWidth - desiredDimensionWidth;
+        // Desired proportions
+        int idWidth = Math.max(minIdWidth, (int) (usable * 0.16f));
+        int itemWidth = minItemWidth; // Fixed width for item column
+        int colorsWidth = Math.max(minColorsWidth, (int) (usable * 0.24f));
+        int dimensionWidth = Math.max(minDimensionWidth, (int) (usable * 0.20f));
+        int coordsWidth = Math.max(minCoordsWidth, usable - idWidth - itemWidth - colorsWidth - dimensionWidth);
 
-        // Apply minimum constraints
-        int idWidth = Math.max(minIdWidth, desiredIdWidth);
-        int colorsWidth = Math.max(minColorsWidth, desiredColorsWidth);
-        int dimensionWidth = Math.max(minDimensionWidth, desiredDimensionWidth);
-        int coordsWidth = Math.max(minCoordsWidth, desiredCoordsWidth);
-
-        // If we exceeded usable space, scale down proportionally (except coords which
-        // gets priority)
-        int totalUsed = idWidth + colorsWidth + dimensionWidth + coordsWidth;
+        // Scale down if total exceeds usable
+        int totalUsed = idWidth + itemWidth + colorsWidth + dimensionWidth + coordsWidth;
         if (totalUsed > usable) {
             int excess = totalUsed - usable;
-            // Reduce from ID, Colors, and Dimension proportionally, but keep coords at
-            // minimum
-            int totalReducible = (idWidth - minIdWidth) + (colorsWidth - minColorsWidth)
-                    + (dimensionWidth - minDimensionWidth);
-            if (totalReducible > 0) {
-                float reduceFactor = Math.min(1.0f, (float) excess / totalReducible);
-                idWidth = Math.max(minIdWidth, idWidth - (int) ((idWidth - minIdWidth) * reduceFactor));
-                colorsWidth = Math.max(minColorsWidth,
-                        colorsWidth - (int) ((colorsWidth - minColorsWidth) * reduceFactor));
-                dimensionWidth = Math.max(minDimensionWidth,
-                        dimensionWidth - (int) ((dimensionWidth - minDimensionWidth) * reduceFactor));
+            float reducible = (idWidth - minIdWidth) + (colorsWidth - minColorsWidth) + (dimensionWidth - minDimensionWidth);
+            if (reducible > 0) {
+                float factor = Math.min(1.0f, (float) excess / reducible);
+                idWidth -= (int) ((idWidth - minIdWidth) * factor);
+                colorsWidth -= (int) ((colorsWidth - minColorsWidth) * factor);
+                dimensionWidth -= (int) ((dimensionWidth - minDimensionWidth) * factor);
             }
-            // Recalculate coords to fit exactly
-            coordsWidth = usable - idWidth - colorsWidth - dimensionWidth;
-            // If still too small, we'll have to reduce other columns more
-            if (coordsWidth < minCoordsWidth) {
-                int stillNeeded = minCoordsWidth - coordsWidth;
-                // Reduce from other columns equally
-                int perColumn = stillNeeded / 3;
-                idWidth = Math.max(minIdWidth, idWidth - perColumn);
-                colorsWidth = Math.max(minColorsWidth, colorsWidth - perColumn);
-                dimensionWidth = Math.max(minDimensionWidth, dimensionWidth - perColumn);
-                coordsWidth = usable - idWidth - colorsWidth - dimensionWidth;
-            }
+            coordsWidth = usable - idWidth - itemWidth - colorsWidth - dimensionWidth;
         } else {
-            // We have extra space, give it to coords column
-            coordsWidth = usable - idWidth - colorsWidth - dimensionWidth;
+            coordsWidth = usable - idWidth - itemWidth - colorsWidth - dimensionWidth;
         }
 
-        return new int[] { minCheckboxWidth, idWidth, colorsWidth, dimensionWidth, coordsWidth };
+        return new int[]{minCheckboxWidth, idWidth, itemWidth, colorsWidth, dimensionWidth, coordsWidth};
     }
 
     private void positionButtons(int contentX, int contentY, int contentWidth) {
@@ -408,18 +410,27 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
         int topMargin = BuildScapeConfigScreen.scaleSize(4);
 
         int y = contentY + topMargin;
+        int x = contentX; // Start x for buttons
 
         // Reload button on the far left
-        reloadButton.x = contentX;
+        reloadButton.x = x;
         reloadButton.y = y;
         reloadButton.setWidth(buttonWidth);
         reloadButton.setHeight(buttonHeight);
+        x += buttonWidth + spacing;
 
-        // Remove Selected button directly next to Reload on the left
-        removeButton.x = reloadButton.x + buttonWidth + spacing;
+        // Remove Selected button next to Reload
+        removeButton.x = x;
         removeButton.y = y;
         removeButton.setWidth(buttonWidth);
         removeButton.setHeight(buttonHeight);
+        x += buttonWidth + spacing;
+
+        // Apply/Save button next to Remove
+        applyButton.x = x;
+        applyButton.y = y;
+        applyButton.setWidth(buttonWidth);
+        applyButton.setHeight(buttonHeight);
 
         // Remove All button on the far right
         removeAllButton.x = contentX + contentWidth - buttonWidth;
@@ -482,7 +493,7 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
             actualTableWidth += col;
         }
         int colGap = getColumnGap();
-        actualTableWidth += colGap * 4;
+        actualTableWidth += colGap * 5; // 5 gaps now (added item column)
 
         // Enable scissoring to prevent rows from rendering above the header or below
         // the visible area
@@ -557,6 +568,7 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
         }
     }
 
+
     private void drawHeader(PoseStack poseStack, int tableX, int tableY, int[] columns) {
         int x = tableX;
         int headerColor = 0xFFCCCCCC; // Light silver text for table headers instead of pure white
@@ -583,15 +595,23 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
         mc.font.draw(poseStack, idText, x + textPadding, headerTextY, headerColor);
         x += columns[1] + columnGap;
 
+        // Item column (NEW)
         drawCell(poseStack, x, tableY, columns[2], headerHeight, true);
-        Component colorsText = new TranslatableComponent("buildscape.config.ids.colors");
-        mc.font.draw(poseStack, colorsText, x + textPadding, headerTextY, headerColor);
+        Component itemText = new TranslatableComponent("buildscape.config.ids.item");
+        int itemTextWidth = mc.font.width(itemText);
+        // Center text horizontally in header cell
+        mc.font.draw(poseStack, itemText, x + (columns[2] - itemTextWidth) / 2, headerTextY, headerColor);
         x += columns[2] + columnGap;
 
         drawCell(poseStack, x, tableY, columns[3], headerHeight, true);
+        Component colorsText = new TranslatableComponent("buildscape.config.ids.colors");
+        mc.font.draw(poseStack, colorsText, x + textPadding, headerTextY, headerColor);
+        x += columns[3] + columnGap;
+
+        drawCell(poseStack, x, tableY, columns[4], headerHeight, true);
         Component dimensionText = new TranslatableComponent("buildscape.config.ids.dimension");
         mc.font.draw(poseStack, dimensionText, x + textPadding, headerTextY, headerColor);
-        x += columns[3] + columnGap;
+        x += columns[4] + columnGap;
 
         // Coordinates column - draw X, Y, Z separately aligned to their fields
         // (No drawCell bounding box, coordinates contain their own nested black border)
@@ -599,15 +619,15 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
         // Calculate positions to match the coordinate fields below
         int coordPadding = BuildScapeConfigScreen.scaleSize(8);
         int coordGap = BuildScapeConfigScreen.scaleSize(8);
-        int coordUsable = columns[4] - coordPadding * 2 - coordGap * 2;
+        int coordUsable = columns[5] - coordPadding * 2 - coordGap * 2;
         int minCoordWidth = BuildScapeConfigScreen.scaleSize(40);
         int coordWidth = Math.max(minCoordWidth, coordUsable / 3);
 
         // Adjust if needed
         int totalNeeded = coordPadding * 2 + coordWidth * 3 + coordGap * 2;
-        if (totalNeeded > columns[4]) {
+        if (totalNeeded > columns[5]) {
             coordGap = Math.max(BuildScapeConfigScreen.scaleSize(4),
-                    (columns[4] - coordPadding * 2 - coordWidth * 3) / 2);
+                    (columns[5] - coordPadding * 2 - coordWidth * 3) / 2);
         }
 
         // Draw X, Y, Z labels centered in their respective columns
@@ -832,6 +852,9 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
 
     @Override
     public void onClose() {
+        if (dirty) {
+            saveRows();
+        }
         setButtonsVisible(false);
         for (PillarRow row : rows) {
             row.setVisible(false);
@@ -879,6 +902,12 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
             for (String id : idsToRemove) {
                 manager.removePillar(id);
             }
+
+            // Sync removal to server
+            com.kingodogo.buildscape.network.ModMessages.INSTANCE.sendToServer(
+                    new com.kingodogo.buildscape.network.RemovePillarPacket(idsToRemove)
+            );
+
             refreshFromManager();
             dirty = true;
             if (Minecraft.getInstance().player != null) {
@@ -904,6 +933,12 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
             for (String id : idsToRemove) {
                 manager.removePillar(id);
             }
+
+            // Sync removal to server
+            com.kingodogo.buildscape.network.ModMessages.INSTANCE.sendToServer(
+                    new com.kingodogo.buildscape.network.RemovePillarPacket(idsToRemove)
+            );
+
             refreshFromManager();
             dirty = true;
             if (Minecraft.getInstance().player != null) {
@@ -935,6 +970,8 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
         private String id;
         private long createdTime;
         private long modifiedTime;
+        private net.minecraft.world.item.ItemStack displayedItem = net.minecraft.world.item.ItemStack.EMPTY;
+        private net.minecraft.world.item.ItemStack pillarTypeStack = net.minecraft.world.item.ItemStack.EMPTY;
 
         // Double-click detection
         private long lastClickTime = 0;
@@ -951,6 +988,9 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
             this.id = data.id;
             this.createdTime = data.createdTime;
             this.modifiedTime = data.modifiedTime;
+
+            // Load items from data
+            loadItemStacks(data);
 
             // Create selection checkbox - Clean 1px border design
             int checkboxSize = BuildScapeConfigScreen.scaleSize(14);
@@ -1038,6 +1078,33 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
             xField.setTextColor(0xFFFF0000); // Red
             yField.setTextColor(0xFF5555FF); // Light Blue/Purple
             zField.setTextColor(0xFF00FF00); // Green
+        }
+
+        private void loadItemStacks(PillarIdManager.PillarData data) {
+            this.displayedItem = net.minecraft.world.item.ItemStack.EMPTY;
+            this.pillarTypeStack = net.minecraft.world.item.ItemStack.EMPTY;
+
+            if (data.displayedItem != null && !data.displayedItem.isEmpty()) {
+                try {
+                    net.minecraft.resources.ResourceLocation itemId = new net.minecraft.resources.ResourceLocation(data.displayedItem);
+                    net.minecraft.world.item.Item item = net.minecraftforge.registries.ForgeRegistries.ITEMS.getValue(itemId);
+                    if (item != null) {
+                        this.displayedItem = new net.minecraft.world.item.ItemStack(item);
+                    }
+                } catch (Exception ignored) {
+                }
+            }
+
+            if (data.pillarType != null && !data.pillarType.isEmpty()) {
+                try {
+                    net.minecraft.resources.ResourceLocation itemId = new net.minecraft.resources.ResourceLocation(data.pillarType);
+                    net.minecraft.world.item.Item item = net.minecraftforge.registries.ForgeRegistries.ITEMS.getValue(itemId);
+                    if (item != null) {
+                        this.pillarTypeStack = new net.minecraft.world.item.ItemStack(item);
+                    }
+                } catch (Exception ignored) {
+                }
+            }
         }
 
         private void openPillarDetailTab(String pillarId) {
@@ -1149,6 +1216,23 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
             this.id = data.id;
             idField.setValue(data.id != null ? data.id : "");
 
+            // Load displayed item from data
+            if (data.displayedItem != null && !data.displayedItem.isEmpty()) {
+                try {
+                    net.minecraft.resources.ResourceLocation itemId = new net.minecraft.resources.ResourceLocation(data.displayedItem);
+                    net.minecraft.world.item.Item item = net.minecraftforge.registries.ForgeRegistries.ITEMS.getValue(itemId);
+                    if (item != null) {
+                        this.displayedItem = new net.minecraft.world.item.ItemStack(item);
+                    } else {
+                        this.displayedItem = net.minecraft.world.item.ItemStack.EMPTY;
+                    }
+                } catch (Exception e) {
+                    this.displayedItem = net.minecraft.world.item.ItemStack.EMPTY;
+                }
+            } else {
+                this.displayedItem = net.minecraft.world.item.ItemStack.EMPTY;
+            }
+
             // IMPORTANT: Use colors from manager file (pillar-ids.dat)
             // File is the source of truth for GUI display
             // Ensure we have a valid list (never null)
@@ -1195,6 +1279,9 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
             zField.setTextColor(0xFF00FF00); // Green
             this.createdTime = data.createdTime;
             this.modifiedTime = data.modifiedTime;
+
+            // Update item stacks
+            loadItemStacks(data);
         }
 
         private void setVisible(boolean visible) {
@@ -1270,7 +1357,7 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
 
             // Calculate total row width (for layout purposes only, no border drawn)
             int totalRowWidth = columns[0] + columnGap + columns[1] + columnGap + columns[2] + columnGap + columns[3]
-                    + columnGap + columns[4];
+                    + columnGap + columns[4] + columnGap + columns[5];
 
             // Calculate EXACT center Y position for all elements - use ONE calculation for
             // EVERYTHING
@@ -1325,8 +1412,33 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
             mc.font.draw(poseStack, idValue, idTextX, textY, 0xFFFFFFFF);
             x += columns[1] + columnGap;
 
-            // Colors column - perfectly centered
+            // Item column (NEW) - Full height box like other columns
             drawCell(poseStack, x, rowY, columns[2], rowHeight, false);
+
+            int iconSize = 16;
+            boolean hasType = pillarTypeStack != null && !pillarTypeStack.isEmpty();
+            boolean hasItem = displayedItem != null && !displayedItem.isEmpty();
+
+            if (hasType || hasItem) {
+                int spacing = BuildScapeConfigScreen.scaleSize(4);
+                int totalWidth = (hasType ? iconSize : 0) + (hasItem ? iconSize : 0) + (hasType && hasItem ? spacing : 0);
+                int renderX = x + (columns[2] - totalWidth) / 2;
+                int renderY = rowY + (rowHeight - iconSize) / 2;
+
+                if (hasType) {
+                    mc.getItemRenderer().renderGuiItem(pillarTypeStack, renderX, renderY);
+                    renderX += iconSize + spacing;
+                }
+
+                if (hasItem) {
+                    mc.getItemRenderer().renderGuiItem(displayedItem, renderX, renderY);
+                    mc.getItemRenderer().renderGuiItemDecorations(mc.font, displayedItem, renderX, renderY);
+                }
+            }
+            x += columns[2] + columnGap;
+
+            // Colors column - perfectly centered
+            drawCell(poseStack, x, rowY, columns[3], rowHeight, false);
             // Render color swatches - perfectly centered vertically
             int swatchSpacing = BuildScapeConfigScreen.scaleSize(4);
             int swatchStartX = x + padding;
@@ -1338,10 +1450,10 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
                 swatch.setHeight(swatchSize);
                 swatch.renderButton(poseStack, 0, 0, 0);
             }
-            x += columns[2] + columnGap;
+            x += columns[3] + columnGap;
 
             // Dimension column - perfectly centered
-            drawCell(poseStack, x, rowY, columns[3], rowHeight, false);
+            drawCell(poseStack, x, rowY, columns[4], rowHeight, false);
             // Format dimension name for display (remove modid prefix like "minecraft:" and
             // show full name)
             String originalDimension = dimensionField.getValue();
@@ -1350,7 +1462,7 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
             // Render dimension EditBox background (no text)
             dimensionField.x = x + padding;
             dimensionField.y = centerY; // Use EXACT same centerY as all other EditBoxes
-            int dimensionWidth = columns[3] - padding * 2;
+            int dimensionWidth = columns[4] - padding * 2;
             dimensionField.setWidth(Math.max(dimensionWidth, BuildScapeConfigScreen.scaleSize(100)));
 
             // Temporarily clear text to draw formatted version
@@ -1370,7 +1482,7 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
             }
             int dimTextX = x + padding; // Left-aligned cleanly instead of centered
             mc.font.draw(poseStack, finalDimText, dimTextX, textY, 0xFFFFFFFF);
-            x += columns[3] + columnGap;
+            x += columns[4] + columnGap;
 
             // Coordinates column - perfectly centered with border
             // (No drawCell bounding box, coordinates contain their own nested black border)
@@ -1378,7 +1490,7 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
             // Improved coordinate alignment - ensure consistent spacing with proper scaling
             int coordPadding = BuildScapeConfigScreen.scaleSize(8);
             int coordGap = BuildScapeConfigScreen.scaleSize(8);
-            int coordUsable = columns[4] - coordPadding * 2 - coordGap * 2;
+            int coordUsable = columns[5] - coordPadding * 2 - coordGap * 2;
 
             // Ensure minimum width per coordinate field
             int minCoordWidth = BuildScapeConfigScreen.scaleSize(40);
@@ -1386,9 +1498,9 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
 
             // If total width exceeds available space, reduce gap
             int totalNeeded = coordPadding * 2 + coordWidth * 3 + coordGap * 2;
-            if (totalNeeded > columns[4]) {
+            if (totalNeeded > columns[5]) {
                 coordGap = Math.max(BuildScapeConfigScreen.scaleSize(4),
-                        (columns[4] - coordPadding * 2 - coordWidth * 3) / 2);
+                        (columns[5] - coordPadding * 2 - coordWidth * 3) / 2);
             }
 
             // Calculate positions for coordinate fields
@@ -1574,6 +1686,11 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
                     }
                 }
                 clickedOnRow = true;
+            }
+
+            // If we get here, they clicked the row but not a specific field that handles it
+            if (button == 0 && clickedOnRow) {
+                selected = !selected;
             }
 
             // Check for double-click on the row (for marking pillar)

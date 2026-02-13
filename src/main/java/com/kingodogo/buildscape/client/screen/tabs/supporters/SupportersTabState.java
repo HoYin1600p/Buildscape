@@ -1,11 +1,8 @@
 package com.kingodogo.buildscape.client.screen.tabs.supporters;
 
-import com.kingodogo.buildscape.BuildScape;
-import com.kingodogo.buildscape.api.SupportersApiClient;
 import com.kingodogo.buildscape.config.CosmeticsConfig;
 import com.kingodogo.buildscape.cosmetics.CosmeticManager;
 import com.kingodogo.buildscape.cosmetics.CosmeticRegistry;
-import net.minecraft.client.Minecraft;
 
 import java.util.*;
 
@@ -29,6 +26,10 @@ public class SupportersTabState {
     private UUID playerUuid;
     private Runnable onSelectionChanged;
     private Runnable onEquippedChanged;
+
+    // Tracks whether unlocked cosmetics have been set from the API at least once this session.
+    // Prevents the default-cosmetics fallback from overwriting API-provided unlock data.
+    private boolean apiUnlocksSet = false;
     
     private SupportersTabState() {
     }
@@ -48,6 +49,7 @@ public class SupportersTabState {
         playerUuid = null;
         onSelectionChanged = null;
         onEquippedChanged = null;
+        apiUnlocksSet = false;
     }
     
     public String getSelectedCosmeticId() {
@@ -84,6 +86,21 @@ public class SupportersTabState {
     
     public void setUnlockedCosmetics(Set<String> unlockedCosmetics) {
         this.unlockedCosmetics = new HashSet<>(unlockedCosmetics != null ? unlockedCosmetics : new HashSet<>());
+    }
+
+    /**
+     * Returns true if unlocked cosmetics have been populated from the API this session.
+     */
+    public boolean isApiUnlocksSet() {
+        return apiUnlocksSet;
+    }
+
+    /**
+     * Marks that unlocked cosmetics have been populated from the API.
+     * Once set, the default-fallback logic in SupportersOnlyTab should NOT overwrite them.
+     */
+    public void markApiUnlocksSet() {
+        this.apiUnlocksSet = true;
     }
     
     public boolean isUnlocked(String cosmeticId) {
@@ -244,10 +261,7 @@ public class SupportersTabState {
                 }
             }
 
-            if (selectedCosmeticId == null && !equippedCosmetics.isEmpty()) {
-                String trailId = equippedCosmeticsBySlot.get(SLOT_TRAIL);
-                setSelectedCosmeticId(trailId != null ? trailId : lastEquippedId);
-            }
+            // Auto-selection of preview cosmetics removed to avoid "punching" the user with selections
         }
         
         if (onEquippedChanged != null) {

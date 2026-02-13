@@ -1,4 +1,4 @@
-package com.kingodogo.buildscape.client.screen.widget;
+package com.kingodogo.buildscape.client.screen.tabs.supporters;
 
 import java.util.function.Consumer;
 
@@ -9,8 +9,9 @@ import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.TextComponent;
+import org.lwjgl.glfw.GLFW;
 
-public class ColorPickerWidget extends AbstractWidget {
+public class CosmeticColorPickerWidget extends AbstractWidget {
     private static final int GRADIENT_SIZE = 80;
     private static final int HUE_SLIDER_WIDTH = 20;
     private static final int HUE_SLIDER_HEIGHT = 80;
@@ -35,10 +36,11 @@ public class ColorPickerWidget extends AbstractWidget {
 
     public EditBox rField, gField, bField;
     public EditBox hField, sField, brightnessField;
+    public EditBox hexField;
     private boolean updatingFields = false;
 
-    public ColorPickerWidget(int x, int y, int width, int height, int initialColor, Consumer<String> onColorChanged) {
-        super(x, y, width, height, net.minecraft.network.chat.TextComponent.EMPTY);
+    public CosmeticColorPickerWidget(int x, int y, int width, int height, int initialColor, Consumer<String> onColorChanged) {
+        super(x, y, width, height, TextComponent.EMPTY);
         this.currentColor = initialColor;
         this.onColorChanged = onColorChanged;
         rgbToHsb(initialColor);
@@ -153,6 +155,43 @@ public class ColorPickerWidget extends AbstractWidget {
                 }
             }
         });
+        
+        // Hex Field
+        hexField = new EditBox(mc.font, 0, 0, 60, fieldHeight, new TextComponent(""));
+        hexField.setMaxLength(7); // #RRGGBB
+        hexField.setFilter(s -> s.matches("[0-9a-fA-F#]*"));
+        hexField.setResponder(value -> {
+             if (!updatingFields && !value.isEmpty()) {
+                 try {
+                     String hex = value.startsWith("#") ? value.substring(1) : value;
+                     if (hex.length() == 6) {
+                         int color = Integer.parseInt(hex, 16);
+                         this.currentColor = color;
+                         rgbToHsb(color);
+                         // Don't call updateColorFromRgb/Hsb fully to avoid recursion loop or text reset unless valid
+                         r = (color >> 16) & 0xFF;
+                         g = (color >> 8) & 0xFF;
+                         b = color & 0xFF;
+                         
+                         // Manually update other fields but keep hex as is (or normalize format)
+                         updatingFields = true;
+                         if (rField != null) rField.setValue(String.valueOf(r));
+                         if (gField != null) gField.setValue(String.valueOf(g));
+                         if (bField != null) bField.setValue(String.valueOf(b));
+                         if (hField != null) hField.setValue(String.format("%.1f", hue));
+                         if (sField != null) sField.setValue(String.format("%.1f", saturation * 100.0f));
+                         if (brightnessField != null) brightnessField.setValue(String.format("%.1f", brightness * 100.0f));
+                         updatingFields = false;
+                         
+                         if (onColorChanged != null) {
+                             onColorChanged.accept("#" + hex.toUpperCase());
+                         }
+                     }
+                 } catch (NumberFormatException e) {
+                     // Ignore invalid hex
+                 }
+             }
+        });
 
         updateFieldValues();
     }
@@ -171,6 +210,8 @@ public class ColorPickerWidget extends AbstractWidget {
             sField.setValue(String.format("%.1f", saturation * 100.0f));
         if (brightnessField != null)
             brightnessField.setValue(String.format("%.1f", brightness * 100.0f));
+        if (hexField != null)
+            hexField.setValue(String.format("#%06X", currentColor));
         updatingFields = false;
     }
 
@@ -234,7 +275,8 @@ public class ColorPickerWidget extends AbstractWidget {
         int scaledSliderSpacing = (int) (SLIDER_SPACING * scale);
         int scaledValueTextWidth = (int) (VALUE_TEXT_WIDTH * scale);
         int scaledGap1 = (int) (5 * scale);
-        int scaledGap2 = (int) (10 * scale);
+        // Increased gap to 8 for better text spacing
+        int scaledGap2 = (int) (8 * scale); 
         int scaledLabelWidth = (int) (15 * scale);
         int scaledPadding = (int) (5 * scale);
 
@@ -284,18 +326,50 @@ public class ColorPickerWidget extends AbstractWidget {
         fill(poseStack, hueSliderX + scaledHueSliderWidth, hueIndicatorY - 2, hueSliderX + scaledHueSliderWidth + 3,
                 hueIndicatorY + 2, 0xFFFFFFFF);
 
+        // --- Custom Render Area for Preview and Hex Input ---
         int previewY = gradientY + scaledGradientSize + scaledGap1;
         int previewX = gradientX;
-        int previewHeight = (int) (20 * scale);
-        int previewWidth = scaledGradientSize + scaledHueSliderWidth + scaledGap1;
-        fill(poseStack, previewX, previewY, previewX + previewWidth, previewY + previewHeight,
+        // Make preview height consistent with scale, maybe slightly larger for better input area
+        int previewHeight = (int) (20 * scale); 
+        int totalPreviewWidth = scaledGradientSize + scaledHueSliderWidth + scaledGap1;
+        
+        // Split area: Left is Square Color Box, Right is Hex
+        int colorBoxWidth = previewHeight; // Square
+        int hexBoxX = previewX + colorBoxWidth + scaledGap1;
+        int hexBoxWidth = totalPreviewWidth - colorBoxWidth - scaledGap1;
+        
+        // Render Color Box
+        fill(poseStack, previewX, previewY, previewX + colorBoxWidth, previewY + previewHeight,
                 0xFF000000 | currentColor);
-        fill(poseStack, previewX - 1, previewY - 1, previewX + previewWidth + 1, previewY, 0xFF000000);
-        fill(poseStack, previewX - 1, previewY + previewHeight, previewX + previewWidth + 1,
+        fill(poseStack, previewX - 1, previewY - 1, previewX + colorBoxWidth + 1, previewY, 0xFF000000);
+        fill(poseStack, previewX - 1, previewY + previewHeight, previewX + colorBoxWidth + 1,
                 previewY + previewHeight + 1, 0xFF000000);
         fill(poseStack, previewX - 1, previewY - 1, previewX, previewY + previewHeight + 1, 0xFF000000);
-        fill(poseStack, previewX + previewWidth, previewY - 1, previewX + previewWidth + 1,
+        fill(poseStack, previewX + colorBoxWidth, previewY - 1, previewX + colorBoxWidth + 1,
                 previewY + previewHeight + 1, 0xFF000000);
+
+        // Render Hex Field
+        if (hexField != null) {
+            // Calculate virtual bounds (unscaled)
+            int virtualX = (int) (hexBoxX / scale);
+            // Center vertically.
+            // Pushing down by 4 virtual pixels
+            int virtualY = (int) (previewY / scale) + 4; 
+            int virtualWidth = (int) (hexBoxWidth / scale);
+            int virtualHeight = (int) (previewHeight / scale);
+            
+            hexField.x = virtualX;
+            hexField.y = virtualY;
+            hexField.setWidth(virtualWidth);
+            // hexField.setHeight(virtualHeight); // Protected access
+            
+            poseStack.pushPose();
+            poseStack.scale(scale, scale, 1.0f);
+            hexField.render(poseStack, (int)(mouseX / scale), (int)(mouseY / scale), partialTick);
+            poseStack.popPose();
+        }
+        
+        // --- End Custom Render ---
 
         int rgbStartX = hueSliderX + scaledHueSliderWidth + scaledGap2;
         int rgbStartY = gradientY;
@@ -404,6 +478,24 @@ public class ColorPickerWidget extends AbstractWidget {
         int scaledFieldWidth = (int) ((textWidth + 6) * scale);
         int scaledFieldHeight = (int) (SLIDER_HEIGHT * scale) + 1;
 
+        // Render manual EditBox background/text if not real editbox (the original code did this, but also created real EditBoxes that were rendered?? No, original code renderSliderScaled draws a FAKE field)
+        // Wait, lines 407-415 in original draw the field.
+        // But createValueFields created REAL EditBoxes.
+        // And renderButton didn't call render() on them.
+        // So they were invisible interaction layers? Or I missed where they are rendered.
+        // Original code: mouseClicked calls rField.mouseClicked.
+        // But renderButton does NOT render rField. it renders a fake box at lines 407-415.
+        // This implies the real EditBoxes are hidden and only used for input?
+        // OR, they are overlayed?
+        // If they are not rendered, you can't see what you type unless the fake box updates.
+        // The fake box updates from `value`. 
+        // When you type in `rField`, it updates `r`, which updates `value` in render.
+        // So the user types blindly? No, EditBox usually renders cursor.
+        // If render isn't called, standard EditBox features (cursor, selection) won't show.
+        // This suggests the original implementation might be slightly broken or relies on something I don't see.
+        // But `CosmeticsDisplayPanel` wants "enter hex code directly".
+        // I should render the `hexField` PROPERLY.
+        
         fill(poseStack, fieldX, fieldY, fieldX + scaledFieldWidth, fieldY + scaledFieldHeight, 0xFF000000);
         fill(poseStack, fieldX + 1, fieldY + 1, fieldX + scaledFieldWidth - 1, fieldY + scaledFieldHeight - 1,
                 0x80FFFFFF);
@@ -411,90 +503,19 @@ public class ColorPickerWidget extends AbstractWidget {
         poseStack.pushPose();
         poseStack.translate(fieldX + 2, fieldY + 2, 0);
         poseStack.scale(scale, scale, 1.0f);
-        mc.font.draw(poseStack, valueStr, 0, 0, 0xFF000000);
+        mc.font.draw(poseStack, valueStr, -1, 0, 0xFF000000);
         poseStack.popPose();
-    }
-
-    private void renderSlider(PoseStack poseStack, Minecraft mc, int x, int y, String label, int value, int min,
-            int max, int gradientColor, boolean isDragging) {
-        mc.font.draw(poseStack, label, x, y + 2, 0xFFFFFF);
-
-        int sliderX = x + 15;
-        int sliderY = y;
-
-        if (gradientColor == -1) {
-            if (label.equals("H")) {
-                for (int px = 0; px < SLIDER_WIDTH; px++) {
-                    float h = (px / (float) SLIDER_WIDTH) * 360.0f;
-                    int color = hsbToRgb(h, 1.0f, 1.0f);
-                    fill(poseStack, sliderX + px, sliderY, sliderX + px + 1, sliderY + SLIDER_HEIGHT,
-                            0xFF000000 | color);
-                }
-            } else {
-                int baseColor = label.equals("S") ? hsbToRgb(hue, 1.0f, brightness) : hsbToRgb(hue, saturation, 1.0f);
-                for (int px = 0; px < SLIDER_WIDTH; px++) {
-                    float ratio = px / (float) SLIDER_WIDTH;
-                    int r = (baseColor >> 16) & 0xFF;
-                    int g = (baseColor >> 8) & 0xFF;
-                    int bl = baseColor & 0xFF;
-                    if (label.equals("S")) {
-                        r = (int) (128 + (r - 128) * ratio);
-                        g = (int) (128 + (g - 128) * ratio);
-                        bl = (int) (128 + (bl - 128) * ratio);
-                    } else {
-                        r = (int) (r * ratio);
-                        g = (int) (g * ratio);
-                        bl = (int) (bl * ratio);
-                    }
-                    int color = (r << 16) | (g << 8) | bl;
-                    fill(poseStack, sliderX + px, sliderY, sliderX + px + 1, sliderY + SLIDER_HEIGHT,
-                            0xFF000000 | color);
-                }
-            }
-        } else {
-            for (int px = 0; px < SLIDER_WIDTH; px++) {
-                float ratio = px / (float) SLIDER_WIDTH;
-                int color = 0;
-                if (label.equals("R")) {
-                    color = ((int) (ratio * 255) << 16) | ((g << 8) | b);
-                } else if (label.equals("G")) {
-                    color = (r << 16) | ((int) (ratio * 255) << 8) | b;
-                } else {
-                    color = (r << 16) | (g << 8) | (int) (ratio * 255);
-                }
-                fill(poseStack, sliderX + px, sliderY, sliderX + px + 1, sliderY + SLIDER_HEIGHT, 0xFF000000 | color);
-            }
-        }
-
-        fill(poseStack, sliderX - 1, sliderY - 1, sliderX + SLIDER_WIDTH + 1, sliderY, 0xFF000000);
-        fill(poseStack, sliderX - 1, sliderY + SLIDER_HEIGHT, sliderX + SLIDER_WIDTH + 1, sliderY + SLIDER_HEIGHT + 1,
-                0xFF000000);
-        fill(poseStack, sliderX - 1, sliderY - 1, sliderX, sliderY + SLIDER_HEIGHT + 1, 0xFF000000);
-        fill(poseStack, sliderX + SLIDER_WIDTH, sliderY - 1, sliderX + SLIDER_WIDTH + 1, sliderY + SLIDER_HEIGHT + 1,
-                0xFF000000);
-
-        float ratio = (value - min) / (float) (max - min);
-        int indicatorX = sliderX + (int) (ratio * SLIDER_WIDTH);
-        fill(poseStack, indicatorX - 1, sliderY - 2, indicatorX + 1, sliderY + SLIDER_HEIGHT + 2, 0xFFFFFFFF);
-        fill(poseStack, indicatorX, sliderY - 1, indicatorX, sliderY + SLIDER_HEIGHT + 1, 0xFF000000);
-
-        String valueText;
-        if (label.equals("R") || label.equals("G") || label.equals("B")) {
-            valueText = String.valueOf(value);
-        } else {
-            valueText = String.format("%.1f", (float) value);
-        }
-        int textX = sliderX + SLIDER_WIDTH + 3;
-        int maxTextWidth = VALUE_TEXT_WIDTH - 3;
-        int textWidth = mc.font.width(valueText);
-        if (textWidth > maxTextWidth) {
-            valueText = String.valueOf(value);
-        }
-        mc.font.draw(poseStack, valueText, textX, sliderY + 2, 0xFFFFFF);
     }
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if (hexField != null) {
+            // Transform mouse to virtual scaled coordinates for hexField
+            if (hexField.mouseClicked(mouseX / currentScale, mouseY / currentScale, button)) {
+                return true;
+            }
+        }
+        
         if (rField != null && rField.mouseClicked(mouseX, mouseY, button))
             return true;
         if (gField != null && gField.mouseClicked(mouseX, mouseY, button))
@@ -516,15 +537,9 @@ public class ColorPickerWidget extends AbstractWidget {
         if (mouseX < x || mouseX >= x + width || mouseY < y || mouseY >= y + height) {
             return false;
         }
-
-        float totalUnscaledWidth = GRADIENT_SIZE + 5 + HUE_SLIDER_WIDTH + 10 + 15 + SLIDER_WIDTH + VALUE_TEXT_WIDTH
-                + 10;
-        float totalUnscaledHeight = GRADIENT_SIZE + 5 + 20 + 10;
-
-        float scaleX = (float) width / totalUnscaledWidth;
-        float scaleY = (float) height / totalUnscaledHeight;
-        float scale = Math.min(scaleX, scaleY);
-        scale = Math.min(1.0f, scale);
+        
+        // Use cached scale for consistency
+        float scale = currentScale;
 
         int scaledGradientSize = (int) (GRADIENT_SIZE * scale);
         int scaledHueSliderWidth = (int) (HUE_SLIDER_WIDTH * scale);
@@ -532,7 +547,8 @@ public class ColorPickerWidget extends AbstractWidget {
         int scaledSliderWidth = (int) (SLIDER_WIDTH * scale);
         int scaledSliderSpacing = (int) (SLIDER_SPACING * scale);
         int scaledGap1 = (int) (5 * scale);
-        int scaledGap2 = (int) (10 * scale);
+        // Match gap from renderButton
+        int scaledGap2 = (int) (8 * scale);
         int scaledPadding = (int) (5 * scale);
 
         int gradientX = x + scaledPadding;
@@ -541,7 +557,7 @@ public class ColorPickerWidget extends AbstractWidget {
         int hueSliderY = gradientY;
         int rgbStartX = hueSliderX + scaledHueSliderWidth + scaledGap2;
         int rgbStartY = gradientY;
-        int hsbStartY = rgbStartY + scaledSliderSpacing * 3 + scaledGap1;
+        int hsbStartY = rgbStartY + scaledSliderSpacing * 3 + 5; // Fixed 5 offset matches render logic
 
         if (mouseX >= gradientX - 2 && mouseX < gradientX + scaledGradientSize + 2 &&
                 mouseY >= gradientY - 2 && mouseY < gradientY + scaledGradientSize + 2) {
@@ -654,92 +670,90 @@ public class ColorPickerWidget extends AbstractWidget {
             clearAllDragging();
             return false;
         }
+        
+        if (isDragging) {
+            float scale = currentScale;
 
-        if (!isDragging) {
-            return false;
-        }
+            int scaledGradientSize = (int) (GRADIENT_SIZE * scale);
+            int scaledHueSliderWidth = (int) (HUE_SLIDER_WIDTH * scale);
+            int scaledHueSliderHeight = (int) (HUE_SLIDER_HEIGHT * scale);
+            int scaledSliderWidth = (int) (SLIDER_WIDTH * scale);
+            int scaledSliderSpacing = (int) (SLIDER_SPACING * scale);
+            int scaledGap1 = (int) (5 * scale);
+            // Match gap
+            int scaledGap2 = (int) (8 * scale);
+            int scaledPadding = (int) (5 * scale);
 
-        float totalUnscaledWidth = GRADIENT_SIZE + 5 + HUE_SLIDER_WIDTH + 10 + 15 + SLIDER_WIDTH + VALUE_TEXT_WIDTH
-                + 10;
-        float totalUnscaledHeight = GRADIENT_SIZE + 5 + 20 + 10;
+            int gradientX = x + scaledPadding;
+            int gradientY = y + scaledPadding;
+            int hueSliderX = gradientX + scaledGradientSize + scaledGap1;
+            int hueSliderY = gradientY;
+            int rgbStartX = hueSliderX + scaledHueSliderWidth + scaledGap2;
+            int sliderX = rgbStartX + (int) (15 * scale);
 
-        float scaleX = (float) width / totalUnscaledWidth;
-        float scaleY = (float) height / totalUnscaledHeight;
-        float scale = Math.min(scaleX, scaleY);
-        scale = Math.min(1.0f, scale);
+            if (draggingGradient) {
+                double clampedX = Math.max(gradientX, Math.min(gradientX + scaledGradientSize - 1, mouseX));
+                double clampedY = Math.max(gradientY, Math.min(gradientY + scaledGradientSize - 1, mouseY));
+                saturation = (float) Math.max(0, Math.min(1, (clampedX - gradientX) / (double) scaledGradientSize));
+                brightness = (float) Math.max(0, Math.min(1, 1.0 - (clampedY - gradientY) / (double) scaledGradientSize));
+                updateColorFromHsb();
+                return true;
+            }
 
-        int scaledGradientSize = (int) (GRADIENT_SIZE * scale);
-        int scaledHueSliderWidth = (int) (HUE_SLIDER_WIDTH * scale);
-        int scaledHueSliderHeight = (int) (HUE_SLIDER_HEIGHT * scale);
-        int scaledSliderWidth = (int) (SLIDER_WIDTH * scale);
-        int scaledSliderSpacing = (int) (SLIDER_SPACING * scale);
-        int scaledGap1 = (int) (5 * scale);
-        int scaledGap2 = (int) (10 * scale);
-        int scaledPadding = (int) (5 * scale);
+            if (draggingHue) {
+                double clampedY = Math.max(hueSliderY, Math.min(hueSliderY + scaledHueSliderHeight - 1, mouseY));
+                hue = (float) Math.max(0,
+                        Math.min(360, ((clampedY - hueSliderY) / (double) scaledHueSliderHeight) * 360.0));
+                updateColorFromHsb();
+                return true;
+            }
 
-        int gradientX = x + scaledPadding;
-        int gradientY = y + scaledPadding;
-        int hueSliderX = gradientX + scaledGradientSize + scaledGap1;
-        int hueSliderY = gradientY;
-        int rgbStartX = hueSliderX + scaledHueSliderWidth + scaledGap2;
-        int sliderX = rgbStartX + (int) (15 * scale);
+            if (draggingR || draggingG || draggingB || draggingH || draggingS || draggingBrightness) {
+                double clampedX = Math.max(sliderX, Math.min(sliderX + scaledSliderWidth - 1, mouseX));
+                float ratio = (float) Math.max(0, Math.min(1, (clampedX - sliderX) / (double) scaledSliderWidth));
 
-        if (draggingGradient) {
-            double clampedX = Math.max(gradientX, Math.min(gradientX + scaledGradientSize - 1, mouseX));
-            double clampedY = Math.max(gradientY, Math.min(gradientY + scaledGradientSize - 1, mouseY));
-            saturation = (float) Math.max(0, Math.min(1, (clampedX - gradientX) / (double) scaledGradientSize));
-            brightness = (float) Math.max(0, Math.min(1, 1.0 - (clampedY - gradientY) / (double) scaledGradientSize));
-            updateColorFromHsb();
+                if (draggingR) {
+                    r = (int) (ratio * 255);
+                    updateColorFromRgb();
+                    return true;
+                }
+
+                if (draggingG) {
+                    g = (int) (ratio * 255);
+                    updateColorFromRgb();
+                    return true;
+                }
+
+                if (draggingB) {
+                    b = (int) (ratio * 255);
+                    updateColorFromRgb();
+                    return true;
+                }
+
+                if (draggingH) {
+                    hue = ratio * 360.0f;
+                    updateColorFromHsb();
+                    return true;
+                }
+
+                if (draggingS) {
+                    saturation = ratio;
+                    updateColorFromHsb();
+                    return true;
+                }
+
+                if (draggingBrightness) {
+                    brightness = ratio;
+                    updateColorFromHsb();
+                    return true;
+                }
+            }
             return true;
         }
 
-        if (draggingHue) {
-            double clampedY = Math.max(hueSliderY, Math.min(hueSliderY + scaledHueSliderHeight - 1, mouseY));
-            hue = (float) Math.max(0,
-                    Math.min(360, ((clampedY - hueSliderY) / (double) scaledHueSliderHeight) * 360.0));
-            updateColorFromHsb();
+        // Only allow text selection if NOT dragging a color/slider
+        if (hexField != null && hexField.mouseDragged(mouseX / currentScale, mouseY / currentScale, button, dragX / currentScale, dragY / currentScale)) {
             return true;
-        }
-
-        if (draggingR || draggingG || draggingB || draggingH || draggingS || draggingBrightness) {
-            double clampedX = Math.max(sliderX, Math.min(sliderX + scaledSliderWidth - 1, mouseX));
-            float ratio = (float) Math.max(0, Math.min(1, (clampedX - sliderX) / (double) scaledSliderWidth));
-
-            if (draggingR) {
-                r = (int) (ratio * 255);
-                updateColorFromRgb();
-                return true;
-            }
-
-            if (draggingG) {
-                g = (int) (ratio * 255);
-                updateColorFromRgb();
-                return true;
-            }
-
-            if (draggingB) {
-                b = (int) (ratio * 255);
-                updateColorFromRgb();
-                return true;
-            }
-
-            if (draggingH) {
-                hue = ratio * 360.0f;
-                updateColorFromHsb();
-                return true;
-            }
-
-            if (draggingS) {
-                saturation = ratio;
-                updateColorFromHsb();
-                return true;
-            }
-
-            if (draggingBrightness) {
-                brightness = ratio;
-                updateColorFromHsb();
-                return true;
-            }
         }
 
         return false;
@@ -750,6 +764,7 @@ public class ColorPickerWidget extends AbstractWidget {
         boolean wasDragging = draggingGradient || draggingHue || draggingR || draggingG || draggingB ||
                 draggingH || draggingS || draggingBrightness;
         clearAllDragging();
+        if (hexField != null) hexField.mouseReleased(mouseX, mouseY, button);
         return wasDragging;
     }
 
@@ -801,5 +816,36 @@ public class ColorPickerWidget extends AbstractWidget {
 
     @Override
     public void updateNarration(NarrationElementOutput narrationElementOutput) {
+        // No narration implemented
+    }
+    
+    @Override
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (hexField != null && hexField.keyPressed(keyCode, scanCode, modifiers)) {
+            return true;
+        }
+        if (rField != null && rField.keyPressed(keyCode, scanCode, modifiers)) return true;
+        if (gField != null && gField.keyPressed(keyCode, scanCode, modifiers)) return true;
+        if (bField != null && bField.keyPressed(keyCode, scanCode, modifiers)) return true;
+        if (hField != null && hField.keyPressed(keyCode, scanCode, modifiers)) return true;
+        if (sField != null && sField.keyPressed(keyCode, scanCode, modifiers)) return true;
+        if (brightnessField != null && brightnessField.keyPressed(keyCode, scanCode, modifiers)) return true;
+        
+        return super.keyPressed(keyCode, scanCode, modifiers);
+    }
+
+    @Override
+    public boolean charTyped(char codePoint, int modifiers) {
+        if (hexField != null && hexField.charTyped(codePoint, modifiers)) {
+            return true;
+        }
+        if (rField != null && rField.charTyped(codePoint, modifiers)) return true;
+        if (gField != null && gField.charTyped(codePoint, modifiers)) return true;
+        if (bField != null && bField.charTyped(codePoint, modifiers)) return true;
+        if (hField != null && hField.charTyped(codePoint, modifiers)) return true;
+        if (sField != null && sField.charTyped(codePoint, modifiers)) return true;
+        if (brightnessField != null && brightnessField.charTyped(codePoint, modifiers)) return true;
+        
+        return super.charTyped(codePoint, modifiers);
     }
 }

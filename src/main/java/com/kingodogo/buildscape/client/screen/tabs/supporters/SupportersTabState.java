@@ -9,13 +9,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-/**
- * Singleton state holder for the Supporters tab.
- */
 public class SupportersTabState {
     private static SupportersTabState instance;
     
-    // Cosmetic Slot Indices
     public static final int SLOT_HEAD = 0;
     public static final int SLOT_CHEST = 1;
     public static final int SLOT_LEGS = 2;
@@ -62,7 +58,19 @@ public class SupportersTabState {
             if (onSelectionChanged != null) {
                 onSelectionChanged.run();
             }
+            // Clear preview state when selection changes
+            this.previewCosmeticId = null;
         }
+    }
+    
+    private String previewCosmeticId;
+    
+    public String getPreviewCosmeticId() {
+        return previewCosmeticId;
+    }
+    
+    public void setPreviewCosmeticId(String previewCosmeticId) {
+        this.previewCosmeticId = previewCosmeticId;
     }
     
     public Set<String> getUnlockedCosmetics() {
@@ -91,14 +99,11 @@ public class SupportersTabState {
     }
     
     public void equipCosmeticToSlot(int slotIndex, String cosmeticId) {
-        // Remove from old slot if already equipped elsewhere
         equippedCosmeticsBySlot.values().remove(cosmeticId);
-        
-        // Remove old cosmetic from this slot if any
+
         String oldCosmetic = equippedCosmeticsBySlot.remove(slotIndex);
         if (oldCosmetic != null) equippedCosmetics.remove(oldCosmetic);
-        
-        // Equip new cosmetic
+
         if (cosmeticId != null && !cosmeticId.isEmpty()) {
             equippedCosmeticsBySlot.put(slotIndex, cosmeticId);
             equippedCosmetics.add(cosmeticId);
@@ -138,7 +143,6 @@ public class SupportersTabState {
         }
         
         if (isUnlocked) {
-            // Determine best slot for this cosmetic
             int bestSlot = getBestSlotForCosmetic(cosmeticId);
             equipCosmeticToSlot(bestSlot, cosmeticId);
         }
@@ -164,8 +168,7 @@ public class SupportersTabState {
     
     public void unequipCosmetic(String cosmeticId) {
         if (cosmeticId == null) return;
-        
-        // Find which slot it's in and unequip
+
         Integer slotToUnequip = null;
         for (Map.Entry<Integer, String> entry : equippedCosmeticsBySlot.entrySet()) {
             if (cosmeticId.equals(entry.getValue())) {
@@ -177,7 +180,6 @@ public class SupportersTabState {
         if (slotToUnequip != null) {
             unequipCosmeticFromSlot(slotToUnequip);
         } else {
-            // Fallback for untracked slots
             equippedCosmetics.remove(cosmeticId);
             if (onEquippedChanged != null) onEquippedChanged.run();
         }
@@ -193,8 +195,7 @@ public class SupportersTabState {
     
     public void setPlayerUuid(UUID playerUuid) {
         this.playerUuid = playerUuid;
-        
-        // Clear current equipment before loading new
+
         equippedCosmeticsBySlot.clear();
         equippedCosmetics.clear();
         
@@ -210,8 +211,7 @@ public class SupportersTabState {
                     lastEquippedId = cosmeticId;
                 }
             }
-            
-            // Auto-select the equipped particle trail if one exists
+
             if (selectedCosmeticId == null && !equippedCosmetics.isEmpty()) {
                 String trailId = equippedCosmeticsBySlot.get(SLOT_TRAIL);
                 setSelectedCosmeticId(trailId != null ? trailId : lastEquippedId);

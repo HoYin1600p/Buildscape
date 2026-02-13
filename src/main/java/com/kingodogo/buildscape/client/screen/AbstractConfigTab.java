@@ -41,22 +41,13 @@ public abstract class AbstractConfigTab {
         return false;
     }
     
-    /**
-     * Add a widget to this tab. The widget will be automatically removed when the tab is closed.
-     */
     protected void addTabWidget(GuiEventListener widget) {
         tabWidgets.add(widget);
         parent.addTabWidget(widget);
     }
     
-    /**
-     * Get the name of this tab for GUI configuration purposes.
-     * Defaults to the class name without "ConfigTab" suffix.
-     * @return The tab name
-     */
     public String getTabName() {
         String className = this.getClass().getSimpleName();
-        // Remove "ConfigTab" suffix if present
         if (className.endsWith("ConfigTab")) {
             return className.substring(0, className.length() - "ConfigTab".length());
         }
@@ -64,7 +55,6 @@ public abstract class AbstractConfigTab {
     }
     
     public void onClose() {
-        // Remove all widgets added by this tab
         for (GuiEventListener widget : tabWidgets) {
             parent.removeTabWidget(widget);
         }

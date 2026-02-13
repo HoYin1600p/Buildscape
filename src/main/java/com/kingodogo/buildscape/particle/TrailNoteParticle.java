@@ -11,12 +11,11 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT)
-public class CakeParticle extends TextureSheetParticle {
+public class TrailNoteParticle extends TextureSheetParticle {
     
     private final SpriteSet sprites;
     
     // Static map to store color queues for particles
-    // Key: "x,y,z" string, Value: ColorEntry
     private static final java.util.Map<String, ColorEntry> POSITION_COLOR_MAP = new java.util.concurrent.ConcurrentHashMap<>();
 
     private static class ColorEntry {
@@ -29,7 +28,7 @@ public class CakeParticle extends TextureSheetParticle {
         }
     }
 
-    protected CakeParticle(ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed, SpriteSet sprites) {
+    protected TrailNoteParticle(ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed, SpriteSet sprites) {
         super(level, x, y, z, xSpeed, ySpeed, zSpeed);
         this.sprites = sprites;
         
@@ -58,7 +57,14 @@ public class CakeParticle extends TextureSheetParticle {
             float[] color = parseColorCode(colorCode);
             this.setColor(color[0], color[1], color[2]);
         } else {
-            this.setColor(1.0F, 1.0F, 1.0F); // Default white
+            // Random color
+            float hue = level.random.nextFloat();
+            // Use HSB for vibrant colors
+            int rgb = java.awt.Color.HSBtoRGB(hue, 0.8f, 0.9f);
+            float r = ((rgb >> 16) & 0xFF) / 255.0f;
+            float g = ((rgb >> 8) & 0xFF) / 255.0f;
+            float b = (rgb & 0xFF) / 255.0f;
+            this.setColor(r, g, b);
         }
         
         if (POSITION_COLOR_MAP.size() > 1000) {
@@ -99,7 +105,6 @@ public class CakeParticle extends TextureSheetParticle {
     @Override
     public void tick() {
         super.tick();
-        // Removed setSpriteFromAge to keep the selected static texture
         
         if (this.age > this.lifetime * 0.7F) {
             float fadeProgress = (this.age - this.lifetime * 0.7F) / (this.lifetime * 0.3F);
@@ -129,7 +134,7 @@ public class CakeParticle extends TextureSheetParticle {
         
         @Override
         public Particle createParticle(SimpleParticleType type, ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
-            return new CakeParticle(level, x, y, z, xSpeed, ySpeed, zSpeed, sprites);
+            return new TrailNoteParticle(level, x, y, z, xSpeed, ySpeed, zSpeed, sprites);
         }
     }
 }

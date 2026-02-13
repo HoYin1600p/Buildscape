@@ -53,3 +53,6 @@ recent_*.java
 /.qoder/
 /.vs/
 /imports/
+/.gemini/
+/.vscode/
+/index.md

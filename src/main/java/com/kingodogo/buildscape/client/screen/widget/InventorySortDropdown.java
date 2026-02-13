@@ -27,8 +27,8 @@ public class InventorySortDropdown extends Button {
     private SortMode currentMode = SortMode.INVENTORY;
     private boolean dropdownOpen = false;
     private final Consumer<SortMode> onModeChanged;
-    private final int dropdownHeight = 60; // Height for 3 options
-    
+    private final int dropdownHeight = 60;
+
     public InventorySortDropdown(int x, int y, int width, int height, Consumer<SortMode> onModeChanged) {
         super(x, y, width, height, new TranslatableComponent("buildscape.config.select_inventory"), (button) -> {
             InventorySortDropdown dropdown = (InventorySortDropdown) button;
@@ -53,10 +53,7 @@ public class InventorySortDropdown extends Button {
     
     @Override
     public void renderButton(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
-        // Background removed - too large
-        // Border removed - no outer white borders
-        
-        // Draw text
+
         Minecraft.getInstance().font.draw(
             poseStack,
             getMessage(),
@@ -64,38 +61,28 @@ public class InventorySortDropdown extends Button {
             y + (height - 8) / 2,
             0xFFFFFF
         );
-        
-        // Draw dropdown arrow
+
         int arrowX = x + width - 15;
         int arrowY = y + height / 2;
         if (dropdownOpen) {
-            // Draw up arrow
             fill(poseStack, arrowX, arrowY - 2, arrowX + 5, arrowY, 0xFFFFFF);
             fill(poseStack, arrowX + 2, arrowY - 4, arrowX + 3, arrowY - 2, 0xFFFFFF);
         } else {
-            // Draw down arrow
             fill(poseStack, arrowX, arrowY, arrowX + 5, arrowY + 2, 0xFFFFFF);
             fill(poseStack, arrowX + 2, arrowY + 2, arrowX + 3, arrowY + 4, 0xFFFFFF);
         }
-        
-        // Render dropdown menu if open
+
         if (dropdownOpen) {
             int dropdownY = y + height;
             int optionHeight = 20;
-            
-            // Background and borders removed - no colorful backgrounds
-            
-            // Render options
+
             for (int i = 0; i < SortMode.values().length; i++) {
                 SortMode mode = SortMode.values()[i];
                 int optionY = dropdownY + i * optionHeight;
                 boolean hovered = mouseX >= x && mouseX < x + width &&
                                 mouseY >= optionY && mouseY < optionY + optionHeight;
                 boolean selected = mode == currentMode;
-                
-                // Option background removed - no colorful backgrounds
-                
-                // Draw icon (simplified - using text for now)
+
                 String icon = "";
                 switch (mode) {
                     case INVENTORY:
@@ -136,8 +123,7 @@ public class InventorySortDropdown extends Button {
                 this.onClick(mouseX, mouseY);
                 return true;
             }
-            
-            // Check dropdown options
+
             if (dropdownOpen) {
                 int dropdownY = y + height;
                 int optionHeight = 20;
@@ -152,8 +138,7 @@ public class InventorySortDropdown extends Button {
                         return true;
                     }
                 }
-                
-                // Clicked outside dropdown, close it
+
                 dropdownOpen = false;
             }
         }

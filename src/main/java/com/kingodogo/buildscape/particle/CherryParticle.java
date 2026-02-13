@@ -42,7 +42,22 @@ public class CherryParticle extends TextureSheetParticle {
         this.yd = ySpeed;
         this.zd = zSpeed;
         
-        this.setSpriteFromAge(sprites);
+        // Logic to select specific texture from the 12 files
+        // 0-5: Shape 1 (6 color themes)
+        // 6-11: Shape 2 (6 color themes)
+        
+        // "Change color theme on the go": Cycle through 6 themes based on time
+        int totalThemes = 6;
+        // Randomly select a theme instead of time-based cycling
+        int currentTheme = level.random.nextInt(totalThemes);
+        
+        // "Spawn both shapes": Randomly pick Shape 1 or Shape 2 for this theme
+        boolean useShape2 = level.random.nextBoolean();
+        int spriteIndex = currentTheme + (useShape2 ? 6 : 0);
+        
+        // Select the specific static sprite
+        // sprites.get(i, total) maps i to the sprite at that fraction of the list
+        this.setSprite(sprites.get(spriteIndex, 12));
         
         // Color handling logic
         String positionKey = String.format("%.1f,%.1f,%.1f", x, y, z);
@@ -98,7 +113,7 @@ public class CherryParticle extends TextureSheetParticle {
     @Override
     public void tick() {
         super.tick();
-        this.setSpriteFromAge(this.sprites);
+        // Removed setSpriteFromAge to keep the selected static texture
         
         if (this.age > this.lifetime * 0.7F) {
             float fadeProgress = (this.age - this.lifetime * 0.7F) / (this.lifetime * 0.3F);

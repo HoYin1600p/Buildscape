@@ -98,15 +98,14 @@ public class CosmeticManager {
      * Check if a particle trail supports color customization.
      */
     public boolean supportsColor(String cosmeticId) {
-        // Only particle trails support color (and specifically only sparkle/heart/cake/cherry/snowflake
-        // types)
         if (!isParticleTrail(cosmeticId)) {
             return false;
         }
 
         String shape = getParticleShape(cosmeticId);
-        // Sparkle, Heart, Cake, Cherry, Snowflake shapes support colors
-        return shape.equals("sparkle") || shape.equals("heart") || shape.equals("cake") || shape.equals("cherry") || shape.equals("snowflake");
+        // Only Sparkle and Heart shapes support colors
+        // Cherry, Cake, Snowflake, Firework, Note, Bubble, Cherry Leaves are NOT colorable
+        return shape.equals("sparkle") || shape.equals("heart");
     }
 
     /**

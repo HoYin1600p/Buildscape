@@ -21,8 +21,12 @@ import java.util.stream.Collectors;
 public class TagsSelectorWidget extends AbstractWidget {
     private static final int TAG_BUTTON_HEIGHT = 20;
     private static final int TAG_BUTTON_SPACING = 2;
-    private static final int TAGS_PER_ROW = 1; // One tag per line
-    
+    private static final int TAGS_PER_ROW = 1;
+    // Header area: top padding (5px) + search box height (~20px) + gap (5px) = 30px
+    // Tags start below this area
+    private static final int HEADER_AREA_HEIGHT = 26; // Reduced to start 1px below search bar (5px padding + 20px
+                                                      // height + 1px)
+
     private List<TagKey<Item>> allTags;
     private List<TagKey<Item>> filteredTags;
     private String filter = "";
@@ -31,30 +35,31 @@ public class TagsSelectorWidget extends AbstractWidget {
     private final Consumer<String> onTagSelected;
     private Set<String> selectedTags;
     private SortType sortType = SortType.ALL_ITEMS;
-    private boolean isDraggingScrollbar = false;
-    private double scrollbarDragStartY = 0;
-    private double scrollbarDragStartOffset = 0;
-    
+    private final CustomScrollbarRenderer scrollbarRenderer = new CustomScrollbarRenderer();
+
+    // Scrolling text state
+    private String currentHoveredTagId = null;
+    private long hoverStartTime = 0;
+
     public enum SortType {
         INVENTORY,
         ALL_ITEMS,
         MOD_ONLY
     }
-    
+
     public TagsSelectorWidget(int x, int y, int width, int height, Consumer<String> onTagSelected) {
         super(x, y, width, height, net.minecraft.network.chat.TextComponent.EMPTY);
         this.onTagSelected = onTagSelected;
         this.selectedTags = new HashSet<>();
         loadAllTags();
         filteredTags = new ArrayList<>(allTags);
-        maxVisibleRows = (height - 20) / (TAG_BUTTON_HEIGHT + TAG_BUTTON_SPACING);
+        maxVisibleRows = (height - HEADER_AREA_HEIGHT) / (TAG_BUTTON_HEIGHT + TAG_BUTTON_SPACING);
     }
-    
+
     private void loadAllTags() {
         allTags = new ArrayList<>();
         Set<String> seenTags = new HashSet<>();
-        
-        // Get all tags by checking all items and their tags
+
         ForgeRegistries.ITEMS.getValues().forEach(item -> {
             item.builtInRegistryHolder().tags().forEach(tagKey -> {
                 String tagId = tagKey.location().toString();
@@ -64,265 +69,307 @@ public class TagsSelectorWidget extends AbstractWidget {
                 }
             });
         });
-        
-        // Sort by tag ID
+
         allTags.sort((a, b) -> a.location().toString().compareToIgnoreCase(b.location().toString()));
     }
-    
+
     public void setFilter(String filter) {
         this.filter = filter.toLowerCase();
         refresh();
     }
-    
+
     public void setSortType(SortType sortType) {
         this.sortType = sortType;
         refresh();
     }
-    
+
     public SortType getSortType() {
         return sortType;
     }
-    
+
     public void refresh() {
         List<TagKey<Item>> baseList = allTags;
-        
-        // Apply filter
+
         if (!filter.isEmpty()) {
             baseList = allTags.stream()
-                .filter(tag -> {
-                    String tagId = tag.location().toString().toLowerCase();
-                    return tagId.contains(filter);
-                })
-                .collect(Collectors.toList());
-        }
-        
-        // Apply sorting
-        switch (sortType) {
-            case INVENTORY:
-                // Filter to only tags that have items in player's inventory
-                filteredTags = baseList.stream()
                     .filter(tag -> {
-                        // Check if any item with this tag is in inventory
-                        return ForgeRegistries.ITEMS.getValues().stream()
-                            .anyMatch(item -> {
-                                if (!item.builtInRegistryHolder().tags().anyMatch(t -> t.equals(tag))) {
-                                    return false;
-                                }
-                                // Check if item is in player's inventory
-                                net.minecraft.client.Minecraft mc = net.minecraft.client.Minecraft.getInstance();
-                                if (mc.player != null) {
-                                    return mc.player.getInventory().items.stream()
-                                        .anyMatch(stack -> stack.getItem() == item);
-                                }
-                                return false;
-                            });
+                        String tagId = tag.location().toString().toLowerCase();
+                        return tagId.contains(filter);
                     })
                     .collect(Collectors.toList());
+        }
+
+        switch (sortType) {
+            case INVENTORY:
+                filteredTags = baseList.stream()
+                        .filter(tag -> {
+                            return ForgeRegistries.ITEMS.getValues().stream()
+                                    .anyMatch(item -> {
+                                        if (!item.builtInRegistryHolder().tags().anyMatch(t -> t.equals(tag))) {
+                                            return false;
+                                        }
+                                        net.minecraft.client.Minecraft mc = net.minecraft.client.Minecraft
+                                                .getInstance();
+                                        if (mc.player != null) {
+                                            return mc.player.getInventory().items.stream()
+                                                    .anyMatch(stack -> stack.getItem() == item);
+                                        }
+                                        return false;
+                                    });
+                        })
+                        .collect(Collectors.toList());
                 break;
             case MOD_ONLY:
-                // Filter to only BuildScape mod tags
                 filteredTags = baseList.stream()
-                    .filter(tag -> tag.location().getNamespace().equals("buildscape"))
-                    .collect(Collectors.toList());
+                        .filter(tag -> tag.location().getNamespace().equals("buildscape"))
+                        .collect(Collectors.toList());
                 break;
             case ALL_ITEMS:
             default:
                 filteredTags = new ArrayList<>(baseList);
                 break;
         }
-        
+
         scrollOffset = Math.max(0, Math.min(scrollOffset, getMaxScroll()));
     }
-    
+
     public void setSelectedTags(Set<String> tags) {
         this.selectedTags = new HashSet<>(tags);
     }
-    
+
     private double getMaxScroll() {
-        int totalRows = filteredTags.size(); // One tag per row
+        int totalRows = filteredTags.size();
         return Math.max(0, totalRows - maxVisibleRows);
     }
-    
+
     @Override
     public void renderButton(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
-        // Recalculate maxVisibleRows dynamically based on current height
-        // This ensures proper display at all GUI scales
-        int topPadding = 5;
-        int availableHeight = height - topPadding;
+        // Tags should start below the header area (label, search box, buttons)
+        // Tags should start below the header area (label, search box, buttons)
+        int topPadding = HEADER_AREA_HEIGHT;
+        int bottomMargin = 10;
+        int availableHeight = height - topPadding - bottomMargin; // Account for bottom margin
         maxVisibleRows = availableHeight / (TAG_BUTTON_HEIGHT + TAG_BUTTON_SPACING);
-        maxVisibleRows = Math.max(1, maxVisibleRows); // At least 1 row visible
+        maxVisibleRows = Math.max(1, maxVisibleRows);
 
-        // Enable scissor to clip tags to widget bounds
         poseStack.pushPose();
         Minecraft mc = Minecraft.getInstance();
         double guiScale = mc.getWindow().getGuiScale();
         int windowHeight = mc.getWindow().getHeight();
-        int scissorX = (int)(x * guiScale);
-        int scissorY = (int)(windowHeight - (y + height) * guiScale);
-        int scissorWidth = (int)(width * guiScale);
-        int scissorHeight = (int)(height * guiScale);
-        RenderSystem.enableScissor(scissorX, scissorY, scissorWidth, scissorHeight);
 
-        // Background removed - too large
+        // Draw border around panel (debug mode)
+        if (com.kingodogo.buildscape.client.screen.DebugRenderConfig.RENDER_PANEL_BORDERS) {
+            int borderColor = com.kingodogo.buildscape.client.screen.DebugRenderConfig.PANEL_BORDER_COLOR;
+            fill(poseStack, x, y, x + width, y + 1, borderColor); // Top
+            fill(poseStack, x, y + height - 1, x + width, y + height, borderColor); // Bottom
+            fill(poseStack, x, y, x + 1, y + height, borderColor); // Left
+            fill(poseStack, x + width - 1, y, x + width, y + height, borderColor); // Right
+        }
 
-        // Title is now rendered in PillarItemsConfigTab for proper alignment
-        // Removed title rendering here
+        int scissorX = (int) (x * guiScale);
+        // Exclude header area from scissor height and add bottom margin
+        // bottomMargin is already defined above
+        // Raise bottom edge by bottomMargin
+        int scissorY = (int) (windowHeight - (y + height) * guiScale + bottomMargin * guiScale);
+        // Clip content to exclude scrollbar area:
+        // 4px right gap + 8px scrollbar + 4px left gap = 16px reserved
+        int scissorWidth = (int) ((width - 16) * guiScale);
+        int scissorHeight = (int) ((height - HEADER_AREA_HEIGHT - bottomMargin) * guiScale); // Reduce height
 
-        // Calculate visible tags (one per line)
+        if (scissorHeight > 0 && scissorWidth > 0) {
+            RenderSystem.enableScissor(scissorX, scissorY, scissorWidth, scissorHeight);
+        }
+
         int startRow = (int) scrollOffset;
-        int endRow = Math.min(startRow + maxVisibleRows, filteredTags.size());
+        int endRow = Math.min(startRow + maxVisibleRows + 1, filteredTags.size()); // +1 to ensure smooth scrolling
 
-        int tagY = y + topPadding; // Start tags with top padding
-        int tagWidth = width - 15; // Full width minus scrollbar space
-        
+        int tagY = y + topPadding;
+        // Total width - 5px left padding - 16px right reserved space = width - 21
+        int tagWidth = width - 21;
+
         for (int row = startRow; row < endRow; row++) {
-            if (row >= filteredTags.size()) break;
-            
+            if (row >= filteredTags.size())
+                break;
+
             TagKey<Item> tag = filteredTags.get(row);
             String tagId = "#" + tag.location();
             int rowY = tagY + (row - startRow) * (TAG_BUTTON_HEIGHT + TAG_BUTTON_SPACING);
-            
-            // Skip rows that are completely outside the widget bounds
-            if (rowY + TAG_BUTTON_HEIGHT < y || rowY > y + height) {
+
+            // Updated visibility check to respect HEADER_AREA_HEIGHT
+            if (rowY + TAG_BUTTON_HEIGHT < y + HEADER_AREA_HEIGHT || rowY > y + height) {
                 continue;
             }
-            
+
             int tagX = x + 5;
-            
+
             boolean isSelected = selectedTags.contains(tagId);
             boolean isHovered = mouseX >= tagX && mouseX < tagX + tagWidth &&
-                              mouseY >= rowY && mouseY < rowY + TAG_BUTTON_HEIGHT &&
-                              mouseX >= x && mouseX < x + width &&
-                              mouseY >= y && mouseY < y + height;
-            
-            // Render tag button background - highlight selected tags
+                    mouseY >= rowY && mouseY < rowY + TAG_BUTTON_HEIGHT &&
+                    mouseX >= x && mouseX < x + width &&
+                    mouseY >= y + HEADER_AREA_HEIGHT && mouseY < y + height; // Updated hover check
+
             int bgColor;
             if (isSelected) {
-                bgColor = isHovered ? 0x6000FF00 : 0x4000FF00; // Green tint for selected
+                bgColor = isHovered ? 0x6000FF00 : 0x4000FF00;
             } else {
                 bgColor = isHovered ? 0x40CCCCCC : 0x33CCCCCC;
             }
             fill(poseStack, tagX, rowY, tagX + tagWidth, rowY + TAG_BUTTON_HEIGHT, bgColor);
-            
-            // Render border for selected tags
+
             if (isSelected) {
-                int borderColor = 0xFF00FF00; // Green border
+                int borderColor = 0xFF00FF00;
                 fill(poseStack, tagX - 1, rowY - 1, tagX + tagWidth + 1, rowY, borderColor);
-                fill(poseStack, tagX - 1, rowY + TAG_BUTTON_HEIGHT, tagX + tagWidth + 1, rowY + TAG_BUTTON_HEIGHT + 1, borderColor);
+                fill(poseStack, tagX - 1, rowY + TAG_BUTTON_HEIGHT, tagX + tagWidth + 1, rowY + TAG_BUTTON_HEIGHT + 1,
+                        borderColor);
                 fill(poseStack, tagX - 1, rowY - 1, tagX, rowY + TAG_BUTTON_HEIGHT + 1, borderColor);
-                fill(poseStack, tagX + tagWidth, rowY - 1, tagX + tagWidth + 1, rowY + TAG_BUTTON_HEIGHT + 1, borderColor);
+                fill(poseStack, tagX + tagWidth, rowY - 1, tagX + tagWidth + 1, rowY + TAG_BUTTON_HEIGHT + 1,
+                        borderColor);
             }
-            
-            // Render tag name (truncate if too long based on available width)
+
             String displayName = tag.location().toString();
-            int availableWidth = tagWidth - 10; // Margin for text
+            int availableWidth = tagWidth - 10;
             int textWidth = Minecraft.getInstance().font.width(displayName);
-            if (textWidth > availableWidth) {
-                // Truncate text to fit available width
-                String truncated = Minecraft.getInstance().font.plainSubstrByWidth(displayName, availableWidth - Minecraft.getInstance().font.width("..."));
-                displayName = truncated + "...";
+
+            if (isHovered && textWidth > availableWidth) {
+                // Scrolling text logic
+                if (!tagId.equals(currentHoveredTagId)) {
+                    currentHoveredTagId = tagId;
+                    hoverStartTime = System.currentTimeMillis();
+                }
+
+                long elapsed = System.currentTimeMillis() - hoverStartTime;
+                double speed = 0.001; // Speed factor
+                int maxScroll = textWidth - availableWidth;
+
+                // Sine wave scrolling: 0 -> max -> 0
+                // (1 - cos(t)) / 2 ranges from 0 to 1 to 0
+                double scrollProgress = (1.0 - Math.cos(elapsed * speed)) / 2.0;
+                int textOffset = (int) (maxScroll * scrollProgress);
+
+                // Clip text to button bounds to prevent leaking
+                int buttonScissorX = (int) ((tagX + 5) * guiScale);
+                int buttonScissorY = (int) (windowHeight - (rowY + TAG_BUTTON_HEIGHT - 6) * guiScale); // Approx bounds
+                int buttonScissorWidth = (int) ((availableWidth) * guiScale);
+                int buttonScissorHeight = (int) (TAG_BUTTON_HEIGHT * guiScale);
+
+                // Use intersection with existing scissor (list area) to remain safe
+                // But simplified: just enabling scissor for the text line is usually enough if
+                // strictly contained
+                // Better: Use viewport intersection logic or just a tighter scissor
+
+                // Strict clipping for the text
+                int textScissorY = (int) (windowHeight - (rowY + TAG_BUTTON_HEIGHT) * guiScale);
+                int textScissorH = (int) (TAG_BUTTON_HEIGHT * guiScale);
+
+                // Apply scissor for text
+                RenderSystem.enableScissor(buttonScissorX, textScissorY, buttonScissorWidth, textScissorH);
+
+                Minecraft.getInstance().font.draw(
+                        poseStack,
+                        displayName,
+                        tagX + 5 - textOffset, rowY + 6,
+                        0xFFFFFF);
+
+                // Restore list scissor
+                if (scissorHeight > 0 && scissorWidth > 0) {
+                    RenderSystem.enableScissor(scissorX, scissorY, scissorWidth, scissorHeight);
+                } else {
+                    RenderSystem.disableScissor();
+                }
+            } else {
+                if (textWidth > availableWidth) {
+                    String truncated = Minecraft.getInstance().font.plainSubstrByWidth(displayName,
+                            availableWidth - Minecraft.getInstance().font.width("..."));
+                    displayName = truncated + "...";
+                }
+                Minecraft.getInstance().font.draw(
+                        poseStack,
+                        displayName,
+                        tagX + 5, rowY + 6,
+                        0xFFFFFF);
             }
-            Minecraft.getInstance().font.draw(
-                poseStack,
-                displayName,
-                tagX + 5, rowY + 6,
-                0xFFFFFF
-            );
         }
-        
-        // Disable scissor before rendering scrollbar
-        RenderSystem.disableScissor();
+
+        if (scissorHeight > 0 && scissorWidth > 0) {
+            RenderSystem.disableScissor();
+        }
         poseStack.popPose();
-        
-        // Render scrollbar if needed
+
         if (getMaxScroll() > 0) {
-            int scrollbarX = x + width - 10;
-            int scrollbarHeight = height - 20;
-            int scrollbarY = y + 20;
-            
-            double scrollRatio = scrollOffset / getMaxScroll();
-            int thumbHeight = (int) (scrollbarHeight * (maxVisibleRows / (double) filteredTags.size()));
-            thumbHeight = Math.max(20, thumbHeight);
-            int thumbY = scrollbarY + (int) (scrollRatio * (scrollbarHeight - thumbHeight));
-            
-            fill(poseStack, scrollbarX, scrollbarY, scrollbarX + 5, scrollbarY + scrollbarHeight, 0x33CCCCCC);
-            fill(poseStack, scrollbarX, thumbY, scrollbarX + 5, thumbY + thumbHeight, 0x40CCCCCC);
+            // Scrollbar X = width - 4px gap - 8px width = width - 12
+            int scrollbarX = x + width - CustomScrollbarRenderer.getScrollbarWidth() - 4;
+            bottomMargin = 10; // Increased margin at bottom
+            int scrollbarHeight = height - HEADER_AREA_HEIGHT - bottomMargin;
+            int scrollbarY = y + HEADER_AREA_HEIGHT;
+
+            double visibleRatio = maxVisibleRows / (double) filteredTags.size();
+            scrollbarRenderer.renderScrollbar(poseStack, scrollbarX, scrollbarY, scrollbarHeight,
+                    scrollOffset, getMaxScroll(), visibleRatio);
         }
     }
-    
+
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if (!isMouseOver(mouseX, mouseY)) {
+        // Updated check to ignore clicks in header area
+        if (!isMouseOver(mouseX, mouseY) || mouseY < y + HEADER_AREA_HEIGHT) {
             return false;
         }
-        
-        // Check if clicking on scrollbar (like creative inventory)
+
         double maxScroll = getMaxScroll();
         if (maxScroll > 0) {
-            int scrollbarX = x + width - 10;
-            int scrollbarY = y + 20;
-            int scrollbarHeight = height - 20;
-            
-            if (mouseX >= scrollbarX && mouseX <= scrollbarX + 5 &&
-                mouseY >= scrollbarY && mouseY <= scrollbarY + scrollbarHeight) {
-                // Clicked on scrollbar - start dragging
-                isDraggingScrollbar = true;
-                scrollbarDragStartY = mouseY;
-                scrollbarDragStartOffset = scrollOffset;
-                
-                // Calculate thumb position and check if clicking on thumb or track
-                int thumbHeight = (int) (scrollbarHeight * (maxVisibleRows / (double) filteredTags.size()));
-                thumbHeight = Math.max(20, thumbHeight);
-                double scrollRatio = maxScroll > 0 ? scrollOffset / maxScroll : 0;
-                int thumbY = scrollbarY + (int) (scrollRatio * (scrollbarHeight - thumbHeight));
-                
-                if (mouseY >= thumbY && mouseY <= thumbY + thumbHeight) {
-                    // Clicked on thumb - drag from current position
-                    return true;
-                } else {
-                    // Clicked on track - jump to that position and allow dragging from there
-                    double clickRatio = (mouseY - scrollbarY) / (double) scrollbarHeight;
-                    scrollOffset = Math.max(0, Math.min(maxScroll, clickRatio * maxScroll));
-                    scrollbarDragStartOffset = scrollOffset;
-                    scrollbarDragStartY = mouseY;
-                    return true;
-                }
+            int scrollbarX = x + width - CustomScrollbarRenderer.getScrollbarWidth() - 4; // 4px form edge
+            int scrollbarY = y + HEADER_AREA_HEIGHT;
+            int bottomMargin = 10;
+            int scrollbarHeight = height - HEADER_AREA_HEIGHT - bottomMargin;
+            int contentX = x + 5;
+            int contentY = y + HEADER_AREA_HEIGHT;
+            // Content width = width - 16px reserved - 5px left padding = width - 21
+            int contentWidth = width - 21;
+            int contentHeight = height - HEADER_AREA_HEIGHT;
+
+            double visibleRatio = maxVisibleRows / (double) filteredTags.size();
+            double newOffset = scrollbarRenderer.handleMouseClick(mouseX, mouseY, button,
+                    scrollbarX, scrollbarY, scrollbarHeight,
+                    contentX, contentY, contentWidth, contentHeight,
+                    scrollOffset, maxScroll, visibleRatio);
+
+            if (newOffset >= 0) {
+                scrollOffset = newOffset;
+                return true;
             }
         }
-        
-        // Check if clicking on a tag (one per line) - must match renderButton positions exactly
-        // Recalculate maxVisibleRows to match renderButton
-        int topPadding = 5;
-        int availableHeight = height - topPadding;
+
+        int topPadding = HEADER_AREA_HEIGHT; // Use constant
+        int bottomMargin = 10;
+        int availableHeight = height - topPadding - bottomMargin;
         maxVisibleRows = availableHeight / (TAG_BUTTON_HEIGHT + TAG_BUTTON_SPACING);
         maxVisibleRows = Math.max(1, maxVisibleRows);
 
         int startRow = (int) scrollOffset;
-        int endRow = Math.min(startRow + maxVisibleRows, filteredTags.size());
+        int endRow = Math.min(startRow + maxVisibleRows + 1, filteredTags.size());
 
-        int tagY = y + topPadding; // Match renderButton tagY exactly
-        int tagWidth = width - 15;
-        
+        int tagY = y + topPadding;
+        int tagWidth = width - 21;
+
         for (int row = startRow; row < endRow; row++) {
-            if (row >= filteredTags.size()) break;
-            
+            if (row >= filteredTags.size())
+                break;
+
             TagKey<Item> tag = filteredTags.get(row);
             String tagId = "#" + tag.location();
             int rowY = tagY + (row - startRow) * (TAG_BUTTON_HEIGHT + TAG_BUTTON_SPACING);
-            
-            // Skip rows that are completely outside the widget bounds
-            if (rowY + TAG_BUTTON_HEIGHT < y || rowY > y + height) {
+
+            // Updated visibility check
+            if (rowY + TAG_BUTTON_HEIGHT < y + HEADER_AREA_HEIGHT || rowY > y + height) {
                 continue;
             }
-            
+
             int tagX = x + 5;
-            
-            // Check if clicking on the entire tag button area (not just the border)
+
             if (mouseX >= tagX && mouseX < tagX + tagWidth &&
-                mouseY >= rowY && mouseY < rowY + TAG_BUTTON_HEIGHT &&
-                mouseX >= x && mouseX < x + width &&
-                mouseY >= y && mouseY < y + height) {
-                // Toggle tag selection
+                    mouseY >= rowY && mouseY < rowY + TAG_BUTTON_HEIGHT &&
+                    mouseX >= x && mouseX < x + width &&
+                    mouseY >= y + HEADER_AREA_HEIGHT && mouseY < y + height) { // Updated click check
                 if (selectedTags.contains(tagId)) {
                     selectedTags.remove(tagId);
                 } else {
@@ -334,68 +381,48 @@ public class TagsSelectorWidget extends AbstractWidget {
                 return true;
             }
         }
-        
+
         return false;
     }
-    
+
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double delta) {
         if (!isMouseOver(mouseX, mouseY)) {
             return false;
         }
-        
+
         scrollOffset = Math.max(0, Math.min(getMaxScroll(), scrollOffset - delta));
         return true;
     }
-    
+
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
-        // Handle scrollbar dragging (like creative inventory) - works even if mouse leaves widget
-        if (isDraggingScrollbar && button == 0) {
+        if (scrollbarRenderer.isDragging() && button == 0) {
             double maxScroll = getMaxScroll();
             if (maxScroll > 0) {
-                int scrollbarY = y + 20;
-                int scrollbarHeight = height - 20;
-                
-                // Calculate thumb height for accurate dragging
-                int thumbHeight = (int) (scrollbarHeight * (maxVisibleRows / (double) filteredTags.size()));
-                thumbHeight = Math.max(20, thumbHeight);
-                
-                // Calculate the usable scrollbar track height (total height minus thumb height)
-                int usableTrackHeight = scrollbarHeight - thumbHeight;
-                
-                // Map mouse Y position to scroll position
-                // Clamp mouse Y to scrollbar bounds for smooth dragging
-                double clampedMouseY = Math.max(scrollbarY, Math.min(scrollbarY + scrollbarHeight, mouseY));
-                double mouseYRelative = clampedMouseY - scrollbarY;
-                
-                // Calculate scroll ratio (0.0 to 1.0) based on where the thumb center should be
-                double thumbCenterRatio = usableTrackHeight > 0 ? 
-                    Math.max(0, Math.min(1, (mouseYRelative - thumbHeight / 2.0) / usableTrackHeight)) : 0;
-                
-                // Convert ratio to scroll offset
-                scrollOffset = thumbCenterRatio * maxScroll;
-                
-                // Clamp to valid range
-                scrollOffset = Math.max(0, Math.min(maxScroll, scrollOffset));
-                return true;
+                int scrollbarY = y + HEADER_AREA_HEIGHT;
+                int bottomMargin = 10;
+                int scrollbarHeight = height - HEADER_AREA_HEIGHT - bottomMargin;
+                double visibleRatio = maxVisibleRows / (double) filteredTags.size();
+
+                double newOffset = scrollbarRenderer.handleMouseDrag(mouseY, scrollbarY, scrollbarHeight,
+                        maxScroll, visibleRatio, 1.0);
+
+                if (newOffset >= 0) {
+                    scrollOffset = newOffset;
+                    return true;
+                }
             }
         }
         return false;
     }
-    
+
     @Override
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
-        if (isDraggingScrollbar && button == 0) {
-            isDraggingScrollbar = false;
-            return true;
-        }
-        return false;
+        return scrollbarRenderer.handleMouseRelease(button);
     }
-    
+
     @Override
     public void updateNarration(NarrationElementOutput narrationElementOutput) {
-        // Not needed
     }
 }
-

@@ -522,6 +522,15 @@ public class BuildScapeConfigScreen extends Screen {
         return activeTab;
     }
 
+    /**
+     * Refreshes the currently active tab. Called when data is received from server.
+     */
+    public void refreshCurrentTab() {
+        if (activeTab != null && activeTab instanceof PillarIdsConfigTab) {
+            ((PillarIdsConfigTab) activeTab).refreshFromManager();
+        }
+    }
+
     private void updateButtonStates() {
         if (activeTab == null) {
             if (pillarItemsButton != null)

@@ -103,7 +103,7 @@ public class PillarParticleConfig {
     public int particle_lifetime = 20;
     public int particle_density = 2;
 
-    public boolean use_pattern = true;
+    public boolean use_pattern = false;
     public String pattern = "ring";
 
     public double pattern_speed = 0.05;
@@ -225,7 +225,7 @@ public class PillarParticleConfig {
         SERVER_CONFIG.use_pattern = packet.use_pattern;
         SERVER_CONFIG.pattern = packet.pattern != null && !packet.pattern.isEmpty()
                 ? packet.pattern
-                : "default";
+                : "ring";
         SERVER_CONFIG.pattern_speed = packet.pattern_speed > 0
                 ? packet.pattern_speed
                 : 0.05;
@@ -331,7 +331,7 @@ public class PillarParticleConfig {
                                                 long currentTime = System.currentTimeMillis();
                                                 if (currentTime - lastNotifyTime > 500) {
                                                     lastNotifyTime = currentTime;
-                                                    if (configReloadCallbacks.isEmpty() == false) {
+                                                    if (!configReloadCallbacks.isEmpty()) {
                                                         notifyCallbacks(false);
                                                     }
                                                 }
@@ -412,8 +412,8 @@ public class PillarParticleConfig {
                 writer.write("  \"use_pattern\": true,\n");
                 writer.write("  \n");
                 writer.write(
-                        "  // Available patterns: \"default\", \"beam\", \"spiral\", \"fountain\", \"pulse\", \"ring\", \"burst\"\n");
-                writer.write("  //   \"default\" - Random spread in all directions\n");
+                        "  // Available patterns: \"beam\", \"spiral\", \"fountain\", \"pulse\", \"ring\", \"burst\"\n");
+                writer.write("  //   \"ring\" - Default ring of particles\n");
                 writer.write(
                         "  //   \"beam\" - Straight upward beam with subtle spread\n");
                 writer.write(
@@ -772,7 +772,7 @@ public class PillarParticleConfig {
                             ? loaded.particle_density
                             : this.particle_density;
                     this.use_pattern = loaded.use_pattern;
-                    this.pattern = loaded.pattern != null ? loaded.pattern : "default";
+                    this.pattern = loaded.pattern != null ? loaded.pattern : "ring";
                     this.pattern_speed = loaded.pattern_speed > 0
                             ? loaded.pattern_speed
                             : this.pattern_speed;
@@ -872,8 +872,7 @@ public class PillarParticleConfig {
             if (jsonMap != null && jsonMap.containsKey("items")) {
                 Object itemsObj = jsonMap.get("items");
                 this.items = new HashSet<>();
-                if (itemsObj instanceof List) {
-                    List<?> itemsList = (List<?>) itemsObj;
+                if (itemsObj instanceof List<?> itemsList) {
                     for (Object item : itemsList) {
                         if (item instanceof String) {
                             this.items.add((String) item);
@@ -1074,7 +1073,7 @@ public class PillarParticleConfig {
                 if (jsonMap != null) {
                     if (jsonMap.containsKey("items")) {
                         Object itemsObj = jsonMap.get("items");
-                        if (itemsObj instanceof List) {
+                        if (itemsObj instanceof List<?> itemsList) {
                             File newItemsFile = getItemsFile();
                             writeDefaultItems(newItemsFile);
 
@@ -1084,7 +1083,6 @@ public class PillarParticleConfig {
                                         "  // Item IDs that trigger particles when placed on pillars\n");
                                 writer.write("  // Migrated from old config file\n");
                                 writer.write("  \"items\": [\n");
-                                List<?> itemsList = (List<?>) itemsObj;
                                 for (int i = 0; i < itemsList.size(); i++) {
                                     Object item = itemsList.get(i);
                                     if (item instanceof String) {
@@ -1243,7 +1241,16 @@ public class PillarParticleConfig {
 
     public void saveItems() {
         if (isClientConnectedToServer() && SERVER_CONFIG != null) {
-            return; // Don't save on client when connected to server
+            // Update the server's global config when changed on client
+            net.minecraftforge.fml.DistExecutor.unsafeRunWhenOn(net.minecraftforge.api.distmarker.Dist.CLIENT, () -> () -> {
+                if (net.minecraft.client.Minecraft.getInstance().player != null &&
+                        net.minecraft.client.Minecraft.getInstance().player.hasPermissions(2)) {
+                    com.kingodogo.buildscape.network.ModMessages.INSTANCE.sendToServer(
+                            new com.kingodogo.buildscape.network.UpdateConfigPacket(this)
+                    );
+                }
+            });
+            return; // Don't save on client disk when connected to server
         }
         File file = getItemsFile();
         try {
@@ -1275,7 +1282,16 @@ public class PillarParticleConfig {
 
     public void saveProperties() {
         if (isClientConnectedToServer() && SERVER_CONFIG != null) {
-            return; // Don't save on client when connected to server
+            // Update the server's global config when changed on client
+            net.minecraftforge.fml.DistExecutor.unsafeRunWhenOn(net.minecraftforge.api.distmarker.Dist.CLIENT, () -> () -> {
+                if (net.minecraft.client.Minecraft.getInstance().player != null &&
+                        net.minecraft.client.Minecraft.getInstance().player.hasPermissions(2)) {
+                    com.kingodogo.buildscape.network.ModMessages.INSTANCE.sendToServer(
+                            new com.kingodogo.buildscape.network.UpdateConfigPacket(this)
+                    );
+                }
+            });
+            return; // Don't save on client disk when connected to server
         }
         File file = getPropertiesFile();
         try {

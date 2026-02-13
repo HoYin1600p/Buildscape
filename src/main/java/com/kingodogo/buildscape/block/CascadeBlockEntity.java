@@ -1,7 +1,6 @@
 package com.kingodogo.buildscape.block;
 
 import com.kingodogo.buildscape.particle.ModParticles;
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
@@ -9,6 +8,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 import java.util.Random;
 
@@ -36,9 +37,11 @@ public class CascadeBlockEntity extends BlockEntity {
         super.setRemoved();
     }
 
+    @OnlyIn(Dist.CLIENT)
     public static void clientTick(Level level, BlockPos pos, BlockState state, CascadeBlockEntity be) {
         // Respect Minecraft's particle settings for performance
-        net.minecraft.client.ParticleStatus particleSetting = Minecraft.getInstance().options.particles;
+        net.minecraft.client.Minecraft minecraft = net.minecraft.client.Minecraft.getInstance();
+        net.minecraft.client.ParticleStatus particleSetting = minecraft.options.particles;
         if (particleSetting == net.minecraft.client.ParticleStatus.MINIMAL) {
             // Minimal: only spawn 1 particle every 10 ticks
             if (level.getGameTime() % 10 != 0) return;
@@ -48,7 +51,7 @@ public class CascadeBlockEntity extends BlockEntity {
         }
 
         // If local player holds cascade block or bottle of mist in OFF-HAND, suppress particles in their chunk
-        Player player = Minecraft.getInstance().player;
+        Player player = minecraft.player;
         if (player != null) {
             if (isMistSuppressor(player.getOffhandItem())) {
                 int playerChunkX = player.blockPosition().getX() >> 4;
@@ -84,6 +87,7 @@ public class CascadeBlockEntity extends BlockEntity {
         }
     }
 
+    @OnlyIn(Dist.CLIENT)
     private static boolean isMistSuppressor(ItemStack stack) {
         if (stack.isEmpty()) return false;
         net.minecraft.world.item.Item item = stack.getItem();

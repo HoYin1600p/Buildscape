@@ -9,6 +9,7 @@ import com.kingodogo.buildscape.config.PillarParticleConfig;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
 
@@ -25,6 +26,7 @@ public class PillarIdDetailConfigTab extends AbstractConfigTab {
     private ScaledTextButton backButton;
     private ScaledTextButton saveButton;
     private ScaledTextButton patternSelector;
+    private ScaledTextButton usePatternToggle;
     private EditBox patternSpeedField;
     private EditBox patternSpreadField;
     private EditBox patternIntensityField;
@@ -39,6 +41,7 @@ public class PillarIdDetailConfigTab extends AbstractConfigTab {
     // Panel coordinates
     private int leftBoxX, leftBoxY, leftBoxWidth, leftBoxHeight;
     private int rightBoxX, rightBoxY, rightBoxWidth, rightBoxHeight;
+    private boolean dirty = false;
     
     public PillarIdDetailConfigTab(BuildScapeConfigScreen parent, String pillarId) {
         super(parent);
@@ -47,6 +50,16 @@ public class PillarIdDetailConfigTab extends AbstractConfigTab {
     
     @Override
     public void init() {
+        // IMPORTANT: Request fresh pillar data from server when opening the tab
+        // This ensures we always have the latest data, especially on multiplayer servers
+        net.minecraft.client.Minecraft mc = net.minecraft.client.Minecraft.getInstance();
+        if (mc.getCurrentServer() != null) {
+            // Multiplayer - request data from server
+            com.kingodogo.buildscape.network.ModMessages.INSTANCE.sendToServer(
+                    new com.kingodogo.buildscape.network.RequestPillarIdsPacket()
+            );
+        }
+
         // Load pillar data
         PillarIdManager manager = PillarIdManager.get();
         try {
@@ -75,7 +88,7 @@ public class PillarIdDetailConfigTab extends AbstractConfigTab {
         backButton = new ScaledTextButton(
             0, 0,
             80, 20,
-            new TextComponent("← Back"),
+                new TranslatableComponent("buildscape.config.ids.back"),
             (btn) -> parent.setActiveTab(new PillarIdsConfigTab(parent))
         );
         backButton.setCustomTextColors(0xFFFF55, 0xFFFFFF); // Yellow/White on hover
@@ -97,6 +110,21 @@ public class PillarIdDetailConfigTab extends AbstractConfigTab {
         patternSelector.setCustomTextColors(0, 0); // Allow component colors
         patternSelector.active = true;
         addTabWidget(patternSelector);
+
+        // Use pattern toggle
+        boolean usePattern = pillarData.use_pattern != null ? pillarData.use_pattern : globalConfig.use_pattern;
+        usePatternToggle = new ScaledTextButton(
+                0, 0,
+                120, 20,
+                getUsePatternMessage(usePattern),
+                (btn) -> {
+                    boolean next = !(pillarData.use_pattern != null ? pillarData.use_pattern : globalConfig.use_pattern);
+                    pillarData.use_pattern = next;
+                    btn.setMessage(getUsePatternMessage(next));
+                    dirty = true;
+                }
+        );
+        addTabWidget(usePatternToggle);
         
         // Pattern speed
         double patternSpeed = pillarData.pattern_speed != null ? pillarData.pattern_speed : globalConfig.pattern_speed;
@@ -112,6 +140,7 @@ public class PillarIdDetailConfigTab extends AbstractConfigTab {
         patternSpeedField.setTextColor(0xFFFFFF);
         patternSpeedField.setTextColorUneditable(0xAAAAAA);
         patternSpeedField.setMaxLength(64);
+        patternSpeedField.setResponder((text) -> dirty = true);
         addTabWidget(patternSpeedField);
         
         // Pattern spread
@@ -128,6 +157,7 @@ public class PillarIdDetailConfigTab extends AbstractConfigTab {
         patternSpreadField.setTextColor(0xFFFFFF);
         patternSpreadField.setTextColorUneditable(0xAAAAAA);
         patternSpreadField.setMaxLength(64);
+        patternSpreadField.setResponder((text) -> dirty = true);
         addTabWidget(patternSpreadField);
         
         // Pattern intensity
@@ -144,6 +174,7 @@ public class PillarIdDetailConfigTab extends AbstractConfigTab {
         patternIntensityField.setTextColor(0xFFFFFF);
         patternIntensityField.setTextColorUneditable(0xAAAAAA);
         patternIntensityField.setMaxLength(64);
+        patternIntensityField.setResponder((text) -> dirty = true);
         addTabWidget(patternIntensityField);
         
         // Max particle color slider
@@ -163,7 +194,7 @@ public class PillarIdDetailConfigTab extends AbstractConfigTab {
         saveButton = new ScaledTextButton(
             0, 0,
             100, 20,
-            new TextComponent("Save"),
+                new TranslatableComponent("buildscape.config.apply"),
             (btn) -> saveConfig()
         );
         addTabWidget(saveButton);
@@ -224,6 +255,7 @@ public class PillarIdDetailConfigTab extends AbstractConfigTab {
                         if (!text.equals(hexText)) {
                             hexField.setValue(hexText);
                         }
+                        dirty = true;
                     }
                 } catch (NumberFormatException e) {
                     // Invalid hex, ignore
@@ -264,6 +296,7 @@ public class PillarIdDetailConfigTab extends AbstractConfigTab {
     
     private void onMaxParticleColorChanged(int value) {
         currentMaxColor = value;
+        dirty = true;
         updateSwatchesEnabledState();
         if (maxParticleColorSlider != null) {
             maxParticleColorSlider.setMessage(new TranslatableComponent("buildscape.config.particles.max_particle_color", currentMaxColor));
@@ -354,6 +387,7 @@ public class PillarIdDetailConfigTab extends AbstractConfigTab {
         currentPatternIndex = (currentPatternIndex + 1) % PATTERNS.length;
         String pattern = PATTERNS[currentPatternIndex];
         patternSelector.setMessage(getPatternMessage(pattern));
+        dirty = true;
     }
     
     private void saveConfig() {
@@ -403,92 +437,108 @@ public class PillarIdDetailConfigTab extends AbstractConfigTab {
         }
         
         pillarData.modifiedTime = System.currentTimeMillis();
-        
+
+        // Send packet to server to update pillar data
+        com.kingodogo.buildscape.network.UpdatePillarDataPacket packet =
+                new com.kingodogo.buildscape.network.UpdatePillarDataPacket(
+                        pillarData.id,
+                        pillarData.pattern,
+                        pillarData.use_pattern,
+                        pillarData.pattern_speed,
+                        pillarData.pattern_spread,
+                        pillarData.pattern_intensity,
+                        pillarData.max_particle_color,
+                        pillarData.dyeColors
+                );
+
+        com.kingodogo.buildscape.network.ModMessages.INSTANCE.sendToServer(packet);
+
+        // Also update local manager for single-player
         PillarIdManager manager = PillarIdManager.get();
         manager.saveImmediate();
-        
-        updateBlockEntityNBT();
+        this.dirty = false;
     }
-    
-    private void updateBlockEntityNBT() {
+
+    @Deprecated
+    private void updateBlockEntityNBT_OLD() {
         if (pillarData == null) return;
-        
+
         try {
             net.minecraft.server.MinecraftServer server = net.minecraftforge.server.ServerLifecycleHooks.getCurrentServer();
             if (server == null || !server.isRunning()) {
                 return;
             }
-            
+
             // Find the level for this pillar's dimension
             for (net.minecraft.server.level.ServerLevel level : server.getAllLevels()) {
                 if (level == null) continue;
-                
+
                 String dimensionKey = PillarIdManager.getDimensionKey(level);
                 if (!dimensionKey.equals(pillarData.dimension)) {
                     continue;
                 }
-                
+
                 net.minecraft.core.BlockPos pos = new net.minecraft.core.BlockPos(pillarData.x, pillarData.y, pillarData.z);
-                
+
                 if (!level.isLoaded(pos)) {
                     continue;
                 }
-                
+
                 net.minecraft.world.level.block.entity.BlockEntity be = level.getBlockEntity(pos);
                 if (!(be instanceof com.kingodogo.buildscape.block.PillarBlockEntity pillarBE)) {
                     continue;
                 }
-                
+
                 // Find the bottom of the stack
                 net.minecraft.core.BlockPos bottomPos = pillarBE.findStackBottom();
                 net.minecraft.world.level.block.entity.BlockEntity bottomBE = level.getBlockEntity(bottomPos);
-                
+
                 if (!(bottomBE instanceof com.kingodogo.buildscape.block.PillarBlockEntity bottomPillarBE)) {
                     continue;
                 }
-                
+
                 // Update NBT with settings from manager
                 boolean needsUpdate = false;
-                
+
                 // Update pattern
                 if (pillarData.pattern != null && !pillarData.pattern.isEmpty()) {
-                    if (bottomPillarBE.getParticlePattern() == null || 
+                    if (bottomPillarBE.getParticlePattern() == null ||
                         !bottomPillarBE.getParticlePattern().equals(pillarData.pattern)) {
                         bottomPillarBE.setParticlePattern(pillarData.pattern);
                         needsUpdate = true;
                     }
                 }
-                
+
                 // Update pattern speed
                 if (pillarData.pattern_speed != null) {
-                    if (bottomPillarBE.getPatternSpeed() == null || 
+                    if (bottomPillarBE.getPatternSpeed() == null ||
                         !bottomPillarBE.getPatternSpeed().equals(pillarData.pattern_speed)) {
                         bottomPillarBE.setPatternSpeed(pillarData.pattern_speed);
                         needsUpdate = true;
                     }
                 }
-                
+
                 // Update pattern spread
                 if (pillarData.pattern_spread != null) {
-                    if (bottomPillarBE.getPatternSpread() == null || 
+                    if (bottomPillarBE.getPatternSpread() == null ||
                         !bottomPillarBE.getPatternSpread().equals(pillarData.pattern_spread)) {
                         bottomPillarBE.setPatternSpread(pillarData.pattern_spread);
                         needsUpdate = true;
                     }
                 }
-                
+
                 // Update pattern intensity
                 if (pillarData.pattern_intensity != null) {
-                    if (bottomPillarBE.getPatternIntensity() == null || 
+                    if (bottomPillarBE.getPatternIntensity() == null ||
                         !bottomPillarBE.getPatternIntensity().equals(pillarData.pattern_intensity)) {
                         bottomPillarBE.setPatternIntensity(pillarData.pattern_intensity);
                         needsUpdate = true;
                     }
                 }
-                
+
                 // Update max particle color
                 if (pillarData.max_particle_color != null) {
-                    if (bottomPillarBE.getMaxParticleColor() == null || 
+                    if (bottomPillarBE.getMaxParticleColor() == null ||
                         !bottomPillarBE.getMaxParticleColor().equals(pillarData.max_particle_color)) {
                         bottomPillarBE.setMaxParticleColor(pillarData.max_particle_color);
                         needsUpdate = true;
@@ -577,11 +627,11 @@ public class PillarIdDetailConfigTab extends AbstractConfigTab {
         
         // Draw title at top, moved down to make room for back button
         String title = "Pillar ID: " + pillarId;
-        Minecraft.getInstance().font.draw(poseStack, new TextComponent(title), 
+        Minecraft.getInstance().font.draw(poseStack, new TranslatableComponent("buildscape.config.ids.id").getString() + ": " + pillarId, 
             contentX + 100, contentY + 15, 0xFFFFFF); // Moved right to avoid back button
-        
-        String subtitle = "Configure individual settings for this pillar";
-        Minecraft.getInstance().font.draw(poseStack, new TextComponent(subtitle), 
+
+        Component subtitle = new TranslatableComponent("buildscape.config.ids.detail.subtitle");
+        Minecraft.getInstance().font.draw(poseStack, subtitle, 
             contentX + 100, contentY + 27, 0xAAAAAA);
         
         // LEFT PANEL: Layout config fields
@@ -597,7 +647,15 @@ public class PillarIdDetailConfigTab extends AbstractConfigTab {
         patternSelector.x = fieldX;
         patternSelector.y = currentY;
         patternSelector.setWidth(fieldWidth);
-        Minecraft.getInstance().font.draw(poseStack, "Pattern:", 
+        Minecraft.getInstance().font.draw(poseStack, new TranslatableComponent("buildscape.config.ids.detail.pattern").getString() + ":",
+                leftBoxX + padding, currentY + 5, 0xFFFFFF);
+        currentY += fieldSpacing;
+
+        // Use Pattern Toggle
+        usePatternToggle.x = fieldX;
+        usePatternToggle.y = currentY;
+        usePatternToggle.setWidth(fieldWidth);
+        Minecraft.getInstance().font.draw(poseStack, "Use Pattern:", 
             leftBoxX + padding, currentY + 5, 0xFFFFFF);
         currentY += fieldSpacing;
         
@@ -682,6 +740,13 @@ public class PillarIdDetailConfigTab extends AbstractConfigTab {
             int numRows = (MAX_COLORS + 1) / 2;
             colorPicker.x = rightContentX;
             colorPicker.y = rightStartY + numRows * rowSpacing + 10;
+        }
+
+        // Unsaved Changes status text
+        if (dirty) {
+            int statusY = contentY + contentHeight - BuildScapeConfigScreen.scaleSize(14);
+            Minecraft.getInstance().font.draw(poseStack, new TranslatableComponent("buildscape.config.ids.unsaved"),
+                    contentX + 10, statusY, 0xFFFFFF);
         }
     }
     
@@ -801,5 +866,11 @@ public class PillarIdDetailConfigTab extends AbstractConfigTab {
         } else {
             return new TranslatableComponent(key).withStyle(net.minecraft.ChatFormatting.GOLD);
         }
+    }
+
+    private net.minecraft.network.chat.Component getUsePatternMessage(boolean use) {
+        String state = use ? "ON" : "OFF";
+        net.minecraft.ChatFormatting color = use ? net.minecraft.ChatFormatting.GREEN : net.minecraft.ChatFormatting.RED;
+        return new TextComponent("Use Pattern: ").append(new TextComponent(state).withStyle(color));
     }
 }

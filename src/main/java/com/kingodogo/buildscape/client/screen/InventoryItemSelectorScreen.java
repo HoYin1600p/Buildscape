@@ -1,15 +1,14 @@
 package com.kingodogo.buildscape.client.screen;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.entity.ItemRenderer;
-import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.registries.ForgeRegistries;
-import com.mojang.blaze3d.vertex.PoseStack;
 
 public class InventoryItemSelectorScreen extends Screen {
     private static final int SLOT_SIZE = 18;
@@ -152,12 +151,6 @@ public class InventoryItemSelectorScreen extends Screen {
         } else {
             // Fallback: directly call the config
             com.kingodogo.buildscape.config.PillarParticleConfig.addItemToConfig(itemId);
-            if (Minecraft.getInstance().player != null) {
-                Minecraft.getInstance().player.sendMessage(
-                    new TranslatableComponent("buildscape.config.item_added", itemId),
-                    java.util.UUID.randomUUID()
-                );
-            }
         }
         onClose();
     }

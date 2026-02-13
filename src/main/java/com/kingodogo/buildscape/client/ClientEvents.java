@@ -1,5 +1,8 @@
 package com.kingodogo.buildscape.client;
 
+import com.kingodogo.buildscape.api.SupportersApiCache;
+import com.kingodogo.buildscape.api.SupportersApiClient;
+import com.kingodogo.buildscape.api.model.CosmeticData;
 import com.kingodogo.buildscape.block.LeafHedgeBlock;
 import com.kingodogo.buildscape.block.PillarBlockEntity;
 import com.kingodogo.buildscape.config.PillarParticleConfig;
@@ -17,11 +20,6 @@ import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import com.kingodogo.buildscape.api.SupportersApiCache;
-import com.kingodogo.buildscape.api.SupportersApiClient;
-import com.kingodogo.buildscape.api.model.AuthenticateResponse;
-import com.kingodogo.buildscape.api.model.CosmeticData;
-// import com.kingodogo.buildscape.particle.ParticleShapeReloader;
 import net.minecraftforge.fml.common.Mod;
 
 @Mod.EventBusSubscriber(
@@ -183,10 +181,8 @@ public class ClientEvents {
                         float pitch = 1.0f;
 
                         if (
-                                sounds instanceof com.kingodogo.buildscape.block.CustomSoundType
+                                sounds instanceof com.kingodogo.buildscape.block.CustomSoundType customSounds
                         ) {
-                            com.kingodogo.buildscape.block.CustomSoundType customSounds =
-                                    (com.kingodogo.buildscape.block.CustomSoundType) sounds;
                             volume = customSounds.getStepVolume();
                             pitch = customSounds.getStepPitch();
                         }
@@ -225,6 +221,10 @@ public class ClientEvents {
         // Reset SupportersTabState on logout
         com.kingodogo.buildscape.client.screen.tabs.supporters.SupportersTabState.getInstance().setPlayerUuid(null);
 
+        // IMPORTANT: Reset PillarIdManager cache when disconnecting from server
+        // This ensures that when you rejoin, all pillar data is properly synced again
+        com.kingodogo.buildscape.config.PillarIdManager.resetWorldCache();
+
         // Clear particle trail and wing shape cache
         com.kingodogo.buildscape.client.ParticleTrailHandler.clearTracking();
         // com.kingodogo.buildscape.particle.ParticleShapeLibrary.clearCache();
@@ -242,6 +242,7 @@ public class ClientEvents {
         SupportersApiCache.getInstance().invalidateAll(); // Safer to clear all on logout to be sure
 
         com.kingodogo.buildscape.config.PillarParticleConfig.clearServerConfig();
+        com.kingodogo.buildscape.config.PillarIdManager.fullReset();
     }
 
     @SubscribeEvent
@@ -275,6 +276,7 @@ public class ClientEvents {
                                             // Add default cosmetics (free for everyone)
                                             unlocked.addAll(com.kingodogo.buildscape.cosmetics.CosmeticManager.getInstance().getDefaultCosmetics());
                                             com.kingodogo.buildscape.client.screen.tabs.supporters.SupportersTabState.getInstance().setUnlockedCosmetics(unlocked);
+                                            com.kingodogo.buildscape.client.screen.tabs.supporters.SupportersTabState.getInstance().markApiUnlocksSet();
                                         }
                                         
                                     } catch (Exception e) {

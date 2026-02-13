@@ -1,17 +1,16 @@
 package com.kingodogo.buildscape.network;
 
 import com.kingodogo.buildscape.config.PillarParticleConfig;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.fml.DistExecutor;
+import net.minecraftforge.network.NetworkEvent;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Supplier;
-
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.network.NetworkEvent;
 
 public class SyncConfigPacket {
 
@@ -38,7 +37,7 @@ public class SyncConfigPacket {
         this.particle_lifetime = config.particle_lifetime;
         this.particle_density = config.particle_density;
         this.use_pattern = config.use_pattern;
-        this.pattern = config.pattern != null ? config.pattern : "default";
+        this.pattern = config.pattern != null ? config.pattern : "ring";
         this.pattern_speed = config.pattern_speed;
         this.pattern_spread = config.pattern_spread;
         this.pattern_intensity = config.pattern_intensity;
@@ -82,7 +81,7 @@ public class SyncConfigPacket {
         buf.writeInt(particle_lifetime);
         buf.writeInt(particle_density);
         buf.writeBoolean(use_pattern);
-        buf.writeUtf(pattern != null ? pattern : "default");
+        buf.writeUtf(pattern != null ? pattern : "ring");
         buf.writeDouble(pattern_speed);
         buf.writeDouble(pattern_spread);
         buf.writeDouble(pattern_intensity);

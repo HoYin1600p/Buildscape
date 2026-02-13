@@ -182,10 +182,11 @@ public class CosmeticsConfig {
         File file = getPlayerFile(playerUuid);
         String uuidStr = playerUuid != null ? playerUuid.toString() : "global";
 
-        playerCosmetics.putIfAbsent(uuidStr, new HashMap<>());
-        playerCosmeticColors.putIfAbsent(uuidStr, new HashMap<>());
-
-        if (!file.exists()) return;
+        if (!file.exists()) {
+            playerCosmetics.putIfAbsent(uuidStr, null);
+            playerCosmeticColors.putIfAbsent(uuidStr, null);
+            return;
+        }
 
         try {
             CompoundTag nbt = NbtIo.readCompressed(file);
@@ -194,6 +195,8 @@ public class CosmeticsConfig {
                     UUID storedUuid = nbt.getUUID("player_uuid");
                     if (!storedUuid.equals(playerUuid)) {
                         BuildScape.getLogger().error("CosmeticsConfig: SECURITY MISMATCH for " + file.getName());
+                        playerCosmetics.putIfAbsent(uuidStr, null);
+                        playerCosmeticColors.putIfAbsent(uuidStr, null);
                         return;
                     }
                 }
@@ -218,6 +221,8 @@ public class CosmeticsConfig {
             }
         } catch (Exception e) {
             BuildScape.getLogger().error("CosmeticsConfig: Failed to read data for " + uuidStr, e);
+            playerCosmetics.putIfAbsent(uuidStr, null);
+            playerCosmeticColors.putIfAbsent(uuidStr, null);
         }
     }
 
@@ -280,7 +285,6 @@ public class CosmeticsConfig {
         String uuidStr = playerUuid != null ? playerUuid.toString() : "global";
         if (!playerCosmetics.containsKey(uuidStr)) loadPlayer(playerUuid);
         Map<Integer, String> cosmetics = playerCosmetics.get(uuidStr);
-        if (playerUuid != null && (cosmetics == null || cosmetics.isEmpty())) return getEquippedCosmetics(null); 
         return cosmetics != null ? new HashMap<>(cosmetics) : new HashMap<>();
     }
 

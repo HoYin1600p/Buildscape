@@ -3,8 +3,8 @@ package com.kingodogo.buildscape.block;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
@@ -39,7 +39,7 @@ import java.util.Random;
 public class RoseVinesBlock extends VineBlock {
 
     public static final BooleanProperty DOWN = BlockStateProperties.DOWN;
-    public static final BooleanProperty SHEARED = BooleanProperty.create("sheared");
+    public static final BooleanProperty SHEARED = ModBlockProperties.SHEARED;
 
     private static final VoxelShape UP_SHAPE = Block.box(
             0.0D,

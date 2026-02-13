@@ -598,6 +598,14 @@ public class PillarBlock
     }
 
     @Override
+    public void setPlacedBy(Level level, BlockPos pos, BlockState state, @javax.annotation.Nullable net.minecraft.world.entity.LivingEntity placer, net.minecraft.world.item.ItemStack stack) {
+        super.setPlacedBy(level, pos, state, placer, stack);
+        if (!level.isClientSide) {
+            com.kingodogo.buildscape.config.PillarIdManager.get().getOrCreatePillarData(level, pos);
+        }
+    }
+
+    @Override
     public <
             T extends BlockEntity
             > net.minecraft.world.level.block.entity.BlockEntityTicker<T> getTicker(
@@ -880,7 +888,8 @@ public class PillarBlock
                 com.kingodogo.buildscape.config.PillarParticleConfig cfg =
                         com.kingodogo.buildscape.config.PillarParticleConfig.get();
                 if (cfg.use_pattern && cfg.pattern != null) {
-                    blockEntity.setParticlePattern(cfg.pattern);
+                    // Intentionally removed: blockEntity.setParticlePattern(cfg.pattern);
+                    // This allows untouched pillars to naturally inherit future global pattern changes.
                 }
             }
 

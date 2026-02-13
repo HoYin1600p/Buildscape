@@ -8,7 +8,9 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class SupportersApiCache {
-    private static final long CACHE_TTL_MS = 5 * 60 * 1000;
+    // Session-lifetime cache: cosmetics should NEVER expire during a game session.
+    // They are only invalidated explicitly on logout/disconnect.
+    private static final long CACHE_TTL_MS = Long.MAX_VALUE;
 
     private static final SupportersApiCache INSTANCE = new SupportersApiCache();
     

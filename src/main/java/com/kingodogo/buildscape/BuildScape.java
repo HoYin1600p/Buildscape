@@ -976,6 +976,23 @@ public class BuildScape {
             items.add(new ItemStack(ModItems.GLOW_LIGHTS.get()));
             items.add(new ItemStack(ModItems.MULTICOLOR_GLOW_LIGHTS.get()));
 
+            items.add(new ItemStack(ModItems.WHITE_REDSTONE_LAMP.get()));
+            items.add(new ItemStack(ModItems.LIGHT_GRAY_REDSTONE_LAMP.get()));
+            items.add(new ItemStack(ModItems.GRAY_REDSTONE_LAMP.get()));
+            items.add(new ItemStack(ModItems.BLACK_REDSTONE_LAMP.get()));
+            items.add(new ItemStack(ModItems.BROWN_REDSTONE_LAMP.get()));
+            items.add(new ItemStack(ModItems.RED_REDSTONE_LAMP.get()));
+            items.add(new ItemStack(ModItems.ORANGE_REDSTONE_LAMP.get()));
+            items.add(new ItemStack(ModItems.YELLOW_REDSTONE_LAMP.get()));
+            items.add(new ItemStack(ModItems.LIME_REDSTONE_LAMP.get()));
+            items.add(new ItemStack(ModItems.GREEN_REDSTONE_LAMP.get()));
+            items.add(new ItemStack(ModItems.CYAN_REDSTONE_LAMP.get()));
+            items.add(new ItemStack(ModItems.LIGHT_BLUE_REDSTONE_LAMP.get()));
+            items.add(new ItemStack(ModItems.BLUE_REDSTONE_LAMP.get()));
+            items.add(new ItemStack(ModItems.PURPLE_REDSTONE_LAMP.get()));
+            items.add(new ItemStack(ModItems.MAGENTA_REDSTONE_LAMP.get()));
+            items.add(new ItemStack(ModItems.PINK_REDSTONE_LAMP.get()));
+
             items.add(new ItemStack(ModItems.DECORATED_POT.get()));
             items.add(new ItemStack(ModItems.WHITE_DECORATED_POT.get()));
             items.add(new ItemStack(ModItems.LIGHT_GRAY_DECORATED_POT.get()));
@@ -1207,27 +1224,32 @@ public class BuildScape {
 
             items.add(new ItemStack(ModItems.BIG_CANDLE.get()));
             items.add(new ItemStack(ModItems.BIG_WHITE_CANDLE.get()));
+            items.add(new ItemStack(ModItems.BIG_LIGHT_GRAY_CANDLE.get()));
+            items.add(new ItemStack(ModItems.BIG_GRAY_CANDLE.get()));
+            items.add(new ItemStack(ModItems.BIG_BLACK_CANDLE.get()));
+            items.add(new ItemStack(ModItems.BIG_BROWN_CANDLE.get()));
+            items.add(new ItemStack(ModItems.BIG_RED_CANDLE.get()));
             items.add(new ItemStack(ModItems.BIG_ORANGE_CANDLE.get()));
-            items.add(new ItemStack(ModItems.BIG_MAGENTA_CANDLE.get()));
-            items.add(new ItemStack(ModItems.BIG_LIGHT_BLUE_CANDLE.get()));
             items.add(new ItemStack(ModItems.BIG_YELLOW_CANDLE.get()));
             items.add(new ItemStack(ModItems.BIG_LIME_CANDLE.get()));
-            items.add(new ItemStack(ModItems.BIG_PINK_CANDLE.get()));
-            items.add(new ItemStack(ModItems.BIG_GRAY_CANDLE.get()));
-            items.add(new ItemStack(ModItems.BIG_LIGHT_GRAY_CANDLE.get()));
-            items.add(new ItemStack(ModItems.BIG_CYAN_CANDLE.get()));
-            items.add(new ItemStack(ModItems.BIG_PURPLE_CANDLE.get()));
-            items.add(new ItemStack(ModItems.BIG_BLUE_CANDLE.get()));
-            items.add(new ItemStack(ModItems.BIG_BROWN_CANDLE.get()));
             items.add(new ItemStack(ModItems.BIG_GREEN_CANDLE.get()));
-            items.add(new ItemStack(ModItems.BIG_RED_CANDLE.get()));
-            items.add(new ItemStack(ModItems.BIG_BLACK_CANDLE.get()));
+            items.add(new ItemStack(ModItems.BIG_CYAN_CANDLE.get()));
+            items.add(new ItemStack(ModItems.BIG_LIGHT_BLUE_CANDLE.get()));
+            items.add(new ItemStack(ModItems.BIG_BLUE_CANDLE.get()));
+            items.add(new ItemStack(ModItems.BIG_PURPLE_CANDLE.get()));
+            items.add(new ItemStack(ModItems.BIG_MAGENTA_CANDLE.get()));
+            items.add(new ItemStack(ModItems.BIG_PINK_CANDLE.get()));
             items.add(new ItemStack(ModItems.BIG_AMETHYST_CANDLE.get()));
             items.add(new ItemStack(ModItems.BIG_SCULK_CANDLE.get()));
 
             items.add(new ItemStack(ModItems.FESTIVE_LAMP.get()));
 
             items.add(new ItemStack(ModItems.SMOKE_VENT.get()));
+
+            items.add(new ItemStack(ModItems.CASCADE_BLOCK.get()));
+            items.add(new ItemStack(ModItems.CASCADE_BLOCK_NO_MIST.get()));
+            items.add(new ItemStack(ModItems.BOTTLE_OF_MIST.get()));
+
         }
     };
 
@@ -1306,6 +1328,53 @@ public class BuildScape {
 
         event.enqueueWork(() -> {
             com.kingodogo.buildscape.network.ModMessages.register();
+        });
+
+        event.enqueueWork(() -> {
+            net.minecraft.world.level.block.DispenserBlock.registerBehavior(
+                    com.kingodogo.buildscape.item.ModItems.BOTTLE_OF_MIST.get(),
+                    new net.minecraft.core.dispenser.AbstractProjectileDispenseBehavior() {
+                        @Override
+                        protected net.minecraft.world.entity.projectile.Projectile getProjectile(net.minecraft.world.level.Level level, net.minecraft.core.Position pos, net.minecraft.world.item.ItemStack stack) {
+                            return null; // Not used - we override execute instead
+                        }
+
+                        @Override
+                        public net.minecraft.world.item.ItemStack execute(net.minecraft.core.BlockSource source, net.minecraft.world.item.ItemStack stack) {
+                            net.minecraft.world.level.Level level = source.getLevel();
+                            net.minecraft.core.Direction facing = source.getBlockState().getValue(net.minecraft.world.level.block.DispenserBlock.FACING);
+                            net.minecraft.core.BlockPos pos = source.getPos().relative(facing);
+
+                            double cx = pos.getX() + 0.5 + facing.getStepX() * 0.5;
+                            double cy = pos.getY() + 0.5 + facing.getStepY() * 0.5;
+                            double cz = pos.getZ() + 0.5 + facing.getStepZ() * 0.5;
+
+                            if (level instanceof net.minecraft.server.level.ServerLevel serverLevel) {
+                                java.util.Random rand = new java.util.Random();
+                                for (int i = 0; i < 40; i++) {
+                                    double x = cx + (rand.nextDouble() - 0.5) * 2.0;
+                                    double y = cy + (rand.nextDouble() - 0.5) * 1.0;
+                                    double z = cz + (rand.nextDouble() - 0.5) * 2.0;
+
+                                    double xSpeed = (rand.nextDouble() - 0.5) * 0.2;
+                                    double ySpeed = rand.nextDouble() * 0.05;
+                                    double zSpeed = (rand.nextDouble() - 0.5) * 0.2;
+
+                                    serverLevel.sendParticles(
+                                            com.kingodogo.buildscape.particle.ModParticles.CASCADE.get(),
+                                            x, y, z, 1, xSpeed, ySpeed, zSpeed, 0.0);
+                                }
+                            }
+
+                            level.playSound(null, pos, net.minecraft.sounds.SoundEvents.FIRE_EXTINGUISH,
+                                    net.minecraft.sounds.SoundSource.BLOCKS, 0.1f, 0.1f);
+
+                            stack.shrink(1);
+                            return stack;
+                        }
+                    }
+            );
+            LOGGER.info("Bottle of Mist dispenser behavior registered");
         });
 
         event.enqueueWork(() -> {
@@ -3362,6 +3431,14 @@ public class BuildScape {
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.MANGROVE_LEAF_HEDGE.get(),
                         net.minecraft.client.renderer.RenderType.cutoutMipped());
+                net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
+                        ModBlocks.CASCADE_BLOCK.get(),
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
+                net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
+                        ModBlocks.CASCADE_BLOCK_NO_MIST.get(),
+                        net.minecraft.client.renderer.RenderType.translucent()
+                );
 
                 net.minecraft.client.color.block.BlockColors blockColors = net.minecraft.client.Minecraft
                         .getInstance().getBlockColors();
@@ -3588,6 +3665,32 @@ public class BuildScape {
                             if (tintIndex != 0) {
                                 return -1;
                             }
+                            if (reader != null && pos != null) {
+                                return net.minecraft.client.renderer.BiomeColors.getAverageWaterColor(reader, pos);
+                            }
+                            return 0x3F76E4;
+                        },
+                        ModBlocks.CASCADE_BLOCK.get()
+                );
+
+                blockColors.register(
+                        (state, reader, pos, tintIndex) -> {
+                            if (tintIndex != 0) {
+                                return -1;
+                            }
+                            if (reader != null && pos != null) {
+                                return net.minecraft.client.renderer.BiomeColors.getAverageWaterColor(reader, pos);
+                            }
+                            return 0x3F76E4;
+                        },
+                        ModBlocks.CASCADE_BLOCK_NO_MIST.get()
+                );
+
+                blockColors.register(
+                        (state, reader, pos, tintIndex) -> {
+                            if (tintIndex != 0) {
+                                return -1;
+                            }
 
                             if (reader != null && pos != null) {
                                 net.minecraft.world.level.block.entity.BlockEntity be = reader
@@ -3628,6 +3731,16 @@ public class BuildScape {
                         .getInstance().getItemColors();
                 net.minecraft.client.color.item.ItemColors vanillaItemColors = net.minecraft.client.Minecraft
                         .getInstance().getItemColors();
+
+                itemColors.register(
+                        (stack, tintIndex) -> tintIndex == 0 ? 0x3F76E4 : -1,
+                        ModItems.CASCADE_BLOCK.get()
+                );
+
+                itemColors.register(
+                        (stack, tintIndex) -> tintIndex == 0 ? 0x3F76E4 : -1,
+                        ModItems.CASCADE_BLOCK_NO_MIST.get()
+                );
 
                 itemColors.register(
                         (stack, tintIndex) -> {
@@ -3989,6 +4102,15 @@ public class BuildScape {
                     com.kingodogo.buildscape.particle.ModParticles.CHERRY.get(),
                     sprites -> new com.kingodogo.buildscape.particle.CherryParticle.Provider(
                             sprites));
+
+            net.minecraft.client.Minecraft.getInstance()
+                    .particleEngine.register(
+                            com.kingodogo.buildscape.particle.ModParticles.CASCADE.get(),
+                            sprites ->
+                                    new com.kingodogo.buildscape.particle.CascadeParticle.Provider(
+                                            sprites
+                                    )
+                    );
         }
     }
 }

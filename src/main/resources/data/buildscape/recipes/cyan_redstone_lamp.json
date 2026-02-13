@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "minecraft:redstone_lamp"
+    },
+    {
+      "item": "minecraft:cyan_dye"
+    }
+  ],
+  "result": {
+    "item": "buildscape:cyan_redstone_lamp",
+    "count": 1
+  }
+}

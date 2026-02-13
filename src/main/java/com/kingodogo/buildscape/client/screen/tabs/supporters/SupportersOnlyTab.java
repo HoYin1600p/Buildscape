@@ -1,7 +1,5 @@
 package com.kingodogo.buildscape.client.screen.tabs.supporters;
 
-import com.kingodogo.buildscape.BuildScape;
-import com.kingodogo.buildscape.api.SupportersApiCache;
 import com.kingodogo.buildscape.api.model.CosmeticData;
 import com.kingodogo.buildscape.client.screen.AbstractConfigTab;
 import com.kingodogo.buildscape.client.screen.BuildScapeConfigScreen;
@@ -80,21 +78,11 @@ public class SupportersOnlyTab extends AbstractConfigTab {
         }
 
         UUID playerUuid = mc.player.getUUID();
-        if (state.getPlayerUuid() == null || !state.getPlayerUuid().equals(playerUuid) || state.getEquippedCosmetics().isEmpty()) {
+        if (state.getPlayerUuid() == null || !state.getPlayerUuid().equals(playerUuid)) {
             state.setPlayerUuid(playerUuid);
         }
 
-        SupportersApiCache apiCache = SupportersApiCache.getInstance();
-
-        // Only use cached data from game launch - do NOT make new API calls in the tab
-        CosmeticData cachedCosmetics = apiCache.getCachedCosmetics(playerUuid);
-        if (cachedCosmetics != null) {
-            updateCosmeticsData(cachedCosmetics);
-            return; // Use cached data (preloaded from game launch)
-        }
-
-        // No cache available - just load defaults and local config
-        // API calls only happen during game launch, not when opening tabs
+        // Fetching from API cache removed - tab is now purely local-driven
         loadDefaultCosmetics();
     }
     
@@ -144,6 +132,7 @@ public class SupportersOnlyTab extends AbstractConfigTab {
         }
 
         state.setUnlockedCosmetics(unlocked);
+        state.markApiUnlocksSet();
 
         List<String> allCosmetics = new ArrayList<>(allRegisteredCosmetics);
 
@@ -159,27 +148,12 @@ public class SupportersOnlyTab extends AbstractConfigTab {
             panel1.setAllCosmeticIds(allCosmetics);
         }
 
-        // Use local equipped cosmetics if they exist, only fallback to API data if nothing locally equipped
+        // Equipped cosmetics come ONLY from local config (.dat file), NEVER from the API.
+        // The API is only used for unlock data (which cosmetics the player has access to).
         UUID storedUuid = state.getPlayerUuid();
         if (storedUuid == null) {
             storedUuid = currentPlayerUuid;
             state.setPlayerUuid(storedUuid);
-        }
-
-        // Load equipped from local config
-        Set<String> localEquipped = new java.util.HashSet<>();
-        if (storedUuid != null) {
-            java.util.Map<Integer, String> localCosmeticsMap = com.kingodogo.buildscape.config.CosmeticsConfig.get().getEquippedCosmetics(storedUuid);
-            if (localCosmeticsMap != null) {
-                localEquipped.addAll(localCosmeticsMap.values());
-            }
-        }
-
-        // Only use API equipped data if local config is empty
-        if (!localEquipped.isEmpty()) {
-            state.setEquippedCosmetics(localEquipped);
-        } else if (cosmetics.getEquipped() != null && !cosmetics.getEquipped().isEmpty()) {
-            state.setEquippedCosmetics(new java.util.HashSet<>(cosmetics.getEquipped()));
         }
     }
     

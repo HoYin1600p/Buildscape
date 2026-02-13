@@ -2,6 +2,7 @@ package com.kingodogo.buildscape.client.screen;
 
 import com.kingodogo.buildscape.block.PillarBlockEntity;
 import com.kingodogo.buildscape.client.screen.widget.*;
+import com.kingodogo.buildscape.config.PillarIdManager;
 import com.kingodogo.buildscape.config.PillarParticleConfig;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -21,7 +22,7 @@ import java.util.List;
 
 public class PillarParticlesConfigTab extends AbstractConfigTab {
 
-    private static final String[] PATTERNS = {"default", "beam", "spiral", "fountain", "pulse", "ring", "burst", "snowflake"};
+    private static final String[] PATTERNS = {"beam", "spiral", "fountain", "pulse", "ring", "burst", "snowflake"};
 
     // Consolidated constants for consistent layout
     private static final int UI_PADDING = 10;
@@ -89,9 +90,6 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
 
         int color = 0xFFFFFF; // Default white
         switch (pattern) {
-            case "default":
-                color = 0xFFFFFF;
-                break; // White
             case "beam":
                 color = 0x00FFFF;
                 break; // Cyan
@@ -169,6 +167,7 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
         particleSpeedField.setTextColorUneditable(0xAAAAAA);
         particleSpeedField.setMaxLength(64);
         particleSpeedField.setFilter(s -> s.matches("[0-9]*\\.?[0-9]{0,3}"));
+        particleSpeedField.setResponder(s -> updateConfigFromFields());
         addTabWidget(particleSpeedField);
 
         particleSpreadField = new EditBox(
@@ -184,6 +183,7 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
         particleSpreadField.setTextColorUneditable(0xAAAAAA);
         particleSpreadField.setMaxLength(64);
         particleSpreadField.setFilter(s -> s.matches("[0-9]*\\.?[0-9]{0,3}"));
+        particleSpreadField.setResponder(s -> updateConfigFromFields());
         addTabWidget(particleSpreadField);
 
         particleLifetimeField = new EditBox(
@@ -199,6 +199,7 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
         particleLifetimeField.setTextColorUneditable(0xAAAAAA);
         particleLifetimeField.setMaxLength(64);
         particleLifetimeField.setFilter(s -> s.matches("[0-9]*\\.?[0-9]{0,3}"));
+        particleLifetimeField.setResponder(s -> updateConfigFromFields());
         addTabWidget(particleLifetimeField);
 
         particleDensityField = new EditBox(
@@ -214,6 +215,7 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
         particleDensityField.setTextColorUneditable(0xAAAAAA);
         particleDensityField.setMaxLength(64);
         particleDensityField.setFilter(s -> s.matches("[0-9]*\\.?[0-9]{0,3}"));
+        particleDensityField.setResponder(s -> updateConfigFromFields());
         addTabWidget(particleDensityField);
 
         // Color swatches and single shared color picker
@@ -244,6 +246,7 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
         patternSpeedField.setTextColorUneditable(0xAAAAAA);
         patternSpeedField.setMaxLength(64);
         patternSpeedField.setFilter(s -> s.matches("[0-9]*\\.?[0-9]{0,3}"));
+        patternSpeedField.setResponder(s -> updateConfigFromFields());
         addTabWidget(patternSpeedField);
 
         patternSpreadField = new EditBox(
@@ -259,6 +262,7 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
         patternSpreadField.setTextColorUneditable(0xAAAAAA);
         patternSpreadField.setMaxLength(64);
         patternSpreadField.setFilter(s -> s.matches("[0-9]*\\.?[0-9]{0,3}"));
+        patternSpreadField.setResponder(s -> updateConfigFromFields());
         addTabWidget(patternSpreadField);
 
         patternIntensityField = new EditBox(
@@ -274,6 +278,7 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
         patternIntensityField.setTextColorUneditable(0xAAAAAA);
         patternIntensityField.setMaxLength(64);
         patternIntensityField.setFilter(s -> s.matches("[0-9]*\\.?[0-9]{0,3}"));
+        patternIntensityField.setResponder(s -> updateConfigFromFields());
         addTabWidget(patternIntensityField);
 
         colorsResetButton = new FlatIconButton(0, 0, 20, 20, new TextComponent("\u27F2"), (btn) -> {
@@ -288,6 +293,10 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
             } else {
                 resetColorsToDefault();
             }
+            // Ensure server is synchronized with the new global defaults
+            com.kingodogo.buildscape.network.ModMessages.INSTANCE.sendToServer(
+                    new com.kingodogo.buildscape.network.UpdateConfigPacket(PillarParticleConfig.get())
+            );
             updateWorldPillars();
         });
         addTabWidget(colorsResetButton);
@@ -1064,11 +1073,16 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
         }
         config.particle_color.set(index, hexColor);
         config.saveProperties();
+
+        // Sync color changes to server
+        com.kingodogo.buildscape.network.ModMessages.INSTANCE.sendToServer(new com.kingodogo.buildscape.network.UpdateConfigPacket(config));
+        
         updateWorldPillars();
     }
 
     private void updateWorldPillars() {
         Minecraft mc = Minecraft.getInstance();
+        PillarIdManager manager = PillarIdManager.get();
         if (mc.level != null && mc.player != null) {
             int renderDistance = mc.options.renderDistance; // Try field access first, widespread in 1.16-1.18
             // If it's 1.19+, it might be renderDistance().get(). But usually 'renderDistance' works or we can guess 32.
@@ -1082,8 +1096,17 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
                     if (mc.level.hasChunk(x, z)) {
                         net.minecraft.world.level.chunk.LevelChunk chunk = mc.level.getChunk(x, z);
                         for (BlockEntity be : chunk.getBlockEntities().values()) {
-                            if (be instanceof PillarBlockEntity) {
-                                ((PillarBlockEntity) be).resetParticleTick();
+                            if (be instanceof PillarBlockEntity pbe) {
+                                // Important: re-sync from manager so that the newly 'locked' 
+                                // patterns (for customized pillars) are picked up by the BE immediately.
+                                String pid = pbe.getPillarId();
+                                if (pid != null) {
+                                    PillarIdManager.PillarData data = manager.getPillarData(pid);
+                                    if (data != null) {
+                                        pbe.syncFromData(data);
+                                    }
+                                }
+                                pbe.resetParticleTick();
                             }
                         }
                     }
@@ -1096,6 +1119,7 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
         PillarParticleConfig config = PillarParticleConfig.get();
         config.use_pattern = !config.use_pattern;
         config.saveProperties();
+        com.kingodogo.buildscape.network.ModMessages.INSTANCE.sendToServer(new com.kingodogo.buildscape.network.UpdateConfigPacket(config));
         updateWorldPillars();
 
         // Update UI - show "Use Pattern True" or "Use Pattern False" with correct styling
@@ -1131,10 +1155,34 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
         String pattern = PATTERNS[currentPatternIndex];
 
         PillarParticleConfig config = PillarParticleConfig.get();
+        String oldPattern = config.pattern; // Capture old pattern for transition
         config.pattern = pattern;
+        config.use_pattern = true; // Instantly enable use_pattern to make sure the cycle takes effect visually
         config.saveProperties();
 
+        // Transition: On the client, proactively lock patterns for any customized pillars
+        // so the UI feedback is instant and doesn't flicker to the global pattern.
+        PillarIdManager manager = PillarIdManager.get();
+        if (manager.hasLoaded()) {
+            for (PillarIdManager.PillarData pData : manager.getAllData()) {
+                // Robust check for modification: has colors or has hardcoded pattern settings
+                boolean hasPatternOverride = pData.pattern != null && !pData.pattern.equals("default");
+                boolean isCustomized = pData.hasColors() || hasPatternOverride;
+
+                if (isCustomized && (pData.pattern == null || pData.pattern.equals("default"))) {
+                    pData.pattern = oldPattern != null ? oldPattern : "ring"; // Lock to the pattern it was using BEFORE the change
+                }
+            }
+        }
+
+        com.kingodogo.buildscape.network.ModMessages.INSTANCE.sendToServer(new com.kingodogo.buildscape.network.UpdateConfigPacket(config));
+
         updateWorldPillars();
+
+        // Update Use Pattern display to reflect it was forced on
+        if (usePatternToggle != null) {
+            usePatternToggle.setMessage(getUsePatternMessage(true));
+        }
 
         // Use helper method to get styled message
         patternSelector.setMessage(getPatternMessage(pattern));
@@ -1146,6 +1194,7 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
         PillarParticleConfig config = PillarParticleConfig.get();
         config.max_particle_color = currentMaxColor;
         config.saveProperties();
+        com.kingodogo.buildscape.network.ModMessages.INSTANCE.sendToServer(new com.kingodogo.buildscape.network.UpdateConfigPacket(config));
         updateWorldPillars();
 
         maxParticleColorSlider.setMessage(
@@ -1861,7 +1910,18 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
 
         if (changed) {
             config.saveProperties();
+
+            // Sync field changes to server (speed, spread, intensity, etc.)
+            com.kingodogo.buildscape.network.ModMessages.INSTANCE.sendToServer(new com.kingodogo.buildscape.network.UpdateConfigPacket(config));
+
+            updateWorldPillars();
         }
+    }
+
+    @Override
+    public void onClose() {
+        updateConfigFromFields();
+        super.onClose();
     }
 
     @Override

@@ -946,12 +946,6 @@ public class PillarItemsConfigTab extends AbstractConfigTab {
                 if (itemSelectionWidget != null) {
                     itemSelectionWidget.refresh();
                 }
-                // Show confirmation message
-                if (net.minecraft.client.Minecraft.getInstance().player != null) {
-                    net.minecraft.client.Minecraft.getInstance().player.sendMessage(
-                            new TranslatableComponent("buildscape.config.item_removed", itemId),
-                            java.util.UUID.randomUUID());
-                }
             }
         } else {
             // Item is not in config, add it (user clicked to add)
@@ -960,12 +954,6 @@ public class PillarItemsConfigTab extends AbstractConfigTab {
                 refreshExistingItems();
                 if (itemSelectionWidget != null) {
                     itemSelectionWidget.refresh();
-                }
-                // Show confirmation message
-                if (net.minecraft.client.Minecraft.getInstance().player != null) {
-                    net.minecraft.client.Minecraft.getInstance().player.sendMessage(
-                            new TranslatableComponent("buildscape.config.item_added", itemId),
-                            java.util.UUID.randomUUID());
                 }
             }
         }
@@ -1003,12 +991,6 @@ public class PillarItemsConfigTab extends AbstractConfigTab {
             refreshExistingItems();
             if (itemSelectionWidget != null) {
                 itemSelectionWidget.refresh();
-            }
-            // Show confirmation message
-            if (net.minecraft.client.Minecraft.getInstance().player != null) {
-                net.minecraft.client.Minecraft.getInstance().player.sendMessage(
-                        new TranslatableComponent("buildscape.config.item_removed", itemId),
-                        java.util.UUID.randomUUID());
             }
         }
     }

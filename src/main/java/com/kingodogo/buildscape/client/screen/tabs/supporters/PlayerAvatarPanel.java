@@ -536,10 +536,45 @@ public class PlayerAvatarPanel extends BasePanel {
             try {
                 RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
 
+                // Initialize cosmetic renderer before rendering player
+                com.kingodogo.buildscape.client.UniversalCosmeticRenderer.init(mc.getEntityModels());
+
                 playerRenderer.render(player, 0.0f, partialTick, poseStack, bufferSource, lightLevel);
                 bufferSource.endBatch();
 
                 RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
+
+                // Render custom cosmetics on the player model
+                if (equippedCosmetics != null && !equippedCosmetics.isEmpty()) {
+                    for (String id : equippedCosmetics) {
+                        com.kingodogo.buildscape.cosmetics.CosmeticManager.CosmeticMetadata meta =
+                                com.kingodogo.buildscape.cosmetics.CosmeticManager.getInstance().getMetadata(id);
+                        if (meta != null) {
+                            if (meta.type() == com.kingodogo.buildscape.cosmetics.CosmeticManager.CosmeticType.HEAD) {
+                                poseStack.pushPose();
+                                // Transform to follow the player model's head
+                                playerRenderer.getModel().head.translateAndRotate(poseStack);
+
+                                // Map the ID if needed (ensure full registered ID)
+                                String fullId = id.contains(":") ? id : "buildscape:cosmatics/gear/" + id;
+
+                                com.kingodogo.buildscape.client.UniversalCosmeticRenderer.renderHeadCosmetic(
+                                        fullId, poseStack, bufferSource, lightLevel, player);
+                                bufferSource.endBatch();
+                                poseStack.popPose();
+                            } else if (meta.type() == com.kingodogo.buildscape.cosmetics.CosmeticManager.CosmeticType.CHEST) {
+                                poseStack.pushPose();
+                                playerRenderer.getModel().body.translateAndRotate(poseStack);
+                                String fullId = id.contains(":") ? id : "buildscape:cosmatics/gear/" + id;
+                                // Rendering chest model (placeholder for now until specific renderers exist)
+                                com.kingodogo.buildscape.client.UniversalCosmeticRenderer.renderHeadCosmetic(
+                                        fullId, poseStack, bufferSource, lightLevel, player);
+                                bufferSource.endBatch();
+                                poseStack.popPose();
+                            }
+                        }
+                    }
+                }
 
                 renderParticleTrails(poseStack, equippedCosmetics, player, partialTick);
             } catch (Exception e) {
@@ -1044,25 +1079,25 @@ public class PlayerAvatarPanel extends BasePanel {
             GuiComponent.fill(poseStack, slotX + slotSize - 1, slotY, slotX + slotSize, slotY + slotSize, borderColor);
 
             if (equippedId != null && !equippedId.isEmpty()) {
-                ItemStack stack = registry.resolveToItemStack(equippedId);
+                boolean isParticleTrail = CosmeticManager.getInstance().isParticleTrail(equippedId);
+                CosmeticManager.CosmeticMetadata slotMeta = CosmeticManager.getInstance().getMetadata(equippedId);
+                boolean isHeadCos = slotMeta != null && slotMeta.type() == CosmeticManager.CosmeticType.HEAD;
+                boolean isParticleWings = slotMeta != null && slotMeta.type() == CosmeticManager.CosmeticType.PARTICLE_WINGS;
 
-                // Fallback for custom head cosmetics that don't have an ItemStack
-                if ((stack == null || stack.isEmpty()) && state.getBestSlotForCosmetic(equippedId) == SupportersTabState.SLOT_HEAD) {
-                    stack = new ItemStack(net.minecraft.world.item.Items.LEATHER_HELMET);
-                }
-
-                if (stack != null && !stack.isEmpty()) {
-                    int itemX = slotX + (slotSize - 16) / 2;
-                    int itemY = slotY + (slotSize - 16) / 2;
-
-                    mc.getItemRenderer().renderGuiItem(stack, itemX, itemY);
-                    mc.getItemRenderer().renderGuiItemDecorations(mc.font, stack, itemX, itemY);
-
-                    if (CosmeticManager.getInstance().isParticleTrail(equippedId)) {
-                        poseStack.pushPose();
-                        poseStack.translate(0, 0, 200);
-                        mc.font.draw(poseStack, "✨", slotX + slotSize - 9, slotY + 1, 0xFFFF00);
-                        poseStack.popPose();
+                if (isParticleTrail || isParticleWings) {
+                    // Render actual particle texture instead of nether star placeholder
+                    renderParticleSlotIcon(poseStack, equippedId, slotX, slotY, slotSize);
+                } else if (isHeadCos) {
+                    // Render actual 3D cosmetic model instead of leather helmet placeholder
+                    renderHeadCosmeticSlotIcon(poseStack, equippedId, slotX, slotY, slotSize);
+                } else {
+                    // Regular item cosmetics - render the actual item
+                    ItemStack stack = registry.resolveToItemStack(equippedId);
+                    if (stack != null && !stack.isEmpty()) {
+                        int itemX = slotX + (slotSize - 16) / 2;
+                        int itemY = slotY + (slotSize - 16) / 2;
+                        mc.getItemRenderer().renderGuiItem(stack, itemX, itemY);
+                        mc.getItemRenderer().renderGuiItemDecorations(mc.font, stack, itemX, itemY);
                     }
                 }
             } else {
@@ -1102,6 +1137,168 @@ public class PlayerAvatarPanel extends BasePanel {
                 }
             }
         }
+    }
+
+    /**
+     * Render proper particle texture icon inside an equipment slot instead of nether star.
+     */
+    private void renderParticleSlotIcon(PoseStack poseStack, String cosmeticId, int slotX, int slotY, int slotSize) {
+        String shape = CosmeticManager.getInstance().getParticleShape(cosmeticId);
+        ResourceLocation tex = getParticleTexture(shape);
+        if (tex == null) return;
+
+        // Get color
+        UUID playerUuid = mc.player != null ? mc.player.getUUID() : null;
+        float[] color = com.kingodogo.buildscape.client.ParticleTrailHandler.getParticleColor(cosmeticId);
+        if (playerUuid != null) {
+            String hex = com.kingodogo.buildscape.config.CosmeticsConfig.get().getCosmeticColor(playerUuid, cosmeticId);
+            if (hex != null && !hex.isEmpty()) {
+                try {
+                    int rgb = Integer.parseInt(hex.startsWith("#") ? hex.substring(1) : hex, 16);
+                    color = new float[]{((rgb >> 16) & 0xFF) / 255.0f, ((rgb >> 8) & 0xFF) / 255.0f, (rgb & 0xFF) / 255.0f};
+                } catch (NumberFormatException e) {
+                    // keep default color
+                }
+            }
+        }
+
+        boolean isBubble = shape.equals("bubble");
+        boolean isMultiFrame = tex.getPath().endsWith("glow_lime_sparkle.png");
+
+        int iconSize = Math.min(slotSize - 4, 16);
+        int centerX = slotX + slotSize / 2;
+        int centerY = slotY + slotSize / 2;
+        float half = iconSize / 2.0f;
+
+        // Slow animated spin
+        long time = System.nanoTime() / 1000000L;
+        float rot = (time * 0.04f) % 360.0f;
+
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
+
+        if (isBubble) {
+            RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 0.9f);
+        } else {
+            RenderSystem.setShaderColor(color[0], color[1], color[2], 0.9f);
+        }
+
+        poseStack.pushPose();
+        poseStack.translate(centerX, centerY, 200);
+        poseStack.mulPose(Vector3f.ZP.rotationDegrees(rot));
+
+        RenderSystem.setShaderTexture(0, tex);
+        RenderSystem.setShader(net.minecraft.client.renderer.GameRenderer::getPositionTexShader);
+        com.mojang.blaze3d.vertex.BufferBuilder bb = com.mojang.blaze3d.vertex.Tesselator.getInstance().getBuilder();
+        bb.begin(com.mojang.blaze3d.vertex.VertexFormat.Mode.QUADS, com.mojang.blaze3d.vertex.DefaultVertexFormat.POSITION_TEX);
+
+        float u0 = 0, u1 = 1.0f, v0 = 0, v1 = 1.0f;
+        if (isMultiFrame) {
+            int totalFrames = 10;
+            // Use time to cycle frames, but make it slow and consistent
+            int totalTicks = (int) (time / 100L); // 10 ticks per second
+            int frameIndex = totalTicks % totalFrames;
+            float frameHeight = 1.0f / totalFrames;
+            v0 = frameIndex * frameHeight;
+            v1 = v0 + frameHeight;
+        }
+
+        bb.vertex(poseStack.last().pose(), -half, half, 0).uv(u0, v1).endVertex();
+        bb.vertex(poseStack.last().pose(), half, half, 0).uv(u1, v1).endVertex();
+        bb.vertex(poseStack.last().pose(), half, -half, 0).uv(u1, v0).endVertex();
+        bb.vertex(poseStack.last().pose(), -half, -half, 0).uv(u0, v0).endVertex();
+        com.mojang.blaze3d.vertex.Tesselator.getInstance().end();
+
+        poseStack.popPose();
+        RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
+    }
+
+    /**
+     * Render actual 3D cosmetic model inside an equipment slot instead of leather helmet.
+     */
+    private void renderHeadCosmeticSlotIcon(PoseStack poseStack, String cosmeticId, int slotX, int slotY, int slotSize) {
+        try {
+            com.kingodogo.buildscape.client.UniversalCosmeticRenderer.init(mc.getEntityModels());
+
+            int centerX = slotX + slotSize / 2;
+            int centerY = slotY + slotSize / 2;
+
+            RenderSystem.enableDepthTest();
+            RenderSystem.depthMask(true);
+            RenderSystem.enableBlend();
+            RenderSystem.defaultBlendFunc();
+
+            Vector3f light0 = new Vector3f(0.2f, 1.0f, 0.7f);
+            light0.normalize();
+            Vector3f light1 = new Vector3f(-0.2f, 1.0f, 0.7f);
+            light1.normalize();
+            RenderSystem.setupGuiFlatDiffuseLighting(light0, light1);
+
+            MultiBufferSource.BufferSource bufferSource = mc.renderBuffers().bufferSource();
+
+            poseStack.pushPose();
+            poseStack.translate(centerX, centerY, 300);
+
+            // Scale to fit inside the slot
+            // Hat geometry is centered around Y=-8.5 in model space
+            // We want it to be centered in the slot
+            float baseScale = slotSize * 0.45f;
+            poseStack.scale(baseScale, -baseScale, baseScale);
+
+            // Flip right-side up and tilt for preview
+            poseStack.mulPose(Vector3f.XP.rotationDegrees(180.0f));
+            poseStack.mulPose(Vector3f.XP.rotationDegrees(25.0f));
+
+            // Slow animated rotation
+            long time = System.nanoTime() / 1000000L;
+            float rot = (time / 1000.0f * 45.0f) % 360.0f;
+            poseStack.mulPose(Vector3f.YP.rotationDegrees(rot));
+
+            // Translate the model origin to center it
+            // Geometry sits at Y=-8.5 in model space, so move +8.5 to center it
+            // After flipping and scaling, this translates to a small visual lift
+            poseStack.translate(0.0, 0.35, 0.0);
+
+            RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
+
+            // Map the ID if needed (ensure full registered ID)
+            String fullId = cosmeticId.contains(":") ? cosmeticId : "buildscape:cosmatics/gear/" + cosmeticId;
+
+            com.kingodogo.buildscape.client.UniversalCosmeticRenderer.renderHeadCosmetic(
+                    fullId, poseStack, bufferSource, 15728880, mc.player);
+            bufferSource.endBatch();
+
+            poseStack.popPose();
+
+            RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
+            RenderSystem.disableDepthTest();
+            RenderSystem.disableBlend();
+        } catch (Exception e) {
+            // Fallback: draw a text label if model rendering fails
+            String label = "H";
+            int labelWidth = mc.font.width(label);
+            mc.font.draw(poseStack, label, slotX + (slotSize - labelWidth) / 2 + 1,
+                    slotY + (slotSize - 8) / 2 + 1, 0xFFFFFF);
+        }
+    }
+
+    /**
+     * Get particle texture ResourceLocation for a given shape.
+     */
+    private ResourceLocation getParticleTexture(String shape) {
+        String path = switch (shape) {
+            case "heart" -> "textures/particle/heart_blank.png";
+            case "bubble" -> "textures/particle/bubble.png";
+            case "note" -> "minecraft:textures/particle/note.png";
+            case "cherry", "cherry_leaves" -> "textures/particle/cherry_0.png";
+            case "firework" -> "minecraft:textures/particle/spark_0.png";
+            case "cake" -> "textures/particle/cake_1.png";
+            case "snowflake" -> "textures/particle/snowflake_1.png";
+            default -> "textures/particle/glow_lime_sparkle.png";
+        };
+        if (path.startsWith("minecraft:"))
+            return new ResourceLocation("minecraft", path.substring(10));
+        return new ResourceLocation(BuildScape.MODID, path);
     }
 
     public void renderTooltips(PoseStack poseStack, int mouseX, int mouseY) {

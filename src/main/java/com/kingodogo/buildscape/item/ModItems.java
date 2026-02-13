@@ -6820,5 +6820,101 @@ public class ModItems {
             () -> new BlockItem(ModBlocks.SMOKE_VENT.get(), createBlockItemProperties())
     );
 
+    // Colored Redstone Lamps
+    public static final RegistryObject<Item> WHITE_REDSTONE_LAMP = ITEMS.register(
+            "white_redstone_lamp",
+            () -> new BlockItem(ModBlocks.WHITE_REDSTONE_LAMP.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> ORANGE_REDSTONE_LAMP = ITEMS.register(
+            "orange_redstone_lamp",
+            () -> new BlockItem(ModBlocks.ORANGE_REDSTONE_LAMP.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> MAGENTA_REDSTONE_LAMP = ITEMS.register(
+            "magenta_redstone_lamp",
+            () -> new BlockItem(ModBlocks.MAGENTA_REDSTONE_LAMP.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> LIGHT_BLUE_REDSTONE_LAMP = ITEMS.register(
+            "light_blue_redstone_lamp",
+            () -> new BlockItem(ModBlocks.LIGHT_BLUE_REDSTONE_LAMP.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> YELLOW_REDSTONE_LAMP = ITEMS.register(
+            "yellow_redstone_lamp",
+            () -> new BlockItem(ModBlocks.YELLOW_REDSTONE_LAMP.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> LIME_REDSTONE_LAMP = ITEMS.register(
+            "lime_redstone_lamp",
+            () -> new BlockItem(ModBlocks.LIME_REDSTONE_LAMP.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> PINK_REDSTONE_LAMP = ITEMS.register(
+            "pink_redstone_lamp",
+            () -> new BlockItem(ModBlocks.PINK_REDSTONE_LAMP.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> GRAY_REDSTONE_LAMP = ITEMS.register(
+            "gray_redstone_lamp",
+            () -> new BlockItem(ModBlocks.GRAY_REDSTONE_LAMP.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> LIGHT_GRAY_REDSTONE_LAMP = ITEMS.register(
+            "light_gray_redstone_lamp",
+            () -> new BlockItem(ModBlocks.LIGHT_GRAY_REDSTONE_LAMP.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> CYAN_REDSTONE_LAMP = ITEMS.register(
+            "cyan_redstone_lamp",
+            () -> new BlockItem(ModBlocks.CYAN_REDSTONE_LAMP.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> PURPLE_REDSTONE_LAMP = ITEMS.register(
+            "purple_redstone_lamp",
+            () -> new BlockItem(ModBlocks.PURPLE_REDSTONE_LAMP.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> BLUE_REDSTONE_LAMP = ITEMS.register(
+            "blue_redstone_lamp",
+            () -> new BlockItem(ModBlocks.BLUE_REDSTONE_LAMP.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> BROWN_REDSTONE_LAMP = ITEMS.register(
+            "brown_redstone_lamp",
+            () -> new BlockItem(ModBlocks.BROWN_REDSTONE_LAMP.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> GREEN_REDSTONE_LAMP = ITEMS.register(
+            "green_redstone_lamp",
+            () -> new BlockItem(ModBlocks.GREEN_REDSTONE_LAMP.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> RED_REDSTONE_LAMP = ITEMS.register(
+            "red_redstone_lamp",
+            () -> new BlockItem(ModBlocks.RED_REDSTONE_LAMP.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> BLACK_REDSTONE_LAMP = ITEMS.register(
+            "black_redstone_lamp",
+            () -> new BlockItem(ModBlocks.BLACK_REDSTONE_LAMP.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> CASCADE_BLOCK = ITEMS.register(
+            "cascade_block",
+            () -> new BlockItem(ModBlocks.CASCADE_BLOCK.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> CASCADE_BLOCK_NO_MIST = ITEMS.register(
+            "cascade_block_no_mist",
+            () -> new BlockItem(ModBlocks.CASCADE_BLOCK_NO_MIST.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> BOTTLE_OF_MIST = ITEMS.register(
+            "bottle_of_mist",
+            () -> new BottleOfMistItem(new Item.Properties().tab(com.kingodogo.buildscape.BuildScape.BUILDSCAPE_TAB).stacksTo(64))
+    );
+
 }
 

@@ -1,0 +1,53 @@
+package com.kingodogo.buildscape.block;
+
+import com.kingodogo.buildscape.particle.ModParticles;
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+
+import java.util.Random;
+
+public class CascadeBlockEntity extends BlockEntity {
+
+    private static final Random RANDOM = new Random();
+
+    public CascadeBlockEntity(BlockPos pos, BlockState state) {
+        super(ModBlockEntities.CASCADE_BLOCK_ENTITY.get(), pos, state);
+    }
+
+    public static void clientTick(Level level, BlockPos pos, BlockState state, CascadeBlockEntity be) {
+        // If local player holds cascade block in off-hand, suppress particles in their chunk
+        Player player = Minecraft.getInstance().player;
+        if (player != null) {
+            ItemStack offhand = player.getOffhandItem();
+            if (!offhand.isEmpty() && offhand.getItem() instanceof BlockItem blockItem
+                    && blockItem.getBlock() instanceof CascadeBlock) {
+                int playerChunkX = player.blockPosition().getX() >> 4;
+                int playerChunkZ = player.blockPosition().getZ() >> 4;
+                int blockChunkX = pos.getX() >> 4;
+                int blockChunkZ = pos.getZ() >> 4;
+                if (playerChunkX == blockChunkX && playerChunkZ == blockChunkZ) {
+                    return;
+                }
+            }
+        }
+
+        int count = 5 + RANDOM.nextInt(3);
+        for (int i = 0; i < count; i++) {
+            double x = (double) pos.getX() + 0.5 + (RANDOM.nextDouble() - 0.5) * 2.0;
+            double y = (double) pos.getY() + 1.75 + (RANDOM.nextDouble() - 0.5) * 0.1;
+            double z = (double) pos.getZ() + 0.5 + (RANDOM.nextDouble() - 0.5) * 2.0;
+
+            double xSpeed = (RANDOM.nextDouble() - 0.5) * 0.15;
+            double ySpeed = RANDOM.nextDouble() * 0.01;
+            double zSpeed = (RANDOM.nextDouble() - 0.5) * 0.15;
+
+            level.addAlwaysVisibleParticle(ModParticles.CASCADE.get(), true, x, y, z, xSpeed, ySpeed, zSpeed);
+        }
+    }
+}

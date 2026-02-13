@@ -97,7 +97,18 @@ public class ModBlockEntities {
                     "smoke_vent_block_entity",
                     () -> BlockEntityType.Builder.of(
                             SmokeVentBlockEntity::new,
-                            ModBlocks.SMOKE_VENT.get()).build(null));
+                            ModBlocks.SMOKE_VENT.get()
+                    ).build(null)
+    );
 
-
+    public static final RegistryObject<
+            BlockEntityType<CascadeBlockEntity>
+            > CASCADE_BLOCK_ENTITY = BLOCK_ENTITIES.register(
+            "cascade_block_entity",
+            () ->
+                    BlockEntityType.Builder.of(
+                            CascadeBlockEntity::new,
+                            ModBlocks.CASCADE_BLOCK.get()
+                    ).build(null)
+    );
 }

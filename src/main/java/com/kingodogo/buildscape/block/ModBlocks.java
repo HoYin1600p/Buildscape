@@ -7083,4 +7083,218 @@ public class ModBlocks {
                         .sound(SoundType.NETHERITE_BLOCK)
                         .noOcclusion()));
 
+    // Colored Redstone Lamps
+    public static final RegistryObject<Block> WHITE_REDSTONE_LAMP =
+            BLOCKS.register("white_redstone_lamp", () ->
+                    new RedstoneLampBlock(
+                            BlockBehaviour.Properties.of(Material.BUILDABLE_GLASS, MaterialColor.SNOW)
+                                    .strength(0.3f)
+                                    .sound(SoundType.GLASS)
+                                    .lightLevel(state -> state.getValue(
+                                            net.minecraft.world.level.block.state.properties.BlockStateProperties.LIT
+                                    ) ? 15 : 0)
+                    )
+            );
+
+    public static final RegistryObject<Block> ORANGE_REDSTONE_LAMP =
+            BLOCKS.register("orange_redstone_lamp", () ->
+                    new RedstoneLampBlock(
+                            BlockBehaviour.Properties.of(Material.BUILDABLE_GLASS, MaterialColor.COLOR_ORANGE)
+                                    .strength(0.3f)
+                                    .sound(SoundType.GLASS)
+                                    .lightLevel(state -> state.getValue(
+                                            net.minecraft.world.level.block.state.properties.BlockStateProperties.LIT
+                                    ) ? 15 : 0)
+                    )
+            );
+
+    public static final RegistryObject<Block> MAGENTA_REDSTONE_LAMP =
+            BLOCKS.register("magenta_redstone_lamp", () ->
+                    new RedstoneLampBlock(
+                            BlockBehaviour.Properties.of(Material.BUILDABLE_GLASS, MaterialColor.COLOR_MAGENTA)
+                                    .strength(0.3f)
+                                    .sound(SoundType.GLASS)
+                                    .lightLevel(state -> state.getValue(
+                                            net.minecraft.world.level.block.state.properties.BlockStateProperties.LIT
+                                    ) ? 15 : 0)
+                    )
+            );
+
+    public static final RegistryObject<Block> LIGHT_BLUE_REDSTONE_LAMP =
+            BLOCKS.register("light_blue_redstone_lamp", () ->
+                    new RedstoneLampBlock(
+                            BlockBehaviour.Properties.of(Material.BUILDABLE_GLASS, MaterialColor.COLOR_LIGHT_BLUE)
+                                    .strength(0.3f)
+                                    .sound(SoundType.GLASS)
+                                    .lightLevel(state -> state.getValue(
+                                            net.minecraft.world.level.block.state.properties.BlockStateProperties.LIT
+                                    ) ? 15 : 0)
+                    )
+            );
+
+    public static final RegistryObject<Block> YELLOW_REDSTONE_LAMP =
+            BLOCKS.register("yellow_redstone_lamp", () ->
+                    new RedstoneLampBlock(
+                            BlockBehaviour.Properties.of(Material.BUILDABLE_GLASS, MaterialColor.COLOR_YELLOW)
+                                    .strength(0.3f)
+                                    .sound(SoundType.GLASS)
+                                    .lightLevel(state -> state.getValue(
+                                            net.minecraft.world.level.block.state.properties.BlockStateProperties.LIT
+                                    ) ? 15 : 0)
+                    )
+            );
+
+    public static final RegistryObject<Block> LIME_REDSTONE_LAMP =
+            BLOCKS.register("lime_redstone_lamp", () ->
+                    new RedstoneLampBlock(
+                            BlockBehaviour.Properties.of(Material.BUILDABLE_GLASS, MaterialColor.COLOR_LIGHT_GREEN)
+                                    .strength(0.3f)
+                                    .sound(SoundType.GLASS)
+                                    .lightLevel(state -> state.getValue(
+                                            net.minecraft.world.level.block.state.properties.BlockStateProperties.LIT
+                                    ) ? 15 : 0)
+                    )
+            );
+
+    public static final RegistryObject<Block> PINK_REDSTONE_LAMP =
+            BLOCKS.register("pink_redstone_lamp", () ->
+                    new RedstoneLampBlock(
+                            BlockBehaviour.Properties.of(Material.BUILDABLE_GLASS, MaterialColor.COLOR_PINK)
+                                    .strength(0.3f)
+                                    .sound(SoundType.GLASS)
+                                    .lightLevel(state -> state.getValue(
+                                            net.minecraft.world.level.block.state.properties.BlockStateProperties.LIT
+                                    ) ? 15 : 0)
+                    )
+            );
+
+    public static final RegistryObject<Block> GRAY_REDSTONE_LAMP =
+            BLOCKS.register("gray_redstone_lamp", () ->
+                    new RedstoneLampBlock(
+                            BlockBehaviour.Properties.of(Material.BUILDABLE_GLASS, MaterialColor.COLOR_GRAY)
+                                    .strength(0.3f)
+                                    .sound(SoundType.GLASS)
+                                    .lightLevel(state -> state.getValue(
+                                            net.minecraft.world.level.block.state.properties.BlockStateProperties.LIT
+                                    ) ? 15 : 0)
+                    )
+            );
+
+    public static final RegistryObject<Block> LIGHT_GRAY_REDSTONE_LAMP =
+            BLOCKS.register("light_gray_redstone_lamp", () ->
+                    new RedstoneLampBlock(
+                            BlockBehaviour.Properties.of(Material.BUILDABLE_GLASS, MaterialColor.COLOR_LIGHT_GRAY)
+                                    .strength(0.3f)
+                                    .sound(SoundType.GLASS)
+                                    .lightLevel(state -> state.getValue(
+                                            net.minecraft.world.level.block.state.properties.BlockStateProperties.LIT
+                                    ) ? 15 : 0)
+                    )
+            );
+
+    public static final RegistryObject<Block> CYAN_REDSTONE_LAMP =
+            BLOCKS.register("cyan_redstone_lamp", () ->
+                    new RedstoneLampBlock(
+                            BlockBehaviour.Properties.of(Material.BUILDABLE_GLASS, MaterialColor.COLOR_CYAN)
+                                    .strength(0.3f)
+                                    .sound(SoundType.GLASS)
+                                    .lightLevel(state -> state.getValue(
+                                            net.minecraft.world.level.block.state.properties.BlockStateProperties.LIT
+                                    ) ? 15 : 0)
+                    )
+            );
+
+    public static final RegistryObject<Block> PURPLE_REDSTONE_LAMP =
+            BLOCKS.register("purple_redstone_lamp", () ->
+                    new RedstoneLampBlock(
+                            BlockBehaviour.Properties.of(Material.BUILDABLE_GLASS, MaterialColor.COLOR_PURPLE)
+                                    .strength(0.3f)
+                                    .sound(SoundType.GLASS)
+                                    .lightLevel(state -> state.getValue(
+                                            net.minecraft.world.level.block.state.properties.BlockStateProperties.LIT
+                                    ) ? 15 : 0)
+                    )
+            );
+
+    public static final RegistryObject<Block> BLUE_REDSTONE_LAMP =
+            BLOCKS.register("blue_redstone_lamp", () ->
+                    new RedstoneLampBlock(
+                            BlockBehaviour.Properties.of(Material.BUILDABLE_GLASS, MaterialColor.COLOR_BLUE)
+                                    .strength(0.3f)
+                                    .sound(SoundType.GLASS)
+                                    .lightLevel(state -> state.getValue(
+                                            net.minecraft.world.level.block.state.properties.BlockStateProperties.LIT
+                                    ) ? 15 : 0)
+                    )
+            );
+
+    public static final RegistryObject<Block> BROWN_REDSTONE_LAMP =
+            BLOCKS.register("brown_redstone_lamp", () ->
+                    new RedstoneLampBlock(
+                            BlockBehaviour.Properties.of(Material.BUILDABLE_GLASS, MaterialColor.COLOR_BROWN)
+                                    .strength(0.3f)
+                                    .sound(SoundType.GLASS)
+                                    .lightLevel(state -> state.getValue(
+                                            net.minecraft.world.level.block.state.properties.BlockStateProperties.LIT
+                                    ) ? 15 : 0)
+                    )
+            );
+
+    public static final RegistryObject<Block> GREEN_REDSTONE_LAMP =
+            BLOCKS.register("green_redstone_lamp", () ->
+                    new RedstoneLampBlock(
+                            BlockBehaviour.Properties.of(Material.BUILDABLE_GLASS, MaterialColor.COLOR_GREEN)
+                                    .strength(0.3f)
+                                    .sound(SoundType.GLASS)
+                                    .lightLevel(state -> state.getValue(
+                                            net.minecraft.world.level.block.state.properties.BlockStateProperties.LIT
+                                    ) ? 15 : 0)
+                    )
+            );
+
+    public static final RegistryObject<Block> RED_REDSTONE_LAMP =
+            BLOCKS.register("red_redstone_lamp", () ->
+                    new RedstoneLampBlock(
+                            BlockBehaviour.Properties.of(Material.BUILDABLE_GLASS, MaterialColor.COLOR_RED)
+                                    .strength(0.3f)
+                                    .sound(SoundType.GLASS)
+                                    .lightLevel(state -> state.getValue(
+                                            net.minecraft.world.level.block.state.properties.BlockStateProperties.LIT
+                                    ) ? 15 : 0)
+                    )
+            );
+
+    public static final RegistryObject<Block> BLACK_REDSTONE_LAMP =
+            BLOCKS.register("black_redstone_lamp", () ->
+                    new RedstoneLampBlock(
+                            BlockBehaviour.Properties.of(Material.BUILDABLE_GLASS, MaterialColor.COLOR_BLACK)
+                                    .strength(0.3f)
+                                    .sound(SoundType.GLASS)
+                                    .lightLevel(state -> state.getValue(
+                                            net.minecraft.world.level.block.state.properties.BlockStateProperties.LIT
+                                    ) ? 15 : 0)
+                    )
+            );
+
+    public static final RegistryObject<Block> CASCADE_BLOCK =
+            BLOCKS.register("cascade_block", () ->
+                    new CascadeBlock(
+                            BlockBehaviour.Properties.of(Material.ICE_SOLID)
+                                    .strength(0.5f)
+                                    .sound(SoundType.CORAL_BLOCK)
+                                    .noOcclusion()
+                                    .isViewBlocking((state, getter, pos) -> false)
+                    )
+            );
+
+    public static final RegistryObject<Block> CASCADE_BLOCK_NO_MIST =
+            BLOCKS.register("cascade_block_no_mist", () ->
+                    new CascadeBlockNoMist(
+                            BlockBehaviour.Properties.of(Material.ICE_SOLID)
+                                    .strength(0.5f)
+                                    .sound(SoundType.CORAL_BLOCK)
+                                    .noOcclusion()
+                                    .isViewBlocking((state, getter, pos) -> false)
+                    )
+            );
 }

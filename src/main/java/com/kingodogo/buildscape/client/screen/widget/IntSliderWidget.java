@@ -48,7 +48,6 @@ public class IntSliderWidget extends AbstractSliderButton {
     
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        // Only respond to clicks if the slider is active and the click is actually on the slider
         if (!this.active || !this.isMouseOver(mouseX, mouseY)) {
             return false;
         }
@@ -57,7 +56,6 @@ public class IntSliderWidget extends AbstractSliderButton {
     
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
-        // Only allow dragging if the slider is active
         if (!this.active) {
             return false;
         }

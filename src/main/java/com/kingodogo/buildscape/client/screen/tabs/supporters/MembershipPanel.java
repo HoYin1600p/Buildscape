@@ -18,17 +18,6 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
-/**
- * Membership Panel (Panel 3)
- * 
- * Displays membership tiers from API.
- * "Connect Account" button → opens browser to https://buildscape.online/connect
- * Shows connected username when authenticated.
- * Filters Panel 1 based on tier.
- * 
- * Dimensions: 33% width × 100% height
- * Position: (67%, 0%)
- */
 public class MembershipPanel extends BasePanel {
     private static final int PADDING = 10;
     private static final int BUTTON_HEIGHT = 20;
@@ -47,17 +36,15 @@ public class MembershipPanel extends BasePanel {
     
     @Override
     public void init() {
-        // Create connect button
         int buttonX = startX + PADDING;
         int buttonY = startY + PADDING;
         int buttonWidth = width - PADDING * 2;
-        
-        // Use fallback text if translation key doesn't exist
+
         String connectText = "Connect Account";
         try {
             connectText = new TranslatableComponent("buildscape.supporters.connect").getString();
             if (connectText.startsWith("buildscape.")) {
-                connectText = "Connect Account"; // Fallback if translation missing
+                connectText = "Connect Account";
             }
         } catch (Exception e) {
             connectText = "Connect Account";
@@ -68,11 +55,9 @@ public class MembershipPanel extends BasePanel {
             new TextComponent(connectText),
             (button) -> openConnectPage()
         );
-        
-        // Load tiers
+
         loadTiers();
-        
-        // Load status if player UUID is available
+
         UUID playerUuid = getPlayerUuid();
         if (playerUuid != null) {
             loadStatus(playerUuid);
@@ -81,9 +66,6 @@ public class MembershipPanel extends BasePanel {
         }
     }
     
-    /**
-     * Get the current player's UUID.
-     */
     private UUID getPlayerUuid() {
         Minecraft mc = Minecraft.getInstance();
         if (mc.player != null) {
@@ -92,18 +74,13 @@ public class MembershipPanel extends BasePanel {
         return null;
     }
     
-    /**
-     * Load membership tiers from API.
-     */
     private void loadTiers() {
-        // Check cache first
         TiersResponse cached = apiCache.getCachedTiers();
         if (cached != null && cached.getTiers() != null) {
             this.tiers = cached.getTiers();
             return;
         }
-        
-        // Load from API
+
         apiClient.getTiers()
             .thenAccept(response -> {
                 if (response != null && response.getTiers() != null) {
@@ -117,14 +94,10 @@ public class MembershipPanel extends BasePanel {
             });
     }
     
-    /**
-     * Load supporter status from API.
-     */
     private void loadStatus(UUID uuid) {
         isLoading = true;
         statusMessage = "Loading...";
-        
-        // Check cache first
+
         SupporterStatus cached = apiCache.getCachedStatus(uuid);
         if (cached != null) {
             this.currentStatus = cached;
@@ -132,8 +105,7 @@ public class MembershipPanel extends BasePanel {
             isLoading = false;
             return;
         }
-        
-        // Load from API
+
         apiClient.getSupporterStatus(uuid)
             .thenAccept(status -> {
                 if (status != null) {
@@ -153,9 +125,6 @@ public class MembershipPanel extends BasePanel {
             });
     }
     
-    /**
-     * Update status display based on current status.
-     */
     private void updateStatusDisplay() {
         if (currentStatus == null) {
             statusMessage = "Not connected. Click 'Connect Account' to link your account.";
@@ -178,9 +147,6 @@ public class MembershipPanel extends BasePanel {
         }
     }
     
-    /**
-     * Open connect page in browser.
-     */
     private void openConnectPage() {
         UUID playerUuid = getPlayerUuid();
         if (playerUuid == null) {
@@ -192,11 +158,10 @@ public class MembershipPanel extends BasePanel {
             String url = "https://buildscape.online/connect?uuid=" + playerUuid;
             java.awt.Desktop.getDesktop().browse(new URI(url));
             statusMessage = "Opening browser... Please complete the connection on the website.";
-            
-            // Refresh status after a delay (user might connect)
+
             new Thread(() -> {
                 try {
-                    Thread.sleep(5000); // Wait 5 seconds
+                    Thread.sleep(5000);
                     loadStatus(playerUuid);
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
@@ -210,13 +175,11 @@ public class MembershipPanel extends BasePanel {
     
     @Override
     public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
-        // Render background
         GuiComponent.fill(poseStack, startX, startY, endX, endY, 0x80000000);
         
         Minecraft mc = Minecraft.getInstance();
         int y = startY + PADDING;
-        
-        // Render title
+
         String title = "Membership";
         try {
             String translated = new TranslatableComponent("buildscape.supporters.membership").getString();
@@ -224,29 +187,23 @@ public class MembershipPanel extends BasePanel {
                 title = translated;
             }
         } catch (Exception e) {
-            // Use default
         }
         mc.font.draw(poseStack, title, startX + PADDING, y, 0xFFFFFF);
         y += 20;
-        
-        // Render connect button
+
         if (connectButton != null) {
             connectButton.render(poseStack, mouseX, mouseY, partialTick);
             y += BUTTON_HEIGHT + BUTTON_SPACING;
         }
-        
-        // Render status message
+
         if (!statusMessage.isEmpty()) {
-            // Fix translation keys
             String displayMessage = statusMessage;
             if (statusMessage.startsWith("buildscape.supporters.")) {
-                // Try to translate, otherwise use fallback
                 try {
                     String translated = new TranslatableComponent(statusMessage).getString();
                     if (!translated.startsWith("buildscape.")) {
                         displayMessage = translated;
                     } else {
-                        // Use fallback messages
                         if (statusMessage.contains("error")) {
                             displayMessage = "Unable to connect to server. Check your internet connection.";
                         } else if (statusMessage.contains("no_tiers")) {
@@ -262,7 +219,6 @@ public class MembershipPanel extends BasePanel {
                         }
                     }
                 } catch (Exception e) {
-                    // Use fallback
                     if (statusMessage.contains("error")) {
                         displayMessage = "Unable to connect to server.";
                     } else if (statusMessage.contains("no_tiers")) {
@@ -275,11 +231,10 @@ public class MembershipPanel extends BasePanel {
             mc.font.draw(poseStack, displayMessage, startX + PADDING, y, isLoading ? 0xFFFF00 : 0xCCCCCC);
             y += 20;
         }
-        
-        // Render tiers
+
         if (tiers != null && !tiers.isEmpty()) {
-            y += 10; // Spacing
-            
+            y += 10;
+
             String tiersTitle = "Membership Tiers";
             try {
                 String translated = new TranslatableComponent("buildscape.supporters.tiers").getString();
@@ -287,20 +242,16 @@ public class MembershipPanel extends BasePanel {
                     tiersTitle = translated;
                 }
             } catch (Exception e) {
-                // Use default
             }
             mc.font.draw(poseStack, tiersTitle, startX + PADDING, y, 0xFFFFFF);
             y += 20;
             
             for (MembershipTier tier : tiers) {
-                // Render tier name
                 String tierText = tier.getName() + " (Level " + tier.getLevel() + ")";
                 mc.font.draw(poseStack, tierText, startX + PADDING, y, 0xCCCCCC);
                 y += 12;
-                
-                // Render tier description if available
+
                 if (tier.getDescription() != null && !tier.getDescription().isEmpty()) {
-                    // Word wrap description
                     List<net.minecraft.util.FormattedCharSequence> wrapped = mc.font.split(
                         new net.minecraft.network.chat.TextComponent(tier.getDescription()), 
                         width - PADDING * 2
@@ -320,7 +271,6 @@ public class MembershipPanel extends BasePanel {
                     noTiersMsg = translated;
                 }
             } catch (Exception e) {
-                // Use default
             }
             mc.font.draw(poseStack, noTiersMsg, startX + PADDING, y, 0xAAAAAA);
         }

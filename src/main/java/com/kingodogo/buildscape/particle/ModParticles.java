@@ -29,4 +29,8 @@ public class ModParticles {
             PARTICLES.register("cake", () -> new SimpleParticleType(false));
     public static final RegistryObject<SimpleParticleType> CHERRY =
             PARTICLES.register("cherry", () -> new SimpleParticleType(false));
+    public static final RegistryObject<SimpleParticleType> BUBBLE =
+            PARTICLES.register("bubble", () -> new SimpleParticleType(false));
+    public static final RegistryObject<SimpleParticleType> TRAIL_NOTE =
+            PARTICLES.register("trail_note", () -> new SimpleParticleType(false));
 }

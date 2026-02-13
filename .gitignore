@@ -50,3 +50,5 @@ temp_*.java
 recent_*.java
 /.vs/
 /imports/
+/.vscode/
+/index.md

@@ -3818,6 +3818,16 @@ public class BuildScape {
                     com.kingodogo.buildscape.particle.ModParticles.CHERRY.get(),
                     sprites -> new com.kingodogo.buildscape.particle.CherryParticle.Provider(
                             sprites));
+
+            net.minecraft.client.Minecraft.getInstance().particleEngine.register(
+                    com.kingodogo.buildscape.particle.ModParticles.BUBBLE.get(),
+                    sprites -> new com.kingodogo.buildscape.particle.BubbleParticle.Provider(
+                            sprites));
+
+            net.minecraft.client.Minecraft.getInstance().particleEngine.register(
+                    com.kingodogo.buildscape.particle.ModParticles.TRAIL_NOTE.get(),
+                    sprites -> new com.kingodogo.buildscape.particle.TrailNoteParticle.Provider(
+                            sprites));
         }
     }
 }

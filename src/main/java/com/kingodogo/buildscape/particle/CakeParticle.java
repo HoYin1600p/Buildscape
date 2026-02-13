@@ -42,7 +42,8 @@ public class CakeParticle extends TextureSheetParticle {
         this.yd = ySpeed;
         this.zd = zSpeed;
         
-        this.setSpriteFromAge(sprites);
+        // Pick random texture from the set
+        this.setSprite(sprites.get(level.random));
         
         // Color handling logic
         String positionKey = String.format("%.1f,%.1f,%.1f", x, y, z);
@@ -98,7 +99,7 @@ public class CakeParticle extends TextureSheetParticle {
     @Override
     public void tick() {
         super.tick();
-        this.setSpriteFromAge(this.sprites);
+        // Removed setSpriteFromAge to keep the selected static texture
         
         if (this.age > this.lifetime * 0.7F) {
             float fadeProgress = (this.age - this.lifetime * 0.7F) / (this.lifetime * 0.3F);

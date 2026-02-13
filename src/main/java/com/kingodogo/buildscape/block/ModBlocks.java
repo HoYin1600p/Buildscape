@@ -7167,7 +7167,4 @@ public class ModBlocks {
                             .strength(2.0f, 6.0f)
                             .requiresCorrectToolForDrops()
                             .sound(SoundType.STONE)));
-
-    // Colored Item Frames
-
 }

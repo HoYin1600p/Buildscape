@@ -38,6 +38,33 @@ public class ParticleTrailHandler {
     // Particle spawn rate (milliseconds between spawns)
     private static final long SPAWN_INTERVAL_MS = 50; // Spawn every 50ms (20 particles per second)
 
+    /**
+     * Get spawn amount for a cosmetic ID.
+     * Controls density/frequency.
+     * < 1.0 : Chance to spawn (e.g. 0.8 = 80% chance)
+     * >= 1.0 : Number of particles to spawn
+     */
+    private static float getSpawnAmount(String cosmeticId) {
+        if (cosmeticId == null)
+            return 1.0f;
+        String idLower = cosmeticId.toLowerCase();
+
+        // Cherry-related and Cake trails spawn slightly less often (80% chance per tick)
+        if (idLower.contains("cherry") || idLower.contains("cake")) {
+            return 0.8f;
+        }
+
+        return 1.0f;
+    }
+
+    /**
+     * Get velocity multiplier for a cosmetic ID.
+     * Controls how far the particles go (spread/speed).
+     */
+    private static float getVelocityMultiplier(String cosmeticId) {
+        return 1.0f; // Default multiplier
+    }
+
     // Minimum movement distance to spawn particles (prevents spawning when standing
     // still)
     private static final double MIN_MOVEMENT_DISTANCE = 0.01;
@@ -64,13 +91,13 @@ public class ParticleTrailHandler {
         // Return different particle types based on shape
         switch (shape) {
             case "bubble":
-                return ParticleTypes.BUBBLE;
+                return ModParticles.BUBBLE.get();
             case "cherry_leaves":
-                return ParticleTypes.SPORE_BLOSSOM_AIR;
+                return ModParticles.CHERRY.get();
             case "heart":
                 return ModParticles.TINTABLE_HEART.get();
             case "note":
-                return ParticleTypes.NOTE;
+                return ModParticles.TRAIL_NOTE.get();
             case "snowflake":
                 return ModParticles.SNOWFLAKE.get();
             case "firework":
@@ -262,18 +289,19 @@ public class ParticleTrailHandler {
             color = getParticleColor(particleTrailId);
         }
 
+        // Get spawn amount and velocity parameters
+        float spawnAmount = getSpawnAmount(particleTrailId);
+        float velocityMult = getVelocityMultiplier(particleTrailId);
+
         // Spawn particle with velocity opposite to movement direction
         // This makes particles spread behind the player
         // Particles glow up first, then fall down (pulsing effect)
-        double velocityX = -direction.x * 0.1 + (random.nextDouble() - 0.5) * 0.05;
-        double velocityY = 0.08 + random.nextDouble() * 0.05; // Start with upward velocity (glow up)
-        double velocityZ = -direction.z * 0.1 + (random.nextDouble() - 0.5) * 0.05;
+        double velocityX = (-direction.x * 0.1 + (random.nextDouble() - 0.5) * 0.05) * velocityMult;
+        double velocityY = (0.08 + random.nextDouble() * 0.05) * velocityMult; // Start with upward velocity (glow up)
+        double velocityZ = (-direction.z * 0.1 + (random.nextDouble() - 0.5) * 0.05) * velocityMult;
 
-        // Queue color for the particle (if using PillarSparkleParticle and supports
-        // color)
+        // Queue color for the particle (if supported)
         CosmeticManager manager = CosmeticManager.getInstance();
-        // Queue color for the particle (if supported)
-        // Queue color for the particle (if supported)
         if (manager.supportsColor(particleTrailId)) {
             String colorCode = String.format("#%02X%02X%02X",
                     (int) (color[0] * 255),
@@ -286,41 +314,35 @@ public class ParticleTrailHandler {
             } else if (particleType == ModParticles.TINTABLE_HEART.get()) {
                 com.kingodogo.buildscape.particle.TintableHeartParticle.queueColor(
                         spawnPos.x, spawnPos.y, spawnPos.z, colorCode);
-            } else if (particleType == ModParticles.CAKE.get()) {
-                com.kingodogo.buildscape.particle.CakeParticle.queueColor(
-                        spawnPos.x, spawnPos.y, spawnPos.z, colorCode);
-            } else if (particleType == ModParticles.CHERRY.get()) {
-                com.kingodogo.buildscape.particle.CherryParticle.queueColor(
-                        spawnPos.x, spawnPos.y, spawnPos.z, colorCode);
-            } else if (particleType == ModParticles.SNOWFLAKE.get()) {
-                com.kingodogo.buildscape.particle.SnowflakeParticle.queueColor(
+            } else if (particleType == ModParticles.TRAIL_NOTE.get()) {
+                com.kingodogo.buildscape.particle.TrailNoteParticle.queueColor(
                         spawnPos.x, spawnPos.y, spawnPos.z, colorCode);
             }
         }
 
+        // Determine number of particles to spawn based on spawnAmount
+        int count = (int) spawnAmount;
+        // Handle fractional part as probability
+        if (random.nextFloat() < (spawnAmount - count)) {
+            count++;
+        }
+
         // Spawn the particle(s)
         try {
-            if (particleType == ParticleTypes.BUBBLE) {
-                // Spawn multiple bubbles for better visibility (bubbles pop quickly)
-                int bubbleCount = 3 + random.nextInt(3); // 3 to 5 bubbles
-                for (int i = 0; i < bubbleCount; i++) {
-                    double bOffsetX = (random.nextDouble() - 0.5) * 0.5;
-                    double bOffsetZ = (random.nextDouble() - 0.5) * 0.5;
-                    double bOffsetY = (random.nextDouble() - 0.5) * 0.2;
-
-                    // Slower upward velocity for bubbles to linger
-                    double bVelX = velocityX * 0.5;
-                    double bVelY = velocityY * 0.5 + random.nextDouble() * 0.05;
-                    double bVelZ = velocityZ * 0.5;
-
-                    mc.level.addParticle(particleType,
-                            spawnPos.x + bOffsetX, spawnPos.y + bOffsetY, spawnPos.z + bOffsetZ,
-                            bVelX, bVelY, bVelZ);
+            for (int i = 0; i < count; i++) {
+                // Slightly randomize spawn position for multiple particles
+                double px = spawnPos.x;
+                double pz = spawnPos.z;
+                
+                if (count > 1) {
+                    px += (random.nextDouble() - 0.5) * 0.1;
+                    pz += (random.nextDouble() - 0.5) * 0.1;
                 }
-            } else {
-                // Standard single particle for other types
+
+                // Standard single particle for all types (including bubble, note, and cherry)
+                // Cherry particles will randomize their shape internally (in CherryParticle class)
                 mc.level.addParticle(particleType,
-                        spawnPos.x, spawnPos.y, spawnPos.z,
+                        px, spawnPos.y, pz,
                         velocityX, velocityY, velocityZ);
             }
         } catch (Exception e) {

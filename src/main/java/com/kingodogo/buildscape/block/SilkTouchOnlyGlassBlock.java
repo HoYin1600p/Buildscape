@@ -5,6 +5,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.AbstractGlassBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
@@ -14,6 +15,21 @@ public class SilkTouchOnlyGlassBlock extends AbstractGlassBlock {
 
     public SilkTouchOnlyGlassBlock(BlockBehaviour.Properties properties) {
         super(properties);
+    }
+
+    @Override
+    public float[] getBeaconColorMultiplier(
+            BlockState state,
+            LevelReader level,
+            BlockPos pos,
+            BlockPos beaconPos
+    ) {
+        int color = state.getMapColor(level, pos).col;
+        return new float[]{
+                ((color >> 16) & 0xFF) / 255.0f,
+                ((color >> 8) & 0xFF) / 255.0f,
+                (color & 0xFF) / 255.0f
+        };
     }
 
     @Override

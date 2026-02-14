@@ -206,10 +206,18 @@ public class PlayerAvatarPanel extends BasePanel {
             }
         }
 
+        int slotY = getSlotY();
         int renderAreaY = startY + PADDING - 5;
-        int renderAreaHeight = height - (PADDING * 2 - 5);
+        // Constrain player render area to stop above the slots
+        int playerRenderBottom = slotY;
+        int renderAreaHeight = playerRenderBottom - renderAreaY;
         int renderAreaX = startX + PADDING;
         int renderAreaWidth = width - PADDING * 2;
+
+        // Clip player to avoid overlapping slots
+        int playerScissorBottomGL = windowHeight - (int) (slotY * actualGuiScale);
+        int playerScissorHeight = (int) ((slotY - startY) * actualGuiScale);
+        RenderSystem.enableScissor(scissorX, playerScissorBottomGL, scissorWidth, playerScissorHeight);
 
         boolean rendered3D = false;
         if (mc.player != null && mc.level != null) {
@@ -230,6 +238,9 @@ public class PlayerAvatarPanel extends BasePanel {
             }
         }
 
+        // Restore original scissor for the rest of the UI
+        RenderSystem.enableScissor(scissorX, scissorY, scissorWidth, scissorHeight);
+
         if (!rendered3D) {
             renderEnhancedDisplay(poseStack, renderAreaX, renderAreaY, renderAreaWidth, renderAreaHeight,
                     cosmeticsToRender);
@@ -239,7 +250,9 @@ public class PlayerAvatarPanel extends BasePanel {
         RenderSystem.depthMask(false);
         poseStack.pushPose();
         poseStack.translate(0, 0, 400);
-        renderCosmeticSlots(poseStack, renderAreaX, renderAreaY, renderAreaWidth, renderAreaHeight, mouseX, mouseY);
+        poseStack.translate(0, 0, 400);
+        // Pass the calculated slotY directly
+        renderCosmeticSlots(poseStack, renderAreaX, slotY, renderAreaWidth, getSlotSize(), mouseX, mouseY);
         poseStack.popPose();
         RenderSystem.depthMask(true);
 
@@ -507,11 +520,11 @@ public class PlayerAvatarPanel extends BasePanel {
             RenderSystem.depthMask(true);
             RenderSystem.enableBlend();
             RenderSystem.defaultBlendFunc();
-            Vector3f light1 = new Vector3f(0.2f, 1.0f, -0.7f);
+            Vector3f light0 = new Vector3f(0.2f, 1.0f, 0.7f);
+            light0.normalize();
+            Vector3f light1 = new Vector3f(-0.2f, 1.0f, 0.7f);
             light1.normalize();
-            Vector3f light2 = new Vector3f(-0.2f, 1.0f, 0.7f);
-            light2.normalize();
-            RenderSystem.setupGui3DDiffuseLighting(light1, light2);
+            RenderSystem.setupGuiFlatDiffuseLighting(light0, light1);
 
             try {
                 RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
@@ -919,17 +932,15 @@ public class PlayerAvatarPanel extends BasePanel {
                 SupportersTabState.SLOT_TRAIL
         };
 
-        int slotSize = 22;
-        int spacing = 4;
+        int slotSize = getSlotSize();
+        int spacing = getSlotSpacing();
 
-        int renderAreaY = startY + PADDING + 20;
-        int renderAreaHeight = height - (PADDING * 2 + 20);
         int renderAreaX = startX + PADDING;
         int renderAreaWidth = width - PADDING * 2;
 
         int totalWidth = (slotSize * slots.length) + (spacing * (slots.length - 1));
         int slotStartX = renderAreaX + (renderAreaWidth - totalWidth) / 2;
-        int slotY = renderAreaY + renderAreaHeight - slotSize - 10;
+        int slotY = getSlotY();
 
         for (int i = 0; i < slots.length; i++) {
             int slotX = slotStartX + i * (slotSize + spacing);
@@ -972,18 +983,13 @@ public class PlayerAvatarPanel extends BasePanel {
 
         // Scale slot size and spacing based on GUI scale for proper rendering at all
         // scales
-        double actualGuiScale = mc.getWindow().getGuiScale();
-        double guiScaleFactor = 2.0 / actualGuiScale; // Normalize to scale 2
-        int baseSlotSize = 22;
-        int baseSpacing = 4;
-        int slotSize = (int) (baseSlotSize * guiScaleFactor);
-        int spacing = (int) (baseSpacing * guiScaleFactor);
-        slotSize = Math.max(16, Math.min(32, slotSize)); // Clamp between 16-32 pixels
-        spacing = Math.max(2, Math.min(6, spacing)); // Clamp between 2-6 pixels
+        int slotSize = getSlotSize();
+        int spacing = getSlotSpacing();
 
         int totalWidth = (slotSize * slots.length) + (spacing * (slots.length - 1));
         int slotStartX = x + (width - totalWidth) / 2;
-        int slotY = y + height - slotSize - (int) (10 * guiScaleFactor);
+        // Use passed Y directly as the top of the slots
+        int slotY = y;
 
         // Removed incorrect scaling logic
         double scaledMouseX = mouseX;
@@ -1134,11 +1140,11 @@ public class PlayerAvatarPanel extends BasePanel {
                 SupportersTabState.SLOT_WINGS,
                 SupportersTabState.SLOT_TRAIL
         };
-        int slotSize = 22;
-        int spacing = 4;
+        int slotSize = getSlotSize();
+        int spacing = getSlotSpacing();
         int totalWidth = (slotSize * slots.length) + (spacing * (slots.length - 1));
         int slotStartX = renderAreaX + (renderAreaWidth - totalWidth) / 2;
-        int slotY = renderAreaY + renderAreaHeight - slotSize - 10;
+        int slotY = getSlotY();
         int slotAreaHeight = slotSize + 20;
 
         if (mouseX >= slotStartX - 5 && mouseX < slotStartX + totalWidth + 5 &&
@@ -1166,11 +1172,11 @@ public class PlayerAvatarPanel extends BasePanel {
                 SupportersTabState.SLOT_TRAIL
         };
 
-        int slotSize = 22;
-        int spacing = 4;
+        int slotSize = getSlotSize();
+        int spacing = getSlotSpacing();
         int totalWidth = (slotSize * slots.length) + (spacing * (slots.length - 1));
         int slotStartX = x + (width - totalWidth) / 2;
-        int slotY = y + height - slotSize - 10;
+        int slotY = getSlotY();
 
         int slotMouseX = mouseX;
         int slotMouseY = mouseY;
@@ -1195,7 +1201,7 @@ public class PlayerAvatarPanel extends BasePanel {
                     case SupportersTabState.SLOT_CHEST -> slotLabel = "Chest";
                     case SupportersTabState.SLOT_LEGS -> slotLabel = "Legs";
                     case SupportersTabState.SLOT_FEET -> slotLabel = "Feet";
-                    case SupportersTabState.SLOT_WINGS -> slotLabel = "Wings";
+                    case SupportersTabState.SLOT_WINGS -> slotLabel = "Wings / Back";
                     case SupportersTabState.SLOT_TRAIL -> slotLabel = "Trail";
                 }
                 break;
@@ -1208,28 +1214,44 @@ public class PlayerAvatarPanel extends BasePanel {
 
         String tooltipText = null;
         if (hoveredCosmeticId != null && !hoveredCosmeticId.isEmpty()) {
-            tooltipText = hoveredCosmeticId;
-            ItemStack stack = registry.resolveToItemStack(hoveredCosmeticId);
-            if (stack != null && !stack.isEmpty()) {
-                net.minecraft.network.chat.Component hoverName = stack.getHoverName();
-                if (hoverName != null) {
-                    tooltipText = hoverName.getString();
+            // Prioritize Metadata Name
+            CosmeticManager cosmeticManager = CosmeticManager.getInstance();
+            com.kingodogo.buildscape.cosmetics.CosmeticManager.CosmeticMetadata metadata = cosmeticManager
+                    .getMetadata(hoveredCosmeticId);
+
+            if (metadata != null && metadata.name() != null && !metadata.name().isEmpty()) {
+                tooltipText = metadata.name();
+            } else {
+                // Fallback to Item Name
+                ItemStack stack = registry.resolveToItemStack(hoveredCosmeticId);
+                if (stack != null && !stack.isEmpty()) {
+                    net.minecraft.network.chat.Component hoverName = stack.getHoverName();
+                    if (hoverName != null) {
+                        tooltipText = hoverName.getString();
+                    }
                 }
             }
 
-            if (tooltipText == null || tooltipText.isEmpty() || tooltipText.equals(hoveredCosmeticId)) {
-                CosmeticManager cosmeticManager = CosmeticManager.getInstance();
-                com.kingodogo.buildscape.cosmetics.CosmeticManager.CosmeticMetadata metadata = cosmeticManager
-                        .getMetadata(hoveredCosmeticId);
-                if (metadata != null && metadata.name() != null && !metadata.name().isEmpty()) {
-                    tooltipText = metadata.name();
-                } else {
-                    String idPart = hoveredCosmeticId;
-                    if (hoveredCosmeticId.startsWith("buildscape:cosmatics/")) {
-                        idPart = hoveredCosmeticId.substring(hoveredCosmeticId.lastIndexOf("/") + 1);
-                    }
-                    tooltipText = idPart.replace("_", " ");
+            // Fallback to ID parsing if still null or equals ID or equals specific generic names
+            if (tooltipText == null || tooltipText.isEmpty() || tooltipText.equals(hoveredCosmeticId) || "Nether Star".equals(tooltipText)) {
+                String idPart = hoveredCosmeticId;
+                if (hoveredCosmeticId.startsWith("buildscape:cosmatics/")) {
+                    idPart = hoveredCosmeticId.substring(hoveredCosmeticId.lastIndexOf("/") + 1);
                 }
+                tooltipText = idPart.replace("_", " ");
+                // Capitalize first letter of each word
+                String[] words = tooltipText.split(" ");
+                StringBuilder sb = new StringBuilder();
+                for (String word : words) {
+                    if (word.length() > 0) {
+                        sb.append(Character.toUpperCase(word.charAt(0)));
+                        if (word.length() > 1) {
+                            sb.append(word.substring(1));
+                        }
+                        sb.append(" ");
+                    }
+                }
+                tooltipText = sb.toString().trim();
             }
         } else if (slotLabel != null) {
             tooltipText = slotLabel + " (Empty)";
@@ -1467,5 +1489,24 @@ public class PlayerAvatarPanel extends BasePanel {
             RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
             RenderSystem.enableDepthTest();
         }
+    }
+
+    private double getGuiScaleFactor() {
+        return 2.0 / mc.getWindow().getGuiScale();
+    }
+
+    private int getSlotSize() {
+        int s = (int) (22 * getGuiScaleFactor());
+        return Math.max(16, Math.min(32, s));
+    }
+
+    private int getSlotSpacing() {
+        int s = (int) (4 * getGuiScaleFactor());
+        return Math.max(2, Math.min(6, s));
+    }
+
+    private int getSlotY() {
+        int margin = Math.max(1, (int) (height * 0.01));
+        return startY + height - margin - getSlotSize();
     }
 }

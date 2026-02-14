@@ -1538,23 +1538,24 @@ public class BuildScape {
                         if (!serverFullyInitialized) {
                                 com.kingodogo.buildscape.config.PillarIdManager.resetWorldCache();
 
-                                // Register callback to sync config when file changes
-                                com.kingodogo.buildscape.config.PillarParticleConfig.addConfigReloadCallback(() -> {
-                                        net.minecraft.server.MinecraftServer server = net.minecraftforge.server.ServerLifecycleHooks
-                                                        .getCurrentServer();
-                                        if (server != null && server.isRunning()
-                                                        && server.getPlayerList().getPlayerCount() > 0) {
-                                                com.kingodogo.buildscape.config.PillarParticleConfig serverConfig = com.kingodogo.buildscape.config.PillarParticleConfig
-                                                                .get();
-                                                com.kingodogo.buildscape.network.SyncConfigPacket configPacket = new com.kingodogo.buildscape.network.SyncConfigPacket(
-                                                                serverConfig);
-                                                com.kingodogo.buildscape.network.ModMessages.INSTANCE.send(
-                                                                net.minecraftforge.network.PacketDistributor.ALL
-                                                                                .noArg(),
-                                                                configPacket);
-                                                LOGGER.info("BuildScape: Config file changed - synced to all players");
-                                        }
-                                });
+                            // Register callback to sync config when file changes
+                            com.kingodogo.buildscape.config.PillarParticleConfig.addConfigReloadCallback((isRemote) -> {
+                                if (!isRemote) {
+                                    net.minecraft.server.MinecraftServer server = net.minecraftforge.server.ServerLifecycleHooks
+                                            .getCurrentServer();
+                                    if (server != null && server.isRunning()
+                                            && server.getPlayerList().getPlayerCount() > 0) {
+                                        com.kingodogo.buildscape.config.PillarParticleConfig serverConfig = com.kingodogo.buildscape.config.PillarParticleConfig
+                                                .get();
+                                        com.kingodogo.buildscape.network.SyncConfigPacket configPacket = new com.kingodogo.buildscape.network.SyncConfigPacket(
+                                                serverConfig);
+                                        com.kingodogo.buildscape.network.ModMessages.INSTANCE.send(
+                                                net.minecraftforge.network.PacketDistributor.ALL
+                                                        .noArg(),
+                                                configPacket);
+                                    }
+                                }
+                            });
                         }
 
                         com.kingodogo.buildscape.config.PillarIdManager manager = com.kingodogo.buildscape.config.PillarIdManager

@@ -34,7 +34,22 @@ public class PillarParticleConfig {
     private static Thread watchThread = null;
     private static final AtomicBoolean watcherInitialized = new AtomicBoolean(
             false);
-    private static Runnable configReloadCallback = null;
+    private static final List<java.util.function.Consumer<Boolean>> configReloadCallbacks = new ArrayList<>();
+    private static long lastNotifyTime = 0;
+
+    public static void addConfigReloadCallback(java.util.function.Consumer<Boolean> callback) {
+        configReloadCallbacks.add(callback);
+    }
+
+    private static void notifyCallbacks(boolean isRemote) {
+        for (java.util.function.Consumer<Boolean> callback : configReloadCallbacks) {
+            try {
+                callback.accept(isRemote);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
     public Set<String> items = new HashSet<>();
 
@@ -121,9 +136,7 @@ public class PillarParticleConfig {
 
             if (reloadProperties) {
                 INSTANCE.loadPropertiesInternal();
-                if (configReloadCallback != null) {
-                    configReloadCallback.run();
-                }
+                notifyCallbacks(false);
             }
             if (reloadItems) {
                 INSTANCE.loadItemsInternal();
@@ -182,9 +195,7 @@ public class PillarParticleConfig {
         SERVER_CONFIG.items = new HashSet<>(
                 packet.items != null ? packet.items : new HashSet<>());
 
-        if (configReloadCallback != null) {
-            configReloadCallback.run();
-        }
+        notifyCallbacks(true);
     }
 
     private static void initializeFileWatcher() {
@@ -227,6 +238,8 @@ public class PillarParticleConfig {
 
                                     if (filename.toString().equals(PROPERTIES_FILE_NAME) ||
                                             filename.toString().equals(ITEMS_FILE_NAME)) {
+
+                                        // Simple debounce: wait a bit to let file write finish
                                         Thread.sleep(100);
 
                                         if (INSTANCE != null) {
@@ -237,15 +250,28 @@ public class PillarParticleConfig {
                                                     .toString()
                                                     .equals(ITEMS_FILE_NAME);
 
+                                            boolean reloaded = false;
                                             if (wasProperties) {
                                                 INSTANCE.loadPropertiesInternal();
+                                                // Check if it actually reloaded by comparing timestamps/sizes isn't easy here since loadPropertiesInternal updates them.
+                                                // But loadPropertiesInternal is only called if we are here. 
+                                                // To properly debounce, we should check if enough time passed since last reload/notify.
+                                                reloaded = true;
                                             }
                                             if (wasItems) {
                                                 INSTANCE.loadItemsInternal();
+                                                reloaded = true;
                                             }
 
-                                            if (configReloadCallback != null) {
-                                                configReloadCallback.run();
+                                            if (reloaded) {
+                                                // Debounce notifications: only notify if > 500ms since last notification
+                                                long currentTime = System.currentTimeMillis();
+                                                if (currentTime - lastNotifyTime > 500) {
+                                                    lastNotifyTime = currentTime;
+                                                    if (configReloadCallbacks.isEmpty() == false) {
+                                                        notifyCallbacks(false);
+                                                    }
+                                                }
                                             }
                                         }
                                     }
@@ -279,9 +305,6 @@ public class PillarParticleConfig {
         SERVER_CONFIG = null;
     }
 
-    public static void setConfigReloadCallback(Runnable callback) {
-        configReloadCallback = callback;
-    }
 
     private File getPropertiesFile() {
         return new File(getConfigDir(), PROPERTIES_FILE_NAME);

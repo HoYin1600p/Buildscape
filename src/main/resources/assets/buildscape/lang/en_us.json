@@ -1866,5 +1866,6 @@
   "item.buildscape.polished_black_concrete_wall": "Polished Black Concrete Wall",
   "block.buildscape.smoke_vent": "Smoke Vent",
   "item.buildscape.smoke_vent": "Smoke Vent",
-  "buildscape.config.particles.reset_tooltip": "Reset Configuration"
+  "buildscape.config.particles.reset_tooltip": "Reset Configuration",
+  "buildscape.config.op_only": "It Seems like Kingo Forgot to enable it for PUBLIC ( Operator's Only ) :P"
 }

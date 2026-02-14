@@ -49,13 +49,12 @@ public class MudSlabBlock extends SlabBlock {
             CollisionContext context
     ) {
         SlabType type = state.getValue(TYPE);
-        switch (type) {
-            case TOP:
-                return TOP_SHAPE;
-            case DOUBLE:
-                return DOUBLE_SHAPE;
-            default:
-                return BOTTOM_SHAPE;
+        if (type == SlabType.TOP) {
+            return TOP_SHAPE;
+        } else if (type == SlabType.DOUBLE) {
+            return DOUBLE_SHAPE;
+        } else {
+            return BOTTOM_SHAPE;
         }
     }
 }

@@ -31,15 +31,13 @@ public class ClientEvents {
 
     private static Component overlayMessage = null;
     private static long overlayMessageTime = 0;
-    private static final long OVERLAY_DURATION = 60;
+    private static final long OVERLAY_DURATION = 5000;
 
     private static int lastHedgeStep = -1;
 
     public static void setOverlayMessage(Component message) {
         overlayMessage = message;
-        overlayMessageTime = Minecraft.getInstance().level != null
-                ? Minecraft.getInstance().level.getGameTime()
-                : 0;
+        overlayMessageTime = System.currentTimeMillis();
     }
 
     public static void resetAllPillarParticles() {
@@ -71,7 +69,7 @@ public class ClientEvents {
     }
 
     public static void initializeConfigCallback() {
-        PillarParticleConfig.setConfigReloadCallback(() -> {
+        PillarParticleConfig.addConfigReloadCallback((isRemote) -> {
             if (Minecraft.getInstance().level != null) {
                 Minecraft.getInstance()
                         .execute(() -> {
@@ -85,33 +83,59 @@ public class ClientEvents {
     public static void onRenderGameOverlay(RenderGameOverlayEvent.Post event) {
         if (event.getType() != RenderGameOverlayEvent.ElementType.ALL) return;
 
+        int screenWidth = event.getWindow().getGuiScaledWidth();
+        int screenHeight = event.getWindow().getGuiScaledHeight();
+
+        renderOverlay(event.getMatrixStack(), screenWidth, screenHeight);
+    }
+
+    public static void renderOverlay(com.mojang.blaze3d.vertex.PoseStack poseStack, int screenWidth, int screenHeight) {
         Minecraft mc = Minecraft.getInstance();
-        if (mc.player == null || mc.level == null) return;
 
         if (overlayMessage != null) {
-            long currentTime = mc.level.getGameTime();
+            long currentTime = System.currentTimeMillis();
             long elapsed = currentTime - overlayMessageTime;
 
-            if (elapsed > OVERLAY_DURATION) {
+            // 5 seconds duration (5000 ms)
+            if (elapsed > 5000) {
                 overlayMessage = null;
                 return;
             }
 
-            int screenWidth = event.getWindow().getGuiScaledWidth();
-            int screenHeight = event.getWindow().getGuiScaledHeight();
-
             int x = screenWidth / 2;
-            int y = screenHeight - 50;
+            int y = screenHeight / 2;
 
-            com.mojang.blaze3d.vertex.PoseStack poseStack = event.getMatrixStack();
+            poseStack.pushPose();
+            poseStack.translate(0, 0, 500); // Translate Z first to be safe
+
+            // Pop animation
+            float elapsedSeconds = elapsed / 1000.0f;
+            float scale = 1.0f;
+
+            if (elapsedSeconds < 0.25f) {
+                // Pop in (0 to 0.25s)
+                scale = (elapsedSeconds / 0.25f) * 1.2f;
+            } else if (elapsedSeconds < 0.4f) {
+                // Settle back to 1.0 (0.25s to 0.4s)
+                scale = 1.2f - ((elapsedSeconds - 0.25f) / 0.15f) * 0.2f;
+            }
+
+            poseStack.translate(x, y, 0);
+            poseStack.scale(scale, scale, 1.0f);
+            poseStack.translate(-x, -y, 0);
+
+            com.mojang.blaze3d.systems.RenderSystem.disableDepthTest();
             GuiComponent.drawCenteredString(
                     poseStack,
                     mc.font,
                     overlayMessage,
                     x,
                     y,
-                    0xFFFFFF
+                    0xFFFF5555 // Red with full Alpha 
             );
+            com.mojang.blaze3d.systems.RenderSystem.enableDepthTest();
+
+            poseStack.popPose();
         }
     }
 

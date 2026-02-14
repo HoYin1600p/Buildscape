@@ -1,16 +1,21 @@
 {
-  "type": "minecraft:crafting_shapeless",
+  "type": "minecraft:crafting_shaped",
   "category": "misc",
-  "ingredients": [
-    {
-      "item": "minecraft:vine"
-    },
-    {
-      "item": "minecraft:poppy"
-    }
+  "pattern": [
+    " P ",
+    " V ",
+    " P "
   ],
+  "key": {
+    "P": {
+      "item": "minecraft:poppy"
+    },
+    "V": {
+      "item": "minecraft:vine"
+    }
+  },
   "result": {
-    "count": 1,
-    "item": "buildscape:red_rose_vines"
+    "item": "buildscape:red_rose_vines",
+    "count": 1
   }
 }

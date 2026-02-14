@@ -38,5 +38,12 @@ public class ModMessages {
                 SyncConfigPacket::decode,
                 SyncConfigPacket::handle
         );
+        INSTANCE.registerMessage(
+                id++,
+                TreeChopPacket.class,
+                TreeChopPacket::encode,
+                TreeChopPacket::decode,
+                TreeChopPacket::handle
+        );
     }
 }

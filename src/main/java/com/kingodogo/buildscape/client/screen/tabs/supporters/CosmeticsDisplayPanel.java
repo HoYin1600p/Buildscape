@@ -673,33 +673,44 @@ public class CosmeticsDisplayPanel extends BasePanel {
         // Removed setPreviewCosmeticId to separate hover states
 
         if (hoveredCosmeticId != null && !hoveredCosmeticId.isEmpty()) {
-            String tooltipText = hoveredCosmeticId;
-            CosmeticRegistry registry = CosmeticRegistry.getInstance();
-            ItemStack stack = registry.resolveToItemStack(hoveredCosmeticId);
-            if (stack != null && !stack.isEmpty()) {
-                net.minecraft.network.chat.Component hoverName = stack.getHoverName();
-                if (hoverName != null) {
-                    tooltipText = hoverName.getString();
-                }
-            }
+            String tooltipText = null;
+            // Prioritize Metadata Name
+            CosmeticManager cosmeticManager = CosmeticManager.getInstance();
+            com.kingodogo.buildscape.cosmetics.CosmeticManager.CosmeticMetadata metadata = cosmeticManager
+                    .getMetadata(hoveredCosmeticId);
 
-            if (tooltipText == null || tooltipText.isEmpty() || tooltipText.equals(hoveredCosmeticId)) {
-                CosmeticManager cosmeticManager = CosmeticManager.getInstance();
-                com.kingodogo.buildscape.cosmetics.CosmeticManager.CosmeticMetadata metadata = cosmeticManager
-                        .getMetadata(hoveredCosmeticId);
-                if (metadata != null && metadata.name() != null && !metadata.name().isEmpty()) {
-                    tooltipText = metadata.name();
-                } else {
-                    String idPart = hoveredCosmeticId;
-                    if (hoveredCosmeticId.startsWith("buildscape:cosmatics/")) {
-                        idPart = hoveredCosmeticId.substring(hoveredCosmeticId.lastIndexOf("/") + 1);
+            if (metadata != null && metadata.name() != null && !metadata.name().isEmpty()) {
+                tooltipText = metadata.name();
+            } else {
+                CosmeticRegistry registry = CosmeticRegistry.getInstance();
+                ItemStack stack = registry.resolveToItemStack(hoveredCosmeticId);
+                if (stack != null && !stack.isEmpty()) {
+                    net.minecraft.network.chat.Component hoverName = stack.getHoverName();
+                    if (hoverName != null) {
+                        tooltipText = hoverName.getString();
                     }
-                    tooltipText = idPart.replace("_", " ");
                 }
             }
 
-            if (tooltipText == null || tooltipText.isEmpty()) {
-                tooltipText = "Unknown Item";
+            if (tooltipText == null || tooltipText.isEmpty() || tooltipText.equals(hoveredCosmeticId) || "Nether Star".equals(tooltipText)) {
+                String idPart = hoveredCosmeticId;
+                if (hoveredCosmeticId.startsWith("buildscape:cosmatics/")) {
+                    idPart = hoveredCosmeticId.substring(hoveredCosmeticId.lastIndexOf("/") + 1);
+                }
+                tooltipText = idPart.replace("_", " ");
+                // Capitalize first letter of each word
+                String[] words = tooltipText.split(" ");
+                StringBuilder sb = new StringBuilder();
+                for (String word : words) {
+                    if (word.length() > 0) {
+                        sb.append(Character.toUpperCase(word.charAt(0)));
+                        if (word.length() > 1) {
+                            sb.append(word.substring(1));
+                        }
+                        sb.append(" ");
+                    }
+                }
+                tooltipText = sb.toString().trim();
             }
 
             RenderSystem.disableScissor();

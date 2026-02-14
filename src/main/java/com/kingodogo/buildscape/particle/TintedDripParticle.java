@@ -54,7 +54,7 @@ public class TintedDripParticle extends TextureSheetParticle {
             this.gravity = 0.0F;
             this.lifetime = 150 + level.random.nextInt(100);
         } else {
-            this.gravity = 0.005F;
+            this.gravity = 0.02F;
             this.lifetime = 300 + level.random.nextInt(150);
         }
         this.hasPhysics = true;

@@ -77,10 +77,10 @@ public class ColoredSporeBlossomBlock
                 }
             }
 
-            if (random.nextFloat() < 0.30F) {
-                int spreadParticleCount = 3 + random.nextInt(18);
+            if (random.nextFloat() < 0.60F) {
+                int spreadParticleCount = 10 + random.nextInt(25);
                 for (int p = 0; p < spreadParticleCount; p++) {
-                    double distance = 3.0D + random.nextDouble() * 12.0D;
+                    double distance = 3.0D + random.nextDouble() * 16.0D;
                     double angle = random.nextDouble() * 2.0D * Math.PI;
 
                     double spreadX = centerX + Math.cos(angle) * distance;

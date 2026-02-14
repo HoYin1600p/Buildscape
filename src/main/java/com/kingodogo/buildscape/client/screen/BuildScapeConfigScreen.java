@@ -179,7 +179,9 @@ public class BuildScapeConfigScreen extends Screen {
                 sidebarX, sidebarY,
                 buttonWidth, buttonHeight,
                 new TranslatableComponent("buildscape.config.category.items"),
-                (button) -> setActiveTab(new PillarItemsConfigTab(this)));
+                (button) -> {
+                    if (checkOpAccessAndNotify()) setActiveTab(new PillarItemsConfigTab(this));
+                });
         addRenderableWidget(pillarItemsButton);
 
         sidebarY += buttonHeight + spacing;
@@ -187,7 +189,9 @@ public class BuildScapeConfigScreen extends Screen {
                 sidebarX, sidebarY,
                 buttonWidth, buttonHeight,
                 new TranslatableComponent("buildscape.config.category.particles"),
-                (button) -> setActiveTab(new PillarParticlesConfigTab(this)));
+                (button) -> {
+                    if (checkOpAccessAndNotify()) setActiveTab(new PillarParticlesConfigTab(this));
+                });
         addRenderableWidget(pillarParticlesButton);
 
         sidebarY += buttonHeight + spacing;
@@ -195,7 +199,9 @@ public class BuildScapeConfigScreen extends Screen {
                 sidebarX, sidebarY,
                 buttonWidth, buttonHeight,
                 new TranslatableComponent("buildscape.config.category.ids"),
-                (button) -> setActiveTab(new PillarIdsConfigTab(this)));
+                (button) -> {
+                    if (checkOpAccessAndNotify()) setActiveTab(new PillarIdsConfigTab(this));
+                });
         addRenderableWidget(pillarIdsButton);
 
         sidebarY += buttonHeight + spacing;
@@ -216,8 +222,27 @@ public class BuildScapeConfigScreen extends Screen {
         addRenderableWidget(kofiButton);
 
         if (activeTab == null) {
-            setActiveTab(new PillarItemsConfigTab(this));
+            if (hasOpAccess()) {
+                setActiveTab(new PillarItemsConfigTab(this));
+            } else {
+                setActiveTab(new com.kingodogo.buildscape.client.screen.tabs.supporters.SupportersOnlyTab(this));
+            }
         }
+    }
+
+    private boolean hasOpAccess() {
+        Minecraft mc = Minecraft.getInstance();
+        return mc.player != null && mc.player.hasPermissions(2);
+    }
+
+    private boolean checkOpAccessAndNotify() {
+        if (hasOpAccess()) return true;
+
+        // Show message using ClientEvents overlay
+        com.kingodogo.buildscape.client.ClientEvents.setOverlayMessage(
+                new TranslatableComponent("buildscape.config.op_only")
+        );
+        return false;
     }
 
     @Override
@@ -434,6 +459,8 @@ public class BuildScapeConfigScreen extends Screen {
             com.mojang.blaze3d.systems.RenderSystem.disableScissor();
             activeTab.renderTooltips(poseStack, mouseX, mouseY, partialTick);
         }
+
+        com.kingodogo.buildscape.client.ClientEvents.renderOverlay(poseStack, width, height);
     }
 
     @Override

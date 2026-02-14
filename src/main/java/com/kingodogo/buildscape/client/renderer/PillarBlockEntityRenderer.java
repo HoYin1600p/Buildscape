@@ -11,23 +11,19 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.item.AxeItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.SpawnEggItem;
+import net.minecraft.world.item.SwordItem;
 import net.minecraft.world.level.Level;
 
 import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class PillarBlockEntityRenderer
         implements BlockEntityRenderer<PillarBlockEntity> {
 
     private final ItemRenderer itemRenderer;
-    // Cache for entity instances to avoid creating new ones every frame
-    private static final Map<String, Entity> entityCache =
-            new ConcurrentHashMap<>();
 
     // Client-side timers for smooth rotation animation (completely independent of server)
     // Maps block position to the time when the item was first rendered on client
@@ -41,6 +37,27 @@ public class PillarBlockEntityRenderer
             BlockEntityRendererProvider.Context context
     ) {
         this.itemRenderer = Minecraft.getInstance().getItemRenderer();
+    }
+
+    // Cache for model bounds to avoid recalculating every frame
+    private static final Map<BakedModel, net.minecraft.world.phys.AABB> modelBoundsCache = new java.util.WeakHashMap<>();
+
+    public static void cleanupStaleEntities() {
+        MobPillarRenderer.cleanupStaleEntities();
+    }
+
+    public static void clearEntityCache(BlockPos pos) {
+        MobPillarRenderer.clearEntityCache(pos);
+        // Also clear the client-side timer and item hash for this position
+        clientStartTimes.remove(pos);
+        itemHashes.remove(pos);
+    }
+
+    public static void clearEntityCache() {
+        MobPillarRenderer.clearAllEntityCaches();
+        // Clear all client-side timers and item hashes
+        clientStartTimes.clear();
+        itemHashes.clear();
     }
 
     @Override
@@ -78,14 +95,7 @@ public class PillarBlockEntityRenderer
             poseStack.pushPose();
 
             // Check if the item is a spawn egg to determine position and rotation speed
-            boolean isSpawnEgg = displayedItem.getItem() instanceof SpawnEggItem;
-
-            // Check if the item has a name tag with "spin" - only then will mobs rotate
-            // Use same logic as dye detection - check NBT directly
-            boolean shouldSpin = false;
-            if (isSpawnEgg) {
-                shouldSpin = hasSpinNameTag(displayedItem);
-            }
+            boolean isSpawnEgg = displayedItem.getItem() instanceof SpawnEggItem && !hasItemNameTag(displayedItem);
 
             // Position: items and mobs both hover just above pillar with 1-2 pixel gap
             // Items: 1.4625 blocks (1.15 + 5 pixels = 0.3125 blocks)
@@ -100,14 +110,18 @@ public class PillarBlockEntityRenderer
             // Items: Always rotate (360 degrees every 4 seconds, 90 degrees per second)
             // Mobs: Only rotate if name tag is "spin" (40% slower than items: 54 degrees per second)
             // If mob doesn't have "spin" name tag, rotation stays at 0 (no rotation)
+
+            boolean isFixed = false;
+            if (!isSpawnEgg) {
+                isFixed = isFixed(displayedItem);
+            }
+
             float rotationSpeed = 0.0f;
             if (!isSpawnEgg) {
                 // Items always rotate
                 rotationSpeed = 90.0f; // degrees per second
-            } else if (shouldSpin) {
-                // Mobs only rotate if name tag is "spin"
-                rotationSpeed = 54.0f; // 40% slower than items
             }
+            // Mobs don't use this rotation speed - they are handled by MobPillarRenderer
 
             // Use client-side system time for completely smooth animation independent of server
             // System.nanoTime() returns time in nanoseconds since some arbitrary point
@@ -137,31 +151,37 @@ public class PillarBlockEntityRenderer
             // For items, apply rotation to pose stack
             // For mobs, rotation will be handled by entity's rotation values
             if (!isSpawnEgg) {
-                poseStack.mulPose(Vector3f.YP.rotationDegrees(rotation));
+                if (isFixed) {
+                    // Fixed items don't spin, they face the pillar's direction
+                    float facingYaw = blockEntity.getFacingYaw();
+                    poseStack.mulPose(Vector3f.YP.rotationDegrees(facingYaw));
+                } else {
+                    poseStack.mulPose(Vector3f.YP.rotationDegrees(rotation));
+                }
             }
 
             // Add a slight floating animation (bobbing up and down)
-            float bobAmount = (float) Math.sin(gameTime * 2.0f) * 0.05f; // Bob up and down
-            poseStack.translate(0, bobAmount, 0);
+            if (!isFixed) {
+                float bobAmount = (float) Math.sin(gameTime * 2.0f) * 0.05f; // Bob up and down
+                poseStack.translate(0, bobAmount, 0);
+            }
 
             // Check if the item is a spawn egg
             if (isSpawnEgg) {
                 try {
-                    // Check if spawn egg has "Grum" or "Dinnerbone" name for upside-down rendering
-                    boolean isUpsideDown = hasUpsideDownName(displayedItem);
-                    // Render mob instead of item
-                    renderMob(
+                    // Use the new MobPillarRenderer for modular state-based rendering
+                    MobPillarRenderer.renderMob(
                             (SpawnEggItem) displayedItem.getItem(),
                             displayedItem,
-                            blockEntity,
+                            pos,
+                            blockEntity.getLevel(),
                             partialTicks,
                             poseStack,
                             bufferSource,
                             combinedLight,
                             rotation,
                             gameTime,
-                            shouldSpin,
-                            isUpsideDown
+                            blockEntity.getFacingYaw()
                     );
                 } catch (Exception e) {
                     // If rendering fails, just render as regular item to prevent crashes
@@ -183,27 +203,165 @@ public class PillarBlockEntityRenderer
                 }
             } else {
                 // Render item normally
-                poseStack.scale(0.5f, 0.5f, 0.5f);
+                if (isFixed) {
+                    // Revert to FIXED transform to guarantee correct positioning.
+                    // The "white outline" is a lighting artifact of FIXED mode, but NONE mode causes unfixable positioning errors.
+                    // We prioritize the correct 70/30 positioning logic here.
+                    BakedModel model = this.itemRenderer.getModel(displayedItem, blockEntity.getLevel(), null, 0);
+                    net.minecraft.world.phys.AABB bounds = getOrCalculateBounds(model);
 
-                // Get the item model
-                Level level = blockEntity.getLevel();
-                BakedModel model =
-                        this.itemRenderer.getModel(displayedItem, level, null, 0);
+                    double lenX = bounds.maxX - bounds.minX;
+                    double lenY = bounds.maxY - bounds.minY;
+                    double visualLength = Math.sqrt(lenX * lenX + lenY * lenY);
+                    if (visualLength < 0.1) visualLength = 1.0;
 
-                // Check if item has enchantments for glint rendering (hasFoil() checks for glint effect)
-                boolean hasGlint = displayedItem.hasFoil();
+                    float scale = 0.8f;
+                    double standardLength = 0.85;
 
-                // Render the item with glint if it has enchantments
-                this.itemRenderer.render(
-                        displayedItem,
-                        ItemTransforms.TransformType.FIXED,
-                        hasGlint,
-                        poseStack,
-                        bufferSource,
-                        combinedLight,
-                        combinedOverlay,
-                        model
-                );
+                    boolean isSword = displayedItem.getItem() instanceof SwordItem;
+                    boolean isAxe = displayedItem.getItem() instanceof AxeItem;
+                    boolean isArmor = displayedItem.getItem() instanceof net.minecraft.world.item.ArmorItem;
+
+                    // Check if item is named "item" to render as normal small item
+                    boolean renderAsItem = hasItemNameTag(displayedItem);
+
+                    // Debug logging
+                    if (isArmor) {
+                        System.out.println("ARMOR DETECTED: " + displayedItem.getItem().getClass().getName() + ", renderAsItem=" + renderAsItem);
+                    }
+
+                    if (isSword) {
+                        // Base position for standard sword
+                        double baseTransY = -0.5;
+
+                        // Dynamic Adjustment: 70% of EXTRA length sticks OUT.
+                        double extraLength = Math.max(0, visualLength - standardLength);
+                        double transY = baseTransY + (extraLength * 0.7 * scale);
+
+                        // Dynamic Collision Check
+                        double tipDist = (visualLength / 2.0) * scale;
+                        double tipY = (1.4625 + transY) - tipDist;
+
+                        if (tipY < 0.05) {
+                            double correctiveLift = 0.05 - tipY;
+                            transY += correctiveLift;
+                        }
+
+                        poseStack.translate(0, transY, 0);
+                        poseStack.mulPose(Vector3f.ZP.rotationDegrees(135));
+                        poseStack.scale(scale, scale, scale);
+
+                    } else if (isAxe) {
+                        // Axes should look "chopped" into the pillar (like the sword)
+                        // Handle UP, Head DOWN.
+                        // Adjusted for steeper angle: -0.55 base, 190 deg rotation (~65 deg handle angle)
+                        double baseTransY = -0.55;
+
+                        double extraLength = Math.max(0, visualLength - standardLength);
+                        double transY = baseTransY + (extraLength * 0.7 * scale);
+
+                        double tipDist = (visualLength / 2.0) * scale;
+                        double tipY = (1.4625 + transY) - tipDist;
+
+                        if (tipY < 0.05) {
+                            double correctiveLift = 0.05 - tipY;
+                            transY += correctiveLift;
+                        }
+
+                        poseStack.translate(0, transY, 0);
+                        // Rotate 190 degrees to tilt handle to ~65 degrees (steeper angle)
+                        poseStack.mulPose(Vector3f.ZP.rotationDegrees(190));
+                        poseStack.scale(scale, scale, scale);
+                    } else if (isArmor && !renderAsItem) {
+                        // Armor rendering: BIG and BOLD by default
+                        // Position at lowest point with proper offset
+                        System.out.println("RENDERING ARMOR IN BIG MODE!");
+                        net.minecraft.world.item.ArmorItem armorItem = (net.minecraft.world.item.ArmorItem) displayedItem.getItem();
+                        net.minecraft.world.entity.EquipmentSlot slot = armorItem.getSlot();
+
+                        // Scale armor to be prominent (1.2x larger than normal items)
+                        float armorScale = 1.2f;
+
+                        // Different positioning based on armor type
+                        double baseTransY;
+                        float rotationAngle;
+
+                        switch (slot) {
+                            case HEAD: // Helmet
+                                baseTransY = -0.3;
+                                rotationAngle = 0; // Upright
+                                break;
+                            case CHEST: // Chestplate
+                                baseTransY = -0.35;
+                                rotationAngle = 0; // Upright
+                                break;
+                            case LEGS: // Leggings
+                                baseTransY = -0.4;
+                                rotationAngle = 0; // Upright
+                                break;
+                            case FEET: // Boots
+                                baseTransY = -0.45;
+                                rotationAngle = 0; // Upright
+                                break;
+                            default:
+                                baseTransY = -0.35;
+                                rotationAngle = 0;
+                                break;
+                        }
+
+                        // Apply dynamic offset based on model bounds
+                        double extraLength = Math.max(0, visualLength - standardLength);
+                        double transY = baseTransY + (extraLength * 0.5 * armorScale);
+
+                        // Ensure lowest point doesn't go below pillar top
+                        double tipDist = (visualLength / 2.0) * armorScale;
+                        double tipY = (1.4625 + transY) - tipDist;
+
+                        if (tipY < 0.05) {
+                            double correctiveLift = 0.05 - tipY;
+                            transY += correctiveLift;
+                        }
+
+                        poseStack.translate(0, transY, 0);
+                        if (rotationAngle != 0) {
+                            poseStack.mulPose(Vector3f.ZP.rotationDegrees(rotationAngle));
+                        }
+                        poseStack.scale(armorScale, armorScale, armorScale);
+                    } else {
+                        poseStack.scale(0.5f, 0.5f, 0.5f);
+                    }
+
+                    // Render using FIXED - precise positioning is more important than minor artifacts
+                    boolean hasGlint = displayedItem.hasFoil();
+                    this.itemRenderer.render(
+                            displayedItem,
+                            ItemTransforms.TransformType.FIXED,
+                            hasGlint,
+                            poseStack,
+                            bufferSource,
+                            combinedLight,
+                            combinedOverlay,
+                            model
+                    );
+                } else {
+                    // Standard floating item rendering
+                    poseStack.scale(0.5f, 0.5f, 0.5f);
+
+                    Level level = blockEntity.getLevel();
+                    BakedModel model = this.itemRenderer.getModel(displayedItem, level, null, 0);
+                    boolean hasGlint = displayedItem.hasFoil();
+
+                    this.itemRenderer.render(
+                            displayedItem,
+                            ItemTransforms.TransformType.FIXED,
+                            hasGlint,
+                            poseStack,
+                            bufferSource,
+                            combinedLight,
+                            combinedOverlay,
+                            model
+                    );
+                }
             }
 
             poseStack.popPose();
@@ -217,414 +375,51 @@ public class PillarBlockEntityRenderer
         }
     }
 
-    public static void cleanupStaleEntities() {
-        entityCache
-                .entrySet()
-                .removeIf(entry -> {
-                    Entity entity = entry.getValue();
-                    if (entity == null || !entity.isAlive()) {
-                        return true;
-                    }
-                    // Remove entities that are too old (older than 5 minutes of game time)
-                    // This prevents memory leaks if blocks are removed without calling clearEntityCache
-                    return false; // For now, keep all alive entities
-                });
+    private net.minecraft.world.phys.AABB getOrCalculateBounds(BakedModel model) {
+        return modelBoundsCache.computeIfAbsent(model, this::calculateBounds);
     }
 
-    public static void clearEntityCache(BlockPos pos) {
-        // Remove all entities cached for this position
-        entityCache
-                .entrySet()
-                .removeIf(entry -> {
-                    if (
-                            entry
-                                    .getKey()
-                                    .startsWith(pos.getX() + "," + pos.getY() + "," + pos.getZ() + ":")
-                    ) {
-                        Entity entity = entry.getValue();
-                        if (entity != null && entity.isAlive()) {
-                            entity.remove(Entity.RemovalReason.DISCARDED);
-                        }
-                        return true;
-                    }
-                    return false;
-                });
+    private net.minecraft.world.phys.AABB calculateBounds(BakedModel model) {
+        double minX = Double.MAX_VALUE, minY = Double.MAX_VALUE, minZ = Double.MAX_VALUE;
+        double maxX = -Double.MAX_VALUE, maxY = -Double.MAX_VALUE, maxZ = -Double.MAX_VALUE;
 
-        // Also clear the client-side timer and item hash for this position
-        clientStartTimes.remove(pos);
-        itemHashes.remove(pos);
-    }
+        java.util.Random rand = new java.util.Random();
+        // Check all sides + null side
+        for (net.minecraft.core.Direction dir : new net.minecraft.core.Direction[]{null, net.minecraft.core.Direction.DOWN, net.minecraft.core.Direction.UP, net.minecraft.core.Direction.NORTH, net.minecraft.core.Direction.SOUTH, net.minecraft.core.Direction.WEST, net.minecraft.core.Direction.EAST}) {
+            rand.setSeed(42L);
+            java.util.List<net.minecraft.client.renderer.block.model.BakedQuad> quads = model.getQuads(null, dir, rand);
+            for (net.minecraft.client.renderer.block.model.BakedQuad quad : quads) {
+                int[] vertices = quad.getVertices();
+                // Vertex data format: [x, y, z, color, u, v, ...] (usually IVertexBuilder format)
+                // Default format is usually Position (3 floats) ...
+                // Unpacking raw data relies on DefaultVertexFormat.BLOCK usually.
+                // Standard baked quad stores data as int array.
+                // Position 3 floats * 4 bytes? No, vertices is int[].
+                // DefaultVertexFormat.BLOCK: Position(3F), Color(4UB), UV(2F), UV2(2S), Normal(3B), Padding(1B) = 32 bytes = 8 ints.
+                // Position is at offset 0, 1, 2.
 
-    public static void clearEntityCache() {
-        // Remove all entities and discard them
-        entityCache
-                .values()
-                .forEach(entity -> {
-                    if (entity != null && entity.isAlive()) {
-                        entity.remove(Entity.RemovalReason.DISCARDED);
-                    }
-                });
-        entityCache.clear();
+                int step = vertices.length / 4; // 4 vertices per quad
+                for (int i = 0; i < 4; i++) {
+                    float x = Float.intBitsToFloat(vertices[i * step]);
+                    float y = Float.intBitsToFloat(vertices[i * step + 1]);
+                    float z = Float.intBitsToFloat(vertices[i * step + 2]);
 
-        // Clear all client-side timers and item hashes
-        clientStartTimes.clear();
-        itemHashes.clear();
-    }
-
-    private void renderMob(
-            SpawnEggItem spawnEgg,
-            ItemStack spawnEggStack,
-            PillarBlockEntity blockEntity,
-            float partialTicks,
-            PoseStack poseStack,
-            MultiBufferSource bufferSource,
-            int combinedLight,
-            float rotation,
-            float gameTime,
-            boolean shouldSpin,
-            boolean isUpsideDown
-    ) {
-        // Block entity renderers are ONLY called on client side, but double-check for safety
-        if (spawnEgg == null || blockEntity == null || spawnEggStack == null) {
-            return;
-        }
-
-        Minecraft mc = Minecraft.getInstance();
-        if (mc == null || mc.level == null || !mc.level.isClientSide) {
-            return;
-        }
-
-        Level level = blockEntity.getLevel();
-        if (level == null) {
-            return;
-        }
-
-        BlockPos pos = blockEntity.getBlockPos();
-        if (pos == null) {
-            return;
-        }
-
-        EntityType<?> entityType = spawnEgg.getType(null);
-        if (entityType == null) {
-            return;
-        }
-
-        // Create a cache key based on block position and entity type
-        String cacheKey =
-                pos.getX() +
-                        "," +
-                        pos.getY() +
-                        "," +
-                        pos.getZ() +
-                        ":" +
-                        net.minecraftforge.registries.ForgeRegistries.ENTITIES.getKey(
-                                entityType
-                        ).toString();
-
-        // Get or create cached entity instance
-        Entity entity = entityCache.get(cacheKey);
-        if (entity == null || entity.getType() != entityType || !entity.isAlive()) {
-            // Remove old entity from cache if it exists
-            if (entity != null && entity.isAlive()) {
-                entity.remove(Entity.RemovalReason.DISCARDED);
-            }
-
-            // Create new entity instance
-            entity = entityType.create(level);
-            if (entity != null) {
-                // Set entity properties for display
-                entity.setNoGravity(true);
-                entity.setInvulnerable(true);
-                entity.setSilent(true);
-                entity.setInvisible(false);
-                // Set a unique UUID to avoid conflicts
-                entity.setUUID(UUID.randomUUID());
-                // Position entity (will be transformed by poseStack, at top of pillar with minimal gap)
-                entity.setPos(pos.getX() + 0.5, pos.getY() + 1.0625, pos.getZ() + 0.5);
-                // Set entity to not tick (we don't want it to update)
-                entity.noPhysics = true;
-
-                // Prevent animations and hurt/dying states for static display
-                // Set tickCount to 0 to prevent time-based animations (bees, blazes, cod, etc.)
-                entity.tickCount = 0;
-
-                if (entity instanceof net.minecraft.world.entity.LivingEntity) {
-                    net.minecraft.world.entity.LivingEntity livingEntity =
-                            (net.minecraft.world.entity.LivingEntity) entity;
-                    // Disable AI to prevent any AI-driven animations (only available on Mob, not all LivingEntity)
-                    if (entity instanceof net.minecraft.world.entity.Mob) {
-                        ((net.minecraft.world.entity.Mob) entity).setNoAi(true);
-                    }
-                    // Reset hurt and death timers to prevent hurt/dying animations
-                    livingEntity.hurtTime = 0;
-                    livingEntity.deathTime = 0;
-                    // Set to idle pose - prevent walking/running animations
-                    livingEntity.setSprinting(false);
-                    livingEntity.setShiftKeyDown(false);
-                    // Prevent entity from updating animations
-                    livingEntity.animationSpeed = 0.0f;
-                    livingEntity.animationSpeedOld = 0.0f;
-                    livingEntity.animationPosition = 0.0f;
-
-                    // Prevent attack/swing animations
-                    livingEntity.swingTime = 0;
-                    livingEntity.attackAnim = 0.0f;
-                    livingEntity.oAttackAnim = 0.0f;
-
-                    // Freeze all movement
-                    livingEntity.setDeltaMovement(0, 0, 0);
-                    livingEntity.setSpeed(0.0f);
+                    if (x < minX) minX = x;
+                    if (y < minY) minY = y;
+                    if (z < minZ) minZ = z;
+                    if (x > maxX) maxX = x;
+                    if (y > maxY) maxY = y;
+                    if (z > maxZ) maxZ = z;
                 }
-
-                // Entity-specific animation prevention
-                // Bees: prevent wing flapping and other animations
-                if (entity instanceof net.minecraft.world.entity.animal.Bee) {
-                    net.minecraft.world.entity.animal.Bee bee =
-                            (net.minecraft.world.entity.animal.Bee) entity;
-                    bee.setRemainingPersistentAngerTime(0);
-                }
-
-                // Blazes: prevent rod rotation animations
-                if (entity instanceof net.minecraft.world.entity.monster.Blaze) {
-                    // Blaze animations are controlled by tickCount, which we already set to 0
-                }
-
-                // Fish (Cod, Salmon, etc.): prevent fin animations
-                if (entity instanceof net.minecraft.world.entity.animal.AbstractFish) {
-                    // Fish animations are also controlled by tickCount
-                }
-
-                // Cache the entity
-                entityCache.put(cacheKey, entity);
             }
         }
 
-        if (entity != null && entity.isAlive()) {
-            // Calculate scale based on entity's actual dimensions to maintain proper proportions
-            float entityWidth = entity.getBbWidth();
-            float entityHeight = entity.getBbHeight();
-
-            // Update entity position and rotation BEFORE rendering
-            // Position: at the top of the pillar with minimal gap (1.125 blocks above block top = 2 pixels)
-            // For normal entities: The entity's position is where its feet will be
-            // For upside-down entities: Position at baseY, then rotate around head so head stays at baseY
-            float baseY = pos.getY() + 1.125f;
-            float entityY = baseY; // Always position at baseY, rotation will handle upside-down positioning
-            entity.setPos(pos.getX() + 0.5, entityY, pos.getZ() + 0.5);
-
-            // Keep entity in static state - prevent animations and hurt/dying states
-            // Reset tickCount every frame to prevent time-based animations (bees, blazes, cod, etc.)
-            entity.tickCount = 0;
-
-            if (entity instanceof net.minecraft.world.entity.LivingEntity) {
-                net.minecraft.world.entity.LivingEntity livingEntity =
-                        (net.minecraft.world.entity.LivingEntity) entity;
-                // Disable AI every frame to prevent any AI-driven animations (only available on Mob, not all LivingEntity)
-                if (entity instanceof net.minecraft.world.entity.Mob) {
-                    ((net.minecraft.world.entity.Mob) entity).setNoAi(true);
-                }
-                // Reset hurt and death timers every frame to prevent hurt/dying animations
-                livingEntity.hurtTime = 0;
-                livingEntity.deathTime = 0;
-                // Keep entity in idle pose
-                livingEntity.setSprinting(false);
-                livingEntity.setShiftKeyDown(false);
-                // Prevent animation updates
-                livingEntity.animationSpeed = 0.0f;
-                livingEntity.animationSpeedOld = 0.0f;
-                livingEntity.animationPosition = 0.0f;
-
-                // Prevent attack/swing animations every frame
-                livingEntity.swingTime = 0;
-                livingEntity.attackAnim = 0.0f;
-                livingEntity.oAttackAnim = 0.0f;
-
-                // Freeze all movement every frame
-                livingEntity.setDeltaMovement(0, 0, 0);
-                livingEntity.setSpeed(0.0f);
-            }
-
-            // Entity-specific animation prevention every frame
-            // Bees: prevent wing flapping and other animations
-            if (entity instanceof net.minecraft.world.entity.animal.Bee) {
-                net.minecraft.world.entity.animal.Bee bee =
-                        (net.minecraft.world.entity.animal.Bee) entity;
-                bee.setRemainingPersistentAngerTime(0);
-            }
-
-            // Update entity rotation for smooth animation - THIS IS CRITICAL FOR ROTATION
-            // Entity renderers use the entity's rotation values, so we need to set them every frame
-            // Base rotation is the facing yaw (direction player was looking when placing)
-            // If shouldSpin is true, add the spinning rotation on top
-            // If isUpsideDown is true, add 180 degrees to face the opposite direction
-            float baseYaw = blockEntity.getFacingYaw();
-            float finalYaw = baseYaw;
-            if (isUpsideDown) {
-                finalYaw = (finalYaw + 180.0f) % 360.0f;
-            }
-            if (shouldSpin) {
-                finalYaw = (finalYaw + rotation) % 360.0f;
-            }
-            if (finalYaw < 0) {
-                finalYaw += 360.0f;
-            }
-
-            float prevYRot = entity.getYRot();
-            entity.setYRot(finalYaw);
-            entity.yRotO = prevYRot; // Previous rotation for smooth interpolation
-
-            // Update head/body rotation for living entities to match the rotation
-            if (entity instanceof net.minecraft.world.entity.LivingEntity) {
-                net.minecraft.world.entity.LivingEntity livingEntity =
-                        (net.minecraft.world.entity.LivingEntity) entity;
-                // Update body and head rotation to match the rotation animation
-                float prevBodyRot = livingEntity.yBodyRot;
-                livingEntity.yBodyRot = finalYaw;
-                livingEntity.yBodyRotO = prevBodyRot;
-
-                float prevHeadRot = livingEntity.yHeadRot;
-                livingEntity.yHeadRot = finalYaw;
-                livingEntity.yHeadRotO = prevHeadRot;
-            }
-
-            float scale;
-            if (entityHeight <= 1.0f) {
-                // Small entities (1 block or less): scale to fit nicely above pillar
-                float maxDimension = Math.max(entityWidth, entityHeight);
-                float targetSize = 0.8f;
-                scale = targetSize / maxDimension;
-                scale = Math.min(1.5f, scale);
-            } else {
-                // Taller entities: render at closer to full size
-                if (entityHeight > 2.5f) {
-                    scale = 1.8f / entityHeight;
-                } else {
-                    scale = 0.9f; // 90% of actual size
-                }
-                scale = Math.max(0.3f, scale);
-            }
-
-            // Get entity renderer
-            net.minecraft.client.renderer.entity.EntityRenderDispatcher dispatcher =
-                    Minecraft.getInstance().getEntityRenderDispatcher();
-            @SuppressWarnings("unchecked")
-            net.minecraft.client.renderer.entity.EntityRenderer<
-                    Entity
-                    > entityRenderer = (net.minecraft.client.renderer.entity.EntityRenderer<
-                    Entity
-                    >) dispatcher.getRenderer(entity);
-
-            if (entityRenderer != null) {
-                // Entity renderers translate to entity.getX(), getY(), getZ() and use entity.getYRot()
-                // The pose stack in block entity renderers starts at block origin (0,0,0 relative to block)
-                // Entity renderer will translate from camera to entity's world position
-                poseStack.pushPose();
-
-                // Add floating animation to entity position
-                float bobAmount = (float) Math.sin(gameTime * 2.0f) * 0.05f;
-                entity.setPos(pos.getX() + 0.5, entityY + bobAmount, pos.getZ() + 0.5);
-
-                // Apply scale - entity renderer will translate and rotate, then our scale will be applied
-                poseStack.scale(scale, scale, scale);
-
-                // Apply upside-down rotation if spawn egg is named "Grum" or "Dinnerbone"
-                if (isUpsideDown) {
-                    // Entity is positioned at baseY (feet at baseY, head at baseY + entityHeight)
-                    // Entity center is at baseY + entityHeight/2
-                    // Rotate 180° around center: head (at baseY + entityHeight) rotates to baseY
-                    // Translate to center, rotate, translate back
-                    float centerOffset = entityHeight * 0.5f;
-                    poseStack.translate(0.0, centerOffset, 0.0);
-                    poseStack.mulPose(Vector3f.XP.rotationDegrees(180.0f));
-                    poseStack.translate(0.0, -centerOffset, 0.0);
-                }
-
-                // Render the entity
-                // Entity renderer will:
-                // 1. Translate from camera to entity position (entity.getX(), getY(), getZ())
-                // 2. Rotate by entity.getYRot() (which we've set to 'finalYaw' - this is CRITICAL for rotation!)
-                // 3. Render the entity
-                // Our scale is applied to the pose stack, so it will scale the entire entity
-                // Use 0.0f for partialTicks to prevent animation interpolation that causes "bugging out"
-                entityRenderer.render(
-                        entity,
-                        finalYaw,
-                        0.0f,
-                        poseStack,
-                        bufferSource,
-                        combinedLight
-                );
-
-                poseStack.popPose();
-            }
-        }
-    }
-
-    private boolean hasSpinNameTag(ItemStack stack) {
-        if (stack == null || stack.isEmpty()) {
-            return false;
+        // Fallback for empty models
+        if (minX == Double.MAX_VALUE) {
+            return new net.minecraft.world.phys.AABB(0, 0, 0, 1, 1, 1);
         }
 
-        // Must be a spawn egg (checked by caller, but double-check here)
-        if (!(stack.getItem() instanceof SpawnEggItem)) {
-            return false;
-        }
-
-        // Check NBT directly for display.Name tag (same approach as dye detection)
-        net.minecraft.nbt.CompoundTag tag = stack.getTag();
-        if (tag == null) {
-            return false;
-        }
-
-        // Check if display compound exists
-        if (!tag.contains("display", 10)) { // 10 = TAG_COMPOUND
-            return false;
-        }
-
-        net.minecraft.nbt.CompoundTag displayTag = tag.getCompound("display");
-        if (!displayTag.contains("Name", 8)) { // 8 = TAG_STRING
-            return false;
-        }
-
-        // Get the name JSON string
-        String nameJson = displayTag.getString("Name");
-        if (nameJson == null || nameJson.isEmpty()) {
-            return false;
-        }
-
-        // Parse the JSON text component to get plain text
-        try {
-            net.minecraft.network.chat.Component nameComponent =
-                    net.minecraft.network.chat.Component.Serializer.fromJson(nameJson);
-            if (nameComponent == null) {
-                return false;
-            }
-
-            // Get plain string from component
-            String displayName = nameComponent.getString();
-            if (displayName == null || displayName.isEmpty()) {
-                return false;
-            }
-
-            // Trim whitespace and remove formatting codes
-            String trimmedName = displayName.trim();
-            trimmedName = net.minecraft.ChatFormatting.stripFormatting(trimmedName);
-
-            // Check if the name contains "spin" (case-insensitive) - allows multiple words like "spin Dinnerbone"
-            if (trimmedName != null && !trimmedName.isEmpty()) {
-                return trimmedName.toLowerCase().contains("spin");
-            }
-        } catch (Exception e) {
-            // If JSON parsing fails, try checking the raw string
-            // Sometimes the name might be stored as plain text
-            String trimmedName = nameJson.trim();
-            trimmedName = net.minecraft.ChatFormatting.stripFormatting(trimmedName);
-            if (trimmedName != null && !trimmedName.isEmpty()) {
-                return trimmedName.toLowerCase().contains("spin");
-            }
-        }
-
-        return false;
+        return new net.minecraft.world.phys.AABB(minX, minY, minZ, maxX, maxY, maxZ);
     }
 
     private boolean hasUpsideDownName(ItemStack stack) {
@@ -690,6 +485,121 @@ public class PillarBlockEntityRenderer
             if (trimmedName != null && !trimmedName.isEmpty()) {
                 String lowerName = trimmedName.toLowerCase();
                 return lowerName.contains("grum") || lowerName.contains("dinnerbone");
+            }
+        }
+
+        return false;
+    }
+
+    private boolean hasItemNameTag(ItemStack stack) {
+        if (stack == null || stack.isEmpty()) {
+            return false;
+        }
+
+        // Check NBT directly for display.Name tag
+        net.minecraft.nbt.CompoundTag tag = stack.getTag();
+        if (tag == null) {
+            return false;
+        }
+
+        // Check if display compound exists
+        if (!tag.contains("display", 10)) { // 10 = TAG_COMPOUND
+            return false;
+        }
+
+        net.minecraft.nbt.CompoundTag displayTag = tag.getCompound("display");
+        if (!displayTag.contains("Name", 8)) { // 8 = TAG_STRING
+            return false;
+        }
+
+        // Get the name JSON string
+        String nameJson = displayTag.getString("Name");
+        if (nameJson == null || nameJson.isEmpty()) {
+            return false;
+        }
+
+        // Parse the JSON text component to get plain text
+        try {
+            net.minecraft.network.chat.Component nameComponent =
+                    net.minecraft.network.chat.Component.Serializer.fromJson(nameJson);
+            if (nameComponent == null) {
+                return false;
+            }
+
+            // Get plain string from component
+            String displayName = nameComponent.getString();
+            if (displayName == null || displayName.isEmpty()) {
+                return false;
+            }
+
+            // Trim whitespace and remove formatting codes
+            String trimmedName = displayName.trim();
+            trimmedName = net.minecraft.ChatFormatting.stripFormatting(trimmedName);
+
+            // Check if the name is exactly "item" (case-insensitive)
+            if (trimmedName != null && !trimmedName.isEmpty()) {
+                return trimmedName.equalsIgnoreCase("item");
+            }
+        } catch (Exception e) {
+            // If JSON parsing fails, try checking the raw string
+            String trimmedName = nameJson.trim();
+            trimmedName = net.minecraft.ChatFormatting.stripFormatting(trimmedName);
+            if (trimmedName != null && !trimmedName.isEmpty()) {
+                return trimmedName.equalsIgnoreCase("item");
+            }
+        }
+
+        return false;
+    }
+
+    private boolean isFixed(ItemStack stack) {
+        if (stack == null || stack.isEmpty()) {
+            return false;
+        }
+
+        net.minecraft.nbt.CompoundTag tag = stack.getTag();
+        if (tag == null) {
+            return false;
+        }
+
+        if (!tag.contains("display", 10)) {
+            return false;
+        }
+
+        net.minecraft.nbt.CompoundTag displayTag = tag.getCompound("display");
+        if (!displayTag.contains("Name", 8)) {
+            return false;
+        }
+
+        String nameJson = displayTag.getString("Name");
+        if (nameJson == null || nameJson.isEmpty()) {
+            return false;
+        }
+
+        try {
+            net.minecraft.network.chat.Component nameComponent =
+                    net.minecraft.network.chat.Component.Serializer.fromJson(nameJson);
+            if (nameComponent == null) {
+                return false;
+            }
+
+            String displayName = nameComponent.getString();
+            if (displayName == null || displayName.isEmpty()) {
+                return false;
+            }
+
+            String trimmedName = displayName.trim();
+            trimmedName = net.minecraft.ChatFormatting.stripFormatting(trimmedName);
+
+            if (trimmedName != null && !trimmedName.isEmpty()) {
+                // Use ROOT locale for consistent case conversion across all system languages
+                return trimmedName.toLowerCase(java.util.Locale.ROOT).contains("fixed");
+            }
+        } catch (Exception e) {
+            String trimmedName = nameJson.trim();
+            trimmedName = net.minecraft.ChatFormatting.stripFormatting(trimmedName);
+            if (trimmedName != null && !trimmedName.isEmpty()) {
+                return trimmedName.toLowerCase(java.util.Locale.ROOT).contains("fixed");
             }
         }
 

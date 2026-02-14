@@ -96,12 +96,18 @@ mixin {
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 repositories {
-
-
     maven { url = 'https://maven.blamejared.com' }
-    maven { url = 'https://cursemaven.com' }
-
-
+    maven {
+        url "https://cursemaven.com"
+        content {
+            includeGroup "curse.maven"
+        }
+    }
+    maven { url = 'https://maven.theillusivec4.top/' }
+    maven { url = 'https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/' }
+    maven { url = 'https://dvs1.progwml6.com/files/maven/' }
+    maven { url = 'https://modmaven.dev' }
+    mavenCentral()
 }
 
 dependencies {

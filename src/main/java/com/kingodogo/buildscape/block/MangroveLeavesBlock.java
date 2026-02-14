@@ -24,8 +24,8 @@ public class MangroveLeavesBlock
         extends LeavesBlock
         implements BonemealableBlock {
 
-    private static final ThreadLocal<Direction> BONEMEAL_DIRECTION =
-            new ThreadLocal<>();
+
+    private static final ThreadLocal<Direction> BONEMEAL_DIRECTION = new ThreadLocal<>();
 
     public MangroveLeavesBlock(BlockBehaviour.Properties properties) {
         super(properties);
@@ -65,6 +65,7 @@ public class MangroveLeavesBlock
 
         return InteractionResult.PASS;
     }
+
 
     @Override
     public boolean isValidBonemealTarget(
@@ -156,32 +157,7 @@ public class MangroveLeavesBlock
         }
     }
 
-    private boolean hasNearbyLogs(BlockGetter level, BlockPos pos) {
-        for (int dx = -6; dx <= 6; dx++) {
-            for (int dy = -6; dy <= 6; dy++) {
-                for (int dz = -6; dz <= 6; dz++) {
-                    if (dx == 0 && dy == 0 && dz == 0) continue;
 
-                    int distanceSq = dx * dx + dy * dy + dz * dz;
-                    if (distanceSq > 36) continue;
-
-                    BlockPos checkPos = pos.offset(dx, dy, dz);
-                    BlockState checkState = level.getBlockState(checkPos);
-
-                    if (
-                            checkState.is(net.minecraft.tags.BlockTags.LOGS) ||
-                                    checkState.getBlock() == ModBlocks.MANGROVE_LOG.get() ||
-                                    checkState.getBlock() == ModBlocks.MANGROVE_WOOD.get() ||
-                                    checkState.getBlock() == ModBlocks.STRIPPED_MANGROVE_LOG.get() ||
-                                    checkState.getBlock() == ModBlocks.STRIPPED_MANGROVE_WOOD.get()
-                    ) {
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
-    }
 
     @Override
     public void randomTick(
@@ -190,18 +166,6 @@ public class MangroveLeavesBlock
             BlockPos pos,
             Random random
     ) {
-        if (state.getValue(PERSISTENT)) {
-            return;
-        }
-
-        if (hasNearbyLogs(level, pos)) {
-            return;
-        }
-
-        if (random.nextInt(10) != 0) {
-            return;
-        }
-
         super.randomTick(state, level, pos, random);
     }
 }

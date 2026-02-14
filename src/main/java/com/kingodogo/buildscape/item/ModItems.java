@@ -6819,4 +6819,6 @@ public class ModItems {
             "smoke_vent",
             () -> new BlockItem(ModBlocks.SMOKE_VENT.get(), createBlockItemProperties())
     );
+
 }
+

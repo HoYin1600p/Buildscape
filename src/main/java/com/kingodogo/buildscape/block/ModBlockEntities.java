@@ -98,4 +98,6 @@ public class ModBlockEntities {
                     () -> BlockEntityType.Builder.of(
                             SmokeVentBlockEntity::new,
                             ModBlocks.SMOKE_VENT.get()).build(null));
+
+
 }

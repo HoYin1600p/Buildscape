@@ -7082,4 +7082,5 @@ public class ModBlocks {
                         .requiresCorrectToolForDrops()
                         .sound(SoundType.NETHERITE_BLOCK)
                         .noOcclusion()));
+
 }

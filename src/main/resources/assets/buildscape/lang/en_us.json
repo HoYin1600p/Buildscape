@@ -1,4 +1,5 @@
 {
+  "buildscape.vertical_slab_prefix": "Vertical ",
   "block.minecraft.chain": "Iron Chain",
   "item.minecraft.chain": "Iron Chain",
   "block.buildscape.amethyst_block_slab": "Amethyst Block Slab",
@@ -1867,5 +1868,7 @@
   "block.buildscape.smoke_vent": "Smoke Vent",
   "item.buildscape.smoke_vent": "Smoke Vent",
   "buildscape.config.particles.reset_tooltip": "Reset Configuration",
-  "buildscape.config.op_only": "It Seems like Kingo Forgot to enable it for PUBLIC ( Operator's Only ) :P"
+  "buildscape.config.op_only": "It Seems like Kingo Forgot to enable it for PUBLIC ( Operator's Only ) :P",
+  "block.buildscape.vertical_slab": "Vertical Slab",
+  "block.buildscape.vertical_slab_prefix": "Vertical "
 }

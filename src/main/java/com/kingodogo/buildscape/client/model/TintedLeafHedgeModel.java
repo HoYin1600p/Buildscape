@@ -1,15 +1,15 @@
 package com.kingodogo.buildscape.client.model;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 public class TintedLeafHedgeModel implements BakedModel {
 
@@ -48,10 +48,13 @@ public class TintedLeafHedgeModel implements BakedModel {
 
                 int[] vertexData = quad.getVertices().clone();
 
+                Direction dir = quad.getDirection();
+                if (dir == null) dir = Direction.NORTH;
+
                 BakedQuad tintedQuad = new BakedQuad(
                         vertexData,
                         0,
-                        quad.getDirection(),
+                        dir,
                         sprite,
                         quad.isShade()
                 );

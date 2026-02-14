@@ -11,6 +11,8 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.AxeItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.SpawnEggItem;
@@ -166,6 +168,35 @@ public class PillarBlockEntityRenderer
                 poseStack.translate(0, bobAmount, 0);
             }
 
+            // Check if item is named "item" to render as normal small item
+            boolean renderAsItem = hasItemNameTag(displayedItem);
+
+            // 3D Gear Detection
+            boolean isArmor = displayedItem.getItem() instanceof net.minecraft.world.item.ArmorItem;
+            boolean isElytra = displayedItem.getItem() instanceof net.minecraft.world.item.ElytraItem;
+            boolean isArmorStand = displayedItem.getItem() instanceof net.minecraft.world.item.ArmorStandItem;
+            EquipmentSlot gearSlot = Mob.getEquipmentSlotForItem(displayedItem);
+            boolean isEquipable = gearSlot.getType() == EquipmentSlot.Type.ARMOR;
+
+            if (!isSpawnEgg && (isArmor || isElytra || isArmorStand || isEquipable) && !renderAsItem) {
+                ArmorPillarRenderer.renderArmor(
+                        displayedItem,
+                        pos,
+                        blockEntity.getLevel(),
+                        partialTicks,
+                        poseStack,
+                        bufferSource,
+                        combinedLight,
+                        rotation,
+                        gameTime,
+                        blockEntity.getFacingYaw(),
+                        isFixed
+                );
+
+                poseStack.popPose();
+                return;
+            }
+
             // Check if the item is a spawn egg
             if (isSpawnEgg) {
                 try {
@@ -220,21 +251,13 @@ public class PillarBlockEntityRenderer
 
                     boolean isSword = displayedItem.getItem() instanceof SwordItem;
                     boolean isAxe = displayedItem.getItem() instanceof AxeItem;
-                    boolean isArmor = displayedItem.getItem() instanceof net.minecraft.world.item.ArmorItem;
-
-                    // Check if item is named "item" to render as normal small item
-                    boolean renderAsItem = hasItemNameTag(displayedItem);
-
-                    // Debug logging
-                    if (isArmor) {
-                        System.out.println("ARMOR DETECTED: " + displayedItem.getItem().getClass().getName() + ", renderAsItem=" + renderAsItem);
-                    }
 
                     if (isSword) {
                         // Base position for standard sword
                         double baseTransY = -0.5;
 
                         // Dynamic Adjustment: 70% of EXTRA length sticks OUT.
+                        // We use visualLength and standardLength from outer scope
                         double extraLength = Math.max(0, visualLength - standardLength);
                         double transY = baseTransY + (extraLength * 0.7 * scale);
 
@@ -253,8 +276,6 @@ public class PillarBlockEntityRenderer
 
                     } else if (isAxe) {
                         // Axes should look "chopped" into the pillar (like the sword)
-                        // Handle UP, Head DOWN.
-                        // Adjusted for steeper angle: -0.55 base, 190 deg rotation (~65 deg handle angle)
                         double baseTransY = -0.55;
 
                         double extraLength = Math.max(0, visualLength - standardLength);
@@ -269,69 +290,11 @@ public class PillarBlockEntityRenderer
                         }
 
                         poseStack.translate(0, transY, 0);
-                        // Rotate 190 degrees to tilt handle to ~65 degrees (steeper angle)
                         poseStack.mulPose(Vector3f.ZP.rotationDegrees(190));
                         poseStack.scale(scale, scale, scale);
-                    } else if (isArmor && !renderAsItem) {
-                        // Armor rendering: BIG and BOLD by default
-                        // Position at lowest point with proper offset
-                        System.out.println("RENDERING ARMOR IN BIG MODE!");
-                        net.minecraft.world.item.ArmorItem armorItem = (net.minecraft.world.item.ArmorItem) displayedItem.getItem();
-                        net.minecraft.world.entity.EquipmentSlot slot = armorItem.getSlot();
-
-                        // Scale armor to be prominent (1.2x larger than normal items)
-                        float armorScale = 1.2f;
-
-                        // Different positioning based on armor type
-                        double baseTransY;
-                        float rotationAngle;
-
-                        switch (slot) {
-                            case HEAD: // Helmet
-                                baseTransY = -0.3;
-                                rotationAngle = 0; // Upright
-                                break;
-                            case CHEST: // Chestplate
-                                baseTransY = -0.35;
-                                rotationAngle = 0; // Upright
-                                break;
-                            case LEGS: // Leggings
-                                baseTransY = -0.4;
-                                rotationAngle = 0; // Upright
-                                break;
-                            case FEET: // Boots
-                                baseTransY = -0.45;
-                                rotationAngle = 0; // Upright
-                                break;
-                            default:
-                                baseTransY = -0.35;
-                                rotationAngle = 0;
-                                break;
-                        }
-
-                        // Apply dynamic offset based on model bounds
-                        double extraLength = Math.max(0, visualLength - standardLength);
-                        double transY = baseTransY + (extraLength * 0.5 * armorScale);
-
-                        // Ensure lowest point doesn't go below pillar top
-                        double tipDist = (visualLength / 2.0) * armorScale;
-                        double tipY = (1.4625 + transY) - tipDist;
-
-                        if (tipY < 0.05) {
-                            double correctiveLift = 0.05 - tipY;
-                            transY += correctiveLift;
-                        }
-
-                        poseStack.translate(0, transY, 0);
-                        if (rotationAngle != 0) {
-                            poseStack.mulPose(Vector3f.ZP.rotationDegrees(rotationAngle));
-                        }
-                        poseStack.scale(armorScale, armorScale, armorScale);
                     } else {
                         poseStack.scale(0.5f, 0.5f, 0.5f);
                     }
-
-                    // Render using FIXED - precise positioning is more important than minor artifacts
                     boolean hasGlint = displayedItem.hasFoil();
                     this.itemRenderer.render(
                             displayedItem,

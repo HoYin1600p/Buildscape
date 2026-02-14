@@ -20,4 +20,12 @@ public class ModRecipeSerializers {
             "shapeless_durability",
             () -> ShapelessDurabilityRecipe.SERIALIZER
     );
+
+    public static final RegistryObject<
+            RecipeSerializer<VerticalSlabRecipe>
+            > VERTICAL_SLAB_RECIPE = RECIPE_SERIALIZERS.register(
+            "vertical_slab",
+            () -> new net.minecraft.world.item.crafting.SimpleRecipeSerializer<>(VerticalSlabRecipe::new)
+    );
 }
+

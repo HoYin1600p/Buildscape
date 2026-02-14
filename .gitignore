@@ -56,3 +56,9 @@ recent_*.java
 /.gemini/
 /.vscode/
 /index.md
+MOB_PILLAR_STATES_DOCUMENTATION.md
+.gitignore
+src/main/resources/assets/buildscape/mob_states.txt
+.gitignore
+states.txt
+.gitignore

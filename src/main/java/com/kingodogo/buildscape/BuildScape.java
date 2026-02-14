@@ -5,11 +5,13 @@ import com.kingodogo.buildscape.item.ModItems;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.Block;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
@@ -30,7 +32,38 @@ public class BuildScape {
 
                 @Override
                 public void fillItemList(net.minecraft.core.NonNullList<ItemStack> items) {
+                        addHardcodedItems(items);
 
+                        // Dynamic Vertical Slabs insertion
+                        // We iterate the list and for each slab, if we have a vertical version, insert it next to it.
+                        java.util.List<ItemStack> current = new java.util.ArrayList<>(items);
+                        items.clear();
+                        for (ItemStack stack : current) {
+                                items.add(stack);
+                                if (stack.getItem() instanceof net.minecraft.world.item.BlockItem) {
+                                        Block block = ((net.minecraft.world.item.BlockItem) stack.getItem()).getBlock();
+                                        if (com.kingodogo.buildscape.block.ModVerticalSlabs.VERTICAL_SLABS.containsKey(block)) {
+                                                items.add(new ItemStack(com.kingodogo.buildscape.block.ModVerticalSlabs.VERTICAL_SLABS.get(block)));
+                                        }
+                                }
+                        }
+
+                        // Also add any vertical slabs that didn't have their parent in the tab (e.g. vanilla slabs)
+                        for (net.minecraft.world.item.Item item : com.kingodogo.buildscape.block.ModVerticalSlabs.DYNAMIC_ITEMS) {
+                                if (!containsItem(items, item)) {
+                                        items.add(new ItemStack(item));
+                                }
+                        }
+                }
+
+                private boolean containsItem(net.minecraft.core.NonNullList<ItemStack> items, net.minecraft.world.item.Item item) {
+                        for (ItemStack stack : items) {
+                                if (stack.getItem() == item) return true;
+                        }
+                        return false;
+                }
+
+                private void addHardcodedItems(net.minecraft.core.NonNullList<ItemStack> items) {
                         items.add(new ItemStack(ModItems.BIT_COPPER_BLOCK.get()));
                         items.add(new ItemStack(ModItems.BIT_COPPER_BLOCK_STAIRS.get()));
                         items.add(new ItemStack(ModItems.BIT_COPPER_BLOCK_SLAB.get()));
@@ -1251,6 +1284,10 @@ public class BuildScape {
 
                 MinecraftForge.EVENT_BUS.register(this);
 
+                DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
+                        net.minecraft.client.Minecraft.getInstance().getResourcePackRepository().addPackFinder(new com.kingodogo.buildscape.client.DynamicVerticalSlabPackFinder());
+                });
+
                 LOGGER.info("BuildScape mod initialized!");
         }
 
@@ -2418,6 +2455,7 @@ public class BuildScape {
                         event.enqueueWork(() -> {
                                 com.kingodogo.buildscape.client.ClientEvents.initializeConfigCallback();
                         });
+
 
                         event.enqueueWork(() -> {
                                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
@@ -3750,13 +3788,13 @@ public class BuildScape {
 
         }
 
-        @Mod.EventBusSubscriber(modid = MODID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
+        @Mod.EventBusSubscriber(modid = BuildScape.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
         public static class ClientForgeEvents {
 
                 @SubscribeEvent
                 public static void onModelBake(
                                 net.minecraftforge.client.event.ModelBakeEvent event) {
-                        LOGGER.info("ModelBakeEvent fired - wrapping leaf hedge models");
+                        BuildScape.LOGGER.info("ModelBakeEvent fired - wrapping leaf hedge models");
                         java.util.Set<net.minecraft.resources.ResourceLocation> leafHedgeModels = new java.util.HashSet<>();
                         leafHedgeModels.add(
                                         new net.minecraft.resources.ResourceLocation(
@@ -3934,20 +3972,20 @@ public class BuildScape {
                                                                         new com.kingodogo.buildscape.client.model.TintedLeafHedgeModel(
                                                                                         originalModel));
                                         wrappedCount++;
-                                        LOGGER.debug("Wrapped model: {}", modelLocation);
+                                        BuildScape.LOGGER.debug("Wrapped model: {}", modelLocation);
                                 } else {
                                         notFoundCount++;
-                                        LOGGER.warn("Model not found: {}", modelLocation);
+                                        BuildScape.LOGGER.warn("Model not found: {}", modelLocation);
                                 }
                         }
-                        LOGGER.info(
+                        BuildScape.LOGGER.info(
                                         "ModelBakeEvent: Wrapped {} leaf hedge models, {} not found",
                                         wrappedCount,
                                         notFoundCount);
                 }
         }
 
-        @Mod.EventBusSubscriber(modid = MODID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
+        @Mod.EventBusSubscriber(modid = BuildScape.MODID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
         public static class ClientModEventsParticles {
 
                 @SubscribeEvent

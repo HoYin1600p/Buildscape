@@ -27,5 +27,7 @@ public class ModRecipeSerializers {
             "vertical_slab",
             () -> new net.minecraft.world.item.crafting.SimpleRecipeSerializer<>(VerticalSlabRecipe::new)
     );
+
+
 }
 

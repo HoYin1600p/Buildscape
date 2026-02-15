@@ -62,3 +62,5 @@ src/main/resources/assets/buildscape/mob_states.txt
 .gitignore
 states.txt
 .gitignore
+.vercel
+.env*.local

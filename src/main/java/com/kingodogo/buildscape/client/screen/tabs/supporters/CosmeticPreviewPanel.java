@@ -75,6 +75,10 @@ public class CosmeticPreviewPanel extends BasePanel {
         }
 
         ItemStack stack = cosmeticRegistry.resolveToItemStack(selectedCosmeticId);
+        if ((stack == null || stack.isEmpty()) && state.getBestSlotForCosmetic(selectedCosmeticId) == SupportersTabState.SLOT_HEAD) {
+            stack = new ItemStack(net.minecraft.world.item.Items.LEATHER_HELMET);
+        }
+
         if (stack == null || stack.isEmpty()) {
             String error = "Invalid cosmetic";
             int textWidth = mc.font.width(error);

@@ -12,11 +12,13 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.item.SpawnEggItem;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.SpawnEggItem;
 import net.minecraft.world.level.Level;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -222,8 +224,7 @@ public class MobPillarRenderer {
             entity.setInvisible(true);
         }
 
-        if (entity instanceof LivingEntity) {
-            LivingEntity livingEntity = (LivingEntity) entity;
+        if (entity instanceof LivingEntity livingEntity) {
 
             // Hurt state - Force red flash
             if (state.parsedStates.contains("hurt") || state.parsedStates.contains("damage")) {
@@ -319,8 +320,7 @@ public class MobPillarRenderer {
      */
     private static void applyEntitySpecificStates(Entity entity, MobState state) {
         // Bees
-        if (entity instanceof net.minecraft.world.entity.animal.Bee) {
-            net.minecraft.world.entity.animal.Bee bee = (net.minecraft.world.entity.animal.Bee) entity;
+        if (entity instanceof net.minecraft.world.entity.animal.Bee bee) {
             if (state.angry) {
                 bee.setRemainingPersistentAngerTime(999999);
             } else {
@@ -329,8 +329,7 @@ public class MobPillarRenderer {
         }
 
         // Wolves
-        if (entity instanceof net.minecraft.world.entity.animal.Wolf) {
-            net.minecraft.world.entity.animal.Wolf wolf = (net.minecraft.world.entity.animal.Wolf) entity;
+        if (entity instanceof net.minecraft.world.entity.animal.Wolf wolf) {
             if (state.angry) {
                 wolf.setRemainingPersistentAngerTime(999999);
             }
@@ -343,8 +342,7 @@ public class MobPillarRenderer {
         }
 
         // Cats
-        if (entity instanceof net.minecraft.world.entity.animal.Cat) {
-            net.minecraft.world.entity.animal.Cat cat = (net.minecraft.world.entity.animal.Cat) entity;
+        if (entity instanceof net.minecraft.world.entity.animal.Cat cat) {
             if (state.tamed) {
                 cat.setTame(true);
             }
@@ -354,8 +352,7 @@ public class MobPillarRenderer {
         }
 
         // Foxes
-        if (entity instanceof net.minecraft.world.entity.animal.Fox) {
-            net.minecraft.world.entity.animal.Fox fox = (net.minecraft.world.entity.animal.Fox) entity;
+        if (entity instanceof net.minecraft.world.entity.animal.Fox fox) {
             if (state.sitting) {
                 fox.setSitting(true);
             }
@@ -372,28 +369,24 @@ public class MobPillarRenderer {
         }
 
         // Sheep
-        if (entity instanceof net.minecraft.world.entity.animal.Sheep) {
-            net.minecraft.world.entity.animal.Sheep sheep = (net.minecraft.world.entity.animal.Sheep) entity;
+        if (entity instanceof net.minecraft.world.entity.animal.Sheep sheep) {
             if (state.sheared) {
                 sheep.setSheared(true);
             }
         }
 
         // Bat - Roosting/Hanging
-        if (entity instanceof net.minecraft.world.entity.ambient.Bat) {
-            net.minecraft.world.entity.ambient.Bat bat = (net.minecraft.world.entity.ambient.Bat) entity;
+        if (entity instanceof net.minecraft.world.entity.ambient.Bat bat) {
             bat.setResting(state.parsedStates.contains("hanging") || state.parsedStates.contains("roosting"));
         }
 
         // Polar Bear - Standing
-        if (entity instanceof net.minecraft.world.entity.animal.PolarBear) {
-            net.minecraft.world.entity.animal.PolarBear bear = (net.minecraft.world.entity.animal.PolarBear) entity;
+        if (entity instanceof net.minecraft.world.entity.animal.PolarBear bear) {
             bear.setStanding(state.parsedStates.contains("standing") || state.parsedStates.contains("rearing"));
         }
 
         // Enderman - Screaming/Staring
-        if (entity instanceof net.minecraft.world.entity.monster.EnderMan) {
-            net.minecraft.world.entity.monster.EnderMan enderman = (net.minecraft.world.entity.monster.EnderMan) entity;
+        if (entity instanceof net.minecraft.world.entity.monster.EnderMan enderman) {
             // setCreepy is usually client-side visible
             // Check mapping name if needed, but setCreepy usually exists? No, it's 'hasBeenStaredAt' logic or data tracker.
             // 1.18.2 Enderman uses DATA_CREEPY (18).
@@ -408,14 +401,12 @@ public class MobPillarRenderer {
         }
 
         // Spider - Climbing
-        if (entity instanceof net.minecraft.world.entity.monster.Spider) {
-            net.minecraft.world.entity.monster.Spider spider = (net.minecraft.world.entity.monster.Spider) entity;
+        if (entity instanceof net.minecraft.world.entity.monster.Spider spider) {
             spider.setClimbing(state.parsedStates.contains("climbing"));
         }
 
         // Vex - Charging
-        if (entity instanceof net.minecraft.world.entity.monster.Vex) {
-            net.minecraft.world.entity.monster.Vex vex = (net.minecraft.world.entity.monster.Vex) entity;
+        if (entity instanceof net.minecraft.world.entity.monster.Vex vex) {
             if (state.parsedStates.contains("charging")) {
                 vex.setIsCharging(true);
             }
@@ -898,8 +889,7 @@ public class MobPillarRenderer {
         entity.yRotO = prevYRot;
 
         // Update living entity rotations
-        if (entity instanceof LivingEntity) {
-            LivingEntity livingEntity = (LivingEntity) entity;
+        if (entity instanceof LivingEntity livingEntity) {
             float prevBodyRot = livingEntity.yBodyRot;
             livingEntity.yBodyRot = finalYaw;
             livingEntity.yBodyRotO = prevBodyRot;
@@ -950,16 +940,20 @@ public class MobPillarRenderer {
             scale = 1.0f;
         } else {
             // Standard Auto-Scaling Logic
+            // Babies should be smaller overall to maintain proportions (prevents "giant head" effect)
+            float targetSize = state.baby ? 0.45f : 0.8f;
+
             if (entityHeight <= 1.0f) {
                 float maxDimension = Math.max(entityWidth, entityHeight);
-                float targetSize = 0.8f;
                 scale = targetSize / maxDimension;
-                scale = Math.min(1.5f, scale);
+                // Cap baby scale lower than adults to prevent extreme scaling of tiny entities
+                scale = Math.min(state.baby ? 1.0f : 1.5f, scale);
             } else {
                 if (entityHeight > 2.5f) {
-                    scale = 1.8f / entityHeight;
+                    // Maintain scaling ratio for large entities relative to target size
+                    scale = (targetSize * 2.25f) / entityHeight;
                 } else {
-                    scale = 0.9f;
+                    scale = state.baby ? 0.5f : 0.9f;
                 }
                 scale = Math.max(0.3f, scale);
             }

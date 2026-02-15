@@ -2,10 +2,9 @@ package com.kingodogo.buildscape.client;
 
 import com.kingodogo.buildscape.BuildScape;
 import com.kingodogo.buildscape.block.ModVerticalSlabs;
-import com.mojang.math.Quaternion;
-import com.mojang.math.Transformation;
-import com.mojang.math.Vector3f;
-import com.mojang.math.Vector4f;
+import com.kingodogo.buildscape.block.VerticalSlabBlock;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.block.BlockModelShaper;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.ItemOverrides;
 import net.minecraft.client.renderer.block.model.ItemTransforms;
@@ -14,6 +13,9 @@ import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.block.SlabBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.SlabType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -33,130 +35,325 @@ public class ModClientEvents {
     public static void onModelBake(ModelBakeEvent event) {
         Map<ResourceLocation, BakedModel> registry = event.getModelRegistry();
 
-        ModVerticalSlabs.VERTICAL_SLABS.forEach((slab, verticalSlab) -> {
+        ModVerticalSlabs.VERTICAL_SLABS.forEach((originalSlab, verticalSlab) -> {
             ResourceLocation verticalId = verticalSlab.getRegistryName();
-            if (verticalId == null) return;
+            if (verticalId != null) {
+                try {
+                    // Try to get the FULL BLOCK model (Double Slab)
+                    BlockState parentDoubleState = originalSlab.defaultBlockState().setValue(SlabBlock.TYPE, SlabType.DOUBLE);
+                    ResourceLocation parentDoubleMrl = BlockModelShaper.stateToModelLocation(parentDoubleState);
+                    BakedModel parentDoubleModel = registry.get(parentDoubleMrl);
 
-            ResourceLocation parentId = slab.getRegistryName();
-            if (parentId == null) return;
+                    if (parentDoubleModel == null || parentDoubleModel == Minecraft.getInstance().getModelManager().getMissingModel()) {
+                        // Fallback to default state if double is missing (unlikely for standard slabs)
+                        parentDoubleModel = registry.get(BlockModelShaper.stateToModelLocation(originalSlab.defaultBlockState()));
+                    }
 
-            // FOOLPROOF: Try exact model locations that Minecraft/Mods use for slabs
-            BakedModel bottomModel = null;
-            String[] singleVariants = {"type=bottom", "half=bottom", "normal", "inventory"};
-            for (String v : singleVariants) {
-                bottomModel = registry.get(new ModelResourceLocation(parentId, v));
-                if (bottomModel != null) break;
+                    if (parentDoubleModel != null) {
+                        for (BlockState state : verticalSlab.getStateDefinition().getPossibleStates()) {
+                            Direction facing = state.getValue(VerticalSlabBlock.FACING);
+                            SlabType type = state.getValue(VerticalSlabBlock.TYPE);
+
+                            String variant = "facing=" + facing.getName() + ",type=" + type.getSerializedName() + ",waterlogged=" + state.getValue(VerticalSlabBlock.WATERLOGGED);
+                            ModelResourceLocation mrl = new ModelResourceLocation(verticalId, variant);
+
+                            // Register correct model based on type
+                            // For Double slabs (full block), use the original parent double model directly.
+                            // For Vertical slabs (half block), use our custom model wrapper.
+                            if (type == SlabType.DOUBLE) {
+                                registry.put(mrl, parentDoubleModel);
+                            } else {
+                                registry.put(mrl, new VerticalSlabBakedModel(parentDoubleModel, facing, false));
+                            }
+                        }
+
+                        // Item Model
+                        ModelResourceLocation itemMrl = new ModelResourceLocation(verticalId, "inventory");
+                        registry.put(itemMrl, new VerticalSlabBakedModel(parentDoubleModel, Direction.NORTH, true));
+                    }
+                } catch (Exception e) {
+                    BuildScape.LOGGER.error("Failed to replace model for vertical slab: " + verticalId, e);
+                }
             }
-
-            BakedModel doubleModel = null;
-            String[] doubleVariants = {"type=double", "half=upper", "double"};
-            for (String v : doubleVariants) {
-                doubleModel = registry.get(new ModelResourceLocation(parentId, v));
-                if (doubleModel != null) break;
-            }
-
-            if (bottomModel == null) return;
-
-            // 1. Single Slab Model (NORTH BASE)
-            // The blockstate JSON converts this to other facings using 'y' rotation.
-            BakedModel verticalSingle = new RotatedVerticalSlabModel(bottomModel, getBaseRotation());
-            registry.put(new ModelResourceLocation(verticalId, "facing=north,type=single,waterlogged=false"), verticalSingle);
-            registry.put(new ModelResourceLocation(verticalId, "facing=north,type=single,waterlogged=true"), verticalSingle);
-
-            // 2. Double Slab Model (DUMMY/PLACEHOLDER OVERRIDE)
-            // We register for all facings to ensure no state is left unmapped.
-            BakedModel verticalDouble = doubleModel != null ? new RotatedVerticalSlabModel(doubleModel, Transformation.identity()) : new DoubleVerticalSlabModel(bottomModel);
-
-            String[] facings = {"north", "east", "south", "west"};
-            for (String f : facings) {
-                registry.put(new ModelResourceLocation(verticalId, "facing=" + f + ",type=double,waterlogged=false"), verticalDouble);
-                registry.put(new ModelResourceLocation(verticalId, "facing=" + f + ",type=double,waterlogged=true"), verticalDouble);
-            }
-
-            // 3. Item Model
-            registry.put(new ModelResourceLocation(verticalId, "inventory"), verticalSingle);
         });
     }
 
-    private static Transformation getBaseRotation() {
-        // Rotates a bottom slab to be a North-facing vertical slab
-        Quaternion rotX = new Quaternion(Vector3f.XP, -90, true);
-        Vector3f trans = new Vector3f(0f, 0f, 0.5f);
-        return new Transformation(trans, rotX, null, null);
-    }
-
-    private static class RotatedVerticalSlabModel implements BakedModel {
-        protected final BakedModel original;
-        protected final Transformation transform;
+    private static class VerticalSlabBakedModel implements BakedModel {
+        private final BakedModel original;
+        private final Direction facing;
+        private final boolean isInventory;
         private final Map<Direction, List<BakedQuad>> quadCache = new ConcurrentHashMap<>();
-        private final Object unculledLock = new Object();
-        private volatile List<BakedQuad> unculledCache = null;
+        private List<BakedQuad> unculledCache = null;
 
-        public RotatedVerticalSlabModel(BakedModel original, Transformation transform) {
+        public VerticalSlabBakedModel(BakedModel original, Direction facing, boolean isInventory) {
             this.original = original;
-            this.transform = transform;
+            this.facing = facing;
+            this.isInventory = isInventory;
         }
 
         @Override
-        public List<BakedQuad> getQuads(@Nullable net.minecraft.world.level.block.state.BlockState state, @Nullable Direction side, Random rand) {
+        public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, Random rand) {
+            // Unculled quads (side == null) handling
             if (side == null) {
                 if (unculledCache == null) {
-                    synchronized (unculledLock) {
-                        if (unculledCache == null) {
-                            List<BakedQuad> quads = new ArrayList<>();
-                            collectAndTransform(null, quads, rand);
-                            unculledCache = quads;
-                        }
-                    }
+                    unculledCache = new ArrayList<>();
+                    generateQuads(null, unculledCache, rand);
                 }
                 return unculledCache;
             }
+
+            // Culled quads
             return quadCache.computeIfAbsent(side, s -> {
                 List<BakedQuad> list = new ArrayList<>();
-                collectAndTransform(s, list, rand);
+                generateQuads(s, list, rand);
                 return list;
             });
         }
 
-        protected void collectAndTransform(@Nullable Direction targetSide, List<BakedQuad> result, Random rand) {
-            for (Direction origD : Direction.values()) {
-                for (BakedQuad q : original.getQuads(null, origD, rand)) {
-                    BakedQuad tr = transformQuad(q, transform);
-                    if (tr.getDirection() == targetSide) result.add(tr);
-                }
+        private void generateQuads(@Nullable Direction targetSide, List<BakedQuad> result, Random rand) {
+            // We iterate over all quads of the original DOUBLE slab model
+            // And selectively keep/modify them based on our facing.
+            // A Vertical Slab occupies half the block space.
+
+            for (Direction d : Direction.values()) {
+                processQuads(original.getQuads(null, d, rand), targetSide, result);
             }
-            for (BakedQuad q : original.getQuads(null, null, rand)) {
-                BakedQuad tr = transformQuad(q, transform);
-                if (tr.getDirection() == targetSide) result.add(tr);
+            processQuads(original.getQuads(null, null, rand), targetSide, result);
+        }
+
+        private void processQuads(List<BakedQuad> sourceQuads, @Nullable Direction targetSide, List<BakedQuad> result) {
+            for (BakedQuad q : sourceQuads) {
+                BakedQuad transformed = transformQuad(q);
+                if (transformed != null) {
+                    // Only add if it matches the target side (culling check)
+                    // If targetSide is null, we add everything that isn't culled.
+                    // If targetSide is not null, we only add quads that face that way.
+                    if (targetSide == null || transformed.getDirection() == targetSide) {
+                        result.add(transformed);
+                    }
+                }
             }
         }
 
-        protected BakedQuad transformQuad(BakedQuad quad, Transformation transform) {
+        private BakedQuad transformQuad(BakedQuad quad) {
             int[] vertexData = quad.getVertices();
             int[] newData = new int[vertexData.length];
             System.arraycopy(vertexData, 0, newData, 0, vertexData.length);
+
+            Direction quadDir = quad.getDirection();
+            TextureAtlasSprite sprite = quad.getSprite();
+
+            // Logic:
+            // We want to "Mask" or "Crop" the full block model to the half we want.
+            // Facing = NORTH -> Keep Z in [0, 0.5] (approx 0..8 pixels)
+            // Facing = SOUTH -> Keep Z in [0.5, 1.0]
+            // Facing = EAST  -> Keep X in [0.5, 1.0]
+            // Facing = WEST  -> Keep X in [0, 0.5]
+
+            float minX = 0, maxX = 1;
+            float minZ = 0, maxZ = 1;
+
+            if (facing == Direction.NORTH) maxZ = 0.5f;
+            else if (facing == Direction.SOUTH) minZ = 0.5f;
+            else if (facing == Direction.WEST) maxX = 0.5f;
+            else if (facing == Direction.EAST) minX = 0.5f;
+
+            boolean needsRemapping = false;
+
+            // Check if quad is fully outside our bounds (culling) or inside/needs cropping
+            // We modify the XYZ coordinates of the vertices to clamp them to our box.
+            // AND we modify the UVs to match (since texture is usually mapped to position).
+
+            // However, simply clamping vertices will stretch texture if UVs aren't adjusted.
+            // But standard MC blocks use "Projected" mapping (1 unit pos = 16 units UV).
+            // So if we move a vertex, we should move the UV proportionally.
+            
             for (int i = 0; i < 4; i++) {
                 int offset = i * 8;
-                Vector4f vec = new Vector4f(Float.intBitsToFloat(newData[offset]), Float.intBitsToFloat(newData[offset + 1]), Float.intBitsToFloat(newData[offset + 2]), 1.0F);
-                vec.transform(transform.getMatrix());
-                newData[offset] = Float.floatToRawIntBits(vec.x());
-                newData[offset + 1] = Float.floatToRawIntBits(vec.y());
-                newData[offset + 2] = Float.floatToRawIntBits(vec.z());
+                float x = Float.intBitsToFloat(newData[offset]);
+                float y = Float.intBitsToFloat(newData[offset + 1]);
+                float z = Float.intBitsToFloat(newData[offset + 2]);
 
-                int normal = newData[offset + 7];
-                if (normal != 0) {
-                    Vector4f nvec = new Vector4f((float) ((byte) (normal & 0xFF)) / 127f, (float) ((byte) ((normal >> 8) & 0xFF)) / 127f, (float) ((byte) ((normal >> 16) & 0xFF)) / 127f, 0.0F);
-                    nvec.transform(transform.getMatrix());
-                    newData[offset + 7] = ((int) (nvec.x() * 127f) & 0xFF) | (((int) (nvec.y() * 127f) & 0xFF) << 8) | (((int) (nvec.z() * 127f) & 0xFF) << 16) | (normal & 0xFF000000);
+                // Clamp Position
+                float newX = Math.max(minX, Math.min(maxX, x));
+                float newZ = Math.max(minZ, Math.min(maxZ, z));
+
+                // Centering translation: move icon by 4 pixels (0.25) so it looks centered in GUI slots
+                if (isInventory) {
+                    if (facing == Direction.NORTH) newZ += 0.25f;
+                    else if (facing == Direction.SOUTH) newZ -= 0.25f;
+                    else if (facing == Direction.WEST) newX += 0.25f;
+                    else if (facing == Direction.EAST) newX -= 0.25f;
+                }
+
+                if (newX != x || newZ != z || isInventory) {
+                    needsRemapping = true;
+                    newData[offset] = Float.floatToRawIntBits(newX);
+                    newData[offset + 2] = Float.floatToRawIntBits(newZ);
+
+                    // Remap UV
+                    float u = Float.intBitsToFloat(newData[offset + 4]);
+                    float v = Float.intBitsToFloat(newData[offset + 5]);
+
+                    // We need to know the axis of the UV mapping.
+                    // Standard:
+                    // UP/DOWN: X=u, Z=v (or similar).
+                    // NORTH/SOUTH: X=u, Y=v.
+                    // EAST/WEST: Z=u, Y=v.
+
+                    // Retrieve interpolated U/V based on the shift in position.
+                    // Determine shift ratio.
+                    // Instead of complex calculation, let's use the sprite's interpolation.
+                    // U = sprite.getU( ... )
+                    // But we have raw U. We need un-interpolated 0-16.
+
+                    float unU = sprite.getUOffset(u); // This returns the offset from minU? No.
+                    // Use sprite.getU(16.0f * value) -> u.
+                    // It's hard to reverse without access to the specific mapping logic of the model.
+                    // But generally: if we moved X by delta, we move U by delta (masked by orientation).
+
+                    // Simplification: We assume standard block mapping.
+                    // Move U/V proportional to move in X/Y/Z.
+
+                    // Actually, simpler approach for "Cut" faces (the internal face we just created by clamping):
+                    // If a Face was at Z=0.5 (internal), it didn't exist before.
+                    // By clamping, we are moving the "Far" face (Z=1) to Z=0.5.
+                    // We must retain the UV of the newly created edge? 
+                    // No. UVs are stuck to the geometry in standard models.
+                    // If we move the geometry, we must decide:
+                    // 1. Stretch the texture (Keep old UV). -> Current generic behavior?
+                    // 2. Crop the texture (Move UV). -> Correct for slabs.
+
+                    // To Crop: calculate how much we moved in 0-1 space, and apply to UV.
+                    // This requires knowing the UV-to-Position direction.
+                    // Let's assume standard axes.
                 }
             }
-            Direction d = quad.getDirection();
-            if (d != null) {
-                Vector4f v = new Vector4f(d.getStepX(), d.getStepY(), d.getStepZ(), 0);
-                v.transform(transform.getMatrix());
-                d = Direction.getNearest(v.x(), v.y(), v.z());
+
+            if (needsRemapping) {
+                // Recalculate UVs based on new positions using "Box" mapping as a heuristic
+                // This is robust for most blocks.
+                recalculateUVs(newData, sprite);
             }
-            return new BakedQuad(newData, quad.getTintIndex(), d, quad.getSprite(), quad.isShade());
+
+            // Check if quad is valid area
+            if (isDegenerate(newData)) return null;
+
+            return new BakedQuad(newData, quad.getTintIndex(), quadDir, sprite, quad.isShade());
+        }
+
+        private void recalculateUVs(int[] vertexData, TextureAtlasSprite sprite) {
+            // Logic to deduce UV from XYZ for standard block mapping
+            // Find normal
+            // (We can assume the quad Direction is preserved or irrelevant for UV calc on axis-aligned faces)
+            // But we need to handle the "New" faces created by clamping?
+            // Actually, when we clamp a Face (e.g. South Face Z=1 to Z=0.5), it becomes the Back face of the slab.
+            // It should use the texture of the original face, effectively cropped.
+            // If we kept original UVs, we would see the Z=1 texture at Z=0.5.
+            // We want to see the texture AT Z=0.5.
+            // So we must interpolate UVs.
+
+            // Get bounds of UVs in the quad to determine orientation?
+            // Too complex.
+            // Standard MC Block mapping:
+            // U = x * 16, V = z * 16 (Up/Down)
+            // U = x * 16, V = 16 - y * 16 (North/South)
+            // ...
+
+            // Re-projecting UVs based on position and sprite is the safest bet for "Cropping".
+            // We assume 0..1 range for positions.
+
+            // Determine major axis (Normal).
+            // Since we modified vertices, we might have flattened a quad. The Normal is derived from vertices usually?
+            // Or we use the original Direction.
+
+            // If we clamped the South Face (Z=1) to Z=0.5. It is still a South Face?
+            // No, it is now at Z=0.5. It is effectively inside.
+            // Wait. If we have a North Vertical Slab (Z 0..0.5).
+            // The North Face (Z=0) is untouched.
+            // The South Face (Z=1) is clamped to Z=0.5. It becomes the Back of the slab.
+            // We want this Back face to show the texture that WAS at Z=0.5?
+            // Or do we want to show the specific "Side" texture?
+            // If we use the original South Face texture (Side texture), and clamp it.
+            // We are essentially saying "The back of this slab uses the Side texture". Correct.
+            // But we need to crop it.
+
+            // For each vertex:
+            for (int i = 0; i < 4; i++) {
+                int offset = i * 8;
+                float x = Float.intBitsToFloat(vertexData[offset]);
+                float y = Float.intBitsToFloat(vertexData[offset + 1]);
+                float z = Float.intBitsToFloat(vertexData[offset + 2]);
+
+                float u = 0, v = 0;
+
+                // Heuristic mapping
+                // This works for standard blocks but might fail for rotated logs if not careful.
+                // However, Vertical Slabs are dynamically generated.
+
+                // Facing logic for UVs:
+                // We don't have the "Face" direction easily for arbitrary quads, but we can guess from Normal in vertex data?
+                // Or pass it in.
+                // Let's rely on simple axis alignment.
+
+                // Standard Block Models:
+                // Up/Down: U=X, V=Z.
+                // North/South: U=X, V=1-Y.
+                // East/West: U=Z, V=1-Y.
+
+                // However, sprite coordinates are minU..maxU.
+                // We need to interp.
+
+                // U_interpolated = sprite.getU(u_01 * 16.0)
+
+                // Identify Face Direction from Quad Data (Normal is stored in int at offset + 7)
+                // But simply:
+                // if normal.y != 0 -> Up/Down.
+                // if normal.z != 0 -> North/South.
+                // if normal.x != 0 -> East/West.
+
+                int normal = vertexData[offset + 7];
+                float nx = (float) ((byte) (normal & 0xFF)) / 127.0f;
+                float ny = (float) ((byte) ((normal >> 8) & 0xFF)) / 127.0f;
+                float nz = (float) ((byte) ((normal >> 16) & 0xFF)) / 127.0f;
+
+                if (Math.abs(ny) > 0.5) { // Up/Down
+                    u = x;
+                    v = z;
+                } else if (Math.abs(nz) > 0.5) { // North/South
+                    u = x;
+                    v = 1.0f - y;
+                } else { // East/West
+                    u = z;
+                    v = 1.0f - y;
+                }
+
+                // Clamp 0..1
+                u = Math.max(0, Math.min(1, u));
+                v = Math.max(0, Math.min(1, v));
+
+                vertexData[offset + 4] = Float.floatToRawIntBits(sprite.getU(u * 16.0f));
+                vertexData[offset + 5] = Float.floatToRawIntBits(sprite.getV(v * 16.0f));
+            }
+        }
+
+        private boolean isDegenerate(int[] vertexData) {
+            // Check if area is zero.
+            // Simple check: if all xs are same AND all ys are same...
+            float x0 = Float.intBitsToFloat(vertexData[0]);
+            float y0 = Float.intBitsToFloat(vertexData[1]);
+            float z0 = Float.intBitsToFloat(vertexData[2]);
+
+            boolean allX = true, allY = true, allZ = true;
+            for (int i = 1; i < 4; i++) {
+                int o = i * 8;
+                if (Math.abs(Float.intBitsToFloat(vertexData[o]) - x0) > 1e-4) allX = false;
+                if (Math.abs(Float.intBitsToFloat(vertexData[o + 1]) - y0) > 1e-4) allY = false;
+                if (Math.abs(Float.intBitsToFloat(vertexData[o + 2]) - z0) > 1e-4) allZ = false;
+            }
+            // If any two dimensions are flattened, it's degenerate (line or point).
+            // Ideally a Face must vary in 2 dimensions.
+            return (allX && allY) || (allX && allZ) || (allY && allZ);
         }
 
         @Override
@@ -186,48 +383,12 @@ public class ModClientEvents {
 
         @Override
         public ItemOverrides getOverrides() {
-            return original.getOverrides();
+            return ItemOverrides.EMPTY;
         }
 
         @Override
         public ItemTransforms getTransforms() {
             return original.getTransforms();
-        }
-    }
-
-    private static class DoubleVerticalSlabModel extends RotatedVerticalSlabModel {
-        private final BakedModel part2; // South half
-        private final Object doubleUnculledLock = new Object();
-        private volatile List<BakedQuad> doubleUnculledCache = null;
-
-        public DoubleVerticalSlabModel(BakedModel bottomSlab) {
-            super(bottomSlab, getBaseRotation()); // Part 1 (North)
-            Transformation southTransform = new Transformation(new Vector3f(1, 0, 1), new Quaternion(Vector3f.YP, 180, true), null, null)
-                    .compose(getBaseRotation());
-            this.part2 = new RotatedVerticalSlabModel(bottomSlab, southTransform);
-        }
-
-        @Override
-        public List<BakedQuad> getQuads(@Nullable net.minecraft.world.level.block.state.BlockState state, @Nullable Direction side, Random rand) {
-            if (side == null) {
-                if (doubleUnculledCache == null) {
-                    synchronized (doubleUnculledLock) {
-                        if (doubleUnculledCache == null) {
-                            List<BakedQuad> quads = new ArrayList<>();
-                            quads.addAll(super.getQuads(state, null, rand));
-                            quads.addAll(part2.getQuads(state, null, rand));
-                            doubleUnculledCache = quads;
-                        }
-                    }
-                }
-                return doubleUnculledCache;
-            }
-            return doubleCache.computeIfAbsent(side, s -> {
-                List<BakedQuad> quads = new ArrayList<>();
-                quads.addAll(super.getQuads(state, s, rand));
-                quads.addAll(part2.getQuads(state, s, rand));
-                return quads;
-            });
         }
     }
 }

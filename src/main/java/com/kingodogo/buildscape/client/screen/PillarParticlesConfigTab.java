@@ -5,18 +5,19 @@ import com.kingodogo.buildscape.client.screen.widget.ColorSwatchButton;
 import com.kingodogo.buildscape.client.screen.widget.CustomScrollbarRenderer;
 import com.kingodogo.buildscape.client.screen.widget.IntSliderWidget;
 import com.kingodogo.buildscape.config.PillarParticleConfig;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.GuiComponent;
-import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.network.chat.TranslatableComponent;
-import net.minecraft.network.chat.TextComponent;
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.systems.RenderSystem;
-import java.util.ArrayList;
-import java.util.List;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class PillarParticlesConfigTab extends AbstractConfigTab {
     private static final String[] PATTERNS = { "default", "beam", "spiral", "fountain", "pulse", "ring", "burst" };
@@ -665,26 +666,28 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
     private void relayout(int contentX, int contentY, int contentWidth, int contentHeight) {
         int padding = 10; // Internal padding within boxes
 
-        // Get screen dimensions for percentage-based calculations
+        // Use dimensions from parent screen directly to ensure consistency
         int screenWidth = parent.width;
+        int screenHeight = parent.height;
 
-        // Layout: [11% sidebar][1% gap][44% middle][1% gap][44% right]
-        // Calculate panel widths from full screen width (not content width)
-        int sidebarWidth = (int) (screenWidth * 0.11); // 11% of full screen
-        int gap = (int) (screenWidth * 0.01); // 1% of full screen
-        int middlePanelWidth = (int) (screenWidth * 0.44); // 44% of full screen
-        int rightPanelWidth = (int) (screenWidth * 0.44); // 44% of full screen
+        int middleX = parent.getContentX();
+        int middlePanelWidth = parent.getContentWidth();
+        int rightX = parent.getRightPanelX();
+        int rightPanelWidth = parent.getRightPanelWidth();
 
-        // Each section takes 50% of content height
-        // Each section takes 50% of available height (total - gap)
-        int availableTotalHeight = contentHeight - gap;
-        int sectionHeight = availableTotalHeight / 2;
+        // Vertical Gaps
+        // Height Gap: 0.5%
+        int topGap = parent.getContentY(); // 5%
+        int bottomGap = (int) (screenHeight * 0.005);
+        int middleGap = (int) (screenHeight * 0.005);
 
-        // Calculate positions - middle panel starts after sidebar + gap
-        // contentX is already the sidebar width, so we add the gap
-        int middleX = sidebarWidth + gap; // 11% + 1% = start of middle panel
-        int rightX = sidebarWidth + gap + middlePanelWidth + gap; // 11% + 1% + 44% + 1% = start of right panel
-        int topY = contentY;
+        // Full available height for content (Total - Top - Bottom)
+        int fullContentHeight = screenHeight - topGap - bottomGap;
+
+        // Split for left side (Two panels with middle gap)
+        int sectionHeight = (fullContentHeight - middleGap) / 2;
+
+        int topY = topGap;
 
         // Middle panel - Top 50%: Default Properties
         defaultBoxX = middleX;
@@ -694,15 +697,15 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
 
         // Middle panel - Bottom 50%: Pattern Properties
         patternBoxX = middleX;
-        patternBoxY = topY + sectionHeight + gap; // Add gap between panels
+        patternBoxY = topY + sectionHeight + middleGap; // Add 0.5% gap
         patternBoxWidth = middlePanelWidth;
         patternBoxHeight = sectionHeight;
 
         // Right panel - 100% height: Color Swatches and Color Picker
         colorBoxX = rightX;
-        colorBoxY = contentY;
+        colorBoxY = topY;
         colorBoxWidth = rightPanelWidth;
-        colorBoxHeight = contentHeight; // Full height instead of 50%
+        colorBoxHeight = fullContentHeight; // Full height
 
         colorsResetButton.x = colorBoxX + colorBoxWidth - 20;
         colorsResetButton.y = colorBoxY + 5;
@@ -728,13 +731,13 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
         int buttonToFieldSpacing = 5; // Spacing between button and first field
         int totalContentHeight = titleHeight + buttonHeight + buttonToFieldSpacing + (numFields * fieldHeight)
                 + ((numFields - 1) * fieldSpacing);
-        int availableHeight = defaultBoxHeight - padding * 2;
+        int defaultPanelAvailableHeight = defaultBoxHeight - padding * 2;
 
         // Always reserve space for scrollbar to prevent fields from overlapping it
         // Use a fixed scrollbar width to ensure consistent layout
         int scrollbarWidth = 13; // 8px width + 5px padding
         int scrollbarOffset = 10; // Increased Gap between components and scrollbar (10 pixels)
-        boolean needsScrollbar = totalContentHeight > availableHeight;
+        boolean needsScrollbar = totalContentHeight > defaultPanelAvailableHeight;
 
         // Calculate end position: if scrollbar exists, end before scrollbar with
         // offset, otherwise use full width
@@ -1116,18 +1119,16 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
         double guiScale = mcInstance.getWindow().getGuiScale();
         int windowHeight = mcInstance.getWindow().getHeight();
 
-        // Draw border for Default Properties panel (debug mode)
-        if (com.kingodogo.buildscape.client.screen.DebugRenderConfig.RENDER_PANEL_BORDERS) {
-            int borderColor = com.kingodogo.buildscape.client.screen.DebugRenderConfig.PANEL_BORDER_COLOR;
-            GuiComponent.fill(poseStack, defaultBoxX, defaultBoxY, defaultBoxX + defaultBoxWidth, defaultBoxY + 1,
-                    borderColor); // Top
-            GuiComponent.fill(poseStack, defaultBoxX, defaultBoxY + defaultBoxHeight - 1, defaultBoxX + defaultBoxWidth,
-                    defaultBoxY + defaultBoxHeight, borderColor); // Bottom
-            GuiComponent.fill(poseStack, defaultBoxX, defaultBoxY, defaultBoxX + 1, defaultBoxY + defaultBoxHeight,
-                    borderColor); // Left
-            GuiComponent.fill(poseStack, defaultBoxX + defaultBoxWidth - 1, defaultBoxY, defaultBoxX + defaultBoxWidth,
-                    defaultBoxY + defaultBoxHeight, borderColor); // Right
-        }
+        // Draw border for Default Properties panel (Always render)
+        int borderColor = 0xFF666666;
+        GuiComponent.fill(poseStack, defaultBoxX, defaultBoxY, defaultBoxX + defaultBoxWidth, defaultBoxY + 1,
+                borderColor); // Top
+        GuiComponent.fill(poseStack, defaultBoxX, defaultBoxY + defaultBoxHeight - 1, defaultBoxX + defaultBoxWidth,
+                defaultBoxY + defaultBoxHeight, borderColor); // Bottom
+        GuiComponent.fill(poseStack, defaultBoxX, defaultBoxY, defaultBoxX + 1, defaultBoxY + defaultBoxHeight,
+                borderColor); // Left
+        GuiComponent.fill(poseStack, defaultBoxX + defaultBoxWidth - 1, defaultBoxY, defaultBoxX + defaultBoxWidth,
+                defaultBoxY + defaultBoxHeight, borderColor); // Right
 
         // Calculate a bottom offset to prevent content from touching the border (user
         // requested ~1%)
@@ -1278,15 +1279,7 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
         // Right Top: Color Swatches and Shared Picker - Render with scissor test to
         // clip to panel bounds
         // Draw border for Color Swatches panel (debug mode)
-        if (com.kingodogo.buildscape.client.screen.DebugRenderConfig.RENDER_PANEL_BORDERS) {
-            int borderColor = com.kingodogo.buildscape.client.screen.DebugRenderConfig.PANEL_BORDER_COLOR;
-            GuiComponent.fill(poseStack, colorBoxX, colorBoxY, colorBoxX + colorBoxWidth, colorBoxY + 1, borderColor); // Top
-            GuiComponent.fill(poseStack, colorBoxX, colorBoxY + colorBoxHeight - 1, colorBoxX + colorBoxWidth,
-                    colorBoxY + colorBoxHeight, borderColor); // Bottom
-            GuiComponent.fill(poseStack, colorBoxX, colorBoxY, colorBoxX + 1, colorBoxY + colorBoxHeight, borderColor); // Left
-            GuiComponent.fill(poseStack, colorBoxX + colorBoxWidth - 1, colorBoxY, colorBoxX + colorBoxWidth,
-                    colorBoxY + colorBoxHeight, borderColor); // Right
-        }
+        // Debug border removed as permanent border is drawn below
 
         scissorX = (int) (colorBoxX * guiScale);
         scissorY = (int) (windowHeight - (colorBoxY + colorBoxHeight) * guiScale);
@@ -1294,11 +1287,18 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
         // Clip top 25px for header
         int colorHeaderClip = 25;
         scissorHeight = (int) (colorBoxHeight * guiScale - colorHeaderClip * guiScale);
+        // Render panel border for Color Swatches (always, as requested)
+        int colorBorderColor = 0xFF666666;
+        GuiComponent.fill(poseStack, colorBoxX - 1, colorBoxY - 1, colorBoxX + colorBoxWidth + 1, colorBoxY, colorBorderColor); // Top
+        GuiComponent.fill(poseStack, colorBoxX - 1, colorBoxY + colorBoxHeight, colorBoxX + colorBoxWidth + 1, colorBoxY + colorBoxHeight + 1, colorBorderColor); // Bottom
+        GuiComponent.fill(poseStack, colorBoxX - 1, colorBoxY, colorBoxX, colorBoxY + colorBoxHeight, colorBorderColor); // Left
+        GuiComponent.fill(poseStack, colorBoxX + colorBoxWidth, colorBoxY, colorBoxX + colorBoxWidth + 1, colorBoxY + colorBoxHeight, colorBorderColor); // Right
+
         RenderSystem.enableScissor(scissorX, scissorY, scissorWidth, scissorHeight);
 
         // Debug: Draw panel background to verify panel is visible
-        GuiComponent.fill(poseStack, colorBoxX, colorBoxY, colorBoxX + colorBoxWidth, colorBoxY + colorBoxHeight,
-                0x40000000);
+        // GuiComponent.fill(poseStack, colorBoxX, colorBoxY, colorBoxX + colorBoxWidth, colorBoxY + colorBoxHeight,
+        //         0x40000000);
 
         // Removed "Custom Properties" title text as requested
 
@@ -1439,17 +1439,16 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
         // Middle Bottom: Pattern Properties - Render with scissor test to clip to panel
         // bounds
         // Draw border for Pattern Properties panel (debug mode)
-        if (com.kingodogo.buildscape.client.screen.DebugRenderConfig.RENDER_PANEL_BORDERS) {
-            int borderColor = com.kingodogo.buildscape.client.screen.DebugRenderConfig.PANEL_BORDER_COLOR;
-            GuiComponent.fill(poseStack, patternBoxX, patternBoxY, patternBoxX + patternBoxWidth, patternBoxY + 1,
-                    borderColor); // Top
-            GuiComponent.fill(poseStack, patternBoxX, patternBoxY + patternBoxHeight - 1, patternBoxX + patternBoxWidth,
-                    patternBoxY + patternBoxHeight, borderColor); // Bottom
-            GuiComponent.fill(poseStack, patternBoxX, patternBoxY, patternBoxX + 1, patternBoxY + patternBoxHeight,
-                    borderColor); // Left
-            GuiComponent.fill(poseStack, patternBoxX + patternBoxWidth - 1, patternBoxY, patternBoxX + patternBoxWidth,
-                    patternBoxY + patternBoxHeight, borderColor); // Right
-        }
+        // Draw border for Pattern Properties panel (Always render)
+        int patternBorderColor = 0xFF666666;
+        GuiComponent.fill(poseStack, patternBoxX, patternBoxY, patternBoxX + patternBoxWidth, patternBoxY + 1,
+                patternBorderColor); // Top
+        GuiComponent.fill(poseStack, patternBoxX, patternBoxY + patternBoxHeight - 1, patternBoxX + patternBoxWidth,
+                patternBoxY + patternBoxHeight, patternBorderColor); // Bottom
+        GuiComponent.fill(poseStack, patternBoxX, patternBoxY, patternBoxX + 1, patternBoxY + patternBoxHeight,
+                patternBorderColor); // Left
+        GuiComponent.fill(poseStack, patternBoxX + patternBoxWidth - 1, patternBoxY, patternBoxX + patternBoxWidth,
+                patternBoxY + patternBoxHeight, patternBorderColor); // Right
 
         scissorX = (int) (patternBoxX * guiScale);
         // Raise the bottom of the scissor box by bottomOffset
@@ -1588,7 +1587,8 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
             int scrollbarY = patternBoxY + padding + patternTitleHeight;
             // Extend scrollbar to the bottom offset
             bottomOffset = Math.max(5, (int) (windowHeight * 0.01 / guiScale));
-            int scrollbarHeight = patternBoxHeight - padding - patternTitleHeight - padding - 2;
+            // Ensure scrollbar stays well within the visible area (above bottom offset)
+            int scrollbarHeight = patternBoxHeight - padding - patternTitleHeight - bottomOffset - 5;
 
             double visibleRatio = patternAvailableHeight / (double) patternTotalContentHeight;
             patternScrollbarRenderer.renderScrollbar(poseStack, scrollbarX, scrollbarY, scrollbarHeight,

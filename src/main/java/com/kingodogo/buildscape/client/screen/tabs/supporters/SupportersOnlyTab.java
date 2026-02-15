@@ -200,8 +200,33 @@ public class SupportersOnlyTab extends AbstractConfigTab {
     
     @Override
     public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
-        if (panel1 != null) panel1.render(poseStack, mouseX, mouseY, partialTick);
-        if (panel5 != null) panel5.render(poseStack, mouseX, mouseY, partialTick);
+        if (panel1 != null) {
+            panel1.render(poseStack, mouseX, mouseY, partialTick);
+            // Draw border for Panel 1
+            int x = panel1.getStartX();
+            int y = panel1.getStartY();
+            int w = panel1.getWidth();
+            int h = panel1.getHeight();
+            int borderColor = 0xFF666666;
+            net.minecraft.client.gui.GuiComponent.fill(poseStack, x, y, x + w, y + 1, borderColor); // Top
+            net.minecraft.client.gui.GuiComponent.fill(poseStack, x, y + h - 1, x + w, y + h, borderColor); // Bottom
+            net.minecraft.client.gui.GuiComponent.fill(poseStack, x, y, x + 1, y + h, borderColor); // Left
+            net.minecraft.client.gui.GuiComponent.fill(poseStack, x + w - 1, y, x + w, y + h, borderColor); // Right
+        }
+
+        if (panel5 != null) {
+            panel5.render(poseStack, mouseX, mouseY, partialTick);
+            // Draw border for Panel 5
+            int x = panel5.getStartX();
+            int y = panel5.getStartY();
+            int w = panel5.getWidth();
+            int h = panel5.getHeight();
+            int borderColor = 0xFF666666;
+            net.minecraft.client.gui.GuiComponent.fill(poseStack, x, y, x + w, y + 1, borderColor); // Top
+            net.minecraft.client.gui.GuiComponent.fill(poseStack, x, y + h - 1, x + w, y + h, borderColor); // Bottom
+            net.minecraft.client.gui.GuiComponent.fill(poseStack, x, y, x + 1, y + h, borderColor); // Left
+            net.minecraft.client.gui.GuiComponent.fill(poseStack, x + w - 1, y, x + w, y + h, borderColor); // Right
+        }
 
         com.mojang.blaze3d.systems.RenderSystem.disableScissor();
 

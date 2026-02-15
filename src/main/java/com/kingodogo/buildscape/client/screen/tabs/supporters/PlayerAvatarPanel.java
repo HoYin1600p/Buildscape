@@ -3,6 +3,7 @@ package com.kingodogo.buildscape.client.screen.tabs.supporters;
 import com.kingodogo.buildscape.BuildScape;
 import com.kingodogo.buildscape.cosmetics.CosmeticManager;
 import com.kingodogo.buildscape.cosmetics.CosmeticRegistry;
+import com.mojang.authlib.GameProfile;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Vector3f;
@@ -12,12 +13,11 @@ import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.renderer.entity.player.PlayerRenderer;
-import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.item.ItemStack;
-import com.mojang.authlib.GameProfile;
-import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.inventory.InventoryMenu;
+import net.minecraft.world.item.ItemStack;
 
 import java.util.Map;
 import java.util.Set;
@@ -114,6 +114,13 @@ public class PlayerAvatarPanel extends BasePanel {
         RenderSystem.enableScissor(scissorX, scissorY, scissorWidth, scissorHeight);
 
         GuiComponent.fill(poseStack, startX, startY, endX, endY, 0x80000000);
+
+        // Draw panel border
+        int borderColor = 0xFF666666;
+        GuiComponent.fill(poseStack, startX - 1, startY - 1, endX + 1, startY, borderColor); // Top
+        GuiComponent.fill(poseStack, startX - 1, endY, endX + 1, endY + 1, borderColor); // Bottom
+        GuiComponent.fill(poseStack, startX - 1, startY, startX, endY, borderColor); // Left
+        GuiComponent.fill(poseStack, endX, startY, endX + 1, endY, borderColor); // Right
 
         String title = "Player Avatar";
         int titleWidth = mc.font.width(title);
@@ -716,6 +723,10 @@ public class PlayerAvatarPanel extends BasePanel {
                 boolean isParticleTrail = CosmeticManager.getInstance().isParticleTrail(cosmeticId);
 
                 ItemStack stack = cosmeticRegistry.resolveToItemStack(cosmeticId);
+                if ((stack == null || stack.isEmpty()) && SupportersTabState.getInstance().getBestSlotForCosmetic(cosmeticId) == SupportersTabState.SLOT_HEAD) {
+                    stack = new ItemStack(net.minecraft.world.item.Items.LEATHER_HELMET);
+                }
+
                 if (stack != null && !stack.isEmpty()) {
                     int itemX = centerX - 8;
                     mc.getItemRenderer().renderGuiItem(stack, itemX, itemY);
@@ -999,42 +1010,7 @@ public class PlayerAvatarPanel extends BasePanel {
         int previewSlot = -999;
         String previewId = state.getPreviewCosmeticId();
         if (previewId != null) {
-            // Use existing helper but we need to expose it or duplicate logic
-            // Since getBestSlotForCosmetic is private in State, let's use public
-            // getBestSlotForCosmetic
-            // Wait, getBestSlotForCosmetic is private in State? Let's check.
-            // It is private. I should have made it public or I need to duplicate logic or
-            // use another way.
-            // Let's assume for now I can duplicate the simple logic or modify State to make
-            // it public.
-            // Actually, I'll modify State to make it public in a separate step or just
-            // assume simple logic here.
-            com.kingodogo.buildscape.cosmetics.CosmeticManager manager = CosmeticManager.getInstance();
-            if (manager.isParticleTrail(previewId)) {
-                previewSlot = SupportersTabState.SLOT_TRAIL;
-            } else {
-                com.kingodogo.buildscape.cosmetics.CosmeticManager.CosmeticMetadata metadata = manager
-                        .getMetadata(previewId);
-                if (metadata != null
-                        && metadata.type() == com.kingodogo.buildscape.cosmetics.CosmeticManager.CosmeticType.WINGS) {
-                    previewSlot = SupportersTabState.SLOT_WINGS;
-                } else {
-                    ItemStack stack = registry.resolveToItemStack(previewId);
-                    if (stack != null && !stack.isEmpty()
-                            && stack.getItem() instanceof net.minecraft.world.item.ArmorItem armor) {
-                        switch (armor.getSlot()) {
-                            case HEAD -> previewSlot = SupportersTabState.SLOT_HEAD;
-                            case CHEST -> previewSlot = SupportersTabState.SLOT_CHEST;
-                            case LEGS -> previewSlot = SupportersTabState.SLOT_LEGS;
-                            case FEET -> previewSlot = SupportersTabState.SLOT_FEET;
-                        }
-                    }
-                    // Fallback for non-armor items that go to head/hand?
-                    // Usually cosmetics are mapped well.
-                    // If simple items (sword etc) usually mainhand but we don't have a mainhand
-                    // slot shown here.
-                }
-            }
+            previewSlot = state.getBestSlotForCosmetic(previewId);
         }
 
         for (int i = 0; i < slots.length; i++) {
@@ -1069,6 +1045,12 @@ public class PlayerAvatarPanel extends BasePanel {
 
             if (equippedId != null && !equippedId.isEmpty()) {
                 ItemStack stack = registry.resolveToItemStack(equippedId);
+
+                // Fallback for custom head cosmetics that don't have an ItemStack
+                if ((stack == null || stack.isEmpty()) && state.getBestSlotForCosmetic(equippedId) == SupportersTabState.SLOT_HEAD) {
+                    stack = new ItemStack(net.minecraft.world.item.Items.LEATHER_HELMET);
+                }
+
                 if (stack != null && !stack.isEmpty()) {
                     int itemX = slotX + (slotSize - 16) / 2;
                     int itemY = slotY + (slotSize - 16) / 2;

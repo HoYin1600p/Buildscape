@@ -4,7 +4,6 @@ import com.kingodogo.buildscape.config.CosmeticsConfig;
 import com.kingodogo.buildscape.cosmetics.CosmeticRegistry;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.model.geom.builders.PartDefinition;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.player.PlayerRenderer;
@@ -51,7 +50,7 @@ public class CosmeticRenderHandler {
     }
 
     // Cache for builders hat model part to avoid recreating it every frame
-    private static net.minecraft.client.model.geom.ModelPart buildersHatModelPart = null;
+    public static net.minecraft.client.model.geom.ModelPart buildersHatModelPart = null;
 
     /**
      * Render cosmetics as overlay on top of vanilla armor after player rendering.
@@ -310,9 +309,49 @@ public class CosmeticRenderHandler {
         }
     }
 
-    /**
-     * Render a custom head cosmetic model.
-     */
+    public static void initBuildersHatModel() {
+        if (buildersHatModelPart != null) return;
+
+        try {
+            // First try to bake the registered layer
+            try {
+                Minecraft mc = Minecraft.getInstance();
+                buildersHatModelPart = mc.getEntityModels().bakeLayer(com.kingodogo.buildscape.client.model.BuildersHatModel.LAYER_LOCATION);
+                if (buildersHatModelPart != null) {
+                    com.kingodogo.buildscape.BuildScape.getLogger().info("Successfully baked builders hat model from layer location");
+                    return;
+                }
+            } catch (Exception e) {
+                // Fallback to manual creation
+            }
+
+            // Manual creation as fallback
+            net.minecraft.client.model.geom.builders.MeshDefinition meshdefinition = new net.minecraft.client.model.geom.builders.MeshDefinition();
+            net.minecraft.client.model.geom.builders.PartDefinition partdefinition = meshdefinition.getRoot();
+
+            net.minecraft.client.model.geom.builders.PartDefinition Head = partdefinition.addOrReplaceChild("Head",
+                    net.minecraft.client.model.geom.builders.CubeListBuilder.create(),
+                    net.minecraft.client.model.geom.PartPose.offset(0.0F, 0.0F, 0.0F));
+
+            Head.addOrReplaceChild("bone",
+                    net.minecraft.client.model.geom.builders.CubeListBuilder.create()
+                            .texOffs(0, 0).addBox(-14.0F, -5.0F, 0.0F, 11.0F, 0.0F, 16.0F,
+                                    new net.minecraft.client.model.geom.builders.CubeDeformation(0.0F))
+                            .texOffs(0, 17).addBox(-13.0F, -10.0F, 5.0F, 9.0F, 5.0F, 9.0F,
+                                    new net.minecraft.client.model.geom.builders.CubeDeformation(0.0F))
+                            .texOffs(0, 32).addBox(-10.0F, -11.0F, 4.0F, 3.0F, 6.0F, 11.0F,
+                                    new net.minecraft.client.model.geom.builders.CubeDeformation(0.0F)),
+                    net.minecraft.client.model.geom.PartPose.offset(8.5F, -1.0F, -9.75F));
+
+            net.minecraft.client.model.geom.ModelPart root = partdefinition.bake(64, 64);
+            if (root != null) {
+                buildersHatModelPart = root.getChild("Head");
+            }
+        } catch (Exception e) {
+            com.kingodogo.buildscape.BuildScape.getLogger().error("Failed to initialize builders hat model", e);
+        }
+    }
+
     private static void renderCustomHeadCosmetic(
             AbstractClientPlayer player,
             String cosmeticId,
@@ -321,124 +360,18 @@ public class CosmeticRenderHandler {
             int packedLight,
             float partialTick) {
         try {
-            // Get the model from the entity render dispatcher
-            Minecraft mc = Minecraft.getInstance();
-            net.minecraft.client.renderer.entity.EntityRenderDispatcher dispatcher = mc.getEntityRenderDispatcher();
-
-            // Create or get cached model part
             if (buildersHatModelPart == null) {
-                com.kingodogo.buildscape.BuildScape.getLogger().info("Creating builders hat model part...");
-                try {
-                    // In 1.18.2, we need to access EntityModels through a player renderer
-                    net.minecraft.client.renderer.entity.player.PlayerRenderer playerRenderer = (net.minecraft.client.renderer.entity.player.PlayerRenderer) dispatcher
-                            .getRenderer(player);
-                    if (playerRenderer != null) {
-                        com.kingodogo.buildscape.BuildScape.getLogger()
-                                .info("PlayerRenderer found, attempting to create model...");
-                        // Try to bake the layer using the player renderer's EntityModels
-                        // PlayerRenderer has access to EntityModels through its context
-                        try {
-                            // Use reflection to access the EntityModels from PlayerRenderer
-                            java.lang.reflect.Field entityModelsField = null;
-                            try {
-                                entityModelsField = net.minecraft.client.renderer.entity.player.PlayerRenderer.class
-                                        .getDeclaredField("entityModels");
-                                entityModelsField.setAccessible(true);
-                            } catch (NoSuchFieldException e) {
-                                // Try alternative field names
-                                try {
-                                    entityModelsField = net.minecraft.client.renderer.entity.player.PlayerRenderer.class
-                                            .getDeclaredField("modelSet");
-                                    entityModelsField.setAccessible(true);
-                                } catch (NoSuchFieldException e2) {
-                                    // Field not found, try direct access through context
-                                }
-                            }
-
-                            if (entityModelsField != null) {
-                                net.minecraft.client.model.geom.EntityModelSet entityModels = (net.minecraft.client.model.geom.EntityModelSet) entityModelsField
-                                        .get(playerRenderer);
-                                if (entityModels != null) {
-                                    net.minecraft.client.model.geom.ModelPart root = entityModels.bakeLayer(
-                                            com.kingodogo.buildscape.client.model.BuildersHatModel.LAYER_LOCATION);
-                                    if (root != null) {
-                                        buildersHatModelPart = root.getChild("Head");
-                                    }
-                                }
-                            }
-
-                            // If reflection failed, recreate the model structure directly from
-                            // MeshDefinition
-                            if (buildersHatModelPart == null) {
-                                // Recreate the MeshDefinition structure exactly as in
-                                // BuildersHatModel.createBodyLayer()
-                                try {
-                                    net.minecraft.client.model.geom.builders.MeshDefinition meshdefinition = new net.minecraft.client.model.geom.builders.MeshDefinition();
-                                    PartDefinition partdefinition = meshdefinition.getRoot();
-
-                                    PartDefinition Head = partdefinition.addOrReplaceChild("Head",
-                                            net.minecraft.client.model.geom.builders.CubeListBuilder.create(),
-                                            net.minecraft.client.model.geom.PartPose.offset(0.0F, 0.0F, 0.0F));
-
-                                    Head.addOrReplaceChild("bone",
-                                            net.minecraft.client.model.geom.builders.CubeListBuilder.create()
-                                                    .texOffs(0, 0).addBox(-14.0F, -5.0F, 0.0F, 11.0F, 0.0F, 16.0F,
-                                                            new net.minecraft.client.model.geom.builders.CubeDeformation(
-                                                                    0.0F))
-                                                    .texOffs(0, 17).addBox(-13.0F, -10.0F, 5.0F, 9.0F, 5.0F, 9.0F,
-                                                            new net.minecraft.client.model.geom.builders.CubeDeformation(
-                                                                    0.0F))
-                                                    .texOffs(0, 32).addBox(-10.0F, -11.0F, 4.0F, 3.0F, 6.0F, 11.0F,
-                                                            new net.minecraft.client.model.geom.builders.CubeDeformation(
-                                                                    0.0F)),
-                                            net.minecraft.client.model.geom.PartPose.offset(8.5F, -1.0F, -9.75F));
-
-                                    // Bake the root PartDefinition to get ModelPart
-                                    net.minecraft.client.model.geom.ModelPart root = partdefinition.bake(64, 64);
-                                    if (root != null) {
-                                        buildersHatModelPart = root.getChild("Head");
-                                        if (buildersHatModelPart != null) {
-                                            com.kingodogo.buildscape.BuildScape.getLogger()
-                                                    .info("Successfully created builders hat model part!");
-                                        } else {
-                                            com.kingodogo.buildscape.BuildScape.getLogger()
-                                                    .warn("Root ModelPart created but 'Head' child not found!");
-                                        }
-                                    } else {
-                                        com.kingodogo.buildscape.BuildScape.getLogger()
-                                                .warn("Failed to bake root ModelPart!");
-                                    }
-                                } catch (Exception e3) {
-                                    com.kingodogo.buildscape.BuildScape.getLogger().error(
-                                            "Failed to create builders hat model: " + e3.getMessage(), e3);
-                                }
-                            }
-                        } catch (Exception e2) {
-                            com.kingodogo.buildscape.BuildScape.getLogger().warn(
-                                    "Failed to create builders hat model: " + e2.getMessage());
-                            return;
-                        }
-                    } else {
-                        return; // Can't get player renderer
-                    }
-                } catch (Exception e) {
-                    com.kingodogo.buildscape.BuildScape.getLogger().debug(
-                            "Builders hat model layer not registered, cannot render custom head cosmetic: "
-                                    + e.getMessage());
-                    return;
-                }
+                initBuildersHatModel();
             }
 
             if (buildersHatModelPart == null) {
-                com.kingodogo.buildscape.BuildScape.getLogger().warn("buildersHatModelPart is null, cannot render!");
-                return; // Model not created
+                return;
             }
 
             // Get texture location
             net.minecraft.resources.ResourceLocation texture = new net.minecraft.resources.ResourceLocation(
                     com.kingodogo.buildscape.BuildScape.MODID,
                     "textures/cosmatics/builders_hat.png");
-            com.kingodogo.buildscape.BuildScape.getLogger().debug("Rendering builders hat with texture: " + texture);
 
             // Get vertex consumer for the texture
             com.mojang.blaze3d.vertex.VertexConsumer vertexConsumer = bufferSource.getBuffer(
@@ -450,10 +383,6 @@ public class CosmeticRenderHandler {
             // Get player head rotation
             float headYaw = player.getYHeadRot();
             float headPitch = player.getXRot();
-
-            // Translate to head position (player head is at y=0.0, but model needs
-            // adjustment)
-            poseStack.translate(0.0, 0.0, 0.0);
 
             // Apply head rotation
             poseStack.mulPose(com.mojang.math.Vector3f.YP.rotationDegrees(headYaw));

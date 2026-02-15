@@ -1,9 +1,6 @@
 package com.kingodogo.buildscape.client.screen.tabs.supporters;
 
 import com.kingodogo.buildscape.BuildScape;
-import com.kingodogo.buildscape.client.screen.widget.ColorPickerWidget;
-import com.kingodogo.buildscape.client.screen.tabs.supporters.CosmeticColorPickerWidget;
-// Note: imports might be redundant if in same package but clean to be explicit or rely on package match
 import com.kingodogo.buildscape.config.CosmeticsConfig;
 import com.kingodogo.buildscape.cosmetics.CosmeticManager;
 import com.kingodogo.buildscape.cosmetics.CosmeticRegistry;
@@ -13,24 +10,17 @@ import com.mojang.math.Vector3f;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ElytraItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class CosmeticsDisplayPanel extends BasePanel {
-
-    private static final double FIXED_GUI_SCALE = 2.0;
 
     private static final int ITEMS_PER_ROW = 4;
 
@@ -86,7 +76,7 @@ public class CosmeticsDisplayPanel extends BasePanel {
     private float rotation = 0.0f;
     private float zoom = 1.0f;
     private long itemStartTime = 0;
-    private String lastSelectedCosmeticId = null;
+    private final String lastSelectedCosmeticId = null;
     private float bobOffset = 0.0f;
 
     private CosmeticColorPickerWidget colorPicker = null;
@@ -110,6 +100,7 @@ public class CosmeticsDisplayPanel extends BasePanel {
 
         itemSize = Math.max(32, itemSize);
 
+
         int titleHeight = 15;
         int availableHeight = height - PADDING * 2 - titleHeight - FILTER_BUTTON_AREA_HEIGHT;
         visibleRows = Math.max(1, availableHeight / (itemSize + itemSpacing));
@@ -131,6 +122,11 @@ public class CosmeticsDisplayPanel extends BasePanel {
         }
 
         if (idLower.contains("particle") || idLower.contains("effect") || idLower.contains("trail")) {
+            return true;
+        }
+
+        com.kingodogo.buildscape.cosmetics.CosmeticManager.CosmeticMetadata metadata = com.kingodogo.buildscape.cosmetics.CosmeticManager.getInstance().getMetadata(cosmeticId);
+        if (metadata != null && metadata.type() == com.kingodogo.buildscape.cosmetics.CosmeticManager.CosmeticType.HEAD) {
             return true;
         }
 
@@ -273,6 +269,7 @@ public class CosmeticsDisplayPanel extends BasePanel {
 
     @Override
     public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
+        if (mc.level == null) return;
 
         int titleHeight = 15;
         int renderStartY = startY + PADDING + titleHeight + FILTER_BUTTON_AREA_HEIGHT + ITEM_AREA_TOP_SPACING;
@@ -286,21 +283,19 @@ public class CosmeticsDisplayPanel extends BasePanel {
         int renderStartYActual = (int) (renderStartY * actualGuiScale);
         int scissorHeightActual = (int) (scissorHeight * actualGuiScale);
         int scissorYAdjusted = windowHeight - (renderStartYActual + scissorHeightActual);
-        int scissorHeightScaled = scissorHeightActual;
+        int scissorHeightScaled = Math.max(0, scissorHeightActual);
 
         int relativeMouseX = mouseX - startX;
         int relativeMouseY = mouseY - startY;
 
         GuiComponent.fill(poseStack, startX, startY, endX, endY, 0x80000000);
 
-        // Draw border around panel (debug mode)
-        if (com.kingodogo.buildscape.client.screen.DebugRenderConfig.RENDER_PANEL_BORDERS) {
-            int borderColor = com.kingodogo.buildscape.client.screen.DebugRenderConfig.PANEL_BORDER_COLOR;
-            GuiComponent.fill(poseStack, startX, startY, endX, startY + 1, borderColor); // Top
-            GuiComponent.fill(poseStack, startX, endY - 1, endX, endY, borderColor); // Bottom
-            GuiComponent.fill(poseStack, startX, startY, startX + 1, endY, borderColor); // Left
-            GuiComponent.fill(poseStack, endX - 1, startY, endX, endY, borderColor); // Right
-        }
+        // Draw panel border
+        int borderColor = 0xFF666666;
+        GuiComponent.fill(poseStack, startX - 1, startY - 1, endX + 1, startY, borderColor); // Top
+        GuiComponent.fill(poseStack, startX - 1, endY, endX + 1, endY + 1, borderColor); // Bottom
+        GuiComponent.fill(poseStack, startX - 1, startY, startX, endY, borderColor); // Left
+        GuiComponent.fill(poseStack, endX, startY, endX + 1, endY, borderColor); // Right
 
         String title = "Available Cosmetics";
         int titleWidth = mc.font.width(title);
@@ -311,7 +306,6 @@ public class CosmeticsDisplayPanel extends BasePanel {
 
         int numTabs = CosmeticType.values().length;
         int resetButtonWidth = 20;
-        int resetButtonHeight = 20;
         int spacing = BUTTON_SPACING;
 
         int availableWidth = width - PADDING * 2;
@@ -330,13 +324,13 @@ public class CosmeticsDisplayPanel extends BasePanel {
             int bgColor = isSelected ? 0xAA000000 : (isHovered ? 0xAA333333 : 0xAA222222);
             GuiComponent.fill(poseStack, buttonX, buttonY, buttonX + buttonWidth, buttonY + BUTTON_HEIGHT, bgColor);
 
-            int borderColor = isSelected ? type.getColor() : 0xFF666666;
-            GuiComponent.fill(poseStack, buttonX, buttonY, buttonX + buttonWidth, buttonY + 1, borderColor);
+            int buttonBorderColor = isSelected ? type.getColor() : 0xFF666666;
+            GuiComponent.fill(poseStack, buttonX, buttonY, buttonX + buttonWidth, buttonY + 1, buttonBorderColor);
             GuiComponent.fill(poseStack, buttonX, buttonY + BUTTON_HEIGHT - 1, buttonX + buttonWidth,
-                    buttonY + BUTTON_HEIGHT, borderColor);
-            GuiComponent.fill(poseStack, buttonX, buttonY, buttonX + 1, buttonY + BUTTON_HEIGHT, borderColor);
+                    buttonY + BUTTON_HEIGHT, buttonBorderColor);
+            GuiComponent.fill(poseStack, buttonX, buttonY, buttonX + 1, buttonY + BUTTON_HEIGHT, buttonBorderColor);
             GuiComponent.fill(poseStack, buttonX + buttonWidth - 1, buttonY, buttonX + buttonWidth,
-                    buttonY + BUTTON_HEIGHT, borderColor);
+                    buttonY + BUTTON_HEIGHT, buttonBorderColor);
 
             int textColor = isSelected ? type.getColor() : 0xCCCCCC;
             int textWidth = mc.font.width(type.getName());
@@ -361,7 +355,6 @@ public class CosmeticsDisplayPanel extends BasePanel {
         GuiComponent.fill(poseStack, resetButtonX, resetButtonY,
                 resetButtonX + resetButtonWidth, resetButtonY + BUTTON_HEIGHT, resetBgColor);
 
-        // Match tab border style
         int resetBorderColor = 0xFF666666;
         GuiComponent.fill(poseStack, resetButtonX, resetButtonY, resetButtonX + resetButtonWidth, resetButtonY + 1,
                 resetBorderColor); // Top
@@ -372,241 +365,123 @@ public class CosmeticsDisplayPanel extends BasePanel {
         GuiComponent.fill(poseStack, resetButtonX + resetButtonWidth - 1, resetButtonY, resetButtonX + resetButtonWidth,
                 resetButtonY + BUTTON_HEIGHT, resetBorderColor); // Right
 
-        int iconColor = isHoveringResetButton ? 0xFFFFAA00 : 0xFFCCCCCC;
-        String resetIcon = "⟲"; // \u27F2
-        int iconWidth = mc.font.width(resetIcon);
-        int iconX = resetButtonX + (resetButtonWidth - iconWidth) / 2 + 1; // +1 to center visually
-        int iconY = resetButtonY + (BUTTON_HEIGHT - 8) / 2;
-        mc.font.draw(poseStack, resetIcon, iconX, iconY, iconColor);
+        String resetIcon = "⟲";
+        mc.font.draw(poseStack, resetIcon, resetButtonX + (resetButtonWidth - mc.font.width(resetIcon)) / 2 + 1, resetButtonY + (BUTTON_HEIGHT - 8) / 2, isHoveringResetButton ? 0xFFFFAA00 : 0xFFCCCCCC);
 
-        RenderSystem.enableScissor(scissorX, scissorYAdjusted, scissorWidth, scissorHeightScaled);
+        try {
+            RenderSystem.enableScissor(scissorX, scissorYAdjusted, scissorWidth, scissorHeightScaled);
 
-        int renderHeight = height - PADDING * 2 - titleHeight - FILTER_BUTTON_AREA_HEIGHT - ITEM_AREA_TOP_SPACING;
+            int totalRows = (int) Math.ceil((double) filteredCosmeticIds.size() / itemsPerRow);
+            double totalContentHeight = totalRows * (itemSize + itemSpacing);
+            double maxScroll = Math.max(0, totalContentHeight - scissorHeight);
+            scrollOffset = Math.max(0, Math.min(scrollOffset, maxScroll));
 
-        int totalRows = (int) Math.ceil((double) filteredCosmeticIds.size() / itemsPerRow);
-        double totalContentHeight = totalRows * (itemSize + itemSpacing);
-        double maxScroll = Math.max(0, totalContentHeight - renderHeight);
-        scrollOffset = Math.max(0, Math.min(scrollOffset, maxScroll));
+            int startRow = (int) (scrollOffset / (itemSize + itemSpacing));
+            int endRow = Math.min(startRow + visibleRows + 2, totalRows);
 
-        double rowHeight = itemSize + itemSpacing;
-        int startRow = (int) (scrollOffset / rowHeight);
-        startRow = Math.max(0, startRow - 2);
-        int endRow = Math.min(startRow + visibleRows + 4, totalRows);
+            if (filteredCosmeticIds.isEmpty()) {
+                String noItems = "No cosmetics available";
+                mc.font.draw(poseStack, noItems, startX + (width - mc.font.width(noItems)) / 2, renderStartY + scissorHeight / 2, 0xAAAAAA);
+            } else {
+                String selectedCosmeticId = state.getSelectedCosmeticId();
+                long currentTime = System.nanoTime() / 1000000L;
+                float elapsedSeconds = (currentTime - itemStartTime) / 1000.0f;
+                rotation = (elapsedSeconds * 90.0f) % 360.0f;
+                bobOffset = (float) Math.sin(elapsedSeconds * 2.0f) * 0.05f;
 
-        if (filteredCosmeticIds.isEmpty()) {
-            String noItems = "No cosmetics available";
-            int textWidth = mc.font.width(noItems);
-            mc.font.draw(poseStack, noItems,
-                    startX + (width - textWidth) / 2,
-                    renderStartY + renderHeight / 2,
-                    0xAAAAAA);
+                for (int row = startRow; row < endRow; row++) {
+                    int rowY = (int) (renderStartY + (row * (itemSize + itemSpacing)) - scrollOffset);
+                    for (int col = 0; col < itemsPerRow; col++) {
+                        int index = row * itemsPerRow + col;
+                        if (index >= filteredCosmeticIds.size()) break;
+
+                        String cosmeticId = filteredCosmeticIds.get(index);
+                        int itemX = startX + itemSpacing + col * (itemSize + itemSpacing);
+                        boolean itemHovered = relativeMouseX >= (itemX - startX) && relativeMouseX < (itemX - startX + itemSize) && relativeMouseY >= (rowY - startY) && relativeMouseY < (rowY - startY + itemSize);
+
+                        boolean isUnlocked = state.isUnlocked(cosmeticId);
+                        boolean isSelected = cosmeticId.equals(selectedCosmeticId);
+                        boolean isEquipped = state.isEquipped(cosmeticId);
+
+                        int bgColor = isEquipped ? 0x8000FF00 : (isSelected ? 0x80FFFFFF : (itemHovered ? (isUnlocked ? 0x40CCCCCC : 0x40CC0000) : (isUnlocked ? 0x33CCCCCC : 0x33CC0000)));
+                        GuiComponent.fill(poseStack, itemX, rowY, itemX + itemSize, rowY + itemSize, bgColor);
+
+                        if (isEquipped || isSelected) {
+                            int borderCol = isEquipped ? 0xFF00FF8A : 0xFFFFFFFF;
+                            GuiComponent.fill(poseStack, itemX - 1, rowY - 1, itemX + itemSize + 1, rowY, borderCol);
+                            GuiComponent.fill(poseStack, itemX - 1, rowY + itemSize, itemX + itemSize + 1, rowY + itemSize + 1, borderCol);
+                            GuiComponent.fill(poseStack, itemX - 1, rowY, itemX, rowY + itemSize, borderCol);
+                            GuiComponent.fill(poseStack, itemX + itemSize, rowY, itemX + itemSize + 1, rowY + itemSize, borderCol);
+                        }
+
+                        boolean isParticleTrail = cosmeticId.toLowerCase().contains("particle");
+                        boolean isHeadCos = CosmeticManager.getInstance().getMetadata(cosmeticId) != null && CosmeticManager.getInstance().getMetadata(cosmeticId).type() == CosmeticManager.CosmeticType.HEAD;
+                        ItemStack stack = cosmeticRegistry.resolveToItemStack(cosmeticId);
+
+                        if ((stack != null && !stack.isEmpty()) || isParticleTrail || isHeadCos) {
+                            try {
+                                if (isSelected && !isParticleTrail) {
+                                    render3DItemPreview(poseStack, stack, itemX + itemSize / 2, rowY + itemSize / 2, partialTick);
+                                } else if (isAnimatedEntity(cosmeticId) || isParticleTrail) {
+                                    renderAnimatedEntity(poseStack, stack, cosmeticId, itemX + itemSize / 2, rowY + itemSize / 2, partialTick, itemHovered);
+                                } else {
+                                    render3DItemLikePillar(poseStack, stack, cosmeticId, itemX + itemSize / 2, rowY + itemSize / 2, partialTick);
+                                }
+                            } catch (Exception e) {
+                                BuildScape.getLogger().debug("Failed to render item " + cosmeticId + ": " + e.getMessage());
+                                mc.font.draw(poseStack, "?", itemX + itemSize / 2 - 2, rowY + itemSize / 2 - 4, 0xFFFFFF);
+                            }
+                        }
+
+                        if (!isUnlocked) {
+                            GuiComponent.fill(poseStack, itemX + itemSize - 8, rowY, itemX + itemSize, rowY + 8, 0xFF000000);
+                            mc.font.draw(poseStack, "🔒", itemX + itemSize - 7, rowY + 1, 0xFFFFFF);
+                        }
+                    }
+                }
+            }
+
+            renderScrollAndColorBoxes(poseStack, renderStartY, scissorHeight);
+        } catch (Exception e) {
+            BuildScape.getLogger().error("Supporters tab render exception: " + e.getMessage());
+        } finally {
             RenderSystem.disableScissor();
-            return;
+        }
+    }
+
+    private void renderScrollAndColorBoxes(PoseStack poseStack, int renderStartY, int scissorHeight) {
+        int totalRows = (int) Math.ceil((double) filteredCosmeticIds.size() / itemsPerRow);
+        if (totalRows * (itemSize + itemSpacing) > scissorHeight) {
+            int scrollbarX = endX - com.kingodogo.buildscape.client.screen.widget.CustomScrollbarRenderer.getScrollbarWidth() - 5;
+            double visibleRatio = scissorHeight / (double) (totalRows * (itemSize + itemSpacing));
+            scrollbarRenderer.renderScrollbar(poseStack, scrollbarX, renderStartY, scissorHeight, scrollOffset, Math.max(0, totalRows * (itemSize + itemSpacing) - scissorHeight), visibleRatio);
         }
 
-        String selectedCosmeticId = state.getSelectedCosmeticId();
-        if (selectedCosmeticId != null && !selectedCosmeticId.equals(lastSelectedCosmeticId)) {
-            itemStartTime = System.nanoTime() / 1000000L;
-            lastSelectedCosmeticId = selectedCosmeticId;
-        }
-
-        if (selectedCosmeticId != null) {
-            long currentTime = System.nanoTime() / 1000000L;
-            float elapsedSeconds = (currentTime - itemStartTime) / 1000.0f;
-            rotation = (elapsedSeconds * 90.0f) % 360.0f;
-            bobOffset = (float) Math.sin(elapsedSeconds * 2.0f) * 0.05f;
-        }
-
-        for (int row = startRow; row < endRow; row++) {
-            double rowYDouble = renderStartY + (row * rowHeight) - scrollOffset;
-            int rowY = (int) rowYDouble;
-
-            if (rowY + itemSize < renderStartY - itemSize || rowY > renderStartY + renderHeight + itemSize) {
-                continue;
-            }
-
-            for (int col = 0; col < itemsPerRow; col++) {
-                int index = row * itemsPerRow + col;
-                if (index >= filteredCosmeticIds.size()) {
-                    break;
-                }
-
-                String cosmeticId = filteredCosmeticIds.get(index);
+        for (int i = 0; i < filteredCosmeticIds.size(); i++) {
+            String cosmeticId = filteredCosmeticIds.get(i);
+            if (CosmeticManager.getInstance().supportsColor(cosmeticId)) {
+                int row = i / itemsPerRow;
+                int col = i % itemsPerRow;
+                int rowY = (int) (renderStartY + (row * (itemSize + itemSpacing)) - scrollOffset);
+                if (rowY + itemSize < renderStartY || rowY > renderStartY + scissorHeight) continue;
+                
                 int itemX = startX + itemSpacing + col * (itemSize + itemSpacing);
-
-                boolean isHovered = relativeMouseX >= (itemX - startX) && relativeMouseX < (itemX - startX + itemSize)
-                        && relativeMouseY >= (rowY - startY) && relativeMouseY < (rowY - startY + itemSize);
-
-                if (isHovered && colorPicker != null) {
-                    int headerHeight = 20;
-                    if (mouseX >= colorPicker.x && mouseX < colorPicker.x + colorPicker.getWidth()
-                            && mouseY >= colorPicker.y - headerHeight
-                            && mouseY < colorPicker.y + colorPicker.getHeight()) {
-                        isHovered = false;
-                    }
-                }
-
-                boolean isUnlocked = state.isUnlocked(cosmeticId);
-                boolean isSelected = cosmeticId.equals(selectedCosmeticId);
-                boolean isEquipped = state.isEquipped(cosmeticId);
-
-                int bgColor;
-                if (isEquipped) {
-                    bgColor = 0x8000FF00;
-                } else if (isSelected) {
-                    bgColor = 0x80FFFFFF;
-                } else if (isHovered) {
-                    bgColor = isUnlocked ? 0x40CCCCCC : 0x40CC0000;
-                } else {
-                    bgColor = isUnlocked ? 0x33CCCCCC : 0x33CC0000;
-                }
-                GuiComponent.fill(poseStack, itemX, rowY, itemX + itemSize, rowY + itemSize, bgColor);
-
-                if (isEquipped) {
-                    int borderColor = 0xFF00FF00;
-                    GuiComponent.fill(poseStack, itemX - 1, rowY - 1, itemX + itemSize + 1, rowY + 1, borderColor);
-                    GuiComponent.fill(poseStack, itemX - 1, rowY + itemSize - 1, itemX + itemSize + 1,
-                            rowY + itemSize + 1, borderColor);
-                    GuiComponent.fill(poseStack, itemX - 1, rowY - 1, itemX + 1, rowY + itemSize + 1, borderColor);
-                    GuiComponent.fill(poseStack, itemX + itemSize - 1, rowY - 1, itemX + itemSize + 1,
-                            rowY + itemSize + 1, borderColor);
-                } else if (isSelected) {
-                    int borderColor = 0xFFFFFFFF;
-                    GuiComponent.fill(poseStack, itemX - 1, rowY - 1, itemX + itemSize + 1, rowY + 1, borderColor);
-                    GuiComponent.fill(poseStack, itemX - 1, rowY + itemSize - 1, itemX + itemSize + 1,
-                            rowY + itemSize + 1, borderColor);
-                    GuiComponent.fill(poseStack, itemX - 1, rowY - 1, itemX + 1, rowY + itemSize + 1, borderColor);
-                    GuiComponent.fill(poseStack, itemX + itemSize - 1, rowY - 1, itemX + itemSize + 1,
-                            rowY + itemSize + 1, borderColor);
-                }
-
-                boolean isParticleTrail = cosmeticId != null
-                        && cosmeticId.toLowerCase().contains("particle")
-                        && (cosmeticId.toLowerCase().contains("trail")
-                                || cosmeticId.toLowerCase().contains("star")
-                                || cosmeticId.toLowerCase().contains("sparkle")
-                                || cosmeticId.toLowerCase().contains("effect"));
-
-                com.kingodogo.buildscape.cosmetics.CosmeticManager.CosmeticMetadata headMetadata = com.kingodogo.buildscape.cosmetics.CosmeticManager
-                        .getInstance().getMetadata(cosmeticId);
-                boolean isHeadCosmetic = headMetadata != null
-                        && headMetadata.type() == com.kingodogo.buildscape.cosmetics.CosmeticManager.CosmeticType.HEAD;
-
-                ItemStack stack = cosmeticRegistry.resolveToItemStack(cosmeticId);
-
-                if (isHeadCosmetic && (stack == null || stack.isEmpty())) {
-                    stack = new ItemStack(net.minecraft.world.item.Items.LEATHER_HELMET);
-                }
-
-                if (stack == null || stack.isEmpty()) {
-                    stack = cosmeticRegistry.resolveToItemStack(cosmeticId);
-                }
-
-                if (stack != null && !stack.isEmpty() || isParticleTrail || isHeadCosmetic) {
-                    boolean isAnimated = isAnimatedEntity(cosmeticId);
-
-                    if (isAnimated) {
-                        if (!itemAnimationTimes.containsKey(cosmeticId)) {
-                            long baseTime = System.nanoTime() / 1000000L;
-                            int staggerOffset = index * 100;
-                            itemAnimationTimes.put(cosmeticId, baseTime - staggerOffset);
-                        }
-                    }
-
+                UUID playerUuid = mc.player != null ? mc.player.getUUID() : null;
+                String hex = playerUuid != null ? CosmeticsConfig.get().getCosmeticColor(playerUuid, cosmeticId) : null;
+                int color = 0xFFFFFF;
+                if (hex != null && !hex.isEmpty()) {
                     try {
-                        if (isSelected && !isParticleTrail) {
-                            render3DItemPreview(poseStack, stack, itemX + itemSize / 2, rowY + itemSize / 2,
-                                    partialTick);
-                        } else if (isAnimated || isParticleTrail) {
-                            renderAnimatedEntity(poseStack, stack, cosmeticId, itemX + itemSize / 2,
-                                    rowY + itemSize / 2, partialTick, false);
-                        } else {
-                            render3DItemLikePillar(poseStack, stack, cosmeticId, itemX + itemSize / 2,
-                                    rowY + itemSize / 2, partialTick);
-                        }
+                        color = Integer.parseInt(hex.startsWith("#") ? hex.substring(1) : hex, 16);
                     } catch (Exception e) {
-                        BuildScape.getLogger().warn("Failed to render cosmetic item (general): " + cosmeticId, e);
-                        mc.font.draw(poseStack, "?", itemX + itemSize / 2 - 3, rowY + itemSize / 2 - 3, 0xFF0000);
                     }
-                } else if (!isParticleTrail) {
-                    mc.font.draw(poseStack, "?", itemX + itemSize / 2 - 3, rowY + itemSize / 2 - 3, 0xFF0000);
-                } else {
-                    String sparkle = "✨";
-                    int sparkleWidth = mc.font.width(sparkle);
-                    mc.font.draw(poseStack, sparkle,
-                            itemX + itemSize / 2 - sparkleWidth / 2,
-                            rowY + itemSize / 2 - 4,
-                            0xFFFF00);
                 }
 
-                if (!isUnlocked) {
-                    GuiComponent.fill(poseStack, itemX + itemSize - 8, rowY, itemX + itemSize, rowY + 8, 0xFF000000);
-                    mc.font.draw(poseStack, "🔒", itemX + itemSize - 7, rowY + 1, 0xFFFFFF);
-                }
+                int cx = itemX + itemSize - COLOR_BOX_SIZE - 2;
+                int cy = rowY + itemSize - COLOR_BOX_SIZE - 2;
+                GuiComponent.fill(poseStack, cx - 1, cy - 1, cx + COLOR_BOX_SIZE + 1, cy + COLOR_BOX_SIZE + 1, 0xFF000000);
+                GuiComponent.fill(poseStack, cx, cy, cx + COLOR_BOX_SIZE, cy + COLOR_BOX_SIZE, 0xFF000000 | color);
             }
         }
-
-        for (int row = startRow; row < endRow; row++) {
-            double rowYDouble = renderStartY + (row * rowHeight) - scrollOffset;
-            int rowY = (int) rowYDouble;
-
-            if (rowY + itemSize < renderStartY - itemSize || rowY > renderStartY + renderHeight + itemSize) {
-                continue;
-            }
-
-            for (int col = 0; col < itemsPerRow; col++) {
-                int index = row * itemsPerRow + col;
-                if (index >= filteredCosmeticIds.size()) {
-                    break;
-                }
-
-                String cosmeticId = filteredCosmeticIds.get(index);
-                int itemX = startX + itemSpacing + col * (itemSize + itemSpacing);
-
-                CosmeticManager cosmeticManager = CosmeticManager.getInstance();
-                if (cosmeticManager.supportsColor(cosmeticId)) {
-                    UUID playerUuid = mc.player != null ? mc.player.getUUID() : null;
-                    CosmeticsConfig config = CosmeticsConfig.get();
-                    String hexColor = playerUuid != null ? config.getCosmeticColor(playerUuid, cosmeticId) : null;
-
-                    int color = 0xFFFFFF;
-                    if (hexColor != null && !hexColor.isEmpty()) {
-                        try {
-                            String hex = hexColor.startsWith("#") ? hexColor.substring(1) : hexColor;
-                            color = Integer.parseInt(hex, 16);
-                        } catch (NumberFormatException e) {
-                        }
-                    }
-
-                    poseStack.pushPose();
-                    poseStack.translate(0, 0, 100);
-
-                    int colorBoxX = itemX + itemSize - COLOR_BOX_SIZE - 2;
-                    int colorBoxY = rowY + itemSize - COLOR_BOX_SIZE - 2;
-
-                    GuiComponent.fill(poseStack, colorBoxX - 1, colorBoxY - 1,
-                            colorBoxX + COLOR_BOX_SIZE + 1, colorBoxY + COLOR_BOX_SIZE + 1, 0xFF000000);
-                    GuiComponent.fill(poseStack, colorBoxX, colorBoxY,
-                            colorBoxX + COLOR_BOX_SIZE, colorBoxY + COLOR_BOX_SIZE, 0xFF000000 | color);
-
-                    poseStack.popPose();
-                }
-            }
-        }
-
-        if (maxScroll > 0) {
-            int scrollbarX = endX
-                    - com.kingodogo.buildscape.client.screen.widget.CustomScrollbarRenderer.getScrollbarWidth() - 5;
-            int scrollbarY = renderStartY;
-            int scrollbarHeight = renderHeight;
-
-            double visibleRatio = visibleRows / (double) totalRows;
-            scrollbarRenderer.renderScrollbar(poseStack, scrollbarX, scrollbarY, scrollbarHeight,
-                    scrollOffset, maxScroll, visibleRatio);
-        }
-
-        RenderSystem.disableScissor();
-
     }
 
     public void renderTooltips(PoseStack poseStack, double mouseX, double mouseY) {
@@ -848,9 +723,7 @@ public class CosmeticsDisplayPanel extends BasePanel {
             return;
         }
 
-        float animSpeedMultiplier = 1.0f;
-
-        float animProgress = getAnimationProgress(cosmeticId, partialTick, animSpeedMultiplier);
+        float animProgress = getAnimationProgress(cosmeticId, partialTick, 1.0f);
         String idLower = cosmeticId.toLowerCase();
 
         RenderSystem.enableDepthTest();
@@ -858,206 +731,138 @@ public class CosmeticsDisplayPanel extends BasePanel {
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
 
-        Vector3f light1 = new Vector3f(0.2f, 1.0f, -0.7f);
-        light1.normalize();
-        Vector3f light2 = new Vector3f(-0.2f, 1.0f, 0.7f);
-        light2.normalize();
-        RenderSystem.setupGui3DDiffuseLighting(light1, light2);
+        Vector3f l1 = new Vector3f(0.2f, 1.0f, -0.7f);
+        l1.normalize();
+        Vector3f l2 = new Vector3f(-0.2f, 1.0f, 0.7f);
+        l2.normalize();
+        RenderSystem.setupGui3DDiffuseLighting(l1, l2);
 
         MultiBufferSource.BufferSource bufferSource = mc.renderBuffers().bufferSource();
-
         poseStack.pushPose();
-
         poseStack.translate(centerX, centerY, 100.0f);
 
         if (idLower.contains("elytra") || idLower.contains("wing")) {
-            float wingScaleBase = 0.8f;
-            float wingScaleRange = 0.4f;
-            float wingScale = wingScaleBase + animProgress * wingScaleRange;
+            float wingScale = 0.8f + animProgress * 0.4f;
             float baseScale = itemSize * 0.46875f * wingScale;
             poseStack.scale(baseScale, -baseScale, baseScale);
-
-            float wingRotationMax = 30.0f;
-            float wingRotation = (animProgress - 0.5f) * wingRotationMax;
-            poseStack.mulPose(Vector3f.ZP.rotationDegrees(wingRotation));
-        } else if (idLower.contains("particle") || idLower.contains("effect") || idLower.contains("trail")) {
-            poseStack.popPose();
-
-            RenderSystem.enableBlend();
-            RenderSystem.defaultBlendFunc();
-            RenderSystem.disableDepthTest();
-
-            UUID playerUuid = mc.player != null ? mc.player.getUUID() : null;
-            com.kingodogo.buildscape.config.CosmeticsConfig config = com.kingodogo.buildscape.config.CosmeticsConfig
-                    .get();
-            String storedColor = playerUuid != null ? config.getCosmeticColor(playerUuid, cosmeticId) : null;
-            float[] color = com.kingodogo.buildscape.client.ParticleTrailHandler.getParticleColor(cosmeticId);
-
-            if (storedColor != null && !storedColor.isEmpty()) {
-                try {
-                    String hex = storedColor.startsWith("#") ? storedColor.substring(1) : storedColor;
-                    int rgb = Integer.parseInt(hex, 16);
-                    int r = (rgb >> 16) & 0xFF;
-                    int g = (rgb >> 8) & 0xFF;
-                    int b = rgb & 0xFF;
-                    color = new float[] { r / 255.0f, g / 255.0f, b / 255.0f };
-                } catch (NumberFormatException e) {
-                }
-            }
-
-            float scaleFactor = itemSize / 64.0f;
-
-            int particleCount = 4;
-            for (int i = 0; i < particleCount; i++) {
-                float baseOffsetY = -14.0f * scaleFactor;
-                float trailOffset = (animProgress * 24.0f * scaleFactor);
-                float offsetY = baseOffsetY + trailOffset + (i * 6.0f * scaleFactor);
-                float offsetX = (float) (Math.sin(animProgress * Math.PI * 2 + i) * 6.0f * scaleFactor);
-
-                float particleX = centerX + offsetX;
-                float particleY = centerY + offsetY;
-
-                float trailProgress = (i + animProgress) / particleCount;
-                float particleSize = 8.0f * scaleFactor * (1.0f - trailProgress * 0.5f);
-                float alpha = 0.9f - (trailProgress * 0.6f);
-
-                RenderSystem.setShaderColor(color[0], color[1], color[2], alpha);
-
-                poseStack.pushPose();
-                poseStack.translate(particleX, particleY, 0);
-                poseStack.mulPose(com.mojang.math.Vector3f.ZP.rotationDegrees(animProgress * 360.0f + i * 45.0f));
-
-                float halfSize = particleSize / 2.0f;
-
-                CosmeticManager manager = CosmeticManager.getInstance();
-                String shape = manager.getParticleShape(cosmeticId);
-
-                net.minecraft.resources.ResourceLocation textureLoc = null;
-
-                if (shape.equals("heart")) {
-                    textureLoc = new net.minecraft.resources.ResourceLocation(com.kingodogo.buildscape.BuildScape.MODID,
-                            "textures/particle/heart_blank.png");
-                } else if (shape.equals("bubble")) {
-                    textureLoc = new net.minecraft.resources.ResourceLocation(com.kingodogo.buildscape.BuildScape.MODID,
-                            "textures/particle/bubble.png");
-                } else if (shape.equals("note")) {
-                    textureLoc = new net.minecraft.resources.ResourceLocation("minecraft",
-                            "textures/particle/note.png");
-                } else if (shape.equals("cherry")) {
-                    textureLoc = new net.minecraft.resources.ResourceLocation(com.kingodogo.buildscape.BuildScape.MODID,
-                            "textures/particle/cherry_0.png");
-                } else if (shape.equals("cherry_leaves")) {
-                    textureLoc = new net.minecraft.resources.ResourceLocation(com.kingodogo.buildscape.BuildScape.MODID,
-                            "textures/particle/cherry_0.png");
-                } else if (shape.equals("firework")) {
-                    textureLoc = new net.minecraft.resources.ResourceLocation("minecraft",
-                            "textures/particle/spark_0.png");
-                } else if (shape.equals("cake")) {
-                    textureLoc = new net.minecraft.resources.ResourceLocation(com.kingodogo.buildscape.BuildScape.MODID,
-                            "textures/particle/cake_1.png");
-                } else if (shape.equals("snowflake")) {
-                    textureLoc = new net.minecraft.resources.ResourceLocation(com.kingodogo.buildscape.BuildScape.MODID,
-                            "textures/particle/snowflake_1.png");
-                } else {
-                    textureLoc = new net.minecraft.resources.ResourceLocation(com.kingodogo.buildscape.BuildScape.MODID,
-                            "textures/particle/glow_lime_sparkle.png");
-                }
-
-                if (textureLoc != null) {
-                    RenderSystem.setShaderTexture(0, textureLoc);
-
-                    // Apply custom color only to colorable particles (heart, sparkle, cake, cherry)
-                    // Non-colorable particles (snowflake, firework, note, bubble, cherry_leaves)
-                    // use white
-                    boolean isColorable = manager.supportsColor(cosmeticId);
-                    if (isColorable) {
-                        RenderSystem.setShaderColor(color[0], color[1], color[2], alpha);
-                    } else {
-                        RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, alpha);
-                    }
-
-                    int x0 = (int) (-halfSize);
-                    int x1 = (int) (halfSize);
-                    int y0 = (int) (-halfSize);
-                    int y1 = (int) (halfSize);
-
-                    com.mojang.blaze3d.vertex.Tesselator tesselator = com.mojang.blaze3d.vertex.Tesselator
-                            .getInstance();
-                    com.mojang.blaze3d.vertex.BufferBuilder bufferbuilder = tesselator.getBuilder();
-                    RenderSystem.setShader(net.minecraft.client.renderer.GameRenderer::getPositionTexShader);
-                    bufferbuilder.begin(com.mojang.blaze3d.vertex.VertexFormat.Mode.QUADS,
-                            com.mojang.blaze3d.vertex.DefaultVertexFormat.POSITION_TEX);
-
-                    // Sparkle particle has 10 frames stacked vertically, so we only render the
-                    // first frame
-                    float minV = 0.0f;
-                    float maxV = 1.0f;
-                    if (shape.equals("sparkle")) {
-                        // Render only the first frame (1/10th of the texture)
-                        minV = 0.0f;
-                        maxV = 0.1f; // 1/10th of the texture height
-                    }
-
-                    bufferbuilder.vertex(poseStack.last().pose(), x0, y1, 0).uv(0.0f, maxV).endVertex();
-                    bufferbuilder.vertex(poseStack.last().pose(), x1, y1, 0).uv(1.0f, maxV).endVertex();
-                    bufferbuilder.vertex(poseStack.last().pose(), x1, y0, 0).uv(1.0f, minV).endVertex();
-                    bufferbuilder.vertex(poseStack.last().pose(), x0, y0, 0).uv(0.0f, minV).endVertex();
-                    tesselator.end();
-                }
-
-                if (textureLoc == null) {
-                    GuiComponent.fill(poseStack, (int) (-halfSize), (int) (-halfSize), (int) halfSize, (int) halfSize,
-                            ((int) (alpha * 255) << 24) | 0xFFFFFF);
-                }
-
-                poseStack.popPose();
-            }
-
-            RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
-
-            RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
-            RenderSystem.enableDepthTest();
-
-            return;
+            poseStack.mulPose(Vector3f.ZP.rotationDegrees((animProgress - 0.5f) * 30.0f));
         } else {
-            float baseScale = itemSize * 0.46875f;
-            poseStack.scale(baseScale, -baseScale, baseScale);
-            float defaultRotation = animProgress * 360.0f * animSpeedMultiplier;
-            poseStack.mulPose(Vector3f.YP.rotationDegrees(defaultRotation));
+            CosmeticManager.CosmeticMetadata meta = CosmeticManager.getInstance().getMetadata(cosmeticId);
+            if (meta != null && meta.type() == CosmeticManager.CosmeticType.HEAD) {
+                com.kingodogo.buildscape.client.CosmeticRenderHandler.initBuildersHatModel();
+                net.minecraft.client.model.geom.ModelPart modelPart = com.kingodogo.buildscape.client.CosmeticRenderHandler.buildersHatModelPart;
+                if (modelPart != null) {
+                    float baseScale = itemSize * 0.46875f * 1.8f;
+                    poseStack.scale(baseScale, -baseScale, baseScale);
+                    poseStack.translate(0.0, -0.1 + Math.sin(System.currentTimeMillis() / 400.0) * 0.05f, 0.0);
+                    float rot = (System.currentTimeMillis() % 6000) / 6000.0f * 360.0f * (isHovered ? 2.0f : 1.0f);
+                    poseStack.mulPose(Vector3f.YP.rotationDegrees(rot));
+                    net.minecraft.resources.ResourceLocation tex = new net.minecraft.resources.ResourceLocation(com.kingodogo.buildscape.BuildScape.MODID, "textures/cosmatics/builders_hat.png");
+                    modelPart.render(poseStack, bufferSource.getBuffer(net.minecraft.client.renderer.RenderType.entityCutoutNoCull(tex)), 15728880, net.minecraft.client.renderer.texture.OverlayTexture.NO_OVERLAY, 1.0f, 1.0f, 1.0f, 1.0f);
+                    bufferSource.endBatch();
+                    poseStack.popPose();
+                    return;
+                }
+            }
+
+            if (idLower.contains("particle") || idLower.contains("effect") || idLower.contains("trail")) {
+                poseStack.popPose();
+                render2DParticles(poseStack, cosmeticId, centerX, centerY, animProgress);
+                return;
+            } else {
+                float baseScale = itemSize * 0.46875f;
+                poseStack.scale(baseScale, -baseScale, baseScale);
+                poseStack.mulPose(Vector3f.YP.rotationDegrees(animProgress * 360.0f));
+            }
         }
 
-        BakedModel model = itemRenderer.getModel(stack, level, null, 0);
-
-        boolean hasGlint = stack.hasFoil();
-
-        int lightLevel = 15728880;
-        int overlay = 0;
-
-        try {
-            itemRenderer.render(stack, ItemTransforms.TransformType.FIXED,
-                    hasGlint, poseStack, bufferSource, lightLevel, overlay, model);
-            bufferSource.endBatch();
-        } catch (Exception e) {
-            BuildScape.getLogger().debug("3D animated entity rendering failed, using 2D fallback: " + e.getMessage());
-            poseStack.popPose();
-            RenderSystem.disableDepthTest();
-            RenderSystem.disableBlend();
-            itemRenderer.renderGuiItem(stack, centerX - 8, centerY - 8);
-            itemRenderer.renderGuiItemDecorations(mc.font, stack, centerX - 8, centerY - 8);
-            return;
+        if (stack != null && !stack.isEmpty()) {
+            try {
+                BakedModel model = itemRenderer.getModel(stack, mc.level, null, 0);
+                itemRenderer.render(stack, net.minecraft.client.renderer.block.model.ItemTransforms.TransformType.GUI, stack.hasFoil(), poseStack, bufferSource, 15728880, 0, model);
+                bufferSource.endBatch();
+            } catch (Exception e) {
+                BuildScape.getLogger().debug("3D anim fallback: " + e.getMessage());
+                poseStack.popPose();
+                itemRenderer.renderGuiItem(stack, centerX - 8, centerY - 8);
+                return;
+            }
         }
 
         poseStack.popPose();
-
         RenderSystem.disableBlend();
+    }
+
+    private void render2DParticles(PoseStack poseStack, String cosmeticId, int centerX, int centerY, float animProgress) {
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
+        RenderSystem.disableDepthTest();
+
+        UUID playerUuid = mc.player != null ? mc.player.getUUID() : null;
+        float[] color = com.kingodogo.buildscape.client.ParticleTrailHandler.getParticleColor(cosmeticId);
+        String hex = (playerUuid != null) ? CosmeticsConfig.get().getCosmeticColor(playerUuid, cosmeticId) : null;
+        if (hex != null && !hex.isEmpty()) {
+            try {
+                int rgb = Integer.parseInt(hex.startsWith("#") ? hex.substring(1) : hex, 16);
+                color = new float[]{((rgb >> 16) & 0xFF) / 255.0f, ((rgb >> 8) & 0xFF) / 255.0f, (rgb & 0xFF) / 255.0f};
+            } catch (Exception e) {
+            }
+        }
+
+        float pScale = itemSize / 64.0f;
+        for (int i = 0; i < 4; i++) {
+            float trailProgress = (i + animProgress) / 4.0f;
+            float offsetX = (float) (Math.sin(animProgress * Math.PI * 2 + i) * 6.0f * pScale);
+            float offsetY = (-14.0f * pScale) + (animProgress * 24.0f * pScale) + (i * 6.0f * pScale);
+            float pSize = 8.0f * pScale * (1.0f - trailProgress * 0.5f);
+
+            RenderSystem.setShaderColor(color[0], color[1], color[2], 0.9f - (trailProgress * 0.6f));
+            poseStack.pushPose();
+            poseStack.translate(centerX + offsetX, centerY + offsetY, 0);
+            poseStack.mulPose(Vector3f.ZP.rotationDegrees(animProgress * 360.0f + i * 45.0f));
+
+            String shape = CosmeticManager.getInstance().getParticleShape(cosmeticId);
+            net.minecraft.resources.ResourceLocation tex = getParticleTexture(shape);
+            if (tex != null) {
+                RenderSystem.setShaderTexture(0, tex);
+                RenderSystem.setShader(net.minecraft.client.renderer.GameRenderer::getPositionTexShader);
+                com.mojang.blaze3d.vertex.BufferBuilder bb = com.mojang.blaze3d.vertex.Tesselator.getInstance().getBuilder();
+                bb.begin(com.mojang.blaze3d.vertex.VertexFormat.Mode.QUADS, com.mojang.blaze3d.vertex.DefaultVertexFormat.POSITION_TEX);
+                float h = pSize / 2.0f;
+                bb.vertex(poseStack.last().pose(), -h, h, 0).uv(0, 1).endVertex();
+                bb.vertex(poseStack.last().pose(), h, h, 0).uv(1, 1).endVertex();
+                bb.vertex(poseStack.last().pose(), h, -h, 0).uv(1, 0).endVertex();
+                bb.vertex(poseStack.last().pose(), -h, -h, 0).uv(0, 0).endVertex();
+                com.mojang.blaze3d.vertex.Tesselator.getInstance().end();
+            }
+            poseStack.popPose();
+        }
+        RenderSystem.setShaderColor(1, 1, 1, 1);
+        RenderSystem.enableDepthTest();
+    }
+
+    private net.minecraft.resources.ResourceLocation getParticleTexture(String shape) {
+        String path = switch (shape) {
+            case "heart" -> "textures/particle/heart_blank.png";
+            case "bubble" -> "textures/particle/bubble.png";
+            case "note" -> "minecraft:textures/particle/note.png";
+            case "cherry", "cherry_leaves" -> "textures/particle/cherry_0.png";
+            case "firework" -> "minecraft:textures/particle/spark_0.png";
+            case "cake" -> "textures/particle/cake_1.png";
+            case "snowflake" -> "textures/particle/snowflake_1.png";
+            default -> "textures/particle/glow_lime_sparkle.png";
+        };
+        if (path.startsWith("minecraft:"))
+            return new net.minecraft.resources.ResourceLocation("minecraft", path.substring(10));
+        return new net.minecraft.resources.ResourceLocation(com.kingodogo.buildscape.BuildScape.MODID, path);
     }
 
     private void render3DItemLikePillar(PoseStack poseStack, ItemStack stack, String cosmeticId, int centerX,
             int centerY, float partialTick) {
-        Level level = mc.level;
-        if (level == null) {
-            itemRenderer.renderGuiItem(stack, centerX - 8, centerY - 8);
-            itemRenderer.renderGuiItemDecorations(mc.font, stack, centerX - 8, centerY - 8);
+        if (mc.level == null || stack == null || stack.isEmpty()) {
+            if (stack != null && !stack.isEmpty()) {
+                itemRenderer.renderGuiItem(stack, centerX - 8, centerY - 8);
+            }
             return;
         }
 
@@ -1066,72 +871,51 @@ public class CosmeticsDisplayPanel extends BasePanel {
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
 
-        Vector3f light1 = new Vector3f(0.2f, 1.0f, -0.7f);
-        light1.normalize();
-        Vector3f light2 = new Vector3f(-0.2f, 1.0f, 0.7f);
-        light2.normalize();
-        RenderSystem.setupGui3DDiffuseLighting(light1, light2);
+        Vector3f l1 = new Vector3f(0.2f, 1.0f, -0.7f);
+        l1.normalize();
+        Vector3f l2 = new Vector3f(-0.2f, 1.0f, 0.7f);
+        l2.normalize();
+        RenderSystem.setupGui3DDiffuseLighting(l1, l2);
 
         MultiBufferSource.BufferSource bufferSource = mc.renderBuffers().bufferSource();
-
         poseStack.pushPose();
-
         poseStack.translate(centerX, centerY, 100.0f);
 
-        long currentRenderTime = System.nanoTime() / 1000000L;
-
-        Long startTime = itemRotationTimes.get(cosmeticId);
-        if (startTime == null) {
-            startTime = currentRenderTime;
-            itemRotationTimes.put(cosmeticId, startTime);
+        long time = System.nanoTime() / 1000000L;
+        Long start = itemRotationTimes.get(cosmeticId);
+        if (start == null) {
+            start = time;
+            itemRotationTimes.put(cosmeticId, start);
         }
+        float elapsed = (time - start + partialTick * 50.0f) / 1000.0f;
 
-        float elapsedSeconds = (currentRenderTime - startTime + partialTick * 50.0f) / 1000.0f;
-
-        float rotationSpeed = 90.0f;
-        float rotation = (elapsedSeconds * rotationSpeed) % 360.0f;
-
-        float bobAmount = (float) Math.sin(elapsedSeconds * 2.0f) * 0.05f;
-        poseStack.translate(0, bobAmount, 0);
-
-        poseStack.mulPose(Vector3f.YP.rotationDegrees(rotation));
-
-        float baseScale = itemSize * 0.390625f;
-        poseStack.scale(baseScale, -baseScale, baseScale);
-
-        BakedModel model = itemRenderer.getModel(stack, level, null, 0);
-
-        boolean hasGlint = stack.hasFoil();
-
-        int lightLevel = 15728880;
-        int overlay = 0;
+        poseStack.translate(0, Math.sin(elapsed * 2.0f) * 0.05f, 0);
+        poseStack.mulPose(Vector3f.YP.rotationDegrees((elapsed * 90.0f) % 360.0f));
+        float scale = itemSize * 0.390625f;
+        poseStack.scale(scale, -scale, scale);
 
         try {
-            itemRenderer.render(stack, ItemTransforms.TransformType.FIXED,
-                    hasGlint, poseStack, bufferSource, lightLevel, overlay, model);
+            BakedModel model = itemRenderer.getModel(stack, mc.level, null, 0);
+            itemRenderer.render(stack, net.minecraft.client.renderer.block.model.ItemTransforms.TransformType.GUI, stack.hasFoil(), poseStack, bufferSource, 15728880, 0, model);
             bufferSource.endBatch();
         } catch (Exception e) {
-            BuildScape.getLogger().debug("3D pillar-style item rendering failed, using 2D fallback: " + e.getMessage());
+            BuildScape.getLogger().debug("Pillar fallback: " + e.getMessage());
             poseStack.popPose();
-            RenderSystem.disableDepthTest();
-            RenderSystem.disableBlend();
             itemRenderer.renderGuiItem(stack, centerX - 8, centerY - 8);
-            itemRenderer.renderGuiItemDecorations(mc.font, stack, centerX - 8, centerY - 8);
             return;
         }
 
         poseStack.popPose();
-
         RenderSystem.disableDepthTest();
         RenderSystem.disableBlend();
     }
 
     private void render3DItemPreview(PoseStack poseStack, ItemStack stack, int centerX, int centerY,
             float partialTick) {
-        Level level = mc.level;
-        if (level == null) {
-            itemRenderer.renderGuiItem(stack, centerX - 8, centerY - 8);
-            itemRenderer.renderGuiItemDecorations(mc.font, stack, centerX - 8, centerY - 8);
+        if (mc.level == null || stack == null || stack.isEmpty()) {
+            if (stack != null && !stack.isEmpty()) {
+                itemRenderer.renderGuiItem(stack, centerX - 8, centerY - 8);
+            }
             return;
         }
 
@@ -1140,47 +924,32 @@ public class CosmeticsDisplayPanel extends BasePanel {
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
 
-        Vector3f light1 = new Vector3f(0.2f, 1.0f, -0.7f);
-        light1.normalize();
-        Vector3f light2 = new Vector3f(-0.2f, 1.0f, 0.7f);
-        light2.normalize();
-        RenderSystem.setupGui3DDiffuseLighting(light1, light2);
+        Vector3f l1 = new Vector3f(0.2f, 1.0f, -0.7f);
+        l1.normalize();
+        Vector3f l2 = new Vector3f(-0.2f, 1.0f, 0.7f);
+        l2.normalize();
+        RenderSystem.setupGui3DDiffuseLighting(l1, l2);
 
         MultiBufferSource.BufferSource bufferSource = mc.renderBuffers().bufferSource();
-
         poseStack.pushPose();
-
         float bobY = bobOffset * 5.0f;
         poseStack.translate(centerX, centerY + bobY, 100.0f);
-
-        float baseScale = itemSize * 0.625f * zoom;
-        poseStack.scale(baseScale, -baseScale, baseScale);
-
+        float scale = itemSize * 0.625f * zoom;
+        poseStack.scale(scale, -scale, scale);
         poseStack.mulPose(Vector3f.YP.rotationDegrees(rotation));
 
-        BakedModel model = itemRenderer.getModel(stack, level, null, 0);
-
-        boolean hasGlint = stack.hasFoil();
-
-        int lightLevel = 15728880;
-        int overlay = 0;
-
         try {
-            itemRenderer.render(stack, ItemTransforms.TransformType.FIXED,
-                    hasGlint, poseStack, bufferSource, lightLevel, overlay, model);
+            BakedModel model = itemRenderer.getModel(stack, mc.level, null, 0);
+            itemRenderer.render(stack, net.minecraft.client.renderer.block.model.ItemTransforms.TransformType.GUI, stack.hasFoil(), poseStack, bufferSource, 15728880, 0, model);
             bufferSource.endBatch();
         } catch (Exception e) {
-            BuildScape.getLogger().debug("3D item rendering failed, using 2D fallback: " + e.getMessage());
+            BuildScape.getLogger().debug("Preview fallback: " + e.getMessage());
             poseStack.popPose();
-            RenderSystem.disableDepthTest();
-            RenderSystem.disableBlend();
             itemRenderer.renderGuiItem(stack, centerX - 8, centerY - 8);
-            itemRenderer.renderGuiItemDecorations(mc.font, stack, centerX - 8, centerY - 8);
             return;
         }
 
         poseStack.popPose();
-
         RenderSystem.disableDepthTest();
         RenderSystem.disableBlend();
     }
@@ -1660,11 +1429,7 @@ public class CosmeticsDisplayPanel extends BasePanel {
             return colorPicker.mouseReleased(mouseX, mouseY, button);
         }
 
-        if (scrollbarRenderer.handleMouseRelease(button)) {
-            return true;
-        }
-
-        return false;
+        return scrollbarRenderer.handleMouseRelease(button);
     }
 
     public String getDraggedCosmeticId() {
@@ -1697,18 +1462,14 @@ public class CosmeticsDisplayPanel extends BasePanel {
 
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         if (colorPicker != null && selectedCosmeticForColor != null) {
-            if (colorPicker.keyPressed(keyCode, scanCode, modifiers)) {
-                return true;
-            }
+            return colorPicker.keyPressed(keyCode, scanCode, modifiers);
         }
         return false;
     }
 
     public boolean charTyped(char codePoint, int modifiers) {
         if (colorPicker != null && selectedCosmeticForColor != null) {
-            if (colorPicker.charTyped(codePoint, modifiers)) {
-                return true;
-            }
+            return colorPicker.charTyped(codePoint, modifiers);
         }
         return false;
     }

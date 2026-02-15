@@ -2,7 +2,10 @@ package com.kingodogo.buildscape.cosmetics;
 
 import com.kingodogo.buildscape.BuildScape;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Manages cosmetic registration and provides access to all available cosmetics.
@@ -63,14 +66,7 @@ public class CosmeticManager {
         registerItemCosmetic("buildscape:cosmatics/wings/elytra", "Elytra Wings", "Wings for gliding", 2,
                 "item:minecraft:elytra");
         registerHeadCosmetic("buildscape:cosmatics/gear/builders_hat", "Builder's Hat", "A stylish builder's hat", 1);
-        registerItemCosmetic("buildscape:cosmatics/gear/netherite_helmet", "Netherite Helmet",
-                "Powerful netherite helmet", 3, "item:minecraft:netherite_helmet");
-        registerItemCosmetic("buildscape:cosmatics/gear/netherite_chestplate", "Netherite Chestplate",
-                "Powerful netherite chestplate", 3, "item:minecraft:netherite_chestplate");
-        registerItemCosmetic("buildscape:cosmatics/gear/netherite_leggings", "Netherite Leggings",
-                "Powerful netherite leggings", 3, "item:minecraft:netherite_leggings");
-        registerItemCosmetic("buildscape:cosmatics/gear/netherite_boots", "Netherite Boots", "Powerful netherite boots",
-                3, "item:minecraft:netherite_boots");
+
 
         // Register block cosmetics
 

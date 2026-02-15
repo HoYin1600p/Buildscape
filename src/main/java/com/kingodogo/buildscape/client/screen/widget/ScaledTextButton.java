@@ -12,52 +12,66 @@ public class ScaledTextButton extends Button {
     @Override
     public void renderButton(com.mojang.blaze3d.vertex.PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
         net.minecraft.client.Minecraft mc = net.minecraft.client.Minecraft.getInstance();
+        boolean hovered = mouseX >= this.x && mouseY >= this.y && mouseX < this.x + this.width && mouseY < this.y + this.height;
+
+        // Draw background with depth
+        int bgColor = hovered ? 0xFF3D3D3D : 0xFF2D2D2D;
+        int borderColor = hovered ? 0xFF808080 : 0xFF404040;
+
+        // Border
+        fill(poseStack, x, y, x + width, y + height, borderColor);
+        // Inner background
+        fill(poseStack, x + 1, y + 1, x + width - 1, y + height - 1, bgColor);
+
         double guiScale = mc.getWindow().getGuiScale();
-        float textScale = 1.0f;
+        float baseTextScale = 1.0f;
         if (guiScale >= 3.0) {
-            textScale = 0.75f;
+            baseTextScale = 0.75f;
         } else if (guiScale >= 2.5) {
-            textScale = 0.85f;
+            baseTextScale = 0.85f;
         }
 
         String buttonText = getMessage().getString();
+        int textColor = hovered ? 0xFFFFFF : 0xCCCCCC;
 
-        int availableWidth = (int)(width / textScale);
+        int borderPadding = com.kingodogo.buildscape.client.screen.BuildScapeConfigScreen.scaleSize(6);
+        int availableWidth = width - borderPadding * 2;
+
+        float finalScale = baseTextScale;
         int textWidth = mc.font.width(buttonText);
 
+        // Use fixed scale, no dynamic shrinking
+        // Handle specific truncation for Ko-fi/Edit GUI if text doesn't fit
         String displayText = buttonText;
-        if (textWidth > availableWidth) {
-            if (buttonText.contains("Ko-fi") || buttonText.contains("ko-fi")) {
+        if (textWidth * finalScale > availableWidth) {
+            if (buttonText.toLowerCase().contains("ko-fi")) {
                 displayText = "Ko-fi";
+                // If "Ko-fi" still doesn't fit, it will fall through to truncation
+                if (mc.font.width(displayText) * finalScale > availableWidth) {
+                    int maxCharsWidth = (int) (availableWidth / finalScale) - mc.font.width("...");
+                    if (maxCharsWidth > 0) displayText = mc.font.plainSubstrByWidth(displayText, maxCharsWidth) + "...";
+                }
             } else if (buttonText.contains("Edit GUI")) {
                 displayText = "Edit GUI";
+                if (mc.font.width(displayText) * finalScale > availableWidth) {
+                    int maxCharsWidth = (int) (availableWidth / finalScale) - mc.font.width("...");
+                    if (maxCharsWidth > 0) displayText = mc.font.plainSubstrByWidth(displayText, maxCharsWidth) + "...";
+                }
             } else {
-                String truncated = mc.font.plainSubstrByWidth(buttonText, availableWidth - mc.font.width("..."));
-                displayText = truncated + "...";
+                int maxCharsWidth = (int) (availableWidth / finalScale) - mc.font.width("...");
+                if (maxCharsWidth > 0) {
+                    displayText = mc.font.plainSubstrByWidth(buttonText, maxCharsWidth) + "...";
+                }
             }
         }
 
-        int bgColor = this.isHovered ? 0xFFE0E0E0 : 0xFFC0C0C0;
-        net.minecraft.client.gui.GuiComponent.fill(poseStack, this.x, this.y, this.x + this.width, this.y + this.height, bgColor);
-
-        int borderColor = 0xFF000000;
-        net.minecraft.client.gui.GuiComponent.fill(poseStack, this.x, this.y, this.x + this.width, this.y + 1, borderColor);
-        net.minecraft.client.gui.GuiComponent.fill(poseStack, this.x, this.y + this.height - 1, this.x + this.width, this.y + this.height, borderColor);
-        net.minecraft.client.gui.GuiComponent.fill(poseStack, this.x, this.y, this.x + 1, this.y + this.height, borderColor);
-        net.minecraft.client.gui.GuiComponent.fill(poseStack, this.x + this.width - 1, this.y, this.x + this.width, this.y + this.height, borderColor);
-
-        int textColor = this.active ? 0xFFFFFF : 0xA0A0A0;
         poseStack.pushPose();
-        poseStack.translate(this.x + this.width / 2.0, this.y + (this.height - 8) / 2.0, 0);
-        poseStack.scale(textScale, textScale, 1.0f);
-        drawCenteredString(poseStack, 
-            mc.font, 
-            new net.minecraft.network.chat.TextComponent(displayText), 
-            0, 
-            0, 
-            textColor
-        );
+        float scaledHeight = 8 * finalScale;
+        // Shift left by borderPadding and vertically center
+        poseStack.translate(this.x + borderPadding, this.y + (this.height - scaledHeight) / 2.0, 0);
+        poseStack.scale(finalScale, finalScale, 1.0f);
+
+        mc.font.drawShadow(poseStack, displayText, 0, 0, textColor);
         poseStack.popPose();
     }
 }
-

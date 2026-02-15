@@ -1,15 +1,11 @@
 package com.kingodogo.buildscape.client.screen.widget;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
-import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
-import net.minecraftforge.registries.ForgeRegistries;
-import com.mojang.blaze3d.vertex.PoseStack;
-import java.util.function.Consumer;
+
 
 public class SortToggleButton extends AbstractWidget {
     public enum SortType {
@@ -20,25 +16,30 @@ public class SortToggleButton extends AbstractWidget {
     
     private final SortType sortType;
     private boolean selected = false;
-    private final Consumer<SortType> onToggle;
+    private final java.util.function.BiConsumer<SortType, Boolean> onToggle;
     private Item iconItem;
-    
-    public SortToggleButton(int x, int y, int width, int height, SortType sortType, Consumer<SortType> onToggle) {
+    private java.util.List<net.minecraft.util.FormattedCharSequence> tooltip;
+
+    public SortToggleButton(int x, int y, int width, int height, SortType sortType, java.util.function.BiConsumer<SortType, Boolean> onToggle) {
         super(x, y, width, height, net.minecraft.network.chat.TextComponent.EMPTY);
         this.sortType = sortType;
         this.onToggle = onToggle;
+        // Icons now rendered as text/shapes
+    }
 
-        switch (sortType) {
-            case INVENTORY:
-                iconItem = Items.CHEST;
-                break;
-            case ALL_ITEMS:
-                iconItem = Items.BOOK;
-                break;
-            case MOD_ONLY:
-                iconItem = Items.BOOK;
-                break;
+    public void setTooltip(java.util.List<net.minecraft.network.chat.Component> tooltipLines) {
+        this.tooltip = new java.util.ArrayList<>();
+        for (net.minecraft.network.chat.Component line : tooltipLines) {
+            this.tooltip.add(line.getVisualOrderText());
         }
+    }
+
+    public void setWidth(int width) {
+        this.width = width;
+    }
+
+    public void setHeight(int height) {
+        this.height = height;
     }
     
     public void setSelected(boolean selected) {
@@ -55,52 +56,71 @@ public class SortToggleButton extends AbstractWidget {
     
     @Override
     public void renderButton(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
+        Minecraft mc = Minecraft.getInstance();
+        boolean hovered = mouseX >= this.x && mouseY >= this.y && mouseX < this.x + this.width && mouseY < this.y + this.height;
 
-        ItemRenderer itemRenderer = Minecraft.getInstance().getItemRenderer();
-        int centerX = x + width / 2;
-        int centerY = y + height / 2;
+        // Modern Flat Design
+        // Background: Dark Grey
+        // Selected: Green Accent
+        // Border: 1px constant
+
+        int bgColor = selected ? 0xFF1E1E1E : (hovered ? 0xFF2A2A2A : 0xFF151515);
+        int borderColor = selected ? 0xFF00FF00 : (hovered ? 0xFF888888 : 0xFF444444); // Green when selected
+        int textColor = selected ? 0xFF00FF00 : 0xFFFFFFFF;
+
+        // Draw background
+        fill(poseStack, x, y, x + width, y + height, borderColor); // Border
+        fill(poseStack, x + 1, y + 1, x + width - 1, y + height - 1, bgColor); // Background
         
-        if (sortType == SortType.INVENTORY) {
-            ItemStack stack = new ItemStack(iconItem);
-            Minecraft mc = Minecraft.getInstance();
-            itemRenderer.renderGuiItem(stack, centerX - 8, centerY - 8);
-        } else if (sortType == SortType.ALL_ITEMS) {
-            Minecraft.getInstance().font.draw(
-                poseStack,
-                "A",
-                centerX - Minecraft.getInstance().font.width("A") / 2,
-                centerY - 4,
-                0xFFFFFF
-            );
-        } else if (sortType == SortType.MOD_ONLY) {
-            Minecraft.getInstance().font.draw(
-                poseStack,
-                "M",
-                centerX - Minecraft.getInstance().font.width("M") / 2,
-                centerY - 4,
-                0xFFFFFF
-            );
+        int centerX = x + width / 2;
+        int centerY = y + (height - 8) / 2; // Center text vertically (font height 8)
+
+        String label = "";
+        switch (sortType) {
+            case INVENTORY:
+                label = "I";
+                break; // I for Inventory
+            case ALL_ITEMS:
+                label = "A";
+                break; // A for All
+            case MOD_ONLY:
+                label = "M";
+                break; // M for Mod
+        }
+
+        drawCenteredString(poseStack, mc.font, label, centerX, centerY, textColor);
+
+        // Optional: Add glow or underline if selected?
+        // kept simple as requested "modern panel like"
+    }
+
+    public void renderButtonTooltip(PoseStack poseStack, int mouseX, int mouseY) {
+        Minecraft mc = Minecraft.getInstance();
+        boolean hovered = mouseX >= this.x && mouseY >= this.y && mouseX < this.x + this.width && mouseY < this.y + this.height;
+        if (hovered && tooltip != null && mc.screen != null) {
+            mc.screen.renderTooltip(poseStack, tooltip, mouseX, mouseY);
         }
     }
     
     @Override
     public void onClick(double mouseX, double mouseY) {
-        if (onToggle != null) {
-            onToggle.accept(sortType);
-        }
+        // This is called from mouseClicked, but we want modifiers, so we'll handle it there instead if possible
     }
     
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (this.active && this.visible) {
             if (isValidClickButton(button)) {
-                boolean clicked = mouseX >= (double)this.x && mouseY >= (double)this.y && 
-                                mouseX < (double)(this.x + this.width) && 
-                                mouseY < (double)(this.y + this.height);
+                boolean clicked = mouseX >= (double)this.x && mouseY >= (double)this.y &&
+                        mouseX < (double) (this.x + this.width) &&
+                        mouseY < (double) (this.y + this.height);
                 
                 if (clicked) {
                     this.playDownSound(net.minecraft.client.Minecraft.getInstance().getSoundManager());
-                    this.onClick(mouseX, mouseY);
+                    boolean isCtrlDown = net.minecraft.client.gui.screens.Screen.hasControlDown();
+                    if (onToggle != null) {
+                        onToggle.accept(sortType, isCtrlDown);
+                    }
                     return true;
                 }
             }

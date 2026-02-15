@@ -1,15 +1,8 @@
 package com.kingodogo.buildscape.client;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
-import java.util.UUID;
-
 import com.kingodogo.buildscape.config.CosmeticsConfig;
 import com.kingodogo.buildscape.cosmetics.CosmeticManager;
 import com.kingodogo.buildscape.particle.ModParticles;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
@@ -20,6 +13,8 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+
+import java.util.*;
 
 /**
  * Handles particle trails for player cosmetics.
@@ -258,7 +253,7 @@ public class ParticleTrailHandler {
         Vec3 spawnPos = lastPos.add(0, 0.1, 0); // Slightly above ground
 
         // Add some randomness to spawn position
-        Random random = mc.level.random;
+        Random random = player.level.random;
         double offsetX = (random.nextDouble() - 0.5) * 0.3;
         double offsetZ = (random.nextDouble() - 0.5) * 0.3;
         spawnPos = spawnPos.add(offsetX, 0, offsetZ);
@@ -341,7 +336,7 @@ public class ParticleTrailHandler {
 
                 // Standard single particle for all types (including bubble, note, and cherry)
                 // Cherry particles will randomize their shape internally (in CherryParticle class)
-                mc.level.addParticle(particleType,
+                player.level.addParticle(particleType,
                         px, spawnPos.y, pz,
                         velocityX, velocityY, velocityZ);
             }

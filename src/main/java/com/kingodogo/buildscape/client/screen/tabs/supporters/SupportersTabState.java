@@ -20,7 +20,7 @@ public class SupportersTabState {
     private String selectedCosmeticId;
     private Set<String> unlockedCosmetics = new HashSet<>();
     private Set<String> equippedCosmetics = new HashSet<>();
-    private Map<Integer, String> equippedCosmeticsBySlot = new HashMap<>();
+    private final Map<Integer, String> equippedCosmeticsBySlot = new HashMap<>();
     private UUID playerUuid;
     private Runnable onSelectionChanged;
     private Runnable onEquippedChanged;
@@ -144,15 +144,18 @@ public class SupportersTabState {
             equipCosmeticToSlot(bestSlot, cosmeticId);
         }
     }
-    
-    private int getBestSlotForCosmetic(String cosmeticId) {
+
+    public int getBestSlotForCosmetic(String cosmeticId) {
         CosmeticManager manager = CosmeticManager.getInstance();
         CosmeticRegistry registry = CosmeticRegistry.getInstance();
         
         if (manager.isParticleTrail(cosmeticId)) return SLOT_TRAIL;
         
         CosmeticManager.CosmeticMetadata metadata = manager.getMetadata(cosmeticId);
-        if (metadata != null && metadata.type() == CosmeticManager.CosmeticType.WINGS) return SLOT_WINGS;
+        if (metadata != null) {
+            if (metadata.type() == CosmeticManager.CosmeticType.WINGS) return SLOT_WINGS;
+            if (metadata.type() == CosmeticManager.CosmeticType.HEAD) return SLOT_HEAD;
+        }
         
         net.minecraft.world.item.ItemStack stack = registry.resolveToItemStack(cosmeticId);
         if (stack != null && !stack.isEmpty()) {

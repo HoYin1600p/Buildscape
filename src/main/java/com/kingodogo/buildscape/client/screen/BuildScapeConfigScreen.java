@@ -3,18 +3,24 @@ package com.kingodogo.buildscape.client.screen;
 import com.kingodogo.buildscape.BuildScape;
 import com.kingodogo.buildscape.client.screen.widget.ConfigCategoryButton;
 import com.kingodogo.buildscape.client.screen.widget.ScaledTextButton;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
-import net.minecraft.client.Minecraft;
+
 import java.net.URI;
 
 public class BuildScapeConfigScreen extends Screen {
-    private static final double SIDEBAR_WIDTH_PERCENT = 0.11;
-    private static final double LEFT_CONTENT_WIDTH_PERCENT = 0.44;
-    private static final double GAP_PERCENT = 0.01;
-    private static final double RIGHT_CONTENT_WIDTH_PERCENT = 0.44;
+    private static final double SIDEBAR_WIDTH_PERCENT = 0.11; // 11% sidebar
+    private static final double LEFT_GAP_PERCENT = 0.005; // 0.5% gap before sidebar
+    private static final double GAP_SIDEBAR_PANEL_PERCENT = 0.01; // 1% gap after sidebar
+    private static final double PANEL_GAP_PERCENT = 0.01; // 1% gap between panels
+    private static final double RIGHT_GAP_PERCENT = 0.005; // 0.5% gap after right panel
+    private static final double PANEL_HEIGHT_GAP_PERCENT = 0.005; // 0.5% gap height
+
+    // Panel Widths: (100% - 0.5 - 11 - 1 - 1 - 0.5) / 2 = (100 - 14) / 2 = 86 / 2 = 43%
+    private static final double LEFT_CONTENT_WIDTH_PERCENT = 0.43;
+    private static final double RIGHT_CONTENT_WIDTH_PERCENT = 0.43;
     private static final double CONTENT_WIDTH_PERCENT = LEFT_CONTENT_WIDTH_PERCENT;
     private static final double RIGHT_PANEL_WIDTH_PERCENT = RIGHT_CONTENT_WIDTH_PERCENT;
 
@@ -168,15 +174,31 @@ public class BuildScapeConfigScreen extends Screen {
 
         calculatedSidebarWidth = (int) (width * SIDEBAR_WIDTH_PERCENT);
 
-        int scaledSpacing = getScaledSpacing();
-        int sidebarX = scaledSpacing;
-        int sidebarY = scaleSize(30);
-        int buttonWidth = (int) (calculatedSidebarWidth * 0.90);
+        // Sidebar uses 0.5% padding on its LEFT (screen edge)
+        // Sidebar Column = 11% of screen width
+        // Buttons should have 0.5% gap on both sides within this 11% column.
+        // So Button X = Left Gap (0.5%) + Button Left Margin (0.5%)?
+        // User said: "buttons inside as we decided should leave 0.5% gap on both side of the nav bar"
+        // This likely means the sidebar background is the 11% column (starting at 0.5% screen X).
+        // And buttons are inside that with 0.5% padding relative to screen width?
+        // Or relative to the sidebar itself? "on both side of the nav bar" implies the bar has padding.
+        // Let's interpret: 
+        // Sidebar Area: Starts at 0.5% screen X, Width 11% screen.
+        // Buttons: Start at Sidebar X + 0.5% screen w. Width = Sidebar Width - 1% screen w.
+
+        int sidebarAreaX = (int) (width * LEFT_GAP_PERCENT);
+        int sidebarAreaWidth = calculatedSidebarWidth;
+
+        int buttonMargin = (int) (width * 0.005); // 0.5% margin
+        int buttonX = sidebarAreaX + buttonMargin;
+        int buttonWidth = sidebarAreaWidth - (buttonMargin * 2);
+
+        int sidebarY = getContentY(); // Start at 5% height
         int buttonHeight = getScaledCategoryButtonHeight();
         int spacing = getScaledCategoryButtonSpacing();
 
         pillarItemsButton = new ConfigCategoryButton(
-                sidebarX, sidebarY,
+                buttonX, sidebarY,
                 buttonWidth, buttonHeight,
                 new TranslatableComponent("buildscape.config.category.items"),
                 (button) -> {
@@ -186,7 +208,7 @@ public class BuildScapeConfigScreen extends Screen {
 
         sidebarY += buttonHeight + spacing;
         pillarParticlesButton = new ConfigCategoryButton(
-                sidebarX, sidebarY,
+                buttonX, sidebarY,
                 buttonWidth, buttonHeight,
                 new TranslatableComponent("buildscape.config.category.particles"),
                 (button) -> {
@@ -196,7 +218,7 @@ public class BuildScapeConfigScreen extends Screen {
 
         sidebarY += buttonHeight + spacing;
         pillarIdsButton = new ConfigCategoryButton(
-                sidebarX, sidebarY,
+                buttonX, sidebarY,
                 buttonWidth, buttonHeight,
                 new TranslatableComponent("buildscape.config.category.ids"),
                 (button) -> {
@@ -206,7 +228,7 @@ public class BuildScapeConfigScreen extends Screen {
 
         sidebarY += buttonHeight + spacing;
         supportersButton = new ConfigCategoryButton(
-                sidebarX, sidebarY,
+                buttonX, sidebarY,
                 buttonWidth, buttonHeight,
                 new TranslatableComponent("buildscape.config.category.supporters"),
                 (button) -> setActiveTab(
@@ -215,7 +237,7 @@ public class BuildScapeConfigScreen extends Screen {
 
         int kofiY = height - scaleSize(30);
         kofiButton = new ScaledTextButton(
-                sidebarX, kofiY,
+                buttonX, kofiY,
                 buttonWidth, getScaledButtonHeight(),
                 new TranslatableComponent("buildscape.config.kofi"),
                 (button) -> openKofiLink());
@@ -228,6 +250,8 @@ public class BuildScapeConfigScreen extends Screen {
                 setActiveTab(new com.kingodogo.buildscape.client.screen.tabs.supporters.SupportersOnlyTab(this));
             }
         }
+
+        updateCategoryButtonScales();
     }
 
     private boolean hasOpAccess() {
@@ -253,15 +277,18 @@ public class BuildScapeConfigScreen extends Screen {
         recalculateDimensions();
 
         calculatedSidebarWidth = (int) (this.width * SIDEBAR_WIDTH_PERCENT);
-        int scaledSpacing = getScaledSpacing();
-        int sidebarX = scaledSpacing;
-        int sidebarY = scaleSize(30);
-        int buttonWidth = (int) (calculatedSidebarWidth * 0.90);
+
+        int sidebarAreaX = (int) (width * LEFT_GAP_PERCENT);
+
+        int sidebarY = getContentY();
+        int buttonMargin = (int) (width * 0.005);
+        int buttonX = sidebarAreaX + buttonMargin;
+        int buttonWidth = calculatedSidebarWidth - (buttonMargin * 2);
         int buttonHeight = getScaledCategoryButtonHeight();
         int spacing = getScaledCategoryButtonSpacing();
 
         if (pillarItemsButton != null) {
-            pillarItemsButton.x = sidebarX;
+            pillarItemsButton.x = buttonX;
             pillarItemsButton.y = sidebarY;
             pillarItemsButton.setWidth(buttonWidth);
             try {
@@ -275,7 +302,7 @@ public class BuildScapeConfigScreen extends Screen {
 
         if (pillarParticlesButton != null) {
             sidebarY += buttonHeight + spacing;
-            pillarParticlesButton.x = sidebarX;
+            pillarParticlesButton.x = buttonX;
             pillarParticlesButton.y = sidebarY;
             pillarParticlesButton.setWidth(buttonWidth);
             try {
@@ -289,7 +316,7 @@ public class BuildScapeConfigScreen extends Screen {
 
         if (pillarIdsButton != null) {
             sidebarY += buttonHeight + spacing;
-            pillarIdsButton.x = sidebarX;
+            pillarIdsButton.x = buttonX;
             pillarIdsButton.y = sidebarY;
             pillarIdsButton.setWidth(buttonWidth);
             try {
@@ -303,7 +330,7 @@ public class BuildScapeConfigScreen extends Screen {
 
         if (supportersButton != null) {
             sidebarY += buttonHeight + spacing;
-            supportersButton.x = sidebarX;
+            supportersButton.x = buttonX;
             supportersButton.y = sidebarY;
             supportersButton.setWidth(buttonWidth);
             try {
@@ -316,17 +343,104 @@ public class BuildScapeConfigScreen extends Screen {
         }
 
         if (editGuiButton != null) {
-            editGuiButton.x = sidebarX;
+            editGuiButton.x = buttonX;
             editGuiButton.y = this.height - scaleSize(60);
             editGuiButton.setWidth(buttonWidth);
         }
         if (kofiButton != null) {
-            kofiButton.x = sidebarX;
+            kofiButton.x = buttonX;
             kofiButton.y = this.height - scaleSize(30);
             kofiButton.setWidth(buttonWidth);
         }
 
         super.resize(mc, this.width, this.height);
+        updateCategoryButtonScales();
+    }
+
+    private void updateCategoryButtonScales() {
+        // Calculate max text width to ensure all buttons use the same scale
+        float maxTextWidth = 0.0f;
+        int maxAvailableWidth = 0;
+
+        java.util.List<ConfigCategoryButton> buttons = java.util.Arrays.asList(
+                pillarItemsButton, pillarParticlesButton, pillarIdsButton, supportersButton
+        );
+
+        for (ConfigCategoryButton btn : buttons) {
+            if (btn != null) {
+                int width = btn.getWidth() - scaleSize(12); // Padding
+                maxAvailableWidth = Math.max(maxAvailableWidth, width);
+                maxTextWidth = Math.max(maxTextWidth, font.width(btn.getMessage()));
+            }
+        }
+
+        float commonScale = 1.0f;
+        if (maxAvailableWidth > 0 && maxTextWidth > 0) {
+            commonScale = Math.min(1.0f, (float) maxAvailableWidth / maxTextWidth);
+        }
+
+        // Apply common scale to all category buttons
+        for (ConfigCategoryButton btn : buttons) {
+            if (btn != null) {
+                btn.setTextScale(commonScale);
+            }
+        }
+    }
+
+    private void renderGradientTitle(com.mojang.blaze3d.vertex.PoseStack poseStack, int x, int y, String text, float scale) {
+        poseStack.pushPose();
+        poseStack.translate(x, y, 0);
+        poseStack.scale(scale, scale, 1.0f);
+
+        int textWidth = font.width(text);
+        int startX = -textWidth / 2;
+
+        // Define gradient colors: Cyan -> Blue -> Purple -> Magenta -> Orange
+        int[] colors = new int[]{0xFF00FFFF, 0xFF0088FF, 0xFF8800FF, 0xFFFF00FF, 0xFFFF8800};
+
+        // Draw border/shadow first
+        for (int ox = -1; ox <= 1; ox++) {
+            for (int oy = -1; oy <= 1; oy++) {
+                if (ox == 0 && oy == 0) continue;
+                font.draw(poseStack, text, startX + ox, oy, 0xFF000000);
+            }
+        }
+
+        // Draw gradient text character by character
+        float colorStep = (float) (colors.length - 1) / (float) text.length();
+        int currentX = startX;
+
+        for (int i = 0; i < text.length(); i++) {
+            char c = text.charAt(i);
+            String charStr = String.valueOf(c);
+            int charWidth = font.width(charStr);
+
+            float colorPos = i * colorStep / (float) colors.length * (float) (colors.length - 1);
+            int colorIndex = (int) colorPos;
+            float progress = colorPos - colorIndex;
+
+            int c1 = colors[Math.min(colorIndex, colors.length - 1)];
+            int c2 = colors[Math.min(colorIndex + 1, colors.length - 1)];
+
+            int r1 = (c1 >> 16) & 0xFF;
+            int g1 = (c1 >> 8) & 0xFF;
+            int b1 = c1 & 0xFF;
+
+            int r2 = (c2 >> 16) & 0xFF;
+            int g2 = (c2 >> 8) & 0xFF;
+            int b2 = c2 & 0xFF;
+
+            int r = (int) (r1 + (r2 - r1) * progress);
+            int g = (int) (g1 + (g2 - g1) * progress);
+            int b = (int) (b1 + (b2 - b1) * progress);
+
+            int color = 0xFF000000 | (r << 16) | (g << 8) | b;
+
+            font.draw(poseStack, charStr, currentX, 0, color);
+            currentX += charWidth;
+        }
+
+        poseStack.popPose();
     }
 
     public void setActiveTab(AbstractConfigTab tab) {
@@ -427,8 +541,10 @@ public class BuildScapeConfigScreen extends Screen {
         this.renderBackground(poseStack);
 
         calculatedSidebarWidth = (int) (width * SIDEBAR_WIDTH_PERCENT);
+        int sidebarStartX = (int) (width * LEFT_GAP_PERCENT);
 
-        fill(poseStack, 0, 0, calculatedSidebarWidth, height, 0xC0101010);
+        // Sidebar background: Draw from StartX to StartX + Width
+        fill(poseStack, sidebarStartX, 0, sidebarStartX + calculatedSidebarWidth, height, 0xC0101010);
 
         int titleY = scaleSize(10);
         int titlePadding = scaleSize(10);
@@ -443,9 +559,8 @@ public class BuildScapeConfigScreen extends Screen {
         int titleX = titlePadding + (calculatedSidebarWidth - titlePadding * 2) / 2;
 
         poseStack.pushPose();
-        poseStack.translate(titleX, titleY, 0);
-        poseStack.scale(titleScale, titleScale, 1.0f);
-        drawCenteredString(poseStack, font, title, 0, 0, 0xFFFFFF);
+        // Use renderGradientTitle instead of drawCenteredString
+        renderGradientTitle(poseStack, titleX, titleY, title.getString(), titleScale);
         poseStack.popPose();
 
         if (activeTab != null) {
@@ -454,13 +569,14 @@ public class BuildScapeConfigScreen extends Screen {
 
         super.render(poseStack, mouseX, mouseY, partialTick);
 
+        com.kingodogo.buildscape.client.ClientEvents.renderOverlay(poseStack, width, height);
+
         if (activeTab != null) {
             // Disable any scissor tests that might clip tooltips
             com.mojang.blaze3d.systems.RenderSystem.disableScissor();
+            // Render tooltips last so they appear on top of everything
             activeTab.renderTooltips(poseStack, mouseX, mouseY, partialTick);
         }
-
-        com.kingodogo.buildscape.client.ClientEvents.renderOverlay(poseStack, width, height);
     }
 
     @Override
@@ -525,15 +641,28 @@ public class BuildScapeConfigScreen extends Screen {
 
     public int getContentX() {
         calculatedSidebarWidth = (int) (width * SIDEBAR_WIDTH_PERCENT);
-        return calculatedSidebarWidth;
+        int leftGap = (int) (width * LEFT_GAP_PERCENT);
+        int gapAfterSidebar = (int) (width * GAP_SIDEBAR_PANEL_PERCENT);
+        return leftGap + calculatedSidebarWidth + gapAfterSidebar;
     }
 
     public int getContentY() {
-        return scaleSize(30);
+        return (int) (height * 0.05); // 5% Gap from top
     }
 
     public int getContentWidth() {
         return (int) (width * LEFT_CONTENT_WIDTH_PERCENT);
+    }
+
+    public int getRightPanelX() {
+        int contentX = getContentX();
+        int leftPanelW = getContentWidth();
+        int centerGap = (int) (width * PANEL_GAP_PERCENT);
+        return contentX + leftPanelW + centerGap;
+    }
+
+    public int getRightPanelWidth() {
+        return (int) (width * RIGHT_CONTENT_WIDTH_PERCENT);
     }
 
     public int getSidebarWidth() {
@@ -541,19 +670,12 @@ public class BuildScapeConfigScreen extends Screen {
         return calculatedSidebarWidth;
     }
 
-    public int getRightPanelWidth() {
-        return (int) (width * RIGHT_CONTENT_WIDTH_PERCENT);
-    }
-
-    public int getRightPanelX() {
-        calculatedSidebarWidth = (int) (width * SIDEBAR_WIDTH_PERCENT);
-        int leftContentWidth = (int) (width * LEFT_CONTENT_WIDTH_PERCENT);
-        int gap = (int) (width * GAP_PERCENT);
-        return calculatedSidebarWidth + leftContentWidth + gap;
-    }
 
     public int getContentHeight() {
-        return height - scaleSize(30);
+        // Total Height - Top 5% - Bottom 0.5%
+        int topGap = getContentY();
+        int bottomGap = (int) (height * 0.005);
+        return height - topGap - bottomGap;
     }
 
     public void addTabWidget(net.minecraft.client.gui.components.events.GuiEventListener widget) {

@@ -34,7 +34,7 @@ public class ItemSelectionWidget extends AbstractWidget {
 
     private final Consumer<String> onItemSelected;
     private final Predicate<String> isItemInConfig;
-    private List<Item> allItems;
+    private final List<Item> allItems;
     private List<Item> filteredItems;
     private String filter = "";
     private double scrollOffset = 0;
@@ -183,14 +183,12 @@ public class ItemSelectionWidget extends AbstractWidget {
         double guiScale = mc.getWindow().getGuiScale();
         int windowHeight = mc.getWindow().getHeight();
 
-        // Draw border around panel (debug mode)
-        if (com.kingodogo.buildscape.client.screen.DebugRenderConfig.RENDER_PANEL_BORDERS) {
-            int borderColor = com.kingodogo.buildscape.client.screen.DebugRenderConfig.PANEL_BORDER_COLOR;
-            fill(poseStack, x, y, x + width, y + 1, borderColor); // Top
-            fill(poseStack, x, y + height - 1, x + width, y + height, borderColor); // Bottom
-            fill(poseStack, x, y, x + 1, y + height, borderColor); // Left
-            fill(poseStack, x + width - 1, y, x + width, y + height, borderColor); // Right
-        }
+        // Draw border around panel (Always render as requested)
+        int borderColor = 0xFF666666;
+        fill(poseStack, x, y, x + width, y + 1, borderColor); // Top
+        fill(poseStack, x, y + height - 1, x + width, y + height, borderColor); // Bottom
+        fill(poseStack, x, y, x + 1, y + height, borderColor); // Left
+        fill(poseStack, x + width - 1, y, x + width, y + height, borderColor); // Right
 
         int scissorX = (int) (x * guiScale);
         // Exclude header area from scissor height
@@ -224,13 +222,18 @@ public class ItemSelectionWidget extends AbstractWidget {
                 continue;
             }
 
+            // Calculate centering offset
+            int totalRowWidth = itemsPerRow * (ITEM_SIZE + ITEM_SPACING) - ITEM_SPACING;
+            int availableAreaWidth = width - 21; // Same as in calculateItemsPerRow
+            int startXOffset = Math.max(0, (availableAreaWidth - totalRowWidth) / 2);
+
             for (int col = 0; col < itemsPerRow; col++) {
                 int index = row * itemsPerRow + col;
                 if (index >= filteredItems.size())
                     break;
 
                 Item item = filteredItems.get(index);
-                int itemX = x + 5 + col * (ITEM_SIZE + ITEM_SPACING);
+                int itemX = x + 5 + startXOffset + col * (ITEM_SIZE + ITEM_SPACING);
 
                 if (itemX + ITEM_SIZE < x || itemX > x + width) {
                     continue;
@@ -253,13 +256,13 @@ public class ItemSelectionWidget extends AbstractWidget {
                 fill(poseStack, itemX, rowY, itemX + ITEM_SIZE, rowY + ITEM_SIZE, bgColor);
 
                 if (inConfig) {
-                    int borderColor = 0xFF00FF00;
-                    fill(poseStack, itemX - 1, rowY - 1, itemX + ITEM_SIZE + 1, rowY, borderColor);
+                    int panelBorderColor = 0xFF00FF00;
+                    fill(poseStack, itemX - 1, rowY - 1, itemX + ITEM_SIZE + 1, rowY, panelBorderColor);
                     fill(poseStack, itemX - 1, rowY + ITEM_SIZE, itemX + ITEM_SIZE + 1, rowY + ITEM_SIZE + 1,
-                            borderColor);
-                    fill(poseStack, itemX - 1, rowY - 1, itemX, rowY + ITEM_SIZE + 1, borderColor);
+                            panelBorderColor);
+                    fill(poseStack, itemX - 1, rowY - 1, itemX, rowY + ITEM_SIZE + 1, panelBorderColor);
                     fill(poseStack, itemX + ITEM_SIZE, rowY - 1, itemX + ITEM_SIZE + 1, rowY + ITEM_SIZE + 1,
-                            borderColor);
+                            panelBorderColor);
                 }
 
                 poseStack.pushPose();
@@ -312,13 +315,18 @@ public class ItemSelectionWidget extends AbstractWidget {
                 continue;
             }
 
+            // Calculate centering offset
+            int totalRowWidth = itemsPerRow * (ITEM_SIZE + ITEM_SPACING) - ITEM_SPACING;
+            int availableAreaWidth = width - 21; // Same as in calculateItemsPerRow
+            int startXOffset = Math.max(0, (availableAreaWidth - totalRowWidth) / 2);
+
             for (int col = 0; col < itemsPerRow; col++) {
                 int index = row * itemsPerRow + col;
                 if (index >= filteredItems.size())
                     break;
 
                 Item item = filteredItems.get(index);
-                int itemX = x + 5 + col * (ITEM_SIZE + ITEM_SPACING);
+                int itemX = x + 5 + startXOffset + col * (ITEM_SIZE + ITEM_SPACING);
 
                 if (itemX + ITEM_SIZE < x || itemX > x + width) {
                     continue;
@@ -405,12 +413,17 @@ public class ItemSelectionWidget extends AbstractWidget {
                 continue;
             }
 
+            // Calculate centering offset
+            int totalRowWidth = itemsPerRow * (ITEM_SIZE + ITEM_SPACING) - ITEM_SPACING;
+            int availableAreaWidth = width - 21; // Same as in calculateItemsPerRow
+            int startXOffset = Math.max(0, (availableAreaWidth - totalRowWidth) / 2);
+
             for (int col = 0; col < itemsPerRow; col++) {
                 int index = row * itemsPerRow + col;
                 if (index >= filteredItems.size())
                     break;
 
-                int itemX = x + 5 + col * (ITEM_SIZE + ITEM_SPACING);
+                int itemX = x + 5 + startXOffset + col * (ITEM_SIZE + ITEM_SPACING);
 
                 if (itemX + ITEM_SIZE < x || itemX > x + width) {
                     continue;

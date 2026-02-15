@@ -3,10 +3,7 @@ package com.kingodogo.buildscape.api;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.kingodogo.buildscape.BuildScape;
-import com.kingodogo.buildscape.api.model.ApiResponse;
-import com.kingodogo.buildscape.api.model.CosmeticData;
-import com.kingodogo.buildscape.api.model.SupporterStatus;
-import com.kingodogo.buildscape.api.model.TiersResponse;
+import com.kingodogo.buildscape.api.model.*;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -19,6 +16,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class SupportersApiClient {
     private static final String BASE_URL = "https://buildscape.online/api/v1";
+    private static final String SECURE_API_URL = "https://buildscape.online/.netlify/functions";
     private static final int TIMEOUT_SECONDS = 10;
     private static final long RATE_LIMIT_MS = 2000;
 
@@ -219,9 +217,95 @@ public class SupportersApiClient {
     public CompletableFuture<TiersResponse> getTiers() {
         return getRequest("/supporters/tiers", TiersResponse.class);
     }
-    
+
+    /**
+     * Authenticate with the secure API using Minecraft session credentials.
+     * This is the new secure authentication method that verifies the access token with Mojang.
+     *
+     * @param uuid        The player's UUID
+     * @param accessToken The player's Minecraft access token
+     * @return CompletableFuture with AuthenticateResponse containing cosmetic data
+     */
+    public CompletableFuture<AuthenticateResponse> authenticate(String uuid, String accessToken) {
+        if (uuid == null || uuid.isEmpty()) {
+            return CompletableFuture.failedFuture(new IllegalArgumentException("UUID cannot be null or empty"));
+        }
+
+        if (accessToken == null || accessToken.isEmpty()) {
+            return CompletableFuture.failedFuture(new IllegalArgumentException("Access token cannot be null or empty"));
+        }
+
+        // Sanitize inputs
+        String sanitizedUuid = sanitizeInput(uuid);
+        String sanitizedToken = sanitizeInput(accessToken);
+
+        // Create request body
+        AuthenticateRequest requestBody = AuthenticateRequest.createAuthenticate(sanitizedUuid, sanitizedToken);
+
+        // Make POST request to secure API
+        String url = SECURE_API_URL + "/api-minecraft";
+
+        if (!url.startsWith("https://")) {
+            BuildScape.getLogger().error("Rejected non-HTTPS URL: " + url);
+            return CompletableFuture.failedFuture(new SecurityException("HTTPS required"));
+        }
+
+        String jsonBody = gson.toJson(requestBody);
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .timeout(Duration.ofSeconds(TIMEOUT_SECONDS))
+                .header("Content-Type", "application/json")
+                .header("Accept", "application/json")
+                .header("User-Agent", "BuildScape-Mod/1.0")
+                .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
+                .build();
+
+        BuildScape.getLogger().debug("Making secure authentication request for UUID: " + sanitizedUuid);
+
+        return httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString())
+                .thenApply(response -> {
+                    String bodyStr = response.body();
+
+                    if (bodyStr == null || bodyStr.isEmpty()) {
+                        BuildScape.getLogger().error("Empty response body from authentication");
+                        AuthenticateResponse errorResponse = new AuthenticateResponse();
+                        errorResponse.setError("Empty response from server");
+                        errorResponse.setCode("EMPTY_RESPONSE");
+                        return errorResponse;
+                    }
+
+                    try {
+                        AuthenticateResponse authResponse = gson.fromJson(bodyStr, AuthenticateResponse.class);
+
+                        // Check for HTTP error status
+                        if (response.statusCode() < 200 || response.statusCode() >= 300) {
+                            BuildScape.getLogger().error("Authentication failed with status " + response.statusCode() +
+                                    ": " + authResponse.getError());
+                            // Error details should be in the response body
+                            return authResponse;
+                        }
+
+                        return authResponse;
+                    } catch (Exception e) {
+                        BuildScape.getLogger().error("Failed to parse authentication response: " + e.getMessage());
+                        AuthenticateResponse errorResponse = new AuthenticateResponse();
+                        errorResponse.setError("Failed to parse response: " + e.getMessage());
+                        errorResponse.setCode("PARSE_ERROR");
+                        return errorResponse;
+                    }
+                })
+                .exceptionally(throwable -> {
+                    BuildScape.getLogger().error("Authentication request failed: " + throwable.getMessage());
+                    AuthenticateResponse errorResponse = new AuthenticateResponse();
+                    errorResponse.setError("Request failed: " + throwable.getMessage());
+                    errorResponse.setCode("REQUEST_FAILED");
+                    return errorResponse;
+                });
+    }
+
     private static class ConnectRequest {
-        private String verificationCode;
+        private final String verificationCode;
         
         public ConnectRequest(String verificationCode) {
             this.verificationCode = verificationCode;

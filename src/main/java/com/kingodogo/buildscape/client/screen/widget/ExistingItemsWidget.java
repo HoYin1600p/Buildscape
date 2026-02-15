@@ -1,5 +1,7 @@
 package com.kingodogo.buildscape.client.screen.widget;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
@@ -10,8 +12,7 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.registries.ForgeRegistries;
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.systems.RenderSystem;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -127,14 +128,12 @@ public class ExistingItemsWidget extends AbstractWidget {
         double guiScale = mc.getWindow().getGuiScale();
         int windowHeight = mc.getWindow().getHeight();
 
-        // Draw border around panel (debug mode)
-        if (com.kingodogo.buildscape.client.screen.DebugRenderConfig.RENDER_PANEL_BORDERS) {
-            int borderColor = com.kingodogo.buildscape.client.screen.DebugRenderConfig.PANEL_BORDER_COLOR;
-            fill(poseStack, x, y, x + width, y + 1, borderColor); // Top
-            fill(poseStack, x, y + height - 1, x + width, y + height, borderColor); // Bottom
-            fill(poseStack, x, y, x + 1, y + height, borderColor); // Left
-            fill(poseStack, x + width - 1, y, x + width, y + height, borderColor); // Right
-        }
+        // Draw border around panel (Always render)
+        int borderColor = 0xFF666666;
+        fill(poseStack, x, y, x + width, y + 1, borderColor); // Top
+        fill(poseStack, x, y + height - 1, x + width, y + height, borderColor); // Bottom
+        fill(poseStack, x, y, x + 1, y + height, borderColor); // Left
+        fill(poseStack, x + width - 1, y, x + width, y + height, borderColor); // Right
 
         int scissorX = (int) (x * guiScale);
         int bottomMargin = 10;

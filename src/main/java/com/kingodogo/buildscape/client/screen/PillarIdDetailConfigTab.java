@@ -3,15 +3,15 @@ package com.kingodogo.buildscape.client.screen;
 import com.kingodogo.buildscape.client.screen.widget.ColorPickerWidget;
 import com.kingodogo.buildscape.client.screen.widget.ColorSwatchButton;
 import com.kingodogo.buildscape.client.screen.widget.IntSliderWidget;
+import com.kingodogo.buildscape.client.screen.widget.ScaledTextButton;
 import com.kingodogo.buildscape.config.PillarIdManager;
 import com.kingodogo.buildscape.config.PillarParticleConfig;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.client.gui.GuiComponent;
-import net.minecraft.network.chat.TranslatableComponent;
-import net.minecraft.network.chat.TextComponent;
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,10 +21,10 @@ public class PillarIdDetailConfigTab extends AbstractConfigTab {
     
     private final String pillarId;
     private PillarIdManager.PillarData pillarData;
-    
-    private Button backButton;
-    private Button saveButton;
-    private Button patternSelector;
+
+    private ScaledTextButton backButton;
+    private ScaledTextButton saveButton;
+    private ScaledTextButton patternSelector;
     private EditBox patternSpeedField;
     private EditBox patternSpreadField;
     private EditBox patternIntensityField;
@@ -72,23 +72,29 @@ public class PillarIdDetailConfigTab extends AbstractConfigTab {
         PillarParticleConfig globalConfig = PillarParticleConfig.get();
         
         // Back button
-        backButton = new Button(
+        backButton = new ScaledTextButton(
             0, 0,
             80, 20,
             new TextComponent("← Back"),
             (btn) -> parent.setActiveTab(new PillarIdsConfigTab(parent))
         );
+        backButton.setCustomTextColors(0xFFFF55, 0xFFFFFF); // Yellow/White on hover
         addTabWidget(backButton);
         
         // Pattern selector
-        String pattern = pillarData.pattern != null ? pillarData.pattern : globalConfig.pattern;
+        String pattern = pillarData.pattern != null ? pillarData.pattern : "none"; // Default to "none" if null (global)
+        // If pattern logic in this tab uses "none" to represent null/global
+        if (pillarData.pattern == null) pattern = "none";
+        
         currentPatternIndex = findPatternIndex(pattern);
-        patternSelector = new com.kingodogo.buildscape.client.screen.widget.WideButton(
+
+        patternSelector = new ScaledTextButton(
             0, 0,
-            100, 20,
-            new TranslatableComponent("buildscape.config.particles.pattern." + pattern),
+                120, 20,
+                getPatternMessage(pattern),
             (btn) -> cyclePattern()
         );
+        patternSelector.setCustomTextColors(0, 0); // Allow component colors
         patternSelector.active = true;
         addTabWidget(patternSelector);
         
@@ -154,7 +160,7 @@ public class PillarIdDetailConfigTab extends AbstractConfigTab {
         addTabWidget(maxParticleColorSlider);
         
         // Save button
-        saveButton = new Button(
+        saveButton = new ScaledTextButton(
             0, 0,
             100, 20,
             new TextComponent("Save"),
@@ -347,7 +353,7 @@ public class PillarIdDetailConfigTab extends AbstractConfigTab {
     private void cyclePattern() {
         currentPatternIndex = (currentPatternIndex + 1) % PATTERNS.length;
         String pattern = PATTERNS[currentPatternIndex];
-        patternSelector.setMessage(new TranslatableComponent("buildscape.config.particles.pattern." + pattern));
+        patternSelector.setMessage(getPatternMessage(pattern));
     }
     
     private void saveConfig() {
@@ -778,5 +784,17 @@ public class PillarIdDetailConfigTab extends AbstractConfigTab {
     @Override
     public String getTabName() {
         return "PillarIdDetail";
+    }
+
+    // Helper to get consistent pattern message styles
+    private net.minecraft.network.chat.Component getPatternMessage(String pattern) {
+        String key = "buildscape.config.particles.pattern." + pattern;
+        if ("none".equals(pattern)) {
+            return new TranslatableComponent(key).withStyle(net.minecraft.ChatFormatting.GRAY);
+        } else if ("default".equals(pattern)) {
+            return new TranslatableComponent(key).withStyle(net.minecraft.ChatFormatting.WHITE);
+        } else {
+            return new TranslatableComponent(key).withStyle(net.minecraft.ChatFormatting.GOLD);
+        }
     }
 }

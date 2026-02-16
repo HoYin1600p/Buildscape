@@ -73,18 +73,33 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
         // render
         int buttonWidth = BuildScapeConfigScreen.scaleSize(100);
         int buttonHeight = BuildScapeConfigScreen.getScaledButtonHeight();
-        reloadButton = new Button(0, 0, buttonWidth, buttonHeight,
+        com.kingodogo.buildscape.client.screen.widget.ScaledTextButton reloadBtn = new com.kingodogo.buildscape.client.screen.widget.ScaledTextButton(
+                0, 0, buttonWidth, buttonHeight,
                 new TranslatableComponent("buildscape.config.ids.reload"),
                 (btn) -> manualReload());
-        selectAllButton = new Button(0, 0, buttonWidth, buttonHeight,
+        reloadBtn.setCustomTextColors(0xFFFF00, 0xFFFF55);
+        reloadButton = reloadBtn;
+
+        com.kingodogo.buildscape.client.screen.widget.ScaledTextButton selectAllBtn = new com.kingodogo.buildscape.client.screen.widget.ScaledTextButton(
+                0, 0, buttonWidth, buttonHeight,
                 new TranslatableComponent("buildscape.config.ids.select_all"),
                 (btn) -> selectAll());
-        removeAllButton = new Button(0, 0, buttonWidth, buttonHeight,
+        selectAllBtn.setCustomTextColors(0x00FFFF, 0x55FFFF); // Cyan
+        selectAllButton = selectAllBtn;
+
+        com.kingodogo.buildscape.client.screen.widget.ScaledTextButton removeAllBtn = new com.kingodogo.buildscape.client.screen.widget.ScaledTextButton(
+                0, 0, buttonWidth, buttonHeight,
                 new TranslatableComponent("buildscape.config.ids.remove_all"),
                 (btn) -> removeAll());
-        removeButton = new Button(0, 0, buttonWidth, buttonHeight,
+        removeAllBtn.setCustomTextColors(0xFF0000, 0xFF5555); // Red text for danger
+        removeAllButton = removeAllBtn;
+
+        com.kingodogo.buildscape.client.screen.widget.ScaledTextButton removeBtn = new com.kingodogo.buildscape.client.screen.widget.ScaledTextButton(
+                0, 0, buttonWidth, buttonHeight,
                 new TranslatableComponent("buildscape.config.ids.remove"),
                 (btn) -> removeSelected());
+        removeBtn.setCustomTextColors(0xFF5555, 0xFF7777); // Lighter red
+        removeButton = removeBtn;
 
         addTabWidget(reloadButton);
         addTabWidget(selectAllButton);
@@ -343,13 +358,17 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
         int buttonHeight = BuildScapeConfigScreen.getScaledButtonHeight();
         int spacing = BuildScapeConfigScreen.scaleSize(8);
         int topMargin = BuildScapeConfigScreen.scaleSize(4);
-        int leftMargin = BuildScapeConfigScreen.scaleSize(4);
 
-        // Position buttons from left to right with proper spacing
-        int x = contentX + leftMargin;
+        // Calculate total width of the button group
+        int totalGroupWidth = (buttonWidth * 4) + (spacing * 3);
+
+        // Center the group within the content width
+        int startX = contentX + (contentWidth - totalGroupWidth) / 2;
         int y = contentY + topMargin;
 
-        // Reload button - set width and height directly for proper rendering
+        int x = startX;
+
+        // Reload button
         reloadButton.x = x;
         reloadButton.y = y;
         reloadButton.setWidth(buttonWidth);
@@ -872,11 +891,14 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
 
             // Create selection checkbox - use a simple button with checkmark
             int checkboxSize = BuildScapeConfigScreen.scaleSize(18);
-            selectCheckbox = new Button(0, 0, checkboxSize, checkboxSize, new TextComponent("☐"),
+            com.kingodogo.buildscape.client.screen.widget.ScaledTextButton checkboxBtn = new com.kingodogo.buildscape.client.screen.widget.ScaledTextButton(
+                    0, 0, checkboxSize, checkboxSize,
+                    new TextComponent("☐"),
                     (btn) -> {
                         selected = !selected;
                         updateCheckboxText();
                     });
+            selectCheckbox = checkboxBtn;
             updateCheckboxText();
             // Make checkbox more visible
             selectCheckbox.setAlpha(1.0f);
@@ -1127,7 +1149,15 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
         }
 
         private void updateCheckboxText() {
-            if (selectCheckbox != null) {
+            if (selectCheckbox instanceof com.kingodogo.buildscape.client.screen.widget.ScaledTextButton btn) {
+                if (selected) {
+                    btn.setMessage(new TextComponent("☑"));
+                    btn.setCustomTextColors(0x00FF00, 0x55FF55); // Green when selected
+                } else {
+                    btn.setMessage(new TextComponent("☐"));
+                    btn.setCustomTextColors(0xAAAAAA, 0xFFFFFF); // Grey/White when unselected
+                }
+            } else if (selectCheckbox != null) {
                 selectCheckbox.setMessage(new TextComponent(selected ? "☑" : "☐"));
             }
         }
@@ -1643,8 +1673,8 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
 
         // Horizontal edges - bottom
         for (int i = 0; i < 10; i++) {
-            double x = centerX - 0.5 + (random.nextDouble() * 1.0);
-            double z = centerZ - 0.5 + (random.nextDouble() * 1.0);
+            double x = centerX - 0.5 + (random.nextDouble());
+            double z = centerZ - 0.5 + (random.nextDouble());
             level.addParticle(ParticleTypes.END_ROD, x, pos.getY() + 0.1, centerZ - 0.5, 0, 0, 0);
             level.addParticle(ParticleTypes.END_ROD, x, pos.getY() + 0.1, centerZ + 0.5, 0, 0, 0);
             level.addParticle(ParticleTypes.END_ROD, centerX - 0.5, pos.getY() + 0.1, z, 0, 0, 0);
@@ -1653,8 +1683,8 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
 
         // Horizontal edges - top
         for (int i = 0; i < 10; i++) {
-            double x = centerX - 0.5 + (random.nextDouble() * 1.0);
-            double z = centerZ - 0.5 + (random.nextDouble() * 1.0);
+            double x = centerX - 0.5 + (random.nextDouble());
+            double z = centerZ - 0.5 + (random.nextDouble());
             level.addParticle(ParticleTypes.END_ROD, x, pos.getY() + 0.9, centerZ - 0.5, 0, 0, 0);
             level.addParticle(ParticleTypes.END_ROD, x, pos.getY() + 0.9, centerZ + 0.5, 0, 0, 0);
             level.addParticle(ParticleTypes.END_ROD, centerX - 0.5, pos.getY() + 0.9, z, 0, 0, 0);

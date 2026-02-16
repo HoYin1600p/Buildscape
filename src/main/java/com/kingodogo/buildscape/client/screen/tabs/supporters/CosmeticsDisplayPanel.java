@@ -816,23 +816,42 @@ public class CosmeticsDisplayPanel extends BasePanel {
             float offsetY = (-14.0f * pScale) + (animProgress * 24.0f * pScale) + (i * 6.0f * pScale);
             float pSize = 8.0f * pScale * (1.0f - trailProgress * 0.5f);
 
-            RenderSystem.setShaderColor(color[0], color[1], color[2], 0.9f - (trailProgress * 0.6f));
+            String shape = CosmeticManager.getInstance().getParticleShape(cosmeticId);
+            boolean isSparkle = cosmeticId.toLowerCase().contains("sparkle") || shape.equals("sparkle") || shape.equals("default");
+            boolean isBubble = shape.equals("bubble");
+
+            if (isBubble) {
+                // For bubble trail, use white color as base (don't tint with cosmetic color)
+                RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 0.9f - (trailProgress * 0.6f));
+            } else {
+                RenderSystem.setShaderColor(color[0], color[1], color[2], 0.9f - (trailProgress * 0.6f));
+            }
+
             poseStack.pushPose();
             poseStack.translate(centerX + offsetX, centerY + offsetY, 0);
             poseStack.mulPose(Vector3f.ZP.rotationDegrees(animProgress * 360.0f + i * 45.0f));
 
-            String shape = CosmeticManager.getInstance().getParticleShape(cosmeticId);
             net.minecraft.resources.ResourceLocation tex = getParticleTexture(shape);
             if (tex != null) {
                 RenderSystem.setShaderTexture(0, tex);
                 RenderSystem.setShader(net.minecraft.client.renderer.GameRenderer::getPositionTexShader);
                 com.mojang.blaze3d.vertex.BufferBuilder bb = com.mojang.blaze3d.vertex.Tesselator.getInstance().getBuilder();
                 bb.begin(com.mojang.blaze3d.vertex.VertexFormat.Mode.QUADS, com.mojang.blaze3d.vertex.DefaultVertexFormat.POSITION_TEX);
+
                 float h = pSize / 2.0f;
-                bb.vertex(poseStack.last().pose(), -h, h, 0).uv(0, 1).endVertex();
-                bb.vertex(poseStack.last().pose(), h, h, 0).uv(1, 1).endVertex();
-                bb.vertex(poseStack.last().pose(), h, -h, 0).uv(1, 0).endVertex();
-                bb.vertex(poseStack.last().pose(), -h, -h, 0).uv(0, 0).endVertex();
+                // Use only the first frame (frame 0) for sparkle particles to fix rendering
+                float u0 = 0, u1 = 1.0f, v0 = 0, v1 = 1.0f;
+                if (isSparkle) {
+                    // sparkle texture is a horizontal sprite sheet (usually 8 frames)
+                    // We render a single middle frame (Frame 3) to show a clean icon in the GUI
+                    u0 = 0.375f;
+                    u1 = 0.500f;
+                }
+
+                bb.vertex(poseStack.last().pose(), -h, h, 0).uv(u0, v1).endVertex();
+                bb.vertex(poseStack.last().pose(), h, h, 0).uv(u1, v1).endVertex();
+                bb.vertex(poseStack.last().pose(), h, -h, 0).uv(u1, v0).endVertex();
+                bb.vertex(poseStack.last().pose(), -h, -h, 0).uv(u0, v0).endVertex();
                 com.mojang.blaze3d.vertex.Tesselator.getInstance().end();
             }
             poseStack.popPose();

@@ -621,12 +621,11 @@ public class PillarBlock
         }
 
         BlockEntity blockEntity = level.getBlockEntity(pos);
-        if (!(blockEntity instanceof PillarBlockEntity)) {
+        if (!(blockEntity instanceof PillarBlockEntity pillarBE)) {
             return InteractionResult.PASS;
         }
 
         ItemStack heldItem = player.getItemInHand(hand);
-        PillarBlockEntity pillarBE = (PillarBlockEntity) blockEntity;
 
         if (!heldItem.isEmpty()) {
             java.util.Map.Entry<String, String> dyeInfo = getDyeColorAndName(
@@ -684,11 +683,11 @@ public class PillarBlock
                     net.minecraft.network.chat.TextComponent message;
                     if (pillarId != null) {
                         message = new net.minecraft.network.chat.TextComponent(
-                                "[" + pillarId + "] + " + dyeName + progressText
+                                "[" + pillarId + "] Dyed " + dyeName + progressText
                         );
                     } else {
                         message = new net.minecraft.network.chat.TextComponent(
-                                "Pillar color added: " + dyeName + progressText
+                                "Pillar Dyed " + dyeName + progressText
                         );
                     }
 

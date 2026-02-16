@@ -343,6 +343,7 @@ public class MobStateParser {
         if (word.equals("crouch")) return "crouching";
         if (word.equals("scream")) return "screaming";
         if (word.equals("aggro")) return "angry";
+        if (word.equals("grumm")) return "grum";
 
         // Comprehensive aliases for relatability
         if (word.equals("beg")) return "begging";

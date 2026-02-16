@@ -239,7 +239,7 @@ public class BuildScapeConfigScreen extends Screen {
         kofiButton = new ScaledTextButton(
                 buttonX, kofiY,
                 buttonWidth, getScaledButtonHeight(),
-                new TranslatableComponent("buildscape.config.kofi"),
+                new net.minecraft.network.chat.TextComponent("Ko-fi"),
                 (button) -> openKofiLink());
         addRenderableWidget(kofiButton);
 
@@ -376,7 +376,8 @@ public class BuildScapeConfigScreen extends Screen {
 
         float commonScale = 1.0f;
         if (maxAvailableWidth > 0 && maxTextWidth > 0) {
-            commonScale = Math.min(1.0f, (float) maxAvailableWidth / maxTextWidth);
+            // Apply a 0.90 multiplier as a safety margin to ensure text never touches the edge or triggers truncation
+            commonScale = Math.min(1.0f, ((float) maxAvailableWidth / maxTextWidth) * 0.90f);
         }
 
         // Apply common scale to all category buttons
@@ -502,7 +503,8 @@ public class BuildScapeConfigScreen extends Screen {
 
         if (Minecraft.getInstance().player != null) {
             net.minecraft.network.chat.MutableComponent linkComponent = new net.minecraft.network.chat.TextComponent(
-                    "Ko-fi: ");
+                    "Support Buildscape Devs ");
+            
             net.minecraft.network.chat.MutableComponent urlComponent = new net.minecraft.network.chat.TextComponent(
                     kofiUrl)
                     .withStyle(style -> style
@@ -513,9 +515,12 @@ public class BuildScapeConfigScreen extends Screen {
                                     kofiUrl))
                             .withHoverEvent(new net.minecraft.network.chat.HoverEvent(
                                     net.minecraft.network.chat.HoverEvent.Action.SHOW_TEXT,
-                                    new net.minecraft.network.chat.TextComponent("Click to open Ko-fi link"))));
+                                    new net.minecraft.network.chat.TextComponent("Click to open"))));
 
-            linkComponent.append(urlComponent);
+            net.minecraft.network.chat.MutableComponent suffixComponent = new net.minecraft.network.chat.TextComponent(
+                    " Buy us a Hot Chocolate.");
+
+            linkComponent.append(urlComponent).append(suffixComponent);
             Minecraft.getInstance().player.sendMessage(linkComponent, java.util.UUID.randomUUID());
         }
 
@@ -551,12 +556,12 @@ public class BuildScapeConfigScreen extends Screen {
         int maxTitleWidth = calculatedSidebarWidth - titlePadding * 2;
         int titleTextWidth = font.width(title);
 
-        float titleScale = 0.85f;
+        float titleScale = 1.0f;
         if (titleTextWidth > maxTitleWidth) {
-            titleScale = Math.max(0.5f, (float) maxTitleWidth / titleTextWidth * 0.85f);
+            titleScale = Math.max(0.5f, (float) maxTitleWidth / titleTextWidth);
         }
 
-        int titleX = titlePadding + (calculatedSidebarWidth - titlePadding * 2) / 2;
+        int titleX = sidebarStartX + calculatedSidebarWidth / 2;
 
         poseStack.pushPose();
         // Use renderGradientTitle instead of drawCenteredString
@@ -679,77 +684,16 @@ public class BuildScapeConfigScreen extends Screen {
     }
 
     public void addTabWidget(net.minecraft.client.gui.components.events.GuiEventListener widget) {
-        try {
-            java.lang.reflect.Method addMethod = net.minecraft.client.gui.screens.Screen.class.getDeclaredMethod(
-                    "addRenderableWidget",
-                    net.minecraft.client.gui.components.events.GuiEventListener.class);
-            addMethod.setAccessible(true);
-            addMethod.invoke(this, widget);
-        } catch (NoSuchMethodException e) {
-            try {
-                for (java.lang.reflect.Method method : net.minecraft.client.gui.screens.Screen.class
-                        .getDeclaredMethods()) {
-                    if (method.getName().equals("addRenderableWidget") &&
-                            method.getParameterCount() == 1 &&
-                            method.getParameterTypes()[0].isAssignableFrom(
-                                    net.minecraft.client.gui.components.events.GuiEventListener.class)) {
-                        method.setAccessible(true);
-                        method.invoke(this, widget);
-                        return;
-                    }
-                }
-                BuildScape.getLogger().error("Could not find addRenderableWidget method");
-            } catch (Exception ex) {
-                BuildScape.getLogger().error("Failed to add widget: " + ex.getMessage());
-                ex.printStackTrace();
-            }
-        } catch (Exception e) {
-            BuildScape.getLogger().error("Failed to add widget: " + e.getMessage());
-            e.printStackTrace();
+        if (widget instanceof net.minecraft.client.gui.components.AbstractWidget abstractWidget) {
+            this.addRenderableWidget(abstractWidget);
+        } else {
+            BuildScape.getLogger().error("Widget type not supported for direct addition (must extend AbstractWidget): " + widget.getClass().getName());
         }
     }
 
     public void removeTabWidget(net.minecraft.client.gui.components.events.GuiEventListener widget) {
-        try {
-            java.lang.reflect.Method removeMethod = net.minecraft.client.gui.screens.Screen.class.getDeclaredMethod(
-                    "removeWidget",
-                    net.minecraft.client.gui.components.events.GuiEventListener.class);
-            removeMethod.setAccessible(true);
-            removeMethod.invoke(this, widget);
-        } catch (NoSuchMethodException e) {
-            try {
-                for (java.lang.reflect.Method method : net.minecraft.client.gui.screens.Screen.class
-                        .getDeclaredMethods()) {
-                    if ((method.getName().equals("removeWidget") || method.getName().equals("remove")) &&
-                            method.getParameterCount() == 1 &&
-                            method.getParameterTypes()[0].isAssignableFrom(
-                                    net.minecraft.client.gui.components.events.GuiEventListener.class)) {
-                        method.setAccessible(true);
-                        method.invoke(this, widget);
-                        return;
-                    }
-                }
-                try {
-                    java.lang.reflect.Field childrenField = net.minecraft.client.gui.screens.Screen.class
-                            .getDeclaredField("children");
-                    childrenField.setAccessible(true);
-                    @SuppressWarnings("unchecked")
-                    java.util.List<net.minecraft.client.gui.components.events.GuiEventListener> children = (java.util.List<net.minecraft.client.gui.components.events.GuiEventListener>) childrenField
-                            .get(this);
-                    if (children != null) {
-                        children.remove(widget);
-                    }
-                } catch (Exception ex) {
-                    BuildScape.getLogger().error("Failed to remove widget: " + ex.getMessage());
-                    ex.printStackTrace();
-                }
-            } catch (Exception ex) {
-                BuildScape.getLogger().error("Failed to remove widget: " + ex.getMessage());
-                ex.printStackTrace();
-            }
-        } catch (Exception e) {
-            BuildScape.getLogger().error("Failed to remove widget: " + e.getMessage());
-            e.printStackTrace();
+        if (widget instanceof net.minecraft.client.gui.components.events.GuiEventListener) {
+            this.removeWidget(widget);
         }
     }
 }

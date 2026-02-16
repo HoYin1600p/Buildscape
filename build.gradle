@@ -138,15 +138,15 @@ tasks.named('processResources', ProcessResources).configure {
 
 tasks.named('jar', Jar).configure {
     manifest {
-        attributes(["Specification-Title"     : mod_id,
-                    "Specification-Vendor"    : mod_authors,
+        attributes(["Specification-Title"     : "buildscape",
+                    "Specification-Vendor"    : "kingodogo",
                     "Specification-Version"   : "1",
                     "Implementation-Title"    : project.name,
-                    "Implementation-Version"  : project.jar.archiveVersion,
-                    "Implementation-Vendor"   : mod_authors,
-                    "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")])
+                    "Implementation-Version"  : "${version}",
+                    "Implementation-Vendor"   : "kingodogo",
+                    "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
+                    "MixinConfigs"            : "${mod_id}.mixins.json"])
     }
-
 
     exclude { it.path.startsWith('.') || it.path.contains('..') }
 

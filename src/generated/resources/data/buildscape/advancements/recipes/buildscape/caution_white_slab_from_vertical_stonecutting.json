@@ -1,0 +1,34 @@
+{
+  "parent": "minecraft:recipes/root",
+  "rewards": {
+    "recipes": [
+      "buildscape:caution_white_slab_from_vertical_stonecutting"
+    ]
+  },
+  "criteria": {
+    "has_vertical_caution_white_slab": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "buildscape:vertical_caution_white_slab"
+            ]
+          }
+        ]
+      }
+    },
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipe": "buildscape:caution_white_slab_from_vertical_stonecutting"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "has_vertical_caution_white_slab",
+      "has_the_recipe"
+    ]
+  ]
+}

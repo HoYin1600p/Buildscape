@@ -89,9 +89,9 @@ public class ExistingItemsWidget extends AbstractWidget {
                     String[] parts = tagString.split(":", 2);
                     ResourceLocation tagLocation;
                     if (parts.length == 2) {
-                        tagLocation = new ResourceLocation(parts[0], parts[1]);
+                        tagLocation = new ResourceLocation(parts[0] + ":" + parts[1]);
                     } else {
-                        tagLocation = new ResourceLocation("minecraft", tagString);
+                        tagLocation = new ResourceLocation("minecraft:" + tagString);
                     }
                     TagKey<Item> tagKey = TagKey.create(Registry.ITEM_REGISTRY, tagLocation);
                     displayEntries.add(new TagDisplayEntry(itemId, tagKey));
@@ -102,9 +102,9 @@ public class ExistingItemsWidget extends AbstractWidget {
                     String[] parts = itemId.split(":", 2);
                     ResourceLocation itemLocation;
                     if (parts.length == 2) {
-                        itemLocation = new ResourceLocation(parts[0], parts[1]);
+                        itemLocation = new ResourceLocation(parts[0] + ":" + parts[1]);
                     } else {
-                        itemLocation = new ResourceLocation("minecraft", itemId);
+                        itemLocation = new ResourceLocation("minecraft:" + itemId);
                     }
                     Item item = ForgeRegistries.ITEMS.getValue(itemLocation);
                     if (item != null) {
@@ -176,7 +176,12 @@ public class ExistingItemsWidget extends AbstractWidget {
                     break;
 
                 DisplayEntry entry = displayEntries.get(index);
-                int itemX = x + 5 + col * (ITEM_SIZE + ITEM_SPACING);
+                // Calculate centering offset matching ItemSelectionWidget
+                int totalRowWidth = itemsPerRow * (ITEM_SIZE + ITEM_SPACING) - ITEM_SPACING;
+                int availableAreaWidth = width - 21; // Same as in calculateItemsPerRow
+                int startXOffset = Math.max(0, (availableAreaWidth - totalRowWidth) / 2);
+
+                int itemX = x + 5 + startXOffset + col * (ITEM_SIZE + ITEM_SPACING);
 
                 if (itemX + ITEM_SIZE < x || itemX > x + width) {
                     continue;
@@ -231,22 +236,16 @@ public class ExistingItemsWidget extends AbstractWidget {
         poseStack.popPose();
 
         // Render scrollbar after disabling scissor so it is not clipped
-        // Use local variable maxScroll which needs to be re-calculated or scoped
-        // correctly
-        // We will re-calculate maxScroll here to be safe and clear
         double maxScrollForBar = Math.max(0, Math.ceil((double) displayEntries.size() / itemsPerRow) - maxVisibleRows);
         if (maxScrollForBar > 0) {
             int scrollbarX = x + width - CustomScrollbarRenderer.getScrollbarWidth() - 4; // 4px from edge
             int scrollbarY = itemY;
-            // bottomMargin is a local variable in the removed block, need to redefine or
-            // use constant
-            int scrollbarHeight = height - labelHeight - 10; // Replaced bottomMargin with its constant value 10
+            int scrollbarHeight = height - labelHeight - 10;
 
             double visibleRatio = maxVisibleRows * itemsPerRow / (double) displayEntries.size();
             scrollbarRenderer.renderScrollbar(poseStack, scrollbarX, scrollbarY, scrollbarHeight,
                     scrollOffset, maxScrollForBar, visibleRatio);
         }
-
     }
 
     public void renderTooltip(PoseStack poseStack, int mouseX, int mouseY) {
@@ -271,13 +270,18 @@ public class ExistingItemsWidget extends AbstractWidget {
                 continue;
             }
 
+            // Calculate centering offset matching ItemSelectionWidget
+            int totalRowWidth = itemsPerRow * (ITEM_SIZE + ITEM_SPACING) - ITEM_SPACING;
+            int availableAreaWidth = width - 21; // Same as in calculateItemsPerRow
+            int startXOffset = Math.max(0, (availableAreaWidth - totalRowWidth) / 2);
+
             for (int col = 0; col < itemsPerRow; col++) {
                 int index = row * itemsPerRow + col;
                 if (index >= displayEntries.size())
                     break;
 
                 DisplayEntry entry = displayEntries.get(index);
-                int itemX = x + 5 + col * (ITEM_SIZE + ITEM_SPACING);
+                int itemX = x + 5 + startXOffset + col * (ITEM_SIZE + ITEM_SPACING);
 
                 if (itemX + ITEM_SIZE < x || itemX > x + width) {
                     continue;
@@ -362,9 +366,11 @@ public class ExistingItemsWidget extends AbstractWidget {
             int scrollbarY = itemY;
             int bottomMargin = 10;
             int scrollbarHeight = height - labelHeight - bottomMargin;
-            int contentX = x + 5;
+            int rowWidth = itemsPerRow * ITEM_SIZE + (itemsPerRow - 1) * ITEM_SPACING;
+            int startX = x + (width - rowWidth) / 2;
+            int contentX = startX;
             int contentY = itemY;
-            int contentWidth = width - 21; // width - 16 - 5
+            int contentWidth = rowWidth;
             int contentHeight = scrollbarHeight;
 
             double visibleRatio = maxVisibleRows / Math.ceil((double) displayEntries.size() / itemsPerRow);
@@ -382,12 +388,17 @@ public class ExistingItemsWidget extends AbstractWidget {
         for (int row = startRow; row < endRow; row++) {
             int rowY = itemY + (row - startRow) * (ITEM_SIZE + ITEM_SPACING);
 
+            // Calculate centering offset matching ItemSelectionWidget
+            int totalRowWidth = itemsPerRow * (ITEM_SIZE + ITEM_SPACING) - ITEM_SPACING;
+            int availableAreaWidth = width - 21; // Same as in calculateItemsPerRow
+            int startXOffset = Math.max(0, (availableAreaWidth - totalRowWidth) / 2);
+
             for (int col = 0; col < itemsPerRow; col++) {
                 int index = row * itemsPerRow + col;
                 if (index >= displayEntries.size())
                     break;
 
-                int itemX = x + 5 + col * (ITEM_SIZE + ITEM_SPACING);
+                int itemX = x + 5 + startXOffset + col * (ITEM_SIZE + ITEM_SPACING);
                 int removeSize = 8;
                 int removeX = itemX + ITEM_SIZE - removeSize;
                 int removeY = rowY;

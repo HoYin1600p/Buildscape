@@ -108,7 +108,31 @@ public class VerticalSlabBlock extends SlabBlock implements SimpleWaterloggedBlo
         ItemStack itemstack = useContext.getItemInHand();
         SlabType slabtype = state.getValue(TYPE);
         if (slabtype != SlabType.DOUBLE && itemstack.getItem() == this.asItem()) {
-            return true;
+            if (useContext.replacingClickedOnBlock()) {
+                boolean flag = useContext.getClickLocation().y - (double) useContext.getClickedPos().getY() > 0.5D;
+                Direction direction = useContext.getClickedFace();
+                Direction facing = state.getValue(FACING);
+
+                // Allow replacing (merging) only if clicking on the correct face
+                if (facing == Direction.NORTH) {
+                    // North slab occupies 0-8 Z. Empty space is 8-16 Z (South).
+                    // Merging requires clicking SOUTH face of the block or into the SOUTH half.
+                    // But canBeReplaced is called before placement state calc.
+                    // Actually, we should check if the click is on the face that 'fills' the block.
+                    return direction == Direction.SOUTH; // Clicking South face merges it
+                } else if (facing == Direction.SOUTH) {
+                    return direction == Direction.NORTH;
+                } else if (facing == Direction.WEST) {
+                    return direction == Direction.EAST;
+                } else if (facing == Direction.EAST) {
+                    return direction == Direction.WEST;
+                }
+
+                // If not clicking the specific merge face, treat as full block (don't replace) -> places adjacent
+                return false;
+            } else {
+                return true;
+            }
         } else {
             return super.canBeReplaced(state, useContext);
         }

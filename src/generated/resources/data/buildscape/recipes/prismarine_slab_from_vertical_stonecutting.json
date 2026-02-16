@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "buildscape:vertical_prismarine_slab"
+  },
+  "result": "minecraft:prismarine_slab",
+  "count": 1
+}

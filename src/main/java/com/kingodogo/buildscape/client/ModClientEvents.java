@@ -160,80 +160,45 @@ public class ModClientEvents {
 
             boolean needsRemapping = false;
 
-            // Check if quad is fully outside our bounds (culling) or inside/needs cropping
-            // We modify the XYZ coordinates of the vertices to clamp them to our box.
-            // AND we modify the UVs to match (since texture is usually mapped to position).
-
-            // However, simply clamping vertices will stretch texture if UVs aren't adjusted.
-            // But standard MC blocks use "Projected" mapping (1 unit pos = 16 units UV).
-            // So if we move a vertex, we should move the UV proportionally.
-            
+            // Step 1: Clamp Vertices to logical slab bounds
             for (int i = 0; i < 4; i++) {
                 int offset = i * 8;
                 float x = Float.intBitsToFloat(newData[offset]);
-                float y = Float.intBitsToFloat(newData[offset + 1]);
                 float z = Float.intBitsToFloat(newData[offset + 2]);
 
                 // Clamp Position
                 float newX = Math.max(minX, Math.min(maxX, x));
                 float newZ = Math.max(minZ, Math.min(maxZ, z));
 
-                // Centering translation: move icon by 4 pixels (0.25) so it looks centered in GUI slots
-                if (isInventory) {
-                    if (facing == Direction.NORTH) newZ += 0.25f;
-                    else if (facing == Direction.SOUTH) newZ -= 0.25f;
-                    else if (facing == Direction.WEST) newX += 0.25f;
-                    else if (facing == Direction.EAST) newX -= 0.25f;
-                }
-
-                if (newX != x || newZ != z || isInventory) {
+                if (newX != x || newZ != z) {
                     needsRemapping = true;
                     newData[offset] = Float.floatToRawIntBits(newX);
                     newData[offset + 2] = Float.floatToRawIntBits(newZ);
-
-                    // Remap UV
-                    float u = Float.intBitsToFloat(newData[offset + 4]);
-                    float v = Float.intBitsToFloat(newData[offset + 5]);
-
-                    // We need to know the axis of the UV mapping.
-                    // Standard:
-                    // UP/DOWN: X=u, Z=v (or similar).
-                    // NORTH/SOUTH: X=u, Y=v.
-                    // EAST/WEST: Z=u, Y=v.
-
-                    // Retrieve interpolated U/V based on the shift in position.
-                    // Determine shift ratio.
-                    // Instead of complex calculation, let's use the sprite's interpolation.
-                    // U = sprite.getU( ... )
-                    // But we have raw U. We need un-interpolated 0-16.
-
-                    float unU = sprite.getUOffset(u); // This returns the offset from minU? No.
-                    // Use sprite.getU(16.0f * value) -> u.
-                    // It's hard to reverse without access to the specific mapping logic of the model.
-                    // But generally: if we moved X by delta, we move U by delta (masked by orientation).
-
-                    // Simplification: We assume standard block mapping.
-                    // Move U/V proportional to move in X/Y/Z.
-
-                    // Actually, simpler approach for "Cut" faces (the internal face we just created by clamping):
-                    // If a Face was at Z=0.5 (internal), it didn't exist before.
-                    // By clamping, we are moving the "Far" face (Z=1) to Z=0.5.
-                    // We must retain the UV of the newly created edge? 
-                    // No. UVs are stuck to the geometry in standard models.
-                    // If we move the geometry, we must decide:
-                    // 1. Stretch the texture (Keep old UV). -> Current generic behavior?
-                    // 2. Crop the texture (Move UV). -> Correct for slabs.
-
-                    // To Crop: calculate how much we moved in 0-1 space, and apply to UV.
-                    // This requires knowing the UV-to-Position direction.
-                    // Let's assume standard axes.
                 }
             }
 
+            // Step 2: Recalculate UVs based on logical bounds (before centering)
+            // This ensures we use the correct slice of the texture (e.g. 0-8 pixels for a North slab)
             if (needsRemapping) {
-                // Recalculate UVs based on new positions using "Box" mapping as a heuristic
-                // This is robust for most blocks.
                 recalculateUVs(newData, sprite);
+            }
+
+            // Step 3: Apply Inventory Centering
+            // Move the geometry to the center of the block space for GUI display, but Keep UVs from Step 2.
+            if (isInventory) {
+                for (int i = 0; i < 4; i++) {
+                    int offset = i * 8;
+                    float x = Float.intBitsToFloat(newData[offset]);
+                    float z = Float.intBitsToFloat(newData[offset + 2]);
+
+                    if (facing == Direction.NORTH) z += 0.25f;
+                    else if (facing == Direction.SOUTH) z -= 0.25f;
+                    else if (facing == Direction.WEST) x += 0.25f;
+                    else if (facing == Direction.EAST) x -= 0.25f;
+
+                    newData[offset] = Float.floatToRawIntBits(x);
+                    newData[offset + 2] = Float.floatToRawIntBits(z);
+                }
             }
 
             // Check if quad is valid area

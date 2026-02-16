@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "buildscape:dripstone_block_slab"
+  },
+  "result": "buildscape:vertical_dripstone_block_slab",
+  "count": 1
+}

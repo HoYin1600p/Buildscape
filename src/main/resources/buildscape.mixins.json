@@ -5,13 +5,14 @@
   "compatibilityLevel": "JAVA_17",
   "refmap": "buildscape.refmap.json",
   "mixins": [
-    "WallBlockMixin",
-    "IronBarsBlockMixin",
-    "FenceBlockMixin",
     "ChainBlockMixin",
-    "LivingEntityMixin",
+    "EntityAccessor",
     "EntityMixin",
-    "LeavesBlockMixin"
+    "FenceBlockMixin",
+    "IronBarsBlockMixin",
+    "LeavesBlockMixin",
+    "LivingEntityMixin",
+    "WallBlockMixin"
   ],
   "client": [
     "PauseScreenMixin"

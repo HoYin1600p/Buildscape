@@ -1,0 +1,34 @@
+{
+  "parent": "minecraft:recipes/root",
+  "rewards": {
+    "recipes": [
+      "buildscape:moss_block_slab_from_vertical_stonecutting"
+    ]
+  },
+  "criteria": {
+    "has_vertical_moss_block_slab": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "buildscape:vertical_moss_block_slab"
+            ]
+          }
+        ]
+      }
+    },
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipe": "buildscape:moss_block_slab_from_vertical_stonecutting"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "has_vertical_moss_block_slab",
+      "has_the_recipe"
+    ]
+  ]
+}

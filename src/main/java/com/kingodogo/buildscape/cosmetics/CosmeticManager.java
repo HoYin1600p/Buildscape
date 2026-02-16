@@ -56,8 +56,7 @@ public class CosmeticManager {
         // Custom Particles
         registerParticleTrail("buildscape:cosmatics/particle/snowflake_trail", "Snowflake Trail",
                 "Snowflakes drift behind you", 2, "snowflake");
-        registerParticleTrail("buildscape:cosmatics/particle/firework_trail", "Firework Trail",
-                "Miniature fireworks trail behind you", 3, "firework");
+
         registerParticleTrail("buildscape:cosmatics/particle/cake_trail", "Cake Trail",
                 "Sweet cake particles follow you", 3, "cake");
 

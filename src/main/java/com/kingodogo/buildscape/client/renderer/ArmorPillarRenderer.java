@@ -99,8 +99,6 @@ public class ArmorPillarRenderer {
                 // Leggings cover the legs, which go all the way down to 0.0 on an armor stand.
                 // We use baseOffset directly or with a tiny adjustment.
                 yOffset = baseOffset;
-            } else if (slot == EquipmentSlot.FEET) {
-                yOffset = baseOffset; // Bottom is 0.0
             } else {
                 yOffset = baseOffset - 0.72;
             }
@@ -199,6 +197,7 @@ public class ArmorPillarRenderer {
         if (stack.getItem() instanceof ElytraItem) {
             return EquipmentSlot.CHEST;
         }
+
         return null;
     }
 

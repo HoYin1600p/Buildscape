@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "buildscape:bit_exposed_cut_copper_slab"
+  },
+  "result": "buildscape:vertical_bit_exposed_cut_copper_slab",
+  "count": 1
+}

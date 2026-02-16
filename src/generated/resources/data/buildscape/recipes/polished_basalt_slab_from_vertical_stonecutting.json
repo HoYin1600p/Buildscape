@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "buildscape:vertical_polished_basalt_slab"
+  },
+  "result": "buildscape:polished_basalt_slab",
+  "count": 1
+}

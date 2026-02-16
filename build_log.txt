@@ -1,0 +1,514 @@
+
+> Configure project :
+MixinGradle did not locate the diffplug APT plugin, skipping eclipse task configuration
+
+> Task :downloadMcpConfig
+> Task :extractSrg UP-TO-DATE
+> Task :createMcpToSrg UP-TO-DATE
+
+> Task :compileJava
+Note: SpongePowered MIXIN Annotation Processor Version=0.8.5 (MixinGradle Version=0.7)
+Note: Supported obfuscation types: ObfuscationServiceMCP supports [notch] ObfuscationServiceFG3 supports [searge]
+Note: Loading searge mappings from E:\DGA2\Buildscape\build\createMcpToSrg\output.tsrg
+Note: Writing refmap to E:\DGA2\Buildscape\build\tmp\compileJava\compileJava-refmap.json
+Note: Writing refmap to E:\DGA2\Buildscape\build\tmp\compileJava\compileJava-refmap.json
+Note: Writing searge composite mappings to E:\DGA2\Buildscape\build\tmp\compileJava\compileJava-mappings.tsrg
+Note: Writing refmap to E:\DGA2\Buildscape\build\tmp\compileJava\compileJava-refmap.json
+Note: Writing refmap to E:\DGA2\Buildscape\build\tmp\compileJava\compileJava-refmap.json
+Note: Writing searge composite mappings to E:\DGA2\Buildscape\build\tmp\compileJava\compileJava-mappings.tsrg
+E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\block\BigCandleBlock.java:235: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+                ResourceLocation soundLocation = new ResourceLocation(
+                                                 ^
+E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\block\BigCandleBlock.java:352: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+                ResourceLocation soundLocation = new ResourceLocation(
+                                                 ^
+E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\config\PillarParticleConfig.java:1160: warning: [removal] ResourceLocation(String) in ResourceLocation has been deprecated and marked for removal
+                    ResourceLocation tagLocation = new ResourceLocation(tagString);
+                                                   ^
+E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\block\ModVerticalSlabs.java:67: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+                ResourceLocation verticalId = new ResourceLocation(BuildScape.MODID, newPath);
+                                              ^
+E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\BuildScape.java:3744: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+                    new net.minecraft.resources.ResourceLocation(
+                    ^
+E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\BuildScape.java:3748: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+                    new net.minecraft.resources.ResourceLocation(
+                    ^
+E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\BuildScape.java:3752: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+                    new net.minecraft.resources.ResourceLocation(
+                    ^
+E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\BuildScape.java:3756: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+                    new net.minecraft.resources.ResourceLocation(
+                    ^
+E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\BuildScape.java:3760: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+                    new net.minecraft.resources.ResourceLocation(
+                    ^
+E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\BuildScape.java:3764: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+                    new net.minecraft.resources.ResourceLocation(
+                    ^
+E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\BuildScape.java:3768: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+                    new net.minecraft.resources.ResourceLocation(
+                    ^
+E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\BuildScape.java:3772: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+                    new net.minecraft.resources.ResourceLocation(
+                    ^
+E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\BuildScape.java:3776: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+                    new net.minecraft.resources.ResourceLocation(
+                    ^
+E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\BuildScape.java:3780: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+                    new net.minecraft.resources.ResourceLocation(
+                    ^
+E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\BuildScape.java:3784: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+                    new net.minecraft.resources.ResourceLocation(
+                    ^
+E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\BuildScape.java:3788: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+                    new net.minecraft.resources.ResourceLocation(
+                    ^
+E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\BuildScape.java:3792: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+                    new net.minecraft.resources.ResourceLocation(
+                    ^
+E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\BuildScape.java:3796: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+                    new net.minecraft.resources.ResourceLocation(
+                    ^
+E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\BuildScape.java:3800: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+                    new net.minecraft.resources.ResourceLocation(
+                    ^
+E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\BuildScape.java:3804: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+                    new net.minecraft.resources.ResourceLocation(
+                    ^
+E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\BuildScape.java:3808: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+                    new net.minecraft.resources.ResourceLocation(
+                    ^
+E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\BuildScape.java:3812: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+                    new net.minecraft.resources.ResourceLocation(
+                    ^
+E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\BuildScape.java:3816: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+                    new net.minecraft.resources.ResourceLocation(
+                    ^
+E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\BuildScape.java:3820: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+                    new net.minecraft.resources.ResourceLocation(
+                    ^
+E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\BuildScape.java:3824: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+                    new net.minecraft.resources.ResourceLocation(
+                    ^
+E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\BuildScape.java:3828: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+                    new net.minecraft.resources.ResourceLocation(
+                    ^
+E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\BuildScape.java:3832: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+                    new net.minecraft.resources.ResourceLocation(
+                    ^
+E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\BuildScape.java:3836: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+                    new net.minecraft.resources.ResourceLocation(
+                    ^
+E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\BuildScape.java:3840: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+                    new net.minecraft.resources.ResourceLocation(
+                    ^
+E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\BuildScape.java:3844: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+                    new net.minecraft.resources.ResourceLocation(
+                    ^
+E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\BuildScape.java:3848: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+                    new net.minecraft.resources.ResourceLocation(
+                    ^
+E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\BuildScape.java:3852: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+                    new net.minecraft.resources.ResourceLocation(
+                    ^
+E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\BuildScape.java:3856: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+                    new net.minecraft.resources.ResourceLocation(
+                    ^
+E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\BuildScape.java:3860: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+                    new net.minecraft.resources.ResourceLocation(
+                    ^
+E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\BuildScape.java:3864: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+                    new net.minecraft.resources.ResourceLocation(
+                    ^
+E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\BuildScape.java:3868: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+                    new net.minecraft.resources.ResourceLocation(
+                    ^
+E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\BuildScape.java:3873: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+                    new net.minecraft.resources.ResourceLocation(
+                    ^
+E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\BuildScape.java:3877: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+                    new net.minecraft.resources.ResourceLocation(
+                    ^
+E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\BuildScape.java:3881: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+                    new net.minecraft.resources.ResourceLocation(
+                    ^
+E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\BuildScape.java:3885: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+                    new net.minecraft.resources.ResourceLocation(
+                    ^
+E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\BuildScape.java:3889: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+                    new net.minecraft.resources.ResourceLocation(
+                    ^
+E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\BuildScape.java:3893: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+                    new net.minecraft.resources.ResourceLocation(
+                    ^
+E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\BuildScape.java:3897: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+                    new net.minecraft.resources.ResourceLocation(
+                    ^
+E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\BuildScape.java:3901: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+                    new net.minecraft.resources.ResourceLocation(
+                    ^
+E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\client\CosmeticRenderHandler.java:372: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+            net.minecraft.resources.ResourceLocation texture = new net.minecraft.resources.ResourceLocation(
+                                                               ^
+E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\client\model\BuildersHatModel.java:19: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+            new ResourceLocation(BuildScape.MODID, "builders_hat"), "main");
+            ^
+E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\client\renderer\ColoredItemFrameRenderer.java:27: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+    private static final ResourceLocation BIRCH_PLANKS = new ResourceLocation("minecraft", "textures/block/birch_planks.png");
+                                                         ^
+E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\client\renderer\ColoredItemFrameRenderer.java:28: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+    private static final ResourceLocation DEFAULT_TEXTURE = new ResourceLocation(BuildScape.MODID, "textures/entity/white_item_frame.png");
+                                                            ^
+E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\client\renderer\ColoredItemFrameRenderer.java:41: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+        return new ResourceLocation(BuildScape.MODID, "textures/entity/" + color + "_item_frame.png");
+               ^
+E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\client\renderer\FestiveStockingBlockEntityRenderer.java:21: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+    private static final ResourceLocation STOCKING_TEXTURE = new ResourceLocation(
+                                                             ^
+E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\client\renderer\FestiveStockingBlockEntityRenderer.java:30: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+        return new ResourceLocation(
+               ^
+E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\client\renderer\FestiveStockingRenderer.java:19: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+    private static final ResourceLocation STOCKING_TEXTURE = new ResourceLocation(
+                                                             ^
+E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\client\renderer\FestiveStockingRenderer.java:28: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+        return new ResourceLocation(
+               ^
+E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\client\renderer\layer\CosmeticLayer.java:73: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+        ResourceLocation texture = new ResourceLocation(BuildScape.MODID, "textures/cosmatics/builders_hat.png");
+                                   ^
+E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\client\renderer\MangroveBoatRenderer.java:16: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+            new ResourceLocation(BuildScape.MODID, "textures/entity/boat/mangrove.png");
+            ^
+E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\client\renderer\MobStateParser.java:47: warning: [removal] ResourceLocation(String) in ResourceLocation has been deprecated and marked for removal
+                ResourceLocation statesFile = new ResourceLocation("buildscape:mob_states.txt");
+                                              ^
+E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\client\screen\widget\ExistingItemsWidget.java:92: warning: [removal] ResourceLocation(String) in ResourceLocation has been deprecated and marked for removal
+                        tagLocation = new ResourceLocation(parts[0] + ":" + parts[1]);
+                                      ^
+E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\client\screen\widget\ExistingItemsWidget.java:94: warning: [removal] ResourceLocation(String) in ResourceLocation has been deprecated and marked for removal
+                        tagLocation = new ResourceLocation("minecraft:" + tagString);
+                                      ^
+E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\client\screen\widget\ExistingItemsWidget.java:105: warning: [removal] ResourceLocation(String) in ResourceLocation has been deprecated and marked for removal
+                        itemLocation = new ResourceLocation(parts[0] + ":" + parts[1]);
+                                       ^
+E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\client\screen\widget\ExistingItemsWidget.java:107: warning: [removal] ResourceLocation(String) in ResourceLocation has been deprecated and marked for removal
+                        itemLocation = new ResourceLocation("minecraft:" + itemId);
+                                       ^
+E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\client\screen\widget\CustomScrollbarRenderer.java:17: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+    private static final ResourceLocation CUSTOM_SCROLLER_TEXTURE = new ResourceLocation("buildscape",
+                                                                    ^
+E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\client\screen\PillarIdDetailConfigTab.java:794: error: cannot find symbol
+            return new TranslatableComponent(key).withStyle(net.minecraft.network.chat.ChatFormatting.GRAY);
+                                                                                      ^
+  symbol:   class ChatFormatting
+  location: package net.minecraft.network.chat
+E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\client\screen\PillarIdDetailConfigTab.java:796: error: cannot find symbol
+            return new TranslatableComponent(key).withStyle(net.minecraft.network.chat.ChatFormatting.WHITE);
+                                                                                      ^
+  symbol:   class ChatFormatting
+  location: package net.minecraft.network.chat
+E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\client\screen\PillarIdDetailConfigTab.java:798: error: cannot find symbol
+            return new TranslatableComponent(key).withStyle(net.minecraft.network.chat.ChatFormatting.GOLD);
+                                                                                      ^
+  symbol:   class ChatFormatting
+  location: package net.minecraft.network.chat
+E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\cosmetics\CosmeticRegistry.java:130: warning: [removal] ResourceLocation(String) in ResourceLocation has been deprecated and marked for removal
+        ResourceLocation resourceLocation = new ResourceLocation(info.namespace + ":" + info.id);
+                                            ^
+E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\cosmetics\CosmeticRegistry.java:164: warning: [removal] ResourceLocation(String) in ResourceLocation has been deprecated and marked for removal
+        ResourceLocation resourceLocation = new ResourceLocation(info.namespace + ":" + info.id);
+                                            ^
+E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\client\screen\tabs\supporters\CosmeticsDisplayPanel.java:760: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+                    net.minecraft.resources.ResourceLocation tex = new net.minecraft.resources.ResourceLocation(com.kingodogo.buildscape.BuildScape.MODID, "textures/cosmatics/builders_hat.png");
+                                                                   ^
+E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\client\screen\tabs\supporters\CosmeticsDisplayPanel.java:856: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+            return new net.minecraft.resources.ResourceLocation("minecraft", path.substring(10));
+                   ^
+E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\client\screen\tabs\supporters\CosmeticsDisplayPanel.java:857: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+        return new net.minecraft.resources.ResourceLocation(com.kingodogo.buildscape.BuildScape.MODID, path);
+               ^
+E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\mixin\FenceBlockMixin.java:22: warning: [removal] ResourceLocation(String) in ResourceLocation has been deprecated and marked for removal
+            new ResourceLocation("minecraft:fences")
+            ^
+E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\mixin\IronBarsBlockMixin.java:20: warning: [removal] ResourceLocation(String) in ResourceLocation has been deprecated and marked for removal
+            new ResourceLocation("minecraft:walls")
+            ^
+E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\mixin\WallBlockMixin.java:21: warning: [removal] ResourceLocation(String) in ResourceLocation has been deprecated and marked for removal
+            new ResourceLocation("minecraft:walls")
+            ^
+E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\network\ModMessages.java:12: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+            new ResourceLocation(BuildScape.MODID, "main"),
+            ^
+E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\sound\ModSounds.java:548: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+                new SoundEvent(new ResourceLocation(BuildScape.MODID, name))
+                               ^
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+Note: Some input files use unchecked or unsafe operations.
+Note: Recompile with -Xlint:unchecked for details.
+3 errors
+71 warnings
+
+> Task :compileJava FAILED
+
+[Incubating] Problems report is available at: file:///E:/DGA2/Buildscape/build/reports/problems/problems-report.html
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':compileJava'.
+> Compilation failed; see the compiler output below.
+  Note: Recompile with -Xlint:deprecation for details.
+  E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\client\screen\PillarIdDetailConfigTab.java:794: error: cannot find symbol
+              return new TranslatableComponent(key).withStyle(net.minecraft.network.chat.ChatFormatting.GRAY);
+                                                                                        ^
+    symbol:   class ChatFormatting
+    location: package net.minecraft.network.chat
+  E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\client\screen\PillarIdDetailConfigTab.java:796: error: cannot find symbol
+              return new TranslatableComponent(key).withStyle(net.minecraft.network.chat.ChatFormatting.WHITE);
+                                                                                        ^
+    symbol:   class ChatFormatting
+    location: package net.minecraft.network.chat
+  E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\client\screen\PillarIdDetailConfigTab.java:798: error: cannot find symbol
+              return new TranslatableComponent(key).withStyle(net.minecraft.network.chat.ChatFormatting.GOLD);
+                                                                                        ^
+    symbol:   class ChatFormatting
+    location: package net.minecraft.network.chat
+  Note: Recompile with -Xlint:unchecked for details.
+  Note: Some input files use or override a deprecated API.
+  E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\block\BigCandleBlock.java:235: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+                  ResourceLocation soundLocation = new ResourceLocation(
+                                                   ^
+  E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\block\BigCandleBlock.java:352: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+                  ResourceLocation soundLocation = new ResourceLocation(
+                                                   ^
+  E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\config\PillarParticleConfig.java:1160: warning: [removal] ResourceLocation(String) in ResourceLocation has been deprecated and marked for removal
+                      ResourceLocation tagLocation = new ResourceLocation(tagString);
+                                                     ^
+  E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\block\ModVerticalSlabs.java:67: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+                  ResourceLocation verticalId = new ResourceLocation(BuildScape.MODID, newPath);
+                                                ^
+  E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\BuildScape.java:3744: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+                      new net.minecraft.resources.ResourceLocation(
+                      ^
+  E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\BuildScape.java:3748: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+                      new net.minecraft.resources.ResourceLocation(
+                      ^
+  E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\BuildScape.java:3752: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+                      new net.minecraft.resources.ResourceLocation(
+                      ^
+  E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\BuildScape.java:3756: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+                      new net.minecraft.resources.ResourceLocation(
+                      ^
+  E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\BuildScape.java:3760: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+                      new net.minecraft.resources.ResourceLocation(
+                      ^
+  E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\BuildScape.java:3764: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+                      new net.minecraft.resources.ResourceLocation(
+                      ^
+  E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\BuildScape.java:3768: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+                      new net.minecraft.resources.ResourceLocation(
+                      ^
+  E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\BuildScape.java:3772: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+                      new net.minecraft.resources.ResourceLocation(
+                      ^
+  E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\BuildScape.java:3776: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+                      new net.minecraft.resources.ResourceLocation(
+                      ^
+  E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\BuildScape.java:3780: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+                      new net.minecraft.resources.ResourceLocation(
+                      ^
+  E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\BuildScape.java:3784: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+                      new net.minecraft.resources.ResourceLocation(
+                      ^
+  E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\BuildScape.java:3788: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+                      new net.minecraft.resources.ResourceLocation(
+                      ^
+  E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\BuildScape.java:3792: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+                      new net.minecraft.resources.ResourceLocation(
+                      ^
+  E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\BuildScape.java:3796: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+                      new net.minecraft.resources.ResourceLocation(
+                      ^
+  E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\BuildScape.java:3800: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+                      new net.minecraft.resources.ResourceLocation(
+                      ^
+  E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\BuildScape.java:3804: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+                      new net.minecraft.resources.ResourceLocation(
+                      ^
+  E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\BuildScape.java:3808: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+                      new net.minecraft.resources.ResourceLocation(
+                      ^
+  E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\BuildScape.java:3812: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+                      new net.minecraft.resources.ResourceLocation(
+                      ^
+  E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\BuildScape.java:3816: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+                      new net.minecraft.resources.ResourceLocation(
+                      ^
+  E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\BuildScape.java:3820: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+                      new net.minecraft.resources.ResourceLocation(
+                      ^
+  E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\BuildScape.java:3824: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+                      new net.minecraft.resources.ResourceLocation(
+                      ^
+  E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\BuildScape.java:3828: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+                      new net.minecraft.resources.ResourceLocation(
+                      ^
+  E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\BuildScape.java:3832: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+                      new net.minecraft.resources.ResourceLocation(
+                      ^
+  E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\BuildScape.java:3836: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+                      new net.minecraft.resources.ResourceLocation(
+                      ^
+  E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\BuildScape.java:3840: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+                      new net.minecraft.resources.ResourceLocation(
+                      ^
+  E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\BuildScape.java:3844: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+                      new net.minecraft.resources.ResourceLocation(
+                      ^
+  E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\BuildScape.java:3848: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+                      new net.minecraft.resources.ResourceLocation(
+                      ^
+  E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\BuildScape.java:3852: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+                      new net.minecraft.resources.ResourceLocation(
+                      ^
+  E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\BuildScape.java:3856: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+                      new net.minecraft.resources.ResourceLocation(
+                      ^
+  E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\BuildScape.java:3860: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+                      new net.minecraft.resources.ResourceLocation(
+                      ^
+  E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\BuildScape.java:3864: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+                      new net.minecraft.resources.ResourceLocation(
+                      ^
+  E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\BuildScape.java:3868: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+                      new net.minecraft.resources.ResourceLocation(
+                      ^
+  E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\BuildScape.java:3873: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+                      new net.minecraft.resources.ResourceLocation(
+                      ^
+  E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\BuildScape.java:3877: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+                      new net.minecraft.resources.ResourceLocation(
+                      ^
+  E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\BuildScape.java:3881: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+                      new net.minecraft.resources.ResourceLocation(
+                      ^
+  E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\BuildScape.java:3885: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+                      new net.minecraft.resources.ResourceLocation(
+                      ^
+  E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\BuildScape.java:3889: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+                      new net.minecraft.resources.ResourceLocation(
+                      ^
+  E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\BuildScape.java:3893: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+                      new net.minecraft.resources.ResourceLocation(
+                      ^
+  E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\BuildScape.java:3897: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+                      new net.minecraft.resources.ResourceLocation(
+                      ^
+  E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\BuildScape.java:3901: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+                      new net.minecraft.resources.ResourceLocation(
+                      ^
+  E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\client\CosmeticRenderHandler.java:372: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+              net.minecraft.resources.ResourceLocation texture = new net.minecraft.resources.ResourceLocation(
+                                                                 ^
+  E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\client\model\BuildersHatModel.java:19: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+              new ResourceLocation(BuildScape.MODID, "builders_hat"), "main");
+              ^
+  E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\client\renderer\ColoredItemFrameRenderer.java:27: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+      private static final ResourceLocation BIRCH_PLANKS = new ResourceLocation("minecraft", "textures/block/birch_planks.png");
+                                                           ^
+  E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\client\renderer\ColoredItemFrameRenderer.java:28: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+      private static final ResourceLocation DEFAULT_TEXTURE = new ResourceLocation(BuildScape.MODID, "textures/entity/white_item_frame.png");
+                                                              ^
+  E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\client\renderer\ColoredItemFrameRenderer.java:41: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+          return new ResourceLocation(BuildScape.MODID, "textures/entity/" + color + "_item_frame.png");
+                 ^
+  E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\client\renderer\FestiveStockingBlockEntityRenderer.java:21: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+      private static final ResourceLocation STOCKING_TEXTURE = new ResourceLocation(
+                                                               ^
+  E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\client\renderer\FestiveStockingBlockEntityRenderer.java:30: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+          return new ResourceLocation(
+                 ^
+  E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\client\renderer\FestiveStockingRenderer.java:19: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+      private static final ResourceLocation STOCKING_TEXTURE = new ResourceLocation(
+                                                               ^
+  E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\client\renderer\FestiveStockingRenderer.java:28: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+          return new ResourceLocation(
+                 ^
+  E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\client\renderer\layer\CosmeticLayer.java:73: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+          ResourceLocation texture = new ResourceLocation(BuildScape.MODID, "textures/cosmatics/builders_hat.png");
+                                     ^
+  E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\client\renderer\MangroveBoatRenderer.java:16: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+              new ResourceLocation(BuildScape.MODID, "textures/entity/boat/mangrove.png");
+              ^
+  E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\client\renderer\MobStateParser.java:47: warning: [removal] ResourceLocation(String) in ResourceLocation has been deprecated and marked for removal
+                  ResourceLocation statesFile = new ResourceLocation("buildscape:mob_states.txt");
+                                                ^
+  E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\client\screen\widget\ExistingItemsWidget.java:92: warning: [removal] ResourceLocation(String) in ResourceLocation has been deprecated and marked for removal
+                          tagLocation = new ResourceLocation(parts[0] + ":" + parts[1]);
+                                        ^
+  E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\client\screen\widget\ExistingItemsWidget.java:94: warning: [removal] ResourceLocation(String) in ResourceLocation has been deprecated and marked for removal
+                          tagLocation = new ResourceLocation("minecraft:" + tagString);
+                                        ^
+  E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\client\screen\widget\ExistingItemsWidget.java:105: warning: [removal] ResourceLocation(String) in ResourceLocation has been deprecated and marked for removal
+                          itemLocation = new ResourceLocation(parts[0] + ":" + parts[1]);
+                                         ^
+  E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\client\screen\widget\ExistingItemsWidget.java:107: warning: [removal] ResourceLocation(String) in ResourceLocation has been deprecated and marked for removal
+                          itemLocation = new ResourceLocation("minecraft:" + itemId);
+                                         ^
+  E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\client\screen\widget\CustomScrollbarRenderer.java:17: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+      private static final ResourceLocation CUSTOM_SCROLLER_TEXTURE = new ResourceLocation("buildscape",
+                                                                      ^
+  E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\cosmetics\CosmeticRegistry.java:130: warning: [removal] ResourceLocation(String) in ResourceLocation has been deprecated and marked for removal
+          ResourceLocation resourceLocation = new ResourceLocation(info.namespace + ":" + info.id);
+                                              ^
+  E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\cosmetics\CosmeticRegistry.java:164: warning: [removal] ResourceLocation(String) in ResourceLocation has been deprecated and marked for removal
+          ResourceLocation resourceLocation = new ResourceLocation(info.namespace + ":" + info.id);
+                                              ^
+  E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\client\screen\tabs\supporters\CosmeticsDisplayPanel.java:760: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+                      net.minecraft.resources.ResourceLocation tex = new net.minecraft.resources.ResourceLocation(com.kingodogo.buildscape.BuildScape.MODID, "textures/cosmatics/builders_hat.png");
+                                                                     ^
+  E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\client\screen\tabs\supporters\CosmeticsDisplayPanel.java:856: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+              return new net.minecraft.resources.ResourceLocation("minecraft", path.substring(10));
+                     ^
+  E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\client\screen\tabs\supporters\CosmeticsDisplayPanel.java:857: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+          return new net.minecraft.resources.ResourceLocation(com.kingodogo.buildscape.BuildScape.MODID, path);
+                 ^
+  E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\mixin\FenceBlockMixin.java:22: warning: [removal] ResourceLocation(String) in ResourceLocation has been deprecated and marked for removal
+              new ResourceLocation("minecraft:fences")
+              ^
+  E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\mixin\IronBarsBlockMixin.java:20: warning: [removal] ResourceLocation(String) in ResourceLocation has been deprecated and marked for removal
+              new ResourceLocation("minecraft:walls")
+              ^
+  E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\mixin\WallBlockMixin.java:21: warning: [removal] ResourceLocation(String) in ResourceLocation has been deprecated and marked for removal
+              new ResourceLocation("minecraft:walls")
+              ^
+  E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\network\ModMessages.java:12: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+              new ResourceLocation(BuildScape.MODID, "main"),
+              ^
+  E:\DGA2\Buildscape\src\main\java\com\kingodogo\buildscape\sound\ModSounds.java:548: warning: [removal] ResourceLocation(String,String) in ResourceLocation has been deprecated and marked for removal
+                  new SoundEvent(new ResourceLocation(BuildScape.MODID, name))
+                                 ^
+  Note: SpongePowered MIXIN Annotation Processor Version=0.8.5 (MixinGradle Version=0.7)
+  Note: Supported obfuscation types: ObfuscationServiceMCP supports [notch] ObfuscationServiceFG3 supports [searge]
+  Note: Loading searge mappings from E:\DGA2\Buildscape\build\createMcpToSrg\output.tsrg
+  Note: Writing refmap to E:\DGA2\Buildscape\build\tmp\compileJava\compileJava-refmap.json
+  Note: Writing searge composite mappings to E:\DGA2\Buildscape\build\tmp\compileJava\compileJava-mappings.tsrg
+  Note: Some input files use unchecked or unsafe operations.
+  3 errors
+  71 warnings
+
+* Try:
+> Check your code and dependencies to fix the compilation error(s)
+> Run with --scan to get full insights.
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.14/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD FAILED in 17s
+4 actionable tasks: 2 executed, 2 up-to-date

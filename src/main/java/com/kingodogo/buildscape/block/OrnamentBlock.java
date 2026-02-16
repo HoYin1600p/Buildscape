@@ -264,7 +264,7 @@ public class OrnamentBlock
 
         if (!canSurvive(state, level, pos)) {
             if (level instanceof net.minecraft.server.level.ServerLevel) {
-                ((net.minecraft.server.level.ServerLevel) level).scheduleTick(
+                level.scheduleTick(
                         pos,
                         this,
                         1
@@ -342,6 +342,44 @@ public class OrnamentBlock
             CollisionContext context
     ) {
         return getShape(state, level, pos, context);
+    }
+
+    @Override
+    public int getLightBlock(
+            BlockState state,
+            BlockGetter level,
+            BlockPos pos
+    ) {
+        if (
+                state.getBlock() ==
+                        com.kingodogo.buildscape.block.ModBlocks.TINTED_GLASS_ORNAMENT.get()
+        ) {
+            return 15;
+        }
+        return super.getLightBlock(state, level, pos);
+    }
+
+    @Override
+    public float[] getBeaconColorMultiplier(
+            BlockState state,
+            LevelReader level,
+            BlockPos pos,
+            BlockPos beaconPos
+    ) {
+        if (
+                state.getBlock() ==
+                        com.kingodogo.buildscape.block.ModBlocks.TINTED_GLASS_ORNAMENT.get()
+        ) {
+            return null; // Tinted glass blocks the beam via opacity (getLightBlock)
+        }
+
+        // For other ornaments, use their map color to tint the beacon beam
+        int color = state.getMapColor(level, pos).col;
+        return new float[]{
+                ((color >> 16) & 0xFF) / 255.0f,
+                ((color >> 8) & 0xFF) / 255.0f,
+                (color & 0xFF) / 255.0f
+        };
     }
 
     @Override

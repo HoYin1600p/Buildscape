@@ -1,0 +1,30 @@
+{
+  "replace": false,
+  "values": [
+    "buildscape:vertical_ashpen_black_slab",
+    "buildscape:vertical_mangrove_slab",
+    "buildscape:vertical_spruce_slab",
+    "buildscape:vertical_ashpen_pink_slab",
+    "buildscape:vertical_ashpen_purple_slab",
+    "buildscape:vertical_ashpen_lime_slab",
+    "buildscape:vertical_ashpen_yellow_slab",
+    "buildscape:vertical_ashpen_magenta_slab",
+    "buildscape:vertical_ashpen_orange_slab",
+    "buildscape:vertical_dark_oak_slab",
+    "buildscape:vertical_birch_slab",
+    "buildscape:vertical_ashpen_white_slab",
+    "buildscape:vertical_ashpen_red_slab",
+    "buildscape:vertical_ashpen_light_gray_slab",
+    "buildscape:vertical_ashpen_blue_slab",
+    "buildscape:vertical_ashpen_light_blue_slab",
+    "buildscape:vertical_bamboo_block_slab",
+    "buildscape:vertical_jungle_slab",
+    "buildscape:vertical_ashpen_cyan_slab",
+    "buildscape:vertical_oak_slab",
+    "buildscape:vertical_acacia_slab",
+    "buildscape:vertical_ashpen_green_slab",
+    "buildscape:vertical_ashpen_brown_slab",
+    "buildscape:vertical_stripped_bamboo_block_slab",
+    "buildscape:vertical_ashpen_gray_slab"
+  ]
+}

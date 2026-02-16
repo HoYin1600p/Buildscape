@@ -75,20 +75,27 @@ public class SortToggleButton extends AbstractWidget {
         int centerX = x + width / 2;
         int centerY = y + (height - 8) / 2; // Center text vertically (font height 8)
 
-        String label = "";
-        switch (sortType) {
-            case INVENTORY:
-                label = "I";
-                break; // I for Inventory
-            case ALL_ITEMS:
-                label = "A";
-                break; // A for All
-            case MOD_ONLY:
-                label = "M";
-                break; // M for Mod
+        if (sortType == SortType.INVENTORY) {
+            // Render Chest Icon
+            net.minecraft.world.item.ItemStack stack = new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.CHEST);
+            // Item is 16x16. CenterY is calculated for text (height 8).
+            // Button Center Y = y + height/2.
+            // Item Y = Button Center Y - 8.
+            // Text CenterY = y + (height - 8) / 2 = Button Center Y - 4.
+            // So Item Y = Text CenterY - 4.
+            mc.getItemRenderer().renderGuiItem(stack, centerX - 8, centerY - 4);
+        } else {
+            String label = "";
+            switch (sortType) {
+                case ALL_ITEMS:
+                    label = "A";
+                    break; // A for All
+                case MOD_ONLY:
+                    label = "M";
+                    break; // M for Mod
+            }
+            drawCenteredString(poseStack, mc.font, label, centerX, centerY, textColor);
         }
-
-        drawCenteredString(poseStack, mc.font, label, centerX, centerY, textColor);
 
         // Optional: Add glow or underline if selected?
         // kept simple as requested "modern panel like"

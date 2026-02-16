@@ -11,12 +11,9 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.Mob;
-import net.minecraft.world.item.AxeItem;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.SpawnEggItem;
-import net.minecraft.world.item.SwordItem;
 import net.minecraft.world.level.Level;
 
 import java.util.Map;
@@ -122,6 +119,13 @@ public class PillarBlockEntityRenderer
             if (!isSpawnEgg) {
                 // Items always rotate
                 rotationSpeed = 90.0f; // degrees per second
+            } else {
+                // Mobs only rotate if they have the "spin" state in their name/metadata
+                EntityType<?> entityType = ((SpawnEggItem) displayedItem.getItem()).getType(null);
+                MobState mobState = MobStateParser.parseStates(displayedItem, entityType);
+                if (mobState.spin) {
+                    rotationSpeed = 22.5f; // Significant slow down (4x slower than items)
+                }
             }
             // Mobs don't use this rotation speed - they are handled by MobPillarRenderer
 
@@ -175,10 +179,8 @@ public class PillarBlockEntityRenderer
             boolean isArmor = displayedItem.getItem() instanceof net.minecraft.world.item.ArmorItem;
             boolean isElytra = displayedItem.getItem() instanceof net.minecraft.world.item.ElytraItem;
             boolean isArmorStand = displayedItem.getItem() instanceof net.minecraft.world.item.ArmorStandItem;
-            EquipmentSlot gearSlot = Mob.getEquipmentSlotForItem(displayedItem);
-            boolean isEquipable = gearSlot.getType() == EquipmentSlot.Type.ARMOR;
 
-            if (!isSpawnEgg && (isArmor || isElytra || isArmorStand || isEquipable) && !renderAsItem) {
+            if (!isSpawnEgg && (isArmor || isElytra || isArmorStand) && !renderAsItem) {
                 ArmorPillarRenderer.renderArmor(
                         displayedItem,
                         pos,
@@ -249,8 +251,13 @@ public class PillarBlockEntityRenderer
                     float scale = 0.8f;
                     double standardLength = 0.85;
 
-                    boolean isSword = displayedItem.getItem() instanceof SwordItem;
-                    boolean isAxe = displayedItem.getItem() instanceof AxeItem;
+                    net.minecraft.world.item.Item item = displayedItem.getItem();
+                    boolean isSword = item instanceof net.minecraft.world.item.SwordItem ||
+                            item instanceof net.minecraft.world.item.TridentItem ||
+                            item instanceof net.minecraft.world.item.ShovelItem;
+                    boolean isAxe = item instanceof net.minecraft.world.item.AxeItem ||
+                            item instanceof net.minecraft.world.item.PickaxeItem ||
+                            item instanceof net.minecraft.world.item.HoeItem;
 
                     if (isSword) {
                         // Base position for standard sword
@@ -555,14 +562,30 @@ public class PillarBlockEntityRenderer
             trimmedName = net.minecraft.ChatFormatting.stripFormatting(trimmedName);
 
             if (trimmedName != null && !trimmedName.isEmpty()) {
-                // Use ROOT locale for consistent case conversion across all system languages
-                return trimmedName.toLowerCase(java.util.Locale.ROOT).contains("fixed");
+                if (trimmedName.toLowerCase(java.util.Locale.ROOT).contains("fixed")) {
+                    net.minecraft.world.item.Item item = stack.getItem();
+                    // Renaming 'Fixed' only affects weapons/tools: Sword, Trident, Axe, Pickaxe, Shovel, Hoe
+                    return item instanceof net.minecraft.world.item.SwordItem ||
+                            item instanceof net.minecraft.world.item.TridentItem ||
+                            item instanceof net.minecraft.world.item.AxeItem ||
+                            item instanceof net.minecraft.world.item.PickaxeItem ||
+                            item instanceof net.minecraft.world.item.ShovelItem ||
+                            item instanceof net.minecraft.world.item.HoeItem;
+                }
             }
         } catch (Exception e) {
             String trimmedName = nameJson.trim();
             trimmedName = net.minecraft.ChatFormatting.stripFormatting(trimmedName);
             if (trimmedName != null && !trimmedName.isEmpty()) {
-                return trimmedName.toLowerCase(java.util.Locale.ROOT).contains("fixed");
+                if (trimmedName.toLowerCase(java.util.Locale.ROOT).contains("fixed")) {
+                    net.minecraft.world.item.Item item = stack.getItem();
+                    return item instanceof net.minecraft.world.item.SwordItem ||
+                            item instanceof net.minecraft.world.item.TridentItem ||
+                            item instanceof net.minecraft.world.item.AxeItem ||
+                            item instanceof net.minecraft.world.item.PickaxeItem ||
+                            item instanceof net.minecraft.world.item.ShovelItem ||
+                            item instanceof net.minecraft.world.item.HoeItem;
+                }
             }
         }
 

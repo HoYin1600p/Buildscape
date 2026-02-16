@@ -617,8 +617,8 @@ public class PillarItemsConfigTab extends AbstractConfigTab {
         // Position tags buttons after tags search box
         // Use consistent Right-Anchored positioning logic
         if (tagsInventoryButton != null && tagsAllButton != null && tagsModOnlyButton != null) {
-            int tagsButtonSize = BuildScapeConfigScreen.scaleSize(20);
-            int tagsButtonSpacing = BuildScapeConfigScreen.scaleSize(5);
+            int tagsButtonSize = 20; // Fixed size to match available items buttons
+            int tagsButtonSpacing = BuildScapeConfigScreen.scaleSize(5); 
             int totalTagsButtonsWidth = (tagsButtonSize * 3) + (tagsButtonSpacing * 2);
             int tagsRightGap = (int) (screenWidth * 0.005);
 
@@ -633,14 +633,17 @@ public class PillarItemsConfigTab extends AbstractConfigTab {
             tagsInventoryButton.x = tagsButtonsStartX;
             tagsInventoryButton.y = buttonY;
             tagsInventoryButton.setWidth(tagsButtonSize);
+            tagsInventoryButton.setHeight(tagsButtonSize);
 
             tagsAllButton.x = tagsButtonsStartX + tagsButtonSize + tagsButtonSpacing;
             tagsAllButton.y = buttonY;
             tagsAllButton.setWidth(tagsButtonSize);
+            tagsAllButton.setHeight(tagsButtonSize);
 
             tagsModOnlyButton.x = tagsButtonsStartX + (tagsButtonSize + tagsButtonSpacing) * 2;
             tagsModOnlyButton.y = buttonY;
             tagsModOnlyButton.setWidth(tagsButtonSize);
+            tagsModOnlyButton.setHeight(tagsButtonSize);
 
             // Adjust search box width to end before buttons
             if (tagsSearchBox != null) {

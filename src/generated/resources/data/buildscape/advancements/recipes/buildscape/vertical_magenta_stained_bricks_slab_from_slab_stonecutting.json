@@ -1,0 +1,34 @@
+{
+  "parent": "minecraft:recipes/root",
+  "rewards": {
+    "recipes": [
+      "buildscape:vertical_magenta_stained_bricks_slab_from_slab_stonecutting"
+    ]
+  },
+  "criteria": {
+    "has_magenta_stained_bricks_slab": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "buildscape:magenta_stained_bricks_slab"
+            ]
+          }
+        ]
+      }
+    },
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipe": "buildscape:vertical_magenta_stained_bricks_slab_from_slab_stonecutting"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "has_magenta_stained_bricks_slab",
+      "has_the_recipe"
+    ]
+  ]
+}

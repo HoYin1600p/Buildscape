@@ -53,14 +53,14 @@ public abstract class LeavesBlockMixin extends Block implements SimpleWaterlogge
     private void buildscape$scheduleFluidTick(BlockState state, Direction direction, BlockState neighborState,
                                               LevelAccessor level, BlockPos pos, BlockPos neighborPos,
                                               CallbackInfoReturnable<BlockState> cir) {
-        if (state.getValue(BlockStateProperties.WATERLOGGED)) {
+        if (state.hasProperty(BlockStateProperties.WATERLOGGED) && state.getValue(BlockStateProperties.WATERLOGGED)) {
             level.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
         }
     }
 
     @Override
     public FluidState getFluidState(BlockState state) {
-        return state.getValue(BlockStateProperties.WATERLOGGED)
+        return state.hasProperty(BlockStateProperties.WATERLOGGED) && state.getValue(BlockStateProperties.WATERLOGGED)
                 ? Fluids.WATER.getSource(false)
                 : super.getFluidState(state);
     }
@@ -93,4 +93,3 @@ public abstract class LeavesBlockMixin extends Block implements SimpleWaterlogge
         }
     }
 }
-

@@ -8,7 +8,20 @@ public class ScaledTextButton extends Button {
     public ScaledTextButton(int x, int y, int width, int height, Component message, OnPress onPress) {
         super(x, y, width, height, message, onPress);
     }
-    
+
+    private int customNormalTextColor = 0;
+    private int customHoveredTextColor = 0;
+    private float customTextScale = 0.0f;
+
+    public void setCustomTextColors(int normalColor, int hoveredColor) {
+        this.customNormalTextColor = normalColor;
+        this.customHoveredTextColor = hoveredColor;
+    }
+
+    public void setTextScale(float scale) {
+        this.customTextScale = scale;
+    }
+
     @Override
     public void renderButton(com.mojang.blaze3d.vertex.PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
         net.minecraft.client.Minecraft mc = net.minecraft.client.Minecraft.getInstance();
@@ -31,47 +44,62 @@ public class ScaledTextButton extends Button {
             baseTextScale = 0.85f;
         }
 
-        String buttonText = getMessage().getString();
-        int textColor = hovered ? 0xFFFFFF : 0xCCCCCC;
+        if (customTextScale > 0) {
+            baseTextScale = customTextScale;
+        }
+
+        Component message = getMessage();
+        String rawText = message.getString();
+
+        int overrideTextColor = 0;
+        if (hovered) {
+            overrideTextColor = customHoveredTextColor;
+        } else {
+            overrideTextColor = customNormalTextColor;
+        }
 
         int borderPadding = com.kingodogo.buildscape.client.screen.BuildScapeConfigScreen.scaleSize(6);
         int availableWidth = width - borderPadding * 2;
 
         float finalScale = baseTextScale;
-        int textWidth = mc.font.width(buttonText);
+        int textWidth = mc.font.width(message); // Measure component width
 
-        // Use fixed scale, no dynamic shrinking
-        // Handle specific truncation for Ko-fi/Edit GUI if text doesn't fit
-        String displayText = buttonText;
-        if (textWidth * finalScale > availableWidth) {
-            if (buttonText.toLowerCase().contains("ko-fi")) {
-                displayText = "Ko-fi";
-                // If "Ko-fi" still doesn't fit, it will fall through to truncation
-                if (mc.font.width(displayText) * finalScale > availableWidth) {
-                    int maxCharsWidth = (int) (availableWidth / finalScale) - mc.font.width("...");
-                    if (maxCharsWidth > 0) displayText = mc.font.plainSubstrByWidth(displayText, maxCharsWidth) + "...";
-                }
-            } else if (buttonText.contains("Edit GUI")) {
-                displayText = "Edit GUI";
-                if (mc.font.width(displayText) * finalScale > availableWidth) {
-                    int maxCharsWidth = (int) (availableWidth / finalScale) - mc.font.width("...");
-                    if (maxCharsWidth > 0) displayText = mc.font.plainSubstrByWidth(displayText, maxCharsWidth) + "...";
-                }
-            } else {
-                int maxCharsWidth = (int) (availableWidth / finalScale) - mc.font.width("...");
-                if (maxCharsWidth > 0) {
-                    displayText = mc.font.plainSubstrByWidth(buttonText, maxCharsWidth) + "...";
-                }
-            }
-        }
+        // Truncation check
+        boolean useRaw = textWidth * finalScale > availableWidth;
 
         poseStack.pushPose();
         float scaledHeight = 8 * finalScale;
-        // Shift left by borderPadding and vertically center
-        poseStack.translate(this.x + borderPadding, this.y + (this.height - scaledHeight) / 2.0, 0);
+
+        float centeredY = this.y + (this.height - scaledHeight) / 2.0f;
+        float centeredX = this.x + (this.width - (textWidth * finalScale)) / 2.0f;
+
+        poseStack.translate(centeredX, centeredY, 0);
         poseStack.scale(finalScale, finalScale, 1.0f);
 
-        mc.font.drawShadow(poseStack, displayText, 0, 0, textColor);
+        if (useRaw || overrideTextColor != 0) {
+            String textToRender = rawText;
+            if (useRaw) {
+                // Measure and truncate
+                int maxCharsWidth = (int) (availableWidth / finalScale) - mc.font.width("...");
+                if (maxCharsWidth > 0) textToRender = mc.font.plainSubstrByWidth(textToRender, maxCharsWidth) + "...";
+
+                // Re-calculate X for centering based on truncated text
+                int newWidth = mc.font.width(textToRender);
+                float newCenteredX = this.x + (this.width - (newWidth * finalScale)) / 2.0f;
+
+                // Reset pose stack translation to use new centered X
+                poseStack.popPose();
+                poseStack.pushPose();
+                poseStack.translate(newCenteredX, centeredY, 0);
+                poseStack.scale(finalScale, finalScale, 1.0f);
+            }
+            int color = (overrideTextColor != 0) ? overrideTextColor : (hovered ? 0xFFFFFF : 0xCCCCCC);
+            mc.font.drawShadow(poseStack, textToRender, 0, 0, color);
+        } else {
+            // Render rich text component
+            mc.font.drawShadow(poseStack, message, 0, 0, 0xFFFFFF); // Base white so colors pop
+        }
+        
         poseStack.popPose();
     }
 }

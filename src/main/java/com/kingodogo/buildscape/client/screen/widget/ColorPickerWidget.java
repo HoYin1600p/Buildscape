@@ -1,14 +1,13 @@
 package com.kingodogo.buildscape.client.screen.widget;
 
-import java.util.function.Consumer;
-
 import com.mojang.blaze3d.vertex.PoseStack;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.TextComponent;
+
+import java.util.function.Consumer;
 
 public class ColorPickerWidget extends AbstractWidget {
     private static final int GRADIENT_SIZE = 80;
@@ -188,6 +187,10 @@ public class ColorPickerWidget extends AbstractWidget {
 
     public float getCurrentScale() {
         return currentScale;
+    }
+
+    public boolean isDragging() {
+        return draggingHue || draggingGradient || draggingR || draggingG || draggingB || draggingH || draggingS || draggingBrightness;
     }
 
     private void updateRgbFromColor() {

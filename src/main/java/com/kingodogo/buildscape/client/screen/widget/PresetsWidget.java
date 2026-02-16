@@ -1,14 +1,15 @@
 package com.kingodogo.buildscape.client.screen.widget;
 
-import com.kingodogo.buildscape.config.PresetsConfig;
 import com.kingodogo.buildscape.config.PillarParticleConfig;
+import com.kingodogo.buildscape.config.PresetsConfig;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.TranslatableComponent;
-import com.mojang.blaze3d.vertex.PoseStack;
+
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -29,6 +30,8 @@ public class PresetsWidget extends AbstractWidget {
     private int scrollOffset = 0;
     private final CustomScrollbarRenderer scrollbarRenderer = new CustomScrollbarRenderer();
 
+    private String appliedPresetKey = null;
+
     public PresetsWidget(int x, int y, int width, int height, Consumer<String> onPresetApplied) {
         super(x, y, width, height, net.minecraft.network.chat.TextComponent.EMPTY);
         this.onPresetApplied = onPresetApplied;
@@ -42,6 +45,13 @@ public class PresetsWidget extends AbstractWidget {
             } else {
                 selectedPresetKey = "default";
             }
+        }
+
+        // Initialize applied preset key
+        this.appliedPresetKey = config.getLastAppliedPreset();
+        if (config.hasUnnamedPreset()) {
+            // If unamed preset exists, it might be the applied one if user just edited properties
+            // But strictly speaking, applied key is what was last applied.
         }
 
         int scaledSpacing = com.kingodogo.buildscape.client.screen.BuildScapeConfigScreen.scaleSize(10);
@@ -75,29 +85,37 @@ public class PresetsWidget extends AbstractWidget {
             nameEditBox.setEditable(false);
         }
 
-        createButton = new Button(
+        com.kingodogo.buildscape.client.screen.widget.ScaledTextButton createBtn = new com.kingodogo.buildscape.client.screen.widget.ScaledTextButton(
                 x + scaledSpacing, buttonY,
                 buttonWidth, scaledButtonHeight,
                 new TranslatableComponent("buildscape.config.preset.create"),
                 (btn) -> createNewPreset());
+        createBtn.setCustomTextColors(0x00FF00, 0x55FF55);
+        createButton = createBtn;
 
-        saveButton = new Button(
+        com.kingodogo.buildscape.client.screen.widget.ScaledTextButton saveBtn = new com.kingodogo.buildscape.client.screen.widget.ScaledTextButton(
                 x + scaledSpacing * 2 + buttonWidth, buttonY,
                 buttonWidth, scaledButtonHeight,
                 new TranslatableComponent("buildscape.config.preset.save"),
                 (btn) -> saveCurrentPreset());
+        saveBtn.setCustomTextColors(0x00FFFF, 0x55FFFF);
+        saveButton = saveBtn;
 
-        deleteButton = new Button(
+        com.kingodogo.buildscape.client.screen.widget.ScaledTextButton deleteBtn = new com.kingodogo.buildscape.client.screen.widget.ScaledTextButton(
                 x + scaledSpacing * 3 + buttonWidth * 2, buttonY,
                 buttonWidth, scaledButtonHeight,
                 new TranslatableComponent("buildscape.config.preset.delete"),
                 (btn) -> deleteSelectedPreset());
+        deleteBtn.setCustomTextColors(0xFF0000, 0xFF5555);
+        deleteButton = deleteBtn;
 
-        applyButton = new Button(
+        com.kingodogo.buildscape.client.screen.widget.ScaledTextButton applyBtn = new com.kingodogo.buildscape.client.screen.widget.ScaledTextButton(
                 x + scaledSpacing * 4 + buttonWidth * 3, buttonY,
                 buttonWidth, scaledButtonHeight,
                 new TranslatableComponent("buildscape.config.preset.apply"),
                 (btn) -> applySelectedPreset());
+        applyBtn.setCustomTextColors(0xFFAA00, 0xFFFF55);
+        applyButton = applyBtn;
     }
 
     private void loadPresets() {
@@ -124,6 +142,9 @@ public class PresetsWidget extends AbstractWidget {
         if (onPresetApplied != null) {
             onPresetApplied.accept("_unnamed");
         }
+        // Applying explicitly sets applied key? Or assume create implies user is working on it.
+        // Usually creating clears items so effectively we applied empty.
+        appliedPresetKey = "_unnamed"; 
     }
 
     private void saveCurrentPreset() {
@@ -153,6 +174,11 @@ public class PresetsWidget extends AbstractWidget {
 
         if (config.savePreset(key, name, itemConfig.items)) {
             selectedPresetKey = key;
+            // If we saved the unnamed preset (which was applied), update applied key to new key
+            if ("_unnamed".equals(appliedPresetKey)) {
+                appliedPresetKey = key;
+            }
+            
             config.clearUnnamedPreset();
             loadPresets();
             nameEditBox.setValue(name);
@@ -165,6 +191,10 @@ public class PresetsWidget extends AbstractWidget {
                 && !selectedPresetKey.equals("_unnamed")) {
             PresetsConfig config = PresetsConfig.get();
             if (config.deletePreset(selectedPresetKey)) {
+                if (selectedPresetKey.equals(appliedPresetKey)) {
+                    appliedPresetKey = "default"; // Fallback
+                    // Or keep null? Default is safer.
+                }
                 selectedPresetKey = "default";
                 PresetsConfig.Preset defaultPreset = config.getPreset("default");
                 if (defaultPreset != null) {
@@ -182,6 +212,8 @@ public class PresetsWidget extends AbstractWidget {
         if (selectedPresetKey != null) {
             PresetsConfig config = PresetsConfig.get();
             config.applyPreset(selectedPresetKey);
+            appliedPresetKey = selectedPresetKey;
+            
             if (onPresetApplied != null) {
                 onPresetApplied.accept(selectedPresetKey);
             }
@@ -201,6 +233,11 @@ public class PresetsWidget extends AbstractWidget {
         nameEditBox.setEditable(key == null || !key.equals("default"));
     }
 
+    // Allow external update of applied key ensuring sync
+    public void setAppliedPreset(String key) {
+        this.appliedPresetKey = key;
+    }
+
     public String getSelectedPresetKey() {
         return selectedPresetKey;
     }
@@ -211,39 +248,62 @@ public class PresetsWidget extends AbstractWidget {
 
     public void updateChildPositions() {
         int scaledSpacing = com.kingodogo.buildscape.client.screen.BuildScapeConfigScreen.scaleSize(10);
-        int buttonY = y + height - com.kingodogo.buildscape.client.screen.BuildScapeConfigScreen.scaleSize(40);
         int scaledButtonHeight = 20; // Fixed 20px for vanilla button assets
+
+        // Calculate button width to fit 4 buttons with spacing
+        // But maybe we want them centered with a fixed width?
+        // Existing logic: int buttonWidth = (width - scaledSpacing * 5) / 4;
+        // Let's keep the width calculation but center the whole group if needed, 
+        // or just ensure they fill the space nicely. The previous logic filled the width.
+        // If the user wants them centered, maybe they mean the text inside? 
+        // "inside there respecitive boxes" -> sounds like text inside button.
+        // "centre algin the other buttons as well like create save and such" -> sounds like buttons themselves.
+        // The screenshot shows "Create Save Delete Apply" left aligned?
+        // No, the screenshot shows them spread out.
+        // Wait, current logic: `x + scaledSpacing`, `x + scaledSpacing * 2 + buttonWidth`...
+        // This spreads them out.
+        // Let's ensuring the *vertical* alignment is centered in the bottom area.
+
+        int bottomAreaHeight = com.kingodogo.buildscape.client.screen.BuildScapeConfigScreen.scaleSize(40);
+        int bottomAreaY = y + height - bottomAreaHeight;
+        // Center buttons vertically in the bottom area
+        int buttonY = bottomAreaY + (bottomAreaHeight - scaledButtonHeight) / 2;
+
+        // Horizontal centering of the group:
         int buttonWidth = (width - scaledSpacing * 5) / 4;
+        // Calculate total width of the group
+        int totalGroupWidth = (buttonWidth * 4) + (scaledSpacing * 3);
+        int startX = x + (width - totalGroupWidth) / 2;
 
         if (nameEditBox != null) {
             int editBoxHeight = com.kingodogo.buildscape.client.screen.BuildScapeConfigScreen.getScaledEditBoxHeight();
-            int editBoxY = buttonY - editBoxHeight - 2;
+            int editBoxY = buttonY - editBoxHeight - 5; // moved up a bit more
             int editBoxWidth = width - com.kingodogo.buildscape.client.screen.BuildScapeConfigScreen.scaleSize(10);
-            nameEditBox.x = x + com.kingodogo.buildscape.client.screen.BuildScapeConfigScreen.scaleSize(5);
+            nameEditBox.x = x + (width - editBoxWidth) / 2; // Center edit box too
             nameEditBox.y = editBoxY;
             nameEditBox.setWidth(editBoxWidth);
         }
 
         if (createButton != null) {
-            createButton.x = x + scaledSpacing;
+            createButton.x = startX;
             createButton.y = buttonY;
             createButton.setWidth(buttonWidth);
         }
 
         if (saveButton != null) {
-            saveButton.x = x + scaledSpacing * 2 + buttonWidth;
+            saveButton.x = startX + buttonWidth + scaledSpacing;
             saveButton.y = buttonY;
             saveButton.setWidth(buttonWidth);
         }
 
         if (deleteButton != null) {
-            deleteButton.x = x + scaledSpacing * 3 + buttonWidth * 2;
+            deleteButton.x = startX + (buttonWidth + scaledSpacing) * 2;
             deleteButton.y = buttonY;
             deleteButton.setWidth(buttonWidth);
         }
 
         if (applyButton != null) {
-            applyButton.x = x + scaledSpacing * 4 + buttonWidth * 3;
+            applyButton.x = startX + (buttonWidth + scaledSpacing) * 3;
             applyButton.y = buttonY;
             applyButton.setWidth(buttonWidth);
         }
@@ -285,6 +345,7 @@ public class PresetsWidget extends AbstractWidget {
             PresetsConfig.Preset preset = presets.get(index);
             String presetKey = presetKeys.get(index);
             boolean isSelected = presetKey.equals(selectedPresetKey);
+            boolean isApplied = presetKey.equals(appliedPresetKey);
 
             int buttonY = presetY + i * (PRESET_BUTTON_HEIGHT + PRESET_BUTTON_SPACING);
 
@@ -315,11 +376,23 @@ public class PresetsWidget extends AbstractWidget {
                 displayName = truncated + "...";
             }
 
+            // Text Color Logic:
+            // Selected -> Light Red (0xFFFF5555)
+            // Applied (and not selected) -> Green (0xFF55FF55)
+            // Else -> White (0xFFFFFF)
+
+            int textColor = 0xFFFFFF;
+            if (isSelected) {
+                textColor = 0xFFFF5555; // Light Red
+            } else if (isApplied) {
+                textColor = 0xFF55FF55; // Light Green
+            }
+
             Minecraft.getInstance().font.draw(
                     poseStack,
                     displayName,
                     x + 10, buttonY + 6,
-                    0xFFFFFF);
+                    textColor);
         }
 
         if (presets.size() > maxVisiblePresets) {

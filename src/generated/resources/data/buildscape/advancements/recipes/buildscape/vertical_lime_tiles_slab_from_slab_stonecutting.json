@@ -1,0 +1,34 @@
+{
+  "parent": "minecraft:recipes/root",
+  "rewards": {
+    "recipes": [
+      "buildscape:vertical_lime_tiles_slab_from_slab_stonecutting"
+    ]
+  },
+  "criteria": {
+    "has_lime_tiles_slab": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "buildscape:lime_tiles_slab"
+            ]
+          }
+        ]
+      }
+    },
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipe": "buildscape:vertical_lime_tiles_slab_from_slab_stonecutting"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "has_lime_tiles_slab",
+      "has_the_recipe"
+    ]
+  ]
+}

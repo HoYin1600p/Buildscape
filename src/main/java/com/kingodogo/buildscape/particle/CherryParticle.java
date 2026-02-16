@@ -1,11 +1,7 @@
 package com.kingodogo.buildscape.particle;
 
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.particle.Particle;
-import net.minecraft.client.particle.ParticleProvider;
-import net.minecraft.client.particle.ParticleRenderType;
-import net.minecraft.client.particle.SpriteSet;
-import net.minecraft.client.particle.TextureSheetParticle;
+import net.minecraft.client.particle.*;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -36,7 +32,7 @@ public class CherryParticle extends TextureSheetParticle {
         this.lifetime = 60 + level.random.nextInt(40);
         this.gravity = 0.05F;
         this.hasPhysics = true;
-        this.quadSize = 0.2F + level.random.nextFloat() * 0.1F;
+        this.quadSize = 0.12F + level.random.nextFloat() * 0.05F;
         
         this.xd = xSpeed;
         this.yd = ySpeed;

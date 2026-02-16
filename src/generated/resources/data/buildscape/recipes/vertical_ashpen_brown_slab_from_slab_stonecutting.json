@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "buildscape:ashpen_brown_slab"
+  },
+  "result": "buildscape:vertical_ashpen_brown_slab",
+  "count": 1
+}

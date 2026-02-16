@@ -1,6 +1,7 @@
 package com.kingodogo.buildscape.world;
 
 import net.minecraft.world.level.GameRules;
+import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
 
 import java.lang.reflect.Method;
 
@@ -9,9 +10,8 @@ public class ModGameRules {
 
     public static void register() {
         try {
-            // Access the private create method using reflection
-            Method createMethod = GameRules.BooleanValue.class.getDeclaredMethod("create", boolean.class);
-            createMethod.setAccessible(true);
+            // Access the private create method using ObfuscationReflectionHelper which handles SRG names
+            Method createMethod = ObfuscationReflectionHelper.findMethod(GameRules.BooleanValue.class, "m_46250_", boolean.class);
 
             // Create the boolean value type with default value false
             GameRules.Type<GameRules.BooleanValue> booleanType =

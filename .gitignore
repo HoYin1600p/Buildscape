@@ -64,3 +64,7 @@ states.txt
 .gitignore
 .vercel
 .env*.local
+.txt
+.iml
+.ipr
+.iws

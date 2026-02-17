@@ -817,7 +817,10 @@ public class CosmeticsDisplayPanel extends BasePanel {
             float pSize = 8.0f * pScale * (1.0f - trailProgress * 0.5f);
 
             String shape = CosmeticManager.getInstance().getParticleShape(cosmeticId);
-            boolean isSparkle = cosmeticId.toLowerCase().contains("sparkle") || shape.equals("sparkle") || shape.equals("default");
+            net.minecraft.resources.ResourceLocation tex = getParticleTexture(shape);
+            
+            // Check if this is the multi-frame sparkle texture
+            boolean isMultiFrameSparkle = tex != null && tex.getPath().endsWith("glow_lime_sparkle.png");
             boolean isBubble = shape.equals("bubble");
 
             if (isBubble) {
@@ -831,7 +834,6 @@ public class CosmeticsDisplayPanel extends BasePanel {
             poseStack.translate(centerX + offsetX, centerY + offsetY, 0);
             poseStack.mulPose(Vector3f.ZP.rotationDegrees(animProgress * 360.0f + i * 45.0f));
 
-            net.minecraft.resources.ResourceLocation tex = getParticleTexture(shape);
             if (tex != null) {
                 RenderSystem.setShaderTexture(0, tex);
                 RenderSystem.setShader(net.minecraft.client.renderer.GameRenderer::getPositionTexShader);
@@ -839,13 +841,25 @@ public class CosmeticsDisplayPanel extends BasePanel {
                 bb.begin(com.mojang.blaze3d.vertex.VertexFormat.Mode.QUADS, com.mojang.blaze3d.vertex.DefaultVertexFormat.POSITION_TEX);
 
                 float h = pSize / 2.0f;
-                // Use only the first frame (frame 0) for sparkle particles to fix rendering
+                // Default to full texture (single frame)
                 float u0 = 0, u1 = 1.0f, v0 = 0, v1 = 1.0f;
-                if (isSparkle) {
-                    // sparkle texture is a horizontal sprite sheet (usually 8 frames)
-                    // We render a single middle frame (Frame 3) to show a clean icon in the GUI
-                    u0 = 0.375f;
-                    u1 = 0.500f;
+                
+                if (isMultiFrameSparkle) {
+                    // Texture is 46x460, so it's a vertical strip of 10 frames (46x46 each)
+                    int totalFrames = 10;
+                    
+                    // Use index + time for randomized animation
+                    int frameIndex = ((i * 3) + (int) (animProgress * 12)) % totalFrames;
+                    
+                    float frameHeight = 1.0f / (float) totalFrames;
+                    
+                    // U remains full width (0 to 1)
+                    u0 = 0.0f;
+                    u1 = 1.0f;
+                    
+                    // V is sliced vertically
+                    v0 = frameIndex * frameHeight;
+                    v1 = v0 + frameHeight;
                 }
 
                 bb.vertex(poseStack.last().pose(), -h, h, 0).uv(u0, v1).endVertex();

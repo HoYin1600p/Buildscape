@@ -10,18 +10,23 @@ import java.util.*;
 
 /**
  * Professional wing renderer using a persistent animated particle plane system.
- * Particles are laid out on an invisible animated plane that moves with the player.
- * No more than 2 particles spawn at the same position.
+ * Creates recognizable feather-pattern wings similar to angel/elytra wings.
  */
 public class WingRenderer {
 
     // Per-player wing plane data
     private static final Map<UUID, WingPlane> wingPlanes = new HashMap<>();
-    private static final int PARTICLES_PER_WING = 120;  // Increased from 40 for better density
-    private static final int MAX_PARTICLES_PER_POS = 2; // Max 2 particles at same position
-    private static final double WING_X_MAX = 1.8;       // Wing extends 1.8 blocks horizontally
-    private static final double WING_Y_MAX = 1.3;       // Wing height
-    private static final double WING_Y_MIN = -0.8;      // Wing bottom
+    private static final int PARTICLES_PER_WING = 180;  // More particles for detailed feather pattern
+
+    // Feather row configuration
+    private static final int FEATHER_ROWS = 9;          // 9 rows of feathers from top to bottom
+    private static final int PARTICLES_PER_ROW = 20;    // ~20 particles per feather row
+
+    // Wing dimensions (in feather layout)
+    private static final double WING_LENGTH = 1.8;      // How far wing extends outward
+    private static final double WING_HEIGHT = 1.5;      // Total height of wing
+    private static final double ROW_SPACING = 0.18;     // Space between feather rows
+    private static final double MIN_WING_GAP = 0.5;     // Minimum gap between left and right wing
 
     /**
      * Represents an animated particle plane for one player's wings.
@@ -134,47 +139,52 @@ public class WingRenderer {
     }
 
     /**
-     * Initialize the particle positions on the wing plane.
-     * Particles are randomly distributed but never more than 2 at same position.
+     * Initialize the particle positions on the wing plane with feather pattern.
      */
     private static void initializeWingParticles(WingPlane plane) {
-        Random random = new Random();
-
-        // Create particle positions for left wing
-        createWingParticles(plane.leftWingParticles, random);
-
-        // Create particle positions for right wing (mirror of left)
-        createWingParticles(plane.rightWingParticles, random);
+        // Create feather-pattern particles for both wings
+        createFeatherWing(plane.leftWingParticles);
+        createFeatherWing(plane.rightWingParticles);
     }
 
     /**
-     * Create particle positions for a single wing.
+     * Create particles in a feather pattern for one wing.
+     * Particles arranged in overlapping rows from top to bottom.
      */
-    private static void createWingParticles(List<ParticleInfo> wingParticles, Random random) {
-        int particlesAdded = 0;
-        int maxAttempts = PARTICLES_PER_WING * 10;
-        int attempts = 0;
+    private static void createFeatherWing(List<ParticleInfo> wingParticles) {
+        Random random = new Random();
 
-        while (particlesAdded < PARTICLES_PER_WING && attempts < maxAttempts) {
-            // Random position on wing plane
-            double x = random.nextDouble() * WING_X_MAX;
-            double y = WING_Y_MIN + random.nextDouble() * (WING_Y_MAX - WING_Y_MIN);
-            double z = (random.nextDouble() - 0.5) * 0.4; // Slight spread perpendicular to wing
+        // Create 9 feather rows from top to bottom
+        for (int row = 0; row < FEATHER_ROWS; row++) {
+            // Y position for this row (top to bottom)
+            double rowY = (WING_HEIGHT / 2.0) - (row * ROW_SPACING);
 
-            String posKey = String.format("%.1f,%.1f", x, y);
-
-            // Count particles at this position
-            int count = (int) wingParticles.stream()
-                    .filter(p -> String.format("%.1f,%.1f", p.baseX, p.baseY).equals(posKey))
-                    .count();
-
-            // Only add if not more than 2 particles at this position
-            if (count < MAX_PARTICLES_PER_POS) {
-                wingParticles.add(new ParticleInfo(x, y, z));
-                particlesAdded++;
+            // Each row has slightly different length (feather taper)
+            // Top rows are shorter, middle rows are longest, bottom rows taper again
+            double rowLength = WING_LENGTH;
+            if (row < 3) {
+                // Top rows shorter
+                rowLength = WING_LENGTH * (0.6 + (row * 0.13));
+            } else if (row > 5) {
+                // Bottom rows shorter
+                rowLength = WING_LENGTH * (1.0 - ((row - 5) * 0.15));
             }
 
-            attempts++;
+            // Place particles along this feather row
+            int particlesInRow = PARTICLES_PER_ROW;
+            for (int i = 0; i < particlesInRow; i++) {
+                // Position along the row (0 at body, rowLength at tip)
+                double x = (i / (double) particlesInRow) * rowLength;
+
+                // Add slight curve (feathers arc slightly)
+                double curvature = Math.sin((i / (double) particlesInRow) * Math.PI) * 0.1;
+                double y = rowY + curvature;
+
+                // Perpendicular spread (feathers have thickness in z direction)
+                double z = (random.nextDouble() - 0.5) * 0.08; // Very slight spread for feather texture
+
+                wingParticles.add(new ParticleInfo(x, y, z));
+            }
         }
     }
 
@@ -213,11 +223,11 @@ public class WingRenderer {
         float sinAngle = (float) Math.sin(wingAngleRad);
         float cosAngle = (float) Math.cos(wingAngleRad);
 
-        // Update left wing particles (positioned to the left/up from center, side = 1.0)
+        // Update left wing particles (side = 1.0, extends to the left)
         updateWing(mc, plane.leftWingParticles, attachX, attachY, attachZ,
                    rightX, rightZ, forwardX, forwardZ, sinAngle, cosAngle, 1.0f);
 
-        // Update right wing particles (positioned to the right/up from center, side = -1.0)
+        // Update right wing particles (side = -1.0, extends to the right)
         updateWing(mc, plane.rightWingParticles, attachX, attachY, attachZ,
                    rightX, rightZ, forwardX, forwardZ, sinAngle, cosAngle, -1.0f);
     }
@@ -225,6 +235,7 @@ public class WingRenderer {
     /**
      * Update positions of particles in one wing.
      * Particles move with the plane as it rotates.
+     * Maintains separation between left and right wings.
      */
     private static void updateWing(Minecraft mc, List<ParticleInfo> particles,
                                    double centerX, double centerY, double centerZ,
@@ -254,10 +265,11 @@ public class WingRenderer {
             double worldY = centerY + heightOnWing + rotY;  // Apply height offset + rotation effect
             double worldZ = centerZ;
 
-            // Move outward along the wing (rightX direction is outward for each side)
-            // side parameter: 1.0 for left wing, -1.0 for right wing
-            worldX += rightX * side * rotZ;
-            worldZ += rightZ * side * rotZ;
+            // Move outward along the wing with minimum gap separation
+            // The gap is enforced by the MIN_WING_GAP offset
+            double gapOffset = MIN_WING_GAP * 0.5 * side; // Half gap on each side
+            worldX += rightX * side * (rotZ + gapOffset);
+            worldZ += rightZ * side * (rotZ + gapOffset);
 
             // Add perpendicular spread (slightly forward/backward)
             worldX += forwardX * spreadZ;
@@ -304,18 +316,19 @@ public class WingRenderer {
         }
 
         // Return wing angle based on state
+        // Larger animation ranges ensure gap stays visible
         if (isSneaking) {
-            return 0.0f;
+            return 5.0f;  // Slightly open even when sneaking
         } else if (isFalling) {
-            return 70.0f + (float) Math.sin(ageInTicks * 0.012f) * 10.0f;
+            return 75.0f + (float) Math.sin(ageInTicks * 0.012f) * 12.0f;
         } else if (isJumping) {
-            return 60.0f;
+            return 65.0f;
         } else if (isSprinting) {
-            return 45.0f + (float) Math.sin(ageInTicks * 0.015f) * 20.0f;
+            return 50.0f + (float) Math.sin(ageInTicks * 0.015f) * 22.0f;
         } else if (isMoving) {
-            return 30.0f + (float) Math.sin(ageInTicks * 0.008f) * 12.0f;
+            return 35.0f + (float) Math.sin(ageInTicks * 0.008f) * 15.0f;
         } else {
-            return 12.0f + (float) Math.sin(ageInTicks * 0.003f) * 5.0f;
+            return 18.0f + (float) Math.sin(ageInTicks * 0.003f) * 6.0f;
         }
     }
 }

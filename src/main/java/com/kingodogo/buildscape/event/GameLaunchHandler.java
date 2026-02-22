@@ -10,6 +10,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 
 import java.util.HashSet;
+import java.util.Map;
 
 /**
  * Handles game launch events to trigger one-time cosmetic authentication.
@@ -31,13 +32,14 @@ public class GameLaunchHandler {
             CosmeticAuthManager.getInstance().authenticateOnLaunch()
                     .thenAccept(cosmeticData -> {
                         if (cosmeticData != null) {
+                            BuildScape.getLogger().info("CosmeticAuthManager: Authentication successful, unlocked " + (cosmeticData.getUnlocked() == null ? 0 : cosmeticData.getUnlocked().size()) + " cosmetics");
+                            
                             // Update SupportersTabState with cosmetic data
                             updateSupportersTabState(cosmeticData);
-                            BuildScape.getLogger().info("GameLaunchHandler: Cosmetic data loaded successfully");
                         } else {
-                            BuildScape.getLogger().warn("GameLaunchHandler: Failed to load cosmetic data, using defaults");
-                            // Use empty/default cosmetics
-                            SupportersTabState.getInstance().setUnlockedCosmetics(new HashSet<>());
+                            BuildScape.getLogger().warn("GameLaunchHandler: API returned NULL for cosmetic data.");
+                            // Ensure default cosmetics are still available (particle trails, etc)
+                            updateSupportersTabState(null);
                         }
                     })
                     .exceptionally(throwable -> {
@@ -53,24 +55,64 @@ public class GameLaunchHandler {
     private static void updateSupportersTabState(CosmeticData cosmeticData) {
         try {
             SupportersTabState state = SupportersTabState.getInstance();
+            com.kingodogo.buildscape.cosmetics.CosmeticManager cosmeticManager =
+                com.kingodogo.buildscape.cosmetics.CosmeticManager.getInstance();
 
-            // Set unlocked cosmetics
-            if (cosmeticData.getUnlocked() != null) {
-                state.setUnlockedCosmetics(new HashSet<>(cosmeticData.getUnlocked()));
-            } else {
-                state.setUnlockedCosmetics(new HashSet<>());
+            java.util.Set<String> unlocked = new HashSet<>();
+            
+            if (cosmeticData != null) {
+                // Add API-provided unlocked cosmetics
+                if (cosmeticData.getUnlocked() != null) {
+                    unlocked.addAll(cosmeticData.getUnlocked());
+                }
+                
+                // If admin, unlock ALL registered cosmetics
+                if (cosmeticData.isAdmin()) {
+                    unlocked.addAll(cosmeticManager.getAllCosmetics());
+                    BuildScape.getLogger().info("GameLaunchHandler: Admin detected, unlocking all cosmetics");
+                }
             }
+            
+            // ALWAYS add default cosmetics (particle trails, builder's hat, etc.)
+            unlocked.addAll(cosmeticManager.getDefaultCosmetics());
+            state.setUnlockedCosmetics(unlocked);
 
-            // Set equipped cosmetics from selectedCosmetics map
-            if (cosmeticData.getSelectedCosmetics() != null && !cosmeticData.getSelectedCosmetics().isEmpty()) {
+            if (cosmeticData != null && cosmeticData.getSelectedCosmetics() != null && !cosmeticData.getSelectedCosmetics().isEmpty()) {
                 state.setEquippedCosmetics(new HashSet<>(cosmeticData.getSelectedCosmetics().values()));
+                
+                for (Map.Entry<String, String> entry : cosmeticData.getSelectedCosmetics().entrySet()) {
+                    String type = entry.getKey();
+                    String cosmeticId = entry.getValue();
+                    int slot = getSlotFromType(type);
+                    if (slot != -100 && cosmeticId != null && !cosmeticId.isEmpty()) {
+                        state.equipCosmeticToSlot(slot, cosmeticId);
+                    }
+                }
             }
 
-            BuildScape.getLogger().debug("GameLaunchHandler: SupportersTabState updated with " +
+            BuildScape.getLogger().info("GameLaunchHandler: SupportersTabState updated with " +
                     state.getUnlockedCosmetics().size() + " unlocked cosmetics");
 
         } catch (Exception e) {
             BuildScape.getLogger().error("GameLaunchHandler: Failed to update SupportersTabState", e);
         }
+    }
+
+    /**
+     * Map string type from API to internal slot ID.
+     */
+    private static int getSlotFromType(String type) {
+        if (type == null) return -100;
+        return switch (type.toLowerCase()) {
+            case "head" -> SupportersTabState.SLOT_HEAD;
+            case "chest" -> SupportersTabState.SLOT_CHEST;
+            case "legs" -> SupportersTabState.SLOT_LEGS;
+            case "feet" -> SupportersTabState.SLOT_FEET;
+            case "trail" -> SupportersTabState.SLOT_TRAIL;
+            case "wings" -> SupportersTabState.SLOT_WINGS;
+            case "back" -> SupportersTabState.SLOT_BACK;
+            case "shoulder" -> SupportersTabState.SLOT_SHOULDER;
+            default -> -100;
+        };
     }
 }

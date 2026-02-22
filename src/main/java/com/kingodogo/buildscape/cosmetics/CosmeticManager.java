@@ -23,8 +23,14 @@ public class CosmeticManager {
     // Particle shape mapping (cosmeticId -> shape type)
     private final Map<String, String> particleShapes = new HashMap<>();
 
-    // Dev username for development access
-    private static final String DEV_USERNAME = "Dev";
+    // Universal Cosmetics Registries
+    private final Map<String, CosHead<?>> headCosmetics = new HashMap<>();
+    private final Map<String, CosChest<?>> chestCosmetics = new HashMap<>();
+    private final Map<String, CosLegs<?>> legsCosmetics = new HashMap<>();
+    private final Map<String, CosFeet<?>> feetCosmetics = new HashMap<>();
+
+    // Default cosmetics that are free for everyone (particle trails)
+    private final Set<String> defaultCosmetics = new HashSet<>();
 
     private CosmeticManager() {
         registerBuiltInCosmetics();
@@ -53,19 +59,19 @@ public class CosmeticManager {
         registerParticleTrail("buildscape:cosmatics/particle/note_trail", "Note Trail", "Musical notes follow you", 1,
                 "note");
 
-        // Custom Particles
-        registerParticleTrail("buildscape:cosmatics/particle/snowflake_trail", "Snowflake Trail",
+        // Custom Particles (Redeemable - not added to defaultCosmetics)
+        registerRedeemableParticleTrail("buildscape:cosmatics/particle/snowflake_trail", "Snowflake Trail",
                 "Snowflakes drift behind you", 2, "snowflake");
 
         registerParticleTrail("buildscape:cosmatics/particle/cake_trail", "Cake Trail",
                 "Sweet cake particles follow you", 3, "cake");
 
-        // Register some item cosmetics for variety
-
-        registerItemCosmetic("buildscape:cosmatics/wings/elytra", "Elytra Wings", "Wings for gliding", 2,
-                "item:minecraft:elytra");
+        // Register gear cosmetics
         registerHeadCosmetic("buildscape:cosmatics/gear/builders_hat", "Builder's Hat", "A stylish builder's hat", 1);
 
+        // Register particle wings (redeemable)
+        registerParticleWings("buildscape:cosmatics/wings/snowflake_wings", "Snowflake Wings",
+                "Elegant wings made of swirling snowflakes", 2, "snowflake");
 
         // Register block cosmetics
 
@@ -73,13 +79,37 @@ public class CosmeticManager {
     }
 
     /**
-     * Register a particle trail cosmetic.
+     * Register a particle trail cosmetic (default = free for everyone).
      */
     private void registerParticleTrail(String cosmeticId, String name, String description, int tier, String shape) {
         allCosmetics.add(cosmeticId);
+        defaultCosmetics.add(cosmeticId); // Particle trails are free for everyone
         cosmeticMetadata.put(cosmeticId,
                 new CosmeticMetadata(name, description, tier, CosmeticType.PARTICLE_TRAIL, null));
         particleShapes.put(cosmeticId, shape);
+    }
+
+    /**
+     * Register a particle trail cosmetic that requires redemption (not free by default).
+     */
+    private void registerRedeemableParticleTrail(String cosmeticId, String name, String description, int tier, String shape) {
+        allCosmetics.add(cosmeticId);
+        // NOT added to defaultCosmetics - requires redemption code
+        cosmeticMetadata.put(cosmeticId,
+                new CosmeticMetadata(name, description, tier, CosmeticType.PARTICLE_TRAIL, null));
+        particleShapes.put(cosmeticId, shape);
+    }
+
+    /**
+     * Register a particle wings cosmetic (free for everyone).
+     */
+    private void registerParticleWings(String cosmeticId, String name, String description, int tier, String shape) {
+        allCosmetics.add(cosmeticId);
+        defaultCosmetics.add(cosmeticId); // Free for everyone
+        cosmeticMetadata.put(cosmeticId,
+                new CosmeticMetadata(name, description, tier, CosmeticType.PARTICLE_WINGS, null));
+        particleShapes.put(cosmeticId, shape);
+        BuildScape.getLogger().info("Registered PARTICLE_WINGS cosmetic: " + cosmeticId + " (" + name + ")");
     }
 
     /**
@@ -90,16 +120,26 @@ public class CosmeticManager {
     }
 
     /**
-     * Check if a particle trail supports color customization.
+     * Check if a cosmetic supports color customization.
      */
     public boolean supportsColor(String cosmeticId) {
+        CosmeticMetadata meta = cosmeticMetadata.get(cosmeticId);
+        if (meta == null) return false;
+
+        // Particle wings with snowflake shape support color
+        if (meta.type() == CosmeticType.PARTICLE_WINGS) {
+            String shape = getParticleShape(cosmeticId);
+            return shape.equals("snowflake");
+        }
+
+        // For particle trails, only specific shapes support color
         if (!isParticleTrail(cosmeticId)) {
             return false;
         }
 
         String shape = getParticleShape(cosmeticId);
         // Only Sparkle and Heart shapes support colors
-        // Cherry, Cake, Snowflake, Firework, Note, Bubble, Cherry Leaves are NOT colorable
+        // Cherry, Cake, Snowflake trail, Firework, Note, Bubble, Cherry Leaves are NOT colorable
         return shape.equals("sparkle") || shape.equals("heart");
     }
 
@@ -119,6 +159,75 @@ public class CosmeticManager {
         allCosmetics.add(cosmeticId);
         cosmeticMetadata.put(cosmeticId, new CosmeticMetadata(name, description, tier, CosmeticType.HEAD, null));
         BuildScape.getLogger().info("Registered HEAD cosmetic: " + cosmeticId + " (" + name + ")");
+    }
+
+    /**
+     * Register a custom armor cosmetic (Chest, Legs, Feet) with a custom model.
+     */
+    private void registerArmorCosmetic(String cosmeticId, String name, String description, int tier, CosmeticType type) {
+        allCosmetics.add(cosmeticId);
+        cosmeticMetadata.put(cosmeticId, new CosmeticMetadata(name, description, tier, type, null));
+        BuildScape.getLogger().info("Registered " + type + " cosmetic: " + cosmeticId + " (" + name + ")");
+    }
+
+    /**
+     * Register a universal head cosmetic.
+     */
+    public void registerCosHead(String cosmeticId, String name, String description, int tier, CosHead<?> cosHead) {
+        registerHeadCosmetic(cosmeticId, name, description, tier);
+        headCosmetics.put(cosmeticId, cosHead);
+    }
+
+    /**
+     * Register a universal chest cosmetic.
+     */
+    public void registerCosChest(String cosmeticId, String name, String description, int tier, CosChest<?> cosChest) {
+        registerArmorCosmetic(cosmeticId, name, description, tier, CosmeticType.CHEST);
+        chestCosmetics.put(cosmeticId, cosChest);
+    }
+
+    /**
+     * Register a universal legs cosmetic.
+     */
+    public void registerCosLegs(String cosmeticId, String name, String description, int tier, CosLegs<?> cosLegs) {
+        registerArmorCosmetic(cosmeticId, name, description, tier, CosmeticType.LEGS);
+        legsCosmetics.put(cosmeticId, cosLegs);
+    }
+
+    /**
+     * Register a universal feet cosmetic.
+     */
+    public void registerCosFeet(String cosmeticId, String name, String description, int tier, CosFeet<?> cosFeet) {
+        registerArmorCosmetic(cosmeticId, name, description, tier, CosmeticType.FEET);
+        feetCosmetics.put(cosmeticId, cosFeet);
+    }
+
+    /**
+     * Get a universal head cosmetic by ID.
+     */
+    public CosHead<?> getCosHead(String cosmeticId) {
+        return headCosmetics.get(cosmeticId);
+    }
+
+    /**
+     * Get a universal chest cosmetic by ID.
+     */
+    public CosChest<?> getCosChest(String cosmeticId) {
+        return chestCosmetics.get(cosmeticId);
+    }
+
+    /**
+     * Get a universal legs cosmetic by ID.
+     */
+    public CosLegs<?> getCosLegs(String cosmeticId) {
+        return legsCosmetics.get(cosmeticId);
+    }
+
+    /**
+     * Get a universal feet cosmetic by ID.
+     */
+    public CosFeet<?> getCosFeet(String cosmeticId) {
+        return feetCosmetics.get(cosmeticId);
     }
 
     /**
@@ -143,33 +252,28 @@ public class CosmeticManager {
     }
 
     /**
-     * Check if a player has access to a cosmetic (dev always has access).
+     * Check if a cosmetic is a default (free for everyone).
      */
-    public boolean hasAccess(String playerUsername, String cosmeticId) {
-        // Dev always has access to everything
-        if (playerUsername != null && playerUsername.equalsIgnoreCase(DEV_USERNAME)) {
-            return true;
-        }
-
-        // For now, all cosmetics are accessible (will be replaced with API check)
-        return isRegistered(cosmeticId);
+    public boolean isDefaultCosmetic(String cosmeticId) {
+        return defaultCosmetics.contains(cosmeticId);
     }
 
     /**
-     * Get unlocked cosmetics for a player (dev gets everything).
+     * Get all default cosmetics (free for everyone).
+     */
+    public Set<String> getDefaultCosmetics() {
+        return new HashSet<>(defaultCosmetics);
+    }
+
+    /**
+     * Get unlocked cosmetics for offline/default use.
+     * Returns only default cosmetics (particle trails).
+     * For full unlocks including redeemed items, use SupportersTabState which gets data from the API.
      */
     public Set<String> getUnlockedCosmetics(String playerUsername) {
-        Set<String> unlocked = new HashSet<>();
-
-        // Dev gets everything
-        if (playerUsername != null && playerUsername.equalsIgnoreCase(DEV_USERNAME)) {
-            unlocked.addAll(allCosmetics);
-            return unlocked;
-        }
-
-        // For now, return empty (will be replaced with API check)
-        // API will determine which cosmetics are unlocked
-        return unlocked;
+        // Return only default cosmetics - no hardcoded bypasses
+        // Admin/redeemed cosmetics come from the API via SupportersTabState
+        return new HashSet<>(defaultCosmetics);
     }
 
     /**
@@ -211,7 +315,11 @@ public class CosmeticManager {
         BLOCK,
         PARTICLE_TRAIL,
         WINGS,
+        PARTICLE_WINGS,
         EFFECT,
-        HEAD // Custom head/armor model cosmetics
+        HEAD, // Custom head model cosmetics
+        CHEST, // Custom chest/torso model cosmetics
+        LEGS, // Custom leggings model cosmetics
+        FEET // Custom boots model cosmetics
     }
 }

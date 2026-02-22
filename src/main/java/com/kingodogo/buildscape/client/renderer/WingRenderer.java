@@ -17,10 +17,7 @@ public class WingRenderer {
     // Per-player wing plane data
     private static final Map<UUID, WingPlane> wingPlanes = new HashMap<>();
     private static final int PARTICLES_PER_WING = 200;  // ~200 particles for detailed curved shape
-
-    // Center gap configuration
-    private static final double CENTER_GAP_MIN = 0.3;  // Minimum gap at top/bottom
-    private static final double CENTER_GAP_MAX = 0.5;  // Maximum gap at middle
+    private static final double WING_GAP_OFFSET = 0.3;  // Gap offset per wing (0.6 total gap)
 
     /**
      * Represents an animated particle plane for one player's wings.
@@ -192,25 +189,14 @@ public class WingRenderer {
                 double heightProgress = i / (double) (particlesAtThisLength + 1);
                 double y = (wingHeight / 2.0) - (heightProgress * wingHeight);
 
-                // Calculate gap offset based on height
-                // Smaller gap at top/bottom, larger gap at middle
-                // This creates the curved center gap shape
-                double yNormalized = Math.abs(heightProgress - 0.5) * 2.0; // 0 at middle, 1 at edges
-                double gapAtThisHeight = CENTER_GAP_MIN + (CENTER_GAP_MAX - CENTER_GAP_MIN) * (1.0 - yNormalized * yNormalized);
-
                 // Z position: spread perpendicular, using circular arc
-                // BUT: ensure particles don't cross into center gap
                 double zProgress = Math.abs(heightProgress - 0.5) * 2.0; // 0 at middle, 1 at edges
                 double maxZAtThisY = currentWidth * Math.sqrt(1.0 - zProgress * zProgress); // Circular arc
 
-                // Only place particles on the outer edge (away from center)
-                // This creates the gap - particles only on left/right, not middle
+                // Distribute particles across the full wing width
                 double z = (random.nextDouble() - 0.5) * maxZAtThisY * 2.0; // Random within bounds
 
-                // Skip particles that would be in the center gap
-                if (Math.abs(z) > gapAtThisHeight / 2.0) {
-                    wingParticles.add(new ParticleInfo(x, y, z));
-                }
+                wingParticles.add(new ParticleInfo(x, y, z));
             }
         }
     }
@@ -299,6 +285,12 @@ public class WingRenderer {
             // This creates the oval shape
             worldX += rightX * side * spreadZ;  // Spread left-right maintains curve
             worldZ += rightZ * side * spreadZ;
+
+            // Add gap offset between wings at the plane level
+            // Left wing offset: +0.3, Right wing offset: -0.3 (creates 0.6 block gap)
+            double gapOffset = WING_GAP_OFFSET * side;
+            worldX += rightX * gapOffset;
+            worldZ += rightZ * gapOffset;
 
             // Slight forward/backward variation for depth
             worldX += forwardX * (Math.random() - 0.5) * 0.02;

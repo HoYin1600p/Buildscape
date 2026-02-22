@@ -17,8 +17,11 @@ public class WingRenderer {
 
     // Per-player wing plane data
     private static final Map<UUID, WingPlane> wingPlanes = new HashMap<>();
-    private static final int PARTICLES_PER_WING = 40;  // 40 particles per wing for clean look
+    private static final int PARTICLES_PER_WING = 120;  // Increased from 40 for better density
     private static final int MAX_PARTICLES_PER_POS = 2; // Max 2 particles at same position
+    private static final double WING_X_MAX = 1.8;       // Wing extends 1.8 blocks horizontally
+    private static final double WING_Y_MAX = 1.3;       // Wing height
+    private static final double WING_Y_MIN = -0.8;      // Wing bottom
 
     /**
      * Represents an animated particle plane for one player's wings.
@@ -27,11 +30,9 @@ public class WingRenderer {
         UUID playerId;
         List<ParticleInfo> leftWingParticles = new ArrayList<>();
         List<ParticleInfo> rightWingParticles = new ArrayList<>();
-        long lastUpdateTime;
 
         WingPlane(UUID playerId) {
             this.playerId = playerId;
-            this.lastUpdateTime = System.currentTimeMillis();
         }
     }
 
@@ -41,13 +42,11 @@ public class WingRenderer {
     private static class ParticleInfo {
         double baseX, baseY, baseZ;  // Position on the plane relative to attachment point
         Particle particle;           // The actual particle entity
-        long spawnTime;
 
         ParticleInfo(double x, double y, double z) {
             this.baseX = x;
             this.baseY = y;
             this.baseZ = z;
-            this.spawnTime = System.currentTimeMillis();
         }
     }
 
@@ -140,55 +139,42 @@ public class WingRenderer {
      */
     private static void initializeWingParticles(WingPlane plane) {
         Random random = new Random();
-        Set<String> usedPositions = new HashSet<>();
 
         // Create particle positions for left wing
-        int particlesAdded = 0;
-        while (particlesAdded < PARTICLES_PER_WING) {
-            // Random position on wing plane (x: 0-1.5 along wing, y: -0.7 to 1.15)
-            double x = random.nextDouble() * 1.5;
-            double y = -0.7 + random.nextDouble() * 1.85;
-            double z = (random.nextDouble() - 0.5) * 0.3; // Small spread perpendicular to wing
-
-            String posKey = String.format("%.2f,%.2f", x, y);
-
-            // Only add if not more than 2 particles at this position
-            int count = (int) plane.leftWingParticles.stream()
-                    .filter(p -> String.format("%.2f,%.2f", p.baseX, p.baseY).equals(posKey))
-                    .count();
-
-            if (count < MAX_PARTICLES_PER_POS) {
-                plane.leftWingParticles.add(new ParticleInfo(x, y, z));
-                particlesAdded++;
-            }
-
-            // Prevent infinite loop
-            if (particlesAdded + plane.leftWingParticles.size() > PARTICLES_PER_WING * 5) {
-                break;
-            }
-        }
+        createWingParticles(plane.leftWingParticles, random);
 
         // Create particle positions for right wing (mirror of left)
-        particlesAdded = 0;
-        usedPositions.clear();
-        while (particlesAdded < PARTICLES_PER_WING) {
-            double x = random.nextDouble() * 1.5;
-            double y = -0.7 + random.nextDouble() * 1.85;
-            double z = (random.nextDouble() - 0.5) * 0.3;
+        createWingParticles(plane.rightWingParticles, random);
+    }
 
-            String posKey = String.format("%.2f,%.2f", x, y);
-            int count = (int) plane.rightWingParticles.stream()
-                    .filter(p -> String.format("%.2f,%.2f", p.baseX, p.baseY).equals(posKey))
+    /**
+     * Create particle positions for a single wing.
+     */
+    private static void createWingParticles(List<ParticleInfo> wingParticles, Random random) {
+        int particlesAdded = 0;
+        int maxAttempts = PARTICLES_PER_WING * 10;
+        int attempts = 0;
+
+        while (particlesAdded < PARTICLES_PER_WING && attempts < maxAttempts) {
+            // Random position on wing plane
+            double x = random.nextDouble() * WING_X_MAX;
+            double y = WING_Y_MIN + random.nextDouble() * (WING_Y_MAX - WING_Y_MIN);
+            double z = (random.nextDouble() - 0.5) * 0.4; // Slight spread perpendicular to wing
+
+            String posKey = String.format("%.1f,%.1f", x, y);
+
+            // Count particles at this position
+            int count = (int) wingParticles.stream()
+                    .filter(p -> String.format("%.1f,%.1f", p.baseX, p.baseY).equals(posKey))
                     .count();
 
+            // Only add if not more than 2 particles at this position
             if (count < MAX_PARTICLES_PER_POS) {
-                plane.rightWingParticles.add(new ParticleInfo(x, y, z));
+                wingParticles.add(new ParticleInfo(x, y, z));
                 particlesAdded++;
             }
 
-            if (particlesAdded + plane.rightWingParticles.size() > PARTICLES_PER_WING * 5) {
-                break;
-            }
+            attempts++;
         }
     }
 
@@ -222,40 +208,63 @@ public class WingRenderer {
         double attachY = playerY - 0.4;
         double attachZ = playerZ - forwardZ * 0.35;
 
-        // Convert wing angle to radians
+        // Convert wing angle to radians for rotation
         float wingAngleRad = (float) Math.toRadians(wingAngle);
         float sinAngle = (float) Math.sin(wingAngleRad);
         float cosAngle = (float) Math.cos(wingAngleRad);
 
-        // Update left wing particles
+        // Update left wing particles (positioned to the left/up from center, side = 1.0)
         updateWing(mc, plane.leftWingParticles, attachX, attachY, attachZ,
-                   rightX, rightZ, sinAngle, cosAngle, 1.0f);
+                   rightX, rightZ, forwardX, forwardZ, sinAngle, cosAngle, 1.0f);
 
-        // Update right wing particles
+        // Update right wing particles (positioned to the right/up from center, side = -1.0)
         updateWing(mc, plane.rightWingParticles, attachX, attachY, attachZ,
-                   rightX, rightZ, sinAngle, cosAngle, -1.0f);
+                   rightX, rightZ, forwardX, forwardZ, sinAngle, cosAngle, -1.0f);
     }
 
     /**
      * Update positions of particles in one wing.
+     * Particles move with the plane as it rotates.
      */
     private static void updateWing(Minecraft mc, List<ParticleInfo> particles,
                                    double centerX, double centerY, double centerZ,
                                    double rightX, double rightZ,
+                                   double forwardX, double forwardZ,
                                    float sinAngle, float cosAngle, float side) {
 
         for (ParticleInfo info : particles) {
-            // Apply wing angle rotation
-            float rotY = sinAngle * (float)info.baseX;
-            float rotZ = cosAngle * (float)info.baseX;
+            // Distance along the wing (x-axis in plane)
+            double distAlongWing = info.baseX;
 
-            // Calculate world position
-            double worldX = centerX + rightX * side * rotZ;
-            double worldY = centerY + rotY + info.baseY;
-            double worldZ = centerZ + rightZ * side * rotZ;
+            // Height on the wing (y-axis in plane)
+            double heightOnWing = info.baseY;
+
+            // Perpendicular spread (z-axis in plane)
+            double spreadZ = info.baseZ;
+
+            // Apply wing angle rotation around the attachment point (x-axis rotation)
+            // rotZ = how far the particle extends outward from the body due to wing opening
+            // rotY = how much the particle rises/falls due to wing rotation
+            float rotZ = cosAngle * (float)distAlongWing;
+            float rotY = sinAngle * (float)distAlongWing;
+
+            // Transform from wing plane coordinates to world coordinates
+            // Start with the attachment point
+            double worldX = centerX;
+            double worldY = centerY + heightOnWing + rotY;  // Apply height offset + rotation effect
+            double worldZ = centerZ;
+
+            // Move outward along the wing (rightX direction is outward for each side)
+            // side parameter: 1.0 for left wing, -1.0 for right wing
+            worldX += rightX * side * rotZ;
+            worldZ += rightZ * side * rotZ;
+
+            // Add perpendicular spread (slightly forward/backward)
+            worldX += forwardX * spreadZ;
+            worldZ += forwardZ * spreadZ;
 
             // Spawn particle if it doesn't exist or has expired
-            if (info.particle == null || info.particle.isAlive() == false) {
+            if (info.particle == null || !info.particle.isAlive()) {
                 try {
                     if (mc.level != null && mc.particleEngine != null) {
                         info.particle = mc.particleEngine.createParticle(
@@ -268,7 +277,7 @@ public class WingRenderer {
                     // Silently fail
                 }
             } else {
-                // Update existing particle position
+                // Update existing particle position - this is the key to smooth animation
                 try {
                     info.particle.setPos(worldX, worldY, worldZ);
                 } catch (Exception e) {

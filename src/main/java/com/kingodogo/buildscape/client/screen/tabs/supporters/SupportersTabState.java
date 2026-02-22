@@ -156,25 +156,26 @@ public class SupportersTabState {
     public int getBestSlotForCosmetic(String cosmeticId) {
         CosmeticManager manager = CosmeticManager.getInstance();
         CosmeticRegistry registry = CosmeticRegistry.getInstance();
-        
+
         if (manager.isParticleTrail(cosmeticId)) return SLOT_TRAIL;
-        
+
         CosmeticManager.CosmeticMetadata metadata = manager.getMetadata(cosmeticId);
         if (metadata != null) {
             if (metadata.type() == CosmeticManager.CosmeticType.WINGS) return SLOT_WINGS;
+            if (metadata.type() == CosmeticManager.CosmeticType.PARTICLE_WINGS) return SLOT_WINGS;  // Particle wings also go to SLOT_WINGS
             if (metadata.type() == CosmeticManager.CosmeticType.HEAD) return SLOT_HEAD;
-            
+
             // Handle future categories based on ID path
             if (cosmeticId.contains("/back/")) return SLOT_BACK;
             if (cosmeticId.contains("/shoulder/")) return SLOT_SHOULDER;
         }
-        
+
         net.minecraft.world.item.ItemStack stack = registry.resolveToItemStack(cosmeticId);
         if (stack != null && !stack.isEmpty()) {
             int slot = getSlotIndexForStack(stack);
             if (slot >= 0) return slot;
         }
-        
+
         return SLOT_OTHER;
     }
     

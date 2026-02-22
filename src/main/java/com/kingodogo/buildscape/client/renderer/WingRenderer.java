@@ -3,20 +3,53 @@ package com.kingodogo.buildscape.client.renderer;
 import com.kingodogo.buildscape.cosmetics.CosmeticManager;
 import com.kingodogo.buildscape.particle.ModParticles;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.particle.Particle;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.world.entity.player.Player;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 /**
- * Professional wing renderer that spawns particles in animated elytra wing shapes.
- * Properly handles animation states and particle lifecycle.
+ * Professional wing renderer using a persistent animated particle plane system.
+ * Particles are laid out on an invisible animated plane that moves with the player.
+ * No more than 2 particles spawn at the same position.
  */
 public class WingRenderer {
 
-    private static final Map<UUID, Long> lastSpawnTime = new HashMap<>();
-    private static final long SPAWN_INTERVAL = 40; // Spawn every 40ms for smooth animation
+    // Per-player wing plane data
+    private static final Map<UUID, WingPlane> wingPlanes = new HashMap<>();
+    private static final int PARTICLES_PER_WING = 40;  // 40 particles per wing for clean look
+    private static final int MAX_PARTICLES_PER_POS = 2; // Max 2 particles at same position
+
+    /**
+     * Represents an animated particle plane for one player's wings.
+     */
+    private static class WingPlane {
+        UUID playerId;
+        List<ParticleInfo> leftWingParticles = new ArrayList<>();
+        List<ParticleInfo> rightWingParticles = new ArrayList<>();
+        long lastUpdateTime;
+
+        WingPlane(UUID playerId) {
+            this.playerId = playerId;
+            this.lastUpdateTime = System.currentTimeMillis();
+        }
+    }
+
+    /**
+     * Stores information about a single particle in the wing plane.
+     */
+    private static class ParticleInfo {
+        double baseX, baseY, baseZ;  // Position on the plane relative to attachment point
+        Particle particle;           // The actual particle entity
+        long spawnTime;
+
+        ParticleInfo(double x, double y, double z) {
+            this.baseX = x;
+            this.baseY = y;
+            this.baseZ = z;
+            this.spawnTime = System.currentTimeMillis();
+        }
+    }
 
     /**
      * Check if player has wings equipped and render them.
@@ -24,10 +57,12 @@ public class WingRenderer {
     public static void renderWingsForPlayer(AbstractClientPlayer player, float ageInTicks) {
         // Check if player has wings equipped
         if (!hasWingsEquipped(player)) {
+            // Clean up if player no longer has wings
+            wingPlanes.remove(player.getUUID());
             return;
         }
 
-        renderPlayerWings(player, ageInTicks);
+        renderWings(player, ageInTicks);
     }
 
     /**
@@ -44,7 +79,6 @@ public class WingRenderer {
                     String cosmeticId = entry.getValue();
                     if (cosmeticId != null && !cosmeticId.isEmpty()) {
                         if (isWingsCosmetic(cosmeticId)) {
-                            com.kingodogo.buildscape.BuildScape.getLogger().debug("Wings equipped in slot " + entry.getKey() + ": " + cosmeticId);
                             return true;
                         }
                     }
@@ -56,13 +90,12 @@ public class WingRenderer {
             if (equippedSet != null && !equippedSet.isEmpty()) {
                 for (String cosmeticId : equippedSet) {
                     if (cosmeticId != null && !cosmeticId.isEmpty() && isWingsCosmetic(cosmeticId)) {
-                        com.kingodogo.buildscape.BuildScape.getLogger().debug("Wings found in equipped set: " + cosmeticId);
                         return true;
                     }
                 }
             }
         } catch (Exception e) {
-            com.kingodogo.buildscape.BuildScape.getLogger().error("Error checking if wings equipped", e);
+            // Silently fail
         }
         return false;
     }
@@ -81,24 +114,89 @@ public class WingRenderer {
     }
 
     /**
-     * Render wings for a player with proper animation.
+     * Main rendering logic for animated wing planes.
      */
-    public static void renderPlayerWings(Player player, float ageInTicks) {
+    private static void renderWings(Player player, float ageInTicks) {
         Minecraft mc = Minecraft.getInstance();
         if (mc.level == null || mc.particleEngine == null) return;
 
-        UUID playerUuid = player.getUUID();
-        long now = System.currentTimeMillis();
-        long lastSpawn = lastSpawnTime.getOrDefault(playerUuid, 0L);
+        UUID playerId = player.getUUID();
 
-        // Only spawn particles at intervals
-        if (now - lastSpawn < SPAWN_INTERVAL) {
-            return;
+        // Get or create wing plane for this player
+        WingPlane plane = wingPlanes.computeIfAbsent(playerId, WingPlane::new);
+
+        // Initialize wing particles on first load
+        if (plane.leftWingParticles.isEmpty() && plane.rightWingParticles.isEmpty()) {
+            initializeWingParticles(plane);
         }
-        lastSpawnTime.put(playerUuid, now);
 
-        com.kingodogo.buildscape.BuildScape.getLogger().debug("Spawning wing particles for player");
+        // Update particle positions based on current player state and animation
+        updateWingPlane(mc, plane, player, ageInTicks);
+    }
 
+    /**
+     * Initialize the particle positions on the wing plane.
+     * Particles are randomly distributed but never more than 2 at same position.
+     */
+    private static void initializeWingParticles(WingPlane plane) {
+        Random random = new Random();
+        Set<String> usedPositions = new HashSet<>();
+
+        // Create particle positions for left wing
+        int particlesAdded = 0;
+        while (particlesAdded < PARTICLES_PER_WING) {
+            // Random position on wing plane (x: 0-1.5 along wing, y: -0.7 to 1.15)
+            double x = random.nextDouble() * 1.5;
+            double y = -0.7 + random.nextDouble() * 1.85;
+            double z = (random.nextDouble() - 0.5) * 0.3; // Small spread perpendicular to wing
+
+            String posKey = String.format("%.2f,%.2f", x, y);
+
+            // Only add if not more than 2 particles at this position
+            int count = (int) plane.leftWingParticles.stream()
+                    .filter(p -> String.format("%.2f,%.2f", p.baseX, p.baseY).equals(posKey))
+                    .count();
+
+            if (count < MAX_PARTICLES_PER_POS) {
+                plane.leftWingParticles.add(new ParticleInfo(x, y, z));
+                particlesAdded++;
+            }
+
+            // Prevent infinite loop
+            if (particlesAdded + plane.leftWingParticles.size() > PARTICLES_PER_WING * 5) {
+                break;
+            }
+        }
+
+        // Create particle positions for right wing (mirror of left)
+        particlesAdded = 0;
+        usedPositions.clear();
+        while (particlesAdded < PARTICLES_PER_WING) {
+            double x = random.nextDouble() * 1.5;
+            double y = -0.7 + random.nextDouble() * 1.85;
+            double z = (random.nextDouble() - 0.5) * 0.3;
+
+            String posKey = String.format("%.2f,%.2f", x, y);
+            int count = (int) plane.rightWingParticles.stream()
+                    .filter(p -> String.format("%.2f,%.2f", p.baseX, p.baseY).equals(posKey))
+                    .count();
+
+            if (count < MAX_PARTICLES_PER_POS) {
+                plane.rightWingParticles.add(new ParticleInfo(x, y, z));
+                particlesAdded++;
+            }
+
+            if (particlesAdded + plane.rightWingParticles.size() > PARTICLES_PER_WING * 5) {
+                break;
+            }
+        }
+    }
+
+    /**
+     * Update the wing plane position and animation.
+     * The plane follows the player and animates based on movement state.
+     */
+    private static void updateWingPlane(Minecraft mc, WingPlane plane, Player player, float ageInTicks) {
         // Calculate wing animation angle
         float wingAngle = calculateWingAngle(player, ageInTicks);
 
@@ -124,73 +222,59 @@ public class WingRenderer {
         double attachY = playerY - 0.4;
         double attachZ = playerZ - forwardZ * 0.35;
 
-        // Convert wing angle to radians for rotation calculations
+        // Convert wing angle to radians
         float wingAngleRad = (float) Math.toRadians(wingAngle);
         float sinAngle = (float) Math.sin(wingAngleRad);
         float cosAngle = (float) Math.cos(wingAngleRad);
 
-        // Spawn left and right wings
-        spawnWingParticles(mc, attachX, attachY, attachZ, rightX, rightZ, sinAngle, cosAngle, 1.0f);  // Left wing
-        spawnWingParticles(mc, attachX, attachY, attachZ, rightX, rightZ, sinAngle, cosAngle, -1.0f); // Right wing
+        // Update left wing particles
+        updateWing(mc, plane.leftWingParticles, attachX, attachY, attachZ,
+                   rightX, rightZ, sinAngle, cosAngle, 1.0f);
+
+        // Update right wing particles
+        updateWing(mc, plane.rightWingParticles, attachX, attachY, attachZ,
+                   rightX, rightZ, sinAngle, cosAngle, -1.0f);
     }
 
     /**
-     * Spawn particles to form one wing shape.
+     * Update positions of particles in one wing.
      */
-    private static void spawnWingParticles(Minecraft mc, double centerX, double centerY, double centerZ,
-            double rightX, double rightZ, float sinAngle, float cosAngle, float side) {
+    private static void updateWing(Minecraft mc, List<ParticleInfo> particles,
+                                   double centerX, double centerY, double centerZ,
+                                   double rightX, double rightZ,
+                                   float sinAngle, float cosAngle, float side) {
 
-        // Wing outline - defines elytra wing shape
-        // Each point is [x-distance, y-height] from attachment
-        float[][] wingPoints = {
-            // Top feather row
-            {0.0f, 1.0f},
-            {0.3f, 1.15f},
-            {0.6f, 1.1f},
-            {0.9f, 0.9f},
-            {1.2f, 0.6f},
-            {1.5f, 0.2f},
-            // Middle feather row
-            {0.0f, 0.5f},
-            {0.3f, 0.5f},
-            {0.6f, 0.4f},
-            {0.9f, 0.2f},
-            {1.2f, 0.0f},
-            {1.5f, -0.2f},
-            // Bottom feather row
-            {0.0f, 0.0f},
-            {0.3f, 0.0f},
-            {0.6f, -0.1f},
-            {0.9f, -0.3f},
-            {1.2f, -0.5f},
-            {1.5f, -0.7f}
-        };
+        for (ParticleInfo info : particles) {
+            // Apply wing angle rotation
+            float rotY = sinAngle * (float)info.baseX;
+            float rotZ = cosAngle * (float)info.baseX;
 
-        // Spawn each point as a snowflake particle
-        for (float[] point : wingPoints) {
-            float x = point[0];
-            float y = point[1];
-
-            // Apply wing angle rotation (wings open/close around the attachment axis)
-            float rotY = sinAngle * x;
-            float rotZ = cosAngle * x;
-
-            // Calculate world position with proper rotation
+            // Calculate world position
             double worldX = centerX + rightX * side * rotZ;
-            double worldY = centerY + rotY + y;
+            double worldY = centerY + rotY + info.baseY;
             double worldZ = centerZ + rightZ * side * rotZ;
 
-            // Spawn snowflake particle
-            try {
-                if (mc.level != null && mc.particleEngine != null) {
-                    mc.particleEngine.createParticle(
-                        ModParticles.SNOWFLAKE.get(),
-                        worldX, worldY, worldZ,
-                        0.0, 0.0, 0.0  // No velocity - particles spawn at exact position
-                    );
+            // Spawn particle if it doesn't exist or has expired
+            if (info.particle == null || info.particle.isAlive() == false) {
+                try {
+                    if (mc.level != null && mc.particleEngine != null) {
+                        info.particle = mc.particleEngine.createParticle(
+                            ModParticles.SNOWFLAKE.get(),
+                            worldX, worldY, worldZ,
+                            0.0, 0.0, 0.0  // No velocity
+                        );
+                    }
+                } catch (Exception e) {
+                    // Silently fail
                 }
-            } catch (Exception e) {
-                // Silently fail
+            } else {
+                // Update existing particle position
+                try {
+                    info.particle.setPos(worldX, worldY, worldZ);
+                } catch (Exception e) {
+                    // Particle may have been removed, will respawn next frame
+                    info.particle = null;
+                }
             }
         }
     }
@@ -199,7 +283,6 @@ public class WingRenderer {
      * Calculate wing animation angle based on player movement state.
      */
     private static float calculateWingAngle(Player player, float ageInTicks) {
-        // Check player movement state
         boolean isSprinting = player.isSprinting();
         boolean isSneaking = player.isCrouching();
         boolean isOnGround = player.isOnGround();
@@ -213,22 +296,16 @@ public class WingRenderer {
 
         // Return wing angle based on state
         if (isSneaking) {
-            // Sneaking: wings completely closed
             return 0.0f;
         } else if (isFalling) {
-            // Falling: wings fully extended with fast flutter
             return 70.0f + (float) Math.sin(ageInTicks * 0.012f) * 10.0f;
         } else if (isJumping) {
-            // Jumping: wings extended
             return 60.0f;
         } else if (isSprinting) {
-            // Sprinting: wings open with fast flutter
             return 45.0f + (float) Math.sin(ageInTicks * 0.015f) * 20.0f;
         } else if (isMoving) {
-            // Walking: wings open with moderate flutter
             return 30.0f + (float) Math.sin(ageInTicks * 0.008f) * 12.0f;
         } else {
-            // Idle: wings slightly open with slow breathing motion
             return 12.0f + (float) Math.sin(ageInTicks * 0.003f) * 5.0f;
         }
     }

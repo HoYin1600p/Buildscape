@@ -10,13 +10,17 @@ import java.util.*;
 
 /**
  * Professional wing renderer using a persistent animated particle plane system.
- * Creates wings with curved oval/teardrop shape, not rectangular boxes.
+ * Creates wings with curved oval shape, rounded edges, clear center gap.
  */
 public class WingRenderer {
 
     // Per-player wing plane data
     private static final Map<UUID, WingPlane> wingPlanes = new HashMap<>();
     private static final int PARTICLES_PER_WING = 200;  // ~200 particles for detailed curved shape
+
+    // Center gap configuration
+    private static final double CENTER_GAP_MIN = 0.3;  // Minimum gap at top/bottom
+    private static final double CENTER_GAP_MAX = 0.5;  // Maximum gap at middle
 
     /**
      * Represents an animated particle plane for one player's wings.
@@ -130,7 +134,7 @@ public class WingRenderer {
 
     /**
      * Initialize the particle positions on the wing plane.
-     * Creates curved oval/teardrop shaped wings using mathematical curves.
+     * Creates curved oval shaped wings with rounded edges and clear center gap.
      */
     private static void initializeWingParticles(WingPlane plane) {
         // Create curved wing for left side
@@ -141,14 +145,14 @@ public class WingRenderer {
     }
 
     /**
-     * Create particles in a curved oval/teardrop wing shape.
+     * Create particles in a curved oval wing shape with rounded edges and clear center gap.
      * Uses mathematical functions to create smooth curves rather than boxes.
      *
      * Wing shape characteristics:
-     * - Wider in the middle (center to shoulder height)
-     * - Narrower at top and bottom (tapered)
-     * - Smooth curves following sine/cosine functions
-     * - Elongated oval/teardrop outline
+     * - Wider in the middle
+     * - Narrower at top and bottom
+     * - Rounded edges instead of sharp tapers
+     * - Clear center gap with no particles crossing middle line
      */
     private static void createCurvedWing(List<ParticleInfo> wingParticles) {
         Random random = new Random();
@@ -159,40 +163,54 @@ public class WingRenderer {
         double maxWidth = 0.65;   // Widest part of wing (middle)
 
         // Create particles using polar-like coordinates
-        // Generate particles along the wing from tip to body
+        // Generate particles along the wing from body to tip
         for (double lengthProgress = 0.0; lengthProgress <= 1.0; lengthProgress += 0.05) {
             // X position: distance outward (0 at body, wingLength at tip)
             double x = lengthProgress * wingLength;
 
-            // Width of wing at this length position (narrower at tip and body)
-            // Using sine curve: widest at 0.4-0.6 progress, narrower at edges
-            double widthFactor = Math.sin(lengthProgress * Math.PI) * 0.8; // 0 to 0.8
-            if (lengthProgress < 0.15) {
-                widthFactor *= (lengthProgress / 0.15); // Taper at body
+            // Width of wing at this length position
+            // Using sine curve with rounded edges (no sharp taper)
+            double widthFactor = Math.sin(lengthProgress * Math.PI) * 0.9; // 0 to 0.9
+
+            // Apply smoother rounding instead of sharp taper
+            if (lengthProgress < 0.1) {
+                // Gentle rounding at body, not sharp taper
+                widthFactor *= Math.sin((lengthProgress / 0.1) * (Math.PI / 2.0)); // Smooth entrance
             }
-            if (lengthProgress > 0.85) {
-                widthFactor *= ((1.0 - lengthProgress) / 0.15); // Taper at tip
+            if (lengthProgress > 0.9) {
+                // Gentle rounding at tip, not sharp taper
+                widthFactor *= Math.sin(((1.0 - lengthProgress) / 0.1) * (Math.PI / 2.0)); // Smooth exit
             }
 
             double currentWidth = maxWidth * widthFactor;
 
             // For each x position, create a vertical arc of particles
-            // The arc is widest at the middle and tapers at top and bottom
-            int particlesAtThisLength = (int) (15 * widthFactor) + 3; // More particles where wing is wider
+            int particlesAtThisLength = (int) (16 * widthFactor) + 2; // More particles where wing is wider
 
             for (int i = 0; i < particlesAtThisLength; i++) {
                 // Y position: distribute vertically across wing height
                 double heightProgress = i / (double) (particlesAtThisLength + 1);
                 double y = (wingHeight / 2.0) - (heightProgress * wingHeight);
 
-                // Z position: spread perpendicular, using parabola shape
-                // Particles are closer to center (z=0) than at edges
-                // Creates the curved oval outline
+                // Calculate gap offset based on height
+                // Smaller gap at top/bottom, larger gap at middle
+                // This creates the curved center gap shape
+                double yNormalized = Math.abs(heightProgress - 0.5) * 2.0; // 0 at middle, 1 at edges
+                double gapAtThisHeight = CENTER_GAP_MIN + (CENTER_GAP_MAX - CENTER_GAP_MIN) * (1.0 - yNormalized * yNormalized);
+
+                // Z position: spread perpendicular, using circular arc
+                // BUT: ensure particles don't cross into center gap
                 double zProgress = Math.abs(heightProgress - 0.5) * 2.0; // 0 at middle, 1 at edges
                 double maxZAtThisY = currentWidth * Math.sqrt(1.0 - zProgress * zProgress); // Circular arc
+
+                // Only place particles on the outer edge (away from center)
+                // This creates the gap - particles only on left/right, not middle
                 double z = (random.nextDouble() - 0.5) * maxZAtThisY * 2.0; // Random within bounds
 
-                wingParticles.add(new ParticleInfo(x, y, z));
+                // Skip particles that would be in the center gap
+                if (Math.abs(z) > gapAtThisHeight / 2.0) {
+                    wingParticles.add(new ParticleInfo(x, y, z));
+                }
             }
         }
     }
@@ -244,7 +262,6 @@ public class WingRenderer {
     /**
      * Update positions of particles in one wing.
      * Particles move with the plane as it rotates and animates.
-     * Gap between wings is maintained by side parameter separation.
      */
     private static void updateWing(Minecraft mc, List<ParticleInfo> particles,
                                    double centerX, double centerY, double centerZ,
@@ -279,7 +296,7 @@ public class WingRenderer {
             worldZ += rightZ * side * rotZ;
 
             // Add perpendicular spread (the curved width of the wing)
-            // This creates the oval/teardrop shape
+            // This creates the oval shape
             worldX += rightX * side * spreadZ;  // Spread left-right maintains curve
             worldZ += rightZ * side * spreadZ;
 
@@ -328,9 +345,8 @@ public class WingRenderer {
         }
 
         // Return wing angle based on state
-        // Larger animation ranges ensure wings spread clearly
         if (isSneaking) {
-            return 10.0f;  // Slightly open even when sneaking
+            return 10.0f;
         } else if (isFalling) {
             return 82.0f + (float) Math.sin(ageInTicks * 0.012f) * 12.0f;
         } else if (isJumping) {

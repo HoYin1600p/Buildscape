@@ -10,23 +10,17 @@ import java.util.*;
 
 /**
  * Professional wing renderer using a persistent animated particle plane system.
- * Creates recognizable feather-pattern wings similar to angel/elytra wings.
+ * Creates wings in a rectangular outline shape with clear vertical gap in middle.
  */
 public class WingRenderer {
 
     // Per-player wing plane data
     private static final Map<UUID, WingPlane> wingPlanes = new HashMap<>();
-    private static final int PARTICLES_PER_WING = 180;  // More particles for detailed feather pattern
 
-    // Feather row configuration
-    private static final int FEATHER_ROWS = 9;          // 9 rows of feathers from top to bottom
-    private static final int PARTICLES_PER_ROW = 20;    // ~20 particles per feather row
-
-    // Wing dimensions (in feather layout)
-    private static final double WING_LENGTH = 1.8;      // How far wing extends outward
-    private static final double WING_HEIGHT = 1.5;      // Total height of wing
-    private static final double ROW_SPACING = 0.18;     // Space between feather rows
-    private static final double MIN_WING_GAP = 0.5;     // Minimum gap between left and right wing
+    // Wing structure: vertical columns of particles
+    private static final int WING_HEIGHT_PARTICLES = 14;  // 14 particles tall (0.14 blocks, ~1.4m)
+    private static final int WING_WIDTH_PARTICLES = 10;   // 10 particles wide per wing (0.1 blocks, ~1m)
+    private static final double CENTER_GAP = 0.6;         // 0.6 block gap in center (visible separation)
 
     /**
      * Represents an animated particle plane for one player's wings.
@@ -139,50 +133,44 @@ public class WingRenderer {
     }
 
     /**
-     * Initialize the particle positions on the wing plane with feather pattern.
+     * Initialize the particle positions on the wing plane.
+     * Creates rectangular wing outlines with a clear center gap.
      */
     private static void initializeWingParticles(WingPlane plane) {
-        // Create feather-pattern particles for both wings
-        createFeatherWing(plane.leftWingParticles);
-        createFeatherWing(plane.rightWingParticles);
+        // Create rectangular wing outline for left wing
+        createRectangularWing(plane.leftWingParticles, 1.0);  // Left side
+
+        // Create rectangular wing outline for right wing
+        createRectangularWing(plane.rightWingParticles, -1.0); // Right side
     }
 
     /**
-     * Create particles in a feather pattern for one wing.
-     * Particles arranged in overlapping rows from top to bottom.
+     * Create particles in a rectangular wing outline.
+     * Forms a clear shape with particles arranged in columns.
+     *
+     * @param wingParticles List to add particles to
+     * @param side 1.0 for left wing, -1.0 for right wing
      */
-    private static void createFeatherWing(List<ParticleInfo> wingParticles) {
-        Random random = new Random();
+    private static void createRectangularWing(List<ParticleInfo> wingParticles, double side) {
+        // Wing dimensions
+        double wingLength = 1.6;  // How far wing extends outward
+        double wingHeight = 1.4;  // How tall the wing is
 
-        // Create 9 feather rows from top to bottom
-        for (int row = 0; row < FEATHER_ROWS; row++) {
-            // Y position for this row (top to bottom)
-            double rowY = (WING_HEIGHT / 2.0) - (row * ROW_SPACING);
+        // Create a grid of particles forming a rectangle
+        // Particles arranged in columns from body outward
+        for (int col = 0; col < WING_WIDTH_PARTICLES; col++) {
+            // X position: distance outward from body (0 at body, wingLength at tip)
+            double x = (col / (double) (WING_WIDTH_PARTICLES - 1)) * wingLength;
 
-            // Each row has slightly different length (feather taper)
-            // Top rows are shorter, middle rows are longest, bottom rows taper again
-            double rowLength = WING_LENGTH;
-            if (row < 3) {
-                // Top rows shorter
-                rowLength = WING_LENGTH * (0.6 + (row * 0.13));
-            } else if (row > 5) {
-                // Bottom rows shorter
-                rowLength = WING_LENGTH * (1.0 - ((row - 5) * 0.15));
-            }
+            // For each column, create particles from top to bottom
+            for (int row = 0; row < WING_HEIGHT_PARTICLES; row++) {
+                // Y position: from top to bottom of wing
+                double y = (wingHeight / 2.0) - (row / (double) (WING_HEIGHT_PARTICLES - 1)) * wingHeight;
 
-            // Place particles along this feather row
-            int particlesInRow = PARTICLES_PER_ROW;
-            for (int i = 0; i < particlesInRow; i++) {
-                // Position along the row (0 at body, rowLength at tip)
-                double x = (i / (double) particlesInRow) * rowLength;
+                // Small random offset for slight texture variation
+                double z = (Math.random() - 0.5) * 0.04;
 
-                // Add slight curve (feathers arc slightly)
-                double curvature = Math.sin((i / (double) particlesInRow) * Math.PI) * 0.1;
-                double y = rowY + curvature;
-
-                // Perpendicular spread (feathers have thickness in z direction)
-                double z = (random.nextDouble() - 0.5) * 0.08; // Very slight spread for feather texture
-
+                // Add to wing (side parameter controls left/right via offset in updateWing)
                 wingParticles.add(new ParticleInfo(x, y, z));
             }
         }
@@ -235,7 +223,7 @@ public class WingRenderer {
     /**
      * Update positions of particles in one wing.
      * Particles move with the plane as it rotates.
-     * Maintains separation between left and right wings.
+     * Maintains clear separation between left and right wings.
      */
     private static void updateWing(Minecraft mc, List<ParticleInfo> particles,
                                    double centerX, double centerY, double centerZ,
@@ -265,9 +253,9 @@ public class WingRenderer {
             double worldY = centerY + heightOnWing + rotY;  // Apply height offset + rotation effect
             double worldZ = centerZ;
 
-            // Move outward along the wing with minimum gap separation
-            // The gap is enforced by the MIN_WING_GAP offset
-            double gapOffset = MIN_WING_GAP * 0.5 * side; // Half gap on each side
+            // Move outward along the wing with CENTER_GAP separation
+            // Each wing is offset by half the gap so they stay separated
+            double gapOffset = CENTER_GAP * 0.5 * side; // Half gap on each side
             worldX += rightX * side * (rotZ + gapOffset);
             worldZ += rightZ * side * (rotZ + gapOffset);
 
@@ -318,17 +306,17 @@ public class WingRenderer {
         // Return wing angle based on state
         // Larger animation ranges ensure gap stays visible
         if (isSneaking) {
-            return 5.0f;  // Slightly open even when sneaking
+            return 8.0f;  // Slightly open even when sneaking
         } else if (isFalling) {
-            return 75.0f + (float) Math.sin(ageInTicks * 0.012f) * 12.0f;
+            return 80.0f + (float) Math.sin(ageInTicks * 0.012f) * 12.0f;
         } else if (isJumping) {
-            return 65.0f;
+            return 70.0f;
         } else if (isSprinting) {
-            return 50.0f + (float) Math.sin(ageInTicks * 0.015f) * 22.0f;
+            return 55.0f + (float) Math.sin(ageInTicks * 0.015f) * 22.0f;
         } else if (isMoving) {
-            return 35.0f + (float) Math.sin(ageInTicks * 0.008f) * 15.0f;
+            return 40.0f + (float) Math.sin(ageInTicks * 0.008f) * 15.0f;
         } else {
-            return 18.0f + (float) Math.sin(ageInTicks * 0.003f) * 6.0f;
+            return 22.0f + (float) Math.sin(ageInTicks * 0.003f) * 7.0f;
         }
     }
 }

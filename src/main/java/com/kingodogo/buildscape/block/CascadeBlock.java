@@ -80,21 +80,6 @@ public class CascadeBlock extends Block implements EntityBlock {
         return InteractionResult.PASS;
     }
 
-    @Override
-    @SuppressWarnings("deprecation")
-    public void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean isMoving) {
-        super.onPlace(state, level, pos, oldState, isMoving);
-        CascadeWaterManager.registerWaterTicket(level, pos);
-    }
-
-    @Override
-    @SuppressWarnings("deprecation")
-    public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
-        if (!state.is(newState.getBlock())) {
-            CascadeWaterManager.removeWaterTicket(level, pos);
-        }
-        super.onRemove(state, level, pos, newState, isMoving);
-    }
 
     @Nullable
     @Override

@@ -7,8 +7,11 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import javax.annotation.Nullable;
 
-public class CascadeBlockNoMist extends Block {
+public class CascadeBlockNoMist extends Block implements EntityBlock {
 
     public CascadeBlockNoMist(Properties properties) {
         super(properties);
@@ -38,19 +41,9 @@ public class CascadeBlockNoMist extends Block {
         return RenderShape.MODEL;
     }
 
+    @Nullable
     @Override
-    @SuppressWarnings("deprecation")
-    public void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean isMoving) {
-        super.onPlace(state, level, pos, oldState, isMoving);
-        CascadeWaterManager.registerWaterTicket(level, pos);
-    }
-
-    @Override
-    @SuppressWarnings("deprecation")
-    public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
-        if (!state.is(newState.getBlock())) {
-            CascadeWaterManager.removeWaterTicket(level, pos);
-        }
-        super.onRemove(state, level, pos, newState, isMoving);
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+        return new CascadeBlockEntity(pos, state);
     }
 }

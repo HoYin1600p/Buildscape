@@ -24,6 +24,7 @@ public class CosmeticData {
     private List<String> defaultCosmetics;
     private List<String> unlockedCosmetics;
     private Map<String, String> selectedCosmetics;
+    private boolean isAdmin;
 
     public CosmeticData() {
     }
@@ -84,6 +85,14 @@ public class CosmeticData {
         this.selectedCosmetics = selectedCosmetics;
     }
 
+    public boolean isAdmin() {
+        return isAdmin;
+    }
+
+    public void setAdmin(boolean admin) {
+        this.isAdmin = admin;
+    }
+
     /**
      * Adapter method to populate legacy fields from new secure API response.
      * Call this after receiving data from the new API.
@@ -92,6 +101,11 @@ public class CosmeticData {
         // Populate unlocked from unlockedCosmetics (combines defaults + unlocked)
         if (this.unlockedCosmetics != null) {
             this.unlocked = this.unlockedCosmetics;
+        }
+
+        if (this.isAdmin) {
+            // If admin, we can't easily list everything here without CosmeticManager
+            // But we can flag it for the UI
         }
 
         // Populate equipped from selectedCosmetics values

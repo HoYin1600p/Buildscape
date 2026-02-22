@@ -111,8 +111,6 @@ public class PlayerAvatarPanel extends BasePanel {
         int scissorY = windowHeight - (int) ((startY + height) * actualGuiScale);
         int scissorHeight = (int) (height * actualGuiScale);
 
-        RenderSystem.enableScissor(scissorX, scissorY, scissorWidth, scissorHeight);
-
         GuiComponent.fill(poseStack, startX, startY, endX, endY, 0x80000000);
 
         // Draw panel border
@@ -121,6 +119,8 @@ public class PlayerAvatarPanel extends BasePanel {
         GuiComponent.fill(poseStack, startX - 1, endY, endX + 1, endY + 1, borderColor); // Bottom
         GuiComponent.fill(poseStack, startX - 1, startY, startX, endY, borderColor); // Left
         GuiComponent.fill(poseStack, endX, startY, endX + 1, endY, borderColor); // Right
+
+        RenderSystem.enableScissor(scissorX, scissorY, scissorWidth, scissorHeight);
 
         String title = "Player Avatar";
         int titleWidth = mc.font.width(title);

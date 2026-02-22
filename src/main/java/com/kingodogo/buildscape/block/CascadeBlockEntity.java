@@ -20,6 +20,22 @@ public class CascadeBlockEntity extends BlockEntity {
         super(ModBlockEntities.CASCADE_BLOCK_ENTITY.get(), pos, state);
     }
 
+    @Override
+    public void onLoad() {
+        super.onLoad();
+        if (this.level != null && !this.level.isClientSide) {
+            CascadeWaterManager.registerWaterTicket(this.level, this.worldPosition);
+        }
+    }
+
+    @Override
+    public void setRemoved() {
+        if (this.level != null && !this.level.isClientSide) {
+            CascadeWaterManager.removeWaterTicket(this.level, this.worldPosition);
+        }
+        super.setRemoved();
+    }
+
     public static void clientTick(Level level, BlockPos pos, BlockState state, CascadeBlockEntity be) {
         // If local player holds cascade block in off-hand, suppress particles in their chunk
         Player player = Minecraft.getInstance().player;

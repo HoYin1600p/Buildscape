@@ -4113,4 +4113,23 @@ public class BuildScape {
                     );
         }
     }
+
+    @Mod.EventBusSubscriber(modid = MODID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
+    public static class UniversalCosmeticClientEvents {
+        @SubscribeEvent
+        public static void registerLayerDefinitions(net.minecraftforge.client.event.EntityRenderersEvent.RegisterLayerDefinitions event) {
+            event.registerLayerDefinition(com.kingodogo.buildscape.client.model.BuildersHatModel.LAYER_LOCATION, com.kingodogo.buildscape.client.model.BuildersHatModel::createBodyLayer);
+        }
+
+        @SubscribeEvent
+        public static void registerLayers(net.minecraftforge.client.event.EntityRenderersEvent.AddLayers event) {
+            String[] skins = {"default", "slim"};
+            for (String skinName : skins) {
+                net.minecraft.client.renderer.entity.player.PlayerRenderer renderer = event.getSkin(skinName);
+                if (renderer != null) {
+                    renderer.addLayer(new com.kingodogo.buildscape.client.renderer.layer.CosmeticLayer(renderer, event.getEntityModels()));
+                }
+            }
+        }
+    }
 }

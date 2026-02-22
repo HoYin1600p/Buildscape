@@ -80,7 +80,7 @@ public class CosmeticAuthManager {
                 return CompletableFuture.completedFuture(null);
             }
 
-            BuildScape.getLogger().info("CosmeticAuthManager: Starting authentication for UUID: " + uuid);
+            BuildScape.getLogger().info("CosmeticAuthManager: Starting authentication...");
 
             // Call the secure API
             return SupportersApiClient.getInstance()

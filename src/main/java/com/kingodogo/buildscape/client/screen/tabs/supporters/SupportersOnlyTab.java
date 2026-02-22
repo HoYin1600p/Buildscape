@@ -15,10 +15,7 @@ import java.util.Set;
 import java.util.UUID;
 
 public class SupportersOnlyTab extends AbstractConfigTab {
-    private static final Set<UUID> FULL_ACCESS_UUIDS = Set.of(
-        UUID.fromString("3f97920a-de17-4e52-9770-a4183ddf2267"),
-        UUID.fromString("7145ec43-712f-45ef-83aa-b259b8a8f184")
-    );
+    // Full access is now determined by the API based on admin/owner role in the database
     
     private CosmeticsDisplayPanel panel1;
     private PlayerAvatarPanel panel5;
@@ -94,22 +91,50 @@ public class SupportersOnlyTab extends AbstractConfigTab {
         CosmeticData cachedCosmetics = apiCache.getCachedCosmetics(playerUuid);
         if (cachedCosmetics != null) {
             updateCosmeticsData(cachedCosmetics);
-        } else {
-            loadDefaultCosmetics();
+            return; // Use cached data (preloaded) and skip redundant API call
         }
         
+        loadDefaultCosmetics();
+        
+        // precise fallback logic: try secure authenticate first, then legacy
+        String uuidStr = playerUuid.toString();
+        try {
+            String accessToken = mc.getUser().getAccessToken();
+            if (accessToken != null && !accessToken.isEmpty()) {
+                apiClient.authenticate(uuidStr, accessToken)
+                    .thenAccept(response -> {
+                        mc.execute(() -> {
+                            if (response != null && !response.isError()) {
+                                CosmeticData data = response.toCosmeticData();
+                                apiCache.cacheCosmetics(playerUuid, data);
+                                updateCosmeticsData(data);
+                            } else {
+                                BuildScape.getLogger().error("Failed to load cosmetics via auth: " + (response != null ? response.getError() : "null"));
+                            }
+                        });
+                    })
+                    .exceptionally(t -> {
+                        mc.execute(() -> BuildScape.getLogger().error("Error loading cosmetics: " + t.getMessage()));
+                        return null;
+                    });
+                 return;
+            }
+        } catch (Exception e) {
+            // Ignore access token errors
+        }
+
+        // Legacy fallback if no token
         apiClient.getCosmetics(playerUuid)
             .thenAccept(cosmetics -> {
-                if (cosmetics != null) {
-                    apiCache.cacheCosmetics(playerUuid, cosmetics);
-                    updateCosmeticsData(cosmetics);
-                } else {
-                    loadDefaultCosmetics();
-                }
+                mc.execute(() -> {
+                    if (cosmetics != null) {
+                        apiCache.cacheCosmetics(playerUuid, cosmetics);
+                        updateCosmeticsData(cosmetics);
+                    }
+                });
             })
             .exceptionally(throwable -> {
-                BuildScape.getLogger().error("Failed to load cosmetics: " + throwable.getMessage());
-                loadDefaultCosmetics();
+                mc.execute(() -> BuildScape.getLogger().error("Failed to load cosmetics: " + throwable.getMessage()));
                 return null;
             });
     }
@@ -128,17 +153,8 @@ public class SupportersOnlyTab extends AbstractConfigTab {
             currentPlayerUuid = mc.player.getUUID();
         }
 
-        Set<String> defaultUnlocked;
-        if (hasFullAccess(currentPlayerUuid)) {
-            defaultUnlocked = new java.util.HashSet<>(allRegisteredCosmetics);
-            BuildScape.getLogger().info("Full-access UUID detected - unlocking all " + allRegisteredCosmetics.size() + " cosmetics");
-        } else if (playerUsername != null && playerUsername.equalsIgnoreCase("Dev")) {
-            defaultUnlocked = new java.util.HashSet<>(allRegisteredCosmetics);
-            BuildScape.getLogger().info("Dev access granted - unlocking all " + allRegisteredCosmetics.size() + " cosmetics");
-        } else {
-            defaultUnlocked = cosmeticManager.getUnlockedCosmetics(playerUsername);
-        }
-        
+        Set<String> defaultUnlocked = cosmeticManager.getUnlockedCosmetics(playerUsername);
+
         state.setUnlockedCosmetics(defaultUnlocked);
 
         if (panel1 != null) {
@@ -159,13 +175,13 @@ public class SupportersOnlyTab extends AbstractConfigTab {
         }
 
         Set<String> unlocked = new java.util.HashSet<>(cosmetics.getUnlocked() != null ? cosmetics.getUnlocked() : new ArrayList<>());
-
-        if (hasFullAccess(currentPlayerUuid)) {
+        
+        // Ensure default cosmetics are ALWAYS unlocked
+        unlocked.addAll(cosmeticManager.getDefaultCosmetics());
+        
+        // If admin, unlock EVERYTHING
+        if (cosmetics.isAdmin()) {
             unlocked.addAll(allRegisteredCosmetics);
-            BuildScape.getLogger().debug("Full-access UUID detected - unlocking all cosmetics");
-        } else if (playerUsername != null && playerUsername.equalsIgnoreCase("Dev")) {
-            unlocked.addAll(allRegisteredCosmetics);
-            BuildScape.getLogger().debug("Dev access - unlocking all cosmetics");
         }
         
         state.setUnlockedCosmetics(unlocked);
@@ -194,9 +210,7 @@ public class SupportersOnlyTab extends AbstractConfigTab {
         }
     }
     
-    private boolean hasFullAccess(UUID uuid) {
-        return uuid != null && FULL_ACCESS_UUIDS.contains(uuid);
-    }
+    // hasFullAccess removed - admin access is now handled by the API based on database role
     
     @Override
     public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {

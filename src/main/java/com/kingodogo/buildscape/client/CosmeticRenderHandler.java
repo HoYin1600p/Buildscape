@@ -49,14 +49,11 @@ public class CosmeticRenderHandler {
         return renderCosmeticsOnly;
     }
 
-    // Cache for builders hat model part to avoid recreating it every frame
-    public static net.minecraft.client.model.geom.ModelPart buildersHatModelPart = null;
-
     /**
      * Render cosmetics as overlay on top of vanilla armor after player rendering.
      * This creates a separate layer that renders on top of everything.
      */
-    @SubscribeEvent
+    // @SubscribeEvent
     public static void onRenderPlayerPost(RenderLivingEvent.Post<? extends LivingEntity, ?> event) {
         if (!(event.getEntity() instanceof AbstractClientPlayer player)) {
             return;
@@ -92,7 +89,7 @@ public class CosmeticRenderHandler {
      * If "cosmetics only" mode, hide vanilla armor.
      * Otherwise, keep vanilla armor and render cosmetics as overlay in Post.
      */
-    @SubscribeEvent
+    // @SubscribeEvent
     public static void onRenderPlayerPre(RenderLivingEvent.Pre<? extends LivingEntity, ?> event) {
         if (!(event.getEntity() instanceof AbstractClientPlayer player)) {
             return;
@@ -181,8 +178,7 @@ public class CosmeticRenderHandler {
                     && metadata.type() == com.kingodogo.buildscape.cosmetics.CosmeticManager.CosmeticType.HEAD) {
                 if (entry.getKey() == 0) { // Slot 0 is head
                     customHeadCosmetic = cosmeticId;
-                    // CRITICAL: Clear head slot IMMEDIATELY to prevent any helmet from rendering
-                    setItemSlotSilent(player, EquipmentSlot.HEAD, ItemStack.EMPTY);
+                    // Overlay mode: Do NOT clear the head slot. Let vanilla helmet render.
                     break; // Found custom head cosmetic, exit early
                 }
             }
@@ -231,13 +227,6 @@ public class CosmeticRenderHandler {
             com.mojang.blaze3d.systems.RenderSystem.defaultBlendFunc();
 
             playerRenderer.render(player, player.getYRot(), partialTick, poseStack, bufferSource, packedLight);
-
-            // Render custom head cosmetics after player render
-            if (customHeadCosmetic != null) {
-                com.kingodogo.buildscape.BuildScape.getLogger()
-                        .debug("Rendering custom head cosmetic: " + customHeadCosmetic);
-                renderCustomHeadCosmetic(player, customHeadCosmetic, poseStack, bufferSource, packedLight, partialTick);
-            }
 
             bufferSource.endBatch();
             poseStack.popPose();
@@ -309,89 +298,27 @@ public class CosmeticRenderHandler {
         }
     }
 
-    public static void initBuildersHatModel() {
-        if (buildersHatModelPart != null) return;
-
-        try {
-            // First try to bake the registered layer
-            try {
-                Minecraft mc = Minecraft.getInstance();
-                buildersHatModelPart = mc.getEntityModels().bakeLayer(com.kingodogo.buildscape.client.model.BuildersHatModel.LAYER_LOCATION);
-                if (buildersHatModelPart != null) {
-                    com.kingodogo.buildscape.BuildScape.getLogger().info("Successfully baked builders hat model from layer location");
-                    return;
-                }
-            } catch (Exception e) {
-                // Fallback to manual creation
-            }
-
-            // Manual creation as fallback
-            net.minecraft.client.model.geom.builders.MeshDefinition meshdefinition = new net.minecraft.client.model.geom.builders.MeshDefinition();
-            net.minecraft.client.model.geom.builders.PartDefinition partdefinition = meshdefinition.getRoot();
-
-            net.minecraft.client.model.geom.builders.PartDefinition Head = partdefinition.addOrReplaceChild("Head",
-                    net.minecraft.client.model.geom.builders.CubeListBuilder.create(),
-                    net.minecraft.client.model.geom.PartPose.offset(0.0F, 0.0F, 0.0F));
-
-            Head.addOrReplaceChild("bone",
-                    net.minecraft.client.model.geom.builders.CubeListBuilder.create()
-                            .texOffs(0, 0).addBox(-14.0F, -5.0F, 0.0F, 11.0F, 0.0F, 16.0F,
-                                    new net.minecraft.client.model.geom.builders.CubeDeformation(0.0F))
-                            .texOffs(0, 17).addBox(-13.0F, -10.0F, 5.0F, 9.0F, 5.0F, 9.0F,
-                                    new net.minecraft.client.model.geom.builders.CubeDeformation(0.0F))
-                            .texOffs(0, 32).addBox(-10.0F, -11.0F, 4.0F, 3.0F, 6.0F, 11.0F,
-                                    new net.minecraft.client.model.geom.builders.CubeDeformation(0.0F)),
-                    net.minecraft.client.model.geom.PartPose.offset(8.5F, -1.0F, -9.75F));
-
-            net.minecraft.client.model.geom.ModelPart root = partdefinition.bake(64, 64);
-            if (root != null) {
-                buildersHatModelPart = root.getChild("Head");
-            }
-        } catch (Exception e) {
-            com.kingodogo.buildscape.BuildScape.getLogger().error("Failed to initialize builders hat model", e);
-        }
-    }
-
     private static void renderCustomHeadCosmetic(
             AbstractClientPlayer player,
+            PlayerRenderer playerRenderer,
             String cosmeticId,
             com.mojang.blaze3d.vertex.PoseStack poseStack,
             MultiBufferSource bufferSource,
             int packedLight,
             float partialTick) {
         try {
-            if (buildersHatModelPart == null) {
-                initBuildersHatModel();
-            }
-
-            if (buildersHatModelPart == null) {
-                return;
-            }
-
-            // Get texture location
-            net.minecraft.resources.ResourceLocation texture = new net.minecraft.resources.ResourceLocation(
-                    com.kingodogo.buildscape.BuildScape.MODID,
-                    "textures/cosmatics/builders_hat.png");
-
-            // Get vertex consumer for the texture
-            com.mojang.blaze3d.vertex.VertexConsumer vertexConsumer = bufferSource.getBuffer(
-                    net.minecraft.client.renderer.RenderType.entityCutoutNoCull(texture));
-
             // Position the model on the player's head
             poseStack.pushPose();
 
-            // Get player head rotation
-            float headYaw = player.getYHeadRot();
-            float headPitch = player.getXRot();
+            // Link to the head bone using the vanilla model
+            // This ensures it follows sneaking, looking, animations, etc.
+            playerRenderer.getModel().head.translateAndRotate(poseStack);
 
-            // Apply head rotation
-            poseStack.mulPose(com.mojang.math.Vector3f.YP.rotationDegrees(headYaw));
-            poseStack.mulPose(com.mojang.math.Vector3f.XP.rotationDegrees(headPitch));
+            // Ensure renderer is initialized
+            UniversalCosmeticRenderer.init(Minecraft.getInstance().getEntityModels());
 
-            // Render the model
-            buildersHatModelPart.render(poseStack, vertexConsumer, packedLight,
-                    net.minecraft.client.renderer.texture.OverlayTexture.NO_OVERLAY,
-                    1.0f, 1.0f, 1.0f, 1.0f);
+            // Universal render
+            UniversalCosmeticRenderer.renderHeadCosmetic(cosmeticId, poseStack, bufferSource, packedLight, player);
 
             poseStack.popPose();
         } catch (Exception e) {

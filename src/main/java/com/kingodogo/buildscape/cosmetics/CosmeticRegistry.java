@@ -209,14 +209,22 @@ public class CosmeticRegistry {
             // Check if it's a particle trail (use nether star as placeholder)
             if (info.type.equals("particle")) {
                 result = new ItemStack(net.minecraft.world.item.Items.NETHER_STAR);
-            } else if (info.type.equals("wings")) {
-                // For wings, try to resolve as item (usually elytra)
-                Item item = resolveToItem(cosmeticId);
-                if (item != null) {
-                    result = new ItemStack(item);
-                } else {
-                    // Placeholder for wings if item not found
-                    result = new ItemStack(net.minecraft.world.item.Items.FEATHER);
+            } else if (info.type.equals("wings") || cosmeticId.contains("/wings/")) {
+                // For wings, try to resolve using legacyId first, then as item
+                if (meta != null && meta.legacyId() != null && !meta.legacyId().isEmpty()) {
+                    Item legacyItem = resolveToItem(meta.legacyId());
+                    if (legacyItem != null) {
+                        result = new ItemStack(legacyItem);
+                    }
+                }
+                if (result == null) {
+                    Item item = resolveToItem(cosmeticId);
+                    if (item != null) {
+                        result = new ItemStack(item);
+                    } else {
+                        // Placeholder for wings if item not found
+                        result = new ItemStack(net.minecraft.world.item.Items.FEATHER);
+                    }
                 }
             } else {
                 // Try as item first

@@ -11,6 +11,7 @@ public class AuthenticateResponse {
     private List<String> defaultCosmetics;
     private List<String> unlockedCosmetics;
     private Map<String, String> selectedCosmetics;
+    private boolean isAdmin;
 
     // Error fields (when authentication fails)
     private String error;
@@ -41,6 +42,14 @@ public class AuthenticateResponse {
 
     public void setSelectedCosmetics(Map<String, String> selectedCosmetics) {
         this.selectedCosmetics = selectedCosmetics;
+    }
+
+    public boolean isAdmin() {
+        return isAdmin;
+    }
+
+    public void setAdmin(boolean admin) {
+        isAdmin = admin;
     }
 
     public String getError() {
@@ -74,6 +83,7 @@ public class AuthenticateResponse {
         data.setDefaultCosmetics(this.defaultCosmetics);
         data.setUnlockedCosmetics(this.unlockedCosmetics);
         data.setSelectedCosmetics(this.selectedCosmetics);
+        data.setAdmin(this.isAdmin);
         data.adaptFromSecureResponse();
         return data;
     }

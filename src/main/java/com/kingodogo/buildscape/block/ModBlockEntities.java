@@ -108,7 +108,8 @@ public class ModBlockEntities {
             () ->
                     BlockEntityType.Builder.of(
                             CascadeBlockEntity::new,
-                            ModBlocks.CASCADE_BLOCK.get()
+                            ModBlocks.CASCADE_BLOCK.get(),
+                            ModBlocks.CASCADE_BLOCK_NO_MIST.get()
                     ).build(null)
     );
 }

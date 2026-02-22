@@ -1,8 +1,11 @@
 package com.kingodogo.buildscape.client.screen.tabs.supporters;
 
+import com.kingodogo.buildscape.BuildScape;
+import com.kingodogo.buildscape.api.SupportersApiClient;
 import com.kingodogo.buildscape.config.CosmeticsConfig;
 import com.kingodogo.buildscape.cosmetics.CosmeticManager;
 import com.kingodogo.buildscape.cosmetics.CosmeticRegistry;
+import net.minecraft.client.Minecraft;
 
 import java.util.*;
 
@@ -15,6 +18,8 @@ public class SupportersTabState {
     public static final int SLOT_FEET = 3;
     public static final int SLOT_TRAIL = -1;
     public static final int SLOT_WINGS = -2;
+    public static final int SLOT_BACK = -3;
+    public static final int SLOT_SHOULDER = -4;
     public static final int SLOT_OTHER = -100;
     
     private String selectedCosmeticId;
@@ -79,6 +84,9 @@ public class SupportersTabState {
     }
     
     public boolean isUnlocked(String cosmeticId) {
+        if (com.kingodogo.buildscape.cosmetics.CosmeticManager.getInstance().isDefaultCosmetic(cosmeticId)) {
+            return true;
+        }
         return unlockedCosmetics.contains(cosmeticId);
     }
     
@@ -108,6 +116,9 @@ public class SupportersTabState {
         
         if (playerUuid != null) {
             CosmeticsConfig.get().equipCosmetic(playerUuid, slotIndex, cosmeticId);
+            
+            // Sync with backend API
+            syncSelectionWithBackend(slotIndex, cosmeticId);
         }
         
         if (onEquippedChanged != null) {
@@ -121,6 +132,9 @@ public class SupportersTabState {
             equippedCosmetics.remove(cosmeticId);
             if (playerUuid != null) {
                 CosmeticsConfig.get().unequipCosmetic(playerUuid, slotIndex);
+                
+                // Sync with backend API (send empty string to unequip)
+                syncSelectionWithBackend(slotIndex, "");
             }
             if (onEquippedChanged != null) {
                 onEquippedChanged.run();
@@ -132,12 +146,6 @@ public class SupportersTabState {
         if (cosmeticId == null) return;
         
         boolean isUnlocked = unlockedCosmetics.contains(cosmeticId);
-        if (!isUnlocked && playerUuid != null) {
-            net.minecraft.client.Minecraft mc = net.minecraft.client.Minecraft.getInstance();
-            if (mc.player != null && mc.player.getName().getString().equalsIgnoreCase("Dev")) {
-                isUnlocked = true;
-            }
-        }
         
         if (isUnlocked) {
             int bestSlot = getBestSlotForCosmetic(cosmeticId);
@@ -155,6 +163,10 @@ public class SupportersTabState {
         if (metadata != null) {
             if (metadata.type() == CosmeticManager.CosmeticType.WINGS) return SLOT_WINGS;
             if (metadata.type() == CosmeticManager.CosmeticType.HEAD) return SLOT_HEAD;
+            
+            // Handle future categories based on ID path
+            if (cosmeticId.contains("/back/")) return SLOT_BACK;
+            if (cosmeticId.contains("/shoulder/")) return SLOT_SHOULDER;
         }
         
         net.minecraft.world.item.ItemStack stack = registry.resolveToItemStack(cosmeticId);
@@ -203,12 +215,31 @@ public class SupportersTabState {
             Map<Integer, String> saved = CosmeticsConfig.get().getEquippedCosmetics(playerUuid);
             
             String lastEquippedId = null;
+            boolean needsConfigCleanup = false;
+
             for (Map.Entry<Integer, String> entry : saved.entrySet()) {
                 String cosmeticId = entry.getValue();
                 if (cosmeticId != null && !cosmeticId.isEmpty()) {
-                    equippedCosmeticsBySlot.put(entry.getKey(), cosmeticId);
-                    equippedCosmetics.add(cosmeticId);
-                    lastEquippedId = cosmeticId;
+                    // SECURITY & ACCESS VALIDATION: Only load and keep if player actually has access
+                    if (isUnlocked(cosmeticId)) {
+                        equippedCosmeticsBySlot.put(entry.getKey(), cosmeticId);
+                        equippedCosmetics.add(cosmeticId);
+                        lastEquippedId = cosmeticId;
+                    } else {
+                        // Player no longer has access (account change or permission revoked)
+                        // Queue for removal from the .dat file
+                        needsConfigCleanup = true;
+                    }
+                }
+            }
+
+            // If we found unauthorized cosmetics, purge them from the private storage
+            if (needsConfigCleanup) {
+                for (int slot : new java.util.HashSet<>(saved.keySet())) {
+                    String id = saved.get(slot);
+                    if (id != null && !id.isEmpty() && !isUnlocked(id)) {
+                        CosmeticsConfig.get().unequipCosmetic(playerUuid, slot);
+                    }
                 }
             }
 
@@ -260,5 +291,47 @@ public class SupportersTabState {
     
     public void setOnEquippedChanged(Runnable callback) {
         this.onEquippedChanged = callback;
+    }
+
+    /**
+     * Helper to sync a cosmetic selection to the backend.
+     */
+    private void syncSelectionWithBackend(int slotIndex, String cosmeticId) {
+        if (playerUuid == null) return;
+        
+        String type = getTypeName(slotIndex);
+        if (type == null) return;
+
+        Minecraft mc = Minecraft.getInstance();
+        String accessToken = mc.getUser().getAccessToken();
+        String uuidStr = playerUuid.toString().replace("-", "");
+
+        SupportersApiClient.getInstance()
+                .selectCosmetic(uuidStr, accessToken, cosmeticId != null ? cosmeticId : "", type)
+                .thenAccept(response -> {
+                    if (response.isSuccess()) {
+                        BuildScape.getLogger().debug("Synced cosmetic " + type + " to backend");
+                    } else {
+                        BuildScape.getLogger().warn("Failed to sync cosmetic " + type + " to backend: " + response.getError());
+                    }
+                })
+                .exceptionally(throwable -> {
+                    BuildScape.getLogger().error("Error syncing cosmetic selection", throwable);
+                    return null;
+                });
+    }
+
+    private String getTypeName(int slotIndex) {
+        return switch (slotIndex) {
+            case SLOT_HEAD -> "head";
+            case SLOT_CHEST -> "chest";
+            case SLOT_LEGS -> "legs";
+            case SLOT_FEET -> "feet";
+            case SLOT_TRAIL -> "trail";
+            case SLOT_WINGS -> "wings";
+            case SLOT_BACK -> "back";
+            case SLOT_SHOULDER -> "shoulder";
+            default -> null;
+        };
     }
 }

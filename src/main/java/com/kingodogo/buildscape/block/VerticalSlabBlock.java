@@ -97,11 +97,7 @@ public class VerticalSlabBlock extends SlabBlock implements SimpleWaterloggedBlo
         return parentBlock.defaultBlockState().canHarvestBlock(level, pos, player);
     }
 
-    @Override
-    public java.util.List<ItemStack> getDrops(BlockState state, net.minecraft.world.level.storage.loot.LootContext.Builder builder) {
-        int count = (state.getValue(TYPE) == SlabType.DOUBLE) ? 2 : 1;
-        return java.util.Collections.singletonList(new ItemStack(this, count));
-    }
+
 
     @Override
     public boolean canBeReplaced(BlockState state, BlockPlaceContext useContext) {

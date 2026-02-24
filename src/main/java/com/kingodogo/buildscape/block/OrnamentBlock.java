@@ -345,21 +345,6 @@ public class OrnamentBlock
     }
 
     @Override
-    public int getLightBlock(
-            BlockState state,
-            BlockGetter level,
-            BlockPos pos
-    ) {
-        if (
-                state.getBlock() ==
-                        com.kingodogo.buildscape.block.ModBlocks.TINTED_GLASS_ORNAMENT.get()
-        ) {
-            return 15;
-        }
-        return super.getLightBlock(state, level, pos);
-    }
-
-    @Override
     public float[] getBeaconColorMultiplier(
             BlockState state,
             LevelReader level,
@@ -370,7 +355,7 @@ public class OrnamentBlock
                 state.getBlock() ==
                         com.kingodogo.buildscape.block.ModBlocks.TINTED_GLASS_ORNAMENT.get()
         ) {
-            return null; // Tinted glass blocks the beam via opacity (getLightBlock)
+            return null; // Tinted glass won't color the beam
         }
 
         // For other ornaments, use their map color to tint the beacon beam
@@ -403,8 +388,28 @@ public class OrnamentBlock
     }
 
     @Override
-    public boolean useShapeForLightOcclusion(BlockState state) {
-        return false;
+    public int getLightBlock(BlockState state, BlockGetter level, BlockPos pos) {
+        if (state.getBlock() == com.kingodogo.buildscape.block.ModBlocks.TINTED_GLASS_ORNAMENT.get()) {
+            if (level instanceof net.minecraft.world.level.Level) {
+                try {
+                    // Check if a Beacon is what's actively checking the block's opacity.
+                    // This explicitly isolates Beacon beam checks from Grass random ticks / light engine.
+                    boolean isBeacon = StackWalker.getInstance().walk(s ->
+                            s.limit(20).anyMatch(f -> {
+                                String name = f.getClassName();
+                                return name.contains("Beacon") || name.contains("beacon");
+                            })
+                    );
+                    if (isBeacon) {
+                        return 15;
+                    }
+                } catch (Throwable ignore) {
+                    // Safe fallback
+                }
+            }
+            return 0; // Natural light completely passes through perfectly
+        }
+        return super.getLightBlock(state, level, pos);
     }
 
     @Override

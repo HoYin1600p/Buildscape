@@ -1,5 +1,6 @@
 {
   "buildscape.vertical_slab_prefix": "Vertical ",
+  "buildscape.vertical_stair_prefix": "Vertical ",
   "block.minecraft.chain": "Iron Chain",
   "item.minecraft.chain": "Iron Chain",
   "block.buildscape.amethyst_block_slab": "Amethyst Block Slab",
@@ -1881,6 +1882,8 @@
   "buildscape.config.op_only": "It Seems like Kingo Forgot to enable it for PUBLIC ( Operator's Only ) :P",
   "block.buildscape.vertical_slab": "Vertical Slab",
   "block.buildscape.vertical_slab_prefix": "Vertical ",
+  "block.buildscape.vertical_stair": "Vertical Stair",
+  "block.buildscape.vertical_stair_prefix": "Vertical ",
     "block.buildscape.white_redstone_lamp":  "White Redstone Lamp",
     "item.buildscape.white_redstone_lamp":  "White Redstone Lamp",
     "block.buildscape.orange_redstone_lamp":  "Orange Redstone Lamp",

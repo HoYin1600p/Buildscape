@@ -457,6 +457,16 @@ public class DynamicDataPack implements PackResources {
             // 2. Item Model
             JsonObject itemModel = new JsonObject();
             itemModel.addProperty("parent", slabModel);
+            
+            // Add vertical display settings
+            JsonObject display = new JsonObject();
+            JsonObject gui = new JsonObject();
+            gui.add("rotation", createJsonArray(30, 45, 90)); // Standing at 45 deg view
+            gui.add("translation", createJsonArray(0, 0, 0));
+            gui.add("scale", createJsonArray(0.625, 0.625, 0.625));
+            display.add("gui", gui);
+            itemModel.add("display", display);
+
             cachedResources.put(
                 PacketPath("assets", verticalId.getNamespace(), "models/item", path + ".json"),
                 GSON.toJson(itemModel)
@@ -500,6 +510,16 @@ public class DynamicDataPack implements PackResources {
 
             JsonObject itemModel = new JsonObject();
             itemModel.addProperty("parent", stairModel);
+            
+            // Add vertical display settings
+            JsonObject display = new JsonObject();
+            JsonObject gui = new JsonObject();
+            gui.add("rotation", createJsonArray(30, 45, 90)); // Standing at 45 deg view
+            gui.add("translation", createJsonArray(0, 0, 0));
+            gui.add("scale", createJsonArray(0.625, 0.625, 0.625));
+            display.add("gui", gui);
+            itemModel.add("display", display);
+
             cachedResources.put(
                 PacketPath("assets", verticalId.getNamespace(), "models/item", path + ".json"),
                 GSON.toJson(itemModel)
@@ -518,6 +538,12 @@ public class DynamicDataPack implements PackResources {
         if (x != 0) obj.addProperty("x", x);
         if (y != 0) obj.addProperty("y", y);
         return obj;
+    }
+
+    private JsonArray createJsonArray(Number... values) {
+        JsonArray array = new JsonArray();
+        for (Number value : values) array.add(GSON.toJsonTree(value));
+        return array;
     }
 
     private String PacketPath(String root, String namespace, String category, String path) {

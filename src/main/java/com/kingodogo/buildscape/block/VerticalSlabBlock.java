@@ -55,6 +55,11 @@ public class VerticalSlabBlock extends SlabBlock implements SimpleWaterloggedBlo
     }
 
     @Override
+    public boolean useShapeForLightOcclusion(BlockState state) {
+        return true;
+    }
+
+    @Override
     public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         if (state.getValue(TYPE) == SlabType.DOUBLE) {
             return Shapes.block();
@@ -112,10 +117,7 @@ public class VerticalSlabBlock extends SlabBlock implements SimpleWaterloggedBlo
                 // Allow replacing (merging) only if clicking on the correct face
                 if (facing == Direction.NORTH) {
                     // North slab occupies 0-8 Z. Empty space is 8-16 Z (South).
-                    // Merging requires clicking SOUTH face of the block or into the SOUTH half.
-                    // But canBeReplaced is called before placement state calc.
-                    // Actually, we should check if the click is on the face that 'fills' the block.
-                    return direction == Direction.SOUTH; // Clicking South face merges it
+                    return direction == Direction.SOUTH;
                 } else if (facing == Direction.SOUTH) {
                     return direction == Direction.NORTH;
                 } else if (facing == Direction.WEST) {

@@ -7,6 +7,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.kingodogo.buildscape.BuildScape;
 import com.kingodogo.buildscape.block.ModVerticalSlabs;
+import com.kingodogo.buildscape.block.ModVerticalStairs;
 import com.kingodogo.buildscape.block.VerticalSlabBlock;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
@@ -52,15 +53,19 @@ public class DynamicDataPack implements PackResources {
             // Iterating the Forge registry during early pack loading (AddPackFindersEvent)
             // causes a native access violation crash because the registry isn't fully initialized.
             Map<Block, Block> slabMap = ModVerticalSlabs.VERTICAL_SLABS;
+            Map<Block, Block> stairMap = ModVerticalStairs.VERTICAL_STAIRS;
             
-            if (slabMap == null || slabMap.isEmpty()) {
-                // Block registration hasn't happened yet. Don't cache empty results
-                // so we can try again when resources are actually needed (after registration).
-                BuildScape.LOGGER.info("Vertical slab map not populated yet. Deferring content generation.");
+            if ((slabMap == null || slabMap.isEmpty()) && (stairMap == null || stairMap.isEmpty())) {
+                BuildScape.LOGGER.info("Vertical slab/stair maps not populated yet. Deferring content generation.");
                 return;
             }
             
-            BuildScape.LOGGER.info("Found " + slabMap.size() + " Vertical Slabs to generate resources for.");
+            if (slabMap != null && !slabMap.isEmpty()) {
+                BuildScape.LOGGER.info("Found " + slabMap.size() + " Vertical Slabs to generate resources for.");
+            }
+            if (stairMap != null && !stairMap.isEmpty()) {
+                BuildScape.LOGGER.info("Found " + stairMap.size() + " Vertical Stairs to generate resources for.");
+            }
 
         // Generate Vertical Slab Logic
         slabMap.forEach((parentSlab, verticalSlab) -> {
@@ -170,6 +175,90 @@ public class DynamicDataPack implements PackResources {
                 GSON.toJson(rCraft)
             );
         });
+
+        stairMap.forEach((parentStair, verticalStair) -> {
+            ResourceLocation verticalId = verticalStair.getRegistryName();
+            ResourceLocation parentId = parentStair.getRegistryName();
+            if (verticalId == null || parentId == null) return;
+
+            String path = verticalId.getPath();
+
+            // 1. Loot Tables
+            JsonObject lootTable = new JsonObject();
+            lootTable.addProperty("type", "minecraft:block");
+            JsonArray pools = new JsonArray();
+            JsonObject pool = new JsonObject();
+            pool.addProperty("rolls", 1);
+            JsonArray entries = new JsonArray();
+            JsonObject entry = new JsonObject();
+            entry.addProperty("type", "minecraft:item");
+            entry.addProperty("name", verticalId.toString());
+
+            JsonArray functions = new JsonArray();
+            JsonObject funcExplosion = new JsonObject();
+            funcExplosion.addProperty("function", "minecraft:explosion_decay");
+            functions.add(funcExplosion);
+            entry.add("functions", functions);
+
+            entries.add(entry);
+            pool.add("entries", entries);
+            pools.add(pool);
+            lootTable.add("pools", pools);
+
+            String lootPath = PacketPath("data", verticalId.getNamespace(), "loot_tables/blocks", verticalId.getPath() + ".json");
+            cachedResources.put(lootPath, GSON.toJson(lootTable));
+
+            // 2. Recipe: Stonecutting (Stair -> Vertical)
+            JsonObject r1 = new JsonObject();
+            r1.addProperty("type", "minecraft:stonecutting");
+            JsonObject r1Ing = new JsonObject();
+            r1Ing.addProperty("item", parentId.toString());
+            r1.add("ingredient", r1Ing);
+            r1.addProperty("result", verticalId.toString());
+            r1.addProperty("count", 1);
+            cachedResources.put(
+                PacketPath("data", BuildScape.MODID, "recipes", path + "_from_stair_stonecutting.json"),
+                GSON.toJson(r1)
+            );
+
+            // 3. Recipe: Stonecutting (Vertical -> Stair)
+            JsonObject r2 = new JsonObject();
+            r2.addProperty("type", "minecraft:stonecutting");
+            JsonObject r2Ing = new JsonObject();
+            r2Ing.addProperty("item", verticalId.toString());
+            r2.add("ingredient", r2Ing);
+            r2.addProperty("result", parentId.toString());
+            r2.addProperty("count", 1);
+            cachedResources.put(
+                PacketPath("data", BuildScape.MODID, "recipes", parentId.getPath() + "_from_vertical_stonecutting.json"),
+                GSON.toJson(r2)
+            );
+
+            // 4. Recipe: Crafting (Shaped vertical)
+            JsonObject rCraft = new JsonObject();
+            rCraft.addProperty("type", "minecraft:crafting_shaped");
+            JsonArray patternArr = new JsonArray();
+            patternArr.add("S");
+            patternArr.add("S");
+            patternArr.add("S");
+            rCraft.add("pattern", patternArr);
+
+            JsonObject keyObj = new JsonObject();
+            JsonObject keyS = new JsonObject();
+            keyS.addProperty("item", parentId.toString());
+            keyObj.add("S", keyS);
+            rCraft.add("key", keyObj);
+
+            JsonObject resultObj = new JsonObject();
+            resultObj.addProperty("item", verticalId.toString());
+            resultObj.addProperty("count", 3);
+            rCraft.add("result", resultObj);
+
+            cachedResources.put(
+                PacketPath("data", BuildScape.MODID, "recipes", path + "_crafting.json"),
+                GSON.toJson(rCraft)
+            );
+        });
         
         // Generate Tags Aggregation
         Map<String, Set<String>> blockTags = new HashMap<>(); 
@@ -222,6 +311,50 @@ public class DynamicDataPack implements PackResources {
             
             itemTags.computeIfAbsent("minecraft:slabs", k -> new HashSet<>()).add(id.toString());
             itemTags.computeIfAbsent(BuildScape.MODID + ":vertical_slabs", k -> new HashSet<>()).add(id.toString());
+        });
+
+        stairMap.forEach((parent, vertical) -> {
+            ResourceLocation id = vertical.getRegistryName();
+            if (id == null) return;
+
+            String logPath = parent.getRegistryName().getPath().toLowerCase();
+            net.minecraft.world.level.material.Material mat = parent.defaultBlockState().getMaterial();
+
+            String toolTag = "minecraft:mineable/pickaxe";
+            if (mat == net.minecraft.world.level.material.Material.WOOD ||
+                logPath.contains("wood") || logPath.contains("plank") || logPath.contains("log") ||
+                logPath.contains("bamboo") || logPath.contains("mangrove") || logPath.contains("fence") || logPath.contains("gate")) {
+                toolTag = "minecraft:mineable/axe";
+            } else if (mat == net.minecraft.world.level.material.Material.DIRT ||
+                       mat == net.minecraft.world.level.material.Material.SAND ||
+                       mat == net.minecraft.world.level.material.Material.CLAY ||
+                       mat == net.minecraft.world.level.material.Material.GRASS ||
+                       logPath.contains("dirt") || logPath.contains("sand") || logPath.contains("mud") || logPath.contains("grass") ||
+                       logPath.contains("podzol") || logPath.contains("mycelium")) {
+                toolTag = "minecraft:mineable/shovel";
+            } else if (logPath.contains("glass") || logPath.contains("pane") || logPath.contains("glowstone") || logPath.contains("leaves")) {
+                toolTag = null;
+            }
+
+            if (toolTag != null) {
+                blockTags.computeIfAbsent(toolTag, k -> new HashSet<>()).add(id.toString());
+            }
+
+            if ("minecraft:mineable/pickaxe".equals(toolTag)) {
+                if (logPath.contains("copper") || logPath.contains("steel") || logPath.contains("iron") || logPath.contains("metal") || logPath.contains("gold")) {
+                    blockTags.computeIfAbsent("minecraft:needs_iron_tool", k -> new HashSet<>()).add(id.toString());
+                } else if (logPath.contains("diamond") || logPath.contains("obsidian") || logPath.contains("netherite")) {
+                    blockTags.computeIfAbsent("minecraft:needs_diamond_tool", k -> new HashSet<>()).add(id.toString());
+                } else if (!logPath.contains("glass")) {
+                    blockTags.computeIfAbsent("minecraft:needs_stone_tool", k -> new HashSet<>()).add(id.toString());
+                }
+            }
+
+            blockTags.computeIfAbsent("minecraft:stairs", k -> new HashSet<>()).add(id.toString());
+            blockTags.computeIfAbsent(BuildScape.MODID + ":vertical_stairs", k -> new HashSet<>()).add(id.toString());
+
+            itemTags.computeIfAbsent("minecraft:stairs", k -> new HashSet<>()).add(id.toString());
+            itemTags.computeIfAbsent(BuildScape.MODID + ":vertical_stairs", k -> new HashSet<>()).add(id.toString());
         });
         
         // Write Block Tags
@@ -293,17 +426,17 @@ public class DynamicDataPack implements PackResources {
             // Variants for type=bottom and type=top (treated same)
             String[] types = {"bottom", "top"};
             for (String type : types) {
-                variants.add("facing=north,type=" + type + ",waterlogged=false", createVariant(slabModel, 90, 0));
-                variants.add("facing=north,type=" + type + ",waterlogged=true", createVariant(slabModel, 90, 0));
+                variants.add("facing=north,type=" + type + ",waterlogged=false", createVariant(slabModel, 90, 180));
+                variants.add("facing=north,type=" + type + ",waterlogged=true", createVariant(slabModel, 90, 180));
                 
-                variants.add("facing=south,type=" + type + ",waterlogged=false", createVariant(slabModel, 270, 0));
-                variants.add("facing=south,type=" + type + ",waterlogged=true", createVariant(slabModel, 270, 0));
+                variants.add("facing=south,type=" + type + ",waterlogged=false", createVariant(slabModel, 90, 0));
+                variants.add("facing=south,type=" + type + ",waterlogged=true", createVariant(slabModel, 90, 0));
                 
-                variants.add("facing=east,type=" + type + ",waterlogged=false", createVariant(slabModel, 90, 90));
-                variants.add("facing=east,type=" + type + ",waterlogged=true", createVariant(slabModel, 90, 90));
+                variants.add("facing=east,type=" + type + ",waterlogged=false", createVariant(slabModel, 90, 270));
+                variants.add("facing=east,type=" + type + ",waterlogged=true", createVariant(slabModel, 90, 270));
                 
-                variants.add("facing=west,type=" + type + ",waterlogged=false", createVariant(slabModel, 90, 270));
-                variants.add("facing=west,type=" + type + ",waterlogged=true", createVariant(slabModel, 90, 270));
+                variants.add("facing=west,type=" + type + ",waterlogged=false", createVariant(slabModel, 90, 90));
+                variants.add("facing=west,type=" + type + ",waterlogged=true", createVariant(slabModel, 90, 90));
             }
 
             // Double state
@@ -324,6 +457,49 @@ public class DynamicDataPack implements PackResources {
             // 2. Item Model
             JsonObject itemModel = new JsonObject();
             itemModel.addProperty("parent", slabModel);
+            cachedResources.put(
+                PacketPath("assets", verticalId.getNamespace(), "models/item", path + ".json"),
+                GSON.toJson(itemModel)
+            );
+        });
+
+        stairMap.forEach((parentStair, verticalStair) -> {
+            ResourceLocation verticalId = verticalStair.getRegistryName();
+            ResourceLocation parentId = parentStair.getRegistryName();
+            if (verticalId == null || parentId == null) return;
+
+            String path = verticalId.getPath();
+            String parentPath = parentId.getPath();
+            String parentNamespace = parentId.getNamespace();
+
+            JsonObject blockstate = new JsonObject();
+            JsonObject variants = new JsonObject();
+
+            String stairModel = parentNamespace + ":block/" + parentPath;
+
+            // Vertical stairs only use facing (4 directions) + waterlogged.
+            // Rotate the original stair model upright and around for each direction.
+            // Rotate upright (x:90) and orient (y:[0,90,180,270])
+            variants.add("facing=north,waterlogged=false", createVariant(stairModel, 90, 180));
+            variants.add("facing=north,waterlogged=true", createVariant(stairModel, 90, 180));
+
+            variants.add("facing=south,waterlogged=false", createVariant(stairModel, 90, 0));
+            variants.add("facing=south,waterlogged=true", createVariant(stairModel, 90, 0));
+
+            variants.add("facing=east,waterlogged=false", createVariant(stairModel, 90, 270));
+            variants.add("facing=east,waterlogged=true", createVariant(stairModel, 90, 270));
+
+            variants.add("facing=west,waterlogged=false", createVariant(stairModel, 90, 90));
+            variants.add("facing=west,waterlogged=true", createVariant(stairModel, 90, 90));
+
+            blockstate.add("variants", variants);
+            cachedResources.put(
+                PacketPath("assets", verticalId.getNamespace(), "blockstates", path + ".json"),
+                GSON.toJson(blockstate)
+            );
+
+            JsonObject itemModel = new JsonObject();
+            itemModel.addProperty("parent", stairModel);
             cachedResources.put(
                 PacketPath("assets", verticalId.getNamespace(), "models/item", path + ".json"),
                 GSON.toJson(itemModel)

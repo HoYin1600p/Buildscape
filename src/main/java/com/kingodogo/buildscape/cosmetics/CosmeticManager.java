@@ -72,6 +72,14 @@ public class CosmeticManager {
         // Register particle wings (redeemable)
         registerParticleWings("buildscape:cosmatics/wings/snowflake_wings", "Snowflake Wings",
                 "Elegant wings made of swirling snowflakes", 2, "snowflake");
+        registerParticleWings("buildscape:cosmatics/wings/heart_wings", "Heart Wings",
+                "Beautiful heart-shaped wings that flutter gracefully", 2, "heart");
+        registerParticleWings("buildscape:cosmatics/wings/sparkle_wings", "Sparkle Wings",
+                "Magical glittering wings that shimmer with sparkles", 2, "sparkle");
+        registerParticleWings("buildscape:cosmatics/wings/cake_wings", "Cake Wings",
+                "Sweet layered wings that look deliciously fluffy", 2, "cake");
+        registerParticleWings("buildscape:cosmatics/wings/spore_wings", "Spore Wings",
+                "Organic wispy wings that release glowing spores", 2, "spore");
 
         // Register block cosmetics
 
@@ -126,10 +134,9 @@ public class CosmeticManager {
         CosmeticMetadata meta = cosmeticMetadata.get(cosmeticId);
         if (meta == null) return false;
 
-        // Particle wings with snowflake shape support color
+        // Particle wings - all shapes support color
         if (meta.type() == CosmeticType.PARTICLE_WINGS) {
-            String shape = getParticleShape(cosmeticId);
-            return shape.equals("snowflake");
+            return true;
         }
 
         // For particle trails, only specific shapes support color

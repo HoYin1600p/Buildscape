@@ -10,7 +10,8 @@
     "FenceBlockMixin",
     "ChainBlockMixin",
     "LivingEntityMixin",
-    "EntityMixin"
+    "EntityMixin",
+    "VineBlockMixin"
   ],
   "client": [
     "PauseScreenMixin"

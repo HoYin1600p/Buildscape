@@ -2547,6 +2547,38 @@ public class ModBlocks {
                                 .sound(net.minecraft.world.level.block.SoundType.STONE)
                                 .noOcclusion()));
 
+        public static final RegistryObject<Block> ASHENKING_DIAMOND_PILLAR = BLOCKS.register(
+                "ashenking_diamond_pillar",
+                () -> new AshenKingPillarBlock(
+                        BlockBehaviour.Properties.of(Material.STONE, MaterialColor.DIAMOND)
+                                .strength(3.0f, 6.0f)
+                                .sound(net.minecraft.world.level.block.SoundType.STONE)
+                                .noOcclusion()));
+
+        public static final RegistryObject<Block> ASHENKING_GOLD_PILLAR = BLOCKS.register(
+                "ashenking_gold_pillar",
+                () -> new AshenKingPillarBlock(
+                        BlockBehaviour.Properties.of(Material.STONE, MaterialColor.GOLD)
+                                .strength(3.0f, 6.0f)
+                                .sound(net.minecraft.world.level.block.SoundType.STONE)
+                                .noOcclusion()));
+
+        public static final RegistryObject<Block> ASHENKING_EMERALD_PILLAR = BLOCKS.register(
+                "ashenking_emerald_pillar",
+                () -> new AshenKingPillarBlock(
+                        BlockBehaviour.Properties.of(Material.STONE, MaterialColor.EMERALD)
+                                .strength(3.0f, 6.0f)
+                                .sound(net.minecraft.world.level.block.SoundType.STONE)
+                                .noOcclusion()));
+
+        public static final RegistryObject<Block> ASHENKING_NETHERITE_PILLAR = BLOCKS.register(
+                "ashenking_netherite_pillar",
+                () -> new AshenKingPillarBlock(
+                        BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_BLACK)
+                                .strength(5.0f, 6.0f)
+                                .sound(net.minecraft.world.level.block.SoundType.STONE)
+                                .noOcclusion()));
+
         public static final RegistryObject<Block> DECORATED_POT = BLOCKS.register(
                 "decorated_pot",
                 () -> new DecoratedPotBlock());

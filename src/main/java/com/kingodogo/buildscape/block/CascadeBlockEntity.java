@@ -37,6 +37,16 @@ public class CascadeBlockEntity extends BlockEntity {
     }
 
     public static void clientTick(Level level, BlockPos pos, BlockState state, CascadeBlockEntity be) {
+        // Respect Minecraft's particle settings for performance
+        net.minecraft.client.ParticleStatus particleSetting = Minecraft.getInstance().options.particles;
+        if (particleSetting == net.minecraft.client.ParticleStatus.MINIMAL) {
+            // Minimal: only spawn 1 particle every 10 ticks
+            if (level.getGameTime() % 10 != 0) return;
+        } else if (particleSetting == net.minecraft.client.ParticleStatus.DECREASED) {
+            // Decreased: skip every other tick
+            if (level.getGameTime() % 2 != 0) return;
+        }
+
         // If local player holds cascade block in off-hand, suppress particles in their chunk
         Player player = Minecraft.getInstance().player;
         if (player != null) {
@@ -53,7 +63,16 @@ public class CascadeBlockEntity extends BlockEntity {
             }
         }
 
-        int count = 5 + RANDOM.nextInt(3);
+        int baseCount = 5 + RANDOM.nextInt(3);
+        int count;
+        if (particleSetting == net.minecraft.client.ParticleStatus.MINIMAL) {
+            count = 1;
+        } else if (particleSetting == net.minecraft.client.ParticleStatus.DECREASED) {
+            count = Math.max(1, baseCount / 2);
+        } else {
+            count = baseCount;
+        }
+
         for (int i = 0; i < count; i++) {
             double x = (double) pos.getX() + 0.5 + (RANDOM.nextDouble() - 0.5) * 2.0;
             double y = (double) pos.getY() + 1.75 + (RANDOM.nextDouble() - 0.5) * 0.1;

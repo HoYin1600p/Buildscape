@@ -4,7 +4,6 @@ import com.kingodogo.buildscape.cosmetics.CosHead;
 import com.kingodogo.buildscape.cosmetics.CosChest;
 import com.kingodogo.buildscape.cosmetics.CosLegs;
 import com.kingodogo.buildscape.cosmetics.CosFeet;
-import com.kingodogo.buildscape.cosmetics.CosWings;
 import com.kingodogo.buildscape.cosmetics.CosmeticManager;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -28,7 +27,6 @@ public class UniversalCosmeticRenderer {
     private static final Map<String, CosChest<?>> bakedChestModels = new HashMap<>();
     private static final Map<String, CosLegs<?>> bakedLegsModels = new HashMap<>();
     private static final Map<String, CosFeet<?>> bakedFeetModels = new HashMap<>();
-    private static final CosWings WINGS_MODEL = new CosWings();
 
     private static net.minecraft.client.model.geom.ModelPart playerHeadPart = null;
     private static net.minecraft.client.model.geom.ModelPart playerHatPart = null;
@@ -175,21 +173,5 @@ public class UniversalCosmeticRenderer {
         model.renderToBuffer(poseStack, vertexConsumer, packedLight, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
 
         poseStack.popPose();
-    }
-
-    public static <T extends Entity> void renderWingsCosmetic(
-            String id,
-            PoseStack poseStack,
-            MultiBufferSource buffer,
-            int packedLight,
-            T entity,
-            float limbSwing,
-            float limbSwingAmount,
-            float ageInTicks) {
-
-        if (!(entity instanceof net.minecraft.world.entity.player.Player player)) return;
-
-        // Render wings
-        WINGS_MODEL.render(poseStack, buffer, packedLight, player, limbSwing, limbSwingAmount, ageInTicks);
     }
 }

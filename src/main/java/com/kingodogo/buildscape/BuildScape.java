@@ -43,10 +43,18 @@ public class BuildScape {
                     if (com.kingodogo.buildscape.block.ModVerticalSlabs.VERTICAL_SLABS.containsKey(block)) {
                         items.add(new ItemStack(com.kingodogo.buildscape.block.ModVerticalSlabs.VERTICAL_SLABS.get(block)));
                     }
+                    if (com.kingodogo.buildscape.block.ModVerticalStairs.VERTICAL_STAIRS.containsKey(block)) {
+                        items.add(new ItemStack(com.kingodogo.buildscape.block.ModVerticalStairs.VERTICAL_STAIRS.get(block)));
+                    }
                 }
             }
 
             for (net.minecraft.world.item.Item item : com.kingodogo.buildscape.block.ModVerticalSlabs.DYNAMIC_ITEMS) {
+                if (!containsItem(items, item)) {
+                    items.add(new ItemStack(item));
+                }
+            }
+            for (net.minecraft.world.item.Item item : com.kingodogo.buildscape.block.ModVerticalStairs.DYNAMIC_ITEMS) {
                 if (!containsItem(items, item)) {
                     items.add(new ItemStack(item));
                 }
@@ -1288,6 +1296,7 @@ public class BuildScape {
         com.kingodogo.buildscape.recipe.ModRecipeSerializers.RECIPE_SERIALIZERS.register(
                 modEventBus);
         modEventBus.register(com.kingodogo.buildscape.block.ModVerticalSlabs.class);
+        modEventBus.register(com.kingodogo.buildscape.block.ModVerticalStairs.class);
 
 
         com.kingodogo.buildscape.worldgen.ModBlockStateProviderTypes.BLOCK_STATE_PROVIDER_TYPES.register(
@@ -4127,6 +4136,41 @@ public class BuildScape {
                                             sprites
                                     )
                     );
+
+            net.minecraft.client.Minecraft.getInstance().particleEngine.register(
+                    com.kingodogo.buildscape.particle.ModParticles.WING_SNOWFLAKE.get(),
+                    sprites -> {
+                        com.kingodogo.buildscape.client.renderer.WingParticleAssets.registerSprites("snowflake", sprites);
+                        return null; // No actual particle class needed
+                    });
+
+            net.minecraft.client.Minecraft.getInstance().particleEngine.register(
+                    com.kingodogo.buildscape.particle.ModParticles.WING_HEART.get(),
+                    sprites -> {
+                        com.kingodogo.buildscape.client.renderer.WingParticleAssets.registerSprites("heart", sprites);
+                        return null;
+                    });
+
+            net.minecraft.client.Minecraft.getInstance().particleEngine.register(
+                    com.kingodogo.buildscape.particle.ModParticles.WING_SPARKLE.get(),
+                    sprites -> {
+                        com.kingodogo.buildscape.client.renderer.WingParticleAssets.registerSprites("sparkle", sprites);
+                        return null;
+                    });
+
+            net.minecraft.client.Minecraft.getInstance().particleEngine.register(
+                    com.kingodogo.buildscape.particle.ModParticles.WING_CAKE.get(),
+                    sprites -> {
+                        com.kingodogo.buildscape.client.renderer.WingParticleAssets.registerSprites("cake", sprites);
+                        return null;
+                    });
+
+            net.minecraft.client.Minecraft.getInstance().particleEngine.register(
+                    com.kingodogo.buildscape.particle.ModParticles.WING_SPORE.get(),
+                    sprites -> {
+                        com.kingodogo.buildscape.client.renderer.WingParticleAssets.registerSprites("spore", sprites);
+                        return null;
+                    });
         }
     }
 

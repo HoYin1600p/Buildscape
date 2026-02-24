@@ -183,6 +183,14 @@ public class PresetsWidget extends AbstractWidget {
             loadPresets();
             nameEditBox.setValue(name);
             nameEditBox.setEditable(true);
+            
+            if (Minecraft.getInstance().player != null) {
+                Minecraft.getInstance().player.playSound(
+                    net.minecraft.sounds.SoundEvents.NOTE_BLOCK_BELL,
+                    1.0f,
+                    1.0f
+                );
+            }
         }
     }
 
@@ -191,6 +199,13 @@ public class PresetsWidget extends AbstractWidget {
                 && !selectedPresetKey.equals("_unnamed")) {
             PresetsConfig config = PresetsConfig.get();
             if (config.deletePreset(selectedPresetKey)) {
+                if (Minecraft.getInstance().player != null) {
+                    Minecraft.getInstance().player.playSound(
+                        net.minecraft.sounds.SoundEvents.NOTE_BLOCK_DIDGERIDOO,
+                        1.0f,
+                        1.0f
+                    );
+                }
                 if (selectedPresetKey.equals(appliedPresetKey)) {
                     appliedPresetKey = "default"; // Fallback
                     // Or keep null? Default is safer.

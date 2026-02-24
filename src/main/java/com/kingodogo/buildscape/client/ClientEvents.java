@@ -21,6 +21,7 @@ import com.kingodogo.buildscape.api.SupportersApiCache;
 import com.kingodogo.buildscape.api.SupportersApiClient;
 import com.kingodogo.buildscape.api.model.AuthenticateResponse;
 import com.kingodogo.buildscape.api.model.CosmeticData;
+import com.kingodogo.buildscape.particle.ParticleShapeReloader;
 import net.minecraftforge.fml.common.Mod;
 
 @Mod.EventBusSubscriber(
@@ -107,7 +108,7 @@ public class ClientEvents {
             }
 
             int x = screenWidth / 2;
-            int y = screenHeight / 2;
+            int y = screenHeight / 2 + 30; // Move from crosshair to subtitle position
 
             poseStack.pushPose();
             poseStack.translate(0, 0, 500); // Translate Z first to be safe
@@ -148,6 +149,9 @@ public class ClientEvents {
         if (event.phase != TickEvent.Phase.END) {
             return;
         }
+
+        // Check for particle shape reloads
+        ParticleShapeReloader.tick();
 
         Minecraft mc = Minecraft.getInstance();
         if (mc.level == null || mc.player == null || mc.isPaused()) {
@@ -221,9 +225,9 @@ public class ClientEvents {
         // Reset SupportersTabState on logout
         com.kingodogo.buildscape.client.screen.tabs.supporters.SupportersTabState.getInstance().setPlayerUuid(null);
 
-        // Clear particle trail and wings tracking
+        // Clear particle trail and wing shape cache
         com.kingodogo.buildscape.client.ParticleTrailHandler.clearTracking();
-        com.kingodogo.buildscape.client.ParticleWingsHandler.clearTracking();
+        com.kingodogo.buildscape.particle.ParticleShapeLibrary.clearCache();
 
         // Invalidate API cache for the player
         Minecraft mc = Minecraft.getInstance();
@@ -312,9 +316,9 @@ public class ClientEvents {
         wasZoomKeyPressed = false;
         lastHedgeStep = -1;
 
-        // Clear particle trail and wings tracking
+        // Clear particle trail and wing shape cache
         com.kingodogo.buildscape.client.ParticleTrailHandler.clearTracking();
-        com.kingodogo.buildscape.client.ParticleWingsHandler.clearTracking();
+        com.kingodogo.buildscape.particle.ParticleShapeLibrary.clearCache();
 
         try {
             com.kingodogo.buildscape.client.renderer.PillarBlockEntityRenderer.clearEntityCache();

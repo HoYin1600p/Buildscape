@@ -4718,6 +4718,7 @@ public class ModBlocks {
                                 .strength(0.3f)
                                 .sound(net.minecraft.world.level.block.SoundType.GLASS)
                                 .noOcclusion()
+                                .dynamicShape()
                                 .lightLevel(state -> 4)));
         public static final RegistryObject<Block> WHITE_STRING_LIGHT = BLOCKS.register("white_string_light",
                 () -> new StringLightBlock(

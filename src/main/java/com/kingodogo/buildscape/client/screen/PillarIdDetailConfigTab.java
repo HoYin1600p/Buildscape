@@ -359,6 +359,14 @@ public class PillarIdDetailConfigTab extends AbstractConfigTab {
     private void saveConfig() {
         if (pillarData == null) return;
         
+        if (Minecraft.getInstance().player != null) {
+            Minecraft.getInstance().player.playSound(
+                net.minecraft.sounds.SoundEvents.NOTE_BLOCK_BELL,
+                1.0f,
+                1.0f
+            );
+        }
+        
         PillarParticleConfig globalConfig = PillarParticleConfig.get();
         
         pillarData.pattern = PATTERNS[currentPatternIndex];

@@ -249,6 +249,9 @@ public class BuildScapeConfigScreen extends Screen {
             } else {
                 setActiveTab(new com.kingodogo.buildscape.client.screen.tabs.supporters.SupportersOnlyTab(this));
             }
+        } else {
+            activeTab.init(); // Explicitly re-initialize the active tab to restore custom widgets if swapping back from another Screen (like ConfirmScreen)
+            updateButtonStates();
         }
 
         updateCategoryButtonScales();
@@ -409,12 +412,14 @@ public class BuildScapeConfigScreen extends Screen {
 
         // Draw gradient text character by character
         float colorStep = (float) (colors.length - 1) / (float) text.length();
-        int currentX = startX;
 
         for (int i = 0; i < text.length(); i++) {
             char c = text.charAt(i);
             String charStr = String.valueOf(c);
-            int charWidth = font.width(charStr);
+            
+            // Calculate the exact exact start x position using substring to preserve font kerning alignments
+            String prefix = text.substring(0, i);
+            int preciseX = startX + font.width(prefix);
 
             float colorPos = i * colorStep / (float) colors.length * (float) (colors.length - 1);
             int colorIndex = (int) colorPos;
@@ -437,11 +442,59 @@ public class BuildScapeConfigScreen extends Screen {
 
             int color = 0xFF000000 | (r << 16) | (g << 8) | b;
 
-            font.draw(poseStack, charStr, currentX, 0, color);
-            currentX += charWidth;
+            font.draw(poseStack, charStr, preciseX, 0, color);
         }
 
         poseStack.popPose();
+    }
+
+    private void drawTexture(com.mojang.blaze3d.vertex.PoseStack poseStack, int x, int y, int w, int h, String texturePath) {
+        drawCroppedTexture(poseStack, x, y, w, h, w, h, texturePath); // Default passthrough without cropping UV bounds
+    }
+
+    private void drawCroppedTexture(com.mojang.blaze3d.vertex.PoseStack poseStack, int x, int y, int w, int h, int texW, int texH, String texturePath) {
+        float u0 = 0.0f;
+        float u1 = 1.0f;
+        float v0 = 0.0f;
+        float v1 = 1.0f;
+
+        com.mojang.blaze3d.systems.RenderSystem.setShader(net.minecraft.client.renderer.GameRenderer::getPositionTexShader);
+        com.mojang.blaze3d.systems.RenderSystem.setShaderTexture(0, new net.minecraft.resources.ResourceLocation("buildscape", "textures/gui/" + texturePath));
+        com.mojang.blaze3d.systems.RenderSystem.enableBlend();
+        com.mojang.blaze3d.systems.RenderSystem.defaultBlendFunc();
+        com.mojang.blaze3d.systems.RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+
+        com.mojang.blaze3d.vertex.Tesselator tesselator = com.mojang.blaze3d.vertex.Tesselator.getInstance();
+        com.mojang.blaze3d.vertex.BufferBuilder bufferbuilder = tesselator.getBuilder();
+        bufferbuilder.begin(com.mojang.blaze3d.vertex.VertexFormat.Mode.QUADS, com.mojang.blaze3d.vertex.DefaultVertexFormat.POSITION_TEX);
+        bufferbuilder.vertex(poseStack.last().pose(), x, y + h, 0).uv(u0, v1).endVertex();
+        bufferbuilder.vertex(poseStack.last().pose(), x + w, y + h, 0).uv(u1, v1).endVertex();
+        bufferbuilder.vertex(poseStack.last().pose(), x + w, y, 0).uv(u1, v0).endVertex();
+        bufferbuilder.vertex(poseStack.last().pose(), x, y, 0).uv(u0, v0).endVertex();
+        tesselator.end();
+        com.mojang.blaze3d.systems.RenderSystem.disableBlend();
+    }
+
+    private void renderCustomFrame(com.mojang.blaze3d.vertex.PoseStack poseStack, int x, int y, int width, int height) {
+        int cx = 6;
+        int cy = 6;
+        int btX = 1;
+        int btY = 1;
+
+        // Top edge - cropped from 178x1 native width
+        drawCroppedTexture(poseStack, x + cx, y, width - cx * 2, btY, 178, 1, "frame/green_vertical.png");
+        // Bottom edge - cropped from 178x1 native width
+        drawCroppedTexture(poseStack, x + cx, y + height - btY, width - cx * 2, btY, 178, 1, "frame/blue_vertical.png");
+        // Left edge - cropped from 1x22 native height
+        drawCroppedTexture(poseStack, x, y + cy, btX, height - cy * 2, 1, 22, "frame/middleside_horizontal.png");
+        // Right edge - cropped from 1x22 native height using the secondary right-edge asset
+        drawCroppedTexture(poseStack, x + width - btX, y + cy, btX, height - cy * 2, 1, 22, "frame/middleside_horizontal-1.png");
+
+        // Corners (no cropping needed, they are exactly 6x6)
+        drawCroppedTexture(poseStack, x, y, cx, cy, cx, cy, "frame/topleft_corner.png");
+        drawCroppedTexture(poseStack, x + width - cx, y, cx, cy, cx, cy, "frame/topright_corner.png");
+        drawCroppedTexture(poseStack, x, y + height - cy, cx, cy, cx, cy, "frame/bottomleft_corner.png");
+        drawCroppedTexture(poseStack, x + width - cx, y + height - cy, cx, cy, cx, cy, "frame/bottomright_corner.png");
     }
 
     public void setActiveTab(AbstractConfigTab tab) {
@@ -551,9 +604,16 @@ public class BuildScapeConfigScreen extends Screen {
         // Sidebar background: Draw from StartX to StartX + Width
         fill(poseStack, sidebarStartX, 0, sidebarStartX + calculatedSidebarWidth, height, 0xC0101010);
 
-        int titleY = scaleSize(10);
-        int titlePadding = scaleSize(10);
-        int maxTitleWidth = calculatedSidebarWidth - titlePadding * 2;
+        int buttonMargin = (int) (width * 0.005);
+        int frameX = sidebarStartX + buttonMargin;
+        int frameWidth = calculatedSidebarWidth - (buttonMargin * 2);
+        
+        // Use the native scaling function instead of hardcoded 20 so the frame actively shrinks naturally to match the Category buttons on high UI scales
+        int frameHeight = getScaledCategoryButtonHeight() + scaleSize(4); 
+        int frameY = scaleSize(10); 
+
+        int titlePadding = 10;
+        int maxTitleWidth = frameWidth - titlePadding * 2;
         int titleTextWidth = font.width(title);
 
         float titleScale = 1.0f;
@@ -561,7 +621,12 @@ public class BuildScapeConfigScreen extends Screen {
             titleScale = Math.max(0.5f, (float) maxTitleWidth / titleTextWidth);
         }
 
-        int titleX = sidebarStartX + calculatedSidebarWidth / 2;
+        // Aligning exact center using half frame height and half scaled font height.
+        int titleY = (int) (frameY + (frameHeight / 2.0f) - ((8.0f * titleScale) / 2.0f)); 
+
+        int titleX = frameX + frameWidth / 2;
+
+        renderCustomFrame(poseStack, frameX, frameY, frameWidth, frameHeight);
 
         poseStack.pushPose();
         // Use renderGradientTitle instead of drawCenteredString
@@ -652,7 +717,10 @@ public class BuildScapeConfigScreen extends Screen {
     }
 
     public int getContentY() {
-        return (int) (height * 0.05); // 5% Gap from top
+        int baseGap = (int) (height * 0.05); // 5% Gap from top
+        int dynamicFrameHeight = getScaledCategoryButtonHeight() + scaleSize(4);
+        int titleBottom = scaleSize(10) + dynamicFrameHeight; 
+        return Math.max(baseGap, titleBottom + scaleSize(8)); // Ensure it's clear of the dynamic frame
     }
 
     public int getContentWidth() {

@@ -27,6 +27,21 @@ public class GlazedGlassBlock extends AbstractGlassBlock {
     }
 
     @Override
+    public float[] getBeaconColorMultiplier(
+            BlockState state,
+            net.minecraft.world.level.LevelReader level,
+            BlockPos pos,
+            BlockPos beaconPos
+    ) {
+        int color = state.getMapColor(level, pos).col;
+        return new float[]{
+                ((color >> 16) & 0xFF) / 255.0f,
+                ((color >> 8) & 0xFF) / 255.0f,
+                (color & 0xFF) / 255.0f
+        };
+    }
+
+    @Override
     protected void createBlockStateDefinition(
             StateDefinition.Builder<
                     net.minecraft.world.level.block.Block,

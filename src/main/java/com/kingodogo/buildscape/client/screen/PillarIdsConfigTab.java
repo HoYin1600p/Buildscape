@@ -49,6 +49,7 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
     private Button selectAllButton;
     private Button removeAllButton;
     private Button removeButton;
+    private Button headerSelectAllCheckbox;
     private double scrollOffset = 0;
     private double maxScroll = 0;
     private long lastRefreshCheck = 0L;
@@ -80,17 +81,10 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
         reloadBtn.setCustomTextColors(0xFFFF00, 0xFFFF55);
         reloadButton = reloadBtn;
 
-        com.kingodogo.buildscape.client.screen.widget.ScaledTextButton selectAllBtn = new com.kingodogo.buildscape.client.screen.widget.ScaledTextButton(
-                0, 0, buttonWidth, buttonHeight,
-                new TranslatableComponent("buildscape.config.ids.select_all"),
-                (btn) -> selectAll());
-        selectAllBtn.setCustomTextColors(0x00FFFF, 0x55FFFF); // Cyan
-        selectAllButton = selectAllBtn;
-
         com.kingodogo.buildscape.client.screen.widget.ScaledTextButton removeAllBtn = new com.kingodogo.buildscape.client.screen.widget.ScaledTextButton(
                 0, 0, buttonWidth, buttonHeight,
                 new TranslatableComponent("buildscape.config.ids.remove_all"),
-                (btn) -> removeAll());
+                (btn) -> confirmRemoveAll());
         removeAllBtn.setCustomTextColors(0xFF0000, 0xFF5555); // Red text for danger
         removeAllButton = removeAllBtn;
 
@@ -102,9 +96,55 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
         removeButton = removeBtn;
 
         addTabWidget(reloadButton);
-        addTabWidget(selectAllButton);
         addTabWidget(removeAllButton);
         addTabWidget(removeButton);
+
+        // Header Checkbox
+        int checkboxSize = BuildScapeConfigScreen.scaleSize(14);
+        headerSelectAllCheckbox = new Button(0, 0, checkboxSize, checkboxSize, TextComponent.EMPTY, (btn) -> {
+            boolean allChecked = true;
+            for (PillarRow row : rows) {
+                if (row.visible && !row.isSelected()) {
+                    allChecked = false;
+                    break;
+                }
+            }
+            boolean newState = !allChecked;
+            for (PillarRow row : rows) {
+                if (row.visible) {
+                    row.setSelected(newState);
+                }
+            }
+        }) {
+            @Override
+            public void renderButton(PoseStack poseStack, int mouseX, int mouseY, float pt) {
+                if (!visible) return;
+                int borderColor = isHoveredOrFocused() ? 0xFFFFFFFF : 0xFFAAAAAA;
+                boolean allChecked = true;
+                boolean someChecked = false;
+                for (PillarRow row : rows) {
+                    if (row.visible) {
+                        if (!row.isSelected()) allChecked = false;
+                        else someChecked = true;
+                    }
+                }
+                
+                GuiComponent.fill(poseStack, x, y, x + width, y + height, 0x80000000); // 50% dark inner bg
+                GuiComponent.fill(poseStack, x, y, x + width, y + 1, borderColor);
+                GuiComponent.fill(poseStack, x, y + height - 1, x + width, y + height, borderColor);
+                GuiComponent.fill(poseStack, x, y, x + 1, y + height, borderColor);
+                GuiComponent.fill(poseStack, x + width - 1, y, x + width, y + height, borderColor);
+                
+                int pad = Math.max(2, BuildScapeConfigScreen.scaleSize(2));
+                if (allChecked && someChecked) {
+                    GuiComponent.fill(poseStack, x + pad, y + pad, x + width - pad, y + height - pad, 0xFF55FF55);
+                } else if (someChecked) {
+                    GuiComponent.fill(poseStack, x + pad, y + (height / 2) - 1, x + width - pad, y + (height / 2) + 1, 0xFF55FF55);
+                }
+            }
+        };
+        addTabWidget(headerSelectAllCheckbox);
+
         setButtonsVisible(true);
 
         // Kick off a load to ensure the manager has data for the current world
@@ -284,6 +324,14 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
             return;
         }
 
+        if (Minecraft.getInstance().player != null) {
+            Minecraft.getInstance().player.playSound(
+                net.minecraft.sounds.SoundEvents.NOTE_BLOCK_BELL,
+                1.0f,
+                1.0f
+            );
+        }
+
         PillarIdManager manager = PillarIdManager.get();
         manager.replaceAllPillarData(toSave);
         dirty = false;
@@ -359,41 +407,25 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
         int spacing = BuildScapeConfigScreen.scaleSize(8);
         int topMargin = BuildScapeConfigScreen.scaleSize(4);
 
-        // Calculate total width of the button group
-        int totalGroupWidth = (buttonWidth * 4) + (spacing * 3);
-
-        // Center the group within the content width
-        int startX = contentX + (contentWidth - totalGroupWidth) / 2;
         int y = contentY + topMargin;
 
-        int x = startX;
-
-        // Reload button
-        reloadButton.x = x;
+        // Reload button on the far left
+        reloadButton.x = contentX;
         reloadButton.y = y;
         reloadButton.setWidth(buttonWidth);
         reloadButton.setHeight(buttonHeight);
-        x += buttonWidth + spacing;
 
-        // Select All button
-        selectAllButton.x = x;
-        selectAllButton.y = y;
-        selectAllButton.setWidth(buttonWidth);
-        selectAllButton.setHeight(buttonHeight);
-        x += buttonWidth + spacing;
-
-        // Remove All button
-        removeAllButton.x = x;
-        removeAllButton.y = y;
-        removeAllButton.setWidth(buttonWidth);
-        removeAllButton.setHeight(buttonHeight);
-        x += buttonWidth + spacing;
-
-        // Remove button
-        removeButton.x = x;
+        // Remove Selected button directly next to Reload on the left
+        removeButton.x = reloadButton.x + buttonWidth + spacing;
         removeButton.y = y;
         removeButton.setWidth(buttonWidth);
         removeButton.setHeight(buttonHeight);
+
+        // Remove All button on the far right
+        removeAllButton.x = contentX + contentWidth - buttonWidth;
+        removeAllButton.y = y;
+        removeAllButton.setWidth(buttonWidth);
+        removeAllButton.setHeight(buttonHeight);
     }
 
     @Override
@@ -527,44 +559,43 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
 
     private void drawHeader(PoseStack poseStack, int tableX, int tableY, int[] columns) {
         int x = tableX;
-        int headerColor = 0xFFFFFFFF;
+        int headerColor = 0xFFCCCCCC; // Light silver text for table headers instead of pure white
         int headerHeight = getHeaderHeight();
         int columnGap = getColumnGap();
         Minecraft mc = Minecraft.getInstance();
         int fontHeight = mc.font.lineHeight;
+        int textPadding = BuildScapeConfigScreen.scaleSize(8);
 
-        // Calculate exact center for header text - use SAME calculation as row text for
-        // perfect alignment
-        int headerCenterY = tableY + headerHeight / 2;
-        // Headers should align with row content - use same simplified formula as rows
-        // Row text Y = rowCenterY + fontHeight/2 - 1
-        // For headers, use the same formula: headerCenterY + fontHeight/2 - 1
-        int headerTextY = headerCenterY + fontHeight / 2 - 1;
+        // Calculate exact mathematical center for vertical text alignment using standard bounds
+        int headerTextY = tableY + (headerHeight - fontHeight) / 2 + 1; // +1 to visually snap 'p' descending letters
 
-        // Checkbox column (no header text, just space)
-        drawCell(poseStack, x, tableY, columns[0], headerHeight, true);
+        // Checkbox column (No bounding cell rendered, just position the interactive Master Checkbox)
+        int checkboxSize = BuildScapeConfigScreen.scaleSize(14);
+        headerSelectAllCheckbox.x = x + (columns[0] - checkboxSize) / 2;
+        headerSelectAllCheckbox.y = tableY + (headerHeight - checkboxSize) / 2;
+        headerSelectAllCheckbox.setWidth(checkboxSize);
+        headerSelectAllCheckbox.setHeight(checkboxSize);
+        headerSelectAllCheckbox.renderButton(poseStack, 0, 0, 0); // Active rendering
         x += columns[0] + columnGap;
 
         drawCell(poseStack, x, tableY, columns[1], headerHeight, true);
         Component idText = new TranslatableComponent("buildscape.config.ids.id");
-        int idTextWidth = mc.font.width(idText);
-        mc.font.draw(poseStack, idText, x + (columns[1] - idTextWidth) / 2, headerTextY, headerColor);
+        mc.font.draw(poseStack, idText, x + textPadding, headerTextY, headerColor);
         x += columns[1] + columnGap;
 
         drawCell(poseStack, x, tableY, columns[2], headerHeight, true);
         Component colorsText = new TranslatableComponent("buildscape.config.ids.colors");
-        int colorsTextWidth = mc.font.width(colorsText);
-        mc.font.draw(poseStack, colorsText, x + (columns[2] - colorsTextWidth) / 2, headerTextY, headerColor);
+        mc.font.draw(poseStack, colorsText, x + textPadding, headerTextY, headerColor);
         x += columns[2] + columnGap;
 
         drawCell(poseStack, x, tableY, columns[3], headerHeight, true);
         Component dimensionText = new TranslatableComponent("buildscape.config.ids.dimension");
-        int dimensionTextWidth = mc.font.width(dimensionText);
-        mc.font.draw(poseStack, dimensionText, x + (columns[3] - dimensionTextWidth) / 2, headerTextY, headerColor);
+        mc.font.draw(poseStack, dimensionText, x + textPadding, headerTextY, headerColor);
         x += columns[3] + columnGap;
 
         // Coordinates column - draw X, Y, Z separately aligned to their fields
-        drawCell(poseStack, x, tableY, columns[4], headerHeight, true);
+        // (No drawCell bounding box, coordinates contain their own nested black border)
+
         // Calculate positions to match the coordinate fields below
         int coordPadding = BuildScapeConfigScreen.scaleSize(8);
         int coordGap = BuildScapeConfigScreen.scaleSize(8);
@@ -595,9 +626,18 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
     }
 
     private void drawCell(PoseStack poseStack, int x, int y, int width, int height, boolean header) {
-        // Background removed - no colorful backgrounds
-        // Removed white dashed border
-        // drawDashedBorder(poseStack, x, y, width, height, 0xFFFFFFFF);
+        // Subtle 1px outline for sleek appeal
+        int borderColor = header ? 0x80555555 : 0x60444444; // Slightly brighter border for header
+        int bgColor = header ? 0x60222222 : 0x40111111;     // Slightly darker background for rows
+        
+        // Fill inner background
+        GuiComponent.fill(poseStack, x, y, x + width, y + height, bgColor);
+        
+        // Render 1px outer borders cleanly
+        GuiComponent.fill(poseStack, x, y, x + width, y + 1, borderColor); // Top
+        GuiComponent.fill(poseStack, x, y + height - 1, x + width, y + height, borderColor); // Bottom
+        GuiComponent.fill(poseStack, x, y, x + 1, y + height, borderColor); // Left
+        GuiComponent.fill(poseStack, x + width - 1, y, x + width, y + height, borderColor); // Right
     }
 
     private void drawDashedBorder(PoseStack poseStack, int x, int y, int width, int height, int color) {
@@ -800,14 +840,10 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
     }
 
     private void setButtonsVisible(boolean visible) {
-        if (reloadButton != null)
-            reloadButton.visible = visible;
-        if (selectAllButton != null)
-            selectAllButton.visible = visible;
-        if (removeAllButton != null)
-            removeAllButton.visible = visible;
-        if (removeButton != null)
-            removeButton.visible = visible;
+        if (reloadButton != null) reloadButton.visible = visible;
+        if (removeAllButton != null) removeAllButton.visible = visible;
+        if (removeButton != null) removeButton.visible = visible;
+        if (headerSelectAllCheckbox != null) headerSelectAllCheckbox.visible = visible;
     }
 
     private void selectAll() {
@@ -816,6 +852,19 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
                 row.setSelected(true);
             }
         }
+    }
+
+    private void confirmRemoveAll() {
+        Minecraft.getInstance().setScreen(new net.minecraft.client.gui.screens.ConfirmScreen(
+                (confirmed) -> {
+                    if (confirmed) {
+                        removeAll();
+                    }
+                    Minecraft.getInstance().setScreen(parent);
+                },
+                new TranslatableComponent("buildscape.config.ids.remove_all"),
+                new TextComponent("Are you sure you want to completely remove all Pillar IDs?")
+        ));
     }
 
     private void removeAll() {
@@ -832,6 +881,13 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
             }
             refreshFromManager();
             dirty = true;
+            if (Minecraft.getInstance().player != null) {
+                Minecraft.getInstance().player.playSound(
+                    net.minecraft.sounds.SoundEvents.NOTE_BLOCK_DIDGERIDOO,
+                    1.0f,
+                    1.0f
+                );
+            }
             statusMessage = new TranslatableComponent("buildscape.config.ids.removed_all");
         }
     }
@@ -850,6 +906,13 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
             }
             refreshFromManager();
             dirty = true;
+            if (Minecraft.getInstance().player != null) {
+                Minecraft.getInstance().player.playSound(
+                    net.minecraft.sounds.SoundEvents.NOTE_BLOCK_DIDGERIDOO,
+                    1.0f,
+                    1.0f
+                );
+            }
             statusMessage = new TranslatableComponent("buildscape.config.ids.removed_selected", idsToRemove.size());
         }
     }
@@ -889,18 +952,27 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
             this.createdTime = data.createdTime;
             this.modifiedTime = data.modifiedTime;
 
-            // Create selection checkbox - use a simple button with checkmark
-            int checkboxSize = BuildScapeConfigScreen.scaleSize(18);
-            com.kingodogo.buildscape.client.screen.widget.ScaledTextButton checkboxBtn = new com.kingodogo.buildscape.client.screen.widget.ScaledTextButton(
-                    0, 0, checkboxSize, checkboxSize,
-                    new TextComponent("☐"),
-                    (btn) -> {
-                        selected = !selected;
-                        updateCheckboxText();
-                    });
-            selectCheckbox = checkboxBtn;
-            updateCheckboxText();
-            // Make checkbox more visible
+            // Create selection checkbox - Clean 1px border design
+            int checkboxSize = BuildScapeConfigScreen.scaleSize(14);
+            selectCheckbox = new Button(0, 0, checkboxSize, checkboxSize, TextComponent.EMPTY, (btn) -> {
+                selected = !selected;
+            }) {
+                @Override
+                public void renderButton(PoseStack poseStack, int mouseX, int mouseY, float pt) {
+                    if (!visible) return;
+                    int borderColor = isHoveredOrFocused() ? 0xFFFFFFFF : 0xFFAAAAAA;
+                    GuiComponent.fill(poseStack, x, y, x + width, y + height, 0x80000000); // 50% dark inner bg
+                    GuiComponent.fill(poseStack, x, y, x + width, y + 1, borderColor);
+                    GuiComponent.fill(poseStack, x, y + height - 1, x + width, y + height, borderColor);
+                    GuiComponent.fill(poseStack, x, y, x + 1, y + height, borderColor);
+                    GuiComponent.fill(poseStack, x + width - 1, y, x + width, y + height, borderColor);
+
+                    if (selected) {
+                        int pad = Math.max(2, BuildScapeConfigScreen.scaleSize(2));
+                        GuiComponent.fill(poseStack, x + pad, y + pad, x + width - pad, y + height - pad, 0xFF55FF55);
+                    }
+                }
+            };
             selectCheckbox.setAlpha(1.0f);
 
             int editBoxHeight = BuildScapeConfigScreen.getScaledEditBoxHeight();
@@ -1149,17 +1221,7 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
         }
 
         private void updateCheckboxText() {
-            if (selectCheckbox instanceof com.kingodogo.buildscape.client.screen.widget.ScaledTextButton btn) {
-                if (selected) {
-                    btn.setMessage(new TextComponent("☑"));
-                    btn.setCustomTextColors(0x00FF00, 0x55FF55); // Green when selected
-                } else {
-                    btn.setMessage(new TextComponent("☐"));
-                    btn.setCustomTextColors(0xAAAAAA, 0xFFFFFF); // Grey/White when unselected
-                }
-            } else if (selectCheckbox != null) {
-                selectCheckbox.setMessage(new TextComponent(selected ? "☑" : "☐"));
-            }
+            // Deprecated logic. Custom rendering explicitly handles selection states now.
         }
 
         private PillarIdManager.PillarData toData(List<String> errors) {
@@ -1234,16 +1296,12 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
             // Position EditBoxes: vertically centered
             int centerY = alignmentCenterY - editBoxHeight / 2;
 
-            // Position text: align text baseline to be in line with checkboxes and swatches
-            // Text Y for font.draw() is the BASELINE, so we need to calculate where the
-            // baseline should be
-            // Move text up to align properly with checkboxes/swatches
-            int textY = alignmentCenterY + fontHeight / 2 - 6;
+            // Position text: Mathematically perfectly centered between the cell's top and bottom border
+            int textY = rowY + (rowHeight - fontHeight) / 2 + 1; 
 
             int x = startX;
 
-            // Checkbox column - perfectly centered vertically
-            drawCell(poseStack, x, rowY, columns[0], rowHeight, false);
+            // Checkbox column - perfectly centered vertically (No bounding cell rendered)
             selectCheckbox.x = x + (columns[0] - checkboxSize) / 2;
             selectCheckbox.y = checkboxCenterY; // Use calculated center for checkbox
             selectCheckbox.setWidth(checkboxSize);
@@ -1310,12 +1368,13 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
                 finalDimText = mc.font.plainSubstrByWidth(displayDimension, maxDimWidth - mc.font.width("...")) + "...";
                 dimTextWidth = mc.font.width(finalDimText);
             }
-            int dimTextX = x + padding + (dimensionWidth - dimTextWidth) / 2;
+            int dimTextX = x + padding; // Left-aligned cleanly instead of centered
             mc.font.draw(poseStack, finalDimText, dimTextX, textY, 0xFFFFFFFF);
             x += columns[3] + columnGap;
 
             // Coordinates column - perfectly centered with border
-            drawCell(poseStack, x, rowY, columns[4], rowHeight, false);
+            // (No drawCell bounding box, coordinates contain their own nested black border)
+
             // Improved coordinate alignment - ensure consistent spacing with proper scaling
             int coordPadding = BuildScapeConfigScreen.scaleSize(8);
             int coordGap = BuildScapeConfigScreen.scaleSize(8);
@@ -1389,29 +1448,12 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
             zField.y = centerY;
             zField.setWidth(coordWidth);
 
-            // Temporarily clear EditBox values to hide their text, then draw colored text
-            // directly
+            // Draw coordinate text directly with colors using SAME textY as all other text
+            // Center text horizontally within each coordinate field
             String xValue = xField.getValue();
             String yValue = yField.getValue();
             String zValue = zField.getValue();
 
-            // Clear EditBox text temporarily so we can draw colored text
-            xField.setValue("");
-            yField.setValue("");
-            zField.setValue("");
-
-            // Render the EditBoxes (background/border only, no text)
-            xField.render(poseStack, 0, 0, 0);
-            yField.render(poseStack, 0, 0, 0);
-            zField.render(poseStack, 0, 0, 0);
-
-            // Restore values
-            xField.setValue(xValue);
-            yField.setValue(yValue);
-            zField.setValue(zValue);
-
-            // Draw coordinate text directly with colors using SAME textY as all other text
-            // Center text horizontally within each coordinate field
             int xTextX = xFieldX + (coordWidth - mc.font.width(xValue)) / 2;
             int yTextX = yFieldX + (coordWidth - mc.font.width(yValue)) / 2;
             int zTextX = zFieldX + (coordWidth - mc.font.width(zValue)) / 2;

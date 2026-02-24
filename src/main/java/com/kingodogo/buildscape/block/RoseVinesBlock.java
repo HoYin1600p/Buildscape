@@ -300,7 +300,7 @@ public class RoseVinesBlock extends VineBlock {
         ItemStack heldItem = player.getItemInHand(hand);
         if (heldItem.is(Items.SHEARS)) {
             level.setBlockAndUpdate(pos, state.setValue(SHEARED, true));
-            level.playSound(null, pos, SoundEvents.VINE_BREAK, SoundSource.BLOCKS, 1.0F, 1.0F);
+            level.playSound(null, pos, SoundEvents.GROWING_PLANT_CROP, SoundSource.BLOCKS, 1.0F, 1.0F);
             level.gameEvent(player, GameEvent.SHEAR, pos);
             heldItem.hurtAndBreak(1, player, (p) -> p.broadcastBreakEvent(hand));
             return InteractionResult.sidedSuccess(level.isClientSide);

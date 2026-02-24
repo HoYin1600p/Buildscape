@@ -1,0 +1,6 @@
+{
+  "parent": "buildscape:block/ashenking_pillar",
+  "textures": {
+    "ashenking_pillar": "buildscape:block/ashenking_emerald_pillar"
+  }
+}

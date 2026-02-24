@@ -2660,6 +2660,30 @@ public class ModItems {
                     new BlockItem(ModBlocks.MOSSY_PILLAR.get(), createBlockItemProperties())
     );
 
+    public static final RegistryObject<Item> ASHENKING_DIAMOND_PILLAR = ITEMS.register(
+            "ashenking_diamond_pillar",
+            () ->
+                    new BlockItem(ModBlocks.ASHENKING_DIAMOND_PILLAR.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> ASHENKING_GOLD_PILLAR = ITEMS.register(
+            "ashenking_gold_pillar",
+            () ->
+                    new BlockItem(ModBlocks.ASHENKING_GOLD_PILLAR.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> ASHENKING_EMERALD_PILLAR = ITEMS.register(
+            "ashenking_emerald_pillar",
+            () ->
+                    new BlockItem(ModBlocks.ASHENKING_EMERALD_PILLAR.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> ASHENKING_NETHERITE_PILLAR = ITEMS.register(
+            "ashenking_netherite_pillar",
+            () ->
+                    new BlockItem(ModBlocks.ASHENKING_NETHERITE_PILLAR.get(), createBlockItemProperties())
+    );
+
     public static final RegistryObject<Item> DECORATED_POT = ITEMS.register(
             "decorated_pot",
             () ->

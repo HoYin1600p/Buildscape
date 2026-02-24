@@ -1051,6 +1051,10 @@ public class BuildScape {
             items.add(new ItemStack(ModItems.MOSSY_PILLAR.get()));
             items.add(new ItemStack(ModItems.DEEPSLATE_PILLAR.get()));
             items.add(new ItemStack(ModItems.QUARTZ_PILLAR.get()));
+            items.add(new ItemStack(ModItems.ASHENKING_DIAMOND_PILLAR.get()));
+            items.add(new ItemStack(ModItems.ASHENKING_GOLD_PILLAR.get()));
+            items.add(new ItemStack(ModItems.ASHENKING_EMERALD_PILLAR.get()));
+            items.add(new ItemStack(ModItems.ASHENKING_NETHERITE_PILLAR.get()));
 
             items.add(new ItemStack(ModItems.WHITE_CARPET_LAYERS.get()));
             items.add(new ItemStack(ModItems.LIGHT_GRAY_CARPET_LAYERS.get()));
@@ -2781,6 +2785,18 @@ public class BuildScape {
                         net.minecraft.client.renderer.RenderType.cutout());
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.NETHERITE_CHAIN.get(),
+                        net.minecraft.client.renderer.RenderType.cutout());
+                net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
+                        ModBlocks.ASHENKING_DIAMOND_PILLAR.get(),
+                        net.minecraft.client.renderer.RenderType.cutout());
+                net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
+                        ModBlocks.ASHENKING_GOLD_PILLAR.get(),
+                        net.minecraft.client.renderer.RenderType.cutout());
+                net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
+                        ModBlocks.ASHENKING_EMERALD_PILLAR.get(),
+                        net.minecraft.client.renderer.RenderType.cutout());
+                net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
+                        ModBlocks.ASHENKING_NETHERITE_PILLAR.get(),
                         net.minecraft.client.renderer.RenderType.cutout());
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.COPPER_CHAIN.get(),

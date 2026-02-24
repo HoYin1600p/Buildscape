@@ -96,10 +96,15 @@ public class PillarBlockEntityRenderer
             // Check if the item is a spawn egg to determine position and rotation speed
             boolean isSpawnEgg = displayedItem.getItem() instanceof SpawnEggItem && !hasItemNameTag(displayedItem);
 
-            // Position: items and mobs both hover just above pillar with 1-2 pixel gap
-            // Items: 1.4625 blocks (1.15 + 5 pixels = 0.3125 blocks)
-            // Mobs: 1.125 blocks (1.0 + 2 pixels = 0.125 blocks) - right on top with 2 pixel gap
-            float hoverHeight = isSpawnEgg ? 1.125f : 1.4625f;
+            // Position: items and mobs hover just above pillar top
+            // AshenKing pillars are shorter (12px = 0.75 blocks) so lower the hover height
+            boolean isAshenKing = blockEntity.getBlockState().getBlock() instanceof com.kingodogo.buildscape.block.AshenKingPillarBlock;
+            float hoverHeight;
+            if (isAshenKing) {
+                hoverHeight = isSpawnEgg ? 0.875f : 1.0f;
+            } else {
+                hoverHeight = isSpawnEgg ? 1.125f : 1.4625f;
+            }
             poseStack.translate(0.5, hoverHeight, 0.5);
 
             // Smooth rotation animation using PURELY CLIENT-SIDE time

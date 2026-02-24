@@ -30,7 +30,11 @@ public class ModBlockEntities {
                     ModBlocks.QUARTZ_PILLAR.get(),
                     ModBlocks.STONE_PILLAR.get(),
                     ModBlocks.DEEPSLATE_PILLAR.get(),
-                    ModBlocks.MOSSY_PILLAR.get()).build(null));
+                    ModBlocks.MOSSY_PILLAR.get(),
+                    ModBlocks.ASHENKING_DIAMOND_PILLAR.get(),
+                    ModBlocks.ASHENKING_GOLD_PILLAR.get(),
+                    ModBlocks.ASHENKING_EMERALD_PILLAR.get(),
+                    ModBlocks.ASHENKING_NETHERITE_PILLAR.get()).build(null));
 
     public static final RegistryObject<BlockEntityType<DecoratedPotBlockEntity>> DECORATED_POT_BLOCK_ENTITY = BLOCK_ENTITIES
             .register(

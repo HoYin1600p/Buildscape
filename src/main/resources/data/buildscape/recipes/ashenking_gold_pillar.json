@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " R ",
+    " R ",
+    " R "
+  ],
+  "key": {
+    "R": {
+      "item": "minecraft:gold_ingot"
+    }
+  },
+  "result": {
+    "item": "buildscape:ashenking_gold_pillar"
+  }
+}

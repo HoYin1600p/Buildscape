@@ -512,7 +512,8 @@ public class PillarBlockEntity extends BlockEntity {
 
         java.util.Random rand = level.random;
         double centerX = pos.getX() + 0.5;
-        double centerY = pos.getY() + 1.0;
+        boolean isAshenKing = state.getBlock() instanceof AshenKingPillarBlock;
+        double centerY = pos.getY() + (isAshenKing ? 0.75 : 1.0);
         double centerZ = pos.getZ() + 0.5;
 
         spawnParticles(

@@ -56,37 +56,23 @@ public class PillarResetHandler {
                                 while (level.getBlockState(current).getBlock() instanceof com.kingodogo.buildscape.block.PillarBlock) {
                                     net.minecraft.world.level.block.entity.BlockEntity be = level.getBlockEntity(current);
                                     if (be instanceof com.kingodogo.buildscape.block.PillarBlockEntity pillarBE) {
-                                        // Get old state for logging (only for first block)
-                                        if (resetCount == 0) {
-                                            String oldId = pillarBE.getPillarId();
-                                            java.util.List<String> oldColors = pillarBE.getParticleColors();
-                                            System.out.println("BuildScape: Resetting pillar stack starting at " + bottomPos + 
-                                                " - Old ID: " + oldId + " (" + (oldColors != null ? oldColors.size() : 0) + " colors)");
-                                        }
-                                        
                                         // Reset all custom particle settings to default (freshly placed state)
                                         resetPillarBlockEntity(pillarBE);
                                         resetCount++;
                                     }
                                     current = current.above();
-                                    
+
                                     // Safety check to prevent infinite loops
                                     if (resetCount > 256) {
                                         break;
                                     }
                                 }
-                                
-                                System.out.println("BuildScape: Reset complete - reset " + resetCount + " pillar blocks in stack");
-                            } else {
-                                System.out.println("BuildScape: Warning - No pillar block entity found at " + pos + " in dimension " + dimension);
                             }
                             break;
                         }
                     }
                 } catch (Exception e) {
-                    // Log error but don't crash
-                    System.err.println("BuildScape: Error resetting pillar at " + pos + ": " + e.getMessage());
-                    e.printStackTrace();
+                    // Error silently handled
                 }
             });
         } catch (Exception e) {

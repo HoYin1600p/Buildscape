@@ -135,7 +135,6 @@ public class ParticleShapeEditorScreen extends Screen {
         String[] patterns = {"curved", "heart", "sparkle", "cake"};
         int currentIndex = java.util.Arrays.asList(patterns).indexOf(selectedPattern);
         selectedPattern = patterns[(currentIndex + 1) % patterns.length];
-        System.out.println("[Editor] Pattern changed to: " + selectedPattern);
     }
 
     private void updatePreview() {
@@ -157,9 +156,7 @@ public class ParticleShapeEditorScreen extends Screen {
             ParticleShapeLibrary.registerShape(previewShapeId, previewConfig);
             ParticleShapeReloader.reloadAllShapes();
 
-            System.out.println("[Editor] Preview updated: " + ParticleShapeLibrary.getShapeStats(previewShapeId));
         } catch (NumberFormatException e) {
-            System.out.println("[Editor] Invalid input: " + e.getMessage());
         }
     }
 
@@ -167,7 +164,6 @@ public class ParticleShapeEditorScreen extends Screen {
         try {
             String shapeName = shapeNameInput.getValue();
             if (shapeName.isEmpty()) {
-                System.out.println("[Editor] Shape name cannot be empty");
                 return;
             }
 
@@ -187,10 +183,7 @@ public class ParticleShapeEditorScreen extends Screen {
             ParticleShapeLibrary.registerShape(shapeName, shapeConfig);
             ParticleShapeReloader.reloadAllShapes();
 
-            System.out.println("[Editor] Shape saved: " + shapeName);
-            System.out.println("[Editor] Export: " + ParticleShapeLibrary.exportShapeConfig(shapeName));
         } catch (NumberFormatException e) {
-            System.out.println("[Editor] Invalid input: " + e.getMessage());
         }
     }
 
@@ -201,7 +194,6 @@ public class ParticleShapeEditorScreen extends Screen {
         maxWidthInput.setValue(String.format("%.2f", preset.maxWidth));
         lengthStepInput.setValue(String.format("%.4f", preset.lengthStep));
         selectedPattern = preset.pattern;
-        System.out.println("[Editor] Loaded preset: " + presetName);
     }
 
     @Override

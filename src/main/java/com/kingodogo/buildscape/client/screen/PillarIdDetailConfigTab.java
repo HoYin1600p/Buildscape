@@ -539,10 +539,7 @@ public class PillarIdDetailConfigTab extends AbstractConfigTab {
                 
                 break; // Found the pillar, done
             }
-        } catch (Exception e) {
-            System.err.println("BuildScape: Error updating block entity NBT: " + e.getMessage());
-            e.printStackTrace();
-        }
+        } catch (Exception e) {}
     }
     
     @Override

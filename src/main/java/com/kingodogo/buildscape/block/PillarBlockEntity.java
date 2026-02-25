@@ -806,8 +806,6 @@ public class PillarBlockEntity extends BlockEntity {
                             }
                         }
                         // Don't save immediately during sync - let recovery or explicit saves handle it
-                        System.out.println("BuildScape: Synced " + this.particleColors.size() +
-                                " colors from NBT to manager for " + idToSync);
                     }
                 }
             }

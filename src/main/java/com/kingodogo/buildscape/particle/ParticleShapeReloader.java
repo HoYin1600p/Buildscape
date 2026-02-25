@@ -17,7 +17,6 @@ public class ParticleShapeReloader {
     public static void requestShapeReload(String shapeId) {
         requestedShapeId = shapeId;
         shapeChangeRequested = true;
-        System.out.println("[ParticleShapeReloader] Shape reload requested: " + shapeId);
     }
 
     /**
@@ -26,7 +25,6 @@ public class ParticleShapeReloader {
     public static void reloadAllShapes() {
         ParticleShapeLibrary.clearCache();
         shapeChangeRequested = false;
-        System.out.println("[ParticleShapeReloader] All shapes reloaded (hot-reload complete)");
     }
 
     /**

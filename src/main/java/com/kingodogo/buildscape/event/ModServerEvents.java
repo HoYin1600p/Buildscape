@@ -17,15 +17,13 @@ public class ModServerEvents {
     @SubscribeEvent
     public static void onPackFinder(AddPackFindersEvent event) {
         try {
-            BuildScape.LOGGER.info("AddPackFindersEvent fired for: " + event.getPackType());
-            
             final PackType type = event.getPackType();
             final String packName = type == PackType.SERVER_DATA ? "data" : "resources";
             final String title = "BuildScape Dynamic " + (type == PackType.SERVER_DATA ? "Data" : "Resources");
             final String description = "Dynamic " + packName + " for vertical slabs";
             
-            // Create the pack instance once
-            final DynamicDataPack packInstance = new DynamicDataPack(description);
+            // Create the pack instance with the current PackType
+            final DynamicDataPack packInstance = new DynamicDataPack(description, type);
             
             event.addRepositorySource((consumer, constructor) -> {
                 try {
@@ -44,7 +42,6 @@ public class ModServerEvents {
                     
                     if (pack != null) {
                         consumer.accept(pack);
-                        BuildScape.LOGGER.info("Successfully added dynamic " + packName + " source.");
                     }
                 } catch (Exception e) {
                     BuildScape.LOGGER.error("Failed to create dynamic pack for " + packName, e);

@@ -256,8 +256,7 @@ public class ClientEvents {
                 
                 if (playerUuid != null && accessToken != null && !accessToken.isEmpty()) {
                     String uuidString = playerUuid.toString();
-                    com.kingodogo.buildscape.BuildScape.getLogger().info("Preloading API data for user: " + uuidString);
-                    
+
                     SupportersApiClient.getInstance().authenticate(uuidString, accessToken)
                         .thenAccept(response -> {
                             if (response != null && !response.isError()) {
@@ -277,12 +276,9 @@ public class ClientEvents {
                                         com.kingodogo.buildscape.client.screen.tabs.supporters.SupportersTabState.getInstance().setUnlockedCosmetics(unlocked);
                                     }
                                     
-                                    com.kingodogo.buildscape.BuildScape.getLogger().info("Successfully preloaded API data");
                                 } catch (Exception e) {
                                     com.kingodogo.buildscape.BuildScape.getLogger().error("Failed to process preloaded data: " + e.getMessage());
                                 }
-                            } else {
-                                com.kingodogo.buildscape.BuildScape.getLogger().warn("Failed to preload API data: " + (response != null ? response.getError() : "null response"));
                             }
                         })
                         .exceptionally(t -> {

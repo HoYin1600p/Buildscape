@@ -1,5 +1,6 @@
 package com.kingodogo.buildscape.client.renderer;
 
+import com.kingodogo.buildscape.BuildScape;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
@@ -41,7 +42,6 @@ public class MobStateParser {
 
             if (rootStatesFile.exists()) {
                 stream = new java.io.FileInputStream(rootStatesFile);
-                System.out.println("[BuildScape] Loading states from root directory: states.txt");
             } else {
                 // Fallback to resource file
                 ResourceLocation statesFile = new ResourceLocation("buildscape:mob_states.txt");
@@ -50,9 +50,8 @@ public class MobStateParser {
                             .getResourceManager()
                             .getResource(statesFile)
                             .getInputStream();
-                    System.out.println("[BuildScape] Loading states from resources: mob_states.txt");
                 } catch (Exception e) {
-                    System.err.println("[BuildScape] Could not find mob_states.txt resource.");
+                    BuildScape.LOGGER.error("Could not find mob_states.txt resource.");
                 }
             }
 

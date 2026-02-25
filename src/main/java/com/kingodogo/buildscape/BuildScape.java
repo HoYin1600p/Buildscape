@@ -1315,7 +1315,6 @@ public class BuildScape {
         MinecraftForge.EVENT_BUS.register(this);
 
 
-        LOGGER.info("BuildScape mod initialized!");
     }
 
     public static Logger getLogger() {
@@ -1335,7 +1334,6 @@ public class BuildScape {
     }
 
     private void commonSetup(final FMLCommonSetupEvent event) {
-        LOGGER.info("Buildscape mod initialized!");
 
         com.kingodogo.buildscape.world.ModGameRules.register();
 
@@ -1387,7 +1385,6 @@ public class BuildScape {
                         }
                     }
             );
-            LOGGER.info("Bottle of Mist dispenser behavior registered");
         });
 
         event.enqueueWork(() -> {
@@ -1395,16 +1392,12 @@ public class BuildScape {
             com.kingodogo.buildscape.sound.ModSounds.COPPER_BULB_SOUNDS();
             com.kingodogo.buildscape.sound.ModSounds.MANGROVE_ROOTS_SOUNDS();
             com.kingodogo.buildscape.sound.ModSounds.MUDDY_MANGROVE_ROOTS_SOUNDS();
-            LOGGER.info("Custom sound types initialized");
 
             com.kingodogo.buildscape.config.PillarParticleConfig.get();
-            LOGGER.info("Pillar particle config initialized");
 
             com.kingodogo.buildscape.block.ModWoodTypes.MANGROVE.getClass();
             com.kingodogo.buildscape.block.ModWoodTypes.BAMBOO.getClass();
-            LOGGER.info("Mangrove and Bamboo WoodTypes initialized for signs");
 
-            LOGGER.info("Mangrove tree configured features registered in code");
 
             net.minecraft.world.level.block.ComposterBlock.COMPOSTABLES.put(ModItems.RED_ROSE_VINES.get(),
                     0.5f);
@@ -1493,13 +1486,11 @@ public class BuildScape {
             net.minecraft.world.level.block.ComposterBlock.COMPOSTABLES
                     .put(ModItems.RED_MUSHROOM_SHELVES.get(), 0.65f);
 
-            LOGGER.info("Composter recipes registered");
-        });
+            });
     }
 
     @SubscribeEvent
     public void onServerStarting(ServerStartingEvent event) {
-        LOGGER.info("Buildscape mod loaded on server");
 
         serverFullyInitialized = false;
         pillarDataLoadStarted = false;
@@ -1512,7 +1503,6 @@ public class BuildScape {
 
     @SubscribeEvent
     public void onRegisterCommands(net.minecraftforge.event.RegisterCommandsEvent event) {
-        LOGGER.debug("Commands registered - fastLeafDecay gamerule should be available");
 
         com.mojang.brigadier.builder.LiteralArgumentBuilder<net.minecraft.commands.CommandSourceStack> buildscapeCommand = com.mojang.brigadier.builder.LiteralArgumentBuilder.<net.minecraft.commands.CommandSourceStack>literal(
                         "buildscape")
@@ -1575,8 +1565,6 @@ public class BuildScape {
     @SubscribeEvent
     public void onServerStarted(
             net.minecraftforge.event.server.ServerStartedEvent event) {
-        LOGGER.info(
-                "BuildScape: Server started - will load pillar data after world is fully loaded");
 
         pillarDataLoadStarted = false;
         worldLoadWaitTicks = 0;
@@ -1585,7 +1573,6 @@ public class BuildScape {
     @SubscribeEvent
     public void onServerStopped(
             net.minecraftforge.event.server.ServerStoppedEvent event) {
-        LOGGER.info("BuildScape: Server stopped - syncing colors and resetting pillar data state");
 
         try {
             net.minecraft.server.MinecraftServer server = event.getServer();
@@ -1596,7 +1583,6 @@ public class BuildScape {
                     manager.syncColorsFromNBTToManager(server);
                     manager.saveImmediate();
                     manager.saveBackupFile();
-                    LOGGER.info("BuildScape: Colors synced and saved (main + backup) on server stop");
                 }
             }
         } catch (Exception e) {
@@ -1683,7 +1669,6 @@ public class BuildScape {
     public void onWorldUnload(
             net.minecraftforge.event.world.WorldEvent.Unload event) {
         if (event.getWorld() instanceof net.minecraft.server.level.ServerLevel) {
-            LOGGER.info("BuildScape: World unloading - saving manager data and syncing colors from NBT");
 
             try {
                 net.minecraft.server.MinecraftServer server = net.minecraftforge.server.ServerLifecycleHooks
@@ -1698,7 +1683,6 @@ public class BuildScape {
 
                         manager.saveBackupFile();
 
-                        LOGGER.info("BuildScape: Colors synced and saved (main + backup) before world unload");
                     }
                 }
             } catch (Exception e) {
@@ -1707,7 +1691,6 @@ public class BuildScape {
                 e.printStackTrace();
             }
 
-            LOGGER.info("BuildScape: World unloading - resetting cached data");
             com.kingodogo.buildscape.config.PillarIdManager.resetWorldCache();
 
             serverFullyInitialized = false;
@@ -2475,7 +2458,6 @@ public class BuildScape {
                 com.kingodogo.buildscape.block.ModWoodTypes.BAMBOO.getClass();
             });
 
-            LOGGER.info("Buildscape mod client setup complete");
 
             event.enqueueWork(() -> {
                 com.kingodogo.buildscape.client.ModKeyBinds.register();
@@ -3876,7 +3858,6 @@ public class BuildScape {
         @SubscribeEvent
         public static void onModelBake(
                 net.minecraftforge.client.event.ModelBakeEvent event) {
-            BuildScape.LOGGER.info("ModelBakeEvent fired - wrapping leaf hedge models");
             java.util.Set<net.minecraft.resources.ResourceLocation> leafHedgeModels = new java.util.HashSet<>();
             leafHedgeModels.add(
                     new net.minecraft.resources.ResourceLocation(
@@ -4054,10 +4035,8 @@ public class BuildScape {
                                     new com.kingodogo.buildscape.client.model.TintedLeafHedgeModel(
                                             originalModel));
                     wrappedCount++;
-                    BuildScape.LOGGER.debug("Wrapped model: {}", modelLocation);
                 } else {
                     notFoundCount++;
-                    BuildScape.LOGGER.warn("Model not found: {}", modelLocation);
                 }
             }
             BuildScape.LOGGER.info(

@@ -121,18 +121,12 @@ public class ModSounds {
                     if (COPPER_GRATE_BREAK.isPresent()) {
                         return COPPER_GRATE_BREAK.get();
                     }
-                    LOGGER.warn(
-                            "Copper grate break sound not ready, using COPPER fallback"
-                    );
                     return net.minecraft.sounds.SoundEvents.COPPER_BREAK;
                 };
                 Supplier<SoundEvent> stepSound = () -> {
                     if (COPPER_GRATE_STEP.isPresent()) {
                         return COPPER_GRATE_STEP.get();
                     }
-                    LOGGER.warn(
-                            "Copper grate step sound not ready, using COPPER fallback"
-                    );
                     return net.minecraft.sounds.SoundEvents.COPPER_STEP;
                 };
 
@@ -145,7 +139,6 @@ public class ModSounds {
                         stepSound,
                         stepSound
                 );
-                LOGGER.info("Copper grate ForgeSoundType initialized successfully");
             } catch (Exception e) {
                 LOGGER.error(
                         "Failed to create copper grate sound type: " + e.getMessage(),
@@ -172,27 +165,18 @@ public class ModSounds {
                     if (COPPER_BULB_BREAK.isPresent()) {
                         return COPPER_BULB_BREAK.get();
                     }
-                    LOGGER.warn(
-                            "Copper bulb break sound not ready, using COPPER fallback"
-                    );
                     return net.minecraft.sounds.SoundEvents.COPPER_BREAK;
                 };
                 Supplier<SoundEvent> stepSound = () -> {
                     if (COPPER_BULB_STEP.isPresent()) {
                         return COPPER_BULB_STEP.get();
                     }
-                    LOGGER.warn(
-                            "Copper bulb step sound not ready, using COPPER fallback"
-                    );
                     return net.minecraft.sounds.SoundEvents.COPPER_STEP;
                 };
                 Supplier<SoundEvent> placeSound = () -> {
                     if (COPPER_BULB_PLACE.isPresent()) {
                         return COPPER_BULB_PLACE.get();
                     }
-                    LOGGER.warn(
-                            "Copper bulb place sound not ready, using COPPER step fallback"
-                    );
                     return net.minecraft.sounds.SoundEvents.COPPER_STEP;
                 };
 
@@ -205,7 +189,6 @@ public class ModSounds {
                         stepSound,
                         stepSound
                 );
-                LOGGER.info("Copper bulb ForgeSoundType initialized successfully");
             } catch (Exception e) {
                 LOGGER.error(
                         "Failed to create copper bulb sound type: " + e.getMessage(),
@@ -231,14 +214,12 @@ public class ModSounds {
                 if (MUD_BREAK.isPresent()) {
                     return MUD_BREAK.get();
                 }
-                LOGGER.warn("Mud break sound not ready, using GRAVEL fallback");
                 return net.minecraft.sounds.SoundEvents.GRAVEL_BREAK;
             };
             Supplier<SoundEvent> stepSound = () -> {
                 if (MUD_STEP.isPresent()) {
                     return MUD_STEP.get();
                 }
-                LOGGER.warn("Mud step sound not ready, using GRAVEL fallback");
                 return net.minecraft.sounds.SoundEvents.GRAVEL_STEP;
             };
 
@@ -301,45 +282,30 @@ public class ModSounds {
                     if (FLOWER_BED_BREAK.isPresent()) {
                         return FLOWER_BED_BREAK.get();
                     }
-                    LOGGER.warn(
-                            "Flower bed break sound not ready, using FLOWERING_AZALEA fallback"
-                    );
                     return net.minecraft.sounds.SoundEvents.FLOWERING_AZALEA_BREAK;
                 },
                 () -> {
                     if (FLOWER_BED_STEP.isPresent()) {
                         return FLOWER_BED_STEP.get();
                     }
-                    LOGGER.warn(
-                            "Flower bed step sound not ready, using FLOWERING_AZALEA fallback"
-                    );
                     return net.minecraft.sounds.SoundEvents.FLOWERING_AZALEA_STEP;
                 },
                 () -> {
                     if (FLOWER_BED_PLACE.isPresent()) {
                         return FLOWER_BED_PLACE.get();
                     }
-                    LOGGER.warn(
-                            "Flower bed place sound not ready, using FLOWERING_AZALEA fallback"
-                    );
                     return net.minecraft.sounds.SoundEvents.FLOWERING_AZALEA_PLACE;
                 },
                 () -> {
                     if (FLOWER_BED_HIT.isPresent()) {
                         return FLOWER_BED_HIT.get();
                     }
-                    LOGGER.warn(
-                            "Flower bed hit sound not ready, using FLOWERING_AZALEA fallback"
-                    );
                     return net.minecraft.sounds.SoundEvents.FLOWERING_AZALEA_HIT;
                 },
                 () -> {
                     if (FLOWER_BED_FALL.isPresent()) {
                         return FLOWER_BED_FALL.get();
                     }
-                    LOGGER.warn(
-                            "Flower bed fall sound not ready, using FLOWERING_AZALEA fallback"
-                    );
                     return net.minecraft.sounds.SoundEvents.FLOWERING_AZALEA_FALL;
                 }
         );
@@ -392,45 +358,30 @@ public class ModSounds {
                     if (MANGROVE_ROOTS_BREAK.isPresent()) {
                         return MANGROVE_ROOTS_BREAK.get();
                     }
-                    LOGGER.warn(
-                            "Mangrove roots break sound not ready, using WOOD fallback"
-                    );
                     return net.minecraft.sounds.SoundEvents.WOOD_BREAK;
                 };
                 Supplier<SoundEvent> stepSound = () -> {
                     if (MANGROVE_ROOTS_STEP.isPresent()) {
                         return MANGROVE_ROOTS_STEP.get();
                     }
-                    LOGGER.warn(
-                            "Mangrove roots step sound not ready, using WOOD fallback"
-                    );
                     return net.minecraft.sounds.SoundEvents.WOOD_STEP;
                 };
                 Supplier<SoundEvent> placeSound = () -> {
                     if (MANGROVE_ROOTS_PLACE.isPresent()) {
                         return MANGROVE_ROOTS_PLACE.get();
                     }
-                    LOGGER.warn(
-                            "Mangrove roots place sound not ready, using WOOD fallback"
-                    );
                     return net.minecraft.sounds.SoundEvents.WOOD_PLACE;
                 };
                 Supplier<SoundEvent> hitSound = () -> {
                     if (MANGROVE_ROOTS_HIT.isPresent()) {
                         return MANGROVE_ROOTS_HIT.get();
                     }
-                    LOGGER.warn(
-                            "Mangrove roots hit sound not ready, using WOOD fallback"
-                    );
                     return net.minecraft.sounds.SoundEvents.WOOD_HIT;
                 };
                 Supplier<SoundEvent> fallSound = () -> {
                     if (MANGROVE_ROOTS_FALL.isPresent()) {
                         return MANGROVE_ROOTS_FALL.get();
                     }
-                    LOGGER.warn(
-                            "Mangrove roots fall sound not ready, using WOOD fallback"
-                    );
                     return net.minecraft.sounds.SoundEvents.WOOD_FALL;
                 };
 
@@ -443,7 +394,6 @@ public class ModSounds {
                         hitSound,
                         fallSound
                 );
-                LOGGER.info("Mangrove roots ForgeSoundType initialized successfully");
             } catch (Exception e) {
                 LOGGER.error(
                         "Failed to create mangrove roots sound type: " + e.getMessage(),
@@ -470,45 +420,30 @@ public class ModSounds {
                     if (MUDDY_MANGROVE_ROOTS_BREAK.isPresent()) {
                         return MUDDY_MANGROVE_ROOTS_BREAK.get();
                     }
-                    LOGGER.warn(
-                            "Muddy mangrove roots break sound not ready, using WOOD fallback"
-                    );
                     return net.minecraft.sounds.SoundEvents.WOOD_BREAK;
                 };
                 Supplier<SoundEvent> stepSound = () -> {
                     if (MUDDY_MANGROVE_ROOTS_STEP.isPresent()) {
                         return MUDDY_MANGROVE_ROOTS_STEP.get();
                     }
-                    LOGGER.warn(
-                            "Muddy mangrove roots step sound not ready, using WOOD fallback"
-                    );
                     return net.minecraft.sounds.SoundEvents.WOOD_STEP;
                 };
                 Supplier<SoundEvent> placeSound = () -> {
                     if (MUDDY_MANGROVE_ROOTS_PLACE.isPresent()) {
                         return MUDDY_MANGROVE_ROOTS_PLACE.get();
                     }
-                    LOGGER.warn(
-                            "Muddy mangrove roots place sound not ready, using WOOD fallback"
-                    );
                     return net.minecraft.sounds.SoundEvents.WOOD_PLACE;
                 };
                 Supplier<SoundEvent> hitSound = () -> {
                     if (MUDDY_MANGROVE_ROOTS_HIT.isPresent()) {
                         return MUDDY_MANGROVE_ROOTS_HIT.get();
                     }
-                    LOGGER.warn(
-                            "Muddy mangrove roots hit sound not ready, using WOOD fallback"
-                    );
                     return net.minecraft.sounds.SoundEvents.WOOD_HIT;
                 };
                 Supplier<SoundEvent> fallSound = () -> {
                     if (MUDDY_MANGROVE_ROOTS_FALL.isPresent()) {
                         return MUDDY_MANGROVE_ROOTS_FALL.get();
                     }
-                    LOGGER.warn(
-                            "Muddy mangrove roots fall sound not ready, using WOOD fallback"
-                    );
                     return net.minecraft.sounds.SoundEvents.WOOD_FALL;
                 };
 
@@ -520,9 +455,6 @@ public class ModSounds {
                         placeSound,
                         hitSound,
                         fallSound
-                );
-                LOGGER.info(
-                        "Muddy mangrove roots ForgeSoundType initialized successfully"
                 );
             } catch (Exception e) {
                 LOGGER.error(
@@ -551,6 +483,5 @@ public class ModSounds {
 
     public static void register(IEventBus eventBus) {
         SOUND_EVENTS.register(eventBus);
-        LOGGER.info("Registered ModSounds DeferredRegister");
     }
 }

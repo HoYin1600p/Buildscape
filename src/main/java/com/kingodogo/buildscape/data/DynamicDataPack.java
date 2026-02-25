@@ -137,24 +137,29 @@ public class DynamicDataPack implements PackResources {
             String fullBlock = parentNamespace + ":block/" + parentPath.replace("_slab", "");
             variants.add("type=double", createVariant(fullBlock, 0, 0));
 
-            // Block Model
-            // FOR MODDED BLOCKS: Parent to the FULL BLOCK model to ensure we get textures like #all correctly
-            String horizontalFullBlock = parentNamespace + ":block/" + parentPath.replace("_slab", "").replace("slab_", "");
-            boolean isVaultMod = parentNamespace.equals("auxiliaryblocks") || parentNamespace.equals("the_vault");
-            String modelToUse = isVaultMod ? horizontalFullBlock : parentNamespace + ":block/" + parentPath;
-            
-            // "Un-wax" the parent for copper to fix missing textures (wrapper blocks)
-            if (parentPath.startsWith("waxed_")) {
-                modelToUse = parentNamespace + ":block/" + parentPath.replace("waxed_", "").replace("_slab", "");
+            // Determine the best parent model and texturing strategy
+            String modelToUse = parentNamespace + ":block/" + parentPath;
+            boolean useAllTexture = false;
+
+            if (parentNamespace.equals("minecraft")) {
+                // Vanilla stable track: parent to horizontal slab
+                if (parentPath.startsWith("waxed_")) {
+                    modelToUse = parentNamespace + ":block/" + parentPath.replace("waxed_", "");
+                }
+            } else if (parentNamespace.equals("auxiliaryblocks") || parentNamespace.equals("the_vault")) {
+                // Modded fix track: parent to the FULL BLOCK to get textures reliably
+                String fullBlockPath = parentPath.replace("_slab", "").replace("slab_", "");
+                modelToUse = parentNamespace + ":block/" + fullBlockPath;
+                useAllTexture = true;
             }
 
             blockstate.add("variants", variants);
             cachedResources.put(PacketPath("assets", verticalId.getNamespace(), "blockstates", path + ".json"), GSON.toJson(blockstate));
             cachedResources.put(PacketPath("assets", verticalId.getNamespace(), "models/block", path + ".json"), 
-                GSON.toJson(createVerticalSlabModel(modelToUse, isVaultMod)));
+                GSON.toJson(createVerticalSlabModel(modelToUse, useAllTexture)));
 
             // Item Model
-            JsonObject itemModel = createVerticalSlabModel(modelToUse, isVaultMod);
+            JsonObject itemModel = createVerticalSlabModel(modelToUse, useAllTexture);
             addVerticalDisplay(itemModel, -2.0, 4.0); // Nudge left (-2) and forward (+4)
             cachedResources.put(PacketPath("assets", verticalId.getNamespace(), "models/item", path + ".json"), GSON.toJson(itemModel));
         });
@@ -188,81 +193,76 @@ public class DynamicDataPack implements PackResources {
             cachedResources.put(PacketPath("assets", verticalId.getNamespace(), "blockstates", path + ".json"), GSON.toJson(blockstate));
 
             // Block Model
-            // FOR MODDED BLOCKS: Parent to the FULL BLOCK model (avoiding broken stair texture logic)
-            String horizontalFullBlock = parentNamespace + ":block/" + parentPath.replace("_stairs", "").replace("stairs_", "");
-            boolean isVaultMod = parentNamespace.equals("auxiliaryblocks") || parentNamespace.equals("the_vault");
-            String modelToUse = isVaultMod ? horizontalFullBlock : parentNamespace + ":block/" + parentPath;
+            String modelToUse = parentNamespace + ":block/" + parentPath;
+            boolean useAllTexture = false;
 
-            // "Un-wax" the parent for copper to fix missing textures (wrapper blocks)
-            if (parentPath.startsWith("waxed_")) {
-                modelToUse = parentNamespace + ":block/" + parentPath.replace("waxed_", "").replace("_stairs", "");
+            if (parentNamespace.equals("minecraft")) {
+                // Vanilla stable track: parent to horizontal stair
+                if (parentPath.startsWith("waxed_")) {
+                    modelToUse = parentNamespace + ":block/" + parentPath.replace("waxed_", "");
+                }
+            } else if (parentNamespace.equals("auxiliaryblocks") || parentNamespace.equals("the_vault")) {
+                // Modded fix track: parent to the FULL BLOCK to get textures reliably
+                String fullBlockPath = parentPath.replace("_stairs", "").replace("stairs_", "");
+                modelToUse = parentNamespace + ":block/" + fullBlockPath;
+                useAllTexture = true;
             }
             
             cachedResources.put(PacketPath("assets", verticalId.getNamespace(), "models/block", path + ".json"), 
-                GSON.toJson(createVerticalStairModel(modelToUse, isVaultMod)));
+                GSON.toJson(createVerticalStairModel(modelToUse, useAllTexture)));
 
             // Item Model
-            JsonObject itemModel = createVerticalStairModel(modelToUse, isVaultMod);
+            JsonObject itemModel = createVerticalStairModel(modelToUse, useAllTexture);
             addVerticalDisplay(itemModel, 0.0, 2.0); // Reverted stairs to original (0 X, 2 Z)
             cachedResources.put(PacketPath("assets", verticalId.getNamespace(), "models/item", path + ".json"), GSON.toJson(itemModel));
         });
     }
 
-    private JsonObject createVerticalSlabModel(String parentModel, boolean isVaultMod) {
+    private JsonObject createVerticalSlabModel(String parentModel, boolean useAll) {
         JsonObject model = new JsonObject();
         model.addProperty("parent", parentModel);
-
-        if (isVaultMod) {
-            JsonObject textures = new JsonObject();
-            textures.addProperty("side", "#all");
-            textures.addProperty("top", "#all");
-            textures.addProperty("bottom", "#all");
-            textures.addProperty("particle", "#all");
-            model.add("textures", textures);
-        }
 
         JsonArray elements = new JsonArray();
         JsonObject slab = new JsonObject();
         slab.add("from", createJsonArray(0, 0, 0));
         slab.add("to", createJsonArray(16, 16, 8));
         JsonObject faces = new JsonObject();
-        faces.add("north", createFace("#side", "north", 0, 0, 16, 16));
-        faces.add("south", createFace("#side", "south", 0, 0, 16, 16));
-        faces.add("west", createFace("#side", "west", 0, 0, 8, 16));
-        faces.add("east", createFace("#side", "east", 8, 0, 16, 16));
-        faces.add("up", createFace("#top", "up", 0, 0, 16, 8));
-        faces.add("down", createFace("#bottom", "down", 0, 8, 16, 16));
+        String mainTex = useAll ? "#all" : "#side";
+        String topTex = useAll ? "#all" : "#top";
+        String botTex = useAll ? "#all" : "#bottom";
+
+        faces.add("north", createFace(mainTex, "north", 0, 0, 16, 16));
+        faces.add("south", createFace(mainTex, "south", 0, 0, 16, 16));
+        faces.add("west", createFace(mainTex, "west", 0, 0, 8, 16));
+        faces.add("east", createFace(mainTex, "east", 8, 0, 16, 16));
+        faces.add("up", createFace(topTex, "up", 0, 0, 16, 8));
+        faces.add("down", createFace(botTex, "down", 0, 8, 16, 16));
         slab.add("faces", faces);
         elements.add(slab);
         model.add("elements", elements);
         return model;
     }
 
-    private JsonObject createVerticalStairModel(String parentModel, boolean isVaultMod) {
+    private JsonObject createVerticalStairModel(String parentModel, boolean useAll) {
         JsonObject model = new JsonObject();
         model.addProperty("parent", parentModel);
 
-        if (isVaultMod) {
-            JsonObject textures = new JsonObject();
-            textures.addProperty("side", "#all");
-            textures.addProperty("top", "#all");
-            textures.addProperty("bottom", "#all");
-            textures.addProperty("particle", "#all");
-            model.add("textures", textures);
-        }
-
         JsonArray elements = new JsonArray();
+        String mainTex = useAll ? "#all" : "#side";
+        String topTex = useAll ? "#all" : "#top";
+        String botTex = useAll ? "#all" : "#bottom";
+
         // Element 1: Back Slab
         JsonObject slab = new JsonObject();
         slab.add("from", createJsonArray(0, 0, 0));
         slab.add("to", createJsonArray(16, 16, 8));
         JsonObject slabFaces = new JsonObject();
-        slabFaces.add("north", createFace("#side", "north", 0, 0, 16, 16));
-        slabFaces.add("south", createFace("#side", null, 0, 0, 16, 16));
-        slabFaces.add("west", createFace("#side", "west", 0, 0, 8, 16));
-        slabFaces.add("east", createFace("#side", "east", 8, 0, 16, 16));
-        slabFaces.add("up", createFace("#top", "up", 0, 0, 16, 8));
-        slabFaces.add("down", createFace("#bottom", "down", 0, 8, 16, 16));
+        slabFaces.add("north", createFace(mainTex, "north", 0, 0, 16, 16));
+        slabFaces.add("south", createFace(mainTex, null, 0, 0, 16, 16));
+        slabFaces.add("west", createFace(mainTex, "west", 0, 0, 8, 16));
+        slabFaces.add("east", createFace(mainTex, "east", 8, 0, 16, 16));
+        slabFaces.add("up", createFace(topTex, "up", 0, 0, 16, 8));
+        slabFaces.add("down", createFace(botTex, "down", 0, 8, 16, 16));
         slab.add("faces", slabFaces);
         elements.add(slab);
 
@@ -271,12 +271,12 @@ public class DynamicDataPack implements PackResources {
         pillar.add("from", createJsonArray(0, 0, 8));
         pillar.add("to", createJsonArray(8, 16, 16));
         JsonObject pFaces = new JsonObject();
-        pFaces.add("north", createFace("#side", null, 0, 0, 8, 16));
-        pFaces.add("south", createFace("#side", "south", 0, 0, 8, 16));
-        pFaces.add("west", createFace("#side", "west", 8, 0, 16, 16));
-        pFaces.add("east", createFace("#side", null, 0, 0, 8, 16));
-        pFaces.add("up", createFace("#top", "up", 0, 8, 8, 16));
-        pFaces.add("down", createFace("#bottom", "down", 0, 0, 8, 8));
+        pFaces.add("north", createFace(mainTex, null, 0, 0, 8, 16));
+        pFaces.add("south", createFace(mainTex, "south", 0, 0, 8, 16));
+        pFaces.add("west", createFace(mainTex, "west", 8, 0, 16, 16));
+        pFaces.add("east", createFace(mainTex, null, 0, 0, 8, 16));
+        pFaces.add("up", createFace(topTex, "up", 0, 8, 8, 16));
+        pFaces.add("down", createFace(botTex, "down", 0, 0, 8, 8));
         pillar.add("faces", pFaces);
         elements.add(pillar);
 

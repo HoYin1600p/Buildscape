@@ -15,6 +15,7 @@ import net.minecraft.server.packs.metadata.MetadataSectionSerializer;
 import net.minecraft.server.packs.metadata.pack.PackMetadataSection;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nullable;
 import java.io.ByteArrayInputStream;
@@ -68,12 +69,18 @@ public class DynamicDataPack implements PackResources {
             ResourceLocation parentId = parentSlab.getRegistryName();
             if (verticalId == null || parentId == null) return;
 
+            // Skip if original block doesn't exist
+            if (!ForgeRegistries.BLOCKS.containsKey(parentId)) return;
+            Block parentBlockObj = ForgeRegistries.BLOCKS.getValue(parentId);
+            if (parentBlockObj == null || parentBlockObj == net.minecraft.world.level.block.Blocks.AIR) return;
+
             // Loot Table
             cachedResources.put(PacketPath("data", verticalId.getNamespace(), "loot_tables/blocks", verticalId.getPath() + ".json"), 
                 createSimpleLootTable(verticalId));
 
-            // Recipes (Stonecutting & Crafting)
+            // Recipes
             addSlabRecipes(verticalId, parentId);
+            addStonecuttingRecipe(verticalId, parentId);
         });
 
         // Generate Stairs
@@ -82,12 +89,18 @@ public class DynamicDataPack implements PackResources {
             ResourceLocation parentId = parentStair.getRegistryName();
             if (verticalId == null || parentId == null) return;
 
+            // Skip if original block doesn't exist
+            if (!ForgeRegistries.BLOCKS.containsKey(parentId)) return;
+            Block parentBlockObj = ForgeRegistries.BLOCKS.getValue(parentId);
+            if (parentBlockObj == null || parentBlockObj == net.minecraft.world.level.block.Blocks.AIR) return;
+
             // Loot Table
             cachedResources.put(PacketPath("data", verticalId.getNamespace(), "loot_tables/blocks", verticalId.getPath() + ".json"), 
                 createSimpleLootTable(verticalId));
 
             // Recipes
             addStairRecipes(verticalId, parentId);
+            addStonecuttingRecipe(verticalId, parentId);
         });
 
         // Tags
@@ -105,6 +118,11 @@ public class DynamicDataPack implements PackResources {
             String parentNamespace = parentId.getNamespace();
             String parentPath = parentId.getPath();
 
+            // Skip if original block doesn't exist or is air
+            if (!ForgeRegistries.BLOCKS.containsKey(parentId)) return;
+            Block parentBlockObj = ForgeRegistries.BLOCKS.getValue(parentId);
+            if (parentBlockObj == null || parentBlockObj == net.minecraft.world.level.block.Blocks.AIR) return;
+
             // Blockstate
             JsonObject blockstate = new JsonObject();
             JsonObject variants = new JsonObject();
@@ -119,20 +137,24 @@ public class DynamicDataPack implements PackResources {
             String fullBlock = parentNamespace + ":block/" + parentPath.replace("_slab", "");
             variants.add("type=double", createVariant(fullBlock, 0, 0));
 
-            // Block Model (Parented to Horizontal Slab for textures)
-            String horizontalSlabModel = parentNamespace + ":block/" + parentPath;
+            // Block Model
+            // FOR MODDED BLOCKS: Parent to the FULL BLOCK model to ensure we get textures like #all correctly
+            String horizontalFullBlock = parentNamespace + ":block/" + parentPath.replace("_slab", "").replace("slab_", "");
+            boolean isVaultMod = parentNamespace.equals("auxiliaryblocks") || parentNamespace.equals("the_vault");
+            String modelToUse = isVaultMod ? horizontalFullBlock : parentNamespace + ":block/" + parentPath;
+            
             // "Un-wax" the parent for copper to fix missing textures (wrapper blocks)
             if (parentPath.startsWith("waxed_")) {
-                horizontalSlabModel = parentNamespace + ":block/" + parentPath.replace("waxed_", "");
+                modelToUse = parentNamespace + ":block/" + parentPath.replace("waxed_", "").replace("_slab", "");
             }
 
             blockstate.add("variants", variants);
             cachedResources.put(PacketPath("assets", verticalId.getNamespace(), "blockstates", path + ".json"), GSON.toJson(blockstate));
             cachedResources.put(PacketPath("assets", verticalId.getNamespace(), "models/block", path + ".json"), 
-                GSON.toJson(createVerticalSlabModel(horizontalSlabModel)));
+                GSON.toJson(createVerticalSlabModel(modelToUse, isVaultMod)));
 
             // Item Model
-            JsonObject itemModel = createVerticalSlabModel(horizontalSlabModel);
+            JsonObject itemModel = createVerticalSlabModel(modelToUse, isVaultMod);
             addVerticalDisplay(itemModel, -2.0, 4.0); // Nudge left (-2) and forward (+4)
             cachedResources.put(PacketPath("assets", verticalId.getNamespace(), "models/item", path + ".json"), GSON.toJson(itemModel));
         });
@@ -146,6 +168,11 @@ public class DynamicDataPack implements PackResources {
             String path = verticalId.getPath();
             String parentNamespace = parentId.getNamespace();
             String parentPath = parentId.getPath();
+
+            // Skip if original block doesn't exist
+            if (!ForgeRegistries.BLOCKS.containsKey(parentId)) return;
+            Block parentBlockObj = ForgeRegistries.BLOCKS.getValue(parentId);
+            if (parentBlockObj == null || parentBlockObj == net.minecraft.world.level.block.Blocks.AIR) return;
 
             // Blockstate
             JsonObject blockstate = new JsonObject();
@@ -161,25 +188,38 @@ public class DynamicDataPack implements PackResources {
             cachedResources.put(PacketPath("assets", verticalId.getNamespace(), "blockstates", path + ".json"), GSON.toJson(blockstate));
 
             // Block Model
-            String horizontalStairModel = parentNamespace + ":block/" + parentPath;
+            // FOR MODDED BLOCKS: Parent to the FULL BLOCK model (avoiding broken stair texture logic)
+            String horizontalFullBlock = parentNamespace + ":block/" + parentPath.replace("_stairs", "").replace("stairs_", "");
+            boolean isVaultMod = parentNamespace.equals("auxiliaryblocks") || parentNamespace.equals("the_vault");
+            String modelToUse = isVaultMod ? horizontalFullBlock : parentNamespace + ":block/" + parentPath;
+
             // "Un-wax" the parent for copper to fix missing textures (wrapper blocks)
             if (parentPath.startsWith("waxed_")) {
-                horizontalStairModel = parentNamespace + ":block/" + parentPath.replace("waxed_", "");
+                modelToUse = parentNamespace + ":block/" + parentPath.replace("waxed_", "").replace("_stairs", "");
             }
             
             cachedResources.put(PacketPath("assets", verticalId.getNamespace(), "models/block", path + ".json"), 
-                GSON.toJson(createVerticalStairModel(horizontalStairModel)));
+                GSON.toJson(createVerticalStairModel(modelToUse, isVaultMod)));
 
             // Item Model
-            JsonObject itemModel = createVerticalStairModel(horizontalStairModel);
+            JsonObject itemModel = createVerticalStairModel(modelToUse, isVaultMod);
             addVerticalDisplay(itemModel, 0.0, 2.0); // Reverted stairs to original (0 X, 2 Z)
             cachedResources.put(PacketPath("assets", verticalId.getNamespace(), "models/item", path + ".json"), GSON.toJson(itemModel));
         });
     }
 
-    private JsonObject createVerticalSlabModel(String parentModel) {
+    private JsonObject createVerticalSlabModel(String parentModel, boolean isVaultMod) {
         JsonObject model = new JsonObject();
         model.addProperty("parent", parentModel);
+
+        if (isVaultMod) {
+            JsonObject textures = new JsonObject();
+            textures.addProperty("side", "#all");
+            textures.addProperty("top", "#all");
+            textures.addProperty("bottom", "#all");
+            textures.addProperty("particle", "#all");
+            model.add("textures", textures);
+        }
 
         JsonArray elements = new JsonArray();
         JsonObject slab = new JsonObject();
@@ -198,9 +238,18 @@ public class DynamicDataPack implements PackResources {
         return model;
     }
 
-    private JsonObject createVerticalStairModel(String parentModel) {
+    private JsonObject createVerticalStairModel(String parentModel, boolean isVaultMod) {
         JsonObject model = new JsonObject();
         model.addProperty("parent", parentModel);
+
+        if (isVaultMod) {
+            JsonObject textures = new JsonObject();
+            textures.addProperty("side", "#all");
+            textures.addProperty("top", "#all");
+            textures.addProperty("bottom", "#all");
+            textures.addProperty("particle", "#all");
+            model.add("textures", textures);
+        }
 
         JsonArray elements = new JsonArray();
         // Element 1: Back Slab
@@ -340,8 +389,37 @@ public class DynamicDataPack implements PackResources {
         cachedResources.put(PacketPath("data", BuildScape.MODID, "recipes", verticalId.getPath() + ".json"), GSON.toJson(recipe));
     }
 
+    private void addStonecuttingRecipe(ResourceLocation verticalId, ResourceLocation parentId) {
+        JsonObject recipe = new JsonObject();
+        recipe.addProperty("type", "minecraft:stonecutting");
+        JsonObject ingredient = new JsonObject();
+        ingredient.addProperty("item", parentId.toString());
+        recipe.add("ingredient", ingredient);
+        recipe.addProperty("result", verticalId.toString());
+        recipe.addProperty("count", 1);
+        cachedResources.put(PacketPath("data", BuildScape.MODID, "recipes", "stonecutting_" + verticalId.getPath() + ".json"), GSON.toJson(recipe));
+    }
+
     private void addTags(Map<Block, Block> slabMap, Map<Block, Block> stairMap) {
-        // Implementation for tags omitted for brevity but can be expanded if needed
+        // Blocks Tags
+        addTag(PacketPath("data", "minecraft", "tags/blocks", "slabs.json"), slabMap.values());
+        addTag(PacketPath("data", "minecraft", "tags/blocks", "stairs.json"), stairMap.values());
+        
+        // Item Tags
+        addTag(PacketPath("data", "minecraft", "tags/items", "slabs.json"), slabMap.values());
+        addTag(PacketPath("data", "minecraft", "tags/items", "stairs.json"), stairMap.values());
+    }
+
+    private void addTag(String path, Collection<Block> blocks) {
+        JsonObject tag = new JsonObject();
+        tag.addProperty("replace", false);
+        JsonArray values = new JsonArray();
+        for (Block block : blocks) {
+            ResourceLocation id = block.getRegistryName();
+            if (id != null) values.add(id.toString());
+        }
+        tag.add("values", values);
+        cachedResources.put(path, GSON.toJson(tag));
     }
 
     private JsonObject createVariant(String model, int x, int y) {

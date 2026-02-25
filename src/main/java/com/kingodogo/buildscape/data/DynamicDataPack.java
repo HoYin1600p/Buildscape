@@ -119,17 +119,21 @@ public class DynamicDataPack implements PackResources {
             String fullBlock = parentNamespace + ":block/" + parentPath.replace("_slab", "");
             variants.add("type=double", createVariant(fullBlock, 0, 0));
 
-            blockstate.add("variants", variants);
-            cachedResources.put(PacketPath("assets", verticalId.getNamespace(), "blockstates", path + ".json"), GSON.toJson(blockstate));
-
             // Block Model (Parented to Horizontal Slab for textures)
             String horizontalSlabModel = parentNamespace + ":block/" + parentPath;
+            // "Un-wax" the parent for copper to fix missing textures (wrapper blocks)
+            if (parentPath.startsWith("waxed_")) {
+                horizontalSlabModel = parentNamespace + ":block/" + parentPath.replace("waxed_", "");
+            }
+
+            blockstate.add("variants", variants);
+            cachedResources.put(PacketPath("assets", verticalId.getNamespace(), "blockstates", path + ".json"), GSON.toJson(blockstate));
             cachedResources.put(PacketPath("assets", verticalId.getNamespace(), "models/block", path + ".json"), 
                 GSON.toJson(createVerticalSlabModel(horizontalSlabModel)));
 
             // Item Model
             JsonObject itemModel = createVerticalSlabModel(horizontalSlabModel);
-            addVerticalDisplay(itemModel);
+            addVerticalDisplay(itemModel, -2.0, 4.0); // Nudge left (-2) and forward (+4)
             cachedResources.put(PacketPath("assets", verticalId.getNamespace(), "models/item", path + ".json"), GSON.toJson(itemModel));
         });
 
@@ -158,12 +162,17 @@ public class DynamicDataPack implements PackResources {
 
             // Block Model
             String horizontalStairModel = parentNamespace + ":block/" + parentPath;
+            // "Un-wax" the parent for copper to fix missing textures (wrapper blocks)
+            if (parentPath.startsWith("waxed_")) {
+                horizontalStairModel = parentNamespace + ":block/" + parentPath.replace("waxed_", "");
+            }
+            
             cachedResources.put(PacketPath("assets", verticalId.getNamespace(), "models/block", path + ".json"), 
                 GSON.toJson(createVerticalStairModel(horizontalStairModel)));
 
             // Item Model
             JsonObject itemModel = createVerticalStairModel(horizontalStairModel);
-            addVerticalDisplay(itemModel);
+            addVerticalDisplay(itemModel, 0.0, 2.0); // Reverted stairs to original (0 X, 2 Z)
             cachedResources.put(PacketPath("assets", verticalId.getNamespace(), "models/item", path + ".json"), GSON.toJson(itemModel));
         });
     }
@@ -226,24 +235,39 @@ public class DynamicDataPack implements PackResources {
         return model;
     }
 
-    private void addVerticalDisplay(JsonObject model) {
+    private void addVerticalDisplay(JsonObject model, double translateX, double translateZ) {
         JsonObject display = new JsonObject();
         
-        // GUI: 315 degree rotation to face correctly
+        // GUI: 315 degree rotation to face correctly, with centering translation
         JsonObject gui = new JsonObject();
         gui.add("rotation", createJsonArray(30, 315, 0));
-        gui.add("translation", createJsonArray(0, 0, 0));
+        gui.add("translation", createJsonArray(translateX, 0, translateZ)); 
         gui.add("scale", createJsonArray(0.625, 0.625, 0.625));
         display.add("gui", gui);
 
-        // First Person: Aligned to 315
+        // Ground: Item floating/spinning on the floor
+        JsonObject ground = new JsonObject();
+        ground.add("translation", createJsonArray(0, 3, 0));
+        ground.add("scale", createJsonArray(0.25, 0.25, 0.25));
+        display.add("ground", ground);
+
+        // Third Person
+        JsonObject thirdPersonRight = new JsonObject();
+        thirdPersonRight.add("rotation", createJsonArray(75, 45, 0));
+        thirdPersonRight.add("translation", createJsonArray(0, 2.5, 0));
+        thirdPersonRight.add("scale", createJsonArray(0.375, 0.375, 0.375));
+        display.add("thirdperson_righthand", thirdPersonRight);
+
+        // First Person: Handheld view
         JsonObject firstPersonRight = new JsonObject();
         firstPersonRight.add("rotation", createJsonArray(0, 315, 0));
+        firstPersonRight.add("translation", createJsonArray(0, 0, translateZ / 2.0)); // Slight centering in hand
         firstPersonRight.add("scale", createJsonArray(0.4, 0.4, 0.4));
         display.add("firstperson_righthand", firstPersonRight);
 
         JsonObject firstPersonLeft = new JsonObject();
         firstPersonLeft.add("rotation", createJsonArray(0, 135, 0));
+        firstPersonLeft.add("translation", createJsonArray(0, 0, translateZ / 2.0));
         firstPersonLeft.add("scale", createJsonArray(0.4, 0.4, 0.4));
         display.add("firstperson_lefthand", firstPersonLeft);
 
@@ -390,6 +414,8 @@ public class DynamicDataPack implements PackResources {
 
     @Override
     public Set<String> getNamespaces(PackType type) {
+        // Return BuildScape namespace only when we actually have content to serve
+        // to avoid interfering with the main mod's file lookups early on.
         return Set.of(BuildScape.MODID, "minecraft");
     }
 

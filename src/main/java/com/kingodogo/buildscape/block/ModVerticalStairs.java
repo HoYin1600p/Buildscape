@@ -35,6 +35,9 @@ public class ModVerticalStairs {
         try {
             for (Block block : ForgeRegistries.BLOCKS) {
                 if (block instanceof StairBlock && !(block instanceof VerticalStairBlock)) {
+                    String path = block.getRegistryName().getPath().toLowerCase();
+                    // Skip blocks that already appear to be vertical/upright variants from other mods
+                    if (path.contains("vertical") || path.contains("upright")) continue;
                     stairs.add(block);
                 }
             }
@@ -51,7 +54,6 @@ public class ModVerticalStairs {
                 }
             });
 
-            BuildScape.LOGGER.info("Found " + stairs.size() + " stairs to generate vertical variants for.");
 
             for (Block stair : stairs) {
                 ResourceLocation id = stair.getRegistryName();

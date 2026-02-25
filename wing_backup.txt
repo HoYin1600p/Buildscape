@@ -1,0 +1,58 @@
+[ParticleShapeLibrary.java State]
+case "heart" -> generateHeartShape(particles, config);
+case "sparkle" -> generateSparkleShape(particles, config);
+case "cake" -> generateCakeShape(particles, config); // Crystalline pattern
+case "snowflake" -> generateSnowflakeShape(particles, config); // Fountain pattern
+case "spore" -> generateSporeShape(particles, config);
+
+[generateSnowflakeShape (Fountain)]
+    private static void generateSnowflakeShape(List<WingParticlePos> particles, WingShapeConfig config) {
+        // Fountain Pattern: Vertical streams that spray out and drop down
+        Random rand = new Random(777);
+        int streamCount = 12;
+        for (int s = 0; s < streamCount; s++) {
+            float streamAngle = (s / (float)streamCount) * 1.2f - 0.2f;
+            float streamMaxLen = 0.6f + rand.nextFloat() * 0.6f;
+            
+            for (float t = 0.0f; t <= 1.0f; t += 0.08f) {
+                float dist = t * streamMaxLen * (float)config.wingLength;
+                // Arch math: arcs up then down
+                float x = (float)Math.cos(streamAngle) * dist;
+                float heightFactor = (float)Math.sin(t * Math.PI);
+                float y = (float)Math.sin(streamAngle) * dist + (heightFactor * 0.8f);
+                
+                // Vertical trails dropping from the arch points
+                if (t > 0.4f) {
+                    for (float drop = 0; drop < 0.6f; drop += 0.2f) {
+                        particles.add(new WingParticlePos(x + (rand.nextFloat()-0.5f)*0.05f, y - drop, 0));
+                    }
+                } else {
+                    particles.add(new WingParticlePos(x, y, 0));
+                }
+            }
+        }
+    }
+
+[generateCakeShape (Crystalline)]
+    private static void generateCakeShape(List<WingParticlePos> particles, WingShapeConfig config) {
+        // Inherits the hexagonal crystalline branching previously used for snowflakes
+        float[] masterAngles = {-0.6f, -0.25f, 0.1f, 0.45f}; 
+        Random rand = new Random(555);
+        for (float mAngle : masterAngles) {
+            for (float t = 0.05f; t <= 1.0f; t += config.lengthStep * 0.8f) {
+                float x = (float)Math.cos(mAngle) * t * (float)config.wingLength;
+                float y = (float)Math.sin(mAngle) * t * (float)config.wingLength;
+                particles.add(new WingParticlePos(x, y, 0));
+                
+                if (t > 0.3f && (int)(t * 100) % 25 == 0) {
+                    float subAngle = 0.6f;
+                    float subLen = 0.3f * t;
+                    particles.add(new WingParticlePos(x + (float)Math.cos(mAngle + subAngle)*subLen, y + (float)Math.sin(mAngle + subAngle)*subLen, 0));
+                    particles.add(new WingParticlePos(x + (float)Math.cos(mAngle - subAngle)*subLen, y + (float)Math.sin(mAngle - subAngle)*subLen, 0));
+                }
+            }
+        }
+    }
+
+[CosmeticWingRenderer Spine Offset]
+poseStack.translate(0.12 * side, 0, 0);

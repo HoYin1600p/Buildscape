@@ -3,6 +3,7 @@ package com.kingodogo.buildscape.config;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+import com.kingodogo.buildscape.BuildScape;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 
@@ -285,8 +286,7 @@ public class PillarParticleConfig {
                         } catch (InterruptedException e) {
                             Thread.currentThread().interrupt();
                         } catch (Exception e) {
-                            System.err.println(
-                                    "BuildScape: Error in config file watcher: " + e.getMessage());
+                            BuildScape.LOGGER.error("Error in config file watcher: " + e.getMessage());
                         }
                     },
                     "BuildScape-ConfigWatcher");
@@ -294,9 +294,6 @@ public class PillarParticleConfig {
             watchThread.setDaemon(true);
             watchThread.start();
         } catch (Exception e) {
-            System.out.println(
-                    "BuildScape: Failed to initialize config file watcher, using polling instead: " +
-                            e.getMessage());
             watcherInitialized.set(false);
         }
     }
@@ -1201,7 +1198,7 @@ public class PillarParticleConfig {
             lastLoadedItems = file.lastModified();
             lastFileSizeItems = file.length();
         } catch (Exception e) {
-            System.err.println("BuildScape: Error saving items config: " + e.getMessage());
+            BuildScape.LOGGER.error("Error saving items config: " + e.getMessage());
         }
     }
 
@@ -1233,7 +1230,7 @@ public class PillarParticleConfig {
             lastLoadedProperties = file.lastModified();
             lastFileSizeProperties = file.length();
         } catch (Exception e) {
-            System.err.println("BuildScape: Error saving properties config: " + e.getMessage());
+            BuildScape.LOGGER.error("Error saving properties config: " + e.getMessage());
         }
     }
 

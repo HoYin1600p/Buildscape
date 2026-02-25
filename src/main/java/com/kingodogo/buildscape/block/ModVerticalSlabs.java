@@ -38,6 +38,9 @@ public class ModVerticalSlabs {
             // Iterate all blocks currently registered (Vanilla + mods that ran before us)
             for (Block block : ForgeRegistries.BLOCKS) {
                 if (block instanceof SlabBlock && !(block instanceof VerticalSlabBlock)) {
+                    String path = block.getRegistryName().getPath().toLowerCase();
+                    // Skip blocks that already appear to be vertical/upright variants from other mods
+                    if (path.contains("vertical") || path.contains("upright")) continue;
                     slabs.add(block);
                 }
             }
@@ -57,7 +60,6 @@ public class ModVerticalSlabs {
                 }
             });
 
-            BuildScape.LOGGER.info("Found " + slabs.size() + " slabs to generate vertical variants for.");
 
             for (Block slab : slabs) {
                 ResourceLocation id = slab.getRegistryName();

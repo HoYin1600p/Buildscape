@@ -185,8 +185,7 @@ public class ArmorPillarRenderer {
         try {
             armorStand.readAdditionalSaveData(nbt);
         } catch (Exception e) {
-            // Log NBT read error but don't crash game here, although it likely means entity is corrupt
-            System.err.println("Error updating ArmorStand NBT: " + e.getMessage());
+            // NBT read error - entity may be corrupt
         }
     }
 

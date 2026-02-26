@@ -161,8 +161,7 @@ public class BuildScapeConfigScreen extends Screen {
 
             calculatedSidebarWidth = (int) (guiScaledWidth * SIDEBAR_WIDTH_PERCENT);
         } catch (Exception e) {
-            BuildScape.getLogger().error("Failed to set screen dimensions: " + e.getMessage());
-            e.printStackTrace();
+            // Silently handle - dimensions will be set correctly in init() via Minecraft's normal flow
         }
     }
 

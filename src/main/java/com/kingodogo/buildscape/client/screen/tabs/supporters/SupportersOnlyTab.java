@@ -2,7 +2,6 @@ package com.kingodogo.buildscape.client.screen.tabs.supporters;
 
 import com.kingodogo.buildscape.BuildScape;
 import com.kingodogo.buildscape.api.SupportersApiCache;
-import com.kingodogo.buildscape.api.SupportersApiClient;
 import com.kingodogo.buildscape.api.model.CosmeticData;
 import com.kingodogo.buildscape.client.screen.AbstractConfigTab;
 import com.kingodogo.buildscape.client.screen.BuildScapeConfigScreen;
@@ -79,64 +78,24 @@ public class SupportersOnlyTab extends AbstractConfigTab {
             loadDefaultCosmetics();
             return;
         }
-        
+
         UUID playerUuid = mc.player.getUUID();
         if (state.getPlayerUuid() == null || !state.getPlayerUuid().equals(playerUuid) || state.getEquippedCosmetics().isEmpty()) {
             state.setPlayerUuid(playerUuid);
         }
-        
-        SupportersApiClient apiClient = SupportersApiClient.getInstance();
+
         SupportersApiCache apiCache = SupportersApiCache.getInstance();
 
+        // Only use cached data from game launch - do NOT make new API calls in the tab
         CosmeticData cachedCosmetics = apiCache.getCachedCosmetics(playerUuid);
         if (cachedCosmetics != null) {
             updateCosmeticsData(cachedCosmetics);
-            return; // Use cached data (preloaded) and skip redundant API call
-        }
-        
-        loadDefaultCosmetics();
-        
-        // precise fallback logic: try secure authenticate first, then legacy
-        String uuidStr = playerUuid.toString();
-        try {
-            String accessToken = mc.getUser().getAccessToken();
-            if (accessToken != null && !accessToken.isEmpty()) {
-                apiClient.authenticate(uuidStr, accessToken)
-                    .thenAccept(response -> {
-                        mc.execute(() -> {
-                            if (response != null && !response.isError()) {
-                                CosmeticData data = response.toCosmeticData();
-                                apiCache.cacheCosmetics(playerUuid, data);
-                                updateCosmeticsData(data);
-                            } else {
-                                BuildScape.getLogger().error("Failed to load cosmetics via auth: " + (response != null ? response.getError() : "null"));
-                            }
-                        });
-                    })
-                    .exceptionally(t -> {
-                        mc.execute(() -> BuildScape.getLogger().error("Error loading cosmetics: " + t.getMessage()));
-                        return null;
-                    });
-                 return;
-            }
-        } catch (Exception e) {
-            // Ignore access token errors
+            return; // Use cached data (preloaded from game launch)
         }
 
-        // Legacy fallback if no token
-        apiClient.getCosmetics(playerUuid)
-            .thenAccept(cosmetics -> {
-                mc.execute(() -> {
-                    if (cosmetics != null) {
-                        apiCache.cacheCosmetics(playerUuid, cosmetics);
-                        updateCosmeticsData(cosmetics);
-                    }
-                });
-            })
-            .exceptionally(throwable -> {
-                mc.execute(() -> BuildScape.getLogger().error("Failed to load cosmetics: " + throwable.getMessage()));
-                return null;
-            });
+        // No cache available - just load defaults and local config
+        // API calls only happen during game launch, not when opening tabs
+        loadDefaultCosmetics();
     }
     
     private void loadDefaultCosmetics() {
@@ -175,15 +134,15 @@ public class SupportersOnlyTab extends AbstractConfigTab {
         }
 
         Set<String> unlocked = new java.util.HashSet<>(cosmetics.getUnlocked() != null ? cosmetics.getUnlocked() : new ArrayList<>());
-        
+
         // Ensure default cosmetics are ALWAYS unlocked
         unlocked.addAll(cosmeticManager.getDefaultCosmetics());
-        
+
         // If admin, unlock EVERYTHING
         if (cosmetics.isAdmin()) {
             unlocked.addAll(allRegisteredCosmetics);
         }
-        
+
         state.setUnlockedCosmetics(unlocked);
 
         List<String> allCosmetics = new ArrayList<>(allRegisteredCosmetics);
@@ -200,13 +159,25 @@ public class SupportersOnlyTab extends AbstractConfigTab {
             panel1.setAllCosmeticIds(allCosmetics);
         }
 
-        if (cosmetics.getEquipped() != null && !cosmetics.getEquipped().isEmpty()) {
+        // Use local equipped cosmetics if they exist, only fallback to API data if nothing locally equipped
+        UUID storedUuid = state.getPlayerUuid();
+        if (storedUuid == null) {
+            storedUuid = currentPlayerUuid;
+            state.setPlayerUuid(storedUuid);
+        }
+
+        // Load equipped from local config
+        Set<String> localEquipped = new java.util.HashSet<>();
+        if (storedUuid != null) {
+            java.util.Map<Integer, String> localCosmeticsMap = com.kingodogo.buildscape.config.CosmeticsConfig.get().getEquippedCosmetics(storedUuid);
+            localEquipped.addAll(localCosmeticsMap.values());
+        }
+
+        // Only use API equipped data if local config is empty
+        if (!localEquipped.isEmpty()) {
+            state.setEquippedCosmetics(localEquipped);
+        } else if (cosmetics.getEquipped() != null && !cosmetics.getEquipped().isEmpty()) {
             state.setEquippedCosmetics(new java.util.HashSet<>(cosmetics.getEquipped()));
-        } else {
-            UUID storedUuid = state.getPlayerUuid();
-            if (storedUuid != null) {
-                state.setPlayerUuid(storedUuid);
-            }
         }
     }
     

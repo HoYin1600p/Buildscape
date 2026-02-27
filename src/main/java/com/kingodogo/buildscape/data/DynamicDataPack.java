@@ -134,22 +134,27 @@ public class DynamicDataPack implements PackResources {
             variants.add("facing=west,type=bottom", createVariant(modelPath, 0, 270));
             
             // Double uses full block model
-            String fullBlock = parentNamespace + ":block/" + parentPath.replace("_slab", "");
+            String cleanPath = parentPath.replace("_slab", "").replace("slab_", "");
+            String fullBlock = parentNamespace + ":block/" + cleanPath;
             variants.add("type=double", createVariant(fullBlock, 0, 0));
 
             // Determine the best parent model and texturing strategy
             String modelToUse = parentNamespace + ":block/" + parentPath;
             boolean useAllTexture = false;
 
+            // Known mods that use a single #all texture for slabs/stairs
+            boolean isSingleTextureMod = parentNamespace.equals("auxiliaryblocks") || 
+                                       parentNamespace.equals("the_vault") ||
+                                       parentNamespace.equals("biomesoplenty");
+
             if (parentNamespace.equals("minecraft")) {
                 // Vanilla stable track: parent to horizontal slab
                 if (parentPath.startsWith("waxed_")) {
                     modelToUse = parentNamespace + ":block/" + parentPath.replace("waxed_", "");
                 }
-            } else if (parentNamespace.equals("auxiliaryblocks") || parentNamespace.equals("the_vault")) {
+            } else if (isSingleTextureMod) {
                 // Modded fix track: parent to the FULL BLOCK to get textures reliably
-                String fullBlockPath = parentPath.replace("_slab", "").replace("slab_", "");
-                modelToUse = parentNamespace + ":block/" + fullBlockPath;
+                modelToUse = parentNamespace + ":block/" + cleanPath;
                 useAllTexture = true;
             }
 
@@ -193,18 +198,21 @@ public class DynamicDataPack implements PackResources {
             cachedResources.put(PacketPath("assets", verticalId.getNamespace(), "blockstates", path + ".json"), GSON.toJson(blockstate));
 
             // Block Model
+            String cleanPath = parentPath.replace("_stairs", "").replace("stairs_", "").replace("_stair", "").replace("stair_", "");
+            boolean isSingleTextureMod = parentNamespace.equals("auxiliaryblocks") || 
+                                       parentNamespace.equals("the_vault") ||
+                                       parentNamespace.equals("biomesoplenty");
+            
             String modelToUse = parentNamespace + ":block/" + parentPath;
             boolean useAllTexture = false;
 
             if (parentNamespace.equals("minecraft")) {
-                // Vanilla stable track: parent to horizontal stair
+                // Vanilla stable track
                 if (parentPath.startsWith("waxed_")) {
                     modelToUse = parentNamespace + ":block/" + parentPath.replace("waxed_", "");
                 }
-            } else if (parentNamespace.equals("auxiliaryblocks") || parentNamespace.equals("the_vault")) {
-                // Modded fix track: parent to the FULL BLOCK to get textures reliably
-                String fullBlockPath = parentPath.replace("_stairs", "").replace("stairs_", "");
-                modelToUse = parentNamespace + ":block/" + fullBlockPath;
+            } else if (isSingleTextureMod) {
+                modelToUse = parentNamespace + ":block/" + cleanPath;
                 useAllTexture = true;
             }
             
@@ -221,6 +229,12 @@ public class DynamicDataPack implements PackResources {
     private JsonObject createVerticalSlabModel(String parentModel, boolean useAll) {
         JsonObject model = new JsonObject();
         model.addProperty("parent", parentModel);
+
+        if (useAll) {
+            JsonObject textures = new JsonObject();
+            textures.addProperty("particle", "#all");
+            model.add("textures", textures);
+        }
 
         JsonArray elements = new JsonArray();
         JsonObject slab = new JsonObject();
@@ -246,6 +260,12 @@ public class DynamicDataPack implements PackResources {
     private JsonObject createVerticalStairModel(String parentModel, boolean useAll) {
         JsonObject model = new JsonObject();
         model.addProperty("parent", parentModel);
+
+        if (useAll) {
+            JsonObject textures = new JsonObject();
+            textures.addProperty("particle", "#all");
+            model.add("textures", textures);
+        }
 
         JsonArray elements = new JsonArray();
         String mainTex = useAll ? "#all" : "#side";
@@ -349,42 +369,31 @@ public class DynamicDataPack implements PackResources {
     }
 
     private void addSlabRecipes(ResourceLocation verticalId, ResourceLocation parentId) {
-        // Simple crafting
         JsonObject recipe = new JsonObject();
-        recipe.addProperty("type", "minecraft:crafting_shaped");
-        JsonArray pattern = new JsonArray();
-        pattern.add("S");
-        pattern.add("S");
-        pattern.add("S");
-        recipe.add("pattern", pattern);
-        JsonObject key = new JsonObject();
-        JsonObject sKey = new JsonObject();
-        sKey.addProperty("item", parentId.toString());
-        key.add("S", sKey);
-        recipe.add("key", key);
+        recipe.addProperty("type", "minecraft:crafting_shapeless");
+        JsonArray ingredients = new JsonArray();
+        JsonObject itemObj = new JsonObject();
+        itemObj.addProperty("item", parentId.toString());
+        ingredients.add(itemObj);
+        recipe.add("ingredients", ingredients);
         JsonObject result = new JsonObject();
         result.addProperty("item", verticalId.toString());
-        result.addProperty("count", 3);
+        result.addProperty("count", 1);
         recipe.add("result", result);
         cachedResources.put(PacketPath("data", BuildScape.MODID, "recipes", verticalId.getPath() + ".json"), GSON.toJson(recipe));
     }
 
     private void addStairRecipes(ResourceLocation verticalId, ResourceLocation parentId) {
         JsonObject recipe = new JsonObject();
-        recipe.addProperty("type", "minecraft:crafting_shaped");
-        JsonArray pattern = new JsonArray();
-        pattern.add("S");
-        pattern.add("S");
-        pattern.add("S");
-        recipe.add("pattern", pattern);
-        JsonObject key = new JsonObject();
-        JsonObject sKey = new JsonObject();
-        sKey.addProperty("item", parentId.toString());
-        key.add("S", sKey);
-        recipe.add("key", key);
+        recipe.addProperty("type", "minecraft:crafting_shapeless");
+        JsonArray ingredients = new JsonArray();
+        JsonObject itemObj = new JsonObject();
+        itemObj.addProperty("item", parentId.toString());
+        ingredients.add(itemObj);
+        recipe.add("ingredients", ingredients);
         JsonObject result = new JsonObject();
         result.addProperty("item", verticalId.toString());
-        result.addProperty("count", 3);
+        result.addProperty("count", 1);
         recipe.add("result", result);
         cachedResources.put(PacketPath("data", BuildScape.MODID, "recipes", verticalId.getPath() + ".json"), GSON.toJson(recipe));
     }

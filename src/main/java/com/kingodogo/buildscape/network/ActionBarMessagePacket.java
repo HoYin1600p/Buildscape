@@ -6,6 +6,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
+import net.minecraft.client.Minecraft;
 import net.minecraftforge.network.NetworkEvent;
 
 public class ActionBarMessagePacket {
@@ -32,15 +33,10 @@ public class ActionBarMessagePacket {
         ctx
                 .get()
                 .enqueueWork(() -> {
-                    DistExecutor.unsafeRunWhenOn(
-                            Dist.CLIENT,
-                            () ->
-                                    () -> {
-                                        com.kingodogo.buildscape.client.ClientEvents.setOverlayMessage(
-                                                message
+                                        Minecraft.getInstance().player.displayClientMessage(
+                                                message,
+                                                true
                                         );
-                                    }
-                    );
                 });
         ctx.get().setPacketHandled(true);
     }

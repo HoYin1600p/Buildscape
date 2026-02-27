@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "key": {
+    "B": {
+      "item": "buildscape:snowy_mangrove_leaves"
+    }
+  },
+  "pattern": [
+    "   ",
+    "BBB",
+    "BBB"
+  ],
+  "result": {
+    "count": 6,
+    "item": "buildscape:snowy_mangrove_leaf_hedge"
+  }
+}

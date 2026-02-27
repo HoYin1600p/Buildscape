@@ -10,6 +10,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 public class CherryParticle extends TextureSheetParticle {
     
     private final SpriteSet sprites;
+    private final float rotSpeed;
     
     // Static map to store color queues for particles
     // Key: "x,y,z" string, Value: ColorEntry
@@ -32,7 +33,10 @@ public class CherryParticle extends TextureSheetParticle {
         this.lifetime = 60 + level.random.nextInt(40);
         this.gravity = 0.05F;
         this.hasPhysics = true;
-        this.quadSize = 0.12F + level.random.nextFloat() * 0.05F;
+        
+        this.rotSpeed = (level.random.nextFloat() - 0.5F) * 0.1F;
+        this.roll = level.random.nextFloat() * ((float)Math.PI * 2F);
+        this.oRoll = this.roll;
         
         this.xd = xSpeed;
         this.yd = ySpeed;
@@ -54,6 +58,9 @@ public class CherryParticle extends TextureSheetParticle {
         // Select the specific static sprite
         // sprites.get(i, total) maps i to the sprite at that fraction of the list
         this.setSprite(sprites.get(spriteIndex, 12));
+        
+        // Scale down the particle
+        this.quadSize *= 0.5F;
         
         // Color handling logic
         String positionKey = String.format("%.1f,%.1f,%.1f", x, y, z);
@@ -109,6 +116,8 @@ public class CherryParticle extends TextureSheetParticle {
     @Override
     public void tick() {
         super.tick();
+        this.oRoll = this.roll;
+        this.roll += this.rotSpeed;
         // Removed setSpriteFromAge to keep the selected static texture
         
         if (this.age > this.lifetime * 0.7F) {

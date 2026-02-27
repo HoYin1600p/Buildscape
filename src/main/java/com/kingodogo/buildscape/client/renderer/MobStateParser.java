@@ -120,8 +120,8 @@ public class MobStateParser {
 
             statesLoaded = true;
 
-            System.out.println("[BuildScape] Loaded " + validMobStates.size() + " mob state definitions");
-            System.out.println("[BuildScape] Universal states: " + universalStates);
+
+
 
         } catch (Exception e) {
             System.err.println("[BuildScape] Failed to load states: " + e.getMessage());
@@ -343,6 +343,7 @@ public class MobStateParser {
         if (word.equals("scream")) return "screaming";
         if (word.equals("aggro")) return "angry";
         if (word.equals("grumm")) return "grum";
+        if (word.equals("jeb_")) return "jeb";
 
         // Comprehensive aliases for relatability
         if (word.equals("beg")) return "begging";

@@ -6927,12 +6927,12 @@ public class ModItems {
 
     public static final RegistryObject<Item> CASCADE_BLOCK = ITEMS.register(
             "cascade_block",
-            () -> new BlockItem(ModBlocks.CASCADE_BLOCK.get(), createBlockItemProperties())
+            () -> new MistBlockItem(ModBlocks.CASCADE_BLOCK.get(), createBlockItemProperties())
     );
 
     public static final RegistryObject<Item> CASCADE_BLOCK_NO_MIST = ITEMS.register(
             "cascade_block_no_mist",
-            () -> new BlockItem(ModBlocks.CASCADE_BLOCK_NO_MIST.get(), createBlockItemProperties())
+            () -> new MistBlockItem(ModBlocks.CASCADE_BLOCK_NO_MIST.get(), createBlockItemProperties())
     );
 
     public static final RegistryObject<Item> BOTTLE_OF_MIST = ITEMS.register(

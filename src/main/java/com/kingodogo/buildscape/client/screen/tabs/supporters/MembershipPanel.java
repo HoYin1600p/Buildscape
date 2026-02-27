@@ -2,7 +2,6 @@ package com.kingodogo.buildscape.client.screen.tabs.supporters;
 
 import com.kingodogo.buildscape.BuildScape;
 import com.kingodogo.buildscape.api.SupportersApiCache;
-import com.kingodogo.buildscape.api.SupportersApiClient;
 import com.kingodogo.buildscape.api.model.MembershipTier;
 import com.kingodogo.buildscape.api.model.SupporterStatus;
 import com.kingodogo.buildscape.api.model.TiersResponse;
@@ -23,7 +22,6 @@ public class MembershipPanel extends BasePanel {
     private static final int BUTTON_SPACING = 5;
     private static final int TIER_SPACING = 30;
     
-    private final SupportersApiClient apiClient = SupportersApiClient.getInstance();
     private final SupportersApiCache apiCache = SupportersApiCache.getInstance();
     private final SupportersTabState state = SupportersTabState.getInstance();
     
@@ -79,49 +77,19 @@ public class MembershipPanel extends BasePanel {
             this.tiers = cached.getTiers();
             return;
         }
-
-        apiClient.getTiers()
-            .thenAccept(response -> {
-                if (response != null && response.getTiers() != null) {
-                    this.tiers = response.getTiers();
-                    apiCache.cacheTiers(response);
-                }
-            })
-            .exceptionally(throwable -> {
-                BuildScape.getLogger().error("Failed to load tiers: " + throwable.getMessage());
-                return null;
-            });
+        // No API call - only use cached data from game launch
     }
     
     private void loadStatus(UUID uuid) {
-        isLoading = true;
-        statusMessage = "Loading...";
-
         SupporterStatus cached = apiCache.getCachedStatus(uuid);
         if (cached != null) {
             this.currentStatus = cached;
             updateStatusDisplay();
-            isLoading = false;
             return;
         }
-
-        apiClient.getSupporterStatus(uuid)
-            .thenAccept(status -> {
-                if (status != null) {
-                    this.currentStatus = status;
-                    apiCache.cacheStatus(uuid, status);
-                    updateStatusDisplay();
-                } else {
-                    statusMessage = "Unable to load status. Check your internet connection.";
-                }
-                isLoading = false;
-            })
-            .exceptionally(throwable -> {
-                BuildScape.getLogger().error("Failed to load status: " + throwable.getMessage());
-                statusMessage = "Unable to connect to server. Check your internet connection.";
-                isLoading = false;
-                return null;
-            });
+        // No API call - only use cached data from game launch
+        isLoading = false;
+        updateStatusDisplay();
     }
     
     private void updateStatusDisplay() {

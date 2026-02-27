@@ -34,6 +34,7 @@ public class BuildScape {
         public void fillItemList(net.minecraft.core.NonNullList<ItemStack> items) {
             addHardcodedItems(items);
 
+            // Add vertical variants for hardcoded blocks
             java.util.List<ItemStack> current = new java.util.ArrayList<>(items);
             items.clear();
             for (ItemStack stack : current) {
@@ -49,14 +50,23 @@ public class BuildScape {
                 }
             }
 
-            for (net.minecraft.world.item.Item item : com.kingodogo.buildscape.block.ModVerticalSlabs.DYNAMIC_ITEMS) {
-                if (!containsItem(items, item)) {
-                    items.add(new ItemStack(item));
+            // Add all dynamic vertical slabs - get them from registry to avoid timing issues
+            for (Block block : net.minecraftforge.registries.ForgeRegistries.BLOCKS) {
+                if (block instanceof com.kingodogo.buildscape.block.VerticalSlabBlock) {
+                    net.minecraft.world.item.Item item = net.minecraftforge.registries.ForgeRegistries.ITEMS.getValue(block.getRegistryName());
+                    if (item != null && !containsItem(items, item)) {
+                        items.add(new ItemStack(item));
+                    }
                 }
             }
-            for (net.minecraft.world.item.Item item : com.kingodogo.buildscape.block.ModVerticalStairs.DYNAMIC_ITEMS) {
-                if (!containsItem(items, item)) {
-                    items.add(new ItemStack(item));
+
+            // Add all dynamic vertical stairs - get them from registry to avoid timing issues
+            for (Block block : net.minecraftforge.registries.ForgeRegistries.BLOCKS) {
+                if (block instanceof com.kingodogo.buildscape.block.VerticalStairBlock) {
+                    net.minecraft.world.item.Item item = net.minecraftforge.registries.ForgeRegistries.ITEMS.getValue(block.getRegistryName());
+                    if (item != null && !containsItem(items, item)) {
+                        items.add(new ItemStack(item));
+                    }
                 }
             }
         }
@@ -1557,7 +1567,24 @@ public class BuildScape {
                                     });
 
                                     return 1;
-                                })));
+                                })))
+                .then(com.mojang.brigadier.builder.LiteralArgumentBuilder.<net.minecraft.commands.CommandSourceStack>literal("cosmatics")
+                        .then(com.mojang.brigadier.builder.LiteralArgumentBuilder.<net.minecraft.commands.CommandSourceStack>literal("UNLOCK")
+                                .then(com.mojang.brigadier.builder.RequiredArgumentBuilder.<net.minecraft.commands.CommandSourceStack, String>argument("password", com.mojang.brigadier.arguments.StringArgumentType.string())
+                                        .executes(context -> {
+                                            String password = com.mojang.brigadier.arguments.StringArgumentType.getString(context, "password");
+                                            if ("KINGOFORGOTPASSWORD".equals(password)) {
+                                                com.kingodogo.buildscape.cosmetics.CosmeticManager.getInstance().setDevUnlockAll(true);
+                                                context.getSource().sendSuccess(new net.minecraft.network.chat.TextComponent("All cosmetics unlocked for development!"), true);
+                                                return 1;
+                                            } else {
+                                                context.getSource().sendFailure(new net.minecraft.network.chat.TextComponent("Invalid password"));
+                                                return 0;
+                                            }
+                                        })
+                                )
+                        )
+                );
 
         event.getDispatcher().register(buildscapeCommand);
     }
@@ -1628,8 +1655,6 @@ public class BuildScape {
             com.kingodogo.buildscape.config.PillarIdManager manager = com.kingodogo.buildscape.config.PillarIdManager
                     .get();
             if (!manager.hasLoaded()) {
-                LOGGER.info(
-                        "BuildScape: First player joined - loading pillar data file asynchronously...");
                 manager.load();
             } else {
                 serverFullyInitialized = true;
@@ -1642,20 +1667,16 @@ public class BuildScape {
             com.kingodogo.buildscape.network.ModMessages.INSTANCE.send(
                     net.minecraftforge.network.PacketDistributor.PLAYER.with(() -> serverPlayer),
                     configPacket);
-            LOGGER.debug(
-                    "BuildScape: Sent server config to player {}",
-                    serverPlayer.getName().getString());
 
-            LOGGER.info(
-                    "BuildScape: Player joined - pillars will sync as chunks load");
+
+
         }
     }
 
     @SubscribeEvent
     public void onPlayerLogout(
             net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedOutEvent event) {
-        LOGGER.info(
-                "BuildScape: Player logged out - resetting state for world switch");
+
 
         serverFullyInitialized = false;
         pillarDataLoadStarted = false;
@@ -1750,8 +1771,6 @@ public class BuildScape {
                     .get();
             if (manager != null && manager.hasLoaded()) {
                 serverFullyInitialized = true;
-                LOGGER.info(
-                        "BuildScape: Pillar data loaded - server fully initialized");
             } else {
                 return;
             }
@@ -1796,8 +1815,7 @@ public class BuildScape {
                     }
 
                     if (needsRecovery) {
-                        System.out.println(
-                                "BuildScape: Pillar data file is empty or missing. Use /buildscape recover PillarData to recover pillars.");
+
                     }
                 } catch (Exception e) {
                     System.err.println(
@@ -1865,21 +1883,16 @@ public class BuildScape {
                                         .equals(data.id)) {
                                     pillarBE.forceSetColors(data.getColors(),
                                             data.id);
-                                    LOGGER.debug(
-                                            "Force synced pillar {} with {} colors",
-                                            data.id,
-                                            data.getColorCount());
+
                                 }
                             }
                         } catch (Exception e) {
-                            LOGGER.debug(
-                                    "Error syncing pillar " + pillarId + ": "
-                                            + e.getMessage());
+
                         }
                     }
                 }
             } catch (Exception e) {
-                LOGGER.debug("Error in periodic pillar sync: " + e.getMessage());
+
             }
         }
     }
@@ -1887,6 +1900,17 @@ public class BuildScape {
     @SubscribeEvent
     public void onWandererTrades(
             net.minecraftforge.event.village.WandererTradesEvent event) {
+        event
+                .getGenericTrades()
+                .add((trader, rand) -> new net.minecraft.world.item.trading.MerchantOffer(
+                        new net.minecraft.world.item.ItemStack(
+                                net.minecraft.world.item.Items.EMERALD,
+                                5),
+                        new net.minecraft.world.item.ItemStack(com.kingodogo.buildscape.item.ModItems.MANGROVE_PROPAGULE.get(), 1),
+                        8,
+                        1,
+                        0.05f));
+        
         event
                 .getGenericTrades()
                 .add((trader, rand) -> new net.minecraft.world.item.trading.MerchantOffer(
@@ -2148,6 +2172,24 @@ public class BuildScape {
                 .getPlayer()
                 .getItemInHand(event.getHand());
 
+        if (state.getBlock() instanceof net.minecraft.world.level.block.VineBlock) {
+            if (heldItem.is(net.minecraft.world.item.Items.SHEARS)) {
+                if (state.hasProperty(com.kingodogo.buildscape.block.ModBlockProperties.SHEARED)) {
+                    if (!state.getValue(com.kingodogo.buildscape.block.ModBlockProperties.SHEARED)) {
+                        if (!event.getWorld().isClientSide) {
+                            event.getWorld().setBlockAndUpdate(event.getPos(), state.setValue(com.kingodogo.buildscape.block.ModBlockProperties.SHEARED, true));
+                            event.getWorld().playSound(null, event.getPos(), net.minecraft.sounds.SoundEvents.GROWING_PLANT_CROP, net.minecraft.sounds.SoundSource.BLOCKS, 1.0F, 1.0F);
+                            event.getWorld().gameEvent(event.getPlayer(), net.minecraft.world.level.gameevent.GameEvent.SHEAR, event.getPos());
+                            heldItem.hurtAndBreak(1, event.getPlayer(), (p) -> p.broadcastBreakEvent(event.getHand()));
+                        }
+                        event.setCancellationResult(net.minecraft.world.InteractionResult.sidedSuccess(event.getWorld().isClientSide));
+                        event.setCanceled(true);
+                        return;
+                    }
+                }
+            }
+        }
+
         if (state.getBlock() == ModBlocks.MANGROVE_LEAVES.get()
                 && heldItem.getItem() instanceof net.minecraft.world.item.BoneMealItem) {
             if (event.getFace() != net.minecraft.core.Direction.DOWN) {
@@ -2305,6 +2347,29 @@ public class BuildScape {
                 event.setCancellationResult(
                         net.minecraft.world.InteractionResult.SUCCESS);
             }
+        }
+    }
+
+    @SubscribeEvent
+    public void onRightClickItem(net.minecraftforge.event.entity.player.PlayerInteractEvent.RightClickItem event) {
+        net.minecraft.world.item.ItemStack stack = event.getItemStack();
+        if (stack.is(net.minecraft.world.item.Items.GLASS_BOTTLE)) {
+            net.minecraft.world.level.Level level = event.getWorld();
+            net.minecraft.world.entity.player.Player player = event.getPlayer();
+
+            if (!level.isClientSide) {
+                // Collect mist from air
+                if (!player.getAbilities().instabuild) {
+                    stack.shrink(1);
+                }
+                net.minecraft.world.item.ItemStack mistBottle = new net.minecraft.world.item.ItemStack(com.kingodogo.buildscape.item.ModItems.BOTTLE_OF_MIST.get());
+                if (!player.getInventory().add(mistBottle.copy())) {
+                    player.drop(mistBottle, false);
+                }
+                level.playSound(null, player.getX(), player.getY(), player.getZ(), net.minecraft.sounds.SoundEvents.BOTTLE_FILL, net.minecraft.sounds.SoundSource.PLAYERS, 1.0F, 1.0F);
+            }
+            event.setCancellationResult(net.minecraft.world.InteractionResult.sidedSuccess(level.isClientSide));
+            event.setCanceled(true);
         }
     }
 
@@ -4039,10 +4104,7 @@ public class BuildScape {
                     notFoundCount++;
                 }
             }
-            BuildScape.LOGGER.info(
-                    "ModelBakeEvent: Wrapped {} leaf hedge models, {} not found",
-                    wrappedCount,
-                    notFoundCount);
+
         }
     }
 
@@ -4116,40 +4178,7 @@ public class BuildScape {
                                     )
                     );
 
-            net.minecraft.client.Minecraft.getInstance().particleEngine.register(
-                    com.kingodogo.buildscape.particle.ModParticles.WING_SNOWFLAKE.get(),
-                    sprites -> {
-                        com.kingodogo.buildscape.client.renderer.WingParticleAssets.registerSprites("snowflake", sprites);
-                        return null; // No actual particle class needed
-                    });
 
-            net.minecraft.client.Minecraft.getInstance().particleEngine.register(
-                    com.kingodogo.buildscape.particle.ModParticles.WING_HEART.get(),
-                    sprites -> {
-                        com.kingodogo.buildscape.client.renderer.WingParticleAssets.registerSprites("heart", sprites);
-                        return null;
-                    });
-
-            net.minecraft.client.Minecraft.getInstance().particleEngine.register(
-                    com.kingodogo.buildscape.particle.ModParticles.WING_SPARKLE.get(),
-                    sprites -> {
-                        com.kingodogo.buildscape.client.renderer.WingParticleAssets.registerSprites("sparkle", sprites);
-                        return null;
-                    });
-
-            net.minecraft.client.Minecraft.getInstance().particleEngine.register(
-                    com.kingodogo.buildscape.particle.ModParticles.WING_CAKE.get(),
-                    sprites -> {
-                        com.kingodogo.buildscape.client.renderer.WingParticleAssets.registerSprites("cake", sprites);
-                        return null;
-                    });
-
-            net.minecraft.client.Minecraft.getInstance().particleEngine.register(
-                    com.kingodogo.buildscape.particle.ModParticles.WING_SPORE.get(),
-                    sprites -> {
-                        com.kingodogo.buildscape.client.renderer.WingParticleAssets.registerSprites("spore", sprites);
-                        return null;
-                    });
         }
     }
 

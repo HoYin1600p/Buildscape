@@ -21,7 +21,7 @@ import com.kingodogo.buildscape.api.SupportersApiCache;
 import com.kingodogo.buildscape.api.SupportersApiClient;
 import com.kingodogo.buildscape.api.model.AuthenticateResponse;
 import com.kingodogo.buildscape.api.model.CosmeticData;
-import com.kingodogo.buildscape.particle.ParticleShapeReloader;
+// import com.kingodogo.buildscape.particle.ParticleShapeReloader;
 import net.minecraftforge.fml.common.Mod;
 
 @Mod.EventBusSubscriber(
@@ -151,7 +151,7 @@ public class ClientEvents {
         }
 
         // Check for particle shape reloads
-        ParticleShapeReloader.tick();
+        // ParticleShapeReloader.tick();
 
         Minecraft mc = Minecraft.getInstance();
         if (mc.level == null || mc.player == null || mc.isPaused()) {
@@ -227,7 +227,7 @@ public class ClientEvents {
 
         // Clear particle trail and wing shape cache
         com.kingodogo.buildscape.client.ParticleTrailHandler.clearTracking();
-        com.kingodogo.buildscape.particle.ParticleShapeLibrary.clearCache();
+        // com.kingodogo.buildscape.particle.ParticleShapeLibrary.clearCache();
 
         // Invalidate API cache for the player
         Minecraft mc = Minecraft.getInstance();
@@ -314,7 +314,7 @@ public class ClientEvents {
 
         // Clear particle trail and wing shape cache
         com.kingodogo.buildscape.client.ParticleTrailHandler.clearTracking();
-        com.kingodogo.buildscape.particle.ParticleShapeLibrary.clearCache();
+        // com.kingodogo.buildscape.particle.ParticleShapeLibrary.clearCache();
 
         try {
             com.kingodogo.buildscape.client.renderer.PillarBlockEntityRenderer.clearEntityCache();

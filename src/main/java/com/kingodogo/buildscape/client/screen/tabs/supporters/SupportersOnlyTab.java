@@ -170,7 +170,9 @@ public class SupportersOnlyTab extends AbstractConfigTab {
         Set<String> localEquipped = new java.util.HashSet<>();
         if (storedUuid != null) {
             java.util.Map<Integer, String> localCosmeticsMap = com.kingodogo.buildscape.config.CosmeticsConfig.get().getEquippedCosmetics(storedUuid);
-            localEquipped.addAll(localCosmeticsMap.values());
+            if (localCosmeticsMap != null) {
+                localEquipped.addAll(localCosmeticsMap.values());
+            }
         }
 
         // Only use API equipped data if local config is empty

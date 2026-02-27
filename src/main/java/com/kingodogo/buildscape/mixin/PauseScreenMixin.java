@@ -19,17 +19,28 @@ public abstract class PauseScreenMixin extends Screen {
     public void addBuildScapeConfigButton(CallbackInfo ci) {
         PauseScreen screen = (PauseScreen) (Object) this;
 
-        // Calculate button position - place it below "Options..." button
-        int buttonWidth = 200;
-        int buttonHeight = 20;
-        int x = (this.width - buttonWidth) / 2;
-        int y = this.height / 4 + 120 + 24 * 2; // Position below "Open to LAN" button
+        // Default fallback positions
+        int targetX = this.width / 2 + 102;
+        int targetY = this.height / 4 + 48;
 
-        // Create BuildScape Config button using ScaledTextButton for consistent styling
-        com.kingodogo.buildscape.client.screen.widget.ScaledTextButton configButton = new com.kingodogo.buildscape.client.screen.widget.ScaledTextButton(
-                x, y, buttonWidth, buttonHeight,
-                new TranslatableComponent("buildscape.config.title"),
-                (button) -> net.minecraft.client.Minecraft.getInstance().setScreen(new BuildScapeConfigScreen(screen))
+        // Dynamically find the Statistics button to align perfectly next to it
+        for (net.minecraft.client.gui.components.events.GuiEventListener listener : this.children()) {
+            if (listener instanceof net.minecraft.client.gui.components.AbstractWidget widget) {
+                net.minecraft.network.chat.Component msg = widget.getMessage();
+                if (msg instanceof net.minecraft.network.chat.TranslatableComponent tc && 
+                    (tc.getKey().equals("menu.statistics") || tc.getKey().equals("gui.stats"))) {
+                    targetX = widget.x + widget.getWidth() + 4;
+                    targetY = widget.y;
+                    break;
+                }
+            }
+        }
+
+        // Create BuildScape Config button using standard Button for vanilla look and feel
+        net.minecraft.client.gui.components.Button configButton = new net.minecraft.client.gui.components.Button(
+                targetX - 2, targetY, 20, 20,
+                new net.minecraft.network.chat.TextComponent("B"),
+                (button) -> net.minecraft.client.Minecraft.getInstance().setScreen(new com.kingodogo.buildscape.client.screen.BuildScapeConfigScreen(screen))
         );
 
         // Add the button using the standard method instead of reflection

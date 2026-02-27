@@ -86,7 +86,7 @@ public class CosmeticsConfig {
                         File newFile = new File(getDataDir(), oldFile.getName());
                         if (!newFile.exists()) {
                             Files.move(oldFile.toPath(), newFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                            BuildScape.getLogger().info("CosmeticsConfig: Relocated " + oldFile.getName() + " to private storage.");
+
                         } else {
                             oldFile.delete(); // Already exists in new location
                         }
@@ -99,7 +99,7 @@ public class CosmeticsConfig {
 
         // 2. Migrate from the way-old JSON format if it still exists
         if (legacyJson.exists()) {
-            BuildScape.getLogger().info("CosmeticsConfig: Found legacy JSON. Migrating to private NBT storage...");
+
             try (FileReader reader = new FileReader(legacyJson)) {
                 @SuppressWarnings("unchecked")
                 Map<String, Object> loaded = GSON.fromJson(reader, Map.class);

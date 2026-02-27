@@ -32,12 +32,22 @@ public class CosmeticManager {
     // Default cosmetics that are free for everyone (particle trails)
     private final Set<String> defaultCosmetics = new HashSet<>();
 
+    private boolean devUnlockAll = false;
+
     private CosmeticManager() {
         registerBuiltInCosmetics();
     }
 
     public static CosmeticManager getInstance() {
         return INSTANCE;
+    }
+
+    public void setDevUnlockAll(boolean devUnlockAll) {
+        this.devUnlockAll = devUnlockAll;
+    }
+
+    public boolean isDevUnlockAll() {
+        return this.devUnlockAll;
     }
 
     /**
@@ -69,21 +79,10 @@ public class CosmeticManager {
         // Register gear cosmetics
         registerHeadCosmetic("buildscape:cosmatics/gear/builders_hat", "Builder's Hat", "A stylish builder's hat", 1);
 
-        // Register particle wings (redeemable)
-        registerParticleWings("buildscape:cosmatics/wings/snowflake_wings", "Snowflake Wings",
-                "Elegant wings made of swirling snowflakes", 2, "snowflake");
-        registerParticleWings("buildscape:cosmatics/wings/heart_wings", "Heart Wings",
-                "Beautiful heart-shaped wings that flutter gracefully", 2, "heart");
-        registerParticleWings("buildscape:cosmatics/wings/sparkle_wings", "Sparkle Wings",
-                "Magical glittering wings that shimmer with sparkles", 2, "sparkle");
-        registerParticleWings("buildscape:cosmatics/wings/cake_wings", "Cake Wings",
-                "Sweet layered wings that look deliciously fluffy", 2, "cake");
-        registerParticleWings("buildscape:cosmatics/wings/spore_wings", "Spore Wings",
-                "Organic wispy wings that release glowing spores", 2, "spore");
 
         // Register block cosmetics
 
-        BuildScape.getLogger().info("Registered " + allCosmetics.size() + " built-in cosmetics");
+
     }
 
     /**
@@ -117,7 +116,7 @@ public class CosmeticManager {
         cosmeticMetadata.put(cosmeticId,
                 new CosmeticMetadata(name, description, tier, CosmeticType.PARTICLE_WINGS, null));
         particleShapes.put(cosmeticId, shape);
-        BuildScape.getLogger().info("Registered PARTICLE_WINGS cosmetic: " + cosmeticId + " (" + name + ")");
+
     }
 
     /**
@@ -165,7 +164,7 @@ public class CosmeticManager {
     private void registerHeadCosmetic(String cosmeticId, String name, String description, int tier) {
         allCosmetics.add(cosmeticId);
         cosmeticMetadata.put(cosmeticId, new CosmeticMetadata(name, description, tier, CosmeticType.HEAD, null));
-        BuildScape.getLogger().info("Registered HEAD cosmetic: " + cosmeticId + " (" + name + ")");
+
     }
 
     /**
@@ -174,7 +173,7 @@ public class CosmeticManager {
     private void registerArmorCosmetic(String cosmeticId, String name, String description, int tier, CosmeticType type) {
         allCosmetics.add(cosmeticId);
         cosmeticMetadata.put(cosmeticId, new CosmeticMetadata(name, description, tier, type, null));
-        BuildScape.getLogger().info("Registered " + type + " cosmetic: " + cosmeticId + " (" + name + ")");
+
     }
 
     /**

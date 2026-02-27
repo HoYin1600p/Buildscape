@@ -35,13 +35,13 @@ public class CosmeticAuthManager {
     public CompletableFuture<CosmeticData> authenticateOnLaunch() {
         // Return cached data if already authenticated
         if (authenticated && cachedCosmetics != null) {
-            BuildScape.getLogger().debug("CosmeticAuthManager: Returning cached cosmetic data");
+
             return CompletableFuture.completedFuture(cachedCosmetics);
         }
 
         // Prevent concurrent authentication attempts
         if (authenticationInProgress) {
-            BuildScape.getLogger().debug("CosmeticAuthManager: Authentication already in progress, waiting...");
+
             return waitForAuthentication();
         }
 
@@ -80,7 +80,7 @@ public class CosmeticAuthManager {
                 return CompletableFuture.completedFuture(null);
             }
 
-            BuildScape.getLogger().info("CosmeticAuthManager: Starting authentication...");
+
 
             // Call the secure API
             return SupportersApiClient.getInstance()
@@ -105,8 +105,7 @@ public class CosmeticAuthManager {
                         this.authenticated = true;
                         this.authTimestamp = System.currentTimeMillis();
 
-                        BuildScape.getLogger().info("CosmeticAuthManager: Authentication successful, " +
-                                "unlocked " + (cosmeticData.getUnlocked() != null ? cosmeticData.getUnlocked().size() : 0) + " cosmetics");
+
 
                         return cosmeticData;
                     })

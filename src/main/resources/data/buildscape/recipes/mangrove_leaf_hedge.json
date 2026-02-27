@@ -1,6 +1,5 @@
 {
   "type": "minecraft:crafting_shaped",
-  "category": "building",
   "key": {
     "B": {
       "item": "buildscape:mangrove_leaves"

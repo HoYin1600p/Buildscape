@@ -47,12 +47,10 @@ public class CascadeBlockEntity extends BlockEntity {
             if (level.getGameTime() % 2 != 0) return;
         }
 
-        // If local player holds cascade block in off-hand, suppress particles in their chunk
+        // If local player holds cascade block or bottle of mist in OFF-HAND, suppress particles in their chunk
         Player player = Minecraft.getInstance().player;
         if (player != null) {
-            ItemStack offhand = player.getOffhandItem();
-            if (!offhand.isEmpty() && offhand.getItem() instanceof BlockItem blockItem
-                    && blockItem.getBlock() instanceof CascadeBlock) {
+            if (isMistSuppressor(player.getOffhandItem())) {
                 int playerChunkX = player.blockPosition().getX() >> 4;
                 int playerChunkZ = player.blockPosition().getZ() >> 4;
                 int blockChunkX = pos.getX() >> 4;
@@ -84,5 +82,15 @@ public class CascadeBlockEntity extends BlockEntity {
 
             level.addAlwaysVisibleParticle(ModParticles.CASCADE.get(), true, x, y, z, xSpeed, ySpeed, zSpeed);
         }
+    }
+
+    private static boolean isMistSuppressor(ItemStack stack) {
+        if (stack.isEmpty()) return false;
+        net.minecraft.world.item.Item item = stack.getItem();
+        if (item instanceof com.kingodogo.buildscape.item.BottleOfMistItem) return true;
+        if (item instanceof BlockItem blockItem) {
+            return blockItem.getBlock() instanceof CascadeBlock;
+        }
+        return false;
     }
 }

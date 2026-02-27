@@ -11,45 +11,52 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import com.kingodogo.buildscape.BuildScape;
 
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.Map;
+import net.minecraft.resources.ResourceLocation;
 
 @Mod.EventBusSubscriber(modid = BuildScape.MODID)
 public class CascadeWaterManager {
 
-    private static final Map<Long, AABBTicket> TICKETS = new HashMap<>();
+    private static final Map<ResourceLocation, Map<BlockPos, AABBTicket>> TICKETS = new ConcurrentHashMap<>();
 
     @SubscribeEvent
     public static void onWorldUnload(WorldEvent.Unload event) {
-        // Clear all tickets when a world unloads to prevent stale data and memory leaks
-        TICKETS.clear();
-    }
-
-    private static long key(Level level, BlockPos pos) {
-        return ((long) level.dimension().location().hashCode() << 32) ^ pos.asLong();
+        if (event.getWorld() instanceof Level level) {
+            ResourceLocation dimension = level.dimension().location();
+            Map<BlockPos, AABBTicket> dimensionTickets = TICKETS.remove(dimension);
+            if (dimensionTickets != null) {
+                dimensionTickets.values().forEach(AABBTicket::invalidate);
+            }
+        }
     }
 
     public static void registerWaterTicket(Level level, BlockPos pos) {
         if (level.isClientSide) return;
-        long k = key(level, pos);
+        ResourceLocation dimension = level.dimension().location();
+        
+        Map<BlockPos, AABBTicket> dimensionTickets = TICKETS.computeIfAbsent(dimension, k -> new ConcurrentHashMap<>());
         
         // If ticket already exists, invalidate it before creating a new one to be safe
-        AABBTicket old = TICKETS.remove(k);
+        AABBTicket old = dimensionTickets.remove(pos);
         if (old != null) {
             old.invalidate();
         }
 
         AABB aabb = new AABB(pos);
         AABBTicket ticket = FarmlandWaterManager.addAABBTicket(level, aabb);
-        TICKETS.put(k, ticket);
+        dimensionTickets.put(pos, ticket);
     }
 
     public static void removeWaterTicket(Level level, BlockPos pos) {
         if (level.isClientSide) return;
-        long k = key(level, pos);
-        AABBTicket ticket = TICKETS.remove(k);
-        if (ticket != null) {
-            ticket.invalidate();
+        ResourceLocation dimension = level.dimension().location();
+        Map<BlockPos, AABBTicket> dimensionTickets = TICKETS.get(dimension);
+        if (dimensionTickets != null) {
+            AABBTicket ticket = dimensionTickets.remove(pos);
+            if (ticket != null) {
+                ticket.invalidate();
+            }
         }
     }
 }

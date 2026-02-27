@@ -26,13 +26,13 @@ public class GameLaunchHandler {
         if (!authenticationTriggered) {
             authenticationTriggered = true;
 
-            BuildScape.getLogger().info("GameLaunchHandler: Triggering cosmetic authentication on game launch");
+
 
             // Run authentication asynchronously to not block game startup
             CosmeticAuthManager.getInstance().authenticateOnLaunch()
                     .thenAccept(cosmeticData -> {
                         if (cosmeticData != null) {
-                            BuildScape.getLogger().info("CosmeticAuthManager: Authentication successful, unlocked " + (cosmeticData.getUnlocked() == null ? 0 : cosmeticData.getUnlocked().size()) + " cosmetics");
+
                             
                             // Update SupportersTabState with cosmetic data
                             updateSupportersTabState(cosmeticData);
@@ -69,7 +69,7 @@ public class GameLaunchHandler {
                 // If admin, unlock ALL registered cosmetics
                 if (cosmeticData.isAdmin()) {
                     unlocked.addAll(cosmeticManager.getAllCosmetics());
-                    BuildScape.getLogger().info("GameLaunchHandler: Admin detected, unlocking all cosmetics");
+
                 }
             }
             
@@ -90,8 +90,7 @@ public class GameLaunchHandler {
                 }
             }
 
-            BuildScape.getLogger().info("GameLaunchHandler: SupportersTabState updated with " +
-                    state.getUnlockedCosmetics().size() + " unlocked cosmetics");
+
 
         } catch (Exception e) {
             BuildScape.getLogger().error("GameLaunchHandler: Failed to update SupportersTabState", e);

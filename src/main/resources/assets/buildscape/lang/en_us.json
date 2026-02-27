@@ -1920,5 +1920,11 @@
     "item.buildscape.cascade_block":  "Cascade Block",
     "block.buildscape.cascade_block_no_mist":  "Cascade Block (No Mist)",
     "item.buildscape.cascade_block_no_mist":  "Cascade Block (No Mist)",
-    "item.buildscape.bottle_of_mist":  "Bottle of Mist"
+    "item.buildscape.bottle_of_mist": "Bottle of Mist",
+    "tooltip.buildscape.bottle_of_mist.use": "Right-click to spawn a burst of mist.",
+    "tooltip.buildscape.mist_toggle": "Keep in Off-Hand to suppress mist particles in the current chunk.",
+    "tooltip.buildscape.mist_toggle.main": "Held in Main-Hand: No suppression.",
+    "tooltip.buildscape.cascade_block.info": "A block that generates mist.",
+    "tooltip.buildscape.cascade_block_no_mist.info": "A variant of the cascade block that does not generate mist.",
+    "gamerule.fastLeafDecay": "Fast Leaf Decay"
 }

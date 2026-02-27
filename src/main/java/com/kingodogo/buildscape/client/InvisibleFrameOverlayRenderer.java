@@ -79,20 +79,41 @@ public class InvisibleFrameOverlayRenderer {
         PoseStack poseStack = event.getPoseStack();
         MultiBufferSource.BufferSource bufferSource = mc.renderBuffers().bufferSource();
 
-        VertexConsumer lineBuffer = bufferSource.getBuffer(RenderType.lines());
+        // Calculate pulsing alpha (0.4 to 0.8 for lines, 0.1 to 0.3 for fill)
+        float time = (System.currentTimeMillis() % 2000) / 2000.0f;
+        float pulse = (float) Math.sin(time * Math.PI * 2.0) * 0.5f + 0.5f;
+        float lineAlpha = 0.4f + pulse * 0.4f;
+        float fillAlpha = 0.1f + pulse * 0.2f;
 
+        // Light cyan color
+        int r = 0;
+        int g = 200;
+        int b = 255;
+
+        // Render filled faces first (using lightning for a translucent, non-culled effect)
+        VertexConsumer fillBuffer = bufferSource.getBuffer(RenderType.lightning());
         for (ItemFrame frame : vanillaFrames) {
-            renderOutline(poseStack, lineBuffer, cameraPos, frame.getBoundingBox());
+            renderFilledBox(poseStack, fillBuffer, cameraPos, frame.getBoundingBox().inflate(0.002), r, g, b, fillAlpha);
         }
         for (ColoredItemFrameEntity frame : moddedFrames) {
-            renderOutline(poseStack, lineBuffer, cameraPos, frame.getBoundingBox());
+            renderFilledBox(poseStack, fillBuffer, cameraPos, frame.getBoundingBox().inflate(0.002), r, g, b, fillAlpha);
         }
 
-        bufferSource.endBatch(RenderType.lines());
+        // Render wireframe
+        VertexConsumer lineBuffer = bufferSource.getBuffer(RenderType.lines());
+        for (ItemFrame frame : vanillaFrames) {
+            renderOutline(poseStack, lineBuffer, cameraPos, frame.getBoundingBox().inflate(0.002), r, g, b, lineAlpha);
+        }
+        for (ColoredItemFrameEntity frame : moddedFrames) {
+            renderOutline(poseStack, lineBuffer, cameraPos, frame.getBoundingBox().inflate(0.002), r, g, b, lineAlpha);
+        }
+
+        bufferSource.endBatch();
     }
 
-    private static void renderOutline(PoseStack poseStack, VertexConsumer buffer,
-                                      Vec3 cameraPos, AABB bb) {
+    private static void renderFilledBox(PoseStack poseStack, VertexConsumer buffer,
+                                        Vec3 cameraPos, AABB bb,
+                                        int r, int g, int b, float alpha) {
         float minX = (float) (bb.minX - cameraPos.x);
         float minY = (float) (bb.minY - cameraPos.y);
         float minZ = (float) (bb.minZ - cameraPos.z);
@@ -100,11 +121,57 @@ public class InvisibleFrameOverlayRenderer {
         float maxY = (float) (bb.maxY - cameraPos.y);
         float maxZ = (float) (bb.maxZ - cameraPos.z);
 
-        // Light cyan color: R=0, G=200, B=255, A=255
-        int r = 0;
-        int g = 200;
-        int b = 255;
-        int a = 255;
+        Matrix4f pose = poseStack.last().pose();
+        int ai = (int) (alpha * 255);
+
+        // Down
+        buffer.vertex(pose, minX, minY, minZ).color(r, g, b, ai).endVertex();
+        buffer.vertex(pose, maxX, minY, minZ).color(r, g, b, ai).endVertex();
+        buffer.vertex(pose, maxX, minY, maxZ).color(r, g, b, ai).endVertex();
+        buffer.vertex(pose, minX, minY, maxZ).color(r, g, b, ai).endVertex();
+
+        // Up
+        buffer.vertex(pose, minX, maxY, minZ).color(r, g, b, ai).endVertex();
+        buffer.vertex(pose, minX, maxY, maxZ).color(r, g, b, ai).endVertex();
+        buffer.vertex(pose, maxX, maxY, maxZ).color(r, g, b, ai).endVertex();
+        buffer.vertex(pose, maxX, maxY, minZ).color(r, g, b, ai).endVertex();
+
+        // North
+        buffer.vertex(pose, minX, minY, minZ).color(r, g, b, ai).endVertex();
+        buffer.vertex(pose, minX, maxY, minZ).color(r, g, b, ai).endVertex();
+        buffer.vertex(pose, maxX, maxY, minZ).color(r, g, b, ai).endVertex();
+        buffer.vertex(pose, maxX, minY, minZ).color(r, g, b, ai).endVertex();
+
+        // South
+        buffer.vertex(pose, minX, minY, maxZ).color(r, g, b, ai).endVertex();
+        buffer.vertex(pose, maxX, minY, maxZ).color(r, g, b, ai).endVertex();
+        buffer.vertex(pose, maxX, maxY, maxZ).color(r, g, b, ai).endVertex();
+        buffer.vertex(pose, minX, maxY, maxZ).color(r, g, b, ai).endVertex();
+
+        // West
+        buffer.vertex(pose, minX, minY, minZ).color(r, g, b, ai).endVertex();
+        buffer.vertex(pose, minX, minY, maxZ).color(r, g, b, ai).endVertex();
+        buffer.vertex(pose, minX, maxY, maxZ).color(r, g, b, ai).endVertex();
+        buffer.vertex(pose, minX, maxY, minZ).color(r, g, b, ai).endVertex();
+
+        // East
+        buffer.vertex(pose, maxX, minY, minZ).color(r, g, b, ai).endVertex();
+        buffer.vertex(pose, maxX, maxY, minZ).color(r, g, b, ai).endVertex();
+        buffer.vertex(pose, maxX, maxY, maxZ).color(r, g, b, ai).endVertex();
+        buffer.vertex(pose, maxX, minY, maxZ).color(r, g, b, ai).endVertex();
+    }
+
+    private static void renderOutline(PoseStack poseStack, VertexConsumer buffer,
+                                      Vec3 cameraPos, AABB bb,
+                                      int r, int g, int b, float alpha) {
+        float minX = (float) (bb.minX - cameraPos.x);
+        float minY = (float) (bb.minY - cameraPos.y);
+        float minZ = (float) (bb.minZ - cameraPos.z);
+        float maxX = (float) (bb.maxX - cameraPos.x);
+        float maxY = (float) (bb.maxY - cameraPos.y);
+        float maxZ = (float) (bb.maxZ - cameraPos.z);
+
+        int a = (int) (alpha * 255);
 
         Matrix4f pose = poseStack.last().pose();
         Matrix3f normal = poseStack.last().normal();

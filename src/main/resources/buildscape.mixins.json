@@ -12,7 +12,8 @@
     "IronBarsBlockMixin",
     "LeavesBlockMixin",
     "LivingEntityMixin",
-    "WallBlockMixin"
+    "WallBlockMixin",
+    "VineBlockMixin"
   ],
   "client": [
     "PauseScreenMixin"

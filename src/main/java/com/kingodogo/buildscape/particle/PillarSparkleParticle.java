@@ -72,7 +72,7 @@ public class PillarSparkleParticle extends TextureSheetParticle {
             sizeMultiplier = 1.0F;
         }
 
-        this.quadSize = 0.3F * sizeMultiplier;
+        this.quadSize = 0.2F * sizeMultiplier;
         this.hasPhysics = false;
 
         float[] color = parseColorCode(colorCode);
@@ -126,7 +126,7 @@ public class PillarSparkleParticle extends TextureSheetParticle {
         float fadeOut = 0.9F;
         if (this.age > this.lifetime * fadeOut) {
             float fadeProgress =
-                    (float) (this.age - this.lifetime * fadeOut) /
+                    (this.age - this.lifetime * fadeOut) /
                             (this.lifetime * (1.0F - fadeOut));
             this.alpha = 1.0F - fadeProgress;
         } else {
@@ -136,32 +136,38 @@ public class PillarSparkleParticle extends TextureSheetParticle {
 
     @Override
     protected float getU0() {
-        return this.baseSprite.getU0();
+        float u0 = this.baseSprite.getU0();
+        float u1 = this.baseSprite.getU1();
+        // Crop 2% from the left to remove potential halos
+        return u0 + (u1 - u0) * 0.02F;
     }
 
     @Override
     protected float getU1() {
-        return this.baseSprite.getU1();
+        float u0 = this.baseSprite.getU0();
+        float u1 = this.baseSprite.getU1();
+        // Crop 2% from the right to remove potential halos
+        return u1 - (u1 - u0) * 0.02F;
     }
 
     @Override
     protected float getV0() {
         float frameHeight = 1.0F / FRAME_COUNT;
         float minV = this.currentFrame * frameHeight;
-        return (
-                this.baseSprite.getV0() +
-                        (this.baseSprite.getV1() - this.baseSprite.getV0()) * minV
-        );
+        float v0 = this.baseSprite.getV0();
+        float v1 = this.baseSprite.getV1();
+        // Crop 2% of the frame height from the top
+        return v0 + (v1 - v0) * (minV + frameHeight * 0.02F);
     }
 
     @Override
     protected float getV1() {
         float frameHeight = 1.0F / FRAME_COUNT;
         float maxV = (this.currentFrame + 1) * frameHeight;
-        return (
-                this.baseSprite.getV0() +
-                        (this.baseSprite.getV1() - this.baseSprite.getV0()) * maxV
-        );
+        float v0 = this.baseSprite.getV0();
+        float v1 = this.baseSprite.getV1();
+        // Crop 2% of the frame height from the bottom
+        return v0 + (v1 - v0) * (maxV - frameHeight * 0.02F);
     }
 
     @Override

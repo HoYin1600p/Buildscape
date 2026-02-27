@@ -332,43 +332,43 @@ public class ModBiomeModifications {
             addPropagulePatchToBiome(
                     event,
                     ModConfiguredFeatures.MANGROVE_PROPAGULE_PATCH_1.get(),
-                    24
+                    5
             );
             addPropagulePatchToBiome(
                     event,
                     ModConfiguredFeatures.MANGROVE_PROPAGULE_PATCH_2.get(),
-                    24
+                    5
             );
             addPropagulePatchToBiome(
                     event,
                     ModConfiguredFeatures.MANGROVE_PROPAGULE_PATCH_3.get(),
-                    24
+                    5
             );
 
             addPropagulePatchToBiome(
                     event,
                     ModConfiguredFeatures.MANGROVE_PROPAGULE_PATCH_4.get(),
-                    200
+                    40
             );
             addPropagulePatchToBiome(
                     event,
                     ModConfiguredFeatures.MANGROVE_PROPAGULE_PATCH_5.get(),
-                    267
+                    53
             );
             addPropagulePatchToBiome(
                     event,
                     ModConfiguredFeatures.MANGROVE_PROPAGULE_PATCH_6.get(),
-                    533
+                    107
             );
             addPropagulePatchToBiome(
                     event,
                     ModConfiguredFeatures.MANGROVE_PROPAGULE_PATCH_7.get(),
-                    800
+                    160
             );
             addPropagulePatchToBiome(
                     event,
                     ModConfiguredFeatures.MANGROVE_PROPAGULE_PATCH_8.get(),
-                    1600
+                    320
             );
         }
     }

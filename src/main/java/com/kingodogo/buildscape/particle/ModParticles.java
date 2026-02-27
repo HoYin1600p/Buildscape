@@ -38,15 +38,4 @@ public class ModParticles {
     public static final RegistryObject<SimpleParticleType> CASCADE =
             PARTICLES.register("cascade", () -> new SimpleParticleType(false));
 
-    // Wing particles - used for their asset registration (textures)
-    public static final RegistryObject<SimpleParticleType> WING_SNOWFLAKE =
-            PARTICLES.register("wing_snowflake", () -> new SimpleParticleType(false));
-    public static final RegistryObject<SimpleParticleType> WING_HEART =
-            PARTICLES.register("wing_heart", () -> new SimpleParticleType(false));
-    public static final RegistryObject<SimpleParticleType> WING_SPARKLE =
-            PARTICLES.register("wing_sparkle", () -> new SimpleParticleType(false));
-    public static final RegistryObject<SimpleParticleType> WING_CAKE =
-            PARTICLES.register("wing_cake", () -> new SimpleParticleType(false));
-    public static final RegistryObject<SimpleParticleType> WING_SPORE =
-            PARTICLES.register("wing_spore", () -> new SimpleParticleType(false));
 }

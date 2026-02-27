@@ -1,0 +1,14 @@
+﻿{
+    "ingredients":  [
+                        {
+                            "item":  "buildscape:jungle_leaf_hedge"
+                        },
+                        {
+                            "item":  "buildscape:snow_overlay"
+                        }
+                    ],
+    "result":  {
+                   "item":  "buildscape:snowy_jungle_leaf_hedge"
+               },
+    "type":  "minecraft:crafting_shapeless"
+}

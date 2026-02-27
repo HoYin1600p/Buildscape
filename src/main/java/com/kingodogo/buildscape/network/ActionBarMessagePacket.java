@@ -30,14 +30,17 @@ public class ActionBarMessagePacket {
     }
 
     public void handle(Supplier<NetworkEvent.Context> ctx) {
-        ctx
-                .get()
-                .enqueueWork(() -> {
-                                        Minecraft.getInstance().player.displayClientMessage(
-                                                message,
-                                                true
-                                        );
-                });
+        ctx.get().enqueueWork(() -> {
+            DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> ClientPacketHandler.handleActionBarMessage(this));
+        });
         ctx.get().setPacketHandled(true);
+    }
+
+    private static class ClientPacketHandler {
+        private static void handleActionBarMessage(ActionBarMessagePacket packet) {
+            if (Minecraft.getInstance().player != null) {
+                Minecraft.getInstance().player.displayClientMessage(packet.message, true);
+            }
+        }
     }
 }

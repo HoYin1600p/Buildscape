@@ -17,7 +17,7 @@ public class CosmeticAuthManager {
     private volatile boolean authenticated = false;
     private volatile CosmeticData cachedCosmetics = null;
     private volatile long authTimestamp = 0;
-    private volatile boolean authenticationInProgress = false;
+    private CompletableFuture<CosmeticData> currentAuthFuture = null;
 
     private CosmeticAuthManager() {
     }
@@ -35,33 +35,24 @@ public class CosmeticAuthManager {
     public CompletableFuture<CosmeticData> authenticateOnLaunch() {
         // Return cached data if already authenticated
         if (authenticated && cachedCosmetics != null) {
-
             return CompletableFuture.completedFuture(cachedCosmetics);
         }
 
-        // Prevent concurrent authentication attempts
-        if (authenticationInProgress) {
-
-            return waitForAuthentication();
-        }
-
         synchronized (this) {
+            // Return existing future if authentication is already in progress
+            if (currentAuthFuture != null) {
+                return currentAuthFuture;
+            }
+
             // Double-check after acquiring lock
             if (authenticated && cachedCosmetics != null) {
                 return CompletableFuture.completedFuture(cachedCosmetics);
             }
 
-            if (authenticationInProgress) {
-                return waitForAuthentication();
-            }
-
-            authenticationInProgress = true;
-
             // Get UUID and access token from Minecraft
             Minecraft mc = Minecraft.getInstance();
             if (mc.getUser() == null) {
                 BuildScape.getLogger().warn("CosmeticAuthManager: No user available, cannot authenticate");
-                authenticationInProgress = false;
                 return CompletableFuture.completedFuture(null);
             }
 
@@ -70,20 +61,16 @@ public class CosmeticAuthManager {
 
             if (uuid == null || uuid.isEmpty()) {
                 BuildScape.getLogger().warn("CosmeticAuthManager: UUID is null or empty");
-                authenticationInProgress = false;
                 return CompletableFuture.completedFuture(null);
             }
 
             if (accessToken == null || accessToken.isEmpty()) {
                 BuildScape.getLogger().warn("CosmeticAuthManager: Access token is null or empty");
-                authenticationInProgress = false;
                 return CompletableFuture.completedFuture(null);
             }
 
-
-
-            // Call the secure API
-            return SupportersApiClient.getInstance()
+            // Call the secure API and share the future
+            currentAuthFuture = SupportersApiClient.getInstance()
                     .authenticate(uuid, accessToken)
                     .thenApply(response -> {
                         if (response == null) {
@@ -105,8 +92,6 @@ public class CosmeticAuthManager {
                         this.authenticated = true;
                         this.authTimestamp = System.currentTimeMillis();
 
-
-
                         return cosmeticData;
                     })
                     .exceptionally(throwable -> {
@@ -114,28 +99,13 @@ public class CosmeticAuthManager {
                         return null;
                     })
                     .whenComplete((result, throwable) -> {
-                        authenticationInProgress = false;
+                        synchronized (this) {
+                            currentAuthFuture = null;
+                        }
                     });
-        }
-    }
 
-    /**
-     * Wait for an ongoing authentication to complete.
-     */
-    private CompletableFuture<CosmeticData> waitForAuthentication() {
-        return CompletableFuture.supplyAsync(() -> {
-            int attempts = 0;
-            while (authenticationInProgress && attempts < 100) {
-                try {
-                    Thread.sleep(100);
-                    attempts++;
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                    return null;
-                }
-            }
-            return cachedCosmetics;
-        });
+            return currentAuthFuture;
+        }
     }
 
     /**
@@ -169,7 +139,7 @@ public class CosmeticAuthManager {
             this.authenticated = false;
             this.cachedCosmetics = null;
             this.authTimestamp = 0;
-            this.authenticationInProgress = false;
+            this.currentAuthFuture = null;
         }
     }
 

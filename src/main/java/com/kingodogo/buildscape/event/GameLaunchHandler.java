@@ -31,16 +31,16 @@ public class GameLaunchHandler {
             // Run authentication asynchronously to not block game startup
             CosmeticAuthManager.getInstance().authenticateOnLaunch()
                     .thenAccept(cosmeticData -> {
-                        if (cosmeticData != null) {
-
-                            
-                            // Update SupportersTabState with cosmetic data
-                            updateSupportersTabState(cosmeticData);
-                        } else {
-                            BuildScape.getLogger().warn("GameLaunchHandler: API returned NULL for cosmetic data.");
-                            // Ensure default cosmetics are still available (particle trails, etc)
-                            updateSupportersTabState(null);
-                        }
+                        net.minecraft.client.Minecraft.getInstance().execute(() -> {
+                            if (cosmeticData != null) {
+                                // Update SupportersTabState with cosmetic data
+                                updateSupportersTabState(cosmeticData);
+                            } else {
+                                BuildScape.getLogger().warn("GameLaunchHandler: API returned NULL for cosmetic data.");
+                                // Ensure default cosmetics are still available (particle trails, etc)
+                                updateSupportersTabState(null);
+                            }
+                        });
                     })
                     .exceptionally(throwable -> {
                         BuildScape.getLogger().error("GameLaunchHandler: Exception during authentication", throwable);

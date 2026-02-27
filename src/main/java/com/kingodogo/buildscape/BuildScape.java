@@ -1570,19 +1570,12 @@ public class BuildScape {
                                 })))
                 .then(com.mojang.brigadier.builder.LiteralArgumentBuilder.<net.minecraft.commands.CommandSourceStack>literal("cosmatics")
                         .then(com.mojang.brigadier.builder.LiteralArgumentBuilder.<net.minecraft.commands.CommandSourceStack>literal("UNLOCK")
-                                .then(com.mojang.brigadier.builder.RequiredArgumentBuilder.<net.minecraft.commands.CommandSourceStack, String>argument("password", com.mojang.brigadier.arguments.StringArgumentType.string())
-                                        .executes(context -> {
-                                            String password = com.mojang.brigadier.arguments.StringArgumentType.getString(context, "password");
-                                            if ("KINGOFORGOTPASSWORD".equals(password)) {
-                                                com.kingodogo.buildscape.cosmetics.CosmeticManager.getInstance().setDevUnlockAll(true);
-                                                context.getSource().sendSuccess(new net.minecraft.network.chat.TextComponent("All cosmetics unlocked for development!"), true);
-                                                return 1;
-                                            } else {
-                                                context.getSource().sendFailure(new net.minecraft.network.chat.TextComponent("Invalid password"));
-                                                return 0;
-                                            }
-                                        })
-                                )
+                                .requires(source -> source.hasPermission(2))
+                                .executes(context -> {
+                                    com.kingodogo.buildscape.cosmetics.CosmeticManager.getInstance().setDevUnlockAll(true);
+                                    context.getSource().sendSuccess(new net.minecraft.network.chat.TextComponent("All cosmetics unlocked for development!"), true);
+                                    return 1;
+                                })
                         )
                 );
 
@@ -2357,19 +2350,32 @@ public class BuildScape {
             net.minecraft.world.level.Level level = event.getWorld();
             net.minecraft.world.entity.player.Player player = event.getPlayer();
 
-            if (!level.isClientSide) {
-                // Collect mist from air
-                if (!player.getAbilities().instabuild) {
-                    stack.shrink(1);
+            // Environmental check: Must be raining OR (Nighttime in a humid/cold biome)
+            boolean isRaining = level.isRaining();
+            boolean isNight = !level.isDay();
+            boolean isMistCondition = isRaining || (isNight && level.getBiome(player.blockPosition()).value().getPrecipitation() != net.minecraft.world.level.biome.Biome.Precipitation.NONE);
+
+            if (isMistCondition) {
+                if (!level.isClientSide) {
+                    // Collect mist from air
+                    if (!player.getAbilities().instabuild) {
+                        stack.shrink(1);
+                    }
+                    net.minecraft.world.item.ItemStack mistBottle = new net.minecraft.world.item.ItemStack(com.kingodogo.buildscape.item.ModItems.BOTTLE_OF_MIST.get());
+                    if (!player.getInventory().add(mistBottle.copy())) {
+                        player.drop(mistBottle, false);
+                    }
+                    level.playSound(null, player.getX(), player.getY(), player.getZ(), net.minecraft.sounds.SoundEvents.BOTTLE_FILL, net.minecraft.sounds.SoundSource.PLAYERS, 1.0F, 1.0F);
+                    
+                    if (level instanceof net.minecraft.server.level.ServerLevel serverLevel) {
+                        serverLevel.sendParticles(com.kingodogo.buildscape.particle.ModParticles.CASCADE.get(), 
+                            player.getX(), player.getEyeY(), player.getZ(), 
+                            15, 0.5, 0.5, 0.5, 0.05);
+                    }
                 }
-                net.minecraft.world.item.ItemStack mistBottle = new net.minecraft.world.item.ItemStack(com.kingodogo.buildscape.item.ModItems.BOTTLE_OF_MIST.get());
-                if (!player.getInventory().add(mistBottle.copy())) {
-                    player.drop(mistBottle, false);
-                }
-                level.playSound(null, player.getX(), player.getY(), player.getZ(), net.minecraft.sounds.SoundEvents.BOTTLE_FILL, net.minecraft.sounds.SoundSource.PLAYERS, 1.0F, 1.0F);
+                event.setCancellationResult(net.minecraft.world.InteractionResult.sidedSuccess(level.isClientSide));
+                event.setCanceled(true);
             }
-            event.setCancellationResult(net.minecraft.world.InteractionResult.sidedSuccess(level.isClientSide));
-            event.setCanceled(true);
         }
     }
 

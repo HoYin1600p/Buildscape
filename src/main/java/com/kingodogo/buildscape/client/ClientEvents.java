@@ -260,25 +260,27 @@ public class ClientEvents {
                     SupportersApiClient.getInstance().authenticate(uuidString, accessToken)
                         .thenAccept(response -> {
                             if (response != null && !response.isError()) {
-                                try {
-                                    CosmeticData data = response.toCosmeticData();
-                                    SupportersApiCache.getInstance().cacheCosmetics(playerUuid, data);
-                                    
-                                    // Update tab state if it matches current player
-                                    if (mc.player != null && mc.player.getUUID().equals(playerUuid)) {
-                                        com.kingodogo.buildscape.client.screen.tabs.supporters.SupportersTabState.getInstance()
-                                            .setPlayerUuid(playerUuid);
+                                mc.execute(() -> {
+                                    try {
+                                        CosmeticData data = response.toCosmeticData();
+                                        SupportersApiCache.getInstance().cacheCosmetics(playerUuid, data);
                                         
-                                        // Combine API unlocked cosmetics with default cosmetics (particle trails)
-                                        java.util.Set<String> unlocked = new java.util.HashSet<>(data.getUnlocked() != null ? data.getUnlocked() : new java.util.ArrayList<>());
-                                        // Add default cosmetics (free for everyone)
-                                        unlocked.addAll(com.kingodogo.buildscape.cosmetics.CosmeticManager.getInstance().getDefaultCosmetics());
-                                        com.kingodogo.buildscape.client.screen.tabs.supporters.SupportersTabState.getInstance().setUnlockedCosmetics(unlocked);
+                                        // Update tab state if it matches current player
+                                        if (mc.player != null && mc.player.getUUID().equals(playerUuid)) {
+                                            com.kingodogo.buildscape.client.screen.tabs.supporters.SupportersTabState.getInstance()
+                                                .setPlayerUuid(playerUuid);
+                                            
+                                            // Combine API unlocked cosmetics with default cosmetics (particle trails)
+                                            java.util.Set<String> unlocked = new java.util.HashSet<>(data.getUnlocked() != null ? data.getUnlocked() : new java.util.ArrayList<>());
+                                            // Add default cosmetics (free for everyone)
+                                            unlocked.addAll(com.kingodogo.buildscape.cosmetics.CosmeticManager.getInstance().getDefaultCosmetics());
+                                            com.kingodogo.buildscape.client.screen.tabs.supporters.SupportersTabState.getInstance().setUnlockedCosmetics(unlocked);
+                                        }
+                                        
+                                    } catch (Exception e) {
+                                        com.kingodogo.buildscape.BuildScape.getLogger().error("Failed to process preloaded data: " + e.getMessage());
                                     }
-                                    
-                                } catch (Exception e) {
-                                    com.kingodogo.buildscape.BuildScape.getLogger().error("Failed to process preloaded data: " + e.getMessage());
-                                }
+                                });
                             }
                         })
                         .exceptionally(t -> {

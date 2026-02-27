@@ -108,8 +108,13 @@ public class CosmeticsConfig {
                 }
                 
                 // Backup or delete old JSON
-                File backup = new File(legacyJson.getAbsolutePath() + ".bak");
-                if (!legacyJson.renameTo(backup)) legacyJson.delete();
+                Path legacyPath = legacyJson.toPath();
+                Path backupPath = legacyPath.resolveSibling(legacyJson.getName() + ".bak");
+                try {
+                    Files.move(legacyPath, backupPath, StandardCopyOption.REPLACE_EXISTING);
+                } catch (Exception e) {
+                    legacyJson.delete(); // Last resort
+                }
                 
             } catch (Exception e) {
                 BuildScape.getLogger().error("CosmeticsConfig: Legacy JSON migration failed!", e);
@@ -283,19 +288,14 @@ public class CosmeticsConfig {
         String uuidStr = playerUuid != null ? playerUuid.toString() : "global";
         playerCosmetics.put(uuidStr, new HashMap<>(cosmeticsBySlot));
         savePlayer(playerUuid);
-        playerCosmetics.put("global", new HashMap<>(cosmeticsBySlot));
-        savePlayer(null);
     }
 
     public void equipCosmetic(UUID playerUuid, int slotIndex, String cosmeticId) {
         String uuidStr = playerUuid != null ? playerUuid.toString() : "global";
         if (!playerCosmetics.containsKey(uuidStr)) loadPlayer(playerUuid);
-        if (!playerCosmetics.containsKey("global")) loadPlayer(null);
 
         updateMap(playerCosmetics.computeIfAbsent(uuidStr, k -> new HashMap<>()), slotIndex, cosmeticId);
         savePlayer(playerUuid);
-        updateMap(playerCosmetics.computeIfAbsent("global", k -> new HashMap<>()), slotIndex, cosmeticId);
-        savePlayer(null);
     }
 
     private void updateMap(Map<Integer, String> map, int slot, String id) {
@@ -307,18 +307,11 @@ public class CosmeticsConfig {
     public void unequipCosmetic(UUID playerUuid, int slotIndex) {
         String uuidStr = playerUuid != null ? playerUuid.toString() : "global";
         if (!playerCosmetics.containsKey(uuidStr)) loadPlayer(playerUuid);
-        if (!playerCosmetics.containsKey("global")) loadPlayer(null);
 
         Map<Integer, String> playerMap = playerCosmetics.get(uuidStr);
         if (playerMap != null) {
             playerMap.remove(slotIndex);
             savePlayer(playerUuid);
-        }
-
-        Map<Integer, String> globalMap = playerCosmetics.get("global");
-        if (globalMap != null) {
-            globalMap.remove(slotIndex);
-            savePlayer(null);
         }
     }
 
@@ -337,17 +330,11 @@ public class CosmeticsConfig {
         if (cosmeticId == null) return;
         String uuidStr = playerUuid != null ? playerUuid.toString() : "global";
         if (!playerCosmeticColors.containsKey(uuidStr)) loadPlayer(playerUuid);
-        if (!playerCosmeticColors.containsKey("global")) loadPlayer(null);
 
         Map<String, String> playerMap = playerCosmeticColors.computeIfAbsent(uuidStr, k -> new HashMap<>());
         if (hexColor != null && !hexColor.isEmpty()) playerMap.put(cosmeticId, hexColor);
         else playerMap.remove(cosmeticId);
         savePlayer(playerUuid);
-
-        Map<String, String> globalMap = playerCosmeticColors.computeIfAbsent("global", k -> new HashMap<>());
-        if (hexColor != null && !hexColor.isEmpty()) globalMap.put(cosmeticId, hexColor);
-        else globalMap.remove(cosmeticId);
-        savePlayer(null);
     }
 
     public boolean supportsColor(String cosmeticId) {

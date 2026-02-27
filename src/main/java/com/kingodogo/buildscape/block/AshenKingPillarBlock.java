@@ -322,7 +322,7 @@ public class AshenKingPillarBlock extends PillarBlock {
         }
 
         // Handle item placement - ONLY on current pillar
-        if (!heldItem.isEmpty()) {
+        if (!heldItem.isEmpty() && !pillarBE.hasDisplayItem()) {
             net.minecraft.world.item.ItemStack displayItem = heldItem.copy();
             displayItem.setCount(1);
 

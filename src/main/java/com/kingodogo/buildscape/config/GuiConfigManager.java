@@ -120,7 +120,7 @@ public class GuiConfigManager {
             String cacheKey = tabName.toLowerCase();
             CACHE.put(cacheKey, config);
             
-            BuildScape.getLogger().debug("Saved GUI config for tab '{}' to {}", tabName, file.getAbsolutePath());
+
         } catch (Exception e) {
             BuildScape.getLogger().error("Failed to save GUI config for tab '{}': {}", tabName, e.getMessage());
             e.printStackTrace();

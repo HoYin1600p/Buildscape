@@ -580,10 +580,7 @@ public class PillarIdManager {
                                     backupFile.toPath(),
                                     java.nio.file.StandardCopyOption.REPLACE_EXISTING
                             );
-                            System.out.println(
-                                    "BuildScape: Corrupted file backed up to: " +
-                                            backupFile.getName()
-                            );
+
                         }
                     } catch (Exception backupEx) {
                         System.err.println(
@@ -626,9 +623,7 @@ public class PillarIdManager {
                                 backupFile.toPath(),
                                 java.nio.file.StandardCopyOption.REPLACE_EXISTING
                         );
-                        System.out.println(
-                                "BuildScape: Corrupted file backed up to: " + backupFile.getName()
-                        );
+
                     }
                 } catch (Exception backupEx) {
                     System.err.println(
@@ -676,9 +671,6 @@ public class PillarIdManager {
 
             File file = getDataFile();
             if (hasLoaded && pillarData.isEmpty() && file.exists()) {
-                System.out.println(
-                        "BuildScape: Detected stale load state, allowing reload"
-                );
                 hasLoaded = false;
             }
 
@@ -779,9 +771,6 @@ public class PillarIdManager {
                 lastLoadedTime = 0L;
                 lastFileSize = 0L;
                 hasLoaded = true;
-                System.out.println(
-                        "BuildScape: No valid pillar data file found - will recover after world is fully loaded"
-                );
                 return;
             }
             
@@ -915,11 +904,6 @@ public class PillarIdManager {
                     }
 
                     if (migrated > 0) {
-                        System.out.println(
-                                "BuildScape: Migrated " +
-                                        migrated +
-                                        " pillar entries for old world compatibility"
-                        );
                         if (server != null && server.isRunning()) {
                             server.execute(() -> {
                                 try {
@@ -931,11 +915,6 @@ public class PillarIdManager {
                     }
 
                     if (skipped > 0) {
-                        System.out.println(
-                                "BuildScape: Skipped " +
-                                        skipped +
-                                        " invalid or outdated pillar entries"
-                        );
                     }
                     
                     // Log how many entries were loaded and how many have colors
@@ -954,9 +933,6 @@ public class PillarIdManager {
                 if (pillarData.isEmpty()) {
                     fileWasDeleted = true;
                     hadColorsOnLoad = false;
-                    System.out.println(
-                            "BuildScape: Pillar data file is empty (just {}) - will recover after world is fully loaded"
-                    );
                 } else {
                     fileWasDeleted = false;
                 }
@@ -1005,9 +981,6 @@ public class PillarIdManager {
             MinecraftServer server,
             boolean clearColors
     ) {
-        System.out.println(
-                "BuildScape: Pillar recovery scheduling disabled during world loading - recovery will happen later if needed"
-        );
     }
 
     public int clearAllPillarIdsFromWorld(MinecraftServer server) {
@@ -1016,9 +989,6 @@ public class PillarIdManager {
         }
 
         if (server.getPlayerList().getPlayerCount() == 0) {
-            System.out.println(
-                    "BuildScape: Skipping pillar ID clearing - no players connected yet"
-            );
             return 0;
         }
 
@@ -1116,9 +1086,6 @@ public class PillarIdManager {
                 }
             }
 
-            System.out.println(
-                    "BuildScape: Cleared " + clearedCount + " pillar IDs from world"
-            );
         } catch (Exception e) {
             System.err.println(
                     "BuildScape: Error clearing pillar IDs from world: " + e.getMessage()
@@ -1138,24 +1105,12 @@ public class PillarIdManager {
         }
 
         if (server.getPlayerList().getPlayerCount() == 0) {
-            System.out.println(
-                    "BuildScape: Skipping pillar recovery - no players connected yet"
-            );
             return;
         }
 
         try {
             if (clearColors) {
-                System.out.println(
-                        "BuildScape: File was deleted - clearing all pillar IDs from world..."
-                );
                 int clearedCount = clearAllPillarIdsFromWorld(server);
-                System.out.println(
-                        "BuildScape: Cleared " +
-                                clearedCount +
-                                " pillar IDs. All pillars are now treated as newly placed."
-                );
-
                 saveImmediate();
                 return;
             }
@@ -1265,9 +1220,7 @@ public class PillarIdManager {
                                     );
                                     
                                     if (positionChanged) {
-                                        System.out.println(
-                                                "BuildScape: Updating position for existing pillar " + pillarId
-                                        );
+
                                         existingData.dimension = dimensionKey;
                                         existingData.x = pos.getX();
                                         existingData.y = pos.getY();
@@ -1358,19 +1311,7 @@ public class PillarIdManager {
             
             if (recoveredCount > 0 || colorClearedCount > 0) {
                 saveImmediate();
-                System.out.println(
-                        "BuildScape: Pillar recovery completed - " +
-                                recoveredCount +
-                                " pillars recovered, " +
-                                colorClearedCount +
-                                " colors cleared, " +
-                                skippedCount +
-                                " skipped"
-                );
             } else {
-                System.out.println(
-                        "BuildScape: Pillar recovery completed - no pillars found in loaded chunks"
-                );
             }
 
             // Don't call syncAllLoadedPillars here - we already synced colors above
@@ -1648,15 +1589,6 @@ public class PillarIdManager {
                 }
             }
 
-            if (syncedCount > 0 || skippedCount > 0) {
-                System.out.println(
-                        "BuildScape: Synced " +
-                                syncedCount +
-                                " pillars, skipped " +
-                                skippedCount +
-                                " (chunks not loaded)"
-                );
-            }
         } catch (Exception e) {
             System.err.println(
                     "BuildScape: Error in syncAllLoadedPillars: " + e.getMessage()
@@ -1755,13 +1687,7 @@ public class PillarIdManager {
             // Don't save if no colors were loaded - this preserves file colors
             if (loadedCount > 0) {
                 saveImmediate();
-                System.out.println(
-                        "BuildScape: Loaded colors from NBT for " + loadedCount + " pillars, saved to file"
-                );
             } else {
-                System.out.println(
-                        "BuildScape: No colors loaded from NBT, preserving file colors (not saving)"
-                );
             }
         } catch (Exception e) {
             System.err.println(
@@ -1911,13 +1837,7 @@ public class PillarIdManager {
 
             if (syncedCount > 0) {
                 saveImmediate();
-                System.out.println(
-                        "BuildScape: Synced " + syncedCount + " pillar colors from NBT to manager, preserved " + preservedCount
-                );
             } else if (preservedCount > 0) {
-                System.out.println(
-                        "BuildScape: Preserved " + preservedCount + " pillar colors (NBT empty or not loaded)"
-                );
             }
         } catch (Exception e) {
             System.err.println(

@@ -1,4 +1,4 @@
-﻿{
+{
   "variants": {
     "facing=east,half=bottom,shape=inner_left": {
       "model": "buildscape:block/polished_white_concrete_stairs_inner",

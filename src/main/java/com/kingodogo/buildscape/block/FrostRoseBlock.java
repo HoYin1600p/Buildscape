@@ -313,4 +313,57 @@ public class FrostRoseBlock extends BushBlock implements BonemealableBlock {
     ) {
         return Collections.singletonList(new ItemStack(this));
     }
+
+    @net.minecraftforge.api.distmarker.OnlyIn(net.minecraftforge.api.distmarker.Dist.CLIENT)
+    @Override
+    public void animateTick(BlockState state, Level level, BlockPos pos, java.util.Random random) {
+        super.animateTick(state, level, pos, random);
+
+        // Check for 5 Frost Roses in a 7x7x7 block radius (so offset by 3)
+        int radius = 3;
+        int count = 0;
+        
+        for (BlockPos p : BlockPos.betweenClosed(pos.offset(-radius, -radius, -radius), pos.offset(radius, radius, radius))) {
+            if (level.getBlockState(p).is(this)) {
+                count++;
+            }
+        }
+
+        // Target "perfect" rate: A 7x7 field (49 roses) with a 1/15 chance.
+        // This calculates the exact relative probability so ANY size cluster
+        // generates the exact same total amount of snow per second.
+        double normalizedProbability = (49.0 / 15.0) / count;
+
+        if (count >= 5 && random.nextDouble() < normalizedProbability) {
+            // Mostly 15-20 particles, but sometimes randomly higher up to 50
+            int particlesToSpawn = 15 + random.nextInt(6); // 15 to 20
+            if (random.nextDouble() < 0.20) { // 20% chance to be higher
+                particlesToSpawn = 21 + random.nextInt(30); // 21 to 50
+            }
+            
+            // Spawn snowfall over an 80 block diameter (40 block radius)
+            double maxRadius = 40.0;
+            for (int i = 0; i < particlesToSpawn; i++) {
+                // Uniformly distribute in the circle
+                double r = maxRadius * Math.sqrt(random.nextDouble());
+                double angle = random.nextDouble() * Math.PI * 2;
+
+                double spawnX = pos.getX() + 0.5 + Math.cos(angle) * r;
+                double spawnZ = pos.getZ() + 0.5 + Math.sin(angle) * r;
+
+                // Spawn above the area so it falls down
+                double spawnY = pos.getY() + 10.0 + random.nextDouble() * 15.0;
+
+                double xSpeed = (random.nextDouble() - 0.5) * 0.1;
+                double ySpeed = -0.05 - random.nextDouble() * 0.05;
+                double zSpeed = (random.nextDouble() - 0.5) * 0.1;
+
+                level.addParticle(
+                        com.kingodogo.buildscape.particle.ModParticles.SNOWFLAKE.get(),
+                        spawnX, spawnY, spawnZ,
+                        xSpeed, ySpeed, zSpeed
+                );
+            }
+        }
+    }
 }

@@ -16,13 +16,20 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-// Elevator feature disabled for now (kept as backup for future release)
-// @Mod.EventBusSubscriber(modid = BuildScape.MODID)
+@Mod.EventBusSubscriber(modid = BuildScape.MODID)
 public class VerticalStairsElevatorHandler {
 
     private static final Map<UUID, Double> playerTargetY = new HashMap<>();
     private static final Map<UUID, Long> playerLastInput = new HashMap<>();
     private static final Map<UUID, Long> playerArrivedTime = new HashMap<>();
+
+    @SubscribeEvent
+    public static void onPlayerLoggedOut(net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedOutEvent event) {
+        UUID id = event.getPlayer().getUUID();
+        playerTargetY.remove(id);
+        playerLastInput.remove(id);
+        playerArrivedTime.remove(id);
+    }
     
     private static final double PASSIVE_SPEED = 0.0; 
     private static final double ACTIVE_SPEED = 0.35; 

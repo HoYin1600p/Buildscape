@@ -130,8 +130,11 @@ public class MobPillarRenderer {
             // Update entity position and rotation (cheap operation, done every frame)
             updateEntityTransform(entity, pos, facingYaw, rotation, gameTime, state);
 
+            boolean isJeb = entity.getType() == EntityType.SHEEP && (state.parsedStates.contains("rainbow") || state.parsedStates.contains("jeb"));
+            float renderPartialTicks = isJeb ? (float)((gameTime * 20.0f) % 1.0f) : 0.0f;
+
             // Render the entity
-            renderEntity(entity, poseStack, bufferSource, combinedLight, partialTicks, state);
+            renderEntity(entity, poseStack, bufferSource, combinedLight, renderPartialTicks, state);
         }
     }
 
@@ -139,11 +142,14 @@ public class MobPillarRenderer {
      * Create a new entity instance with initial setup
      */
     private static Entity createEntity(EntityType<?> entityType, Level level, BlockPos pos, MobState state) {
-        // Handle Zombie -> Giant conversion
+        // Handle Zombie -> Giant conversion (but NOT for Rabbits)
         if (state.parsedStates.contains("giant") &&
                 (entityType == EntityType.ZOMBIE || entityType == EntityType.HUSK || entityType == EntityType.DROWNED)) {
             entityType = EntityType.GIANT;
         }
+
+        // For rabbits, "giant" should NOT convert to a different entity type
+        // The scaling happens during rendering based on parsed states
 
         // Create NBT with variant data BEFORE creating entity
         CompoundTag nbt = new CompoundTag();
@@ -902,6 +908,31 @@ public class MobPillarRenderer {
         // Add floating animation
         float bobAmount = (float) Math.sin(gameTime * 2.0f) * 0.05f;
         float baseY = pos.getY() + 1.125f;
+
+        // Sync tickCount for animated features (like jeb_ sheep or idle anims)
+        // 20 ticks per second for standard Minecraft timing
+        // Only apply "rainbow" animation/tick advancement to sheep as requested
+        if (entity.getType() == EntityType.SHEEP && (state.parsedStates.contains("rainbow") || state.parsedStates.contains("jeb"))) {
+            entity.tickCount = (int)(gameTime * 20);
+        } else {
+            entity.tickCount = 0;
+            if (entity instanceof LivingEntity livingEntity) {
+                if (!state.parsedStates.contains("hurt") && !state.parsedStates.contains("damage")) {
+                    livingEntity.hurtTime = 0;
+                }
+                livingEntity.setSprinting(false);
+                livingEntity.setShiftKeyDown(false);
+                livingEntity.animationSpeed = 0.0f;
+                livingEntity.animationSpeedOld = 0.0f;
+                livingEntity.animationPosition = 0.0f;
+                livingEntity.swingTime = 0;
+                livingEntity.attackAnim = 0.0f;
+                livingEntity.oAttackAnim = 0.0f;
+                livingEntity.setDeltaMovement(0, 0, 0);
+                livingEntity.setSpeed(0.0f);
+            }
+        }
+
         entity.setPos(pos.getX() + 0.5, baseY + bobAmount, pos.getZ() + 0.5);
     }
 
@@ -923,7 +954,10 @@ public class MobPillarRenderer {
 
         if (state.parsedStates.contains("giant") || state.parsedStates.contains("huge")) {
             // Explicitly requested GIANT size.
-            if (entityHeight > 6.0f) {
+            // Special case: Rabbits with "giant" should be bigger than normal
+            if (entity instanceof net.minecraft.world.entity.animal.Rabbit) {
+                scale = 1.8f; // Make rabbits much bigger when renamed "giant"
+            } else if (entityHeight > 6.0f) {
                 scale = 0.4f; // Massive entities (Giants) become ~4.8m
             } else {
                 scale = 1.2f; // Smaller entities (Slimes) become prominent
@@ -982,7 +1016,7 @@ public class MobPillarRenderer {
             entityRenderer.render(
                     entity,
                     entity.getYRot(),
-                    0.0f,
+                    partialTicks,
                     poseStack,
                     bufferSource,
                     combinedLight

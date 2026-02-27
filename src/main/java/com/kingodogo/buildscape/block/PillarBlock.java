@@ -96,11 +96,16 @@ public class PillarBlock
             }
         }
 
-        boolean hasAbove = above.getBlock() instanceof PillarBlock;
-        boolean hasBelow = below.getBlock() instanceof PillarBlock;
+        // Only stack with regular PillarBlocks, NOT AshenKingPillars (they're independent)
+        boolean hasAbove = above.getBlock() instanceof PillarBlock && !(above.getBlock() instanceof AshenKingPillarBlock);
+        boolean hasBelow = below.getBlock() instanceof PillarBlock && !(below.getBlock() instanceof AshenKingPillarBlock);
 
         if (!level.isClientSide) {
-            if (hasBelow && !hasAbove) {
+            // Only transfer items from stacked regular pillars, NOT AshenKingPillars
+            BlockState belowState = level.getBlockState(pos.below());
+            BlockState aboveState = level.getBlockState(pos.above());
+
+            if (hasBelow && !hasAbove && !(belowState.getBlock() instanceof AshenKingPillarBlock)) {
                 if (
                         level.getBlockEntity(pos.below()) instanceof PillarBlockEntity be &&
                                 be.hasDisplayItem()
@@ -118,7 +123,7 @@ public class PillarBlock
                     itemEntity.setDefaultPickUpDelay();
                     level.addFreshEntity(itemEntity);
                 }
-            } else if (hasAbove && !hasBelow) {
+            } else if (hasAbove && !hasBelow && !(aboveState.getBlock() instanceof AshenKingPillarBlock)) {
                 if (
                         level.getBlockEntity(pos.above()) instanceof PillarBlockEntity be &&
                                 be.hasDisplayItem()
@@ -174,8 +179,9 @@ public class PillarBlock
         if (direction == Direction.UP || direction == Direction.DOWN) {
             BlockState below = level.getBlockState(pos.below());
             BlockState above = level.getBlockState(pos.above());
-            boolean hasAbove = above.getBlock() instanceof PillarBlock;
-            boolean hasBelow = below.getBlock() instanceof PillarBlock;
+            // Only stack with regular PillarBlocks, NOT AshenKingPillars (they're independent)
+            boolean hasAbove = above.getBlock() instanceof PillarBlock && !(above.getBlock() instanceof AshenKingPillarBlock);
+            boolean hasBelow = below.getBlock() instanceof PillarBlock && !(below.getBlock() instanceof AshenKingPillarBlock);
 
             PillarPart newPart;
             if (hasAbove && hasBelow) {
@@ -557,8 +563,9 @@ public class PillarBlock
             if (!level.isClientSide) {
                 BlockState below = level.getBlockState(pos.below());
                 BlockState above = level.getBlockState(pos.above());
-                boolean hasAbove = above.getBlock() instanceof PillarBlock;
-                boolean hasBelow = below.getBlock() instanceof PillarBlock;
+                // Only stack with regular PillarBlocks, NOT AshenKingPillars (they're independent)
+                boolean hasAbove = above.getBlock() instanceof PillarBlock && !(above.getBlock() instanceof AshenKingPillarBlock);
+                boolean hasBelow = below.getBlock() instanceof PillarBlock && !(below.getBlock() instanceof AshenKingPillarBlock);
 
                 PillarPart newPart;
                 if (hasAbove && hasBelow) {
@@ -920,7 +927,9 @@ public class PillarBlock
         ItemStack firstItem = ItemStack.EMPTY;
         BlockPos current = bottom;
 
-        while (level.getBlockState(current).getBlock() instanceof PillarBlock) {
+        // Only iterate through regular PillarBlocks, NOT AshenKingPillars
+        while (level.getBlockState(current).getBlock() instanceof PillarBlock &&
+               !(level.getBlockState(current).getBlock() instanceof AshenKingPillarBlock)) {
             BlockEntity be = level.getBlockEntity(current);
             if (
                     be instanceof PillarBlockEntity pillarBE && pillarBE.hasDisplayItem()
@@ -949,7 +958,9 @@ public class PillarBlock
         }
 
         current = bottom;
-        while (level.getBlockState(current).getBlock() instanceof PillarBlock) {
+        // Only iterate through regular PillarBlocks, NOT AshenKingPillars
+        while (level.getBlockState(current).getBlock() instanceof PillarBlock &&
+               !(level.getBlockState(current).getBlock() instanceof AshenKingPillarBlock)) {
             if (!current.equals(top)) {
                 BlockEntity be = level.getBlockEntity(current);
                 if (
@@ -970,9 +981,9 @@ public class PillarBlock
 
     private BlockPos findBottomBlock(Level level, BlockPos pos) {
         BlockPos current = pos;
-        while (
-                level.getBlockState(current.below()).getBlock() instanceof PillarBlock
-        ) {
+        // Stop at AshenKingPillars - they're not part of regular pillar stacks
+        while (level.getBlockState(current.below()).getBlock() instanceof PillarBlock &&
+               !(level.getBlockState(current.below()).getBlock() instanceof AshenKingPillarBlock)) {
             current = current.below();
         }
         return current;
@@ -980,9 +991,9 @@ public class PillarBlock
 
     private BlockPos findTopBlock(Level level, BlockPos pos) {
         BlockPos current = pos;
-        while (
-                level.getBlockState(current.above()).getBlock() instanceof PillarBlock
-        ) {
+        // Stop at AshenKingPillars - they're not part of regular pillar stacks
+        while (level.getBlockState(current.above()).getBlock() instanceof PillarBlock &&
+               !(level.getBlockState(current.above()).getBlock() instanceof AshenKingPillarBlock)) {
             current = current.above();
         }
         return current;

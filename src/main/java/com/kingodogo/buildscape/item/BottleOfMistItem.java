@@ -60,4 +60,11 @@ public class BottleOfMistItem extends Item {
 
         return InteractionResultHolder.sidedSuccess(stack, level.isClientSide);
     }
+
+    @Override
+    public void appendHoverText(ItemStack stack, @javax.annotation.Nullable Level level, java.util.List<net.minecraft.network.chat.Component> tooltip, net.minecraft.world.item.TooltipFlag flag) {
+        tooltip.add(new net.minecraft.network.chat.TranslatableComponent("tooltip.buildscape.bottle_of_mist.use").withStyle(net.minecraft.ChatFormatting.GRAY));
+        tooltip.add(new net.minecraft.network.chat.TranslatableComponent("tooltip.buildscape.mist_toggle").withStyle(net.minecraft.ChatFormatting.DARK_AQUA));
+        super.appendHoverText(stack, level, tooltip, flag);
+    }
 }

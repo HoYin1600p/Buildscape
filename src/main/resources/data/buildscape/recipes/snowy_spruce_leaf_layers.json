@@ -1,0 +1,15 @@
+﻿{
+    "key":  {
+                "#":  {
+                          "item":  "buildscape:snowy_spruce_leaves"
+                      }
+            },
+    "pattern":  [
+                    "###"
+                ],
+    "result":  {
+                   "count":  8,
+                   "item":  "buildscape:snowy_spruce_leaf_layers"
+               },
+    "type":  "minecraft:crafting_shaped"
+}

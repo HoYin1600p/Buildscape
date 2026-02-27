@@ -261,7 +261,7 @@ public class SupportersApiClient {
                 .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
                 .build();
 
-        BuildScape.getLogger().debug("Making secure authentication request for UUID: " + sanitizedUuid);
+
 
         return httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString())
                 .thenApply(response -> {
@@ -354,7 +354,7 @@ public class SupportersApiClient {
                 .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
                 .build();
 
-        BuildScape.getLogger().debug("Making secure redeem request for UUID: " + sanitizedUuid);
+
 
         return httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString())
                 .thenApply(response -> {

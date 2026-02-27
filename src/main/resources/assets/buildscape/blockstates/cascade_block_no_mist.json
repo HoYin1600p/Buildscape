@@ -1,7 +1,7 @@
 {
   "variants": {
     "": {
-      "model": "buildscape:block/cascade_block"
+      "model": "buildscape:block/cascade_block_no_mist"
     }
   }
 }

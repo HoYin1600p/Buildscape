@@ -72,11 +72,12 @@ public class ColoredItemFrameRenderer extends EntityRenderer<ColoredItemFrameEnt
         Vec3 renderOffset = this.getRenderOffset(entity, partialTicks);
         poseStack.translate(-renderOffset.x(), -renderOffset.y(), -renderOffset.z());
 
-        // Translate by direction * 0.46875 to move render origin to block center
+        // Translate slightly more than vanilla (0.46875) to avoid Z-fighting with the block behind
+        double wallOffset = 0.469D;
         poseStack.translate(
-                (double) direction.getStepX() * 0.46875D,
-                (double) direction.getStepY() * 0.46875D,
-                (double) direction.getStepZ() * 0.46875D
+                (double) direction.getStepX() * wallOffset,
+                (double) direction.getStepY() * wallOffset,
+                (double) direction.getStepZ() * wallOffset
         );
 
         // Apply rotation using entity's xRot/yRot (set by setDirection), matching vanilla
@@ -141,28 +142,28 @@ public class ColoredItemFrameRenderer extends EntityRenderer<ColoredItemFrameEnt
                 3F / 16F, 13F / 16F, 13F / 16F, 3F / 16F,
                 0, 0, 1);
 
-        // Render frame border with birch planks
+        // Render frame border
         VertexConsumer frameConsumer = buffer.getBuffer(RenderType.entityCutoutNoCull(BIRCH_PLANKS));
 
-        // Bottom border: from [2, 2, 15] to [14, 3, 16]
+        // Bottom border: [3, 2] to [13, 3]
+        renderBoxFaces(frameConsumer, pose, normal, packedLight,
+                3F / 16F, 2F / 16F, frameZ1,
+                13F / 16F, 3F / 16F, frameZ2);
+
+        // Top border: [3, 13] to [13, 14]
+        renderBoxFaces(frameConsumer, pose, normal, packedLight,
+                3F / 16F, 13F / 16F, frameZ1,
+                13F / 16F, 14F / 16F, frameZ2);
+
+        // Left border: full height [2, 14]
         renderBoxFaces(frameConsumer, pose, normal, packedLight,
                 2F / 16F, 2F / 16F, frameZ1,
-                14F / 16F, 3F / 16F, frameZ2);
+                3F / 16F, 14F / 16F, frameZ2);
 
-        // Top border: from [2, 13, 15] to [14, 14, 16]
+        // Right border: full height [2, 14]
         renderBoxFaces(frameConsumer, pose, normal, packedLight,
-                2F / 16F, 13F / 16F, frameZ1,
+                13F / 16F, 2F / 16F, frameZ1,
                 14F / 16F, 14F / 16F, frameZ2);
-
-        // Left border: from [2, 3, 15] to [3, 13, 16]
-        renderBoxFaces(frameConsumer, pose, normal, packedLight,
-                2F / 16F, 3F / 16F, frameZ1,
-                3F / 16F, 13F / 16F, frameZ2);
-
-        // Right border: from [13, 3, 15] to [14, 13, 16]
-        renderBoxFaces(frameConsumer, pose, normal, packedLight,
-                13F / 16F, 3F / 16F, frameZ1,
-                14F / 16F, 13F / 16F, frameZ2);
 
         poseStack.popPose();
     }
@@ -203,28 +204,28 @@ public class ColoredItemFrameRenderer extends EntityRenderer<ColoredItemFrameEnt
                 1F / 16F, 15F / 16F, 15F / 16F, 1F / 16F,
                 0, 0, 1);
 
-        // Render frame border with birch planks
+        // Render frame border
         VertexConsumer frameConsumer = buffer.getBuffer(RenderType.entityCutoutNoCull(BIRCH_PLANKS));
 
-        // Bottom border: from [0, 0, 15.001] to [16, 1, 16]
+        // Bottom border: [1, 0] to [15, 1]
+        renderBoxFaces(frameConsumer, pose, normal, packedLight,
+                1F / 16F, 0F, frameZ1,
+                15F / 16F, 1F / 16F, frameZ2);
+
+        // Top border: [1, 15] to [15, 16]
+        renderBoxFaces(frameConsumer, pose, normal, packedLight,
+                1F / 16F, 15F / 16F, frameZ1,
+                15F / 16F, 1F, frameZ2);
+
+        // Left border: full height [0, 16]
         renderBoxFaces(frameConsumer, pose, normal, packedLight,
                 0F, 0F, frameZ1,
-                1F, 1F / 16F, frameZ2);
+                1F / 16F, 1F, frameZ2);
 
-        // Top border: from [0, 15, 15.001] to [16, 16, 16]
+        // Right border: full height [0, 16]
         renderBoxFaces(frameConsumer, pose, normal, packedLight,
-                0F, 15F / 16F, frameZ1,
+                15F / 16F, 0F, frameZ1,
                 1F, 1F, frameZ2);
-
-        // Left border: from [0, 1, 15.001] to [1, 15, 16]
-        renderBoxFaces(frameConsumer, pose, normal, packedLight,
-                0F, 1F / 16F, frameZ1,
-                1F / 16F, 15F / 16F, frameZ2);
-
-        // Right border: from [15, 1, 15.001] to [16, 15, 16]
-        renderBoxFaces(frameConsumer, pose, normal, packedLight,
-                15F / 16F, 1F / 16F, frameZ1,
-                1F, 15F / 16F, frameZ2);
 
         poseStack.popPose();
     }

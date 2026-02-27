@@ -1,4 +1,4 @@
-﻿{
+{
   "parent": "minecraft:block/slab",
   "textures": {
     "bottom": "buildscape:block/polished_blue_concrete",

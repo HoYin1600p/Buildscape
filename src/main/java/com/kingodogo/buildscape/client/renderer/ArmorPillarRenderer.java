@@ -95,9 +95,9 @@ public class ArmorPillarRenderer {
                 yOffset = baseOffset - 1.42;
             } else if (slot == EquipmentSlot.CHEST || itemStack.getItem() instanceof ElytraItem) {
                 yOffset = baseOffset - 0.72;
-            } else if (slot == EquipmentSlot.LEGS) {
-                // Leggings cover the legs, which go all the way down to 0.0 on an armor stand.
-                // We use baseOffset directly or with a tiny adjustment.
+            } else if (slot == EquipmentSlot.LEGS || slot == EquipmentSlot.FEET) {
+                // Legs and Feet cover the lower parts, which go all the way down to 0.0 on an armor stand.
+                // We use baseOffset directly to align the bottom of the model with the pillar top.
                 yOffset = baseOffset;
             } else {
                 yOffset = baseOffset - 0.72;

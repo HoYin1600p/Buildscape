@@ -1,0 +1,18 @@
+﻿{
+    "key":  {
+                "B":  {
+                          "item":  "buildscape:snowy_flowering_azalea_leaves"
+                      }
+            },
+    "category":  "building",
+    "pattern":  [
+                    "   ",
+                    "BBB",
+                    "BBB"
+                ],
+    "result":  {
+                   "count":  6,
+                   "item":  "buildscape:snowy_flowering_azalea_leaf_hedge"
+               },
+    "type":  "minecraft:crafting_shaped"
+}

@@ -32,6 +32,16 @@ public class PillarBlockEntityRenderer
     private static final Map<BlockPos, Integer> itemHashes =
             new ConcurrentHashMap<>();
 
+    // ── Per-item render-state caches (keyed by item NBT hash) ─────────────────
+    // hasItemNameTag / isFixed / hasUpsideDownName all parse JSON every frame;
+    // cache the result so we only pay that cost when the item actually changes.
+    private static final Map<Integer, Boolean> cachedIsFixed      = new ConcurrentHashMap<>();
+    private static final Map<Integer, Boolean> cachedIsItem       = new ConcurrentHashMap<>();
+    private static final Map<Integer, Boolean> cachedIsUpsideDown = new ConcurrentHashMap<>();
+    private static final Map<Integer, MobState> cachedMobState    = new ConcurrentHashMap<>();
+    // isAshenKing is block-type dependent, constant per position — cache it.
+    private static final Map<BlockPos, Boolean> cachedIsAshenKing = new ConcurrentHashMap<>();
+
     public PillarBlockEntityRenderer(
             BlockEntityRendererProvider.Context context
     ) {
@@ -47,16 +57,20 @@ public class PillarBlockEntityRenderer
 
     public static void clearEntityCache(BlockPos pos) {
         MobPillarRenderer.clearEntityCache(pos);
-        // Also clear the client-side timer and item hash for this position
         clientStartTimes.remove(pos);
         itemHashes.remove(pos);
+        cachedIsAshenKing.remove(pos); // also evict block-type cache for this pos
     }
 
     public static void clearEntityCache() {
         MobPillarRenderer.clearAllEntityCaches();
-        // Clear all client-side timers and item hashes
         clientStartTimes.clear();
         itemHashes.clear();
+        cachedIsFixed.clear();
+        cachedIsItem.clear();
+        cachedIsUpsideDown.clear();
+        cachedMobState.clear();
+        cachedIsAshenKing.clear();
     }
 
     @Override
@@ -90,15 +104,38 @@ public class PillarBlockEntityRenderer
             return;
         }
 
+        // Distance-based culling: skip rendering entities on pillars that are beyond
+        // the player's current render distance. This prevents off-screen pillars from
+        // burning CPU/GPU time on entity rendering.
+        net.minecraft.client.player.LocalPlayer localPlayer = Minecraft.getInstance().player;
+        if (localPlayer != null) {
+            int renderDistanceChunks = Minecraft.getInstance().options.renderDistance;
+            // Convert chunk render distance to block distance (each chunk is 16 blocks).
+            // We use the block-diagonal distance so corners are checked correctly.
+            double maxRenderDistBlocks = renderDistanceChunks * 16.0;
+            double dx = pos.getX() + 0.5 - localPlayer.getX();
+            double dy = pos.getY() + 0.5 - localPlayer.getY();
+            double dz = pos.getZ() + 0.5 - localPlayer.getZ();
+            double distSq = dx * dx + dy * dy + dz * dz;
+            if (distSq > maxRenderDistBlocks * maxRenderDistBlocks) {
+                return;
+            }
+        }
+
         try {
             poseStack.pushPose();
 
-            // Check if the item is a spawn egg to determine position and rotation speed
-            boolean isSpawnEgg = displayedItem.getItem() instanceof SpawnEggItem && !hasItemNameTag(displayedItem);
+        // Compute hash once — reused by all three per-item caches below
+        int itemHash = displayedItem.hashCode();
 
-            // Position: items and mobs hover just above pillar top
-            // AshenKing pillars are shorter (12px = 0.75 blocks) so lower the hover height
-            boolean isAshenKing = blockEntity.getBlockState().getBlock() instanceof com.kingodogo.buildscape.block.AshenKingPillarBlock;
+        // Check if the item is a spawn egg to determine position and rotation speed
+        boolean isSpawnEgg = displayedItem.getItem() instanceof SpawnEggItem
+                && !cachedIsItem.computeIfAbsent(itemHash, k -> hasItemNameTag(displayedItem));
+
+        // isAshenKing is constant per position (block type never changes) — cache it
+        boolean isAshenKing = cachedIsAshenKing.computeIfAbsent(
+                pos, k -> blockEntity.getBlockState().getBlock()
+                        instanceof com.kingodogo.buildscape.block.AshenKingPillarBlock);
             float hoverHeight;
             if (isAshenKing) {
                 hoverHeight = isSpawnEgg ? 0.875f : 1.0f;
@@ -107,37 +144,30 @@ public class PillarBlockEntityRenderer
             }
             poseStack.translate(0.5, hoverHeight, 0.5);
 
-            // Smooth rotation animation using PURELY CLIENT-SIDE time
-            // CRITICAL: Use RenderSystem.getTime() which is completely independent of server sync
-            // This ensures smooth rotation even when connected to servers with network lag
-            // Block entity renderers are ONLY called on client, so this is safe
-            // Items: Always rotate (360 degrees every 4 seconds, 90 degrees per second)
-            // Mobs: Only rotate if name tag is "spin" (40% slower than items: 54 degrees per second)
-            // If mob doesn't have "spin" name tag, rotation stays at 0 (no rotation)
+            // Smooth rotation animation using PURELY CLIENT-SIDE time.
+            // Items: Always rotate (90 deg/sec). Mobs: only if named "spin".
 
+            // Cache isFixed lookup per item NBT hash — avoids repeated JSON parsing
             boolean isFixed = false;
             if (!isSpawnEgg) {
-                isFixed = isFixed(displayedItem);
+                isFixed = cachedIsFixed.computeIfAbsent(itemHash, k -> isFixed(displayedItem));
             }
-
             float rotationSpeed = 0.0f;
             if (!isSpawnEgg) {
-                // Items always rotate
-                rotationSpeed = 90.0f; // degrees per second
+                rotationSpeed = 90.0f;
             } else {
-                // Mobs only rotate if they have the "spin" state in their name/metadata
+                // Cache MobState parse per item NBT hash — avoids repeated JSON/NBT parsing
                 EntityType<?> entityType = ((SpawnEggItem) displayedItem.getItem()).getType(null);
-                MobState mobState = MobStateParser.parseStates(displayedItem, entityType);
+                MobState mobState = cachedMobState.computeIfAbsent(
+                        itemHash,
+                        k -> MobStateParser.parseStates(displayedItem, entityType));
                 if (mobState.spin) {
-                    rotationSpeed = 22.5f; // Significant slow down (4x slower than items)
+                    rotationSpeed = 22.5f;
                 }
             }
-            // Mobs don't use this rotation speed - they are handled by MobPillarRenderer
 
-            // Use client-side system time for completely smooth animation independent of server
-            // System.nanoTime() returns time in nanoseconds since some arbitrary point
-            // This is completely independent of server sync and provides smooth animation
-            long currentRenderTime = System.nanoTime() / 1000000L; // Convert nanoseconds to milliseconds
+            // Use System.currentTimeMillis() for smooth client-side animation — avoids nanoTime division
+            long currentRenderTime = System.currentTimeMillis();
 
             // Check if the displayed item has changed - if so, reset the timer
             int currentItemHash = displayedItem.hashCode();

@@ -39,23 +39,37 @@ public class AshenKingPillarBlock extends PillarBlock {
 
     private static VoxelShape createShape(Direction facing, PillarPart part) {
         VoxelShape result = Shapes.empty();
-        
-        // 1. Main Central Log (always present)
-        result = Shapes.or(result, rotateBox(0, 0, 3.5, 16, 5, 12.5, facing));
-        
-        // 2. Red Cushion / Center Decoration (always present)
-        result = Shapes.or(result, rotateBox(5.5, 5, 6, 10.5, 7.5, 10, facing));
-        
-        // 3. Handle base - only on SINGLE or BOTTOM (the "start" side)
+
+        // 1. Main Central Log body (always present)
+        //    Model: from [0,0,3] to [18,5.5,13] — X clamped to 16 (anchor side extends beyond block)
+        result = Shapes.or(result, rotateBox(0, 0, 3, 16, 5.5, 13, facing));
+
+        // 2. Seat / cushion layers (always present) — 3 individual layers from the model, no rotation
+        //    Model: bottom padding [4,5,4.75]→[12,6.5,11.25]
+        result = Shapes.or(result, rotateBox(4, 5, 4.75, 12, 6.5, 11.25, facing));
+        //    Model: middle ledge [5,6.5,5.75]→[11,7.5,10.25]
+        result = Shapes.or(result, rotateBox(5, 6.5, 5.75, 11, 7.5, 10.25, facing));
+        //    Model: top rail [4,7.5,4.75]→[12,8.5,11.25]
+        result = Shapes.or(result, rotateBox(4, 7.5, 4.75, 12, 8.5, 11.25, facing));
+
+        // 3. Handle side — only on SINGLE or BOTTOM
+        //    Front-face tooth prongs (model elements, no rotation): 3 small studs at z~3
         if (part == PillarPart.SINGLE || part == PillarPart.BOTTOM) {
-            result = Shapes.or(result, rotateBox(-3, 1.5, 4, 0, 5, 12, facing));
+            result = Shapes.or(result, rotateBox(2.1, 1.5, 2.1, 5.1, 4.5, 3.1, facing));
+            result = Shapes.or(result, rotateBox(6.1, 1.5, 2.1, 9.1, 4.5, 3.1, facing));
+            result = Shapes.or(result, rotateBox(10.1, 1.5, 2.1, 13.1, 4.5, 3.1, facing));
         }
 
-        // 4. Anchor base - only on SINGLE or TOP (the "end" side)
+        // 4. Anchor side — only on SINGLE or TOP
+        //    Back stud (model element, no rotation): 1 stud at z~13
         if (part == PillarPart.SINGLE || part == PillarPart.TOP) {
-            result = Shapes.or(result, rotateBox(16, 0.5, 4, 20, 4, 12, facing));
+            result = Shapes.or(result, rotateBox(9.6, 1.5, 12.95, 12.6, 4.5, 13.95, facing));
         }
-        
+
+        // NOTE: The tilted handle column (-22.5° z) and anchor column (+22.5° z) are intentionally
+        // excluded — axis-aligned VoxelShapes cannot represent rotated geometry without creating
+        // oversized bounding boxes that visually spill far outside the actual model.
+
         return result.optimize();
     }
 

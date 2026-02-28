@@ -33,11 +33,18 @@ public class PillarBlockEntity extends BlockEntity {
 
     private int particleColorCounter = 0;
 
+    /** Monotonically increasing version counter: incremented on every color/pattern
+     *  change so that syncColorsFromManager() can skip its O(n) list-equality
+     *  walk when nothing has changed since the last sync. */
+    private int colorsVersion = 0;
+    private int lastSyncedColorsVersion = -1; // version at last successful sync
+
     private static final int MAX_SYNC_ATTEMPTS = 5;
 
     public static final int MAX_DYE_COLORS = 5;
 
     private float facingYaw = 0.0f;
+
 
     private static final String[] PATTERNS = {
             "none",
@@ -64,7 +71,7 @@ public class PillarBlockEntity extends BlockEntity {
     public PillarBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.PILLAR_BLOCK_ENTITY.get(), pos, state);
     }
-    private static final int SYNC_INTERVAL = 20; // Sync every 20 ticks (1 second)
+    private static final int SYNC_INTERVAL = 100; // Sync every 100 ticks (5 seconds) — colors/patterns change rarely
     
     public void syncPatternFromManager() {
         if (level == null || level.isClientSide) return;
@@ -289,6 +296,22 @@ public class PillarBlockEntity extends BlockEntity {
     private int clientSyncAttempts = 0;
     private int syncTickCounter = 0;
 
+    // ── Particle reflection cache ────────────────────────────────────────────────
+    // Look up the providers map and the internal ParticleEngine.add() once per
+    // particle type rather than on every spawn tick.  Keyed by particle type so
+    // both GLOW_LIME_SPARKLE and SNOWFLAKE each get their own cached provider.
+    private static final java.util.concurrent.ConcurrentHashMap<
+            net.minecraft.core.particles.ParticleType<?>,
+            net.minecraft.client.particle.ParticleProvider<?>>
+            CACHED_PROVIDERS = new java.util.concurrent.ConcurrentHashMap<>();
+    private static volatile java.lang.reflect.Method CACHED_ADD_METHOD = null;
+    private static volatile boolean REFLECTION_INIT_DONE = false;
+
+    // Compiled pattern for hex colour validation — avoids re-compiling the regex
+    // on every call to getParticleColor().
+    private static final java.util.regex.Pattern HEX_COLOR_PATTERN =
+            java.util.regex.Pattern.compile("^#[0-9A-Fa-f]{6}$");
+
     private static void spawnParticles(
             net.minecraft.world.level.Level level,
             BlockPos pos,
@@ -363,32 +386,38 @@ public class PillarBlockEntity extends BlockEntity {
         net.minecraft.client.particle.ParticleEngine particleEngine =
                 mc.particleEngine;
 
-        net.minecraft.client.particle.ParticleProvider<
-                SimpleParticleType
-                > provider = null;
-        try {
-            java.lang.reflect.Field providersField =
-                    net.minecraft.client.particle.ParticleEngine.class.getDeclaredField(
-                            "providers"
-                    );
-            providersField.setAccessible(true);
-            @SuppressWarnings("unchecked")
-            java.util.Map<
-                    net.minecraft.core.particles.ParticleType<?>,
-                    net.minecraft.client.particle.ParticleProvider<?>
-                    > providers = (java.util.Map<
-                    net.minecraft.core.particles.ParticleType<?>,
-                    net.minecraft.client.particle.ParticleProvider<?>
-                    >) providersField.get(particleEngine);
-
-            @SuppressWarnings("unchecked")
-            net.minecraft.client.particle.ParticleProvider<SimpleParticleType> p =
-                    (net.minecraft.client.particle.ParticleProvider<
-                            SimpleParticleType
-                            >) providers.get(particleType);
-            provider = p;
-        } catch (Exception e) {
+        // ── Cached reflection lookup (runs at most once per particle type) ───────
+        if (!REFLECTION_INIT_DONE) {
+            try {
+                java.lang.reflect.Method addM =
+                        net.minecraft.client.particle.ParticleEngine.class
+                                .getDeclaredMethod("add",
+                                        net.minecraft.client.particle.Particle.class);
+                addM.setAccessible(true);
+                CACHED_ADD_METHOD = addM;
+            } catch (Exception ignored) {}
+            REFLECTION_INIT_DONE = true;
         }
+
+        @SuppressWarnings("unchecked")
+        net.minecraft.client.particle.ParticleProvider<SimpleParticleType> provider =
+                (net.minecraft.client.particle.ParticleProvider<SimpleParticleType>)
+                        CACHED_PROVIDERS.computeIfAbsent(particleType, pt -> {
+                            try {
+                                java.lang.reflect.Field f =
+                                        net.minecraft.client.particle.ParticleEngine.class
+                                                .getDeclaredField("providers");
+                                f.setAccessible(true);
+                                @SuppressWarnings("unchecked")
+                                java.util.Map<net.minecraft.core.particles.ParticleType<?>,
+                                        net.minecraft.client.particle.ParticleProvider<?>> map =
+                                        (java.util.Map<net.minecraft.core.particles.ParticleType<?>,
+                                                net.minecraft.client.particle.ParticleProvider<?>>) f.get(particleEngine);
+                                return map.get(pt);
+                            } catch (Exception e) {
+                                return null;
+                            }
+                        });
 
         for (int i = 0; i < count; i++) {
             ParticleSpawnData data = calculateParticleData(
@@ -425,7 +454,8 @@ public class PillarBlockEntity extends BlockEntity {
                 }
             }
 
-            if (provider != null) {
+            java.lang.reflect.Method addMethod = CACHED_ADD_METHOD;
+            if (provider != null && addMethod != null) {
                 try {
                     net.minecraft.client.particle.Particle particle =
                             provider.createParticle(
@@ -440,12 +470,6 @@ public class PillarBlockEntity extends BlockEntity {
                             );
 
                     if (particle != null) {
-                        java.lang.reflect.Method addMethod =
-                                net.minecraft.client.particle.ParticleEngine.class.getDeclaredMethod(
-                                        "add",
-                                        net.minecraft.client.particle.Particle.class
-                                );
-                        addMethod.setAccessible(true);
                         addMethod.invoke(particleEngine, particle);
                     }
                 } catch (Exception e) {
@@ -479,12 +503,108 @@ public class PillarBlockEntity extends BlockEntity {
             BlockState state,
             PillarBlockEntity be
     ) {
-        // Sync colors and pattern from manager periodically to pick up config changes
+        // Sync colors and pattern from manager periodically.
+        // Both syncs share the same chunk-validity / manager-ready guards,
+        // so we merge them into a single if-block to halve that overhead.
         be.syncTickCounter++;
         if (be.syncTickCounter >= SYNC_INTERVAL) {
             be.syncTickCounter = 0;
-            be.syncColorsFromManager();
-            be.syncPatternFromManager();
+            be.syncBothFromManager(); // single combined sync — avoids duplicate guard checks
+        }
+    }
+
+    /**
+     * Combined server-side sync: runs the expensive guard checks ONCE and then
+     * syncs both colors and pattern in a single pass.
+     * This replaces the previous pattern of calling syncColorsFromManager() and
+     * syncPatternFromManager() sequentially, which duplicated every guard.
+     */
+    private void syncBothFromManager() {
+        if (level == null || level.isClientSide) return;
+
+        // ── Shared guard block ───────────────────────────────────────────
+        if (level.getServer() == null ||
+                !level.getServer().isRunning() ||
+                !com.kingodogo.buildscape.BuildScape.isServerFullyInitialized()) {
+            return;
+        }
+        if (level.getServer().getPlayerList().getPlayerCount() == 0) return;
+        if (!level.hasChunkAt(worldPosition)) return;
+        try {
+            net.minecraft.world.level.chunk.ChunkAccess chunk = level.getChunk(worldPosition);
+            if (!(chunk instanceof net.minecraft.world.level.chunk.LevelChunk)) return;
+            if (!chunk.getStatus().isOrAfter(net.minecraft.world.level.chunk.ChunkStatus.FULL)) return;
+        } catch (Exception e) {
+            return;
+        }
+
+        PillarIdManager manager = PillarIdManager.get();
+        if (!manager.hasLoaded()) return;
+
+        // Resolve the pillar ID once
+        String expectedPrefix = PillarIdManager.getVariantPrefix(level, worldPosition);
+        String idToSync = (this.pillarId != null && !this.pillarId.isEmpty())
+                ? this.pillarId : getStackPillarId();
+        if (idToSync == null || idToSync.isEmpty()) return;
+        if (!idToSync.startsWith(expectedPrefix + "-P")) return;
+
+        PillarIdManager.PillarData data = manager.getPillarData(idToSync);
+        boolean changed = false;
+
+        // ── Sync colors ───────────────────────────────────────────────
+        if (data != null && data.hasColors()) {
+            java.util.List<String> managerColors = data.getColors();
+            boolean colorsDiffer = (this.particleColors == null ||
+                    this.particleColors.isEmpty() ||
+                    !this.pillarId.equals(idToSync) ||
+                    managerColors.size() != this.particleColors.size());
+
+            if (!colorsDiffer) {
+                // Fine-grained compare only when sizes match
+                for (int i = 0; i < managerColors.size(); i++) {
+                    String mc = managerColors.get(i), cc = this.particleColors.get(i);
+                    if (mc == null || cc == null || !mc.equals(cc)) { colorsDiffer = true; break; }
+                }
+            }
+
+            if (colorsDiffer) {
+                this.pillarId = idToSync;
+                this.particleColors = new java.util.ArrayList<>(managerColors);
+                this.colorsInitialized = true;
+                this.particleColorCounter = 0;
+                this.lastParticleTick = 0;
+                this.colorsVersion++;
+                changed = true;
+            }
+        }
+
+        // ── Sync pattern ───────────────────────────────────────────────
+        if (data != null) {
+            String managerPattern = data.pattern;
+            if (managerPattern != null && !managerPattern.isEmpty()) {
+                boolean validPattern = false;
+                for (String p : PATTERNS) {
+                    if (p.equals(managerPattern)) { validPattern = true; break; }
+                }
+                if (validPattern && (this.particlePattern == null || !this.particlePattern.equals(managerPattern))) {
+                    this.particlePattern = managerPattern;
+                    changed = true;
+                }
+            }
+            if (data.pattern_speed != null && (this.patternSpeed == null || !this.patternSpeed.equals(data.pattern_speed))) {
+                this.patternSpeed = data.pattern_speed;  changed = true;
+            }
+            if (data.pattern_spread != null && (this.patternSpread == null || !this.patternSpread.equals(data.pattern_spread))) {
+                this.patternSpread = data.pattern_spread; changed = true;
+            }
+            if (data.pattern_intensity != null && (this.patternIntensity == null || !this.patternIntensity.equals(data.pattern_intensity))) {
+                this.patternIntensity = data.pattern_intensity; changed = true;
+            }
+        }
+
+        if (changed) {
+            this.setChanged();
+            level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
         }
     }
 
@@ -496,10 +616,20 @@ public class PillarBlockEntity extends BlockEntity {
     ) {
         if (level == null || !level.isClientSide) return;
         if (!be.hasDisplayItem()) return;
-        PillarParticleConfig cfg = PillarParticleConfig.get();
-        if (!cfg.matches(be.displayedItem)) return;
+
         long time = level.getGameTime();
         if ((time - be.lastParticleTick) < 5) return;
+
+        // Use peek() — zero I/O, zero reflection; returns the last-known config
+        // snapshot.  get() is still called the first time and lazily whenever
+        // the watcher thread reloads, so hot-reloading still works.
+        PillarParticleConfig cfg = PillarParticleConfig.peek();
+        if (!cfg.matches(be.displayedItem)) return;
+
+        // Early-out: skip all work if the per-pillar or global pattern is "none"
+        String earlyPattern = be.particlePattern != null ? be.particlePattern : cfg.pattern;
+        if ("none".equals(earlyPattern)) return;
+
         be.lastParticleTick = time;
 
         int baseCount = cfg.particle_density;
@@ -890,12 +1020,12 @@ public class PillarBlockEntity extends BlockEntity {
             if (pattern == null) {
                 pattern = cfg.pattern != null ? cfg.pattern : "default";
             }
-            
+
             // Handle "none" pattern - no particles
             if ("none".equals(pattern)) {
                 return null; // Return null to skip particle spawning
             }
-            
+
             // Use pillar-specific pattern settings if available, otherwise use global config
             double patternSpeed = be.patternSpeed != null ? be.patternSpeed : cfg.pattern_speed;
             double patternIntensity = be.patternIntensity != null ? be.patternIntensity : cfg.pattern_intensity;
@@ -1005,7 +1135,7 @@ public class PillarBlockEntity extends BlockEntity {
             particleColorCounter++;
 
             String customColor = particleColors.get(colorIndex);
-            if (customColor != null && customColor.matches("^#[0-9A-Fa-f]{6}$")) {
+            if (customColor != null && HEX_COLOR_PATTERN.matcher(customColor).matches()) {
                 return customColor.toUpperCase();
             }
         }
@@ -1033,7 +1163,7 @@ public class PillarBlockEntity extends BlockEntity {
         }
 
         String configColor = colorsToUse.get(colorIndex);
-        if (configColor != null && configColor.matches("^#[0-9A-Fa-f]{6}$")) {
+        if (configColor != null && HEX_COLOR_PATTERN.matcher(configColor).matches()) {
             return configColor.toUpperCase();
         }
         return "#FFFFFF";
@@ -1576,6 +1706,7 @@ public class PillarBlockEntity extends BlockEntity {
         this.colorsInitialized = true;
         this.particleColorCounter = 0;
         this.lastParticleTick = 0;
+        this.colorsVersion++; // notify syncer that data changed
 
         this.setChanged();
 

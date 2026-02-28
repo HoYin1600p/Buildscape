@@ -32,6 +32,12 @@ public class PillarIdManager {
 
     private final Map<String, PillarData> pillarData = new ConcurrentHashMap<>();
 
+    // ── O(1) position index ───────────────────────────────────────────────
+    // getPillarDataByPosition() previously scanned all pillarData entries.
+    // On servers with hundreds of pillars this became O(n) per serverTick.
+    // The index maps "dimension:x:y:z" → pillarId so lookups are O(1).
+    private final Map<String, String> positionIndex = new ConcurrentHashMap<>();
+
     private long lastLoadedTime = 0L;
     private long lastFileSize = 0L;
 
@@ -229,8 +235,8 @@ public class PillarIdManager {
         recoveryScheduledTime = 0L;
         
         if (INSTANCE != null) {
-            int dataCount = INSTANCE.pillarData.size();
             INSTANCE.pillarData.clear();
+            INSTANCE.positionIndex.clear(); // keep index in sync
             INSTANCE.lastLoadedTime = 0L;
             INSTANCE.lastFileSize = 0L;
             INSTANCE.hasLoaded = false;
@@ -419,31 +425,29 @@ public class PillarIdManager {
     public PillarData getOrCreatePillarData(Level level, BlockPos pos) {
         String dimension = getDimensionKey(level);
         String expectedPrefix = getVariantPrefix(level, pos);
+        String posKey = positionKey(dimension, pos);
 
-        String existingIdToRemove = null;
-        for (PillarData data : pillarData.values()) {
-            if (
-                    data.dimension.equals(dimension) &&
-                            data.x == pos.getX() &&
-                            data.y == pos.getY() &&
-                            data.z == pos.getZ()
-            ) {
-                if (data.id != null && data.id.startsWith(expectedPrefix + "-P")) {
-                    return data;
+        // O(1) fast path via position index
+        String existingId = positionIndex.get(posKey);
+        if (existingId != null) {
+            PillarData existing = pillarData.get(existingId);
+            if (existing != null) {
+                if (existing.id != null && existing.id.startsWith(expectedPrefix + "-P")) {
+                    return existing;
                 } else {
-                    existingIdToRemove = data.id;
-                    break;
+                    // Wrong variant prefix — evict and recreate
+                    pillarData.remove(existingId);
+                    positionIndex.remove(posKey);
                 }
+            } else {
+                positionIndex.remove(posKey); // dangling reference — clean up
             }
-        }
-
-        if (existingIdToRemove != null) {
-            pillarData.remove(existingIdToRemove);
         }
 
         String id = generatePillarId(expectedPrefix);
         PillarData newData = new PillarData(id, dimension, pos);
         pillarData.put(id, newData);
+        positionIndex.put(posKey, id); // keep index in sync
         
         // IMPORTANT: Don't save during recovery - recovery will save once at the end
         // This prevents saving empty colors repeatedly during recovery
@@ -460,17 +464,9 @@ public class PillarIdManager {
 
     public PillarData getPillarDataByPosition(Level level, BlockPos pos) {
         String dimension = getDimensionKey(level);
-        for (PillarData data : pillarData.values()) {
-            if (
-                    data.dimension.equals(dimension) &&
-                            data.x == pos.getX() &&
-                            data.y == pos.getY() &&
-                            data.z == pos.getZ()
-            ) {
-                return data;
-            }
-        }
-        return null;
+        // O(1) lookup via position index instead of iterating all entries
+        String id = positionIndex.get(positionKey(dimension, pos));
+        return id != null ? pillarData.get(id) : null;
     }
 
     public String getPillarIdByPosition(Level level, BlockPos pos) {
@@ -491,8 +487,8 @@ public class PillarIdManager {
         if (pillarId != null) {
             PillarData data = pillarData.remove(pillarId);
             if (data != null) {
-                // Reset the pillar block entity to default state (freshly placed)
-                // This removes custom colors/patterns from NBT and resets the pillar
+                // Remove from position index too
+                positionIndex.remove(positionKey(data.dimension, new BlockPos(data.x, data.y, data.z)));
                 PillarResetHandler.resetPillarFromData(data);
                 saveImmediate();
             }
@@ -501,26 +497,12 @@ public class PillarIdManager {
 
     public void removePillarByPosition(Level level, BlockPos pos) {
         String dimension = getDimensionKey(level);
-        String idToRemove = null;
-        PillarData dataToReset = null;
+        String posKey = positionKey(dimension, pos);
 
-        for (Map.Entry<String, PillarData> entry : pillarData.entrySet()) {
-            PillarData data = entry.getValue();
-            if (
-                    data.dimension.equals(dimension) &&
-                            data.x == pos.getX() &&
-                            data.y == pos.getY() &&
-                            data.z == pos.getZ()
-            ) {
-                idToRemove = entry.getKey();
-                dataToReset = data;
-                break;
-            }
-        }
-
+        // O(1) removal via position index
+        String idToRemove = positionIndex.remove(posKey);
         if (idToRemove != null) {
-            pillarData.remove(idToRemove);
-            // Reset the pillar block entity to default state (freshly placed)
+            PillarData dataToReset = pillarData.remove(idToRemove);
             if (dataToReset != null) {
                 PillarResetHandler.resetPillarFromData(dataToReset);
             }
@@ -894,6 +876,8 @@ public class PillarIdManager {
                             }
 
                             pillarData.put(id, data);
+                            // Keep position index in sync with loaded data
+                            positionIndex.put(positionKey(data.dimension, data.getBlockPos()), id);
                             if (needsMigration) {
                                 migrated++;
                             }

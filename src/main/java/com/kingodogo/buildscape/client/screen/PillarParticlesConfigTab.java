@@ -168,7 +168,7 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
         particleSpeedField.setTextColorUneditable(0xAAAAAA);
         particleSpeedField.setTextColorUneditable(0xAAAAAA);
         particleSpeedField.setMaxLength(64);
-        particleSpeedField.setFilter(s -> s.matches("[0-9.]*"));
+        particleSpeedField.setFilter(s -> s.matches("[0-9]*\\.?[0-9]{0,3}"));
         addTabWidget(particleSpeedField);
 
         particleSpreadField = new EditBox(
@@ -183,7 +183,7 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
         particleSpreadField.setTextColorUneditable(0xAAAAAA);
         particleSpreadField.setTextColorUneditable(0xAAAAAA);
         particleSpreadField.setMaxLength(64);
-        particleSpreadField.setFilter(s -> s.matches("[0-9.]*"));
+        particleSpreadField.setFilter(s -> s.matches("[0-9]*\\.?[0-9]{0,3}"));
         addTabWidget(particleSpreadField);
 
         particleLifetimeField = new EditBox(
@@ -198,7 +198,7 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
         particleLifetimeField.setTextColorUneditable(0xAAAAAA);
         particleLifetimeField.setTextColorUneditable(0xAAAAAA);
         particleLifetimeField.setMaxLength(64);
-        particleLifetimeField.setFilter(s -> s.matches("[0-9.]*"));
+        particleLifetimeField.setFilter(s -> s.matches("[0-9]*\\.?[0-9]{0,3}"));
         addTabWidget(particleLifetimeField);
 
         particleDensityField = new EditBox(
@@ -213,7 +213,7 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
         particleDensityField.setTextColorUneditable(0xAAAAAA);
         particleDensityField.setTextColorUneditable(0xAAAAAA);
         particleDensityField.setMaxLength(64);
-        particleDensityField.setFilter(s -> s.matches("[0-9.]*"));
+        particleDensityField.setFilter(s -> s.matches("[0-9]*\\.?[0-9]{0,3}"));
         addTabWidget(particleDensityField);
 
         // Color swatches and single shared color picker
@@ -243,7 +243,7 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
         patternSpeedField.setTextColorUneditable(0xAAAAAA);
         patternSpeedField.setTextColorUneditable(0xAAAAAA);
         patternSpeedField.setMaxLength(64);
-        patternSpeedField.setFilter(s -> s.matches("[0-9.]*"));
+        patternSpeedField.setFilter(s -> s.matches("[0-9]*\\.?[0-9]{0,3}"));
         addTabWidget(patternSpeedField);
 
         patternSpreadField = new EditBox(
@@ -258,7 +258,7 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
         patternSpreadField.setTextColorUneditable(0xAAAAAA);
         patternSpreadField.setTextColorUneditable(0xAAAAAA);
         patternSpreadField.setMaxLength(64);
-        patternSpreadField.setFilter(s -> s.matches("[0-9.]*"));
+        patternSpreadField.setFilter(s -> s.matches("[0-9]*\\.?[0-9]{0,3}"));
         addTabWidget(patternSpreadField);
 
         patternIntensityField = new EditBox(
@@ -273,7 +273,7 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
         patternIntensityField.setTextColorUneditable(0xAAAAAA);
         patternIntensityField.setTextColorUneditable(0xAAAAAA);
         patternIntensityField.setMaxLength(64);
-        patternIntensityField.setFilter(s -> s.matches("[0-9.]*"));
+        patternIntensityField.setFilter(s -> s.matches("[0-9]*\\.?[0-9]{0,3}"));
         addTabWidget(patternIntensityField);
 
         colorsResetButton = new FlatIconButton(0, 0, 20, 20, new TextComponent("\u27F2"), (btn) -> {
@@ -1776,6 +1776,9 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
         }
     }
 
+    /** Minimum allowed value for all numeric double/float config fields to prevent crashes. */
+    private static final double FIELD_MIN_VALUE = 0.001;
+
     private void updateConfigFromFields() {
         PillarParticleConfig config = PillarParticleConfig.get();
         boolean changed = false;
@@ -1783,7 +1786,7 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
         // Update default properties
         if (!config.use_pattern) {
             try {
-                double speed = Double.parseDouble(particleSpeedField.getValue());
+                double speed = Math.max(FIELD_MIN_VALUE, Double.parseDouble(particleSpeedField.getValue()));
                 if (config.particle_speed != speed) {
                     config.particle_speed = speed;
                     changed = true;
@@ -1793,7 +1796,7 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
             }
 
             try {
-                double spread = Double.parseDouble(particleSpreadField.getValue());
+                double spread = Math.max(FIELD_MIN_VALUE, Double.parseDouble(particleSpreadField.getValue()));
                 if (config.particle_spread != spread) {
                     config.particle_spread = spread;
                     changed = true;
@@ -1803,7 +1806,7 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
             }
 
             try {
-                int lifetime = Integer.parseInt(particleLifetimeField.getValue());
+                int lifetime = Math.max(1, Integer.parseInt(particleLifetimeField.getValue()));
                 if (config.particle_lifetime != lifetime) {
                     config.particle_lifetime = lifetime;
                     changed = true;
@@ -1813,7 +1816,7 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
             }
 
             try {
-                int density = Integer.parseInt(particleDensityField.getValue());
+                int density = Math.max(1, Integer.parseInt(particleDensityField.getValue()));
                 if (config.particle_density != density) {
                     config.particle_density = density;
                     changed = true;
@@ -1826,7 +1829,7 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
         // Update pattern properties
         if (config.use_pattern) {
             try {
-                double speed = Double.parseDouble(patternSpeedField.getValue());
+                double speed = Math.max(FIELD_MIN_VALUE, Double.parseDouble(patternSpeedField.getValue()));
                 if (config.pattern_speed != speed) {
                     config.pattern_speed = speed;
                     changed = true;
@@ -1836,7 +1839,7 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
             }
 
             try {
-                double spread = Double.parseDouble(patternSpreadField.getValue());
+                double spread = Math.max(FIELD_MIN_VALUE, Double.parseDouble(patternSpreadField.getValue()));
                 if (config.pattern_spread != spread) {
                     config.pattern_spread = spread;
                     changed = true;
@@ -1846,7 +1849,7 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
             }
 
             try {
-                double intensity = Double.parseDouble(patternIntensityField.getValue());
+                double intensity = Math.max(FIELD_MIN_VALUE, Double.parseDouble(patternIntensityField.getValue()));
                 if (config.pattern_intensity != intensity) {
                     config.pattern_intensity = intensity;
                     changed = true;

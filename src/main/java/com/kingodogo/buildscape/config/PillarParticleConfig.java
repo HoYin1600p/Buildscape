@@ -38,6 +38,35 @@ public class PillarParticleConfig {
     private static final List<java.util.function.Consumer<Boolean>> configReloadCallbacks = new ArrayList<>();
     private static long lastNotifyTime = 0;
 
+    // ── Cheap-read snapshot for the hot tick path ────────────────────────────────
+    // clientTick() reads config dozens of times per second. Rather than going
+    // through the full get() machinery (isClientConnectedToServer reflection +
+    // file-stat check on two files) on every call, we keep a volatile snapshot
+    // that get() refreshes whenever the underlying config actually changes.
+    private static volatile PillarParticleConfig SNAPSHOT = null;
+
+    /** Fast path for the hot client-tick loop: returns the last loaded config
+     *  without any I/O or reflection.  Falls back to the full get() path only
+     *  until the first non-null snapshot is available. */
+    public static PillarParticleConfig peek() {
+        PillarParticleConfig s = SNAPSHOT;
+        return s != null ? s : get();
+    }
+
+    // ── isClientConnectedToServer cache ────────────────────────────────────
+    // Class.forName + 3 reflection invocations is very expensive to call on
+    // every tick.  Cache the result and refresh at most once per ~3 seconds.
+    private static volatile boolean cachedConnectedToServer = false;
+    private static volatile long connectedCacheTime = 0L;
+    private static final long CONNECTED_CACHE_TTL_MS = 3000L; // 3 s
+
+    // ── File-stat throttle ───────────────────────────────────────────────
+    // file.lastModified() + file.length() on two files was being called on
+    // every invocation of get() which happens every client tick per pillar.
+    // Throttle to once every 2 seconds (40 game ticks / 2000 ms).
+    private static volatile long lastStatCheckTime = 0L;
+    private static final long STAT_CHECK_INTERVAL_MS = 2000L; // 2 s
+
     public static void addConfigReloadCallback(java.util.function.Consumer<Boolean> callback) {
         configReloadCallbacks.add(callback);
     }
@@ -50,9 +79,24 @@ public class PillarParticleConfig {
                 e.printStackTrace();
             }
         }
+        clearMatchCache(); // invalidate per-Item match cache on every config reload
     }
 
     public Set<String> items = new HashSet<>();
+
+    // ── matches() cache ───────────────────────────────────────────────────
+    // matches() iterates the items set, calling new ResourceLocation() and a full
+    // tag-registry lookup for every tag-prefixed entry, every 5 client ticks per
+    // active pillar.  The result only depends on the Item type (registry key +
+    // tags) — not on the ItemStack NBT — so we can safely cache Boolean per Item.
+    // The cache is cleared whenever the config reloads so hot-reload still works.
+    private static final java.util.concurrent.ConcurrentHashMap<
+            net.minecraft.world.item.Item, Boolean> MATCH_CACHE =
+            new java.util.concurrent.ConcurrentHashMap<>();
+
+    private static void clearMatchCache() {
+        MATCH_CACHE.clear();
+    }
 
     public double particle_speed = 0.02;
     public double particle_spread = 0.1;
@@ -71,32 +115,39 @@ public class PillarParticleConfig {
     public int max_particle_color = 3;
 
     private static boolean isClientConnectedToServer() {
+        long now = System.currentTimeMillis();
+        if (now - connectedCacheTime < CONNECTED_CACHE_TTL_MS) {
+            return cachedConnectedToServer;
+        }
+        boolean result;
         try {
             Class<?> mcClass = Class.forName("net.minecraft.client.Minecraft");
             Object mc = mcClass.getMethod("getInstance").invoke(null);
-            if (mc == null)
-                return false;
-
-            Object connection = mcClass.getMethod("getConnection").invoke(mc);
-            if (connection == null)
-                return false;
-
-            Object level = mcClass.getMethod("level").invoke(mc);
-            if (level == null)
-                return false;
-
-            Boolean isClientSide = (Boolean) level
-                    .getClass()
-                    .getMethod("isClientSide")
-                    .invoke(level);
-            return isClientSide != null && isClientSide;
+            if (mc == null) { result = false; }
+            else {
+                Object connection = mcClass.getMethod("getConnection").invoke(mc);
+                if (connection == null) { result = false; }
+                else {
+                    Object level = mcClass.getMethod("level").invoke(mc);
+                    if (level == null) { result = false; }
+                    else {
+                        Boolean isClientSide = (Boolean) level.getClass()
+                                .getMethod("isClientSide").invoke(level);
+                        result = isClientSide != null && isClientSide;
+                    }
+                }
+            }
         } catch (Exception e) {
-            return false;
+            result = false;
         }
+        cachedConnectedToServer = result;
+        connectedCacheTime = now;
+        return result;
     }
 
     public static PillarParticleConfig get() {
         if (isClientConnectedToServer() && SERVER_CONFIG != null) {
+            SNAPSHOT = SERVER_CONFIG;
             return SERVER_CONFIG;
         }
 
@@ -104,44 +155,54 @@ public class PillarParticleConfig {
             INSTANCE = new PillarParticleConfig();
             INSTANCE.loadInternal();
             initializeFileWatcher();
+            SNAPSHOT = INSTANCE;
         } else {
-            File propertiesFile = INSTANCE.getPropertiesFile();
-            File itemsFile = INSTANCE.getItemsFile();
+            // ── Throttled file-stat check ──────────────────────────────────
+            // Only hit the filesystem to check for config changes every 2 s.
+            // In steady-state, most calls return immediately without any I/O.
+            long now = System.currentTimeMillis();
+            if (now - lastStatCheckTime >= STAT_CHECK_INTERVAL_MS) {
+                lastStatCheckTime = now;
 
-            boolean reloadProperties = false;
-            boolean reloadItems = false;
+                File propertiesFile = INSTANCE.getPropertiesFile();
+                File itemsFile = INSTANCE.getItemsFile();
 
-            if (propertiesFile.exists()) {
-                long currentModified = propertiesFile.lastModified();
-                long currentSize = propertiesFile.length();
-                if (currentModified != INSTANCE.lastLoadedProperties ||
-                        currentSize != INSTANCE.lastFileSizeProperties) {
-                    reloadProperties = true;
+                boolean reloadProperties = false;
+                boolean reloadItems = false;
+
+                if (propertiesFile.exists()) {
+                    long currentModified = propertiesFile.lastModified();
+                    long currentSize = propertiesFile.length();
+                    if (currentModified != INSTANCE.lastLoadedProperties ||
+                            currentSize != INSTANCE.lastFileSizeProperties) {
+                        reloadProperties = true;
+                    }
+                } else {
+                    INSTANCE.lastLoadedProperties = 0L;
+                    INSTANCE.lastFileSizeProperties = 0L;
                 }
-            } else {
-                INSTANCE.lastLoadedProperties = 0L;
-                INSTANCE.lastFileSizeProperties = 0L;
-            }
 
-            if (itemsFile.exists()) {
-                long currentModified = itemsFile.lastModified();
-                long currentSize = itemsFile.length();
-                if (currentModified != INSTANCE.lastLoadedItems ||
-                        currentSize != INSTANCE.lastFileSizeItems) {
-                    reloadItems = true;
+                if (itemsFile.exists()) {
+                    long currentModified = itemsFile.lastModified();
+                    long currentSize = itemsFile.length();
+                    if (currentModified != INSTANCE.lastLoadedItems ||
+                            currentSize != INSTANCE.lastFileSizeItems) {
+                        reloadItems = true;
+                    }
+                } else {
+                    INSTANCE.lastLoadedItems = 0L;
+                    INSTANCE.lastFileSizeItems = 0L;
                 }
-            } else {
-                INSTANCE.lastLoadedItems = 0L;
-                INSTANCE.lastFileSizeItems = 0L;
-            }
 
-            if (reloadProperties) {
-                INSTANCE.loadPropertiesInternal();
-                notifyCallbacks(false);
+                if (reloadProperties) {
+                    INSTANCE.loadPropertiesInternal();
+                    notifyCallbacks(false);
+                }
+                if (reloadItems) {
+                    INSTANCE.loadItemsInternal();
+                }
             }
-            if (reloadItems) {
-                INSTANCE.loadItemsInternal();
-            }
+            SNAPSHOT = INSTANCE;
         }
         return INSTANCE;
     }
@@ -196,6 +257,7 @@ public class PillarParticleConfig {
         SERVER_CONFIG.items = new HashSet<>(
                 packet.items != null ? packet.items : new HashSet<>());
 
+        clearMatchCache(); // new server config — invalidate match cache
         notifyCallbacks(true);
     }
 
@@ -1141,9 +1203,18 @@ public class PillarParticleConfig {
     }
 
     public boolean matches(ItemStack stack) {
-        if (stack == null || stack.isEmpty())
-            return false;
+        if (stack == null || stack.isEmpty()) return false;
 
+        // Fast path: result is cached per Item type (cleared on config reload)
+        Boolean cached = MATCH_CACHE.get(stack.getItem());
+        if (cached != null) return cached;
+
+        boolean result = matchesUncached(stack);
+        MATCH_CACHE.put(stack.getItem(), result);
+        return result;
+    }
+
+    private boolean matchesUncached(ItemStack stack) {
         ResourceLocation id = net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(
                 stack.getItem());
         if (id != null && items.contains(id.toString())) {

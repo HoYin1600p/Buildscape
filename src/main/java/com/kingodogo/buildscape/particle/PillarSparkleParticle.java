@@ -51,21 +51,8 @@ public class PillarSparkleParticle extends TextureSheetParticle {
         this.lifetime = 100;
 
         String positionKey = String.format("%.1f,%.1f,%.1f", x, y, z);
-        String colorCode = null;
-
-        ColorEntry colorEntry = POSITION_COLOR_MAP.remove(positionKey);
-        if (colorEntry != null) {
-            colorCode = colorEntry.colorCode;
-        }
-
-        if (colorCode == null || colorCode.isEmpty()) {
-            PillarParticleConfig cfg = PillarParticleConfig.get();
-            if (cfg.particle_color != null && !cfg.particle_color.isEmpty()) {
-                colorCode = cfg.particle_color.get(0);
-            } else {
-                colorCode = "#FFFFFF";
-            }
-        }
+        float[] colors = getColorForPosition(x, y, z);
+        this.setColor(colors[0], colors[1], colors[2]);
 
         Float sizeMultiplier = POSITION_SIZE_MAP.remove(positionKey);
         if (sizeMultiplier == null || sizeMultiplier <= 0) {
@@ -74,9 +61,6 @@ public class PillarSparkleParticle extends TextureSheetParticle {
 
         this.quadSize = 0.2F * sizeMultiplier;
         this.hasPhysics = false;
-
-        float[] color = parseColorCode(colorCode);
-        this.setColor(color[0], color[1], color[2]);
 
         this.alpha = 1.0F;
 
@@ -94,7 +78,7 @@ public class PillarSparkleParticle extends TextureSheetParticle {
                 });
     }
 
-    private static float[] parseColorCode(String colorCode) {
+    public static float[] parseColorCode(String colorCode) {
         if (
                 colorCode == null || colorCode.isEmpty() || !colorCode.startsWith("#")
         ) {
@@ -115,6 +99,22 @@ public class PillarSparkleParticle extends TextureSheetParticle {
         } catch (NumberFormatException e) {
             return new float[]{1.0F, 1.0F, 1.0F};
         }
+    }
+
+    public static float[] getColorForPosition(double x, double y, double z) {
+        String positionKey = String.format("%.1f,%.1f,%.1f", x, y, z);
+        ColorEntry colorEntry = POSITION_COLOR_MAP.remove(positionKey);
+        String colorCode = (colorEntry != null) ? colorEntry.colorCode : null;
+
+        if (colorCode == null || colorCode.isEmpty()) {
+            PillarParticleConfig cfg = PillarParticleConfig.get();
+            if (cfg.particle_color != null && !cfg.particle_color.isEmpty()) {
+                colorCode = cfg.particle_color.get(0);
+            } else {
+                colorCode = "#FFFFFF";
+            }
+        }
+        return parseColorCode(colorCode);
     }
 
     @Override

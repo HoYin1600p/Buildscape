@@ -1,18 +1,13 @@
 {
-  "type": "minecraft:crafting_shaped",
+  "type": "minecraft:crafting_shapeless",
   "category": "building",
-  "key": {
-    "G": {
+  "ingredients": [
+    {
       "item": "buildscape:glow_star"
     },
-    "D": {
+    {
       "item": "minecraft:lime_dye"
     }
-  },
-  "pattern": [
-    "GGG",
-    "GDG",
-    "GGG"
   ],
   "result": {
     "item": "buildscape:lime_star"

@@ -36,8 +36,8 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
     private static final int DEFAULT_BTN_TO_FIELD_SPACING = 5;
     
     // Spacing for Pattern Properties (Tighter as requested)
-    private static final int PATTERN_FIELD_SPACING = 1;
-    private static final int PATTERN_BTN_TO_FIELD_SPACING = 2;
+    private static final int PATTERN_FIELD_SPACING = 2;
+    private static final int PATTERN_BTN_TO_FIELD_SPACING = 5;
     
     // Spacing for Color Swatches
     private static final int COLOR_SWATCH_SIZE = 20;
@@ -738,11 +738,17 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
     // Update pattern properties widget positions with scroll offset applied
     private void updatePatternPropertiesPositions() {
         patternBaseButtonY = patternBoxY + UI_PADDING + UI_TITLE_HEIGHT;
-        patternBaseFirstFieldY = patternBaseButtonY + UI_BUTTON_HEIGHT + PATTERN_BTN_TO_FIELD_SPACING;
+        double guiScale = Minecraft.getInstance().getWindow().getGuiScale();
+        int windowHeight = Minecraft.getInstance().getWindow().getHeight();
+        int dynamicGap = (int) (windowHeight * 0.002 / guiScale);
+        int patternButtonToFieldSpacing = 5 + dynamicGap;
+        int patternFieldSpacing = 2;
+
+        patternBaseFirstFieldY = patternBaseButtonY + UI_BUTTON_HEIGHT + patternButtonToFieldSpacing;
 
         // Calculate max scroll for pattern properties
-        int totalContentHeight = UI_TITLE_HEIGHT + UI_BUTTON_HEIGHT + PATTERN_BTN_TO_FIELD_SPACING + (3 * UI_FIELD_HEIGHT)
-                + (2 * PATTERN_FIELD_SPACING) + UI_SLIDER_HEIGHT + PATTERN_FIELD_SPACING;
+        int totalContentHeight = UI_TITLE_HEIGHT + UI_BUTTON_HEIGHT + patternButtonToFieldSpacing + (3 * UI_FIELD_HEIGHT)
+                + (2 * patternFieldSpacing) + UI_SLIDER_HEIGHT + patternFieldSpacing;
         int availableHeight = patternBoxHeight - UI_PADDING * 2;
         double maxScroll = Math.max(0, totalContentHeight - availableHeight);
 
@@ -751,9 +757,9 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
 
         patternSelector.y = patternBaseButtonY - scrollOffsetInt;
         maxParticleColorSlider.y = patternBaseFirstFieldY - scrollOffsetInt;
-        patternSpeedField.y = patternBaseFirstFieldY + UI_FIELD_HEIGHT + PATTERN_FIELD_SPACING - scrollOffsetInt;
-        patternSpreadField.y = patternBaseFirstFieldY + (UI_FIELD_HEIGHT + PATTERN_FIELD_SPACING) * 2 - scrollOffsetInt;
-        patternIntensityField.y = patternBaseFirstFieldY + (UI_FIELD_HEIGHT + PATTERN_FIELD_SPACING) * 3 - scrollOffsetInt;
+        patternSpeedField.y = patternBaseFirstFieldY + UI_FIELD_HEIGHT + patternFieldSpacing - scrollOffsetInt;
+        patternSpreadField.y = patternBaseFirstFieldY + (UI_FIELD_HEIGHT + patternFieldSpacing) * 2 - scrollOffsetInt;
+        patternIntensityField.y = patternBaseFirstFieldY + (UI_FIELD_HEIGHT + patternFieldSpacing) * 3 - scrollOffsetInt;
     }
 
     /**
@@ -923,14 +929,15 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
         // Layout Middle Bottom: Pattern Properties (within patternBox bounds)
         int patternTextX = patternBoxX + padding;
         int patternLabelWidth = 140;
-        int patternFieldX = patternTextX + patternLabelWidth - 3; // Start fields earlier (overlap slightly with label
-                                                                  // end for tighter layout)
+        // Use a dynamic gap based on screen height to separate text and values (requested 0.2%)
+        int dynamicGap = (int) (screenHeight * 0.002);
+        int patternFieldX = patternTextX + patternLabelWidth + dynamicGap;
 
         // Define pattern properties constants first
         int patternFieldSpacing = 2; // Reduced spacing between fields (matching user's changes)
         int patternTitleHeight = 20;
         int patternButtonHeight = 20;
-        int patternButtonToFieldSpacing = 5; // Reduced spacing between button and first field (matching user's changes)
+        int patternButtonToFieldSpacing = 5 + dynamicGap; // Reduced spacing between button and first field (matching user's changes) + dynamic gap
 
         // Calculate field width based on available space in panel - ensure it doesn't
         // exceed panel
@@ -1629,15 +1636,16 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
 
         int patternTitleHeight = 20;
         int patternButtonHeight = 20;
-        int patternButtonToFieldSpacing = 2; // Reduced spacing (matching user's changes)
-        int patternFieldSpacing = 1; // Reduced spacing (matching user's changes)
+        int dynamicGap = (int) (windowHeight * 0.002 / guiScale);
+        int patternButtonToFieldSpacing = 5 + dynamicGap; // Reduced spacing + dynamic gap
+        int patternFieldSpacing = 2; // Reduced spacing (matching user's changes)
         int patternLabelYOffset = 6;
         int patternFieldHeight = 20;
         int patternSliderHeight = 20;
 
         // Calculate scroll info
-        int patternTotalContentHeight = UI_TITLE_HEIGHT + UI_BUTTON_HEIGHT + PATTERN_BTN_TO_FIELD_SPACING +
-                (3 * UI_FIELD_HEIGHT) + (2 * PATTERN_FIELD_SPACING) + UI_SLIDER_HEIGHT + PATTERN_FIELD_SPACING;
+        int patternTotalContentHeight = UI_TITLE_HEIGHT + UI_BUTTON_HEIGHT + patternButtonToFieldSpacing +
+                (3 * UI_FIELD_HEIGHT) + (2 * patternFieldSpacing) + UI_SLIDER_HEIGHT + patternFieldSpacing;
         int patternAvailableHeight = patternBoxHeight - UI_PADDING * 2;
         double patternMaxScroll = Math.max(0, patternTotalContentHeight - patternAvailableHeight);
         boolean patternNeedsScrollbar = patternMaxScroll > 0;
@@ -1965,8 +1973,12 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
 
         // Handle scrollbar clicks for Pattern Properties panel
         int patternAvailableHeight = patternBoxHeight - UI_PADDING * 2;
-        int patternTotalContentHeight = UI_TITLE_HEIGHT + UI_BUTTON_HEIGHT + PATTERN_BTN_TO_FIELD_SPACING +
-                (3 * UI_FIELD_HEIGHT) + (2 * PATTERN_FIELD_SPACING) + UI_SLIDER_HEIGHT + PATTERN_FIELD_SPACING;
+        int dynamicGapPatternClick = (int) (windowHeight * 0.002 / guiScale);
+        int patternButtonToFieldSpacingClick = 5 + dynamicGapPatternClick;
+        int patternFieldSpacingClick = 2;
+
+        int patternTotalContentHeight = UI_TITLE_HEIGHT + UI_BUTTON_HEIGHT + patternButtonToFieldSpacingClick +
+                (3 * UI_FIELD_HEIGHT) + (2 * patternFieldSpacingClick) + UI_SLIDER_HEIGHT + patternFieldSpacingClick;
         double patternMaxScroll = Math.max(0, patternTotalContentHeight - patternAvailableHeight);
 
         if (patternMaxScroll > 0 && button == 0) {
@@ -2239,8 +2251,12 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
 
         if (patternScrollbarRenderer.isDragging()) {
             int patternAvailableHeight = patternBoxHeight - UI_PADDING * 2;
-            int patternTotalContentHeight = UI_TITLE_HEIGHT + UI_BUTTON_HEIGHT + PATTERN_BTN_TO_FIELD_SPACING +
-                    (3 * UI_FIELD_HEIGHT) + (2 * PATTERN_FIELD_SPACING) + UI_SLIDER_HEIGHT + PATTERN_FIELD_SPACING;
+            int dynamicGap = (int) (windowHeight * 0.002 / guiScale);
+            int patternButtonToFieldSpacing = 5 + dynamicGap;
+            int patternFieldSpacing = 2;
+
+            int patternTotalContentHeight = UI_TITLE_HEIGHT + UI_BUTTON_HEIGHT + patternButtonToFieldSpacing +
+                    (3 * UI_FIELD_HEIGHT) + (2 * patternFieldSpacing) + UI_SLIDER_HEIGHT + patternFieldSpacing;
             double patternMaxScroll = Math.max(0, patternTotalContentHeight - patternAvailableHeight);
 
             if (patternMaxScroll > 0) {
@@ -2527,8 +2543,14 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
         if (mouseX >= patternBoxX && mouseX <= patternBoxX + patternBoxWidth &&
                 mouseY >= patternBoxY && mouseY <= patternBoxY + patternBoxHeight) {
             int patternAvailableHeight = patternBoxHeight - UI_PADDING * 2;
-            int patternTotalContentHeight = UI_TITLE_HEIGHT + UI_BUTTON_HEIGHT + PATTERN_BTN_TO_FIELD_SPACING +
-                    (3 * UI_FIELD_HEIGHT) + (2 * PATTERN_FIELD_SPACING) + UI_SLIDER_HEIGHT + PATTERN_FIELD_SPACING;
+            double guiScale = Minecraft.getInstance().getWindow().getGuiScale();
+            int windowHeight = Minecraft.getInstance().getWindow().getHeight();
+            int dynamicGap = (int) (windowHeight * 0.002 / guiScale);
+            int patternButtonToFieldSpacing = 5 + dynamicGap;
+            int patternFieldSpacing = 2;
+
+            int patternTotalContentHeight = UI_TITLE_HEIGHT + UI_BUTTON_HEIGHT + patternButtonToFieldSpacing +
+                    (3 * UI_FIELD_HEIGHT) + (2 * patternFieldSpacing) + UI_SLIDER_HEIGHT + patternFieldSpacing;
             double patternMaxScroll = Math.max(0, patternTotalContentHeight - patternAvailableHeight);
 
             if (patternMaxScroll > 0) {

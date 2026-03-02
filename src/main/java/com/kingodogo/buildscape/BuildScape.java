@@ -104,8 +104,7 @@ public class BuildScape {
             items.add(new ItemStack(ModItems.BIT_EXPOSED_COPPER_GRATE.get()));
 
             items.add(new ItemStack(ModItems.BIT_WEATHERED_COPPER_BLOCK.get()));
-            items.add(
-                    new ItemStack(ModItems.BIT_WEATHERED_COPPER_BLOCK_STAIRS.get()));
+            items.add(new ItemStack(ModItems.BIT_WEATHERED_COPPER_BLOCK_STAIRS.get()));
             items.add(new ItemStack(ModItems.BIT_WEATHERED_COPPER_BLOCK_SLAB.get()));
             items.add(new ItemStack(ModItems.BIT_WEATHERED_COPPER_BLOCK_WALL.get()));
             items.add(new ItemStack(ModItems.BIT_WEATHERED_CUT_COPPER.get()));
@@ -158,6 +157,56 @@ public class BuildScape {
             items.add(new ItemStack(ModItems.BOLTED_STEEL_PILLAR.get()));
             items.add(new ItemStack(ModItems.STEEL_GRATE.get()));
             items.add(new ItemStack(ModItems.STEEL_FAN.get()));
+
+            items.add(new ItemStack(ModItems.BLACK_FACTORY_MESH.get()));
+            items.add(new ItemStack(ModItems.BLACK_FACTORY_MESH_STAIRS.get()));
+            items.add(new ItemStack(ModItems.BLACK_FACTORY_MESH_SLAB.get()));
+            items.add(new ItemStack(ModItems.BLACK_FACTORY_MESH_WALL.get()));
+
+            items.add(new ItemStack(ModItems.BLUE_FACTORY_MESH.get()));
+            items.add(new ItemStack(ModItems.BLUE_FACTORY_MESH_STAIRS.get()));
+            items.add(new ItemStack(ModItems.BLUE_FACTORY_MESH_SLAB.get()));
+            items.add(new ItemStack(ModItems.BLUE_FACTORY_MESH_WALL.get()));
+
+            items.add(new ItemStack(ModItems.BROWN_FACTORY_MESH.get()));
+            items.add(new ItemStack(ModItems.BROWN_FACTORY_MESH_STAIRS.get()));
+            items.add(new ItemStack(ModItems.BROWN_FACTORY_MESH_SLAB.get()));
+            items.add(new ItemStack(ModItems.BROWN_FACTORY_MESH_WALL.get()));
+
+            items.add(new ItemStack(ModItems.GRAY_FACTORY_MESH.get()));
+            items.add(new ItemStack(ModItems.GRAY_FACTORY_MESH_STAIRS.get()));
+            items.add(new ItemStack(ModItems.GRAY_FACTORY_MESH_SLAB.get()));
+            items.add(new ItemStack(ModItems.GRAY_FACTORY_MESH_WALL.get()));
+
+            items.add(new ItemStack(ModItems.GREEN_FACTORY_MESH.get()));
+            items.add(new ItemStack(ModItems.GREEN_FACTORY_MESH_STAIRS.get()));
+            items.add(new ItemStack(ModItems.GREEN_FACTORY_MESH_SLAB.get()));
+            items.add(new ItemStack(ModItems.GREEN_FACTORY_MESH_WALL.get()));
+
+            items.add(new ItemStack(ModItems.LIGHT_GRAY_FACTORY_MESH.get()));
+            items.add(new ItemStack(ModItems.LIGHT_GRAY_FACTORY_MESH_STAIRS.get()));
+            items.add(new ItemStack(ModItems.LIGHT_GRAY_FACTORY_MESH_SLAB.get()));
+            items.add(new ItemStack(ModItems.LIGHT_GRAY_FACTORY_MESH_WALL.get()));
+
+            items.add(new ItemStack(ModItems.LIME_FACTORY_MESH.get()));
+            items.add(new ItemStack(ModItems.LIME_FACTORY_MESH_STAIRS.get()));
+            items.add(new ItemStack(ModItems.LIME_FACTORY_MESH_SLAB.get()));
+            items.add(new ItemStack(ModItems.LIME_FACTORY_MESH_WALL.get()));
+
+            items.add(new ItemStack(ModItems.ORANGE_FACTORY_MESH.get()));
+            items.add(new ItemStack(ModItems.ORANGE_FACTORY_MESH_STAIRS.get()));
+            items.add(new ItemStack(ModItems.ORANGE_FACTORY_MESH_SLAB.get()));
+            items.add(new ItemStack(ModItems.ORANGE_FACTORY_MESH_WALL.get()));
+
+            items.add(new ItemStack(ModItems.RED_FACTORY_MESH.get()));
+            items.add(new ItemStack(ModItems.RED_FACTORY_MESH_STAIRS.get()));
+            items.add(new ItemStack(ModItems.RED_FACTORY_MESH_SLAB.get()));
+            items.add(new ItemStack(ModItems.RED_FACTORY_MESH_WALL.get()));
+
+            items.add(new ItemStack(ModItems.YELLOW_FACTORY_MESH.get()));
+            items.add(new ItemStack(ModItems.YELLOW_FACTORY_MESH_STAIRS.get()));
+            items.add(new ItemStack(ModItems.YELLOW_FACTORY_MESH_SLAB.get()));
+            items.add(new ItemStack(ModItems.YELLOW_FACTORY_MESH_WALL.get()));
 
             items.add(new ItemStack(ModItems.CAUTION_FACTORY.get()));
             items.add(new ItemStack(ModItems.CAUTION_FACTORY_STAIRS.get()));
@@ -414,10 +463,10 @@ public class BuildScape {
             items.add(new ItemStack(ModItems.STRIPPED_BAMBOO_BLOCK_WALL.get()));
             items.add(new ItemStack(ModItems.STRIPPED_BAMBOO_BLOCK_FENCE.get()));
             items.add(new ItemStack(ModItems.STRIPPED_BAMBOO_BLOCK_FENCE_GATE.get()));
-            items.add(
-                    new ItemStack(ModItems.STRIPPED_BAMBOO_BLOCK_PRESSURE_PLATE.get()));
+            items.add(new ItemStack(ModItems.STRIPPED_BAMBOO_BLOCK_PRESSURE_PLATE.get()));
             items.add(new ItemStack(ModItems.STRIPPED_BAMBOO_BLOCK_BUTTON.get()));
             items.add(new ItemStack(ModItems.STRIPPED_BAMBOO_WOOD.get()));
+
 
             items.add(new ItemStack(ModItems.MANGROVE_LOG.get()));
             items.add(new ItemStack(ModItems.STRIPPED_MANGROVE_LOG.get()));
@@ -426,6 +475,19 @@ public class BuildScape {
             items.add(new ItemStack(ModItems.MANGROVE_LEAVES.get()));
             items.add(new ItemStack(ModItems.MANGROVE_ROOTS.get()));
             items.add(new ItemStack(ModItems.MUDDY_MANGROVE_ROOTS.get()));
+
+            items.add(new ItemStack(ModItems.MUD.get()));
+            items.add(new ItemStack(ModItems.MUD_SLAB.get()));
+
+            items.add(new ItemStack(ModItems.PACKED_MUD.get()));
+            items.add(new ItemStack(ModItems.PACKED_MUD_STAIRS.get()));
+            items.add(new ItemStack(ModItems.PACKED_MUD_SLAB.get()));
+            items.add(new ItemStack(ModItems.PACKED_MUD_WALL.get()));
+
+            items.add(new ItemStack(ModItems.MUD_BRICKS.get()));
+            items.add(new ItemStack(ModItems.MUD_BRICK_STAIRS.get()));
+            items.add(new ItemStack(ModItems.MUD_BRICK_SLAB.get()));
+            items.add(new ItemStack(ModItems.MUD_BRICK_WALL.get()));
             items.add(new ItemStack(ModItems.MANGROVE_PROPAGULE.get()));
             items.add(new ItemStack(ModItems.MANGROVE_PLANKS.get()));
             items.add(new ItemStack(ModItems.MANGROVE_STAIRS.get()));
@@ -1206,8 +1268,7 @@ public class BuildScape {
             items.add(new ItemStack(ModItems.PODZOL_SLAB.get()));
             items.add(new ItemStack(ModItems.MYCELIUM_SLAB.get()));
             items.add(new ItemStack(ModItems.DIRT_SLAB.get()));
-            items.add(new ItemStack(ModItems.MUD.get()));
-            items.add(new ItemStack(ModItems.MUD_SLAB.get()));
+
             items.add(new ItemStack(ModItems.AMETHYST_BLOCK_SLAB.get()));
             items.add(new ItemStack(ModItems.HAY_BALE_SLAB.get()));
 
@@ -1271,6 +1332,8 @@ public class BuildScape {
             items.add(new ItemStack(ModItems.CASCADE_BLOCK.get()));
             items.add(new ItemStack(ModItems.CASCADE_BLOCK_NO_MIST.get()));
             items.add(new ItemStack(ModItems.BOTTLE_OF_MIST.get()));
+            
+            items.add(new ItemStack(ModItems.ANCIENT_ASHEN_SCROLL.get()));
 
         }
     };
@@ -1669,6 +1732,15 @@ public class BuildScape {
             // Use a robust delayed sync that actually waits for manager to be ready
             net.minecraft.server.MinecraftServer server = net.minecraftforge.server.ServerLifecycleHooks.getCurrentServer();
             if (server != null && server.isRunning()) {
+                // Also Sync Gamerules
+                com.kingodogo.buildscape.network.ModMessages.INSTANCE.send(
+                    net.minecraftforge.network.PacketDistributor.PLAYER.with(() -> serverPlayer),
+                    new com.kingodogo.buildscape.network.SyncGameRulesPacket(
+                        serverPlayer.getLevel().getGameRules().getBoolean(com.kingodogo.buildscape.world.ModGameRules.FAST_LEAF_DECAY),
+                        serverPlayer.getLevel().getGameRules().getBoolean(com.kingodogo.buildscape.world.ModGameRules.CREATIVE_TREE_BREAKER)
+                    )
+                );
+                
                 // Schedule pillar ID sync - try immediately, with retries if not loaded
                 schedulePillarIdSync(server, serverPlayer, manager, 0);
             }
@@ -2194,6 +2266,22 @@ public class BuildScape {
                         2,
                         1,
                         0.05f));
+
+        event
+                .getGenericTrades()
+                .add((trader, rand) -> {
+                    if (rand.nextFloat() <= 0.0001f) { // 0.01% chance
+                        int emeralds = 25 + rand.nextInt(39); // 25 to 63 emeralds
+                        return new net.minecraft.world.item.trading.MerchantOffer(
+                                new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.EMERALD, emeralds),
+                                new net.minecraft.world.item.ItemStack(ModItems.ANCIENT_ASHEN_SCROLL.get(), 1),
+                                1, // max uses
+                                1, // xp reward
+                                0.0f// multiplier
+                        );
+                    }
+                    return null;
+                });
     }
 
     @SubscribeEvent
@@ -2411,6 +2499,13 @@ public class BuildScape {
         }
     }
 
+    private static class HitHelper extends net.minecraft.world.item.Item {
+        public HitHelper() { super(new net.minecraft.world.item.Item.Properties()); }
+        public static net.minecraft.world.phys.BlockHitResult getHit(net.minecraft.world.level.Level level, net.minecraft.world.entity.player.Player player, net.minecraft.world.level.ClipContext.Fluid fluidMode) {
+            return getPlayerPOVHitResult(level, player, fluidMode);
+        }
+    }
+
     @SubscribeEvent
     public void onRightClickItem(net.minecraftforge.event.entity.player.PlayerInteractEvent.RightClickItem event) {
         net.minecraft.world.item.ItemStack stack = event.getItemStack();
@@ -2418,12 +2513,9 @@ public class BuildScape {
             net.minecraft.world.level.Level level = event.getWorld();
             net.minecraft.world.entity.player.Player player = event.getPlayer();
 
-            // Environmental check: Must be raining OR (Nighttime in a humid/cold biome)
-            boolean isRaining = level.isRaining();
-            boolean isNight = !level.isDay();
-            boolean isMistCondition = isRaining || (isNight && level.getBiome(player.blockPosition()).value().getPrecipitation() != net.minecraft.world.level.biome.Biome.Precipitation.NONE);
+            net.minecraft.world.phys.BlockHitResult hitResult = HitHelper.getHit(level, player, net.minecraft.world.level.ClipContext.Fluid.SOURCE_ONLY);
 
-            if (isMistCondition) {
+            if (hitResult.getType() == net.minecraft.world.phys.HitResult.Type.MISS) {
                 if (!level.isClientSide) {
                     // Collect mist from air
                     if (!player.getAbilities().instabuild) {
@@ -4206,6 +4298,11 @@ public class BuildScape {
             net.minecraft.client.Minecraft.getInstance().particleEngine.register(
                     com.kingodogo.buildscape.particle.ModParticles.SNOWFLAKE.get(),
                     sprites -> new com.kingodogo.buildscape.particle.SnowflakeParticle.Provider(
+                            sprites));
+
+            net.minecraft.client.Minecraft.getInstance().particleEngine.register(
+                    com.kingodogo.buildscape.particle.ModParticles.SNOWFLAKE_STILL.get(),
+                    sprites -> new com.kingodogo.buildscape.particle.SnowflakeStillParticle.Provider(
                             sprites));
 
             net.minecraft.client.Minecraft.getInstance().particleEngine.register(

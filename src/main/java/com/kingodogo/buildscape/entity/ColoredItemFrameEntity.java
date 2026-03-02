@@ -38,6 +38,10 @@ public class ColoredItemFrameEntity extends HangingEntity {
             .defineId(ColoredItemFrameEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<String> DATA_COLOR = SynchedEntityData
             .defineId(ColoredItemFrameEntity.class, EntityDataSerializers.STRING);
+    private static final EntityDataAccessor<String> DATA_PARTICLE_PATTERN = SynchedEntityData
+            .defineId(ColoredItemFrameEntity.class, EntityDataSerializers.STRING);
+    private static final EntityDataAccessor<String> DATA_PARTICLE_COLORS = SynchedEntityData
+            .defineId(ColoredItemFrameEntity.class, EntityDataSerializers.STRING);
 
     private float dropChance = 1.0F;
     private boolean fixed = false;
@@ -69,6 +73,8 @@ public class ColoredItemFrameEntity extends HangingEntity {
         this.getEntityData().define(DATA_ITEM, ItemStack.EMPTY);
         this.getEntityData().define(DATA_ROTATION, 0);
         this.getEntityData().define(DATA_COLOR, "white");
+        this.getEntityData().define(DATA_PARTICLE_PATTERN, "none");
+        this.getEntityData().define(DATA_PARTICLE_COLORS, "");
     }
 
     @Override
@@ -138,6 +144,22 @@ public class ColoredItemFrameEntity extends HangingEntity {
 
     public void setColorVariant(String color) {
         this.getEntityData().set(DATA_COLOR, color);
+    }
+
+    public String getParticlePattern() {
+        return this.getEntityData().get(DATA_PARTICLE_PATTERN);
+    }
+
+    public void setParticlePattern(String pattern) {
+        this.getEntityData().set(DATA_PARTICLE_PATTERN, (pattern == null || pattern.isEmpty()) ? "none" : pattern);
+    }
+
+    public String getParticleColorsRaw() {
+        return this.getEntityData().get(DATA_PARTICLE_COLORS);
+    }
+
+    public void setParticleColorsRaw(String colors) {
+        this.getEntityData().set(DATA_PARTICLE_COLORS, colors == null ? "" : colors);
     }
 
     public ItemStack getItem() {
@@ -325,6 +347,15 @@ public class ColoredItemFrameEntity extends HangingEntity {
         tag.putByte("Facing", (byte) this.direction.get3DDataValue());
         tag.putBoolean("Invisible", this.isInvisible());
         tag.putBoolean("Fixed", this.fixed);
+
+        // Save particle pattern and colors from synchronized data
+        tag.putString("BuildScapeParticlePattern", this.getParticlePattern());
+        tag.putString("BuildScapeParticleColorsRaw", this.getParticleColorsRaw());
+
+        CompoundTag persistentData = this.getPersistentData();
+        if (persistentData.contains("BuildScapeFrameId", 8)) {
+            tag.putString("BuildScapeFrameId", persistentData.getString("BuildScapeFrameId"));
+        }
     }
 
     @Override
@@ -342,6 +373,53 @@ public class ColoredItemFrameEntity extends HangingEntity {
             this.setRotation(tag.getByte("ItemRotation"), false);
             if (tag.contains("ItemDropChance", 99)) {
                 this.dropChance = tag.getFloat("ItemDropChance");
+            }
+        }
+        // Handle ITEM tag from /give or /summon commands (custom NBT format)
+        else if (tag.contains("ITEM", 8)) {
+            String itemId = tag.getString("ITEM");
+            try {
+                net.minecraft.resources.ResourceLocation itemLocation =
+                        new net.minecraft.resources.ResourceLocation(itemId);
+                net.minecraft.world.item.Item item =
+                        net.minecraftforge.registries.ForgeRegistries.ITEMS.getValue(itemLocation);
+                if (item != null && item != net.minecraft.world.item.Items.AIR) {
+                    ItemStack itemstack = new ItemStack(item);
+                    this.setItem(itemstack, false);
+                }
+            } catch (Exception e) {
+                // Invalid item ID, ignore
+            }
+        }
+
+        // Load particle pattern and colors from saved data
+        if (tag.contains("BuildScapeParticlePattern", 8)) {
+            this.setParticlePattern(tag.getString("BuildScapeParticlePattern"));
+        }
+        if (tag.contains("BuildScapeParticleColorsRaw", 8)) {
+            this.setParticleColorsRaw(tag.getString("BuildScapeParticleColorsRaw"));
+        }
+
+        CompoundTag persistentData = this.getPersistentData();
+        if (tag.contains("BuildScapeFrameId", 8)) {
+            persistentData.putString("BuildScapeFrameId", tag.getString("BuildScapeFrameId"));
+        }
+
+        // Handle PATTERN tag from /give or /summon commands (custom NBT format)
+        if (tag.contains("PATTERN", 8)) {
+            String pattern = tag.getString("PATTERN");
+            this.setParticlePattern(pattern);
+        }
+
+        // Handle COLORS tag from /give or /summon commands (custom NBT format)
+        if (tag.contains("COLORS", 9)) {
+            net.minecraft.nbt.ListTag colorList = tag.getList("COLORS", 8);
+            if (colorList.size() > 0) {
+                java.util.List<String> colors = new java.util.ArrayList<>();
+                for (int i = 0; i < colorList.size(); i++) {
+                    colors.add(colorList.getString(i));
+                }
+                this.setParticleColorsRaw(String.join(";", colors));
             }
         }
 
@@ -367,8 +445,42 @@ public class ColoredItemFrameEntity extends HangingEntity {
 
     @Override
     public ItemStack getPickResult() {
-        ItemStack itemstack = this.getItem();
-        return itemstack.isEmpty() ? this.getFrameItemForColor(this.getColorVariant()) : itemstack.copy();
+        ItemStack frameItem = this.getFrameItemForColor(this.getColorVariant());
+        ItemStack displayedItem = this.getItem();
+        CompoundTag tag = frameItem.getOrCreateTag();
+        boolean hasCustomData = false;
+
+        // If the frame has an item, add it to the NBT so it persists when placed
+        if (!displayedItem.isEmpty()) {
+            net.minecraft.resources.ResourceLocation itemId =
+                    net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(displayedItem.getItem());
+            if (itemId != null) {
+                tag.putString("ITEM", itemId.toString());
+                hasCustomData = true;
+            }
+        }
+
+        // Preserve particle pattern from persistent data
+        CompoundTag persistentData = this.getPersistentData();
+        if (persistentData.contains("BuildScapeParticlePattern", 8)) {
+            tag.putString("PATTERN", persistentData.getString("BuildScapeParticlePattern"));
+            hasCustomData = true;
+        }
+
+        // Preserve particle colors from persistent data
+        if (persistentData.contains("BuildScapeParticleColors", 9)) {
+            net.minecraft.nbt.ListTag colorList = persistentData.getList("BuildScapeParticleColors", 8);
+            if (colorList.size() > 0) {
+                tag.put("COLORS", colorList.copy());
+                hasCustomData = true;
+            }
+        }
+
+        if (hasCustomData) {
+            frameItem.setTag(tag);
+        }
+
+        return frameItem;
     }
 
     public int getAnalogOutput() {

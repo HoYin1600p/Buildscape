@@ -9,7 +9,6 @@ import com.kingodogo.buildscape.config.PillarParticleConfig;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
 
@@ -592,161 +591,18 @@ public class PillarIdDetailConfigTab extends AbstractConfigTab {
         } catch (Exception e) {}
     }
     
-    @Override
-    public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
-        int contentX = parent.getContentX();
-        int contentY = parent.getContentY();
-        int contentWidth = parent.getContentWidth();
-        int contentHeight = parent.getContentHeight();
-        
-        // Calculate layout like PillarParticlesConfigTab
-        int screenWidth = parent.width;
-        int sidebarWidth = (int)(screenWidth * 0.11);
-        int gap = (int)(screenWidth * 0.01);
-        int leftPanelWidth = (int)(screenWidth * 0.44);
-        int rightPanelWidth = (int)(screenWidth * 0.44);
-        
-        int leftX = sidebarWidth + gap;
-        int rightX = sidebarWidth + gap + leftPanelWidth + gap;
-        
-        leftBoxX = leftX;
-        leftBoxY = contentY;
-        leftBoxWidth = leftPanelWidth;
-        leftBoxHeight = contentHeight;
-        
-        rightBoxX = rightX;
-        rightBoxY = contentY;
-        rightBoxWidth = rightPanelWidth;
-        rightBoxHeight = contentHeight;
-        
-        int padding = 10;
-        
-        // Position back button - place it at the very top left of the content area
-        backButton.x = contentX + 10;
-        backButton.y = contentY + 10;
-        
-        // Draw title at top, moved down to make room for back button
-        String title = "Pillar ID: " + pillarId;
-        Minecraft.getInstance().font.draw(poseStack, new TranslatableComponent("buildscape.config.ids.id").getString() + ": " + pillarId, 
-            contentX + 100, contentY + 15, 0xFFFFFF); // Moved right to avoid back button
-
-        Component subtitle = new TranslatableComponent("buildscape.config.ids.detail.subtitle");
-        Minecraft.getInstance().font.draw(poseStack, subtitle, 
-            contentX + 100, contentY + 27, 0xAAAAAA);
-        
-        // LEFT PANEL: Layout config fields
-        int labelWidth = 150;
-        int fieldX = leftBoxX + padding + labelWidth;
-        int fieldWidth = leftBoxWidth - padding * 2 - labelWidth - 5;
-        int fieldHeight = 20;
-        int fieldSpacing = 26;
-        int startY = leftBoxY + 45; // Adjusted to align with right panel
-        int currentY = startY;
-        
-        // Pattern
-        patternSelector.x = fieldX;
-        patternSelector.y = currentY;
-        patternSelector.setWidth(fieldWidth);
-        Minecraft.getInstance().font.draw(poseStack, new TranslatableComponent("buildscape.config.ids.detail.pattern").getString() + ":",
-                leftBoxX + padding, currentY + 5, 0xFFFFFF);
-        currentY += fieldSpacing;
-
-        // Use Pattern Toggle
-        usePatternToggle.x = fieldX;
-        usePatternToggle.y = currentY;
-        usePatternToggle.setWidth(fieldWidth);
-        Minecraft.getInstance().font.draw(poseStack, "Use Pattern:", 
-            leftBoxX + padding, currentY + 5, 0xFFFFFF);
-        currentY += fieldSpacing;
-        
-        // Pattern Speed
-        patternSpeedField.x = fieldX;
-        patternSpeedField.y = currentY;
-        patternSpeedField.setWidth(fieldWidth);
-        Minecraft.getInstance().font.draw(poseStack, 
-            new TranslatableComponent("buildscape.config.particles.pattern_speed").getString() + ":", 
-            leftBoxX + padding, currentY + 5, 0xFFFFFF);
-        currentY += fieldSpacing;
-        
-        // Pattern Spread
-        patternSpreadField.x = fieldX;
-        patternSpreadField.y = currentY;
-        patternSpreadField.setWidth(fieldWidth);
-        Minecraft.getInstance().font.draw(poseStack, 
-            new TranslatableComponent("buildscape.config.particles.pattern_spread").getString() + ":", 
-            leftBoxX + padding, currentY + 5, 0xFFFFFF);
-        currentY += fieldSpacing;
-        
-        // Pattern Intensity
-        patternIntensityField.x = fieldX;
-        patternIntensityField.y = currentY;
-        patternIntensityField.setWidth(fieldWidth);
-        Minecraft.getInstance().font.draw(poseStack, 
-            new TranslatableComponent("buildscape.config.particles.pattern_intensity").getString() + ":", 
-            leftBoxX + padding, currentY + 5, 0xFFFFFF);
-        currentY += fieldSpacing;
-        
-        // Max Particle Colors
-        maxParticleColorSlider.x = fieldX;
-        maxParticleColorSlider.y = currentY;
-        maxParticleColorSlider.setWidth(fieldWidth);
-        Minecraft.getInstance().font.draw(poseStack, 
-            new TranslatableComponent("buildscape.config.particles.max_particle_color").getString() + ":", 
-            leftBoxX + padding, currentY + 5, 0xFFFFFF);
-        currentY += fieldSpacing + 10;
-        
-        // Save button
-        if (saveButton != null) {
-            saveButton.x = leftBoxX + padding;
-            saveButton.y = currentY;
-        }
-        
-        // RIGHT PANEL: Color swatches and picker (moved 10px left from edge)
-        int swatchSize = 20;
-        int swatchSpacing = 6; // Spacing between swatch and hex field
-        int hexFieldWidth = 65; // Reduced from 80 to fit properly in window
-        int rowSpacing = 25;
-        int rightStartY = rightBoxY + 45; // Start below title area (adjusted for new title position)
-        
-        // Move everything 10px left from the edge
-        int rightContentX = rightBoxX + padding - 10;
-        
-        // 2 columns layout with better spacing
-        int swatchX1 = rightContentX;
-        int hexFieldX1 = swatchX1 + swatchSize + swatchSpacing; // Add spacing before hex field
-        int columnGap = 12; // Gap between columns
-        int swatchX2 = hexFieldX1 + hexFieldWidth + columnGap; // Add spacing after hex field
-        int hexFieldX2 = swatchX2 + swatchSize + swatchSpacing;
-        
-        for (int i = 0; i < MAX_COLORS; i++) {
-            int row = i / 2;
-            int col = i % 2;
-            int swatchY = rightStartY + row * rowSpacing;
-            
-            ColorSwatchButton swatch = colorSwatchButtons.get(i);
-            swatch.x = col == 0 ? swatchX1 : swatchX2;
-            swatch.y = swatchY;
-            swatch.setWidth(swatchSize);
-            swatch.setHeight(swatchSize);
-            
-            EditBox hexField = colorHexFields.get(i);
-            hexField.x = col == 0 ? hexFieldX1 : hexFieldX2;
-            hexField.y = swatchY;
-            hexField.setWidth(hexFieldWidth);
-        }
-        
-        // Position color picker below swatches (also moved left)
-        if (colorPicker != null && colorPicker.visible) {
-            int numRows = (MAX_COLORS + 1) / 2;
-            colorPicker.x = rightContentX;
-            colorPicker.y = rightStartY + numRows * rowSpacing + 10;
-        }
-
-        // Unsaved Changes status text
-        if (dirty) {
-            int statusY = contentY + contentHeight - BuildScapeConfigScreen.scaleSize(14);
-            Minecraft.getInstance().font.draw(poseStack, new TranslatableComponent("buildscape.config.ids.unsaved"),
-                    contentX + 10, statusY, 0xFFFFFF);
+    /**
+     * Sets the height of an EditBox via reflection since 1.18.2 EditBox
+     * doesn't have a public setHeight method.
+     */
+    private static void setEditBoxHeight(EditBox editBox, int height) {
+        try {
+            java.lang.reflect.Field heightField = net.minecraft.client.gui.components.AbstractWidget.class
+                    .getDeclaredField("height");
+            heightField.setAccessible(true);
+            heightField.setInt(editBox, height);
+        } catch (Exception e) {
+            // Fallback - ignore
         }
     }
     
@@ -818,36 +674,210 @@ public class PillarIdDetailConfigTab extends AbstractConfigTab {
         return super.charTyped(codePoint, modifiers);
     }
     
-    private void syncPatternFromBlockEntity(PillarIdManager manager) {
-        if (pillarData == null) return;
-        
-        net.minecraft.client.Minecraft mc = net.minecraft.client.Minecraft.getInstance();
-        if (mc.level == null || mc.player == null) return;
-        
-        String currentDimension = mc.level.dimension().location().toString();
-        if (!currentDimension.equals(pillarData.dimension)) {
-            return;
+    @Override
+    public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
+        int contentX = parent.getContentX();
+        int contentY = parent.getContentY();
+        // Use full width spanning both left and right areas (consistent with PillarIdsConfigTab)
+        int contentWidth = parent.getRightPanelX() + parent.getRightPanelWidth() - parent.getContentX();
+        int contentHeight = parent.getContentHeight();
+
+        Minecraft mc = Minecraft.getInstance();
+        int padding = BuildScapeConfigScreen.scaleSize(10);
+        int borderColor = 0xFF666666; // Matching other panels
+
+        // Calculate left and right panel areas using parent methods
+        int leftPanelWidth = parent.getContentWidth();
+        int rightPanelX = parent.getRightPanelX();
+        int rightPanelWidth = parent.getRightPanelWidth();
+
+        // Button area at top
+        int buttonAreaHeight = BuildScapeConfigScreen.getScaledButtonHeight() + BuildScapeConfigScreen.scaleSize(12);
+
+        // Position back button - ensure it's fully visible
+        backButton.x = contentX + padding;
+        backButton.y = contentY + BuildScapeConfigScreen.scaleSize(6);
+        backButton.setWidth(BuildScapeConfigScreen.scaleSize(80));
+        backButton.setHeight(BuildScapeConfigScreen.getScaledButtonHeight());
+
+        // Draw title next to back button
+        int titleX = contentX + BuildScapeConfigScreen.scaleSize(115);
+        int titleY = contentY + BuildScapeConfigScreen.scaleSize(6);
+        mc.font.draw(poseStack, new TranslatableComponent("buildscape.config.ids.id").getString() + ": " + pillarId,
+                titleX, titleY, 0xFFFFFF);
+        mc.font.draw(poseStack, new TranslatableComponent("buildscape.config.ids.detail.subtitle"),
+                titleX, titleY + mc.font.lineHeight + 2, 0xAAAAAA);
+
+        // LEFT PANEL: Settings panel with bounding box
+        leftBoxX = contentX;
+        leftBoxY = contentY + buttonAreaHeight;
+        leftBoxWidth = leftPanelWidth;
+        leftBoxHeight = contentHeight - buttonAreaHeight;
+
+        // Draw left panel bounding box
+        net.minecraft.client.gui.GuiComponent.fill(poseStack, leftBoxX, leftBoxY, leftBoxX + leftBoxWidth, leftBoxY + 1, borderColor);
+        net.minecraft.client.gui.GuiComponent.fill(poseStack, leftBoxX, leftBoxY + leftBoxHeight - 1, leftBoxX + leftBoxWidth, leftBoxY + leftBoxHeight, borderColor);
+        net.minecraft.client.gui.GuiComponent.fill(poseStack, leftBoxX, leftBoxY, leftBoxX + 1, leftBoxY + leftBoxHeight, borderColor);
+        net.minecraft.client.gui.GuiComponent.fill(poseStack, leftBoxX + leftBoxWidth - 1, leftBoxY, leftBoxX + leftBoxWidth, leftBoxY + leftBoxHeight, borderColor);
+
+        // RIGHT PANEL: Colors panel with bounding box
+        rightBoxX = rightPanelX;
+        rightBoxY = contentY + buttonAreaHeight;
+        rightBoxWidth = rightPanelWidth;
+        rightBoxHeight = contentHeight - buttonAreaHeight;
+
+        // Draw right panel bounding box
+        net.minecraft.client.gui.GuiComponent.fill(poseStack, rightBoxX, rightBoxY, rightBoxX + rightBoxWidth, rightBoxY + 1, borderColor);
+        net.minecraft.client.gui.GuiComponent.fill(poseStack, rightBoxX, rightBoxY + rightBoxHeight - 1, rightBoxX + rightBoxWidth, rightBoxY + rightBoxHeight, borderColor);
+        net.minecraft.client.gui.GuiComponent.fill(poseStack, rightBoxX, rightBoxY, rightBoxX + 1, rightBoxY + rightBoxHeight, borderColor);
+        net.minecraft.client.gui.GuiComponent.fill(poseStack, rightBoxX + rightBoxWidth - 1, rightBoxY, rightBoxX + rightBoxWidth, rightBoxY + rightBoxHeight, borderColor);
+
+        // LEFT PANEL: Layout config fields
+        // Use larger gap to prevent overlapping
+        int gap = Math.max(BuildScapeConfigScreen.scaleSize(6), (int) (parent.height * 0.015));
+        // Use percentage of left panel width for label so it scales with the panel
+        int labelWidth = Math.min(BuildScapeConfigScreen.scaleSize(100), (int) (leftBoxWidth * 0.4));
+        // Add proper spacing between label and field - increased offset
+        int labelToFieldGap = BuildScapeConfigScreen.scaleSize(10);
+        int fieldX = leftBoxX + padding + labelWidth + labelToFieldGap;
+        int fieldWidth = leftBoxWidth - padding * 2 - labelWidth - labelToFieldGap;
+        int fieldHeight = BuildScapeConfigScreen.getScaledEditBoxHeight();
+        int fieldSpacing = fieldHeight + gap;
+        int startY = leftBoxY + padding;
+        int currentY = startY;
+        int labelYOffset = (fieldHeight - mc.font.lineHeight) / 2;
+
+        // Pattern
+        patternSelector.x = fieldX;
+        patternSelector.y = currentY;
+        patternSelector.setWidth(fieldWidth);
+        patternSelector.setHeight(fieldHeight);
+        mc.font.draw(poseStack, new TranslatableComponent("buildscape.config.ids.detail.pattern").getString() + ":",
+                leftBoxX + padding, currentY + labelYOffset, 0xFFFFFF);
+        currentY += fieldSpacing;
+
+        // Use Pattern Toggle
+        usePatternToggle.x = fieldX;
+        usePatternToggle.y = currentY;
+        usePatternToggle.setWidth(fieldWidth);
+        usePatternToggle.setHeight(fieldHeight);
+        mc.font.draw(poseStack, "Use Pattern:",
+                leftBoxX + padding, currentY + labelYOffset, 0xFFFFFF);
+        currentY += fieldSpacing;
+
+        // Pattern Speed
+        patternSpeedField.x = fieldX;
+        patternSpeedField.y = currentY;
+        patternSpeedField.setWidth(fieldWidth);
+        setEditBoxHeight(patternSpeedField, fieldHeight);
+        mc.font.draw(poseStack,
+            new TranslatableComponent("buildscape.config.particles.pattern_speed").getString() + ":",
+                leftBoxX + padding, currentY + labelYOffset, 0xFFFFFF);
+        currentY += fieldSpacing;
+
+        // Pattern Spread
+        patternSpreadField.x = fieldX;
+        patternSpreadField.y = currentY;
+        patternSpreadField.setWidth(fieldWidth);
+        setEditBoxHeight(patternSpreadField, fieldHeight);
+        mc.font.draw(poseStack,
+            new TranslatableComponent("buildscape.config.particles.pattern_spread").getString() + ":",
+                leftBoxX + padding, currentY + labelYOffset, 0xFFFFFF);
+        currentY += fieldSpacing;
+
+        // Pattern Intensity
+        patternIntensityField.x = fieldX;
+        patternIntensityField.y = currentY;
+        patternIntensityField.setWidth(fieldWidth);
+        setEditBoxHeight(patternIntensityField, fieldHeight);
+        mc.font.draw(poseStack,
+            new TranslatableComponent("buildscape.config.particles.pattern_intensity").getString() + ":",
+                leftBoxX + padding, currentY + labelYOffset, 0xFFFFFF);
+        currentY += fieldSpacing;
+
+        // Max Particle Colors
+        maxParticleColorSlider.x = fieldX;
+        maxParticleColorSlider.y = currentY;
+        maxParticleColorSlider.setWidth(fieldWidth);
+        maxParticleColorSlider.setHeight(fieldHeight);
+        mc.font.draw(poseStack,
+                new TranslatableComponent("buildscape.config.particles.max_particle_color").getString() + ":",
+                leftBoxX + padding, currentY + labelYOffset, 0xFFFFFF);
+
+        // Save button at the bottom of left panel
+        if (saveButton != null) {
+            saveButton.x = leftBoxX + padding;
+            saveButton.y = leftBoxY + leftBoxHeight - padding - BuildScapeConfigScreen.getScaledButtonHeight();
+            saveButton.setWidth(leftBoxWidth - padding * 2);
+            saveButton.setHeight(BuildScapeConfigScreen.getScaledButtonHeight());
         }
-        
-        net.minecraft.core.BlockPos pillarPos = new net.minecraft.core.BlockPos(
-            pillarData.x, pillarData.y, pillarData.z
-        );
-        
-        if (!mc.level.isLoaded(pillarPos)) {
-            return;
+
+        // RIGHT PANEL: Color swatches and picker - vertical layout like PillarParticlesConfigTab
+        int swatchSize = BuildScapeConfigScreen.scaleSize(18);
+        int swatchSpacing = BuildScapeConfigScreen.scaleSize(4);
+        int hexFieldWidth = BuildScapeConfigScreen.scaleSize(70);
+        int hexFieldHeight = BuildScapeConfigScreen.scaleSize(18);
+        int rowSpacing = BuildScapeConfigScreen.scaleSize(3); // Gap between rows
+        int rightStartY = rightBoxY + padding;
+
+        // Single column vertical layout
+        int swatchX = rightBoxX + padding;
+        int hexFieldX = swatchX + swatchSize + swatchSpacing;
+
+        // Ensure everything fits within right panel width
+        int requiredWidth = swatchSize + swatchSpacing + hexFieldWidth + padding * 2;
+        if (requiredWidth > rightBoxWidth) {
+            // Scale down hex field width to fit
+            hexFieldWidth = rightBoxWidth - padding * 2 - swatchSize - swatchSpacing;
         }
-        
-        net.minecraft.world.level.block.entity.BlockEntity be = mc.level.getBlockEntity(pillarPos);
-        if (be instanceof com.kingodogo.buildscape.block.PillarBlockEntity pillarBE) {
-            String blockEntityPattern = pillarBE.getParticlePattern();
-            
-            if (blockEntityPattern != null && !blockEntityPattern.isEmpty()) {
-                if (pillarData.pattern == null || !pillarData.pattern.equals(blockEntityPattern)) {
-                    pillarData.pattern = blockEntityPattern;
-                    pillarData.modifiedTime = System.currentTimeMillis();
-                    manager.saveImmediate();
-                }
+
+        for (int i = 0; i < MAX_COLORS; i++) {
+            int swatchY = rightStartY + i * (swatchSize + rowSpacing);
+
+            ColorSwatchButton swatch = colorSwatchButtons.get(i);
+            swatch.x = swatchX;
+            swatch.y = swatchY;
+            swatch.setWidth(swatchSize);
+            swatch.setHeight(swatchSize);
+
+            EditBox hexField = colorHexFields.get(i);
+            hexField.x = hexFieldX;
+            hexField.y = swatchY + (swatchSize - hexFieldHeight) / 2; // Vertically center with swatch
+            hexField.setWidth(hexFieldWidth);
+            setEditBoxHeight(hexField, hexFieldHeight);
+        }
+
+        // Position color picker to the right of swatches (or below if not enough width)
+        if (colorPicker != null && colorPicker.visible) {
+            int swatchesEndY = rightStartY + MAX_COLORS * (swatchSize + rowSpacing);
+            int pickerAvailHeight = rightBoxY + rightBoxHeight - padding - swatchesEndY - gap;
+            int pickerAvailWidth = rightBoxWidth - padding * 2;
+
+            // Try to fit picker below swatches
+            int pickerWidth = BuildScapeConfigScreen.scaleSize(260);
+            int pickerHeight = BuildScapeConfigScreen.scaleSize(200);
+
+            // Scale down if needed
+            if (pickerWidth > pickerAvailWidth) {
+                pickerWidth = pickerAvailWidth;
             }
+            if (pickerHeight > pickerAvailHeight) {
+                pickerHeight = pickerAvailHeight;
+            }
+
+            // Center horizontally in panel
+            colorPicker.x = rightBoxX + (rightBoxWidth - pickerWidth) / 2;
+            colorPicker.y = swatchesEndY + gap;
+            colorPicker.setWidth(pickerWidth);
+            colorPicker.setHeight(pickerHeight);
+        }
+
+        // Unsaved Changes status text
+        if (dirty) {
+            int statusY = saveButton != null ? saveButton.y - mc.font.lineHeight - BuildScapeConfigScreen.scaleSize(4)
+                    : contentY + contentHeight - BuildScapeConfigScreen.scaleSize(14);
+            mc.font.draw(poseStack, new TranslatableComponent("buildscape.config.ids.unsaved"),
+                    leftBoxX + padding, statusY, 0xFFFFFF);
         }
     }
     
@@ -872,5 +902,66 @@ public class PillarIdDetailConfigTab extends AbstractConfigTab {
         String state = use ? "ON" : "OFF";
         net.minecraft.ChatFormatting color = use ? net.minecraft.ChatFormatting.GREEN : net.minecraft.ChatFormatting.RED;
         return new TextComponent("Use Pattern: ").append(new TextComponent(state).withStyle(color));
+    }
+
+    private void syncPatternFromBlockEntity(PillarIdManager manager) {
+        if (pillarData == null) return;
+
+        net.minecraft.client.Minecraft mc = net.minecraft.client.Minecraft.getInstance();
+        if (mc.level == null || mc.player == null) return;
+
+        String currentDimension = mc.level.dimension().location().toString();
+        if (!currentDimension.equals(pillarData.dimension)) {
+            return;
+        }
+
+        net.minecraft.core.BlockPos pillarPos = new net.minecraft.core.BlockPos(
+            pillarData.x, pillarData.y, pillarData.z
+        );
+
+        if (!mc.level.isLoaded(pillarPos)) {
+            return;
+        }
+
+        net.minecraft.world.level.block.entity.BlockEntity be = mc.level.getBlockEntity(pillarPos);
+        if (be instanceof com.kingodogo.buildscape.block.PillarBlockEntity pillarBE) {
+            String blockEntityPattern = pillarBE.getParticlePattern();
+
+            if (blockEntityPattern != null && !blockEntityPattern.isEmpty()) {
+                if (pillarData.pattern == null || !pillarData.pattern.equals(blockEntityPattern)) {
+                    pillarData.pattern = blockEntityPattern;
+                    pillarData.modifiedTime = System.currentTimeMillis();
+                    manager.saveImmediate();
+                }
+            }
+        } else {
+            // Try to find item frame entities at this position
+            double range = 1.0;
+            java.util.List<net.minecraft.world.entity.Entity> entities = mc.level.getEntities(
+                    null,
+                    new net.minecraft.world.phys.AABB(pillarPos).inflate(range)
+            );
+            for (net.minecraft.world.entity.Entity entity : entities) {
+                String frameId = null;
+                String pattern = null;
+
+                if (entity instanceof net.minecraft.world.entity.decoration.ItemFrame frame) {
+                    frameId = frame.getPersistentData().getString("BuildScapeFrameId");
+                    pattern = frame.getPersistentData().getString("BuildScapeParticlePattern");
+                } else if (entity instanceof com.kingodogo.buildscape.entity.ColoredItemFrameEntity frame) {
+                    frameId = frame.getPersistentData().getString("BuildScapeFrameId");
+                    pattern = frame.getPersistentData().getString("BuildScapeParticlePattern");
+                }
+
+                if (pillarId.equals(frameId) && pattern != null && !pattern.isEmpty()) {
+                    if (!java.util.Objects.equals(pillarData.pattern, pattern)) {
+                        pillarData.pattern = pattern;
+                        pillarData.modifiedTime = System.currentTimeMillis();
+                        manager.saveImmediate();
+                    }
+                    break;
+                }
+            }
+        }
     }
 }

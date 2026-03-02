@@ -2,13 +2,10 @@ package com.kingodogo.buildscape.client.screen;
 
 import com.kingodogo.buildscape.BuildScape;
 import com.kingodogo.buildscape.client.screen.widget.ConfigCategoryButton;
-import com.kingodogo.buildscape.client.screen.widget.ScaledTextButton;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.TranslatableComponent;
-
-import java.net.URI;
 
 public class BuildScapeConfigScreen extends Screen {
     private static final double SIDEBAR_WIDTH_PERCENT = 0.11; // 11% sidebar
@@ -122,7 +119,9 @@ public class BuildScapeConfigScreen extends Screen {
     private ConfigCategoryButton pillarItemsButton;
     private ConfigCategoryButton pillarParticlesButton;
     private ConfigCategoryButton pillarIdsButton;
+    private ConfigCategoryButton worldSettingsButton;
     private ConfigCategoryButton supportersButton;
+    private ConfigCategoryButton reportButton;
     private AbstractConfigTab activeTab;
     private Button kofiButton;
     private Button editGuiButton;
@@ -194,7 +193,7 @@ public class BuildScapeConfigScreen extends Screen {
 
         int sidebarY = getContentY(); // Start at 5% height
         int buttonHeight = getScaledCategoryButtonHeight();
-        int spacing = getScaledCategoryButtonSpacing();
+        int spacing = getScaledCategoryButtonSpacing() + (int) (height * 0.005);
 
         pillarItemsButton = new ConfigCategoryButton(
                 buttonX, sidebarY,
@@ -226,6 +225,16 @@ public class BuildScapeConfigScreen extends Screen {
         addRenderableWidget(pillarIdsButton);
 
         sidebarY += buttonHeight + spacing;
+        worldSettingsButton = new ConfigCategoryButton(
+                buttonX, sidebarY,
+                buttonWidth, buttonHeight,
+                new TranslatableComponent("buildscape.config.category.world"),
+                (button) -> {
+                    if (checkOpAccessAndNotify()) setActiveTab(new WorldSettingsConfigTab(this));
+                });
+        addRenderableWidget(worldSettingsButton);
+
+        sidebarY += buttonHeight + spacing;
         supportersButton = new ConfigCategoryButton(
                 buttonX, sidebarY,
                 buttonWidth, buttonHeight,
@@ -234,13 +243,47 @@ public class BuildScapeConfigScreen extends Screen {
                         new com.kingodogo.buildscape.client.screen.tabs.supporters.SupportersOnlyTab(this)));
         addRenderableWidget(supportersButton);
 
-        int kofiY = height - scaleSize(30);
-        kofiButton = new ScaledTextButton(
+        int frameHeight = getScaledCategoryButtonHeight() + scaleSize(4);
+        int bottomPadding = scaleSize(10);
+        int kofiY = height - frameHeight - bottomPadding;
+
+        kofiButton = new net.minecraft.client.gui.components.Button(
                 buttonX, kofiY,
-                buttonWidth, getScaledButtonHeight(),
+                buttonWidth, frameHeight,
                 new net.minecraft.network.chat.TextComponent("Ko-fi"),
-                (button) -> openKofiLink());
+                (button) -> openKofiLink()) {
+            @Override
+            public void renderButton(com.mojang.blaze3d.vertex.PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
+                renderCustomFrame(poseStack, this.x, this.y, this.width, this.height);
+                boolean hovered = mouseX >= this.x && mouseY >= this.y && mouseX < this.x + this.width && mouseY < this.y + this.height;
+                if (hovered) {
+                    fill(poseStack, this.x + 2, this.y + 2, this.x + this.width - 2, this.y + this.height - 2, 0x30FFFFFF);
+                }
+
+                float titleScale = 1.0f;
+                int titlePadding = 10;
+                int titleTextWidth = font.width(getMessage());
+                int maxTitleWidth = this.width - titlePadding * 2;
+                if (titleTextWidth > maxTitleWidth) {
+                    titleScale = Math.max(0.5f, (float) maxTitleWidth / titleTextWidth);
+                }
+                int titleY = (int) (this.y + (this.height / 2.0f) - ((8.0f * titleScale) / 2.0f));
+                int titleX = this.x + this.width / 2;
+
+                poseStack.pushPose();
+                renderGradientTitle(poseStack, titleX, titleY, getMessage().getString(), titleScale, false);
+                poseStack.popPose();
+            }
+        };
         addRenderableWidget(kofiButton);
+
+        int reportY = kofiY - getScaledCategoryButtonHeight() - spacing - scaleSize(6);
+        reportButton = new ConfigCategoryButton(
+                buttonX, reportY,
+                buttonWidth, getScaledCategoryButtonHeight(),
+                new net.minecraft.network.chat.TextComponent("Report"),
+                (button) -> openReportLink());
+        addRenderableWidget(reportButton);
 
         if (activeTab == null) {
             if (hasOpAccess()) {
@@ -287,7 +330,7 @@ public class BuildScapeConfigScreen extends Screen {
         int buttonX = sidebarAreaX + buttonMargin;
         int buttonWidth = calculatedSidebarWidth - (buttonMargin * 2);
         int buttonHeight = getScaledCategoryButtonHeight();
-        int spacing = getScaledCategoryButtonSpacing();
+        int spacing = getScaledCategoryButtonSpacing() + (int) (this.height * 0.005);
 
         if (pillarItemsButton != null) {
             pillarItemsButton.x = buttonX;
@@ -330,6 +373,20 @@ public class BuildScapeConfigScreen extends Screen {
             }
         }
 
+        if (worldSettingsButton != null) {
+            sidebarY += buttonHeight + spacing;
+            worldSettingsButton.x = buttonX;
+            worldSettingsButton.y = sidebarY;
+            worldSettingsButton.setWidth(buttonWidth);
+            try {
+                java.lang.reflect.Field heightField = net.minecraft.client.gui.components.AbstractWidget.class
+                        .getDeclaredField("height");
+                heightField.setAccessible(true);
+                heightField.setInt(worldSettingsButton, buttonHeight);
+            } catch (Exception e) {
+            }
+        }
+
         if (supportersButton != null) {
             sidebarY += buttonHeight + spacing;
             supportersButton.x = buttonX;
@@ -344,6 +401,10 @@ public class BuildScapeConfigScreen extends Screen {
             }
         }
 
+        int frameHeight = getScaledCategoryButtonHeight() + scaleSize(4);
+        int bottomPadding = scaleSize(10);
+        int kofiY = this.height - frameHeight - bottomPadding;
+
         if (editGuiButton != null) {
             editGuiButton.x = buttonX;
             editGuiButton.y = this.height - scaleSize(60);
@@ -351,8 +412,28 @@ public class BuildScapeConfigScreen extends Screen {
         }
         if (kofiButton != null) {
             kofiButton.x = buttonX;
-            kofiButton.y = this.height - scaleSize(30);
+            kofiButton.y = kofiY;
             kofiButton.setWidth(buttonWidth);
+            try {
+                java.lang.reflect.Field heightField = net.minecraft.client.gui.components.AbstractWidget.class
+                        .getDeclaredField("height");
+                heightField.setAccessible(true);
+                heightField.setInt(kofiButton, frameHeight);
+            } catch (Exception e) {
+            }
+        }
+        if (reportButton != null) {
+            int reportY = kofiY - buttonHeight - spacing - scaleSize(6);
+            reportButton.x = buttonX;
+            reportButton.y = reportY;
+            reportButton.setWidth(buttonWidth);
+            try {
+                java.lang.reflect.Field heightField = net.minecraft.client.gui.components.AbstractWidget.class
+                        .getDeclaredField("height");
+                heightField.setAccessible(true);
+                heightField.setInt(reportButton, buttonHeight);
+            } catch (Exception e) {
+            }
         }
 
         super.resize(mc, this.width, this.height);
@@ -365,7 +446,7 @@ public class BuildScapeConfigScreen extends Screen {
         int maxAvailableWidth = 0;
 
         java.util.List<ConfigCategoryButton> buttons = java.util.Arrays.asList(
-                pillarItemsButton, pillarParticlesButton, pillarIdsButton, supportersButton
+                pillarItemsButton, pillarParticlesButton, pillarIdsButton, worldSettingsButton, supportersButton, reportButton
         );
 
         for (ConfigCategoryButton btn : buttons) {
@@ -390,7 +471,7 @@ public class BuildScapeConfigScreen extends Screen {
         }
     }
 
-    private void renderGradientTitle(com.mojang.blaze3d.vertex.PoseStack poseStack, int x, int y, String text, float scale) {
+    private void renderGradientTitle(com.mojang.blaze3d.vertex.PoseStack poseStack, int x, int y, String text, float scale, boolean drawShadow) {
         poseStack.pushPose();
         poseStack.translate(x, y, 0);
         poseStack.scale(scale, scale, 1.0f);
@@ -402,11 +483,15 @@ public class BuildScapeConfigScreen extends Screen {
         int[] colors = new int[]{0xFF00FFFF, 0xFF0088FF, 0xFF8800FF, 0xFFFF00FF, 0xFFFF8800};
 
         // Draw border/shadow first
-        for (int ox = -1; ox <= 1; ox++) {
-            for (int oy = -1; oy <= 1; oy++) {
-                if (ox == 0 && oy == 0) continue;
-                font.draw(poseStack, text, startX + ox, oy, 0xFF000000);
+        if (drawShadow) {
+            for (int ox = -1; ox <= 1; ox++) {
+                for (int oy = -1; oy <= 1; oy++) {
+                    if (ox == 0 && oy == 0) continue;
+                    font.draw(poseStack, text, startX + ox, oy, 0xFF000000);
+                }
             }
+        } else {
+            font.draw(poseStack, text, startX + 1f, 1f, 0xFF000000); // Standard text drop shadow equivalent
         }
 
         // Draw gradient text character by character
@@ -507,8 +592,12 @@ public class BuildScapeConfigScreen extends Screen {
             pillarParticlesButton.setActive(false);
         if (pillarIdsButton != null)
             pillarIdsButton.setActive(false);
+        if (worldSettingsButton != null)
+            worldSettingsButton.setActive(false);
         if (supportersButton != null)
             supportersButton.setActive(false);
+        if (reportButton != null)
+            reportButton.setActive(false);
 
         activeTab = tab;
         if (activeTab != null) {
@@ -541,6 +630,8 @@ public class BuildScapeConfigScreen extends Screen {
                 pillarIdsButton.setActive(false);
             if (supportersButton != null)
                 supportersButton.setActive(false);
+            if (reportButton != null)
+                reportButton.setActive(false);
             return;
         }
 
@@ -555,39 +646,26 @@ public class BuildScapeConfigScreen extends Screen {
             pillarParticlesButton.setActive(isParticles);
         if (pillarIdsButton != null)
             pillarIdsButton.setActive(isIds);
+        if (worldSettingsButton != null)
+            worldSettingsButton.setActive(activeTab instanceof WorldSettingsConfigTab);
         if (supportersButton != null)
-            supportersButton.setActive(isSupporters);
+            supportersButton.setActive(activeTab instanceof com.kingodogo.buildscape.client.screen.tabs.supporters.SupportersOnlyTab);
+        if (reportButton != null)
+            reportButton.setActive(false);
     }
 
     private void openKofiLink() {
         String kofiUrl = "https://ko-fi.com/itzmedga";
-
-        if (Minecraft.getInstance().player != null) {
-            net.minecraft.network.chat.MutableComponent linkComponent = new net.minecraft.network.chat.TextComponent(
-                    "Support Buildscape Devs ");
-            
-            net.minecraft.network.chat.MutableComponent urlComponent = new net.minecraft.network.chat.TextComponent(
-                    kofiUrl)
-                    .withStyle(style -> style
-                            .withColor(net.minecraft.ChatFormatting.AQUA)
-                            .withUnderlined(true)
-                            .withClickEvent(new net.minecraft.network.chat.ClickEvent(
-                                    net.minecraft.network.chat.ClickEvent.Action.OPEN_URL,
-                                    kofiUrl))
-                            .withHoverEvent(new net.minecraft.network.chat.HoverEvent(
-                                    net.minecraft.network.chat.HoverEvent.Action.SHOW_TEXT,
-                                    new net.minecraft.network.chat.TextComponent("Click to open"))));
-
-            net.minecraft.network.chat.MutableComponent suffixComponent = new net.minecraft.network.chat.TextComponent(
-                    " Buy us a Hot Chocolate.");
-
-            linkComponent.append(urlComponent).append(suffixComponent);
-            Minecraft.getInstance().player.sendMessage(linkComponent, java.util.UUID.randomUUID());
-        }
-
         try {
-            URI uri = new URI(kofiUrl);
-            java.awt.Desktop.getDesktop().browse(uri);
+            net.minecraft.Util.getPlatform().openUri(new java.net.URI(kofiUrl));
+        } catch (Exception e) {
+        }
+    }
+
+    private void openReportLink() {
+        String reportUrl = "https://buildscape.online/report";
+        try {
+            net.minecraft.Util.getPlatform().openUri(new java.net.URI(reportUrl));
         } catch (Exception e) {
         }
     }
@@ -638,7 +716,7 @@ public class BuildScapeConfigScreen extends Screen {
 
         poseStack.pushPose();
         // Use renderGradientTitle instead of drawCenteredString
-        renderGradientTitle(poseStack, titleX, titleY, title.getString(), titleScale);
+        renderGradientTitle(poseStack, titleX, titleY, title.getString(), titleScale, true);
         poseStack.popPose();
 
         if (activeTab != null) {

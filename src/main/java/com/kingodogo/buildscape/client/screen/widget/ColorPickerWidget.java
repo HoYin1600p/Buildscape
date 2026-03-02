@@ -219,8 +219,7 @@ public class ColorPickerWidget extends AbstractWidget {
     public void renderButton(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
         Minecraft mc = Minecraft.getInstance();
 
-        float totalUnscaledWidth = GRADIENT_SIZE + 5 + HUE_SLIDER_WIDTH + 10 + 15 + SLIDER_WIDTH + VALUE_TEXT_WIDTH
-                + 10;
+        float totalUnscaledWidth = GRADIENT_SIZE + 5 + HUE_SLIDER_WIDTH + 10 + 15 + SLIDER_WIDTH + VALUE_TEXT_WIDTH + 15;
         float totalUnscaledHeight = GRADIENT_SIZE + 5 + 20 + 10;
 
         float scaleX = (float) width / totalUnscaledWidth;
@@ -309,7 +308,7 @@ public class ColorPickerWidget extends AbstractWidget {
         renderSliderScaled(poseStack, mc, rgbStartX, rgbStartY + scaledSliderSpacing * 2, "B", b, 0, 255, 0x0000FF,
                 draggingB, scale, false, mouseX, mouseY, partialTick);
 
-        int hsbStartY = rgbStartY + scaledSliderSpacing * 3 + 5;
+        int hsbStartY = rgbStartY + scaledSliderSpacing * 3 + (int) (5 * scale);
         renderSliderScaled(poseStack, mc, rgbStartX, hsbStartY, "H", (int) hue, 0, 360, -1, draggingH, scale, true,
                 mouseX, mouseY, partialTick);
         renderSliderScaled(poseStack, mc, rgbStartX, hsbStartY + scaledSliderSpacing, "S", (int) (saturation * 100), 0,
@@ -338,7 +337,8 @@ public class ColorPickerWidget extends AbstractWidget {
         }
         poseStack.popPose();
 
-        int sliderX = x + 15;
+        int labelW = (int) (15 * scale);
+        int sliderX = x + labelW;
         int sliderY = y;
 
         if (gradientColor == -1) {
@@ -398,7 +398,7 @@ public class ColorPickerWidget extends AbstractWidget {
         fill(poseStack, indicatorX - 1, sliderY - 2, indicatorX + 1, sliderY + scaledSliderHeight + 2, 0xFFFFFFFF);
         fill(poseStack, indicatorX, sliderY - 1, indicatorX, sliderY + scaledSliderHeight + 1, 0xFF000000);
 
-        int fieldX = sliderX + scaledSliderWidth + 3;
+        int fieldX = sliderX + scaledSliderWidth + (int) (3 * scale);
         int fieldY = sliderY;
 
         String valueStr = isHsb && !label.equals("H") ? String.format("%.1f", (float) value) : String.valueOf(value);
@@ -571,7 +571,8 @@ public class ColorPickerWidget extends AbstractWidget {
             return true;
         }
 
-        int sliderX = rgbStartX + 15;
+        int labelW = (int) (15 * scale);
+        int sliderX = rgbStartX + labelW;
         if (mouseX >= sliderX - 2 && mouseX < sliderX + scaledSliderWidth + 2) {
             double clampedX = Math.max(sliderX, Math.min(sliderX + scaledSliderWidth - 1, mouseX));
             float ratio = (float) Math.max(0, Math.min(1, (clampedX - sliderX) / (double) scaledSliderWidth));
@@ -685,7 +686,8 @@ public class ColorPickerWidget extends AbstractWidget {
         int hueSliderX = gradientX + scaledGradientSize + scaledGap1;
         int hueSliderY = gradientY;
         int rgbStartX = hueSliderX + scaledHueSliderWidth + scaledGap2;
-        int sliderX = rgbStartX + (int) (15 * scale);
+        int labelW = (int) (15 * scale);
+        int sliderX = rgbStartX + labelW;
 
         if (draggingGradient) {
             double clampedX = Math.max(gradientX, Math.min(gradientX + scaledGradientSize - 1, mouseX));

@@ -87,5 +87,19 @@ public class ModMessages {
                 UpdateAllPillarIdsPacket::decode,
                 UpdateAllPillarIdsPacket::handle
         );
+        INSTANCE.registerMessage(
+                id++,
+                SyncGameRulesPacket.class,
+                SyncGameRulesPacket::encode,
+                SyncGameRulesPacket::decode,
+                SyncGameRulesPacket::handle
+        );
+        INSTANCE.registerMessage(
+                id++,
+                UpdateGameRulePacket.class,
+                UpdateGameRulePacket::encode,
+                UpdateGameRulePacket::decode,
+                UpdateGameRulePacket::handle
+        );
     }
 }

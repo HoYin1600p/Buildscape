@@ -1595,6 +1595,23 @@ public class PillarBlockEntity extends BlockEntity {
             if (tag.contains("DisplayedItem", 10)) {
                 ItemStack loaded = ItemStack.of(tag.getCompound("DisplayedItem"));
                 this.displayedItem = loaded == null ? ItemStack.EMPTY : loaded;
+            }
+            // Handle ITEM tag from /fill or /give commands (custom NBT format)
+            else if (tag.contains("ITEM", 8)) {
+                String itemId = tag.getString("ITEM");
+                try {
+                    net.minecraft.resources.ResourceLocation itemLocation =
+                            new net.minecraft.resources.ResourceLocation(itemId);
+                    net.minecraft.world.item.Item item =
+                            net.minecraftforge.registries.ForgeRegistries.ITEMS.getValue(itemLocation);
+                    if (item != null && item != net.minecraft.world.item.Items.AIR) {
+                        this.displayedItem = new ItemStack(item);
+                    } else {
+                        this.displayedItem = ItemStack.EMPTY;
+                    }
+                } catch (Exception e) {
+                    this.displayedItem = ItemStack.EMPTY;
+                }
             } else {
                 this.displayedItem = ItemStack.EMPTY;
             }
@@ -1604,6 +1621,20 @@ public class PillarBlockEntity extends BlockEntity {
 
         if (tag.contains("ParticlePattern", 8)) {
             this.particlePattern = tag.getString("ParticlePattern");
+            boolean valid = false;
+            for (String p : PATTERNS) {
+                if (p.equals(this.particlePattern)) {
+                    valid = true;
+                    break;
+                }
+            }
+            if (!valid) {
+                this.particlePattern = null;
+            }
+        }
+        // Handle PATTERN tag from /fill or /give commands (custom NBT format)
+        else if (tag.contains("PATTERN", 8)) {
+            this.particlePattern = tag.getString("PATTERN");
             boolean valid = false;
             for (String p : PATTERNS) {
                 if (p.equals(this.particlePattern)) {

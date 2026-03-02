@@ -94,6 +94,8 @@
     "buildscape:yellow_concrete_slab",
     "buildscape:yellow_sandstone_slab",
     "buildscape:yellow_smooth_sandstone_slab",
-    "buildscape:yellow_tiles_slab"
+    "buildscape:yellow_tiles_slab",
+    "buildscape:packed_mud_slab",
+    "buildscape:mud_brick_slab"
   ]
 }

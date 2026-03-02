@@ -1,17 +1,23 @@
 package com.kingodogo.buildscape.item;
 
 import com.kingodogo.buildscape.entity.ColoredItemFrameEntity;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.gameevent.GameEvent;
+
+import java.util.List;
 
 public class ColoredItemFrameItem extends Item {
     private final String colorVariant;
@@ -57,5 +63,12 @@ public class ColoredItemFrameItem extends Item {
 
     protected boolean canPlace(Player player, Direction direction, ItemStack stack, BlockPos pos) {
         return !player.level.isOutsideBuildHeight(pos) && player.mayUseItemAt(pos, direction, stack);
+    }
+
+    @Override
+    public void appendHoverText(ItemStack stack, Level level, List<Component> tooltip, TooltipFlag flag) {
+        if (this.colorVariant.equals("invisible")) {
+            tooltip.add(new TranslatableComponent("item.buildscape.invisible_item_frame.tooltip").withStyle(ChatFormatting.GRAY));
+        }
     }
 }

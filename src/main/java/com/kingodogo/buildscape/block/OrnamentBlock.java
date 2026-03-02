@@ -103,22 +103,22 @@ public class OrnamentBlock
     }
 
     public enum StringColor implements StringRepresentable {
-        WHITE("white", 0xFFFFFF, "White"),
-        ORANGE("orange", 0xFF9800, "Orange"),
-        MAGENTA("magenta", 0xC74EBD, "Magenta"),
-        LIGHT_BLUE("light_blue", 0x3AB3DA, "Light Blue"),
-        YELLOW("yellow", 0xFED83D, "Yellow"),
-        LIME("lime", 0x80C71F, "Lime"),
-        PINK("pink", 0xF38BAA, "Pink"),
-        GRAY("gray", 0x474F52, "Gray"),
-        LIGHT_GRAY("light_gray", 0x9D9D97, "Light Gray"),
-        CYAN("cyan", 0x169C9C, "Cyan"),
-        PURPLE("purple", 0x8932B8, "Purple"),
-        BLUE("blue", 0x3C44AA, "Blue"),
-        BROWN("brown", 0x835432, "Brown"),
-        GREEN("green", 0x5E7C16, "Green"),
-        RED("red", 0xB02E26, "Red"),
-        BLACK("black", 0x1D1D21, "Black");
+        WHITE("white", 0xE8FEFD, "White"),
+        ORANGE("orange", 0xFF5C00, "Orange"),
+        MAGENTA("magenta", 0xFF00FF, "Magenta"),
+        LIGHT_BLUE("light_blue", 0x3CDFFF, "Light Blue"),
+        YELLOW("yellow", 0xFFFF00, "Yellow"),
+        LIME("lime", 0xBFFE00, "Lime"),
+        PINK("pink", 0xF686B7, "Pink"),
+        GRAY("gray", 0x232526, "Gray"),
+        LIGHT_GRAY("light_gray", 0xB1B8C5, "Light Gray"),
+        CYAN("cyan", 0x00FFFF, "Cyan"),
+        PURPLE("purple", 0xAB87FF, "Purple"),
+        BLUE("blue", 0x1919EA, "Blue"),
+        BROWN("brown", 0x411900, "Brown"),
+        GREEN("green", 0x39FF14, "Green"),
+        RED("red", 0xFF0000, "Red"),
+        BLACK("black", 0x07010C, "Black");
 
         private final String name;
         private final int color;

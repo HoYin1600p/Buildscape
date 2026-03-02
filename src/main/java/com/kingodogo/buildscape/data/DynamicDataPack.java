@@ -7,14 +7,11 @@ import com.google.gson.JsonObject;
 import com.kingodogo.buildscape.BuildScape;
 import com.kingodogo.buildscape.block.ModVerticalSlabs;
 import com.kingodogo.buildscape.block.ModVerticalStairs;
-import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackResources;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.metadata.MetadataSectionSerializer;
-import net.minecraft.server.packs.metadata.pack.PackMetadataSection;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nullable;

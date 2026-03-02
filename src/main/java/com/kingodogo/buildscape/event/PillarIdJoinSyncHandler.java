@@ -46,5 +46,15 @@ public class PillarIdJoinSyncHandler {
                 net.minecraftforge.network.PacketDistributor.PLAYER.with(() -> player),
                 syncPacket
         );
+
+        // Also sync gamerules to the joining player so their GUI is correct from the start
+        net.minecraft.world.level.GameRules rules = player.getLevel().getGameRules();
+        ModMessages.INSTANCE.send(
+                net.minecraftforge.network.PacketDistributor.PLAYER.with(() -> player),
+                new com.kingodogo.buildscape.network.SyncGameRulesPacket(
+                        rules.getBoolean(com.kingodogo.buildscape.world.ModGameRules.FAST_LEAF_DECAY),
+                        rules.getBoolean(com.kingodogo.buildscape.world.ModGameRules.CREATIVE_TREE_BREAKER)
+                )
+        );
     }
 }

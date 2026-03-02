@@ -1,9 +1,9 @@
 package com.kingodogo.buildscape.client.screen.widget;
 
-import net.minecraft.client.gui.components.Button;
-import net.minecraft.network.chat.TextComponent;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.network.chat.TextComponent;
 
 public class ColorSwatchButton extends Button {
     private int color = 0xFFFFFF;
@@ -51,10 +51,11 @@ public class ColorSwatchButton extends Button {
         GuiComponent.fill(poseStack, swatchX + swatchSize - 1, swatchY, swatchX + swatchSize, swatchY + swatchSize, borderColor);
 
         if (isSelected && this.active) {
-            GuiComponent.fill(poseStack, swatchX - 2, swatchY - 2, swatchX + swatchSize + 2, swatchY, 0xFFFF00FF);
-            GuiComponent.fill(poseStack, swatchX - 2, swatchY + swatchSize, swatchX + swatchSize + 2, swatchY + swatchSize + 2, 0xFFFF00FF);
-            GuiComponent.fill(poseStack, swatchX - 2, swatchY - 2, swatchX, swatchY + swatchSize + 2, 0xFFFF00FF);
-            GuiComponent.fill(poseStack, swatchX + swatchSize, swatchY - 2, swatchX + swatchSize + 2, swatchY + swatchSize + 2, 0xFFFF00FF);
+            int borderSize = Math.max(1, com.kingodogo.buildscape.client.screen.BuildScapeConfigScreen.scaleSize(2));
+            GuiComponent.fill(poseStack, swatchX - borderSize, swatchY - borderSize, swatchX + swatchSize + borderSize, swatchY, 0xFFFF00FF);
+            GuiComponent.fill(poseStack, swatchX - borderSize, swatchY + swatchSize, swatchX + swatchSize + borderSize, swatchY + borderSize, 0xFFFF00FF);
+            GuiComponent.fill(poseStack, swatchX - borderSize, swatchY - borderSize, swatchX, swatchY + swatchSize + borderSize, 0xFFFF00FF);
+            GuiComponent.fill(poseStack, swatchX + swatchSize, swatchY - borderSize, swatchX + swatchSize + borderSize, swatchY + swatchSize + borderSize, 0xFFFF00FF);
         }
     }
 }

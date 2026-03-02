@@ -166,23 +166,3 @@ These keywords work on **almost any mob**!
 
 ---
 
-## Technical Details & Architecture
-
-### Overview
-
-The system uses `states.txt` as the authoritative reference for all valid mob names and their allowed states.
-
-### Architecture
-
-* **MobPillarRenderer.java**: Handles all mob state parsing and rendering logic.
-* **states.txt**: Configuration file in the root directory listing valid mobs and states.
-* **PillarBlockEntityRenderer.java**: Delegates mob rendering to `MobPillarRenderer`.
-
-### State Parsing Logic
-
-1. Load `states.txt` on first use (lazy loading).
-2. Extract custom name from spawn egg NBT.
-3. Split name into words.
-4. Check each word against valid states for that mob type (defined in `states.txt`).
-5. Apply universal states regardless of mob type.
-6. Build a `MobState` object with all active states.

@@ -1,20 +1,19 @@
 package com.kingodogo.buildscape.network;
 
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.Queue;
-import java.util.Set;
-import java.util.function.Supplier;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
-
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.network.NetworkEvent;
+
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.Set;
+import java.util.function.Supplier;
 
 public class TreeChopPacket {
 
@@ -51,6 +50,10 @@ public class TreeChopPacket {
 
             Level level = player.getLevel();
             if (level.isClientSide) {
+                return;
+            }
+
+            if (!level.getGameRules().getBoolean(com.kingodogo.buildscape.world.ModGameRules.CREATIVE_TREE_BREAKER)) {
                 return;
             }
 
@@ -156,14 +159,11 @@ public class TreeChopPacket {
         int finalNextBatchSize = nextBatchSize;
         int nextIndex = end;
 
-        // Schedule for 2 ticks in the future (not next tick)
-        level.getServer().execute(() -> {
-            try {
-                Thread.sleep(100); // 100ms = ~2 ticks
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
-            scheduleNextBreak(level, blocks, nextIndex, finalNextBatchSize, nextConsecutiveTicks);
+        // Schedule next batch with a 100ms (~2 ticks) delay without blocking the server thread
+        java.util.concurrent.CompletableFuture.delayedExecutor(100, java.util.concurrent.TimeUnit.MILLISECONDS).execute(() -> {
+            level.getServer().execute(() -> {
+                scheduleNextBreak(level, blocks, nextIndex, finalNextBatchSize, nextConsecutiveTicks);
+            });
         });
     }
 }

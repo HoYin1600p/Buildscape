@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "buildscape:green_factory_mesh"
+  },
+  "result": "buildscape:green_factory_mesh_stairs",
+  "count": 1
+}

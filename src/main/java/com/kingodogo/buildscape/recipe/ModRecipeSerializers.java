@@ -15,6 +15,13 @@ public class ModRecipeSerializers {
             );
 
     public static final RegistryObject<
+            RecipeSerializer<ShapedDurabilityRecipe>
+            > SHAPED_DURABILITY_RECIPE = RECIPE_SERIALIZERS.register(
+            "shaped_durability",
+            () -> ShapedDurabilityRecipe.SERIALIZER
+    );
+
+    public static final RegistryObject<
             RecipeSerializer<ShapelessDurabilityRecipe>
             > SHAPELESS_DURABILITY_RECIPE = RECIPE_SERIALIZERS.register(
             "shapeless_durability",

@@ -162,6 +162,7 @@ public class ClientEvents {
             BlockPos blockBelowPlayer = playerBlockPos.below();
             BlockState blockBelow = mc.level.getBlockState(blockBelowPlayer);
 
+
             if (blockBelow.getBlock() instanceof LeafHedgeBlock) {
                 double playerY = player.getY();
                 double blockTopY = blockBelowPlayer.getY() + 1.0;

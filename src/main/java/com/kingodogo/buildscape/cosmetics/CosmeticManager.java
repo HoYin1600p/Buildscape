@@ -1,7 +1,5 @@
 package com.kingodogo.buildscape.cosmetics;
 
-import com.kingodogo.buildscape.BuildScape;
-
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -73,7 +71,7 @@ public class CosmeticManager {
         registerRedeemableParticleTrail("buildscape:cosmatics/particle/snowflake_trail", "Snowflake Trail",
                 "Snowflakes drift behind you", 2, "snowflake");
 
-        registerParticleTrail("buildscape:cosmatics/particle/cake_trail", "Cake Trail",
+        registerRedeemableParticleTrail("buildscape:cosmatics/particle/cake_trail", "Cake Trail",
                 "Sweet cake particles follow you", 3, "cake");
 
         // Register gear cosmetics

@@ -291,22 +291,22 @@ public class SmokeVentBlock extends Block implements EntityBlock {
 
         net.minecraft.world.item.Item item = stack.getItem();
 
-        if (item == Items.WHITE_DYE) return Map.entry("#FFFFFF", "White");
-        else if (item == Items.ORANGE_DYE) return Map.entry("#FF9800", "Orange");
-        else if (item == Items.MAGENTA_DYE) return Map.entry("#C74EBD", "Magenta");
-        else if (item == Items.LIGHT_BLUE_DYE) return Map.entry("#3AB3DA", "Light Blue");
-        else if (item == Items.YELLOW_DYE) return Map.entry("#FED83D", "Yellow");
-        else if (item == Items.LIME_DYE) return Map.entry("#80C71F", "Lime");
-        else if (item == Items.PINK_DYE) return Map.entry("#F38BAA", "Pink");
-        else if (item == Items.GRAY_DYE) return Map.entry("#474F52", "Gray");
-        else if (item == Items.LIGHT_GRAY_DYE) return Map.entry("#9D9D97", "Light Gray");
-        else if (item == Items.CYAN_DYE) return Map.entry("#169C9C", "Cyan");
-        else if (item == Items.PURPLE_DYE) return Map.entry("#8932B8", "Purple");
-        else if (item == Items.BLUE_DYE) return Map.entry("#3C44AA", "Blue");
-        else if (item == Items.BROWN_DYE) return Map.entry("#835432", "Brown");
-        else if (item == Items.GREEN_DYE) return Map.entry("#5E7C16", "Green");
-        else if (item == Items.RED_DYE) return Map.entry("#B02E26", "Red");
-        else if (item == Items.BLACK_DYE) return Map.entry("#1D1D21", "Black");
+        if (item == Items.WHITE_DYE) return Map.entry("#E8FEFD", "White");
+        else if (item == Items.ORANGE_DYE) return Map.entry("#FF5C00", "Orange");
+        else if (item == Items.MAGENTA_DYE) return Map.entry("#FF00FF", "Magenta");
+        else if (item == Items.LIGHT_BLUE_DYE) return Map.entry("#3CDFFF", "Light Blue");
+        else if (item == Items.YELLOW_DYE) return Map.entry("#FFFF00", "Yellow");
+        else if (item == Items.LIME_DYE) return Map.entry("#BFFE00", "Lime");
+        else if (item == Items.PINK_DYE) return Map.entry("#F686B7", "Pink");
+        else if (item == Items.GRAY_DYE) return Map.entry("#232526", "Gray");
+        else if (item == Items.LIGHT_GRAY_DYE) return Map.entry("#B1B8C5", "Light Gray");
+        else if (item == Items.CYAN_DYE) return Map.entry("#00FFFF", "Cyan");
+        else if (item == Items.PURPLE_DYE) return Map.entry("#AB87FF", "Purple");
+        else if (item == Items.BLUE_DYE) return Map.entry("#1919EA", "Blue");
+        else if (item == Items.BROWN_DYE) return Map.entry("#411900", "Brown");
+        else if (item == Items.GREEN_DYE) return Map.entry("#39FF14", "Green");
+        else if (item == Items.RED_DYE) return Map.entry("#FF0000", "Red");
+        else if (item == Items.BLACK_DYE) return Map.entry("#07010C", "Black");
 
         return null;
     }

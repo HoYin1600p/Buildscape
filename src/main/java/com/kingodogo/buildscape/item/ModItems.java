@@ -6940,5 +6940,106 @@ public class ModItems {
             () -> new BottleOfMistItem(new Item.Properties().tab(com.kingodogo.buildscape.BuildScape.BUILDSCAPE_TAB).stacksTo(64))
     );
 
-}
+    public static final RegistryObject<Item> BLACK_FACTORY_MESH = ITEMS.register("black_factory_mesh",
+            () -> new BlockItem(ModBlocks.BLACK_FACTORY_MESH.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BLACK_FACTORY_MESH_STAIRS = ITEMS.register("black_factory_mesh_stairs",
+            () -> new BlockItem(ModBlocks.BLACK_FACTORY_MESH_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BLACK_FACTORY_MESH_SLAB = ITEMS.register("black_factory_mesh_slab",
+            () -> new BlockItem(ModBlocks.BLACK_FACTORY_MESH_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BLACK_FACTORY_MESH_WALL = ITEMS.register("black_factory_mesh_wall",
+            () -> new BlockItem(ModBlocks.BLACK_FACTORY_MESH_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BLUE_FACTORY_MESH = ITEMS.register("blue_factory_mesh",
+            () -> new BlockItem(ModBlocks.BLUE_FACTORY_MESH.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BLUE_FACTORY_MESH_STAIRS = ITEMS.register("blue_factory_mesh_stairs",
+            () -> new BlockItem(ModBlocks.BLUE_FACTORY_MESH_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BLUE_FACTORY_MESH_SLAB = ITEMS.register("blue_factory_mesh_slab",
+            () -> new BlockItem(ModBlocks.BLUE_FACTORY_MESH_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BLUE_FACTORY_MESH_WALL = ITEMS.register("blue_factory_mesh_wall",
+            () -> new BlockItem(ModBlocks.BLUE_FACTORY_MESH_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BROWN_FACTORY_MESH = ITEMS.register("brown_factory_mesh",
+            () -> new BlockItem(ModBlocks.BROWN_FACTORY_MESH.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BROWN_FACTORY_MESH_STAIRS = ITEMS.register("brown_factory_mesh_stairs",
+            () -> new BlockItem(ModBlocks.BROWN_FACTORY_MESH_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BROWN_FACTORY_MESH_SLAB = ITEMS.register("brown_factory_mesh_slab",
+            () -> new BlockItem(ModBlocks.BROWN_FACTORY_MESH_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BROWN_FACTORY_MESH_WALL = ITEMS.register("brown_factory_mesh_wall",
+            () -> new BlockItem(ModBlocks.BROWN_FACTORY_MESH_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GRAY_FACTORY_MESH = ITEMS.register("gray_factory_mesh",
+            () -> new BlockItem(ModBlocks.GRAY_FACTORY_MESH.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GRAY_FACTORY_MESH_STAIRS = ITEMS.register("gray_factory_mesh_stairs",
+            () -> new BlockItem(ModBlocks.GRAY_FACTORY_MESH_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GRAY_FACTORY_MESH_SLAB = ITEMS.register("gray_factory_mesh_slab",
+            () -> new BlockItem(ModBlocks.GRAY_FACTORY_MESH_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GRAY_FACTORY_MESH_WALL = ITEMS.register("gray_factory_mesh_wall",
+            () -> new BlockItem(ModBlocks.GRAY_FACTORY_MESH_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GREEN_FACTORY_MESH = ITEMS.register("green_factory_mesh",
+            () -> new BlockItem(ModBlocks.GREEN_FACTORY_MESH.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GREEN_FACTORY_MESH_STAIRS = ITEMS.register("green_factory_mesh_stairs",
+            () -> new BlockItem(ModBlocks.GREEN_FACTORY_MESH_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GREEN_FACTORY_MESH_SLAB = ITEMS.register("green_factory_mesh_slab",
+            () -> new BlockItem(ModBlocks.GREEN_FACTORY_MESH_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GREEN_FACTORY_MESH_WALL = ITEMS.register("green_factory_mesh_wall",
+            () -> new BlockItem(ModBlocks.GREEN_FACTORY_MESH_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIGHT_GRAY_FACTORY_MESH = ITEMS.register("light_gray_factory_mesh",
+            () -> new BlockItem(ModBlocks.LIGHT_GRAY_FACTORY_MESH.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIGHT_GRAY_FACTORY_MESH_STAIRS = ITEMS.register("light_gray_factory_mesh_stairs",
+            () -> new BlockItem(ModBlocks.LIGHT_GRAY_FACTORY_MESH_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIGHT_GRAY_FACTORY_MESH_SLAB = ITEMS.register("light_gray_factory_mesh_slab",
+            () -> new BlockItem(ModBlocks.LIGHT_GRAY_FACTORY_MESH_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIGHT_GRAY_FACTORY_MESH_WALL = ITEMS.register("light_gray_factory_mesh_wall",
+            () -> new BlockItem(ModBlocks.LIGHT_GRAY_FACTORY_MESH_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIME_FACTORY_MESH = ITEMS.register("lime_factory_mesh",
+            () -> new BlockItem(ModBlocks.LIME_FACTORY_MESH.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIME_FACTORY_MESH_STAIRS = ITEMS.register("lime_factory_mesh_stairs",
+            () -> new BlockItem(ModBlocks.LIME_FACTORY_MESH_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIME_FACTORY_MESH_SLAB = ITEMS.register("lime_factory_mesh_slab",
+            () -> new BlockItem(ModBlocks.LIME_FACTORY_MESH_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIME_FACTORY_MESH_WALL = ITEMS.register("lime_factory_mesh_wall",
+            () -> new BlockItem(ModBlocks.LIME_FACTORY_MESH_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> ORANGE_FACTORY_MESH = ITEMS.register("orange_factory_mesh",
+            () -> new BlockItem(ModBlocks.ORANGE_FACTORY_MESH.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> ORANGE_FACTORY_MESH_STAIRS = ITEMS.register("orange_factory_mesh_stairs",
+            () -> new BlockItem(ModBlocks.ORANGE_FACTORY_MESH_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> ORANGE_FACTORY_MESH_SLAB = ITEMS.register("orange_factory_mesh_slab",
+            () -> new BlockItem(ModBlocks.ORANGE_FACTORY_MESH_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> ORANGE_FACTORY_MESH_WALL = ITEMS.register("orange_factory_mesh_wall",
+            () -> new BlockItem(ModBlocks.ORANGE_FACTORY_MESH_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> RED_FACTORY_MESH = ITEMS.register("red_factory_mesh",
+            () -> new BlockItem(ModBlocks.RED_FACTORY_MESH.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> RED_FACTORY_MESH_STAIRS = ITEMS.register("red_factory_mesh_stairs",
+            () -> new BlockItem(ModBlocks.RED_FACTORY_MESH_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> RED_FACTORY_MESH_SLAB = ITEMS.register("red_factory_mesh_slab",
+            () -> new BlockItem(ModBlocks.RED_FACTORY_MESH_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> RED_FACTORY_MESH_WALL = ITEMS.register("red_factory_mesh_wall",
+            () -> new BlockItem(ModBlocks.RED_FACTORY_MESH_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> YELLOW_FACTORY_MESH = ITEMS.register("yellow_factory_mesh",
+            () -> new BlockItem(ModBlocks.YELLOW_FACTORY_MESH.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> YELLOW_FACTORY_MESH_STAIRS = ITEMS.register("yellow_factory_mesh_stairs",
+            () -> new BlockItem(ModBlocks.YELLOW_FACTORY_MESH_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> YELLOW_FACTORY_MESH_SLAB = ITEMS.register("yellow_factory_mesh_slab",
+            () -> new BlockItem(ModBlocks.YELLOW_FACTORY_MESH_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> YELLOW_FACTORY_MESH_WALL = ITEMS.register("yellow_factory_mesh_wall",
+            () -> new BlockItem(ModBlocks.YELLOW_FACTORY_MESH_WALL.get(), createBlockItemProperties()));
 
+    public static final RegistryObject<Item> PACKED_MUD = ITEMS.register("packed_mud",
+            () -> new BlockItem(ModBlocks.PACKED_MUD.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PACKED_MUD_STAIRS = ITEMS.register("packed_mud_stairs",
+            () -> new BlockItem(ModBlocks.PACKED_MUD_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PACKED_MUD_SLAB = ITEMS.register("packed_mud_slab",
+            () -> new BlockItem(ModBlocks.PACKED_MUD_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PACKED_MUD_WALL = ITEMS.register("packed_mud_wall",
+            () -> new BlockItem(ModBlocks.PACKED_MUD_WALL.get(), createBlockItemProperties()));
+
+    public static final RegistryObject<Item> MUD_BRICKS = ITEMS.register("mud_bricks",
+            () -> new BlockItem(ModBlocks.MUD_BRICKS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> MUD_BRICK_STAIRS = ITEMS.register("mud_brick_stairs",
+            () -> new BlockItem(ModBlocks.MUD_BRICK_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> MUD_BRICK_SLAB = ITEMS.register("mud_brick_slab",
+            () -> new BlockItem(ModBlocks.MUD_BRICK_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> MUD_BRICK_WALL = ITEMS.register("mud_brick_wall",
+            () -> new BlockItem(ModBlocks.MUD_BRICK_WALL.get(), createBlockItemProperties()));
+
+    public static final RegistryObject<Item> ANCIENT_ASHEN_SCROLL = ITEMS.register("ancient_ashen_scroll",
+            () -> new Item(new Item.Properties().tab(BuildScape.BUILDSCAPE_TAB).durability(100)));
+
+}

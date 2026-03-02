@@ -14,6 +14,11 @@ public class ModSlabBlock extends SlabBlock {
     @SuppressWarnings("unused")
     private final RegistryObject<?> dropItem;
 
+    public ModSlabBlock(BlockBehaviour.Properties properties) {
+        super(properties);
+        this.dropItem = null;
+    }
+
     public ModSlabBlock(
             BlockBehaviour.Properties properties,
             RegistryObject<?> dropItem

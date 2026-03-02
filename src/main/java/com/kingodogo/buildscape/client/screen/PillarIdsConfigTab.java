@@ -365,42 +365,51 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
     }
 
     private int[] computeColumns(int tableWidth) {
-        int columnGap = getColumnGap();
-        int checkboxWidth = BuildScapeConfigScreen.scaleSize(20); // Space for selection checkbox
-        int usable = tableWidth - columnGap * 5 - checkboxWidth; // 5 gaps + checkbox column
+        // Reserve space for scrollbar (always visible in layout calculations)
+        int scrollbarWidth = BuildScapeConfigScreen.scaleSize(8);
+        int scrollbarPadding = BuildScapeConfigScreen.scaleSize(4);
+        int availableWidth = tableWidth - scrollbarWidth - scrollbarPadding;
 
-        // Minimum widths for readability at all scales
-        int minCheckboxWidth = checkboxWidth;
-        int minIdWidth = BuildScapeConfigScreen.scaleSize(90);
-        int minItemWidth = BuildScapeConfigScreen.scaleSize(64); // Fits base pillar box + displayed item box + gap
-        int minColorsWidth = BuildScapeConfigScreen.scaleSize(100);
-        int minDimensionWidth = BuildScapeConfigScreen.scaleSize(110);
-        int minCoordsWidth = BuildScapeConfigScreen.scaleSize(160);
+        // Item column width: Ensure at least 42px for two 16px items + gaps
+        // We use scaleSize(54) as base but enforce a minimum of 42 units
+        int itemWidth = Math.max(42, BuildScapeConfigScreen.scaleSize(54));
 
-        // Desired proportions
-        int idWidth = Math.max(minIdWidth, (int) (usable * 0.16f));
-        int itemWidth = minItemWidth; // Fixed width for item column
-        int colorsWidth = Math.max(minColorsWidth, (int) (usable * 0.24f));
-        int dimensionWidth = Math.max(minDimensionWidth, (int) (usable * 0.20f));
-        int coordsWidth = Math.max(minCoordsWidth, usable - idWidth - itemWidth - colorsWidth - dimensionWidth);
+        // Calculate remaining width for percentage-based columns
+        int remainingWidth = availableWidth - itemWidth;
 
-        // Scale down if total exceeds usable
-        int totalUsed = idWidth + itemWidth + colorsWidth + dimensionWidth + coordsWidth;
-        if (totalUsed > usable) {
-            int excess = totalUsed - usable;
-            float reducible = (idWidth - minIdWidth) + (colorsWidth - minColorsWidth) + (dimensionWidth - minDimensionWidth);
-            if (reducible > 0) {
-                float factor = Math.min(1.0f, (float) excess / reducible);
-                idWidth -= (int) ((idWidth - minIdWidth) * factor);
-                colorsWidth -= (int) ((colorsWidth - minColorsWidth) * factor);
-                dimensionWidth -= (int) ((dimensionWidth - minDimensionWidth) * factor);
-            }
-            coordsWidth = usable - idWidth - itemWidth - colorsWidth - dimensionWidth;
-        } else {
-            coordsWidth = usable - idWidth - itemWidth - colorsWidth - dimensionWidth;
-        }
+        // Define column percentages for remaining columns (total must be 100%)
+        // Adjusted percentages to balance the extra space given to the item column
+        double leftMarginPercent = 0.2;  // Gap from bounding box
+        double gapPercent = 0.5;         // Gap between columns
+        double checkboxPercent = 3.5;    // Checkbox column
+        double idPercent = 17.5;         // ID column
+        double colorsPercent = 21.0;     // Color swatches column
+        double dimensionPercent = 14.8;  // Dimension column
+        double coordsPercent = 20.5;     // Coordinates column (reduced slightly)
 
-        return new int[]{minCheckboxWidth, idWidth, itemWidth, colorsWidth, dimensionWidth, coordsWidth};
+        // Total gaps: 5 gaps * 0.5% = 2.5%
+        double totalGapPercent = gapPercent * 5;
+
+        // Verify total equals 100%
+        double totalPercent = leftMarginPercent + checkboxPercent + idPercent +
+                colorsPercent + dimensionPercent + coordsPercent + totalGapPercent;
+
+        // Calculate actual widths from percentages using remaining width
+        int leftMargin = (int) (remainingWidth * leftMarginPercent / 100.0);
+        int gap = (int) (remainingWidth * gapPercent / 100.0);
+        int checkboxWidth = (int) (remainingWidth * checkboxPercent / 100.0);
+        int idWidth = (int) (remainingWidth * idPercent / 100.0);
+        int colorsWidth = (int) (remainingWidth * colorsPercent / 100.0);
+        int dimensionWidth = (int) (remainingWidth * dimensionPercent / 100.0);
+        int coordsWidth = (int) (remainingWidth * coordsPercent / 100.0);
+
+        // Adjust coords to fill any remaining space from rounding
+        int totalCalculated = leftMargin + checkboxWidth + gap + idWidth + gap + itemWidth + gap +
+                colorsWidth + gap + dimensionWidth + gap + coordsWidth;
+        int remainder = availableWidth - totalCalculated;
+        coordsWidth += remainder;
+
+        return new int[]{leftMargin, checkboxWidth, idWidth, itemWidth, colorsWidth, dimensionWidth, coordsWidth, gap};
     }
 
     private void positionButtons(int contentX, int contentY, int contentWidth) {
@@ -410,7 +419,8 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
         int topMargin = BuildScapeConfigScreen.scaleSize(4);
 
         int y = contentY + topMargin;
-        int x = contentX; // Start x for buttons
+        int buttonInset = getTableMargin(); // Offset buttons so they don't sit on the bounding box
+        int x = contentX + buttonInset; // Start x for buttons
 
         // Reload button on the far left
         reloadButton.x = x;
@@ -433,7 +443,7 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
         applyButton.setHeight(buttonHeight);
 
         // Remove All button on the far right
-        removeAllButton.x = contentX + contentWidth - buttonWidth;
+        removeAllButton.x = contentX + contentWidth - buttonWidth - buttonInset;
         removeAllButton.y = y;
         removeAllButton.setWidth(buttonWidth);
         removeAllButton.setHeight(buttonHeight);
@@ -466,6 +476,8 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
         int tableHeight = contentHeight - buttonAreaHeight - statusAreaHeight;
 
         int[] columns = computeColumns(tableWidth);
+        int colGap = columns[7]; // Gap is now at index 7
+
         // Add extra spacing between header and content for better visual separation
         int headerSpacing = BuildScapeConfigScreen.scaleSize(16);
         int rowsStartY = tableY + headerHeight + headerSpacing;
@@ -477,7 +489,9 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
         }
         // Calculate available height for rows (from rowsStartY to bottom of content)
         int availableRowHeight = tableHeight - headerHeight - headerSpacing;
-        maxScroll = Math.max(0, visibleRows * rowHeight - availableRowHeight);
+        // 0.2% of screen height gap between rows
+        int rowGapForScroll = Math.max(1, (int) (Minecraft.getInstance().getWindow().getGuiScaledHeight() * 0.002));
+        maxScroll = Math.max(0, visibleRows * (rowHeight + rowGapForScroll) - availableRowHeight);
         scrollOffset = Mth.clamp(scrollOffset, 0, maxScroll);
 
         // Header background - removed
@@ -485,15 +499,14 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
         // HEADER_HEIGHT, 0xFF5E8C1A);
         // Table border removed
         // drawTableBorder(poseStack, tableX, tableY, tableWidth, tableHeight);
-        drawHeader(poseStack, tableX, tableY, columns);
+        drawHeader(poseStack, tableX, tableY, columns, colGap);
 
         // Calculate actual table width from columns for scrollbar positioning
         int actualTableWidth = 0;
-        for (int col : columns) {
-            actualTableWidth += col;
+        for (int i = 0; i < 7; i++) { // Sum first 7 columns (leftMargin through coordsWidth, not gap)
+            actualTableWidth += columns[i];
         }
-        int colGap = getColumnGap();
-        actualTableWidth += colGap * 5; // 5 gaps now (added item column)
+        actualTableWidth += colGap * 5; // 5 gaps between 6 content columns
 
         // Enable scissoring to prevent rows from rendering above the header or below
         // the visible area
@@ -524,10 +537,12 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
         // Rows - render all visible rows within the scissor area
         int rowIndex = 0;
         int visibleAreaBottom = rowsStartY + scissorHeight; // Bottom of visible area
+        // 0.2% of screen height gap between rows
+        int rowGap = Math.max(1, (int) (Minecraft.getInstance().getWindow().getGuiScaledHeight() * 0.002));
         for (PillarRow row : rows) {
             if (!row.visible)
                 continue;
-            int rowY = rowsStartY + rowIndex * rowHeight - (int) scrollOffset;
+            int rowY = rowsStartY + rowIndex * (rowHeight + rowGap) - (int) scrollOffset;
 
             // Only skip rows that are completely outside the visible area
             // Allow rows that are partially visible (even if bottom is cut off, we want to
@@ -553,10 +568,17 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
             int scrollbarY = rowsStartY;
             int scrollbarHeight = availableRowHeight;
 
-            double visibleRatio = (double) availableRowHeight / (visibleRows * rowHeight);
+            double visibleRatio = (double) availableRowHeight / (visibleRows * (rowHeight + rowGapForScroll));
             scrollbarRenderer.renderScrollbar(poseStack, scrollbarX, scrollbarY, scrollbarHeight,
                     scrollOffset, maxScroll, visibleRatio);
         }
+
+        // Draw 1px border around the entire panel (matching other tabs)
+        int borderColor = 0xFF666666;
+        GuiComponent.fill(poseStack, contentX, contentY, contentX + contentWidth, contentY + 1, borderColor); // Top
+        GuiComponent.fill(poseStack, contentX, contentY + contentHeight - 1, contentX + contentWidth, contentY + contentHeight, borderColor); // Bottom
+        GuiComponent.fill(poseStack, contentX, contentY, contentX + 1, contentY + contentHeight, borderColor); // Left
+        GuiComponent.fill(poseStack, contentX + contentWidth - 1, contentY, contentX + contentWidth, contentY + contentHeight, borderColor); // Right
 
         // Status text
         int statusY = contentY + contentHeight - BuildScapeConfigScreen.scaleSize(14);
@@ -569,49 +591,98 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
     }
 
 
-    private void drawHeader(PoseStack poseStack, int tableX, int tableY, int[] columns) {
+    private void drawHeader(PoseStack poseStack, int tableX, int tableY, int[] columns, int columnGap) {
         int x = tableX;
         int headerColor = 0xFFCCCCCC; // Light silver text for table headers instead of pure white
         int headerHeight = getHeaderHeight();
-        int columnGap = getColumnGap();
         Minecraft mc = Minecraft.getInstance();
         int fontHeight = mc.font.lineHeight;
-        int textPadding = BuildScapeConfigScreen.scaleSize(8);
+        int textPadding = BuildScapeConfigScreen.scaleSize(10); // Increased padding for better spacing
 
         // Calculate exact mathematical center for vertical text alignment using standard bounds
         int headerTextY = tableY + (headerHeight - fontHeight) / 2 + 1; // +1 to visually snap 'p' descending letters
 
+        // Apply left margin (1% gap from left panel)
+        x += columns[0]; // leftMargin at index 0
+
         // Checkbox column (No bounding cell rendered, just position the interactive Master Checkbox)
         int checkboxSize = BuildScapeConfigScreen.scaleSize(14);
-        headerSelectAllCheckbox.x = x + (columns[0] - checkboxSize) / 2;
+        headerSelectAllCheckbox.x = x + (columns[1] - checkboxSize) / 2;
         headerSelectAllCheckbox.y = tableY + (headerHeight - checkboxSize) / 2;
         headerSelectAllCheckbox.setWidth(checkboxSize);
         headerSelectAllCheckbox.setHeight(checkboxSize);
         headerSelectAllCheckbox.renderButton(poseStack, 0, 0, 0); // Active rendering
-        x += columns[0] + columnGap;
+        x += columns[1] + columnGap; // checkboxWidth at index 1
 
-        drawCell(poseStack, x, tableY, columns[1], headerHeight, true);
+        drawCell(poseStack, x, tableY, columns[2], headerHeight, true);
         Component idText = new TranslatableComponent("buildscape.config.ids.id");
-        mc.font.draw(poseStack, idText, x + textPadding, headerTextY, headerColor);
-        x += columns[1] + columnGap;
+        // Scale text to fit within column width if needed
+        String idTextStr = idText.getString();
+        int maxIdHeaderWidth = columns[2] - textPadding * 2;
+        int idHeaderTextWidth = mc.font.width(idTextStr);
+        if (idHeaderTextWidth > maxIdHeaderWidth) {
+            poseStack.pushPose();
+            float scale = (float) maxIdHeaderWidth / (float) idHeaderTextWidth;
+            poseStack.scale(scale, scale, 1.0f);
+            mc.font.draw(poseStack, idTextStr, (x + textPadding) / scale, headerTextY / scale, headerColor);
+            poseStack.popPose();
+        } else {
+            mc.font.draw(poseStack, idTextStr, x + textPadding, headerTextY, headerColor);
+        }
+        x += columns[2] + columnGap; // idWidth at index 2
 
         // Item column (NEW)
-        drawCell(poseStack, x, tableY, columns[2], headerHeight, true);
-        Component itemText = new TranslatableComponent("buildscape.config.ids.item");
-        int itemTextWidth = mc.font.width(itemText);
-        // Center text horizontally in header cell
-        mc.font.draw(poseStack, itemText, x + (columns[2] - itemTextWidth) / 2, headerTextY, headerColor);
-        x += columns[2] + columnGap;
-
         drawCell(poseStack, x, tableY, columns[3], headerHeight, true);
-        Component colorsText = new TranslatableComponent("buildscape.config.ids.colors");
-        mc.font.draw(poseStack, colorsText, x + textPadding, headerTextY, headerColor);
-        x += columns[3] + columnGap;
+        Component itemText = new TranslatableComponent("buildscape.config.ids.item");
+        String itemTextStr = itemText.getString();
+        int maxItemHeaderWidth = columns[3] - textPadding * 2;
+        int itemTextWidth = mc.font.width(itemTextStr);
+        int itemCenterX = x + (columns[3] - itemTextWidth) / 2;
+        if (itemTextWidth > maxItemHeaderWidth) {
+            poseStack.pushPose();
+            float scale = (float) maxItemHeaderWidth / (float) itemTextWidth;
+            poseStack.scale(scale, scale, 1.0f);
+            // Re-center after scaling
+            int scaledWidth = (int) (itemTextWidth * scale);
+            itemCenterX = x + (columns[3] - scaledWidth) / 2;
+            mc.font.draw(poseStack, itemTextStr, itemCenterX / scale, headerTextY / scale, headerColor);
+            poseStack.popPose();
+        } else {
+            mc.font.draw(poseStack, itemTextStr, itemCenterX, headerTextY, headerColor);
+        }
+        x += columns[3] + columnGap; // itemWidth at index 3
 
         drawCell(poseStack, x, tableY, columns[4], headerHeight, true);
+        Component colorsText = new TranslatableComponent("buildscape.config.ids.colors");
+        String colorsTextStr = colorsText.getString();
+        int maxColorsHeaderWidth = columns[4] - textPadding * 2;
+        int colorsHeaderTextWidth = mc.font.width(colorsTextStr);
+        if (colorsHeaderTextWidth > maxColorsHeaderWidth) {
+            poseStack.pushPose();
+            float scale = (float) maxColorsHeaderWidth / (float) colorsHeaderTextWidth;
+            poseStack.scale(scale, scale, 1.0f);
+            mc.font.draw(poseStack, colorsTextStr, (x + textPadding) / scale, headerTextY / scale, headerColor);
+            poseStack.popPose();
+        } else {
+            mc.font.draw(poseStack, colorsTextStr, x + textPadding, headerTextY, headerColor);
+        }
+        x += columns[4] + columnGap; // colorsWidth at index 4
+
+        drawCell(poseStack, x, tableY, columns[5], headerHeight, true);
         Component dimensionText = new TranslatableComponent("buildscape.config.ids.dimension");
-        mc.font.draw(poseStack, dimensionText, x + textPadding, headerTextY, headerColor);
-        x += columns[4] + columnGap;
+        String dimensionTextStr = dimensionText.getString();
+        int maxDimensionHeaderWidth = columns[5] - textPadding * 2;
+        int dimensionHeaderTextWidth = mc.font.width(dimensionTextStr);
+        if (dimensionHeaderTextWidth > maxDimensionHeaderWidth) {
+            poseStack.pushPose();
+            float scale = (float) maxDimensionHeaderWidth / (float) dimensionHeaderTextWidth;
+            poseStack.scale(scale, scale, 1.0f);
+            mc.font.draw(poseStack, dimensionTextStr, (x + textPadding) / scale, headerTextY / scale, headerColor);
+            poseStack.popPose();
+        } else {
+            mc.font.draw(poseStack, dimensionTextStr, x + textPadding, headerTextY, headerColor);
+        }
+        x += columns[5] + columnGap; // dimensionWidth at index 5
 
         // Coordinates column - draw X, Y, Z separately aligned to their fields
         // (No drawCell bounding box, coordinates contain their own nested black border)
@@ -619,15 +690,15 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
         // Calculate positions to match the coordinate fields below
         int coordPadding = BuildScapeConfigScreen.scaleSize(8);
         int coordGap = BuildScapeConfigScreen.scaleSize(8);
-        int coordUsable = columns[5] - coordPadding * 2 - coordGap * 2;
+        int coordUsable = columns[6] - coordPadding * 2 - coordGap * 2; // coordsWidth at index 6
         int minCoordWidth = BuildScapeConfigScreen.scaleSize(40);
         int coordWidth = Math.max(minCoordWidth, coordUsable / 3);
 
         // Adjust if needed
         int totalNeeded = coordPadding * 2 + coordWidth * 3 + coordGap * 2;
-        if (totalNeeded > columns[5]) {
+        if (totalNeeded > columns[6]) {
             coordGap = Math.max(BuildScapeConfigScreen.scaleSize(4),
-                    (columns[5] - coordPadding * 2 - coordWidth * 3) / 2);
+                    (columns[6] - coordPadding * 2 - coordWidth * 3) / 2);
         }
 
         // Draw X, Y, Z labels centered in their respective columns
@@ -739,6 +810,7 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
             int tableHeight = contentHeight - buttonAreaHeight - statusAreaHeight;
 
             int[] columns = computeColumns(tableWidth);
+            int colGap = columns[7]; // Gap at index 7
             int headerSpacing = BuildScapeConfigScreen.scaleSize(16);
             int rowsStartY = tableY + headerHeight + headerSpacing;
 
@@ -746,11 +818,10 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
 
             // Calculate actual table width for scrollbar interaction
             int actualTableWidth = 0;
-            for (int col : columns) {
-                actualTableWidth += col;
+            for (int i = 0; i < 7; i++) { // Sum first 7 columns (leftMargin through coordsWidth)
+                actualTableWidth += columns[i];
             }
-            int colGap = getColumnGap();
-            actualTableWidth += colGap * 4;
+            actualTableWidth += colGap * 5; // 5 gaps between 6 content columns
 
             int scrollbarX = tableX + actualTableWidth + BuildScapeConfigScreen.scaleSize(4);
             int scrollbarY = rowsStartY;
@@ -1102,6 +1173,7 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
                     if (item != null) {
                         this.pillarTypeStack = new net.minecraft.world.item.ItemStack(item);
                     }
+                    // Don't fallback to vanilla item_frame - colored frames should show their actual color
                 } catch (Exception ignored) {
                 }
             }
@@ -1215,6 +1287,23 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
         private void apply(PillarIdManager.PillarData data) {
             this.id = data.id;
             idField.setValue(data.id != null ? data.id : "");
+
+            // Load pillar type icon from manager data
+            if (data.pillarType != null && !data.pillarType.isEmpty()) {
+                try {
+                    net.minecraft.resources.ResourceLocation key = new net.minecraft.resources.ResourceLocation(data.pillarType);
+                    net.minecraft.world.item.Item item = net.minecraftforge.registries.ForgeRegistries.ITEMS.getValue(key);
+                    if (item != null) {
+                        this.pillarTypeStack = new net.minecraft.world.item.ItemStack(item);
+                    } else {
+                        this.pillarTypeStack = net.minecraft.world.item.ItemStack.EMPTY;
+                    }
+                } catch (Exception e) {
+                    this.pillarTypeStack = net.minecraft.world.item.ItemStack.EMPTY;
+                }
+            } else {
+                this.pillarTypeStack = net.minecraft.world.item.ItemStack.EMPTY;
+            }
 
             // Load displayed item from data
             if (data.displayedItem != null && !data.displayedItem.isEmpty()) {
@@ -1349,15 +1438,18 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
 
         private void render(PoseStack poseStack, int startX, int rowY, int[] columns) {
             int rowHeight = PillarIdsConfigTab.this.getRowHeight();
-            int columnGap = PillarIdsConfigTab.this.getColumnGap();
+            int columnGap = columns[7]; // Gap is at index 7
             int padding = BuildScapeConfigScreen.scaleSize(8);
             int editBoxHeight = BuildScapeConfigScreen.getScaledEditBoxHeight();
             Minecraft mc = Minecraft.getInstance();
             int fontHeight = mc.font.lineHeight;
 
             // Calculate total row width (for layout purposes only, no border drawn)
-            int totalRowWidth = columns[0] + columnGap + columns[1] + columnGap + columns[2] + columnGap + columns[3]
-                    + columnGap + columns[4] + columnGap + columns[5];
+            int totalRowWidth = 0;
+            for (int i = 0; i < 7; i++) { // Sum leftMargin through coordsWidth
+                totalRowWidth += columns[i];
+            }
+            totalRowWidth += columnGap * 5; // 5 gaps between 6 content columns
 
             // Calculate EXACT center Y position for all elements - use ONE calculation for
             // EVERYTHING
@@ -1388,46 +1480,79 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
 
             int x = startX;
 
+            // Apply left margin (1% gap from left panel) - matches header
+            x += columns[0]; // leftMargin at index 0
+
             // Checkbox column - perfectly centered vertically (No bounding cell rendered)
-            selectCheckbox.x = x + (columns[0] - checkboxSize) / 2;
+            selectCheckbox.x = x + (columns[1] - checkboxSize) / 2;
             selectCheckbox.y = checkboxCenterY; // Use calculated center for checkbox
             selectCheckbox.setWidth(checkboxSize);
             selectCheckbox.setHeight(checkboxSize);
             selectCheckbox.renderButton(poseStack, 0, 0, 0);
-            x += columns[0] + columnGap;
+            x += columns[1] + columnGap;
 
             // ID column - perfectly centered
-            drawCell(poseStack, x, rowY, columns[1], rowHeight, false);
+            drawCell(poseStack, x, rowY, columns[2], rowHeight, false);
             // Render Pillar ID EditBox background
             idField.x = x + padding;
             idField.y = centerY;
-            idField.setWidth(columns[1] - padding * 2);
+            idField.setWidth(columns[2] - padding * 2);
             // Clear text temporarily to draw it directly for alignment
             String idValue = idField.getValue();
             idField.setValue("");
             idField.render(poseStack, 0, 0, 0);
             idField.setValue(idValue);
-            // Draw Pillar ID text directly using the textY calculated at the top
-            int idTextX = x + padding;
-            mc.font.draw(poseStack, idValue, idTextX, textY, 0xFFFFFFFF);
-            x += columns[1] + columnGap;
+            // Draw Pillar ID text with scaling if too long to fit in column
+            int maxIdWidth = columns[2] - padding * 2 - BuildScapeConfigScreen.scaleSize(4);
+            int idTextWidth = mc.font.width(idValue);
+            int idTextX = x + padding + BuildScapeConfigScreen.scaleSize(2);
 
-            // Item column (NEW) - Full height box like other columns
-            drawCell(poseStack, x, rowY, columns[2], rowHeight, false);
+            if (idTextWidth > maxIdWidth) {
+                // Scale down text to fit
+                poseStack.pushPose();
+                float scale = (float) maxIdWidth / (float) idTextWidth;
+                poseStack.scale(scale, scale, 1.0f);
+                // Adjust position for scaled text
+                float scaledX = idTextX / scale;
+                float scaledY = textY / scale;
+                mc.font.draw(poseStack, idValue, scaledX, scaledY, 0xFFFFFFFF);
+                poseStack.popPose();
+            } else {
+                mc.font.draw(poseStack, idValue, idTextX, textY, 0xFFFFFFFF);
+            }
+            x += columns[2] + columnGap;
 
+            // Item column - items are NEVER scaled, always 16x16, must fit within column
+            drawCell(poseStack, x, rowY, columns[3], rowHeight, false);
+
+            // Items are always rendered at their native 16x16 size
             int iconSize = 16;
             boolean hasType = pillarTypeStack != null && !pillarTypeStack.isEmpty();
             boolean hasItem = displayedItem != null && !displayedItem.isEmpty();
 
             if (hasType || hasItem) {
-                int spacing = BuildScapeConfigScreen.scaleSize(4);
-                int totalWidth = (hasType ? iconSize : 0) + (hasItem ? iconSize : 0) + (hasType && hasItem ? spacing : 0);
-                int renderX = x + (columns[2] - totalWidth) / 2;
+                // Use gaps between items
+                int itemGap = BuildScapeConfigScreen.scaleSize(3);  // Gap between items
+
+                // Calculate total width needed for items (no edge gaps, will center instead)
+                int itemCount = (hasType ? 1 : 0) + (hasItem ? 1 : 0);
+                int totalItemsWidth = itemCount * iconSize + (itemCount > 1 ? itemGap : 0);
+
+                // Center items within column, but shift left by 1px to add more space on right side
+                int availableItemWidth = columns[3];
+                int itemStartX = x + (availableItemWidth - totalItemsWidth) / 2 - 1;
+
+                // Ensure we don't go negative or too far right
+                itemStartX = Math.max(x + 2, Math.min(itemStartX, x + availableItemWidth - totalItemsWidth - 2));
+
+                int renderX = itemStartX;
                 int renderY = rowY + (rowHeight - iconSize) / 2;
 
                 if (hasType) {
                     mc.getItemRenderer().renderGuiItem(pillarTypeStack, renderX, renderY);
-                    renderX += iconSize + spacing;
+                    if (hasItem) {
+                        renderX += iconSize + itemGap; // Add item gap only if there's a second item
+                    }
                 }
 
                 if (hasItem) {
@@ -1435,35 +1560,55 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
                     mc.getItemRenderer().renderGuiItemDecorations(mc.font, displayedItem, renderX, renderY);
                 }
             }
-            x += columns[2] + columnGap;
-
-            // Colors column - perfectly centered
-            drawCell(poseStack, x, rowY, columns[3], rowHeight, false);
-            // Render color swatches - perfectly centered vertically
-            int swatchSpacing = BuildScapeConfigScreen.scaleSize(4);
-            int swatchStartX = x + padding;
-            for (int i = 0; i < colorSwatches.size(); i++) {
-                ColorSwatchButton swatch = colorSwatches.get(i);
-                swatch.x = swatchStartX + i * (swatchSize + swatchSpacing);
-                swatch.y = swatchCenterY; // Use calculated center for swatches
-                swatch.setWidth(swatchSize);
-                swatch.setHeight(swatchSize);
-                swatch.renderButton(poseStack, 0, 0, 0);
-            }
             x += columns[3] + columnGap;
 
-            // Dimension column - perfectly centered
+            // Colors column - swatches must fit within column bounds
             drawCell(poseStack, x, rowY, columns[4], rowHeight, false);
-            // Format dimension name for display (remove modid prefix like "minecraft:" and
-            // show full name)
+            // Render color swatches - scale to fit and left-align with padding
+            int swatchSpacing = BuildScapeConfigScreen.scaleSize(2);
+            int availableColorWidth = columns[4] - padding * 2;
+            int numSwatches = colorSwatches.size();
+
+            if (numSwatches > 0) {
+                // Calculate maximum swatch size that fits within available width
+                int maxSwatchSize = (availableColorWidth - (numSwatches - 1) * swatchSpacing) / numSwatches;
+                // Clamp to minimum size and rowHeight
+                int finalSwatchSize = Math.max(8, Math.min(maxSwatchSize, rowHeight - padding * 2));
+
+                // Ensure swatches actually fit
+                int totalSwatchWidth = numSwatches * finalSwatchSize + (numSwatches - 1) * swatchSpacing;
+                if (totalSwatchWidth > availableColorWidth) {
+                    // Recalculate to definitely fit
+                    finalSwatchSize = (availableColorWidth - (numSwatches - 1) * swatchSpacing) / numSwatches;
+                }
+
+                // Left-align with padding to ensure they stay within column
+                int swatchStartX = x + padding;
+                // Center vertically
+                int swatchY = rowY + (rowHeight - finalSwatchSize) / 2;
+
+                for (int i = 0; i < colorSwatches.size(); i++) {
+                    ColorSwatchButton swatch = colorSwatches.get(i);
+                    swatch.x = swatchStartX + i * (finalSwatchSize + swatchSpacing);
+                    swatch.y = swatchY;
+                    swatch.setWidth(finalSwatchSize);
+                    swatch.setHeight(finalSwatchSize);
+                    swatch.renderButton(poseStack, 0, 0, 0);
+                }
+            }
+            x += columns[4] + columnGap;
+
+            // Dimension column - perfectly centered
+            drawCell(poseStack, x, rowY, columns[5], rowHeight, false);
+            // Format dimension name for display (remove modid prefix like "minecraft:" and show full name)
             String originalDimension = dimensionField.getValue();
             String displayDimension = formatDimensionName(originalDimension);
 
             // Render dimension EditBox background (no text)
             dimensionField.x = x + padding;
             dimensionField.y = centerY; // Use EXACT same centerY as all other EditBoxes
-            int dimensionWidth = columns[4] - padding * 2;
-            dimensionField.setWidth(Math.max(dimensionWidth, BuildScapeConfigScreen.scaleSize(100)));
+            int dimensionWidth = columns[5] - padding * 2;
+            dimensionField.setWidth(dimensionWidth);
 
             // Temporarily clear text to draw formatted version
             String tempValue = dimensionField.getValue();
@@ -1471,36 +1616,40 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
             dimensionField.render(poseStack, 0, 0, 0);
             dimensionField.setValue(tempValue);
 
-            // Draw formatted dimension text directly using SAME textY as all other text
-            int dimTextWidth = mc.font.width(displayDimension);
+            // Draw formatted dimension text - scale down if needed to fit
             int maxDimWidth = dimensionWidth - BuildScapeConfigScreen.scaleSize(4);
-            String finalDimText = displayDimension;
+            int dimTextWidth = mc.font.width(displayDimension);
+            int dimTextX = x + padding + BuildScapeConfigScreen.scaleSize(2);
+
             if (dimTextWidth > maxDimWidth) {
-                // Truncate with ellipsis if too long
-                finalDimText = mc.font.plainSubstrByWidth(displayDimension, maxDimWidth - mc.font.width("...")) + "...";
-                dimTextWidth = mc.font.width(finalDimText);
+                // Scale down text to fit
+                poseStack.pushPose();
+                float scale = (float) maxDimWidth / (float) dimTextWidth;
+                poseStack.scale(scale, scale, 1.0f);
+                mc.font.draw(poseStack, displayDimension, dimTextX / scale, textY / scale, 0xFFFFFFFF);
+                poseStack.popPose();
+            } else {
+                mc.font.draw(poseStack, displayDimension, dimTextX, textY, 0xFFFFFFFF);
             }
-            int dimTextX = x + padding; // Left-aligned cleanly instead of centered
-            mc.font.draw(poseStack, finalDimText, dimTextX, textY, 0xFFFFFFFF);
-            x += columns[4] + columnGap;
+            x += columns[5] + columnGap;
 
             // Coordinates column - perfectly centered with border
             // (No drawCell bounding box, coordinates contain their own nested black border)
 
             // Improved coordinate alignment - ensure consistent spacing with proper scaling
-            int coordPadding = BuildScapeConfigScreen.scaleSize(8);
-            int coordGap = BuildScapeConfigScreen.scaleSize(8);
-            int coordUsable = columns[5] - coordPadding * 2 - coordGap * 2;
+            int coordPadding = BuildScapeConfigScreen.scaleSize(4);
+            int coordGap = BuildScapeConfigScreen.scaleSize(4);
+            int coordUsable = columns[6] - coordPadding * 2 - coordGap * 2;
 
-            // Ensure minimum width per coordinate field
-            int minCoordWidth = BuildScapeConfigScreen.scaleSize(40);
+            // Ensure minimum width per coordinate field (reduced since text is smaller)
+            int minCoordWidth = BuildScapeConfigScreen.scaleSize(28);
             int coordWidth = Math.max(minCoordWidth, coordUsable / 3);
 
             // If total width exceeds available space, reduce gap
             int totalNeeded = coordPadding * 2 + coordWidth * 3 + coordGap * 2;
-            if (totalNeeded > columns[5]) {
+            if (totalNeeded > columns[6]) {
                 coordGap = Math.max(BuildScapeConfigScreen.scaleSize(4),
-                        (columns[5] - coordPadding * 2 - coordWidth * 3) / 2);
+                        (columns[6] - coordPadding * 2 - coordWidth * 3) / 2);
             }
 
             // Calculate positions for coordinate fields
@@ -1561,19 +1710,68 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
             zField.setWidth(coordWidth);
 
             // Draw coordinate text directly with colors using SAME textY as all other text
-            // Center text horizontally within each coordinate field
+            // Apply a smaller base scale to coordinate text to make it more compact
+            // Center text horizontally within each coordinate field and scale if needed
             String xValue = xField.getValue();
             String yValue = yField.getValue();
             String zValue = zField.getValue();
 
-            int xTextX = xFieldX + (coordWidth - mc.font.width(xValue)) / 2;
-            int yTextX = yFieldX + (coordWidth - mc.font.width(yValue)) / 2;
-            int zTextX = zFieldX + (coordWidth - mc.font.width(zValue)) / 2;
+            float baseCoordScale = 0.75f; // Make coordinates smaller (75% of original size)
+            int maxCoordTextWidth = coordWidth - BuildScapeConfigScreen.scaleSize(2);
 
-            // Draw colored coordinate text directly
-            mc.font.draw(poseStack, xValue, xTextX, textY, 0xFFFF0000); // Red
-            mc.font.draw(poseStack, yValue, yTextX, textY, 0xFF5555FF); // Light Blue/Purple
-            mc.font.draw(poseStack, zValue, zTextX, textY, 0xFF00FF00); // Green
+            // X coordinate (Red)
+            poseStack.pushPose();
+            int xTextWidth = mc.font.width(xValue);
+            int scaledXTextWidth = (int) (xTextWidth * baseCoordScale);
+            int xTextX = xFieldX + (coordWidth - scaledXTextWidth) / 2;
+
+            if (scaledXTextWidth > maxCoordTextWidth) {
+                float additionalScale = (float) maxCoordTextWidth / (float) scaledXTextWidth;
+                float finalScale = baseCoordScale * additionalScale;
+                poseStack.scale(finalScale, finalScale, 1.0f);
+                int scaledTextX = xFieldX + (coordWidth - (int) (xTextWidth * finalScale)) / 2;
+                mc.font.draw(poseStack, xValue, scaledTextX / finalScale, textY / finalScale, 0xFFFF0000);
+            } else {
+                poseStack.scale(baseCoordScale, baseCoordScale, 1.0f);
+                mc.font.draw(poseStack, xValue, xTextX / baseCoordScale, textY / baseCoordScale, 0xFFFF0000);
+            }
+            poseStack.popPose();
+
+            // Y coordinate (Light Blue/Purple)
+            poseStack.pushPose();
+            int yTextWidth = mc.font.width(yValue);
+            int scaledYTextWidth = (int) (yTextWidth * baseCoordScale);
+            int yTextX = yFieldX + (coordWidth - scaledYTextWidth) / 2;
+
+            if (scaledYTextWidth > maxCoordTextWidth) {
+                float additionalScale = (float) maxCoordTextWidth / (float) scaledYTextWidth;
+                float finalScale = baseCoordScale * additionalScale;
+                poseStack.scale(finalScale, finalScale, 1.0f);
+                int scaledTextX = yFieldX + (coordWidth - (int) (yTextWidth * finalScale)) / 2;
+                mc.font.draw(poseStack, yValue, scaledTextX / finalScale, textY / finalScale, 0xFF5555FF);
+            } else {
+                poseStack.scale(baseCoordScale, baseCoordScale, 1.0f);
+                mc.font.draw(poseStack, yValue, yTextX / baseCoordScale, textY / baseCoordScale, 0xFF5555FF);
+            }
+            poseStack.popPose();
+
+            // Z coordinate (Green)
+            poseStack.pushPose();
+            int zTextWidth = mc.font.width(zValue);
+            int scaledZTextWidth = (int) (zTextWidth * baseCoordScale);
+            int zTextX = zFieldX + (coordWidth - scaledZTextWidth) / 2;
+
+            if (scaledZTextWidth > maxCoordTextWidth) {
+                float additionalScale = (float) maxCoordTextWidth / (float) scaledZTextWidth;
+                float finalScale = baseCoordScale * additionalScale;
+                poseStack.scale(finalScale, finalScale, 1.0f);
+                int scaledTextX = zFieldX + (coordWidth - (int) (zTextWidth * finalScale)) / 2;
+                mc.font.draw(poseStack, zValue, scaledTextX / finalScale, textY / finalScale, 0xFF00FF00);
+            } else {
+                poseStack.scale(baseCoordScale, baseCoordScale, 1.0f);
+                mc.font.draw(poseStack, zValue, zTextX / baseCoordScale, textY / baseCoordScale, 0xFF00FF00);
+            }
+            poseStack.popPose();
         }
 
         /**
@@ -1644,7 +1842,22 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
         }
 
         private boolean mouseClicked(double mouseX, double mouseY, int button) {
-            // Check if clicking on checkbox
+            // First check if mouse is over row vertically and within content area (exclude scrollbar)
+            if (!isMouseOverRow(mouseX, mouseY)) {
+                return false;
+            }
+
+            // Calculate actual content width (exclude scrollbar area)
+            int scrollbarWidth = BuildScapeConfigScreen.scaleSize(8);
+            int scrollbarPadding = BuildScapeConfigScreen.scaleSize(4);
+            int contentEndX = rowX + rowWidth - scrollbarWidth - scrollbarPadding;
+
+            // Ignore clicks on scrollbar area
+            if (mouseX >= contentEndX) {
+                return false;
+            }
+
+            // Check if clicking on checkbox - ONLY the checkbox toggles selection
             if (selectCheckbox != null && selectCheckbox.mouseClicked(mouseX, mouseY, button)) {
                 return true;
             }
@@ -1660,52 +1873,67 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
                 }
             }
 
-            // Check if clicking anywhere on the row (not just input fields)
-            boolean clickedOnRow = false;
-            // We'll check if mouse is over any part of the row by checking if it's over any
-            // field
+            // Check if clicking on interactive fields (swatches, dimension, coords)
+            // These handle their own click logic but do NOT toggle selection
+            boolean clickedOnField = false;
             for (ColorSwatchButton swatch : colorSwatches) {
-                clickedOnRow |= swatch.mouseClicked(mouseX, mouseY, button);
+                clickedOnField |= swatch.mouseClicked(mouseX, mouseY, button);
             }
-            clickedOnRow |= dimensionField.mouseClicked(mouseX, mouseY, button);
-            clickedOnRow |= xField.mouseClicked(mouseX, mouseY, button);
-            clickedOnRow |= yField.mouseClicked(mouseX, mouseY, button);
-            clickedOnRow |= zField.mouseClicked(mouseX, mouseY, button);
+            clickedOnField |= dimensionField.mouseClicked(mouseX, mouseY, button);
+            clickedOnField |= xField.mouseClicked(mouseX, mouseY, button);
+            clickedOnField |= yField.mouseClicked(mouseX, mouseY, button);
+            clickedOnField |= zField.mouseClicked(mouseX, mouseY, button);
 
-            // Also check if clicking anywhere on the row bounds (but not ID field)
-            if (!clickedOnRow && isMouseOverRow(mouseX, mouseY)) {
-                // Check if it's in the ID column area - use outer class method
-                int[] columns = PillarIdsConfigTab.this.computeColumns(rowWidth);
-                int columnGap = PillarIdsConfigTab.this.getColumnGap();
-                int idColumnStartX = rowX + columns[0] + columnGap; // Skip checkbox column
-                if (mouseX >= idColumnStartX && mouseX < idColumnStartX + columns[1]) {
-                    // Clicked in ID column but not on ID field - still open detail tab
-                    if (button == 0) {
-                        openPillarDetailTab(id);
-                        return true;
-                    }
-                }
-                clickedOnRow = true;
+            if (clickedOnField) {
+                return true; // Consumed by field, no selection toggle
             }
 
-            // If we get here, they clicked the row but not a specific field that handles it
-            if (button == 0 && clickedOnRow) {
-                selected = !selected;
+            // Get column positions to determine which column was clicked
+            int[] columns = PillarIdsConfigTab.this.computeColumns(rowWidth);
+            int columnGap = columns[7]; // Gap at index 7
+
+            // Calculate column X positions
+            int checkboxEndX = rowX + columns[0] + columns[1]; // leftMargin + checkbox
+            int idStartX = checkboxEndX + columnGap;
+            int idEndX = idStartX + columns[2];
+            int itemStartX = idEndX + columnGap;
+            int itemEndX = itemStartX + columns[3];
+            int colorStartX = itemEndX + columnGap;
+            int colorEndX = colorStartX + columns[4];
+            int dimStartX = colorEndX + columnGap;
+            int dimEndX = dimStartX + columns[5];
+            int coordsStartX = dimEndX + columnGap;
+            int coordsEndX = coordsStartX + columns[6];
+
+            // Only handle double-click if clicking on specific columns (ID, Item, Color, Dimension, Coords)
+            boolean clickedOnValidColumn =
+                    (mouseX >= idStartX && mouseX < idEndX) ||
+                            (mouseX >= itemStartX && mouseX < itemEndX) ||
+                            (mouseX >= colorStartX && mouseX < colorEndX) ||
+                            (mouseX >= dimStartX && mouseX < dimEndX) ||
+                            (mouseX >= coordsStartX && mouseX < coordsEndX);
+
+            if (!clickedOnValidColumn) {
+                return false; // Ignore clicks on checkbox column or gaps
             }
 
-            // Check for double-click on the row (for marking pillar)
-            if (button == 0 && clickedOnRow) { // Left click
+            // Check if it's in the ID column area - single click opens detail tab
+            if (mouseX >= idStartX && mouseX < idEndX && button == 0) {
+                openPillarDetailTab(id);
+                return true;
+            }
+
+            // Double-click on valid columns for marking pillar in world
+            if (button == 0) {
                 long currentTime = System.currentTimeMillis();
 
-                // Check if this is a double-click (same position within time window)
                 if (lastClickTime > 0 &&
                         currentTime - lastClickTime < DOUBLE_CLICK_TIME_MS &&
                         lastClickX >= 0 && lastClickY >= 0 &&
                         Math.abs(mouseX - lastClickX) < DOUBLE_CLICK_DISTANCE &&
                         Math.abs(mouseY - lastClickY) < DOUBLE_CLICK_DISTANCE) {
-                    // Double-click detected - mark pillar and close GUI
                     handleDoubleClick();
-                    lastClickTime = 0; // Reset to prevent triple-click
+                    lastClickTime = 0;
                     lastClickX = -1;
                     lastClickY = -1;
                     return true;
@@ -1716,7 +1944,7 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
                 lastClickY = mouseY;
             }
 
-            return clickedOnRow;
+            return true; // Consumed the row click
         }
 
         private void handleDoubleClick() {

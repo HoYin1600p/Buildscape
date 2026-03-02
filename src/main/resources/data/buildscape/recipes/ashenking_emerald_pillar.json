@@ -1,15 +1,19 @@
 {
-  "type": "minecraft:crafting_shaped",
-  "pattern": [
-    " R ",
-    " R ",
-    " R "
-  ],
+  "type": "buildscape:shaped_durability",
+  "damageAmount": 1,
   "key": {
-    "R": {
-      "item": "minecraft:emerald"
+    "S": {
+      "item": "buildscape:ancient_ashen_scroll"
+    },
+    "I": {
+      "item": "minecraft:emerald_block"
     }
   },
+  "pattern": [
+    " I ",
+    " IS",
+    " I "
+  ],
   "result": {
     "item": "buildscape:ashenking_emerald_pillar"
   }

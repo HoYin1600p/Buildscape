@@ -13,12 +13,12 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.world.item.ElytraItem;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 public class CosmeticsDisplayPanel extends BasePanel {
 
@@ -35,28 +35,25 @@ public class CosmeticsDisplayPanel extends BasePanel {
     private static final int FILTER_BUTTON_AREA_HEIGHT = 30;
     private static final int ITEM_AREA_TOP_SPACING = 5;
 
-    public enum CosmeticType {
-        ALL("All", 0xFFFFFF),
-        WINGS("Wings", 0x00FF00),
-        PARTICLES("Particles", 0xFFFF00),
-        GEAR("Gear", 0xFF8800);
-
-        private final String name;
-        private final int color;
-
-        CosmeticType(String name, int color) {
-            this.name = name;
-            this.color = color;
+        private boolean isAnimatedEntity(String cosmeticId) {
+        if (cosmeticId == null || cosmeticId.isEmpty()) {
+            return false;
         }
 
-        public String getName() {
-            return name;
+        String idLower = cosmeticId.toLowerCase();
+
+        if (idLower.contains("elytra") || idLower.contains("wing")) {
+            return true;
         }
 
-        public int getColor() {
-            return color;
+        if (idLower.contains("particle") || idLower.contains("effect") || idLower.contains("trail")) {
+            return true;
         }
-    }
+
+        com.kingodogo.buildscape.cosmetics.CosmeticManager.CosmeticMetadata metadata = com.kingodogo.buildscape.cosmetics.CosmeticManager.getInstance().getMetadata(cosmeticId);
+            return metadata != null && (metadata.type() == CosmeticManager.CosmeticType.HEAD
+                    || metadata.type() == CosmeticManager.CosmeticType.PARTICLE_WINGS);
+        }
 
     private final CosmeticRegistry cosmeticRegistry = CosmeticRegistry.getInstance();
     private final SupportersTabState state = SupportersTabState.getInstance();
@@ -74,11 +71,11 @@ public class CosmeticsDisplayPanel extends BasePanel {
 
     private final java.util.Map<String, Long> itemRotationTimes = new java.util.HashMap<>();
 
-    private float rotation = 0.0f;
+    private final float rotation = 0.0f;
     private float zoom = 1.0f;
     private long itemStartTime = 0;
     private final String lastSelectedCosmeticId = null;
-    private float bobOffset = 0.0f;
+    private final float bobOffset = 0.0f;
 
     private CosmeticColorPickerWidget colorPicker = null;
     private String selectedCosmeticForColor = null;
@@ -111,28 +108,197 @@ public class CosmeticsDisplayPanel extends BasePanel {
         updateCosmeticList();
     }
 
-        private boolean isAnimatedEntity(String cosmeticId) {
-        if (cosmeticId == null || cosmeticId.isEmpty()) {
-            return false;
-        }
-
-        String idLower = cosmeticId.toLowerCase();
-
-        if (idLower.contains("elytra") || idLower.contains("wing")) {
+    private boolean isUserSupporter() {
+        if (state.getUnlockedCosmetics().size() > CosmeticManager.getInstance().getDefaultCosmetics().size())
             return true;
-        }
 
-        if (idLower.contains("particle") || idLower.contains("effect") || idLower.contains("trail")) {
-            return true;
-        }
+        com.kingodogo.buildscape.api.model.CosmeticData data = com.kingodogo.buildscape.api.CosmeticAuthManager.getInstance().getCachedCosmetics();
+        if (data != null && data.isAdmin()) return true;
 
-        com.kingodogo.buildscape.cosmetics.CosmeticManager.CosmeticMetadata metadata = com.kingodogo.buildscape.cosmetics.CosmeticManager.getInstance().getMetadata(cosmeticId);
-        if (metadata != null && (metadata.type() == com.kingodogo.buildscape.cosmetics.CosmeticManager.CosmeticType.HEAD
-                || metadata.type() == com.kingodogo.buildscape.cosmetics.CosmeticManager.CosmeticType.PARTICLE_WINGS)) {
-            return true;
+        if (mc.player != null) {
+            com.kingodogo.buildscape.api.model.SupporterStatus status = com.kingodogo.buildscape.api.SupportersApiCache.getInstance().getCachedStatus(mc.player.getUUID());
+            return status != null && status.isConnected() && status.getTier() != null;
         }
 
         return false;
+    }
+
+    @Override
+    public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
+        if (mc.level == null) return;
+
+        int titleHeight = 15;
+        int renderStartY = startY + PADDING + titleHeight + FILTER_BUTTON_AREA_HEIGHT + ITEM_AREA_TOP_SPACING;
+        int scissorHeight = height - (renderStartY - startY);
+
+        int windowHeight = mc.getWindow().getHeight();
+        double actualGuiScale = mc.getWindow().getGuiScale();
+
+        int scissorRenderStartY = renderStartY - 2;
+        int scissorHeightAdjusted = scissorHeight + 4;
+
+        int scissorX = Math.max(0, (int) (startX * actualGuiScale));
+        int scissorWidth = Math.max(1, (int) (width * actualGuiScale));
+        int renderStartYActual = (int) (scissorRenderStartY * actualGuiScale);
+        int scissorHeightActual = (int) (scissorHeightAdjusted * actualGuiScale);
+
+        // Ensure scissor area is within window bounds
+        int scissorYAdjusted = Math.max(0, windowHeight - (renderStartYActual + scissorHeightActual));
+        int scissorHeightScaled = Math.max(0, Math.min(scissorHeightActual, windowHeight - scissorYAdjusted));
+
+        int relativeMouseX = mouseX - startX;
+        int relativeMouseY = mouseY - startY;
+
+        GuiComponent.fill(poseStack, startX, startY, endX, endY, 0x80000000);
+
+        int borderColor = 0xFF666666;
+        GuiComponent.fill(poseStack, startX - 1, startY - 1, endX + 1, startY, borderColor);
+        GuiComponent.fill(poseStack, startX - 1, endY, endX + 1, endY + 1, borderColor);
+        GuiComponent.fill(poseStack, startX - 1, startY, startX, endY, borderColor);
+        GuiComponent.fill(poseStack, endX, startY, endX + 1, endY, borderColor);
+
+        String title = "Available Cosmetics";
+        int titleWidth = mc.font.width(title);
+        mc.font.draw(poseStack, title, startX + (width - titleWidth) / 2, startY + PADDING, 0xFFFFFF);
+
+        int numTabs = CosmeticType.values().length;
+        int resetButtonWidth = 20;
+        int spacing = BUTTON_SPACING;
+
+        int availableWidth = width - PADDING * 2;
+        int reservedForReset = resetButtonWidth + spacing;
+        int buttonWidth = (availableWidth - reservedForReset - spacing * (numTabs - 1)) / numTabs;
+
+        int buttonY = startY + PADDING + 15;
+        int buttonX = startX + PADDING;
+
+        for (CosmeticType type : CosmeticType.values()) {
+            boolean isSelected = type == currentFilter;
+            boolean isHovered = mouseX >= buttonX && mouseX < buttonX + buttonWidth && mouseY >= buttonY && mouseY < buttonY + BUTTON_HEIGHT;
+
+            int bgColor = isSelected ? 0xAA000000 : (isHovered ? 0xAA333333 : 0xAA222222);
+            GuiComponent.fill(poseStack, buttonX, buttonY, buttonX + buttonWidth, buttonY + BUTTON_HEIGHT, bgColor);
+
+            int buttonBorderColor = isSelected ? type.getColor() : 0xFF666666;
+            GuiComponent.fill(poseStack, buttonX, buttonY, buttonX + buttonWidth, buttonY + 1, buttonBorderColor);
+            GuiComponent.fill(poseStack, buttonX, buttonY + BUTTON_HEIGHT - 1, buttonX + buttonWidth, buttonY + BUTTON_HEIGHT, buttonBorderColor);
+            GuiComponent.fill(poseStack, buttonX, buttonY, buttonX + 1, buttonY + BUTTON_HEIGHT, buttonBorderColor);
+            GuiComponent.fill(poseStack, buttonX + buttonWidth - 1, buttonY, buttonX + buttonWidth, buttonY + BUTTON_HEIGHT, buttonBorderColor);
+
+            int textColor = isSelected ? type.getColor() : 0xCCCCCC;
+            mc.font.draw(poseStack, type.getName(), buttonX + (buttonWidth - mc.font.width(type.getName())) / 2, buttonY + (BUTTON_HEIGHT - 8) / 2, textColor);
+
+            if (type.isSupporterOnly() && !isUserSupporter()) {
+                int lSize = 10;
+                int lx = buttonX + buttonWidth - lSize - 2;
+                int ly = buttonY + (BUTTON_HEIGHT - lSize) / 2;
+
+                RenderSystem.setShaderTexture(0, LOCK_ICON);
+                RenderSystem.setShader(net.minecraft.client.renderer.GameRenderer::getPositionTexShader);
+                RenderSystem.enableBlend();
+                // Use the actual lock texture size so the icon renders correctly
+                GuiComponent.blit(poseStack, lx, ly, 0, 0, lSize, lSize, 32, 32);
+                RenderSystem.disableBlend();
+            }
+
+            buttonX += buttonWidth + spacing;
+        }
+
+        int resetButtonX = buttonX;
+        int resetButtonY = buttonY;
+        isHoveringResetButton = mouseX >= resetButtonX && mouseX < resetButtonX + resetButtonWidth && mouseY >= resetButtonY && mouseY < resetButtonY + BUTTON_HEIGHT;
+
+        int resetBgColor = isHoveringResetButton ? 0xFF555555 : 0xFF333333;
+        GuiComponent.fill(poseStack, resetButtonX, resetButtonY, resetButtonX + resetButtonWidth, resetButtonY + BUTTON_HEIGHT, resetBgColor);
+        GuiComponent.fill(poseStack, resetButtonX, resetButtonY, resetButtonX + resetButtonWidth, resetButtonY + 1, 0xFF666666);
+        GuiComponent.fill(poseStack, resetButtonX, resetButtonY + BUTTON_HEIGHT - 1, resetButtonX + resetButtonWidth, resetButtonY + BUTTON_HEIGHT, 0xFF666666);
+        GuiComponent.fill(poseStack, resetButtonX, resetButtonY, resetButtonX + 1, resetButtonY + BUTTON_HEIGHT, 0xFF666666);
+        GuiComponent.fill(poseStack, resetButtonX + resetButtonWidth - 1, resetButtonY, resetButtonX + resetButtonWidth, resetButtonY + BUTTON_HEIGHT, 0xFF666666);
+        mc.font.draw(poseStack, "⟲", resetButtonX + (resetButtonWidth - mc.font.width("⟲")) / 2 + 1, resetButtonY + (BUTTON_HEIGHT - 8) / 2, isHoveringResetButton ? 0xFFFFAA00 : 0xFFCCCCCC);
+
+        try {
+            RenderSystem.enableScissor(scissorX, scissorYAdjusted, scissorWidth, scissorHeightScaled);
+            int totalRows = (int) Math.ceil((double) filteredCosmeticIds.size() / itemsPerRow);
+            double maxScroll = Math.max(0, totalRows * (itemSize + itemSpacing) - scissorHeight);
+            scrollOffset = Math.max(0, Math.min(scrollOffset, maxScroll));
+
+            int startRow = (int) (scrollOffset / (itemSize + itemSpacing));
+            int endRow = Math.min(startRow + visibleRows + 2, totalRows);
+
+            if (filteredCosmeticIds.isEmpty()) {
+                mc.font.draw(poseStack, "No cosmetics available", startX + (width - mc.font.width("No cosmetics available")) / 2, renderStartY + scissorHeight / 2, 0xAAAAAA);
+            } else {
+                String selectedCosmeticId = state.getSelectedCosmeticId();
+                for (int row = startRow; row < endRow; row++) {
+                    int rowY = (int) (renderStartY + (row * (itemSize + itemSpacing)) - scrollOffset);
+                    for (int col = 0; col < itemsPerRow; col++) {
+                        int index = row * itemsPerRow + col;
+                        if (index >= filteredCosmeticIds.size()) break;
+
+                        String cosmeticId = filteredCosmeticIds.get(index);
+                        int itemX = startX + itemSpacing + col * (itemSize + itemSpacing);
+                        boolean itemHovered = relativeMouseX >= (itemX - startX) && relativeMouseX < (itemX - startX + itemSize) && relativeMouseY >= (rowY - startY) && relativeMouseY < (rowY - startY + itemSize);
+
+                        boolean isUnlocked = state.isUnlocked(cosmeticId);
+                        boolean isSelected = cosmeticId.equals(selectedCosmeticId);
+                        boolean isEquipped = state.isEquipped(cosmeticId);
+
+                        int bgColor = isEquipped ? 0x1A00FF00 : (isSelected ? 0x1AFFFFFF : (itemHovered ? (isUnlocked ? 0x40CCCCCC : 0x40CC0000) : (isUnlocked ? 0x11CCCCCC : 0)));
+                        GuiComponent.fill(poseStack, itemX, rowY, itemX + itemSize, rowY + itemSize, bgColor);
+
+                        int borderCol = isEquipped ? 0xFF00AA00 : (isSelected ? 0xFFFFFFFF : (isUnlocked ? 0xFF444444 : 0xFF8B0000));
+                        int borderAlpha = (isEquipped || isSelected || itemHovered) ? 0xFF : 0xAA;
+                        borderCol = (borderCol & 0x00FFFFFF) | (borderAlpha << 24);
+
+                        GuiComponent.fill(poseStack, itemX - 1, rowY - 1, itemX + itemSize + 1, rowY, borderCol);
+                        GuiComponent.fill(poseStack, itemX - 1, rowY + itemSize, itemX + itemSize + 1, rowY + itemSize + 1, borderCol);
+                        GuiComponent.fill(poseStack, itemX - 1, rowY, itemX, rowY + itemSize, borderCol);
+                        GuiComponent.fill(poseStack, itemX + itemSize, rowY, itemX + itemSize + 1, rowY + itemSize, borderCol);
+
+                        boolean isParticleTrail = cosmeticId.toLowerCase().contains("particle");
+                        boolean isHeadCos = CosmeticManager.getInstance().getMetadata(cosmeticId) != null && CosmeticManager.getInstance().getMetadata(cosmeticId).type() == CosmeticManager.CosmeticType.HEAD;
+                        ItemStack stack = cosmeticRegistry.resolveToItemStack(cosmeticId);
+
+                        if ((stack != null && !stack.isEmpty()) || isParticleTrail || isHeadCos) {
+                            try {
+                                if (isHeadCos || isAnimatedEntity(cosmeticId) || isParticleTrail) {
+                                    renderAnimatedEntity(poseStack, stack, cosmeticId, itemX + itemSize / 2, rowY + itemSize / 2, partialTick, itemHovered);
+                                } else if (isSelected && !isParticleTrail) {
+                                    render3DItemPreview(poseStack, stack, itemX + itemSize / 2, rowY + itemSize / 2, partialTick);
+                                } else {
+                                    render3DItemLikePillar(poseStack, stack, cosmeticId, itemX + itemSize / 2, rowY + itemSize / 2, partialTick);
+                                }
+                            } catch (Exception e) {
+                                BuildScape.getLogger().debug("Failed to render item " + cosmeticId + ": " + e.getMessage());
+                                mc.font.draw(poseStack, "?", itemX + itemSize / 2 - 2, rowY + itemSize / 2 - 4, 0xFFFFFF);
+                            }
+                        }
+
+                        if (!isUnlocked) {
+                            int cornerSize = 14;
+                            int lx = itemX + itemSize - cornerSize - 2;
+                            int ly = rowY + 2;
+
+                            // Yellow outline for the corner
+                            GuiComponent.fill(poseStack, lx - 1, ly - 1, lx + cornerSize + 1, ly + cornerSize + 1, 0xFFFFFF00);
+                            GuiComponent.fill(poseStack, lx, ly, lx + cornerSize, ly + cornerSize, 0xFF111111);
+
+                            RenderSystem.setShaderTexture(0, LOCK_ICON);
+                            RenderSystem.setShader(net.minecraft.client.renderer.GameRenderer::getPositionTexShader);
+                            RenderSystem.enableBlend();
+                            // Use the actual lock texture size so the icon renders correctly
+                            GuiComponent.blit(poseStack, lx + 1, ly + 1, 0, 0, cornerSize - 2, cornerSize - 2, 32, 32);
+                            RenderSystem.disableBlend();
+                        }
+                    }
+                }
+            }
+            renderScrollAndColorBoxes(poseStack, renderStartY, scissorHeight);
+        } catch (Exception e) {
+            BuildScape.getLogger().error("Supporters tab render exception: " + e.getMessage());
+        } finally {
+            RenderSystem.disableScissor();
+        }
     }
 
     private float getAnimationProgress(String cosmeticId, float partialTick, float speedMultiplier) {
@@ -193,16 +359,16 @@ public class CosmeticsDisplayPanel extends BasePanel {
     }
 
     public void updateCosmeticList() {
-        filteredCosmeticIds = (java.util.List<String>) allCosmeticIds.stream()
-                .filter(id -> matchesFilter((String)id))
+        filteredCosmeticIds = allCosmeticIds.stream()
+                .filter(id -> matchesFilter(id))
                 .collect(java.util.stream.Collectors.toList());
 
         java.util.Set<String> unlocked = state.getUnlockedCosmetics();
-        java.util.List<String> unlockedList = (java.util.List<String>) filteredCosmeticIds.stream()
-                .filter(id -> unlocked.contains((String)id))
+        java.util.List<String> unlockedList = filteredCosmeticIds.stream()
+                .filter(id -> unlocked.contains(id))
                 .collect(java.util.stream.Collectors.toList());
-        java.util.List<String> lockedList = (java.util.List<String>) filteredCosmeticIds.stream()
-                .filter(id -> !unlocked.contains((String)id))
+        java.util.List<String> lockedList = filteredCosmeticIds.stream()
+                .filter(id -> !unlocked.contains(id))
                 .collect(java.util.stream.Collectors.toList());
 
         filteredCosmeticIds = new ArrayList<>();
@@ -235,167 +401,42 @@ public class CosmeticsDisplayPanel extends BasePanel {
         updateCosmeticList();
     }
 
-    @Override
-    public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
-        if (mc.level == null) return;
+    public void renderColorPickerOverlay(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
+        if (colorPicker == null || selectedCosmeticForColor == null) return;
+        RenderSystem.disableScissor();
+        RenderSystem.disableDepthTest();
+        RenderSystem.depthMask(false);
+        poseStack.pushPose();
+        poseStack.translate(0, 0, 500);
 
-        int titleHeight = 15;
-        int renderStartY = startY + PADDING + titleHeight + FILTER_BUTTON_AREA_HEIGHT + ITEM_AREA_TOP_SPACING;
-        int scissorHeight = height - (renderStartY - startY);
+        int headerHeight = 14;
+        GuiComponent.fill(poseStack, colorPicker.x, colorPicker.y - headerHeight, colorPicker.x + colorPicker.getWidth(), colorPicker.y, 0xFF222222);
+        GuiComponent.fill(poseStack, colorPicker.x, colorPicker.y, colorPicker.x + colorPicker.getWidth(), colorPicker.y + colorPicker.getHeight(), 0xFF151515);
+        int border = 0xFF000000;
+        GuiComponent.fill(poseStack, colorPicker.x - 1, colorPicker.y - headerHeight - 1, colorPicker.x + colorPicker.getWidth() + 1, colorPicker.y - headerHeight, border);
+        GuiComponent.fill(poseStack, colorPicker.x - 1, colorPicker.y - headerHeight, colorPicker.x, colorPicker.y + colorPicker.getHeight() + 1, border);
+        GuiComponent.fill(poseStack, colorPicker.x + colorPicker.getWidth(), colorPicker.y - headerHeight, colorPicker.x + colorPicker.getWidth() + 1, colorPicker.y + colorPicker.getHeight() + 1, border);
+        GuiComponent.fill(poseStack, colorPicker.x - 1, colorPicker.y + colorPicker.getHeight(), colorPicker.x + colorPicker.getWidth() + 1, colorPicker.y + colorPicker.getHeight() + 1, border);
+        GuiComponent.fill(poseStack, colorPicker.x, colorPicker.y - 1, colorPicker.x + colorPicker.getWidth(), colorPicker.y, border);
 
-        int windowHeight = mc.getWindow().getHeight();
-        double actualGuiScale = mc.getWindow().getGuiScale();
+        colorPicker.renderButton(poseStack, mouseX, mouseY, partialTick);
 
-        int scissorRenderStartY = renderStartY - 2;
-        int scissorHeightAdjusted = scissorHeight + 4;
+        int titleY = colorPicker.y - headerHeight + (headerHeight - 8) / 2 + 1;
 
-        int scissorX = Math.max(0, (int) (startX * actualGuiScale));
-        int scissorWidth = Math.max(1, (int) (width * actualGuiScale));
-        int renderStartYActual = (int) (scissorRenderStartY * actualGuiScale);
-        int scissorHeightActual = (int) (scissorHeightAdjusted * actualGuiScale);
-        
-        // Ensure scissor area is within window bounds
-        int scissorYAdjusted = Math.max(0, windowHeight - (renderStartYActual + scissorHeightActual));
-        int scissorHeightScaled = Math.max(0, Math.min(scissorHeightActual, windowHeight - scissorYAdjusted));
+        // Title aligned to the left
+        mc.font.draw(poseStack, "Color Picker", colorPicker.x + 4, titleY, 0xFFE0E0E0);
 
-        int relativeMouseX = mouseX - startX;
-        int relativeMouseY = mouseY - startY;
+        // Close and reset buttons aligned to the right
+        float scale = colorPicker.getCurrentScale();
+        int closeX = colorPicker.x + colorPicker.getWidth() - 10;
+        int resetX = closeX - 12;
 
-        GuiComponent.fill(poseStack, startX, startY, endX, endY, 0x80000000);
+        mc.font.draw(poseStack, "⟲", resetX, titleY, 0xFF55FF55);
+        mc.font.draw(poseStack, "x", closeX, titleY, 0xFFFF5555);
 
-        int borderColor = 0xFF666666;
-        GuiComponent.fill(poseStack, startX - 1, startY - 1, endX + 1, startY, borderColor);
-        GuiComponent.fill(poseStack, startX - 1, endY, endX + 1, endY + 1, borderColor);
-        GuiComponent.fill(poseStack, startX - 1, startY, startX, endY, borderColor);
-        GuiComponent.fill(poseStack, endX, startY, endX + 1, endY, borderColor);
-
-        String title = "Available Cosmetics";
-        int titleWidth = mc.font.width(title);
-        mc.font.draw(poseStack, title, startX + (width - titleWidth) / 2, startY + PADDING, 0xFFFFFF);
-
-        int numTabs = CosmeticType.values().length;
-        int resetButtonWidth = 20;
-        int spacing = BUTTON_SPACING;
-
-        int availableWidth = width - PADDING * 2;
-        int reservedForReset = resetButtonWidth + spacing;
-        int buttonWidth = (availableWidth - reservedForReset - spacing * (numTabs - 1)) / numTabs;
-
-        int buttonY = startY + PADDING + 15;
-        int buttonX = startX + PADDING;
-
-        for (CosmeticType type : CosmeticType.values()) {
-            boolean isSelected = type == currentFilter;
-            boolean isHovered = mouseX >= buttonX && mouseX < buttonX + buttonWidth && mouseY >= buttonY && mouseY < buttonY + BUTTON_HEIGHT;
-
-            int bgColor = isSelected ? 0xAA000000 : (isHovered ? 0xAA333333 : 0xAA222222);
-            GuiComponent.fill(poseStack, buttonX, buttonY, buttonX + buttonWidth, buttonY + BUTTON_HEIGHT, bgColor);
-
-            int buttonBorderColor = isSelected ? type.getColor() : 0xFF666666;
-            GuiComponent.fill(poseStack, buttonX, buttonY, buttonX + buttonWidth, buttonY + 1, buttonBorderColor);
-            GuiComponent.fill(poseStack, buttonX, buttonY + BUTTON_HEIGHT - 1, buttonX + buttonWidth, buttonY + BUTTON_HEIGHT, buttonBorderColor);
-            GuiComponent.fill(poseStack, buttonX, buttonY, buttonX + 1, buttonY + BUTTON_HEIGHT, buttonBorderColor);
-            GuiComponent.fill(poseStack, buttonX + buttonWidth - 1, buttonY, buttonX + buttonWidth, buttonY + BUTTON_HEIGHT, buttonBorderColor);
-
-            int textColor = isSelected ? type.getColor() : 0xCCCCCC;
-            mc.font.draw(poseStack, type.getName(), buttonX + (buttonWidth - mc.font.width(type.getName())) / 2, buttonY + (BUTTON_HEIGHT - 8) / 2, textColor);
-            buttonX += buttonWidth + spacing;
-        }
-
-        int resetButtonX = buttonX;
-        int resetButtonY = buttonY;
-        isHoveringResetButton = mouseX >= resetButtonX && mouseX < resetButtonX + resetButtonWidth && mouseY >= resetButtonY && mouseY < resetButtonY + BUTTON_HEIGHT;
-
-        int resetBgColor = isHoveringResetButton ? 0xFF555555 : 0xFF333333;
-        GuiComponent.fill(poseStack, resetButtonX, resetButtonY, resetButtonX + resetButtonWidth, resetButtonY + BUTTON_HEIGHT, resetBgColor);
-        GuiComponent.fill(poseStack, resetButtonX, resetButtonY, resetButtonX + resetButtonWidth, resetButtonY + 1, 0xFF666666);
-        GuiComponent.fill(poseStack, resetButtonX, resetButtonY + BUTTON_HEIGHT - 1, resetButtonX + resetButtonWidth, resetButtonY + BUTTON_HEIGHT, 0xFF666666);
-        GuiComponent.fill(poseStack, resetButtonX, resetButtonY, resetButtonX + 1, resetButtonY + BUTTON_HEIGHT, 0xFF666666);
-        GuiComponent.fill(poseStack, resetButtonX + resetButtonWidth - 1, resetButtonY, resetButtonX + resetButtonWidth, resetButtonY + BUTTON_HEIGHT, 0xFF666666);
-        mc.font.draw(poseStack, "⟲", resetButtonX + (resetButtonWidth - mc.font.width("⟲")) / 2 + 1, resetButtonY + (BUTTON_HEIGHT - 8) / 2, isHoveringResetButton ? 0xFFFFAA00 : 0xFFCCCCCC);
-
-        try {
-            RenderSystem.enableScissor(scissorX, scissorYAdjusted, scissorWidth, scissorHeightScaled);
-            int totalRows = (int) Math.ceil((double) filteredCosmeticIds.size() / itemsPerRow);
-            double maxScroll = Math.max(0, totalRows * (itemSize + itemSpacing) - scissorHeight);
-            scrollOffset = Math.max(0, Math.min(scrollOffset, maxScroll));
-
-            int startRow = (int) (scrollOffset / (itemSize + itemSpacing));
-            int endRow = Math.min(startRow + visibleRows + 2, totalRows);
-
-            if (filteredCosmeticIds.isEmpty()) {
-                mc.font.draw(poseStack, "No cosmetics available", startX + (width - mc.font.width("No cosmetics available")) / 2, renderStartY + scissorHeight / 2, 0xAAAAAA);
-            } else {
-                String selectedCosmeticId = state.getSelectedCosmeticId();
-                for (int row = startRow; row < endRow; row++) {
-                    int rowY = (int) (renderStartY + (row * (itemSize + itemSpacing)) - scrollOffset);
-                    for (int col = 0; col < itemsPerRow; col++) {
-                        int index = row * itemsPerRow + col;
-                        if (index >= filteredCosmeticIds.size()) break;
-
-                        String cosmeticId = filteredCosmeticIds.get(index);
-                        int itemX = startX + itemSpacing + col * (itemSize + itemSpacing);
-                        boolean itemHovered = relativeMouseX >= (itemX - startX) && relativeMouseX < (itemX - startX + itemSize) && relativeMouseY >= (rowY - startY) && relativeMouseY < (rowY - startY + itemSize);
-
-                        boolean isUnlocked = state.isUnlocked(cosmeticId);
-                        boolean isSelected = cosmeticId.equals(selectedCosmeticId);
-                        boolean isEquipped = state.isEquipped(cosmeticId);
-
-                        int bgColor = isEquipped ? 0x1A00FF00 : (isSelected ? 0x1AFFFFFF : (itemHovered ? (isUnlocked ? 0x40CCCCCC : 0x40CC0000) : (isUnlocked ? 0x11CCCCCC : 0)));
-                        GuiComponent.fill(poseStack, itemX, rowY, itemX + itemSize, rowY + itemSize, bgColor);
-
-                        int borderCol = isEquipped ? 0xFF00AA00 : (isSelected ? 0xFFFFFFFF : (isUnlocked ? 0xFF444444 : 0xFF8B0000));
-                        int borderAlpha = (isEquipped || isSelected || itemHovered) ? 0xFF : 0xAA;
-                        borderCol = (borderCol & 0x00FFFFFF) | (borderAlpha << 24);
-                        
-                        GuiComponent.fill(poseStack, itemX - 1, rowY - 1, itemX + itemSize + 1, rowY, borderCol);
-                        GuiComponent.fill(poseStack, itemX - 1, rowY + itemSize, itemX + itemSize + 1, rowY + itemSize + 1, borderCol);
-                        GuiComponent.fill(poseStack, itemX - 1, rowY, itemX, rowY + itemSize, borderCol);
-                        GuiComponent.fill(poseStack, itemX + itemSize, rowY, itemX + itemSize + 1, rowY + itemSize, borderCol);
-
-                        boolean isParticleTrail = cosmeticId.toLowerCase().contains("particle");
-                        boolean isHeadCos = CosmeticManager.getInstance().getMetadata(cosmeticId) != null && CosmeticManager.getInstance().getMetadata(cosmeticId).type() == CosmeticManager.CosmeticType.HEAD;
-                        ItemStack stack = cosmeticRegistry.resolveToItemStack(cosmeticId);
-
-                        if ((stack != null && !stack.isEmpty()) || isParticleTrail || isHeadCos) {
-                            try {
-                                if (isHeadCos || isAnimatedEntity(cosmeticId) || isParticleTrail) {
-                                    renderAnimatedEntity(poseStack, stack, cosmeticId, itemX + itemSize / 2, rowY + itemSize / 2, partialTick, itemHovered);
-                                } else if (isSelected && !isParticleTrail) {
-                                    render3DItemPreview(poseStack, stack, itemX + itemSize / 2, rowY + itemSize / 2, partialTick);
-                                } else {
-                                    render3DItemLikePillar(poseStack, stack, cosmeticId, itemX + itemSize / 2, rowY + itemSize / 2, partialTick);
-                                }
-                            } catch (Exception e) {
-                                BuildScape.getLogger().debug("Failed to render item " + cosmeticId + ": " + e.getMessage());
-                                mc.font.draw(poseStack, "?", itemX + itemSize / 2 - 2, rowY + itemSize / 2 - 4, 0xFFFFFF);
-                            }
-                        }
-
-                        if (!isUnlocked) {
-                            int cornerSize = 14;
-                            int lx = itemX + itemSize - cornerSize - 2;
-                            int ly = rowY + 2;
-
-                            // Yellow outline for the corner
-                            GuiComponent.fill(poseStack, lx - 1, ly - 1, lx + cornerSize + 1, ly + cornerSize + 1, 0xFFFFFF00);
-                            GuiComponent.fill(poseStack, lx, ly, lx + cornerSize, ly + cornerSize, 0xFF111111);
-
-                            RenderSystem.setShaderTexture(0, LOCK_ICON);
-                            RenderSystem.setShader(net.minecraft.client.renderer.GameRenderer::getPositionTexShader);
-                            RenderSystem.enableBlend();
-                            GuiComponent.blit(poseStack, lx + 1, ly + 1, 0, 0, cornerSize - 2, cornerSize - 2, 256, 256);
-                            RenderSystem.disableBlend();
-                        }
-                    }
-                }
-            }
-            renderScrollAndColorBoxes(poseStack, renderStartY, scissorHeight);
-        } catch (Exception e) {
-            BuildScape.getLogger().error("Supporters tab render exception: " + e.getMessage());
-        } finally {
-            RenderSystem.disableScissor();
-        }
+        poseStack.popPose();
+        RenderSystem.depthMask(true);
+        RenderSystem.enableDepthTest();
     }
 
     private void renderScrollAndColorBoxes(PoseStack poseStack, int renderStartY, int scissorHeight) {
@@ -507,35 +548,83 @@ public class CosmeticsDisplayPanel extends BasePanel {
         }
     }
 
-    public void renderColorPickerOverlay(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
-        if (colorPicker == null || selectedCosmeticForColor == null) return;
-        RenderSystem.disableScissor();
-        RenderSystem.disableDepthTest();
-        RenderSystem.depthMask(false);
-        poseStack.pushPose();
-        poseStack.translate(0, 0, 500);
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if (colorPicker != null && selectedCosmeticForColor != null) {
+            int headerHeight = 14;
+            if (mouseX >= colorPicker.x && mouseX < colorPicker.x + colorPicker.getWidth()
+                    && mouseY >= colorPicker.y - headerHeight && mouseY < colorPicker.y + colorPicker.getHeight()) {
 
-        int headerHeight = 14;
-        GuiComponent.fill(poseStack, colorPicker.x, colorPicker.y - headerHeight, colorPicker.x + colorPicker.getWidth(), colorPicker.y, 0xFF222222);
-        GuiComponent.fill(poseStack, colorPicker.x, colorPicker.y, colorPicker.x + colorPicker.getWidth(), colorPicker.y + colorPicker.getHeight(), 0xFF151515);
-        int border = 0xFF000000;
-        GuiComponent.fill(poseStack, colorPicker.x - 1, colorPicker.y - headerHeight - 1, colorPicker.x + colorPicker.getWidth() + 1, colorPicker.y - headerHeight, border);
-        GuiComponent.fill(poseStack, colorPicker.x - 1, colorPicker.y - headerHeight, colorPicker.x, colorPicker.y + colorPicker.getHeight() + 1, border);
-        GuiComponent.fill(poseStack, colorPicker.x + colorPicker.getWidth(), colorPicker.y - headerHeight, colorPicker.x + colorPicker.getWidth() + 1, colorPicker.y + colorPicker.getHeight() + 1, border);
-        GuiComponent.fill(poseStack, colorPicker.x - 1, colorPicker.y + colorPicker.getHeight(), colorPicker.x + colorPicker.getWidth() + 1, colorPicker.y + colorPicker.getHeight() + 1, border);
-        GuiComponent.fill(poseStack, colorPicker.x, colorPicker.y - 1, colorPicker.x + colorPicker.getWidth(), colorPicker.y, border);
+                // Header interaction
+                boolean insideHeader = mouseY < colorPicker.y;
+                if (insideHeader) {
+                    int closeX = colorPicker.x + colorPicker.getWidth() - 10;
+                    int resetX = closeX - 12;
 
-        colorPicker.renderButton(poseStack, mouseX, mouseY, partialTick);
-        float scale = colorPicker.getCurrentScale();
-        mc.font.draw(poseStack, "Color Picker", colorPicker.x + (colorPicker.getWidth() - (int)(mc.font.width("Color Picker") * scale))/2, colorPicker.y - headerHeight + (headerHeight - 8)/2 + 1, 0xFFE0E0E0);
-        
-        int closeX = colorPicker.x + colorPicker.getWidth() - (int)(12 * scale) - 2;
-        mc.font.draw(poseStack, "x", closeX, colorPicker.y - headerHeight + (headerHeight - 8)/2 + 1, 0xFFFF5555);
-        mc.font.draw(poseStack, "⟲", closeX - (int)(12 * scale) - 2, colorPicker.y - headerHeight + (headerHeight - 8)/2 + 1, 0xFF55FF55);
+                    // Close button (approximate area)
+                    if (mouseX >= closeX - 2 && mouseX <= closeX + 10) {
+                        if (button == 0) {
+                            closeColorPicker();
+                            return true;
+                        }
+                    }
 
-        poseStack.popPose();
-        RenderSystem.depthMask(true);
-        RenderSystem.enableDepthTest();
+                    // Reset Color button (approximate area)
+                    if (mouseX >= resetX - 2 && mouseX <= resetX + 10) {
+                        if (button == 0) {
+                            if (mc.player != null) {
+                                CosmeticsConfig.get().setCosmeticColor(mc.player.getUUID(), selectedCosmeticForColor,
+                                        null);
+                                // Refresh listener if easy, but mostly just updating config is enough for next
+                                // frame
+                                // Re-open/refresh to update picker state to default
+                                openColorPicker(selectedCosmeticForColor);
+                            }
+                            return true;
+                        }
+                    }
+
+                    if (button == 0) {
+                        isDraggingColorPicker = true;
+                        pickerDragOffsetX = mouseX - colorPicker.x;
+                        pickerDragOffsetY = mouseY - colorPicker.y;
+                        return true;
+                    }
+                }
+
+                colorPicker.mouseClicked(mouseX, mouseY, button);
+                return true; // Consume click even if header action didn't fire
+            }
+        }
+
+        // Scrollbar interaction
+        int titleHeight = 15;
+        int renderStartY = startY + PADDING + titleHeight + FILTER_BUTTON_AREA_HEIGHT + ITEM_AREA_TOP_SPACING;
+        int renderHeight = height - PADDING * 2 - titleHeight - FILTER_BUTTON_AREA_HEIGHT - ITEM_AREA_TOP_SPACING;
+
+        int totalRows = (int) Math.ceil((double) filteredCosmeticIds.size() / itemsPerRow);
+        double maxScroll = Math.max(0, (totalRows - visibleRows) * (itemSize + itemSpacing));
+
+        if (maxScroll > 0) {
+            int scrollbarX = endX
+                    - com.kingodogo.buildscape.client.screen.widget.CustomScrollbarRenderer.getScrollbarWidth() - 5;
+            int scrollbarY = renderStartY;
+            int scrollbarHeight = renderHeight;
+
+            double visibleRatio = visibleRows / (double) totalRows;
+
+            double newOffset = scrollbarRenderer.handleMouseClick(mouseX, mouseY, button,
+                    scrollbarX, scrollbarY, scrollbarHeight,
+                    startX, renderStartY, width, renderHeight,
+                    scrollOffset, maxScroll, visibleRatio);
+
+            if (newOffset >= 0) {
+                scrollOffset = newOffset;
+                return true;
+            }
+        }
+
+        return super.mouseClicked(mouseX, mouseY, button);
     }
 
     private void renderAnimatedEntity(PoseStack poseStack, ItemStack stack, String cosmeticId, int centerX, int centerY, float partialTick, boolean isHovered) {
@@ -1235,85 +1324,31 @@ public class CosmeticsDisplayPanel extends BasePanel {
         return -1;
     }
 
-    @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if (colorPicker != null && selectedCosmeticForColor != null) {
-            int headerHeight = 14;
-            if (mouseX >= colorPicker.x && mouseX < colorPicker.x + colorPicker.getWidth()
-                    && mouseY >= colorPicker.y - headerHeight && mouseY < colorPicker.y + colorPicker.getHeight()) {
+    public enum CosmeticType {
+        ALL("All", 0xFFFFFF),
+        WINGS("Wings", 0x00FF00),
+        PARTICLES("Particles", 0xFFFF00),
+        GEAR("Gear", 0xFF8800);
 
-                // Header interaction
-                boolean insideHeader = mouseY < colorPicker.y;
-                if (insideHeader) {
-                    float scale = colorPicker.getCurrentScale();
-                    int buttonSpacing = 2;
-                    int closeX = colorPicker.x + colorPicker.getWidth() - (int) (12 * scale) - buttonSpacing;
-                    int resetX = closeX - (int) (12 * scale) - buttonSpacing;
+        private final String name;
+        private final int color;
 
-                    // Close button (approximate area)
-                    if (mouseX >= closeX && mouseX <= closeX + (int) (12 * scale)) {
-                        if (button == 0) {
-                            closeColorPicker();
-                            return true;
-                        }
-                    }
-
-                    // Reset Color button (approximate area)
-                    if (mouseX >= resetX && mouseX <= resetX + (int) (12 * scale)) {
-                        if (button == 0) {
-                            if (mc.player != null) {
-                                CosmeticsConfig.get().setCosmeticColor(mc.player.getUUID(), selectedCosmeticForColor,
-                                        null);
-                                // Refresh listener if easy, but mostly just updating config is enough for next
-                                // frame
-                                // Re-open/refresh to update picker state to default
-                                openColorPicker(selectedCosmeticForColor);
-                            }
-                            return true;
-                        }
-                    }
-
-                    if (button == 0) {
-                        isDraggingColorPicker = true;
-                        pickerDragOffsetX = mouseX - colorPicker.x;
-                        pickerDragOffsetY = mouseY - colorPicker.y;
-                        return true;
-                    }
-                }
-
-                colorPicker.mouseClicked(mouseX, mouseY, button);
-                return true; // Consume click even if header action didn't fire
-            }
+        CosmeticType(String name, int color) {
+            this.name = name;
+            this.color = color;
         }
 
-        // Scrollbar interaction
-        int titleHeight = 15;
-        int renderStartY = startY + PADDING + titleHeight + FILTER_BUTTON_AREA_HEIGHT + ITEM_AREA_TOP_SPACING;
-        int renderHeight = height - PADDING * 2 - titleHeight - FILTER_BUTTON_AREA_HEIGHT - ITEM_AREA_TOP_SPACING;
-
-        int totalRows = (int) Math.ceil((double) filteredCosmeticIds.size() / itemsPerRow);
-        double maxScroll = Math.max(0, (totalRows - visibleRows) * (itemSize + itemSpacing));
-
-        if (maxScroll > 0) {
-            int scrollbarX = endX
-                    - com.kingodogo.buildscape.client.screen.widget.CustomScrollbarRenderer.getScrollbarWidth() - 5;
-            int scrollbarY = renderStartY;
-            int scrollbarHeight = renderHeight;
-
-            double visibleRatio = visibleRows / (double) totalRows;
-
-            double newOffset = scrollbarRenderer.handleMouseClick(mouseX, mouseY, button,
-                    scrollbarX, scrollbarY, scrollbarHeight,
-                    startX, renderStartY, width, renderHeight,
-                    scrollOffset, maxScroll, visibleRatio);
-
-            if (newOffset >= 0) {
-                scrollOffset = newOffset;
-                return true;
-            }
+        public String getName() {
+            return name;
         }
 
-        return super.mouseClicked(mouseX, mouseY, button);
+        public int getColor() {
+            return color;
+        }
+
+        public boolean isSupporterOnly() {
+            return this == WINGS || this == GEAR;
+        }
     }
 
     @Override

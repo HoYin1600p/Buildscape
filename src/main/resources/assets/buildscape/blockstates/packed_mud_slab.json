@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "buildscape:block/packed_mud_slab"
+    },
+    "type=top": {
+      "model": "buildscape:block/packed_mud_slab_top"
+    },
+    "type=double": {
+      "model": "buildscape:block/packed_mud"
+    }
+  }
+}

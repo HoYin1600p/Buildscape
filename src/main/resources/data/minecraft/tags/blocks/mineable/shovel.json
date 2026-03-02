@@ -18,6 +18,10 @@
     "buildscape:snow_stairs",
     "buildscape:snowy_grass_block",
     "buildscape:snowy_grass_block_slab",
-    "buildscape:snowy_grass_block_stairs"
+    "buildscape:snowy_grass_block_stairs",
+    "buildscape:packed_mud",
+    "buildscape:packed_mud_stairs",
+    "buildscape:packed_mud_slab",
+    "buildscape:packed_mud_wall"
   ]
 }

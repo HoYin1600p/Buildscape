@@ -375,37 +375,37 @@ public class AshenKingPillarBlock extends PillarBlock {
 
         net.minecraft.world.item.Item item = stack.getItem();
         if (item == net.minecraft.world.item.Items.WHITE_DYE)
-            return new java.util.AbstractMap.SimpleEntry<>("#FFFFFF", "White");
+            return new java.util.AbstractMap.SimpleEntry<>("#E8FEFD", "White");
         else if (item == net.minecraft.world.item.Items.ORANGE_DYE)
-            return new java.util.AbstractMap.SimpleEntry<>("#FF9800", "Orange");
+            return new java.util.AbstractMap.SimpleEntry<>("#FF5C00", "Orange");
         else if (item == net.minecraft.world.item.Items.MAGENTA_DYE)
-            return new java.util.AbstractMap.SimpleEntry<>("#C74EBD", "Magenta");
+            return new java.util.AbstractMap.SimpleEntry<>("#FF00FF", "Magenta");
         else if (item == net.minecraft.world.item.Items.LIGHT_BLUE_DYE)
-            return new java.util.AbstractMap.SimpleEntry<>("#3AB3DA", "Light Blue");
+            return new java.util.AbstractMap.SimpleEntry<>("#3CDFFF", "Light Blue");
         else if (item == net.minecraft.world.item.Items.YELLOW_DYE)
-            return new java.util.AbstractMap.SimpleEntry<>("#FED83D", "Yellow");
+            return new java.util.AbstractMap.SimpleEntry<>("#FFFF00", "Yellow");
         else if (item == net.minecraft.world.item.Items.LIME_DYE)
-            return new java.util.AbstractMap.SimpleEntry<>("#80C71F", "Lime");
+            return new java.util.AbstractMap.SimpleEntry<>("#BFFE00", "Lime");
         else if (item == net.minecraft.world.item.Items.PINK_DYE)
-            return new java.util.AbstractMap.SimpleEntry<>("#F38BAA", "Pink");
+            return new java.util.AbstractMap.SimpleEntry<>("#F686B7", "Pink");
         else if (item == net.minecraft.world.item.Items.GRAY_DYE)
-            return new java.util.AbstractMap.SimpleEntry<>("#474F52", "Gray");
+            return new java.util.AbstractMap.SimpleEntry<>("#232526", "Gray");
         else if (item == net.minecraft.world.item.Items.LIGHT_GRAY_DYE)
-            return new java.util.AbstractMap.SimpleEntry<>("#9D9D97", "Light Gray");
+            return new java.util.AbstractMap.SimpleEntry<>("#B1B8C5", "Light Gray");
         else if (item == net.minecraft.world.item.Items.CYAN_DYE)
-            return new java.util.AbstractMap.SimpleEntry<>("#169C9C", "Cyan");
+            return new java.util.AbstractMap.SimpleEntry<>("#00FFFF", "Cyan");
         else if (item == net.minecraft.world.item.Items.PURPLE_DYE)
-            return new java.util.AbstractMap.SimpleEntry<>("#8932B8", "Purple");
+            return new java.util.AbstractMap.SimpleEntry<>("#AB87FF", "Purple");
         else if (item == net.minecraft.world.item.Items.BLUE_DYE)
-            return new java.util.AbstractMap.SimpleEntry<>("#3C44AA", "Blue");
+            return new java.util.AbstractMap.SimpleEntry<>("#1919EA", "Blue");
         else if (item == net.minecraft.world.item.Items.BROWN_DYE)
-            return new java.util.AbstractMap.SimpleEntry<>("#835432", "Brown");
+            return new java.util.AbstractMap.SimpleEntry<>("#411900", "Brown");
         else if (item == net.minecraft.world.item.Items.GREEN_DYE)
-            return new java.util.AbstractMap.SimpleEntry<>("#5E7C16", "Green");
+            return new java.util.AbstractMap.SimpleEntry<>("#39FF14", "Green");
         else if (item == net.minecraft.world.item.Items.RED_DYE)
-            return new java.util.AbstractMap.SimpleEntry<>("#B02E26", "Red");
+            return new java.util.AbstractMap.SimpleEntry<>("#FF0000", "Red");
         else if (item == net.minecraft.world.item.Items.BLACK_DYE)
-            return new java.util.AbstractMap.SimpleEntry<>("#1D1D21", "Black");
+            return new java.util.AbstractMap.SimpleEntry<>("#07010C", "Black");
 
         return null;
     }

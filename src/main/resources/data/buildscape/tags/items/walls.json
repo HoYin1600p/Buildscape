@@ -85,6 +85,8 @@
     "buildscape:yellow_concrete_wall",
     "buildscape:yellow_sandstone_wall",
     "buildscape:yellow_smooth_sandstone_wall",
-    "buildscape:yellow_tiles_wall"
+    "buildscape:yellow_tiles_wall",
+    "buildscape:packed_mud_wall",
+    "buildscape:mud_brick_wall"
   ]
 }

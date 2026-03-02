@@ -2270,10 +2270,9 @@ public class BuildScape {
         event
                 .getGenericTrades()
                 .add((trader, rand) -> {
-                    if (rand.nextFloat() <= 0.0001f) { // 0.01% chance
-                        int emeralds = 25 + rand.nextInt(39); // 25 to 63 emeralds
+                    if (rand.nextFloat() <= 0.00075f) { // 0.075% chance
                         return new net.minecraft.world.item.trading.MerchantOffer(
-                                new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.EMERALD, emeralds),
+                                new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.DIAMOND, 12),
                                 new net.minecraft.world.item.ItemStack(ModItems.ANCIENT_ASHEN_SCROLL.get(), 1),
                                 1, // max uses
                                 1, // xp reward

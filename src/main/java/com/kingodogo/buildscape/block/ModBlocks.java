@@ -7330,4 +7330,102 @@ public class ModBlocks {
                                     .isViewBlocking((state, getter, pos) -> false)
                     )
             );
+    public static final RegistryObject<Block> BLACK_FACTORY_MESH = BLOCKS.register("black_factory_mesh",
+            () -> new ModBlock(BlockBehaviour.Properties.of(Material.METAL, MaterialColor.COLOR_GRAY).strength(3.0f, 6.0f).requiresCorrectToolForDrops().noOcclusion().sound(net.minecraft.world.level.block.SoundType.COPPER)));
+    public static final RegistryObject<Block> BLACK_FACTORY_MESH_STAIRS = BLOCKS.register("black_factory_mesh_stairs",
+            () -> new ModStairBlock(BLACK_FACTORY_MESH.get().defaultBlockState(), BlockBehaviour.Properties.of(Material.METAL, MaterialColor.COLOR_GRAY).strength(3.0f, 6.0f).requiresCorrectToolForDrops().noOcclusion().sound(net.minecraft.world.level.block.SoundType.COPPER)));
+    public static final RegistryObject<Block> BLACK_FACTORY_MESH_SLAB = BLOCKS.register("black_factory_mesh_slab",
+            () -> new ModSlabBlock(BlockBehaviour.Properties.of(Material.METAL, MaterialColor.COLOR_GRAY).strength(3.0f, 6.0f).requiresCorrectToolForDrops().noOcclusion().sound(net.minecraft.world.level.block.SoundType.COPPER)));
+    public static final RegistryObject<Block> BLACK_FACTORY_MESH_WALL = BLOCKS.register("black_factory_mesh_wall",
+            () -> new ModWallBlock(BlockBehaviour.Properties.of(Material.METAL, MaterialColor.COLOR_GRAY).strength(3.0f, 6.0f).requiresCorrectToolForDrops().noOcclusion().sound(net.minecraft.world.level.block.SoundType.COPPER)));
+    public static final RegistryObject<Block> BLUE_FACTORY_MESH = BLOCKS.register("blue_factory_mesh",
+            () -> new ModBlock(BlockBehaviour.Properties.of(Material.METAL, MaterialColor.COLOR_GRAY).strength(3.0f, 6.0f).requiresCorrectToolForDrops().noOcclusion().sound(net.minecraft.world.level.block.SoundType.COPPER)));
+    public static final RegistryObject<Block> BLUE_FACTORY_MESH_STAIRS = BLOCKS.register("blue_factory_mesh_stairs",
+            () -> new ModStairBlock(BLUE_FACTORY_MESH.get().defaultBlockState(), BlockBehaviour.Properties.of(Material.METAL, MaterialColor.COLOR_GRAY).strength(3.0f, 6.0f).requiresCorrectToolForDrops().noOcclusion().sound(net.minecraft.world.level.block.SoundType.COPPER)));
+    public static final RegistryObject<Block> BLUE_FACTORY_MESH_SLAB = BLOCKS.register("blue_factory_mesh_slab",
+            () -> new ModSlabBlock(BlockBehaviour.Properties.of(Material.METAL, MaterialColor.COLOR_GRAY).strength(3.0f, 6.0f).requiresCorrectToolForDrops().noOcclusion().sound(net.minecraft.world.level.block.SoundType.COPPER)));
+    public static final RegistryObject<Block> BLUE_FACTORY_MESH_WALL = BLOCKS.register("blue_factory_mesh_wall",
+            () -> new ModWallBlock(BlockBehaviour.Properties.of(Material.METAL, MaterialColor.COLOR_GRAY).strength(3.0f, 6.0f).requiresCorrectToolForDrops().noOcclusion().sound(net.minecraft.world.level.block.SoundType.COPPER)));
+    public static final RegistryObject<Block> BROWN_FACTORY_MESH = BLOCKS.register("brown_factory_mesh",
+            () -> new ModBlock(BlockBehaviour.Properties.of(Material.METAL, MaterialColor.COLOR_GRAY).strength(3.0f, 6.0f).requiresCorrectToolForDrops().noOcclusion().sound(net.minecraft.world.level.block.SoundType.COPPER)));
+    public static final RegistryObject<Block> BROWN_FACTORY_MESH_STAIRS = BLOCKS.register("brown_factory_mesh_stairs",
+            () -> new ModStairBlock(BROWN_FACTORY_MESH.get().defaultBlockState(), BlockBehaviour.Properties.of(Material.METAL, MaterialColor.COLOR_GRAY).strength(3.0f, 6.0f).requiresCorrectToolForDrops().noOcclusion().sound(net.minecraft.world.level.block.SoundType.COPPER)));
+    public static final RegistryObject<Block> BROWN_FACTORY_MESH_SLAB = BLOCKS.register("brown_factory_mesh_slab",
+            () -> new ModSlabBlock(BlockBehaviour.Properties.of(Material.METAL, MaterialColor.COLOR_GRAY).strength(3.0f, 6.0f).requiresCorrectToolForDrops().noOcclusion().sound(net.minecraft.world.level.block.SoundType.COPPER)));
+    public static final RegistryObject<Block> BROWN_FACTORY_MESH_WALL = BLOCKS.register("brown_factory_mesh_wall",
+            () -> new ModWallBlock(BlockBehaviour.Properties.of(Material.METAL, MaterialColor.COLOR_GRAY).strength(3.0f, 6.0f).requiresCorrectToolForDrops().noOcclusion().sound(net.minecraft.world.level.block.SoundType.COPPER)));
+    public static final RegistryObject<Block> GRAY_FACTORY_MESH = BLOCKS.register("gray_factory_mesh",
+            () -> new ModBlock(BlockBehaviour.Properties.of(Material.METAL, MaterialColor.COLOR_GRAY).strength(3.0f, 6.0f).requiresCorrectToolForDrops().noOcclusion().sound(net.minecraft.world.level.block.SoundType.COPPER)));
+    public static final RegistryObject<Block> GRAY_FACTORY_MESH_STAIRS = BLOCKS.register("gray_factory_mesh_stairs",
+            () -> new ModStairBlock(GRAY_FACTORY_MESH.get().defaultBlockState(), BlockBehaviour.Properties.of(Material.METAL, MaterialColor.COLOR_GRAY).strength(3.0f, 6.0f).requiresCorrectToolForDrops().noOcclusion().sound(net.minecraft.world.level.block.SoundType.COPPER)));
+    public static final RegistryObject<Block> GRAY_FACTORY_MESH_SLAB = BLOCKS.register("gray_factory_mesh_slab",
+            () -> new ModSlabBlock(BlockBehaviour.Properties.of(Material.METAL, MaterialColor.COLOR_GRAY).strength(3.0f, 6.0f).requiresCorrectToolForDrops().noOcclusion().sound(net.minecraft.world.level.block.SoundType.COPPER)));
+    public static final RegistryObject<Block> GRAY_FACTORY_MESH_WALL = BLOCKS.register("gray_factory_mesh_wall",
+            () -> new ModWallBlock(BlockBehaviour.Properties.of(Material.METAL, MaterialColor.COLOR_GRAY).strength(3.0f, 6.0f).requiresCorrectToolForDrops().noOcclusion().sound(net.minecraft.world.level.block.SoundType.COPPER)));
+    public static final RegistryObject<Block> GREEN_FACTORY_MESH = BLOCKS.register("green_factory_mesh",
+            () -> new ModBlock(BlockBehaviour.Properties.of(Material.METAL, MaterialColor.COLOR_GRAY).strength(3.0f, 6.0f).requiresCorrectToolForDrops().noOcclusion().sound(net.minecraft.world.level.block.SoundType.COPPER)));
+    public static final RegistryObject<Block> GREEN_FACTORY_MESH_STAIRS = BLOCKS.register("green_factory_mesh_stairs",
+            () -> new ModStairBlock(GREEN_FACTORY_MESH.get().defaultBlockState(), BlockBehaviour.Properties.of(Material.METAL, MaterialColor.COLOR_GRAY).strength(3.0f, 6.0f).requiresCorrectToolForDrops().noOcclusion().sound(net.minecraft.world.level.block.SoundType.COPPER)));
+    public static final RegistryObject<Block> GREEN_FACTORY_MESH_SLAB = BLOCKS.register("green_factory_mesh_slab",
+            () -> new ModSlabBlock(BlockBehaviour.Properties.of(Material.METAL, MaterialColor.COLOR_GRAY).strength(3.0f, 6.0f).requiresCorrectToolForDrops().noOcclusion().sound(net.minecraft.world.level.block.SoundType.COPPER)));
+    public static final RegistryObject<Block> GREEN_FACTORY_MESH_WALL = BLOCKS.register("green_factory_mesh_wall",
+            () -> new ModWallBlock(BlockBehaviour.Properties.of(Material.METAL, MaterialColor.COLOR_GRAY).strength(3.0f, 6.0f).requiresCorrectToolForDrops().noOcclusion().sound(net.minecraft.world.level.block.SoundType.COPPER)));
+    public static final RegistryObject<Block> LIGHT_GRAY_FACTORY_MESH = BLOCKS.register("light_gray_factory_mesh",
+            () -> new ModBlock(BlockBehaviour.Properties.of(Material.METAL, MaterialColor.COLOR_GRAY).strength(3.0f, 6.0f).requiresCorrectToolForDrops().noOcclusion().sound(net.minecraft.world.level.block.SoundType.COPPER)));
+    public static final RegistryObject<Block> LIGHT_GRAY_FACTORY_MESH_STAIRS = BLOCKS.register("light_gray_factory_mesh_stairs",
+            () -> new ModStairBlock(LIGHT_GRAY_FACTORY_MESH.get().defaultBlockState(), BlockBehaviour.Properties.of(Material.METAL, MaterialColor.COLOR_GRAY).strength(3.0f, 6.0f).requiresCorrectToolForDrops().noOcclusion().sound(net.minecraft.world.level.block.SoundType.COPPER)));
+    public static final RegistryObject<Block> LIGHT_GRAY_FACTORY_MESH_SLAB = BLOCKS.register("light_gray_factory_mesh_slab",
+            () -> new ModSlabBlock(BlockBehaviour.Properties.of(Material.METAL, MaterialColor.COLOR_GRAY).strength(3.0f, 6.0f).requiresCorrectToolForDrops().noOcclusion().sound(net.minecraft.world.level.block.SoundType.COPPER)));
+    public static final RegistryObject<Block> LIGHT_GRAY_FACTORY_MESH_WALL = BLOCKS.register("light_gray_factory_mesh_wall",
+            () -> new ModWallBlock(BlockBehaviour.Properties.of(Material.METAL, MaterialColor.COLOR_GRAY).strength(3.0f, 6.0f).requiresCorrectToolForDrops().noOcclusion().sound(net.minecraft.world.level.block.SoundType.COPPER)));
+    public static final RegistryObject<Block> LIME_FACTORY_MESH = BLOCKS.register("lime_factory_mesh",
+            () -> new ModBlock(BlockBehaviour.Properties.of(Material.METAL, MaterialColor.COLOR_GRAY).strength(3.0f, 6.0f).requiresCorrectToolForDrops().noOcclusion().sound(net.minecraft.world.level.block.SoundType.COPPER)));
+    public static final RegistryObject<Block> LIME_FACTORY_MESH_STAIRS = BLOCKS.register("lime_factory_mesh_stairs",
+            () -> new ModStairBlock(LIME_FACTORY_MESH.get().defaultBlockState(), BlockBehaviour.Properties.of(Material.METAL, MaterialColor.COLOR_GRAY).strength(3.0f, 6.0f).requiresCorrectToolForDrops().noOcclusion().sound(net.minecraft.world.level.block.SoundType.COPPER)));
+    public static final RegistryObject<Block> LIME_FACTORY_MESH_SLAB = BLOCKS.register("lime_factory_mesh_slab",
+            () -> new ModSlabBlock(BlockBehaviour.Properties.of(Material.METAL, MaterialColor.COLOR_GRAY).strength(3.0f, 6.0f).requiresCorrectToolForDrops().noOcclusion().sound(net.minecraft.world.level.block.SoundType.COPPER)));
+    public static final RegistryObject<Block> LIME_FACTORY_MESH_WALL = BLOCKS.register("lime_factory_mesh_wall",
+            () -> new ModWallBlock(BlockBehaviour.Properties.of(Material.METAL, MaterialColor.COLOR_GRAY).strength(3.0f, 6.0f).requiresCorrectToolForDrops().noOcclusion().sound(net.minecraft.world.level.block.SoundType.COPPER)));
+    public static final RegistryObject<Block> ORANGE_FACTORY_MESH = BLOCKS.register("orange_factory_mesh",
+            () -> new ModBlock(BlockBehaviour.Properties.of(Material.METAL, MaterialColor.COLOR_GRAY).strength(3.0f, 6.0f).requiresCorrectToolForDrops().noOcclusion().sound(net.minecraft.world.level.block.SoundType.COPPER)));
+    public static final RegistryObject<Block> ORANGE_FACTORY_MESH_STAIRS = BLOCKS.register("orange_factory_mesh_stairs",
+            () -> new ModStairBlock(ORANGE_FACTORY_MESH.get().defaultBlockState(), BlockBehaviour.Properties.of(Material.METAL, MaterialColor.COLOR_GRAY).strength(3.0f, 6.0f).requiresCorrectToolForDrops().noOcclusion().sound(net.minecraft.world.level.block.SoundType.COPPER)));
+    public static final RegistryObject<Block> ORANGE_FACTORY_MESH_SLAB = BLOCKS.register("orange_factory_mesh_slab",
+            () -> new ModSlabBlock(BlockBehaviour.Properties.of(Material.METAL, MaterialColor.COLOR_GRAY).strength(3.0f, 6.0f).requiresCorrectToolForDrops().noOcclusion().sound(net.minecraft.world.level.block.SoundType.COPPER)));
+    public static final RegistryObject<Block> ORANGE_FACTORY_MESH_WALL = BLOCKS.register("orange_factory_mesh_wall",
+            () -> new ModWallBlock(BlockBehaviour.Properties.of(Material.METAL, MaterialColor.COLOR_GRAY).strength(3.0f, 6.0f).requiresCorrectToolForDrops().noOcclusion().sound(net.minecraft.world.level.block.SoundType.COPPER)));
+    public static final RegistryObject<Block> RED_FACTORY_MESH = BLOCKS.register("red_factory_mesh",
+            () -> new ModBlock(BlockBehaviour.Properties.of(Material.METAL, MaterialColor.COLOR_GRAY).strength(3.0f, 6.0f).requiresCorrectToolForDrops().noOcclusion().sound(net.minecraft.world.level.block.SoundType.COPPER)));
+    public static final RegistryObject<Block> RED_FACTORY_MESH_STAIRS = BLOCKS.register("red_factory_mesh_stairs",
+            () -> new ModStairBlock(RED_FACTORY_MESH.get().defaultBlockState(), BlockBehaviour.Properties.of(Material.METAL, MaterialColor.COLOR_GRAY).strength(3.0f, 6.0f).requiresCorrectToolForDrops().noOcclusion().sound(net.minecraft.world.level.block.SoundType.COPPER)));
+    public static final RegistryObject<Block> RED_FACTORY_MESH_SLAB = BLOCKS.register("red_factory_mesh_slab",
+            () -> new ModSlabBlock(BlockBehaviour.Properties.of(Material.METAL, MaterialColor.COLOR_GRAY).strength(3.0f, 6.0f).requiresCorrectToolForDrops().noOcclusion().sound(net.minecraft.world.level.block.SoundType.COPPER)));
+    public static final RegistryObject<Block> RED_FACTORY_MESH_WALL = BLOCKS.register("red_factory_mesh_wall",
+            () -> new ModWallBlock(BlockBehaviour.Properties.of(Material.METAL, MaterialColor.COLOR_GRAY).strength(3.0f, 6.0f).requiresCorrectToolForDrops().noOcclusion().sound(net.minecraft.world.level.block.SoundType.COPPER)));
+    public static final RegistryObject<Block> YELLOW_FACTORY_MESH = BLOCKS.register("yellow_factory_mesh",
+            () -> new ModBlock(BlockBehaviour.Properties.of(Material.METAL, MaterialColor.COLOR_GRAY).strength(3.0f, 6.0f).requiresCorrectToolForDrops().noOcclusion().sound(net.minecraft.world.level.block.SoundType.COPPER)));
+    public static final RegistryObject<Block> YELLOW_FACTORY_MESH_STAIRS = BLOCKS.register("yellow_factory_mesh_stairs",
+            () -> new ModStairBlock(YELLOW_FACTORY_MESH.get().defaultBlockState(), BlockBehaviour.Properties.of(Material.METAL, MaterialColor.COLOR_GRAY).strength(3.0f, 6.0f).requiresCorrectToolForDrops().noOcclusion().sound(net.minecraft.world.level.block.SoundType.COPPER)));
+    public static final RegistryObject<Block> YELLOW_FACTORY_MESH_SLAB = BLOCKS.register("yellow_factory_mesh_slab",
+            () -> new ModSlabBlock(BlockBehaviour.Properties.of(Material.METAL, MaterialColor.COLOR_GRAY).strength(3.0f, 6.0f).requiresCorrectToolForDrops().noOcclusion().sound(net.minecraft.world.level.block.SoundType.COPPER)));
+    public static final RegistryObject<Block> YELLOW_FACTORY_MESH_WALL = BLOCKS.register("yellow_factory_mesh_wall",
+            () -> new ModWallBlock(BlockBehaviour.Properties.of(Material.METAL, MaterialColor.COLOR_GRAY).strength(3.0f, 6.0f).requiresCorrectToolForDrops().noOcclusion().sound(net.minecraft.world.level.block.SoundType.COPPER)));
+    public static final RegistryObject<Block> PACKED_MUD = BLOCKS.register("packed_mud",
+            () -> new ModBlock(BlockBehaviour.Properties.of(Material.DIRT, MaterialColor.DIRT).strength(1.0f).requiresCorrectToolForDrops().sound(ModSounds.PACKED_MUD_SOUNDS())));
+    public static final RegistryObject<Block> PACKED_MUD_STAIRS = BLOCKS.register("packed_mud_stairs",
+            () -> new ModStairBlock(PACKED_MUD.get().defaultBlockState(), BlockBehaviour.Properties.of(Material.DIRT, MaterialColor.DIRT).strength(1.0f).requiresCorrectToolForDrops().sound(ModSounds.PACKED_MUD_SOUNDS())));
+    public static final RegistryObject<Block> PACKED_MUD_SLAB = BLOCKS.register("packed_mud_slab",
+            () -> new ModSlabBlock(BlockBehaviour.Properties.of(Material.DIRT, MaterialColor.DIRT).strength(1.0f).requiresCorrectToolForDrops().sound(ModSounds.PACKED_MUD_SOUNDS())));
+    public static final RegistryObject<Block> PACKED_MUD_WALL = BLOCKS.register("packed_mud_wall",
+            () -> new ModWallBlock(BlockBehaviour.Properties.of(Material.DIRT, MaterialColor.DIRT).strength(1.0f).requiresCorrectToolForDrops().sound(ModSounds.PACKED_MUD_SOUNDS())));
+
+    public static final RegistryObject<Block> MUD_BRICKS = BLOCKS.register("mud_bricks",
+            () -> new ModBlock(BlockBehaviour.Properties.of(Material.STONE, MaterialColor.DIRT).strength(1.5f, 3.0f).requiresCorrectToolForDrops().sound(ModSounds.MUD_BRICKS_SOUNDS())));
+    public static final RegistryObject<Block> MUD_BRICK_STAIRS = BLOCKS.register("mud_brick_stairs",
+            () -> new ModStairBlock(MUD_BRICKS.get().defaultBlockState(), BlockBehaviour.Properties.of(Material.STONE, MaterialColor.DIRT).strength(1.5f, 3.0f).requiresCorrectToolForDrops().sound(ModSounds.MUD_BRICKS_SOUNDS())));
+    public static final RegistryObject<Block> MUD_BRICK_SLAB = BLOCKS.register("mud_brick_slab",
+            () -> new ModSlabBlock(BlockBehaviour.Properties.of(Material.STONE, MaterialColor.DIRT).strength(1.5f, 3.0f).requiresCorrectToolForDrops().sound(ModSounds.MUD_BRICKS_SOUNDS())));
+    public static final RegistryObject<Block> MUD_BRICK_WALL = BLOCKS.register("mud_brick_wall",
+            () -> new ModWallBlock(BlockBehaviour.Properties.of(Material.STONE, MaterialColor.DIRT).strength(1.5f, 3.0f).requiresCorrectToolForDrops().sound(ModSounds.MUD_BRICKS_SOUNDS())));
+
 }

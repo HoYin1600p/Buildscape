@@ -38,6 +38,8 @@ public class PillarBlock
             BlockStateProperties.WATERLOGGED;
     private static final ThreadLocal<Float> PLACING_PLAYER_YAW =
             new ThreadLocal<>();
+    private static final ThreadLocal<net.minecraft.nbt.CompoundTag> PLACING_NBT_DATA =
+            new ThreadLocal<>();
 
     private static final VoxelShape SHAPE_SINGLE = Shapes.or(
             Block.box(2, 0, 2, 14, 2, 14),
@@ -221,6 +223,12 @@ public class PillarBlock
     ) {
 
         if (!level.isClientSide) {
+            // First, handle stack enforcement and syncing BEFORE applying NBT data
+            // This ensures the pillar is in the correct state before we add the custom item
+            enforceSingleItemPerStack(level, pos);
+            syncNewPillarWithStack(level, pos);
+
+            // Now apply NBT data from the placed item (ITEM and PATTERN tags)
             BlockEntity be = level.getBlockEntity(pos);
             if (be instanceof PillarBlockEntity pillarBE) {
                 Float storedYaw = PLACING_PLAYER_YAW.get();
@@ -228,11 +236,39 @@ public class PillarBlock
                     pillarBE.setFacingYaw(storedYaw);
                     PLACING_PLAYER_YAW.set(null);
                 }
+
+                net.minecraft.nbt.CompoundTag storedNBT = PLACING_NBT_DATA.get();
+                if (storedNBT != null) {
+                    // Read ITEM tag and set displayed item
+                    if (storedNBT.contains("ITEM", 8)) { // 8 = String type
+                        String itemId = storedNBT.getString("ITEM");
+                        try {
+                            net.minecraft.resources.ResourceLocation itemLocation =
+                                    new net.minecraft.resources.ResourceLocation(itemId);
+                            net.minecraft.world.item.Item item =
+                                    net.minecraftforge.registries.ForgeRegistries.ITEMS.getValue(itemLocation);
+                            if (item != null && item != net.minecraft.world.item.Items.AIR) {
+                                ItemStack displayItem = new ItemStack(item);
+                                pillarBE.setDisplayedItem(displayItem);
+                            }
+                        } catch (Exception e) {
+                            // Invalid item ID, ignore
+                        }
+                    }
+
+                    // Read PATTERN tag and set particle pattern
+                    if (storedNBT.contains("PATTERN", 8)) { // 8 = String type
+                        String pattern = storedNBT.getString("PATTERN");
+                        pillarBE.setParticlePattern(pattern);
+                    }
+
+                    PLACING_NBT_DATA.set(null);
+                    pillarBE.setChanged();
+
+                    // Send block update to sync to clients
+                    level.sendBlockUpdated(pos, state, state, 3);
+                }
             }
-
-            enforceSingleItemPerStack(level, pos);
-
-            syncNewPillarWithStack(level, pos);
 
             BlockPos above = pos.above();
             BlockPos below = pos.below();
@@ -602,7 +638,63 @@ public class PillarBlock
         super.setPlacedBy(level, pos, state, placer, stack);
         if (!level.isClientSide) {
             com.kingodogo.buildscape.config.PillarIdManager.get().getOrCreatePillarData(level, pos);
+
+            // Store NBT data in ThreadLocal to be applied in onPlace (after the block is fully initialized)
+            if (stack.hasTag()) {
+                net.minecraft.nbt.CompoundTag tag = stack.getTag();
+                // Check for direct NBT tags (from /give command)
+                if (tag.contains("ITEM", 8) || tag.contains("PATTERN", 8)) {
+                    PLACING_NBT_DATA.set(tag.copy());
+                }
+                // Check for BlockEntityTag (from /fill command or middle-click with NBT)
+                else if (tag.contains("BlockEntityTag", 10)) {
+                    net.minecraft.nbt.CompoundTag beTag = tag.getCompound("BlockEntityTag");
+                    if (beTag.contains("ITEM", 8) || beTag.contains("PATTERN", 8)) {
+                        PLACING_NBT_DATA.set(beTag.copy());
+                    }
+                }
+            }
         }
+    }
+
+    @Override
+    public ItemStack getCloneItemStack(BlockState state, net.minecraft.world.phys.HitResult target, BlockGetter level, BlockPos pos, Player player) {
+        ItemStack stack = super.getCloneItemStack(state, target, level, pos, player);
+
+        BlockEntity be = level.getBlockEntity(pos);
+        if (be instanceof PillarBlockEntity pillarBE) {
+            boolean hasCustomData = false;
+            net.minecraft.nbt.CompoundTag beTag = new net.minecraft.nbt.CompoundTag();
+
+            // Write ITEM tag if the pillar has a displayed item
+            if (pillarBE.hasDisplayItem()) {
+                ItemStack displayedItem = pillarBE.getDisplayedItem();
+                if (!displayedItem.isEmpty()) {
+                    net.minecraft.resources.ResourceLocation itemId =
+                            net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(displayedItem.getItem());
+                    if (itemId != null) {
+                        beTag.putString("ITEM", itemId.toString());
+                        hasCustomData = true;
+                    }
+                }
+            }
+
+            // Write PATTERN tag if the pillar has a pattern
+            String pattern = pillarBE.getParticlePattern();
+            if (pattern != null && !pattern.isEmpty()) {
+                beTag.putString("PATTERN", pattern);
+                hasCustomData = true;
+            }
+
+            // Only add BlockEntityTag if we have custom data
+            if (hasCustomData) {
+                net.minecraft.nbt.CompoundTag tag = stack.getOrCreateTag();
+                tag.put("BlockEntityTag", beTag);
+                stack.setTag(tag);
+            }
+        }
+
+        return stack;
     }
 
     @Override
@@ -1018,37 +1110,37 @@ public class PillarBlock
         net.minecraft.world.item.Item item = stack.getItem();
 
         if (item == net.minecraft.world.item.Items.WHITE_DYE) {
-            return new java.util.AbstractMap.SimpleEntry<>("#FFFFFF", "White");
+            return new java.util.AbstractMap.SimpleEntry<>("#E8FEFD", "White");
         } else if (item == net.minecraft.world.item.Items.ORANGE_DYE) {
-            return new java.util.AbstractMap.SimpleEntry<>("#FF9800", "Orange");
+            return new java.util.AbstractMap.SimpleEntry<>("#FF5C00", "Orange");
         } else if (item == net.minecraft.world.item.Items.MAGENTA_DYE) {
-            return new java.util.AbstractMap.SimpleEntry<>("#C74EBD", "Magenta");
+            return new java.util.AbstractMap.SimpleEntry<>("#FF00FF", "Magenta");
         } else if (item == net.minecraft.world.item.Items.LIGHT_BLUE_DYE) {
-            return new java.util.AbstractMap.SimpleEntry<>("#3AB3DA", "Light Blue");
+            return new java.util.AbstractMap.SimpleEntry<>("#3CDFFF", "Light Blue");
         } else if (item == net.minecraft.world.item.Items.YELLOW_DYE) {
-            return new java.util.AbstractMap.SimpleEntry<>("#FED83D", "Yellow");
+            return new java.util.AbstractMap.SimpleEntry<>("#FFFF00", "Yellow");
         } else if (item == net.minecraft.world.item.Items.LIME_DYE) {
-            return new java.util.AbstractMap.SimpleEntry<>("#80C71F", "Lime");
+            return new java.util.AbstractMap.SimpleEntry<>("#BFFE00", "Lime");
         } else if (item == net.minecraft.world.item.Items.PINK_DYE) {
-            return new java.util.AbstractMap.SimpleEntry<>("#F38BAA", "Pink");
+            return new java.util.AbstractMap.SimpleEntry<>("#F686B7", "Pink");
         } else if (item == net.minecraft.world.item.Items.GRAY_DYE) {
-            return new java.util.AbstractMap.SimpleEntry<>("#474F52", "Gray");
+            return new java.util.AbstractMap.SimpleEntry<>("#232526", "Gray");
         } else if (item == net.minecraft.world.item.Items.LIGHT_GRAY_DYE) {
-            return new java.util.AbstractMap.SimpleEntry<>("#9D9D97", "Light Gray");
+            return new java.util.AbstractMap.SimpleEntry<>("#B1B8C5", "Light Gray");
         } else if (item == net.minecraft.world.item.Items.CYAN_DYE) {
-            return new java.util.AbstractMap.SimpleEntry<>("#169C9C", "Cyan");
+            return new java.util.AbstractMap.SimpleEntry<>("#00FFFF", "Cyan");
         } else if (item == net.minecraft.world.item.Items.PURPLE_DYE) {
-            return new java.util.AbstractMap.SimpleEntry<>("#8932B8", "Purple");
+            return new java.util.AbstractMap.SimpleEntry<>("#AB87FF", "Purple");
         } else if (item == net.minecraft.world.item.Items.BLUE_DYE) {
-            return new java.util.AbstractMap.SimpleEntry<>("#3C44AA", "Blue");
+            return new java.util.AbstractMap.SimpleEntry<>("#1919EA", "Blue");
         } else if (item == net.minecraft.world.item.Items.BROWN_DYE) {
-            return new java.util.AbstractMap.SimpleEntry<>("#835432", "Brown");
+            return new java.util.AbstractMap.SimpleEntry<>("#411900", "Brown");
         } else if (item == net.minecraft.world.item.Items.GREEN_DYE) {
-            return new java.util.AbstractMap.SimpleEntry<>("#5E7C16", "Green");
+            return new java.util.AbstractMap.SimpleEntry<>("#39FF14", "Green");
         } else if (item == net.minecraft.world.item.Items.RED_DYE) {
-            return new java.util.AbstractMap.SimpleEntry<>("#B02E26", "Red");
+            return new java.util.AbstractMap.SimpleEntry<>("#FF0000", "Red");
         } else if (item == net.minecraft.world.item.Items.BLACK_DYE) {
-            return new java.util.AbstractMap.SimpleEntry<>("#1D1D21", "Black");
+            return new java.util.AbstractMap.SimpleEntry<>("#07010C", "Black");
         }
 
         return null;

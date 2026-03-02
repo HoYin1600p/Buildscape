@@ -54,7 +54,8 @@ public class TreeChopHandler {
         if (player == null || mc.level == null) return;
 
         // Reset
-        if (!player.isCreative() || !player.isShiftKeyDown() || mc.options.keyAttack == null || !mc.options.keyAttack.isDown()) {
+        if (!player.isCreative() || !player.isShiftKeyDown() || mc.options.keyAttack == null || !mc.options.keyAttack.isDown()
+                || !mc.level.getGameRules().getBoolean(com.kingodogo.buildscape.world.ModGameRules.CREATIVE_TREE_BREAKER)) {
             if (mc.level != null && targetBlockPos != null) {
                 mc.level.destroyBlockProgress(player.getId(), targetBlockPos, -1);
             }
@@ -123,6 +124,8 @@ public class TreeChopHandler {
         Player player = mc.player;
         if (player == null || mc.level == null) return;
         if (!player.isCreative() || !player.isShiftKeyDown()) return;
+        if (!mc.level.getGameRules().getBoolean(com.kingodogo.buildscape.world.ModGameRules.CREATIVE_TREE_BREAKER))
+            return;
 
         // Check what we are looking at NOW
         HitResult hit = mc.hitResult;
@@ -157,6 +160,8 @@ public class TreeChopHandler {
         if (player == null || mc.level == null) return;
 
         if (!player.isCreative() || !player.isShiftKeyDown()) return;
+        if (!mc.level.getGameRules().getBoolean(com.kingodogo.buildscape.world.ModGameRules.CREATIVE_TREE_BREAKER))
+            return;
 
         HitResult target = event.getTarget();
         if (target.getType() != HitResult.Type.BLOCK) return;
@@ -208,7 +213,8 @@ public class TreeChopHandler {
         Minecraft mc = Minecraft.getInstance();
         if (mc.player == null || mc.level == null) return;
 
-        if (mc.player.isCreative() && mc.player.isShiftKeyDown()) {
+        if (mc.player.isCreative() && mc.player.isShiftKeyDown() &&
+                mc.level.getGameRules().getBoolean(com.kingodogo.buildscape.world.ModGameRules.CREATIVE_TREE_BREAKER)) {
             HitResult hit = mc.hitResult;
             if (hit != null && hit.getType() == HitResult.Type.BLOCK) {
                 BlockHitResult blockHit = (BlockHitResult) hit;

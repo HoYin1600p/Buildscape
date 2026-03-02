@@ -1,12 +1,8 @@
 package com.kingodogo.buildscape.sound;
 
 import com.kingodogo.buildscape.BuildScape;
-
-import java.util.function.Supplier;
-
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
-import net.minecraft.world.level.block.SoundType;
 import net.minecraftforge.common.util.ForgeSoundType;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
@@ -14,6 +10,8 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.util.function.Supplier;
 
 public class ModSounds {
 
@@ -58,6 +56,18 @@ public class ModSounds {
     public static final RegistryObject<SoundEvent> MUD_PLACE = MUD_STEP;
     public static final RegistryObject<SoundEvent> MUD_HIT = MUD_STEP;
     public static final RegistryObject<SoundEvent> MUD_FALL = MUD_STEP;
+
+    public static final RegistryObject<SoundEvent> PACKED_MUD_BREAK = registerSoundEvent("block.packed_mud.break");
+    public static final RegistryObject<SoundEvent> PACKED_MUD_STEP = registerSoundEvent("block.packed_mud.step");
+    public static final RegistryObject<SoundEvent> PACKED_MUD_PLACE = registerSoundEvent("block.packed_mud.place");
+    public static final RegistryObject<SoundEvent> PACKED_MUD_HIT = registerSoundEvent("block.packed_mud.hit");
+    public static final RegistryObject<SoundEvent> PACKED_MUD_FALL = registerSoundEvent("block.packed_mud.fall");
+
+    public static final RegistryObject<SoundEvent> MUD_BRICKS_BREAK = registerSoundEvent("block.mud_bricks.break");
+    public static final RegistryObject<SoundEvent> MUD_BRICKS_STEP = registerSoundEvent("block.mud_bricks.step");
+    public static final RegistryObject<SoundEvent> MUD_BRICKS_PLACE = registerSoundEvent("block.mud_bricks.place");
+    public static final RegistryObject<SoundEvent> MUD_BRICKS_HIT = registerSoundEvent("block.mud_bricks.hit");
+    public static final RegistryObject<SoundEvent> MUD_BRICKS_FALL = registerSoundEvent("block.mud_bricks.fall");
 
     public static final RegistryObject<SoundEvent> DECORATED_POT_PLACE =
             registerSoundEvent("block.decorated_pot.place");
@@ -208,42 +218,49 @@ public class ModSounds {
         return copperBulbSounds;
     }
 
-    public static ForgeSoundType MUD_SOUNDS() {
-        try {
-            Supplier<SoundEvent> breakSound = () -> {
-                if (MUD_BREAK.isPresent()) {
-                    return MUD_BREAK.get();
-                }
-                return net.minecraft.sounds.SoundEvents.GRAVEL_BREAK;
-            };
-            Supplier<SoundEvent> stepSound = () -> {
-                if (MUD_STEP.isPresent()) {
-                    return MUD_STEP.get();
-                }
-                return net.minecraft.sounds.SoundEvents.GRAVEL_STEP;
-            };
+    public static com.kingodogo.buildscape.block.CustomSoundType MUD_SOUNDS() {
+        return new com.kingodogo.buildscape.block.CustomSoundType(
+                1.0f, 1.0f,   // break
+                1.0f, 1.0f,  // step
+                1.0f, 1.0f,   // place
+                1.0f, 1.0f,   // hit
+                1.0f, 1.0f,  // fall
+                () -> MUD_BREAK.isPresent() ? MUD_BREAK.get() : net.minecraft.sounds.SoundEvents.GRAVEL_BREAK,
+                () -> MUD_STEP.isPresent() ? MUD_STEP.get() : net.minecraft.sounds.SoundEvents.GRAVEL_STEP,
+                () -> MUD_STEP.isPresent() ? MUD_STEP.get() : net.minecraft.sounds.SoundEvents.GRAVEL_PLACE,
+                () -> MUD_STEP.isPresent() ? MUD_STEP.get() : net.minecraft.sounds.SoundEvents.GRAVEL_HIT,
+                () -> MUD_STEP.isPresent() ? MUD_STEP.get() : net.minecraft.sounds.SoundEvents.GRAVEL_FALL
+        );
+    }
 
-            return new ForgeSoundType(
-                    1.0f,
-                    1.0f,
-                    breakSound,
-                    stepSound,
-                    stepSound,
-                    stepSound,
-                    stepSound
-            );
-        } catch (Exception e) {
-            LOGGER.error("Failed to create mud sound type: " + e.getMessage(), e);
-            return new ForgeSoundType(
-                    1.0f,
-                    1.0f,
-                    () -> net.minecraft.sounds.SoundEvents.GRAVEL_BREAK,
-                    () -> net.minecraft.sounds.SoundEvents.GRAVEL_STEP,
-                    () -> net.minecraft.sounds.SoundEvents.GRAVEL_STEP,
-                    () -> net.minecraft.sounds.SoundEvents.GRAVEL_STEP,
-                    () -> net.minecraft.sounds.SoundEvents.GRAVEL_STEP
-            );
-        }
+    public static com.kingodogo.buildscape.block.CustomSoundType PACKED_MUD_SOUNDS() {
+        return new com.kingodogo.buildscape.block.CustomSoundType(
+                0.3f, 1.0f,   // break
+                1.0f, 0.95f, // step
+                0.3f, 1.0f,   // place
+                1.0f, 1.0f,  // hit
+                1.0f, 1.0f,  // fall
+                () -> PACKED_MUD_BREAK.isPresent() ? PACKED_MUD_BREAK.get() : net.minecraft.sounds.SoundEvents.GRAVEL_BREAK,
+                () -> PACKED_MUD_STEP.isPresent() ? PACKED_MUD_STEP.get() : net.minecraft.sounds.SoundEvents.GRAVEL_STEP,
+                () -> PACKED_MUD_PLACE.isPresent() ? PACKED_MUD_PLACE.get() : net.minecraft.sounds.SoundEvents.GRAVEL_PLACE,
+                () -> PACKED_MUD_HIT.isPresent() ? PACKED_MUD_HIT.get() : net.minecraft.sounds.SoundEvents.GRAVEL_HIT,
+                () -> PACKED_MUD_FALL.isPresent() ? PACKED_MUD_FALL.get() : net.minecraft.sounds.SoundEvents.GRAVEL_FALL
+        );
+    }
+
+    public static com.kingodogo.buildscape.block.CustomSoundType MUD_BRICKS_SOUNDS() {
+        return new com.kingodogo.buildscape.block.CustomSoundType(
+                1.0f, 1.0f,  // break
+                1.0f, 1.0f,   // step
+                1.0f, 1.0f,  // place
+                1.0f, 1.0f,  // hit
+                1.0f, 1.0f,  // fall
+                () -> MUD_BRICKS_BREAK.isPresent() ? MUD_BRICKS_BREAK.get() : net.minecraft.sounds.SoundEvents.STONE_BREAK,
+                () -> MUD_BRICKS_STEP.isPresent() ? MUD_BRICKS_STEP.get() : net.minecraft.sounds.SoundEvents.STONE_STEP,
+                () -> MUD_BRICKS_PLACE.isPresent() ? MUD_BRICKS_PLACE.get() : net.minecraft.sounds.SoundEvents.STONE_PLACE,
+                () -> MUD_BRICKS_HIT.isPresent() ? MUD_BRICKS_HIT.get() : net.minecraft.sounds.SoundEvents.STONE_HIT,
+                () -> MUD_BRICKS_FALL.isPresent() ? MUD_BRICKS_FALL.get() : net.minecraft.sounds.SoundEvents.STONE_FALL
+        );
     }
 
     public static com.kingodogo.buildscape.block.CustomSoundType PETAL_CLOVER_SOUNDS() {

@@ -1,0 +1,8 @@
+{
+  "ingredient": {
+    "item": "buildscape:steel_block"
+  },
+  "result": "buildscape:white_factory_mesh",
+  "count": 4,
+  "type": "minecraft:stonecutting"
+}

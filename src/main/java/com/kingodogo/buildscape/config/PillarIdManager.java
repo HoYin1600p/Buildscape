@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -60,6 +61,7 @@ public class PillarIdManager {
     public static final String PREFIX_STONE = "S";
     public static final String PREFIX_DEEPSLATE = "D";
     public static final String PREFIX_QUARTZ = "Q";
+    public static final String PREFIX_ITEM_FRAME = "I-F";
 
     /**
      * Reset world cache directory and CLEAR data - makes Pillar IDs world/server specific.
@@ -431,12 +433,25 @@ public class PillarIdManager {
     }
 
     private String positionKey(String dimension, BlockPos pos) {
-        return dimension + ":" + pos.getX() + ":" + pos.getY() + ":" + pos.getZ();
+        return positionKey(dimension, pos, null);
+    }
+
+    public String positionKey(String dimension, BlockPos pos, net.minecraft.core.Direction facing) {
+        String key = dimension + ":" + pos.getX() + ":" + pos.getY() + ":" + pos.getZ();
+        if (facing != null) {
+            key += ":" + facing.getSerializedName();
+        }
+        return key;
     }
 
     public static String getDimensionKey(Level level) {
         if (level == null) return "unknown";
         return level.dimension().location().toString();
+    }
+
+    public String getIdForPosition(String posKey) {
+        if (posKey == null) return null;
+        return positionIndex.get(posKey);
     }
 
     public java.util.Collection<PillarData> getAllData() {
@@ -750,11 +765,13 @@ public class PillarIdManager {
     private void processLoadedData(Map<String, PillarData> loaded, MinecraftServer server, File sourceFile) {
         try {
 
-                // IMPORTANT: Preserve existing colors when reloading
-                // If file has empty colors but manager has colors, preserve manager colors
+            // IMPORTANT: Preserve existing entries when reloading (especially early-registered item frames)
                 Map<String, PillarData> existingData = new HashMap<>(pillarData);
 
+            // Clear map and index, we will rebuild them from file + existingData merge
                 pillarData.clear();
+            positionIndex.clear();
+                
                 if (loaded != null && !loaded.isEmpty()) {
                     int migrated = 0;
                     int skipped = 0;
@@ -833,8 +850,12 @@ public class PillarIdManager {
                             }
 
                             pillarData.put(id, data);
-                            // Keep position index in sync with loaded data
-                            positionIndex.put(positionKey(data.dimension, data.getBlockPos()), id);
+                            // Keep position index in sync with loaded data (respect facing for ItemFrames)
+                            net.minecraft.core.Direction facing = null;
+                            if (data.facing != null) {
+                                facing = net.minecraft.core.Direction.byName(data.facing);
+                            }
+                            positionIndex.put(positionKey(data.dimension, data.getBlockPos(), facing), id);
                             if (needsMigration) {
                                 migrated++;
                             }
@@ -858,18 +879,31 @@ public class PillarIdManager {
                     if (skipped > 0) {
                     }
 
-                    // Log how many entries were loaded and how many have colors
-                    int loadedCount = pillarData.size();
-                    int colorsCount = 0;
-                    for (PillarData data : pillarData.values()) {
-                        if (data != null && data.hasColors()) {
-                            colorsCount++;
-                        }
-                    }
-
-                    // Track if we had colors when we loaded
-                    hadColorsOnLoad = (colorsCount > 0);
                 }
+
+            // Preserve and re-add entries that were registered early but aren't in the file yet
+            for (Map.Entry<String, PillarData> entry : existingData.entrySet()) {
+                if (!pillarData.containsKey(entry.getKey())) {
+                    PillarData earlyData = entry.getValue();
+                    pillarData.put(entry.getKey(), earlyData);
+
+                    // Also add to index
+                    net.minecraft.core.Direction facing = null;
+                    if (earlyData.facing != null) {
+                        facing = net.minecraft.core.Direction.byName(earlyData.facing);
+                    }
+                    positionIndex.put(positionKey(earlyData.dimension, earlyData.getBlockPos(), facing), entry.getKey());
+                }
+            }
+
+            // Track if we had colors when we loaded
+            int colorsCountAfterMerge = 0;
+            for (PillarData data : pillarData.values()) {
+                if (data != null && data.hasColors()) {
+                    colorsCountAfterMerge++;
+                }
+            }
+            hadColorsOnLoad = (colorsCountAfterMerge > 0);
 
                 if (pillarData.isEmpty()) {
                     fileWasDeleted = true;
@@ -2118,7 +2152,11 @@ public class PillarIdManager {
         for (PillarData data : newData.values()) {
             if (data != null && data.dimension != null) {
                 try {
-                    positionIndex.put(positionKey(data.dimension, data.getBlockPos()), data.id);
+                    net.minecraft.core.Direction facing = null;
+                    if (data.facing != null) {
+                        facing = net.minecraft.core.Direction.byName(data.facing);
+                    }
+                    positionIndex.put(positionKey(data.dimension, data.getBlockPos(), facing), data.id);
                 } catch (Exception ignored) {
                 }
             }
@@ -2135,6 +2173,7 @@ public class PillarIdManager {
     public void clearForServerSync() {
         pillarData.clear();
         positionIndex.clear();
+        com.kingodogo.buildscape.event.ItemFrameParticleHandler.clearClientCaches();
         // Don't set isServerSynced here - wait until data is fully loaded
         hasLoaded = false;
     }
@@ -2149,7 +2188,11 @@ public class PillarIdManager {
         pillarData.put(data.id, data);
         if (data.dimension != null) {
             try {
-                positionIndex.put(positionKey(data.dimension, data.getBlockPos()), data.id);
+                net.minecraft.core.Direction facing = null;
+                if (data.facing != null) {
+                    facing = net.minecraft.core.Direction.byName(data.facing);
+                }
+                positionIndex.put(positionKey(data.dimension, data.getBlockPos(), facing), data.id);
             } catch (Exception ignored) {
             }
         }
@@ -2212,6 +2255,207 @@ public class PillarIdManager {
     }
 
     /**
+     * Registers an item frame with the manager.
+     */
+    public void registerItemFrame(net.minecraft.world.entity.decoration.ItemFrame frame) {
+        if (frame == null || frame.level == null || frame.level.isClientSide) {
+            return;
+        }
+
+        CompoundTag dataTag = frame.getPersistentData();
+        String id = dataTag.getString("BuildScapeFrameId");
+
+        // Generate and save ID if missing
+        if (id == null || id.isEmpty()) {
+            id = com.kingodogo.buildscape.event.ItemFrameParticleHandler.getFrameId(frame);
+        }
+
+        String pattern = dataTag.getString("BuildScapeParticlePattern");
+        List<String> colors = new ArrayList<>();
+        if (dataTag.contains("BuildScapeParticleColors")) {
+            net.minecraft.nbt.ListTag colorList = dataTag.getList("BuildScapeParticleColors", 8);
+            for (int i = 0; i < colorList.size(); i++) {
+                colors.add(colorList.getString(i));
+            }
+        }
+
+        String dimension = getDimensionKey(frame.level);
+        BlockPos pos = frame.blockPosition();
+        net.minecraft.core.Direction facing = frame.getDirection();
+        String posKey = positionKey(dimension, pos, facing);
+
+        PillarData existing = pillarData.get(id);
+        if (existing == null) {
+            PillarData data = new PillarData(id, dimension, pos);
+            data.pattern = pattern;
+            data.dyeColors = colors;
+
+            // Set type for icon display
+            data.pillarType = "minecraft:item_frame";
+            data.facing = facing != null ? facing.getSerializedName() : null;
+
+            // Set displayed item
+            if (!frame.getItem().isEmpty()) {
+                net.minecraft.resources.ResourceLocation itemRL = net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(frame.getItem().getItem());
+                if (itemRL != null) data.displayedItem = itemRL.toString();
+            }
+
+            pillarData.put(id, data);
+            positionIndex.put(posKey, id);
+
+            if (com.kingodogo.buildscape.BuildScape.isServerFullyInitialized()) {
+                saveImmediate();
+            }
+        } else {
+            positionIndex.put(posKey, id);
+            boolean changed = false;
+
+            // Always ensure type and facing are set even if re-registering
+            if (existing.pillarType == null || !existing.pillarType.equals("minecraft:item_frame")) {
+                existing.pillarType = "minecraft:item_frame";
+                changed = true;
+            }
+            if (!Objects.equals(existing.facing, facing != null ? facing.getSerializedName() : null)) {
+                existing.facing = facing != null ? facing.getSerializedName() : null;
+                changed = true;
+            }
+
+            if (!Objects.equals(existing.pattern, pattern)) {
+                existing.pattern = pattern;
+                changed = true;
+            }
+            if (!Objects.equals(existing.dyeColors, colors)) {
+                existing.dyeColors = colors;
+                changed = true;
+            }
+
+            // Update item
+            if (!frame.getItem().isEmpty()) {
+                net.minecraft.resources.ResourceLocation itemKey = net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(frame.getItem().getItem());
+                String itemId = itemKey != null ? itemKey.toString() : null;
+                if (!Objects.equals(existing.displayedItem, itemId)) {
+                    existing.displayedItem = itemId;
+                    changed = true;
+                }
+            } else if (existing.displayedItem != null) {
+                existing.displayedItem = null;
+                changed = true;
+            }
+
+            if (changed && com.kingodogo.buildscape.BuildScape.isServerFullyInitialized()) {
+                saveImmediate();
+            }
+        }
+    }
+
+
+    /**
+     * Registers a colored item frame with the manager.
+     */
+    public void registerColoredItemFrame(com.kingodogo.buildscape.entity.ColoredItemFrameEntity frame) {
+        if (frame == null || frame.level == null || frame.level.isClientSide) {
+            return;
+        }
+
+        CompoundTag dataTag = frame.getPersistentData();
+        String id = dataTag.getString("BuildScapeFrameId");
+
+        // Generate and save ID if missing
+        if (id == null || id.isEmpty()) {
+            id = com.kingodogo.buildscape.event.ItemFrameParticleHandler.getFrameIdColored(frame);
+        }
+
+        String pattern = dataTag.getString("BuildScapeParticlePattern");
+        List<String> colors = new ArrayList<>();
+        if (dataTag.contains("BuildScapeParticleColors")) {
+            net.minecraft.nbt.ListTag colorList = dataTag.getList("BuildScapeParticleColors", 8);
+            for (int i = 0; i < colorList.size(); i++) {
+                colors.add(colorList.getString(i));
+            }
+        }
+
+        String dimension = getDimensionKey(frame.level);
+        BlockPos pos = frame.blockPosition();
+        net.minecraft.core.Direction facing = frame.getDirection();
+        String posKey = positionKey(dimension, pos, facing);
+
+        PillarData existing = pillarData.get(id);
+        if (existing == null) {
+            PillarData data = new PillarData(id, dimension, pos);
+            data.pattern = pattern;
+            data.dyeColors = colors;
+
+            // Set type for icon display based on variant
+            String color = frame.getColorVariant();
+            if (color == null || color.isEmpty()) color = "white";
+            else color = color.toLowerCase(java.util.Locale.ROOT);
+
+            net.minecraft.resources.ResourceLocation typeRL = new net.minecraft.resources.ResourceLocation("buildscape", color + "_item_frame");
+            data.pillarType = typeRL.toString();
+            data.facing = facing != null ? facing.getSerializedName() : null;
+
+            // Set displayed item
+            if (!frame.getItem().isEmpty()) {
+                net.minecraft.resources.ResourceLocation itemKey = net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(frame.getItem().getItem());
+                if (itemKey != null) {
+                    data.displayedItem = itemKey.toString();
+                }
+            }
+
+            pillarData.put(id, data);
+            positionIndex.put(posKey, id);
+
+            if (com.kingodogo.buildscape.BuildScape.isServerFullyInitialized()) {
+                saveImmediate();
+            }
+        } else {
+            positionIndex.put(posKey, id);
+            boolean changed = false;
+
+            // Always ensure type and facing are set even if re-registering
+            String color = frame.getColorVariant();
+            if (color == null || color.isEmpty()) color = "white";
+            else color = color.toLowerCase(java.util.Locale.ROOT);
+            String expectedType = "buildscape:" + color + "_item_frame";
+
+            if (existing.pillarType == null || !existing.pillarType.equals(expectedType)) {
+                existing.pillarType = expectedType;
+                changed = true;
+            }
+            if (!Objects.equals(existing.facing, facing != null ? facing.getSerializedName() : null)) {
+                existing.facing = facing != null ? facing.getSerializedName() : null;
+                changed = true;
+            }
+
+            if (!Objects.equals(existing.pattern, pattern)) {
+                existing.pattern = pattern;
+                changed = true;
+            }
+            if (!Objects.equals(existing.dyeColors, colors)) {
+                existing.dyeColors = colors;
+                changed = true;
+            }
+
+            // Update item
+            if (!frame.getItem().isEmpty()) {
+                net.minecraft.resources.ResourceLocation itemKey = net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(frame.getItem().getItem());
+                String itemId = itemKey != null ? itemKey.toString() : null;
+                if (!Objects.equals(existing.displayedItem, itemId)) {
+                    existing.displayedItem = itemId;
+                    changed = true;
+                }
+            } else if (existing.displayedItem != null) {
+                existing.displayedItem = null;
+                changed = true;
+            }
+
+            if (changed && com.kingodogo.buildscape.BuildScape.isServerFullyInitialized()) {
+                saveImmediate();
+            }
+        }
+    }
+
+    /**
      * Marks the manager as loaded. Called after syncing from server.
      * This sets both hasLoaded and isServerSynced flags to indicate
      * that the client has received complete data from the server.
@@ -2248,6 +2492,7 @@ public class PillarIdManager {
         // Display item (serialized as string for JSON compatibility)
         public String displayedItem = null; // Format: "minecraft:item_id"
         public String pillarType = null; // Format: "minecraft:stone_pillar"
+        public String facing = null; // Direction name for item frames
         public Float itemYaw = null; // Rotation of displayed item
 
         public PillarData() {

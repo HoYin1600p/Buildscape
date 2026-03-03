@@ -232,6 +232,7 @@ public class PresetsConfig {
         allItems.add("minecraft:pufferfish");
         allItems.add("minecraft:poisonous_potato");
         allItems.add("minecraft:written_book");
+        allItems.add("buildscape:ancient_ashen_scroll");
 
         allItems.add("minecraft:creeper_spawn_egg");
         allItems.add("minecraft:turtle_spawn_egg");

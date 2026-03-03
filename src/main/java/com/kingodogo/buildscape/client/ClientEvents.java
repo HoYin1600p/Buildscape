@@ -269,8 +269,6 @@ public class ClientEvents {
                                         
                                         // Update tab state if it matches current player
                                         if (mc.player != null && mc.player.getUUID().equals(playerUuid)) {
-                                            com.kingodogo.buildscape.client.screen.tabs.supporters.SupportersTabState.getInstance()
-                                                .setPlayerUuid(playerUuid);
                                             
                                             // Combine API unlocked cosmetics with default cosmetics (particle trails)
                                             java.util.Set<String> unlocked = new java.util.HashSet<>(data.getUnlocked() != null ? data.getUnlocked() : new java.util.ArrayList<>());
@@ -278,6 +276,18 @@ public class ClientEvents {
                                             unlocked.addAll(com.kingodogo.buildscape.cosmetics.CosmeticManager.getInstance().getDefaultCosmetics());
                                             com.kingodogo.buildscape.client.screen.tabs.supporters.SupportersTabState.getInstance().setUnlockedCosmetics(unlocked);
                                             com.kingodogo.buildscape.client.screen.tabs.supporters.SupportersTabState.getInstance().markApiUnlocksSet();
+
+                                            // Apply equipped items from the API response
+                                            if (data.getEquipped() != null && !data.getEquipped().isEmpty()) {
+                                                for (String id : data.getEquipped()) {
+                                                    if (id != null && !id.isEmpty() && unlocked.contains(id)) {
+                                                        com.kingodogo.buildscape.config.CosmeticsConfig.get().equipCosmetic(playerUuid, com.kingodogo.buildscape.client.screen.tabs.supporters.SupportersTabState.getInstance().getBestSlotForCosmetic(id), id);
+                                                    }
+                                                }
+                                            }
+
+                                            com.kingodogo.buildscape.client.screen.tabs.supporters.SupportersTabState.getInstance()
+                                                .setPlayerUuid(playerUuid);
                                         }
                                         
                                     } catch (Exception e) {

@@ -661,36 +661,39 @@ public class PillarBlock
     public ItemStack getCloneItemStack(BlockState state, net.minecraft.world.phys.HitResult target, BlockGetter level, BlockPos pos, Player player) {
         ItemStack stack = super.getCloneItemStack(state, target, level, pos, player);
 
-        BlockEntity be = level.getBlockEntity(pos);
-        if (be instanceof PillarBlockEntity pillarBE) {
-            boolean hasCustomData = false;
-            net.minecraft.nbt.CompoundTag beTag = new net.minecraft.nbt.CompoundTag();
+        // Only add custom NBT data if the player is sneaking (Creative middle-click behavior)
+        if (player != null && player.isShiftKeyDown()) {
+            BlockEntity be = level.getBlockEntity(pos);
+            if (be instanceof PillarBlockEntity pillarBE) {
+                boolean hasCustomData = false;
+                net.minecraft.nbt.CompoundTag beTag = new net.minecraft.nbt.CompoundTag();
 
-            // Write ITEM tag if the pillar has a displayed item
-            if (pillarBE.hasDisplayItem()) {
-                ItemStack displayedItem = pillarBE.getDisplayedItem();
-                if (!displayedItem.isEmpty()) {
-                    net.minecraft.resources.ResourceLocation itemId =
-                            net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(displayedItem.getItem());
-                    if (itemId != null) {
-                        beTag.putString("ITEM", itemId.toString());
-                        hasCustomData = true;
+                // Write ITEM tag if the pillar has a displayed item
+                if (pillarBE.hasDisplayItem()) {
+                    ItemStack displayedItem = pillarBE.getDisplayedItem();
+                    if (!displayedItem.isEmpty()) {
+                        net.minecraft.resources.ResourceLocation itemId =
+                                net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(displayedItem.getItem());
+                        if (itemId != null) {
+                            beTag.putString("ITEM", itemId.toString());
+                            hasCustomData = true;
+                        }
                     }
                 }
-            }
 
-            // Write PATTERN tag if the pillar has a pattern
-            String pattern = pillarBE.getParticlePattern();
-            if (pattern != null && !pattern.isEmpty()) {
-                beTag.putString("PATTERN", pattern);
-                hasCustomData = true;
-            }
+                // Write PATTERN tag if the pillar has a pattern
+                String pattern = pillarBE.getParticlePattern();
+                if (pattern != null && !pattern.isEmpty()) {
+                    beTag.putString("PATTERN", pattern);
+                    hasCustomData = true;
+                }
 
-            // Only add BlockEntityTag if we have custom data
-            if (hasCustomData) {
-                net.minecraft.nbt.CompoundTag tag = stack.getOrCreateTag();
-                tag.put("BlockEntityTag", beTag);
-                stack.setTag(tag);
+                // Only add BlockEntityTag if we have custom data
+                if (hasCustomData) {
+                    net.minecraft.nbt.CompoundTag tag = stack.getOrCreateTag();
+                    tag.put("BlockEntityTag", beTag);
+                    stack.setTag(tag);
+                }
             }
         }
 

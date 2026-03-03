@@ -188,19 +188,6 @@ public class CosmeticsDisplayPanel extends BasePanel {
             int textColor = isSelected ? type.getColor() : 0xCCCCCC;
             mc.font.draw(poseStack, type.getName(), buttonX + (buttonWidth - mc.font.width(type.getName())) / 2, buttonY + (BUTTON_HEIGHT - 8) / 2, textColor);
 
-            if (type.isSupporterOnly() && !isUserSupporter()) {
-                int lSize = 10;
-                int lx = buttonX + buttonWidth - lSize - 2;
-                int ly = buttonY + (BUTTON_HEIGHT - lSize) / 2;
-
-                RenderSystem.setShaderTexture(0, LOCK_ICON);
-                RenderSystem.setShader(net.minecraft.client.renderer.GameRenderer::getPositionTexShader);
-                RenderSystem.enableBlend();
-                // Use the actual lock texture size so the icon renders correctly
-                GuiComponent.blit(poseStack, lx, ly, 0, 0, lSize, lSize, 32, 32);
-                RenderSystem.disableBlend();
-            }
-
             buttonX += buttonWidth + spacing;
         }
 
@@ -287,7 +274,7 @@ public class CosmeticsDisplayPanel extends BasePanel {
                             RenderSystem.setShader(net.minecraft.client.renderer.GameRenderer::getPositionTexShader);
                             RenderSystem.enableBlend();
                             // Use the actual lock texture size so the icon renders correctly
-                            GuiComponent.blit(poseStack, lx + 1, ly + 1, 0, 0, cornerSize - 2, cornerSize - 2, 32, 32);
+                            GuiComponent.blit(poseStack, lx + 1, ly + 1, cornerSize - 2, cornerSize - 2, 0, 0, 32, 32, 32, 32);
                             RenderSystem.disableBlend();
                         }
                     }
@@ -513,38 +500,16 @@ public class CosmeticsDisplayPanel extends BasePanel {
             CosmeticManager.CosmeticMetadata metadata = CosmeticManager.getInstance().getMetadata(hoveredCosmeticId);
             String tooltipText = (metadata != null && metadata.name() != null && !metadata.name().isEmpty()) ? metadata.name() : hoveredCosmeticId;
 
-            RenderSystem.disableScissor();
-            RenderSystem.disableDepthTest();
-            RenderSystem.depthMask(false);
-            RenderSystem.enableBlend();
-            RenderSystem.defaultBlendFunc();
+            java.util.List<net.minecraft.network.chat.Component> tooltip = new java.util.ArrayList<>();
+            tooltip.add(new net.minecraft.network.chat.TextComponent(tooltipText));
+            
+            if (!state.isUnlocked(hoveredCosmeticId)) {
+                tooltip.add(new net.minecraft.network.chat.TextComponent("Unlocked by redeem Code on Buildscape.Online").withStyle(net.minecraft.ChatFormatting.RED));
+            }
 
-            poseStack.pushPose();
-            poseStack.translate(0, 0, 500);
-
-            int textWidth = mc.font.width(tooltipText);
-            int padding = 3;
-            int tooltipWidth = textWidth + padding * 2;
-            int tooltipHeight = mc.font.lineHeight + padding * 2;
-            int tooltipX = (int) mouseX + 10;
-            int tooltipY = (int) mouseY - 12;
-
-            int screenWidth = mc.getWindow().getGuiScaledWidth();
-            int screenHeight = mc.getWindow().getGuiScaledHeight();
-            if (tooltipX + tooltipWidth > screenWidth) tooltipX = (int) mouseX - tooltipWidth - 10;
-            if (tooltipY < 0) tooltipY = (int) mouseY + 20;
-            if (tooltipY + tooltipHeight > screenHeight) tooltipY = screenHeight - tooltipHeight - 2;
-
-            GuiComponent.fill(poseStack, tooltipX, tooltipY, tooltipX + tooltipWidth, tooltipY + tooltipHeight, 0xF0000000);
-            GuiComponent.fill(poseStack, tooltipX, tooltipY, tooltipX + tooltipWidth, tooltipY + 1, 0xFFCCCCCC);
-            GuiComponent.fill(poseStack, tooltipX, tooltipY + tooltipHeight - 1, tooltipX + tooltipWidth, tooltipY + tooltipHeight, 0xFFCCCCCC);
-            GuiComponent.fill(poseStack, tooltipX, tooltipY, tooltipX + 1, tooltipY + tooltipHeight, 0xFFCCCCCC);
-            GuiComponent.fill(poseStack, tooltipX + tooltipWidth - 1, tooltipY, tooltipX + tooltipWidth, tooltipY + tooltipHeight, 0xFFCCCCCC);
-
-            mc.font.draw(poseStack, tooltipText, tooltipX + padding, tooltipY + padding, 0xFFFFFF);
-            poseStack.popPose();
-            RenderSystem.depthMask(true);
-            RenderSystem.enableDepthTest();
+            if (mc.screen != null) {
+                mc.screen.renderComponentTooltip(poseStack, tooltip, (int) mouseX, (int) mouseY);
+            }
         }
     }
 

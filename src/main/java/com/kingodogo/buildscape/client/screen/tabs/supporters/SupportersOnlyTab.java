@@ -82,8 +82,12 @@ public class SupportersOnlyTab extends AbstractConfigTab {
             state.setPlayerUuid(playerUuid);
         }
 
-        // Fetching from API cache removed - tab is now purely local-driven
-        loadDefaultCosmetics();
+        com.kingodogo.buildscape.api.model.CosmeticData data = com.kingodogo.buildscape.api.CosmeticAuthManager.getInstance().getCachedCosmetics();
+        if (data != null) {
+            updateCosmeticsData(data);
+        } else {
+            loadDefaultCosmetics();
+        }
     }
     
     private void loadDefaultCosmetics() {

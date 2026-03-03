@@ -544,37 +544,8 @@ public class PlayerAvatarPanel extends BasePanel {
 
                 RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
 
-                // Render custom cosmetics on the player model
-                if (equippedCosmetics != null && !equippedCosmetics.isEmpty()) {
-                    for (String id : equippedCosmetics) {
-                        com.kingodogo.buildscape.cosmetics.CosmeticManager.CosmeticMetadata meta =
-                                com.kingodogo.buildscape.cosmetics.CosmeticManager.getInstance().getMetadata(id);
-                        if (meta != null) {
-                            if (meta.type() == com.kingodogo.buildscape.cosmetics.CosmeticManager.CosmeticType.HEAD) {
-                                poseStack.pushPose();
-                                // Transform to follow the player model's head
-                                playerRenderer.getModel().head.translateAndRotate(poseStack);
+                // Removed redundant manual rendering as it's already handled by CosmeticLayer
 
-                                // Map the ID if needed (ensure full registered ID)
-                                String fullId = id.contains(":") ? id : "buildscape:cosmatics/gear/" + id;
-
-                                com.kingodogo.buildscape.client.UniversalCosmeticRenderer.renderHeadCosmetic(
-                                        fullId, poseStack, bufferSource, lightLevel, player);
-                                bufferSource.endBatch();
-                                poseStack.popPose();
-                            } else if (meta.type() == com.kingodogo.buildscape.cosmetics.CosmeticManager.CosmeticType.CHEST) {
-                                poseStack.pushPose();
-                                playerRenderer.getModel().body.translateAndRotate(poseStack);
-                                String fullId = id.contains(":") ? id : "buildscape:cosmatics/gear/" + id;
-                                // Rendering chest model (placeholder for now until specific renderers exist)
-                                com.kingodogo.buildscape.client.UniversalCosmeticRenderer.renderHeadCosmetic(
-                                        fullId, poseStack, bufferSource, lightLevel, player);
-                                bufferSource.endBatch();
-                                poseStack.popPose();
-                            }
-                        }
-                    }
-                }
 
                 renderParticleTrails(poseStack, equippedCosmetics, player, partialTick);
             } catch (Exception e) {

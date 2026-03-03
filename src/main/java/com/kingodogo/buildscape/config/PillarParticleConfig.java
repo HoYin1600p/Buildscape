@@ -880,6 +880,96 @@ public class PillarParticleConfig {
                     }
                 }
 
+                // Auto-add any new default vanilla items that were added in mod updates
+                {
+                    boolean changed = false;
+                    String[] defaultVanillaItems = new String[]{
+                            "minecraft:diamond",
+                            "minecraft:netherite_ingot",
+                            "minecraft:nether_star",
+                            "minecraft:heart_of_the_sea",
+                            "minecraft:trident",
+                            "minecraft:emerald",
+                            "minecraft:dragon_breath",
+                            "minecraft:netherite_scrap",
+                            "minecraft:totem_of_undying",
+                            "minecraft:spyglass",
+                            "minecraft:elytra",
+                            "minecraft:diamond_sword",
+                            "minecraft:diamond_hoe",
+                            "minecraft:diamond_axe",
+                            "minecraft:diamond_pickaxe",
+                            "minecraft:diamond_shovel",
+                            "minecraft:diamond_boots",
+                            "minecraft:diamond_leggings",
+                            "minecraft:diamond_chestplate",
+                            "minecraft:diamond_helmet",
+                            "minecraft:netherite_sword",
+                            "minecraft:netherite_hoe",
+                            "minecraft:netherite_pickaxe",
+                            "minecraft:netherite_axe",
+                            "minecraft:netherite_shovel",
+                            "minecraft:netherite_boots",
+                            "minecraft:netherite_leggings",
+                            "minecraft:netherite_chestplate",
+                            "minecraft:netherite_helmet",
+                            "minecraft:nautilus_shell",
+                            "minecraft:shulker_shell",
+                            "minecraft:golden_apple",
+                            "minecraft:enchanted_golden_apple",
+                            "minecraft:golden_carrot",
+                            "minecraft:experience_bottle",
+                            "minecraft:mojang_banner_pattern",
+                            "minecraft:ancient_debris",
+                            "minecraft:dragon_head",
+                            "minecraft:dragon_egg",
+                            "minecraft:player_head",
+                            "minecraft:beacon",
+                            "minecraft:end_crystal",
+                            "minecraft:conduit",
+                            "minecraft:skeleton_skull",
+                            "minecraft:zombie_head",
+                            "minecraft:wither_skeleton_skull",
+                            "minecraft:creeper_head",
+                            "minecraft:enchanting_table",
+                            "minecraft:emerald_block",
+                            "minecraft:diamond_block",
+                            "minecraft:gold_block",
+                            "minecraft:netherite_block",
+                            "minecraft:deepslate_diamond_ore",
+                            "minecraft:diamond_ore",
+                            "minecraft:bedrock",
+                            "minecraft:pufferfish",
+                            "minecraft:poisonous_potato",
+                            "minecraft:written_book",
+                            "minecraft:creeper_spawn_egg",
+                            "minecraft:turtle_spawn_egg",
+                            "minecraft:axolotl_spawn_egg",
+                            "minecraft:wither_skeleton_spawn_egg",
+                            "minecraft:shulker_spawn_egg",
+                            "minecraft:elder_guardian_spawn_egg",
+                            "minecraft:ravager_spawn_egg",
+                            "minecraft:slime_spawn_egg",
+                            "minecraft:zoglin_spawn_egg",
+                            "minecraft:villager_spawn_egg",
+                            "minecraft:skeleton_horse_spawn_egg",
+                            "minecraft:glow_squid_spawn_egg",
+                            "minecraft:goat_spawn_egg",
+                            "minecraft:enderman_spawn_egg"
+                    };
+
+                    for (String defaultItem : defaultVanillaItems) {
+                        if (!this.items.contains(defaultItem)) {
+                            this.items.add(defaultItem);
+                            changed = true;
+                        }
+                    }
+
+                    if (changed) {
+                        saveItems();
+                    }
+                }
+
                 // Check for auto-update of Vault Hunters items
                 if (net.minecraftforge.fml.ModList.get().isLoaded("the_vault")) {
                     boolean changed = false;

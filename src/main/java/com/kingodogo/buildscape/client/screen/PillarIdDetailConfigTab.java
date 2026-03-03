@@ -40,6 +40,9 @@ public class PillarIdDetailConfigTab extends AbstractConfigTab {
     // Panel coordinates
     private int leftBoxX, leftBoxY, leftBoxWidth, leftBoxHeight;
     private int rightBoxX, rightBoxY, rightBoxWidth, rightBoxHeight;
+    private int lastContentX = -1, lastContentY = -1, lastContentWidth = -1, lastContentHeight = -1;
+    private int lastScreenWidth = -1;
+
     private boolean dirty = false;
     
     public PillarIdDetailConfigTab(BuildScapeConfigScreen parent, String pillarId) {
@@ -96,7 +99,7 @@ public class PillarIdDetailConfigTab extends AbstractConfigTab {
         // Pattern selector
         String pattern = pillarData.pattern != null ? pillarData.pattern : "none"; // Default to "none" if null (global)
         // If pattern logic in this tab uses "none" to represent null/global
-        if (pillarData.pattern == null) pattern = "none";
+        if (pillarData.pattern == null || pillarData.pattern.isEmpty()) pattern = "none";
         
         currentPatternIndex = findPatternIndex(pattern);
 
@@ -291,6 +294,151 @@ public class PillarIdDetailConfigTab extends AbstractConfigTab {
         addTabWidget(colorPicker);
         
         updateSwatchesEnabledState();
+        
+        // Initial layout
+        relayout(parent.getContentX(), parent.getContentY(), parent.getContentWidth(), parent.getContentHeight());
+    }
+    
+    private void relayout(int contentX, int contentY, int contentWidth, int contentHeight) {
+        Minecraft mc = Minecraft.getInstance();
+        int padding = BuildScapeConfigScreen.scaleSize(10);
+        
+        // Use dimensions from parent screen directly to ensure consistency
+        int middleX = parent.getContentX();
+        int middlePanelWidth = parent.getContentWidth();
+        int rightX = parent.getRightPanelX();
+        int rightPanelWidth = parent.getRightPanelWidth();
+        
+        // Button area at top for back button
+        int buttonAreaHeight = BuildScapeConfigScreen.getScaledButtonHeight() + BuildScapeConfigScreen.scaleSize(12);
+        
+        // Position back button
+        backButton.x = contentX + padding;
+        backButton.y = contentY + BuildScapeConfigScreen.scaleSize(6);
+        backButton.setWidth(BuildScapeConfigScreen.scaleSize(80));
+        backButton.setHeight(BuildScapeConfigScreen.getScaledButtonHeight());
+
+        // LEFT PANEL: Settings
+        leftBoxX = middleX;
+        leftBoxY = contentY + buttonAreaHeight;
+        leftBoxWidth = middlePanelWidth;
+        leftBoxHeight = contentHeight - buttonAreaHeight;
+
+        // RIGHT PANEL: Colors
+        rightBoxX = rightX;
+        rightBoxY = contentY + buttonAreaHeight;
+        rightBoxWidth = rightPanelWidth;
+        rightBoxHeight = contentHeight - buttonAreaHeight;
+
+        // Left Panel Layout: Config fields
+        int gap = BuildScapeConfigScreen.scaleSize(6);
+        int fieldHeight = BuildScapeConfigScreen.getScaledEditBoxHeight();
+        int fieldSpacing = fieldHeight + gap;
+        int currentY = leftBoxY + padding + BuildScapeConfigScreen.scaleSize(15); // Extra space for title
+        
+        // Calculate label and field widths
+        int labelWidth = BuildScapeConfigScreen.scaleSize(140);
+        int fieldGap = BuildScapeConfigScreen.scaleSize(8);
+        int fieldX = leftBoxX + padding + labelWidth + fieldGap;
+        int fieldWidth = leftBoxWidth - padding * 2 - labelWidth - fieldGap;
+
+        patternSelector.x = fieldX;
+        patternSelector.y = currentY;
+        patternSelector.setWidth(fieldWidth);
+        patternSelector.setHeight(fieldHeight);
+        currentY += fieldSpacing;
+
+        usePatternToggle.x = fieldX;
+        usePatternToggle.y = currentY;
+        usePatternToggle.setWidth(fieldWidth);
+        usePatternToggle.setHeight(fieldHeight);
+        currentY += fieldSpacing;
+
+        patternSpeedField.x = fieldX;
+        patternSpeedField.y = currentY;
+        patternSpeedField.setWidth(fieldWidth);
+        setEditBoxHeight(patternSpeedField, fieldHeight);
+        currentY += fieldSpacing;
+
+        patternSpreadField.x = fieldX;
+        patternSpreadField.y = currentY;
+        patternSpreadField.setWidth(fieldWidth);
+        setEditBoxHeight(patternSpreadField, fieldHeight);
+        currentY += fieldSpacing;
+
+        patternIntensityField.x = fieldX;
+        patternIntensityField.y = currentY;
+        patternIntensityField.setWidth(fieldWidth);
+        setEditBoxHeight(patternIntensityField, fieldHeight);
+        currentY += fieldSpacing;
+
+        maxParticleColorSlider.x = fieldX;
+        maxParticleColorSlider.y = currentY;
+        maxParticleColorSlider.setWidth(fieldWidth);
+        maxParticleColorSlider.setHeight(fieldHeight);
+        
+        // Save button
+        if (saveButton != null) {
+            saveButton.x = leftBoxX + padding;
+            saveButton.y = leftBoxY + leftBoxHeight - padding - BuildScapeConfigScreen.getScaledButtonHeight();
+            saveButton.setWidth(leftBoxWidth - padding * 2);
+            saveButton.setHeight(BuildScapeConfigScreen.getScaledButtonHeight());
+        }
+
+        // Right Panel Layout: Colors (2 column layout like PillarParticlesConfigTab)
+        int swatchSize = BuildScapeConfigScreen.scaleSize(20);
+        int hexFieldWidth = BuildScapeConfigScreen.scaleSize(85);
+        int hexFieldHeight = BuildScapeConfigScreen.getScaledEditBoxHeight();
+        int colorRowSpacing = BuildScapeConfigScreen.scaleSize(6);
+        int startY = rightBoxY + padding + BuildScapeConfigScreen.scaleSize(18);
+        
+        // Column spacing
+        int availableWidth = rightBoxWidth - padding * 2;
+        int columnSpacing = BuildScapeConfigScreen.scaleSize(10);
+        int columnWidth = (availableWidth - columnSpacing) / 2;
+        
+        int leftSwatchX = rightBoxX + padding;
+        int fieldSwatchGap = BuildScapeConfigScreen.scaleSize(6);
+        int leftHexFieldX = leftSwatchX + swatchSize + fieldSwatchGap;
+        
+        int rightSwatchX = rightBoxX + padding + columnWidth + columnSpacing;
+        int rightHexFieldX = rightSwatchX + swatchSize + fieldSwatchGap;
+
+        for (int i = 0; i < MAX_COLORS; i++) {
+            int row = i / 2;
+            int col = i % 2;
+            int swatchY = startY + row * (swatchSize + colorRowSpacing);
+            
+            ColorSwatchButton swatch = colorSwatchButtons.get(i);
+            swatch.x = (col == 0) ? leftSwatchX : rightSwatchX;
+            swatch.y = swatchY;
+            swatch.setWidth(swatchSize);
+            swatch.setHeight(swatchSize);
+
+            EditBox hexField = colorHexFields.get(i);
+            hexField.x = (col == 0) ? leftHexFieldX : rightHexFieldX;
+            hexField.y = swatchY + (swatchSize - hexFieldHeight) / 2;
+            hexField.setWidth(Math.min(hexFieldWidth, columnWidth - swatchSize - BuildScapeConfigScreen.scaleSize(8)));
+            setEditBoxHeight(hexField, hexFieldHeight);
+        }
+
+        // Position color picker below swatches
+        if (colorPicker != null) {
+            int swatchesEndY = startY + ((MAX_COLORS + 1) / 2) * (swatchSize + colorRowSpacing);
+            int pickerX = rightBoxX + padding;
+            int pickerY = swatchesEndY + BuildScapeConfigScreen.scaleSize(10);
+            int pickerWidth = rightBoxWidth - padding * 2;
+            int pickerHeight = rightBoxY + rightBoxHeight - padding - pickerY;
+            
+            // Limit picker size to reasonable proportions
+            int idealWidth = BuildScapeConfigScreen.scaleSize(260);
+            int idealHeight = BuildScapeConfigScreen.scaleSize(200);
+            
+            colorPicker.setWidth(Math.min(pickerWidth, idealWidth));
+            colorPicker.setHeight(Math.min(pickerHeight, idealHeight));
+            colorPicker.x = rightBoxX + (rightBoxWidth - colorPicker.getWidth()) / 2;
+            colorPicker.y = pickerY;
+        }
     }
     
     private void onMaxParticleColorChanged(int value) {
@@ -316,8 +464,10 @@ public class PillarIdDetailConfigTab extends AbstractConfigTab {
         for (int i = 0; i < colorSwatchButtons.size(); i++) {
             boolean enabled = i < currentMaxColor;
             colorSwatchButtons.get(i).active = enabled;
+            colorSwatchButtons.get(i).visible = enabled;
             if (i < colorHexFields.size()) {
                 colorHexFields.get(i).setEditable(enabled);
+                colorHexFields.get(i).visible = enabled;
             }
         }
     }
@@ -678,29 +828,28 @@ public class PillarIdDetailConfigTab extends AbstractConfigTab {
     public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
         int contentX = parent.getContentX();
         int contentY = parent.getContentY();
-        // Use full width spanning both left and right areas (consistent with PillarIdsConfigTab)
-        int contentWidth = parent.getRightPanelX() + parent.getRightPanelWidth() - parent.getContentX();
+        int contentWidth = parent.getContentWidth();
         int contentHeight = parent.getContentHeight();
 
+        // Check if relayout needed
+        int screenWidth = parent.width;
+        if (contentX != lastContentX || contentY != lastContentY || 
+            contentWidth != lastContentWidth || contentHeight != lastContentHeight ||
+            screenWidth != lastScreenWidth) {
+            
+            relayout(contentX, contentY, contentWidth, contentHeight);
+            lastContentX = contentX;
+            lastContentY = contentY;
+            lastContentWidth = contentWidth;
+            lastContentHeight = contentHeight;
+            lastScreenWidth = screenWidth;
+        }
+
         Minecraft mc = Minecraft.getInstance();
+        int borderColor = 0xFF666666;
         int padding = BuildScapeConfigScreen.scaleSize(10);
-        int borderColor = 0xFF666666; // Matching other panels
 
-        // Calculate left and right panel areas using parent methods
-        int leftPanelWidth = parent.getContentWidth();
-        int rightPanelX = parent.getRightPanelX();
-        int rightPanelWidth = parent.getRightPanelWidth();
-
-        // Button area at top
-        int buttonAreaHeight = BuildScapeConfigScreen.getScaledButtonHeight() + BuildScapeConfigScreen.scaleSize(12);
-
-        // Position back button - ensure it's fully visible
-        backButton.x = contentX + padding;
-        backButton.y = contentY + BuildScapeConfigScreen.scaleSize(6);
-        backButton.setWidth(BuildScapeConfigScreen.scaleSize(80));
-        backButton.setHeight(BuildScapeConfigScreen.getScaledButtonHeight());
-
-        // Draw title next to back button
+        // Header info (Pillar ID)
         int titleX = contentX + BuildScapeConfigScreen.scaleSize(115);
         int titleY = contentY + BuildScapeConfigScreen.scaleSize(6);
         mc.font.draw(poseStack, new TranslatableComponent("buildscape.config.ids.id").getString() + ": " + pillarId,
@@ -708,171 +857,42 @@ public class PillarIdDetailConfigTab extends AbstractConfigTab {
         mc.font.draw(poseStack, new TranslatableComponent("buildscape.config.ids.detail.subtitle"),
                 titleX, titleY + mc.font.lineHeight + 2, 0xAAAAAA);
 
-        // LEFT PANEL: Settings panel with bounding box
-        leftBoxX = contentX;
-        leftBoxY = contentY + buttonAreaHeight;
-        leftBoxWidth = leftPanelWidth;
-        leftBoxHeight = contentHeight - buttonAreaHeight;
-
-        // Draw left panel bounding box
+        // LEFT PANEL: Borders
         net.minecraft.client.gui.GuiComponent.fill(poseStack, leftBoxX, leftBoxY, leftBoxX + leftBoxWidth, leftBoxY + 1, borderColor);
         net.minecraft.client.gui.GuiComponent.fill(poseStack, leftBoxX, leftBoxY + leftBoxHeight - 1, leftBoxX + leftBoxWidth, leftBoxY + leftBoxHeight, borderColor);
         net.minecraft.client.gui.GuiComponent.fill(poseStack, leftBoxX, leftBoxY, leftBoxX + 1, leftBoxY + leftBoxHeight, borderColor);
         net.minecraft.client.gui.GuiComponent.fill(poseStack, leftBoxX + leftBoxWidth - 1, leftBoxY, leftBoxX + leftBoxWidth, leftBoxY + leftBoxHeight, borderColor);
 
-        // RIGHT PANEL: Colors panel with bounding box
-        rightBoxX = rightPanelX;
-        rightBoxY = contentY + buttonAreaHeight;
-        rightBoxWidth = rightPanelWidth;
-        rightBoxHeight = contentHeight - buttonAreaHeight;
+        mc.font.draw(poseStack, new TranslatableComponent("buildscape.config.particles.pattern_properties"),
+                leftBoxX + BuildScapeConfigScreen.scaleSize(10), leftBoxY + BuildScapeConfigScreen.scaleSize(5), 0xFFFFFF);
 
-        // Draw right panel bounding box
+        // Labels for fields in Left Panel - ensure they are drawn ONLY once
+        int labelYOffset = (BuildScapeConfigScreen.getScaledEditBoxHeight() - mc.font.lineHeight) / 2;
+        int textX = leftBoxX + padding;
+
+        mc.font.draw(poseStack, new TranslatableComponent("buildscape.config.ids.detail.pattern").getString() + ":",
+                textX, patternSelector.y + labelYOffset, 0xFFFFFF);
+        mc.font.draw(poseStack, "Use Pattern:",
+                textX, usePatternToggle.y + labelYOffset, 0xFFFFFF);
+        mc.font.draw(poseStack, new TranslatableComponent("buildscape.config.particles.pattern_speed").getString() + ":",
+                textX, patternSpeedField.y + labelYOffset, 0xFFFFFF);
+        mc.font.draw(poseStack, new TranslatableComponent("buildscape.config.particles.pattern_spread").getString() + ":",
+                textX, patternSpreadField.y + labelYOffset, 0xFFFFFF);
+        mc.font.draw(poseStack, new TranslatableComponent("buildscape.config.particles.pattern_intensity").getString() + ":",
+                textX, patternIntensityField.y + labelYOffset, 0xFFFFFF);
+        mc.font.draw(poseStack, new TranslatableComponent("buildscape.config.ids.detail.max_colors").getString() + ":",
+                textX, maxParticleColorSlider.y + labelYOffset, 0xFFFFFF);
+
+        // RIGHT PANEL: Borders
         net.minecraft.client.gui.GuiComponent.fill(poseStack, rightBoxX, rightBoxY, rightBoxX + rightBoxWidth, rightBoxY + 1, borderColor);
         net.minecraft.client.gui.GuiComponent.fill(poseStack, rightBoxX, rightBoxY + rightBoxHeight - 1, rightBoxX + rightBoxWidth, rightBoxY + rightBoxHeight, borderColor);
         net.minecraft.client.gui.GuiComponent.fill(poseStack, rightBoxX, rightBoxY, rightBoxX + 1, rightBoxY + rightBoxHeight, borderColor);
         net.minecraft.client.gui.GuiComponent.fill(poseStack, rightBoxX + rightBoxWidth - 1, rightBoxY, rightBoxX + rightBoxWidth, rightBoxY + rightBoxHeight, borderColor);
 
-        // LEFT PANEL: Layout config fields
-        // Use larger gap to prevent overlapping
-        int gap = Math.max(BuildScapeConfigScreen.scaleSize(6), (int) (parent.height * 0.015));
-        // Use percentage of left panel width for label so it scales with the panel
-        int labelWidth = Math.min(BuildScapeConfigScreen.scaleSize(100), (int) (leftBoxWidth * 0.4));
-        // Add proper spacing between label and field - increased offset
-        int labelToFieldGap = BuildScapeConfigScreen.scaleSize(10);
-        int fieldX = leftBoxX + padding + labelWidth + labelToFieldGap;
-        int fieldWidth = leftBoxWidth - padding * 2 - labelWidth - labelToFieldGap;
-        int fieldHeight = BuildScapeConfigScreen.getScaledEditBoxHeight();
-        int fieldSpacing = fieldHeight + gap;
-        int startY = leftBoxY + padding;
-        int currentY = startY;
-        int labelYOffset = (fieldHeight - mc.font.lineHeight) / 2;
+        mc.font.draw(poseStack, new TranslatableComponent("buildscape.config.particles.particle_colors").getString(),
+                rightBoxX + BuildScapeConfigScreen.scaleSize(10), rightBoxY + BuildScapeConfigScreen.scaleSize(5), 0xFFFFFF);
 
-        // Pattern
-        patternSelector.x = fieldX;
-        patternSelector.y = currentY;
-        patternSelector.setWidth(fieldWidth);
-        patternSelector.setHeight(fieldHeight);
-        mc.font.draw(poseStack, new TranslatableComponent("buildscape.config.ids.detail.pattern").getString() + ":",
-                leftBoxX + padding, currentY + labelYOffset, 0xFFFFFF);
-        currentY += fieldSpacing;
-
-        // Use Pattern Toggle
-        usePatternToggle.x = fieldX;
-        usePatternToggle.y = currentY;
-        usePatternToggle.setWidth(fieldWidth);
-        usePatternToggle.setHeight(fieldHeight);
-        mc.font.draw(poseStack, "Use Pattern:",
-                leftBoxX + padding, currentY + labelYOffset, 0xFFFFFF);
-        currentY += fieldSpacing;
-
-        // Pattern Speed
-        patternSpeedField.x = fieldX;
-        patternSpeedField.y = currentY;
-        patternSpeedField.setWidth(fieldWidth);
-        setEditBoxHeight(patternSpeedField, fieldHeight);
-        mc.font.draw(poseStack,
-            new TranslatableComponent("buildscape.config.particles.pattern_speed").getString() + ":",
-                leftBoxX + padding, currentY + labelYOffset, 0xFFFFFF);
-        currentY += fieldSpacing;
-
-        // Pattern Spread
-        patternSpreadField.x = fieldX;
-        patternSpreadField.y = currentY;
-        patternSpreadField.setWidth(fieldWidth);
-        setEditBoxHeight(patternSpreadField, fieldHeight);
-        mc.font.draw(poseStack,
-            new TranslatableComponent("buildscape.config.particles.pattern_spread").getString() + ":",
-                leftBoxX + padding, currentY + labelYOffset, 0xFFFFFF);
-        currentY += fieldSpacing;
-
-        // Pattern Intensity
-        patternIntensityField.x = fieldX;
-        patternIntensityField.y = currentY;
-        patternIntensityField.setWidth(fieldWidth);
-        setEditBoxHeight(patternIntensityField, fieldHeight);
-        mc.font.draw(poseStack,
-            new TranslatableComponent("buildscape.config.particles.pattern_intensity").getString() + ":",
-                leftBoxX + padding, currentY + labelYOffset, 0xFFFFFF);
-        currentY += fieldSpacing;
-
-        // Max Particle Colors
-        maxParticleColorSlider.x = fieldX;
-        maxParticleColorSlider.y = currentY;
-        maxParticleColorSlider.setWidth(fieldWidth);
-        maxParticleColorSlider.setHeight(fieldHeight);
-        mc.font.draw(poseStack,
-                new TranslatableComponent("buildscape.config.particles.max_particle_color").getString() + ":",
-                leftBoxX + padding, currentY + labelYOffset, 0xFFFFFF);
-
-        // Save button at the bottom of left panel
-        if (saveButton != null) {
-            saveButton.x = leftBoxX + padding;
-            saveButton.y = leftBoxY + leftBoxHeight - padding - BuildScapeConfigScreen.getScaledButtonHeight();
-            saveButton.setWidth(leftBoxWidth - padding * 2);
-            saveButton.setHeight(BuildScapeConfigScreen.getScaledButtonHeight());
-        }
-
-        // RIGHT PANEL: Color swatches and picker - vertical layout like PillarParticlesConfigTab
-        int swatchSize = BuildScapeConfigScreen.scaleSize(18);
-        int swatchSpacing = BuildScapeConfigScreen.scaleSize(4);
-        int hexFieldWidth = BuildScapeConfigScreen.scaleSize(70);
-        int hexFieldHeight = BuildScapeConfigScreen.scaleSize(18);
-        int rowSpacing = BuildScapeConfigScreen.scaleSize(3); // Gap between rows
-        int rightStartY = rightBoxY + padding;
-
-        // Single column vertical layout
-        int swatchX = rightBoxX + padding;
-        int hexFieldX = swatchX + swatchSize + swatchSpacing;
-
-        // Ensure everything fits within right panel width
-        int requiredWidth = swatchSize + swatchSpacing + hexFieldWidth + padding * 2;
-        if (requiredWidth > rightBoxWidth) {
-            // Scale down hex field width to fit
-            hexFieldWidth = rightBoxWidth - padding * 2 - swatchSize - swatchSpacing;
-        }
-
-        for (int i = 0; i < MAX_COLORS; i++) {
-            int swatchY = rightStartY + i * (swatchSize + rowSpacing);
-
-            ColorSwatchButton swatch = colorSwatchButtons.get(i);
-            swatch.x = swatchX;
-            swatch.y = swatchY;
-            swatch.setWidth(swatchSize);
-            swatch.setHeight(swatchSize);
-
-            EditBox hexField = colorHexFields.get(i);
-            hexField.x = hexFieldX;
-            hexField.y = swatchY + (swatchSize - hexFieldHeight) / 2; // Vertically center with swatch
-            hexField.setWidth(hexFieldWidth);
-            setEditBoxHeight(hexField, hexFieldHeight);
-        }
-
-        // Position color picker to the right of swatches (or below if not enough width)
-        if (colorPicker != null && colorPicker.visible) {
-            int swatchesEndY = rightStartY + MAX_COLORS * (swatchSize + rowSpacing);
-            int pickerAvailHeight = rightBoxY + rightBoxHeight - padding - swatchesEndY - gap;
-            int pickerAvailWidth = rightBoxWidth - padding * 2;
-
-            // Try to fit picker below swatches
-            int pickerWidth = BuildScapeConfigScreen.scaleSize(260);
-            int pickerHeight = BuildScapeConfigScreen.scaleSize(200);
-
-            // Scale down if needed
-            if (pickerWidth > pickerAvailWidth) {
-                pickerWidth = pickerAvailWidth;
-            }
-            if (pickerHeight > pickerAvailHeight) {
-                pickerHeight = pickerAvailHeight;
-            }
-
-            // Center horizontally in panel
-            colorPicker.x = rightBoxX + (rightBoxWidth - pickerWidth) / 2;
-            colorPicker.y = swatchesEndY + gap;
-            colorPicker.setWidth(pickerWidth);
-            colorPicker.setHeight(pickerHeight);
-        }
-
-        // Unsaved Changes status text
+        // Status text
         if (dirty) {
             int statusY = saveButton != null ? saveButton.y - mc.font.lineHeight - BuildScapeConfigScreen.scaleSize(4)
                     : contentY + contentHeight - BuildScapeConfigScreen.scaleSize(14);
@@ -901,7 +921,7 @@ public class PillarIdDetailConfigTab extends AbstractConfigTab {
     private net.minecraft.network.chat.Component getUsePatternMessage(boolean use) {
         String state = use ? "ON" : "OFF";
         net.minecraft.ChatFormatting color = use ? net.minecraft.ChatFormatting.GREEN : net.minecraft.ChatFormatting.RED;
-        return new TextComponent("Use Pattern: ").append(new TextComponent(state).withStyle(color));
+        return new TextComponent(state).withStyle(color);
     }
 
     private void syncPatternFromBlockEntity(PillarIdManager manager) {

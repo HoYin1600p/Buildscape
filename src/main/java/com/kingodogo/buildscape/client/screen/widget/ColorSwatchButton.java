@@ -28,6 +28,9 @@ public class ColorSwatchButton extends Button {
     
     @Override
     public void renderButton(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
+        // Reset color state to ensure hex colors draw accurately
+        com.mojang.blaze3d.systems.RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
+        
         int swatchX = this.x;
         int swatchY = this.y;
         int swatchSize = this.width;
@@ -42,20 +45,27 @@ public class ColorSwatchButton extends Button {
             b = (int)(b * 0.4f);
             displayColor = (r << 16) | (g << 8) | b;
         }
-        GuiComponent.fill(poseStack, swatchX, swatchY, swatchX + swatchSize, swatchY + swatchSize, 0xFF000000 | displayColor);
+        
+        // Use a standard fill for the color block - ensure Alpha is solid 0xFF
+        // We mask to 0xFFFFFF to be 100% sure no alpha channel bits from the int interfere
+        GuiComponent.fill(poseStack, swatchX, swatchY, swatchX + swatchSize, swatchY + swatchSize, 0xFF000000 | (displayColor & 0xFFFFFF));
 
+        // Standard White/Grey border for the box itself
         int borderColor = this.active ? 0xFFFFFFFF : 0xFF666666;
         GuiComponent.fill(poseStack, swatchX, swatchY, swatchX + swatchSize, swatchY + 1, borderColor);
         GuiComponent.fill(poseStack, swatchX, swatchY + swatchSize - 1, swatchX + swatchSize, swatchY + swatchSize, borderColor);
         GuiComponent.fill(poseStack, swatchX, swatchY, swatchX + 1, swatchY + swatchSize, borderColor);
         GuiComponent.fill(poseStack, swatchX + swatchSize - 1, swatchY, swatchX + swatchSize, swatchY + swatchSize, borderColor);
 
+        // Selection Indicator - Black border outline with a 1px gap to show "it is just a border"
         if (isSelected && this.active) {
-            int borderSize = Math.max(1, com.kingodogo.buildscape.client.screen.BuildScapeConfigScreen.scaleSize(2));
-            GuiComponent.fill(poseStack, swatchX - borderSize, swatchY - borderSize, swatchX + swatchSize + borderSize, swatchY, 0xFFFF00FF);
-            GuiComponent.fill(poseStack, swatchX - borderSize, swatchY + swatchSize, swatchX + swatchSize + borderSize, swatchY + borderSize, 0xFFFF00FF);
-            GuiComponent.fill(poseStack, swatchX - borderSize, swatchY - borderSize, swatchX, swatchY + swatchSize + borderSize, 0xFFFF00FF);
-            GuiComponent.fill(poseStack, swatchX + swatchSize, swatchY - borderSize, swatchX + swatchSize + borderSize, swatchY + swatchSize + borderSize, 0xFFFF00FF);
+            int selColor = 0xFF000000;
+            int gap = 1;
+            // Draw a thin black outline slightly outside the swatch so it doesn't obscure the color
+            GuiComponent.fill(poseStack, swatchX - gap - 1, swatchY - gap - 1, swatchX + swatchSize + gap + 1, swatchY - gap, selColor); // Top
+            GuiComponent.fill(poseStack, swatchX - gap - 1, swatchY + swatchSize + gap, swatchX + swatchSize + gap + 1, swatchY + swatchSize + gap + 1, selColor); // Bottom
+            GuiComponent.fill(poseStack, swatchX - gap - 1, swatchY - gap, swatchX - gap, swatchY + swatchSize + gap, selColor); // Left
+            GuiComponent.fill(poseStack, swatchX + swatchSize + gap, swatchY - gap, swatchX + swatchSize + gap + 1, swatchY + swatchSize + gap, selColor); // Right
         }
     }
 }

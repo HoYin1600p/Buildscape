@@ -99,15 +99,19 @@ public class CosmeticsConfig {
 
         // 2. Migrate from the way-old JSON format if it still exists
         if (legacyJson.exists()) {
-
+            boolean loadedSuccessfully = false;
             try (FileReader reader = new FileReader(legacyJson)) {
                 @SuppressWarnings("unchecked")
                 Map<String, Object> loaded = GSON.fromJson(reader, Map.class);
                 if (loaded != null) {
                     processLegacyJsonMap(loaded);
                 }
-                
-                // Backup or delete old JSON
+                loadedSuccessfully = true;
+            } catch (Exception e) {
+            }
+            
+            if (loadedSuccessfully) {
+                // Backup or delete old JSON outside the try-with-resources to ensure file isn't locked
                 Path legacyPath = legacyJson.toPath();
                 Path backupPath = legacyPath.resolveSibling(legacyJson.getName() + ".bak");
                 try {
@@ -115,9 +119,6 @@ public class CosmeticsConfig {
                 } catch (Exception e) {
                     legacyJson.delete(); // Last resort
                 }
-                
-            } catch (Exception e) {
-                BuildScape.getLogger().error("CosmeticsConfig: Legacy JSON migration failed!", e);
             }
         }
     }

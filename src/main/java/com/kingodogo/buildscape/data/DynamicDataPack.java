@@ -137,8 +137,8 @@ public class DynamicDataPack implements PackResources {
                     modelToUse = parentNamespace + ":block/" + parentPath.replace("waxed_", "");
                 }
             } else if (isSingleTextureMod) {
-                // Modded fix track: parent to the FULL BLOCK to get textures reliably
-                modelToUse = parentNamespace + ":block/" + cleanPath;
+                // Modded fix track: for single-texture slabs, we still parent to
+                // the slab model but tell our geometry to sample "#all".
                 useAllTexture = true;
             }
 

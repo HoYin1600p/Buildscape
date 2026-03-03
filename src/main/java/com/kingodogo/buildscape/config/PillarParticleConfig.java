@@ -569,7 +569,8 @@ public class PillarParticleConfig {
                 writer.write("    \"minecraft:glow_squid_spawn_egg\",\n");
                 writer.write("    \"minecraft:goat_spawn_egg\",\n");
                 writer.write("    \"minecraft:enderman_spawn_egg\",\n");
-                writer.write("    \"minecraft:written_book\"");
+                writer.write("    \"minecraft:written_book\",\n");
+                writer.write("    \"buildscape:ancient_ashen_scroll\"");
 
                 boolean hasVaultHunters = net.minecraftforge.fml.ModList.get().isLoaded("the_vault");
                 if (hasVaultHunters) {
@@ -955,7 +956,8 @@ public class PillarParticleConfig {
                             "minecraft:skeleton_horse_spawn_egg",
                             "minecraft:glow_squid_spawn_egg",
                             "minecraft:goat_spawn_egg",
-                            "minecraft:enderman_spawn_egg"
+                            "minecraft:enderman_spawn_egg",
+                            "buildscape:ancient_ashen_scroll"
                     };
 
                     for (String defaultItem : defaultVanillaItems) {
@@ -1103,6 +1105,7 @@ public class PillarParticleConfig {
         items.add("minecraft:glow_squid_spawn_egg");
         items.add("minecraft:goat_spawn_egg");
         items.add("minecraft:enderman_spawn_egg");
+        items.add("buildscape:ancient_ashen_scroll");
 
         if (net.minecraftforge.fml.ModList.get().isLoaded("the_vault")) {
             items.add("the_vault:echo_pog");

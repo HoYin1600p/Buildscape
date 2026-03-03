@@ -54,7 +54,7 @@ public class CosmeticManager {
     private void registerBuiltInCosmetics() {
         // Register particle trail cosmetics with different shapes
         // Default / Dyeable Particles
-        registerParticleTrail("buildscape:cosmatics/particle/heart_trail", "Heart Trail", "Hearts float behind you", 2,
+        registerRedeemableParticleTrail("buildscape:cosmatics/particle/heart_trail", "Heart Trail", "Hearts float behind you", 2,
                 "heart");
         registerParticleTrail("buildscape:cosmatics/particle/sparkle_trail", "Sparkle Trail",
                 "Magical sparkles trail behind you", 1, "sparkle");

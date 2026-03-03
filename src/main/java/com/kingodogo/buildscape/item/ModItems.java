@@ -5602,7 +5602,13 @@ public class ModItems {
 
     public static final RegistryObject<Item> FROST_ROSE = ITEMS.register(
             "frost_rose",
-            () -> new BlockItem(ModBlocks.FROST_ROSE.get(), createBlockItemProperties())
+            () -> new BlockItem(ModBlocks.FROST_ROSE.get(), createBlockItemProperties()) {
+                @Override
+                public void appendHoverText(net.minecraft.world.item.ItemStack stack, @javax.annotation.Nullable net.minecraft.world.level.Level level, java.util.List<net.minecraft.network.chat.Component> tooltip, net.minecraft.world.item.TooltipFlag flag) {
+                    tooltip.add(new net.minecraft.network.chat.TextComponent("Obtained when a Wither kills a Snow Golem")
+                            .withStyle(net.minecraft.ChatFormatting.DARK_AQUA));
+                }
+            }
     );
 
     public static final RegistryObject<Item> GLOW_LIGHTS = ITEMS.register(
@@ -7040,6 +7046,38 @@ public class ModItems {
             () -> new BlockItem(ModBlocks.MUD_BRICK_WALL.get(), createBlockItemProperties()));
 
     public static final RegistryObject<Item> ANCIENT_ASHEN_SCROLL = ITEMS.register("ancient_ashen_scroll",
-            () -> new Item(new Item.Properties().tab(BuildScape.BUILDSCAPE_TAB).durability(100)));
+            () -> new Item(new Item.Properties().tab(BuildScape.BUILDSCAPE_TAB).durability(28)) {
+                @Override
+                public boolean isEnchantable(net.minecraft.world.item.ItemStack stack) {
+                    return false;
+                }
+
+                @Override
+                public boolean isBookEnchantable(net.minecraft.world.item.ItemStack stack, net.minecraft.world.item.ItemStack book) {
+                    return false;
+                }
+
+                @Override
+                public void appendHoverText(net.minecraft.world.item.ItemStack stack, @javax.annotation.Nullable net.minecraft.world.level.Level level, java.util.List<net.minecraft.network.chat.Component> tooltip, net.minecraft.world.item.TooltipFlag flag) {
+                    tooltip.add(new net.minecraft.network.chat.TextComponent("Found rarely in ")
+                            .withStyle(net.minecraft.ChatFormatting.GRAY)
+                            .append(new net.minecraft.network.chat.TextComponent("End Cities")
+                                    .withStyle(net.minecraft.ChatFormatting.AQUA))
+                            .append(new net.minecraft.network.chat.TextComponent(" & ")
+                                    .withStyle(net.minecraft.ChatFormatting.GRAY))
+                            .append(new net.minecraft.network.chat.TextComponent("Woodland Mansions")
+                                    .withStyle(net.minecraft.ChatFormatting.AQUA))
+                            .append(new net.minecraft.network.chat.TextComponent(", also if")
+                                    .withStyle(net.minecraft.ChatFormatting.GRAY)));
+                    tooltip.add(new net.minecraft.network.chat.TextComponent("you are lucky a ")
+                            .withStyle(net.minecraft.ChatFormatting.GRAY)
+                            .append(new net.minecraft.network.chat.TextComponent("Wandering Trader")
+                                    .withStyle(net.minecraft.ChatFormatting.AQUA))
+                            .append(new net.minecraft.network.chat.TextComponent(" might trade")
+                                    .withStyle(net.minecraft.ChatFormatting.GRAY)));
+                    tooltip.add(new net.minecraft.network.chat.TextComponent("it for a sweet price.")
+                            .withStyle(net.minecraft.ChatFormatting.GRAY));
+                }
+            });
 
 }

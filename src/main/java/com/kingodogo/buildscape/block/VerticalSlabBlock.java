@@ -82,11 +82,13 @@ public class VerticalSlabBlock extends SlabBlock implements SimpleWaterloggedBlo
         BlockPos pos = context.getClickedPos();
         BlockState existingState = context.getLevel().getBlockState(pos);
         if (existingState.is(this)) {
-            return existingState.setValue(TYPE, SlabType.DOUBLE).setValue(WATERLOGGED, false);
+            if (context.replacingClickedOnBlock()) {
+                return existingState.setValue(TYPE, SlabType.DOUBLE).setValue(WATERLOGGED, false);
+            }
+            return null;
         }
 
         FluidState fluidState = context.getLevel().getFluidState(pos);
-        // Changed: Removed .getOpposite() to try the other side as requested
         Direction facing = context.getHorizontalDirection();
         return this.defaultBlockState().setValue(FACING, facing).setValue(TYPE, SlabType.BOTTOM).setValue(WATERLOGGED, fluidState.getType() == Fluids.WATER);
     }

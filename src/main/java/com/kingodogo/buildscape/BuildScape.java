@@ -2270,7 +2270,7 @@ public class BuildScape {
         event
                 .getGenericTrades()
                 .add((trader, rand) -> {
-                    if (rand.nextFloat() <= 0.00075f) { // 0.075% chance
+                    if (rand.nextFloat() <= 0.15f) { // 15% chance
                         return new net.minecraft.world.item.trading.MerchantOffer(
                                 new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.DIAMOND, 12),
                                 new net.minecraft.world.item.ItemStack(ModItems.ANCIENT_ASHEN_SCROLL.get(), 1),
@@ -4323,6 +4323,7 @@ public class BuildScape {
                     com.kingodogo.buildscape.particle.ModParticles.COLORED_SMOKE.get(),
                     sprites -> new com.kingodogo.buildscape.particle.ColoredSmokeParticle.Provider(
                             sprites));
+
 
             net.minecraft.client.Minecraft.getInstance().particleEngine.register(
                     com.kingodogo.buildscape.particle.ModParticles.TINTABLE_HEART.get(),

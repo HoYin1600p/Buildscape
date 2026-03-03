@@ -2553,6 +2553,7 @@ public class ModBlocks {
                         BlockBehaviour.Properties.of(Material.STONE, MaterialColor.DIAMOND)
                                 .strength(3.0f, 6.0f)
                                 .sound(net.minecraft.world.level.block.SoundType.STONE)
+                                .lightLevel(state -> 15)
                                 .noOcclusion()));
 
         public static final RegistryObject<Block> ASHENKING_GOLD_PILLAR = BLOCKS.register(
@@ -2561,6 +2562,7 @@ public class ModBlocks {
                         BlockBehaviour.Properties.of(Material.STONE, MaterialColor.GOLD)
                                 .strength(3.0f, 6.0f)
                                 .sound(net.minecraft.world.level.block.SoundType.STONE)
+                                .lightLevel(state -> 15)
                                 .noOcclusion()));
 
         public static final RegistryObject<Block> ASHENKING_EMERALD_PILLAR = BLOCKS.register(
@@ -2569,6 +2571,7 @@ public class ModBlocks {
                         BlockBehaviour.Properties.of(Material.STONE, MaterialColor.EMERALD)
                                 .strength(3.0f, 6.0f)
                                 .sound(net.minecraft.world.level.block.SoundType.STONE)
+                                .lightLevel(state -> 15)
                                 .noOcclusion()));
 
         public static final RegistryObject<Block> ASHENKING_NETHERITE_PILLAR = BLOCKS.register(
@@ -2577,6 +2580,7 @@ public class ModBlocks {
                         BlockBehaviour.Properties.of(Material.STONE, MaterialColor.COLOR_BLACK)
                                 .strength(5.0f, 6.0f)
                                 .sound(net.minecraft.world.level.block.SoundType.STONE)
+                                .lightLevel(state -> 15)
                                 .noOcclusion()));
 
         public static final RegistryObject<Block> DECORATED_POT = BLOCKS.register(

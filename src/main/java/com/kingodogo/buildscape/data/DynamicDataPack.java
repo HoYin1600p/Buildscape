@@ -120,27 +120,14 @@ public class DynamicDataPack implements PackResources {
             Block parentBlockObj = ForgeRegistries.BLOCKS.getValue(parentId);
             if (parentBlockObj == null || parentBlockObj == net.minecraft.world.level.block.Blocks.AIR) return;
 
-            // Blockstate
-            JsonObject blockstate = new JsonObject();
-            JsonObject variants = new JsonObject();
-            String modelPath = BuildScape.MODID + ":block/" + path;
-            
-            variants.add("facing=north,type=bottom", createVariant(modelPath, 0, 0));
-            variants.add("facing=south,type=bottom", createVariant(modelPath, 0, 180));
-            variants.add("facing=east,type=bottom", createVariant(modelPath, 0, 90));
-            variants.add("facing=west,type=bottom", createVariant(modelPath, 0, 270));
-            
-            // Double uses full block model
-            String cleanPath = parentPath.replace("_slab", "").replace("slab_", "");
-            String fullBlock = parentNamespace + ":block/" + cleanPath;
-            variants.add("type=double", createVariant(fullBlock, 0, 0));
-
             // Determine the best parent model and texturing strategy
             String modelToUse = parentNamespace + ":block/" + parentPath;
             boolean useAllTexture = false;
 
+            String cleanPath = parentPath.replace("_slab", "").replace("slab_", "");
+
             // Known mods that use a single #all texture for slabs/stairs
-            boolean isSingleTextureMod = parentNamespace.equals("auxiliaryblocks") || 
+            boolean isSingleTextureMod = parentNamespace.equals("auxiliaryblocks") ||
                                        parentNamespace.equals("the_vault") ||
                                        parentNamespace.equals("biomesoplenty");
 
@@ -155,10 +142,26 @@ public class DynamicDataPack implements PackResources {
                 useAllTexture = true;
             }
 
+            // Blockstate
+            JsonObject blockstate = new JsonObject();
+            JsonObject variants = new JsonObject();
+            String modelPath = BuildScape.MODID + ":block/" + path;
+            String doubleModelPath = BuildScape.MODID + ":block/" + path + "_double";
+
+            variants.add("facing=north,type=bottom", createVariant(modelPath, 0, 0));
+            variants.add("facing=south,type=bottom", createVariant(modelPath, 0, 180));
+            variants.add("facing=east,type=bottom", createVariant(modelPath, 0, 90));
+            variants.add("facing=west,type=bottom", createVariant(modelPath, 0, 270));
+
+            // Double uses a generated full block model that inherits textures from the parent slab
+            variants.add("type=double", createVariant(doubleModelPath, 0, 0));
+
             blockstate.add("variants", variants);
             cachedResources.put(PacketPath("assets", verticalId.getNamespace(), "blockstates", path + ".json"), GSON.toJson(blockstate));
-            cachedResources.put(PacketPath("assets", verticalId.getNamespace(), "models/block", path + ".json"), 
+            cachedResources.put(PacketPath("assets", verticalId.getNamespace(), "models/block", path + ".json"),
                 GSON.toJson(createVerticalSlabModel(modelToUse, useAllTexture)));
+            cachedResources.put(PacketPath("assets", verticalId.getNamespace(), "models/block", path + "_double.json"),
+                GSON.toJson(createDoubleSlabModel(modelToUse, useAllTexture)));
 
             // Item Model
             JsonObject itemModel = createVerticalSlabModel(modelToUse, useAllTexture);
@@ -250,6 +253,37 @@ public class DynamicDataPack implements PackResources {
         faces.add("down", createFace(botTex, "down", 0, 8, 16, 16));
         slab.add("faces", faces);
         elements.add(slab);
+        model.add("elements", elements);
+        return model;
+    }
+
+    private JsonObject createDoubleSlabModel(String parentModel, boolean useAll) {
+        JsonObject model = new JsonObject();
+        model.addProperty("parent", parentModel);
+
+        if (useAll) {
+            JsonObject textures = new JsonObject();
+            textures.addProperty("particle", "#all");
+            model.add("textures", textures);
+        }
+
+        JsonArray elements = new JsonArray();
+        JsonObject fullBlock = new JsonObject();
+        fullBlock.add("from", createJsonArray(0, 0, 0));
+        fullBlock.add("to", createJsonArray(16, 16, 16));
+        JsonObject faces = new JsonObject();
+        String mainTex = useAll ? "#all" : "#side";
+        String topTex = useAll ? "#all" : "#top";
+        String botTex = useAll ? "#all" : "#bottom";
+
+        faces.add("north", createFace(mainTex, "north", 0, 0, 16, 16));
+        faces.add("south", createFace(mainTex, "south", 0, 0, 16, 16));
+        faces.add("west", createFace(mainTex, "west", 0, 0, 16, 16));
+        faces.add("east", createFace(mainTex, "east", 0, 0, 16, 16));
+        faces.add("up", createFace(topTex, "up", 0, 0, 16, 16));
+        faces.add("down", createFace(botTex, "down", 0, 0, 16, 16));
+        fullBlock.add("faces", faces);
+        elements.add(fullBlock);
         model.add("elements", elements);
         return model;
     }

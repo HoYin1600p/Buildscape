@@ -1,75 +1,76 @@
-{
-  "textures": {
-    "texture": "buildscape:block/green_stocking"
-  },
-  "elements": [
-    {
-      "from": [
-        0,
-        0,
-        15
-      ],
-      "to": [
-        16,
-        16,
-        16
-      ],
-      "faces": {
-        "north": {
-          "texture": "#texture",
-          "uv": [
-            0,
-            0,
-            16,
-            16
-          ]
-        },
-        "south": {
-          "texture": "#texture",
-          "uv": [
-            0,
-            0,
-            16,
-            16
-          ]
-        },
-        "east": {
-          "texture": "#texture",
-          "uv": [
-            0,
-            0,
-            16,
-            16
-          ]
-        },
-        "west": {
-          "texture": "#texture",
-          "uv": [
-            0,
-            0,
-            16,
-            16
-          ]
-        },
-        "up": {
-          "texture": "#texture",
-          "uv": [
-            0,
-            0,
-            16,
-            16
-          ]
-        },
-        "down": {
-          "texture": "#texture",
-          "uv": [
-            0,
-            0,
-            16,
-            16
-          ]
-        }
-      }
-    }
-  ]
+﻿{
+    "textures":  {
+                     "texture":  "buildscape:block/green_stocking",
+                     "particle":  "#texture"
+                 },
+    "elements":  [
+                     {
+                         "from":  [
+                                      0,
+                                      0,
+                                      15
+                                  ],
+                         "to":  [
+                                    16,
+                                    16,
+                                    16
+                                ],
+                         "faces":  {
+                                       "north":  {
+                                                     "texture":  "#texture",
+                                                     "uv":  [
+                                                                0,
+                                                                0,
+                                                                16,
+                                                                16
+                                                            ]
+                                                 },
+                                       "south":  {
+                                                     "texture":  "#texture",
+                                                     "uv":  [
+                                                                0,
+                                                                0,
+                                                                16,
+                                                                16
+                                                            ]
+                                                 },
+                                       "east":  {
+                                                    "texture":  "#texture",
+                                                    "uv":  [
+                                                               0,
+                                                               0,
+                                                               16,
+                                                               16
+                                                           ]
+                                                },
+                                       "west":  {
+                                                    "texture":  "#texture",
+                                                    "uv":  [
+                                                               0,
+                                                               0,
+                                                               16,
+                                                               16
+                                                           ]
+                                                },
+                                       "up":  {
+                                                  "texture":  "#texture",
+                                                  "uv":  [
+                                                             0,
+                                                             0,
+                                                             16,
+                                                             16
+                                                         ]
+                                              },
+                                       "down":  {
+                                                    "texture":  "#texture",
+                                                    "uv":  [
+                                                               0,
+                                                               0,
+                                                               16,
+                                                               16
+                                                           ]
+                                                }
+                                   }
+                     }
+                 ]
 }

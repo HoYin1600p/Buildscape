@@ -1,7 +1,7 @@
 package com.kingodogo.buildscape.event;
 
 import com.kingodogo.buildscape.BuildScape;
-import com.kingodogo.buildscape.data.DynamicDataPack;
+import com.kingodogo.buildscape.data.legacy.DynamicDataPack;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.metadata.pack.PackMetadataSection;

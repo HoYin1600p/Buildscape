@@ -1,6 +1,7 @@
-{
-  "parent": "block/cube_all",
-  "textures": {
-    "all": "buildscape:block/bit_polished_tuff"
-  }
+﻿{
+    "parent":  "block/cube_all",
+    "textures":  {
+                     "all":  "buildscape:block/bit_polished_tuff",
+                     "particle":  "#all"
+                 }
 }

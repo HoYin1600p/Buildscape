@@ -1,8 +1,9 @@
-{
-  "parent": "minecraft:block/inner_stairs",
-  "textures": {
-    "bottom": "buildscape:block/smooth_basalt",
-    "top": "buildscape:block/smooth_basalt",
-    "side": "buildscape:block/smooth_basalt"
-  }
+﻿{
+    "parent":  "minecraft:block/inner_stairs",
+    "textures":  {
+                     "bottom":  "buildscape:block/smooth_basalt",
+                     "top":  "buildscape:block/smooth_basalt",
+                     "side":  "buildscape:block/smooth_basalt",
+                     "particle":  "#side"
+                 }
 }

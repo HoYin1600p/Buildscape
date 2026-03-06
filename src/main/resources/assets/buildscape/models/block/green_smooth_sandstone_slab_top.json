@@ -1,8 +1,9 @@
-{
-  "parent": "minecraft:block/slab_top",
-  "textures": {
-    "bottom": "buildscape:block/green_smooth_sandstone",
-    "top": "buildscape:block/green_smooth_sandstone",
-    "side": "buildscape:block/green_smooth_sandstone"
-  }
+﻿{
+    "parent":  "minecraft:block/slab_top",
+    "textures":  {
+                     "bottom":  "buildscape:block/green_smooth_sandstone",
+                     "top":  "buildscape:block/green_smooth_sandstone",
+                     "side":  "buildscape:block/green_smooth_sandstone",
+                     "particle":  "#side"
+                 }
 }

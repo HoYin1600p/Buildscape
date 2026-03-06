@@ -1,8 +1,9 @@
-{
-  "parent": "block/cube_bottom_top",
-  "textures": {
-    "bottom": "buildscape:block/stripped_bamboo_block",
-    "top": "buildscape:block/stripped_bamboo_block",
-    "side": "buildscape:block/stripped_bamboo_block"
-  }
+﻿{
+    "parent":  "block/cube_bottom_top",
+    "textures":  {
+                     "bottom":  "buildscape:block/stripped_bamboo_block",
+                     "top":  "buildscape:block/stripped_bamboo_block",
+                     "side":  "buildscape:block/stripped_bamboo_block",
+                     "particle":  "#side"
+                 }
 }

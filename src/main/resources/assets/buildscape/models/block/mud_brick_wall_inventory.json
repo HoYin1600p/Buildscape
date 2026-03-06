@@ -1,6 +1,7 @@
-{
-  "parent": "minecraft:block/wall_inventory",
-  "textures": {
-    "wall": "buildscape:block/mud_bricks"
-  }
+﻿{
+    "parent":  "minecraft:block/wall_inventory",
+    "textures":  {
+                     "wall":  "buildscape:block/mud_bricks",
+                     "particle":  "buildscape:block/mud_bricks"
+                 }
 }

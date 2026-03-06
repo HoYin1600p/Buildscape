@@ -1,8 +1,9 @@
-{
-  "parent": "minecraft:block/stairs",
-  "textures": {
-    "bottom": "buildscape:block/bit_exposed_copper_block",
-    "top": "buildscape:block/bit_exposed_copper_block",
-    "side": "buildscape:block/bit_exposed_copper_block"
-  }
+﻿{
+    "parent":  "minecraft:block/stairs",
+    "textures":  {
+                     "bottom":  "buildscape:block/bit_exposed_copper_block",
+                     "top":  "buildscape:block/bit_exposed_copper_block",
+                     "side":  "buildscape:block/bit_exposed_copper_block",
+                     "particle":  "#side"
+                 }
 }

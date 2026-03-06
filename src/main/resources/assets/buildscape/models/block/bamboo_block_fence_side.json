@@ -1,6 +1,7 @@
-{
-  "parent": "block/fence_side",
-  "textures": {
-    "texture": "buildscape:block/bamboo_block"
-  }
+﻿{
+    "parent":  "block/fence_side",
+    "textures":  {
+                     "texture":  "buildscape:block/bamboo_block",
+                     "particle":  "#texture"
+                 }
 }

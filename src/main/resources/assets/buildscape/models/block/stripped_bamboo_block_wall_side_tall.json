@@ -1,6 +1,7 @@
-{
-  "textures": {
-    "wall": "buildscape:block/stripped_bamboo_block"
-  },
-  "parent": "minecraft:block/template_wall_side_tall"
+﻿{
+    "textures":  {
+                     "wall":  "buildscape:block/stripped_bamboo_block",
+                     "particle":  "buildscape:block/stripped_bamboo_block"
+                 },
+    "parent":  "minecraft:block/template_wall_side_tall"
 }

@@ -1,6 +1,7 @@
-{
-  "parent": "block/button_pressed",
-  "textures": {
-    "texture": "buildscape:block/ashpen_cyan_planks"
-  }
+﻿{
+    "parent":  "block/button_pressed",
+    "textures":  {
+                     "texture":  "buildscape:block/ashpen_cyan_planks",
+                     "particle":  "#texture"
+                 }
 }

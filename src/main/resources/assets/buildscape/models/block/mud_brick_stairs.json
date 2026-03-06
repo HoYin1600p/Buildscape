@@ -1,8 +1,9 @@
-{
-  "parent": "minecraft:block/stairs",
-  "textures": {
-    "bottom": "buildscape:block/mud_bricks",
-    "top": "buildscape:block/mud_bricks",
-    "side": "buildscape:block/mud_bricks"
-  }
+﻿{
+    "parent":  "minecraft:block/stairs",
+    "textures":  {
+                     "bottom":  "buildscape:block/mud_bricks",
+                     "top":  "buildscape:block/mud_bricks",
+                     "side":  "buildscape:block/mud_bricks",
+                     "particle":  "#side"
+                 }
 }

@@ -1,6 +1,7 @@
-{
-  "parent": "minecraft:block/template_wall_post",
-  "textures": {
-    "wall": "buildscape:block/polished_magenta_concrete"
-  }
+﻿{
+    "parent":  "minecraft:block/template_wall_post",
+    "textures":  {
+                     "wall":  "buildscape:block/polished_magenta_concrete",
+                     "particle":  "buildscape:block/polished_magenta_concrete"
+                 }
 }

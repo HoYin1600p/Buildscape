@@ -1,6 +1,7 @@
-{
-  "parent": "block/cube_all",
-  "textures": {
-    "all": "buildscape:block/ashpen_magenta_planks"
-  }
+﻿{
+    "parent":  "block/cube_all",
+    "textures":  {
+                     "all":  "buildscape:block/ashpen_magenta_planks",
+                     "particle":  "#all"
+                 }
 }

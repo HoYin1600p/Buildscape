@@ -1,8 +1,9 @@
-{
-  "parent": "minecraft:block/inner_stairs",
-  "textures": {
-    "bottom": "buildscape:block/lime_tiles",
-    "top": "buildscape:block/lime_tiles",
-    "side": "buildscape:block/lime_tiles"
-  }
+﻿{
+    "parent":  "minecraft:block/inner_stairs",
+    "textures":  {
+                     "bottom":  "buildscape:block/lime_tiles",
+                     "top":  "buildscape:block/lime_tiles",
+                     "side":  "buildscape:block/lime_tiles",
+                     "particle":  "#side"
+                 }
 }

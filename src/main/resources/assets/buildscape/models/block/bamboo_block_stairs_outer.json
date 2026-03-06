@@ -1,8 +1,9 @@
-{
-  "parent": "block/outer_stairs",
-  "textures": {
-    "bottom": "buildscape:block/bamboo_block",
-    "top": "buildscape:block/bamboo_block",
-    "side": "buildscape:block/bamboo_block"
-  }
+﻿{
+    "parent":  "block/outer_stairs",
+    "textures":  {
+                     "bottom":  "buildscape:block/bamboo_block",
+                     "top":  "buildscape:block/bamboo_block",
+                     "side":  "buildscape:block/bamboo_block",
+                     "particle":  "#side"
+                 }
 }

@@ -1,7 +1,7 @@
-{
-  "parent": "minecraft:block/template_wall_side_tall",
-  "textures": {
-    "wall": "buildscape:block/snow_bricks"
-  }
+﻿{
+    "parent":  "minecraft:block/template_wall_side_tall",
+    "textures":  {
+                     "wall":  "buildscape:block/snow_bricks",
+                     "particle":  "buildscape:block/snow_bricks"
+                 }
 }
-

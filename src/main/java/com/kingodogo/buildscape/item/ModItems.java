@@ -16,7 +16,7 @@ public class ModItems {
     );
 
     private static Item.Properties createBlockItemProperties() {
-        return new Item.Properties().tab(BuildScape.BUILDSCAPE_TAB);
+        return new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB);
     }
 
     public static final RegistryObject<Item> BLACK_SAND = ITEMS.register(
@@ -5230,7 +5230,7 @@ public class ModItems {
     public static final RegistryObject<Item> SNOWY_LEAVES = ITEMS.register(
             "snowy_leaves",
             () ->
-                    new BlockItem(ModBlocks.SNOWY_LEAVES.get(), createBlockItemProperties())
+                    new BlockItem(ModBlocks.SNOWY_LEAVES.get(), new Item.Properties()) // template block, hidden from creative tab
     );
 
     public static final RegistryObject<Item> SNOWY_OAK_LEAVES = ITEMS.register(
@@ -5416,12 +5416,12 @@ public class ModItems {
 
     public static final RegistryObject<Item> COPPER_NUGGET = ITEMS.register(
             "copper_nugget",
-            () -> new Item(new Item.Properties().tab(BuildScape.BUILDSCAPE_TAB))
+            () -> new Item(new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB))
     );
 
     public static final RegistryObject<Item> STEEL_INGOT = ITEMS.register(
             "steel_ingot",
-            () -> new Item(new Item.Properties().tab(BuildScape.BUILDSCAPE_TAB))
+            () -> new Item(new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB))
     );
 
     public static final RegistryObject<Item> SNOW_STAIRS = ITEMS.register(
@@ -5570,7 +5570,7 @@ public class ModItems {
             "mangrove_sign",
             () ->
                     new net.minecraft.world.item.SignItem(
-                    new Item.Properties().tab(BuildScape.BUILDSCAPE_TAB).stacksTo(16),
+                    new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB).stacksTo(16),
                     ModBlocks.MANGROVE_SIGN.get(),
                             ModBlocks.MANGROVE_WALL_SIGN.get()
                     )
@@ -5580,7 +5580,7 @@ public class ModItems {
             "bamboo_sign",
             () ->
                     new net.minecraft.world.item.SignItem(
-                    new Item.Properties().tab(BuildScape.BUILDSCAPE_TAB).stacksTo(16),
+                    new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB).stacksTo(16),
                     ModBlocks.BAMBOO_SIGN.get(),
                             ModBlocks.BAMBOO_WALL_SIGN.get()
                     )
@@ -5590,7 +5590,7 @@ public class ModItems {
             "mangrove_boat",
             () ->
                     new MangroveBoatItem(
-                            new Item.Properties().tab(BuildScape.BUILDSCAPE_TAB).stacksTo(1)
+                            new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB).stacksTo(1)
                     )
     );
 
@@ -5627,7 +5627,7 @@ public class ModItems {
 
     public static final RegistryObject<Item> CONFETTI_ITEM = ITEMS.register(
             "confetti",
-            () -> new ConfettiItem(new Item.Properties().tab(BuildScape.BUILDSCAPE_TAB))
+            () -> new ConfettiItem(new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB))
     );
 
     public static final RegistryObject<Item> STEEL_BLOCK = ITEMS.register(
@@ -6943,7 +6943,7 @@ public class ModItems {
 
     public static final RegistryObject<Item> BOTTLE_OF_MIST = ITEMS.register(
             "bottle_of_mist",
-            () -> new BottleOfMistItem(new Item.Properties().tab(com.kingodogo.buildscape.BuildScape.BUILDSCAPE_TAB).stacksTo(64))
+            () -> new BottleOfMistItem(new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB).stacksTo(64))
     );
 
     public static final RegistryObject<Item> BLACK_FACTORY_MESH = ITEMS.register("black_factory_mesh",
@@ -7046,7 +7046,7 @@ public class ModItems {
             () -> new BlockItem(ModBlocks.MUD_BRICK_WALL.get(), createBlockItemProperties()));
 
     public static final RegistryObject<Item> ANCIENT_ASHEN_SCROLL = ITEMS.register("ancient_ashen_scroll",
-            () -> new Item(new Item.Properties().tab(BuildScape.BUILDSCAPE_TAB).durability(28)) {
+            () -> new Item(new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB).durability(28)) {
                 @Override
                 public boolean isEnchantable(net.minecraft.world.item.ItemStack stack) {
                     return false;

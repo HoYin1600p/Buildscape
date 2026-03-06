@@ -1,6 +1,7 @@
-{
-  "parent": "block/cube_all",
-  "textures": {
-    "all": "buildscape:block/brown_tiles"
-  }
+﻿{
+    "parent":  "block/cube_all",
+    "textures":  {
+                     "all":  "buildscape:block/brown_tiles",
+                     "particle":  "#all"
+                 }
 }

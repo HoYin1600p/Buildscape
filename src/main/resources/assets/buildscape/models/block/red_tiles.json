@@ -1,6 +1,7 @@
-{
-  "parent": "block/cube_all",
-  "textures": {
-    "all": "buildscape:block/red_tiles"
-  }
+﻿{
+    "parent":  "block/cube_all",
+    "textures":  {
+                     "all":  "buildscape:block/red_tiles",
+                     "particle":  "#all"
+                 }
 }

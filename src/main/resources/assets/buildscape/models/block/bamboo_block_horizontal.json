@@ -1,8 +1,8 @@
-{
-  "parent": "minecraft:block/cube_column_horizontal",
-  "textures": {
-    "end": "buildscape:block/bamboo_block_top",
-    "side": "buildscape:block/bamboo_block"
-  }
+﻿{
+    "parent":  "minecraft:block/cube_column_horizontal",
+    "textures":  {
+                     "end":  "buildscape:block/bamboo_block_top",
+                     "side":  "buildscape:block/bamboo_block",
+                     "particle":  "#side"
+                 }
 }
-

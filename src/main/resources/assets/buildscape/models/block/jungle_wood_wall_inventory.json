@@ -1,6 +1,7 @@
-{
-  "textures": {
-    "wall": "minecraft:block/jungle_log"
-  },
-  "parent": "minecraft:block/wall_inventory"
+﻿{
+    "textures":  {
+                     "wall":  "minecraft:block/jungle_log",
+                     "particle":  "minecraft:block/jungle_log"
+                 },
+    "parent":  "minecraft:block/wall_inventory"
 }

@@ -1,8 +1,9 @@
-{
-  "parent": "minecraft:block/slab",
-  "textures": {
-    "bottom": "buildscape:block/framed_caution",
-    "top": "buildscape:block/framed_caution",
-    "side": "buildscape:block/framed_caution"
-  }
+﻿{
+    "parent":  "minecraft:block/slab",
+    "textures":  {
+                     "bottom":  "buildscape:block/framed_caution",
+                     "top":  "buildscape:block/framed_caution",
+                     "side":  "buildscape:block/framed_caution",
+                     "particle":  "#side"
+                 }
 }

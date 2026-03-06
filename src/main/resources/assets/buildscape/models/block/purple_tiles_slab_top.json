@@ -1,8 +1,9 @@
-{
-  "parent": "minecraft:block/slab_top",
-  "textures": {
-    "bottom": "buildscape:block/purple_tiles",
-    "top": "buildscape:block/purple_tiles",
-    "side": "buildscape:block/purple_tiles"
-  }
+﻿{
+    "parent":  "minecraft:block/slab_top",
+    "textures":  {
+                     "bottom":  "buildscape:block/purple_tiles",
+                     "top":  "buildscape:block/purple_tiles",
+                     "side":  "buildscape:block/purple_tiles",
+                     "particle":  "#side"
+                 }
 }

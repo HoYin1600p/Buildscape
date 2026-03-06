@@ -1,6 +1,7 @@
-{
-  "parent": "block/button",
-  "textures": {
-    "texture": "buildscape:block/ashpen_green_planks"
-  }
+﻿{
+    "parent":  "block/button",
+    "textures":  {
+                     "texture":  "buildscape:block/ashpen_green_planks",
+                     "particle":  "#texture"
+                 }
 }

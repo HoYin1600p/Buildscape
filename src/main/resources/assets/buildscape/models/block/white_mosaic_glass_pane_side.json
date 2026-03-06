@@ -1,8 +1,9 @@
-{
-  "parent": "minecraft:block/template_glass_pane_side",
-  "textures": {
-    "pane": "buildscape:block/white_mosaic_glass",
-    "edge": "buildscape:block/white_mosaic_glass"
-  },
-  "render_type": "translucent"
+﻿{
+    "parent":  "minecraft:block/template_glass_pane_side",
+    "textures":  {
+                     "pane":  "buildscape:block/white_mosaic_glass",
+                     "edge":  "buildscape:block/white_mosaic_glass",
+                     "particle":  "buildscape:block/white_mosaic_glass"
+                 },
+    "render_type":  "translucent"
 }

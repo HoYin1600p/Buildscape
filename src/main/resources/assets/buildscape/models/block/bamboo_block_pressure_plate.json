@@ -1,6 +1,7 @@
-{
-  "parent": "block/pressure_plate_up",
-  "textures": {
-    "texture": "buildscape:block/bamboo_block"
-  }
+﻿{
+    "parent":  "block/pressure_plate_up",
+    "textures":  {
+                     "texture":  "buildscape:block/bamboo_block",
+                     "particle":  "#texture"
+                 }
 }

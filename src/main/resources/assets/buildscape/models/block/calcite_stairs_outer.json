@@ -1,8 +1,9 @@
-{
-  "parent": "minecraft:block/outer_stairs",
-  "textures": {
-    "bottom": "buildscape:block/calcite",
-    "top": "buildscape:block/calcite",
-    "side": "buildscape:block/calcite"
-  }
+﻿{
+    "parent":  "minecraft:block/outer_stairs",
+    "textures":  {
+                     "bottom":  "buildscape:block/calcite",
+                     "top":  "buildscape:block/calcite",
+                     "side":  "buildscape:block/calcite",
+                     "particle":  "#side"
+                 }
 }

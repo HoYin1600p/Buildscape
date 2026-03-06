@@ -1,8 +1,9 @@
-{
-  "parent": "minecraft:block/slab_top",
-  "textures": {
-    "bottom": "buildscape:block/bedrock",
-    "top": "buildscape:block/bedrock",
-    "side": "buildscape:block/bedrock"
-  }
+﻿{
+    "parent":  "minecraft:block/slab_top",
+    "textures":  {
+                     "bottom":  "buildscape:block/bedrock",
+                     "top":  "buildscape:block/bedrock",
+                     "side":  "buildscape:block/bedrock",
+                     "particle":  "#side"
+                 }
 }

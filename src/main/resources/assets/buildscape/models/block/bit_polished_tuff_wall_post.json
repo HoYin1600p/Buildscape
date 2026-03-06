@@ -1,6 +1,7 @@
-{
-  "parent": "minecraft:block/template_wall_post",
-  "textures": {
-    "wall": "buildscape:block/bit_polished_tuff"
-  }
+﻿{
+    "parent":  "minecraft:block/template_wall_post",
+    "textures":  {
+                     "wall":  "buildscape:block/bit_polished_tuff",
+                     "particle":  "buildscape:block/bit_polished_tuff"
+                 }
 }

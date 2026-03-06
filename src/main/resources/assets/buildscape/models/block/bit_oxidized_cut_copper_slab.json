@@ -1,8 +1,9 @@
-{
-  "parent": "minecraft:block/slab",
-  "textures": {
-    "bottom": "buildscape:block/bit_oxidized_cut_copper",
-    "top": "buildscape:block/bit_oxidized_cut_copper",
-    "side": "buildscape:block/bit_oxidized_cut_copper"
-  }
+﻿{
+    "parent":  "minecraft:block/slab",
+    "textures":  {
+                     "bottom":  "buildscape:block/bit_oxidized_cut_copper",
+                     "top":  "buildscape:block/bit_oxidized_cut_copper",
+                     "side":  "buildscape:block/bit_oxidized_cut_copper",
+                     "particle":  "#side"
+                 }
 }

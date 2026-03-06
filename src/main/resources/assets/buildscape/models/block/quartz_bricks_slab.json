@@ -1,8 +1,9 @@
-{
-  "parent": "minecraft:block/slab",
-  "textures": {
-    "bottom": "buildscape:block/quartz_bricks",
-    "top": "buildscape:block/quartz_bricks",
-    "side": "buildscape:block/quartz_bricks"
-  }
+﻿{
+    "parent":  "minecraft:block/slab",
+    "textures":  {
+                     "bottom":  "buildscape:block/quartz_bricks",
+                     "top":  "buildscape:block/quartz_bricks",
+                     "side":  "buildscape:block/quartz_bricks",
+                     "particle":  "#side"
+                 }
 }

@@ -1,8 +1,9 @@
-{
-  "parent": "block/slab_top",
-  "textures": {
-    "bottom": "buildscape:block/mud",
-    "top": "buildscape:block/mud",
-    "side": "buildscape:block/mud"
-  }
+﻿{
+    "parent":  "block/slab_top",
+    "textures":  {
+                     "bottom":  "buildscape:block/mud",
+                     "top":  "buildscape:block/mud",
+                     "side":  "buildscape:block/mud",
+                     "particle":  "#side"
+                 }
 }

@@ -1,6 +1,7 @@
-{
-  "parent": "minecraft:block/button",
-  "textures": {
-    "texture": "buildscape:block/ashpen_red_planks"
-  }
+﻿{
+    "parent":  "minecraft:block/button",
+    "textures":  {
+                     "texture":  "buildscape:block/ashpen_red_planks",
+                     "particle":  "#texture"
+                 }
 }

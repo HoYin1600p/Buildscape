@@ -1,8 +1,8 @@
-{
-  "parent": "minecraft:block/pointed_dripstone_down_tip_merge",
-  "textures": {
-    "cross": "buildscape:block/icicle_down_tip_merge"
-  },
-  "render_type": "minecraft:cutout_mipped"
+﻿{
+    "parent":  "minecraft:block/pointed_dripstone_down_tip_merge",
+    "textures":  {
+                     "cross":  "buildscape:block/icicle_down_tip_merge",
+                     "particle":  "#cross"
+                 },
+    "render_type":  "minecraft:cutout_mipped"
 }
-

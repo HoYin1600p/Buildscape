@@ -1,8 +1,9 @@
-{
-  "parent": "block/slab",
-  "textures": {
-    "bottom": "buildscape:block/ashpen_brown_planks",
-    "top": "buildscape:block/ashpen_brown_planks",
-    "side": "buildscape:block/ashpen_brown_planks"
-  }
+﻿{
+    "parent":  "block/slab",
+    "textures":  {
+                     "bottom":  "buildscape:block/ashpen_brown_planks",
+                     "top":  "buildscape:block/ashpen_brown_planks",
+                     "side":  "buildscape:block/ashpen_brown_planks",
+                     "particle":  "#side"
+                 }
 }

@@ -1,8 +1,9 @@
-{
-  "parent": "minecraft:block/stairs",
-  "textures": {
-    "bottom": "buildscape:block/ashpen_yellow_planks",
-    "top": "buildscape:block/ashpen_yellow_planks",
-    "side": "buildscape:block/ashpen_yellow_planks"
-  }
+﻿{
+    "parent":  "minecraft:block/stairs",
+    "textures":  {
+                     "bottom":  "buildscape:block/ashpen_yellow_planks",
+                     "top":  "buildscape:block/ashpen_yellow_planks",
+                     "side":  "buildscape:block/ashpen_yellow_planks",
+                     "particle":  "#side"
+                 }
 }

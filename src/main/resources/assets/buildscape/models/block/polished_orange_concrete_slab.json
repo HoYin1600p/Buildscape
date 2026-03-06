@@ -1,8 +1,9 @@
-{
-  "parent": "minecraft:block/slab",
-  "textures": {
-    "bottom": "buildscape:block/polished_orange_concrete",
-    "top": "buildscape:block/polished_orange_concrete",
-    "side": "buildscape:block/polished_orange_concrete"
-  }
+﻿{
+    "parent":  "minecraft:block/slab",
+    "textures":  {
+                     "bottom":  "buildscape:block/polished_orange_concrete",
+                     "top":  "buildscape:block/polished_orange_concrete",
+                     "side":  "buildscape:block/polished_orange_concrete",
+                     "particle":  "#side"
+                 }
 }

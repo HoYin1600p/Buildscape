@@ -1,6 +1,7 @@
-{
-  "parent": "minecraft:block/template_wall_side",
-  "textures": {
-    "wall": "minecraft:block/green_concrete"
-  }
+﻿{
+    "parent":  "minecraft:block/template_wall_side",
+    "textures":  {
+                     "wall":  "minecraft:block/green_concrete",
+                     "particle":  "minecraft:block/green_concrete"
+                 }
 }

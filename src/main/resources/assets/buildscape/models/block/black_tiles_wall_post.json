@@ -1,6 +1,7 @@
-{
-  "parent": "minecraft:block/template_wall_post",
-  "textures": {
-    "wall": "buildscape:block/black_tiles"
-  }
+﻿{
+    "parent":  "minecraft:block/template_wall_post",
+    "textures":  {
+                     "wall":  "buildscape:block/black_tiles",
+                     "particle":  "buildscape:block/black_tiles"
+                 }
 }

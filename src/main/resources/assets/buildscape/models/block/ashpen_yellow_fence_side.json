@@ -1,6 +1,7 @@
-{
-  "parent": "block/fence_side",
-  "textures": {
-    "texture": "buildscape:block/ashpen_yellow_planks"
-  }
+﻿{
+    "parent":  "block/fence_side",
+    "textures":  {
+                     "texture":  "buildscape:block/ashpen_yellow_planks",
+                     "particle":  "#texture"
+                 }
 }

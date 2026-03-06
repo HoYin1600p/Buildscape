@@ -1,8 +1,9 @@
-{
-  "parent": "minecraft:block/slab_top",
-  "textures": {
-    "bottom": "buildscape:block/caution_mintcandy",
-    "top": "buildscape:block/caution_mintcandy",
-    "side": "buildscape:block/caution_mintcandy"
-  }
+﻿{
+    "parent":  "minecraft:block/slab_top",
+    "textures":  {
+                     "bottom":  "buildscape:block/caution_mintcandy",
+                     "top":  "buildscape:block/caution_mintcandy",
+                     "side":  "buildscape:block/caution_mintcandy",
+                     "particle":  "#side"
+                 }
 }

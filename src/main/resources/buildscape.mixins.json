@@ -6,6 +6,7 @@
   "refmap": "buildscape.refmap.json",
   "mixins": [
     "ChainBlockMixin",
+    "CreativeModeTabMixin",
     "EntityAccessor",
     "EntityMixin",
     "FenceBlockMixin",

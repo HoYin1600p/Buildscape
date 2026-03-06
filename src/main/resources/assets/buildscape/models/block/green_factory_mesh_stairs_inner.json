@@ -1,8 +1,9 @@
-{
-  "parent": "minecraft:block/inner_stairs",
-  "textures": {
-    "bottom": "buildscape:block/factory_mesh_green",
-    "top": "buildscape:block/factory_mesh_green",
-    "side": "buildscape:block/factory_mesh_green"
-  }
+﻿{
+    "parent":  "minecraft:block/inner_stairs",
+    "textures":  {
+                     "bottom":  "buildscape:block/factory_mesh_green",
+                     "top":  "buildscape:block/factory_mesh_green",
+                     "side":  "buildscape:block/factory_mesh_green",
+                     "particle":  "#side"
+                 }
 }

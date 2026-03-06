@@ -1,8 +1,9 @@
-{
-  "parent": "minecraft:block/template_glass_pane_side_alt",
-  "textures": {
-    "pane": "buildscape:block/factory_cyan_glass",
-    "edge": "buildscape:block/factory_cyan_glass"
-  },
-  "render_type": "translucent"
+﻿{
+    "parent":  "minecraft:block/template_glass_pane_side_alt",
+    "textures":  {
+                     "pane":  "buildscape:block/factory_cyan_glass",
+                     "edge":  "buildscape:block/factory_cyan_glass",
+                     "particle":  "buildscape:block/factory_cyan_glass"
+                 },
+    "render_type":  "translucent"
 }

@@ -1,6 +1,6 @@
 package com.kingodogo.buildscape.recipe;
 
-import com.kingodogo.buildscape.block.ModVerticalSlabs;
+import com.kingodogo.buildscape.compat.vertical.VerticalRegistry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.BlockItem;
@@ -44,7 +44,7 @@ public class VerticalSlabRecipe extends CustomRecipe {
                         if (topBlock instanceof SlabBlock &&
                                 topBlock == midBlock &&
                                 midBlock == botBlock &&
-                                ModVerticalSlabs.VERTICAL_SLABS.containsKey(topBlock)) {
+                                VerticalRegistry.VERTICAL_SLABS.containsKey(topBlock)) {
 
                             // Ensure no other items are in the grid
                             if (countTotalItems(container) == 3) {
@@ -72,8 +72,8 @@ public class VerticalSlabRecipe extends CustomRecipe {
             ItemStack stack = container.getItem(i);
             if (!stack.isEmpty() && stack.getItem() instanceof BlockItem) {
                 Block block = ((BlockItem) stack.getItem()).getBlock();
-                if (ModVerticalSlabs.VERTICAL_SLABS.containsKey(block)) {
-                    Block vertical = ModVerticalSlabs.VERTICAL_SLABS.get(block);
+                if (VerticalRegistry.VERTICAL_SLABS.containsKey(block)) {
+                    Block vertical = VerticalRegistry.VERTICAL_SLABS.get(block);
                     return new ItemStack(vertical, 3);
                 }
             }

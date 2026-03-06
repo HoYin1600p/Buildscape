@@ -1,6 +1,7 @@
-{
-  "parent": "minecraft:block/template_wall_side_tall",
-  "textures": {
-    "wall": "buildscape:block/orange_tiles"
-  }
+﻿{
+    "parent":  "minecraft:block/template_wall_side_tall",
+    "textures":  {
+                     "wall":  "buildscape:block/orange_tiles",
+                     "particle":  "buildscape:block/orange_tiles"
+                 }
 }

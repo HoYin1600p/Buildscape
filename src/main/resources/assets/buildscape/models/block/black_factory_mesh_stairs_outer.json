@@ -1,8 +1,9 @@
-{
-  "parent": "minecraft:block/outer_stairs",
-  "textures": {
-    "bottom": "buildscape:block/factory_mesh_black",
-    "top": "buildscape:block/factory_mesh_black",
-    "side": "buildscape:block/factory_mesh_black"
-  }
+﻿{
+    "parent":  "minecraft:block/outer_stairs",
+    "textures":  {
+                     "bottom":  "buildscape:block/factory_mesh_black",
+                     "top":  "buildscape:block/factory_mesh_black",
+                     "side":  "buildscape:block/factory_mesh_black",
+                     "particle":  "#side"
+                 }
 }

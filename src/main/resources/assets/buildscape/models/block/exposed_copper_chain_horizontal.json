@@ -1,7 +1,7 @@
-{
-  "parent": "buildscape:block/chain_block",
-  "textures": {
-    "texture": "buildscape:block/exposed_copper_chain"
-  }
+﻿{
+    "parent":  "buildscape:block/chain_block",
+    "textures":  {
+                     "texture":  "buildscape:block/exposed_copper_chain",
+                     "particle":  "#texture"
+                 }
 }
-

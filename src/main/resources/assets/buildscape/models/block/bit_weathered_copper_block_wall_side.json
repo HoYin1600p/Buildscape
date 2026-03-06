@@ -1,6 +1,7 @@
-{
-  "parent": "minecraft:block/template_wall_side",
-  "textures": {
-    "wall": "buildscape:block/bit_weathered_copper_block"
-  }
+﻿{
+    "parent":  "minecraft:block/template_wall_side",
+    "textures":  {
+                     "wall":  "buildscape:block/bit_weathered_copper_block",
+                     "particle":  "buildscape:block/bit_weathered_copper_block"
+                 }
 }

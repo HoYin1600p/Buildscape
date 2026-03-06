@@ -1,6 +1,7 @@
-{
-  "parent": "block/button_inventory",
-  "textures": {
-    "texture": "buildscape:block/bamboo_block"
-  }
+﻿{
+    "parent":  "block/button_inventory",
+    "textures":  {
+                     "texture":  "buildscape:block/bamboo_block",
+                     "particle":  "#texture"
+                 }
 }

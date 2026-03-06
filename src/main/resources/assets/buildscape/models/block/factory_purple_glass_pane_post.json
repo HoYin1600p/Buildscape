@@ -1,8 +1,9 @@
-{
-  "parent": "minecraft:block/template_glass_pane_post",
-  "textures": {
-    "pane": "buildscape:block/factory_purple_glass",
-    "edge": "buildscape:block/factory_purple_glass"
-  },
-  "render_type": "translucent"
+﻿{
+    "parent":  "minecraft:block/template_glass_pane_post",
+    "textures":  {
+                     "pane":  "buildscape:block/factory_purple_glass",
+                     "edge":  "buildscape:block/factory_purple_glass",
+                     "particle":  "buildscape:block/factory_purple_glass"
+                 },
+    "render_type":  "translucent"
 }

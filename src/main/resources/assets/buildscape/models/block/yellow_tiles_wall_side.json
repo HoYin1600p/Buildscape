@@ -1,6 +1,7 @@
-{
-  "parent": "minecraft:block/template_wall_side",
-  "textures": {
-    "wall": "buildscape:block/yellow_tiles"
-  }
+﻿{
+    "parent":  "minecraft:block/template_wall_side",
+    "textures":  {
+                     "wall":  "buildscape:block/yellow_tiles",
+                     "particle":  "buildscape:block/yellow_tiles"
+                 }
 }

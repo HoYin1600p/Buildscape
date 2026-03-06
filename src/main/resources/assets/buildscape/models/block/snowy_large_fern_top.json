@@ -1,6 +1,7 @@
-{
-  "parent": "minecraft:block/cross",
-  "textures": {
-    "cross": "buildscape:block/snowy_large_fern_top"
-  }
+﻿{
+    "parent":  "minecraft:block/cross",
+    "textures":  {
+                     "cross":  "buildscape:block/snowy_large_fern_top",
+                     "particle":  "#cross"
+                 }
 }

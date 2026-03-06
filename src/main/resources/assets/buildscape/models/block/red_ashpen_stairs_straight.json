@@ -1,8 +1,9 @@
-{
-  "parent": "block/stairs_straight",
-  "textures": {
-    "bottom": "buildscape:block/ashpen_red_planks",
-    "top": "buildscape:block/ashpen_red_planks",
-    "side": "buildscape:block/ashpen_red_planks"
-  }
+﻿{
+    "parent":  "block/stairs_straight",
+    "textures":  {
+                     "bottom":  "buildscape:block/ashpen_red_planks",
+                     "top":  "buildscape:block/ashpen_red_planks",
+                     "side":  "buildscape:block/ashpen_red_planks",
+                     "particle":  "#side"
+                 }
 }

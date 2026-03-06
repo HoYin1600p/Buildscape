@@ -1,6 +1,7 @@
-{
-  "parent": "minecraft:block/template_wall_side",
-  "textures": {
-    "wall": "buildscape:block/mossy_calcite"
-  }
+﻿{
+    "parent":  "minecraft:block/template_wall_side",
+    "textures":  {
+                     "wall":  "buildscape:block/mossy_calcite",
+                     "particle":  "buildscape:block/mossy_calcite"
+                 }
 }

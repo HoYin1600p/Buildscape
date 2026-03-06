@@ -1,8 +1,9 @@
-{
-  "parent": "minecraft:block/outer_stairs",
-  "textures": {
-    "bottom": "buildscape:block/yellow_sandstone_bottom",
-    "top": "buildscape:block/yellow_sandstone_top",
-    "side": "buildscape:block/yellow_sandstone"
-  }
+﻿{
+    "parent":  "minecraft:block/outer_stairs",
+    "textures":  {
+                     "bottom":  "buildscape:block/yellow_sandstone_bottom",
+                     "top":  "buildscape:block/yellow_sandstone_top",
+                     "side":  "buildscape:block/yellow_sandstone",
+                     "particle":  "#side"
+                 }
 }

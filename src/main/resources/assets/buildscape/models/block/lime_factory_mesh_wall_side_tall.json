@@ -1,6 +1,7 @@
-{
-  "parent": "minecraft:block/template_wall_side_tall",
-  "textures": {
-    "wall": "buildscape:block/factory_mesh_lime"
-  }
+﻿{
+    "parent":  "minecraft:block/template_wall_side_tall",
+    "textures":  {
+                     "wall":  "buildscape:block/factory_mesh_lime",
+                     "particle":  "buildscape:block/factory_mesh_lime"
+                 }
 }

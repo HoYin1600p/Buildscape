@@ -1,6 +1,7 @@
-{
-  "parent": "block/button_pressed",
-  "textures": {
-    "texture": "buildscape:block/ashpen_lime_planks"
-  }
+﻿{
+    "parent":  "block/button_pressed",
+    "textures":  {
+                     "texture":  "buildscape:block/ashpen_lime_planks",
+                     "particle":  "#texture"
+                 }
 }

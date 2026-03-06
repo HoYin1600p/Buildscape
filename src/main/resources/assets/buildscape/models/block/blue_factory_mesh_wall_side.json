@@ -1,6 +1,7 @@
-{
-  "parent": "minecraft:block/template_wall_side",
-  "textures": {
-    "wall": "buildscape:block/factory_mesh_blue"
-  }
+﻿{
+    "parent":  "minecraft:block/template_wall_side",
+    "textures":  {
+                     "wall":  "buildscape:block/factory_mesh_blue",
+                     "particle":  "buildscape:block/factory_mesh_blue"
+                 }
 }

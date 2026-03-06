@@ -1,6 +1,7 @@
-{
-  "parent": "block/template_fence_gate_open_wall",
-  "textures": {
-    "texture": "buildscape:block/bamboo_block"
-  }
+﻿{
+    "parent":  "block/template_fence_gate_open_wall",
+    "textures":  {
+                     "texture":  "buildscape:block/bamboo_block",
+                     "particle":  "#texture"
+                 }
 }

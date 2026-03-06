@@ -1,8 +1,9 @@
-{
-  "parent": "block/slab",
-  "textures": {
-    "bottom": "buildscape:block/bamboo_block",
-    "top": "buildscape:block/bamboo_block",
-    "side": "buildscape:block/bamboo_block"
-  }
+﻿{
+    "parent":  "block/slab",
+    "textures":  {
+                     "bottom":  "buildscape:block/bamboo_block",
+                     "top":  "buildscape:block/bamboo_block",
+                     "side":  "buildscape:block/bamboo_block",
+                     "particle":  "#side"
+                 }
 }

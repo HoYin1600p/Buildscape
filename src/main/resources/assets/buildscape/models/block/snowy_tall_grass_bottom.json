@@ -1,6 +1,7 @@
-{
-  "parent": "minecraft:block/cross",
-  "textures": {
-    "cross": "buildscape:block/snowy_tall_grass_bottom"
-  }
+﻿{
+    "parent":  "minecraft:block/cross",
+    "textures":  {
+                     "cross":  "buildscape:block/snowy_tall_grass_bottom",
+                     "particle":  "#cross"
+                 }
 }

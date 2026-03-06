@@ -1,7 +1,7 @@
-{
-  "parent": "minecraft:block/template_wall_side_tall",
-  "textures": {
-    "wall": "buildscape:block/white_smooth_sandstone"
-  }
+﻿{
+    "parent":  "minecraft:block/template_wall_side_tall",
+    "textures":  {
+                     "wall":  "buildscape:block/white_smooth_sandstone",
+                     "particle":  "buildscape:block/white_smooth_sandstone"
+                 }
 }
-

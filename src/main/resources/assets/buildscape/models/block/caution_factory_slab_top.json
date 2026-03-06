@@ -1,8 +1,9 @@
-{
-  "parent": "minecraft:block/slab_top",
-  "textures": {
-    "bottom": "buildscape:block/caution_factory",
-    "top": "buildscape:block/caution_factory",
-    "side": "buildscape:block/caution_factory"
-  }
+﻿{
+    "parent":  "minecraft:block/slab_top",
+    "textures":  {
+                     "bottom":  "buildscape:block/caution_factory",
+                     "top":  "buildscape:block/caution_factory",
+                     "side":  "buildscape:block/caution_factory",
+                     "particle":  "#side"
+                 }
 }

@@ -1,6 +1,7 @@
-{
-  "parent": "block/template_fence_gate",
-  "textures": {
-    "texture": "buildscape:block/ashpen_light_gray_planks"
-  }
+﻿{
+    "parent":  "block/template_fence_gate",
+    "textures":  {
+                     "texture":  "buildscape:block/ashpen_light_gray_planks",
+                     "particle":  "#texture"
+                 }
 }

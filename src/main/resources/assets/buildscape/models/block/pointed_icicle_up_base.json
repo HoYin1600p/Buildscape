@@ -1,8 +1,8 @@
-{
-  "parent": "minecraft:block/pointed_dripstone_up_base",
-  "textures": {
-    "cross": "buildscape:block/icicle_up_base"
-  },
-  "render_type": "minecraft:cutout_mipped"
+﻿{
+    "parent":  "minecraft:block/pointed_dripstone_up_base",
+    "textures":  {
+                     "cross":  "buildscape:block/icicle_up_base",
+                     "particle":  "#cross"
+                 },
+    "render_type":  "minecraft:cutout_mipped"
 }
-

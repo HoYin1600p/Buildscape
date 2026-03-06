@@ -1,6 +1,7 @@
-{
-  "parent": "buildscape:block/chain_block",
-  "textures": {
-    "texture": "buildscape:block/emerald_chain"
-  }
+﻿{
+    "parent":  "buildscape:block/chain_block",
+    "textures":  {
+                     "texture":  "buildscape:block/emerald_chain",
+                     "particle":  "#texture"
+                 }
 }

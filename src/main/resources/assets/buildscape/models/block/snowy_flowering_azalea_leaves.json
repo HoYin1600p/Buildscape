@@ -1,6 +1,7 @@
-{
-  "parent": "minecraft:block/leaves",
-  "textures": {
-    "all": "buildscape:block/snowy_flowering_azalea_leaves"
-  }
+﻿{
+    "parent":  "minecraft:block/leaves",
+    "textures":  {
+                     "all":  "buildscape:block/snowy_flowering_azalea_leaves",
+                     "particle":  "#all"
+                 }
 }

@@ -1,7 +1,8 @@
-{
-  "parent": "minecraft:block/template_glass_pane_noside",
-  "textures": {
-    "pane": "buildscape:block/factory_green_glass"
-  },
-  "render_type": "translucent"
+﻿{
+    "parent":  "minecraft:block/template_glass_pane_noside",
+    "textures":  {
+                     "pane":  "buildscape:block/factory_green_glass",
+                     "particle":  "buildscape:block/factory_green_glass"
+                 },
+    "render_type":  "translucent"
 }

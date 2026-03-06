@@ -1,8 +1,9 @@
-{
-  "parent": "minecraft:block/outer_stairs",
-  "textures": {
-    "bottom": "buildscape:block/black_tiles",
-    "top": "buildscape:block/black_tiles",
-    "side": "buildscape:block/black_tiles"
-  }
+﻿{
+    "parent":  "minecraft:block/outer_stairs",
+    "textures":  {
+                     "bottom":  "buildscape:block/black_tiles",
+                     "top":  "buildscape:block/black_tiles",
+                     "side":  "buildscape:block/black_tiles",
+                     "particle":  "#side"
+                 }
 }

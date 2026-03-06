@@ -1,6 +1,7 @@
-{
-  "parent": "minecraft:block/wall_inventory",
-  "textures": {
-    "wall": "buildscape:block/factory_mesh_lime"
-  }
+﻿{
+    "parent":  "minecraft:block/wall_inventory",
+    "textures":  {
+                     "wall":  "buildscape:block/factory_mesh_lime",
+                     "particle":  "buildscape:block/factory_mesh_lime"
+                 }
 }

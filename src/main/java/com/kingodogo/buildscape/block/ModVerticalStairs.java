@@ -87,7 +87,7 @@ public class ModVerticalStairs {
         VERTICAL_STAIRS.values().forEach(block -> {
             ResourceLocation id = block.getRegistryName();
             if (id != null && !registry.containsKey(id)) {
-                Item item = new VerticalStairBlockItem(block, new Item.Properties().tab(BuildScape.BUILDSCAPE_TAB))
+                Item item = new VerticalStairBlockItem(block, new Item.Properties().tab(com.kingodogo.buildscape.item.ModCreativeModeTab.BUILDSCAPE_TAB))
                         .setRegistryName(id);
                 registry.register(item);
                 DYNAMIC_ITEMS.add(item);

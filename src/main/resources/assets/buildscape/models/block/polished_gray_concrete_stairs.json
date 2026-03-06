@@ -1,8 +1,9 @@
-{
-  "parent": "minecraft:block/stairs",
-  "textures": {
-    "bottom": "buildscape:block/polished_gray_concrete",
-    "top": "buildscape:block/polished_gray_concrete",
-    "side": "buildscape:block/polished_gray_concrete"
-  }
+﻿{
+    "parent":  "minecraft:block/stairs",
+    "textures":  {
+                     "bottom":  "buildscape:block/polished_gray_concrete",
+                     "top":  "buildscape:block/polished_gray_concrete",
+                     "side":  "buildscape:block/polished_gray_concrete",
+                     "particle":  "#side"
+                 }
 }

@@ -1,6 +1,7 @@
-{
-  "parent": "buildscape:block/large_chain",
-  "textures": {
-    "texture": "buildscape:block/large_netherite_chain"
-  }
+﻿{
+    "parent":  "buildscape:block/large_chain",
+    "textures":  {
+                     "texture":  "buildscape:block/large_netherite_chain",
+                     "particle":  "#texture"
+                 }
 }

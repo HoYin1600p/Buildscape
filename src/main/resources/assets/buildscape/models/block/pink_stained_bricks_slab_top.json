@@ -1,8 +1,9 @@
-{
-  "parent": "minecraft:block/slab_top",
-  "textures": {
-    "bottom": "buildscape:block/pink_stained_bricks",
-    "top": "buildscape:block/pink_stained_bricks",
-    "side": "buildscape:block/pink_stained_bricks"
-  }
+﻿{
+    "parent":  "minecraft:block/slab_top",
+    "textures":  {
+                     "bottom":  "buildscape:block/pink_stained_bricks",
+                     "top":  "buildscape:block/pink_stained_bricks",
+                     "side":  "buildscape:block/pink_stained_bricks",
+                     "particle":  "#side"
+                 }
 }

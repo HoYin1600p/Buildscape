@@ -1,1 +1,8 @@
-{"parent": "block/cube_column", "textures": {"end": "buildscape:block/caution_cottoncandy", "side": "buildscape:block/caution_cottoncandy"}}
+﻿{
+    "parent":  "block/cube_column",
+    "textures":  {
+                     "end":  "buildscape:block/caution_cottoncandy",
+                     "side":  "buildscape:block/caution_cottoncandy",
+                     "particle":  "#side"
+                 }
+}

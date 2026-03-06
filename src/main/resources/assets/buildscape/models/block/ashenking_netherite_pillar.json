@@ -1,6 +1,7 @@
-{
-  "parent": "buildscape:block/ashenking_pillar",
-  "textures": {
-    "ashenking_pillar": "buildscape:block/ashenking_netherite_pillar"
-  }
+﻿{
+    "parent":  "buildscape:block/ashenking_pillar",
+    "textures":  {
+                     "ashenking_pillar":  "buildscape:block/ashenking_netherite_pillar",
+                     "particle":  "buildscape:block/ashenking_netherite_pillar"
+                 }
 }

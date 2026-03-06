@@ -1,6 +1,7 @@
-{
-  "parent": "minecraft:block/template_wall_post",
-  "textures": {
-    "wall": "minecraft:block/gray_concrete"
-  }
+﻿{
+    "parent":  "minecraft:block/template_wall_post",
+    "textures":  {
+                     "wall":  "minecraft:block/gray_concrete",
+                     "particle":  "minecraft:block/gray_concrete"
+                 }
 }

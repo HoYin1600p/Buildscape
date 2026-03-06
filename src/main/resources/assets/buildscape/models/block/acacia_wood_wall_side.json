@@ -1,6 +1,7 @@
-{
-  "textures": {
-    "wall": "minecraft:block/acacia_log"
-  },
-  "parent": "minecraft:block/template_wall_side"
+﻿{
+    "textures":  {
+                     "wall":  "minecraft:block/acacia_log",
+                     "particle":  "minecraft:block/acacia_log"
+                 },
+    "parent":  "minecraft:block/template_wall_side"
 }

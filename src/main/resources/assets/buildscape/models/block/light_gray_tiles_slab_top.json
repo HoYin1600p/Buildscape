@@ -1,8 +1,9 @@
-{
-  "parent": "minecraft:block/slab_top",
-  "textures": {
-    "bottom": "buildscape:block/light_gray_tiles",
-    "top": "buildscape:block/light_gray_tiles",
-    "side": "buildscape:block/light_gray_tiles"
-  }
+﻿{
+    "parent":  "minecraft:block/slab_top",
+    "textures":  {
+                     "bottom":  "buildscape:block/light_gray_tiles",
+                     "top":  "buildscape:block/light_gray_tiles",
+                     "side":  "buildscape:block/light_gray_tiles",
+                     "particle":  "#side"
+                 }
 }

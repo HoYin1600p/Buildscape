@@ -1,6 +1,7 @@
-{
-  "parent": "minecraft:block/cube_all",
-  "textures": {
-    "all": "buildscape:block/polished_white_concrete"
-  }
+﻿{
+    "parent":  "minecraft:block/cube_all",
+    "textures":  {
+                     "all":  "buildscape:block/polished_white_concrete",
+                     "particle":  "#all"
+                 }
 }

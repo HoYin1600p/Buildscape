@@ -1,6 +1,7 @@
-{
-  "parent": "minecraft:block/template_glass_pane_noside_alt",
-  "textures": {
-    "pane": "minecraft:block/bedrock"
-  }
+﻿{
+    "parent":  "minecraft:block/template_glass_pane_noside_alt",
+    "textures":  {
+                     "pane":  "minecraft:block/bedrock",
+                     "particle":  "minecraft:block/bedrock"
+                 }
 }

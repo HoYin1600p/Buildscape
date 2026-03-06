@@ -1,6 +1,7 @@
-{
-  "textures": {
-    "wall": "buildscape:block/mangrove_log"
-  },
-  "parent": "minecraft:block/template_wall_post"
+﻿{
+    "textures":  {
+                     "wall":  "buildscape:block/mangrove_log",
+                     "particle":  "buildscape:block/mangrove_log"
+                 },
+    "parent":  "minecraft:block/template_wall_post"
 }

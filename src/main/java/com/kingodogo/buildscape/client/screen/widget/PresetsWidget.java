@@ -31,6 +31,10 @@ public class PresetsWidget extends AbstractWidget {
     private final CustomScrollbarRenderer scrollbarRenderer = new CustomScrollbarRenderer();
 
     private String appliedPresetKey = null;
+    
+    private boolean showCreateOptions = false;
+    private final Button createDefaultBtn;
+    private final Button createEmptyBtn;
 
     public PresetsWidget(int x, int y, int width, int height, Consumer<String> onPresetApplied) {
         super(x, y, width, height, net.minecraft.network.chat.TextComponent.EMPTY);
@@ -89,9 +93,33 @@ public class PresetsWidget extends AbstractWidget {
                 x + scaledSpacing, buttonY,
                 buttonWidth, scaledButtonHeight,
                 new TranslatableComponent("buildscape.config.preset.create"),
-                (btn) -> createNewPreset());
+                (btn) -> {
+                    showCreateOptions = !showCreateOptions;
+                });
         createBtn.setCustomTextColors(0x00FF00, 0x55FF55);
         createButton = createBtn;
+        
+        createDefaultBtn = new com.kingodogo.buildscape.client.screen.widget.ScaledTextButton(
+                0, 0,
+                buttonWidth, scaledButtonHeight,
+                new net.minecraft.network.chat.TextComponent("Default Items"),
+                (btn) -> {
+                    showCreateOptions = false;
+                    createNewPreset(false);
+                });
+        ((com.kingodogo.buildscape.client.screen.widget.ScaledTextButton) createDefaultBtn).setCustomTextColors(0x00FF00, 0x55FF55);
+        createDefaultBtn.visible = false;
+
+        createEmptyBtn = new com.kingodogo.buildscape.client.screen.widget.ScaledTextButton(
+                0, 0,
+                buttonWidth, scaledButtonHeight,
+                new net.minecraft.network.chat.TextComponent("Empty"),
+                (btn) -> {
+                    showCreateOptions = false;
+                    createNewPreset(true);
+                });
+        ((com.kingodogo.buildscape.client.screen.widget.ScaledTextButton) createEmptyBtn).setCustomTextColors(0x00FF00, 0x55FF55);
+        createEmptyBtn.visible = false;
 
         com.kingodogo.buildscape.client.screen.widget.ScaledTextButton saveBtn = new com.kingodogo.buildscape.client.screen.widget.ScaledTextButton(
                 x + scaledSpacing * 2 + buttonWidth, buttonY,
@@ -124,17 +152,28 @@ public class PresetsWidget extends AbstractWidget {
         presetKeys = config.getPresetKeys();
     }
 
-    private void createNewPreset() {
+    private void createNewPreset(boolean empty) {
         nameEditBox.setValue("");
         nameEditBox.setEditable(true);
         selectedPresetKey = "_unnamed";
 
         PresetsConfig config = PresetsConfig.get();
         PillarParticleConfig itemConfig = PillarParticleConfig.get();
-        java.util.Set<String> emptyItems = new java.util.HashSet<>();
-        config.saveUnnamedPreset(emptyItems);
+        java.util.Set<String> newItems;
+        if (empty) {
+            newItems = new java.util.HashSet<>();
+        } else {
+            PresetsConfig.Preset defaultPreset = config.getPreset("default");
+            if (defaultPreset != null) {
+                newItems = new java.util.HashSet<>(defaultPreset.items);
+            } else {
+                newItems = new java.util.HashSet<>();
+            }
+        }
+        config.saveUnnamedPreset(newItems);
 
         itemConfig.items.clear();
+        itemConfig.items.addAll(newItems);
         itemConfig.saveItems();
 
         loadPresets();
@@ -303,6 +342,17 @@ public class PresetsWidget extends AbstractWidget {
             createButton.x = startX;
             createButton.y = buttonY;
             createButton.setWidth(buttonWidth);
+            
+            if (createDefaultBtn != null) {
+                createDefaultBtn.x = startX;
+                createDefaultBtn.y = buttonY - scaledButtonHeight - 2;
+                createDefaultBtn.setWidth(buttonWidth);
+            }
+            if (createEmptyBtn != null) {
+                createEmptyBtn.x = startX;
+                createEmptyBtn.y = buttonY - (scaledButtonHeight * 2) - 4;
+                createEmptyBtn.setWidth(buttonWidth);
+            }
         }
 
         if (saveButton != null) {
@@ -426,6 +476,23 @@ public class PresetsWidget extends AbstractWidget {
         saveButton.render(poseStack, mouseX, mouseY, partialTick);
         deleteButton.render(poseStack, mouseX, mouseY, partialTick);
         applyButton.render(poseStack, mouseX, mouseY, partialTick);
+        
+        createDefaultBtn.visible = showCreateOptions;
+        createEmptyBtn.visible = showCreateOptions;
+
+        if (showCreateOptions) {
+            poseStack.pushPose();
+            poseStack.translate(0, 0, 500); // render on top
+            int bgX = createDefaultBtn.x - 2;
+            int bgY = createEmptyBtn.y - 2;
+            int bgW = createDefaultBtn.getWidth() + 4;
+            int bgH = (createDefaultBtn.getHeight() * 2) + 6;
+            fill(poseStack, bgX, bgY, bgX + bgW, bgY + bgH, 0xD0000000);
+            
+            createEmptyBtn.render(poseStack, mouseX, mouseY, partialTick);
+            createDefaultBtn.render(poseStack, mouseX, mouseY, partialTick);
+            poseStack.popPose();
+        }
 
         deleteButton.active = selectedPresetKey != null && !selectedPresetKey.equals("default");
     }
@@ -482,6 +549,13 @@ public class PresetsWidget extends AbstractWidget {
                 setSelectedPreset(presetKey);
                 return true;
             }
+        }
+
+        if (showCreateOptions) {
+            if (createDefaultBtn.mouseClicked(mouseX, mouseY, button)) return true;
+            if (createEmptyBtn.mouseClicked(mouseX, mouseY, button)) return true;
+            // hide options if clicked elsewhere
+            showCreateOptions = false;
         }
 
         if (nameEditBox.mouseClicked(mouseX, mouseY, button)) {

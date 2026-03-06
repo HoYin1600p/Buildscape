@@ -7,6 +7,7 @@ import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import org.jetbrains.annotations.NotNull;
 
 public class ModCreativeModeTab {
 
@@ -50,7 +51,7 @@ public class ModCreativeModeTab {
             });
         }
 
-        private void addHardcodedItems(NonNullList<ItemStack> items) {
+        private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.BIT_COPPER_BLOCK.get()));
             items.add(new ItemStack(ModItems.BIT_COPPER_BLOCK_STAIRS.get()));
             items.add(new ItemStack(ModItems.BIT_COPPER_BLOCK_SLAB.get()));

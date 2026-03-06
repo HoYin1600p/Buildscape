@@ -1,8 +1,9 @@
-{
-  "parent": "minecraft:block/slab",
-  "textures": {
-    "bottom": "buildscape:block/amethyst_block",
-    "top": "buildscape:block/amethyst_block",
-    "side": "buildscape:block/amethyst_block"
-  }
+﻿{
+    "parent":  "minecraft:block/slab",
+    "textures":  {
+                     "bottom":  "buildscape:block/amethyst_block",
+                     "top":  "buildscape:block/amethyst_block",
+                     "side":  "buildscape:block/amethyst_block",
+                     "particle":  "#side"
+                 }
 }

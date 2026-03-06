@@ -1,7 +1,7 @@
-{
-  "parent": "minecraft:block/cube_all",
-  "textures": {
-    "all": "buildscape:block/festive_lamp_on"
-  }
+﻿{
+    "parent":  "minecraft:block/cube_all",
+    "textures":  {
+                     "all":  "buildscape:block/festive_lamp_on",
+                     "particle":  "#all"
+                 }
 }
-

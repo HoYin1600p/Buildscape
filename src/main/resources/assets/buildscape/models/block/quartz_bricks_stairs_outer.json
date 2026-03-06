@@ -1,8 +1,9 @@
-{
-  "parent": "minecraft:block/outer_stairs",
-  "textures": {
-    "bottom": "buildscape:block/quartz_bricks",
-    "top": "buildscape:block/quartz_bricks",
-    "side": "buildscape:block/quartz_bricks"
-  }
+﻿{
+    "parent":  "minecraft:block/outer_stairs",
+    "textures":  {
+                     "bottom":  "buildscape:block/quartz_bricks",
+                     "top":  "buildscape:block/quartz_bricks",
+                     "side":  "buildscape:block/quartz_bricks",
+                     "particle":  "#side"
+                 }
 }

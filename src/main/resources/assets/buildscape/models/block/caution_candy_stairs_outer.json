@@ -1,8 +1,9 @@
-{
-  "parent": "minecraft:block/outer_stairs",
-  "textures": {
-    "bottom": "buildscape:block/caution_candy",
-    "top": "buildscape:block/caution_candy",
-    "side": "buildscape:block/caution_candy"
-  }
+﻿{
+    "parent":  "minecraft:block/outer_stairs",
+    "textures":  {
+                     "bottom":  "buildscape:block/caution_candy",
+                     "top":  "buildscape:block/caution_candy",
+                     "side":  "buildscape:block/caution_candy",
+                     "particle":  "#side"
+                 }
 }

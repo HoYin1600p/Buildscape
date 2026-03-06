@@ -1,6 +1,7 @@
-{
-  "parent": "block/cube_all",
-  "textures": {
-    "all": "buildscape:block/bit_weathered_copper_bulb"
-  }
+﻿{
+    "parent":  "block/cube_all",
+    "textures":  {
+                     "all":  "buildscape:block/bit_weathered_copper_bulb",
+                     "particle":  "#all"
+                 }
 }

@@ -1,9 +1,9 @@
-{
-  "parent": "minecraft:block/template_glass_pane_side_alt",
-  "textures": {
-    "pane": "minecraft:block/obsidian",
-    "edge": "minecraft:block/obsidian"
-  },
-  "render_type": "translucent"
+﻿{
+    "parent":  "minecraft:block/template_glass_pane_side_alt",
+    "textures":  {
+                     "pane":  "minecraft:block/obsidian",
+                     "edge":  "minecraft:block/obsidian",
+                     "particle":  "minecraft:block/obsidian"
+                 },
+    "render_type":  "translucent"
 }
-

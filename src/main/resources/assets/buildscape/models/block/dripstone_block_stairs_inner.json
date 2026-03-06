@@ -1,8 +1,9 @@
-{
-  "parent": "minecraft:block/inner_stairs",
-  "textures": {
-    "bottom": "buildscape:block/dripstone_block",
-    "top": "buildscape:block/dripstone_block",
-    "side": "buildscape:block/dripstone_block"
-  }
+﻿{
+    "parent":  "minecraft:block/inner_stairs",
+    "textures":  {
+                     "bottom":  "buildscape:block/dripstone_block",
+                     "top":  "buildscape:block/dripstone_block",
+                     "side":  "buildscape:block/dripstone_block",
+                     "particle":  "#side"
+                 }
 }

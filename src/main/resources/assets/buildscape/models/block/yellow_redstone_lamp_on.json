@@ -1,6 +1,7 @@
-{
-  "parent": "minecraft:block/cube_all",
-  "textures": {
-    "all": "buildscape:block/yellow_redstone_lamp_on"
-  }
+﻿{
+    "parent":  "minecraft:block/cube_all",
+    "textures":  {
+                     "all":  "buildscape:block/yellow_redstone_lamp_on",
+                     "particle":  "#all"
+                 }
 }

@@ -1,6 +1,6 @@
 package com.kingodogo.buildscape.recipe;
 
-import com.kingodogo.buildscape.block.ModVerticalStairs;
+import com.kingodogo.buildscape.compat.vertical.VerticalRegistry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.BlockItem;
@@ -42,7 +42,7 @@ public class VerticalStairRecipe extends CustomRecipe {
                         if (topBlock instanceof StairBlock &&
                                 topBlock == midBlock &&
                                 midBlock == botBlock &&
-                                ModVerticalStairs.VERTICAL_STAIRS.containsKey(topBlock)) {
+                                VerticalRegistry.VERTICAL_STAIRS.containsKey(topBlock)) {
 
                             if (countTotalItems(container) == 3) {
                                 return true;
@@ -69,8 +69,8 @@ public class VerticalStairRecipe extends CustomRecipe {
             ItemStack stack = container.getItem(i);
             if (!stack.isEmpty() && stack.getItem() instanceof BlockItem) {
                 Block block = ((BlockItem) stack.getItem()).getBlock();
-                if (ModVerticalStairs.VERTICAL_STAIRS.containsKey(block)) {
-                    Block vertical = ModVerticalStairs.VERTICAL_STAIRS.get(block);
+                if (VerticalRegistry.VERTICAL_STAIRS.containsKey(block)) {
+                    Block vertical = VerticalRegistry.VERTICAL_STAIRS.get(block);
                     return new ItemStack(vertical, 3);
                 }
             }

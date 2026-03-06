@@ -1,8 +1,9 @@
-{
-  "parent": "minecraft:block/slab_top",
-  "textures": {
-    "bottom": "buildscape:block/factory_mesh_gray",
-    "top": "buildscape:block/factory_mesh_gray",
-    "side": "buildscape:block/factory_mesh_gray"
-  }
+﻿{
+    "parent":  "minecraft:block/slab_top",
+    "textures":  {
+                     "bottom":  "buildscape:block/factory_mesh_gray",
+                     "top":  "buildscape:block/factory_mesh_gray",
+                     "side":  "buildscape:block/factory_mesh_gray",
+                     "particle":  "#side"
+                 }
 }

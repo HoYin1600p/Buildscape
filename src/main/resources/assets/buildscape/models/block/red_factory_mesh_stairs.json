@@ -1,8 +1,9 @@
-{
-  "parent": "minecraft:block/stairs",
-  "textures": {
-    "bottom": "buildscape:block/factory_mesh_red",
-    "top": "buildscape:block/factory_mesh_red",
-    "side": "buildscape:block/factory_mesh_red"
-  }
+﻿{
+    "parent":  "minecraft:block/stairs",
+    "textures":  {
+                     "bottom":  "buildscape:block/factory_mesh_red",
+                     "top":  "buildscape:block/factory_mesh_red",
+                     "side":  "buildscape:block/factory_mesh_red",
+                     "particle":  "#side"
+                 }
 }

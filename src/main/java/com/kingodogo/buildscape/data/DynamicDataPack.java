@@ -400,44 +400,80 @@ public class DynamicDataPack implements PackResources {
     }
 
     private void addSlabRecipes(ResourceLocation verticalId, ResourceLocation parentId) {
-        JsonObject recipe = new JsonObject();
-        recipe.addProperty("type", "minecraft:crafting_shapeless");
-        JsonArray ingredients = new JsonArray();
-        JsonObject itemObj = new JsonObject();
-        itemObj.addProperty("item", parentId.toString());
-        ingredients.add(itemObj);
-        recipe.add("ingredients", ingredients);
-        JsonObject result = new JsonObject();
-        result.addProperty("item", verticalId.toString());
-        result.addProperty("count", 1);
-        recipe.add("result", result);
-        cachedResources.put(PacketPath("data", BuildScape.MODID, "recipes", verticalId.getPath() + ".json"), GSON.toJson(recipe));
+        addReversibleShapeless(verticalId, parentId);
     }
 
     private void addStairRecipes(ResourceLocation verticalId, ResourceLocation parentId) {
-        JsonObject recipe = new JsonObject();
-        recipe.addProperty("type", "minecraft:crafting_shapeless");
-        JsonArray ingredients = new JsonArray();
-        JsonObject itemObj = new JsonObject();
-        itemObj.addProperty("item", parentId.toString());
-        ingredients.add(itemObj);
-        recipe.add("ingredients", ingredients);
-        JsonObject result = new JsonObject();
-        result.addProperty("item", verticalId.toString());
-        result.addProperty("count", 1);
-        recipe.add("result", result);
-        cachedResources.put(PacketPath("data", BuildScape.MODID, "recipes", verticalId.getPath() + ".json"), GSON.toJson(recipe));
+        addReversibleShapeless(verticalId, parentId);
+    }
+
+    private void addReversibleShapeless(ResourceLocation verticalId, ResourceLocation parentId) {
+        // Parent -> Vertical
+        JsonObject recipe1 = new JsonObject();
+        recipe1.addProperty("type", "minecraft:crafting_shapeless");
+        JsonArray ingredients1 = new JsonArray();
+        JsonObject itemObj1 = new JsonObject();
+        itemObj1.addProperty("item", parentId.toString());
+        ingredients1.add(itemObj1);
+        recipe1.add("ingredients", ingredients1);
+        JsonObject result1 = new JsonObject();
+        result1.addProperty("item", verticalId.toString());
+        result1.addProperty("count", 1);
+        recipe1.add("result", result1);
+        cachedResources.put(PacketPath("data", BuildScape.MODID, "recipes", verticalId.getPath() + ".json"), GSON.toJson(recipe1));
+
+        // Vertical -> Parent
+        JsonObject recipe2 = new JsonObject();
+        recipe2.addProperty("type", "minecraft:crafting_shapeless");
+        JsonArray ingredients2 = new JsonArray();
+        JsonObject itemObj2 = new JsonObject();
+        itemObj2.addProperty("item", verticalId.toString());
+        ingredients2.add(itemObj2);
+        recipe2.add("ingredients", ingredients2);
+        JsonObject result2 = new JsonObject();
+        result2.addProperty("item", parentId.toString());
+        result2.addProperty("count", 1);
+        recipe2.add("result", result2);
+        cachedResources.put(PacketPath("data", BuildScape.MODID, "recipes", verticalId.getPath() + "_revert.json"), GSON.toJson(recipe2));
     }
 
     private void addStonecuttingRecipe(ResourceLocation verticalId, ResourceLocation parentId) {
-        JsonObject recipe = new JsonObject();
-        recipe.addProperty("type", "minecraft:stonecutting");
-        JsonObject ingredient = new JsonObject();
-        ingredient.addProperty("item", parentId.toString());
-        recipe.add("ingredient", ingredient);
-        recipe.addProperty("result", verticalId.toString());
-        recipe.addProperty("count", 1);
-        cachedResources.put(PacketPath("data", BuildScape.MODID, "recipes", "stonecutting_" + verticalId.getPath() + ".json"), GSON.toJson(recipe));
+        // 1. Horizontal Block -> Vertical Block
+        JsonObject recipe1 = new JsonObject();
+        recipe1.addProperty("type", "minecraft:stonecutting");
+        JsonObject ingredient1 = new JsonObject();
+        ingredient1.addProperty("item", parentId.toString());
+        recipe1.add("ingredient", ingredient1);
+        recipe1.addProperty("result", verticalId.toString());
+        recipe1.addProperty("count", 1);
+        cachedResources.put(PacketPath("data", BuildScape.MODID, "recipes", "stonecutting_" + verticalId.getPath() + ".json"), GSON.toJson(recipe1));
+
+        // 2. Base Block -> Vertical Block
+        String basePath = parentId.getPath()
+                .replace("_slab", "").replace("_stairs", "").replace("_stair", "");
+        String basePathAlt = basePath;
+        if (basePath.equals("oak") || basePath.equals("spruce") || basePath.equals("birch") ||
+            basePath.equals("jungle") || basePath.equals("acacia") || basePath.equals("dark_oak") ||
+            basePath.equals("crimson") || basePath.equals("warped") || basePath.equals("mangrove") ||
+            basePath.equals("cherry") || basePath.equals("bamboo")) {
+            basePathAlt = basePath + "_planks";
+        }
+        if (parentId.getPath().contains("brick") && !basePath.endsWith("s")) basePathAlt = basePath + "s";
+
+        if (!basePathAlt.equals(parentId.getPath())) {
+            ResourceLocation baseId = new ResourceLocation(parentId.getNamespace(), basePathAlt);
+            
+            JsonObject recipe2 = new JsonObject();
+            recipe2.addProperty("type", "minecraft:stonecutting");
+            JsonObject ingredient2 = new JsonObject();
+            ingredient2.addProperty("item", baseId.toString());
+            recipe2.add("ingredient", ingredient2);
+            recipe2.addProperty("result", verticalId.toString());
+            // Vanilla gives 1 stair for 1 base block, but 2 slabs for 1 base block.
+            int count = verticalId.getPath().contains("slab") ? 2 : 1;
+            recipe2.addProperty("count", count);
+            cachedResources.put(PacketPath("data", BuildScape.MODID, "recipes", "stonecutting_from_base_" + verticalId.getPath() + ".json"), GSON.toJson(recipe2));
+        }
     }
 
     private void addTags(Map<Block, Block> slabMap, Map<Block, Block> stairMap) {

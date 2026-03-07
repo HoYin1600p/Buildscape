@@ -1,6 +1,7 @@
 package com.kingodogo.buildscape.mixin;
 
-import com.kingodogo.buildscape.compat.vertical.VerticalRegistry;
+import com.kingodogo.buildscape.variantengine.builder.BlockShape;
+import com.kingodogo.buildscape.variantengine.util.BlockBiMaps;
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
@@ -27,13 +28,13 @@ public abstract class CreativeModeTabMixin {
             ItemStack stack = it.next();
             if (stack.getItem() instanceof BlockItem blockItem) {
                 Block block = blockItem.getBlock();
-
-                if (VerticalRegistry.VERTICAL_SLABS.containsKey(block)) {
-                    Block verticalSlab = VerticalRegistry.VERTICAL_SLABS.get(block);
+                Block verticalSlab = BlockBiMaps.getBlockOf(BlockShape.VERTICAL_SLAB, block);
+                if (verticalSlab != null) {
                     it.add(new ItemStack(verticalSlab));
-                } else if (VerticalRegistry.VERTICAL_STAIRS.containsKey(block)) {
-                    Block verticalStair = VerticalRegistry.VERTICAL_STAIRS.get(block);
-                    it.add(new ItemStack(verticalStair));
+                }
+                Block verticalStairs = BlockBiMaps.getBlockOf(BlockShape.VERTICAL_STAIRS, block);
+                if (verticalStairs != null) {
+                    it.add(new ItemStack(verticalStairs));
                 }
             }
         }

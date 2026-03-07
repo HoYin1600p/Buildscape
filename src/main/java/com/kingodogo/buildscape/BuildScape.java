@@ -2,10 +2,6 @@ package com.kingodogo.buildscape;
 
 import com.kingodogo.buildscape.block.ModBlocks;
 import com.kingodogo.buildscape.item.ModItems;
-import net.minecraft.world.item.CreativeModeTab;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.level.block.Block;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.server.ServerStartingEvent;
@@ -59,7 +55,6 @@ public class BuildScape {
         com.kingodogo.buildscape.entity.ModEntities.ENTITIES.register(modEventBus);
         com.kingodogo.buildscape.recipe.ModRecipeSerializers.RECIPE_SERIALIZERS.register(
                 modEventBus);
-        modEventBus.register(com.kingodogo.buildscape.compat.vertical.VerticalRegistry.class);
 
 
         com.kingodogo.buildscape.worldgen.ModBlockStateProviderTypes.BLOCK_STATE_PROVIDER_TYPES.register(
@@ -254,6 +249,7 @@ public class BuildScape {
         // Reset the in-memory cache - file data will be loaded when first player joins
         com.kingodogo.buildscape.config.PillarIdManager.resetWorldCache();
     }
+
 
     @SubscribeEvent
     public void onRegisterCommands(net.minecraftforge.event.RegisterCommandsEvent event) {

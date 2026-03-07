@@ -64,3 +64,4 @@ states.txt
 .gitignore
 .vercel
 .env*.local
+/backup/

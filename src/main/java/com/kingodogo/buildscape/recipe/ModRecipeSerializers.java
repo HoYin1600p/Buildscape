@@ -28,18 +28,4 @@ public class ModRecipeSerializers {
             () -> ShapelessDurabilityRecipe.SERIALIZER
     );
 
-    public static final RegistryObject<
-            RecipeSerializer<VerticalSlabRecipe>
-            > VERTICAL_SLAB_RECIPE = RECIPE_SERIALIZERS.register(
-            "vertical_slab",
-            () -> new net.minecraft.world.item.crafting.SimpleRecipeSerializer<>(VerticalSlabRecipe::new)
-    );
-
-    public static final RegistryObject<
-            RecipeSerializer<VerticalStairRecipe>
-            > VERTICAL_STAIR_RECIPE = RECIPE_SERIALIZERS.register(
-            "vertical_stair",
-            () -> new net.minecraft.world.item.crafting.SimpleRecipeSerializer<>(VerticalStairRecipe::new)
-    );
-
 }

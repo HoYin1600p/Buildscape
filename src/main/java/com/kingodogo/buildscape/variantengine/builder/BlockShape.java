@@ -11,6 +11,10 @@ import java.util.function.Predicate;
 
 public class BlockShape implements StringRepresentable, Comparable<BlockShape>, Predicate<Block> {
 
+    private static final Map<String, BlockShape> NAME_TO_SHAPE = new HashMap<>();
+    private static final List<BlockShape> SHAPES = new ArrayList<>();
+    private static final List<BlockShape> VALUES = Collections.unmodifiableList(SHAPES);
+
     public static final BlockShape BASE = new BlockShape(b -> true, "base", 1f, true);
     public static final BlockShape STAIRS = new BlockShape(b -> b instanceof StairBlock, "stairs", 1f, true);
     public static final BlockShape SLAB = new BlockShape(b -> b instanceof SlabBlock, "slab", 0.5f, true);
@@ -23,9 +27,6 @@ public class BlockShape implements StringRepresentable, Comparable<BlockShape>, 
     public static final BlockShape WALL = new BlockShape(b -> b instanceof WallBlock, "wall", 1f, false);
     public static final BlockShape BUTTON = new BlockShape(b -> b instanceof ButtonBlock, "button", 1 / 3f, false);
     public static final BlockShape PRESSURE_PLATE = new BlockShape(b -> b instanceof PressurePlateBlock, "pressure_plate", 1 / 3f, false);
-    private static final Map<String, BlockShape> NAME_TO_SHAPE = new HashMap<>();
-    private static final List<BlockShape> SHAPES = new ArrayList<>();
-    private static final List<BlockShape> VALUES = Collections.unmodifiableList(SHAPES);
     public final Predicate<Block> blockPredicate;
     public final float logicalCompleteness;
     public final boolean isConstruction;

@@ -16,17 +16,33 @@ public class BlockFamilyDetector {
         ResourceLocation id = block.getRegistryName();
         if (id == null) return null;
 
-        // Apply filters: no BuildScape blocks, NO fluids, no EntityBlocks (machines)
-        if (id.getNamespace().equals(com.kingodogo.buildscape.BuildScape.MODID)) return null;
+        // Skip our own generated variants to avoid recursion
+        if (block instanceof com.kingodogo.buildscape.variantengine.block.VerticalSlabBlock ||
+            block instanceof com.kingodogo.buildscape.variantengine.block.VerticalStairsBlock ||
+            block instanceof com.kingodogo.buildscape.variantengine.block.QuarterPieceBlock ||
+            block instanceof com.kingodogo.buildscape.variantengine.block.VerticalQuarterPieceBlock) {
+            return null;
+        }
+
+        // Apply global filters: NO fluids, no EntityBlocks (machines)
         if (block instanceof net.minecraft.world.level.block.LiquidBlock) return null;
         if (block instanceof net.minecraft.world.level.block.EntityBlock) return null;
+        
+        String path = id.getPath();
+        boolean isSlab = block instanceof SlabBlock || path.endsWith("_slab");
+        boolean isStair = block instanceof StairBlock || path.endsWith("_stairs") || path.endsWith("_stair");
+
+        // ONLY detect families starting from Slab/Stair candidates
+        if (!isSlab && !isStair) {
+            return null;
+        }
 
         Block base = findBaseBlock(block);
         if (base == null || base == net.minecraft.world.level.block.Blocks.AIR) return null;
 
         BlockFamily family = new BlockFamily(base);
 
-        // Scan for other vanilla/modded relatives
+        // Scan for other relatives (vanilla or modded)
         for (BlockShape shape : BlockShape.values()) {
             if (shape == BlockShape.BASE) continue;
             ResourceLocation variantId = getPredictedId(base.getRegistryName(), shape);
@@ -46,15 +62,21 @@ public class BlockFamilyDetector {
 
         if (block instanceof SlabBlock || path.endsWith("_slab")) {
             String baseName = path.endsWith("_slab") ? path.substring(0, path.length() - 5) : path;
-            return ForgeRegistries.BLOCKS.getValue(new ResourceLocation(id.getNamespace(), baseName));
+            Block base = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(id.getNamespace(), baseName));
+            if (base != null && base != net.minecraft.world.level.block.Blocks.AIR) return base;
+            
+            // Fallback for cases like 'bricks_slab' -> 'bricks'
+            if (baseName.endsWith("_slab")) baseName = baseName.substring(0, baseName.length() - 5);
+            base = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(id.getNamespace(), baseName));
+            if (base != null) return base;
         }
-        if (block instanceof StairBlock || path.endsWith("_stairs")) {
-            String baseName = path.endsWith("_stairs") ? path.substring(0, path.length() - 7) : path;
-            return ForgeRegistries.BLOCKS.getValue(new ResourceLocation(id.getNamespace(), baseName));
+        if (block instanceof StairBlock || path.endsWith("_stairs") || path.endsWith("_stair")) {
+            String baseName = path.endsWith("_stairs") ? path.substring(0, path.length() - 7) : (path.endsWith("_stair") ? path.substring(0, path.length() - 6) : path);
+            Block base = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(id.getNamespace(), baseName));
+            if (base != null && base != net.minecraft.world.level.block.Blocks.AIR) return base;
         }
 
-        // If it's a full block, it's the base
-        return block;
+        return null; 
     }
 
     private static ResourceLocation getPredictedId(ResourceLocation baseId, BlockShape shape) {

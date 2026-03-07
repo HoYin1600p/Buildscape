@@ -36,6 +36,7 @@ public class VariantPackResources implements PackResources {
             if (parentId == null || parentId.equals(new ResourceLocation("minecraft", "air"))) continue;
 
             for (BlockShape shape : BlockShape.values()) {
+                if (shape == BlockShape.BASE) continue; // NEVER redefine vanilla/modded base blocks
                 Block variant = BlockBiMaps.getBlockOf(shape, baseBlock);
                 if (variant == null) continue;
 
@@ -65,8 +66,9 @@ public class VariantPackResources implements PackResources {
 
                 // Add to language file
                 String langName = VariantNamingUtil.generateLangName(parentId, shape);
-                langObj.addProperty("block." + BuildScape.MODID + "." + verticalId.getPath(), langName);
-                langObj.addProperty("item." + BuildScape.MODID + "." + verticalId.getPath(), langName);
+                String translationKey = verticalId.getPath().replace('/', '.');
+                langObj.addProperty("block." + BuildScape.MODID + "." + translationKey, langName);
+                langObj.addProperty("item." + BuildScape.MODID + "." + translationKey, langName);
             }
         }
 
@@ -78,16 +80,14 @@ public class VariantPackResources implements PackResources {
         JsonObject blockstate = new JsonObject();
         JsonObject variants = new JsonObject();
         String modelPath = BuildScape.MODID + ":block/" + path;
-        String doubleModelPath = BuildScape.MODID + ":block/" + path + "_double";
 
-        for (String facing : new String[]{"north", "south", "east", "west"}) {
+        // No rotation here - handled in VariantModelBakingManager
+        for (String type : new String[]{"north", "south", "east", "west", "double"}) {
             for (String waterlogged : new String[]{"false", "true"}) {
-                int rotation = getRotation(facing);
-                variants.add("facing=" + facing + ",type=bottom,waterlogged=" + waterlogged, createVariant(modelPath, 0, rotation));
-                variants.add("facing=" + facing + ",type=top,waterlogged=" + waterlogged, createVariant(modelPath, 0, rotation));
-                variants.add("facing=" + facing + ",type=double,waterlogged=" + waterlogged, createVariant(doubleModelPath, 0, rotation));
+                variants.add("type=" + type + ",waterlogged=" + waterlogged, createVariant(modelPath, 0, 0));
             }
         }
+        
         blockstate.add("variants", variants);
         cachedResources.put("assets/" + BuildScape.MODID + "/blockstates/" + path + ".json", GSON.toJson(blockstate));
 
@@ -95,7 +95,6 @@ public class VariantPackResources implements PackResources {
         JsonObject dummy = new JsonObject();
         dummy.add("textures", new JsonObject());
         cachedResources.put("assets/" + BuildScape.MODID + "/models/block/" + path + ".json", GSON.toJson(dummy));
-        cachedResources.put("assets/" + BuildScape.MODID + "/models/block/" + path + "_double.json", GSON.toJson(dummy));
         cachedResources.put("assets/" + BuildScape.MODID + "/models/item/" + path + ".json", GSON.toJson(dummy));
     }
 
@@ -105,10 +104,9 @@ public class VariantPackResources implements PackResources {
         JsonObject variants = new JsonObject();
         String modelPath = BuildScape.MODID + ":block/" + path;
 
-        for (String facing : new String[]{"north", "south", "east", "west"}) {
+        for (String facing : new String[]{"north_west", "north_east", "south_east", "south_west"}) {
             for (String waterlogged : new String[]{"false", "true"}) {
-                int rotation = getRotation(facing);
-                variants.add("facing=" + facing + ",waterlogged=" + waterlogged, createVariant(modelPath, 0, rotation));
+                variants.add("facing=" + facing + ",waterlogged=" + waterlogged, createVariant(modelPath, 0, 0));
             }
         }
         blockstate.add("variants", variants);
@@ -126,14 +124,23 @@ public class VariantPackResources implements PackResources {
         JsonObject variants = new JsonObject();
         String modelPath = BuildScape.MODID + ":block/" + path;
 
-        for (String facing : new String[]{"north", "south", "east", "west"}) {
-            for (String waterlogged : new String[]{"false", "true"}) {
-                for (String half : new String[]{"bottom", "top"}) {
-                    int rotation = getRotation(facing);
-                    variants.add("facing=" + facing + ",half=" + half + ",waterlogged=" + waterlogged, createVariant(modelPath, 0, rotation));
+        // QuarterPieceBlock uses 4 booleans: north_west, north_east, south_west, south_east
+        // We generate combinations where at least one is true, or just individual ones? 
+        // For simplicity, we can generate all combinations or the most common ones.
+        // Minecraft requires all properties in the state to be present in the variant string.
+        for (boolean nw : new boolean[]{false, true}) {
+            for (boolean ne : new boolean[]{false, true}) {
+                for (boolean sw : new boolean[]{false, true}) {
+                    for (boolean se : new boolean[]{false, true}) {
+                        for (String waterlogged : new String[]{"false", "true"}) {
+                            String variant = "north_east=" + ne + ",north_west=" + nw + ",south_east=" + se + ",south_west=" + sw + ",waterlogged=" + waterlogged;
+                            variants.add(variant, createVariant(modelPath, 0, 0));
+                        }
+                    }
                 }
             }
         }
+        
         blockstate.add("variants", variants);
         cachedResources.put("assets/" + BuildScape.MODID + "/blockstates/" + path + ".json", GSON.toJson(blockstate));
 
@@ -151,8 +158,7 @@ public class VariantPackResources implements PackResources {
 
         for (String facing : new String[]{"north_west", "north_east", "south_east", "south_west"}) {
             for (String waterlogged : new String[]{"false", "true"}) {
-                int rotation = getCornerRotation(facing);
-                variants.add("facing=" + facing + ",waterlogged=" + waterlogged, createVariant(modelPath, 0, rotation));
+                variants.add("facing=" + facing + ",waterlogged=" + waterlogged, createVariant(modelPath, 0, 0));
             }
         }
         blockstate.add("variants", variants);

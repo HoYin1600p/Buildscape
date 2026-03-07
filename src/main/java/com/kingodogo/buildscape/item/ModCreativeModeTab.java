@@ -1,12 +1,12 @@
 package com.kingodogo.buildscape.item;
 
 import com.kingodogo.buildscape.BuildScape;
-import com.kingodogo.buildscape.compat.vertical.VerticalRegistry;
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.Block;
 import org.jetbrains.annotations.NotNull;
 
 public class ModCreativeModeTab {
@@ -40,15 +40,20 @@ public class ModCreativeModeTab {
             // Collect items already present so we don't duplicate
             java.util.Set<Item> seen = new java.util.HashSet<>();
             for (ItemStack s : items) seen.add(s.getItem());
-            // Append all vertical slabs, then all vertical stairs, at the end
-            VerticalRegistry.VERTICAL_SLABS.values().forEach(block -> {
-                ItemStack stack = new ItemStack(block);
-                if (seen.add(stack.getItem())) items.add(stack);
-            });
-            VerticalRegistry.VERTICAL_STAIRS.values().forEach(block -> {
-                ItemStack stack = new ItemStack(block);
-                if (seen.add(stack.getItem())) items.add(stack);
-            });
+
+            for (Block baseBlock : com.kingodogo.buildscape.variantengine.util.BlockBiMaps.BASE_BLOCKS) {
+                Block slabBlock = com.kingodogo.buildscape.variantengine.util.BlockBiMaps.getBlockOf(com.kingodogo.buildscape.variantengine.builder.BlockShape.VERTICAL_SLAB, baseBlock);
+                if (slabBlock != null && slabBlock.getRegistryName() != null && !slabBlock.getRegistryName().getPath().equals("air")) {
+                    ItemStack stack = new ItemStack(slabBlock);
+                    if (seen.add(stack.getItem())) items.add(stack);
+                }
+
+                Block stairBlock = com.kingodogo.buildscape.variantengine.util.BlockBiMaps.getBlockOf(com.kingodogo.buildscape.variantengine.builder.BlockShape.VERTICAL_STAIRS, baseBlock);
+                if (stairBlock != null && stairBlock.getRegistryName() != null && !stairBlock.getRegistryName().getPath().equals("air")) {
+                    ItemStack stack = new ItemStack(stairBlock);
+                    if (seen.add(stack.getItem())) items.add(stack);
+                }
+            }
         }
 
         private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {

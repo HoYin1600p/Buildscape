@@ -14,7 +14,7 @@ public class VariantNamingUtil {
      * Format: buildscape:{shape}/{original_namespace}/{original_path}
      */
     public static ResourceLocation getGeneratedId(ResourceLocation baseId, BlockShape shape) {
-        return new ResourceLocation(BuildScape.MODID, shape.asString() + "/" + baseId.getNamespace() + "/" + baseId.getPath());
+        return new ResourceLocation(BuildScape.MODID + ":" + shape.asString() + "/" + baseId.getNamespace() + "/" + baseId.getPath());
     }
 
     /**

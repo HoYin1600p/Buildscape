@@ -22,37 +22,50 @@ import java.util.List;
 @Mod.EventBusSubscriber(modid = BuildScape.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class VariantRegistrar {
 
-    /**
-     * Registers the actual Block instances for missing family variants.
-     */
     public static void registerMissingBlocks(IForgeRegistry<Block> registry, List<BlockFamily> families) {
         for (BlockFamily family : families) {
             for (BlockShape shape : BlockShape.values()) {
                 if (family.hasVariant(shape)) continue; // Already exists
 
+                // Implementation logic: Only register vertical versions if vanilla versions exist
+                boolean shouldRegister = false;
+                if (shape == BlockShape.VERTICAL_SLAB && family.hasVariant(BlockShape.SLAB)) {
+                    shouldRegister = true;
+                } else if (shape == BlockShape.VERTICAL_STAIRS && family.hasVariant(BlockShape.STAIRS)) {
+                    shouldRegister = true;
+                }
+
+                if (!shouldRegister) continue;
+
                 // Create and register new block
                 Block generated = createVariantBlock(family.getBaseBlock(), shape);
                 if (generated != null) {
-                    generated.setRegistryName(VariantNamingUtil.getGeneratedId(family.getBaseBlock().getRegistryName(), shape));
+                    net.minecraft.resources.ResourceLocation id = VariantNamingUtil.getGeneratedId(family.getBaseBlock().getRegistryName(), shape);
+                    generated.setRegistryName(id);
                     registry.register(generated);
                     family.addVariant(shape, generated);
+                    
+                    // Register in BiMaps for the creative tab
+                    com.kingodogo.buildscape.variantengine.util.BlockBiMaps.setBlockOf(shape, family.getBaseBlock(), generated);
+                    
+                    BuildScape.LOGGER.info("VariantEngine: Registered block: {}", id);
                 }
             }
         }
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = net.minecraftforge.eventbus.api.EventPriority.LOWEST)
     public static void onRegisterItems(RegistryEvent.Register<Item> event) {
         IForgeRegistry<Item> registry = event.getRegistry();
 
         for (BlockFamily family : BlockRegistryScanner.getDetectedFamilies()) {
             for (Block variant : family.getVariants().values()) {
                 if (variant.getRegistryName() != null && variant.getRegistryName().getNamespace().equals(BuildScape.MODID)) {
-                    // It's one of ours, check if it needs an item
-                    if (ForgeRegistries.ITEMS.getValue(variant.getRegistryName()) == null) {
-                        registry.register(new BlockItem(variant, new Item.Properties().tab(com.kingodogo.buildscape.item.ModCreativeModeTab.BUILDSCAPE_TAB))
-                                .setRegistryName(variant.getRegistryName()));
-                    }
+                    // It's one of ours, register an item for it
+                    net.minecraft.resources.ResourceLocation id = variant.getRegistryName();
+                    registry.register(new BlockItem(variant, new Item.Properties().tab(com.kingodogo.buildscape.item.ModCreativeModeTab.BUILDSCAPE_TAB))
+                            .setRegistryName(id));
+                    BuildScape.LOGGER.info("VariantEngine: Registered item: {}", id);
                 }
             }
         }
@@ -69,7 +82,12 @@ public class VariantRegistrar {
         props.isValidSpawn((state, level, pos, type) -> false);
         props.hasPostProcess((state, level, pos) -> false);
         props.emissiveRendering((state, level, pos) -> false);
-        //props.isNormalCube((state, level, pos) -> false);
+        props.lightLevel((state) -> parent.defaultBlockState().getLightEmission());
+
+        // Sanitize map color for pillar blocks (logs, etc.) that use dynamic color based on AXIS
+        if (parent.getStateDefinition().getProperties().contains(net.minecraft.world.level.block.state.properties.BlockStateProperties.AXIS)) {
+             props.color(parent.defaultBlockState().setValue(net.minecraft.world.level.block.state.properties.BlockStateProperties.AXIS, net.minecraft.core.Direction.Axis.Y).getMapColor(null, null));
+        }
 
         if (shape == BlockShape.VERTICAL_SLAB) return new VerticalSlabBlock(props, parent);
         if (shape == BlockShape.VERTICAL_STAIRS) return new VerticalStairsBlock(props, parent);

@@ -116,4 +116,12 @@ public class ModBlockEntities {
                             ModBlocks.CASCADE_BLOCK_NO_MIST.get()
                     ).build(null)
     );
+
+    public static final RegistryObject<BlockEntityType<MirrorBlockEntity>> MIRROR_BLOCK_ENTITY = BLOCK_ENTITIES.register(
+            "mirror_block_entity",
+            () -> BlockEntityType.Builder.of(
+                    MirrorBlockEntity::new,
+                    ModBlocks.MIRROR_BLOCK.get()
+            ).build(null)
+    );
 }

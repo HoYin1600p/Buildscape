@@ -73,12 +73,13 @@ public class BlockFamilyDetector {
 
         Block base = null;
         boolean isOurMod = namespace.equals(com.kingodogo.buildscape.BuildScape.MODID);
-        
+
         if (isSlab || isStair) {
             base = findBaseBlock(block);
             if (base == null) {
-                // ULTRA GREEDY: If no base found, use the block itself as the family root
-                // This ensures every modded slab/stair gets a vertical version.
+                // ULTRA GREEDY: No companion base block found (orphan case — e.g. a mod registers
+                // custom stairs without a plain block counterpart). Use the block itself as the
+                // family root so it still receives vertical variants.
                 base = block;
             }
         } else if (isOurMod || hasPotentialVariants(id)) {
@@ -88,16 +89,31 @@ public class BlockFamilyDetector {
         if (base == null || base == net.minecraft.world.level.block.Blocks.AIR) return null;
 
         BlockFamily family = new BlockFamily(base);
-        
-        // If the base block itself IS a slab or stair, mark it so we don't re-register it
-        if (base instanceof net.minecraft.world.level.block.SlabBlock || base.defaultBlockState().is(net.minecraft.tags.BlockTags.SLABS)) {
-            family.addVariant(BlockShape.SLAB, base);
-        }
-        if (base instanceof net.minecraft.world.level.block.StairBlock || base.defaultBlockState().is(net.minecraft.tags.BlockTags.STAIRS)) {
-            family.addVariant(BlockShape.STAIRS, base);
+
+        // CRITICAL: Add SLAB / STAIRS to the family variant map using the SAME detection logic
+        // that was used above (triple-check: instanceof OR name-contains OR BlockTags).
+        // DO NOT re-check with stricter instanceof-only conditions here — mods such as
+        // Builder's Delight use custom stair/slab classes that do NOT extend SlabBlock /
+        // StairBlock and may not be registered in vanilla BlockTags.SLABS / BlockTags.STAIRS.
+        // Using the stricter check would silently drop those blocks from the family, causing
+        // the BiMap seed and shouldRegister gate in VariantRegistrar to both return false.
+        if (base == block) {
+            // Orphan path: base IS the slab/stair — record whichever shape it carries.
+            if (isSlab) family.addVariant(BlockShape.SLAB, base);
+            if (isStair) family.addVariant(BlockShape.STAIRS, base);
+        } else {
+            // Base is a full block — check whether the original scanned block is a known variant.
+            // For slabs/stairs that extend standard classes or are tagged, record them here.
+            // (The broad name-based path is covered by getPredictedId lookups below.)
+            if (block instanceof SlabBlock || block.defaultBlockState().is(net.minecraft.tags.BlockTags.SLABS)) {
+                family.addVariant(BlockShape.SLAB, block);
+            }
+            if (block instanceof StairBlock || block.defaultBlockState().is(net.minecraft.tags.BlockTags.STAIRS)) {
+                family.addVariant(BlockShape.STAIRS, block);
+            }
         }
 
-        // Populate existing relatives
+        // Populate all other existing relatives via predicted naming conventions
         for (BlockShape shape : BlockShape.values()) {
             if (shape == BlockShape.BASE || family.hasVariant(shape)) continue;
             ResourceLocation variantId = getPredictedId(base.getRegistryName(), shape);

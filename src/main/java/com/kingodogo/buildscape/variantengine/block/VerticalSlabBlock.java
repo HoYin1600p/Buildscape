@@ -59,20 +59,28 @@ public class VerticalSlabBlock extends Block implements SimpleWaterloggedBlock, 
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         VerticalSlabType type = state.getValue(TYPE);
-        switch (type) {
-            case NORTH:
-                return NORTH_SHAPE;
-            case SOUTH:
-                return SOUTH_SHAPE;
-            case EAST:
-                return EAST_SHAPE;
-            case WEST:
-                return WEST_SHAPE;
-            case DOUBLE:
-                return Shapes.block();
-            default:
-                return Shapes.block();
-        }
+        return switch (type) {
+            case NORTH -> NORTH_SHAPE;
+            case SOUTH -> SOUTH_SHAPE;
+            case EAST -> EAST_SHAPE;
+            case WEST -> WEST_SHAPE;
+            case DOUBLE -> Shapes.block();
+        };
+    }
+
+    @Override
+    public VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+        return this.getShape(state, level, pos, context);
+    }
+
+    @Override
+    public VoxelShape getOcclusionShape(BlockState state, BlockGetter level, BlockPos pos) {
+        return this.getShape(state, level, pos, CollisionContext.empty());
+    }
+
+    @Override
+    public boolean useShapeForLightOcclusion(BlockState state) {
+        return state.getValue(TYPE) != VerticalSlabType.DOUBLE;
     }
 
     @Override
@@ -84,9 +92,7 @@ public class VerticalSlabBlock extends Block implements SimpleWaterloggedBlock, 
         if (existingState.is(this)) {
             VerticalSlabType existingType = existingState.getValue(TYPE);
             if (existingType != VerticalSlabType.DOUBLE) {
-                // Determine if we should merge
-                Direction dir = context.getClickedFace();
-                if (shouldMerge(existingType, dir)) {
+                if (shouldMerge(existingType, context)) {
                     return existingState.setValue(TYPE, VerticalSlabType.DOUBLE).setValue(WATERLOGGED, false);
                 }
             }
@@ -94,6 +100,7 @@ public class VerticalSlabBlock extends Block implements SimpleWaterloggedBlock, 
 
         Direction.Axis axis = context.getHorizontalDirection().getAxis();
         double d = context.getClickLocation().get(axis) - blockPos.get(axis);
+// ... existing switch logic below ...
 
         VerticalSlabType type;
         switch (axis) {
@@ -119,19 +126,34 @@ public class VerticalSlabBlock extends Block implements SimpleWaterloggedBlock, 
         VerticalSlabType type = state.getValue(TYPE);
         if (type != VerticalSlabType.DOUBLE && itemstack.is(this.asItem())) {
             if (context.replacingClickedOnBlock()) {
-                return shouldMerge(type, context.getClickedFace());
+                Direction face = context.getClickedFace();
+                BlockPos pos = context.getClickedPos();
+                double dx = context.getClickLocation().x - (double)pos.getX();
+                double dz = context.getClickLocation().z - (double)pos.getZ();
+                
+                if (type == VerticalSlabType.NORTH) return face == Direction.SOUTH || (dz > 0.5D && face.getAxis() != Direction.Axis.Z);
+                if (type == VerticalSlabType.SOUTH) return face == Direction.NORTH || (dz < 0.5D && face.getAxis() != Direction.Axis.Z);
+                if (type == VerticalSlabType.WEST) return face == Direction.EAST || (dx > 0.5D && face.getAxis() != Direction.Axis.X);
+                if (type == VerticalSlabType.EAST) return face == Direction.WEST || (dx < 0.5D && face.getAxis() != Direction.Axis.X);
             } else {
                 return true;
             }
         }
-        return false;
+        return super.canBeReplaced(state, context);
     }
 
-    private boolean shouldMerge(VerticalSlabType type, Direction face) {
-        if (type == VerticalSlabType.NORTH && face == Direction.SOUTH) return true;
-        if (type == VerticalSlabType.SOUTH && face == Direction.NORTH) return true;
-        if (type == VerticalSlabType.EAST && face == Direction.WEST) return true;
-        return type == VerticalSlabType.WEST && face == Direction.EAST;
+    private boolean shouldMerge(VerticalSlabType type, BlockPlaceContext context) {
+        Direction face = context.getClickedFace();
+        BlockPos pos = context.getClickedPos();
+        double dx = context.getClickLocation().x - (double)pos.getX();
+        double dz = context.getClickLocation().z - (double)pos.getZ();
+
+        if (type == VerticalSlabType.NORTH) return face == Direction.SOUTH || (dz > 0.5D && face.getAxis() != Direction.Axis.Z);
+        if (type == VerticalSlabType.SOUTH) return face == Direction.NORTH || (dz < 0.5D && face.getAxis() != Direction.Axis.Z);
+        if (type == VerticalSlabType.WEST) return face == Direction.EAST || (dx > 0.5D && face.getAxis() != Direction.Axis.X);
+        if (type == VerticalSlabType.EAST) return face == Direction.WEST || (dx < 0.5D && face.getAxis() != Direction.Axis.X);
+        
+        return false;
     }
 
     @Override

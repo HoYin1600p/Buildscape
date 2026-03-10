@@ -1,0 +1,1 @@
+        variants.add("facing=north_west,waterlogged=false", createVariant(modelPath, 0, 0));

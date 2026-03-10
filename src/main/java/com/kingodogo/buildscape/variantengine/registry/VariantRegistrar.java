@@ -2,7 +2,6 @@ package com.kingodogo.buildscape.variantengine.registry;
 
 import com.kingodogo.buildscape.BuildScape;
 import com.kingodogo.buildscape.variantengine.block.QuarterPieceBlock;
-import com.kingodogo.buildscape.variantengine.block.VerticalQuarterPieceBlock;
 import com.kingodogo.buildscape.variantengine.block.VerticalSlabBlock;
 import com.kingodogo.buildscape.variantengine.block.VerticalStairsBlock;
 import com.kingodogo.buildscape.variantengine.builder.BlockShape;
@@ -27,11 +26,37 @@ public class VariantRegistrar {
             for (BlockShape shape : BlockShape.values()) {
                 if (family.hasVariant(shape)) continue; // Already exists
 
-                // Implementation logic: Only register vertical versions if vanilla versions exist
+                // Implementation logic: Selective Registration
+                // We ONLY register vertical versions if:
+                // 1. The base block already has a slab/stair variant (proves it's a building block)
+                // 2. OR the base block itself IS a slab/stair (orphan case from other mods)
+                // 3. OR it's one of our own BuildScape blocks (we want everything for our own mod)
                 boolean shouldRegister = false;
-                if (shape == BlockShape.VERTICAL_SLAB && family.hasVariant(BlockShape.SLAB)) {
+                String namespace = family.getBaseBlock().getRegistryName().getNamespace();
+                boolean isOurMod = namespace.equals(BuildScape.MODID);
+                Block base = family.getBaseBlock();
+
+                // Check via BiMap (populated during scanning)
+                boolean hasStandardSlab = com.kingodogo.buildscape.variantengine.util.BlockBiMaps.getBlockOf(BlockShape.SLAB, base) != null;
+                boolean hasStandardStair = com.kingodogo.buildscape.variantengine.util.BlockBiMaps.getBlockOf(BlockShape.STAIRS, base) != null;
+
+                // Fallback: directly check the family's variants map
+                if (!hasStandardSlab) hasStandardSlab = family.hasVariant(BlockShape.SLAB);
+                if (!hasStandardStair) hasStandardStair = family.hasVariant(BlockShape.STAIRS);
+
+                // Fallback: the base block itself IS the slab or stair (orphan block — no companion base)
+                if (!hasStandardSlab && (base instanceof net.minecraft.world.level.block.SlabBlock
+                        || base.defaultBlockState().is(net.minecraft.tags.BlockTags.SLABS))) {
+                    hasStandardSlab = true;
+                }
+                if (!hasStandardStair && (base instanceof net.minecraft.world.level.block.StairBlock
+                        || base.defaultBlockState().is(net.minecraft.tags.BlockTags.STAIRS))) {
+                    hasStandardStair = true;
+                }
+
+                if (shape == BlockShape.VERTICAL_SLAB && (hasStandardSlab || isOurMod)) {
                     shouldRegister = true;
-                } else if (shape == BlockShape.VERTICAL_STAIRS && family.hasVariant(BlockShape.STAIRS)) {
+                } else if (shape == BlockShape.VERTICAL_STAIRS && (hasStandardStair || isOurMod)) {
                     shouldRegister = true;
                 }
 
@@ -41,6 +66,12 @@ public class VariantRegistrar {
                 Block generated = createVariantBlock(family.getBaseBlock(), shape);
                 if (generated != null) {
                     net.minecraft.resources.ResourceLocation id = VariantNamingUtil.getGeneratedId(family.getBaseBlock().getRegistryName(), shape);
+                    // SAFETY: Never register if the ID is already taken.
+                    if (registry.containsKey(id)) {
+                        family.addVariant(shape, registry.getValue(id));
+                        continue;
+                    }
+
                     generated.setRegistryName(id);
                     registry.register(generated);
                     family.addVariant(shape, generated);
@@ -61,6 +92,10 @@ public class VariantRegistrar {
         for (BlockFamily family : BlockRegistryScanner.getDetectedFamilies()) {
             for (Block variant : family.getVariants().values()) {
                 if (variant.getRegistryName() != null && variant.getRegistryName().getNamespace().equals(BuildScape.MODID)) {
+                    // CRITICAL FIX: Only register if the item doesn't exist yet!
+                    // This avoids double-registering ModBlocks' existing items.
+                    if (ForgeRegistries.ITEMS.containsKey(variant.getRegistryName())) continue;
+
                     // It's one of ours, register an item for it
                     net.minecraft.resources.ResourceLocation id = variant.getRegistryName();
                     registry.register(new BlockItem(variant, new Item.Properties().tab(com.kingodogo.buildscape.item.ModCreativeModeTab.BUILDSCAPE_TAB))
@@ -74,15 +109,38 @@ public class VariantRegistrar {
     private static Block createVariantBlock(Block parent, BlockShape shape) {
         Block.Properties props = Block.Properties.copy(parent);
 
+        // ALWAYS disable occlusion for partial variants (Slabs/Stairs)
+        // This prevents the engine from treating them as a full cube for physics/rendering.
+        props.noOcclusion();
+
+        // Inherit light emission (fallback if lightLevel predicate is too complex in parent)
+        props.lightLevel((state) -> parent.defaultBlockState().getLightEmission());
+
+        // Explosive Resistance & Friction are already copied by Properties.copy(parent)
+        
         // Sanitize properties to avoid crashes if parent has functional predicates 
         // that depend on properties our variants don't have (like AXIS in Logs).
-        props.isRedstoneConductor((state, level, pos) -> false);
-        props.isSuffocating((state, level, pos) -> false);
-        props.isViewBlocking((state, level, pos) -> false);
-        props.isValidSpawn((state, level, pos, type) -> false);
-        props.hasPostProcess((state, level, pos) -> false);
-        props.emissiveRendering((state, level, pos) -> false);
-        props.lightLevel((state) -> parent.defaultBlockState().getLightEmission());
+        props.isRedstoneConductor((state, level, pos) -> {
+            if (state.hasProperty(VerticalSlabBlock.TYPE)) {
+                return state.getValue(VerticalSlabBlock.TYPE) == VerticalSlabBlock.VerticalSlabType.DOUBLE && parent.defaultBlockState().isRedstoneConductor(level, pos);
+            }
+            return false;
+        });
+        props.isSuffocating((state, level, pos) -> {
+            if (state.hasProperty(VerticalSlabBlock.TYPE)) {
+                return state.getValue(VerticalSlabBlock.TYPE) == VerticalSlabBlock.VerticalSlabType.DOUBLE && parent.defaultBlockState().isSuffocating(level, pos);
+            }
+            return false;
+        });
+        props.isViewBlocking((state, level, pos) -> {
+            if (state.hasProperty(VerticalSlabBlock.TYPE)) {
+                return state.getValue(VerticalSlabBlock.TYPE) == VerticalSlabBlock.VerticalSlabType.DOUBLE && parent.defaultBlockState().isViewBlocking(level, pos);
+            }
+            return false;
+        });
+        props.isValidSpawn((state, level, pos, type) -> false); 
+        props.hasPostProcess((state, level, pos) -> parent.defaultBlockState().hasPostProcess(level, pos));
+        props.emissiveRendering((state, level, pos) -> parent.defaultBlockState().emissiveRendering(level, pos));
 
         // Sanitize map color for pillar blocks (logs, etc.) that use dynamic color based on AXIS
         if (parent.getStateDefinition().getProperties().contains(net.minecraft.world.level.block.state.properties.BlockStateProperties.AXIS)) {
@@ -92,7 +150,6 @@ public class VariantRegistrar {
         if (shape == BlockShape.VERTICAL_SLAB) return new VerticalSlabBlock(props, parent);
         if (shape == BlockShape.VERTICAL_STAIRS) return new VerticalStairsBlock(props, parent);
         if (shape == BlockShape.QUARTER_PIECE) return new QuarterPieceBlock(props, parent);
-        if (shape == BlockShape.VERTICAL_QUARTER_PIECE) return new VerticalQuarterPieceBlock(props, parent);
         return null;
     }
 }

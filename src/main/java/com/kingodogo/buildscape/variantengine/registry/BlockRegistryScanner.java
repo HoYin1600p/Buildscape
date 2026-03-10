@@ -106,30 +106,27 @@ public class BlockRegistryScanner {
             Block familyBase = cf.getBaseBlock();
             java.util.Map<com.kingodogo.buildscape.variantengine.builder.BlockShape, Block> variants = cf.getVariants();
 
-            // Populate SLAB and STAIRS into BiMaps
+            // Populate SLAB and STAIRS into BiMaps.
+            // BlockFamilyDetector now correctly seeds the variant map for ALL stair/slab types
+            // using the same broad triple-check (instanceof OR name-contains OR BlockTags) that
+            // was used during detection. So we just read the variant map directly — no need to
+            // re-run instanceof/BlockTags here (which would miss custom mod block classes).
             Block slabVariant = variants.get(com.kingodogo.buildscape.variantengine.builder.BlockShape.SLAB);
             if (slabVariant != null) {
                 com.kingodogo.buildscape.variantengine.util.BlockBiMaps.setBlockOf(
                     com.kingodogo.buildscape.variantengine.builder.BlockShape.SLAB, familyBase, slabVariant);
-            } else if (familyBase instanceof net.minecraft.world.level.block.SlabBlock
-                    || familyBase.defaultBlockState().is(net.minecraft.tags.BlockTags.SLABS)) {
-                // Orphan case: the family base IS the slab — register it as its own slab variant
-                // so the shouldRegister gate in VariantRegistrar passes.
-                com.kingodogo.buildscape.variantengine.util.BlockBiMaps.setBlockOf(
-                    com.kingodogo.buildscape.variantengine.builder.BlockShape.SLAB, familyBase, familyBase);
-                BuildScape.LOGGER.debug("VariantEngine: Orphan slab base detected: {}", familyBase.getRegistryName());
+                if (slabVariant == familyBase) {
+                    BuildScape.LOGGER.debug("VariantEngine: Orphan slab base seeded: {}", familyBase.getRegistryName());
+                }
             }
 
             Block stairVariant = variants.get(com.kingodogo.buildscape.variantengine.builder.BlockShape.STAIRS);
             if (stairVariant != null) {
                 com.kingodogo.buildscape.variantengine.util.BlockBiMaps.setBlockOf(
                     com.kingodogo.buildscape.variantengine.builder.BlockShape.STAIRS, familyBase, stairVariant);
-            } else if (familyBase instanceof net.minecraft.world.level.block.StairBlock
-                    || familyBase.defaultBlockState().is(net.minecraft.tags.BlockTags.STAIRS)) {
-                // Orphan case: the family base IS the stair — register it as its own stair variant.
-                com.kingodogo.buildscape.variantengine.util.BlockBiMaps.setBlockOf(
-                    com.kingodogo.buildscape.variantengine.builder.BlockShape.STAIRS, familyBase, familyBase);
-                BuildScape.LOGGER.debug("VariantEngine: Orphan stair base detected: {}", familyBase.getRegistryName());
+                if (stairVariant == familyBase) {
+                    BuildScape.LOGGER.debug("VariantEngine: Orphan stair base seeded: {}", familyBase.getRegistryName());
+                }
             }
 
             // Populate remaining variants (vertical slabs, vertical stairs, etc.) into BiMaps

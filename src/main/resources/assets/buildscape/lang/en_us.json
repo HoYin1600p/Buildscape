@@ -1,4 +1,6 @@
 {
+  "block.buildscape.mirror_block": "Mirror Block",
+  "item.buildscape.mirror_block": "Mirror Block",
   "block.buildscape.yellow_factory_mesh": "Yellow Factory Mesh",
   "block.buildscape.yellow_factory_mesh_stairs": "Yellow Factory Mesh Stairs",
   "block.buildscape.yellow_factory_mesh_slab": "Yellow Factory Mesh Slab",

@@ -16,6 +16,16 @@ public class BlockFamilyDetector {
     private static final String[] BLOCK_SUFFIXES = {"_bricks", "_brick", "_tiles", "_planks", "_plank", "_block"};
 
     public static BlockFamily detectFamily(Block block) {
+        try {
+            return detectFamilyInternal(block);
+        } catch (Exception e) {
+            // Swallow — the scanner's per-block try-catch will log this.
+            // Returning null safely skips this block.
+            return null;
+        }
+    }
+
+    private static BlockFamily detectFamilyInternal(Block block) {
         ResourceLocation id = block.getRegistryName();
         if (id == null) return null;
 
@@ -29,8 +39,8 @@ public class BlockFamilyDetector {
             return null;
         }
 
-        // GLOBAL BLACKLIST: No functional, thin, or decorative blocks
-        if (block instanceof net.minecraft.world.level.block.DoorBlock || 
+        // GLOBAL BLACKLIST: functional, thin, or decorative blocks by class
+        if (block instanceof net.minecraft.world.level.block.DoorBlock ||
             block instanceof net.minecraft.world.level.block.TrapDoorBlock ||
             block instanceof net.minecraft.world.level.block.FenceBlock ||
             block instanceof net.minecraft.world.level.block.FenceGateBlock ||
@@ -50,7 +60,7 @@ public class BlockFamilyDetector {
             return null;
         }
 
-        // String-based safety for modded blocks that don't use standard classes or materials
+        // String-based safety for modded blocks that don't use standard classes
         String lowPath = path.toLowerCase();
         if (lowPath.contains("door") || lowPath.contains("trapdoor") || lowPath.contains("sign") ||
             lowPath.contains("fence") || lowPath.contains("wall") || lowPath.contains("chain") ||

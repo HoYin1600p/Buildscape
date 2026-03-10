@@ -41,7 +41,10 @@ public final class BlockBiMaps {
      */
     public static void setBlockOf(@NotNull BlockShape shape, @NotNull Block baseBlock, @NotNull Block block) {
         final BiMap<Block, Block> biMap = of(shape);
-        biMap.put(baseBlock, block);
+        // Use forcePut to avoid IllegalArgumentException when the same variant block
+        // was already mapped from a different base (can happen during canonicalization
+        // with certain mod-block naming patterns).
+        biMap.forcePut(baseBlock, block);
         BASE_BLOCKS.add(baseBlock);
     }
 

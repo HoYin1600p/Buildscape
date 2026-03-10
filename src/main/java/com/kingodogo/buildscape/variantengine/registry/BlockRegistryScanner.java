@@ -1,148 +1,233 @@
 package com.kingodogo.buildscape.variantengine.registry;
 
 import com.kingodogo.buildscape.BuildScape;
+import com.kingodogo.buildscape.variantengine.builder.BlockShape;
 import com.kingodogo.buildscape.variantengine.family.BlockFamily;
 import com.kingodogo.buildscape.variantengine.family.BlockFamilyDetector;
+import com.kingodogo.buildscape.variantengine.util.BlockBiMaps;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.IForgeRegistry;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Mod.EventBusSubscriber(modid = BuildScape.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class BlockRegistryScanner {
 
-    private static final java.util.Map<Block, BlockFamily> DETECTED_FAMILIES = new java.util.HashMap<>();
+    private static final Map<Block, BlockFamily> DETECTED_FAMILIES = new HashMap<>();
 
-    @SubscribeEvent(priority = net.minecraftforge.eventbus.api.EventPriority.LOWEST)
+    // -----------------------------------------------------------------------
+    // Phase 1: Scan — runs at LOWEST so all other mods have registered first.
+    // Each block is processed in its own try-catch so one bad block cannot
+    // silently abort the entire scan.
+    // -----------------------------------------------------------------------
+    @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void onRegisterBlocks(RegistryEvent.Register<Block> event) {
         DETECTED_FAMILIES.clear();
-        BuildScape.LOGGER.info("VariantEngine: Scanning registries for block families...");
+        BlockBiMaps.BASE_BLOCKS.clear();
 
-        // Use the event's registry as the source of truth
-        for (Block block : event.getRegistry()) {
-            BlockFamily detected = BlockFamilyDetector.detectFamily(block);
-            if (detected != null) {
-                Block base = detected.getBaseBlock();
-                
-                // Redundancy Check: If the base block itself is a slab or stair, 
-                // but a 'fuller' block (planks, etc) exists that would own it, skip creating a separate family.
-                if (base instanceof net.minecraft.world.level.block.SlabBlock || base instanceof net.minecraft.world.level.block.StairBlock) {
-                    // This is a last-resort base. We'll only use it if no better base emerged.
-                    // For now, let's keep it but mark it for a second pass.
-                }
+        IForgeRegistry<Block> registry = event.getRegistry();
+        BuildScape.LOGGER.info("VariantEngine: Scanning all registered blocks for stair/slab families...");
 
-                BlockFamily family = DETECTED_FAMILIES.computeIfAbsent(base, k -> new BlockFamily(k));
-                detected.getVariants().forEach(family::addVariant);
+        int scanned = 0, detected = 0, errors = 0;
+
+        // Iterate every block that is in the Forge registry at this point.
+        // At LOWEST priority, all other mods' DeferredRegister handlers (NORMAL priority)
+        // have already fired, so every modded block is present here.
+        for (Block block : registry) {
+            scanned++;
+            try {
+                processBlock(block);
+                detected++;
+            } catch (Exception e) {
+                errors++;
+                BuildScape.LOGGER.warn("VariantEngine: Skipping block {} due to error during detection: {}",
+                        safeId(block), e.getMessage());
             }
         }
 
-        // Post-processing: Canonicalize families to prevent duplicates.
-        // Strategy: namespace:path is used as the canonical key. Strip only slab/stair/vertical
-        // suffixes — do NOT strip _bricks/_block/_planks etc. as those are content descriptors, not
-        // shape suffixes. This prevents unrelated blocks from colliding under the same canonical key.
-        java.util.Map<net.minecraft.resources.ResourceLocation, BlockFamily> canonicalFamilies = new java.util.HashMap<>();
+        BuildScape.LOGGER.info("VariantEngine: Scan complete. Scanned={}, FamilyCandidates={}, Errors={}",
+                scanned, detected, errors);
 
-        for (BlockFamily family : DETECTED_FAMILIES.values()) {
-            Block base = family.getBaseBlock();
-            net.minecraft.resources.ResourceLocation baseId = base.getRegistryName();
-            if (baseId == null) continue;
+        // -----------------------------------------------------------------------
+        // Phase 2: Canonicalize — merge slab/stair orphans with full-block families
+        // that share the same root name (e.g. oak → oak_slab, oak_stairs).
+        // -----------------------------------------------------------------------
+        Map<ResourceLocation, BlockFamily> canonicalFamilies = canonicalize(DETECTED_FAMILIES);
 
-            // Strip ONLY shape-suffixes to determine the canonical family key.
-            // We deliberately do NOT strip material-suffixes like _bricks, _planks, _block because
-            // those are part of the block's identity and stripping them causes false merges between
-            // unrelated mod families (e.g. mymod:oak_block and mymod:oak_planks colliding).
-            String corePath = baseId.getPath()
-                .replace("_stairs", "").replace("_stair", "")
-                .replace("_slab", "")
-                .replaceAll("^v_slab_|^v_stair_", "")
-                .replaceAll("^_+|_+$", ""); // clean leading/trailing underscores
-            net.minecraft.resources.ResourceLocation coreId = new net.minecraft.resources.ResourceLocation(baseId.getNamespace(), corePath);
-
-            BlockFamily existing = canonicalFamilies.get(coreId);
-            if (existing != null) {
-                Block existingBase = existing.getBaseBlock();
-                boolean currentIsShaped = base instanceof net.minecraft.world.level.block.SlabBlock
-                    || base instanceof net.minecraft.world.level.block.StairBlock
-                    || base.defaultBlockState().is(net.minecraft.tags.BlockTags.SLABS)
-                    || base.defaultBlockState().is(net.minecraft.tags.BlockTags.STAIRS);
-                boolean existingIsShaped = existingBase instanceof net.minecraft.world.level.block.SlabBlock
-                    || existingBase instanceof net.minecraft.world.level.block.StairBlock
-                    || existingBase.defaultBlockState().is(net.minecraft.tags.BlockTags.SLABS)
-                    || existingBase.defaultBlockState().is(net.minecraft.tags.BlockTags.STAIRS);
-
-                if (!currentIsShaped && existingIsShaped) {
-                    // Current base is a full block — it wins. Merge existing variants in.
-                    existing.getVariants().forEach((shape, block) -> {
-                        if (shape != com.kingodogo.buildscape.variantengine.builder.BlockShape.BASE) {
-                            family.addVariant(shape, block);
-                        }
-                    });
-                    canonicalFamilies.put(coreId, family);
-                } else {
-                    // Existing is fuller or equal — merge current's non-base variants into it.
-                    family.getVariants().forEach((shape, block) -> {
-                        if (shape != com.kingodogo.buildscape.variantengine.builder.BlockShape.BASE) {
-                            existing.addVariant(shape, block);
-                        }
-                    });
-                }
-            } else {
-                canonicalFamilies.put(coreId, family);
-            }
-        }
-
+        // -----------------------------------------------------------------------
+        // Phase 3: Commit — clear + rebuild DETECTED_FAMILIES from canonical map,
+        // then seed BlockBiMaps with SLAB / STAIRS / vertical shapes.
+        // -----------------------------------------------------------------------
         DETECTED_FAMILIES.clear();
         for (BlockFamily cf : canonicalFamilies.values()) {
             DETECTED_FAMILIES.put(cf.getBaseBlock(), cf);
+            seedBiMaps(cf);
+        }
 
-            // Seed BiMaps for SLAB and STAIRS variants so VariantRegistrar can detect them.
-            // This is critical for orphan slab/stair blocks from other mods (where the slab IS the
-            // base block of the family) — without this seed, hasStandardSlab/hasStandardStair would
-            // always return false and no vertical variants would ever be registered for those mods.
-            Block familyBase = cf.getBaseBlock();
-            java.util.Map<com.kingodogo.buildscape.variantengine.builder.BlockShape, Block> variants = cf.getVariants();
+        BuildScape.LOGGER.info("VariantEngine: {} canonical families ready for vertical variant registration.",
+                DETECTED_FAMILIES.size());
 
-            // Populate SLAB and STAIRS into BiMaps.
-            // BlockFamilyDetector now correctly seeds the variant map for ALL stair/slab types
-            // using the same broad triple-check (instanceof OR name-contains OR BlockTags) that
-            // was used during detection. So we just read the variant map directly — no need to
-            // re-run instanceof/BlockTags here (which would miss custom mod block classes).
-            Block slabVariant = variants.get(com.kingodogo.buildscape.variantengine.builder.BlockShape.SLAB);
-            if (slabVariant != null) {
-                com.kingodogo.buildscape.variantengine.util.BlockBiMaps.setBlockOf(
-                    com.kingodogo.buildscape.variantengine.builder.BlockShape.SLAB, familyBase, slabVariant);
-                if (slabVariant == familyBase) {
-                    BuildScape.LOGGER.debug("VariantEngine: Orphan slab base seeded: {}", familyBase.getRegistryName());
-                }
+        // -----------------------------------------------------------------------
+        // Phase 4: Register missing vertical blocks.
+        // -----------------------------------------------------------------------
+        VariantRegistrar.registerMissingBlocks(registry, new ArrayList<>(DETECTED_FAMILIES.values()));
+    }
+
+    // -----------------------------------------------------------------------
+    // Individual block processing — deliberately does NOT contain try/catch;
+    // the caller wraps each call and logs any exception.
+    // -----------------------------------------------------------------------
+    private static void processBlock(Block block) {
+        BlockFamily detected = BlockFamilyDetector.detectFamily(block);
+        if (detected == null) return;
+
+        Block base = detected.getBaseBlock();
+        BlockFamily existing = DETECTED_FAMILIES.computeIfAbsent(base, BlockFamily::new);
+        // Merge all variants from the detected family into the accumulated one.
+        detected.getVariants().forEach((shape, varBlock) -> {
+            if (shape != BlockShape.BASE) {
+                existing.addVariant(shape, varBlock);
             }
+        });
+    }
 
-            Block stairVariant = variants.get(com.kingodogo.buildscape.variantengine.builder.BlockShape.STAIRS);
-            if (stairVariant != null) {
-                com.kingodogo.buildscape.variantengine.util.BlockBiMaps.setBlockOf(
-                    com.kingodogo.buildscape.variantengine.builder.BlockShape.STAIRS, familyBase, stairVariant);
-                if (stairVariant == familyBase) {
-                    BuildScape.LOGGER.debug("VariantEngine: Orphan stair base seeded: {}", familyBase.getRegistryName());
+    // -----------------------------------------------------------------------
+    // Canonicalize families so that "oak" (full block) wins over "oak_slab"
+    // or "oak_stairs" as the family root.
+    //
+    // Key rules:
+    //  • Strip ONLY shape suffixes (_stairs, _stair, _slab) to compute the
+    //    canonical key — never strip material suffixes (_bricks, _planks…)
+    //    because that causes unrelated blocks to collide.
+    //  • A full block beats a shaped block as the canonical base.
+    //  • Variants are always merged (non-destructively) into the winner.
+    // -----------------------------------------------------------------------
+    private static Map<ResourceLocation, BlockFamily> canonicalize(Map<Block, BlockFamily> raw) {
+        Map<ResourceLocation, BlockFamily> canonical = new LinkedHashMap<>();
+
+        for (BlockFamily family : raw.values()) {
+            Block base = family.getBaseBlock();
+            ResourceLocation baseId = safeRegistryName(base);
+            if (baseId == null) continue;
+
+            ResourceLocation coreId = toCoreId(baseId);
+
+            BlockFamily existing = canonical.get(coreId);
+            if (existing == null) {
+                canonical.put(coreId, family);
+            } else {
+                // Decide which base is "fuller" (not a shaped block itself).
+                boolean currentIsShaped = isShaped(base);
+                boolean existingIsShaped = isShaped(existing.getBaseBlock());
+
+                if (!currentIsShaped && existingIsShaped) {
+                    // Current wins — absorb the existing variants into it, then replace.
+                    existing.getVariants().forEach((shape, blk) -> {
+                        if (shape != BlockShape.BASE) family.addVariant(shape, blk);
+                    });
+                    canonical.put(coreId, family);
+                } else {
+                    // Existing wins (or they're equal) — merge current into existing.
+                    family.getVariants().forEach((shape, blk) -> {
+                        if (shape != BlockShape.BASE) existing.addVariant(shape, blk);
+                    });
                 }
-            }
-
-            // Populate remaining variants (vertical slabs, vertical stairs, etc.) into BiMaps
-            for (java.util.Map.Entry<com.kingodogo.buildscape.variantengine.builder.BlockShape, Block> entry : variants.entrySet()) {
-                com.kingodogo.buildscape.variantengine.builder.BlockShape shape = entry.getKey();
-                if (shape == com.kingodogo.buildscape.variantengine.builder.BlockShape.SLAB
-                    || shape == com.kingodogo.buildscape.variantengine.builder.BlockShape.STAIRS
-                    || shape == com.kingodogo.buildscape.variantengine.builder.BlockShape.BASE) continue;
-                com.kingodogo.buildscape.variantengine.util.BlockBiMaps.setBlockOf(shape, familyBase, entry.getValue());
             }
         }
 
-        BuildScape.LOGGER.info("VariantEngine: Found {} unique block families for completion.", DETECTED_FAMILIES.size());
+        return canonical;
+    }
 
-        // Now register missing variants
-        VariantRegistrar.registerMissingBlocks(event.getRegistry(), new ArrayList<>(DETECTED_FAMILIES.values()));
+    // -----------------------------------------------------------------------
+    // Seed BlockBiMaps from the canonical family.
+    // Because BlockFamilyDetector now uses the SAME broad detection logic
+    // (instanceof OR name-contains OR BlockTags) when it populates the family
+    // variant map, we only need to read from the variant map directly.
+    // -----------------------------------------------------------------------
+    private static void seedBiMaps(BlockFamily cf) {
+        Block familyBase = cf.getBaseBlock();
+        Map<BlockShape, Block> variants = cf.getVariants();
+
+        Block slabVariant = variants.get(BlockShape.SLAB);
+        if (slabVariant != null) {
+            BlockBiMaps.setBlockOf(BlockShape.SLAB, familyBase, slabVariant);
+            if (slabVariant == familyBase) {
+                BuildScape.LOGGER.info("VariantEngine: Orphan-slab family: {}", safeRegistryName(familyBase));
+            }
+        }
+
+        Block stairVariant = variants.get(BlockShape.STAIRS);
+        if (stairVariant != null) {
+            BlockBiMaps.setBlockOf(BlockShape.STAIRS, familyBase, stairVariant);
+            if (stairVariant == familyBase) {
+                BuildScape.LOGGER.info("VariantEngine: Orphan-stair family: {}", safeRegistryName(familyBase));
+            }
+        }
+
+        // Seed any other shapes (vertical slab, vertical stairs, etc.) that already exist
+        for (Map.Entry<BlockShape, Block> entry : variants.entrySet()) {
+            BlockShape shape = entry.getKey();
+            if (shape == BlockShape.SLAB || shape == BlockShape.STAIRS || shape == BlockShape.BASE) continue;
+            BlockBiMaps.setBlockOf(shape, familyBase, entry.getValue());
+        }
+    }
+
+    // -----------------------------------------------------------------------
+    // Helpers
+    // -----------------------------------------------------------------------
+
+    /** Returns true if the block is itself a shaped block (slab or stair). */
+    private static boolean isShaped(Block block) {
+        try {
+            if (block instanceof net.minecraft.world.level.block.SlabBlock) return true;
+            if (block instanceof net.minecraft.world.level.block.StairBlock) return true;
+            if (block.defaultBlockState().is(net.minecraft.tags.BlockTags.SLABS)) return true;
+            if (block.defaultBlockState().is(net.minecraft.tags.BlockTags.STAIRS)) return true;
+        } catch (Exception ignored) {}
+        // Name-based fallback: if the block's path contains slab/stair keywords it is shaped.
+        ResourceLocation id = safeRegistryName(block);
+        if (id != null) {
+            String p = id.getPath();
+            if (p.contains("slab") || p.contains("stair")) return true;
+        }
+        return false;
+    }
+
+    /**
+     * Strips shape suffixes from a block path to get the canonical "core" name.
+     * Only shape suffixes are removed; material suffixes (_bricks, _planks, etc.)
+     * are intentionally preserved to prevent unrelated families from colliding.
+     */
+    private static ResourceLocation toCoreId(ResourceLocation id) {
+        String p = id.getPath();
+        // Remove shape suffixes (order matters — longest first to avoid partial matches)
+        p = p.replace("_stairs", "").replace("_stair", "").replace("_slab", "");
+        // Remove our own generated prefixes (if somehow they appear)
+        if (p.startsWith("v_slab_"))  p = p.substring(7);
+        if (p.startsWith("v_stair_")) p = p.substring(8);
+        // Clean up leading/trailing underscores left by removals
+        p = p.replaceAll("^_+|_+$", "");
+        if (p.isEmpty()) p = id.getPath(); // safety: never produce an empty path
+        return new ResourceLocation(id.getNamespace(), p);
+    }
+
+    private static ResourceLocation safeRegistryName(Block block) {
+        try { return block.getRegistryName(); } catch (Exception e) { return null; }
+    }
+
+    private static String safeId(Block block) {
+        try {
+            ResourceLocation id = block.getRegistryName();
+            return id != null ? id.toString() : block.getClass().getSimpleName();
+        } catch (Exception e) {
+            return block.getClass().getSimpleName();
+        }
     }
 
     public static List<BlockFamily> getDetectedFamilies() {

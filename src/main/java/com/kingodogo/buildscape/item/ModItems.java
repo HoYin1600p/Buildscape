@@ -19,6 +19,11 @@ public class ModItems {
         return new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB);
     }
 
+    public static final RegistryObject<Item> MIRROR_BLOCK = ITEMS.register(
+            "mirror_block",
+            () -> new BlockItem(ModBlocks.MIRROR_BLOCK.get(), createBlockItemProperties())
+    );
+
     public static final RegistryObject<Item> BLACK_SAND = ITEMS.register(
             "black_sand",
             () -> new BlockItem(ModBlocks.BLACK_SAND.get(), createBlockItemProperties())

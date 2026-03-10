@@ -9,6 +9,11 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 public class ModCreativeModeTab {
 
     public static final CreativeModeTab BUILDSCAPE_TAB = new CreativeModeTab(BuildScape.MODID) {
@@ -19,39 +24,98 @@ public class ModCreativeModeTab {
 
         @Override
         public void fillItemList(NonNullList<ItemStack> items) {
-            addHardcodedItems(items);
-            super.fillItemList(items);
-            removeDuplicates(items);
-            appendVerticalItems(items);
-        }
-
-        private void removeDuplicates(NonNullList<ItemStack> items) {
-            java.util.Set<Item> seen = new java.util.HashSet<>();
-            java.util.Iterator<ItemStack> it = items.iterator();
-            while (it.hasNext()) {
-                ItemStack stack = it.next();
-                if (!seen.add(stack.getItem())) {
-                    it.remove();
+            // 1. Start with the HARDCODED items to preserve the mod's intended sequence
+            NonNullList<ItemStack> list = NonNullList.create();
+            addHardcodedItems(list);
+            
+            // 2. Add other items assigned to this tab (e.g. from mod compatibility or dynamic registration)
+            NonNullList<ItemStack> others = NonNullList.create();
+            super.fillItemList(others);
+            for (ItemStack stack : others) {
+                if (!list.contains(stack)) {
+                    // Avoid simple item identity checks for stacks that might have NBT, 
+                    // but for building blocks Item check is usually sufficient.
+                    boolean exists = false;
+                    for (ItemStack existsStack : list) {
+                        if (existsStack.getItem() == stack.getItem()) {
+                            exists = true;
+                            break;
+                        }
+                    }
+                    if (!exists) list.add(stack);
                 }
             }
+            
+            // 3. Clear the target list and perform intelligent insertion of vertical variants
+            items.clear();
+            Set<Item> added = new HashSet<>();
+            
+            for (ItemStack stack : list) {
+                Item item = stack.getItem();
+                if (added.contains(item)) continue;
+                
+                // Add the current item
+                items.add(stack);
+                added.add(item);
+                
+                // If this is a block, immediately insert its vertical variants
+                if (item instanceof net.minecraft.world.item.BlockItem) {
+                    Block block = ((net.minecraft.world.item.BlockItem)item).getBlock();
+                    
+                    // Priority 1: Vertical Slab
+                    Block vSlab = findVerticalVariant(block, com.kingodogo.buildscape.variantengine.builder.BlockShape.VERTICAL_SLAB);
+                    if (vSlab != null && vSlab != block) {
+                        ItemStack vStack = new ItemStack(vSlab);
+                        if (added.add(vStack.getItem())) items.add(vStack);
+                    }
+                    
+                    // Priority 2: Vertical Stair
+                    Block vStair = findVerticalVariant(block, com.kingodogo.buildscape.variantengine.builder.BlockShape.VERTICAL_STAIRS);
+                    if (vStair != null && vStair != block) {
+                        ItemStack vStack = new ItemStack(vStair);
+                        if (added.add(vStack.getItem())) items.add(vStack);
+                    }
+                }
+            }
+            
+            // 4. Final safety pass for any "orphan" vertical blocks
+            appendRemainingVerticals(items, added);
         }
 
-        private void appendVerticalItems(NonNullList<ItemStack> items) {
-            // Collect items already present so we don't duplicate
-            java.util.Set<Item> seen = new java.util.HashSet<>();
-            for (ItemStack s : items) seen.add(s.getItem());
-
-            for (Block baseBlock : com.kingodogo.buildscape.variantengine.util.BlockBiMaps.BASE_BLOCKS) {
-                Block slabBlock = com.kingodogo.buildscape.variantengine.util.BlockBiMaps.getBlockOf(com.kingodogo.buildscape.variantengine.builder.BlockShape.VERTICAL_SLAB, baseBlock);
-                if (slabBlock != null && slabBlock.getRegistryName() != null && !slabBlock.getRegistryName().getPath().equals("air")) {
-                    ItemStack stack = new ItemStack(slabBlock);
-                    if (seen.add(stack.getItem())) items.add(stack);
+        private Block findVerticalVariant(Block block, com.kingodogo.buildscape.variantengine.builder.BlockShape shape) {
+            // Strategy 1: Is this block itself a BASE block?
+            if (com.kingodogo.buildscape.variantengine.util.BlockBiMaps.BASE_BLOCKS.contains(block)) {
+                return com.kingodogo.buildscape.variantengine.util.BlockBiMaps.getBlockOf(shape, block);
+            }
+            
+            // Strategy 2: Is this a slab/stair of a base block?
+            // (e.g. block is Oak Slab, we want to find Oak Vertical Slab)
+            for (Block base : com.kingodogo.buildscape.variantengine.util.BlockBiMaps.BASE_BLOCKS) {
+                if (isNormalVariantOf(block, base)) {
+                    return com.kingodogo.buildscape.variantengine.util.BlockBiMaps.getBlockOf(shape, base);
                 }
+            }
+            return null;
+        }
 
-                Block stairBlock = com.kingodogo.buildscape.variantengine.util.BlockBiMaps.getBlockOf(com.kingodogo.buildscape.variantengine.builder.BlockShape.VERTICAL_STAIRS, baseBlock);
-                if (stairBlock != null && stairBlock.getRegistryName() != null && !stairBlock.getRegistryName().getPath().equals("air")) {
-                    ItemStack stack = new ItemStack(stairBlock);
-                    if (seen.add(stack.getItem())) items.add(stack);
+        private boolean isNormalVariantOf(Block block, Block base) {
+             String bName = block.getRegistryName().getPath();
+             String baseName = base.getRegistryName().getPath();
+             // Simple heuristic: block contains base name and is a slab/stair
+             return bName.contains(baseName) && (bName.contains("slab") || bName.contains("stair"));
+        }
+
+        private void appendRemainingVerticals(NonNullList<ItemStack> items, Set<Item> added) {
+            for (Block base : com.kingodogo.buildscape.variantengine.util.BlockBiMaps.BASE_BLOCKS) {
+                for (com.kingodogo.buildscape.variantengine.builder.BlockShape shape : 
+                     new com.kingodogo.buildscape.variantengine.builder.BlockShape[]{
+                         com.kingodogo.buildscape.variantengine.builder.BlockShape.VERTICAL_SLAB, 
+                         com.kingodogo.buildscape.variantengine.builder.BlockShape.VERTICAL_STAIRS}) {
+                    Block v = com.kingodogo.buildscape.variantengine.util.BlockBiMaps.getBlockOf(shape, base);
+                    if (v != null && !added.contains(v.asItem())) {
+                        items.add(new ItemStack(v));
+                        added.add(v.asItem());
+                    }
                 }
             }
         }
@@ -1117,6 +1181,7 @@ public class ModCreativeModeTab {
             items.add(new ItemStack(ModItems.BIG_PINK_CANDLE.get()));
             items.add(new ItemStack(ModItems.BIG_AMETHYST_CANDLE.get()));
             items.add(new ItemStack(ModItems.BIG_SCULK_CANDLE.get()));
+            items.add(new ItemStack(ModItems.MIRROR_BLOCK.get()));
         }
     };
 }

@@ -1976,6 +1976,11 @@ public class BuildScape {
                         com.kingodogo.buildscape.client.renderer.FestiveStockingBlockEntityRenderer::new);
 
                 net.minecraft.client.renderer.blockentity.BlockEntityRenderers.register(
+                        com.kingodogo.buildscape.block.ModBlockEntities.MIRROR_BLOCK_ENTITY
+                                .get(),
+                        com.kingodogo.buildscape.client.renderer.MirrorBlockEntityRenderer::new);
+
+                net.minecraft.client.renderer.blockentity.BlockEntityRenderers.register(
                         com.kingodogo.buildscape.block.ModBlockEntities.MANGROVE_SIGN_BLOCK_ENTITY
                                 .get(),
                         net.minecraft.client.renderer.blockentity.SignRenderer::new);

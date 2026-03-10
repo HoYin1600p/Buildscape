@@ -17,6 +17,14 @@ public class ModBlocks {
                 ForgeRegistries.BLOCKS,
                 BuildScape.MODID);
 
+        public static final RegistryObject<Block> MIRROR_BLOCK = BLOCKS.register(
+                "mirror_block",
+                () -> new MirrorBlock(
+                        BlockBehaviour.Properties.of(Material.GLASS)
+                                .strength(0.5f)
+                                .sound(net.minecraft.world.level.block.SoundType.GLASS)
+                                .noOcclusion()));
+
         public static final RegistryObject<Block> BLACK_SAND = BLOCKS.register(
                 "black_sand",
                 () -> new FallingSandBlock(

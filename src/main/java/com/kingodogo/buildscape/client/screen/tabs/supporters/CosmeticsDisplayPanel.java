@@ -267,14 +267,15 @@ public class CosmeticsDisplayPanel extends BasePanel {
                             int ly = rowY + 2;
 
                             // Yellow outline for the corner
-                            GuiComponent.fill(poseStack, lx - 1, ly - 1, lx + cornerSize + 1, ly + cornerSize + 1, 0xFFFFFF00);
-                            GuiComponent.fill(poseStack, lx, ly, lx + cornerSize, ly + cornerSize, 0xFF111111);
+                            net.minecraft.client.gui.GuiComponent.fill(poseStack, lx - 1, ly - 1, lx + cornerSize + 1, ly + cornerSize + 1, 0xFFFFFF00);
+                            net.minecraft.client.gui.GuiComponent.fill(poseStack, lx, ly, lx + cornerSize, ly + cornerSize, 0xFF111111);
 
                             RenderSystem.setShaderTexture(0, LOCK_ICON);
                             RenderSystem.setShader(net.minecraft.client.renderer.GameRenderer::getPositionTexShader);
                             RenderSystem.enableBlend();
+                            RenderSystem.defaultBlendFunc();
                             // Use the actual lock texture size so the icon renders correctly
-                            GuiComponent.blit(poseStack, lx + 1, ly + 1, cornerSize - 2, cornerSize - 2, 0, 0, 32, 32, 32, 32);
+                            net.minecraft.client.gui.GuiComponent.blit(poseStack, lx + 1, ly + 1, cornerSize - 2, cornerSize - 2, 0, 0, 16, 16, 16, 16);
                             RenderSystem.disableBlend();
                         }
                     }

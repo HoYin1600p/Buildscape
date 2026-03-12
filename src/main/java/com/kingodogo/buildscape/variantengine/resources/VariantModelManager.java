@@ -56,15 +56,18 @@ public class VariantModelManager {
             "\"down\":{\"uv\":[0,0,16,16],\"texture\":\"#bottom\",\"cullface\":\"down\"}}} " +
             "]";
     private static final String STAIRS_ELEMENTS = "[" +
-            "{\"from\":[0,0,0],\"to\":[16,16,8],\"faces\":{" +
-            "\"north\":{\"uv\":[0,0,16,16],\"texture\":\"#side\",\"cullface\":\"north\"}," +
-            "\"south\":{\"uv\":[0,0,16,16],\"texture\":\"#side\"}," +
+            "{\"from\":[0,0,0],\"to\":[8,16,8],\"faces\":{" +
+            "\"north\":{\"uv\":[8,0,16,16],\"texture\":\"#side\",\"cullface\":\"north\"}," +
             "\"west\":{\"uv\":[0,0,8,16],\"texture\":\"#side\",\"cullface\":\"west\"}," +
-            "\"east\":{\"uv\":[8,0,16,16],\"texture\":\"#side\"}," +
-            "\"up\":{\"uv\":[0,0,16,8],\"texture\":\"#top\",\"cullface\":\"up\"}," +
-            "\"down\":{\"uv\":[0,8,16,16],\"texture\":\"#bottom\",\"cullface\":\"down\"}}}," +
+            "\"up\":{\"uv\":[0,0,8,8],\"texture\":\"#top\",\"cullface\":\"up\"}," +
+            "\"down\":{\"uv\":[0,8,8,16],\"texture\":\"#bottom\",\"cullface\":\"down\"}}}," +
+            "{\"from\":[8,0,0],\"to\":[16,16,8],\"faces\":{" +
+            "\"north\":{\"uv\":[0,0,8,16],\"texture\":\"#side\",\"cullface\":\"north\"}," +
+            "\"south\":{\"uv\":[8,0,16,16],\"texture\":\"#side\"}," +
+            "\"east\":{\"uv\":[8,0,16,16],\"texture\":\"#side\",\"cullface\":\"east\"}," +
+            "\"up\":{\"uv\":[8,0,16,8],\"texture\":\"#top\",\"cullface\":\"up\"}," +
+            "\"down\":{\"uv\":[8,8,16,16],\"texture\":\"#bottom\",\"cullface\":\"down\"}}}," +
             "{\"from\":[0,0,8],\"to\":[8,16,16],\"faces\":{" +
-            "\"north\":{\"uv\":[0,0,8,16],\"texture\":\"#side\"}," +
             "\"south\":{\"uv\":[0,0,8,16],\"texture\":\"#side\",\"cullface\":\"south\"}," +
             "\"west\":{\"uv\":[8,0,16,16],\"texture\":\"#side\",\"cullface\":\"west\"}," +
             "\"east\":{\"uv\":[0,0,8,16],\"texture\":\"#side\"}," +

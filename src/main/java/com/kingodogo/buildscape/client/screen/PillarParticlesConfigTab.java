@@ -379,12 +379,12 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
     }
 
     private void createColorSwatchesAndPicker(PillarParticleConfig config) {
-        int padding = 10;
-        int swatchSize = 20;
-        int swatchSpacing = 5;
-        int hexFieldWidth = 80;
-        int hexFieldHeight = 20;
-        int rowSpacing = 25;
+        int padding = BuildScapeConfigScreen.scaleSize(10);
+        int swatchSize = BuildScapeConfigScreen.getScaledEditBoxHeight();
+        int swatchSpacing = BuildScapeConfigScreen.scaleSize(5);
+        int hexFieldWidth = BuildScapeConfigScreen.scaleSize(80);
+        int hexFieldHeight = BuildScapeConfigScreen.getScaledEditBoxHeight();
+        int rowSpacing = BuildScapeConfigScreen.scaleSize(25);
 
         // Clear existing widgets
         if (colorSwatchButtons != null) {
@@ -566,15 +566,30 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
     // Base positions for color swatches (without scroll offset)
     private int colorBaseStartY = 0;
 
+    /**
+     * Sets the height of an EditBox via reflection since 1.18.2 EditBox
+     * doesn't have a public setHeight method.
+     */
+    private static void setEditBoxHeight(EditBox editBox, int height) {
+        try {
+            java.lang.reflect.Field heightField = net.minecraft.client.gui.components.AbstractWidget.class
+                    .getDeclaredField("height");
+            heightField.setAccessible(true);
+            heightField.setInt(editBox, height);
+        } catch (Exception e) {
+            // Fallback - ignore
+        }
+    }
+
     private void updateColorSwatchesPositions() {
         // Use panel-relative positioning to ensure components stay within bounds
-        int padding = 10;
+        int padding = BuildScapeConfigScreen.scaleSize(10);
 
-        int swatchSize = 20;
-        int swatchSpacing = 4;
-        int hexFieldWidth = 80;
-        int hexFieldHeight = 20;
-        int rowSpacing = 4; // Reduced spacing between rows (was 25)
+        int swatchSize = BuildScapeConfigScreen.getScaledEditBoxHeight();
+        int swatchSpacing = BuildScapeConfigScreen.scaleSize(4);
+        int hexFieldWidth = BuildScapeConfigScreen.scaleSize(80);
+        int hexFieldHeight = BuildScapeConfigScreen.getScaledEditBoxHeight();
+        int rowSpacing = BuildScapeConfigScreen.scaleSize(4); // Reduced spacing between rows (was 25)
 
         // Calculate positions relative to colorBox panel bounds
         // Layout: 2 columns of swatches (2 per row)
@@ -645,6 +660,8 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
 
                 colorSwatchButtons.get(i).x = swatchX;
                 colorSwatchButtons.get(i).y = swatchY;
+                colorSwatchButtons.get(i).setWidth(swatchSize);
+                colorSwatchButtons.get(i).setHeight(swatchSize);
 
                 // Align hex field vertically with swatch (center it if heights differ)
                 int hexFieldY = swatchY; // Same Y position for side-by-side alignment
@@ -670,6 +687,7 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
                 } else {
                     colorHexFields.get(i).setWidth(hexFieldWidth);
                 }
+                setEditBoxHeight(colorHexFields.get(i), hexFieldHeight);
             }
         }
 

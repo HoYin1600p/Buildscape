@@ -32,7 +32,9 @@ public abstract class VineBlockMixin extends Block {
 
     @Inject(method = "<init>", at = @At("RETURN"))
     private void buildscape$setDefaultSheared(Properties properties, CallbackInfo ci) {
-        this.registerDefaultState(this.defaultBlockState().setValue(BUILDSCAPE_SHEARED, false));
+        if (this.defaultBlockState().hasProperty(BUILDSCAPE_SHEARED)) {
+            this.registerDefaultState(this.defaultBlockState().setValue(BUILDSCAPE_SHEARED, false));
+        }
     }
 
     @Inject(method = "randomTick", at = @At("HEAD"), cancellable = true)

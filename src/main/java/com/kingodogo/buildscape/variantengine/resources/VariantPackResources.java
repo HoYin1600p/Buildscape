@@ -7,6 +7,7 @@ import com.google.gson.JsonObject;
 import com.kingodogo.buildscape.BuildScape;
 import com.kingodogo.buildscape.variantengine.builder.BlockShape;
 import com.kingodogo.buildscape.variantengine.util.BlockBiMaps;
+import com.kingodogo.buildscape.variantengine.family.BlockFamilyDetector;
 import com.kingodogo.buildscape.variantengine.util.VariantNamingUtil;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackResources;
@@ -46,29 +47,73 @@ public class VariantPackResources implements PackResources {
         JsonObject langObj = new JsonObject();
 
         for (Block baseBlock : BlockBiMaps.BASE_BLOCKS) {
-            ResourceLocation parentId = baseBlock.getRegistryName();
-            if (parentId == null || parentId.equals(new ResourceLocation("minecraft", "air"))) continue;
+            ResourceLocation baseId = baseBlock.getRegistryName();
+            if (baseId == null || baseId.equals(new ResourceLocation("minecraft", "air"))) continue;
 
-            for (BlockShape shape : BlockShape.values()) {
-                if (shape == BlockShape.BASE) continue;
+            // Only generate VERTICAL_SLAB and VERTICAL_STAIRS shapes
+            BlockShape[] recipeShapes = {BlockShape.VERTICAL_SLAB, BlockShape.VERTICAL_STAIRS};
+
+            for (BlockShape shape : recipeShapes) {
                 Block variant = BlockBiMaps.getBlockOf(shape, baseBlock);
                 if (variant == null) continue;
 
                 ResourceLocation verticalId = variant.getRegistryName();
-                if (verticalId == null) continue;
+                if (verticalId == null || !verticalId.getNamespace().equals(BuildScape.MODID)) continue;
 
-                addShapelessRecipe(verticalId, parentId);
-                addStonecuttingRecipe(verticalId, parentId);
+                // ============================================================
+                // RECIPE LOGIC: Determine what recipes to generate
+                // ============================================================
+                // Rule 1: Crafting (shapeless 1:1) ONLY when horizontal slab/stair exists
+                //         e.g. 1x stone_slab ↔ 1x v_slab_stone
+                // Rule 2: Stonecutting from horizontal slab/stair (always, if exists)
+                //         e.g. stone_slab → v_slab_stone (stonecutter)
+                // Rule 3: Stonecutting from base block (as extra convenience, if base != slab/stair)
+                //         e.g. stone → v_slab_stone (stonecutter)
+                // Rule 4: If NO horizontal counterpart exists, stonecutting from base only. NO crafting.
+                // Rule 5: NEVER use logs, raw materials, etc. as crafting input.
+                // ============================================================
+
+                ResourceLocation horizontalId = null;
+                if (shape == BlockShape.VERTICAL_SLAB) {
+                    Block slab = BlockBiMaps.getBlockOf(BlockShape.SLAB, baseBlock);
+                    if (slab != null && slab.getRegistryName() != null) {
+                        horizontalId = slab.getRegistryName();
+                    }
+                } else if (shape == BlockShape.VERTICAL_STAIRS) {
+                    Block stairs = BlockBiMaps.getBlockOf(BlockShape.STAIRS, baseBlock);
+                    if (stairs != null && stairs.getRegistryName() != null) {
+                        horizontalId = stairs.getRegistryName();
+                    }
+                }
+
+                if (horizontalId != null) {
+                    // HAS horizontal counterpart → crafting + stonecutting
+                    addShapelessRecipe(verticalId, horizontalId);
+                    addStonecuttingRecipe(verticalId, horizontalId);
+
+                    // ALSO add stonecutting from base block (if base is different from the slab/stair)
+                    if (!baseId.equals(horizontalId) && isValidStonecuttingSource(baseId)) {
+                        addStonecuttingRecipe(verticalId, baseId, "_from_base_stonecutting");
+                    }
+                } else {
+                    // NO horizontal counterpart → stonecutting from base only, NO crafting
+                    if (isValidStonecuttingSource(baseId)) {
+                        addStonecuttingRecipe(verticalId, baseId);
+                    }
+                }
+
                 addLootTable(verticalId, shape);
                 addBlockTags(verticalId, baseBlock, shape);
 
+                boolean isTransparent = BlockFamilyDetector.isGlass(baseBlock) || !baseBlock.defaultBlockState().canOcclude();
+                
                 if (shape == BlockShape.VERTICAL_SLAB) {
-                    addVerticalSlabResources(verticalId, parentId);
+                    addVerticalSlabResources(verticalId, baseId, isTransparent);
                 } else if (shape == BlockShape.VERTICAL_STAIRS) {
-                    addVerticalStairResources(verticalId, parentId);
+                    addVerticalStairResources(verticalId, baseId, isTransparent);
                 }
 
-                String langName = VariantNamingUtil.generateLangName(parentId, shape);
+                String langName = VariantNamingUtil.generateLangName(baseId, shape);
                 String translationKey = verticalId.getPath();
                 langObj.addProperty("block." + BuildScape.MODID + "." + translationKey, langName);
                 langObj.addProperty("item." + BuildScape.MODID + "." + translationKey, langName);
@@ -79,9 +124,11 @@ public class VariantPackResources implements PackResources {
         cachedResources.forEach(this::saveToDisk);
     }
 
-    private void addVerticalSlabResources(ResourceLocation verticalId, ResourceLocation parentId) {
+    private void addVerticalSlabResources(ResourceLocation verticalId, ResourceLocation baseId, boolean isTransparent) {
         String path = verticalId.getPath();
-        String tex = parentId.getNamespace() + ":block/" + parentId.getPath().replace("_slab", "").replace("_stairs", "").replace("_stair", "");
+        // Use the base block ID directly for texture, stripping ONLY if it is an orphan-based variant
+        String cleanPath = baseId.getPath().replaceAll("_slab$", "").replaceAll("_stairs$", "").replaceAll("_stair$", "");
+        String tex = baseId.getNamespace() + ":block/" + cleanPath;
 
         JsonObject blockstate = new JsonObject();
         JsonObject variants = new JsonObject();
@@ -120,7 +167,7 @@ public class VariantPackResources implements PackResources {
         
         JsonObject faces = new JsonObject();
         faces.add("north", createFace("north", "side", 0, 0, 16, 16));
-        faces.add("south", createFace(null, "side", 0, 0, 16, 16)); 
+        faces.add("south", createFace(null, "side", 0, 0, 16, 16)); // Internal 
         faces.add("west", createFace("west", "side", 0, 0, 8, 16));
         faces.add("east", createFace("east", "side", 8, 0, 16, 16));
         faces.add("up", createFace("up", "top", 0, 0, 16, 8));
@@ -140,17 +187,46 @@ public class VariantPackResources implements PackResources {
         doubleModel.add("textures", doubleTextures);
         putResource("assets/" + BuildScape.MODID + "/models/block/" + path + "_double.json", GSON.toJson(doubleModel));
 
-        // Item Model
+        // Item Model — standalone geometry, does NOT inherit from block model.
+        // This ensures consistent facing in inventory regardless of model baking.
         JsonObject itemModel = new JsonObject();
-        itemModel.addProperty("parent", BuildScape.MODID + ":block/" + path);
-        // Perfectly Centered Slab: Move -2 on X and -1 on Y to perfectly center and align profile @ 315 rotation
-        itemModel.add("display", getPremiumDisplay(-2, -1, 4, 30, 315, 0));
+        itemModel.addProperty("parent", "minecraft:block/block");
+        
+        JsonObject itemTextures = new JsonObject();
+        itemTextures.addProperty("particle", tex);
+        itemTextures.addProperty("top", tex);
+        itemTextures.addProperty("bottom", tex);
+        itemTextures.addProperty("side", tex);
+        itemModel.add("textures", itemTextures);
+
+        // Defined slab geometry inline — always north-facing half (from=0,0,0 to=16,16,8)
+        JsonArray itemElements = new JsonArray();
+        JsonObject itemElement = new JsonObject();
+        itemElement.add("from", createJsonArray(0, 0, 0));
+        itemElement.add("to", createJsonArray(16, 16, 8));
+        JsonObject itemFaces = new JsonObject();
+        // CULLFACE MUST BE NULL FOR ITEMS TO PREVENT THEM FROM LOOKING HOLLOW IN INVENTORY
+        itemFaces.add("north", createFace(null, "side", 0, 0, 16, 16));
+        itemFaces.add("south", createFace(null, "side", 0, 0, 16, 16)); 
+        itemFaces.add("west", createFace(null, "side", 0, 0, 8, 16));
+        itemFaces.add("east", createFace(null, "side", 8, 0, 16, 16));
+        itemFaces.add("up", createFace(null, "top", 0, 0, 16, 8));
+        itemFaces.add("down", createFace(null, "bottom", 0, 8, 16, 16));
+        itemElement.add("faces", itemFaces);
+        itemElements.add(itemElement);
+        itemModel.add("elements", itemElements);
+
+        // Perfectly Centered Slab: Shift +4 on Z to center the 8-unit depth slab in a 16-unit depth workspace.
+        // Moved -2.0 on X to shift it left in the GUI slot for better visual centering as requested.
+        itemModel.add("display", getPremiumDisplay(-2.0f, 0, 4, 30, 315, 0));
         putResource("assets/" + BuildScape.MODID + "/models/item/" + path + ".json", GSON.toJson(itemModel));
     }
 
-    private void addVerticalStairResources(ResourceLocation verticalId, ResourceLocation parentId) {
+    private void addVerticalStairResources(ResourceLocation verticalId, ResourceLocation baseId, boolean isTransparent) {
         String path = verticalId.getPath();
-        String tex = parentId.getNamespace() + ":block/" + parentId.getPath().replace("_slab", "").replace("_stairs", "").replace("_stair", "");
+        // Use the base block ID directly for texture, stripping ONLY if it is an orphan-based variant
+        String cleanPath = baseId.getPath().replaceAll("_slab$", "").replaceAll("_stairs$", "").replaceAll("_stair$", "");
+        String tex = baseId.getNamespace() + ":block/" + cleanPath;
 
         JsonObject blockstate = new JsonObject();
         JsonObject variants = new JsonObject();
@@ -179,39 +255,103 @@ public class VariantPackResources implements PackResources {
         model.add("textures", textures);
 
         JsonArray elements = new JsonArray();
+        
+        // Box 1: Front-Left (0,0,0 to 8,16,8)
         JsonObject e1 = new JsonObject();
         e1.add("from", createJsonArray(0, 0, 0));
-        e1.add("to", createJsonArray(16, 16, 8));
+        e1.add("to", createJsonArray(8, 16, 8));
         JsonObject f1 = new JsonObject();
-        f1.add("north", createFace("north", "side", 0, 0, 16, 16));
-        f1.add("south", createFace(null, "side", 0, 0, 16, 16)); 
+        f1.add("north", createFace("north", "side", 8, 0, 16, 16));
         f1.add("west", createFace("west", "side", 0, 0, 8, 16));
-        f1.add("east", createFace("east", "side", 8, 0, 16, 16));
-        f1.add("up", createFace("up", "top", 0, 0, 16, 8));
-        f1.add("down", createFace("down", "bottom", 0, 8, 16, 16));
+        f1.add("up", createFace("up", "top", 0, 0, 8, 8));
+        f1.add("down", createFace("down", "bottom", 0, 8, 8, 16));
         e1.add("faces", f1);
         elements.add(e1);
 
+        // Box 2: Front-Right (8,0,0 to 16,16,8)
         JsonObject e2 = new JsonObject();
-        e2.add("from", createJsonArray(0, 0, 8));
-        e2.add("to", createJsonArray(8, 16, 16));
+        e2.add("from", createJsonArray(8, 0, 0));
+        e2.add("to", createJsonArray(16, 16, 8));
         JsonObject f2 = new JsonObject();
-        f2.add("north", createFace(null, "side", 8, 0, 16, 16)); 
-        f2.add("south", createFace("south", "side", 0, 0, 16, 16));
-        f2.add("west", createFace("west", "side", 8, 0, 16, 16));
-        f2.add("east", createFace(null, "side", 0, 0, 8, 16)); 
-        f2.add("up", createFace("up", "top", 0, 8, 8, 16));
-        f2.add("down", createFace("down", "bottom", 0, 0, 8, 8));
+        f2.add("north", createFace("north", "side", 0, 0, 8, 16));
+        f2.add("south", createFace(null, "side", 8, 0, 16, 16)); // Exposed inside surface
+        f2.add("east", createFace("east", "side", 8, 0, 16, 16));
+        f2.add("up", createFace("up", "top", 8, 0, 16, 8));
+        f2.add("down", createFace("down", "bottom", 8, 8, 16, 16));
         e2.add("faces", f2);
         elements.add(e2);
+
+        // Box 3: Back-Left (0,0,8 to 8,16,16)
+        JsonObject e3 = new JsonObject();
+        e3.add("from", createJsonArray(0, 0, 8));
+        e3.add("to", createJsonArray(8, 16, 16));
+        JsonObject f3 = new JsonObject();
+        f3.add("south", createFace("south", "side", 0, 0, 8, 16));
+        f3.add("west", createFace("west", "side", 8, 0, 16, 16));
+        f3.add("east", createFace(null, "side", 0, 0, 8, 16)); // Exposed inside surface
+        f3.add("up", createFace("up", "top", 0, 8, 8, 16));
+        f3.add("down", createFace("down", "bottom", 0, 0, 8, 8));
+        e3.add("faces", f3);
+        elements.add(e3);
 
         model.add("elements", elements);
         putResource("assets/" + BuildScape.MODID + "/models/block/" + path + ".json", GSON.toJson(model));
 
-        // Item Model
+        // Item Model — standalone geometry for consistent inventory display
         JsonObject itemModel = new JsonObject();
-        itemModel.addProperty("parent", BuildScape.MODID + ":block/" + path);
-        // Front-Facing Stair: Exactly 315 degrees as requested, standard centering (0,0,0)
+        itemModel.addProperty("parent", "minecraft:block/block");
+
+        JsonObject itemTextures = new JsonObject();
+        itemTextures.addProperty("particle", tex);
+        itemTextures.addProperty("top", tex);
+        itemTextures.addProperty("bottom", tex);
+        itemTextures.addProperty("side", tex);
+        itemModel.add("textures", itemTextures);
+
+        // Stair geometry: Three-box mosaic to avoid overlapping internal segments (no middle line)
+        // This keeps it 100% solid while being seamless for glass.
+        JsonArray itemElements = new JsonArray();
+        
+        // Box 1: Front-Left (0,0,0 to 8,16,8)
+        JsonObject ie1 = new JsonObject();
+        ie1.add("from", createJsonArray(0, 0, 0));
+        ie1.add("to", createJsonArray(8, 16, 8));
+        JsonObject if1 = new JsonObject();
+        // CULLFACE MUST BE NULL FOR ITEMS
+        if1.add("north", createFace(null, "side", 0, 0, 8, 16));
+        if1.add("west", createFace(null, "side", 0, 0, 8, 16));
+        if1.add("up", createFace(null, "top", 0, 0, 8, 8));
+        if1.add("down", createFace(null, "bottom", 0, 8, 8, 16));
+        ie1.add("faces", if1);
+        itemElements.add(ie1);
+
+        // Box 2: Front-Right (8,0,0 to 16,16,8)
+        JsonObject ie2 = new JsonObject();
+        ie2.add("from", createJsonArray(8, 0, 0));
+        ie2.add("to", createJsonArray(16, 16, 8));
+        JsonObject if2 = new JsonObject();
+        if2.add("north", createFace(null, "side", 8, 0, 16, 16));
+        if2.add("south", createFace(null, "side", 8, 0, 16, 16));
+        if2.add("east", createFace(null, "side", 8, 0, 16, 16));
+        if2.add("up", createFace(null, "top", 8, 0, 16, 8));
+        if2.add("down", createFace(null, "bottom", 8, 8, 16, 16));
+        ie2.add("faces", if2);
+        itemElements.add(ie2);
+
+        // Box 3: Back-Left (0,0,8 to 8,16,16)
+        JsonObject ie3 = new JsonObject();
+        ie3.add("from", createJsonArray(0, 0, 8));
+        ie3.add("to", createJsonArray(8, 16, 16));
+        JsonObject if3 = new JsonObject();
+        if3.add("south", createFace(null, "side", 0, 0, 8, 16));
+        if3.add("west", createFace(null, "side", 8, 0, 16, 16));
+        if3.add("east", createFace(null, "side", 0, 0, 8, 16));
+        if3.add("up", createFace(null, "top", 0, 8, 8, 16));
+        if3.add("down", createFace(null, "bottom", 0, 0, 8, 8));
+        ie3.add("faces", if3);
+        itemElements.add(ie3);
+
+        itemModel.add("elements", itemElements);
         itemModel.add("display", getPremiumDisplay(0, 0, 0, 30, 315, 0));
         putResource("assets/" + BuildScape.MODID + "/models/item/" + path + ".json", GSON.toJson(itemModel));
     }
@@ -293,6 +433,10 @@ public class VariantPackResources implements PackResources {
     }
 
     private void addStonecuttingRecipe(ResourceLocation verticalId, ResourceLocation parentId) {
+        addStonecuttingRecipe(verticalId, parentId, "_stonecutting");
+    }
+
+    private void addStonecuttingRecipe(ResourceLocation verticalId, ResourceLocation parentId, String suffix) {
         String path = verticalId.getPath();
         JsonObject recipe = new JsonObject();
         recipe.addProperty("type", "minecraft:stonecutting");
@@ -301,7 +445,31 @@ public class VariantPackResources implements PackResources {
         recipe.add("ingredient", ingredient);
         recipe.addProperty("result", verticalId.toString());
         recipe.addProperty("count", 1);
-        putResource("data/" + BuildScape.MODID + "/recipes/" + path + "_from_" + parentId.getPath() + "_stonecutting.json", GSON.toJson(recipe));
+        putResource("data/" + BuildScape.MODID + "/recipes/" + path + suffix + ".json", GSON.toJson(recipe));
+    }
+
+    /**
+     * Check if a block is a valid stonecutting source.
+     * Prevents creating recipes like oak_log → v_slab_oak or iron_ore → v_slab_iron.
+     * Valid sources: solid building blocks, planks, bricks, stone types, etc.
+     * Invalid sources: logs, ores, raw materials, ingots, etc.
+     */
+    private boolean isValidStonecuttingSource(ResourceLocation id) {
+        if (id == null) return false;
+        String path = id.getPath().toLowerCase();
+        
+        // Use ForgeRegistries to safely get the block instance
+        Block b = net.minecraftforge.registries.ForgeRegistries.BLOCKS.getValue(id);
+        if (b == null || b == net.minecraft.world.level.block.Blocks.AIR) return false;
+
+        // Allowed keywords: logs, wood, stems, etc. (per user request)
+        // Invalid source keywords — raw materials, ores, functional blocks
+        if (path.contains("_ore") || path.contains("raw_") || path.contains("_ingot") || path.contains("_nugget")) return false;
+        if (path.contains("spawner") || path.contains("command") || path.contains("barrier")) return false;
+        if (path.contains("_egg") || path.contains("_spawn")) return false;
+        if (path.contains("command") || path.contains("jigsaw") || path.contains("structure_block")) return false;
+        
+        return true;
     }
 
     private void addLootTable(ResourceLocation verticalId, BlockShape shape) {

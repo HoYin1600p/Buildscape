@@ -12,7 +12,6 @@ import java.util.function.BiConsumer;
 
 public class ModGameRules {
     public static GameRules.Key<GameRules.BooleanValue> FAST_LEAF_DECAY;
-    public static GameRules.Key<GameRules.BooleanValue> CREATIVE_TREE_BREAKER;
 
     public static void register() {
         try {
@@ -21,8 +20,7 @@ public class ModGameRules {
                 if (server != null) {
                     ModMessages.INSTANCE.send(PacketDistributor.ALL.noArg(),
                             new SyncGameRulesPacket(
-                                    server.getGameRules().getBoolean(FAST_LEAF_DECAY),
-                                    server.getGameRules().getBoolean(CREATIVE_TREE_BREAKER)
+                                    server.getGameRules().getBoolean(FAST_LEAF_DECAY)
                             )
                     );
                 }
@@ -43,11 +41,7 @@ public class ModGameRules {
                     booleanType
             );
 
-            CREATIVE_TREE_BREAKER = GameRules.register(
-                    "creativeTreeBreaker",
-                    GameRules.Category.MISC,
-                    booleanType
-            );
+
         } catch (Exception e) {
             throw new RuntimeException("Failed to register gamerules", e);
         }

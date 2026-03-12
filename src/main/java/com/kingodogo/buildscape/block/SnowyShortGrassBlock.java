@@ -32,7 +32,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class SnowyShortGrassBlock
         extends BushBlock
-        implements BonemealableBlock {
+        implements SinksOnFarmland, BonemealableBlock {
 
     protected static final VoxelShape SHAPE = Block.box(
             2.0D,
@@ -45,16 +45,26 @@ public class SnowyShortGrassBlock
 
     public SnowyShortGrassBlock(BlockBehaviour.Properties properties) {
         super(properties);
+        this.registerDefaultState(this.stateDefinition.any().setValue(ON_FARMLAND, false));
     }
 
     @Override
-    public net.minecraft.world.phys.shapes.VoxelShape getShape(
+    protected void createBlockStateDefinition(net.minecraft.world.level.block.state.StateDefinition.Builder<Block, BlockState> builder) {
+        builder.add(ON_FARMLAND);
+    }
+
+    @Override
+    public VoxelShape getShape(
             BlockState state,
             BlockGetter level,
             BlockPos pos,
             CollisionContext context
     ) {
-        return SHAPE;
+        VoxelShape shape = SHAPE;
+        if (state.getValue(ON_FARMLAND)) {
+            return shape.move(0, -0.0625D, 0);
+        }
+        return shape;
     }
 
     @Override
@@ -65,9 +75,27 @@ public class SnowyShortGrassBlock
     ) {
         return (
                 state.is(BlockTags.DIRT) ||
+                        state.is(net.minecraft.world.level.block.Blocks.FARMLAND) ||
                         state.is(net.minecraft.world.level.block.Blocks.SNOW_BLOCK) ||
                         state.is(com.kingodogo.buildscape.block.ModBlocks.SNOW_BRICKS.get())
         );
+    }
+
+    @Override
+    public BlockState getStateForPlacement(net.minecraft.world.item.context.BlockPlaceContext context) {
+        BlockState state = super.getStateForPlacement(context);
+        if (state != null) {
+            return state.setValue(ON_FARMLAND, shouldSink(context.getLevel(), context.getClickedPos()));
+        }
+        return null;
+    }
+
+    @Override
+    public BlockState updateShape(BlockState state, net.minecraft.core.Direction direction, BlockState adjacentState, net.minecraft.world.level.LevelAccessor level, BlockPos pos, BlockPos adjacentPos) {
+        if (direction == net.minecraft.core.Direction.DOWN) {
+            return state.setValue(ON_FARMLAND, shouldSink(level, pos));
+        }
+        return super.updateShape(state, direction, adjacentState, level, pos, adjacentPos);
     }
 
     @Override

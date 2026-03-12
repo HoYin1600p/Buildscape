@@ -15,6 +15,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -57,8 +58,7 @@ public class VariantRegistrar {
             IForgeRegistry<Block> registry = event.getRegistry();
             scanAndRegisterVariants(registry);
         } catch (Exception e) {
-            BuildScape.LOGGER.error("VariantEngine: Block registration failed: {}", e.getMessage());
-            e.printStackTrace();
+            BuildScape.LOGGER.error("Critical error during variant block registration", e);
         }
     }
 
@@ -71,7 +71,6 @@ public class VariantRegistrar {
         try {
             registerVariantItems(event.getRegistry());
         } catch (Exception e) {
-            BuildScape.LOGGER.error("VariantEngine: Item registration failed: {}", e.getMessage());
         }
     }
 
@@ -79,7 +78,6 @@ public class VariantRegistrar {
         DETECTED_FAMILIES.clear();
         BlockBiMaps.BASE_BLOCKS.clear();
 
-        BuildScape.LOGGER.info("VariantEngine: Scanning all mods for building blocks...");
         int scanned = 0, detected = 0;
         Set<String> namespaces = new HashSet<>();
 
@@ -113,8 +111,6 @@ public class VariantRegistrar {
 
         // 4. Registration of vertical variants
         commitNewVariants(registry);
-
-        BuildScape.LOGGER.info("VariantEngine: Scanning complete. Found {} families across {} mods.", DETECTED_FAMILIES.size(), namespaces.size());
     }
 
     private static boolean processBlock(Block block, IForgeRegistry<Block> registry) {
@@ -208,7 +204,7 @@ public class VariantRegistrar {
                 }
             }
         }
-        BuildScape.LOGGER.info("VariantEngine: Registered {} new vertical blocks.", count);
+        BuildScape.LOGGER.info("Buildscape Registerd Vertical Varients: {}", count);
     }
 
     private static boolean shouldGenerate(BlockFamily family, Block base, String path, String ns, BlockShape shape) {
@@ -239,7 +235,6 @@ public class VariantRegistrar {
                 count++;
             }
         }
-        BuildScape.LOGGER.info("VariantEngine: Registered {} variant items.", count);
     }
 
     private static void seedBiMaps(BlockFamily cf) {
@@ -289,4 +284,44 @@ public class VariantRegistrar {
     private static ResourceLocation safeRegistryName(Block b) { try { return b.getRegistryName(); } catch (Exception e) { return null; } }
 
     public static List<BlockFamily> getDetectedFamilies() { return new ArrayList<>(DETECTED_FAMILIES.values()); }
+
+    /**
+     * Handles remapping of missing blocks/items to avoid handshake errors when loading old worlds.
+     */
+    @Mod.EventBusSubscriber(modid = BuildScape.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
+    public static class Remapper {
+        @SubscribeEvent
+        public static void onMissingBlockMappings(RegistryEvent.MissingMappings<Block> event) {
+            handleMappings(event);
+        }
+
+        @SubscribeEvent
+        public static void onMissingItemMappings(RegistryEvent.MissingMappings<Item> event) {
+            handleMappings(event);
+        }
+
+        @SubscribeEvent
+        public static void onMissingBlockEntityMappings(RegistryEvent.MissingMappings<BlockEntityType<?>> event) {
+            handleMappings(event);
+        }
+
+        private static <T extends net.minecraftforge.registries.IForgeRegistryEntry<T>> void handleMappings(RegistryEvent.MissingMappings<T> event) {
+            for (RegistryEvent.MissingMappings.Mapping<T> mapping : event.getAllMappings()) {
+                String ns = mapping.key.getNamespace();
+                String path = mapping.key.getPath();
+                
+                // Catch our mod's removed items AND legacy everycomp items related to us
+                boolean isLegacyBuildScape = ns.equals(BuildScape.MODID) || (ns.equals("everycomp") && path.contains("buildscape"));
+                
+                if (isLegacyBuildScape) {
+                    if (path.contains("counter") || path.contains("leaves") || path.contains("pavement") || 
+                        path.contains("decorated") || path.contains("vertical") || path.contains("_v_") || 
+                        path.contains("v_slab") || path.contains("v_stair") || path.contains("q_piece") || path.contains("hedge")) {
+                        
+                        mapping.ignore();
+                    }
+                }
+            }
+        }
+    }
 }

@@ -123,8 +123,6 @@ public class VariantModelManager {
         Map<ResourceLocation, BakedModel> registry = event.getModelRegistry();
         ModelBakery bakery = event.getModelLoader();
 
-        BuildScape.LOGGER.info("VariantEngine: Starting dynamic model baking");
-
         for (Block baseBlock : BlockBiMaps.BASE_BLOCKS) {
             for (BlockShape shape : BlockShape.values()) {
                 Block variant = BlockBiMaps.getBlockOf(shape, baseBlock);
@@ -133,8 +131,6 @@ public class VariantModelManager {
                 }
             }
         }
-
-        BuildScape.LOGGER.info("VariantEngine: Finished dynamic model baking");
     }
 
     private static void bakeVariant(Block parent, Block variant, BlockShape shape, Map<ResourceLocation, BakedModel> registry, ModelBakery bakery) {
@@ -154,7 +150,6 @@ public class VariantModelManager {
                 bakeVerticalQuarterPieceModels(verticalId, parent, parentParticle, registry, bakery);
             }
         } catch (Exception e) {
-            BuildScape.LOGGER.error("VariantEngine: Failed to bake models for " + variant.getRegistryName(), e);
         }
     }
 
@@ -258,7 +253,6 @@ public class VariantModelManager {
                 registry.put(location, baked);
             }
         } catch (Exception e) {
-            BuildScape.LOGGER.error("VariantEngine: Failed to bake model " + location, e);
         }
     }
 
@@ -354,7 +348,6 @@ public class VariantModelManager {
             resolve.setAccessible(true);
             resolve.invoke(model, (java.util.function.Function<ResourceLocation, UnbakedModel>) bakery::getModel);
         } catch (Exception e) {
-            BuildScape.LOGGER.warn("VariantEngine: Failed reflection resolve for " + model);
         }
     }
 

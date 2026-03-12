@@ -16,7 +16,6 @@ public class VariantClientRegistry {
 
     @SubscribeEvent
     public static void onClientSetup(FMLClientSetupEvent event) {
-        BuildScape.LOGGER.info("VariantEngine: Synchronizing RenderLayers for generated variants...");
         
         event.enqueueWork(() -> {
             for (BlockFamily family : VariantRegistrar.getDetectedFamilies()) {
@@ -56,7 +55,6 @@ public class VariantClientRegistry {
                     if (variant.getRegistryName().getNamespace().equals(BuildScape.MODID)) {
                         // Applying the render layer to both the block and its state for maximum world transparency
                         ItemBlockRenderTypes.setRenderLayer(variant, finalLayer);
-                        BuildScape.LOGGER.info("VariantEngine: Applied {} layer to variant {}", finalLayer, variant.getRegistryName());
                     }
                 });
             }

@@ -31,7 +31,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import java.util.Collections;
 import java.util.List;
 
-public class StarBlock extends BushBlock implements SimpleWaterloggedBlock {
+public class StarBlock extends BushBlock implements SinksOnFarmland, SimpleWaterloggedBlock {
 
     public static final BooleanProperty WATERLOGGED =
             BlockStateProperties.WATERLOGGED;
@@ -63,6 +63,7 @@ public class StarBlock extends BushBlock implements SimpleWaterloggedBlock {
                         .setValue(LIT, false)
                         .setValue(WATERLOGGED, false)
                         .setValue(VERTICAL_DIRECTION, Direction.UP)
+                        .setValue(ON_FARMLAND, false)
         );
     }
 
@@ -70,7 +71,7 @@ public class StarBlock extends BushBlock implements SimpleWaterloggedBlock {
     protected void createBlockStateDefinition(
             StateDefinition.Builder<Block, BlockState> builder
     ) {
-        builder.add(LIT, WATERLOGGED, VERTICAL_DIRECTION);
+        builder.add(LIT, WATERLOGGED, VERTICAL_DIRECTION, ON_FARMLAND);
     }
 
     @Override
@@ -81,7 +82,11 @@ public class StarBlock extends BushBlock implements SimpleWaterloggedBlock {
             CollisionContext context
     ) {
         Direction direction = state.getValue(VERTICAL_DIRECTION);
-        return direction == Direction.DOWN ? SHAPE_DOWN : SHAPE_UP;
+        VoxelShape shape = direction == Direction.DOWN ? SHAPE_DOWN : SHAPE_UP;
+        if (state.getValue(ON_FARMLAND) && direction == Direction.UP) {
+            return shape.move(0, -0.0625D, 0);
+        }
+        return shape;
     }
 
     @Override
@@ -90,7 +95,7 @@ public class StarBlock extends BushBlock implements SimpleWaterloggedBlock {
             BlockGetter level,
             BlockPos pos
     ) {
-        return !state.isAir();
+        return !state.isAir() || state.is(net.minecraft.world.level.block.Blocks.FARMLAND);
     }
 
     @Override
@@ -151,7 +156,8 @@ public class StarBlock extends BushBlock implements SimpleWaterloggedBlock {
         return this.defaultBlockState()
                 .setValue(LIT, false)
                 .setValue(WATERLOGGED, fluidstate.getType() == Fluids.WATER)
-                .setValue(VERTICAL_DIRECTION, verticalDirection);
+                .setValue(VERTICAL_DIRECTION, verticalDirection)
+                .setValue(ON_FARMLAND, verticalDirection == Direction.UP && shouldSink(level, clickedPos));
     }
 
     @Override
@@ -165,6 +171,9 @@ public class StarBlock extends BushBlock implements SimpleWaterloggedBlock {
     ) {
         if (state.getValue(WATERLOGGED)) {
             level.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
+        }
+        if (direction == Direction.DOWN) {
+            return state.setValue(ON_FARMLAND, state.getValue(VERTICAL_DIRECTION) == Direction.UP && shouldSink(level, pos));
         }
         return super.updateShape(
                 state,

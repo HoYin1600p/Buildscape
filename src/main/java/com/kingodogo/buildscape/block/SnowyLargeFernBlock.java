@@ -19,10 +19,25 @@ import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 
-public class SnowyLargeFernBlock extends DoublePlantBlock {
+public class SnowyLargeFernBlock extends DoublePlantBlock implements SinksOnFarmland {
 
     public SnowyLargeFernBlock(BlockBehaviour.Properties properties) {
         super(properties);
+        this.registerDefaultState(this.stateDefinition.any().setValue(HALF, DoubleBlockHalf.LOWER).setValue(ON_FARMLAND, false));
+    }
+
+    @Override
+    protected void createBlockStateDefinition(net.minecraft.world.level.block.state.StateDefinition.Builder<net.minecraft.world.level.block.Block, BlockState> builder) {
+        builder.add(HALF, ON_FARMLAND);
+    }
+
+    @Override
+    public net.minecraft.world.phys.shapes.VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, net.minecraft.world.phys.shapes.CollisionContext context) {
+        net.minecraft.world.phys.shapes.VoxelShape shape = super.getShape(state, level, pos, context);
+        if (state.getValue(ON_FARMLAND)) {
+            return shape.move(0, -0.0625D, 0);
+        }
+        return shape;
     }
 
     @Override
@@ -33,6 +48,7 @@ public class SnowyLargeFernBlock extends DoublePlantBlock {
     ) {
         return (
                 state.is(BlockTags.DIRT) ||
+                        state.is(Blocks.FARMLAND) ||
                         state.is(Blocks.SNOW_BLOCK) ||
                         state.is(com.kingodogo.buildscape.block.ModBlocks.SNOW_BRICKS.get())
         );
@@ -51,12 +67,23 @@ public class SnowyLargeFernBlock extends DoublePlantBlock {
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         BlockPos pos = context.getClickedPos();
-        return (
-                pos.getY() < context.getLevel().getMaxBuildHeight() - 1 &&
-                        context.getLevel().getBlockState(pos.above()).canBeReplaced(context)
-        )
-                ? super.getStateForPlacement(context)
-                : null;
+        if (pos.getY() < context.getLevel().getMaxBuildHeight() - 1 && context.getLevel().getBlockState(pos.above()).canBeReplaced(context)) {
+            BlockState state = super.getStateForPlacement(context);
+            if (state != null) {
+                return state.setValue(ON_FARMLAND, shouldSink(context.getLevel(), pos));
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public BlockState updateShape(BlockState state, net.minecraft.core.Direction direction, BlockState adjacentState, net.minecraft.world.level.LevelAccessor level, BlockPos pos, BlockPos adjacentPos) {
+        BlockState updatedState = super.updateShape(state, direction, adjacentState, level, pos, adjacentPos);
+        if (!updatedState.isAir()) {
+            BlockPos basePos = updatedState.getValue(HALF) == DoubleBlockHalf.UPPER ? pos.below() : pos;
+            return updatedState.setValue(ON_FARMLAND, shouldSink(level, basePos));
+        }
+        return updatedState;
     }
 
     @Override

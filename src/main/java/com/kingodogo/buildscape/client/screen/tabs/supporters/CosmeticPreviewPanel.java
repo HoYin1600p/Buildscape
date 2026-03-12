@@ -196,7 +196,7 @@ public class CosmeticPreviewPanel extends BasePanel {
                 hasGlint, poseStack, bufferSource, lightLevel, overlay, model);
             bufferSource.endBatch();
         } catch (Exception e) {
-            BuildScape.getLogger().debug("3D item rendering failed, using 2D fallback: " + e.getMessage());
+            // Suppressed debug log to prevent render loop spam
             poseStack.popPose();
             RenderSystem.disableDepthTest();
             RenderSystem.disableBlend();

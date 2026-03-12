@@ -341,7 +341,7 @@ public class ParticleTrailHandler {
                         velocityX, velocityY, velocityZ);
             }
         } catch (Exception e) {
-            com.kingodogo.buildscape.BuildScape.getLogger().warn("Failed to spawn particle trail: " + e.getMessage());
+            // Suppressed debug log to prevent render loop spam
         }
 
         // Update tracking

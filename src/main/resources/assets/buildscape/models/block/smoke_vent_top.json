@@ -65,8 +65,7 @@
             5.5,
             0
           ],
-          "texture": "#0",
-          "cullface": "up"
+          "texture": "#0"
         },
         "down": {
           "uv": [
@@ -145,8 +144,7 @@
             0,
             0
           ],
-          "texture": "#0",
-          "cullface": "up"
+          "texture": "#0"
         },
         "down": {
           "uv": [

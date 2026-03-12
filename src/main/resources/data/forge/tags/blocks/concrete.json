@@ -1,7 +1,4 @@
 {
   "replace": false,
-  "values": [
-    "#buildscape:concrete_variants"
-  ]
+  "values": []
 }
-

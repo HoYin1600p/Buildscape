@@ -19,10 +19,12 @@ import net.minecraft.world.level.block.BushBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
-public class MonetFlowerBlock extends BushBlock implements BonemealableBlock {
+public class MonetFlowerBlock extends BushBlock implements SinksOnFarmland, BonemealableBlock {
 
     protected static final VoxelShape SHAPE = Block.box(
             2.0D,
@@ -35,6 +37,12 @@ public class MonetFlowerBlock extends BushBlock implements BonemealableBlock {
 
     public MonetFlowerBlock(BlockBehaviour.Properties properties) {
         super(properties);
+        this.registerDefaultState(this.stateDefinition.any().setValue(ON_FARMLAND, false));
+    }
+
+    @Override
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+        builder.add(ON_FARMLAND);
     }
 
     @Override
@@ -44,7 +52,11 @@ public class MonetFlowerBlock extends BushBlock implements BonemealableBlock {
             BlockPos pos,
             CollisionContext context
     ) {
-        return SHAPE;
+        VoxelShape shape = SHAPE;
+        if (state.getValue(ON_FARMLAND)) {
+            return shape.move(0, -0.0625D, 0);
+        }
+        return shape;
     }
 
     @Override
@@ -53,7 +65,7 @@ public class MonetFlowerBlock extends BushBlock implements BonemealableBlock {
             BlockGetter level,
             BlockPos pos
     ) {
-        return state.is(BlockTags.DIRT);
+        return state.is(BlockTags.DIRT) || state.is(net.minecraft.world.level.block.Blocks.FARMLAND);
     }
 
     @Override
@@ -66,13 +78,18 @@ public class MonetFlowerBlock extends BushBlock implements BonemealableBlock {
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         BlockState state = super.getStateForPlacement(context);
-        if (
-                state != null &&
-                        this.canSurvive(state, context.getLevel(), context.getClickedPos())
-        ) {
-            return state;
+        if (state != null) {
+            return state.setValue(ON_FARMLAND, shouldSink(context.getLevel(), context.getClickedPos()));
         }
         return null;
+    }
+
+    @Override
+    public BlockState updateShape(BlockState state, net.minecraft.core.Direction direction, BlockState adjacentState, net.minecraft.world.level.LevelAccessor level, BlockPos pos, BlockPos adjacentPos) {
+        if (direction == net.minecraft.core.Direction.DOWN) {
+            return state.setValue(ON_FARMLAND, shouldSink(level, pos));
+        }
+        return super.updateShape(state, direction, adjacentState, level, pos, adjacentPos);
     }
 
     @Override

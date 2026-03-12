@@ -29,7 +29,6 @@ public class VariantEngine {
                     packConsumer.accept(builtPack);
                 }
             });
-            BuildScape.LOGGER.info("VariantEngine: Injected dynamic resource pack for " + event.getPackType());
         }
     }
 }

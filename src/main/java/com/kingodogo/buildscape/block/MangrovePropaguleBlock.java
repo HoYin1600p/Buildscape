@@ -36,7 +36,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class MangrovePropaguleBlock
         extends BushBlock
-        implements BonemealableBlock, SimpleWaterloggedBlock {
+        implements SinksOnFarmland, BonemealableBlock, SimpleWaterloggedBlock {
 
     public static final IntegerProperty AGE = IntegerProperty.create("age", 0, 4);
     public static final IntegerProperty STAGE = IntegerProperty.create(
@@ -96,10 +96,11 @@ public class MangrovePropaguleBlock
         super(properties);
         this.registerDefaultState(
                 this.stateDefinition.any()
-                        .setValue(AGE, 0)
-                        .setValue(STAGE, 0)
-                        .setValue(HANGING, false)
-                        .setValue(WATERLOGGED, false)
+                        .setValue( AGE, 0 )
+                        .setValue( STAGE, 0 )
+                        .setValue( HANGING, false )
+                        .setValue( WATERLOGGED, false )
+                        .setValue( ON_FARMLAND, false )
         );
     }
 
@@ -107,7 +108,7 @@ public class MangrovePropaguleBlock
     protected void createBlockStateDefinition(
             StateDefinition.Builder<Block, BlockState> builder
     ) {
-        builder.add(AGE, STAGE, HANGING, WATERLOGGED);
+        builder.add(AGE, STAGE, HANGING, WATERLOGGED, ON_FARMLAND);
     }
 
     @Override
@@ -132,7 +133,11 @@ public class MangrovePropaguleBlock
                     return HANGING_SHAPE_0;
             }
         }
-        return SHAPE;
+        VoxelShape shape = SHAPE;
+        if (state.getValue(ON_FARMLAND)) {
+            return shape.move(0, -0.0625D, 0);
+        }
+        return shape;
     }
 
     @Override
@@ -150,7 +155,8 @@ public class MangrovePropaguleBlock
                 .setValue(HANGING, hanging)
                 .setValue(AGE, 0)
                 .setValue(STAGE, 0)
-                .setValue(WATERLOGGED, fluidstate.getType() == Fluids.WATER);
+                .setValue(WATERLOGGED, fluidstate.getType() == Fluids.WATER)
+                .setValue(ON_FARMLAND, !hanging && shouldSink(level, pos));
     }
 
     @Override
@@ -166,6 +172,7 @@ public class MangrovePropaguleBlock
             BlockState belowState = level.getBlockState(belowPos);
             return (
                     (belowState.is(BlockTags.DIRT) && !belowState.is(Blocks.DIRT_PATH)) ||
+                            belowState.is(Blocks.FARMLAND) ||
                             belowState.is(Blocks.MOSS_BLOCK) ||
                             belowState.is(ModBlocks.MUD.get()) ||
                             belowState.is(Blocks.CLAY) ||
@@ -198,8 +205,11 @@ public class MangrovePropaguleBlock
                 }
             }
         } else {
-            if (direction == Direction.DOWN && !this.canSurvive(state, level, pos)) {
-                return Blocks.AIR.defaultBlockState();
+            if (direction == Direction.DOWN) {
+                if (!this.canSurvive(state, level, pos)) {
+                    return Blocks.AIR.defaultBlockState();
+                }
+                return state.setValue(ON_FARMLAND, shouldSink(level, pos));
             }
         }
 

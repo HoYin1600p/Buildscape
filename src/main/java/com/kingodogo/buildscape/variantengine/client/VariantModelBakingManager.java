@@ -29,7 +29,6 @@ public class VariantModelBakingManager {
     @SubscribeEvent
     public static void onModelBake(ModelBakeEvent event) {
         try {
-            BuildScape.LOGGER.info("VariantEngine: Restoring block textures and fixing item icons...");
             Map<ResourceLocation, BakedModel> models = event.getModelRegistry();
             ResourceLocation missing = MissingTextureAtlasSprite.getLocation();
 
@@ -37,7 +36,6 @@ public class VariantModelBakingManager {
             try {
                 families = VariantRegistrar.getDetectedFamilies();
             } catch (Exception e) {
-                BuildScape.LOGGER.error("VariantEngine: Failed to get detected families, skipping model bake: {}", e.getMessage());
                 return;
             }
 
@@ -69,17 +67,13 @@ public class VariantModelBakingManager {
                                 }
                             }
                         } catch (Exception e) {
-                            BuildScape.LOGGER.debug("VariantEngine: Skipping variant model for {}: {}", variant.getRegistryName(), e.getMessage());
                         }
                     });
                     processed++;
                 } catch (Exception e) {
-                    BuildScape.LOGGER.debug("VariantEngine: Skipping family during model bake: {}", e.getMessage());
                 }
             }
-            BuildScape.LOGGER.info("VariantEngine: Model bake complete. Processed {} families.", processed);
         } catch (Exception e) {
-            BuildScape.LOGGER.error("VariantEngine: Model bake failed entirely (non-fatal): {}", e.getMessage());
         }
     }
 

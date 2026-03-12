@@ -224,7 +224,8 @@ public class PillarIdDetailConfigTab extends AbstractConfigTab {
             
             ColorSwatchButton swatch = new ColorSwatchButton(
                 0, 0,
-                20, 20,
+                BuildScapeConfigScreen.getScaledEditBoxHeight(), 
+                BuildScapeConfigScreen.getScaledEditBoxHeight(),
                 color,
                 (btn) -> onColorSwatchClicked(colorIndex)
             );
@@ -386,7 +387,7 @@ public class PillarIdDetailConfigTab extends AbstractConfigTab {
         }
 
         // Right Panel Layout: Colors (2 column layout like PillarParticlesConfigTab)
-        int swatchSize = BuildScapeConfigScreen.scaleSize(20);
+        int swatchSize = BuildScapeConfigScreen.getScaledEditBoxHeight();
         int hexFieldWidth = BuildScapeConfigScreen.scaleSize(85);
         int hexFieldHeight = BuildScapeConfigScreen.getScaledEditBoxHeight();
         int colorRowSpacing = BuildScapeConfigScreen.scaleSize(6);

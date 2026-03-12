@@ -10,6 +10,8 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SimpleWaterloggedBlock;
+import net.minecraft.world.level.block.SlabBlock;
+import net.minecraft.world.level.block.StairBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -20,6 +22,11 @@ import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraft.world.level.block.FallingBlock;
+import net.minecraft.world.level.Level;
+import net.minecraft.server.level.ServerLevel;
+import java.util.Random;
+import net.minecraft.world.entity.item.FallingBlockEntity;
 
 /**
  * Vertical Slab Block with merging functionality (North, South, East, West, Double).
@@ -98,6 +105,10 @@ public class VerticalSlabBlock extends Block implements SimpleWaterloggedBlock, 
             }
         }
 
+        if (com.kingodogo.buildscape.variantengine.family.BlockFamilyDetector.isFallingBlock(this.baseBlock)) {
+            context.getLevel().scheduleTick(blockPos, this, 2);
+        }
+
         Direction.Axis axis = context.getHorizontalDirection().getAxis();
         double d = context.getClickLocation().get(axis) - blockPos.get(axis);
 // ... existing switch logic below ...
@@ -157,11 +168,113 @@ public class VerticalSlabBlock extends Block implements SimpleWaterloggedBlock, 
     }
 
     @Override
+    public boolean skipRendering(BlockState state, BlockState adjacentState, Direction side) {
+        Block adjBlock = adjacentState.getBlock();
+        BlockState adjBaseState = adjacentState;
+        
+        if (adjBlock instanceof ExtShapeBlockInterface extShape) {
+            adjBaseState = extShape.getBaseBlock().defaultBlockState();
+        }
+        
+        boolean baseWouldSkip = this.baseBlock.skipRendering(this.defaultBlockState(), adjBaseState, side);
+        
+        // Fallback safety check for tricky glass implementations
+        if (!baseWouldSkip && com.kingodogo.buildscape.variantengine.family.BlockFamilyDetector.isGlass(this.baseBlock)) {
+            Block pureAdjBlock = (adjBlock instanceof ExtShapeBlockInterface ext) ? ext.getBaseBlock() : adjBlock;
+            if (com.kingodogo.buildscape.variantengine.family.BlockFamilyDetector.isGlass(pureAdjBlock)) {
+                if (this.baseBlock == pureAdjBlock) {
+                    baseWouldSkip = true;
+                }
+            }
+        }
+        
+        if (baseWouldSkip) {
+            if (side == Direction.UP || side == Direction.DOWN) {
+                if (adjBlock instanceof VerticalSlabBlock && adjacentState.hasProperty(TYPE)) {
+                    VerticalSlabType adjType = adjacentState.getValue(TYPE);
+                    VerticalSlabType myType = state.getValue(TYPE);
+                    if (myType == VerticalSlabType.DOUBLE) return adjType == VerticalSlabType.DOUBLE;
+                    if (adjType == VerticalSlabType.DOUBLE) return true;
+                    return myType == adjType;
+                } else if (adjBlock instanceof SlabBlock || adjBlock instanceof StairBlock || adjBlock instanceof VerticalStairsBlock) {
+                    return false;
+                }
+                return true;
+            }
+
+            if (adjBlock instanceof VerticalSlabBlock && adjacentState.hasProperty(TYPE)) {
+                VerticalSlabType myType = state.getValue(TYPE);
+                VerticalSlabType adjType = adjacentState.getValue(TYPE);
+                return getFaceProfile(myType, side) == getFaceProfile(adjType, side.getOpposite()) && getFaceProfile(myType, side) != FaceProfile.NONE;
+            } else if (adjBlock instanceof SlabBlock || adjBlock instanceof StairBlock || adjBlock instanceof VerticalStairsBlock) {
+                return false;
+            } else {
+                return state.getValue(TYPE) == VerticalSlabType.DOUBLE || getFaceProfile(state.getValue(TYPE), side) == FaceProfile.FULL;
+            }
+        }
+        
+        return super.skipRendering(state, adjacentState, side);
+    }
+
+    private enum FaceProfile { FULL, NORTH_HALF, SOUTH_HALF, WEST_HALF, EAST_HALF, NONE }
+
+    private FaceProfile getFaceProfile(VerticalSlabType type, Direction side) {
+        if (type == VerticalSlabType.DOUBLE) return FaceProfile.FULL;
+        return switch (type) {
+            case NORTH -> switch (side) {
+                case NORTH -> FaceProfile.FULL;
+                case WEST, EAST -> FaceProfile.NORTH_HALF;
+                default -> FaceProfile.NONE;
+            };
+            case SOUTH -> switch (side) {
+                case SOUTH -> FaceProfile.FULL;
+                case WEST, EAST -> FaceProfile.SOUTH_HALF;
+                default -> FaceProfile.NONE;
+            };
+            case EAST -> switch (side) {
+                case EAST -> FaceProfile.FULL;
+                case NORTH, SOUTH -> FaceProfile.EAST_HALF;
+                default -> FaceProfile.NONE;
+            };
+            case WEST -> switch (side) {
+                case WEST -> FaceProfile.FULL;
+                case NORTH, SOUTH -> FaceProfile.WEST_HALF;
+                default -> FaceProfile.NONE;
+            };
+            default -> FaceProfile.NONE;
+        };
+    }
+
+    @Override
     public BlockState updateShape(BlockState state, Direction facing, BlockState facingState, LevelAccessor level, BlockPos currentPos, BlockPos facingPos) {
         if (state.getValue(WATERLOGGED)) {
             level.scheduleTick(currentPos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
         }
+        if (com.kingodogo.buildscape.variantengine.family.BlockFamilyDetector.isFallingBlock(this.baseBlock)) {
+            level.scheduleTick(currentPos, this, 2);
+        }
         return super.updateShape(state, facing, facingState, level, currentPos, facingPos);
+    }
+
+    @Override
+    public void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean isMoving) {
+        if (com.kingodogo.buildscape.variantengine.family.BlockFamilyDetector.isFallingBlock(this.baseBlock)) {
+            level.scheduleTick(pos, this, 2);
+        }
+    }
+
+    @Override
+    public void tick(BlockState state, ServerLevel level, BlockPos pos, Random random) {
+        if (com.kingodogo.buildscape.variantengine.family.BlockFamilyDetector.isFallingBlock(this.baseBlock) && (level.isEmptyBlock(pos.below()) || FallingBlock.isFree(level.getBlockState(pos.below()))) && pos.getY() >= level.getMinBuildHeight()) {
+            FallingBlockEntity fallingblockentity = FallingBlockEntity.fall(level, pos, state);
+            this.falling(fallingblockentity);
+        }
+    }
+
+    protected void falling(FallingBlockEntity entity) {
+        if (com.kingodogo.buildscape.variantengine.family.BlockFamilyDetector.isFallingBlock(this.baseBlock)) {
+            // Logic if needed for custom falling properties
+        }
     }
 
     @Override

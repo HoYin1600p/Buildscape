@@ -16,8 +16,8 @@ public class BlockShape implements StringRepresentable, Comparable<BlockShape>, 
     private static final List<BlockShape> VALUES = Collections.unmodifiableList(SHAPES);
 
     public static final BlockShape BASE = new BlockShape(b -> true, "base", 1f, true);
-    public static final BlockShape STAIRS = new BlockShape(b -> b instanceof StairBlock, "stairs", 1f, true);
-    public static final BlockShape SLAB = new BlockShape(b -> b instanceof SlabBlock, "slab", 0.5f, true);
+    public static final BlockShape STAIRS = new BlockShape(com.kingodogo.buildscape.variantengine.util.BlockDetectionUtil::isStair, "stairs", 1f, true);
+    public static final BlockShape SLAB = new BlockShape(com.kingodogo.buildscape.variantengine.util.BlockDetectionUtil::isSlab, "slab", 0.5f, true);
     public static final BlockShape VERTICAL_SLAB = new BlockShape(b -> b instanceof VerticalSlabBlock, "vertical_slab", 0.5f, true);
     public static final BlockShape VERTICAL_STAIRS = new BlockShape(b -> b instanceof VerticalStairsBlock, "vertical_stairs", 1f, true);
     public static final BlockShape QUARTER_PIECE = new BlockShape(b -> b instanceof QuarterPieceBlock, "quarter_piece", 0.25f, true);

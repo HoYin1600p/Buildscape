@@ -3,7 +3,7 @@ package com.kingodogo.buildscape.variantengine.client;
 import com.kingodogo.buildscape.BuildScape;
 import com.kingodogo.buildscape.variantengine.builder.BlockShape;
 import com.kingodogo.buildscape.variantengine.family.BlockFamily;
-import com.kingodogo.buildscape.variantengine.registry.BlockRegistryScanner;
+import com.kingodogo.buildscape.variantengine.registry.VariantRegistrar;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
@@ -28,35 +28,58 @@ public class VariantModelBakingManager {
 
     @SubscribeEvent
     public static void onModelBake(ModelBakeEvent event) {
-        BuildScape.LOGGER.info("VariantEngine: Restoring block textures and fixing item icons...");
-        Map<ResourceLocation, BakedModel> models = event.getModelRegistry();
-        ResourceLocation missing = MissingTextureAtlasSprite.getLocation();
+        try {
+            BuildScape.LOGGER.info("VariantEngine: Restoring block textures and fixing item icons...");
+            Map<ResourceLocation, BakedModel> models = event.getModelRegistry();
+            ResourceLocation missing = MissingTextureAtlasSprite.getLocation();
 
-        for (BlockFamily family : BlockRegistryScanner.getDetectedFamilies()) {
-            Block base = family.getBaseBlock();
-            ResourceLocation baseId = base.getRegistryName();
-            if (baseId == null) continue;
+            List<BlockFamily> families;
+            try {
+                families = VariantRegistrar.getDetectedFamilies();
+            } catch (Exception e) {
+                BuildScape.LOGGER.error("VariantEngine: Failed to get detected families, skipping model bake: {}", e.getMessage());
+                return;
+            }
 
-            // Find a good donor block model (the base block itself)
-            BakedModel donor = findDonorModel(baseId, models);
-            if (donor == null) continue;
+            int processed = 0;
+            for (BlockFamily family : families) {
+                try {
+                    Block base = family.getBaseBlock();
+                    ResourceLocation baseId = base.getRegistryName();
+                    if (baseId == null) continue;
 
-            family.getVariants().forEach((shape, variant) -> {
-                ResourceLocation variantId = variant.getRegistryName();
-                if (variantId == null || !variantId.getNamespace().equals(BuildScape.MODID)) return;
+                    // Find a good donor block model (the base block itself)
+                    BakedModel donor = findDonorModel(baseId, models);
+                    if (donor == null) continue;
 
-                for (Map.Entry<ResourceLocation, BakedModel> entry : models.entrySet()) {
-                    ResourceLocation loc = entry.getKey();
-                    if (loc.getNamespace().equals(variantId.getNamespace()) && 
-                        (loc.getPath().equals(variantId.getPath()) || loc.getPath().equals(variantId.getPath() + "_double"))) {
-                        BakedModel original = entry.getValue();
-                        if (original != null && !(original instanceof VariantBakedModel)) {
-                            boolean isItem = loc instanceof ModelResourceLocation && ((ModelResourceLocation)loc).getVariant().equals("inventory");
-                            models.put(loc, new VariantBakedModel(original, donor, isItem, getCleanState(base), missing));
+                    family.getVariants().forEach((shape, variant) -> {
+                        try {
+                            ResourceLocation variantId = variant.getRegistryName();
+                            if (variantId == null || !variantId.getNamespace().equals(BuildScape.MODID)) return;
+
+                            for (Map.Entry<ResourceLocation, BakedModel> entry : models.entrySet()) {
+                                ResourceLocation loc = entry.getKey();
+                                if (loc.getNamespace().equals(variantId.getNamespace()) && 
+                                    (loc.getPath().equals(variantId.getPath()) || loc.getPath().equals(variantId.getPath() + "_double"))) {
+                                    BakedModel original = entry.getValue();
+                                    if (original != null && !(original instanceof VariantBakedModel)) {
+                                        boolean isItem = loc instanceof ModelResourceLocation && ((ModelResourceLocation)loc).getVariant().equals("inventory");
+                                        models.put(loc, new VariantBakedModel(original, donor, isItem, getCleanState(base), missing));
+                                    }
+                                }
+                            }
+                        } catch (Exception e) {
+                            BuildScape.LOGGER.debug("VariantEngine: Skipping variant model for {}: {}", variant.getRegistryName(), e.getMessage());
                         }
-                    }
+                    });
+                    processed++;
+                } catch (Exception e) {
+                    BuildScape.LOGGER.debug("VariantEngine: Skipping family during model bake: {}", e.getMessage());
                 }
-            });
+            }
+            BuildScape.LOGGER.info("VariantEngine: Model bake complete. Processed {} families.", processed);
+        } catch (Exception e) {
+            BuildScape.LOGGER.error("VariantEngine: Model bake failed entirely (non-fatal): {}", e.getMessage());
         }
     }
 
@@ -97,6 +120,7 @@ public class VariantModelBakingManager {
         private final boolean isItem;
         private final BlockState donorState;
         private final ResourceLocation missing;
+        private final Map<Direction, TextureAtlasSprite> resolvedSprites = new EnumMap<>(Direction.class);
 
         public VariantBakedModel(BakedModel geometry, BakedModel donor, boolean isItem, BlockState donorState, ResourceLocation missing) {
             this.geometry = geometry;
@@ -104,6 +128,12 @@ public class VariantModelBakingManager {
             this.isItem = isItem;
             this.donorState = donorState;
             this.missing = missing;
+            
+            // PRE-RESOLVE sprites on the Render Thread!
+            Random rand = new Random(42);
+            for (Direction d : Direction.values()) {
+                resolvedSprites.put(d, findBestSprite(d, rand));
+            }
         }
 
         @Override
@@ -120,20 +150,17 @@ public class VariantModelBakingManager {
             return processQuads(geometry.getQuads(state, side, rand), rand);
         }
 
-
         private List<BakedQuad> processQuads(List<BakedQuad> jsonQuads, Random rand) {
             List<BakedQuad> result = new ArrayList<>();
             for (BakedQuad quad : jsonQuads) {
                 Direction dir = quad.getDirection();
                 if (dir == null) dir = inferDirection(quad.getVertices());
 
-                BakedQuad donorQuad = findBestDonorQuad(dir, rand);
-                if (donorQuad != null) {
-                    result.add(remapUVs(quad, donorQuad, null));
-                } else {
-                    TextureAtlasSprite sprite = findBestSprite(dir, rand);
-                    result.add(remapUVs(quad, null, sprite));
-                }
+                // Use the PRE-RESOLVED sprite
+                TextureAtlasSprite sprite = resolvedSprites.get(dir);
+                if (sprite == null) sprite = resolvedSprites.get(Direction.NORTH); // fallback
+
+                result.add(remapUVs(quad, sprite));
             }
             return result;
         }
@@ -302,12 +329,11 @@ public class VariantModelBakingManager {
             return Direction.NORTH;
         }
 
-        private BakedQuad remapUVs(BakedQuad jsonQuad, @Nullable BakedQuad donorQuad, @Nullable TextureAtlasSprite forceSprite) {
+        private BakedQuad remapUVs(BakedQuad jsonQuad, TextureAtlasSprite sprite) {
             int[] data = jsonQuad.getVertices().clone();
-            TextureAtlasSprite sprite = donorQuad != null ? donorQuad.getSprite() : forceSprite;
             if (sprite == null || !isValidSprite(sprite)) return jsonQuad;
 
-            int tint = donorQuad != null ? donorQuad.getTintIndex() : -1;
+            int tint = jsonQuad.getTintIndex();
             int stride = data.length / 4;
             float minU = sprite.getU0(); float maxU = sprite.getU1();
             float minV = sprite.getV0(); float maxV = sprite.getV1();

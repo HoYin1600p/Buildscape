@@ -53,10 +53,6 @@ public class TreeChopPacket {
                 return;
             }
 
-            if (!level.getGameRules().getBoolean(com.kingodogo.buildscape.world.ModGameRules.CREATIVE_TREE_BREAKER)) {
-                return;
-            }
-
             if (!level.isLoaded(pos)) {
                 return;
             }

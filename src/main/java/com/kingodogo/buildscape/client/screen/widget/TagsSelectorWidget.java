@@ -174,7 +174,7 @@ public class TagsSelectorWidget extends AbstractWidget {
         // Clip content to exclude scrollbar area:
         // 4px right gap + 8px scrollbar + 4px left gap = 16px reserved
         int scissorWidth = (int) ((width - 16) * guiScale);
-        int scissorHeight = (int) ((height - HEADER_AREA_HEIGHT - bottomMargin) * guiScale); // Reduce height
+        int scissorHeight = (int) ((height - HEADER_AREA_HEIGHT - bottomMargin + 2) * guiScale); // Reduce height
 
         if (scissorHeight > 0 && scissorWidth > 0) {
             RenderSystem.enableScissor(scissorX, scissorY, scissorWidth, scissorHeight);

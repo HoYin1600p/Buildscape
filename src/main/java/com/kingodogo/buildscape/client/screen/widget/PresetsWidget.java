@@ -176,7 +176,7 @@ public class PresetsWidget extends AbstractWidget {
         itemConfig.items.addAll(newItems);
         itemConfig.saveItems();
 
-        loadPresets();
+        refreshPresets();
 
         if (onPresetApplied != null) {
             onPresetApplied.accept("_unnamed");
@@ -219,7 +219,7 @@ public class PresetsWidget extends AbstractWidget {
             }
             
             config.clearUnnamedPreset();
-            loadPresets();
+            refreshPresets();
             nameEditBox.setValue(name);
             nameEditBox.setEditable(true);
             
@@ -234,10 +234,37 @@ public class PresetsWidget extends AbstractWidget {
     }
 
     private void deleteSelectedPreset() {
-        if (selectedPresetKey != null && !selectedPresetKey.equals("default")
-                && !selectedPresetKey.equals("_unnamed")) {
+        if (selectedPresetKey != null && !selectedPresetKey.equals("default")) {
             PresetsConfig config = PresetsConfig.get();
-            if (config.deletePreset(selectedPresetKey)) {
+            if (selectedPresetKey.equals("_unnamed")) {
+                config.clearUnnamedPreset();
+                String revertKey = appliedPresetKey != null && !appliedPresetKey.equals("_unnamed") ? appliedPresetKey : "default";
+                config.applyPreset(revertKey);
+                
+                if (Minecraft.getInstance().player != null) {
+                    Minecraft.getInstance().player.playSound(
+                        net.minecraft.sounds.SoundEvents.NOTE_BLOCK_DIDGERIDOO,
+                        1.0f,
+                        1.0f
+                    );
+                }
+                
+                selectedPresetKey = revertKey;
+                appliedPresetKey = revertKey;
+                
+                PresetsConfig.Preset revPreset = config.getPreset(revertKey);
+                if (revPreset != null) {
+                    nameEditBox.setValue(revPreset.name);
+                } else {
+                    nameEditBox.setValue("");
+                }
+                nameEditBox.setEditable(false);
+                refreshPresets();
+                
+                if (onPresetApplied != null) {
+                    onPresetApplied.accept(revertKey);
+                }
+            } else if (config.deletePreset(selectedPresetKey)) {
                 if (Minecraft.getInstance().player != null) {
                     Minecraft.getInstance().player.playSound(
                         net.minecraft.sounds.SoundEvents.NOTE_BLOCK_DIDGERIDOO,
@@ -247,7 +274,6 @@ public class PresetsWidget extends AbstractWidget {
                 }
                 if (selectedPresetKey.equals(appliedPresetKey)) {
                     appliedPresetKey = "default"; // Fallback
-                    // Or keep null? Default is safer.
                 }
                 selectedPresetKey = "default";
                 PresetsConfig.Preset defaultPreset = config.getPreset("default");
@@ -257,7 +283,7 @@ public class PresetsWidget extends AbstractWidget {
                     nameEditBox.setValue("");
                 }
                 nameEditBox.setEditable(false);
-                loadPresets();
+                refreshPresets();
             }
         }
     }
@@ -298,6 +324,20 @@ public class PresetsWidget extends AbstractWidget {
 
     public Button getCreateButton() {
         return createButton;
+    }
+
+    public void refreshPresets() {
+        loadPresets();
+        int presetY = y + 20;
+        int bottomAreaHeight = com.kingodogo.buildscape.client.screen.BuildScapeConfigScreen.scaleSize(40);
+        int buttonYPos = y + height - bottomAreaHeight;
+        int editBoxTop = nameEditBox != null ? nameEditBox.y : buttonYPos;
+        int availableHeight = editBoxTop - presetY - 5;
+        // Approx 20+2 button height
+        int maxVisiblePresets = Math.max(1, availableHeight / (PRESET_BUTTON_HEIGHT + PRESET_BUTTON_SPACING));
+        
+        double maxScroll = Math.max(0, presets.size() - maxVisiblePresets);
+        scrollOffset = (int) Math.max(0, Math.min(scrollOffset, maxScroll));
     }
 
     public void updateChildPositions() {

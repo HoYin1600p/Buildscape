@@ -230,7 +230,7 @@ public class BuildScapeConfigScreen extends Screen {
                 buttonWidth, buttonHeight,
                 new TranslatableComponent("buildscape.config.category.world"),
                 (button) -> {
-                    if (checkOpAccessAndNotify()) setActiveTab(new WorldSettingsConfigTab(this));
+                    setActiveTab(new WorldSettingsConfigTab(this));
                 });
         addRenderableWidget(worldSettingsButton);
 
@@ -299,9 +299,11 @@ public class BuildScapeConfigScreen extends Screen {
         updateCategoryButtonScales();
     }
 
-    private boolean hasOpAccess() {
-        Minecraft mc = Minecraft.getInstance();
-        return mc.player != null && mc.player.hasPermissions(2);
+    public boolean hasOpAccess() {
+        if (Minecraft.getInstance().player == null) {
+            return false;
+        }
+        return Minecraft.getInstance().player.hasPermissions(2);
     }
 
     private boolean checkOpAccessAndNotify() {

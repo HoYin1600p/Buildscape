@@ -8,17 +8,19 @@ import net.minecraft.tags.BlockTags;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.BushBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
-public class SnowyBushBlock extends BushBlock {
+public class SnowyBushBlock extends BushBlock implements SinksOnFarmland {
 
     protected static final VoxelShape SHAPE = Block.box(
             2.0D,
@@ -31,6 +33,12 @@ public class SnowyBushBlock extends BushBlock {
 
     public SnowyBushBlock(BlockBehaviour.Properties properties) {
         super(properties);
+        this.registerDefaultState(this.stateDefinition.any().setValue(ON_FARMLAND, false));
+    }
+
+    @Override
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+        builder.add(ON_FARMLAND);
     }
 
     @Override
@@ -40,7 +48,11 @@ public class SnowyBushBlock extends BushBlock {
             BlockPos pos,
             CollisionContext context
     ) {
-        return SHAPE;
+        VoxelShape shape = SHAPE;
+        if (state.getValue(ON_FARMLAND)) {
+            return shape.move(0, -0.0625D, 0);
+        }
+        return shape;
     }
 
     @Override
@@ -51,9 +63,27 @@ public class SnowyBushBlock extends BushBlock {
     ) {
         return (
                 state.is(BlockTags.DIRT) ||
+                        state.is(net.minecraft.world.level.block.Blocks.FARMLAND) ||
                         state.is(net.minecraft.world.level.block.Blocks.SNOW_BLOCK) ||
                         state.is(com.kingodogo.buildscape.block.ModBlocks.SNOW_BRICKS.get())
         );
+    }
+
+    @Override
+    public BlockState getStateForPlacement(net.minecraft.world.item.context.BlockPlaceContext context) {
+        BlockState state = super.getStateForPlacement(context);
+        if (state != null) {
+            return state.setValue(ON_FARMLAND, shouldSink(context.getLevel(), context.getClickedPos()));
+        }
+        return null;
+    }
+
+    @Override
+    public BlockState updateShape(BlockState state, net.minecraft.core.Direction direction, BlockState adjacentState, LevelAccessor level, BlockPos pos, BlockPos adjacentPos) {
+        if (direction == net.minecraft.core.Direction.DOWN) {
+            return state.setValue(ON_FARMLAND, shouldSink(level, pos));
+        }
+        return super.updateShape(state, direction, adjacentState, level, pos, adjacentPos);
     }
 
     @Override

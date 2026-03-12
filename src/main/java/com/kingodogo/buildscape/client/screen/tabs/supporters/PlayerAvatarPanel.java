@@ -233,7 +233,7 @@ public class PlayerAvatarPanel extends BasePanel {
                         cosmeticsToRender, partialTick);
                 rendered3D = true;
             } catch (Exception e) {
-                BuildScape.getLogger().debug("3D player rendering not available, using fallback: " + e.getMessage());
+                // Suppressed debug log to prevent render loop spam
             }
         } else {
             try {
@@ -241,7 +241,7 @@ public class PlayerAvatarPanel extends BasePanel {
                         cosmeticsToRender, partialTick);
                 rendered3D = true;
             } catch (Exception e) {
-                BuildScape.getLogger().debug("Offline player rendering failed: " + e.getMessage());
+                // Suppressed debug log to prevent render loop spam
             }
         }
 
@@ -833,7 +833,7 @@ public class PlayerAvatarPanel extends BasePanel {
                 render3DPlayerModel(poseStack, x, y, width, height, equippedCosmetics, partialTick);
                 return;
             } catch (Exception e) {
-                BuildScape.getLogger().debug("Failed to render offline player 3D: " + e.getMessage());
+                // Suppressed debug log to prevent render loop spam
             }
         }
 

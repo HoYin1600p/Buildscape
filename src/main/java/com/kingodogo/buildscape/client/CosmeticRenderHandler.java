@@ -235,8 +235,7 @@ public class CosmeticRenderHandler {
             com.mojang.blaze3d.systems.RenderSystem.disableDepthTest();
 
         } catch (Exception e) {
-            com.kingodogo.buildscape.BuildScape.getLogger()
-                    .debug("Failed to render cosmetic overlay: " + e.getMessage());
+            // Suppressed debug log to prevent render loop spam
         } finally {
             isRenderingCosmetics.remove();
             // Restore original vanilla equipment
@@ -322,8 +321,7 @@ public class CosmeticRenderHandler {
 
             poseStack.popPose();
         } catch (Exception e) {
-            com.kingodogo.buildscape.BuildScape.getLogger()
-                    .debug("Failed to render custom head cosmetic: " + e.getMessage());
+            // Suppressed debug log to prevent render loop spam
         }
     }
 }

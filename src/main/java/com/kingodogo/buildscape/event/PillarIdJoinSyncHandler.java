@@ -52,8 +52,7 @@ public class PillarIdJoinSyncHandler {
         ModMessages.INSTANCE.send(
                 net.minecraftforge.network.PacketDistributor.PLAYER.with(() -> player),
                 new com.kingodogo.buildscape.network.SyncGameRulesPacket(
-                        rules.getBoolean(com.kingodogo.buildscape.world.ModGameRules.FAST_LEAF_DECAY),
-                        rules.getBoolean(com.kingodogo.buildscape.world.ModGameRules.CREATIVE_TREE_BREAKER)
+                        rules.getBoolean(com.kingodogo.buildscape.world.ModGameRules.FAST_LEAF_DECAY)
                 )
         );
     }

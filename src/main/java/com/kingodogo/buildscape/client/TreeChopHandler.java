@@ -55,7 +55,7 @@ public class TreeChopHandler {
 
         // Reset
         if (!player.isCreative() || !player.isShiftKeyDown() || mc.options.keyAttack == null || !mc.options.keyAttack.isDown()
-                || !mc.level.getGameRules().getBoolean(com.kingodogo.buildscape.world.ModGameRules.CREATIVE_TREE_BREAKER)) {
+                || !com.kingodogo.buildscape.config.CosmeticsConfig.get().getCreativeTreeBreaker(player.getUUID())) {
             if (mc.level != null && targetBlockPos != null) {
                 mc.level.destroyBlockProgress(player.getId(), targetBlockPos, -1);
             }
@@ -124,7 +124,7 @@ public class TreeChopHandler {
         Player player = mc.player;
         if (player == null || mc.level == null) return;
         if (!player.isCreative() || !player.isShiftKeyDown()) return;
-        if (!mc.level.getGameRules().getBoolean(com.kingodogo.buildscape.world.ModGameRules.CREATIVE_TREE_BREAKER))
+        if (!com.kingodogo.buildscape.config.CosmeticsConfig.get().getCreativeTreeBreaker(player.getUUID()))
             return;
 
         // Check what we are looking at NOW
@@ -160,7 +160,7 @@ public class TreeChopHandler {
         if (player == null || mc.level == null) return;
 
         if (!player.isCreative() || !player.isShiftKeyDown()) return;
-        if (!mc.level.getGameRules().getBoolean(com.kingodogo.buildscape.world.ModGameRules.CREATIVE_TREE_BREAKER))
+        if (!com.kingodogo.buildscape.config.CosmeticsConfig.get().getCreativeTreeBreaker(player.getUUID()))
             return;
 
         HitResult target = event.getTarget();
@@ -214,7 +214,7 @@ public class TreeChopHandler {
         if (mc.player == null || mc.level == null) return;
 
         if (mc.player.isCreative() && mc.player.isShiftKeyDown() &&
-                mc.level.getGameRules().getBoolean(com.kingodogo.buildscape.world.ModGameRules.CREATIVE_TREE_BREAKER)) {
+                com.kingodogo.buildscape.config.CosmeticsConfig.get().getCreativeTreeBreaker(mc.player.getUUID())) {
             HitResult hit = mc.hitResult;
             if (hit != null && hit.getType() == HitResult.Type.BLOCK) {
                 BlockHitResult blockHit = (BlockHitResult) hit;

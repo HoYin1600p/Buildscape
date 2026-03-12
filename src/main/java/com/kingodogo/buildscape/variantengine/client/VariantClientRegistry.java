@@ -2,7 +2,7 @@ package com.kingodogo.buildscape.variantengine.client;
 
 import com.kingodogo.buildscape.BuildScape;
 import com.kingodogo.buildscape.variantengine.family.BlockFamily;
-import com.kingodogo.buildscape.variantengine.registry.BlockRegistryScanner;
+import com.kingodogo.buildscape.variantengine.registry.VariantRegistrar;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.world.level.block.Block;
@@ -19,25 +19,37 @@ public class VariantClientRegistry {
         BuildScape.LOGGER.info("VariantEngine: Synchronizing RenderLayers for generated variants...");
         
         event.enqueueWork(() -> {
-            for (BlockFamily family : BlockRegistryScanner.getDetectedFamilies()) {
+            for (BlockFamily family : VariantRegistrar.getDetectedFamilies()) {
                 Block parent = family.getBaseBlock();
                 
                 // CRITICAL FIX: Identify the BEST render type from the parent's default state.
-                // We check multiple sources because some blocks don't declare their render layer correctly early on.
                 RenderType layer = ItemBlockRenderTypes.getChunkRenderType(parent.defaultBlockState());
                 
-                // AGGRESSIVE HEURISTIC: Force transparency if keywords match, even if parent reported 'solid'
+                // AGGRESSIVE HEURISTIC: Force transparency if keywords match or if Java class properties suggest it
                 String name = parent.getRegistryName().getPath().toLowerCase();
+                net.minecraft.world.level.block.state.BlockState state = parent.defaultBlockState();
+                net.minecraft.world.level.material.Material mat = state.getMaterial();
+                
                 boolean isTranslucent = name.contains("glass") || name.contains("pane") || name.contains("translucent") || 
                                       name.contains("tinted") || name.contains("ornament") || name.contains("mist") || 
-                                      name.contains("star") || name.contains("lights") || name.contains("lamp");
+                                      name.contains("star") || name.contains("lights") || name.contains("lamp") ||
+                                      mat == net.minecraft.world.level.material.Material.GLASS ||
+                                      mat == net.minecraft.world.level.material.Material.ICE ||
+                                      mat == net.minecraft.world.level.material.Material.ICE_SOLID;
                                       
                 boolean isCutout = name.contains("leaves") || name.contains("sapling") || name.contains("hedge") || 
                                    name.contains("bars") || name.contains("mesh") || name.contains("petal") || 
-                                   name.contains("icicle") || name.contains("vines");
+                                   name.contains("icicle") || name.contains("vines") ||
+                                   mat == net.minecraft.world.level.material.Material.LEAVES ||
+                                   mat == net.minecraft.world.level.material.Material.REPLACEABLE_PLANT ||
+                                   mat == net.minecraft.world.level.material.Material.PLANT ||
+                                   !state.canOcclude() || 
+                                   state.propagatesSkylightDown(net.minecraft.world.level.EmptyBlockGetter.INSTANCE, net.minecraft.core.BlockPos.ZERO) ||
+                                   !state.isViewBlocking(net.minecraft.world.level.EmptyBlockGetter.INSTANCE, net.minecraft.core.BlockPos.ZERO) ||
+                                   !state.isSuffocating(net.minecraft.world.level.EmptyBlockGetter.INSTANCE, net.minecraft.core.BlockPos.ZERO);
                 
                 if (isTranslucent) layer = RenderType.translucent();
-                else if (isCutout) layer = RenderType.cutout();
+                else if (isCutout && layer == RenderType.solid()) layer = RenderType.cutout();
                 
                 final RenderType finalLayer = layer;
                 family.getVariants().values().forEach(variant -> {

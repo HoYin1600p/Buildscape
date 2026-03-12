@@ -42,8 +42,6 @@ public class UpdateGameRulePacket {
             GameRules rules = player.getLevel().getGameRules();
             if (ruleName.equals("fastLeafDecay")) {
                 rules.getRule(ModGameRules.FAST_LEAF_DECAY).set(value, player.getServer());
-            } else if (ruleName.equals("creativeTreeBreaker")) {
-                rules.getRule(ModGameRules.CREATIVE_TREE_BREAKER).set(value, player.getServer());
             }
         });
         context.setPacketHandled(true);

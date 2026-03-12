@@ -37,13 +37,15 @@ public abstract class LeavesBlockMixin extends Block implements SimpleWaterlogge
 
     @Inject(method = "<init>", at = @At("RETURN"))
     private void buildscape$setDefaultWaterlogged(Properties properties, CallbackInfo ci) {
-        this.registerDefaultState(this.defaultBlockState().setValue(BlockStateProperties.WATERLOGGED, false));
+        if (this.defaultBlockState().hasProperty(BlockStateProperties.WATERLOGGED)) {
+            this.registerDefaultState(this.defaultBlockState().setValue(BlockStateProperties.WATERLOGGED, false));
+        }
     }
 
     @Inject(method = "getStateForPlacement", at = @At("RETURN"), cancellable = true)
     private void buildscape$waterloggedPlacement(BlockPlaceContext context, CallbackInfoReturnable<BlockState> cir) {
         BlockState state = cir.getReturnValue();
-        if (state != null) {
+        if (state != null && state.hasProperty(BlockStateProperties.WATERLOGGED)) {
             FluidState fluidState = context.getLevel().getFluidState(context.getClickedPos());
             cir.setReturnValue(state.setValue(BlockStateProperties.WATERLOGGED, fluidState.getType() == Fluids.WATER));
         }

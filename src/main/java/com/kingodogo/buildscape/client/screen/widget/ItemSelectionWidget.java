@@ -200,7 +200,7 @@ public class ItemSelectionWidget extends AbstractWidget {
         int bottomMargin = 10;
         int scissorY = (int) (windowHeight - (y + height) * guiScale + bottomMargin * guiScale);
         int scissorWidth = (int) ((width - 21) * guiScale); // Exclude scrollbar area
-        int scissorHeight = (int) ((height - HEADER_AREA_HEIGHT - bottomMargin) * guiScale);
+        int scissorHeight = (int) ((height - HEADER_AREA_HEIGHT - bottomMargin + 2) * guiScale);
 
         if (scissorHeight > 0 && scissorWidth > 0) {
             RenderSystem.enableScissor(scissorX, scissorY, scissorWidth, scissorHeight);

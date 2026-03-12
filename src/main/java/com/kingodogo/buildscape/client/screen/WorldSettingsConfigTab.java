@@ -31,10 +31,10 @@ public class WorldSettingsConfigTab extends AbstractConfigTab {
         int contentHeight = parent.getContentHeight();
 
         // One-time widget creation
-        boolean treeBreaker = mc.level.getGameRules().getBoolean(ModGameRules.CREATIVE_TREE_BREAKER);
+        boolean treeBreaker = com.kingodogo.buildscape.config.CosmeticsConfig.get().getCreativeTreeBreaker(mc.player.getUUID());
         creativeTreeBreakerToggle = new ScalableToggle(0, 0, 100, 20,
                 new TranslatableComponent("buildscape.config.world.tree_breaker"), treeBreaker, (btn) -> {
-            ModMessages.INSTANCE.sendToServer(new UpdateGameRulePacket("creativeTreeBreaker", ((ScalableToggle) btn).isToggled()));
+            com.kingodogo.buildscape.config.CosmeticsConfig.get().setCreativeTreeBreaker(mc.player.getUUID(), ((ScalableToggle) btn).isToggled());
         });
         addTabWidget(creativeTreeBreakerToggle);
 
@@ -43,6 +43,7 @@ public class WorldSettingsConfigTab extends AbstractConfigTab {
                 new TranslatableComponent("buildscape.config.world.leaf_decay"), leafDecay, (btn) -> {
             ModMessages.INSTANCE.sendToServer(new UpdateGameRulePacket("fastLeafDecay", ((ScalableToggle) btn).isToggled()));
         });
+        fastLeafDecayToggle.active = parent.hasOpAccess();
         addTabWidget(fastLeafDecayToggle);
 
         relayout(contentX, contentY, contentWidth, contentHeight);
@@ -114,7 +115,7 @@ public class WorldSettingsConfigTab extends AbstractConfigTab {
 
         // Update button states from mc.level.getGameRules() to ensure they reflect sync packets
         if (mc.level != null) {
-            creativeTreeBreakerToggle.toggled = mc.level.getGameRules().getBoolean(ModGameRules.CREATIVE_TREE_BREAKER);
+            creativeTreeBreakerToggle.toggled = com.kingodogo.buildscape.config.CosmeticsConfig.get().getCreativeTreeBreaker(mc.player.getUUID());
             fastLeafDecayToggle.toggled = mc.level.getGameRules().getBoolean(ModGameRules.FAST_LEAF_DECAY);
         }
     }
@@ -150,7 +151,7 @@ public class WorldSettingsConfigTab extends AbstractConfigTab {
         @Override
         public void renderButton(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
             Minecraft mc = Minecraft.getInstance();
-            int borderColor = isHoveredOrFocused() ? 0xFFFFFFFF : 0xFF666666;
+            int borderColor = (active && isHoveredOrFocused()) ? 0xFFFFFFFF : 0xFF666666;
 
             // Draw custom button background
             net.minecraft.client.gui.GuiComponent.fill(poseStack, x, y, x + width, y + height, 0x80000000); // 50% dark
@@ -164,15 +165,28 @@ public class WorldSettingsConfigTab extends AbstractConfigTab {
             // Draw toggle status bar
             int barHeight = Math.max(2, BuildScapeConfigScreen.scaleSize(2));
             int barColor = toggled ? 0xFF55FF55 : 0xFFFF5555;
+            if (!active) barColor = 0xFF555555;
             net.minecraft.client.gui.GuiComponent.fill(poseStack, x + 2, y + height - 2 - barHeight, x + width - 2, y + height - 2, barColor);
 
             // Draw text
             int textY = y + (height - mc.font.lineHeight) / 2;
-            mc.font.draw(poseStack, baseMessage, x + BuildScapeConfigScreen.scaleSize(6), textY, 0xFFFFFF);
+            mc.font.draw(poseStack, baseMessage, x + BuildScapeConfigScreen.scaleSize(6), textY, active ? 0xFFFFFF : 0x888888);
 
             String status = toggled ? "ON" : "OFF";
             int statusWidth = mc.font.width(status);
-            mc.font.draw(poseStack, status, x + width - statusWidth - BuildScapeConfigScreen.scaleSize(6), textY, barColor);
+            mc.font.draw(poseStack, status, x + width - statusWidth - BuildScapeConfigScreen.scaleSize(6), textY, active ? barColor : 0x888888);
+            
+            // Render lock icon if inactive
+            if (!active) {
+                com.mojang.blaze3d.systems.RenderSystem.setShaderTexture(0, new net.minecraft.resources.ResourceLocation(com.kingodogo.buildscape.BuildScape.MODID, "textures/gui/lock.png"));
+                com.mojang.blaze3d.systems.RenderSystem.setShader(net.minecraft.client.renderer.GameRenderer::getPositionTexShader);
+                com.mojang.blaze3d.systems.RenderSystem.enableBlend();
+                com.mojang.blaze3d.systems.RenderSystem.defaultBlendFunc();
+                int lockSize = Math.max(8, BuildScapeConfigScreen.scaleSize(10));
+                int lockX = x + width - statusWidth - BuildScapeConfigScreen.scaleSize(22);
+                net.minecraft.client.gui.GuiComponent.blit(poseStack, lockX, y + (height - lockSize) / 2, lockSize, lockSize, 0, 0, 16, 16, 16, 16);
+                com.mojang.blaze3d.systems.RenderSystem.disableBlend();
+            }
         }
     }
 }

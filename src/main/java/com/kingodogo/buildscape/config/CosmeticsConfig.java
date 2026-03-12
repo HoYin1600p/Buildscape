@@ -30,6 +30,9 @@ public class CosmeticsConfig {
     // Cache of player UUID string to cosmetic colors (cosmeticId -> hex color string)
     private final Map<String, Map<String, String>> playerCosmeticColors = new HashMap<>();
 
+    // Cache of player UUID string to creative tree breaker boolean
+    private final Map<String, Boolean> playerCreativeTreeBreaker = new HashMap<>();
+
     // Color picker window position
     private Integer colorPickerX = null;
     private Integer colorPickerY = null;
@@ -219,11 +222,18 @@ public class CosmeticsConfig {
                     }
                 }
                 playerCosmeticColors.put(uuidStr, colors);
+                
+                if (nbt.contains("creative_tree_breaker")) {
+                    playerCreativeTreeBreaker.put(uuidStr, nbt.getBoolean("creative_tree_breaker"));
+                } else {
+                    playerCreativeTreeBreaker.put(uuidStr, false);
+                }
             }
         } catch (Exception e) {
             BuildScape.getLogger().error("CosmeticsConfig: Failed to read data for " + uuidStr, e);
             playerCosmetics.putIfAbsent(uuidStr, null);
             playerCosmeticColors.putIfAbsent(uuidStr, null);
+            playerCreativeTreeBreaker.putIfAbsent(uuidStr, false);
         }
     }
 
@@ -252,6 +262,11 @@ public class CosmeticsConfig {
             }
         }
         nbt.put("cosmetic_colors", colorsTag);
+
+        Boolean treeBreaker = playerCreativeTreeBreaker.get(uuidStr);
+        if (treeBreaker != null) {
+            nbt.putBoolean("creative_tree_breaker", treeBreaker);
+        }
 
         try {
             NbtIo.writeCompressed(nbt, file);
@@ -361,5 +376,18 @@ public class CosmeticsConfig {
         this.colorPickerX = null;
         this.colorPickerY = null;
         saveGlobalSettings();
+    }
+
+    public boolean getCreativeTreeBreaker(UUID playerUuid) {
+        String uuidStr = playerUuid != null ? playerUuid.toString() : "global";
+        if (!playerCreativeTreeBreaker.containsKey(uuidStr)) loadPlayer(playerUuid);
+        return playerCreativeTreeBreaker.getOrDefault(uuidStr, false);
+    }
+
+    public void setCreativeTreeBreaker(UUID playerUuid, boolean value) {
+        String uuidStr = playerUuid != null ? playerUuid.toString() : "global";
+        if (!playerCreativeTreeBreaker.containsKey(uuidStr)) loadPlayer(playerUuid);
+        playerCreativeTreeBreaker.put(uuidStr, value);
+        savePlayer(playerUuid);
     }
 }

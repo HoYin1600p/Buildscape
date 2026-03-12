@@ -256,7 +256,7 @@ public class CosmeticsDisplayPanel extends BasePanel {
                                     render3DItemLikePillar(poseStack, stack, cosmeticId, itemX + itemSize / 2, rowY + itemSize / 2, partialTick);
                                 }
                             } catch (Exception e) {
-                                BuildScape.getLogger().debug("Failed to render item " + cosmeticId + ": " + e.getMessage());
+                                // Suppressed debug log to prevent render loop spam
                                 mc.font.draw(poseStack, "?", itemX + itemSize / 2 - 2, rowY + itemSize / 2 - 4, 0xFFFFFF);
                             }
                         }
@@ -915,7 +915,7 @@ public class CosmeticsDisplayPanel extends BasePanel {
             BakedModel model = itemRenderer.getModel(stack, mc.level, null, 0);
             itemRenderer.render(stack, net.minecraft.client.renderer.block.model.ItemTransforms.TransformType.GUI, stack.hasFoil(), poseStack, bufferSource, 15728880, 0, model);
         } catch (Exception e) {
-            BuildScape.getLogger().debug("Pillar fallback: " + e.getMessage());
+            // Suppressed debug log to prevent render loop spam
             poseStack.popPose();
             itemRenderer.renderGuiItem(stack, centerX - 8, centerY - 8);
             return;
@@ -958,7 +958,7 @@ public class CosmeticsDisplayPanel extends BasePanel {
             BakedModel model = itemRenderer.getModel(stack, mc.level, null, 0);
             itemRenderer.render(stack, net.minecraft.client.renderer.block.model.ItemTransforms.TransformType.GUI, stack.hasFoil(), poseStack, bufferSource, 15728880, 0, model);
         } catch (Exception e) {
-            BuildScape.getLogger().debug("Preview fallback: " + e.getMessage());
+            // Suppressed debug log to prevent render loop spam
             poseStack.popPose();
             itemRenderer.renderGuiItem(stack, centerX - 8, centerY - 8);
             return;

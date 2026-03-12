@@ -19,6 +19,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.BonemealableBlock;
@@ -38,7 +39,7 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
-public class CloverBlock extends BushBlock implements BonemealableBlock {
+public class CloverBlock extends BushBlock implements SinksOnFarmland, BonemealableBlock {
 
     public static final IntegerProperty FLOWER_AMOUNT = IntegerProperty.create(
             "flower_amount",
@@ -205,6 +206,7 @@ public class CloverBlock extends BushBlock implements BonemealableBlock {
                 this.stateDefinition.any()
                         .setValue(FLOWER_AMOUNT, 1)
                         .setValue(FACING, Direction.SOUTH)
+                        .setValue(ON_FARMLAND, false)
         );
     }
 
@@ -217,7 +219,7 @@ public class CloverBlock extends BushBlock implements BonemealableBlock {
     protected void createBlockStateDefinition(
             StateDefinition.Builder<Block, BlockState> builder
     ) {
-        builder.add(FLOWER_AMOUNT, FACING);
+        builder.add(FLOWER_AMOUNT, FACING, ON_FARMLAND);
     }
 
     @Override
@@ -230,7 +232,7 @@ public class CloverBlock extends BushBlock implements BonemealableBlock {
         int stage = state.getValue(FLOWER_AMOUNT);
         Direction facing = state.getValue(FACING);
 
-        return switch (facing) {
+        VoxelShape shape = switch (facing) {
             case NORTH -> switch (stage) {
                 case 1 -> SHAPE_1_NORTH;
                 case 2 -> SHAPE_2_NORTH;
@@ -256,6 +258,11 @@ public class CloverBlock extends BushBlock implements BonemealableBlock {
                 default -> SHAPE_4_SOUTH;
             };
         };
+
+        if (state.getValue(ON_FARMLAND)) {
+            return shape.move(0, -0.0625D, 0);
+        }
+        return shape;
     }
 
     @Override
@@ -318,7 +325,7 @@ public class CloverBlock extends BushBlock implements BonemealableBlock {
                 state.isFaceSturdy(level, pos, Direction.UP) &&
                         state.getMaterial().isSolid() &&
                         !state.getMaterial().isReplaceable()
-        );
+        ) || state.is(net.minecraft.world.level.block.Blocks.FARMLAND);
     }
 
     @Override
@@ -331,14 +338,21 @@ public class CloverBlock extends BushBlock implements BonemealableBlock {
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         BlockState state = super.getStateForPlacement(context);
-        if (
-                state != null &&
-                        this.canSurvive(state, context.getLevel(), context.getClickedPos())
-        ) {
+        if (state != null) {
             Direction playerFacing = context.getHorizontalDirection();
-            return state.setValue(FLOWER_AMOUNT, 1).setValue(FACING, playerFacing);
+            return state.setValue(FLOWER_AMOUNT, 1)
+                    .setValue(FACING, playerFacing)
+                    .setValue(ON_FARMLAND, shouldSink(context.getLevel(), context.getClickedPos()));
         }
         return null;
+    }
+
+    @Override
+    public BlockState updateShape(BlockState state, Direction direction, BlockState adjacentState, LevelAccessor level, BlockPos pos, BlockPos adjacentPos) {
+        if (direction == Direction.DOWN) {
+            return state.setValue(ON_FARMLAND, shouldSink(level, pos));
+        }
+        return super.updateShape(state, direction, adjacentState, level, pos, adjacentPos);
     }
 
     @Override

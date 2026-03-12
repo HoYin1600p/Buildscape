@@ -39,10 +39,7 @@ public class VariantPackResources implements PackResources {
                 deleteDirectory(generatedDir);
             }
         } catch (Exception e) {
-            BuildScape.LOGGER.warn("VariantEngine: Failed to clear generated resources: {}", e.getMessage());
         }
-
-        BuildScape.LOGGER.info("VariantEngine: Generating and exporting resources to {}/", ROOT_DIR);
 
         JsonObject langObj = new JsonObject();
 
@@ -54,69 +51,58 @@ public class VariantPackResources implements PackResources {
             BlockShape[] recipeShapes = {BlockShape.VERTICAL_SLAB, BlockShape.VERTICAL_STAIRS};
 
             for (BlockShape shape : recipeShapes) {
-                Block variant = BlockBiMaps.getBlockOf(shape, baseBlock);
-                if (variant == null) continue;
+                try {
+                    Block variant = BlockBiMaps.getBlockOf(shape, baseBlock);
+                    if (variant == null) continue;
 
-                ResourceLocation verticalId = variant.getRegistryName();
-                if (verticalId == null || !verticalId.getNamespace().equals(BuildScape.MODID)) continue;
+                    ResourceLocation verticalId = variant.getRegistryName();
+                    if (verticalId == null || !verticalId.getNamespace().equals(BuildScape.MODID)) continue;
 
-                // ============================================================
-                // RECIPE LOGIC: Determine what recipes to generate
-                // ============================================================
-                // Rule 1: Crafting (shapeless 1:1) ONLY when horizontal slab/stair exists
-                //         e.g. 1x stone_slab ↔ 1x v_slab_stone
-                // Rule 2: Stonecutting from horizontal slab/stair (always, if exists)
-                //         e.g. stone_slab → v_slab_stone (stonecutter)
-                // Rule 3: Stonecutting from base block (as extra convenience, if base != slab/stair)
-                //         e.g. stone → v_slab_stone (stonecutter)
-                // Rule 4: If NO horizontal counterpart exists, stonecutting from base only. NO crafting.
-                // Rule 5: NEVER use logs, raw materials, etc. as crafting input.
-                // ============================================================
-
-                ResourceLocation horizontalId = null;
-                if (shape == BlockShape.VERTICAL_SLAB) {
-                    Block slab = BlockBiMaps.getBlockOf(BlockShape.SLAB, baseBlock);
-                    if (slab != null && slab.getRegistryName() != null) {
-                        horizontalId = slab.getRegistryName();
+                    ResourceLocation horizontalId = null;
+                    if (shape == BlockShape.VERTICAL_SLAB) {
+                        Block slab = BlockBiMaps.getBlockOf(BlockShape.SLAB, baseBlock);
+                        if (slab != null && slab.getRegistryName() != null) {
+                            horizontalId = slab.getRegistryName();
+                        }
+                    } else if (shape == BlockShape.VERTICAL_STAIRS) {
+                        Block stairs = BlockBiMaps.getBlockOf(BlockShape.STAIRS, baseBlock);
+                        if (stairs != null && stairs.getRegistryName() != null) {
+                            horizontalId = stairs.getRegistryName();
+                        }
                     }
-                } else if (shape == BlockShape.VERTICAL_STAIRS) {
-                    Block stairs = BlockBiMaps.getBlockOf(BlockShape.STAIRS, baseBlock);
-                    if (stairs != null && stairs.getRegistryName() != null) {
-                        horizontalId = stairs.getRegistryName();
+
+                    if (horizontalId != null) {
+                        addShapelessRecipe(verticalId, horizontalId);
+                        addStonecuttingRecipe(verticalId, horizontalId);
+
+                        if (!baseId.equals(horizontalId) && isValidStonecuttingSource(baseId)) {
+                            addStonecuttingRecipe(verticalId, baseId, "_from_base_stonecutting");
+                        }
+                    } else {
+                        if (isValidStonecuttingSource(baseId)) {
+                            addStonecuttingRecipe(verticalId, baseId);
+                        }
                     }
-                }
 
-                if (horizontalId != null) {
-                    // HAS horizontal counterpart → crafting + stonecutting
-                    addShapelessRecipe(verticalId, horizontalId);
-                    addStonecuttingRecipe(verticalId, horizontalId);
+                    addLootTable(verticalId, shape);
+                    addBlockTags(verticalId, baseBlock, shape);
 
-                    // ALSO add stonecutting from base block (if base is different from the slab/stair)
-                    if (!baseId.equals(horizontalId) && isValidStonecuttingSource(baseId)) {
-                        addStonecuttingRecipe(verticalId, baseId, "_from_base_stonecutting");
+                    boolean isTransparent = false;
+                    try {
+                        isTransparent = BlockFamilyDetector.isGlass(baseBlock) || !baseBlock.defaultBlockState().canOcclude();
+                    } catch (Exception ignored) {}
+                    
+                    if (shape == BlockShape.VERTICAL_SLAB) {
+                        addVerticalSlabResources(verticalId, baseId, isTransparent);
+                    } else if (shape == BlockShape.VERTICAL_STAIRS) {
+                        addVerticalStairResources(verticalId, baseId, isTransparent);
                     }
-                } else {
-                    // NO horizontal counterpart → stonecutting from base only, NO crafting
-                    if (isValidStonecuttingSource(baseId)) {
-                        addStonecuttingRecipe(verticalId, baseId);
-                    }
-                }
 
-                addLootTable(verticalId, shape);
-                addBlockTags(verticalId, baseBlock, shape);
-
-                boolean isTransparent = BlockFamilyDetector.isGlass(baseBlock) || !baseBlock.defaultBlockState().canOcclude();
-                
-                if (shape == BlockShape.VERTICAL_SLAB) {
-                    addVerticalSlabResources(verticalId, baseId, isTransparent);
-                } else if (shape == BlockShape.VERTICAL_STAIRS) {
-                    addVerticalStairResources(verticalId, baseId, isTransparent);
-                }
-
-                String langName = VariantNamingUtil.generateLangName(baseId, shape);
-                String translationKey = verticalId.getPath();
-                langObj.addProperty("block." + BuildScape.MODID + "." + translationKey, langName);
-                langObj.addProperty("item." + BuildScape.MODID + "." + translationKey, langName);
+                    String langName = VariantNamingUtil.generateLangName(baseId, shape);
+                    String translationKey = verticalId.getPath();
+                    langObj.addProperty("block." + BuildScape.MODID + "." + translationKey, langName);
+                    langObj.addProperty("item." + BuildScape.MODID + "." + translationKey, langName);
+                } catch (Exception ignored) {}
             }
         }
 

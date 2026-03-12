@@ -64,7 +64,7 @@ public class SupportersApiClient {
         
         long timeSinceLastRequest = now - lastTime;
         if (timeSinceLastRequest < RATE_LIMIT_MS) {
-            BuildScape.getLogger().debug("Rate limit: Request for UUID " + uuid + " too soon");
+            // Suppressed debug log to prevent render loop spam
             return false;
         }
         

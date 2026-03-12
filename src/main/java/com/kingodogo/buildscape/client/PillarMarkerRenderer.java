@@ -91,8 +91,7 @@ public class PillarMarkerRenderer {
                 renderPillarStackBoundingBox(poseStack, bufferSource, cameraPos, bottomPos, topPos, marked);
             }
         } catch (Exception e) {
-            // Silently catch any rendering errors to prevent crashes
-            BuildScape.getLogger().debug("Error rendering pillar markers: " + e.getMessage());
+            // Suppressed debug log to prevent render loop spam
         }
     }
     

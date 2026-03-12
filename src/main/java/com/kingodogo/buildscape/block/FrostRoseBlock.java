@@ -12,12 +12,14 @@ import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.BonemealableBlock;
 import net.minecraft.world.level.block.BushBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
@@ -28,7 +30,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class FrostRoseBlock extends BushBlock implements BonemealableBlock {
+public class FrostRoseBlock extends BushBlock implements SinksOnFarmland, BonemealableBlock {
 
     protected static final VoxelShape SHAPE = Block.box(
             5.0D,
@@ -44,6 +46,12 @@ public class FrostRoseBlock extends BushBlock implements BonemealableBlock {
 
     public FrostRoseBlock(BlockBehaviour.Properties properties) {
         super(properties);
+        this.registerDefaultState(this.stateDefinition.any().setValue(ON_FARMLAND, false));
+    }
+
+    @Override
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+        builder.add(ON_FARMLAND);
     }
 
     @Override
@@ -53,7 +61,11 @@ public class FrostRoseBlock extends BushBlock implements BonemealableBlock {
             BlockPos pos,
             CollisionContext context
     ) {
-        return SHAPE;
+        VoxelShape shape = SHAPE;
+        if (state.getValue(ON_FARMLAND)) {
+            return shape.move(0, -0.0625D, 0);
+        }
+        return shape;
     }
 
     @Override
@@ -75,6 +87,7 @@ public class FrostRoseBlock extends BushBlock implements BonemealableBlock {
         return (
                 state.is(BlockTags.DIRT) ||
                         state.is(Blocks.GRASS_BLOCK) ||
+                        state.is(Blocks.FARMLAND) ||
                         state.is(Blocks.ICE) ||
                         state.is(Blocks.PACKED_ICE) ||
                         state.is(Blocks.BLUE_ICE) ||
@@ -124,13 +137,18 @@ public class FrostRoseBlock extends BushBlock implements BonemealableBlock {
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         BlockState state = super.getStateForPlacement(context);
-        if (
-                state != null &&
-                        this.canSurvive(state, context.getLevel(), context.getClickedPos())
-        ) {
-            return state;
+        if (state != null) {
+            return state.setValue(ON_FARMLAND, shouldSink(context.getLevel(), context.getClickedPos()));
         }
         return null;
+    }
+
+    @Override
+    public BlockState updateShape(BlockState state, Direction direction, BlockState adjacentState, LevelAccessor level, BlockPos pos, BlockPos adjacentPos) {
+        if (direction == Direction.DOWN) {
+            return state.setValue(ON_FARMLAND, shouldSink(level, pos));
+        }
+        return super.updateShape(state, direction, adjacentState, level, pos, adjacentPos);
     }
 
     @Override

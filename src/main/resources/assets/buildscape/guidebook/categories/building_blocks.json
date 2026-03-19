@@ -1,0 +1,46 @@
+{
+  "id": "building_blocks",
+  "displayName": "guidebook.category.building_blocks",
+  "icon": "minecraft:bricks",
+  "sort": 30,
+  "entries": [
+    {
+      "id": "building_blocks_overview",
+      "title": "guidebook.entry.building_blocks_overview",
+      "pages": [
+        {
+          "components": [
+            { "type": "header", "text": "guidebook.page.building.overview.header" },
+            { "type": "text",   "text": "guidebook.page.building.overview.body1" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "slabs_stairs",
+      "title": "guidebook.entry.slabs_stairs",
+      "pages": [
+        {
+          "components": [
+            { "type": "header", "text": "guidebook.page.building.slabs.header" },
+            { "type": "text",   "text": "guidebook.page.building.slabs.body1" },
+            { "type": "spacer", "pixels": 6 },
+            { "type": "text",   "text": "guidebook.page.building.slabs.body2" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "glass_variants",
+      "title": "guidebook.entry.glass_variants",
+      "pages": [
+        {
+          "components": [
+            { "type": "header", "text": "guidebook.page.building.glass.header" },
+            { "type": "text",   "text": "guidebook.page.building.glass.body1" }
+          ]
+        }
+      ]
+    }
+  ]
+}

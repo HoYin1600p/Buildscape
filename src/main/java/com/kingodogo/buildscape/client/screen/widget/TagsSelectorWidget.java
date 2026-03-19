@@ -22,10 +22,14 @@ public class TagsSelectorWidget extends AbstractWidget {
     private static final int TAG_BUTTON_HEIGHT = 20;
     private static final int TAG_BUTTON_SPACING = 2;
     private static final int TAGS_PER_ROW = 1;
-    // Header area: top padding (5px) + search box height (~20px) + gap (5px) = 30px
-    // Tags start below this area
-    private static final int HEADER_AREA_HEIGHT = 26; // Reduced to start 1px below search bar (5px padding + 20px
-                                                      // height + 1px)
+    // Items start below this area
+    private int headerAreaHeight = 26; // Default to 1px below 20px search bar
+    private static final int GRID_PADDING_TOP = 5; // Headspace between separator line and tag list
+    
+    public void setHeaderAreaHeight(int height) {
+        this.headerAreaHeight = height;
+        refresh();
+    }
 
     private List<TagKey<Item>> allTags;
     private List<TagKey<Item>> filteredTags;
@@ -53,7 +57,7 @@ public class TagsSelectorWidget extends AbstractWidget {
         this.selectedTags = new HashSet<>();
         loadAllTags();
         filteredTags = new ArrayList<>(allTags);
-        maxVisibleRows = (height - HEADER_AREA_HEIGHT) / (TAG_BUTTON_HEIGHT + TAG_BUTTON_SPACING);
+        maxVisibleRows = (height - headerAreaHeight) / (TAG_BUTTON_HEIGHT + TAG_BUTTON_SPACING);
     }
 
     private void loadAllTags() {
@@ -146,7 +150,7 @@ public class TagsSelectorWidget extends AbstractWidget {
     public void renderButton(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
         // Tags should start below the header area (label, search box, buttons)
         // Tags should start below the header area (label, search box, buttons)
-        int topPadding = HEADER_AREA_HEIGHT;
+        int topPadding = headerAreaHeight;
         int bottomMargin = 10;
         int availableHeight = height - topPadding - bottomMargin; // Account for bottom margin
         maxVisibleRows = availableHeight / (TAG_BUTTON_HEIGHT + TAG_BUTTON_SPACING);
@@ -156,47 +160,36 @@ public class TagsSelectorWidget extends AbstractWidget {
         Minecraft mc = Minecraft.getInstance();
         double guiScale = mc.getWindow().getGuiScale();
         int windowHeight = mc.getWindow().getHeight();
-
-        // Draw border around panel (debug mode)
-        if (com.kingodogo.buildscape.client.screen.DebugRenderConfig.RENDER_PANEL_BORDERS) {
-            int borderColor = com.kingodogo.buildscape.client.screen.DebugRenderConfig.PANEL_BORDER_COLOR;
-            fill(poseStack, x, y, x + width, y + 1, borderColor); // Top
-            fill(poseStack, x, y + height - 1, x + width, y + height, borderColor); // Bottom
-            fill(poseStack, x, y, x + 1, y + height, borderColor); // Left
-            fill(poseStack, x + width - 1, y, x + width, y + height, borderColor); // Right
-        }
-
         int scissorX = (int) (x * guiScale);
-        // Exclude header area from scissor height and add bottom margin
-        // bottomMargin is already defined above
-        // Raise bottom edge by bottomMargin
         int scissorY = (int) (windowHeight - (y + height) * guiScale + bottomMargin * guiScale);
-        // Clip content to exclude scrollbar area:
-        // 4px right gap + 8px scrollbar + 4px left gap = 16px reserved
+        
+        // Clip content area: Include the padding space for selection borders
         int scissorWidth = (int) ((width - 16) * guiScale);
-        int scissorHeight = (int) ((height - HEADER_AREA_HEIGHT - bottomMargin + 2) * guiScale); // Reduce height
+        int scissorHeight = (int) ((height - headerAreaHeight - 1 - bottomMargin) * guiScale);
 
         if (scissorHeight > 0 && scissorWidth > 0) {
             RenderSystem.enableScissor(scissorX, scissorY, scissorWidth, scissorHeight);
         }
 
-        int startRow = (int) scrollOffset;
-        int endRow = Math.min(startRow + maxVisibleRows + 1, filteredTags.size()); // +1 to ensure smooth scrolling
+        int startRow = (int) Math.floor(scrollOffset);
+        int endRow = Math.min(startRow + maxVisibleRows + 2, filteredTags.size()); // +1 for smooth scrolling
 
-        int tagY = y + topPadding;
+        double pixelOffsetInRow = (scrollOffset % 1.0) * (TAG_BUTTON_HEIGHT + TAG_BUTTON_SPACING);
+        // Tag list starts below separator + padding gap (matching items grid)
+        int tagY = y + headerAreaHeight + GRID_PADDING_TOP - (int) pixelOffsetInRow;
         // Total width - 5px left padding - 16px right reserved space = width - 21
-        int tagWidth = width - 21;
+        int tagWidth = width - CustomScrollbarRenderer.getScrollbarWidth() - 20;
 
         for (int row = startRow; row < endRow; row++) {
-            if (row >= filteredTags.size())
+            if (row < 0 || row >= filteredTags.size())
                 break;
 
             TagKey<Item> tag = filteredTags.get(row);
             String tagId = "#" + tag.location();
             int rowY = tagY + (row - startRow) * (TAG_BUTTON_HEIGHT + TAG_BUTTON_SPACING);
 
-            // Updated visibility check to respect HEADER_AREA_HEIGHT
-            if (rowY + TAG_BUTTON_HEIGHT < y + HEADER_AREA_HEIGHT || rowY > y + height) {
+            // Updated visibility check - allow items slightly above the start point
+            if (rowY + TAG_BUTTON_HEIGHT < y + headerAreaHeight || rowY > y + height - bottomMargin) {
                 continue;
             }
 
@@ -206,7 +199,7 @@ public class TagsSelectorWidget extends AbstractWidget {
             boolean isHovered = mouseX >= tagX && mouseX < tagX + tagWidth &&
                     mouseY >= rowY && mouseY < rowY + TAG_BUTTON_HEIGHT &&
                     mouseX >= x && mouseX < x + width &&
-                    mouseY >= y + HEADER_AREA_HEIGHT && mouseY < y + height; // Updated hover check
+                    mouseY >= y + headerAreaHeight + 1 && mouseY < y + height - bottomMargin;
 
             int bgColor;
             if (isSelected) {
@@ -217,13 +210,13 @@ public class TagsSelectorWidget extends AbstractWidget {
             fill(poseStack, tagX, rowY, tagX + tagWidth, rowY + TAG_BUTTON_HEIGHT, bgColor);
 
             if (isSelected) {
-                int borderColor = 0xFF00FF00;
-                fill(poseStack, tagX - 1, rowY - 1, tagX + tagWidth + 1, rowY, borderColor);
+                int selectionBorderColor = 0xFF00FF00;
+                fill(poseStack, tagX - 1, rowY - 1, tagX + tagWidth + 1, rowY, selectionBorderColor);
                 fill(poseStack, tagX - 1, rowY + TAG_BUTTON_HEIGHT, tagX + tagWidth + 1, rowY + TAG_BUTTON_HEIGHT + 1,
-                        borderColor);
-                fill(poseStack, tagX - 1, rowY - 1, tagX, rowY + TAG_BUTTON_HEIGHT + 1, borderColor);
+                        selectionBorderColor);
+                fill(poseStack, tagX - 1, rowY - 1, tagX, rowY + TAG_BUTTON_HEIGHT + 1, selectionBorderColor);
                 fill(poseStack, tagX + tagWidth, rowY - 1, tagX + tagWidth + 1, rowY + TAG_BUTTON_HEIGHT + 1,
-                        borderColor);
+                        selectionBorderColor);
             }
 
             String displayName = tag.location().toString();
@@ -294,13 +287,21 @@ public class TagsSelectorWidget extends AbstractWidget {
             RenderSystem.disableScissor();
         }
         poseStack.popPose();
+        
+        // Draw panel borders and separator
+        int borderCol = 0xFF666666;
+        fill(poseStack, x, y, x + width, y + 1, borderCol); // Top
+        fill(poseStack, x, y + height - 1, x + width, y + height, borderCol); // Bottom
+        fill(poseStack, x, y, x + 1, y + height, borderCol); // Left
+        fill(poseStack, x + width - 1, y, x + width, y + height, borderCol); // Right
+        fill(poseStack, x, y + headerAreaHeight + 1, x + width, y + headerAreaHeight + 2, borderCol); // Separator (moved 1px down)
 
         if (getMaxScroll() > 0) {
             // Scrollbar X = width - 4px gap - 8px width = width - 12
             int scrollbarX = x + width - CustomScrollbarRenderer.getScrollbarWidth() - 4;
-            bottomMargin = 10; // Increased margin at bottom
-            int scrollbarHeight = height - HEADER_AREA_HEIGHT - bottomMargin;
-            int scrollbarY = y + HEADER_AREA_HEIGHT;
+            bottomMargin = 10;
+            int scrollbarHeight = height - headerAreaHeight - GRID_PADDING_TOP - bottomMargin - 1;
+            int scrollbarY = y + headerAreaHeight + GRID_PADDING_TOP + 1;
 
             double visibleRatio = maxVisibleRows / (double) filteredTags.size();
             scrollbarRenderer.renderScrollbar(poseStack, scrollbarX, scrollbarY, scrollbarHeight,
@@ -311,21 +312,21 @@ public class TagsSelectorWidget extends AbstractWidget {
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         // Updated check to ignore clicks in header area
-        if (!isMouseOver(mouseX, mouseY) || mouseY < y + HEADER_AREA_HEIGHT) {
+        if (!isMouseOver(mouseX, mouseY) || mouseY < y + headerAreaHeight + GRID_PADDING_TOP) {
             return false;
         }
 
         double maxScroll = getMaxScroll();
         if (maxScroll > 0) {
-            int scrollbarX = x + width - CustomScrollbarRenderer.getScrollbarWidth() - 4; // 4px form edge
-            int scrollbarY = y + HEADER_AREA_HEIGHT;
+            int scrollbarX = x + width - CustomScrollbarRenderer.getScrollbarWidth() - 4;
+            int scrollbarY = y + headerAreaHeight + GRID_PADDING_TOP + 1;
             int bottomMargin = 10;
-            int scrollbarHeight = height - HEADER_AREA_HEIGHT - bottomMargin;
+            int scrollbarHeight = height - headerAreaHeight - GRID_PADDING_TOP - bottomMargin - 1;
             int contentX = x + 5;
-            int contentY = y + HEADER_AREA_HEIGHT;
+            int contentY = y + headerAreaHeight + GRID_PADDING_TOP + 1;
             // Content width = width - 16px reserved - 5px left padding = width - 21
             int contentWidth = width - 21;
-            int contentHeight = height - HEADER_AREA_HEIGHT;
+            int contentHeight = scrollbarHeight;
 
             double visibleRatio = maxVisibleRows / (double) filteredTags.size();
             double newOffset = scrollbarRenderer.handleMouseClick(mouseX, mouseY, button,
@@ -339,7 +340,7 @@ public class TagsSelectorWidget extends AbstractWidget {
             }
         }
 
-        int topPadding = HEADER_AREA_HEIGHT; // Use constant
+        int topPadding = headerAreaHeight; // Use dynamic value
         int bottomMargin = 10;
         int availableHeight = height - topPadding - bottomMargin;
         maxVisibleRows = availableHeight / (TAG_BUTTON_HEIGHT + TAG_BUTTON_SPACING);
@@ -360,7 +361,7 @@ public class TagsSelectorWidget extends AbstractWidget {
             int rowY = tagY + (row - startRow) * (TAG_BUTTON_HEIGHT + TAG_BUTTON_SPACING);
 
             // Updated visibility check
-            if (rowY + TAG_BUTTON_HEIGHT < y + HEADER_AREA_HEIGHT || rowY > y + height) {
+            if (rowY + TAG_BUTTON_HEIGHT < y + headerAreaHeight + GRID_PADDING_TOP || rowY > y + height) {
                 continue;
             }
 
@@ -369,7 +370,7 @@ public class TagsSelectorWidget extends AbstractWidget {
             if (mouseX >= tagX && mouseX < tagX + tagWidth &&
                     mouseY >= rowY && mouseY < rowY + TAG_BUTTON_HEIGHT &&
                     mouseX >= x && mouseX < x + width &&
-                    mouseY >= y + HEADER_AREA_HEIGHT && mouseY < y + height) { // Updated click check
+                    mouseY >= y + headerAreaHeight + GRID_PADDING_TOP && mouseY < y + height) {
                 if (selectedTags.contains(tagId)) {
                     selectedTags.remove(tagId);
                 } else {
@@ -400,9 +401,9 @@ public class TagsSelectorWidget extends AbstractWidget {
         if (scrollbarRenderer.isDragging() && button == 0) {
             double maxScroll = getMaxScroll();
             if (maxScroll > 0) {
-                int scrollbarY = y + HEADER_AREA_HEIGHT;
+                int scrollbarY = y + headerAreaHeight + GRID_PADDING_TOP + 1;
                 int bottomMargin = 10;
-                int scrollbarHeight = height - HEADER_AREA_HEIGHT - bottomMargin;
+                int scrollbarHeight = height - headerAreaHeight - GRID_PADDING_TOP - bottomMargin - 1;
                 double visibleRatio = maxVisibleRows / (double) filteredTags.size();
 
                 double newOffset = scrollbarRenderer.handleMouseDrag(mouseY, scrollbarY, scrollbarHeight,

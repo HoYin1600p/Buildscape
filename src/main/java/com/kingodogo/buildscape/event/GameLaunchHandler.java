@@ -19,11 +19,21 @@ import java.util.HashSet;
 public class GameLaunchHandler {
     private static boolean authenticationTriggered = false;
 
+/*
+    @SubscribeEvent
+    public static void onRegisterReloadListeners(
+            net.minecraftforge.client.event.RegisterClientReloadListenersEvent event) {
+        event.registerReloadListener(
+                com.kingodogo.buildscape.client.guidebook.data.GuidePageLoader.INSTANCE);
+    }
+*/
+
     @SubscribeEvent
     public static void onClientSetup(FMLClientSetupEvent event) {
         // Trigger one-time authentication on game launch
         if (!authenticationTriggered) {
             authenticationTriggered = true;
+
 
 
 

@@ -1,0 +1,58 @@
+{
+  "id": "pillar_blocks",
+  "displayName": "guidebook.category.pillar_blocks",
+  "icon": "buildscape:pillar_oak",
+  "sort": 10,
+  "entries": [
+    {
+      "id": "pillar_overview",
+      "title": "guidebook.entry.pillar_overview",
+      "pages": [
+        {
+          "components": [
+            { "type": "header", "text": "guidebook.page.pillar.overview.header" },
+            { "type": "text",   "text": "guidebook.page.pillar.overview.body1" },
+            { "type": "spacer", "pixels": 6 },
+            { "type": "text",   "text": "guidebook.page.pillar.overview.body2" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "pillar_dye_colors",
+      "title": "guidebook.entry.pillar_dye_colors",
+      "pages": [
+        {
+          "components": [
+            { "type": "header", "text": "guidebook.page.pillar.dye.header" },
+            { "type": "text",   "text": "guidebook.page.pillar.dye.body1" },
+            { "type": "spacer", "pixels": 6 },
+            { "type": "item",   "item": "minecraft:red_dye", "caption": "guidebook.page.pillar.dye.caption" }
+          ]
+        },
+        {
+          "components": [
+            { "type": "header", "text": "guidebook.page.pillar.dye.multi.header" },
+            { "type": "text",   "text": "guidebook.page.pillar.dye.multi.body1" },
+            { "type": "spacer", "pixels": 4 },
+            { "type": "text",   "text": "guidebook.page.pillar.dye.multi.body2" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "pillar_particles",
+      "title": "guidebook.entry.pillar_particles",
+      "pages": [
+        {
+          "components": [
+            { "type": "header", "text": "guidebook.page.pillar.particles.header" },
+            { "type": "text",   "text": "guidebook.page.pillar.particles.body1" },
+            { "type": "spacer", "pixels": 6 },
+            { "type": "text",   "text": "guidebook.page.pillar.particles.body2" }
+          ]
+        }
+      ]
+    }
+  ]
+}

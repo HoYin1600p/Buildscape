@@ -38,13 +38,7 @@ public class ConfigCategoryButton extends Button {
             fill(poseStack, x + 1, y + 1, x + width - 1, y + 2, 0x40FFFFFF);
         }
 
-        double guiScale = mc.getWindow().getGuiScale();
-        float textScale = 1.0f;
-        if (guiScale >= 3.0) {
-            textScale = 0.75f;
-        } else if (guiScale >= 2.5) {
-            textScale = 0.85f;
-        }
+        float textScale = com.kingodogo.buildscape.client.screen.BuildScapeConfigScreen.getStandardTextScale();
 
         String buttonText = getMessage().getString();
         int textColor = active ? 0xFFFFFF : (hovered ? 0xFFFFFF : 0xCCCCCC);

@@ -19,10 +19,12 @@ public class ModItems {
         return new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB);
     }
 
+/*
     public static final RegistryObject<Item> MIRROR_BLOCK = ITEMS.register(
             "mirror_block",
             () -> new BlockItem(ModBlocks.MIRROR_BLOCK.get(), createBlockItemProperties())
     );
+*/
 
     public static final RegistryObject<Item> BLACK_SAND = ITEMS.register(
             "black_sand",
@@ -5632,7 +5634,7 @@ public class ModItems {
 
     public static final RegistryObject<Item> CONFETTI_ITEM = ITEMS.register(
             "confetti",
-            () -> new ConfettiItem(new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB))
+            () -> new ConfettiItem(new Item.Properties())
     );
 
     public static final RegistryObject<Item> STEEL_BLOCK = ITEMS.register(
@@ -7085,4 +7087,526 @@ public class ModItems {
                 }
             });
 
+
+
+    public static final RegistryObject<Item> GLASS_SLAB = ITEMS.register(
+            "glass_slab",
+            () -> new BlockItem(ModBlocks.GLASS_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> WHITE_STAINED_GLASS_SLAB = ITEMS.register(
+            "white_stained_glass_slab",
+            () -> new BlockItem(ModBlocks.WHITE_STAINED_GLASS_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> LIGHT_GRAY_STAINED_GLASS_SLAB = ITEMS.register(
+            "light_gray_stained_glass_slab",
+            () -> new BlockItem(ModBlocks.LIGHT_GRAY_STAINED_GLASS_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> GRAY_STAINED_GLASS_SLAB = ITEMS.register(
+            "gray_stained_glass_slab",
+            () -> new BlockItem(ModBlocks.GRAY_STAINED_GLASS_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> BLACK_STAINED_GLASS_SLAB = ITEMS.register(
+            "black_stained_glass_slab",
+            () -> new BlockItem(ModBlocks.BLACK_STAINED_GLASS_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> BROWN_STAINED_GLASS_SLAB = ITEMS.register(
+            "brown_stained_glass_slab",
+            () -> new BlockItem(ModBlocks.BROWN_STAINED_GLASS_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> RED_STAINED_GLASS_SLAB = ITEMS.register(
+            "red_stained_glass_slab",
+            () -> new BlockItem(ModBlocks.RED_STAINED_GLASS_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> ORANGE_STAINED_GLASS_SLAB = ITEMS.register(
+            "orange_stained_glass_slab",
+            () -> new BlockItem(ModBlocks.ORANGE_STAINED_GLASS_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> YELLOW_STAINED_GLASS_SLAB = ITEMS.register(
+            "yellow_stained_glass_slab",
+            () -> new BlockItem(ModBlocks.YELLOW_STAINED_GLASS_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> LIME_STAINED_GLASS_SLAB = ITEMS.register(
+            "lime_stained_glass_slab",
+            () -> new BlockItem(ModBlocks.LIME_STAINED_GLASS_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> GREEN_STAINED_GLASS_SLAB = ITEMS.register(
+            "green_stained_glass_slab",
+            () -> new BlockItem(ModBlocks.GREEN_STAINED_GLASS_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> CYAN_STAINED_GLASS_SLAB = ITEMS.register(
+            "cyan_stained_glass_slab",
+            () -> new BlockItem(ModBlocks.CYAN_STAINED_GLASS_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> LIGHT_BLUE_STAINED_GLASS_SLAB = ITEMS.register(
+            "light_blue_stained_glass_slab",
+            () -> new BlockItem(ModBlocks.LIGHT_BLUE_STAINED_GLASS_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> BLUE_STAINED_GLASS_SLAB = ITEMS.register(
+            "blue_stained_glass_slab",
+            () -> new BlockItem(ModBlocks.BLUE_STAINED_GLASS_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> PURPLE_STAINED_GLASS_SLAB = ITEMS.register(
+            "purple_stained_glass_slab",
+            () -> new BlockItem(ModBlocks.PURPLE_STAINED_GLASS_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> MAGENTA_STAINED_GLASS_SLAB = ITEMS.register(
+            "magenta_stained_glass_slab",
+            () -> new BlockItem(ModBlocks.MAGENTA_STAINED_GLASS_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> PINK_STAINED_GLASS_SLAB = ITEMS.register(
+            "pink_stained_glass_slab",
+            () -> new BlockItem(ModBlocks.PINK_STAINED_GLASS_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> GLASS_STAIRS = ITEMS.register(
+            "glass_stairs",
+            () -> new BlockItem(ModBlocks.GLASS_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> WHITE_STAINED_GLASS_STAIRS = ITEMS.register(
+            "white_stained_glass_stairs",
+            () -> new BlockItem(ModBlocks.WHITE_STAINED_GLASS_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> LIGHT_GRAY_STAINED_GLASS_STAIRS = ITEMS.register(
+            "light_gray_stained_glass_stairs",
+            () -> new BlockItem(ModBlocks.LIGHT_GRAY_STAINED_GLASS_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> GRAY_STAINED_GLASS_STAIRS = ITEMS.register(
+            "gray_stained_glass_stairs",
+            () -> new BlockItem(ModBlocks.GRAY_STAINED_GLASS_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> BLACK_STAINED_GLASS_STAIRS = ITEMS.register(
+            "black_stained_glass_stairs",
+            () -> new BlockItem(ModBlocks.BLACK_STAINED_GLASS_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> BROWN_STAINED_GLASS_STAIRS = ITEMS.register(
+            "brown_stained_glass_stairs",
+            () -> new BlockItem(ModBlocks.BROWN_STAINED_GLASS_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> RED_STAINED_GLASS_STAIRS = ITEMS.register(
+            "red_stained_glass_stairs",
+            () -> new BlockItem(ModBlocks.RED_STAINED_GLASS_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> ORANGE_STAINED_GLASS_STAIRS = ITEMS.register(
+            "orange_stained_glass_stairs",
+            () -> new BlockItem(ModBlocks.ORANGE_STAINED_GLASS_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> YELLOW_STAINED_GLASS_STAIRS = ITEMS.register(
+            "yellow_stained_glass_stairs",
+            () -> new BlockItem(ModBlocks.YELLOW_STAINED_GLASS_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> LIME_STAINED_GLASS_STAIRS = ITEMS.register(
+            "lime_stained_glass_stairs",
+            () -> new BlockItem(ModBlocks.LIME_STAINED_GLASS_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> GREEN_STAINED_GLASS_STAIRS = ITEMS.register(
+            "green_stained_glass_stairs",
+            () -> new BlockItem(ModBlocks.GREEN_STAINED_GLASS_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> CYAN_STAINED_GLASS_STAIRS = ITEMS.register(
+            "cyan_stained_glass_stairs",
+            () -> new BlockItem(ModBlocks.CYAN_STAINED_GLASS_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> LIGHT_BLUE_STAINED_GLASS_STAIRS = ITEMS.register(
+            "light_blue_stained_glass_stairs",
+            () -> new BlockItem(ModBlocks.LIGHT_BLUE_STAINED_GLASS_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> BLUE_STAINED_GLASS_STAIRS = ITEMS.register(
+            "blue_stained_glass_stairs",
+            () -> new BlockItem(ModBlocks.BLUE_STAINED_GLASS_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> PURPLE_STAINED_GLASS_STAIRS = ITEMS.register(
+            "purple_stained_glass_stairs",
+            () -> new BlockItem(ModBlocks.PURPLE_STAINED_GLASS_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> MAGENTA_STAINED_GLASS_STAIRS = ITEMS.register(
+            "magenta_stained_glass_stairs",
+            () -> new BlockItem(ModBlocks.MAGENTA_STAINED_GLASS_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> PINK_STAINED_GLASS_STAIRS = ITEMS.register(
+            "pink_stained_glass_stairs",
+            () -> new BlockItem(ModBlocks.PINK_STAINED_GLASS_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> WHITE_MOSAIC_GLASS_SLAB = ITEMS.register(
+            "white_mosaic_glass_slab",
+            () -> new BlockItem(ModBlocks.WHITE_MOSAIC_GLASS_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> WHITE_MOSAIC_GLASS_STAIRS = ITEMS.register(
+            "white_mosaic_glass_stairs",
+            () -> new BlockItem(ModBlocks.WHITE_MOSAIC_GLASS_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> LIGHT_GRAY_MOSAIC_GLASS_SLAB = ITEMS.register(
+            "light_gray_mosaic_glass_slab",
+            () -> new BlockItem(ModBlocks.LIGHT_GRAY_MOSAIC_GLASS_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> LIGHT_GRAY_MOSAIC_GLASS_STAIRS = ITEMS.register(
+            "light_gray_mosaic_glass_stairs",
+            () -> new BlockItem(ModBlocks.LIGHT_GRAY_MOSAIC_GLASS_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> GRAY_MOSAIC_GLASS_SLAB = ITEMS.register(
+            "gray_mosaic_glass_slab",
+            () -> new BlockItem(ModBlocks.GRAY_MOSAIC_GLASS_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> GRAY_MOSAIC_GLASS_STAIRS = ITEMS.register(
+            "gray_mosaic_glass_stairs",
+            () -> new BlockItem(ModBlocks.GRAY_MOSAIC_GLASS_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> BLACK_MOSAIC_GLASS_SLAB = ITEMS.register(
+            "black_mosaic_glass_slab",
+            () -> new BlockItem(ModBlocks.BLACK_MOSAIC_GLASS_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> BLACK_MOSAIC_GLASS_STAIRS = ITEMS.register(
+            "black_mosaic_glass_stairs",
+            () -> new BlockItem(ModBlocks.BLACK_MOSAIC_GLASS_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> BROWN_MOSAIC_GLASS_SLAB = ITEMS.register(
+            "brown_mosaic_glass_slab",
+            () -> new BlockItem(ModBlocks.BROWN_MOSAIC_GLASS_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> BROWN_MOSAIC_GLASS_STAIRS = ITEMS.register(
+            "brown_mosaic_glass_stairs",
+            () -> new BlockItem(ModBlocks.BROWN_MOSAIC_GLASS_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> RED_MOSAIC_GLASS_SLAB = ITEMS.register(
+            "red_mosaic_glass_slab",
+            () -> new BlockItem(ModBlocks.RED_MOSAIC_GLASS_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> RED_MOSAIC_GLASS_STAIRS = ITEMS.register(
+            "red_mosaic_glass_stairs",
+            () -> new BlockItem(ModBlocks.RED_MOSAIC_GLASS_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> ORANGE_MOSAIC_GLASS_SLAB = ITEMS.register(
+            "orange_mosaic_glass_slab",
+            () -> new BlockItem(ModBlocks.ORANGE_MOSAIC_GLASS_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> ORANGE_MOSAIC_GLASS_STAIRS = ITEMS.register(
+            "orange_mosaic_glass_stairs",
+            () -> new BlockItem(ModBlocks.ORANGE_MOSAIC_GLASS_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> YELLOW_MOSAIC_GLASS_SLAB = ITEMS.register(
+            "yellow_mosaic_glass_slab",
+            () -> new BlockItem(ModBlocks.YELLOW_MOSAIC_GLASS_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> YELLOW_MOSAIC_GLASS_STAIRS = ITEMS.register(
+            "yellow_mosaic_glass_stairs",
+            () -> new BlockItem(ModBlocks.YELLOW_MOSAIC_GLASS_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> LIME_MOSAIC_GLASS_SLAB = ITEMS.register(
+            "lime_mosaic_glass_slab",
+            () -> new BlockItem(ModBlocks.LIME_MOSAIC_GLASS_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> LIME_MOSAIC_GLASS_STAIRS = ITEMS.register(
+            "lime_mosaic_glass_stairs",
+            () -> new BlockItem(ModBlocks.LIME_MOSAIC_GLASS_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> GREEN_MOSAIC_GLASS_SLAB = ITEMS.register(
+            "green_mosaic_glass_slab",
+            () -> new BlockItem(ModBlocks.GREEN_MOSAIC_GLASS_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> GREEN_MOSAIC_GLASS_STAIRS = ITEMS.register(
+            "green_mosaic_glass_stairs",
+            () -> new BlockItem(ModBlocks.GREEN_MOSAIC_GLASS_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> CYAN_MOSAIC_GLASS_SLAB = ITEMS.register(
+            "cyan_mosaic_glass_slab",
+            () -> new BlockItem(ModBlocks.CYAN_MOSAIC_GLASS_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> CYAN_MOSAIC_GLASS_STAIRS = ITEMS.register(
+            "cyan_mosaic_glass_stairs",
+            () -> new BlockItem(ModBlocks.CYAN_MOSAIC_GLASS_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> LIGHT_BLUE_MOSAIC_GLASS_SLAB = ITEMS.register(
+            "light_blue_mosaic_glass_slab",
+            () -> new BlockItem(ModBlocks.LIGHT_BLUE_MOSAIC_GLASS_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> LIGHT_BLUE_MOSAIC_GLASS_STAIRS = ITEMS.register(
+            "light_blue_mosaic_glass_stairs",
+            () -> new BlockItem(ModBlocks.LIGHT_BLUE_MOSAIC_GLASS_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> BLUE_MOSAIC_GLASS_SLAB = ITEMS.register(
+            "blue_mosaic_glass_slab",
+            () -> new BlockItem(ModBlocks.BLUE_MOSAIC_GLASS_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> BLUE_MOSAIC_GLASS_STAIRS = ITEMS.register(
+            "blue_mosaic_glass_stairs",
+            () -> new BlockItem(ModBlocks.BLUE_MOSAIC_GLASS_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> PURPLE_MOSAIC_GLASS_SLAB = ITEMS.register(
+            "purple_mosaic_glass_slab",
+            () -> new BlockItem(ModBlocks.PURPLE_MOSAIC_GLASS_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> PURPLE_MOSAIC_GLASS_STAIRS = ITEMS.register(
+            "purple_mosaic_glass_stairs",
+            () -> new BlockItem(ModBlocks.PURPLE_MOSAIC_GLASS_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> MAGENTA_MOSAIC_GLASS_SLAB = ITEMS.register(
+            "magenta_mosaic_glass_slab",
+            () -> new BlockItem(ModBlocks.MAGENTA_MOSAIC_GLASS_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> MAGENTA_MOSAIC_GLASS_STAIRS = ITEMS.register(
+            "magenta_mosaic_glass_stairs",
+            () -> new BlockItem(ModBlocks.MAGENTA_MOSAIC_GLASS_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> PINK_MOSAIC_GLASS_SLAB = ITEMS.register(
+            "pink_mosaic_glass_slab",
+            () -> new BlockItem(ModBlocks.PINK_MOSAIC_GLASS_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> PINK_MOSAIC_GLASS_STAIRS = ITEMS.register(
+            "pink_mosaic_glass_stairs",
+            () -> new BlockItem(ModBlocks.PINK_MOSAIC_GLASS_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> FACTORY_WHITE_GLASS_SLAB = ITEMS.register(
+            "factory_white_glass_slab",
+            () -> new BlockItem(ModBlocks.FACTORY_WHITE_GLASS_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> FACTORY_WHITE_GLASS_STAIRS = ITEMS.register(
+            "factory_white_glass_stairs",
+            () -> new BlockItem(ModBlocks.FACTORY_WHITE_GLASS_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> FACTORY_LIGHT_GRAY_GLASS_SLAB = ITEMS.register(
+            "factory_light_gray_glass_slab",
+            () -> new BlockItem(ModBlocks.FACTORY_LIGHT_GRAY_GLASS_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> FACTORY_LIGHT_GRAY_GLASS_STAIRS = ITEMS.register(
+            "factory_light_gray_glass_stairs",
+            () -> new BlockItem(ModBlocks.FACTORY_LIGHT_GRAY_GLASS_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> FACTORY_GRAY_GLASS_SLAB = ITEMS.register(
+            "factory_gray_glass_slab",
+            () -> new BlockItem(ModBlocks.FACTORY_GRAY_GLASS_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> FACTORY_GRAY_GLASS_STAIRS = ITEMS.register(
+            "factory_gray_glass_stairs",
+            () -> new BlockItem(ModBlocks.FACTORY_GRAY_GLASS_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> FACTORY_BLACK_GLASS_SLAB = ITEMS.register(
+            "factory_black_glass_slab",
+            () -> new BlockItem(ModBlocks.FACTORY_BLACK_GLASS_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> FACTORY_BLACK_GLASS_STAIRS = ITEMS.register(
+            "factory_black_glass_stairs",
+            () -> new BlockItem(ModBlocks.FACTORY_BLACK_GLASS_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> FACTORY_BROWN_GLASS_SLAB = ITEMS.register(
+            "factory_brown_glass_slab",
+            () -> new BlockItem(ModBlocks.FACTORY_BROWN_GLASS_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> FACTORY_BROWN_GLASS_STAIRS = ITEMS.register(
+            "factory_brown_glass_stairs",
+            () -> new BlockItem(ModBlocks.FACTORY_BROWN_GLASS_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> FACTORY_RED_GLASS_SLAB = ITEMS.register(
+            "factory_red_glass_slab",
+            () -> new BlockItem(ModBlocks.FACTORY_RED_GLASS_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> FACTORY_RED_GLASS_STAIRS = ITEMS.register(
+            "factory_red_glass_stairs",
+            () -> new BlockItem(ModBlocks.FACTORY_RED_GLASS_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> FACTORY_ORANGE_GLASS_SLAB = ITEMS.register(
+            "factory_orange_glass_slab",
+            () -> new BlockItem(ModBlocks.FACTORY_ORANGE_GLASS_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> FACTORY_ORANGE_GLASS_STAIRS = ITEMS.register(
+            "factory_orange_glass_stairs",
+            () -> new BlockItem(ModBlocks.FACTORY_ORANGE_GLASS_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> FACTORY_YELLOW_GLASS_SLAB = ITEMS.register(
+            "factory_yellow_glass_slab",
+            () -> new BlockItem(ModBlocks.FACTORY_YELLOW_GLASS_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> FACTORY_YELLOW_GLASS_STAIRS = ITEMS.register(
+            "factory_yellow_glass_stairs",
+            () -> new BlockItem(ModBlocks.FACTORY_YELLOW_GLASS_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> FACTORY_LIME_GLASS_SLAB = ITEMS.register(
+            "factory_lime_glass_slab",
+            () -> new BlockItem(ModBlocks.FACTORY_LIME_GLASS_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> FACTORY_LIME_GLASS_STAIRS = ITEMS.register(
+            "factory_lime_glass_stairs",
+            () -> new BlockItem(ModBlocks.FACTORY_LIME_GLASS_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> FACTORY_GREEN_GLASS_SLAB = ITEMS.register(
+            "factory_green_glass_slab",
+            () -> new BlockItem(ModBlocks.FACTORY_GREEN_GLASS_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> FACTORY_GREEN_GLASS_STAIRS = ITEMS.register(
+            "factory_green_glass_stairs",
+            () -> new BlockItem(ModBlocks.FACTORY_GREEN_GLASS_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> FACTORY_CYAN_GLASS_SLAB = ITEMS.register(
+            "factory_cyan_glass_slab",
+            () -> new BlockItem(ModBlocks.FACTORY_CYAN_GLASS_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> FACTORY_CYAN_GLASS_STAIRS = ITEMS.register(
+            "factory_cyan_glass_stairs",
+            () -> new BlockItem(ModBlocks.FACTORY_CYAN_GLASS_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> FACTORY_LIGHT_BLUE_GLASS_SLAB = ITEMS.register(
+            "factory_light_blue_glass_slab",
+            () -> new BlockItem(ModBlocks.FACTORY_LIGHT_BLUE_GLASS_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> FACTORY_LIGHT_BLUE_GLASS_STAIRS = ITEMS.register(
+            "factory_light_blue_glass_stairs",
+            () -> new BlockItem(ModBlocks.FACTORY_LIGHT_BLUE_GLASS_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> FACTORY_BLUE_GLASS_SLAB = ITEMS.register(
+            "factory_blue_glass_slab",
+            () -> new BlockItem(ModBlocks.FACTORY_BLUE_GLASS_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> FACTORY_BLUE_GLASS_STAIRS = ITEMS.register(
+            "factory_blue_glass_stairs",
+            () -> new BlockItem(ModBlocks.FACTORY_BLUE_GLASS_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> FACTORY_PURPLE_GLASS_SLAB = ITEMS.register(
+            "factory_purple_glass_slab",
+            () -> new BlockItem(ModBlocks.FACTORY_PURPLE_GLASS_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> FACTORY_PURPLE_GLASS_STAIRS = ITEMS.register(
+            "factory_purple_glass_stairs",
+            () -> new BlockItem(ModBlocks.FACTORY_PURPLE_GLASS_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> FACTORY_MAGENTA_GLASS_SLAB = ITEMS.register(
+            "factory_magenta_glass_slab",
+            () -> new BlockItem(ModBlocks.FACTORY_MAGENTA_GLASS_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> FACTORY_MAGENTA_GLASS_STAIRS = ITEMS.register(
+            "factory_magenta_glass_stairs",
+            () -> new BlockItem(ModBlocks.FACTORY_MAGENTA_GLASS_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> FACTORY_PINK_GLASS_SLAB = ITEMS.register(
+            "factory_pink_glass_slab",
+            () -> new BlockItem(ModBlocks.FACTORY_PINK_GLASS_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> FACTORY_PINK_GLASS_STAIRS = ITEMS.register(
+            "factory_pink_glass_stairs",
+            () -> new BlockItem(ModBlocks.FACTORY_PINK_GLASS_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> WHITE_GLAZED_GLASS_SLAB = ITEMS.register(
+            "white_glazed_glass_slab",
+            () -> new BlockItem(ModBlocks.WHITE_GLAZED_GLASS_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> WHITE_GLAZED_GLASS_STAIRS = ITEMS.register(
+            "white_glazed_glass_stairs",
+            () -> new BlockItem(ModBlocks.WHITE_GLAZED_GLASS_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> LIGHT_GRAY_GLAZED_GLASS_SLAB = ITEMS.register(
+            "light_gray_glazed_glass_slab",
+            () -> new BlockItem(ModBlocks.LIGHT_GRAY_GLAZED_GLASS_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> LIGHT_GRAY_GLAZED_GLASS_STAIRS = ITEMS.register(
+            "light_gray_glazed_glass_stairs",
+            () -> new BlockItem(ModBlocks.LIGHT_GRAY_GLAZED_GLASS_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> GRAY_GLAZED_GLASS_SLAB = ITEMS.register(
+            "gray_glazed_glass_slab",
+            () -> new BlockItem(ModBlocks.GRAY_GLAZED_GLASS_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> GRAY_GLAZED_GLASS_STAIRS = ITEMS.register(
+            "gray_glazed_glass_stairs",
+            () -> new BlockItem(ModBlocks.GRAY_GLAZED_GLASS_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> BLACK_GLAZED_GLASS_SLAB = ITEMS.register(
+            "black_glazed_glass_slab",
+            () -> new BlockItem(ModBlocks.BLACK_GLAZED_GLASS_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> BLACK_GLAZED_GLASS_STAIRS = ITEMS.register(
+            "black_glazed_glass_stairs",
+            () -> new BlockItem(ModBlocks.BLACK_GLAZED_GLASS_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> BROWN_GLAZED_GLASS_SLAB = ITEMS.register(
+            "brown_glazed_glass_slab",
+            () -> new BlockItem(ModBlocks.BROWN_GLAZED_GLASS_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> BROWN_GLAZED_GLASS_STAIRS = ITEMS.register(
+            "brown_glazed_glass_stairs",
+            () -> new BlockItem(ModBlocks.BROWN_GLAZED_GLASS_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> RED_GLAZED_GLASS_SLAB = ITEMS.register(
+            "red_glazed_glass_slab",
+            () -> new BlockItem(ModBlocks.RED_GLAZED_GLASS_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> RED_GLAZED_GLASS_STAIRS = ITEMS.register(
+            "red_glazed_glass_stairs",
+            () -> new BlockItem(ModBlocks.RED_GLAZED_GLASS_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> ORANGE_GLAZED_GLASS_SLAB = ITEMS.register(
+            "orange_glazed_glass_slab",
+            () -> new BlockItem(ModBlocks.ORANGE_GLAZED_GLASS_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> ORANGE_GLAZED_GLASS_STAIRS = ITEMS.register(
+            "orange_glazed_glass_stairs",
+            () -> new BlockItem(ModBlocks.ORANGE_GLAZED_GLASS_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> YELLOW_GLAZED_GLASS_SLAB = ITEMS.register(
+            "yellow_glazed_glass_slab",
+            () -> new BlockItem(ModBlocks.YELLOW_GLAZED_GLASS_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> YELLOW_GLAZED_GLASS_STAIRS = ITEMS.register(
+            "yellow_glazed_glass_stairs",
+            () -> new BlockItem(ModBlocks.YELLOW_GLAZED_GLASS_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> LIME_GLAZED_GLASS_SLAB = ITEMS.register(
+            "lime_glazed_glass_slab",
+            () -> new BlockItem(ModBlocks.LIME_GLAZED_GLASS_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> LIME_GLAZED_GLASS_STAIRS = ITEMS.register(
+            "lime_glazed_glass_stairs",
+            () -> new BlockItem(ModBlocks.LIME_GLAZED_GLASS_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> GREEN_GLAZED_GLASS_SLAB = ITEMS.register(
+            "green_glazed_glass_slab",
+            () -> new BlockItem(ModBlocks.GREEN_GLAZED_GLASS_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> GREEN_GLAZED_GLASS_STAIRS = ITEMS.register(
+            "green_glazed_glass_stairs",
+            () -> new BlockItem(ModBlocks.GREEN_GLAZED_GLASS_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> CYAN_GLAZED_GLASS_SLAB = ITEMS.register(
+            "cyan_glazed_glass_slab",
+            () -> new BlockItem(ModBlocks.CYAN_GLAZED_GLASS_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> CYAN_GLAZED_GLASS_STAIRS = ITEMS.register(
+            "cyan_glazed_glass_stairs",
+            () -> new BlockItem(ModBlocks.CYAN_GLAZED_GLASS_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> LIGHT_BLUE_GLAZED_GLASS_SLAB = ITEMS.register(
+            "light_blue_glazed_glass_slab",
+            () -> new BlockItem(ModBlocks.LIGHT_BLUE_GLAZED_GLASS_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> LIGHT_BLUE_GLAZED_GLASS_STAIRS = ITEMS.register(
+            "light_blue_glazed_glass_stairs",
+            () -> new BlockItem(ModBlocks.LIGHT_BLUE_GLAZED_GLASS_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> BLUE_GLAZED_GLASS_SLAB = ITEMS.register(
+            "blue_glazed_glass_slab",
+            () -> new BlockItem(ModBlocks.BLUE_GLAZED_GLASS_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> BLUE_GLAZED_GLASS_STAIRS = ITEMS.register(
+            "blue_glazed_glass_stairs",
+            () -> new BlockItem(ModBlocks.BLUE_GLAZED_GLASS_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> PURPLE_GLAZED_GLASS_SLAB = ITEMS.register(
+            "purple_glazed_glass_slab",
+            () -> new BlockItem(ModBlocks.PURPLE_GLAZED_GLASS_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> PURPLE_GLAZED_GLASS_STAIRS = ITEMS.register(
+            "purple_glazed_glass_stairs",
+            () -> new BlockItem(ModBlocks.PURPLE_GLAZED_GLASS_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> MAGENTA_GLAZED_GLASS_SLAB = ITEMS.register(
+            "magenta_glazed_glass_slab",
+            () -> new BlockItem(ModBlocks.MAGENTA_GLAZED_GLASS_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> MAGENTA_GLAZED_GLASS_STAIRS = ITEMS.register(
+            "magenta_glazed_glass_stairs",
+            () -> new BlockItem(ModBlocks.MAGENTA_GLAZED_GLASS_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> PINK_GLAZED_GLASS_SLAB = ITEMS.register(
+            "pink_glazed_glass_slab",
+            () -> new BlockItem(ModBlocks.PINK_GLAZED_GLASS_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> PINK_GLAZED_GLASS_STAIRS = ITEMS.register(
+            "pink_glazed_glass_stairs",
+            () -> new BlockItem(ModBlocks.PINK_GLAZED_GLASS_STAIRS.get(), createBlockItemProperties())
+    );
 }

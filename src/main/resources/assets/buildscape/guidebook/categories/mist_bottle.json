@@ -1,0 +1,48 @@
+{
+  "id": "mist_bottle",
+  "displayName": "guidebook.category.mist_bottle",
+  "icon": "buildscape:bottle_of_mist",
+  "sort": 20,
+  "entries": [
+    {
+      "id": "mist_bottle_overview",
+      "title": "guidebook.entry.mist_bottle_overview",
+      "pages": [
+        {
+          "components": [
+            { "type": "header", "text": "guidebook.page.mist.overview.header" },
+            { "type": "text",   "text": "guidebook.page.mist.overview.body1" },
+            { "type": "spacer", "pixels": 6 },
+            { "type": "item",   "item": "buildscape:bottle_of_mist", "caption": "guidebook.page.mist.overview.caption" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mist_bottle_capture",
+      "title": "guidebook.entry.mist_bottle_capture",
+      "pages": [
+        {
+          "components": [
+            { "type": "header", "text": "guidebook.page.mist.capture.header" },
+            { "type": "text",   "text": "guidebook.page.mist.capture.body1" },
+            { "type": "spacer", "pixels": 6 },
+            { "type": "text",   "text": "guidebook.page.mist.capture.body2" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mist_bottle_dispenser",
+      "title": "guidebook.entry.mist_bottle_dispenser",
+      "pages": [
+        {
+          "components": [
+            { "type": "header", "text": "guidebook.page.mist.dispenser.header" },
+            { "type": "text",   "text": "guidebook.page.mist.dispenser.body1" }
+          ]
+        }
+      ]
+    }
+  ]
+}

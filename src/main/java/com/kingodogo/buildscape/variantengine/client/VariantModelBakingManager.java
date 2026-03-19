@@ -34,7 +34,7 @@ public class VariantModelBakingManager {
 
             List<BlockFamily> families;
             try {
-                families = VariantRegistrar.getDetectedFamilies();
+                families = new ArrayList<>(VariantRegistrar.getDetectedFamilies());
             } catch (Exception e) {
                 return;
             }

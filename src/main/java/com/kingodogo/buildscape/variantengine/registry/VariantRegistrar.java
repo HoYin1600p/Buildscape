@@ -30,10 +30,13 @@ import java.util.*;
  * Subscribes to the 'zz_buildscape_variants' mod bus to ensure it runs at the VERY END
  * of the registry phase, catching blocks from all other mods.
  */
-@Mod.EventBusSubscriber(modid = "zz_buildscape_variants", bus = Mod.EventBusSubscriber.Bus.MOD)
+@Mod.EventBusSubscriber(modid = com.kingodogo.buildscape.BuildScape.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class VariantRegistrar {
 
     private static final Map<Block, BlockFamily> DETECTED_FAMILIES = new HashMap<>();
+    private static volatile boolean isScanningComplete = false;
+
+    public static boolean isScanningComplete() { return isScanningComplete; }
 
     private static final String[] REGISTRAR_BLACKLIST = {
         "torch", "lantern", "candle", "lamp", "sign", "banner", "carpet",
@@ -78,16 +81,33 @@ public class VariantRegistrar {
         DETECTED_FAMILIES.clear();
         BlockBiMaps.BASE_BLOCKS.clear();
 
-        int scanned = 0, detected = 0;
-        Set<String> namespaces = new HashSet<>();
+        long startTime = System.currentTimeMillis();
 
-        // 1. Discovery
+        // --- CACHE CHECK ---
+        String fingerprint = VariantScanCache.computeFingerprint();
+        VariantScanCache.CacheData cached = VariantScanCache.tryLoad(fingerprint);
+
+
+        if (cached != null && cached.valid) {
+            // Fast path: reconstruct families directly from cached block IDs
+            int count = commitFromCache(cached, registry);
+            BuildScape.LOGGER.info("BuildScape: Cache hit! Registered {} variants from cache in {}ms (skipped full scan).",
+                    count, System.currentTimeMillis() - startTime);
+            isScanningComplete = true; 
+            return;
+        }
+
+
+        // --- FULL SCAN (slow path, only runs when mods change) ---
+        BuildScape.LOGGER.info("BuildScape: No cache or mods changed. Running full block scan...");
+
+        int scanned = 0, detected = 0;
+
         for (Block block : registry) {
             ResourceLocation id = safeRegistryName(block);
             if (id == null) continue;
-            
+
             scanned++;
-            namespaces.add(id.getNamespace());
 
             if (id.getNamespace().equals(BuildScape.MODID)) {
                 String p = id.getPath();
@@ -99,19 +119,158 @@ public class VariantRegistrar {
             }
         }
 
-        // 2. Canonicalization
+        // Canonicalize
         Map<ResourceLocation, BlockFamily> canonical = canonicalize(DETECTED_FAMILIES);
-        
-        // 3. Commit
+
         DETECTED_FAMILIES.clear();
         for (BlockFamily cf : canonical.values()) {
             DETECTED_FAMILIES.put(cf.getBaseBlock(), cf);
             seedBiMaps(cf);
         }
 
-        // 4. Registration of vertical variants
-        commitNewVariants(registry);
+        // Register new variants
+        int totalGenerated = commitNewVariants(registry);
+
+        // Save results to cache for next launch
+        VariantScanCache.CacheData toSave = buildCacheData();
+        VariantScanCache.save(fingerprint, toSave);
+
+        BuildScape.LOGGER.info("BuildScape: Full scan done in {}ms: scanned={}, detected={}, canonicalized={}, generated={}",
+                System.currentTimeMillis() - startTime, scanned, detected, canonical.size(), totalGenerated);
+        isScanningComplete = true;
     }
+
+    /**
+     * Fast-path: directly re-registers variants using cached block IDs.
+     * Avoids all detectFamily() calls.
+     */
+    private static int commitFromCache(VariantScanCache.CacheData cached, IForgeRegistry<Block> registry) {
+        int count = 0;
+        BlockShape[] targets = {BlockShape.VERTICAL_SLAB, BlockShape.VERTICAL_STAIRS};
+        com.kingodogo.buildscape.config.VerticalConfig config = com.kingodogo.buildscape.config.VerticalConfig.get();
+
+        for (Map.Entry<String, Set<String>> entry : cached.baseToShapes.entrySet()) {
+            String baseIdStr = entry.getKey();
+            ResourceLocation baseId;
+            try {
+                baseId = new ResourceLocation(baseIdStr);
+            } catch (Exception e) {
+                continue;
+            }
+
+            Block base = registry.getValue(baseId);
+            if (base == null || base == Blocks.AIR) continue;
+
+            String ns = baseId.getNamespace();
+            // config check removed to retain candidate families in memory for UI
+
+            BlockFamily family = new BlockFamily(base);
+            DETECTED_FAMILIES.put(base, family);
+
+            // Restore companion slabs/stairs into the family
+            String slabComp = cached.baseToSlabCompanion.get(baseIdStr);
+            if (slabComp != null) {
+                Block slab = registry.getValue(new ResourceLocation(slabComp));
+                if (slab != null && slab != Blocks.AIR) {
+                    family.addVariant(BlockShape.SLAB, slab);
+                    BlockBiMaps.setBlockOf(BlockShape.SLAB, base, slab);
+                }
+            }
+            String stairComp = cached.baseToStairCompanion.get(baseIdStr);
+            if (stairComp != null) {
+                Block stair = registry.getValue(new ResourceLocation(stairComp));
+                if (stair != null && stair != Blocks.AIR) {
+                    family.addVariant(BlockShape.STAIRS, stair);
+                    BlockBiMaps.setBlockOf(BlockShape.STAIRS, base, stair);
+                }
+            }
+
+            Set<String> shapes = entry.getValue();
+            for (BlockShape shape : targets) {
+                if (!shapes.contains(shape.getSerializedName())) continue;
+
+                String path = baseId.getPath();
+                if (!shouldGenerate(family, base, path, ns, shape)) {
+                    continue; // Skip generating if current code excludes it!
+                }
+
+                ResourceLocation genId = VariantNamingUtil.getGeneratedId(baseId, shape);
+                if (registry.containsKey(genId)) {
+                    Block existing = registry.getValue(genId);
+                    if (existing != null) {
+                        family.addVariant(shape, existing);
+                        BlockBiMaps.setBlockOf(shape, base, existing);
+                    }
+                    continue;
+                }
+
+                Block generated = createVariantBlock(base, shape);
+                if (generated != null) {
+                    generated.setRegistryName(genId);
+                    registry.register(generated);
+                    family.addVariant(shape, generated);
+                    BlockBiMaps.setBlockOf(shape, base, generated);
+                    count++;
+                }
+            }
+
+            BlockBiMaps.BASE_BLOCKS.add(base);
+        }
+        return count;
+    }
+
+    /**
+     * Builds a CacheData snapshot from the current DETECTED_FAMILIES state,
+     * capturing which base blocks and shapes were selected for generation.
+     */
+    private static VariantScanCache.CacheData buildCacheData() {
+        VariantScanCache.CacheData data = new VariantScanCache.CacheData();
+        BlockShape[] targets = {BlockShape.VERTICAL_SLAB, BlockShape.VERTICAL_STAIRS};
+
+        for (Map.Entry<Block, BlockFamily> e : DETECTED_FAMILIES.entrySet()) {
+            Block base = e.getKey();
+            BlockFamily family = e.getValue();
+            ResourceLocation baseId = safeRegistryName(base);
+            if (baseId == null) continue;
+
+            String path = baseId.getPath().toLowerCase();
+            String ns = baseId.getNamespace().toLowerCase();
+
+            // config check removed to save candidate families into cache
+            if (ns.equals("compressium") || isBlacklisted(path)) continue;
+
+            Set<String> shapes = new LinkedHashSet<>();
+            for (BlockShape shape : targets) {
+                // Record the shape if we actually generated it (i.e. it's a buildscape variant)
+                Block variant = BlockBiMaps.getBlockOf(shape, base);
+                if (variant != null) {
+                    ResourceLocation vid = safeRegistryName(variant);
+                    if (vid != null && vid.getNamespace().equals(BuildScape.MODID)) {
+                        shapes.add(shape.getSerializedName());
+                    }
+                }
+            }
+
+            // shapes empty check removed to save families without generated variants into cache
+            
+            String baseIdStr = baseId.toString();
+            data.baseToShapes.put(baseIdStr, shapes);
+
+            // Save companion IDs
+            Block slab = family.getVariants().get(BlockShape.SLAB);
+            if (slab != null) {
+                ResourceLocation sid = safeRegistryName(slab);
+                if (sid != null) data.baseToSlabCompanion.put(baseIdStr, sid.toString());
+            }
+            Block stair = family.getVariants().get(BlockShape.STAIRS);
+            if (stair != null) {
+                ResourceLocation sid = safeRegistryName(stair);
+                if (sid != null) data.baseToStairCompanion.put(baseIdStr, sid.toString());
+            }
+        }
+        return data;
+    }
+
 
     private static boolean processBlock(Block block, IForgeRegistry<Block> registry) {
         BlockFamily detected = BlockFamilyDetector.detectFamily(block, registry);
@@ -166,9 +325,13 @@ public class VariantRegistrar {
         return canonical;
     }
 
-    private static void commitNewVariants(IForgeRegistry<Block> registry) {
+    private static int commitNewVariants(IForgeRegistry<Block> registry) {
         int count = 0;
         BlockShape[] targets = {BlockShape.VERTICAL_SLAB, BlockShape.VERTICAL_STAIRS};
+
+        int skippedBlacklist = 0;
+        int skippedConfigAllow = 0;
+        int skippedShouldGenerate = 0;
 
         for (BlockFamily family : DETECTED_FAMILIES.values()) {
             Block base = family.getBaseBlock();
@@ -178,7 +341,12 @@ public class VariantRegistrar {
             String path = baseId.getPath().toLowerCase();
             String ns = baseId.getNamespace().toLowerCase();
 
-            if (ns.equals("compressium") || isBlacklisted(path)) continue;
+
+
+            if (ns.equals("compressium") || isBlacklisted(path)) {
+                skippedBlacklist++;
+                continue;
+            }
 
             for (BlockShape shape : targets) {
                 if (family.hasVariant(shape)) continue;
@@ -189,7 +357,10 @@ public class VariantRegistrar {
                     continue;
                 }
 
-                if (!shouldGenerate(family, base, path, ns, shape)) continue;
+                if (!shouldGenerate(family, base, path, ns, shape)) {
+                    skippedShouldGenerate++;
+                    continue;
+                }
 
                 String cleanBase = path.replaceAll("_slab$", "").replaceAll("_stairs?$", "").replaceAll("^_+|_+$", "");
                 if (hasExistingVerticalInRegistry(registry, ns, cleanBase, shape == BlockShape.VERTICAL_SLAB ? "slab" : "stairs")) continue;
@@ -204,16 +375,41 @@ public class VariantRegistrar {
                 }
             }
         }
-        BuildScape.LOGGER.info("Buildscape Registerd Vertical Varients: {}", count);
+        BuildScape.LOGGER.info("Buildscape Registerd Vertical Varients Diagnostic: generated={}, configAllowedSkip={}, blacklistedSkip={}, shouldGenSkip={}", 
+            count, skippedConfigAllow, skippedBlacklist, skippedShouldGenerate);
+        return count;
     }
 
     private static boolean shouldGenerate(BlockFamily family, Block base, String path, String ns, BlockShape shape) {
+        if (path.contains("sandstone")) {
+            return true; // Force allow All Sandstone variants
+        }
+
+        com.kingodogo.buildscape.config.VerticalConfig config = com.kingodogo.buildscape.config.VerticalConfig.get();
+        ResourceLocation baseId = safeRegistryName(base);
+        if (baseId != null) {
+            String baseIdStr = baseId.toString();
+            if (config.getBlocklistedFamilies().contains(baseIdStr) || config.isModBlocklisted(ns)) {
+                return false; // Explicitly blocked
+            }
+            if (config.getExplicitlyGreyFamilies().contains(baseIdStr)) {
+                return false; // Force Grey (Disabled)
+            }
+            if (config.getAllowedFamilies().contains(baseIdStr) || config.isModAllowed(ns)) {
+                return true; // Explicitly allowed
+            }
+        }
+
         boolean isLog = path.contains("log") || path.contains("wood") || path.contains("_stem") || path.contains("_hyphae");
         boolean isGlass = BlockFamilyDetector.isGlass(base);
         boolean isFalling = base instanceof net.minecraft.world.level.block.FallingBlock || path.contains("sand") || path.contains("gravel");
         boolean hasHorizontal = (shape == BlockShape.VERTICAL_SLAB) ? 
             (family.hasVariant(BlockShape.SLAB) || BlockDetectionUtil.isSlab(base)) :
             (family.hasVariant(BlockShape.STAIRS) || BlockDetectionUtil.isStair(base));
+
+        if ((path.contains("sand") && !path.contains("sandstone")) || path.contains("concrete_powder") || path.contains("gravel")) {
+            return false; // Skip Sand/Concrete Powders/Gravel by default, keep Sandstone
+        }
 
         if ((ns.equals("minecraft") || ns.equals("buildscape")) && !path.contains("ashenking")) {
              return hasHorizontal || isLog || isGlass || isFalling;
@@ -227,7 +423,9 @@ public class VariantRegistrar {
             for (Block variant : family.getVariants().values()) {
                 ResourceLocation id = safeRegistryName(variant);
                 if (id == null || !id.getNamespace().equals(BuildScape.MODID)) continue;
-                if (!id.getPath().startsWith("v_slab_") && !id.getPath().startsWith("v_stair_") && !id.getPath().startsWith("q_piece_")) continue;
+                String path = id.getPath();
+                if (!path.startsWith("v_slab_") && !path.startsWith("v_stair_") && !path.startsWith("q_piece_") && 
+                    !path.startsWith("slab_") && !path.startsWith("stairs_")) continue;
                 if (registry.containsKey(id)) continue;
 
                 registry.register(new com.kingodogo.buildscape.variantengine.item.VariantBlockItem(variant, 
@@ -254,6 +452,8 @@ public class VariantRegistrar {
         if (shape == BlockShape.VERTICAL_SLAB) return new VerticalSlabBlock(props, parent);
         if (shape == BlockShape.VERTICAL_STAIRS) return new VerticalStairsBlock(props, parent);
         if (shape == BlockShape.QUARTER_PIECE) return new QuarterPieceBlock(props, parent);
+        if (shape == BlockShape.SLAB) return new net.minecraft.world.level.block.SlabBlock(props);
+        if (shape == BlockShape.STAIRS) return new net.minecraft.world.level.block.StairBlock(parent::defaultBlockState, props);
         return null;
     }
 

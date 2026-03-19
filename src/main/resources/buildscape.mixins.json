@@ -5,6 +5,7 @@
   "compatibilityLevel": "JAVA_17",
   "refmap": "buildscape.refmap.json",
   "mixins": [
+    "BlockMixin",
     "ChainBlockMixin",
     "CreativeModeTabMixin",
     "EntityAccessor",

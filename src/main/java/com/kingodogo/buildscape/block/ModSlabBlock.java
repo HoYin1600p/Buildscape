@@ -1,65 +1,70 @@
 package com.kingodogo.buildscape.block;
 
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SlabBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.registries.RegistryObject;
 
 public class ModSlabBlock extends SlabBlock {
 
-    @SuppressWarnings("unused")
-    private final RegistryObject<?> dropItem;
-
-    public ModSlabBlock(BlockBehaviour.Properties properties) {
-        super(properties);
-        this.dropItem = null;
-    }
+    private final Block baseBlock;
 
     public ModSlabBlock(
-            BlockBehaviour.Properties properties,
-            RegistryObject<?> dropItem
+            Block baseBlock,
+            BlockBehaviour.Properties properties
     ) {
         super(properties);
-        this.dropItem = dropItem;
+        this.baseBlock = baseBlock;
+    }
+
+    // Secondary constructor for non-glass slabs using only properties
+    public ModSlabBlock(
+            BlockBehaviour.Properties properties
+    ) {
+        super(properties);
+        this.baseBlock = null;
+    }
+
+    public Block getBaseBlock() {
+        return this.baseBlock;
     }
 
     @Override
-    public float getDestroyProgress(
-            BlockState state,
-            Player player,
-            BlockGetter level,
-            BlockPos pos
-    ) {
-        float destroySpeed = state.getDestroySpeed(level, pos);
-        if (destroySpeed == -1.0F) {
-            return 0.0F;
+    public float[] getBeaconColorMultiplier(BlockState state, net.minecraft.world.level.LevelReader level, net.minecraft.core.BlockPos pos, net.minecraft.core.BlockPos beaconPos) {
+        if (!com.kingodogo.buildscape.variantengine.family.BlockFamilyDetector.isGlass(this.baseBlock)) {
+            return null;
         }
-
-        int efficiencyLevel =
-                net.minecraft.world.item.enchantment.EnchantmentHelper.getBlockEfficiency(
-                        player
-                );
-        ItemStack tool = player.getMainHandItem();
-
-        float speedMultiplier = 1.0F;
-        if (!tool.isEmpty()) {
-            speedMultiplier = tool.getDestroySpeed(state);
+        int color = state.getMapColor(level, pos).col;
+        if (color == 0 || color == 16777215) {
+            return null;
         }
+        return new float[]{
+                ((color >> 16) & 0xFF) / 255.0f,
+                ((color >> 8) & 0xFF) / 255.0f,
+                (color & 0xFF) / 255.0f
+        };
+    }
 
-        if (speedMultiplier > 1.0F) {
-            int efficiencyBonus = efficiencyLevel > 0
-                    ? efficiencyLevel * efficiencyLevel + 1
-                    : 0;
-            speedMultiplier += (float) efficiencyBonus;
+    @Override
+    public boolean skipRendering(BlockState state, BlockState adjacentBlockState, net.minecraft.core.Direction side) {
+        if (com.kingodogo.buildscape.variantengine.family.BlockFamilyDetector.isGlass(this.baseBlock)) {
+            net.minecraft.world.level.block.Block adjBlock = adjacentBlockState.getBlock();
+            net.minecraft.world.level.block.Block pureAdjBlock = adjBlock;
+            
+            if (adjBlock instanceof ModSlabBlock other) {
+                pureAdjBlock = other.getBaseBlock();
+            } else if (adjBlock instanceof ModStairBlock otherStair) {
+                pureAdjBlock = otherStair.getBaseBlock();
+            } else if (adjBlock instanceof com.kingodogo.buildscape.variantengine.block.ExtShapeBlockInterface ext) {
+                pureAdjBlock = ext.getBaseBlock();
+            }
+
+            if (pureAdjBlock != null && this.baseBlock != null && 
+                pureAdjBlock.getRegistryName() != null && this.baseBlock.getRegistryName() != null &&
+                pureAdjBlock.getRegistryName().equals(this.baseBlock.getRegistryName())) {
+                return true;
+            }
         }
-
-        float difficultyModifier = player.hasCorrectToolForDrops(state)
-                ? 30.0F
-                : 100.0F;
-        return speedMultiplier / destroySpeed / difficultyModifier;
+        return super.skipRendering(state, adjacentBlockState, side);
     }
 }

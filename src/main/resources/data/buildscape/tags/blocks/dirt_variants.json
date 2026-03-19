@@ -1,12 +1,24 @@
 {
   "values": [
     "buildscape:dirt_slab",
+    "buildscape:dirt_stairs",
+    "buildscape:dirt_wall",
     "buildscape:podzol_slab",
+    "buildscape:podzol_stairs",
+    "buildscape:podzol_wall",
     "buildscape:mycelium_slab",
+    "buildscape:mycelium_stairs",
+    "buildscape:mycelium_wall",
     "buildscape:mud",
     "buildscape:mud_slab",
+    "buildscape:mud_stairs",
+    "buildscape:mud_wall",
     "buildscape:snowy_grass_block",
-    "buildscape:snowy_grass_block_slab"
+    "buildscape:snowy_grass_block_slab",
+    "buildscape:snowy_grass_block_stairs",
+    "buildscape:snowy_grass_block_wall",
+    "buildscape:grass_block_slab",
+    "buildscape:grass_block_stairs",
+    "buildscape:grass_block_wall"
   ]
 }
-

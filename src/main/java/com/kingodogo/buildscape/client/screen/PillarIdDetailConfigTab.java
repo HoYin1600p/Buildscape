@@ -89,8 +89,8 @@ public class PillarIdDetailConfigTab extends AbstractConfigTab {
         // Back button
         backButton = new ScaledTextButton(
             0, 0,
-            80, 20,
-                new TranslatableComponent("buildscape.config.ids.back"),
+            60, 20,
+            new TextComponent("Back"),
             (btn) -> parent.setActiveTab(new PillarIdsConfigTab(parent))
         );
         backButton.setCustomTextColors(0xFFFF55, 0xFFFFFF); // Yellow/White on hover
@@ -311,12 +311,12 @@ public class PillarIdDetailConfigTab extends AbstractConfigTab {
         int rightPanelWidth = parent.getRightPanelWidth();
         
         // Button area at top for back button
-        int buttonAreaHeight = BuildScapeConfigScreen.getScaledButtonHeight() + BuildScapeConfigScreen.scaleSize(12);
+        int buttonAreaHeight = BuildScapeConfigScreen.getScaledButtonHeight() + padding;
         
         // Position back button
         backButton.x = contentX + padding;
-        backButton.y = contentY + BuildScapeConfigScreen.scaleSize(6);
-        backButton.setWidth(BuildScapeConfigScreen.scaleSize(80));
+        backButton.y = contentY + BuildScapeConfigScreen.scaleSize(3);
+        backButton.setWidth(BuildScapeConfigScreen.scaleSize(60));
         backButton.setHeight(BuildScapeConfigScreen.getScaledButtonHeight());
 
         // LEFT PANEL: Settings
@@ -850,13 +850,19 @@ public class PillarIdDetailConfigTab extends AbstractConfigTab {
         int borderColor = 0xFF666666;
         int padding = BuildScapeConfigScreen.scaleSize(10);
 
+        float textScale = BuildScapeConfigScreen.getStandardTextScale();
+
         // Header info (Pillar ID)
-        int titleX = contentX + BuildScapeConfigScreen.scaleSize(115);
-        int titleY = contentY + BuildScapeConfigScreen.scaleSize(6);
+        int titleX = backButton.x + backButton.getWidth() + padding;
+        int titleY = backButton.y;
+        
+        poseStack.pushPose();
+        poseStack.scale(textScale, textScale, 1.0f);
         mc.font.draw(poseStack, new TranslatableComponent("buildscape.config.ids.id").getString() + ": " + pillarId,
-                titleX, titleY, 0xFFFFFF);
+                titleX / textScale, titleY / textScale, 0xFFFFFF);
         mc.font.draw(poseStack, new TranslatableComponent("buildscape.config.ids.detail.subtitle"),
-                titleX, titleY + mc.font.lineHeight + 2, 0xAAAAAA);
+                titleX / textScale, (titleY + (int) (mc.font.lineHeight * textScale) + 2) / textScale, 0xAAAAAA);
+        poseStack.popPose();
 
         // LEFT PANEL: Borders
         net.minecraft.client.gui.GuiComponent.fill(poseStack, leftBoxX, leftBoxY, leftBoxX + leftBoxWidth, leftBoxY + 1, borderColor);
@@ -864,25 +870,31 @@ public class PillarIdDetailConfigTab extends AbstractConfigTab {
         net.minecraft.client.gui.GuiComponent.fill(poseStack, leftBoxX, leftBoxY, leftBoxX + 1, leftBoxY + leftBoxHeight, borderColor);
         net.minecraft.client.gui.GuiComponent.fill(poseStack, leftBoxX + leftBoxWidth - 1, leftBoxY, leftBoxX + leftBoxWidth, leftBoxY + leftBoxHeight, borderColor);
 
+        poseStack.pushPose();
+        poseStack.scale(textScale, textScale, 1.0f);
         mc.font.draw(poseStack, new TranslatableComponent("buildscape.config.particles.pattern_properties"),
-                leftBoxX + BuildScapeConfigScreen.scaleSize(10), leftBoxY + BuildScapeConfigScreen.scaleSize(5), 0xFFFFFF);
+                (leftBoxX + BuildScapeConfigScreen.scaleSize(10)) / textScale, (leftBoxY + BuildScapeConfigScreen.scaleSize(5)) / textScale, 0xFFFFFF);
+        poseStack.popPose();
 
         // Labels for fields in Left Panel - ensure they are drawn ONLY once
         int labelYOffset = (BuildScapeConfigScreen.getScaledEditBoxHeight() - mc.font.lineHeight) / 2;
         int textX = leftBoxX + padding;
 
+        poseStack.pushPose();
+        poseStack.scale(textScale, textScale, 1.0f);
         mc.font.draw(poseStack, new TranslatableComponent("buildscape.config.ids.detail.pattern").getString() + ":",
-                textX, patternSelector.y + labelYOffset, 0xFFFFFF);
+                textX / textScale, (patternSelector.y + labelYOffset) / textScale, 0xFFFFFF);
         mc.font.draw(poseStack, "Use Pattern:",
-                textX, usePatternToggle.y + labelYOffset, 0xFFFFFF);
+                textX / textScale, (usePatternToggle.y + labelYOffset) / textScale, 0xFFFFFF);
         mc.font.draw(poseStack, new TranslatableComponent("buildscape.config.particles.pattern_speed").getString() + ":",
-                textX, patternSpeedField.y + labelYOffset, 0xFFFFFF);
+                textX / textScale, (patternSpeedField.y + labelYOffset) / textScale, 0xFFFFFF);
         mc.font.draw(poseStack, new TranslatableComponent("buildscape.config.particles.pattern_spread").getString() + ":",
-                textX, patternSpreadField.y + labelYOffset, 0xFFFFFF);
+                textX / textScale, (patternSpreadField.y + labelYOffset) / textScale, 0xFFFFFF);
         mc.font.draw(poseStack, new TranslatableComponent("buildscape.config.particles.pattern_intensity").getString() + ":",
-                textX, patternIntensityField.y + labelYOffset, 0xFFFFFF);
+                textX / textScale, (patternIntensityField.y + labelYOffset) / textScale, 0xFFFFFF);
         mc.font.draw(poseStack, new TranslatableComponent("buildscape.config.ids.detail.max_colors").getString() + ":",
-                textX, maxParticleColorSlider.y + labelYOffset, 0xFFFFFF);
+                textX / textScale, (maxParticleColorSlider.y + labelYOffset) / textScale, 0xFFFFFF);
+        poseStack.popPose();
 
         // RIGHT PANEL: Borders
         net.minecraft.client.gui.GuiComponent.fill(poseStack, rightBoxX, rightBoxY, rightBoxX + rightBoxWidth, rightBoxY + 1, borderColor);
@@ -890,8 +902,11 @@ public class PillarIdDetailConfigTab extends AbstractConfigTab {
         net.minecraft.client.gui.GuiComponent.fill(poseStack, rightBoxX, rightBoxY, rightBoxX + 1, rightBoxY + rightBoxHeight, borderColor);
         net.minecraft.client.gui.GuiComponent.fill(poseStack, rightBoxX + rightBoxWidth - 1, rightBoxY, rightBoxX + rightBoxWidth, rightBoxY + rightBoxHeight, borderColor);
 
+        poseStack.pushPose();
+        poseStack.scale(textScale, textScale, 1.0f);
         mc.font.draw(poseStack, new TranslatableComponent("buildscape.config.particles.particle_colors").getString(),
-                rightBoxX + BuildScapeConfigScreen.scaleSize(10), rightBoxY + BuildScapeConfigScreen.scaleSize(5), 0xFFFFFF);
+                (rightBoxX + BuildScapeConfigScreen.scaleSize(10)) / textScale, (rightBoxY + BuildScapeConfigScreen.scaleSize(5)) / textScale, 0xFFFFFF);
+        poseStack.popPose();
 
         // Status text
         if (dirty) {

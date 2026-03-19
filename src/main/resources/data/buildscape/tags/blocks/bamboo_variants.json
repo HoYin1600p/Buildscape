@@ -15,8 +15,12 @@
     "buildscape:stripped_bamboo_block_fence",
     "buildscape:stripped_bamboo_block_fence_gate",
     "buildscape:stripped_bamboo_block_button",
-    "buildscape:stripped_bamboo_block_pressure_plate"
+    "buildscape:stripped_bamboo_block_pressure_plate",
+    "buildscape:bamboo_door",
+    "buildscape:bamboo_sign",
+    "buildscape:bamboo_trapdoor",
+    "buildscape:bamboo_wall_sign",
+    "buildscape:bamboo_wood",
+    "buildscape:stripped_bamboo_wood"
   ]
 }
-
-

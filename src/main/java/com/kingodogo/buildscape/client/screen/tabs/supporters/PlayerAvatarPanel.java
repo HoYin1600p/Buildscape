@@ -129,31 +129,24 @@ public class PlayerAvatarPanel extends BasePanel {
                 startY + PADDING,
                 0xFFFFFF);
 
-        String hint = "Click and drag to rotate";
-        int hintWidth = mc.font.width(hint);
-        mc.font.draw(poseStack, hint,
-                startX + (width - hintWidth) / 2,
-                startY + PADDING + 12,
-                0xAAAAAA);
+        // Info button setup
+        int infoX = endX - 16;
+        int infoY = startY + 6;
+        int infoSize = 10;
+        boolean infoHovered = mouseX >= infoX && mouseX <= infoX + infoSize && mouseY >= infoY && mouseY <= infoY + infoSize;
 
-        String zoomHint = "Ctrl + Scroll to zoom";
-        int zoomHintWidth = mc.font.width(zoomHint);
-        mc.font.draw(poseStack, zoomHint,
-                startX + (width - zoomHintWidth) / 2,
-                startY + PADDING + 24,
-                0x888888);
-
-        if (Math.abs(playerZoom - 1.0f) > 0.01f) {
-            String zoomLevel = String.format("%.0f%%", playerZoom * 100.0f);
-            int zoomLevelWidth = mc.font.width(zoomLevel);
-            mc.font.draw(poseStack, zoomLevel,
-                    startX + (width - zoomLevelWidth) / 2,
-                    startY + PADDING + 36,
-                    0x00FF00);
-        }
+        // Draw small Info [i] Texture
+        RenderSystem.setShaderTexture(0, new ResourceLocation("buildscape", "textures/gui/info.png"));
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
+        RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, infoHovered ? 1.0f : 0.7f);
+        GuiComponent.blit(poseStack, infoX, infoY, 0, 0, infoSize, infoSize, infoSize, infoSize);
+        RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
 
         // Scale button size based on panel dimensions for proper GUI scaling
         double guiScaleFactor = 2.0 / actualGuiScale; // Normalize to scale 2
+        // Animation Toggle Button Render Disabled
+        /*
         int buttonSize = (int) (16 * guiScaleFactor);
         buttonSize = Math.max(12, Math.min(24, buttonSize)); // Clamp between 12-24 pixels
         int buttonX = endX - buttonSize - (int) (5 * guiScaleFactor);
@@ -197,6 +190,7 @@ public class PlayerAvatarPanel extends BasePanel {
                         0xFFFFFFFF);
             }
         }
+        */
 
         Map<Integer, String> equippedBySlot = state.getEquippedCosmeticsBySlot();
         Set<String> equippedSet = state.getEquippedCosmetics();
@@ -214,16 +208,16 @@ public class PlayerAvatarPanel extends BasePanel {
         }
 
         int slotY = getSlotY();
-        int renderAreaY = startY + PADDING - 5;
+        int renderAreaY = startY + PADDING + 12; // Start strictly below "Player Avatar" title
         // Constrain player render area to stop above the slots
         int playerRenderBottom = slotY;
         int renderAreaHeight = playerRenderBottom - renderAreaY;
         int renderAreaX = startX + PADDING;
         int renderAreaWidth = width - PADDING * 2;
 
-        // Clip player to avoid overlapping slots
+        // Clip player to avoid overlapping slots or title above
         int playerScissorBottomGL = windowHeight - (int) (slotY * actualGuiScale);
-        int playerScissorHeight = (int) ((slotY - startY) * actualGuiScale);
+        int playerScissorHeight = (int) ((slotY - renderAreaY) * actualGuiScale);
         RenderSystem.enableScissor(scissorX, playerScissorBottomGL, scissorWidth, playerScissorHeight);
 
         boolean rendered3D = false;
@@ -263,8 +257,39 @@ public class PlayerAvatarPanel extends BasePanel {
         poseStack.popPose();
         RenderSystem.depthMask(true);
 
-        RenderSystem.disableScissor();
+        if (infoHovered) {
+            String[] tooltip = {
+                    "Click and drag to rotate",
+                    "Ctrl + Scroll to zoom",
+                    String.format("Zoom: %.0f%%", playerZoom * 100.0f)
+            };
 
+            RenderSystem.disableDepthTest();
+            poseStack.pushPose();
+            // Translate above regular layers
+            poseStack.translate(0, 0, 500);
+
+            int maxW = 0;
+            for (String s : tooltip) maxW = Math.max(maxW, mc.font.width(s));
+            int boxW = maxW + 8;
+            int boxH = tooltip.length * 11 + 4;
+            int boxX = mouseX - boxW - 5;
+            int boxY = mouseY;
+
+            GuiComponent.fill(poseStack, boxX, boxY, boxX + boxW, boxY + boxH, 0xF0101010);
+            GuiComponent.fill(poseStack, boxX, boxY, boxX + boxW, boxY + 1, 0xFF888888);
+            GuiComponent.fill(poseStack, boxX, boxY + boxH - 1, boxX + boxW, boxY + boxH, 0xFF888888);
+            GuiComponent.fill(poseStack, boxX, boxY, boxX + 1, boxY + boxH, 0xFF888888);
+            GuiComponent.fill(poseStack, boxX + boxW - 1, boxY, boxX + boxW, boxY + boxH, 0xFF888888); // Right
+
+            for (int j = 0; j < tooltip.length; j++) {
+                mc.font.draw(poseStack, tooltip[j], boxX + 4, boxY + 3 + (j * 11), 0xCCCCCC);
+            }
+            poseStack.popPose();
+            RenderSystem.enableDepthTest();
+        }
+
+        RenderSystem.disableScissor();
     }
 
     private void render3DPlayerModel(PoseStack poseStack, int x, int y, int width, int height,
@@ -316,7 +341,8 @@ public class PlayerAvatarPanel extends BasePanel {
 
             poseStack.pushPose();
 
-            poseStack.translate(centerX, centerY + height * 0.2f, 100.0f);
+            // Center vertically above slots panel without shifts, because bounding area starts below header title now
+            poseStack.translate(centerX, centerY, 100.0f);
 
             poseStack.translate(0.0, 0.9, 0.0);
 
@@ -916,6 +942,8 @@ public class PlayerAvatarPanel extends BasePanel {
         double scaledMouseX = mouseX;
         double scaledMouseY = mouseY;
 
+        // Animation Toggle Button Click Event Disabled
+        /*
         int buttonSize = 16;
         int buttonX = endX - buttonSize - 5;
         int buttonY = endY - buttonSize - 5;
@@ -938,6 +966,7 @@ public class PlayerAvatarPanel extends BasePanel {
             }
             return true;
         }
+        */
 
         SupportersTabState state = SupportersTabState.getInstance();
         int[] slots = {
@@ -1466,7 +1495,7 @@ public class PlayerAvatarPanel extends BasePanel {
         double scaledDragY = dragY / scaleFactor;
 
         if (button == 0 && isDragging) {
-            float rotationSpeed = 2.0f;
+            float rotationSpeed = 0.4f; // Slower and smoother rotation sensitivity
 
             rotationYaw -= (float) scaledDragX * rotationSpeed;
 

@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/slab",
+  "textures": {
+    "bottom": "buildscape:block/factory_blue_glass",
+    "top": "buildscape:block/factory_blue_glass",
+    "side": "buildscape:block/factory_blue_glass"
+  }
+}

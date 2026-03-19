@@ -156,6 +156,13 @@ public class ClientEvents {
             return;
         }
 
+        /*
+        // ── Guidebook keybind ─────────────────────────────────────────────
+        if (mc.screen == null && ModKeyBinds.OPEN_GUIDEBOOK.consumeClick()) {
+            mc.setScreen(new com.kingodogo.buildscape.client.guidebook.screen.GuideBookScreen());
+        }
+        */
+
         net.minecraft.world.entity.player.Player player = mc.player;
         if (player.isOnGround()) {
             BlockPos playerBlockPos = player.blockPosition();

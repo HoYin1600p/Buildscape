@@ -13,6 +13,7 @@ public class ModStairBlock extends StairBlock {
 
     @SuppressWarnings("unused")
     private final RegistryObject<?> dropItem;
+    private final net.minecraft.world.level.block.Block baseBlock;
 
     public ModStairBlock(
             BlockState baseState,
@@ -20,6 +21,7 @@ public class ModStairBlock extends StairBlock {
     ) {
         super(baseState, properties);
         this.dropItem = null;
+        this.baseBlock = baseState.getBlock();
     }
 
     public ModStairBlock(
@@ -29,6 +31,11 @@ public class ModStairBlock extends StairBlock {
     ) {
         super(baseState, properties);
         this.dropItem = dropItem;
+        this.baseBlock = baseState.getBlock();
+    }
+
+    public net.minecraft.world.level.block.Block getBaseBlock() {
+        return this.baseBlock;
     }
 
     @Override

@@ -71,12 +71,14 @@ public class BlockFamilyDetector {
         "beehive", "bee_nest", "conduit", "end_portal", "nether_portal",
         "respawn_anchor", "lodestone", "target", "sculk",
         "canopy", "nest", "web", "cobweb", "string", "chain",
-        "command_block", "debug", "petrified", "infested",
+        "command_block", "debug", "petrified", "infested", "egg",
         // Mod-specific decorative
         "tiki", "wind_vane", "weather_vane", "flag", "planter",
         "hanging_pot", "jar", "cage", "hook", "rope",
         "clock", "globe", "notice_board", "hat_stand",
-        "sconce", "chandelier", "pergola", "lattice"
+        "sconce", "chandelier", "pergola", "lattice",
+        // Exemptions for user requests (exact matches or very specific substrings)
+        "pumpkin_stem", "melon_stem", "attached_", "pumpkin_seed", "melon_seed", "void_air", "cave_air"
     };
 
     public static BlockFamily detectFamily(Block block) {
@@ -100,6 +102,10 @@ public class BlockFamilyDetector {
 
         // Skip our own generated variants — they'll be handled by the registrar
         if (namespace.equals(BuildScape.MODID) && (path.startsWith("v_slab_") || path.startsWith("v_stair_") || path.startsWith("q_piece_"))) {
+            return null;
+        }
+
+        if (block == Blocks.AIR || block == Blocks.CAVE_AIR || block == Blocks.VOID_AIR) {
             return null;
         }
 
@@ -177,7 +183,8 @@ public class BlockFamilyDetector {
             if (isGlass(block) || isLogOrFalling) {
                 return new BlockFamily(block);
             }
-            return null; // No companions found and not a special case
+            // Return base family for all full blocks to configure them in dashboard
+            return new BlockFamily(block);
         }
 
         BlockFamily family = new BlockFamily(block);

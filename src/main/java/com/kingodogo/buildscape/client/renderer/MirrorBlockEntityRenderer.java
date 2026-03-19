@@ -1,7 +1,7 @@
 package com.kingodogo.buildscape.client.renderer;
 
-import com.kingodogo.buildscape.block.MirrorBlock;
-import com.kingodogo.buildscape.block.MirrorBlockEntity;
+// import com.kingodogo.buildscape.block.MirrorBlock;
+// import com.kingodogo.buildscape.block.MirrorBlockEntity;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -16,6 +16,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.state.BlockState;
 
+/*
 public class MirrorBlockEntityRenderer implements BlockEntityRenderer<MirrorBlockEntity> {
     private static final ResourceLocation WHITE_CONCRETE = new ResourceLocation("minecraft", "textures/block/white_concrete.png");
 
@@ -89,3 +90,4 @@ public class MirrorBlockEntityRenderer implements BlockEntityRenderer<MirrorBloc
         vc.vertex(pose, -s, s, 0.001f).color(1f, 1f, 1f, 1.0f).uv(1, 0).uv2(15728880).endVertex();
     }
 }
+*/

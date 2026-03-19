@@ -1,7 +1,7 @@
 package com.kingodogo.buildscape.client.renderer;
 
-import com.kingodogo.buildscape.block.MirrorBlock;
-import com.kingodogo.buildscape.block.MirrorBlockEntity;
+// import com.kingodogo.buildscape.block.MirrorBlock;
+// import com.kingodogo.buildscape.block.MirrorBlockEntity;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.pipeline.TextureTarget;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -32,6 +32,7 @@ import org.lwjgl.opengl.GL11;
 
 import java.util.*;
 
+/*
 @Mod.EventBusSubscriber(value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class MirrorRenderer extends RenderStateShard {
 
@@ -239,3 +240,4 @@ public class MirrorRenderer extends RenderStateShard {
         }
     }
 }
+*/

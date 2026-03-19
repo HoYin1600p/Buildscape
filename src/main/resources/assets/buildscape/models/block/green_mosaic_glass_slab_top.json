@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/slab_top",
+  "textures": {
+    "bottom": "buildscape:block/green_mosaic_glass",
+    "top": "buildscape:block/green_mosaic_glass",
+    "side": "buildscape:block/green_mosaic_glass"
+  }
+}

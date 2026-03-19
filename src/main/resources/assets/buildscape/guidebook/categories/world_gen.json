@@ -1,0 +1,34 @@
+{
+  "id": "world_gen",
+  "displayName": "guidebook.category.world_gen",
+  "icon": "minecraft:grass_block",
+  "sort": 60,
+  "entries": [
+    {
+      "id": "world_gen_overview",
+      "title": "guidebook.entry.world_gen_overview",
+      "pages": [
+        {
+          "components": [
+            { "type": "header", "text": "guidebook.page.worldgen.overview.header" },
+            { "type": "text",   "text": "guidebook.page.worldgen.overview.body1" },
+            { "type": "spacer", "pixels": 6 },
+            { "type": "text",   "text": "guidebook.page.worldgen.overview.body2" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "fast_leaf_decay",
+      "title": "guidebook.entry.fast_leaf_decay",
+      "pages": [
+        {
+          "components": [
+            { "type": "header", "text": "guidebook.page.worldgen.leafdecay.header" },
+            { "type": "text",   "text": "guidebook.page.worldgen.leafdecay.body1" }
+          ]
+        }
+      ]
+    }
+  ]
+}

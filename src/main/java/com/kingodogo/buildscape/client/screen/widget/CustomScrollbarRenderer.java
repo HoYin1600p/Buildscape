@@ -23,6 +23,7 @@ public class CustomScrollbarRenderer {
     // Drag state tracking
     private boolean isDraggingScrollbar = false;
     private boolean isDraggingContent = false;
+    private double thumbClickOffsetY = 0; // Relative Y offset from thumb top when clicked
     private double scrollbarDragStartY = 0;
     private double scrollbarDragStartOffset = 0;
     private double contentDragStartY = 0;
@@ -124,12 +125,8 @@ public class CustomScrollbarRenderer {
         }
 
         // Check if clicking on scrollbar
-        if (mouseX >= scrollbarX && mouseX <= scrollbarX + SCROLLBAR_WIDTH &&
+        if (mouseX >= scrollbarX && mouseX <= scrollbarX + SCROLLBAR_WIDTH + 10 &&
                 mouseY >= scrollbarY && mouseY <= scrollbarY + scrollbarHeight) {
-
-            isDraggingScrollbar = true;
-            scrollbarDragStartY = mouseY;
-            scrollbarDragStartOffset = scrollOffset;
 
             // Calculate thumb position with fixed scroller height
             int scrollerHeight = 17; // Fixed size
@@ -137,30 +134,24 @@ public class CustomScrollbarRenderer {
             double scrollRatio = maxScroll > 0 ? scrollOffset / maxScroll : 0;
             int thumbY = scrollbarY + (int) (scrollRatio * usableTrackHeight);
 
-            // If clicking on track (not thumb), jump to that position
+            // If clicking on track (not thumb), jump to that position (centering thumb)
             if (mouseY < thumbY || mouseY > thumbY + scrollerHeight) {
-                // Calculate new scroll position based on click
-                double clickRatio = Math.max(0,
-                        Math.min(1, (mouseY - scrollbarY - scrollerHeight / 2.0) / usableTrackHeight));
-                return Math.max(0, Math.min(maxScroll, clickRatio * maxScroll));
+                thumbClickOffsetY = scrollerHeight / 2.0; // Center thumb during jump
+                double clickRatio = usableTrackHeight > 0 
+                        ? Math.max(0, Math.min(1, (mouseY - scrollbarY - thumbClickOffsetY) / usableTrackHeight))
+                        : 0;
+                scrollOffset = clickRatio * maxScroll;
+            } else {
+                // Clicking ON the thumb - store the offset from thumb top
+                thumbClickOffsetY = mouseY - thumbY;
             }
+
+            isDraggingScrollbar = true;
+            scrollbarDragStartY = mouseY;
+            scrollbarDragStartOffset = scrollOffset;
 
             return scrollOffset;
         }
-
-        // Check if clicking on content area for drag-to-scroll
-        /*
-         * // DISABLED: Drag-to-scroll on content area blocks interaction with widgets
-         * (buttons, fields)
-         * if (mouseX >= contentX && mouseX <= contentX + contentWidth &&
-         * mouseY >= contentY && mouseY <= contentY + contentHeight) {
-         * 
-         * isDraggingContent = true;
-         * contentDragStartY = mouseY;
-         * contentDragStartOffset = scrollOffset;
-         * return scrollOffset;
-         * }
-         */
 
         return -1;
     }
@@ -183,15 +174,13 @@ public class CustomScrollbarRenderer {
             int scrollerHeight = 17; // Fixed size
             int usableTrackHeight = scrollbarHeight - scrollerHeight;
 
-            double clampedMouseY = Math.max(scrollbarY, Math.min(scrollbarY + scrollbarHeight, mouseY));
-            double mouseYRelative = clampedMouseY - scrollbarY;
+            if (usableTrackHeight <= 0) return 0;
 
-            double thumbCenterRatio = usableTrackHeight > 0
-                    ? Math.max(0, Math.min(1, (mouseYRelative - scrollerHeight / 2.0) / usableTrackHeight))
-                    : 0;
+            // Target thumb Y should keep the cursor at the same relative position within the thumb
+            double targetThumbY = mouseY - thumbClickOffsetY;
+            double thumbTargetRatio = Math.max(0, Math.min(1, (targetThumbY - scrollbarY) / usableTrackHeight));
 
-            double newOffset = thumbCenterRatio * maxScroll;
-            return Math.max(0, Math.min(maxScroll, newOffset));
+            return thumbTargetRatio * maxScroll;
         }
 
         if (isDraggingContent) {

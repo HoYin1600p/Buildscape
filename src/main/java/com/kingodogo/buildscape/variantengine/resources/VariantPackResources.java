@@ -21,93 +21,446 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.MessageDigest;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class VariantPackResources implements PackResources {
     private static final String ROOT_DIR = "buildscape/generated";
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
     private final Map<String, String> cachedResources = new ConcurrentHashMap<>();
+    private final Set<String> diskFiles = ConcurrentHashMap.newKeySet();
 
-    private synchronized void generateContent() {
-        if (!cachedResources.isEmpty()) return;
+    private static final Object GEN_LOCK = new Object();
+    private static boolean diskMatchesFingerprint = false;
+    private boolean instanceInitialized = false;
 
-        try {
+    private void generateContent() {
+        if (instanceInitialized) return;
+
+        // Ensure we don't generate until ALL blocks from ALL mods are registered
+        if (!com.kingodogo.buildscape.variantengine.registry.VariantRegistrar.isScanningComplete()) {
+            return;
+        }
+
+        synchronized (GEN_LOCK) {
+            if (diskMatchesFingerprint && !cachedResources.isEmpty()) {
+                instanceInitialized = true;
+                return;
+            }
+
+            String currentFingerprint = calculateFingerprint();
             File generatedDir = new File(ROOT_DIR);
-            if (generatedDir.exists()) {
-                deleteDirectory(generatedDir);
-            }
-        } catch (Exception e) {
-        }
+            File fingerprintFile = new File(generatedDir, "fingerprint.txt");
 
-        JsonObject langObj = new JsonObject();
-
-        for (Block baseBlock : BlockBiMaps.BASE_BLOCKS) {
-            ResourceLocation baseId = baseBlock.getRegistryName();
-            if (baseId == null || baseId.equals(new ResourceLocation("minecraft", "air"))) continue;
-
-            // Only generate VERTICAL_SLAB and VERTICAL_STAIRS shapes
-            BlockShape[] recipeShapes = {BlockShape.VERTICAL_SLAB, BlockShape.VERTICAL_STAIRS};
-
-            for (BlockShape shape : recipeShapes) {
+            if (generatedDir.exists() && fingerprintFile.exists()) {
                 try {
-                    Block variant = BlockBiMaps.getBlockOf(shape, baseBlock);
-                    if (variant == null) continue;
-
-                    ResourceLocation verticalId = variant.getRegistryName();
-                    if (verticalId == null || !verticalId.getNamespace().equals(BuildScape.MODID)) continue;
-
-                    ResourceLocation horizontalId = null;
-                    if (shape == BlockShape.VERTICAL_SLAB) {
-                        Block slab = BlockBiMaps.getBlockOf(BlockShape.SLAB, baseBlock);
-                        if (slab != null && slab.getRegistryName() != null) {
-                            horizontalId = slab.getRegistryName();
-                        }
-                    } else if (shape == BlockShape.VERTICAL_STAIRS) {
-                        Block stairs = BlockBiMaps.getBlockOf(BlockShape.STAIRS, baseBlock);
-                        if (stairs != null && stairs.getRegistryName() != null) {
-                            horizontalId = stairs.getRegistryName();
-                        }
+                    String oldFingerprint = Files.readString(fingerprintFile.toPath(), StandardCharsets.UTF_8).trim();
+                    if (currentFingerprint.equals(oldFingerprint)) {
+                        BuildScape.LOGGER.info("BuildScape: Vertical variants are up to date ({} blocks). Caching disk index...", BlockBiMaps.BASE_BLOCKS.size());
+                        try {
+                            java.nio.file.Path genPath = generatedDir.toPath();
+                            Files.walk(genPath).forEach(p -> {
+                                if (Files.isRegularFile(p) && !p.getFileName().toString().equals("fingerprint.txt")) {
+                                    String rel = genPath.relativize(p).toString().replace("\\", "/");
+                                    diskFiles.add(rel);
+                                }
+                            });
+                        } catch (Exception e) {}
+                        
+                        diskMatchesFingerprint = true;
+                        instanceInitialized = true;
+                        return;
                     }
+                } catch (Exception ignored) {
+                }
+            }
 
-                    if (horizontalId != null) {
-                        addShapelessRecipe(verticalId, horizontalId);
-                        addStonecuttingRecipe(verticalId, horizontalId);
+            BuildScape.LOGGER.info("BuildScape: Detected new blocks or mods. Regenerating vertical variants for {} blocks...", BlockBiMaps.BASE_BLOCKS.size());
+            long startTime = System.currentTimeMillis();
 
-                        if (!baseId.equals(horizontalId) && isValidStonecuttingSource(baseId)) {
-                            addStonecuttingRecipe(verticalId, baseId, "_from_base_stonecutting");
-                        }
-                    } else {
-                        if (isValidStonecuttingSource(baseId)) {
-                            addStonecuttingRecipe(verticalId, baseId);
-                        }
-                    }
+            try {
+                if (generatedDir.exists()) {
+                    deleteDirectory(generatedDir);
+                }
+                generatedDir.mkdirs();
+            } catch (Exception e) {
+            }
 
-                    addLootTable(verticalId, shape);
-                    addBlockTags(verticalId, baseBlock, shape);
+            cachedResources.clear();
+            JsonObject langObj = new JsonObject();
 
-                    boolean isTransparent = false;
+            for (Block baseBlock : BlockBiMaps.BASE_BLOCKS) {
+                ResourceLocation baseId = baseBlock.getRegistryName();
+                if (baseId == null || baseId.equals(new ResourceLocation("minecraft", "air"))) continue;
+
+                // Only generate VERTICAL_SLAB and VERTICAL_STAIRS shapes
+                BlockShape[] recipeShapes = {BlockShape.SLAB, BlockShape.VERTICAL_SLAB, BlockShape.STAIRS, BlockShape.VERTICAL_STAIRS};
+
+                for (BlockShape shape : recipeShapes) {
                     try {
-                        isTransparent = BlockFamilyDetector.isGlass(baseBlock) || !baseBlock.defaultBlockState().canOcclude();
-                    } catch (Exception ignored) {}
-                    
-                    if (shape == BlockShape.VERTICAL_SLAB) {
-                        addVerticalSlabResources(verticalId, baseId, isTransparent);
-                    } else if (shape == BlockShape.VERTICAL_STAIRS) {
-                        addVerticalStairResources(verticalId, baseId, isTransparent);
-                    }
+                        Block variant = BlockBiMaps.getBlockOf(shape, baseBlock);
+                        if (variant == null) continue;
 
-                    String langName = VariantNamingUtil.generateLangName(baseId, shape);
-                    String translationKey = verticalId.getPath();
-                    langObj.addProperty("block." + BuildScape.MODID + "." + translationKey, langName);
-                    langObj.addProperty("item." + BuildScape.MODID + "." + translationKey, langName);
-                } catch (Exception ignored) {}
+                        ResourceLocation verticalId = variant.getRegistryName();
+                        if (verticalId == null || !verticalId.getNamespace().equals(BuildScape.MODID)) continue;
+
+                        ResourceLocation horizontalId = null;
+                        if (shape == BlockShape.VERTICAL_SLAB) {
+                            Block slab = BlockBiMaps.getBlockOf(BlockShape.SLAB, baseBlock);
+                            if (slab != null && slab.getRegistryName() != null) {
+                                horizontalId = slab.getRegistryName();
+                            }
+                        } else if (shape == BlockShape.VERTICAL_STAIRS) {
+                            Block stairs = BlockBiMaps.getBlockOf(BlockShape.STAIRS, baseBlock);
+                            if (stairs != null && stairs.getRegistryName() != null) {
+                                horizontalId = stairs.getRegistryName();
+                            }
+                        }
+
+                        if (horizontalId != null) {
+                            addShapelessRecipe(verticalId, horizontalId);
+                            addStonecuttingRecipe(verticalId, horizontalId);
+
+                            if (!baseId.equals(horizontalId) && isValidStonecuttingSource(baseId)) {
+                                addStonecuttingRecipe(verticalId, baseId, "_from_base_stonecutting");
+                            }
+                        } else {
+                            if (isValidStonecuttingSource(baseId)) {
+                                addStonecuttingRecipe(verticalId, baseId);
+                            }
+                        }
+
+                        addLootTable(verticalId, shape);
+                        addBlockTags(verticalId, baseBlock, shape);
+
+                        boolean isTransparent = false;
+                        try {
+                            isTransparent = BlockFamilyDetector.isGlass(baseBlock) || !baseBlock.defaultBlockState().canOcclude();
+                        } catch (Exception ignored) {}
+                        
+                        if (shape == BlockShape.VERTICAL_SLAB) {
+                            addVerticalSlabResources(verticalId, baseId, isTransparent);
+                        } else if (shape == BlockShape.VERTICAL_STAIRS) {
+                            addVerticalStairResources(verticalId, baseId, isTransparent);
+                        } else if (shape == BlockShape.SLAB) {
+                            addSlabResources(verticalId, baseId);
+                        } else if (shape == BlockShape.STAIRS) {
+                            addStairResources(verticalId, baseId, BlockFamilyDetector.isGlass(baseBlock));
+                        }
+
+                        String langName = VariantNamingUtil.generateLangName(baseId, shape);
+                        String translationKey = verticalId.getPath();
+                        langObj.addProperty("block." + BuildScape.MODID + "." + translationKey, langName);
+                        langObj.addProperty("item." + BuildScape.MODID + "." + translationKey, langName);
+                    } catch (Exception ignored) {}
+                }
+            }
+
+            putResource("assets/" + BuildScape.MODID + "/lang/en_us.json", GSON.toJson(langObj));
+            
+            // Save fingerprint to disk
+            try {
+                if (!generatedDir.exists()) generatedDir.mkdirs();
+                Files.writeString(fingerprintFile.toPath(), currentFingerprint, StandardCharsets.UTF_8);
+            } catch (Exception e) {}
+
+            BuildScape.LOGGER.info("BuildScape: Generation completed in {}ms", (System.currentTimeMillis() - startTime));
+            diskMatchesFingerprint = true;
+        }
+        instanceInitialized = true;
+    }
+
+    private String calculateFingerprint() {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            StringBuilder sb = new StringBuilder();
+
+            // 1. All base blocks currently being processed (sorted by ID)
+            List<String> ids = new ArrayList<>();
+            for (Block b : BlockBiMaps.BASE_BLOCKS) {
+                ResourceLocation id = b.getRegistryName();
+                if (id != null) ids.add(id.toString());
+            }
+            Collections.sort(ids);
+            sb.append("blocks:");
+            for (String id : ids) sb.append(id).append("|");
+
+            // 2. Mod list and versions (sorted)
+            List<String> mods = net.minecraftforge.fml.ModList.get().getMods().stream()
+                    .map(m -> m.getModId() + ":" + m.getVersion().toString())
+                    .sorted()
+                    .collect(Collectors.toList());
+            sb.append("mods:");
+            for (String m : mods) sb.append(m).append(";");
+
+            // 3. VerticalConfig state (Crucial Fix: Include UI configuration in the JSON generation fingerprint)
+            com.kingodogo.buildscape.config.VerticalConfig cfg = com.kingodogo.buildscape.config.VerticalConfig.get();
+            
+            List<String> allowedFams = new ArrayList<>(cfg.getAllowedFamilies());
+            Collections.sort(allowedFams);
+            sb.append("allowedFam:").append(String.join(",", allowedFams)).append("|");
+            
+            List<String> blockedFams = new ArrayList<>(cfg.getBlocklistedFamilies());
+            Collections.sort(blockedFams);
+            sb.append("blockedFam:").append(String.join(",", blockedFams)).append("|");
+            
+            List<String> allowedMods = new ArrayList<>(cfg.getAllowedMods());
+            Collections.sort(allowedMods);
+            sb.append("allowedMod:").append(String.join(",", allowedMods)).append("|");
+            
+            List<String> blockedMods = new ArrayList<>(cfg.getBlocklistedMods());
+            Collections.sort(blockedMods);
+            sb.append("blockedMod:").append(String.join(",", blockedMods)).append("|");
+
+            byte[] hash = digest.digest(sb.toString().getBytes(StandardCharsets.UTF_8));
+            StringBuilder hexString = new StringBuilder();
+            for (byte b : hash) {
+                String hex = Integer.toHexString(0xff & b);
+                if (hex.length() == 1) hexString.append('0');
+                hexString.append(hex);
+            }
+            return hexString.toString();
+        } catch (Exception e) {
+            return "fallback-" + BlockBiMaps.BASE_BLOCKS.size() + "-" + System.currentTimeMillis();
+        }
+    }
+
+    private void addSlabResources(ResourceLocation slabId, ResourceLocation baseId) {
+        String path = slabId.getPath();
+        String cleanPath = baseId.getPath().replaceAll("_slab$", "").replaceAll("_stairs$", "").replaceAll("_stair$", "");
+        String tex = baseId.getNamespace() + ":block/" + cleanPath;
+
+        JsonObject blockstate = new JsonObject();
+        JsonObject variants = new JsonObject();
+        String bottomModel = BuildScape.MODID + ":block/" + path;
+        String topModel = BuildScape.MODID + ":block/" + path + "_top";
+        String doubleModel = baseId.getNamespace() + ":block/" + cleanPath;
+
+        variants.add("type=bottom", createVariant(bottomModel, 0, 0));
+        variants.add("type=top", createVariant(topModel, 0, 0));
+        variants.add("type=double", createVariant(doubleModel, 0, 0));
+
+        blockstate.add("variants", variants);
+        putResource("assets/" + BuildScape.MODID + "/blockstates/" + path + ".json", GSON.toJson(blockstate));
+
+        // Bottom Model
+        JsonObject modelBottom = new JsonObject();
+        modelBottom.addProperty("parent", "minecraft:block/slab");
+        JsonObject texBottom = new JsonObject();
+        texBottom.addProperty("bottom", tex);
+        texBottom.addProperty("top", tex);
+        texBottom.addProperty("side", tex);
+        modelBottom.add("textures", texBottom);
+        putResource("assets/" + BuildScape.MODID + "/models/block/" + path + ".json", GSON.toJson(modelBottom));
+
+        // Top Model
+        JsonObject modelTop = new JsonObject();
+        modelTop.addProperty("parent", "minecraft:block/slab_top");
+        JsonObject texTop = new JsonObject();
+        texTop.addProperty("bottom", tex);
+        texTop.addProperty("top", tex);
+        texTop.addProperty("side", tex);
+        modelTop.add("textures", texTop);
+        putResource("assets/" + BuildScape.MODID + "/models/block/" + path + "_top.json", GSON.toJson(modelTop));
+
+        // Item Model
+        JsonObject itemModel = new JsonObject();
+        itemModel.addProperty("parent", bottomModel);
+        putResource("assets/" + BuildScape.MODID + "/models/item/" + path + ".json", GSON.toJson(itemModel));
+    }
+
+        private void addStairResources(ResourceLocation stairId, ResourceLocation baseId, boolean isGlass) {
+        String path = stairId.getPath();
+        String cleanPath = baseId.getPath().replaceAll("_slab$", "").replaceAll("_stairs$", "").replaceAll("_stair$", "");
+        String tex = baseId.getNamespace() + ":block/" + cleanPath;
+
+        JsonObject blockstate = new JsonObject();
+        JsonObject variants = new JsonObject();
+        String stairModel = BuildScape.MODID + ":block/" + path;
+        String innerModel = BuildScape.MODID + ":block/" + path + "_inner";
+        String outerModel = BuildScape.MODID + ":block/" + path + "_outer";
+
+
+        Map<String, int[]> GLASS_STAIR_ROTATIONS = Map.ofEntries(
+            Map.entry("facing=east,half=bottom,shape=inner_left", new int[]{0, 270}),
+            Map.entry("facing=east,half=bottom,shape=inner_right", new int[]{0, 0}),
+            Map.entry("facing=east,half=bottom,shape=outer_left", new int[]{0, 270}),
+            Map.entry("facing=east,half=bottom,shape=outer_right", new int[]{0, 0}),
+            Map.entry("facing=east,half=bottom,shape=straight", new int[]{0, 270}),
+            Map.entry("facing=east,half=top,shape=inner_left", new int[]{180, 0}),
+            Map.entry("facing=east,half=top,shape=inner_right", new int[]{180, 90}),
+            Map.entry("facing=east,half=top,shape=outer_left", new int[]{180, 0}),
+            Map.entry("facing=east,half=top,shape=outer_right", new int[]{180, 90}),
+            Map.entry("facing=east,half=top,shape=straight", new int[]{180, 90}),
+            Map.entry("facing=north,half=bottom,shape=inner_left", new int[]{0, 180}),
+            Map.entry("facing=north,half=bottom,shape=inner_right", new int[]{0, 270}),
+            Map.entry("facing=north,half=bottom,shape=outer_left", new int[]{0, 180}),
+            Map.entry("facing=north,half=bottom,shape=outer_right", new int[]{0, 270}),
+            Map.entry("facing=north,half=bottom,shape=straight", new int[]{0, 180}),
+            Map.entry("facing=north,half=top,shape=inner_left", new int[]{180, 270}),
+            Map.entry("facing=north,half=top,shape=inner_right", new int[]{180, 0}),
+            Map.entry("facing=north,half=top,shape=outer_left", new int[]{180, 270}),
+            Map.entry("facing=north,half=top,shape=outer_right", new int[]{180, 0}),
+            Map.entry("facing=north,half=top,shape=straight", new int[]{180, 0}),
+            Map.entry("facing=south,half=bottom,shape=inner_left", new int[]{0, 0}),
+            Map.entry("facing=south,half=bottom,shape=inner_right", new int[]{0, 90}),
+            Map.entry("facing=south,half=bottom,shape=outer_left", new int[]{0, 0}),
+            Map.entry("facing=south,half=bottom,shape=outer_right", new int[]{0, 90}),
+            Map.entry("facing=south,half=bottom,shape=straight", new int[]{0, 0}),
+            Map.entry("facing=south,half=top,shape=inner_left", new int[]{180, 90}),
+            Map.entry("facing=south,half=top,shape=inner_right", new int[]{180, 180}),
+            Map.entry("facing=south,half=top,shape=outer_left", new int[]{180, 90}),
+            Map.entry("facing=south,half=top,shape=outer_right", new int[]{180, 180}),
+            Map.entry("facing=south,half=top,shape=straight", new int[]{180, 180}),
+            Map.entry("facing=west,half=bottom,shape=inner_left", new int[]{0, 90}),
+            Map.entry("facing=west,half=bottom,shape=inner_right", new int[]{0, 180}),
+            Map.entry("facing=west,half=bottom,shape=outer_left", new int[]{0, 90}),
+            Map.entry("facing=west,half=bottom,shape=outer_right", new int[]{0, 180}),
+            Map.entry("facing=west,half=bottom,shape=straight", new int[]{0, 90}),
+            Map.entry("facing=west,half=top,shape=inner_left", new int[]{180, 180}),
+            Map.entry("facing=west,half=top,shape=inner_right", new int[]{180, 270}),
+            Map.entry("facing=west,half=top,shape=outer_left", new int[]{180, 180}),
+            Map.entry("facing=west,half=top,shape=outer_right", new int[]{180, 270}),
+            Map.entry("facing=west,half=top,shape=straight", new int[]{180, 270})
+        );
+        Map<String, int[]> VANILLA_STAIR_ROTATIONS = Map.ofEntries(
+            Map.entry("facing=east,half=bottom,shape=inner_left", new int[]{0, 270}),
+            Map.entry("facing=east,half=bottom,shape=inner_right", new int[]{0, 0}),
+            Map.entry("facing=east,half=bottom,shape=outer_left", new int[]{0, 270}),
+            Map.entry("facing=east,half=bottom,shape=outer_right", new int[]{0, 0}),
+            Map.entry("facing=east,half=bottom,shape=straight", new int[]{0, 0}),
+            Map.entry("facing=east,half=top,shape=inner_left", new int[]{180, 0}),
+            Map.entry("facing=east,half=top,shape=inner_right", new int[]{180, 90}),
+            Map.entry("facing=east,half=top,shape=outer_left", new int[]{180, 0}),
+            Map.entry("facing=east,half=top,shape=outer_right", new int[]{180, 90}),
+            Map.entry("facing=east,half=top,shape=straight", new int[]{180, 0}),
+            Map.entry("facing=north,half=bottom,shape=inner_left", new int[]{0, 180}),
+            Map.entry("facing=north,half=bottom,shape=inner_right", new int[]{0, 270}),
+            Map.entry("facing=north,half=bottom,shape=outer_left", new int[]{0, 180}),
+            Map.entry("facing=north,half=bottom,shape=outer_right", new int[]{0, 270}),
+            Map.entry("facing=north,half=bottom,shape=straight", new int[]{0, 270}),
+            Map.entry("facing=north,half=top,shape=inner_left", new int[]{180, 270}),
+            Map.entry("facing=north,half=top,shape=inner_right", new int[]{180, 0}),
+            Map.entry("facing=north,half=top,shape=outer_left", new int[]{180, 270}),
+            Map.entry("facing=north,half=top,shape=outer_right", new int[]{180, 0}),
+            Map.entry("facing=north,half=top,shape=straight", new int[]{180, 270}),
+            Map.entry("facing=south,half=bottom,shape=inner_left", new int[]{0, 0}),
+            Map.entry("facing=south,half=bottom,shape=inner_right", new int[]{0, 90}),
+            Map.entry("facing=south,half=bottom,shape=outer_left", new int[]{0, 0}),
+            Map.entry("facing=south,half=bottom,shape=outer_right", new int[]{0, 90}),
+            Map.entry("facing=south,half=bottom,shape=straight", new int[]{0, 90}),
+            Map.entry("facing=south,half=top,shape=inner_left", new int[]{180, 90}),
+            Map.entry("facing=south,half=top,shape=inner_right", new int[]{180, 180}),
+            Map.entry("facing=south,half=top,shape=outer_left", new int[]{180, 90}),
+            Map.entry("facing=south,half=top,shape=outer_right", new int[]{180, 180}),
+            Map.entry("facing=south,half=top,shape=straight", new int[]{180, 90}),
+            Map.entry("facing=west,half=bottom,shape=inner_left", new int[]{0, 90}),
+            Map.entry("facing=west,half=bottom,shape=inner_right", new int[]{0, 180}),
+            Map.entry("facing=west,half=bottom,shape=outer_left", new int[]{0, 90}),
+            Map.entry("facing=west,half=bottom,shape=outer_right", new int[]{0, 180}),
+            Map.entry("facing=west,half=bottom,shape=straight", new int[]{0, 180}),
+            Map.entry("facing=west,half=top,shape=inner_left", new int[]{180, 180}),
+            Map.entry("facing=west,half=top,shape=inner_right", new int[]{180, 270}),
+            Map.entry("facing=west,half=top,shape=outer_left", new int[]{180, 180}),
+            Map.entry("facing=west,half=top,shape=outer_right", new int[]{180, 270}),
+            Map.entry("facing=west,half=top,shape=straight", new int[]{180, 180})
+        );
+        Map<String, int[]> STAIR_ROTATIONS = isGlass ? GLASS_STAIR_ROTATIONS : VANILLA_STAIR_ROTATIONS;
+
+        for (Map.Entry<String, int[]> entry : STAIR_ROTATIONS.entrySet()) {
+             String stateKey = entry.getKey();
+             int[] value = entry.getValue();
+             String m = stateKey.contains("straight") ? stairModel : stateKey.contains("inner") ? innerModel : outerModel;
+             variants.add(stateKey, createVariant(m, value[0], value[1]));
+        }
+
+        blockstate.add("variants", variants);
+        putResource("assets/" + BuildScape.MODID + "/blockstates/" + path + ".json", GSON.toJson(blockstate));
+
+        // Models (Stair, Inner, Outer)
+        String[] types = {"", "_inner", "_outer"};
+        String[] parents = {"minecraft:block/stairs", "minecraft:block/inner_stairs", "minecraft:block/outer_stairs"};
+
+        if (isGlass) {
+            parents = new String[] {
+                "buildscape:block/glass_stairs_template",
+                "buildscape:block/glass_stairs_inner_template",
+                "buildscape:block/glass_stairs_outer_template"
+            };
+        }
+
+        for (int i=0; i<3; i++) {
+            JsonObject m = new JsonObject();
+            m.addProperty("parent", parents[i]);
+            JsonObject t = new JsonObject();
+            t.addProperty("bottom", tex);
+            t.addProperty("top", tex);
+            t.addProperty("side", tex);
+            m.add("textures", t);
+            putResource("assets/" + BuildScape.MODID + "/models/block/" + path + types[i] + ".json", GSON.toJson(m));
+        }
+
+        // Item Model
+        JsonObject itemModel = new JsonObject();
+        itemModel.addProperty("parent", stairModel);
+        putResource("assets/" + BuildScape.MODID + "/models/item/" + path + ".json", GSON.toJson(itemModel));
+    }
+
+    private void addStairResources(ResourceLocation stairId, ResourceLocation baseId) {
+        String path = stairId.getPath();
+        String cleanPath = baseId.getPath().replaceAll("_slab$", "").replaceAll("_stairs$", "").replaceAll("_stair$", "");
+        String tex = baseId.getNamespace() + ":block/" + cleanPath;
+
+        JsonObject blockstate = new JsonObject();
+        JsonObject variants = new JsonObject();
+        String stairModel = BuildScape.MODID + ":block/" + path;
+        String innerModel = BuildScape.MODID + ":block/" + path + "_inner";
+        String outerModel = BuildScape.MODID + ":block/" + path + "_outer";
+
+        // Define standard variants for stairs facing/half/shape combinations
+        String[] facings = {"north", "south", "east", "west"};
+        String[] halves = {"bottom", "top"};
+        String[] shapes = {"straight", "inner_left", "inner_right", "outer_left", "outer_right"};
+
+        for (String f : facings) {
+            for (String h : halves) {
+                for (String s : shapes) {
+                    String stateKey = "facing=" + f + ",half=" + h + ",shape=" + s;
+                    int y = f.equals("east") ? 90 : f.equals("south") ? 180 : f.equals("west") ? 270 : 0;
+                    if (s.startsWith("inner") || s.startsWith("outer")) {
+                        // Stair rotation logic offset for corners
+                    }
+                    String m = s.equals("straight") ? stairModel : s.startsWith("inner") ? innerModel : outerModel;
+                    variants.add(stateKey, createVariant(m, h.equals("top") ? 180 : 0, y));
+                }
             }
         }
 
-        putResource("assets/" + BuildScape.MODID + "/lang/en_us.json", GSON.toJson(langObj));
-        cachedResources.forEach(this::saveToDisk);
+        blockstate.add("variants", variants);
+        putResource("assets/" + BuildScape.MODID + "/blockstates/" + path + ".json", GSON.toJson(blockstate));
+
+        // Models (Stair, Inner, Outer)
+        String[] types = {"", "_inner", "_outer"};
+        String[] parents = {"minecraft:block/stairs", "minecraft:block/inner_stairs", "minecraft:block/outer_stairs"};
+
+        for (int i=0; i<3; i++) {
+            JsonObject m = new JsonObject();
+            m.addProperty("parent", parents[i]);
+            JsonObject t = new JsonObject();
+            t.addProperty("bottom", tex);
+            t.addProperty("top", tex);
+            t.addProperty("side", tex);
+            m.add("textures", t);
+            putResource("assets/" + BuildScape.MODID + "/models/block/" + path + types[i] + ".json", GSON.toJson(m));
+        }
+
+        // Item Model
+        JsonObject itemModel = new JsonObject();
+        itemModel.addProperty("parent", stairModel);
+        putResource("assets/" + BuildScape.MODID + "/models/item/" + path + ".json", GSON.toJson(itemModel));
     }
 
     private void addVerticalSlabResources(ResourceLocation verticalId, ResourceLocation baseId, boolean isTransparent) {
@@ -593,7 +946,7 @@ public class VariantPackResources implements PackResources {
         String path = (type == PackType.SERVER_DATA ? "data" : "assets") + "/" + location.getNamespace() + "/" + location.getPath();
 
         Path diskPath = Paths.get(ROOT_DIR, path);
-        if (Files.exists(diskPath)) {
+        if (diskFiles.contains(path)) {
             try { return Files.newInputStream(diskPath); } catch (IOException e) {}
         }
         
@@ -633,7 +986,7 @@ public class VariantPackResources implements PackResources {
     public boolean hasResource(PackType type, ResourceLocation location) {
         generateContent();
         String path = (type == PackType.SERVER_DATA ? "data" : "assets") + "/" + location.getNamespace() + "/" + location.getPath();
-        return cachedResources.containsKey(path) || Files.exists(Paths.get(ROOT_DIR, path));
+        return cachedResources.containsKey(path) || diskFiles.contains(path);
     }
 
     @Override

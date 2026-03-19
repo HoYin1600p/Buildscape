@@ -11,6 +11,7 @@ import net.minecraft.network.chat.TranslatableComponent;
 public class WorldSettingsConfigTab extends AbstractConfigTab {
     private ScalableToggle creativeTreeBreakerToggle;
     private ScalableToggle fastLeafDecayToggle;
+    private ScalableMenuButton verticalStuffManagerButton;
     private int leftBoxX, leftBoxY, leftBoxWidth, leftBoxHeight;
     private int rightBoxX, rightBoxY, rightBoxWidth, rightBoxHeight;
     private int lastContentWidth = -1;
@@ -46,6 +47,14 @@ public class WorldSettingsConfigTab extends AbstractConfigTab {
         fastLeafDecayToggle.active = parent.hasOpAccess();
         addTabWidget(fastLeafDecayToggle);
 
+        verticalStuffManagerButton = new ScalableMenuButton(
+                0, 0, 100, 20,
+                new TranslatableComponent("buildscape.config.others.vertical_stuff_manager"),
+                (btn) -> {
+                    parent.setActiveTab(new com.kingodogo.buildscape.client.screen.tabs.supporters.VerticalStuffManagerTab(parent));
+                });
+        addTabWidget(verticalStuffManagerButton);
+
         relayout(contentX, contentY, contentWidth, contentHeight);
 
         lastContentWidth = contentWidth;
@@ -53,19 +62,19 @@ public class WorldSettingsConfigTab extends AbstractConfigTab {
     }
 
     private void relayout(int contentX, int contentY, int contentWidth, int contentHeight) {
-        int padding = BuildScapeConfigScreen.scaleSize(10);
-        int middleGap = (int) (parent.height * 0.005);
-        int topGap = parent.getContentY();
-        int fullContentHeight = parent.height - topGap - (int) (parent.height * 0.005);
+        int screenWidth = parent.width;
+        int screenHeight = parent.height;
 
-        // Define two panels side-by-side matching the middle and right panels of other tabs
-        // Left Panel (Player settings)
+        int fullContentHeight = parent.getContentHeight();
+        int padding = BuildScapeConfigScreen.scaleSize(10);
+
+        // leftPanel
         leftBoxX = parent.getContentX();
         leftBoxY = parent.getContentY();
         leftBoxWidth = parent.getContentWidth();
         leftBoxHeight = fullContentHeight;
 
-        // Right Panel (Update settings)
+        // rightPanel
         rightBoxX = parent.getRightPanelX();
         rightBoxY = parent.getContentY();
         rightBoxWidth = parent.getRightPanelWidth();
@@ -78,10 +87,17 @@ public class WorldSettingsConfigTab extends AbstractConfigTab {
         creativeTreeBreakerToggle.x = leftBoxX + padding;
         creativeTreeBreakerToggle.y = leftBoxY + padding + titleHeight + BuildScapeConfigScreen.scaleSize(5);
         creativeTreeBreakerToggle.setWidth(buttonWidth);
+        creativeTreeBreakerToggle.setHeight(buttonHeight);
 
         fastLeafDecayToggle.x = rightBoxX + padding;
         fastLeafDecayToggle.y = rightBoxY + padding + titleHeight + BuildScapeConfigScreen.scaleSize(5);
         fastLeafDecayToggle.setWidth(rightBoxWidth - padding * 2);
+        fastLeafDecayToggle.setHeight(buttonHeight);
+
+        verticalStuffManagerButton.x = rightBoxX + padding;
+        verticalStuffManagerButton.y = fastLeafDecayToggle.y + buttonHeight + BuildScapeConfigScreen.scaleSize(5);
+        verticalStuffManagerButton.setWidth(rightBoxWidth - padding * 2);
+        verticalStuffManagerButton.setHeight(buttonHeight);
     }
 
     @Override
@@ -110,13 +126,64 @@ public class WorldSettingsConfigTab extends AbstractConfigTab {
         net.minecraft.client.gui.GuiComponent.fill(poseStack, rightBoxX + rightBoxWidth - 1, rightBoxY, rightBoxX + rightBoxWidth, rightBoxY + rightBoxHeight, borderColor);
 
         Minecraft mc = Minecraft.getInstance();
-        mc.font.draw(poseStack, new TranslatableComponent("buildscape.config.world.player_rules"), leftBoxX + 10, leftBoxY + 5, 0xFFFFFF);
-        mc.font.draw(poseStack, new TranslatableComponent("buildscape.config.world.update_rules"), rightBoxX + 10, rightBoxY + 5, 0xFFFFFF);
+        float textScale = BuildScapeConfigScreen.getStandardTextScale();
+        int titleYOffset = 2 + BuildScapeConfigScreen.getScaledButtonHeight() / 2 - (int)(mc.font.lineHeight * textScale) / 2 + 1;
+
+        poseStack.pushPose();
+        poseStack.translate(leftBoxX + 2, leftBoxY + titleYOffset, 0);
+        poseStack.scale(textScale, textScale, 1.0f);
+        mc.font.draw(poseStack, new TranslatableComponent("buildscape.config.world.player_rules"), 0, 0, 0xFFFFFF);
+        poseStack.popPose();
+
+        poseStack.pushPose();
+        poseStack.translate(rightBoxX + 2, rightBoxY + titleYOffset, 0);
+        poseStack.scale(textScale, textScale, 1.0f);
+        mc.font.draw(poseStack, new TranslatableComponent("buildscape.config.world.update_rules"), 0, 0, 0xFFFFFF);
+        poseStack.popPose();
 
         // Update button states from mc.level.getGameRules() to ensure they reflect sync packets
         if (mc.level != null) {
             creativeTreeBreakerToggle.toggled = com.kingodogo.buildscape.config.CosmeticsConfig.get().getCreativeTreeBreaker(mc.player.getUUID());
             fastLeafDecayToggle.toggled = mc.level.getGameRules().getBoolean(ModGameRules.FAST_LEAF_DECAY);
+        }
+    }
+
+    private static class ScalableMenuButton extends net.minecraft.client.gui.components.Button {
+        private final net.minecraft.network.chat.Component baseMessage;
+
+        public ScalableMenuButton(int x, int y, int width, int height, net.minecraft.network.chat.Component message, OnPress onPress) {
+            super(x, y, width, height, TextComponent.EMPTY, onPress);
+            this.baseMessage = message;
+        }
+
+        public void setHeight(int h) {
+            this.height = h;
+        }
+
+        @Override
+        public void renderButton(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
+            Minecraft mc = Minecraft.getInstance();
+            int borderColor = (active && isHoveredOrFocused()) ? 0xFFFFFFFF : 0xFF666666;
+
+            // Draw custom button background
+            net.minecraft.client.gui.GuiComponent.fill(poseStack, x, y, x + width, y + height, 0x80000000); // 50% dark
+
+            // Draw border
+            net.minecraft.client.gui.GuiComponent.fill(poseStack, x, y, x + width, y + 1, borderColor);
+            net.minecraft.client.gui.GuiComponent.fill(poseStack, x, y + height - 1, x + width, y + height, borderColor);
+            net.minecraft.client.gui.GuiComponent.fill(poseStack, x, y, x + 1, y + height, borderColor);
+            net.minecraft.client.gui.GuiComponent.fill(poseStack, x + width - 1, y, x + width, y + height, borderColor);
+
+            // Draw left aligned text matching toggle box pattern
+            float textScale = BuildScapeConfigScreen.getStandardTextScale();
+            int textX = x + BuildScapeConfigScreen.scaleSize(6);
+            int textY = y + (height - (int)(mc.font.lineHeight * textScale)) / 2;
+            
+            poseStack.pushPose();
+            poseStack.translate(textX, textY, 0);
+            poseStack.scale(textScale, textScale, 1.0f);
+            mc.font.draw(poseStack, baseMessage, 0, 0, active ? 0xFFFFFF : 0x888888);
+            poseStack.popPose();
         }
     }
 
@@ -134,6 +201,10 @@ public class WorldSettingsConfigTab extends AbstractConfigTab {
 
         public boolean isToggled() {
             return toggled;
+        }
+
+        public void setHeight(int h) {
+            this.height = h;
         }
 
         private void updateMessage() {
@@ -169,12 +240,23 @@ public class WorldSettingsConfigTab extends AbstractConfigTab {
             net.minecraft.client.gui.GuiComponent.fill(poseStack, x + 2, y + height - 2 - barHeight, x + width - 2, y + height - 2, barColor);
 
             // Draw text
-            int textY = y + (height - mc.font.lineHeight) / 2;
-            mc.font.draw(poseStack, baseMessage, x + BuildScapeConfigScreen.scaleSize(6), textY, active ? 0xFFFFFF : 0x888888);
+            float textScale = BuildScapeConfigScreen.getStandardTextScale();
+            int textY = y + (height - (int)(mc.font.lineHeight * textScale)) / 2;
+
+            poseStack.pushPose();
+            poseStack.translate(x + BuildScapeConfigScreen.scaleSize(6), textY, 0);
+            poseStack.scale(textScale, textScale, 1.0f);
+            mc.font.draw(poseStack, baseMessage, 0, 0, active ? 0xFFFFFF : 0x888888);
+            poseStack.popPose();
 
             String status = toggled ? "ON" : "OFF";
-            int statusWidth = mc.font.width(status);
-            mc.font.draw(poseStack, status, x + width - statusWidth - BuildScapeConfigScreen.scaleSize(6), textY, active ? barColor : 0x888888);
+            int statusWidth = (int)(mc.font.width(status) * textScale);
+
+            poseStack.pushPose();
+            poseStack.translate(x + width - statusWidth - BuildScapeConfigScreen.scaleSize(6), textY, 0);
+            poseStack.scale(textScale, textScale, 1.0f);
+            mc.font.draw(poseStack, status, 0, 0, active ? barColor : 0x888888);
+            poseStack.popPose();
             
             // Render lock icon if inactive
             if (!active) {

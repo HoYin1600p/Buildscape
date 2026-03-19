@@ -240,6 +240,9 @@ public class PillarParticleConfig {
             SERVER_CONFIG.particle_color = new ArrayList<>(packet.particle_color);
         } else {
             SERVER_CONFIG.particle_color = new ArrayList<>();
+            SERVER_CONFIG.particle_color.add("#FFB81C");
+            SERVER_CONFIG.particle_color.add("#FFFFFF");
+            SERVER_CONFIG.particle_color.add("#FFFF00");
             SERVER_CONFIG.particle_color.add("#E8FEFD"); // White
             SERVER_CONFIG.particle_color.add("#FF5C00"); // Orange
             SERVER_CONFIG.particle_color.add("#3CDFFF"); // Light Blue
@@ -461,7 +464,7 @@ public class PillarParticleConfig {
                         "  // Each pillar can have its own dye colors, independent of other pillars\n");
                 writer.write("  // To reset a pillar's colors, break and replace it\n");
                 writer.write(
-                        "  \"particle_color\": [\"#E8FEFD\", \"#FF5C00\", \"#3CDFFF\"],\n");
+                        "  \"particle_color\": [\"#FFB81C\", \"#FFFFFF\", \"#FFFF00\", \"#E8FEFD\", \"#FF5C00\", \"#3CDFFF\"],\n");
                 writer.write("  \n");
                 writer.write(
                         "  // Maximum number of colors to use from particle_color array (1-7)\n");
@@ -713,6 +716,9 @@ public class PillarParticleConfig {
         if (!file.exists()) {
             writeDefaultProperties(file);
             this.particle_color.clear();
+            this.particle_color.add("#FFB81C");
+            this.particle_color.add("#FFFFFF");
+            this.particle_color.add("#FFFF00");
             this.particle_color.add("#E8FEFD"); // White
             this.particle_color.add("#FF5C00"); // Orange
             this.particle_color.add("#3CDFFF"); // Light Blue

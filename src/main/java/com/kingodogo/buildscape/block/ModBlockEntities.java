@@ -117,6 +117,7 @@ public class ModBlockEntities {
                     ).build(null)
     );
 
+/*
     public static final RegistryObject<BlockEntityType<MirrorBlockEntity>> MIRROR_BLOCK_ENTITY = BLOCK_ENTITIES.register(
             "mirror_block_entity",
             () -> BlockEntityType.Builder.of(
@@ -124,4 +125,5 @@ public class ModBlockEntities {
                     ModBlocks.MIRROR_BLOCK.get()
             ).build(null)
     );
+*/
 }

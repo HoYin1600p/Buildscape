@@ -13,6 +13,7 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import org.jetbrains.annotations.Nullable;
 
+/*
 public class MirrorBlock extends Block implements EntityBlock {
     public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
 
@@ -47,3 +48,5 @@ public class MirrorBlock extends Block implements EntityBlock {
         return new MirrorBlockEntity(pos, state);
     }
 }
+*/
+

@@ -17,6 +17,18 @@ public class ModKeyBinds {
             CATEGORY
     );
 
+    /*
+    Opens the BuildScape Guidebook. Default key: G
+    public static final KeyMapping OPEN_GUIDEBOOK = new KeyMapping(
+            "key.buildscape.open_guidebook",
+            KeyConflictContext.IN_GAME,
+            InputConstants.Type.KEYSYM,
+            InputConstants.KEY_G,
+            CATEGORY
+    );
+    */
+
+
     public static void register() {
     }
 }

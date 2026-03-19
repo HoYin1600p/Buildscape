@@ -10,14 +10,14 @@ import net.minecraft.network.chat.TranslatableComponent;
 public class BuildScapeConfigScreen extends Screen {
     private static final double SIDEBAR_WIDTH_PERCENT = 0.11; // 11% sidebar
     private static final double LEFT_GAP_PERCENT = 0.005; // 0.5% gap before sidebar
-    private static final double GAP_SIDEBAR_PANEL_PERCENT = 0.01; // 1% gap after sidebar
-    private static final double PANEL_GAP_PERCENT = 0.01; // 1% gap between panels
+    private static final double GAP_SIDEBAR_PANEL_PERCENT = 0.005; // 0.5% gap after sidebar
+    private static final double PANEL_GAP_PERCENT = 0.005; // 0.5% gap between panels
     private static final double RIGHT_GAP_PERCENT = 0.005; // 0.5% gap after right panel
     private static final double PANEL_HEIGHT_GAP_PERCENT = 0.005; // 0.5% gap height
 
-    // Panel Widths: (100% - 0.5 - 11 - 1 - 1 - 0.5) / 2 = (100 - 14) / 2 = 86 / 2 = 43%
-    private static final double LEFT_CONTENT_WIDTH_PERCENT = 0.43;
-    private static final double RIGHT_CONTENT_WIDTH_PERCENT = 0.43;
+    // Panel Widths: (100% - 0.5 - 11 - 0.5 - 0.5 - 0.5) / 2 = (100 - 13.0) / 2 = 87.0 / 2 = 43.5%
+    private static final double LEFT_CONTENT_WIDTH_PERCENT = 0.435;
+    private static final double RIGHT_CONTENT_WIDTH_PERCENT = 0.435;
     private static final double CONTENT_WIDTH_PERCENT = LEFT_CONTENT_WIDTH_PERCENT;
     private static final double RIGHT_PANEL_WIDTH_PERCENT = RIGHT_CONTENT_WIDTH_PERCENT;
 
@@ -228,7 +228,7 @@ public class BuildScapeConfigScreen extends Screen {
         worldSettingsButton = new ConfigCategoryButton(
                 buttonX, sidebarY,
                 buttonWidth, buttonHeight,
-                new TranslatableComponent("buildscape.config.category.world"),
+                new TranslatableComponent("buildscape.config.category.others"),
                 (button) -> {
                     setActiveTab(new WorldSettingsConfigTab(this));
                 });
@@ -545,7 +545,7 @@ public class BuildScapeConfigScreen extends Screen {
         float v1 = 1.0f;
 
         com.mojang.blaze3d.systems.RenderSystem.setShader(net.minecraft.client.renderer.GameRenderer::getPositionTexShader);
-        com.mojang.blaze3d.systems.RenderSystem.setShaderTexture(0, new net.minecraft.resources.ResourceLocation("buildscape", "textures/gui/" + texturePath));
+        com.mojang.blaze3d.systems.RenderSystem.setShaderTexture(0, new net.minecraft.resources.ResourceLocation("buildscape:" + "textures/gui/" + texturePath));
         com.mojang.blaze3d.systems.RenderSystem.enableBlend();
         com.mojang.blaze3d.systems.RenderSystem.defaultBlendFunc();
         com.mojang.blaze3d.systems.RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
@@ -630,6 +630,8 @@ public class BuildScapeConfigScreen extends Screen {
                 pillarParticlesButton.setActive(false);
             if (pillarIdsButton != null)
                 pillarIdsButton.setActive(false);
+            if (worldSettingsButton != null)
+                worldSettingsButton.setActive(false);
             if (supportersButton != null)
                 supportersButton.setActive(false);
             if (reportButton != null)
@@ -639,7 +641,9 @@ public class BuildScapeConfigScreen extends Screen {
 
         boolean isItems = activeTab instanceof PillarItemsConfigTab;
         boolean isParticles = activeTab instanceof PillarParticlesConfigTab;
-        boolean isIds = activeTab instanceof PillarIdsConfigTab;
+        boolean isIds = activeTab instanceof PillarIdsConfigTab || activeTab instanceof PillarIdDetailConfigTab;
+        boolean isWorldSettings = activeTab instanceof WorldSettingsConfigTab || 
+                                  activeTab instanceof com.kingodogo.buildscape.client.screen.tabs.supporters.VerticalStuffManagerTab;
         boolean isSupporters = activeTab instanceof com.kingodogo.buildscape.client.screen.tabs.supporters.SupportersOnlyTab;
 
         if (pillarItemsButton != null)
@@ -649,9 +653,9 @@ public class BuildScapeConfigScreen extends Screen {
         if (pillarIdsButton != null)
             pillarIdsButton.setActive(isIds);
         if (worldSettingsButton != null)
-            worldSettingsButton.setActive(activeTab instanceof WorldSettingsConfigTab);
+            worldSettingsButton.setActive(isWorldSettings);
         if (supportersButton != null)
-            supportersButton.setActive(activeTab instanceof com.kingodogo.buildscape.client.screen.tabs.supporters.SupportersOnlyTab);
+            supportersButton.setActive(isSupporters);
         if (reportButton != null)
             reportButton.setActive(false);
     }
@@ -805,10 +809,12 @@ public class BuildScapeConfigScreen extends Screen {
     }
 
     public int getContentY() {
-        int baseGap = (int) (height * 0.05); // 5% Gap from top
+        // Content panels MUST start at exactly the same Y as the first sidebar button.
+        // The title frame sits at scaleSize(10) with frameHeight = getScaledCategoryButtonHeight() + scaleSize(4).
+        // First sidebar button Y = titleBottom + spacing (scaleSize(8)).
         int dynamicFrameHeight = getScaledCategoryButtonHeight() + scaleSize(4);
-        int titleBottom = scaleSize(10) + dynamicFrameHeight; 
-        return Math.max(baseGap, titleBottom + scaleSize(8)); // Ensure it's clear of the dynamic frame
+        int titleBottom = scaleSize(10) + dynamicFrameHeight;
+        return titleBottom + scaleSize(8);
     }
 
     public int getContentWidth() {
@@ -833,10 +839,31 @@ public class BuildScapeConfigScreen extends Screen {
 
 
     public int getContentHeight() {
-        // Total Height - Top 5% - Bottom 0.5%
+        // Total panel height: from content top down to 0.5% from bottom
         int topGap = getContentY();
-        int bottomGap = (int) (height * 0.005);
+        int bottomGap = (int) (height * 0.005); // 0.5% bottom gap
         return height - topGap - bottomGap;
+    }
+
+    /**
+     * Returns the consistent 0.5% vertical gap between stacked panels.
+     * Use this everywhere instead of hard-coding (int)(height * 0.005).
+     */
+    public int getVerticalPanelGap() {
+        return Math.max(1, (int) (height * 0.005));
+    }
+
+    /**
+     * Returns the single standard text scale for ALL label/header text across every tab.
+     * Keeps all panel text the same visual size regardless of GUI scale.
+     */
+    public static float getStandardTextScale() {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.getWindow() == null) return 1.0f;
+        double guiScale = mc.getWindow().getGuiScale();
+        if (guiScale >= 3.0) return 0.75f;
+        if (guiScale >= 2.5) return 0.85f;
+        return 1.0f;
     }
 
     public void addTabWidget(net.minecraft.client.gui.components.events.GuiEventListener widget) {

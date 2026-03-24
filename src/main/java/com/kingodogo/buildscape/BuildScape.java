@@ -53,8 +53,10 @@ public class BuildScape {
         com.kingodogo.buildscape.block.ModBlockEntities.BLOCK_ENTITIES.register(
                 modEventBus);
         com.kingodogo.buildscape.entity.ModEntities.ENTITIES.register(modEventBus);
+        com.kingodogo.buildscape.test.TestEntities.ENTITIES.register(modEventBus);
         com.kingodogo.buildscape.recipe.ModRecipeSerializers.RECIPE_SERIALIZERS.register(
                 modEventBus);
+        com.kingodogo.buildscape.network.ModMenuTypes.MENUS.register(modEventBus);
 
 
         com.kingodogo.buildscape.worldgen.ModBlockStateProviderTypes.BLOCK_STATE_PROVIDER_TYPES.register(
@@ -1370,6 +1372,13 @@ public class BuildScape {
 
             event.enqueueWork(() -> {
                 com.kingodogo.buildscape.client.ClientEvents.initializeConfigCallback();
+            });
+
+            event.enqueueWork(() -> {
+                net.minecraft.client.gui.screens.MenuScreens.register(
+                        com.kingodogo.buildscape.network.ModMenuTypes.PET_MENU.get(),
+                        com.kingodogo.buildscape.client.screen.PetScreen::new
+                );
             });
 
 

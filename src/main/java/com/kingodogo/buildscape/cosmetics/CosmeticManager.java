@@ -77,6 +77,11 @@ public class CosmeticManager {
         // Register gear cosmetics
         registerHeadCosmetic("buildscape:cosmatics/gear/builders_hat", "Builder's Hat", "A stylish builder's hat", 1);
 
+        // Register Test Pet Cosmetic in Wings slot (default/unlocked for everyone)
+        cosmeticMetadata.put("buildscape:cosmatics/wings/test_pet", new CosmeticMetadata("Player Pet", "Spawns a baby player pet that follows you.", 1, CosmeticType.WINGS, null));
+        allCosmetics.add("buildscape:cosmatics/wings/test_pet");
+        defaultCosmetics.add("buildscape:cosmatics/wings/test_pet"); // Unlocked for everyone
+
 
         // Register block cosmetics
 

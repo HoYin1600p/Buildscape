@@ -153,6 +153,24 @@ public class ModCreativeModeTab {
         }
 
 private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
+            // Vanilla Log Slabs
+            items.add(new ItemStack(ModItems.OAK_LOG_SLAB.get()));
+            items.add(new ItemStack(ModItems.STRIPPED_OAK_LOG_SLAB.get()));
+            items.add(new ItemStack(ModItems.SPRUCE_LOG_SLAB.get()));
+            items.add(new ItemStack(ModItems.STRIPPED_SPRUCE_LOG_SLAB.get()));
+            items.add(new ItemStack(ModItems.BIRCH_LOG_SLAB.get()));
+            items.add(new ItemStack(ModItems.STRIPPED_BIRCH_LOG_SLAB.get()));
+            items.add(new ItemStack(ModItems.JUNGLE_LOG_SLAB.get()));
+            items.add(new ItemStack(ModItems.STRIPPED_JUNGLE_LOG_SLAB.get()));
+            items.add(new ItemStack(ModItems.ACACIA_LOG_SLAB.get()));
+            items.add(new ItemStack(ModItems.STRIPPED_ACACIA_LOG_SLAB.get()));
+            items.add(new ItemStack(ModItems.DARK_OAK_LOG_SLAB.get()));
+            items.add(new ItemStack(ModItems.STRIPPED_DARK_OAK_LOG_SLAB.get()));
+            items.add(new ItemStack(ModItems.CRIMSON_STEM_SLAB.get()));
+            items.add(new ItemStack(ModItems.STRIPPED_CRIMSON_STEM_SLAB.get()));
+            items.add(new ItemStack(ModItems.WARPED_STEM_SLAB.get()));
+            items.add(new ItemStack(ModItems.STRIPPED_WARPED_STEM_SLAB.get()));
+
             items.add(new ItemStack(ModItems.BIT_COPPER_BLOCK.get()));
             items.add(new ItemStack(ModItems.BIT_COPPER_BLOCK_STAIRS.get()));
             items.add(new ItemStack(ModItems.BIT_COPPER_BLOCK_SLAB.get()));
@@ -477,7 +495,9 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.STRIPPED_BAMBOO_BLOCK_PRESSURE_PLATE.get()));
             items.add(new ItemStack(ModItems.STRIPPED_BAMBOO_WOOD.get()));
             items.add(new ItemStack(ModItems.MANGROVE_LOG.get()));
+            items.add(new ItemStack(ModItems.MANGROVE_LOG_SLAB.get()));
             items.add(new ItemStack(ModItems.STRIPPED_MANGROVE_LOG.get()));
+            items.add(new ItemStack(ModItems.STRIPPED_MANGROVE_LOG_SLAB.get()));
             items.add(new ItemStack(ModItems.MANGROVE_WOOD.get()));
             items.add(new ItemStack(ModItems.STRIPPED_MANGROVE_WOOD.get()));
             items.add(new ItemStack(ModItems.MANGROVE_LEAVES.get()));
@@ -519,6 +539,10 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.STRIPPED_JUNGLE_WOOD_WALL.get()));
             items.add(new ItemStack(ModItems.ACACIA_WOOD_WALL.get()));
             items.add(new ItemStack(ModItems.STRIPPED_ACACIA_WOOD_WALL.get()));
+            items.add(new ItemStack(ModItems.ASHPEN_LOG.get()));
+            items.add(new ItemStack(ModItems.ASHPEN_WOOD.get()));
+            items.add(new ItemStack(ModItems.ASHPEN_WOOD_SLAB.get()));
+            items.add(new ItemStack(ModItems.ASHPEN_LOG_SLAB.get()));
             items.add(new ItemStack(ModItems.ASHPEN_WHITE_PLANKS.get()));
             items.add(new ItemStack(ModItems.ASHPEN_WHITE_STAIRS.get()));
             items.add(new ItemStack(ModItems.ASHPEN_WHITE_SLAB.get()));
@@ -1113,22 +1137,39 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.MAGENTA_REDSTONE_LAMP.get()));
             items.add(new ItemStack(ModItems.PINK_REDSTONE_LAMP.get()));
             items.add(new ItemStack(ModItems.DECORATED_POT.get()));
+            items.add(new ItemStack(ModItems.TRAPPED_DECORATED_POT.get()));
             items.add(new ItemStack(ModItems.WHITE_DECORATED_POT.get()));
+            items.add(new ItemStack(ModItems.WHITE_TRAPPED_DECORATED_POT.get()));
             items.add(new ItemStack(ModItems.LIGHT_GRAY_DECORATED_POT.get()));
+            items.add(new ItemStack(ModItems.LIGHT_GRAY_TRAPPED_DECORATED_POT.get()));
             items.add(new ItemStack(ModItems.GRAY_DECORATED_POT.get()));
+            items.add(new ItemStack(ModItems.GRAY_TRAPPED_DECORATED_POT.get()));
             items.add(new ItemStack(ModItems.BLACK_DECORATED_POT.get()));
+            items.add(new ItemStack(ModItems.BLACK_TRAPPED_DECORATED_POT.get()));
             items.add(new ItemStack(ModItems.BROWN_DECORATED_POT.get()));
+            items.add(new ItemStack(ModItems.BROWN_TRAPPED_DECORATED_POT.get()));
             items.add(new ItemStack(ModItems.RED_DECORATED_POT.get()));
+            items.add(new ItemStack(ModItems.RED_TRAPPED_DECORATED_POT.get()));
             items.add(new ItemStack(ModItems.ORANGE_DECORATED_POT.get()));
+            items.add(new ItemStack(ModItems.ORANGE_TRAPPED_DECORATED_POT.get()));
             items.add(new ItemStack(ModItems.YELLOW_DECORATED_POT.get()));
+            items.add(new ItemStack(ModItems.YELLOW_TRAPPED_DECORATED_POT.get()));
             items.add(new ItemStack(ModItems.LIME_DECORATED_POT.get()));
+            items.add(new ItemStack(ModItems.LIME_TRAPPED_DECORATED_POT.get()));
             items.add(new ItemStack(ModItems.GREEN_DECORATED_POT.get()));
+            items.add(new ItemStack(ModItems.GREEN_TRAPPED_DECORATED_POT.get()));
             items.add(new ItemStack(ModItems.CYAN_DECORATED_POT.get()));
+            items.add(new ItemStack(ModItems.CYAN_TRAPPED_DECORATED_POT.get()));
             items.add(new ItemStack(ModItems.LIGHT_BLUE_DECORATED_POT.get()));
+            items.add(new ItemStack(ModItems.LIGHT_BLUE_TRAPPED_DECORATED_POT.get()));
             items.add(new ItemStack(ModItems.BLUE_DECORATED_POT.get()));
+            items.add(new ItemStack(ModItems.BLUE_TRAPPED_DECORATED_POT.get()));
             items.add(new ItemStack(ModItems.PURPLE_DECORATED_POT.get()));
+            items.add(new ItemStack(ModItems.PURPLE_TRAPPED_DECORATED_POT.get()));
             items.add(new ItemStack(ModItems.MAGENTA_DECORATED_POT.get()));
+            items.add(new ItemStack(ModItems.MAGENTA_TRAPPED_DECORATED_POT.get()));
             items.add(new ItemStack(ModItems.PINK_DECORATED_POT.get()));
+            items.add(new ItemStack(ModItems.PINK_TRAPPED_DECORATED_POT.get()));
             items.add(new ItemStack(ModItems.FESTIVE_STOCKING.get()));
             items.add(new ItemStack(ModItems.WHITE_FESTIVE_STOCKING.get()));
             items.add(new ItemStack(ModItems.LIGHT_GRAY_FESTIVE_STOCKING.get()));

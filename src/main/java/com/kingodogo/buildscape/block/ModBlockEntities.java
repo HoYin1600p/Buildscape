@@ -59,6 +59,29 @@ public class ModBlockEntities {
                             ModBlocks.WHITE_DECORATED_POT.get(),
                             ModBlocks.YELLOW_DECORATED_POT.get()).build(null));
 
+    public static final RegistryObject<BlockEntityType<TrappedDecoratedPotBlockEntity>> TRAPPED_DECORATED_POT_BLOCK_ENTITY = BLOCK_ENTITIES
+            .register(
+                    "trapped_decorated_pot_block_entity",
+                    () -> BlockEntityType.Builder.of(
+                            TrappedDecoratedPotBlockEntity::new,
+                            ModBlocks.TRAPPED_DECORATED_POT.get(),
+                            ModBlocks.BLACK_TRAPPED_DECORATED_POT.get(),
+                            ModBlocks.BLUE_TRAPPED_DECORATED_POT.get(),
+                            ModBlocks.BROWN_TRAPPED_DECORATED_POT.get(),
+                            ModBlocks.CYAN_TRAPPED_DECORATED_POT.get(),
+                            ModBlocks.GRAY_TRAPPED_DECORATED_POT.get(),
+                            ModBlocks.GREEN_TRAPPED_DECORATED_POT.get(),
+                            ModBlocks.LIGHT_BLUE_TRAPPED_DECORATED_POT.get(),
+                            ModBlocks.LIGHT_GRAY_TRAPPED_DECORATED_POT.get(),
+                            ModBlocks.LIME_TRAPPED_DECORATED_POT.get(),
+                            ModBlocks.MAGENTA_TRAPPED_DECORATED_POT.get(),
+                            ModBlocks.ORANGE_TRAPPED_DECORATED_POT.get(),
+                            ModBlocks.PINK_TRAPPED_DECORATED_POT.get(),
+                            ModBlocks.PURPLE_TRAPPED_DECORATED_POT.get(),
+                            ModBlocks.RED_TRAPPED_DECORATED_POT.get(),
+                            ModBlocks.WHITE_TRAPPED_DECORATED_POT.get(),
+                            ModBlocks.YELLOW_TRAPPED_DECORATED_POT.get()).build(null));
+
     public static final RegistryObject<BlockEntityType<IcicleCauldronBlockEntity>> ICICLE_CAULDRON_BLOCK_ENTITY = BLOCK_ENTITIES
             .register(
                     "icicle_cauldron_block_entity",

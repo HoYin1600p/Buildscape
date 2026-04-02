@@ -1,0 +1,13 @@
+﻿{
+    "variants":  {
+                     "type=bottom":  {
+                                         "model":  "buildscape:block/crimson_stem_slab"
+                                     },
+                     "type=top":  {
+                                      "model":  "buildscape:block/crimson_stem_slab_top"
+                                  },
+                     "type=double":  {
+                                         "model":  "minecraft:block/crimson_stem"
+                                     }
+                 }
+}

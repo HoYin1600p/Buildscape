@@ -2626,6 +2626,45 @@ public class ModBlocks {
         public static final RegistryObject<Block> YELLOW_DECORATED_POT = BLOCKS.register("yellow_decorated_pot",
                 () -> new DecoratedPotBlock());
 
+        // =====================================================================
+        //  Trapped Decorated Pots – same textures, spawn-egg trap mechanic
+        // =====================================================================
+
+        public static final RegistryObject<Block> TRAPPED_DECORATED_POT = BLOCKS.register("trapped_decorated_pot",
+                () -> new TrappedDecoratedPotBlock());
+        public static final RegistryObject<Block> BLACK_TRAPPED_DECORATED_POT = BLOCKS.register("black_trapped_decorated_pot",
+                () -> new TrappedDecoratedPotBlock());
+        public static final RegistryObject<Block> BLUE_TRAPPED_DECORATED_POT = BLOCKS.register("blue_trapped_decorated_pot",
+                () -> new TrappedDecoratedPotBlock());
+        public static final RegistryObject<Block> BROWN_TRAPPED_DECORATED_POT = BLOCKS.register("brown_trapped_decorated_pot",
+                () -> new TrappedDecoratedPotBlock());
+        public static final RegistryObject<Block> CYAN_TRAPPED_DECORATED_POT = BLOCKS.register("cyan_trapped_decorated_pot",
+                () -> new TrappedDecoratedPotBlock());
+        public static final RegistryObject<Block> GRAY_TRAPPED_DECORATED_POT = BLOCKS.register("gray_trapped_decorated_pot",
+                () -> new TrappedDecoratedPotBlock());
+        public static final RegistryObject<Block> GREEN_TRAPPED_DECORATED_POT = BLOCKS.register("green_trapped_decorated_pot",
+                () -> new TrappedDecoratedPotBlock());
+        public static final RegistryObject<Block> LIGHT_BLUE_TRAPPED_DECORATED_POT = BLOCKS.register("light_blue_trapped_decorated_pot",
+                () -> new TrappedDecoratedPotBlock());
+        public static final RegistryObject<Block> LIGHT_GRAY_TRAPPED_DECORATED_POT = BLOCKS.register("light_gray_trapped_decorated_pot",
+                () -> new TrappedDecoratedPotBlock());
+        public static final RegistryObject<Block> LIME_TRAPPED_DECORATED_POT = BLOCKS.register("lime_trapped_decorated_pot",
+                () -> new TrappedDecoratedPotBlock());
+        public static final RegistryObject<Block> MAGENTA_TRAPPED_DECORATED_POT = BLOCKS.register("magenta_trapped_decorated_pot",
+                () -> new TrappedDecoratedPotBlock());
+        public static final RegistryObject<Block> ORANGE_TRAPPED_DECORATED_POT = BLOCKS.register("orange_trapped_decorated_pot",
+                () -> new TrappedDecoratedPotBlock());
+        public static final RegistryObject<Block> PINK_TRAPPED_DECORATED_POT = BLOCKS.register("pink_trapped_decorated_pot",
+                () -> new TrappedDecoratedPotBlock());
+        public static final RegistryObject<Block> PURPLE_TRAPPED_DECORATED_POT = BLOCKS.register("purple_trapped_decorated_pot",
+                () -> new TrappedDecoratedPotBlock());
+        public static final RegistryObject<Block> RED_TRAPPED_DECORATED_POT = BLOCKS.register("red_trapped_decorated_pot",
+                () -> new TrappedDecoratedPotBlock());
+        public static final RegistryObject<Block> WHITE_TRAPPED_DECORATED_POT = BLOCKS.register("white_trapped_decorated_pot",
+                () -> new TrappedDecoratedPotBlock());
+        public static final RegistryObject<Block> YELLOW_TRAPPED_DECORATED_POT = BLOCKS.register("yellow_trapped_decorated_pot",
+                () -> new TrappedDecoratedPotBlock());
+
         public static final RegistryObject<Block> BLACK_CARPET_LAYERS = BLOCKS.register("black_carpet_layers",
                 () -> new WoolLayersBlock(
                         BlockBehaviour.Properties.of(Material.WOOL, MaterialColor.COLOR_BLACK)
@@ -3229,7 +3268,7 @@ public class ModBlocks {
                                 .sound(net.minecraft.world.level.block.SoundType.BAMBOO)));
         public static final RegistryObject<Block> BAMBOO_BLOCK_SLAB = BLOCKS.register(
                 "bamboo_block_slab",
-                () -> new SlabBlock(
+                () -> new LogSlabBlock(
                         BlockBehaviour.Properties.of(Material.WOOD, MaterialColor.COLOR_YELLOW)
                                 .strength(2.0f)
                                 .sound(net.minecraft.world.level.block.SoundType.BAMBOO)));
@@ -3259,7 +3298,7 @@ public class ModBlocks {
                                 .sound(net.minecraft.world.level.block.SoundType.BAMBOO)
                                 .noCollission()));
         public static final RegistryObject<Block> STRIPPED_BAMBOO_BLOCK_SLAB = BLOCKS
-                .register("stripped_bamboo_block_slab", () -> new SlabBlock(
+                .register("stripped_bamboo_block_slab", () -> new LogSlabBlock(
                         BlockBehaviour.Properties.of(Material.WOOD, MaterialColor.COLOR_YELLOW)
                                 .strength(2.0f)
                                 .sound(net.minecraft.world.level.block.SoundType.BAMBOO)));
@@ -8154,4 +8193,52 @@ public class ModBlocks {
                         PINK_GLAZED_GLASS.get().defaultBlockState(),
                         BlockBehaviour.Properties.copy(PINK_GLAZED_GLASS.get())
                 ));
+
+        // Log Slabs with Sitting Feature
+        public static final RegistryObject<Block> OAK_LOG_SLAB = BLOCKS.register("oak_log_slab",
+                () -> new LogSlabBlock(Blocks.OAK_LOG, BlockBehaviour.Properties.of(Material.WOOD, MaterialColor.WOOD).strength(2.0f).sound(net.minecraft.world.level.block.SoundType.WOOD)));
+        public static final RegistryObject<Block> STRIPPED_OAK_LOG_SLAB = BLOCKS.register("stripped_oak_log_slab",
+                () -> new LogSlabBlock(Blocks.STRIPPED_OAK_LOG, BlockBehaviour.Properties.of(Material.WOOD, MaterialColor.WOOD).strength(2.0f).sound(net.minecraft.world.level.block.SoundType.WOOD)));
+        public static final RegistryObject<Block> SPRUCE_LOG_SLAB = BLOCKS.register("spruce_log_slab",
+                () -> new LogSlabBlock(Blocks.SPRUCE_LOG, BlockBehaviour.Properties.of(Material.WOOD, MaterialColor.PODZOL).strength(2.0f).sound(net.minecraft.world.level.block.SoundType.WOOD)));
+        public static final RegistryObject<Block> STRIPPED_SPRUCE_LOG_SLAB = BLOCKS.register("stripped_spruce_log_slab",
+                () -> new LogSlabBlock(Blocks.STRIPPED_SPRUCE_LOG, BlockBehaviour.Properties.of(Material.WOOD, MaterialColor.PODZOL).strength(2.0f).sound(net.minecraft.world.level.block.SoundType.WOOD)));
+        public static final RegistryObject<Block> BIRCH_LOG_SLAB = BLOCKS.register("birch_log_slab",
+                () -> new LogSlabBlock(Blocks.BIRCH_LOG, BlockBehaviour.Properties.of(Material.WOOD, MaterialColor.SAND).strength(2.0f).sound(net.minecraft.world.level.block.SoundType.WOOD)));
+        public static final RegistryObject<Block> STRIPPED_BIRCH_LOG_SLAB = BLOCKS.register("stripped_birch_log_slab",
+                () -> new LogSlabBlock(Blocks.STRIPPED_BIRCH_LOG, BlockBehaviour.Properties.of(Material.WOOD, MaterialColor.SAND).strength(2.0f).sound(net.minecraft.world.level.block.SoundType.WOOD)));
+        public static final RegistryObject<Block> JUNGLE_LOG_SLAB = BLOCKS.register("jungle_log_slab",
+                () -> new LogSlabBlock(Blocks.JUNGLE_LOG, BlockBehaviour.Properties.of(Material.WOOD, MaterialColor.DIRT).strength(2.0f).sound(net.minecraft.world.level.block.SoundType.WOOD)));
+        public static final RegistryObject<Block> STRIPPED_JUNGLE_LOG_SLAB = BLOCKS.register("stripped_jungle_log_slab",
+                () -> new LogSlabBlock(Blocks.STRIPPED_JUNGLE_LOG, BlockBehaviour.Properties.of(Material.WOOD, MaterialColor.DIRT).strength(2.0f).sound(net.minecraft.world.level.block.SoundType.WOOD)));
+        public static final RegistryObject<Block> ACACIA_LOG_SLAB = BLOCKS.register("acacia_log_slab",
+                () -> new LogSlabBlock(Blocks.ACACIA_LOG, BlockBehaviour.Properties.of(Material.WOOD, MaterialColor.COLOR_ORANGE).strength(2.0f).sound(net.minecraft.world.level.block.SoundType.WOOD)));
+        public static final RegistryObject<Block> STRIPPED_ACACIA_LOG_SLAB = BLOCKS.register("stripped_acacia_log_slab",
+                () -> new LogSlabBlock(Blocks.STRIPPED_ACACIA_LOG, BlockBehaviour.Properties.of(Material.WOOD, MaterialColor.COLOR_ORANGE).strength(2.0f).sound(net.minecraft.world.level.block.SoundType.WOOD)));
+        public static final RegistryObject<Block> DARK_OAK_LOG_SLAB = BLOCKS.register("dark_oak_log_slab",
+                () -> new LogSlabBlock(Blocks.DARK_OAK_LOG, BlockBehaviour.Properties.of(Material.WOOD, MaterialColor.COLOR_BROWN).strength(2.0f).sound(net.minecraft.world.level.block.SoundType.WOOD)));
+        public static final RegistryObject<Block> STRIPPED_DARK_OAK_LOG_SLAB = BLOCKS.register("stripped_dark_oak_log_slab",
+                () -> new LogSlabBlock(Blocks.STRIPPED_DARK_OAK_LOG, BlockBehaviour.Properties.of(Material.WOOD, MaterialColor.COLOR_BROWN).strength(2.0f).sound(net.minecraft.world.level.block.SoundType.WOOD)));
+        public static final RegistryObject<Block> CRIMSON_STEM_SLAB = BLOCKS.register("crimson_stem_slab",
+                () -> new LogSlabBlock(Blocks.CRIMSON_STEM, BlockBehaviour.Properties.of(Material.WOOD, MaterialColor.COLOR_RED).strength(2.0f).sound(net.minecraft.world.level.block.SoundType.STEM)));
+        public static final RegistryObject<Block> STRIPPED_CRIMSON_STEM_SLAB = BLOCKS.register("stripped_crimson_stem_slab",
+                () -> new LogSlabBlock(Blocks.STRIPPED_CRIMSON_STEM, BlockBehaviour.Properties.of(Material.WOOD, MaterialColor.COLOR_RED).strength(2.0f).sound(net.minecraft.world.level.block.SoundType.STEM)));
+        public static final RegistryObject<Block> WARPED_STEM_SLAB = BLOCKS.register("warped_stem_slab",
+                () -> new LogSlabBlock(Blocks.WARPED_STEM, BlockBehaviour.Properties.of(Material.WOOD, MaterialColor.COLOR_CYAN).strength(2.0f).sound(net.minecraft.world.level.block.SoundType.STEM)));
+        public static final RegistryObject<Block> STRIPPED_WARPED_STEM_SLAB = BLOCKS.register("stripped_warped_stem_slab",
+                () -> new LogSlabBlock(Blocks.STRIPPED_WARPED_STEM, BlockBehaviour.Properties.of(Material.WOOD, MaterialColor.COLOR_CYAN).strength(2.0f).sound(net.minecraft.world.level.block.SoundType.STEM)));
+        public static final RegistryObject<Block> MANGROVE_LOG_SLAB = BLOCKS.register("mangrove_log_slab",
+                () -> new LogSlabBlock(MANGROVE_LOG.get(), BlockBehaviour.Properties.of(Material.WOOD, MaterialColor.COLOR_RED).strength(2.0f).sound(net.minecraft.world.level.block.SoundType.WOOD)));
+        public static final RegistryObject<Block> STRIPPED_MANGROVE_LOG_SLAB = BLOCKS.register("stripped_mangrove_log_slab",
+                () -> new LogSlabBlock(STRIPPED_MANGROVE_LOG.get(), BlockBehaviour.Properties.of(Material.WOOD, MaterialColor.COLOR_RED).strength(2.0f).sound(net.minecraft.world.level.block.SoundType.WOOD)));
+
+        // Ashpen Log
+        public static final RegistryObject<Block> ASHPEN_LOG = BLOCKS.register("ashpen_log",
+                () -> new RotatedPillarBlock(BlockBehaviour.Properties.copy(Blocks.OAK_LOG)));
+        public static final RegistryObject<Block> ASHPEN_WOOD = BLOCKS.register("ashpen_wood",
+                () -> new RotatedPillarBlock(BlockBehaviour.Properties.copy(Blocks.OAK_WOOD)));
+        public static final RegistryObject<Block> ASHPEN_LOG_SLAB = BLOCKS.register("ashpen_log_slab",
+                () -> new LogSlabBlock(ASHPEN_LOG.get(), BlockBehaviour.Properties.of(Material.WOOD, MaterialColor.WOOD).strength(2.0f).sound(net.minecraft.world.level.block.SoundType.WOOD)));
+        public static final RegistryObject<Block> ASHPEN_WOOD_SLAB = BLOCKS.register("ashpen_wood_slab",
+                () -> new LogSlabBlock(ASHPEN_WOOD.get(), BlockBehaviour.Properties.of(Material.WOOD, MaterialColor.WOOD).strength(2.0f).sound(net.minecraft.world.level.block.SoundType.WOOD)));
 }

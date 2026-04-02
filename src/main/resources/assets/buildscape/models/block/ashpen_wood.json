@@ -1,0 +1,6 @@
+﻿{
+    "textures":  {
+                     "all":  "buildscape:block/ashpen_log"
+                 },
+    "parent":  "minecraft:block/cube_all"
+}

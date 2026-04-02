@@ -28,7 +28,7 @@ public class VerticalPresetsWidget extends AbstractWidget {
     private final Button applyButton;
     private final Consumer<String> onPresetApplied;
     private String selectedPresetKey = "default";
-    private int scrollOffset = 0;
+    private final int scrollOffset = 0;
     private final CustomScrollbarRenderer scrollbarRenderer = new CustomScrollbarRenderer();
 
     public VerticalPresetsWidget(int x, int y, int width, int height, Consumer<String> onPresetApplied) {

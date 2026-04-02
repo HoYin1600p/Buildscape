@@ -27,7 +27,7 @@ public final class GuideRegistry {
     public synchronized void reload(List<GuideCategory> newCategories) {
         categories.clear();
         categories.addAll(newCategories);
-        categories.sort(Comparator.comparingInt(GuideCategory::getSortOrder));
+        categories.sort(Comparator.comparingInt(GuideCategory::sortOrder));
     }
 
     // -------------------------------------------------------------------------
@@ -39,13 +39,13 @@ public final class GuideRegistry {
     }
 
     public Optional<GuideCategory> findCategory(String id) {
-        return categories.stream().filter(c -> c.getId().equals(id)).findFirst();
+        return categories.stream().filter(c -> c.id().equals(id)).findFirst();
     }
 
     public Optional<GuideEntry> findEntry(String categoryId, String entryId) {
         return findCategory(categoryId)
-                .flatMap(cat -> cat.getEntries().stream()
-                        .filter(e -> e.getId().equals(entryId))
+                .flatMap(cat -> cat.entries().stream()
+                        .filter(e -> e.id().equals(entryId))
                         .findFirst());
     }
 
@@ -57,7 +57,7 @@ public final class GuideRegistry {
         if (query == null || query.isBlank()) {
             List<SearchResult> all = new ArrayList<>();
             for (GuideCategory cat : categories) {
-                for (GuideEntry entry : cat.getEntries()) {
+                for (GuideEntry entry : cat.entries()) {
                     all.add(new SearchResult(cat, entry));
                 }
             }
@@ -68,10 +68,10 @@ public final class GuideRegistry {
         List<SearchResult> results = new ArrayList<>();
 
         for (GuideCategory cat : categories) {
-            for (GuideEntry entry : cat.getEntries()) {
-                if (entry.getId().toLowerCase().contains(lq)
-                        || entry.getTitleKey().toLowerCase().contains(lq)
-                        || cat.getId().toLowerCase().contains(lq)) {
+            for (GuideEntry entry : cat.entries()) {
+                if (entry.id().toLowerCase().contains(lq)
+                        || entry.titleKey().toLowerCase().contains(lq)
+                        || cat.id().toLowerCase().contains(lq)) {
                     results.add(new SearchResult(cat, entry));
                 }
             }

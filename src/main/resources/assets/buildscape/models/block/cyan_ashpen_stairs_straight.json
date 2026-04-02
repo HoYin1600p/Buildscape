@@ -1,4 +1,4 @@
-﻿{
+{
     "parent":  "block/stairs_straight",
     "textures":  {
                      "bottom":  "buildscape:block/ashpen_cyan_planks",

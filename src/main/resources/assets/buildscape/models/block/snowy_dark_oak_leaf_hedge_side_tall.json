@@ -1,4 +1,4 @@
-﻿{
+{
     "parent":  "buildscape:block/template_wall_side_tall_tinted",
     "textures":  {
                      "wall":  "buildscape:block/snowy_dark_oak_leaves",

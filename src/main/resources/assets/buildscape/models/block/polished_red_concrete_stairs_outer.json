@@ -1,4 +1,4 @@
-﻿{
+{
     "parent":  "minecraft:block/outer_stairs",
     "textures":  {
                      "bottom":  "buildscape:block/polished_red_concrete",

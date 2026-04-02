@@ -9,7 +9,10 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.lang.reflect.Type;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class VerticalPresetsConfig {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();

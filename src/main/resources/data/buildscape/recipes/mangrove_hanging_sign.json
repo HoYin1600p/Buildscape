@@ -3,7 +3,7 @@
   "category": "misc",
   "group": "hanging_sign",
   "key": {
-    "#": "minecraft:stripped_mangrove_log",
+    "#": "buildscape:stripped_mangrove_log",
     "X": "minecraft:iron_chain"
   },
   "pattern": [
@@ -13,6 +13,6 @@
   ],
   "result": {
     "count": 6,
-    "id": "buildscape:mangrove_hanging_sign"
+    "item": "buildscape:mangrove_hanging_sign"
   }
 }

@@ -74,7 +74,7 @@ public abstract class CopperBulbBlock extends Block {
             BlockPos pos,
             Direction direction
     ) {
-        return false;
+        return true;
     }
 
     @Override
@@ -88,24 +88,20 @@ public abstract class CopperBulbBlock extends Block {
     ) {
         if (!level.isClientSide) {
             boolean powered = level.hasNeighborSignal(pos);
-            boolean wasPowered = state.getValue(POWERED);
-            boolean currentlyLit = state.getValue(LIT);
-
-            if (powered && !wasPowered) {
-                BlockState newState = state
-                        .setValue(LIT, !currentlyLit)
-                        .setValue(POWERED, true);
-                level.setBlock(pos, newState, 2);
-                level.playSound(
-                        null,
-                        pos,
-                        ModSounds.COPPER_BULB_TOGGLE.get(),
-                        SoundSource.BLOCKS,
-                        0.5f,
-                        1.0f
-                );
-            } else if (!powered && wasPowered) {
-                level.setBlock(pos, state.setValue(POWERED, false), 2);
+            if (powered != state.getValue(POWERED)) {
+                BlockState newState = state;
+                if (!state.getValue(POWERED)) {
+                    newState = state.cycle(LIT);
+                    level.playSound(
+                            null,
+                            pos,
+                            ModSounds.COPPER_BULB_TOGGLE.get(),
+                            SoundSource.BLOCKS,
+                            0.5f,
+                            1.0f
+                    );
+                }
+                level.setBlock(pos, newState.setValue(POWERED, powered), 3);
             }
         }
     }
@@ -118,9 +114,13 @@ public abstract class CopperBulbBlock extends Block {
             BlockState oldState,
             boolean isMoving
     ) {
-        if (!level.isClientSide) {
-            boolean powered = level.hasNeighborSignal(pos);
-            level.setBlock(pos, state.setValue(POWERED, powered), 2);
+        if (!oldState.is(state.getBlock())) {
+            if (!level.isClientSide) {
+                boolean powered = level.hasNeighborSignal(pos);
+                if (powered != state.getValue(POWERED)) {
+                    level.setBlock(pos, state.setValue(POWERED, powered), 3);
+                }
+            }
         }
     }
 

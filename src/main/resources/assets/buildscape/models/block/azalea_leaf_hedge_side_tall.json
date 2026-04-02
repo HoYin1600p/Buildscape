@@ -1,4 +1,4 @@
-﻿{
+{
     "parent":  "buildscape:block/template_wall_side_tall_tinted",
     "textures":  {
                      "wall":  "minecraft:block/azalea_leaves",

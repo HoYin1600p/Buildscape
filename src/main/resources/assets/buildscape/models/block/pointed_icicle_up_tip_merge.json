@@ -1,4 +1,4 @@
-﻿{
+{
     "parent":  "minecraft:block/pointed_dripstone_up_tip_merge",
     "textures":  {
                      "cross":  "buildscape:block/icicle_up_tip_merge",

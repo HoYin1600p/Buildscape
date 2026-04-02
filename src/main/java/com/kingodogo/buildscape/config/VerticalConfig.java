@@ -120,8 +120,6 @@ public class VerticalConfig {
         if (blocklistedMods.contains(namespace)) return false;
         
         if (!allowedFamilies.isEmpty() && !allowedFamilies.contains(coreName)) return false;
-        if (blocklistedFamilies.contains(coreName)) return false;
-        
-        return true;
+        return !blocklistedFamilies.contains(coreName);
     }
 }

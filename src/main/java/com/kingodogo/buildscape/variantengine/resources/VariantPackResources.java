@@ -6,8 +6,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.kingodogo.buildscape.BuildScape;
 import com.kingodogo.buildscape.variantengine.builder.BlockShape;
-import com.kingodogo.buildscape.variantengine.util.BlockBiMaps;
 import com.kingodogo.buildscape.variantengine.family.BlockFamilyDetector;
+import com.kingodogo.buildscape.variantengine.util.BlockBiMaps;
 import com.kingodogo.buildscape.variantengine.util.VariantNamingUtil;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackResources;
@@ -97,7 +97,7 @@ public class VariantPackResources implements PackResources {
                 if (baseId == null || baseId.equals(new ResourceLocation("minecraft", "air"))) continue;
 
                 // Only generate VERTICAL_SLAB and VERTICAL_STAIRS shapes
-                BlockShape[] recipeShapes = {BlockShape.SLAB, BlockShape.VERTICAL_SLAB, BlockShape.STAIRS, BlockShape.VERTICAL_STAIRS};
+                BlockShape[] recipeShapes = {BlockShape.VERTICAL_SLAB, BlockShape.VERTICAL_STAIRS};
 
                 for (BlockShape shape : recipeShapes) {
                     try {
@@ -121,15 +121,19 @@ public class VariantPackResources implements PackResources {
                         }
 
                         if (horizontalId != null) {
-                            addShapelessRecipe(verticalId, horizontalId);
-                            addStonecuttingRecipe(verticalId, horizontalId);
+                            if (hasItem(verticalId) && hasItem(horizontalId)) {
+                                addShapelessRecipe(verticalId, horizontalId);
+                                addStonecuttingRecipe(verticalId, horizontalId);
 
-                            if (!baseId.equals(horizontalId) && isValidStonecuttingSource(baseId)) {
-                                addStonecuttingRecipe(verticalId, baseId, "_from_base_stonecutting");
+                                if (!baseId.equals(horizontalId) && isValidStonecuttingSource(baseId) && hasItem(baseId)) {
+                                    addStonecuttingRecipe(verticalId, baseId, "_from_base_stonecutting");
+                                }
                             }
                         } else {
                             if (isValidStonecuttingSource(baseId)) {
-                                addStonecuttingRecipe(verticalId, baseId);
+                                if (hasItem(verticalId) && hasItem(baseId)) {
+                                    addStonecuttingRecipe(verticalId, baseId);
+                                }
                             }
                         }
 
@@ -773,9 +777,12 @@ public class VariantPackResources implements PackResources {
         if (path.contains("_ore") || path.contains("raw_") || path.contains("_ingot") || path.contains("_nugget")) return false;
         if (path.contains("spawner") || path.contains("command") || path.contains("barrier")) return false;
         if (path.contains("_egg") || path.contains("_spawn")) return false;
-        if (path.contains("command") || path.contains("jigsaw") || path.contains("structure_block")) return false;
-        
-        return true;
+        return !path.contains("command") && !path.contains("jigsaw") && !path.contains("structure_block");
+    }
+
+    private boolean hasItem(ResourceLocation id) {
+        if (id == null) return false;
+        return net.minecraftforge.registries.ForgeRegistries.ITEMS.containsKey(id);
     }
 
     private void addLootTable(ResourceLocation verticalId, BlockShape shape) {

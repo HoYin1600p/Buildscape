@@ -1,4 +1,4 @@
-﻿{
+{
     "parent":  "minecraft:block/leaves",
     "textures":  {
                      "all":  "buildscape:block/mangrove_leaves",

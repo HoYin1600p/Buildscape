@@ -14,13 +14,12 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.IForgeRegistry;
 
 import java.util.*;
@@ -48,7 +47,7 @@ public class VariantRegistrar {
         "brewing", "enchant", "head", "skull", "pot", "vine",
         "tiki", "flag", "hook", "rope", "cage", "jar", "jars",
         "chain", "web", "cobweb", "string", "sack", "urn", "urns",
-        "pouch", "compressium", "hourglass"
+            "pouch", "compressium", "hourglass", "bulb", "vent", "sconce"
     };
 
     /**
@@ -73,6 +72,7 @@ public class VariantRegistrar {
     public static void onRegisterItems(RegistryEvent.Register<Item> event) {
         try {
             registerVariantItems(event.getRegistry());
+            isScanningComplete = true; // Mark as complete after blocks AND items are registered
         } catch (Exception e) {
         }
     }
@@ -93,7 +93,6 @@ public class VariantRegistrar {
             int count = commitFromCache(cached, registry);
             BuildScape.LOGGER.info("BuildScape: Cache hit! Registered {} variants from cache in {}ms (skipped full scan).",
                     count, System.currentTimeMillis() - startTime);
-            isScanningComplete = true; 
             return;
         }
 
@@ -111,7 +110,8 @@ public class VariantRegistrar {
 
             if (id.getNamespace().equals(BuildScape.MODID)) {
                 String p = id.getPath();
-                if (p.startsWith("v_slab_") || p.startsWith("v_stair_") || p.startsWith("q_piece_")) continue;
+                if (p.startsWith("vertical_") || p.startsWith("v_slab_") || p.startsWith("v_stair_") || p.startsWith("q_piece_") || p.startsWith("vq_piece_"))
+                    continue;
             }
 
             if (processBlock(block, registry)) {
@@ -137,7 +137,6 @@ public class VariantRegistrar {
 
         BuildScape.LOGGER.info("BuildScape: Full scan done in {}ms: scanned={}, detected={}, canonicalized={}, generated={}",
                 System.currentTimeMillis() - startTime, scanned, detected, canonical.size(), totalGenerated);
-        isScanningComplete = true;
     }
 
     /**
@@ -427,8 +426,9 @@ public class VariantRegistrar {
                 ResourceLocation id = safeRegistryName(variant);
                 if (id == null || !id.getNamespace().equals(BuildScape.MODID)) continue;
                 String path = id.getPath();
-                if (!path.startsWith("v_slab_") && !path.startsWith("v_stair_") && !path.startsWith("q_piece_") && 
-                    !path.startsWith("slab_") && !path.startsWith("stairs_")) continue;
+                if (!path.startsWith("v_slab_") && !path.startsWith("v_stair_") && !path.startsWith("q_piece_") &&
+                        !path.startsWith("slab_") && !path.startsWith("stairs_") &&
+                        !path.startsWith("vertical_")) continue;
                 if (registry.containsKey(id)) continue;
 
                 registry.register(new com.kingodogo.buildscape.variantengine.item.VariantBlockItem(variant, 
@@ -513,18 +513,44 @@ public class VariantRegistrar {
                 String ns = mapping.key.getNamespace();
                 String path = mapping.key.getPath();
                 
-                // Catch our mod's removed items AND legacy everycomp items related to us
                 boolean isLegacyBuildScape = ns.equals(BuildScape.MODID) || (ns.equals("everycomp") && path.contains("buildscape"));
-                
-                if (isLegacyBuildScape) {
-                    if (path.contains("counter") || path.contains("leaves") || path.contains("pavement") || 
-                        path.contains("decorated") || path.contains("vertical") || path.contains("_v_") || 
-                        path.contains("v_slab") || path.contains("v_stair") || path.contains("q_piece") || path.contains("hedge")) {
-                        
-                        mapping.ignore();
+
+                if (!isLegacyBuildScape) continue;
+
+                // --- Active remap: v_slab_<name> -> vertical_<name>_slab ---
+                if (path.startsWith("v_slab_")) {
+                    String baseName = path.substring("v_slab_".length()); // e.g. "oak_planks"
+                    String newPath = "vertical_" + baseName + "_slab";    // e.g. "vertical_oak_planks_slab"
+                    ResourceLocation newId = new ResourceLocation(BuildScape.MODID, newPath);
+                    @SuppressWarnings("unchecked")
+                    T newEntry = mapping.registry.getValue(newId);
+                    if (newEntry != null) {
+                        mapping.remap(newEntry);
+                        continue;
                     }
+                }
+
+                // --- Active remap: v_stair_<name> -> vertical_<name>_stair ---
+                if (path.startsWith("v_stair_")) {
+                    String baseName = path.substring("v_stair_".length()); // e.g. "oak_planks"
+                    String newPath = "vertical_" + baseName + "_stair";    // e.g. "vertical_oak_planks_stair"
+                    ResourceLocation newId = new ResourceLocation(BuildScape.MODID, newPath);
+                    @SuppressWarnings("unchecked")
+                    T newEntry = mapping.registry.getValue(newId);
+                    if (newEntry != null) {
+                        mapping.remap(newEntry);
+                        continue;
+                    }
+                }
+
+                // --- Fallback: ignore removed/unmappable entries to suppress warnings ---
+                if (path.contains("counter") || path.contains("leaves") || path.contains("pavement") ||
+                        path.contains("decorated") || path.contains("vertical") || path.contains("_v_") ||
+                        path.contains("v_slab") || path.contains("v_stair") || path.contains("q_piece") || path.contains("hedge")) {
+                    mapping.ignore();
                 }
             }
         }
+
     }
 }

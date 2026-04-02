@@ -1,4 +1,4 @@
-﻿{
+{
     "parent":  "block/button_inventory",
     "textures":  {
                      "texture":  "buildscape:block/stripped_bamboo_block",

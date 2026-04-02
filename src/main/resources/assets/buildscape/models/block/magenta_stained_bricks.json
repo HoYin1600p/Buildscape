@@ -1,4 +1,4 @@
-﻿{
+{
     "parent":  "block/cube_all",
     "textures":  {
                      "all":  "buildscape:block/magenta_stained_bricks",

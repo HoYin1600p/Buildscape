@@ -1,4 +1,4 @@
-﻿{
+{
     "parent":  "block/template_fence_gate_wall",
     "textures":  {
                      "texture":  "buildscape:block/ashpen_yellow_planks",

@@ -1,4 +1,4 @@
-﻿{
+{
     "parent":  "minecraft:block/template_wall_post",
     "textures":  {
                      "wall":  "buildscape:block/orange_smooth_sandstone",

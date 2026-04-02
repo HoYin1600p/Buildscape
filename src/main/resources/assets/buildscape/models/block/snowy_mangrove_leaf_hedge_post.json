@@ -1,4 +1,4 @@
-﻿{
+{
     "parent":  "buildscape:block/template_wall_post_tinted",
     "textures":  {
                      "wall":  "buildscape:block/snowy_mangrove_leaves",

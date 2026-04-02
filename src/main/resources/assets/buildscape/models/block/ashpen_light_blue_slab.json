@@ -1,4 +1,4 @@
-﻿{
+{
     "parent":  "block/slab",
     "textures":  {
                      "bottom":  "buildscape:block/ashpen_light_blue_planks",

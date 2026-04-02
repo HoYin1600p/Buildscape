@@ -1,0 +1,13 @@
+﻿{
+    "variants":  {
+                     "type=bottom":  {
+                                         "model":  "buildscape:block/birch_log_slab"
+                                     },
+                     "type=top":  {
+                                      "model":  "buildscape:block/birch_log_slab_top"
+                                  },
+                     "type=double":  {
+                                         "model":  "minecraft:block/birch_log"
+                                     }
+                 }
+}

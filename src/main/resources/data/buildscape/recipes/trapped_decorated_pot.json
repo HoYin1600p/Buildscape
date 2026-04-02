@@ -1,0 +1,1 @@
+{"type":"minecraft:crafting_shaped","category":"building","key":{"B":{"item":"minecraft:brick"},"P":{"item":"buildscape:decorated_pot"}},"pattern":[" B ","BPB"," B "],"result":{"count":1,"item":"buildscape:trapped_decorated_pot"}}

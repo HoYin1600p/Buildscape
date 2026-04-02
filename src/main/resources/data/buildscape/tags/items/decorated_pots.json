@@ -16,7 +16,24 @@
     "buildscape:purple_decorated_pot",
     "buildscape:red_decorated_pot",
     "buildscape:white_decorated_pot",
-    "buildscape:yellow_decorated_pot"
+    "buildscape:yellow_decorated_pot",
+    "buildscape:trapped_decorated_pot",
+    "buildscape:black_trapped_decorated_pot",
+    "buildscape:blue_trapped_decorated_pot",
+    "buildscape:brown_trapped_decorated_pot",
+    "buildscape:cyan_trapped_decorated_pot",
+    "buildscape:gray_trapped_decorated_pot",
+    "buildscape:green_trapped_decorated_pot",
+    "buildscape:light_blue_trapped_decorated_pot",
+    "buildscape:light_gray_trapped_decorated_pot",
+    "buildscape:lime_trapped_decorated_pot",
+    "buildscape:magenta_trapped_decorated_pot",
+    "buildscape:orange_trapped_decorated_pot",
+    "buildscape:pink_trapped_decorated_pot",
+    "buildscape:purple_trapped_decorated_pot",
+    "buildscape:red_trapped_decorated_pot",
+    "buildscape:white_trapped_decorated_pot",
+    "buildscape:yellow_trapped_decorated_pot"
   ]
 }
 

@@ -2365,6 +2365,10 @@ public class BuildScape {
                                 .get(),
                         com.kingodogo.buildscape.client.renderer.DecoratedPotBlockEntityRenderer::new);
                 net.minecraft.client.renderer.blockentity.BlockEntityRenderers.register(
+                        com.kingodogo.buildscape.block.ModBlockEntities.TRAPPED_DECORATED_POT_BLOCK_ENTITY
+                                .get(),
+                        com.kingodogo.buildscape.client.renderer.TrappedDecoratedPotBlockEntityRenderer::new);
+                net.minecraft.client.renderer.blockentity.BlockEntityRenderers.register(
                         com.kingodogo.buildscape.block.ModBlockEntities.ICICLE_CAULDRON_BLOCK_ENTITY
                                 .get(),
                         com.kingodogo.buildscape.client.renderer.IcicleCauldronBlockEntityRenderer::new);
@@ -2402,6 +2406,10 @@ public class BuildScape {
                 net.minecraft.client.renderer.entity.EntityRenderers.register(
                         com.kingodogo.buildscape.entity.ModEntities.COLORED_ITEM_FRAME.get(),
                         com.kingodogo.buildscape.client.renderer.ColoredItemFrameRenderer::new);
+
+                net.minecraft.client.renderer.entity.EntityRenderers.register(
+                        com.kingodogo.buildscape.entity.ModEntities.SEAT_ENTITY.get(),
+                        net.minecraft.client.renderer.entity.NoopRenderer::new);
 
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.MANGROVE_SIGN.get(),
@@ -2478,6 +2486,58 @@ public class BuildScape {
                         net.minecraft.client.renderer.RenderType.cutout());
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.YELLOW_DECORATED_POT.get(),
+                        net.minecraft.client.renderer.RenderType.cutout());
+
+                net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
+                        ModBlocks.TRAPPED_DECORATED_POT.get(),
+                        net.minecraft.client.renderer.RenderType.cutout());
+                net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
+                        ModBlocks.BLACK_TRAPPED_DECORATED_POT.get(),
+                        net.minecraft.client.renderer.RenderType.cutout());
+                net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
+                        ModBlocks.BLUE_TRAPPED_DECORATED_POT.get(),
+                        net.minecraft.client.renderer.RenderType.cutout());
+                net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
+                        ModBlocks.BROWN_TRAPPED_DECORATED_POT.get(),
+                        net.minecraft.client.renderer.RenderType.cutout());
+                net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
+                        ModBlocks.CYAN_TRAPPED_DECORATED_POT.get(),
+                        net.minecraft.client.renderer.RenderType.cutout());
+                net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
+                        ModBlocks.GRAY_TRAPPED_DECORATED_POT.get(),
+                        net.minecraft.client.renderer.RenderType.cutout());
+                net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
+                        ModBlocks.GREEN_TRAPPED_DECORATED_POT.get(),
+                        net.minecraft.client.renderer.RenderType.cutout());
+                net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
+                        ModBlocks.LIGHT_BLUE_TRAPPED_DECORATED_POT.get(),
+                        net.minecraft.client.renderer.RenderType.cutout());
+                net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
+                        ModBlocks.LIGHT_GRAY_TRAPPED_DECORATED_POT.get(),
+                        net.minecraft.client.renderer.RenderType.cutout());
+                net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
+                        ModBlocks.LIME_TRAPPED_DECORATED_POT.get(),
+                        net.minecraft.client.renderer.RenderType.cutout());
+                net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
+                        ModBlocks.MAGENTA_TRAPPED_DECORATED_POT.get(),
+                        net.minecraft.client.renderer.RenderType.cutout());
+                net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
+                        ModBlocks.ORANGE_TRAPPED_DECORATED_POT.get(),
+                        net.minecraft.client.renderer.RenderType.cutout());
+                net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
+                        ModBlocks.PINK_TRAPPED_DECORATED_POT.get(),
+                        net.minecraft.client.renderer.RenderType.cutout());
+                net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
+                        ModBlocks.PURPLE_TRAPPED_DECORATED_POT.get(),
+                        net.minecraft.client.renderer.RenderType.cutout());
+                net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
+                        ModBlocks.RED_TRAPPED_DECORATED_POT.get(),
+                        net.minecraft.client.renderer.RenderType.cutout());
+                net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
+                        ModBlocks.WHITE_TRAPPED_DECORATED_POT.get(),
+                        net.minecraft.client.renderer.RenderType.cutout());
+                net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
+                        ModBlocks.YELLOW_TRAPPED_DECORATED_POT.get(),
                         net.minecraft.client.renderer.RenderType.cutout());
 
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(

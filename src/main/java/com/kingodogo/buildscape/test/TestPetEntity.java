@@ -47,6 +47,7 @@ public class TestPetEntity extends TamableAnimal {
     public LivingEntity grudgeTarget = null;
     // Ticks remaining before the next fancy animation is allowed.
     public int animCooldownTicks = 0;
+    public int ownerStillTicks = 0;
 
     public PetInventory getInventory() {
         return this.inventory;

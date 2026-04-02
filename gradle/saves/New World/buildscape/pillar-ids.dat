@@ -1,0 +1,69 @@
+{
+  "S-P5271": {
+    "id": "S-P5271",
+    "dyeColors": [
+      "#39FF14",
+      "#AB87FF"
+    ],
+    "dimension": "minecraft:overworld",
+    "x": 39,
+    "y": 88,
+    "z": 58,
+    "createdTime": 1773290005702,
+    "modifiedTime": 1773290005702,
+    "pattern": "ring",
+    "max_particle_color": 2,
+    "displayedItem": "minecraft:beacon",
+    "pillarType": "buildscape:stone_pillar",
+    "itemYaw": 244.04535
+  },
+  "AK-N6650": {
+    "id": "AK-N6650",
+    "dyeColors": [
+      "#1919EA",
+      "#FF5C00"
+    ],
+    "dimension": "minecraft:overworld",
+    "x": 39,
+    "y": 88,
+    "z": 56,
+    "createdTime": 1773290005702,
+    "modifiedTime": 1773290494603,
+    "pattern": "ring",
+    "max_particle_color": 2,
+    "displayedItem": "minecraft:beacon",
+    "pillarType": "buildscape:ashenking_netherite_pillar",
+    "itemYaw": 269.9956
+  },
+  "S-P5444": {
+    "id": "S-P5444",
+    "dyeColors": [
+      "#AB87FF",
+      "#00FFFF"
+    ],
+    "dimension": "minecraft:overworld",
+    "x": 39,
+    "y": 88,
+    "z": 54,
+    "createdTime": 1773290005702,
+    "modifiedTime": 1773290005702,
+    "pattern": "ring",
+    "max_particle_color": 2,
+    "displayedItem": "minecraft:beacon",
+    "pillarType": "buildscape:stone_pillar",
+    "itemYaw": 317.39557
+  },
+  "S-P7924": {
+    "id": "S-P7924",
+    "dyeColors": [],
+    "dimension": "minecraft:overworld",
+    "x": 39,
+    "y": 88,
+    "z": 60,
+    "createdTime": 1773290005702,
+    "modifiedTime": 1773290005702,
+    "displayedItem": "minecraft:beacon",
+    "pillarType": "buildscape:stone_pillar",
+    "itemYaw": 267.59528
+  }
+}

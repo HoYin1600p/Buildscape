@@ -8,10 +8,8 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SlabBlock;
 import net.minecraft.world.level.block.StairBlock;
-import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.ForgeRegistries;
-
-import java.util.Set;
+import net.minecraftforge.registries.IForgeRegistry;
 
 /**
  * Detects block families for the VariantEngine.
@@ -37,7 +35,7 @@ public class BlockFamilyDetector {
     // -----------------------------------------------------------------------
     private static final String[] BLACKLISTED_KEYWORDS = {
         // Lighting & decoration
-        "torch", "lantern", "candle", "lamp", "light_bulb", "sconce",
+            "torch", "lantern", "candle", "lamp", "light_bulb", "sconce", "bulb",
         // Flora & nature
         "flower", "grass_", "shroom", "mushroom", "sapling", "crop", "seed",
         "leaves", "vine", "bush", "fern", "azalea", "moss_carpet",
@@ -100,7 +98,7 @@ public class BlockFamilyDetector {
         String namespace = id.getNamespace().toLowerCase();
 
         // Skip our own generated variants — they'll be handled by the registrar
-        if (namespace.equals(BuildScape.MODID) && (path.startsWith("v_slab_") || path.startsWith("v_stair_") || path.startsWith("q_piece_"))) {
+        if (namespace.equals(BuildScape.MODID) && (path.startsWith("vertical_") || path.startsWith("v_slab_") || path.startsWith("v_stair_") || path.startsWith("q_piece_") || path.startsWith("vq_piece_"))) {
             return null;
         }
 
@@ -305,7 +303,7 @@ public class BlockFamilyDetector {
         // Try minecraft as fallback
         if (!primaryNs.equals("minecraft")) {
             b = findCompanion("minecraft", basePath, suffix, registry);
-            if (b != null) return b;
+            return b;
         }
         return null;
     }
@@ -385,11 +383,7 @@ public class BlockFamilyDetector {
         // Structural blocks (pillars/columns) for vanilla/buildscape only
         boolean isStructural = coreName.contains("pillar") || coreName.contains("column") ||
                              coreName.contains("beam") || coreName.contains("post");
-        if (isStructural && (namespace.equals("minecraft") || namespace.equals("buildscape")) && !coreName.contains("ashenking") && !coreName.contains("vertical")) {
-            return true;
-        }
-
-        return false;
+        return isStructural && (namespace.equals("minecraft") || namespace.equals("buildscape")) && !coreName.contains("ashenking") && !coreName.contains("vertical");
     }
 
     public static boolean isFallingBlock(Block block) {

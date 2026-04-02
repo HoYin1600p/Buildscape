@@ -1,4 +1,4 @@
-﻿{
+{
     "parent":  "minecraft:block/template_glass_pane_side",
     "textures":  {
                      "pane":  "buildscape:block/cyan_mosaic_glass",

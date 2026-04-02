@@ -1,0 +1,8 @@
+{
+  "parent": "buildscape:block/glass_stairs_outer_template",
+  "textures": {
+    "bottom": "buildscape:block/black_glazed_glass",
+    "top": "buildscape:block/black_glazed_glass",
+    "side": "buildscape:block/black_glazed_glass"
+  }
+}

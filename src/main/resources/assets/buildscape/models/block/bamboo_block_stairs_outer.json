@@ -1,4 +1,4 @@
-﻿{
+{
     "parent":  "block/outer_stairs",
     "textures":  {
                      "bottom":  "buildscape:block/bamboo_block",

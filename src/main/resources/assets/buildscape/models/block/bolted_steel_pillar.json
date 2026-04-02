@@ -1,4 +1,4 @@
-﻿{
+{
     "parent":  "block/cube_column",
     "textures":  {
                      "end":  "buildscape:block/bolted_steel_pillar",

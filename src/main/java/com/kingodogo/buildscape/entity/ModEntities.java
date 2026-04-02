@@ -1,12 +1,17 @@
 package com.kingodogo.buildscape.entity;
 
 import com.kingodogo.buildscape.BuildScape;
+import com.kingodogo.buildscape.entity.pet.PetEntity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
+import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 
+@Mod.EventBusSubscriber(modid = BuildScape.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class ModEntities {
 
     public static final DeferredRegister<EntityType<?>> ENTITIES =
@@ -75,4 +80,20 @@ public class ModEntities {
                     .updateInterval(20)
                     .build("seat")
     );
+    public static final RegistryObject<
+            EntityType<PetEntity>
+            > PET = ENTITIES.register("pet", () ->
+            EntityType.Builder.of(
+                            PetEntity::new,
+                            MobCategory.CREATURE
+                    )
+                    .sized(0.3F, 0.85F)
+                    .clientTrackingRange(10)
+                    .build("pet")
+    );
+
+    @SubscribeEvent
+    public static void registerAttributes(EntityAttributeCreationEvent event) {
+        event.put(PET.get(), PetEntity.createAttributes().build());
+    }
 }

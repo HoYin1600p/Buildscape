@@ -10,7 +10,6 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -45,58 +44,87 @@ public class ModCreativeModeTab {
                 Item item = stack.getItem();
                 if (added.contains(item)) continue;
 
-                // Skip adding vertical variants here, they will be inserted next to their parents
+                // Skip generated verticals here — they get inserted inline after their horizontal sibling
                 if (isGeneratedVertical(item)) continue;
                 
                 // Add the current item
                 items.add(stack);
                 added.add(item);
 
-                // If this is a block, immediately insert its vertical variants right after it!
                 if (item instanceof net.minecraft.world.item.BlockItem) {
-                    Block block = ((net.minecraft.world.item.BlockItem)item).getBlock();
+                    Block block = ((net.minecraft.world.item.BlockItem) item).getBlock();
                     Block root = findRootBlock(block);
-                    // Only expand from the root block to preserve ordering
+
                     if (block == root) {
-                        insertFamilyVariants(items, added, block);
+                        // Base block — insert: slab, v_slab, stair, v_stair
+                        insertFamilyVariants(items, added, root);
+                    } else {
+                        // It's a horizontal slab or stair — insert matching vertical right after it
+                        insertVerticalForShape(items, added, root, block);
                     }
                 }
             }
-            
-            // 3. Final safety pass for any orphan vertical blocks (e.g. from mods with weird names)
+
+            // 3. Orphan verticals whose base block isn't in this tab at all — append at end
             appendRemainingVerticals(items, added);
         }
 
+        /**
+         * Called when we land on a BASE block.
+         * Inserts: slab -> vertical_slab -> stair -> vertical_stair -> quarter_piece
+         * Any variant not present is silently skipped.
+         */
         private void insertFamilyVariants(NonNullList<ItemStack> items, Set<Item> added, Block base) {
-            // Find the TRUE base of this family (e.g. if we are looking at Oak Slab, find Oak)
-            Block root = com.kingodogo.buildscape.variantengine.family.BlockFamilyDetector.detectFamily(base) != null ? 
-                         findRootBlock(base) : base;
+            insertOneShape(items, added, base, com.kingodogo.buildscape.variantengine.builder.BlockShape.SLAB);
+            insertOneShape(items, added, base, com.kingodogo.buildscape.variantengine.builder.BlockShape.VERTICAL_SLAB);
+            insertOneShape(items, added, base, com.kingodogo.buildscape.variantengine.builder.BlockShape.STAIRS);
+            insertOneShape(items, added, base, com.kingodogo.buildscape.variantengine.builder.BlockShape.VERTICAL_STAIRS);
+            insertOneShape(items, added, base, com.kingodogo.buildscape.variantengine.builder.BlockShape.QUARTER_PIECE);
+        }
 
-            // Define the ideal sequence for building materials
-            com.kingodogo.buildscape.variantengine.builder.BlockShape[] sequence = {
-                com.kingodogo.buildscape.variantengine.builder.BlockShape.SLAB,
-                com.kingodogo.buildscape.variantengine.builder.BlockShape.VERTICAL_SLAB,
-                com.kingodogo.buildscape.variantengine.builder.BlockShape.STAIRS,
-                com.kingodogo.buildscape.variantengine.builder.BlockShape.VERTICAL_STAIRS,
-                com.kingodogo.buildscape.variantengine.builder.BlockShape.QUARTER_PIECE
-            };
+        /**
+         * Called when we land on a horizontal slab or stair that belongs to a known family.
+         * Inserts the matching vertical variant directly after it.
+         * e.g. landing on oak_slab inserts vertical_oak_slab
+         * landing on oak_stairs inserts vertical_oak_stair
+         */
+        private void insertVerticalForShape(NonNullList<ItemStack> items, Set<Item> added, Block root, Block horizontalVariant) {
+            if (root == null) return;
+            ResourceLocation hId = horizontalVariant.getRegistryName();
+            if (hId == null) return;
+            String hPath = hId.getPath();
+            // Determine which vertical shape corresponds to this horizontal block
+            com.kingodogo.buildscape.variantengine.builder.BlockShape verticalShape = null;
+            if (hPath.contains("slab")) {
+                verticalShape = com.kingodogo.buildscape.variantengine.builder.BlockShape.VERTICAL_SLAB;
+            } else if (hPath.contains("stair")) {
+                verticalShape = com.kingodogo.buildscape.variantengine.builder.BlockShape.VERTICAL_STAIRS;
+            }
+            if (verticalShape != null) {
+                insertOneShape(items, added, root, verticalShape);
+            }
+        }
 
-            for (com.kingodogo.buildscape.variantengine.builder.BlockShape shape : sequence) {
-                Block variant = com.kingodogo.buildscape.variantengine.util.BlockBiMaps.getBlockOf(shape, root);
-                if (variant != null && variant != net.minecraft.world.level.block.Blocks.AIR) {
-                    ItemStack vStack = new ItemStack(variant);
-                    if (added.add(vStack.getItem())) {
-                        items.add(vStack);
-                    }
+        /**
+         * Inserts a single shape's variant block into the item list if it exists and hasn't been added yet.
+         */
+        private void insertOneShape(NonNullList<ItemStack> items, Set<Item> added, Block root,
+                                    com.kingodogo.buildscape.variantengine.builder.BlockShape shape) {
+            Block variant = com.kingodogo.buildscape.variantengine.util.BlockBiMaps.getBlockOf(shape, root);
+            if (variant != null && variant != net.minecraft.world.level.block.Blocks.AIR) {
+                ItemStack vStack = new ItemStack(variant);
+                if (added.add(vStack.getItem())) {
+                    items.add(vStack);
                 }
             }
         }
+
 
         private boolean isGeneratedVertical(Item item) {
             ResourceLocation id = item.getRegistryName();
             if (id == null) return false;
             String path = id.getPath();
-            return id.getNamespace().equals(BuildScape.MODID) && (path.startsWith("v_slab_") || path.startsWith("v_stair_") || path.startsWith("q_piece_"));
+            return id.getNamespace().equals(BuildScape.MODID) && (path.startsWith("v_slab_") || path.startsWith("v_stair_") || path.startsWith("q_piece_") || path.startsWith("vertical_"));
         }
 
         private Block findRootBlock(Block block) {
@@ -153,24 +181,6 @@ public class ModCreativeModeTab {
         }
 
 private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
-            // Vanilla Log Slabs
-            items.add(new ItemStack(ModItems.OAK_LOG_SLAB.get()));
-            items.add(new ItemStack(ModItems.STRIPPED_OAK_LOG_SLAB.get()));
-            items.add(new ItemStack(ModItems.SPRUCE_LOG_SLAB.get()));
-            items.add(new ItemStack(ModItems.STRIPPED_SPRUCE_LOG_SLAB.get()));
-            items.add(new ItemStack(ModItems.BIRCH_LOG_SLAB.get()));
-            items.add(new ItemStack(ModItems.STRIPPED_BIRCH_LOG_SLAB.get()));
-            items.add(new ItemStack(ModItems.JUNGLE_LOG_SLAB.get()));
-            items.add(new ItemStack(ModItems.STRIPPED_JUNGLE_LOG_SLAB.get()));
-            items.add(new ItemStack(ModItems.ACACIA_LOG_SLAB.get()));
-            items.add(new ItemStack(ModItems.STRIPPED_ACACIA_LOG_SLAB.get()));
-            items.add(new ItemStack(ModItems.DARK_OAK_LOG_SLAB.get()));
-            items.add(new ItemStack(ModItems.STRIPPED_DARK_OAK_LOG_SLAB.get()));
-            items.add(new ItemStack(ModItems.CRIMSON_STEM_SLAB.get()));
-            items.add(new ItemStack(ModItems.STRIPPED_CRIMSON_STEM_SLAB.get()));
-            items.add(new ItemStack(ModItems.WARPED_STEM_SLAB.get()));
-            items.add(new ItemStack(ModItems.STRIPPED_WARPED_STEM_SLAB.get()));
-
             items.add(new ItemStack(ModItems.BIT_COPPER_BLOCK.get()));
             items.add(new ItemStack(ModItems.BIT_COPPER_BLOCK_STAIRS.get()));
             items.add(new ItemStack(ModItems.BIT_COPPER_BLOCK_SLAB.get()));
@@ -526,7 +536,24 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.MANGROVE_TRAPDOOR.get()));
             items.add(new ItemStack(ModItems.MANGROVE_SIGN.get()));
             items.add(new ItemStack(ModItems.STRIPPED_MANGROVE_WOOD_WALL.get()));
-            items.add(new ItemStack(ModItems.MANGROVE_BOAT.get()));
+    items.add(new ItemStack(ModItems.MANGROVE_BOAT.get()));
+    // Vanilla Log Slabs
+    items.add(new ItemStack(ModItems.OAK_LOG_SLAB.get()));
+    items.add(new ItemStack(ModItems.STRIPPED_OAK_LOG_SLAB.get()));
+    items.add(new ItemStack(ModItems.SPRUCE_LOG_SLAB.get()));
+    items.add(new ItemStack(ModItems.STRIPPED_SPRUCE_LOG_SLAB.get()));
+    items.add(new ItemStack(ModItems.BIRCH_LOG_SLAB.get()));
+    items.add(new ItemStack(ModItems.STRIPPED_BIRCH_LOG_SLAB.get()));
+    items.add(new ItemStack(ModItems.JUNGLE_LOG_SLAB.get()));
+    items.add(new ItemStack(ModItems.STRIPPED_JUNGLE_LOG_SLAB.get()));
+    items.add(new ItemStack(ModItems.ACACIA_LOG_SLAB.get()));
+    items.add(new ItemStack(ModItems.STRIPPED_ACACIA_LOG_SLAB.get()));
+    items.add(new ItemStack(ModItems.DARK_OAK_LOG_SLAB.get()));
+    items.add(new ItemStack(ModItems.STRIPPED_DARK_OAK_LOG_SLAB.get()));
+    items.add(new ItemStack(ModItems.CRIMSON_STEM_SLAB.get()));
+    items.add(new ItemStack(ModItems.STRIPPED_CRIMSON_STEM_SLAB.get()));
+    items.add(new ItemStack(ModItems.WARPED_STEM_SLAB.get()));
+    items.add(new ItemStack(ModItems.STRIPPED_WARPED_STEM_SLAB.get()));
             items.add(new ItemStack(ModItems.OAK_WOOD_WALL.get()));
             items.add(new ItemStack(ModItems.STRIPPED_OAK_WOOD_WALL.get()));
             items.add(new ItemStack(ModItems.SPRUCE_WOOD_WALL.get()));

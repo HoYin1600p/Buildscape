@@ -77,10 +77,10 @@ public class CosmeticManager {
         // Register gear cosmetics
         registerHeadCosmetic("buildscape:cosmatics/gear/builders_hat", "Builder's Hat", "A stylish builder's hat", 1);
 
-        // Register Test Pet Cosmetic in Wings slot (default/unlocked for everyone)
-        cosmeticMetadata.put("buildscape:cosmatics/wings/test_pet", new CosmeticMetadata("Player Pet", "Spawns a baby player pet that follows you.", 1, CosmeticType.WINGS, null));
-        allCosmetics.add("buildscape:cosmatics/wings/test_pet");
-        defaultCosmetics.add("buildscape:cosmatics/wings/test_pet"); // Unlocked for everyone
+        // Register Annoying Kingo Pet (unlocked for everyone)
+        cosmeticMetadata.put("buildscape:cosmatics/pets/kingodogo_pet", new CosmeticMetadata("Annoying Kingo Pet", "Adopt KingoDogo as your annoying loyal companion!", 1, CosmeticType.PET, null));
+        allCosmetics.add("buildscape:cosmatics/pets/kingodogo_pet");
+        defaultCosmetics.add("buildscape:cosmatics/pets/kingodogo_pet"); // Unlocked for everyone
 
 
         // Register block cosmetics
@@ -326,6 +326,7 @@ public class CosmeticManager {
         WINGS,
         PARTICLE_WINGS,
         EFFECT,
+        PET,   // Pet entity cosmetics
         HEAD, // Custom head model cosmetics
         CHEST, // Custom chest/torso model cosmetics
         LEGS, // Custom leggings model cosmetics

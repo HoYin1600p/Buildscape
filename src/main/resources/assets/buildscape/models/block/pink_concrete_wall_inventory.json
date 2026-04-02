@@ -1,4 +1,4 @@
-﻿{
+{
     "parent":  "minecraft:block/wall_inventory",
     "textures":  {
                      "wall":  "minecraft:block/pink_concrete",

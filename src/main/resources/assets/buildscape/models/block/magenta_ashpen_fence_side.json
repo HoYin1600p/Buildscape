@@ -1,4 +1,4 @@
-﻿{
+{
     "parent":  "block/fence_side",
     "textures":  {
                      "texture":  "buildscape:block/ashpen_magenta_planks",

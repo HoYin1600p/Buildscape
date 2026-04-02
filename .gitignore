@@ -62,3 +62,6 @@ states.txt
 .env*.local
 /backup/
 *.ps1
+*.txt
+/backup/
+/gradle/

@@ -22,7 +22,7 @@ public class VariantEngine {
                         true,
                         () -> pack,
                         packConstructor,
-                        Pack.Position.TOP,
+                        Pack.Position.BOTTOM,
                         PackSource.BUILT_IN
                 );
                 if (builtPack != null) {

@@ -31,7 +31,7 @@ public class ModSlabBlock extends SlabBlock {
 
     @Override
     public float[] getBeaconColorMultiplier(BlockState state, net.minecraft.world.level.LevelReader level, net.minecraft.core.BlockPos pos, net.minecraft.core.BlockPos beaconPos) {
-        if (!com.kingodogo.buildscape.variantengine.family.BlockFamilyDetector.isGlass(this.baseBlock)) {
+        if (this.baseBlock == null || !com.kingodogo.buildscape.variantengine.family.BlockFamilyDetector.isGlass(this.baseBlock)) {
             return null;
         }
         int color = state.getMapColor(level, pos).col;
@@ -47,7 +47,7 @@ public class ModSlabBlock extends SlabBlock {
 
     @Override
     public boolean skipRendering(BlockState state, BlockState adjacentBlockState, net.minecraft.core.Direction side) {
-        if (com.kingodogo.buildscape.variantengine.family.BlockFamilyDetector.isGlass(this.baseBlock)) {
+        if (this.baseBlock != null && com.kingodogo.buildscape.variantengine.family.BlockFamilyDetector.isGlass(this.baseBlock)) {
             net.minecraft.world.level.block.Block adjBlock = adjacentBlockState.getBlock();
             net.minecraft.world.level.block.Block pureAdjBlock = adjBlock;
             

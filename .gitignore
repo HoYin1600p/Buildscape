@@ -61,3 +61,4 @@ states.txt
 .vercel
 .env*.local
 /backup/
+*.ps1

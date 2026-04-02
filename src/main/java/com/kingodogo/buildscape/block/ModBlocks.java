@@ -578,6 +578,7 @@ public class ModBlocks {
                 () -> new FreshCopperBulbBlock(
                         BlockBehaviour.Properties.of(Material.METAL, MaterialColor.COLOR_ORANGE)
                                 .strength(0.75f, 1.5f)
+                                .lightLevel((state) -> state.getValue(CopperBulbBlock.LIT) ? 15 : 0)
                                 .requiresCorrectToolForDrops()
                                 .sound(ModSounds.COPPER_BULB_SOUNDS())
                                 .isRedstoneConductor((state, reader, pos) -> false)));
@@ -637,6 +638,7 @@ public class ModBlocks {
                                         Material.METAL,
                                         MaterialColor.TERRACOTTA_LIGHT_GRAY)
                                 .strength(0.75f, 1.5f)
+                                .lightLevel((state) -> state.getValue(CopperBulbBlock.LIT) ? 12 : 0)
                                 .requiresCorrectToolForDrops()
                                 .sound(ModSounds.COPPER_BULB_SOUNDS())
                                 .isRedstoneConductor((state, reader, pos) -> false)));
@@ -700,6 +702,7 @@ public class ModBlocks {
                                         Material.METAL,
                                         MaterialColor.WARPED_NYLIUM)
                                 .strength(0.75f, 1.5f)
+                                .lightLevel((state) -> state.getValue(CopperBulbBlock.LIT) ? 8 : 0)
                                 .requiresCorrectToolForDrops()
                                 .sound(ModSounds.COPPER_BULB_SOUNDS())
                                 .isRedstoneConductor((state, reader, pos) -> false)));
@@ -755,6 +758,7 @@ public class ModBlocks {
                 () -> new OxidizedCopperBulbBlock(
                         BlockBehaviour.Properties.of(Material.METAL, MaterialColor.WARPED_STEM)
                                 .strength(0.75f, 1.5f)
+                                .lightLevel((state) -> state.getValue(CopperBulbBlock.LIT) ? 4 : 0)
                                 .requiresCorrectToolForDrops()
                                 .sound(ModSounds.COPPER_BULB_SOUNDS())
                                 .isRedstoneConductor((state, reader, pos) -> false)));

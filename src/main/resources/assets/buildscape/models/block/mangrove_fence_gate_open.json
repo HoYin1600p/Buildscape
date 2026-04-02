@@ -1,4 +1,4 @@
-﻿{
+{
     "parent":  "minecraft:block/template_fence_gate_open",
     "textures":  {
                      "texture":  "buildscape:block/mangrove_planks",

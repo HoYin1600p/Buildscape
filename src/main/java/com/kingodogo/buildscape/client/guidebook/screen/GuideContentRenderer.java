@@ -1,6 +1,5 @@
 package com.kingodogo.buildscape.client.guidebook.screen;
 
-import com.kingodogo.buildscape.BuildScape;
 import com.kingodogo.buildscape.client.guidebook.data.GuidePage;
 import com.kingodogo.buildscape.client.guidebook.data.PageComponent;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -10,7 +9,6 @@ import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -36,7 +34,7 @@ public final class GuideContentRenderer {
 
     public static int render(PoseStack ps, GuidePage page, int x, int y, int w, Font font, ItemRenderer ir) {
         int cy = y;
-        for (PageComponent comp : page.getComponents()) {
+        for (PageComponent comp : page.components()) {
             cy += renderComponent(ps, comp, x, cy, w, font, ir);
         }
         return cy - y;

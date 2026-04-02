@@ -14,10 +14,16 @@ public class VariantNamingUtil {
      * Format: buildscape:{shape}/{original_namespace}/{original_path}
      */
     public static ResourceLocation getGeneratedId(ResourceLocation baseId, BlockShape shape) {
-        String shapePrefix = shape == BlockShape.VERTICAL_SLAB ? "v_slab" : 
-                             shape == BlockShape.VERTICAL_STAIRS ? "v_stair" : 
-                             shape == BlockShape.QUARTER_PIECE ? "q_piece" : 
-                             shape == BlockShape.VERTICAL_QUARTER_PIECE ? "vq_piece" : shape.asString();
+        String shapePrefix = "vertical";
+        String shapeSuffix = (shape == BlockShape.VERTICAL_STAIRS || shape == BlockShape.STAIRS) ? "_stair" : "_slab";
+
+        if (shape == BlockShape.QUARTER_PIECE) {
+            shapePrefix = "q_piece";
+            shapeSuffix = "";
+        } else if (shape == BlockShape.VERTICAL_QUARTER_PIECE) {
+            shapePrefix = "vq_piece";
+            shapeSuffix = "";
+        }
         
         String ns = baseId.getNamespace().toLowerCase();
         String path = baseId.getPath().toLowerCase();
@@ -40,9 +46,9 @@ public class VariantNamingUtil {
         // We want: buildscape:v_slab_biomesoplenty_fir_log (for other mods)
         String finalPath;
         if (ns.equals("minecraft") || ns.equalsIgnoreCase(BuildScape.MODID)) {
-            finalPath = shapePrefix + "_" + path;
+            finalPath = shapePrefix + "_" + path + shapeSuffix;
         } else {
-            finalPath = shapePrefix + "_" + ns + "_" + path;
+            finalPath = shapePrefix + "_" + ns + "_" + path + shapeSuffix;
         }
 
         return new ResourceLocation(BuildScape.MODID, finalPath);

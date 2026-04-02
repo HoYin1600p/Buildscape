@@ -1,12 +1,12 @@
 package com.kingodogo.buildscape.client.guidebook.screen;
 
-import com.kingodogo.buildscape.BuildScape;
-import com.kingodogo.buildscape.client.guidebook.data.*;
+import com.kingodogo.buildscape.client.guidebook.data.GuideCategory;
+import com.kingodogo.buildscape.client.guidebook.data.GuideEntry;
+import com.kingodogo.buildscape.client.guidebook.data.GuideRegistry;
 import com.kingodogo.buildscape.client.screen.BuildScapeConfigScreen;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Vector3f;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
@@ -60,7 +60,7 @@ public class GuideBookScreen extends Screen {
         rebuildList("");
         if (selCat == null && !cats.isEmpty()) {
             selCat = cats.get(0);
-            if (!selCat.getEntries().isEmpty()) selEntry = selCat.getEntries().get(0);
+            if (!selCat.entries().isEmpty()) selEntry = selCat.entries().get(0);
         }
         rebuildWidgets();
     }
@@ -97,10 +97,10 @@ public class GuideBookScreen extends Screen {
 
         for (GuideCategory cat : cats) {
             boolean active = (cat == selCat);
-            CategoryButton cBtn = new CategoryButton(bx, curY, bw, itemH, new TranslatableComponent(cat.getDisplayNameKey()), cat.getIconItem(), b -> {
+            CategoryButton cBtn = new CategoryButton(bx, curY, bw, itemH, new TranslatableComponent(cat.displayNameKey()), cat.iconItem(), b -> {
                 if (selCat != cat) {
                     selCat = cat;
-                    if (!cat.getEntries().isEmpty()) selectEntry(cat.getEntries().get(0), 0, true);
+                    if (!cat.entries().isEmpty()) selectEntry(cat.entries().get(0), 0, true);
                     rebuildWidgets();
                 }
             });
@@ -112,11 +112,11 @@ public class GuideBookScreen extends Screen {
             curY += itemH + 3;
 
             if (active) {
-                List<GuideEntry> entries = cat.getEntries();
+                List<GuideEntry> entries = cat.entries();
                 for (int i = 0; i < entries.size(); i++) {
                     GuideEntry ent = entries.get(i);
                     boolean isLast = (i == entries.size() - 1);
-                    EntryButton eBtn = new EntryButton(bx + 16, curY, bw - 16, itemH - 4, new TranslatableComponent(ent.getTitleKey()), isLast, b -> {
+                    EntryButton eBtn = new EntryButton(bx + 16, curY, bw - 16, itemH - 4, new TranslatableComponent(ent.titleKey()), isLast, b -> {
                         selectEntry(ent, 0, true);
                         rebuildWidgets();
                     });
@@ -199,7 +199,7 @@ public class GuideBookScreen extends Screen {
 
         if (selCat != null && selEntry != null) {
             // Header Crumbs
-            String ctx = resolve(selCat.getDisplayNameKey()).toUpperCase() + " \u00AB " + resolve(selEntry.getTitleKey());
+            String ctx = resolve(selCat.displayNameKey()).toUpperCase() + " \u00AB " + resolve(selEntry.titleKey());
             font.draw(ps, ctx, contentX + 5, contentY - 14, 0xFF00E5FF);
             String pgNum = (pageIdx + 1) + " OF " + selEntry.pageCount();
             font.draw(ps, pgNum, contentX + contentW - font.width(pgNum) - 5, contentY - 14, 0xFF555555);
@@ -217,9 +217,9 @@ public class GuideBookScreen extends Screen {
     }
 
     private void renderMainContent(PoseStack ps) {
-        if (selEntry != null && !selEntry.getPages().isEmpty()) {
+        if (selEntry != null && !selEntry.pages().isEmpty()) {
             contentTotalHeight = GuideContentRenderer.render(ps, 
-                selEntry.getPages().get(pageIdx), contentX + 20, contentY + 20 - contentScroll, contentW - 40, 
+                selEntry.pages().get(pageIdx), contentX + 20, contentY + 20 - contentScroll, contentW - 40,
                 font, itemRenderer);
         }
     }
@@ -234,7 +234,7 @@ public class GuideBookScreen extends Screen {
         ps.pushPose();
         // Layer 1: Under-page
         if (p > 0.5f) {
-            if (prevEntry != null) GuideContentRenderer.render(ps, prevEntry.getPages().get(prevPageIdx), contentX + 20, contentY + 20, contentW - 40, font, itemRenderer);
+            if (prevEntry != null) GuideContentRenderer.render(ps, prevEntry.pages().get(prevPageIdx), contentX + 20, contentY + 20, contentW - 40, font, itemRenderer);
         } else {
             renderMainContent(ps);
         }

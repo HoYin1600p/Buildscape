@@ -1,4 +1,4 @@
-﻿{
+{
     "parent":  "block/button_pressed",
     "textures":  {
                      "texture":  "buildscape:block/ashpen_gray_planks",

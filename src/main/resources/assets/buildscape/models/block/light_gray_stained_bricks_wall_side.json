@@ -1,4 +1,4 @@
-﻿{
+{
     "parent":  "minecraft:block/template_wall_side",
     "textures":  {
                      "wall":  "buildscape:block/light_gray_stained_bricks",

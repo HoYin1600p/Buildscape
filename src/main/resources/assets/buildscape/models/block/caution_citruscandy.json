@@ -1,4 +1,4 @@
-﻿{
+{
     "parent":  "block/cube_column",
     "textures":  {
                      "end":  "buildscape:block/caution_citruscandy",

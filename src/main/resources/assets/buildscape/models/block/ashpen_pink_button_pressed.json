@@ -1,4 +1,4 @@
-﻿{
+{
     "parent":  "minecraft:block/button_pressed",
     "textures":  {
                      "texture":  "buildscape:block/ashpen_pink_planks",

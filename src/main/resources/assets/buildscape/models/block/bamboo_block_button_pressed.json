@@ -1,4 +1,4 @@
-﻿{
+{
     "parent":  "block/button_pressed",
     "textures":  {
                      "texture":  "buildscape:block/bamboo_block",

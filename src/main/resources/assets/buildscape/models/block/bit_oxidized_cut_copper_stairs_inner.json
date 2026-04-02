@@ -1,4 +1,4 @@
-﻿{
+{
     "parent":  "minecraft:block/inner_stairs",
     "textures":  {
                      "bottom":  "buildscape:block/bit_oxidized_cut_copper",

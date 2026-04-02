@@ -1,4 +1,4 @@
-﻿{
+{
     "parent":  "minecraft:block/template_glass_pane_post",
     "textures":  {
                      "edge":  "buildscape:block/green_glazed_glass",

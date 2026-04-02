@@ -1,4 +1,4 @@
-﻿{
+{
     "parent":  "minecraft:block/cross",
     "textures":  {
                      "cross":  "buildscape:block/snowy_bush",

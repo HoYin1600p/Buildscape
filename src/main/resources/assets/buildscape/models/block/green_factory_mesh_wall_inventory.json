@@ -1,4 +1,4 @@
-﻿{
+{
     "parent":  "minecraft:block/wall_inventory",
     "textures":  {
                      "wall":  "buildscape:block/factory_mesh_green",

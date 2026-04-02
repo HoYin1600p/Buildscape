@@ -31,7 +31,7 @@ public class CosmeticsDisplayPanel extends BasePanel {
     private int itemSize = 80;
     private int itemSpacing = 10;
     private static final int BUTTON_HEIGHT = 20;
-    private static final int BUTTON_SPACING = 5;
+    private static final int BUTTON_SPACING = 2;
     private static final int FILTER_BUTTON_AREA_HEIGHT = 30;
     private static final int ITEM_AREA_TOP_SPACING = 5;
 
@@ -46,13 +46,14 @@ public class CosmeticsDisplayPanel extends BasePanel {
             return true;
         }
 
-        if (idLower.contains("particle") || idLower.contains("effect") || idLower.contains("trail")) {
+            if (idLower.contains("particle") || idLower.contains("effect") || idLower.contains("trail") || idLower.contains("/pets/")) {
             return true;
         }
 
         com.kingodogo.buildscape.cosmetics.CosmeticManager.CosmeticMetadata metadata = com.kingodogo.buildscape.cosmetics.CosmeticManager.getInstance().getMetadata(cosmeticId);
             return metadata != null && (metadata.type() == CosmeticManager.CosmeticType.HEAD
-                    || metadata.type() == CosmeticManager.CosmeticType.PARTICLE_WINGS);
+                    || metadata.type() == CosmeticManager.CosmeticType.PARTICLE_WINGS
+                    || metadata.type() == CosmeticManager.CosmeticType.PET);
         }
 
     private final CosmeticRegistry cosmeticRegistry = CosmeticRegistry.getInstance();
@@ -129,13 +130,14 @@ public class CosmeticsDisplayPanel extends BasePanel {
 
         int titleHeight = 15;
         int renderStartY = startY + PADDING + titleHeight + FILTER_BUTTON_AREA_HEIGHT + ITEM_AREA_TOP_SPACING;
-        int scissorHeight = height - (renderStartY - startY);
+        int bottomPadding = 8; // Increased padding to avoid border overlap
+        int scissorHeight = height - (renderStartY - startY) - bottomPadding;
 
         int windowHeight = mc.getWindow().getHeight();
         double actualGuiScale = mc.getWindow().getGuiScale();
 
         int scissorRenderStartY = renderStartY - 2;
-        int scissorHeightAdjusted = scissorHeight + 4;
+        int scissorHeightAdjusted = scissorHeight + 2;
 
         int scissorX = Math.max(0, (int) (startX * actualGuiScale));
         int scissorWidth = Math.max(1, (int) (width * actualGuiScale));
@@ -151,23 +153,15 @@ public class CosmeticsDisplayPanel extends BasePanel {
 
         GuiComponent.fill(poseStack, startX, startY, endX, endY, 0x80000000);
 
-        int borderColor = 0xFF666666;
-        GuiComponent.fill(poseStack, startX - 1, startY - 1, endX + 1, startY, borderColor);
-        GuiComponent.fill(poseStack, startX - 1, endY, endX + 1, endY + 1, borderColor);
-        GuiComponent.fill(poseStack, startX - 1, startY, startX, endY, borderColor);
-        GuiComponent.fill(poseStack, endX, startY, endX + 1, endY, borderColor);
-
         String title = "Available Cosmetics";
         int titleWidth = mc.font.width(title);
         mc.font.draw(poseStack, title, startX + (width - titleWidth) / 2, startY + PADDING, 0xFFFFFF);
 
         int numTabs = CosmeticType.values().length;
-        int resetButtonWidth = 20;
         int spacing = BUTTON_SPACING;
 
         int availableWidth = width - PADDING * 2;
-        int reservedForReset = resetButtonWidth + spacing;
-        int buttonWidth = (availableWidth - reservedForReset - spacing * (numTabs - 1)) / numTabs;
+        int buttonWidth = (availableWidth - spacing * (numTabs - 1)) / numTabs;
 
         int buttonY = startY + PADDING + 15;
         int buttonX = startX + PADDING;
@@ -190,18 +184,6 @@ public class CosmeticsDisplayPanel extends BasePanel {
 
             buttonX += buttonWidth + spacing;
         }
-
-        int resetButtonX = buttonX;
-        int resetButtonY = buttonY;
-        isHoveringResetButton = mouseX >= resetButtonX && mouseX < resetButtonX + resetButtonWidth && mouseY >= resetButtonY && mouseY < resetButtonY + BUTTON_HEIGHT;
-
-        int resetBgColor = isHoveringResetButton ? 0xFF555555 : 0xFF333333;
-        GuiComponent.fill(poseStack, resetButtonX, resetButtonY, resetButtonX + resetButtonWidth, resetButtonY + BUTTON_HEIGHT, resetBgColor);
-        GuiComponent.fill(poseStack, resetButtonX, resetButtonY, resetButtonX + resetButtonWidth, resetButtonY + 1, 0xFF666666);
-        GuiComponent.fill(poseStack, resetButtonX, resetButtonY + BUTTON_HEIGHT - 1, resetButtonX + resetButtonWidth, resetButtonY + BUTTON_HEIGHT, 0xFF666666);
-        GuiComponent.fill(poseStack, resetButtonX, resetButtonY, resetButtonX + 1, resetButtonY + BUTTON_HEIGHT, 0xFF666666);
-        GuiComponent.fill(poseStack, resetButtonX + resetButtonWidth - 1, resetButtonY, resetButtonX + resetButtonWidth, resetButtonY + BUTTON_HEIGHT, 0xFF666666);
-        mc.font.draw(poseStack, "⟲", resetButtonX + (resetButtonWidth - mc.font.width("⟲")) / 2 + 1, resetButtonY + (BUTTON_HEIGHT - 8) / 2, isHoveringResetButton ? 0xFFFFAA00 : 0xFFCCCCCC);
 
         try {
             RenderSystem.enableScissor(scissorX, scissorYAdjusted, scissorWidth, scissorHeightScaled);
@@ -286,6 +268,13 @@ public class CosmeticsDisplayPanel extends BasePanel {
             BuildScape.getLogger().error("Supporters tab render exception: " + e.getMessage());
         } finally {
             RenderSystem.disableScissor();
+
+            // Draw panel borders at the very end to ensure they aren't overlapped by items
+            int borderColor = 0xFF666666;
+            GuiComponent.fill(poseStack, startX - 1, startY - 1, endX + 1, startY, borderColor);
+            GuiComponent.fill(poseStack, startX - 1, endY, endX + 1, endY + 1, borderColor);
+            GuiComponent.fill(poseStack, startX - 1, startY, startX, endY, borderColor);
+            GuiComponent.fill(poseStack, endX, startY, endX + 1, endY, borderColor);
         }
     }
 
@@ -310,13 +299,16 @@ public class CosmeticsDisplayPanel extends BasePanel {
                         || (wMeta.type() == CosmeticManager.CosmeticType.ITEM && idLower.contains("elytra")))) {
                     return true;
                 }
-                return idLower.contains("elytra") || idLower.contains("wing");
+                return (idLower.contains("elytra") || idLower.contains("wing")) && (wMeta == null || wMeta.type() != CosmeticManager.CosmeticType.PET);
             case PARTICLES:
                 CosmeticManager.CosmeticMetadata pMeta = CosmeticManager.getInstance().getMetadata(cosmeticId);
                 if (pMeta != null && pMeta.type() == CosmeticManager.CosmeticType.PARTICLE_TRAIL) {
                     return true;
                 }
                 return idLower.contains("particle") || idLower.contains("effect") || idLower.contains("trail");
+            case PETS:
+                CosmeticManager.CosmeticMetadata petMeta = CosmeticManager.getInstance().getMetadata(cosmeticId);
+                return petMeta != null && petMeta.type() == CosmeticManager.CosmeticType.PET;
             case GEAR:
                 CosmeticManager.CosmeticMetadata meta = CosmeticManager.getInstance().getMetadata(cosmeticId);
                 if (meta != null && meta.type() == CosmeticManager.CosmeticType.HEAD) {
@@ -668,6 +660,29 @@ public class CosmeticsDisplayPanel extends BasePanel {
                  return;
             }
 
+            if (meta != null && meta.type() == CosmeticManager.CosmeticType.PET) {
+                com.kingodogo.buildscape.client.UniversalCosmeticRenderer.init(mc.getEntityModels());
+                float baseScale = itemSize * 0.42f;
+                poseStack.pushPose();
+                poseStack.translate(centerX, centerY, 110.0f);
+                poseStack.scale(baseScale, -baseScale, baseScale);
+
+                // Centering for Pet in GUI
+                poseStack.translate(0.0, -0.6, 0.0);
+
+                long time = System.nanoTime() / 1000000L;
+                float rot = (time / 20.0f) % 360.0f;
+                poseStack.mulPose(Vector3f.YP.rotationDegrees(rot));
+
+                com.mojang.blaze3d.platform.Lighting.setupForEntityInInventory();
+                com.kingodogo.buildscape.client.UniversalCosmeticRenderer.renderPetCosmetic(poseStack, bufferSource, 15728880, partialTick);
+                bufferSource.endBatch();
+
+                poseStack.popPose();
+                RenderSystem.disableBlend();
+                return;
+            }
+
             if (idLower.contains("particle") || idLower.contains("effect") || idLower.contains("trail")) {
                 poseStack.popPose();
                 render2DParticles(poseStack, cosmeticId, centerX, centerY, animProgress);
@@ -684,7 +699,9 @@ public class CosmeticsDisplayPanel extends BasePanel {
         }
         poseStack.popPose();
         RenderSystem.disableBlend();
-    }private boolean isArmorItem(ItemStack stack) {
+    }
+
+    private boolean isArmorItem(ItemStack stack) {
         return stack.getItem() instanceof net.minecraft.world.item.ArmorItem || stack.getItem() instanceof net.minecraft.world.item.ElytraItem;
     }
 
@@ -780,16 +797,34 @@ public class CosmeticsDisplayPanel extends BasePanel {
     }
 
     private net.minecraft.resources.ResourceLocation getParticleTexture(String shape) {
-        String path = switch (shape) {
-            case "heart" -> "textures/particle/heart_blank.png";
-            case "bubble" -> "textures/particle/bubble.png";
-            case "note" -> "minecraft:textures/particle/note.png";
-            case "cherry", "cherry_leaves" -> "textures/particle/cherry_0.png";
-            case "firework" -> "minecraft:textures/particle/spark_0.png";
-            case "cake" -> "textures/particle/cake_1.png";
-            case "snowflake" -> "textures/particle/snowflake_1.png";
-            default -> "textures/particle/glow_lime_sparkle.png";
-        };
+        String path;
+        switch (shape) {
+            case "heart":
+                path = "textures/particle/heart_blank.png";
+                break;
+            case "bubble":
+                path = "textures/particle/bubble.png";
+                break;
+            case "note":
+                path = "minecraft:textures/particle/note.png";
+                break;
+            case "cherry":
+            case "cherry_leaves":
+                path = "textures/particle/cherry_0.png";
+                break;
+            case "firework":
+                path = "minecraft:textures/particle/spark_0.png";
+                break;
+            case "cake":
+                path = "textures/particle/cake_1.png";
+                break;
+            case "snowflake":
+                path = "textures/particle/snowflake_1.png";
+                break;
+            default:
+                path = "textures/particle/glow_lime_sparkle.png";
+                break;
+        }
         if (path.startsWith("minecraft:"))
             return new net.minecraft.resources.ResourceLocation("minecraft", path.substring(10));
         return new net.minecraft.resources.ResourceLocation(com.kingodogo.buildscape.BuildScape.MODID, path);
@@ -1021,12 +1056,10 @@ public class CosmeticsDisplayPanel extends BasePanel {
         int buttonY = startY + PADDING + 15;
         int buttonX = startX + PADDING;
         int availableWidth = width - PADDING * 2;
-        int resetButtonWidth = 20; // Must match render
         int spacing = BUTTON_SPACING;
         int numTabs = CosmeticType.values().length;
-        int reservedForReset = resetButtonWidth + spacing;
 
-        int buttonWidth = (availableWidth - reservedForReset - spacing * (numTabs - 1)) / numTabs;
+        int buttonWidth = (availableWidth - spacing * (numTabs - 1)) / numTabs;
 
         for (CosmeticType type : CosmeticType.values()) {
             if (mouseX >= buttonX && mouseX < buttonX + buttonWidth
@@ -1250,7 +1283,7 @@ public class CosmeticsDisplayPanel extends BasePanel {
     private double pickerDragOffsetX = 0;
     private double pickerDragOffsetY = 0;
 
-    private boolean isHoveringResetButton = false;
+    private final boolean isHoveringResetButton = false;
 
     private void saveColorPickerPosition(int x, int y) {
         CosmeticsConfig config = CosmeticsConfig.get();
@@ -1294,7 +1327,8 @@ public class CosmeticsDisplayPanel extends BasePanel {
         ALL("All", 0xFFFFFF),
         WINGS("Wings", 0x00FF00),
         PARTICLES("Particles", 0xFFFF00),
-        GEAR("Gear", 0xFF8800);
+        GEAR("Gear", 0xFF8800),
+        PETS("Pets", 0xFF55FF);
 
         private final String name;
         private final int color;

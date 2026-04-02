@@ -2,7 +2,6 @@ package com.kingodogo.buildscape.block;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 
 public interface SinksOnFarmland {

@@ -2,15 +2,12 @@ package com.kingodogo.buildscape.client.screen.tabs.supporters;
 
 import com.kingodogo.buildscape.client.screen.widget.CustomScrollbarRenderer;
 import com.kingodogo.buildscape.client.screen.widget.SortToggleButton;
-import com.kingodogo.buildscape.variantengine.family.BlockFamily;
-import com.kingodogo.buildscape.variantengine.registry.VariantRegistrar;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.util.Mth;
 
 import java.util.ArrayList;
@@ -18,7 +15,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
-import java.util.function.Predicate;
 
 public class VerticalModsSelectorWidget extends AbstractWidget {
     private static final int ROW_HEIGHT = 20;

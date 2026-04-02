@@ -1,10 +1,11 @@
 package com.kingodogo.buildscape.client;
 
-import com.kingodogo.buildscape.cosmetics.CosHead;
 import com.kingodogo.buildscape.cosmetics.CosChest;
-import com.kingodogo.buildscape.cosmetics.CosLegs;
 import com.kingodogo.buildscape.cosmetics.CosFeet;
-import com.kingodogo.buildscape.cosmetics.CosmeticManager;
+import com.kingodogo.buildscape.cosmetics.CosHead;
+import com.kingodogo.buildscape.cosmetics.CosLegs;
+import com.kingodogo.buildscape.entity.pet.PetEntity;
+import com.kingodogo.buildscape.entity.pet.PetModel;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Minecraft;
@@ -27,6 +28,8 @@ public class UniversalCosmeticRenderer {
     private static final Map<String, CosChest<?>> bakedChestModels = new HashMap<>();
     private static final Map<String, CosLegs<?>> bakedLegsModels = new HashMap<>();
     private static final Map<String, CosFeet<?>> bakedFeetModels = new HashMap<>();
+    private static PetModel<PetEntity> petModel = null;
+    private static PetEntity dummyPet = null;
 
     private static net.minecraft.client.model.geom.ModelPart playerHeadPart = null;
     private static net.minecraft.client.model.geom.ModelPart playerHatPart = null;
@@ -47,6 +50,13 @@ public class UniversalCosmeticRenderer {
         }
 
         bakeAll(modelSet);
+        if (petModel == null) {
+            try {
+                petModel = new PetModel<>(modelSet.bakeLayer(PetModel.LAYER_LOCATION));
+            } catch (Exception e) {
+                com.kingodogo.buildscape.BuildScape.getLogger().error("Failed to bake pet model for preview", e);
+            }
+        }
         initialized = true;
     }
 
@@ -171,6 +181,32 @@ public class UniversalCosmeticRenderer {
         VertexConsumer vertexConsumer = buffer.getBuffer(RenderType.entityCutoutNoCull(model.getTexture()));
         
         model.renderToBuffer(poseStack, vertexConsumer, packedLight, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
+
+        poseStack.popPose();
+    }
+
+    public static void renderPetCosmetic(
+            PoseStack poseStack,
+            MultiBufferSource buffer,
+            int packedLight,
+            float partialTick) {
+
+        if (petModel == null) return;
+
+        if (dummyPet == null && Minecraft.getInstance().level != null) {
+            dummyPet = new PetEntity(com.kingodogo.buildscape.entity.ModEntities.PET.get(), Minecraft.getInstance().level);
+        }
+
+        poseStack.pushPose();
+
+        if (dummyPet != null) {
+            long gameTime = Minecraft.getInstance().level != null ? Minecraft.getInstance().level.getGameTime() : 0L;
+            float age = (gameTime + partialTick) * 0.5F;
+            petModel.setupAnim(dummyPet, 0.0F, 0.0F, age, 0.0F, 0.0F);
+        }
+
+        VertexConsumer vertexConsumer = buffer.getBuffer(RenderType.entityCutoutNoCull(new net.minecraft.resources.ResourceLocation("buildscape", "textures/entity/kingo_pet.png")));
+        petModel.renderToBuffer(poseStack, vertexConsumer, packedLight, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
 
         poseStack.popPose();
     }

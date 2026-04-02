@@ -1,4 +1,4 @@
-﻿{
+{
     "parent":  "minecraft:block/stairs",
     "textures":  {
                      "bottom":  "buildscape:block/end_stone",

@@ -209,6 +209,9 @@ public class CosmeticRegistry {
             // Check if it's a particle trail (use nether star as placeholder)
             if (info.type.equals("particle")) {
                 result = new ItemStack(net.minecraft.world.item.Items.NETHER_STAR);
+            } else if (info.type.equals("pets") || cosmeticId.contains("/pets/")) {
+                // Pets use custom rendering and should not have an ItemStack representation
+                return null;
             } else if (info.type.equals("wings") || cosmeticId.contains("/wings/")) {
                 // For wings, try to resolve using legacyId first, then as item
                 if (meta != null && meta.legacyId() != null && !meta.legacyId().isEmpty()) {
@@ -312,20 +315,9 @@ public class CosmeticRegistry {
     }
 
     /**
-     * Internal class to hold parsed cosmetic information.
-     */
-    public static class CosmeticInfo {
-        public final String type;
-        public final String namespace;
-        public final String id;
-        public final String fullId;
-
-        public CosmeticInfo(String type, String namespace, String id, String fullId) {
-            this.type = type;
-            this.namespace = namespace;
-            this.id = id;
-            this.fullId = fullId;
-        }
+         * Internal class to hold parsed cosmetic information.
+         */
+        public record CosmeticInfo(String type, String namespace, String id, String fullId) {
     }
 
     /**

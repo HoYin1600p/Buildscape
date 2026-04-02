@@ -1,4 +1,4 @@
-﻿{
+{
     "parent":  "minecraft:block/template_glass_pane_side_alt",
     "textures":  {
                      "edge":  "buildscape:block/orange_glazed_glass",

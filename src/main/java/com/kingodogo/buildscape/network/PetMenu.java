@@ -1,7 +1,7 @@
 package com.kingodogo.buildscape.network;
 
-import com.kingodogo.buildscape.test.PetAnimation;
-import com.kingodogo.buildscape.test.TestPetEntity;
+import com.kingodogo.buildscape.entity.pet.PetAnimation;
+import com.kingodogo.buildscape.entity.pet.PetEntity;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
@@ -14,7 +14,7 @@ import net.minecraft.world.item.ItemStack;
 
 public class PetMenu extends AbstractContainerMenu {
     private final Container container;
-    private TestPetEntity pet;
+    private final PetEntity pet;
 
     // Client-side constructor
     public PetMenu(int windowId, Inventory playerInventory, FriendlyByteBuf extraData) {
@@ -22,7 +22,7 @@ public class PetMenu extends AbstractContainerMenu {
     }
 
     // Server-side constructor
-    public PetMenu(int windowId, Inventory playerInventory, Container container, TestPetEntity pet) {
+    public PetMenu(int windowId, Inventory playerInventory, Container container, PetEntity pet) {
         super(ModMenuTypes.PET_MENU.get(), windowId);
         checkContainerSize(container, 10);
         this.container = container;

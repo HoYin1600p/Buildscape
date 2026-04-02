@@ -1,4 +1,4 @@
-﻿{
+{
     "parent":  "block/pressure_plate_down",
     "textures":  {
                      "texture":  "buildscape:block/ashpen_green_planks",

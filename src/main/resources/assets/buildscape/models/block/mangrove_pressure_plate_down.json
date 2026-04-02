@@ -1,4 +1,4 @@
-﻿{
+{
     "parent":  "minecraft:block/pressure_plate_down",
     "textures":  {
                      "texture":  "buildscape:block/mangrove_planks",

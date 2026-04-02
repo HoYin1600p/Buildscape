@@ -1,4 +1,4 @@
-﻿{
+{
     "parent":  "minecraft:block/cube_bottom_top",
     "textures":  {
                      "side":  "buildscape:block/bit_chiseled_tuff",

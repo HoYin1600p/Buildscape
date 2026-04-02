@@ -53,7 +53,6 @@ public class BuildScape {
         com.kingodogo.buildscape.block.ModBlockEntities.BLOCK_ENTITIES.register(
                 modEventBus);
         com.kingodogo.buildscape.entity.ModEntities.ENTITIES.register(modEventBus);
-        com.kingodogo.buildscape.test.TestEntities.ENTITIES.register(modEventBus);
         com.kingodogo.buildscape.recipe.ModRecipeSerializers.RECIPE_SERIALIZERS.register(
                 modEventBus);
         com.kingodogo.buildscape.network.ModMenuTypes.MENUS.register(modEventBus);

@@ -20,6 +20,7 @@ import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
@@ -32,6 +33,10 @@ import java.util.Random;
 public class SmokeVentBlock extends Block implements EntityBlock {
 
     public static final EnumProperty<PillarPart> PART = EnumProperty.create("part", PillarPart.class);
+    /**
+     * Tracks current redstone power — changing this fires observers; value mirrors live signal.
+     */
+    public static final BooleanProperty POWERED = BooleanProperty.create("powered");
 
     private static final VoxelShape SHAPE_SINGLE = Shapes.or(
             Block.box(4, 0, 4, 12, 7, 12),
@@ -46,12 +51,12 @@ public class SmokeVentBlock extends Block implements EntityBlock {
 
     public SmokeVentBlock(Properties properties) {
         super(properties);
-        this.registerDefaultState(this.stateDefinition.any().setValue(PART, PillarPart.SINGLE));
+        this.registerDefaultState(this.stateDefinition.any().setValue(PART, PillarPart.SINGLE).setValue(POWERED, false));
     }
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(PART);
+        builder.add(PART, POWERED);
     }
 
     @Override
@@ -82,7 +87,8 @@ public class SmokeVentBlock extends Block implements EntityBlock {
             part = PillarPart.SINGLE;
         }
 
-        return this.defaultBlockState().setValue(PART, part);
+        boolean powered = level.hasNeighborSignal(pos);
+        return this.defaultBlockState().setValue(PART, part).setValue(POWERED, powered);
     }
 
     @Override
@@ -106,6 +112,85 @@ public class SmokeVentBlock extends Block implements EntityBlock {
             return state.setValue(PART, newPart);
         }
         return super.updateShape(state, direction, neighborState, level, pos, neighborPos);
+    }
+
+    @Override
+    public void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean isMoving) {
+        if (!level.isClientSide) {
+            boolean powered = hasRedstonePowerInStack(level, pos);
+            if (powered != state.getValue(POWERED)) {
+                setPoweredAndSync(level, pos, powered);
+            }
+        }
+    }
+
+    @Override
+    public void neighborChanged(BlockState state, Level level, BlockPos pos,
+                                Block block, BlockPos fromPos, boolean isMoving) {
+        if (!level.isClientSide) {
+            if (block instanceof SmokeVentBlock) return;
+
+            boolean powered = hasRedstonePowerInStack(level, pos);
+            boolean wasPowered = state.getValue(POWERED);
+            if (powered == wasPowered) return;
+
+            setPoweredAndSync(level, pos, powered);
+            applyActiveToStack(level, pos, powered);
+
+            // Notify comparators for the whole stack
+            BlockPos current = findBottomBlock(level, pos);
+            while (level.getBlockState(current).getBlock() instanceof SmokeVentBlock) {
+                level.updateNeighbourForOutputSignal(current, this);
+                current = current.above();
+            }
+
+            level.playSound(null, pos, net.minecraft.sounds.SoundEvents.UI_BUTTON_CLICK,
+                    net.minecraft.sounds.SoundSource.BLOCKS, 0.5f, powered ? 1.2f : 0.8f);
+        }
+    }
+
+    /**
+     * Comparator output: 15 when smoke is active, 0 when off. Reads from the BlockEntity.
+     */
+    @Override
+    public boolean hasAnalogOutputSignal(BlockState state) {
+        return true;
+    }
+
+    @Override
+    public int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos) {
+        // Read from the top block's entity so any segment next to a comparator returns correctly
+        BlockPos top = findTopBlock(level, pos);
+        BlockEntity be = level.getBlockEntity(top);
+        if (be instanceof SmokeVentBlockEntity ventBE) {
+            return ventBE.isActive() ? 15 : 0;
+        }
+        return 0;
+    }
+
+    /**
+     * Sets POWERED on every segment of the pillar, flag=3 so adjacent observers detect the
+     * block state change. The cascade guard in neighborChanged prevents vent segments from
+     * reacting to each other's updates.
+     */
+    private void setPoweredAndSync(Level level, BlockPos pos, boolean powered) {
+        BlockPos current = findBottomBlock(level, pos);
+        while (level.getBlockState(current).getBlock() instanceof SmokeVentBlock) {
+            BlockState bs = level.getBlockState(current);
+            if (bs.getValue(POWERED) != powered) {
+                level.setBlock(current, bs.setValue(POWERED, powered), 3);
+            }
+            current = current.above();
+        }
+    }
+
+    private boolean hasRedstonePowerInStack(Level level, BlockPos pos) {
+        BlockPos current = findBottomBlock(level, pos);
+        while (level.getBlockState(current).getBlock() instanceof SmokeVentBlock) {
+            if (level.hasNeighborSignal(current)) return true;
+            current = current.above();
+        }
+        return false;
     }
 
     @Override
@@ -168,6 +253,14 @@ public class SmokeVentBlock extends Block implements EntityBlock {
 
             level.playSound(null, pos, net.minecraft.sounds.SoundEvents.UI_BUTTON_CLICK,
                     net.minecraft.sounds.SoundSource.BLOCKS, 0.5f, newActive ? 1.2f : 0.8f);
+
+            // VERY IMPORTANT: right-clicking didn't update comparators or observers before!
+            BlockPos current = findBottomBlock(level, pos);
+            while (level.getBlockState(current).getBlock() instanceof SmokeVentBlock) {
+                level.updateNeighbourForOutputSignal(current, this); // Updates comparators
+                level.updateNeighborsAt(current, this); // Updates observers
+                current = current.above();
+            }
 
             net.minecraft.network.chat.TextComponent message =
                     new net.minecraft.network.chat.TextComponent(newActive ? "Smoke Vent: On" : "Smoke Vent: Off");

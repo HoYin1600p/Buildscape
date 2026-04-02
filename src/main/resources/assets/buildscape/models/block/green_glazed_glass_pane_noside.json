@@ -1,4 +1,4 @@
-﻿{
+{
     "parent":  "minecraft:block/template_glass_pane_noside",
     "textures":  {
                      "pane":  "buildscape:block/green_glazed_glass",

@@ -25,9 +25,8 @@ import java.util.Set;
  */
 public class BlockFamilyDetector {
 
-    private static final String[] SHAPE_SUFFIXES = {"_slab", "_stairs", "_stair"};
-    private static final String[] SHAPE_PREFIXES = {"slab_", "stairs_", "stair_"};
-    private static final String[] BLOCK_SUFFIXES = {"_bricks", "_brick", "_tiles", "_tile", "_planks", "_plank", "_block", "_log", "_wood", "_stem", "_hyphae"};
+    private static final String[] SHAPE_SUFFIXES = {"_slab", "slab_", "_stairs", "_stair", "stairs_", "stair_"};
+    private static final String[] BLOCK_SUFFIXES = {"_bricks", "_brick", "_tiles", "_tile", "_planks", "_plank", "_block", "_log", "_wood", "_stem", "_hyphae", "_bale"};
     private static final String[] VERTICAL_MARKERS = {"_vertical_", "vertical_", "v_slab", "v_stair", "vslab", "vstair", "_v_"};
 
     // -----------------------------------------------------------------------
@@ -195,6 +194,7 @@ public class BlockFamilyDetector {
     }
 
     public static boolean isGlass(Block block) {
+        if (block == null) return false;
         ResourceLocation id = block.getRegistryName();
         if (id == null) return false;
         String path = id.getPath().toLowerCase();
@@ -397,7 +397,10 @@ public class BlockFamilyDetector {
         ResourceLocation id = block.getRegistryName();
         if (id != null) {
             String path = id.getPath().toLowerCase();
-            return path.contains("sand") || path.contains("gravel");
+            // Use word-boundary checks: "sand" and "gravel" should not match "sandstone"
+            boolean isSand = path.equals("sand") || path.endsWith("_sand") || path.startsWith("sand_");
+            boolean isGravel = path.equals("gravel") || path.endsWith("_gravel") || path.startsWith("gravel_");
+            return isSand || isGravel;
         }
         return false;
     }
@@ -474,17 +477,16 @@ public class BlockFamilyDetector {
     private static String stripShapeSuffixes(String path) {
         String result = path;
         for (String s : SHAPE_SUFFIXES) result = result.replace(s, "");
-        for (String s : SHAPE_PREFIXES) result = result.replace(s, "");
         return result.replaceAll("^_+|_+$", "");
     }
 
-    /**
-     * Strip material suffixes like _planks, _bricks, _block, etc.
-     */
+    private static final String[] STRIP_MATERIAL_PATTERNS = {"_planks?$", "_bricks?$", "_tiles?$", "_block$", "_log$", "_wood$", "_stem$", "_hyphae$", "_bale$"};
     private static String stripMaterialSuffix(String path) {
-        return path.replaceAll("_planks?$", "").replaceAll("_bricks?$", "").replaceAll("_tiles?$", "")
-                   .replaceAll("_block$", "").replaceAll("_log$", "").replaceAll("_wood$", "")
-                   .replaceAll("_stem$", "").replaceAll("_hyphae$", "");
+        String result = path;
+        for (String pattern : STRIP_MATERIAL_PATTERNS) {
+            result = result.replaceAll(pattern, "");
+        }
+        return result;
     }
 
     private static Block tryGetBlock(String namespace, String path, IForgeRegistry<Block> registry) {

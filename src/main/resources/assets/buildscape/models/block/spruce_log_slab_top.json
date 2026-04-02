@@ -1,0 +1,8 @@
+﻿{
+    "textures":  {
+                     "bottom":  "minecraft:block/spruce_log_top",
+                     "top":  "minecraft:block/spruce_log_top",
+                     "side":  "minecraft:block/spruce_log"
+                 },
+    "parent":  "minecraft:block/slab_top"
+}

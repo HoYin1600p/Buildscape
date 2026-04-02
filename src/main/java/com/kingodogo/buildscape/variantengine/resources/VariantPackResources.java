@@ -146,7 +146,7 @@ public class VariantPackResources implements PackResources {
                         } else if (shape == BlockShape.VERTICAL_STAIRS) {
                             addVerticalStairResources(verticalId, baseId, isTransparent);
                         } else if (shape == BlockShape.SLAB) {
-                            addSlabResources(verticalId, baseId);
+                            addSlabResources(verticalId, baseId, BlockFamilyDetector.isGlass(baseBlock));
                         } else if (shape == BlockShape.STAIRS) {
                             addStairResources(verticalId, baseId, BlockFamilyDetector.isGlass(baseBlock));
                         }
@@ -159,7 +159,11 @@ public class VariantPackResources implements PackResources {
                 }
             }
 
-            putResource("assets/" + BuildScape.MODID + "/lang/en_us.json", GSON.toJson(langObj));
+            // Write lang entries to a separate 'zz_buildscape_variants' namespace.
+            // This is the "lib mod" approach: by using a different namespace for our generated keys,
+            // we avoid file collisions with the main 'buildscape' JAR resources.
+            // Minecraft will load both files and merge the keys into the global language map.
+            putResource("assets/zz_buildscape_variants/lang/en_us.json", GSON.toJson(langObj));
             
             // Save fingerprint to disk
             try {
@@ -228,10 +232,10 @@ public class VariantPackResources implements PackResources {
         }
     }
 
-    private void addSlabResources(ResourceLocation slabId, ResourceLocation baseId) {
+    private void addSlabResources(ResourceLocation slabId, ResourceLocation baseId, boolean isGlass) {
         String path = slabId.getPath();
         String cleanPath = baseId.getPath().replaceAll("_slab$", "").replaceAll("_stairs$", "").replaceAll("_stair$", "");
-        String tex = baseId.getNamespace() + ":block/" + cleanPath;
+        String tex = getGuessedTexture(baseId);
 
         JsonObject blockstate = new JsonObject();
         JsonObject variants = new JsonObject();
@@ -272,10 +276,9 @@ public class VariantPackResources implements PackResources {
         putResource("assets/" + BuildScape.MODID + "/models/item/" + path + ".json", GSON.toJson(itemModel));
     }
 
-        private void addStairResources(ResourceLocation stairId, ResourceLocation baseId, boolean isGlass) {
+    private void addStairResources(ResourceLocation stairId, ResourceLocation baseId, boolean isGlass) {
         String path = stairId.getPath();
-        String cleanPath = baseId.getPath().replaceAll("_slab$", "").replaceAll("_stairs$", "").replaceAll("_stair$", "");
-        String tex = baseId.getNamespace() + ":block/" + cleanPath;
+        String tex = getGuessedTexture(baseId);
 
         JsonObject blockstate = new JsonObject();
         JsonObject variants = new JsonObject();
@@ -409,65 +412,10 @@ public class VariantPackResources implements PackResources {
         putResource("assets/" + BuildScape.MODID + "/models/item/" + path + ".json", GSON.toJson(itemModel));
     }
 
-    private void addStairResources(ResourceLocation stairId, ResourceLocation baseId) {
-        String path = stairId.getPath();
-        String cleanPath = baseId.getPath().replaceAll("_slab$", "").replaceAll("_stairs$", "").replaceAll("_stair$", "");
-        String tex = baseId.getNamespace() + ":block/" + cleanPath;
-
-        JsonObject blockstate = new JsonObject();
-        JsonObject variants = new JsonObject();
-        String stairModel = BuildScape.MODID + ":block/" + path;
-        String innerModel = BuildScape.MODID + ":block/" + path + "_inner";
-        String outerModel = BuildScape.MODID + ":block/" + path + "_outer";
-
-        // Define standard variants for stairs facing/half/shape combinations
-        String[] facings = {"north", "south", "east", "west"};
-        String[] halves = {"bottom", "top"};
-        String[] shapes = {"straight", "inner_left", "inner_right", "outer_left", "outer_right"};
-
-        for (String f : facings) {
-            for (String h : halves) {
-                for (String s : shapes) {
-                    String stateKey = "facing=" + f + ",half=" + h + ",shape=" + s;
-                    int y = f.equals("east") ? 90 : f.equals("south") ? 180 : f.equals("west") ? 270 : 0;
-                    if (s.startsWith("inner") || s.startsWith("outer")) {
-                        // Stair rotation logic offset for corners
-                    }
-                    String m = s.equals("straight") ? stairModel : s.startsWith("inner") ? innerModel : outerModel;
-                    variants.add(stateKey, createVariant(m, h.equals("top") ? 180 : 0, y));
-                }
-            }
-        }
-
-        blockstate.add("variants", variants);
-        putResource("assets/" + BuildScape.MODID + "/blockstates/" + path + ".json", GSON.toJson(blockstate));
-
-        // Models (Stair, Inner, Outer)
-        String[] types = {"", "_inner", "_outer"};
-        String[] parents = {"minecraft:block/stairs", "minecraft:block/inner_stairs", "minecraft:block/outer_stairs"};
-
-        for (int i=0; i<3; i++) {
-            JsonObject m = new JsonObject();
-            m.addProperty("parent", parents[i]);
-            JsonObject t = new JsonObject();
-            t.addProperty("bottom", tex);
-            t.addProperty("top", tex);
-            t.addProperty("side", tex);
-            m.add("textures", t);
-            putResource("assets/" + BuildScape.MODID + "/models/block/" + path + types[i] + ".json", GSON.toJson(m));
-        }
-
-        // Item Model
-        JsonObject itemModel = new JsonObject();
-        itemModel.addProperty("parent", stairModel);
-        putResource("assets/" + BuildScape.MODID + "/models/item/" + path + ".json", GSON.toJson(itemModel));
-    }
 
     private void addVerticalSlabResources(ResourceLocation verticalId, ResourceLocation baseId, boolean isTransparent) {
         String path = verticalId.getPath();
-        // Use the base block ID directly for texture, stripping ONLY if it is an orphan-based variant
-        String cleanPath = baseId.getPath().replaceAll("_slab$", "").replaceAll("_stairs$", "").replaceAll("_stair$", "");
-        String tex = baseId.getNamespace() + ":block/" + cleanPath;
+        String tex = getGuessedTexture(baseId);
 
         JsonObject blockstate = new JsonObject();
         JsonObject variants = new JsonObject();
@@ -563,9 +511,7 @@ public class VariantPackResources implements PackResources {
 
     private void addVerticalStairResources(ResourceLocation verticalId, ResourceLocation baseId, boolean isTransparent) {
         String path = verticalId.getPath();
-        // Use the base block ID directly for texture, stripping ONLY if it is an orphan-based variant
-        String cleanPath = baseId.getPath().replaceAll("_slab$", "").replaceAll("_stairs$", "").replaceAll("_stair$", "");
-        String tex = baseId.getNamespace() + ":block/" + cleanPath;
+        String tex = getGuessedTexture(baseId);
 
         JsonObject blockstate = new JsonObject();
         JsonObject variants = new JsonObject();
@@ -743,6 +689,27 @@ public class VariantPackResources implements PackResources {
         return obj;
     }
 
+    private String getGuessedTexture(ResourceLocation baseId) {
+        String path = baseId.getPath();
+        String cleanPath = path.replaceAll("_slab$", "").replaceAll("_stairs$", "").replaceAll("_stair$", "");
+        
+        // Handle common suffix shifts
+        if (baseId.getNamespace().equals(BuildScape.MODID)) {
+            if (cleanPath.equals("hay_bale")) cleanPath = "hay_block";
+        }
+        
+        String tex = baseId.getNamespace() + ":block/" + cleanPath;
+        
+        // Handle vanilla blocks with side textures
+        if (baseId.getNamespace().equals("minecraft")) {
+            if (cleanPath.equals("hay_block")) return "minecraft:block/hay_block_side";
+            if (cleanPath.equals("grass_block")) return "minecraft:block/grass_block_side";
+            if (cleanPath.equals("dirt_path")) return "minecraft:block/dirt_path_side";
+        }
+        
+        return tex;
+    }
+
     private void addShapelessRecipe(ResourceLocation verticalId, ResourceLocation parentId) {
         JsonObject toVertical = new JsonObject();
         toVertical.addProperty("type", "minecraft:crafting_shapeless");
@@ -899,8 +866,26 @@ public class VariantPackResources implements PackResources {
     }
     
     private void putResource(String path, String content) {
+        // Do NOT generate a resource if it already exists in the mod's own JAR.
+        // This preserves handcrafted files like hay_bale_slab.json over generated ones.
+        // EXCEPTION: lang files — Minecraft merges lang additively so its safe to always write them.
+        boolean isLang = path.contains("/lang/");
+        if (!isLang && path.startsWith("assets/") && isResourceInModJar(path)) {
+            return;
+        }
         cachedResources.put(path, content);
         saveToDisk(path, content);
+    }
+
+    private boolean isResourceInModJar(String path) {
+        // path is like "assets/buildscape/models/block/hay_bale_slab.json"
+        // The mod classloader can find resources from the JAR/resources folder.
+        try {
+            String resourcePath = path; // already relative
+            return VariantPackResources.class.getClassLoader().getResource(resourcePath) != null;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     private void saveToDisk(String path, String content) {
@@ -991,7 +976,7 @@ public class VariantPackResources implements PackResources {
 
     @Override
     public Set<String> getNamespaces(PackType type) {
-        return new HashSet<>(Arrays.asList(BuildScape.MODID, "minecraft"));
+        return new HashSet<>(Arrays.asList(BuildScape.MODID, "minecraft", "zz_buildscape_variants"));
     }
 
     @Nullable

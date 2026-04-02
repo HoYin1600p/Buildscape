@@ -63,4 +63,16 @@ public class ModEntities {
                     .updateInterval(20)
                     .build("colored_item_frame")
     );
+    public static final RegistryObject<
+            EntityType<SeatEntity>
+            > SEAT_ENTITY = ENTITIES.register("seat", () ->
+            EntityType.Builder.<SeatEntity>of(
+                            SeatEntity::new,
+                            MobCategory.MISC
+                    )
+                    .sized(0.1F, 0.1F) // Small invisible entity
+                    .clientTrackingRange(10)
+                    .updateInterval(20)
+                    .build("seat")
+    );
 }

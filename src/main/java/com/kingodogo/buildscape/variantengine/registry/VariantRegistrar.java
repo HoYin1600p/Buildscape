@@ -402,12 +402,15 @@ public class VariantRegistrar {
 
         boolean isLog = path.contains("log") || path.contains("wood") || path.contains("_stem") || path.contains("_hyphae");
         boolean isGlass = BlockFamilyDetector.isGlass(base);
-        boolean isFalling = base instanceof net.minecraft.world.level.block.FallingBlock || path.contains("sand") || path.contains("gravel");
+        // Use word-boundary check: "sand" in "sandstone" should NOT count as a falling block
+        boolean isTrueSand = path.equals("sand") || path.endsWith("_sand") || path.startsWith("sand_");
+        boolean isTrueGravel = path.equals("gravel") || path.endsWith("_gravel") || path.startsWith("gravel_");
+        boolean isFalling = base instanceof net.minecraft.world.level.block.FallingBlock || isTrueSand || isTrueGravel;
         boolean hasHorizontal = (shape == BlockShape.VERTICAL_SLAB) ? 
             (family.hasVariant(BlockShape.SLAB) || BlockDetectionUtil.isSlab(base)) :
             (family.hasVariant(BlockShape.STAIRS) || BlockDetectionUtil.isStair(base));
 
-        if ((path.contains("sand") && !path.contains("sandstone")) || path.contains("concrete_powder") || path.contains("gravel")) {
+        if (isTrueSand || path.contains("concrete_powder") || isTrueGravel) {
             return false; // Skip Sand/Concrete Powders/Gravel by default, keep Sandstone
         }
 

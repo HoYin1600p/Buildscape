@@ -2820,6 +2820,79 @@ public class ModItems {
                     )
             );
 
+    // =========================================================================
+    //  Trapped Decorated Pot items
+    // =========================================================================
+
+    public static final RegistryObject<Item> TRAPPED_DECORATED_POT = ITEMS.register(
+            "trapped_decorated_pot",
+            () -> new BlockItem(ModBlocks.TRAPPED_DECORATED_POT.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> BLACK_TRAPPED_DECORATED_POT = ITEMS.register(
+            "black_trapped_decorated_pot",
+            () -> new BlockItem(ModBlocks.BLACK_TRAPPED_DECORATED_POT.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> BLUE_TRAPPED_DECORATED_POT = ITEMS.register(
+            "blue_trapped_decorated_pot",
+            () -> new BlockItem(ModBlocks.BLUE_TRAPPED_DECORATED_POT.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> BROWN_TRAPPED_DECORATED_POT = ITEMS.register(
+            "brown_trapped_decorated_pot",
+            () -> new BlockItem(ModBlocks.BROWN_TRAPPED_DECORATED_POT.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> CYAN_TRAPPED_DECORATED_POT = ITEMS.register(
+            "cyan_trapped_decorated_pot",
+            () -> new BlockItem(ModBlocks.CYAN_TRAPPED_DECORATED_POT.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> GRAY_TRAPPED_DECORATED_POT = ITEMS.register(
+            "gray_trapped_decorated_pot",
+            () -> new BlockItem(ModBlocks.GRAY_TRAPPED_DECORATED_POT.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> GREEN_TRAPPED_DECORATED_POT = ITEMS.register(
+            "green_trapped_decorated_pot",
+            () -> new BlockItem(ModBlocks.GREEN_TRAPPED_DECORATED_POT.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> LIGHT_BLUE_TRAPPED_DECORATED_POT = ITEMS.register(
+            "light_blue_trapped_decorated_pot",
+            () -> new BlockItem(ModBlocks.LIGHT_BLUE_TRAPPED_DECORATED_POT.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> LIGHT_GRAY_TRAPPED_DECORATED_POT = ITEMS.register(
+            "light_gray_trapped_decorated_pot",
+            () -> new BlockItem(ModBlocks.LIGHT_GRAY_TRAPPED_DECORATED_POT.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> LIME_TRAPPED_DECORATED_POT = ITEMS.register(
+            "lime_trapped_decorated_pot",
+            () -> new BlockItem(ModBlocks.LIME_TRAPPED_DECORATED_POT.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> MAGENTA_TRAPPED_DECORATED_POT = ITEMS.register(
+            "magenta_trapped_decorated_pot",
+            () -> new BlockItem(ModBlocks.MAGENTA_TRAPPED_DECORATED_POT.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> ORANGE_TRAPPED_DECORATED_POT = ITEMS.register(
+            "orange_trapped_decorated_pot",
+            () -> new BlockItem(ModBlocks.ORANGE_TRAPPED_DECORATED_POT.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> PINK_TRAPPED_DECORATED_POT = ITEMS.register(
+            "pink_trapped_decorated_pot",
+            () -> new BlockItem(ModBlocks.PINK_TRAPPED_DECORATED_POT.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> PURPLE_TRAPPED_DECORATED_POT = ITEMS.register(
+            "purple_trapped_decorated_pot",
+            () -> new BlockItem(ModBlocks.PURPLE_TRAPPED_DECORATED_POT.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> RED_TRAPPED_DECORATED_POT = ITEMS.register(
+            "red_trapped_decorated_pot",
+            () -> new BlockItem(ModBlocks.RED_TRAPPED_DECORATED_POT.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> WHITE_TRAPPED_DECORATED_POT = ITEMS.register(
+            "white_trapped_decorated_pot",
+            () -> new BlockItem(ModBlocks.WHITE_TRAPPED_DECORATED_POT.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> YELLOW_TRAPPED_DECORATED_POT = ITEMS.register(
+            "yellow_trapped_decorated_pot",
+            () -> new BlockItem(ModBlocks.YELLOW_TRAPPED_DECORATED_POT.get(), createBlockItemProperties())
+    );
+
     public static final RegistryObject<Item> FESTIVE_STOCKING = ITEMS.register(
             "festive_stocking",
             () ->
@@ -7609,4 +7682,50 @@ public class ModItems {
             "pink_glazed_glass_stairs",
             () -> new BlockItem(ModBlocks.PINK_GLAZED_GLASS_STAIRS.get(), createBlockItemProperties())
     );
+
+    // Log Slab Items
+    public static final RegistryObject<Item> OAK_LOG_SLAB = ITEMS.register("oak_log_slab",
+            () -> new BlockItem(ModBlocks.OAK_LOG_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> STRIPPED_OAK_LOG_SLAB = ITEMS.register("stripped_oak_log_slab",
+            () -> new BlockItem(ModBlocks.STRIPPED_OAK_LOG_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> SPRUCE_LOG_SLAB = ITEMS.register("spruce_log_slab",
+            () -> new BlockItem(ModBlocks.SPRUCE_LOG_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> STRIPPED_SPRUCE_LOG_SLAB = ITEMS.register("stripped_spruce_log_slab",
+            () -> new BlockItem(ModBlocks.STRIPPED_SPRUCE_LOG_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BIRCH_LOG_SLAB = ITEMS.register("birch_log_slab",
+            () -> new BlockItem(ModBlocks.BIRCH_LOG_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> STRIPPED_BIRCH_LOG_SLAB = ITEMS.register("stripped_birch_log_slab",
+            () -> new BlockItem(ModBlocks.STRIPPED_BIRCH_LOG_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> JUNGLE_LOG_SLAB = ITEMS.register("jungle_log_slab",
+            () -> new BlockItem(ModBlocks.JUNGLE_LOG_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> STRIPPED_JUNGLE_LOG_SLAB = ITEMS.register("stripped_jungle_log_slab",
+            () -> new BlockItem(ModBlocks.STRIPPED_JUNGLE_LOG_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> ACACIA_LOG_SLAB = ITEMS.register("acacia_log_slab",
+            () -> new BlockItem(ModBlocks.ACACIA_LOG_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> STRIPPED_ACACIA_LOG_SLAB = ITEMS.register("stripped_acacia_log_slab",
+            () -> new BlockItem(ModBlocks.STRIPPED_ACACIA_LOG_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> DARK_OAK_LOG_SLAB = ITEMS.register("dark_oak_log_slab",
+            () -> new BlockItem(ModBlocks.DARK_OAK_LOG_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> STRIPPED_DARK_OAK_LOG_SLAB = ITEMS.register("stripped_dark_oak_log_slab",
+            () -> new BlockItem(ModBlocks.STRIPPED_DARK_OAK_LOG_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> CRIMSON_STEM_SLAB = ITEMS.register("crimson_stem_slab",
+            () -> new BlockItem(ModBlocks.CRIMSON_STEM_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> STRIPPED_CRIMSON_STEM_SLAB = ITEMS.register("stripped_crimson_stem_slab",
+            () -> new BlockItem(ModBlocks.STRIPPED_CRIMSON_STEM_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WARPED_STEM_SLAB = ITEMS.register("warped_stem_slab",
+            () -> new BlockItem(ModBlocks.WARPED_STEM_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> STRIPPED_WARPED_STEM_SLAB = ITEMS.register("stripped_warped_stem_slab",
+            () -> new BlockItem(ModBlocks.STRIPPED_WARPED_STEM_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> MANGROVE_LOG_SLAB = ITEMS.register("mangrove_log_slab",
+            () -> new BlockItem(ModBlocks.MANGROVE_LOG_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> STRIPPED_MANGROVE_LOG_SLAB = ITEMS.register("stripped_mangrove_log_slab",
+            () -> new BlockItem(ModBlocks.STRIPPED_MANGROVE_LOG_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> ASHPEN_LOG = ITEMS.register("ashpen_log",
+            () -> new BlockItem(ModBlocks.ASHPEN_LOG.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> ASHPEN_WOOD = ITEMS.register("ashpen_wood",
+            () -> new BlockItem(ModBlocks.ASHPEN_WOOD.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> ASHPEN_LOG_SLAB = ITEMS.register("ashpen_log_slab",
+            () -> new BlockItem(ModBlocks.ASHPEN_LOG_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> ASHPEN_WOOD_SLAB = ITEMS.register("ashpen_wood_slab",
+            () -> new BlockItem(ModBlocks.ASHPEN_WOOD_SLAB.get(), createBlockItemProperties()));
 }

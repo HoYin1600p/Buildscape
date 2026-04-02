@@ -1,0 +1,8 @@
+﻿{
+    "textures":  {
+                     "bottom":  "minecraft:block/warped_stem_top",
+                     "top":  "minecraft:block/warped_stem_top",
+                     "side":  "minecraft:block/warped_stem"
+                 },
+    "parent":  "minecraft:block/slab"
+}

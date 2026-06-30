@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "#",
+    "#"
+  ],
+  "key": {
+    "#": {
+      "item": "buildscape:bit_copper_block_stairs"
+    }
+  },
+  "result": {
+    "item": "buildscape:bit_copper_block_vertical_stairs",
+    "count": 2
+  }
+}

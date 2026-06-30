@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "#",
+    "#"
+  ],
+  "key": {
+    "#": {
+      "item": "buildscape:caution_mintcandy_stairs"
+    }
+  },
+  "result": {
+    "item": "buildscape:caution_mintcandy_vertical_stairs",
+    "count": 2
+  }
+}

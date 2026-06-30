@@ -21,7 +21,6 @@ public class ModBlockTagsProvider extends BlockTagsProvider {
 
     @Override
     protected void addTags() {
-        // Tagging logic for static blocks would go here.
-        // Dynamic vertical variants are tagged at runtime via VerticalResourcePack.
+        // Vertical slab/stair tags are maintained as static tag JSON.
     }
 }

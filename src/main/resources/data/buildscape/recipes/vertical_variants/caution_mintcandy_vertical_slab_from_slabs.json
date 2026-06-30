@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "#",
+    "#"
+  ],
+  "key": {
+    "#": {
+      "item": "buildscape:caution_mintcandy_slab"
+    }
+  },
+  "result": {
+    "item": "buildscape:caution_mintcandy_vertical_slab",
+    "count": 2
+  }
+}

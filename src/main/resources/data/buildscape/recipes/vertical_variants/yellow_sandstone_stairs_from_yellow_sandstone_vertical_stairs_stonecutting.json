@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "buildscape:yellow_sandstone_vertical_stairs"
+  },
+  "result": "buildscape:yellow_sandstone_stairs",
+  "count": 1
+}

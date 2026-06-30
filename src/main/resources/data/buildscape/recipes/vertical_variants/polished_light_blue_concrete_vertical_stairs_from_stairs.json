@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "#",
+    "#"
+  ],
+  "key": {
+    "#": {
+      "item": "buildscape:polished_light_blue_concrete_stairs"
+    }
+  },
+  "result": {
+    "item": "buildscape:polished_light_blue_concrete_vertical_stairs",
+    "count": 2
+  }
+}

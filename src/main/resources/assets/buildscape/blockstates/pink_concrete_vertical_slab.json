@@ -1,0 +1,25 @@
+{
+  "variants": {
+    "axis=z,type=bottom": {
+      "model": "buildscape:block/pink_concrete_vertical_slab"
+    },
+    "axis=z,type=top": {
+      "model": "buildscape:block/pink_concrete_vertical_slab",
+      "y": 180
+    },
+    "axis=x,type=bottom": {
+      "model": "buildscape:block/pink_concrete_vertical_slab",
+      "y": 270
+    },
+    "axis=x,type=top": {
+      "model": "buildscape:block/pink_concrete_vertical_slab",
+      "y": 90
+    },
+    "axis=z,type=double": {
+      "model": "minecraft:block/pink_concrete"
+    },
+    "axis=x,type=double": {
+      "model": "minecraft:block/pink_concrete"
+    }
+  }
+}

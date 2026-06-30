@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "buildscape:dripstone_block_vertical_stairs"
+  },
+  "result": "buildscape:dripstone_block_stairs",
+  "count": 1
+}

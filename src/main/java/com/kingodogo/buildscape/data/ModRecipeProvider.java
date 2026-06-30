@@ -15,7 +15,6 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
 
     @Override
     protected void buildCraftingRecipes(Consumer<FinishedRecipe> consumer) {
-        // Tagging logic for static variants would go here.
-        // Dynamic horizontal/vertical conversions are handled at runtime via VerticalResourcePack.
+        // Vertical slab/stair conversions are maintained as static recipe JSON.
     }
 }

@@ -1,0 +1,9 @@
+{
+  "parent": "buildscape:block/template_vertical_stairs_top",
+  "textures": {
+    "bottom": "buildscape:block/factory_mesh_gray",
+    "top": "buildscape:block/factory_mesh_gray",
+    "side": "buildscape:block/factory_mesh_gray",
+    "particle": "#side"
+  }
+}

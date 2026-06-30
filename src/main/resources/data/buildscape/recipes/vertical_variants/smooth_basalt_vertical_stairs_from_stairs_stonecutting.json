@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "buildscape:smooth_basalt_stairs"
+  },
+  "result": "buildscape:smooth_basalt_vertical_stairs",
+  "count": 1
+}

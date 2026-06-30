@@ -1,0 +1,9 @@
+{
+  "parent": "buildscape:block/template_vertical_stairs_octant_0_1_1",
+  "textures": {
+    "bottom": "buildscape:block/bit_cut_copper",
+    "top": "buildscape:block/bit_cut_copper",
+    "side": "buildscape:block/bit_cut_copper",
+    "particle": "#side"
+  }
+}

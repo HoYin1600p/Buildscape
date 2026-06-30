@@ -1,0 +1,9 @@
+{
+  "parent": "buildscape:block/template_vertical_stairs_top",
+  "textures": {
+    "bottom": "buildscape:block/caution_blue",
+    "top": "buildscape:block/caution_blue",
+    "side": "buildscape:block/caution_blue",
+    "particle": "#side"
+  }
+}

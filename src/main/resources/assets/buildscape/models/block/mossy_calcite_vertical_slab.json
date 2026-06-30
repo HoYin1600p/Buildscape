@@ -1,0 +1,9 @@
+{
+  "parent": "buildscape:block/template_vertical_slab",
+  "textures": {
+    "bottom": "buildscape:block/mossy_calcite",
+    "top": "buildscape:block/mossy_calcite",
+    "side": "buildscape:block/mossy_calcite",
+    "particle": "#side"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "#",
+    "#"
+  ],
+  "key": {
+    "#": {
+      "item": "buildscape:steel_block_slab"
+    }
+  },
+  "result": {
+    "item": "buildscape:steel_block_vertical_slab",
+    "count": 2
+  }
+}

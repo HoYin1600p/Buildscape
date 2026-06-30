@@ -1,0 +1,9 @@
+{
+  "parent": "buildscape:block/template_vertical_slab",
+  "textures": {
+    "bottom": "minecraft:block/dirt",
+    "top": "minecraft:block/mycelium_top",
+    "side": "minecraft:block/mycelium_side",
+    "particle": "#side"
+  }
+}

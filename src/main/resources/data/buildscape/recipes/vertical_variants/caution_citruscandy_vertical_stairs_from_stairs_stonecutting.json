@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "buildscape:caution_citruscandy_stairs"
+  },
+  "result": "buildscape:caution_citruscandy_vertical_stairs",
+  "count": 1
+}

@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "#",
+    "#"
+  ],
+  "key": {
+    "#": {
+      "item": "buildscape:bit_oxidized_copper_block_slab"
+    }
+  },
+  "result": {
+    "item": "buildscape:bit_oxidized_copper_block_vertical_slab",
+    "count": 2
+  }
+}

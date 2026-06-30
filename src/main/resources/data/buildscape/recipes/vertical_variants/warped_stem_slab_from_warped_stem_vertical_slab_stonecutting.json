@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "buildscape:warped_stem_vertical_slab"
+  },
+  "result": "buildscape:warped_stem_slab",
+  "count": 1
+}

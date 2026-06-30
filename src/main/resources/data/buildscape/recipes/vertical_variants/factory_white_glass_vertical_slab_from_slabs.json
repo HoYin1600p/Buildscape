@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "#",
+    "#"
+  ],
+  "key": {
+    "#": {
+      "item": "buildscape:factory_white_glass_slab"
+    }
+  },
+  "result": {
+    "item": "buildscape:factory_white_glass_vertical_slab",
+    "count": 2
+  }
+}

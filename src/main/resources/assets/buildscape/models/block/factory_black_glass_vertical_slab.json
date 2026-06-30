@@ -1,0 +1,9 @@
+{
+  "parent": "buildscape:block/template_vertical_slab",
+  "textures": {
+    "bottom": "buildscape:block/factory_black_glass",
+    "top": "buildscape:block/factory_black_glass",
+    "side": "buildscape:block/factory_black_glass",
+    "particle": "#side"
+  }
+}

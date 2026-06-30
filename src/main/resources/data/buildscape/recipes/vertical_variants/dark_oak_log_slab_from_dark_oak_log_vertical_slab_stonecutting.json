@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "buildscape:dark_oak_log_vertical_slab"
+  },
+  "result": "buildscape:dark_oak_log_slab",
+  "count": 1
+}

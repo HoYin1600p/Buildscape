@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "buildscape:orange_mosaic_glass_stairs"
+  },
+  "result": "buildscape:orange_mosaic_glass_vertical_stairs",
+  "count": 1
+}

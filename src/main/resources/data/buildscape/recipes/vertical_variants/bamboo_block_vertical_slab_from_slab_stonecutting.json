@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "buildscape:bamboo_block_slab"
+  },
+  "result": "buildscape:bamboo_block_vertical_slab",
+  "count": 1
+}

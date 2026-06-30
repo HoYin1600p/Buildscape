@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "#",
+    "#"
+  ],
+  "key": {
+    "#": {
+      "item": "buildscape:hay_bale_slab"
+    }
+  },
+  "result": {
+    "item": "buildscape:hay_bale_vertical_slab",
+    "count": 2
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "#",
+    "#"
+  ],
+  "key": {
+    "#": {
+      "item": "buildscape:yellow_smooth_sandstone_slab"
+    }
+  },
+  "result": {
+    "item": "buildscape:yellow_smooth_sandstone_vertical_slab",
+    "count": 2
+  }
+}

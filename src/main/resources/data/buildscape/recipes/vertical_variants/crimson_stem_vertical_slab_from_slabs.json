@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "#",
+    "#"
+  ],
+  "key": {
+    "#": {
+      "item": "buildscape:crimson_stem_slab"
+    }
+  },
+  "result": {
+    "item": "buildscape:crimson_stem_vertical_slab",
+    "count": 2
+  }
+}

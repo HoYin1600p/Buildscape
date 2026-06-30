@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "buildscape:green_smooth_sandstone_stairs"
+  },
+  "result": "buildscape:green_smooth_sandstone_vertical_stairs",
+  "count": 1
+}

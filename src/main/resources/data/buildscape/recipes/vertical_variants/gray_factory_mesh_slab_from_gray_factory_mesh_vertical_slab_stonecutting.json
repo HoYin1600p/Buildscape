@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "buildscape:gray_factory_mesh_vertical_slab"
+  },
+  "result": "buildscape:gray_factory_mesh_slab",
+  "count": 1
+}

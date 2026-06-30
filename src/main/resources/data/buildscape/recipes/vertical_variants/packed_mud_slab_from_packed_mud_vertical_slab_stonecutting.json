@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "buildscape:packed_mud_vertical_slab"
+  },
+  "result": "buildscape:packed_mud_slab",
+  "count": 1
+}

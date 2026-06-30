@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "buildscape:snowy_grass_block_vertical_stairs"
+  },
+  "result": "buildscape:snowy_grass_block_stairs",
+  "count": 1
+}

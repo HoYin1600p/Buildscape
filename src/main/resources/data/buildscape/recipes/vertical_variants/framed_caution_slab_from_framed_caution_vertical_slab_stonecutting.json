@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "buildscape:framed_caution_vertical_slab"
+  },
+  "result": "buildscape:framed_caution_slab",
+  "count": 1
+}

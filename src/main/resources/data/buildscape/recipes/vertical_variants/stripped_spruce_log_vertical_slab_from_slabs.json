@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "#",
+    "#"
+  ],
+  "key": {
+    "#": {
+      "item": "buildscape:stripped_spruce_log_slab"
+    }
+  },
+  "result": {
+    "item": "buildscape:stripped_spruce_log_vertical_slab",
+    "count": 2
+  }
+}

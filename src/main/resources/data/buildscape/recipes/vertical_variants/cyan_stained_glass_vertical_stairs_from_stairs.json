@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "#",
+    "#"
+  ],
+  "key": {
+    "#": {
+      "item": "buildscape:cyan_stained_glass_stairs"
+    }
+  },
+  "result": {
+    "item": "buildscape:cyan_stained_glass_vertical_stairs",
+    "count": 2
+  }
+}

@@ -7,7 +7,6 @@
   "mixins": [
     "BlockMixin",
     "ChainBlockMixin",
-    "CreativeModeTabMixin",
     "EntityAccessor",
     "EntityMixin",
     "FenceBlockMixin",

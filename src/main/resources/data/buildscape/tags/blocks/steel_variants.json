@@ -1,27 +1,27 @@
-{
-  "values": [
-    "buildscape:steel_block",
-    "buildscape:steel_block_stairs",
-    "buildscape:steel_block_slab",
-    "buildscape:steel_block_wall",
-    "buildscape:bolted_steel_pillar",
-    "buildscape:bolted_steel",
-    "buildscape:pressed_steel",
-    "buildscape:pressed_steel_stairs",
-    "buildscape:pressed_steel_slab",
-    "buildscape:pressed_steel_wall",
-    "buildscape:steel_trim",
-    "buildscape:steel_pillar",
-    "buildscape:steel_grate",
-    "buildscape:steel_fan",
-    "buildscape:steel_casing",
-    "buildscape:cut_steel",
-    "buildscape:cut_steel_stairs",
-    "buildscape:cut_steel_slab",
-    "buildscape:cut_steel_wall",
-    "buildscape:polished_steel",
-    "buildscape:polished_steel_stairs",
-    "buildscape:polished_steel_slab",
-    "buildscape:polished_steel_wall"
-  ]
+﻿{
+    "values":  [
+                   "buildscape:steel_block",
+                   "buildscape:steel_block_stairs",
+                   "buildscape:steel_block_slab",
+                   "buildscape:steel_block_wall",
+                   "buildscape:bolted_steel_pillar",
+                   "buildscape:pressed_steel",
+                   "buildscape:pressed_steel_stairs",
+                   "buildscape:pressed_steel_slab",
+                   "buildscape:pressed_steel_wall",
+                   "buildscape:steel_trim",
+                   "buildscape:steel_pillar",
+                   "buildscape:steel_grate",
+                   "buildscape:steel_fan",
+                   "buildscape:steel_casing",
+                   "buildscape:cut_steel",
+                   "buildscape:cut_steel_stairs",
+                   "buildscape:cut_steel_slab",
+                   "buildscape:cut_steel_wall",
+                   "buildscape:polished_steel",
+                   "buildscape:polished_steel_stairs",
+                   "buildscape:polished_steel_slab",
+                   "buildscape:polished_steel_wall"
+               ]
 }
+

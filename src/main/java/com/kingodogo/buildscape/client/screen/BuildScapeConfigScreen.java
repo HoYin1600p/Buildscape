@@ -120,7 +120,6 @@ public class BuildScapeConfigScreen extends Screen {
     private ConfigCategoryButton pillarParticlesButton;
     private ConfigCategoryButton pillarIdsButton;
     private ConfigCategoryButton worldSettingsButton;
-    private ConfigCategoryButton supportersButton;
     private ConfigCategoryButton reportButton;
     private AbstractConfigTab activeTab;
     private Button kofiButton;
@@ -234,15 +233,6 @@ public class BuildScapeConfigScreen extends Screen {
                 });
         addRenderableWidget(worldSettingsButton);
 
-        sidebarY += buttonHeight + spacing;
-        supportersButton = new ConfigCategoryButton(
-                buttonX, sidebarY,
-                buttonWidth, buttonHeight,
-                new TranslatableComponent("buildscape.config.category.supporters"),
-                (button) -> setActiveTab(
-                        new com.kingodogo.buildscape.client.screen.tabs.supporters.SupportersOnlyTab(this)));
-        addRenderableWidget(supportersButton);
-
         int frameHeight = getScaledCategoryButtonHeight() + scaleSize(4);
         int bottomPadding = scaleSize(10);
         int kofiY = height - frameHeight - bottomPadding;
@@ -251,30 +241,7 @@ public class BuildScapeConfigScreen extends Screen {
                 buttonX, kofiY,
                 buttonWidth, frameHeight,
                 new net.minecraft.network.chat.TextComponent("Ko-fi"),
-                (button) -> openKofiLink()) {
-            @Override
-            public void renderButton(com.mojang.blaze3d.vertex.PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
-                renderCustomFrame(poseStack, this.x, this.y, this.width, this.height);
-                boolean hovered = mouseX >= this.x && mouseY >= this.y && mouseX < this.x + this.width && mouseY < this.y + this.height;
-                if (hovered) {
-                    fill(poseStack, this.x + 2, this.y + 2, this.x + this.width - 2, this.y + this.height - 2, 0x30FFFFFF);
-                }
-
-                float titleScale = 1.0f;
-                int titlePadding = 10;
-                int titleTextWidth = font.width(getMessage());
-                int maxTitleWidth = this.width - titlePadding * 2;
-                if (titleTextWidth > maxTitleWidth) {
-                    titleScale = Math.max(0.5f, (float) maxTitleWidth / titleTextWidth);
-                }
-                int titleY = (int) (this.y + (this.height / 2.0f) - ((8.0f * titleScale) / 2.0f));
-                int titleX = this.x + this.width / 2;
-
-                poseStack.pushPose();
-                renderGradientTitle(poseStack, titleX, titleY, getMessage().getString(), titleScale, false);
-                poseStack.popPose();
-            }
-        };
+                (button) -> openKofiLink());
         addRenderableWidget(kofiButton);
 
         int reportY = kofiY - getScaledCategoryButtonHeight() - spacing - scaleSize(6);
@@ -289,7 +256,7 @@ public class BuildScapeConfigScreen extends Screen {
             if (hasOpAccess()) {
                 setActiveTab(new PillarItemsConfigTab(this));
             } else {
-                setActiveTab(new com.kingodogo.buildscape.client.screen.tabs.supporters.SupportersOnlyTab(this));
+                setActiveTab(new WorldSettingsConfigTab(this));
             }
         } else {
             activeTab.init(); // Explicitly re-initialize the active tab to restore custom widgets if swapping back from another Screen (like ConfirmScreen)
@@ -389,20 +356,6 @@ public class BuildScapeConfigScreen extends Screen {
             }
         }
 
-        if (supportersButton != null) {
-            sidebarY += buttonHeight + spacing;
-            supportersButton.x = buttonX;
-            supportersButton.y = sidebarY;
-            supportersButton.setWidth(buttonWidth);
-            try {
-                java.lang.reflect.Field heightField = net.minecraft.client.gui.components.AbstractWidget.class
-                        .getDeclaredField("height");
-                heightField.setAccessible(true);
-                heightField.setInt(supportersButton, buttonHeight);
-            } catch (Exception e) {
-            }
-        }
-
         int frameHeight = getScaledCategoryButtonHeight() + scaleSize(4);
         int bottomPadding = scaleSize(10);
         int kofiY = this.height - frameHeight - bottomPadding;
@@ -448,7 +401,7 @@ public class BuildScapeConfigScreen extends Screen {
         int maxAvailableWidth = 0;
 
         java.util.List<ConfigCategoryButton> buttons = java.util.Arrays.asList(
-                pillarItemsButton, pillarParticlesButton, pillarIdsButton, worldSettingsButton, supportersButton, reportButton
+                pillarItemsButton, pillarParticlesButton, pillarIdsButton, worldSettingsButton, reportButton
         );
 
         for (ConfigCategoryButton btn : buttons) {
@@ -596,8 +549,6 @@ public class BuildScapeConfigScreen extends Screen {
             pillarIdsButton.setActive(false);
         if (worldSettingsButton != null)
             worldSettingsButton.setActive(false);
-        if (supportersButton != null)
-            supportersButton.setActive(false);
         if (reportButton != null)
             reportButton.setActive(false);
 
@@ -632,8 +583,6 @@ public class BuildScapeConfigScreen extends Screen {
                 pillarIdsButton.setActive(false);
             if (worldSettingsButton != null)
                 worldSettingsButton.setActive(false);
-            if (supportersButton != null)
-                supportersButton.setActive(false);
             if (reportButton != null)
                 reportButton.setActive(false);
             return;
@@ -642,9 +591,7 @@ public class BuildScapeConfigScreen extends Screen {
         boolean isItems = activeTab instanceof PillarItemsConfigTab;
         boolean isParticles = activeTab instanceof PillarParticlesConfigTab;
         boolean isIds = activeTab instanceof PillarIdsConfigTab || activeTab instanceof PillarIdDetailConfigTab;
-        boolean isWorldSettings = activeTab instanceof WorldSettingsConfigTab || 
-                                  activeTab instanceof com.kingodogo.buildscape.client.screen.tabs.supporters.VerticalStuffManagerTab;
-        boolean isSupporters = activeTab instanceof com.kingodogo.buildscape.client.screen.tabs.supporters.SupportersOnlyTab;
+        boolean isWorldSettings = activeTab instanceof WorldSettingsConfigTab;
 
         if (pillarItemsButton != null)
             pillarItemsButton.setActive(isItems);
@@ -654,8 +601,6 @@ public class BuildScapeConfigScreen extends Screen {
             pillarIdsButton.setActive(isIds);
         if (worldSettingsButton != null)
             worldSettingsButton.setActive(isWorldSettings);
-        if (supportersButton != null)
-            supportersButton.setActive(isSupporters);
         if (reportButton != null)
             reportButton.setActive(false);
     }

@@ -8,6 +8,24 @@
           "type": "minecraft:item",
           "name": "buildscape:factory_white_glass_stairs"
         }
+      ],
+      "conditions": [
+        {
+          "condition": "minecraft:match_tool",
+          "predicate": {
+            "enchantments": [
+              {
+                "enchantment": "minecraft:silk_touch",
+                "levels": {
+                  "min": 1
+                }
+              }
+            ]
+          }
+        },
+        {
+          "condition": "minecraft:survives_explosion"
+        }
       ]
     }
   ]

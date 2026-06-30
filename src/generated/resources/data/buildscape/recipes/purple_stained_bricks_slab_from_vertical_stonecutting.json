@@ -1,8 +1,0 @@
-{
-  "type": "minecraft:stonecutting",
-  "ingredient": {
-    "item": "buildscape:vertical_purple_stained_bricks_slab"
-  },
-  "result": "buildscape:purple_stained_bricks_slab",
-  "count": 1
-}

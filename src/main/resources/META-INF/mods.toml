@@ -1,47 +1,27 @@
 modLoader = "javafml"
-loaderVersion = "${loader_version_range}"
-license = "${mod_license}"
+loaderVersion = "[40,)"
+license = "All Rights Reserved"
 [[mods]]
-modId = "${mod_id}"
-version = "${mod_version}"
-displayName = "${mod_name}"
+modId = "buildscape"
+version = "3.0.2-VH"
+displayName = "BuildScape"
 displayURL = "buildscape.online"
 logoFile = "buildscape.png"
-authors = "${mod_authors}"
+authors = "Kingodogo"
 
-description = '''${mod_description}'''
+description = '''Welcome to Buildscape the ultimate expansion for builders, architects, and creators! This mod adds a massive collection of new building blocks designed to spark creativity and transform your Minecraft world into a true masterpiece. From sleek modern tiles and rustic wood planks to glowing crystals, smooth marbles, and industrial metals Buildscape gives you every texture and color you could imagine. Whether you're crafting a cozy village, a grand castle, or a futuristic city, these blocks fit perfectly into any theme or building style. Each block has been carefully designed to blend seamlessly with vanilla Minecraft while adding fresh, unique flair to your builds. Experiment with countless combinations, mix materials, and design without limits.'''
 
-[[dependencies.${mod_id}]]
+[[dependencies.buildscape]]
     modId="forge"
     mandatory=true
-    versionRange="${forge_version_range}"
+    versionRange="[40,)"
     ordering="NONE"
     side="BOTH"
 
-[[dependencies.${mod_id}]]
+[[dependencies.buildscape]]
     modId="minecraft"
     mandatory=true
-    versionRange="${minecraft_version_range}"
+    versionRange="[1.18.2,1.19)"
     ordering="AFTER"
     side = "BOTH"
 
-[[mods]]
-modId = "zz_buildscape_variants"
-version = "${mod_version}"
-displayName = "BuildScape Variant Engine Late Loader"
-description = "Internal late-loader for BuildScape to ensure all modded blocks are scanned."
-authors = "BuildScape Team"
-
-[[dependencies.zz_buildscape_variants]]
-    modId="buildscape"
-    mandatory=true
-    versionRange="[3.0.2,)"
-    ordering="AFTER"
-    side="BOTH"
-
-[[dependencies.zz_buildscape_variants]]
-    modId="forge"
-    mandatory=true
-    versionRange="${forge_version_range}"
-    ordering="NONE"
-    side="BOTH"

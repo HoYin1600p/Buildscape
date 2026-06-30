@@ -1,8 +1,0 @@
-{
-  "type": "minecraft:stonecutting",
-  "ingredient": {
-    "item": "buildscape:amethyst_block_slab"
-  },
-  "result": "buildscape:vertical_amethyst_block_slab",
-  "count": 1
-}

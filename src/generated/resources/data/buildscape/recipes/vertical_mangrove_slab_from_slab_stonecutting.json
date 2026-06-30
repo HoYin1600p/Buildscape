@@ -1,8 +1,0 @@
-{
-  "type": "minecraft:stonecutting",
-  "ingredient": {
-    "item": "buildscape:mangrove_slab"
-  },
-  "result": "buildscape:vertical_mangrove_slab",
-  "count": 1
-}

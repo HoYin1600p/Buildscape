@@ -1,8 +1,0 @@
-{
-  "type": "minecraft:stonecutting",
-  "ingredient": {
-    "item": "minecraft:acacia_slab"
-  },
-  "result": "buildscape:vertical_acacia_slab",
-  "count": 1
-}

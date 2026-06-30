@@ -137,6 +137,8 @@ tasks.named('processResources', ProcessResources).configure {
 
 
 tasks.named('jar', Jar).configure {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
     manifest {
         attributes(["Specification-Title"     : "buildscape",
                     "Specification-Vendor"    : "kingodogo",

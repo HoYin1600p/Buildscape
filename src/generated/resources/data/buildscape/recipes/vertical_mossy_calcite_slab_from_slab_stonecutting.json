@@ -1,8 +1,0 @@
-{
-  "type": "minecraft:stonecutting",
-  "ingredient": {
-    "item": "buildscape:mossy_calcite_slab"
-  },
-  "result": "buildscape:vertical_mossy_calcite_slab",
-  "count": 1
-}

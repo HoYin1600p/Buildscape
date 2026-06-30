@@ -1,8 +1,0 @@
-{
-  "type": "minecraft:stonecutting",
-  "ingredient": {
-    "item": "buildscape:vertical_caution_mintcandy_slab"
-  },
-  "result": "buildscape:caution_mintcandy_slab",
-  "count": 1
-}

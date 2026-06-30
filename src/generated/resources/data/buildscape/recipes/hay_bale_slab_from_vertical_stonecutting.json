@@ -1,8 +1,0 @@
-{
-  "type": "minecraft:stonecutting",
-  "ingredient": {
-    "item": "buildscape:vertical_hay_bale_slab"
-  },
-  "result": "buildscape:hay_bale_slab",
-  "count": 1
-}

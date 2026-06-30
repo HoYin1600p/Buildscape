@@ -1,8 +1,0 @@
-{
-  "type": "minecraft:stonecutting",
-  "ingredient": {
-    "item": "buildscape:polished_pink_concrete_slab"
-  },
-  "result": "buildscape:vertical_polished_pink_concrete_slab",
-  "count": 1
-}

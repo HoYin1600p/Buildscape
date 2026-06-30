@@ -2,12 +2,10 @@ package com.kingodogo.buildscape.item;
 
 import com.kingodogo.buildscape.BuildScape;
 import net.minecraft.core.NonNullList;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.level.block.Block;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
@@ -36,148 +34,20 @@ public class ModCreativeModeTab {
                 }
             }
             
-            // 2. Clear target and intelligently rebuild it
             items.clear();
             Set<Item> added = new HashSet<>();
             
             for (ItemStack stack : rawList) {
                 Item item = stack.getItem();
                 if (added.contains(item)) continue;
-
-                // Skip generated verticals here — they get inserted inline after their horizontal sibling
-                if (isGeneratedVertical(item)) continue;
-                
-                // Add the current item
                 items.add(stack);
                 added.add(item);
-
-                if (item instanceof net.minecraft.world.item.BlockItem) {
-                    Block block = ((net.minecraft.world.item.BlockItem) item).getBlock();
-                    Block root = findRootBlock(block);
-
-                    if (block == root) {
-                        // Base block — insert: slab, v_slab, stair, v_stair
-                        insertFamilyVariants(items, added, root);
-                    } else {
-                        // It's a horizontal slab or stair — insert matching vertical right after it
-                        insertVerticalForShape(items, added, root, block);
-                    }
-                }
             }
-
-            // 3. Orphan verticals whose base block isn't in this tab at all — append at end
-            appendRemainingVerticals(items, added);
-        }
-
-        /**
-         * Called when we land on a BASE block.
-         * Inserts: slab -> vertical_slab -> stair -> vertical_stair -> quarter_piece
-         * Any variant not present is silently skipped.
-         */
-        private void insertFamilyVariants(NonNullList<ItemStack> items, Set<Item> added, Block base) {
-            insertOneShape(items, added, base, com.kingodogo.buildscape.variantengine.builder.BlockShape.SLAB);
-            insertOneShape(items, added, base, com.kingodogo.buildscape.variantengine.builder.BlockShape.VERTICAL_SLAB);
-            insertOneShape(items, added, base, com.kingodogo.buildscape.variantengine.builder.BlockShape.STAIRS);
-            insertOneShape(items, added, base, com.kingodogo.buildscape.variantengine.builder.BlockShape.VERTICAL_STAIRS);
-            insertOneShape(items, added, base, com.kingodogo.buildscape.variantengine.builder.BlockShape.QUARTER_PIECE);
-        }
-
-        /**
-         * Called when we land on a horizontal slab or stair that belongs to a known family.
-         * Inserts the matching vertical variant directly after it.
-         * e.g. landing on oak_slab inserts vertical_oak_slab
-         * landing on oak_stairs inserts vertical_oak_stair
-         */
-        private void insertVerticalForShape(NonNullList<ItemStack> items, Set<Item> added, Block root, Block horizontalVariant) {
-            if (root == null) return;
-            ResourceLocation hId = horizontalVariant.getRegistryName();
-            if (hId == null) return;
-            String hPath = hId.getPath();
-            // Determine which vertical shape corresponds to this horizontal block
-            com.kingodogo.buildscape.variantengine.builder.BlockShape verticalShape = null;
-            if (hPath.contains("slab")) {
-                verticalShape = com.kingodogo.buildscape.variantengine.builder.BlockShape.VERTICAL_SLAB;
-            } else if (hPath.contains("stair")) {
-                verticalShape = com.kingodogo.buildscape.variantengine.builder.BlockShape.VERTICAL_STAIRS;
-            }
-            if (verticalShape != null) {
-                insertOneShape(items, added, root, verticalShape);
-            }
-        }
-
-        /**
-         * Inserts a single shape's variant block into the item list if it exists and hasn't been added yet.
-         */
-        private void insertOneShape(NonNullList<ItemStack> items, Set<Item> added, Block root,
-                                    com.kingodogo.buildscape.variantengine.builder.BlockShape shape) {
-            Block variant = com.kingodogo.buildscape.variantengine.util.BlockBiMaps.getBlockOf(shape, root);
-            if (variant != null && variant != net.minecraft.world.level.block.Blocks.AIR) {
-                ItemStack vStack = new ItemStack(variant);
-                if (added.add(vStack.getItem())) {
-                    items.add(vStack);
-                }
-            }
-        }
-
-
-        private boolean isGeneratedVertical(Item item) {
-            ResourceLocation id = item.getRegistryName();
-            if (id == null) return false;
-            String path = id.getPath();
-            return id.getNamespace().equals(BuildScape.MODID) && (path.startsWith("v_slab_") || path.startsWith("v_stair_") || path.startsWith("q_piece_") || path.startsWith("vertical_"));
-        }
-
-        private Block findRootBlock(Block block) {
-            if (com.kingodogo.buildscape.variantengine.util.BlockBiMaps.BASE_BLOCKS.contains(block)) return block;
-            
-            // Check if it's a variant of a known base
-            for (Block base : com.kingodogo.buildscape.variantengine.util.BlockBiMaps.BASE_BLOCKS) {
-                if (isNormalVariantOf(block, base)) return base;
-            }
-            return block;
         }
 
         private boolean containsItem(List<ItemStack> list, Item item) {
             for (ItemStack s : list) if (s.getItem() == item) return true;
             return false;
-        }
-
-        private Block findVerticalVariant(Block block, com.kingodogo.buildscape.variantengine.builder.BlockShape shape) {
-            // Strategy 1: Is this block itself a BASE block?
-            if (com.kingodogo.buildscape.variantengine.util.BlockBiMaps.BASE_BLOCKS.contains(block)) {
-                return com.kingodogo.buildscape.variantengine.util.BlockBiMaps.getBlockOf(shape, block);
-            }
-            
-            // Strategy 2: Is this a slab/stair of a base block?
-            // (e.g. block is Oak Slab, we want to find Oak Vertical Slab)
-            for (Block base : com.kingodogo.buildscape.variantengine.util.BlockBiMaps.BASE_BLOCKS) {
-                if (isNormalVariantOf(block, base)) {
-                    return com.kingodogo.buildscape.variantengine.util.BlockBiMaps.getBlockOf(shape, base);
-                }
-            }
-            return null;
-        }
-
-        private boolean isNormalVariantOf(Block block, Block base) {
-             String bName = block.getRegistryName().getPath();
-             String baseName = base.getRegistryName().getPath();
-             // Simple heuristic: block contains base name and is a slab/stair
-             return bName.contains(baseName) && (bName.contains("slab") || bName.contains("stair"));
-        }
-
-        private void appendRemainingVerticals(NonNullList<ItemStack> items, Set<Item> added) {
-            for (Block base : com.kingodogo.buildscape.variantengine.util.BlockBiMaps.BASE_BLOCKS) {
-                for (com.kingodogo.buildscape.variantengine.builder.BlockShape shape : 
-                     new com.kingodogo.buildscape.variantengine.builder.BlockShape[]{
-                         com.kingodogo.buildscape.variantengine.builder.BlockShape.VERTICAL_SLAB, 
-                         com.kingodogo.buildscape.variantengine.builder.BlockShape.VERTICAL_STAIRS}) {
-                    Block v = com.kingodogo.buildscape.variantengine.util.BlockBiMaps.getBlockOf(shape, base);
-                    if (v != null && !added.contains(v.asItem())) {
-                        items.add(new ItemStack(v));
-                        added.add(v.asItem());
-                    }
-                }
-            }
         }
 
 private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {

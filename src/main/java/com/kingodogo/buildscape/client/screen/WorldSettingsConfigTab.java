@@ -11,7 +11,6 @@ import net.minecraft.network.chat.TranslatableComponent;
 public class WorldSettingsConfigTab extends AbstractConfigTab {
     private ScalableToggle creativeTreeBreakerToggle;
     private ScalableToggle fastLeafDecayToggle;
-    private ScalableMenuButton verticalStuffManagerButton;
     private int leftBoxX, leftBoxY, leftBoxWidth, leftBoxHeight;
     private int rightBoxX, rightBoxY, rightBoxWidth, rightBoxHeight;
     private int lastContentWidth = -1;
@@ -46,14 +45,6 @@ public class WorldSettingsConfigTab extends AbstractConfigTab {
         });
         fastLeafDecayToggle.active = parent.hasOpAccess();
         addTabWidget(fastLeafDecayToggle);
-
-        verticalStuffManagerButton = new ScalableMenuButton(
-                0, 0, 100, 20,
-                new TranslatableComponent("buildscape.config.others.vertical_stuff_manager"),
-                (btn) -> {
-                    parent.setActiveTab(new com.kingodogo.buildscape.client.screen.tabs.supporters.VerticalStuffManagerTab(parent));
-                });
-        addTabWidget(verticalStuffManagerButton);
 
         relayout(contentX, contentY, contentWidth, contentHeight);
 
@@ -94,10 +85,6 @@ public class WorldSettingsConfigTab extends AbstractConfigTab {
         fastLeafDecayToggle.setWidth(rightBoxWidth - padding * 2);
         fastLeafDecayToggle.setHeight(buttonHeight);
 
-        verticalStuffManagerButton.x = rightBoxX + padding;
-        verticalStuffManagerButton.y = fastLeafDecayToggle.y + buttonHeight + BuildScapeConfigScreen.scaleSize(5);
-        verticalStuffManagerButton.setWidth(rightBoxWidth - padding * 2);
-        verticalStuffManagerButton.setHeight(buttonHeight);
     }
 
     @Override

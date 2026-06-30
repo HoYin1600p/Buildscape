@@ -1,12 +1,1 @@
-{
-  "values": [
-    "buildscape:mud",
-    "buildscape:mud_slab",
-    "buildscape:mud_stairs",
-    "buildscape:mud_wall",
-    "buildscape:packed_mud",
-    "buildscape:packed_mud_slab",
-    "buildscape:packed_mud_stairs",
-    "buildscape:packed_mud_wall"
-  ]
-}
+{"values": ["buildscape:mud", "buildscape:mud_slab", "buildscape:packed_mud", "buildscape:packed_mud_slab"]}

@@ -1,8 +1,5 @@
 package com.kingodogo.buildscape.client;
 
-import com.kingodogo.buildscape.api.SupportersApiCache;
-import com.kingodogo.buildscape.api.SupportersApiClient;
-import com.kingodogo.buildscape.api.model.CosmeticData;
 import com.kingodogo.buildscape.block.LeafHedgeBlock;
 import com.kingodogo.buildscape.block.PillarBlockEntity;
 import com.kingodogo.buildscape.config.PillarParticleConfig;
@@ -226,104 +223,12 @@ public class ClientEvents {
 
         wasZoomKeyPressed = false;
 
-        // Reset SupportersTabState on logout
-        com.kingodogo.buildscape.client.screen.tabs.supporters.SupportersTabState.getInstance().setPlayerUuid(null);
-
         // IMPORTANT: Reset PillarIdManager cache when disconnecting from server
         // This ensures that when you rejoin, all pillar data is properly synced again
         com.kingodogo.buildscape.config.PillarIdManager.resetWorldCache();
 
-        // Clear particle trail and wing shape cache
-        com.kingodogo.buildscape.client.ParticleTrailHandler.clearTracking();
-        // com.kingodogo.buildscape.particle.ParticleShapeLibrary.clearCache();
-
-        // Invalidate API cache for the player
-        Minecraft mc = Minecraft.getInstance();
-        if (mc.getUser() != null) {
-            try {
-                java.util.UUID uuid = mc.getUser().getGameProfile().getId();
-                SupportersApiCache.getInstance().invalidate(uuid);
-            } catch (Exception e) {
-                // Should not happen if uuid is valid
-            }
-        }
-        SupportersApiCache.getInstance().invalidateAll(); // Safer to clear all on logout to be sure
-
         com.kingodogo.buildscape.config.PillarParticleConfig.clearServerConfig();
         com.kingodogo.buildscape.config.PillarIdManager.fullReset();
-    }
-
-    @SubscribeEvent
-    public static void onClientJoin(ClientPlayerNetworkEvent.LoggedInEvent event) {
-        // Preload API data securely
-        Minecraft mc = Minecraft.getInstance();
-        if (mc.getUser() != null) {
-            try {
-                // Use GameProfile ID which is standard UUID
-                java.util.UUID playerUuid = mc.getUser().getGameProfile().getId();
-                String accessToken = mc.getUser().getAccessToken();
-                
-                if (playerUuid != null && accessToken != null && !accessToken.isEmpty()) {
-                    String uuidString = playerUuid.toString();
-
-                    SupportersApiClient.getInstance().authenticate(uuidString, accessToken)
-                        .thenAccept(response -> {
-                            if (response != null && !response.isError()) {
-                                mc.execute(() -> {
-                                    try {
-                                        CosmeticData data = response.toCosmeticData();
-                                        SupportersApiCache.getInstance().cacheCosmetics(playerUuid, data);
-                                        
-                                        // Update tab state if it matches current player
-                                        if (mc.player != null && mc.player.getUUID().equals(playerUuid)) {
-                                            
-                                            // Combine API unlocked cosmetics with default cosmetics (particle trails)
-                                            java.util.Set<String> unlocked = new java.util.HashSet<>(data.getUnlocked() != null ? data.getUnlocked() : new java.util.ArrayList<>());
-                                            // Add default cosmetics (free for everyone)
-                                            unlocked.addAll(com.kingodogo.buildscape.cosmetics.CosmeticManager.getInstance().getDefaultCosmetics());
-                                            com.kingodogo.buildscape.client.screen.tabs.supporters.SupportersTabState.getInstance().setUnlockedCosmetics(unlocked);
-                                            com.kingodogo.buildscape.client.screen.tabs.supporters.SupportersTabState.getInstance().markApiUnlocksSet();
-
-                                            // Apply equipped items from the API response
-                                            if (data.getEquipped() != null && !data.getEquipped().isEmpty()) {
-                                                for (String id : data.getEquipped()) {
-                                                    if (id != null && !id.isEmpty() && unlocked.contains(id)) {
-                                                        com.kingodogo.buildscape.config.CosmeticsConfig.get().equipCosmetic(playerUuid, com.kingodogo.buildscape.client.screen.tabs.supporters.SupportersTabState.getInstance().getBestSlotForCosmetic(id), id);
-                                                    }
-                                                }
-                                            }
-
-                                            com.kingodogo.buildscape.client.screen.tabs.supporters.SupportersTabState.getInstance()
-                                                .setPlayerUuid(playerUuid);
-                                        }
-                                        
-                                    } catch (Exception e) {
-                                        com.kingodogo.buildscape.BuildScape.getLogger().error("Failed to process preloaded data: " + e.getMessage());
-                                    }
-                                });
-                            }
-                        })
-                        .exceptionally(t -> {
-                            com.kingodogo.buildscape.BuildScape.getLogger().error("Error preloading API data: " + t.getMessage());
-                            return null;
-                        });
-                }
-            } catch (Exception e) {
-                com.kingodogo.buildscape.BuildScape.getLogger().error("Error initiating API preload: " + e.getMessage());
-            }
-        }
-    }
-
-    @SubscribeEvent
-    public static void onEntityJoinWorld(net.minecraftforge.event.entity.EntityJoinWorldEvent event) {
-        if (event.getWorld().isClientSide && event.getEntity() == Minecraft.getInstance().player) {
-            // Local player has joined the world - initialize cosmetics
-            Minecraft mc = Minecraft.getInstance();
-            if (mc.player != null) {
-                com.kingodogo.buildscape.client.screen.tabs.supporters.SupportersTabState.getInstance()
-                        .setPlayerUuid(mc.player.getUUID());
-            }
-        }
     }
 
     @SubscribeEvent
@@ -333,10 +238,6 @@ public class ClientEvents {
         wasPressed = false;
         wasZoomKeyPressed = false;
         lastHedgeStep = -1;
-
-        // Clear particle trail and wing shape cache
-        com.kingodogo.buildscape.client.ParticleTrailHandler.clearTracking();
-        // com.kingodogo.buildscape.particle.ParticleShapeLibrary.clearCache();
 
         try {
             com.kingodogo.buildscape.client.renderer.PillarBlockEntityRenderer.clearEntityCache();

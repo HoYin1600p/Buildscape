@@ -1,0 +1,9 @@
+{
+  "parent": "buildscape:block/template_vertical_stairs_octant_0_1_1",
+  "textures": {
+    "bottom": "buildscape:block/factory_white_glass",
+    "top": "buildscape:block/factory_white_glass",
+    "side": "buildscape:block/factory_white_glass",
+    "particle": "#side"
+  }
+}

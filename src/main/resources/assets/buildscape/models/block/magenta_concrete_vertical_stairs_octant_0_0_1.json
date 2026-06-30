@@ -1,0 +1,9 @@
+{
+  "parent": "buildscape:block/template_vertical_stairs_octant_0_0_1",
+  "textures": {
+    "bottom": "minecraft:block/magenta_concrete",
+    "top": "minecraft:block/magenta_concrete",
+    "side": "minecraft:block/magenta_concrete",
+    "particle": "#side"
+  }
+}

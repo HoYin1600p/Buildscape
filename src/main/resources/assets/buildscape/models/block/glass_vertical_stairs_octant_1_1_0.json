@@ -1,0 +1,9 @@
+{
+  "parent": "buildscape:block/template_vertical_stairs_octant_1_1_0",
+  "textures": {
+    "bottom": "minecraft:block/glass",
+    "top": "minecraft:block/glass",
+    "side": "minecraft:block/glass",
+    "particle": "#side"
+  }
+}

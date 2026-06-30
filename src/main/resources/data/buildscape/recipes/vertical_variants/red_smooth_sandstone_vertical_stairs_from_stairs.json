@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "#",
+    "#"
+  ],
+  "key": {
+    "#": {
+      "item": "buildscape:red_smooth_sandstone_stairs"
+    }
+  },
+  "result": {
+    "item": "buildscape:red_smooth_sandstone_vertical_stairs",
+    "count": 2
+  }
+}

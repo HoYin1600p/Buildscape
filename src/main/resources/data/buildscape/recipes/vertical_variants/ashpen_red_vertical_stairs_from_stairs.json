@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "#",
+    "#"
+  ],
+  "key": {
+    "#": {
+      "item": "buildscape:ashpen_red_stairs"
+    }
+  },
+  "result": {
+    "item": "buildscape:ashpen_red_vertical_stairs",
+    "count": 2
+  }
+}

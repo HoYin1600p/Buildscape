@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "buildscape:steel_block_vertical_slab"
+  },
+  "result": "buildscape:steel_block_slab",
+  "count": 1
+}

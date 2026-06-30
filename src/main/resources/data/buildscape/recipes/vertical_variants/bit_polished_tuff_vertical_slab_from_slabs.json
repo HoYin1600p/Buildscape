@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "#",
+    "#"
+  ],
+  "key": {
+    "#": {
+      "item": "buildscape:bit_polished_tuff_slab"
+    }
+  },
+  "result": {
+    "item": "buildscape:bit_polished_tuff_vertical_slab",
+    "count": 2
+  }
+}

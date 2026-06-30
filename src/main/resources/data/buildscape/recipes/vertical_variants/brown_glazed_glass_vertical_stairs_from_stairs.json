@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "#",
+    "#"
+  ],
+  "key": {
+    "#": {
+      "item": "buildscape:brown_glazed_glass_stairs"
+    }
+  },
+  "result": {
+    "item": "buildscape:brown_glazed_glass_vertical_stairs",
+    "count": 2
+  }
+}

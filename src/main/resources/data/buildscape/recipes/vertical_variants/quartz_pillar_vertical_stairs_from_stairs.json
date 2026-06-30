@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "#",
+    "#"
+  ],
+  "key": {
+    "#": {
+      "item": "buildscape:quartz_pillar_stairs"
+    }
+  },
+  "result": {
+    "item": "buildscape:quartz_pillar_vertical_stairs",
+    "count": 2
+  }
+}

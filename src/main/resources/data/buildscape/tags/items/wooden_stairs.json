@@ -18,7 +18,24 @@
     "buildscape:ashpen_red_stairs",
     "buildscape:ashpen_yellow_stairs",
     "buildscape:bamboo_block_stairs",
-    "buildscape:stripped_bamboo_block_stairs"
+    "buildscape:stripped_bamboo_block_stairs",
+    "buildscape:bamboo_block_vertical_stairs",
+    "buildscape:ashpen_white_vertical_stairs",
+    "buildscape:ashpen_black_vertical_stairs",
+    "buildscape:ashpen_blue_vertical_stairs",
+    "buildscape:ashpen_brown_vertical_stairs",
+    "buildscape:ashpen_cyan_vertical_stairs",
+    "buildscape:ashpen_gray_vertical_stairs",
+    "buildscape:ashpen_green_vertical_stairs",
+    "buildscape:ashpen_light_blue_vertical_stairs",
+    "buildscape:ashpen_light_gray_vertical_stairs",
+    "buildscape:ashpen_lime_vertical_stairs",
+    "buildscape:ashpen_magenta_vertical_stairs",
+    "buildscape:ashpen_orange_vertical_stairs",
+    "buildscape:ashpen_pink_vertical_stairs",
+    "buildscape:ashpen_purple_vertical_stairs",
+    "buildscape:ashpen_red_vertical_stairs",
+    "buildscape:ashpen_yellow_vertical_stairs",
+    "buildscape:stripped_bamboo_block_vertical_stairs"
   ]
 }
-

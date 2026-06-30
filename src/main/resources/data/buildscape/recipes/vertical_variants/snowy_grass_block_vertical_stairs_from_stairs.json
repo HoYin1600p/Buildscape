@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "#",
+    "#"
+  ],
+  "key": {
+    "#": {
+      "item": "buildscape:snowy_grass_block_stairs"
+    }
+  },
+  "result": {
+    "item": "buildscape:snowy_grass_block_vertical_stairs",
+    "count": 2
+  }
+}

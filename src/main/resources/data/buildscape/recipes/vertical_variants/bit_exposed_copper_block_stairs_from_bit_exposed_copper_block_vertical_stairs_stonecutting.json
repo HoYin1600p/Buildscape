@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "buildscape:bit_exposed_copper_block_vertical_stairs"
+  },
+  "result": "buildscape:bit_exposed_copper_block_stairs",
+  "count": 1
+}

@@ -1,0 +1,9 @@
+{
+  "parent": "buildscape:block/template_vertical_stairs_octant_0_0_1",
+  "textures": {
+    "bottom": "minecraft:block/dirt",
+    "top": "buildscape:block/snowy_grass_block_top",
+    "side": "buildscape:block/snowy_grass_block_snow",
+    "particle": "#side"
+  }
+}

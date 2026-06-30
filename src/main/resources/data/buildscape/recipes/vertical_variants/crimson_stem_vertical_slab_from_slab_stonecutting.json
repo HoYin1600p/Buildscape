@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "buildscape:crimson_stem_slab"
+  },
+  "result": "buildscape:crimson_stem_vertical_slab",
+  "count": 1
+}

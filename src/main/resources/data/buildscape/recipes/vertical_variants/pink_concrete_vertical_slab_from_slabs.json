@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "#",
+    "#"
+  ],
+  "key": {
+    "#": {
+      "item": "buildscape:pink_concrete_slab"
+    }
+  },
+  "result": {
+    "item": "buildscape:pink_concrete_vertical_slab",
+    "count": 2
+  }
+}

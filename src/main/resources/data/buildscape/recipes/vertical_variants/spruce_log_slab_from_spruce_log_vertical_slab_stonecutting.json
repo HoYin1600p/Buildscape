@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "buildscape:spruce_log_vertical_slab"
+  },
+  "result": "buildscape:spruce_log_slab",
+  "count": 1
+}

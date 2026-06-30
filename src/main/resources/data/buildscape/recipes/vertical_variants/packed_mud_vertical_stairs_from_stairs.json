@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "#",
+    "#"
+  ],
+  "key": {
+    "#": {
+      "item": "buildscape:packed_mud_stairs"
+    }
+  },
+  "result": {
+    "item": "buildscape:packed_mud_vertical_stairs",
+    "count": 2
+  }
+}

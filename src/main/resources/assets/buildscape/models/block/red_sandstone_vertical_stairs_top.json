@@ -1,0 +1,9 @@
+{
+  "parent": "buildscape:block/template_vertical_stairs_top",
+  "textures": {
+    "bottom": "buildscape:block/red_sandstone_bottom",
+    "top": "buildscape:block/red_sandstone_top",
+    "side": "buildscape:block/red_sandstone",
+    "particle": "#side"
+  }
+}

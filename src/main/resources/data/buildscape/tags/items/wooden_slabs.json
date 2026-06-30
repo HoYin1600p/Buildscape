@@ -18,7 +18,24 @@
     "buildscape:ashpen_red_slab",
     "buildscape:ashpen_yellow_slab",
     "buildscape:bamboo_block_slab",
-    "buildscape:stripped_bamboo_block_slab"
+    "buildscape:stripped_bamboo_block_slab",
+    "buildscape:bamboo_block_vertical_slab",
+    "buildscape:ashpen_white_vertical_slab",
+    "buildscape:ashpen_black_vertical_slab",
+    "buildscape:ashpen_blue_vertical_slab",
+    "buildscape:ashpen_brown_vertical_slab",
+    "buildscape:ashpen_cyan_vertical_slab",
+    "buildscape:ashpen_gray_vertical_slab",
+    "buildscape:ashpen_green_vertical_slab",
+    "buildscape:ashpen_light_blue_vertical_slab",
+    "buildscape:ashpen_light_gray_vertical_slab",
+    "buildscape:ashpen_lime_vertical_slab",
+    "buildscape:ashpen_magenta_vertical_slab",
+    "buildscape:ashpen_orange_vertical_slab",
+    "buildscape:ashpen_pink_vertical_slab",
+    "buildscape:ashpen_purple_vertical_slab",
+    "buildscape:ashpen_red_vertical_slab",
+    "buildscape:ashpen_yellow_vertical_slab",
+    "buildscape:stripped_bamboo_block_vertical_slab"
   ]
 }
-

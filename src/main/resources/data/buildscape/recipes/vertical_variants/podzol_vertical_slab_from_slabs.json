@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "#",
+    "#"
+  ],
+  "key": {
+    "#": {
+      "item": "buildscape:podzol_slab"
+    }
+  },
+  "result": {
+    "item": "buildscape:podzol_vertical_slab",
+    "count": 2
+  }
+}

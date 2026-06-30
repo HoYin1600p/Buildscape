@@ -1,8 +1,0 @@
-{
-  "type": "minecraft:stonecutting",
-  "ingredient": {
-    "item": "buildscape:vertical_cyan_concrete_slab"
-  },
-  "result": "buildscape:cyan_concrete_slab",
-  "count": 1
-}

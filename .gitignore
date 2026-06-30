@@ -69,3 +69,14 @@ states.txt
 *.txt
 /backup/
 /gradle/
+
+# Local generated reports and schematics
+/.codex-artifacts/
+MISSING_RECIPES.md
+ADDED_RECIPES.md
+VERTICAL_VARIANTS_ADDED.md
+THIRD_PARTY_NOTICES.md
+*_map.md
+*.litematic
+*.schem
+*.schematic

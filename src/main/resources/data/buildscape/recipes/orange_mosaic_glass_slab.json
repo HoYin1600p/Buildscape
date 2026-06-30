@@ -1,0 +1,15 @@
+﻿{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "###"
+  ],
+  "key": {
+    "#": {
+      "item": "buildscape:orange_mosaic_glass"
+    }
+  },
+  "result": {
+    "item": "buildscape:orange_mosaic_glass_slab",
+    "count": 6
+  }
+}

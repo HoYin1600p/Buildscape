@@ -1,8 +1,0 @@
-{
-  "type": "minecraft:stonecutting",
-  "ingredient": {
-    "item": "buildscape:vertical_polished_diorite_slab"
-  },
-  "result": "minecraft:polished_diorite_slab",
-  "count": 1
-}

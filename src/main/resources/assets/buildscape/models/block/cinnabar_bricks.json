@@ -1,0 +1,6 @@
+﻿{
+    "textures":  {
+                     "all":  "buildscape:block/cinnabar_bricks"
+                 },
+    "parent":  "minecraft:block/cube_all"
+}

@@ -1,0 +1,20 @@
+﻿{
+    "key":  {
+                "S":  {
+                          "item":  "buildscape:sulfur"
+                      },
+                "G":  {
+                          "item":  "minecraft:granite"
+                      }
+            },
+    "category":  "building",
+    "pattern":  [
+                    "GS",
+                    "SG"
+                ],
+    "result":  {
+                   "count":  4,
+                   "item":  "buildscape:cinnabar"
+               },
+    "type":  "minecraft:crafting_shaped"
+}

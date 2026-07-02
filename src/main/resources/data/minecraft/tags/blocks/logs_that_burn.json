@@ -1,0 +1,11 @@
+{
+    "replace":  false,
+    "values":  [
+                   "buildscape:poplar_log",
+                   "buildscape:stripped_poplar_log",
+                   "buildscape:poplar_wood",
+                   "buildscape:stripped_poplar_wood",
+                   "buildscape:ashpen_log",
+                   "buildscape:ashpen_wood"
+               ]
+}

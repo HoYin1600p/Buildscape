@@ -67,6 +67,14 @@ public class ModConfiguredFeatures {
                     )
             );
 
+    public static final RegistryObject<ConfiguredFeature<?, ?>> POPLAR_TREE =
+            CONFIGURED_FEATURES.register("poplar", () ->
+                    new ConfiguredFeature<>(
+                            Feature.TREE,
+                            createPoplarTreeConfiguration()
+                    )
+            );
+
     public static final RegistryObject<ConfiguredFeature<?, ?>> RED_MONETS =
             CONFIGURED_FEATURES.register("red_monets", () ->
                     new ConfiguredFeature<>(
@@ -1508,5 +1516,32 @@ public class ModConfiguredFeatures {
             String variant
     ) {
         return ResourceLocation.tryParse(BuildScape.MODID + ":" + variant);
+    }
+
+    private static TreeConfiguration createPoplarTreeConfiguration() {
+        return new TreeConfiguration.TreeConfigurationBuilder(
+                BlockStateProvider.simple(
+                        ModBlocks.POPLAR_LOG.get().defaultBlockState()
+                ),
+                new net.minecraft.world.level.levelgen.feature.trunkplacers.StraightTrunkPlacer(
+                        4,
+                        2,
+                        0
+                ),
+                new net.minecraft.world.level.levelgen.feature.stateproviders.WeightedStateProvider(
+                        net.minecraft.util.random.SimpleWeightedRandomList.<net.minecraft.world.level.block.state.BlockState>builder()
+                                .add(ModBlocks.RED_POPLAR_LEAVES.get().defaultBlockState(), 1)
+                                .add(ModBlocks.ORANGE_POPLAR_LEAVES.get().defaultBlockState(), 1)
+                                .add(ModBlocks.YELLOW_POPLAR_LEAVES.get().defaultBlockState(), 1)
+                ),
+                new net.minecraft.world.level.levelgen.feature.foliageplacers.BlobFoliagePlacer(
+                        net.minecraft.util.valueproviders.ConstantInt.of(2),
+                        net.minecraft.util.valueproviders.ConstantInt.of(0),
+                        3
+                ),
+                new net.minecraft.world.level.levelgen.feature.featuresize.TwoLayersFeatureSize(1, 0, 1)
+        )
+                .ignoreVines()
+                .build();
     }
 }

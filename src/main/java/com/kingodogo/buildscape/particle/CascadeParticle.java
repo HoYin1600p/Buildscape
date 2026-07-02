@@ -47,12 +47,14 @@ public class CascadeParticle extends TextureSheetParticle {
 
         this.setSpriteFromAge(this.sprites);
 
-        this.yd -= this.gravity;
+        if (this.level.getFluidState(new net.minecraft.core.BlockPos(this.x, this.y, this.z)).is(net.minecraft.tags.FluidTags.WATER)) {
+            this.yd += 0.005F; // Float up gently underwater
+        } else {
+            this.yd -= this.gravity; // Fall down in air
+        }
 
-        // Move directly without physics checks so particles render through water
-        this.x += this.xd;
-        this.y += this.yd;
-        this.z += this.zd;
+        // Move directly and update bounding box so particles render through water and frustum cull correctly
+        this.move(this.xd, this.yd, this.zd);
 
         this.xd *= 0.95;
         this.zd *= 0.95;

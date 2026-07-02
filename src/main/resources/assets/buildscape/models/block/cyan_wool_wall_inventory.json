@@ -1,0 +1,7 @@
+{
+    "textures":  {
+                     "wall":  "minecraft:block/cyan_wool",
+                     "particle":  "minecraft:block/cyan_wool"
+                 },
+    "parent":  "minecraft:block/wall_inventory"
+}

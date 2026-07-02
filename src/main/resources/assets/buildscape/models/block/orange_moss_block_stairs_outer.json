@@ -1,0 +1,9 @@
+﻿{
+  "parent": "minecraft:block/outer_stairs",
+  "textures": {
+    "bottom": "buildscape:block/orange_moss_block",
+    "top": "buildscape:block/orange_moss_block",
+    "side": "buildscape:block/orange_moss_block",
+    "particle": "#side"
+  }
+}

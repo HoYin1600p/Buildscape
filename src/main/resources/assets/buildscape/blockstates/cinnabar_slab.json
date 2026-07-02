@@ -1,0 +1,13 @@
+﻿{
+    "variants":  {
+                     "type=bottom":  {
+                                         "model":  "buildscape:block/cinnabar_slab"
+                                     },
+                     "type=top":  {
+                                      "model":  "buildscape:block/cinnabar_slab_top"
+                                  },
+                     "type=double":  {
+                                         "model":  "buildscape:block/cinnabar"
+                                     }
+                 }
+}

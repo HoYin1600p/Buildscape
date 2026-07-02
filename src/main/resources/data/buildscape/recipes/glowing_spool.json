@@ -1,0 +1,21 @@
+﻿{
+    "key":  {
+                "D":  {
+                          "item":  "minecraft:glow_ink_sac"
+                      },
+                "S":  {
+                          "item":  "buildscape:spool"
+                      }
+            },
+    "category":  "building",
+    "pattern":  [
+                    "SSS",
+                    "SDS",
+                    "SSS"
+                ],
+    "result":  {
+                   "count":  8,
+                   "item":  "buildscape:glowing_spool"
+               },
+    "type":  "minecraft:crafting_shaped"
+}

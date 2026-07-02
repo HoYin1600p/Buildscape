@@ -1,1 +1,16 @@
-{"type":"minecraft:crafting_shaped","category":"building","key":{"P":{"item":"buildscape:trapped_decorated_pot"},"D":{"item":"minecraft:black_dye"}},"pattern":["PPP","PDP","PPP"],"result":{"count":8,"item":"buildscape:black_trapped_decorated_pot"}}
+﻿{
+    "ingredients":  [
+                        {
+                            "item":  "buildscape:trapped_decorated_pot"
+                        },
+                        {
+                            "item":  "minecraft:black_dye"
+                        }
+                    ],
+    "category":  "building",
+    "result":  {
+                   "count":  1,
+                   "item":  "buildscape:black_trapped_decorated_pot"
+               },
+    "type":  "minecraft:crafting_shapeless"
+}

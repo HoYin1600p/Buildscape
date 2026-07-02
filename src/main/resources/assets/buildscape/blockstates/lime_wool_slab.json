@@ -1,0 +1,13 @@
+{
+    "variants":  {
+                     "type=bottom":  {
+                                         "model":  "buildscape:block/lime_wool_slab"
+                                     },
+                     "type=top":  {
+                                      "model":  "buildscape:block/lime_wool_slab_top"
+                                  },
+                     "type=double":  {
+                                         "model":  "minecraft:block/lime_wool"
+                                     }
+                 }
+}

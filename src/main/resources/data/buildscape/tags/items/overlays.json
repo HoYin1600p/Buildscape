@@ -1,6 +1,9 @@
 {
   "values": [
     "buildscape:moss_overlay",
+    "buildscape:red_moss_overlay",
+    "buildscape:orange_moss_overlay",
+    "buildscape:yellow_moss_overlay",
     "buildscape:snow_overlay"
   ]
 }

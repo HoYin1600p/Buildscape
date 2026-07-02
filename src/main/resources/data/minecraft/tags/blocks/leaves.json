@@ -1,0 +1,19 @@
+{
+  "replace": false,
+  "values": [
+    "buildscape:orange_poplar_leaves",
+    "buildscape:red_poplar_leaves",
+    "buildscape:yellow_poplar_leaves",
+    "buildscape:mangrove_leaves",
+    "buildscape:snowy_leaves",
+    "buildscape:snowy_oak_leaves",
+    "buildscape:snowy_spruce_leaves",
+    "buildscape:snowy_birch_leaves",
+    "buildscape:snowy_jungle_leaves",
+    "buildscape:snowy_acacia_leaves",
+    "buildscape:snowy_dark_oak_leaves",
+    "buildscape:snowy_mangrove_leaves",
+    "buildscape:snowy_azalea_leaves",
+    "buildscape:snowy_flowering_azalea_leaves"
+  ]
+}

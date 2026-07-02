@@ -1,0 +1,13 @@
+﻿{
+    "ingredients":  [
+                        {
+                            "item":  "buildscape:poplar_planks"
+                        }
+                    ],
+    "category":  "redstone",
+    "result":  {
+                   "count":  1,
+                   "item":  "buildscape:poplar_button"
+               },
+    "type":  "minecraft:crafting_shapeless"
+}

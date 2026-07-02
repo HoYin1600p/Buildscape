@@ -1,7 +1,9 @@
 {
-  "values": [
-    "buildscape:bit_polished_tuff_wall",
-    "buildscape:bit_tuff_bricks_wall"
-  ]
+    "values": [
+        "buildscape:bit_polished_tuff_wall",
+        "buildscape:bit_tuff_bricks_wall",
+        "buildscape:polished_tuff_wall",
+        "buildscape:tuff_brick_wall",
+        "buildscape:tuff_wall"
+    ]
 }
-

@@ -1,0 +1,10 @@
+﻿{
+    "variants":  {
+                     "powered=true":  {
+                                          "model":  "buildscape:block/poplar_pressure_plate_down"
+                                      },
+                     "powered=false":  {
+                                           "model":  "buildscape:block/poplar_pressure_plate"
+                                       }
+                 }
+}

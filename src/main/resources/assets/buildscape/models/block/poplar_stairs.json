@@ -1,0 +1,8 @@
+﻿{
+    "textures":  {
+                     "bottom":  "buildscape:block/poplar_planks",
+                     "top":  "buildscape:block/poplar_planks",
+                     "side":  "buildscape:block/poplar_planks"
+                 },
+    "parent":  "minecraft:block/stairs"
+}

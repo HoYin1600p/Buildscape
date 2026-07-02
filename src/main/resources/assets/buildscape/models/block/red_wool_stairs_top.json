@@ -1,0 +1,8 @@
+{
+    "textures":  {
+                     "bottom":  "minecraft:block/red_wool",
+                     "top":  "minecraft:block/red_wool",
+                     "side":  "minecraft:block/red_wool"
+                 },
+    "parent":  "minecraft:block/stairs_top"
+}

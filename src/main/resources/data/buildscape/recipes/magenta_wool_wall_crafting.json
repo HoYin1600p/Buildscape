@@ -1,0 +1,18 @@
+{
+    "key":  {
+                "B":  {
+                          "item":  "minecraft:magenta_wool"
+                      }
+            },
+    "category":  "building",
+    "pattern":  [
+                    "   ",
+                    "BBB",
+                    "BBB"
+                ],
+    "result":  {
+                   "count":  6,
+                   "item":  "buildscape:magenta_wool_wall"
+               },
+    "type":  "minecraft:crafting_shaped"
+}

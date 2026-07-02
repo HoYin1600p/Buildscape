@@ -726,7 +726,7 @@ public class BuildScape {
                                 net.minecraft.world.item.Items.EMERALD,
                                 1),
                         new net.minecraft.world.item.ItemStack(ModItems.RED_MONETS.get(), 1),
-                        2,
+                        6,
                         1,
                         0.05f));
 
@@ -737,7 +737,7 @@ public class BuildScape {
                                 net.minecraft.world.item.Items.EMERALD,
                                 1),
                         new net.minecraft.world.item.ItemStack(ModItems.BLUE_MONETS.get(), 1),
-                        2,
+                        6,
                         1,
                         0.05f));
 
@@ -750,7 +750,7 @@ public class BuildScape {
                         new net.minecraft.world.item.ItemStack(
                                 ModItems.PURPLE_MONETS.get(),
                                 1),
-                        2,
+                        6,
                         1,
                         0.05f));
 
@@ -763,7 +763,7 @@ public class BuildScape {
                         new net.minecraft.world.item.ItemStack(
                                 ModItems.LIGHT_BLUE_MONETS.get(),
                                 1),
-                        2,
+                        6,
                         1,
                         0.05f));
 
@@ -774,7 +774,7 @@ public class BuildScape {
                                 net.minecraft.world.item.Items.EMERALD,
                                 1),
                         new net.minecraft.world.item.ItemStack(ModItems.PINK_MONETS.get(), 1),
-                        2,
+                        6,
                         1,
                         0.05f));
 
@@ -787,7 +787,7 @@ public class BuildScape {
                         new net.minecraft.world.item.ItemStack(
                                 ModItems.YELLOW_MONETS.get(),
                                 1),
-                        2,
+                        6,
                         1,
                         0.05f));
 
@@ -798,7 +798,7 @@ public class BuildScape {
                                 net.minecraft.world.item.Items.EMERALD,
                                 1),
                         new net.minecraft.world.item.ItemStack(ModItems.CLOVER.get(), 4),
-                        2,
+                        6,
                         1,
                         0.05f));
 
@@ -811,7 +811,7 @@ public class BuildScape {
                         new net.minecraft.world.item.ItemStack(
                                 ModItems.RED_ROSE_VINES.get(),
                                 1),
-                        2,
+                        6,
                         1,
                         0.05f));
 
@@ -824,7 +824,7 @@ public class BuildScape {
                         new net.minecraft.world.item.ItemStack(
                                 ModItems.BLACK_ROSE_VINES.get(),
                                 1),
-                        2,
+                        6,
                         1,
                         0.05f));
 
@@ -837,7 +837,7 @@ public class BuildScape {
                         new net.minecraft.world.item.ItemStack(
                                 ModItems.BLUE_ROSE_VINES.get(),
                                 1),
-                        2,
+                        6,
                         1,
                         0.05f));
 
@@ -850,7 +850,7 @@ public class BuildScape {
                         new net.minecraft.world.item.ItemStack(
                                 ModItems.WHITE_ROSE_VINES.get(),
                                 1),
-                        2,
+                        6,
                         1,
                         0.05f));
 
@@ -875,7 +875,7 @@ public class BuildScape {
                         new net.minecraft.world.item.ItemStack(
                                 ModItems.RED_SPORE_BLOSSOM.get(),
                                 1),
-                        2,
+                        6,
                         1,
                         0.05f));
 
@@ -888,7 +888,7 @@ public class BuildScape {
                         new net.minecraft.world.item.ItemStack(
                                 ModItems.CYAN_SPORE_BLOSSOM.get(),
                                 1),
-                        2,
+                        6,
                         1,
                         0.05f));
 
@@ -901,7 +901,7 @@ public class BuildScape {
                         new net.minecraft.world.item.ItemStack(
                                 ModItems.BLUE_SPORE_BLOSSOM.get(),
                                 1),
-                        2,
+                        6,
                         1,
                         0.05f));
 
@@ -914,7 +914,7 @@ public class BuildScape {
                         new net.minecraft.world.item.ItemStack(
                                 ModItems.PURPLE_SPORE_BLOSSOM.get(),
                                 1),
-                        2,
+                        6,
                         1,
                         0.05f));
 
@@ -927,7 +927,7 @@ public class BuildScape {
                         new net.minecraft.world.item.ItemStack(
                                 ModItems.ORANGE_SPORE_BLOSSOM.get(),
                                 1),
-                        2,
+                        6,
                         1,
                         0.05f));
 
@@ -938,7 +938,51 @@ public class BuildScape {
                                 net.minecraft.world.item.Items.EMERALD,
                                 1),
                         new net.minecraft.world.item.ItemStack(ModItems.ICICLE.get(), 2),
-                        2,
+                        6,
+                        1,
+                        0.05f));
+
+        event
+                .getGenericTrades()
+                .add((trader, rand) -> new net.minecraft.world.item.trading.MerchantOffer(
+                        new net.minecraft.world.item.ItemStack(
+                                net.minecraft.world.item.Items.EMERALD,
+                                1),
+                        new net.minecraft.world.item.ItemStack(ModItems.SULFUR_SPIKE.get(), 2),
+                        6,
+                        1,
+                        0.05f));
+
+        event
+                .getGenericTrades()
+                .add((trader, rand) -> new net.minecraft.world.item.trading.MerchantOffer(
+                        new net.minecraft.world.item.ItemStack(
+                                net.minecraft.world.item.Items.EMERALD,
+                                1),
+                        new net.minecraft.world.item.ItemStack(ModItems.SULFUR.get(), 1),
+                        8,
+                        1,
+                        0.05f));
+
+        event
+                .getGenericTrades()
+                .add((trader, rand) -> new net.minecraft.world.item.trading.MerchantOffer(
+                        new net.minecraft.world.item.ItemStack(
+                                net.minecraft.world.item.Items.EMERALD,
+                                1),
+                        new net.minecraft.world.item.ItemStack(ModItems.CINNABAR.get(), 1),
+                        8,
+                        1,
+                        0.05f));
+
+        event
+                .getGenericTrades()
+                .add((trader, rand) -> new net.minecraft.world.item.trading.MerchantOffer(
+                        new net.minecraft.world.item.ItemStack(
+                                net.minecraft.world.item.Items.EMERALD,
+                                1),
+                        new net.minecraft.world.item.ItemStack(ModItems.POPLAR_SAPLING.get(), 2),
+                        8,
                         1,
                         0.05f));
 
@@ -1106,6 +1150,78 @@ public class BuildScape {
             level.setBlock(
                     pos,
                     ModBlocks.STRIPPED_MANGROVE_WOOD.get()
+                            .defaultBlockState()
+                            .setValue(
+                                    net.minecraft.world.level.block.RotatedPillarBlock.AXIS,
+                                    axis),
+                    11);
+
+            level.playSound(
+                    null,
+                    pos,
+                    net.minecraft.sounds.SoundEvents.AXE_STRIP,
+                    net.minecraft.sounds.SoundSource.BLOCKS,
+                    1.0f,
+                    1.0f);
+
+            if (!player.getAbilities().instabuild) {
+                heldItem.hurtAndBreak(1, player, p -> p.broadcastBreakEvent(event.getHand()));
+            }
+
+            event.setCanceled(true);
+            event.setCancellationResult(
+                    net.minecraft.world.InteractionResult.SUCCESS);
+            return;
+        }
+
+        if (state.getBlock() == ModBlocks.POPLAR_LOG.get()
+                && heldItem.getItem() instanceof net.minecraft.world.item.AxeItem) {
+            net.minecraft.core.BlockPos pos = event.getPos();
+            net.minecraft.world.level.Level level = event.getWorld();
+            net.minecraft.world.entity.player.Player player = event.getPlayer();
+
+            net.minecraft.core.Direction.Axis axis = state.getValue(
+                    net.minecraft.world.level.block.RotatedPillarBlock.AXIS);
+
+            level.setBlock(
+                    pos,
+                    ModBlocks.STRIPPED_POPLAR_LOG.get()
+                            .defaultBlockState()
+                            .setValue(
+                                    net.minecraft.world.level.block.RotatedPillarBlock.AXIS,
+                                    axis),
+                    11);
+
+            level.playSound(
+                    null,
+                    pos,
+                    net.minecraft.sounds.SoundEvents.AXE_STRIP,
+                    net.minecraft.sounds.SoundSource.BLOCKS,
+                    1.0f,
+                    1.0f);
+
+            if (!player.getAbilities().instabuild) {
+                heldItem.hurtAndBreak(1, player, p -> p.broadcastBreakEvent(event.getHand()));
+            }
+
+            event.setCanceled(true);
+            event.setCancellationResult(
+                    net.minecraft.world.InteractionResult.SUCCESS);
+            return;
+        }
+
+        if (state.getBlock() == ModBlocks.POPLAR_WOOD.get()
+                && heldItem.getItem() instanceof net.minecraft.world.item.AxeItem) {
+            net.minecraft.core.BlockPos pos = event.getPos();
+            net.minecraft.world.level.Level level = event.getWorld();
+            net.minecraft.world.entity.player.Player player = event.getPlayer();
+
+            net.minecraft.core.Direction.Axis axis = state.getValue(
+                    net.minecraft.world.level.block.RotatedPillarBlock.AXIS);
+
+            level.setBlock(
+                    pos,
+                    ModBlocks.STRIPPED_POPLAR_WOOD.get()
                             .defaultBlockState()
                             .setValue(
                                     net.minecraft.world.level.block.RotatedPillarBlock.AXIS,
@@ -2394,6 +2510,10 @@ public class BuildScape {
                         com.kingodogo.buildscape.client.renderer.MangroveBoatRenderer::new);
 
                 net.minecraft.client.renderer.entity.EntityRenderers.register(
+                        com.kingodogo.buildscape.entity.ModEntities.POPLAR_BOAT.get(),
+                        com.kingodogo.buildscape.client.renderer.PoplarBoatRenderer::new);
+
+                net.minecraft.client.renderer.entity.EntityRenderers.register(
                         com.kingodogo.buildscape.entity.ModEntities.COLORED_ITEM_FRAME.get(),
                         com.kingodogo.buildscape.client.renderer.ColoredItemFrameRenderer::new);
 
@@ -2417,6 +2537,10 @@ public class BuildScape {
 
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.ICICLE.get(),
+                        net.minecraft.client.renderer.RenderType.cutout());
+
+                net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
+                        ModBlocks.SULFUR_SPIKE.get(),
                         net.minecraft.client.renderer.RenderType.cutout());
 
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
@@ -2626,6 +2750,25 @@ public class BuildScape {
                         net.minecraft.client.renderer.RenderType.cutout());
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.MANGROVE_LEAVES.get(),
+                        net.minecraft.client.renderer.RenderType.cutoutMipped());
+
+                net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
+                        ModBlocks.POPLAR_DOOR.get(),
+                        net.minecraft.client.renderer.RenderType.cutout());
+                net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
+                        ModBlocks.POPLAR_TRAPDOOR.get(),
+                        net.minecraft.client.renderer.RenderType.cutout());
+                net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
+                        ModBlocks.POPLAR_SAPLING.get(),
+                        net.minecraft.client.renderer.RenderType.cutout());
+                net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
+                        ModBlocks.ORANGE_POPLAR_LEAVES.get(),
+                        net.minecraft.client.renderer.RenderType.cutoutMipped());
+                net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
+                        ModBlocks.RED_POPLAR_LEAVES.get(),
+                        net.minecraft.client.renderer.RenderType.cutoutMipped());
+                net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
+                        ModBlocks.YELLOW_POPLAR_LEAVES.get(),
                         net.minecraft.client.renderer.RenderType.cutoutMipped());
 
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
@@ -3481,8 +3624,14 @@ public class BuildScape {
                                     )
                     );
 
-
+            net.minecraft.client.Minecraft.getInstance()
+                    .particleEngine.register(
+                            com.kingodogo.buildscape.particle.ModParticles.NOXIOUS_GAS.get(),
+                            sprites ->
+                                    new com.kingodogo.buildscape.particle.NoxiousGasParticle.Provider(
+                                            sprites
+                                    )
+                    );
         }
     }
-
 }

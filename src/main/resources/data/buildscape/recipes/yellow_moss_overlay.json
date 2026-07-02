@@ -1,0 +1,15 @@
+﻿{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "##"
+  ],
+  "key": {
+    "#": {
+      "item": "buildscape:yellow_moss_carpet"
+    }
+  },
+  "result": {
+    "item": "buildscape:yellow_moss_overlay",
+    "count": 2
+  }
+}

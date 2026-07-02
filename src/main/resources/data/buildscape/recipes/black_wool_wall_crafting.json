@@ -1,0 +1,18 @@
+{
+    "key":  {
+                "B":  {
+                          "item":  "minecraft:black_wool"
+                      }
+            },
+    "category":  "building",
+    "pattern":  [
+                    "   ",
+                    "BBB",
+                    "BBB"
+                ],
+    "result":  {
+                   "count":  6,
+                   "item":  "buildscape:black_wool_wall"
+               },
+    "type":  "minecraft:crafting_shaped"
+}

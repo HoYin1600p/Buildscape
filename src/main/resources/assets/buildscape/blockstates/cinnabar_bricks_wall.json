@@ -1,0 +1,17 @@
+﻿{
+    "variants":  {
+                     "east=low,north=low,south=low,up=true,west=low":  {
+                                                                           "model":  "buildscape:block/cinnabar_bricks_wall_side"
+                                                                       },
+                     "east=low,north=none,south=none,up=true,west=low":  {
+                                                                             "model":  "buildscape:block/cinnabar_bricks_wall_side",
+                                                                             "y":  90
+                                                                         },
+                     "east=none,north=none,south=none,up=true,west=none":  {
+                                                                               "model":  "buildscape:block/cinnabar_bricks_wall_post"
+                                                                           },
+                     "east=none,north=low,south=low,up=true,west=none":  {
+                                                                             "model":  "buildscape:block/cinnabar_bricks_wall_side"
+                                                                         }
+                 }
+}

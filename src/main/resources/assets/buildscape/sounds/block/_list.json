@@ -1,7 +1,14 @@
 {
   "directories": [
     "copper_bulb",
-    "copper_grate"
+    "copper_grate",
+    "decorated_pot",
+    "flower_bed",
+    "mangrove_roots",
+    "mud",
+    "mud_bricks",
+    "muddy_mangrove_roots",
+    "packed_mud"
   ],
   "files": []
 }

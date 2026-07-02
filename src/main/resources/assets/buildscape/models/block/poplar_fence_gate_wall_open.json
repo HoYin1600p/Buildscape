@@ -1,0 +1,6 @@
+﻿{
+    "textures":  {
+                     "texture":  "buildscape:block/poplar_planks"
+                 },
+    "parent":  "minecraft:block/template_fence_gate_wall_open"
+}

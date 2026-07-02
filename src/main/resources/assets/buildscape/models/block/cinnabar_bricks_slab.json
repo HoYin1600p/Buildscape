@@ -1,0 +1,8 @@
+﻿{
+    "textures":  {
+                     "bottom":  "buildscape:block/cinnabar_bricks",
+                     "top":  "buildscape:block/cinnabar_bricks",
+                     "side":  "buildscape:block/cinnabar_bricks"
+                 },
+    "parent":  "minecraft:block/slab"
+}

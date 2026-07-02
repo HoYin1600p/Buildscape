@@ -1,0 +1,6 @@
+﻿{
+    "textures":  {
+                     "layer0":  "buildscape:block/poplar_sapling"
+                 },
+    "parent":  "minecraft:item/generated"
+}

@@ -1,0 +1,13 @@
+﻿{
+    "ingredients":  [
+                        {
+                            "item":  "buildscape:poplar_wood"
+                        }
+                    ],
+    "category":  "building",
+    "result":  {
+                   "count":  4,
+                   "item":  "buildscape:poplar_planks"
+               },
+    "type":  "minecraft:crafting_shapeless"
+}

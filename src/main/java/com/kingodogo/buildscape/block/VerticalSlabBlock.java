@@ -6,6 +6,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.AbstractGlassBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SlabBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
@@ -44,6 +45,10 @@ public class VerticalSlabBlock extends SlabBlock {
         return this.baseBlock;
     }
 
+    private boolean isGlassLike() {
+        return this.baseBlock instanceof AbstractGlassBlock;
+    }
+
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         super.createBlockStateDefinition(builder);
@@ -69,7 +74,9 @@ public class VerticalSlabBlock extends SlabBlock {
         BlockPos pos = context.getClickedPos();
         BlockState state = context.getLevel().getBlockState(pos);
         if (state.is(this)) {
-            return state.setValue(TYPE, SlabType.DOUBLE).setValue(WATERLOGGED, Boolean.FALSE);
+            return this.canMergeWithExisting(state, context)
+                    ? state.setValue(TYPE, SlabType.DOUBLE).setValue(WATERLOGGED, Boolean.FALSE)
+                    : null;
         }
 
         FluidState fluid = context.getLevel().getFluidState(pos);
@@ -105,13 +112,17 @@ public class VerticalSlabBlock extends SlabBlock {
 
     @Override
     public boolean canBeReplaced(BlockState state, BlockPlaceContext context) {
+        return this.canMergeWithExisting(state, context);
+    }
+
+    private boolean canMergeWithExisting(BlockState state, BlockPlaceContext context) {
         ItemStack stack = context.getItemInHand();
         SlabType type = state.getValue(TYPE);
         if (type == SlabType.DOUBLE || !stack.is(this.asItem())) {
             return false;
         }
         if (!context.replacingClickedOnBlock()) {
-            return context.getClickedFace().getAxis() != state.getValue(AXIS);
+            return false;
         }
 
         Direction face = context.getClickedFace();
@@ -125,6 +136,21 @@ public class VerticalSlabBlock extends SlabBlock {
         return face.getAxisDirection() == Direction.AxisDirection.POSITIVE
                 ? type == SlabType.BOTTOM
                 : type == SlabType.TOP;
+    }
+
+    @Override
+    public boolean propagatesSkylightDown(BlockState state, BlockGetter level, BlockPos pos) {
+        return this.isGlassLike() || super.propagatesSkylightDown(state, level, pos);
+    }
+
+    @Override
+    public boolean useShapeForLightOcclusion(BlockState state) {
+        return !this.isGlassLike() && super.useShapeForLightOcclusion(state);
+    }
+
+    @Override
+    public boolean skipRendering(BlockState state, BlockState adjacentBlockState, Direction side) {
+        return (this.isGlassLike() && adjacentBlockState.is(this)) || super.skipRendering(state, adjacentBlockState, side);
     }
 
     @Override

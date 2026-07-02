@@ -1,6 +1,6 @@
 {
   "credit": "Made with Blockbench",
-  "render_type": "translucent",
+  "render_type": "minecraft:translucent",
   "textures": {
     "0": "buildscape:block/glass_ornament_top",
     "1": "buildscape:block/ornament_string",

@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "buildscape:poplar_wood_slab"
+  },
+  "result": "buildscape:poplar_wood_vertical_slab",
+  "count": 1
+}

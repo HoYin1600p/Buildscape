@@ -4,5 +4,5 @@
                      "top":  "minecraft:block/orange_wool",
                      "side":  "minecraft:block/orange_wool"
                  },
-    "parent":  "minecraft:block/inner_stairs_top"
+    "parent":  "minecraft:block/inner_stairs"
 }

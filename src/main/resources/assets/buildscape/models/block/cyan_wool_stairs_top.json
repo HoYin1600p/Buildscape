@@ -4,5 +4,5 @@
                      "top":  "minecraft:block/cyan_wool",
                      "side":  "minecraft:block/cyan_wool"
                  },
-    "parent":  "minecraft:block/stairs_top"
+    "parent":  "minecraft:block/stairs"
 }

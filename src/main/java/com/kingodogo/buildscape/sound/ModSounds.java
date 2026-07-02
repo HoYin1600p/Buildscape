@@ -493,8 +493,9 @@ public class ModSounds {
     }
 
     private static RegistryObject<SoundEvent> registerSoundEvent(String name) {
-        return SOUND_EVENTS.register(name.replace('.', '_'), () ->
-                new SoundEvent(new ResourceLocation(BuildScape.MODID, name))
+        String eventName = name.replace('.', '_');
+        return SOUND_EVENTS.register(eventName, () ->
+                new SoundEvent(new ResourceLocation(BuildScape.MODID, eventName))
         );
     }
 

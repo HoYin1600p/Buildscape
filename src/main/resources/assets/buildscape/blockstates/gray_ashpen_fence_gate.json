@@ -10,7 +10,7 @@
       "model": "buildscape:block/gray_ashpen_fence_gate_open"
     },
     "facing=north,open=true,in_wall=true": {
-      "model": "buildscape:block/gray_ashpen_fence_gate_open_wall"
+      "model": "buildscape:block/gray_ashpen_fence_gate_wall_open"
     },
     "facing=south,open=false,in_wall=false": {
       "model": "buildscape:block/gray_ashpen_fence_gate"
@@ -22,7 +22,7 @@
       "model": "buildscape:block/gray_ashpen_fence_gate_open"
     },
     "facing=south,open=true,in_wall=true": {
-      "model": "buildscape:block/gray_ashpen_fence_gate_open_wall"
+      "model": "buildscape:block/gray_ashpen_fence_gate_wall_open"
     },
     "facing=east,open=false,in_wall=false": {
       "model": "buildscape:block/gray_ashpen_fence_gate"
@@ -34,7 +34,7 @@
       "model": "buildscape:block/gray_ashpen_fence_gate_open"
     },
     "facing=east,open=true,in_wall=true": {
-      "model": "buildscape:block/gray_ashpen_fence_gate_open_wall"
+      "model": "buildscape:block/gray_ashpen_fence_gate_wall_open"
     },
     "facing=west,open=false,in_wall=false": {
       "model": "buildscape:block/gray_ashpen_fence_gate"
@@ -46,7 +46,7 @@
       "model": "buildscape:block/gray_ashpen_fence_gate_open"
     },
     "facing=west,open=true,in_wall=true": {
-      "model": "buildscape:block/gray_ashpen_fence_gate_open_wall"
+      "model": "buildscape:block/gray_ashpen_fence_gate_wall_open"
     }
   }
 }

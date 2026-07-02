@@ -4,5 +4,6 @@
     "bottom": "buildscape:block/green_mosaic_glass",
     "top": "buildscape:block/green_mosaic_glass",
     "side": "buildscape:block/green_mosaic_glass"
-  }
+  },
+  "render_type": "translucent"
 }

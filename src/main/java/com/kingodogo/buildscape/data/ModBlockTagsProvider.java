@@ -13,7 +13,6 @@ import org.jetbrains.annotations.Nullable;
 public class ModBlockTagsProvider extends BlockTagsProvider {
 
     public static final TagKey<Block> VERTICAL_SLABS = BlockTags.create(new ResourceLocation(BuildScape.MODID, "vertical_slabs"));
-    public static final TagKey<Block> VERTICAL_STAIRS = BlockTags.create(new ResourceLocation(BuildScape.MODID, "vertical_stairs"));
 
     public ModBlockTagsProvider(DataGenerator generator, @Nullable ExistingFileHelper existingFileHelper) {
         super(generator, BuildScape.MODID, existingFileHelper);

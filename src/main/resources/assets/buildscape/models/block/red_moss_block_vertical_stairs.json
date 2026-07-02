@@ -1,9 +1,0 @@
-{
-  "parent": "buildscape:block/template_vertical_stairs",
-  "textures": {
-    "bottom": "buildscape:block/red_moss_block",
-    "top": "buildscape:block/red_moss_block",
-    "side": "buildscape:block/red_moss_block",
-    "particle": "buildscape:block/red_moss_block"
-  }
-}

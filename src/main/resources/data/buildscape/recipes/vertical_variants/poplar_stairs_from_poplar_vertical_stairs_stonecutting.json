@@ -1,8 +1,0 @@
-{
-  "type": "minecraft:stonecutting",
-  "ingredient": {
-    "item": "buildscape:poplar_vertical_stairs"
-  },
-  "result": "buildscape:poplar_stairs",
-  "count": 1
-}

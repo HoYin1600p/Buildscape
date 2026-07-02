@@ -344,5 +344,6 @@
         0.4
       ]
     }
-  }
+  },
+  "render_type": "translucent"
 }

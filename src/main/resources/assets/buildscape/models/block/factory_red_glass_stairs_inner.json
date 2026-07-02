@@ -4,5 +4,6 @@
     "bottom": "buildscape:block/factory_red_glass",
     "top": "buildscape:block/factory_red_glass",
     "side": "buildscape:block/factory_red_glass"
-  }
+  },
+  "render_type": "translucent"
 }

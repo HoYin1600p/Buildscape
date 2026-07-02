@@ -4,5 +4,6 @@
     "bottom": "buildscape:block/blue_glazed_glass",
     "top": "buildscape:block/blue_glazed_glass",
     "side": "buildscape:block/blue_glazed_glass"
-  }
+  },
+  "render_type": "translucent"
 }

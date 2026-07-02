@@ -8372,6 +8372,9 @@ public class ModItems {
     // Cinnabar Set Items
     public static final RegistryObject<Item> CINNABAR = ITEMS.register("cinnabar", () -> new BlockItem(ModBlocks.CINNABAR.get(), createBlockItemProperties()));
     public static final RegistryObject<Item> POLISHED_CINNABAR = ITEMS.register("polished_cinnabar", () -> new BlockItem(ModBlocks.POLISHED_CINNABAR.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> CINNABAR_SLAB = ITEMS.register("cinnabar_slab", () -> new BlockItem(ModBlocks.CINNABAR_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> CINNABAR_STAIRS = ITEMS.register("cinnabar_stairs", () -> new BlockItem(ModBlocks.CINNABAR_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> CINNABAR_WALL = ITEMS.register("cinnabar_wall", () -> new BlockItem(ModBlocks.CINNABAR_WALL.get(), createBlockItemProperties()));
     public static final RegistryObject<Item> POLISHED_CINNABAR_SLAB = ITEMS.register("polished_cinnabar_slab", () -> new BlockItem(ModBlocks.POLISHED_CINNABAR_SLAB.get(), createBlockItemProperties()));
     public static final RegistryObject<Item> POLISHED_CINNABAR_STAIRS = ITEMS.register("polished_cinnabar_stairs", () -> new BlockItem(ModBlocks.POLISHED_CINNABAR_STAIRS.get(), createBlockItemProperties()));
     public static final RegistryObject<Item> POLISHED_CINNABAR_WALL = ITEMS.register("polished_cinnabar_wall", () -> new BlockItem(ModBlocks.POLISHED_CINNABAR_WALL.get(), createBlockItemProperties()));
@@ -8384,6 +8387,9 @@ public class ModItems {
     // Sulfur Set Items
     public static final RegistryObject<Item> SULFUR = ITEMS.register("sulfur", () -> new BlockItem(ModBlocks.SULFUR.get(), createBlockItemProperties()));
     public static final RegistryObject<Item> POLISHED_SULFUR = ITEMS.register("polished_sulfur", () -> new BlockItem(ModBlocks.POLISHED_SULFUR.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> SULFUR_SLAB = ITEMS.register("sulfur_slab", () -> new BlockItem(ModBlocks.SULFUR_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> SULFUR_STAIRS = ITEMS.register("sulfur_stairs", () -> new BlockItem(ModBlocks.SULFUR_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> SULFUR_WALL = ITEMS.register("sulfur_wall", () -> new BlockItem(ModBlocks.SULFUR_WALL.get(), createBlockItemProperties()));
     public static final RegistryObject<Item> POLISHED_SULFUR_SLAB = ITEMS.register("polished_sulfur_slab", () -> new BlockItem(ModBlocks.POLISHED_SULFUR_SLAB.get(), createBlockItemProperties()));
     public static final RegistryObject<Item> POLISHED_SULFUR_STAIRS = ITEMS.register("polished_sulfur_stairs", () -> new BlockItem(ModBlocks.POLISHED_SULFUR_STAIRS.get(), createBlockItemProperties()));
     public static final RegistryObject<Item> POLISHED_SULFUR_WALL = ITEMS.register("polished_sulfur_wall", () -> new BlockItem(ModBlocks.POLISHED_SULFUR_WALL.get(), createBlockItemProperties()));

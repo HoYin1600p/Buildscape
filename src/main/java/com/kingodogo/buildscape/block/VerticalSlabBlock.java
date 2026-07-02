@@ -111,13 +111,13 @@ public class VerticalSlabBlock extends SlabBlock {
             return false;
         }
         if (!context.replacingClickedOnBlock()) {
-            return true;
+            return context.getClickedFace().getAxis() != state.getValue(AXIS);
         }
 
         Direction face = context.getClickedFace();
         Direction.Axis axis = state.getValue(AXIS);
         if (face.getAxis().isVertical()) {
-            return true;
+            return false;
         }
         if (face.getAxis() != axis) {
             return false;

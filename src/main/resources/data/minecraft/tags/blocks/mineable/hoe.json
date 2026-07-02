@@ -24,9 +24,6 @@
     "buildscape:yellow_moss_overlay",
     "buildscape:red_moss_block_vertical_slab",
     "buildscape:orange_moss_block_vertical_slab",
-    "buildscape:yellow_moss_block_vertical_slab",
-    "buildscape:red_moss_block_vertical_stairs",
-    "buildscape:orange_moss_block_vertical_stairs",
-    "buildscape:yellow_moss_block_vertical_stairs"
+    "buildscape:yellow_moss_block_vertical_slab"
   ]
 }

@@ -1,8 +1,0 @@
-{
-  "type": "minecraft:stonecutting",
-  "ingredient": {
-    "item": "buildscape:yellow_moss_block_stairs"
-  },
-  "result": "buildscape:yellow_moss_block_vertical_stairs",
-  "count": 1
-}

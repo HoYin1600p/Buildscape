@@ -1,5 +1,5 @@
 {
-  "block.copper_grate.break": {
+  "block_copper_grate_break": {
     "sounds": [
       "buildscape:block/copper_grate/break1",
       "buildscape:block/copper_grate/break2",
@@ -7,7 +7,7 @@
       "buildscape:block/copper_grate/break4"
     ]
   },
-  "block.copper_grate.step": {
+  "block_copper_grate_step": {
     "sounds": [
       "buildscape:block/copper_grate/step1",
       "buildscape:block/copper_grate/step2",
@@ -17,7 +17,7 @@
       "buildscape:block/copper_grate/step6"
     ]
   },
-  "block.copper_bulb.break": {
+  "block_copper_bulb_break": {
     "sounds": [
       "buildscape:block/copper_bulb/break1",
       "buildscape:block/copper_bulb/break2",
@@ -25,7 +25,7 @@
       "buildscape:block/copper_bulb/break4"
     ]
   },
-  "block.copper_bulb.place": {
+  "block_copper_bulb_place": {
     "sounds": [
       "buildscape:block/copper_bulb/place1",
       "buildscape:block/copper_bulb/place2",
@@ -33,7 +33,7 @@
       "buildscape:block/copper_bulb/place4"
     ]
   },
-  "block.copper_bulb.step": {
+  "block_copper_bulb_step": {
     "sounds": [
       "buildscape:block/copper_bulb/step1",
       "buildscape:block/copper_bulb/step2",
@@ -43,12 +43,12 @@
       "buildscape:block/copper_bulb/step6"
     ]
   },
-  "block.copper_bulb.toggle": {
+  "block_copper_bulb_toggle": {
     "sounds": [
       "buildscape:block/copper_bulb/toggle"
     ]
   },
-  "block.mud.break": {
+  "block_mud_break": {
     "sounds": [
       {
         "name": "buildscape:block/mud/break1",
@@ -82,7 +82,7 @@
       }
     ]
   },
-  "block.mud.step": {
+  "block_mud_step": {
     "sounds": [
       {
         "name": "buildscape:block/mud/step1",
@@ -116,7 +116,7 @@
       }
     ]
   },
-  "block.decorated_pot.place": {
+  "block_decorated_pot_place": {
     "sounds": [
       "buildscape:block/decorated_pot/break1",
       "buildscape:block/decorated_pot/break2",
@@ -124,7 +124,7 @@
       "buildscape:block/decorated_pot/break4"
     ]
   },
-  "block.decorated_pot.break": {
+  "block_decorated_pot_break": {
     "sounds": [
       "buildscape:block/decorated_pot/break1",
       "buildscape:block/decorated_pot/break2",
@@ -132,7 +132,7 @@
       "buildscape:block/decorated_pot/break4"
     ]
   },
-  "block.decorated_pot.hit": {
+  "block_decorated_pot_hit": {
     "sounds": [
       "buildscape:block/decorated_pot/break1",
       "buildscape:block/decorated_pot/break2",
@@ -140,7 +140,7 @@
       "buildscape:block/decorated_pot/break4"
     ]
   },
-  "block.decorated_pot.step": {
+  "block_decorated_pot_step": {
     "sounds": [
       "buildscape:block/decorated_pot/step1",
       "buildscape:block/decorated_pot/step2",
@@ -149,7 +149,7 @@
       "buildscape:block/decorated_pot/step5"
     ]
   },
-  "block.decorated_pot.fall": {
+  "block_decorated_pot_fall": {
     "sounds": [
       "buildscape:block/decorated_pot/break1",
       "buildscape:block/decorated_pot/break2",
@@ -157,7 +157,7 @@
       "buildscape:block/decorated_pot/break4"
     ]
   },
-  "block.decorated_pot.insert_item": {
+  "block_decorated_pot_insert_item": {
     "sounds": [
       "buildscape:block/decorated_pot/insert1",
       "buildscape:block/decorated_pot/insert2",
@@ -165,7 +165,7 @@
       "buildscape:block/decorated_pot/insert4"
     ]
   },
-  "block.decorated_pot.insert_fail": {
+  "block_decorated_pot_insert_fail": {
     "sounds": [
       "buildscape:block/decorated_pot/insert_fail1",
       "buildscape:block/decorated_pot/insert_fail2",
@@ -174,7 +174,7 @@
       "buildscape:block/decorated_pot/insert_fail5"
     ]
   },
-  "block.decorated_pot.shatter": {
+  "block_decorated_pot_shatter": {
     "sounds": [
       "buildscape:block/decorated_pot/shatter1",
       "buildscape:block/decorated_pot/shatter2",
@@ -183,7 +183,7 @@
       "buildscape:block/decorated_pot/shatter5"
     ]
   },
-  "block.flower_bed.break": {
+  "block_flower_bed_break": {
     "sounds": [
       {
         "name": "buildscape:block/flower_bed/break1",
@@ -212,7 +212,7 @@
       }
     ]
   },
-  "block.flower_bed.step": {
+  "block_flower_bed_step": {
     "sounds": [
       {
         "name": "buildscape:block/flower_bed/step1",
@@ -241,7 +241,7 @@
       }
     ]
   },
-  "block.flower_bed.place": {
+  "block_flower_bed_place": {
     "sounds": [
       {
         "name": "buildscape:block/flower_bed/step1",
@@ -270,7 +270,7 @@
       }
     ]
   },
-  "block.flower_bed.hit": {
+  "block_flower_bed_hit": {
     "sounds": [
       {
         "name": "buildscape:block/flower_bed/step1",
@@ -299,7 +299,7 @@
       }
     ]
   },
-  "block.flower_bed.fall": {
+  "block_flower_bed_fall": {
     "sounds": [
       {
         "name": "buildscape:block/flower_bed/step1",
@@ -328,7 +328,7 @@
       }
     ]
   },
-  "block.mangrove_roots.break": {
+  "block_mangrove_roots_break": {
     "sounds": [
       {
         "name": "buildscape:block/mangrove_roots/break1",
@@ -363,7 +363,7 @@
     ],
     "subtitle": "subtitles.block.generic.break"
   },
-  "block.mangrove_roots.place": {
+  "block_mangrove_roots_place": {
     "sounds": [
       {
         "name": "buildscape:block/mangrove_roots/step1",
@@ -398,7 +398,7 @@
     ],
     "subtitle": "subtitles.block.generic.place"
   },
-  "block.mangrove_roots.hit": {
+  "block_mangrove_roots_hit": {
     "sounds": [
       {
         "name": "buildscape:block/mangrove_roots/step1",
@@ -433,7 +433,7 @@
     ],
     "subtitle": "subtitles.block.generic.hit"
   },
-  "block.mangrove_roots.fall": {
+  "block_mangrove_roots_fall": {
     "sounds": [
       {
         "name": "buildscape:block/mangrove_roots/step1",
@@ -468,7 +468,7 @@
     ],
     "subtitle": "subtitles.block.generic.fall"
   },
-  "block.mangrove_roots.step": {
+  "block_mangrove_roots_step": {
     "sounds": [
       {
         "name": "buildscape:block/mangrove_roots/step1",
@@ -503,7 +503,7 @@
     ],
     "subtitle": "subtitles.block.generic.footsteps"
   },
-  "block.muddy_mangrove_roots.break": {
+  "block_muddy_mangrove_roots_break": {
     "sounds": [
       {
         "name": "buildscape:block/muddy_mangrove_roots/break1",
@@ -538,7 +538,7 @@
     ],
     "subtitle": "subtitles.block.generic.break"
   },
-  "block.muddy_mangrove_roots.place": {
+  "block_muddy_mangrove_roots_place": {
     "sounds": [
       {
         "name": "buildscape:block/muddy_mangrove_roots/step1",
@@ -573,7 +573,7 @@
     ],
     "subtitle": "subtitles.block.generic.place"
   },
-  "block.muddy_mangrove_roots.hit": {
+  "block_muddy_mangrove_roots_hit": {
     "sounds": [
       {
         "name": "buildscape:block/muddy_mangrove_roots/step1",
@@ -608,7 +608,7 @@
     ],
     "subtitle": "subtitles.block.generic.hit"
   },
-  "block.muddy_mangrove_roots.fall": {
+  "block_muddy_mangrove_roots_fall": {
     "sounds": [
       {
         "name": "buildscape:block/muddy_mangrove_roots/step1",
@@ -643,7 +643,7 @@
     ],
     "subtitle": "subtitles.block.generic.fall"
   },
-  "block.muddy_mangrove_roots.step": {
+  "block_muddy_mangrove_roots_step": {
     "sounds": [
       {
         "name": "buildscape:block/muddy_mangrove_roots/step1",
@@ -678,7 +678,7 @@
     ],
     "subtitle": "subtitles.block.generic.footsteps"
   },
-  "block.packed_mud.break": {
+  "block_packed_mud_break": {
     "sounds": [
       {
         "name": "buildscape:block/packed_mud/break1",
@@ -713,7 +713,7 @@
     ],
     "subtitle": "subtitles.block.generic.break"
   },
-  "block.packed_mud.place": {
+  "block_packed_mud_place": {
     "sounds": [
       {
         "name": "buildscape:block/packed_mud/break1",
@@ -748,7 +748,7 @@
     ],
     "subtitle": "subtitles.block.generic.place"
   },
-  "block.packed_mud.step": {
+  "block_packed_mud_step": {
     "sounds": [
       {
         "name": "buildscape:block/packed_mud/step1",
@@ -783,7 +783,7 @@
     ],
     "subtitle": "subtitles.block.generic.footsteps"
   },
-  "block.packed_mud.hit": {
+  "block_packed_mud_hit": {
     "sounds": [
       {
         "name": "buildscape:block/packed_mud/step1",
@@ -818,7 +818,7 @@
     ],
     "subtitle": "subtitles.block.generic.hit"
   },
-  "block.packed_mud.fall": {
+  "block_packed_mud_fall": {
     "sounds": [
       {
         "name": "buildscape:block/packed_mud/step1",
@@ -853,7 +853,7 @@
     ],
     "subtitle": "subtitles.block.generic.fall"
   },
-  "block.mud_bricks.break": {
+  "block_mud_bricks_break": {
     "sounds": [
       {
         "name": "buildscape:block/mud_bricks/break1",
@@ -888,7 +888,7 @@
     ],
     "subtitle": "subtitles.block.generic.break"
   },
-  "block.mud_bricks.place": {
+  "block_mud_bricks_place": {
     "sounds": [
       {
         "name": "buildscape:block/mud_bricks/break1",
@@ -923,7 +923,7 @@
     ],
     "subtitle": "subtitles.block.generic.place"
   },
-  "block.mud_bricks.step": {
+  "block_mud_bricks_step": {
     "sounds": [
       {
         "name": "buildscape:block/mud_bricks/step1",
@@ -958,7 +958,7 @@
     ],
     "subtitle": "subtitles.block.generic.footsteps"
   },
-  "block.mud_bricks.hit": {
+  "block_mud_bricks_hit": {
     "sounds": [
       {
         "name": "buildscape:block/mud_bricks/step1",
@@ -993,7 +993,7 @@
     ],
     "subtitle": "subtitles.block.generic.hit"
   },
-  "block.mud_bricks.fall": {
+  "block_mud_bricks_fall": {
     "sounds": [
       {
         "name": "buildscape:block/mud_bricks/step1",
@@ -1028,33 +1028,33 @@
     ],
     "subtitle": "subtitles.block.generic.fall"
   },
-  "block.string_light.place": {
+  "block_string_light_place": {
     "sounds": [
       "entity/leashknot/place1",
       "entity/leashknot/place2",
       "entity/leashknot/place3"
     ]
   },
-  "block.string_light.connect": {
+  "block_string_light_connect": {
     "sounds": [
       "entity/leashknot/place1",
       "entity/leashknot/place2",
       "entity/leashknot/place3"
     ]
   },
-  "block.string_light.disconnect": {
+  "block_string_light_disconnect": {
     "sounds": [
       "entity/leashknot/break1",
       "entity/leashknot/break2",
       "entity/leashknot/break3"
     ]
   },
-  "block.string_light.turnon": {
+  "block_string_light_turnon": {
     "sounds": [
       "random/click"
     ]
   },
-  "block.string_light.turnoff": {
+  "block_string_light_turnoff": {
     "sounds": [
       "random/click"
     ]

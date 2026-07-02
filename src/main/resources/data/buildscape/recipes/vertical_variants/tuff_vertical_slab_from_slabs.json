@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "#",
+    "#"
+  ],
+  "key": {
+    "#": {
+      "item": "buildscape:tuff_slab"
+    }
+  },
+  "result": {
+    "item": "buildscape:tuff_vertical_slab",
+    "count": 2
+  }
+}

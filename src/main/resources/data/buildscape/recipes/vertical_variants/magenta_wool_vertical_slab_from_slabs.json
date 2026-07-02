@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "#",
+    "#"
+  ],
+  "key": {
+    "#": {
+      "item": "buildscape:magenta_wool_slab"
+    }
+  },
+  "result": {
+    "item": "buildscape:magenta_wool_vertical_slab",
+    "count": 2
+  }
+}

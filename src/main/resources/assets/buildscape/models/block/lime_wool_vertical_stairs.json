@@ -1,0 +1,9 @@
+{
+  "parent": "buildscape:block/template_vertical_stairs",
+  "textures": {
+    "bottom": "minecraft:block/lime_wool",
+    "top": "minecraft:block/lime_wool",
+    "side": "minecraft:block/lime_wool",
+    "particle": "#side"
+  }
+}

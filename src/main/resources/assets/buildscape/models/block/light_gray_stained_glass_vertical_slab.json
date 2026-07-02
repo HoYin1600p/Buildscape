@@ -6,5 +6,5 @@
     "side": "minecraft:block/light_gray_stained_glass",
     "particle": "#side"
   },
-  "render_type": "translucent"
+  "render_type": "minecraft:translucent"
 }

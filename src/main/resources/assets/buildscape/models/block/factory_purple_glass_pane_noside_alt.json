@@ -4,5 +4,5 @@
                      "pane":  "buildscape:block/factory_purple_glass",
                      "particle":  "buildscape:block/factory_purple_glass"
                  },
-    "render_type":  "translucent"
+    "render_type": "minecraft:translucent"
 }

@@ -1,5 +1,6 @@
 package com.kingodogo.buildscape.block;
 
+import net.minecraft.world.level.block.AbstractGlassBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SlabBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
@@ -29,13 +30,27 @@ public class ModSlabBlock extends SlabBlock {
         return this.baseBlock;
     }
 
+    private boolean isGlassLike() {
+        return this.baseBlock instanceof AbstractGlassBlock;
+    }
+
     @Override
     public float[] getBeaconColorMultiplier(BlockState state, net.minecraft.world.level.LevelReader level, net.minecraft.core.BlockPos pos, net.minecraft.core.BlockPos beaconPos) {
         return null;
     }
 
     @Override
+    public boolean propagatesSkylightDown(BlockState state, net.minecraft.world.level.BlockGetter level, net.minecraft.core.BlockPos pos) {
+        return this.isGlassLike() || super.propagatesSkylightDown(state, level, pos);
+    }
+
+    @Override
+    public boolean useShapeForLightOcclusion(BlockState state) {
+        return !this.isGlassLike() && super.useShapeForLightOcclusion(state);
+    }
+
+    @Override
     public boolean skipRendering(BlockState state, BlockState adjacentBlockState, net.minecraft.core.Direction side) {
-        return super.skipRendering(state, adjacentBlockState, side);
+        return (this.isGlassLike() && adjacentBlockState.is(this)) || super.skipRendering(state, adjacentBlockState, side);
     }
 }

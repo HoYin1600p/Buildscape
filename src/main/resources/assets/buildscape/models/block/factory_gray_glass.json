@@ -4,5 +4,5 @@
                      "all":  "buildscape:block/factory_gray_glass",
                      "particle":  "#all"
                  },
-    "render_type":  "translucent"
+    "render_type": "minecraft:translucent"
 }

@@ -5,5 +5,5 @@
     "top": "buildscape:block/pink_glazed_glass",
     "side": "buildscape:block/pink_glazed_glass"
   },
-  "render_type": "translucent"
+  "render_type": "minecraft:translucent"
 }

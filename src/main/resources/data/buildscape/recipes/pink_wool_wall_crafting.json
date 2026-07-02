@@ -1,0 +1,18 @@
+{
+    "key":  {
+                "B":  {
+                          "item":  "minecraft:pink_wool"
+                      }
+            },
+    "category":  "building",
+    "pattern":  [
+                    "   ",
+                    "BBB",
+                    "BBB"
+                ],
+    "result":  {
+                   "count":  6,
+                   "item":  "buildscape:pink_wool_wall"
+               },
+    "type":  "minecraft:crafting_shaped"
+}

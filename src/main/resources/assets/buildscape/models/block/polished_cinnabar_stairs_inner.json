@@ -1,0 +1,8 @@
+﻿{
+    "textures":  {
+                     "bottom":  "buildscape:block/polished_cinnabar",
+                     "top":  "buildscape:block/polished_cinnabar",
+                     "side":  "buildscape:block/polished_cinnabar"
+                 },
+    "parent":  "minecraft:block/inner_stairs"
+}

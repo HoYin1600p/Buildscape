@@ -1,6 +1,9 @@
 {
   "values": [
     "buildscape:moss_layers",
+    "buildscape:red_moss_layers",
+    "buildscape:orange_moss_layers",
+    "buildscape:yellow_moss_layers",
     "buildscape:oak_leaf_layers",
     "buildscape:spruce_leaf_layers",
     "buildscape:birch_leaf_layers",

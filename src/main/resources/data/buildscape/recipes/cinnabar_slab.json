@@ -1,0 +1,16 @@
+﻿{
+    "key":  {
+                "S":  {
+                          "item":  "buildscape:cinnabar"
+                      }
+            },
+    "category":  "building",
+    "pattern":  [
+                    "SSS"
+                ],
+    "result":  {
+                   "count":  6,
+                   "item":  "buildscape:cinnabar_slab"
+               },
+    "type":  "minecraft:crafting_shaped"
+}

@@ -1,0 +1,17 @@
+﻿{
+    "key":  {
+                "S":  {
+                          "item":  "buildscape:polished_cinnabar_slab"
+                      }
+            },
+    "category":  "building",
+    "pattern":  [
+                    "S",
+                    "S"
+                ],
+    "result":  {
+                   "count":  1,
+                   "item":  "buildscape:chiseled_cinnabar"
+               },
+    "type":  "minecraft:crafting_shaped"
+}

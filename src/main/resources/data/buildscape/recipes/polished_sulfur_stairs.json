@@ -1,0 +1,18 @@
+﻿{
+    "key":  {
+                "S":  {
+                          "item":  "buildscape:polished_sulfur"
+                      }
+            },
+    "category":  "building",
+    "pattern":  [
+                    "S  ",
+                    "SS ",
+                    "SSS"
+                ],
+    "result":  {
+                   "count":  4,
+                   "item":  "buildscape:polished_sulfur_stairs"
+               },
+    "type":  "minecraft:crafting_shaped"
+}

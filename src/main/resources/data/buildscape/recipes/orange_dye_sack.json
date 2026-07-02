@@ -1,0 +1,18 @@
+{
+    "key":  {
+                "D":  {
+                          "item":  "minecraft:orange_dye"
+                      }
+            },
+    "category":  "building",
+    "pattern":  [
+                    "DDD",
+                    "DDD",
+                    "DDD"
+                ],
+    "result":  {
+                   "count":  1,
+                   "item":  "buildscape:orange_dye_sack"
+               },
+    "type":  "minecraft:crafting_shaped"
+}

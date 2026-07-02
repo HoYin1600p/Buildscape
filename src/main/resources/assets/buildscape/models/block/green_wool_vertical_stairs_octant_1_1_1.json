@@ -1,9 +1,0 @@
-{
-  "parent": "buildscape:block/template_vertical_stairs_octant_1_1_1",
-  "textures": {
-    "bottom": "minecraft:block/green_wool",
-    "top": "minecraft:block/green_wool",
-    "side": "minecraft:block/green_wool",
-    "particle": "#side"
-  }
-}

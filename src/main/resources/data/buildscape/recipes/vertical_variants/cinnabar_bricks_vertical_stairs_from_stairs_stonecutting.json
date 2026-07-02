@@ -1,8 +1,0 @@
-{
-  "type": "minecraft:stonecutting",
-  "ingredient": {
-    "item": "buildscape:cinnabar_bricks_stairs"
-  },
-  "result": "buildscape:cinnabar_bricks_vertical_stairs",
-  "count": 1
-}

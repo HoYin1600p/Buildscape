@@ -1,0 +1,8 @@
+{
+    "textures":  {
+                     "bottom":  "minecraft:block/orange_wool",
+                     "top":  "minecraft:block/orange_wool",
+                     "side":  "minecraft:block/orange_wool"
+                 },
+    "parent":  "minecraft:block/stairs"
+}

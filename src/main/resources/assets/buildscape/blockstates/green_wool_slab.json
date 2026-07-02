@@ -1,0 +1,13 @@
+{
+    "variants":  {
+                     "type=bottom":  {
+                                         "model":  "buildscape:block/green_wool_slab"
+                                     },
+                     "type=top":  {
+                                      "model":  "buildscape:block/green_wool_slab_top"
+                                  },
+                     "type=double":  {
+                                         "model":  "minecraft:block/green_wool"
+                                     }
+                 }
+}

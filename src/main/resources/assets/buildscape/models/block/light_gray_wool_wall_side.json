@@ -1,0 +1,7 @@
+{
+    "textures":  {
+                     "wall":  "minecraft:block/light_gray_wool",
+                     "particle":  "minecraft:block/light_gray_wool"
+                 },
+    "parent":  "minecraft:block/template_wall_side"
+}

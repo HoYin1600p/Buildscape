@@ -1,0 +1,8 @@
+﻿{
+    "render_type":  "minecraft:cutout_mipped",
+    "parent":  "minecraft:block/pointed_dripstone_up_frustum",
+    "textures":  {
+                     "particle":  "#cross",
+                     "cross":  "buildscape:block/sulfur_spike_up_frustum"
+                 }
+}

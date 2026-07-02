@@ -1,0 +1,18 @@
+﻿{
+    "key":  {
+                "P":  {
+                          "item":  "buildscape:poplar_planks"
+                      }
+            },
+    "category":  "redstone",
+    "pattern":  [
+                    "PP",
+                    "PP",
+                    "PP"
+                ],
+    "result":  {
+                   "count":  3,
+                   "item":  "buildscape:poplar_door"
+               },
+    "type":  "minecraft:crafting_shaped"
+}

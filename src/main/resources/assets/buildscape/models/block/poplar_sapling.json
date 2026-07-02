@@ -1,0 +1,7 @@
+﻿{
+    "render_type":  "minecraft:cutout",
+    "parent":  "minecraft:block/cross",
+    "textures":  {
+                     "cross":  "buildscape:block/poplar_sapling"
+                 }
+}

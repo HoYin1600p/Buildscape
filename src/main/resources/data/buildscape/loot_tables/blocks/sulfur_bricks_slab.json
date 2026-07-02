@@ -1,0 +1,38 @@
+﻿{
+    "pools":  [
+                  {
+                      "entries":  [
+                                      {
+                                          "functions":  [
+                                                            {
+                                                                "function":  "minecraft:set_count",
+                                                                "conditions":  [
+                                                                                   {
+                                                                                       "properties":  {
+                                                                                                          "type":  "double"
+                                                                                                      },
+                                                                                       "condition":  "minecraft:block_state_property",
+                                                                                       "block":  "buildscape:sulfur_bricks_slab"
+                                                                                   }
+                                                                               ],
+                                                                "count":  {
+                                                                              "min":  1,
+                                                                              "type":  "minecraft:uniform",
+                                                                              "max":  2
+                                                                          }
+                                                            }
+                                                        ],
+                                          "name":  "buildscape:sulfur_bricks_slab",
+                                          "type":  "minecraft:item"
+                                      }
+                                  ],
+                      "rolls":  1,
+                      "conditions":  [
+                                         {
+                                             "condition":  "minecraft:survives_explosion"
+                                         }
+                                     ]
+                  }
+              ],
+    "type":  "minecraft:block"
+}

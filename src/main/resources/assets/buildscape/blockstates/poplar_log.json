@@ -1,0 +1,16 @@
+﻿{
+    "variants":  {
+                     "axis=y":  {
+                                    "model":  "buildscape:block/poplar_log"
+                                },
+                     "axis=x":  {
+                                    "y":  90,
+                                    "model":  "buildscape:block/poplar_log",
+                                    "x":  90
+                                },
+                     "axis=z":  {
+                                    "model":  "buildscape:block/poplar_log",
+                                    "x":  90
+                                }
+                 }
+}

@@ -1,0 +1,16 @@
+﻿{
+    "variants":  {
+                     "axis=y":  {
+                                    "model":  "buildscape:block/poplar_wood"
+                                },
+                     "axis=x":  {
+                                    "y":  90,
+                                    "model":  "buildscape:block/poplar_wood",
+                                    "x":  90
+                                },
+                     "axis=z":  {
+                                    "model":  "buildscape:block/poplar_wood",
+                                    "x":  90
+                                }
+                 }
+}

@@ -1,0 +1,17 @@
+﻿{
+    "key":  {
+                "S":  {
+                          "item":  "buildscape:sulfur"
+                      }
+            },
+    "category":  "building",
+    "pattern":  [
+                    "SSS",
+                    "SSS"
+                ],
+    "result":  {
+                   "count":  6,
+                   "item":  "buildscape:sulfur_wall"
+               },
+    "type":  "minecraft:crafting_shaped"
+}

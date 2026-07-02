@@ -1,0 +1,6 @@
+﻿{
+    "textures":  {
+                     "all":  "buildscape:block/sulfur_bricks"
+                 },
+    "parent":  "minecraft:block/cube_all"
+}

@@ -1,0 +1,16 @@
+﻿{
+    "key":  {
+                "P":  {
+                          "item":  "buildscape:poplar_planks"
+                      }
+            },
+    "category":  "building",
+    "pattern":  [
+                    "PPP"
+                ],
+    "result":  {
+                   "count":  6,
+                   "item":  "buildscape:poplar_slab"
+               },
+    "type":  "minecraft:crafting_shaped"
+}

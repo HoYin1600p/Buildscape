@@ -1,0 +1,16 @@
+{
+    "key":  {
+                "#":  {
+                          "item":  "minecraft:yellow_wool"
+                      }
+            },
+    "category":  "building",
+    "pattern":  [
+                    "###"
+                ],
+    "result":  {
+                   "count":  6,
+                   "item":  "buildscape:yellow_wool_slab"
+               },
+    "type":  "minecraft:crafting_shaped"
+}

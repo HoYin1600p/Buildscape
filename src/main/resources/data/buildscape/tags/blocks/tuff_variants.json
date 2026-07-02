@@ -1,16 +1,27 @@
 {
-  "values": [
-    "buildscape:bit_chiseled_tuff",
-    "buildscape:bit_chiseled_tuff_bricks",
-    "buildscape:bit_polished_tuff",
-    "buildscape:bit_polished_tuff_stairs",
-    "buildscape:bit_polished_tuff_slab",
-    "buildscape:bit_polished_tuff_wall",
-    "buildscape:bit_tuff_bricks",
-    "buildscape:bit_tuff_bricks_stairs",
-    "buildscape:bit_tuff_bricks_slab",
-    "buildscape:bit_tuff_bricks_wall"
-  ]
+    "values": [
+        "buildscape:bit_chiseled_tuff",
+        "buildscape:bit_chiseled_tuff_bricks",
+        "buildscape:bit_polished_tuff",
+        "buildscape:bit_polished_tuff_slab",
+        "buildscape:bit_polished_tuff_stairs",
+        "buildscape:bit_polished_tuff_wall",
+        "buildscape:bit_tuff_bricks",
+        "buildscape:bit_tuff_bricks_slab",
+        "buildscape:bit_tuff_bricks_stairs",
+        "buildscape:bit_tuff_bricks_wall",
+        "buildscape:chiseled_tuff",
+        "buildscape:chiseled_tuff_bricks",
+        "buildscape:polished_tuff",
+        "buildscape:polished_tuff_slab",
+        "buildscape:polished_tuff_stairs",
+        "buildscape:polished_tuff_wall",
+        "buildscape:tuff_brick_slab",
+        "buildscape:tuff_brick_stairs",
+        "buildscape:tuff_brick_wall",
+        "buildscape:tuff_bricks",
+        "buildscape:tuff_slab",
+        "buildscape:tuff_stairs",
+        "buildscape:tuff_wall"
+    ]
 }
-
-

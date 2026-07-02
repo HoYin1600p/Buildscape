@@ -1,0 +1,18 @@
+﻿{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "key": {
+    "S": {
+      "item": "buildscape:yellow_moss_block"
+    }
+  },
+  "pattern": [
+    "S  ",
+    "SS ",
+    "SSS"
+  ],
+  "result": {
+    "count": 4,
+    "item": "buildscape:yellow_moss_block_stairs"
+  }
+}

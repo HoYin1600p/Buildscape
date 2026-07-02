@@ -1,0 +1,16 @@
+﻿{
+    "key":  {
+                "#":  {
+                          "item":  "minecraft:stripped_crimson_stem"
+                      }
+            },
+    "category":  "building",
+    "pattern":  [
+                    "###"
+                ],
+    "result":  {
+                   "count":  6,
+                   "item":  "buildscape:stripped_crimson_stem_slab"
+               },
+    "type":  "minecraft:crafting_shaped"
+}

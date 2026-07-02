@@ -4,5 +4,5 @@
                      "pane":  "minecraft:block/obsidian",
                      "particle":  "minecraft:block/obsidian"
                  },
-    "render_type":  "translucent"
+    "render_type": "minecraft:translucent"
 }

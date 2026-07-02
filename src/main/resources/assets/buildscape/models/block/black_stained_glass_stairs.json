@@ -5,5 +5,5 @@
     "top": "minecraft:block/black_stained_glass",
     "side": "minecraft:block/black_stained_glass"
   },
-  "render_type": "translucent"
+  "render_type": "minecraft:translucent"
 }

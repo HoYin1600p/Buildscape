@@ -5,5 +5,5 @@
     "top": "buildscape:block/red_mosaic_glass",
     "side": "buildscape:block/red_mosaic_glass"
   },
-  "render_type": "translucent"
+  "render_type": "minecraft:translucent"
 }

@@ -5,5 +5,5 @@
                      "edge":  "buildscape:block/light_gray_mosaic_glass",
                      "particle":  "buildscape:block/light_gray_mosaic_glass"
                  },
-    "render_type":  "translucent"
+    "render_type": "minecraft:translucent"
 }

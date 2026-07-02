@@ -1,7 +1,9 @@
 {
-  "values": [
-    "buildscape:bit_polished_tuff_slab",
-    "buildscape:bit_tuff_bricks_slab"
-  ]
+    "values": [
+        "buildscape:bit_polished_tuff_slab",
+        "buildscape:bit_tuff_bricks_slab",
+        "buildscape:polished_tuff_slab",
+        "buildscape:tuff_brick_slab",
+        "buildscape:tuff_slab"
+    ]
 }
-

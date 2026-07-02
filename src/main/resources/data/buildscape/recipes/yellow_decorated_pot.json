@@ -1,21 +1,16 @@
-{
-  "type": "minecraft:crafting_shaped",
-  "category": "building",
-  "key": {
-    "P": {
-      "item": "buildscape:decorated_pot"
-    },
-    "D": {
-      "item": "minecraft:yellow_dye"
-    }
-  },
-  "pattern": [
-    "PPP",
-    "PDP",
-    "PPP"
-  ],
-  "result": {
-    "count": 8,
-    "item": "buildscape:yellow_decorated_pot"
-  }
+﻿{
+    "ingredients":  [
+                        {
+                            "item":  "buildscape:decorated_pot"
+                        },
+                        {
+                            "item":  "minecraft:yellow_dye"
+                        }
+                    ],
+    "category":  "building",
+    "result":  {
+                   "count":  1,
+                   "item":  "buildscape:yellow_decorated_pot"
+               },
+    "type":  "minecraft:crafting_shapeless"
 }

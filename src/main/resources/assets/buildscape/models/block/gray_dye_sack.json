@@ -1,0 +1,12 @@
+{
+    "textures":  {
+                     "north":  "buildscape:block/gray_dye_sack_side",
+                     "up":  "buildscape:block/gray_dye_sack_top",
+                     "west":  "buildscape:block/gray_dye_sack_side",
+                     "south":  "buildscape:block/gray_dye_sack_side",
+                     "particle":  "buildscape:block/gray_dye_sack_side",
+                     "east":  "buildscape:block/gray_dye_sack_side",
+                     "down":  "buildscape:block/dye_sack_bottom"
+                 },
+    "parent":  "block/cube"
+}

@@ -1,0 +1,6 @@
+﻿{
+    "textures":  {
+                     "layer0":  "buildscape:block/sulfur_spike_down_tip"
+                 },
+    "parent":  "minecraft:item/generated"
+}

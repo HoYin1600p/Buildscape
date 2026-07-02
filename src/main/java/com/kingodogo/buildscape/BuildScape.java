@@ -1489,6 +1489,17 @@ public class BuildScape {
             });
 
             event.enqueueWork(() -> {
+                for (net.minecraftforge.registries.RegistryObject<net.minecraft.world.level.block.Block> registryObject : ModBlocks.BLOCKS.getEntries()) {
+                    net.minecraft.resources.ResourceLocation id = registryObject.getId();
+                    if (id != null && id.getPath().contains("glass")) {
+                        net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
+                                registryObject.get(),
+                                net.minecraft.client.renderer.RenderType.translucent());
+                    }
+                }
+            });
+
+            event.enqueueWork(() -> {
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.BLACK_MOSAIC_GLASS.get(),
                         net.minecraft.client.renderer.RenderType.translucent());
@@ -3546,6 +3557,7 @@ public class BuildScape {
             }
 
         }
+
     }
 
     @Mod.EventBusSubscriber(modid = BuildScape.MODID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)

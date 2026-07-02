@@ -4,5 +4,6 @@
     "bottom": "buildscape:block/factory_pink_glass",
     "top": "buildscape:block/factory_pink_glass",
     "side": "buildscape:block/factory_pink_glass"
-  }
+  },
+  "render_type": "translucent"
 }

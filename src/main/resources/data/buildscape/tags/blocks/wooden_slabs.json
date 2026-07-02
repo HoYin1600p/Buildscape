@@ -1,5 +1,9 @@
-{
-  "values": [
-    "buildscape:mangrove_slab"
-  ]
+﻿{
+    "values":  [
+                   "buildscape:mangrove_slab",
+                   "buildscape:poplar_log_slab",
+                   "buildscape:stripped_poplar_log_slab",
+                   "buildscape:poplar_wood_slab",
+                   "buildscape:stripped_poplar_wood_slab"
+               ]
 }

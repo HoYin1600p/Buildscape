@@ -5,7 +5,7 @@
   ],
   "key": {
     "#": {
-      "item": "minecraft:pink_wool"
+      "item": "minecraft:pink_carpet"
     }
   },
   "result": {
@@ -13,4 +13,3 @@
     "count": 8
   }
 }
-

@@ -1,0 +1,6 @@
+﻿{
+    "textures":  {
+                     "all":  "buildscape:block/chiseled_cinnabar"
+                 },
+    "parent":  "minecraft:block/cube_all"
+}

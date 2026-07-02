@@ -1,0 +1,16 @@
+﻿{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "key": {
+    "#": {
+      "item": "buildscape:red_moss_carpet"
+    }
+  },
+  "pattern": [
+    "###"
+  ],
+  "result": {
+    "item": "buildscape:red_moss_layers",
+    "count": 6
+  }
+}

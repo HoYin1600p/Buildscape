@@ -7728,4 +7728,182 @@ public class ModItems {
             () -> new BlockItem(ModBlocks.ASHPEN_LOG_SLAB.get(), createBlockItemProperties()));
     public static final RegistryObject<Item> ASHPEN_WOOD_SLAB = ITEMS.register("ashpen_wood_slab",
             () -> new BlockItem(ModBlocks.ASHPEN_WOOD_SLAB.get(), createBlockItemProperties()));
+
+    // Spool Items
+    public static final RegistryObject<Item> SPOOL = ITEMS.register("spool", () -> new BlockItem(ModBlocks.SPOOL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GLOWING_SPOOL = ITEMS.register("glowing_spool", () -> new BlockItem(ModBlocks.GLOWING_SPOOL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WHITE_SPOOL = ITEMS.register("white_spool", () -> new BlockItem(ModBlocks.WHITE_SPOOL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIGHT_GRAY_SPOOL = ITEMS.register("light_gray_spool", () -> new BlockItem(ModBlocks.LIGHT_GRAY_SPOOL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GRAY_SPOOL = ITEMS.register("gray_spool", () -> new BlockItem(ModBlocks.GRAY_SPOOL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BLACK_SPOOL = ITEMS.register("black_spool", () -> new BlockItem(ModBlocks.BLACK_SPOOL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BROWN_SPOOL = ITEMS.register("brown_spool", () -> new BlockItem(ModBlocks.BROWN_SPOOL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> RED_SPOOL = ITEMS.register("red_spool", () -> new BlockItem(ModBlocks.RED_SPOOL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> ORANGE_SPOOL = ITEMS.register("orange_spool", () -> new BlockItem(ModBlocks.ORANGE_SPOOL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> YELLOW_SPOOL = ITEMS.register("yellow_spool", () -> new BlockItem(ModBlocks.YELLOW_SPOOL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIME_SPOOL = ITEMS.register("lime_spool", () -> new BlockItem(ModBlocks.LIME_SPOOL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GREEN_SPOOL = ITEMS.register("green_spool", () -> new BlockItem(ModBlocks.GREEN_SPOOL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> CYAN_SPOOL = ITEMS.register("cyan_spool", () -> new BlockItem(ModBlocks.CYAN_SPOOL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIGHT_BLUE_SPOOL = ITEMS.register("light_blue_spool", () -> new BlockItem(ModBlocks.LIGHT_BLUE_SPOOL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BLUE_SPOOL = ITEMS.register("blue_spool", () -> new BlockItem(ModBlocks.BLUE_SPOOL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PURPLE_SPOOL = ITEMS.register("purple_spool", () -> new BlockItem(ModBlocks.PURPLE_SPOOL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> MAGENTA_SPOOL = ITEMS.register("magenta_spool", () -> new BlockItem(ModBlocks.MAGENTA_SPOOL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PINK_SPOOL = ITEMS.register("pink_spool", () -> new BlockItem(ModBlocks.PINK_SPOOL.get(), createBlockItemProperties()));
+
+    // Dye Sack Items
+    public static final RegistryObject<Item> WHITE_DYE_SACK = ITEMS.register("white_dye_sack", () -> new BlockItem(ModBlocks.WHITE_DYE_SACK.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIGHT_GRAY_DYE_SACK = ITEMS.register("light_gray_dye_sack", () -> new BlockItem(ModBlocks.LIGHT_GRAY_DYE_SACK.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GRAY_DYE_SACK = ITEMS.register("gray_dye_sack", () -> new BlockItem(ModBlocks.GRAY_DYE_SACK.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BLACK_DYE_SACK = ITEMS.register("black_dye_sack", () -> new BlockItem(ModBlocks.BLACK_DYE_SACK.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BROWN_DYE_SACK = ITEMS.register("brown_dye_sack", () -> new BlockItem(ModBlocks.BROWN_DYE_SACK.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> RED_DYE_SACK = ITEMS.register("red_dye_sack", () -> new BlockItem(ModBlocks.RED_DYE_SACK.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> ORANGE_DYE_SACK = ITEMS.register("orange_dye_sack", () -> new BlockItem(ModBlocks.ORANGE_DYE_SACK.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> YELLOW_DYE_SACK = ITEMS.register("yellow_dye_sack", () -> new BlockItem(ModBlocks.YELLOW_DYE_SACK.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIME_DYE_SACK = ITEMS.register("lime_dye_sack", () -> new BlockItem(ModBlocks.LIME_DYE_SACK.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GREEN_DYE_SACK = ITEMS.register("green_dye_sack", () -> new BlockItem(ModBlocks.GREEN_DYE_SACK.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> CYAN_DYE_SACK = ITEMS.register("cyan_dye_sack", () -> new BlockItem(ModBlocks.CYAN_DYE_SACK.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIGHT_BLUE_DYE_SACK = ITEMS.register("light_blue_dye_sack", () -> new BlockItem(ModBlocks.LIGHT_BLUE_DYE_SACK.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BLUE_DYE_SACK = ITEMS.register("blue_dye_sack", () -> new BlockItem(ModBlocks.BLUE_DYE_SACK.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PURPLE_DYE_SACK = ITEMS.register("purple_dye_sack", () -> new BlockItem(ModBlocks.PURPLE_DYE_SACK.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> MAGENTA_DYE_SACK = ITEMS.register("magenta_dye_sack", () -> new BlockItem(ModBlocks.MAGENTA_DYE_SACK.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PINK_DYE_SACK = ITEMS.register("pink_dye_sack", () -> new BlockItem(ModBlocks.PINK_DYE_SACK.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GLOW_INK_SACK = ITEMS.register("glow_ink_sack", () -> new BlockItem(ModBlocks.GLOW_INK_SACK.get(), createBlockItemProperties()));
+
+    // Colored Moss Block Items
+    public static final RegistryObject<Item> RED_MOSS_BLOCK = ITEMS.register("red_moss_block", () -> new BlockItem(ModBlocks.RED_MOSS_BLOCK.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> RED_MOSS_BLOCK_SLAB = ITEMS.register("red_moss_block_slab", () -> new BlockItem(ModBlocks.RED_MOSS_BLOCK_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> RED_MOSS_BLOCK_STAIRS = ITEMS.register("red_moss_block_stairs", () -> new BlockItem(ModBlocks.RED_MOSS_BLOCK_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> RED_MOSS_LAYERS = ITEMS.register("red_moss_layers", () -> new BlockItem(ModBlocks.RED_MOSS_LAYERS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> RED_MOSS_CARPET = ITEMS.register("red_moss_carpet", () -> new BlockItem(ModBlocks.RED_MOSS_CARPET.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> RED_MOSS_OVERLAY = ITEMS.register("red_moss_overlay", () -> new BlockItem(ModBlocks.RED_MOSS_OVERLAY.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> ORANGE_MOSS_BLOCK = ITEMS.register("orange_moss_block", () -> new BlockItem(ModBlocks.ORANGE_MOSS_BLOCK.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> ORANGE_MOSS_BLOCK_SLAB = ITEMS.register("orange_moss_block_slab", () -> new BlockItem(ModBlocks.ORANGE_MOSS_BLOCK_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> ORANGE_MOSS_BLOCK_STAIRS = ITEMS.register("orange_moss_block_stairs", () -> new BlockItem(ModBlocks.ORANGE_MOSS_BLOCK_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> ORANGE_MOSS_LAYERS = ITEMS.register("orange_moss_layers", () -> new BlockItem(ModBlocks.ORANGE_MOSS_LAYERS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> ORANGE_MOSS_CARPET = ITEMS.register("orange_moss_carpet", () -> new BlockItem(ModBlocks.ORANGE_MOSS_CARPET.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> ORANGE_MOSS_OVERLAY = ITEMS.register("orange_moss_overlay", () -> new BlockItem(ModBlocks.ORANGE_MOSS_OVERLAY.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> YELLOW_MOSS_BLOCK = ITEMS.register("yellow_moss_block", () -> new BlockItem(ModBlocks.YELLOW_MOSS_BLOCK.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> YELLOW_MOSS_BLOCK_SLAB = ITEMS.register("yellow_moss_block_slab", () -> new BlockItem(ModBlocks.YELLOW_MOSS_BLOCK_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> YELLOW_MOSS_BLOCK_STAIRS = ITEMS.register("yellow_moss_block_stairs", () -> new BlockItem(ModBlocks.YELLOW_MOSS_BLOCK_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> YELLOW_MOSS_LAYERS = ITEMS.register("yellow_moss_layers", () -> new BlockItem(ModBlocks.YELLOW_MOSS_LAYERS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> YELLOW_MOSS_CARPET = ITEMS.register("yellow_moss_carpet", () -> new BlockItem(ModBlocks.YELLOW_MOSS_CARPET.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> YELLOW_MOSS_OVERLAY = ITEMS.register("yellow_moss_overlay", () -> new BlockItem(ModBlocks.YELLOW_MOSS_OVERLAY.get(), createBlockItemProperties()));
+
+    // Tuff Items
+    public static final RegistryObject<Item> TUFF_SLAB = ITEMS.register("tuff_slab", () -> new BlockItem(ModBlocks.TUFF_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> TUFF_STAIRS = ITEMS.register("tuff_stairs", () -> new BlockItem(ModBlocks.TUFF_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> TUFF_WALL = ITEMS.register("tuff_wall", () -> new BlockItem(ModBlocks.TUFF_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> POLISHED_TUFF = ITEMS.register("polished_tuff", () -> new BlockItem(ModBlocks.POLISHED_TUFF.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> POLISHED_TUFF_SLAB = ITEMS.register("polished_tuff_slab", () -> new BlockItem(ModBlocks.POLISHED_TUFF_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> POLISHED_TUFF_STAIRS = ITEMS.register("polished_tuff_stairs", () -> new BlockItem(ModBlocks.POLISHED_TUFF_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> POLISHED_TUFF_WALL = ITEMS.register("polished_tuff_wall", () -> new BlockItem(ModBlocks.POLISHED_TUFF_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> CHISELED_TUFF = ITEMS.register("chiseled_tuff", () -> new BlockItem(ModBlocks.CHISELED_TUFF.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> TUFF_BRICKS = ITEMS.register("tuff_bricks", () -> new BlockItem(ModBlocks.TUFF_BRICKS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> TUFF_BRICK_SLAB = ITEMS.register("tuff_brick_slab", () -> new BlockItem(ModBlocks.TUFF_BRICK_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> TUFF_BRICK_STAIRS = ITEMS.register("tuff_brick_stairs", () -> new BlockItem(ModBlocks.TUFF_BRICK_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> TUFF_BRICK_WALL = ITEMS.register("tuff_brick_wall", () -> new BlockItem(ModBlocks.TUFF_BRICK_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> CHISELED_TUFF_BRICKS = ITEMS.register("chiseled_tuff_bricks", () -> new BlockItem(ModBlocks.CHISELED_TUFF_BRICKS.get(), createBlockItemProperties()));
+
+    // Wool Slab, Stairs, and Wall Items
+    public static final RegistryObject<Item> WHITE_WOOL_SLAB = ITEMS.register("white_wool_slab", () -> new BlockItem(ModBlocks.WHITE_WOOL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WHITE_WOOL_STAIRS = ITEMS.register("white_wool_stairs", () -> new BlockItem(ModBlocks.WHITE_WOOL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WHITE_WOOL_WALL = ITEMS.register("white_wool_wall", () -> new BlockItem(ModBlocks.WHITE_WOOL_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> ORANGE_WOOL_SLAB = ITEMS.register("orange_wool_slab", () -> new BlockItem(ModBlocks.ORANGE_WOOL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> ORANGE_WOOL_STAIRS = ITEMS.register("orange_wool_stairs", () -> new BlockItem(ModBlocks.ORANGE_WOOL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> ORANGE_WOOL_WALL = ITEMS.register("orange_wool_wall", () -> new BlockItem(ModBlocks.ORANGE_WOOL_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> MAGENTA_WOOL_SLAB = ITEMS.register("magenta_wool_slab", () -> new BlockItem(ModBlocks.MAGENTA_WOOL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> MAGENTA_WOOL_STAIRS = ITEMS.register("magenta_wool_stairs", () -> new BlockItem(ModBlocks.MAGENTA_WOOL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> MAGENTA_WOOL_WALL = ITEMS.register("magenta_wool_wall", () -> new BlockItem(ModBlocks.MAGENTA_WOOL_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIGHT_BLUE_WOOL_SLAB = ITEMS.register("light_blue_wool_slab", () -> new BlockItem(ModBlocks.LIGHT_BLUE_WOOL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIGHT_BLUE_WOOL_STAIRS = ITEMS.register("light_blue_wool_stairs", () -> new BlockItem(ModBlocks.LIGHT_BLUE_WOOL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIGHT_BLUE_WOOL_WALL = ITEMS.register("light_blue_wool_wall", () -> new BlockItem(ModBlocks.LIGHT_BLUE_WOOL_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> YELLOW_WOOL_SLAB = ITEMS.register("yellow_wool_slab", () -> new BlockItem(ModBlocks.YELLOW_WOOL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> YELLOW_WOOL_STAIRS = ITEMS.register("yellow_wool_stairs", () -> new BlockItem(ModBlocks.YELLOW_WOOL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> YELLOW_WOOL_WALL = ITEMS.register("yellow_wool_wall", () -> new BlockItem(ModBlocks.YELLOW_WOOL_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIME_WOOL_SLAB = ITEMS.register("lime_wool_slab", () -> new BlockItem(ModBlocks.LIME_WOOL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIME_WOOL_STAIRS = ITEMS.register("lime_wool_stairs", () -> new BlockItem(ModBlocks.LIME_WOOL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIME_WOOL_WALL = ITEMS.register("lime_wool_wall", () -> new BlockItem(ModBlocks.LIME_WOOL_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PINK_WOOL_SLAB = ITEMS.register("pink_wool_slab", () -> new BlockItem(ModBlocks.PINK_WOOL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PINK_WOOL_STAIRS = ITEMS.register("pink_wool_stairs", () -> new BlockItem(ModBlocks.PINK_WOOL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PINK_WOOL_WALL = ITEMS.register("pink_wool_wall", () -> new BlockItem(ModBlocks.PINK_WOOL_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GRAY_WOOL_SLAB = ITEMS.register("gray_wool_slab", () -> new BlockItem(ModBlocks.GRAY_WOOL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GRAY_WOOL_STAIRS = ITEMS.register("gray_wool_stairs", () -> new BlockItem(ModBlocks.GRAY_WOOL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GRAY_WOOL_WALL = ITEMS.register("gray_wool_wall", () -> new BlockItem(ModBlocks.GRAY_WOOL_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIGHT_GRAY_WOOL_SLAB = ITEMS.register("light_gray_wool_slab", () -> new BlockItem(ModBlocks.LIGHT_GRAY_WOOL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIGHT_GRAY_WOOL_STAIRS = ITEMS.register("light_gray_wool_stairs", () -> new BlockItem(ModBlocks.LIGHT_GRAY_WOOL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIGHT_GRAY_WOOL_WALL = ITEMS.register("light_gray_wool_wall", () -> new BlockItem(ModBlocks.LIGHT_GRAY_WOOL_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> CYAN_WOOL_SLAB = ITEMS.register("cyan_wool_slab", () -> new BlockItem(ModBlocks.CYAN_WOOL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> CYAN_WOOL_STAIRS = ITEMS.register("cyan_wool_stairs", () -> new BlockItem(ModBlocks.CYAN_WOOL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> CYAN_WOOL_WALL = ITEMS.register("cyan_wool_wall", () -> new BlockItem(ModBlocks.CYAN_WOOL_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PURPLE_WOOL_SLAB = ITEMS.register("purple_wool_slab", () -> new BlockItem(ModBlocks.PURPLE_WOOL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PURPLE_WOOL_STAIRS = ITEMS.register("purple_wool_stairs", () -> new BlockItem(ModBlocks.PURPLE_WOOL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PURPLE_WOOL_WALL = ITEMS.register("purple_wool_wall", () -> new BlockItem(ModBlocks.PURPLE_WOOL_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BLUE_WOOL_SLAB = ITEMS.register("blue_wool_slab", () -> new BlockItem(ModBlocks.BLUE_WOOL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BLUE_WOOL_STAIRS = ITEMS.register("blue_wool_stairs", () -> new BlockItem(ModBlocks.BLUE_WOOL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BLUE_WOOL_WALL = ITEMS.register("blue_wool_wall", () -> new BlockItem(ModBlocks.BLUE_WOOL_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BROWN_WOOL_SLAB = ITEMS.register("brown_wool_slab", () -> new BlockItem(ModBlocks.BROWN_WOOL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BROWN_WOOL_STAIRS = ITEMS.register("brown_wool_stairs", () -> new BlockItem(ModBlocks.BROWN_WOOL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BROWN_WOOL_WALL = ITEMS.register("brown_wool_wall", () -> new BlockItem(ModBlocks.BROWN_WOOL_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GREEN_WOOL_SLAB = ITEMS.register("green_wool_slab", () -> new BlockItem(ModBlocks.GREEN_WOOL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GREEN_WOOL_STAIRS = ITEMS.register("green_wool_stairs", () -> new BlockItem(ModBlocks.GREEN_WOOL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GREEN_WOOL_WALL = ITEMS.register("green_wool_wall", () -> new BlockItem(ModBlocks.GREEN_WOOL_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> RED_WOOL_SLAB = ITEMS.register("red_wool_slab", () -> new BlockItem(ModBlocks.RED_WOOL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> RED_WOOL_STAIRS = ITEMS.register("red_wool_stairs", () -> new BlockItem(ModBlocks.RED_WOOL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> RED_WOOL_WALL = ITEMS.register("red_wool_wall", () -> new BlockItem(ModBlocks.RED_WOOL_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BLACK_WOOL_SLAB = ITEMS.register("black_wool_slab", () -> new BlockItem(ModBlocks.BLACK_WOOL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BLACK_WOOL_STAIRS = ITEMS.register("black_wool_stairs", () -> new BlockItem(ModBlocks.BLACK_WOOL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BLACK_WOOL_WALL = ITEMS.register("black_wool_wall", () -> new BlockItem(ModBlocks.BLACK_WOOL_WALL.get(), createBlockItemProperties()));
+
+    // Poplar Wood Set Items
+    public static final RegistryObject<Item> POPLAR_LOG = ITEMS.register("poplar_log", () -> new BlockItem(ModBlocks.POPLAR_LOG.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> POPLAR_PLANKS = ITEMS.register("poplar_planks", () -> new BlockItem(ModBlocks.POPLAR_PLANKS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> POPLAR_SAPLING = ITEMS.register("poplar_sapling", () -> new BlockItem(ModBlocks.POPLAR_SAPLING.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> POPLAR_BUTTON = ITEMS.register("poplar_button", () -> new BlockItem(ModBlocks.POPLAR_BUTTON.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> POPLAR_DOOR = ITEMS.register("poplar_door", () -> new BlockItem(ModBlocks.POPLAR_DOOR.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> POPLAR_FENCE = ITEMS.register("poplar_fence", () -> new BlockItem(ModBlocks.POPLAR_FENCE.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> POPLAR_FENCE_GATE = ITEMS.register("poplar_fence_gate", () -> new BlockItem(ModBlocks.POPLAR_FENCE_GATE.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> POPLAR_LOG_SLAB = ITEMS.register("poplar_log_slab", () -> new BlockItem(ModBlocks.POPLAR_LOG_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> POPLAR_LOG_WALL = ITEMS.register("poplar_log_wall", () -> new BlockItem(ModBlocks.POPLAR_LOG_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> POPLAR_PRESSURE_PLATE = ITEMS.register("poplar_pressure_plate", () -> new BlockItem(ModBlocks.POPLAR_PRESSURE_PLATE.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> POPLAR_SLAB = ITEMS.register("poplar_slab", () -> new BlockItem(ModBlocks.POPLAR_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> POPLAR_STAIRS = ITEMS.register("poplar_stairs", () -> new BlockItem(ModBlocks.POPLAR_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> POPLAR_TRAPDOOR = ITEMS.register("poplar_trapdoor", () -> new BlockItem(ModBlocks.POPLAR_TRAPDOOR.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> POPLAR_WOOD = ITEMS.register("poplar_wood", () -> new BlockItem(ModBlocks.POPLAR_WOOD.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> POPLAR_WOOD_SLAB = ITEMS.register("poplar_wood_slab", () -> new BlockItem(ModBlocks.POPLAR_WOOD_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> STRIPPED_POPLAR_LOG = ITEMS.register("stripped_poplar_log", () -> new BlockItem(ModBlocks.STRIPPED_POPLAR_LOG.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> STRIPPED_POPLAR_LOG_SLAB = ITEMS.register("stripped_poplar_log_slab", () -> new BlockItem(ModBlocks.STRIPPED_POPLAR_LOG_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> STRIPPED_POPLAR_LOG_WALL = ITEMS.register("stripped_poplar_log_wall", () -> new BlockItem(ModBlocks.STRIPPED_POPLAR_LOG_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> STRIPPED_POPLAR_WOOD = ITEMS.register("stripped_poplar_wood", () -> new BlockItem(ModBlocks.STRIPPED_POPLAR_WOOD.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> STRIPPED_POPLAR_WOOD_SLAB = ITEMS.register("stripped_poplar_wood_slab", () -> new BlockItem(ModBlocks.STRIPPED_POPLAR_WOOD_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> POPLAR_BOAT = ITEMS.register("poplar_boat", () -> new PoplarBoatItem(new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB).stacksTo(1)));
+
+    // Poplar Leaves Items
+    public static final RegistryObject<Item> ORANGE_POPLAR_LEAVES = ITEMS.register("orange_poplar_leaves", () -> new BlockItem(ModBlocks.ORANGE_POPLAR_LEAVES.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> RED_POPLAR_LEAVES = ITEMS.register("red_poplar_leaves", () -> new BlockItem(ModBlocks.RED_POPLAR_LEAVES.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> YELLOW_POPLAR_LEAVES = ITEMS.register("yellow_poplar_leaves", () -> new BlockItem(ModBlocks.YELLOW_POPLAR_LEAVES.get(), createBlockItemProperties()));
+
+    // Cinnabar Set Items
+    public static final RegistryObject<Item> CINNABAR = ITEMS.register("cinnabar", () -> new BlockItem(ModBlocks.CINNABAR.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> POLISHED_CINNABAR = ITEMS.register("polished_cinnabar", () -> new BlockItem(ModBlocks.POLISHED_CINNABAR.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> POLISHED_CINNABAR_SLAB = ITEMS.register("polished_cinnabar_slab", () -> new BlockItem(ModBlocks.POLISHED_CINNABAR_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> POLISHED_CINNABAR_STAIRS = ITEMS.register("polished_cinnabar_stairs", () -> new BlockItem(ModBlocks.POLISHED_CINNABAR_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> POLISHED_CINNABAR_WALL = ITEMS.register("polished_cinnabar_wall", () -> new BlockItem(ModBlocks.POLISHED_CINNABAR_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> CINNABAR_BRICKS = ITEMS.register("cinnabar_bricks", () -> new BlockItem(ModBlocks.CINNABAR_BRICKS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> CINNABAR_BRICKS_SLAB = ITEMS.register("cinnabar_bricks_slab", () -> new BlockItem(ModBlocks.CINNABAR_BRICKS_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> CINNABAR_BRICKS_STAIRS = ITEMS.register("cinnabar_bricks_stairs", () -> new BlockItem(ModBlocks.CINNABAR_BRICKS_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> CINNABAR_BRICKS_WALL = ITEMS.register("cinnabar_bricks_wall", () -> new BlockItem(ModBlocks.CINNABAR_BRICKS_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> CHISELED_CINNABAR = ITEMS.register("chiseled_cinnabar", () -> new BlockItem(ModBlocks.CHISELED_CINNABAR.get(), createBlockItemProperties()));
+
+    // Sulfur Set Items
+    public static final RegistryObject<Item> SULFUR = ITEMS.register("sulfur", () -> new BlockItem(ModBlocks.SULFUR.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> POLISHED_SULFUR = ITEMS.register("polished_sulfur", () -> new BlockItem(ModBlocks.POLISHED_SULFUR.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> POLISHED_SULFUR_SLAB = ITEMS.register("polished_sulfur_slab", () -> new BlockItem(ModBlocks.POLISHED_SULFUR_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> POLISHED_SULFUR_STAIRS = ITEMS.register("polished_sulfur_stairs", () -> new BlockItem(ModBlocks.POLISHED_SULFUR_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> POLISHED_SULFUR_WALL = ITEMS.register("polished_sulfur_wall", () -> new BlockItem(ModBlocks.POLISHED_SULFUR_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> SULFUR_BRICKS = ITEMS.register("sulfur_bricks", () -> new BlockItem(ModBlocks.SULFUR_BRICKS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> SULFUR_BRICKS_SLAB = ITEMS.register("sulfur_bricks_slab", () -> new BlockItem(ModBlocks.SULFUR_BRICKS_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> SULFUR_BRICKS_STAIRS = ITEMS.register("sulfur_bricks_stairs", () -> new BlockItem(ModBlocks.SULFUR_BRICKS_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> SULFUR_BRICKS_WALL = ITEMS.register("sulfur_bricks_wall", () -> new BlockItem(ModBlocks.SULFUR_BRICKS_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> CHISELED_SULFUR = ITEMS.register("chiseled_sulfur", () -> new BlockItem(ModBlocks.CHISELED_SULFUR.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> POTENT_SULFUR = ITEMS.register("potent_sulfur", () -> new BlockItem(ModBlocks.POTENT_SULFUR.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> SULFUR_SPIKE = ITEMS.register("sulfur_spike", () -> new BlockItem(ModBlocks.SULFUR_SPIKE.get(), createBlockItemProperties()));
 }

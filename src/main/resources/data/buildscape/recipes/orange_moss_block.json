@@ -1,0 +1,21 @@
+﻿{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "key": {
+    "M": {
+      "item": "minecraft:moss_block"
+    },
+    "D": {
+      "item": "minecraft:orange_dye"
+    }
+  },
+  "pattern": [
+    "MMM",
+    "MDM",
+    "MMM"
+  ],
+  "result": {
+    "item": "buildscape:orange_moss_block",
+    "count": 8
+  }
+}

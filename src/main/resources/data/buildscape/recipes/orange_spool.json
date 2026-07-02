@@ -1,0 +1,21 @@
+﻿{
+    "key":  {
+                "D":  {
+                          "item":  "minecraft:orange_dye"
+                      },
+                "S":  {
+                          "item":  "buildscape:spool"
+                      }
+            },
+    "category":  "building",
+    "pattern":  [
+                    "SSS",
+                    "SDS",
+                    "SSS"
+                ],
+    "result":  {
+                   "count":  8,
+                   "item":  "buildscape:orange_spool"
+               },
+    "type":  "minecraft:crafting_shaped"
+}

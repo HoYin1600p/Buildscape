@@ -1,0 +1,6 @@
+﻿{
+    "textures":  {
+                     "all":  "buildscape:block/poplar_planks"
+                 },
+    "parent":  "minecraft:block/cube_all"
+}

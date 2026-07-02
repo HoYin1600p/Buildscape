@@ -1,0 +1,16 @@
+﻿{
+    "key":  {
+                "S":  {
+                          "item":  "buildscape:sulfur_bricks"
+                      }
+            },
+    "category":  "building",
+    "pattern":  [
+                    "SSS"
+                ],
+    "result":  {
+                   "count":  6,
+                   "item":  "buildscape:sulfur_bricks_slab"
+               },
+    "type":  "minecraft:crafting_shaped"
+}

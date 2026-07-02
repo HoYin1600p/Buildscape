@@ -1,0 +1,16 @@
+﻿{
+    "key":  {
+                "#":  {
+                          "item":  "minecraft:warped_stem"
+                      }
+            },
+    "category":  "building",
+    "pattern":  [
+                    "###"
+                ],
+    "result":  {
+                   "count":  6,
+                   "item":  "buildscape:warped_stem_slab"
+               },
+    "type":  "minecraft:crafting_shaped"
+}

@@ -1,0 +1,13 @@
+{
+    "ingredients":  [
+                        {
+                            "item":  "buildscape:orange_dye_sack"
+                        }
+                    ],
+    "category":  "misc",
+    "result":  {
+                   "count":  9,
+                   "item":  "minecraft:orange_dye"
+               },
+    "type":  "minecraft:crafting_shapeless"
+}

@@ -1,0 +1,13 @@
+﻿{
+    "variants":  {
+                     "type=bottom":  {
+                                         "model":  "buildscape:block/sulfur_bricks_slab"
+                                     },
+                     "type=top":  {
+                                      "model":  "buildscape:block/sulfur_bricks_slab_top"
+                                  },
+                     "type=double":  {
+                                         "model":  "buildscape:block/sulfur_bricks"
+                                     }
+                 }
+}

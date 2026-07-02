@@ -1,22 +1,24 @@
-{
-  "values": [
-    "buildscape:oak_wood_wall",
-    "buildscape:spruce_wood_wall",
-    "buildscape:birch_wood_wall",
-    "buildscape:jungle_wood_wall",
-    "buildscape:acacia_wood_wall",
-    "buildscape:dark_oak_wood_wall",
-    "buildscape:bamboo_block_wall",
-    "buildscape:mangrove_wood_wall",
-    "buildscape:stripped_oak_wood_wall",
-    "buildscape:stripped_spruce_wood_wall",
-    "buildscape:stripped_birch_wood_wall",
-    "buildscape:stripped_jungle_wood_wall",
-    "buildscape:stripped_acacia_wood_wall",
-    "buildscape:stripped_dark_oak_wood_wall",
-    "buildscape:stripped_bamboo_block_wall",
-    "buildscape:stripped_mangrove_wood_wall"
-  ]
+﻿{
+    "values":  [
+                   "buildscape:oak_wood_wall",
+                   "buildscape:spruce_wood_wall",
+                   "buildscape:birch_wood_wall",
+                   "buildscape:jungle_wood_wall",
+                   "buildscape:acacia_wood_wall",
+                   "buildscape:dark_oak_wood_wall",
+                   "buildscape:bamboo_block_wall",
+                   "buildscape:mangrove_wood_wall",
+                   "buildscape:stripped_oak_wood_wall",
+                   "buildscape:stripped_spruce_wood_wall",
+                   "buildscape:stripped_birch_wood_wall",
+                   "buildscape:stripped_jungle_wood_wall",
+                   "buildscape:stripped_acacia_wood_wall",
+                   "buildscape:stripped_dark_oak_wood_wall",
+                   "buildscape:stripped_bamboo_block_wall",
+                   "buildscape:stripped_mangrove_wood_wall",
+                   "buildscape:poplar_log_wall",
+                   "buildscape:stripped_poplar_log_wall",
+                   "buildscape:poplar_wood_wall",
+                   "buildscape:stripped_poplar_wood_wall"
+               ]
 }
-
-

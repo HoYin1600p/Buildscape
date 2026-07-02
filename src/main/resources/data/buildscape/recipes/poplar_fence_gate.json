@@ -1,0 +1,20 @@
+﻿{
+    "key":  {
+                "S":  {
+                          "item":  "minecraft:stick"
+                      },
+                "P":  {
+                          "item":  "buildscape:poplar_planks"
+                      }
+            },
+    "category":  "building",
+    "pattern":  [
+                    "SPS",
+                    "SPS"
+                ],
+    "result":  {
+                   "count":  1,
+                   "item":  "buildscape:poplar_fence_gate"
+               },
+    "type":  "minecraft:crafting_shaped"
+}

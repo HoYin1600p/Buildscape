@@ -1,0 +1,21 @@
+﻿{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "key": {
+    "M": {
+      "item": "minecraft:moss_block"
+    },
+    "D": {
+      "item": "minecraft:red_dye"
+    }
+  },
+  "pattern": [
+    "MMM",
+    "MDM",
+    "MMM"
+  ],
+  "result": {
+    "item": "buildscape:red_moss_block",
+    "count": 8
+  }
+}

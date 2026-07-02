@@ -1,0 +1,6 @@
+﻿{
+    "textures":  {
+                     "all":  "buildscape:block/red_poplar_leaves"
+                 },
+    "parent":  "minecraft:block/leaves"
+}

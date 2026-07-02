@@ -1,0 +1,21 @@
+﻿{
+    "key":  {
+                "S":  {
+                          "item":  "buildscape:sulfur"
+                      },
+                "B":  {
+                          "item":  "minecraft:blaze_powder"
+                      }
+            },
+    "category":  "building",
+    "pattern":  [
+                    " S ",
+                    "SBS",
+                    " S "
+                ],
+    "result":  {
+                   "count":  4,
+                   "item":  "buildscape:potent_sulfur"
+               },
+    "type":  "minecraft:crafting_shaped"
+}

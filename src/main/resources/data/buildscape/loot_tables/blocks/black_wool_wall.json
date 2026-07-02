@@ -1,0 +1,20 @@
+{
+    "pools":  [
+                  {
+                      "conditions":  [
+                                         {
+                                             "condition":  "minecraft:survives_explosion"
+                                         }
+                                     ],
+                      "bonus_rolls":  0,
+                      "rolls":  1,
+                      "entries":  [
+                                      {
+                                          "name":  "buildscape:black_wool_wall",
+                                          "type":  "minecraft:item"
+                                      }
+                                  ]
+                  }
+              ],
+    "type":  "minecraft:block"
+}

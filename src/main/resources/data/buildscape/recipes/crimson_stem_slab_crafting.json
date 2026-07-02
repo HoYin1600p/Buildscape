@@ -1,0 +1,16 @@
+﻿{
+    "key":  {
+                "#":  {
+                          "item":  "minecraft:crimson_stem"
+                      }
+            },
+    "category":  "building",
+    "pattern":  [
+                    "###"
+                ],
+    "result":  {
+                   "count":  6,
+                   "item":  "buildscape:crimson_stem_slab"
+               },
+    "type":  "minecraft:crafting_shaped"
+}

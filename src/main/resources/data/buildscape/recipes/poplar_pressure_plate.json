@@ -1,0 +1,16 @@
+﻿{
+    "key":  {
+                "P":  {
+                          "item":  "buildscape:poplar_planks"
+                      }
+            },
+    "category":  "redstone",
+    "pattern":  [
+                    "PP"
+                ],
+    "result":  {
+                   "count":  1,
+                   "item":  "buildscape:poplar_pressure_plate"
+               },
+    "type":  "minecraft:crafting_shaped"
+}

@@ -1,0 +1,7 @@
+﻿{
+    "textures":  {
+                     "end":  "buildscape:block/stripped_poplar_log",
+                     "side":  "buildscape:block/stripped_poplar_log"
+                 },
+    "parent":  "minecraft:block/cube_column"
+}

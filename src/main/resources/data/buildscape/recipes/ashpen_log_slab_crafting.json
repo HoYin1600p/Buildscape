@@ -1,0 +1,16 @@
+﻿{
+    "key":  {
+                "#":  {
+                          "item":  "buildscape:ashpen_log"
+                      }
+            },
+    "category":  "building",
+    "pattern":  [
+                    "###"
+                ],
+    "result":  {
+                   "count":  6,
+                   "item":  "buildscape:ashpen_log_slab"
+               },
+    "type":  "minecraft:crafting_shaped"
+}

@@ -1,0 +1,13 @@
+﻿{
+  "variants": {
+    "type=bottom": {
+      "model": "buildscape:block/red_moss_block_slab"
+    },
+    "type=top": {
+      "model": "buildscape:block/red_moss_block_slab_top"
+    },
+    "type=double": {
+      "model": "buildscape:block/red_moss_block"
+    }
+  }
+}

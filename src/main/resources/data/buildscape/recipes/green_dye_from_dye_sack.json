@@ -1,0 +1,13 @@
+{
+    "ingredients":  [
+                        {
+                            "item":  "buildscape:green_dye_sack"
+                        }
+                    ],
+    "category":  "misc",
+    "result":  {
+                   "count":  9,
+                   "item":  "minecraft:green_dye"
+               },
+    "type":  "minecraft:crafting_shapeless"
+}

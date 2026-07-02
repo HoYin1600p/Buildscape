@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "key": {
+    "T": {
+      "item": "minecraft:tuff"
+    }
+  },
+  "pattern": [
+    "TTT"
+  ],
+  "result": {
+    "item": "buildscape:tuff_slab",
+    "count": 6
+  }
+}

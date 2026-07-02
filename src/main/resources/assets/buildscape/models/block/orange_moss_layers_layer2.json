@@ -1,0 +1,7 @@
+﻿{
+  "parent": "minecraft:block/snow_height4",
+  "textures": {
+    "texture": "buildscape:block/orange_moss_block",
+    "particle": "buildscape:block/orange_moss_block"
+  }
+}

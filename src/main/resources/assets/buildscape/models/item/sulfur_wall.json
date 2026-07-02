@@ -1,0 +1,6 @@
+﻿{
+    "textures":  {
+                     "wall":  "buildscape:block/sulfur"
+                 },
+    "parent":  "minecraft:block/wall_inventory"
+}

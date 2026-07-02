@@ -1,0 +1,16 @@
+﻿{
+    "key":  {
+                "#":  {
+                          "item":  "minecraft:stripped_jungle_log"
+                      }
+            },
+    "category":  "building",
+    "pattern":  [
+                    "###"
+                ],
+    "result":  {
+                   "count":  6,
+                   "item":  "buildscape:stripped_jungle_log_slab"
+               },
+    "type":  "minecraft:crafting_shaped"
+}

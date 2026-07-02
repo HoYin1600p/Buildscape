@@ -1,0 +1,17 @@
+﻿{
+    "key":  {
+                "S":  {
+                          "item":  "buildscape:cinnabar_bricks"
+                      }
+            },
+    "category":  "building",
+    "pattern":  [
+                    "SSS",
+                    "SSS"
+                ],
+    "result":  {
+                   "count":  6,
+                   "item":  "buildscape:cinnabar_bricks_wall"
+               },
+    "type":  "minecraft:crafting_shaped"
+}

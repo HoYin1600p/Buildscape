@@ -1,0 +1,7 @@
+{
+    "textures":  {
+                     "wall":  "minecraft:block/white_wool",
+                     "particle":  "minecraft:block/white_wool"
+                 },
+    "parent":  "minecraft:block/template_wall_post"
+}

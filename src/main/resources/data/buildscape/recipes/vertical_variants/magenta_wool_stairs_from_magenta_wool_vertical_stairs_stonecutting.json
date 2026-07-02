@@ -1,8 +1,0 @@
-{
-  "type": "minecraft:stonecutting",
-  "ingredient": {
-    "item": "buildscape:magenta_wool_vertical_stairs"
-  },
-  "result": "buildscape:magenta_wool_stairs",
-  "count": 1
-}

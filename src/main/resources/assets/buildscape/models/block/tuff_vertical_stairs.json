@@ -1,9 +1,0 @@
-{
-  "parent": "buildscape:block/template_vertical_stairs",
-  "textures": {
-    "bottom": "minecraft:block/tuff",
-    "top": "minecraft:block/tuff",
-    "side": "minecraft:block/tuff",
-    "particle": "#side"
-  }
-}

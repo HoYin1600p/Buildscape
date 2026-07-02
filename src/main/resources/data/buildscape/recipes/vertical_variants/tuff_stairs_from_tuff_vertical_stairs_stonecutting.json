@@ -1,8 +1,0 @@
-{
-  "type": "minecraft:stonecutting",
-  "ingredient": {
-    "item": "buildscape:tuff_vertical_stairs"
-  },
-  "result": "buildscape:tuff_stairs",
-  "count": 1
-}

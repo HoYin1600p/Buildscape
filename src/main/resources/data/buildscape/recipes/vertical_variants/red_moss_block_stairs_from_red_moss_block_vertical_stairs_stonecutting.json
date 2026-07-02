@@ -1,8 +1,0 @@
-{
-  "type": "minecraft:stonecutting",
-  "ingredient": {
-    "item": "buildscape:red_moss_block_vertical_stairs"
-  },
-  "result": "buildscape:red_moss_block_stairs",
-  "count": 1
-}

@@ -1,6 +1,9 @@
 {
   "replace": false,
   "values": [
+    "buildscape:mangrove_stairs",
+    "buildscape:mangrove_vertical_stairs",
+    "buildscape:poplar_vertical_stairs",
     "buildscape:ashpen_white_stairs",
     "buildscape:ashpen_black_stairs",
     "buildscape:ashpen_blue_stairs",

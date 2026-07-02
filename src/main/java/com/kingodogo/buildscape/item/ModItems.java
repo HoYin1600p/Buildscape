@@ -8826,4 +8826,132 @@ public class ModItems {
     public static final RegistryObject<Item> CHISELED_SULFUR = ITEMS.register("chiseled_sulfur", () -> new BlockItem(ModBlocks.CHISELED_SULFUR.get(), createBlockItemProperties()));
     public static final RegistryObject<Item> POTENT_SULFUR = ITEMS.register("potent_sulfur", () -> new BlockItem(ModBlocks.POTENT_SULFUR.get(), createBlockItemProperties()));
     public static final RegistryObject<Item> SULFUR_SPIKE = ITEMS.register("sulfur_spike", () -> new BlockItem(ModBlocks.SULFUR_SPIKE.get(), createBlockItemProperties()));
+
+    // New main vertical variant block items.
+    public static final RegistryObject<Item> WHITE_WOOL_VERTICAL_SLAB = ITEMS.register("white_wool_vertical_slab",
+            () -> new BlockItem(ModBlocks.WHITE_WOOL_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> ORANGE_WOOL_VERTICAL_SLAB = ITEMS.register("orange_wool_vertical_slab",
+            () -> new BlockItem(ModBlocks.ORANGE_WOOL_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> MAGENTA_WOOL_VERTICAL_SLAB = ITEMS.register("magenta_wool_vertical_slab",
+            () -> new BlockItem(ModBlocks.MAGENTA_WOOL_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIGHT_BLUE_WOOL_VERTICAL_SLAB = ITEMS.register("light_blue_wool_vertical_slab",
+            () -> new BlockItem(ModBlocks.LIGHT_BLUE_WOOL_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> YELLOW_WOOL_VERTICAL_SLAB = ITEMS.register("yellow_wool_vertical_slab",
+            () -> new BlockItem(ModBlocks.YELLOW_WOOL_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIME_WOOL_VERTICAL_SLAB = ITEMS.register("lime_wool_vertical_slab",
+            () -> new BlockItem(ModBlocks.LIME_WOOL_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PINK_WOOL_VERTICAL_SLAB = ITEMS.register("pink_wool_vertical_slab",
+            () -> new BlockItem(ModBlocks.PINK_WOOL_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GRAY_WOOL_VERTICAL_SLAB = ITEMS.register("gray_wool_vertical_slab",
+            () -> new BlockItem(ModBlocks.GRAY_WOOL_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIGHT_GRAY_WOOL_VERTICAL_SLAB = ITEMS.register("light_gray_wool_vertical_slab",
+            () -> new BlockItem(ModBlocks.LIGHT_GRAY_WOOL_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> CYAN_WOOL_VERTICAL_SLAB = ITEMS.register("cyan_wool_vertical_slab",
+            () -> new BlockItem(ModBlocks.CYAN_WOOL_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PURPLE_WOOL_VERTICAL_SLAB = ITEMS.register("purple_wool_vertical_slab",
+            () -> new BlockItem(ModBlocks.PURPLE_WOOL_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BLUE_WOOL_VERTICAL_SLAB = ITEMS.register("blue_wool_vertical_slab",
+            () -> new BlockItem(ModBlocks.BLUE_WOOL_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BROWN_WOOL_VERTICAL_SLAB = ITEMS.register("brown_wool_vertical_slab",
+            () -> new BlockItem(ModBlocks.BROWN_WOOL_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GREEN_WOOL_VERTICAL_SLAB = ITEMS.register("green_wool_vertical_slab",
+            () -> new BlockItem(ModBlocks.GREEN_WOOL_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> RED_WOOL_VERTICAL_SLAB = ITEMS.register("red_wool_vertical_slab",
+            () -> new BlockItem(ModBlocks.RED_WOOL_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BLACK_WOOL_VERTICAL_SLAB = ITEMS.register("black_wool_vertical_slab",
+            () -> new BlockItem(ModBlocks.BLACK_WOOL_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> RED_MOSS_BLOCK_VERTICAL_SLAB = ITEMS.register("red_moss_block_vertical_slab",
+            () -> new BlockItem(ModBlocks.RED_MOSS_BLOCK_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> ORANGE_MOSS_BLOCK_VERTICAL_SLAB = ITEMS.register("orange_moss_block_vertical_slab",
+            () -> new BlockItem(ModBlocks.ORANGE_MOSS_BLOCK_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> YELLOW_MOSS_BLOCK_VERTICAL_SLAB = ITEMS.register("yellow_moss_block_vertical_slab",
+            () -> new BlockItem(ModBlocks.YELLOW_MOSS_BLOCK_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> TUFF_VERTICAL_SLAB = ITEMS.register("tuff_vertical_slab",
+            () -> new BlockItem(ModBlocks.TUFF_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> POLISHED_TUFF_VERTICAL_SLAB = ITEMS.register("polished_tuff_vertical_slab",
+            () -> new BlockItem(ModBlocks.POLISHED_TUFF_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> TUFF_BRICK_VERTICAL_SLAB = ITEMS.register("tuff_brick_vertical_slab",
+            () -> new BlockItem(ModBlocks.TUFF_BRICK_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> SULFUR_VERTICAL_SLAB = ITEMS.register("sulfur_vertical_slab",
+            () -> new BlockItem(ModBlocks.SULFUR_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> POLISHED_SULFUR_VERTICAL_SLAB = ITEMS.register("polished_sulfur_vertical_slab",
+            () -> new BlockItem(ModBlocks.POLISHED_SULFUR_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> SULFUR_BRICKS_VERTICAL_SLAB = ITEMS.register("sulfur_bricks_vertical_slab",
+            () -> new BlockItem(ModBlocks.SULFUR_BRICKS_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> CINNABAR_VERTICAL_SLAB = ITEMS.register("cinnabar_vertical_slab",
+            () -> new BlockItem(ModBlocks.CINNABAR_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> POLISHED_CINNABAR_VERTICAL_SLAB = ITEMS.register("polished_cinnabar_vertical_slab",
+            () -> new BlockItem(ModBlocks.POLISHED_CINNABAR_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> CINNABAR_BRICKS_VERTICAL_SLAB = ITEMS.register("cinnabar_bricks_vertical_slab",
+            () -> new BlockItem(ModBlocks.CINNABAR_BRICKS_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> POPLAR_VERTICAL_SLAB = ITEMS.register("poplar_vertical_slab",
+            () -> new BlockItem(ModBlocks.POPLAR_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> POPLAR_LOG_VERTICAL_SLAB = ITEMS.register("poplar_log_vertical_slab",
+            () -> new BlockItem(ModBlocks.POPLAR_LOG_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> STRIPPED_POPLAR_LOG_VERTICAL_SLAB = ITEMS.register("stripped_poplar_log_vertical_slab",
+            () -> new BlockItem(ModBlocks.STRIPPED_POPLAR_LOG_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> POPLAR_WOOD_VERTICAL_SLAB = ITEMS.register("poplar_wood_vertical_slab",
+            () -> new BlockItem(ModBlocks.POPLAR_WOOD_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> STRIPPED_POPLAR_WOOD_VERTICAL_SLAB = ITEMS.register("stripped_poplar_wood_vertical_slab",
+            () -> new BlockItem(ModBlocks.STRIPPED_POPLAR_WOOD_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WHITE_WOOL_VERTICAL_STAIRS = ITEMS.register("white_wool_vertical_stairs",
+            () -> new BlockItem(ModBlocks.WHITE_WOOL_VERTICAL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> ORANGE_WOOL_VERTICAL_STAIRS = ITEMS.register("orange_wool_vertical_stairs",
+            () -> new BlockItem(ModBlocks.ORANGE_WOOL_VERTICAL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> MAGENTA_WOOL_VERTICAL_STAIRS = ITEMS.register("magenta_wool_vertical_stairs",
+            () -> new BlockItem(ModBlocks.MAGENTA_WOOL_VERTICAL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIGHT_BLUE_WOOL_VERTICAL_STAIRS = ITEMS.register("light_blue_wool_vertical_stairs",
+            () -> new BlockItem(ModBlocks.LIGHT_BLUE_WOOL_VERTICAL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> YELLOW_WOOL_VERTICAL_STAIRS = ITEMS.register("yellow_wool_vertical_stairs",
+            () -> new BlockItem(ModBlocks.YELLOW_WOOL_VERTICAL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIME_WOOL_VERTICAL_STAIRS = ITEMS.register("lime_wool_vertical_stairs",
+            () -> new BlockItem(ModBlocks.LIME_WOOL_VERTICAL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PINK_WOOL_VERTICAL_STAIRS = ITEMS.register("pink_wool_vertical_stairs",
+            () -> new BlockItem(ModBlocks.PINK_WOOL_VERTICAL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GRAY_WOOL_VERTICAL_STAIRS = ITEMS.register("gray_wool_vertical_stairs",
+            () -> new BlockItem(ModBlocks.GRAY_WOOL_VERTICAL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIGHT_GRAY_WOOL_VERTICAL_STAIRS = ITEMS.register("light_gray_wool_vertical_stairs",
+            () -> new BlockItem(ModBlocks.LIGHT_GRAY_WOOL_VERTICAL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> CYAN_WOOL_VERTICAL_STAIRS = ITEMS.register("cyan_wool_vertical_stairs",
+            () -> new BlockItem(ModBlocks.CYAN_WOOL_VERTICAL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PURPLE_WOOL_VERTICAL_STAIRS = ITEMS.register("purple_wool_vertical_stairs",
+            () -> new BlockItem(ModBlocks.PURPLE_WOOL_VERTICAL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BLUE_WOOL_VERTICAL_STAIRS = ITEMS.register("blue_wool_vertical_stairs",
+            () -> new BlockItem(ModBlocks.BLUE_WOOL_VERTICAL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BROWN_WOOL_VERTICAL_STAIRS = ITEMS.register("brown_wool_vertical_stairs",
+            () -> new BlockItem(ModBlocks.BROWN_WOOL_VERTICAL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GREEN_WOOL_VERTICAL_STAIRS = ITEMS.register("green_wool_vertical_stairs",
+            () -> new BlockItem(ModBlocks.GREEN_WOOL_VERTICAL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> RED_WOOL_VERTICAL_STAIRS = ITEMS.register("red_wool_vertical_stairs",
+            () -> new BlockItem(ModBlocks.RED_WOOL_VERTICAL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BLACK_WOOL_VERTICAL_STAIRS = ITEMS.register("black_wool_vertical_stairs",
+            () -> new BlockItem(ModBlocks.BLACK_WOOL_VERTICAL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> RED_MOSS_BLOCK_VERTICAL_STAIRS = ITEMS.register("red_moss_block_vertical_stairs",
+            () -> new BlockItem(ModBlocks.RED_MOSS_BLOCK_VERTICAL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> ORANGE_MOSS_BLOCK_VERTICAL_STAIRS = ITEMS.register("orange_moss_block_vertical_stairs",
+            () -> new BlockItem(ModBlocks.ORANGE_MOSS_BLOCK_VERTICAL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> YELLOW_MOSS_BLOCK_VERTICAL_STAIRS = ITEMS.register("yellow_moss_block_vertical_stairs",
+            () -> new BlockItem(ModBlocks.YELLOW_MOSS_BLOCK_VERTICAL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> TUFF_VERTICAL_STAIRS = ITEMS.register("tuff_vertical_stairs",
+            () -> new BlockItem(ModBlocks.TUFF_VERTICAL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> POLISHED_TUFF_VERTICAL_STAIRS = ITEMS.register("polished_tuff_vertical_stairs",
+            () -> new BlockItem(ModBlocks.POLISHED_TUFF_VERTICAL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> TUFF_BRICK_VERTICAL_STAIRS = ITEMS.register("tuff_brick_vertical_stairs",
+            () -> new BlockItem(ModBlocks.TUFF_BRICK_VERTICAL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> SULFUR_VERTICAL_STAIRS = ITEMS.register("sulfur_vertical_stairs",
+            () -> new BlockItem(ModBlocks.SULFUR_VERTICAL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> POLISHED_SULFUR_VERTICAL_STAIRS = ITEMS.register("polished_sulfur_vertical_stairs",
+            () -> new BlockItem(ModBlocks.POLISHED_SULFUR_VERTICAL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> SULFUR_BRICKS_VERTICAL_STAIRS = ITEMS.register("sulfur_bricks_vertical_stairs",
+            () -> new BlockItem(ModBlocks.SULFUR_BRICKS_VERTICAL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> CINNABAR_VERTICAL_STAIRS = ITEMS.register("cinnabar_vertical_stairs",
+            () -> new BlockItem(ModBlocks.CINNABAR_VERTICAL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> POLISHED_CINNABAR_VERTICAL_STAIRS = ITEMS.register("polished_cinnabar_vertical_stairs",
+            () -> new BlockItem(ModBlocks.POLISHED_CINNABAR_VERTICAL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> CINNABAR_BRICKS_VERTICAL_STAIRS = ITEMS.register("cinnabar_bricks_vertical_stairs",
+            () -> new BlockItem(ModBlocks.CINNABAR_BRICKS_VERTICAL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> POPLAR_VERTICAL_STAIRS = ITEMS.register("poplar_vertical_stairs",
+            () -> new BlockItem(ModBlocks.POPLAR_VERTICAL_STAIRS.get(), createBlockItemProperties()));
+    // End new main vertical variant block items.
+
 }

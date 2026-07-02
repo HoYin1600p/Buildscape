@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "#",
+    "#"
+  ],
+  "key": {
+    "#": {
+      "item": "buildscape:poplar_stairs"
+    }
+  },
+  "result": {
+    "item": "buildscape:poplar_vertical_stairs",
+    "count": 2
+  }
+}

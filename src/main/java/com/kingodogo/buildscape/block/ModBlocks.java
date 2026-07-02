@@ -10348,4 +10348,256 @@ public class ModBlocks {
                 () -> new ModWallBlock(BlockBehaviour.Properties.copy(TUFF_BRICKS.get())));
         public static final RegistryObject<Block> CHISELED_TUFF_BRICKS = BLOCKS.register("chiseled_tuff_bricks",
                 () -> new Block(BlockBehaviour.Properties.copy(Blocks.TUFF)));
+
+    // New main vertical variants.
+    public static final RegistryObject<Block> WHITE_WOOL_VERTICAL_SLAB = BLOCKS.register("white_wool_vertical_slab",
+            () -> new VerticalSlabBlock(
+                    Blocks.WHITE_WOOL,
+                    BlockBehaviour.Properties.copy(WHITE_WOOL_SLAB.get())));
+    public static final RegistryObject<Block> ORANGE_WOOL_VERTICAL_SLAB = BLOCKS.register("orange_wool_vertical_slab",
+            () -> new VerticalSlabBlock(
+                    Blocks.ORANGE_WOOL,
+                    BlockBehaviour.Properties.copy(ORANGE_WOOL_SLAB.get())));
+    public static final RegistryObject<Block> MAGENTA_WOOL_VERTICAL_SLAB = BLOCKS.register("magenta_wool_vertical_slab",
+            () -> new VerticalSlabBlock(
+                    Blocks.MAGENTA_WOOL,
+                    BlockBehaviour.Properties.copy(MAGENTA_WOOL_SLAB.get())));
+    public static final RegistryObject<Block> LIGHT_BLUE_WOOL_VERTICAL_SLAB = BLOCKS.register("light_blue_wool_vertical_slab",
+            () -> new VerticalSlabBlock(
+                    Blocks.LIGHT_BLUE_WOOL,
+                    BlockBehaviour.Properties.copy(LIGHT_BLUE_WOOL_SLAB.get())));
+    public static final RegistryObject<Block> YELLOW_WOOL_VERTICAL_SLAB = BLOCKS.register("yellow_wool_vertical_slab",
+            () -> new VerticalSlabBlock(
+                    Blocks.YELLOW_WOOL,
+                    BlockBehaviour.Properties.copy(YELLOW_WOOL_SLAB.get())));
+    public static final RegistryObject<Block> LIME_WOOL_VERTICAL_SLAB = BLOCKS.register("lime_wool_vertical_slab",
+            () -> new VerticalSlabBlock(
+                    Blocks.LIME_WOOL,
+                    BlockBehaviour.Properties.copy(LIME_WOOL_SLAB.get())));
+    public static final RegistryObject<Block> PINK_WOOL_VERTICAL_SLAB = BLOCKS.register("pink_wool_vertical_slab",
+            () -> new VerticalSlabBlock(
+                    Blocks.PINK_WOOL,
+                    BlockBehaviour.Properties.copy(PINK_WOOL_SLAB.get())));
+    public static final RegistryObject<Block> GRAY_WOOL_VERTICAL_SLAB = BLOCKS.register("gray_wool_vertical_slab",
+            () -> new VerticalSlabBlock(
+                    Blocks.GRAY_WOOL,
+                    BlockBehaviour.Properties.copy(GRAY_WOOL_SLAB.get())));
+    public static final RegistryObject<Block> LIGHT_GRAY_WOOL_VERTICAL_SLAB = BLOCKS.register("light_gray_wool_vertical_slab",
+            () -> new VerticalSlabBlock(
+                    Blocks.LIGHT_GRAY_WOOL,
+                    BlockBehaviour.Properties.copy(LIGHT_GRAY_WOOL_SLAB.get())));
+    public static final RegistryObject<Block> CYAN_WOOL_VERTICAL_SLAB = BLOCKS.register("cyan_wool_vertical_slab",
+            () -> new VerticalSlabBlock(
+                    Blocks.CYAN_WOOL,
+                    BlockBehaviour.Properties.copy(CYAN_WOOL_SLAB.get())));
+    public static final RegistryObject<Block> PURPLE_WOOL_VERTICAL_SLAB = BLOCKS.register("purple_wool_vertical_slab",
+            () -> new VerticalSlabBlock(
+                    Blocks.PURPLE_WOOL,
+                    BlockBehaviour.Properties.copy(PURPLE_WOOL_SLAB.get())));
+    public static final RegistryObject<Block> BLUE_WOOL_VERTICAL_SLAB = BLOCKS.register("blue_wool_vertical_slab",
+            () -> new VerticalSlabBlock(
+                    Blocks.BLUE_WOOL,
+                    BlockBehaviour.Properties.copy(BLUE_WOOL_SLAB.get())));
+    public static final RegistryObject<Block> BROWN_WOOL_VERTICAL_SLAB = BLOCKS.register("brown_wool_vertical_slab",
+            () -> new VerticalSlabBlock(
+                    Blocks.BROWN_WOOL,
+                    BlockBehaviour.Properties.copy(BROWN_WOOL_SLAB.get())));
+    public static final RegistryObject<Block> GREEN_WOOL_VERTICAL_SLAB = BLOCKS.register("green_wool_vertical_slab",
+            () -> new VerticalSlabBlock(
+                    Blocks.GREEN_WOOL,
+                    BlockBehaviour.Properties.copy(GREEN_WOOL_SLAB.get())));
+    public static final RegistryObject<Block> RED_WOOL_VERTICAL_SLAB = BLOCKS.register("red_wool_vertical_slab",
+            () -> new VerticalSlabBlock(
+                    Blocks.RED_WOOL,
+                    BlockBehaviour.Properties.copy(RED_WOOL_SLAB.get())));
+    public static final RegistryObject<Block> BLACK_WOOL_VERTICAL_SLAB = BLOCKS.register("black_wool_vertical_slab",
+            () -> new VerticalSlabBlock(
+                    Blocks.BLACK_WOOL,
+                    BlockBehaviour.Properties.copy(BLACK_WOOL_SLAB.get())));
+    public static final RegistryObject<Block> RED_MOSS_BLOCK_VERTICAL_SLAB = BLOCKS.register("red_moss_block_vertical_slab",
+            () -> new VerticalSlabBlock(
+                    RED_MOSS_BLOCK.get(),
+                    BlockBehaviour.Properties.copy(RED_MOSS_BLOCK_SLAB.get())));
+    public static final RegistryObject<Block> ORANGE_MOSS_BLOCK_VERTICAL_SLAB = BLOCKS.register("orange_moss_block_vertical_slab",
+            () -> new VerticalSlabBlock(
+                    ORANGE_MOSS_BLOCK.get(),
+                    BlockBehaviour.Properties.copy(ORANGE_MOSS_BLOCK_SLAB.get())));
+    public static final RegistryObject<Block> YELLOW_MOSS_BLOCK_VERTICAL_SLAB = BLOCKS.register("yellow_moss_block_vertical_slab",
+            () -> new VerticalSlabBlock(
+                    YELLOW_MOSS_BLOCK.get(),
+                    BlockBehaviour.Properties.copy(YELLOW_MOSS_BLOCK_SLAB.get())));
+    public static final RegistryObject<Block> TUFF_VERTICAL_SLAB = BLOCKS.register("tuff_vertical_slab",
+            () -> new VerticalSlabBlock(
+                    Blocks.TUFF,
+                    BlockBehaviour.Properties.copy(TUFF_SLAB.get())));
+    public static final RegistryObject<Block> POLISHED_TUFF_VERTICAL_SLAB = BLOCKS.register("polished_tuff_vertical_slab",
+            () -> new VerticalSlabBlock(
+                    POLISHED_TUFF.get(),
+                    BlockBehaviour.Properties.copy(POLISHED_TUFF_SLAB.get())));
+    public static final RegistryObject<Block> TUFF_BRICK_VERTICAL_SLAB = BLOCKS.register("tuff_brick_vertical_slab",
+            () -> new VerticalSlabBlock(
+                    TUFF_BRICKS.get(),
+                    BlockBehaviour.Properties.copy(TUFF_BRICK_SLAB.get())));
+    public static final RegistryObject<Block> SULFUR_VERTICAL_SLAB = BLOCKS.register("sulfur_vertical_slab",
+            () -> new VerticalSlabBlock(
+                    SULFUR.get(),
+                    BlockBehaviour.Properties.copy(SULFUR_SLAB.get())));
+    public static final RegistryObject<Block> POLISHED_SULFUR_VERTICAL_SLAB = BLOCKS.register("polished_sulfur_vertical_slab",
+            () -> new VerticalSlabBlock(
+                    POLISHED_SULFUR.get(),
+                    BlockBehaviour.Properties.copy(POLISHED_SULFUR_SLAB.get())));
+    public static final RegistryObject<Block> SULFUR_BRICKS_VERTICAL_SLAB = BLOCKS.register("sulfur_bricks_vertical_slab",
+            () -> new VerticalSlabBlock(
+                    SULFUR_BRICKS.get(),
+                    BlockBehaviour.Properties.copy(SULFUR_BRICKS_SLAB.get())));
+    public static final RegistryObject<Block> CINNABAR_VERTICAL_SLAB = BLOCKS.register("cinnabar_vertical_slab",
+            () -> new VerticalSlabBlock(
+                    CINNABAR.get(),
+                    BlockBehaviour.Properties.copy(CINNABAR_SLAB.get())));
+    public static final RegistryObject<Block> POLISHED_CINNABAR_VERTICAL_SLAB = BLOCKS.register("polished_cinnabar_vertical_slab",
+            () -> new VerticalSlabBlock(
+                    POLISHED_CINNABAR.get(),
+                    BlockBehaviour.Properties.copy(POLISHED_CINNABAR_SLAB.get())));
+    public static final RegistryObject<Block> CINNABAR_BRICKS_VERTICAL_SLAB = BLOCKS.register("cinnabar_bricks_vertical_slab",
+            () -> new VerticalSlabBlock(
+                    CINNABAR_BRICKS.get(),
+                    BlockBehaviour.Properties.copy(CINNABAR_BRICKS_SLAB.get())));
+    public static final RegistryObject<Block> POPLAR_VERTICAL_SLAB = BLOCKS.register("poplar_vertical_slab",
+            () -> new VerticalSlabBlock(
+                    POPLAR_PLANKS.get(),
+                    BlockBehaviour.Properties.copy(POPLAR_SLAB.get())));
+    public static final RegistryObject<Block> POPLAR_LOG_VERTICAL_SLAB = BLOCKS.register("poplar_log_vertical_slab",
+            () -> new VerticalSlabBlock(
+                    POPLAR_LOG.get(),
+                    BlockBehaviour.Properties.copy(POPLAR_LOG_SLAB.get())));
+    public static final RegistryObject<Block> STRIPPED_POPLAR_LOG_VERTICAL_SLAB = BLOCKS.register("stripped_poplar_log_vertical_slab",
+            () -> new VerticalSlabBlock(
+                    STRIPPED_POPLAR_LOG.get(),
+                    BlockBehaviour.Properties.copy(STRIPPED_POPLAR_LOG_SLAB.get())));
+    public static final RegistryObject<Block> POPLAR_WOOD_VERTICAL_SLAB = BLOCKS.register("poplar_wood_vertical_slab",
+            () -> new VerticalSlabBlock(
+                    POPLAR_WOOD.get(),
+                    BlockBehaviour.Properties.copy(POPLAR_WOOD_SLAB.get())));
+    public static final RegistryObject<Block> STRIPPED_POPLAR_WOOD_VERTICAL_SLAB = BLOCKS.register("stripped_poplar_wood_vertical_slab",
+            () -> new VerticalSlabBlock(
+                    STRIPPED_POPLAR_WOOD.get(),
+                    BlockBehaviour.Properties.copy(STRIPPED_POPLAR_WOOD_SLAB.get())));
+    public static final RegistryObject<Block> WHITE_WOOL_VERTICAL_STAIRS = BLOCKS.register("white_wool_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.WHITE_WOOL.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(WHITE_WOOL_STAIRS.get())));
+    public static final RegistryObject<Block> ORANGE_WOOL_VERTICAL_STAIRS = BLOCKS.register("orange_wool_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.ORANGE_WOOL.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(ORANGE_WOOL_STAIRS.get())));
+    public static final RegistryObject<Block> MAGENTA_WOOL_VERTICAL_STAIRS = BLOCKS.register("magenta_wool_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.MAGENTA_WOOL.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(MAGENTA_WOOL_STAIRS.get())));
+    public static final RegistryObject<Block> LIGHT_BLUE_WOOL_VERTICAL_STAIRS = BLOCKS.register("light_blue_wool_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.LIGHT_BLUE_WOOL.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(LIGHT_BLUE_WOOL_STAIRS.get())));
+    public static final RegistryObject<Block> YELLOW_WOOL_VERTICAL_STAIRS = BLOCKS.register("yellow_wool_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.YELLOW_WOOL.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(YELLOW_WOOL_STAIRS.get())));
+    public static final RegistryObject<Block> LIME_WOOL_VERTICAL_STAIRS = BLOCKS.register("lime_wool_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.LIME_WOOL.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(LIME_WOOL_STAIRS.get())));
+    public static final RegistryObject<Block> PINK_WOOL_VERTICAL_STAIRS = BLOCKS.register("pink_wool_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.PINK_WOOL.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(PINK_WOOL_STAIRS.get())));
+    public static final RegistryObject<Block> GRAY_WOOL_VERTICAL_STAIRS = BLOCKS.register("gray_wool_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.GRAY_WOOL.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(GRAY_WOOL_STAIRS.get())));
+    public static final RegistryObject<Block> LIGHT_GRAY_WOOL_VERTICAL_STAIRS = BLOCKS.register("light_gray_wool_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.LIGHT_GRAY_WOOL.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(LIGHT_GRAY_WOOL_STAIRS.get())));
+    public static final RegistryObject<Block> CYAN_WOOL_VERTICAL_STAIRS = BLOCKS.register("cyan_wool_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.CYAN_WOOL.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(CYAN_WOOL_STAIRS.get())));
+    public static final RegistryObject<Block> PURPLE_WOOL_VERTICAL_STAIRS = BLOCKS.register("purple_wool_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.PURPLE_WOOL.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(PURPLE_WOOL_STAIRS.get())));
+    public static final RegistryObject<Block> BLUE_WOOL_VERTICAL_STAIRS = BLOCKS.register("blue_wool_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.BLUE_WOOL.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(BLUE_WOOL_STAIRS.get())));
+    public static final RegistryObject<Block> BROWN_WOOL_VERTICAL_STAIRS = BLOCKS.register("brown_wool_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.BROWN_WOOL.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(BROWN_WOOL_STAIRS.get())));
+    public static final RegistryObject<Block> GREEN_WOOL_VERTICAL_STAIRS = BLOCKS.register("green_wool_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.GREEN_WOOL.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(GREEN_WOOL_STAIRS.get())));
+    public static final RegistryObject<Block> RED_WOOL_VERTICAL_STAIRS = BLOCKS.register("red_wool_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.RED_WOOL.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(RED_WOOL_STAIRS.get())));
+    public static final RegistryObject<Block> BLACK_WOOL_VERTICAL_STAIRS = BLOCKS.register("black_wool_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.BLACK_WOOL.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(BLACK_WOOL_STAIRS.get())));
+    public static final RegistryObject<Block> RED_MOSS_BLOCK_VERTICAL_STAIRS = BLOCKS.register("red_moss_block_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    RED_MOSS_BLOCK.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(RED_MOSS_BLOCK_STAIRS.get())));
+    public static final RegistryObject<Block> ORANGE_MOSS_BLOCK_VERTICAL_STAIRS = BLOCKS.register("orange_moss_block_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    ORANGE_MOSS_BLOCK.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(ORANGE_MOSS_BLOCK_STAIRS.get())));
+    public static final RegistryObject<Block> YELLOW_MOSS_BLOCK_VERTICAL_STAIRS = BLOCKS.register("yellow_moss_block_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    YELLOW_MOSS_BLOCK.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(YELLOW_MOSS_BLOCK_STAIRS.get())));
+    public static final RegistryObject<Block> TUFF_VERTICAL_STAIRS = BLOCKS.register("tuff_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.TUFF.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(TUFF_STAIRS.get())));
+    public static final RegistryObject<Block> POLISHED_TUFF_VERTICAL_STAIRS = BLOCKS.register("polished_tuff_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    POLISHED_TUFF.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(POLISHED_TUFF_STAIRS.get())));
+    public static final RegistryObject<Block> TUFF_BRICK_VERTICAL_STAIRS = BLOCKS.register("tuff_brick_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    TUFF_BRICKS.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(TUFF_BRICK_STAIRS.get())));
+    public static final RegistryObject<Block> SULFUR_VERTICAL_STAIRS = BLOCKS.register("sulfur_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    SULFUR.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(SULFUR_STAIRS.get())));
+    public static final RegistryObject<Block> POLISHED_SULFUR_VERTICAL_STAIRS = BLOCKS.register("polished_sulfur_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    POLISHED_SULFUR.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(POLISHED_SULFUR_STAIRS.get())));
+    public static final RegistryObject<Block> SULFUR_BRICKS_VERTICAL_STAIRS = BLOCKS.register("sulfur_bricks_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    SULFUR_BRICKS.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(SULFUR_BRICKS_STAIRS.get())));
+    public static final RegistryObject<Block> CINNABAR_VERTICAL_STAIRS = BLOCKS.register("cinnabar_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    CINNABAR.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(CINNABAR_STAIRS.get())));
+    public static final RegistryObject<Block> POLISHED_CINNABAR_VERTICAL_STAIRS = BLOCKS.register("polished_cinnabar_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    POLISHED_CINNABAR.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(POLISHED_CINNABAR_STAIRS.get())));
+    public static final RegistryObject<Block> CINNABAR_BRICKS_VERTICAL_STAIRS = BLOCKS.register("cinnabar_bricks_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    CINNABAR_BRICKS.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(CINNABAR_BRICKS_STAIRS.get())));
+    public static final RegistryObject<Block> POPLAR_VERTICAL_STAIRS = BLOCKS.register("poplar_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    POPLAR_PLANKS.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(POPLAR_STAIRS.get())));
+    // End new main vertical variants.
+
 }

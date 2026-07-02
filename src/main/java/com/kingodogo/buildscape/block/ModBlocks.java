@@ -9216,6 +9216,870 @@ public class ModBlocks {
             () -> new VerticalSlabBlock(
                     ASHPEN_WOOD.get(),
                     BlockBehaviour.Properties.copy(ASHPEN_WOOD_SLAB.get())));
+    public static final RegistryObject<Block> BLACK_SANDSTONE_VERTICAL_STAIRS = BLOCKS.register("black_sandstone_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    BLACK_SANDSTONE.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(BLACK_SANDSTONE_STAIRS.get())));
+    public static final RegistryObject<Block> BLUE_SANDSTONE_VERTICAL_STAIRS = BLOCKS.register("blue_sandstone_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    BLUE_SANDSTONE.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(BLUE_SANDSTONE_STAIRS.get())));
+    public static final RegistryObject<Block> GREEN_SANDSTONE_VERTICAL_STAIRS = BLOCKS.register("green_sandstone_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    GREEN_SANDSTONE.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(GREEN_SANDSTONE_STAIRS.get())));
+    public static final RegistryObject<Block> ORANGE_SANDSTONE_VERTICAL_STAIRS = BLOCKS.register("orange_sandstone_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    ORANGE_SANDSTONE.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(ORANGE_SANDSTONE_STAIRS.get())));
+    public static final RegistryObject<Block> PINK_SANDSTONE_VERTICAL_STAIRS = BLOCKS.register("pink_sandstone_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    PINK_SANDSTONE.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(PINK_SANDSTONE_STAIRS.get())));
+    public static final RegistryObject<Block> RED_SANDSTONE_VERTICAL_STAIRS = BLOCKS.register("red_sandstone_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    RED_SANDSTONE.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(RED_SANDSTONE_STAIRS.get())));
+    public static final RegistryObject<Block> WHITE_SANDSTONE_VERTICAL_STAIRS = BLOCKS.register("white_sandstone_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    WHITE_SANDSTONE.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(WHITE_SANDSTONE_STAIRS.get())));
+    public static final RegistryObject<Block> YELLOW_SANDSTONE_VERTICAL_STAIRS = BLOCKS.register("yellow_sandstone_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    YELLOW_SANDSTONE.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(YELLOW_SANDSTONE_STAIRS.get())));
+    public static final RegistryObject<Block> BLACK_TILES_VERTICAL_STAIRS = BLOCKS.register("black_tiles_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    BLACK_TILES.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(BLACK_TILES_STAIRS.get())));
+    public static final RegistryObject<Block> BLUE_TILES_VERTICAL_STAIRS = BLOCKS.register("blue_tiles_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    BLUE_TILES.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(BLUE_TILES_STAIRS.get())));
+    public static final RegistryObject<Block> BROWN_TILES_VERTICAL_STAIRS = BLOCKS.register("brown_tiles_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    BROWN_TILES.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(BROWN_TILES_STAIRS.get())));
+    public static final RegistryObject<Block> CYAN_TILES_VERTICAL_STAIRS = BLOCKS.register("cyan_tiles_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    CYAN_TILES.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(CYAN_TILES_STAIRS.get())));
+    public static final RegistryObject<Block> GRAY_TILES_VERTICAL_STAIRS = BLOCKS.register("gray_tiles_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    GRAY_TILES.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(GRAY_TILES_STAIRS.get())));
+    public static final RegistryObject<Block> GREEN_TILES_VERTICAL_STAIRS = BLOCKS.register("green_tiles_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    GREEN_TILES.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(GREEN_TILES_STAIRS.get())));
+    public static final RegistryObject<Block> LIGHT_BLUE_TILES_VERTICAL_STAIRS = BLOCKS.register("light_blue_tiles_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    LIGHT_BLUE_TILES.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(LIGHT_BLUE_TILES_STAIRS.get())));
+    public static final RegistryObject<Block> LIGHT_GRAY_TILES_VERTICAL_STAIRS = BLOCKS.register("light_gray_tiles_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    LIGHT_GRAY_TILES.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(LIGHT_GRAY_TILES_STAIRS.get())));
+    public static final RegistryObject<Block> LIME_TILES_VERTICAL_STAIRS = BLOCKS.register("lime_tiles_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    LIME_TILES.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(LIME_TILES_STAIRS.get())));
+    public static final RegistryObject<Block> MAGENTA_TILES_VERTICAL_STAIRS = BLOCKS.register("magenta_tiles_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    MAGENTA_TILES.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(MAGENTA_TILES_STAIRS.get())));
+    public static final RegistryObject<Block> ORANGE_TILES_VERTICAL_STAIRS = BLOCKS.register("orange_tiles_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    ORANGE_TILES.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(ORANGE_TILES_STAIRS.get())));
+    public static final RegistryObject<Block> PINK_TILES_VERTICAL_STAIRS = BLOCKS.register("pink_tiles_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    PINK_TILES.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(PINK_TILES_STAIRS.get())));
+    public static final RegistryObject<Block> PURPLE_TILES_VERTICAL_STAIRS = BLOCKS.register("purple_tiles_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    PURPLE_TILES.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(PURPLE_TILES_STAIRS.get())));
+    public static final RegistryObject<Block> RED_TILES_VERTICAL_STAIRS = BLOCKS.register("red_tiles_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    RED_TILES.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(RED_TILES_STAIRS.get())));
+    public static final RegistryObject<Block> WHITE_TILES_VERTICAL_STAIRS = BLOCKS.register("white_tiles_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    WHITE_TILES.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(WHITE_TILES_STAIRS.get())));
+    public static final RegistryObject<Block> YELLOW_TILES_VERTICAL_STAIRS = BLOCKS.register("yellow_tiles_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    YELLOW_TILES.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(YELLOW_TILES_STAIRS.get())));
+    public static final RegistryObject<Block> BIT_COPPER_BLOCK_VERTICAL_STAIRS = BLOCKS.register("bit_copper_block_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    BIT_COPPER_BLOCK.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(BIT_COPPER_BLOCK_STAIRS.get())));
+    public static final RegistryObject<Block> BIT_CUT_COPPER_VERTICAL_STAIRS = BLOCKS.register("bit_cut_copper_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    BIT_CUT_COPPER.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(BIT_CUT_COPPER_STAIRS.get())));
+    public static final RegistryObject<Block> BIT_EXPOSED_COPPER_BLOCK_VERTICAL_STAIRS = BLOCKS.register("bit_exposed_copper_block_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    BIT_EXPOSED_COPPER_BLOCK.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(BIT_EXPOSED_COPPER_BLOCK_STAIRS.get())));
+    public static final RegistryObject<Block> BIT_EXPOSED_CUT_COPPER_VERTICAL_STAIRS = BLOCKS.register("bit_exposed_cut_copper_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    BIT_EXPOSED_CUT_COPPER.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(BIT_EXPOSED_CUT_COPPER_STAIRS.get())));
+    public static final RegistryObject<Block> BIT_WEATHERED_COPPER_BLOCK_VERTICAL_STAIRS = BLOCKS.register("bit_weathered_copper_block_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    BIT_WEATHERED_COPPER_BLOCK.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(BIT_WEATHERED_COPPER_BLOCK_STAIRS.get())));
+    public static final RegistryObject<Block> BIT_WEATHERED_CUT_COPPER_VERTICAL_STAIRS = BLOCKS.register("bit_weathered_cut_copper_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    BIT_WEATHERED_CUT_COPPER.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(BIT_WEATHERED_CUT_COPPER_STAIRS.get())));
+    public static final RegistryObject<Block> BIT_OXIDIZED_COPPER_BLOCK_VERTICAL_STAIRS = BLOCKS.register("bit_oxidized_copper_block_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    BIT_OXIDIZED_COPPER_BLOCK.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(BIT_OXIDIZED_COPPER_BLOCK_STAIRS.get())));
+    public static final RegistryObject<Block> BIT_OXIDIZED_CUT_COPPER_VERTICAL_STAIRS = BLOCKS.register("bit_oxidized_cut_copper_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    BIT_OXIDIZED_CUT_COPPER.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(BIT_OXIDIZED_CUT_COPPER_STAIRS.get())));
+    public static final RegistryObject<Block> BIT_POLISHED_TUFF_VERTICAL_STAIRS = BLOCKS.register("bit_polished_tuff_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    BIT_POLISHED_TUFF.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(BIT_POLISHED_TUFF_STAIRS.get())));
+    public static final RegistryObject<Block> BIT_TUFF_BRICKS_VERTICAL_STAIRS = BLOCKS.register("bit_tuff_bricks_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    BIT_TUFF_BRICKS.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(BIT_TUFF_BRICKS_STAIRS.get())));
+    public static final RegistryObject<Block> BLACK_SMOOTH_SANDSTONE_VERTICAL_STAIRS = BLOCKS.register("black_smooth_sandstone_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    BLACK_SMOOTH_SANDSTONE.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(BLACK_SMOOTH_SANDSTONE_STAIRS.get())));
+    public static final RegistryObject<Block> BLUE_SMOOTH_SANDSTONE_VERTICAL_STAIRS = BLOCKS.register("blue_smooth_sandstone_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    BLUE_SMOOTH_SANDSTONE.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(BLUE_SMOOTH_SANDSTONE_STAIRS.get())));
+    public static final RegistryObject<Block> GREEN_SMOOTH_SANDSTONE_VERTICAL_STAIRS = BLOCKS.register("green_smooth_sandstone_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    GREEN_SMOOTH_SANDSTONE.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(GREEN_SMOOTH_SANDSTONE_STAIRS.get())));
+    public static final RegistryObject<Block> ORANGE_SMOOTH_SANDSTONE_VERTICAL_STAIRS = BLOCKS.register("orange_smooth_sandstone_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    ORANGE_SMOOTH_SANDSTONE.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(ORANGE_SMOOTH_SANDSTONE_STAIRS.get())));
+    public static final RegistryObject<Block> PINK_SMOOTH_SANDSTONE_VERTICAL_STAIRS = BLOCKS.register("pink_smooth_sandstone_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    PINK_SMOOTH_SANDSTONE.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(PINK_SMOOTH_SANDSTONE_STAIRS.get())));
+    public static final RegistryObject<Block> RED_SMOOTH_SANDSTONE_VERTICAL_STAIRS = BLOCKS.register("red_smooth_sandstone_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    RED_SMOOTH_SANDSTONE.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(RED_SMOOTH_SANDSTONE_STAIRS.get())));
+    public static final RegistryObject<Block> WHITE_SMOOTH_SANDSTONE_VERTICAL_STAIRS = BLOCKS.register("white_smooth_sandstone_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    WHITE_SMOOTH_SANDSTONE.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(WHITE_SMOOTH_SANDSTONE_STAIRS.get())));
+    public static final RegistryObject<Block> YELLOW_SMOOTH_SANDSTONE_VERTICAL_STAIRS = BLOCKS.register("yellow_smooth_sandstone_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    YELLOW_SMOOTH_SANDSTONE.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(YELLOW_SMOOTH_SANDSTONE_STAIRS.get())));
+    public static final RegistryObject<Block> POLISHED_BASALT_VERTICAL_STAIRS = BLOCKS.register("polished_basalt_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.POLISHED_BASALT.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(POLISHED_BASALT_STAIRS.get())));
+    public static final RegistryObject<Block> DRIPSTONE_BLOCK_VERTICAL_STAIRS = BLOCKS.register("dripstone_block_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.DRIPSTONE_BLOCK.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(DRIPSTONE_BLOCK_STAIRS.get())));
+    public static final RegistryObject<Block> END_STONE_VERTICAL_STAIRS = BLOCKS.register("end_stone_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.END_STONE.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(END_STONE_STAIRS.get())));
+    public static final RegistryObject<Block> QUARTZ_BRICKS_VERTICAL_STAIRS = BLOCKS.register("quartz_bricks_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.QUARTZ_BRICKS.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(QUARTZ_BRICKS_STAIRS.get())));
+    public static final RegistryObject<Block> CALCITE_VERTICAL_STAIRS = BLOCKS.register("calcite_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.CALCITE.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(CALCITE_STAIRS.get())));
+    public static final RegistryObject<Block> OBSIDIAN_VERTICAL_STAIRS = BLOCKS.register("obsidian_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.OBSIDIAN.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(OBSIDIAN_STAIRS.get())));
+    public static final RegistryObject<Block> SMOOTH_BASALT_VERTICAL_STAIRS = BLOCKS.register("smooth_basalt_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.SMOOTH_BASALT.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(SMOOTH_BASALT_STAIRS.get())));
+    public static final RegistryObject<Block> MOSSY_CALCITE_VERTICAL_STAIRS = BLOCKS.register("mossy_calcite_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    MOSSY_CALCITE.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(MOSSY_CALCITE_STAIRS.get())));
+    public static final RegistryObject<Block> BLACK_CONCRETE_VERTICAL_STAIRS = BLOCKS.register("black_concrete_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.BLACK_CONCRETE.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(BLACK_CONCRETE_STAIRS.get())));
+    public static final RegistryObject<Block> BLUE_CONCRETE_VERTICAL_STAIRS = BLOCKS.register("blue_concrete_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.BLUE_CONCRETE.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(BLUE_CONCRETE_STAIRS.get())));
+    public static final RegistryObject<Block> BROWN_CONCRETE_VERTICAL_STAIRS = BLOCKS.register("brown_concrete_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.BROWN_CONCRETE.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(BROWN_CONCRETE_STAIRS.get())));
+    public static final RegistryObject<Block> CYAN_CONCRETE_VERTICAL_STAIRS = BLOCKS.register("cyan_concrete_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.CYAN_CONCRETE.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(CYAN_CONCRETE_STAIRS.get())));
+    public static final RegistryObject<Block> GRAY_CONCRETE_VERTICAL_STAIRS = BLOCKS.register("gray_concrete_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.GRAY_CONCRETE.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(GRAY_CONCRETE_STAIRS.get())));
+    public static final RegistryObject<Block> GREEN_CONCRETE_VERTICAL_STAIRS = BLOCKS.register("green_concrete_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.GREEN_CONCRETE.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(GREEN_CONCRETE_STAIRS.get())));
+    public static final RegistryObject<Block> LIGHT_BLUE_CONCRETE_VERTICAL_STAIRS = BLOCKS.register("light_blue_concrete_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.LIGHT_BLUE_CONCRETE.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(LIGHT_BLUE_CONCRETE_STAIRS.get())));
+    public static final RegistryObject<Block> LIGHT_GRAY_CONCRETE_VERTICAL_STAIRS = BLOCKS.register("light_gray_concrete_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.LIGHT_GRAY_CONCRETE.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(LIGHT_GRAY_CONCRETE_STAIRS.get())));
+    public static final RegistryObject<Block> LIME_CONCRETE_VERTICAL_STAIRS = BLOCKS.register("lime_concrete_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.LIME_CONCRETE.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(LIME_CONCRETE_STAIRS.get())));
+    public static final RegistryObject<Block> MAGENTA_CONCRETE_VERTICAL_STAIRS = BLOCKS.register("magenta_concrete_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.MAGENTA_CONCRETE.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(MAGENTA_CONCRETE_STAIRS.get())));
+    public static final RegistryObject<Block> ORANGE_CONCRETE_VERTICAL_STAIRS = BLOCKS.register("orange_concrete_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.ORANGE_CONCRETE.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(ORANGE_CONCRETE_STAIRS.get())));
+    public static final RegistryObject<Block> PINK_CONCRETE_VERTICAL_STAIRS = BLOCKS.register("pink_concrete_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.PINK_CONCRETE.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(PINK_CONCRETE_STAIRS.get())));
+    public static final RegistryObject<Block> PURPLE_CONCRETE_VERTICAL_STAIRS = BLOCKS.register("purple_concrete_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.PURPLE_CONCRETE.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(PURPLE_CONCRETE_STAIRS.get())));
+    public static final RegistryObject<Block> RED_CONCRETE_VERTICAL_STAIRS = BLOCKS.register("red_concrete_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.RED_CONCRETE.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(RED_CONCRETE_STAIRS.get())));
+    public static final RegistryObject<Block> WHITE_CONCRETE_VERTICAL_STAIRS = BLOCKS.register("white_concrete_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.WHITE_CONCRETE.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(WHITE_CONCRETE_STAIRS.get())));
+    public static final RegistryObject<Block> YELLOW_CONCRETE_VERTICAL_STAIRS = BLOCKS.register("yellow_concrete_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.YELLOW_CONCRETE.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(YELLOW_CONCRETE_STAIRS.get())));
+    public static final RegistryObject<Block> QUARTZ_PILLAR_VERTICAL_STAIRS = BLOCKS.register("quartz_pillar_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    QUARTZ_PILLAR.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(QUARTZ_PILLAR_STAIRS.get())));
+    public static final RegistryObject<Block> BAMBOO_BLOCK_VERTICAL_STAIRS = BLOCKS.register("bamboo_block_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    BAMBOO_BLOCK.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(BAMBOO_BLOCK_STAIRS.get())));
+    public static final RegistryObject<Block> STRIPPED_BAMBOO_BLOCK_VERTICAL_STAIRS = BLOCKS.register("stripped_bamboo_block_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.AIR.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(STRIPPED_BAMBOO_BLOCK_STAIRS.get())));
+    public static final RegistryObject<Block> ASHPEN_WHITE_VERTICAL_STAIRS = BLOCKS.register("ashpen_white_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    ASHPEN_WHITE_PLANKS.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(ASHPEN_WHITE_STAIRS.get())));
+    public static final RegistryObject<Block> ASHPEN_BLACK_VERTICAL_STAIRS = BLOCKS.register("ashpen_black_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    BLACK_ASHPEN_PLANKS.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(BLACK_ASHPEN_STAIRS.get())));
+    public static final RegistryObject<Block> ASHPEN_BLUE_VERTICAL_STAIRS = BLOCKS.register("ashpen_blue_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    BLUE_ASHPEN_PLANKS.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(BLUE_ASHPEN_STAIRS.get())));
+    public static final RegistryObject<Block> ASHPEN_BROWN_VERTICAL_STAIRS = BLOCKS.register("ashpen_brown_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    BROWN_ASHPEN_PLANKS.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(BROWN_ASHPEN_STAIRS.get())));
+    public static final RegistryObject<Block> ASHPEN_CYAN_VERTICAL_STAIRS = BLOCKS.register("ashpen_cyan_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    CYAN_ASHPEN_PLANKS.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(CYAN_ASHPEN_STAIRS.get())));
+    public static final RegistryObject<Block> ASHPEN_GRAY_VERTICAL_STAIRS = BLOCKS.register("ashpen_gray_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    GRAY_ASHPEN_PLANKS.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(GRAY_ASHPEN_STAIRS.get())));
+    public static final RegistryObject<Block> ASHPEN_GREEN_VERTICAL_STAIRS = BLOCKS.register("ashpen_green_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    GREEN_ASHPEN_PLANKS.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(GREEN_ASHPEN_STAIRS.get())));
+    public static final RegistryObject<Block> ASHPEN_LIGHT_BLUE_VERTICAL_STAIRS = BLOCKS.register("ashpen_light_blue_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    LIGHT_BLUE_ASHPEN_PLANKS.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(LIGHT_BLUE_ASHPEN_STAIRS.get())));
+    public static final RegistryObject<Block> ASHPEN_LIGHT_GRAY_VERTICAL_STAIRS = BLOCKS.register("ashpen_light_gray_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    LIGHT_GRAY_ASHPEN_PLANKS.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(LIGHT_GRAY_ASHPEN_STAIRS.get())));
+    public static final RegistryObject<Block> ASHPEN_LIME_VERTICAL_STAIRS = BLOCKS.register("ashpen_lime_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    LIME_ASHPEN_PLANKS.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(LIME_ASHPEN_STAIRS.get())));
+    public static final RegistryObject<Block> ASHPEN_MAGENTA_VERTICAL_STAIRS = BLOCKS.register("ashpen_magenta_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    MAGENTA_ASHPEN_PLANKS.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(MAGENTA_ASHPEN_STAIRS.get())));
+    public static final RegistryObject<Block> ASHPEN_ORANGE_VERTICAL_STAIRS = BLOCKS.register("ashpen_orange_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    ORANGE_ASHPEN_PLANKS.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(ORANGE_ASHPEN_STAIRS.get())));
+    public static final RegistryObject<Block> ASHPEN_PINK_VERTICAL_STAIRS = BLOCKS.register("ashpen_pink_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    PINK_ASHPEN_PLANKS.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(PINK_ASHPEN_STAIRS.get())));
+    public static final RegistryObject<Block> ASHPEN_PURPLE_VERTICAL_STAIRS = BLOCKS.register("ashpen_purple_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    PURPLE_ASHPEN_PLANKS.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(PURPLE_ASHPEN_STAIRS.get())));
+    public static final RegistryObject<Block> ASHPEN_RED_VERTICAL_STAIRS = BLOCKS.register("ashpen_red_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    RED_ASHPEN_PLANKS.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(RED_ASHPEN_STAIRS.get())));
+    public static final RegistryObject<Block> ASHPEN_YELLOW_VERTICAL_STAIRS = BLOCKS.register("ashpen_yellow_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    YELLOW_ASHPEN_PLANKS.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(YELLOW_ASHPEN_STAIRS.get())));
+    public static final RegistryObject<Block> SNOW_BRICKS_VERTICAL_STAIRS = BLOCKS.register("snow_bricks_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    SNOW_BRICKS.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(SNOW_BRICKS_STAIRS.get())));
+    public static final RegistryObject<Block> SNOW_VERTICAL_STAIRS = BLOCKS.register("snow_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.SNOW_BLOCK.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(SNOW_STAIRS.get())));
+    public static final RegistryObject<Block> SNOWY_GRASS_BLOCK_VERTICAL_STAIRS = BLOCKS.register("snowy_grass_block_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    SNOWY_GRASS_BLOCK.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(SNOWY_GRASS_BLOCK_STAIRS.get())));
+    public static final RegistryObject<Block> MANGROVE_VERTICAL_STAIRS = BLOCKS.register("mangrove_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    MANGROVE_PLANKS.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(MANGROVE_STAIRS.get())));
+    public static final RegistryObject<Block> STEEL_BLOCK_VERTICAL_STAIRS = BLOCKS.register("steel_block_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    STEEL_BLOCK.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(STEEL_BLOCK_STAIRS.get())));
+    public static final RegistryObject<Block> PRESSED_STEEL_VERTICAL_STAIRS = BLOCKS.register("pressed_steel_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    PRESSED_STEEL.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(PRESSED_STEEL_STAIRS.get())));
+    public static final RegistryObject<Block> CUT_STEEL_VERTICAL_STAIRS = BLOCKS.register("cut_steel_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    CUT_STEEL.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(CUT_STEEL_STAIRS.get())));
+    public static final RegistryObject<Block> POLISHED_STEEL_VERTICAL_STAIRS = BLOCKS.register("polished_steel_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    POLISHED_STEEL.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(POLISHED_STEEL_STAIRS.get())));
+    public static final RegistryObject<Block> CAUTION_BLACK_VERTICAL_STAIRS = BLOCKS.register("caution_black_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.AIR.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(CAUTION_BLACK_STAIRS.get())));
+    public static final RegistryObject<Block> CAUTION_BLUE_VERTICAL_STAIRS = BLOCKS.register("caution_blue_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.AIR.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(CAUTION_BLUE_STAIRS.get())));
+    public static final RegistryObject<Block> CAUTION_FACTORY_VERTICAL_STAIRS = BLOCKS.register("caution_factory_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.AIR.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(CAUTION_FACTORY_STAIRS.get())));
+    public static final RegistryObject<Block> CAUTION_RED_VERTICAL_STAIRS = BLOCKS.register("caution_red_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.AIR.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(CAUTION_RED_STAIRS.get())));
+    public static final RegistryObject<Block> FRAMED_CAUTION_VERTICAL_STAIRS = BLOCKS.register("framed_caution_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.AIR.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(FRAMED_CAUTION_STAIRS.get())));
+    public static final RegistryObject<Block> CAUTION_WHITE_VERTICAL_STAIRS = BLOCKS.register("caution_white_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.AIR.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(CAUTION_WHITE_STAIRS.get())));
+    public static final RegistryObject<Block> CAUTION_LIME_VERTICAL_STAIRS = BLOCKS.register("caution_lime_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.AIR.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(CAUTION_LIME_STAIRS.get())));
+    public static final RegistryObject<Block> CAUTION_PINK_VERTICAL_STAIRS = BLOCKS.register("caution_pink_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.AIR.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(CAUTION_PINK_STAIRS.get())));
+    public static final RegistryObject<Block> CAUTION_YELLOW_VERTICAL_STAIRS = BLOCKS.register("caution_yellow_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.AIR.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(CAUTION_YELLOW_STAIRS.get())));
+    public static final RegistryObject<Block> CAUTION_CANDY_VERTICAL_STAIRS = BLOCKS.register("caution_candy_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.AIR.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(CAUTION_CANDY_STAIRS.get())));
+    public static final RegistryObject<Block> CAUTION_COTTONCANDY_VERTICAL_STAIRS = BLOCKS.register("caution_cottoncandy_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.AIR.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(CAUTION_COTTONCANDY_STAIRS.get())));
+    public static final RegistryObject<Block> CAUTION_MINTCANDY_VERTICAL_STAIRS = BLOCKS.register("caution_mintcandy_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.AIR.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(CAUTION_MINTCANDY_STAIRS.get())));
+    public static final RegistryObject<Block> CAUTION_CITRUSCANDY_VERTICAL_STAIRS = BLOCKS.register("caution_citruscandy_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.AIR.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(CAUTION_CITRUSCANDY_STAIRS.get())));
+    public static final RegistryObject<Block> WHITE_STAINED_BRICKS_VERTICAL_STAIRS = BLOCKS.register("white_stained_bricks_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.AIR.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(WHITE_STAINED_BRICKS_STAIRS.get())));
+    public static final RegistryObject<Block> LIGHT_GRAY_STAINED_BRICKS_VERTICAL_STAIRS = BLOCKS.register("light_gray_stained_bricks_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.AIR.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(LIGHT_GRAY_STAINED_BRICKS_STAIRS.get())));
+    public static final RegistryObject<Block> GRAY_STAINED_BRICKS_VERTICAL_STAIRS = BLOCKS.register("gray_stained_bricks_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.AIR.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(GRAY_STAINED_BRICKS_STAIRS.get())));
+    public static final RegistryObject<Block> BLACK_STAINED_BRICKS_VERTICAL_STAIRS = BLOCKS.register("black_stained_bricks_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.AIR.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(BLACK_STAINED_BRICKS_STAIRS.get())));
+    public static final RegistryObject<Block> BROWN_STAINED_BRICKS_VERTICAL_STAIRS = BLOCKS.register("brown_stained_bricks_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.AIR.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(BROWN_STAINED_BRICKS_STAIRS.get())));
+    public static final RegistryObject<Block> RED_STAINED_BRICKS_VERTICAL_STAIRS = BLOCKS.register("red_stained_bricks_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.AIR.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(RED_STAINED_BRICKS_STAIRS.get())));
+    public static final RegistryObject<Block> ORANGE_STAINED_BRICKS_VERTICAL_STAIRS = BLOCKS.register("orange_stained_bricks_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.AIR.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(ORANGE_STAINED_BRICKS_STAIRS.get())));
+    public static final RegistryObject<Block> YELLOW_STAINED_BRICKS_VERTICAL_STAIRS = BLOCKS.register("yellow_stained_bricks_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.AIR.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(YELLOW_STAINED_BRICKS_STAIRS.get())));
+    public static final RegistryObject<Block> LIME_STAINED_BRICKS_VERTICAL_STAIRS = BLOCKS.register("lime_stained_bricks_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.AIR.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(LIME_STAINED_BRICKS_STAIRS.get())));
+    public static final RegistryObject<Block> GREEN_STAINED_BRICKS_VERTICAL_STAIRS = BLOCKS.register("green_stained_bricks_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.AIR.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(GREEN_STAINED_BRICKS_STAIRS.get())));
+    public static final RegistryObject<Block> CYAN_STAINED_BRICKS_VERTICAL_STAIRS = BLOCKS.register("cyan_stained_bricks_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.AIR.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(CYAN_STAINED_BRICKS_STAIRS.get())));
+    public static final RegistryObject<Block> LIGHT_BLUE_STAINED_BRICKS_VERTICAL_STAIRS = BLOCKS.register("light_blue_stained_bricks_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.AIR.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(LIGHT_BLUE_STAINED_BRICKS_STAIRS.get())));
+    public static final RegistryObject<Block> BLUE_STAINED_BRICKS_VERTICAL_STAIRS = BLOCKS.register("blue_stained_bricks_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.AIR.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(BLUE_STAINED_BRICKS_STAIRS.get())));
+    public static final RegistryObject<Block> PURPLE_STAINED_BRICKS_VERTICAL_STAIRS = BLOCKS.register("purple_stained_bricks_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.AIR.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(PURPLE_STAINED_BRICKS_STAIRS.get())));
+    public static final RegistryObject<Block> MAGENTA_STAINED_BRICKS_VERTICAL_STAIRS = BLOCKS.register("magenta_stained_bricks_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.AIR.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(MAGENTA_STAINED_BRICKS_STAIRS.get())));
+    public static final RegistryObject<Block> PINK_STAINED_BRICKS_VERTICAL_STAIRS = BLOCKS.register("pink_stained_bricks_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.AIR.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(PINK_STAINED_BRICKS_STAIRS.get())));
+    public static final RegistryObject<Block> SMOOTH_STONE_VERTICAL_STAIRS = BLOCKS.register("smooth_stone_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.AIR.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(SMOOTH_STONE_STAIRS.get())));
+    public static final RegistryObject<Block> POLISHED_WHITE_CONCRETE_VERTICAL_STAIRS = BLOCKS.register("polished_white_concrete_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    POLISHED_WHITE_CONCRETE.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(POLISHED_WHITE_CONCRETE_STAIRS.get())));
+    public static final RegistryObject<Block> POLISHED_ORANGE_CONCRETE_VERTICAL_STAIRS = BLOCKS.register("polished_orange_concrete_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    POLISHED_ORANGE_CONCRETE.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(POLISHED_ORANGE_CONCRETE_STAIRS.get())));
+    public static final RegistryObject<Block> POLISHED_MAGENTA_CONCRETE_VERTICAL_STAIRS = BLOCKS.register("polished_magenta_concrete_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    POLISHED_MAGENTA_CONCRETE.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(POLISHED_MAGENTA_CONCRETE_STAIRS.get())));
+    public static final RegistryObject<Block> POLISHED_LIGHT_BLUE_CONCRETE_VERTICAL_STAIRS = BLOCKS.register("polished_light_blue_concrete_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    POLISHED_LIGHT_BLUE_CONCRETE.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(POLISHED_LIGHT_BLUE_CONCRETE_STAIRS.get())));
+    public static final RegistryObject<Block> POLISHED_YELLOW_CONCRETE_VERTICAL_STAIRS = BLOCKS.register("polished_yellow_concrete_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    POLISHED_YELLOW_CONCRETE.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(POLISHED_YELLOW_CONCRETE_STAIRS.get())));
+    public static final RegistryObject<Block> POLISHED_LIME_CONCRETE_VERTICAL_STAIRS = BLOCKS.register("polished_lime_concrete_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    POLISHED_LIME_CONCRETE.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(POLISHED_LIME_CONCRETE_STAIRS.get())));
+    public static final RegistryObject<Block> POLISHED_PINK_CONCRETE_VERTICAL_STAIRS = BLOCKS.register("polished_pink_concrete_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    POLISHED_PINK_CONCRETE.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(POLISHED_PINK_CONCRETE_STAIRS.get())));
+    public static final RegistryObject<Block> POLISHED_GRAY_CONCRETE_VERTICAL_STAIRS = BLOCKS.register("polished_gray_concrete_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    POLISHED_GRAY_CONCRETE.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(POLISHED_GRAY_CONCRETE_STAIRS.get())));
+    public static final RegistryObject<Block> POLISHED_LIGHT_GRAY_CONCRETE_VERTICAL_STAIRS = BLOCKS.register("polished_light_gray_concrete_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    POLISHED_LIGHT_GRAY_CONCRETE.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(POLISHED_LIGHT_GRAY_CONCRETE_STAIRS.get())));
+    public static final RegistryObject<Block> POLISHED_CYAN_CONCRETE_VERTICAL_STAIRS = BLOCKS.register("polished_cyan_concrete_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    POLISHED_CYAN_CONCRETE.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(POLISHED_CYAN_CONCRETE_STAIRS.get())));
+    public static final RegistryObject<Block> POLISHED_PURPLE_CONCRETE_VERTICAL_STAIRS = BLOCKS.register("polished_purple_concrete_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    POLISHED_PURPLE_CONCRETE.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(POLISHED_PURPLE_CONCRETE_STAIRS.get())));
+    public static final RegistryObject<Block> POLISHED_BLUE_CONCRETE_VERTICAL_STAIRS = BLOCKS.register("polished_blue_concrete_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    POLISHED_BLUE_CONCRETE.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(POLISHED_BLUE_CONCRETE_STAIRS.get())));
+    public static final RegistryObject<Block> POLISHED_BROWN_CONCRETE_VERTICAL_STAIRS = BLOCKS.register("polished_brown_concrete_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    POLISHED_BROWN_CONCRETE.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(POLISHED_BROWN_CONCRETE_STAIRS.get())));
+    public static final RegistryObject<Block> POLISHED_GREEN_CONCRETE_VERTICAL_STAIRS = BLOCKS.register("polished_green_concrete_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    POLISHED_GREEN_CONCRETE.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(POLISHED_GREEN_CONCRETE_STAIRS.get())));
+    public static final RegistryObject<Block> POLISHED_RED_CONCRETE_VERTICAL_STAIRS = BLOCKS.register("polished_red_concrete_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    POLISHED_RED_CONCRETE.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(POLISHED_RED_CONCRETE_STAIRS.get())));
+    public static final RegistryObject<Block> POLISHED_BLACK_CONCRETE_VERTICAL_STAIRS = BLOCKS.register("polished_black_concrete_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    POLISHED_BLACK_CONCRETE.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(POLISHED_BLACK_CONCRETE_STAIRS.get())));
+    public static final RegistryObject<Block> BLACK_FACTORY_MESH_VERTICAL_STAIRS = BLOCKS.register("black_factory_mesh_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    BLACK_FACTORY_MESH.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(BLACK_FACTORY_MESH_STAIRS.get())));
+    public static final RegistryObject<Block> BLUE_FACTORY_MESH_VERTICAL_STAIRS = BLOCKS.register("blue_factory_mesh_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    BLUE_FACTORY_MESH.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(BLUE_FACTORY_MESH_STAIRS.get())));
+    public static final RegistryObject<Block> BROWN_FACTORY_MESH_VERTICAL_STAIRS = BLOCKS.register("brown_factory_mesh_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    BROWN_FACTORY_MESH.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(BROWN_FACTORY_MESH_STAIRS.get())));
+    public static final RegistryObject<Block> GRAY_FACTORY_MESH_VERTICAL_STAIRS = BLOCKS.register("gray_factory_mesh_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    GRAY_FACTORY_MESH.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(GRAY_FACTORY_MESH_STAIRS.get())));
+    public static final RegistryObject<Block> GREEN_FACTORY_MESH_VERTICAL_STAIRS = BLOCKS.register("green_factory_mesh_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    GREEN_FACTORY_MESH.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(GREEN_FACTORY_MESH_STAIRS.get())));
+    public static final RegistryObject<Block> LIGHT_GRAY_FACTORY_MESH_VERTICAL_STAIRS = BLOCKS.register("light_gray_factory_mesh_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    LIGHT_GRAY_FACTORY_MESH.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(LIGHT_GRAY_FACTORY_MESH_STAIRS.get())));
+    public static final RegistryObject<Block> LIME_FACTORY_MESH_VERTICAL_STAIRS = BLOCKS.register("lime_factory_mesh_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    LIME_FACTORY_MESH.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(LIME_FACTORY_MESH_STAIRS.get())));
+    public static final RegistryObject<Block> ORANGE_FACTORY_MESH_VERTICAL_STAIRS = BLOCKS.register("orange_factory_mesh_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    ORANGE_FACTORY_MESH.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(ORANGE_FACTORY_MESH_STAIRS.get())));
+    public static final RegistryObject<Block> RED_FACTORY_MESH_VERTICAL_STAIRS = BLOCKS.register("red_factory_mesh_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    RED_FACTORY_MESH.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(RED_FACTORY_MESH_STAIRS.get())));
+    public static final RegistryObject<Block> YELLOW_FACTORY_MESH_VERTICAL_STAIRS = BLOCKS.register("yellow_factory_mesh_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    YELLOW_FACTORY_MESH.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(YELLOW_FACTORY_MESH_STAIRS.get())));
+    public static final RegistryObject<Block> PACKED_MUD_VERTICAL_STAIRS = BLOCKS.register("packed_mud_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    PACKED_MUD.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(PACKED_MUD_STAIRS.get())));
+    public static final RegistryObject<Block> MUD_BRICK_VERTICAL_STAIRS = BLOCKS.register("mud_brick_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    MUD_BRICKS.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(MUD_BRICK_STAIRS.get())));
+    public static final RegistryObject<Block> GLASS_VERTICAL_STAIRS = BLOCKS.register("glass_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.GLASS.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(GLASS_STAIRS.get())));
+    public static final RegistryObject<Block> WHITE_STAINED_GLASS_VERTICAL_STAIRS = BLOCKS.register("white_stained_glass_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.WHITE_STAINED_GLASS.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(WHITE_STAINED_GLASS_STAIRS.get())));
+    public static final RegistryObject<Block> LIGHT_GRAY_STAINED_GLASS_VERTICAL_STAIRS = BLOCKS.register("light_gray_stained_glass_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.LIGHT_GRAY_STAINED_GLASS.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(LIGHT_GRAY_STAINED_GLASS_STAIRS.get())));
+    public static final RegistryObject<Block> GRAY_STAINED_GLASS_VERTICAL_STAIRS = BLOCKS.register("gray_stained_glass_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.GRAY_STAINED_GLASS.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(GRAY_STAINED_GLASS_STAIRS.get())));
+    public static final RegistryObject<Block> BLACK_STAINED_GLASS_VERTICAL_STAIRS = BLOCKS.register("black_stained_glass_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.BLACK_STAINED_GLASS.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(BLACK_STAINED_GLASS_STAIRS.get())));
+    public static final RegistryObject<Block> BROWN_STAINED_GLASS_VERTICAL_STAIRS = BLOCKS.register("brown_stained_glass_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.BROWN_STAINED_GLASS.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(BROWN_STAINED_GLASS_STAIRS.get())));
+    public static final RegistryObject<Block> RED_STAINED_GLASS_VERTICAL_STAIRS = BLOCKS.register("red_stained_glass_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.RED_STAINED_GLASS.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(RED_STAINED_GLASS_STAIRS.get())));
+    public static final RegistryObject<Block> ORANGE_STAINED_GLASS_VERTICAL_STAIRS = BLOCKS.register("orange_stained_glass_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.ORANGE_STAINED_GLASS.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(ORANGE_STAINED_GLASS_STAIRS.get())));
+    public static final RegistryObject<Block> YELLOW_STAINED_GLASS_VERTICAL_STAIRS = BLOCKS.register("yellow_stained_glass_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.YELLOW_STAINED_GLASS.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(YELLOW_STAINED_GLASS_STAIRS.get())));
+    public static final RegistryObject<Block> LIME_STAINED_GLASS_VERTICAL_STAIRS = BLOCKS.register("lime_stained_glass_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.LIME_STAINED_GLASS.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(LIME_STAINED_GLASS_STAIRS.get())));
+    public static final RegistryObject<Block> GREEN_STAINED_GLASS_VERTICAL_STAIRS = BLOCKS.register("green_stained_glass_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.GREEN_STAINED_GLASS.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(GREEN_STAINED_GLASS_STAIRS.get())));
+    public static final RegistryObject<Block> CYAN_STAINED_GLASS_VERTICAL_STAIRS = BLOCKS.register("cyan_stained_glass_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.CYAN_STAINED_GLASS.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(CYAN_STAINED_GLASS_STAIRS.get())));
+    public static final RegistryObject<Block> LIGHT_BLUE_STAINED_GLASS_VERTICAL_STAIRS = BLOCKS.register("light_blue_stained_glass_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.LIGHT_BLUE_STAINED_GLASS.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(LIGHT_BLUE_STAINED_GLASS_STAIRS.get())));
+    public static final RegistryObject<Block> BLUE_STAINED_GLASS_VERTICAL_STAIRS = BLOCKS.register("blue_stained_glass_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.BLUE_STAINED_GLASS.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(BLUE_STAINED_GLASS_STAIRS.get())));
+    public static final RegistryObject<Block> PURPLE_STAINED_GLASS_VERTICAL_STAIRS = BLOCKS.register("purple_stained_glass_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.PURPLE_STAINED_GLASS.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(PURPLE_STAINED_GLASS_STAIRS.get())));
+    public static final RegistryObject<Block> MAGENTA_STAINED_GLASS_VERTICAL_STAIRS = BLOCKS.register("magenta_stained_glass_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.MAGENTA_STAINED_GLASS.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(MAGENTA_STAINED_GLASS_STAIRS.get())));
+    public static final RegistryObject<Block> PINK_STAINED_GLASS_VERTICAL_STAIRS = BLOCKS.register("pink_stained_glass_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.PINK_STAINED_GLASS.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(PINK_STAINED_GLASS_STAIRS.get())));
+    public static final RegistryObject<Block> WHITE_MOSAIC_GLASS_VERTICAL_STAIRS = BLOCKS.register("white_mosaic_glass_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    WHITE_MOSAIC_GLASS.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(WHITE_MOSAIC_GLASS_STAIRS.get())));
+    public static final RegistryObject<Block> LIGHT_GRAY_MOSAIC_GLASS_VERTICAL_STAIRS = BLOCKS.register("light_gray_mosaic_glass_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    LIGHT_GRAY_MOSAIC_GLASS.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(LIGHT_GRAY_MOSAIC_GLASS_STAIRS.get())));
+    public static final RegistryObject<Block> GRAY_MOSAIC_GLASS_VERTICAL_STAIRS = BLOCKS.register("gray_mosaic_glass_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    GRAY_MOSAIC_GLASS.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(GRAY_MOSAIC_GLASS_STAIRS.get())));
+    public static final RegistryObject<Block> BLACK_MOSAIC_GLASS_VERTICAL_STAIRS = BLOCKS.register("black_mosaic_glass_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    BLACK_MOSAIC_GLASS.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(BLACK_MOSAIC_GLASS_STAIRS.get())));
+    public static final RegistryObject<Block> BROWN_MOSAIC_GLASS_VERTICAL_STAIRS = BLOCKS.register("brown_mosaic_glass_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    BROWN_MOSAIC_GLASS.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(BROWN_MOSAIC_GLASS_STAIRS.get())));
+    public static final RegistryObject<Block> RED_MOSAIC_GLASS_VERTICAL_STAIRS = BLOCKS.register("red_mosaic_glass_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    RED_MOSAIC_GLASS.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(RED_MOSAIC_GLASS_STAIRS.get())));
+    public static final RegistryObject<Block> ORANGE_MOSAIC_GLASS_VERTICAL_STAIRS = BLOCKS.register("orange_mosaic_glass_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    ORANGE_MOSAIC_GLASS.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(ORANGE_MOSAIC_GLASS_STAIRS.get())));
+    public static final RegistryObject<Block> YELLOW_MOSAIC_GLASS_VERTICAL_STAIRS = BLOCKS.register("yellow_mosaic_glass_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    YELLOW_MOSAIC_GLASS.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(YELLOW_MOSAIC_GLASS_STAIRS.get())));
+    public static final RegistryObject<Block> LIME_MOSAIC_GLASS_VERTICAL_STAIRS = BLOCKS.register("lime_mosaic_glass_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    LIME_MOSAIC_GLASS.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(LIME_MOSAIC_GLASS_STAIRS.get())));
+    public static final RegistryObject<Block> GREEN_MOSAIC_GLASS_VERTICAL_STAIRS = BLOCKS.register("green_mosaic_glass_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    GREEN_MOSAIC_GLASS.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(GREEN_MOSAIC_GLASS_STAIRS.get())));
+    public static final RegistryObject<Block> CYAN_MOSAIC_GLASS_VERTICAL_STAIRS = BLOCKS.register("cyan_mosaic_glass_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    CYAN_MOSAIC_GLASS.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(CYAN_MOSAIC_GLASS_STAIRS.get())));
+    public static final RegistryObject<Block> LIGHT_BLUE_MOSAIC_GLASS_VERTICAL_STAIRS = BLOCKS.register("light_blue_mosaic_glass_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    LIGHT_BLUE_MOSAIC_GLASS.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(LIGHT_BLUE_MOSAIC_GLASS_STAIRS.get())));
+    public static final RegistryObject<Block> BLUE_MOSAIC_GLASS_VERTICAL_STAIRS = BLOCKS.register("blue_mosaic_glass_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    BLUE_MOSAIC_GLASS.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(BLUE_MOSAIC_GLASS_STAIRS.get())));
+    public static final RegistryObject<Block> PURPLE_MOSAIC_GLASS_VERTICAL_STAIRS = BLOCKS.register("purple_mosaic_glass_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    PURPLE_MOSAIC_GLASS.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(PURPLE_MOSAIC_GLASS_STAIRS.get())));
+    public static final RegistryObject<Block> MAGENTA_MOSAIC_GLASS_VERTICAL_STAIRS = BLOCKS.register("magenta_mosaic_glass_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    MAGENTA_MOSAIC_GLASS.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(MAGENTA_MOSAIC_GLASS_STAIRS.get())));
+    public static final RegistryObject<Block> PINK_MOSAIC_GLASS_VERTICAL_STAIRS = BLOCKS.register("pink_mosaic_glass_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    PINK_MOSAIC_GLASS.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(PINK_MOSAIC_GLASS_STAIRS.get())));
+    public static final RegistryObject<Block> FACTORY_WHITE_GLASS_VERTICAL_STAIRS = BLOCKS.register("factory_white_glass_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    FACTORY_WHITE_GLASS.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(FACTORY_WHITE_GLASS_STAIRS.get())));
+    public static final RegistryObject<Block> FACTORY_LIGHT_GRAY_GLASS_VERTICAL_STAIRS = BLOCKS.register("factory_light_gray_glass_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    FACTORY_LIGHT_GRAY_GLASS.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(FACTORY_LIGHT_GRAY_GLASS_STAIRS.get())));
+    public static final RegistryObject<Block> FACTORY_GRAY_GLASS_VERTICAL_STAIRS = BLOCKS.register("factory_gray_glass_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    FACTORY_GRAY_GLASS.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(FACTORY_GRAY_GLASS_STAIRS.get())));
+    public static final RegistryObject<Block> FACTORY_BLACK_GLASS_VERTICAL_STAIRS = BLOCKS.register("factory_black_glass_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    FACTORY_BLACK_GLASS.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(FACTORY_BLACK_GLASS_STAIRS.get())));
+    public static final RegistryObject<Block> FACTORY_BROWN_GLASS_VERTICAL_STAIRS = BLOCKS.register("factory_brown_glass_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    FACTORY_BROWN_GLASS.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(FACTORY_BROWN_GLASS_STAIRS.get())));
+    public static final RegistryObject<Block> FACTORY_RED_GLASS_VERTICAL_STAIRS = BLOCKS.register("factory_red_glass_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    FACTORY_RED_GLASS.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(FACTORY_RED_GLASS_STAIRS.get())));
+    public static final RegistryObject<Block> FACTORY_ORANGE_GLASS_VERTICAL_STAIRS = BLOCKS.register("factory_orange_glass_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    FACTORY_ORANGE_GLASS.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(FACTORY_ORANGE_GLASS_STAIRS.get())));
+    public static final RegistryObject<Block> FACTORY_YELLOW_GLASS_VERTICAL_STAIRS = BLOCKS.register("factory_yellow_glass_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    FACTORY_YELLOW_GLASS.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(FACTORY_YELLOW_GLASS_STAIRS.get())));
+    public static final RegistryObject<Block> FACTORY_LIME_GLASS_VERTICAL_STAIRS = BLOCKS.register("factory_lime_glass_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    FACTORY_LIME_GLASS.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(FACTORY_LIME_GLASS_STAIRS.get())));
+    public static final RegistryObject<Block> FACTORY_GREEN_GLASS_VERTICAL_STAIRS = BLOCKS.register("factory_green_glass_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    FACTORY_GREEN_GLASS.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(FACTORY_GREEN_GLASS_STAIRS.get())));
+    public static final RegistryObject<Block> FACTORY_CYAN_GLASS_VERTICAL_STAIRS = BLOCKS.register("factory_cyan_glass_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    FACTORY_CYAN_GLASS.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(FACTORY_CYAN_GLASS_STAIRS.get())));
+    public static final RegistryObject<Block> FACTORY_LIGHT_BLUE_GLASS_VERTICAL_STAIRS = BLOCKS.register("factory_light_blue_glass_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    FACTORY_LIGHT_BLUE_GLASS.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(FACTORY_LIGHT_BLUE_GLASS_STAIRS.get())));
+    public static final RegistryObject<Block> FACTORY_BLUE_GLASS_VERTICAL_STAIRS = BLOCKS.register("factory_blue_glass_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    FACTORY_BLUE_GLASS.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(FACTORY_BLUE_GLASS_STAIRS.get())));
+    public static final RegistryObject<Block> FACTORY_PURPLE_GLASS_VERTICAL_STAIRS = BLOCKS.register("factory_purple_glass_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    FACTORY_PURPLE_GLASS.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(FACTORY_PURPLE_GLASS_STAIRS.get())));
+    public static final RegistryObject<Block> FACTORY_MAGENTA_GLASS_VERTICAL_STAIRS = BLOCKS.register("factory_magenta_glass_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    FACTORY_MAGENTA_GLASS.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(FACTORY_MAGENTA_GLASS_STAIRS.get())));
+    public static final RegistryObject<Block> FACTORY_PINK_GLASS_VERTICAL_STAIRS = BLOCKS.register("factory_pink_glass_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    FACTORY_PINK_GLASS.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(FACTORY_PINK_GLASS_STAIRS.get())));
+    public static final RegistryObject<Block> WHITE_GLAZED_GLASS_VERTICAL_STAIRS = BLOCKS.register("white_glazed_glass_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    WHITE_GLAZED_GLASS.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(WHITE_GLAZED_GLASS_STAIRS.get())));
+    public static final RegistryObject<Block> LIGHT_GRAY_GLAZED_GLASS_VERTICAL_STAIRS = BLOCKS.register("light_gray_glazed_glass_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    LIGHT_GRAY_GLAZED_GLASS.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(LIGHT_GRAY_GLAZED_GLASS_STAIRS.get())));
+    public static final RegistryObject<Block> GRAY_GLAZED_GLASS_VERTICAL_STAIRS = BLOCKS.register("gray_glazed_glass_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    GRAY_GLAZED_GLASS.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(GRAY_GLAZED_GLASS_STAIRS.get())));
+    public static final RegistryObject<Block> BLACK_GLAZED_GLASS_VERTICAL_STAIRS = BLOCKS.register("black_glazed_glass_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    BLACK_GLAZED_GLASS.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(BLACK_GLAZED_GLASS_STAIRS.get())));
+    public static final RegistryObject<Block> BROWN_GLAZED_GLASS_VERTICAL_STAIRS = BLOCKS.register("brown_glazed_glass_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    BROWN_GLAZED_GLASS.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(BROWN_GLAZED_GLASS_STAIRS.get())));
+    public static final RegistryObject<Block> RED_GLAZED_GLASS_VERTICAL_STAIRS = BLOCKS.register("red_glazed_glass_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    RED_GLAZED_GLASS.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(RED_GLAZED_GLASS_STAIRS.get())));
+    public static final RegistryObject<Block> ORANGE_GLAZED_GLASS_VERTICAL_STAIRS = BLOCKS.register("orange_glazed_glass_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    ORANGE_GLAZED_GLASS.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(ORANGE_GLAZED_GLASS_STAIRS.get())));
+    public static final RegistryObject<Block> YELLOW_GLAZED_GLASS_VERTICAL_STAIRS = BLOCKS.register("yellow_glazed_glass_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    YELLOW_GLAZED_GLASS.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(YELLOW_GLAZED_GLASS_STAIRS.get())));
+    public static final RegistryObject<Block> LIME_GLAZED_GLASS_VERTICAL_STAIRS = BLOCKS.register("lime_glazed_glass_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    LIME_GLAZED_GLASS.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(LIME_GLAZED_GLASS_STAIRS.get())));
+    public static final RegistryObject<Block> GREEN_GLAZED_GLASS_VERTICAL_STAIRS = BLOCKS.register("green_glazed_glass_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    GREEN_GLAZED_GLASS.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(GREEN_GLAZED_GLASS_STAIRS.get())));
+    public static final RegistryObject<Block> CYAN_GLAZED_GLASS_VERTICAL_STAIRS = BLOCKS.register("cyan_glazed_glass_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    CYAN_GLAZED_GLASS.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(CYAN_GLAZED_GLASS_STAIRS.get())));
+    public static final RegistryObject<Block> LIGHT_BLUE_GLAZED_GLASS_VERTICAL_STAIRS = BLOCKS.register("light_blue_glazed_glass_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    LIGHT_BLUE_GLAZED_GLASS.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(LIGHT_BLUE_GLAZED_GLASS_STAIRS.get())));
+    public static final RegistryObject<Block> BLUE_GLAZED_GLASS_VERTICAL_STAIRS = BLOCKS.register("blue_glazed_glass_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    BLUE_GLAZED_GLASS.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(BLUE_GLAZED_GLASS_STAIRS.get())));
+    public static final RegistryObject<Block> PURPLE_GLAZED_GLASS_VERTICAL_STAIRS = BLOCKS.register("purple_glazed_glass_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    PURPLE_GLAZED_GLASS.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(PURPLE_GLAZED_GLASS_STAIRS.get())));
+    public static final RegistryObject<Block> MAGENTA_GLAZED_GLASS_VERTICAL_STAIRS = BLOCKS.register("magenta_glazed_glass_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    MAGENTA_GLAZED_GLASS.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(MAGENTA_GLAZED_GLASS_STAIRS.get())));
+    public static final RegistryObject<Block> PINK_GLAZED_GLASS_VERTICAL_STAIRS = BLOCKS.register("pink_glazed_glass_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    PINK_GLAZED_GLASS.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(PINK_GLAZED_GLASS_STAIRS.get())));
     // End generated vertical variants.
 
         // Dye Sacks
@@ -9618,6 +10482,122 @@ public class ModBlocks {
             () -> new VerticalSlabBlock(
                     STRIPPED_POPLAR_WOOD.get(),
                     BlockBehaviour.Properties.copy(STRIPPED_POPLAR_WOOD_SLAB.get())));
+    public static final RegistryObject<Block> WHITE_WOOL_VERTICAL_STAIRS = BLOCKS.register("white_wool_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.WHITE_WOOL.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(WHITE_WOOL_STAIRS.get())));
+    public static final RegistryObject<Block> ORANGE_WOOL_VERTICAL_STAIRS = BLOCKS.register("orange_wool_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.ORANGE_WOOL.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(ORANGE_WOOL_STAIRS.get())));
+    public static final RegistryObject<Block> MAGENTA_WOOL_VERTICAL_STAIRS = BLOCKS.register("magenta_wool_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.MAGENTA_WOOL.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(MAGENTA_WOOL_STAIRS.get())));
+    public static final RegistryObject<Block> LIGHT_BLUE_WOOL_VERTICAL_STAIRS = BLOCKS.register("light_blue_wool_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.LIGHT_BLUE_WOOL.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(LIGHT_BLUE_WOOL_STAIRS.get())));
+    public static final RegistryObject<Block> YELLOW_WOOL_VERTICAL_STAIRS = BLOCKS.register("yellow_wool_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.YELLOW_WOOL.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(YELLOW_WOOL_STAIRS.get())));
+    public static final RegistryObject<Block> LIME_WOOL_VERTICAL_STAIRS = BLOCKS.register("lime_wool_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.LIME_WOOL.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(LIME_WOOL_STAIRS.get())));
+    public static final RegistryObject<Block> PINK_WOOL_VERTICAL_STAIRS = BLOCKS.register("pink_wool_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.PINK_WOOL.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(PINK_WOOL_STAIRS.get())));
+    public static final RegistryObject<Block> GRAY_WOOL_VERTICAL_STAIRS = BLOCKS.register("gray_wool_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.GRAY_WOOL.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(GRAY_WOOL_STAIRS.get())));
+    public static final RegistryObject<Block> LIGHT_GRAY_WOOL_VERTICAL_STAIRS = BLOCKS.register("light_gray_wool_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.LIGHT_GRAY_WOOL.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(LIGHT_GRAY_WOOL_STAIRS.get())));
+    public static final RegistryObject<Block> CYAN_WOOL_VERTICAL_STAIRS = BLOCKS.register("cyan_wool_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.CYAN_WOOL.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(CYAN_WOOL_STAIRS.get())));
+    public static final RegistryObject<Block> PURPLE_WOOL_VERTICAL_STAIRS = BLOCKS.register("purple_wool_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.PURPLE_WOOL.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(PURPLE_WOOL_STAIRS.get())));
+    public static final RegistryObject<Block> BLUE_WOOL_VERTICAL_STAIRS = BLOCKS.register("blue_wool_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.BLUE_WOOL.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(BLUE_WOOL_STAIRS.get())));
+    public static final RegistryObject<Block> BROWN_WOOL_VERTICAL_STAIRS = BLOCKS.register("brown_wool_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.BROWN_WOOL.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(BROWN_WOOL_STAIRS.get())));
+    public static final RegistryObject<Block> GREEN_WOOL_VERTICAL_STAIRS = BLOCKS.register("green_wool_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.GREEN_WOOL.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(GREEN_WOOL_STAIRS.get())));
+    public static final RegistryObject<Block> RED_WOOL_VERTICAL_STAIRS = BLOCKS.register("red_wool_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.RED_WOOL.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(RED_WOOL_STAIRS.get())));
+    public static final RegistryObject<Block> BLACK_WOOL_VERTICAL_STAIRS = BLOCKS.register("black_wool_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.BLACK_WOOL.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(BLACK_WOOL_STAIRS.get())));
+    public static final RegistryObject<Block> RED_MOSS_BLOCK_VERTICAL_STAIRS = BLOCKS.register("red_moss_block_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    RED_MOSS_BLOCK.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(RED_MOSS_BLOCK_STAIRS.get())));
+    public static final RegistryObject<Block> ORANGE_MOSS_BLOCK_VERTICAL_STAIRS = BLOCKS.register("orange_moss_block_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    ORANGE_MOSS_BLOCK.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(ORANGE_MOSS_BLOCK_STAIRS.get())));
+    public static final RegistryObject<Block> YELLOW_MOSS_BLOCK_VERTICAL_STAIRS = BLOCKS.register("yellow_moss_block_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    YELLOW_MOSS_BLOCK.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(YELLOW_MOSS_BLOCK_STAIRS.get())));
+    public static final RegistryObject<Block> TUFF_VERTICAL_STAIRS = BLOCKS.register("tuff_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    Blocks.TUFF.defaultBlockState(),
+                    BlockBehaviour.Properties.copy(TUFF_STAIRS.get())));
+    public static final RegistryObject<Block> POLISHED_TUFF_VERTICAL_STAIRS = BLOCKS.register("polished_tuff_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    POLISHED_TUFF.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(POLISHED_TUFF_STAIRS.get())));
+    public static final RegistryObject<Block> TUFF_BRICK_VERTICAL_STAIRS = BLOCKS.register("tuff_brick_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    TUFF_BRICKS.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(TUFF_BRICK_STAIRS.get())));
+    public static final RegistryObject<Block> SULFUR_VERTICAL_STAIRS = BLOCKS.register("sulfur_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    SULFUR.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(SULFUR_STAIRS.get())));
+    public static final RegistryObject<Block> POLISHED_SULFUR_VERTICAL_STAIRS = BLOCKS.register("polished_sulfur_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    POLISHED_SULFUR.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(POLISHED_SULFUR_STAIRS.get())));
+    public static final RegistryObject<Block> SULFUR_BRICKS_VERTICAL_STAIRS = BLOCKS.register("sulfur_bricks_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    SULFUR_BRICKS.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(SULFUR_BRICKS_STAIRS.get())));
+    public static final RegistryObject<Block> CINNABAR_VERTICAL_STAIRS = BLOCKS.register("cinnabar_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    CINNABAR.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(CINNABAR_STAIRS.get())));
+    public static final RegistryObject<Block> POLISHED_CINNABAR_VERTICAL_STAIRS = BLOCKS.register("polished_cinnabar_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    POLISHED_CINNABAR.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(POLISHED_CINNABAR_STAIRS.get())));
+    public static final RegistryObject<Block> CINNABAR_BRICKS_VERTICAL_STAIRS = BLOCKS.register("cinnabar_bricks_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    CINNABAR_BRICKS.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(CINNABAR_BRICKS_STAIRS.get())));
+    public static final RegistryObject<Block> POPLAR_VERTICAL_STAIRS = BLOCKS.register("poplar_vertical_stairs",
+            () -> new VerticalStairBlock(
+                    POPLAR_PLANKS.get().defaultBlockState(),
+                    BlockBehaviour.Properties.copy(POPLAR_STAIRS.get())));
     // End new main vertical variants.
 
 }

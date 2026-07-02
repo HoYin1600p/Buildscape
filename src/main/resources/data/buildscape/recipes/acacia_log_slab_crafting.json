@@ -1,16 +1,16 @@
-{
-  "type": "minecraft:crafting_shaped",
-  "category": "building",
-  "key": {
-    "#": {
-      "item": "minecraft:acacia_log"
-    }
-  },
-  "pattern": [
-    "###"
-  ],
-  "result": {
-    "count": 6,
-    "item": "buildscape:acacia_log_slab"
-  }
+﻿{
+    "key":  {
+                "#":  {
+                          "item":  "minecraft:acacia_log"
+                      }
+            },
+    "category":  "building",
+    "pattern":  [
+                    "###"
+                ],
+    "result":  {
+                   "count":  6,
+                   "item":  "buildscape:acacia_log_slab"
+               },
+    "type":  "minecraft:crafting_shaped"
 }

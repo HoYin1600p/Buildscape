@@ -1,0 +1,17 @@
+﻿{
+    "key":  {
+                "C":  {
+                          "item":  "buildscape:cinnabar"
+                      }
+            },
+    "category":  "building",
+    "pattern":  [
+                    "CC",
+                    "CC"
+                ],
+    "result":  {
+                   "count":  4,
+                   "item":  "buildscape:polished_cinnabar"
+               },
+    "type":  "minecraft:crafting_shaped"
+}

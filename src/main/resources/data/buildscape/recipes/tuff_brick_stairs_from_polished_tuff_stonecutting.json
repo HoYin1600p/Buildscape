@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "buildscape:polished_tuff"
+  },
+  "result": "buildscape:tuff_brick_stairs",
+  "count": 1
+}

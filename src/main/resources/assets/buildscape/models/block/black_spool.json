@@ -1,0 +1,12 @@
+{
+    "textures":  {
+                     "north":  "buildscape:block/black_spool_side",
+                     "up":  "buildscape:block/black_spool_top",
+                     "west":  "buildscape:block/black_spool_side",
+                     "south":  "buildscape:block/black_spool_side",
+                     "particle":  "buildscape:block/black_spool_side",
+                     "east":  "buildscape:block/black_spool_side",
+                     "down":  "buildscape:block/black_spool_top"
+                 },
+    "parent":  "block/cube"
+}

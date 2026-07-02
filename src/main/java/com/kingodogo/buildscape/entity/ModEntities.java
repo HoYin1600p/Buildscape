@@ -80,6 +80,19 @@ public class ModEntities {
                     .build("seat")
     );
 
+    public static final RegistryObject<
+            EntityType<PoplarBoatEntity>
+            > POPLAR_BOAT = ENTITIES.register("poplar_boat", () ->
+            EntityType.Builder.<PoplarBoatEntity>of(
+                            PoplarBoatEntity::new,
+                            MobCategory.MISC
+                    )
+                    .sized(1.375F, 0.5625F)
+                    .clientTrackingRange(10)
+                    .updateInterval(3)
+                    .build("poplar_boat")
+    );
+
     @SubscribeEvent
     public static void registerAttributes(EntityAttributeCreationEvent event) {
     }

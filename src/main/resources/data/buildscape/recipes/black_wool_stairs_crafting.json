@@ -1,0 +1,18 @@
+{
+    "key":  {
+                "C":  {
+                          "item":  "minecraft:black_wool"
+                      }
+            },
+    "category":  "building",
+    "pattern":  [
+                    "C  ",
+                    "CC ",
+                    "CCC"
+                ],
+    "result":  {
+                   "count":  4,
+                   "item":  "buildscape:black_wool_stairs"
+               },
+    "type":  "minecraft:crafting_shaped"
+}

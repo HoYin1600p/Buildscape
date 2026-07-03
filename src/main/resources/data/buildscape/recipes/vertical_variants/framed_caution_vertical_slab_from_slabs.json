@@ -1,17 +1,13 @@
 {
-  "type": "minecraft:crafting_shaped",
+  "type": "minecraft:crafting_shapeless",
   "category": "building",
-  "pattern": [
-    "#",
-    "#"
-  ],
-  "key": {
-    "#": {
+  "ingredients": [
+    {
       "item": "buildscape:framed_caution_slab"
     }
-  },
+  ],
   "result": {
     "item": "buildscape:framed_caution_vertical_slab",
-    "count": 2
+    "count": 1
   }
 }

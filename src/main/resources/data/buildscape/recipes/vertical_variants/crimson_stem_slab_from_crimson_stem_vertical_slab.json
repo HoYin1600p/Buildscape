@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "building",
+  "ingredients": [
+    {
+      "item": "buildscape:crimson_stem_vertical_slab"
+    }
+  ],
+  "result": {
+    "item": "buildscape:crimson_stem_slab",
+    "count": 1
+  }
+}

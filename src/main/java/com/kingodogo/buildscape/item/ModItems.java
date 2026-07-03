@@ -8532,8 +8532,6 @@ public class ModItems {
             () -> new BlockItem(ModBlocks.RED_NETHER_BRICK_VERTICAL_SLAB.get(), createBlockItemProperties()));
     public static final RegistryObject<Item> OAK_LOG_STAIRS = ITEMS.register("oak_log_stairs",
             () -> new BlockItem(ModBlocks.OAK_LOG_STAIRS.get(), createBlockItemProperties()));
-    public static final RegistryObject<Item> OAK_LOG_BARK_STAIRS = ITEMS.register("oak_log_bark_stairs",
-            () -> new BlockItem(ModBlocks.OAK_LOG_BARK_STAIRS.get(), createBlockItemProperties()));
 
     // Extended vanilla slab and stair coverage block items.
     public static final RegistryObject<Item> CUT_COPPER_VERTICAL_SLAB = ITEMS.register("cut_copper_vertical_slab",
@@ -8686,64 +8684,36 @@ public class ModItems {
             () -> new BlockItem(ModBlocks.BLACK_TERRACOTTA_VERTICAL_SLAB.get(), createBlockItemProperties()));
     public static final RegistryObject<Item> STRIPPED_OAK_LOG_STAIRS = ITEMS.register("stripped_oak_log_stairs",
             () -> new BlockItem(ModBlocks.STRIPPED_OAK_LOG_STAIRS.get(), createBlockItemProperties()));
-    public static final RegistryObject<Item> STRIPPED_OAK_LOG_BARK_STAIRS = ITEMS.register("stripped_oak_log_bark_stairs",
-            () -> new BlockItem(ModBlocks.STRIPPED_OAK_LOG_BARK_STAIRS.get(), createBlockItemProperties()));
     public static final RegistryObject<Item> SPRUCE_LOG_STAIRS = ITEMS.register("spruce_log_stairs",
             () -> new BlockItem(ModBlocks.SPRUCE_LOG_STAIRS.get(), createBlockItemProperties()));
     public static final RegistryObject<Item> SPRUCE_LOG_BARK_STAIRS = ITEMS.register("spruce_log_bark_stairs",
             () -> new BlockItem(ModBlocks.SPRUCE_LOG_BARK_STAIRS.get(), createBlockItemProperties()));
     public static final RegistryObject<Item> STRIPPED_SPRUCE_LOG_STAIRS = ITEMS.register("stripped_spruce_log_stairs",
             () -> new BlockItem(ModBlocks.STRIPPED_SPRUCE_LOG_STAIRS.get(), createBlockItemProperties()));
-    public static final RegistryObject<Item> STRIPPED_SPRUCE_LOG_BARK_STAIRS = ITEMS.register("stripped_spruce_log_bark_stairs",
-            () -> new BlockItem(ModBlocks.STRIPPED_SPRUCE_LOG_BARK_STAIRS.get(), createBlockItemProperties()));
     public static final RegistryObject<Item> BIRCH_LOG_STAIRS = ITEMS.register("birch_log_stairs",
             () -> new BlockItem(ModBlocks.BIRCH_LOG_STAIRS.get(), createBlockItemProperties()));
-    public static final RegistryObject<Item> BIRCH_LOG_BARK_STAIRS = ITEMS.register("birch_log_bark_stairs",
-            () -> new BlockItem(ModBlocks.BIRCH_LOG_BARK_STAIRS.get(), createBlockItemProperties()));
     public static final RegistryObject<Item> STRIPPED_BIRCH_LOG_STAIRS = ITEMS.register("stripped_birch_log_stairs",
             () -> new BlockItem(ModBlocks.STRIPPED_BIRCH_LOG_STAIRS.get(), createBlockItemProperties()));
-    public static final RegistryObject<Item> STRIPPED_BIRCH_LOG_BARK_STAIRS = ITEMS.register("stripped_birch_log_bark_stairs",
-            () -> new BlockItem(ModBlocks.STRIPPED_BIRCH_LOG_BARK_STAIRS.get(), createBlockItemProperties()));
     public static final RegistryObject<Item> JUNGLE_LOG_STAIRS = ITEMS.register("jungle_log_stairs",
             () -> new BlockItem(ModBlocks.JUNGLE_LOG_STAIRS.get(), createBlockItemProperties()));
-    public static final RegistryObject<Item> JUNGLE_LOG_BARK_STAIRS = ITEMS.register("jungle_log_bark_stairs",
-            () -> new BlockItem(ModBlocks.JUNGLE_LOG_BARK_STAIRS.get(), createBlockItemProperties()));
     public static final RegistryObject<Item> STRIPPED_JUNGLE_LOG_STAIRS = ITEMS.register("stripped_jungle_log_stairs",
             () -> new BlockItem(ModBlocks.STRIPPED_JUNGLE_LOG_STAIRS.get(), createBlockItemProperties()));
-    public static final RegistryObject<Item> STRIPPED_JUNGLE_LOG_BARK_STAIRS = ITEMS.register("stripped_jungle_log_bark_stairs",
-            () -> new BlockItem(ModBlocks.STRIPPED_JUNGLE_LOG_BARK_STAIRS.get(), createBlockItemProperties()));
     public static final RegistryObject<Item> ACACIA_LOG_STAIRS = ITEMS.register("acacia_log_stairs",
             () -> new BlockItem(ModBlocks.ACACIA_LOG_STAIRS.get(), createBlockItemProperties()));
-    public static final RegistryObject<Item> ACACIA_LOG_BARK_STAIRS = ITEMS.register("acacia_log_bark_stairs",
-            () -> new BlockItem(ModBlocks.ACACIA_LOG_BARK_STAIRS.get(), createBlockItemProperties()));
     public static final RegistryObject<Item> STRIPPED_ACACIA_LOG_STAIRS = ITEMS.register("stripped_acacia_log_stairs",
             () -> new BlockItem(ModBlocks.STRIPPED_ACACIA_LOG_STAIRS.get(), createBlockItemProperties()));
-    public static final RegistryObject<Item> STRIPPED_ACACIA_LOG_BARK_STAIRS = ITEMS.register("stripped_acacia_log_bark_stairs",
-            () -> new BlockItem(ModBlocks.STRIPPED_ACACIA_LOG_BARK_STAIRS.get(), createBlockItemProperties()));
     public static final RegistryObject<Item> DARK_OAK_LOG_STAIRS = ITEMS.register("dark_oak_log_stairs",
             () -> new BlockItem(ModBlocks.DARK_OAK_LOG_STAIRS.get(), createBlockItemProperties()));
-    public static final RegistryObject<Item> DARK_OAK_LOG_BARK_STAIRS = ITEMS.register("dark_oak_log_bark_stairs",
-            () -> new BlockItem(ModBlocks.DARK_OAK_LOG_BARK_STAIRS.get(), createBlockItemProperties()));
     public static final RegistryObject<Item> STRIPPED_DARK_OAK_LOG_STAIRS = ITEMS.register("stripped_dark_oak_log_stairs",
             () -> new BlockItem(ModBlocks.STRIPPED_DARK_OAK_LOG_STAIRS.get(), createBlockItemProperties()));
-    public static final RegistryObject<Item> STRIPPED_DARK_OAK_LOG_BARK_STAIRS = ITEMS.register("stripped_dark_oak_log_bark_stairs",
-            () -> new BlockItem(ModBlocks.STRIPPED_DARK_OAK_LOG_BARK_STAIRS.get(), createBlockItemProperties()));
     public static final RegistryObject<Item> CRIMSON_STEM_STAIRS = ITEMS.register("crimson_stem_stairs",
             () -> new BlockItem(ModBlocks.CRIMSON_STEM_STAIRS.get(), createBlockItemProperties()));
-    public static final RegistryObject<Item> CRIMSON_STEM_BARK_STAIRS = ITEMS.register("crimson_stem_bark_stairs",
-            () -> new BlockItem(ModBlocks.CRIMSON_STEM_BARK_STAIRS.get(), createBlockItemProperties()));
     public static final RegistryObject<Item> STRIPPED_CRIMSON_STEM_STAIRS = ITEMS.register("stripped_crimson_stem_stairs",
             () -> new BlockItem(ModBlocks.STRIPPED_CRIMSON_STEM_STAIRS.get(), createBlockItemProperties()));
-    public static final RegistryObject<Item> STRIPPED_CRIMSON_STEM_BARK_STAIRS = ITEMS.register("stripped_crimson_stem_bark_stairs",
-            () -> new BlockItem(ModBlocks.STRIPPED_CRIMSON_STEM_BARK_STAIRS.get(), createBlockItemProperties()));
     public static final RegistryObject<Item> WARPED_STEM_STAIRS = ITEMS.register("warped_stem_stairs",
             () -> new BlockItem(ModBlocks.WARPED_STEM_STAIRS.get(), createBlockItemProperties()));
-    public static final RegistryObject<Item> WARPED_STEM_BARK_STAIRS = ITEMS.register("warped_stem_bark_stairs",
-            () -> new BlockItem(ModBlocks.WARPED_STEM_BARK_STAIRS.get(), createBlockItemProperties()));
     public static final RegistryObject<Item> STRIPPED_WARPED_STEM_STAIRS = ITEMS.register("stripped_warped_stem_stairs",
             () -> new BlockItem(ModBlocks.STRIPPED_WARPED_STEM_STAIRS.get(), createBlockItemProperties()));
-    public static final RegistryObject<Item> STRIPPED_WARPED_STEM_BARK_STAIRS = ITEMS.register("stripped_warped_stem_bark_stairs",
-            () -> new BlockItem(ModBlocks.STRIPPED_WARPED_STEM_BARK_STAIRS.get(), createBlockItemProperties()));
 
     // Vanilla gap slab and stair coverage block items.
     public static final RegistryObject<Item> ACACIA_WOOD_SLAB = ITEMS.register("acacia_wood_slab",

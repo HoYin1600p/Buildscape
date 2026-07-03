@@ -1,0 +1,9 @@
+{
+  "parent": "buildscape:block/template_vertical_slab",
+  "textures": {
+    "bottom": "minecraft:block/prismarine_bricks",
+    "top": "minecraft:block/prismarine_bricks",
+    "side": "minecraft:block/prismarine_bricks",
+    "particle": "#side"
+  }
+}

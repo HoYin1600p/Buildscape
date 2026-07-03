@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "###"
+  ],
+  "key": {
+    "#": {
+      "item": "minecraft:white_terracotta"
+    }
+  },
+  "result": {
+    "item": "buildscape:white_terracotta_slab",
+    "count": 6
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "buildscape:nether_brick_vertical_slab"
+  },
+  "result": "minecraft:nether_brick_slab",
+  "count": 1
+}

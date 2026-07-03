@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "buildscape:green_terracotta_vertical_slab"
+  },
+  "result": "buildscape:green_terracotta_slab",
+  "count": 1
+}

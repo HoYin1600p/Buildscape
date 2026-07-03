@@ -1,16 +1,16 @@
-﻿{
-    "key":  {
-                "#":  {
-                          "item":  "buildscape:stripped_bamboo_block"
-                      }
-            },
-    "category":  "building",
-    "pattern":  [
-                    "###"
-                ],
-    "result":  {
-                   "count":  6,
-                   "item":  "buildscape:stripped_bamboo_block_slab"
-               },
-    "type":  "minecraft:crafting_shaped"
+{
+  "key": {
+    "#": {
+      "item": "buildscape:stripped_bamboo_block"
+    }
+  },
+  "category": "building",
+  "pattern": [
+    "###"
+  ],
+  "result": {
+    "count": 6,
+    "item": "buildscape:stripped_bamboo_block_slab"
+  },
+  "type": "minecraft:crafting_shaped"
 }

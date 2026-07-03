@@ -9727,8 +9727,6 @@ public class ModBlocks {
                     BlockBehaviour.Properties.copy(Blocks.RED_NETHER_BRICK_SLAB)));
     public static final RegistryObject<Block> OAK_LOG_STAIRS = BLOCKS.register("oak_log_stairs",
             () -> new ModStairBlock(Blocks.OAK_LOG.defaultBlockState(), BlockBehaviour.Properties.copy(Blocks.OAK_LOG)));
-    public static final RegistryObject<Block> OAK_LOG_BARK_STAIRS = BLOCKS.register("oak_log_bark_stairs",
-            () -> new ModStairBlock(Blocks.OAK_LOG.defaultBlockState(), BlockBehaviour.Properties.copy(Blocks.OAK_LOG)));
 
     // Extended vanilla slab and stair coverage.
     public static final RegistryObject<Block> CUT_COPPER_VERTICAL_SLAB = BLOCKS.register("cut_copper_vertical_slab",
@@ -9961,63 +9959,35 @@ public class ModBlocks {
                     BlockBehaviour.Properties.copy(BLACK_TERRACOTTA_SLAB.get())));
     public static final RegistryObject<Block> STRIPPED_OAK_LOG_STAIRS = BLOCKS.register("stripped_oak_log_stairs",
             () -> new ModStairBlock(Blocks.STRIPPED_OAK_LOG.defaultBlockState(), BlockBehaviour.Properties.copy(Blocks.STRIPPED_OAK_LOG)));
-    public static final RegistryObject<Block> STRIPPED_OAK_LOG_BARK_STAIRS = BLOCKS.register("stripped_oak_log_bark_stairs",
-            () -> new ModStairBlock(Blocks.STRIPPED_OAK_LOG.defaultBlockState(), BlockBehaviour.Properties.copy(Blocks.STRIPPED_OAK_LOG)));
     public static final RegistryObject<Block> SPRUCE_LOG_STAIRS = BLOCKS.register("spruce_log_stairs",
             () -> new ModStairBlock(Blocks.SPRUCE_LOG.defaultBlockState(), BlockBehaviour.Properties.copy(Blocks.SPRUCE_LOG)));
     public static final RegistryObject<Block> SPRUCE_LOG_BARK_STAIRS = BLOCKS.register("spruce_log_bark_stairs",
             () -> new ModStairBlock(Blocks.SPRUCE_LOG.defaultBlockState(), BlockBehaviour.Properties.copy(Blocks.SPRUCE_LOG)));
     public static final RegistryObject<Block> STRIPPED_SPRUCE_LOG_STAIRS = BLOCKS.register("stripped_spruce_log_stairs",
             () -> new ModStairBlock(Blocks.STRIPPED_SPRUCE_LOG.defaultBlockState(), BlockBehaviour.Properties.copy(Blocks.STRIPPED_SPRUCE_LOG)));
-    public static final RegistryObject<Block> STRIPPED_SPRUCE_LOG_BARK_STAIRS = BLOCKS.register("stripped_spruce_log_bark_stairs",
-            () -> new ModStairBlock(Blocks.STRIPPED_SPRUCE_LOG.defaultBlockState(), BlockBehaviour.Properties.copy(Blocks.STRIPPED_SPRUCE_LOG)));
     public static final RegistryObject<Block> BIRCH_LOG_STAIRS = BLOCKS.register("birch_log_stairs",
-            () -> new ModStairBlock(Blocks.BIRCH_LOG.defaultBlockState(), BlockBehaviour.Properties.copy(Blocks.BIRCH_LOG)));
-    public static final RegistryObject<Block> BIRCH_LOG_BARK_STAIRS = BLOCKS.register("birch_log_bark_stairs",
             () -> new ModStairBlock(Blocks.BIRCH_LOG.defaultBlockState(), BlockBehaviour.Properties.copy(Blocks.BIRCH_LOG)));
     public static final RegistryObject<Block> STRIPPED_BIRCH_LOG_STAIRS = BLOCKS.register("stripped_birch_log_stairs",
             () -> new ModStairBlock(Blocks.STRIPPED_BIRCH_LOG.defaultBlockState(), BlockBehaviour.Properties.copy(Blocks.STRIPPED_BIRCH_LOG)));
-    public static final RegistryObject<Block> STRIPPED_BIRCH_LOG_BARK_STAIRS = BLOCKS.register("stripped_birch_log_bark_stairs",
-            () -> new ModStairBlock(Blocks.STRIPPED_BIRCH_LOG.defaultBlockState(), BlockBehaviour.Properties.copy(Blocks.STRIPPED_BIRCH_LOG)));
     public static final RegistryObject<Block> JUNGLE_LOG_STAIRS = BLOCKS.register("jungle_log_stairs",
-            () -> new ModStairBlock(Blocks.JUNGLE_LOG.defaultBlockState(), BlockBehaviour.Properties.copy(Blocks.JUNGLE_LOG)));
-    public static final RegistryObject<Block> JUNGLE_LOG_BARK_STAIRS = BLOCKS.register("jungle_log_bark_stairs",
             () -> new ModStairBlock(Blocks.JUNGLE_LOG.defaultBlockState(), BlockBehaviour.Properties.copy(Blocks.JUNGLE_LOG)));
     public static final RegistryObject<Block> STRIPPED_JUNGLE_LOG_STAIRS = BLOCKS.register("stripped_jungle_log_stairs",
             () -> new ModStairBlock(Blocks.STRIPPED_JUNGLE_LOG.defaultBlockState(), BlockBehaviour.Properties.copy(Blocks.STRIPPED_JUNGLE_LOG)));
-    public static final RegistryObject<Block> STRIPPED_JUNGLE_LOG_BARK_STAIRS = BLOCKS.register("stripped_jungle_log_bark_stairs",
-            () -> new ModStairBlock(Blocks.STRIPPED_JUNGLE_LOG.defaultBlockState(), BlockBehaviour.Properties.copy(Blocks.STRIPPED_JUNGLE_LOG)));
     public static final RegistryObject<Block> ACACIA_LOG_STAIRS = BLOCKS.register("acacia_log_stairs",
-            () -> new ModStairBlock(Blocks.ACACIA_LOG.defaultBlockState(), BlockBehaviour.Properties.copy(Blocks.ACACIA_LOG)));
-    public static final RegistryObject<Block> ACACIA_LOG_BARK_STAIRS = BLOCKS.register("acacia_log_bark_stairs",
             () -> new ModStairBlock(Blocks.ACACIA_LOG.defaultBlockState(), BlockBehaviour.Properties.copy(Blocks.ACACIA_LOG)));
     public static final RegistryObject<Block> STRIPPED_ACACIA_LOG_STAIRS = BLOCKS.register("stripped_acacia_log_stairs",
             () -> new ModStairBlock(Blocks.STRIPPED_ACACIA_LOG.defaultBlockState(), BlockBehaviour.Properties.copy(Blocks.STRIPPED_ACACIA_LOG)));
-    public static final RegistryObject<Block> STRIPPED_ACACIA_LOG_BARK_STAIRS = BLOCKS.register("stripped_acacia_log_bark_stairs",
-            () -> new ModStairBlock(Blocks.STRIPPED_ACACIA_LOG.defaultBlockState(), BlockBehaviour.Properties.copy(Blocks.STRIPPED_ACACIA_LOG)));
     public static final RegistryObject<Block> DARK_OAK_LOG_STAIRS = BLOCKS.register("dark_oak_log_stairs",
-            () -> new ModStairBlock(Blocks.DARK_OAK_LOG.defaultBlockState(), BlockBehaviour.Properties.copy(Blocks.DARK_OAK_LOG)));
-    public static final RegistryObject<Block> DARK_OAK_LOG_BARK_STAIRS = BLOCKS.register("dark_oak_log_bark_stairs",
             () -> new ModStairBlock(Blocks.DARK_OAK_LOG.defaultBlockState(), BlockBehaviour.Properties.copy(Blocks.DARK_OAK_LOG)));
     public static final RegistryObject<Block> STRIPPED_DARK_OAK_LOG_STAIRS = BLOCKS.register("stripped_dark_oak_log_stairs",
             () -> new ModStairBlock(Blocks.STRIPPED_DARK_OAK_LOG.defaultBlockState(), BlockBehaviour.Properties.copy(Blocks.STRIPPED_DARK_OAK_LOG)));
-    public static final RegistryObject<Block> STRIPPED_DARK_OAK_LOG_BARK_STAIRS = BLOCKS.register("stripped_dark_oak_log_bark_stairs",
-            () -> new ModStairBlock(Blocks.STRIPPED_DARK_OAK_LOG.defaultBlockState(), BlockBehaviour.Properties.copy(Blocks.STRIPPED_DARK_OAK_LOG)));
     public static final RegistryObject<Block> CRIMSON_STEM_STAIRS = BLOCKS.register("crimson_stem_stairs",
-            () -> new ModStairBlock(Blocks.CRIMSON_STEM.defaultBlockState(), BlockBehaviour.Properties.copy(Blocks.CRIMSON_STEM)));
-    public static final RegistryObject<Block> CRIMSON_STEM_BARK_STAIRS = BLOCKS.register("crimson_stem_bark_stairs",
             () -> new ModStairBlock(Blocks.CRIMSON_STEM.defaultBlockState(), BlockBehaviour.Properties.copy(Blocks.CRIMSON_STEM)));
     public static final RegistryObject<Block> STRIPPED_CRIMSON_STEM_STAIRS = BLOCKS.register("stripped_crimson_stem_stairs",
             () -> new ModStairBlock(Blocks.STRIPPED_CRIMSON_STEM.defaultBlockState(), BlockBehaviour.Properties.copy(Blocks.STRIPPED_CRIMSON_STEM)));
-    public static final RegistryObject<Block> STRIPPED_CRIMSON_STEM_BARK_STAIRS = BLOCKS.register("stripped_crimson_stem_bark_stairs",
-            () -> new ModStairBlock(Blocks.STRIPPED_CRIMSON_STEM.defaultBlockState(), BlockBehaviour.Properties.copy(Blocks.STRIPPED_CRIMSON_STEM)));
     public static final RegistryObject<Block> WARPED_STEM_STAIRS = BLOCKS.register("warped_stem_stairs",
             () -> new ModStairBlock(Blocks.WARPED_STEM.defaultBlockState(), BlockBehaviour.Properties.copy(Blocks.WARPED_STEM)));
-    public static final RegistryObject<Block> WARPED_STEM_BARK_STAIRS = BLOCKS.register("warped_stem_bark_stairs",
-            () -> new ModStairBlock(Blocks.WARPED_STEM.defaultBlockState(), BlockBehaviour.Properties.copy(Blocks.WARPED_STEM)));
     public static final RegistryObject<Block> STRIPPED_WARPED_STEM_STAIRS = BLOCKS.register("stripped_warped_stem_stairs",
-            () -> new ModStairBlock(Blocks.STRIPPED_WARPED_STEM.defaultBlockState(), BlockBehaviour.Properties.copy(Blocks.STRIPPED_WARPED_STEM)));
-    public static final RegistryObject<Block> STRIPPED_WARPED_STEM_BARK_STAIRS = BLOCKS.register("stripped_warped_stem_bark_stairs",
             () -> new ModStairBlock(Blocks.STRIPPED_WARPED_STEM.defaultBlockState(), BlockBehaviour.Properties.copy(Blocks.STRIPPED_WARPED_STEM)));
 
     // Vanilla gap slab and stair coverage.

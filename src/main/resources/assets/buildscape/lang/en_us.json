@@ -3489,5 +3489,8 @@
   "item.buildscape.yellow_trapped_decorated_pot": "Yellow Trapped Decorated Pot",
   "item.buildscape.yellow_wool_slab": "Yellow Wool Slab",
   "item.buildscape.yellow_wool_stairs": "Yellow Wool Stairs",
-  "item.buildscape.yellow_wool_wall": "Yellow Wool Wall"
+  "item.buildscape.yellow_wool_wall": "Yellow Wool Wall",
+  "tooltip.buildscape.cut_all.on": "Cut All: ON",
+  "tooltip.buildscape.cut_all.off": "Cut All: OFF",
+  "tooltip.buildscape.cut_all.desc": "Cuts all similar blocks in the inventory when crafted"
 }

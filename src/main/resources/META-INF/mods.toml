@@ -3,7 +3,7 @@ loaderVersion = "[40,)"
 license = "All Rights Reserved"
 [[mods]]
 modId = "buildscape"
-version = "3.0.3-VH"
+version = "3.0.4-VH"
 displayName = "BuildScape"
 displayURL = "buildscape.online"
 logoFile = "buildscape.png"

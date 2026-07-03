@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "building",
+  "ingredients": [
+    {
+      "item": "minecraft:polished_granite_slab"
+    }
+  ],
+  "result": {
+    "item": "buildscape:polished_granite_vertical_slab",
+    "count": 1
+  }
+}

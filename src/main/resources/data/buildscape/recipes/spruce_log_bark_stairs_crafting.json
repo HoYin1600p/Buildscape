@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "L  ",
+    "LL ",
+    "LLL"
+  ],
+  "key": {
+    "L": {
+      "item": "minecraft:spruce_log"
+    }
+  },
+  "result": {
+    "item": "buildscape:spruce_log_bark_stairs",
+    "count": 4
+  }
+}

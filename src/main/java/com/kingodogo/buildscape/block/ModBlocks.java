@@ -9961,8 +9961,6 @@ public class ModBlocks {
             () -> new ModStairBlock(Blocks.STRIPPED_OAK_LOG.defaultBlockState(), BlockBehaviour.Properties.copy(Blocks.STRIPPED_OAK_LOG)));
     public static final RegistryObject<Block> SPRUCE_LOG_STAIRS = BLOCKS.register("spruce_log_stairs",
             () -> new ModStairBlock(Blocks.SPRUCE_LOG.defaultBlockState(), BlockBehaviour.Properties.copy(Blocks.SPRUCE_LOG)));
-    public static final RegistryObject<Block> SPRUCE_LOG_BARK_STAIRS = BLOCKS.register("spruce_log_bark_stairs",
-            () -> new ModStairBlock(Blocks.SPRUCE_LOG.defaultBlockState(), BlockBehaviour.Properties.copy(Blocks.SPRUCE_LOG)));
     public static final RegistryObject<Block> STRIPPED_SPRUCE_LOG_STAIRS = BLOCKS.register("stripped_spruce_log_stairs",
             () -> new ModStairBlock(Blocks.STRIPPED_SPRUCE_LOG.defaultBlockState(), BlockBehaviour.Properties.copy(Blocks.STRIPPED_SPRUCE_LOG)));
     public static final RegistryObject<Block> BIRCH_LOG_STAIRS = BLOCKS.register("birch_log_stairs",

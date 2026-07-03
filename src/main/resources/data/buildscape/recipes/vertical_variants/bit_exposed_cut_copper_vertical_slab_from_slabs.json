@@ -1,17 +1,13 @@
 {
-  "type": "minecraft:crafting_shaped",
+  "type": "minecraft:crafting_shapeless",
   "category": "building",
-  "pattern": [
-    "#",
-    "#"
-  ],
-  "key": {
-    "#": {
+  "ingredients": [
+    {
       "item": "buildscape:bit_exposed_cut_copper_slab"
     }
-  },
+  ],
   "result": {
     "item": "buildscape:bit_exposed_cut_copper_vertical_slab",
-    "count": 2
+    "count": 1
   }
 }

@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "building",
+  "ingredients": [
+    {
+      "item": "buildscape:light_gray_stained_glass_vertical_slab"
+    }
+  ],
+  "result": {
+    "item": "buildscape:light_gray_stained_glass_slab",
+    "count": 1
+  }
+}

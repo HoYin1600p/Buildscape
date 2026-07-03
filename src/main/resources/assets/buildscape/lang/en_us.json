@@ -3769,5 +3769,8 @@
   "block.buildscape.stripped_poplar_wood_stairs": "Stripped Poplar Wood Stairs",
   "item.buildscape.stripped_poplar_wood_stairs": "Stripped Poplar Wood Stairs",
   "block.buildscape.hay_bale_stairs": "Hay Bale Stairs",
-  "item.buildscape.hay_bale_stairs": "Hay Bale Stairs"
+  "item.buildscape.hay_bale_stairs": "Hay Bale Stairs",
+  "tooltip.buildscape.cut_all.on": "Cut All: ON",
+  "tooltip.buildscape.cut_all.off": "Cut All: OFF",
+  "tooltip.buildscape.cut_all.desc": "Cuts all similar blocks in the inventory when crafted"
 }

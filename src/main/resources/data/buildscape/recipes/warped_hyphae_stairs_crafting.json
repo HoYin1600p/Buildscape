@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "B  ",
+    "BB ",
+    "BBB"
+  ],
+  "key": {
+    "B": {
+      "item": "minecraft:warped_hyphae"
+    }
+  },
+  "result": {
+    "item": "buildscape:warped_hyphae_stairs",
+    "count": 4
+  }
+}

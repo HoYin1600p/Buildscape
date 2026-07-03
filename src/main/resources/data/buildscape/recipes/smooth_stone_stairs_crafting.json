@@ -1,18 +1,18 @@
 {
   "type": "minecraft:crafting_shaped",
   "category": "building",
+  "pattern": [
+    "B  ",
+    "BB ",
+    "BBB"
+  ],
   "key": {
-    "P": {
+    "B": {
       "item": "minecraft:smooth_stone"
     }
   },
-  "pattern": [
-    "P  ",
-    "PP ",
-    "PPP"
-  ],
   "result": {
-    "count": 4,
-    "item": "buildscape:smooth_stone_stairs"
+    "item": "buildscape:smooth_stone_stairs",
+    "count": 4
   }
 }

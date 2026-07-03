@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "building",
+  "ingredients": [
+    {
+      "item": "minecraft:andesite_slab"
+    }
+  ],
+  "result": {
+    "item": "buildscape:andesite_vertical_slab",
+    "count": 1
+  }
+}

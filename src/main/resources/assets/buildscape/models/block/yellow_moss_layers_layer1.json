@@ -1,4 +1,4 @@
-﻿{
+{
   "parent": "minecraft:block/snow_height2",
   "textures": {
     "texture": "buildscape:block/yellow_moss_block",

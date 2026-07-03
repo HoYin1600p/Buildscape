@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "#  ",
+    "## ",
+    "###"
+  ],
+  "key": {
+    "#": {
+      "item": "buildscape:mud"
+    }
+  },
+  "result": {
+    "item": "buildscape:mud_stairs",
+    "count": 4
+  }
+}

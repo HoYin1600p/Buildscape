@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "B  ",
+    "BB ",
+    "BBB"
+  ],
+  "key": {
+    "B": {
+      "item": "minecraft:birch_wood"
+    }
+  },
+  "result": {
+    "item": "buildscape:birch_wood_stairs",
+    "count": 4
+  }
+}

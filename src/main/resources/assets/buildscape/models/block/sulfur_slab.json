@@ -1,8 +1,8 @@
-﻿{
-    "textures":  {
-                     "bottom":  "buildscape:block/sulfur",
-                     "top":  "buildscape:block/sulfur",
-                     "side":  "buildscape:block/sulfur"
-                 },
-    "parent":  "minecraft:block/slab"
+{
+  "textures": {
+    "bottom": "buildscape:block/sulfur",
+    "top": "buildscape:block/sulfur",
+    "side": "buildscape:block/sulfur"
+  },
+  "parent": "minecraft:block/slab"
 }

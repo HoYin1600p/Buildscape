@@ -1,4 +1,5 @@
 {
+  "replace": false,
   "values": [
     "buildscape:mangrove_stairs",
     "buildscape:ashpen_white_stairs",
@@ -18,6 +19,30 @@
     "buildscape:ashpen_red_stairs",
     "buildscape:ashpen_yellow_stairs",
     "buildscape:bamboo_block_stairs",
-    "buildscape:stripped_bamboo_block_stairs"
+    "buildscape:stripped_bamboo_block_stairs",
+    "buildscape:oak_wood_stairs",
+    "buildscape:stripped_oak_wood_stairs",
+    "buildscape:spruce_wood_stairs",
+    "buildscape:stripped_spruce_wood_stairs",
+    "buildscape:birch_wood_stairs",
+    "buildscape:stripped_birch_wood_stairs",
+    "buildscape:jungle_wood_stairs",
+    "buildscape:stripped_jungle_wood_stairs",
+    "buildscape:acacia_wood_stairs",
+    "buildscape:stripped_acacia_wood_stairs",
+    "buildscape:dark_oak_wood_stairs",
+    "buildscape:stripped_dark_oak_wood_stairs",
+    "buildscape:crimson_hyphae_stairs",
+    "buildscape:stripped_crimson_hyphae_stairs",
+    "buildscape:warped_hyphae_stairs",
+    "buildscape:stripped_warped_hyphae_stairs",
+    "buildscape:mangrove_log_stairs",
+    "buildscape:stripped_mangrove_log_stairs",
+    "buildscape:ashpen_log_stairs",
+    "buildscape:ashpen_wood_stairs",
+    "buildscape:poplar_log_stairs",
+    "buildscape:stripped_poplar_log_stairs",
+    "buildscape:poplar_wood_stairs",
+    "buildscape:stripped_poplar_wood_stairs"
   ]
 }

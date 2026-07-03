@@ -1,7 +1,7 @@
-﻿{
-    "variants":  {
-                     "":  {
-                              "model":  "buildscape:block/chiseled_cinnabar"
-                          }
-                 }
+{
+  "variants": {
+    "": {
+      "model": "buildscape:block/chiseled_cinnabar"
+    }
+  }
 }

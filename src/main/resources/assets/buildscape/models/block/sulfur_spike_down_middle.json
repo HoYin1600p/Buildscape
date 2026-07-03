@@ -1,8 +1,8 @@
-﻿{
-    "render_type":  "minecraft:cutout_mipped",
-    "parent":  "minecraft:block/pointed_dripstone_down_middle",
-    "textures":  {
-                     "particle":  "#cross",
-                     "cross":  "buildscape:block/sulfur_spike_down_middle"
-                 }
+{
+  "render_type": "minecraft:cutout_mipped",
+  "parent": "minecraft:block/pointed_dripstone_down_middle",
+  "textures": {
+    "particle": "#cross",
+    "cross": "buildscape:block/sulfur_spike_down_middle"
+  }
 }

@@ -52,32 +52,32 @@
     "sounds": [
       {
         "name": "buildscape:block/mud/break1",
-        "volume": 1.0,
+        "volume": 1,
         "pitch": 0.9
       },
       {
         "name": "buildscape:block/mud/break2",
-        "volume": 1.0,
+        "volume": 1,
         "pitch": 0.9
       },
       {
         "name": "buildscape:block/mud/break3",
-        "volume": 1.0,
+        "volume": 1,
         "pitch": 0.9
       },
       {
         "name": "buildscape:block/mud/break4",
-        "volume": 1.0,
+        "volume": 1,
         "pitch": 0.9
       },
       {
         "name": "buildscape:block/mud/break5",
-        "volume": 1.0,
+        "volume": 1,
         "pitch": 0.9
       },
       {
         "name": "buildscape:block/mud/break6",
-        "volume": 1.0,
+        "volume": 1,
         "pitch": 0.9
       }
     ]
@@ -86,32 +86,32 @@
     "sounds": [
       {
         "name": "buildscape:block/mud/step1",
-        "volume": 1.0,
+        "volume": 1,
         "pitch": 0.9
       },
       {
         "name": "buildscape:block/mud/step2",
-        "volume": 1.0,
+        "volume": 1,
         "pitch": 0.9
       },
       {
         "name": "buildscape:block/mud/step3",
-        "volume": 1.0,
+        "volume": 1,
         "pitch": 0.9
       },
       {
         "name": "buildscape:block/mud/step4",
-        "volume": 1.0,
+        "volume": 1,
         "pitch": 0.9
       },
       {
         "name": "buildscape:block/mud/step5",
-        "volume": 1.0,
+        "volume": 1,
         "pitch": 0.9
       },
       {
         "name": "buildscape:block/mud/step6",
-        "volume": 1.0,
+        "volume": 1,
         "pitch": 0.9
       }
     ]
@@ -216,28 +216,28 @@
     "sounds": [
       {
         "name": "buildscape:block/flower_bed/step1",
-        "volume": 1.0,
-        "pitch": 1.0
+        "volume": 1,
+        "pitch": 1
       },
       {
         "name": "buildscape:block/flower_bed/step2",
-        "volume": 1.0,
-        "pitch": 1.0
+        "volume": 1,
+        "pitch": 1
       },
       {
         "name": "buildscape:block/flower_bed/step3",
-        "volume": 1.0,
-        "pitch": 1.0
+        "volume": 1,
+        "pitch": 1
       },
       {
         "name": "buildscape:block/flower_bed/step4",
-        "volume": 1.0,
-        "pitch": 1.0
+        "volume": 1,
+        "pitch": 1
       },
       {
         "name": "buildscape:block/flower_bed/step5",
-        "volume": 1.0,
-        "pitch": 1.0
+        "volume": 1,
+        "pitch": 1
       }
     ]
   },
@@ -473,32 +473,32 @@
       {
         "name": "buildscape:block/mangrove_roots/step1",
         "volume": 0.0375,
-        "pitch": 1.0
+        "pitch": 1
       },
       {
         "name": "buildscape:block/mangrove_roots/step2",
         "volume": 0.0375,
-        "pitch": 1.0
+        "pitch": 1
       },
       {
         "name": "buildscape:block/mangrove_roots/step3",
         "volume": 0.0375,
-        "pitch": 1.0
+        "pitch": 1
       },
       {
         "name": "buildscape:block/mangrove_roots/step4",
         "volume": 0.0375,
-        "pitch": 1.0
+        "pitch": 1
       },
       {
         "name": "buildscape:block/mangrove_roots/step5",
         "volume": 0.0375,
-        "pitch": 1.0
+        "pitch": 1
       },
       {
         "name": "buildscape:block/mangrove_roots/step6",
         "volume": 0.0375,
-        "pitch": 1.0
+        "pitch": 1
       }
     ],
     "subtitle": "subtitles.block.generic.footsteps"
@@ -648,32 +648,32 @@
       {
         "name": "buildscape:block/muddy_mangrove_roots/step1",
         "volume": 0.0375,
-        "pitch": 1.0
+        "pitch": 1
       },
       {
         "name": "buildscape:block/muddy_mangrove_roots/step2",
         "volume": 0.0375,
-        "pitch": 1.0
+        "pitch": 1
       },
       {
         "name": "buildscape:block/muddy_mangrove_roots/step3",
         "volume": 0.0375,
-        "pitch": 1.0
+        "pitch": 1
       },
       {
         "name": "buildscape:block/muddy_mangrove_roots/step4",
         "volume": 0.0375,
-        "pitch": 1.0
+        "pitch": 1
       },
       {
         "name": "buildscape:block/muddy_mangrove_roots/step5",
         "volume": 0.0375,
-        "pitch": 1.0
+        "pitch": 1
       },
       {
         "name": "buildscape:block/muddy_mangrove_roots/step6",
         "volume": 0.0375,
-        "pitch": 1.0
+        "pitch": 1
       }
     ],
     "subtitle": "subtitles.block.generic.footsteps"
@@ -682,33 +682,33 @@
     "sounds": [
       {
         "name": "buildscape:block/packed_mud/break1",
-        "volume": 1.0,
-        "pitch": 1.0
+        "volume": 1,
+        "pitch": 1
       },
       {
         "name": "buildscape:block/packed_mud/break2",
-        "volume": 1.0,
-        "pitch": 1.0
+        "volume": 1,
+        "pitch": 1
       },
       {
         "name": "buildscape:block/packed_mud/break3",
-        "volume": 1.0,
-        "pitch": 1.0
+        "volume": 1,
+        "pitch": 1
       },
       {
         "name": "buildscape:block/packed_mud/break4",
-        "volume": 1.0,
-        "pitch": 1.0
+        "volume": 1,
+        "pitch": 1
       },
       {
         "name": "buildscape:block/packed_mud/break5",
-        "volume": 1.0,
-        "pitch": 1.0
+        "volume": 1,
+        "pitch": 1
       },
       {
         "name": "buildscape:block/packed_mud/break6",
-        "volume": 1.0,
-        "pitch": 1.0
+        "volume": 1,
+        "pitch": 1
       }
     ],
     "subtitle": "subtitles.block.generic.break"
@@ -717,33 +717,33 @@
     "sounds": [
       {
         "name": "buildscape:block/packed_mud/break1",
-        "volume": 1.0,
-        "pitch": 1.0
+        "volume": 1,
+        "pitch": 1
       },
       {
         "name": "buildscape:block/packed_mud/break2",
-        "volume": 1.0,
-        "pitch": 1.0
+        "volume": 1,
+        "pitch": 1
       },
       {
         "name": "buildscape:block/packed_mud/break3",
-        "volume": 1.0,
-        "pitch": 1.0
+        "volume": 1,
+        "pitch": 1
       },
       {
         "name": "buildscape:block/packed_mud/break4",
-        "volume": 1.0,
-        "pitch": 1.0
+        "volume": 1,
+        "pitch": 1
       },
       {
         "name": "buildscape:block/packed_mud/break5",
-        "volume": 1.0,
-        "pitch": 1.0
+        "volume": 1,
+        "pitch": 1
       },
       {
         "name": "buildscape:block/packed_mud/break6",
-        "volume": 1.0,
-        "pitch": 1.0
+        "volume": 1,
+        "pitch": 1
       }
     ],
     "subtitle": "subtitles.block.generic.place"
@@ -752,33 +752,33 @@
     "sounds": [
       {
         "name": "buildscape:block/packed_mud/step1",
-        "volume": 1.0,
-        "pitch": 1.0
+        "volume": 1,
+        "pitch": 1
       },
       {
         "name": "buildscape:block/packed_mud/step2",
-        "volume": 1.0,
-        "pitch": 1.0
+        "volume": 1,
+        "pitch": 1
       },
       {
         "name": "buildscape:block/packed_mud/step3",
-        "volume": 1.0,
-        "pitch": 1.0
+        "volume": 1,
+        "pitch": 1
       },
       {
         "name": "buildscape:block/packed_mud/step4",
-        "volume": 1.0,
-        "pitch": 1.0
+        "volume": 1,
+        "pitch": 1
       },
       {
         "name": "buildscape:block/packed_mud/step5",
-        "volume": 1.0,
-        "pitch": 1.0
+        "volume": 1,
+        "pitch": 1
       },
       {
         "name": "buildscape:block/packed_mud/step6",
-        "volume": 1.0,
-        "pitch": 1.0
+        "volume": 1,
+        "pitch": 1
       }
     ],
     "subtitle": "subtitles.block.generic.footsteps"
@@ -787,33 +787,33 @@
     "sounds": [
       {
         "name": "buildscape:block/packed_mud/step1",
-        "volume": 1.0,
-        "pitch": 1.0
+        "volume": 1,
+        "pitch": 1
       },
       {
         "name": "buildscape:block/packed_mud/step2",
-        "volume": 1.0,
-        "pitch": 1.0
+        "volume": 1,
+        "pitch": 1
       },
       {
         "name": "buildscape:block/packed_mud/step3",
-        "volume": 1.0,
-        "pitch": 1.0
+        "volume": 1,
+        "pitch": 1
       },
       {
         "name": "buildscape:block/packed_mud/step4",
-        "volume": 1.0,
-        "pitch": 1.0
+        "volume": 1,
+        "pitch": 1
       },
       {
         "name": "buildscape:block/packed_mud/step5",
-        "volume": 1.0,
-        "pitch": 1.0
+        "volume": 1,
+        "pitch": 1
       },
       {
         "name": "buildscape:block/packed_mud/step6",
-        "volume": 1.0,
-        "pitch": 1.0
+        "volume": 1,
+        "pitch": 1
       }
     ],
     "subtitle": "subtitles.block.generic.hit"
@@ -822,33 +822,33 @@
     "sounds": [
       {
         "name": "buildscape:block/packed_mud/step1",
-        "volume": 1.0,
-        "pitch": 1.0
+        "volume": 1,
+        "pitch": 1
       },
       {
         "name": "buildscape:block/packed_mud/step2",
-        "volume": 1.0,
-        "pitch": 1.0
+        "volume": 1,
+        "pitch": 1
       },
       {
         "name": "buildscape:block/packed_mud/step3",
-        "volume": 1.0,
-        "pitch": 1.0
+        "volume": 1,
+        "pitch": 1
       },
       {
         "name": "buildscape:block/packed_mud/step4",
-        "volume": 1.0,
-        "pitch": 1.0
+        "volume": 1,
+        "pitch": 1
       },
       {
         "name": "buildscape:block/packed_mud/step5",
-        "volume": 1.0,
-        "pitch": 1.0
+        "volume": 1,
+        "pitch": 1
       },
       {
         "name": "buildscape:block/packed_mud/step6",
-        "volume": 1.0,
-        "pitch": 1.0
+        "volume": 1,
+        "pitch": 1
       }
     ],
     "subtitle": "subtitles.block.generic.fall"
@@ -857,33 +857,33 @@
     "sounds": [
       {
         "name": "buildscape:block/mud_bricks/break1",
-        "volume": 1.0,
-        "pitch": 1.0
+        "volume": 1,
+        "pitch": 1
       },
       {
         "name": "buildscape:block/mud_bricks/break2",
-        "volume": 1.0,
-        "pitch": 1.0
+        "volume": 1,
+        "pitch": 1
       },
       {
         "name": "buildscape:block/mud_bricks/break3",
-        "volume": 1.0,
-        "pitch": 1.0
+        "volume": 1,
+        "pitch": 1
       },
       {
         "name": "buildscape:block/mud_bricks/break4",
-        "volume": 1.0,
-        "pitch": 1.0
+        "volume": 1,
+        "pitch": 1
       },
       {
         "name": "buildscape:block/mud_bricks/break5",
-        "volume": 1.0,
-        "pitch": 1.0
+        "volume": 1,
+        "pitch": 1
       },
       {
         "name": "buildscape:block/mud_bricks/break6",
-        "volume": 1.0,
-        "pitch": 1.0
+        "volume": 1,
+        "pitch": 1
       }
     ],
     "subtitle": "subtitles.block.generic.break"
@@ -892,33 +892,33 @@
     "sounds": [
       {
         "name": "buildscape:block/mud_bricks/break1",
-        "volume": 1.0,
-        "pitch": 1.0
+        "volume": 1,
+        "pitch": 1
       },
       {
         "name": "buildscape:block/mud_bricks/break2",
-        "volume": 1.0,
-        "pitch": 1.0
+        "volume": 1,
+        "pitch": 1
       },
       {
         "name": "buildscape:block/mud_bricks/break3",
-        "volume": 1.0,
-        "pitch": 1.0
+        "volume": 1,
+        "pitch": 1
       },
       {
         "name": "buildscape:block/mud_bricks/break4",
-        "volume": 1.0,
-        "pitch": 1.0
+        "volume": 1,
+        "pitch": 1
       },
       {
         "name": "buildscape:block/mud_bricks/break5",
-        "volume": 1.0,
-        "pitch": 1.0
+        "volume": 1,
+        "pitch": 1
       },
       {
         "name": "buildscape:block/mud_bricks/break6",
-        "volume": 1.0,
-        "pitch": 1.0
+        "volume": 1,
+        "pitch": 1
       }
     ],
     "subtitle": "subtitles.block.generic.place"
@@ -927,33 +927,33 @@
     "sounds": [
       {
         "name": "buildscape:block/mud_bricks/step1",
-        "volume": 1.0,
-        "pitch": 1.0
+        "volume": 1,
+        "pitch": 1
       },
       {
         "name": "buildscape:block/mud_bricks/step2",
-        "volume": 1.0,
-        "pitch": 1.0
+        "volume": 1,
+        "pitch": 1
       },
       {
         "name": "buildscape:block/mud_bricks/step3",
-        "volume": 1.0,
-        "pitch": 1.0
+        "volume": 1,
+        "pitch": 1
       },
       {
         "name": "buildscape:block/mud_bricks/step4",
-        "volume": 1.0,
-        "pitch": 1.0
+        "volume": 1,
+        "pitch": 1
       },
       {
         "name": "buildscape:block/mud_bricks/step5",
-        "volume": 1.0,
-        "pitch": 1.0
+        "volume": 1,
+        "pitch": 1
       },
       {
         "name": "buildscape:block/mud_bricks/step6",
-        "volume": 1.0,
-        "pitch": 1.0
+        "volume": 1,
+        "pitch": 1
       }
     ],
     "subtitle": "subtitles.block.generic.footsteps"
@@ -962,33 +962,33 @@
     "sounds": [
       {
         "name": "buildscape:block/mud_bricks/step1",
-        "volume": 1.0,
-        "pitch": 1.0
+        "volume": 1,
+        "pitch": 1
       },
       {
         "name": "buildscape:block/mud_bricks/step2",
-        "volume": 1.0,
-        "pitch": 1.0
+        "volume": 1,
+        "pitch": 1
       },
       {
         "name": "buildscape:block/mud_bricks/step3",
-        "volume": 1.0,
-        "pitch": 1.0
+        "volume": 1,
+        "pitch": 1
       },
       {
         "name": "buildscape:block/mud_bricks/step4",
-        "volume": 1.0,
-        "pitch": 1.0
+        "volume": 1,
+        "pitch": 1
       },
       {
         "name": "buildscape:block/mud_bricks/step5",
-        "volume": 1.0,
-        "pitch": 1.0
+        "volume": 1,
+        "pitch": 1
       },
       {
         "name": "buildscape:block/mud_bricks/step6",
-        "volume": 1.0,
-        "pitch": 1.0
+        "volume": 1,
+        "pitch": 1
       }
     ],
     "subtitle": "subtitles.block.generic.hit"
@@ -997,33 +997,33 @@
     "sounds": [
       {
         "name": "buildscape:block/mud_bricks/step1",
-        "volume": 1.0,
-        "pitch": 1.0
+        "volume": 1,
+        "pitch": 1
       },
       {
         "name": "buildscape:block/mud_bricks/step2",
-        "volume": 1.0,
-        "pitch": 1.0
+        "volume": 1,
+        "pitch": 1
       },
       {
         "name": "buildscape:block/mud_bricks/step3",
-        "volume": 1.0,
-        "pitch": 1.0
+        "volume": 1,
+        "pitch": 1
       },
       {
         "name": "buildscape:block/mud_bricks/step4",
-        "volume": 1.0,
-        "pitch": 1.0
+        "volume": 1,
+        "pitch": 1
       },
       {
         "name": "buildscape:block/mud_bricks/step5",
-        "volume": 1.0,
-        "pitch": 1.0
+        "volume": 1,
+        "pitch": 1
       },
       {
         "name": "buildscape:block/mud_bricks/step6",
-        "volume": 1.0,
-        "pitch": 1.0
+        "volume": 1,
+        "pitch": 1
       }
     ],
     "subtitle": "subtitles.block.generic.fall"

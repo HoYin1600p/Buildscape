@@ -1,4 +1,4 @@
-﻿{
+{
   "variants": {
     "facing=east,half=bottom,shape=inner_left": {
       "model": "buildscape:block/orange_moss_block_stairs_inner",

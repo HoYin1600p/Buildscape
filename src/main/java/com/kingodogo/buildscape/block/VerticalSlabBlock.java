@@ -8,6 +8,7 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.AbstractGlassBlock;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SlabBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
@@ -46,7 +47,11 @@ public class VerticalSlabBlock extends SlabBlock {
     }
 
     private boolean isGlassLike() {
-        return this.baseBlock instanceof AbstractGlassBlock;
+        return this.baseBlock instanceof AbstractGlassBlock && !this.isTintedGlassLike();
+    }
+
+    private boolean isTintedGlassLike() {
+        return this.baseBlock == Blocks.TINTED_GLASS;
     }
 
     @Override
@@ -74,73 +79,75 @@ public class VerticalSlabBlock extends SlabBlock {
         BlockPos pos = context.getClickedPos();
         BlockState state = context.getLevel().getBlockState(pos);
         if (state.is(this)) {
-            return this.canMergeWithExisting(state, context)
-                    ? state.setValue(TYPE, SlabType.DOUBLE).setValue(WATERLOGGED, Boolean.FALSE)
-                    : null;
+            return state.setValue(TYPE, SlabType.DOUBLE).setValue(WATERLOGGED, Boolean.FALSE);
         }
 
         FluidState fluid = context.getLevel().getFluidState(pos);
-        Direction clickedFace = context.getClickedFace();
-        Direction.Axis axis;
-        SlabType type;
-
-        if (clickedFace.getAxis().isHorizontal()) {
-            axis = clickedFace.getAxis();
-            type = clickedFace.getAxisDirection() == Direction.AxisDirection.POSITIVE
-                    ? SlabType.TOP
-                    : SlabType.BOTTOM;
-        } else {
-            Vec3 hit = context.getClickLocation();
-            double x = hit.x - pos.getX();
-            double z = hit.z - pos.getZ();
-            double xDistance = Math.abs(x - 0.5D);
-            double zDistance = Math.abs(z - 0.5D);
-            if (xDistance > zDistance) {
-                axis = Direction.Axis.X;
-                type = x > 0.5D ? SlabType.TOP : SlabType.BOTTOM;
-            } else {
-                axis = Direction.Axis.Z;
-                type = z > 0.5D ? SlabType.TOP : SlabType.BOTTOM;
-            }
-        }
+        Direction direction = this.getDirectionForPlacement(context);
 
         return this.defaultBlockState()
-                .setValue(AXIS, axis)
-                .setValue(TYPE, type)
+                .setValue(AXIS, direction.getAxis())
+                .setValue(TYPE, this.typeFromDirection(direction))
                 .setValue(WATERLOGGED, fluid.getType() == Fluids.WATER);
     }
 
     @Override
     public boolean canBeReplaced(BlockState state, BlockPlaceContext context) {
-        return this.canMergeWithExisting(state, context);
-    }
-
-    private boolean canMergeWithExisting(BlockState state, BlockPlaceContext context) {
         ItemStack stack = context.getItemInHand();
         SlabType type = state.getValue(TYPE);
         if (type == SlabType.DOUBLE || !stack.is(this.asItem())) {
             return false;
         }
-        if (!context.replacingClickedOnBlock()) {
-            return false;
+
+        Direction slabDirection = this.directionFromState(state);
+        Direction clickedFace = context.getClickedFace();
+        if (context.replacingClickedOnBlock()) {
+            return clickedFace == slabDirection && this.getDirectionForPlacement(context) == slabDirection;
+        }
+        return clickedFace.getAxis() != slabDirection.getAxis();
+    }
+
+    private Direction getDirectionForPlacement(BlockPlaceContext context) {
+        Direction direction = context.getClickedFace();
+        if (direction.getAxis().isHorizontal()) {
+            return direction;
         }
 
-        Direction face = context.getClickedFace();
+        BlockPos pos = context.getClickedPos();
+        Vec3 hit = context.getClickLocation()
+                .subtract(pos.getX(), pos.getY(), pos.getZ())
+                .subtract(0.5D, 0.0D, 0.5D);
+        double angle = Math.atan2(hit.x, hit.z) * -180.0D / Math.PI;
+        return Direction.fromYRot(angle).getOpposite();
+    }
+
+    private Direction directionFromState(BlockState state) {
         Direction.Axis axis = state.getValue(AXIS);
-        if (face.getAxis().isVertical()) {
-            return false;
-        }
-        if (face.getAxis() != axis) {
-            return false;
-        }
-        return face.getAxisDirection() == Direction.AxisDirection.POSITIVE
-                ? type == SlabType.BOTTOM
-                : type == SlabType.TOP;
+        SlabType type = state.getValue(TYPE);
+        Direction.AxisDirection axisDirection = type == SlabType.TOP
+                ? Direction.AxisDirection.NEGATIVE
+                : Direction.AxisDirection.POSITIVE;
+        return Direction.fromAxisAndDirection(axis, axisDirection);
+    }
+
+    private SlabType typeFromDirection(Direction direction) {
+        return direction.getAxisDirection() == Direction.AxisDirection.POSITIVE
+                ? SlabType.BOTTOM
+                : SlabType.TOP;
     }
 
     @Override
     public boolean propagatesSkylightDown(BlockState state, BlockGetter level, BlockPos pos) {
-        return this.isGlassLike() || super.propagatesSkylightDown(state, level, pos);
+        return !this.isTintedGlassLike() && (this.isGlassLike() || super.propagatesSkylightDown(state, level, pos));
+    }
+
+    @Override
+    public int getLightBlock(BlockState state, BlockGetter level, BlockPos pos) {
+        if (this.isTintedGlassLike()) {
+            return 15;
+        }
+
+        return super.getLightBlock(state, level, pos);
     }
 
     @Override

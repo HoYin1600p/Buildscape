@@ -13,6 +13,9 @@
     "buildscape:white_sand",
     "buildscape:yellow_sand",
     "buildscape:snowy_grass_block_vertical_slab",
-    "buildscape:packed_mud_vertical_slab"
+    "buildscape:packed_mud_vertical_slab",
+    "buildscape:dirt_stairs",
+    "buildscape:mycelium_stairs",
+    "buildscape:podzol_stairs"
   ]
 }

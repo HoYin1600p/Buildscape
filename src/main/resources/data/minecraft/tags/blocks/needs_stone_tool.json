@@ -721,6 +721,16 @@
     "buildscape:blue_stained_bricks_vertical_slab",
     "buildscape:purple_stained_bricks_vertical_slab",
     "buildscape:magenta_stained_bricks_vertical_slab",
-    "buildscape:pink_stained_bricks_vertical_slab"
+    "buildscape:pink_stained_bricks_vertical_slab",
+    "buildscape:cut_copper_vertical_slab",
+    "buildscape:exposed_cut_copper_vertical_slab",
+    "buildscape:weathered_cut_copper_vertical_slab",
+    "buildscape:oxidized_cut_copper_vertical_slab",
+    "buildscape:waxed_cut_copper_vertical_slab",
+    "buildscape:waxed_exposed_cut_copper_vertical_slab",
+    "buildscape:waxed_weathered_cut_copper_vertical_slab",
+    "buildscape:waxed_oxidized_cut_copper_vertical_slab",
+    "buildscape:mud_stairs",
+    "buildscape:hay_bale_stairs"
   ]
 }

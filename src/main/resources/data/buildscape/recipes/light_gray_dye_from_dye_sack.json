@@ -1,13 +1,13 @@
 {
-    "ingredients":  [
-                        {
-                            "item":  "buildscape:light_gray_dye_sack"
-                        }
-                    ],
-    "category":  "misc",
-    "result":  {
-                   "count":  9,
-                   "item":  "minecraft:light_gray_dye"
-               },
-    "type":  "minecraft:crafting_shapeless"
+  "ingredients": [
+    {
+      "item": "buildscape:light_gray_dye_sack"
+    }
+  ],
+  "category": "misc",
+  "result": {
+    "count": 9,
+    "item": "minecraft:light_gray_dye"
+  },
+  "type": "minecraft:crafting_shapeless"
 }

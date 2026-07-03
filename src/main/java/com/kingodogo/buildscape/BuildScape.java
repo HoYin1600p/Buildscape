@@ -1495,6 +1495,10 @@ public class BuildScape {
                         net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                                 registryObject.get(),
                                 net.minecraft.client.renderer.RenderType.translucent());
+                    } else if (id != null && id.getPath().contains("leaves")) {
+                        net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
+                                registryObject.get(),
+                                net.minecraft.client.renderer.RenderType.cutoutMipped());
                     }
                 }
             });

@@ -1,6 +1,6 @@
-﻿{
-    "textures":  {
-                     "texture":  "buildscape:block/poplar_planks"
-                 },
-    "parent":  "minecraft:block/button_inventory"
+{
+  "textures": {
+    "texture": "buildscape:block/poplar_planks"
+  },
+  "parent": "minecraft:block/button_inventory"
 }

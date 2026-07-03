@@ -2,14 +2,20 @@ package com.kingodogo.buildscape.item;
 
 import com.kingodogo.buildscape.BuildScape;
 import net.minecraft.core.NonNullList;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class ModCreativeModeTab {
@@ -33,6 +39,8 @@ public class ModCreativeModeTab {
                     rawList.add(stack);
                 }
             }
+
+            rawList = arrangeVariantItems(rawList);
             
             items.clear();
             Set<Item> added = new HashSet<>();
@@ -48,6 +56,127 @@ public class ModCreativeModeTab {
         private boolean containsItem(List<ItemStack> list, Item item) {
             for (ItemStack s : list) if (s.getItem() == item) return true;
             return false;
+        }
+
+        private NonNullList<ItemStack> arrangeVariantItems(NonNullList<ItemStack> input) {
+            List<ItemStack> ordered = new ArrayList<>(input);
+            Map<String, ItemStack> buildscapeItems = new HashMap<>();
+            Set<String> variantBasePaths = new LinkedHashSet<>();
+
+            for (ItemStack stack : ordered) {
+                ResourceLocation id = ForgeRegistries.ITEMS.getKey(stack.getItem());
+                if (id != null && BuildScape.MODID.equals(id.getNamespace())) {
+                    String path = id.getPath();
+                    buildscapeItems.put(path, stack);
+
+                    String basePath = getVariantBasePath(path);
+                    if (basePath != null) {
+                        variantBasePaths.add(basePath);
+                    }
+                }
+            }
+
+            for (String basePath : variantBasePaths) {
+                arrangeVariantGroup(ordered, buildscapeItems, basePath);
+            }
+
+            NonNullList<ItemStack> output = NonNullList.create();
+            output.addAll(ordered);
+            return output;
+        }
+
+        private String getVariantBasePath(String path) {
+            if (path.endsWith("_vertical_slab")) {
+                return path.substring(0, path.length() - "_vertical_slab".length());
+            }
+            if (path.endsWith("_stairs")) {
+                return path.substring(0, path.length() - "_stairs".length());
+            }
+            if (path.endsWith("_slab")) {
+                return path.substring(0, path.length() - "_slab".length());
+            }
+            if (path.endsWith("_wall")) {
+                return path.substring(0, path.length() - "_wall".length());
+            }
+            return null;
+        }
+
+        private void arrangeVariantGroup(List<ItemStack> ordered, Map<String, ItemStack> buildscapeItems, String basePath) {
+            ItemStack parent = buildscapeItems.get(basePath);
+            ItemStack stairs = buildscapeItems.get(basePath + "_stairs");
+            ItemStack slab = buildscapeItems.get(basePath + "_slab");
+            ItemStack verticalSlab = buildscapeItems.get(basePath + "_vertical_slab");
+            ItemStack wall = buildscapeItems.get(basePath + "_wall");
+
+            if (parent == null && (stairs != null || slab != null || wall != null)) {
+                parent = getOrInsertVanillaAnchor(ordered, firstPresent(stairs, slab, verticalSlab, wall), basePath);
+            }
+
+            if (slab == null && verticalSlab != null) {
+                slab = getOrInsertVanillaAnchor(ordered, verticalSlab, basePath + "_slab");
+            }
+
+            ItemStack anchor = parent;
+            if (stairs != null) {
+                moveAfter(ordered, stairs, anchor);
+                anchor = stairs;
+            }
+            if (slab != null) {
+                moveAfter(ordered, slab, anchor);
+                anchor = slab;
+            }
+            if (verticalSlab != null) {
+                moveAfter(ordered, verticalSlab, anchor);
+                anchor = verticalSlab;
+            }
+            if (wall != null) {
+                moveAfter(ordered, wall, anchor);
+            }
+        }
+
+        private ItemStack firstPresent(ItemStack... stacks) {
+            for (ItemStack stack : stacks) {
+                if (stack != null) {
+                    return stack;
+                }
+            }
+            return null;
+        }
+
+        private ItemStack getOrInsertVanillaAnchor(List<ItemStack> ordered, ItemStack stack, String path) {
+            Item vanillaItem = ForgeRegistries.ITEMS.getValue(new ResourceLocation("minecraft", path));
+            if (vanillaItem == null || vanillaItem == Items.AIR) {
+                return null;
+            }
+
+            for (ItemStack existing : ordered) {
+                if (existing.getItem() == vanillaItem) {
+                    return existing;
+                }
+            }
+
+            ItemStack anchor = new ItemStack(vanillaItem);
+            int stackIndex = ordered.indexOf(stack);
+            if (stackIndex >= 0) {
+                ordered.add(stackIndex, anchor);
+            } else {
+                ordered.add(anchor);
+            }
+            return anchor;
+        }
+
+        private void moveAfter(List<ItemStack> ordered, ItemStack stack, ItemStack anchor) {
+            if (anchor == null || stack == anchor) {
+                return;
+            }
+
+            ordered.remove(stack);
+            int anchorIndex = ordered.indexOf(anchor);
+            if (anchorIndex >= 0) {
+                ordered.add(anchorIndex + 1, stack);
+            } else {
+                ordered.add(stack);
+            }
         }
 
 private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {

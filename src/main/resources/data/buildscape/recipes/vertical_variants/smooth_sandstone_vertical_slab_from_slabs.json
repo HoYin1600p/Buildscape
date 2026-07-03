@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "building",
+  "ingredients": [
+    {
+      "item": "minecraft:smooth_sandstone_slab"
+    }
+  ],
+  "result": {
+    "item": "buildscape:smooth_sandstone_vertical_slab",
+    "count": 1
+  }
+}

@@ -1,13 +1,13 @@
-﻿{
-    "variants":  {
-                     "type=bottom":  {
-                                         "model":  "buildscape:block/sulfur_slab"
-                                     },
-                     "type=top":  {
-                                      "model":  "buildscape:block/sulfur_slab_top"
-                                  },
-                     "type=double":  {
-                                         "model":  "buildscape:block/sulfur"
-                                     }
-                 }
+{
+  "variants": {
+    "type=bottom": {
+      "model": "buildscape:block/sulfur_slab"
+    },
+    "type=top": {
+      "model": "buildscape:block/sulfur_slab_top"
+    },
+    "type=double": {
+      "model": "buildscape:block/sulfur"
+    }
+  }
 }

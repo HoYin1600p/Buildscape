@@ -8686,8 +8686,6 @@ public class ModItems {
             () -> new BlockItem(ModBlocks.STRIPPED_OAK_LOG_STAIRS.get(), createBlockItemProperties()));
     public static final RegistryObject<Item> SPRUCE_LOG_STAIRS = ITEMS.register("spruce_log_stairs",
             () -> new BlockItem(ModBlocks.SPRUCE_LOG_STAIRS.get(), createBlockItemProperties()));
-    public static final RegistryObject<Item> SPRUCE_LOG_BARK_STAIRS = ITEMS.register("spruce_log_bark_stairs",
-            () -> new BlockItem(ModBlocks.SPRUCE_LOG_BARK_STAIRS.get(), createBlockItemProperties()));
     public static final RegistryObject<Item> STRIPPED_SPRUCE_LOG_STAIRS = ITEMS.register("stripped_spruce_log_stairs",
             () -> new BlockItem(ModBlocks.STRIPPED_SPRUCE_LOG_STAIRS.get(), createBlockItemProperties()));
     public static final RegistryObject<Item> BIRCH_LOG_STAIRS = ITEMS.register("birch_log_stairs",

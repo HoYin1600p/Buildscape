@@ -1,0 +1,90 @@
+{
+  "multipart": [
+    {
+      "when": {
+        "up": "true"
+      },
+      "apply": {
+        "model": "buildscape:block/yellow_stained_brick_tiles_wall_post"
+      }
+    },
+    {
+      "when": {
+        "north": "low"
+      },
+      "apply": {
+        "model": "buildscape:block/yellow_stained_brick_tiles_wall_side",
+        "uvlock": true
+      }
+    },
+    {
+      "when": {
+        "east": "low"
+      },
+      "apply": {
+        "model": "buildscape:block/yellow_stained_brick_tiles_wall_side",
+        "y": 90,
+        "uvlock": true
+      }
+    },
+    {
+      "when": {
+        "south": "low"
+      },
+      "apply": {
+        "model": "buildscape:block/yellow_stained_brick_tiles_wall_side",
+        "y": 180,
+        "uvlock": true
+      }
+    },
+    {
+      "when": {
+        "west": "low"
+      },
+      "apply": {
+        "model": "buildscape:block/yellow_stained_brick_tiles_wall_side",
+        "y": 270,
+        "uvlock": true
+      }
+    },
+    {
+      "when": {
+        "north": "high"
+      },
+      "apply": {
+        "model": "buildscape:block/yellow_stained_brick_tiles_wall_side_tall",
+        "uvlock": true
+      }
+    },
+    {
+      "when": {
+        "east": "high"
+      },
+      "apply": {
+        "model": "buildscape:block/yellow_stained_brick_tiles_wall_side_tall",
+        "y": 90,
+        "uvlock": true
+      }
+    },
+    {
+      "when": {
+        "south": "high"
+      },
+      "apply": {
+        "model": "buildscape:block/yellow_stained_brick_tiles_wall_side_tall",
+        "y": 180,
+        "uvlock": true
+      }
+    },
+    {
+      "when": {
+        "west": "high"
+      },
+      "apply": {
+        "model": "buildscape:block/yellow_stained_brick_tiles_wall_side_tall",
+        "y": 270,
+        "uvlock": true
+      }
+    }
+  ]
+}

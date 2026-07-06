@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "buildscape:block/orange_wallpaper_slab"
+    },
+    "type=double": {
+      "model": "buildscape:block/orange_wallpaper"
+    },
+    "type=top": {
+      "model": "buildscape:block/orange_wallpaper_slab_top"
+    }
+  }
+}

@@ -6275,6 +6275,330 @@ public class ModItems {
             () -> new BlockItem(ModBlocks.PINK_STAINED_BRICKS.get(), createBlockItemProperties())
     );
 
+    // Stained Brick Tiles
+    public static final RegistryObject<Item> WHITE_STAINED_BRICK_TILES = ITEMS.register(
+            "white_stained_brick_tiles",
+            () -> new BlockItem(ModBlocks.WHITE_STAINED_BRICK_TILES.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> LIGHT_GRAY_STAINED_BRICK_TILES = ITEMS.register(
+            "light_gray_stained_brick_tiles",
+            () -> new BlockItem(ModBlocks.LIGHT_GRAY_STAINED_BRICK_TILES.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> GRAY_STAINED_BRICK_TILES = ITEMS.register(
+            "gray_stained_brick_tiles",
+            () -> new BlockItem(ModBlocks.GRAY_STAINED_BRICK_TILES.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> BLACK_STAINED_BRICK_TILES = ITEMS.register(
+            "black_stained_brick_tiles",
+            () -> new BlockItem(ModBlocks.BLACK_STAINED_BRICK_TILES.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> BROWN_STAINED_BRICK_TILES = ITEMS.register(
+            "brown_stained_brick_tiles",
+            () -> new BlockItem(ModBlocks.BROWN_STAINED_BRICK_TILES.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> RED_STAINED_BRICK_TILES = ITEMS.register(
+            "red_stained_brick_tiles",
+            () -> new BlockItem(ModBlocks.RED_STAINED_BRICK_TILES.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> ORANGE_STAINED_BRICK_TILES = ITEMS.register(
+            "orange_stained_brick_tiles",
+            () -> new BlockItem(ModBlocks.ORANGE_STAINED_BRICK_TILES.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> YELLOW_STAINED_BRICK_TILES = ITEMS.register(
+            "yellow_stained_brick_tiles",
+            () -> new BlockItem(ModBlocks.YELLOW_STAINED_BRICK_TILES.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> LIME_STAINED_BRICK_TILES = ITEMS.register(
+            "lime_stained_brick_tiles",
+            () -> new BlockItem(ModBlocks.LIME_STAINED_BRICK_TILES.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> GREEN_STAINED_BRICK_TILES = ITEMS.register(
+            "green_stained_brick_tiles",
+            () -> new BlockItem(ModBlocks.GREEN_STAINED_BRICK_TILES.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> CYAN_STAINED_BRICK_TILES = ITEMS.register(
+            "cyan_stained_brick_tiles",
+            () -> new BlockItem(ModBlocks.CYAN_STAINED_BRICK_TILES.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> LIGHT_BLUE_STAINED_BRICK_TILES = ITEMS.register(
+            "light_blue_stained_brick_tiles",
+            () -> new BlockItem(ModBlocks.LIGHT_BLUE_STAINED_BRICK_TILES.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> BLUE_STAINED_BRICK_TILES = ITEMS.register(
+            "blue_stained_brick_tiles",
+            () -> new BlockItem(ModBlocks.BLUE_STAINED_BRICK_TILES.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> PURPLE_STAINED_BRICK_TILES = ITEMS.register(
+            "purple_stained_brick_tiles",
+            () -> new BlockItem(ModBlocks.PURPLE_STAINED_BRICK_TILES.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> MAGENTA_STAINED_BRICK_TILES = ITEMS.register(
+            "magenta_stained_brick_tiles",
+            () -> new BlockItem(ModBlocks.MAGENTA_STAINED_BRICK_TILES.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> PINK_STAINED_BRICK_TILES = ITEMS.register(
+            "pink_stained_brick_tiles",
+            () -> new BlockItem(ModBlocks.PINK_STAINED_BRICK_TILES.get(), createBlockItemProperties())
+    );
+    // Stained Brick Tiles Slabs, Stairs, Walls, and Vertical Slabs
+    public static final RegistryObject<Item> WHITE_STAINED_BRICK_TILES_SLAB = ITEMS.register(
+            "white_stained_brick_tiles_slab",
+            () -> new BlockItem(ModBlocks.WHITE_STAINED_BRICK_TILES_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> WHITE_STAINED_BRICK_TILES_STAIRS = ITEMS.register(
+            "white_stained_brick_tiles_stairs",
+            () -> new BlockItem(ModBlocks.WHITE_STAINED_BRICK_TILES_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> WHITE_STAINED_BRICK_TILES_WALL = ITEMS.register(
+            "white_stained_brick_tiles_wall",
+            () -> new BlockItem(ModBlocks.WHITE_STAINED_BRICK_TILES_WALL.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> WHITE_STAINED_BRICK_TILES_VERTICAL_SLAB = ITEMS.register(
+            "white_stained_brick_tiles_vertical_slab",
+            () -> new BlockItem(ModBlocks.WHITE_STAINED_BRICK_TILES_VERTICAL_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> LIGHT_GRAY_STAINED_BRICK_TILES_SLAB = ITEMS.register(
+            "light_gray_stained_brick_tiles_slab",
+            () -> new BlockItem(ModBlocks.LIGHT_GRAY_STAINED_BRICK_TILES_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> LIGHT_GRAY_STAINED_BRICK_TILES_STAIRS = ITEMS.register(
+            "light_gray_stained_brick_tiles_stairs",
+            () -> new BlockItem(ModBlocks.LIGHT_GRAY_STAINED_BRICK_TILES_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> LIGHT_GRAY_STAINED_BRICK_TILES_WALL = ITEMS.register(
+            "light_gray_stained_brick_tiles_wall",
+            () -> new BlockItem(ModBlocks.LIGHT_GRAY_STAINED_BRICK_TILES_WALL.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> LIGHT_GRAY_STAINED_BRICK_TILES_VERTICAL_SLAB = ITEMS.register(
+            "light_gray_stained_brick_tiles_vertical_slab",
+            () -> new BlockItem(ModBlocks.LIGHT_GRAY_STAINED_BRICK_TILES_VERTICAL_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> GRAY_STAINED_BRICK_TILES_SLAB = ITEMS.register(
+            "gray_stained_brick_tiles_slab",
+            () -> new BlockItem(ModBlocks.GRAY_STAINED_BRICK_TILES_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> GRAY_STAINED_BRICK_TILES_STAIRS = ITEMS.register(
+            "gray_stained_brick_tiles_stairs",
+            () -> new BlockItem(ModBlocks.GRAY_STAINED_BRICK_TILES_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> GRAY_STAINED_BRICK_TILES_WALL = ITEMS.register(
+            "gray_stained_brick_tiles_wall",
+            () -> new BlockItem(ModBlocks.GRAY_STAINED_BRICK_TILES_WALL.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> GRAY_STAINED_BRICK_TILES_VERTICAL_SLAB = ITEMS.register(
+            "gray_stained_brick_tiles_vertical_slab",
+            () -> new BlockItem(ModBlocks.GRAY_STAINED_BRICK_TILES_VERTICAL_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> BLACK_STAINED_BRICK_TILES_SLAB = ITEMS.register(
+            "black_stained_brick_tiles_slab",
+            () -> new BlockItem(ModBlocks.BLACK_STAINED_BRICK_TILES_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> BLACK_STAINED_BRICK_TILES_STAIRS = ITEMS.register(
+            "black_stained_brick_tiles_stairs",
+            () -> new BlockItem(ModBlocks.BLACK_STAINED_BRICK_TILES_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> BLACK_STAINED_BRICK_TILES_WALL = ITEMS.register(
+            "black_stained_brick_tiles_wall",
+            () -> new BlockItem(ModBlocks.BLACK_STAINED_BRICK_TILES_WALL.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> BLACK_STAINED_BRICK_TILES_VERTICAL_SLAB = ITEMS.register(
+            "black_stained_brick_tiles_vertical_slab",
+            () -> new BlockItem(ModBlocks.BLACK_STAINED_BRICK_TILES_VERTICAL_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> BROWN_STAINED_BRICK_TILES_SLAB = ITEMS.register(
+            "brown_stained_brick_tiles_slab",
+            () -> new BlockItem(ModBlocks.BROWN_STAINED_BRICK_TILES_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> BROWN_STAINED_BRICK_TILES_STAIRS = ITEMS.register(
+            "brown_stained_brick_tiles_stairs",
+            () -> new BlockItem(ModBlocks.BROWN_STAINED_BRICK_TILES_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> BROWN_STAINED_BRICK_TILES_WALL = ITEMS.register(
+            "brown_stained_brick_tiles_wall",
+            () -> new BlockItem(ModBlocks.BROWN_STAINED_BRICK_TILES_WALL.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> BROWN_STAINED_BRICK_TILES_VERTICAL_SLAB = ITEMS.register(
+            "brown_stained_brick_tiles_vertical_slab",
+            () -> new BlockItem(ModBlocks.BROWN_STAINED_BRICK_TILES_VERTICAL_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> RED_STAINED_BRICK_TILES_SLAB = ITEMS.register(
+            "red_stained_brick_tiles_slab",
+            () -> new BlockItem(ModBlocks.RED_STAINED_BRICK_TILES_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> RED_STAINED_BRICK_TILES_STAIRS = ITEMS.register(
+            "red_stained_brick_tiles_stairs",
+            () -> new BlockItem(ModBlocks.RED_STAINED_BRICK_TILES_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> RED_STAINED_BRICK_TILES_WALL = ITEMS.register(
+            "red_stained_brick_tiles_wall",
+            () -> new BlockItem(ModBlocks.RED_STAINED_BRICK_TILES_WALL.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> RED_STAINED_BRICK_TILES_VERTICAL_SLAB = ITEMS.register(
+            "red_stained_brick_tiles_vertical_slab",
+            () -> new BlockItem(ModBlocks.RED_STAINED_BRICK_TILES_VERTICAL_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> ORANGE_STAINED_BRICK_TILES_SLAB = ITEMS.register(
+            "orange_stained_brick_tiles_slab",
+            () -> new BlockItem(ModBlocks.ORANGE_STAINED_BRICK_TILES_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> ORANGE_STAINED_BRICK_TILES_STAIRS = ITEMS.register(
+            "orange_stained_brick_tiles_stairs",
+            () -> new BlockItem(ModBlocks.ORANGE_STAINED_BRICK_TILES_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> ORANGE_STAINED_BRICK_TILES_WALL = ITEMS.register(
+            "orange_stained_brick_tiles_wall",
+            () -> new BlockItem(ModBlocks.ORANGE_STAINED_BRICK_TILES_WALL.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> ORANGE_STAINED_BRICK_TILES_VERTICAL_SLAB = ITEMS.register(
+            "orange_stained_brick_tiles_vertical_slab",
+            () -> new BlockItem(ModBlocks.ORANGE_STAINED_BRICK_TILES_VERTICAL_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> YELLOW_STAINED_BRICK_TILES_SLAB = ITEMS.register(
+            "yellow_stained_brick_tiles_slab",
+            () -> new BlockItem(ModBlocks.YELLOW_STAINED_BRICK_TILES_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> YELLOW_STAINED_BRICK_TILES_STAIRS = ITEMS.register(
+            "yellow_stained_brick_tiles_stairs",
+            () -> new BlockItem(ModBlocks.YELLOW_STAINED_BRICK_TILES_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> YELLOW_STAINED_BRICK_TILES_WALL = ITEMS.register(
+            "yellow_stained_brick_tiles_wall",
+            () -> new BlockItem(ModBlocks.YELLOW_STAINED_BRICK_TILES_WALL.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> YELLOW_STAINED_BRICK_TILES_VERTICAL_SLAB = ITEMS.register(
+            "yellow_stained_brick_tiles_vertical_slab",
+            () -> new BlockItem(ModBlocks.YELLOW_STAINED_BRICK_TILES_VERTICAL_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> LIME_STAINED_BRICK_TILES_SLAB = ITEMS.register(
+            "lime_stained_brick_tiles_slab",
+            () -> new BlockItem(ModBlocks.LIME_STAINED_BRICK_TILES_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> LIME_STAINED_BRICK_TILES_STAIRS = ITEMS.register(
+            "lime_stained_brick_tiles_stairs",
+            () -> new BlockItem(ModBlocks.LIME_STAINED_BRICK_TILES_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> LIME_STAINED_BRICK_TILES_WALL = ITEMS.register(
+            "lime_stained_brick_tiles_wall",
+            () -> new BlockItem(ModBlocks.LIME_STAINED_BRICK_TILES_WALL.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> LIME_STAINED_BRICK_TILES_VERTICAL_SLAB = ITEMS.register(
+            "lime_stained_brick_tiles_vertical_slab",
+            () -> new BlockItem(ModBlocks.LIME_STAINED_BRICK_TILES_VERTICAL_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> GREEN_STAINED_BRICK_TILES_SLAB = ITEMS.register(
+            "green_stained_brick_tiles_slab",
+            () -> new BlockItem(ModBlocks.GREEN_STAINED_BRICK_TILES_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> GREEN_STAINED_BRICK_TILES_STAIRS = ITEMS.register(
+            "green_stained_brick_tiles_stairs",
+            () -> new BlockItem(ModBlocks.GREEN_STAINED_BRICK_TILES_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> GREEN_STAINED_BRICK_TILES_WALL = ITEMS.register(
+            "green_stained_brick_tiles_wall",
+            () -> new BlockItem(ModBlocks.GREEN_STAINED_BRICK_TILES_WALL.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> GREEN_STAINED_BRICK_TILES_VERTICAL_SLAB = ITEMS.register(
+            "green_stained_brick_tiles_vertical_slab",
+            () -> new BlockItem(ModBlocks.GREEN_STAINED_BRICK_TILES_VERTICAL_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> CYAN_STAINED_BRICK_TILES_SLAB = ITEMS.register(
+            "cyan_stained_brick_tiles_slab",
+            () -> new BlockItem(ModBlocks.CYAN_STAINED_BRICK_TILES_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> CYAN_STAINED_BRICK_TILES_STAIRS = ITEMS.register(
+            "cyan_stained_brick_tiles_stairs",
+            () -> new BlockItem(ModBlocks.CYAN_STAINED_BRICK_TILES_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> CYAN_STAINED_BRICK_TILES_WALL = ITEMS.register(
+            "cyan_stained_brick_tiles_wall",
+            () -> new BlockItem(ModBlocks.CYAN_STAINED_BRICK_TILES_WALL.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> CYAN_STAINED_BRICK_TILES_VERTICAL_SLAB = ITEMS.register(
+            "cyan_stained_brick_tiles_vertical_slab",
+            () -> new BlockItem(ModBlocks.CYAN_STAINED_BRICK_TILES_VERTICAL_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> LIGHT_BLUE_STAINED_BRICK_TILES_SLAB = ITEMS.register(
+            "light_blue_stained_brick_tiles_slab",
+            () -> new BlockItem(ModBlocks.LIGHT_BLUE_STAINED_BRICK_TILES_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> LIGHT_BLUE_STAINED_BRICK_TILES_STAIRS = ITEMS.register(
+            "light_blue_stained_brick_tiles_stairs",
+            () -> new BlockItem(ModBlocks.LIGHT_BLUE_STAINED_BRICK_TILES_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> LIGHT_BLUE_STAINED_BRICK_TILES_WALL = ITEMS.register(
+            "light_blue_stained_brick_tiles_wall",
+            () -> new BlockItem(ModBlocks.LIGHT_BLUE_STAINED_BRICK_TILES_WALL.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> LIGHT_BLUE_STAINED_BRICK_TILES_VERTICAL_SLAB = ITEMS.register(
+            "light_blue_stained_brick_tiles_vertical_slab",
+            () -> new BlockItem(ModBlocks.LIGHT_BLUE_STAINED_BRICK_TILES_VERTICAL_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> BLUE_STAINED_BRICK_TILES_SLAB = ITEMS.register(
+            "blue_stained_brick_tiles_slab",
+            () -> new BlockItem(ModBlocks.BLUE_STAINED_BRICK_TILES_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> BLUE_STAINED_BRICK_TILES_STAIRS = ITEMS.register(
+            "blue_stained_brick_tiles_stairs",
+            () -> new BlockItem(ModBlocks.BLUE_STAINED_BRICK_TILES_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> BLUE_STAINED_BRICK_TILES_WALL = ITEMS.register(
+            "blue_stained_brick_tiles_wall",
+            () -> new BlockItem(ModBlocks.BLUE_STAINED_BRICK_TILES_WALL.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> BLUE_STAINED_BRICK_TILES_VERTICAL_SLAB = ITEMS.register(
+            "blue_stained_brick_tiles_vertical_slab",
+            () -> new BlockItem(ModBlocks.BLUE_STAINED_BRICK_TILES_VERTICAL_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> PURPLE_STAINED_BRICK_TILES_SLAB = ITEMS.register(
+            "purple_stained_brick_tiles_slab",
+            () -> new BlockItem(ModBlocks.PURPLE_STAINED_BRICK_TILES_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> PURPLE_STAINED_BRICK_TILES_STAIRS = ITEMS.register(
+            "purple_stained_brick_tiles_stairs",
+            () -> new BlockItem(ModBlocks.PURPLE_STAINED_BRICK_TILES_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> PURPLE_STAINED_BRICK_TILES_WALL = ITEMS.register(
+            "purple_stained_brick_tiles_wall",
+            () -> new BlockItem(ModBlocks.PURPLE_STAINED_BRICK_TILES_WALL.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> PURPLE_STAINED_BRICK_TILES_VERTICAL_SLAB = ITEMS.register(
+            "purple_stained_brick_tiles_vertical_slab",
+            () -> new BlockItem(ModBlocks.PURPLE_STAINED_BRICK_TILES_VERTICAL_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> MAGENTA_STAINED_BRICK_TILES_SLAB = ITEMS.register(
+            "magenta_stained_brick_tiles_slab",
+            () -> new BlockItem(ModBlocks.MAGENTA_STAINED_BRICK_TILES_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> MAGENTA_STAINED_BRICK_TILES_STAIRS = ITEMS.register(
+            "magenta_stained_brick_tiles_stairs",
+            () -> new BlockItem(ModBlocks.MAGENTA_STAINED_BRICK_TILES_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> MAGENTA_STAINED_BRICK_TILES_WALL = ITEMS.register(
+            "magenta_stained_brick_tiles_wall",
+            () -> new BlockItem(ModBlocks.MAGENTA_STAINED_BRICK_TILES_WALL.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> MAGENTA_STAINED_BRICK_TILES_VERTICAL_SLAB = ITEMS.register(
+            "magenta_stained_brick_tiles_vertical_slab",
+            () -> new BlockItem(ModBlocks.MAGENTA_STAINED_BRICK_TILES_VERTICAL_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> PINK_STAINED_BRICK_TILES_SLAB = ITEMS.register(
+            "pink_stained_brick_tiles_slab",
+            () -> new BlockItem(ModBlocks.PINK_STAINED_BRICK_TILES_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> PINK_STAINED_BRICK_TILES_STAIRS = ITEMS.register(
+            "pink_stained_brick_tiles_stairs",
+            () -> new BlockItem(ModBlocks.PINK_STAINED_BRICK_TILES_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> PINK_STAINED_BRICK_TILES_WALL = ITEMS.register(
+            "pink_stained_brick_tiles_wall",
+            () -> new BlockItem(ModBlocks.PINK_STAINED_BRICK_TILES_WALL.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> PINK_STAINED_BRICK_TILES_VERTICAL_SLAB = ITEMS.register(
+            "pink_stained_brick_tiles_vertical_slab",
+            () -> new BlockItem(ModBlocks.PINK_STAINED_BRICK_TILES_VERTICAL_SLAB.get(), createBlockItemProperties())
+    );
+
+
     // Stained Bricks Slabs
     public static final RegistryObject<Item> WHITE_STAINED_BRICKS_SLAB = ITEMS.register(
             "white_stained_bricks_slab",
@@ -8846,5 +9170,174 @@ public class ModItems {
             () -> new BlockItem(ModBlocks.WARPED_HYPHAE_STAIRS.get(), createBlockItemProperties()));
     public static final RegistryObject<Item> WARPED_HYPHAE_VERTICAL_SLAB = ITEMS.register("warped_hyphae_vertical_slab",
             () -> new BlockItem(ModBlocks.WARPED_HYPHAE_VERTICAL_SLAB.get(), createBlockItemProperties()));
+=======
+    public static final RegistryObject<Item> MUFF_BLOCK = ITEMS.register("muff_block",
+            () -> new MuffBlockItem(ModBlocks.MUFF_BLOCK.get(), createBlockItemProperties()));
+
+    public static final RegistryObject<Item> WHITE_WALLPAPER = ITEMS.register("white_wallpaper",
+            () -> new BlockItem(ModBlocks.WHITE_WALLPAPER.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> ORANGE_WALLPAPER = ITEMS.register("orange_wallpaper",
+            () -> new BlockItem(ModBlocks.ORANGE_WALLPAPER.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> MAGENTA_WALLPAPER = ITEMS.register("magenta_wallpaper",
+            () -> new BlockItem(ModBlocks.MAGENTA_WALLPAPER.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIGHT_BLUE_WALLPAPER = ITEMS.register("light_blue_wallpaper",
+            () -> new BlockItem(ModBlocks.LIGHT_BLUE_WALLPAPER.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> YELLOW_WALLPAPER = ITEMS.register("yellow_wallpaper",
+            () -> new BlockItem(ModBlocks.YELLOW_WALLPAPER.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIME_WALLPAPER = ITEMS.register("lime_wallpaper",
+            () -> new BlockItem(ModBlocks.LIME_WALLPAPER.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PINK_WALLPAPER = ITEMS.register("pink_wallpaper",
+            () -> new BlockItem(ModBlocks.PINK_WALLPAPER.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GRAY_WALLPAPER = ITEMS.register("gray_wallpaper",
+            () -> new BlockItem(ModBlocks.GRAY_WALLPAPER.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIGHT_GRAY_WALLPAPER = ITEMS.register("light_gray_wallpaper",
+            () -> new BlockItem(ModBlocks.LIGHT_GRAY_WALLPAPER.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> CYAN_WALLPAPER = ITEMS.register("cyan_wallpaper",
+            () -> new BlockItem(ModBlocks.CYAN_WALLPAPER.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PURPLE_WALLPAPER = ITEMS.register("purple_wallpaper",
+            () -> new BlockItem(ModBlocks.PURPLE_WALLPAPER.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BLUE_WALLPAPER = ITEMS.register("blue_wallpaper",
+            () -> new BlockItem(ModBlocks.BLUE_WALLPAPER.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BROWN_WALLPAPER = ITEMS.register("brown_wallpaper",
+            () -> new BlockItem(ModBlocks.BROWN_WALLPAPER.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GREEN_WALLPAPER = ITEMS.register("green_wallpaper",
+            () -> new BlockItem(ModBlocks.GREEN_WALLPAPER.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> RED_WALLPAPER = ITEMS.register("red_wallpaper",
+            () -> new BlockItem(ModBlocks.RED_WALLPAPER.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BLACK_WALLPAPER = ITEMS.register("black_wallpaper",
+            () -> new BlockItem(ModBlocks.BLACK_WALLPAPER.get(), createBlockItemProperties()));
+    // Wallpaper Slabs and Vertical Slabs
+    public static final RegistryObject<Item> WHITE_WALLPAPER_SLAB = ITEMS.register(
+            "white_wallpaper_slab",
+            () -> new BlockItem(ModBlocks.WHITE_WALLPAPER_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> WHITE_WALLPAPER_VERTICAL_SLAB = ITEMS.register(
+            "white_wallpaper_vertical_slab",
+            () -> new BlockItem(ModBlocks.WHITE_WALLPAPER_VERTICAL_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> ORANGE_WALLPAPER_SLAB = ITEMS.register(
+            "orange_wallpaper_slab",
+            () -> new BlockItem(ModBlocks.ORANGE_WALLPAPER_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> ORANGE_WALLPAPER_VERTICAL_SLAB = ITEMS.register(
+            "orange_wallpaper_vertical_slab",
+            () -> new BlockItem(ModBlocks.ORANGE_WALLPAPER_VERTICAL_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> MAGENTA_WALLPAPER_SLAB = ITEMS.register(
+            "magenta_wallpaper_slab",
+            () -> new BlockItem(ModBlocks.MAGENTA_WALLPAPER_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> MAGENTA_WALLPAPER_VERTICAL_SLAB = ITEMS.register(
+            "magenta_wallpaper_vertical_slab",
+            () -> new BlockItem(ModBlocks.MAGENTA_WALLPAPER_VERTICAL_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> LIGHT_BLUE_WALLPAPER_SLAB = ITEMS.register(
+            "light_blue_wallpaper_slab",
+            () -> new BlockItem(ModBlocks.LIGHT_BLUE_WALLPAPER_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> LIGHT_BLUE_WALLPAPER_VERTICAL_SLAB = ITEMS.register(
+            "light_blue_wallpaper_vertical_slab",
+            () -> new BlockItem(ModBlocks.LIGHT_BLUE_WALLPAPER_VERTICAL_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> YELLOW_WALLPAPER_SLAB = ITEMS.register(
+            "yellow_wallpaper_slab",
+            () -> new BlockItem(ModBlocks.YELLOW_WALLPAPER_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> YELLOW_WALLPAPER_VERTICAL_SLAB = ITEMS.register(
+            "yellow_wallpaper_vertical_slab",
+            () -> new BlockItem(ModBlocks.YELLOW_WALLPAPER_VERTICAL_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> LIME_WALLPAPER_SLAB = ITEMS.register(
+            "lime_wallpaper_slab",
+            () -> new BlockItem(ModBlocks.LIME_WALLPAPER_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> LIME_WALLPAPER_VERTICAL_SLAB = ITEMS.register(
+            "lime_wallpaper_vertical_slab",
+            () -> new BlockItem(ModBlocks.LIME_WALLPAPER_VERTICAL_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> PINK_WALLPAPER_SLAB = ITEMS.register(
+            "pink_wallpaper_slab",
+            () -> new BlockItem(ModBlocks.PINK_WALLPAPER_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> PINK_WALLPAPER_VERTICAL_SLAB = ITEMS.register(
+            "pink_wallpaper_vertical_slab",
+            () -> new BlockItem(ModBlocks.PINK_WALLPAPER_VERTICAL_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> GRAY_WALLPAPER_SLAB = ITEMS.register(
+            "gray_wallpaper_slab",
+            () -> new BlockItem(ModBlocks.GRAY_WALLPAPER_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> GRAY_WALLPAPER_VERTICAL_SLAB = ITEMS.register(
+            "gray_wallpaper_vertical_slab",
+            () -> new BlockItem(ModBlocks.GRAY_WALLPAPER_VERTICAL_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> LIGHT_GRAY_WALLPAPER_SLAB = ITEMS.register(
+            "light_gray_wallpaper_slab",
+            () -> new BlockItem(ModBlocks.LIGHT_GRAY_WALLPAPER_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> LIGHT_GRAY_WALLPAPER_VERTICAL_SLAB = ITEMS.register(
+            "light_gray_wallpaper_vertical_slab",
+            () -> new BlockItem(ModBlocks.LIGHT_GRAY_WALLPAPER_VERTICAL_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> CYAN_WALLPAPER_SLAB = ITEMS.register(
+            "cyan_wallpaper_slab",
+            () -> new BlockItem(ModBlocks.CYAN_WALLPAPER_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> CYAN_WALLPAPER_VERTICAL_SLAB = ITEMS.register(
+            "cyan_wallpaper_vertical_slab",
+            () -> new BlockItem(ModBlocks.CYAN_WALLPAPER_VERTICAL_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> PURPLE_WALLPAPER_SLAB = ITEMS.register(
+            "purple_wallpaper_slab",
+            () -> new BlockItem(ModBlocks.PURPLE_WALLPAPER_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> PURPLE_WALLPAPER_VERTICAL_SLAB = ITEMS.register(
+            "purple_wallpaper_vertical_slab",
+            () -> new BlockItem(ModBlocks.PURPLE_WALLPAPER_VERTICAL_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> BLUE_WALLPAPER_SLAB = ITEMS.register(
+            "blue_wallpaper_slab",
+            () -> new BlockItem(ModBlocks.BLUE_WALLPAPER_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> BLUE_WALLPAPER_VERTICAL_SLAB = ITEMS.register(
+            "blue_wallpaper_vertical_slab",
+            () -> new BlockItem(ModBlocks.BLUE_WALLPAPER_VERTICAL_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> BROWN_WALLPAPER_SLAB = ITEMS.register(
+            "brown_wallpaper_slab",
+            () -> new BlockItem(ModBlocks.BROWN_WALLPAPER_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> BROWN_WALLPAPER_VERTICAL_SLAB = ITEMS.register(
+            "brown_wallpaper_vertical_slab",
+            () -> new BlockItem(ModBlocks.BROWN_WALLPAPER_VERTICAL_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> GREEN_WALLPAPER_SLAB = ITEMS.register(
+            "green_wallpaper_slab",
+            () -> new BlockItem(ModBlocks.GREEN_WALLPAPER_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> GREEN_WALLPAPER_VERTICAL_SLAB = ITEMS.register(
+            "green_wallpaper_vertical_slab",
+            () -> new BlockItem(ModBlocks.GREEN_WALLPAPER_VERTICAL_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> RED_WALLPAPER_SLAB = ITEMS.register(
+            "red_wallpaper_slab",
+            () -> new BlockItem(ModBlocks.RED_WALLPAPER_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> RED_WALLPAPER_VERTICAL_SLAB = ITEMS.register(
+            "red_wallpaper_vertical_slab",
+            () -> new BlockItem(ModBlocks.RED_WALLPAPER_VERTICAL_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> BLACK_WALLPAPER_SLAB = ITEMS.register(
+            "black_wallpaper_slab",
+            () -> new BlockItem(ModBlocks.BLACK_WALLPAPER_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> BLACK_WALLPAPER_VERTICAL_SLAB = ITEMS.register(
+            "black_wallpaper_vertical_slab",
+            () -> new BlockItem(ModBlocks.BLACK_WALLPAPER_VERTICAL_SLAB.get(), createBlockItemProperties())
+    );
+
+
+    // End new main vertical variant block items.
+
 
 }

@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "buildscape:block/brown_stained_brick_tiles_slab"
+    },
+    "type=double": {
+      "model": "buildscape:block/brown_stained_brick_tiles"
+    },
+    "type=top": {
+      "model": "buildscape:block/brown_stained_brick_tiles_slab_top"
+    }
+  }
+}

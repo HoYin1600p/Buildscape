@@ -1316,12 +1316,6 @@ public class BuildScape {
                         player.drop(mistBottle, false);
                     }
                     level.playSound(null, player.getX(), player.getY(), player.getZ(), net.minecraft.sounds.SoundEvents.BOTTLE_FILL, net.minecraft.sounds.SoundSource.PLAYERS, 1.0F, 1.0F);
-                    
-                    if (level instanceof net.minecraft.server.level.ServerLevel serverLevel) {
-                        serverLevel.sendParticles(com.kingodogo.buildscape.particle.ModParticles.CASCADE.get(), 
-                            player.getX(), player.getEyeY(), player.getZ(), 
-                            15, 0.5, 0.5, 0.5, 0.05);
-                    }
                 }
                 event.setCancellationResult(net.minecraft.world.InteractionResult.sidedSuccess(level.isClientSide));
                 event.setCanceled(true);

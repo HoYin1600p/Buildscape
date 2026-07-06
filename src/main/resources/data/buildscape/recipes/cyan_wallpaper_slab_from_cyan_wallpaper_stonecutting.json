@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "buildscape:cyan_wallpaper"
+  },
+  "result": "buildscape:cyan_wallpaper_slab",
+  "count": 2
+}

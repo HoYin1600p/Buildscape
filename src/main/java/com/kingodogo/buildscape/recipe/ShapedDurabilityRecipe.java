@@ -55,11 +55,26 @@ public class ShapedDurabilityRecipe extends ShapedRecipe {
             if (!stack.isEmpty()) {
                 if (stack.isDamageableItem() && !(stack.getItem() instanceof ArmorItem)) {
                     ItemStack damagedStack = stack.copy();
-                    int currentDamage = damagedStack.getDamageValue();
-                    int newDamage = currentDamage + damageAmount;
-                    damagedStack.setDamageValue(newDamage);
+                    int unbreakingLevel = net.minecraft.world.item.enchantment.EnchantmentHelper.getItemEnchantmentLevel(
+                            net.minecraft.world.item.enchantment.Enchantments.UNBREAKING, damagedStack
+                    );
+                    boolean shouldDamage = true;
+                    if (unbreakingLevel > 0) {
+                        java.util.Random random = new java.util.Random();
+                        if (random.nextFloat() < 0.20f * unbreakingLevel) {
+                            shouldDamage = false;
+                        }
+                    }
 
-                    if (newDamage < damagedStack.getMaxDamage()) {
+                    if (shouldDamage) {
+                        int currentDamage = damagedStack.getDamageValue();
+                        int newDamage = currentDamage + damageAmount;
+                        damagedStack.setDamageValue(newDamage);
+
+                        if (newDamage < damagedStack.getMaxDamage()) {
+                            remaining.set(i, damagedStack);
+                        }
+                    } else {
                         remaining.set(i, damagedStack);
                     }
                 } else if (stack.hasContainerItem()) {

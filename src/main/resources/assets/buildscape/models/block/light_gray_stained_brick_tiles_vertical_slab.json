@@ -1,0 +1,9 @@
+{
+  "parent": "buildscape:block/template_vertical_slab",
+  "textures": {
+    "bottom": "buildscape:block/light_gray_stained_brick_tiles",
+    "top": "buildscape:block/light_gray_stained_brick_tiles",
+    "side": "buildscape:block/light_gray_stained_brick_tiles",
+    "particle": "#side"
+  }
+}

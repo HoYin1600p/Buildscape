@@ -149,4 +149,12 @@ public class ModBlockEntities {
             ).build(null)
     );
 */
+
+    public static final RegistryObject<BlockEntityType<MuffBlockEntity>> MUFF_BLOCK_ENTITY = BLOCK_ENTITIES.register(
+            "muff_block_entity",
+            () -> BlockEntityType.Builder.of(
+                    MuffBlockEntity::new,
+                    ModBlocks.MUFF_BLOCK.get()
+            ).build(null)
+    );
 }

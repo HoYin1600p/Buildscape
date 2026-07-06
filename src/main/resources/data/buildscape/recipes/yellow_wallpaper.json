@@ -1,0 +1,16 @@
+{
+  "type": "buildscape:shapeless_durability",
+  "damageAmount": 1,
+  "ingredients": [
+    {
+      "item": "minecraft:shears"
+    },
+    {
+      "item": "minecraft:yellow_wool"
+    }
+  ],
+  "result": {
+    "item": "buildscape:yellow_wallpaper",
+    "count": 1
+  }
+}

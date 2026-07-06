@@ -229,6 +229,7 @@ public class ClientEvents {
 
         com.kingodogo.buildscape.config.PillarParticleConfig.clearServerConfig();
         com.kingodogo.buildscape.config.PillarIdManager.fullReset();
+        com.kingodogo.buildscape.client.MuffBlockManager.clear();
     }
 
     @SubscribeEvent
@@ -244,6 +245,7 @@ public class ClientEvents {
             com.kingodogo.buildscape.particle.TintedDripParticle.clearColorCache();
             com.kingodogo.buildscape.event.ItemFrameParticleHandler.clearCaches();
             com.kingodogo.buildscape.config.PillarParticleConfig.clearServerConfig();
+            com.kingodogo.buildscape.client.MuffBlockManager.clear();
         } catch (Exception e) {
             System.err.println(
                     "BuildScape: Error clearing caches on world unload: " + e.getMessage()

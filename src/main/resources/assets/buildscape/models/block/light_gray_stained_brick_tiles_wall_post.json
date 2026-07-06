@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/template_wall_post",
+  "textures": {
+    "wall": "buildscape:block/light_gray_stained_brick_tiles",
+    "particle": "buildscape:block/light_gray_stained_brick_tiles"
+  }
+}

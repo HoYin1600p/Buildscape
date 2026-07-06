@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/template_wall_side_tall",
+  "textures": {
+    "wall": "buildscape:block/magenta_stained_brick_tiles",
+    "particle": "buildscape:block/magenta_stained_brick_tiles"
+  }
+}

@@ -11541,4 +11541,42 @@ public class ModBlocks {
 
         // End new main vertical variants.
 
+        // Cushions
+        public static final RegistryObject<Block> WHITE_CUSHION = BLOCKS.register("white_cushion",
+                        () -> new CushionBlock(BlockBehaviour.Properties.copy(Blocks.WHITE_WOOL).noOcclusion()));
+        public static final RegistryObject<Block> ORANGE_CUSHION = BLOCKS.register("orange_cushion",
+                        () -> new CushionBlock(BlockBehaviour.Properties.copy(Blocks.ORANGE_WOOL).noOcclusion()));
+        public static final RegistryObject<Block> MAGENTA_CUSHION = BLOCKS.register("magenta_cushion",
+                        () -> new CushionBlock(BlockBehaviour.Properties.copy(Blocks.MAGENTA_WOOL).noOcclusion()));
+        public static final RegistryObject<Block> LIGHT_BLUE_CUSHION = BLOCKS.register("light_blue_cushion",
+                        () -> new CushionBlock(BlockBehaviour.Properties.copy(Blocks.LIGHT_BLUE_WOOL).noOcclusion()));
+        public static final RegistryObject<Block> YELLOW_CUSHION = BLOCKS.register("yellow_cushion",
+                        () -> new CushionBlock(BlockBehaviour.Properties.copy(Blocks.YELLOW_WOOL).noOcclusion()));
+        public static final RegistryObject<Block> LIME_CUSHION = BLOCKS.register("lime_cushion",
+                        () -> new CushionBlock(BlockBehaviour.Properties.copy(Blocks.LIME_WOOL).noOcclusion()));
+        public static final RegistryObject<Block> PINK_CUSHION = BLOCKS.register("pink_cushion",
+                        () -> new CushionBlock(BlockBehaviour.Properties.copy(Blocks.PINK_WOOL).noOcclusion()));
+        public static final RegistryObject<Block> GRAY_CUSHION = BLOCKS.register("gray_cushion",
+                        () -> new CushionBlock(BlockBehaviour.Properties.copy(Blocks.GRAY_WOOL).noOcclusion()));
+        public static final RegistryObject<Block> LIGHT_GRAY_CUSHION = BLOCKS.register("light_gray_cushion",
+                        () -> new CushionBlock(BlockBehaviour.Properties.copy(Blocks.LIGHT_GRAY_WOOL).noOcclusion()));
+        public static final RegistryObject<Block> CYAN_CUSHION = BLOCKS.register("cyan_cushion",
+                        () -> new CushionBlock(BlockBehaviour.Properties.copy(Blocks.CYAN_WOOL).noOcclusion()));
+        public static final RegistryObject<Block> PURPLE_CUSHION = BLOCKS.register("purple_cushion",
+                        () -> new CushionBlock(BlockBehaviour.Properties.copy(Blocks.PURPLE_WOOL).noOcclusion()));
+        public static final RegistryObject<Block> BLUE_CUSHION = BLOCKS.register("blue_cushion",
+                        () -> new CushionBlock(BlockBehaviour.Properties.copy(Blocks.BLUE_WOOL).noOcclusion()));
+        public static final RegistryObject<Block> BROWN_CUSHION = BLOCKS.register("brown_cushion",
+                        () -> new CushionBlock(BlockBehaviour.Properties.copy(Blocks.BROWN_WOOL).noOcclusion()));
+        public static final RegistryObject<Block> GREEN_CUSHION = BLOCKS.register("green_cushion",
+                        () -> new CushionBlock(BlockBehaviour.Properties.copy(Blocks.GREEN_WOOL).noOcclusion()));
+        public static final RegistryObject<Block> RED_CUSHION = BLOCKS.register("red_cushion",
+                        () -> new CushionBlock(BlockBehaviour.Properties.copy(Blocks.RED_WOOL).noOcclusion()));
+        public static final RegistryObject<Block> BLACK_CUSHION = BLOCKS.register("black_cushion",
+                        () -> new CushionBlock(BlockBehaviour.Properties.copy(Blocks.BLACK_WOOL).noOcclusion()));
+
+        // Straw Bed
+        public static final RegistryObject<Block> STRAW_BED = BLOCKS.register("straw_bed",
+                        () -> new StrawBedBlock(BlockBehaviour.Properties.copy(Blocks.HAY_BLOCK).noOcclusion()));
+
 }

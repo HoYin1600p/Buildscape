@@ -3901,5 +3901,22 @@
   "block.buildscape.red_wallpaper_slab": "Red Wallpaper Slab",
   "block.buildscape.red_wallpaper_vertical_slab": "Red Wallpaper Vertical Slab",
   "block.buildscape.black_wallpaper_slab": "Black Wallpaper Slab",
-  "block.buildscape.black_wallpaper_vertical_slab": "Black Wallpaper Vertical Slab"
+  "block.buildscape.black_wallpaper_vertical_slab": "Black Wallpaper Vertical Slab",
+  "block.buildscape.white_cushion": "White Cushion",
+  "block.buildscape.orange_cushion": "Orange Cushion",
+  "block.buildscape.magenta_cushion": "Magenta Cushion",
+  "block.buildscape.light_blue_cushion": "Light Blue Cushion",
+  "block.buildscape.yellow_cushion": "Yellow Cushion",
+  "block.buildscape.lime_cushion": "Lime Cushion",
+  "block.buildscape.pink_cushion": "Pink Cushion",
+  "block.buildscape.gray_cushion": "Gray Cushion",
+  "block.buildscape.light_gray_cushion": "Light Gray Cushion",
+  "block.buildscape.cyan_cushion": "Cyan Cushion",
+  "block.buildscape.purple_cushion": "Purple Cushion",
+  "block.buildscape.blue_cushion": "Blue Cushion",
+  "block.buildscape.brown_cushion": "Brown Cushion",
+  "block.buildscape.green_cushion": "Green Cushion",
+  "block.buildscape.red_cushion": "Red Cushion",
+  "block.buildscape.black_cushion": "Black Cushion",
+  "block.buildscape.straw_bed": "Straw Bed"
 }

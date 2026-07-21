@@ -90,6 +90,35 @@ public class BuildScape {
         });
 
         event.enqueueWork(() -> {
+            for (net.minecraft.world.item.Item item : net.minecraftforge.registries.ForgeRegistries.ITEMS) {
+                net.minecraft.resources.ResourceLocation id = item.getRegistryName();
+                if (id != null && id.getNamespace().equals(MODID)) {
+                    String path = id.getPath();
+                    if (path.endsWith("_vertical_slab")) {
+                        String base = path.substring(0, path.length() - "_vertical_slab".length());
+                        net.minecraft.resources.ResourceLocation vanillaBlockId = new net.minecraft.resources.ResourceLocation("minecraft", base);
+                        net.minecraft.resources.ResourceLocation vanillaSlabId = new net.minecraft.resources.ResourceLocation("minecraft", base + "_slab");
+                        boolean isVanilla = net.minecraftforge.registries.ForgeRegistries.ITEMS.containsKey(vanillaBlockId)
+                                || net.minecraftforge.registries.ForgeRegistries.ITEMS.containsKey(vanillaSlabId);
+                        
+                        if (isVanilla) {
+                            net.minecraft.world.item.CreativeModeTab targetTab = net.minecraft.world.item.CreativeModeTab.TAB_BUILDING_BLOCKS;
+                            if (base.endsWith("_wool") || base.equals("crying_obsidian") || base.equals("tinted_glass")) {
+                                targetTab = net.minecraft.world.item.CreativeModeTab.TAB_DECORATIONS;
+                            }
+                            try {
+                                net.minecraftforge.fml.util.ObfuscationReflectionHelper.setPrivateValue(
+                                        net.minecraft.world.item.Item.class, item, targetTab, "f_41377_");
+                            } catch (Exception e) {
+                                LOGGER.error("Failed to change creative tab for vertical slab: " + path, e);
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        event.enqueueWork(() -> {
             net.minecraft.world.level.block.DispenserBlock.registerBehavior(
                     com.kingodogo.buildscape.item.ModItems.BOTTLE_OF_MIST.get(),
                     new net.minecraft.core.dispenser.AbstractProjectileDispenseBehavior() {
@@ -2959,6 +2988,10 @@ public class BuildScape {
                 net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                         ModBlocks.CASCADE_BLOCK_NO_MIST.get(),
                         net.minecraft.client.renderer.RenderType.translucent()
+                );
+                net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
+                        ModBlocks.STRAW_BED.get(),
+                        net.minecraft.client.renderer.RenderType.cutout()
                 );
 
                 net.minecraft.client.color.block.BlockColors blockColors = net.minecraft.client.Minecraft

@@ -3,6 +3,7 @@ package com.kingodogo.buildscape.item;
 import com.kingodogo.buildscape.BuildScape;
 import com.kingodogo.buildscape.block.ModBlocks;
 import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.BedItem;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -9170,7 +9171,6 @@ public class ModItems {
             () -> new BlockItem(ModBlocks.WARPED_HYPHAE_STAIRS.get(), createBlockItemProperties()));
     public static final RegistryObject<Item> WARPED_HYPHAE_VERTICAL_SLAB = ITEMS.register("warped_hyphae_vertical_slab",
             () -> new BlockItem(ModBlocks.WARPED_HYPHAE_VERTICAL_SLAB.get(), createBlockItemProperties()));
-=======
     public static final RegistryObject<Item> MUFF_BLOCK = ITEMS.register("muff_block",
             () -> new MuffBlockItem(ModBlocks.MUFF_BLOCK.get(), createBlockItemProperties()));
 
@@ -9339,5 +9339,43 @@ public class ModItems {
 
     // End new main vertical variant block items.
 
+    // Cushions
+    public static final RegistryObject<Item> WHITE_CUSHION = ITEMS.register("white_cushion",
+            () -> new BlockItem(ModBlocks.WHITE_CUSHION.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> ORANGE_CUSHION = ITEMS.register("orange_cushion",
+            () -> new BlockItem(ModBlocks.ORANGE_CUSHION.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> MAGENTA_CUSHION = ITEMS.register("magenta_cushion",
+            () -> new BlockItem(ModBlocks.MAGENTA_CUSHION.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIGHT_BLUE_CUSHION = ITEMS.register("light_blue_cushion",
+            () -> new BlockItem(ModBlocks.LIGHT_BLUE_CUSHION.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> YELLOW_CUSHION = ITEMS.register("yellow_cushion",
+            () -> new BlockItem(ModBlocks.YELLOW_CUSHION.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIME_CUSHION = ITEMS.register("lime_cushion",
+            () -> new BlockItem(ModBlocks.LIME_CUSHION.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PINK_CUSHION = ITEMS.register("pink_cushion",
+            () -> new BlockItem(ModBlocks.PINK_CUSHION.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GRAY_CUSHION = ITEMS.register("gray_cushion",
+            () -> new BlockItem(ModBlocks.GRAY_CUSHION.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIGHT_GRAY_CUSHION = ITEMS.register("light_gray_cushion",
+            () -> new BlockItem(ModBlocks.LIGHT_GRAY_CUSHION.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> CYAN_CUSHION = ITEMS.register("cyan_cushion",
+            () -> new BlockItem(ModBlocks.CYAN_CUSHION.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PURPLE_CUSHION = ITEMS.register("purple_cushion",
+            () -> new BlockItem(ModBlocks.PURPLE_CUSHION.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BLUE_CUSHION = ITEMS.register("blue_cushion",
+            () -> new BlockItem(ModBlocks.BLUE_CUSHION.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BROWN_CUSHION = ITEMS.register("brown_cushion",
+            () -> new BlockItem(ModBlocks.BROWN_CUSHION.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GREEN_CUSHION = ITEMS.register("green_cushion",
+            () -> new BlockItem(ModBlocks.GREEN_CUSHION.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> RED_CUSHION = ITEMS.register("red_cushion",
+            () -> new BlockItem(ModBlocks.RED_CUSHION.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BLACK_CUSHION = ITEMS.register("black_cushion",
+            () -> new BlockItem(ModBlocks.BLACK_CUSHION.get(), createBlockItemProperties()));
+
+    // Straw Bed (stackable up to 16)
+    public static final RegistryObject<Item> STRAW_BED = ITEMS.register("straw_bed",
+            () -> new BedItem(ModBlocks.STRAW_BED.get(), new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB).stacksTo(16)));
 
 }
+

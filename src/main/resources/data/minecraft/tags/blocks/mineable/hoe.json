@@ -25,6 +25,23 @@
     "buildscape:red_moss_block_vertical_slab",
     "buildscape:orange_moss_block_vertical_slab",
     "buildscape:yellow_moss_block_vertical_slab",
-    "buildscape:moss_block_stairs"
+    "buildscape:moss_block_stairs",
+    "buildscape:white_cushion",
+    "buildscape:orange_cushion",
+    "buildscape:magenta_cushion",
+    "buildscape:light_blue_cushion",
+    "buildscape:yellow_cushion",
+    "buildscape:lime_cushion",
+    "buildscape:pink_cushion",
+    "buildscape:gray_cushion",
+    "buildscape:light_gray_cushion",
+    "buildscape:cyan_cushion",
+    "buildscape:purple_cushion",
+    "buildscape:blue_cushion",
+    "buildscape:brown_cushion",
+    "buildscape:green_cushion",
+    "buildscape:red_cushion",
+    "buildscape:black_cushion",
+    "buildscape:straw_bed"
   ]
 }

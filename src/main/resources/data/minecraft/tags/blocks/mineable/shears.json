@@ -80,6 +80,23 @@
     "buildscape:yellow_wool_slab",
     "buildscape:yellow_wool_stairs",
     "buildscape:yellow_wool_vertical_slab",
-    "buildscape:yellow_wool_wall"
+    "buildscape:yellow_wool_wall",
+    "buildscape:white_cushion",
+    "buildscape:orange_cushion",
+    "buildscape:magenta_cushion",
+    "buildscape:light_blue_cushion",
+    "buildscape:yellow_cushion",
+    "buildscape:lime_cushion",
+    "buildscape:pink_cushion",
+    "buildscape:gray_cushion",
+    "buildscape:light_gray_cushion",
+    "buildscape:cyan_cushion",
+    "buildscape:purple_cushion",
+    "buildscape:blue_cushion",
+    "buildscape:brown_cushion",
+    "buildscape:green_cushion",
+    "buildscape:red_cushion",
+    "buildscape:black_cushion",
+    "buildscape:straw_bed"
   ]
 }

@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "group": "cushion_dye",
+  "ingredients": [
+    "minecraft:light_blue_dye",
+    [
+      "buildscape:white_cushion",
+      "buildscape:orange_cushion",
+      "buildscape:magenta_cushion",
+      "buildscape:yellow_cushion",
+      "buildscape:lime_cushion",
+      "buildscape:pink_cushion",
+      "buildscape:gray_cushion",
+      "buildscape:light_gray_cushion",
+      "buildscape:cyan_cushion",
+      "buildscape:purple_cushion",
+      "buildscape:blue_cushion",
+      "buildscape:brown_cushion",
+      "buildscape:green_cushion",
+      "buildscape:red_cushion",
+      "buildscape:black_cushion"
+    ]
+  ],
+  "result": {
+    "item": "buildscape:light_blue_cushion"
+  }
+}

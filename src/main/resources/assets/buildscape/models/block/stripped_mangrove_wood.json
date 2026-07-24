@@ -3,6 +3,6 @@
     "textures":  {
                      "end":  "buildscape:block/stripped_mangrove_log",
                      "side":  "buildscape:block/stripped_mangrove_log",
-                     "particle":  "#side"
+                     "particle":  "buildscape:block/stripped_mangrove_log"
                  }
 }

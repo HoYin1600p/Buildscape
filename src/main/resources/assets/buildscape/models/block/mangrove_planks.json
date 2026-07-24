@@ -2,6 +2,6 @@
     "parent":  "minecraft:block/cube_all",
     "textures":  {
                      "all":  "buildscape:block/mangrove_planks",
-                     "particle":  "#all"
+                     "particle":  "buildscape:block/mangrove_planks"
                  }
 }

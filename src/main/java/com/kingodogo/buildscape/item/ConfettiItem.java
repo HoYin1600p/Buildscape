@@ -21,58 +21,47 @@ public class ConfettiItem extends Item {
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         ItemStack itemstack = player.getItemInHand(hand);
         
-        // Server-side: consume item and play sound
+        // Server-side: consume item and play burst sounds
         if (!level.isClientSide) {
             level.playSound(null, player.getX(), player.getY(), player.getZ(), 
-                SoundEvents.FIREWORK_ROCKET_LAUNCH, SoundSource.PLAYERS, 0.5F, 1.2F);
+                SoundEvents.FIREWORK_ROCKET_BLAST, SoundSource.PLAYERS, 0.8F, 1.4F);
+            level.playSound(null, player.getX(), player.getY(), player.getZ(), 
+                SoundEvents.FIREWORK_ROCKET_TWINKLE, SoundSource.PLAYERS, 0.6F, 1.6F);
             
             if (!player.getAbilities().instabuild) {
                 itemstack.shrink(1);
             }
         }
         
-        // Spawn particles on client-side (particles are client-side only)
+        // Spawn particles on client-side
         if (level.isClientSide) {
             spawnConfettiParticles(level, player);
         }
-        
-        player.getCooldowns().addCooldown(this, 5); // 5 tick cooldown
         
         return InteractionResultHolder.sidedSuccess(itemstack, level.isClientSide());
     }
     
     private void spawnConfettiParticles(Level level, Player player) {
-        // Spawn confetti particles in a burst pattern
-        double x = player.getX();
-        double y = player.getY() + player.getEyeHeight();
-        double z = player.getZ();
+        net.minecraft.world.phys.Vec3 look = player.getLookAngle();
+        double startX = player.getX() + look.x * 0.9D;
+        double startY = player.getEyeY() + look.y * 0.9D;
+        double startZ = player.getZ() + look.z * 0.9D;
         
-        // Get player's look direction for directional burst
-        float yaw = player.getYRot() * (float)(Math.PI / 180.0);
-        float pitch = player.getXRot() * (float)(Math.PI / 180.0);
-        
-        // Spawn 30-50 confetti particles in a burst
-        int particleCount = 30 + level.random.nextInt(21);
+        // Explosive burst of 75-120 confetti particles across a wide cone
+        int particleCount = 75 + level.random.nextInt(46);
         
         for (int i = 0; i < particleCount; i++) {
-            // Random direction in a cone shape
-            double spread = level.random.nextDouble() * 0.5 + 0.3; // Spread angle
-            double speed = 0.3 + level.random.nextDouble() * 0.4; // Random speed
+            double speed = 0.15D + level.random.nextDouble() * 0.25D;
+            double spread = 0.30D + level.random.nextDouble() * 0.35D;
             
-            // Calculate velocity based on player's look direction with spread
-            double vx = Math.sin(pitch) * Math.cos(yaw) * speed + 
-                       (level.random.nextDouble() - 0.5) * spread;
-            double vy = -Math.cos(pitch) * speed + 
-                       (level.random.nextDouble() - 0.5) * spread + 0.2; // Slight upward bias
-            double vz = Math.sin(pitch) * Math.sin(yaw) * speed + 
-                       (level.random.nextDouble() - 0.5) * spread;
+            double vx = look.x * speed + (level.random.nextDouble() - 0.5D) * spread;
+            double vy = look.y * speed + (level.random.nextDouble() - 0.5D) * spread + 0.12D;
+            double vz = look.z * speed + (level.random.nextDouble() - 0.5D) * spread;
             
-            // Add some randomness to position
-            double px = x + (level.random.nextDouble() - 0.5) * 0.3;
-            double py = y + (level.random.nextDouble() - 0.5) * 0.3;
-            double pz = z + (level.random.nextDouble() - 0.5) * 0.3;
+            double px = startX + (level.random.nextDouble() - 0.5D) * 0.4D;
+            double py = startY + (level.random.nextDouble() - 0.5D) * 0.4D;
+            double pz = startZ + (level.random.nextDouble() - 0.5D) * 0.4D;
             
-            // Spawn the particle
             level.addParticle((SimpleParticleType) ModParticles.CONFETTI.get(), 
                 px, py, pz, vx, vy, vz);
         }

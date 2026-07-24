@@ -11539,44 +11539,132 @@ public class ModBlocks {
                                         Blocks.AIR,
                                         BlockBehaviour.Properties.copy(BLACK_WALLPAPER_SLAB.get())));
 
+        // Wallpaper Flat Blocks
+        public static final RegistryObject<Block> WHITE_WALLPAPER_FLAT = BLOCKS.register("white_wallpaper_flat",
+                        () -> new WallpaperFlatBlock(BlockBehaviour.Properties.of(Material.WOOL, MaterialColor.SNOW)
+                                        .strength(0.8F).sound(net.minecraft.world.level.block.SoundType.WOOL).noOcclusion()));
+        public static final RegistryObject<Block> ORANGE_WALLPAPER_FLAT = BLOCKS.register("orange_wallpaper_flat",
+                        () -> new WallpaperFlatBlock(BlockBehaviour.Properties.of(Material.WOOL, MaterialColor.COLOR_ORANGE)
+                                        .strength(0.8F).sound(net.minecraft.world.level.block.SoundType.WOOL).noOcclusion()));
+        public static final RegistryObject<Block> MAGENTA_WALLPAPER_FLAT = BLOCKS.register("magenta_wallpaper_flat",
+                        () -> new WallpaperFlatBlock(BlockBehaviour.Properties.of(Material.WOOL, MaterialColor.COLOR_MAGENTA)
+                                        .strength(0.8F).sound(net.minecraft.world.level.block.SoundType.WOOL).noOcclusion()));
+        public static final RegistryObject<Block> LIGHT_BLUE_WALLPAPER_FLAT = BLOCKS.register("light_blue_wallpaper_flat",
+                        () -> new WallpaperFlatBlock(BlockBehaviour.Properties.of(Material.WOOL, MaterialColor.COLOR_LIGHT_BLUE)
+                                        .strength(0.8F).sound(net.minecraft.world.level.block.SoundType.WOOL).noOcclusion()));
+        public static final RegistryObject<Block> YELLOW_WALLPAPER_FLAT = BLOCKS.register("yellow_wallpaper_flat",
+                        () -> new WallpaperFlatBlock(BlockBehaviour.Properties.of(Material.WOOL, MaterialColor.COLOR_YELLOW)
+                                        .strength(0.8F).sound(net.minecraft.world.level.block.SoundType.WOOL).noOcclusion()));
+        public static final RegistryObject<Block> LIME_WALLPAPER_FLAT = BLOCKS.register("lime_wallpaper_flat",
+                        () -> new WallpaperFlatBlock(BlockBehaviour.Properties.of(Material.WOOL, MaterialColor.COLOR_LIGHT_GREEN)
+                                        .strength(0.8F).sound(net.minecraft.world.level.block.SoundType.WOOL).noOcclusion()));
+        public static final RegistryObject<Block> PINK_WALLPAPER_FLAT = BLOCKS.register("pink_wallpaper_flat",
+                        () -> new WallpaperFlatBlock(BlockBehaviour.Properties.of(Material.WOOL, MaterialColor.COLOR_PINK)
+                                        .strength(0.8F).sound(net.minecraft.world.level.block.SoundType.WOOL).noOcclusion()));
+        public static final RegistryObject<Block> GRAY_WALLPAPER_FLAT = BLOCKS.register("gray_wallpaper_flat",
+                        () -> new WallpaperFlatBlock(BlockBehaviour.Properties.of(Material.WOOL, MaterialColor.COLOR_GRAY)
+                                        .strength(0.8F).sound(net.minecraft.world.level.block.SoundType.WOOL).noOcclusion()));
+        public static final RegistryObject<Block> LIGHT_GRAY_WALLPAPER_FLAT = BLOCKS.register("light_gray_wallpaper_flat",
+                        () -> new WallpaperFlatBlock(BlockBehaviour.Properties.of(Material.WOOL, MaterialColor.COLOR_LIGHT_GRAY)
+                                        .strength(0.8F).sound(net.minecraft.world.level.block.SoundType.WOOL).noOcclusion()));
+        public static final RegistryObject<Block> CYAN_WALLPAPER_FLAT = BLOCKS.register("cyan_wallpaper_flat",
+                        () -> new WallpaperFlatBlock(BlockBehaviour.Properties.of(Material.WOOL, MaterialColor.COLOR_CYAN)
+                                        .strength(0.8F).sound(net.minecraft.world.level.block.SoundType.WOOL).noOcclusion()));
+        public static final RegistryObject<Block> PURPLE_WALLPAPER_FLAT = BLOCKS.register("purple_wallpaper_flat",
+                        () -> new WallpaperFlatBlock(BlockBehaviour.Properties.of(Material.WOOL, MaterialColor.COLOR_PURPLE)
+                                        .strength(0.8F).sound(net.minecraft.world.level.block.SoundType.WOOL).noOcclusion()));
+        public static final RegistryObject<Block> BLUE_WALLPAPER_FLAT = BLOCKS.register("blue_wallpaper_flat",
+                        () -> new WallpaperFlatBlock(BlockBehaviour.Properties.of(Material.WOOL, MaterialColor.COLOR_BLUE)
+                                        .strength(0.8F).sound(net.minecraft.world.level.block.SoundType.WOOL).noOcclusion()));
+        public static final RegistryObject<Block> BROWN_WALLPAPER_FLAT = BLOCKS.register("brown_wallpaper_flat",
+                        () -> new WallpaperFlatBlock(BlockBehaviour.Properties.of(Material.WOOL, MaterialColor.COLOR_BROWN)
+                                        .strength(0.8F).sound(net.minecraft.world.level.block.SoundType.WOOL).noOcclusion()));
+        public static final RegistryObject<Block> GREEN_WALLPAPER_FLAT = BLOCKS.register("green_wallpaper_flat",
+                        () -> new WallpaperFlatBlock(BlockBehaviour.Properties.of(Material.WOOL, MaterialColor.COLOR_GREEN)
+                                        .strength(0.8F).sound(net.minecraft.world.level.block.SoundType.WOOL).noOcclusion()));
+        public static final RegistryObject<Block> RED_WALLPAPER_FLAT = BLOCKS.register("red_wallpaper_flat",
+                        () -> new WallpaperFlatBlock(BlockBehaviour.Properties.of(Material.WOOL, MaterialColor.COLOR_RED)
+                                        .strength(0.8F).sound(net.minecraft.world.level.block.SoundType.WOOL).noOcclusion()));
+        public static final RegistryObject<Block> BLACK_WALLPAPER_FLAT = BLOCKS.register("black_wallpaper_flat",
+                        () -> new WallpaperFlatBlock(BlockBehaviour.Properties.of(Material.WOOL, MaterialColor.COLOR_BLACK)
+                                        .strength(0.8F).sound(net.minecraft.world.level.block.SoundType.WOOL).noOcclusion()));
+
         // End new main vertical variants.
 
         // Cushions
         public static final RegistryObject<Block> WHITE_CUSHION = BLOCKS.register("white_cushion",
-                        () -> new CushionBlock(BlockBehaviour.Properties.copy(Blocks.WHITE_WOOL).noOcclusion()));
+                        () -> new CushionBlock(BlockBehaviour.Properties.copy(Blocks.WHITE_WOOL).strength(0.4F).noOcclusion()));
         public static final RegistryObject<Block> ORANGE_CUSHION = BLOCKS.register("orange_cushion",
-                        () -> new CushionBlock(BlockBehaviour.Properties.copy(Blocks.ORANGE_WOOL).noOcclusion()));
+                        () -> new CushionBlock(BlockBehaviour.Properties.copy(Blocks.ORANGE_WOOL).strength(0.4F).noOcclusion()));
         public static final RegistryObject<Block> MAGENTA_CUSHION = BLOCKS.register("magenta_cushion",
-                        () -> new CushionBlock(BlockBehaviour.Properties.copy(Blocks.MAGENTA_WOOL).noOcclusion()));
+                        () -> new CushionBlock(BlockBehaviour.Properties.copy(Blocks.MAGENTA_WOOL).strength(0.4F).noOcclusion()));
         public static final RegistryObject<Block> LIGHT_BLUE_CUSHION = BLOCKS.register("light_blue_cushion",
-                        () -> new CushionBlock(BlockBehaviour.Properties.copy(Blocks.LIGHT_BLUE_WOOL).noOcclusion()));
+                        () -> new CushionBlock(BlockBehaviour.Properties.copy(Blocks.LIGHT_BLUE_WOOL).strength(0.4F).noOcclusion()));
         public static final RegistryObject<Block> YELLOW_CUSHION = BLOCKS.register("yellow_cushion",
-                        () -> new CushionBlock(BlockBehaviour.Properties.copy(Blocks.YELLOW_WOOL).noOcclusion()));
+                        () -> new CushionBlock(BlockBehaviour.Properties.copy(Blocks.YELLOW_WOOL).strength(0.4F).noOcclusion()));
         public static final RegistryObject<Block> LIME_CUSHION = BLOCKS.register("lime_cushion",
-                        () -> new CushionBlock(BlockBehaviour.Properties.copy(Blocks.LIME_WOOL).noOcclusion()));
+                        () -> new CushionBlock(BlockBehaviour.Properties.copy(Blocks.LIME_WOOL).strength(0.4F).noOcclusion()));
         public static final RegistryObject<Block> PINK_CUSHION = BLOCKS.register("pink_cushion",
-                        () -> new CushionBlock(BlockBehaviour.Properties.copy(Blocks.PINK_WOOL).noOcclusion()));
+                        () -> new CushionBlock(BlockBehaviour.Properties.copy(Blocks.PINK_WOOL).strength(0.4F).noOcclusion()));
         public static final RegistryObject<Block> GRAY_CUSHION = BLOCKS.register("gray_cushion",
-                        () -> new CushionBlock(BlockBehaviour.Properties.copy(Blocks.GRAY_WOOL).noOcclusion()));
+                        () -> new CushionBlock(BlockBehaviour.Properties.copy(Blocks.GRAY_WOOL).strength(0.4F).noOcclusion()));
         public static final RegistryObject<Block> LIGHT_GRAY_CUSHION = BLOCKS.register("light_gray_cushion",
-                        () -> new CushionBlock(BlockBehaviour.Properties.copy(Blocks.LIGHT_GRAY_WOOL).noOcclusion()));
+                        () -> new CushionBlock(BlockBehaviour.Properties.copy(Blocks.LIGHT_GRAY_WOOL).strength(0.4F).noOcclusion()));
         public static final RegistryObject<Block> CYAN_CUSHION = BLOCKS.register("cyan_cushion",
-                        () -> new CushionBlock(BlockBehaviour.Properties.copy(Blocks.CYAN_WOOL).noOcclusion()));
+                        () -> new CushionBlock(BlockBehaviour.Properties.copy(Blocks.CYAN_WOOL).strength(0.4F).noOcclusion()));
         public static final RegistryObject<Block> PURPLE_CUSHION = BLOCKS.register("purple_cushion",
-                        () -> new CushionBlock(BlockBehaviour.Properties.copy(Blocks.PURPLE_WOOL).noOcclusion()));
+                        () -> new CushionBlock(BlockBehaviour.Properties.copy(Blocks.PURPLE_WOOL).strength(0.4F).noOcclusion()));
         public static final RegistryObject<Block> BLUE_CUSHION = BLOCKS.register("blue_cushion",
-                        () -> new CushionBlock(BlockBehaviour.Properties.copy(Blocks.BLUE_WOOL).noOcclusion()));
+                        () -> new CushionBlock(BlockBehaviour.Properties.copy(Blocks.BLUE_WOOL).strength(0.4F).noOcclusion()));
         public static final RegistryObject<Block> BROWN_CUSHION = BLOCKS.register("brown_cushion",
-                        () -> new CushionBlock(BlockBehaviour.Properties.copy(Blocks.BROWN_WOOL).noOcclusion()));
+                        () -> new CushionBlock(BlockBehaviour.Properties.copy(Blocks.BROWN_WOOL).strength(0.4F).noOcclusion()));
         public static final RegistryObject<Block> GREEN_CUSHION = BLOCKS.register("green_cushion",
-                        () -> new CushionBlock(BlockBehaviour.Properties.copy(Blocks.GREEN_WOOL).noOcclusion()));
+                        () -> new CushionBlock(BlockBehaviour.Properties.copy(Blocks.GREEN_WOOL).strength(0.4F).noOcclusion()));
         public static final RegistryObject<Block> RED_CUSHION = BLOCKS.register("red_cushion",
-                        () -> new CushionBlock(BlockBehaviour.Properties.copy(Blocks.RED_WOOL).noOcclusion()));
+                        () -> new CushionBlock(BlockBehaviour.Properties.copy(Blocks.RED_WOOL).strength(0.4F).noOcclusion()));
         public static final RegistryObject<Block> BLACK_CUSHION = BLOCKS.register("black_cushion",
-                        () -> new CushionBlock(BlockBehaviour.Properties.copy(Blocks.BLACK_WOOL).noOcclusion()));
+                        () -> new CushionBlock(BlockBehaviour.Properties.copy(Blocks.BLACK_WOOL).strength(0.4F).noOcclusion()));
 
         // Straw Bed
         public static final RegistryObject<Block> STRAW_BED = BLOCKS.register("straw_bed",
                         () -> new StrawBedBlock(BlockBehaviour.Properties.copy(Blocks.HAY_BLOCK).noOcclusion()));
+
+        // Big Books
+        public static final RegistryObject<Block> BIG_BOOK = BLOCKS.register("big_book",
+                        () -> new BigBookBlock(BlockBehaviour.Properties.copy(Blocks.BOOKSHELF)));
+        public static final RegistryObject<Block> GLOWING_BIG_BOOK = BLOCKS.register("glowing_big_book",
+                        () -> new BigBookBlock(BlockBehaviour.Properties.copy(Blocks.BOOKSHELF).lightLevel(s -> 15)));
+        public static final RegistryObject<Block> WHITE_BIG_BOOK = BLOCKS.register("white_big_book",
+                        () -> new BigBookBlock(BlockBehaviour.Properties.copy(Blocks.BOOKSHELF)));
+        public static final RegistryObject<Block> ORANGE_BIG_BOOK = BLOCKS.register("orange_big_book",
+                        () -> new BigBookBlock(BlockBehaviour.Properties.copy(Blocks.BOOKSHELF)));
+        public static final RegistryObject<Block> MAGENTA_BIG_BOOK = BLOCKS.register("magenta_big_book",
+                        () -> new BigBookBlock(BlockBehaviour.Properties.copy(Blocks.BOOKSHELF)));
+        public static final RegistryObject<Block> LIGHT_BLUE_BIG_BOOK = BLOCKS.register("light_blue_big_book",
+                        () -> new BigBookBlock(BlockBehaviour.Properties.copy(Blocks.BOOKSHELF)));
+        public static final RegistryObject<Block> YELLOW_BIG_BOOK = BLOCKS.register("yellow_big_book",
+                        () -> new BigBookBlock(BlockBehaviour.Properties.copy(Blocks.BOOKSHELF)));
+        public static final RegistryObject<Block> LIME_BIG_BOOK = BLOCKS.register("lime_big_book",
+                        () -> new BigBookBlock(BlockBehaviour.Properties.copy(Blocks.BOOKSHELF)));
+        public static final RegistryObject<Block> PINK_BIG_BOOK = BLOCKS.register("pink_big_book",
+                        () -> new BigBookBlock(BlockBehaviour.Properties.copy(Blocks.BOOKSHELF)));
+        public static final RegistryObject<Block> GRAY_BIG_BOOK = BLOCKS.register("gray_big_book",
+                        () -> new BigBookBlock(BlockBehaviour.Properties.copy(Blocks.BOOKSHELF)));
+        public static final RegistryObject<Block> LIGHT_GRAY_BIG_BOOK = BLOCKS.register("light_gray_big_book",
+                        () -> new BigBookBlock(BlockBehaviour.Properties.copy(Blocks.BOOKSHELF)));
+        public static final RegistryObject<Block> CYAN_BIG_BOOK = BLOCKS.register("cyan_big_book",
+                        () -> new BigBookBlock(BlockBehaviour.Properties.copy(Blocks.BOOKSHELF)));
+        public static final RegistryObject<Block> PURPLE_BIG_BOOK = BLOCKS.register("purple_big_book",
+                        () -> new BigBookBlock(BlockBehaviour.Properties.copy(Blocks.BOOKSHELF)));
+        public static final RegistryObject<Block> BLUE_BIG_BOOK = BLOCKS.register("blue_big_book",
+                        () -> new BigBookBlock(BlockBehaviour.Properties.copy(Blocks.BOOKSHELF)));
+        public static final RegistryObject<Block> BROWN_BIG_BOOK = BLOCKS.register("brown_big_book",
+                        () -> new BigBookBlock(BlockBehaviour.Properties.copy(Blocks.BOOKSHELF)));
+        public static final RegistryObject<Block> GREEN_BIG_BOOK = BLOCKS.register("green_big_book",
+                        () -> new BigBookBlock(BlockBehaviour.Properties.copy(Blocks.BOOKSHELF)));
+        public static final RegistryObject<Block> RED_BIG_BOOK = BLOCKS.register("red_big_book",
+                        () -> new BigBookBlock(BlockBehaviour.Properties.copy(Blocks.BOOKSHELF)));
+        public static final RegistryObject<Block> BLACK_BIG_BOOK = BLOCKS.register("black_big_book",
+                        () -> new BigBookBlock(BlockBehaviour.Properties.copy(Blocks.BOOKSHELF)));
 
 }

@@ -13,22 +13,38 @@ public class ConfettiParticle extends TextureSheetParticle {
     
     private final float rotationSpeed;
     
+    private static final int[] VIBRANT_COLORS = {
+        0xFF0000, // Red
+        0x00FFFF, // Cyan
+        0x1919EA, // Blue
+        0x3CDFFF, // Light Blue
+        0xFFFF00, // Yellow
+        0xFF5C00, // Orange
+        0xBFFE00, // Lime
+        0x39FF14, // Green
+        0xF686B7, // Pink
+        0xAB87FF, // Purple
+        0xFF00FF  // Magenta
+    };
+
     protected ConfettiParticle(ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed, SpriteSet sprites) {
         super(level, x, y, z, xSpeed, ySpeed, zSpeed);
         
-        // Use setSpriteFromAge to properly initialize the sprite (like working particles)
-        // Then pick the sprite to ensure it's properly set (like snowflake does)
-        this.setSpriteFromAge(sprites);
+        // Pick a random sprite from the 7 confetti textures (confetti_1 through confetti_7)
         this.pickSprite(sprites);
         
         Random rand = level.random;
         
-        // Set color to white so texture shows its natural colors without tinting
-        this.setColor(1.0F, 1.0F, 1.0F);
+        // Pick a random vibrant color from the 11 base pillar colors
+        int hexColor = VIBRANT_COLORS[rand.nextInt(VIBRANT_COLORS.length)];
+        float r = ((hexColor >> 16) & 0xFF) / 255.0F;
+        float g = ((hexColor >> 8) & 0xFF) / 255.0F;
+        float b = (hexColor & 0xFF) / 255.0F;
+        this.setColor(r, g, b);
         
         // Confetti physics - more realistic falling
-        this.gravity = 0.15F + rand.nextFloat() * 0.1F; // Variable gravity for different fall speeds
-        this.lifetime = 60 + rand.nextInt(40); // 60-100 ticks lifetime (approx 3-5 seconds)
+        this.gravity = 0.05F + rand.nextFloat() * 0.04F; // Variable light gravity for gentle float
+        this.lifetime = 70 + rand.nextInt(40); // 70-110 ticks lifetime
         this.hasPhysics = true;
         
         // Random size variation

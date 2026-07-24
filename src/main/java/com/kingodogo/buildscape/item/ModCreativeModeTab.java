@@ -47,6 +47,10 @@ public class ModCreativeModeTab {
             
             for (ItemStack stack : rawList) {
                 Item item = stack.getItem();
+                ResourceLocation id = ForgeRegistries.ITEMS.getKey(item);
+                if (id != null && !BuildScape.MODID.equals(id.getNamespace())) {
+                    continue;
+                }
                 if (added.contains(item)) continue;
                 items.add(stack);
                 added.add(item);
@@ -108,28 +112,26 @@ public class ModCreativeModeTab {
             ItemStack verticalSlab = buildscapeItems.get(basePath + "_vertical_slab");
             ItemStack wall = buildscapeItems.get(basePath + "_wall");
 
-            if (parent == null && (stairs != null || slab != null || wall != null)) {
-                parent = getOrInsertVanillaAnchor(ordered, firstPresent(stairs, slab, verticalSlab, wall), basePath);
-            }
+            ItemStack anchor = firstPresent(parent, stairs, slab, verticalSlab, wall);
+            if (anchor == null) return;
 
-            if (slab == null && verticalSlab != null) {
-                slab = getOrInsertVanillaAnchor(ordered, verticalSlab, basePath + "_slab");
+            if (parent != null && parent != anchor) {
+                moveAfter(ordered, parent, anchor);
+                anchor = parent;
             }
-
-            ItemStack anchor = parent;
-            if (stairs != null) {
+            if (stairs != null && stairs != anchor) {
                 moveAfter(ordered, stairs, anchor);
                 anchor = stairs;
             }
-            if (slab != null) {
+            if (slab != null && slab != anchor) {
                 moveAfter(ordered, slab, anchor);
                 anchor = slab;
             }
-            if (verticalSlab != null) {
+            if (verticalSlab != null && verticalSlab != anchor) {
                 moveAfter(ordered, verticalSlab, anchor);
                 anchor = verticalSlab;
             }
-            if (wall != null) {
+            if (wall != null && wall != anchor) {
                 moveAfter(ordered, wall, anchor);
             }
         }
@@ -141,28 +143,6 @@ public class ModCreativeModeTab {
                 }
             }
             return null;
-        }
-
-        private ItemStack getOrInsertVanillaAnchor(List<ItemStack> ordered, ItemStack stack, String path) {
-            Item vanillaItem = ForgeRegistries.ITEMS.getValue(new ResourceLocation("minecraft", path));
-            if (vanillaItem == null || vanillaItem == Items.AIR) {
-                return null;
-            }
-
-            for (ItemStack existing : ordered) {
-                if (existing.getItem() == vanillaItem) {
-                    return existing;
-                }
-            }
-
-            ItemStack anchor = new ItemStack(vanillaItem);
-            int stackIndex = ordered.indexOf(stack);
-            if (stackIndex >= 0) {
-                ordered.add(stackIndex, anchor);
-            } else {
-                ordered.add(anchor);
-            }
-            return anchor;
         }
 
         private void moveAfter(List<ItemStack> ordered, ItemStack stack, ItemStack anchor) {
@@ -1578,6 +1558,7 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.CASCADE_BLOCK.get()));
             items.add(new ItemStack(ModItems.CASCADE_BLOCK_NO_MIST.get()));
             items.add(new ItemStack(ModItems.BOTTLE_OF_MIST.get()));
+            items.add(new ItemStack(ModItems.CONFETTI_ITEM.get()));
             // White
             items.add(new ItemStack(ModItems.WHITE_CARPET_LAYERS.get()));
             items.add(new ItemStack(ModItems.WHITE_WOOL_SLAB.get()));
@@ -1694,51 +1675,67 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.WHITE_WALLPAPER.get()));
             items.add(new ItemStack(ModItems.WHITE_WALLPAPER_SLAB.get()));
             items.add(new ItemStack(ModItems.WHITE_WALLPAPER_VERTICAL_SLAB.get()));
+            items.add(new ItemStack(ModItems.WHITE_WALLPAPER_FLAT.get()));
             items.add(new ItemStack(ModItems.LIGHT_GRAY_WALLPAPER.get()));
             items.add(new ItemStack(ModItems.LIGHT_GRAY_WALLPAPER_SLAB.get()));
             items.add(new ItemStack(ModItems.LIGHT_GRAY_WALLPAPER_VERTICAL_SLAB.get()));
+            items.add(new ItemStack(ModItems.LIGHT_GRAY_WALLPAPER_FLAT.get()));
             items.add(new ItemStack(ModItems.GRAY_WALLPAPER.get()));
             items.add(new ItemStack(ModItems.GRAY_WALLPAPER_SLAB.get()));
             items.add(new ItemStack(ModItems.GRAY_WALLPAPER_VERTICAL_SLAB.get()));
+            items.add(new ItemStack(ModItems.GRAY_WALLPAPER_FLAT.get()));
             items.add(new ItemStack(ModItems.BLACK_WALLPAPER.get()));
             items.add(new ItemStack(ModItems.BLACK_WALLPAPER_SLAB.get()));
             items.add(new ItemStack(ModItems.BLACK_WALLPAPER_VERTICAL_SLAB.get()));
+            items.add(new ItemStack(ModItems.BLACK_WALLPAPER_FLAT.get()));
             items.add(new ItemStack(ModItems.BROWN_WALLPAPER.get()));
             items.add(new ItemStack(ModItems.BROWN_WALLPAPER_SLAB.get()));
             items.add(new ItemStack(ModItems.BROWN_WALLPAPER_VERTICAL_SLAB.get()));
+            items.add(new ItemStack(ModItems.BROWN_WALLPAPER_FLAT.get()));
             items.add(new ItemStack(ModItems.RED_WALLPAPER.get()));
             items.add(new ItemStack(ModItems.RED_WALLPAPER_SLAB.get()));
             items.add(new ItemStack(ModItems.RED_WALLPAPER_VERTICAL_SLAB.get()));
+            items.add(new ItemStack(ModItems.RED_WALLPAPER_FLAT.get()));
             items.add(new ItemStack(ModItems.ORANGE_WALLPAPER.get()));
             items.add(new ItemStack(ModItems.ORANGE_WALLPAPER_SLAB.get()));
             items.add(new ItemStack(ModItems.ORANGE_WALLPAPER_VERTICAL_SLAB.get()));
+            items.add(new ItemStack(ModItems.ORANGE_WALLPAPER_FLAT.get()));
             items.add(new ItemStack(ModItems.YELLOW_WALLPAPER.get()));
             items.add(new ItemStack(ModItems.YELLOW_WALLPAPER_SLAB.get()));
             items.add(new ItemStack(ModItems.YELLOW_WALLPAPER_VERTICAL_SLAB.get()));
+            items.add(new ItemStack(ModItems.YELLOW_WALLPAPER_FLAT.get()));
             items.add(new ItemStack(ModItems.LIME_WALLPAPER.get()));
             items.add(new ItemStack(ModItems.LIME_WALLPAPER_SLAB.get()));
             items.add(new ItemStack(ModItems.LIME_WALLPAPER_VERTICAL_SLAB.get()));
+            items.add(new ItemStack(ModItems.LIME_WALLPAPER_FLAT.get()));
             items.add(new ItemStack(ModItems.GREEN_WALLPAPER.get()));
             items.add(new ItemStack(ModItems.GREEN_WALLPAPER_SLAB.get()));
             items.add(new ItemStack(ModItems.GREEN_WALLPAPER_VERTICAL_SLAB.get()));
+            items.add(new ItemStack(ModItems.GREEN_WALLPAPER_FLAT.get()));
             items.add(new ItemStack(ModItems.CYAN_WALLPAPER.get()));
             items.add(new ItemStack(ModItems.CYAN_WALLPAPER_SLAB.get()));
             items.add(new ItemStack(ModItems.CYAN_WALLPAPER_VERTICAL_SLAB.get()));
+            items.add(new ItemStack(ModItems.CYAN_WALLPAPER_FLAT.get()));
             items.add(new ItemStack(ModItems.LIGHT_BLUE_WALLPAPER.get()));
             items.add(new ItemStack(ModItems.LIGHT_BLUE_WALLPAPER_SLAB.get()));
             items.add(new ItemStack(ModItems.LIGHT_BLUE_WALLPAPER_VERTICAL_SLAB.get()));
+            items.add(new ItemStack(ModItems.LIGHT_BLUE_WALLPAPER_FLAT.get()));
             items.add(new ItemStack(ModItems.BLUE_WALLPAPER.get()));
             items.add(new ItemStack(ModItems.BLUE_WALLPAPER_SLAB.get()));
             items.add(new ItemStack(ModItems.BLUE_WALLPAPER_VERTICAL_SLAB.get()));
+            items.add(new ItemStack(ModItems.BLUE_WALLPAPER_FLAT.get()));
             items.add(new ItemStack(ModItems.PURPLE_WALLPAPER.get()));
             items.add(new ItemStack(ModItems.PURPLE_WALLPAPER_SLAB.get()));
             items.add(new ItemStack(ModItems.PURPLE_WALLPAPER_VERTICAL_SLAB.get()));
+            items.add(new ItemStack(ModItems.PURPLE_WALLPAPER_FLAT.get()));
             items.add(new ItemStack(ModItems.MAGENTA_WALLPAPER.get()));
             items.add(new ItemStack(ModItems.MAGENTA_WALLPAPER_SLAB.get()));
             items.add(new ItemStack(ModItems.MAGENTA_WALLPAPER_VERTICAL_SLAB.get()));
+            items.add(new ItemStack(ModItems.MAGENTA_WALLPAPER_FLAT.get()));
             items.add(new ItemStack(ModItems.PINK_WALLPAPER.get()));
             items.add(new ItemStack(ModItems.PINK_WALLPAPER_SLAB.get()));
             items.add(new ItemStack(ModItems.PINK_WALLPAPER_VERTICAL_SLAB.get()));
+            items.add(new ItemStack(ModItems.PINK_WALLPAPER_FLAT.get()));
 
             items.add(new ItemStack(ModItems.OAK_LEAF_LAYERS.get()));
             items.add(new ItemStack(ModItems.SPRUCE_LEAF_LAYERS.get()));
@@ -2011,6 +2008,26 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.PURPLE_SPOOL.get()));
             items.add(new ItemStack(ModItems.MAGENTA_SPOOL.get()));
             items.add(new ItemStack(ModItems.PINK_SPOOL.get()));
+
+            // Big Books
+            items.add(new ItemStack(ModItems.BIG_BOOK.get()));
+            items.add(new ItemStack(ModItems.GLOWING_BIG_BOOK.get()));
+            items.add(new ItemStack(ModItems.WHITE_BIG_BOOK.get()));
+            items.add(new ItemStack(ModItems.LIGHT_GRAY_BIG_BOOK.get()));
+            items.add(new ItemStack(ModItems.GRAY_BIG_BOOK.get()));
+            items.add(new ItemStack(ModItems.BLACK_BIG_BOOK.get()));
+            items.add(new ItemStack(ModItems.BROWN_BIG_BOOK.get()));
+            items.add(new ItemStack(ModItems.RED_BIG_BOOK.get()));
+            items.add(new ItemStack(ModItems.ORANGE_BIG_BOOK.get()));
+            items.add(new ItemStack(ModItems.YELLOW_BIG_BOOK.get()));
+            items.add(new ItemStack(ModItems.LIME_BIG_BOOK.get()));
+            items.add(new ItemStack(ModItems.GREEN_BIG_BOOK.get()));
+            items.add(new ItemStack(ModItems.CYAN_BIG_BOOK.get()));
+            items.add(new ItemStack(ModItems.LIGHT_BLUE_BIG_BOOK.get()));
+            items.add(new ItemStack(ModItems.BLUE_BIG_BOOK.get()));
+            items.add(new ItemStack(ModItems.PURPLE_BIG_BOOK.get()));
+            items.add(new ItemStack(ModItems.MAGENTA_BIG_BOOK.get()));
+            items.add(new ItemStack(ModItems.PINK_BIG_BOOK.get()));
 
             // Dye Sacks
             items.add(new ItemStack(ModItems.WHITE_DYE_SACK.get()));

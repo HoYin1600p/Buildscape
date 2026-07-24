@@ -5713,7 +5713,7 @@ public class ModItems {
 
     public static final RegistryObject<Item> CONFETTI_ITEM = ITEMS.register(
             "confetti",
-            () -> new ConfettiItem(new Item.Properties())
+            () -> new ConfettiItem(new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB).stacksTo(64))
     );
 
     public static final RegistryObject<Item> STEEL_BLOCK = ITEMS.register(
@@ -9336,6 +9336,40 @@ public class ModItems {
             () -> new BlockItem(ModBlocks.BLACK_WALLPAPER_VERTICAL_SLAB.get(), createBlockItemProperties())
     );
 
+    // Wallpaper Flat Items
+    public static final RegistryObject<Item> WHITE_WALLPAPER_FLAT = ITEMS.register("white_wallpaper_flat",
+            () -> new BlockItem(ModBlocks.WHITE_WALLPAPER_FLAT.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> ORANGE_WALLPAPER_FLAT = ITEMS.register("orange_wallpaper_flat",
+            () -> new BlockItem(ModBlocks.ORANGE_WALLPAPER_FLAT.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> MAGENTA_WALLPAPER_FLAT = ITEMS.register("magenta_wallpaper_flat",
+            () -> new BlockItem(ModBlocks.MAGENTA_WALLPAPER_FLAT.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIGHT_BLUE_WALLPAPER_FLAT = ITEMS.register("light_blue_wallpaper_flat",
+            () -> new BlockItem(ModBlocks.LIGHT_BLUE_WALLPAPER_FLAT.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> YELLOW_WALLPAPER_FLAT = ITEMS.register("yellow_wallpaper_flat",
+            () -> new BlockItem(ModBlocks.YELLOW_WALLPAPER_FLAT.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIME_WALLPAPER_FLAT = ITEMS.register("lime_wallpaper_flat",
+            () -> new BlockItem(ModBlocks.LIME_WALLPAPER_FLAT.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PINK_WALLPAPER_FLAT = ITEMS.register("pink_wallpaper_flat",
+            () -> new BlockItem(ModBlocks.PINK_WALLPAPER_FLAT.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GRAY_WALLPAPER_FLAT = ITEMS.register("gray_wallpaper_flat",
+            () -> new BlockItem(ModBlocks.GRAY_WALLPAPER_FLAT.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIGHT_GRAY_WALLPAPER_FLAT = ITEMS.register("light_gray_wallpaper_flat",
+            () -> new BlockItem(ModBlocks.LIGHT_GRAY_WALLPAPER_FLAT.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> CYAN_WALLPAPER_FLAT = ITEMS.register("cyan_wallpaper_flat",
+            () -> new BlockItem(ModBlocks.CYAN_WALLPAPER_FLAT.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PURPLE_WALLPAPER_FLAT = ITEMS.register("purple_wallpaper_flat",
+            () -> new BlockItem(ModBlocks.PURPLE_WALLPAPER_FLAT.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BLUE_WALLPAPER_FLAT = ITEMS.register("blue_wallpaper_flat",
+            () -> new BlockItem(ModBlocks.BLUE_WALLPAPER_FLAT.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BROWN_WALLPAPER_FLAT = ITEMS.register("brown_wallpaper_flat",
+            () -> new BlockItem(ModBlocks.BROWN_WALLPAPER_FLAT.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GREEN_WALLPAPER_FLAT = ITEMS.register("green_wallpaper_flat",
+            () -> new BlockItem(ModBlocks.GREEN_WALLPAPER_FLAT.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> RED_WALLPAPER_FLAT = ITEMS.register("red_wallpaper_flat",
+            () -> new BlockItem(ModBlocks.RED_WALLPAPER_FLAT.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BLACK_WALLPAPER_FLAT = ITEMS.register("black_wallpaper_flat",
+            () -> new BlockItem(ModBlocks.BLACK_WALLPAPER_FLAT.get(), createBlockItemProperties()));
+
 
     // End new main vertical variant block items.
 
@@ -9376,6 +9410,44 @@ public class ModItems {
     // Straw Bed (stackable up to 16)
     public static final RegistryObject<Item> STRAW_BED = ITEMS.register("straw_bed",
             () -> new BedItem(ModBlocks.STRAW_BED.get(), new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB).stacksTo(16)));
+
+    // Big Books
+    public static final RegistryObject<Item> BIG_BOOK = ITEMS.register("big_book",
+            () -> new BlockItem(ModBlocks.BIG_BOOK.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GLOWING_BIG_BOOK = ITEMS.register("glowing_big_book",
+            () -> new BlockItem(ModBlocks.GLOWING_BIG_BOOK.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WHITE_BIG_BOOK = ITEMS.register("white_big_book",
+            () -> new BlockItem(ModBlocks.WHITE_BIG_BOOK.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> ORANGE_BIG_BOOK = ITEMS.register("orange_big_book",
+            () -> new BlockItem(ModBlocks.ORANGE_BIG_BOOK.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> MAGENTA_BIG_BOOK = ITEMS.register("magenta_big_book",
+            () -> new BlockItem(ModBlocks.MAGENTA_BIG_BOOK.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIGHT_BLUE_BIG_BOOK = ITEMS.register("light_blue_big_book",
+            () -> new BlockItem(ModBlocks.LIGHT_BLUE_BIG_BOOK.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> YELLOW_BIG_BOOK = ITEMS.register("yellow_big_book",
+            () -> new BlockItem(ModBlocks.YELLOW_BIG_BOOK.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIME_BIG_BOOK = ITEMS.register("lime_big_book",
+            () -> new BlockItem(ModBlocks.LIME_BIG_BOOK.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PINK_BIG_BOOK = ITEMS.register("pink_big_book",
+            () -> new BlockItem(ModBlocks.PINK_BIG_BOOK.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GRAY_BIG_BOOK = ITEMS.register("gray_big_book",
+            () -> new BlockItem(ModBlocks.GRAY_BIG_BOOK.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIGHT_GRAY_BIG_BOOK = ITEMS.register("light_gray_big_book",
+            () -> new BlockItem(ModBlocks.LIGHT_GRAY_BIG_BOOK.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> CYAN_BIG_BOOK = ITEMS.register("cyan_big_book",
+            () -> new BlockItem(ModBlocks.CYAN_BIG_BOOK.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PURPLE_BIG_BOOK = ITEMS.register("purple_big_book",
+            () -> new BlockItem(ModBlocks.PURPLE_BIG_BOOK.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BLUE_BIG_BOOK = ITEMS.register("blue_big_book",
+            () -> new BlockItem(ModBlocks.BLUE_BIG_BOOK.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BROWN_BIG_BOOK = ITEMS.register("brown_big_book",
+            () -> new BlockItem(ModBlocks.BROWN_BIG_BOOK.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GREEN_BIG_BOOK = ITEMS.register("green_big_book",
+            () -> new BlockItem(ModBlocks.GREEN_BIG_BOOK.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> RED_BIG_BOOK = ITEMS.register("red_big_book",
+            () -> new BlockItem(ModBlocks.RED_BIG_BOOK.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BLACK_BIG_BOOK = ITEMS.register("black_big_book",
+            () -> new BlockItem(ModBlocks.BLACK_BIG_BOOK.get(), createBlockItemProperties()));
 
 }
 

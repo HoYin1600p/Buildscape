@@ -406,13 +406,13 @@ public class ItemFrameParticleHandler {
                     break;
                 case "burst":
                     double bAngle = rand.nextDouble() * 2.0 * Math.PI;
-                    double bElevation = (rand.nextDouble() - 0.5) * Math.PI * 0.5;
-                    u = Math.cos(bAngle) * Math.cos(bElevation) * spread * 0.3;
-                    v = Math.sin(bAngle) * Math.cos(bElevation) * spread * 0.3;
-                    w = Math.sin(bElevation) * spread * 0.3;
-                    vu = Math.cos(bAngle) * Math.cos(bElevation) * speed;
-                    vv = Math.sin(bAngle) * Math.cos(bElevation) * speed;
-                    vw = Math.sin(bElevation) * speed;
+                    double bElevation = (rand.nextDouble() - 0.5) * Math.PI * 0.7;
+                    u = Math.cos(bAngle) * Math.cos(bElevation) * spread * 0.6;
+                    v = Math.sin(bAngle) * Math.cos(bElevation) * spread * 0.6;
+                    w = Math.sin(bElevation) * spread * 0.6;
+                    vu = Math.cos(bAngle) * Math.cos(bElevation) * speed * 1.5;
+                    vv = Math.sin(bAngle) * Math.cos(bElevation) * speed * 1.5;
+                    vw = Math.sin(bElevation) * speed * 1.5;
                     break;
                 case "snowflake":
                     // Snowflake pattern: Reverse of beam pattern

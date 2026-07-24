@@ -1,0 +1,27 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "buildscape:block/white_big_book"
+    },
+    "facing=south": {
+      "model": "buildscape:block/white_big_book",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "buildscape:block/white_big_book",
+      "y": 270
+    },
+    "facing=east": {
+      "model": "buildscape:block/white_big_book",
+      "y": 90
+    },
+    "facing=up": {
+      "model": "buildscape:block/white_big_book",
+      "x": 270
+    },
+    "facing=down": {
+      "model": "buildscape:block/white_big_book",
+      "x": 90
+    }
+  }
+}

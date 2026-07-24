@@ -1,6 +1,11 @@
 {
   "textures": [
-    "buildscape:confetti_particle"
+    "buildscape:confetti_1",
+    "buildscape:confetti_2",
+    "buildscape:confetti_3",
+    "buildscape:confetti_4",
+    "buildscape:confetti_5",
+    "buildscape:confetti_6",
+    "buildscape:confetti_7"
   ]
 }
-

@@ -16,10 +16,10 @@
       "y": 90
     },
     "axis=z,type=double": {
-      "model": "minecraft:block/brick"
+      "model": "minecraft:block/bricks"
     },
     "axis=x,type=double": {
-      "model": "minecraft:block/brick"
+      "model": "minecraft:block/bricks"
     }
   }
 }

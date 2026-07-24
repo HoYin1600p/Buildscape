@@ -2,23 +2,55 @@
   "type": "minecraft:crafting_shapeless",
   "group": "cushion_dye",
   "ingredients": [
-    "minecraft:red_dye",
+    {
+      "item": "minecraft:red_dye"
+    },
     [
-      "buildscape:white_cushion",
-      "buildscape:orange_cushion",
-      "buildscape:magenta_cushion",
-      "buildscape:light_blue_cushion",
-      "buildscape:yellow_cushion",
-      "buildscape:lime_cushion",
-      "buildscape:pink_cushion",
-      "buildscape:gray_cushion",
-      "buildscape:light_gray_cushion",
-      "buildscape:cyan_cushion",
-      "buildscape:purple_cushion",
-      "buildscape:blue_cushion",
-      "buildscape:brown_cushion",
-      "buildscape:green_cushion",
-      "buildscape:black_cushion"
+      {
+        "item": "buildscape:white_cushion"
+      },
+      {
+        "item": "buildscape:orange_cushion"
+      },
+      {
+        "item": "buildscape:magenta_cushion"
+      },
+      {
+        "item": "buildscape:light_blue_cushion"
+      },
+      {
+        "item": "buildscape:yellow_cushion"
+      },
+      {
+        "item": "buildscape:lime_cushion"
+      },
+      {
+        "item": "buildscape:pink_cushion"
+      },
+      {
+        "item": "buildscape:gray_cushion"
+      },
+      {
+        "item": "buildscape:light_gray_cushion"
+      },
+      {
+        "item": "buildscape:cyan_cushion"
+      },
+      {
+        "item": "buildscape:purple_cushion"
+      },
+      {
+        "item": "buildscape:blue_cushion"
+      },
+      {
+        "item": "buildscape:brown_cushion"
+      },
+      {
+        "item": "buildscape:green_cushion"
+      },
+      {
+        "item": "buildscape:black_cushion"
+      }
     ]
   ],
   "result": {

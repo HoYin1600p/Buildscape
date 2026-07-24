@@ -16,10 +16,10 @@
       "y": 90
     },
     "axis=z,type=double": {
-      "model": "minecraft:block/deepslate_tile"
+      "model": "minecraft:block/deepslate_tiles"
     },
     "axis=x,type=double": {
-      "model": "minecraft:block/deepslate_tile"
+      "model": "minecraft:block/deepslate_tiles"
     }
   }
 }

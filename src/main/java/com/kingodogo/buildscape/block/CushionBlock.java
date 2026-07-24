@@ -130,7 +130,7 @@ public class CushionBlock extends Block implements SimpleWaterloggedBlock {
             }
 
             if (!level.isClientSide) {
-                double sitHeight = state.getValue(HALF) == Half.TOP ? 0.85 : 0.05;
+                double sitHeight = state.getValue(HALF) == Half.TOP ? 0.725 : -0.075;
                 SeatEntity.createSeat(level, pos.getX() + 0.5, pos.getY() + sitHeight, pos.getZ() + 0.5, player);
             }
             return InteractionResult.sidedSuccess(level.isClientSide);

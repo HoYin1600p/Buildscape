@@ -162,6 +162,108 @@ public class BuildScape {
                         }
                     }
             );
+
+            net.minecraft.world.level.block.DispenserBlock.registerBehavior(
+                    com.kingodogo.buildscape.item.ModItems.CONFETTI_ITEM.get(),
+                    new net.minecraft.core.dispenser.DefaultDispenseItemBehavior() {
+                        @Override
+                        protected net.minecraft.world.item.ItemStack execute(net.minecraft.core.BlockSource source, net.minecraft.world.item.ItemStack stack) {
+                            net.minecraft.world.level.Level level = source.getLevel();
+                            net.minecraft.core.Direction facing = source.getBlockState().getValue(net.minecraft.world.level.block.DispenserBlock.FACING);
+                            net.minecraft.core.BlockPos pos = source.getPos().relative(facing);
+
+                            double startX = pos.getX() + 0.5;
+                            double startY = pos.getY() + 0.5;
+                            double startZ = pos.getZ() + 0.5;
+
+                            // Determine which slot of the 3x3 dispenser grid fired the confetti
+                            int slotIndex = 4; // Default to center slot (4)
+                            if (source.getEntity() instanceof net.minecraft.world.level.block.entity.DispenserBlockEntity dispenser) {
+                                int matchSlot = -1;
+                                for (int i = 0; i < dispenser.getContainerSize(); i++) {
+                                    net.minecraft.world.item.ItemStack itemInSlot = dispenser.getItem(i);
+                                    if (itemInSlot == stack) {
+                                        matchSlot = i;
+                                        break;
+                                    } else if (matchSlot == -1 && !itemInSlot.isEmpty() && itemInSlot.getItem() == stack.getItem()) {
+                                        matchSlot = i;
+                                    }
+                                }
+                                if (matchSlot != -1) {
+                                    slotIndex = matchSlot;
+                                }
+                            }
+
+                            // Calculate horizontal yaw rotation offset based on slot index (0..8)
+                            // Slot 4 (center) = 0 yaw offset (straight out front face)
+                            // Slots 0..3 angle left, slots 5..8 angle right
+                            double yawOffset = (slotIndex - 4) * 0.15D;
+
+                            // Main direction is always out of the front face of the dispenser
+                            double forwardX = facing.getStepX();
+                            double forwardY = facing.getStepY();
+                            double forwardZ = facing.getStepZ();
+
+                            // Right vector relative to front face for horizontal yaw rotation
+                            double rightX = 0.0, rightY = 0.0, rightZ = 0.0;
+
+                            if (facing.getAxis().isHorizontal()) {
+                                net.minecraft.core.Direction rightDir = facing.getClockWise();
+                                rightX = rightDir.getStepX();
+                                rightY = 0.0;
+                                rightZ = rightDir.getStepZ();
+                            } else {
+                                rightX = 1.0;
+                                rightY = 0.0;
+                                rightZ = 0.0;
+                            }
+
+                            double dirX = forwardX + rightX * yawOffset;
+                            double dirY = forwardY;
+                            double dirZ = forwardZ + rightZ * yawOffset;
+
+                            double len = Math.sqrt(dirX * dirX + dirY * dirY + dirZ * dirZ);
+                            if (len > 0.0001D) {
+                                dirX /= len;
+                                dirY /= len;
+                                dirZ /= len;
+                            }
+
+                            if (level instanceof net.minecraft.server.level.ServerLevel serverLevel) {
+                                java.util.Random rand = level.random;
+                                int particleCount = 65 + rand.nextInt(36);
+
+                                for (int i = 0; i < particleCount; i++) {
+                                    double speed = 0.08D + rand.nextDouble() * 0.12D;
+                                    double spread = 0.04D + rand.nextDouble() * 0.06D;
+
+                                    double vx = dirX * speed + (rand.nextDouble() - 0.5D) * spread;
+                                    double vy = dirY * speed + (rand.nextDouble() - 0.5D) * spread + (facing.getAxis().isHorizontal() ? 0.05D : 0.0D);
+                                    double vz = dirZ * speed + (rand.nextDouble() - 0.5D) * spread;
+
+                                    double px = startX + (rand.nextDouble() - 0.5D) * 0.15D;
+                                    double py = startY + (rand.nextDouble() - 0.5D) * 0.15D;
+                                    double pz = startZ + (rand.nextDouble() - 0.5D) * 0.15D;
+
+                                    serverLevel.sendParticles(
+                                            (net.minecraft.core.particles.SimpleParticleType) com.kingodogo.buildscape.particle.ModParticles.CONFETTI.get(),
+                                            px, py, pz, 0, vx, vy, vz, 1.0D
+                                    );
+                                }
+
+                                level.playSound(null, pos,
+                                        net.minecraft.sounds.SoundEvents.FIREWORK_ROCKET_BLAST,
+                                        net.minecraft.sounds.SoundSource.BLOCKS, 0.8F, 1.4F);
+                                level.playSound(null, pos,
+                                        net.minecraft.sounds.SoundEvents.FIREWORK_ROCKET_TWINKLE,
+                                        net.minecraft.sounds.SoundSource.BLOCKS, 0.6F, 1.6F);
+                            }
+
+                            stack.shrink(1);
+                            return stack;
+                        }
+                    }
+            );
         });
 
         event.enqueueWork(() -> {
@@ -1522,6 +1624,10 @@ public class BuildScape {
                         net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
                                 registryObject.get(),
                                 net.minecraft.client.renderer.RenderType.cutoutMipped());
+                    } else if (id != null && id.getPath().contains("wallpaper_flat")) {
+                        net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(
+                                registryObject.get(),
+                                net.minecraft.client.renderer.RenderType.cutout());
                     }
                 }
             });

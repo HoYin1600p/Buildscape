@@ -49,7 +49,7 @@
     },
     {
       "when": {
-        "north": "high"
+        "north": "tall"
       },
       "apply": {
         "model": "buildscape:block/magenta_stained_brick_tiles_wall_side_tall",
@@ -58,7 +58,7 @@
     },
     {
       "when": {
-        "east": "high"
+        "east": "tall"
       },
       "apply": {
         "model": "buildscape:block/magenta_stained_brick_tiles_wall_side_tall",
@@ -68,7 +68,7 @@
     },
     {
       "when": {
-        "south": "high"
+        "south": "tall"
       },
       "apply": {
         "model": "buildscape:block/magenta_stained_brick_tiles_wall_side_tall",
@@ -78,7 +78,7 @@
     },
     {
       "when": {
-        "west": "high"
+        "west": "tall"
       },
       "apply": {
         "model": "buildscape:block/magenta_stained_brick_tiles_wall_side_tall",

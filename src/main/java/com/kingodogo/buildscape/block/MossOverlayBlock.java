@@ -109,7 +109,7 @@ public class MossOverlayBlock extends Block {
 
     @Override
     public boolean canBeReplaced(BlockState state, BlockPlaceContext context) {
-        return true;
+        return false;
     }
 
     @Override

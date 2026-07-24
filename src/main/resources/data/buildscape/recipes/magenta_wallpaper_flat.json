@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "#",
+    "#",
+    "#"
+  ],
+  "key": {
+    "#": {
+      "item": "buildscape:magenta_wallpaper"
+    }
+  },
+  "result": {
+    "item": "buildscape:magenta_wallpaper_flat",
+    "count": 12
+  }
+}

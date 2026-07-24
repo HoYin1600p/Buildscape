@@ -104,7 +104,12 @@ public class SnowyGrassBlock extends Block implements BonemealableBlock {
 
                 BlockState targetState = level.getBlockState(targetPos);
 
-                if (
+                if (targetState.is(ModBlocks.DIRT_SLAB.get()) && canPropagate(snowyGrassState, level, targetPos)) {
+                    BlockState grassSlabState = ModBlocks.SNOWY_GRASS_BLOCK_SLAB.get().defaultBlockState()
+                            .setValue(net.minecraft.world.level.block.SlabBlock.TYPE, targetState.getValue(net.minecraft.world.level.block.SlabBlock.TYPE))
+                            .setValue(net.minecraft.world.level.block.SlabBlock.WATERLOGGED, targetState.getValue(net.minecraft.world.level.block.SlabBlock.WATERLOGGED));
+                    level.setBlockAndUpdate(targetPos, grassSlabState);
+                } else if (
                         targetState.is(Blocks.DIRT) &&
                                 canPropagate(snowyGrassState, level, targetPos)
                 ) {

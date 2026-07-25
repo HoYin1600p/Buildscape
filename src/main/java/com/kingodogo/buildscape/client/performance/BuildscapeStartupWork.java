@@ -17,7 +17,6 @@ import java.util.function.IntConsumer;
  * @author hoyin1600p
  */
 public final class BuildscapeStartupWork {
-    private static final int MAX_WORKERS = 16;
     private static final AtomicInteger POOL_IDS = new AtomicInteger();
 
     private BuildscapeStartupWork() {
@@ -29,10 +28,7 @@ public final class BuildscapeStartupWork {
         }
 
         int availableProcessors = Runtime.getRuntime().availableProcessors();
-        int workerCount = Math.min(
-                itemCount,
-                Math.min(MAX_WORKERS, Math.max(1, availableProcessors - 1))
-        );
+        int workerCount = Math.min(itemCount, Math.max(1, availableProcessors / 2));
         if (workerCount == 1) {
             for (int index = 0; index < itemCount; index++) {
                 action.accept(index);
@@ -53,15 +49,18 @@ public final class BuildscapeStartupWork {
 
         ExecutorService executor = Executors.newFixedThreadPool(workerCount, threadFactory);
         List<Future<?>> futures = new ArrayList<>(workerCount);
-        int batchSize = (itemCount + workerCount - 1) / workerCount;
+        AtomicInteger nextIndex = new AtomicInteger();
+        int chunkSize = Math.max(1, itemCount / (workerCount * 32));
 
         try {
-            for (int start = 0; start < itemCount; start += batchSize) {
-                int batchStart = start;
-                int batchEnd = Math.min(itemCount, start + batchSize);
+            for (int worker = 0; worker < workerCount; worker++) {
                 futures.add(executor.submit(() -> {
-                    for (int index = batchStart; index < batchEnd; index++) {
-                        action.accept(index);
+                    int start;
+                    while ((start = nextIndex.getAndAdd(chunkSize)) < itemCount) {
+                        int end = Math.min(itemCount, start + chunkSize);
+                        for (int index = start; index < end; index++) {
+                            action.accept(index);
+                        }
                     }
                 }));
             }

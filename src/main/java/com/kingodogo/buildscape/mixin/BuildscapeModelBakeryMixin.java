@@ -17,6 +17,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.profiling.ProfilerFiller;
+import net.minecraftforge.fml.ModList;
 import org.apache.commons.lang3.tuple.Triple;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
@@ -31,8 +32,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Collection;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -64,10 +65,6 @@ public abstract class BuildscapeModelBakeryMixin {
 
     @Shadow
     @Final
-    private Map<ResourceLocation, UnbakedModel> unbakedCache;
-
-    @Shadow
-    @Final
     private Map<ResourceLocation, UnbakedModel> topLevelModels;
 
     @Shadow
@@ -76,6 +73,9 @@ public abstract class BuildscapeModelBakeryMixin {
 
     @Unique
     private Map<ResourceLocation, BlockModel> buildscape$parsedModels;
+
+    @Unique
+    private volatile boolean buildscape$hasCustomGeometry;
 
     @Inject(method = "processLoading", at = @At("HEAD"), remap = false)
     private void buildscape$parseModelsInParallel(
@@ -91,14 +91,7 @@ public abstract class BuildscapeModelBakeryMixin {
         }
 
         long startedAt = System.nanoTime();
-        Collection<ResourceLocation> listedResources = resourceManager.listResources(
-                "models",
-                path -> path.endsWith(".json")
-        );
-        List<ResourceLocation> modelFiles = listedResources.stream()
-                .filter(location -> BuildScape.MODID.equals(location.getNamespace()))
-                .sorted(Comparator.comparing(ResourceLocation::toString))
-                .toList();
+        List<ResourceLocation> modelFiles = buildscape$listBundledModels();
 
         ConcurrentMap<ResourceLocation, BlockModel> parsedModels = new ConcurrentHashMap<>();
         AtomicInteger fallbackCount = new AtomicInteger();
@@ -158,6 +151,19 @@ public abstract class BuildscapeModelBakeryMixin {
         }
     }
 
+    @Inject(method = "loadBlockModel", at = @At("RETURN"))
+    private void buildscape$detectCustomGeometry(
+            ResourceLocation location,
+            CallbackInfoReturnable<BlockModel> callback
+    ) {
+        if (
+                BuildScape.MODID.equals(location.getNamespace()) &&
+                callback.getReturnValue().customData.hasCustomGeometry()
+        ) {
+            buildscape$hasCustomGeometry = true;
+        }
+    }
+
     @Inject(method = "processLoading", at = @At("TAIL"), remap = false)
     private void buildscape$releaseParsedModels(
             ProfilerFiller profiler,
@@ -188,14 +194,7 @@ public abstract class BuildscapeModelBakeryMixin {
             return;
         }
 
-        boolean hasCustomGeometry = unbakedCache.values().stream()
-                .filter(BlockModel.class::isInstance)
-                .map(BlockModel.class::cast)
-                .anyMatch(model ->
-                        model.name.startsWith(BuildScape.MODID + ":") &&
-                                model.customData.hasCustomGeometry()
-                );
-        if (hasCustomGeometry) {
+        if (buildscape$hasCustomGeometry) {
             BuildScape.LOGGER.info(
                     "Buildscape startup kept model baking sequential because custom geometry was detected"
             );
@@ -247,5 +246,36 @@ public abstract class BuildscapeModelBakeryMixin {
         String path = fileLocation.getPath();
         String modelPath = path.substring("models/".length(), path.length() - ".json".length());
         return new ResourceLocation(fileLocation.getNamespace(), modelPath);
+    }
+
+    @Unique
+    private static List<ResourceLocation> buildscape$listBundledModels() {
+        Path modelRoot = ModList.get()
+                .getModFileById(BuildScape.MODID)
+                .getFile()
+                .findResource("assets", BuildScape.MODID, "models");
+        if (!Files.isDirectory(modelRoot)) {
+            return List.of();
+        }
+
+        try (var paths = Files.walk(modelRoot)) {
+            return paths
+                    .filter(Files::isRegularFile)
+                    .map(modelRoot::relativize)
+                    .map(Path::toString)
+                    .filter(path -> path.endsWith(".json"))
+                    .map(path -> new ResourceLocation(
+                            BuildScape.MODID,
+                            "models/" + path.replace('\\', '/')
+                    ))
+                    .sorted(Comparator.comparing(ResourceLocation::toString))
+                    .toList();
+        } catch (Exception exception) {
+            BuildScape.LOGGER.warn(
+                    "Buildscape model discovery fell back to the normal loader",
+                    exception
+            );
+            return List.of();
+        }
     }
 }

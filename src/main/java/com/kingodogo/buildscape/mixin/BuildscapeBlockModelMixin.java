@@ -58,10 +58,10 @@ public abstract class BuildscapeBlockModelMixin {
 
     @Unique
     private boolean buildscape$canCacheMaterials() {
-        if (!BuildscapeClientConfig.get().isModelMaterialCacheEnabled()) {
+        if (name == null || !name.startsWith(BuildScape.MODID + ":")) {
             return false;
         }
-        if (name == null || !name.startsWith(BuildScape.MODID + ":")) {
+        if (!BuildscapeClientConfig.get().isModelMaterialCacheEnabled()) {
             return false;
         }
 

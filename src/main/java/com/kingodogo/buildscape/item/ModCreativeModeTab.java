@@ -10,9 +10,10 @@ import net.minecraft.world.item.Items;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -31,11 +32,16 @@ public class ModCreativeModeTab {
             // 1. Gather ALL potential items for this tab
             NonNullList<ItemStack> rawList = NonNullList.create();
             addHardcodedItems(rawList);
-            
+
+            Set<Item> rawItems = Collections.newSetFromMap(new IdentityHashMap<>());
+            for (ItemStack stack : rawList) {
+                rawItems.add(stack.getItem());
+            }
+
             NonNullList<ItemStack> others = NonNullList.create();
             super.fillItemList(others);
             for (ItemStack stack : others) {
-                if (!containsItem(rawList, stack.getItem())) {
+                if (rawItems.add(stack.getItem())) {
                     rawList.add(stack);
                 }
             }
@@ -57,17 +63,12 @@ public class ModCreativeModeTab {
             }
         }
 
-        private boolean containsItem(List<ItemStack> list, Item item) {
-            for (ItemStack s : list) if (s.getItem() == item) return true;
-            return false;
-        }
-
         private NonNullList<ItemStack> arrangeVariantItems(NonNullList<ItemStack> input) {
-            List<ItemStack> ordered = new ArrayList<>(input);
+            ItemStackOrder ordered = new ItemStackOrder(input);
             Map<String, ItemStack> buildscapeItems = new HashMap<>();
             Set<String> variantBasePaths = new LinkedHashSet<>();
 
-            for (ItemStack stack : ordered) {
+            for (ItemStack stack : input) {
                 ResourceLocation id = ForgeRegistries.ITEMS.getKey(stack.getItem());
                 if (id != null && BuildScape.MODID.equals(id.getNamespace())) {
                     String path = id.getPath();
@@ -84,9 +85,7 @@ public class ModCreativeModeTab {
                 arrangeVariantGroup(ordered, buildscapeItems, basePath);
             }
 
-            NonNullList<ItemStack> output = NonNullList.create();
-            output.addAll(ordered);
-            return output;
+            return ordered.toNonNullList();
         }
 
         private String getVariantBasePath(String path) {
@@ -105,7 +104,7 @@ public class ModCreativeModeTab {
             return null;
         }
 
-        private void arrangeVariantGroup(List<ItemStack> ordered, Map<String, ItemStack> buildscapeItems, String basePath) {
+        private void arrangeVariantGroup(ItemStackOrder ordered, Map<String, ItemStack> buildscapeItems, String basePath) {
             ItemStack parent = buildscapeItems.get(basePath);
             ItemStack stairs = buildscapeItems.get(basePath + "_stairs");
             ItemStack slab = buildscapeItems.get(basePath + "_slab");
@@ -145,17 +144,102 @@ public class ModCreativeModeTab {
             return null;
         }
 
-        private void moveAfter(List<ItemStack> ordered, ItemStack stack, ItemStack anchor) {
+        private void moveAfter(ItemStackOrder ordered, ItemStack stack, ItemStack anchor) {
             if (anchor == null || stack == anchor) {
                 return;
             }
 
-            ordered.remove(stack);
-            int anchorIndex = ordered.indexOf(anchor);
-            if (anchorIndex >= 0) {
-                ordered.add(anchorIndex + 1, stack);
-            } else {
-                ordered.add(stack);
+            ordered.moveAfter(stack, anchor);
+        }
+
+        private final class ItemStackOrder {
+            private final Map<ItemStack, ItemStackNode> nodes = new IdentityHashMap<>();
+            private ItemStackNode head;
+            private ItemStackNode tail;
+
+            private ItemStackOrder(List<ItemStack> stacks) {
+                for (ItemStack stack : stacks) {
+                    ItemStackNode node = new ItemStackNode(stack);
+                    nodes.put(stack, node);
+
+                    if (tail == null) {
+                        head = node;
+                    } else {
+                        tail.next = node;
+                        node.previous = tail;
+                    }
+                    tail = node;
+                }
+            }
+
+            private void moveAfter(ItemStack stack, ItemStack anchor) {
+                ItemStackNode node = nodes.get(stack);
+                ItemStackNode anchorNode = nodes.get(anchor);
+                if (node == null || node == anchorNode) {
+                    return;
+                }
+
+                detach(node);
+                if (anchorNode == null) {
+                    append(node);
+                    return;
+                }
+
+                ItemStackNode next = anchorNode.next;
+                anchorNode.next = node;
+                node.previous = anchorNode;
+                node.next = next;
+
+                if (next == null) {
+                    tail = node;
+                } else {
+                    next.previous = node;
+                }
+            }
+
+            private void detach(ItemStackNode node) {
+                if (node.previous == null) {
+                    head = node.next;
+                } else {
+                    node.previous.next = node.next;
+                }
+
+                if (node.next == null) {
+                    tail = node.previous;
+                } else {
+                    node.next.previous = node.previous;
+                }
+
+                node.previous = null;
+                node.next = null;
+            }
+
+            private void append(ItemStackNode node) {
+                if (tail == null) {
+                    head = node;
+                } else {
+                    tail.next = node;
+                    node.previous = tail;
+                }
+                tail = node;
+            }
+
+            private NonNullList<ItemStack> toNonNullList() {
+                NonNullList<ItemStack> output = NonNullList.create();
+                for (ItemStackNode node = head; node != null; node = node.next) {
+                    output.add(node.stack);
+                }
+                return output;
+            }
+        }
+
+        private final class ItemStackNode {
+            private final ItemStack stack;
+            private ItemStackNode previous;
+            private ItemStackNode next;
+
+            private ItemStackNode(ItemStack stack) {
+                this.stack = stack;
             }
         }
 

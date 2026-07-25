@@ -10,9 +10,17 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.IdentityHashMap;
+import java.util.Map;
+import java.util.Set;
 
+/**
+ * Keeps Buildscape's vanilla vertical slabs beside their horizontal variants.
+ *
+ * @author hoyin1600p
+ */
 @Mixin(CreativeModeTab.class)
 public class CreativeModeTabMixin {
 
@@ -20,66 +28,45 @@ public class CreativeModeTabMixin {
     private void buildscape$arrangeVerticalSlabs(NonNullList<ItemStack> items, CallbackInfo ci) {
         CreativeModeTab tab = (CreativeModeTab) (Object) this;
         if (tab == CreativeModeTab.TAB_BUILDING_BLOCKS || tab == CreativeModeTab.TAB_DECORATIONS) {
-            List<ItemStack> ordered = new ArrayList<>(items);
-            List<ItemStack> toMove = new ArrayList<>();
-            
-            // Find all Buildscape vertical slabs in this tab
-            for (ItemStack stack : ordered) {
+            Map<ResourceLocation, ItemStack> stacksById = new HashMap<>();
+            for (ItemStack stack : items) {
                 ResourceLocation id = ForgeRegistries.ITEMS.getKey(stack.getItem());
-                if (id != null && "buildscape".equals(id.getNamespace())) {
-                    String path = id.getPath();
-                    if (path.endsWith("_vertical_slab")) {
-                        String base = path.substring(0, path.length() - "_vertical_slab".length());
-                        ResourceLocation vanillaBlockId = new ResourceLocation("minecraft", base);
-                        ResourceLocation vanillaSlabId = new ResourceLocation("minecraft", base + "_slab");
-                        boolean isVanilla = ForgeRegistries.ITEMS.containsKey(vanillaBlockId)
-                                || ForgeRegistries.ITEMS.containsKey(vanillaSlabId);
-                        if (isVanilla) {
-                            toMove.add(stack);
-                        }
-                    }
+                if (id != null) {
+                    stacksById.put(id, stack);
                 }
             }
-            
-            // Move each to its proper place
-            for (ItemStack stack : toMove) {
-                ResourceLocation id = ForgeRegistries.ITEMS.getKey(stack.getItem());
-                if (id == null) continue;
+
+            Map<ItemStack, ItemStack> insertAfter = new IdentityHashMap<>();
+            Set<ItemStack> moved = Collections.newSetFromMap(new IdentityHashMap<>());
+            for (Map.Entry<ResourceLocation, ItemStack> entry : stacksById.entrySet()) {
+                ResourceLocation id = entry.getKey();
                 String path = id.getPath();
+                if (!"buildscape".equals(id.getNamespace()) || !path.endsWith("_vertical_slab")) {
+                    continue;
+                }
+
                 String base = path.substring(0, path.length() - "_vertical_slab".length());
-                ResourceLocation anchorId1 = new ResourceLocation("minecraft", base + "_slab");
-                ResourceLocation anchorId2 = new ResourceLocation("minecraft", base);
-                
-                ordered.remove(stack);
-                int targetIndex = -1;
-                
-                // First look for slab anchor
-                for (int i = 0; i < ordered.size(); i++) {
-                    ResourceLocation currentId = ForgeRegistries.ITEMS.getKey(ordered.get(i).getItem());
-                    if (currentId != null && anchorId1.equals(currentId)) {
-                        targetIndex = i;
-                        break;
-                    }
+                ItemStack anchor = stacksById.get(new ResourceLocation("minecraft", base + "_slab"));
+                if (anchor == null) {
+                    anchor = stacksById.get(new ResourceLocation("minecraft", base));
                 }
-                
-                // If not found, look for base block anchor
-                if (targetIndex < 0) {
-                    for (int i = 0; i < ordered.size(); i++) {
-                        ResourceLocation currentId = ForgeRegistries.ITEMS.getKey(ordered.get(i).getItem());
-                        if (currentId != null && anchorId2.equals(currentId)) {
-                            targetIndex = i;
-                            break;
-                        }
-                    }
-                }
-                
-                if (targetIndex >= 0) {
-                    ordered.add(targetIndex + 1, stack);
-                } else {
-                    ordered.add(stack);
+                if (anchor != null) {
+                    insertAfter.put(anchor, entry.getValue());
+                    moved.add(entry.getValue());
                 }
             }
-            
+
+            NonNullList<ItemStack> ordered = NonNullList.create();
+            for (ItemStack stack : items) {
+                if (!moved.contains(stack)) {
+                    ordered.add(stack);
+                    ItemStack verticalSlab = insertAfter.get(stack);
+                    if (verticalSlab != null) {
+                        ordered.add(verticalSlab);
+                    }
+                }
+            }
+
             items.clear();
             items.addAll(ordered);
         }

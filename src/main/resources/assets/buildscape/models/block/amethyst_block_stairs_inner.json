@@ -1,9 +1,9 @@
 {
   "parent": "minecraft:block/inner_stairs",
   "textures": {
-    "bottom": "minecraft:block/amethyst_block",
-    "top": "minecraft:block/amethyst_block",
-    "side": "minecraft:block/amethyst_block",
+    "bottom": "buildscape:block/amethyst_block",
+    "top": "buildscape:block/amethyst_block",
+    "side": "buildscape:block/amethyst_block",
     "particle": "#side"
   }
 }

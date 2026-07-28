@@ -1,0 +1,9 @@
+{
+  "parent": "minecraft:block/outer_stairs",
+  "textures": {
+    "bottom": "buildscape:block/stripped_ashpen_log",
+    "top": "buildscape:block/stripped_ashpen_log",
+    "side": "buildscape:block/stripped_ashpen_log",
+    "particle": "#side"
+  }
+}

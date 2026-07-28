@@ -75,6 +75,22 @@ public class ModConfiguredFeatures {
                     )
             );
 
+    public static final RegistryObject<ConfiguredFeature<?, ?>> PALE_OAK_TREE =
+            CONFIGURED_FEATURES.register("pale_oak", () ->
+                    new ConfiguredFeature<>(
+                            Feature.TREE,
+                            createPaleOakTreeConfiguration()
+                    )
+            );
+
+    public static final RegistryObject<ConfiguredFeature<?, ?>> CHERRY_TREE =
+            CONFIGURED_FEATURES.register("cherry", () ->
+                    new ConfiguredFeature<>(
+                            Feature.TREE,
+                            createCherryTreeConfiguration()
+                    )
+            );
+
     public static final RegistryObject<ConfiguredFeature<?, ?>> RED_MONETS =
             CONFIGURED_FEATURES.register("red_monets", () ->
                     new ConfiguredFeature<>(
@@ -1534,6 +1550,39 @@ public class ModConfiguredFeatures {
                                 .add(ModBlocks.ORANGE_POPLAR_LEAVES.get().defaultBlockState(), 1)
                                 .add(ModBlocks.YELLOW_POPLAR_LEAVES.get().defaultBlockState(), 1)
                 ),
+                new net.minecraft.world.level.levelgen.feature.foliageplacers.BlobFoliagePlacer(
+                        net.minecraft.util.valueproviders.ConstantInt.of(2),
+                        net.minecraft.util.valueproviders.ConstantInt.of(0),
+                        3
+                ),
+                new net.minecraft.world.level.levelgen.feature.featuresize.TwoLayersFeatureSize(1, 0, 1)
+        )
+                .ignoreVines()
+                .build();
+    }
+
+    private static TreeConfiguration createPaleOakTreeConfiguration() {
+        return new TreeConfiguration.TreeConfigurationBuilder(
+                BlockStateProvider.simple(ModBlocks.PALE_OAK_LOG.get().defaultBlockState()),
+                new net.minecraft.world.level.levelgen.feature.trunkplacers.StraightTrunkPlacer(5, 2, 1),
+                BlockStateProvider.simple(ModBlocks.PALE_OAK_LEAVES.get().defaultBlockState()),
+                new net.minecraft.world.level.levelgen.feature.foliageplacers.BlobFoliagePlacer(
+                        net.minecraft.util.valueproviders.ConstantInt.of(2),
+                        net.minecraft.util.valueproviders.ConstantInt.of(0),
+                        3
+                ),
+                new net.minecraft.world.level.levelgen.feature.featuresize.TwoLayersFeatureSize(1, 0, 1)
+        )
+                .decorators(java.util.List.of(CreakingHeartTreeDecorator.INSTANCE))
+                .ignoreVines()
+                .build();
+    }
+
+    private static TreeConfiguration createCherryTreeConfiguration() {
+        return new TreeConfiguration.TreeConfigurationBuilder(
+                BlockStateProvider.simple(ModBlocks.CHERRY_LOG.get().defaultBlockState()),
+                new net.minecraft.world.level.levelgen.feature.trunkplacers.StraightTrunkPlacer(4, 2, 0),
+                BlockStateProvider.simple(ModBlocks.CHERRY_LEAVES.get().defaultBlockState()),
                 new net.minecraft.world.level.levelgen.feature.foliageplacers.BlobFoliagePlacer(
                         net.minecraft.util.valueproviders.ConstantInt.of(2),
                         net.minecraft.util.valueproviders.ConstantInt.of(0),

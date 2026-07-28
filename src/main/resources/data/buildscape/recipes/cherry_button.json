@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "group": "wooden_button",
+  "ingredients": [
+    {
+      "item": "buildscape:cherry_planks"
+    }
+  ],
+  "result": {
+    "item": "buildscape:cherry_button",
+    "count": 1
+  }
+}

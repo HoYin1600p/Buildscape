@@ -41,4 +41,11 @@ public class ModTreeDecoratorTypes {
             "mangrove_leave_vine",
             () -> new TreeDecoratorType<>(MangroveLeaveVineDecorator.CODEC)
     );
+
+    public static final RegistryObject<
+            TreeDecoratorType<CreakingHeartTreeDecorator>
+            > CREAKING_HEART = TREE_DECORATOR_TYPES.register(
+            "creaking_heart",
+            () -> new TreeDecoratorType<>(CreakingHeartTreeDecorator.CODEC)
+    );
 }

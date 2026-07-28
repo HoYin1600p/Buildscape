@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "buildscape:resin_block"
+    }
+  ],
+  "result": {
+    "item": "buildscape:resin_clump",
+    "count": 4
+  }
+}

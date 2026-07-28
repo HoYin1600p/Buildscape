@@ -518,6 +518,20 @@
     "buildscape:warped_hyphae_slab",
     "buildscape:warped_hyphae_vertical_slab",
     "buildscape:stripped_warped_hyphae_slab",
-    "buildscape:stripped_warped_hyphae_vertical_slab"
+    "buildscape:stripped_warped_hyphae_vertical_slab",
+    "buildscape:pale_oak_slab",
+    "buildscape:pale_oak_log_slab",
+    "buildscape:stripped_pale_oak_log_slab",
+    "buildscape:pale_oak_wood_slab",
+    "buildscape:stripped_pale_oak_wood_slab",
+    "buildscape:cherry_slab",
+    "buildscape:cherry_log_slab",
+    "buildscape:stripped_cherry_log_slab",
+    "buildscape:cherry_wood_slab",
+    "buildscape:stripped_cherry_wood_slab",
+    "buildscape:pale_moss_block_slab",
+    "buildscape:resin_block_slab",
+    "buildscape:resin_brick_slab",
+    "buildscape:sculk_slab"
   ]
 }

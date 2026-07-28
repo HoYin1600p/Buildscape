@@ -1,0 +1,104 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "rolls": 1.0,
+      "bonus_rolls": 0.0,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "buildscape:resin_clump",
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": 1.0,
+              "add": false,
+              "conditions": [
+                {
+                  "condition": "minecraft:block_state_property",
+                  "block": "buildscape:resin_clump",
+                  "properties": {
+                    "down": "true"
+                  }
+                }
+              ]
+            },
+            {
+              "function": "minecraft:set_count",
+              "count": 1.0,
+              "add": true,
+              "conditions": [
+                {
+                  "condition": "minecraft:block_state_property",
+                  "block": "buildscape:resin_clump",
+                  "properties": {
+                    "up": "true"
+                  }
+                }
+              ]
+            },
+            {
+              "function": "minecraft:set_count",
+              "count": 1.0,
+              "add": true,
+              "conditions": [
+                {
+                  "condition": "minecraft:block_state_property",
+                  "block": "buildscape:resin_clump",
+                  "properties": {
+                    "north": "true"
+                  }
+                }
+              ]
+            },
+            {
+              "function": "minecraft:set_count",
+              "count": 1.0,
+              "add": true,
+              "conditions": [
+                {
+                  "condition": "minecraft:block_state_property",
+                  "block": "buildscape:resin_clump",
+                  "properties": {
+                    "south": "true"
+                  }
+                }
+              ]
+            },
+            {
+              "function": "minecraft:set_count",
+              "count": 1.0,
+              "add": true,
+              "conditions": [
+                {
+                  "condition": "minecraft:block_state_property",
+                  "block": "buildscape:resin_clump",
+                  "properties": {
+                    "west": "true"
+                  }
+                }
+              ]
+            },
+            {
+              "function": "minecraft:set_count",
+              "count": 1.0,
+              "add": true,
+              "conditions": [
+                {
+                  "condition": "minecraft:block_state_property",
+                  "block": "buildscape:resin_clump",
+                  "properties": {
+                    "east": "true"
+                  }
+                }
+              ]
+            },
+            {
+              "function": "minecraft:explosion_decay"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

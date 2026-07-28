@@ -1,7 +1,7 @@
 {
-    "parent":  "buildscape:block/large_chain",
-    "textures":  {
-                     "texture":  "buildscape:block/large_diamond_chain",
-                     "particle":  "#texture"
-                 }
+  "parent": "buildscape:block/large_chain",
+  "textures": {
+    "texture": "buildscape:block/large_diamond_chain",
+    "particle": "#texture"
+  }
 }

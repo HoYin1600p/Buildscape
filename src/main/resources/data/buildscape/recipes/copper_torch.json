@@ -1,0 +1,39 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "C",
+    "S",
+    "N"
+  ],
+  "key": {
+    "C": [
+      {
+        "item": "minecraft:coal"
+      },
+      {
+        "item": "minecraft:charcoal"
+      },
+      {
+        "tag": "minecraft:coals"
+      },
+      {
+        "tag": "forge:coals"
+      }
+    ],
+    "S": {
+      "item": "minecraft:stick"
+    },
+    "N": [
+      {
+        "item": "buildscape:copper_nugget"
+      },
+      {
+        "tag": "forge:nuggets/copper"
+      }
+    ]
+  },
+  "result": {
+    "item": "buildscape:copper_torch",
+    "count": 4
+  }
+}

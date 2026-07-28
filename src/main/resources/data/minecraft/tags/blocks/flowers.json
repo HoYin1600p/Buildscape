@@ -1,0 +1,10 @@
+{
+  "replace": false,
+  "values": [
+    "buildscape:golden_dandelion",
+    "buildscape:wildflowers",
+    "buildscape:closed_eyeblossom",
+    "buildscape:open_eyeblossom",
+    "buildscape:cactus_flower"
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "variants": {
+    "active=false,axis=y": {
+      "model": "buildscape:block/creaking_heart"
+    },
+    "active=false,axis=z": {
+      "model": "buildscape:block/creaking_heart_horizontal",
+      "x": 90
+    },
+    "active=false,axis=x": {
+      "model": "buildscape:block/creaking_heart_horizontal",
+      "x": 90,
+      "y": 90
+    },
+    "active=true,axis=y": {
+      "model": "buildscape:block/creaking_heart_active"
+    },
+    "active=true,axis=z": {
+      "model": "buildscape:block/creaking_heart_active_horizontal",
+      "x": 90
+    },
+    "active=true,axis=x": {
+      "model": "buildscape:block/creaking_heart_active_horizontal",
+      "x": 90,
+      "y": 90
+    },
+    "axis=y": {
+      "model": "buildscape:block/creaking_heart"
+    },
+    "axis=z": {
+      "model": "buildscape:block/creaking_heart_horizontal",
+      "x": 90
+    },
+    "axis=x": {
+      "model": "buildscape:block/creaking_heart_horizontal",
+      "x": 90,
+      "y": 90
+    }
+  }
+}

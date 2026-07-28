@@ -1,9 +1,9 @@
 {
-    "parent":  "minecraft:block/slab_top",
-    "textures":  {
-                     "bottom":  "buildscape:block/smooth_basalt",
-                     "top":  "buildscape:block/smooth_basalt",
-                     "side":  "buildscape:block/smooth_basalt",
-                     "particle":  "#side"
-                 }
+  "parent": "minecraft:block/slab_top",
+  "textures": {
+    "bottom": "buildscape:block/smooth_basalt",
+    "top": "buildscape:block/smooth_basalt",
+    "side": "buildscape:block/smooth_basalt",
+    "particle": "#side"
+  }
 }

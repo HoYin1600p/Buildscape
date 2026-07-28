@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "building",
+  "ingredients": [
+    {
+      "item": "buildscape:pale_oak_log_slab"
+    }
+  ],
+  "result": {
+    "item": "buildscape:pale_oak_log_vertical_slab",
+    "count": 1
+  }
+}

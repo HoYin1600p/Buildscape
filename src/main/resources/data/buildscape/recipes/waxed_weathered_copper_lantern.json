@@ -1,0 +1,28 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "NNN",
+    "NTN",
+    "NBN"
+  ],
+  "key": {
+    "N": [
+      {
+        "item": "buildscape:copper_nugget"
+      },
+      {
+        "tag": "forge:nuggets/copper"
+      }
+    ],
+    "T": {
+      "item": "buildscape:copper_torch"
+    },
+    "B": {
+      "item": "minecraft:waxed_weathered_copper"
+    }
+  },
+  "result": {
+    "item": "buildscape:waxed_weathered_copper_lantern",
+    "count": 1
+  }
+}

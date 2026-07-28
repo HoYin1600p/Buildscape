@@ -52,6 +52,24 @@ public final class BuildscapeRenderLayers {
                 path.endsWith("_door") ||
                 path.endsWith("_trapdoor") ||
                 path.endsWith("_sign") ||
+                path.contains("sapling") ||
+                path.contains("flower") ||
+                path.contains("bush") ||
+                path.contains("grass") ||
+                path.contains("moss") ||
+                path.contains("vein") ||
+                path.contains("torch") ||
+                path.contains("lantern") ||
+                path.contains("dandelion") ||
+                path.contains("eyeblossom") ||
+                path.contains("copper_bars") ||
+                path.contains("litter") ||
+                path.contains("resin_clump") ||
+                path.contains("copper_grate") ||
+                path.contains("copper_rod") ||
+                path.contains("sculk") ||
+                path.contains("sensor") ||
+                path.contains("shrieker") ||
                 isCutoutExact(path)
         ) {
             return RenderType.cutout();

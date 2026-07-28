@@ -3,5 +3,6 @@
   "textures": {
     "wool": "buildscape:block/yellow_moss_block",
     "particle": "buildscape:block/yellow_moss_block"
-  }
+  },
+  "render_type": "cutout"
 }

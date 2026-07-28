@@ -1,0 +1,11 @@
+{
+  "parent": "buildscape:block/template_sculk_shrieker",
+  "textures": {
+    "bottom": "buildscape:block/sculk_shrieker_bottom",
+    "inner_top": "buildscape:block/sculk_shrieker_can_summon_inner_top",
+    "particle": "buildscape:block/sculk_shrieker_bottom",
+    "side": "buildscape:block/sculk_shrieker_side",
+    "top": "buildscape:block/sculk_shrieker_top"
+  },
+  "render_type": "cutout"
+}

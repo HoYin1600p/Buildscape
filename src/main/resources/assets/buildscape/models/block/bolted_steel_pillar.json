@@ -1,8 +1,8 @@
 {
-    "parent":  "block/cube_column",
-    "textures":  {
-                     "end":  "buildscape:block/bolted_steel_pillar",
-                     "side":  "buildscape:block/bolted_steel_pillar",
-                     "particle":  "#side"
-                 }
+  "parent": "block/cube_column",
+  "textures": {
+    "end": "buildscape:block/bolted_steel_pillar",
+    "side": "buildscape:block/bolted_steel_pillar",
+    "particle": "#side"
+  }
 }

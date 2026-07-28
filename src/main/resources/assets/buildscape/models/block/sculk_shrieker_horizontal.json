@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/cube_column_horizontal",
+  "textures": {
+    "end": "buildscape:block/sculk_shrieker_top",
+    "side": "buildscape:block/sculk_shrieker_side"
+  },
+  "render_type": "cutout"
+}

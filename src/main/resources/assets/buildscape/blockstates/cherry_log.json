@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "axis=y": {
+      "model": "buildscape:block/cherry_log"
+    },
+    "axis=z": {
+      "model": "buildscape:block/cherry_log_horizontal",
+      "x": 90
+    },
+    "axis=x": {
+      "model": "buildscape:block/cherry_log_horizontal",
+      "x": 90,
+      "y": 90
+    }
+  }
+}

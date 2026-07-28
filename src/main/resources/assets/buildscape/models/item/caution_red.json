@@ -1,1 +1,3 @@
-{"parent": "buildscape:block/caution_red"}
+{
+  "parent": "buildscape:block/caution_red"
+}

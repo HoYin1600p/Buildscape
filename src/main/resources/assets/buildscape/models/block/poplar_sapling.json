@@ -1,5 +1,5 @@
 {
-  "render_type": "minecraft:cutout",
+  "render_type": "cutout",
   "parent": "minecraft:block/cross",
   "textures": {
     "cross": "buildscape:block/poplar_sapling"

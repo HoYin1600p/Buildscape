@@ -41,4 +41,8 @@ public class ModParticles {
             PARTICLES.register("cascade", () -> new SimpleParticleType(false));
     public static final RegistryObject<SimpleParticleType> NOXIOUS_GAS =
             PARTICLES.register("noxious_gas", () -> new SimpleParticleType(false));
+    public static final RegistryObject<SimpleParticleType> COPPER_FIRE_FLAME =
+            PARTICLES.register("copper_fire_flame", () -> new SimpleParticleType(false));
+    public static final RegistryObject<SimpleParticleType> FIREFLY =
+            PARTICLES.register("firefly", () -> new SimpleParticleType(false));
 }

@@ -1,1 +1,6 @@
-{"parent": "minecraft:block/wall_inventory", "textures": {"wall": "buildscape:block/steel_block"}}
+{
+  "parent": "minecraft:block/wall_inventory",
+  "textures": {
+    "wall": "buildscape:block/steel_block"
+  }
+}

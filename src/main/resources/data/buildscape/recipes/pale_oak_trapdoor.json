@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "wooden_trapdoor",
+  "pattern": [
+    "###",
+    "###"
+  ],
+  "key": {
+    "#": {
+      "item": "buildscape:pale_oak_planks"
+    }
+  },
+  "result": {
+    "item": "buildscape:pale_oak_trapdoor",
+    "count": 2
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "parent": "buildscape:block/cross_emissive",
+  "textures": {
+    "cross": "buildscape:block/open_eyeblossom",
+    "cross_emissive": "buildscape:block/open_eyeblossom_emissive"
+  }
+}

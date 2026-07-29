@@ -87,6 +87,16 @@ public class BuildScape {
 
         event.enqueueWork(() -> {
             com.kingodogo.buildscape.network.ModMessages.register();
+            try {
+                net.minecraftforge.fml.util.ObfuscationReflectionHelper.setPrivateValue(
+                        net.minecraft.world.item.Item.class, net.minecraft.world.item.Items.POTION, 16, "f_41370_");
+                net.minecraftforge.fml.util.ObfuscationReflectionHelper.setPrivateValue(
+                        net.minecraft.world.item.Item.class, net.minecraft.world.item.Items.SPLASH_POTION, 16, "f_41370_");
+                net.minecraftforge.fml.util.ObfuscationReflectionHelper.setPrivateValue(
+                        net.minecraft.world.item.Item.class, net.minecraft.world.item.Items.LINGERING_POTION, 16, "f_41370_");
+            } catch (Exception e) {
+                LOGGER.error("Failed to set max stack size for potions", e);
+            }
         });
 
         event.enqueueWork(() -> {
@@ -540,7 +550,10 @@ public class BuildScape {
                 com.kingodogo.buildscape.network.ModMessages.INSTANCE.send(
                     net.minecraftforge.network.PacketDistributor.PLAYER.with(() -> serverPlayer),
                     new com.kingodogo.buildscape.network.SyncGameRulesPacket(
-                        serverPlayer.getLevel().getGameRules().getBoolean(com.kingodogo.buildscape.world.ModGameRules.FAST_LEAF_DECAY)
+                        serverPlayer.getLevel().getGameRules().getBoolean(com.kingodogo.buildscape.world.ModGameRules.FAST_LEAF_DECAY),
+                        serverPlayer.getLevel().getGameRules().getBoolean(com.kingodogo.buildscape.world.ModGameRules.DISABLE_ENDERMAN_GRIEFING),
+                        serverPlayer.getLevel().getGameRules().getBoolean(com.kingodogo.buildscape.world.ModGameRules.DISABLE_CREEPER_GRIEFING),
+                        serverPlayer.getLevel().getGameRules().getBoolean(com.kingodogo.buildscape.world.ModGameRules.DISABLE_GHAST_GRIEFING)
                     )
                 );
                 
@@ -548,6 +561,27 @@ public class BuildScape {
                 schedulePillarIdSync(server, serverPlayer, manager, 0);
             }
 
+        }
+    }
+
+    @SubscribeEvent
+    public void onMobGriefing(net.minecraftforge.event.entity.EntityMobGriefingEvent event) {
+        net.minecraft.world.entity.Entity entity = event.getEntity();
+        if (entity != null && entity.level != null) {
+            if (entity instanceof net.minecraft.world.entity.monster.EnderMan) {
+                if (entity.level.getGameRules().getBoolean(com.kingodogo.buildscape.world.ModGameRules.DISABLE_ENDERMAN_GRIEFING)) {
+                    event.setResult(net.minecraftforge.eventbus.api.Event.Result.DENY);
+                }
+            } else if (entity instanceof net.minecraft.world.entity.monster.Creeper) {
+                if (entity.level.getGameRules().getBoolean(com.kingodogo.buildscape.world.ModGameRules.DISABLE_CREEPER_GRIEFING)) {
+                    event.setResult(net.minecraftforge.eventbus.api.Event.Result.DENY);
+                }
+            } else if (entity instanceof net.minecraft.world.entity.monster.Ghast || 
+                       entity instanceof net.minecraft.world.entity.projectile.LargeFireball) {
+                if (entity.level.getGameRules().getBoolean(com.kingodogo.buildscape.world.ModGameRules.DISABLE_GHAST_GRIEFING)) {
+                    event.setResult(net.minecraftforge.eventbus.api.Event.Result.DENY);
+                }
+            }
         }
     }
 
@@ -846,6 +880,33 @@ public class BuildScape {
                         8,
                         1,
                         0.05f));
+
+        event
+                .getGenericTrades()
+                .add((trader, rand) -> new net.minecraft.world.item.trading.MerchantOffer(
+                        new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.EMERALD, 1),
+                        new net.minecraft.world.item.ItemStack(ModItems.POPLAR_SAPLING.get(), 2),
+                        8,
+                        1,
+                        0.05f));
+
+        event
+                .getGenericTrades()
+                .add((trader, rand) -> new net.minecraft.world.item.trading.MerchantOffer(
+                        new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.EMERALD, 1),
+                        new net.minecraft.world.item.ItemStack(ModItems.CHERRY_SAPLING.get(), 2),
+                        8,
+                        1,
+                        0.05f));
+
+        event
+                .getGenericTrades()
+                .add((trader, rand) -> new net.minecraft.world.item.trading.MerchantOffer(
+                        new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.EMERALD, 1),
+                        new net.minecraft.world.item.ItemStack(ModItems.PALE_OAK_SAPLING.get(), 2),
+                        8,
+                        1,
+                        0.05f));
         
         event
                 .getGenericTrades()
@@ -1115,15 +1176,15 @@ public class BuildScape {
                         0.05f));
 
         event
-                .getGenericTrades()
+                .getRareTrades()
                 .add((trader, rand) -> {
-                    if (rand.nextFloat() <= 0.15f) { // 15% chance
+                    if (rand.nextFloat() <= 0.10f) {
                         return new net.minecraft.world.item.trading.MerchantOffer(
                                 new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.DIAMOND, 12),
                                 new net.minecraft.world.item.ItemStack(ModItems.ANCIENT_ASHEN_SCROLL.get(), 1),
-                                1, // max uses
-                                1, // xp reward
-                                0.0f// multiplier
+                                1,
+                                1,
+                                0.0f
                         );
                     }
                     return null;
@@ -1166,6 +1227,10 @@ public class BuildScape {
         net.minecraft.world.item.ItemStack heldItem = event
                 .getPlayer()
                 .getItemInHand(event.getHand());
+
+        if (com.kingodogo.buildscape.block.CopperOxidationHandler.handleRightClick(event)) {
+            return;
+        }
 
         if (state.getBlock() instanceof net.minecraft.world.level.block.VineBlock) {
             if (heldItem.is(net.minecraft.world.item.Items.SHEARS)) {
@@ -1302,75 +1367,7 @@ public class BuildScape {
             return;
         }
 
-        if (state.getBlock() == ModBlocks.POPLAR_LOG.get()
-                && heldItem.getItem() instanceof net.minecraft.world.item.AxeItem) {
-            net.minecraft.core.BlockPos pos = event.getPos();
-            net.minecraft.world.level.Level level = event.getWorld();
-            net.minecraft.world.entity.player.Player player = event.getPlayer();
-
-            net.minecraft.core.Direction.Axis axis = state.getValue(
-                    net.minecraft.world.level.block.RotatedPillarBlock.AXIS);
-
-            level.setBlock(
-                    pos,
-                    ModBlocks.STRIPPED_POPLAR_LOG.get()
-                            .defaultBlockState()
-                            .setValue(
-                                    net.minecraft.world.level.block.RotatedPillarBlock.AXIS,
-                                    axis),
-                    11);
-
-            level.playSound(
-                    null,
-                    pos,
-                    net.minecraft.sounds.SoundEvents.AXE_STRIP,
-                    net.minecraft.sounds.SoundSource.BLOCKS,
-                    1.0f,
-                    1.0f);
-
-            if (!player.getAbilities().instabuild) {
-                heldItem.hurtAndBreak(1, player, p -> p.broadcastBreakEvent(event.getHand()));
-            }
-
-            event.setCanceled(true);
-            event.setCancellationResult(
-                    net.minecraft.world.InteractionResult.SUCCESS);
-            return;
-        }
-
-        if (state.getBlock() == ModBlocks.POPLAR_WOOD.get()
-                && heldItem.getItem() instanceof net.minecraft.world.item.AxeItem) {
-            net.minecraft.core.BlockPos pos = event.getPos();
-            net.minecraft.world.level.Level level = event.getWorld();
-            net.minecraft.world.entity.player.Player player = event.getPlayer();
-
-            net.minecraft.core.Direction.Axis axis = state.getValue(
-                    net.minecraft.world.level.block.RotatedPillarBlock.AXIS);
-
-            level.setBlock(
-                    pos,
-                    ModBlocks.STRIPPED_POPLAR_WOOD.get()
-                            .defaultBlockState()
-                            .setValue(
-                                    net.minecraft.world.level.block.RotatedPillarBlock.AXIS,
-                                    axis),
-                    11);
-
-            level.playSound(
-                    null,
-                    pos,
-                    net.minecraft.sounds.SoundEvents.AXE_STRIP,
-                    net.minecraft.sounds.SoundSource.BLOCKS,
-                    1.0f,
-                    1.0f);
-
-            if (!player.getAbilities().instabuild) {
-                heldItem.hurtAndBreak(1, player, p -> p.broadcastBreakEvent(event.getHand()));
-            }
-
-            event.setCanceled(true);
-            event.setCancellationResult(
-                    net.minecraft.world.InteractionResult.SUCCESS);
+        if (com.kingodogo.buildscape.block.LogStrippingHandler.handleAxeStrip(event)) {
             return;
         }
 
@@ -1690,6 +1687,10 @@ public class BuildScape {
                         com.kingodogo.buildscape.entity.ModEntities.SEAT_ENTITY.get(),
                         net.minecraft.client.renderer.entity.NoopRenderer::new);
 
+                net.minecraft.client.renderer.entity.EntityRenderers.register(
+                        com.kingodogo.buildscape.entity.ModEntities.WANDERING_HOMEMAKER.get(),
+                        com.kingodogo.buildscape.client.renderer.WanderingHomemakerRenderer::new);
+
 
 
 
@@ -1847,6 +1848,38 @@ public class BuildScape {
                         ModBlocks.JUNGLE_LEAF_HEDGE.get(),
                         ModBlocks.ACACIA_LEAF_HEDGE.get(),
                         ModBlocks.DARK_OAK_LEAF_HEDGE.get());
+
+                blockColors.register(
+                        (state, reader, pos, tintIndex) -> {
+                            if (tintIndex != 0) return -1;
+                            if (reader != null && pos != null) {
+                                return net.minecraft.client.renderer.BiomeColors.getAverageFoliageColor(reader, pos);
+                            }
+                            return net.minecraft.world.level.FoliageColor.getDefaultColor();
+                        },
+                        ModBlocks.BUSH.get());
+
+                blockColors.register(
+                        (state, reader, pos, tintIndex) -> {
+                            if (tintIndex != 0) return -1;
+                            if (reader != null && pos != null) {
+                                return com.kingodogo.buildscape.client.DryFoliageColor.getDryFoliageColor(reader, pos);
+                            }
+                            return com.kingodogo.buildscape.client.DryFoliageColor.getDefaultColor();
+                        },
+                        ModBlocks.LEAF_LITTER.get());
+
+                blockColors.register(
+                        (state, reader, pos, tintIndex) -> {
+                            if (tintIndex == 1 || tintIndex == 0) {
+                                if (reader != null && pos != null) {
+                                    return net.minecraft.client.renderer.BiomeColors.getAverageFoliageColor(reader, pos);
+                                }
+                                return net.minecraft.world.level.FoliageColor.getDefaultColor();
+                            }
+                            return -1;
+                        },
+                        ModBlocks.WILDFLOWERS.get());
 
                 blockColors.register(
                         (state, reader, pos, tintIndex) -> {
@@ -2018,16 +2051,17 @@ public class BuildScape {
                             if (tintIndex != 0) {
                                 return -1;
                             }
-
                             net.minecraft.world.item.Item item = stack.getItem();
                             if (item instanceof net.minecraft.world.item.BlockItem) {
                                 net.minecraft.world.level.block.Block block = ((net.minecraft.world.item.BlockItem) item)
                                         .getBlock();
 
                                 int color = -1;
-                                if (block == ModBlocks.OAK_LEAF_HEDGE.get()
-                                        || block == ModBlocks.OAK_LEAF_LAYERS
-                                        .get()) {
+                                if (block == ModBlocks.LEAF_LITTER.get()) {
+                                    color = com.kingodogo.buildscape.client.DryFoliageColor.getDefaultColor();
+                                } else if (block == ModBlocks.BUSH.get()
+                                        || block == ModBlocks.OAK_LEAF_HEDGE.get()
+                                        || block == ModBlocks.OAK_LEAF_LAYERS.get()) {
                                     color = vanillaItemColors.getColor(
                                             new net.minecraft.world.item.ItemStack(
                                                     net.minecraft.world.item.Items.OAK_LEAVES),
@@ -2100,6 +2134,7 @@ public class BuildScape {
                         ModItems.DARK_OAK_LEAF_HEDGE.get(),
                         ModItems.AZALEA_LEAF_HEDGE.get(),
                         ModItems.FLOWERING_AZALEA_LEAF_HEDGE.get(),
+                        ModItems.BUSH.get(),
                         ModItems.SNOWY_OAK_LEAF_HEDGE.get(),
                         ModItems.SNOWY_SPRUCE_LEAF_HEDGE.get(),
                         ModItems.SNOWY_BIRCH_LEAF_HEDGE.get(),
@@ -2114,6 +2149,10 @@ public class BuildScape {
             });
         }
 
+        @SubscribeEvent
+        public static void registerLayerDefinitions(net.minecraftforge.client.event.EntityRenderersEvent.RegisterLayerDefinitions event) {
+            event.registerLayerDefinition(com.kingodogo.buildscape.client.model.WanderingHomemakerModel.LAYER_LOCATION, com.kingodogo.buildscape.client.model.WanderingHomemakerModel::createBodyLayer);
+        }
     }
 
     @Mod.EventBusSubscriber(modid = BuildScape.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
@@ -2392,6 +2431,225 @@ public class BuildScape {
                                             sprites
                                     )
                     );
+
+            net.minecraft.client.Minecraft.getInstance()
+                    .particleEngine.register(
+                            com.kingodogo.buildscape.particle.ModParticles.FIREFLY.get(),
+                            sprites ->
+                                    new com.kingodogo.buildscape.particle.FireflyParticle.Provider(
+                                            sprites
+                                    )
+                    );
+
+            net.minecraft.client.Minecraft.getInstance()
+                    .particleEngine.register(
+                            com.kingodogo.buildscape.particle.ModParticles.COPPER_FIRE_FLAME.get(),
+                            net.minecraft.client.particle.FlameParticle.Provider::new
+                    );
+        }
+    }
+
+    @SubscribeEvent
+    public static void onEntityInteract(net.minecraftforge.event.entity.player.PlayerInteractEvent.EntityInteract event) {
+        if (event.getTarget() instanceof net.minecraft.world.entity.AgeableMob mob) {
+            net.minecraft.world.item.ItemStack held = event.getItemStack();
+            if (held.is(ModItems.GOLDEN_DANDELION.get()) && mob.isBaby()) {
+                net.minecraft.nbt.CompoundTag data = mob.getPersistentData();
+                boolean isFrozen = data.getBoolean("buildscape:frozen_growth");
+                net.minecraft.world.level.Level level = event.getWorld();
+                if (!level.isClientSide) {
+                    if (!isFrozen) {
+                        data.putBoolean("buildscape:frozen_growth", true);
+                        ((net.minecraft.server.level.ServerLevel) level).sendParticles(net.minecraft.core.particles.ParticleTypes.WAX_OFF, mob.getX(), mob.getY() + mob.getBbHeight() * 0.5D, mob.getZ(), 12, 0.3D, 0.3D, 0.3D, 0.05D);
+                        level.playSound(null, mob.blockPosition(), net.minecraft.sounds.SoundEvents.HONEYCOMB_WAX_ON, net.minecraft.sounds.SoundSource.NEUTRAL, 1.0F, 1.0F);
+                    } else {
+                        data.remove("buildscape:frozen_growth");
+                        ((net.minecraft.server.level.ServerLevel) level).sendParticles(net.minecraft.core.particles.ParticleTypes.HAPPY_VILLAGER, mob.getX(), mob.getY() + mob.getBbHeight() * 0.5D, mob.getZ(), 12, 0.3D, 0.3D, 0.3D, 0.05D);
+                        level.playSound(null, mob.blockPosition(), net.minecraft.sounds.SoundEvents.VILLAGER_YES, net.minecraft.sounds.SoundSource.NEUTRAL, 1.0F, 1.0F);
+                    }
+                    if (!event.getPlayer().getAbilities().instabuild) {
+                        held.shrink(1);
+                    }
+                }
+                event.setCanceled(true);
+                event.setCancellationResult(net.minecraft.world.InteractionResult.SUCCESS);
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public static void onLivingUpdate(net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent event) {
+        if (event.getEntityLiving() instanceof net.minecraft.world.entity.AgeableMob mob) {
+            if (mob.getPersistentData().getBoolean("buildscape:frozen_growth") && mob.isBaby()) {
+                mob.setAge(-24000);
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public void onLivingDeath(net.minecraftforge.event.entity.living.LivingDeathEvent event) {
+        if (event.getEntityLiving().level.isClientSide) return;
+        net.minecraft.world.entity.LivingEntity entity = event.getEntityLiving();
+        net.minecraft.world.level.Level level = entity.level;
+        net.minecraft.core.BlockPos deathPos = entity.blockPosition();
+
+        for (net.minecraft.core.BlockPos pos : net.minecraft.core.BlockPos.betweenClosed(deathPos.offset(-8, -8, -8), deathPos.offset(8, 8, 8))) {
+            if (level.getBlockState(pos).is(ModBlocks.SCULK_CATALYST.get())) {
+                com.kingodogo.buildscape.block.SculkCatalystHandler.onMobKilledNearCatalyst(level, pos, deathPos, entity);
+                break;
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public void onSculkBlockBreak(net.minecraftforge.event.world.BlockEvent.BreakEvent event) {
+        if (event.getPlayer() != null && !event.getPlayer().isCreative()) {
+            net.minecraft.world.item.ItemStack tool = event.getPlayer().getMainHandItem();
+            int silkTouch = net.minecraft.world.item.enchantment.EnchantmentHelper.getItemEnchantmentLevel(net.minecraft.world.item.enchantment.Enchantments.SILK_TOUCH, tool);
+            if (silkTouch == 0) {
+                net.minecraft.world.level.block.state.BlockState state = event.getState();
+                if (state.is(ModBlocks.SCULK.get()) || state.is(ModBlocks.SCULK_VEIN.get()) || state.is(ModBlocks.SCULK_SLAB.get()) || state.is(ModBlocks.SCULK_STAIRS.get()) || state.is(ModBlocks.SCULK_WALL.get()) || state.is(ModBlocks.SCULK_VERTICAL_SLAB.get())) {
+                    event.setExpToDrop(1);
+                } else if (state.is(ModBlocks.SCULK_CATALYST.get()) || state.is(ModBlocks.SCULK_SHRIEKER.get()) || state.is(ModBlocks.SCULK_SENSOR.get())) {
+                    event.setExpToDrop(5);
+                }
+            } else {
+                event.setExpToDrop(0);
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public void onBackportBonemealRightClickBlock(net.minecraftforge.event.entity.player.PlayerInteractEvent.RightClickBlock event) {
+        net.minecraft.world.item.ItemStack held = event.getItemStack();
+        if (held.is(net.minecraft.world.item.Items.BONE_MEAL)) {
+            net.minecraft.world.level.Level level = event.getWorld();
+            net.minecraft.core.BlockPos pos = event.getPos();
+            net.minecraft.world.level.block.state.BlockState state = level.getBlockState(pos);
+
+            // 1. Bonemeal Cactus Top -> Cactus Flower
+            if (state.is(net.minecraft.world.level.block.Blocks.CACTUS) && event.getFace() == net.minecraft.core.Direction.UP) {
+                net.minecraft.core.BlockPos above = pos.above();
+                if (level.isEmptyBlock(above)) {
+                    if (!level.isClientSide) {
+                        level.setBlock(above, ModBlocks.CACTUS_FLOWER.get().defaultBlockState(), 3);
+                        level.levelEvent(2005, pos, 0);
+                        if (!event.getPlayer().getAbilities().instabuild) held.shrink(1);
+                    }
+                    event.setCanceled(true);
+                    event.setCancellationResult(net.minecraft.world.InteractionResult.SUCCESS);
+                    return;
+                }
+            }
+
+            // 2. Bonemeal Sand -> Single-block Dry Grass
+            if ((state.is(net.minecraft.world.level.block.Blocks.SAND) || state.is(net.minecraft.world.level.block.Blocks.RED_SAND)) && event.getFace() == net.minecraft.core.Direction.UP) {
+                net.minecraft.core.BlockPos above = pos.above();
+                if (level.isEmptyBlock(above)) {
+                    if (!level.isClientSide) {
+                        level.setBlock(above, ModBlocks.DRY_GRASS.get().defaultBlockState(), 3);
+                        level.levelEvent(2005, pos, 0);
+                        if (!event.getPlayer().getAbilities().instabuild) held.shrink(1);
+                    }
+                    event.setCanceled(true);
+                    event.setCancellationResult(net.minecraft.world.InteractionResult.SUCCESS);
+                    return;
+                }
+            }
+
+            // 3. Bonemeal Grass Block -> Generates Bushes in radius
+            if (state.is(net.minecraft.world.level.block.Blocks.GRASS_BLOCK) && event.getFace() == net.minecraft.core.Direction.UP) {
+                if (!level.isClientSide) {
+                    net.minecraft.core.BlockPos.betweenClosedStream(pos.offset(-3, -1, -3), pos.offset(3, 1, 3)).forEach(checkPos -> {
+                        if (level.getBlockState(checkPos).is(net.minecraft.world.level.block.Blocks.GRASS_BLOCK) && level.isEmptyBlock(checkPos.above())) {
+                            if (level.random.nextFloat() < 0.25F) {
+                                level.setBlock(checkPos.above(), ModBlocks.BUSH.get().defaultBlockState(), 3);
+                            }
+                        }
+                    });
+                }
+            }
+
+            // 4. Bonemeal Moss Block -> Generates Firefly Bushes in radius alongside vanilla Moss Block bonemeal
+            if (state.is(net.minecraft.world.level.block.Blocks.MOSS_BLOCK) && event.getFace() == net.minecraft.core.Direction.UP) {
+                if (!level.isClientSide) {
+                    net.minecraft.core.BlockPos.betweenClosedStream(pos.offset(-3, -1, -3), pos.offset(3, 1, 3)).forEach(checkPos -> {
+                        if (level.getBlockState(checkPos).is(net.minecraft.world.level.block.Blocks.MOSS_BLOCK) && level.isEmptyBlock(checkPos.above())) {
+                            if (level.random.nextFloat() < 0.20F) {
+                                level.setBlock(checkPos.above(), ModBlocks.FIREFLY_BUSH.get().defaultBlockState(), 3);
+                            }
+                        }
+                    });
+                }
+            }
+
+            // 4. Bonemeal Pale Oak Leaves -> Pale Hanging Moss
+            if (state.is(ModBlocks.PALE_OAK_LEAVES.get())) {
+                net.minecraft.core.BlockPos targetPos = pos.below();
+                while (level.getBlockState(targetPos).is(ModBlocks.PALE_HANGING_MOSS.get())) {
+                    targetPos = targetPos.below();
+                }
+                if (level.isEmptyBlock(targetPos)) {
+                    if (!level.isClientSide) {
+                        level.setBlock(targetPos, ModBlocks.PALE_HANGING_MOSS.get().defaultBlockState().setValue(com.kingodogo.buildscape.block.HangingMossBlock.TIP, true), 3);
+                        level.levelEvent(2005, pos, 0);
+                        if (!event.getPlayer().getAbilities().instabuild) held.shrink(1);
+                    }
+                    event.setCanceled(true);
+                    event.setCancellationResult(net.minecraft.world.InteractionResult.SUCCESS);
+                    return;
+                }
+            }
+
+            // 5. Bonemeal Creaking Heart -> Spawns Resin Clump blocks on heart block faces
+            if (state.is(ModBlocks.CREAKING_HEART.get())) {
+                if (!level.isClientSide) {
+                    if (state.getBlock() instanceof com.kingodogo.buildscape.block.CreakingHeartBlock heart) {
+                        level.setBlock(pos, state.setValue(com.kingodogo.buildscape.block.CreakingHeartBlock.ACTIVE, true), 3);
+                    }
+                    java.util.List<net.minecraft.core.Direction> directions = new java.util.ArrayList<>(java.util.List.of(net.minecraft.core.Direction.NORTH, net.minecraft.core.Direction.SOUTH, net.minecraft.core.Direction.EAST, net.minecraft.core.Direction.WEST, net.minecraft.core.Direction.UP, net.minecraft.core.Direction.DOWN));
+                    java.util.Collections.shuffle(directions, level.random);
+                    int spawned = 0;
+                    for (net.minecraft.core.Direction dir : directions) {
+                        net.minecraft.core.BlockPos adjPos = pos.relative(dir);
+                        net.minecraft.core.Direction attachFace = dir.getOpposite();
+                        net.minecraft.world.level.block.state.properties.BooleanProperty faceProp = net.minecraft.world.level.block.GlowLichenBlock.getFaceProperty(attachFace);
+                        net.minecraft.world.level.block.state.BlockState adjState = level.getBlockState(adjPos);
+
+                        if (adjState.is(ModBlocks.RESIN_CLUMP.get())) {
+                            if (!adjState.getValue(faceProp)) {
+                                level.setBlock(adjPos, adjState.setValue(faceProp, true), 3);
+                                spawned++;
+                            }
+                        } else if (adjState.isAir() || adjState.getMaterial().isReplaceable()) {
+                            net.minecraft.world.level.block.state.BlockState newState = ModBlocks.RESIN_CLUMP.get().defaultBlockState().setValue(faceProp, true);
+                            level.setBlock(adjPos, newState, 3);
+                            spawned++;
+                        }
+                        if (spawned >= 2) break;
+                    }
+                    level.levelEvent(2005, pos, 0);
+                    if (!event.getPlayer().getAbilities().instabuild) held.shrink(1);
+                }
+                event.setCanceled(true);
+                event.setCancellationResult(net.minecraft.world.InteractionResult.SUCCESS);
+                return;
+            }
+
+            // 7. Bonemeal Tall Dry Grass -> Drops Short Dry Grass item
+            if (state.is(ModBlocks.TALL_DRY_GRASS.get())) {
+                if (!level.isClientSide) {
+                    net.minecraft.world.entity.item.ItemEntity item = new net.minecraft.world.entity.item.ItemEntity(
+                            level, pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D,
+                            new net.minecraft.world.item.ItemStack(ModItems.DRY_GRASS.get(), 1));
+                    level.addFreshEntity(item);
+                    level.levelEvent(2005, pos, 0);
+                    if (!event.getPlayer().getAbilities().instabuild) held.shrink(1);
+                }
+                event.setCanceled(true);
+                event.setCancellationResult(net.minecraft.world.InteractionResult.SUCCESS);
+                return;
+            }
         }
     }
 }

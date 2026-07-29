@@ -101,5 +101,12 @@ public class ModMessages {
                 UpdateGameRulePacket::decode,
                 UpdateGameRulePacket::handle
         );
+        INSTANCE.registerMessage(
+                id++,
+                SyncHomemakerCooldownPacket.class,
+                SyncHomemakerCooldownPacket::encode,
+                SyncHomemakerCooldownPacket::decode,
+                SyncHomemakerCooldownPacket::handle
+        );
     }
 }

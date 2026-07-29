@@ -4,7 +4,7 @@
   "textures": {
     "1": "buildscape:block/moss_overlay",
     "particle": "buildscape:block/moss_overlay",
-    "all": "minecraft:block/moss_block"
+    "all": "buildscape:block/moss_block"
   },
   "elements": [
     {

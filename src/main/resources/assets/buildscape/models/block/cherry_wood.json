@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cube_column",
+  "textures": {
+    "end": "buildscape:block/cherry_log",
+    "side": "buildscape:block/cherry_log"
+  }
+}

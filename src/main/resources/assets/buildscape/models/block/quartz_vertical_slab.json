@@ -1,9 +1,9 @@
 {
   "parent": "buildscape:block/template_vertical_slab",
   "textures": {
-    "bottom": "minecraft:block/quartz_block_bottom",
+    "bottom": "buildscape:block/quartz_block_bottom",
     "top": "minecraft:block/quartz_block_top",
-    "side": "minecraft:block/quartz_block_side",
+    "side": "buildscape:block/quartz_block_side",
     "particle": "#side"
   }
 }

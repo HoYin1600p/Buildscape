@@ -25,12 +25,20 @@ public class ColoredMossBlock extends ModBlock implements BonemealableBlock {
     private final Supplier<Block> carpet;
     private final Supplier<Block> overlay;
     private final Supplier<Block> layers;
+    private final Supplier<Block> sapling;
+    private final Supplier<Block> flower;
 
     public ColoredMossBlock(Properties properties, Supplier<Block> carpet, Supplier<Block> overlay, Supplier<Block> layers) {
+        this(properties, carpet, overlay, layers, () -> ModBlocks.POPLAR_SAPLING.get(), null);
+    }
+
+    public ColoredMossBlock(Properties properties, Supplier<Block> carpet, Supplier<Block> overlay, Supplier<Block> layers, Supplier<Block> sapling, Supplier<Block> flower) {
         super(properties);
         this.carpet = carpet;
         this.overlay = overlay;
         this.layers = layers;
+        this.sapling = sapling;
+        this.flower = flower;
     }
 
     @Override
@@ -98,11 +106,16 @@ public class ColoredMossBlock extends ModBlock implements BonemealableBlock {
             BlockPos targetPos = pos.offset(offsetX, offsetY, offsetZ);
             BlockState targetState = level.getBlockState(targetPos);
 
-            if (targetState.is(BlockTags.MOSS_REPLACEABLE)) {
-                // Change the block to this colored moss block
-                level.setBlock(targetPos, this.defaultBlockState(), 3);
+            boolean isMoss = targetState.is(this);
+            boolean isReplaceable = targetState.is(BlockTags.MOSS_REPLACEABLE);
 
-                // Try to spawn carpet/overlay/layers on top
+            if (isMoss || isReplaceable) {
+                if (isReplaceable) {
+                    // Change the block to this colored moss block
+                    level.setBlock(targetPos, this.defaultBlockState(), 3);
+                }
+
+                // Try to spawn carpet/overlay/layers/sapling/flower on top
                 BlockPos abovePos = targetPos.above();
                 BlockState aboveState = level.getBlockState(abovePos);
 
@@ -123,10 +136,19 @@ public class ColoredMossBlock extends ModBlock implements BonemealableBlock {
                         if (layersState.canSurvive(level, abovePos)) {
                             level.setBlock(abovePos, layersState, 3);
                         }
-                    } else if (rand < 60) { // 15% chance to place poplar sapling
-                        BlockState saplingState = ModBlocks.POPLAR_SAPLING.get().defaultBlockState();
-                        if (saplingState.canSurvive(level, abovePos)) {
-                            level.setBlock(abovePos, saplingState, 3);
+                    } else if (rand < 58) { // 13% chance to place sapling
+                        if (sapling != null && sapling.get() != null) {
+                            BlockState saplingState = sapling.get().defaultBlockState();
+                            if (saplingState.canSurvive(level, abovePos)) {
+                                level.setBlock(abovePos, saplingState, 3);
+                            }
+                        }
+                    } else if (rand < 70) { // 12% chance to place flower (e.g. eyeblossom)
+                        if (flower != null && flower.get() != null) {
+                            BlockState flowerState = flower.get().defaultBlockState();
+                            if (flowerState.canSurvive(level, abovePos)) {
+                                level.setBlock(abovePos, flowerState, 3);
+                            }
                         }
                     }
                 }

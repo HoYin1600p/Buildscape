@@ -4,6 +4,8 @@ import com.kingodogo.buildscape.BuildScape;
 import com.kingodogo.buildscape.block.ModBlocks;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.BedItem;
+import net.minecraft.world.item.DoubleHighBlockItem;
+import net.minecraft.world.item.StandingAndWallBlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -3770,6 +3772,51 @@ public class ModItems {
             ITEMS.register("stripped_mangrove_wood_wall", () ->
                             new BlockItem(
             ModBlocks.STRIPPED_MANGROVE_WOOD_WALL.get(),
+                                    createBlockItemProperties()
+                            )
+            );
+
+    public static final RegistryObject<Item> CHERRY_WOOD_WALL =
+            ITEMS.register("cherry_wood_wall", () ->
+                            new BlockItem(
+            ModBlocks.CHERRY_WOOD_WALL.get(),
+                                    createBlockItemProperties()
+                            )
+            );
+    public static final RegistryObject<Item> STRIPPED_CHERRY_WOOD_WALL =
+            ITEMS.register("stripped_cherry_wood_wall", () ->
+                            new BlockItem(
+            ModBlocks.STRIPPED_CHERRY_WOOD_WALL.get(),
+                                    createBlockItemProperties()
+                            )
+            );
+
+    public static final RegistryObject<Item> PALE_OAK_WOOD_WALL =
+            ITEMS.register("pale_oak_wood_wall", () ->
+                            new BlockItem(
+            ModBlocks.PALE_OAK_WOOD_WALL.get(),
+                                    createBlockItemProperties()
+                            )
+            );
+    public static final RegistryObject<Item> STRIPPED_PALE_OAK_WOOD_WALL =
+            ITEMS.register("stripped_pale_oak_wood_wall", () ->
+                            new BlockItem(
+            ModBlocks.STRIPPED_PALE_OAK_WOOD_WALL.get(),
+                                    createBlockItemProperties()
+                            )
+            );
+
+    public static final RegistryObject<Item> ASHPEN_WOOD_WALL =
+            ITEMS.register("ashpen_wood_wall", () ->
+                            new BlockItem(
+            ModBlocks.ASHPEN_WOOD_WALL.get(),
+                                    createBlockItemProperties()
+                            )
+            );
+    public static final RegistryObject<Item> STRIPPED_ASHPEN_WOOD_WALL =
+            ITEMS.register("stripped_ashpen_wood_wall", () ->
+                            new BlockItem(
+            ModBlocks.STRIPPED_ASHPEN_WOOD_WALL.get(),
                                     createBlockItemProperties()
                             )
             );
@@ -8066,6 +8113,18 @@ public class ModItems {
             () -> new BlockItem(ModBlocks.ASHPEN_WOOD_SLAB.get(), createBlockItemProperties()));
     public static final RegistryObject<Item> ASHPEN_WOOD_STAIRS = ITEMS.register("ashpen_wood_stairs",
             () -> new BlockItem(ModBlocks.ASHPEN_WOOD_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> STRIPPED_ASHPEN_LOG = ITEMS.register("stripped_ashpen_log",
+            () -> new BlockItem(ModBlocks.STRIPPED_ASHPEN_LOG.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> STRIPPED_ASHPEN_WOOD = ITEMS.register("stripped_ashpen_wood",
+            () -> new BlockItem(ModBlocks.STRIPPED_ASHPEN_WOOD.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> STRIPPED_ASHPEN_LOG_SLAB = ITEMS.register("stripped_ashpen_log_slab",
+            () -> new BlockItem(ModBlocks.STRIPPED_ASHPEN_LOG_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> STRIPPED_ASHPEN_LOG_STAIRS = ITEMS.register("stripped_ashpen_log_stairs",
+            () -> new BlockItem(ModBlocks.STRIPPED_ASHPEN_LOG_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> STRIPPED_ASHPEN_WOOD_SLAB = ITEMS.register("stripped_ashpen_wood_slab",
+            () -> new BlockItem(ModBlocks.STRIPPED_ASHPEN_WOOD_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> STRIPPED_ASHPEN_WOOD_STAIRS = ITEMS.register("stripped_ashpen_wood_stairs",
+            () -> new BlockItem(ModBlocks.STRIPPED_ASHPEN_WOOD_STAIRS.get(), createBlockItemProperties()));
 
 
     // Static vertical slab and stair block items generated from BuildScape horizontal variants.
@@ -8553,6 +8612,10 @@ public class ModItems {
             () -> new BlockItem(ModBlocks.ASHPEN_LOG_VERTICAL_SLAB.get(), createBlockItemProperties()));
     public static final RegistryObject<Item> ASHPEN_WOOD_VERTICAL_SLAB = ITEMS.register("ashpen_wood_vertical_slab",
             () -> new BlockItem(ModBlocks.ASHPEN_WOOD_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> STRIPPED_ASHPEN_LOG_VERTICAL_SLAB = ITEMS.register("stripped_ashpen_log_vertical_slab",
+            () -> new BlockItem(ModBlocks.STRIPPED_ASHPEN_LOG_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> STRIPPED_ASHPEN_WOOD_VERTICAL_SLAB = ITEMS.register("stripped_ashpen_wood_vertical_slab",
+            () -> new BlockItem(ModBlocks.STRIPPED_ASHPEN_WOOD_VERTICAL_SLAB.get(), createBlockItemProperties()));
     // End generated vertical variants.
 
     // Spool Items
@@ -9449,5 +9512,251 @@ public class ModItems {
     public static final RegistryObject<Item> BLACK_BIG_BOOK = ITEMS.register("black_big_book",
             () -> new BlockItem(ModBlocks.BLACK_BIG_BOOK.get(), createBlockItemProperties()));
 
+    // --- PALE OAK ITEMS ---
+    public static final RegistryObject<Item> PALE_OAK_LOG = ITEMS.register("pale_oak_log", () -> new BlockItem(ModBlocks.PALE_OAK_LOG.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> STRIPPED_PALE_OAK_LOG = ITEMS.register("stripped_pale_oak_log", () -> new BlockItem(ModBlocks.STRIPPED_PALE_OAK_LOG.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PALE_OAK_WOOD = ITEMS.register("pale_oak_wood", () -> new BlockItem(ModBlocks.PALE_OAK_WOOD.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> STRIPPED_PALE_OAK_WOOD = ITEMS.register("stripped_pale_oak_wood", () -> new BlockItem(ModBlocks.STRIPPED_PALE_OAK_WOOD.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PALE_OAK_PLANKS = ITEMS.register("pale_oak_planks", () -> new BlockItem(ModBlocks.PALE_OAK_PLANKS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PALE_OAK_STAIRS = ITEMS.register("pale_oak_stairs", () -> new BlockItem(ModBlocks.PALE_OAK_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PALE_OAK_SLAB = ITEMS.register("pale_oak_slab", () -> new BlockItem(ModBlocks.PALE_OAK_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PALE_OAK_VERTICAL_SLAB = ITEMS.register("pale_oak_vertical_slab", () -> new BlockItem(ModBlocks.PALE_OAK_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PALE_OAK_FENCE = ITEMS.register("pale_oak_fence", () -> new BlockItem(ModBlocks.PALE_OAK_FENCE.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PALE_OAK_FENCE_GATE = ITEMS.register("pale_oak_fence_gate", () -> new BlockItem(ModBlocks.PALE_OAK_FENCE_GATE.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PALE_OAK_DOOR = ITEMS.register("pale_oak_door", () -> new DoubleHighBlockItem(ModBlocks.PALE_OAK_DOOR.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PALE_OAK_TRAPDOOR = ITEMS.register("pale_oak_trapdoor", () -> new BlockItem(ModBlocks.PALE_OAK_TRAPDOOR.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PALE_OAK_BUTTON = ITEMS.register("pale_oak_button", () -> new BlockItem(ModBlocks.PALE_OAK_BUTTON.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PALE_OAK_PRESSURE_PLATE = ITEMS.register("pale_oak_pressure_plate", () -> new BlockItem(ModBlocks.PALE_OAK_PRESSURE_PLATE.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PALE_OAK_LEAVES = ITEMS.register("pale_oak_leaves", () -> new BlockItem(ModBlocks.PALE_OAK_LEAVES.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PALE_OAK_SAPLING = ITEMS.register("pale_oak_sapling", () -> new BlockItem(ModBlocks.PALE_OAK_SAPLING.get(), createBlockItemProperties()));
+
+    public static final RegistryObject<Item> PALE_OAK_LOG_SLAB = ITEMS.register("pale_oak_log_slab", () -> new BlockItem(ModBlocks.PALE_OAK_LOG_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PALE_OAK_LOG_VERTICAL_SLAB = ITEMS.register("pale_oak_log_vertical_slab", () -> new BlockItem(ModBlocks.PALE_OAK_LOG_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> STRIPPED_PALE_OAK_LOG_SLAB = ITEMS.register("stripped_pale_oak_log_slab", () -> new BlockItem(ModBlocks.STRIPPED_PALE_OAK_LOG_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> STRIPPED_PALE_OAK_LOG_VERTICAL_SLAB = ITEMS.register("stripped_pale_oak_log_vertical_slab", () -> new BlockItem(ModBlocks.STRIPPED_PALE_OAK_LOG_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PALE_OAK_WOOD_SLAB = ITEMS.register("pale_oak_wood_slab", () -> new BlockItem(ModBlocks.PALE_OAK_WOOD_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PALE_OAK_WOOD_VERTICAL_SLAB = ITEMS.register("pale_oak_wood_vertical_slab", () -> new BlockItem(ModBlocks.PALE_OAK_WOOD_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> STRIPPED_PALE_OAK_WOOD_SLAB = ITEMS.register("stripped_pale_oak_wood_slab", () -> new BlockItem(ModBlocks.STRIPPED_PALE_OAK_WOOD_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> STRIPPED_PALE_OAK_WOOD_VERTICAL_SLAB = ITEMS.register("stripped_pale_oak_wood_vertical_slab", () -> new BlockItem(ModBlocks.STRIPPED_PALE_OAK_WOOD_VERTICAL_SLAB.get(), createBlockItemProperties()));
+
+    // --- CHERRY ITEMS ---
+    public static final RegistryObject<Item> CHERRY_LOG = ITEMS.register("cherry_log", () -> new BlockItem(ModBlocks.CHERRY_LOG.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> STRIPPED_CHERRY_LOG = ITEMS.register("stripped_cherry_log", () -> new BlockItem(ModBlocks.STRIPPED_CHERRY_LOG.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> CHERRY_WOOD = ITEMS.register("cherry_wood", () -> new BlockItem(ModBlocks.CHERRY_WOOD.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> STRIPPED_CHERRY_WOOD = ITEMS.register("stripped_cherry_wood", () -> new BlockItem(ModBlocks.STRIPPED_CHERRY_WOOD.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> CHERRY_PLANKS = ITEMS.register("cherry_planks", () -> new BlockItem(ModBlocks.CHERRY_PLANKS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> CHERRY_STAIRS = ITEMS.register("cherry_stairs", () -> new BlockItem(ModBlocks.CHERRY_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> CHERRY_SLAB = ITEMS.register("cherry_slab", () -> new BlockItem(ModBlocks.CHERRY_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> CHERRY_VERTICAL_SLAB = ITEMS.register("cherry_vertical_slab", () -> new BlockItem(ModBlocks.CHERRY_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> CHERRY_FENCE = ITEMS.register("cherry_fence", () -> new BlockItem(ModBlocks.CHERRY_FENCE.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> CHERRY_FENCE_GATE = ITEMS.register("cherry_fence_gate", () -> new BlockItem(ModBlocks.CHERRY_FENCE_GATE.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> CHERRY_DOOR = ITEMS.register("cherry_door", () -> new DoubleHighBlockItem(ModBlocks.CHERRY_DOOR.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> CHERRY_TRAPDOOR = ITEMS.register("cherry_trapdoor", () -> new BlockItem(ModBlocks.CHERRY_TRAPDOOR.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> CHERRY_BUTTON = ITEMS.register("cherry_button", () -> new BlockItem(ModBlocks.CHERRY_BUTTON.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> CHERRY_PRESSURE_PLATE = ITEMS.register("cherry_pressure_plate", () -> new BlockItem(ModBlocks.CHERRY_PRESSURE_PLATE.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> CHERRY_LEAVES = ITEMS.register("cherry_leaves", () -> new BlockItem(ModBlocks.CHERRY_LEAVES.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> CHERRY_SAPLING = ITEMS.register("cherry_sapling", () -> new BlockItem(ModBlocks.CHERRY_SAPLING.get(), createBlockItemProperties()));
+
+    public static final RegistryObject<Item> CHERRY_LOG_SLAB = ITEMS.register("cherry_log_slab", () -> new BlockItem(ModBlocks.CHERRY_LOG_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> CHERRY_LOG_VERTICAL_SLAB = ITEMS.register("cherry_log_vertical_slab", () -> new BlockItem(ModBlocks.CHERRY_LOG_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> STRIPPED_CHERRY_LOG_SLAB = ITEMS.register("stripped_cherry_log_slab", () -> new BlockItem(ModBlocks.STRIPPED_CHERRY_LOG_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> STRIPPED_CHERRY_LOG_VERTICAL_SLAB = ITEMS.register("stripped_cherry_log_vertical_slab", () -> new BlockItem(ModBlocks.STRIPPED_CHERRY_LOG_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> CHERRY_WOOD_SLAB = ITEMS.register("cherry_wood_slab", () -> new BlockItem(ModBlocks.CHERRY_WOOD_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> CHERRY_WOOD_VERTICAL_SLAB = ITEMS.register("cherry_wood_vertical_slab", () -> new BlockItem(ModBlocks.CHERRY_WOOD_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> STRIPPED_CHERRY_WOOD_SLAB = ITEMS.register("stripped_cherry_wood_slab", () -> new BlockItem(ModBlocks.STRIPPED_CHERRY_WOOD_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> STRIPPED_CHERRY_WOOD_VERTICAL_SLAB = ITEMS.register("stripped_cherry_wood_vertical_slab", () -> new BlockItem(ModBlocks.STRIPPED_CHERRY_WOOD_VERTICAL_SLAB.get(), createBlockItemProperties()));
+
+    // --- PALE MOSS ITEMS ---
+    public static final RegistryObject<Item> PALE_MOSS_BLOCK = ITEMS.register("pale_moss_block", () -> new BlockItem(ModBlocks.PALE_MOSS_BLOCK.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PALE_MOSS_BLOCK_SLAB = ITEMS.register("pale_moss_block_slab", () -> new BlockItem(ModBlocks.PALE_MOSS_BLOCK_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PALE_MOSS_BLOCK_STAIRS = ITEMS.register("pale_moss_block_stairs", () -> new BlockItem(ModBlocks.PALE_MOSS_BLOCK_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PALE_MOSS_BLOCK_VERTICAL_SLAB = ITEMS.register("pale_moss_block_vertical_slab", () -> new BlockItem(ModBlocks.PALE_MOSS_BLOCK_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PALE_MOSS_CARPET = ITEMS.register("pale_moss_carpet", () -> new BlockItem(ModBlocks.PALE_MOSS_CARPET.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PALE_MOSS_LAYERS = ITEMS.register("pale_moss_layers", () -> new BlockItem(ModBlocks.PALE_MOSS_LAYERS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PALE_MOSS_OVERLAY = ITEMS.register("pale_moss_overlay", () -> new BlockItem(ModBlocks.PALE_MOSS_OVERLAY.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PALE_HANGING_MOSS = ITEMS.register("pale_hanging_moss", () -> new BlockItem(ModBlocks.PALE_HANGING_MOSS.get(), createBlockItemProperties()));
+
+    // --- RESIN & CREAKING HEART ---
+    public static final RegistryObject<Item> CREAKING_HEART = ITEMS.register("creaking_heart", () -> new BlockItem(ModBlocks.CREAKING_HEART.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> RESIN_CLUMP = ITEMS.register("resin_clump", () -> new BlockItem(ModBlocks.RESIN_CLUMP.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> RESIN_BLOCK = ITEMS.register("resin_block", () -> new BlockItem(ModBlocks.RESIN_BLOCK.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> RESIN_BLOCK_SLAB = ITEMS.register("resin_block_slab", () -> new BlockItem(ModBlocks.RESIN_BLOCK_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> RESIN_BLOCK_STAIRS = ITEMS.register("resin_block_stairs", () -> new BlockItem(ModBlocks.RESIN_BLOCK_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> RESIN_BLOCK_VERTICAL_SLAB = ITEMS.register("resin_block_vertical_slab", () -> new BlockItem(ModBlocks.RESIN_BLOCK_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> RESIN_BRICKS = ITEMS.register("resin_bricks", () -> new BlockItem(ModBlocks.RESIN_BRICKS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> RESIN_BRICK_SLAB = ITEMS.register("resin_brick_slab", () -> new BlockItem(ModBlocks.RESIN_BRICK_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> RESIN_BRICK_STAIRS = ITEMS.register("resin_brick_stairs", () -> new BlockItem(ModBlocks.RESIN_BRICK_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> RESIN_BRICK_WALL = ITEMS.register("resin_brick_wall", () -> new BlockItem(ModBlocks.RESIN_BRICK_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> RESIN_BRICK_VERTICAL_SLAB = ITEMS.register("resin_brick_vertical_slab", () -> new BlockItem(ModBlocks.RESIN_BRICK_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> CHISELED_RESIN_BRICKS = ITEMS.register("chiseled_resin_bricks", () -> new BlockItem(ModBlocks.CHISELED_RESIN_BRICKS.get(), createBlockItemProperties()));
+
+    // --- PLANTS & FLOWERS ---
+    public static final RegistryObject<Item> CLOSED_EYEBLOSSOM = ITEMS.register("closed_eyeblossom", () -> new BlockItem(ModBlocks.CLOSED_EYEBLOSSOM.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> OPEN_EYEBLOSSOM = ITEMS.register("open_eyeblossom", () -> new BlockItem(ModBlocks.OPEN_EYEBLOSSOM.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WILDFLOWERS = ITEMS.register("wildflowers", () -> new BlockItem(ModBlocks.WILDFLOWERS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LEAF_LITTER = ITEMS.register("leaf_litter", () -> new BlockItem(ModBlocks.LEAF_LITTER.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> CACTUS_FLOWER = ITEMS.register("cactus_flower", () -> new BlockItem(ModBlocks.CACTUS_FLOWER.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BUSH = ITEMS.register("bush", () -> new BlockItem(ModBlocks.BUSH.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> RED_BUSH = ITEMS.register("red_bush", () -> new BlockItem(ModBlocks.RED_BUSH.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> FIREFLY_BUSH = ITEMS.register("firefly_bush", () -> new BlockItem(ModBlocks.FIREFLY_BUSH.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> DRY_GRASS = ITEMS.register("dry_grass", () -> new BlockItem(ModBlocks.DRY_GRASS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> TALL_DRY_GRASS = ITEMS.register("tall_dry_grass", () -> new BlockItem(ModBlocks.TALL_DRY_GRASS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GOLDEN_DANDELION = ITEMS.register("golden_dandelion", () -> new BlockItem(ModBlocks.GOLDEN_DANDELION.get(), createBlockItemProperties()));
+
+    // --- FROGLIGHTS ---
+    public static final RegistryObject<Item> OCHRE_FROGLIGHT = ITEMS.register("ochre_froglight", () -> new BlockItem(ModBlocks.OCHRE_FROGLIGHT.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PEARLESCENT_FROGLIGHT = ITEMS.register("pearlescent_froglight", () -> new BlockItem(ModBlocks.PEARLESCENT_FROGLIGHT.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> VERDANT_FROGLIGHT = ITEMS.register("verdant_froglight", () -> new BlockItem(ModBlocks.VERDANT_FROGLIGHT.get(), createBlockItemProperties()));
+
+    // --- SCULK ITEMS ---
+    public static final RegistryObject<Item> SCULK = ITEMS.register("sculk", () -> new BlockItem(ModBlocks.SCULK.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> SCULK_SLAB = ITEMS.register("sculk_slab", () -> new BlockItem(ModBlocks.SCULK_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> SCULK_STAIRS = ITEMS.register("sculk_stairs", () -> new BlockItem(ModBlocks.SCULK_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> SCULK_WALL = ITEMS.register("sculk_wall", () -> new BlockItem(ModBlocks.SCULK_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> SCULK_VERTICAL_SLAB = ITEMS.register("sculk_vertical_slab", () -> new BlockItem(ModBlocks.SCULK_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> SCULK_VEIN = ITEMS.register("sculk_vein", () -> new BlockItem(ModBlocks.SCULK_VEIN.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> SCULK_CATALYST = ITEMS.register("sculk_catalyst", () -> new BlockItem(ModBlocks.SCULK_CATALYST.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> SCULK_SHRIEKER = ITEMS.register("sculk_shrieker", () -> new BlockItem(ModBlocks.SCULK_SHRIEKER.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> SCULK_SENSOR = ITEMS.register("sculk_sensor", () -> new BlockItem(ModBlocks.SCULK_SENSOR.get(), createBlockItemProperties()));
+
+    // --- COPPER LIGHTING & TORCH ---
+    public static final RegistryObject<Item> COPPER_TORCH = ITEMS.register("copper_torch", () -> new StandingAndWallBlockItem(ModBlocks.COPPER_TORCH.get(), ModBlocks.COPPER_WALL_TORCH.get(), createBlockItemProperties()));
+
+    // --- COPPER RODS ---
+    public static final RegistryObject<Item> COPPER_ROD = ITEMS.register("copper_rod", () -> new BlockItem(ModBlocks.COPPER_ROD.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WAXED_COPPER_ROD = ITEMS.register("waxed_copper_rod", () -> new BlockItem(ModBlocks.WAXED_COPPER_ROD.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> EXPOSED_COPPER_ROD = ITEMS.register("exposed_copper_rod", () -> new BlockItem(ModBlocks.EXPOSED_COPPER_ROD.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WAXED_EXPOSED_COPPER_ROD = ITEMS.register("waxed_exposed_copper_rod", () -> new BlockItem(ModBlocks.WAXED_EXPOSED_COPPER_ROD.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WEATHERED_COPPER_ROD = ITEMS.register("weathered_copper_rod", () -> new BlockItem(ModBlocks.WEATHERED_COPPER_ROD.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WAXED_WEATHERED_COPPER_ROD = ITEMS.register("waxed_weathered_copper_rod", () -> new BlockItem(ModBlocks.WAXED_WEATHERED_COPPER_ROD.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> OXIDIZED_COPPER_ROD = ITEMS.register("oxidized_copper_rod", () -> new BlockItem(ModBlocks.OXIDIZED_COPPER_ROD.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WAXED_OXIDIZED_COPPER_ROD = ITEMS.register("waxed_oxidized_copper_rod", () -> new BlockItem(ModBlocks.WAXED_OXIDIZED_COPPER_ROD.get(), createBlockItemProperties()));
+
+    // --- COPPER LANTERNS ---
+    public static final RegistryObject<Item> COPPER_LANTERN = ITEMS.register("copper_lantern", () -> new BlockItem(ModBlocks.COPPER_LANTERN.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WAXED_COPPER_LANTERN = ITEMS.register("waxed_copper_lantern", () -> new BlockItem(ModBlocks.WAXED_COPPER_LANTERN.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> EXPOSED_COPPER_LANTERN = ITEMS.register("exposed_copper_lantern", () -> new BlockItem(ModBlocks.EXPOSED_COPPER_LANTERN.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WAXED_EXPOSED_COPPER_LANTERN = ITEMS.register("waxed_exposed_copper_lantern", () -> new BlockItem(ModBlocks.WAXED_EXPOSED_COPPER_LANTERN.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WEATHERED_COPPER_LANTERN = ITEMS.register("weathered_copper_lantern", () -> new BlockItem(ModBlocks.WEATHERED_COPPER_LANTERN.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WAXED_WEATHERED_COPPER_LANTERN = ITEMS.register("waxed_weathered_copper_lantern", () -> new BlockItem(ModBlocks.WAXED_WEATHERED_COPPER_LANTERN.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> OXIDIZED_COPPER_LANTERN = ITEMS.register("oxidized_copper_lantern", () -> new BlockItem(ModBlocks.OXIDIZED_COPPER_LANTERN.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WAXED_OXIDIZED_COPPER_LANTERN = ITEMS.register("waxed_oxidized_copper_lantern", () -> new BlockItem(ModBlocks.WAXED_OXIDIZED_COPPER_LANTERN.get(), createBlockItemProperties()));
+
+    // --- COPPER EXPANSION ITEMS ---
+    public static final RegistryObject<Item> CHISELED_COPPER = ITEMS.register("chiseled_copper", () -> new BlockItem(ModBlocks.CHISELED_COPPER.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WAXED_CHISELED_COPPER = ITEMS.register("waxed_chiseled_copper", () -> new BlockItem(ModBlocks.WAXED_CHISELED_COPPER.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> EXPOSED_CHISELED_COPPER = ITEMS.register("exposed_chiseled_copper", () -> new BlockItem(ModBlocks.EXPOSED_CHISELED_COPPER.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WAXED_EXPOSED_CHISELED_COPPER = ITEMS.register("waxed_exposed_chiseled_copper", () -> new BlockItem(ModBlocks.WAXED_EXPOSED_CHISELED_COPPER.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WEATHERED_CHISELED_COPPER = ITEMS.register("weathered_chiseled_copper", () -> new BlockItem(ModBlocks.WEATHERED_CHISELED_COPPER.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WAXED_WEATHERED_CHISELED_COPPER = ITEMS.register("waxed_weathered_chiseled_copper", () -> new BlockItem(ModBlocks.WAXED_WEATHERED_CHISELED_COPPER.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> OXIDIZED_CHISELED_COPPER = ITEMS.register("oxidized_chiseled_copper", () -> new BlockItem(ModBlocks.OXIDIZED_CHISELED_COPPER.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WAXED_OXIDIZED_CHISELED_COPPER = ITEMS.register("waxed_oxidized_chiseled_copper", () -> new BlockItem(ModBlocks.WAXED_OXIDIZED_CHISELED_COPPER.get(), createBlockItemProperties()));
+
+    public static final RegistryObject<Item> COPPER_GRATE = ITEMS.register("copper_grate", () -> new BlockItem(ModBlocks.COPPER_GRATE.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WAXED_COPPER_GRATE = ITEMS.register("waxed_copper_grate", () -> new BlockItem(ModBlocks.WAXED_COPPER_GRATE.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> EXPOSED_COPPER_GRATE = ITEMS.register("exposed_copper_grate", () -> new BlockItem(ModBlocks.EXPOSED_COPPER_GRATE.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WAXED_EXPOSED_COPPER_GRATE = ITEMS.register("waxed_exposed_copper_grate", () -> new BlockItem(ModBlocks.WAXED_EXPOSED_COPPER_GRATE.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WEATHERED_COPPER_GRATE = ITEMS.register("weathered_copper_grate", () -> new BlockItem(ModBlocks.WEATHERED_COPPER_GRATE.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WAXED_WEATHERED_COPPER_GRATE = ITEMS.register("waxed_weathered_copper_grate", () -> new BlockItem(ModBlocks.WAXED_WEATHERED_COPPER_GRATE.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> OXIDIZED_COPPER_GRATE = ITEMS.register("oxidized_copper_grate", () -> new BlockItem(ModBlocks.OXIDIZED_COPPER_GRATE.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WAXED_OXIDIZED_COPPER_GRATE = ITEMS.register("waxed_oxidized_copper_grate", () -> new BlockItem(ModBlocks.WAXED_OXIDIZED_COPPER_GRATE.get(), createBlockItemProperties()));
+
+    public static final RegistryObject<Item> COPPER_BULB = ITEMS.register("copper_bulb", () -> new BlockItem(ModBlocks.COPPER_BULB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WAXED_COPPER_BULB = ITEMS.register("waxed_copper_bulb", () -> new BlockItem(ModBlocks.WAXED_COPPER_BULB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> EXPOSED_COPPER_BULB = ITEMS.register("exposed_copper_bulb", () -> new BlockItem(ModBlocks.EXPOSED_COPPER_BULB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WAXED_EXPOSED_COPPER_BULB = ITEMS.register("waxed_exposed_copper_bulb", () -> new BlockItem(ModBlocks.WAXED_EXPOSED_COPPER_BULB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WEATHERED_COPPER_BULB = ITEMS.register("weathered_copper_bulb", () -> new BlockItem(ModBlocks.WEATHERED_COPPER_BULB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WAXED_WEATHERED_COPPER_BULB = ITEMS.register("waxed_weathered_copper_bulb", () -> new BlockItem(ModBlocks.WAXED_WEATHERED_COPPER_BULB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> OXIDIZED_COPPER_BULB = ITEMS.register("oxidized_copper_bulb", () -> new BlockItem(ModBlocks.OXIDIZED_COPPER_BULB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WAXED_OXIDIZED_COPPER_BULB = ITEMS.register("waxed_oxidized_copper_bulb", () -> new BlockItem(ModBlocks.WAXED_OXIDIZED_COPPER_BULB.get(), createBlockItemProperties()));
+
+    public static final RegistryObject<Item> COPPER_DOOR = ITEMS.register("copper_door", () -> new DoubleHighBlockItem(ModBlocks.COPPER_DOOR.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WAXED_COPPER_DOOR = ITEMS.register("waxed_copper_door", () -> new DoubleHighBlockItem(ModBlocks.WAXED_COPPER_DOOR.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> EXPOSED_COPPER_DOOR = ITEMS.register("exposed_copper_door", () -> new DoubleHighBlockItem(ModBlocks.EXPOSED_COPPER_DOOR.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WAXED_EXPOSED_COPPER_DOOR = ITEMS.register("waxed_exposed_copper_door", () -> new DoubleHighBlockItem(ModBlocks.WAXED_EXPOSED_COPPER_DOOR.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WEATHERED_COPPER_DOOR = ITEMS.register("weathered_copper_door", () -> new DoubleHighBlockItem(ModBlocks.WEATHERED_COPPER_DOOR.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WAXED_WEATHERED_COPPER_DOOR = ITEMS.register("waxed_weathered_copper_door", () -> new DoubleHighBlockItem(ModBlocks.WAXED_WEATHERED_COPPER_DOOR.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> OXIDIZED_COPPER_DOOR = ITEMS.register("oxidized_copper_door", () -> new DoubleHighBlockItem(ModBlocks.OXIDIZED_COPPER_DOOR.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WAXED_OXIDIZED_COPPER_DOOR = ITEMS.register("waxed_oxidized_copper_door", () -> new DoubleHighBlockItem(ModBlocks.WAXED_OXIDIZED_COPPER_DOOR.get(), createBlockItemProperties()));
+
+    public static final RegistryObject<Item> COPPER_TRAPDOOR = ITEMS.register("copper_trapdoor", () -> new BlockItem(ModBlocks.COPPER_TRAPDOOR.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WAXED_COPPER_TRAPDOOR = ITEMS.register("waxed_copper_trapdoor", () -> new BlockItem(ModBlocks.WAXED_COPPER_TRAPDOOR.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> EXPOSED_COPPER_TRAPDOOR = ITEMS.register("exposed_copper_trapdoor", () -> new BlockItem(ModBlocks.EXPOSED_COPPER_TRAPDOOR.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WAXED_EXPOSED_COPPER_TRAPDOOR = ITEMS.register("waxed_exposed_copper_trapdoor", () -> new BlockItem(ModBlocks.WAXED_EXPOSED_COPPER_TRAPDOOR.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WEATHERED_COPPER_TRAPDOOR = ITEMS.register("weathered_copper_trapdoor", () -> new BlockItem(ModBlocks.WEATHERED_COPPER_TRAPDOOR.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WAXED_WEATHERED_COPPER_TRAPDOOR = ITEMS.register("waxed_weathered_copper_trapdoor", () -> new BlockItem(ModBlocks.WAXED_WEATHERED_COPPER_TRAPDOOR.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> OXIDIZED_COPPER_TRAPDOOR = ITEMS.register("oxidized_copper_trapdoor", () -> new BlockItem(ModBlocks.OXIDIZED_COPPER_TRAPDOOR.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WAXED_OXIDIZED_COPPER_TRAPDOOR = ITEMS.register("waxed_oxidized_copper_trapdoor", () -> new BlockItem(ModBlocks.WAXED_OXIDIZED_COPPER_TRAPDOOR.get(), createBlockItemProperties()));
+
+    public static final RegistryObject<Item> COPPER_BARS = ITEMS.register("copper_bars", () -> new BlockItem(ModBlocks.COPPER_BARS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WAXED_COPPER_BARS = ITEMS.register("waxed_copper_bars", () -> new BlockItem(ModBlocks.WAXED_COPPER_BARS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> EXPOSED_COPPER_BARS = ITEMS.register("exposed_copper_bars", () -> new BlockItem(ModBlocks.EXPOSED_COPPER_BARS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WAXED_EXPOSED_COPPER_BARS = ITEMS.register("waxed_exposed_copper_bars", () -> new BlockItem(ModBlocks.WAXED_EXPOSED_COPPER_BARS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WEATHERED_COPPER_BARS = ITEMS.register("weathered_copper_bars", () -> new BlockItem(ModBlocks.WEATHERED_COPPER_BARS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WAXED_WEATHERED_COPPER_BARS = ITEMS.register("waxed_weathered_copper_bars", () -> new BlockItem(ModBlocks.WAXED_WEATHERED_COPPER_BARS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> OXIDIZED_COPPER_BARS = ITEMS.register("oxidized_copper_bars", () -> new BlockItem(ModBlocks.OXIDIZED_COPPER_BARS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WAXED_OXIDIZED_COPPER_BARS = ITEMS.register("waxed_oxidized_copper_bars", () -> new BlockItem(ModBlocks.WAXED_OXIDIZED_COPPER_BARS.get(), createBlockItemProperties()));
+
+    // Copper Buttons
+    public static final RegistryObject<Item> COPPER_BUTTON = ITEMS.register("copper_button", () -> new BlockItem(ModBlocks.COPPER_BUTTON.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WAXED_COPPER_BUTTON = ITEMS.register("waxed_copper_button", () -> new BlockItem(ModBlocks.WAXED_COPPER_BUTTON.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> EXPOSED_COPPER_BUTTON = ITEMS.register("exposed_copper_button", () -> new BlockItem(ModBlocks.EXPOSED_COPPER_BUTTON.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WAXED_EXPOSED_COPPER_BUTTON = ITEMS.register("waxed_exposed_copper_button", () -> new BlockItem(ModBlocks.WAXED_EXPOSED_COPPER_BUTTON.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WEATHERED_COPPER_BUTTON = ITEMS.register("weathered_copper_button", () -> new BlockItem(ModBlocks.WEATHERED_COPPER_BUTTON.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WAXED_WEATHERED_COPPER_BUTTON = ITEMS.register("waxed_weathered_copper_button", () -> new BlockItem(ModBlocks.WAXED_WEATHERED_COPPER_BUTTON.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> OXIDIZED_COPPER_BUTTON = ITEMS.register("oxidized_copper_button", () -> new BlockItem(ModBlocks.OXIDIZED_COPPER_BUTTON.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WAXED_OXIDIZED_COPPER_BUTTON = ITEMS.register("waxed_oxidized_copper_button", () -> new BlockItem(ModBlocks.WAXED_OXIDIZED_COPPER_BUTTON.get(), createBlockItemProperties()));
+
+    // Copper Pressure Plates
+    public static final RegistryObject<Item> COPPER_PRESSURE_PLATE = ITEMS.register("copper_pressure_plate", () -> new BlockItem(ModBlocks.COPPER_PRESSURE_PLATE.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WAXED_COPPER_PRESSURE_PLATE = ITEMS.register("waxed_copper_pressure_plate", () -> new BlockItem(ModBlocks.WAXED_COPPER_PRESSURE_PLATE.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> EXPOSED_COPPER_PRESSURE_PLATE = ITEMS.register("exposed_copper_pressure_plate", () -> new BlockItem(ModBlocks.EXPOSED_COPPER_PRESSURE_PLATE.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WAXED_EXPOSED_COPPER_PRESSURE_PLATE = ITEMS.register("waxed_exposed_copper_pressure_plate", () -> new BlockItem(ModBlocks.WAXED_EXPOSED_COPPER_PRESSURE_PLATE.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WEATHERED_COPPER_PRESSURE_PLATE = ITEMS.register("weathered_copper_pressure_plate", () -> new BlockItem(ModBlocks.WEATHERED_COPPER_PRESSURE_PLATE.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WAXED_WEATHERED_COPPER_PRESSURE_PLATE = ITEMS.register("waxed_weathered_copper_pressure_plate", () -> new BlockItem(ModBlocks.WAXED_WEATHERED_COPPER_PRESSURE_PLATE.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> OXIDIZED_COPPER_PRESSURE_PLATE = ITEMS.register("oxidized_copper_pressure_plate", () -> new BlockItem(ModBlocks.OXIDIZED_COPPER_PRESSURE_PLATE.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WAXED_OXIDIZED_COPPER_PRESSURE_PLATE = ITEMS.register("waxed_oxidized_copper_pressure_plate", () -> new BlockItem(ModBlocks.WAXED_OXIDIZED_COPPER_PRESSURE_PLATE.get(), createBlockItemProperties()));
+
+    public static class WanderingHomemakerSpawnEggItem extends net.minecraftforge.common.ForgeSpawnEggItem {
+        public WanderingHomemakerSpawnEggItem(java.util.function.Supplier<? extends net.minecraft.world.entity.EntityType<? extends net.minecraft.world.entity.Mob>> type, int backgroundColor, int highlightColor, Item.Properties properties) {
+            super(type, backgroundColor, highlightColor, properties);
+        }
+
+        public int getColor(int tintIndex) {
+            return -1;
+        }
+
+        @Override
+        public void appendHoverText(net.minecraft.world.item.ItemStack stack, @javax.annotation.Nullable net.minecraft.world.level.Level level, java.util.List<net.minecraft.network.chat.Component> tooltip, net.minecraft.world.item.TooltipFlag flag) {
+            super.appendHoverText(stack, level, tooltip, flag);
+            tooltip.add(new net.minecraft.network.chat.TranslatableComponent("tooltip.buildscape.wandering_homemaker_spawn_egg.spawn_info"));
+            if (level != null) {
+                long currentTime = level.getGameTime();
+                long endTime = com.kingodogo.buildscape.client.HomemakerCooldownTracker.cooldownEndTime;
+                if (endTime > currentTime) {
+                    long remainingTicks = endTime - currentTime;
+                    long totalSeconds = remainingTicks / 20;
+                    long minutes = totalSeconds / 60;
+                    long seconds = totalSeconds % 60;
+                    tooltip.add(new net.minecraft.network.chat.TranslatableComponent("tooltip.buildscape.wandering_homemaker_spawn_egg.cooldown_active", minutes, seconds)
+                            .withStyle(net.minecraft.ChatFormatting.RED));
+                } else {
+                    tooltip.add(new net.minecraft.network.chat.TranslatableComponent("tooltip.buildscape.wandering_homemaker_spawn_egg.cooldown_ready")
+                            .withStyle(net.minecraft.ChatFormatting.GREEN));
+                }
+            }
+        }
+    }
+
+    public static final RegistryObject<Item> WANDERING_HOMEMAKER_SPAWN_EGG = ITEMS.register(
+            "wandering_homemaker_spawn_egg",
+            () -> new WanderingHomemakerSpawnEggItem(
+                    com.kingodogo.buildscape.entity.ModEntities.WANDERING_HOMEMAKER,
+                    0x5c3c24,
+                    0xe4b484,
+                    createBlockItemProperties()
+            )
+    );
 }
+
 

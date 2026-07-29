@@ -12016,5 +12016,25 @@ public class ModBlocks {
         public static final RegistryObject<Block> OXIDIZED_COPPER_BARS = BLOCKS.register("oxidized_copper_bars", () -> new IronBarsBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BARS).sound(SoundType.COPPER)));
         public static final RegistryObject<Block> WAXED_OXIDIZED_COPPER_BARS = BLOCKS.register("waxed_oxidized_copper_bars", () -> new IronBarsBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BARS).sound(SoundType.COPPER)));
 
+        // Copper Buttons
+        public static final RegistryObject<Block> COPPER_BUTTON = BLOCKS.register("copper_button", () -> new WeatheringButtonBlock(BlockBehaviour.Properties.copy(Blocks.COPPER_BLOCK).noCollission().strength(0.5F).sound(SoundType.COPPER)));
+        public static final RegistryObject<Block> WAXED_COPPER_BUTTON = BLOCKS.register("waxed_copper_button", () -> new ModButtonBlock(BlockBehaviour.Properties.copy(Blocks.COPPER_BLOCK).noCollission().strength(0.5F).sound(SoundType.COPPER)));
+        public static final RegistryObject<Block> EXPOSED_COPPER_BUTTON = BLOCKS.register("exposed_copper_button", () -> new WeatheringButtonBlock(BlockBehaviour.Properties.copy(Blocks.EXPOSED_COPPER).noCollission().strength(0.5F).sound(SoundType.COPPER)));
+        public static final RegistryObject<Block> WAXED_EXPOSED_COPPER_BUTTON = BLOCKS.register("waxed_exposed_copper_button", () -> new ModButtonBlock(BlockBehaviour.Properties.copy(Blocks.EXPOSED_COPPER).noCollission().strength(0.5F).sound(SoundType.COPPER)));
+        public static final RegistryObject<Block> WEATHERED_COPPER_BUTTON = BLOCKS.register("weathered_copper_button", () -> new WeatheringButtonBlock(BlockBehaviour.Properties.copy(Blocks.WEATHERED_COPPER).noCollission().strength(0.5F).sound(SoundType.COPPER)));
+        public static final RegistryObject<Block> WAXED_WEATHERED_COPPER_BUTTON = BLOCKS.register("waxed_weathered_copper_button", () -> new ModButtonBlock(BlockBehaviour.Properties.copy(Blocks.WEATHERED_COPPER).noCollission().strength(0.5F).sound(SoundType.COPPER)));
+        public static final RegistryObject<Block> OXIDIZED_COPPER_BUTTON = BLOCKS.register("oxidized_copper_button", () -> new WeatheringButtonBlock(BlockBehaviour.Properties.copy(Blocks.OXIDIZED_COPPER).noCollission().strength(0.5F).sound(SoundType.COPPER)));
+        public static final RegistryObject<Block> WAXED_OXIDIZED_COPPER_BUTTON = BLOCKS.register("waxed_oxidized_copper_button", () -> new ModButtonBlock(BlockBehaviour.Properties.copy(Blocks.OXIDIZED_COPPER).noCollission().strength(0.5F).sound(SoundType.COPPER)));
+
+        // Copper Pressure Plates
+        public static final RegistryObject<Block> COPPER_PRESSURE_PLATE = BLOCKS.register("copper_pressure_plate", () -> new WeatheringPressurePlateBlock(150, BlockBehaviour.Properties.copy(Blocks.COPPER_BLOCK).noCollission().strength(0.5F).sound(SoundType.COPPER)));
+        public static final RegistryObject<Block> WAXED_COPPER_PRESSURE_PLATE = BLOCKS.register("waxed_copper_pressure_plate", () -> new ModPressurePlateBlock(150, BlockBehaviour.Properties.copy(Blocks.COPPER_BLOCK).noCollission().strength(0.5F).sound(SoundType.COPPER)));
+        public static final RegistryObject<Block> EXPOSED_COPPER_PRESSURE_PLATE = BLOCKS.register("exposed_copper_pressure_plate", () -> new WeatheringPressurePlateBlock(150, BlockBehaviour.Properties.copy(Blocks.EXPOSED_COPPER).noCollission().strength(0.5F).sound(SoundType.COPPER)));
+        public static final RegistryObject<Block> WAXED_EXPOSED_COPPER_PRESSURE_PLATE = BLOCKS.register("waxed_exposed_copper_pressure_plate", () -> new ModPressurePlateBlock(150, BlockBehaviour.Properties.copy(Blocks.EXPOSED_COPPER).noCollission().strength(0.5F).sound(SoundType.COPPER)));
+        public static final RegistryObject<Block> WEATHERED_COPPER_PRESSURE_PLATE = BLOCKS.register("weathered_copper_pressure_plate", () -> new WeatheringPressurePlateBlock(150, BlockBehaviour.Properties.copy(Blocks.WEATHERED_COPPER).noCollission().strength(0.5F).sound(SoundType.COPPER)));
+        public static final RegistryObject<Block> WAXED_WEATHERED_COPPER_PRESSURE_PLATE = BLOCKS.register("waxed_weathered_copper_pressure_plate", () -> new ModPressurePlateBlock(150, BlockBehaviour.Properties.copy(Blocks.WEATHERED_COPPER).noCollission().strength(0.5F).sound(SoundType.COPPER)));
+        public static final RegistryObject<Block> OXIDIZED_COPPER_PRESSURE_PLATE = BLOCKS.register("oxidized_copper_pressure_plate", () -> new WeatheringPressurePlateBlock(150, BlockBehaviour.Properties.copy(Blocks.OXIDIZED_COPPER).noCollission().strength(0.5F).sound(SoundType.COPPER)));
+        public static final RegistryObject<Block> WAXED_OXIDIZED_COPPER_PRESSURE_PLATE = BLOCKS.register("waxed_oxidized_copper_pressure_plate", () -> new ModPressurePlateBlock(150, BlockBehaviour.Properties.copy(Blocks.OXIDIZED_COPPER).noCollission().strength(0.5F).sound(SoundType.COPPER)));
+
 }
 

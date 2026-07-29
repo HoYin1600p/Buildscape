@@ -377,6 +377,26 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.WAXED_WEATHERED_COPPER_BARS.get()));
             items.add(new ItemStack(ModItems.OXIDIZED_COPPER_BARS.get()));
             items.add(new ItemStack(ModItems.WAXED_OXIDIZED_COPPER_BARS.get()));
+
+            // Copper Buttons
+            items.add(new ItemStack(ModItems.COPPER_BUTTON.get()));
+            items.add(new ItemStack(ModItems.WAXED_COPPER_BUTTON.get()));
+            items.add(new ItemStack(ModItems.EXPOSED_COPPER_BUTTON.get()));
+            items.add(new ItemStack(ModItems.WAXED_EXPOSED_COPPER_BUTTON.get()));
+            items.add(new ItemStack(ModItems.WEATHERED_COPPER_BUTTON.get()));
+            items.add(new ItemStack(ModItems.WAXED_WEATHERED_COPPER_BUTTON.get()));
+            items.add(new ItemStack(ModItems.OXIDIZED_COPPER_BUTTON.get()));
+            items.add(new ItemStack(ModItems.WAXED_OXIDIZED_COPPER_BUTTON.get()));
+
+            // Copper Pressure Plates
+            items.add(new ItemStack(ModItems.COPPER_PRESSURE_PLATE.get()));
+            items.add(new ItemStack(ModItems.WAXED_COPPER_PRESSURE_PLATE.get()));
+            items.add(new ItemStack(ModItems.EXPOSED_COPPER_PRESSURE_PLATE.get()));
+            items.add(new ItemStack(ModItems.WAXED_EXPOSED_COPPER_PRESSURE_PLATE.get()));
+            items.add(new ItemStack(ModItems.WEATHERED_COPPER_PRESSURE_PLATE.get()));
+            items.add(new ItemStack(ModItems.WAXED_WEATHERED_COPPER_PRESSURE_PLATE.get()));
+            items.add(new ItemStack(ModItems.OXIDIZED_COPPER_PRESSURE_PLATE.get()));
+            items.add(new ItemStack(ModItems.WAXED_OXIDIZED_COPPER_PRESSURE_PLATE.get()));
             items.add(new ItemStack(ModItems.COPPER_CHAIN.get()));
             items.add(new ItemStack(ModItems.EXPOSED_COPPER_CHAIN.get()));
             items.add(new ItemStack(ModItems.WEATHERED_COPPER_CHAIN.get()));

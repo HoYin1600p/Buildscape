@@ -1722,6 +1722,11 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.PURPLE_REDSTONE_LAMP.get()));
             items.add(new ItemStack(ModItems.MAGENTA_REDSTONE_LAMP.get()));
             items.add(new ItemStack(ModItems.PINK_REDSTONE_LAMP.get()));
+
+            // --- FROGLIGHTS ---
+            items.add(new ItemStack(ModItems.OCHRE_FROGLIGHT.get()));
+            items.add(new ItemStack(ModItems.PEARLESCENT_FROGLIGHT.get()));
+            items.add(new ItemStack(ModItems.VERDANT_FROGLIGHT.get()));
             items.add(new ItemStack(ModItems.DECORATED_POT.get()));
             items.add(new ItemStack(ModItems.TRAPPED_DECORATED_POT.get()));
             items.add(new ItemStack(ModItems.WHITE_DECORATED_POT.get()));
@@ -2328,10 +2333,7 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
 
 
 
-            // --- FROGLIGHTS ---
-            items.add(new ItemStack(ModItems.OCHRE_FROGLIGHT.get()));
-            items.add(new ItemStack(ModItems.PEARLESCENT_FROGLIGHT.get()));
-            items.add(new ItemStack(ModItems.VERDANT_FROGLIGHT.get()));
+
 
             // --- SCULK FAMILY ---
             items.add(new ItemStack(ModItems.SCULK.get()));

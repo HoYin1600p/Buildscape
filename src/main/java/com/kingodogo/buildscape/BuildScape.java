@@ -846,6 +846,33 @@ public class BuildScape {
                         8,
                         1,
                         0.05f));
+
+        event
+                .getGenericTrades()
+                .add((trader, rand) -> new net.minecraft.world.item.trading.MerchantOffer(
+                        new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.EMERALD, 1),
+                        new net.minecraft.world.item.ItemStack(ModItems.POPLAR_SAPLING.get(), 2),
+                        8,
+                        1,
+                        0.05f));
+
+        event
+                .getGenericTrades()
+                .add((trader, rand) -> new net.minecraft.world.item.trading.MerchantOffer(
+                        new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.EMERALD, 1),
+                        new net.minecraft.world.item.ItemStack(ModItems.CHERRY_SAPLING.get(), 2),
+                        8,
+                        1,
+                        0.05f));
+
+        event
+                .getGenericTrades()
+                .add((trader, rand) -> new net.minecraft.world.item.trading.MerchantOffer(
+                        new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.EMERALD, 1),
+                        new net.minecraft.world.item.ItemStack(ModItems.PALE_OAK_SAPLING.get(), 2),
+                        8,
+                        1,
+                        0.05f));
         
         event
                 .getGenericTrades()

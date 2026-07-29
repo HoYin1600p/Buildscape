@@ -52,7 +52,10 @@ public class PillarIdJoinSyncHandler {
         ModMessages.INSTANCE.send(
                 net.minecraftforge.network.PacketDistributor.PLAYER.with(() -> player),
                 new com.kingodogo.buildscape.network.SyncGameRulesPacket(
-                        rules.getBoolean(com.kingodogo.buildscape.world.ModGameRules.FAST_LEAF_DECAY)
+                        rules.getBoolean(com.kingodogo.buildscape.world.ModGameRules.FAST_LEAF_DECAY),
+                        rules.getBoolean(com.kingodogo.buildscape.world.ModGameRules.DISABLE_ENDERMAN_GRIEFING),
+                        rules.getBoolean(com.kingodogo.buildscape.world.ModGameRules.DISABLE_CREEPER_GRIEFING),
+                        rules.getBoolean(com.kingodogo.buildscape.world.ModGameRules.DISABLE_GHAST_GRIEFING)
                 )
         );
     }

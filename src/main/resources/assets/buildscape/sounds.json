@@ -274,27 +274,27 @@
     "sounds": [
       {
         "name": "buildscape:block/flower_bed/step1",
-        "volume": 0.2,
+        "volume": 1.0,
         "pitch": 0.6
       },
       {
         "name": "buildscape:block/flower_bed/step2",
-        "volume": 0.2,
+        "volume": 1.0,
         "pitch": 0.6
       },
       {
         "name": "buildscape:block/flower_bed/step3",
-        "volume": 0.2,
+        "volume": 1.0,
         "pitch": 0.6
       },
       {
         "name": "buildscape:block/flower_bed/step4",
-        "volume": 0.2,
+        "volume": 1.0,
         "pitch": 0.6
       },
       {
         "name": "buildscape:block/flower_bed/step5",
-        "volume": 0.2,
+        "volume": 1.0,
         "pitch": 0.6
       }
     ]
@@ -303,27 +303,27 @@
     "sounds": [
       {
         "name": "buildscape:block/flower_bed/step1",
-        "volume": 0.4,
+        "volume": 1.0,
         "pitch": 0.9
       },
       {
         "name": "buildscape:block/flower_bed/step2",
-        "volume": 0.4,
+        "volume": 1.0,
         "pitch": 0.9
       },
       {
         "name": "buildscape:block/flower_bed/step3",
-        "volume": 0.4,
+        "volume": 1.0,
         "pitch": 0.9
       },
       {
         "name": "buildscape:block/flower_bed/step4",
-        "volume": 0.4,
+        "volume": 1.0,
         "pitch": 0.9
       },
       {
         "name": "buildscape:block/flower_bed/step5",
-        "volume": 0.4,
+        "volume": 1.0,
         "pitch": 0.9
       }
     ]
@@ -332,32 +332,32 @@
     "sounds": [
       {
         "name": "buildscape:block/mangrove_roots/break1",
-        "volume": 0.25,
+        "volume": 1.0,
         "pitch": 0.96
       },
       {
         "name": "buildscape:block/mangrove_roots/break2",
-        "volume": 0.25,
+        "volume": 1.0,
         "pitch": 0.96
       },
       {
         "name": "buildscape:block/mangrove_roots/break3",
-        "volume": 0.25,
+        "volume": 1.0,
         "pitch": 0.96
       },
       {
         "name": "buildscape:block/mangrove_roots/break4",
-        "volume": 0.25,
+        "volume": 1.0,
         "pitch": 0.96
       },
       {
         "name": "buildscape:block/mangrove_roots/break5",
-        "volume": 0.25,
+        "volume": 1.0,
         "pitch": 0.96
       },
       {
         "name": "buildscape:block/mangrove_roots/break6",
-        "volume": 0.25,
+        "volume": 1.0,
         "pitch": 0.96
       }
     ],
@@ -367,32 +367,32 @@
     "sounds": [
       {
         "name": "buildscape:block/mangrove_roots/step1",
-        "volume": 0.25,
+        "volume": 1.0,
         "pitch": 0.96
       },
       {
         "name": "buildscape:block/mangrove_roots/step2",
-        "volume": 0.25,
+        "volume": 1.0,
         "pitch": 0.96
       },
       {
         "name": "buildscape:block/mangrove_roots/step3",
-        "volume": 0.25,
+        "volume": 1.0,
         "pitch": 0.96
       },
       {
         "name": "buildscape:block/mangrove_roots/step4",
-        "volume": 0.25,
+        "volume": 1.0,
         "pitch": 0.96
       },
       {
         "name": "buildscape:block/mangrove_roots/step5",
-        "volume": 0.25,
+        "volume": 1.0,
         "pitch": 0.96
       },
       {
         "name": "buildscape:block/mangrove_roots/step6",
-        "volume": 0.25,
+        "volume": 1.0,
         "pitch": 0.96
       }
     ],
@@ -402,32 +402,32 @@
     "sounds": [
       {
         "name": "buildscape:block/mangrove_roots/step1",
-        "volume": 0.0625,
+        "volume": 1.0,
         "pitch": 0.5
       },
       {
         "name": "buildscape:block/mangrove_roots/step2",
-        "volume": 0.0625,
+        "volume": 1.0,
         "pitch": 0.5
       },
       {
         "name": "buildscape:block/mangrove_roots/step3",
-        "volume": 0.0625,
+        "volume": 1.0,
         "pitch": 0.5
       },
       {
         "name": "buildscape:block/mangrove_roots/step4",
-        "volume": 0.0625,
+        "volume": 1.0,
         "pitch": 0.5
       },
       {
         "name": "buildscape:block/mangrove_roots/step5",
-        "volume": 0.0625,
+        "volume": 1.0,
         "pitch": 0.5
       },
       {
         "name": "buildscape:block/mangrove_roots/step6",
-        "volume": 0.0625,
+        "volume": 1.0,
         "pitch": 0.5
       }
     ],
@@ -437,32 +437,32 @@
     "sounds": [
       {
         "name": "buildscape:block/mangrove_roots/step1",
-        "volume": 0.125,
+        "volume": 1.0,
         "pitch": 0.75
       },
       {
         "name": "buildscape:block/mangrove_roots/step2",
-        "volume": 0.125,
+        "volume": 1.0,
         "pitch": 0.75
       },
       {
         "name": "buildscape:block/mangrove_roots/step3",
-        "volume": 0.125,
+        "volume": 1.0,
         "pitch": 0.75
       },
       {
         "name": "buildscape:block/mangrove_roots/step4",
-        "volume": 0.125,
+        "volume": 1.0,
         "pitch": 0.75
       },
       {
         "name": "buildscape:block/mangrove_roots/step5",
-        "volume": 0.125,
+        "volume": 1.0,
         "pitch": 0.75
       },
       {
         "name": "buildscape:block/mangrove_roots/step6",
-        "volume": 0.125,
+        "volume": 1.0,
         "pitch": 0.75
       }
     ],
@@ -472,32 +472,32 @@
     "sounds": [
       {
         "name": "buildscape:block/mangrove_roots/step1",
-        "volume": 0.0375,
+        "volume": 1.0,
         "pitch": 1
       },
       {
         "name": "buildscape:block/mangrove_roots/step2",
-        "volume": 0.0375,
+        "volume": 1.0,
         "pitch": 1
       },
       {
         "name": "buildscape:block/mangrove_roots/step3",
-        "volume": 0.0375,
+        "volume": 1.0,
         "pitch": 1
       },
       {
         "name": "buildscape:block/mangrove_roots/step4",
-        "volume": 0.0375,
+        "volume": 1.0,
         "pitch": 1
       },
       {
         "name": "buildscape:block/mangrove_roots/step5",
-        "volume": 0.0375,
+        "volume": 1.0,
         "pitch": 1
       },
       {
         "name": "buildscape:block/mangrove_roots/step6",
-        "volume": 0.0375,
+        "volume": 1.0,
         "pitch": 1
       }
     ],
@@ -507,32 +507,32 @@
     "sounds": [
       {
         "name": "buildscape:block/muddy_mangrove_roots/break1",
-        "volume": 0.25,
+        "volume": 1.0,
         "pitch": 0.96
       },
       {
         "name": "buildscape:block/muddy_mangrove_roots/break2",
-        "volume": 0.25,
+        "volume": 1.0,
         "pitch": 0.96
       },
       {
         "name": "buildscape:block/muddy_mangrove_roots/break3",
-        "volume": 0.25,
+        "volume": 1.0,
         "pitch": 0.96
       },
       {
         "name": "buildscape:block/muddy_mangrove_roots/break4",
-        "volume": 0.25,
+        "volume": 1.0,
         "pitch": 0.96
       },
       {
         "name": "buildscape:block/muddy_mangrove_roots/break5",
-        "volume": 0.25,
+        "volume": 1.0,
         "pitch": 0.96
       },
       {
         "name": "buildscape:block/muddy_mangrove_roots/break6",
-        "volume": 0.25,
+        "volume": 1.0,
         "pitch": 0.96
       }
     ],
@@ -542,32 +542,32 @@
     "sounds": [
       {
         "name": "buildscape:block/muddy_mangrove_roots/step1",
-        "volume": 0.25,
+        "volume": 1.0,
         "pitch": 0.96
       },
       {
         "name": "buildscape:block/muddy_mangrove_roots/step2",
-        "volume": 0.25,
+        "volume": 1.0,
         "pitch": 0.96
       },
       {
         "name": "buildscape:block/muddy_mangrove_roots/step3",
-        "volume": 0.25,
+        "volume": 1.0,
         "pitch": 0.96
       },
       {
         "name": "buildscape:block/muddy_mangrove_roots/step4",
-        "volume": 0.25,
+        "volume": 1.0,
         "pitch": 0.96
       },
       {
         "name": "buildscape:block/muddy_mangrove_roots/step5",
-        "volume": 0.25,
+        "volume": 1.0,
         "pitch": 0.96
       },
       {
         "name": "buildscape:block/muddy_mangrove_roots/step6",
-        "volume": 0.25,
+        "volume": 1.0,
         "pitch": 0.96
       }
     ],
@@ -577,32 +577,32 @@
     "sounds": [
       {
         "name": "buildscape:block/muddy_mangrove_roots/step1",
-        "volume": 0.0625,
+        "volume": 1.0,
         "pitch": 0.5
       },
       {
         "name": "buildscape:block/muddy_mangrove_roots/step2",
-        "volume": 0.0625,
+        "volume": 1.0,
         "pitch": 0.5
       },
       {
         "name": "buildscape:block/muddy_mangrove_roots/step3",
-        "volume": 0.0625,
+        "volume": 1.0,
         "pitch": 0.5
       },
       {
         "name": "buildscape:block/muddy_mangrove_roots/step4",
-        "volume": 0.0625,
+        "volume": 1.0,
         "pitch": 0.5
       },
       {
         "name": "buildscape:block/muddy_mangrove_roots/step5",
-        "volume": 0.0625,
+        "volume": 1.0,
         "pitch": 0.5
       },
       {
         "name": "buildscape:block/muddy_mangrove_roots/step6",
-        "volume": 0.0625,
+        "volume": 1.0,
         "pitch": 0.5
       }
     ],
@@ -612,32 +612,32 @@
     "sounds": [
       {
         "name": "buildscape:block/muddy_mangrove_roots/step1",
-        "volume": 0.125,
+        "volume": 1.0,
         "pitch": 0.75
       },
       {
         "name": "buildscape:block/muddy_mangrove_roots/step2",
-        "volume": 0.125,
+        "volume": 1.0,
         "pitch": 0.75
       },
       {
         "name": "buildscape:block/muddy_mangrove_roots/step3",
-        "volume": 0.125,
+        "volume": 1.0,
         "pitch": 0.75
       },
       {
         "name": "buildscape:block/muddy_mangrove_roots/step4",
-        "volume": 0.125,
+        "volume": 1.0,
         "pitch": 0.75
       },
       {
         "name": "buildscape:block/muddy_mangrove_roots/step5",
-        "volume": 0.125,
+        "volume": 1.0,
         "pitch": 0.75
       },
       {
         "name": "buildscape:block/muddy_mangrove_roots/step6",
-        "volume": 0.125,
+        "volume": 1.0,
         "pitch": 0.75
       }
     ],
@@ -647,32 +647,32 @@
     "sounds": [
       {
         "name": "buildscape:block/muddy_mangrove_roots/step1",
-        "volume": 0.0375,
+        "volume": 1.0,
         "pitch": 1
       },
       {
         "name": "buildscape:block/muddy_mangrove_roots/step2",
-        "volume": 0.0375,
+        "volume": 1.0,
         "pitch": 1
       },
       {
         "name": "buildscape:block/muddy_mangrove_roots/step3",
-        "volume": 0.0375,
+        "volume": 1.0,
         "pitch": 1
       },
       {
         "name": "buildscape:block/muddy_mangrove_roots/step4",
-        "volume": 0.0375,
+        "volume": 1.0,
         "pitch": 1
       },
       {
         "name": "buildscape:block/muddy_mangrove_roots/step5",
-        "volume": 0.0375,
+        "volume": 1.0,
         "pitch": 1
       },
       {
         "name": "buildscape:block/muddy_mangrove_roots/step6",
-        "volume": 0.0375,
+        "volume": 1.0,
         "pitch": 1
       }
     ],
@@ -1030,33 +1030,66 @@
   },
   "block_string_light_place": {
     "sounds": [
-      "entity/leashknot/place1",
-      "entity/leashknot/place2",
-      "entity/leashknot/place3"
+      {
+        "name": "minecraft:entity/leashknot/place1",
+        "type": "event"
+      },
+      {
+        "name": "minecraft:entity/leashknot/place2",
+        "type": "event"
+      },
+      {
+        "name": "minecraft:entity/leashknot/place3",
+        "type": "event"
+      }
     ]
   },
   "block_string_light_connect": {
     "sounds": [
-      "entity/leashknot/place1",
-      "entity/leashknot/place2",
-      "entity/leashknot/place3"
+      {
+        "name": "minecraft:entity/leashknot/place1",
+        "type": "event"
+      },
+      {
+        "name": "minecraft:entity/leashknot/place2",
+        "type": "event"
+      },
+      {
+        "name": "minecraft:entity/leashknot/place3",
+        "type": "event"
+      }
     ]
   },
   "block_string_light_disconnect": {
     "sounds": [
-      "entity/leashknot/break1",
-      "entity/leashknot/break2",
-      "entity/leashknot/break3"
+      {
+        "name": "minecraft:entity/leashknot/break1",
+        "type": "event"
+      },
+      {
+        "name": "minecraft:entity/leashknot/break2",
+        "type": "event"
+      },
+      {
+        "name": "minecraft:entity/leashknot/break3",
+        "type": "event"
+      }
     ]
   },
   "block_string_light_turnon": {
     "sounds": [
-      "random/click"
+      {
+        "name": "minecraft:random/click",
+        "type": "event"
+      }
     ]
   },
   "block_string_light_turnoff": {
     "sounds": [
-      "random/click"
+      {
+        "name": "minecraft:random/click",
+        "type": "event"
+      }
     ]
   }
 }

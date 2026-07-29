@@ -49,16 +49,6 @@ public class CustomSoundType extends ForgeSoundType {
         this.fallPitch = fallPitch;
     }
 
-    @Override
-    public float getVolume() {
-        return breakVolume;
-    }
-
-    @Override
-    public float getPitch() {
-        return breakPitch;
-    }
-
     public float getStepVolume() {
         return stepVolume;
     }

@@ -1687,6 +1687,10 @@ public class BuildScape {
                         com.kingodogo.buildscape.entity.ModEntities.SEAT_ENTITY.get(),
                         net.minecraft.client.renderer.entity.NoopRenderer::new);
 
+                net.minecraft.client.renderer.entity.EntityRenderers.register(
+                        com.kingodogo.buildscape.entity.ModEntities.WANDERING_HOMEMAKER.get(),
+                        com.kingodogo.buildscape.client.renderer.WanderingHomemakerRenderer::new);
+
 
 
 

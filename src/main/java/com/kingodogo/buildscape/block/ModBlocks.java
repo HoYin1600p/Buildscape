@@ -3477,6 +3477,40 @@ public class ModBlocks {
                                         BlockBehaviour.Properties.of(Material.WOOD, MaterialColor.COLOR_RED)
                                                         .strength(2.0f)
                                                         .sound(net.minecraft.world.level.block.SoundType.WOOD)));
+
+        public static final RegistryObject<Block> CHERRY_WOOD_WALL = BLOCKS.register(
+                        "cherry_wood_wall",
+                        () -> new WallBlock(BlockBehaviour.Properties.of(Material.WOOD, MaterialColor.TERRACOTTA_WHITE)
+                                        .strength(2.0f)
+                                        .sound(net.minecraft.world.level.block.SoundType.WOOD)));
+        public static final RegistryObject<Block> STRIPPED_CHERRY_WOOD_WALL = BLOCKS.register(
+                        "stripped_cherry_wood_wall",
+                        () -> new WallBlock(BlockBehaviour.Properties.of(Material.WOOD, MaterialColor.TERRACOTTA_WHITE)
+                                        .strength(2.0f)
+                                        .sound(net.minecraft.world.level.block.SoundType.WOOD)));
+
+        public static final RegistryObject<Block> PALE_OAK_WOOD_WALL = BLOCKS.register(
+                        "pale_oak_wood_wall",
+                        () -> new WallBlock(BlockBehaviour.Properties.of(Material.WOOD, MaterialColor.TERRACOTTA_WHITE)
+                                        .strength(2.0f)
+                                        .sound(net.minecraft.world.level.block.SoundType.WOOD)));
+        public static final RegistryObject<Block> STRIPPED_PALE_OAK_WOOD_WALL = BLOCKS.register(
+                        "stripped_pale_oak_wood_wall",
+                        () -> new WallBlock(BlockBehaviour.Properties.of(Material.WOOD, MaterialColor.TERRACOTTA_WHITE)
+                                        .strength(2.0f)
+                                        .sound(net.minecraft.world.level.block.SoundType.WOOD)));
+
+        public static final RegistryObject<Block> ASHPEN_WOOD_WALL = BLOCKS.register(
+                        "ashpen_wood_wall",
+                        () -> new WallBlock(BlockBehaviour.Properties.of(Material.WOOD, MaterialColor.SAND)
+                                        .strength(2.0f)
+                                        .sound(net.minecraft.world.level.block.SoundType.WOOD)));
+        public static final RegistryObject<Block> STRIPPED_ASHPEN_WOOD_WALL = BLOCKS.register(
+                        "stripped_ashpen_wood_wall",
+                        () -> new WallBlock(BlockBehaviour.Properties.of(Material.WOOD, MaterialColor.SAND)
+                                        .strength(2.0f)
+                                        .sound(net.minecraft.world.level.block.SoundType.WOOD)));
+
         public static final RegistryObject<Block> ASHPEN_WHITE_PLANKS = BLOCKS.register("ashpen_white_planks",
                         () -> new ModBlock(
                                         BlockBehaviour.Properties.of(Material.WOOD, MaterialColor.SNOW)

@@ -9726,6 +9726,21 @@ public class ModItems {
         public void appendHoverText(net.minecraft.world.item.ItemStack stack, @javax.annotation.Nullable net.minecraft.world.level.Level level, java.util.List<net.minecraft.network.chat.Component> tooltip, net.minecraft.world.item.TooltipFlag flag) {
             super.appendHoverText(stack, level, tooltip, flag);
             tooltip.add(new net.minecraft.network.chat.TranslatableComponent("tooltip.buildscape.wandering_homemaker_spawn_egg.spawn_info"));
+            if (level != null) {
+                long currentTime = level.getGameTime();
+                long endTime = com.kingodogo.buildscape.client.HomemakerCooldownTracker.cooldownEndTime;
+                if (endTime > currentTime) {
+                    long remainingTicks = endTime - currentTime;
+                    long totalSeconds = remainingTicks / 20;
+                    long minutes = totalSeconds / 60;
+                    long seconds = totalSeconds % 60;
+                    tooltip.add(new net.minecraft.network.chat.TranslatableComponent("tooltip.buildscape.wandering_homemaker_spawn_egg.cooldown_active", minutes, seconds)
+                            .withStyle(net.minecraft.ChatFormatting.RED));
+                } else {
+                    tooltip.add(new net.minecraft.network.chat.TranslatableComponent("tooltip.buildscape.wandering_homemaker_spawn_egg.cooldown_ready")
+                            .withStyle(net.minecraft.ChatFormatting.GREEN));
+                }
+            }
         }
     }
 

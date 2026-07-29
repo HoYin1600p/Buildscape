@@ -18,11 +18,4 @@ public class ItemMixin {
             cir.setReturnValue(16);
         }
     }
-
-    @Inject(method = "getItemStackLimit", at = @At("HEAD"), cancellable = true, remap = false)
-    private void buildscape$waterBottleItemStackLimit(ItemStack stack, CallbackInfoReturnable<Integer> cir) {
-        if (stack.is(Items.POTION) || stack.is(Items.SPLASH_POTION) || stack.is(Items.LINGERING_POTION)) {
-            cir.setReturnValue(16);
-        }
-    }
 }

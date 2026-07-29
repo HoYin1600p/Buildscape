@@ -1,7 +1,7 @@
 # Buildscape Startup Optimization Notes
 
 This document describes the startup optimizations maintained on the
-`launch-optimizing` branch and what contributors must check when adding content.
+`main` branch and what contributors must check when adding content.
 It is a repository document and is not packaged into the mod jar.
 
 Maintainer: `hoyin1600p`

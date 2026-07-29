@@ -1,0 +1,37 @@
+{
+  "type": "forge:conditional",
+  "recipes": [
+    {
+      "conditions": [
+        {
+          "type": "forge:mod_loaded",
+          "modid": "botanypots"
+        }
+      ],
+      "recipe": {
+        "type": "botanypots:crop",
+        "seed": {
+          "item": "buildscape:cyan_spore_blossom"
+        },
+        "categories": [
+          "dirt",
+          "farmland",
+          "moss"
+        ],
+        "growthTicks": 1200,
+        "display": {
+          "block": "buildscape:cyan_spore_blossom",
+          "rotation": "X_180"
+        },
+        "drops": [
+          {
+            "chance": 1,
+            "output": {
+              "item": "buildscape:cyan_spore_blossom"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

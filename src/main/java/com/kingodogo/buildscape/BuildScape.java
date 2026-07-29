@@ -550,7 +550,10 @@ public class BuildScape {
                 com.kingodogo.buildscape.network.ModMessages.INSTANCE.send(
                     net.minecraftforge.network.PacketDistributor.PLAYER.with(() -> serverPlayer),
                     new com.kingodogo.buildscape.network.SyncGameRulesPacket(
-                        serverPlayer.getLevel().getGameRules().getBoolean(com.kingodogo.buildscape.world.ModGameRules.FAST_LEAF_DECAY)
+                        serverPlayer.getLevel().getGameRules().getBoolean(com.kingodogo.buildscape.world.ModGameRules.FAST_LEAF_DECAY),
+                        serverPlayer.getLevel().getGameRules().getBoolean(com.kingodogo.buildscape.world.ModGameRules.DISABLE_ENDERMAN_GRIEFING),
+                        serverPlayer.getLevel().getGameRules().getBoolean(com.kingodogo.buildscape.world.ModGameRules.DISABLE_CREEPER_GRIEFING),
+                        serverPlayer.getLevel().getGameRules().getBoolean(com.kingodogo.buildscape.world.ModGameRules.DISABLE_GHAST_GRIEFING)
                     )
                 );
                 
@@ -558,6 +561,27 @@ public class BuildScape {
                 schedulePillarIdSync(server, serverPlayer, manager, 0);
             }
 
+        }
+    }
+
+    @SubscribeEvent
+    public void onMobGriefing(net.minecraftforge.event.entity.EntityMobGriefingEvent event) {
+        net.minecraft.world.entity.Entity entity = event.getEntity();
+        if (entity != null && entity.level != null) {
+            if (entity instanceof net.minecraft.world.entity.monster.EnderMan) {
+                if (entity.level.getGameRules().getBoolean(com.kingodogo.buildscape.world.ModGameRules.DISABLE_ENDERMAN_GRIEFING)) {
+                    event.setResult(net.minecraftforge.eventbus.api.Event.Result.DENY);
+                }
+            } else if (entity instanceof net.minecraft.world.entity.monster.Creeper) {
+                if (entity.level.getGameRules().getBoolean(com.kingodogo.buildscape.world.ModGameRules.DISABLE_CREEPER_GRIEFING)) {
+                    event.setResult(net.minecraftforge.eventbus.api.Event.Result.DENY);
+                }
+            } else if (entity instanceof net.minecraft.world.entity.monster.Ghast || 
+                       entity instanceof net.minecraft.world.entity.projectile.LargeFireball) {
+                if (entity.level.getGameRules().getBoolean(com.kingodogo.buildscape.world.ModGameRules.DISABLE_GHAST_GRIEFING)) {
+                    event.setResult(net.minecraftforge.eventbus.api.Event.Result.DENY);
+                }
+            }
         }
     }
 

@@ -1177,12 +1177,18 @@ public class BuildScape {
 
         event
                 .getRareTrades()
-                .add((trader, rand) -> new net.minecraft.world.item.trading.MerchantOffer(
-                        new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.DIAMOND, 12),
-                        new net.minecraft.world.item.ItemStack(ModItems.ANCIENT_ASHEN_SCROLL.get(), 1),
-                        1,
-                        1,
-                        0.0f));
+                .add((trader, rand) -> {
+                    if (rand.nextFloat() <= 0.10f) {
+                        return new net.minecraft.world.item.trading.MerchantOffer(
+                                new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.DIAMOND, 12),
+                                new net.minecraft.world.item.ItemStack(ModItems.ANCIENT_ASHEN_SCROLL.get(), 1),
+                                1,
+                                1,
+                                0.0f
+                        );
+                    }
+                    return null;
+                });
     }
 
     @SubscribeEvent

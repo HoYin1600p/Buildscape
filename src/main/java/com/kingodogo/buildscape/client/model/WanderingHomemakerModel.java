@@ -50,7 +50,7 @@ public class WanderingHomemakerModel extends HierarchicalModel<WanderingHomemake
 
         headDef.addOrReplaceChild("nose", CubeListBuilder.create()
                 .texOffs(60, 55).addBox(-1.0F, -1.0F, -3.0F, 2.0F, 4.0F, 2.0F)
-                , PartPose.offsetAndRotation(0.0F, 2.0F, -3.0F, 1.3090F, 0.0F, 0.0F));
+                , PartPose.offsetAndRotation(0.0F, -2.0F, -3.0F, 1.3090F, 0.0F, 0.0F));
 
         headDef.addOrReplaceChild("brim", CubeListBuilder.create()
                 .texOffs(0, 35).addBox(-4.0F, -2.0F, -4.25F, 8.0F, 3.0F, 6.0F)

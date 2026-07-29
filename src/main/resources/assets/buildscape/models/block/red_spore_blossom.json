@@ -4,7 +4,7 @@
   "textures": {
     "particle": "buildscape:block/spore_blossom_red",
     "flower": "buildscape:block/spore_blossom_red",
-    "base": "minecraft:block/spore_blossom_base"
+    "base": "buildscape:block/spore_blossom_base"
   },
   "elements": [
     {

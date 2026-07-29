@@ -128,15 +128,19 @@ public class ModSounds {
         if (copperGrateSounds == null) {
             try {
                 Supplier<SoundEvent> breakSound = () -> {
-                    if (COPPER_GRATE_BREAK.isPresent()) {
-                        return COPPER_GRATE_BREAK.get();
-                    }
+                    try {
+                        if (COPPER_GRATE_BREAK != null && COPPER_GRATE_BREAK.isPresent()) {
+                            return COPPER_GRATE_BREAK.get();
+                        }
+                    } catch (Throwable ignored) {}
                     return net.minecraft.sounds.SoundEvents.COPPER_BREAK;
                 };
                 Supplier<SoundEvent> stepSound = () -> {
-                    if (COPPER_GRATE_STEP.isPresent()) {
-                        return COPPER_GRATE_STEP.get();
-                    }
+                    try {
+                        if (COPPER_GRATE_STEP != null && COPPER_GRATE_STEP.isPresent()) {
+                            return COPPER_GRATE_STEP.get();
+                        }
+                    } catch (Throwable ignored) {}
                     return net.minecraft.sounds.SoundEvents.COPPER_STEP;
                 };
 
@@ -150,10 +154,7 @@ public class ModSounds {
                         stepSound
                 );
             } catch (Exception e) {
-                LOGGER.error(
-                        "Failed to create copper grate sound type: " + e.getMessage(),
-                        e
-                );
+                LOGGER.error("Failed to create copper grate sound type: " + e.getMessage(), e);
                 return new ForgeSoundType(
                         1f,
                         1f,
@@ -172,21 +173,27 @@ public class ModSounds {
         if (copperBulbSounds == null) {
             try {
                 Supplier<SoundEvent> breakSound = () -> {
-                    if (COPPER_BULB_BREAK.isPresent()) {
-                        return COPPER_BULB_BREAK.get();
-                    }
+                    try {
+                        if (COPPER_BULB_BREAK != null && COPPER_BULB_BREAK.isPresent()) {
+                            return COPPER_BULB_BREAK.get();
+                        }
+                    } catch (Throwable ignored) {}
                     return net.minecraft.sounds.SoundEvents.COPPER_BREAK;
                 };
                 Supplier<SoundEvent> stepSound = () -> {
-                    if (COPPER_BULB_STEP.isPresent()) {
-                        return COPPER_BULB_STEP.get();
-                    }
+                    try {
+                        if (COPPER_BULB_STEP != null && COPPER_BULB_STEP.isPresent()) {
+                            return COPPER_BULB_STEP.get();
+                        }
+                    } catch (Throwable ignored) {}
                     return net.minecraft.sounds.SoundEvents.COPPER_STEP;
                 };
                 Supplier<SoundEvent> placeSound = () -> {
-                    if (COPPER_BULB_PLACE.isPresent()) {
-                        return COPPER_BULB_PLACE.get();
-                    }
+                    try {
+                        if (COPPER_BULB_PLACE != null && COPPER_BULB_PLACE.isPresent()) {
+                            return COPPER_BULB_PLACE.get();
+                        }
+                    } catch (Throwable ignored) {}
                     return net.minecraft.sounds.SoundEvents.COPPER_STEP;
                 };
 
@@ -200,10 +207,7 @@ public class ModSounds {
                         stepSound
                 );
             } catch (Exception e) {
-                LOGGER.error(
-                        "Failed to create copper bulb sound type: " + e.getMessage(),
-                        e
-                );
+                LOGGER.error("Failed to create copper bulb sound type: " + e.getMessage(), e);
                 return new ForgeSoundType(
                         1f,
                         1f,

@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "group": "wooden_button",
+  "ingredients": [
+    {
+      "item": "buildscape:pale_oak_planks"
+    }
+  ],
+  "result": {
+    "item": "buildscape:pale_oak_button",
+    "count": 1
+  }
+}

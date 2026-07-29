@@ -398,6 +398,12 @@
     "buildscape:warped_stem_vertical_slab",
     "buildscape:warped_vertical_slab",
     "buildscape:white_big_book",
-    "buildscape:yellow_big_book"
+    "buildscape:yellow_big_book",
+    "buildscape:stripped_ashpen_log_slab",
+    "buildscape:stripped_ashpen_log_stairs",
+    "buildscape:stripped_ashpen_log_vertical_slab",
+    "buildscape:stripped_ashpen_wood_slab",
+    "buildscape:stripped_ashpen_wood_stairs",
+    "buildscape:stripped_ashpen_wood_vertical_slab"
   ]
 }

@@ -11,6 +11,9 @@
     "buildscape:sculk_stairs",
     "buildscape:sculk_wall",
     "buildscape:sculk_vertical_slab",
-    "buildscape:pale_hanging_moss"
+    "buildscape:pale_hanging_moss",
+    "buildscape:pale_moss_block_slab",
+    "buildscape:pale_moss_block_stairs",
+    "buildscape:pale_moss_block_vertical_slab"
   ]
 }

@@ -50,27 +50,10 @@ public class EyeblossomBlock extends FlowerBlock {
             // Open flower during night
             level.setBlock(pos, ModBlocks.OPEN_EYEBLOSSOM.get().defaultBlockState(), 3);
             level.playSound(null, pos, SoundEvents.AMETHYST_BLOCK_CHIME, SoundSource.BLOCKS, 1.0F, 1.2F);
-            level.sendParticles(ParticleTypes.GLOW,
-                    pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D,
-                    8, 0.2D, 0.2D, 0.2D, 0.02D);
-            level.sendParticles(ParticleTypes.SOUL_FIRE_FLAME,
-                    pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D,
-                    4, 0.15D, 0.15D, 0.15D, 0.01D);
         }
     }
 
     @Override
     public void animateTick(BlockState state, Level level, BlockPos pos, Random random) {
-        if (isOpen) {
-            if (random.nextInt(2) == 0) {
-                double x = (double) pos.getX() + 0.5D + (random.nextDouble() - 0.5D) * 0.35D;
-                double y = (double) pos.getY() + 0.45D + random.nextDouble() * 0.25D;
-                double z = (double) pos.getZ() + 0.5D + (random.nextDouble() - 0.5D) * 0.35D;
-                level.addParticle(ParticleTypes.GLOW, x, y, z, 0.0D, 0.01D, 0.0D);
-                if (random.nextInt(3) == 0) {
-                    level.addParticle(ParticleTypes.SOUL_FIRE_FLAME, x, y, z, 0.0D, 0.005D, 0.0D);
-                }
-            }
-        }
     }
 }

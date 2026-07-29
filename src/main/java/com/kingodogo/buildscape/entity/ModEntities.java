@@ -93,7 +93,21 @@ public class ModEntities {
                     .build("poplar_boat")
     );
 
+    public static final RegistryObject<
+            EntityType<WanderingHomemakerEntity>
+            > WANDERING_HOMEMAKER = ENTITIES.register("wandering_homemaker", () ->
+            EntityType.Builder.<WanderingHomemakerEntity>of(
+                            WanderingHomemakerEntity::new,
+                            MobCategory.CREATURE
+                    )
+                    .sized(0.6F, 1.95F)
+                    .clientTrackingRange(10)
+                    .updateInterval(3)
+                    .build("wandering_homemaker")
+    );
+
     @SubscribeEvent
     public static void registerAttributes(EntityAttributeCreationEvent event) {
+        event.put(WANDERING_HOMEMAKER.get(), WanderingHomemakerEntity.createAttributes().build());
     }
 }

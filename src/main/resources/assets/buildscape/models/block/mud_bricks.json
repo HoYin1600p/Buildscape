@@ -1,7 +1,7 @@
 {
-    "parent":  "minecraft:block/cube_all",
-    "textures":  {
-                     "all":  "buildscape:block/mud_bricks",
-                     "particle":  "#all"
-                 }
+  "parent": "minecraft:block/cube_all",
+  "textures": {
+    "all": "buildscape:block/mud_bricks",
+    "particle": "#all"
+  }
 }

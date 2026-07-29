@@ -1,0 +1,7 @@
+{
+  "parent": "buildscape:block/template_bars_post_ends",
+  "textures": {
+    "bars": "buildscape:block/exposed_copper_bars",
+    "edge": "buildscape:block/exposed_copper_bars"
+  }
+}

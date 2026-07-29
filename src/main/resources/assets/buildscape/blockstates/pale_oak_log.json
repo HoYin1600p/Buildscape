@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "axis=y": {
+      "model": "buildscape:block/pale_oak_log"
+    },
+    "axis=z": {
+      "model": "buildscape:block/pale_oak_log_horizontal",
+      "x": 90
+    },
+    "axis=x": {
+      "model": "buildscape:block/pale_oak_log_horizontal",
+      "x": 90,
+      "y": 90
+    }
+  }
+}

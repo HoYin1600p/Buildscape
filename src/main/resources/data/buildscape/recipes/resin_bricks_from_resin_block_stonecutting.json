@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "buildscape:resin_block"
+  },
+  "result": "buildscape:resin_bricks",
+  "count": 1
+}

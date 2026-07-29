@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "##",
+    "##"
+  ],
+  "key": {
+    "#": {
+      "item": "buildscape:resin_clump"
+    }
+  },
+  "result": {
+    "item": "buildscape:resin_block",
+    "count": 1
+  }
+}

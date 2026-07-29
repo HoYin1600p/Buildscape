@@ -6,10 +6,20 @@
     "buildscape:poplar_wood",
     "buildscape:stripped_poplar_wood",
     "buildscape:ashpen_log",
+    "buildscape:stripped_ashpen_log",
     "buildscape:ashpen_wood",
+    "buildscape:stripped_ashpen_wood",
     "buildscape:mangrove_log",
     "buildscape:stripped_mangrove_log",
     "buildscape:mangrove_wood",
-    "buildscape:stripped_mangrove_wood"
+    "buildscape:stripped_mangrove_wood",
+    "buildscape:pale_oak_log",
+    "buildscape:stripped_pale_oak_log",
+    "buildscape:pale_oak_wood",
+    "buildscape:stripped_pale_oak_wood",
+    "buildscape:cherry_log",
+    "buildscape:stripped_cherry_log",
+    "buildscape:cherry_wood",
+    "buildscape:stripped_cherry_wood"
   ]
 }

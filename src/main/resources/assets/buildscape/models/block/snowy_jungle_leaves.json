@@ -1,7 +1,7 @@
 {
-    "parent":  "minecraft:block/leaves",
-    "textures":  {
-                     "all":  "buildscape:block/snowy_jungle_leaves",
-                     "particle":  "#all"
-                 }
+  "parent": "minecraft:block/leaves",
+  "textures": {
+    "all": "buildscape:block/snowy_jungle_leaves",
+    "particle": "#all"
+  }
 }

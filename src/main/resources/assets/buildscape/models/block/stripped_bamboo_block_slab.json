@@ -1,8 +1,8 @@
 {
-    "textures":  {
-                     "bottom":  "buildscape:block/stripped_bamboo_block_top",
-                     "top":  "buildscape:block/stripped_bamboo_block_top",
-                     "side":  "buildscape:block/stripped_bamboo_block"
-                 },
-    "parent":  "minecraft:block/slab"
+  "textures": {
+    "bottom": "buildscape:block/stripped_bamboo_block_top",
+    "top": "buildscape:block/stripped_bamboo_block_top",
+    "side": "buildscape:block/stripped_bamboo_block"
+  },
+  "parent": "minecraft:block/slab"
 }

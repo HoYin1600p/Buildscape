@@ -3477,6 +3477,40 @@ public class ModBlocks {
                                         BlockBehaviour.Properties.of(Material.WOOD, MaterialColor.COLOR_RED)
                                                         .strength(2.0f)
                                                         .sound(net.minecraft.world.level.block.SoundType.WOOD)));
+
+        public static final RegistryObject<Block> CHERRY_WOOD_WALL = BLOCKS.register(
+                        "cherry_wood_wall",
+                        () -> new WallBlock(BlockBehaviour.Properties.of(Material.WOOD, MaterialColor.TERRACOTTA_WHITE)
+                                        .strength(2.0f)
+                                        .sound(net.minecraft.world.level.block.SoundType.WOOD)));
+        public static final RegistryObject<Block> STRIPPED_CHERRY_WOOD_WALL = BLOCKS.register(
+                        "stripped_cherry_wood_wall",
+                        () -> new WallBlock(BlockBehaviour.Properties.of(Material.WOOD, MaterialColor.TERRACOTTA_WHITE)
+                                        .strength(2.0f)
+                                        .sound(net.minecraft.world.level.block.SoundType.WOOD)));
+
+        public static final RegistryObject<Block> PALE_OAK_WOOD_WALL = BLOCKS.register(
+                        "pale_oak_wood_wall",
+                        () -> new WallBlock(BlockBehaviour.Properties.of(Material.WOOD, MaterialColor.TERRACOTTA_WHITE)
+                                        .strength(2.0f)
+                                        .sound(net.minecraft.world.level.block.SoundType.WOOD)));
+        public static final RegistryObject<Block> STRIPPED_PALE_OAK_WOOD_WALL = BLOCKS.register(
+                        "stripped_pale_oak_wood_wall",
+                        () -> new WallBlock(BlockBehaviour.Properties.of(Material.WOOD, MaterialColor.TERRACOTTA_WHITE)
+                                        .strength(2.0f)
+                                        .sound(net.minecraft.world.level.block.SoundType.WOOD)));
+
+        public static final RegistryObject<Block> ASHPEN_WOOD_WALL = BLOCKS.register(
+                        "ashpen_wood_wall",
+                        () -> new WallBlock(BlockBehaviour.Properties.of(Material.WOOD, MaterialColor.SAND)
+                                        .strength(2.0f)
+                                        .sound(net.minecraft.world.level.block.SoundType.WOOD)));
+        public static final RegistryObject<Block> STRIPPED_ASHPEN_WOOD_WALL = BLOCKS.register(
+                        "stripped_ashpen_wood_wall",
+                        () -> new WallBlock(BlockBehaviour.Properties.of(Material.WOOD, MaterialColor.SAND)
+                                        .strength(2.0f)
+                                        .sound(net.minecraft.world.level.block.SoundType.WOOD)));
+
         public static final RegistryObject<Block> ASHPEN_WHITE_PLANKS = BLOCKS.register("ashpen_white_planks",
                         () -> new ModBlock(
                                         BlockBehaviour.Properties.of(Material.WOOD, MaterialColor.SNOW)
@@ -8763,6 +8797,24 @@ public class ModBlocks {
         public static final RegistryObject<Block> ASHPEN_WOOD_STAIRS = BLOCKS.register("ashpen_wood_stairs",
                         () -> new ModStairBlock(ASHPEN_WOOD.get().defaultBlockState(),
                                         BlockBehaviour.Properties.copy(ASHPEN_WOOD.get())));
+        public static final RegistryObject<Block> STRIPPED_ASHPEN_LOG = BLOCKS.register("stripped_ashpen_log",
+                        () -> new RotatedPillarBlock(BlockBehaviour.Properties.copy(Blocks.STRIPPED_OAK_LOG)));
+        public static final RegistryObject<Block> STRIPPED_ASHPEN_WOOD = BLOCKS.register("stripped_ashpen_wood",
+                        () -> new RotatedPillarBlock(BlockBehaviour.Properties.copy(Blocks.STRIPPED_OAK_WOOD)));
+        public static final RegistryObject<Block> STRIPPED_ASHPEN_LOG_SLAB = BLOCKS.register("stripped_ashpen_log_slab",
+                        () -> new LogSlabBlock(STRIPPED_ASHPEN_LOG.get(),
+                                        BlockBehaviour.Properties.of(Material.WOOD, MaterialColor.WOOD).strength(2.0f)
+                                                        .sound(net.minecraft.world.level.block.SoundType.WOOD)));
+        public static final RegistryObject<Block> STRIPPED_ASHPEN_LOG_STAIRS = BLOCKS.register("stripped_ashpen_log_stairs",
+                        () -> new ModStairBlock(STRIPPED_ASHPEN_LOG.get().defaultBlockState(),
+                                        BlockBehaviour.Properties.copy(STRIPPED_ASHPEN_LOG.get())));
+        public static final RegistryObject<Block> STRIPPED_ASHPEN_WOOD_SLAB = BLOCKS.register("stripped_ashpen_wood_slab",
+                        () -> new LogSlabBlock(STRIPPED_ASHPEN_WOOD.get(),
+                                        BlockBehaviour.Properties.of(Material.WOOD, MaterialColor.WOOD).strength(2.0f)
+                                                        .sound(net.minecraft.world.level.block.SoundType.WOOD)));
+        public static final RegistryObject<Block> STRIPPED_ASHPEN_WOOD_STAIRS = BLOCKS.register("stripped_ashpen_wood_stairs",
+                        () -> new ModStairBlock(STRIPPED_ASHPEN_WOOD.get().defaultBlockState(),
+                                        BlockBehaviour.Properties.copy(STRIPPED_ASHPEN_WOOD.get())));
 
         // Static vertical slab and stair variants generated from BuildScape horizontal
         // variants.
@@ -10578,6 +10630,16 @@ public class ModBlocks {
                         () -> new VerticalSlabBlock(
                                         CINNABAR_BRICKS.get(),
                                         BlockBehaviour.Properties.copy(CINNABAR_BRICKS_SLAB.get())));
+        public static final RegistryObject<Block> STRIPPED_ASHPEN_LOG_VERTICAL_SLAB = BLOCKS.register(
+                        "stripped_ashpen_log_vertical_slab",
+                        () -> new VerticalSlabBlock(
+                                        STRIPPED_ASHPEN_LOG.get(),
+                                        BlockBehaviour.Properties.copy(STRIPPED_ASHPEN_LOG_SLAB.get())));
+        public static final RegistryObject<Block> STRIPPED_ASHPEN_WOOD_VERTICAL_SLAB = BLOCKS.register(
+                        "stripped_ashpen_wood_vertical_slab",
+                        () -> new VerticalSlabBlock(
+                                        STRIPPED_ASHPEN_WOOD.get(),
+                                        BlockBehaviour.Properties.copy(STRIPPED_ASHPEN_WOOD_SLAB.get())));
         public static final RegistryObject<Block> POPLAR_VERTICAL_SLAB = BLOCKS.register("poplar_vertical_slab",
                         () -> new VerticalSlabBlock(
                                         POPLAR_PLANKS.get(),
@@ -11667,4 +11729,346 @@ public class ModBlocks {
         public static final RegistryObject<Block> BLACK_BIG_BOOK = BLOCKS.register("black_big_book",
                         () -> new BigBookBlock(BlockBehaviour.Properties.copy(Blocks.BOOKSHELF)));
 
+        // --- PALE OAK WOODSET ---
+        public static final RegistryObject<Block> PALE_OAK_LOG = BLOCKS.register("pale_oak_log",
+                        () -> new RotatedPillarBlock(BlockBehaviour.Properties.copy(Blocks.OAK_LOG)));
+        public static final RegistryObject<Block> STRIPPED_PALE_OAK_LOG = BLOCKS.register("stripped_pale_oak_log",
+                        () -> new RotatedPillarBlock(BlockBehaviour.Properties.copy(Blocks.STRIPPED_OAK_LOG)));
+        public static final RegistryObject<Block> PALE_OAK_WOOD = BLOCKS.register("pale_oak_wood",
+                        () -> new RotatedPillarBlock(BlockBehaviour.Properties.copy(Blocks.OAK_WOOD)));
+        public static final RegistryObject<Block> STRIPPED_PALE_OAK_WOOD = BLOCKS.register("stripped_pale_oak_wood",
+                        () -> new RotatedPillarBlock(BlockBehaviour.Properties.copy(Blocks.STRIPPED_OAK_WOOD)));
+        public static final RegistryObject<Block> PALE_OAK_PLANKS = BLOCKS.register("pale_oak_planks",
+                        () -> new Block(BlockBehaviour.Properties.copy(Blocks.OAK_PLANKS)));
+        public static final RegistryObject<Block> PALE_OAK_STAIRS = BLOCKS.register("pale_oak_stairs",
+                        () -> new StairBlock(() -> PALE_OAK_PLANKS.get().defaultBlockState(), BlockBehaviour.Properties.copy(Blocks.OAK_STAIRS)));
+        public static final RegistryObject<Block> PALE_OAK_SLAB = BLOCKS.register("pale_oak_slab",
+                        () -> new ModSlabBlock(PALE_OAK_PLANKS.get(), BlockBehaviour.Properties.copy(Blocks.OAK_SLAB)));
+        public static final RegistryObject<Block> PALE_OAK_VERTICAL_SLAB = BLOCKS.register("pale_oak_vertical_slab",
+                        () -> new VerticalSlabBlock(PALE_OAK_PLANKS.get(), BlockBehaviour.Properties.copy(Blocks.OAK_SLAB)));
+        public static final RegistryObject<Block> PALE_OAK_FENCE = BLOCKS.register("pale_oak_fence",
+                        () -> new FenceBlock(BlockBehaviour.Properties.copy(Blocks.OAK_FENCE)));
+        public static final RegistryObject<Block> PALE_OAK_FENCE_GATE = BLOCKS.register("pale_oak_fence_gate",
+                        () -> new FenceGateBlock(BlockBehaviour.Properties.copy(Blocks.OAK_FENCE_GATE)));
+        public static final RegistryObject<Block> PALE_OAK_DOOR = BLOCKS.register("pale_oak_door",
+                        () -> new DoorBlock(BlockBehaviour.Properties.copy(Blocks.OAK_DOOR)));
+        public static final RegistryObject<Block> PALE_OAK_TRAPDOOR = BLOCKS.register("pale_oak_trapdoor",
+                        () -> new TrapDoorBlock(BlockBehaviour.Properties.copy(Blocks.OAK_TRAPDOOR)));
+        public static final RegistryObject<Block> PALE_OAK_BUTTON = BLOCKS.register("pale_oak_button",
+                        () -> new WoodButtonBlock(BlockBehaviour.Properties.copy(Blocks.OAK_BUTTON)));
+        public static final RegistryObject<Block> PALE_OAK_PRESSURE_PLATE = BLOCKS.register("pale_oak_pressure_plate",
+                        () -> new PressurePlateBlock(PressurePlateBlock.Sensitivity.EVERYTHING, BlockBehaviour.Properties.copy(Blocks.OAK_PRESSURE_PLATE)));
+        public static final RegistryObject<Block> PALE_OAK_LEAVES = BLOCKS.register("pale_oak_leaves",
+                        () -> new LeavesBlock(BlockBehaviour.Properties.copy(Blocks.OAK_LEAVES)));
+        public static final RegistryObject<Block> PALE_OAK_SAPLING = BLOCKS.register("pale_oak_sapling",
+                        () -> new SaplingBlock(new com.kingodogo.buildscape.worldgen.PaleOakTreeGrower(), BlockBehaviour.Properties.copy(Blocks.OAK_SAPLING)));
+
+        // Pale Oak Log/Wood Slabs & Vertical Slabs
+        public static final RegistryObject<Block> PALE_OAK_LOG_SLAB = BLOCKS.register("pale_oak_log_slab", () -> new LogSlabBlock(PALE_OAK_LOG.get(), BlockBehaviour.Properties.copy(Blocks.OAK_SLAB)));
+        public static final RegistryObject<Block> PALE_OAK_LOG_VERTICAL_SLAB = BLOCKS.register("pale_oak_log_vertical_slab", () -> new VerticalSlabBlock(PALE_OAK_LOG.get(), BlockBehaviour.Properties.copy(Blocks.OAK_SLAB)));
+        public static final RegistryObject<Block> STRIPPED_PALE_OAK_LOG_SLAB = BLOCKS.register("stripped_pale_oak_log_slab", () -> new LogSlabBlock(STRIPPED_PALE_OAK_LOG.get(), BlockBehaviour.Properties.copy(Blocks.OAK_SLAB)));
+        public static final RegistryObject<Block> STRIPPED_PALE_OAK_LOG_VERTICAL_SLAB = BLOCKS.register("stripped_pale_oak_log_vertical_slab", () -> new VerticalSlabBlock(STRIPPED_PALE_OAK_LOG.get(), BlockBehaviour.Properties.copy(Blocks.OAK_SLAB)));
+        public static final RegistryObject<Block> PALE_OAK_WOOD_SLAB = BLOCKS.register("pale_oak_wood_slab", () -> new LogSlabBlock(PALE_OAK_WOOD.get(), BlockBehaviour.Properties.copy(Blocks.OAK_SLAB)));
+        public static final RegistryObject<Block> PALE_OAK_WOOD_VERTICAL_SLAB = BLOCKS.register("pale_oak_wood_vertical_slab", () -> new VerticalSlabBlock(PALE_OAK_WOOD.get(), BlockBehaviour.Properties.copy(Blocks.OAK_SLAB)));
+        public static final RegistryObject<Block> STRIPPED_PALE_OAK_WOOD_SLAB = BLOCKS.register("stripped_pale_oak_wood_slab", () -> new LogSlabBlock(STRIPPED_PALE_OAK_WOOD.get(), BlockBehaviour.Properties.copy(Blocks.OAK_SLAB)));
+        public static final RegistryObject<Block> STRIPPED_PALE_OAK_WOOD_VERTICAL_SLAB = BLOCKS.register("stripped_pale_oak_wood_vertical_slab", () -> new VerticalSlabBlock(STRIPPED_PALE_OAK_WOOD.get(), BlockBehaviour.Properties.copy(Blocks.OAK_SLAB)));
+
+        // --- CHERRY WOODSET ---
+        public static final RegistryObject<Block> CHERRY_LOG = BLOCKS.register("cherry_log",
+                        () -> new RotatedPillarBlock(BlockBehaviour.Properties.copy(Blocks.OAK_LOG)));
+        public static final RegistryObject<Block> STRIPPED_CHERRY_LOG = BLOCKS.register("stripped_cherry_log",
+                        () -> new RotatedPillarBlock(BlockBehaviour.Properties.copy(Blocks.STRIPPED_OAK_LOG)));
+        public static final RegistryObject<Block> CHERRY_WOOD = BLOCKS.register("cherry_wood",
+                        () -> new RotatedPillarBlock(BlockBehaviour.Properties.copy(Blocks.OAK_WOOD)));
+        public static final RegistryObject<Block> STRIPPED_CHERRY_WOOD = BLOCKS.register("stripped_cherry_wood",
+                        () -> new RotatedPillarBlock(BlockBehaviour.Properties.copy(Blocks.STRIPPED_OAK_WOOD)));
+        public static final RegistryObject<Block> CHERRY_PLANKS = BLOCKS.register("cherry_planks",
+                        () -> new Block(BlockBehaviour.Properties.copy(Blocks.OAK_PLANKS)));
+        public static final RegistryObject<Block> CHERRY_STAIRS = BLOCKS.register("cherry_stairs",
+                        () -> new ModStairBlock(CHERRY_PLANKS.get().defaultBlockState(), BlockBehaviour.Properties.copy(Blocks.OAK_STAIRS)));
+        public static final RegistryObject<Block> CHERRY_SLAB = BLOCKS.register("cherry_slab",
+                        () -> new ModSlabBlock(CHERRY_PLANKS.get(), BlockBehaviour.Properties.copy(Blocks.OAK_SLAB)));
+        public static final RegistryObject<Block> CHERRY_VERTICAL_SLAB = BLOCKS.register("cherry_vertical_slab",
+                        () -> new VerticalSlabBlock(CHERRY_PLANKS.get(), BlockBehaviour.Properties.copy(Blocks.OAK_SLAB)));
+        public static final RegistryObject<Block> CHERRY_FENCE = BLOCKS.register("cherry_fence",
+                        () -> new FenceBlock(BlockBehaviour.Properties.copy(Blocks.OAK_FENCE)));
+        public static final RegistryObject<Block> CHERRY_FENCE_GATE = BLOCKS.register("cherry_fence_gate",
+                        () -> new FenceGateBlock(BlockBehaviour.Properties.copy(Blocks.OAK_FENCE_GATE)));
+        public static final RegistryObject<Block> CHERRY_DOOR = BLOCKS.register("cherry_door",
+                        () -> new DoorBlock(BlockBehaviour.Properties.copy(Blocks.OAK_DOOR)));
+        public static final RegistryObject<Block> CHERRY_TRAPDOOR = BLOCKS.register("cherry_trapdoor",
+                        () -> new TrapDoorBlock(BlockBehaviour.Properties.copy(Blocks.OAK_TRAPDOOR)));
+        public static final RegistryObject<Block> CHERRY_BUTTON = BLOCKS.register("cherry_button",
+                        () -> new WoodButtonBlock(BlockBehaviour.Properties.copy(Blocks.OAK_BUTTON)));
+        public static final RegistryObject<Block> CHERRY_PRESSURE_PLATE = BLOCKS.register("cherry_pressure_plate",
+                        () -> new PressurePlateBlock(PressurePlateBlock.Sensitivity.EVERYTHING, BlockBehaviour.Properties.copy(Blocks.OAK_PRESSURE_PLATE)));
+        public static final RegistryObject<Block> CHERRY_LEAVES = BLOCKS.register("cherry_leaves",
+                        () -> new LeavesBlock(BlockBehaviour.Properties.copy(Blocks.OAK_LEAVES)));
+        public static final RegistryObject<Block> CHERRY_SAPLING = BLOCKS.register("cherry_sapling",
+                        () -> new SaplingBlock(new com.kingodogo.buildscape.worldgen.CherryTreeGrower(), BlockBehaviour.Properties.copy(Blocks.OAK_SAPLING)));
+
+        // Cherry Log/Wood Slabs & Vertical Slabs
+        public static final RegistryObject<Block> CHERRY_LOG_SLAB = BLOCKS.register("cherry_log_slab", () -> new LogSlabBlock(CHERRY_LOG.get(), BlockBehaviour.Properties.copy(Blocks.OAK_SLAB)));
+        public static final RegistryObject<Block> CHERRY_LOG_VERTICAL_SLAB = BLOCKS.register("cherry_log_vertical_slab", () -> new VerticalSlabBlock(CHERRY_LOG.get(), BlockBehaviour.Properties.copy(Blocks.OAK_SLAB)));
+        public static final RegistryObject<Block> STRIPPED_CHERRY_LOG_SLAB = BLOCKS.register("stripped_cherry_log_slab", () -> new LogSlabBlock(STRIPPED_CHERRY_LOG.get(), BlockBehaviour.Properties.copy(Blocks.OAK_SLAB)));
+        public static final RegistryObject<Block> STRIPPED_CHERRY_LOG_VERTICAL_SLAB = BLOCKS.register("stripped_cherry_log_vertical_slab", () -> new VerticalSlabBlock(STRIPPED_CHERRY_LOG.get(), BlockBehaviour.Properties.copy(Blocks.OAK_SLAB)));
+        public static final RegistryObject<Block> CHERRY_WOOD_SLAB = BLOCKS.register("cherry_wood_slab", () -> new LogSlabBlock(CHERRY_WOOD.get(), BlockBehaviour.Properties.copy(Blocks.OAK_SLAB)));
+        public static final RegistryObject<Block> CHERRY_WOOD_VERTICAL_SLAB = BLOCKS.register("cherry_wood_vertical_slab", () -> new VerticalSlabBlock(CHERRY_WOOD.get(), BlockBehaviour.Properties.copy(Blocks.OAK_SLAB)));
+        public static final RegistryObject<Block> STRIPPED_CHERRY_WOOD_SLAB = BLOCKS.register("stripped_cherry_wood_slab", () -> new LogSlabBlock(STRIPPED_CHERRY_WOOD.get(), BlockBehaviour.Properties.copy(Blocks.OAK_SLAB)));
+        public static final RegistryObject<Block> STRIPPED_CHERRY_WOOD_VERTICAL_SLAB = BLOCKS.register("stripped_cherry_wood_vertical_slab", () -> new VerticalSlabBlock(STRIPPED_CHERRY_WOOD.get(), BlockBehaviour.Properties.copy(Blocks.OAK_SLAB)));
+
+        // --- PALE MOSS FAMILY ---
+        public static final RegistryObject<Block> PALE_MOSS_CARPET = BLOCKS.register("pale_moss_carpet",
+                        () -> new CarpetBlock(BlockBehaviour.Properties.copy(Blocks.MOSS_CARPET)));
+        public static final RegistryObject<Block> PALE_MOSS_OVERLAY = BLOCKS.register("pale_moss_overlay",
+                        () -> new MossOverlayBlock(BlockBehaviour.Properties.copy(Blocks.MOSS_CARPET)));
+        public static final RegistryObject<Block> PALE_MOSS_LAYERS = BLOCKS.register("pale_moss_layers",
+                        () -> new ColoredMossLayersBlock(BlockBehaviour.Properties.copy(Blocks.MOSS_CARPET),
+                                        () -> ModItems.PALE_MOSS_LAYERS.get()));
+        public static final RegistryObject<Block> PALE_MOSS_BLOCK = BLOCKS.register("pale_moss_block",
+                        () -> new ColoredMossBlock(BlockBehaviour.Properties.copy(Blocks.MOSS_BLOCK), PALE_MOSS_CARPET,
+                                        PALE_MOSS_OVERLAY, PALE_MOSS_LAYERS, () -> ModBlocks.PALE_OAK_SAPLING.get(), () -> ModBlocks.CLOSED_EYEBLOSSOM.get()));
+        public static final RegistryObject<Block> PALE_MOSS_BLOCK_SLAB = BLOCKS.register("pale_moss_block_slab",
+                        () -> new ModSlabBlock(PALE_MOSS_BLOCK.get(), BlockBehaviour.Properties.copy(Blocks.MOSS_BLOCK)));
+        public static final RegistryObject<Block> PALE_MOSS_BLOCK_STAIRS = BLOCKS.register("pale_moss_block_stairs",
+                        () -> new ModStairBlock(PALE_MOSS_BLOCK.get().defaultBlockState(), BlockBehaviour.Properties.copy(Blocks.MOSS_BLOCK)));
+        public static final RegistryObject<Block> PALE_MOSS_BLOCK_VERTICAL_SLAB = BLOCKS.register("pale_moss_block_vertical_slab",
+                        () -> new VerticalSlabBlock(PALE_MOSS_BLOCK.get(), BlockBehaviour.Properties.copy(Blocks.MOSS_BLOCK)));
+        public static final RegistryObject<Block> PALE_HANGING_MOSS = BLOCKS.register("pale_hanging_moss",
+                        () -> new HangingMossBlock(BlockBehaviour.Properties.copy(Blocks.MOSS_CARPET).noCollission().strength(0.2F)));
+
+        // --- CREAKING HEART & RESIN SET ---
+        public static final RegistryObject<Block> CREAKING_HEART = BLOCKS.register("creaking_heart",
+                        () -> new CreakingHeartBlock(BlockBehaviour.Properties.copy(Blocks.OAK_LOG).strength(2.0F)));
+        public static final RegistryObject<Block> RESIN_CLUMP = BLOCKS.register("resin_clump",
+                        () -> new ResinClumpBlock(BlockBehaviour.Properties.copy(Blocks.GLOW_LICHEN).lightLevel(state -> 7).hasPostProcess((state, getter, pos) -> true).emissiveRendering((state, getter, pos) -> true)));
+        public static final RegistryObject<Block> RESIN_BLOCK = BLOCKS.register("resin_block",
+                        () -> new Block(BlockBehaviour.Properties.copy(Blocks.TERRACOTTA)));
+        public static final RegistryObject<Block> RESIN_BLOCK_SLAB = BLOCKS.register("resin_block_slab",
+                        () -> new ModSlabBlock(RESIN_BLOCK.get(), BlockBehaviour.Properties.copy(Blocks.TERRACOTTA)));
+        public static final RegistryObject<Block> RESIN_BLOCK_STAIRS = BLOCKS.register("resin_block_stairs",
+                        () -> new ModStairBlock(RESIN_BLOCK.get().defaultBlockState(), BlockBehaviour.Properties.copy(Blocks.TERRACOTTA)));
+        public static final RegistryObject<Block> RESIN_BLOCK_VERTICAL_SLAB = BLOCKS.register("resin_block_vertical_slab",
+                        () -> new VerticalSlabBlock(RESIN_BLOCK.get(), BlockBehaviour.Properties.copy(Blocks.TERRACOTTA)));
+        public static final RegistryObject<Block> RESIN_BRICKS = BLOCKS.register("resin_bricks",
+                        () -> new Block(BlockBehaviour.Properties.copy(Blocks.BRICKS)));
+        public static final RegistryObject<Block> RESIN_BRICK_SLAB = BLOCKS.register("resin_brick_slab",
+                        () -> new ModSlabBlock(RESIN_BRICKS.get(), BlockBehaviour.Properties.copy(Blocks.BRICKS)));
+        public static final RegistryObject<Block> RESIN_BRICK_STAIRS = BLOCKS.register("resin_brick_stairs",
+                        () -> new ModStairBlock(RESIN_BRICKS.get().defaultBlockState(), BlockBehaviour.Properties.copy(Blocks.BRICKS)));
+        public static final RegistryObject<Block> RESIN_BRICK_WALL = BLOCKS.register("resin_brick_wall",
+                        () -> new WallBlock(BlockBehaviour.Properties.copy(Blocks.BRICKS)));
+        public static final RegistryObject<Block> RESIN_BRICK_VERTICAL_SLAB = BLOCKS.register("resin_brick_vertical_slab",
+                        () -> new VerticalSlabBlock(RESIN_BRICKS.get(), BlockBehaviour.Properties.copy(Blocks.BRICKS)));
+        public static final RegistryObject<Block> CHISELED_RESIN_BRICKS = BLOCKS.register("chiseled_resin_bricks",
+                        () -> new Block(BlockBehaviour.Properties.copy(Blocks.BRICKS)));
+
+        // --- PLANTS & FLOWERS ---
+        public static final RegistryObject<Block> CLOSED_EYEBLOSSOM = BLOCKS.register("closed_eyeblossom",
+                        () -> new EyeblossomBlock(false, net.minecraft.world.effect.MobEffects.BLINDNESS, 7, BlockBehaviour.Properties.copy(Blocks.POPPY)));
+        public static final RegistryObject<Block> OPEN_EYEBLOSSOM = BLOCKS.register("open_eyeblossom",
+                        () -> new EyeblossomBlock(true, net.minecraft.world.effect.MobEffects.CONFUSION, 7, BlockBehaviour.Properties.copy(Blocks.POPPY).lightLevel(state -> 7).hasPostProcess((state, getter, pos) -> true).emissiveRendering((state, getter, pos) -> true)));
+        public static final RegistryObject<Block> WILDFLOWERS = BLOCKS.register("wildflowers",
+                        () -> new PetalBlock(BlockBehaviour.Properties.copy(Blocks.MOSS_CARPET).noCollission().sound(SoundType.GRASS)));
+        public static final RegistryObject<Block> LEAF_LITTER = BLOCKS.register("leaf_litter",
+                        () -> new PetalBlock(BlockBehaviour.Properties.copy(Blocks.MOSS_CARPET).noCollission().sound(SoundType.GRASS)));
+        public static final RegistryObject<Block> CACTUS_FLOWER = BLOCKS.register("cactus_flower",
+                        () -> new CactusFlowerBlock(BlockBehaviour.Properties.copy(Blocks.DANDELION)));
+        public static final RegistryObject<Block> BUSH = BLOCKS.register("bush",
+                        () -> new ModBushBlock(BlockBehaviour.Properties.copy(Blocks.DEAD_BUSH)));
+        public static final RegistryObject<Block> RED_BUSH = BLOCKS.register("red_bush",
+                        () -> new ModBushBlock(BlockBehaviour.Properties.copy(Blocks.DEAD_BUSH)));
+        public static final RegistryObject<Block> FIREFLY_BUSH = BLOCKS.register("firefly_bush",
+                        () -> new FireflyBushBlock(BlockBehaviour.Properties.copy(Blocks.GRASS).lightLevel(state -> 8).hasPostProcess((state, getter, pos) -> true).emissiveRendering((state, getter, pos) -> true)));
+        public static final RegistryObject<Block> DRY_GRASS = BLOCKS.register("dry_grass",
+                        () -> new DryGrassBlock(BlockBehaviour.Properties.copy(Blocks.GRASS)));
+        public static final RegistryObject<Block> TALL_DRY_GRASS = BLOCKS.register("tall_dry_grass",
+                        () -> new TallDryGrassBlock(BlockBehaviour.Properties.copy(Blocks.TALL_GRASS)));
+        public static final RegistryObject<Block> GOLDEN_DANDELION = BLOCKS.register("golden_dandelion",
+                        () -> new GoldenDandelionBlock(BlockBehaviour.Properties.copy(Blocks.DANDELION)));
+
+        // --- FROGLIGHTS ---
+        public static final RegistryObject<Block> OCHRE_FROGLIGHT = BLOCKS.register("ochre_froglight",
+                        () -> new FroglightBlock(BlockBehaviour.Properties.copy(Blocks.SHROOMLIGHT).lightLevel(state -> 15)));
+        public static final RegistryObject<Block> PEARLESCENT_FROGLIGHT = BLOCKS.register("pearlescent_froglight",
+                        () -> new FroglightBlock(BlockBehaviour.Properties.copy(Blocks.SHROOMLIGHT).lightLevel(state -> 15)));
+        public static final RegistryObject<Block> VERDANT_FROGLIGHT = BLOCKS.register("verdant_froglight",
+                        () -> new FroglightBlock(BlockBehaviour.Properties.copy(Blocks.SHROOMLIGHT).lightLevel(state -> 15)));
+
+        // --- SCULK FAMILY ---
+        public static final RegistryObject<Block> SCULK = BLOCKS.register("sculk",
+                        () -> new Block(BlockBehaviour.Properties.copy(Blocks.SCULK_SENSOR)));
+        public static final RegistryObject<Block> SCULK_SLAB = BLOCKS.register("sculk_slab",
+                        () -> new SlabBlock(BlockBehaviour.Properties.copy(Blocks.SCULK_SENSOR)));
+        public static final RegistryObject<Block> SCULK_STAIRS = BLOCKS.register("sculk_stairs",
+                        () -> new ModStairBlock(SCULK.get().defaultBlockState(), BlockBehaviour.Properties.copy(Blocks.SCULK_SENSOR)));
+        public static final RegistryObject<Block> SCULK_WALL = BLOCKS.register("sculk_wall",
+                        () -> new WallBlock(BlockBehaviour.Properties.copy(Blocks.SCULK_SENSOR)));
+        public static final RegistryObject<Block> SCULK_VERTICAL_SLAB = BLOCKS.register("sculk_vertical_slab",
+                        () -> new VerticalSlabBlock(SCULK.get(), BlockBehaviour.Properties.copy(Blocks.SCULK_SENSOR)));
+        public static final RegistryObject<Block> SCULK_VEIN = BLOCKS.register("sculk_vein",
+                        () -> new SculkVeinBlock(BlockBehaviour.Properties.copy(Blocks.GLOW_LICHEN)));
+        public static final RegistryObject<Block> SCULK_CATALYST = BLOCKS.register("sculk_catalyst",
+                        () -> new SculkCatalystBlock(BlockBehaviour.Properties.copy(Blocks.SCULK_SENSOR).lightLevel(state -> 6)));
+        public static final RegistryObject<Block> SCULK_SHRIEKER = BLOCKS.register("sculk_shrieker",
+                        () -> new Block(BlockBehaviour.Properties.copy(Blocks.SCULK_SENSOR).noOcclusion()));
+        public static final RegistryObject<Block> SCULK_SENSOR = BLOCKS.register("sculk_sensor",
+                        () -> new Block(BlockBehaviour.Properties.copy(Blocks.SCULK_SENSOR).lightLevel(state -> 1).noOcclusion()));
+
+        // --- COPPER TORCH & LIGHTING ---
+        public static final RegistryObject<Block> COPPER_TORCH = BLOCKS.register("copper_torch",
+                        () -> new CopperTorchBlock(BlockBehaviour.Properties.copy(Blocks.TORCH).lightLevel(state -> 14)));
+        public static final RegistryObject<Block> COPPER_WALL_TORCH = BLOCKS.register("copper_wall_torch",
+                        () -> new CopperWallTorchBlock(BlockBehaviour.Properties.copy(Blocks.WALL_TORCH).lightLevel(state -> 14)));
+
+        // --- COPPER RODS ---
+        public static final RegistryObject<Block> COPPER_ROD = BLOCKS.register("copper_rod",
+                        () -> new WeatheringRodBlock(BlockBehaviour.Properties.copy(Blocks.LIGHTNING_ROD)));
+        public static final RegistryObject<Block> WAXED_COPPER_ROD = BLOCKS.register("waxed_copper_rod",
+                        () -> new LightningRodBlock(BlockBehaviour.Properties.copy(Blocks.LIGHTNING_ROD)));
+        public static final RegistryObject<Block> EXPOSED_COPPER_ROD = BLOCKS.register("exposed_copper_rod",
+                        () -> new WeatheringRodBlock(BlockBehaviour.Properties.copy(Blocks.LIGHTNING_ROD)));
+        public static final RegistryObject<Block> WAXED_EXPOSED_COPPER_ROD = BLOCKS.register("waxed_exposed_copper_rod",
+                        () -> new LightningRodBlock(BlockBehaviour.Properties.copy(Blocks.LIGHTNING_ROD)));
+        public static final RegistryObject<Block> WEATHERED_COPPER_ROD = BLOCKS.register("weathered_copper_rod",
+                        () -> new WeatheringRodBlock(BlockBehaviour.Properties.copy(Blocks.LIGHTNING_ROD)));
+        public static final RegistryObject<Block> WAXED_WEATHERED_COPPER_ROD = BLOCKS.register("waxed_weathered_copper_rod",
+                        () -> new LightningRodBlock(BlockBehaviour.Properties.copy(Blocks.LIGHTNING_ROD)));
+        public static final RegistryObject<Block> OXIDIZED_COPPER_ROD = BLOCKS.register("oxidized_copper_rod",
+                        () -> new LightningRodBlock(BlockBehaviour.Properties.copy(Blocks.LIGHTNING_ROD)));
+        public static final RegistryObject<Block> WAXED_OXIDIZED_COPPER_ROD = BLOCKS.register("waxed_oxidized_copper_rod",
+                        () -> new LightningRodBlock(BlockBehaviour.Properties.copy(Blocks.LIGHTNING_ROD)));
+
+        // --- COPPER LANTERNS ---
+        public static final RegistryObject<Block> COPPER_LANTERN = BLOCKS.register("copper_lantern",
+                        () -> new WeatheringLanternBlock(BlockBehaviour.Properties.copy(Blocks.LANTERN).lightLevel(state -> 15).sound(SoundType.COPPER)));
+        public static final RegistryObject<Block> WAXED_COPPER_LANTERN = BLOCKS.register("waxed_copper_lantern",
+                        () -> new LanternBlock(BlockBehaviour.Properties.copy(Blocks.LANTERN).lightLevel(state -> 15).sound(SoundType.COPPER)));
+        public static final RegistryObject<Block> EXPOSED_COPPER_LANTERN = BLOCKS.register("exposed_copper_lantern",
+                        () -> new WeatheringLanternBlock(BlockBehaviour.Properties.copy(Blocks.LANTERN).lightLevel(state -> 15).sound(SoundType.COPPER)));
+        public static final RegistryObject<Block> WAXED_EXPOSED_COPPER_LANTERN = BLOCKS.register("waxed_exposed_copper_lantern",
+                        () -> new LanternBlock(BlockBehaviour.Properties.copy(Blocks.LANTERN).lightLevel(state -> 15).sound(SoundType.COPPER)));
+        public static final RegistryObject<Block> WEATHERED_COPPER_LANTERN = BLOCKS.register("weathered_copper_lantern",
+                        () -> new WeatheringLanternBlock(BlockBehaviour.Properties.copy(Blocks.LANTERN).lightLevel(state -> 15).sound(SoundType.COPPER)));
+        public static final RegistryObject<Block> WAXED_WEATHERED_COPPER_LANTERN = BLOCKS.register("waxed_weathered_copper_lantern",
+                        () -> new LanternBlock(BlockBehaviour.Properties.copy(Blocks.LANTERN).lightLevel(state -> 15).sound(SoundType.COPPER)));
+        public static final RegistryObject<Block> OXIDIZED_COPPER_LANTERN = BLOCKS.register("oxidized_copper_lantern",
+                        () -> new LanternBlock(BlockBehaviour.Properties.copy(Blocks.LANTERN).lightLevel(state -> 15).sound(SoundType.COPPER)));
+        public static final RegistryObject<Block> WAXED_OXIDIZED_COPPER_LANTERN = BLOCKS.register("waxed_oxidized_copper_lantern",
+                        () -> new LanternBlock(BlockBehaviour.Properties.copy(Blocks.LANTERN).lightLevel(state -> 15).sound(SoundType.COPPER)));
+
+        // --- COPPER EXPANSION BLOCKS ---
+        // Chiseled Copper
+        public static final RegistryObject<Block> CHISELED_COPPER = BLOCKS.register("chiseled_copper", () -> new WeatheringBlock(BlockBehaviour.Properties.copy(Blocks.CUT_COPPER)));
+        public static final RegistryObject<Block> WAXED_CHISELED_COPPER = BLOCKS.register("waxed_chiseled_copper", () -> new Block(BlockBehaviour.Properties.copy(Blocks.CUT_COPPER)));
+        public static final RegistryObject<Block> EXPOSED_CHISELED_COPPER = BLOCKS.register("exposed_chiseled_copper", () -> new WeatheringBlock(BlockBehaviour.Properties.copy(Blocks.EXPOSED_CUT_COPPER)));
+        public static final RegistryObject<Block> WAXED_EXPOSED_CHISELED_COPPER = BLOCKS.register("waxed_exposed_chiseled_copper", () -> new Block(BlockBehaviour.Properties.copy(Blocks.EXPOSED_CUT_COPPER)));
+        public static final RegistryObject<Block> WEATHERED_CHISELED_COPPER = BLOCKS.register("weathered_chiseled_copper", () -> new WeatheringBlock(BlockBehaviour.Properties.copy(Blocks.WEATHERED_CUT_COPPER)));
+        public static final RegistryObject<Block> WAXED_WEATHERED_CHISELED_COPPER = BLOCKS.register("waxed_weathered_chiseled_copper", () -> new Block(BlockBehaviour.Properties.copy(Blocks.WEATHERED_CUT_COPPER)));
+        public static final RegistryObject<Block> OXIDIZED_CHISELED_COPPER = BLOCKS.register("oxidized_chiseled_copper", () -> new Block(BlockBehaviour.Properties.copy(Blocks.OXIDIZED_CUT_COPPER)));
+        public static final RegistryObject<Block> WAXED_OXIDIZED_CHISELED_COPPER = BLOCKS.register("waxed_oxidized_chiseled_copper", () -> new Block(BlockBehaviour.Properties.copy(Blocks.OXIDIZED_CUT_COPPER)));
+
+        // Copper Grates
+        public static final RegistryObject<Block> COPPER_GRATE = BLOCKS.register("copper_grate", () -> new WeatheringGrateBlock(BlockBehaviour.Properties.copy(Blocks.CUT_COPPER).noOcclusion().sound(com.kingodogo.buildscape.sound.ModSounds.COPPER_GRATE_SOUNDS())));
+        public static final RegistryObject<Block> WAXED_COPPER_GRATE = BLOCKS.register("waxed_copper_grate", () -> new WaterloggableGrateBlock(BlockBehaviour.Properties.copy(Blocks.CUT_COPPER).noOcclusion().sound(com.kingodogo.buildscape.sound.ModSounds.COPPER_GRATE_SOUNDS())));
+        public static final RegistryObject<Block> EXPOSED_COPPER_GRATE = BLOCKS.register("exposed_copper_grate", () -> new WeatheringGrateBlock(BlockBehaviour.Properties.copy(Blocks.EXPOSED_CUT_COPPER).noOcclusion().sound(com.kingodogo.buildscape.sound.ModSounds.COPPER_GRATE_SOUNDS())));
+        public static final RegistryObject<Block> WAXED_EXPOSED_COPPER_GRATE = BLOCKS.register("waxed_exposed_copper_grate", () -> new WaterloggableGrateBlock(BlockBehaviour.Properties.copy(Blocks.EXPOSED_CUT_COPPER).noOcclusion().sound(com.kingodogo.buildscape.sound.ModSounds.COPPER_GRATE_SOUNDS())));
+        public static final RegistryObject<Block> WEATHERED_COPPER_GRATE = BLOCKS.register("weathered_copper_grate", () -> new WeatheringGrateBlock(BlockBehaviour.Properties.copy(Blocks.WEATHERED_CUT_COPPER).noOcclusion().sound(com.kingodogo.buildscape.sound.ModSounds.COPPER_GRATE_SOUNDS())));
+        public static final RegistryObject<Block> WAXED_WEATHERED_COPPER_GRATE = BLOCKS.register("waxed_weathered_copper_grate", () -> new WaterloggableGrateBlock(BlockBehaviour.Properties.copy(Blocks.WEATHERED_CUT_COPPER).noOcclusion().sound(com.kingodogo.buildscape.sound.ModSounds.COPPER_GRATE_SOUNDS())));
+        public static final RegistryObject<Block> OXIDIZED_COPPER_GRATE = BLOCKS.register("oxidized_copper_grate", () -> new WaterloggableGrateBlock(BlockBehaviour.Properties.copy(Blocks.OXIDIZED_CUT_COPPER).noOcclusion().sound(com.kingodogo.buildscape.sound.ModSounds.COPPER_GRATE_SOUNDS())));
+        public static final RegistryObject<Block> WAXED_OXIDIZED_COPPER_GRATE = BLOCKS.register("waxed_oxidized_copper_grate", () -> new WaterloggableGrateBlock(BlockBehaviour.Properties.copy(Blocks.OXIDIZED_CUT_COPPER).noOcclusion().sound(com.kingodogo.buildscape.sound.ModSounds.COPPER_GRATE_SOUNDS())));
+
+        // Copper Bulbs
+        public static final RegistryObject<Block> COPPER_BULB = BLOCKS.register("copper_bulb",
+                        () -> new FreshCopperBulbBlock(BlockBehaviour.Properties.copy(Blocks.COPPER_BLOCK)
+                                        .lightLevel((state) -> state.getValue(CopperBulbBlock.LIT) ? 15 : 0)
+                                        .sound(ModSounds.COPPER_BULB_SOUNDS())
+                                        .isRedstoneConductor((state, reader, pos) -> false)));
+        public static final RegistryObject<Block> WAXED_COPPER_BULB = BLOCKS.register("waxed_copper_bulb",
+                        () -> new FreshCopperBulbBlock(BlockBehaviour.Properties.copy(Blocks.COPPER_BLOCK)
+                                        .lightLevel((state) -> state.getValue(CopperBulbBlock.LIT) ? 15 : 0)
+                                        .sound(ModSounds.COPPER_BULB_SOUNDS())
+                                        .isRedstoneConductor((state, reader, pos) -> false)));
+        public static final RegistryObject<Block> EXPOSED_COPPER_BULB = BLOCKS.register("exposed_copper_bulb",
+                        () -> new ExposedCopperBulbBlock(BlockBehaviour.Properties.copy(Blocks.EXPOSED_COPPER)
+                                        .lightLevel((state) -> state.getValue(CopperBulbBlock.LIT) ? 12 : 0)
+                                        .sound(ModSounds.COPPER_BULB_SOUNDS())
+                                        .isRedstoneConductor((state, reader, pos) -> false)));
+        public static final RegistryObject<Block> WAXED_EXPOSED_COPPER_BULB = BLOCKS.register("waxed_exposed_copper_bulb",
+                        () -> new ExposedCopperBulbBlock(BlockBehaviour.Properties.copy(Blocks.EXPOSED_COPPER)
+                                        .lightLevel((state) -> state.getValue(CopperBulbBlock.LIT) ? 12 : 0)
+                                        .sound(ModSounds.COPPER_BULB_SOUNDS())
+                                        .isRedstoneConductor((state, reader, pos) -> false)));
+        public static final RegistryObject<Block> WEATHERED_COPPER_BULB = BLOCKS.register("weathered_copper_bulb",
+                        () -> new WeatheredCopperBulbBlock(BlockBehaviour.Properties.copy(Blocks.WEATHERED_COPPER)
+                                        .lightLevel((state) -> state.getValue(CopperBulbBlock.LIT) ? 8 : 0)
+                                        .sound(ModSounds.COPPER_BULB_SOUNDS())
+                                        .isRedstoneConductor((state, reader, pos) -> false)));
+        public static final RegistryObject<Block> WAXED_WEATHERED_COPPER_BULB = BLOCKS.register("waxed_weathered_copper_bulb",
+                        () -> new WeatheredCopperBulbBlock(BlockBehaviour.Properties.copy(Blocks.WEATHERED_COPPER)
+                                        .lightLevel((state) -> state.getValue(CopperBulbBlock.LIT) ? 8 : 0)
+                                        .sound(ModSounds.COPPER_BULB_SOUNDS())
+                                        .isRedstoneConductor((state, reader, pos) -> false)));
+        public static final RegistryObject<Block> OXIDIZED_COPPER_BULB = BLOCKS.register("oxidized_copper_bulb",
+                        () -> new OxidizedCopperBulbBlock(BlockBehaviour.Properties.copy(Blocks.OXIDIZED_COPPER)
+                                        .lightLevel((state) -> state.getValue(CopperBulbBlock.LIT) ? 4 : 0)
+                                        .sound(ModSounds.COPPER_BULB_SOUNDS())
+                                        .isRedstoneConductor((state, reader, pos) -> false)));
+        public static final RegistryObject<Block> WAXED_OXIDIZED_COPPER_BULB = BLOCKS.register("waxed_oxidized_copper_bulb",
+                        () -> new OxidizedCopperBulbBlock(BlockBehaviour.Properties.copy(Blocks.OXIDIZED_COPPER)
+                                        .lightLevel((state) -> state.getValue(CopperBulbBlock.LIT) ? 4 : 0)
+                                        .sound(ModSounds.COPPER_BULB_SOUNDS())
+                                        .isRedstoneConductor((state, reader, pos) -> false)));
+
+        // Copper Doors
+        public static final RegistryObject<Block> COPPER_DOOR = BLOCKS.register("copper_door", () -> new WeatheringDoorBlock(BlockBehaviour.Properties.copy(Blocks.COPPER_BLOCK).noOcclusion().sound(SoundType.COPPER)));
+        public static final RegistryObject<Block> WAXED_COPPER_DOOR = BLOCKS.register("waxed_copper_door", () -> new ModCopperDoorBlock(BlockBehaviour.Properties.copy(Blocks.COPPER_BLOCK).noOcclusion().sound(SoundType.COPPER)));
+        public static final RegistryObject<Block> EXPOSED_COPPER_DOOR = BLOCKS.register("exposed_copper_door", () -> new WeatheringDoorBlock(BlockBehaviour.Properties.copy(Blocks.EXPOSED_COPPER).noOcclusion().sound(SoundType.COPPER)));
+        public static final RegistryObject<Block> WAXED_EXPOSED_COPPER_DOOR = BLOCKS.register("waxed_exposed_copper_door", () -> new ModCopperDoorBlock(BlockBehaviour.Properties.copy(Blocks.EXPOSED_COPPER).noOcclusion().sound(SoundType.COPPER)));
+        public static final RegistryObject<Block> WEATHERED_COPPER_DOOR = BLOCKS.register("weathered_copper_door", () -> new WeatheringDoorBlock(BlockBehaviour.Properties.copy(Blocks.WEATHERED_COPPER).noOcclusion().sound(SoundType.COPPER)));
+        public static final RegistryObject<Block> WAXED_WEATHERED_COPPER_DOOR = BLOCKS.register("waxed_weathered_copper_door", () -> new ModCopperDoorBlock(BlockBehaviour.Properties.copy(Blocks.WEATHERED_COPPER).noOcclusion().sound(SoundType.COPPER)));
+        public static final RegistryObject<Block> OXIDIZED_COPPER_DOOR = BLOCKS.register("oxidized_copper_door", () -> new ModCopperDoorBlock(BlockBehaviour.Properties.copy(Blocks.OXIDIZED_COPPER).noOcclusion().sound(SoundType.COPPER)));
+        public static final RegistryObject<Block> WAXED_OXIDIZED_COPPER_DOOR = BLOCKS.register("waxed_oxidized_copper_door", () -> new ModCopperDoorBlock(BlockBehaviour.Properties.copy(Blocks.OXIDIZED_COPPER).noOcclusion().sound(SoundType.COPPER)));
+
+        // Copper Trapdoors
+        public static final RegistryObject<Block> COPPER_TRAPDOOR = BLOCKS.register("copper_trapdoor", () -> new WeatheringTrapdoorBlock(BlockBehaviour.Properties.copy(Blocks.COPPER_BLOCK).noOcclusion().sound(SoundType.COPPER)));
+        public static final RegistryObject<Block> WAXED_COPPER_TRAPDOOR = BLOCKS.register("waxed_copper_trapdoor", () -> new ModCopperTrapdoorBlock(BlockBehaviour.Properties.copy(Blocks.COPPER_BLOCK).noOcclusion().sound(SoundType.COPPER)));
+        public static final RegistryObject<Block> EXPOSED_COPPER_TRAPDOOR = BLOCKS.register("exposed_copper_trapdoor", () -> new WeatheringTrapdoorBlock(BlockBehaviour.Properties.copy(Blocks.EXPOSED_COPPER).noOcclusion().sound(SoundType.COPPER)));
+        public static final RegistryObject<Block> WAXED_EXPOSED_COPPER_TRAPDOOR = BLOCKS.register("waxed_exposed_copper_trapdoor", () -> new ModCopperTrapdoorBlock(BlockBehaviour.Properties.copy(Blocks.EXPOSED_COPPER).noOcclusion().sound(SoundType.COPPER)));
+        public static final RegistryObject<Block> WEATHERED_COPPER_TRAPDOOR = BLOCKS.register("weathered_copper_trapdoor", () -> new WeatheringTrapdoorBlock(BlockBehaviour.Properties.copy(Blocks.WEATHERED_COPPER).noOcclusion().sound(SoundType.COPPER)));
+        public static final RegistryObject<Block> WAXED_WEATHERED_COPPER_TRAPDOOR = BLOCKS.register("waxed_weathered_copper_trapdoor", () -> new ModCopperTrapdoorBlock(BlockBehaviour.Properties.copy(Blocks.WEATHERED_COPPER).noOcclusion().sound(SoundType.COPPER)));
+        public static final RegistryObject<Block> OXIDIZED_COPPER_TRAPDOOR = BLOCKS.register("oxidized_copper_trapdoor", () -> new ModCopperTrapdoorBlock(BlockBehaviour.Properties.copy(Blocks.OXIDIZED_COPPER).noOcclusion().sound(SoundType.COPPER)));
+        public static final RegistryObject<Block> WAXED_OXIDIZED_COPPER_TRAPDOOR = BLOCKS.register("waxed_oxidized_copper_trapdoor", () -> new ModCopperTrapdoorBlock(BlockBehaviour.Properties.copy(Blocks.OXIDIZED_COPPER).noOcclusion().sound(SoundType.COPPER)));
+
+        // Copper Bars
+        public static final RegistryObject<Block> COPPER_BARS = BLOCKS.register("copper_bars", () -> new WeatheringBarsBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BARS).sound(SoundType.COPPER)));
+        public static final RegistryObject<Block> WAXED_COPPER_BARS = BLOCKS.register("waxed_copper_bars", () -> new IronBarsBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BARS).sound(SoundType.COPPER)));
+        public static final RegistryObject<Block> EXPOSED_COPPER_BARS = BLOCKS.register("exposed_copper_bars", () -> new WeatheringBarsBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BARS).sound(SoundType.COPPER)));
+        public static final RegistryObject<Block> WAXED_EXPOSED_COPPER_BARS = BLOCKS.register("waxed_exposed_copper_bars", () -> new IronBarsBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BARS).sound(SoundType.COPPER)));
+        public static final RegistryObject<Block> WEATHERED_COPPER_BARS = BLOCKS.register("weathered_copper_bars", () -> new WeatheringBarsBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BARS).sound(SoundType.COPPER)));
+        public static final RegistryObject<Block> WAXED_WEATHERED_COPPER_BARS = BLOCKS.register("waxed_weathered_copper_bars", () -> new IronBarsBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BARS).sound(SoundType.COPPER)));
+        public static final RegistryObject<Block> OXIDIZED_COPPER_BARS = BLOCKS.register("oxidized_copper_bars", () -> new IronBarsBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BARS).sound(SoundType.COPPER)));
+        public static final RegistryObject<Block> WAXED_OXIDIZED_COPPER_BARS = BLOCKS.register("waxed_oxidized_copper_bars", () -> new IronBarsBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BARS).sound(SoundType.COPPER)));
+
+        // Copper Buttons
+        public static final RegistryObject<Block> COPPER_BUTTON = BLOCKS.register("copper_button", () -> new WeatheringButtonBlock(BlockBehaviour.Properties.copy(Blocks.COPPER_BLOCK).noCollission().strength(0.5F).sound(SoundType.COPPER)));
+        public static final RegistryObject<Block> WAXED_COPPER_BUTTON = BLOCKS.register("waxed_copper_button", () -> new ModButtonBlock(BlockBehaviour.Properties.copy(Blocks.COPPER_BLOCK).noCollission().strength(0.5F).sound(SoundType.COPPER)));
+        public static final RegistryObject<Block> EXPOSED_COPPER_BUTTON = BLOCKS.register("exposed_copper_button", () -> new WeatheringButtonBlock(BlockBehaviour.Properties.copy(Blocks.EXPOSED_COPPER).noCollission().strength(0.5F).sound(SoundType.COPPER)));
+        public static final RegistryObject<Block> WAXED_EXPOSED_COPPER_BUTTON = BLOCKS.register("waxed_exposed_copper_button", () -> new ModButtonBlock(BlockBehaviour.Properties.copy(Blocks.EXPOSED_COPPER).noCollission().strength(0.5F).sound(SoundType.COPPER)));
+        public static final RegistryObject<Block> WEATHERED_COPPER_BUTTON = BLOCKS.register("weathered_copper_button", () -> new WeatheringButtonBlock(BlockBehaviour.Properties.copy(Blocks.WEATHERED_COPPER).noCollission().strength(0.5F).sound(SoundType.COPPER)));
+        public static final RegistryObject<Block> WAXED_WEATHERED_COPPER_BUTTON = BLOCKS.register("waxed_weathered_copper_button", () -> new ModButtonBlock(BlockBehaviour.Properties.copy(Blocks.WEATHERED_COPPER).noCollission().strength(0.5F).sound(SoundType.COPPER)));
+        public static final RegistryObject<Block> OXIDIZED_COPPER_BUTTON = BLOCKS.register("oxidized_copper_button", () -> new WeatheringButtonBlock(BlockBehaviour.Properties.copy(Blocks.OXIDIZED_COPPER).noCollission().strength(0.5F).sound(SoundType.COPPER)));
+        public static final RegistryObject<Block> WAXED_OXIDIZED_COPPER_BUTTON = BLOCKS.register("waxed_oxidized_copper_button", () -> new ModButtonBlock(BlockBehaviour.Properties.copy(Blocks.OXIDIZED_COPPER).noCollission().strength(0.5F).sound(SoundType.COPPER)));
+
+        // Copper Pressure Plates
+        public static final RegistryObject<Block> COPPER_PRESSURE_PLATE = BLOCKS.register("copper_pressure_plate", () -> new WeatheringPressurePlateBlock(150, BlockBehaviour.Properties.copy(Blocks.COPPER_BLOCK).noCollission().strength(0.5F).sound(SoundType.COPPER)));
+        public static final RegistryObject<Block> WAXED_COPPER_PRESSURE_PLATE = BLOCKS.register("waxed_copper_pressure_plate", () -> new ModPressurePlateBlock(150, BlockBehaviour.Properties.copy(Blocks.COPPER_BLOCK).noCollission().strength(0.5F).sound(SoundType.COPPER)));
+        public static final RegistryObject<Block> EXPOSED_COPPER_PRESSURE_PLATE = BLOCKS.register("exposed_copper_pressure_plate", () -> new WeatheringPressurePlateBlock(150, BlockBehaviour.Properties.copy(Blocks.EXPOSED_COPPER).noCollission().strength(0.5F).sound(SoundType.COPPER)));
+        public static final RegistryObject<Block> WAXED_EXPOSED_COPPER_PRESSURE_PLATE = BLOCKS.register("waxed_exposed_copper_pressure_plate", () -> new ModPressurePlateBlock(150, BlockBehaviour.Properties.copy(Blocks.EXPOSED_COPPER).noCollission().strength(0.5F).sound(SoundType.COPPER)));
+        public static final RegistryObject<Block> WEATHERED_COPPER_PRESSURE_PLATE = BLOCKS.register("weathered_copper_pressure_plate", () -> new WeatheringPressurePlateBlock(150, BlockBehaviour.Properties.copy(Blocks.WEATHERED_COPPER).noCollission().strength(0.5F).sound(SoundType.COPPER)));
+        public static final RegistryObject<Block> WAXED_WEATHERED_COPPER_PRESSURE_PLATE = BLOCKS.register("waxed_weathered_copper_pressure_plate", () -> new ModPressurePlateBlock(150, BlockBehaviour.Properties.copy(Blocks.WEATHERED_COPPER).noCollission().strength(0.5F).sound(SoundType.COPPER)));
+        public static final RegistryObject<Block> OXIDIZED_COPPER_PRESSURE_PLATE = BLOCKS.register("oxidized_copper_pressure_plate", () -> new WeatheringPressurePlateBlock(150, BlockBehaviour.Properties.copy(Blocks.OXIDIZED_COPPER).noCollission().strength(0.5F).sound(SoundType.COPPER)));
+        public static final RegistryObject<Block> WAXED_OXIDIZED_COPPER_PRESSURE_PLATE = BLOCKS.register("waxed_oxidized_copper_pressure_plate", () -> new ModPressurePlateBlock(150, BlockBehaviour.Properties.copy(Blocks.OXIDIZED_COPPER).noCollission().strength(0.5F).sound(SoundType.COPPER)));
+
 }
+

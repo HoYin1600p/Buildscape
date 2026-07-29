@@ -1,7 +1,7 @@
 {
-    "parent":  "minecraft:block/button_pressed",
-    "textures":  {
-                     "texture":  "buildscape:block/ashpen_black_planks",
-                     "particle":  "#texture"
-                 }
+  "parent": "minecraft:block/button_pressed",
+  "textures": {
+    "texture": "buildscape:block/ashpen_black_planks",
+    "particle": "#texture"
+  }
 }

@@ -1,7 +1,7 @@
 {
-    "parent":  "block/pressure_plate_down",
-    "textures":  {
-                     "texture":  "buildscape:block/ashpen_white_planks",
-                     "particle":  "#texture"
-                 }
+  "parent": "block/pressure_plate_down",
+  "textures": {
+    "texture": "buildscape:block/ashpen_white_planks",
+    "particle": "#texture"
+  }
 }

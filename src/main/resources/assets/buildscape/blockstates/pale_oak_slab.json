@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "buildscape:block/pale_oak_slab"
+    },
+    "type=top": {
+      "model": "buildscape:block/pale_oak_slab_top"
+    },
+    "type=double": {
+      "model": "buildscape:block/pale_oak_planks"
+    }
+  }
+}

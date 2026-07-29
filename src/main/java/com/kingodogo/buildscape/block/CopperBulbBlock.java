@@ -37,6 +37,16 @@ public abstract class CopperBulbBlock extends Block {
     }
 
     @Override
+    public boolean isRandomlyTicking(BlockState state) {
+        return true;
+    }
+
+    @Override
+    public void randomTick(BlockState state, net.minecraft.server.level.ServerLevel level, BlockPos pos, java.util.Random random) {
+        CopperOxidationHandler.tryOxidize(level, pos, state);
+    }
+
+    @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         return this.defaultBlockState()
                 .setValue(LIT, false)

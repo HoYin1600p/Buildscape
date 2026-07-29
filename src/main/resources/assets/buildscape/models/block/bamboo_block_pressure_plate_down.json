@@ -1,7 +1,7 @@
 {
-    "parent":  "block/pressure_plate_down",
-    "textures":  {
-                     "texture":  "buildscape:block/bamboo_block",
-                     "particle":  "#texture"
-                 }
+  "parent": "block/pressure_plate_down",
+  "textures": {
+    "texture": "buildscape:block/bamboo_block",
+    "particle": "#texture"
+  }
 }

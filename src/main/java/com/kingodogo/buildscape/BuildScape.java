@@ -87,6 +87,16 @@ public class BuildScape {
 
         event.enqueueWork(() -> {
             com.kingodogo.buildscape.network.ModMessages.register();
+            try {
+                net.minecraftforge.fml.util.ObfuscationReflectionHelper.setPrivateValue(
+                        net.minecraft.world.item.Item.class, net.minecraft.world.item.Items.POTION, 16, "f_41370_");
+                net.minecraftforge.fml.util.ObfuscationReflectionHelper.setPrivateValue(
+                        net.minecraft.world.item.Item.class, net.minecraft.world.item.Items.SPLASH_POTION, 16, "f_41370_");
+                net.minecraftforge.fml.util.ObfuscationReflectionHelper.setPrivateValue(
+                        net.minecraft.world.item.Item.class, net.minecraft.world.item.Items.LINGERING_POTION, 16, "f_41370_");
+            } catch (Exception e) {
+                LOGGER.error("Failed to set max stack size for potions", e);
+            }
         });
 
         event.enqueueWork(() -> {

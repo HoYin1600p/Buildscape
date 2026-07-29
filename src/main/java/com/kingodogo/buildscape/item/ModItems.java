@@ -9652,6 +9652,26 @@ public class ModItems {
     public static final RegistryObject<Item> OXIDIZED_COPPER_BARS = ITEMS.register("oxidized_copper_bars", () -> new BlockItem(ModBlocks.OXIDIZED_COPPER_BARS.get(), createBlockItemProperties()));
     public static final RegistryObject<Item> WAXED_OXIDIZED_COPPER_BARS = ITEMS.register("waxed_oxidized_copper_bars", () -> new BlockItem(ModBlocks.WAXED_OXIDIZED_COPPER_BARS.get(), createBlockItemProperties()));
 
+    // Copper Buttons
+    public static final RegistryObject<Item> COPPER_BUTTON = ITEMS.register("copper_button", () -> new BlockItem(ModBlocks.COPPER_BUTTON.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WAXED_COPPER_BUTTON = ITEMS.register("waxed_copper_button", () -> new BlockItem(ModBlocks.WAXED_COPPER_BUTTON.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> EXPOSED_COPPER_BUTTON = ITEMS.register("exposed_copper_button", () -> new BlockItem(ModBlocks.EXPOSED_COPPER_BUTTON.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WAXED_EXPOSED_COPPER_BUTTON = ITEMS.register("waxed_exposed_copper_button", () -> new BlockItem(ModBlocks.WAXED_EXPOSED_COPPER_BUTTON.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WEATHERED_COPPER_BUTTON = ITEMS.register("weathered_copper_button", () -> new BlockItem(ModBlocks.WEATHERED_COPPER_BUTTON.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WAXED_WEATHERED_COPPER_BUTTON = ITEMS.register("waxed_weathered_copper_button", () -> new BlockItem(ModBlocks.WAXED_WEATHERED_COPPER_BUTTON.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> OXIDIZED_COPPER_BUTTON = ITEMS.register("oxidized_copper_button", () -> new BlockItem(ModBlocks.OXIDIZED_COPPER_BUTTON.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WAXED_OXIDIZED_COPPER_BUTTON = ITEMS.register("waxed_oxidized_copper_button", () -> new BlockItem(ModBlocks.WAXED_OXIDIZED_COPPER_BUTTON.get(), createBlockItemProperties()));
+
+    // Copper Pressure Plates
+    public static final RegistryObject<Item> COPPER_PRESSURE_PLATE = ITEMS.register("copper_pressure_plate", () -> new BlockItem(ModBlocks.COPPER_PRESSURE_PLATE.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WAXED_COPPER_PRESSURE_PLATE = ITEMS.register("waxed_copper_pressure_plate", () -> new BlockItem(ModBlocks.WAXED_COPPER_PRESSURE_PLATE.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> EXPOSED_COPPER_PRESSURE_PLATE = ITEMS.register("exposed_copper_pressure_plate", () -> new BlockItem(ModBlocks.EXPOSED_COPPER_PRESSURE_PLATE.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WAXED_EXPOSED_COPPER_PRESSURE_PLATE = ITEMS.register("waxed_exposed_copper_pressure_plate", () -> new BlockItem(ModBlocks.WAXED_EXPOSED_COPPER_PRESSURE_PLATE.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WEATHERED_COPPER_PRESSURE_PLATE = ITEMS.register("weathered_copper_pressure_plate", () -> new BlockItem(ModBlocks.WEATHERED_COPPER_PRESSURE_PLATE.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WAXED_WEATHERED_COPPER_PRESSURE_PLATE = ITEMS.register("waxed_weathered_copper_pressure_plate", () -> new BlockItem(ModBlocks.WAXED_WEATHERED_COPPER_PRESSURE_PLATE.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> OXIDIZED_COPPER_PRESSURE_PLATE = ITEMS.register("oxidized_copper_pressure_plate", () -> new BlockItem(ModBlocks.OXIDIZED_COPPER_PRESSURE_PLATE.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WAXED_OXIDIZED_COPPER_PRESSURE_PLATE = ITEMS.register("waxed_oxidized_copper_pressure_plate", () -> new BlockItem(ModBlocks.WAXED_OXIDIZED_COPPER_PRESSURE_PLATE.get(), createBlockItemProperties()));
+
 }
 
 

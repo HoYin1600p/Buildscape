@@ -9722,6 +9722,10 @@ public class ModItems {
             super(type, backgroundColor, highlightColor, properties);
         }
 
+        public int getColor(int tintIndex) {
+            return -1;
+        }
+
         @Override
         public void appendHoverText(net.minecraft.world.item.ItemStack stack, @javax.annotation.Nullable net.minecraft.world.level.Level level, java.util.List<net.minecraft.network.chat.Component> tooltip, net.minecraft.world.item.TooltipFlag flag) {
             super.appendHoverText(stack, level, tooltip, flag);

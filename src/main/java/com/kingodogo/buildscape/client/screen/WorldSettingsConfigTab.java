@@ -11,6 +11,9 @@ import net.minecraft.network.chat.TranslatableComponent;
 public class WorldSettingsConfigTab extends AbstractConfigTab {
     private ScalableToggle creativeTreeBreakerToggle;
     private ScalableToggle fastLeafDecayToggle;
+    private ScalableToggle disableEndermanGriefingToggle;
+    private ScalableToggle disableCreeperGriefingToggle;
+    private ScalableToggle disableGhastGriefingToggle;
     private int leftBoxX, leftBoxY, leftBoxWidth, leftBoxHeight;
     private int rightBoxX, rightBoxY, rightBoxWidth, rightBoxHeight;
     private int lastContentWidth = -1;
@@ -46,6 +49,30 @@ public class WorldSettingsConfigTab extends AbstractConfigTab {
         fastLeafDecayToggle.active = parent.hasOpAccess();
         addTabWidget(fastLeafDecayToggle);
 
+        boolean endermanGriefing = mc.level.getGameRules().getBoolean(ModGameRules.DISABLE_ENDERMAN_GRIEFING);
+        disableEndermanGriefingToggle = new ScalableToggle(0, 0, 100, 20,
+                new TranslatableComponent("buildscape.config.world.disable_enderman_griefing"), endermanGriefing, (btn) -> {
+            ModMessages.INSTANCE.sendToServer(new UpdateGameRulePacket("disableEndermanGriefing", ((ScalableToggle) btn).isToggled()));
+        });
+        disableEndermanGriefingToggle.active = parent.hasOpAccess();
+        addTabWidget(disableEndermanGriefingToggle);
+
+        boolean creeperGriefing = mc.level.getGameRules().getBoolean(ModGameRules.DISABLE_CREEPER_GRIEFING);
+        disableCreeperGriefingToggle = new ScalableToggle(0, 0, 100, 20,
+                new TranslatableComponent("buildscape.config.world.disable_creeper_griefing"), creeperGriefing, (btn) -> {
+            ModMessages.INSTANCE.sendToServer(new UpdateGameRulePacket("disableCreeperGriefing", ((ScalableToggle) btn).isToggled()));
+        });
+        disableCreeperGriefingToggle.active = parent.hasOpAccess();
+        addTabWidget(disableCreeperGriefingToggle);
+
+        boolean ghastGriefing = mc.level.getGameRules().getBoolean(ModGameRules.DISABLE_GHAST_GRIEFING);
+        disableGhastGriefingToggle = new ScalableToggle(0, 0, 100, 20,
+                new TranslatableComponent("buildscape.config.world.disable_ghast_griefing"), ghastGriefing, (btn) -> {
+            ModMessages.INSTANCE.sendToServer(new UpdateGameRulePacket("disableGhastGriefing", ((ScalableToggle) btn).isToggled()));
+        });
+        disableGhastGriefingToggle.active = parent.hasOpAccess();
+        addTabWidget(disableGhastGriefingToggle);
+
         relayout(contentX, contentY, contentWidth, contentHeight);
 
         lastContentWidth = contentWidth;
@@ -80,11 +107,28 @@ public class WorldSettingsConfigTab extends AbstractConfigTab {
         creativeTreeBreakerToggle.setWidth(buttonWidth);
         creativeTreeBreakerToggle.setHeight(buttonHeight);
 
+        int rightY = rightBoxY + padding + titleHeight + BuildScapeConfigScreen.scaleSize(5);
+        int spacing = BuildScapeConfigScreen.scaleSize(5);
+
         fastLeafDecayToggle.x = rightBoxX + padding;
-        fastLeafDecayToggle.y = rightBoxY + padding + titleHeight + BuildScapeConfigScreen.scaleSize(5);
+        fastLeafDecayToggle.y = rightY;
         fastLeafDecayToggle.setWidth(rightBoxWidth - padding * 2);
         fastLeafDecayToggle.setHeight(buttonHeight);
 
+        disableEndermanGriefingToggle.x = rightBoxX + padding;
+        disableEndermanGriefingToggle.y = rightY + buttonHeight + spacing;
+        disableEndermanGriefingToggle.setWidth(rightBoxWidth - padding * 2);
+        disableEndermanGriefingToggle.setHeight(buttonHeight);
+
+        disableCreeperGriefingToggle.x = rightBoxX + padding;
+        disableCreeperGriefingToggle.y = rightY + (buttonHeight + spacing) * 2;
+        disableCreeperGriefingToggle.setWidth(rightBoxWidth - padding * 2);
+        disableCreeperGriefingToggle.setHeight(buttonHeight);
+
+        disableGhastGriefingToggle.x = rightBoxX + padding;
+        disableGhastGriefingToggle.y = rightY + (buttonHeight + spacing) * 3;
+        disableGhastGriefingToggle.setWidth(rightBoxWidth - padding * 2);
+        disableGhastGriefingToggle.setHeight(buttonHeight);
     }
 
     @Override
@@ -132,6 +176,9 @@ public class WorldSettingsConfigTab extends AbstractConfigTab {
         if (mc.level != null) {
             creativeTreeBreakerToggle.toggled = com.kingodogo.buildscape.config.CosmeticsConfig.get().getCreativeTreeBreaker(mc.player.getUUID());
             fastLeafDecayToggle.toggled = mc.level.getGameRules().getBoolean(ModGameRules.FAST_LEAF_DECAY);
+            disableEndermanGriefingToggle.toggled = mc.level.getGameRules().getBoolean(ModGameRules.DISABLE_ENDERMAN_GRIEFING);
+            disableCreeperGriefingToggle.toggled = mc.level.getGameRules().getBoolean(ModGameRules.DISABLE_CREEPER_GRIEFING);
+            disableGhastGriefingToggle.toggled = mc.level.getGameRules().getBoolean(ModGameRules.DISABLE_GHAST_GRIEFING);
         }
     }
 

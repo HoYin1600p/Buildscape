@@ -52,30 +52,45 @@ public final class BuildscapeRenderLayers {
                 path.endsWith("_door") ||
                 path.endsWith("_trapdoor") ||
                 path.endsWith("_sign") ||
-                path.contains("sapling") ||
-                path.contains("flower") ||
-                path.contains("bush") ||
-                path.contains("grass") ||
-                path.contains("moss") ||
-                path.contains("vein") ||
-                path.contains("torch") ||
-                path.contains("lantern") ||
-                path.contains("dandelion") ||
-                path.contains("eyeblossom") ||
-                path.contains("copper_bars") ||
-                path.contains("litter") ||
-                path.contains("resin_clump") ||
-                path.contains("copper_grate") ||
-                path.contains("copper_rod") ||
-                path.contains("sculk") ||
-                path.contains("sensor") ||
-                path.contains("shrieker") ||
+                path.endsWith("_sapling") ||
+                path.endsWith("copper_bars") ||
+                path.endsWith("copper_grate") ||
+                path.endsWith("copper_lantern") ||
+                path.endsWith("copper_rod") ||
+                isBackportCutout(path) ||
                 isCutoutExact(path)
         ) {
             return RenderType.cutout();
         }
 
         return null;
+    }
+
+    private static boolean isBackportCutout(String path) {
+        return switch (path) {
+            case "bush",
+                    "cactus_flower",
+                    "closed_eyeblossom",
+                    "copper_torch",
+                    "copper_wall_torch",
+                    "dry_grass",
+                    "firefly_bush",
+                    "golden_dandelion",
+                    "leaf_litter",
+                    "open_eyeblossom",
+                    "pale_hanging_moss",
+                    "pale_moss_carpet",
+                    "pale_moss_layers",
+                    "pale_moss_overlay",
+                    "red_bush",
+                    "resin_clump",
+                    "sculk_sensor",
+                    "sculk_shrieker",
+                    "sculk_vein",
+                    "tall_dry_grass",
+                    "wildflowers" -> true;
+            default -> false;
+        };
     }
 
     private static boolean isTranslucentExact(String path) {

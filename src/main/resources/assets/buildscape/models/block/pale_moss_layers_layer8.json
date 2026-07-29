@@ -1,5 +1,5 @@
 {
-  "parent": "minecraft:block/snow_height16",
+  "parent": "buildscape:block/pale_moss_layers_height16",
   "textures": {
     "texture": "buildscape:block/pale_moss_block",
     "particle": "buildscape:block/pale_moss_block"

@@ -1176,19 +1176,13 @@ public class BuildScape {
                         0.05f));
 
         event
-                .getGenericTrades()
-                .add((trader, rand) -> {
-                    if (rand.nextFloat() <= 0.15f) { // 15% chance
-                        return new net.minecraft.world.item.trading.MerchantOffer(
-                                new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.DIAMOND, 12),
-                                new net.minecraft.world.item.ItemStack(ModItems.ANCIENT_ASHEN_SCROLL.get(), 1),
-                                1, // max uses
-                                1, // xp reward
-                                0.0f// multiplier
-                        );
-                    }
-                    return null;
-                });
+                .getRareTrades()
+                .add((trader, rand) -> new net.minecraft.world.item.trading.MerchantOffer(
+                        new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.DIAMOND, 12),
+                        new net.minecraft.world.item.ItemStack(ModItems.ANCIENT_ASHEN_SCROLL.get(), 1),
+                        1,
+                        1,
+                        0.0f));
     }
 
     @SubscribeEvent

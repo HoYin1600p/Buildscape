@@ -2149,6 +2149,10 @@ public class BuildScape {
             });
         }
 
+        @SubscribeEvent
+        public static void registerLayerDefinitions(net.minecraftforge.client.event.EntityRenderersEvent.RegisterLayerDefinitions event) {
+            event.registerLayerDefinition(com.kingodogo.buildscape.client.model.WanderingHomemakerModel.LAYER_LOCATION, com.kingodogo.buildscape.client.model.WanderingHomemakerModel::createBodyLayer);
+        }
     }
 
     @Mod.EventBusSubscriber(modid = BuildScape.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)

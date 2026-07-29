@@ -3776,6 +3776,51 @@ public class ModItems {
                             )
             );
 
+    public static final RegistryObject<Item> CHERRY_WOOD_WALL =
+            ITEMS.register("cherry_wood_wall", () ->
+                            new BlockItem(
+            ModBlocks.CHERRY_WOOD_WALL.get(),
+                                    createBlockItemProperties()
+                            )
+            );
+    public static final RegistryObject<Item> STRIPPED_CHERRY_WOOD_WALL =
+            ITEMS.register("stripped_cherry_wood_wall", () ->
+                            new BlockItem(
+            ModBlocks.STRIPPED_CHERRY_WOOD_WALL.get(),
+                                    createBlockItemProperties()
+                            )
+            );
+
+    public static final RegistryObject<Item> PALE_OAK_WOOD_WALL =
+            ITEMS.register("pale_oak_wood_wall", () ->
+                            new BlockItem(
+            ModBlocks.PALE_OAK_WOOD_WALL.get(),
+                                    createBlockItemProperties()
+                            )
+            );
+    public static final RegistryObject<Item> STRIPPED_PALE_OAK_WOOD_WALL =
+            ITEMS.register("stripped_pale_oak_wood_wall", () ->
+                            new BlockItem(
+            ModBlocks.STRIPPED_PALE_OAK_WOOD_WALL.get(),
+                                    createBlockItemProperties()
+                            )
+            );
+
+    public static final RegistryObject<Item> ASHPEN_WOOD_WALL =
+            ITEMS.register("ashpen_wood_wall", () ->
+                            new BlockItem(
+            ModBlocks.ASHPEN_WOOD_WALL.get(),
+                                    createBlockItemProperties()
+                            )
+            );
+    public static final RegistryObject<Item> STRIPPED_ASHPEN_WOOD_WALL =
+            ITEMS.register("stripped_ashpen_wood_wall", () ->
+                            new BlockItem(
+            ModBlocks.STRIPPED_ASHPEN_WOOD_WALL.get(),
+                                    createBlockItemProperties()
+                            )
+            );
+
     public static final RegistryObject<Item> ASHPEN_WHITE_PLANKS = ITEMS.register(
             "ashpen_white_planks",
             () ->

@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "buildscape:block/sculk_slab"
+    },
+    "type=top": {
+      "model": "buildscape:block/sculk_slab_top"
+    },
+    "type=double": {
+      "model": "buildscape:block/sculk"
+    }
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "parent": "buildscape:block/copper_rod_on",
+  "textures": {
+    "texture": "buildscape:block/copper_rod_on",
+    "particle": "buildscape:block/copper_rod_on"
+  }
+}

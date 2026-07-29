@@ -1,7 +1,7 @@
 {
-    "parent":  "minecraft:block/pressure_plate_down",
-    "textures":  {
-                     "texture":  "buildscape:block/mangrove_planks",
-                     "particle":  "#texture"
-                 }
+  "parent": "minecraft:block/pressure_plate_down",
+  "textures": {
+    "texture": "buildscape:block/mangrove_planks",
+    "particle": "#texture"
+  }
 }

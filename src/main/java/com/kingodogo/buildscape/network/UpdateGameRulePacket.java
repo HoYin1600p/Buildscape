@@ -42,6 +42,12 @@ public class UpdateGameRulePacket {
             GameRules rules = player.getLevel().getGameRules();
             if (ruleName.equals("fastLeafDecay")) {
                 rules.getRule(ModGameRules.FAST_LEAF_DECAY).set(value, player.getServer());
+            } else if (ruleName.equals("disableEndermanGriefing")) {
+                rules.getRule(ModGameRules.DISABLE_ENDERMAN_GRIEFING).set(value, player.getServer());
+            } else if (ruleName.equals("disableCreeperGriefing")) {
+                rules.getRule(ModGameRules.DISABLE_CREEPER_GRIEFING).set(value, player.getServer());
+            } else if (ruleName.equals("disableGhastGriefing")) {
+                rules.getRule(ModGameRules.DISABLE_GHAST_GRIEFING).set(value, player.getServer());
             }
         });
         context.setPacketHandled(true);

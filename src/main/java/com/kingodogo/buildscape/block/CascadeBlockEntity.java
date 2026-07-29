@@ -2,6 +2,10 @@ package com.kingodogo.buildscape.block;
 
 import com.kingodogo.buildscape.particle.ModParticles;
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
@@ -16,9 +20,59 @@ import java.util.Random;
 public class CascadeBlockEntity extends BlockEntity {
 
     private static final Random RANDOM = new Random();
+    private int particleLevel = 5; // 1 = 20%, 2 = 40%, 3 = 60%, 4 = 80%, 5 = 100%
 
     public CascadeBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.CASCADE_BLOCK_ENTITY.get(), pos, state);
+    }
+
+    public int getParticleLevel() {
+        if (particleLevel < 1 || particleLevel > 5) {
+            particleLevel = 5;
+        }
+        return particleLevel;
+    }
+
+    public int cycleParticleLevel() {
+        particleLevel = (getParticleLevel() % 5) + 1;
+        setChanged();
+        if (level != null && !level.isClientSide) {
+            level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
+        }
+        return particleLevel;
+    }
+
+    @Override
+    protected void saveAdditional(CompoundTag tag) {
+        super.saveAdditional(tag);
+        tag.putInt("ParticleLevel", getParticleLevel());
+    }
+
+    @Override
+    public void load(CompoundTag tag) {
+        super.load(tag);
+        if (tag.contains("ParticleLevel")) {
+            this.particleLevel = tag.getInt("ParticleLevel");
+        } else {
+            this.particleLevel = 5;
+        }
+    }
+
+    @Override
+    public CompoundTag getUpdateTag() {
+        CompoundTag tag = super.getUpdateTag();
+        saveAdditional(tag);
+        return tag;
+    }
+
+    @Override
+    public Packet<ClientGamePacketListener> getUpdatePacket() {
+        return ClientboundBlockEntityDataPacket.create(this);
+    }
+
+    @Override
+    public void handleUpdateTag(CompoundTag tag) {
+        load(tag);
     }
 
     @Override
@@ -43,10 +97,8 @@ public class CascadeBlockEntity extends BlockEntity {
         net.minecraft.client.Minecraft minecraft = net.minecraft.client.Minecraft.getInstance();
         net.minecraft.client.ParticleStatus particleSetting = minecraft.options.particles;
         if (particleSetting == net.minecraft.client.ParticleStatus.MINIMAL) {
-            // Minimal: only spawn 1 particle every 10 ticks
             if (level.getGameTime() % 10 != 0) return;
         } else if (particleSetting == net.minecraft.client.ParticleStatus.DECREASED) {
-            // Decreased: skip every other tick
             if (level.getGameTime() % 2 != 0) return;
         }
 
@@ -64,14 +116,15 @@ public class CascadeBlockEntity extends BlockEntity {
             }
         }
 
-        int baseCount = 5 + RANDOM.nextInt(3);
+        double levelFactor = be.getParticleLevel() * 0.2;
+        int rawBase = 5 + RANDOM.nextInt(3);
         int count;
         if (particleSetting == net.minecraft.client.ParticleStatus.MINIMAL) {
             count = 1;
         } else if (particleSetting == net.minecraft.client.ParticleStatus.DECREASED) {
-            count = Math.max(1, baseCount / 2);
+            count = Math.max(1, (int) Math.round(rawBase * 0.5 * levelFactor));
         } else {
-            count = baseCount;
+            count = Math.max(1, (int) Math.round(rawBase * levelFactor));
         }
 
         for (int i = 0; i < count; i++) {

@@ -323,22 +323,20 @@ public class PetalBlock extends BushBlock implements SinksOnFarmland, Bonemealab
             BlockGetter level,
             BlockPos pos
     ) {
-        return (
-                state.isFaceSturdy(level, pos, Direction.UP) &&
-                        state.getMaterial().isSolid() &&
-                        !state.getMaterial().isReplaceable()
-        ) || state.is(net.minecraft.world.level.block.Blocks.FARMLAND);
+        return state.isFaceSturdy(level, pos, Direction.UP) || state.is(net.minecraft.world.level.block.Blocks.FARMLAND);
     }
 
     @Override
-    public boolean canSurvive(BlockState state, LevelReader level, BlockPos pos) {
-        BlockPos belowPos = pos.below();
-        BlockState belowState = level.getBlockState(belowPos);
-        return this.mayPlaceOn(belowState, level, belowPos);
+    public boolean canBeReplaced(BlockState state, BlockPlaceContext context) {
+        return (!context.isSecondaryUseActive() && context.getItemInHand().getItem() == this.asItem() && state.getValue(FLOWER_AMOUNT) < 4) || super.canBeReplaced(state, context);
     }
 
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
+        BlockState existing = context.getLevel().getBlockState(context.getClickedPos());
+        if (existing.is(this)) {
+            return existing.setValue(FLOWER_AMOUNT, Math.min(4, existing.getValue(FLOWER_AMOUNT) + 1));
+        }
         BlockState state = super.getStateForPlacement(context);
         if (state != null) {
             Direction playerFacing = context.getHorizontalDirection();

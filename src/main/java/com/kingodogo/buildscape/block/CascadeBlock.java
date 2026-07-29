@@ -124,6 +124,20 @@ public class CascadeBlock extends Block implements EntityBlock, SimpleWaterlogge
             return InteractionResult.sidedSuccess(level.isClientSide);
         }
 
+        // Empty hand -> tune cascade particle density (20%, 40%, 60%, 80%, 100%)
+        if (heldItem.isEmpty()) {
+            if (level.getBlockEntity(pos) instanceof CascadeBlockEntity be) {
+                if (!level.isClientSide) {
+                    int newLevel = be.cycleParticleLevel();
+                    int percentage = newLevel * 20;
+                    player.displayClientMessage(new net.minecraft.network.chat.TranslatableComponent("message.buildscape.cascade_particles", percentage + "%"), true);
+                    float pitch = 0.6f + (newLevel * 0.16f);
+                    level.playSound(null, pos, SoundEvents.LEVER_CLICK, SoundSource.BLOCKS, 0.5f, pitch);
+                }
+                return InteractionResult.sidedSuccess(level.isClientSide);
+            }
+        }
+
         return InteractionResult.PASS;
     }
 

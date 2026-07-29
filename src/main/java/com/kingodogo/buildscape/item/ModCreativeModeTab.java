@@ -381,6 +381,18 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.EXPOSED_COPPER_CHAIN.get()));
             items.add(new ItemStack(ModItems.WEATHERED_COPPER_CHAIN.get()));
             items.add(new ItemStack(ModItems.OXIDIZED_COPPER_CHAIN.get()));
+            items.add(new ItemStack(Items.CHAIN));
+            items.add(new ItemStack(ModItems.LARGE_IRON_CHAIN.get()));
+            items.add(new ItemStack(ModItems.ANCIENT_STEEL_CHAIN.get()));
+            items.add(new ItemStack(ModItems.LARGE_ANCIENT_STEEL_CHAIN.get()));
+            items.add(new ItemStack(ModItems.GOLD_CHAIN.get()));
+            items.add(new ItemStack(ModItems.LARGE_GOLD_CHAIN.get()));
+            items.add(new ItemStack(ModItems.DIAMOND_CHAIN.get()));
+            items.add(new ItemStack(ModItems.LARGE_DIAMOND_CHAIN.get()));
+            items.add(new ItemStack(ModItems.EMERALD_CHAIN.get()));
+            items.add(new ItemStack(ModItems.LARGE_EMERALD_CHAIN.get()));
+            items.add(new ItemStack(ModItems.NETHERITE_CHAIN.get()));
+            items.add(new ItemStack(ModItems.LARGE_NETHERITE_CHAIN.get()));
             items.add(new ItemStack(ModItems.STEEL_INGOT.get()));
             items.add(new ItemStack(ModItems.STEEL_BLOCK.get()));
             items.add(new ItemStack(ModItems.STEEL_BLOCK_STAIRS.get()));
@@ -511,18 +523,7 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.CAUTION_CITRUSCANDY_STAIRS.get()));
             items.add(new ItemStack(ModItems.CAUTION_CITRUSCANDY_SLAB.get()));
             items.add(new ItemStack(ModItems.CAUTION_CITRUSCANDY_VERTICAL_SLAB.get()));
-            items.add(new ItemStack(Items.CHAIN));
-            items.add(new ItemStack(ModItems.LARGE_IRON_CHAIN.get()));
-            items.add(new ItemStack(ModItems.ANCIENT_STEEL_CHAIN.get()));
-            items.add(new ItemStack(ModItems.LARGE_ANCIENT_STEEL_CHAIN.get()));
-            items.add(new ItemStack(ModItems.GOLD_CHAIN.get()));
-            items.add(new ItemStack(ModItems.LARGE_GOLD_CHAIN.get()));
-            items.add(new ItemStack(ModItems.DIAMOND_CHAIN.get()));
-            items.add(new ItemStack(ModItems.LARGE_DIAMOND_CHAIN.get()));
-            items.add(new ItemStack(ModItems.EMERALD_CHAIN.get()));
-            items.add(new ItemStack(ModItems.LARGE_EMERALD_CHAIN.get()));
-            items.add(new ItemStack(ModItems.NETHERITE_CHAIN.get()));
-            items.add(new ItemStack(ModItems.LARGE_NETHERITE_CHAIN.get()));
+
             items.add(new ItemStack(ModItems.BIT_CHISELED_TUFF.get()));
             items.add(new ItemStack(ModItems.BIT_CHISELED_TUFF_BRICKS.get()));
             items.add(new ItemStack(ModItems.BIT_POLISHED_TUFF.get()));
@@ -2047,6 +2048,7 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.PINK_BIG_BOOK.get()));
 
             // Dye Sacks
+            items.add(new ItemStack(ModItems.GLOW_INK_SACK.get()));
             items.add(new ItemStack(ModItems.WHITE_DYE_SACK.get()));
             items.add(new ItemStack(ModItems.LIGHT_GRAY_DYE_SACK.get()));
             items.add(new ItemStack(ModItems.GRAY_DYE_SACK.get()));

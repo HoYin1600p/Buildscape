@@ -78,6 +78,19 @@ public class LogStrippingHandler {
         registerPair(ModBlocks.JUNGLE_LOG_VERTICAL_SLAB, ModBlocks.STRIPPED_JUNGLE_LOG_VERTICAL_SLAB);
         registerPair(ModBlocks.ACACIA_LOG_VERTICAL_SLAB, ModBlocks.STRIPPED_ACACIA_LOG_VERTICAL_SLAB);
         registerPair(ModBlocks.DARK_OAK_LOG_VERTICAL_SLAB, ModBlocks.STRIPPED_DARK_OAK_LOG_VERTICAL_SLAB);
+
+        // Wood Walls
+        registerPair(ModBlocks.OAK_WOOD_WALL, ModBlocks.STRIPPED_OAK_WOOD_WALL);
+        registerPair(ModBlocks.SPRUCE_WOOD_WALL, ModBlocks.STRIPPED_SPRUCE_WOOD_WALL);
+        registerPair(ModBlocks.BIRCH_WOOD_WALL, ModBlocks.STRIPPED_BIRCH_WOOD_WALL);
+        registerPair(ModBlocks.DARK_OAK_WOOD_WALL, ModBlocks.STRIPPED_DARK_OAK_WOOD_WALL);
+        registerPair(ModBlocks.JUNGLE_WOOD_WALL, ModBlocks.STRIPPED_JUNGLE_WOOD_WALL);
+        registerPair(ModBlocks.ACACIA_WOOD_WALL, ModBlocks.STRIPPED_ACACIA_WOOD_WALL);
+        registerPair(ModBlocks.MANGROVE_WOOD_WALL, ModBlocks.STRIPPED_MANGROVE_WOOD_WALL);
+        registerPair(ModBlocks.BAMBOO_BLOCK_WALL, ModBlocks.STRIPPED_BAMBOO_BLOCK_WALL);
+        registerPair(ModBlocks.CHERRY_WOOD_WALL, ModBlocks.STRIPPED_CHERRY_WOOD_WALL);
+        registerPair(ModBlocks.PALE_OAK_WOOD_WALL, ModBlocks.STRIPPED_PALE_OAK_WOOD_WALL);
+        registerPair(ModBlocks.ASHPEN_WOOD_WALL, ModBlocks.STRIPPED_ASHPEN_WOOD_WALL);
     }
 
     private static void registerPair(Supplier<Block> unstripped, Supplier<Block> stripped) {

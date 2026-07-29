@@ -1009,6 +1009,12 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.STRIPPED_JUNGLE_WOOD_WALL.get()));
             items.add(new ItemStack(ModItems.ACACIA_WOOD_WALL.get()));
             items.add(new ItemStack(ModItems.STRIPPED_ACACIA_WOOD_WALL.get()));
+            items.add(new ItemStack(ModItems.CHERRY_WOOD_WALL.get()));
+            items.add(new ItemStack(ModItems.STRIPPED_CHERRY_WOOD_WALL.get()));
+            items.add(new ItemStack(ModItems.PALE_OAK_WOOD_WALL.get()));
+            items.add(new ItemStack(ModItems.STRIPPED_PALE_OAK_WOOD_WALL.get()));
+            items.add(new ItemStack(ModItems.ASHPEN_WOOD_WALL.get()));
+            items.add(new ItemStack(ModItems.STRIPPED_ASHPEN_WOOD_WALL.get()));
             items.add(new ItemStack(ModItems.ASHPEN_LOG.get()));
             items.add(new ItemStack(ModItems.STRIPPED_ASHPEN_LOG.get()));
             items.add(new ItemStack(ModItems.ASHPEN_WOOD.get()));

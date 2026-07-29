@@ -49,19 +49,19 @@ public class WanderingHomemakerModel extends HierarchicalModel<WanderingHomemake
                 , PartPose.offset(0.0F, 0.0F, 0.0F));
 
         headDef.addOrReplaceChild("nose", CubeListBuilder.create()
-                .texOffs(60, 55).addBox(-1.0F, -1.0F, -3.0F, 2.0F, 4.0F, 2.0F)
-                , PartPose.offsetAndRotation(0.0F, -2.0F, -3.0F, 1.3090F, 0.0F, 0.0F));
+                .texOffs(60, 55).addBox(-1.0F, -2.0F, -1.0F, 2.0F, 4.0F, 2.0F)
+                , PartPose.offsetAndRotation(0.0F, -1.0F, -5.0F, -1.3090F, 0.0F, 0.0F));
 
         headDef.addOrReplaceChild("brim", CubeListBuilder.create()
                 .texOffs(0, 35).addBox(-4.0F, -2.0F, -4.25F, 8.0F, 3.0F, 6.0F)
-                , PartPose.offsetAndRotation(0.0F, 0.1534F, -2.4870F, -0.6981F, 0.0F, 0.0F));
+                , PartPose.offsetAndRotation(0.0F, 0.1534F, -2.4870F, 0.6981F, 0.0F, 0.0F));
 
         // 3. Arms (child of body)
         bodyDef.addOrReplaceChild("arms", CubeListBuilder.create()
                 .texOffs(42, 0).addBox(-4.0F, 2.0F, -2.0F, 8.0F, 4.0F, 4.0F)     // arms center
                 .texOffs(60, 43).addBox(4.0F, -2.0F, -2.0F, 4.0F, 8.0F, 4.0F)     // right arm
                 .texOffs(60, 43).addBox(-8.0F, -2.0F, -2.0F, 4.0F, 8.0F, 4.0F)    // left arm
-                , PartPose.offsetAndRotation(0.0F, 3.0F, -1.0F, 0.75F, 0.0F, 0.0F));
+                , PartPose.offsetAndRotation(0.0F, 3.0F, -1.0F, -0.75F, 0.0F, 0.0F));
 
         // 4. Legs (root children)
         partdefinition.addOrReplaceChild("leg0", CubeListBuilder.create()

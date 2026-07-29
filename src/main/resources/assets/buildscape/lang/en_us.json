@@ -4220,5 +4220,8 @@
   "block.buildscape.stripped_ashpen_log": "Stripped Ashpen Log",
   "block.buildscape.stripped_ashpen_wood": "Stripped Ashpen Wood",
   "block.buildscape.stripped_ashpen_log_slab": "Stripped Ashpen Log Slab",
-  "block.buildscape.stripped_ashpen_log_vertical_slab": "Stripped Ashpen Log Vertical Slab"
+  "block.buildscape.stripped_ashpen_log_vertical_slab": "Stripped Ashpen Log Vertical Slab",
+  "item.buildscape.wandering_homemaker_spawn_egg": "Wandering Homemaker Spawn Egg",
+  "entity.buildscape.wandering_homemaker": "Wandering Homemaker",
+  "tooltip.buildscape.wandering_homemaker_spawn_egg.spawn_info": "Summoned when there are at least 4 Decorated Pots, Big Candles, Pillars, Stars, or Cushions of the same type in a 2x2 square."
 }

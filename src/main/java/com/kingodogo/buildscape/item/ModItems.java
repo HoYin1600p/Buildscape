@@ -9717,6 +9717,27 @@ public class ModItems {
     public static final RegistryObject<Item> OXIDIZED_COPPER_PRESSURE_PLATE = ITEMS.register("oxidized_copper_pressure_plate", () -> new BlockItem(ModBlocks.OXIDIZED_COPPER_PRESSURE_PLATE.get(), createBlockItemProperties()));
     public static final RegistryObject<Item> WAXED_OXIDIZED_COPPER_PRESSURE_PLATE = ITEMS.register("waxed_oxidized_copper_pressure_plate", () -> new BlockItem(ModBlocks.WAXED_OXIDIZED_COPPER_PRESSURE_PLATE.get(), createBlockItemProperties()));
 
+    public static class WanderingHomemakerSpawnEggItem extends net.minecraftforge.common.ForgeSpawnEggItem {
+        public WanderingHomemakerSpawnEggItem(java.util.function.Supplier<? extends net.minecraft.world.entity.EntityType<? extends net.minecraft.world.entity.Mob>> type, int backgroundColor, int highlightColor, Item.Properties properties) {
+            super(type, backgroundColor, highlightColor, properties);
+        }
+
+        @Override
+        public void appendHoverText(net.minecraft.world.item.ItemStack stack, @javax.annotation.Nullable net.minecraft.world.level.Level level, java.util.List<net.minecraft.network.chat.Component> tooltip, net.minecraft.world.item.TooltipFlag flag) {
+            super.appendHoverText(stack, level, tooltip, flag);
+            tooltip.add(new net.minecraft.network.chat.TranslatableComponent("tooltip.buildscape.wandering_homemaker_spawn_egg.spawn_info"));
+        }
+    }
+
+    public static final RegistryObject<Item> WANDERING_HOMEMAKER_SPAWN_EGG = ITEMS.register(
+            "wandering_homemaker_spawn_egg",
+            () -> new WanderingHomemakerSpawnEggItem(
+                    com.kingodogo.buildscape.entity.ModEntities.WANDERING_HOMEMAKER,
+                    0x5c3c24,
+                    0xe4b484,
+                    createBlockItemProperties()
+            )
+    );
 }
 
 

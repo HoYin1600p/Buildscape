@@ -85,6 +85,26 @@ public class CascadeBlockNoMist extends Block implements EntityBlock, SimpleWate
         return RenderShape.MODEL;
     }
 
+    @Override
+    @SuppressWarnings("deprecation")
+    public net.minecraft.world.InteractionResult use(BlockState state, Level level, BlockPos pos, net.minecraft.world.entity.player.Player player,
+            net.minecraft.world.InteractionHand hand, net.minecraft.world.phys.BlockHitResult hit) {
+        net.minecraft.world.item.ItemStack heldItem = player.getItemInHand(hand);
+        if (heldItem.isEmpty()) {
+            if (level.getBlockEntity(pos) instanceof CascadeBlockEntity be) {
+                if (!level.isClientSide) {
+                    int newLevel = be.cycleParticleLevel();
+                    int percentage = newLevel * 20;
+                    player.displayClientMessage(new net.minecraft.network.chat.TranslatableComponent("message.buildscape.cascade_particles", percentage + "%"), true);
+                    float pitch = 0.6f + (newLevel * 0.16f);
+                    level.playSound(null, pos, net.minecraft.sounds.SoundEvents.LEVER_CLICK, net.minecraft.sounds.SoundSource.BLOCKS, 0.5f, pitch);
+                }
+                return net.minecraft.world.InteractionResult.sidedSuccess(level.isClientSide);
+            }
+        }
+        return net.minecraft.world.InteractionResult.PASS;
+    }
+
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {

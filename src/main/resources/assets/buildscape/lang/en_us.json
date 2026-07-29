@@ -2072,6 +2072,8 @@
   "tooltip.buildscape.cascade_block.info": "A block that generates mist.",
   "tooltip.buildscape.cascade_block_no_mist.info": "A variant of the cascade block that does not generate mist.",
   "tooltip.buildscape.cascade_block_no_mist.obtain": "To obtain Cascade Block (No mist) rightclick Cascade Block with empty bottle",
+  "tooltip.buildscape.cascade_block.tune": "Right-click with empty hand to tune particles (20%, 40%, 60%, 80%, 100%)",
+  "message.buildscape.cascade_particles": "Cascade Particles: %s",
   "gamerule.fastLeafDecay": "Fast Leaf Decay",
   "block.buildscape.packed_mud": "Packed Mud",
   "block.buildscape.packed_mud_stairs": "Packed Mud Stairs",

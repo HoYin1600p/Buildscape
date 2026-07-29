@@ -131,6 +131,13 @@ public class WanderingHomemakerSpawningHandler {
                 player.getPersistentData().putLong("WanderingHomemakerCooldown", gameTime + 144000L); // 2 hours in ticks
                 player.getPersistentData().putUUID("WanderingHomemakerUUID", homemaker.getUUID());
                 ACTIVE_HOMEMAKERS.add(homemaker.getUUID());
+
+                if (player instanceof net.minecraft.server.level.ServerPlayer serverPlayer) {
+                    com.kingodogo.buildscape.network.ModMessages.INSTANCE.send(
+                            net.minecraftforge.network.PacketDistributor.PLAYER.with(() -> serverPlayer),
+                            new com.kingodogo.buildscape.network.SyncHomemakerCooldownPacket(gameTime + 144000L)
+                    );
+                }
             }
         }
     }

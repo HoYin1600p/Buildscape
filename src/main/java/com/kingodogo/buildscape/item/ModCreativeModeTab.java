@@ -2375,6 +2375,7 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.SCULK_CATALYST.get()));
             items.add(new ItemStack(ModItems.SCULK_SHRIEKER.get()));
             items.add(new ItemStack(ModItems.SCULK_SENSOR.get()));
+            items.add(new ItemStack(ModItems.WANDERING_HOMEMAKER_SPAWN_EGG.get()));
 
         }
     };

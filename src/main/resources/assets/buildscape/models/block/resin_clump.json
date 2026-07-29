@@ -16,6 +16,7 @@
         16,
         0.1
       ],
+      "shade": false,
       "faces": {
         "north": {
           "uv": [

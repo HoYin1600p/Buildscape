@@ -10,6 +10,6 @@ public class ResinClumpBlock extends GlowLichenBlock {
 
     @Override
     public int getLightEmission(net.minecraft.world.level.block.state.BlockState state, net.minecraft.world.level.BlockGetter level, net.minecraft.core.BlockPos pos) {
-        return 0;
+        return 7;
     }
 }

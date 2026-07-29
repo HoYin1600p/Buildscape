@@ -11807,7 +11807,7 @@ public class ModBlocks {
         public static final RegistryObject<Block> CREAKING_HEART = BLOCKS.register("creaking_heart",
                         () -> new CreakingHeartBlock(BlockBehaviour.Properties.copy(Blocks.OAK_LOG).strength(2.0F)));
         public static final RegistryObject<Block> RESIN_CLUMP = BLOCKS.register("resin_clump",
-                        () -> new ResinClumpBlock(BlockBehaviour.Properties.copy(Blocks.GLOW_LICHEN)));
+                        () -> new ResinClumpBlock(BlockBehaviour.Properties.copy(Blocks.GLOW_LICHEN).lightLevel(state -> 7).hasPostProcess((state, getter, pos) -> true).emissiveRendering((state, getter, pos) -> true)));
         public static final RegistryObject<Block> RESIN_BLOCK = BLOCKS.register("resin_block",
                         () -> new Block(BlockBehaviour.Properties.copy(Blocks.TERRACOTTA)));
         public static final RegistryObject<Block> RESIN_BLOCK_SLAB = BLOCKS.register("resin_block_slab",
@@ -11833,7 +11833,7 @@ public class ModBlocks {
         public static final RegistryObject<Block> CLOSED_EYEBLOSSOM = BLOCKS.register("closed_eyeblossom",
                         () -> new EyeblossomBlock(false, net.minecraft.world.effect.MobEffects.BLINDNESS, 7, BlockBehaviour.Properties.copy(Blocks.POPPY)));
         public static final RegistryObject<Block> OPEN_EYEBLOSSOM = BLOCKS.register("open_eyeblossom",
-                        () -> new EyeblossomBlock(true, net.minecraft.world.effect.MobEffects.CONFUSION, 7, BlockBehaviour.Properties.copy(Blocks.POPPY).lightLevel(state -> 5)));
+                        () -> new EyeblossomBlock(true, net.minecraft.world.effect.MobEffects.CONFUSION, 7, BlockBehaviour.Properties.copy(Blocks.POPPY).lightLevel(state -> 7).hasPostProcess((state, getter, pos) -> true).emissiveRendering((state, getter, pos) -> true)));
         public static final RegistryObject<Block> WILDFLOWERS = BLOCKS.register("wildflowers",
                         () -> new PetalBlock(BlockBehaviour.Properties.copy(Blocks.MOSS_CARPET).noCollission().sound(SoundType.GRASS)));
         public static final RegistryObject<Block> LEAF_LITTER = BLOCKS.register("leaf_litter",
@@ -11845,7 +11845,7 @@ public class ModBlocks {
         public static final RegistryObject<Block> RED_BUSH = BLOCKS.register("red_bush",
                         () -> new ModBushBlock(BlockBehaviour.Properties.copy(Blocks.DEAD_BUSH)));
         public static final RegistryObject<Block> FIREFLY_BUSH = BLOCKS.register("firefly_bush",
-                        () -> new FireflyBushBlock(BlockBehaviour.Properties.copy(Blocks.GRASS).lightLevel(state -> 8)));
+                        () -> new FireflyBushBlock(BlockBehaviour.Properties.copy(Blocks.GRASS).lightLevel(state -> 8).hasPostProcess((state, getter, pos) -> true).emissiveRendering((state, getter, pos) -> true)));
         public static final RegistryObject<Block> DRY_GRASS = BLOCKS.register("dry_grass",
                         () -> new DryGrassBlock(BlockBehaviour.Properties.copy(Blocks.GRASS)));
         public static final RegistryObject<Block> TALL_DRY_GRASS = BLOCKS.register("tall_dry_grass",

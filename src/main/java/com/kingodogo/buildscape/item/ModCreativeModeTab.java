@@ -2006,6 +2006,64 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.RED_CUSHION.get()));
             items.add(new ItemStack(ModItems.BLACK_CUSHION.get()));
 
+            // Spools
+            items.add(new ItemStack(ModItems.SPOOL.get()));
+            items.add(new ItemStack(ModItems.GLOWING_SPOOL.get()));
+            items.add(new ItemStack(ModItems.WHITE_SPOOL.get()));
+            items.add(new ItemStack(ModItems.LIGHT_GRAY_SPOOL.get()));
+            items.add(new ItemStack(ModItems.GRAY_SPOOL.get()));
+            items.add(new ItemStack(ModItems.BLACK_SPOOL.get()));
+            items.add(new ItemStack(ModItems.BROWN_SPOOL.get()));
+            items.add(new ItemStack(ModItems.RED_SPOOL.get()));
+            items.add(new ItemStack(ModItems.ORANGE_SPOOL.get()));
+            items.add(new ItemStack(ModItems.YELLOW_SPOOL.get()));
+            items.add(new ItemStack(ModItems.LIME_SPOOL.get()));
+            items.add(new ItemStack(ModItems.GREEN_SPOOL.get()));
+            items.add(new ItemStack(ModItems.CYAN_SPOOL.get()));
+            items.add(new ItemStack(ModItems.LIGHT_BLUE_SPOOL.get()));
+            items.add(new ItemStack(ModItems.BLUE_SPOOL.get()));
+            items.add(new ItemStack(ModItems.PURPLE_SPOOL.get()));
+            items.add(new ItemStack(ModItems.MAGENTA_SPOOL.get()));
+            items.add(new ItemStack(ModItems.PINK_SPOOL.get()));
+
+            // Big Books
+            items.add(new ItemStack(ModItems.BIG_BOOK.get()));
+            items.add(new ItemStack(ModItems.GLOWING_BIG_BOOK.get()));
+            items.add(new ItemStack(ModItems.WHITE_BIG_BOOK.get()));
+            items.add(new ItemStack(ModItems.LIGHT_GRAY_BIG_BOOK.get()));
+            items.add(new ItemStack(ModItems.GRAY_BIG_BOOK.get()));
+            items.add(new ItemStack(ModItems.BLACK_BIG_BOOK.get()));
+            items.add(new ItemStack(ModItems.BROWN_BIG_BOOK.get()));
+            items.add(new ItemStack(ModItems.RED_BIG_BOOK.get()));
+            items.add(new ItemStack(ModItems.ORANGE_BIG_BOOK.get()));
+            items.add(new ItemStack(ModItems.YELLOW_BIG_BOOK.get()));
+            items.add(new ItemStack(ModItems.LIME_BIG_BOOK.get()));
+            items.add(new ItemStack(ModItems.GREEN_BIG_BOOK.get()));
+            items.add(new ItemStack(ModItems.CYAN_BIG_BOOK.get()));
+            items.add(new ItemStack(ModItems.LIGHT_BLUE_BIG_BOOK.get()));
+            items.add(new ItemStack(ModItems.BLUE_BIG_BOOK.get()));
+            items.add(new ItemStack(ModItems.PURPLE_BIG_BOOK.get()));
+            items.add(new ItemStack(ModItems.MAGENTA_BIG_BOOK.get()));
+            items.add(new ItemStack(ModItems.PINK_BIG_BOOK.get()));
+
+            // Dye Sacks
+            items.add(new ItemStack(ModItems.WHITE_DYE_SACK.get()));
+            items.add(new ItemStack(ModItems.LIGHT_GRAY_DYE_SACK.get()));
+            items.add(new ItemStack(ModItems.GRAY_DYE_SACK.get()));
+            items.add(new ItemStack(ModItems.BLACK_DYE_SACK.get()));
+            items.add(new ItemStack(ModItems.BROWN_DYE_SACK.get()));
+            items.add(new ItemStack(ModItems.RED_DYE_SACK.get()));
+            items.add(new ItemStack(ModItems.ORANGE_DYE_SACK.get()));
+            items.add(new ItemStack(ModItems.YELLOW_DYE_SACK.get()));
+            items.add(new ItemStack(ModItems.LIME_DYE_SACK.get()));
+            items.add(new ItemStack(ModItems.GREEN_DYE_SACK.get()));
+            items.add(new ItemStack(ModItems.CYAN_DYE_SACK.get()));
+            items.add(new ItemStack(ModItems.LIGHT_BLUE_DYE_SACK.get()));
+            items.add(new ItemStack(ModItems.BLUE_DYE_SACK.get()));
+            items.add(new ItemStack(ModItems.PURPLE_DYE_SACK.get()));
+            items.add(new ItemStack(ModItems.MAGENTA_DYE_SACK.get()));
+            items.add(new ItemStack(ModItems.PINK_DYE_SACK.get()));
+
             items.add(new ItemStack(ModItems.OAK_LEAF_LAYERS.get()));
             items.add(new ItemStack(ModItems.SPRUCE_LEAF_LAYERS.get()));
             items.add(new ItemStack(ModItems.BIRCH_LEAF_LAYERS.get()));
@@ -2271,63 +2329,7 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.BIG_AMETHYST_CANDLE.get()));
             items.add(new ItemStack(ModItems.BIG_SCULK_CANDLE.get()));
 
-            // Spools
-            items.add(new ItemStack(ModItems.SPOOL.get()));
-            items.add(new ItemStack(ModItems.GLOWING_SPOOL.get()));
-            items.add(new ItemStack(ModItems.WHITE_SPOOL.get()));
-            items.add(new ItemStack(ModItems.LIGHT_GRAY_SPOOL.get()));
-            items.add(new ItemStack(ModItems.GRAY_SPOOL.get()));
-            items.add(new ItemStack(ModItems.BLACK_SPOOL.get()));
-            items.add(new ItemStack(ModItems.BROWN_SPOOL.get()));
-            items.add(new ItemStack(ModItems.RED_SPOOL.get()));
-            items.add(new ItemStack(ModItems.ORANGE_SPOOL.get()));
-            items.add(new ItemStack(ModItems.YELLOW_SPOOL.get()));
-            items.add(new ItemStack(ModItems.LIME_SPOOL.get()));
-            items.add(new ItemStack(ModItems.GREEN_SPOOL.get()));
-            items.add(new ItemStack(ModItems.CYAN_SPOOL.get()));
-            items.add(new ItemStack(ModItems.LIGHT_BLUE_SPOOL.get()));
-            items.add(new ItemStack(ModItems.BLUE_SPOOL.get()));
-            items.add(new ItemStack(ModItems.PURPLE_SPOOL.get()));
-            items.add(new ItemStack(ModItems.MAGENTA_SPOOL.get()));
-            items.add(new ItemStack(ModItems.PINK_SPOOL.get()));
 
-            // Big Books
-            items.add(new ItemStack(ModItems.BIG_BOOK.get()));
-            items.add(new ItemStack(ModItems.GLOWING_BIG_BOOK.get()));
-            items.add(new ItemStack(ModItems.WHITE_BIG_BOOK.get()));
-            items.add(new ItemStack(ModItems.LIGHT_GRAY_BIG_BOOK.get()));
-            items.add(new ItemStack(ModItems.GRAY_BIG_BOOK.get()));
-            items.add(new ItemStack(ModItems.BLACK_BIG_BOOK.get()));
-            items.add(new ItemStack(ModItems.BROWN_BIG_BOOK.get()));
-            items.add(new ItemStack(ModItems.RED_BIG_BOOK.get()));
-            items.add(new ItemStack(ModItems.ORANGE_BIG_BOOK.get()));
-            items.add(new ItemStack(ModItems.YELLOW_BIG_BOOK.get()));
-            items.add(new ItemStack(ModItems.LIME_BIG_BOOK.get()));
-            items.add(new ItemStack(ModItems.GREEN_BIG_BOOK.get()));
-            items.add(new ItemStack(ModItems.CYAN_BIG_BOOK.get()));
-            items.add(new ItemStack(ModItems.LIGHT_BLUE_BIG_BOOK.get()));
-            items.add(new ItemStack(ModItems.BLUE_BIG_BOOK.get()));
-            items.add(new ItemStack(ModItems.PURPLE_BIG_BOOK.get()));
-            items.add(new ItemStack(ModItems.MAGENTA_BIG_BOOK.get()));
-            items.add(new ItemStack(ModItems.PINK_BIG_BOOK.get()));
-
-            // Dye Sacks
-            items.add(new ItemStack(ModItems.WHITE_DYE_SACK.get()));
-            items.add(new ItemStack(ModItems.LIGHT_GRAY_DYE_SACK.get()));
-            items.add(new ItemStack(ModItems.GRAY_DYE_SACK.get()));
-            items.add(new ItemStack(ModItems.BLACK_DYE_SACK.get()));
-            items.add(new ItemStack(ModItems.BROWN_DYE_SACK.get()));
-            items.add(new ItemStack(ModItems.RED_DYE_SACK.get()));
-            items.add(new ItemStack(ModItems.ORANGE_DYE_SACK.get()));
-            items.add(new ItemStack(ModItems.YELLOW_DYE_SACK.get()));
-            items.add(new ItemStack(ModItems.LIME_DYE_SACK.get()));
-            items.add(new ItemStack(ModItems.GREEN_DYE_SACK.get()));
-            items.add(new ItemStack(ModItems.CYAN_DYE_SACK.get()));
-            items.add(new ItemStack(ModItems.LIGHT_BLUE_DYE_SACK.get()));
-            items.add(new ItemStack(ModItems.BLUE_DYE_SACK.get()));
-            items.add(new ItemStack(ModItems.PURPLE_DYE_SACK.get()));
-            items.add(new ItemStack(ModItems.MAGENTA_DYE_SACK.get()));
-            items.add(new ItemStack(ModItems.PINK_DYE_SACK.get()));
 
 
 

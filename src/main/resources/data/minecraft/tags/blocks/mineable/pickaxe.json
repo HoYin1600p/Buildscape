@@ -1248,6 +1248,14 @@
     "buildscape:weathered_copper_lantern",
     "buildscape:waxed_weathered_copper_lantern",
     "buildscape:oxidized_copper_lantern",
-    "buildscape:waxed_oxidized_copper_lantern"
+    "buildscape:waxed_oxidized_copper_lantern",
+    "buildscape:copper_button",
+    "buildscape:exposed_copper_button",
+    "buildscape:oxidized_copper_button",
+    "buildscape:waxed_copper_button",
+    "buildscape:waxed_exposed_copper_button",
+    "buildscape:waxed_oxidized_copper_button",
+    "buildscape:waxed_weathered_copper_button",
+    "buildscape:weathered_copper_button"
   ]
 }

@@ -106,11 +106,16 @@ public class ColoredMossBlock extends ModBlock implements BonemealableBlock {
             BlockPos targetPos = pos.offset(offsetX, offsetY, offsetZ);
             BlockState targetState = level.getBlockState(targetPos);
 
-            if (targetState.is(BlockTags.MOSS_REPLACEABLE)) {
-                // Change the block to this colored moss block
-                level.setBlock(targetPos, this.defaultBlockState(), 3);
+            boolean isMoss = targetState.is(this);
+            boolean isReplaceable = targetState.is(BlockTags.MOSS_REPLACEABLE);
 
-                // Try to spawn carpet/overlay/layers on top
+            if (isMoss || isReplaceable) {
+                if (isReplaceable) {
+                    // Change the block to this colored moss block
+                    level.setBlock(targetPos, this.defaultBlockState(), 3);
+                }
+
+                // Try to spawn carpet/overlay/layers/sapling/flower on top
                 BlockPos abovePos = targetPos.above();
                 BlockState aboveState = level.getBlockState(abovePos);
 

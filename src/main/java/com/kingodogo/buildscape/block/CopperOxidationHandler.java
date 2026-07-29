@@ -134,6 +134,21 @@ public class CopperOxidationHandler {
 
         // 1. HONEYCOMB WAXING
         if (held.is(Items.HONEYCOMB)) {
+            if (block instanceof EyeblossomBlock) {
+                if (!state.getValue(EyeblossomBlock.WAXED)) {
+                    if (!level.isClientSide) {
+                        level.setBlock(pos, state.setValue(EyeblossomBlock.WAXED, true), 3);
+                        level.levelEvent(3003, pos, 0); // Wax on particles
+                        if (player != null && !player.getAbilities().instabuild) {
+                            held.shrink(1);
+                        }
+                    }
+                    level.playSound(player, pos, SoundEvents.HONEYCOMB_WAX_ON, SoundSource.BLOCKS, 1.0f, 1.0f);
+                    event.setCanceled(true);
+                    event.setCancellationResult(InteractionResult.sidedSuccess(level.isClientSide));
+                    return true;
+                }
+            }
             for (Map.Entry<Supplier<Block>, Supplier<Block>> entry : WAXED_MAP.entrySet()) {
                 if (entry.getKey().get() == block) {
                     Block targetBlock = entry.getValue().get();
@@ -154,6 +169,22 @@ public class CopperOxidationHandler {
 
         // 2. AXE INTERACTION (UNWAXING & DE-OXIDIZING / SCRAPING)
         if (held.getItem() instanceof AxeItem) {
+            // Check Eyeblossom unwaxing
+            if (block instanceof EyeblossomBlock) {
+                if (state.getValue(EyeblossomBlock.WAXED)) {
+                    if (!level.isClientSide) {
+                        level.setBlock(pos, state.setValue(EyeblossomBlock.WAXED, false), 3);
+                        level.levelEvent(3004, pos, 0); // Wax off particles
+                        if (player != null && !player.getAbilities().instabuild) {
+                            held.hurtAndBreak(1, player, p -> p.broadcastBreakEvent(event.getHand()));
+                        }
+                    }
+                    level.playSound(player, pos, SoundEvents.AXE_SCRAPE, SoundSource.BLOCKS, 1.0f, 1.0f);
+                    event.setCanceled(true);
+                    event.setCancellationResult(InteractionResult.sidedSuccess(level.isClientSide));
+                    return true;
+                }
+            }
             // A) Check Unwaxing
             for (Map.Entry<Supplier<Block>, Supplier<Block>> entry : UNWAXED_MAP.entrySet()) {
                 if (entry.getKey().get() == block) {

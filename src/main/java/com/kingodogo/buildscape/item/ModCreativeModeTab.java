@@ -1983,6 +1983,24 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.PINK_WALLPAPER_VERTICAL_SLAB.get()));
             items.add(new ItemStack(ModItems.PINK_WALLPAPER_FLAT.get()));
 
+            // Cushions
+            items.add(new ItemStack(ModItems.WHITE_CUSHION.get()));
+            items.add(new ItemStack(ModItems.ORANGE_CUSHION.get()));
+            items.add(new ItemStack(ModItems.MAGENTA_CUSHION.get()));
+            items.add(new ItemStack(ModItems.LIGHT_BLUE_CUSHION.get()));
+            items.add(new ItemStack(ModItems.YELLOW_CUSHION.get()));
+            items.add(new ItemStack(ModItems.LIME_CUSHION.get()));
+            items.add(new ItemStack(ModItems.PINK_CUSHION.get()));
+            items.add(new ItemStack(ModItems.GRAY_CUSHION.get()));
+            items.add(new ItemStack(ModItems.LIGHT_GRAY_CUSHION.get()));
+            items.add(new ItemStack(ModItems.CYAN_CUSHION.get()));
+            items.add(new ItemStack(ModItems.PURPLE_CUSHION.get()));
+            items.add(new ItemStack(ModItems.BLUE_CUSHION.get()));
+            items.add(new ItemStack(ModItems.BROWN_CUSHION.get()));
+            items.add(new ItemStack(ModItems.GREEN_CUSHION.get()));
+            items.add(new ItemStack(ModItems.RED_CUSHION.get()));
+            items.add(new ItemStack(ModItems.BLACK_CUSHION.get()));
+
             items.add(new ItemStack(ModItems.OAK_LEAF_LAYERS.get()));
             items.add(new ItemStack(ModItems.SPRUCE_LEAF_LAYERS.get()));
             items.add(new ItemStack(ModItems.BIRCH_LEAF_LAYERS.get()));
@@ -2044,6 +2062,19 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.PINK_PETAL.get()));
             items.add(new ItemStack(ModItems.PURPLE_PETAL.get()));
             items.add(new ItemStack(ModItems.CLOVER.get()));
+
+            // --- FLOWERS, BUSHES & VEGETATION ---
+            items.add(new ItemStack(ModItems.CLOSED_EYEBLOSSOM.get()));
+            items.add(new ItemStack(ModItems.OPEN_EYEBLOSSOM.get()));
+            items.add(new ItemStack(ModItems.WILDFLOWERS.get()));
+            items.add(new ItemStack(ModItems.LEAF_LITTER.get()));
+            items.add(new ItemStack(ModItems.CACTUS_FLOWER.get()));
+            items.add(new ItemStack(ModItems.BUSH.get()));
+            items.add(new ItemStack(ModItems.RED_BUSH.get()));
+            items.add(new ItemStack(ModItems.FIREFLY_BUSH.get()));
+            items.add(new ItemStack(ModItems.DRY_GRASS.get()));
+            items.add(new ItemStack(ModItems.TALL_DRY_GRASS.get()));
+            items.add(new ItemStack(ModItems.GOLDEN_DANDELION.get()));
             items.add(new ItemStack(ModItems.SNOWY_SHORT_GRASS.get()));
             items.add(new ItemStack(ModItems.SNOWY_TALL_GRASS.get()));
             items.add(new ItemStack(ModItems.SNOWY_FERN.get()));
@@ -2295,18 +2326,7 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
 
 
 
-            // --- FLOWERS, BUSHES & VEGETATION ---
-            items.add(new ItemStack(ModItems.CLOSED_EYEBLOSSOM.get()));
-            items.add(new ItemStack(ModItems.OPEN_EYEBLOSSOM.get()));
-            items.add(new ItemStack(ModItems.WILDFLOWERS.get()));
-            items.add(new ItemStack(ModItems.LEAF_LITTER.get()));
-            items.add(new ItemStack(ModItems.CACTUS_FLOWER.get()));
-            items.add(new ItemStack(ModItems.BUSH.get()));
-            items.add(new ItemStack(ModItems.RED_BUSH.get()));
-            items.add(new ItemStack(ModItems.FIREFLY_BUSH.get()));
-            items.add(new ItemStack(ModItems.DRY_GRASS.get()));
-            items.add(new ItemStack(ModItems.TALL_DRY_GRASS.get()));
-            items.add(new ItemStack(ModItems.GOLDEN_DANDELION.get()));
+
 
             // --- FROGLIGHTS ---
             items.add(new ItemStack(ModItems.OCHRE_FROGLIGHT.get()));

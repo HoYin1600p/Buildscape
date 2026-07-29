@@ -58,5 +58,29 @@ public class PillarIdJoinSyncHandler {
                         rules.getBoolean(com.kingodogo.buildscape.world.ModGameRules.DISABLE_GHAST_GRIEFING)
                 )
         );
+
+        // Sync Wandering Homemaker cooldown
+        long cooldown = 0;
+        if (player.getPersistentData().contains("WanderingHomemakerCooldown")) {
+            cooldown = player.getPersistentData().getLong("WanderingHomemakerCooldown");
+        }
+        ModMessages.INSTANCE.send(
+                net.minecraftforge.network.PacketDistributor.PLAYER.with(() -> player),
+                new com.kingodogo.buildscape.network.SyncHomemakerCooldownPacket(cooldown)
+        );
+    }
+
+    @SubscribeEvent
+    public static void onPlayerChangedDimension(PlayerEvent.PlayerChangedDimensionEvent event) {
+        if (event.getPlayer() instanceof ServerPlayer player) {
+            long cooldown = 0;
+            if (player.getPersistentData().contains("WanderingHomemakerCooldown")) {
+                cooldown = player.getPersistentData().getLong("WanderingHomemakerCooldown");
+            }
+            ModMessages.INSTANCE.send(
+                    net.minecraftforge.network.PacketDistributor.PLAYER.with(() -> player),
+                    new com.kingodogo.buildscape.network.SyncHomemakerCooldownPacket(cooldown)
+            );
+        }
     }
 }

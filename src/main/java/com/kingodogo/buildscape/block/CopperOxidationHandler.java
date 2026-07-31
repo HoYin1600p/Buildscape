@@ -16,8 +16,13 @@ import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.block.WeatheringCopper;
+import com.kingodogo.buildscape.item.ModItems;
+
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 public class CopperOxidationHandler {
@@ -131,6 +136,39 @@ public class CopperOxidationHandler {
         Block block = state.getBlock();
         ItemStack held = event.getItemStack();
         Player player = event.getPlayer();
+
+        // 0. BOTTLE OF MIST OXIDATION SPEEDUP
+        if (held.is(ModItems.BOTTLE_OF_MIST.get())) {
+            BlockState nextState = getNextOxidationState(state);
+            if (nextState != null) {
+                if (!level.isClientSide) {
+                    setBlockStateOrDoor(level, pos, state, nextState.getBlock());
+                    
+                    if (level instanceof ServerLevel serverLevel) {
+                        serverLevel.sendParticles(
+                            net.minecraft.core.particles.ParticleTypes.SMOKE,
+                            (double)pos.getX() + 0.5D, (double)pos.getY() + 0.5D, (double)pos.getZ() + 0.5D,
+                            8, 0.25D, 0.25D, 0.25D, 0.05D
+                        );
+                    }
+                    
+                    if (player != null && !player.getAbilities().instabuild) {
+                        held.shrink(1);
+                        ItemStack emptyBottle = new ItemStack(Items.GLASS_BOTTLE);
+                        if (held.isEmpty()) {
+                            player.setItemInHand(event.getHand(), emptyBottle);
+                        } else if (!player.getInventory().add(emptyBottle)) {
+                            player.drop(emptyBottle, false);
+                        }
+                    }
+                }
+                
+                level.playSound(player, pos, SoundEvents.FIRE_EXTINGUISH, SoundSource.BLOCKS, 0.6f, 0.8f);
+                event.setCanceled(true);
+                event.setCancellationResult(InteractionResult.sidedSuccess(level.isClientSide));
+                return true;
+            }
+        }
 
         // 1. HONEYCOMB WAXING
         if (held.is(Items.HONEYCOMB)) {
@@ -265,5 +303,24 @@ public class CopperOxidationHandler {
             }
         }
         return to;
+    }
+
+    public static BlockState getNextOxidationState(BlockState state) {
+        init();
+        Block block = state.getBlock();
+        
+        for (Map.Entry<Supplier<Block>, Supplier<Block>> entry : NEXT_STAGE.entrySet()) {
+            if (entry.getKey().get() == block) {
+                Block targetBlock = entry.getValue().get();
+                return copyStateProperties(state, targetBlock.defaultBlockState());
+            }
+        }
+        
+        Optional<Block> vanillaNext = WeatheringCopper.getNext(block);
+        if (vanillaNext.isPresent()) {
+            return copyStateProperties(state, vanillaNext.get().defaultBlockState());
+        }
+        
+        return null;
     }
 }

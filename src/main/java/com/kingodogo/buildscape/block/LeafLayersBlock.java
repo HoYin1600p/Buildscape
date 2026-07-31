@@ -311,6 +311,27 @@ public class LeafLayersBlock
             case "mangrove" -> List.of(
                     new ItemStack(ModItems.MANGROVE_LEAF_LAYERS.get(), layerCount)
             );
+            case "orange_poplar" -> List.of(
+                    new ItemStack(ModItems.ORANGE_POPLAR_LEAF_LAYERS.get(), layerCount)
+            );
+            case "red_poplar" -> List.of(
+                    new ItemStack(ModItems.RED_POPLAR_LEAF_LAYERS.get(), layerCount)
+            );
+            case "yellow_poplar" -> List.of(
+                    new ItemStack(ModItems.YELLOW_POPLAR_LEAF_LAYERS.get(), layerCount)
+            );
+            case "cherry" -> List.of(
+                    new ItemStack(ModItems.CHERRY_LEAF_LAYERS.get(), layerCount)
+            );
+            case "pale_oak" -> List.of(
+                    new ItemStack(ModItems.PALE_OAK_LEAF_LAYERS.get(), layerCount)
+            );
+            case "snowy_cherry" -> List.of(
+                    new ItemStack(ModItems.SNOWY_CHERRY_LEAF_LAYERS.get(), layerCount)
+            );
+            case "snowy_pale_oak" -> List.of(
+                    new ItemStack(ModItems.SNOWY_PALE_OAK_LEAF_LAYERS.get(), layerCount)
+            );
             default -> List.of(
                     new ItemStack(ModItems.OAK_LEAF_LAYERS.get(), layerCount)
             );

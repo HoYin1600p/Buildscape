@@ -30,7 +30,7 @@ public abstract class StonecutterMenuMixin extends AbstractContainerMenu impleme
 
     @Inject(method = "clickMenuButton", at = @At("HEAD"), cancellable = true)
     private void onBeforeClickMenuButton(Player player, int id, CallbackInfoReturnable<Boolean> cir) {
-        if (id == 31337) {
+        if (id == -123) {
             this.buildscape$cutAll = !this.buildscape$cutAll;
             cir.setReturnValue(true);
         }

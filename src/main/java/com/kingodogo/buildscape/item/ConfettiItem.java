@@ -2,6 +2,7 @@ package com.kingodogo.buildscape.item;
 
 import com.kingodogo.buildscape.particle.ModParticles;
 import net.minecraft.core.particles.SimpleParticleType;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
@@ -21,27 +22,24 @@ public class ConfettiItem extends Item {
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         ItemStack itemstack = player.getItemInHand(hand);
         
-        // Server-side: consume item and play burst sounds
+        // Play sounds and spawn particles on server-side
         if (!level.isClientSide) {
             level.playSound(null, player.getX(), player.getY(), player.getZ(), 
                 SoundEvents.FIREWORK_ROCKET_BLAST, SoundSource.PLAYERS, 0.8F, 1.4F);
             level.playSound(null, player.getX(), player.getY(), player.getZ(), 
                 SoundEvents.FIREWORK_ROCKET_TWINKLE, SoundSource.PLAYERS, 0.6F, 1.6F);
             
+            spawnConfettiParticles((ServerLevel) level, player);
+
             if (!player.getAbilities().instabuild) {
                 itemstack.shrink(1);
             }
         }
         
-        // Spawn particles on client-side
-        if (level.isClientSide) {
-            spawnConfettiParticles(level, player);
-        }
-        
         return InteractionResultHolder.sidedSuccess(itemstack, level.isClientSide());
     }
     
-    private void spawnConfettiParticles(Level level, Player player) {
+    private void spawnConfettiParticles(ServerLevel level, Player player) {
         net.minecraft.world.phys.Vec3 look = player.getLookAngle();
         double startX = player.getX() + look.x * 0.9D;
         double startY = player.getEyeY() + look.y * 0.9D;
@@ -62,8 +60,8 @@ public class ConfettiItem extends Item {
             double py = startY + (level.random.nextDouble() - 0.5D) * 0.4D;
             double pz = startZ + (level.random.nextDouble() - 0.5D) * 0.4D;
             
-            level.addParticle((SimpleParticleType) ModParticles.CONFETTI.get(), 
-                px, py, pz, vx, vy, vz);
+            level.sendParticles((SimpleParticleType) ModParticles.CONFETTI.get(), 
+                px, py, pz, 0, vx, vy, vz, 1.0D);
         }
     }
 }

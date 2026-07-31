@@ -38,16 +38,38 @@ public class FireflyBushBlock extends BushBlock {
         int effectiveLight = Math.max(blockLight, level.isNight() ? Math.max(0, skyLight - 11) : skyLight);
 
         if (effectiveLight <= 13) {
+            // Local spawning inside/very close to the bush
             if (random.nextInt(2) == 0) {
                 double x = (double) pos.getX() + 0.5D + (random.nextDouble() - 0.5D) * 1.0D;
                 double y = (double) pos.getY() + 0.2D + random.nextDouble() * 1.0D;
                 double z = (double) pos.getZ() + 0.5D + (random.nextDouble() - 0.5D) * 1.0D;
 
-                double xSpeed = (random.nextFloat() - 0.5F) * 0.02;
-                double ySpeed = random.nextFloat() * 0.015;
-                double zSpeed = (random.nextFloat() - 0.5F) * 0.02;
+                double xSpeed = (random.nextFloat() - 0.5F) * 0.02D;
+                double ySpeed = random.nextFloat() * 0.015D;
+                double zSpeed = (random.nextFloat() - 0.5F) * 0.02D;
 
                 level.addParticle(ModParticles.FIREFLY.get(), x, y, z, xSpeed, ySpeed, zSpeed);
+            }
+
+            // Ambient/wider volume spawning (similar to Spore Blossom)
+            BlockPos.MutableBlockPos mutablePos = new BlockPos.MutableBlockPos();
+            for (int i = 0; i < 8; i++) {
+                int dx = random.nextInt(17) - 8; // X range [-8, 8]
+                int dy = random.nextInt(7) - 2;  // Y range [-2, 4]
+                int dz = random.nextInt(17) - 8; // Z range [-8, 8]
+                mutablePos.set(pos.getX() + dx, pos.getY() + dy, pos.getZ() + dz);
+                BlockState targetState = level.getBlockState(mutablePos);
+                if (!targetState.isCollisionShapeFullBlock(level, mutablePos)) {
+                    double x = (double) mutablePos.getX() + random.nextDouble();
+                    double y = (double) mutablePos.getY() + random.nextDouble();
+                    double z = (double) mutablePos.getZ() + random.nextDouble();
+
+                    double xSpeed = (random.nextFloat() - 0.5F) * 0.01D;
+                    double ySpeed = (random.nextFloat() - 0.5F) * 0.005D;
+                    double zSpeed = (random.nextFloat() - 0.5F) * 0.01D;
+
+                    level.addParticle(ModParticles.FIREFLY.get(), x, y, z, xSpeed, ySpeed, zSpeed);
+                }
             }
         }
     }

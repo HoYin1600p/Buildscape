@@ -2101,6 +2101,11 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.AZALEA_LEAF_LAYERS.get()));
             items.add(new ItemStack(ModItems.FLOWERING_AZALEA_LEAF_LAYERS.get()));
             items.add(new ItemStack(ModItems.MANGROVE_LEAF_LAYERS.get()));
+            items.add(new ItemStack(ModItems.ORANGE_POPLAR_LEAF_LAYERS.get()));
+            items.add(new ItemStack(ModItems.RED_POPLAR_LEAF_LAYERS.get()));
+            items.add(new ItemStack(ModItems.YELLOW_POPLAR_LEAF_LAYERS.get()));
+            items.add(new ItemStack(ModItems.CHERRY_LEAF_LAYERS.get()));
+            items.add(new ItemStack(ModItems.PALE_OAK_LEAF_LAYERS.get()));
             items.add(new ItemStack(ModItems.SNOWY_OAK_LEAF_LAYERS.get()));
             items.add(new ItemStack(ModItems.SNOWY_SPRUCE_LEAF_LAYERS.get()));
             items.add(new ItemStack(ModItems.SNOWY_BIRCH_LEAF_LAYERS.get()));
@@ -2110,6 +2115,8 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.SNOWY_MANGROVE_LEAF_LAYERS.get()));
             items.add(new ItemStack(ModItems.SNOWY_AZALEA_LEAF_LAYERS.get()));
             items.add(new ItemStack(ModItems.SNOWY_FLOWERING_AZALEA_LEAF_LAYERS.get()));
+            items.add(new ItemStack(ModItems.SNOWY_CHERRY_LEAF_LAYERS.get()));
+            items.add(new ItemStack(ModItems.SNOWY_PALE_OAK_LEAF_LAYERS.get()));
             items.add(new ItemStack(ModItems.OAK_LEAF_HEDGE.get()));
             items.add(new ItemStack(ModItems.SPRUCE_LEAF_HEDGE.get()));
             items.add(new ItemStack(ModItems.BIRCH_LEAF_HEDGE.get()));
@@ -2119,6 +2126,11 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.AZALEA_LEAF_HEDGE.get()));
             items.add(new ItemStack(ModItems.FLOWERING_AZALEA_LEAF_HEDGE.get()));
             items.add(new ItemStack(ModItems.MANGROVE_LEAF_HEDGE.get()));
+            items.add(new ItemStack(ModItems.ORANGE_POPLAR_LEAF_HEDGE.get()));
+            items.add(new ItemStack(ModItems.RED_POPLAR_LEAF_HEDGE.get()));
+            items.add(new ItemStack(ModItems.YELLOW_POPLAR_LEAF_HEDGE.get()));
+            items.add(new ItemStack(ModItems.CHERRY_LEAF_HEDGE.get()));
+            items.add(new ItemStack(ModItems.PALE_OAK_LEAF_HEDGE.get()));
             items.add(new ItemStack(ModItems.SNOWY_OAK_LEAF_HEDGE.get()));
             items.add(new ItemStack(ModItems.SNOWY_SPRUCE_LEAF_HEDGE.get()));
             items.add(new ItemStack(ModItems.SNOWY_BIRCH_LEAF_HEDGE.get()));
@@ -2128,6 +2140,8 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.SNOWY_MANGROVE_LEAF_HEDGE.get()));
             items.add(new ItemStack(ModItems.SNOWY_AZALEA_LEAF_HEDGE.get()));
             items.add(new ItemStack(ModItems.SNOWY_FLOWERING_AZALEA_LEAF_HEDGE.get()));
+            items.add(new ItemStack(ModItems.SNOWY_CHERRY_LEAF_HEDGE.get()));
+            items.add(new ItemStack(ModItems.SNOWY_PALE_OAK_LEAF_HEDGE.get()));
             items.add(new ItemStack(ModItems.SNOWY_OAK_LEAVES.get()));
             items.add(new ItemStack(ModItems.SNOWY_SPRUCE_LEAVES.get()));
             items.add(new ItemStack(ModItems.SNOWY_BIRCH_LEAVES.get()));
@@ -2137,6 +2151,8 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.SNOWY_MANGROVE_LEAVES.get()));
             items.add(new ItemStack(ModItems.SNOWY_AZALEA_LEAVES.get()));
             items.add(new ItemStack(ModItems.SNOWY_FLOWERING_AZALEA_LEAVES.get()));
+            items.add(new ItemStack(ModItems.SNOWY_CHERRY_LEAVES.get()));
+            items.add(new ItemStack(ModItems.SNOWY_PALE_OAK_LEAVES.get()));
             items.add(new ItemStack(ModItems.RED_ROSE_VINES.get()));
             items.add(new ItemStack(ModItems.BLACK_ROSE_VINES.get()));
             items.add(new ItemStack(ModItems.BLUE_ROSE_VINES.get()));

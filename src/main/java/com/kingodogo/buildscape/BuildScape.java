@@ -1178,7 +1178,7 @@ public class BuildScape {
         event
                 .getRareTrades()
                 .add((trader, rand) -> {
-                    if (rand.nextFloat() <= 0.10f) {
+                    if (rand.nextInt(5000) == 0) {
                         return new net.minecraft.world.item.trading.MerchantOffer(
                                 new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.DIAMOND, 12),
                                 new net.minecraft.world.item.ItemStack(ModItems.ANCIENT_ASHEN_SCROLL.get(), 1),
@@ -1908,7 +1908,23 @@ public class BuildScape {
                         ModBlocks.AZALEA_LEAF_LAYERS.get(),
                         ModBlocks.FLOWERING_AZALEA_LEAF_LAYERS.get(),
                         ModBlocks.AZALEA_LEAF_HEDGE.get(),
-                        ModBlocks.FLOWERING_AZALEA_LEAF_HEDGE.get());
+                        ModBlocks.FLOWERING_AZALEA_LEAF_HEDGE.get(),
+                        ModBlocks.ORANGE_POPLAR_LEAF_LAYERS.get(),
+                        ModBlocks.RED_POPLAR_LEAF_LAYERS.get(),
+                        ModBlocks.YELLOW_POPLAR_LEAF_LAYERS.get(),
+                        ModBlocks.CHERRY_LEAF_LAYERS.get(),
+                        ModBlocks.PALE_OAK_LEAF_LAYERS.get(),
+                        ModBlocks.SNOWY_CHERRY_LEAF_LAYERS.get(),
+                        ModBlocks.SNOWY_PALE_OAK_LEAF_LAYERS.get(),
+                        ModBlocks.ORANGE_POPLAR_LEAF_HEDGE.get(),
+                        ModBlocks.RED_POPLAR_LEAF_HEDGE.get(),
+                        ModBlocks.YELLOW_POPLAR_LEAF_HEDGE.get(),
+                        ModBlocks.CHERRY_LEAF_HEDGE.get(),
+                        ModBlocks.PALE_OAK_LEAF_HEDGE.get(),
+                        ModBlocks.SNOWY_CHERRY_LEAF_HEDGE.get(),
+                        ModBlocks.SNOWY_PALE_OAK_LEAF_HEDGE.get(),
+                        ModBlocks.SNOWY_CHERRY_LEAVES.get(),
+                        ModBlocks.SNOWY_PALE_OAK_LEAVES.get());
 
                 blockColors.register(
                         (state, reader, pos, tintIndex) -> {

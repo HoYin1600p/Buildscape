@@ -3277,6 +3277,62 @@ public class ModItems {
                     )
             );
 
+    public static final RegistryObject<Item> ORANGE_POPLAR_LEAF_LAYERS =
+            ITEMS.register("orange_poplar_leaf_layers", () ->
+                    new BlockItem(
+                    ModBlocks.ORANGE_POPLAR_LEAF_LAYERS.get(),
+                            createBlockItemProperties()
+                    )
+            );
+
+    public static final RegistryObject<Item> RED_POPLAR_LEAF_LAYERS =
+            ITEMS.register("red_poplar_leaf_layers", () ->
+                    new BlockItem(
+                    ModBlocks.RED_POPLAR_LEAF_LAYERS.get(),
+                            createBlockItemProperties()
+                    )
+            );
+
+    public static final RegistryObject<Item> YELLOW_POPLAR_LEAF_LAYERS =
+            ITEMS.register("yellow_poplar_leaf_layers", () ->
+                    new BlockItem(
+                    ModBlocks.YELLOW_POPLAR_LEAF_LAYERS.get(),
+                            createBlockItemProperties()
+                    )
+            );
+
+    public static final RegistryObject<Item> CHERRY_LEAF_LAYERS =
+            ITEMS.register("cherry_leaf_layers", () ->
+                    new BlockItem(
+                    ModBlocks.CHERRY_LEAF_LAYERS.get(),
+                            createBlockItemProperties()
+                    )
+            );
+
+    public static final RegistryObject<Item> PALE_OAK_LEAF_LAYERS =
+            ITEMS.register("pale_oak_leaf_layers", () ->
+                    new BlockItem(
+                    ModBlocks.PALE_OAK_LEAF_LAYERS.get(),
+                            createBlockItemProperties()
+                    )
+            );
+
+    public static final RegistryObject<Item> SNOWY_CHERRY_LEAF_LAYERS =
+            ITEMS.register("snowy_cherry_leaf_layers", () ->
+                    new BlockItem(
+                    ModBlocks.SNOWY_CHERRY_LEAF_LAYERS.get(),
+                            createBlockItemProperties()
+                    )
+            );
+
+    public static final RegistryObject<Item> SNOWY_PALE_OAK_LEAF_LAYERS =
+            ITEMS.register("snowy_pale_oak_leaf_layers", () ->
+                    new BlockItem(
+                    ModBlocks.SNOWY_PALE_OAK_LEAF_LAYERS.get(),
+                            createBlockItemProperties()
+                    )
+            );
+
     public static final RegistryObject<Item> OAK_LEAF_HEDGE = ITEMS.register(
             "oak_leaf_hedge",
             () ->
@@ -3409,6 +3465,62 @@ public class ModItems {
                             createBlockItemProperties()
                     )
     );
+
+    public static final RegistryObject<Item> ORANGE_POPLAR_LEAF_HEDGE =
+            ITEMS.register("orange_poplar_leaf_hedge", () ->
+                    new BlockItem(
+                    ModBlocks.ORANGE_POPLAR_LEAF_HEDGE.get(),
+                            createBlockItemProperties()
+                    )
+            );
+
+    public static final RegistryObject<Item> RED_POPLAR_LEAF_HEDGE =
+            ITEMS.register("red_poplar_leaf_hedge", () ->
+                    new BlockItem(
+                    ModBlocks.RED_POPLAR_LEAF_HEDGE.get(),
+                            createBlockItemProperties()
+                    )
+            );
+
+    public static final RegistryObject<Item> YELLOW_POPLAR_LEAF_HEDGE =
+            ITEMS.register("yellow_poplar_leaf_hedge", () ->
+                    new BlockItem(
+                    ModBlocks.YELLOW_POPLAR_LEAF_HEDGE.get(),
+                            createBlockItemProperties()
+                    )
+            );
+
+    public static final RegistryObject<Item> CHERRY_LEAF_HEDGE =
+            ITEMS.register("cherry_leaf_hedge", () ->
+                    new BlockItem(
+                    ModBlocks.CHERRY_LEAF_HEDGE.get(),
+                            createBlockItemProperties()
+                    )
+            );
+
+    public static final RegistryObject<Item> PALE_OAK_LEAF_HEDGE =
+            ITEMS.register("pale_oak_leaf_hedge", () ->
+                    new BlockItem(
+                    ModBlocks.PALE_OAK_LEAF_HEDGE.get(),
+                            createBlockItemProperties()
+                    )
+            );
+
+    public static final RegistryObject<Item> SNOWY_CHERRY_LEAF_HEDGE =
+            ITEMS.register("snowy_cherry_leaf_hedge", () ->
+                    new BlockItem(
+                    ModBlocks.SNOWY_CHERRY_LEAF_HEDGE.get(),
+                            createBlockItemProperties()
+                    )
+            );
+
+    public static final RegistryObject<Item> SNOWY_PALE_OAK_LEAF_HEDGE =
+            ITEMS.register("snowy_pale_oak_leaf_hedge", () ->
+                    new BlockItem(
+                    ModBlocks.SNOWY_PALE_OAK_LEAF_HEDGE.get(),
+                            createBlockItemProperties()
+                    )
+            );
 
     public static final RegistryObject<Item> HAY_BALE_SLAB = ITEMS.register(
             "hay_bale_slab",
@@ -5434,6 +5546,22 @@ public class ModItems {
             ModBlocks.SNOWY_FLOWERING_AZALEA_LEAVES.get(),
                                     createBlockItemProperties()
                             )
+            );
+
+    public static final RegistryObject<Item> SNOWY_CHERRY_LEAVES =
+            ITEMS.register("snowy_cherry_leaves", () ->
+                    new BlockItem(
+                            ModBlocks.SNOWY_CHERRY_LEAVES.get(),
+                            createBlockItemProperties()
+                    )
+            );
+
+    public static final RegistryObject<Item> SNOWY_PALE_OAK_LEAVES =
+            ITEMS.register("snowy_pale_oak_leaves", () ->
+                    new BlockItem(
+                            ModBlocks.SNOWY_PALE_OAK_LEAVES.get(),
+                            createBlockItemProperties()
+                    )
             );
 
     public static final RegistryObject<Item> SNOWY_SHORT_GRASS = ITEMS.register(

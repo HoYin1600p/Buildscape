@@ -3065,6 +3065,83 @@ public class ModBlocks {
                                                         .isViewBlocking((state, reader, pos) -> false),
                                         "mangrove"));
 
+        public static final RegistryObject<Block> ORANGE_POPLAR_LEAF_LAYERS = BLOCKS.register("orange_poplar_leaf_layers",
+                        () -> new LeafLayersBlock(
+                                        BlockBehaviour.Properties.of(Material.LEAVES, MaterialColor.COLOR_ORANGE)
+                                                        .strength(0.2f)
+                                                        .sound(net.minecraft.world.level.block.SoundType.GRASS)
+                                                        .noOcclusion()
+                                                        .isRedstoneConductor((state, reader, pos) -> false)
+                                                        .isSuffocating((state, reader, pos) -> false)
+                                                        .isViewBlocking((state, reader, pos) -> false),
+                                        "orange_poplar"));
+
+        public static final RegistryObject<Block> RED_POPLAR_LEAF_LAYERS = BLOCKS.register("red_poplar_leaf_layers",
+                        () -> new LeafLayersBlock(
+                                        BlockBehaviour.Properties.of(Material.LEAVES, MaterialColor.COLOR_RED)
+                                                        .strength(0.2f)
+                                                        .sound(net.minecraft.world.level.block.SoundType.GRASS)
+                                                        .noOcclusion()
+                                                        .isRedstoneConductor((state, reader, pos) -> false)
+                                                        .isSuffocating((state, reader, pos) -> false)
+                                                        .isViewBlocking((state, reader, pos) -> false),
+                                        "red_poplar"));
+
+        public static final RegistryObject<Block> YELLOW_POPLAR_LEAF_LAYERS = BLOCKS.register("yellow_poplar_leaf_layers",
+                        () -> new LeafLayersBlock(
+                                        BlockBehaviour.Properties.of(Material.LEAVES, MaterialColor.COLOR_YELLOW)
+                                                        .strength(0.2f)
+                                                        .sound(net.minecraft.world.level.block.SoundType.GRASS)
+                                                        .noOcclusion()
+                                                        .isRedstoneConductor((state, reader, pos) -> false)
+                                                        .isSuffocating((state, reader, pos) -> false)
+                                                        .isViewBlocking((state, reader, pos) -> false),
+                                        "yellow_poplar"));
+
+        public static final RegistryObject<Block> CHERRY_LEAF_LAYERS = BLOCKS.register("cherry_leaf_layers",
+                        () -> new LeafLayersBlock(
+                                        BlockBehaviour.Properties.of(Material.LEAVES, MaterialColor.COLOR_PINK)
+                                                        .strength(0.2f)
+                                                        .sound(net.minecraft.world.level.block.SoundType.GRASS)
+                                                        .noOcclusion()
+                                                        .isRedstoneConductor((state, reader, pos) -> false)
+                                                        .isSuffocating((state, reader, pos) -> false)
+                                                        .isViewBlocking((state, reader, pos) -> false),
+                                        "cherry"));
+
+        public static final RegistryObject<Block> PALE_OAK_LEAF_LAYERS = BLOCKS.register("pale_oak_leaf_layers",
+                        () -> new LeafLayersBlock(
+                                        BlockBehaviour.Properties.of(Material.LEAVES, MaterialColor.PLANT)
+                                                        .strength(0.2f)
+                                                        .sound(net.minecraft.world.level.block.SoundType.GRASS)
+                                                        .noOcclusion()
+                                                        .isRedstoneConductor((state, reader, pos) -> false)
+                                                        .isSuffocating((state, reader, pos) -> false)
+                                                        .isViewBlocking((state, reader, pos) -> false),
+                                        "pale_oak"));
+
+        public static final RegistryObject<Block> SNOWY_CHERRY_LEAF_LAYERS = BLOCKS.register("snowy_cherry_leaf_layers",
+                        () -> new LeafLayersBlock(
+                                        BlockBehaviour.Properties.of(Material.LEAVES, MaterialColor.SNOW)
+                                                        .strength(0.2f)
+                                                        .sound(net.minecraft.world.level.block.SoundType.GRASS)
+                                                        .noOcclusion()
+                                                        .isRedstoneConductor((state, reader, pos) -> false)
+                                                        .isSuffocating((state, reader, pos) -> false)
+                                                        .isViewBlocking((state, reader, pos) -> false),
+                                        "snowy_cherry"));
+
+        public static final RegistryObject<Block> SNOWY_PALE_OAK_LEAF_LAYERS = BLOCKS.register("snowy_pale_oak_leaf_layers",
+                        () -> new LeafLayersBlock(
+                                        BlockBehaviour.Properties.of(Material.LEAVES, MaterialColor.SNOW)
+                                                        .strength(0.2f)
+                                                        .sound(net.minecraft.world.level.block.SoundType.GRASS)
+                                                        .noOcclusion()
+                                                        .isRedstoneConductor((state, reader, pos) -> false)
+                                                        .isSuffocating((state, reader, pos) -> false)
+                                                        .isViewBlocking((state, reader, pos) -> false),
+                                        "snowy_pale_oak"));
+
         public static final RegistryObject<Block> OAK_LEAF_HEDGE = BLOCKS.register(
                         "oak_leaf_hedge",
                         () -> new LeafHedgeBlock(
@@ -3250,6 +3327,76 @@ public class ModBlocks {
                                                         .isSuffocating((state, reader, pos) -> false)
                                                         .isViewBlocking((state, reader, pos) -> false),
                                         ModItems.MANGROVE_LEAF_HEDGE));
+
+        public static final RegistryObject<Block> ORANGE_POPLAR_LEAF_HEDGE = BLOCKS.register("orange_poplar_leaf_hedge",
+                        () -> new LeafHedgeBlock(
+                                        BlockBehaviour.Properties.of(Material.PLANT, MaterialColor.COLOR_ORANGE)
+                                                        .strength(0.2F)
+                                                        .sound(com.kingodogo.buildscape.sound.ModSounds.AZALEA_SOUNDS())
+                                                        .noOcclusion()
+                                                        .isSuffocating((state, reader, pos) -> false)
+                                                        .isViewBlocking((state, reader, pos) -> false),
+                                        ModItems.ORANGE_POPLAR_LEAF_HEDGE));
+
+        public static final RegistryObject<Block> RED_POPLAR_LEAF_HEDGE = BLOCKS.register("red_poplar_leaf_hedge",
+                        () -> new LeafHedgeBlock(
+                                        BlockBehaviour.Properties.of(Material.PLANT, MaterialColor.COLOR_RED)
+                                                        .strength(0.2F)
+                                                        .sound(com.kingodogo.buildscape.sound.ModSounds.AZALEA_SOUNDS())
+                                                        .noOcclusion()
+                                                        .isSuffocating((state, reader, pos) -> false)
+                                                        .isViewBlocking((state, reader, pos) -> false),
+                                        ModItems.RED_POPLAR_LEAF_HEDGE));
+
+        public static final RegistryObject<Block> YELLOW_POPLAR_LEAF_HEDGE = BLOCKS.register("yellow_poplar_leaf_hedge",
+                        () -> new LeafHedgeBlock(
+                                        BlockBehaviour.Properties.of(Material.PLANT, MaterialColor.COLOR_YELLOW)
+                                                        .strength(0.2F)
+                                                        .sound(com.kingodogo.buildscape.sound.ModSounds.AZALEA_SOUNDS())
+                                                        .noOcclusion()
+                                                        .isSuffocating((state, reader, pos) -> false)
+                                                        .isViewBlocking((state, reader, pos) -> false),
+                                        ModItems.YELLOW_POPLAR_LEAF_HEDGE));
+
+        public static final RegistryObject<Block> CHERRY_LEAF_HEDGE = BLOCKS.register("cherry_leaf_hedge",
+                        () -> new LeafHedgeBlock(
+                                        BlockBehaviour.Properties.of(Material.PLANT, MaterialColor.COLOR_PINK)
+                                                        .strength(0.2F)
+                                                        .sound(com.kingodogo.buildscape.sound.ModSounds.AZALEA_SOUNDS())
+                                                        .noOcclusion()
+                                                        .isSuffocating((state, reader, pos) -> false)
+                                                        .isViewBlocking((state, reader, pos) -> false),
+                                        ModItems.CHERRY_LEAF_HEDGE));
+
+        public static final RegistryObject<Block> PALE_OAK_LEAF_HEDGE = BLOCKS.register("pale_oak_leaf_hedge",
+                        () -> new LeafHedgeBlock(
+                                        BlockBehaviour.Properties.of(Material.PLANT, MaterialColor.PLANT)
+                                                        .strength(0.2F)
+                                                        .sound(com.kingodogo.buildscape.sound.ModSounds.AZALEA_SOUNDS())
+                                                        .noOcclusion()
+                                                        .isSuffocating((state, reader, pos) -> false)
+                                                        .isViewBlocking((state, reader, pos) -> false),
+                                        ModItems.PALE_OAK_LEAF_HEDGE));
+
+        public static final RegistryObject<Block> SNOWY_CHERRY_LEAF_HEDGE = BLOCKS.register("snowy_cherry_leaf_hedge",
+                        () -> new LeafHedgeBlock(
+                                        BlockBehaviour.Properties.of(Material.PLANT, MaterialColor.SNOW)
+                                                        .strength(0.2F)
+                                                        .sound(com.kingodogo.buildscape.sound.ModSounds.AZALEA_SOUNDS())
+                                                        .noOcclusion()
+                                                        .isSuffocating((state, reader, pos) -> false)
+                                                        .isViewBlocking((state, reader, pos) -> false),
+                                        ModItems.SNOWY_CHERRY_LEAF_HEDGE));
+
+        public static final RegistryObject<Block> SNOWY_PALE_OAK_LEAF_HEDGE = BLOCKS.register("snowy_pale_oak_leaf_hedge",
+                        () -> new LeafHedgeBlock(
+                                        BlockBehaviour.Properties.of(Material.PLANT, MaterialColor.SNOW)
+                                                        .strength(0.2F)
+                                                        .sound(com.kingodogo.buildscape.sound.ModSounds.AZALEA_SOUNDS())
+                                                        .noOcclusion()
+                                                        .isSuffocating((state, reader, pos) -> false)
+                                                        .isViewBlocking((state, reader, pos) -> false),
+                                        ModItems.SNOWY_PALE_OAK_LEAF_HEDGE));
 
         public static final RegistryObject<Block> HAY_BALE_SLAB = BLOCKS.register(
                         "hay_bale_slab",
@@ -5183,6 +5330,26 @@ public class ModBlocks {
                                         BlockBehaviour.Properties.of(Material.LEAVES)
                                                         .strength(0.2f)
                                                         .sound(com.kingodogo.buildscape.sound.ModSounds.AZALEA_SOUNDS())
+                                                        .noOcclusion()
+                                                        .isValidSpawn((state, reader, pos, entityType) -> false)
+                                                        .isSuffocating((state, reader, pos) -> false)
+                                                        .isViewBlocking((state, reader, pos) -> false)));
+
+        public static final RegistryObject<Block> SNOWY_CHERRY_LEAVES = BLOCKS.register("snowy_cherry_leaves",
+                        () -> new SnowyLeavesBlock(
+                                        BlockBehaviour.Properties.of(Material.LEAVES)
+                                                        .strength(0.2f)
+                                                        .sound(net.minecraft.world.level.block.SoundType.GRASS)
+                                                        .noOcclusion()
+                                                        .isValidSpawn((state, reader, pos, entityType) -> false)
+                                                        .isSuffocating((state, reader, pos) -> false)
+                                                        .isViewBlocking((state, reader, pos) -> false)));
+
+        public static final RegistryObject<Block> SNOWY_PALE_OAK_LEAVES = BLOCKS.register("snowy_pale_oak_leaves",
+                        () -> new SnowyLeavesBlock(
+                                        BlockBehaviour.Properties.of(Material.LEAVES)
+                                                        .strength(0.2f)
+                                                        .sound(net.minecraft.world.level.block.SoundType.GRASS)
                                                         .noOcclusion()
                                                         .isValidSpawn((state, reader, pos, entityType) -> false)
                                                         .isSuffocating((state, reader, pos) -> false)

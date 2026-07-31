@@ -1,9 +1,10 @@
 package com.kingodogo.buildscape.block;
 
-import com.kingodogo.buildscape.client.MuffBlockManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.fml.DistExecutor;
 
 public class MuffBlockEntity extends BlockEntity {
 
@@ -15,14 +16,14 @@ public class MuffBlockEntity extends BlockEntity {
     public void onLoad() {
         super.onLoad();
         if (this.level != null && this.level.isClientSide) {
-            MuffBlockManager.register(this.worldPosition);
+            DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> ClientHandler.register(this.worldPosition));
         }
     }
 
     @Override
     public void setRemoved() {
         if (this.level != null && this.level.isClientSide) {
-            MuffBlockManager.unregister(this.worldPosition);
+            DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> ClientHandler.unregister(this.worldPosition));
         }
         super.setRemoved();
     }
@@ -31,7 +32,17 @@ public class MuffBlockEntity extends BlockEntity {
     public void onChunkUnloaded() {
         super.onChunkUnloaded();
         if (this.level != null && this.level.isClientSide) {
-            MuffBlockManager.unregister(this.worldPosition);
+            DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> ClientHandler.unregister(this.worldPosition));
+        }
+    }
+
+    private static class ClientHandler {
+        private static void register(BlockPos pos) {
+            com.kingodogo.buildscape.client.MuffBlockManager.register(pos);
+        }
+
+        private static void unregister(BlockPos pos) {
+            com.kingodogo.buildscape.client.MuffBlockManager.unregister(pos);
         }
     }
 }

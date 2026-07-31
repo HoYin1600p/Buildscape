@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "###"
+  ],
+  "key": {
+    "#": {
+      "item": "buildscape:snowy_cherry_leaves"
+    }
+  },
+  "result": {
+    "item": "buildscape:snowy_cherry_leaf_layers",
+    "count": 8
+  }
+}

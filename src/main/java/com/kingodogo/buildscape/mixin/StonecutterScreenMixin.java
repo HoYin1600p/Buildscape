@@ -35,7 +35,7 @@ public abstract class StonecutterScreenMixin extends AbstractContainerScreen<Sto
             boolean current = ((StonecutterMenuExtension) this.menu).buildscape$isCutAll();
             ((StonecutterMenuExtension) this.menu).buildscape$setCutAll(!current);
             if (this.minecraft != null && this.minecraft.gameMode != null) {
-                this.minecraft.gameMode.handleInventoryButtonClick(this.menu.containerId, 31337);
+                this.minecraft.gameMode.handleInventoryButtonClick(this.menu.containerId, -123);
             }
         }) {
             @Override

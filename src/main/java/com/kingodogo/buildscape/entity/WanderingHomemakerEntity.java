@@ -91,8 +91,8 @@ public class WanderingHomemakerEntity extends WanderingTrader {
             offers.add(list.get(j));
         }
 
-        // Rare trade: 10% chance to offer 1 scroll for 12 diamonds
-        if (this.random.nextFloat() <= 0.10f) {
+        // Rare trade: 1 in 5000 chance to offer 1 scroll for 12 diamonds
+        if (this.random.nextInt(5000) == 0) {
             offers.add(new MerchantOffer(new ItemStack(Items.DIAMOND, 12), new ItemStack(ModItems.ANCIENT_ASHEN_SCROLL.get(), 1), 1, 1, 0.0f));
         }
     }

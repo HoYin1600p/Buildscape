@@ -34,8 +34,6 @@ public class WanderingHomemakerSpawningHandler {
         NONE
     }
 
-    private static final Set<UUID> ACTIVE_HOMEMAKERS = Collections.synchronizedSet(new HashSet<>());
-
     private static BlockCategory getCategory(Block block) {
         if (block instanceof DecoratedPotBlock) return BlockCategory.DECORATED_POT;
         if (block instanceof BigCandleBlock) return BlockCategory.BIG_CANDLE;
@@ -74,13 +72,9 @@ public class WanderingHomemakerSpawningHandler {
     public static boolean isHomemakerAlive(ServerLevel level, Player player) {
         if (player.getPersistentData().hasUUID("WanderingHomemakerUUID")) {
             UUID uuid = player.getPersistentData().getUUID("WanderingHomemakerUUID");
-            if (ACTIVE_HOMEMAKERS.contains(uuid)) {
-                return true;
-            }
             for (ServerLevel sl : level.getServer().getAllLevels()) {
                 net.minecraft.world.entity.Entity entity = sl.getEntity(uuid);
                 if (entity != null && entity.isAlive()) {
-                    ACTIVE_HOMEMAKERS.add(uuid);
                     return true;
                 }
             }
@@ -128,14 +122,13 @@ public class WanderingHomemakerSpawningHandler {
                     level.sendParticles(ParticleTypes.CLOUD, px, py, pz, 1, 0.0D, 0.0D, 0.0D, 0.0D);
                 }
 
-                player.getPersistentData().putLong("WanderingHomemakerCooldown", gameTime + 144000L); // 2 hours in ticks
+                player.getPersistentData().putLong("WanderingHomemakerCooldown", gameTime + 36000L); // 30 minutes in ticks
                 player.getPersistentData().putUUID("WanderingHomemakerUUID", homemaker.getUUID());
-                ACTIVE_HOMEMAKERS.add(homemaker.getUUID());
 
                 if (player instanceof net.minecraft.server.level.ServerPlayer serverPlayer) {
                     com.kingodogo.buildscape.network.ModMessages.INSTANCE.send(
                             net.minecraftforge.network.PacketDistributor.PLAYER.with(() -> serverPlayer),
-                            new com.kingodogo.buildscape.network.SyncHomemakerCooldownPacket(gameTime + 144000L)
+                            new com.kingodogo.buildscape.network.SyncHomemakerCooldownPacket(gameTime + 36000L)
                     );
                 }
             }

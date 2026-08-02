@@ -896,7 +896,7 @@ public class PointedIcicleBlock extends PointedDripstoneBlock {
             return;
         }
 
-        if (random.nextFloat() >= 0.011F) {
+        if (random.nextFloat() >= 0.06F) {
             return;
         }
 
@@ -1020,7 +1020,7 @@ public class PointedIcicleBlock extends PointedDripstoneBlock {
             return;
         }
 
-        if (random.nextFloat() >= 0.022F) {
+        if (random.nextFloat() >= 0.12F) {
             return;
         }
 

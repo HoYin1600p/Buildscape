@@ -10594,7 +10594,7 @@ public class ModBlocks {
                                         () -> ModItems.RED_MOSS_LAYERS.get()));
         public static final RegistryObject<Block> RED_MOSS_BLOCK = BLOCKS.register("red_moss_block",
                         () -> new ColoredMossBlock(BlockBehaviour.Properties.copy(Blocks.MOSS_BLOCK), RED_MOSS_CARPET,
-                                        RED_MOSS_OVERLAY, RED_MOSS_LAYERS));
+                                        RED_MOSS_OVERLAY, RED_MOSS_LAYERS, () -> ModBlocks.POPLAR_SAPLING.get(), () -> ModBlocks.RED_BUSH.get()));
         public static final RegistryObject<Block> RED_MOSS_BLOCK_SLAB = BLOCKS.register("red_moss_block_slab",
                         () -> new ModSlabBlock(RED_MOSS_BLOCK.get(),
                                         BlockBehaviour.Properties.copy(Blocks.MOSS_BLOCK)));
@@ -10612,7 +10612,7 @@ public class ModBlocks {
                                         () -> ModItems.ORANGE_MOSS_LAYERS.get()));
         public static final RegistryObject<Block> ORANGE_MOSS_BLOCK = BLOCKS.register("orange_moss_block",
                         () -> new ColoredMossBlock(BlockBehaviour.Properties.copy(Blocks.MOSS_BLOCK),
-                                        ORANGE_MOSS_CARPET, ORANGE_MOSS_OVERLAY, ORANGE_MOSS_LAYERS));
+                                        ORANGE_MOSS_CARPET, ORANGE_MOSS_OVERLAY, ORANGE_MOSS_LAYERS, () -> ModBlocks.POPLAR_SAPLING.get(), () -> ModBlocks.RED_BUSH.get()));
         public static final RegistryObject<Block> ORANGE_MOSS_BLOCK_SLAB = BLOCKS.register("orange_moss_block_slab",
                         () -> new ModSlabBlock(ORANGE_MOSS_BLOCK.get(),
                                         BlockBehaviour.Properties.copy(Blocks.MOSS_BLOCK)));
@@ -10630,7 +10630,7 @@ public class ModBlocks {
                                         () -> ModItems.YELLOW_MOSS_LAYERS.get()));
         public static final RegistryObject<Block> YELLOW_MOSS_BLOCK = BLOCKS.register("yellow_moss_block",
                         () -> new ColoredMossBlock(BlockBehaviour.Properties.copy(Blocks.MOSS_BLOCK),
-                                        YELLOW_MOSS_CARPET, YELLOW_MOSS_OVERLAY, YELLOW_MOSS_LAYERS));
+                                        YELLOW_MOSS_CARPET, YELLOW_MOSS_OVERLAY, YELLOW_MOSS_LAYERS, () -> ModBlocks.POPLAR_SAPLING.get(), () -> ModBlocks.RED_BUSH.get()));
         public static final RegistryObject<Block> YELLOW_MOSS_BLOCK_SLAB = BLOCKS.register("yellow_moss_block_slab",
                         () -> new ModSlabBlock(YELLOW_MOSS_BLOCK.get(),
                                         BlockBehaviour.Properties.copy(Blocks.MOSS_BLOCK)));
@@ -12237,5 +12237,115 @@ public class ModBlocks {
         public static final RegistryObject<Block> OXIDIZED_COPPER_PRESSURE_PLATE = BLOCKS.register("oxidized_copper_pressure_plate", () -> new WeatheringPressurePlateBlock(150, BlockBehaviour.Properties.copy(Blocks.OXIDIZED_COPPER).noCollission().strength(0.5F).sound(SoundType.COPPER)));
         public static final RegistryObject<Block> WAXED_OXIDIZED_COPPER_PRESSURE_PLATE = BLOCKS.register("waxed_oxidized_copper_pressure_plate", () -> new ModPressurePlateBlock(150, BlockBehaviour.Properties.copy(Blocks.OXIDIZED_COPPER).noCollission().strength(0.5F).sound(SoundType.COPPER)));
 
+        // Glass Jars
+        public static final RegistryObject<Block> GLASS_JAR = BLOCKS.register("glass_jar", () -> new GlassJarBlock(BlockBehaviour.Properties.of(net.minecraft.world.level.material.Material.GLASS).strength(0.3F).sound(SoundType.GLASS).noOcclusion().isSuffocating((state, reader, pos) -> false).isViewBlocking((state, reader, pos) -> false)));
+        public static final RegistryObject<Block> WHITE_GLASS_JAR = BLOCKS.register("white_glass_jar", () -> new GlassJarBlock(BlockBehaviour.Properties.of(net.minecraft.world.level.material.Material.GLASS, net.minecraft.world.level.material.MaterialColor.SNOW).strength(0.3F).sound(SoundType.GLASS).noOcclusion().isSuffocating((state, reader, pos) -> false).isViewBlocking((state, reader, pos) -> false)));
+        public static final RegistryObject<Block> ORANGE_GLASS_JAR = BLOCKS.register("orange_glass_jar", () -> new GlassJarBlock(BlockBehaviour.Properties.of(net.minecraft.world.level.material.Material.GLASS, net.minecraft.world.level.material.MaterialColor.COLOR_ORANGE).strength(0.3F).sound(SoundType.GLASS).noOcclusion().isSuffocating((state, reader, pos) -> false).isViewBlocking((state, reader, pos) -> false)));
+        public static final RegistryObject<Block> MAGENTA_GLASS_JAR = BLOCKS.register("magenta_glass_jar", () -> new GlassJarBlock(BlockBehaviour.Properties.of(net.minecraft.world.level.material.Material.GLASS, net.minecraft.world.level.material.MaterialColor.COLOR_MAGENTA).strength(0.3F).sound(SoundType.GLASS).noOcclusion().isSuffocating((state, reader, pos) -> false).isViewBlocking((state, reader, pos) -> false)));
+        public static final RegistryObject<Block> LIGHT_BLUE_GLASS_JAR = BLOCKS.register("light_blue_glass_jar", () -> new GlassJarBlock(BlockBehaviour.Properties.of(net.minecraft.world.level.material.Material.GLASS, net.minecraft.world.level.material.MaterialColor.COLOR_LIGHT_BLUE).strength(0.3F).sound(SoundType.GLASS).noOcclusion().isSuffocating((state, reader, pos) -> false).isViewBlocking((state, reader, pos) -> false)));
+        public static final RegistryObject<Block> YELLOW_GLASS_JAR = BLOCKS.register("yellow_glass_jar", () -> new GlassJarBlock(BlockBehaviour.Properties.of(net.minecraft.world.level.material.Material.GLASS, net.minecraft.world.level.material.MaterialColor.COLOR_YELLOW).strength(0.3F).sound(SoundType.GLASS).noOcclusion().isSuffocating((state, reader, pos) -> false).isViewBlocking((state, reader, pos) -> false)));
+        public static final RegistryObject<Block> LIME_GLASS_JAR = BLOCKS.register("lime_glass_jar", () -> new GlassJarBlock(BlockBehaviour.Properties.of(net.minecraft.world.level.material.Material.GLASS, net.minecraft.world.level.material.MaterialColor.COLOR_LIGHT_GREEN).strength(0.3F).sound(SoundType.GLASS).noOcclusion().isSuffocating((state, reader, pos) -> false).isViewBlocking((state, reader, pos) -> false)));
+        public static final RegistryObject<Block> PINK_GLASS_JAR = BLOCKS.register("pink_glass_jar", () -> new GlassJarBlock(BlockBehaviour.Properties.of(net.minecraft.world.level.material.Material.GLASS, net.minecraft.world.level.material.MaterialColor.COLOR_PINK).strength(0.3F).sound(SoundType.GLASS).noOcclusion().isSuffocating((state, reader, pos) -> false).isViewBlocking((state, reader, pos) -> false)));
+        public static final RegistryObject<Block> GRAY_GLASS_JAR = BLOCKS.register("gray_glass_jar", () -> new GlassJarBlock(BlockBehaviour.Properties.of(net.minecraft.world.level.material.Material.GLASS, net.minecraft.world.level.material.MaterialColor.COLOR_GRAY).strength(0.3F).sound(SoundType.GLASS).noOcclusion().isSuffocating((state, reader, pos) -> false).isViewBlocking((state, reader, pos) -> false)));
+        public static final RegistryObject<Block> LIGHT_GRAY_GLASS_JAR = BLOCKS.register("light_gray_glass_jar", () -> new GlassJarBlock(BlockBehaviour.Properties.of(net.minecraft.world.level.material.Material.GLASS, net.minecraft.world.level.material.MaterialColor.COLOR_LIGHT_GRAY).strength(0.3F).sound(SoundType.GLASS).noOcclusion().isSuffocating((state, reader, pos) -> false).isViewBlocking((state, reader, pos) -> false)));
+        public static final RegistryObject<Block> CYAN_GLASS_JAR = BLOCKS.register("cyan_glass_jar", () -> new GlassJarBlock(BlockBehaviour.Properties.of(net.minecraft.world.level.material.Material.GLASS, net.minecraft.world.level.material.MaterialColor.COLOR_CYAN).strength(0.3F).sound(SoundType.GLASS).noOcclusion().isSuffocating((state, reader, pos) -> false).isViewBlocking((state, reader, pos) -> false)));
+        public static final RegistryObject<Block> PURPLE_GLASS_JAR = BLOCKS.register("purple_glass_jar", () -> new GlassJarBlock(BlockBehaviour.Properties.of(net.minecraft.world.level.material.Material.GLASS, net.minecraft.world.level.material.MaterialColor.COLOR_PURPLE).strength(0.3F).sound(SoundType.GLASS).noOcclusion().isSuffocating((state, reader, pos) -> false).isViewBlocking((state, reader, pos) -> false)));
+        public static final RegistryObject<Block> BLUE_GLASS_JAR = BLOCKS.register("blue_glass_jar", () -> new GlassJarBlock(BlockBehaviour.Properties.of(net.minecraft.world.level.material.Material.GLASS, net.minecraft.world.level.material.MaterialColor.COLOR_BLUE).strength(0.3F).sound(SoundType.GLASS).noOcclusion().isSuffocating((state, reader, pos) -> false).isViewBlocking((state, reader, pos) -> false)));
+        public static final RegistryObject<Block> BROWN_GLASS_JAR = BLOCKS.register("brown_glass_jar", () -> new GlassJarBlock(BlockBehaviour.Properties.of(net.minecraft.world.level.material.Material.GLASS, net.minecraft.world.level.material.MaterialColor.COLOR_BROWN).strength(0.3F).sound(SoundType.GLASS).noOcclusion().isSuffocating((state, reader, pos) -> false).isViewBlocking((state, reader, pos) -> false)));
+        public static final RegistryObject<Block> GREEN_GLASS_JAR = BLOCKS.register("green_glass_jar", () -> new GlassJarBlock(BlockBehaviour.Properties.of(net.minecraft.world.level.material.Material.GLASS, net.minecraft.world.level.material.MaterialColor.COLOR_GREEN).strength(0.3F).sound(SoundType.GLASS).noOcclusion().isSuffocating((state, reader, pos) -> false).isViewBlocking((state, reader, pos) -> false)));
+        public static final RegistryObject<Block> RED_GLASS_JAR = BLOCKS.register("red_glass_jar", () -> new GlassJarBlock(BlockBehaviour.Properties.of(net.minecraft.world.level.material.Material.GLASS, net.minecraft.world.level.material.MaterialColor.COLOR_RED).strength(0.3F).sound(SoundType.GLASS).noOcclusion().isSuffocating((state, reader, pos) -> false).isViewBlocking((state, reader, pos) -> false)));
+        public static final RegistryObject<Block> BLACK_GLASS_JAR = BLOCKS.register("black_glass_jar", () -> new GlassJarBlock(BlockBehaviour.Properties.of(net.minecraft.world.level.material.Material.GLASS, net.minecraft.world.level.material.MaterialColor.COLOR_BLACK).strength(0.3F).sound(SoundType.GLASS).noOcclusion().isSuffocating((state, reader, pos) -> false).isViewBlocking((state, reader, pos) -> false)));
+        public static final RegistryObject<Block> TINTED_GLASS_JAR = BLOCKS.register("tinted_glass_jar", () -> new GlassJarBlock(BlockBehaviour.Properties.of(net.minecraft.world.level.material.Material.GLASS, net.minecraft.world.level.material.MaterialColor.COLOR_GRAY).strength(0.3F).sound(SoundType.GLASS).noOcclusion().isSuffocating((state, reader, pos) -> false).isViewBlocking((state, reader, pos) -> false)));
+
+        // Snowy Poplar Leaves, Layers, and Hedges
+        public static final RegistryObject<Block> SNOWY_ORANGE_POPLAR_LEAVES = BLOCKS.register("snowy_orange_poplar_leaves",
+                        () -> new SnowyLeavesBlock(
+                                        BlockBehaviour.Properties.of(Material.LEAVES)
+                                                        .strength(0.2f)
+                                                        .sound(net.minecraft.world.level.block.SoundType.GRASS)
+                                                        .noOcclusion()
+                                                        .isValidSpawn((state, reader, pos, entityType) -> false)
+                                                        .isSuffocating((state, reader, pos) -> false)
+                                                        .isViewBlocking((state, reader, pos) -> false)));
+
+        public static final RegistryObject<Block> SNOWY_RED_POPLAR_LEAVES = BLOCKS.register("snowy_red_poplar_leaves",
+                        () -> new SnowyLeavesBlock(
+                                        BlockBehaviour.Properties.of(Material.LEAVES)
+                                                        .strength(0.2f)
+                                                        .sound(net.minecraft.world.level.block.SoundType.GRASS)
+                                                        .noOcclusion()
+                                                        .isValidSpawn((state, reader, pos, entityType) -> false)
+                                                        .isSuffocating((state, reader, pos) -> false)
+                                                        .isViewBlocking((state, reader, pos) -> false)));
+
+        public static final RegistryObject<Block> SNOWY_YELLOW_POPLAR_LEAVES = BLOCKS.register("snowy_yellow_poplar_leaves",
+                        () -> new SnowyLeavesBlock(
+                                        BlockBehaviour.Properties.of(Material.LEAVES)
+                                                        .strength(0.2f)
+                                                        .sound(net.minecraft.world.level.block.SoundType.GRASS)
+                                                        .noOcclusion()
+                                                        .isValidSpawn((state, reader, pos, entityType) -> false)
+                                                        .isSuffocating((state, reader, pos) -> false)
+                                                        .isViewBlocking((state, reader, pos) -> false)));
+
+        public static final RegistryObject<Block> SNOWY_ORANGE_POPLAR_LEAF_LAYERS = BLOCKS.register("snowy_orange_poplar_leaf_layers",
+                        () -> new LeafLayersBlock(
+                                        BlockBehaviour.Properties.of(Material.PLANT, MaterialColor.SNOW)
+                                                        .strength(0.2f)
+                                                        .sound(com.kingodogo.buildscape.sound.ModSounds.AZALEA_SOUNDS())
+                                                        .noOcclusion()
+                                                        .isSuffocating((state, reader, pos) -> false)
+                                                        .isViewBlocking((state, reader, pos) -> false),
+                                        "snowy_orange_poplar"));
+
+        public static final RegistryObject<Block> SNOWY_RED_POPLAR_LEAF_LAYERS = BLOCKS.register("snowy_red_poplar_leaf_layers",
+                        () -> new LeafLayersBlock(
+                                        BlockBehaviour.Properties.of(Material.PLANT, MaterialColor.SNOW)
+                                                        .strength(0.2f)
+                                                        .sound(com.kingodogo.buildscape.sound.ModSounds.AZALEA_SOUNDS())
+                                                        .noOcclusion()
+                                                        .isSuffocating((state, reader, pos) -> false)
+                                                        .isViewBlocking((state, reader, pos) -> false),
+                                        "snowy_red_poplar"));
+
+        public static final RegistryObject<Block> SNOWY_YELLOW_POPLAR_LEAF_LAYERS = BLOCKS.register("snowy_yellow_poplar_leaf_layers",
+                        () -> new LeafLayersBlock(
+                                        BlockBehaviour.Properties.of(Material.PLANT, MaterialColor.SNOW)
+                                                        .strength(0.2f)
+                                                        .sound(com.kingodogo.buildscape.sound.ModSounds.AZALEA_SOUNDS())
+                                                        .noOcclusion()
+                                                        .isSuffocating((state, reader, pos) -> false)
+                                                        .isViewBlocking((state, reader, pos) -> false),
+                                        "snowy_yellow_poplar"));
+
+        public static final RegistryObject<Block> SNOWY_ORANGE_POPLAR_LEAF_HEDGE = BLOCKS.register("snowy_orange_poplar_leaf_hedge",
+                        () -> new LeafHedgeBlock(
+                                        BlockBehaviour.Properties.of(Material.PLANT, MaterialColor.SNOW)
+                                                        .strength(0.2F)
+                                                        .sound(com.kingodogo.buildscape.sound.ModSounds.AZALEA_SOUNDS())
+                                                        .noOcclusion()
+                                                        .isSuffocating((state, reader, pos) -> false)
+                                                        .isViewBlocking((state, reader, pos) -> false),
+                                        ModItems.SNOWY_ORANGE_POPLAR_LEAF_HEDGE));
+
+        public static final RegistryObject<Block> SNOWY_RED_POPLAR_LEAF_HEDGE = BLOCKS.register("snowy_red_poplar_leaf_hedge",
+                        () -> new LeafHedgeBlock(
+                                        BlockBehaviour.Properties.of(Material.PLANT, MaterialColor.SNOW)
+                                                        .strength(0.2F)
+                                                        .sound(com.kingodogo.buildscape.sound.ModSounds.AZALEA_SOUNDS())
+                                                        .noOcclusion()
+                                                        .isSuffocating((state, reader, pos) -> false)
+                                                        .isViewBlocking((state, reader, pos) -> false),
+                                        ModItems.SNOWY_RED_POPLAR_LEAF_HEDGE));
+
+        public static final RegistryObject<Block> SNOWY_YELLOW_POPLAR_LEAF_HEDGE = BLOCKS.register("snowy_yellow_poplar_leaf_hedge",
+                        () -> new LeafHedgeBlock(
+                                        BlockBehaviour.Properties.of(Material.PLANT, MaterialColor.SNOW)
+                                                        .strength(0.2F)
+                                                        .sound(com.kingodogo.buildscape.sound.ModSounds.AZALEA_SOUNDS())
+                                                        .noOcclusion()
+                                                        .isSuffocating((state, reader, pos) -> false)
+                                                        .isViewBlocking((state, reader, pos) -> false),
+                                        ModItems.SNOWY_YELLOW_POPLAR_LEAF_HEDGE));
 }
 

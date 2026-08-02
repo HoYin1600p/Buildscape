@@ -237,6 +237,8 @@ public class ModBiomeModifications {
         ) {
             addFeatureToBiome(event, ModConfiguredFeatures.ALL_PETALS.get(), 11);
             addFeatureToBiome(event, ModConfiguredFeatures.CLOVER.get(), 32);
+            addFeatureToBiome(event, ModConfiguredFeatures.WILDFLOWERS.get(), 11);
+            addFeatureToBiome(event, ModConfiguredFeatures.LEAF_LITTER.get(), 11);
         }
 
         if (event.getName().equals(Biomes.LUSH_CAVES.location())) {

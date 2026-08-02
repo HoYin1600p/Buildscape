@@ -237,26 +237,32 @@ public class BuildScape {
                             }
 
                             if (level instanceof net.minecraft.server.level.ServerLevel serverLevel) {
-                                java.util.Random rand = level.random;
-                                int particleCount = 65 + rand.nextInt(36);
+                                 java.util.Random rand = level.random;
+                                 int burstLevel = 1;
+                                 if (stack.hasTag() && stack.getTag().contains("BurstLevel")) {
+                                     burstLevel = Math.min(5, Math.max(1, stack.getTag().getInt("BurstLevel")));
+                                 }
+                                 int particleCount = (65 + rand.nextInt(36)) * burstLevel;
+                                 double speedMultiplier = 1.0 + (burstLevel - 1) * 0.2D;
+                                 double spreadMultiplier = 1.0 + (burstLevel - 1) * 0.1D;
 
-                                for (int i = 0; i < particleCount; i++) {
-                                    double speed = 0.08D + rand.nextDouble() * 0.12D;
-                                    double spread = 0.04D + rand.nextDouble() * 0.06D;
+                                 for (int i = 0; i < particleCount; i++) {
+                                     double speed = (0.08D + rand.nextDouble() * 0.12D) * speedMultiplier;
+                                     double spread = (0.04D + rand.nextDouble() * 0.06D) * spreadMultiplier;
 
-                                    double vx = dirX * speed + (rand.nextDouble() - 0.5D) * spread;
-                                    double vy = dirY * speed + (rand.nextDouble() - 0.5D) * spread + (facing.getAxis().isHorizontal() ? 0.05D : 0.0D);
-                                    double vz = dirZ * speed + (rand.nextDouble() - 0.5D) * spread;
+                                     double vx = dirX * speed + (rand.nextDouble() - 0.5D) * spread;
+                                     double vy = dirY * speed + (rand.nextDouble() - 0.5D) * spread + (facing.getAxis().isHorizontal() ? 0.05D : 0.0D);
+                                     double vz = dirZ * speed + (rand.nextDouble() - 0.5D) * spread;
 
-                                    double px = startX + (rand.nextDouble() - 0.5D) * 0.15D;
-                                    double py = startY + (rand.nextDouble() - 0.5D) * 0.15D;
-                                    double pz = startZ + (rand.nextDouble() - 0.5D) * 0.15D;
+                                     double px = startX + (rand.nextDouble() - 0.5D) * 0.15D;
+                                     double py = startY + (rand.nextDouble() - 0.5D) * 0.15D;
+                                     double pz = startZ + (rand.nextDouble() - 0.5D) * 0.15D;
 
-                                    serverLevel.sendParticles(
-                                            (net.minecraft.core.particles.SimpleParticleType) com.kingodogo.buildscape.particle.ModParticles.CONFETTI.get(),
-                                            px, py, pz, 0, vx, vy, vz, 1.0D
-                                    );
-                                }
+                                     serverLevel.sendParticles(
+                                             (net.minecraft.core.particles.SimpleParticleType) com.kingodogo.buildscape.particle.ModParticles.CONFETTI.get(),
+                                             px, py, pz, 0, vx, vy, vz, 1.0D
+                                     );
+                                 }
 
                                 level.playSound(null, pos,
                                         net.minecraft.sounds.SoundEvents.FIREWORK_ROCKET_BLAST,
@@ -1649,6 +1655,10 @@ public class BuildScape {
                         com.kingodogo.buildscape.block.ModBlockEntities.FESTIVE_STOCKING_BLOCK_ENTITY
                                 .get(),
                         com.kingodogo.buildscape.client.renderer.FestiveStockingBlockEntityRenderer::new);
+                net.minecraft.client.renderer.blockentity.BlockEntityRenderers.register(
+                        com.kingodogo.buildscape.block.ModBlockEntities.GLASS_JAR_BLOCK_ENTITY
+                                .get(),
+                        com.kingodogo.buildscape.client.renderer.GlassJarBlockEntityRenderer::new);
 
 /*
                 net.minecraft.client.renderer.blockentity.BlockEntityRenderers.register(
@@ -1924,7 +1934,16 @@ public class BuildScape {
                         ModBlocks.SNOWY_CHERRY_LEAF_HEDGE.get(),
                         ModBlocks.SNOWY_PALE_OAK_LEAF_HEDGE.get(),
                         ModBlocks.SNOWY_CHERRY_LEAVES.get(),
-                        ModBlocks.SNOWY_PALE_OAK_LEAVES.get());
+                        ModBlocks.SNOWY_PALE_OAK_LEAVES.get(),
+                        ModBlocks.SNOWY_ORANGE_POPLAR_LEAF_LAYERS.get(),
+                        ModBlocks.SNOWY_RED_POPLAR_LEAF_LAYERS.get(),
+                        ModBlocks.SNOWY_YELLOW_POPLAR_LEAF_LAYERS.get(),
+                        ModBlocks.SNOWY_ORANGE_POPLAR_LEAF_HEDGE.get(),
+                        ModBlocks.SNOWY_RED_POPLAR_LEAF_HEDGE.get(),
+                        ModBlocks.SNOWY_YELLOW_POPLAR_LEAF_HEDGE.get(),
+                        ModBlocks.SNOWY_ORANGE_POPLAR_LEAVES.get(),
+                        ModBlocks.SNOWY_RED_POPLAR_LEAVES.get(),
+                        ModBlocks.SNOWY_YELLOW_POPLAR_LEAVES.get());
 
                 blockColors.register(
                         (state, reader, pos, tintIndex) -> {

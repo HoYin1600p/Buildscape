@@ -88,12 +88,9 @@ public class BuildScape {
         event.enqueueWork(() -> {
             com.kingodogo.buildscape.network.ModMessages.register();
             try {
+                // Only set base max stack size for POTION item - the ItemMixin restricts this to water bottles only
                 net.minecraftforge.fml.util.ObfuscationReflectionHelper.setPrivateValue(
                         net.minecraft.world.item.Item.class, net.minecraft.world.item.Items.POTION, 16, "f_41370_");
-                net.minecraftforge.fml.util.ObfuscationReflectionHelper.setPrivateValue(
-                        net.minecraft.world.item.Item.class, net.minecraft.world.item.Items.SPLASH_POTION, 16, "f_41370_");
-                net.minecraftforge.fml.util.ObfuscationReflectionHelper.setPrivateValue(
-                        net.minecraft.world.item.Item.class, net.minecraft.world.item.Items.LINGERING_POTION, 16, "f_41370_");
             } catch (Exception e) {
                 LOGGER.error("Failed to set max stack size for potions", e);
             }
@@ -2592,28 +2589,47 @@ public class BuildScape {
                 }
             }
 
-            // 3. Bonemeal Grass Block -> Generates Bushes in radius
+            // 3. Bonemeal Grass Block -> Generates Bushes in radius alongside vanilla grass, ferns, etc.
             if (state.is(net.minecraft.world.level.block.Blocks.GRASS_BLOCK) && event.getFace() == net.minecraft.core.Direction.UP) {
                 if (!level.isClientSide) {
-                    net.minecraft.core.BlockPos.betweenClosedStream(pos.offset(-3, -1, -3), pos.offset(3, 1, 3)).forEach(checkPos -> {
-                        if (level.getBlockState(checkPos).is(net.minecraft.world.level.block.Blocks.GRASS_BLOCK) && level.isEmptyBlock(checkPos.above())) {
-                            if (level.random.nextFloat() < 0.25F) {
-                                level.setBlock(checkPos.above(), ModBlocks.BUSH.get().defaultBlockState(), 3);
+                    // Use a delayed task so vanilla vegetation (grass, fern, flowers) spawns first
+                    final net.minecraft.core.BlockPos finalPos = pos;
+                    ((net.minecraft.server.level.ServerLevel) level).getServer().execute(() -> {
+                        net.minecraft.core.BlockPos.betweenClosedStream(finalPos.offset(-3, -1, -3), finalPos.offset(3, 1, 3)).forEach(checkPos -> {
+                            if (level.getBlockState(checkPos).is(net.minecraft.world.level.block.Blocks.GRASS_BLOCK) && level.isEmptyBlock(checkPos.above())) {
+                                if (level.random.nextFloat() < 0.05F) {
+                                    level.setBlock(checkPos.above(), ModBlocks.BUSH.get().defaultBlockState(), 3);
+                                }
                             }
-                        }
+                        });
                     });
                 }
             }
 
-            // 4. Bonemeal Moss Block -> Generates Firefly Bushes in radius alongside vanilla Moss Block bonemeal
+            // 4. Bonemeal Moss Block -> Generates Firefly Bushes, Cherry Saplings & Mangrove Propagules alongside vanilla Moss Block bonemeal
             if (state.is(net.minecraft.world.level.block.Blocks.MOSS_BLOCK) && event.getFace() == net.minecraft.core.Direction.UP) {
                 if (!level.isClientSide) {
-                    net.minecraft.core.BlockPos.betweenClosedStream(pos.offset(-3, -1, -3), pos.offset(3, 1, 3)).forEach(checkPos -> {
-                        if (level.getBlockState(checkPos).is(net.minecraft.world.level.block.Blocks.MOSS_BLOCK) && level.isEmptyBlock(checkPos.above())) {
-                            if (level.random.nextFloat() < 0.20F) {
-                                level.setBlock(checkPos.above(), ModBlocks.FIREFLY_BUSH.get().defaultBlockState(), 3);
+                    // Use a delayed task so vanilla moss vegetation (grass, azalea, etc.) spawns first
+                    final net.minecraft.core.BlockPos finalMossPos = pos;
+                    ((net.minecraft.server.level.ServerLevel) level).getServer().execute(() -> {
+                        net.minecraft.core.BlockPos.betweenClosedStream(finalMossPos.offset(-3, -1, -3), finalMossPos.offset(3, 1, 3)).forEach(checkPos -> {
+                            if (level.getBlockState(checkPos).is(net.minecraft.world.level.block.Blocks.MOSS_BLOCK) && level.isEmptyBlock(checkPos.above())) {
+                                float roll = level.random.nextFloat();
+                                if (roll < 0.10F) { // 10% chance: Firefly Bush
+                                    level.setBlock(checkPos.above(), ModBlocks.FIREFLY_BUSH.get().defaultBlockState(), 3);
+                                } else if (roll < 0.15F) { // 5% chance: Cherry Sapling
+                                    net.minecraft.world.level.block.state.BlockState saplingState = ModBlocks.CHERRY_SAPLING.get().defaultBlockState();
+                                    if (saplingState.canSurvive(level, checkPos.above())) {
+                                        level.setBlock(checkPos.above(), saplingState, 3);
+                                    }
+                                } else if (roll < 0.20F) { // 5% chance: Mangrove Propagule
+                                    net.minecraft.world.level.block.state.BlockState propaguleState = ModBlocks.MANGROVE_PROPAGULE.get().defaultBlockState();
+                                    if (propaguleState.canSurvive(level, checkPos.above())) {
+                                        level.setBlock(checkPos.above(), propaguleState, 3);
+                                    }
+                                }
                             }
-                        }
+                        });
                     });
                 }
             }

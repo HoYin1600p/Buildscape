@@ -1,15 +1,15 @@
 {
-    "replace": false,
-    "values": [
-        "buildscape:cherry_leaves",
-        "buildscape:orange_poplar_leaves",
-        "buildscape:pale_oak_leaves",
-        "buildscape:red_poplar_leaves",
-        "buildscape:snowy_cherry_leaves",
-        "buildscape:snowy_orange_poplar_leaves",
-        "buildscape:snowy_pale_oak_leaves",
-        "buildscape:snowy_red_poplar_leaves",
-        "buildscape:snowy_yellow_poplar_leaves",
-        "buildscape:yellow_poplar_leaves"
-    ]
+  "replace": false,
+  "values": [
+    "buildscape:cherry_leaves",
+    "buildscape:orange_poplar_leaves",
+    "buildscape:pale_oak_leaves",
+    "buildscape:red_poplar_leaves",
+    "buildscape:snowy_cherry_leaves",
+    "buildscape:snowy_orange_poplar_leaves",
+    "buildscape:snowy_pale_oak_leaves",
+    "buildscape:snowy_red_poplar_leaves",
+    "buildscape:snowy_yellow_poplar_leaves",
+    "buildscape:yellow_poplar_leaves"
+  ]
 }

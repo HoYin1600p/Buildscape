@@ -157,4 +157,29 @@ public class ModBlockEntities {
                     ModBlocks.MUFF_BLOCK.get()
             ).build(null)
     );
+
+    public static final RegistryObject<BlockEntityType<GlassJarBlockEntity>> GLASS_JAR_BLOCK_ENTITY = BLOCK_ENTITIES.register(
+            "glass_jar_block_entity",
+            () -> BlockEntityType.Builder.of(
+                    GlassJarBlockEntity::new,
+                    ModBlocks.GLASS_JAR.get(),
+                    ModBlocks.WHITE_GLASS_JAR.get(),
+                    ModBlocks.ORANGE_GLASS_JAR.get(),
+                    ModBlocks.MAGENTA_GLASS_JAR.get(),
+                    ModBlocks.LIGHT_BLUE_GLASS_JAR.get(),
+                    ModBlocks.YELLOW_GLASS_JAR.get(),
+                    ModBlocks.LIME_GLASS_JAR.get(),
+                    ModBlocks.PINK_GLASS_JAR.get(),
+                    ModBlocks.GRAY_GLASS_JAR.get(),
+                    ModBlocks.LIGHT_GRAY_GLASS_JAR.get(),
+                    ModBlocks.CYAN_GLASS_JAR.get(),
+                    ModBlocks.PURPLE_GLASS_JAR.get(),
+                    ModBlocks.BLUE_GLASS_JAR.get(),
+                    ModBlocks.BROWN_GLASS_JAR.get(),
+                    ModBlocks.GREEN_GLASS_JAR.get(),
+                    ModBlocks.RED_GLASS_JAR.get(),
+                    ModBlocks.BLACK_GLASS_JAR.get(),
+                    ModBlocks.TINTED_GLASS_JAR.get()
+            ).build(null)
+    );
 }

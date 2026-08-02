@@ -1002,6 +1002,30 @@ public class ModConfiguredFeatures {
                     )
             );
 
+    public static final RegistryObject<ConfiguredFeature<?, ?>> WILDFLOWERS =
+            CONFIGURED_FEATURES.register("wildflowers", () ->
+                    new ConfiguredFeature<>(
+                            Feature.RANDOM_PATCH,
+                            createFlowerPatchConfiguration(
+                                    ModBlocks.WILDFLOWERS.get(),
+                                    com.kingodogo.buildscape.block.WildflowersBlock.FLOWER_AMOUNT,
+                                    com.kingodogo.buildscape.block.WildflowersBlock.FACING
+                            )
+                    )
+            );
+
+    public static final RegistryObject<ConfiguredFeature<?, ?>> LEAF_LITTER =
+            CONFIGURED_FEATURES.register("leaf_litter", () ->
+                    new ConfiguredFeature<>(
+                            Feature.RANDOM_PATCH,
+                            createFlowerPatchConfiguration(
+                                    ModBlocks.LEAF_LITTER.get(),
+                                    com.kingodogo.buildscape.block.LeafLitterBlock.FLOWER_AMOUNT,
+                                    com.kingodogo.buildscape.block.LeafLitterBlock.FACING
+                            )
+                    )
+            );
+
     @Deprecated
     public static final RegistryObject<
             ConfiguredFeature<?, ?>
@@ -1295,6 +1319,36 @@ public class ModConfiguredFeatures {
                 )
         );
 
+        return new RandomPatchConfiguration(64, 7, 3, Holder.direct(placedFeature));
+    }
+
+    private static RandomPatchConfiguration createFlowerPatchConfiguration(
+            net.minecraft.world.level.block.Block block,
+            IntegerProperty amountProp,
+            DirectionProperty facingProp
+    ) {
+        List<net.minecraft.world.level.block.state.BlockState> states = new ArrayList<>();
+        Direction[] facings = { Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST };
+        for (int state = 1; state <= 4; state++) {
+            for (Direction facing : facings) {
+                states.add(block.defaultBlockState().setValue(amountProp, state).setValue(facingProp, facing));
+            }
+        }
+        RandomStateProvider stateProvider = new RandomStateProvider(states);
+        ConfiguredFeature<?, ?> simpleBlockFeature = new ConfiguredFeature<>(
+                Feature.SIMPLE_BLOCK,
+                new SimpleBlockConfiguration(stateProvider)
+        );
+        PlacedFeature placedFeature = new PlacedFeature(
+                Holder.direct(simpleBlockFeature),
+                List.of(
+                        net.minecraft.world.level.levelgen.placement.BlockPredicateFilter.forPredicate(
+                                net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate.matchesBlocks(
+                                        List.of(net.minecraft.world.level.block.Blocks.AIR)
+                                )
+                        )
+                )
+        );
         return new RandomPatchConfiguration(64, 7, 3, Holder.direct(placedFeature));
     }
 

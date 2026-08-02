@@ -16,9 +16,13 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.BonemealableBlock;
+
 import java.util.Random;
 
-public class EyeblossomBlock extends FlowerBlock {
+public class EyeblossomBlock extends FlowerBlock implements BonemealableBlock {
     public static final BooleanProperty WAXED = BooleanProperty.create("waxed");
     private final boolean isOpen;
     protected static final VoxelShape SHAPE = box(3.0D, 0.0D, 3.0D, 13.0D, 10.0D, 13.0D);
@@ -68,5 +72,29 @@ public class EyeblossomBlock extends FlowerBlock {
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         super.createBlockStateDefinition(builder);
         builder.add(WAXED);
+    }
+
+    @Override
+    public boolean isValidBonemealTarget(BlockGetter level, BlockPos pos, BlockState state, boolean isClient) {
+        return true;
+    }
+
+    @Override
+    public boolean isBonemealSuccess(Level level, Random random, BlockPos pos, BlockState state) {
+        return true;
+    }
+
+    @Override
+    public void performBonemeal(ServerLevel level, Random random, BlockPos pos, BlockState state) {
+        ItemStack flowerStack = new ItemStack(this);
+        ItemEntity itemEntity = new ItemEntity(
+                level,
+                pos.getX() + 0.5D,
+                pos.getY() + 0.5D,
+                pos.getZ() + 0.5D,
+                flowerStack
+        );
+        itemEntity.setDefaultPickUpDelay();
+        level.addFreshEntity(itemEntity);
     }
 }

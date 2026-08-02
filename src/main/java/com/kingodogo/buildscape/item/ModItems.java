@@ -3333,6 +3333,30 @@ public class ModItems {
                     )
             );
 
+    public static final RegistryObject<Item> SNOWY_ORANGE_POPLAR_LEAF_LAYERS =
+            ITEMS.register("snowy_orange_poplar_leaf_layers", () ->
+                    new BlockItem(
+                    ModBlocks.SNOWY_ORANGE_POPLAR_LEAF_LAYERS.get(),
+                            createBlockItemProperties()
+                    )
+            );
+
+    public static final RegistryObject<Item> SNOWY_RED_POPLAR_LEAF_LAYERS =
+            ITEMS.register("snowy_red_poplar_leaf_layers", () ->
+                    new BlockItem(
+                    ModBlocks.SNOWY_RED_POPLAR_LEAF_LAYERS.get(),
+                            createBlockItemProperties()
+                    )
+            );
+
+    public static final RegistryObject<Item> SNOWY_YELLOW_POPLAR_LEAF_LAYERS =
+            ITEMS.register("snowy_yellow_poplar_leaf_layers", () ->
+                    new BlockItem(
+                    ModBlocks.SNOWY_YELLOW_POPLAR_LEAF_LAYERS.get(),
+                            createBlockItemProperties()
+                    )
+            );
+
     public static final RegistryObject<Item> OAK_LEAF_HEDGE = ITEMS.register(
             "oak_leaf_hedge",
             () ->
@@ -3518,6 +3542,30 @@ public class ModItems {
             ITEMS.register("snowy_pale_oak_leaf_hedge", () ->
                     new BlockItem(
                     ModBlocks.SNOWY_PALE_OAK_LEAF_HEDGE.get(),
+                            createBlockItemProperties()
+                    )
+            );
+
+    public static final RegistryObject<Item> SNOWY_ORANGE_POPLAR_LEAF_HEDGE =
+            ITEMS.register("snowy_orange_poplar_leaf_hedge", () ->
+                    new BlockItem(
+                    ModBlocks.SNOWY_ORANGE_POPLAR_LEAF_HEDGE.get(),
+                            createBlockItemProperties()
+                    )
+            );
+
+    public static final RegistryObject<Item> SNOWY_RED_POPLAR_LEAF_HEDGE =
+            ITEMS.register("snowy_red_poplar_leaf_hedge", () ->
+                    new BlockItem(
+                    ModBlocks.SNOWY_RED_POPLAR_LEAF_HEDGE.get(),
+                            createBlockItemProperties()
+                    )
+            );
+
+    public static final RegistryObject<Item> SNOWY_YELLOW_POPLAR_LEAF_HEDGE =
+            ITEMS.register("snowy_yellow_poplar_leaf_hedge", () ->
+                    new BlockItem(
+                    ModBlocks.SNOWY_YELLOW_POPLAR_LEAF_HEDGE.get(),
                             createBlockItemProperties()
                     )
             );
@@ -5560,6 +5608,30 @@ public class ModItems {
             ITEMS.register("snowy_pale_oak_leaves", () ->
                     new BlockItem(
                             ModBlocks.SNOWY_PALE_OAK_LEAVES.get(),
+                            createBlockItemProperties()
+                    )
+            );
+
+    public static final RegistryObject<Item> SNOWY_ORANGE_POPLAR_LEAVES =
+            ITEMS.register("snowy_orange_poplar_leaves", () ->
+                    new BlockItem(
+                            ModBlocks.SNOWY_ORANGE_POPLAR_LEAVES.get(),
+                            createBlockItemProperties()
+                    )
+            );
+
+    public static final RegistryObject<Item> SNOWY_RED_POPLAR_LEAVES =
+            ITEMS.register("snowy_red_poplar_leaves", () ->
+                    new BlockItem(
+                            ModBlocks.SNOWY_RED_POPLAR_LEAVES.get(),
+                            createBlockItemProperties()
+                    )
+            );
+
+    public static final RegistryObject<Item> SNOWY_YELLOW_POPLAR_LEAVES =
+            ITEMS.register("snowy_yellow_poplar_leaves", () ->
+                    new BlockItem(
+                            ModBlocks.SNOWY_YELLOW_POPLAR_LEAVES.get(),
                             createBlockItemProperties()
                     )
             );
@@ -9885,6 +9957,44 @@ public class ModItems {
                     createBlockItemProperties()
             )
     );
+
+    // Glass Jars
+    public static final RegistryObject<Item> GLASS_JAR = ITEMS.register("glass_jar",
+            () -> new GlassJarItem(ModBlocks.GLASS_JAR.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WHITE_GLASS_JAR = ITEMS.register("white_glass_jar",
+            () -> new GlassJarItem(ModBlocks.WHITE_GLASS_JAR.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> ORANGE_GLASS_JAR = ITEMS.register("orange_glass_jar",
+            () -> new GlassJarItem(ModBlocks.ORANGE_GLASS_JAR.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> MAGENTA_GLASS_JAR = ITEMS.register("magenta_glass_jar",
+            () -> new GlassJarItem(ModBlocks.MAGENTA_GLASS_JAR.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIGHT_BLUE_GLASS_JAR = ITEMS.register("light_blue_glass_jar",
+            () -> new GlassJarItem(ModBlocks.LIGHT_BLUE_GLASS_JAR.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> YELLOW_GLASS_JAR = ITEMS.register("yellow_glass_jar",
+            () -> new GlassJarItem(ModBlocks.YELLOW_GLASS_JAR.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIME_GLASS_JAR = ITEMS.register("lime_glass_jar",
+            () -> new GlassJarItem(ModBlocks.LIME_GLASS_JAR.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PINK_GLASS_JAR = ITEMS.register("pink_glass_jar",
+            () -> new GlassJarItem(ModBlocks.PINK_GLASS_JAR.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GRAY_GLASS_JAR = ITEMS.register("gray_glass_jar",
+            () -> new GlassJarItem(ModBlocks.GRAY_GLASS_JAR.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIGHT_GRAY_GLASS_JAR = ITEMS.register("light_gray_glass_jar",
+            () -> new GlassJarItem(ModBlocks.LIGHT_GRAY_GLASS_JAR.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> CYAN_GLASS_JAR = ITEMS.register("cyan_glass_jar",
+            () -> new GlassJarItem(ModBlocks.CYAN_GLASS_JAR.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PURPLE_GLASS_JAR = ITEMS.register("purple_glass_jar",
+            () -> new GlassJarItem(ModBlocks.PURPLE_GLASS_JAR.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BLUE_GLASS_JAR = ITEMS.register("blue_glass_jar",
+            () -> new GlassJarItem(ModBlocks.BLUE_GLASS_JAR.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BROWN_GLASS_JAR = ITEMS.register("brown_glass_jar",
+            () -> new GlassJarItem(ModBlocks.BROWN_GLASS_JAR.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GREEN_GLASS_JAR = ITEMS.register("green_glass_jar",
+            () -> new GlassJarItem(ModBlocks.GREEN_GLASS_JAR.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> RED_GLASS_JAR = ITEMS.register("red_glass_jar",
+            () -> new GlassJarItem(ModBlocks.RED_GLASS_JAR.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BLACK_GLASS_JAR = ITEMS.register("black_glass_jar",
+            () -> new GlassJarItem(ModBlocks.BLACK_GLASS_JAR.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> TINTED_GLASS_JAR = ITEMS.register("tinted_glass_jar",
+            () -> new GlassJarItem(ModBlocks.TINTED_GLASS_JAR.get(), createBlockItemProperties()));
 }
 
 

@@ -2117,6 +2117,9 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.SNOWY_FLOWERING_AZALEA_LEAF_LAYERS.get()));
             items.add(new ItemStack(ModItems.SNOWY_CHERRY_LEAF_LAYERS.get()));
             items.add(new ItemStack(ModItems.SNOWY_PALE_OAK_LEAF_LAYERS.get()));
+            items.add(new ItemStack(ModItems.SNOWY_ORANGE_POPLAR_LEAF_LAYERS.get()));
+            items.add(new ItemStack(ModItems.SNOWY_RED_POPLAR_LEAF_LAYERS.get()));
+            items.add(new ItemStack(ModItems.SNOWY_YELLOW_POPLAR_LEAF_LAYERS.get()));
             items.add(new ItemStack(ModItems.OAK_LEAF_HEDGE.get()));
             items.add(new ItemStack(ModItems.SPRUCE_LEAF_HEDGE.get()));
             items.add(new ItemStack(ModItems.BIRCH_LEAF_HEDGE.get()));
@@ -2142,6 +2145,9 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.SNOWY_FLOWERING_AZALEA_LEAF_HEDGE.get()));
             items.add(new ItemStack(ModItems.SNOWY_CHERRY_LEAF_HEDGE.get()));
             items.add(new ItemStack(ModItems.SNOWY_PALE_OAK_LEAF_HEDGE.get()));
+            items.add(new ItemStack(ModItems.SNOWY_ORANGE_POPLAR_LEAF_HEDGE.get()));
+            items.add(new ItemStack(ModItems.SNOWY_RED_POPLAR_LEAF_HEDGE.get()));
+            items.add(new ItemStack(ModItems.SNOWY_YELLOW_POPLAR_LEAF_HEDGE.get()));
             items.add(new ItemStack(ModItems.SNOWY_OAK_LEAVES.get()));
             items.add(new ItemStack(ModItems.SNOWY_SPRUCE_LEAVES.get()));
             items.add(new ItemStack(ModItems.SNOWY_BIRCH_LEAVES.get()));
@@ -2153,6 +2159,9 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.SNOWY_FLOWERING_AZALEA_LEAVES.get()));
             items.add(new ItemStack(ModItems.SNOWY_CHERRY_LEAVES.get()));
             items.add(new ItemStack(ModItems.SNOWY_PALE_OAK_LEAVES.get()));
+            items.add(new ItemStack(ModItems.SNOWY_ORANGE_POPLAR_LEAVES.get()));
+            items.add(new ItemStack(ModItems.SNOWY_RED_POPLAR_LEAVES.get()));
+            items.add(new ItemStack(ModItems.SNOWY_YELLOW_POPLAR_LEAVES.get()));
             items.add(new ItemStack(ModItems.RED_ROSE_VINES.get()));
             items.add(new ItemStack(ModItems.BLACK_ROSE_VINES.get()));
             items.add(new ItemStack(ModItems.BLUE_ROSE_VINES.get()));
@@ -2372,6 +2381,26 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.BIG_PINK_CANDLE.get()));
             items.add(new ItemStack(ModItems.BIG_AMETHYST_CANDLE.get()));
             items.add(new ItemStack(ModItems.BIG_SCULK_CANDLE.get()));
+
+            // --- GLASS JARS ---
+            items.add(new ItemStack(ModItems.GLASS_JAR.get()));
+            items.add(new ItemStack(ModItems.WHITE_GLASS_JAR.get()));
+            items.add(new ItemStack(ModItems.LIGHT_GRAY_GLASS_JAR.get()));
+            items.add(new ItemStack(ModItems.GRAY_GLASS_JAR.get()));
+            items.add(new ItemStack(ModItems.BLACK_GLASS_JAR.get()));
+            items.add(new ItemStack(ModItems.BROWN_GLASS_JAR.get()));
+            items.add(new ItemStack(ModItems.RED_GLASS_JAR.get()));
+            items.add(new ItemStack(ModItems.ORANGE_GLASS_JAR.get()));
+            items.add(new ItemStack(ModItems.YELLOW_GLASS_JAR.get()));
+            items.add(new ItemStack(ModItems.LIME_GLASS_JAR.get()));
+            items.add(new ItemStack(ModItems.GREEN_GLASS_JAR.get()));
+            items.add(new ItemStack(ModItems.CYAN_GLASS_JAR.get()));
+            items.add(new ItemStack(ModItems.LIGHT_BLUE_GLASS_JAR.get()));
+            items.add(new ItemStack(ModItems.BLUE_GLASS_JAR.get()));
+            items.add(new ItemStack(ModItems.PURPLE_GLASS_JAR.get()));
+            items.add(new ItemStack(ModItems.MAGENTA_GLASS_JAR.get()));
+            items.add(new ItemStack(ModItems.PINK_GLASS_JAR.get()));
+            items.add(new ItemStack(ModItems.TINTED_GLASS_JAR.get()));
 
 
 

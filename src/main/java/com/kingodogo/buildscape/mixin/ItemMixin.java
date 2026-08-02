@@ -16,8 +16,12 @@ public class ItemMixin {
     private void buildscape$waterBottleMaxStackSize(CallbackInfoReturnable<Integer> cir) {
         ItemStack self = (ItemStack) (Object) this;
         // Only water bottles should be stackable to 16
-        if (self.is(Items.POTION) && PotionUtils.getPotion(self) == Potions.WATER) {
-            cir.setReturnValue(16);
+        if (self.is(Items.POTION)) {
+            if (PotionUtils.getPotion(self) == Potions.WATER) {
+                cir.setReturnValue(16);
+            } else {
+                cir.setReturnValue(1);
+            }
         }
         // Splash potions, lingering potions, and non-water potions stay at vanilla stack size (1)
     }

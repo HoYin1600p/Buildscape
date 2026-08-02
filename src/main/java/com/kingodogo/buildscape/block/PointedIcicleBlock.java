@@ -838,9 +838,9 @@ public class PointedIcicleBlock extends PointedDripstoneBlock {
             if (blockEntity instanceof IcicleCauldronBlockEntity) {
                 IcicleCauldronBlockEntity cauldronEntity =
                         (IcicleCauldronBlockEntity) blockEntity;
-                // Store Icicle Block in the cauldron (not Packed Icicle)
+                // Store Packed Icicle Block in the cauldron
                 net.minecraft.world.item.Item icicleItem =
-                        com.kingodogo.buildscape.item.ModItems.ICICLE_BLOCK.get();
+                        com.kingodogo.buildscape.item.ModItems.PACKED_ICICLE_BLOCK.get();
                 cauldronEntity.setStoredIcicle(
                         new net.minecraft.world.item.ItemStack(icicleItem, 1)
                 );

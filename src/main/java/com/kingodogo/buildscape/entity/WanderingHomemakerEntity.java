@@ -81,9 +81,10 @@ public class WanderingHomemakerEntity extends WanderingTrader {
         list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.BLUE_SPORE_BLOSSOM.get(), 2), 6, 1, 0.05f));
         list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.PURPLE_SPORE_BLOSSOM.get(), 2), 6, 1, 0.05f));
         list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.ORANGE_SPORE_BLOSSOM.get(), 2), 6, 1, 0.05f));
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.ICICLE.get(), 4), 6, 1, 0.05f));
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.SULFUR_SPIKE.get(), 4), 6, 1, 0.05f));
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.SULFUR.get(), 2), 8, 1, 0.05f));
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.ICICLE.get(), 32), 8, 1, 0.05f));
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.SULFUR_SPIKE.get(), 32), 8, 1, 0.05f));
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.PACKED_ICICLE_BLOCK.get(), 4), 8, 1, 0.05f));
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.SULFUR.get(), 4), 8, 1, 0.05f));
         list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.CINNABAR.get(), 2), 8, 1, 0.05f));
         list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.WILDFLOWERS.get(), 4), 6, 1, 0.05f));
         list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.LEAF_LITTER.get(), 4), 6, 1, 0.05f));

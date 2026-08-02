@@ -1,21 +1,19 @@
 package com.kingodogo.buildscape.block;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.BonemealableBlock;
 import net.minecraft.world.level.block.BushBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
-public class DryGrassBlock extends BushBlock {
+import java.util.Random;
+
+public class DryGrassBlock extends BushBlock implements BonemealableBlock {
     protected static final VoxelShape SHAPE = box(2.0D, 0.0D, 2.0D, 14.0D, 12.0D, 14.0D);
 
     public DryGrassBlock(BlockBehaviour.Properties properties) {
@@ -33,18 +31,17 @@ public class DryGrassBlock extends BushBlock {
     }
 
     @Override
-    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
-        ItemStack held = player.getItemInHand(hand);
-        if (held.is(Items.BONE_MEAL)) {
-            if (!level.isClientSide) {
-                popResource(level, pos, new ItemStack(this.asItem()));
-                if (!player.getAbilities().instabuild) {
-                    held.shrink(1);
-                }
-                level.levelEvent(2005, pos, 0);
-            }
-            return InteractionResult.sidedSuccess(level.isClientSide);
-        }
-        return super.use(state, level, pos, player, hand, hitResult);
+    public boolean isValidBonemealTarget(BlockGetter level, BlockPos pos, BlockState state, boolean isClient) {
+        return true;
+    }
+
+    @Override
+    public boolean isBonemealSuccess(Level level, Random random, BlockPos pos, BlockState state) {
+        return true;
+    }
+
+    @Override
+    public void performBonemeal(ServerLevel level, Random random, BlockPos pos, BlockState state) {
+        level.setBlock(pos, ModBlocks.TALL_DRY_GRASS.get().defaultBlockState(), 3);
     }
 }

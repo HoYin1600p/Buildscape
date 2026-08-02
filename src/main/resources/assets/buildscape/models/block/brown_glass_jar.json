@@ -1,0 +1,7 @@
+{
+  "parent": "buildscape:block/glass_jar",
+  "textures": {
+    "particle": "buildscape:block/brown_glass_jar",
+    "jar": "buildscape:block/brown_glass_jar"
+  }
+}

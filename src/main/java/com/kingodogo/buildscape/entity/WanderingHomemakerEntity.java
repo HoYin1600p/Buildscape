@@ -60,7 +60,7 @@ public class WanderingHomemakerEntity extends WanderingTrader {
         offers.clear();
 
         List<MerchantOffer> list = new ArrayList<>();
-        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 5), new ItemStack(ModItems.MANGROVE_PROPAGULE.get(), 2), 8, 1, 0.05f));
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.MANGROVE_PROPAGULE.get(), 5), 8, 1, 0.05f));
         list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.POPLAR_SAPLING.get(), 4), 8, 1, 0.05f));
         list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.CHERRY_SAPLING.get(), 4), 8, 1, 0.05f));
         list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.PALE_OAK_SAPLING.get(), 4), 8, 1, 0.05f));
@@ -85,6 +85,37 @@ public class WanderingHomemakerEntity extends WanderingTrader {
         list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.SULFUR_SPIKE.get(), 4), 6, 1, 0.05f));
         list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.SULFUR.get(), 2), 8, 1, 0.05f));
         list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.CINNABAR.get(), 2), 8, 1, 0.05f));
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.WILDFLOWERS.get(), 4), 6, 1, 0.05f));
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.LEAF_LITTER.get(), 4), 6, 1, 0.05f));
+
+        // New Vegetation/Flora trades
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.DRY_GRASS.get(), 6), 8, 1, 0.05f));
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.TALL_DRY_GRASS.get(), 6), 8, 1, 0.05f));
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.BUSH.get(), 6), 8, 1, 0.05f));
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.CACTUS_FLOWER.get(), 6), 8, 1, 0.05f));
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.RED_BUSH.get(), 6), 8, 1, 0.05f));
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.FIREFLY_BUSH.get(), 6), 8, 1, 0.05f));
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.OPEN_EYEBLOSSOM.get(), 6), 8, 1, 0.05f));
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.CLOSED_EYEBLOSSOM.get(), 6), 8, 1, 0.05f));
+
+        // Sculk Catalyst trade
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.SCULK_CATALYST.get(), 2), 3, 1, 0.05f));
+
+        // Muff Block trade
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.MUFF_BLOCK.get(), 2), 4, 1, 0.05f));
+
+        // Mist Bottle trade
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.BOTTLE_OF_MIST.get(), 16), 4, 1, 0.05f));
+
+        // Confetti trade
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.CONFETTI_ITEM.get(), 32), 6, 1, 0.05f));
+
+        // Resin Clump & Resin Block trades
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.RESIN_CLUMP.get(), 16), 8, 1, 0.05f));
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.RESIN_BLOCK.get(), 16), 8, 1, 0.05f));
+
+        // Creaking Heart trade
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.CREAKING_HEART.get(), 2), 2, 1, 0.05f));
 
         Collections.shuffle(list, this.random);
         for (int j = 0; j < Math.min(5, list.size()); j++) {

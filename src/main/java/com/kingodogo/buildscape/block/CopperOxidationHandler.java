@@ -265,6 +265,9 @@ public class CopperOxidationHandler {
 
     public static void tryOxidize(Level level, BlockPos pos, BlockState state) {
         init();
+        if (state.hasProperty(DoorBlock.HALF) && state.getValue(DoorBlock.HALF) != DoubleBlockHalf.LOWER) {
+            return;
+        }
         Block block = state.getBlock();
         for (Map.Entry<Supplier<Block>, Supplier<Block>> entry : NEXT_STAGE.entrySet()) {
             if (entry.getKey().get() == block) {
@@ -287,8 +290,8 @@ public class CopperOxidationHandler {
             BlockState lowerState = copyStateProperties(level.getBlockState(lowerPos), targetBlock.defaultBlockState()).setValue(DoorBlock.HALF, DoubleBlockHalf.LOWER);
             BlockState upperState = copyStateProperties(level.getBlockState(upperPos), targetBlock.defaultBlockState()).setValue(DoorBlock.HALF, DoubleBlockHalf.UPPER);
 
-            level.setBlock(lowerPos, lowerState, 11);
-            level.setBlock(upperPos, upperState, 11);
+            level.setBlock(lowerPos, lowerState, 2 | 16);
+            level.setBlock(upperPos, upperState, 3);
         } else {
             BlockState nextState = copyStateProperties(state, targetBlock.defaultBlockState());
             level.setBlock(pos, nextState, 3);

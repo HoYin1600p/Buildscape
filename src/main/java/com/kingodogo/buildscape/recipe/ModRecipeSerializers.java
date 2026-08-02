@@ -6,6 +6,8 @@ import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 
+import net.minecraft.world.item.crafting.SimpleRecipeSerializer;
+
 public class ModRecipeSerializers {
 
     public static final DeferredRegister<RecipeSerializer<?>> RECIPE_SERIALIZERS =
@@ -26,6 +28,13 @@ public class ModRecipeSerializers {
             > SHAPELESS_DURABILITY_RECIPE = RECIPE_SERIALIZERS.register(
             "shapeless_durability",
             () -> ShapelessDurabilityRecipe.SERIALIZER
+    );
+
+    public static final RegistryObject<
+            SimpleRecipeSerializer<ConfettiConfigureRecipe>
+            > CONFETTI_CONFIGURE_RECIPE = RECIPE_SERIALIZERS.register(
+            "confetti_configure",
+            () -> new SimpleRecipeSerializer<>(ConfettiConfigureRecipe::new)
     );
 
 }

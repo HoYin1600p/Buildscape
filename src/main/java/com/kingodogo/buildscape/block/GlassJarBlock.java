@@ -318,10 +318,15 @@ public class GlassJarBlock extends Block implements EntityBlock, SimpleWaterlogg
 
             // B. Drink potion / liquid directly from jar
             if (jarBE.hasLiquid()) {
-                if (level.isClientSide) return InteractionResult.SUCCESS;
-
                 ItemStack liquidItem = jarBE.getStoredLiquidItem();
                 if (!liquidItem.isEmpty()) {
+                    // Do not allow consuming lava from jars
+                    if (liquidItem.is(Items.LAVA_BUCKET) || (liquidItem.getItem() instanceof net.minecraft.world.item.BucketItem bucket && bucket.getFluid() == net.minecraft.world.level.material.Fluids.LAVA)) {
+                        return InteractionResult.PASS;
+                    }
+
+                    if (level.isClientSide) return InteractionResult.SUCCESS;
+
                     if (liquidItem.getItem() instanceof PotionItem) {
                         for (MobEffectInstance effect : PotionUtils.getMobEffects(liquidItem)) {
                             if (effect.getEffect().isInstantenous()) {

@@ -1,6 +1,7 @@
 package com.kingodogo.buildscape.block;
 
 import javax.annotation.Nullable;
+import javax.annotation.Nonnull;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -14,6 +15,12 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.IItemHandlerModifiable;
+import net.minecraftforge.items.wrapper.SidedInvWrapper;
 
 public class IcicleCauldronBlockEntity
         extends BlockEntity
@@ -22,6 +29,9 @@ public class IcicleCauldronBlockEntity
     private ItemStack storedIcicle = ItemStack.EMPTY;
 
     private static final int[] SLOTS = new int[]{0};
+
+    private final LazyOptional<IItemHandlerModifiable>[] itemHandlers = SidedInvWrapper.create(this,
+            Direction.UP, Direction.DOWN, Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST);
 
     public IcicleCauldronBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.ICICLE_CAULDRON_BLOCK_ENTITY.get(), pos, state);
@@ -196,5 +206,38 @@ public class IcicleCauldronBlockEntity
     @Override
     public CompoundTag getUpdateTag() {
         return saveWithoutMetadata();
+    }
+
+    @Nonnull
+    @Override
+    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
+        if (!this.remove && cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
+            if (side == null) {
+                return itemHandlers[0].cast();
+            }
+            switch (side) {
+                case UP:
+                    return itemHandlers[0].cast();
+                case DOWN:
+                    return itemHandlers[1].cast();
+                case NORTH:
+                    return itemHandlers[2].cast();
+                case SOUTH:
+                    return itemHandlers[3].cast();
+                case EAST:
+                    return itemHandlers[4].cast();
+                case WEST:
+                    return itemHandlers[5].cast();
+            }
+        }
+        return super.getCapability(cap, side);
+    }
+
+    @Override
+    public void invalidateCaps() {
+        super.invalidateCaps();
+        for (LazyOptional<IItemHandlerModifiable> handler : itemHandlers) {
+            handler.invalidate();
+        }
     }
 }

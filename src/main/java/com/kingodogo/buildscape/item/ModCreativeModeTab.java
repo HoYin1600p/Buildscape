@@ -418,6 +418,7 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.IRON_HAMMER.get()));
             items.add(new ItemStack(ModItems.DIAMOND_HAMMER.get()));
             items.add(new ItemStack(ModItems.NETHERITE_HAMMER.get()));
+            items.add(new ItemStack(ModItems.BUILDERS_WORKBENCH.get()));
             items.add(new ItemStack(ModItems.STEEL_BLOCK.get()));
             items.add(new ItemStack(ModItems.STEEL_BLOCK_STAIRS.get()));
             items.add(new ItemStack(ModItems.STEEL_BLOCK_SLAB.get()));

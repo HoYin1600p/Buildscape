@@ -55,7 +55,7 @@ public class BuildScape {
         com.kingodogo.buildscape.entity.ModEntities.ENTITIES.register(modEventBus);
         com.kingodogo.buildscape.recipe.ModRecipeSerializers.RECIPE_SERIALIZERS.register(
                 modEventBus);
-
+        com.kingodogo.buildscape.network.ModMenuTypes.register(modEventBus);
 
         com.kingodogo.buildscape.worldgen.ModBlockStateProviderTypes.BLOCK_STATE_PROVIDER_TYPES.register(
                 modEventBus);
@@ -1615,10 +1615,10 @@ public class BuildScape {
             });
 
             event.enqueueWork(() -> {
-
-
-
-
+                net.minecraft.client.gui.screens.MenuScreens.register(
+                        com.kingodogo.buildscape.network.ModMenuTypes.BUILDERS_WORKBENCH_MENU.get(),
+                        com.kingodogo.buildscape.client.screen.BuildersWorkbenchScreen::new
+                );
 
 
 

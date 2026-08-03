@@ -28,6 +28,14 @@ public class ModBlocks {
          * .noOcclusion()));
          */
 
+        public static final RegistryObject<Block> BUILDERS_WORKBENCH = BLOCKS.register(
+                        "builders_workbench",
+                        () -> new BuildersWorkbenchBlock(
+                                        BlockBehaviour.Properties.of(Material.WOOD, MaterialColor.COLOR_BROWN)
+                                                        .strength(2.5f)
+                                                        .sound(SoundType.WOOD)
+                                                        .requiresCorrectToolForDrops()));
+
         public static final RegistryObject<Block> BLACK_SAND = BLOCKS.register(
                         "black_sand",
                         () -> new FallingSandBlock(

@@ -122,5 +122,12 @@ public class ModMessages {
                 HammerReplacePacket::decode,
                 HammerReplacePacket::handle
         );
+        INSTANCE.registerMessage(
+                id++,
+                BuildersWorkbenchActionPacket.class,
+                BuildersWorkbenchActionPacket::encode,
+                BuildersWorkbenchActionPacket::decode,
+                BuildersWorkbenchActionPacket::handle
+        );
     }
 }

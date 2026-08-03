@@ -182,4 +182,11 @@ public class ModBlockEntities {
                     ModBlocks.TINTED_GLASS_JAR.get()
             ).build(null)
     );
+
+    public static final RegistryObject<BlockEntityType<BuildersWorkbenchBlockEntity>> BUILDERS_WORKBENCH_BE =
+            BLOCK_ENTITIES.register("builders_workbench",
+                    () -> BlockEntityType.Builder.of(
+                            BuildersWorkbenchBlockEntity::new,
+                            ModBlocks.BUILDERS_WORKBENCH.get()
+                    ).build(null));
 }

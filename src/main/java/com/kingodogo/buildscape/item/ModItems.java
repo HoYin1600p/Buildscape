@@ -5777,6 +5777,14 @@ public class ModItems {
             () -> new HammerItem(HammerItem.HammerTier.NETHERITE, new Item.Properties().fireResistant().tab(ModCreativeModeTab.BUILDSCAPE_TAB))
     );
 
+    public static final RegistryObject<Item> BUILDERS_WORKBENCH = ITEMS.register(
+            "builders_workbench",
+            () -> new BlockItem(
+                    ModBlocks.BUILDERS_WORKBENCH.get(),
+                    new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB).stacksTo(64)
+            )
+    );
+
     public static final RegistryObject<Item> SNOW_STAIRS = ITEMS.register(
             "snow_stairs",
             () ->

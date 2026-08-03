@@ -108,5 +108,19 @@ public class ModMessages {
                 SyncHomemakerCooldownPacket::decode,
                 SyncHomemakerCooldownPacket::handle
         );
+        INSTANCE.registerMessage(
+                id++,
+                RotateBlockPacket.class,
+                RotateBlockPacket::encode,
+                RotateBlockPacket::decode,
+                RotateBlockPacket::handle
+        );
+        INSTANCE.registerMessage(
+                id++,
+                HammerReplacePacket.class,
+                HammerReplacePacket::encode,
+                HammerReplacePacket::decode,
+                HammerReplacePacket::handle
+        );
     }
 }

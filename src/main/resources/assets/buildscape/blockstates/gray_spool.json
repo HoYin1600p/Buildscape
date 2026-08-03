@@ -1,7 +1,16 @@
 {
   "variants": {
-    "": {
+    "axis=y": {
       "model": "buildscape:block/gray_spool"
+    },
+    "axis=x": {
+      "model": "buildscape:block/gray_spool",
+      "x": 90,
+      "y": 90
+    },
+    "axis=z": {
+      "model": "buildscape:block/gray_spool",
+      "x": 90
     }
   }
 }

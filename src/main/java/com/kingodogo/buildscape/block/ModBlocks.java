@@ -10290,42 +10290,42 @@ public class ModBlocks {
 
         // Spools
         public static final RegistryObject<Block> SPOOL = BLOCKS.register("spool",
-                        () -> new SoftFabricBlock(BlockBehaviour.Properties.copy(Blocks.WHITE_WOOL)));
+                        () -> new SpoolBlock(BlockBehaviour.Properties.copy(Blocks.WHITE_WOOL)));
         public static final RegistryObject<Block> GLOWING_SPOOL = BLOCKS.register("glowing_spool",
-                        () -> new SoftFabricBlock(
-                                        BlockBehaviour.Properties.copy(Blocks.BLACK_WOOL).lightLevel(state -> 7)));
+                        () -> new SpoolBlock(
+                                         BlockBehaviour.Properties.copy(Blocks.BLACK_WOOL).lightLevel(state -> 7)));
         public static final RegistryObject<Block> BLACK_SPOOL = BLOCKS.register("black_spool",
-                        () -> new SoftFabricBlock(BlockBehaviour.Properties.copy(Blocks.BLACK_WOOL)));
+                        () -> new SpoolBlock(BlockBehaviour.Properties.copy(Blocks.BLACK_WOOL)));
         public static final RegistryObject<Block> BLUE_SPOOL = BLOCKS.register("blue_spool",
-                        () -> new SoftFabricBlock(BlockBehaviour.Properties.copy(Blocks.BLUE_WOOL)));
+                        () -> new SpoolBlock(BlockBehaviour.Properties.copy(Blocks.BLUE_WOOL)));
         public static final RegistryObject<Block> BROWN_SPOOL = BLOCKS.register("brown_spool",
-                        () -> new SoftFabricBlock(BlockBehaviour.Properties.copy(Blocks.BROWN_WOOL)));
+                        () -> new SpoolBlock(BlockBehaviour.Properties.copy(Blocks.BROWN_WOOL)));
         public static final RegistryObject<Block> CYAN_SPOOL = BLOCKS.register("cyan_spool",
-                        () -> new SoftFabricBlock(BlockBehaviour.Properties.copy(Blocks.CYAN_WOOL)));
+                        () -> new SpoolBlock(BlockBehaviour.Properties.copy(Blocks.CYAN_WOOL)));
         public static final RegistryObject<Block> GRAY_SPOOL = BLOCKS.register("gray_spool",
-                        () -> new SoftFabricBlock(BlockBehaviour.Properties.copy(Blocks.GRAY_WOOL)));
+                        () -> new SpoolBlock(BlockBehaviour.Properties.copy(Blocks.GRAY_WOOL)));
         public static final RegistryObject<Block> GREEN_SPOOL = BLOCKS.register("green_spool",
-                        () -> new SoftFabricBlock(BlockBehaviour.Properties.copy(Blocks.GREEN_WOOL)));
+                        () -> new SpoolBlock(BlockBehaviour.Properties.copy(Blocks.GREEN_WOOL)));
         public static final RegistryObject<Block> LIGHT_BLUE_SPOOL = BLOCKS.register("light_blue_spool",
-                        () -> new SoftFabricBlock(BlockBehaviour.Properties.copy(Blocks.LIGHT_BLUE_WOOL)));
+                        () -> new SpoolBlock(BlockBehaviour.Properties.copy(Blocks.LIGHT_BLUE_WOOL)));
         public static final RegistryObject<Block> LIGHT_GRAY_SPOOL = BLOCKS.register("light_gray_spool",
-                        () -> new SoftFabricBlock(BlockBehaviour.Properties.copy(Blocks.LIGHT_GRAY_WOOL)));
+                        () -> new SpoolBlock(BlockBehaviour.Properties.copy(Blocks.LIGHT_GRAY_WOOL)));
         public static final RegistryObject<Block> LIME_SPOOL = BLOCKS.register("lime_spool",
-                        () -> new SoftFabricBlock(BlockBehaviour.Properties.copy(Blocks.LIME_WOOL)));
+                        () -> new SpoolBlock(BlockBehaviour.Properties.copy(Blocks.LIME_WOOL)));
         public static final RegistryObject<Block> MAGENTA_SPOOL = BLOCKS.register("magenta_spool",
-                        () -> new SoftFabricBlock(BlockBehaviour.Properties.copy(Blocks.MAGENTA_WOOL)));
+                        () -> new SpoolBlock(BlockBehaviour.Properties.copy(Blocks.MAGENTA_WOOL)));
         public static final RegistryObject<Block> ORANGE_SPOOL = BLOCKS.register("orange_spool",
-                        () -> new SoftFabricBlock(BlockBehaviour.Properties.copy(Blocks.ORANGE_WOOL)));
+                        () -> new SpoolBlock(BlockBehaviour.Properties.copy(Blocks.ORANGE_WOOL)));
         public static final RegistryObject<Block> PINK_SPOOL = BLOCKS.register("pink_spool",
-                        () -> new SoftFabricBlock(BlockBehaviour.Properties.copy(Blocks.PINK_WOOL)));
+                        () -> new SpoolBlock(BlockBehaviour.Properties.copy(Blocks.PINK_WOOL)));
         public static final RegistryObject<Block> PURPLE_SPOOL = BLOCKS.register("purple_spool",
-                        () -> new SoftFabricBlock(BlockBehaviour.Properties.copy(Blocks.PURPLE_WOOL)));
+                        () -> new SpoolBlock(BlockBehaviour.Properties.copy(Blocks.PURPLE_WOOL)));
         public static final RegistryObject<Block> RED_SPOOL = BLOCKS.register("red_spool",
-                        () -> new SoftFabricBlock(BlockBehaviour.Properties.copy(Blocks.RED_WOOL)));
+                        () -> new SpoolBlock(BlockBehaviour.Properties.copy(Blocks.RED_WOOL)));
         public static final RegistryObject<Block> WHITE_SPOOL = BLOCKS.register("white_spool",
-                        () -> new SoftFabricBlock(BlockBehaviour.Properties.copy(Blocks.WHITE_WOOL)));
+                        () -> new SpoolBlock(BlockBehaviour.Properties.copy(Blocks.WHITE_WOOL)));
         public static final RegistryObject<Block> YELLOW_SPOOL = BLOCKS.register("yellow_spool",
-                        () -> new SoftFabricBlock(BlockBehaviour.Properties.copy(Blocks.YELLOW_WOOL)));
+                        () -> new SpoolBlock(BlockBehaviour.Properties.copy(Blocks.YELLOW_WOOL)));
 
         // Sulfur Blocks
         public static final RegistryObject<Block> SULFUR = BLOCKS.register("sulfur",

@@ -5757,6 +5757,26 @@ public class ModItems {
             () -> new Item(new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB))
     );
 
+    public static final RegistryObject<Item> WRENCH = ITEMS.register(
+            "wrench",
+            () -> new WrenchItem(new Item.Properties().stacksTo(1).tab(ModCreativeModeTab.BUILDSCAPE_TAB))
+    );
+
+    public static final RegistryObject<Item> IRON_HAMMER = ITEMS.register(
+            "iron_hammer",
+            () -> new HammerItem(HammerItem.HammerTier.IRON, new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB))
+    );
+
+    public static final RegistryObject<Item> DIAMOND_HAMMER = ITEMS.register(
+            "diamond_hammer",
+            () -> new HammerItem(HammerItem.HammerTier.DIAMOND, new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB))
+    );
+
+    public static final RegistryObject<Item> NETHERITE_HAMMER = ITEMS.register(
+            "netherite_hammer",
+            () -> new HammerItem(HammerItem.HammerTier.NETHERITE, new Item.Properties().fireResistant().tab(ModCreativeModeTab.BUILDSCAPE_TAB))
+    );
+
     public static final RegistryObject<Item> SNOW_STAIRS = ITEMS.register(
             "snow_stairs",
             () ->

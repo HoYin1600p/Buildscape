@@ -808,13 +808,28 @@ public class PointedIcicleBlock extends PointedDripstoneBlock {
             return;
         }
 
+        // Traverse the entire icicle chain upward to find the source block
         BlockPos icicleBlockPos = iciclePos.above();
+        for (int i = 0; i < 11; i++) {
+            BlockState checkState = level.getBlockState(icicleBlockPos);
+            if (
+                    checkState.is(this) &&
+                            checkState.getValue(BlockStateProperties.VERTICAL_DIRECTION) ==
+                                    Direction.DOWN
+            ) {
+                icicleBlockPos = icicleBlockPos.above();
+            } else {
+                break;
+            }
+        }
+
         BlockState icicleBlockState = level.getBlockState(icicleBlockPos);
         Block icicleBlock = icicleBlockState.getBlock();
-        // Only accept Packed Icicle Block as the source block
+        // Accept Packed Icicle Block or vanilla Packed Ice as the source block
         boolean isPackedIcicleBlock =
                 icicleBlock == ModBlocks.PACKED_ICICLE_BLOCK.get() ||
-                        icicleBlock instanceof PackedIcicleBlock;
+                        icicleBlock instanceof PackedIcicleBlock ||
+                        icicleBlock == Blocks.PACKED_ICE;
 
         if (!isPackedIcicleBlock) {
             return;
@@ -826,7 +841,7 @@ public class PointedIcicleBlock extends PointedDripstoneBlock {
             return;
         }
 
-        if (random.nextInt(50) == 0) {
+        if (random.nextInt(10) == 0) {
             level.setBlock(
                     cauldronPos,
                     ModBlocks.ICICLE_CAULDRON.get().defaultBlockState(),
@@ -1042,9 +1057,11 @@ public class PointedIcicleBlock extends PointedDripstoneBlock {
 
     private boolean isIcicleSourceBlock(BlockState state) {
         Block block = state.getBlock();
-        // Only accept Icicle Block, not Packed Icicle (for consistency with cauldron feature)
+        // Accept normal icicle blocks, packed icicle blocks, and vanilla ice blocks as source blocks
         return (
-                block == ModBlocks.ICICLE_BLOCK.get() || block instanceof IcicleBlock
+                block == ModBlocks.ICICLE_BLOCK.get() || block instanceof IcicleBlock ||
+                block == ModBlocks.PACKED_ICICLE_BLOCK.get() || block instanceof PackedIcicleBlock ||
+                block == Blocks.ICE || block == Blocks.PACKED_ICE || block == Blocks.BLUE_ICE
         );
     }
 

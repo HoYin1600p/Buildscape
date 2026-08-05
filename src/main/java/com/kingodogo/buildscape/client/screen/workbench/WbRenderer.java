@@ -15,6 +15,7 @@ public final class WbRenderer {
 
     // ── Texture Resources ─────────────────────────────────────────────────────
     public static final ResourceLocation BG_WORKSTATION = new ResourceLocation("buildscape", "textures/gui/builders_workbench/builders_workbench_bg.png");
+    public static final ResourceLocation BG_COLOR_BUILDER = new ResourceLocation("buildscape", "textures/gui/builders_workbench/color_builder_bg.png");
     public static final ResourceLocation BG_TOP_LEFT = new ResourceLocation("buildscape", "textures/gui/builders_workbench/bg_top_left.png");
     public static final ResourceLocation BG_TOP_RIGHT = new ResourceLocation("buildscape", "textures/gui/builders_workbench/bg_top_right.png");
     public static final ResourceLocation BG_BOTTOM_LEFT = new ResourceLocation("buildscape", "textures/gui/builders_workbench/bg_bottom_left.png");
@@ -27,6 +28,13 @@ public final class WbRenderer {
     public static final ResourceLocation SLOT_INPUT = new ResourceLocation("buildscape", "textures/gui/builders_workbench/input_slot.png");
     public static final ResourceLocation SLOT_OUTPUT = new ResourceLocation("buildscape", "textures/gui/builders_workbench/output_slot.png");
     public static final ResourceLocation SLOT_RESULT = new ResourceLocation("buildscape", "textures/gui/builders_workbench/result_slot.png");
+    public static final ResourceLocation TAB_NORMAL = new ResourceLocation("buildscape", "textures/gui/builders_workbench/builders_workbench_tab.png");
+    public static final ResourceLocation TAB_HOVER = new ResourceLocation("buildscape", "textures/gui/builders_workbench/builders_workbench_tab_hover.png");
+    public static final ResourceLocation TAB_SELECTED = new ResourceLocation("buildscape", "textures/gui/builders_workbench/builders_workbench_tab_selected.png");
+    public static final ResourceLocation ICON_COLOR_BUILDER = new ResourceLocation("buildscape", "textures/gui/builders_workbench/color_builder_icon.png");
+    public static final ResourceLocation ICON_GRADIENT_BUILDER = new ResourceLocation("buildscape", "textures/gui/builders_workbench/gradiant_builder_icon.png");
+    public static final ResourceLocation BUILDERS_ARROW = new ResourceLocation("buildscape", "textures/gui/builders_workbench/builders_arrow.png");
+    public static final ResourceLocation BUILDERS_ARROW_ACTIVE = new ResourceLocation("buildscape", "textures/gui/builders_workbench/builders_arrow_active.png");
     public static final ResourceLocation BTN_ALL = new ResourceLocation("buildscape", "textures/gui/builders_workbench/all.png");
     public static final ResourceLocation BTN_ALL_HOVER = new ResourceLocation("buildscape", "textures/gui/builders_workbench/all_hover.png");
     public static final ResourceLocation BTN_ALL_SEL = new ResourceLocation("buildscape", "textures/gui/builders_workbench/all_selected.png");
@@ -333,6 +341,44 @@ public final class WbRenderer {
                 GuiComponent.fill(ps, x, y + i, x + 1, y + i + 1, color);
                 GuiComponent.fill(ps, x + w - 1, y + i, x + w, y + i + 1, color);
             }
+        }
+    }
+
+    public static void drawTitleBanner(PoseStack ps, int x, int y, int w, int h) {
+        // Dark outline
+        GuiComponent.fill(ps, x, y, x + w, y + h, 0xFF3E2D1E); // dark brown
+        // Face
+        GuiComponent.fill(ps, x + 1, y + 1, x + w - 1, y + h - 1, 0xFFDA9F6C); // main tan
+        // Highlight (top/left)
+        GuiComponent.fill(ps, x + 1, y + 1, x + w - 1, y + 2, 0xFFF1C39A); // lighter tan
+        GuiComponent.fill(ps, x + 1, y + 1, x + 2, y + h - 1, 0xFFF1C39A);
+        // Shadow (bottom/right)
+        GuiComponent.fill(ps, x + 1, y + h - 2, x + w - 1, y + h - 1, 0xFFAC703D); // darker brown
+        GuiComponent.fill(ps, x + w - 2, y + 1, x + w - 1, y + h - 1, 0xFFAC703D);
+    }
+
+    public static void drawTabButton(PoseStack ps, int x, int y, boolean active, boolean hovered, ResourceLocation icon, int iconW, int iconH) {
+        ResourceLocation tabTex = active ? TAB_SELECTED : (hovered ? TAB_HOVER : TAB_NORMAL);
+        RenderSystem.setShaderTexture(0, tabTex);
+        GuiComponent.blit(ps, x, y, 0, 0, 16, 16, 16, 16);
+
+        // Draw icon centered on the tab
+        RenderSystem.setShaderTexture(0, icon);
+        int ox = x + (16 - iconW) / 2;
+        int oy = y + (16 - iconH) / 2;
+        GuiComponent.blit(ps, ox, oy, 0, 0, iconW, iconH, iconW, iconH);
+    }
+
+    public static void drawColorBuilderBG(PoseStack ps, int x, int y, int w) {
+        RenderSystem.setShaderTexture(0, BG_COLOR_BUILDER);
+        GuiComponent.blit(ps, x, y, 0, 0, 176, 192, 176, 192);
+    }
+
+    public static void drawRescaledIcon(PoseStack ps, int x, int y, ResourceLocation icon, int destW, int destH, int texW, int texH, boolean hover) {
+        RenderSystem.setShaderTexture(0, icon);
+        GuiComponent.blit(ps, x, y, destW, destH, 0f, 0f, texW, texH, texW, texH);
+        if (hover) {
+            GuiComponent.fill(ps, x, y, x + destW, y + destH, 0x40FFFFFF);
         }
     }
 

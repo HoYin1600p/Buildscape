@@ -20,13 +20,15 @@
     "StonecutterMenuAccessor",
     "StonecutterMenuMixin",
     "VineBlockMixin",
-    "WallBlockMixin"
+    "WallBlockMixin",
+    "ShulkerBoxBlockEntityMixin"
   ],
   "client": [
     "BuildscapeBlockModelMixin",
     "BuildscapeBlockStateCacheMixin",
     "BuildscapeForgeRegistryMixin",
     "BuildscapeModelBakeryMixin",
+    "ItemRendererMixin",
     "PauseScreenMixin",
     "StonecutterScreenMixin"
   ],

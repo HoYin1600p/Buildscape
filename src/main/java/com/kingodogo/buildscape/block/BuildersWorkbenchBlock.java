@@ -64,7 +64,12 @@ public class BuildersWorkbenchBlock extends BaseEntityBlock {
         if (!state.is(newState.getBlock())) {
             BlockEntity be = level.getBlockEntity(pos);
             if (be instanceof BuildersWorkbenchBlockEntity wbe) {
-                net.minecraft.world.Containers.dropContents(level, pos, wbe);
+                for (int slotIdx : new int[]{0, 10, 11, 21, 22, 23, 24, 25, 26, 27, 28, 29}) {
+                    net.minecraft.world.item.ItemStack stack = wbe.getItem(slotIdx);
+                    if (!stack.isEmpty()) {
+                        net.minecraft.world.Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), stack);
+                    }
+                }
             }
         }
         super.onRemove(state, level, pos, newState, isMoving);

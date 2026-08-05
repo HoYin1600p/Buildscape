@@ -50,16 +50,40 @@ public class BuildersWorkbenchScreen extends AbstractContainerScreen<BuildersWor
 
     @Override
     protected void init() {
+        this.activeTab = this.menu.getActiveTab();
+        this.imageWidth = this.activeTab == 0 ? 176 : 240;
+        this.imageHeight = this.activeTab == 0 ? 192 : 266;
         super.init();
         openTime = System.currentTimeMillis();
-        this.activeTab = this.menu.getActiveTab();
         this.filterMask = this.menu.getFilterMask();
     }
 
     @Override
     public void render(PoseStack ps, int mouseX, int mouseY, float partialTick) {
+        this.activeTab = this.menu.getActiveTab();
+        this.imageWidth = this.activeTab == 0 ? 176 : 240;
+        this.imageHeight = this.activeTab == 0 ? 192 : 266;
+        this.leftPos = (this.width - this.imageWidth) / 2;
+        this.topPos = (this.height - this.imageHeight) / 2;
+
+        float scale = 1.0f;
+        if (this.width < this.imageWidth || this.height < this.imageHeight) {
+            scale = Math.min((float) this.width / (float) this.imageWidth, (float) this.height / (float) this.imageHeight);
+        }
+
+        int finalMouseX = mouseX;
+        int finalMouseY = mouseY;
+        if (scale < 1.0f) {
+            ps.pushPose();
+            ps.translate(this.width / 2.0f, this.height / 2.0f, 0.0f);
+            ps.scale(scale, scale, 1.0f);
+            ps.translate(-this.width / 2.0f, -this.height / 2.0f, 0.0f);
+            finalMouseX = (int) ((mouseX - this.width / 2.0f) / scale + this.width / 2.0f);
+            finalMouseY = (int) ((mouseY - this.height / 2.0f) / scale + this.height / 2.0f);
+        }
+
         this.renderBackground(ps);
-        super.render(ps, mouseX, mouseY, partialTick);
+        super.render(ps, finalMouseX, finalMouseY, partialTick);
 
         // Render Cycle Buttons on top of the slot items
         int px = this.leftPos;
@@ -68,10 +92,10 @@ public class BuildersWorkbenchScreen extends AbstractContainerScreen<BuildersWor
             for (int i = 0; i < 9; i++) {
                 int col = i % 3;
                 int row = i / 3;
-                int sx = px + 85 + col * 20;
-                int sy = py + 21 + row * 20;
+                int sx = px + 63 + col * 17;
+                int sy = py + 28 + (row == 0 ? 0 : (row == 1 ? 18 : 35));
                 if (!this.menu.getSlot(1 + i).getItem().isEmpty()) {
-                    boolean hovered = isIn(mouseX, mouseY, sx + 12, sy + 12, 5, 5);
+                    boolean hovered = isIn(finalMouseX, finalMouseY, sx + 12, sy + 12, 5, 5);
                     int color = hovered ? 0xFF00FFCC : 0xFF00AA88;
                     fill(ps, sx + 12, sy + 12, sx + 17, sy + 17, color);
                     fill(ps, sx + 14, sy + 14, sx + 15, sy + 15, 0xFF000000);
@@ -82,7 +106,7 @@ public class BuildersWorkbenchScreen extends AbstractContainerScreen<BuildersWor
                 int sx = px + 8 + i * 18;
                 int sy = py + 77;
                 if (!this.menu.getSlot(12 + i).getItem().isEmpty()) {
-                    boolean hovered = isIn(mouseX, mouseY, sx + 12, sy + 12, 5, 5);
+                    boolean hovered = isIn(finalMouseX, finalMouseY, sx + 12, sy + 12, 5, 5);
                     int color = hovered ? 0xFF00FFCC : 0xFF00AA88;
                     fill(ps, sx + 12, sy + 12, sx + 17, sy + 17, color);
                     fill(ps, sx + 14, sy + 14, sx + 15, sy + 15, 0xFF000000);
@@ -90,13 +114,17 @@ public class BuildersWorkbenchScreen extends AbstractContainerScreen<BuildersWor
             }
         }
 
-        this.renderTooltip(ps, mouseX, mouseY);
+        this.renderTooltip(ps, finalMouseX, finalMouseY);
 
         // Render tab button tooltips
-        if (isIn(mouseX, mouseY, px + 98, py + TAB_Y, 20, 12)) {
-            this.renderComponentTooltip(ps, java.util.List.of(new net.minecraft.network.chat.TextComponent("Color Picker")), mouseX, mouseY);
-        } else if (isIn(mouseX, mouseY, px + 122, py + TAB_Y, 20, 12)) {
-            this.renderComponentTooltip(ps, java.util.List.of(new net.minecraft.network.chat.TextComponent("Gradient Builder")), mouseX, mouseY);
+        if (isIn(finalMouseX, finalMouseY, px + 8, py - 12, 16, 16)) {
+            this.renderComponentTooltip(ps, java.util.List.of(new net.minecraft.network.chat.TextComponent("Color Builder")), finalMouseX, finalMouseY);
+        } else if (isIn(finalMouseX, finalMouseY, px + 26, py - 12, 16, 16)) {
+            this.renderComponentTooltip(ps, java.util.List.of(new net.minecraft.network.chat.TextComponent("Gradient Builder")), finalMouseX, finalMouseY);
+        }
+
+        if (scale < 1.0f) {
+            ps.popPose();
         }
     }
 
@@ -110,8 +138,8 @@ public class BuildersWorkbenchScreen extends AbstractContainerScreen<BuildersWor
             for (int i = 0; i < 9; i++) {
                 int col = i % 3;
                 int row = i / 3;
-                int sx = px + 85 + col * 20;
-                int sy = py + 21 + row * 20;
+                int sx = px + 63 + col * 17;
+                int sy = py + 28 + (row == 0 ? 0 : (row == 1 ? 18 : 35));
                 if (!this.menu.getSlot(1 + i).getItem().isEmpty() && isIn(x, y, sx + 12, sy + 12, 5, 5)) {
                     this.renderComponentTooltip(ps, java.util.List.of(new net.minecraft.network.chat.TextComponent("Cycle Block (Reroll)")), x, y);
                     return;
@@ -163,17 +191,36 @@ public class BuildersWorkbenchScreen extends AbstractContainerScreen<BuildersWor
         RenderSystem.disableDepthTest();
 
         // ── 1. Tab buttons inside the dip ────────────────────────────────────────
-        boolean cpTabHov = isIn(mouseX, mouseY, px + 98, py + TAB_Y, 20, 12);
-        WbRenderer.drawTab(ps, this.font, px + 98, py + TAB_Y, 20, 12, "C", activeTab == 0, cpTabHov);
+        float scale = 1.0f;
+        if (this.width < this.imageWidth || this.height < this.imageHeight) {
+            scale = Math.min((float) this.width / (float) this.imageWidth, (float) this.height / (float) this.imageHeight);
+        }
+        int finalMouseX = mouseX;
+        int finalMouseY = mouseY;
+        if (scale < 1.0f) {
+            finalMouseX = (int) ((mouseX - this.width / 2.0f) / scale + this.width / 2.0f);
+            finalMouseY = (int) ((mouseY - this.height / 2.0f) / scale + this.height / 2.0f);
+        }
 
-        boolean gbTabHov = isIn(mouseX, mouseY, px + 122, py + TAB_Y, 20, 12);
-        WbRenderer.drawTab(ps, this.font, px + 122, py + TAB_Y, 20, 12, "G", activeTab == 1, gbTabHov);
+        if (activeTab == 0) {
+            boolean cpTabHov = isIn(finalMouseX, finalMouseY, px + 8, py - 8, 8, 8);
+            WbRenderer.drawRescaledIcon(ps, px + 9, py - 7, WbRenderer.ICON_COLOR_BUILDER, 6, 6, 16, 16, cpTabHov);
+
+            boolean gbTabHov = isIn(finalMouseX, finalMouseY, px + 18, py - 8, 8, 8);
+            WbRenderer.drawRescaledIcon(ps, px + 19, py - 7, WbRenderer.ICON_GRADIENT_BUILDER, 6, 6, 18, 18, gbTabHov);
+        } else {
+            boolean cpTabHov = isIn(finalMouseX, finalMouseY, px + 8, py - 12, 16, 16);
+            WbRenderer.drawTabButton(ps, px + 8, py - 12, activeTab == 0, cpTabHov, WbRenderer.ICON_COLOR_BUILDER, 16, 16);
+
+            boolean gbTabHov = isIn(finalMouseX, finalMouseY, px + 26, py - 12, 16, 16);
+            WbRenderer.drawTabButton(ps, px + 26, py - 12, activeTab == 1, gbTabHov, WbRenderer.ICON_GRADIENT_BUILDER, 18, 18);
+        }
 
         // ── 2. Workstation and Slots Layout ──────────────────────────────────────
         if (activeTab == 0) {
-            renderColorPickerTab(ps, px, py, mouseX, mouseY, tick);
+            renderColorPickerTab(ps, px, py, finalMouseX, finalMouseY, tick);
         } else {
-            renderGradientBuilderTab(ps, px, py, mouseX, mouseY, tick);
+            renderGradientBuilderTab(ps, px, py, finalMouseX, finalMouseY, tick);
         }
 
         RenderSystem.enableDepthTest();
@@ -186,51 +233,40 @@ public class BuildersWorkbenchScreen extends AbstractContainerScreen<BuildersWor
 
     private void renderColorPickerTab(PoseStack ps, int px, int py,
                                       int mouseX, int mouseY, float tick) {
-        // Workstation background (ears shape) - ends at py + 148 on sides
-        WbRenderer.drawWorkstationBG(ps, px, py, W, 148);
-
-        // Pouch Transfer Box (rounded overlay at bottom of workstation panel) - goes to py + 154
-        WbRenderer.drawInsetBox(ps, px + 10, py + 110, 220, 44);
-
-        // Inset boxes
-        WbRenderer.drawInsetBox(ps, px + 20, py + 35, 32, 32);
-        WbRenderer.drawInsetBox(ps, px + 80, py + 16, 72, 72);
-        WbRenderer.drawInsetBox(ps, px + 180, py + 16, 32, 80);
-
-        // Slot backgrounds
-        WbRenderer.drawSlotTexture(ps, WbRenderer.SLOT_INPUT, px + 26, py + 41); // Slot 0: Pipette
-        for (int i = 0; i < 9; i++) {
-            int col = i % 3;
-            int row = i / 3;
-            WbRenderer.drawSlotTexture(ps, WbRenderer.SLOT_RESULT, px + 85 + col * 20, py + 21 + row * 20); // Slots 1-9: Presets
-        }
+        // Workstation background (ears shape with bottom protrusion)
+        WbRenderer.drawColorBuilderBG(ps, px, py, imageWidth);
 
         // Filter Buttons
         for (int i = 0; i < 3; i++) {
-            boolean hov = isIn(mouseX, mouseY, px + 187, py + 22 + i * 24, 18, 18);
-            WbRenderer.drawFilterButton(ps, px + 187, py + 22 + i * 24, i, filterMask, hov);
+            boolean hov = isIn(mouseX, mouseY, px + 131, py + 22 + i * 22, 18, 18);
+            WbRenderer.drawFilterButton(ps, px + 131, py + 22 + i * 22, i, filterMask, hov);
         }
 
-        // Pouch slots backgrounds inside bottom overlay (perfectly centered vertically)
-        WbRenderer.drawInsetBox(ps, px + 40, py + 117, 30, 30);
-        WbRenderer.drawInsetBox(ps, px + 168, py + 117, 30, 30);
+        // Title text centered on the pre-drawn top wooden banner
+        String titleText = "Color Builder";
+        int tw = this.font.width(titleText);
+        this.font.draw(ps, new net.minecraft.network.chat.TextComponent(titleText), px + 56 + (64 - tw) / 2.0f, py + 3.0f, 0xFF372211);
 
-        WbRenderer.drawSlotTexture(ps, WbRenderer.SLOT_INPUT, px + 46, py + 123); // Slot 10: Input Pouch
-        WbRenderer.drawSlotTexture(ps, WbRenderer.SLOT_OUTPUT, px + 174, py + 123); // Slot 11: Output Pouch
+        // Pouch slots backgrounds (drawn directly on tan BG without wooden frame)
+        WbRenderer.drawSlotTexture(ps, WbRenderer.SLOT_INPUT, px + 40, py + 80); // Slot 10: Input Pouch
+        WbRenderer.drawSlotTexture(ps, WbRenderer.SLOT_OUTPUT, px + 118, py + 80); // Slot 11: Output Pouch
 
-        // Synced copy progress
+        // Process Arrow (inactive by default, filled with active version based on progress)
+        RenderSystem.setShaderTexture(0, WbRenderer.BUILDERS_ARROW);
+        WbRenderer.blitFloat(ps, px + 64, py + 81, 48, 16, 0f, 0f, 1f, 1f);
+
         float progress = (float) this.menu.getCopyProgress() / 40.0f;
-        // Faint process arrow between pouches
-        WbRenderer.drawProcessArrow(ps, px + 76, py + 124, 88, progress);
-
-        // Separated Vanilla Player Inventory Panel (aligns perfectly with slots at py + 161)
-        WbRenderer.drawVanillaInventory(ps, this.font, px + 31, py + 161, 176, 96);
+        if (progress > 0.0f) {
+            int progressW = (int) (progress * 48);
+            RenderSystem.setShaderTexture(0, WbRenderer.BUILDERS_ARROW_ACTIVE);
+            WbRenderer.blitFloat(ps, px + 64, py + 81, progressW, 16, 0f, 0f, progress, 1f);
+        }
     }
 
     private void renderGradientBuilderTab(PoseStack ps, int px, int py,
                                           int mouseX, int mouseY, float tick) {
         // Workstation background (ears shape) - extended to 138 to wrap slots fully at bottom
-        WbRenderer.drawWorkstationBG(ps, px, py, W, 138);
+        WbRenderer.drawWorkstationBG(ps, px, py, imageWidth, 138);
 
         // Inset boxes
         WbRenderer.drawInsetBox(ps, px + 3, py + 42, 174, 30);
@@ -238,6 +274,12 @@ public class BuildersWorkbenchScreen extends AbstractContainerScreen<BuildersWor
         WbRenderer.drawInsetBox(ps, px + 3, py + 106, 30, 30);
         WbRenderer.drawInsetBox(ps, px + 147, py + 106, 30, 30);
         WbRenderer.drawInsetBox(ps, px + 180, py + 16, 32, 80); // Filter box on right
+
+        // Title Banner (wooden banner centered at top)
+        WbRenderer.drawTitleBanner(ps, px + 80, py + 6, 80, 14);
+        String titleText = "Gradient Builder";
+        int tw = this.font.width(titleText);
+        this.font.draw(ps, new net.minecraft.network.chat.TextComponent(titleText), px + 80 + (80 - tw) / 2.0f, py + 6 + 3.0f, 0xFF372211);
 
         // Slot backgrounds (shifted by -1,-1 to align with container slot item positions)
         for (int i = 0; i < 9; i++) {
@@ -273,12 +315,25 @@ public class BuildersWorkbenchScreen extends AbstractContainerScreen<BuildersWor
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        float scale = 1.0f;
+        if (this.width < this.imageWidth || this.height < this.imageHeight) {
+            scale = Math.min((float) this.width / (float) this.imageWidth, (float) this.height / (float) this.imageHeight);
+        }
+
+        double finalMouseX = mouseX;
+        double finalMouseY = mouseY;
+        if (scale < 1.0f) {
+            finalMouseX = (mouseX - this.width / 2.0f) / scale + this.width / 2.0f;
+            finalMouseY = (mouseY - this.height / 2.0f) / scale + this.height / 2.0f;
+        }
+
         int px = this.leftPos;
         int py = this.topPos;
-        int mx = (int) mouseX, my = (int) mouseY;
+        int mx = (int) finalMouseX, my = (int) finalMouseY;
 
         // ── Tab clicks ────────────────────────────────────────────────────────
-        if (isIn(mx, my, px + 98, py + TAB_Y, 20, 12)) {
+        boolean clickTab0 = activeTab == 0 ? isIn(mx, my, px + 8, py - 8, 8, 8) : isIn(mx, my, px + 8, py - 12, 16, 16);
+        if (clickTab0) {
             if (activeTab != 0) {
                 activeTab = 0;
                 if (this.minecraft != null && this.minecraft.gameMode != null) {
@@ -288,7 +343,8 @@ public class BuildersWorkbenchScreen extends AbstractContainerScreen<BuildersWor
             }
             return true;
         }
-        if (isIn(mx, my, px + 122, py + TAB_Y, 20, 12)) {
+        boolean clickTab1 = activeTab == 0 ? isIn(mx, my, px + 18, py - 8, 8, 8) : isIn(mx, my, px + 26, py - 12, 16, 16);
+        if (clickTab1) {
             if (activeTab != 1) {
                 activeTab = 1;
                 if (this.minecraft != null && this.minecraft.gameMode != null) {
@@ -304,8 +360,8 @@ public class BuildersWorkbenchScreen extends AbstractContainerScreen<BuildersWor
             for (int i = 0; i < 9; i++) {
                 int col = i % 3;
                 int row = i / 3;
-                int sx = px + 85 + col * 20;
-                int sy = py + 21 + row * 20;
+                int sx = px + 63 + col * 17;
+                int sy = py + 28 + (row == 0 ? 0 : (row == 1 ? 18 : 35));
                 if (!this.menu.getSlot(1 + i).getItem().isEmpty() && isIn(mx, my, sx + 12, sy + 12, 5, 5)) {
                     ModMessages.INSTANCE.sendToServer(
                             new BuildersWorkbenchActionPacket(3, this.menu.getBlockEntity().getBlockPos(), i)
@@ -333,15 +389,28 @@ public class BuildersWorkbenchScreen extends AbstractContainerScreen<BuildersWor
 
         // ── Filter Button clicks ──────────────────────────────────────────────
         for (int i = 0; i < 3; i++) {
-            if (isIn(mx, my, px + 187, py + 22 + i * 24, 18, 18)) {
-                if (filterMask != i) {
-                    filterMask = i;
-                    ModMessages.INSTANCE.sendToServer(
-                            new BuildersWorkbenchActionPacket(2, this.menu.getBlockEntity().getBlockPos(), i)
-                    );
-                    playClick();
+            if (activeTab == 0) {
+                if (isIn(mx, my, px + 131, py + 22 + i * 22, 18, 18)) {
+                    if (filterMask != i) {
+                        filterMask = i;
+                        ModMessages.INSTANCE.sendToServer(
+                                new BuildersWorkbenchActionPacket(2, this.menu.getBlockEntity().getBlockPos(), i)
+                        );
+                        playClick();
+                    }
+                    return true;
                 }
-                return true;
+            } else {
+                if (isIn(mx, my, px + 187, py + 22 + i * 24, 18, 18)) {
+                    if (filterMask != i) {
+                        filterMask = i;
+                        ModMessages.INSTANCE.sendToServer(
+                                new BuildersWorkbenchActionPacket(2, this.menu.getBlockEntity().getBlockPos(), i)
+                        );
+                        playClick();
+                    }
+                    return true;
+                }
             }
         }
 
@@ -366,7 +435,35 @@ public class BuildersWorkbenchScreen extends AbstractContainerScreen<BuildersWor
             }
         }
 
-        return super.mouseClicked(mouseX, mouseY, button);
+        return super.mouseClicked(finalMouseX, finalMouseY, button);
+    }
+
+    @Override
+    public boolean mouseReleased(double mouseX, double mouseY, int button) {
+        float scale = 1.0f;
+        if (this.width < this.imageWidth || this.height < this.imageHeight) {
+            scale = Math.min((float) this.width / (float) this.imageWidth, (float) this.height / (float) this.imageHeight);
+        }
+        if (scale < 1.0f) {
+            double scaledMouseX = (mouseX - this.width / 2.0f) / scale + this.width / 2.0f;
+            double scaledMouseY = (mouseY - this.height / 2.0f) / scale + this.height / 2.0f;
+            return super.mouseReleased(scaledMouseX, scaledMouseY, button);
+        }
+        return super.mouseReleased(mouseX, mouseY, button);
+    }
+
+    @Override
+    public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
+        float scale = 1.0f;
+        if (this.width < this.imageWidth || this.height < this.imageHeight) {
+            scale = Math.min((float) this.width / (float) this.imageWidth, (float) this.height / (float) this.imageHeight);
+        }
+        if (scale < 1.0f) {
+            double scaledMouseX = (mouseX - this.width / 2.0f) / scale + this.width / 2.0f;
+            double scaledMouseY = (mouseY - this.height / 2.0f) / scale + this.height / 2.0f;
+            return super.mouseDragged(scaledMouseX, scaledMouseY, button, dragX / scale, dragY / scale);
+        }
+        return super.mouseDragged(mouseX, mouseY, button, dragX, dragY);
     }
 
     private boolean isIn(int mx, int my, int rx, int ry, int rw, int rh) {

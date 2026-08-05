@@ -1549,6 +1549,13 @@ public class BuildScape {
     @SubscribeEvent
     public void onEntityJoinWorld(
             net.minecraftforge.event.entity.EntityJoinWorldEvent event) {
+        if (event.getEntity() instanceof net.minecraft.world.entity.item.ItemEntity itemEntity) {
+            net.minecraft.world.item.ItemStack stack = itemEntity.getItem();
+            if (!stack.isEmpty() && stack.hasTag() && stack.getTag().getBoolean("ghost")) {
+                event.setCanceled(true);
+                return;
+            }
+        }
         if (event.getEntity() instanceof net.minecraft.world.entity.vehicle.Boat boat) {
             net.minecraft.nbt.CompoundTag nbt = boat.getPersistentData();
             if (nbt.contains("MangroveBoatType")

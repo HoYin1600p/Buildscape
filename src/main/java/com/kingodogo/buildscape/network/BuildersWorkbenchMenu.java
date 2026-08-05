@@ -29,7 +29,7 @@ public class BuildersWorkbenchMenu extends AbstractContainerMenu {
         // ── Tab 0: Color Picker Layout Slots (Indices 0 to 47) ─────────────────
 
         // Slot 0: Pipette/tool slot (index 0, active on Tab 0)
-        this.addSlot(new Slot(be, 0, 27, 42) {
+        this.addSlot(new Slot(be, 0, 28, 38) {
             @Override
             public boolean isActive() {
                 return be.getActiveTab() == 0;
@@ -40,7 +40,7 @@ public class BuildersWorkbenchMenu extends AbstractContainerMenu {
         for (int i = 0; i < 9; i++) {
             int col = i % 3;
             int row = i / 3;
-            this.addSlot(new Slot(be, 1 + i, 86 + col * 20, 22 + row * 20) {
+            this.addSlot(new Slot(be, 1 + i, 63 + col * 18, 24 + row * 18) {
                 @Override
                 public boolean mayPlace(ItemStack stack) {
                     return false;
@@ -59,7 +59,7 @@ public class BuildersWorkbenchMenu extends AbstractContainerMenu {
         }
 
         // Slot 10: Input Pouch (index 10, active on Tab 0) - Pouch Only
-        this.addSlot(new Slot(be, 10, 47, 124) {
+        this.addSlot(new Slot(be, 10, 47, 93) {
             @Override
             public boolean mayPlace(ItemStack stack) {
                 return com.kingodogo.buildscape.block.BuildersWorkbenchBlockEntity.isPouch(stack);
@@ -72,7 +72,7 @@ public class BuildersWorkbenchMenu extends AbstractContainerMenu {
         });
 
         // Slot 11: Output Pouch (index 11, active on Tab 0)
-        this.addSlot(new Slot(be, 11, 175, 124) {
+        this.addSlot(new Slot(be, 11, 113, 93) {
             @Override
             public boolean mayPlace(ItemStack stack) {
                 return false;
@@ -84,10 +84,10 @@ public class BuildersWorkbenchMenu extends AbstractContainerMenu {
             }
         });
 
-        // Player Inventory slots for Tab 0 (Indices 12 to 47)
+        // Player Inventory slots for Tab 0 (Indices 12 to 47) - aligned with H=192 / W=176 layout
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 9; col++) {
-                this.addSlot(new Slot(playerInv, col + row * 9 + 9, 39 + col * 18, 175 + row * 18) {
+                this.addSlot(new Slot(playerInv, col + row * 9 + 9, 8 + col * 18, 112 + row * 18) {
                     @Override
                     public boolean isActive() {
                         return be.getActiveTab() == 0;
@@ -96,7 +96,7 @@ public class BuildersWorkbenchMenu extends AbstractContainerMenu {
             }
         }
         for (int col = 0; col < 9; col++) {
-            this.addSlot(new Slot(playerInv, col, 39 + col * 18, 233) {
+            this.addSlot(new Slot(playerInv, col, 8 + col * 18, 170) {
                 @Override
                 public boolean isActive() {
                     return be.getActiveTab() == 0;

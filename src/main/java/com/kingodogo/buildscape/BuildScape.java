@@ -1663,6 +1663,10 @@ public class BuildScape {
                         com.kingodogo.buildscape.block.ModBlockEntities.GLASS_JAR_BLOCK_ENTITY
                                 .get(),
                         com.kingodogo.buildscape.client.renderer.GlassJarBlockEntityRenderer::new);
+                net.minecraft.client.renderer.blockentity.BlockEntityRenderers.register(
+                        com.kingodogo.buildscape.block.ModBlockEntities.COPPER_CHEST
+                                .get(),
+                        com.kingodogo.buildscape.client.renderer.CopperChestRenderer::new);
 
 /*
                 net.minecraft.client.renderer.blockentity.BlockEntityRenderers.register(

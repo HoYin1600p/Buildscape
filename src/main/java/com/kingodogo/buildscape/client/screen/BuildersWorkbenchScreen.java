@@ -92,8 +92,8 @@ public class BuildersWorkbenchScreen extends AbstractContainerScreen<BuildersWor
             for (int i = 0; i < 9; i++) {
                 int col = i % 3;
                 int row = i / 3;
-                int sx = px + 63 + col * 17;
-                int sy = py + 28 + (row == 0 ? 0 : (row == 1 ? 18 : 35));
+                int sx = px + 63 + col * 18;
+                int sy = py + 24 + row * 18;
                 if (!this.menu.getSlot(1 + i).getItem().isEmpty()) {
                     boolean hovered = isIn(finalMouseX, finalMouseY, sx + 12, sy + 12, 5, 5);
                     int color = hovered ? 0xFF00FFCC : 0xFF00AA88;
@@ -138,8 +138,8 @@ public class BuildersWorkbenchScreen extends AbstractContainerScreen<BuildersWor
             for (int i = 0; i < 9; i++) {
                 int col = i % 3;
                 int row = i / 3;
-                int sx = px + 63 + col * 17;
-                int sy = py + 28 + (row == 0 ? 0 : (row == 1 ? 18 : 35));
+                int sx = px + 63 + col * 18;
+                int sy = py + 24 + row * 18;
                 if (!this.menu.getSlot(1 + i).getItem().isEmpty() && isIn(x, y, sx + 12, sy + 12, 5, 5)) {
                     this.renderComponentTooltip(ps, java.util.List.of(new net.minecraft.network.chat.TextComponent("Cycle Block (Reroll)")), x, y);
                     return;
@@ -245,21 +245,21 @@ public class BuildersWorkbenchScreen extends AbstractContainerScreen<BuildersWor
         // Title text centered on the pre-drawn top wooden banner
         String titleText = "Color Builder";
         int tw = this.font.width(titleText);
-        this.font.draw(ps, new net.minecraft.network.chat.TextComponent(titleText), px + 56 + (64 - tw) / 2.0f, py + 3.0f, 0xFF372211);
+        this.font.draw(ps, new net.minecraft.network.chat.TextComponent(titleText), px + 56 + (64 - tw) / 2.0f, py - 4 + 3.0f, 0xFF372211);
 
         // Pouch slots backgrounds (drawn directly on tan BG without wooden frame)
-        WbRenderer.drawSlotTexture(ps, WbRenderer.SLOT_INPUT, px + 40, py + 80); // Slot 10: Input Pouch
-        WbRenderer.drawSlotTexture(ps, WbRenderer.SLOT_OUTPUT, px + 118, py + 80); // Slot 11: Output Pouch
+        WbRenderer.drawSlotTexture(ps, WbRenderer.SLOT_INPUT, px + 46, py + 92); // Slot 10: Input Pouch
+        WbRenderer.drawSlotTexture(ps, WbRenderer.SLOT_OUTPUT, px + 112, py + 92); // Slot 11: Output Pouch
 
         // Process Arrow (inactive by default, filled with active version based on progress)
         RenderSystem.setShaderTexture(0, WbRenderer.BUILDERS_ARROW);
-        WbRenderer.blitFloat(ps, px + 64, py + 81, 48, 16, 0f, 0f, 1f, 1f);
+        WbRenderer.blitFloat(ps, px + 64, py + 93, 48, 16, 0f, 0f, 1f, 1f);
 
         float progress = (float) this.menu.getCopyProgress() / 40.0f;
         if (progress > 0.0f) {
             int progressW = (int) (progress * 48);
             RenderSystem.setShaderTexture(0, WbRenderer.BUILDERS_ARROW_ACTIVE);
-            WbRenderer.blitFloat(ps, px + 64, py + 81, progressW, 16, 0f, 0f, progress, 1f);
+            WbRenderer.blitFloat(ps, px + 64, py + 93, progressW, 16, 0f, 0f, progress, 1f);
         }
     }
 
@@ -360,8 +360,8 @@ public class BuildersWorkbenchScreen extends AbstractContainerScreen<BuildersWor
             for (int i = 0; i < 9; i++) {
                 int col = i % 3;
                 int row = i / 3;
-                int sx = px + 63 + col * 17;
-                int sy = py + 28 + (row == 0 ? 0 : (row == 1 ? 18 : 35));
+                int sx = px + 63 + col * 18;
+                int sy = py + 24 + row * 18;
                 if (!this.menu.getSlot(1 + i).getItem().isEmpty() && isIn(mx, my, sx + 12, sy + 12, 5, 5)) {
                     ModMessages.INSTANCE.sendToServer(
                             new BuildersWorkbenchActionPacket(3, this.menu.getBlockEntity().getBlockPos(), i)

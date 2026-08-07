@@ -44,7 +44,7 @@ public final class WbRenderer {
     public static final ResourceLocation BTN_SURVIVAL = new ResourceLocation("buildscape", "textures/gui/builders_workbench/survival_plus.png");
     public static final ResourceLocation BTN_SURVIVAL_HOVER = new ResourceLocation("buildscape", "textures/gui/builders_workbench/survival_plus_hover.png");
     public static final ResourceLocation BTN_SURVIVAL_SEL = new ResourceLocation("buildscape", "textures/gui/builders_workbench/survival_plus_selected.png");
-    public static final ResourceLocation POUCH_ICON = new ResourceLocation("buildscape", "textures/item/builders_pouch.png");
+    public static final ResourceLocation POUCH_ICON = new ResourceLocation("minecraft", "textures/item/bundle.png");
     // Colors
     public static final int COLOR_BG_FILL = 0xFFDA9F6C; // exact brown color of builders_workbench_bg center
     public static final ResourceLocation VANILLA_CONTAINER = new ResourceLocation("textures/gui/container/generic_54.png");

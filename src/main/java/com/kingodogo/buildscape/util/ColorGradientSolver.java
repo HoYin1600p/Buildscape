@@ -10,18 +10,16 @@ import net.minecraft.world.level.block.state.BlockState;
 import java.util.*;
 
 /**
- * ColorGradientSolver — client-aware, Lab-space gradient engine.
+ * Server-safe Lab-space gradient engine.
  * <p>
- * Color registration flow:
- * ClientEvents.scanAndSyncBlockColors()
- * → ClientColorExtractor.extractColor()        (real texture pixels, client-only)
- * → ColorGradientSolver.registerDynamicColor() (stores Lab coords)
+ * Colors default to each block's MapColor. registerDynamicColor remains as an
+ * integration point for a future explicit color-data source.
  * <p>
  * Gradient solving:
  * solveGradient(start, end, filterMode)
  * → interpolates in CIE-Lab space for perceptually uniform transitions
  * → enforces uniqueness so every slot is a different block
- * → applies shape-based filter (All / Full / Slab / Stair / Wall)
+ * -> applies the selected availability filter
  */
 public class ColorGradientSolver {
 
@@ -103,8 +101,7 @@ public class ColorGradientSolver {
     // ── Public API ───────────────────────────────────────────────────────────
 
     /**
-     * Called by the client color-scan pipeline with a texture-derived RGB value.
-     * Thread-safe (synchronised on REGISTRY).
+     * Registers an explicit RGB override for a structural block.
      */
     public static synchronized void registerDynamicColor(Item item, int colorHex) {
         if (!isStructuralBlock(item)) return;
@@ -121,8 +118,7 @@ public class ColorGradientSolver {
     }
 
     /**
-     * Lazy fallback using MapColor.  Only runs if registerDynamicColor was never called
-     * (i.e. client-side scan hasn't run yet, shouldn't happen in normal play).
+     * Lazily builds the registry from MapColor on the logical server.
      */
     private static synchronized void ensureRegistryPopulated() {
         if (!ALL_BLOCKS.isEmpty()) return;
@@ -179,7 +175,6 @@ public class ColorGradientSolver {
                 }
             }
         }
-        System.out.println("ColorGradientSolver: solveGradient start=" + startStack.getItem().getRegistryName() + " end=" + endStack.getItem().getRegistryName() + " filterMode=" + filterMode + " -> found " + candidates.size() + " candidates");
         if (candidates.isEmpty()) {
             synchronized (ColorGradientSolver.class) {
                 candidates = new ArrayList<>(ALL_BLOCKS);
@@ -421,7 +416,6 @@ public class ColorGradientSolver {
                 }
             }
         }
-        System.out.println("ColorGradientSolver: solveColorPicker target=" + target.getItem().getRegistryName() + " filterMode=" + filterMode + " -> found " + candidates.size() + " candidates");
         if (candidates.isEmpty()) {
             synchronized (ColorGradientSolver.class) {
                 candidates = new ArrayList<>(ALL_BLOCKS);

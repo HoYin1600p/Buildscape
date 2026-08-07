@@ -1549,13 +1549,6 @@ public class BuildScape {
     @SubscribeEvent
     public void onEntityJoinWorld(
             net.minecraftforge.event.entity.EntityJoinWorldEvent event) {
-        if (event.getEntity() instanceof net.minecraft.world.entity.item.ItemEntity itemEntity) {
-            net.minecraft.world.item.ItemStack stack = itemEntity.getItem();
-            if (!stack.isEmpty() && stack.hasTag() && stack.getTag().getBoolean("ghost")) {
-                event.setCanceled(true);
-                return;
-            }
-        }
         if (event.getEntity() instanceof net.minecraft.world.entity.vehicle.Boat boat) {
             net.minecraft.nbt.CompoundTag nbt = boat.getPersistentData();
             if (nbt.contains("MangroveBoatType")
@@ -1625,6 +1618,10 @@ public class BuildScape {
                 net.minecraft.client.gui.screens.MenuScreens.register(
                         com.kingodogo.buildscape.network.ModMenuTypes.BUILDERS_WORKBENCH_MENU.get(),
                         com.kingodogo.buildscape.client.screen.BuildersWorkbenchScreen::new
+                );
+                net.minecraft.client.gui.screens.MenuScreens.register(
+                        com.kingodogo.buildscape.network.ModMenuTypes.BUILDERS_POUCH_MENU.get(),
+                        com.kingodogo.buildscape.client.screen.BuildersPouchScreen::new
                 );
 
 

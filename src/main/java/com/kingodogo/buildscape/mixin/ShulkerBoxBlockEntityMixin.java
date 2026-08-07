@@ -16,36 +16,38 @@ public class ShulkerBoxBlockEntityMixin implements GhostFilterable {
     @Unique
     private final String[] buildscape$ghostFilters = new String[27];
 
+    @Inject(method = "load", at = @At("HEAD"))
+    private void migrateStoredGhostItems(CompoundTag tag, CallbackInfo ci) {
+        ListTag filters = tag.contains("GhostFilters", 9)
+                ? tag.getList("GhostFilters", 8).copy()
+                : new ListTag();
+        while (filters.size() < 27) filters.add(StringTag.valueOf(""));
+
+        if (tag.contains("Items", 9)) {
+            ListTag items = tag.getList("Items", 10);
+            for (int i = items.size() - 1; i >= 0; i--) {
+                CompoundTag item = items.getCompound(i);
+                int slot = item.getByte("Slot") & 255;
+                if (slot >= 27 || !item.contains("tag", 10)
+                        || !item.getCompound("tag").getBoolean("ghost")) continue;
+
+                if (filters.getString(slot).isEmpty()) {
+                    filters.set(slot, StringTag.valueOf(item.getString("id")));
+                }
+                items.remove(i);
+            }
+            tag.put("Items", items);
+        }
+        tag.put("GhostFilters", filters);
+    }
+
     @Inject(method = "load", at = @At("TAIL"))
     private void onLoad(CompoundTag tag, CallbackInfo ci) {
+        for (int i = 0; i < 27; i++) buildscape$ghostFilters[i] = "";
         if (tag.contains("GhostFilters", 9)) {
             ListTag list = tag.getList("GhostFilters", 8);
             for (int i = 0; i < 27; i++) {
-                if (i < list.size()) {
-                    buildscape$ghostFilters[i] = list.getString(i);
-                } else {
-                    buildscape$ghostFilters[i] = "";
-                }
-            }
-        } else {
-            // Fallback: populate from existing items if they are ghost
-            for (int i = 0; i < 27; i++) {
-                buildscape$ghostFilters[i] = "";
-            }
-            if (tag.contains("Items", 9)) {
-                ListTag itemsList = tag.getList("Items", 10);
-                for (int i = 0; i < itemsList.size(); i++) {
-                    CompoundTag itemTag = itemsList.getCompound(i);
-                    int slot = itemTag.getByte("Slot") & 255;
-                    if (slot >= 0 && slot < 27) {
-                        if (itemTag.contains("tag", 10)) {
-                            CompoundTag tagTag = itemTag.getCompound("tag");
-                            if (tagTag.getBoolean("ghost")) {
-                                buildscape$ghostFilters[slot] = itemTag.getString("id");
-                            }
-                        }
-                    }
-                }
+                if (i < list.size()) buildscape$ghostFilters[i] = list.getString(i);
             }
         }
     }

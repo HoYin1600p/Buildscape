@@ -15,8 +15,10 @@ import java.util.function.Supplier;
  * Handles server-side actions for the Builders Workbench.
  * <p>
  * actionId:
- * 0 – Solve gradient from input slots 1-9, write results to slots 12-20
+ * 0 – Solve gradient from input slots 21-29, write results to slots 12-20
  * 1 – Copy solved gradient (slots 12-20) into the Output Pouch (slot 11)
+ * 2 – Set the result filter mode
+ * 3 – Cycle one result slot to its next candidate
  */
 public class BuildersWorkbenchActionPacket {
 
@@ -51,7 +53,10 @@ public class BuildersWorkbenchActionPacket {
             ServerPlayer player = ctx.get().getSender();
             if (player == null || player.level == null) return;
 
-            if (!(player.level.getBlockEntity(pos) instanceof BuildersWorkbenchBlockEntity wbe)) return;
+            if (!(player.level.getBlockEntity(pos) instanceof BuildersWorkbenchBlockEntity wbe)
+                    || !(player.containerMenu instanceof BuildersWorkbenchMenu menu)
+                    || menu.getBlockEntity() != wbe
+                    || !wbe.stillValid(player)) return;
 
             if (actionId == 0) {
                 // ── Solve gradient ────────────────────────────────────────────
@@ -63,22 +68,23 @@ public class BuildersWorkbenchActionPacket {
                 // ── Instant copy to output pouch ──────────────────────────────
                 ItemStack inPouch = wbe.getItem(BuildersWorkbenchBlockEntity.SLOT_INPUT_POUCH);
                 ItemStack outPouch = wbe.getItem(BuildersWorkbenchBlockEntity.SLOT_OUTPUT_POUCH);
-                if (!inPouch.isEmpty() && BuildersWorkbenchBlockEntity.isPouch(inPouch) && outPouch.isEmpty()) {
+                if (!inPouch.isEmpty() && BuildersWorkbenchBlockEntity.isPouch(inPouch)
+                        && outPouch.isEmpty() && wbe.hasSolvedItems()) {
                     ItemStack pouchCopy = inPouch.copy();
-                    wbe.writeSolvedToPouch(pouchCopy);
-                    wbe.setItem(BuildersWorkbenchBlockEntity.SLOT_OUTPUT_POUCH, pouchCopy);
-                    wbe.setItem(BuildersWorkbenchBlockEntity.SLOT_INPUT_POUCH, ItemStack.EMPTY);
-                    wbe.setCopyProgress(0);
-
-                    player.level.playSound(null, pos, SoundEvents.EXPERIENCE_ORB_PICKUP,
-                            SoundSource.BLOCKS, 0.5f, 1.0f);
+                    if (wbe.writeSolvedToPouch(pouchCopy)) {
+                        wbe.setItem(BuildersWorkbenchBlockEntity.SLOT_OUTPUT_POUCH, pouchCopy);
+                        wbe.setItem(BuildersWorkbenchBlockEntity.SLOT_INPUT_POUCH, ItemStack.EMPTY);
+                        wbe.setCopyProgress(0);
+                        player.level.playSound(null, pos, SoundEvents.EXPERIENCE_ORB_PICKUP,
+                                SoundSource.BLOCKS, 0.5f, 1.0f);
+                    }
                 }
             } else if (actionId == 2) {
                 // ── Set filter mask ───────────────────────────────────────────
-                wbe.setFilterMask(filterMask);
+                if (filterMask >= 0 && filterMask <= 2) wbe.setFilterMask(filterMask);
             } else if (actionId == 3) {
                 // ── Cycle result offset for a slot index ──────────────────────
-                wbe.incrementResultOffset(filterMask);
+                if (filterMask >= 0 && filterMask < 9) wbe.incrementResultOffset(filterMask);
             }
         });
         ctx.get().setPacketHandled(true);

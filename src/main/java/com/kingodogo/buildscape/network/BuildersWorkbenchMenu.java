@@ -9,6 +9,8 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 
 public class BuildersWorkbenchMenu extends AbstractContainerMenu {
+    public static final int MENU_COLOR_RESULT_START = 1;
+    public static final int MENU_GRADIENT_OUTPUT_START = 48;
 
     private final BuildersWorkbenchBlockEntity blockEntity;
 

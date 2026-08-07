@@ -1,1 +1,40 @@
-// Replaced by ItemRendererMixin.java for transparent ghost rendering.
+package com.kingodogo.buildscape.mixin;
+
+import com.kingodogo.buildscape.util.GhostFilterMenu;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.renderer.entity.ItemRenderer;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import org.spongepowered.asm.mixin.Final;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+@Mixin(AbstractContainerScreen.class)
+public abstract class AbstractContainerScreenMixin {
+    @Shadow
+    @Final
+    protected AbstractContainerMenu menu;
+
+    @Inject(method = "renderSlot", at = @At("TAIL"))
+    private void renderFilterPlaceholder(PoseStack poseStack, Slot slot, CallbackInfo ci) {
+        if (slot.hasItem() || !slot.isActive() || !(menu instanceof GhostFilterMenu filters)) return;
+        Item filter = filters.buildscape$getFilterItem(slot.index);
+        if (filter == null) return;
+
+        ItemStack placeholder = new ItemStack(filter);
+        placeholder.getOrCreateTag().putBoolean("ghost", true);
+        Minecraft minecraft = Minecraft.getInstance();
+        ItemRenderer renderer = minecraft.getItemRenderer();
+        renderer.blitOffset = 100.0F;
+        renderer.renderAndDecorateItem(minecraft.player, placeholder, slot.x, slot.y,
+                slot.x + slot.y * 176);
+        renderer.blitOffset = 0.0F;
+    }
+}

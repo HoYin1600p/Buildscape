@@ -94,7 +94,7 @@ public class BuildersWorkbenchScreen extends AbstractContainerScreen<BuildersWor
                 int row = i / 3;
                 int sx = px + 63 + col * 18;
                 int sy = py + 24 + row * 18;
-                if (!this.menu.getSlot(1 + i).getItem().isEmpty()) {
+                if (!this.menu.getSlot(BuildersWorkbenchMenu.MENU_COLOR_RESULT_START + i).getItem().isEmpty()) {
                     boolean hovered = isIn(finalMouseX, finalMouseY, sx + 12, sy + 12, 5, 5);
                     int color = hovered ? 0xFF00FFCC : 0xFF00AA88;
                     fill(ps, sx + 12, sy + 12, sx + 17, sy + 17, color);
@@ -105,7 +105,7 @@ public class BuildersWorkbenchScreen extends AbstractContainerScreen<BuildersWor
             for (int i = 1; i < 8; i++) { // only slots 1-7 are result slots
                 int sx = px + 8 + i * 18;
                 int sy = py + 77;
-                if (!this.menu.getSlot(12 + i).getItem().isEmpty()) {
+                if (!this.menu.getSlot(BuildersWorkbenchMenu.MENU_GRADIENT_OUTPUT_START + i).getItem().isEmpty()) {
                     boolean hovered = isIn(finalMouseX, finalMouseY, sx + 12, sy + 12, 5, 5);
                     int color = hovered ? 0xFF00FFCC : 0xFF00AA88;
                     fill(ps, sx + 12, sy + 12, sx + 17, sy + 17, color);
@@ -118,9 +118,11 @@ public class BuildersWorkbenchScreen extends AbstractContainerScreen<BuildersWor
 
         // Render tab button tooltips
         if (isIn(finalMouseX, finalMouseY, px + 8, py - 12, 16, 16)) {
-            this.renderComponentTooltip(ps, java.util.List.of(new net.minecraft.network.chat.TextComponent("Color Builder")), finalMouseX, finalMouseY);
+            this.renderComponentTooltip(ps, java.util.List.of(new net.minecraft.network.chat.TranslatableComponent(
+                    "screen.buildscape.builders_workbench.color_builder")), finalMouseX, finalMouseY);
         } else if (isIn(finalMouseX, finalMouseY, px + 26, py - 12, 16, 16)) {
-            this.renderComponentTooltip(ps, java.util.List.of(new net.minecraft.network.chat.TextComponent("Gradient Builder")), finalMouseX, finalMouseY);
+            this.renderComponentTooltip(ps, java.util.List.of(new net.minecraft.network.chat.TranslatableComponent(
+                    "screen.buildscape.builders_workbench.gradient_builder")), finalMouseX, finalMouseY);
         }
 
         if (scale < 1.0f) {
@@ -140,8 +142,10 @@ public class BuildersWorkbenchScreen extends AbstractContainerScreen<BuildersWor
                 int row = i / 3;
                 int sx = px + 63 + col * 18;
                 int sy = py + 24 + row * 18;
-                if (!this.menu.getSlot(1 + i).getItem().isEmpty() && isIn(x, y, sx + 12, sy + 12, 5, 5)) {
-                    this.renderComponentTooltip(ps, java.util.List.of(new net.minecraft.network.chat.TextComponent("Cycle Block (Reroll)")), x, y);
+                if (!this.menu.getSlot(BuildersWorkbenchMenu.MENU_COLOR_RESULT_START + i).getItem().isEmpty()
+                        && isIn(x, y, sx + 12, sy + 12, 5, 5)) {
+                    this.renderComponentTooltip(ps, java.util.List.of(new net.minecraft.network.chat.TranslatableComponent(
+                            "screen.buildscape.builders_workbench.cycle")), x, y);
                     return;
                 }
             }
@@ -149,8 +153,10 @@ public class BuildersWorkbenchScreen extends AbstractContainerScreen<BuildersWor
             for (int i = 1; i < 8; i++) {
                 int sx = px + 8 + i * 18;
                 int sy = py + 77;
-                if (!this.menu.getSlot(12 + i).getItem().isEmpty() && isIn(x, y, sx + 12, sy + 12, 5, 5)) {
-                    this.renderComponentTooltip(ps, java.util.List.of(new net.minecraft.network.chat.TextComponent("Cycle Block (Reroll)")), x, y);
+                if (!this.menu.getSlot(BuildersWorkbenchMenu.MENU_GRADIENT_OUTPUT_START + i).getItem().isEmpty()
+                        && isIn(x, y, sx + 12, sy + 12, 5, 5)) {
+                    this.renderComponentTooltip(ps, java.util.List.of(new net.minecraft.network.chat.TranslatableComponent(
+                            "screen.buildscape.builders_workbench.cycle")), x, y);
                     return;
                 }
             }
@@ -165,7 +171,8 @@ public class BuildersWorkbenchScreen extends AbstractContainerScreen<BuildersWor
                         || (activeTab == 1 && slotIndex >= (BuildersWorkbenchBlockEntity.SLOT_GRADIENT_START + 1) && slotIndex <= (BuildersWorkbenchBlockEntity.SLOT_GRADIENT_END - 1));
                 if (isResult) {
                     java.util.List<Component> tooltip = this.getTooltipFromItem(stack);
-                    tooltip.add(new net.minecraft.network.chat.TextComponent("§bClick corner button to cycle/reroll"));
+                    tooltip.add(new net.minecraft.network.chat.TranslatableComponent(
+                            "screen.buildscape.builders_workbench.cycle_hint"));
                     this.renderComponentTooltip(ps, tooltip, x, y);
                     return;
                 }
@@ -243,7 +250,8 @@ public class BuildersWorkbenchScreen extends AbstractContainerScreen<BuildersWor
         }
 
         // Title text centered on the pre-drawn top wooden banner
-        String titleText = "Color Builder";
+        String titleText = new net.minecraft.network.chat.TranslatableComponent(
+                "screen.buildscape.builders_workbench.color_builder").getString();
         int tw = this.font.width(titleText);
         this.font.draw(ps, new net.minecraft.network.chat.TextComponent(titleText), px + 56 + (64 - tw) / 2.0f, py - 4 + 3.0f, 0xFF372211);
 
@@ -277,7 +285,8 @@ public class BuildersWorkbenchScreen extends AbstractContainerScreen<BuildersWor
 
         // Title Banner (wooden banner centered at top)
         WbRenderer.drawTitleBanner(ps, px + 80, py + 6, 80, 14);
-        String titleText = "Gradient Builder";
+        String titleText = new net.minecraft.network.chat.TranslatableComponent(
+                "screen.buildscape.builders_workbench.gradient_builder").getString();
         int tw = this.font.width(titleText);
         this.font.draw(ps, new net.minecraft.network.chat.TextComponent(titleText), px + 80 + (80 - tw) / 2.0f, py + 6 + 3.0f, 0xFF372211);
 
@@ -305,9 +314,11 @@ public class BuildersWorkbenchScreen extends AbstractContainerScreen<BuildersWor
         boolean copyHov = isIn(mouseX, mouseY, px + 93, py + GRAD_BTN_Y, 72, GRAD_BTN_H);
 
         WbRenderer.drawActionButton(ps, this.font, px + 9, py + GRAD_BTN_Y, 72, GRAD_BTN_H,
-                "Solve Gradient", solveHov, false, 0xFF00BBCC);
+                new net.minecraft.network.chat.TranslatableComponent(
+                        "screen.buildscape.builders_workbench.solve").getString(), solveHov, false, 0xFF00BBCC);
         WbRenderer.drawActionButton(ps, this.font, px + 93, py + GRAD_BTN_Y, 72, GRAD_BTN_H,
-                "Copy to Pouch", copyHov, false, 0xFF00CC66);
+                new net.minecraft.network.chat.TranslatableComponent(
+                        "screen.buildscape.builders_workbench.copy").getString(), copyHov, false, 0xFF00CC66);
 
         // Separated Vanilla Player Inventory Panel (aligns perfectly with slots at py + 145)
         WbRenderer.drawVanillaInventory(ps, this.font, px + 31, py + 145, 176, 96);
@@ -362,7 +373,8 @@ public class BuildersWorkbenchScreen extends AbstractContainerScreen<BuildersWor
                 int row = i / 3;
                 int sx = px + 63 + col * 18;
                 int sy = py + 24 + row * 18;
-                if (!this.menu.getSlot(1 + i).getItem().isEmpty() && isIn(mx, my, sx + 12, sy + 12, 5, 5)) {
+                if (!this.menu.getSlot(BuildersWorkbenchMenu.MENU_COLOR_RESULT_START + i).getItem().isEmpty()
+                        && isIn(mx, my, sx + 12, sy + 12, 5, 5)) {
                     ModMessages.INSTANCE.sendToServer(
                             new BuildersWorkbenchActionPacket(3, this.menu.getBlockEntity().getBlockPos(), i)
                     );
@@ -377,7 +389,8 @@ public class BuildersWorkbenchScreen extends AbstractContainerScreen<BuildersWor
             for (int i = 1; i < 8; i++) { // only slots 1-7 (offsets index 1-7) can cycle
                 int sx = px + 8 + i * 18;
                 int sy = py + 77;
-                if (!this.menu.getSlot(12 + i).getItem().isEmpty() && isIn(mx, my, sx + 12, sy + 12, 5, 5)) {
+                if (!this.menu.getSlot(BuildersWorkbenchMenu.MENU_GRADIENT_OUTPUT_START + i).getItem().isEmpty()
+                        && isIn(mx, my, sx + 12, sy + 12, 5, 5)) {
                     ModMessages.INSTANCE.sendToServer(
                             new BuildersWorkbenchActionPacket(3, this.menu.getBlockEntity().getBlockPos(), i)
                     );

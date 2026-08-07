@@ -2,6 +2,6 @@
     "gui_light":  "front",
     "parent":  "builtin/entity",
     "textures":  {
-                     "particle":  "minecraft:block/copper_block"
+                     "particle":  "minecraft:block/exposed_copper"
                  }
 }

@@ -1,10 +1,13 @@
 {
   "type": "minecraft:crafting_shapeless",
-  "category": "building",
   "group": "waxed_copper_chest",
   "ingredients": [
-    "buildscape:copper_chest",
-    "minecraft:honeycomb"
+    {
+      "item": "buildscape:copper_chest"
+    },
+    {
+      "item": "minecraft:honeycomb"
+    }
   ],
   "result": {
     "count": 1,

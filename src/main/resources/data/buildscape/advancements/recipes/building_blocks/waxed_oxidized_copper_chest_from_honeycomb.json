@@ -2,26 +2,28 @@
   "parent": "minecraft:recipes/root",
   "criteria": {
     "has_oxidized_copper_chest": {
+      "trigger": "minecraft:inventory_changed",
       "conditions": {
         "items": [
           {
-            "items": "buildscape:oxidized_copper_chest"
+            "items": [
+              "buildscape:oxidized_copper_chest"
+            ]
           }
         ]
-      },
-      "trigger": "minecraft:inventory_changed"
+      }
     },
     "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
       "conditions": {
         "recipe": "buildscape:waxed_oxidized_copper_chest_from_honeycomb"
-      },
-      "trigger": "minecraft:recipe_unlocked"
+      }
     }
   },
   "requirements": [
     [
-      "has_the_recipe",
-      "has_oxidized_copper_chest"
+      "has_oxidized_copper_chest",
+      "has_the_recipe"
     ]
   ],
   "rewards": {

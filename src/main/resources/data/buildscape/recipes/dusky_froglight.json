@@ -1,0 +1,15 @@
+{
+    "ingredients":  [
+                        {
+                            "item":  "minecraft:shroomlight"
+                        },
+                        {
+                            "item":  "minecraft:brown_dye"
+                        }
+                    ],
+    "result":  {
+                   "count":  1,
+                   "item":  "buildscape:dusky_froglight"
+               },
+    "type":  "minecraft:crafting_shapeless"
+}

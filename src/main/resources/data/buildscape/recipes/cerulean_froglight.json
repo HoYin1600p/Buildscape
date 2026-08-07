@@ -1,0 +1,15 @@
+{
+    "ingredients":  [
+                        {
+                            "item":  "minecraft:shroomlight"
+                        },
+                        {
+                            "item":  "minecraft:light_blue_dye"
+                        }
+                    ],
+    "result":  {
+                   "count":  1,
+                   "item":  "buildscape:cerulean_froglight"
+               },
+    "type":  "minecraft:crafting_shapeless"
+}

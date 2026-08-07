@@ -1,0 +1,16 @@
+{
+    "key":  {
+                "N":  {
+                          "item":  "buildscape:copper_nugget"
+                      }
+            },
+    "pattern":  [
+                    "NNN",
+                    "NNN"
+                ],
+    "result":  {
+                   "count":  16,
+                   "item":  "buildscape:copper_mesh"
+               },
+    "type":  "minecraft:crafting_shaped"
+}

@@ -12355,5 +12355,174 @@ public class ModBlocks {
                                                         .isSuffocating((state, reader, pos) -> false)
                                                         .isViewBlocking((state, reader, pos) -> false),
                                         ModItems.SNOWY_YELLOW_POPLAR_LEAF_HEDGE));
+
+        // --- WOOD & BAMBOO LADDERS ---
+        public static final RegistryObject<Block> ACACIA_LADDER = BLOCKS.register("acacia_ladder",
+                        () -> new net.minecraft.world.level.block.LadderBlock(BlockBehaviour.Properties.copy(net.minecraft.world.level.block.Blocks.LADDER)));
+        public static final RegistryObject<Block> ASHPEN_BLACK_LADDER = BLOCKS.register("ashpen_black_ladder",
+                        () -> new net.minecraft.world.level.block.LadderBlock(BlockBehaviour.Properties.copy(net.minecraft.world.level.block.Blocks.LADDER)));
+        public static final RegistryObject<Block> ASHPEN_BLUE_LADDER = BLOCKS.register("ashpen_blue_ladder",
+                        () -> new net.minecraft.world.level.block.LadderBlock(BlockBehaviour.Properties.copy(net.minecraft.world.level.block.Blocks.LADDER)));
+        public static final RegistryObject<Block> ASHPEN_BROWN_LADDER = BLOCKS.register("ashpen_brown_ladder",
+                        () -> new net.minecraft.world.level.block.LadderBlock(BlockBehaviour.Properties.copy(net.minecraft.world.level.block.Blocks.LADDER)));
+        public static final RegistryObject<Block> ASHPEN_CYAN_LADDER = BLOCKS.register("ashpen_cyan_ladder",
+                        () -> new net.minecraft.world.level.block.LadderBlock(BlockBehaviour.Properties.copy(net.minecraft.world.level.block.Blocks.LADDER)));
+        public static final RegistryObject<Block> ASHPEN_GRAY_LADDER = BLOCKS.register("ashpen_gray_ladder",
+                        () -> new net.minecraft.world.level.block.LadderBlock(BlockBehaviour.Properties.copy(net.minecraft.world.level.block.Blocks.LADDER)));
+        public static final RegistryObject<Block> ASHPEN_GREEN_LADDER = BLOCKS.register("ashpen_green_ladder",
+                        () -> new net.minecraft.world.level.block.LadderBlock(BlockBehaviour.Properties.copy(net.minecraft.world.level.block.Blocks.LADDER)));
+        public static final RegistryObject<Block> ASHPEN_LIGHT_BLUE_LADDER = BLOCKS.register("ashpen_light_blue_ladder",
+                        () -> new net.minecraft.world.level.block.LadderBlock(BlockBehaviour.Properties.copy(net.minecraft.world.level.block.Blocks.LADDER)));
+        public static final RegistryObject<Block> ASHPEN_LIGHT_GRAY_LADDER = BLOCKS.register("ashpen_light_gray_ladder",
+                        () -> new net.minecraft.world.level.block.LadderBlock(BlockBehaviour.Properties.copy(net.minecraft.world.level.block.Blocks.LADDER)));
+        public static final RegistryObject<Block> ASHPEN_LIME_LADDER = BLOCKS.register("ashpen_lime_ladder",
+                        () -> new net.minecraft.world.level.block.LadderBlock(BlockBehaviour.Properties.copy(net.minecraft.world.level.block.Blocks.LADDER)));
+        public static final RegistryObject<Block> ASHPEN_MAGENTA_LADDER = BLOCKS.register("ashpen_magenta_ladder",
+                        () -> new net.minecraft.world.level.block.LadderBlock(BlockBehaviour.Properties.copy(net.minecraft.world.level.block.Blocks.LADDER)));
+        public static final RegistryObject<Block> ASHPEN_ORANGE_LADDER = BLOCKS.register("ashpen_orange_ladder",
+                        () -> new net.minecraft.world.level.block.LadderBlock(BlockBehaviour.Properties.copy(net.minecraft.world.level.block.Blocks.LADDER)));
+        public static final RegistryObject<Block> ASHPEN_PINK_LADDER = BLOCKS.register("ashpen_pink_ladder",
+                        () -> new net.minecraft.world.level.block.LadderBlock(BlockBehaviour.Properties.copy(net.minecraft.world.level.block.Blocks.LADDER)));
+        public static final RegistryObject<Block> ASHPEN_PURPLE_LADDER = BLOCKS.register("ashpen_purple_ladder",
+                        () -> new net.minecraft.world.level.block.LadderBlock(BlockBehaviour.Properties.copy(net.minecraft.world.level.block.Blocks.LADDER)));
+        public static final RegistryObject<Block> ASHPEN_RED_LADDER = BLOCKS.register("ashpen_red_ladder",
+                        () -> new net.minecraft.world.level.block.LadderBlock(BlockBehaviour.Properties.copy(net.minecraft.world.level.block.Blocks.LADDER)));
+        public static final RegistryObject<Block> ASHPEN_WHITE_LADDER = BLOCKS.register("ashpen_white_ladder",
+                        () -> new net.minecraft.world.level.block.LadderBlock(BlockBehaviour.Properties.copy(net.minecraft.world.level.block.Blocks.LADDER)));
+        public static final RegistryObject<Block> ASHPEN_YELLOW_LADDER = BLOCKS.register("ashpen_yellow_ladder",
+                        () -> new net.minecraft.world.level.block.LadderBlock(BlockBehaviour.Properties.copy(net.minecraft.world.level.block.Blocks.LADDER)));
+        public static final RegistryObject<Block> BAMBOO_LADDER = BLOCKS.register("bamboo_ladder",
+                        () -> new net.minecraft.world.level.block.LadderBlock(BlockBehaviour.Properties.copy(net.minecraft.world.level.block.Blocks.LADDER)));
+        public static final RegistryObject<Block> BIRCH_LADDER = BLOCKS.register("birch_ladder",
+                        () -> new net.minecraft.world.level.block.LadderBlock(BlockBehaviour.Properties.copy(net.minecraft.world.level.block.Blocks.LADDER)));
+        public static final RegistryObject<Block> CHERRY_LADDER = BLOCKS.register("cherry_ladder",
+                        () -> new net.minecraft.world.level.block.LadderBlock(BlockBehaviour.Properties.copy(net.minecraft.world.level.block.Blocks.LADDER)));
+        public static final RegistryObject<Block> CRIMSON_LADDER = BLOCKS.register("crimson_ladder",
+                        () -> new net.minecraft.world.level.block.LadderBlock(BlockBehaviour.Properties.copy(net.minecraft.world.level.block.Blocks.LADDER)));
+        public static final RegistryObject<Block> DARK_OAK_LADDER = BLOCKS.register("dark_oak_ladder",
+                        () -> new net.minecraft.world.level.block.LadderBlock(BlockBehaviour.Properties.copy(net.minecraft.world.level.block.Blocks.LADDER)));
+        public static final RegistryObject<Block> JUNGLE_LADDER = BLOCKS.register("jungle_ladder",
+                        () -> new net.minecraft.world.level.block.LadderBlock(BlockBehaviour.Properties.copy(net.minecraft.world.level.block.Blocks.LADDER)));
+        public static final RegistryObject<Block> MANGROVE_LADDER = BLOCKS.register("mangrove_ladder",
+                        () -> new net.minecraft.world.level.block.LadderBlock(BlockBehaviour.Properties.copy(net.minecraft.world.level.block.Blocks.LADDER)));
+        public static final RegistryObject<Block> OAK_LADDER = BLOCKS.register("oak_ladder",
+                        () -> new net.minecraft.world.level.block.LadderBlock(BlockBehaviour.Properties.copy(net.minecraft.world.level.block.Blocks.LADDER)));
+        public static final RegistryObject<Block> PALE_OAK_LADDER = BLOCKS.register("pale_oak_ladder",
+                        () -> new net.minecraft.world.level.block.LadderBlock(BlockBehaviour.Properties.copy(net.minecraft.world.level.block.Blocks.LADDER)));
+        public static final RegistryObject<Block> POPLAR_LADDER = BLOCKS.register("poplar_ladder",
+                        () -> new net.minecraft.world.level.block.LadderBlock(BlockBehaviour.Properties.copy(net.minecraft.world.level.block.Blocks.LADDER)));
+        public static final RegistryObject<Block> SPRUCE_LADDER = BLOCKS.register("spruce_ladder",
+                        () -> new net.minecraft.world.level.block.LadderBlock(BlockBehaviour.Properties.copy(net.minecraft.world.level.block.Blocks.LADDER)));
+        public static final RegistryObject<Block> STRIPPED_BAMBOO_LADDER = BLOCKS.register("stripped_bamboo_ladder",
+                        () -> new net.minecraft.world.level.block.LadderBlock(BlockBehaviour.Properties.copy(net.minecraft.world.level.block.Blocks.LADDER)));
+        public static final RegistryObject<Block> WARPED_LADDER = BLOCKS.register("warped_ladder",
+                        () -> new net.minecraft.world.level.block.LadderBlock(BlockBehaviour.Properties.copy(net.minecraft.world.level.block.Blocks.LADDER)));
+
+        // --- COPPER CHESTS ---
+        public static final RegistryObject<Block> COPPER_CHEST = BLOCKS.register("copper_chest",
+                        () -> new CopperChestBlock(false, BlockBehaviour.Properties.copy(net.minecraft.world.level.block.Blocks.CHEST).sound(net.minecraft.world.level.block.SoundType.COPPER), () -> ModBlockEntities.COPPER_CHEST.get()));
+        public static final RegistryObject<Block> EXPOSED_COPPER_CHEST = BLOCKS.register("exposed_copper_chest",
+                        () -> new CopperChestBlock(false, BlockBehaviour.Properties.copy(net.minecraft.world.level.block.Blocks.CHEST).sound(net.minecraft.world.level.block.SoundType.COPPER), () -> ModBlockEntities.COPPER_CHEST.get()));
+        public static final RegistryObject<Block> WEATHERED_COPPER_CHEST = BLOCKS.register("weathered_copper_chest",
+                        () -> new CopperChestBlock(false, BlockBehaviour.Properties.copy(net.minecraft.world.level.block.Blocks.CHEST).sound(net.minecraft.world.level.block.SoundType.COPPER), () -> ModBlockEntities.COPPER_CHEST.get()));
+        public static final RegistryObject<Block> OXIDIZED_COPPER_CHEST = BLOCKS.register("oxidized_copper_chest",
+                        () -> new CopperChestBlock(false, BlockBehaviour.Properties.copy(net.minecraft.world.level.block.Blocks.CHEST).sound(net.minecraft.world.level.block.SoundType.COPPER), () -> ModBlockEntities.COPPER_CHEST.get()));
+        public static final RegistryObject<Block> WAXED_COPPER_CHEST = BLOCKS.register("waxed_copper_chest",
+                        () -> new CopperChestBlock(true, BlockBehaviour.Properties.copy(net.minecraft.world.level.block.Blocks.CHEST).sound(net.minecraft.world.level.block.SoundType.COPPER), () -> ModBlockEntities.COPPER_CHEST.get()));
+        public static final RegistryObject<Block> WAXED_EXPOSED_COPPER_CHEST = BLOCKS.register("waxed_exposed_copper_chest",
+                        () -> new CopperChestBlock(true, BlockBehaviour.Properties.copy(net.minecraft.world.level.block.Blocks.CHEST).sound(net.minecraft.world.level.block.SoundType.COPPER), () -> ModBlockEntities.COPPER_CHEST.get()));
+        public static final RegistryObject<Block> WAXED_WEATHERED_COPPER_CHEST = BLOCKS.register("waxed_weathered_copper_chest",
+                        () -> new CopperChestBlock(true, BlockBehaviour.Properties.copy(net.minecraft.world.level.block.Blocks.CHEST).sound(net.minecraft.world.level.block.SoundType.COPPER), () -> ModBlockEntities.COPPER_CHEST.get()));
+        public static final RegistryObject<Block> WAXED_OXIDIZED_COPPER_CHEST = BLOCKS.register("waxed_oxidized_copper_chest",
+                        () -> new CopperChestBlock(true, BlockBehaviour.Properties.copy(net.minecraft.world.level.block.Blocks.CHEST).sound(net.minecraft.world.level.block.SoundType.COPPER), () -> ModBlockEntities.COPPER_CHEST.get()));
+
+        // --- BARS AND MESHES ---
+        public static final RegistryObject<Block> GOLD_BARS = BLOCKS.register("gold_bars",
+                        () -> new net.minecraft.world.level.block.IronBarsBlock(BlockBehaviour.Properties.copy(net.minecraft.world.level.block.Blocks.IRON_BARS)));
+        public static final RegistryObject<Block> STEEL_BARS = BLOCKS.register("steel_bars",
+                        () -> new net.minecraft.world.level.block.IronBarsBlock(BlockBehaviour.Properties.copy(net.minecraft.world.level.block.Blocks.IRON_BARS)));
+
+        public static final RegistryObject<Block> IRON_MESH = BLOCKS.register("iron_mesh",
+                        () -> new net.minecraft.world.level.block.IronBarsBlock(BlockBehaviour.Properties.copy(net.minecraft.world.level.block.Blocks.IRON_BARS)));
+        public static final RegistryObject<Block> GOLD_MESH = BLOCKS.register("gold_mesh",
+                        () -> new net.minecraft.world.level.block.IronBarsBlock(BlockBehaviour.Properties.copy(net.minecraft.world.level.block.Blocks.IRON_BARS)));
+        public static final RegistryObject<Block> STEEL_MESH = BLOCKS.register("steel_mesh",
+                        () -> new net.minecraft.world.level.block.IronBarsBlock(BlockBehaviour.Properties.copy(net.minecraft.world.level.block.Blocks.IRON_BARS)));
+
+        public static final RegistryObject<Block> COPPER_MESH = BLOCKS.register("copper_mesh",
+                        () -> new WeatheringBarsBlock(BlockBehaviour.Properties.copy(net.minecraft.world.level.block.Blocks.IRON_BARS).sound(net.minecraft.world.level.block.SoundType.COPPER)));
+        public static final RegistryObject<Block> EXPOSED_COPPER_MESH = BLOCKS.register("exposed_copper_mesh",
+                        () -> new WeatheringBarsBlock(BlockBehaviour.Properties.copy(net.minecraft.world.level.block.Blocks.IRON_BARS).sound(net.minecraft.world.level.block.SoundType.COPPER)));
+        public static final RegistryObject<Block> WEATHERED_COPPER_MESH = BLOCKS.register("weathered_copper_mesh",
+                        () -> new WeatheringBarsBlock(BlockBehaviour.Properties.copy(net.minecraft.world.level.block.Blocks.IRON_BARS).sound(net.minecraft.world.level.block.SoundType.COPPER)));
+        public static final RegistryObject<Block> OXIDIZED_COPPER_MESH = BLOCKS.register("oxidized_copper_mesh",
+                        () -> new WeatheringBarsBlock(BlockBehaviour.Properties.copy(net.minecraft.world.level.block.Blocks.IRON_BARS).sound(net.minecraft.world.level.block.SoundType.COPPER)));
+
+        public static final RegistryObject<Block> WAXED_COPPER_MESH = BLOCKS.register("waxed_copper_mesh",
+                        () -> new net.minecraft.world.level.block.IronBarsBlock(BlockBehaviour.Properties.copy(net.minecraft.world.level.block.Blocks.IRON_BARS).sound(net.minecraft.world.level.block.SoundType.COPPER)));
+        public static final RegistryObject<Block> WAXED_EXPOSED_COPPER_MESH = BLOCKS.register("waxed_exposed_copper_mesh",
+                        () -> new net.minecraft.world.level.block.IronBarsBlock(BlockBehaviour.Properties.copy(net.minecraft.world.level.block.Blocks.IRON_BARS).sound(net.minecraft.world.level.block.SoundType.COPPER)));
+        public static final RegistryObject<Block> WAXED_WEATHERED_COPPER_MESH = BLOCKS.register("waxed_weathered_copper_mesh",
+                        () -> new net.minecraft.world.level.block.IronBarsBlock(BlockBehaviour.Properties.copy(net.minecraft.world.level.block.Blocks.IRON_BARS).sound(net.minecraft.world.level.block.SoundType.COPPER)));
+        public static final RegistryObject<Block> WAXED_OXIDIZED_COPPER_MESH = BLOCKS.register("waxed_oxidized_copper_mesh",
+                        () -> new net.minecraft.world.level.block.IronBarsBlock(BlockBehaviour.Properties.copy(net.minecraft.world.level.block.Blocks.IRON_BARS).sound(net.minecraft.world.level.block.SoundType.COPPER)));
+
+        // --- FROGLIGHTS ---
+        public static final RegistryObject<Block> GLEAMING_FROGLIGHT = BLOCKS.register("gleaming_froglight",
+                        () -> new FroglightBlock(BlockBehaviour.Properties.copy(net.minecraft.world.level.block.Blocks.SHROOMLIGHT).lightLevel(state -> 15)));
+        public static final RegistryObject<Block> IVORY_FROGLIGHT = BLOCKS.register("ivory_froglight",
+                        () -> new FroglightBlock(BlockBehaviour.Properties.copy(net.minecraft.world.level.block.Blocks.SHROOMLIGHT).lightLevel(state -> 15)));
+        public static final RegistryObject<Block> ASHEN_FROGLIGHT = BLOCKS.register("ashen_froglight",
+                        () -> new FroglightBlock(BlockBehaviour.Properties.copy(net.minecraft.world.level.block.Blocks.SHROOMLIGHT).lightLevel(state -> 15)));
+        public static final RegistryObject<Block> ONYX_FROGLIGHT = BLOCKS.register("onyx_froglight",
+                        () -> new FroglightBlock(BlockBehaviour.Properties.copy(net.minecraft.world.level.block.Blocks.SHROOMLIGHT).lightLevel(state -> 15)));
+        public static final RegistryObject<Block> DUSKY_FROGLIGHT = BLOCKS.register("dusky_froglight",
+                        () -> new FroglightBlock(BlockBehaviour.Properties.copy(net.minecraft.world.level.block.Blocks.SHROOMLIGHT).lightLevel(state -> 15)));
+        public static final RegistryObject<Block> SCARLET_FROGLIGHT = BLOCKS.register("scarlet_froglight",
+                        () -> new FroglightBlock(BlockBehaviour.Properties.copy(net.minecraft.world.level.block.Blocks.SHROOMLIGHT).lightLevel(state -> 15)));
+        public static final RegistryObject<Block> RUSSET_FROGLIGHT = BLOCKS.register("russet_froglight",
+                        () -> new FroglightBlock(BlockBehaviour.Properties.copy(net.minecraft.world.level.block.Blocks.SHROOMLIGHT).lightLevel(state -> 15)));
+        public static final RegistryObject<Block> VERIDIAN_FROGLIGHT = BLOCKS.register("veridian_froglight",
+                        () -> new FroglightBlock(BlockBehaviour.Properties.copy(net.minecraft.world.level.block.Blocks.SHROOMLIGHT).lightLevel(state -> 15)));
+        public static final RegistryObject<Block> TIDAL_FROGLIGHT = BLOCKS.register("tidal_froglight",
+                        () -> new FroglightBlock(BlockBehaviour.Properties.copy(net.minecraft.world.level.block.Blocks.SHROOMLIGHT).lightLevel(state -> 15)));
+        public static final RegistryObject<Block> CERULEAN_FROGLIGHT = BLOCKS.register("cerulean_froglight",
+                        () -> new FroglightBlock(BlockBehaviour.Properties.copy(net.minecraft.world.level.block.Blocks.SHROOMLIGHT).lightLevel(state -> 15)));
+        public static final RegistryObject<Block> AZURE_FROGLIGHT = BLOCKS.register("azure_froglight",
+                        () -> new FroglightBlock(BlockBehaviour.Properties.copy(net.minecraft.world.level.block.Blocks.SHROOMLIGHT).lightLevel(state -> 15)));
+        public static final RegistryObject<Block> IRIDESCENT_FROGLIGHT = BLOCKS.register("iridescent_froglight",
+                        () -> new FroglightBlock(BlockBehaviour.Properties.copy(net.minecraft.world.level.block.Blocks.SHROOMLIGHT).lightLevel(state -> 15)));
+        public static final RegistryObject<Block> CORALINE_FROGLIGHT = BLOCKS.register("coraline_froglight",
+                        () -> new FroglightBlock(BlockBehaviour.Properties.copy(net.minecraft.world.level.block.Blocks.SHROOMLIGHT).lightLevel(state -> 15)));
+
+        // --- LARGE COPPER CHAINS ---
+        public static final RegistryObject<Block> LARGE_COPPER_CHAIN = BLOCKS.register(
+                        "large_copper_chain",
+                        () -> new LargeChainBlock(
+                                        BlockBehaviour.Properties.copy(Blocks.CHAIN)
+                                                        .sound(net.minecraft.world.level.block.SoundType.CHAIN)
+                        )
+        );
+        public static final RegistryObject<Block> LARGE_EXPOSED_COPPER_CHAIN = BLOCKS.register(
+                        "large_exposed_copper_chain",
+                        () -> new LargeChainBlock(
+                                        BlockBehaviour.Properties.copy(Blocks.CHAIN)
+                                                        .sound(net.minecraft.world.level.block.SoundType.CHAIN)
+                        )
+        );
+        public static final RegistryObject<Block> LARGE_WEATHERED_COPPER_CHAIN = BLOCKS.register(
+                        "large_weathered_copper_chain",
+                        () -> new LargeChainBlock(
+                                        BlockBehaviour.Properties.copy(Blocks.CHAIN)
+                                                        .sound(net.minecraft.world.level.block.SoundType.CHAIN)
+                        )
+        );
+        public static final RegistryObject<Block> LARGE_OXIDIZED_COPPER_CHAIN = BLOCKS.register(
+                        "large_oxidized_copper_chain",
+                        () -> new LargeChainBlock(
+                                        BlockBehaviour.Properties.copy(Blocks.CHAIN)
+                                                        .sound(net.minecraft.world.level.block.SoundType.CHAIN)
+                        )
+        );
 }
 

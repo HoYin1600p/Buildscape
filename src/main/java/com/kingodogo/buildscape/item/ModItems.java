@@ -5821,6 +5821,11 @@ public class ModItems {
             )
     );
 
+    public static final RegistryObject<Item> BUILDERS_POUCH = ITEMS.register(
+            "builders_pouch",
+            () -> new BuildersPouchItem(new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB))
+    );
+
     public static final RegistryObject<Item> SNOW_STAIRS = ITEMS.register(
             "snow_stairs",
             () ->

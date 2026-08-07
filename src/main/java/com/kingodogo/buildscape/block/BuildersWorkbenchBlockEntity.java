@@ -18,18 +18,19 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
 import javax.annotation.Nullable;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 public class BuildersWorkbenchBlockEntity extends BlockEntity implements MenuProvider, Container {
 
     /**
-     * Slot layout (22 total workbench slots):
+     * Slot layout (30 total workbench slots):
      * 0        – Color Picker tool slot
-     * 1–9      – Color Preset / Gradient Input slots (user-editable)
+     * 1–9      – Color result slots
      * 10        – Input Pouch slot
      * 11        – Output Pouch slot
      * 12–20     – Gradient Output slots (server-written, read-only for players)
+     * 21–29     – Gradient Input slots (user-editable)
      */
     public static final int SLOT_COLOR_PICKER = 0;
     public static final int SLOT_PRESETS_START = 1;
@@ -223,16 +224,14 @@ public class BuildersWorkbenchBlockEntity extends BlockEntity implements MenuPro
             setChanged();
             if (copyProgress >= 40) { // 2 seconds
                 ItemStack pouchCopy = inPouch.copy();
-                writeSolvedToPouch(pouchCopy);
-
-                this.setItem(SLOT_OUTPUT_POUCH, pouchCopy);
-                this.setItem(SLOT_INPUT_POUCH, ItemStack.EMPTY);
-
+                if (writeSolvedToPouch(pouchCopy)) {
+                    this.setItem(SLOT_OUTPUT_POUCH, pouchCopy);
+                    this.setItem(SLOT_INPUT_POUCH, ItemStack.EMPTY);
+                    level.playSound(null, pos, net.minecraft.sounds.SoundEvents.EXPERIENCE_ORB_PICKUP,
+                            net.minecraft.sounds.SoundSource.BLOCKS, 0.5f, 1.0f);
+                }
                 copyProgress = 0;
                 setChanged();
-
-                level.playSound(null, pos, net.minecraft.sounds.SoundEvents.EXPERIENCE_ORB_PICKUP,
-                        net.minecraft.sounds.SoundSource.BLOCKS, 0.5f, 1.0f);
             }
         } else {
             if (copyProgress != 0) {
@@ -242,7 +241,7 @@ public class BuildersWorkbenchBlockEntity extends BlockEntity implements MenuPro
         }
     }
 
-    private boolean hasSolvedItems() {
+    public boolean hasSolvedItems() {
         if (activeTab == 0) {
             return !this.getItem(SLOT_COLOR_PICKER).isEmpty();
         } else {
@@ -253,133 +252,84 @@ public class BuildersWorkbenchBlockEntity extends BlockEntity implements MenuPro
         }
     }
 
-    public void writeSolvedToPouch(ItemStack pouch) {
+    public boolean writeSolvedToPouch(ItemStack pouch) {
+        List<ItemStack> solved = getSolvedItems();
+        if (pouch.getItem() instanceof com.kingodogo.buildscape.item.BuildersPouchItem) {
+            com.kingodogo.buildscape.item.BuildersPouchInventory inventory =
+                    new com.kingodogo.buildscape.item.BuildersPouchInventory(pouch);
+            for (int i = 0; i < solved.size(); i++) {
+                ItemStack stored = inventory.getItem(i);
+                ItemStack filter = solved.get(i);
+                if (!stored.isEmpty() && (filter.isEmpty() || stored.getItem() != filter.getItem())) {
+                    return false;
+                }
+            }
+            com.kingodogo.buildscape.item.BuildersPouchItem.setFilters(pouch, solved);
+            return true;
+        }
+
         if (pouch.getItem() instanceof net.minecraft.world.item.BlockItem bi
                 && bi.getBlock() instanceof net.minecraft.world.level.block.ShulkerBoxBlock) {
-            writeSolvedToShulker(pouch);
-            return;
+            return writeSolvedToShulker(pouch, solved);
         }
-
-        CompoundTag pouchTag = pouch.getOrCreateTag();
-        ListTag solvedList = new ListTag();
-
-        if (activeTab == 0) {
-            for (int i = 0; i < 9; i++) {
-                ItemStack stack = this.getItem(SLOT_PRESETS_START + i);
-                if (!stack.isEmpty()) {
-                    CompoundTag slotTag = new CompoundTag();
-                    slotTag.putInt("Slot", i);
-                    slotTag.put("Item", stack.save(new CompoundTag()));
-                    solvedList.add(slotTag);
-                }
-            }
-        } else {
-            for (int i = 0; i < 9; i++) {
-                ItemStack stack = this.getItem(SLOT_GRADIENT_START + i);
-                if (!stack.isEmpty()) {
-                    CompoundTag slotTag = new CompoundTag();
-                    slotTag.putInt("Slot", i);
-                    slotTag.put("Item", stack.save(new CompoundTag()));
-                    solvedList.add(slotTag);
-                }
-            }
-        }
-        pouchTag.put("SolvedGradients", solvedList);
-        pouchTag.putIntArray("StoredCounts", new int[9]);
+        return false;
     }
 
-    public void writeSolvedToShulker(ItemStack shulker) {
+    private List<ItemStack> getSolvedItems() {
+        List<ItemStack> solved = new ArrayList<>(9);
+        int firstSlot = activeTab == 0 ? SLOT_PRESETS_START : SLOT_GRADIENT_START;
+        for (int i = 0; i < 9; i++) solved.add(this.getItem(firstSlot + i));
+        return solved;
+    }
+
+    private boolean writeSolvedToShulker(ItemStack shulker, List<ItemStack> solved) {
         NonNullList<ItemStack> shulkerItems = NonNullList.withSize(27, ItemStack.EMPTY);
         CompoundTag blockEntityTag = shulker.getTagElement("BlockEntityTag");
         if (blockEntityTag != null && blockEntityTag.contains("Items", 9)) {
             ContainerHelper.loadAllItems(blockEntityTag, shulkerItems);
         }
 
-        // Find the first row of 9 slots that doesn't have any items
-        int targetRow = 0;
-        for (int r = 0; r < 3; r++) {
-            boolean rowHasItems = false;
-            for (int c = 0; c < 9; c++) {
-                int slotIdx = r * 9 + c;
-                if (!shulkerItems.get(slotIdx).isEmpty()) {
-                    rowHasItems = true;
+        CompoundTag beTag = shulker.getOrCreateTagElement("BlockEntityTag");
+        ListTag savedFilters = beTag.getList("GhostFilters", 8);
+        List<String> filters = new ArrayList<>(27);
+        for (int i = 0; i < 27; i++) {
+            filters.add(i < savedFilters.size() ? savedFilters.getString(i) : "");
+            ItemStack item = shulkerItems.get(i);
+            if (!item.isEmpty() && item.hasTag() && item.getTag().getBoolean("ghost")) {
+                net.minecraft.resources.ResourceLocation id =
+                        net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(item.getItem());
+                if (filters.get(i).isEmpty() && id != null) filters.set(i, id.toString());
+                shulkerItems.set(i, ItemStack.EMPTY);
+            }
+        }
+
+        int targetRow = -1;
+        for (int row = 0; row < 3 && targetRow < 0; row++) {
+            boolean available = true;
+            for (int col = 0; col < 9; col++) {
+                int slot = row * 9 + col;
+                if (!shulkerItems.get(slot).isEmpty() || !filters.get(slot).isEmpty()) {
+                    available = false;
                     break;
                 }
             }
-            if (!rowHasItems) {
-                targetRow = r;
-                break;
-            }
-            targetRow = r; // fallback to row 3 (idx 2)
+            if (available) targetRow = row;
         }
+        if (targetRow < 0) return false;
 
-        // Get the 9 solved blocks based on the active tab
-        List<ItemStack> solved = new ArrayList<>();
-        if (this.activeTab == 0) {
-            for (int i = 0; i < 9; i++) {
-                solved.add(this.getItem(SLOT_PRESETS_START + i));
-            }
-        } else {
-            for (int i = 0; i < 9; i++) {
-                solved.add(this.getItem(SLOT_GRADIENT_START + i));
-            }
-        }
-
-        // Populate the target row with solved items marked as ghost
         for (int i = 0; i < 9; i++) {
-            int slotIdx = targetRow * 9 + i;
+            int slot = targetRow * 9 + i;
             ItemStack solvedStack = solved.get(i);
-            if (!solvedStack.isEmpty()) {
-                ItemStack ghostCopy = solvedStack.copy();
-                ghostCopy.setCount(1);
-                ghostCopy.getOrCreateTag().putBoolean("ghost", true);
-                shulkerItems.set(slotIdx, ghostCopy);
-            } else {
-                shulkerItems.set(slotIdx, ItemStack.EMPTY);
-            }
+            net.minecraft.resources.ResourceLocation itemId = solvedStack.isEmpty() ? null
+                    : net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(solvedStack.getItem());
+            filters.set(slot, itemId == null ? "" : itemId.toString());
         }
 
-        CompoundTag beTag = shulker.getOrCreateTagElement("BlockEntityTag");
-        ContainerHelper.saveAllItems(beTag, shulkerItems);
-
-        // Read or create GhostFilters list tag
-        ListTag ghostFiltersList = new ListTag();
-        if (beTag.contains("GhostFilters", 9)) {
-            ghostFiltersList = beTag.getList("GhostFilters", 8);
-        }
-        
-        // Pad to size 27 if it is smaller
-        List<String> filters = new ArrayList<>();
-        for (int i = 0; i < 27; i++) {
-            if (i < ghostFiltersList.size()) {
-                filters.add(ghostFiltersList.getString(i));
-            } else {
-                filters.add("");
-            }
-        }
-
-        // Set the filters for the target row
-        for (int i = 0; i < 9; i++) {
-            int slotIdx = targetRow * 9 + i;
-            ItemStack solvedStack = solved.get(i);
-            if (!solvedStack.isEmpty()) {
-                net.minecraft.resources.ResourceLocation itemId = net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(solvedStack.getItem());
-                if (itemId != null) {
-                    filters.set(slotIdx, itemId.toString());
-                } else {
-                    filters.set(slotIdx, "");
-                }
-            } else {
-                filters.set(slotIdx, "");
-            }
-        }
-
-        // Save filters back to beTag
         ListTag newGhostFiltersList = new ListTag();
-        for (int i = 0; i < 27; i++) {
-            newGhostFiltersList.add(net.minecraft.nbt.StringTag.valueOf(filters.get(i)));
-        }
+        for (String filter : filters) newGhostFiltersList.add(net.minecraft.nbt.StringTag.valueOf(filter));
+        ContainerHelper.saveAllItems(beTag, shulkerItems);
         beTag.put("GhostFilters", newGhostFiltersList);
+        return true;
     }
 
     @Override
@@ -403,6 +353,7 @@ public class BuildersWorkbenchBlockEntity extends BlockEntity implements MenuPro
     }
 
     public void setActiveTab(int tab) {
+        if (tab < 0 || tab > 1) return;
         this.activeTab = tab;
         setChanged();
         if (tab == 0) {
@@ -415,6 +366,7 @@ public class BuildersWorkbenchBlockEntity extends BlockEntity implements MenuPro
     }
 
     public void setFilterMask(int mask) {
+        if (mask < 0 || mask > 2) return;
         this.filterMask = mask;
         setChanged();
         if (activeTab == 0) {
@@ -442,6 +394,8 @@ public class BuildersWorkbenchBlockEntity extends BlockEntity implements MenuPro
     }
 
     public void incrementResultOffset(int index) {
+        if (index < 0 || index >= resultOffsets.length) return;
+        if (activeTab == 1 && (index == 0 || index == resultOffsets.length - 1)) return;
         resultOffsets[index]++;
         setChanged();
         if (activeTab == 0) {
@@ -485,8 +439,7 @@ public class BuildersWorkbenchBlockEntity extends BlockEntity implements MenuPro
 
      public static boolean isPouch(ItemStack stack) {
          if (stack.isEmpty()) return false;
-         net.minecraft.resources.ResourceLocation name = net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(stack.getItem());
-         if (name != null && name.getPath().equals("builders_pouch")) return true;
+         if (stack.getItem() instanceof com.kingodogo.buildscape.item.BuildersPouchItem) return true;
          return stack.getItem() instanceof net.minecraft.world.item.BlockItem bi
                  && bi.getBlock() instanceof net.minecraft.world.level.block.ShulkerBoxBlock;
      }

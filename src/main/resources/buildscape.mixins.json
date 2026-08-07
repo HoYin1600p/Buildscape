@@ -21,9 +21,11 @@
     "StonecutterMenuMixin",
     "VineBlockMixin",
     "WallBlockMixin",
-    "ShulkerBoxBlockEntityMixin"
+    "ShulkerBoxBlockEntityMixin",
+    "ShulkerBoxMenuMixin"
   ],
   "client": [
+    "AbstractContainerScreenMixin",
     "BuildscapeBlockModelMixin",
     "BuildscapeBlockStateCacheMixin",
     "BuildscapeForgeRegistryMixin",

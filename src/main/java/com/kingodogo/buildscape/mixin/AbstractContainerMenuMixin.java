@@ -1,6 +1,7 @@
 package com.kingodogo.buildscape.mixin;
 
 import com.kingodogo.buildscape.util.StonecutterMenuExtension;
+import com.kingodogo.buildscape.util.GhostFilterMenu;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ClickType;
@@ -22,80 +23,29 @@ public abstract class AbstractContainerMenuMixin {
     private void onBeforeClicked(int slotId, int buttonId, ClickType clickType, Player player, CallbackInfo ci) {
         AbstractContainerMenu containerMenu = (AbstractContainerMenu) (Object) this;
 
-        // Custom Quick Move (Shift-Click) handling to insert items matching ghost filters
-        if (clickType == ClickType.QUICK_MOVE && slotId >= 0 && slotId < containerMenu.slots.size()) {
-            net.minecraft.world.inventory.Slot clickedSlot = containerMenu.getSlot(slotId);
-            ItemStack clickedStack = clickedSlot.getItem();
-            if (!clickedStack.isEmpty() && !(clickedStack.hasTag() && clickedStack.getTag().getBoolean("ghost"))) {
-                // Search for matching empty/ghost filter slot in the container
-                for (int i = 0; i < containerMenu.slots.size(); i++) {
-                    net.minecraft.world.inventory.Slot targetSlot = containerMenu.getSlot(i);
-                    if (targetSlot.container instanceof com.kingodogo.buildscape.util.GhostFilterable filterable) {
-                        String filterId = filterable.buildscape$getGhostFilters()[targetSlot.getContainerSlot()];
-                        if (filterId != null && !filterId.isEmpty()) {
-                            net.minecraft.resources.ResourceLocation resLoc = new net.minecraft.resources.ResourceLocation(filterId);
-                            net.minecraft.world.item.Item filterItem = net.minecraftforge.registries.ForgeRegistries.ITEMS.getValue(resLoc);
-                            if (filterItem != null && clickedStack.getItem() == filterItem) {
-                                ItemStack targetStack = targetSlot.getItem();
-                                if (targetStack.isEmpty() || (targetStack.hasTag() && targetStack.getTag().getBoolean("ghost"))) {
-                                    // Move item to the filter slot
-                                    ItemStack newSlotStack = clickedStack.copy();
-                                    targetSlot.set(newSlotStack);
-                                    clickedSlot.set(ItemStack.EMPTY);
-                                    containerMenu.broadcastChanges();
-                                    ci.cancel();
-                                    return;
-                                }
-                            }
-                        }
-                    }
+        if ((Object) this instanceof net.minecraft.world.inventory.ShulkerBoxMenu
+                && (Object) this instanceof GhostFilterMenu filterMenu) {
+            if (clickType == ClickType.QUICK_MOVE && slotId >= filterMenu.buildscape$getFilterSlotCount()
+                    && slotId < containerMenu.slots.size()) {
+                net.minecraft.world.inventory.Slot sourceSlot = containerMenu.getSlot(slotId);
+                ItemStack source = sourceSlot.getItem();
+                if (!source.isEmpty() && hasFilters(filterMenu)) {
+                    moveToFilteredSlots(containerMenu, filterMenu, source);
+                    if (source.isEmpty()) sourceSlot.set(ItemStack.EMPTY);
+                    else sourceSlot.setChanged();
+                    containerMenu.broadcastChanges();
+                    ci.cancel();
+                    return;
                 }
             }
-        }
 
-        if (slotId >= 0 && slotId < containerMenu.slots.size()) {
-            net.minecraft.world.inventory.Slot slot = containerMenu.getSlot(slotId);
-            if (slot.container instanceof com.kingodogo.buildscape.util.GhostFilterable filterable) {
-                String filterId = filterable.buildscape$getGhostFilters()[slot.getContainerSlot()];
-                if (filterId != null && !filterId.isEmpty()) {
-                    net.minecraft.resources.ResourceLocation resLoc = new net.minecraft.resources.ResourceLocation(filterId);
-                    net.minecraft.world.item.Item filterItem = net.minecraftforge.registries.ForgeRegistries.ITEMS.getValue(resLoc);
-                    if (filterItem != null) {
-                        ItemStack slotStack = slot.getItem();
-                        // Slot is showing the ghost item
-                        if (slotStack.isEmpty() || (slotStack.hasTag() && slotStack.getTag().getBoolean("ghost"))) {
-                            if (clickType == ClickType.PICKUP) {
-                                ItemStack carried = containerMenu.getCarried();
-                                if (!carried.isEmpty() && carried.getItem() == filterItem && !(carried.hasTag() && carried.getTag().getBoolean("ghost"))) {
-                                    if (buttonId == 0) { // Left click: place all
-                                        ItemStack newSlotStack = carried.copy();
-                                        slot.set(newSlotStack);
-                                        containerMenu.setCarried(ItemStack.EMPTY);
-                                    } else if (buttonId == 1) { // Right click: place 1
-                                        ItemStack newSlotStack = carried.copy();
-                                        newSlotStack.setCount(1);
-                                        slot.set(newSlotStack);
-                                        carried.shrink(1);
-                                        containerMenu.setCarried(carried);
-                                    }
-                                    containerMenu.broadcastChanges();
-                                    ci.cancel();
-                                    return;
-                                }
-                            }
-                            // Cancel all other interactions when slot is showing ghost filter
-                            ci.cancel();
-                            return;
-                        }
-                    }
+            if (slotId >= 0 && slotId < filterMenu.buildscape$getFilterSlotCount()) {
+                Item filter = filterMenu.buildscape$getFilterItem(slotId);
+                if (filter != null && wouldInsertMismatchedItem(containerMenu, player, clickType, buttonId, filter)) {
+                    ci.cancel();
+                    return;
                 }
             }
-        }
-
-        ItemStack carried = containerMenu.getCarried();
-        if (!carried.isEmpty() && carried.hasTag() && carried.getTag().getBoolean("ghost")) {
-            ci.cancel();
-            return;
         }
 
         if ((Object) this instanceof StonecutterMenu) {
@@ -176,27 +126,36 @@ public abstract class AbstractContainerMenuMixin {
         }
     }
 
-    @Inject(method = "clicked", at = @At("TAIL"))
-    private void onAfterClicked(int slotId, int buttonId, ClickType clickType, Player player, CallbackInfo ci) {
-        AbstractContainerMenu menu = (AbstractContainerMenu) (Object) this;
-        for (int i = 0; i < menu.slots.size(); i++) {
-            net.minecraft.world.inventory.Slot slot = menu.getSlot(i);
-            if (slot.container instanceof com.kingodogo.buildscape.util.GhostFilterable filterable) {
-                String filterId = filterable.buildscape$getGhostFilters()[slot.getContainerSlot()];
-                if (filterId != null && !filterId.isEmpty()) {
-                    ItemStack slotStack = slot.getItem();
-                    if (slotStack.isEmpty()) {
-                        net.minecraft.resources.ResourceLocation resLoc = new net.minecraft.resources.ResourceLocation(filterId);
-                        net.minecraft.world.item.Item filterItem = net.minecraftforge.registries.ForgeRegistries.ITEMS.getValue(resLoc);
-                        if (filterItem != null) {
-                            ItemStack ghostStack = new ItemStack(filterItem);
-                            ghostStack.setCount(1);
-                            ghostStack.getOrCreateTag().putBoolean("ghost", true);
-                            slot.set(ghostStack);
-                        }
-                    }
-                }
+    private static boolean hasFilters(GhostFilterMenu menu) {
+        for (int i = 0; i < menu.buildscape$getFilterSlotCount(); i++) {
+            if (menu.buildscape$getFilterItem(i) != null) return true;
+        }
+        return false;
+    }
+
+    private static void moveToFilteredSlots(AbstractContainerMenu menu, GhostFilterMenu filters, ItemStack source) {
+        for (int pass = 0; pass < 2 && !source.isEmpty(); pass++) {
+            for (int i = 0; i < filters.buildscape$getFilterSlotCount() && !source.isEmpty(); i++) {
+                net.minecraft.world.inventory.Slot target = menu.getSlot(i);
+                Item filter = filters.buildscape$getFilterItem(i);
+                if (filter != null && source.getItem() != filter) continue;
+                if ((pass == 0) == target.getItem().isEmpty()) continue;
+                target.safeInsert(source);
             }
         }
+    }
+
+    private static boolean wouldInsertMismatchedItem(AbstractContainerMenu menu, Player player,
+                                                     ClickType clickType, int buttonId, Item filter) {
+        if (clickType == ClickType.PICKUP || clickType == ClickType.QUICK_CRAFT) {
+            ItemStack carried = menu.getCarried();
+            return !carried.isEmpty() && carried.getItem() != filter;
+        }
+        if (clickType == ClickType.SWAP && buttonId >= 0
+                && buttonId < player.getInventory().getContainerSize()) {
+            ItemStack swapped = player.getInventory().getItem(buttonId);
+            return !swapped.isEmpty() && swapped.getItem() != filter;
+        }
+        return false;
     }
 }

@@ -14,6 +14,9 @@ public class ModMenuTypes {
     public static final RegistryObject<MenuType<BuildersWorkbenchMenu>> BUILDERS_WORKBENCH_MENU =
             MENUS.register("builders_workbench", () -> IForgeMenuType.create(BuildersWorkbenchMenu::new));
 
+    public static final RegistryObject<MenuType<BuildersPouchMenu>> BUILDERS_POUCH_MENU =
+            MENUS.register("builders_pouch", () -> IForgeMenuType.create(BuildersPouchMenu::new));
+
     public static void register(net.minecraftforge.eventbus.api.IEventBus eventBus) {
         MENUS.register(eventBus);
     }

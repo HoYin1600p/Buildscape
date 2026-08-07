@@ -12,6 +12,23 @@ public class BuildersWorkbenchMenu extends AbstractContainerMenu {
     public static final int MENU_COLOR_RESULT_START = 1;
     public static final int MENU_GRADIENT_OUTPUT_START = 48;
 
+    // ── LAYOUT ────────────────────────────────────────────────────────────────
+    // Slot coordinates are the *item* positions (the slot frame is drawn at -1/-1).
+    // They are taken straight from the background artwork and MUST stay in sync
+    // with the layout constants in BuildersWorkbenchScreen.
+    // Colour Builder (184 x 203)
+    private static final int C_PICKER_X = 25, C_PICKER_Y = 52;
+    private static final int C_RESULT_X = 66, C_RESULT_Y = 34;
+    private static final int C_POUCH_IN_X = 51, C_POUCH_IN_Y = 94;
+    private static final int C_POUCH_OUT_X = 117, C_POUCH_OUT_Y = 94;
+    // Gradient Builder (206 x 203)
+    private static final int G_INPUT_X = 12, G_INPUT_Y = 37;
+    private static final int G_OUTPUT_X = 12, G_OUTPUT_Y = 65;
+    private static final int G_POUCH_IN_X = 51, G_POUCH_IN_Y = 94;
+    private static final int G_POUCH_OUT_X = 117, G_POUCH_OUT_Y = 94;
+    // Player inventory - identical on both tabs
+    private static final int INV_X = 12, INV_Y = 121, HOTBAR_Y = 179;
+
     private final BuildersWorkbenchBlockEntity blockEntity;
 
     // ── Client-side constructor ────────────────────────────────
@@ -31,7 +48,7 @@ public class BuildersWorkbenchMenu extends AbstractContainerMenu {
         // ── Tab 0: Color Picker Layout Slots (Indices 0 to 47) ─────────────────
 
         // Slot 0: Pipette/tool slot (index 0, active on Tab 0)
-        this.addSlot(new Slot(be, 0, 28, 38) {
+        this.addSlot(new Slot(be, 0, C_PICKER_X, C_PICKER_Y) {
             @Override
             public boolean mayPlace(ItemStack stack) {
                 return stack.getItem() instanceof net.minecraft.world.item.BlockItem;
@@ -47,7 +64,7 @@ public class BuildersWorkbenchMenu extends AbstractContainerMenu {
         for (int i = 0; i < 9; i++) {
             int col = i % 3;
             int row = i / 3;
-            this.addSlot(new Slot(be, 1 + i, 63 + col * 18, 24 + row * 18) {
+            this.addSlot(new Slot(be, 1 + i, C_RESULT_X + col * 18, C_RESULT_Y + row * 18) {
                 @Override
                 public boolean mayPlace(ItemStack stack) {
                     return false;
@@ -66,7 +83,7 @@ public class BuildersWorkbenchMenu extends AbstractContainerMenu {
         }
 
         // Slot 10: Input Pouch (index 10, active on Tab 0) - Pouch Only
-        this.addSlot(new Slot(be, 10, 47, 93) {
+        this.addSlot(new Slot(be, 10, C_POUCH_IN_X, C_POUCH_IN_Y) {
             @Override
             public boolean mayPlace(ItemStack stack) {
                 return com.kingodogo.buildscape.block.BuildersWorkbenchBlockEntity.isPouch(stack);
@@ -79,7 +96,7 @@ public class BuildersWorkbenchMenu extends AbstractContainerMenu {
         });
 
         // Slot 11: Output Pouch (index 11, active on Tab 0)
-        this.addSlot(new Slot(be, 11, 113, 93) {
+        this.addSlot(new Slot(be, 11, C_POUCH_OUT_X, C_POUCH_OUT_Y) {
             @Override
             public boolean mayPlace(ItemStack stack) {
                 return false;
@@ -94,7 +111,7 @@ public class BuildersWorkbenchMenu extends AbstractContainerMenu {
         // Player Inventory slots for Tab 0 (Indices 12 to 47) - aligned with H=192 / W=176 layout
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 9; col++) {
-                this.addSlot(new Slot(playerInv, col + row * 9 + 9, 8 + col * 18, 112 + row * 18) {
+                this.addSlot(new Slot(playerInv, col + row * 9 + 9, INV_X + col * 18, INV_Y + row * 18) {
                     @Override
                     public boolean isActive() {
                         return be.getActiveTab() == 0;
@@ -103,7 +120,7 @@ public class BuildersWorkbenchMenu extends AbstractContainerMenu {
             }
         }
         for (int col = 0; col < 9; col++) {
-            this.addSlot(new Slot(playerInv, col, 8 + col * 18, 170) {
+            this.addSlot(new Slot(playerInv, col, INV_X + col * 18, HOTBAR_Y) {
                 @Override
                 public boolean isActive() {
                     return be.getActiveTab() == 0;
@@ -115,7 +132,7 @@ public class BuildersWorkbenchMenu extends AbstractContainerMenu {
 
         // Slots 12–20: Gradient Output (indices 12–20, active on Tab 1)
         for (int i = 0; i < 9; i++) {
-            this.addSlot(new WbOutputSlot(be, 12 + i, 9 + i * 18, 78) {
+            this.addSlot(new WbOutputSlot(be, 12 + i, G_OUTPUT_X + i * 18, G_OUTPUT_Y) {
                 @Override
                 public boolean isActive() {
                     return be.getActiveTab() == 1;
@@ -124,7 +141,7 @@ public class BuildersWorkbenchMenu extends AbstractContainerMenu {
         }
 
         // Slot 10: Input Pouch (index 10, active on Tab 1) - Pouch Only
-        this.addSlot(new Slot(be, 10, 9, 112) {
+        this.addSlot(new Slot(be, 10, G_POUCH_IN_X, G_POUCH_IN_Y) {
             @Override
             public boolean mayPlace(ItemStack stack) {
                 return com.kingodogo.buildscape.block.BuildersWorkbenchBlockEntity.isPouch(stack);
@@ -137,7 +154,7 @@ public class BuildersWorkbenchMenu extends AbstractContainerMenu {
         });
 
         // Slot 11: Output Pouch (index 11, active on Tab 1)
-        this.addSlot(new Slot(be, 11, 153, 112) {
+        this.addSlot(new Slot(be, 11, G_POUCH_OUT_X, G_POUCH_OUT_Y) {
             @Override
             public boolean mayPlace(ItemStack stack) {
                 return false;
@@ -151,7 +168,7 @@ public class BuildersWorkbenchMenu extends AbstractContainerMenu {
 
         // Slots 21–29: Gradient Inputs row (indices 21–29, active on Tab 1)
         for (int i = 0; i < 9; i++) {
-            this.addSlot(new WbInputSlot(be, 21 + i, 9 + i * 18, 48) {
+            this.addSlot(new WbInputSlot(be, 21 + i, G_INPUT_X + i * 18, G_INPUT_Y) {
                 @Override
                 public boolean isActive() {
                     return be.getActiveTab() == 1;
@@ -162,7 +179,7 @@ public class BuildersWorkbenchMenu extends AbstractContainerMenu {
         // Player Inventory slots for Tab 1 (Indices 68 to 103)
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 9; col++) {
-                this.addSlot(new Slot(playerInv, col + row * 9 + 9, 28 + col * 18, 159 + row * 18) {
+                this.addSlot(new Slot(playerInv, col + row * 9 + 9, INV_X + col * 18, INV_Y + row * 18) {
                     @Override
                     public boolean isActive() {
                         return be.getActiveTab() == 1;
@@ -171,7 +188,7 @@ public class BuildersWorkbenchMenu extends AbstractContainerMenu {
             }
         }
         for (int col = 0; col < 9; col++) {
-            this.addSlot(new Slot(playerInv, col, 28 + col * 18, 217) {
+            this.addSlot(new Slot(playerInv, col, INV_X + col * 18, HOTBAR_Y) {
                 @Override
                 public boolean isActive() {
                     return be.getActiveTab() == 1;

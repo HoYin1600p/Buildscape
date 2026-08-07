@@ -2,7 +2,9 @@ package com.kingodogo.buildscape.block;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.ChestBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.entity.ChestBlockEntity;
 import net.minecraft.world.level.block.state.BlockBehaviour;
@@ -19,6 +21,11 @@ public class CopperChestBlock extends ChestBlock {
     }
 
     @Override
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+        return new CopperChestBlockEntity(pos, state);
+    }
+
+    @Override
     public boolean isRandomlyTicking(BlockState state) {
         return !isWaxed;
     }
@@ -28,5 +35,15 @@ public class CopperChestBlock extends ChestBlock {
         if (!isWaxed) {
             CopperOxidationHandler.tryOxidize(level, pos, state);
         }
+    }
+
+    @Override
+    public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
+        if (newState.getBlock() instanceof CopperChestBlock) {
+            level.updateNeighbourForOutputSignal(pos, this);
+            return;
+        }
+
+        super.onRemove(state, level, pos, newState, isMoving);
     }
 }

@@ -1,0 +1,6 @@
+{
+  "textures": {
+    "particle": "minecraft:block/copper_block"
+  },
+  "parent": "minecraft:block/thin_block"
+}

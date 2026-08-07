@@ -1,0 +1,7 @@
+{
+    "textures":  {
+                     "edge":  "buildscape:block/copper_mesh",
+                     "bars":  "buildscape:block/copper_mesh"
+                 },
+    "parent":  "buildscape:block/template_bars_cap"
+}

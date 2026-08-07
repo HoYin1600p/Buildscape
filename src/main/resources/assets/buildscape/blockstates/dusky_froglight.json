@@ -1,0 +1,16 @@
+{
+    "variants":  {
+                     "axis=y":  {
+                                    "model":  "buildscape:block/dusky_froglight"
+                                },
+                     "axis=x":  {
+                                    "y":  90,
+                                    "model":  "buildscape:block/dusky_froglight_horizontal",
+                                    "x":  90
+                                },
+                     "axis=z":  {
+                                    "model":  "buildscape:block/dusky_froglight_horizontal",
+                                    "x":  90
+                                }
+                 }
+}

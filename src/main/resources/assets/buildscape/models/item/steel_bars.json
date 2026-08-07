@@ -1,0 +1,6 @@
+{
+    "textures":  {
+                     "layer0":  "buildscape:block/steel_bars"
+                 },
+    "parent":  "item/generated"
+}

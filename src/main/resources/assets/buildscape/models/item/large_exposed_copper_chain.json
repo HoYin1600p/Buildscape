@@ -1,0 +1,6 @@
+{
+    "textures":  {
+                     "layer0":  "buildscape:item/large_exposed_copper_chain"
+                 },
+    "parent":  "item/generated"
+}

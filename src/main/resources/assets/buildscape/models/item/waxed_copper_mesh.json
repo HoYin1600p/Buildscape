@@ -1,0 +1,6 @@
+{
+    "textures":  {
+                     "layer0":  "buildscape:block/copper_mesh"
+                 },
+    "parent":  "item/generated"
+}

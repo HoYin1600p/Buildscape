@@ -1,0 +1,7 @@
+{
+    "textures":  {
+                     "particle":  "buildscape:block/mangrove_ladder",
+                     "texture":  "buildscape:block/mangrove_ladder"
+                 },
+    "parent":  "minecraft:block/ladder"
+}

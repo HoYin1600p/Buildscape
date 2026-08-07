@@ -1,0 +1,20 @@
+{
+    "key":  {
+                "S":  {
+                          "item":  "minecraft:stick"
+                      },
+                "P":  {
+                          "item":  "buildscape:bamboo_block"
+                      }
+            },
+    "pattern":  [
+                    "S S",
+                    "SPS",
+                    "S S"
+                ],
+    "result":  {
+                   "count":  3,
+                   "item":  "buildscape:bamboo_ladder"
+               },
+    "type":  "minecraft:crafting_shaped"
+}

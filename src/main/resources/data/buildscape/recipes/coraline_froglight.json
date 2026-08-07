@@ -1,0 +1,15 @@
+{
+    "ingredients":  [
+                        {
+                            "item":  "minecraft:shroomlight"
+                        },
+                        {
+                            "item":  "minecraft:pink_dye"
+                        }
+                    ],
+    "result":  {
+                   "count":  1,
+                   "item":  "buildscape:coraline_froglight"
+               },
+    "type":  "minecraft:crafting_shapeless"
+}

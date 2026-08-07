@@ -1,0 +1,15 @@
+{
+    "ingredients":  [
+                        {
+                            "item":  "minecraft:shroomlight"
+                        },
+                        {
+                            "item":  "minecraft:red_dye"
+                        }
+                    ],
+    "result":  {
+                   "count":  1,
+                   "item":  "buildscape:scarlet_froglight"
+               },
+    "type":  "minecraft:crafting_shapeless"
+}

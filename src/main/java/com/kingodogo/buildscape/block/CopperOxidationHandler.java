@@ -91,6 +91,13 @@ public class CopperOxidationHandler {
         registerWaxPair(ModBlocks.WEATHERED_COPPER_BARS, ModBlocks.WAXED_WEATHERED_COPPER_BARS);
         registerWaxPair(ModBlocks.OXIDIZED_COPPER_BARS, ModBlocks.WAXED_OXIDIZED_COPPER_BARS);
 
+        // Copper Meshes
+        registerChain(ModBlocks.COPPER_MESH, ModBlocks.EXPOSED_COPPER_MESH, ModBlocks.WEATHERED_COPPER_MESH, ModBlocks.OXIDIZED_COPPER_MESH);
+        registerWaxPair(ModBlocks.COPPER_MESH, ModBlocks.WAXED_COPPER_MESH);
+        registerWaxPair(ModBlocks.EXPOSED_COPPER_MESH, ModBlocks.WAXED_EXPOSED_COPPER_MESH);
+        registerWaxPair(ModBlocks.WEATHERED_COPPER_MESH, ModBlocks.WAXED_WEATHERED_COPPER_MESH);
+        registerWaxPair(ModBlocks.OXIDIZED_COPPER_MESH, ModBlocks.WAXED_OXIDIZED_COPPER_MESH);
+
         // 9. Cut Copper Vertical Slab
         registerChain(ModBlocks.CUT_COPPER_VERTICAL_SLAB, ModBlocks.EXPOSED_CUT_COPPER_VERTICAL_SLAB, ModBlocks.WEATHERED_CUT_COPPER_VERTICAL_SLAB, ModBlocks.OXIDIZED_CUT_COPPER_VERTICAL_SLAB);
         registerWaxPair(ModBlocks.CUT_COPPER_VERTICAL_SLAB, ModBlocks.WAXED_CUT_COPPER_VERTICAL_SLAB);
@@ -111,6 +118,13 @@ public class CopperOxidationHandler {
         registerWaxPair(ModBlocks.EXPOSED_COPPER_PRESSURE_PLATE, ModBlocks.WAXED_EXPOSED_COPPER_PRESSURE_PLATE);
         registerWaxPair(ModBlocks.WEATHERED_COPPER_PRESSURE_PLATE, ModBlocks.WAXED_WEATHERED_COPPER_PRESSURE_PLATE);
         registerWaxPair(ModBlocks.OXIDIZED_COPPER_PRESSURE_PLATE, ModBlocks.WAXED_OXIDIZED_COPPER_PRESSURE_PLATE);
+
+        // 12. Copper Chests
+        registerChain(ModBlocks.COPPER_CHEST, ModBlocks.EXPOSED_COPPER_CHEST, ModBlocks.WEATHERED_COPPER_CHEST, ModBlocks.OXIDIZED_COPPER_CHEST);
+        registerWaxPair(ModBlocks.COPPER_CHEST, ModBlocks.WAXED_COPPER_CHEST);
+        registerWaxPair(ModBlocks.EXPOSED_COPPER_CHEST, ModBlocks.WAXED_EXPOSED_COPPER_CHEST);
+        registerWaxPair(ModBlocks.WEATHERED_COPPER_CHEST, ModBlocks.WAXED_WEATHERED_COPPER_CHEST);
+        registerWaxPair(ModBlocks.OXIDIZED_COPPER_CHEST, ModBlocks.WAXED_OXIDIZED_COPPER_CHEST);
     }
 
     private static void registerChain(Supplier<Block> b0, Supplier<Block> b1, Supplier<Block> b2, Supplier<Block> b3) {
@@ -316,6 +330,33 @@ public class CopperOxidationHandler {
             if (entry.getKey().get() == block) {
                 Block targetBlock = entry.getValue().get();
                 return copyStateProperties(state, targetBlock.defaultBlockState());
+            }
+        }
+        
+        net.minecraft.resources.ResourceLocation rl = net.minecraftforge.registries.ForgeRegistries.BLOCKS.getKey(block);
+        if (rl != null && rl.getNamespace().equals("buildscape")) {
+            String path = rl.getPath();
+            String nextPath = null;
+            
+            if (path.startsWith("bit_oxidized_")) {
+                nextPath = null;
+            } else if (path.startsWith("bit_weathered_")) {
+                nextPath = path.replace("bit_weathered_", "weathered_");
+            } else if (path.startsWith("weathered_")) {
+                nextPath = path.replace("weathered_", "bit_oxidized_");
+            } else if (path.startsWith("bit_exposed_")) {
+                nextPath = path.replace("bit_exposed_", "exposed_");
+            } else if (path.startsWith("exposed_")) {
+                nextPath = path.replace("exposed_", "bit_weathered_");
+            } else if (!path.startsWith("waxed_")) {
+                nextPath = "bit_exposed_" + path;
+            }
+            
+            if (nextPath != null) {
+                Block targetBlock = net.minecraftforge.registries.ForgeRegistries.BLOCKS.getValue(new net.minecraft.resources.ResourceLocation("buildscape", nextPath));
+                if (targetBlock != null && targetBlock != net.minecraft.world.level.block.Blocks.AIR) {
+                    return copyStateProperties(state, targetBlock.defaultBlockState());
+                }
             }
         }
         

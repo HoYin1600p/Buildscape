@@ -297,6 +297,8 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.BIT_OXIDIZED_COPPER_BULB.get()));
             items.add(new ItemStack(ModItems.BIT_OXIDIZED_COPPER_GRATE.get()));
             items.add(new ItemStack(ModItems.COPPER_NUGGET.get()));
+            items.add(new ItemStack(ModItems.STEEL_INGOT.get()));
+            items.add(new ItemStack(ModItems.STEEL_NUGGET.get()));
 
             // --- COPPER EXPANSION ---
             items.add(new ItemStack(ModItems.COPPER_TORCH.get()));
@@ -377,6 +379,29 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.WAXED_WEATHERED_COPPER_BARS.get()));
             items.add(new ItemStack(ModItems.OXIDIZED_COPPER_BARS.get()));
             items.add(new ItemStack(ModItems.WAXED_OXIDIZED_COPPER_BARS.get()));
+            items.add(new ItemStack(ModItems.GOLD_BARS.get()));
+            items.add(new ItemStack(ModItems.STEEL_BARS.get()));
+            items.add(new ItemStack(ModItems.IRON_MESH.get()));
+            items.add(new ItemStack(ModItems.GOLD_MESH.get()));
+            items.add(new ItemStack(ModItems.STEEL_MESH.get()));
+            items.add(new ItemStack(ModItems.COPPER_MESH.get()));
+            items.add(new ItemStack(ModItems.WAXED_COPPER_MESH.get()));
+            items.add(new ItemStack(ModItems.EXPOSED_COPPER_MESH.get()));
+            items.add(new ItemStack(ModItems.WAXED_EXPOSED_COPPER_MESH.get()));
+            items.add(new ItemStack(ModItems.WEATHERED_COPPER_MESH.get()));
+            items.add(new ItemStack(ModItems.WAXED_WEATHERED_COPPER_MESH.get()));
+            items.add(new ItemStack(ModItems.OXIDIZED_COPPER_MESH.get()));
+            items.add(new ItemStack(ModItems.WAXED_OXIDIZED_COPPER_MESH.get()));
+
+            // Copper Chests
+            items.add(new ItemStack(ModItems.COPPER_CHEST.get()));
+            items.add(new ItemStack(ModItems.WAXED_COPPER_CHEST.get()));
+            items.add(new ItemStack(ModItems.EXPOSED_COPPER_CHEST.get()));
+            items.add(new ItemStack(ModItems.WAXED_EXPOSED_COPPER_CHEST.get()));
+            items.add(new ItemStack(ModItems.WEATHERED_COPPER_CHEST.get()));
+            items.add(new ItemStack(ModItems.WAXED_WEATHERED_COPPER_CHEST.get()));
+            items.add(new ItemStack(ModItems.OXIDIZED_COPPER_CHEST.get()));
+            items.add(new ItemStack(ModItems.WAXED_OXIDIZED_COPPER_CHEST.get()));
 
             // Copper Buttons
             items.add(new ItemStack(ModItems.COPPER_BUTTON.get()));
@@ -401,6 +426,10 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.EXPOSED_COPPER_CHAIN.get()));
             items.add(new ItemStack(ModItems.WEATHERED_COPPER_CHAIN.get()));
             items.add(new ItemStack(ModItems.OXIDIZED_COPPER_CHAIN.get()));
+            items.add(new ItemStack(ModItems.LARGE_COPPER_CHAIN.get()));
+            items.add(new ItemStack(ModItems.LARGE_EXPOSED_COPPER_CHAIN.get()));
+            items.add(new ItemStack(ModItems.LARGE_WEATHERED_COPPER_CHAIN.get()));
+            items.add(new ItemStack(ModItems.LARGE_OXIDIZED_COPPER_CHAIN.get()));
             items.add(new ItemStack(Items.CHAIN));
             items.add(new ItemStack(ModItems.LARGE_IRON_CHAIN.get()));
             items.add(new ItemStack(ModItems.ANCIENT_STEEL_CHAIN.get()));
@@ -915,6 +944,38 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.CHERRY_BUTTON.get()));
             items.add(new ItemStack(ModItems.CHERRY_LEAVES.get()));
             items.add(new ItemStack(ModItems.CHERRY_SAPLING.get()));
+
+            // --- LADDERS ---
+            items.add(new ItemStack(ModItems.OAK_LADDER.get()));
+            items.add(new ItemStack(ModItems.SPRUCE_LADDER.get()));
+            items.add(new ItemStack(ModItems.BIRCH_LADDER.get()));
+            items.add(new ItemStack(ModItems.JUNGLE_LADDER.get()));
+            items.add(new ItemStack(ModItems.ACACIA_LADDER.get()));
+            items.add(new ItemStack(ModItems.DARK_OAK_LADDER.get()));
+            items.add(new ItemStack(ModItems.MANGROVE_LADDER.get()));
+            items.add(new ItemStack(ModItems.CHERRY_LADDER.get()));
+            items.add(new ItemStack(ModItems.PALE_OAK_LADDER.get()));
+            items.add(new ItemStack(ModItems.POPLAR_LADDER.get()));
+            items.add(new ItemStack(ModItems.BAMBOO_LADDER.get()));
+            items.add(new ItemStack(ModItems.STRIPPED_BAMBOO_LADDER.get()));
+            items.add(new ItemStack(ModItems.CRIMSON_LADDER.get()));
+            items.add(new ItemStack(ModItems.WARPED_LADDER.get()));
+            items.add(new ItemStack(ModItems.ASHPEN_WHITE_LADDER.get()));
+            items.add(new ItemStack(ModItems.ASHPEN_LIGHT_GRAY_LADDER.get()));
+            items.add(new ItemStack(ModItems.ASHPEN_GRAY_LADDER.get()));
+            items.add(new ItemStack(ModItems.ASHPEN_BLACK_LADDER.get()));
+            items.add(new ItemStack(ModItems.ASHPEN_BROWN_LADDER.get()));
+            items.add(new ItemStack(ModItems.ASHPEN_RED_LADDER.get()));
+            items.add(new ItemStack(ModItems.ASHPEN_ORANGE_LADDER.get()));
+            items.add(new ItemStack(ModItems.ASHPEN_YELLOW_LADDER.get()));
+            items.add(new ItemStack(ModItems.ASHPEN_LIME_LADDER.get()));
+            items.add(new ItemStack(ModItems.ASHPEN_GREEN_LADDER.get()));
+            items.add(new ItemStack(ModItems.ASHPEN_CYAN_LADDER.get()));
+            items.add(new ItemStack(ModItems.ASHPEN_LIGHT_BLUE_LADDER.get()));
+            items.add(new ItemStack(ModItems.ASHPEN_BLUE_LADDER.get()));
+            items.add(new ItemStack(ModItems.ASHPEN_PURPLE_LADDER.get()));
+            items.add(new ItemStack(ModItems.ASHPEN_MAGENTA_LADDER.get()));
+            items.add(new ItemStack(ModItems.ASHPEN_PINK_LADDER.get()));
 
             // --- PALE MOSS & HANGING MOSS ---
             items.add(new ItemStack(ModItems.PALE_MOSS_BLOCK.get()));
@@ -1756,9 +1817,22 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.PINK_REDSTONE_LAMP.get()));
 
             // --- FROGLIGHTS ---
+            items.add(new ItemStack(ModItems.GLEAMING_FROGLIGHT.get()));
+            items.add(new ItemStack(ModItems.IVORY_FROGLIGHT.get()));
+            items.add(new ItemStack(ModItems.ASHEN_FROGLIGHT.get()));
+            items.add(new ItemStack(ModItems.ONYX_FROGLIGHT.get()));
+            items.add(new ItemStack(ModItems.DUSKY_FROGLIGHT.get()));
+            items.add(new ItemStack(ModItems.SCARLET_FROGLIGHT.get()));
+            items.add(new ItemStack(ModItems.RUSSET_FROGLIGHT.get()));
             items.add(new ItemStack(ModItems.OCHRE_FROGLIGHT.get()));
-            items.add(new ItemStack(ModItems.PEARLESCENT_FROGLIGHT.get()));
             items.add(new ItemStack(ModItems.VERDANT_FROGLIGHT.get()));
+            items.add(new ItemStack(ModItems.VERIDIAN_FROGLIGHT.get()));
+            items.add(new ItemStack(ModItems.TIDAL_FROGLIGHT.get()));
+            items.add(new ItemStack(ModItems.CERULEAN_FROGLIGHT.get()));
+            items.add(new ItemStack(ModItems.AZURE_FROGLIGHT.get()));
+            items.add(new ItemStack(ModItems.IRIDESCENT_FROGLIGHT.get()));
+            items.add(new ItemStack(ModItems.PEARLESCENT_FROGLIGHT.get()));
+            items.add(new ItemStack(ModItems.CORALINE_FROGLIGHT.get()));
             items.add(new ItemStack(ModItems.DECORATED_POT.get()));
             items.add(new ItemStack(ModItems.TRAPPED_DECORATED_POT.get()));
             items.add(new ItemStack(ModItems.WHITE_DECORATED_POT.get()));

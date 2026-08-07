@@ -53,7 +53,9 @@ public final class BuildscapeRenderLayers {
                 path.endsWith("_trapdoor") ||
                 path.endsWith("_sign") ||
                 path.endsWith("_sapling") ||
-                path.endsWith("copper_bars") ||
+                path.endsWith("_bars") ||
+                path.endsWith("_mesh") ||
+                path.endsWith("_ladder") ||
                 path.endsWith("copper_grate") ||
                 path.endsWith("copper_lantern") ||
                 path.endsWith("copper_rod") ||

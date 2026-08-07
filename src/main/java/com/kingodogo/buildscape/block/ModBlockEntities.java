@@ -189,4 +189,18 @@ public class ModBlockEntities {
                             BuildersWorkbenchBlockEntity::new,
                             ModBlocks.BUILDERS_WORKBENCH.get()
                     ).build(null));
+
+    public static final RegistryObject<BlockEntityType<CopperChestBlockEntity>> COPPER_CHEST =
+            BLOCK_ENTITIES.register("copper_chest",
+                    () -> BlockEntityType.Builder.of(
+                            CopperChestBlockEntity::new,
+                            ModBlocks.COPPER_CHEST.get(),
+                            ModBlocks.EXPOSED_COPPER_CHEST.get(),
+                            ModBlocks.WEATHERED_COPPER_CHEST.get(),
+                            ModBlocks.OXIDIZED_COPPER_CHEST.get(),
+                            ModBlocks.WAXED_COPPER_CHEST.get(),
+                            ModBlocks.WAXED_EXPOSED_COPPER_CHEST.get(),
+                            ModBlocks.WAXED_WEATHERED_COPPER_CHEST.get(),
+                            ModBlocks.WAXED_OXIDIZED_COPPER_CHEST.get()
+                    ).build(null));
 }

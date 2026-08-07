@@ -33,6 +33,11 @@ public class BuildersWorkbenchMenu extends AbstractContainerMenu {
         // Slot 0: Pipette/tool slot (index 0, active on Tab 0)
         this.addSlot(new Slot(be, 0, 28, 38) {
             @Override
+            public boolean mayPlace(ItemStack stack) {
+                return stack.getItem() instanceof net.minecraft.world.item.BlockItem;
+            }
+
+            @Override
             public boolean isActive() {
                 return be.getActiveTab() == 0;
             }
@@ -157,7 +162,7 @@ public class BuildersWorkbenchMenu extends AbstractContainerMenu {
         // Player Inventory slots for Tab 1 (Indices 68 to 103)
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 9; col++) {
-                this.addSlot(new Slot(playerInv, col + row * 9 + 9, 39 + col * 18, 159 + row * 18) {
+                this.addSlot(new Slot(playerInv, col + row * 9 + 9, 28 + col * 18, 159 + row * 18) {
                     @Override
                     public boolean isActive() {
                         return be.getActiveTab() == 1;
@@ -166,7 +171,7 @@ public class BuildersWorkbenchMenu extends AbstractContainerMenu {
             }
         }
         for (int col = 0; col < 9; col++) {
-            this.addSlot(new Slot(playerInv, col, 39 + col * 18, 217) {
+            this.addSlot(new Slot(playerInv, col, 28 + col * 18, 217) {
                 @Override
                 public boolean isActive() {
                     return be.getActiveTab() == 1;
@@ -189,6 +194,10 @@ public class BuildersWorkbenchMenu extends AbstractContainerMenu {
 
     public int getFilterMask() {
         return this.blockEntity.dataAccess.get(2);
+    }
+
+    public int getResultOffset(int slot) {
+        return slot >= 0 && slot < 9 ? this.blockEntity.dataAccess.get(3 + slot) : 0;
     }
 
     @Override

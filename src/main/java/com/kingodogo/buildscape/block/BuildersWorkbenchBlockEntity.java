@@ -47,7 +47,7 @@ public class BuildersWorkbenchBlockEntity extends BlockEntity implements MenuPro
     private final int[] resultOffsets = new int[9];
     // Persisted filter/tab state
     private int activeTab = 0; // 0=ColorPicker, 1=GradientBuilder
-    private int filterMask = 0; // bitmask of active filter chips
+    private int filterMask = com.kingodogo.buildscape.util.ColorGradientSolver.FILTER_ALL;
     private int copyProgress = 0;
     public final net.minecraft.world.inventory.ContainerData dataAccess = new net.minecraft.world.inventory.ContainerData() {
         @Override
@@ -60,7 +60,7 @@ public class BuildersWorkbenchBlockEntity extends BlockEntity implements MenuPro
                 case 2:
                     return filterMask;
                 default:
-                    return 0;
+                    return index >= 3 && index < 12 ? resultOffsets[index - 3] : 0;
             }
         }
 
@@ -76,12 +76,15 @@ public class BuildersWorkbenchBlockEntity extends BlockEntity implements MenuPro
                 case 2:
                     filterMask = value;
                     break;
+                default:
+                    if (index >= 3 && index < 12) resultOffsets[index - 3] = Math.max(0, value);
+                    break;
             }
         }
 
         @Override
         public int getCount() {
-            return 3;
+            return 12;
         }
     };
 
@@ -183,25 +186,12 @@ public class BuildersWorkbenchBlockEntity extends BlockEntity implements MenuPro
     public void updateGradientResults() {
         if (this.level == null || this.level.isClientSide()) return;
 
-        ItemStack start = ItemStack.EMPTY;
-        ItemStack end = ItemStack.EMPTY;
+        java.util.List<ItemStack> anchors = new java.util.ArrayList<>(9);
         for (int i = 0; i < 9; i++) {
-            ItemStack s = this.getItem(SLOT_GRADIENT_INPUT_START + i);
-            if (!s.isEmpty()) {
-                if (start.isEmpty()) start = s;
-                end = s;
-            }
+            anchors.add(this.getItem(SLOT_GRADIENT_INPUT_START + i));
         }
-
-        if (start.isEmpty() && end.isEmpty()) {
-            for (int i = 0; i < 9; i++) {
-                this.items.set(SLOT_GRADIENT_START + i, ItemStack.EMPTY);
-            }
-            setChanged();
-            return;
-        }
-
-        java.util.List<ItemStack> solved = com.kingodogo.buildscape.util.ColorGradientSolver.solveGradient(start, end, filterMask, resultOffsets);
+        java.util.List<ItemStack> solved = com.kingodogo.buildscape.util.ColorGradientSolver
+                .solveGradient(anchors, filterMask, resultOffsets);
         for (int i = 0; i < 9; i++) {
             this.items.set(SLOT_GRADIENT_START + i, solved.get(i));
         }
@@ -366,7 +356,7 @@ public class BuildersWorkbenchBlockEntity extends BlockEntity implements MenuPro
     }
 
     public void setFilterMask(int mask) {
-        if (mask < 0 || mask > 2) return;
+        if (mask < 0 || mask > com.kingodogo.buildscape.util.ColorGradientSolver.FILTER_ALL) return;
         this.filterMask = mask;
         setChanged();
         if (activeTab == 0) {
@@ -393,6 +383,57 @@ public class BuildersWorkbenchBlockEntity extends BlockEntity implements MenuPro
         return resultOffsets[index];
     }
 
+    public void setResultOffsets(int[] offsets) {
+        for (int i = 0; i < resultOffsets.length; i++) {
+            resultOffsets[i] = offsets != null && i < offsets.length ? Math.max(0, offsets[i]) : 0;
+        }
+        setChanged();
+    }
+
+    public boolean resultsMatchInputs(int tab, List<ItemStack> results) {
+        if (results == null || results.size() != 9) return false;
+        if (tab == 0) {
+            ItemStack input = this.getItem(SLOT_COLOR_PICKER);
+            if (input.isEmpty()) return results.stream().allMatch(ItemStack::isEmpty);
+            return input.getItem() instanceof net.minecraft.world.item.BlockItem;
+        }
+
+        int anchors = 0;
+        int first = -1;
+        int last = -1;
+        for (int i = 0; i < 9; i++) {
+            ItemStack input = this.getItem(SLOT_GRADIENT_INPUT_START + i);
+            if (!input.isEmpty()) {
+                anchors++;
+                if (first < 0) first = i;
+                last = i;
+                if (results.get(i).getItem() != input.getItem()) return false;
+            }
+        }
+        if (anchors < 2) return results.stream().allMatch(ItemStack::isEmpty);
+        for (int i = 0; i < first; i++) if (!results.get(i).isEmpty()) return false;
+        for (int i = last + 1; i < 9; i++) if (!results.get(i).isEmpty()) return false;
+        return true;
+    }
+
+    public void applyClientResults(int tab, int mask, int[] offsets, List<ItemStack> results) {
+        if (tab < 0 || tab > 1 || mask < 0
+                || mask > com.kingodogo.buildscape.util.ColorGradientSolver.FILTER_ALL
+                || results == null || results.size() != 9) {
+            return;
+        }
+        this.filterMask = mask;
+        setResultOffsets(offsets);
+        int firstSlot = tab == 0 ? SLOT_PRESETS_START : SLOT_GRADIENT_START;
+        for (int i = 0; i < 9; i++) {
+            ItemStack stack = results.get(i);
+            ItemStack stored = stack == null || stack.isEmpty() ? ItemStack.EMPTY : stack.copy();
+            if (!stored.isEmpty()) stored.setCount(1);
+            this.items.set(firstSlot + i, stored);
+        }
+        setChanged();
+    }
+
     public void incrementResultOffset(int index) {
         if (index < 0 || index >= resultOffsets.length) return;
         if (activeTab == 1 && (index == 0 || index == resultOffsets.length - 1)) return;
@@ -417,7 +458,12 @@ public class BuildersWorkbenchBlockEntity extends BlockEntity implements MenuPro
         super.load(tag);
         ContainerHelper.loadAllItems(tag, items);
         if (tag.contains("ActiveTab")) this.activeTab = tag.getInt("ActiveTab");
-        if (tag.contains("FilterMask")) this.filterMask = tag.getInt("FilterMask");
+        if (tag.contains("FilterMaskVersion")) {
+            this.filterMask = tag.getInt("FilterMask")
+                    & com.kingodogo.buildscape.util.ColorGradientSolver.FILTER_ALL;
+        } else {
+            this.filterMask = com.kingodogo.buildscape.util.ColorGradientSolver.FILTER_ALL;
+        }
         if (tag.contains("CopyProgress")) this.copyProgress = tag.getInt("CopyProgress");
         if (tag.contains("ResultOffsets")) {
             int[] saved = tag.getIntArray("ResultOffsets");
@@ -433,6 +479,7 @@ public class BuildersWorkbenchBlockEntity extends BlockEntity implements MenuPro
         ContainerHelper.saveAllItems(tag, items);
         tag.putInt("ActiveTab", activeTab);
         tag.putInt("FilterMask", filterMask);
+        tag.putInt("FilterMaskVersion", 1);
         tag.putInt("CopyProgress", copyProgress);
         tag.putIntArray("ResultOffsets", resultOffsets);
      }

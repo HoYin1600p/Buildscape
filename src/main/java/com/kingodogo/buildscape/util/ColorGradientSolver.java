@@ -1,579 +1,424 @@
 package com.kingodogo.buildscape.util;
 
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.EmptyBlockGetter;
+import net.minecraft.world.level.block.AbstractGlassBlock;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.HalfTransparentBlock;
+import net.minecraft.world.level.block.LeavesBlock;
+import net.minecraft.world.level.block.StainedGlassPaneBlock;
 import net.minecraft.world.level.block.state.BlockState;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
- * Server-safe Lab-space gradient engine.
- * <p>
- * Colors default to each block's MapColor. registerDynamicColor remains as an
- * integration point for a future explicit color-data source.
- * <p>
- * Gradient solving:
- * solveGradient(start, end, filterMode)
- * → interpolates in CIE-Lab space for perceptually uniform transitions
- * → enforces uniqueness so every slot is a different block
- * -> applies the selected availability filter
+ * Nine-slot color and gradient solver. The logical server uses MapColor as a
+ * safe fallback; clients replace that catalog with colors sampled from baked
+ * models when the Builder's Workbench is opened.
  */
-public class ColorGradientSolver {
-
-    // ── Inner record ─────────────────────────────────────────────────────────
+public final class ColorGradientSolver {
+    public static final int FILTER_SOLID = 1;
+    public static final int FILTER_TRANSPARENT = 1 << 1;
+    public static final int FILTER_NON_FULL = 1 << 2;
+    public static final int FILTER_ALL = FILTER_SOLID | FILTER_TRANSPARENT | FILTER_NON_FULL;
 
     private static final Map<Item, BlockColor> REGISTRY = new LinkedHashMap<>();
-
-    // ── Registry ─────────────────────────────────────────────────────────────
     private static final List<BlockColor> ALL_BLOCKS = new ArrayList<>();
 
-    public static boolean isSlab(ItemStack stack) {
-        if (stack.isEmpty() || !(stack.getItem() instanceof BlockItem bi)) return false;
-        return bi.getBlock() instanceof net.minecraft.world.level.block.SlabBlock;
+    private ColorGradientSolver() {
     }
 
-    // ── Shape helpers ────────────────────────────────────────────────────────
-
-    public static boolean isStair(ItemStack stack) {
-        if (stack.isEmpty() || !(stack.getItem() instanceof BlockItem bi)) return false;
-        return bi.getBlock() instanceof net.minecraft.world.level.block.StairBlock;
-    }
-
-    /**
-     * Returns true if this item represents a placeable structural block that
-     * makes sense for colour-gradient comparisons.
-     */
-    public static boolean isStructuralBlock(Item item) {
+    public static boolean isCandidateBlock(Item item) {
         if (!(item instanceof BlockItem blockItem)) return false;
         Block block = blockItem.getBlock();
-        BlockState state;
+        ResourceLocation id = block.getRegistryName();
+        if (isCreativeOnly(id)) return false;
+
         try {
-            state = block.defaultBlockState();
-        } catch (Exception e) {
+            BlockState state = block.defaultBlockState();
+            return !state.isAir() && state.getFluidState().isEmpty();
+        } catch (RuntimeException ignored) {
             return false;
         }
-
-        // Exclude liquids and non-solid / replaceable materials
-        if (state.getMaterial().isLiquid()) return false;
-        if (!state.getMaterial().isSolid() || state.getMaterial().isReplaceable()) return false;
-
-        // Blacklist non-structural block classes
-        if (block instanceof net.minecraft.world.level.block.ButtonBlock ||
-                block instanceof net.minecraft.world.level.block.PressurePlateBlock ||
-                block instanceof net.minecraft.world.level.block.SignBlock ||
-                block instanceof net.minecraft.world.level.block.WallSignBlock ||
-                block instanceof net.minecraft.world.level.block.TorchBlock ||
-                block instanceof net.minecraft.world.level.block.WallTorchBlock ||
-                block instanceof net.minecraft.world.level.block.FlowerBlock ||
-                block instanceof net.minecraft.world.level.block.TallFlowerBlock ||
-                block instanceof net.minecraft.world.level.block.SaplingBlock ||
-                block instanceof net.minecraft.world.level.block.CropBlock ||
-                block instanceof net.minecraft.world.level.block.BushBlock ||
-                block instanceof net.minecraft.world.level.block.StemBlock ||
-                block instanceof net.minecraft.world.level.block.BannerBlock ||
-                block instanceof net.minecraft.world.level.block.WallBannerBlock ||
-                block instanceof net.minecraft.world.level.block.FlowerPotBlock ||
-                block instanceof net.minecraft.world.level.block.DoorBlock ||
-                block instanceof net.minecraft.world.level.block.BellBlock ||
-                block instanceof net.minecraft.world.level.block.DiodeBlock) {
-            return false;
-        }
-
-        // Registry-path based exclusions (covers modded variants without naming classes)
-        ResourceLocation rl = block.getRegistryName();
-        if (rl != null) {
-            String path = rl.getPath();
-            return !path.equals("redstone_wire") && !path.equals("repeater") &&
-                    !path.equals("comparator") && !path.contains("_wire") &&
-                    !path.contains("lever") && !path.contains("tripwire") &&
-                    !path.contains("_rail") && !path.contains("piston") &&
-                    !path.contains("dispenser") && !path.contains("dropper") &&
-                    !path.contains("hopper") && !path.contains("observer") &&
-                    !path.contains("daylight") && !path.contains("conduit");
-        }
-
-        return true;
     }
 
-    // ── Public API ───────────────────────────────────────────────────────────
-
-    /**
-     * Registers an explicit RGB override for a structural block.
-     */
     public static synchronized void registerDynamicColor(Item item, int colorHex) {
-        if (!isStructuralBlock(item)) return;
-
-        int r = (colorHex >> 16) & 0xFF;
-        int g = (colorHex >> 8) & 0xFF;
-        int b = colorHex & 0xFF;
-
-        BlockColor bc = new BlockColor(item, r, g, b);
-        REGISTRY.put(item, bc);
-
-        ALL_BLOCKS.removeIf(existing -> existing.item == item);
-        ALL_BLOCKS.add(bc);
+        registerDynamicColor(item, colorHex, categoriesFor(item));
     }
 
-    /**
-     * Lazily builds the registry from MapColor on the logical server.
-     */
+    public static synchronized void registerDynamicColor(Item item, int colorHex, int categories) {
+        if (!isCandidateBlock(item)) return;
+        int r = colorHex >> 16 & 255;
+        int g = colorHex >> 8 & 255;
+        int b = colorHex & 255;
+        BlockColor color = new BlockColor(item, r, g, b, normalizeCategories(categories));
+        REGISTRY.put(item, color);
+        ALL_BLOCKS.removeIf(existing -> existing.item == item);
+        ALL_BLOCKS.add(color);
+    }
+
+    public static synchronized void replaceDynamicColors(Collection<BlockColor> colors) {
+        REGISTRY.clear();
+        ALL_BLOCKS.clear();
+        for (BlockColor color : colors) {
+            if (color != null && isCandidateBlock(color.item)) {
+                REGISTRY.put(color.item, color);
+                ALL_BLOCKS.add(color);
+            }
+        }
+    }
+
     private static synchronized void ensureRegistryPopulated() {
         if (!ALL_BLOCKS.isEmpty()) return;
-        for (ResourceLocation rl : net.minecraft.core.Registry.ITEM.keySet()) {
-            Item item = net.minecraft.core.Registry.ITEM.get(rl);
-            if (item instanceof BlockItem && isStructuralBlock(item)) {
-                int col = ((BlockItem) item).getBlock().defaultBlockState()
-                        .getMapColor(null, null).col;
-                if (col != 0) registerDynamicColor(item, col);
+        for (ResourceLocation id : Registry.ITEM.keySet()) {
+            Item item = Registry.ITEM.get(id);
+            if (!isCandidateBlock(item)) continue;
+            Block block = ((BlockItem) item).getBlock();
+            int color;
+            try {
+                color = block.defaultBlockState().getMapColor(null, null).col;
+            } catch (RuntimeException ignored) {
+                color = 0x808080;
+            }
+            registerDynamicColor(item, color == 0 ? 0x808080 : color, categoriesFor(item));
+        }
+    }
+
+    public static List<ItemStack> solveColorPicker(ItemStack target, int filterMask, int[] offsets) {
+        ensureRegistryPopulated();
+        List<ItemStack> result = emptyResult();
+        if (target.isEmpty()) return result;
+
+        BlockColor targetColor = resolveColor(target);
+        List<BlockColor> candidates = candidates(filterMask);
+        if (candidates.isEmpty()) return result;
+        candidates.sort(byDistance(targetColor));
+
+        Item[] defaults = chooseUniqueDefaults(candidates, 9, Set.of());
+        for (int slot = 0; slot < 9; slot++) {
+            List<BlockColor> available = excludingOtherDefaults(candidates, defaults, slot, Set.of());
+            if (available.isEmpty()) available = candidates;
+            BlockColor chosen = available.get(offset(offsets, slot, available.size()));
+            result.set(slot, new ItemStack(chosen.item));
+        }
+        return result;
+    }
+
+    public static List<ItemStack> solveColorPickerWithInventory(ItemStack target, List<ItemStack> inventory,
+                                                                 int[] offsets) {
+        ensureRegistryPopulated();
+        Set<Item> availableItems = new HashSet<>();
+        for (ItemStack stack : inventory) {
+            if (!stack.isEmpty()) availableItems.add(stack.getItem());
+        }
+
+        List<ItemStack> result = emptyResult();
+        if (target.isEmpty() || availableItems.isEmpty()) return result;
+        BlockColor targetColor = resolveColor(target);
+        List<BlockColor> candidates = new ArrayList<>();
+        synchronized (ColorGradientSolver.class) {
+            for (BlockColor color : ALL_BLOCKS) {
+                if (availableItems.contains(color.item)) candidates.add(color);
             }
         }
+        if (candidates.isEmpty()) return result;
+        candidates.sort(byDistance(targetColor));
+
+        Item[] defaults = chooseUniqueDefaults(candidates, 9, Set.of());
+        for (int slot = 0; slot < 9; slot++) {
+            List<BlockColor> available = excludingOtherDefaults(candidates, defaults, slot, Set.of());
+            if (available.isEmpty()) available = candidates;
+            result.set(slot, new ItemStack(available.get(offset(offsets, slot, available.size())).item));
+        }
+        return result;
+    }
+
+    public static List<ItemStack> solveGradient(ItemStack start, ItemStack end, int filterMask, int[] offsets) {
+        List<ItemStack> anchors = emptyResult();
+        anchors.set(0, start);
+        anchors.set(8, end);
+        return solveGradient(anchors, filterMask, offsets);
     }
 
     /**
-     * Builds a 9-element gradient between startStack (slot 0) and endStack (slot 8).
-     *
-     * @param filterMode 0=All, 1=Filtered, 2=Survival+
+     * Solves each interval between occupied anchor slots independently. Slots
+     * outside the first and last anchor remain empty, and every anchor is copied
+     * exactly into the output at its input position.
      */
-    public static List<ItemStack> solveGradient(ItemStack startStack, ItemStack endStack, int filterMode, int[] offsets) {
+    public static List<ItemStack> solveGradient(List<ItemStack> anchors, int filterMask, int[] offsets) {
         ensureRegistryPopulated();
+        List<ItemStack> result = emptyResult();
+        if (anchors == null || anchors.size() < 9) return result;
 
-        List<ItemStack> path = new ArrayList<>(Collections.nCopies(9, ItemStack.EMPTY));
-
-        // --- Edge cases -------------------------------------------------------
-        if (startStack.isEmpty() && endStack.isEmpty()) return path;
-        if (startStack.isEmpty()) {
-            path.set(8, endStack.copy());
-            return path;
-        }
-        if (endStack.isEmpty()) {
-            path.set(0, startStack.copy());
-            return path;
-        }
-
-        // --- Resolve colors for start/end ------------------------------------
-        BlockColor startColor = resolveColor(startStack);
-        BlockColor endColor = resolveColor(endStack);
-
-        boolean targetIsSlab = isSlab(startStack) || isSlab(endStack);
-        boolean targetIsStair = isStair(startStack) || isStair(endStack);
-
-        // --- Build filtered candidate list -----------------------------------
-        List<BlockColor> candidates;
-        synchronized (ColorGradientSolver.class) {
-            candidates = new ArrayList<>(ALL_BLOCKS.size());
-            for (BlockColor bc : ALL_BLOCKS) {
-                if (matchesFilter(bc.item, filterMode)) {
-                    ItemStack cStack = new ItemStack(bc.item);
-                    if (targetIsSlab && !isSlab(cStack)) continue;
-                    if (targetIsStair && !isStair(cStack)) continue;
-                    if (!targetIsSlab && !targetIsStair && filterMode != 0 && (isSlab(cStack) || isStair(cStack)))
-                        continue;
-                    candidates.add(bc);
-                }
+        List<Integer> anchorSlots = new ArrayList<>();
+        Set<Item> anchorItems = new HashSet<>();
+        for (int slot = 0; slot < 9; slot++) {
+            ItemStack anchor = anchors.get(slot);
+            if (anchor != null && !anchor.isEmpty()) {
+                anchorSlots.add(slot);
+                anchorItems.add(anchor.getItem());
+                result.set(slot, anchor.copy());
             }
         }
-        if (candidates.isEmpty()) {
-            synchronized (ColorGradientSolver.class) {
-                candidates = new ArrayList<>(ALL_BLOCKS);
+        if (anchorSlots.size() < 2) return emptyResult();
+
+        BlockColor[] targets = new BlockColor[9];
+        for (int segment = 0; segment < anchorSlots.size() - 1; segment++) {
+            int startSlot = anchorSlots.get(segment);
+            int endSlot = anchorSlots.get(segment + 1);
+            BlockColor startColor = resolveColor(anchors.get(startSlot));
+            BlockColor endColor = resolveColor(anchors.get(endSlot));
+            int width = endSlot - startSlot;
+            for (int slot = startSlot + 1; slot < endSlot; slot++) {
+                float t = (float) (slot - startSlot) / width;
+                targets[slot] = BlockColor.target(
+                        lerp(startColor.L, endColor.L, t),
+                        lerp(startColor.a, endColor.a, t),
+                        lerp(startColor.bStar, endColor.bStar, t));
             }
         }
 
-        // Fill fixed edges
-        path.set(0, startStack.copy());
-        path.set(8, endStack.copy());
+        List<BlockColor> candidates = candidates(filterMask);
+        if (candidates.isEmpty()) return result;
 
-        // 1. Establish baseline default blocks (offsets = 0) to ensure global uniqueness
         Item[] defaults = new Item[9];
-        defaults[0] = startStack.getItem();
-        defaults[8] = endStack.getItem();
-        Set<Item> defaultUsed = new HashSet<>();
-        defaultUsed.add(startStack.getItem());
-        defaultUsed.add(endStack.getItem());
-
-        for (int i = 1; i < 8; i++) {
-            float t = i / 8.0f;
-            float tL = lerp(startColor.L, endColor.L, t);
-            float ta = lerp(startColor.a, endColor.a, t);
-            float tb = lerp(startColor.bStar, endColor.bStar, t);
-
-            List<BlockColor> sortedCandidates = new ArrayList<>(candidates);
-            sortedCandidates.sort(Comparator.comparingDouble(bc -> labDistance(tL, ta, tb, bc.L, bc.a, bc.bStar)));
-
-            BlockColor chosen = null;
-            for (BlockColor bc : sortedCandidates) {
-                if (!defaultUsed.contains(bc.item)) {
-                    chosen = bc;
-                    break;
-                }
-            }
-            if (chosen == null && !sortedCandidates.isEmpty()) {
-                chosen = sortedCandidates.get(0);
-            }
+        Set<Item> used = new HashSet<>(anchorItems);
+        for (int slot = 0; slot < 9; slot++) {
+            if (targets[slot] == null) continue;
+            List<BlockColor> sorted = sortedForTarget(candidates, targets[slot]);
+            BlockColor chosen = firstUnused(sorted, used);
+            if (chosen == null && !sorted.isEmpty()) chosen = sorted.get(0);
             if (chosen != null) {
-                defaults[i] = chosen.item;
-                defaultUsed.add(chosen.item);
+                defaults[slot] = chosen.item;
+                used.add(chosen.item);
             }
         }
 
-        // 2. Solve each slot with its local offset, excluding default items chosen by other slots
-        for (int i = 1; i < 8; i++) {
-            float t = i / 8.0f;
-            float tL = lerp(startColor.L, endColor.L, t);
-            float ta = lerp(startColor.a, endColor.a, t);
-            float tb = lerp(startColor.bStar, endColor.bStar, t);
-
-            List<BlockColor> sortedCandidates = new ArrayList<>(candidates);
-            sortedCandidates.sort(Comparator.comparingDouble(bc -> labDistance(tL, ta, tb, bc.L, bc.a, bc.bStar)));
-
-            Set<Item> excluded = new HashSet<>();
-            excluded.add(startStack.getItem());
-            excluded.add(endStack.getItem());
-            for (int j = 1; j < 8; j++) {
-                if (j != i && defaults[j] != null) {
-                    excluded.add(defaults[j]);
-                }
-            }
-
-            List<BlockColor> available = new ArrayList<>();
-            for (BlockColor bc : sortedCandidates) {
-                if (!excluded.contains(bc.item)) {
-                    available.add(bc);
-                }
-            }
+        for (int slot = 0; slot < 9; slot++) {
+            if (targets[slot] == null) continue;
+            List<BlockColor> sorted = sortedForTarget(candidates, targets[slot]);
+            List<BlockColor> available = excludingOtherDefaults(sorted, defaults, slot, anchorItems);
             if (available.isEmpty()) {
-                available = sortedCandidates;
+                available = new ArrayList<>();
+                for (BlockColor color : sorted) {
+                    if (!anchorItems.contains(color.item)) available.add(color);
+                }
             }
-
-            int skipCount = offsets[i] % available.size();
-            BlockColor chosen = available.get(skipCount);
-            if (chosen != null) {
-                path.set(i, new ItemStack(chosen.item));
+            if (!available.isEmpty()) {
+                result.set(slot, new ItemStack(available.get(offset(offsets, slot, available.size())).item));
             }
         }
-
-        return path;
+        return result;
     }
 
-    // ── Main gradient solver ──────────────────────────────────────────────────
+    private static List<BlockColor> candidates(int filterMask) {
+        if ((filterMask & FILTER_ALL) == 0) return new ArrayList<>();
+        List<BlockColor> result = new ArrayList<>();
+        synchronized (ColorGradientSolver.class) {
+            for (BlockColor color : ALL_BLOCKS) {
+                if ((color.categories & filterMask) != 0) result.add(color);
+            }
+        }
+        return result;
+    }
+
+    private static Comparator<BlockColor> byDistance(BlockColor target) {
+        return Comparator.comparingDouble(color -> labDistance(
+                target.L, target.a, target.bStar, color.L, color.a, color.bStar));
+    }
+
+    private static List<BlockColor> sortedForTarget(List<BlockColor> candidates, BlockColor target) {
+        List<BlockColor> sorted = new ArrayList<>(candidates);
+        sorted.sort(byDistance(target));
+        return sorted;
+    }
+
+    private static Item[] chooseUniqueDefaults(List<BlockColor> candidates, int count, Set<Item> excluded) {
+        Item[] defaults = new Item[count];
+        Set<Item> used = new HashSet<>(excluded);
+        for (int slot = 0; slot < count; slot++) {
+            BlockColor chosen = firstUnused(candidates, used);
+            if (chosen == null && !candidates.isEmpty()) chosen = candidates.get(slot % candidates.size());
+            if (chosen != null) {
+                defaults[slot] = chosen.item;
+                used.add(chosen.item);
+            }
+        }
+        return defaults;
+    }
+
+    private static BlockColor firstUnused(List<BlockColor> candidates, Set<Item> used) {
+        for (BlockColor candidate : candidates) {
+            if (!used.contains(candidate.item)) return candidate;
+        }
+        return null;
+    }
+
+    private static List<BlockColor> excludingOtherDefaults(List<BlockColor> candidates, Item[] defaults,
+                                                            int currentSlot, Set<Item> additionallyExcluded) {
+        Set<Item> excluded = new HashSet<>(additionallyExcluded);
+        for (int slot = 0; slot < defaults.length; slot++) {
+            if (slot != currentSlot && defaults[slot] != null) excluded.add(defaults[slot]);
+        }
+        List<BlockColor> result = new ArrayList<>();
+        for (BlockColor candidate : candidates) {
+            if (!excluded.contains(candidate.item)) result.add(candidate);
+        }
+        return result;
+    }
+
+    private static int offset(int[] offsets, int slot, int size) {
+        if (size <= 0 || offsets == null || slot < 0 || slot >= offsets.length) return 0;
+        return Math.floorMod(offsets[slot], size);
+    }
+
+    private static List<ItemStack> emptyResult() {
+        return new ArrayList<>(Collections.nCopies(9, ItemStack.EMPTY));
+    }
 
     private static BlockColor resolveColor(ItemStack stack) {
-        BlockColor bc = REGISTRY.get(stack.getItem());
-        if (bc == null && stack.getItem() instanceof BlockItem bi) {
-            int col = bi.getBlock().defaultBlockState().getMapColor(null, null).col;
-            int r = (col >> 16) & 0xFF, g = (col >> 8) & 0xFF, b = col & 0xFF;
-            bc = new BlockColor(stack.getItem(), r, g, b);
+        BlockColor registered;
+        synchronized (ColorGradientSolver.class) {
+            registered = REGISTRY.get(stack.getItem());
         }
-        if (bc == null) bc = new BlockColor(stack.getItem(), 128, 128, 128);
-        return bc;
+        if (registered != null) return registered;
+        if (stack.getItem() instanceof BlockItem blockItem) {
+            int color;
+            try {
+                color = blockItem.getBlock().defaultBlockState().getMapColor(null, null).col;
+            } catch (RuntimeException ignored) {
+                color = 0x808080;
+            }
+            if (color == 0) color = 0x808080;
+            return new BlockColor(stack.getItem(), color >> 16 & 255, color >> 8 & 255, color & 255,
+                    categoriesFor(stack.getItem()));
+        }
+        return new BlockColor(stack.getItem(), 128, 128, 128, FILTER_SOLID);
     }
 
-    // ── Helpers ───────────────────────────────────────────────────────────────
+    public static int categoriesFor(Item item) {
+        if (!(item instanceof BlockItem blockItem)) return 0;
+        Block block = blockItem.getBlock();
+        BlockState state = block.defaultBlockState();
+        boolean full;
+        try {
+            full = Block.isShapeFullBlock(state.getShape(EmptyBlockGetter.INSTANCE, BlockPos.ZERO));
+        } catch (RuntimeException ignored) {
+            full = false;
+        }
+        ResourceLocation id = block.getRegistryName();
+        String path = id == null ? "" : id.getPath();
+        boolean transparent = block instanceof AbstractGlassBlock
+                || block instanceof HalfTransparentBlock
+                || block instanceof StainedGlassPaneBlock
+                || block instanceof LeavesBlock
+                || path.contains("glass")
+                || path.contains("ice");
 
-    /**
-     * CIE-Lab euclidean distance (Delta-E approximation).
-     */
-    private static double labDistance(float L1, float a1, float b1,
-                                      float L2, float a2, float b2) {
-        float dL = L1 - L2, da = a1 - a2, db = b1 - b2;
-        return dL * dL + da * da + db * db;
+        int categories = 0;
+        if (full && !transparent) categories |= FILTER_SOLID;
+        if (transparent) categories |= FILTER_TRANSPARENT;
+        if (!full) categories |= FILTER_NON_FULL;
+        return normalizeCategories(categories);
     }
 
-    public static boolean isCreativeOnly(ResourceLocation rl) {
-        if (rl == null) return false;
-        String path = rl.getPath();
+    private static int normalizeCategories(int categories) {
+        int normalized = categories & FILTER_ALL;
+        return normalized == 0 ? FILTER_NON_FULL : normalized;
+    }
+
+    public static boolean isCreativeOnly(ResourceLocation id) {
+        if (id == null) return false;
+        String path = id.getPath();
         return path.equals("bedrock") || path.equals("barrier") || path.contains("command_block")
-                || path.contains("structure_block") || path.contains("jigsaw") || path.equals("spawner")
-                || path.contains("portal") || path.equals("moving_piston");
-    }
-
-    // ── Shape filter ──────────────────────────────────────────────────────────
-
-    public static boolean isOre(ResourceLocation rl) {
-        if (rl == null) return false;
-        String path = rl.getPath();
-        return path.contains("_ore") || path.contains("raw_") || path.contains("ancient_debris");
-    }
-
-    public static boolean isWorkstation(ResourceLocation rl) {
-        if (rl == null) return false;
-        String path = rl.getPath();
-        return path.contains("crafting_table") || path.contains("furnace") || path.contains("smoker")
-                || path.contains("blast_furnace") || path.contains("fletching_table") || path.contains("cartography_table")
-                || path.contains("smithing_table") || path.contains("loom") || path.contains("grindstone")
-                || path.contains("stonecutter") || path.contains("anvil") || path.contains("enchanting_table")
-                || path.contains("brewing_stand") || path.contains("builders_workbench") || path.contains("workbench");
-    }
-
-    public static boolean isLightBlock(ResourceLocation rl) {
-        if (rl == null) return false;
-        String path = rl.getPath();
-        return path.contains("glowstone") || path.contains("lantern") || path.contains("sea_lantern")
-                || path.contains("shroomlight") || path.contains("torch") || path.contains("campfire")
-                || path.contains("glow_lichen") || path.contains("redstone_lamp") || path.contains("jack_o_lantern")
-                || path.contains("froglight") || path.equals("light");
-    }
-
-    public static boolean isRedstoneComponent(ResourceLocation rl) {
-        if (rl == null) return false;
-        String path = rl.getPath();
-        return path.contains("redstone_block") || path.contains("repeater") || path.contains("comparator")
-                || path.contains("observer") || path.contains("dispenser") || path.contains("dropper")
-                || path.contains("hopper") || path.contains("piston") || path.contains("note_block")
-                || path.contains("jukebox") || path.contains("target") || path.contains("tnt")
-                || path.contains("tripwire") || path.contains("daylight_detector") || path.contains("lectern")
-                || path.contains("redstone_wire");
-    }
-
-    private static boolean matchesFilter(Item item, int filterMode) {
-        if (!(item instanceof BlockItem bi)) return false;
-        Block block = bi.getBlock();
-        ResourceLocation rl = block.getRegistryName();
-        if (rl == null) return false;
-
-        // All filters exclude creative-only blocks
-        if (isCreativeOnly(rl)) return false;
-
-        if (filterMode == 1) { // Filtered
-            return !isOre(rl) && !isWorkstation(rl) && !isLightBlock(rl) && !isRedstoneComponent(rl);
-        } else if (filterMode == 2) { // Survival+
-            return !isWorkstation(rl);
-        }
-        return true; // All
+                || path.contains("structure_block") || path.contains("structure_void")
+                || path.contains("jigsaw") || path.equals("spawner") || path.contains("portal")
+                || path.equals("moving_piston") || path.equals("light");
     }
 
     private static float lerp(float start, float end, float t) {
         return start + t * (end - start);
     }
 
-    // ── Math helpers ──────────────────────────────────────────────────────────
-
-    /**
-     * Converts sRGB [0-255] to CIE-Lab.
-     * Lab[0] = L* (0-100), Lab[1] = a* (~-128..127), Lab[2] = b* (~-128..127)
-     */
-    private static float[] rgbToLab(int ri, int gi, int bi) {
-        // Step 1: sRGB → linear RGB
-        float r = srgbToLinear(ri / 255.0f);
-        float g = srgbToLinear(gi / 255.0f);
-        float b = srgbToLinear(bi / 255.0f);
-
-        // Step 2: linear RGB → XYZ (D65 illuminant)
-        float X = r * 0.4124564f + g * 0.3575761f + b * 0.1804375f;
-        float Y = r * 0.2126729f + g * 0.7151522f + b * 0.0721750f;
-        float Z = r * 0.0193339f + g * 0.1191920f + b * 0.9503041f;
-
-        // Normalise by D65 white point
-        X /= 0.95047f;
-        // Y stays /= 1.00000
-        Z /= 1.08883f;
-
-        // Step 3: XYZ → Lab
-        X = labF(X);
-        Y = labF(Y);
-        Z = labF(Z);
-
-        float L = 116.0f * Y - 16.0f;
-        float a = 500.0f * (X - Y);
-        float bStar = 200.0f * (Y - Z);
-
-        return new float[]{L, a, bStar};
+    private static double labDistance(float l1, float a1, float b1, float l2, float a2, float b2) {
+        float dl = l1 - l2;
+        float da = a1 - a2;
+        float db = b1 - b2;
+        return dl * dl + da * da + db * db;
     }
 
-    private static float srgbToLinear(float c) {
-        return c <= 0.04045f ? c / 12.92f : (float) Math.pow((c + 0.055f) / 1.055f, 2.4);
+    private static float[] rgbToLab(int red, int green, int blue) {
+        float r = srgbToLinear(red / 255.0f);
+        float g = srgbToLinear(green / 255.0f);
+        float b = srgbToLinear(blue / 255.0f);
+        float x = (r * 0.4124564f + g * 0.3575761f + b * 0.1804375f) / 0.95047f;
+        float y = r * 0.2126729f + g * 0.7151522f + b * 0.0721750f;
+        float z = (r * 0.0193339f + g * 0.1191920f + b * 0.9503041f) / 1.08883f;
+        x = labF(x);
+        y = labF(y);
+        z = labF(z);
+        return new float[]{116.0f * y - 16.0f, 500.0f * (x - y), 200.0f * (y - z)};
     }
 
-    private static float labF(float t) {
-        final float delta = 6.0f / 29.0f;
-        return t > delta * delta * delta
-                ? (float) Math.cbrt(t)
-                : t / (3 * delta * delta) + 4.0f / 29.0f;
+    private static float srgbToLinear(float value) {
+        return value <= 0.04045f ? value / 12.92f
+                : (float) Math.pow((value + 0.055f) / 1.055f, 2.4);
     }
 
-    public static List<ItemStack> solveColorPicker(ItemStack target, int filterMode, int[] offsets) {
-        ensureRegistryPopulated();
-        List<ItemStack> path = new ArrayList<>(Collections.nCopies(9, ItemStack.EMPTY));
-        if (target.isEmpty()) return path;
-
-        BlockColor targetColor = resolveColor(target);
-
-        boolean targetIsSlab = isSlab(target);
-        boolean targetIsStair = isStair(target);
-
-        List<BlockColor> candidates = new ArrayList<>();
-        synchronized (ColorGradientSolver.class) {
-            for (BlockColor bc : ALL_BLOCKS) {
-                if (matchesFilter(bc.item, filterMode)) {
-                    ItemStack cStack = new ItemStack(bc.item);
-                    if (targetIsSlab && !isSlab(cStack)) continue;
-                    if (targetIsStair && !isStair(cStack)) continue;
-                    if (!targetIsSlab && !targetIsStair && filterMode != 0 && (isSlab(cStack) || isStair(cStack)))
-                        continue;
-                    candidates.add(bc);
-                }
-            }
-        }
-        if (candidates.isEmpty()) {
-            synchronized (ColorGradientSolver.class) {
-                candidates = new ArrayList<>(ALL_BLOCKS);
-            }
-        }
-
-        candidates.sort(Comparator.comparingDouble(bc -> labDistance(targetColor.L, targetColor.a, targetColor.bStar, bc.L, bc.a, bc.bStar)));
-
-        // 1. Establish default baseline (offset = 0)
-        Item[] defaults = new Item[9];
-        Set<Item> defaultUsed = new HashSet<>();
-        for (int i = 0; i < 9; i++) {
-            BlockColor chosen = null;
-            for (BlockColor bc : candidates) {
-                if (!defaultUsed.contains(bc.item)) {
-                    chosen = bc;
-                    break;
-                }
-            }
-            if (chosen == null && !candidates.isEmpty()) {
-                chosen = candidates.get(0);
-            }
-            if (chosen != null) {
-                defaults[i] = chosen.item;
-                defaultUsed.add(chosen.item);
-            }
-        }
-
-        // 2. Solve each slot with its offset, excluding defaults of other slots
-        for (int i = 0; i < 9; i++) {
-            Set<Item> excluded = new HashSet<>();
-            for (int j = 0; j < 9; j++) {
-                if (j != i && defaults[j] != null) {
-                    excluded.add(defaults[j]);
-                }
-            }
-
-            List<BlockColor> available = new ArrayList<>();
-            for (BlockColor bc : candidates) {
-                if (!excluded.contains(bc.item)) {
-                    available.add(bc);
-                }
-            }
-            if (available.isEmpty()) {
-                available = candidates;
-            }
-
-            int skipCount = offsets[i] % available.size();
-            BlockColor chosen = available.get(skipCount);
-            if (chosen != null) {
-                path.set(i, new ItemStack(chosen.item));
-            }
-        }
-        return path;
+    private static float labF(float value) {
+        float delta = 6.0f / 29.0f;
+        return value > delta * delta * delta ? (float) Math.cbrt(value)
+                : value / (3 * delta * delta) + 4.0f / 29.0f;
     }
 
-    public static List<ItemStack> solveColorPickerWithInventory(ItemStack target, List<ItemStack> inventory, int[] offsets) {
-        ensureRegistryPopulated();
-        List<ItemStack> path = new ArrayList<>(Collections.nCopies(9, ItemStack.EMPTY));
-        if (target.isEmpty()) return path;
-
-        BlockColor targetColor = resolveColor(target);
-
-        boolean targetIsSlab = isSlab(target);
-        boolean targetIsStair = isStair(target);
-
-        Set<Item> invItems = new HashSet<>();
-        for (ItemStack s : inventory) {
-            if (!s.isEmpty()) {
-                invItems.add(s.getItem());
-            }
-        }
-
-        List<BlockColor> candidates = new ArrayList<>();
-        synchronized (ColorGradientSolver.class) {
-            for (BlockColor bc : ALL_BLOCKS) {
-                if (invItems.contains(bc.item)) {
-                    ItemStack cStack = new ItemStack(bc.item);
-                    if (targetIsSlab && !isSlab(cStack)) continue;
-                    if (targetIsStair && !isStair(cStack)) continue;
-                    if (!targetIsSlab && !targetIsStair && (isSlab(cStack) || isStair(cStack))) continue;
-                    candidates.add(bc);
-                }
-            }
-        }
-        if (candidates.isEmpty()) {
-            synchronized (ColorGradientSolver.class) {
-                candidates = new ArrayList<>(ALL_BLOCKS);
-            }
-        }
-
-        candidates.sort(Comparator.comparingDouble(bc -> labDistance(targetColor.L, targetColor.a, targetColor.bStar, bc.L, bc.a, bc.bStar)));
-
-        // 1. Establish default baseline (offset = 0)
-        Item[] defaults = new Item[9];
-        Set<Item> defaultUsed = new HashSet<>();
-        for (int i = 0; i < 9; i++) {
-            BlockColor chosen = null;
-            for (BlockColor bc : candidates) {
-                if (!defaultUsed.contains(bc.item)) {
-                    chosen = bc;
-                    break;
-                }
-            }
-            if (chosen == null && !candidates.isEmpty()) {
-                chosen = candidates.get(0);
-            }
-            if (chosen != null) {
-                defaults[i] = chosen.item;
-                defaultUsed.add(chosen.item);
-            }
-        }
-
-        // 2. Solve each slot with its offset, excluding defaults of other slots
-        for (int i = 0; i < 9; i++) {
-            Set<Item> excluded = new HashSet<>();
-            for (int j = 0; j < 9; j++) {
-                if (j != i && defaults[j] != null) {
-                    excluded.add(defaults[j]);
-                }
-            }
-
-            List<BlockColor> available = new ArrayList<>();
-            for (BlockColor bc : candidates) {
-                if (!excluded.contains(bc.item)) {
-                    available.add(bc);
-                }
-            }
-            if (available.isEmpty()) {
-                available = candidates;
-            }
-
-            int skipCount = offsets[i] % available.size();
-            BlockColor chosen = available.get(skipCount);
-            if (chosen != null) {
-                path.set(i, new ItemStack(chosen.item));
-            }
-        }
-        return path;
-    }
-
-    public static class BlockColor {
+    public static final class BlockColor {
         public final Item item;
-        public final int r, g, b;
-        /**
-         * CIE-Lab coordinates, computed once at registration time.
-         */
-        public final float L, a, bStar;
+        public final int r;
+        public final int g;
+        public final int b;
+        public final int categories;
+        public final float L;
+        public final float a;
+        public final float bStar;
 
-        public BlockColor(Item item, int r, int g, int b) {
+        public BlockColor(Item item, int r, int g, int b, int categories) {
             this.item = item;
             this.r = r;
             this.g = g;
             this.b = b;
+            this.categories = normalizeCategories(categories);
             float[] lab = rgbToLab(r, g, b);
             this.L = lab[0];
             this.a = lab[1];
             this.bStar = lab[2];
+        }
+
+        private BlockColor(float l, float a, float bStar) {
+            this.item = null;
+            this.r = 0;
+            this.g = 0;
+            this.b = 0;
+            this.categories = 0;
+            this.L = l;
+            this.a = a;
+            this.bStar = bStar;
+        }
+
+        private static BlockColor target(float l, float a, float bStar) {
+            return new BlockColor(l, a, bStar);
         }
     }
 }

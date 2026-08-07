@@ -1595,6 +1595,14 @@ public class BuildScape {
     public static class ClientModEvents {
 
         @SubscribeEvent
+        public static void onRegisterClientReloadListeners(
+                net.minecraftforge.client.event.RegisterClientReloadListenersEvent event) {
+            net.minecraft.server.packs.resources.ResourceManagerReloadListener listener = resourceManager ->
+                    com.kingodogo.buildscape.client.workbench.ClientBlockColorCatalog.invalidate();
+            event.registerReloadListener(listener);
+        }
+
+        @SubscribeEvent
         public static void onClientSetup(FMLClientSetupEvent event) {
             event.enqueueWork(() -> {
                 com.kingodogo.buildscape.block.ModWoodTypes.MANGROVE.getClass();

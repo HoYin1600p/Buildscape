@@ -27,7 +27,7 @@ public final class WbRenderer {
     public static final ResourceLocation BG_CENTER = new ResourceLocation("buildscape", "textures/gui/builders_workbench/bg_center.png");
     public static final ResourceLocation SLOT_INPUT = new ResourceLocation("buildscape", "textures/gui/builders_workbench/input_slot.png");
     public static final ResourceLocation SLOT_OUTPUT = new ResourceLocation("buildscape", "textures/gui/builders_workbench/output_slot.png");
-    public static final ResourceLocation SLOT_RESULT = new ResourceLocation("buildscape", "textures/gui/builders_workbench/result_slot.png");
+    public static final ResourceLocation SLOT_BLOCK = new ResourceLocation("buildscape", "textures/gui/builders_workbench/block_slot.png");
     public static final ResourceLocation TAB_NORMAL = new ResourceLocation("buildscape", "textures/gui/builders_workbench/builders_workbench_tab.png");
     public static final ResourceLocation TAB_HOVER = new ResourceLocation("buildscape", "textures/gui/builders_workbench/builders_workbench_tab_hover.png");
     public static final ResourceLocation TAB_SELECTED = new ResourceLocation("buildscape", "textures/gui/builders_workbench/builders_workbench_tab_selected.png");
@@ -38,12 +38,12 @@ public final class WbRenderer {
     public static final ResourceLocation BTN_ALL = new ResourceLocation("buildscape", "textures/gui/builders_workbench/all.png");
     public static final ResourceLocation BTN_ALL_HOVER = new ResourceLocation("buildscape", "textures/gui/builders_workbench/all_hover.png");
     public static final ResourceLocation BTN_ALL_SEL = new ResourceLocation("buildscape", "textures/gui/builders_workbench/all_selected.png");
-    public static final ResourceLocation BTN_FILTERED = new ResourceLocation("buildscape", "textures/gui/builders_workbench/filtered.png");
-    public static final ResourceLocation BTN_FILTERED_HOVER = new ResourceLocation("buildscape", "textures/gui/builders_workbench/filtered_hover.png");
-    public static final ResourceLocation BTN_FILTERED_SEL = new ResourceLocation("buildscape", "textures/gui/builders_workbench/filtered_selected.png");
-    public static final ResourceLocation BTN_SURVIVAL = new ResourceLocation("buildscape", "textures/gui/builders_workbench/survival_plus.png");
-    public static final ResourceLocation BTN_SURVIVAL_HOVER = new ResourceLocation("buildscape", "textures/gui/builders_workbench/survival_plus_hover.png");
-    public static final ResourceLocation BTN_SURVIVAL_SEL = new ResourceLocation("buildscape", "textures/gui/builders_workbench/survival_plus_selected.png");
+    public static final ResourceLocation BTN_TRANSPARENT = new ResourceLocation("buildscape", "textures/gui/builders_workbench/transparent.png");
+    public static final ResourceLocation BTN_TRANSPARENT_HOVER = new ResourceLocation("buildscape", "textures/gui/builders_workbench/transparent_hover.png");
+    public static final ResourceLocation BTN_TRANSPARENT_SEL = new ResourceLocation("buildscape", "textures/gui/builders_workbench/transparent_selected.png");
+    public static final ResourceLocation BTN_NON_FULL = new ResourceLocation("buildscape", "textures/gui/builders_workbench/non_full.png");
+    public static final ResourceLocation BTN_NON_FULL_HOVER = new ResourceLocation("buildscape", "textures/gui/builders_workbench/non_full_hover.png");
+    public static final ResourceLocation BTN_NON_FULL_SEL = new ResourceLocation("buildscape", "textures/gui/builders_workbench/non_full_selected.png");
     public static final ResourceLocation POUCH_ICON = new ResourceLocation("minecraft", "textures/item/bundle.png");
     // Colors
     public static final int COLOR_BG_FILL = 0xFFDA9F6C; // exact brown color of builders_workbench_bg center
@@ -237,16 +237,17 @@ public final class WbRenderer {
             hoverTex = BTN_ALL_HOVER;
             selectedTex = BTN_ALL_SEL;
         } else if (index == 1) {
-            normalTex = BTN_FILTERED;
-            hoverTex = BTN_FILTERED_HOVER;
-            selectedTex = BTN_FILTERED_SEL;
+            normalTex = BTN_TRANSPARENT;
+            hoverTex = BTN_TRANSPARENT_HOVER;
+            selectedTex = BTN_TRANSPARENT_SEL;
         } else {
-            normalTex = BTN_SURVIVAL;
-            hoverTex = BTN_SURVIVAL_HOVER;
-            selectedTex = BTN_SURVIVAL_SEL;
+            normalTex = BTN_NON_FULL;
+            hoverTex = BTN_NON_FULL_HOVER;
+            selectedTex = BTN_NON_FULL_SEL;
         }
 
-        ResourceLocation activeTex = (currentMask == index) ? selectedTex : (hovered ? hoverTex : normalTex);
+        ResourceLocation activeTex = (currentMask & (1 << index)) != 0
+                ? selectedTex : (hovered ? hoverTex : normalTex);
         RenderSystem.setShaderTexture(0, activeTex);
         GuiComponent.blit(ps, x, y, 0, 0, 18, 18, 18, 18);
     }
@@ -369,9 +370,9 @@ public final class WbRenderer {
         GuiComponent.blit(ps, ox, oy, 0, 0, iconW, iconH, iconW, iconH);
     }
 
-    public static void drawColorBuilderBG(PoseStack ps, int x, int y, int w) {
+    public static void drawColorBuilderBG(PoseStack ps, int x, int y) {
         RenderSystem.setShaderTexture(0, BG_COLOR_BUILDER);
-        GuiComponent.blit(ps, x, y, 0, 0, 176, 192, 176, 192);
+        GuiComponent.blit(ps, x, y, 0, 0, 185, 193, 185, 193);
     }
 
     public static void drawRescaledIcon(PoseStack ps, int x, int y, ResourceLocation icon, int destW, int destH, int texW, int texH, boolean hover) {

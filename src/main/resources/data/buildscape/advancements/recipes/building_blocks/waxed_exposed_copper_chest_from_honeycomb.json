@@ -2,26 +2,28 @@
   "parent": "minecraft:recipes/root",
   "criteria": {
     "has_exposed_copper_chest": {
+      "trigger": "minecraft:inventory_changed",
       "conditions": {
         "items": [
           {
-            "items": "buildscape:exposed_copper_chest"
+            "items": [
+              "buildscape:exposed_copper_chest"
+            ]
           }
         ]
-      },
-      "trigger": "minecraft:inventory_changed"
+      }
     },
     "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
       "conditions": {
         "recipe": "buildscape:waxed_exposed_copper_chest_from_honeycomb"
-      },
-      "trigger": "minecraft:recipe_unlocked"
+      }
     }
   },
   "requirements": [
     [
-      "has_the_recipe",
-      "has_exposed_copper_chest"
+      "has_exposed_copper_chest",
+      "has_the_recipe"
     ]
   ],
   "rewards": {

@@ -1,7 +1,7 @@
 {
   "variants": {
     "": {
-      "model": "minecraft:block/oxidized_copper_chest"
+      "model": "buildscape:block/oxidized_copper_chest"
     }
   }
 }

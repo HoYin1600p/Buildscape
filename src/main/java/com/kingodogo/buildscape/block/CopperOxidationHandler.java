@@ -10,8 +10,10 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.ChestBlock;
 import net.minecraft.world.level.block.DoorBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.ChestType;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
@@ -306,10 +308,40 @@ public class CopperOxidationHandler {
 
             level.setBlock(lowerPos, lowerState, 2 | 16);
             level.setBlock(upperPos, upperState, 3);
+        } else if (state.getBlock() instanceof CopperChestBlock && targetBlock instanceof CopperChestBlock) {
+            setCopperChestState(level, pos, state, targetBlock);
         } else {
             BlockState nextState = copyStateProperties(state, targetBlock.defaultBlockState());
             level.setBlock(pos, nextState, 3);
         }
+    }
+
+    private static void setCopperChestState(Level level, BlockPos pos, BlockState state, Block targetBlock) {
+        BlockState nextState = copyStateProperties(state, targetBlock.defaultBlockState());
+        ChestType chestType = state.getValue(ChestBlock.TYPE);
+
+        if (chestType == ChestType.SINGLE) {
+            level.setBlock(pos, nextState, 3);
+            return;
+        }
+
+        BlockPos partnerPos = pos.relative(ChestBlock.getConnectedDirection(state));
+        BlockState partnerState = level.getBlockState(partnerPos);
+        if (partnerState.getBlock() != state.getBlock()
+                || partnerState.getValue(ChestBlock.TYPE) == ChestType.SINGLE) {
+            level.setBlock(pos, nextState.setValue(ChestBlock.TYPE, ChestType.SINGLE), 3);
+            return;
+        }
+
+        BlockState partnerNextState = copyStateProperties(partnerState, targetBlock.defaultBlockState());
+
+        // Suppress intermediate shape updates so neither half is detached while the pair changes.
+        level.setBlock(pos, nextState, 2 | 16);
+        level.setBlock(partnerPos, partnerNextState, 2 | 16);
+        level.updateNeighborsAt(pos, targetBlock);
+        level.updateNeighborsAt(partnerPos, targetBlock);
+        level.updateNeighbourForOutputSignal(pos, targetBlock);
+        level.updateNeighbourForOutputSignal(partnerPos, targetBlock);
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})

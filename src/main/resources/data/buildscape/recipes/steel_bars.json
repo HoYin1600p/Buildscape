@@ -1,0 +1,16 @@
+{
+    "key":  {
+                "I":  {
+                          "item":  "buildscape:steel_ingot"
+                      }
+            },
+    "pattern":  [
+                    "III",
+                    "III"
+                ],
+    "result":  {
+                   "count":  16,
+                   "item":  "buildscape:steel_bars"
+               },
+    "type":  "minecraft:crafting_shaped"
+}

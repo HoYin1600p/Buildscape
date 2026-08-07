@@ -14,6 +14,22 @@
     "buildscape:pale_hanging_moss",
     "buildscape:pale_moss_block_slab",
     "buildscape:pale_moss_block_stairs",
-    "buildscape:pale_moss_block_vertical_slab"
+    "buildscape:pale_moss_block_vertical_slab",
+    "buildscape:ochre_froglight",
+    "buildscape:pearlescent_froglight",
+    "buildscape:verdant_froglight",
+    "buildscape:gleaming_froglight",
+    "buildscape:ivory_froglight",
+    "buildscape:ashen_froglight",
+    "buildscape:onyx_froglight",
+    "buildscape:dusky_froglight",
+    "buildscape:scarlet_froglight",
+    "buildscape:russet_froglight",
+    "buildscape:veridian_froglight",
+    "buildscape:tidal_froglight",
+    "buildscape:cerulean_froglight",
+    "buildscape:azure_froglight",
+    "buildscape:iridescent_froglight",
+    "buildscape:coraline_froglight"
   ]
 }

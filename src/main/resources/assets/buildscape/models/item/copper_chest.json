@@ -1,0 +1,7 @@
+{
+    "gui_light":  "front",
+    "parent":  "builtin/entity",
+    "textures":  {
+                     "particle":  "minecraft:block/copper_block"
+                 }
+}

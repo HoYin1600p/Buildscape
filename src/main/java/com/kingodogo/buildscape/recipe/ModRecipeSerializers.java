@@ -37,4 +37,11 @@ public class ModRecipeSerializers {
             () -> new SimpleRecipeSerializer<>(ConfettiConfigureRecipe::new)
     );
 
+    public static final RegistryObject<
+            SimpleRecipeSerializer<ClearShulkerFiltersRecipe>
+            > CLEAR_SHULKER_FILTERS_RECIPE = RECIPE_SERIALIZERS.register(
+            "clear_shulker_filters",
+            () -> new SimpleRecipeSerializer<>(ClearShulkerFiltersRecipe::new)
+    );
+
 }

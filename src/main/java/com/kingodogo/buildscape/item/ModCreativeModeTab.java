@@ -297,9 +297,6 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.BIT_OXIDIZED_COPPER_BULB.get()));
             items.add(new ItemStack(ModItems.BIT_OXIDIZED_COPPER_GRATE.get()));
             items.add(new ItemStack(ModItems.COPPER_NUGGET.get()));
-            items.add(new ItemStack(ModItems.STEEL_INGOT.get()));
-            items.add(new ItemStack(ModItems.STEEL_NUGGET.get()));
-
             // --- COPPER EXPANSION ---
             items.add(new ItemStack(ModItems.COPPER_TORCH.get()));
             items.add(new ItemStack(ModItems.COPPER_ROD.get()));
@@ -443,6 +440,7 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.NETHERITE_CHAIN.get()));
             items.add(new ItemStack(ModItems.LARGE_NETHERITE_CHAIN.get()));
             items.add(new ItemStack(ModItems.STEEL_INGOT.get()));
+            items.add(new ItemStack(ModItems.STEEL_NUGGET.get()));
             items.add(new ItemStack(ModItems.WRENCH.get()));
             items.add(new ItemStack(ModItems.IRON_HAMMER.get()));
             items.add(new ItemStack(ModItems.DIAMOND_HAMMER.get()));

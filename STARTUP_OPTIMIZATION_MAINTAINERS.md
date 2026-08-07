@@ -32,8 +32,8 @@ namespace and uses the established Buildscape registries.
 
 Non-solid render layers are assigned by
 `client/BuildscapeRenderLayers.java`. Existing naming conventions cover common
-glass, leaf, wallpaper, chain, vine, ornament, string-light, and decorative
-families.
+glass and jar, leaf, wallpaper, chain, bars, mesh, ladder, vine, ornament,
+string-light, and decorative families.
 
 When adding a translucent, cutout, or cutout-mipped block:
 

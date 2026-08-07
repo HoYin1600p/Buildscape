@@ -21,10 +21,56 @@ import java.util.Arrays;
 import java.util.List;
 
 public class BuildersWorkbenchScreen extends AbstractContainerScreen<BuildersWorkbenchMenu> {
-    private static final int COLOR_WIDTH = 185;
-    private static final int COLOR_HEIGHT = 193;
-    private static final int GRADIENT_WIDTH = 216;
-    private static final int GRADIENT_HEIGHT = 241;
+    // ── Layout ────────────────────────────────────────────────────────────────
+    // All values below are relative to leftPos/topPos and mirror the artwork in
+    // textures/gui/builders_workbench/{color,gradient}_builder_bg.png (256x256 sheets,
+    // artwork anchored at 0,0). Slot coordinates MUST stay in sync with
+    // BuildersWorkbenchMenu - see the LAYOUT block there.
+    private static final int COLOR_WIDTH = 184;
+    private static final int GRADIENT_WIDTH = 206;
+    private static final int GUI_HEIGHT = 203;
+
+    // Tab sprites are 17x17 with the icon baked in. TAB_Y = -1 keeps their bottom edge
+    // exactly where the artwork expects it (GUI y = 15, one row above the panel top),
+    // and the 3px gap matches the spacing drawn in the mockup.
+    private static final int TAB_SIZE = 17;
+    private static final int TAB_Y = -1;
+    private static final int TAB_COLOR_X = 6;
+    private static final int TAB_GRADIENT_X = 26;
+
+    // Title banner (baked into the background). Every title is scaled to the same
+    // usable width, so both tabs end up with an identical margin on each side even
+    // though their strings differ in length.
+    private static final int TITLE_X = 58;
+    private static final int TITLE_W = 68;
+    private static final int TITLE_Y = 14;
+    private static final int TITLE_PAD = 8;   // margin left and right, identical on both tabs
+    private static final int TITLE_H = 8;     // vanilla glyph height
+    private static final float TITLE_MIN_SCALE = 0.5f;
+    /** Trailing glyph spacing that font.width() includes but nothing actually draws. */
+    private static final int TITLE_TRAILING_ADVANCE = 1;
+    private static final String TITLE_KEY_COLOR = "screen.buildscape.builders_workbench.color_builder";
+    private static final String TITLE_KEY_GRADIENT = "screen.buildscape.builders_workbench.gradient_builder";
+
+    // Filter buttons (18x18, stacked vertically)
+    private static final int FILTER_Y = 33;
+    private static final int FILTER_SPACING = 18;
+    private static final int COLOR_FILTER_X = 141;
+    private static final int GRADIENT_FILTER_X = 184;
+
+    // Copy arrow (48x16, animated) - identical position on both tabs. The sprite has
+    // transparent padding: the ink sits at x 4..43, y 2..12, symmetric around row 7.
+    // These values put that ink in the middle of the 46px gap between the pouch slots.
+    private static final int ARROW_X = 68;
+    private static final int ARROW_Y = 94;
+
+    // Slot interiors used for the re-roll dots (must match the menu)
+    private static final int COLOR_RESULT_X = 66;
+    private static final int COLOR_RESULT_Y = 34;
+    private static final int GRADIENT_OUTPUT_X = 12;
+    private static final int GRADIENT_OUTPUT_Y = 65;
+    /** Above the item render layer (items blit around Z 100-200) so the dots stay visible. */
+    private static final float REROLL_Z = 300.0f;
 
     private int activeTab;
     private int filterMask;
@@ -75,7 +121,7 @@ public class BuildersWorkbenchScreen extends AbstractContainerScreen<BuildersWor
 
     private void updateDimensions() {
         imageWidth = activeTab == 0 ? COLOR_WIDTH : GRADIENT_WIDTH;
-        imageHeight = activeTab == 0 ? COLOR_HEIGHT : GRADIENT_HEIGHT;
+        imageHeight = GUI_HEIGHT;
         leftPos = (width - imageWidth) / 2;
         topPos = (height - imageHeight) / 2;
     }
@@ -138,107 +184,108 @@ public class BuildersWorkbenchScreen extends AbstractContainerScreen<BuildersWor
         int y = topPos;
         RenderSystem.disableDepthTest();
 
-        boolean colorHover = isIn(mouseX, mouseY, x + 8, y - 12, 16, 16);
-        boolean gradientHover = isIn(mouseX, mouseY, x + 26, y - 12, 16, 16);
-        WbRenderer.drawTabButton(poseStack, x + 8, y - 12, activeTab == 0, colorHover,
-                WbRenderer.ICON_COLOR_BUILDER, 16, 16);
-        WbRenderer.drawTabButton(poseStack, x + 26, y - 12, activeTab == 1, gradientHover,
-                WbRenderer.ICON_GRADIENT_BUILDER, 18, 18);
+        // The whole static layout - panel, frames, every slot background, the player
+        // inventory and the idle arrow - lives in a single background texture.
+        WbRenderer.drawBuilderBG(poseStack,
+                activeTab == 0 ? WbRenderer.BG_COLOR_BUILDER : WbRenderer.BG_GRADIENT_BUILDER,
+                x, y, imageWidth, imageHeight);
 
-        if (activeTab == 0) renderColorBuilder(poseStack, x, y, mouseX, mouseY);
-        else renderGradientBuilder(poseStack, x, y, mouseX, mouseY);
+        drawTabs(poseStack, x, y, mouseX, mouseY);
+        drawTitle(poseStack, x, y, activeTab == 0 ? TITLE_KEY_COLOR : TITLE_KEY_GRADIENT);
+        drawFilters(poseStack, x + filterX(), y + FILTER_Y, mouseX, mouseY);
+        drawCopyArrow(poseStack, x + ARROW_X, y + ARROW_Y);
+
         RenderSystem.enableDepthTest();
     }
 
-    private void renderColorBuilder(PoseStack poseStack, int x, int y, int mouseX, int mouseY) {
-        WbRenderer.drawColorBuilderBG(poseStack, x, y);
-        WbRenderer.drawSlotTexture(poseStack, WbRenderer.SLOT_INPUT, x + 27, y + 37);
-        for (int i = 0; i < 9; i++) {
-            int column = i % 3;
-            int row = i / 3;
-            WbRenderer.drawSlotTexture(poseStack, WbRenderer.SLOT_BLOCK, x + 62 + column * 18, y + 23 + row * 18);
-        }
-        drawFilters(poseStack, x + 131, y + 22, 22, mouseX, mouseY);
-        drawTitle(poseStack, x + 58, y + 1, 67, "screen.buildscape.builders_workbench.color_builder");
-        WbRenderer.drawSlotTexture(poseStack, WbRenderer.SLOT_INPUT, x + 46, y + 92);
-        WbRenderer.drawSlotTexture(poseStack, WbRenderer.SLOT_OUTPUT, x + 112, y + 92);
-        drawCopyArrow(poseStack, x + 64, y + 93);
+    private void drawTabs(PoseStack poseStack, int x, int y, int mouseX, int mouseY) {
+        boolean colorHover = isIn(mouseX, mouseY, x + TAB_COLOR_X, y + TAB_Y, TAB_SIZE, TAB_SIZE);
+        boolean gradientHover = isIn(mouseX, mouseY, x + TAB_GRADIENT_X, y + TAB_Y, TAB_SIZE, TAB_SIZE);
+        WbRenderer.drawTabButton(poseStack, x + TAB_COLOR_X, y + TAB_Y, activeTab == 0, colorHover,
+                WbRenderer.TAB_COLOR, WbRenderer.TAB_COLOR_HOVER, WbRenderer.TAB_COLOR_SEL);
+        WbRenderer.drawTabButton(poseStack, x + TAB_GRADIENT_X, y + TAB_Y, activeTab == 1, gradientHover,
+                WbRenderer.TAB_GRADIENT, WbRenderer.TAB_GRADIENT_HOVER, WbRenderer.TAB_GRADIENT_SEL);
     }
 
-    private void renderGradientBuilder(PoseStack poseStack, int x, int y, int mouseX, int mouseY) {
-        WbRenderer.drawWorkstationBG(poseStack, x, y, imageWidth, 138);
-        WbRenderer.drawInsetBox(poseStack, x + 3, y + 42, 174, 30);
-        WbRenderer.drawInsetBox(poseStack, x + 3, y + 72, 174, 30);
-        WbRenderer.drawInsetBox(poseStack, x + 3, y + 106, 30, 30);
-        WbRenderer.drawInsetBox(poseStack, x + 147, y + 106, 30, 30);
-        WbRenderer.drawInsetBox(poseStack, x + 180, y + 16, 32, 80);
-        WbRenderer.drawTitleBanner(poseStack, x + 68, y + 6, 80, 14);
-        drawTitle(poseStack, x + 68, y + 6, 80, "screen.buildscape.builders_workbench.gradient_builder");
-
-        for (int i = 0; i < 9; i++) {
-            WbRenderer.drawSlotTexture(poseStack, WbRenderer.SLOT_INPUT, x + 8 + i * 18, y + 47);
-            WbRenderer.drawSlotTexture(poseStack, WbRenderer.SLOT_BLOCK, x + 8 + i * 18, y + 77);
-        }
-        WbRenderer.drawSlotTexture(poseStack, WbRenderer.SLOT_INPUT, x + 8, y + 111);
-        WbRenderer.drawSlotTexture(poseStack, WbRenderer.SLOT_OUTPUT, x + 152, y + 111);
-        drawFilters(poseStack, x + 187, y + 22, 24, mouseX, mouseY);
-        WbRenderer.drawProcessArrow(poseStack, x + 26, y + 112, 126, menu.getCopyProgress() / 40.0f);
-        WbRenderer.drawVanillaInventory(poseStack, font, x + 20, y + 145, 176, 96);
+    private int filterX() {
+        return activeTab == 0 ? COLOR_FILTER_X : GRADIENT_FILTER_X;
     }
 
-    private void drawTitle(PoseStack poseStack, int x, int y, int width, String key) {
+    private void drawTitle(PoseStack poseStack, int x, int y, String key) {
         String title = new TranslatableComponent(key).getString();
-        font.draw(poseStack, title, x + (width - font.width(title)) / 2.0f, y + 3, 0xFF372211);
+        int textWidth = font.width(title);
+        int usable = TITLE_W - TITLE_PAD * 2;
+
+        // Shrink to the shared usable width. Titles that already fit are left alone
+        // rather than stretched, so short localisations never look blown up.
+        float scale = textWidth > usable ? Math.max(TITLE_MIN_SCALE, (float) usable / textWidth) : 1.0f;
+
+        // font.width() counts the 1px spacing that follows every glyph, including the
+        // last one, so the visible ink is one pixel narrower than the measured width.
+        // Centring on the raw value biases the text to the left; centre on the ink.
+        float inkWidth = (textWidth - TITLE_TRAILING_ADVANCE) * scale;
+        float drawX = x + TITLE_X + (TITLE_W - inkWidth) / 2.0f;
+        float drawY = y + TITLE_Y + (TITLE_H - TITLE_H * scale) / 2.0f;
+
+        poseStack.pushPose();
+        poseStack.translate(drawX, drawY, 0.0f);
+        poseStack.scale(scale, scale, 1.0f);
+        font.draw(poseStack, title, 0.0f, 0.0f, 0xFF372211);
+        poseStack.popPose();
     }
 
-    private void drawFilters(PoseStack poseStack, int x, int y, int spacing, int mouseX, int mouseY) {
+    private void drawFilters(PoseStack poseStack, int x, int y, int mouseX, int mouseY) {
         for (int i = 0; i < 3; i++) {
-            boolean hovered = isIn(mouseX, mouseY, x, y + i * spacing, 18, 18);
-            WbRenderer.drawFilterButton(poseStack, x, y + i * spacing, i, filterMask, hovered);
+            boolean hovered = isIn(mouseX, mouseY, x, y + i * FILTER_SPACING, 18, 18);
+            WbRenderer.drawFilterButton(poseStack, x, y + i * FILTER_SPACING, i, filterMask, hovered);
         }
     }
 
     private void drawCopyArrow(PoseStack poseStack, int x, int y) {
-        RenderSystem.setShaderTexture(0, WbRenderer.BUILDERS_ARROW);
-        WbRenderer.blitFloat(poseStack, x, y, 48, 16, 0, 0, 1, 1);
-        float progress = Math.max(0, Math.min(1, menu.getCopyProgress() / 40.0f));
-        if (progress > 0) {
-            RenderSystem.setShaderTexture(0, WbRenderer.BUILDERS_ARROW_ACTIVE);
-            WbRenderer.blitFloat(poseStack, x, y, (int) (48 * progress), 16, 0, 0, progress, 1);
-        }
+        WbRenderer.drawCopyArrow(poseStack, x, y, menu.getCopyProgress() / 40.0f);
     }
 
+    /**
+     * Drawn after super.render() and lifted on the Z axis: item stacks are rendered at a
+     * blit offset of their own, so without this the dots would disappear under any item
+     * sitting in the slot.
+     */
     private void renderRerollControls(PoseStack poseStack, int mouseX, int mouseY) {
+        poseStack.pushPose();
+        poseStack.translate(0.0f, 0.0f, REROLL_Z);
+
         if (activeTab == 0) {
             for (int i = 0; i < 9; i++) drawRerollControl(poseStack, mouseX, mouseY,
-                    leftPos + 63 + i % 3 * 18, topPos + 24 + i / 3 * 18,
+                    leftPos + COLOR_RESULT_X + i % 3 * 18, topPos + COLOR_RESULT_Y + i / 3 * 18,
                     BuildersWorkbenchMenu.MENU_COLOR_RESULT_START + i);
         } else {
             for (int i = 0; i < 9; i++) {
                 if (isGradientAnchor(i)) continue;
                 drawRerollControl(poseStack, mouseX, mouseY,
-                        leftPos + 9 + i * 18, topPos + 78,
+                        leftPos + GRADIENT_OUTPUT_X + i * 18, topPos + GRADIENT_OUTPUT_Y,
                         BuildersWorkbenchMenu.MENU_GRADIENT_OUTPUT_START + i);
             }
         }
+
+        poseStack.popPose();
     }
 
     private void drawRerollControl(PoseStack poseStack, int mouseX, int mouseY, int slotX, int slotY, int menuSlot) {
         if (menuSlot < 0 || menuSlot >= menu.slots.size() || menu.getSlot(menuSlot).getItem().isEmpty()) return;
-        boolean hovered = isIn(mouseX, mouseY, slotX + 12, slotY + 12, 5, 5);
-        fill(poseStack, slotX + 12, slotY + 12, slotX + 17, slotY + 17,
+        boolean hovered = isIn(mouseX, mouseY, slotX + 11, slotY + 11, 5, 5);
+        fill(poseStack, slotX + 11, slotY + 11, slotX + 16, slotY + 16,
                 hovered ? 0xFF00FFCC : 0xFF00AA88);
-        fill(poseStack, slotX + 14, slotY + 14, slotX + 15, slotY + 15, 0xFF000000);
+        fill(poseStack, slotX + 13, slotY + 13, slotX + 14, slotY + 14, 0xFF000000);
     }
 
     @Override
     protected void renderTooltip(PoseStack poseStack, int mouseX, int mouseY) {
-        if (isIn(mouseX, mouseY, leftPos + 8, topPos - 12, 16, 16)) {
+        if (isIn(mouseX, mouseY, leftPos + TAB_COLOR_X, topPos + TAB_Y, TAB_SIZE, TAB_SIZE)) {
             renderComponentTooltip(poseStack, List.of(new TranslatableComponent(
                     "screen.buildscape.builders_workbench.color_builder")), mouseX, mouseY);
             return;
         }
-        if (isIn(mouseX, mouseY, leftPos + 26, topPos - 12, 16, 16)) {
+        if (isIn(mouseX, mouseY, leftPos + TAB_GRADIENT_X, topPos + TAB_Y, TAB_SIZE, TAB_SIZE)) {
             renderComponentTooltip(poseStack, List.of(new TranslatableComponent(
                     "screen.buildscape.builders_workbench.gradient_builder")), mouseX, mouseY);
             return;
@@ -266,11 +313,11 @@ public class BuildersWorkbenchScreen extends AbstractContainerScreen<BuildersWor
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         int x = leftPos;
         int y = topPos;
-        if (isIn(mouseX, mouseY, x + 8, y - 12, 16, 16)) {
+        if (isIn(mouseX, mouseY, x + TAB_COLOR_X, y + TAB_Y, TAB_SIZE, TAB_SIZE)) {
             switchTab(0);
             return true;
         }
-        if (isIn(mouseX, mouseY, x + 26, y - 12, 16, 16)) {
+        if (isIn(mouseX, mouseY, x + TAB_GRADIENT_X, y + TAB_Y, TAB_SIZE, TAB_SIZE)) {
             switchTab(1);
             return true;
         }
@@ -310,11 +357,10 @@ public class BuildersWorkbenchScreen extends AbstractContainerScreen<BuildersWor
     }
 
     private int hoveredFilter(double mouseX, double mouseY) {
-        int x = activeTab == 0 ? leftPos + 131 : leftPos + 187;
-        int y = topPos + 22;
-        int spacing = activeTab == 0 ? 22 : 24;
+        int x = leftPos + filterX();
+        int y = topPos + FILTER_Y;
         for (int i = 0; i < 3; i++) {
-            if (isIn(mouseX, mouseY, x, y + i * spacing, 18, 18)) return i;
+            if (isIn(mouseX, mouseY, x, y + i * FILTER_SPACING, 18, 18)) return i;
         }
         return -1;
     }
@@ -322,18 +368,18 @@ public class BuildersWorkbenchScreen extends AbstractContainerScreen<BuildersWor
     private int hoveredReroll(double mouseX, double mouseY) {
         if (activeTab == 0) {
             for (int i = 0; i < 9; i++) {
-                int slotX = leftPos + 63 + i % 3 * 18;
-                int slotY = topPos + 24 + i / 3 * 18;
+                int slotX = leftPos + COLOR_RESULT_X + i % 3 * 18;
+                int slotY = topPos + COLOR_RESULT_Y + i / 3 * 18;
                 if (!menu.getSlot(BuildersWorkbenchMenu.MENU_COLOR_RESULT_START + i).getItem().isEmpty()
-                        && isIn(mouseX, mouseY, slotX + 12, slotY + 12, 5, 5)) return i;
+                        && isIn(mouseX, mouseY, slotX + 11, slotY + 11, 5, 5)) return i;
             }
         } else {
             for (int i = 0; i < 9; i++) {
-                int slotX = leftPos + 9 + i * 18;
-                int slotY = topPos + 78;
+                int slotX = leftPos + GRADIENT_OUTPUT_X + i * 18;
+                int slotY = topPos + GRADIENT_OUTPUT_Y;
                 if (!isGradientAnchor(i)
                         && !menu.getSlot(BuildersWorkbenchMenu.MENU_GRADIENT_OUTPUT_START + i).getItem().isEmpty()
-                        && isIn(mouseX, mouseY, slotX + 12, slotY + 12, 5, 5)) return i;
+                        && isIn(mouseX, mouseY, slotX + 11, slotY + 11, 5, 5)) return i;
             }
         }
         return -1;

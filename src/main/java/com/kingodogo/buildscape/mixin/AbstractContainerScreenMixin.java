@@ -1,5 +1,6 @@
 package com.kingodogo.buildscape.mixin;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.kingodogo.buildscape.util.GhostFilterMenu;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
@@ -18,6 +19,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(AbstractContainerScreen.class)
 public abstract class AbstractContainerScreenMixin {
+    private static final float BUILDSCAPE_GHOST_OPACITY = 0.6F;
+
     @Shadow
     @Final
     protected AbstractContainerMenu menu;
@@ -32,9 +35,23 @@ public abstract class AbstractContainerScreenMixin {
         placeholder.getOrCreateTag().putBoolean("ghost", true);
         Minecraft minecraft = Minecraft.getInstance();
         ItemRenderer renderer = minecraft.getItemRenderer();
-        renderer.blitOffset = 100.0F;
-        renderer.renderAndDecorateItem(minecraft.player, placeholder, slot.x, slot.y,
-                slot.x + slot.y * 176);
-        renderer.blitOffset = 0.0F;
+        float previousBlitOffset = renderer.blitOffset;
+        float[] previousShaderColor = RenderSystem.getShaderColor();
+        float previousRed = previousShaderColor[0];
+        float previousGreen = previousShaderColor[1];
+        float previousBlue = previousShaderColor[2];
+        float previousAlpha = previousShaderColor[3];
+
+        try {
+            RenderSystem.enableBlend();
+            RenderSystem.defaultBlendFunc();
+            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, BUILDSCAPE_GHOST_OPACITY);
+            renderer.blitOffset = 100.0F;
+            renderer.renderAndDecorateItem(minecraft.player, placeholder, slot.x, slot.y,
+                    slot.x + slot.y * 176);
+        } finally {
+            renderer.blitOffset = previousBlitOffset;
+            RenderSystem.setShaderColor(previousRed, previousGreen, previousBlue, previousAlpha);
+        }
     }
 }

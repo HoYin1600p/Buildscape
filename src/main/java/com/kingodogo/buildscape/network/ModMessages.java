@@ -7,7 +7,7 @@ import net.minecraftforge.network.simple.SimpleChannel;
 
 public class ModMessages {
 
-    private static final String PROTOCOL_VERSION = "1";
+    private static final String PROTOCOL_VERSION = "2";
     public static final SimpleChannel INSTANCE = NetworkRegistry.newSimpleChannel(
             new ResourceLocation(BuildScape.MODID, "main"),
             () -> PROTOCOL_VERSION,
@@ -124,10 +124,10 @@ public class ModMessages {
         );
         INSTANCE.registerMessage(
                 id++,
-                BuildersWorkbenchActionPacket.class,
-                BuildersWorkbenchActionPacket::encode,
-                BuildersWorkbenchActionPacket::decode,
-                BuildersWorkbenchActionPacket::handle
+                BuildersWorkbenchResultsPacket.class,
+                BuildersWorkbenchResultsPacket::encode,
+                BuildersWorkbenchResultsPacket::decode,
+                BuildersWorkbenchResultsPacket::handle
         );
     }
 }

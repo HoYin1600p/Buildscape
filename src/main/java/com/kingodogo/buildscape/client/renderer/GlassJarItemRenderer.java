@@ -39,10 +39,6 @@ public class GlassJarItemRenderer extends BlockEntityWithoutLevelRenderer {
                 dummyBE.setBlockState(state);
             }
 
-            if (Minecraft.getInstance().level != null) {
-                dummyBE.setLevel(Minecraft.getInstance().level);
-            }
-
             if (stack.hasTag() && stack.getTag().contains("BlockEntityTag", 10)) {
                 dummyBE.load(stack.getTag().getCompound("BlockEntityTag"));
             } else {

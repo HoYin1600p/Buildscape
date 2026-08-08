@@ -61,7 +61,7 @@ public class BuildersPouchMenu extends AbstractContainerMenu implements GhostFil
 
         for (int col = 0; col < POUCH_SLOTS; col++) {
             final int pouchSlot = col;
-            addSlot(new Slot(pouchInventory, col, 8 + col * 18, 20) {
+            addSlot(new Slot(pouchInventory, col, 8 + col * 18, 18) {
                 @Override
                 public boolean mayPlace(ItemStack stack) {
                     Item filter = BuildersPouchMenu.this.buildscape$getFilterItem(pouchSlot);

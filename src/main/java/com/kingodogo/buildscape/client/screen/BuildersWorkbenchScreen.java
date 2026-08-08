@@ -324,7 +324,20 @@ public class BuildersWorkbenchScreen extends AbstractContainerScreen<BuildersWor
 
         int filter = hoveredFilter(mouseX, mouseY);
         if (filter >= 0 && (button == 0 || button == 1)) {
-            filterMask ^= 1 << filter;
+            int categoryBit = 1 << filter;
+            int strictBit = categoryBit << ColorGradientSolver.STRICT_SHIFT;
+            if (hasShiftDown()) {
+                if ((filterMask & categoryBit) == 0) {
+                    filterMask |= categoryBit | strictBit;
+                } else if ((filterMask & strictBit) == 0) {
+                    filterMask |= strictBit;
+                } else {
+                    filterMask &= ~(categoryBit | strictBit);
+                }
+            } else {
+                filterMask ^= categoryBit;
+                if ((filterMask & categoryBit) == 0) filterMask &= ~strictBit;
+            }
             Arrays.fill(resultOffsets, 0);
             lastInputSignature = inputSignature();
             solveNow();

@@ -80,7 +80,7 @@ public final class BuildersWorkbenchResultsPacket {
                     || !workbench.stillValid(player)
                     || tab < 0 || tab > 1
                     || tab != workbench.getActiveTab()
-                    || filterMask < 0 || filterMask > ColorGradientSolver.FILTER_ALL) {
+                    || filterMask < 0 || (filterMask & ~ColorGradientSolver.FILTER_STATE_MASK) != 0) {
                 return;
             }
 

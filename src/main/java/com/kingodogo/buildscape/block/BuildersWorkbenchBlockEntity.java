@@ -356,7 +356,7 @@ public class BuildersWorkbenchBlockEntity extends BlockEntity implements MenuPro
     }
 
     public void setFilterMask(int mask) {
-        if (mask < 0 || mask > com.kingodogo.buildscape.util.ColorGradientSolver.FILTER_ALL) return;
+        if (mask < 0 || (mask & ~com.kingodogo.buildscape.util.ColorGradientSolver.FILTER_STATE_MASK) != 0) return;
         this.filterMask = mask;
         setChanged();
         if (activeTab == 0) {
@@ -418,7 +418,7 @@ public class BuildersWorkbenchBlockEntity extends BlockEntity implements MenuPro
 
     public void applyClientResults(int tab, int mask, int[] offsets, List<ItemStack> results) {
         if (tab < 0 || tab > 1 || mask < 0
-                || mask > com.kingodogo.buildscape.util.ColorGradientSolver.FILTER_ALL
+                || (mask & ~com.kingodogo.buildscape.util.ColorGradientSolver.FILTER_STATE_MASK) != 0
                 || results == null || results.size() != 9) {
             return;
         }
@@ -460,7 +460,7 @@ public class BuildersWorkbenchBlockEntity extends BlockEntity implements MenuPro
         if (tag.contains("ActiveTab")) this.activeTab = tag.getInt("ActiveTab");
         if (tag.contains("FilterMaskVersion")) {
             this.filterMask = tag.getInt("FilterMask")
-                    & com.kingodogo.buildscape.util.ColorGradientSolver.FILTER_ALL;
+                    & com.kingodogo.buildscape.util.ColorGradientSolver.FILTER_STATE_MASK;
         } else {
             this.filterMask = com.kingodogo.buildscape.util.ColorGradientSolver.FILTER_ALL;
         }
@@ -479,7 +479,7 @@ public class BuildersWorkbenchBlockEntity extends BlockEntity implements MenuPro
         ContainerHelper.saveAllItems(tag, items);
         tag.putInt("ActiveTab", activeTab);
         tag.putInt("FilterMask", filterMask);
-        tag.putInt("FilterMaskVersion", 1);
+        tag.putInt("FilterMaskVersion", 2);
         tag.putInt("CopyProgress", copyProgress);
         tag.putIntArray("ResultOffsets", resultOffsets);
      }

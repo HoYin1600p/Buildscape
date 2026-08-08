@@ -8,11 +8,59 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.EmptyBlockGetter;
 import net.minecraft.world.level.block.AbstractGlassBlock;
+import net.minecraft.world.level.block.AnvilBlock;
+import net.minecraft.world.level.block.BannerBlock;
+import net.minecraft.world.level.block.BarrelBlock;
+import net.minecraft.world.level.block.BasePressurePlateBlock;
+import net.minecraft.world.level.block.BaseRailBlock;
+import net.minecraft.world.level.block.BeaconBlock;
+import net.minecraft.world.level.block.BedBlock;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.BushBlock;
+import net.minecraft.world.level.block.ButtonBlock;
+import net.minecraft.world.level.block.CampfireBlock;
+import net.minecraft.world.level.block.CandleBlock;
+import net.minecraft.world.level.block.ChestBlock;
+import net.minecraft.world.level.block.ConduitBlock;
+import net.minecraft.world.level.block.DispenserBlock;
+import net.minecraft.world.level.block.DoorBlock;
+import net.minecraft.world.level.block.DropperBlock;
+import net.minecraft.world.level.block.EnchantmentTableBlock;
+import net.minecraft.world.level.block.EndRodBlock;
+import net.minecraft.world.level.block.EnderChestBlock;
+import net.minecraft.world.level.block.FenceBlock;
+import net.minecraft.world.level.block.FenceGateBlock;
+import net.minecraft.world.level.block.FlowerPotBlock;
+import net.minecraft.world.level.block.GrindstoneBlock;
 import net.minecraft.world.level.block.HalfTransparentBlock;
+import net.minecraft.world.level.block.HopperBlock;
+import net.minecraft.world.level.block.IronBarsBlock;
+import net.minecraft.world.level.block.LadderBlock;
+import net.minecraft.world.level.block.LanternBlock;
+import net.minecraft.world.level.block.LecternBlock;
 import net.minecraft.world.level.block.LeavesBlock;
+import net.minecraft.world.level.block.LeverBlock;
+import net.minecraft.world.level.block.NoteBlock;
+import net.minecraft.world.level.block.RedStoneOreBlock;
+import net.minecraft.world.level.block.RedstoneLampBlock;
+import net.minecraft.world.level.block.RepeaterBlock;
+import net.minecraft.world.level.block.SculkSensorBlock;
+import net.minecraft.world.level.block.SignBlock;
+import net.minecraft.world.level.block.SlabBlock;
+import net.minecraft.world.level.block.StairBlock;
 import net.minecraft.world.level.block.StainedGlassPaneBlock;
+import net.minecraft.world.level.block.StonecutterBlock;
+import net.minecraft.world.level.block.TntBlock;
+import net.minecraft.world.level.block.TorchBlock;
+import net.minecraft.world.level.block.TrapDoorBlock;
+import net.minecraft.world.level.block.TripWireBlock;
+import net.minecraft.world.level.block.WallBannerBlock;
+import net.minecraft.world.level.block.WallBlock;
+import net.minecraft.world.level.block.WallSignBlock;
+import net.minecraft.world.level.block.WallTorchBlock;
+import net.minecraft.world.level.block.WebBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.common.Tags;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -34,6 +82,9 @@ public final class ColorGradientSolver {
     public static final int FILTER_TRANSPARENT = 1 << 1;
     public static final int FILTER_NON_FULL = 1 << 2;
     public static final int FILTER_ALL = FILTER_SOLID | FILTER_TRANSPARENT | FILTER_NON_FULL;
+    // Low bits enable categories; the matching high bits apply shift-click exclusions.
+    public static final int STRICT_SHIFT = 3;
+    public static final int FILTER_STATE_MASK = FILTER_ALL | FILTER_ALL << STRICT_SHIFT;
 
     private static final Map<Item, BlockColor> REGISTRY = new LinkedHashMap<>();
     private static final List<BlockColor> ALL_BLOCKS = new ArrayList<>();
@@ -49,7 +100,8 @@ public final class ColorGradientSolver {
 
         try {
             BlockState state = block.defaultBlockState();
-            return !state.isAir() && state.getFluidState().isEmpty();
+            return !state.isAir() && state.getFluidState().isEmpty()
+                    && state.getDestroySpeed(EmptyBlockGetter.INSTANCE, BlockPos.ZERO) >= 0.0F;
         } catch (RuntimeException ignored) {
             return false;
         }
@@ -225,14 +277,40 @@ public final class ColorGradientSolver {
     }
 
     private static List<BlockColor> candidates(int filterMask) {
-        if ((filterMask & FILTER_ALL) == 0) return new ArrayList<>();
+        int enabled = filterMask & FILTER_ALL;
+        if (enabled == 0) return new ArrayList<>();
         List<BlockColor> result = new ArrayList<>();
         synchronized (ColorGradientSolver.class) {
             for (BlockColor color : ALL_BLOCKS) {
-                if ((color.categories & filterMask) != 0) result.add(color);
+                if (matchesFilter(color.item, color.categories, filterMask)) result.add(color);
             }
         }
         return result;
+    }
+
+    public static boolean matchesFilter(Item item, int filterState) {
+        return matchesFilter(item, categoriesFor(item), filterState);
+    }
+
+    private static boolean matchesFilter(Item item, int physicalCategories, int filterState) {
+        if (!(item instanceof BlockItem blockItem)) return false;
+        if (!isCandidateBlock(item)) return false;
+        int enabled = filterState & FILTER_ALL;
+        if (enabled == 0) return false;
+        if (isShiftExcluded(blockItem.getBlock(), filterState >>> STRICT_SHIFT & FILTER_ALL)) return false;
+        if (enabled == FILTER_ALL) return true;
+
+        Block block = blockItem.getBlock();
+        String path = registryPath(block);
+        return switch (enabled) {
+            case FILTER_SOLID -> physicalCategories == FILTER_SOLID && !path.contains("wallpaper_flat");
+            case FILTER_TRANSPARENT -> isTransparentOnly(block, path, physicalCategories);
+            case FILTER_NON_FULL -> isNonFullOnly(block, path, physicalCategories);
+            case FILTER_SOLID | FILTER_TRANSPARENT -> isSolidTransparent(block, path);
+            case FILTER_TRANSPARENT | FILTER_NON_FULL -> isTransparentNonFull(block, path);
+            case FILTER_SOLID | FILTER_NON_FULL -> isSolidNonFull(path);
+            default -> false;
+        };
     }
 
     private static Comparator<BlockColor> byDistance(BlockColor target) {
@@ -327,12 +405,117 @@ public final class ColorGradientSolver {
                 || block instanceof LeavesBlock
                 || path.contains("glass")
                 || path.contains("ice");
+        return categoriesFor(item, full, transparent);
+    }
 
-        int categories = 0;
-        if (full && !transparent) categories |= FILTER_SOLID;
-        if (transparent) categories |= FILTER_TRANSPARENT;
-        if (!full) categories |= FILTER_NON_FULL;
-        return normalizeCategories(categories);
+    public static int categoriesFor(Item item, boolean full, boolean transparent) {
+        if (!(item instanceof BlockItem blockItem)) return 0;
+        Block block = blockItem.getBlock();
+        String path = registryPath(block);
+        int physicalCategories = 0;
+        if (full && !transparent) physicalCategories |= FILTER_SOLID;
+        if (transparent) physicalCategories |= FILTER_TRANSPARENT;
+        if (!full) physicalCategories |= FILTER_NON_FULL;
+        if (path.contains("wallpaper_flat")) return FILTER_NON_FULL;
+        if (isTransparentNonFull(block, path)) return FILTER_TRANSPARENT | FILTER_NON_FULL;
+        if (isSolidTransparent(block, path)) return FILTER_SOLID | FILTER_TRANSPARENT;
+        if (isSolidNonFull(path)) return FILTER_SOLID | FILTER_NON_FULL;
+        if (isNonFullOnly(block, path, physicalCategories)) return FILTER_NON_FULL;
+        if (isTransparentOnly(block, path, physicalCategories)) {
+            return FILTER_TRANSPARENT;
+        }
+        return full ? FILTER_SOLID : FILTER_NON_FULL;
+    }
+
+    private static boolean isTransparentOnly(Block block, String path, int physicalCategories) {
+        if (isTransparentNonFull(block, path) || isSolidTransparent(block, path)) return false;
+        return physicalCategories == FILTER_TRANSPARENT && (block instanceof AbstractGlassBlock
+                || block instanceof LeavesBlock
+                || path.contains("glass") || path.contains("grate") || path.contains("leaves")
+                || path.equals("slime_block") || path.equals("honey_block")
+                || path.equals("ice") || path.equals("packed_ice") || path.equals("blue_ice")
+                || path.equals("frosted_ice") || path.equals("icicle_block"));
+    }
+
+    private static boolean isNonFullOnly(Block block, String path, int physicalCategories) {
+        if (isTransparentNonFull(block, path) || isSolidNonFull(path)) return false;
+        return block instanceof SlabBlock || block instanceof StairBlock || block instanceof WallBlock
+                || block instanceof BasePressurePlateBlock || block instanceof ButtonBlock
+                || block instanceof FenceBlock || block instanceof FenceGateBlock || block instanceof CandleBlock
+                || block instanceof BedBlock || block instanceof DoorBlock || block instanceof TrapDoorBlock
+                || block instanceof TorchBlock || block instanceof WallTorchBlock || block instanceof LanternBlock
+                || block instanceof CampfireBlock || block instanceof EndRodBlock || block instanceof BaseRailBlock
+                || block instanceof WebBlock || block instanceof LadderBlock || block instanceof ChestBlock
+                || block instanceof EnderChestBlock || block instanceof IronBarsBlock || block instanceof BannerBlock
+                || block instanceof WallBannerBlock || block instanceof SignBlock || block instanceof WallSignBlock
+                || block instanceof FlowerPotBlock || block instanceof BushBlock || block instanceof ConduitBlock
+                || block instanceof RepeaterBlock || block instanceof HopperBlock || block instanceof LecternBlock
+                || block instanceof TripWireBlock || block instanceof LeverBlock || block instanceof AnvilBlock
+                || block instanceof StonecutterBlock || block instanceof GrindstoneBlock
+                || block instanceof EnchantmentTableBlock || block instanceof SculkSensorBlock
+                || path.contains("decorated_pot") || path.contains("sculk_shrieker")
+                || path.contains("vertical_slab") || path.contains("spike") || path.contains("overlay")
+                || path.contains("hedge") || path.contains("foliage") || path.contains("candle")
+                || path.contains("stocking") || path.contains("item_frame")
+                || path.contains("smoke_vent") || path.contains("wallpaper_flat") || path.contains("copper_rod")
+                || path.contains("mesh") || path.contains("carpet_layer") || path.endsWith("_carpet")
+                || path.endsWith("_bars") || path.endsWith("_star") || path.endsWith("_chest")
+                || path.endsWith("_sign") || path.endsWith("_pot") || path.contains("amethyst_cluster")
+                || physicalCategories == FILTER_NON_FULL;
+    }
+
+    private static boolean isSolidTransparent(Block block, String path) {
+        return block instanceof RedstoneLampBlock
+                || block instanceof DropperBlock || block instanceof DispenserBlock || block instanceof NoteBlock
+                || block instanceof BeaconBlock
+                || path.contains("bulb") || path.contains("festive_lamp") || path.contains("froglight")
+                || path.equals("shroomlight") || path.equals("target") || path.equals("observer")
+                || path.equals("jack_o_lantern") || path.equals("lantern")
+                || path.endsWith("_lantern");
+    }
+
+    private static boolean isTransparentNonFull(Block block, String path) {
+        return block instanceof StainedGlassPaneBlock || path.contains("glass_pane")
+                || path.contains("leaf_layer") || path.contains("ornament")
+                || path.contains("string_light") || path.equals("icicle");
+    }
+
+    private static boolean isSolidNonFull(String path) {
+        return path.equals("soul_sand") || path.equals("mud") || path.equals("farmland");
+    }
+
+    private static boolean isShiftExcluded(Block block, int strictMask) {
+        if (strictMask == 0) return false;
+        String path = registryPath(block);
+        if ((strictMask & FILTER_SOLID) != 0 && (block instanceof BarrelBlock
+                || block instanceof TntBlock || isOre(block, path) || path.contains("workbench")
+                || path.contains("sack") || path.contains("big_book")
+                || path.contains("shulker_box") || path.contains("bookshelf") || path.contains("steel_fan")
+                || path.contains("muff_block"))) return true;
+        if ((strictMask & FILTER_TRANSPARENT) != 0 && (isSolidTransparent(block, path)
+                || path.contains("ornament") || path.contains("string_light"))) return true;
+        return (strictMask & FILTER_NON_FULL) != 0 && (block instanceof ConduitBlock
+                || block instanceof RepeaterBlock || block instanceof HopperBlock || block instanceof LecternBlock
+                || block instanceof TripWireBlock || block instanceof LeverBlock || block instanceof AnvilBlock
+                || block instanceof StonecutterBlock || block instanceof GrindstoneBlock
+                || block instanceof EnchantmentTableBlock || block instanceof SculkSensorBlock
+                || path.contains("decorated_pot") || path.contains("sculk_shrieker")
+                || path.endsWith("_star") || path.endsWith("_head") || path.contains("mob_head") || path.contains("_skull")
+                || path.contains("scaffolding") || path.contains("daylight_detector")
+                || path.contains("tripwire")
+                || path.equals("comparator") || path.equals("bell")
+                || path.contains("stocking") || path.contains("item_frame") || path.contains("smoke_vent")
+                || path.contains("wallpaper_flat"));
+    }
+
+    private static boolean isOre(Block block, String path) {
+        return block instanceof RedStoneOreBlock || block.defaultBlockState().is(Tags.Blocks.ORES)
+                || path.contains("_ore") || path.equals("ancient_debris");
+    }
+
+    private static String registryPath(Block block) {
+        ResourceLocation id = block.getRegistryName();
+        return id == null ? "" : id.getPath();
     }
 
     private static int normalizeCategories(int categories) {
@@ -343,9 +526,14 @@ public final class ColorGradientSolver {
     public static boolean isCreativeOnly(ResourceLocation id) {
         if (id == null) return false;
         String path = id.getPath();
-        return path.equals("bedrock") || path.equals("barrier") || path.contains("command_block")
+        return path.contains("bedrock") || path.equals("barrier") || path.contains("command_block")
                 || path.contains("structure_block") || path.contains("structure_void")
-                || path.contains("jigsaw") || path.equals("spawner") || path.contains("portal")
+                || path.contains("jigsaw") || path.equals("spawner") || path.equals("end_portal_frame")
+                || path.contains("infested") || path.equals("budding_amethyst")
+                || path.startsWith("cascade_block") || path.equals("mirror_block")
+                || path.equals("reinforced_deepslate")
+                || path.equals("petrified_oak_slab") || path.contains("test_instance_block")
+                || path.equals("test_block") || path.equals("trial_spawner")
                 || path.equals("moving_piston") || path.equals("light");
     }
 

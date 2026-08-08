@@ -84,7 +84,7 @@ public final class ClientBlockColorCatalog {
                         categories = ColorGradientSolver.categoriesFor(item);
                     } else {
                         rgb = sample.rgb;
-                        categories = categories(state, sample.transparent);
+                        categories = categories(item, state, sample.transparent);
                     }
                     colors.add(new ColorGradientSolver.BlockColor(item,
                             rgb >> 16 & 255, rgb >> 8 & 255, rgb & 255, categories));
@@ -212,7 +212,7 @@ public final class ClientBlockColorCatalog {
         return new PixelSample(red / weight, green / weight, blue / weight, transparent, true);
     }
 
-    private static int categories(BlockState state, boolean sampledTransparency) {
+    private static int categories(Item item, BlockState state, boolean sampledTransparency) {
         boolean full;
         try {
             full = Block.isShapeFullBlock(state.getShape(EmptyBlockGetter.INSTANCE, BlockPos.ZERO));
@@ -221,11 +221,7 @@ public final class ClientBlockColorCatalog {
         }
         boolean transparent = sampledTransparency
                 || ItemBlockRenderTypes.canRenderInLayer(state, RenderType.translucent());
-        int categories = 0;
-        if (full && !transparent) categories |= ColorGradientSolver.FILTER_SOLID;
-        if (transparent) categories |= ColorGradientSolver.FILTER_TRANSPARENT;
-        if (!full) categories |= ColorGradientSolver.FILTER_NON_FULL;
-        return categories == 0 ? ColorGradientSolver.FILTER_NON_FULL : categories;
+        return ColorGradientSolver.categoriesFor(item, full, transparent);
     }
 
     private static int fallbackColor(BlockState state) {

@@ -19,8 +19,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(AbstractContainerScreen.class)
 public abstract class AbstractContainerScreenMixin {
-    private static final float BUILDSCAPE_GHOST_OPACITY = 0.6F;
-
     @Shadow
     @Final
     protected AbstractContainerMenu menu;
@@ -45,7 +43,7 @@ public abstract class AbstractContainerScreenMixin {
         try {
             RenderSystem.enableBlend();
             RenderSystem.defaultBlendFunc();
-            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, BUILDSCAPE_GHOST_OPACITY);
+            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
             renderer.blitOffset = 100.0F;
             renderer.renderAndDecorateItem(minecraft.player, placeholder, slot.x, slot.y,
                     slot.x + slot.y * 176);

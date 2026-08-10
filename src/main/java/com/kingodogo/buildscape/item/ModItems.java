@@ -5813,6 +5813,21 @@ public class ModItems {
             () -> new HammerItem(HammerItem.HammerTier.NETHERITE, new Item.Properties().fireResistant().tab(ModCreativeModeTab.BUILDSCAPE_TAB))
     );
 
+    public static final RegistryObject<Item> COPPER_BIOME_BRUSH = ITEMS.register(
+            "copper_biome_brush",
+            () -> new BiomeBrushItem(BiomeBrushItem.BiomeBrushTier.COPPER, new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB))
+    );
+
+    public static final RegistryObject<Item> DIAMOND_BIOME_BRUSH = ITEMS.register(
+            "diamond_biome_brush",
+            () -> new BiomeBrushItem(BiomeBrushItem.BiomeBrushTier.DIAMOND, new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB))
+    );
+
+    public static final RegistryObject<Item> NETHERITE_BIOME_BRUSH = ITEMS.register(
+            "netherite_biome_brush",
+            () -> new BiomeBrushItem(BiomeBrushItem.BiomeBrushTier.NETHERITE, new Item.Properties().fireResistant().tab(ModCreativeModeTab.BUILDSCAPE_TAB))
+    );
+
     public static final RegistryObject<Item> BUILDERS_WORKBENCH = ITEMS.register(
             "builders_workbench",
             () -> new BlockItem(
@@ -10027,11 +10042,42 @@ public class ModItems {
             super.appendHoverText(stack, level, tooltip, flag);
             tooltip.add(new net.minecraft.network.chat.TranslatableComponent("tooltip.buildscape.wandering_homemaker_spawn_egg.spawn_info"));
             if (level != null) {
-                long currentTime = level.getGameTime();
+                long currentTime = System.currentTimeMillis();
                 long endTime = com.kingodogo.buildscape.client.HomemakerCooldownTracker.cooldownEndTime;
                 if (endTime > currentTime) {
-                    long remainingTicks = endTime - currentTime;
-                    long totalSeconds = remainingTicks / 20;
+                    long remainingMs = endTime - currentTime;
+                    long totalSeconds = remainingMs / 1000;
+                    long minutes = totalSeconds / 60;
+                    long seconds = totalSeconds % 60;
+                    tooltip.add(new net.minecraft.network.chat.TranslatableComponent("tooltip.buildscape.wandering_homemaker_spawn_egg.cooldown_active", minutes, seconds)
+                            .withStyle(net.minecraft.ChatFormatting.RED));
+                } else {
+                    tooltip.add(new net.minecraft.network.chat.TranslatableComponent("tooltip.buildscape.wandering_homemaker_spawn_egg.cooldown_ready")
+                            .withStyle(net.minecraft.ChatFormatting.GREEN));
+                }
+            }
+        }
+    }
+
+    public static class FestiveWanderingHomemakerSpawnEggItem extends net.minecraftforge.common.ForgeSpawnEggItem {
+        public FestiveWanderingHomemakerSpawnEggItem(java.util.function.Supplier<? extends net.minecraft.world.entity.EntityType<? extends net.minecraft.world.entity.Mob>> type, int backgroundColor, int highlightColor, Item.Properties properties) {
+            super(type, backgroundColor, highlightColor, properties);
+        }
+
+        public int getColor(int tintIndex) {
+            return -1;
+        }
+
+        @Override
+        public void appendHoverText(net.minecraft.world.item.ItemStack stack, @javax.annotation.Nullable net.minecraft.world.level.Level level, java.util.List<net.minecraft.network.chat.Component> tooltip, net.minecraft.world.item.TooltipFlag flag) {
+            super.appendHoverText(stack, level, tooltip, flag);
+            tooltip.add(new net.minecraft.network.chat.TranslatableComponent("tooltip.buildscape.festive_wandering_homemaker_spawn_egg.spawn_info"));
+            if (level != null) {
+                long currentTime = System.currentTimeMillis();
+                long endTime = com.kingodogo.buildscape.client.HomemakerCooldownTracker.cooldownEndTime;
+                if (endTime > currentTime) {
+                    long remainingMs = endTime - currentTime;
+                    long totalSeconds = remainingMs / 1000;
                     long minutes = totalSeconds / 60;
                     long seconds = totalSeconds % 60;
                     tooltip.add(new net.minecraft.network.chat.TranslatableComponent("tooltip.buildscape.wandering_homemaker_spawn_egg.cooldown_active", minutes, seconds)
@@ -10050,6 +10096,16 @@ public class ModItems {
                     com.kingodogo.buildscape.entity.ModEntities.WANDERING_HOMEMAKER,
                     0x5c3c24,
                     0xe4b484,
+                    createBlockItemProperties()
+            )
+    );
+
+    public static final RegistryObject<Item> FESTIVE_WANDERING_HOMEMAKER_SPAWN_EGG = ITEMS.register(
+            "festive_wandering_homemaker_spawn_egg",
+            () -> new FestiveWanderingHomemakerSpawnEggItem(
+                    com.kingodogo.buildscape.entity.ModEntities.FESTIVE_WANDERING_HOMEMAKER,
+                    0x990000,
+                    0x009900,
                     createBlockItemProperties()
             )
     );

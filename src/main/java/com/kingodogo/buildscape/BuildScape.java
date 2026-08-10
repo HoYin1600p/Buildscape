@@ -1713,6 +1713,9 @@ public class BuildScape {
                 net.minecraft.client.renderer.entity.EntityRenderers.register(
                         com.kingodogo.buildscape.entity.ModEntities.WANDERING_HOMEMAKER.get(),
                         com.kingodogo.buildscape.client.renderer.WanderingHomemakerRenderer::new);
+                net.minecraft.client.renderer.entity.EntityRenderers.register(
+                        com.kingodogo.buildscape.entity.ModEntities.FESTIVE_WANDERING_HOMEMAKER.get(),
+                        com.kingodogo.buildscape.client.renderer.FestiveWanderingHomemakerRenderer::new);
 
 
 
@@ -2194,6 +2197,36 @@ public class BuildScape {
                         ModItems.SNOWY_FLOWERING_AZALEA_LEAF_HEDGE.get(),
                         ModItems.MANGROVE_LEAF_HEDGE.get(),
                         ModItems.MANGROVE_LEAVES.get());
+
+                itemColors.register(
+                        (stack, tintIndex) -> {
+                            if (tintIndex != 1) {
+                                return -1;
+                            }
+                            if (stack.getItem() instanceof com.kingodogo.buildscape.item.BiomeBrushItem brush) {
+                                String biomeStr = brush.getCapturedBiome(stack);
+                                if (biomeStr != null && !biomeStr.isEmpty()) {
+                                    net.minecraft.resources.ResourceLocation biomeKey = net.minecraft.resources.ResourceLocation.tryParse(biomeStr);
+                                    if (biomeKey != null) {
+                                        net.minecraft.client.multiplayer.ClientLevel level = net.minecraft.client.Minecraft.getInstance().level;
+                                        if (level != null) {
+                                            java.util.Optional<? extends net.minecraft.core.Registry<net.minecraft.world.level.biome.Biome>> registryOpt = level.registryAccess().registry(net.minecraft.core.Registry.BIOME_REGISTRY);
+                                            if (registryOpt.isPresent()) {
+                                                net.minecraft.world.level.biome.Biome biome = registryOpt.get().get(biomeKey);
+                                                if (biome != null) {
+                                                    return biome.getFoliageColor();
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            return -1;
+                        },
+                        ModItems.COPPER_BIOME_BRUSH.get(),
+                        ModItems.DIAMOND_BIOME_BRUSH.get(),
+                        ModItems.NETHERITE_BIOME_BRUSH.get()
+                );
             });
         }
 

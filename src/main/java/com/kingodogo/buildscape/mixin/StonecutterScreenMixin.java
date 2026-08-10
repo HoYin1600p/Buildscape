@@ -54,14 +54,24 @@ public abstract class StonecutterScreenMixin extends AbstractContainerScreen<Sto
                 int thumbX = active ? this.x + this.width - 7 : this.x + 1;
                 int thumbColor = 0xFFFFFFFF;
                 fill(poseStack, thumbX, this.y + 1, thumbX + 6, this.y + this.height - 1, thumbColor);
+
+                if (this.isHovered) {
+                    this.renderToolTip(poseStack, mouseX, mouseY);
+                }
             }
 
             @Override
             public void renderToolTip(PoseStack poseStack, int mouseX, int mouseY) {
                 boolean active = ((StonecutterMenuExtension) StonecutterScreenMixin.this.menu).buildscape$isCutAll();
                 List<Component> tooltip = new ArrayList<>();
-                tooltip.add(new TranslatableComponent(active ? "tooltip.buildscape.cut_all.on" : "tooltip.buildscape.cut_all.off").withStyle(ChatFormatting.BOLD));
-                tooltip.add(new TranslatableComponent("tooltip.buildscape.cut_all.desc").withStyle(ChatFormatting.GRAY));
+                tooltip.add(new TranslatableComponent("tooltip.buildscape.stonecutter.title")
+                        .withStyle(ChatFormatting.GOLD, ChatFormatting.BOLD));
+                tooltip.add(new TranslatableComponent(active
+                        ? "tooltip.buildscape.cut_all.on"
+                        : "tooltip.buildscape.cut_stack.off").withStyle(ChatFormatting.BOLD));
+                tooltip.add(new TranslatableComponent(active
+                        ? "tooltip.buildscape.cut_all.desc"
+                        : "tooltip.buildscape.cut_stack.desc").withStyle(ChatFormatting.GRAY));
                 StonecutterScreenMixin.this.renderComponentTooltip(poseStack, tooltip, mouseX, mouseY);
             }
         });

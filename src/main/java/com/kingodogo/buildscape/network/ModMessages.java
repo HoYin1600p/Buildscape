@@ -129,5 +129,12 @@ public class ModMessages {
                 BuildersWorkbenchResultsPacket::decode,
                 BuildersWorkbenchResultsPacket::handle
         );
+        INSTANCE.registerMessage(
+                id++,
+                ClearBiomeBrushPacket.class,
+                ClearBiomeBrushPacket::encode,
+                ClearBiomeBrushPacket::decode,
+                ClearBiomeBrushPacket::handle
+        );
     }
 }

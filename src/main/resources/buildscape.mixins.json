@@ -7,6 +7,8 @@
   "plugin": "com.kingodogo.buildscape.mixin.BuildscapeMixinPlugin",
   "mixins": [
     "AbstractContainerMenuMixin",
+    "BeaconBlockEntityAccessor",
+    "BeaconBlockEntityMixin",
     "BlockMixin",
     "ChainBlockMixin",
     "CreativeModeTabMixin",
@@ -25,7 +27,12 @@
     "ShulkerBoxMenuMixin"
   ],
   "client": [
+<<<<<<< Updated upstream
     "AbstractContainerScreenMixin",
+=======
+    "BeaconBlockEntityRendererMixin",
+    "BeaconRendererInvoker",
+>>>>>>> Stashed changes
     "BuildscapeBlockModelMixin",
     "BuildscapeBlockStateCacheMixin",
     "BuildscapeForgeRegistryMixin",

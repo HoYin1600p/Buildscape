@@ -6,11 +6,11 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.resources.ResourceLocation;
 
-public class WanderingHomemakerRenderer extends MobRenderer<WanderingHomemakerEntity, WanderingHomemakerModel> {
+public class WanderingHomemakerRenderer extends MobRenderer<WanderingHomemakerEntity, WanderingHomemakerModel<WanderingHomemakerEntity>> {
     private static final ResourceLocation TEXTURE = new ResourceLocation(com.kingodogo.buildscape.BuildScape.MODID, "textures/entity/wandering_homemaker.png");
 
     public WanderingHomemakerRenderer(EntityRendererProvider.Context context) {
-        super(context, new WanderingHomemakerModel(context.bakeLayer(WanderingHomemakerModel.LAYER_LOCATION)), 0.5F);
+        super(context, new WanderingHomemakerModel<>(context.bakeLayer(WanderingHomemakerModel.LAYER_LOCATION)), 0.5F);
     }
 
     @Override

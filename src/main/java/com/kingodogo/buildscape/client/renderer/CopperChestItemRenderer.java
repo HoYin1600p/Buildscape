@@ -26,8 +26,7 @@ public class CopperChestItemRenderer extends BlockEntityWithoutLevelRenderer {
             PoseStack poseStack,
             MultiBufferSource bufferSource,
             int combinedLight,
-            int combinedOverlay
-    ) {
+            int combinedOverlay) {
         if (stack.getItem() instanceof BlockItem blockItem) {
             BlockState state = blockItem.getBlock().defaultBlockState();
 
@@ -41,11 +40,19 @@ public class CopperChestItemRenderer extends BlockEntityWithoutLevelRenderer {
                 dummyBE.setLevel(Minecraft.getInstance().level);
             }
 
-            net.minecraft.client.renderer.blockentity.BlockEntityRenderer<CopperChestBlockEntity> renderer = Minecraft.getInstance()
+            net.minecraft.client.renderer.blockentity.BlockEntityRenderer<CopperChestBlockEntity> renderer = Minecraft
+                    .getInstance()
                     .getBlockEntityRenderDispatcher()
                     .getRenderer(dummyBE);
             if (renderer != null) {
+                poseStack.pushPose();
+                poseStack.translate(0.5D, 0.5D, 0.5D);
+                poseStack.mulPose(com.mojang.math.Vector3f.YP.rotationDegrees(270.0F));
+                poseStack.translate(-0.5D, -0.5D, -0.5D);
+
                 renderer.render(dummyBE, 0.0F, poseStack, bufferSource, combinedLight, combinedOverlay);
+
+                poseStack.popPose();
             }
         }
     }

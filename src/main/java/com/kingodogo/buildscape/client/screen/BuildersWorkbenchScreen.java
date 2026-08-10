@@ -58,6 +58,12 @@ public class BuildersWorkbenchScreen extends AbstractContainerScreen<BuildersWor
     private static final int COLOR_FILTER_X = 141;
     private static final int GRADIENT_FILTER_X = 184;
 
+    // Compact modifier controls occupy the unused lower-left strip of both panels.
+    // Their 11x11 hitboxes do not overlap the workbench slots or the copy arrow.
+    private static final int MODIFIER_Y = 94;
+    private static final int SINGLE_TEXTURE_X = 13;
+    private static final int MATCH_SHAPE_X = 27;
+
     // Copy arrow (48x16, animated) - identical position on both tabs. The sprite has
     // transparent padding: the ink sits at x 4..43, y 2..12, symmetric around row 7.
     // These values put that ink in the middle of the 46px gap between the pouch slots.
@@ -193,6 +199,7 @@ public class BuildersWorkbenchScreen extends AbstractContainerScreen<BuildersWor
         drawTabs(poseStack, x, y, mouseX, mouseY);
         drawTitle(poseStack, x, y, activeTab == 0 ? TITLE_KEY_COLOR : TITLE_KEY_GRADIENT);
         drawFilters(poseStack, x + filterX(), y + FILTER_Y, mouseX, mouseY);
+        drawModifierFilters(poseStack, x, y, mouseX, mouseY);
         drawCopyArrow(poseStack, x + ARROW_X, y + ARROW_Y);
 
         RenderSystem.enableDepthTest();
@@ -239,6 +246,22 @@ public class BuildersWorkbenchScreen extends AbstractContainerScreen<BuildersWor
             boolean hovered = isIn(mouseX, mouseY, x, y + i * FILTER_SPACING, 18, 18);
             WbRenderer.drawFilterButton(poseStack, x, y + i * FILTER_SPACING, i, filterMask, hovered);
         }
+    }
+
+    private void drawModifierFilters(PoseStack poseStack, int x, int y, int mouseX, int mouseY) {
+        boolean singleHover = isIn(mouseX, mouseY, x + SINGLE_TEXTURE_X, y + MODIFIER_Y,
+                WbRenderer.MODIFIER_SIZE, WbRenderer.MODIFIER_SIZE);
+        WbRenderer.drawModifierButton(poseStack, x + SINGLE_TEXTURE_X, y + MODIFIER_Y,
+                (filterMask & ColorGradientSolver.FILTER_SINGLE_TEXTURE) != 0, singleHover,
+                WbRenderer.BTN_SINGLE_TEXTURE, WbRenderer.BTN_SINGLE_TEXTURE_HOVER,
+                WbRenderer.BTN_SINGLE_TEXTURE_SEL);
+
+        boolean shapeHover = isIn(mouseX, mouseY, x + MATCH_SHAPE_X, y + MODIFIER_Y,
+                WbRenderer.MODIFIER_SIZE, WbRenderer.MODIFIER_SIZE);
+        WbRenderer.drawModifierButton(poseStack, x + MATCH_SHAPE_X, y + MODIFIER_Y,
+                (filterMask & ColorGradientSolver.FILTER_MATCH_SHAPE) != 0, shapeHover,
+                WbRenderer.BTN_MATCH_SHAPE, WbRenderer.BTN_MATCH_SHAPE_HOVER,
+                WbRenderer.BTN_MATCH_SHAPE_SEL);
     }
 
     private void drawCopyArrow(PoseStack poseStack, int x, int y) {
@@ -297,7 +320,22 @@ public class BuildersWorkbenchScreen extends AbstractContainerScreen<BuildersWor
                 case 1 -> "screen.buildscape.builders_workbench.filter.transparent";
                 default -> "screen.buildscape.builders_workbench.filter.non_full";
             };
-            renderComponentTooltip(poseStack, List.of(new TranslatableComponent(key)), mouseX, mouseY);
+            int strictBit = (1 << filter) << ColorGradientSolver.STRICT_SHIFT;
+            String hintKey = (filterMask & strictBit) != 0
+                    ? "screen.buildscape.builders_workbench.filter.shift_active"
+                    : "screen.buildscape.builders_workbench.filter.shift_hint";
+            renderComponentTooltip(poseStack, List.of(
+                    new TranslatableComponent(key), new TranslatableComponent(hintKey)), mouseX, mouseY);
+            return;
+        }
+        int modifier = hoveredModifier(mouseX, mouseY);
+        if (modifier >= 0) {
+            String key = modifier == 0
+                    ? "screen.buildscape.builders_workbench.filter.single_texture"
+                    : "screen.buildscape.builders_workbench.filter.match_shape";
+            String description = key + ".description";
+            renderComponentTooltip(poseStack, List.of(
+                    new TranslatableComponent(key), new TranslatableComponent(description)), mouseX, mouseY);
             return;
         }
         int result = hoveredReroll(mouseX, mouseY);
@@ -345,6 +383,18 @@ public class BuildersWorkbenchScreen extends AbstractContainerScreen<BuildersWor
             return true;
         }
 
+        int modifier = hoveredModifier(mouseX, mouseY);
+        if (modifier >= 0 && button == 0) {
+            filterMask ^= modifier == 0
+                    ? ColorGradientSolver.FILTER_SINGLE_TEXTURE
+                    : ColorGradientSolver.FILTER_MATCH_SHAPE;
+            Arrays.fill(resultOffsets, 0);
+            lastInputSignature = inputSignature();
+            solveNow();
+            playClick();
+            return true;
+        }
+
         int result = hoveredReroll(mouseX, mouseY);
         if (result >= 0 && (button == 0 || button == 1)) {
             if (button == 1) resultOffsets[result]++;
@@ -375,6 +425,15 @@ public class BuildersWorkbenchScreen extends AbstractContainerScreen<BuildersWor
         for (int i = 0; i < 3; i++) {
             if (isIn(mouseX, mouseY, x, y + i * FILTER_SPACING, 18, 18)) return i;
         }
+        return -1;
+    }
+
+    private int hoveredModifier(double mouseX, double mouseY) {
+        int y = topPos + MODIFIER_Y;
+        if (isIn(mouseX, mouseY, leftPos + SINGLE_TEXTURE_X, y,
+                WbRenderer.MODIFIER_SIZE, WbRenderer.MODIFIER_SIZE)) return 0;
+        if (isIn(mouseX, mouseY, leftPos + MATCH_SHAPE_X, y,
+                WbRenderer.MODIFIER_SIZE, WbRenderer.MODIFIER_SIZE)) return 1;
         return -1;
     }
 

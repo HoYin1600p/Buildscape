@@ -45,7 +45,7 @@ public final class BuildersWorkbenchResultsPacket {
     private BuildersWorkbenchResultsPacket(FriendlyByteBuf buffer) {
         this.pos = buffer.readBlockPos();
         this.tab = buffer.readByte();
-        this.filterMask = buffer.readByte();
+        this.filterMask = buffer.readUnsignedByte();
         this.offsets = new int[RESULT_COUNT];
         for (int i = 0; i < RESULT_COUNT; i++) offsets[i] = buffer.readVarInt();
         this.results = new ArrayList<>(RESULT_COUNT);

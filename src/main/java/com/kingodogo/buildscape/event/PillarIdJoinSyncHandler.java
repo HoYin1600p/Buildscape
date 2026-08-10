@@ -61,8 +61,8 @@ public class PillarIdJoinSyncHandler {
 
         // Sync Wandering Homemaker cooldown
         long cooldown = 0;
-        if (player.getPersistentData().contains("WanderingHomemakerCooldown")) {
-            cooldown = player.getPersistentData().getLong("WanderingHomemakerCooldown");
+        if (player.getPersistentData().contains("WanderingHomemakerCooldownRealTime")) {
+            cooldown = player.getPersistentData().getLong("WanderingHomemakerCooldownRealTime");
         }
         ModMessages.INSTANCE.send(
                 net.minecraftforge.network.PacketDistributor.PLAYER.with(() -> player),
@@ -74,8 +74,8 @@ public class PillarIdJoinSyncHandler {
     public static void onPlayerChangedDimension(PlayerEvent.PlayerChangedDimensionEvent event) {
         if (event.getPlayer() instanceof ServerPlayer player) {
             long cooldown = 0;
-            if (player.getPersistentData().contains("WanderingHomemakerCooldown")) {
-                cooldown = player.getPersistentData().getLong("WanderingHomemakerCooldown");
+            if (player.getPersistentData().contains("WanderingHomemakerCooldownRealTime")) {
+                cooldown = player.getPersistentData().getLong("WanderingHomemakerCooldownRealTime");
             }
             ModMessages.INSTANCE.send(
                     net.minecraftforge.network.PacketDistributor.PLAYER.with(() -> player),

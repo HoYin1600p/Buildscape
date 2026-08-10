@@ -72,12 +72,12 @@ public class BuildersPouchMenu extends AbstractContainerMenu implements GhostFil
 
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 9; col++) {
-                addSlot(new Slot(playerInventory, col + row * 9 + 9, 8 + col * 18, 51 + row * 18));
+                addSlot(new Slot(playerInventory, col + row * 9 + 9, 8 + col * 18, 49 + row * 18));
             }
         }
         for (int col = 0; col < 9; col++) {
             final int hotbarSlot = col;
-            addSlot(new Slot(playerInventory, col, 8 + col * 18, 109) {
+            addSlot(new Slot(playerInventory, col, 8 + col * 18, 107) {
                 private boolean isOpenPouchSlot() {
                     return BuildersPouchMenu.this.hand == InteractionHand.MAIN_HAND
                             && playerInventory.selected == hotbarSlot;

@@ -30,6 +30,7 @@ import net.minecraft.world.level.block.EndRodBlock;
 import net.minecraft.world.level.block.EnderChestBlock;
 import net.minecraft.world.level.block.FenceBlock;
 import net.minecraft.world.level.block.FenceGateBlock;
+import net.minecraft.world.level.block.FlowerBlock;
 import net.minecraft.world.level.block.FlowerPotBlock;
 import net.minecraft.world.level.block.GrindstoneBlock;
 import net.minecraft.world.level.block.HalfTransparentBlock;
@@ -84,7 +85,10 @@ public final class ColorGradientSolver {
     public static final int FILTER_ALL = FILTER_SOLID | FILTER_TRANSPARENT | FILTER_NON_FULL;
     // Low bits enable categories; the matching high bits apply shift-click exclusions.
     public static final int STRICT_SHIFT = 3;
-    public static final int FILTER_STATE_MASK = FILTER_ALL | FILTER_ALL << STRICT_SHIFT;
+    public static final int FILTER_SINGLE_TEXTURE = 1 << 6;
+    public static final int FILTER_MATCH_SHAPE = 1 << 7;
+    public static final int FILTER_MODIFIERS = FILTER_SINGLE_TEXTURE | FILTER_MATCH_SHAPE;
+    public static final int FILTER_STATE_MASK = FILTER_ALL | FILTER_ALL << STRICT_SHIFT | FILTER_MODIFIERS;
 
     private static final Map<Item, BlockColor> REGISTRY = new LinkedHashMap<>();
     private static final List<BlockColor> ALL_BLOCKS = new ArrayList<>();
@@ -96,7 +100,7 @@ public final class ColorGradientSolver {
         if (!(item instanceof BlockItem blockItem)) return false;
         Block block = blockItem.getBlock();
         ResourceLocation id = block.getRegistryName();
-        if (isCreativeOnly(id)) return false;
+        if (isCreativeOnly(id) || isWaxed(id)) return false;
 
         try {
             BlockState state = block.defaultBlockState();
@@ -155,7 +159,8 @@ public final class ColorGradientSolver {
         if (target.isEmpty()) return result;
 
         BlockColor targetColor = resolveColor(target);
-        List<BlockColor> candidates = candidates(filterMask);
+        ShapeFamily shape = requiredShape(filterMask, target);
+        List<BlockColor> candidates = candidates(filterMask, shape);
         if (candidates.isEmpty()) return result;
         candidates.sort(byDistance(targetColor));
 
@@ -243,7 +248,8 @@ public final class ColorGradientSolver {
             }
         }
 
-        List<BlockColor> candidates = candidates(filterMask);
+        ShapeFamily shape = requiredShape(filterMask, anchors);
+        List<BlockColor> candidates = candidates(filterMask, shape);
         if (candidates.isEmpty()) return result;
 
         Item[] defaults = new Item[9];
@@ -276,13 +282,17 @@ public final class ColorGradientSolver {
         return result;
     }
 
-    private static List<BlockColor> candidates(int filterMask) {
+    private static List<BlockColor> candidates(int filterMask, ShapeFamily requiredShape) {
         int enabled = filterMask & FILTER_ALL;
         if (enabled == 0) return new ArrayList<>();
+        if ((filterMask & FILTER_MATCH_SHAPE) != 0 && requiredShape == null) return new ArrayList<>();
         List<BlockColor> result = new ArrayList<>();
         synchronized (ColorGradientSolver.class) {
             for (BlockColor color : ALL_BLOCKS) {
-                if (matchesFilter(color.item, color.categories, filterMask)) result.add(color);
+                if (!matchesFilter(color.item, color.categories, filterMask)) continue;
+                if ((filterMask & FILTER_SINGLE_TEXTURE) != 0 && !color.singleTexture) continue;
+                if ((filterMask & FILTER_MATCH_SHAPE) != 0 && shapeFor(color.item) != requiredShape) continue;
+                result.add(color);
             }
         }
         return result;
@@ -298,12 +308,12 @@ public final class ColorGradientSolver {
         int enabled = filterState & FILTER_ALL;
         if (enabled == 0) return false;
         if (isShiftExcluded(blockItem.getBlock(), filterState >>> STRICT_SHIFT & FILTER_ALL)) return false;
-        if (enabled == FILTER_ALL) return true;
-
         Block block = blockItem.getBlock();
         String path = registryPath(block);
+        if (enabled == FILTER_ALL) return true;
         return switch (enabled) {
-            case FILTER_SOLID -> physicalCategories == FILTER_SOLID && !path.contains("wallpaper_flat");
+            case FILTER_SOLID -> physicalCategories == FILTER_SOLID
+                    && !path.contains("wallpaper_flat") && !path.endsWith("_rose_vines");
             case FILTER_TRANSPARENT -> isTransparentOnly(block, path, physicalCategories);
             case FILTER_NON_FULL -> isNonFullOnly(block, path, physicalCategories);
             case FILTER_SOLID | FILTER_TRANSPARENT -> isSolidTransparent(block, path);
@@ -311,6 +321,88 @@ public final class ColorGradientSolver {
             case FILTER_SOLID | FILTER_NON_FULL -> isSolidNonFull(path);
             default -> false;
         };
+    }
+
+    private static ShapeFamily requiredShape(int filterMask, ItemStack input) {
+        return (filterMask & FILTER_MATCH_SHAPE) == 0 || input == null || input.isEmpty()
+                ? null : shapeFor(input.getItem());
+    }
+
+    private static ShapeFamily requiredShape(int filterMask, List<ItemStack> inputs) {
+        if ((filterMask & FILTER_MATCH_SHAPE) == 0) return null;
+        ShapeFamily required = null;
+        for (ItemStack input : inputs) {
+            if (input == null || input.isEmpty()) continue;
+            ShapeFamily shape = shapeFor(input.getItem());
+            if (shape == null || required != null && required != shape) return null;
+            required = shape;
+        }
+        return required;
+    }
+
+    private static ShapeFamily shapeFor(Item item) {
+        if (!(item instanceof BlockItem blockItem)) return null;
+        Block block = blockItem.getBlock();
+        String path = registryPath(block);
+
+        if (path.contains("glass_pane") || path.endsWith("_pane")) return ShapeFamily.PANE;
+        if (path.contains("leaf_layer") || path.contains("carpet_layer") || path.endsWith("_layer")) {
+            return ShapeFamily.LAYER;
+        }
+        if (path.contains("vertical_slab")) return ShapeFamily.VERTICAL_SLAB;
+        if (block instanceof TrapDoorBlock) return ShapeFamily.TRAPDOOR;
+        if (block instanceof DoorBlock) return ShapeFamily.DOOR;
+        if (block instanceof FenceGateBlock) return ShapeFamily.FENCE_GATE;
+        if (block instanceof FenceBlock) return ShapeFamily.FENCE;
+        if (block instanceof SlabBlock) return ShapeFamily.SLAB;
+        if (block instanceof StairBlock) return ShapeFamily.STAIR;
+        if (block instanceof WallBlock) return ShapeFamily.WALL;
+        if (block instanceof ButtonBlock) return ShapeFamily.BUTTON;
+        if (block instanceof BasePressurePlateBlock) return ShapeFamily.PRESSURE_PLATE;
+        if (block instanceof ChestBlock || block instanceof EnderChestBlock || path.endsWith("_chest")) {
+            return ShapeFamily.CHEST;
+        }
+        if (block instanceof BedBlock) return ShapeFamily.BED;
+        if (block instanceof BannerBlock || block instanceof WallBannerBlock) return ShapeFamily.BANNER;
+        if (block instanceof CandleBlock || path.contains("candle")) return ShapeFamily.CANDLE;
+        if (block instanceof SignBlock || block instanceof WallSignBlock || path.endsWith("_sign")) {
+            return ShapeFamily.SIGN;
+        }
+        if (block instanceof LeavesBlock || path.contains("leaves")) return ShapeFamily.LEAVES;
+        if (block instanceof LadderBlock || path.contains("ladder")) return ShapeFamily.LADDER;
+        if (block instanceof AbstractGlassBlock || path.contains("glass")) return ShapeFamily.GLASS;
+        if (path.endsWith("_carpet")) return ShapeFamily.CARPET;
+        if (path.contains("overlay")) return ShapeFamily.OVERLAY;
+        if (block instanceof FlowerBlock || path.contains("flower") || path.contains("blossom")) {
+            return ShapeFamily.FLOWER;
+        }
+        if (path.contains("foliage") || path.contains("hedge")) return ShapeFamily.FOLIAGE;
+        if (path.equals("chain") || path.endsWith("_chain")) return ShapeFamily.CHAIN;
+        if (path.contains("ornament")) return ShapeFamily.ORNAMENT;
+        if (path.endsWith("_star") || path.startsWith("star_")) return ShapeFamily.STAR;
+        if (path.contains("string_light")) return ShapeFamily.STRING_LIGHT;
+        if (path.contains("glow_lights") || path.contains("light_block") || path.contains("bulb")
+                || path.contains("lamp") || path.contains("froglight") || path.equals("shroomlight")) {
+            return ShapeFamily.LIGHT_BLOCK;
+        }
+        if (path.contains("vine")) return ShapeFamily.VINE;
+        if (path.contains("amethyst_cluster") || path.endsWith("_cluster")) return ShapeFamily.CLUSTER;
+        if (path.contains("mesh") || path.endsWith("_bars")) return ShapeFamily.MESH;
+        if (path.contains("decorated_pot")) return ShapeFamily.DECORATED;
+        if (path.contains("item_frame")) return ShapeFamily.ITEM_FRAME;
+        if (path.contains("stocking")) return ShapeFamily.STOCKING;
+        if (path.contains("cushion")) return ShapeFamily.CUSHION;
+        if (path.contains("jar")) return ShapeFamily.JAR;
+
+        try {
+            BlockState state = block.defaultBlockState();
+            if (Block.isShapeFullBlock(state.getShape(EmptyBlockGetter.INSTANCE, BlockPos.ZERO))) {
+                return ShapeFamily.FULL_BLOCK;
+            }
+        } catch (RuntimeException ignored) {
+            // Unknown custom shapes do not participate in Match Shape.
+        }
+        return null;
     }
 
     private static Comparator<BlockColor> byDistance(BlockColor target) {
@@ -458,6 +550,7 @@ public final class ColorGradientSolver {
                 || path.contains("hedge") || path.contains("foliage") || path.contains("candle")
                 || path.contains("stocking") || path.contains("item_frame")
                 || path.contains("smoke_vent") || path.contains("wallpaper_flat") || path.contains("copper_rod")
+                || path.contains("glow_lights") || path.endsWith("_rose_vines")
                 || path.contains("mesh") || path.contains("carpet_layer") || path.endsWith("_carpet")
                 || path.endsWith("_bars") || path.endsWith("_star") || path.endsWith("_chest")
                 || path.endsWith("_sign") || path.endsWith("_pot") || path.contains("amethyst_cluster")
@@ -470,8 +563,7 @@ public final class ColorGradientSolver {
                 || block instanceof BeaconBlock
                 || path.contains("bulb") || path.contains("festive_lamp") || path.contains("froglight")
                 || path.equals("shroomlight") || path.equals("target") || path.equals("observer")
-                || path.equals("jack_o_lantern") || path.equals("lantern")
-                || path.endsWith("_lantern");
+                || path.equals("jack_o_lantern");
     }
 
     private static boolean isTransparentNonFull(Block block, String path) {
@@ -537,6 +629,10 @@ public final class ColorGradientSolver {
                 || path.equals("moving_piston") || path.equals("light");
     }
 
+    private static boolean isWaxed(ResourceLocation id) {
+        return id != null && id.getPath().startsWith("waxed_");
+    }
+
     private static float lerp(float start, float end, float t) {
         return start + t * (end - start);
     }
@@ -572,22 +668,69 @@ public final class ColorGradientSolver {
                 : value / (3 * delta * delta) + 4.0f / 29.0f;
     }
 
+    private enum ShapeFamily {
+        FULL_BLOCK,
+        GLASS,
+        PANE,
+        CARPET,
+        LAYER,
+        OVERLAY,
+        CHEST,
+        DOOR,
+        TRAPDOOR,
+        WALL,
+        SLAB,
+        STAIR,
+        BUTTON,
+        PRESSURE_PLATE,
+        VERTICAL_SLAB,
+        FENCE,
+        FENCE_GATE,
+        FLOWER,
+        FOLIAGE,
+        CHAIN,
+        ORNAMENT,
+        STAR,
+        STRING_LIGHT,
+        LIGHT_BLOCK,
+        VINE,
+        BED,
+        BANNER,
+        CANDLE,
+        CLUSTER,
+        SIGN,
+        LEAVES,
+        MESH,
+        LADDER,
+        DECORATED,
+        ITEM_FRAME,
+        STOCKING,
+        CUSHION,
+        JAR
+    }
+
     public static final class BlockColor {
         public final Item item;
         public final int r;
         public final int g;
         public final int b;
         public final int categories;
+        public final boolean singleTexture;
         public final float L;
         public final float a;
         public final float bStar;
 
         public BlockColor(Item item, int r, int g, int b, int categories) {
+            this(item, r, g, b, categories, false);
+        }
+
+        public BlockColor(Item item, int r, int g, int b, int categories, boolean singleTexture) {
             this.item = item;
             this.r = r;
             this.g = g;
             this.b = b;
             this.categories = normalizeCategories(categories);
+            this.singleTexture = singleTexture;
             float[] lab = rgbToLab(r, g, b);
             this.L = lab[0];
             this.a = lab[1];
@@ -600,6 +743,7 @@ public final class ColorGradientSolver {
             this.g = 0;
             this.b = 0;
             this.categories = 0;
+            this.singleTexture = false;
             this.L = l;
             this.a = a;
             this.bStar = bStar;

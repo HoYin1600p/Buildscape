@@ -9,7 +9,7 @@ import net.minecraft.client.model.geom.builders.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 
-public class WanderingHomemakerModel extends HierarchicalModel<WanderingHomemakerEntity> {
+public class WanderingHomemakerModel<T extends net.minecraft.world.entity.npc.WanderingTrader> extends HierarchicalModel<T> {
     public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(new ResourceLocation(com.kingodogo.buildscape.BuildScape.MODID, "wandering_homemaker"), "main");
 
     private final ModelPart root;
@@ -76,7 +76,7 @@ public class WanderingHomemakerModel extends HierarchicalModel<WanderingHomemake
     }
 
     @Override
-    public void setupAnim(WanderingHomemakerEntity entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
+    public void setupAnim(T entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
         this.head.yRot = netHeadYaw * ((float)Math.PI / 180F);
         this.head.xRot = headPitch * ((float)Math.PI / 180F);
         this.rightLeg.xRot = Mth.cos(limbSwing * 0.6662F) * 1.4F * limbSwingAmount * 0.5F;

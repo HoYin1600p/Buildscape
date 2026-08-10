@@ -441,10 +441,6 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.LARGE_NETHERITE_CHAIN.get()));
             items.add(new ItemStack(ModItems.STEEL_INGOT.get()));
             items.add(new ItemStack(ModItems.STEEL_NUGGET.get()));
-            items.add(new ItemStack(ModItems.WRENCH.get()));
-            items.add(new ItemStack(ModItems.IRON_HAMMER.get()));
-            items.add(new ItemStack(ModItems.DIAMOND_HAMMER.get()));
-            items.add(new ItemStack(ModItems.NETHERITE_HAMMER.get()));
             items.add(new ItemStack(ModItems.BUILDERS_WORKBENCH.get()));
             items.add(new ItemStack(ModItems.BUILDERS_POUCH.get()));
             items.add(new ItemStack(ModItems.STEEL_BLOCK.get()));
@@ -1909,6 +1905,13 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.ASHENKING_EMERALD_PILLAR.get()));
             items.add(new ItemStack(ModItems.ASHENKING_NETHERITE_PILLAR.get()));
             items.add(new ItemStack(ModItems.ANCIENT_ASHEN_SCROLL.get()));
+            items.add(new ItemStack(ModItems.WRENCH.get()));
+            items.add(new ItemStack(ModItems.IRON_HAMMER.get()));
+            items.add(new ItemStack(ModItems.DIAMOND_HAMMER.get()));
+            items.add(new ItemStack(ModItems.NETHERITE_HAMMER.get()));
+            items.add(new ItemStack(ModItems.COPPER_BIOME_BRUSH.get()));
+            items.add(new ItemStack(ModItems.DIAMOND_BIOME_BRUSH.get()));
+            items.add(new ItemStack(ModItems.NETHERITE_BIOME_BRUSH.get()));
             items.add(new ItemStack(ModItems.SMOKE_VENT.get()));
             items.add(new ItemStack(ModItems.MUFF_BLOCK.get()));
             items.add(new ItemStack(ModItems.CASCADE_BLOCK.get()));

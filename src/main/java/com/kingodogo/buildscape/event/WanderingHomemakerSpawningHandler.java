@@ -95,40 +95,70 @@ public class WanderingHomemakerSpawningHandler {
 
         BlockPos pos = event.getPos();
         if (formsSquare(level, pos, category)) {
-            long gameTime = level.getGameTime();
+            long currentTime = System.currentTimeMillis();
             long cooldown = 0;
-            if (player.getPersistentData().contains("WanderingHomemakerCooldown")) {
-                cooldown = player.getPersistentData().getLong("WanderingHomemakerCooldown");
+            if (player.getPersistentData().contains("WanderingHomemakerCooldownRealTime")) {
+                cooldown = player.getPersistentData().getLong("WanderingHomemakerCooldownRealTime");
             }
 
-            if (gameTime < cooldown) {
+            if (currentTime < cooldown) {
                 return; // Cooldown active
             }
 
-            if (isHomemakerAlive(level, player)) {
-                return; // Homemaker is already alive for this player
+            // Despawn old homemaker if it's currently loaded
+            if (player.getPersistentData().hasUUID("WanderingHomemakerUUID")) {
+                java.util.UUID oldUuid = player.getPersistentData().getUUID("WanderingHomemakerUUID");
+                for (ServerLevel sl : level.getServer().getAllLevels()) {
+                    net.minecraft.world.entity.Entity oldEntity = sl.getEntity(oldUuid);
+                    if (oldEntity != null && oldEntity.isAlive()) {
+                        oldEntity.discard();
+                    }
+                }
             }
 
-            WanderingHomemakerEntity homemaker = ModEntities.WANDERING_HOMEMAKER.get().create(level);
+            java.time.LocalDate today = java.time.LocalDate.now();
+            int month = today.getMonthValue();
+            int day = today.getDayOfMonth();
+
+            boolean spawnFestive = false;
+            if (month == 12) {
+                if (day == 24 || day == 25) {
+                    spawnFestive = level.random.nextFloat() < 0.99f;
+                } else {
+                    spawnFestive = level.random.nextFloat() < 0.50f;
+                }
+            }
+
+            net.minecraft.world.entity.npc.WanderingTrader homemaker = spawnFestive ?
+                    ModEntities.FESTIVE_WANDERING_HOMEMAKER.get().create(level) :
+                    ModEntities.WANDERING_HOMEMAKER.get().create(level);
             if (homemaker != null) {
-                homemaker.moveTo(pos.getX() + 0.5D, pos.getY(), pos.getZ() + 0.5D, level.random.nextFloat() * 360F, 0.0F);
+                double angle = level.random.nextDouble() * 2.0D * Math.PI;
+                double distance = 2.0D + level.random.nextDouble() * 1.0D; // 2 to 3 blocks away
+                double spawnX = pos.getX() + 0.5D + Math.cos(angle) * distance;
+                double spawnY = pos.getY();
+                double spawnZ = pos.getZ() + 0.5D + Math.sin(angle) * distance;
+
+                homemaker.moveTo(spawnX, spawnY, spawnZ, level.random.nextFloat() * 360F, 0.0F);
                 level.addFreshEntity(homemaker);
 
-                level.playSound(null, pos, SoundEvents.EVOKER_PREPARE_SUMMON, SoundSource.NEUTRAL, 1.0F, 1.0F);
+                BlockPos spawnPos = new BlockPos((int)spawnX, (int)spawnY, (int)spawnZ);
+                level.playSound(null, spawnPos, SoundEvents.EVOKER_PREPARE_SUMMON, SoundSource.NEUTRAL, 1.0F, 1.0F);
                 for (int i = 0; i < 20; i++) {
-                    double px = pos.getX() + 0.5D + (level.random.nextDouble() - 0.5D) * 1.5D;
-                    double py = pos.getY() + 0.5D + level.random.nextDouble() * 2.0D;
-                    double pz = pos.getZ() + 0.5D + (level.random.nextDouble() - 0.5D) * 1.5D;
+                    double px = spawnX + (level.random.nextDouble() - 0.5D) * 1.5D;
+                    double py = spawnY + 0.5D + level.random.nextDouble() * 2.0D;
+                    double pz = spawnZ + (level.random.nextDouble() - 0.5D) * 1.5D;
                     level.sendParticles(ParticleTypes.CLOUD, px, py, pz, 1, 0.0D, 0.0D, 0.0D, 0.0D);
                 }
 
-                player.getPersistentData().putLong("WanderingHomemakerCooldown", gameTime + 36000L); // 30 minutes in ticks
+                long cooldownEnd = currentTime + 1800000L; // 30 minutes in milliseconds
+                player.getPersistentData().putLong("WanderingHomemakerCooldownRealTime", cooldownEnd);
                 player.getPersistentData().putUUID("WanderingHomemakerUUID", homemaker.getUUID());
 
                 if (player instanceof net.minecraft.server.level.ServerPlayer serverPlayer) {
                     com.kingodogo.buildscape.network.ModMessages.INSTANCE.send(
                             net.minecraftforge.network.PacketDistributor.PLAYER.with(() -> serverPlayer),
-                            new com.kingodogo.buildscape.network.SyncHomemakerCooldownPacket(gameTime + 36000L)
+                            new com.kingodogo.buildscape.network.SyncHomemakerCooldownPacket(cooldownEnd)
                     );
                 }
             }

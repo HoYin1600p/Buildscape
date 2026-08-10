@@ -43,8 +43,11 @@ public class BuildersWorkbenchBlockEntity extends BlockEntity implements MenuPro
     public static final int SLOT_GRADIENT_INPUT_END = 29;
     public static final int TOTAL_SLOTS = 30; // 0–29
 
+    private static final int TAB_COUNT = 2;
+    private static final int RESULT_COUNT = 9;
+
     private final NonNullList<ItemStack> items = NonNullList.withSize(TOTAL_SLOTS, ItemStack.EMPTY);
-    private final int[] resultOffsets = new int[9];
+    private final int[][] resultOffsetsByTab = new int[TAB_COUNT][RESULT_COUNT];
     // Persisted filter/tab state
     private int activeTab = 0; // 0=ColorPicker, 1=GradientBuilder
     private int filterMask = com.kingodogo.buildscape.util.ColorGradientSolver.FILTER_ALL;
@@ -60,7 +63,11 @@ public class BuildersWorkbenchBlockEntity extends BlockEntity implements MenuPro
                 case 2:
                     return filterMask;
                 default:
-                    return index >= 3 && index < 12 ? resultOffsets[index - 3] : 0;
+                    if (index >= 3 && index < 3 + TAB_COUNT * RESULT_COUNT) {
+                        int offsetIndex = index - 3;
+                        return resultOffsetsByTab[offsetIndex / RESULT_COUNT][offsetIndex % RESULT_COUNT];
+                    }
+                    return 0;
             }
         }
 
@@ -77,14 +84,17 @@ public class BuildersWorkbenchBlockEntity extends BlockEntity implements MenuPro
                     filterMask = value;
                     break;
                 default:
-                    if (index >= 3 && index < 12) resultOffsets[index - 3] = Math.max(0, value);
+                    if (index >= 3 && index < 3 + TAB_COUNT * RESULT_COUNT) {
+                        int offsetIndex = index - 3;
+                        resultOffsetsByTab[offsetIndex / RESULT_COUNT][offsetIndex % RESULT_COUNT] = Math.max(0, value);
+                    }
                     break;
             }
         }
 
         @Override
         public int getCount() {
-            return 12;
+            return 3 + TAB_COUNT * RESULT_COUNT;
         }
     };
 
@@ -154,11 +164,11 @@ public class BuildersWorkbenchBlockEntity extends BlockEntity implements MenuPro
 
         if (slot == SLOT_COLOR_PICKER) {
             if (oldStack.getItem() != stack.getItem()) {
-                resetResultOffsets();
+                resetResultOffsets(0);
             }
             updateColorPickerResults();
         } else if (slot >= SLOT_GRADIENT_INPUT_START && slot <= SLOT_GRADIENT_INPUT_END) {
-            resetResultOffsets();
+            resetResultOffsets(1);
             updateGradientResults();
         }
     }
@@ -175,7 +185,8 @@ public class BuildersWorkbenchBlockEntity extends BlockEntity implements MenuPro
             return;
         }
 
-        java.util.List<ItemStack> solved = com.kingodogo.buildscape.util.ColorGradientSolver.solveColorPicker(target, filterMask, resultOffsets);
+        java.util.List<ItemStack> solved = com.kingodogo.buildscape.util.ColorGradientSolver.solveColorPicker(
+                target, filterMask, resultOffsetsByTab[0]);
 
         for (int i = 0; i < 9; i++) {
             this.items.set(SLOT_PRESETS_START + i, solved.get(i));
@@ -191,7 +202,7 @@ public class BuildersWorkbenchBlockEntity extends BlockEntity implements MenuPro
             anchors.add(this.getItem(SLOT_GRADIENT_INPUT_START + i));
         }
         java.util.List<ItemStack> solved = com.kingodogo.buildscape.util.ColorGradientSolver
-                .solveGradient(anchors, filterMask, resultOffsets);
+                .solveGradient(anchors, filterMask, resultOffsetsByTab[1]);
         for (int i = 0; i < 9; i++) {
             this.items.set(SLOT_GRADIENT_START + i, solved.get(i));
         }
@@ -348,6 +359,8 @@ public class BuildersWorkbenchBlockEntity extends BlockEntity implements MenuPro
         setChanged();
         if (tab == 0) {
             updateColorPickerResults();
+        } else {
+            updateGradientResults();
         }
     }
 
@@ -376,16 +389,29 @@ public class BuildersWorkbenchBlockEntity extends BlockEntity implements MenuPro
     }
 
     public int[] getResultOffsets() {
-        return resultOffsets;
+        return getResultOffsets(activeTab);
+    }
+
+    public int[] getResultOffsets(int tab) {
+        return resultOffsetsByTab[validTab(tab)].clone();
     }
 
     public int getResultOffset(int index) {
-        return resultOffsets[index];
+        return getResultOffset(activeTab, index);
+    }
+
+    public int getResultOffset(int tab, int index) {
+        return resultOffsetsByTab[validTab(tab)][index];
     }
 
     public void setResultOffsets(int[] offsets) {
-        for (int i = 0; i < resultOffsets.length; i++) {
-            resultOffsets[i] = offsets != null && i < offsets.length ? Math.max(0, offsets[i]) : 0;
+        setResultOffsets(activeTab, offsets);
+    }
+
+    public void setResultOffsets(int tab, int[] offsets) {
+        int[] storedOffsets = resultOffsetsByTab[validTab(tab)];
+        for (int i = 0; i < storedOffsets.length; i++) {
+            storedOffsets[i] = offsets != null && i < offsets.length ? Math.max(0, offsets[i]) : 0;
         }
         setChanged();
     }
@@ -422,8 +448,11 @@ public class BuildersWorkbenchBlockEntity extends BlockEntity implements MenuPro
                 || results == null || results.size() != 9) {
             return;
         }
+        if (this.filterMask != mask) {
+            resetAllResultOffsets();
+        }
         this.filterMask = mask;
-        setResultOffsets(offsets);
+        setResultOffsets(tab, offsets);
         int firstSlot = tab == 0 ? SLOT_PRESETS_START : SLOT_GRADIENT_START;
         for (int i = 0; i < 9; i++) {
             ItemStack stack = results.get(i);
@@ -435,9 +464,9 @@ public class BuildersWorkbenchBlockEntity extends BlockEntity implements MenuPro
     }
 
     public void incrementResultOffset(int index) {
-        if (index < 0 || index >= resultOffsets.length) return;
-        if (activeTab == 1 && (index == 0 || index == resultOffsets.length - 1)) return;
-        resultOffsets[index]++;
+        if (index < 0 || index >= RESULT_COUNT) return;
+        if (activeTab == 1 && (index == 0 || index == RESULT_COUNT - 1)) return;
+        resultOffsetsByTab[activeTab][index]++;
         setChanged();
         if (activeTab == 0) {
             updateColorPickerResults();
@@ -447,8 +476,23 @@ public class BuildersWorkbenchBlockEntity extends BlockEntity implements MenuPro
     }
 
     public void resetResultOffsets() {
-        for (int i = 0; i < 9; i++) resultOffsets[i] = 0;
+        resetResultOffsets(activeTab);
+    }
+
+    public void resetResultOffsets(int tab) {
+        java.util.Arrays.fill(resultOffsetsByTab[validTab(tab)], 0);
         setChanged();
+    }
+
+    private void resetAllResultOffsets() {
+        for (int tab = 0; tab < TAB_COUNT; tab++) {
+            java.util.Arrays.fill(resultOffsetsByTab[tab], 0);
+        }
+        setChanged();
+    }
+
+    private static int validTab(int tab) {
+        return tab == 1 ? 1 : 0;
     }
 
     // ── NBT ───────────────────────────────────────────────────────────────────
@@ -457,7 +501,7 @@ public class BuildersWorkbenchBlockEntity extends BlockEntity implements MenuPro
     public void load(CompoundTag tag) {
         super.load(tag);
         ContainerHelper.loadAllItems(tag, items);
-        if (tag.contains("ActiveTab")) this.activeTab = tag.getInt("ActiveTab");
+        if (tag.contains("ActiveTab")) this.activeTab = validTab(tag.getInt("ActiveTab"));
         if (tag.contains("FilterMaskVersion")) {
             this.filterMask = tag.getInt("FilterMask")
                     & com.kingodogo.buildscape.util.ColorGradientSolver.FILTER_STATE_MASK;
@@ -465,10 +509,24 @@ public class BuildersWorkbenchBlockEntity extends BlockEntity implements MenuPro
             this.filterMask = com.kingodogo.buildscape.util.ColorGradientSolver.FILTER_ALL;
         }
         if (tag.contains("CopyProgress")) this.copyProgress = tag.getInt("CopyProgress");
-        if (tag.contains("ResultOffsets")) {
+        for (int tab = 0; tab < TAB_COUNT; tab++) {
+            java.util.Arrays.fill(this.resultOffsetsByTab[tab], 0);
+        }
+        if (tag.contains("ColorResultOffsets")) {
+            int[] saved = tag.getIntArray("ColorResultOffsets");
+            for (int i = 0; i < RESULT_COUNT && i < saved.length; i++) {
+                this.resultOffsetsByTab[0][i] = Math.max(0, saved[i]);
+            }
+        }
+        if (tag.contains("GradientResultOffsets")) {
+            int[] saved = tag.getIntArray("GradientResultOffsets");
+            for (int i = 0; i < RESULT_COUNT && i < saved.length; i++) {
+                this.resultOffsetsByTab[1][i] = Math.max(0, saved[i]);
+            }
+        } else if (!tag.contains("ColorResultOffsets") && tag.contains("ResultOffsets")) {
             int[] saved = tag.getIntArray("ResultOffsets");
-            for (int i = 0; i < 9 && i < saved.length; i++) {
-                this.resultOffsets[i] = saved[i];
+            for (int i = 0; i < RESULT_COUNT && i < saved.length; i++) {
+                this.resultOffsetsByTab[this.activeTab][i] = Math.max(0, saved[i]);
             }
         }
     }
@@ -481,7 +539,8 @@ public class BuildersWorkbenchBlockEntity extends BlockEntity implements MenuPro
         tag.putInt("FilterMask", filterMask);
         tag.putInt("FilterMaskVersion", 2);
         tag.putInt("CopyProgress", copyProgress);
-        tag.putIntArray("ResultOffsets", resultOffsets);
+        tag.putIntArray("ColorResultOffsets", resultOffsetsByTab[0]);
+        tag.putIntArray("GradientResultOffsets", resultOffsetsByTab[1]);
      }
 
      public static boolean isPouch(ItemStack stack) {

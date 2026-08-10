@@ -75,14 +75,16 @@ public class BuildersWorkbenchScreen extends AbstractContainerScreen<BuildersWor
     private static final int COLOR_RESULT_Y = 34;
     private static final int GRADIENT_OUTPUT_X = 12;
     private static final int GRADIENT_OUTPUT_Y = 65;
+    private static final int INITIAL_DATA_SYNC_TICKS = 3;
     /** Above the item render layer (items blit around Z 100-200) so the dots stay visible. */
     private static final float REROLL_Z = 300.0f;
 
     private int activeTab;
     private int filterMask;
-    private final int[] resultOffsets = new int[9];
+    private final int[][] resultOffsetsByTab = new int[2][9];
     private int lastInputSignature = Integer.MIN_VALUE;
     private int lastSentSignature = Integer.MIN_VALUE;
+    private int initialDataSyncTicks;
 
     public BuildersWorkbenchScreen(BuildersWorkbenchMenu menu, Inventory playerInventory, Component title) {
         super(menu, playerInventory, title);
@@ -96,33 +98,66 @@ public class BuildersWorkbenchScreen extends AbstractContainerScreen<BuildersWor
     protected void init() {
         this.activeTab = menu.getActiveTab();
         this.filterMask = menu.getFilterMask();
-        for (int i = 0; i < resultOffsets.length; i++) resultOffsets[i] = menu.getResultOffset(i);
+        for (int tab = 0; tab < resultOffsetsByTab.length; tab++) {
+            for (int i = 0; i < resultOffsetsByTab[tab].length; i++) {
+                resultOffsetsByTab[tab][i] = menu.getResultOffset(tab, i);
+            }
+        }
         updateDimensions();
         super.init();
         ClientBlockColorCatalog.ensureReady();
+        lastInputSignature = inputSignature();
+        lastSentSignature = Integer.MIN_VALUE;
+        initialDataSyncTicks = INITIAL_DATA_SYNC_TICKS;
     }
 
     @Override
     protected void containerTick() {
         super.containerTick();
+        if (initialDataSyncTicks > 0) {
+            syncInitialMenuState();
+            if (!ClientBlockColorCatalog.ensureReady()) return;
+            initialDataSyncTicks--;
+            if (initialDataSyncTicks == 0) {
+                lastInputSignature = inputSignature();
+                lastSentSignature = solveSignature(lastInputSignature);
+            }
+            return;
+        }
+
         int syncedTab = menu.getActiveTab();
         if (syncedTab != activeTab) {
             activeTab = syncedTab;
             updateDimensions();
-            lastInputSignature = Integer.MIN_VALUE;
+            lastInputSignature = inputSignature();
             lastSentSignature = Integer.MIN_VALUE;
         }
         if (!ClientBlockColorCatalog.ensureReady()) return;
 
         int inputSignature = inputSignature();
         if (inputSignature != lastInputSignature) {
-            Arrays.fill(resultOffsets, 0);
+            Arrays.fill(currentResultOffsets(), 0);
             lastInputSignature = inputSignature;
             lastSentSignature = Integer.MIN_VALUE;
         }
-        int solveSignature = 31 * inputSignature + Arrays.hashCode(resultOffsets);
-        solveSignature = 31 * solveSignature + ClientBlockColorCatalog.generation();
+        int solveSignature = solveSignature(inputSignature);
         if (solveSignature != lastSentSignature) sendSolvedResults(solveSignature);
+    }
+
+    private void syncInitialMenuState() {
+        activeTab = menu.getActiveTab() == 1 ? 1 : 0;
+        filterMask = menu.getFilterMask();
+        for (int tab = 0; tab < resultOffsetsByTab.length; tab++) {
+            for (int i = 0; i < resultOffsetsByTab[tab].length; i++) {
+                resultOffsetsByTab[tab][i] = menu.getResultOffset(tab, i);
+            }
+        }
+        updateDimensions();
+    }
+
+    private int solveSignature(int inputSignature) {
+        int signature = 31 * inputSignature + Arrays.hashCode(currentResultOffsets());
+        return 31 * signature + ClientBlockColorCatalog.generation();
     }
 
     private void updateDimensions() {
@@ -155,24 +190,23 @@ public class BuildersWorkbenchScreen extends AbstractContainerScreen<BuildersWor
         List<ItemStack> solved;
         if (activeTab == 0) {
             solved = ColorGradientSolver.solveColorPicker(
-                    workbench.getItem(BuildersWorkbenchBlockEntity.SLOT_COLOR_PICKER), filterMask, resultOffsets);
+                    workbench.getItem(BuildersWorkbenchBlockEntity.SLOT_COLOR_PICKER), filterMask,
+                    currentResultOffsets());
         } else {
             List<ItemStack> anchors = new ArrayList<>(9);
             for (int i = 0; i < 9; i++) {
                 anchors.add(workbench.getItem(BuildersWorkbenchBlockEntity.SLOT_GRADIENT_INPUT_START + i));
             }
-            solved = ColorGradientSolver.solveGradient(anchors, filterMask, resultOffsets);
+            solved = ColorGradientSolver.solveGradient(anchors, filterMask, currentResultOffsets());
         }
         ModMessages.INSTANCE.sendToServer(new BuildersWorkbenchResultsPacket(
-                workbench.getBlockPos(), activeTab, filterMask, resultOffsets, solved));
+                workbench.getBlockPos(), activeTab, filterMask, currentResultOffsets(), solved));
         lastSentSignature = solveSignature;
     }
 
     private void solveNow() {
         lastInputSignature = inputSignature();
-        int signature = 31 * lastInputSignature + Arrays.hashCode(resultOffsets);
-        signature = 31 * signature + ClientBlockColorCatalog.generation();
-        sendSolvedResults(signature);
+        sendSolvedResults(solveSignature(lastInputSignature));
     }
 
     @Override
@@ -376,7 +410,7 @@ public class BuildersWorkbenchScreen extends AbstractContainerScreen<BuildersWor
                 filterMask ^= categoryBit;
                 if ((filterMask & categoryBit) == 0) filterMask &= ~strictBit;
             }
-            Arrays.fill(resultOffsets, 0);
+            resetAllResultOffsets();
             lastInputSignature = inputSignature();
             solveNow();
             playClick();
@@ -388,7 +422,7 @@ public class BuildersWorkbenchScreen extends AbstractContainerScreen<BuildersWor
             filterMask ^= modifier == 0
                     ? ColorGradientSolver.FILTER_SINGLE_TEXTURE
                     : ColorGradientSolver.FILTER_MATCH_SHAPE;
-            Arrays.fill(resultOffsets, 0);
+            resetAllResultOffsets();
             lastInputSignature = inputSignature();
             solveNow();
             playClick();
@@ -397,6 +431,7 @@ public class BuildersWorkbenchScreen extends AbstractContainerScreen<BuildersWor
 
         int result = hoveredReroll(mouseX, mouseY);
         if (result >= 0 && (button == 0 || button == 1)) {
+            int[] resultOffsets = currentResultOffsets();
             if (button == 1) resultOffsets[result]++;
             else resultOffsets[result] = Math.max(0, resultOffsets[result] - 1);
             solveNow();
@@ -409,14 +444,21 @@ public class BuildersWorkbenchScreen extends AbstractContainerScreen<BuildersWor
     private void switchTab(int tab) {
         if (tab == activeTab) return;
         activeTab = tab;
-        Arrays.fill(resultOffsets, 0);
-        lastInputSignature = Integer.MIN_VALUE;
+        lastInputSignature = inputSignature();
         lastSentSignature = Integer.MIN_VALUE;
         updateDimensions();
         if (minecraft != null && minecraft.gameMode != null) {
             minecraft.gameMode.handleInventoryButtonClick(menu.containerId, tab);
         }
         playClick();
+    }
+
+    private int[] currentResultOffsets() {
+        return resultOffsetsByTab[activeTab == 1 ? 1 : 0];
+    }
+
+    private void resetAllResultOffsets() {
+        for (int[] offsets : resultOffsetsByTab) Arrays.fill(offsets, 0);
     }
 
     private int hoveredFilter(double mouseX, double mouseY) {

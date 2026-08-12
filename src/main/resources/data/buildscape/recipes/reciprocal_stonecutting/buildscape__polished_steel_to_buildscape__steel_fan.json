@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "buildscape:polished_steel"
+  },
+  "result": "buildscape:steel_fan",
+  "count": 1
+}

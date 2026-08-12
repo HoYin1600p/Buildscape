@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "buildscape:magenta_concrete_wall"
+  },
+  "result": "buildscape:polished_magenta_concrete_stairs",
+  "count": 1
+}

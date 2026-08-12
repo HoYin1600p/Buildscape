@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "buildscape:red_sandstone_wall"
+  },
+  "result": "buildscape:red_sandstone",
+  "count": 1
+}

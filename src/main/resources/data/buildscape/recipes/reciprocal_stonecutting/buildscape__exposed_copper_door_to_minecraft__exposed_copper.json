@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "buildscape:exposed_copper_door"
+  },
+  "result": "minecraft:exposed_copper",
+  "count": 1
+}

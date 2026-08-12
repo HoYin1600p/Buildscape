@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "buildscape:waxed_weathered_chiseled_copper"
+  },
+  "result": "buildscape:waxed_weathered_copper_door",
+  "count": 1
+}

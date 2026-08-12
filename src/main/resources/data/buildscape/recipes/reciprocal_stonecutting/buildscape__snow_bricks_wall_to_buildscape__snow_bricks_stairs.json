@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "buildscape:snow_bricks_wall"
+  },
+  "result": "buildscape:snow_bricks_stairs",
+  "count": 1
+}

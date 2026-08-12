@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "buildscape:steel_trim"
+  },
+  "result": "buildscape:steel_casing",
+  "count": 1
+}

@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "buildscape:oxidized_chiseled_copper"
+  },
+  "result": "buildscape:oxidized_copper_door",
+  "count": 1
+}

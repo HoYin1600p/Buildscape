@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "buildscape:terracotta_stairs"
+  },
+  "result": "minecraft:terracotta",
+  "count": 1
+}

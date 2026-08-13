@@ -436,6 +436,21 @@
     "buildscape:warped_ladder",
     "buildscape:ashpen_lime_ladder",
     "buildscape:poplar_ladder",
-    "buildscape:mangrove_ladder"
+    "buildscape:mangrove_ladder",
+    "buildscape:ashpen_black_slab",
+    "buildscape:ashpen_blue_slab",
+    "buildscape:ashpen_brown_slab",
+    "buildscape:ashpen_cyan_slab",
+    "buildscape:ashpen_gray_slab",
+    "buildscape:ashpen_green_slab",
+    "buildscape:ashpen_lime_slab",
+    "buildscape:ashpen_pink_slab",
+    "buildscape:ashpen_red_button",
+    "buildscape:ashpen_red_slab",
+    "buildscape:ashpen_white_slab",
+    "buildscape:mangrove_button",
+    "buildscape:stripped_ashpen_log",
+    "buildscape:stripped_ashpen_wood",
+    "buildscape:stripped_bamboo_block_button"
   ]
 }

@@ -79,6 +79,18 @@ public class BuildersPouchItem extends Item {
         getData(pouch, true).put(FILTERS_KEY, filters);
     }
 
+    public static boolean hasFilters(ItemStack pouch) {
+        for (String filter : getFilters(pouch)) {
+            if (!filter.isEmpty()) return true;
+        }
+        return false;
+    }
+
+    public static void clearFilters(ItemStack pouch) {
+        CompoundTag data = getData(pouch, false);
+        if (data != null) data.remove(FILTERS_KEY);
+    }
+
     @Nullable
     public static CompoundTag getData(ItemStack pouch, boolean create) {
         CompoundTag root = create ? pouch.getOrCreateTag() : pouch.getTag();

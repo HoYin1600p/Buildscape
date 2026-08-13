@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "buildscape:ancient_steel_chain"
+  },
+  "result": "minecraft:chain",
+  "count": 1
+}

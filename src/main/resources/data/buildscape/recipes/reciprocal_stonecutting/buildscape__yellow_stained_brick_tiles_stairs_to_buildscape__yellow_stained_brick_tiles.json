@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "buildscape:yellow_stained_brick_tiles_stairs"
+  },
+  "result": "buildscape:yellow_stained_brick_tiles",
+  "count": 1
+}

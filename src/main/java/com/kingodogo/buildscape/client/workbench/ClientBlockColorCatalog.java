@@ -87,7 +87,8 @@ public final class ClientBlockColorCatalog {
                         categories = categories(item, state, sample.transparent);
                     }
                     colors.add(new ColorGradientSolver.BlockColor(item,
-                            rgb >> 16 & 255, rgb >> 8 & 255, rgb & 255, categories));
+                            rgb >> 16 & 255, rgb >> 8 & 255, rgb & 255, categories,
+                            sample != null && sample.singleTexture));
                 } catch (RuntimeException error) {
                     BuildScape.LOGGER.debug("Builder's Workbench skipped color sampling for {}", id, error);
                     BlockState state = ((BlockItem) item).getBlock().defaultBlockState();
@@ -137,7 +138,7 @@ public final class ClientBlockColorCatalog {
             if (particle != null && !MissingTextureAtlasSprite.getLocation().equals(particle.getName())) {
                 PixelSample sample = spriteCache.computeIfAbsent(new SpriteKey(particle.getName(), 0xFFFFFF),
                         ignored -> sampleSprite(particle, 0xFFFFFF));
-                accumulator.add(sample);
+                accumulator.add(sample, particle.getName());
             }
         }
         return accumulator.finish();
@@ -169,7 +170,7 @@ public final class ClientBlockColorCatalog {
             if (!seenOnFace.add(key)) continue;
             int tintColor = tint;
             PixelSample sample = spriteCache.computeIfAbsent(key, ignored -> sampleSprite(sprite, tintColor));
-            accumulator.add(sample);
+            accumulator.add(sample, sprite.getName());
         }
     }
 
@@ -250,7 +251,7 @@ public final class ClientBlockColorCatalog {
         private static final PixelSample EMPTY = new PixelSample(0, 0, 0, true, false);
     }
 
-    private record BlockSample(int rgb, boolean transparent) {
+    private record BlockSample(int rgb, boolean transparent, boolean singleTexture) {
     }
 
     private static final class BlockAccumulator {
@@ -259,13 +260,15 @@ public final class ClientBlockColorCatalog {
         private double blue;
         private int weight;
         private boolean transparent;
+        private final Set<ResourceLocation> textures = new HashSet<>();
 
-        private void add(PixelSample sample) {
+        private void add(PixelSample sample, ResourceLocation texture) {
             if (sample == null || !sample.valid) return;
             red += sample.red;
             green += sample.green;
             blue += sample.blue;
             transparent |= sample.transparent;
+            if (texture != null) textures.add(texture);
             weight++;
         }
 
@@ -274,7 +277,7 @@ public final class ClientBlockColorCatalog {
             int r = linearToSrgb(red / weight);
             int g = linearToSrgb(green / weight);
             int b = linearToSrgb(blue / weight);
-            return new BlockSample(r << 16 | g << 8 | b, transparent);
+            return new BlockSample(r << 16 | g << 8 | b, transparent, textures.size() == 1);
         }
     }
 }

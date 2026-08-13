@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "buildscape:prismarine_bricks_wall"
+  },
+  "result": "minecraft:prismarine_bricks",
+  "count": 1
+}

@@ -16,6 +16,7 @@
     "buildscape:packed_mud_vertical_slab",
     "buildscape:dirt_stairs",
     "buildscape:mycelium_stairs",
-    "buildscape:podzol_stairs"
+    "buildscape:podzol_stairs",
+    "buildscape:snow_overlay"
   ]
 }

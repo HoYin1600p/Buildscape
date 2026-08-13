@@ -58,6 +58,12 @@ public class BuildersWorkbenchScreen extends AbstractContainerScreen<BuildersWor
     private static final int COLOR_FILTER_X = 141;
     private static final int GRADIENT_FILTER_X = 184;
 
+    // Compact modifier controls occupy the unused lower-left strip of both panels.
+    // Their 11x11 hitboxes do not overlap the workbench slots or the copy arrow.
+    private static final int MODIFIER_Y = 94;
+    private static final int SINGLE_TEXTURE_X = 13;
+    private static final int MATCH_SHAPE_X = 27;
+
     // Copy arrow (48x16, animated) - identical position on both tabs. The sprite has
     // transparent padding: the ink sits at x 4..43, y 2..12, symmetric around row 7.
     // These values put that ink in the middle of the 46px gap between the pouch slots.
@@ -69,14 +75,16 @@ public class BuildersWorkbenchScreen extends AbstractContainerScreen<BuildersWor
     private static final int COLOR_RESULT_Y = 34;
     private static final int GRADIENT_OUTPUT_X = 12;
     private static final int GRADIENT_OUTPUT_Y = 65;
+    private static final int INITIAL_DATA_SYNC_TICKS = 3;
     /** Above the item render layer (items blit around Z 100-200) so the dots stay visible. */
     private static final float REROLL_Z = 300.0f;
 
     private int activeTab;
     private int filterMask;
-    private final int[] resultOffsets = new int[9];
+    private final int[][] resultOffsetsByTab = new int[2][9];
     private int lastInputSignature = Integer.MIN_VALUE;
     private int lastSentSignature = Integer.MIN_VALUE;
+    private int initialDataSyncTicks;
 
     public BuildersWorkbenchScreen(BuildersWorkbenchMenu menu, Inventory playerInventory, Component title) {
         super(menu, playerInventory, title);
@@ -90,39 +98,86 @@ public class BuildersWorkbenchScreen extends AbstractContainerScreen<BuildersWor
     protected void init() {
         this.activeTab = menu.getActiveTab();
         this.filterMask = menu.getFilterMask();
-        for (int i = 0; i < resultOffsets.length; i++) resultOffsets[i] = menu.getResultOffset(i);
+        for (int tab = 0; tab < resultOffsetsByTab.length; tab++) {
+            for (int i = 0; i < resultOffsetsByTab[tab].length; i++) {
+                resultOffsetsByTab[tab][i] = menu.getResultOffset(tab, i);
+            }
+        }
         updateDimensions();
         super.init();
+        // AbstractContainerScreen#init recentres on imageWidth, which would undo the
+        // anchoring above, so re-apply it once the vanilla layout pass is done.
+        updateDimensions();
         ClientBlockColorCatalog.ensureReady();
+        lastInputSignature = inputSignature();
+        lastSentSignature = Integer.MIN_VALUE;
+        initialDataSyncTicks = INITIAL_DATA_SYNC_TICKS;
     }
 
     @Override
     protected void containerTick() {
         super.containerTick();
+        if (initialDataSyncTicks > 0) {
+            syncInitialMenuState();
+            if (!ClientBlockColorCatalog.ensureReady()) return;
+            initialDataSyncTicks--;
+            if (initialDataSyncTicks == 0) {
+                lastInputSignature = inputSignature();
+                lastSentSignature = solveSignature(lastInputSignature);
+            }
+            return;
+        }
+
         int syncedTab = menu.getActiveTab();
         if (syncedTab != activeTab) {
             activeTab = syncedTab;
             updateDimensions();
-            lastInputSignature = Integer.MIN_VALUE;
+            lastInputSignature = inputSignature();
             lastSentSignature = Integer.MIN_VALUE;
         }
         if (!ClientBlockColorCatalog.ensureReady()) return;
 
         int inputSignature = inputSignature();
         if (inputSignature != lastInputSignature) {
-            Arrays.fill(resultOffsets, 0);
+            Arrays.fill(currentResultOffsets(), 0);
             lastInputSignature = inputSignature;
             lastSentSignature = Integer.MIN_VALUE;
         }
-        int solveSignature = 31 * inputSignature + Arrays.hashCode(resultOffsets);
-        solveSignature = 31 * solveSignature + ClientBlockColorCatalog.generation();
+        int solveSignature = solveSignature(inputSignature);
         if (solveSignature != lastSentSignature) sendSolvedResults(solveSignature);
     }
 
+    private void syncInitialMenuState() {
+        activeTab = menu.getActiveTab() == 1 ? 1 : 0;
+        filterMask = menu.getFilterMask();
+        for (int tab = 0; tab < resultOffsetsByTab.length; tab++) {
+            for (int i = 0; i < resultOffsetsByTab[tab].length; i++) {
+                resultOffsetsByTab[tab][i] = menu.getResultOffset(tab, i);
+            }
+        }
+        updateDimensions();
+    }
+
+    private int solveSignature(int inputSignature) {
+        int signature = 31 * inputSignature + Arrays.hashCode(currentResultOffsets());
+        return 31 * signature + ClientBlockColorCatalog.generation();
+    }
+
+    /**
+     * Sizes the screen for the active tab, but anchors it as if it were always the
+     * colour builder.
+     *
+     * <p>The gradient artwork is wider only because of the filter panel hanging off its
+     * right-hand side - the main body starts at x = 0 in both sheets. Centring on the
+     * real imageWidth would therefore shove the whole panel {@code (GRADIENT_WIDTH -
+     * COLOR_WIDTH) / 2} pixels to the left when switching tabs. Centring on COLOR_WIDTH
+     * instead keeps the body, its slots and the player inventory perfectly still, and
+     * lets the extra strip grow to the right.
+     */
     private void updateDimensions() {
         imageWidth = activeTab == 0 ? COLOR_WIDTH : GRADIENT_WIDTH;
         imageHeight = GUI_HEIGHT;
-        leftPos = (width - imageWidth) / 2;
+        leftPos = (width - COLOR_WIDTH) / 2;
         topPos = (height - imageHeight) / 2;
     }
 
@@ -149,24 +204,23 @@ public class BuildersWorkbenchScreen extends AbstractContainerScreen<BuildersWor
         List<ItemStack> solved;
         if (activeTab == 0) {
             solved = ColorGradientSolver.solveColorPicker(
-                    workbench.getItem(BuildersWorkbenchBlockEntity.SLOT_COLOR_PICKER), filterMask, resultOffsets);
+                    workbench.getItem(BuildersWorkbenchBlockEntity.SLOT_COLOR_PICKER), filterMask,
+                    currentResultOffsets());
         } else {
             List<ItemStack> anchors = new ArrayList<>(9);
             for (int i = 0; i < 9; i++) {
                 anchors.add(workbench.getItem(BuildersWorkbenchBlockEntity.SLOT_GRADIENT_INPUT_START + i));
             }
-            solved = ColorGradientSolver.solveGradient(anchors, filterMask, resultOffsets);
+            solved = ColorGradientSolver.solveGradient(anchors, filterMask, currentResultOffsets());
         }
         ModMessages.INSTANCE.sendToServer(new BuildersWorkbenchResultsPacket(
-                workbench.getBlockPos(), activeTab, filterMask, resultOffsets, solved));
+                workbench.getBlockPos(), activeTab, filterMask, currentResultOffsets(), solved));
         lastSentSignature = solveSignature;
     }
 
     private void solveNow() {
         lastInputSignature = inputSignature();
-        int signature = 31 * lastInputSignature + Arrays.hashCode(resultOffsets);
-        signature = 31 * signature + ClientBlockColorCatalog.generation();
-        sendSolvedResults(signature);
+        sendSolvedResults(solveSignature(lastInputSignature));
     }
 
     @Override
@@ -193,6 +247,7 @@ public class BuildersWorkbenchScreen extends AbstractContainerScreen<BuildersWor
         drawTabs(poseStack, x, y, mouseX, mouseY);
         drawTitle(poseStack, x, y, activeTab == 0 ? TITLE_KEY_COLOR : TITLE_KEY_GRADIENT);
         drawFilters(poseStack, x + filterX(), y + FILTER_Y, mouseX, mouseY);
+        drawModifierFilters(poseStack, x, y, mouseX, mouseY);
         drawCopyArrow(poseStack, x + ARROW_X, y + ARROW_Y);
 
         RenderSystem.enableDepthTest();
@@ -239,6 +294,22 @@ public class BuildersWorkbenchScreen extends AbstractContainerScreen<BuildersWor
             boolean hovered = isIn(mouseX, mouseY, x, y + i * FILTER_SPACING, 18, 18);
             WbRenderer.drawFilterButton(poseStack, x, y + i * FILTER_SPACING, i, filterMask, hovered);
         }
+    }
+
+    private void drawModifierFilters(PoseStack poseStack, int x, int y, int mouseX, int mouseY) {
+        boolean singleHover = isIn(mouseX, mouseY, x + SINGLE_TEXTURE_X, y + MODIFIER_Y,
+                WbRenderer.MODIFIER_SIZE, WbRenderer.MODIFIER_SIZE);
+        WbRenderer.drawModifierButton(poseStack, x + SINGLE_TEXTURE_X, y + MODIFIER_Y,
+                (filterMask & ColorGradientSolver.FILTER_SINGLE_TEXTURE) != 0, singleHover,
+                WbRenderer.BTN_SINGLE_TEXTURE, WbRenderer.BTN_SINGLE_TEXTURE_HOVER,
+                WbRenderer.BTN_SINGLE_TEXTURE_SEL);
+
+        boolean shapeHover = isIn(mouseX, mouseY, x + MATCH_SHAPE_X, y + MODIFIER_Y,
+                WbRenderer.MODIFIER_SIZE, WbRenderer.MODIFIER_SIZE);
+        WbRenderer.drawModifierButton(poseStack, x + MATCH_SHAPE_X, y + MODIFIER_Y,
+                (filterMask & ColorGradientSolver.FILTER_MATCH_SHAPE) != 0, shapeHover,
+                WbRenderer.BTN_MATCH_SHAPE, WbRenderer.BTN_MATCH_SHAPE_HOVER,
+                WbRenderer.BTN_MATCH_SHAPE_SEL);
     }
 
     private void drawCopyArrow(PoseStack poseStack, int x, int y) {
@@ -297,7 +368,22 @@ public class BuildersWorkbenchScreen extends AbstractContainerScreen<BuildersWor
                 case 1 -> "screen.buildscape.builders_workbench.filter.transparent";
                 default -> "screen.buildscape.builders_workbench.filter.non_full";
             };
-            renderComponentTooltip(poseStack, List.of(new TranslatableComponent(key)), mouseX, mouseY);
+            int strictBit = (1 << filter) << ColorGradientSolver.STRICT_SHIFT;
+            String hintKey = (filterMask & strictBit) != 0
+                    ? "screen.buildscape.builders_workbench.filter.shift_active"
+                    : "screen.buildscape.builders_workbench.filter.shift_hint";
+            renderComponentTooltip(poseStack, List.of(
+                    new TranslatableComponent(key), new TranslatableComponent(hintKey)), mouseX, mouseY);
+            return;
+        }
+        int modifier = hoveredModifier(mouseX, mouseY);
+        if (modifier >= 0) {
+            String key = modifier == 0
+                    ? "screen.buildscape.builders_workbench.filter.single_texture"
+                    : "screen.buildscape.builders_workbench.filter.match_shape";
+            String description = key + ".description";
+            renderComponentTooltip(poseStack, List.of(
+                    new TranslatableComponent(key), new TranslatableComponent(description)), mouseX, mouseY);
             return;
         }
         int result = hoveredReroll(mouseX, mouseY);
@@ -338,7 +424,19 @@ public class BuildersWorkbenchScreen extends AbstractContainerScreen<BuildersWor
                 filterMask ^= categoryBit;
                 if ((filterMask & categoryBit) == 0) filterMask &= ~strictBit;
             }
-            Arrays.fill(resultOffsets, 0);
+            resetAllResultOffsets();
+            lastInputSignature = inputSignature();
+            solveNow();
+            playClick();
+            return true;
+        }
+
+        int modifier = hoveredModifier(mouseX, mouseY);
+        if (modifier >= 0 && button == 0) {
+            filterMask ^= modifier == 0
+                    ? ColorGradientSolver.FILTER_SINGLE_TEXTURE
+                    : ColorGradientSolver.FILTER_MATCH_SHAPE;
+            resetAllResultOffsets();
             lastInputSignature = inputSignature();
             solveNow();
             playClick();
@@ -347,6 +445,7 @@ public class BuildersWorkbenchScreen extends AbstractContainerScreen<BuildersWor
 
         int result = hoveredReroll(mouseX, mouseY);
         if (result >= 0 && (button == 0 || button == 1)) {
+            int[] resultOffsets = currentResultOffsets();
             if (button == 1) resultOffsets[result]++;
             else resultOffsets[result] = Math.max(0, resultOffsets[result] - 1);
             solveNow();
@@ -359,8 +458,7 @@ public class BuildersWorkbenchScreen extends AbstractContainerScreen<BuildersWor
     private void switchTab(int tab) {
         if (tab == activeTab) return;
         activeTab = tab;
-        Arrays.fill(resultOffsets, 0);
-        lastInputSignature = Integer.MIN_VALUE;
+        lastInputSignature = inputSignature();
         lastSentSignature = Integer.MIN_VALUE;
         updateDimensions();
         if (minecraft != null && minecraft.gameMode != null) {
@@ -369,12 +467,29 @@ public class BuildersWorkbenchScreen extends AbstractContainerScreen<BuildersWor
         playClick();
     }
 
+    private int[] currentResultOffsets() {
+        return resultOffsetsByTab[activeTab == 1 ? 1 : 0];
+    }
+
+    private void resetAllResultOffsets() {
+        for (int[] offsets : resultOffsetsByTab) Arrays.fill(offsets, 0);
+    }
+
     private int hoveredFilter(double mouseX, double mouseY) {
         int x = leftPos + filterX();
         int y = topPos + FILTER_Y;
         for (int i = 0; i < 3; i++) {
             if (isIn(mouseX, mouseY, x, y + i * FILTER_SPACING, 18, 18)) return i;
         }
+        return -1;
+    }
+
+    private int hoveredModifier(double mouseX, double mouseY) {
+        int y = topPos + MODIFIER_Y;
+        if (isIn(mouseX, mouseY, leftPos + SINGLE_TEXTURE_X, y,
+                WbRenderer.MODIFIER_SIZE, WbRenderer.MODIFIER_SIZE)) return 0;
+        if (isIn(mouseX, mouseY, leftPos + MATCH_SHAPE_X, y,
+                WbRenderer.MODIFIER_SIZE, WbRenderer.MODIFIER_SIZE)) return 1;
         return -1;
     }
 

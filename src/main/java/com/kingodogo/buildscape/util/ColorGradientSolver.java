@@ -88,6 +88,12 @@ public final class ColorGradientSolver {
     public static final int FILTER_SINGLE_TEXTURE = 1 << 6;
     public static final int FILTER_MATCH_SHAPE = 1 << 7;
     public static final int FILTER_MODIFIERS = FILTER_SINGLE_TEXTURE | FILTER_MATCH_SHAPE;
+    /**
+     * State a freshly placed workbench starts in: solid full blocks only, every other
+     * category and both modifiers switched off, so the palette opens narrow and the
+     * player widens it deliberately.
+     */
+    public static final int FILTER_DEFAULT = FILTER_SOLID;
     public static final int FILTER_STATE_MASK = FILTER_ALL | FILTER_ALL << STRICT_SHIFT | FILTER_MODIFIERS;
 
     private static final Map<Item, BlockColor> REGISTRY = new LinkedHashMap<>();

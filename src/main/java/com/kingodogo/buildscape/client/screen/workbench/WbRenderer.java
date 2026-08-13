@@ -1,5 +1,6 @@
 package com.kingodogo.buildscape.client.screen.workbench;
 
+import com.kingodogo.buildscape.util.ColorGradientSolver;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import com.mojang.math.Matrix4f;
@@ -34,15 +35,24 @@ public final class WbRenderer {
     public static final ResourceLocation BUILDERS_ARROW_ACTIVE = new ResourceLocation("buildscape", "textures/gui/builders_workbench/builders_arrow_active.png");
 
     // Filter buttons
-    public static final ResourceLocation BTN_ALL = new ResourceLocation("buildscape", "textures/gui/builders_workbench/all.png");
-    public static final ResourceLocation BTN_ALL_HOVER = new ResourceLocation("buildscape", "textures/gui/builders_workbench/all_hover.png");
-    public static final ResourceLocation BTN_ALL_SEL = new ResourceLocation("buildscape", "textures/gui/builders_workbench/all_selected.png");
+    public static final ResourceLocation BTN_SOLID = new ResourceLocation("buildscape", "textures/gui/builders_workbench/solid.png");
+    public static final ResourceLocation BTN_SOLID_HOVER = new ResourceLocation("buildscape", "textures/gui/builders_workbench/solid_hover.png");
+    public static final ResourceLocation BTN_SOLID_SEL = new ResourceLocation("buildscape", "textures/gui/builders_workbench/solid_selected.png");
+    public static final ResourceLocation BTN_SOLID_STRICT = new ResourceLocation("buildscape", "textures/gui/builders_workbench/solid_shift_selected.png");
     public static final ResourceLocation BTN_TRANSPARENT = new ResourceLocation("buildscape", "textures/gui/builders_workbench/transparent.png");
     public static final ResourceLocation BTN_TRANSPARENT_HOVER = new ResourceLocation("buildscape", "textures/gui/builders_workbench/transparent_hover.png");
     public static final ResourceLocation BTN_TRANSPARENT_SEL = new ResourceLocation("buildscape", "textures/gui/builders_workbench/transparent_selected.png");
+    public static final ResourceLocation BTN_TRANSPARENT_STRICT = new ResourceLocation("buildscape", "textures/gui/builders_workbench/transparent_shift_selected.png");
     public static final ResourceLocation BTN_NON_FULL = new ResourceLocation("buildscape", "textures/gui/builders_workbench/non_full.png");
     public static final ResourceLocation BTN_NON_FULL_HOVER = new ResourceLocation("buildscape", "textures/gui/builders_workbench/non_full_hover.png");
     public static final ResourceLocation BTN_NON_FULL_SEL = new ResourceLocation("buildscape", "textures/gui/builders_workbench/non_full_selected.png");
+    public static final ResourceLocation BTN_NON_FULL_STRICT = new ResourceLocation("buildscape", "textures/gui/builders_workbench/non_full_shift_selected.png");
+    public static final ResourceLocation BTN_SINGLE_TEXTURE = new ResourceLocation("buildscape", "textures/gui/builders_workbench/single_texture.png");
+    public static final ResourceLocation BTN_SINGLE_TEXTURE_HOVER = new ResourceLocation("buildscape", "textures/gui/builders_workbench/single_texture_hover.png");
+    public static final ResourceLocation BTN_SINGLE_TEXTURE_SEL = new ResourceLocation("buildscape", "textures/gui/builders_workbench/single_texture_selected.png");
+    public static final ResourceLocation BTN_MATCH_SHAPE = new ResourceLocation("buildscape", "textures/gui/builders_workbench/match_shape.png");
+    public static final ResourceLocation BTN_MATCH_SHAPE_HOVER = new ResourceLocation("buildscape", "textures/gui/builders_workbench/match_shape_hover.png");
+    public static final ResourceLocation BTN_MATCH_SHAPE_SEL = new ResourceLocation("buildscape", "textures/gui/builders_workbench/match_shape_selected.png");
 
     // Sizes
     /** Both builder background sheets are 256x256 with the artwork anchored at (0,0). */
@@ -50,6 +60,7 @@ public final class WbRenderer {
     /** Tab sprites are 17x17 with the plate and icon already composed by the artist. */
     public static final int TAB_SIZE = 17;
     public static final int BUTTON_SIZE = 18;
+    public static final int MODIFIER_SIZE = 11;
     public static final int ARROW_W = 48;
     public static final int ARROW_H = 16;
 
@@ -95,25 +106,38 @@ public final class WbRenderer {
     }
 
     public static void drawFilterButton(PoseStack ps, int x, int y, int index, int currentMask, boolean hovered) {
-        ResourceLocation normalTex, hoverTex, selectedTex;
+        ResourceLocation normalTex, hoverTex, selectedTex, strictTex;
         if (index == 0) {
-            normalTex = BTN_ALL;
-            hoverTex = BTN_ALL_HOVER;
-            selectedTex = BTN_ALL_SEL;
+            normalTex = BTN_SOLID;
+            hoverTex = BTN_SOLID_HOVER;
+            selectedTex = BTN_SOLID_SEL;
+            strictTex = BTN_SOLID_STRICT;
         } else if (index == 1) {
             normalTex = BTN_TRANSPARENT;
             hoverTex = BTN_TRANSPARENT_HOVER;
             selectedTex = BTN_TRANSPARENT_SEL;
+            strictTex = BTN_TRANSPARENT_STRICT;
         } else {
             normalTex = BTN_NON_FULL;
             hoverTex = BTN_NON_FULL_HOVER;
             selectedTex = BTN_NON_FULL_SEL;
+            strictTex = BTN_NON_FULL_STRICT;
         }
 
-        ResourceLocation activeTex = (currentMask & (1 << index)) != 0
-                ? selectedTex : (hovered ? hoverTex : normalTex);
+        int categoryBit = 1 << index;
+        int strictBit = categoryBit << ColorGradientSolver.STRICT_SHIFT;
+        ResourceLocation activeTex = (currentMask & strictBit) != 0 ? strictTex
+                : (currentMask & categoryBit) != 0 ? selectedTex
+                : hovered ? hoverTex : normalTex;
         RenderSystem.setShaderTexture(0, activeTex);
         GuiComponent.blit(ps, x, y, 0, 0, BUTTON_SIZE, BUTTON_SIZE, BUTTON_SIZE, BUTTON_SIZE);
+    }
+
+    public static void drawModifierButton(PoseStack ps, int x, int y, boolean selected, boolean hovered,
+                                          ResourceLocation normal, ResourceLocation hover,
+                                          ResourceLocation selectedTexture) {
+        RenderSystem.setShaderTexture(0, selected ? selectedTexture : hovered ? hover : normal);
+        GuiComponent.blit(ps, x, y, 0, 0, MODIFIER_SIZE, MODIFIER_SIZE, MODIFIER_SIZE, MODIFIER_SIZE);
     }
 
     /**

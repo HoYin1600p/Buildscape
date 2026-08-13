@@ -1,5 +1,6 @@
 package com.kingodogo.buildscape.recipe;
 
+import com.kingodogo.buildscape.item.BuildersPouchItem;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
@@ -22,21 +23,21 @@ public class ClearShulkerFiltersRecipe extends CustomRecipe {
 
     @Override
     public boolean matches(CraftingContainer container, Level level) {
-        ItemStack filteredShulker = ItemStack.EMPTY;
+        ItemStack filteredContainer = ItemStack.EMPTY;
         for (int i = 0; i < container.getContainerSize(); i++) {
             ItemStack stack = container.getItem(i);
             if (stack.isEmpty()) continue;
-            if (!filteredShulker.isEmpty() || !isShulker(stack)) return false;
-            filteredShulker = stack;
+            if (!filteredContainer.isEmpty() || !isSupportedContainer(stack)) return false;
+            filteredContainer = stack;
         }
-        return !filteredShulker.isEmpty() && hasFilters(filteredShulker);
+        return !filteredContainer.isEmpty() && hasFilters(filteredContainer);
     }
 
     @Override
     public ItemStack assemble(CraftingContainer container) {
         for (int i = 0; i < container.getContainerSize(); i++) {
             ItemStack stack = container.getItem(i);
-            if (!stack.isEmpty() && isShulker(stack) && hasFilters(stack)) {
+            if (!stack.isEmpty() && isSupportedContainer(stack) && hasFilters(stack)) {
                 ItemStack result = stack.copy();
                 result.setCount(1);
                 clearFilters(result);
@@ -61,7 +62,12 @@ public class ClearShulkerFiltersRecipe extends CustomRecipe {
                 && blockItem.getBlock() instanceof ShulkerBoxBlock;
     }
 
+    private static boolean isSupportedContainer(ItemStack stack) {
+        return isShulker(stack) || stack.getItem() instanceof BuildersPouchItem;
+    }
+
     private static boolean hasFilters(ItemStack stack) {
+        if (stack.getItem() instanceof BuildersPouchItem) return BuildersPouchItem.hasFilters(stack);
         CompoundTag blockEntityTag = stack.getTagElement(BLOCK_ENTITY_TAG);
         if (blockEntityTag == null) return false;
 
@@ -85,6 +91,10 @@ public class ClearShulkerFiltersRecipe extends CustomRecipe {
     }
 
     private static void clearFilters(ItemStack stack) {
+        if (stack.getItem() instanceof BuildersPouchItem) {
+            BuildersPouchItem.clearFilters(stack);
+            return;
+        }
         CompoundTag blockEntityTag = stack.getTagElement(BLOCK_ENTITY_TAG);
         if (blockEntityTag == null) return;
 

@@ -214,7 +214,12 @@ public class BuildersWorkbenchMenu extends AbstractContainerMenu {
     }
 
     public int getResultOffset(int slot) {
-        return slot >= 0 && slot < 9 ? this.blockEntity.dataAccess.get(3 + slot) : 0;
+        return getResultOffset(getActiveTab(), slot);
+    }
+
+    public int getResultOffset(int tab, int slot) {
+        return tab >= 0 && tab < 2 && slot >= 0 && slot < 9
+                ? this.blockEntity.dataAccess.get(3 + tab * 9 + slot) : 0;
     }
 
     @Override

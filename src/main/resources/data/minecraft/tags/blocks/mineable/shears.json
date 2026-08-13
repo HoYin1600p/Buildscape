@@ -162,6 +162,10 @@
     "buildscape:yellow_wool_stairs",
     "buildscape:yellow_wool_vertical_slab",
     "buildscape:yellow_wool_wall",
-    "buildscape:pale_hanging_moss"
+    "buildscape:pale_hanging_moss",
+    "buildscape:black_rose_vines",
+    "buildscape:blue_rose_vines",
+    "buildscape:red_rose_vines",
+    "buildscape:white_rose_vines"
   ]
 }

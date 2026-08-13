@@ -105,6 +105,9 @@ public class BuildersWorkbenchScreen extends AbstractContainerScreen<BuildersWor
         }
         updateDimensions();
         super.init();
+        // AbstractContainerScreen#init recentres on imageWidth, which would undo the
+        // anchoring above, so re-apply it once the vanilla layout pass is done.
+        updateDimensions();
         ClientBlockColorCatalog.ensureReady();
         lastInputSignature = inputSignature();
         lastSentSignature = Integer.MIN_VALUE;
@@ -160,10 +163,21 @@ public class BuildersWorkbenchScreen extends AbstractContainerScreen<BuildersWor
         return 31 * signature + ClientBlockColorCatalog.generation();
     }
 
+    /**
+     * Sizes the screen for the active tab, but anchors it as if it were always the
+     * colour builder.
+     *
+     * <p>The gradient artwork is wider only because of the filter panel hanging off its
+     * right-hand side - the main body starts at x = 0 in both sheets. Centring on the
+     * real imageWidth would therefore shove the whole panel {@code (GRADIENT_WIDTH -
+     * COLOR_WIDTH) / 2} pixels to the left when switching tabs. Centring on COLOR_WIDTH
+     * instead keeps the body, its slots and the player inventory perfectly still, and
+     * lets the extra strip grow to the right.
+     */
     private void updateDimensions() {
         imageWidth = activeTab == 0 ? COLOR_WIDTH : GRADIENT_WIDTH;
         imageHeight = GUI_HEIGHT;
-        leftPos = (width - imageWidth) / 2;
+        leftPos = (width - COLOR_WIDTH) / 2;
         topPos = (height - imageHeight) / 2;
     }
 

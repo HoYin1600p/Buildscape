@@ -50,7 +50,12 @@ public class BuildersWorkbenchBlockEntity extends BlockEntity implements MenuPro
     private final int[][] resultOffsetsByTab = new int[TAB_COUNT][RESULT_COUNT];
     // Persisted filter/tab state
     private int activeTab = 0; // 0=ColorPicker, 1=GradientBuilder
-    private int filterMask = com.kingodogo.buildscape.util.ColorGradientSolver.FILTER_ALL;
+    /**
+     * Bumped when the meaning of the saved mask changes; older tags fall back to
+     * FILTER_DEFAULT instead of silently keeping the previous all-on state.
+     */
+    private static final int FILTER_MASK_VERSION = 3;
+    private int filterMask = com.kingodogo.buildscape.util.ColorGradientSolver.FILTER_DEFAULT;
     private int copyProgress = 0;
     public final net.minecraft.world.inventory.ContainerData dataAccess = new net.minecraft.world.inventory.ContainerData() {
         @Override
@@ -502,11 +507,11 @@ public class BuildersWorkbenchBlockEntity extends BlockEntity implements MenuPro
         super.load(tag);
         ContainerHelper.loadAllItems(tag, items);
         if (tag.contains("ActiveTab")) this.activeTab = validTab(tag.getInt("ActiveTab"));
-        if (tag.contains("FilterMaskVersion")) {
+        if (tag.getInt("FilterMaskVersion") >= FILTER_MASK_VERSION) {
             this.filterMask = tag.getInt("FilterMask")
                     & com.kingodogo.buildscape.util.ColorGradientSolver.FILTER_STATE_MASK;
         } else {
-            this.filterMask = com.kingodogo.buildscape.util.ColorGradientSolver.FILTER_ALL;
+            this.filterMask = com.kingodogo.buildscape.util.ColorGradientSolver.FILTER_DEFAULT;
         }
         if (tag.contains("CopyProgress")) this.copyProgress = tag.getInt("CopyProgress");
         for (int tab = 0; tab < TAB_COUNT; tab++) {
@@ -537,7 +542,7 @@ public class BuildersWorkbenchBlockEntity extends BlockEntity implements MenuPro
         ContainerHelper.saveAllItems(tag, items);
         tag.putInt("ActiveTab", activeTab);
         tag.putInt("FilterMask", filterMask);
-        tag.putInt("FilterMaskVersion", 2);
+        tag.putInt("FilterMaskVersion", FILTER_MASK_VERSION);
         tag.putInt("CopyProgress", copyProgress);
         tag.putIntArray("ColorResultOffsets", resultOffsetsByTab[0]);
         tag.putIntArray("GradientResultOffsets", resultOffsetsByTab[1]);

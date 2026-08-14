@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "#  ",
+    "## ",
+    "###"
+  ],
+  "key": {
+    "#": {
+      "item": "buildscape:blue_stained_brick_tiles"
+    }
+  },
+  "result": {
+    "item": "buildscape:blue_stained_brick_tiles_stairs",
+    "count": 4
+  }
+}

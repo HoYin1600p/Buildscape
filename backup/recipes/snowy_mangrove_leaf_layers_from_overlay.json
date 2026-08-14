@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "buildscape:mangrove_leaf_layers"
+    },
+    {
+      "item": "buildscape:snow_overlay"
+    }
+  ],
+  "result": {
+    "item": "buildscape:snowy_mangrove_leaf_layers"
+  }
+}

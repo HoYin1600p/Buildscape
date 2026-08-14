@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "B  ",
+    "BB ",
+    "BBB"
+  ],
+  "key": {
+    "B": {
+      "item": "minecraft:spruce_wood"
+    }
+  },
+  "result": {
+    "item": "buildscape:spruce_wood_stairs",
+    "count": 4
+  }
+}

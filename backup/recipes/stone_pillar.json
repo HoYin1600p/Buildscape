@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " R ",
+    " R ",
+    " R "
+  ],
+  "key": {
+    "R": {
+      "item": "minecraft:stone"
+    }
+  },
+  "result": {
+    "item": "buildscape:stone_pillar"
+  }
+}
+

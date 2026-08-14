@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "buildscape:yellow_smooth_sandstone_slab"
+  },
+  "result": "buildscape:yellow_smooth_sandstone_vertical_slab",
+  "count": 1
+}

@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "###"
+  ],
+  "key": {
+    "#": {
+      "item": "buildscape:mangrove_leaves"
+    }
+  },
+  "result": {
+    "item": "buildscape:mangrove_leaf_layers",
+    "count": 8
+  }
+}

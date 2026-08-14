@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "building",
+  "ingredients": [
+    {
+      "item": "buildscape:prismarine_vertical_slab"
+    }
+  ],
+  "result": {
+    "item": "minecraft:prismarine_slab",
+    "count": 1
+  }
+}

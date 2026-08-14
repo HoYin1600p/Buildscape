@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "buildscape:bit_tuff_bricks"
+  },
+  "result": "buildscape:bit_chiseled_tuff",
+  "count": 1
+}
+

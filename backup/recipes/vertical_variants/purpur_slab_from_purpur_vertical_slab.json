@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "building",
+  "ingredients": [
+    {
+      "item": "buildscape:purpur_vertical_slab"
+    }
+  ],
+  "result": {
+    "item": "minecraft:purpur_slab",
+    "count": 1
+  }
+}

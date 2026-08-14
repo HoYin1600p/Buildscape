@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "###",
+    "###"
+  ],
+  "key": {
+    "#": {
+      "item": "buildscape:mud_bricks"
+    }
+  },
+  "result": {
+    "item": "buildscape:mud_brick_wall",
+    "count": 6
+  }
+}

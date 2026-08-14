@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "building",
+  "ingredients": [
+    {
+      "item": "buildscape:caution_factory_slab"
+    }
+  ],
+  "result": {
+    "item": "buildscape:caution_factory_vertical_slab",
+    "count": 1
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "minecraft:tuff"
+  },
+  "result": "buildscape:bit_polished_tuff_wall",
+  "count": 1
+}
+

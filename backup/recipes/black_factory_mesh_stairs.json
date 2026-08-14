@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "#  ",
+    "## ",
+    "###"
+  ],
+  "key": {
+    "#": {
+      "item": "buildscape:black_factory_mesh"
+    }
+  },
+  "result": {
+    "item": "buildscape:black_factory_mesh_stairs",
+    "count": 4
+  }
+}

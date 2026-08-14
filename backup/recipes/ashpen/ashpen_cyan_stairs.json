@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "#  ",
+    "## ",
+    "###"
+  ],
+  "key": {
+    "#": {
+      "item": "buildscape:ashpen_cyan_planks"
+    }
+  },
+  "result": {
+    "item": "buildscape:ashpen_cyan_stairs",
+    "count": 4
+  }
+}

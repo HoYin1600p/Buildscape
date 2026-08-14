@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "buildscape:steel_block"
+  },
+  "result": "buildscape:cut_steel_stairs",
+  "count": 1
+}

@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "buildscape:factory_pink_glass_slab"
+  },
+  "result": "buildscape:factory_pink_glass_vertical_slab",
+  "count": 1
+}

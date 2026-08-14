@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "###"
+  ],
+  "key": {
+    "#": {
+      "item": "minecraft:green_carpet"
+    }
+  },
+  "result": {
+    "item": "buildscape:green_carpet_layers",
+    "count": 8
+  }
+}

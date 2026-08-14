@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "B  ",
+    "BB ",
+    "BBB"
+  ],
+  "key": {
+    "B": {
+      "item": "minecraft:red_terracotta"
+    }
+  },
+  "result": {
+    "item": "buildscape:red_terracotta_stairs",
+    "count": 4
+  }
+}

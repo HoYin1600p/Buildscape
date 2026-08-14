@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "#  ",
+    "## ",
+    "###"
+  ],
+  "key": {
+    "#": {
+      "item": "buildscape:mangrove_log"
+    }
+  },
+  "result": {
+    "item": "buildscape:mangrove_log_stairs",
+    "count": 4
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "buildscape:snow_vertical_slab"
+  },
+  "result": "buildscape:snow_slab",
+  "count": 1
+}

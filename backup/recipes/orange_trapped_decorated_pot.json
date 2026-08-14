@@ -1,0 +1,16 @@
+{
+  "ingredients": [
+    {
+      "item": "buildscape:trapped_decorated_pot"
+    },
+    {
+      "item": "minecraft:orange_dye"
+    }
+  ],
+  "category": "building",
+  "result": {
+    "count": 1,
+    "item": "buildscape:orange_trapped_decorated_pot"
+  },
+  "type": "minecraft:crafting_shapeless"
+}

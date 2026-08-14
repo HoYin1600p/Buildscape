@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "PP",
+    "GG",
+    "GG"
+  ],
+  "key": {
+    "P": {
+      "tag": "minecraft:planks"
+    },
+    "G": {
+      "item": "minecraft:white_stained_glass"
+    }
+  },
+  "result": {
+    "item": "buildscape:white_glass_jar",
+    "count": 4
+  }
+}

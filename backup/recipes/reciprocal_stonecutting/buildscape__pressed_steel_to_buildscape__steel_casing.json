@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "buildscape:pressed_steel"
+  },
+  "result": "buildscape:steel_casing",
+  "count": 1
+}

@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "building",
+  "ingredients": [
+    {
+      "item": "buildscape:yellow_moss_block_slab"
+    }
+  ],
+  "result": {
+    "item": "buildscape:yellow_moss_block_vertical_slab",
+    "count": 1
+  }
+}

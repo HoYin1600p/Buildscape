@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "buildscape:cascade_block_no_mist"
+    },
+    {
+      "item": "buildscape:bottle_of_mist"
+    }
+  ],
+  "result": {
+    "item": "buildscape:cascade_block",
+    "count": 1
+  }
+}

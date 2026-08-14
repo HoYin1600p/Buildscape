@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "L  ",
+    "LL ",
+    "LLL"
+  ],
+  "key": {
+    "L": {
+      "item": "minecraft:warped_stem"
+    }
+  },
+  "result": {
+    "item": "buildscape:warped_stem_stairs",
+    "count": 4
+  }
+}

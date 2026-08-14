@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "###"
+  ],
+  "key": {
+    "#": {
+      "item": "minecraft:lime_carpet"
+    }
+  },
+  "result": {
+    "item": "buildscape:lime_carpet_layers",
+    "count": 8
+  }
+}

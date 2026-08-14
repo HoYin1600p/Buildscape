@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "buildscape:green_big_book"
+    }
+  ],
+  "result": {
+    "item": "minecraft:book",
+    "count": 9
+  }
+}

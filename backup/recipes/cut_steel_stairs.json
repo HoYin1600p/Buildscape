@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "#  ",
+    "## ",
+    "###"
+  ],
+  "key": {
+    "#": {
+      "item": "buildscape:cut_steel"
+    }
+  },
+  "result": {
+    "item": "buildscape:cut_steel_stairs",
+    "count": 4
+  }
+}

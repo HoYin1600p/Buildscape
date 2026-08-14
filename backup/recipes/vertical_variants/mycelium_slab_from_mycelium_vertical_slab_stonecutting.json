@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "buildscape:mycelium_vertical_slab"
+  },
+  "result": "buildscape:mycelium_slab",
+  "count": 1
+}

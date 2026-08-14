@@ -29,6 +29,7 @@ public final class BuildscapeRenderLayers {
                 path.endsWith("_ornament") ||
                 path.endsWith("_string_light") ||
                 path.startsWith("bit_") && path.endsWith("copper_grate") ||
+                path.endsWith("flaming_steel_grate") ||
                 isTranslucentExact(path)
         ) {
             return RenderType.translucent();
@@ -39,6 +40,7 @@ public final class BuildscapeRenderLayers {
         }
 
         if (
+                path.contains("hollow") ||
                 path.contains("wallpaper_flat") ||
                 path.endsWith("_leaf_layers") ||
                 path.endsWith("_decorated_pot") ||

@@ -64,6 +64,22 @@
     "buildscape:black_wallpaper",
     "buildscape:black_wallpaper_slab",
     "buildscape:black_wallpaper_vertical_slab",
-    "buildscape:black_wallpaper_flat"
+    "buildscape:black_wallpaper_flat",
+    "buildscape:white_layered_wool",
+    "buildscape:orange_layered_wool",
+    "buildscape:magenta_layered_wool",
+    "buildscape:light_blue_layered_wool",
+    "buildscape:yellow_layered_wool",
+    "buildscape:lime_layered_wool",
+    "buildscape:pink_layered_wool",
+    "buildscape:gray_layered_wool",
+    "buildscape:light_gray_layered_wool",
+    "buildscape:cyan_layered_wool",
+    "buildscape:purple_layered_wool",
+    "buildscape:blue_layered_wool",
+    "buildscape:brown_layered_wool",
+    "buildscape:green_layered_wool",
+    "buildscape:red_layered_wool",
+    "buildscape:black_layered_wool"
   ]
 }

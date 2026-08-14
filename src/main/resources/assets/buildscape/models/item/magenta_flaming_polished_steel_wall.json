@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/wall_inventory",
+  "textures": {
+    "wall": "buildscape:block/magenta_flaming_polished_steel"
+  }
+}

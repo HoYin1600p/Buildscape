@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "buildscape:yellow_mosaic_glass_slab"
+  },
+  "result": "buildscape:yellow_mosaic_glass_vertical_slab",
+  "count": 1
+}

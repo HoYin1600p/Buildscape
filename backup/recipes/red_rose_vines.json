@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " P ",
+    " V ",
+    " P "
+  ],
+  "key": {
+    "P": {
+      "item": "minecraft:poppy"
+    },
+    "V": {
+      "item": "minecraft:vine"
+    }
+  },
+  "result": {
+    "item": "buildscape:red_rose_vines",
+    "count": 1
+  }
+}

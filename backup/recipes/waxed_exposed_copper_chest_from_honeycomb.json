@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "group": "waxed_exposed_copper_chest",
+  "ingredients": [
+    {
+      "item": "buildscape:exposed_copper_chest"
+    },
+    {
+      "item": "minecraft:honeycomb"
+    }
+  ],
+  "result": {
+    "count": 1,
+    "item": "buildscape:waxed_exposed_copper_chest"
+  }
+}

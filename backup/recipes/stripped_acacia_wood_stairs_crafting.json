@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "B  ",
+    "BB ",
+    "BBB"
+  ],
+  "key": {
+    "B": {
+      "item": "minecraft:stripped_acacia_wood"
+    }
+  },
+  "result": {
+    "item": "buildscape:stripped_acacia_wood_stairs",
+    "count": 4
+  }
+}

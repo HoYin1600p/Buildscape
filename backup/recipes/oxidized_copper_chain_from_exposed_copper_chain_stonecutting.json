@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "buildscape:exposed_copper_chain"
+  },
+  "result": "buildscape:oxidized_copper_chain",
+  "count": 1
+}
+

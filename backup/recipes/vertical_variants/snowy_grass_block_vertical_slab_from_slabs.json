@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "building",
+  "ingredients": [
+    {
+      "item": "buildscape:snowy_grass_block_slab"
+    }
+  ],
+  "result": {
+    "item": "buildscape:snowy_grass_block_vertical_slab",
+    "count": 1
+  }
+}

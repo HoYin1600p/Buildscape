@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "building",
+  "ingredients": [
+    {
+      "item": "buildscape:polished_magenta_concrete_slab"
+    }
+  ],
+  "result": {
+    "item": "buildscape:polished_magenta_concrete_vertical_slab",
+    "count": 1
+  }
+}

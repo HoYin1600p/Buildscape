@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "building",
+  "ingredients": [
+    {
+      "item": "buildscape:crimson_hyphae_vertical_slab"
+    }
+  ],
+  "result": {
+    "item": "buildscape:crimson_hyphae_slab",
+    "count": 1
+  }
+}

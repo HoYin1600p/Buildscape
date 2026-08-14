@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "buildscape:ashpen_lime_planks"
+    }
+  ],
+  "result": {
+    "item": "buildscape:ashpen_lime_button",
+    "count": 1
+  }
+}

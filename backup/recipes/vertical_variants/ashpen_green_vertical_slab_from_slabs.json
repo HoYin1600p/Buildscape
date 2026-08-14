@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "building",
+  "ingredients": [
+    {
+      "item": "buildscape:ashpen_green_slab"
+    }
+  ],
+  "result": {
+    "item": "buildscape:ashpen_green_vertical_slab",
+    "count": 1
+  }
+}

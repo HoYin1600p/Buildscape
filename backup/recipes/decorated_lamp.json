@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "R": {
+      "item": "minecraft:red_dye"
+    },
+    "L": {
+      "item": "minecraft:redstone_lamp"
+    },
+    "D": {
+      "item": "minecraft:lime_dye"
+    }
+  },
+  "pattern": [
+    " R ",
+    " L ",
+    " D "
+  ],
+  "result": {
+    "count": 1,
+    "item": "buildscape:festive_lamp"
+  }
+}
+

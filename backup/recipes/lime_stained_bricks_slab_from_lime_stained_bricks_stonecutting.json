@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "buildscape:lime_stained_bricks"
+  },
+  "result": "buildscape:lime_stained_bricks_slab",
+  "count": 2
+}

@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "O": {
+      "item": "buildscape:glass_ornament"
+    },
+    "D": {
+      "item": "minecraft:black_dye"
+    }
+  },
+  "pattern": [
+    "OOO",
+    "ODO",
+    "OOO"
+  ],
+  "result": {
+    "count": 8,
+    "item": "buildscape:black_ornament"
+  }
+}

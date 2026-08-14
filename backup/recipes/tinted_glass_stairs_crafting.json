@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "B  ",
+    "BB ",
+    "BBB"
+  ],
+  "key": {
+    "B": {
+      "item": "minecraft:tinted_glass"
+    }
+  },
+  "result": {
+    "item": "buildscape:tinted_glass_stairs",
+    "count": 4
+  }
+}

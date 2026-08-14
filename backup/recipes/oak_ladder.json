@@ -1,0 +1,20 @@
+{
+    "key":  {
+                "S":  {
+                          "item":  "minecraft:stick"
+                      },
+                "P":  {
+                          "item":  "minecraft:oak_planks"
+                      }
+            },
+    "pattern":  [
+                    "S S",
+                    "SPS",
+                    "S S"
+                ],
+    "result":  {
+                   "count":  3,
+                   "item":  "buildscape:oak_ladder"
+               },
+    "type":  "minecraft:crafting_shaped"
+}

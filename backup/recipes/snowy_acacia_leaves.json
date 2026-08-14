@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "minecraft:acacia_leaves"
+    },
+    {
+      "item": "buildscape:snow_overlay"
+    }
+  ],
+  "result": {
+    "item": "buildscape:snowy_acacia_leaves"
+  }
+}

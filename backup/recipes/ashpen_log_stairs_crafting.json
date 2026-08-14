@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "#  ",
+    "## ",
+    "###"
+  ],
+  "key": {
+    "#": {
+      "item": "buildscape:ashpen_log"
+    }
+  },
+  "result": {
+    "item": "buildscape:ashpen_log_stairs",
+    "count": 4
+  }
+}

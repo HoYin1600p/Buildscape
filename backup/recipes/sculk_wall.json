@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "###",
+    "###"
+  ],
+  "key": {
+    "#": {
+      "item": "buildscape:sculk"
+    }
+  },
+  "result": {
+    "item": "buildscape:sculk_wall",
+    "count": 6
+  }
+}

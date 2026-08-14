@@ -1,9 +1,0 @@
-{
-  "type": "minecraft:stonecutting",
-  "ingredient": {
-    "item": "buildscape:bit_copper_bulb"
-  },
-  "result": "buildscape:bit_exposed_cut_copper",
-  "count": 1
-}
-

@@ -1,8 +1,0 @@
-{
-  "type": "minecraft:stonecutting",
-  "ingredient": {
-    "item": "buildscape:magenta_stained_bricks_wall"
-  },
-  "result": "buildscape:magenta_stained_bricks",
-  "count": 1
-}

@@ -1,8 +1,0 @@
-{
-  "type": "minecraft:stonecutting",
-  "ingredient": {
-    "item": "buildscape:steel_grate"
-  },
-  "result": "buildscape:pressed_steel_wall",
-  "count": 1
-}

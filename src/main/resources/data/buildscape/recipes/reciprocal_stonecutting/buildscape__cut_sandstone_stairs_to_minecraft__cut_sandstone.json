@@ -1,8 +1,0 @@
-{
-  "type": "minecraft:stonecutting",
-  "ingredient": {
-    "item": "buildscape:cut_sandstone_stairs"
-  },
-  "result": "minecraft:cut_sandstone",
-  "count": 1
-}

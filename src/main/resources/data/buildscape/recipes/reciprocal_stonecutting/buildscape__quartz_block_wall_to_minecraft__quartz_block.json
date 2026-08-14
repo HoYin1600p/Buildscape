@@ -1,8 +1,0 @@
-{
-  "type": "minecraft:stonecutting",
-  "ingredient": {
-    "item": "buildscape:quartz_block_wall"
-  },
-  "result": "minecraft:quartz_block",
-  "count": 1
-}

@@ -1,8 +1,0 @@
-{
-  "type": "minecraft:stonecutting",
-  "ingredient": {
-    "item": "buildscape:caution_pink"
-  },
-  "result": "buildscape:framed_caution",
-  "count": 1
-}

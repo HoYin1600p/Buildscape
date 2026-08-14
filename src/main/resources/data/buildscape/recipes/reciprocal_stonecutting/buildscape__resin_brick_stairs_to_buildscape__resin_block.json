@@ -1,8 +1,0 @@
-{
-  "type": "minecraft:stonecutting",
-  "ingredient": {
-    "item": "buildscape:resin_brick_stairs"
-  },
-  "result": "buildscape:resin_block",
-  "count": 1
-}

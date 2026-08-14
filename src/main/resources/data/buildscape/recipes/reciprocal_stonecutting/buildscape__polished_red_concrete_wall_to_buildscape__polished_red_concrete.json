@@ -1,8 +1,0 @@
-{
-  "type": "minecraft:stonecutting",
-  "ingredient": {
-    "item": "buildscape:polished_red_concrete_wall"
-  },
-  "result": "buildscape:polished_red_concrete",
-  "count": 1
-}

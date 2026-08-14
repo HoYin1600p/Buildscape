@@ -1,8 +1,0 @@
-{
-  "type": "minecraft:stonecutting",
-  "ingredient": {
-    "item": "buildscape:waxed_oxidized_cut_copper_vertical_slab"
-  },
-  "result": "minecraft:waxed_oxidized_cut_copper_slab",
-  "count": 1
-}

@@ -1,8 +1,0 @@
-{
-  "type": "minecraft:stonecutting",
-  "ingredient": {
-    "item": "buildscape:smooth_stone_stairs"
-  },
-  "result": "minecraft:smooth_stone",
-  "count": 1
-}

@@ -1,8 +1,0 @@
-{
-  "type": "minecraft:stonecutting",
-  "ingredient": {
-    "item": "buildscape:cinnabar"
-  },
-  "result": "buildscape:cinnabar_bricks",
-  "count": 1
-}

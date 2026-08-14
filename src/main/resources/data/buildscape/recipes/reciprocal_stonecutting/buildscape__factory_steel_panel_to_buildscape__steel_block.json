@@ -1,8 +1,0 @@
-{
-  "type": "minecraft:stonecutting",
-  "ingredient": {
-    "item": "buildscape:factory_steel_panel"
-  },
-  "result": "buildscape:steel_block",
-  "count": 1
-}

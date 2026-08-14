@@ -1,9 +1,0 @@
-{
-  "type": "minecraft:stonecutting",
-  "ingredient": {
-    "item": "minecraft:bedrock"
-  },
-  "result": "buildscape:bedrock_stairs",
-  "count": 2
-}
-

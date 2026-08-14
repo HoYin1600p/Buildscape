@@ -46,9 +46,7 @@ public class ShapelessDurabilityRecipe extends ShapelessRecipe {
         for (int i = 0; i < remaining.size(); i++) {
             ItemStack stack = container.getItem(i);
             if (!stack.isEmpty()) {
-                if (
-                        stack.isDamageableItem() && !(stack.getItem() instanceof ArmorItem)
-                ) {
+                if ((stack.isDamageableItem() || stack.getMaxDamage() > 0) && !(stack.getItem() instanceof ArmorItem)) {
                     ItemStack damagedStack = stack.copy();
                     int unbreakingLevel = net.minecraft.world.item.enchantment.EnchantmentHelper.getItemEnchantmentLevel(
                             net.minecraft.world.item.enchantment.Enchantments.UNBREAKING, damagedStack
@@ -56,7 +54,7 @@ public class ShapelessDurabilityRecipe extends ShapelessRecipe {
                     boolean shouldDamage = true;
                     if (unbreakingLevel > 0) {
                         java.util.Random random = new java.util.Random();
-                        if (random.nextFloat() < 0.20f * unbreakingLevel) {
+                        if (random.nextFloat() >= (1.0f / (unbreakingLevel + 1.0f))) {
                             shouldDamage = false;
                         }
                     }
@@ -68,6 +66,8 @@ public class ShapelessDurabilityRecipe extends ShapelessRecipe {
 
                         if (newDamage < damagedStack.getMaxDamage()) {
                             remaining.set(i, damagedStack);
+                        } else {
+                            remaining.set(i, ItemStack.EMPTY);
                         }
                     } else {
                         remaining.set(i, damagedStack);

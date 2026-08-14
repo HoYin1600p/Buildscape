@@ -1,8 +1,0 @@
-{
-  "type": "minecraft:stonecutting",
-  "ingredient": {
-    "item": "minecraft:andesite_slab"
-  },
-  "result": "buildscape:andesite_vertical_slab",
-  "count": 1
-}

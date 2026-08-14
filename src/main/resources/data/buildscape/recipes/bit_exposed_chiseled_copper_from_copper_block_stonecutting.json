@@ -1,9 +1,0 @@
-{
-  "type": "minecraft:stonecutting",
-  "ingredient": {
-    "item": "minecraft:copper_block"
-  },
-  "result": "buildscape:bit_exposed_chiseled_copper",
-  "count": 1
-}
-

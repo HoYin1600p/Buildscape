@@ -1,8 +1,0 @@
-{
-  "type": "minecraft:stonecutting",
-  "ingredient": {
-    "item": "buildscape:factory_red_glass"
-  },
-  "result": "buildscape:red_mosaic_glass",
-  "count": 1
-}

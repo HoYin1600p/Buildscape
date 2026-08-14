@@ -1,9 +1,0 @@
-{
-  "type": "minecraft:stonecutting",
-  "ingredient": {
-    "item": "minecraft:snow_block"
-  },
-  "result": "buildscape:snow_bricks_slab",
-  "count": 2
-}
-

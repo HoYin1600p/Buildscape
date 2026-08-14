@@ -1,8 +1,0 @@
-{
-  "type": "minecraft:stonecutting",
-  "ingredient": {
-    "item": "buildscape:framed_caution"
-  },
-  "result": "buildscape:caution_factory",
-  "count": 1
-}

@@ -1,8 +1,0 @@
-{
-  "type": "minecraft:stonecutting",
-  "ingredient": {
-    "item": "minecraft:waxed_oxidized_copper"
-  },
-  "result": "buildscape:bit_exposed_copper_grate",
-  "count": 4
-}

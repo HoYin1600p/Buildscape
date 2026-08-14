@@ -1,8 +1,0 @@
-{
-  "type": "minecraft:stonecutting",
-  "ingredient": {
-    "item": "buildscape:obsidian_stairs"
-  },
-  "result": "minecraft:obsidian",
-  "count": 1
-}

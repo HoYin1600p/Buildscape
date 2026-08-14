@@ -1,8 +1,0 @@
-{
-  "type": "minecraft:stonecutting",
-  "ingredient": {
-    "item": "minecraft:copper_block"
-  },
-  "result": "buildscape:caution_candy",
-  "count": 4
-}

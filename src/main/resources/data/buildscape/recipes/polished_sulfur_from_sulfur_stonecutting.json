@@ -1,8 +1,0 @@
-{
-  "type": "minecraft:stonecutting",
-  "ingredient": {
-    "item": "buildscape:sulfur"
-  },
-  "result": "buildscape:polished_sulfur",
-  "count": 1
-}

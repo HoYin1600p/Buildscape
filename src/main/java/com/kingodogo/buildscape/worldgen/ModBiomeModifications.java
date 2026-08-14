@@ -19,7 +19,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate;
-import net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.placement.*;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
@@ -34,46 +33,11 @@ import net.minecraftforge.fml.common.Mod;
 public class ModBiomeModifications {
 
     private static BlockPredicate matchesBlocksBelow(List<Block> blocks) {
-        return new BlockPredicate() {
-            @Override
-            public boolean test(WorldGenLevel level, BlockPos pos) {
-                BlockPos belowPos = pos.below();
-                BlockState belowState = level.getBlockState(belowPos);
-                return blocks.contains(belowState.getBlock());
-            }
-
-            @Override
-            public net.minecraft.world.level.levelgen.blockpredicates.BlockPredicateType<
-                    ?
-                    > type() {
-                return null;
-            }
-        };
+        return BlockPredicate.matchesBlocks(blocks, new net.minecraft.core.Vec3i(0, -1, 0));
     }
 
-    private static net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate mossBlockAboveAir() {
-        return new net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate() {
-            @Override
-            public boolean test(
-                    net.minecraft.world.level.WorldGenLevel level,
-                    net.minecraft.core.BlockPos pos
-            ) {
-                if (!level.getBlockState(pos).isAir()) {
-                    return false;
-                }
-                BlockPos abovePos = pos.above();
-                return level
-                        .getBlockState(abovePos)
-                        .is(net.minecraft.world.level.block.Blocks.MOSS_BLOCK);
-            }
-
-            @Override
-            public net.minecraft.world.level.levelgen.blockpredicates.BlockPredicateType<
-                    ?
-                    > type() {
-                return null;
-            }
-        };
+    private static BlockPredicate mossBlockAboveAir() {
+        return BlockPredicate.matchesBlocks(List.of(net.minecraft.world.level.block.Blocks.MOSS_BLOCK), new net.minecraft.core.Vec3i(0, 1, 0));
     }
 
     private static void addFeatureToBiome(

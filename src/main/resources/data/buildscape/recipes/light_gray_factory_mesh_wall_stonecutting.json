@@ -1,8 +1,0 @@
-{
-  "type": "minecraft:stonecutting",
-  "ingredient": {
-    "item": "buildscape:light_gray_factory_mesh"
-  },
-  "result": "buildscape:light_gray_factory_mesh_wall",
-  "count": 1
-}

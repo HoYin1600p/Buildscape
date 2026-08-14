@@ -1,8 +1,0 @@
-{
-  "type": "minecraft:stonecutting",
-  "ingredient": {
-    "item": "buildscape:polished_basalt_wall"
-  },
-  "result": "minecraft:polished_basalt",
-  "count": 1
-}

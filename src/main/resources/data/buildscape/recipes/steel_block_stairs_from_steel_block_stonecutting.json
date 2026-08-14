@@ -1,8 +1,0 @@
-{
-  "type": "minecraft:stonecutting",
-  "ingredient": {
-    "item": "buildscape:steel_block"
-  },
-  "result": "buildscape:steel_block_stairs",
-  "count": 1
-}

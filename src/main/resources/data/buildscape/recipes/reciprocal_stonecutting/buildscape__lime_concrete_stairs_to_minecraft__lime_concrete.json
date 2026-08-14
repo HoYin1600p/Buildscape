@@ -1,8 +1,0 @@
-{
-  "type": "minecraft:stonecutting",
-  "ingredient": {
-    "item": "buildscape:lime_concrete_stairs"
-  },
-  "result": "minecraft:lime_concrete",
-  "count": 1
-}

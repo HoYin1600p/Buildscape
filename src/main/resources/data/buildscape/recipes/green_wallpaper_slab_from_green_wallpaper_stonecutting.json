@@ -1,8 +1,0 @@
-{
-  "type": "minecraft:stonecutting",
-  "ingredient": {
-    "item": "buildscape:green_wallpaper"
-  },
-  "result": "buildscape:green_wallpaper_slab",
-  "count": 2
-}

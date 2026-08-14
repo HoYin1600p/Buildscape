@@ -1,8 +1,0 @@
-{
-  "type": "minecraft:stonecutting",
-  "ingredient": {
-    "item": "buildscape:pink_concrete_stairs"
-  },
-  "result": "minecraft:pink_concrete",
-  "count": 1
-}

@@ -1,8 +1,0 @@
-{
-  "type": "minecraft:stonecutting",
-  "ingredient": {
-    "item": "minecraft:waxed_weathered_copper"
-  },
-  "result": "buildscape:waxed_weathered_copper_trapdoor",
-  "count": 2
-}

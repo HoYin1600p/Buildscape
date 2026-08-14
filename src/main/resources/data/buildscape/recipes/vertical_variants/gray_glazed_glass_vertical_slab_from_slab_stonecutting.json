@@ -1,8 +1,0 @@
-{
-  "type": "minecraft:stonecutting",
-  "ingredient": {
-    "item": "buildscape:gray_glazed_glass_slab"
-  },
-  "result": "buildscape:gray_glazed_glass_vertical_slab",
-  "count": 1
-}

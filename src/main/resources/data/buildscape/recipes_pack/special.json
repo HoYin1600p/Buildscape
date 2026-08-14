@@ -1,0 +1,11 @@
+{
+  "aliases": {
+    "BS": "buildscape:",
+    "MC": "minecraft:",
+    "F": "forge:"
+  },
+  "recipes": [
+    {"type": "buildscape:clear_shulker_filters"},
+    {"type": "buildscape:confetti_configure"}
+  ]
+}

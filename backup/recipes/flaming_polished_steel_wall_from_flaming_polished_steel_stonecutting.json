@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "buildscape:flaming_polished_steel"
+  },
+  "result": "buildscape:flaming_polished_steel_wall",
+  "count": 1
+}

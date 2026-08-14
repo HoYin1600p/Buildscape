@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "###",
+    "# #",
+    "###"
+  ],
+  "key": {
+    "#": {
+      "item": "buildscape:mangrove_log"
+    }
+  },
+  "result": {
+    "item": "buildscape:hollow_mangrove_log",
+    "count": 8
+  }
+}

@@ -1,0 +1,8 @@
+{
+    "ingredient":  {
+                       "item":  "minecraft:lime_wool"
+                   },
+    "result":  "buildscape:lime_layered_wool",
+    "count":  1,
+    "type":  "minecraft:stonecutting"
+}

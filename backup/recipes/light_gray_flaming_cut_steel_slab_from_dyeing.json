@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "key": {
+    "#": {
+      "item": "buildscape:flaming_cut_steel_slab"
+    },
+    "D": {
+      "item": "minecraft:light_gray_dye"
+    }
+  },
+  "pattern": [
+    "###",
+    "#D#",
+    "###"
+  ],
+  "result": {
+    "count": 8,
+    "item": "buildscape:light_gray_flaming_cut_steel_slab"
+  }
+}

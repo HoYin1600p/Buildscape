@@ -1,12 +1,12 @@
 {
   "parent": "minecraft:block/cube",
   "textures": {
-    "particle": "minecraft:block/crafting_table_side",
-    "down": "minecraft:block/oak_planks",
-    "up": "minecraft:block/crafting_table_top",
-    "north": "minecraft:block/crafting_table_front",
-    "south": "minecraft:block/crafting_table_front",
-    "west": "minecraft:block/crafting_table_side",
-    "east": "minecraft:block/crafting_table_side"
+    "particle": "buildscape:block/builders_workbench_front",
+    "down": "buildscape:block/builders_workbench_bottom",
+    "up": "buildscape:block/builders_workbench_top",
+    "north": "buildscape:block/builders_workbench_front",
+    "south": "buildscape:block/builders_workbench_back",
+    "west": "buildscape:block/builders_workbench_side_left",
+    "east": "buildscape:block/builders_workbench_side_right"
   }
 }

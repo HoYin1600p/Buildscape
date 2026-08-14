@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "buildscape:light_gray_flaming_pressed_steel"
+  },
+  "result": "buildscape:light_gray_flaming_pressed_steel_slab",
+  "count": 2
+}

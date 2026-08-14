@@ -127,6 +127,12 @@ public class CopperOxidationHandler {
         registerWaxPair(ModBlocks.EXPOSED_COPPER_CHEST, ModBlocks.WAXED_EXPOSED_COPPER_CHEST);
         registerWaxPair(ModBlocks.WEATHERED_COPPER_CHEST, ModBlocks.WAXED_WEATHERED_COPPER_CHEST);
         registerWaxPair(ModBlocks.OXIDIZED_COPPER_CHEST, ModBlocks.WAXED_OXIDIZED_COPPER_CHEST);
+
+        // 13. Copper Chains
+        registerChain(ModBlocks.COPPER_CHAIN, ModBlocks.EXPOSED_COPPER_CHAIN, ModBlocks.WEATHERED_COPPER_CHAIN, ModBlocks.OXIDIZED_COPPER_CHAIN);
+
+        // 14. Large Copper Chains
+        registerChain(ModBlocks.LARGE_COPPER_CHAIN, ModBlocks.LARGE_EXPOSED_COPPER_CHAIN, ModBlocks.LARGE_WEATHERED_COPPER_CHAIN, ModBlocks.LARGE_OXIDIZED_COPPER_CHAIN);
     }
 
     private static void registerChain(Supplier<Block> b0, Supplier<Block> b1, Supplier<Block> b2, Supplier<Block> b3) {
@@ -358,6 +364,19 @@ public class CopperOxidationHandler {
         init();
         Block block = state.getBlock();
         
+        Optional<BlockState> unwaxedOpt = getUnwaxedState(state);
+        if (unwaxedOpt.isPresent()) {
+            BlockState unwaxedState = unwaxedOpt.get();
+            BlockState nextUnwaxedState = getNextOxidationState(unwaxedState);
+            if (nextUnwaxedState != null) {
+                Optional<BlockState> nextWaxedOpt = getWaxedState(nextUnwaxedState);
+                if (nextWaxedOpt.isPresent()) {
+                    return nextWaxedOpt.get();
+                }
+            }
+            return null;
+        }
+        
         for (Map.Entry<Supplier<Block>, Supplier<Block>> entry : NEXT_STAGE.entrySet()) {
             if (entry.getKey().get() == block) {
                 Block targetBlock = entry.getValue().get();
@@ -398,5 +417,31 @@ public class CopperOxidationHandler {
         }
         
         return null;
+    }
+
+    private static Optional<BlockState> getUnwaxedState(BlockState state) {
+        Block block = state.getBlock();
+        for (Map.Entry<Supplier<Block>, Supplier<Block>> entry : UNWAXED_MAP.entrySet()) {
+            if (entry.getKey().get() == block) {
+                Block unwaxedBlock = entry.getValue().get();
+                return Optional.of(copyStateProperties(state, unwaxedBlock.defaultBlockState()));
+            }
+        }
+        Block unwaxedVanilla = net.minecraft.world.item.HoneycombItem.WAX_OFF_BY_BLOCK.get().get(block);
+        if (unwaxedVanilla != null) {
+            return Optional.of(copyStateProperties(state, unwaxedVanilla.defaultBlockState()));
+        }
+        return Optional.empty();
+    }
+
+    private static Optional<BlockState> getWaxedState(BlockState state) {
+        Block block = state.getBlock();
+        for (Map.Entry<Supplier<Block>, Supplier<Block>> entry : WAXED_MAP.entrySet()) {
+            if (entry.getKey().get() == block) {
+                Block waxedBlock = entry.getValue().get();
+                return Optional.of(copyStateProperties(state, waxedBlock.defaultBlockState()));
+            }
+        }
+        return net.minecraft.world.item.HoneycombItem.getWaxed(state);
     }
 }

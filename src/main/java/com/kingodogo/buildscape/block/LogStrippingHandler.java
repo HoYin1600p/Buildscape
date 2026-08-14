@@ -91,6 +91,21 @@ public class LogStrippingHandler {
         registerPair(ModBlocks.CHERRY_WOOD_WALL, ModBlocks.STRIPPED_CHERRY_WOOD_WALL);
         registerPair(ModBlocks.PALE_OAK_WOOD_WALL, ModBlocks.STRIPPED_PALE_OAK_WOOD_WALL);
         registerPair(ModBlocks.ASHPEN_WOOD_WALL, ModBlocks.STRIPPED_ASHPEN_WOOD_WALL);
+
+        // Hollow Logs
+        registerPair(ModBlocks.HOLLOW_OAK_LOG, ModBlocks.STRIPPED_HOLLOW_OAK_LOG);
+        registerPair(ModBlocks.HOLLOW_SPRUCE_LOG, ModBlocks.STRIPPED_HOLLOW_SPRUCE_LOG);
+        registerPair(ModBlocks.HOLLOW_BIRCH_LOG, ModBlocks.STRIPPED_HOLLOW_BIRCH_LOG);
+        registerPair(ModBlocks.HOLLOW_JUNGLE_LOG, ModBlocks.STRIPPED_HOLLOW_JUNGLE_LOG);
+        registerPair(ModBlocks.HOLLOW_ACACIA_LOG, ModBlocks.STRIPPED_HOLLOW_ACACIA_LOG);
+        registerPair(ModBlocks.HOLLOW_DARK_OAK_LOG, ModBlocks.STRIPPED_HOLLOW_DARK_OAK_LOG);
+        registerPair(ModBlocks.HOLLOW_CRIMSON_STEM, ModBlocks.STRIPPED_HOLLOW_CRIMSON_STEM);
+        registerPair(ModBlocks.HOLLOW_WARPED_STEM, ModBlocks.STRIPPED_HOLLOW_WARPED_STEM);
+        registerPair(ModBlocks.HOLLOW_MANGROVE_LOG, ModBlocks.STRIPPED_HOLLOW_MANGROVE_LOG);
+        registerPair(ModBlocks.HOLLOW_ASHPEN_LOG, ModBlocks.STRIPPED_HOLLOW_ASHPEN_LOG);
+        registerPair(ModBlocks.HOLLOW_POPLAR_LOG, ModBlocks.STRIPPED_HOLLOW_POPLAR_LOG);
+        registerPair(ModBlocks.HOLLOW_PALE_OAK_LOG, ModBlocks.STRIPPED_HOLLOW_PALE_OAK_LOG);
+        registerPair(ModBlocks.HOLLOW_CHERRY_LOG, ModBlocks.STRIPPED_HOLLOW_CHERRY_LOG);
     }
 
     private static void registerPair(Supplier<Block> unstripped, Supplier<Block> stripped) {

@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "buildscape:black_flaming_cut_steel"
+  },
+  "result": "buildscape:black_flaming_cut_steel_stairs",
+  "count": 1
+}

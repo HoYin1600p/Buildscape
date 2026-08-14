@@ -1,0 +1,13 @@
+{
+    "ingredients":  [
+                        {
+                            "item":  "buildscape:black_layered_wool"
+                        }
+                    ],
+    "category":  "misc",
+    "result":  {
+                   "count":  1,
+                   "item":  "minecraft:black_wool"
+               },
+    "type":  "minecraft:crafting_shapeless"
+}

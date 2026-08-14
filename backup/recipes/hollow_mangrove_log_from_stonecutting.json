@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "buildscape:mangrove_log"
+  },
+  "result": "buildscape:hollow_mangrove_log",
+  "count": 1
+}

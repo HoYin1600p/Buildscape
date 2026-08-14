@@ -27,12 +27,9 @@
     "ShulkerBoxMenuMixin"
   ],
   "client": [
-<<<<<<< Updated upstream
     "AbstractContainerScreenMixin",
-=======
     "BeaconBlockEntityRendererMixin",
     "BeaconRendererInvoker",
->>>>>>> Stashed changes
     "BuildscapeBlockModelMixin",
     "BuildscapeBlockStateCacheMixin",
     "BuildscapeForgeRegistryMixin",

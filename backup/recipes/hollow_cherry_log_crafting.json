@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "###",
+    "# #",
+    "###"
+  ],
+  "key": {
+    "#": {
+      "item": "buildscape:cherry_log"
+    }
+  },
+  "result": {
+    "item": "buildscape:hollow_cherry_log",
+    "count": 8
+  }
+}

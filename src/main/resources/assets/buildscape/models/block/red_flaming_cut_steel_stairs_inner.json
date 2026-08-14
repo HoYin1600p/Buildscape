@@ -1,0 +1,9 @@
+{
+  "parent": "minecraft:block/stairs_inner",
+  "textures": {
+    "bottom": "buildscape:block/red_flaming_cut_steel",
+    "top": "buildscape:block/red_flaming_cut_steel",
+    "side": "buildscape:block/red_flaming_cut_steel",
+    "particle": "#side"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "buildscape:poplar_log"
+  },
+  "result": "buildscape:hollow_poplar_log",
+  "count": 1
+}

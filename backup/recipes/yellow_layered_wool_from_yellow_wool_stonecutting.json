@@ -1,0 +1,8 @@
+{
+    "ingredient":  {
+                       "item":  "minecraft:yellow_wool"
+                   },
+    "result":  "buildscape:yellow_layered_wool",
+    "count":  1,
+    "type":  "minecraft:stonecutting"
+}

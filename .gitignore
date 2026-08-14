@@ -80,3 +80,4 @@ THIRD_PARTY_NOTICES.md
 *.litematic
 *.schem
 *.schematic
+/BDRE/

@@ -1,0 +1,9 @@
+{
+  "aliases": {
+    "BS": "buildscape:",
+    "MC": "minecraft:",
+    "F": "forge:"
+  },
+  "smoking": [
+  ]
+}

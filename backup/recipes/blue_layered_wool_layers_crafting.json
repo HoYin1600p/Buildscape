@@ -1,0 +1,16 @@
+{
+  "key": {
+    "#": {
+      "item": "buildscape:blue_layered_wool_carpet"
+    }
+  },
+  "category": "building",
+  "pattern": [
+    "###"
+  ],
+  "result": {
+    "count": 8,
+    "item": "buildscape:blue_layered_wool_layers"
+  },
+  "type": "minecraft:crafting_shaped"
+}

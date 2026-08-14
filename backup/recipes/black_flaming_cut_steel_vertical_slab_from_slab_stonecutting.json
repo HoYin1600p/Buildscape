@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "buildscape:black_flaming_cut_steel_slab"
+  },
+  "result": "buildscape:black_flaming_cut_steel_vertical_slab",
+  "count": 1
+}

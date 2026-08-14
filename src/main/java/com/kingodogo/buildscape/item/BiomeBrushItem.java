@@ -224,16 +224,96 @@ public class BiomeBrushItem extends Item {
             int affectedBlocks = 0;
             Set<LevelChunk> modifiedChunks = new HashSet<>();
 
+            // Caching variables for fast lookup
+            LevelChunk lastChunk = null;
+            int lastChunkX = Integer.MIN_VALUE;
+            int lastChunkZ = Integer.MIN_VALUE;
+
+            LevelChunkSection lastSection = null;
+            int lastSectionIndex = Integer.MIN_VALUE;
+
+            PalettedContainer<Holder<Biome>> lastBiomes = null;
+            int lastQuartX = Integer.MIN_VALUE;
+            int lastQuartY = Integer.MIN_VALUE;
+            int lastQuartZ = Integer.MIN_VALUE;
+
+            boolean broken = false;
             for (int x = minX; x <= maxX; x++) {
-                for (int y = minY; y <= maxY; y++) {
-                    for (int z = minZ; z <= maxZ; z++) {
+                int shiftedX = x - 2;
+                int chunkX = shiftedX >> 4;
+                int qX = shiftedX >> 2;
+                int localQx = qX & 3;
+
+                for (int z = minZ; z <= maxZ; z++) {
+                    int shiftedZ = z - 2;
+                    int chunkZ = shiftedZ >> 4;
+                    int qZ = shiftedZ >> 2;
+                    int localQz = qZ & 3;
+
+                    // Retrieve chunk (cached)
+                    LevelChunk chunk;
+                    if (chunkX == lastChunkX && chunkZ == lastChunkZ && lastChunk != null) {
+                        chunk = lastChunk;
+                    } else {
+                        chunk = serverLevel.getChunk(chunkX, chunkZ);
+                        lastChunk = chunk;
+                        lastChunkX = chunkX;
+                        lastChunkZ = chunkZ;
+                        lastSection = null;
+                        lastSectionIndex = Integer.MIN_VALUE;
+                        lastBiomes = null;
+                        lastQuartX = Integer.MIN_VALUE;
+                        lastQuartY = Integer.MIN_VALUE;
+                        lastQuartZ = Integer.MIN_VALUE;
+                        if (chunk != null) {
+                            modifiedChunks.add(chunk);
+                        }
+                    }
+
+                    if (chunk == null) {
+                        continue;
+                    }
+
+                    for (int y = minY; y <= maxY; y++) {
                         // Check durability
                         if (stack.getDamageValue() >= stack.getMaxDamage()) {
+                            broken = true;
                             break;
                         }
 
-                        BlockPos currentPos = new BlockPos(x, y, z);
-                        setBiomeAt(serverLevel, currentPos, biomeHolder, modifiedChunks);
+                        int shiftedY = y - 2;
+                        int sectionIndex = chunk.getSectionIndex(shiftedY);
+                        int qY = shiftedY >> 2;
+                        int localQy = qY & 3;
+
+                        // Retrieve section (cached)
+                        LevelChunkSection section;
+                        if (sectionIndex == lastSectionIndex && lastSection != null) {
+                            section = lastSection;
+                        } else {
+                            if (sectionIndex >= 0 && sectionIndex < chunk.getSections().length) {
+                                section = chunk.getSections()[sectionIndex];
+                            } else {
+                                section = null;
+                            }
+                            lastSection = section;
+                            lastSectionIndex = sectionIndex;
+                            lastBiomes = section != null ? section.getBiomes() : null;
+                            lastQuartX = Integer.MIN_VALUE;
+                            lastQuartY = Integer.MIN_VALUE;
+                            lastQuartZ = Integer.MIN_VALUE;
+                        }
+
+                        if (lastBiomes != null) {
+                            // Check if the quart is different from the last set quart in this container
+                            if (qX != lastQuartX || qY != lastQuartY || qZ != lastQuartZ) {
+                                lastBiomes.set(localQx, localQy, localQz, biomeHolder);
+                                lastQuartX = qX;
+                                lastQuartY = qY;
+                                lastQuartZ = qZ;
+                            }
+                        }
+
                         affectedBlocks++;
 
                         // Handle durability decrease
@@ -245,11 +325,11 @@ public class BiomeBrushItem extends Item {
                             stack.setDamageValue(stack.getDamageValue() + 1);
                         }
                     }
-                    if (stack.getDamageValue() >= stack.getMaxDamage()) {
+                    if (broken) {
                         break;
                     }
                 }
-                if (stack.getDamageValue() >= stack.getMaxDamage()) {
+                if (broken) {
                     break;
                 }
             }
@@ -304,23 +384,6 @@ public class BiomeBrushItem extends Item {
 
     private static ResourceLocation registryKey(Level level, Biome biome) {
         return level.registryAccess().registryOrThrow(Registry.BIOME_REGISTRY).getKey(biome);
-    }
-
-    private static void setBiomeAt(ServerLevel level, BlockPos pos, Holder<Biome> biomeHolder, Set<LevelChunk> modifiedChunks) {
-        BlockPos shiftedPos = new BlockPos(pos.getX() - 2, pos.getY() - 2, pos.getZ() - 2);
-        LevelChunk chunk = level.getChunkAt(shiftedPos);
-        int sectionIndex = chunk.getSectionIndex(shiftedPos.getY());
-        if (sectionIndex >= 0 && sectionIndex < chunk.getSections().length) {
-            LevelChunkSection section = chunk.getSections()[sectionIndex];
-            if (section != null) {
-                PalettedContainer<Holder<Biome>> biomes = section.getBiomes();
-                int localQuartX = (shiftedPos.getX() >> 2) & 3;
-                int localQuartY = (shiftedPos.getY() >> 2) & 3;
-                int localQuartZ = (shiftedPos.getZ() >> 2) & 3;
-                biomes.set(localQuartX, localQuartY, localQuartZ, biomeHolder);
-                modifiedChunks.add(chunk);
-            }
-        }
     }
 
     private static void syncChunk(ServerLevel level, LevelChunk chunk) {

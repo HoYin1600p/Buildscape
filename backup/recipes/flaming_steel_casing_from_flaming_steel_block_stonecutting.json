@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "buildscape:flaming_steel_block"
+  },
+  "result": "buildscape:flaming_steel_casing",
+  "count": 1
+}

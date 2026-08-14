@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "buildscape:cyan_flaming_cut_steel"
+  },
+  "result": "buildscape:cyan_flaming_cut_steel_wall",
+  "count": 1
+}

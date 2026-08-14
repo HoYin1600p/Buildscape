@@ -1,7 +1,8 @@
 {
   "variants": {
-    "": {
-      "model": "buildscape:block/builders_workbench"
-    }
+    "facing=north": { "model": "buildscape:block/builders_workbench" },
+    "facing=south": { "model": "buildscape:block/builders_workbench", "y": 180 },
+    "facing=west": { "model": "buildscape:block/builders_workbench", "y": 270 },
+    "facing=east": { "model": "buildscape:block/builders_workbench", "y": 90 }
   }
 }

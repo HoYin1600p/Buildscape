@@ -1,0 +1,7 @@
+{
+  "textures": {
+    "wall": "buildscape:block/blue_layered_wool",
+    "particle": "buildscape:block/blue_layered_wool"
+  },
+  "parent": "minecraft:block/wall_inventory"
+}

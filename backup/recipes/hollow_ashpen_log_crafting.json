@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "###",
+    "# #",
+    "###"
+  ],
+  "key": {
+    "#": {
+      "item": "buildscape:ashpen_log"
+    }
+  },
+  "result": {
+    "item": "buildscape:hollow_ashpen_log",
+    "count": 8
+  }
+}

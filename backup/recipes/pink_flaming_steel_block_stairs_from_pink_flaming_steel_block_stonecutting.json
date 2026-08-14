@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "buildscape:pink_flaming_steel_block"
+  },
+  "result": "buildscape:pink_flaming_steel_block_stairs",
+  "count": 1
+}

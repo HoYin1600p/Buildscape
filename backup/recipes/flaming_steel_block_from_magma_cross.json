@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "M": {
+      "item": "minecraft:magma_block"
+    },
+    "S": {
+      "item": "buildscape:steel_block"
+    }
+  },
+  "pattern": [
+    " M ",
+    "S S",
+    " M "
+  ],
+  "result": {
+    "count": 4,
+    "item": "buildscape:flaming_steel_block"
+  }
+}

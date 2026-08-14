@@ -1,0 +1,187 @@
+buildscript {
+    repositories {
+
+        maven { url = 'https://repo.spongepowered.org/repository/maven-public/' }
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'org.spongepowered:mixingradle:0.7-SNAPSHOT'
+    }
+}
+
+plugins {
+    id 'eclipse'
+    id 'idea'
+    id 'net.minecraftforge.gradle' version '[6.0,7)'
+}
+
+apply plugin: 'org.spongepowered.mixin'
+
+group = mod_group_id
+version = mod_version
+
+base {
+    archivesName = mod_id
+}
+
+java {
+    toolchain.languageVersion = JavaLanguageVersion.of(17)
+}
+
+minecraft {
+
+
+    mappings channel: mapping_channel, version: mapping_version
+
+
+    accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
+
+
+    runs {
+
+        configureEach {
+            workingDirectory project.file('run')
+
+
+            property 'forge.logging.markers', 'REGISTRIES'
+
+
+            property 'forge.logging.console.level', 'info'
+        }
+
+        client {
+
+            property 'forge.enabledGameTestNamespaces', mod_id
+
+
+            args '--username', 'Dev'
+
+
+            jvmArgs '-Xmx4G', '-Xms2G'
+        }
+
+        server {
+            property 'forge.enabledGameTestNamespaces', mod_id
+            args '--nogui'
+
+
+            jvmArgs '-Xmx4G', '-Xms2G'
+        }
+
+
+        gameTestServer {
+            property 'forge.enabledGameTestNamespaces', mod_id
+        }
+
+        data {
+
+            workingDirectory project.file('run-data')
+
+
+            args '--mod', mod_id, '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
+        }
+    }
+}
+
+mixin {
+    add sourceSets.main, "${mod_id}.refmap.json"
+
+
+    config "${mod_id}.mixins.json"
+
+
+}
+
+
+sourceSets.main.resources { srcDir 'src/generated/resources' }
+
+repositories {
+    maven { url = 'https://maven.blamejared.com' } // JEI
+    maven { url = 'https://dvs1.progwml6.com/files/maven/' } // JEI Backup
+    maven { url = 'https://modmaven.dev' } // JEI Backup
+    mavenCentral()
+}
+
+dependencies {
+
+
+    minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
+
+
+    runtimeOnly fg.deobf("mezz.jei:jei-${minecraft_version}:9.7.1.255")
+
+
+    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
+
+
+    implementation('net.sf.jopt-simple:jopt-simple:5.0.4') { version { strictly '5.0.4' } }
+}
+
+
+
+tasks.named('processResources', ProcessResources).configure {
+    var replaceProperties = [minecraft_version   : minecraft_version, minecraft_version_range: minecraft_version_range,
+                             forge_version       : forge_version, forge_version_range: forge_version_range,
+                             loader_version_range: loader_version_range,
+                             mod_id              : mod_id, mod_name: mod_name, mod_license: mod_license, mod_version: mod_version,
+                             mod_authors         : mod_authors, mod_description: mod_description,]
+
+    inputs.properties replaceProperties
+
+
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    exclude '**/*.refmap.json'
+
+    filesMatching(['META-INF/mods.toml', 'pack.mcmeta']) {
+        expand replaceProperties + [project: project]
+    }
+
+    doLast {
+        [
+                new File(destinationDir, "assets/${mod_id}/models"),
+                new File(destinationDir, "assets/${mod_id}/blockstates")
+        ].each { resourceRoot ->
+            if (resourceRoot.isDirectory()) {
+                fileTree(resourceRoot).matching { include '**/*.json' }.each { jsonFile ->
+                    def parsed = new groovy.json.JsonSlurper().parseText(jsonFile.getText('UTF-8'))
+                    jsonFile.setText(groovy.json.JsonOutput.toJson(parsed), 'UTF-8')
+                }
+            }
+        }
+    }
+}
+
+
+tasks.named('jar', Jar).configure {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+    manifest {
+        attributes(["Specification-Title"     : "buildscape",
+                    "Specification-Vendor"    : "kingodogo",
+                    "Specification-Version"   : "1",
+                    "Implementation-Title"    : project.name,
+                    "Implementation-Version"  : "${version}",
+                    "Implementation-Vendor"   : "kingodogo",
+                    "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
+                    "MixinConfigs"            : "${mod_id}.mixins.json"])
+    }
+
+    exclude { it.path.startsWith('.') || it.path.contains('..') }
+
+
+}
+
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
+
+
+
+
+
+
+
+
+

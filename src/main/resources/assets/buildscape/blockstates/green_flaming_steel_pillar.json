@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "axis=y": {
+      "model": "buildscape:block/green_flaming_steel_pillar"
+    },
+    "axis=z": {
+      "model": "buildscape:block/green_flaming_steel_pillar",
+      "x": 90
+    },
+    "axis=x": {
+      "model": "buildscape:block/green_flaming_steel_pillar",
+      "x": 90,
+      "y": 90
+    }
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "building",
+  "ingredients": [
+    {
+      "item": "buildscape:cyan_flaming_pressed_steel_slab"
+    }
+  ],
+  "result": {
+    "item": "buildscape:cyan_flaming_pressed_steel_vertical_slab",
+    "count": 1
+  }
+}

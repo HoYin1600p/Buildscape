@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "###",
+    "# #",
+    "###"
+  ],
+  "key": {
+    "#": {
+      "item": "buildscape:stripped_poplar_log"
+    }
+  },
+  "result": {
+    "item": "buildscape:stripped_hollow_poplar_log",
+    "count": 8
+  }
+}

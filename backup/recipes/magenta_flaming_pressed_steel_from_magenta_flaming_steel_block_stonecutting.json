@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "buildscape:magenta_flaming_steel_block"
+  },
+  "result": "buildscape:magenta_flaming_pressed_steel",
+  "count": 1
+}

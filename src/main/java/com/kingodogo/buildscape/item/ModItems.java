@@ -10187,6 +10187,1141 @@ public class ModItems {
     public static final RegistryObject<Item> WAXED_EXPOSED_COPPER_CHEST = ITEMS.register("waxed_exposed_copper_chest", () -> new CopperChestItem(ModBlocks.WAXED_EXPOSED_COPPER_CHEST.get(), createBlockItemProperties()));
     public static final RegistryObject<Item> WAXED_WEATHERED_COPPER_CHEST = ITEMS.register("waxed_weathered_copper_chest", () -> new CopperChestItem(ModBlocks.WAXED_WEATHERED_COPPER_CHEST.get(), createBlockItemProperties()));
     public static final RegistryObject<Item> WAXED_OXIDIZED_COPPER_CHEST = ITEMS.register("waxed_oxidized_copper_chest", () -> new CopperChestItem(ModBlocks.WAXED_OXIDIZED_COPPER_CHEST.get(), createBlockItemProperties()));
+
+    // --- LAYERED WOOLS ---
+    public static final RegistryObject<Item> WHITE_LAYERED_WOOL = ITEMS.register(
+            "white_layered_wool",
+            () -> new BlockItem(ModBlocks.WHITE_LAYERED_WOOL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> ORANGE_LAYERED_WOOL = ITEMS.register(
+            "orange_layered_wool",
+            () -> new BlockItem(ModBlocks.ORANGE_LAYERED_WOOL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> MAGENTA_LAYERED_WOOL = ITEMS.register(
+            "magenta_layered_wool",
+            () -> new BlockItem(ModBlocks.MAGENTA_LAYERED_WOOL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIGHT_BLUE_LAYERED_WOOL = ITEMS.register(
+            "light_blue_layered_wool",
+            () -> new BlockItem(ModBlocks.LIGHT_BLUE_LAYERED_WOOL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> YELLOW_LAYERED_WOOL = ITEMS.register(
+            "yellow_layered_wool",
+            () -> new BlockItem(ModBlocks.YELLOW_LAYERED_WOOL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIME_LAYERED_WOOL = ITEMS.register(
+            "lime_layered_wool",
+            () -> new BlockItem(ModBlocks.LIME_LAYERED_WOOL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PINK_LAYERED_WOOL = ITEMS.register(
+            "pink_layered_wool",
+            () -> new BlockItem(ModBlocks.PINK_LAYERED_WOOL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GRAY_LAYERED_WOOL = ITEMS.register(
+            "gray_layered_wool",
+            () -> new BlockItem(ModBlocks.GRAY_LAYERED_WOOL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIGHT_GRAY_LAYERED_WOOL = ITEMS.register(
+            "light_gray_layered_wool",
+            () -> new BlockItem(ModBlocks.LIGHT_GRAY_LAYERED_WOOL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> CYAN_LAYERED_WOOL = ITEMS.register(
+            "cyan_layered_wool",
+            () -> new BlockItem(ModBlocks.CYAN_LAYERED_WOOL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PURPLE_LAYERED_WOOL = ITEMS.register(
+            "purple_layered_wool",
+            () -> new BlockItem(ModBlocks.PURPLE_LAYERED_WOOL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BLUE_LAYERED_WOOL = ITEMS.register(
+            "blue_layered_wool",
+            () -> new BlockItem(ModBlocks.BLUE_LAYERED_WOOL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BROWN_LAYERED_WOOL = ITEMS.register(
+            "brown_layered_wool",
+            () -> new BlockItem(ModBlocks.BROWN_LAYERED_WOOL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GREEN_LAYERED_WOOL = ITEMS.register(
+            "green_layered_wool",
+            () -> new BlockItem(ModBlocks.GREEN_LAYERED_WOOL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> RED_LAYERED_WOOL = ITEMS.register(
+            "red_layered_wool",
+            () -> new BlockItem(ModBlocks.RED_LAYERED_WOOL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BLACK_LAYERED_WOOL = ITEMS.register(
+            "black_layered_wool",
+            () -> new BlockItem(ModBlocks.BLACK_LAYERED_WOOL.get(), createBlockItemProperties()));
+
+    // Layered Wool Slabs, Stairs, Walls, Carpets, Layers & Vertical Slabs Items
+    public static final RegistryObject<Item> WHITE_LAYERED_WOOL_SLAB = ITEMS.register(
+            "white_layered_wool_slab",
+            () -> new BlockItem(ModBlocks.WHITE_LAYERED_WOOL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WHITE_LAYERED_WOOL_STAIRS = ITEMS.register(
+            "white_layered_wool_stairs",
+            () -> new BlockItem(ModBlocks.WHITE_LAYERED_WOOL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WHITE_LAYERED_WOOL_WALL = ITEMS.register(
+            "white_layered_wool_wall",
+            () -> new BlockItem(ModBlocks.WHITE_LAYERED_WOOL_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WHITE_LAYERED_WOOL_CARPET = ITEMS.register(
+            "white_layered_wool_carpet",
+            () -> new BlockItem(ModBlocks.WHITE_LAYERED_WOOL_CARPET.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WHITE_LAYERED_WOOL_LAYERS = ITEMS.register(
+            "white_layered_wool_layers",
+            () -> new BlockItem(ModBlocks.WHITE_LAYERED_WOOL_LAYERS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WHITE_LAYERED_WOOL_VERTICAL_SLAB = ITEMS.register(
+            "white_layered_wool_vertical_slab",
+            () -> new BlockItem(ModBlocks.WHITE_LAYERED_WOOL_VERTICAL_SLAB.get(), createBlockItemProperties()));
+
+    public static final RegistryObject<Item> ORANGE_LAYERED_WOOL_SLAB = ITEMS.register(
+            "orange_layered_wool_slab",
+            () -> new BlockItem(ModBlocks.ORANGE_LAYERED_WOOL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> ORANGE_LAYERED_WOOL_STAIRS = ITEMS.register(
+            "orange_layered_wool_stairs",
+            () -> new BlockItem(ModBlocks.ORANGE_LAYERED_WOOL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> ORANGE_LAYERED_WOOL_WALL = ITEMS.register(
+            "orange_layered_wool_wall",
+            () -> new BlockItem(ModBlocks.ORANGE_LAYERED_WOOL_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> ORANGE_LAYERED_WOOL_CARPET = ITEMS.register(
+            "orange_layered_wool_carpet",
+            () -> new BlockItem(ModBlocks.ORANGE_LAYERED_WOOL_CARPET.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> ORANGE_LAYERED_WOOL_LAYERS = ITEMS.register(
+            "orange_layered_wool_layers",
+            () -> new BlockItem(ModBlocks.ORANGE_LAYERED_WOOL_LAYERS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> ORANGE_LAYERED_WOOL_VERTICAL_SLAB = ITEMS.register(
+            "orange_layered_wool_vertical_slab",
+            () -> new BlockItem(ModBlocks.ORANGE_LAYERED_WOOL_VERTICAL_SLAB.get(), createBlockItemProperties()));
+
+    public static final RegistryObject<Item> MAGENTA_LAYERED_WOOL_SLAB = ITEMS.register(
+            "magenta_layered_wool_slab",
+            () -> new BlockItem(ModBlocks.MAGENTA_LAYERED_WOOL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> MAGENTA_LAYERED_WOOL_STAIRS = ITEMS.register(
+            "magenta_layered_wool_stairs",
+            () -> new BlockItem(ModBlocks.MAGENTA_LAYERED_WOOL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> MAGENTA_LAYERED_WOOL_WALL = ITEMS.register(
+            "magenta_layered_wool_wall",
+            () -> new BlockItem(ModBlocks.MAGENTA_LAYERED_WOOL_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> MAGENTA_LAYERED_WOOL_CARPET = ITEMS.register(
+            "magenta_layered_wool_carpet",
+            () -> new BlockItem(ModBlocks.MAGENTA_LAYERED_WOOL_CARPET.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> MAGENTA_LAYERED_WOOL_LAYERS = ITEMS.register(
+            "magenta_layered_wool_layers",
+            () -> new BlockItem(ModBlocks.MAGENTA_LAYERED_WOOL_LAYERS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> MAGENTA_LAYERED_WOOL_VERTICAL_SLAB = ITEMS.register(
+            "magenta_layered_wool_vertical_slab",
+            () -> new BlockItem(ModBlocks.MAGENTA_LAYERED_WOOL_VERTICAL_SLAB.get(), createBlockItemProperties()));
+
+    public static final RegistryObject<Item> LIGHT_BLUE_LAYERED_WOOL_SLAB = ITEMS.register(
+            "light_blue_layered_wool_slab",
+            () -> new BlockItem(ModBlocks.LIGHT_BLUE_LAYERED_WOOL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIGHT_BLUE_LAYERED_WOOL_STAIRS = ITEMS.register(
+            "light_blue_layered_wool_stairs",
+            () -> new BlockItem(ModBlocks.LIGHT_BLUE_LAYERED_WOOL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIGHT_BLUE_LAYERED_WOOL_WALL = ITEMS.register(
+            "light_blue_layered_wool_wall",
+            () -> new BlockItem(ModBlocks.LIGHT_BLUE_LAYERED_WOOL_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIGHT_BLUE_LAYERED_WOOL_CARPET = ITEMS.register(
+            "light_blue_layered_wool_carpet",
+            () -> new BlockItem(ModBlocks.LIGHT_BLUE_LAYERED_WOOL_CARPET.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIGHT_BLUE_LAYERED_WOOL_LAYERS = ITEMS.register(
+            "light_blue_layered_wool_layers",
+            () -> new BlockItem(ModBlocks.LIGHT_BLUE_LAYERED_WOOL_LAYERS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIGHT_BLUE_LAYERED_WOOL_VERTICAL_SLAB = ITEMS.register(
+            "light_blue_layered_wool_vertical_slab",
+            () -> new BlockItem(ModBlocks.LIGHT_BLUE_LAYERED_WOOL_VERTICAL_SLAB.get(), createBlockItemProperties()));
+
+    public static final RegistryObject<Item> YELLOW_LAYERED_WOOL_SLAB = ITEMS.register(
+            "yellow_layered_wool_slab",
+            () -> new BlockItem(ModBlocks.YELLOW_LAYERED_WOOL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> YELLOW_LAYERED_WOOL_STAIRS = ITEMS.register(
+            "yellow_layered_wool_stairs",
+            () -> new BlockItem(ModBlocks.YELLOW_LAYERED_WOOL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> YELLOW_LAYERED_WOOL_WALL = ITEMS.register(
+            "yellow_layered_wool_wall",
+            () -> new BlockItem(ModBlocks.YELLOW_LAYERED_WOOL_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> YELLOW_LAYERED_WOOL_CARPET = ITEMS.register(
+            "yellow_layered_wool_carpet",
+            () -> new BlockItem(ModBlocks.YELLOW_LAYERED_WOOL_CARPET.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> YELLOW_LAYERED_WOOL_LAYERS = ITEMS.register(
+            "yellow_layered_wool_layers",
+            () -> new BlockItem(ModBlocks.YELLOW_LAYERED_WOOL_LAYERS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> YELLOW_LAYERED_WOOL_VERTICAL_SLAB = ITEMS.register(
+            "yellow_layered_wool_vertical_slab",
+            () -> new BlockItem(ModBlocks.YELLOW_LAYERED_WOOL_VERTICAL_SLAB.get(), createBlockItemProperties()));
+
+    public static final RegistryObject<Item> LIME_LAYERED_WOOL_SLAB = ITEMS.register(
+            "lime_layered_wool_slab",
+            () -> new BlockItem(ModBlocks.LIME_LAYERED_WOOL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIME_LAYERED_WOOL_STAIRS = ITEMS.register(
+            "lime_layered_wool_stairs",
+            () -> new BlockItem(ModBlocks.LIME_LAYERED_WOOL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIME_LAYERED_WOOL_WALL = ITEMS.register(
+            "lime_layered_wool_wall",
+            () -> new BlockItem(ModBlocks.LIME_LAYERED_WOOL_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIME_LAYERED_WOOL_CARPET = ITEMS.register(
+            "lime_layered_wool_carpet",
+            () -> new BlockItem(ModBlocks.LIME_LAYERED_WOOL_CARPET.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIME_LAYERED_WOOL_LAYERS = ITEMS.register(
+            "lime_layered_wool_layers",
+            () -> new BlockItem(ModBlocks.LIME_LAYERED_WOOL_LAYERS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIME_LAYERED_WOOL_VERTICAL_SLAB = ITEMS.register(
+            "lime_layered_wool_vertical_slab",
+            () -> new BlockItem(ModBlocks.LIME_LAYERED_WOOL_VERTICAL_SLAB.get(), createBlockItemProperties()));
+
+    public static final RegistryObject<Item> PINK_LAYERED_WOOL_SLAB = ITEMS.register(
+            "pink_layered_wool_slab",
+            () -> new BlockItem(ModBlocks.PINK_LAYERED_WOOL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PINK_LAYERED_WOOL_STAIRS = ITEMS.register(
+            "pink_layered_wool_stairs",
+            () -> new BlockItem(ModBlocks.PINK_LAYERED_WOOL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PINK_LAYERED_WOOL_WALL = ITEMS.register(
+            "pink_layered_wool_wall",
+            () -> new BlockItem(ModBlocks.PINK_LAYERED_WOOL_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PINK_LAYERED_WOOL_CARPET = ITEMS.register(
+            "pink_layered_wool_carpet",
+            () -> new BlockItem(ModBlocks.PINK_LAYERED_WOOL_CARPET.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PINK_LAYERED_WOOL_LAYERS = ITEMS.register(
+            "pink_layered_wool_layers",
+            () -> new BlockItem(ModBlocks.PINK_LAYERED_WOOL_LAYERS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PINK_LAYERED_WOOL_VERTICAL_SLAB = ITEMS.register(
+            "pink_layered_wool_vertical_slab",
+            () -> new BlockItem(ModBlocks.PINK_LAYERED_WOOL_VERTICAL_SLAB.get(), createBlockItemProperties()));
+
+    public static final RegistryObject<Item> GRAY_LAYERED_WOOL_SLAB = ITEMS.register(
+            "gray_layered_wool_slab",
+            () -> new BlockItem(ModBlocks.GRAY_LAYERED_WOOL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GRAY_LAYERED_WOOL_STAIRS = ITEMS.register(
+            "gray_layered_wool_stairs",
+            () -> new BlockItem(ModBlocks.GRAY_LAYERED_WOOL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GRAY_LAYERED_WOOL_WALL = ITEMS.register(
+            "gray_layered_wool_wall",
+            () -> new BlockItem(ModBlocks.GRAY_LAYERED_WOOL_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GRAY_LAYERED_WOOL_CARPET = ITEMS.register(
+            "gray_layered_wool_carpet",
+            () -> new BlockItem(ModBlocks.GRAY_LAYERED_WOOL_CARPET.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GRAY_LAYERED_WOOL_LAYERS = ITEMS.register(
+            "gray_layered_wool_layers",
+            () -> new BlockItem(ModBlocks.GRAY_LAYERED_WOOL_LAYERS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GRAY_LAYERED_WOOL_VERTICAL_SLAB = ITEMS.register(
+            "gray_layered_wool_vertical_slab",
+            () -> new BlockItem(ModBlocks.GRAY_LAYERED_WOOL_VERTICAL_SLAB.get(), createBlockItemProperties()));
+
+    public static final RegistryObject<Item> LIGHT_GRAY_LAYERED_WOOL_SLAB = ITEMS.register(
+            "light_gray_layered_wool_slab",
+            () -> new BlockItem(ModBlocks.LIGHT_GRAY_LAYERED_WOOL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIGHT_GRAY_LAYERED_WOOL_STAIRS = ITEMS.register(
+            "light_gray_layered_wool_stairs",
+            () -> new BlockItem(ModBlocks.LIGHT_GRAY_LAYERED_WOOL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIGHT_GRAY_LAYERED_WOOL_WALL = ITEMS.register(
+            "light_gray_layered_wool_wall",
+            () -> new BlockItem(ModBlocks.LIGHT_GRAY_LAYERED_WOOL_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIGHT_GRAY_LAYERED_WOOL_CARPET = ITEMS.register(
+            "light_gray_layered_wool_carpet",
+            () -> new BlockItem(ModBlocks.LIGHT_GRAY_LAYERED_WOOL_CARPET.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIGHT_GRAY_LAYERED_WOOL_LAYERS = ITEMS.register(
+            "light_gray_layered_wool_layers",
+            () -> new BlockItem(ModBlocks.LIGHT_GRAY_LAYERED_WOOL_LAYERS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIGHT_GRAY_LAYERED_WOOL_VERTICAL_SLAB = ITEMS.register(
+            "light_gray_layered_wool_vertical_slab",
+            () -> new BlockItem(ModBlocks.LIGHT_GRAY_LAYERED_WOOL_VERTICAL_SLAB.get(), createBlockItemProperties()));
+
+    public static final RegistryObject<Item> CYAN_LAYERED_WOOL_SLAB = ITEMS.register(
+            "cyan_layered_wool_slab",
+            () -> new BlockItem(ModBlocks.CYAN_LAYERED_WOOL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> CYAN_LAYERED_WOOL_STAIRS = ITEMS.register(
+            "cyan_layered_wool_stairs",
+            () -> new BlockItem(ModBlocks.CYAN_LAYERED_WOOL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> CYAN_LAYERED_WOOL_WALL = ITEMS.register(
+            "cyan_layered_wool_wall",
+            () -> new BlockItem(ModBlocks.CYAN_LAYERED_WOOL_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> CYAN_LAYERED_WOOL_CARPET = ITEMS.register(
+            "cyan_layered_wool_carpet",
+            () -> new BlockItem(ModBlocks.CYAN_LAYERED_WOOL_CARPET.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> CYAN_LAYERED_WOOL_LAYERS = ITEMS.register(
+            "cyan_layered_wool_layers",
+            () -> new BlockItem(ModBlocks.CYAN_LAYERED_WOOL_LAYERS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> CYAN_LAYERED_WOOL_VERTICAL_SLAB = ITEMS.register(
+            "cyan_layered_wool_vertical_slab",
+            () -> new BlockItem(ModBlocks.CYAN_LAYERED_WOOL_VERTICAL_SLAB.get(), createBlockItemProperties()));
+
+    public static final RegistryObject<Item> PURPLE_LAYERED_WOOL_SLAB = ITEMS.register(
+            "purple_layered_wool_slab",
+            () -> new BlockItem(ModBlocks.PURPLE_LAYERED_WOOL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PURPLE_LAYERED_WOOL_STAIRS = ITEMS.register(
+            "purple_layered_wool_stairs",
+            () -> new BlockItem(ModBlocks.PURPLE_LAYERED_WOOL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PURPLE_LAYERED_WOOL_WALL = ITEMS.register(
+            "purple_layered_wool_wall",
+            () -> new BlockItem(ModBlocks.PURPLE_LAYERED_WOOL_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PURPLE_LAYERED_WOOL_CARPET = ITEMS.register(
+            "purple_layered_wool_carpet",
+            () -> new BlockItem(ModBlocks.PURPLE_LAYERED_WOOL_CARPET.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PURPLE_LAYERED_WOOL_LAYERS = ITEMS.register(
+            "purple_layered_wool_layers",
+            () -> new BlockItem(ModBlocks.PURPLE_LAYERED_WOOL_LAYERS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PURPLE_LAYERED_WOOL_VERTICAL_SLAB = ITEMS.register(
+            "purple_layered_wool_vertical_slab",
+            () -> new BlockItem(ModBlocks.PURPLE_LAYERED_WOOL_VERTICAL_SLAB.get(), createBlockItemProperties()));
+
+    public static final RegistryObject<Item> BLUE_LAYERED_WOOL_SLAB = ITEMS.register(
+            "blue_layered_wool_slab",
+            () -> new BlockItem(ModBlocks.BLUE_LAYERED_WOOL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BLUE_LAYERED_WOOL_STAIRS = ITEMS.register(
+            "blue_layered_wool_stairs",
+            () -> new BlockItem(ModBlocks.BLUE_LAYERED_WOOL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BLUE_LAYERED_WOOL_WALL = ITEMS.register(
+            "blue_layered_wool_wall",
+            () -> new BlockItem(ModBlocks.BLUE_LAYERED_WOOL_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BLUE_LAYERED_WOOL_CARPET = ITEMS.register(
+            "blue_layered_wool_carpet",
+            () -> new BlockItem(ModBlocks.BLUE_LAYERED_WOOL_CARPET.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BLUE_LAYERED_WOOL_LAYERS = ITEMS.register(
+            "blue_layered_wool_layers",
+            () -> new BlockItem(ModBlocks.BLUE_LAYERED_WOOL_LAYERS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BLUE_LAYERED_WOOL_VERTICAL_SLAB = ITEMS.register(
+            "blue_layered_wool_vertical_slab",
+            () -> new BlockItem(ModBlocks.BLUE_LAYERED_WOOL_VERTICAL_SLAB.get(), createBlockItemProperties()));
+
+    public static final RegistryObject<Item> BROWN_LAYERED_WOOL_SLAB = ITEMS.register(
+            "brown_layered_wool_slab",
+            () -> new BlockItem(ModBlocks.BROWN_LAYERED_WOOL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BROWN_LAYERED_WOOL_STAIRS = ITEMS.register(
+            "brown_layered_wool_stairs",
+            () -> new BlockItem(ModBlocks.BROWN_LAYERED_WOOL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BROWN_LAYERED_WOOL_WALL = ITEMS.register(
+            "brown_layered_wool_wall",
+            () -> new BlockItem(ModBlocks.BROWN_LAYERED_WOOL_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BROWN_LAYERED_WOOL_CARPET = ITEMS.register(
+            "brown_layered_wool_carpet",
+            () -> new BlockItem(ModBlocks.BROWN_LAYERED_WOOL_CARPET.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BROWN_LAYERED_WOOL_LAYERS = ITEMS.register(
+            "brown_layered_wool_layers",
+            () -> new BlockItem(ModBlocks.BROWN_LAYERED_WOOL_LAYERS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BROWN_LAYERED_WOOL_VERTICAL_SLAB = ITEMS.register(
+            "brown_layered_wool_vertical_slab",
+            () -> new BlockItem(ModBlocks.BROWN_LAYERED_WOOL_VERTICAL_SLAB.get(), createBlockItemProperties()));
+
+    public static final RegistryObject<Item> GREEN_LAYERED_WOOL_SLAB = ITEMS.register(
+            "green_layered_wool_slab",
+            () -> new BlockItem(ModBlocks.GREEN_LAYERED_WOOL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GREEN_LAYERED_WOOL_STAIRS = ITEMS.register(
+            "green_layered_wool_stairs",
+            () -> new BlockItem(ModBlocks.GREEN_LAYERED_WOOL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GREEN_LAYERED_WOOL_WALL = ITEMS.register(
+            "green_layered_wool_wall",
+            () -> new BlockItem(ModBlocks.GREEN_LAYERED_WOOL_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GREEN_LAYERED_WOOL_CARPET = ITEMS.register(
+            "green_layered_wool_carpet",
+            () -> new BlockItem(ModBlocks.GREEN_LAYERED_WOOL_CARPET.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GREEN_LAYERED_WOOL_LAYERS = ITEMS.register(
+            "green_layered_wool_layers",
+            () -> new BlockItem(ModBlocks.GREEN_LAYERED_WOOL_LAYERS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GREEN_LAYERED_WOOL_VERTICAL_SLAB = ITEMS.register(
+            "green_layered_wool_vertical_slab",
+            () -> new BlockItem(ModBlocks.GREEN_LAYERED_WOOL_VERTICAL_SLAB.get(), createBlockItemProperties()));
+
+    public static final RegistryObject<Item> RED_LAYERED_WOOL_SLAB = ITEMS.register(
+            "red_layered_wool_slab",
+            () -> new BlockItem(ModBlocks.RED_LAYERED_WOOL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> RED_LAYERED_WOOL_STAIRS = ITEMS.register(
+            "red_layered_wool_stairs",
+            () -> new BlockItem(ModBlocks.RED_LAYERED_WOOL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> RED_LAYERED_WOOL_WALL = ITEMS.register(
+            "red_layered_wool_wall",
+            () -> new BlockItem(ModBlocks.RED_LAYERED_WOOL_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> RED_LAYERED_WOOL_CARPET = ITEMS.register(
+            "red_layered_wool_carpet",
+            () -> new BlockItem(ModBlocks.RED_LAYERED_WOOL_CARPET.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> RED_LAYERED_WOOL_LAYERS = ITEMS.register(
+            "red_layered_wool_layers",
+            () -> new BlockItem(ModBlocks.RED_LAYERED_WOOL_LAYERS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> RED_LAYERED_WOOL_VERTICAL_SLAB = ITEMS.register(
+            "red_layered_wool_vertical_slab",
+            () -> new BlockItem(ModBlocks.RED_LAYERED_WOOL_VERTICAL_SLAB.get(), createBlockItemProperties()));
+
+    public static final RegistryObject<Item> BLACK_LAYERED_WOOL_SLAB = ITEMS.register(
+            "black_layered_wool_slab",
+            () -> new BlockItem(ModBlocks.BLACK_LAYERED_WOOL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BLACK_LAYERED_WOOL_STAIRS = ITEMS.register(
+            "black_layered_wool_stairs",
+            () -> new BlockItem(ModBlocks.BLACK_LAYERED_WOOL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BLACK_LAYERED_WOOL_WALL = ITEMS.register(
+            "black_layered_wool_wall",
+            () -> new BlockItem(ModBlocks.BLACK_LAYERED_WOOL_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BLACK_LAYERED_WOOL_CARPET = ITEMS.register(
+            "black_layered_wool_carpet",
+            () -> new BlockItem(ModBlocks.BLACK_LAYERED_WOOL_CARPET.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BLACK_LAYERED_WOOL_LAYERS = ITEMS.register(
+            "black_layered_wool_layers",
+            () -> new BlockItem(ModBlocks.BLACK_LAYERED_WOOL_LAYERS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BLACK_LAYERED_WOOL_VERTICAL_SLAB = ITEMS.register(
+            "black_layered_wool_vertical_slab",
+            () -> new BlockItem(ModBlocks.BLACK_LAYERED_WOOL_VERTICAL_SLAB.get(), createBlockItemProperties()));
+
+
+public static final RegistryObject<Item> FLAMING_STEEL_INGOT = ITEMS.register("flaming_steel_ingot",
+            () -> new Item(new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB)));
+    public static final RegistryObject<Item> FLAMING_STEEL_NUGGET = ITEMS.register("flaming_steel_nugget",
+            () -> new Item(new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB)));
+    public static final RegistryObject<Item> FLAMING_STEEL_BLOCK = ITEMS.register("flaming_steel_block",
+            () -> new BlockItem(ModBlocks.FLAMING_STEEL_BLOCK.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> FLAMING_STEEL_BLOCK_SLAB = ITEMS.register("flaming_steel_block_slab",
+            () -> new BlockItem(ModBlocks.FLAMING_STEEL_BLOCK_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> FLAMING_STEEL_BLOCK_VERTICAL_SLAB = ITEMS.register("flaming_steel_block_vertical_slab",
+            () -> new BlockItem(ModBlocks.FLAMING_STEEL_BLOCK_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> FLAMING_STEEL_BLOCK_STAIRS = ITEMS.register("flaming_steel_block_stairs",
+            () -> new BlockItem(ModBlocks.FLAMING_STEEL_BLOCK_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> FLAMING_STEEL_BLOCK_WALL = ITEMS.register("flaming_steel_block_wall",
+            () -> new BlockItem(ModBlocks.FLAMING_STEEL_BLOCK_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> FLAMING_CUT_STEEL = ITEMS.register("flaming_cut_steel",
+            () -> new BlockItem(ModBlocks.FLAMING_CUT_STEEL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> FLAMING_CUT_STEEL_SLAB = ITEMS.register("flaming_cut_steel_slab",
+            () -> new BlockItem(ModBlocks.FLAMING_CUT_STEEL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> FLAMING_CUT_STEEL_VERTICAL_SLAB = ITEMS.register("flaming_cut_steel_vertical_slab",
+            () -> new BlockItem(ModBlocks.FLAMING_CUT_STEEL_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> FLAMING_CUT_STEEL_STAIRS = ITEMS.register("flaming_cut_steel_stairs",
+            () -> new BlockItem(ModBlocks.FLAMING_CUT_STEEL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> FLAMING_CUT_STEEL_WALL = ITEMS.register("flaming_cut_steel_wall",
+            () -> new BlockItem(ModBlocks.FLAMING_CUT_STEEL_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> FLAMING_POLISHED_STEEL = ITEMS.register("flaming_polished_steel",
+            () -> new BlockItem(ModBlocks.FLAMING_POLISHED_STEEL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> FLAMING_POLISHED_STEEL_SLAB = ITEMS.register("flaming_polished_steel_slab",
+            () -> new BlockItem(ModBlocks.FLAMING_POLISHED_STEEL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> FLAMING_POLISHED_STEEL_VERTICAL_SLAB = ITEMS.register("flaming_polished_steel_vertical_slab",
+            () -> new BlockItem(ModBlocks.FLAMING_POLISHED_STEEL_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> FLAMING_POLISHED_STEEL_STAIRS = ITEMS.register("flaming_polished_steel_stairs",
+            () -> new BlockItem(ModBlocks.FLAMING_POLISHED_STEEL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> FLAMING_POLISHED_STEEL_WALL = ITEMS.register("flaming_polished_steel_wall",
+            () -> new BlockItem(ModBlocks.FLAMING_POLISHED_STEEL_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> FLAMING_PRESSED_STEEL = ITEMS.register("flaming_pressed_steel",
+            () -> new BlockItem(ModBlocks.FLAMING_PRESSED_STEEL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> FLAMING_PRESSED_STEEL_SLAB = ITEMS.register("flaming_pressed_steel_slab",
+            () -> new BlockItem(ModBlocks.FLAMING_PRESSED_STEEL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> FLAMING_PRESSED_STEEL_VERTICAL_SLAB = ITEMS.register("flaming_pressed_steel_vertical_slab",
+            () -> new BlockItem(ModBlocks.FLAMING_PRESSED_STEEL_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> FLAMING_PRESSED_STEEL_STAIRS = ITEMS.register("flaming_pressed_steel_stairs",
+            () -> new BlockItem(ModBlocks.FLAMING_PRESSED_STEEL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> FLAMING_PRESSED_STEEL_WALL = ITEMS.register("flaming_pressed_steel_wall",
+            () -> new BlockItem(ModBlocks.FLAMING_PRESSED_STEEL_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> FLAMING_STEEL_CASING = ITEMS.register("flaming_steel_casing",
+            () -> new BlockItem(ModBlocks.FLAMING_STEEL_CASING.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> FLAMING_STEEL_GRATE = ITEMS.register("flaming_steel_grate",
+            () -> new BlockItem(ModBlocks.FLAMING_STEEL_GRATE.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> FLAMING_STEEL_PILLAR = ITEMS.register("flaming_steel_pillar",
+            () -> new BlockItem(ModBlocks.FLAMING_STEEL_PILLAR.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> FLAMING_BOLTED_STEEL_PILLAR = ITEMS.register("flaming_bolted_steel_pillar",
+            () -> new BlockItem(ModBlocks.FLAMING_BOLTED_STEEL_PILLAR.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> MAGENTA_FLAMING_STEEL_BLOCK = ITEMS.register("magenta_flaming_steel_block",
+            () -> new BlockItem(ModBlocks.MAGENTA_FLAMING_STEEL_BLOCK.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> MAGENTA_FLAMING_STEEL_BLOCK_SLAB = ITEMS.register("magenta_flaming_steel_block_slab",
+            () -> new BlockItem(ModBlocks.MAGENTA_FLAMING_STEEL_BLOCK_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> MAGENTA_FLAMING_STEEL_BLOCK_VERTICAL_SLAB = ITEMS.register("magenta_flaming_steel_block_vertical_slab",
+            () -> new BlockItem(ModBlocks.MAGENTA_FLAMING_STEEL_BLOCK_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> MAGENTA_FLAMING_STEEL_BLOCK_STAIRS = ITEMS.register("magenta_flaming_steel_block_stairs",
+            () -> new BlockItem(ModBlocks.MAGENTA_FLAMING_STEEL_BLOCK_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> MAGENTA_FLAMING_STEEL_BLOCK_WALL = ITEMS.register("magenta_flaming_steel_block_wall",
+            () -> new BlockItem(ModBlocks.MAGENTA_FLAMING_STEEL_BLOCK_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> MAGENTA_FLAMING_CUT_STEEL = ITEMS.register("magenta_flaming_cut_steel",
+            () -> new BlockItem(ModBlocks.MAGENTA_FLAMING_CUT_STEEL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> MAGENTA_FLAMING_CUT_STEEL_SLAB = ITEMS.register("magenta_flaming_cut_steel_slab",
+            () -> new BlockItem(ModBlocks.MAGENTA_FLAMING_CUT_STEEL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> MAGENTA_FLAMING_CUT_STEEL_VERTICAL_SLAB = ITEMS.register("magenta_flaming_cut_steel_vertical_slab",
+            () -> new BlockItem(ModBlocks.MAGENTA_FLAMING_CUT_STEEL_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> MAGENTA_FLAMING_CUT_STEEL_STAIRS = ITEMS.register("magenta_flaming_cut_steel_stairs",
+            () -> new BlockItem(ModBlocks.MAGENTA_FLAMING_CUT_STEEL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> MAGENTA_FLAMING_CUT_STEEL_WALL = ITEMS.register("magenta_flaming_cut_steel_wall",
+            () -> new BlockItem(ModBlocks.MAGENTA_FLAMING_CUT_STEEL_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> MAGENTA_FLAMING_POLISHED_STEEL = ITEMS.register("magenta_flaming_polished_steel",
+            () -> new BlockItem(ModBlocks.MAGENTA_FLAMING_POLISHED_STEEL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> MAGENTA_FLAMING_POLISHED_STEEL_SLAB = ITEMS.register("magenta_flaming_polished_steel_slab",
+            () -> new BlockItem(ModBlocks.MAGENTA_FLAMING_POLISHED_STEEL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> MAGENTA_FLAMING_POLISHED_STEEL_VERTICAL_SLAB = ITEMS.register("magenta_flaming_polished_steel_vertical_slab",
+            () -> new BlockItem(ModBlocks.MAGENTA_FLAMING_POLISHED_STEEL_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> MAGENTA_FLAMING_POLISHED_STEEL_STAIRS = ITEMS.register("magenta_flaming_polished_steel_stairs",
+            () -> new BlockItem(ModBlocks.MAGENTA_FLAMING_POLISHED_STEEL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> MAGENTA_FLAMING_POLISHED_STEEL_WALL = ITEMS.register("magenta_flaming_polished_steel_wall",
+            () -> new BlockItem(ModBlocks.MAGENTA_FLAMING_POLISHED_STEEL_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> MAGENTA_FLAMING_PRESSED_STEEL = ITEMS.register("magenta_flaming_pressed_steel",
+            () -> new BlockItem(ModBlocks.MAGENTA_FLAMING_PRESSED_STEEL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> MAGENTA_FLAMING_PRESSED_STEEL_SLAB = ITEMS.register("magenta_flaming_pressed_steel_slab",
+            () -> new BlockItem(ModBlocks.MAGENTA_FLAMING_PRESSED_STEEL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> MAGENTA_FLAMING_PRESSED_STEEL_VERTICAL_SLAB = ITEMS.register("magenta_flaming_pressed_steel_vertical_slab",
+            () -> new BlockItem(ModBlocks.MAGENTA_FLAMING_PRESSED_STEEL_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> MAGENTA_FLAMING_PRESSED_STEEL_STAIRS = ITEMS.register("magenta_flaming_pressed_steel_stairs",
+            () -> new BlockItem(ModBlocks.MAGENTA_FLAMING_PRESSED_STEEL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> MAGENTA_FLAMING_PRESSED_STEEL_WALL = ITEMS.register("magenta_flaming_pressed_steel_wall",
+            () -> new BlockItem(ModBlocks.MAGENTA_FLAMING_PRESSED_STEEL_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> MAGENTA_FLAMING_STEEL_CASING = ITEMS.register("magenta_flaming_steel_casing",
+            () -> new BlockItem(ModBlocks.MAGENTA_FLAMING_STEEL_CASING.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> MAGENTA_FLAMING_STEEL_GRATE = ITEMS.register("magenta_flaming_steel_grate",
+            () -> new BlockItem(ModBlocks.MAGENTA_FLAMING_STEEL_GRATE.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> MAGENTA_FLAMING_STEEL_PILLAR = ITEMS.register("magenta_flaming_steel_pillar",
+            () -> new BlockItem(ModBlocks.MAGENTA_FLAMING_STEEL_PILLAR.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> MAGENTA_FLAMING_BOLTED_STEEL_PILLAR = ITEMS.register("magenta_flaming_bolted_steel_pillar",
+            () -> new BlockItem(ModBlocks.MAGENTA_FLAMING_BOLTED_STEEL_PILLAR.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIGHT_BLUE_FLAMING_STEEL_BLOCK = ITEMS.register("light_blue_flaming_steel_block",
+            () -> new BlockItem(ModBlocks.LIGHT_BLUE_FLAMING_STEEL_BLOCK.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIGHT_BLUE_FLAMING_STEEL_BLOCK_SLAB = ITEMS.register("light_blue_flaming_steel_block_slab",
+            () -> new BlockItem(ModBlocks.LIGHT_BLUE_FLAMING_STEEL_BLOCK_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIGHT_BLUE_FLAMING_STEEL_BLOCK_VERTICAL_SLAB = ITEMS.register("light_blue_flaming_steel_block_vertical_slab",
+            () -> new BlockItem(ModBlocks.LIGHT_BLUE_FLAMING_STEEL_BLOCK_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIGHT_BLUE_FLAMING_STEEL_BLOCK_STAIRS = ITEMS.register("light_blue_flaming_steel_block_stairs",
+            () -> new BlockItem(ModBlocks.LIGHT_BLUE_FLAMING_STEEL_BLOCK_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIGHT_BLUE_FLAMING_STEEL_BLOCK_WALL = ITEMS.register("light_blue_flaming_steel_block_wall",
+            () -> new BlockItem(ModBlocks.LIGHT_BLUE_FLAMING_STEEL_BLOCK_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIGHT_BLUE_FLAMING_CUT_STEEL = ITEMS.register("light_blue_flaming_cut_steel",
+            () -> new BlockItem(ModBlocks.LIGHT_BLUE_FLAMING_CUT_STEEL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIGHT_BLUE_FLAMING_CUT_STEEL_SLAB = ITEMS.register("light_blue_flaming_cut_steel_slab",
+            () -> new BlockItem(ModBlocks.LIGHT_BLUE_FLAMING_CUT_STEEL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIGHT_BLUE_FLAMING_CUT_STEEL_VERTICAL_SLAB = ITEMS.register("light_blue_flaming_cut_steel_vertical_slab",
+            () -> new BlockItem(ModBlocks.LIGHT_BLUE_FLAMING_CUT_STEEL_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIGHT_BLUE_FLAMING_CUT_STEEL_STAIRS = ITEMS.register("light_blue_flaming_cut_steel_stairs",
+            () -> new BlockItem(ModBlocks.LIGHT_BLUE_FLAMING_CUT_STEEL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIGHT_BLUE_FLAMING_CUT_STEEL_WALL = ITEMS.register("light_blue_flaming_cut_steel_wall",
+            () -> new BlockItem(ModBlocks.LIGHT_BLUE_FLAMING_CUT_STEEL_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIGHT_BLUE_FLAMING_POLISHED_STEEL = ITEMS.register("light_blue_flaming_polished_steel",
+            () -> new BlockItem(ModBlocks.LIGHT_BLUE_FLAMING_POLISHED_STEEL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIGHT_BLUE_FLAMING_POLISHED_STEEL_SLAB = ITEMS.register("light_blue_flaming_polished_steel_slab",
+            () -> new BlockItem(ModBlocks.LIGHT_BLUE_FLAMING_POLISHED_STEEL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIGHT_BLUE_FLAMING_POLISHED_STEEL_VERTICAL_SLAB = ITEMS.register("light_blue_flaming_polished_steel_vertical_slab",
+            () -> new BlockItem(ModBlocks.LIGHT_BLUE_FLAMING_POLISHED_STEEL_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIGHT_BLUE_FLAMING_POLISHED_STEEL_STAIRS = ITEMS.register("light_blue_flaming_polished_steel_stairs",
+            () -> new BlockItem(ModBlocks.LIGHT_BLUE_FLAMING_POLISHED_STEEL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIGHT_BLUE_FLAMING_POLISHED_STEEL_WALL = ITEMS.register("light_blue_flaming_polished_steel_wall",
+            () -> new BlockItem(ModBlocks.LIGHT_BLUE_FLAMING_POLISHED_STEEL_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIGHT_BLUE_FLAMING_PRESSED_STEEL = ITEMS.register("light_blue_flaming_pressed_steel",
+            () -> new BlockItem(ModBlocks.LIGHT_BLUE_FLAMING_PRESSED_STEEL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIGHT_BLUE_FLAMING_PRESSED_STEEL_SLAB = ITEMS.register("light_blue_flaming_pressed_steel_slab",
+            () -> new BlockItem(ModBlocks.LIGHT_BLUE_FLAMING_PRESSED_STEEL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIGHT_BLUE_FLAMING_PRESSED_STEEL_VERTICAL_SLAB = ITEMS.register("light_blue_flaming_pressed_steel_vertical_slab",
+            () -> new BlockItem(ModBlocks.LIGHT_BLUE_FLAMING_PRESSED_STEEL_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIGHT_BLUE_FLAMING_PRESSED_STEEL_STAIRS = ITEMS.register("light_blue_flaming_pressed_steel_stairs",
+            () -> new BlockItem(ModBlocks.LIGHT_BLUE_FLAMING_PRESSED_STEEL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIGHT_BLUE_FLAMING_PRESSED_STEEL_WALL = ITEMS.register("light_blue_flaming_pressed_steel_wall",
+            () -> new BlockItem(ModBlocks.LIGHT_BLUE_FLAMING_PRESSED_STEEL_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIGHT_BLUE_FLAMING_STEEL_CASING = ITEMS.register("light_blue_flaming_steel_casing",
+            () -> new BlockItem(ModBlocks.LIGHT_BLUE_FLAMING_STEEL_CASING.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIGHT_BLUE_FLAMING_STEEL_GRATE = ITEMS.register("light_blue_flaming_steel_grate",
+            () -> new BlockItem(ModBlocks.LIGHT_BLUE_FLAMING_STEEL_GRATE.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIGHT_BLUE_FLAMING_STEEL_PILLAR = ITEMS.register("light_blue_flaming_steel_pillar",
+            () -> new BlockItem(ModBlocks.LIGHT_BLUE_FLAMING_STEEL_PILLAR.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIGHT_BLUE_FLAMING_BOLTED_STEEL_PILLAR = ITEMS.register("light_blue_flaming_bolted_steel_pillar",
+            () -> new BlockItem(ModBlocks.LIGHT_BLUE_FLAMING_BOLTED_STEEL_PILLAR.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> YELLOW_FLAMING_STEEL_BLOCK = ITEMS.register("yellow_flaming_steel_block",
+            () -> new BlockItem(ModBlocks.YELLOW_FLAMING_STEEL_BLOCK.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> YELLOW_FLAMING_STEEL_BLOCK_SLAB = ITEMS.register("yellow_flaming_steel_block_slab",
+            () -> new BlockItem(ModBlocks.YELLOW_FLAMING_STEEL_BLOCK_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> YELLOW_FLAMING_STEEL_BLOCK_VERTICAL_SLAB = ITEMS.register("yellow_flaming_steel_block_vertical_slab",
+            () -> new BlockItem(ModBlocks.YELLOW_FLAMING_STEEL_BLOCK_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> YELLOW_FLAMING_STEEL_BLOCK_STAIRS = ITEMS.register("yellow_flaming_steel_block_stairs",
+            () -> new BlockItem(ModBlocks.YELLOW_FLAMING_STEEL_BLOCK_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> YELLOW_FLAMING_STEEL_BLOCK_WALL = ITEMS.register("yellow_flaming_steel_block_wall",
+            () -> new BlockItem(ModBlocks.YELLOW_FLAMING_STEEL_BLOCK_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> YELLOW_FLAMING_CUT_STEEL = ITEMS.register("yellow_flaming_cut_steel",
+            () -> new BlockItem(ModBlocks.YELLOW_FLAMING_CUT_STEEL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> YELLOW_FLAMING_CUT_STEEL_SLAB = ITEMS.register("yellow_flaming_cut_steel_slab",
+            () -> new BlockItem(ModBlocks.YELLOW_FLAMING_CUT_STEEL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> YELLOW_FLAMING_CUT_STEEL_VERTICAL_SLAB = ITEMS.register("yellow_flaming_cut_steel_vertical_slab",
+            () -> new BlockItem(ModBlocks.YELLOW_FLAMING_CUT_STEEL_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> YELLOW_FLAMING_CUT_STEEL_STAIRS = ITEMS.register("yellow_flaming_cut_steel_stairs",
+            () -> new BlockItem(ModBlocks.YELLOW_FLAMING_CUT_STEEL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> YELLOW_FLAMING_CUT_STEEL_WALL = ITEMS.register("yellow_flaming_cut_steel_wall",
+            () -> new BlockItem(ModBlocks.YELLOW_FLAMING_CUT_STEEL_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> YELLOW_FLAMING_POLISHED_STEEL = ITEMS.register("yellow_flaming_polished_steel",
+            () -> new BlockItem(ModBlocks.YELLOW_FLAMING_POLISHED_STEEL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> YELLOW_FLAMING_POLISHED_STEEL_SLAB = ITEMS.register("yellow_flaming_polished_steel_slab",
+            () -> new BlockItem(ModBlocks.YELLOW_FLAMING_POLISHED_STEEL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> YELLOW_FLAMING_POLISHED_STEEL_VERTICAL_SLAB = ITEMS.register("yellow_flaming_polished_steel_vertical_slab",
+            () -> new BlockItem(ModBlocks.YELLOW_FLAMING_POLISHED_STEEL_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> YELLOW_FLAMING_POLISHED_STEEL_STAIRS = ITEMS.register("yellow_flaming_polished_steel_stairs",
+            () -> new BlockItem(ModBlocks.YELLOW_FLAMING_POLISHED_STEEL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> YELLOW_FLAMING_POLISHED_STEEL_WALL = ITEMS.register("yellow_flaming_polished_steel_wall",
+            () -> new BlockItem(ModBlocks.YELLOW_FLAMING_POLISHED_STEEL_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> YELLOW_FLAMING_PRESSED_STEEL = ITEMS.register("yellow_flaming_pressed_steel",
+            () -> new BlockItem(ModBlocks.YELLOW_FLAMING_PRESSED_STEEL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> YELLOW_FLAMING_PRESSED_STEEL_SLAB = ITEMS.register("yellow_flaming_pressed_steel_slab",
+            () -> new BlockItem(ModBlocks.YELLOW_FLAMING_PRESSED_STEEL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> YELLOW_FLAMING_PRESSED_STEEL_VERTICAL_SLAB = ITEMS.register("yellow_flaming_pressed_steel_vertical_slab",
+            () -> new BlockItem(ModBlocks.YELLOW_FLAMING_PRESSED_STEEL_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> YELLOW_FLAMING_PRESSED_STEEL_STAIRS = ITEMS.register("yellow_flaming_pressed_steel_stairs",
+            () -> new BlockItem(ModBlocks.YELLOW_FLAMING_PRESSED_STEEL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> YELLOW_FLAMING_PRESSED_STEEL_WALL = ITEMS.register("yellow_flaming_pressed_steel_wall",
+            () -> new BlockItem(ModBlocks.YELLOW_FLAMING_PRESSED_STEEL_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> YELLOW_FLAMING_STEEL_CASING = ITEMS.register("yellow_flaming_steel_casing",
+            () -> new BlockItem(ModBlocks.YELLOW_FLAMING_STEEL_CASING.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> YELLOW_FLAMING_STEEL_GRATE = ITEMS.register("yellow_flaming_steel_grate",
+            () -> new BlockItem(ModBlocks.YELLOW_FLAMING_STEEL_GRATE.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> YELLOW_FLAMING_STEEL_PILLAR = ITEMS.register("yellow_flaming_steel_pillar",
+            () -> new BlockItem(ModBlocks.YELLOW_FLAMING_STEEL_PILLAR.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> YELLOW_FLAMING_BOLTED_STEEL_PILLAR = ITEMS.register("yellow_flaming_bolted_steel_pillar",
+            () -> new BlockItem(ModBlocks.YELLOW_FLAMING_BOLTED_STEEL_PILLAR.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIME_FLAMING_STEEL_BLOCK = ITEMS.register("lime_flaming_steel_block",
+            () -> new BlockItem(ModBlocks.LIME_FLAMING_STEEL_BLOCK.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIME_FLAMING_STEEL_BLOCK_SLAB = ITEMS.register("lime_flaming_steel_block_slab",
+            () -> new BlockItem(ModBlocks.LIME_FLAMING_STEEL_BLOCK_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIME_FLAMING_STEEL_BLOCK_VERTICAL_SLAB = ITEMS.register("lime_flaming_steel_block_vertical_slab",
+            () -> new BlockItem(ModBlocks.LIME_FLAMING_STEEL_BLOCK_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIME_FLAMING_STEEL_BLOCK_STAIRS = ITEMS.register("lime_flaming_steel_block_stairs",
+            () -> new BlockItem(ModBlocks.LIME_FLAMING_STEEL_BLOCK_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIME_FLAMING_STEEL_BLOCK_WALL = ITEMS.register("lime_flaming_steel_block_wall",
+            () -> new BlockItem(ModBlocks.LIME_FLAMING_STEEL_BLOCK_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIME_FLAMING_CUT_STEEL = ITEMS.register("lime_flaming_cut_steel",
+            () -> new BlockItem(ModBlocks.LIME_FLAMING_CUT_STEEL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIME_FLAMING_CUT_STEEL_SLAB = ITEMS.register("lime_flaming_cut_steel_slab",
+            () -> new BlockItem(ModBlocks.LIME_FLAMING_CUT_STEEL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIME_FLAMING_CUT_STEEL_VERTICAL_SLAB = ITEMS.register("lime_flaming_cut_steel_vertical_slab",
+            () -> new BlockItem(ModBlocks.LIME_FLAMING_CUT_STEEL_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIME_FLAMING_CUT_STEEL_STAIRS = ITEMS.register("lime_flaming_cut_steel_stairs",
+            () -> new BlockItem(ModBlocks.LIME_FLAMING_CUT_STEEL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIME_FLAMING_CUT_STEEL_WALL = ITEMS.register("lime_flaming_cut_steel_wall",
+            () -> new BlockItem(ModBlocks.LIME_FLAMING_CUT_STEEL_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIME_FLAMING_POLISHED_STEEL = ITEMS.register("lime_flaming_polished_steel",
+            () -> new BlockItem(ModBlocks.LIME_FLAMING_POLISHED_STEEL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIME_FLAMING_POLISHED_STEEL_SLAB = ITEMS.register("lime_flaming_polished_steel_slab",
+            () -> new BlockItem(ModBlocks.LIME_FLAMING_POLISHED_STEEL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIME_FLAMING_POLISHED_STEEL_VERTICAL_SLAB = ITEMS.register("lime_flaming_polished_steel_vertical_slab",
+            () -> new BlockItem(ModBlocks.LIME_FLAMING_POLISHED_STEEL_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIME_FLAMING_POLISHED_STEEL_STAIRS = ITEMS.register("lime_flaming_polished_steel_stairs",
+            () -> new BlockItem(ModBlocks.LIME_FLAMING_POLISHED_STEEL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIME_FLAMING_POLISHED_STEEL_WALL = ITEMS.register("lime_flaming_polished_steel_wall",
+            () -> new BlockItem(ModBlocks.LIME_FLAMING_POLISHED_STEEL_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIME_FLAMING_PRESSED_STEEL = ITEMS.register("lime_flaming_pressed_steel",
+            () -> new BlockItem(ModBlocks.LIME_FLAMING_PRESSED_STEEL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIME_FLAMING_PRESSED_STEEL_SLAB = ITEMS.register("lime_flaming_pressed_steel_slab",
+            () -> new BlockItem(ModBlocks.LIME_FLAMING_PRESSED_STEEL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIME_FLAMING_PRESSED_STEEL_VERTICAL_SLAB = ITEMS.register("lime_flaming_pressed_steel_vertical_slab",
+            () -> new BlockItem(ModBlocks.LIME_FLAMING_PRESSED_STEEL_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIME_FLAMING_PRESSED_STEEL_STAIRS = ITEMS.register("lime_flaming_pressed_steel_stairs",
+            () -> new BlockItem(ModBlocks.LIME_FLAMING_PRESSED_STEEL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIME_FLAMING_PRESSED_STEEL_WALL = ITEMS.register("lime_flaming_pressed_steel_wall",
+            () -> new BlockItem(ModBlocks.LIME_FLAMING_PRESSED_STEEL_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIME_FLAMING_STEEL_CASING = ITEMS.register("lime_flaming_steel_casing",
+            () -> new BlockItem(ModBlocks.LIME_FLAMING_STEEL_CASING.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIME_FLAMING_STEEL_GRATE = ITEMS.register("lime_flaming_steel_grate",
+            () -> new BlockItem(ModBlocks.LIME_FLAMING_STEEL_GRATE.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIME_FLAMING_STEEL_PILLAR = ITEMS.register("lime_flaming_steel_pillar",
+            () -> new BlockItem(ModBlocks.LIME_FLAMING_STEEL_PILLAR.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIME_FLAMING_BOLTED_STEEL_PILLAR = ITEMS.register("lime_flaming_bolted_steel_pillar",
+            () -> new BlockItem(ModBlocks.LIME_FLAMING_BOLTED_STEEL_PILLAR.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PINK_FLAMING_STEEL_BLOCK = ITEMS.register("pink_flaming_steel_block",
+            () -> new BlockItem(ModBlocks.PINK_FLAMING_STEEL_BLOCK.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PINK_FLAMING_STEEL_BLOCK_SLAB = ITEMS.register("pink_flaming_steel_block_slab",
+            () -> new BlockItem(ModBlocks.PINK_FLAMING_STEEL_BLOCK_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PINK_FLAMING_STEEL_BLOCK_VERTICAL_SLAB = ITEMS.register("pink_flaming_steel_block_vertical_slab",
+            () -> new BlockItem(ModBlocks.PINK_FLAMING_STEEL_BLOCK_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PINK_FLAMING_STEEL_BLOCK_STAIRS = ITEMS.register("pink_flaming_steel_block_stairs",
+            () -> new BlockItem(ModBlocks.PINK_FLAMING_STEEL_BLOCK_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PINK_FLAMING_STEEL_BLOCK_WALL = ITEMS.register("pink_flaming_steel_block_wall",
+            () -> new BlockItem(ModBlocks.PINK_FLAMING_STEEL_BLOCK_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PINK_FLAMING_CUT_STEEL = ITEMS.register("pink_flaming_cut_steel",
+            () -> new BlockItem(ModBlocks.PINK_FLAMING_CUT_STEEL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PINK_FLAMING_CUT_STEEL_SLAB = ITEMS.register("pink_flaming_cut_steel_slab",
+            () -> new BlockItem(ModBlocks.PINK_FLAMING_CUT_STEEL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PINK_FLAMING_CUT_STEEL_VERTICAL_SLAB = ITEMS.register("pink_flaming_cut_steel_vertical_slab",
+            () -> new BlockItem(ModBlocks.PINK_FLAMING_CUT_STEEL_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PINK_FLAMING_CUT_STEEL_STAIRS = ITEMS.register("pink_flaming_cut_steel_stairs",
+            () -> new BlockItem(ModBlocks.PINK_FLAMING_CUT_STEEL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PINK_FLAMING_CUT_STEEL_WALL = ITEMS.register("pink_flaming_cut_steel_wall",
+            () -> new BlockItem(ModBlocks.PINK_FLAMING_CUT_STEEL_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PINK_FLAMING_POLISHED_STEEL = ITEMS.register("pink_flaming_polished_steel",
+            () -> new BlockItem(ModBlocks.PINK_FLAMING_POLISHED_STEEL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PINK_FLAMING_POLISHED_STEEL_SLAB = ITEMS.register("pink_flaming_polished_steel_slab",
+            () -> new BlockItem(ModBlocks.PINK_FLAMING_POLISHED_STEEL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PINK_FLAMING_POLISHED_STEEL_VERTICAL_SLAB = ITEMS.register("pink_flaming_polished_steel_vertical_slab",
+            () -> new BlockItem(ModBlocks.PINK_FLAMING_POLISHED_STEEL_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PINK_FLAMING_POLISHED_STEEL_STAIRS = ITEMS.register("pink_flaming_polished_steel_stairs",
+            () -> new BlockItem(ModBlocks.PINK_FLAMING_POLISHED_STEEL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PINK_FLAMING_POLISHED_STEEL_WALL = ITEMS.register("pink_flaming_polished_steel_wall",
+            () -> new BlockItem(ModBlocks.PINK_FLAMING_POLISHED_STEEL_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PINK_FLAMING_PRESSED_STEEL = ITEMS.register("pink_flaming_pressed_steel",
+            () -> new BlockItem(ModBlocks.PINK_FLAMING_PRESSED_STEEL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PINK_FLAMING_PRESSED_STEEL_SLAB = ITEMS.register("pink_flaming_pressed_steel_slab",
+            () -> new BlockItem(ModBlocks.PINK_FLAMING_PRESSED_STEEL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PINK_FLAMING_PRESSED_STEEL_VERTICAL_SLAB = ITEMS.register("pink_flaming_pressed_steel_vertical_slab",
+            () -> new BlockItem(ModBlocks.PINK_FLAMING_PRESSED_STEEL_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PINK_FLAMING_PRESSED_STEEL_STAIRS = ITEMS.register("pink_flaming_pressed_steel_stairs",
+            () -> new BlockItem(ModBlocks.PINK_FLAMING_PRESSED_STEEL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PINK_FLAMING_PRESSED_STEEL_WALL = ITEMS.register("pink_flaming_pressed_steel_wall",
+            () -> new BlockItem(ModBlocks.PINK_FLAMING_PRESSED_STEEL_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PINK_FLAMING_STEEL_CASING = ITEMS.register("pink_flaming_steel_casing",
+            () -> new BlockItem(ModBlocks.PINK_FLAMING_STEEL_CASING.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PINK_FLAMING_STEEL_GRATE = ITEMS.register("pink_flaming_steel_grate",
+            () -> new BlockItem(ModBlocks.PINK_FLAMING_STEEL_GRATE.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PINK_FLAMING_STEEL_PILLAR = ITEMS.register("pink_flaming_steel_pillar",
+            () -> new BlockItem(ModBlocks.PINK_FLAMING_STEEL_PILLAR.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PINK_FLAMING_BOLTED_STEEL_PILLAR = ITEMS.register("pink_flaming_bolted_steel_pillar",
+            () -> new BlockItem(ModBlocks.PINK_FLAMING_BOLTED_STEEL_PILLAR.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GRAY_FLAMING_STEEL_BLOCK = ITEMS.register("gray_flaming_steel_block",
+            () -> new BlockItem(ModBlocks.GRAY_FLAMING_STEEL_BLOCK.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GRAY_FLAMING_STEEL_BLOCK_SLAB = ITEMS.register("gray_flaming_steel_block_slab",
+            () -> new BlockItem(ModBlocks.GRAY_FLAMING_STEEL_BLOCK_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GRAY_FLAMING_STEEL_BLOCK_VERTICAL_SLAB = ITEMS.register("gray_flaming_steel_block_vertical_slab",
+            () -> new BlockItem(ModBlocks.GRAY_FLAMING_STEEL_BLOCK_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GRAY_FLAMING_STEEL_BLOCK_STAIRS = ITEMS.register("gray_flaming_steel_block_stairs",
+            () -> new BlockItem(ModBlocks.GRAY_FLAMING_STEEL_BLOCK_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GRAY_FLAMING_STEEL_BLOCK_WALL = ITEMS.register("gray_flaming_steel_block_wall",
+            () -> new BlockItem(ModBlocks.GRAY_FLAMING_STEEL_BLOCK_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GRAY_FLAMING_CUT_STEEL = ITEMS.register("gray_flaming_cut_steel",
+            () -> new BlockItem(ModBlocks.GRAY_FLAMING_CUT_STEEL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GRAY_FLAMING_CUT_STEEL_SLAB = ITEMS.register("gray_flaming_cut_steel_slab",
+            () -> new BlockItem(ModBlocks.GRAY_FLAMING_CUT_STEEL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GRAY_FLAMING_CUT_STEEL_VERTICAL_SLAB = ITEMS.register("gray_flaming_cut_steel_vertical_slab",
+            () -> new BlockItem(ModBlocks.GRAY_FLAMING_CUT_STEEL_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GRAY_FLAMING_CUT_STEEL_STAIRS = ITEMS.register("gray_flaming_cut_steel_stairs",
+            () -> new BlockItem(ModBlocks.GRAY_FLAMING_CUT_STEEL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GRAY_FLAMING_CUT_STEEL_WALL = ITEMS.register("gray_flaming_cut_steel_wall",
+            () -> new BlockItem(ModBlocks.GRAY_FLAMING_CUT_STEEL_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GRAY_FLAMING_POLISHED_STEEL = ITEMS.register("gray_flaming_polished_steel",
+            () -> new BlockItem(ModBlocks.GRAY_FLAMING_POLISHED_STEEL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GRAY_FLAMING_POLISHED_STEEL_SLAB = ITEMS.register("gray_flaming_polished_steel_slab",
+            () -> new BlockItem(ModBlocks.GRAY_FLAMING_POLISHED_STEEL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GRAY_FLAMING_POLISHED_STEEL_VERTICAL_SLAB = ITEMS.register("gray_flaming_polished_steel_vertical_slab",
+            () -> new BlockItem(ModBlocks.GRAY_FLAMING_POLISHED_STEEL_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GRAY_FLAMING_POLISHED_STEEL_STAIRS = ITEMS.register("gray_flaming_polished_steel_stairs",
+            () -> new BlockItem(ModBlocks.GRAY_FLAMING_POLISHED_STEEL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GRAY_FLAMING_POLISHED_STEEL_WALL = ITEMS.register("gray_flaming_polished_steel_wall",
+            () -> new BlockItem(ModBlocks.GRAY_FLAMING_POLISHED_STEEL_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GRAY_FLAMING_PRESSED_STEEL = ITEMS.register("gray_flaming_pressed_steel",
+            () -> new BlockItem(ModBlocks.GRAY_FLAMING_PRESSED_STEEL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GRAY_FLAMING_PRESSED_STEEL_SLAB = ITEMS.register("gray_flaming_pressed_steel_slab",
+            () -> new BlockItem(ModBlocks.GRAY_FLAMING_PRESSED_STEEL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GRAY_FLAMING_PRESSED_STEEL_VERTICAL_SLAB = ITEMS.register("gray_flaming_pressed_steel_vertical_slab",
+            () -> new BlockItem(ModBlocks.GRAY_FLAMING_PRESSED_STEEL_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GRAY_FLAMING_PRESSED_STEEL_STAIRS = ITEMS.register("gray_flaming_pressed_steel_stairs",
+            () -> new BlockItem(ModBlocks.GRAY_FLAMING_PRESSED_STEEL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GRAY_FLAMING_PRESSED_STEEL_WALL = ITEMS.register("gray_flaming_pressed_steel_wall",
+            () -> new BlockItem(ModBlocks.GRAY_FLAMING_PRESSED_STEEL_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GRAY_FLAMING_STEEL_CASING = ITEMS.register("gray_flaming_steel_casing",
+            () -> new BlockItem(ModBlocks.GRAY_FLAMING_STEEL_CASING.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GRAY_FLAMING_STEEL_GRATE = ITEMS.register("gray_flaming_steel_grate",
+            () -> new BlockItem(ModBlocks.GRAY_FLAMING_STEEL_GRATE.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GRAY_FLAMING_STEEL_PILLAR = ITEMS.register("gray_flaming_steel_pillar",
+            () -> new BlockItem(ModBlocks.GRAY_FLAMING_STEEL_PILLAR.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GRAY_FLAMING_BOLTED_STEEL_PILLAR = ITEMS.register("gray_flaming_bolted_steel_pillar",
+            () -> new BlockItem(ModBlocks.GRAY_FLAMING_BOLTED_STEEL_PILLAR.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIGHT_GRAY_FLAMING_STEEL_BLOCK = ITEMS.register("light_gray_flaming_steel_block",
+            () -> new BlockItem(ModBlocks.LIGHT_GRAY_FLAMING_STEEL_BLOCK.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIGHT_GRAY_FLAMING_STEEL_BLOCK_SLAB = ITEMS.register("light_gray_flaming_steel_block_slab",
+            () -> new BlockItem(ModBlocks.LIGHT_GRAY_FLAMING_STEEL_BLOCK_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIGHT_GRAY_FLAMING_STEEL_BLOCK_VERTICAL_SLAB = ITEMS.register("light_gray_flaming_steel_block_vertical_slab",
+            () -> new BlockItem(ModBlocks.LIGHT_GRAY_FLAMING_STEEL_BLOCK_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIGHT_GRAY_FLAMING_STEEL_BLOCK_STAIRS = ITEMS.register("light_gray_flaming_steel_block_stairs",
+            () -> new BlockItem(ModBlocks.LIGHT_GRAY_FLAMING_STEEL_BLOCK_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIGHT_GRAY_FLAMING_STEEL_BLOCK_WALL = ITEMS.register("light_gray_flaming_steel_block_wall",
+            () -> new BlockItem(ModBlocks.LIGHT_GRAY_FLAMING_STEEL_BLOCK_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIGHT_GRAY_FLAMING_CUT_STEEL = ITEMS.register("light_gray_flaming_cut_steel",
+            () -> new BlockItem(ModBlocks.LIGHT_GRAY_FLAMING_CUT_STEEL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIGHT_GRAY_FLAMING_CUT_STEEL_SLAB = ITEMS.register("light_gray_flaming_cut_steel_slab",
+            () -> new BlockItem(ModBlocks.LIGHT_GRAY_FLAMING_CUT_STEEL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIGHT_GRAY_FLAMING_CUT_STEEL_VERTICAL_SLAB = ITEMS.register("light_gray_flaming_cut_steel_vertical_slab",
+            () -> new BlockItem(ModBlocks.LIGHT_GRAY_FLAMING_CUT_STEEL_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIGHT_GRAY_FLAMING_CUT_STEEL_STAIRS = ITEMS.register("light_gray_flaming_cut_steel_stairs",
+            () -> new BlockItem(ModBlocks.LIGHT_GRAY_FLAMING_CUT_STEEL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIGHT_GRAY_FLAMING_CUT_STEEL_WALL = ITEMS.register("light_gray_flaming_cut_steel_wall",
+            () -> new BlockItem(ModBlocks.LIGHT_GRAY_FLAMING_CUT_STEEL_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIGHT_GRAY_FLAMING_POLISHED_STEEL = ITEMS.register("light_gray_flaming_polished_steel",
+            () -> new BlockItem(ModBlocks.LIGHT_GRAY_FLAMING_POLISHED_STEEL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIGHT_GRAY_FLAMING_POLISHED_STEEL_SLAB = ITEMS.register("light_gray_flaming_polished_steel_slab",
+            () -> new BlockItem(ModBlocks.LIGHT_GRAY_FLAMING_POLISHED_STEEL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIGHT_GRAY_FLAMING_POLISHED_STEEL_VERTICAL_SLAB = ITEMS.register("light_gray_flaming_polished_steel_vertical_slab",
+            () -> new BlockItem(ModBlocks.LIGHT_GRAY_FLAMING_POLISHED_STEEL_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIGHT_GRAY_FLAMING_POLISHED_STEEL_STAIRS = ITEMS.register("light_gray_flaming_polished_steel_stairs",
+            () -> new BlockItem(ModBlocks.LIGHT_GRAY_FLAMING_POLISHED_STEEL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIGHT_GRAY_FLAMING_POLISHED_STEEL_WALL = ITEMS.register("light_gray_flaming_polished_steel_wall",
+            () -> new BlockItem(ModBlocks.LIGHT_GRAY_FLAMING_POLISHED_STEEL_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIGHT_GRAY_FLAMING_PRESSED_STEEL = ITEMS.register("light_gray_flaming_pressed_steel",
+            () -> new BlockItem(ModBlocks.LIGHT_GRAY_FLAMING_PRESSED_STEEL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIGHT_GRAY_FLAMING_PRESSED_STEEL_SLAB = ITEMS.register("light_gray_flaming_pressed_steel_slab",
+            () -> new BlockItem(ModBlocks.LIGHT_GRAY_FLAMING_PRESSED_STEEL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIGHT_GRAY_FLAMING_PRESSED_STEEL_VERTICAL_SLAB = ITEMS.register("light_gray_flaming_pressed_steel_vertical_slab",
+            () -> new BlockItem(ModBlocks.LIGHT_GRAY_FLAMING_PRESSED_STEEL_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIGHT_GRAY_FLAMING_PRESSED_STEEL_STAIRS = ITEMS.register("light_gray_flaming_pressed_steel_stairs",
+            () -> new BlockItem(ModBlocks.LIGHT_GRAY_FLAMING_PRESSED_STEEL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIGHT_GRAY_FLAMING_PRESSED_STEEL_WALL = ITEMS.register("light_gray_flaming_pressed_steel_wall",
+            () -> new BlockItem(ModBlocks.LIGHT_GRAY_FLAMING_PRESSED_STEEL_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIGHT_GRAY_FLAMING_STEEL_CASING = ITEMS.register("light_gray_flaming_steel_casing",
+            () -> new BlockItem(ModBlocks.LIGHT_GRAY_FLAMING_STEEL_CASING.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIGHT_GRAY_FLAMING_STEEL_GRATE = ITEMS.register("light_gray_flaming_steel_grate",
+            () -> new BlockItem(ModBlocks.LIGHT_GRAY_FLAMING_STEEL_GRATE.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIGHT_GRAY_FLAMING_STEEL_PILLAR = ITEMS.register("light_gray_flaming_steel_pillar",
+            () -> new BlockItem(ModBlocks.LIGHT_GRAY_FLAMING_STEEL_PILLAR.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIGHT_GRAY_FLAMING_BOLTED_STEEL_PILLAR = ITEMS.register("light_gray_flaming_bolted_steel_pillar",
+            () -> new BlockItem(ModBlocks.LIGHT_GRAY_FLAMING_BOLTED_STEEL_PILLAR.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> CYAN_FLAMING_STEEL_BLOCK = ITEMS.register("cyan_flaming_steel_block",
+            () -> new BlockItem(ModBlocks.CYAN_FLAMING_STEEL_BLOCK.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> CYAN_FLAMING_STEEL_BLOCK_SLAB = ITEMS.register("cyan_flaming_steel_block_slab",
+            () -> new BlockItem(ModBlocks.CYAN_FLAMING_STEEL_BLOCK_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> CYAN_FLAMING_STEEL_BLOCK_VERTICAL_SLAB = ITEMS.register("cyan_flaming_steel_block_vertical_slab",
+            () -> new BlockItem(ModBlocks.CYAN_FLAMING_STEEL_BLOCK_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> CYAN_FLAMING_STEEL_BLOCK_STAIRS = ITEMS.register("cyan_flaming_steel_block_stairs",
+            () -> new BlockItem(ModBlocks.CYAN_FLAMING_STEEL_BLOCK_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> CYAN_FLAMING_STEEL_BLOCK_WALL = ITEMS.register("cyan_flaming_steel_block_wall",
+            () -> new BlockItem(ModBlocks.CYAN_FLAMING_STEEL_BLOCK_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> CYAN_FLAMING_CUT_STEEL = ITEMS.register("cyan_flaming_cut_steel",
+            () -> new BlockItem(ModBlocks.CYAN_FLAMING_CUT_STEEL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> CYAN_FLAMING_CUT_STEEL_SLAB = ITEMS.register("cyan_flaming_cut_steel_slab",
+            () -> new BlockItem(ModBlocks.CYAN_FLAMING_CUT_STEEL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> CYAN_FLAMING_CUT_STEEL_VERTICAL_SLAB = ITEMS.register("cyan_flaming_cut_steel_vertical_slab",
+            () -> new BlockItem(ModBlocks.CYAN_FLAMING_CUT_STEEL_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> CYAN_FLAMING_CUT_STEEL_STAIRS = ITEMS.register("cyan_flaming_cut_steel_stairs",
+            () -> new BlockItem(ModBlocks.CYAN_FLAMING_CUT_STEEL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> CYAN_FLAMING_CUT_STEEL_WALL = ITEMS.register("cyan_flaming_cut_steel_wall",
+            () -> new BlockItem(ModBlocks.CYAN_FLAMING_CUT_STEEL_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> CYAN_FLAMING_POLISHED_STEEL = ITEMS.register("cyan_flaming_polished_steel",
+            () -> new BlockItem(ModBlocks.CYAN_FLAMING_POLISHED_STEEL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> CYAN_FLAMING_POLISHED_STEEL_SLAB = ITEMS.register("cyan_flaming_polished_steel_slab",
+            () -> new BlockItem(ModBlocks.CYAN_FLAMING_POLISHED_STEEL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> CYAN_FLAMING_POLISHED_STEEL_VERTICAL_SLAB = ITEMS.register("cyan_flaming_polished_steel_vertical_slab",
+            () -> new BlockItem(ModBlocks.CYAN_FLAMING_POLISHED_STEEL_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> CYAN_FLAMING_POLISHED_STEEL_STAIRS = ITEMS.register("cyan_flaming_polished_steel_stairs",
+            () -> new BlockItem(ModBlocks.CYAN_FLAMING_POLISHED_STEEL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> CYAN_FLAMING_POLISHED_STEEL_WALL = ITEMS.register("cyan_flaming_polished_steel_wall",
+            () -> new BlockItem(ModBlocks.CYAN_FLAMING_POLISHED_STEEL_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> CYAN_FLAMING_PRESSED_STEEL = ITEMS.register("cyan_flaming_pressed_steel",
+            () -> new BlockItem(ModBlocks.CYAN_FLAMING_PRESSED_STEEL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> CYAN_FLAMING_PRESSED_STEEL_SLAB = ITEMS.register("cyan_flaming_pressed_steel_slab",
+            () -> new BlockItem(ModBlocks.CYAN_FLAMING_PRESSED_STEEL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> CYAN_FLAMING_PRESSED_STEEL_VERTICAL_SLAB = ITEMS.register("cyan_flaming_pressed_steel_vertical_slab",
+            () -> new BlockItem(ModBlocks.CYAN_FLAMING_PRESSED_STEEL_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> CYAN_FLAMING_PRESSED_STEEL_STAIRS = ITEMS.register("cyan_flaming_pressed_steel_stairs",
+            () -> new BlockItem(ModBlocks.CYAN_FLAMING_PRESSED_STEEL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> CYAN_FLAMING_PRESSED_STEEL_WALL = ITEMS.register("cyan_flaming_pressed_steel_wall",
+            () -> new BlockItem(ModBlocks.CYAN_FLAMING_PRESSED_STEEL_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> CYAN_FLAMING_STEEL_CASING = ITEMS.register("cyan_flaming_steel_casing",
+            () -> new BlockItem(ModBlocks.CYAN_FLAMING_STEEL_CASING.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> CYAN_FLAMING_STEEL_GRATE = ITEMS.register("cyan_flaming_steel_grate",
+            () -> new BlockItem(ModBlocks.CYAN_FLAMING_STEEL_GRATE.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> CYAN_FLAMING_STEEL_PILLAR = ITEMS.register("cyan_flaming_steel_pillar",
+            () -> new BlockItem(ModBlocks.CYAN_FLAMING_STEEL_PILLAR.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> CYAN_FLAMING_BOLTED_STEEL_PILLAR = ITEMS.register("cyan_flaming_bolted_steel_pillar",
+            () -> new BlockItem(ModBlocks.CYAN_FLAMING_BOLTED_STEEL_PILLAR.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PURPLE_FLAMING_STEEL_BLOCK = ITEMS.register("purple_flaming_steel_block",
+            () -> new BlockItem(ModBlocks.PURPLE_FLAMING_STEEL_BLOCK.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PURPLE_FLAMING_STEEL_BLOCK_SLAB = ITEMS.register("purple_flaming_steel_block_slab",
+            () -> new BlockItem(ModBlocks.PURPLE_FLAMING_STEEL_BLOCK_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PURPLE_FLAMING_STEEL_BLOCK_VERTICAL_SLAB = ITEMS.register("purple_flaming_steel_block_vertical_slab",
+            () -> new BlockItem(ModBlocks.PURPLE_FLAMING_STEEL_BLOCK_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PURPLE_FLAMING_STEEL_BLOCK_STAIRS = ITEMS.register("purple_flaming_steel_block_stairs",
+            () -> new BlockItem(ModBlocks.PURPLE_FLAMING_STEEL_BLOCK_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PURPLE_FLAMING_STEEL_BLOCK_WALL = ITEMS.register("purple_flaming_steel_block_wall",
+            () -> new BlockItem(ModBlocks.PURPLE_FLAMING_STEEL_BLOCK_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PURPLE_FLAMING_CUT_STEEL = ITEMS.register("purple_flaming_cut_steel",
+            () -> new BlockItem(ModBlocks.PURPLE_FLAMING_CUT_STEEL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PURPLE_FLAMING_CUT_STEEL_SLAB = ITEMS.register("purple_flaming_cut_steel_slab",
+            () -> new BlockItem(ModBlocks.PURPLE_FLAMING_CUT_STEEL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PURPLE_FLAMING_CUT_STEEL_VERTICAL_SLAB = ITEMS.register("purple_flaming_cut_steel_vertical_slab",
+            () -> new BlockItem(ModBlocks.PURPLE_FLAMING_CUT_STEEL_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PURPLE_FLAMING_CUT_STEEL_STAIRS = ITEMS.register("purple_flaming_cut_steel_stairs",
+            () -> new BlockItem(ModBlocks.PURPLE_FLAMING_CUT_STEEL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PURPLE_FLAMING_CUT_STEEL_WALL = ITEMS.register("purple_flaming_cut_steel_wall",
+            () -> new BlockItem(ModBlocks.PURPLE_FLAMING_CUT_STEEL_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PURPLE_FLAMING_POLISHED_STEEL = ITEMS.register("purple_flaming_polished_steel",
+            () -> new BlockItem(ModBlocks.PURPLE_FLAMING_POLISHED_STEEL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PURPLE_FLAMING_POLISHED_STEEL_SLAB = ITEMS.register("purple_flaming_polished_steel_slab",
+            () -> new BlockItem(ModBlocks.PURPLE_FLAMING_POLISHED_STEEL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PURPLE_FLAMING_POLISHED_STEEL_VERTICAL_SLAB = ITEMS.register("purple_flaming_polished_steel_vertical_slab",
+            () -> new BlockItem(ModBlocks.PURPLE_FLAMING_POLISHED_STEEL_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PURPLE_FLAMING_POLISHED_STEEL_STAIRS = ITEMS.register("purple_flaming_polished_steel_stairs",
+            () -> new BlockItem(ModBlocks.PURPLE_FLAMING_POLISHED_STEEL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PURPLE_FLAMING_POLISHED_STEEL_WALL = ITEMS.register("purple_flaming_polished_steel_wall",
+            () -> new BlockItem(ModBlocks.PURPLE_FLAMING_POLISHED_STEEL_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PURPLE_FLAMING_PRESSED_STEEL = ITEMS.register("purple_flaming_pressed_steel",
+            () -> new BlockItem(ModBlocks.PURPLE_FLAMING_PRESSED_STEEL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PURPLE_FLAMING_PRESSED_STEEL_SLAB = ITEMS.register("purple_flaming_pressed_steel_slab",
+            () -> new BlockItem(ModBlocks.PURPLE_FLAMING_PRESSED_STEEL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PURPLE_FLAMING_PRESSED_STEEL_VERTICAL_SLAB = ITEMS.register("purple_flaming_pressed_steel_vertical_slab",
+            () -> new BlockItem(ModBlocks.PURPLE_FLAMING_PRESSED_STEEL_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PURPLE_FLAMING_PRESSED_STEEL_STAIRS = ITEMS.register("purple_flaming_pressed_steel_stairs",
+            () -> new BlockItem(ModBlocks.PURPLE_FLAMING_PRESSED_STEEL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PURPLE_FLAMING_PRESSED_STEEL_WALL = ITEMS.register("purple_flaming_pressed_steel_wall",
+            () -> new BlockItem(ModBlocks.PURPLE_FLAMING_PRESSED_STEEL_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PURPLE_FLAMING_STEEL_CASING = ITEMS.register("purple_flaming_steel_casing",
+            () -> new BlockItem(ModBlocks.PURPLE_FLAMING_STEEL_CASING.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PURPLE_FLAMING_STEEL_GRATE = ITEMS.register("purple_flaming_steel_grate",
+            () -> new BlockItem(ModBlocks.PURPLE_FLAMING_STEEL_GRATE.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PURPLE_FLAMING_STEEL_PILLAR = ITEMS.register("purple_flaming_steel_pillar",
+            () -> new BlockItem(ModBlocks.PURPLE_FLAMING_STEEL_PILLAR.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PURPLE_FLAMING_BOLTED_STEEL_PILLAR = ITEMS.register("purple_flaming_bolted_steel_pillar",
+            () -> new BlockItem(ModBlocks.PURPLE_FLAMING_BOLTED_STEEL_PILLAR.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BLUE_FLAMING_STEEL_BLOCK = ITEMS.register("blue_flaming_steel_block",
+            () -> new BlockItem(ModBlocks.BLUE_FLAMING_STEEL_BLOCK.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BLUE_FLAMING_STEEL_BLOCK_SLAB = ITEMS.register("blue_flaming_steel_block_slab",
+            () -> new BlockItem(ModBlocks.BLUE_FLAMING_STEEL_BLOCK_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BLUE_FLAMING_STEEL_BLOCK_VERTICAL_SLAB = ITEMS.register("blue_flaming_steel_block_vertical_slab",
+            () -> new BlockItem(ModBlocks.BLUE_FLAMING_STEEL_BLOCK_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BLUE_FLAMING_STEEL_BLOCK_STAIRS = ITEMS.register("blue_flaming_steel_block_stairs",
+            () -> new BlockItem(ModBlocks.BLUE_FLAMING_STEEL_BLOCK_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BLUE_FLAMING_STEEL_BLOCK_WALL = ITEMS.register("blue_flaming_steel_block_wall",
+            () -> new BlockItem(ModBlocks.BLUE_FLAMING_STEEL_BLOCK_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BLUE_FLAMING_CUT_STEEL = ITEMS.register("blue_flaming_cut_steel",
+            () -> new BlockItem(ModBlocks.BLUE_FLAMING_CUT_STEEL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BLUE_FLAMING_CUT_STEEL_SLAB = ITEMS.register("blue_flaming_cut_steel_slab",
+            () -> new BlockItem(ModBlocks.BLUE_FLAMING_CUT_STEEL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BLUE_FLAMING_CUT_STEEL_VERTICAL_SLAB = ITEMS.register("blue_flaming_cut_steel_vertical_slab",
+            () -> new BlockItem(ModBlocks.BLUE_FLAMING_CUT_STEEL_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BLUE_FLAMING_CUT_STEEL_STAIRS = ITEMS.register("blue_flaming_cut_steel_stairs",
+            () -> new BlockItem(ModBlocks.BLUE_FLAMING_CUT_STEEL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BLUE_FLAMING_CUT_STEEL_WALL = ITEMS.register("blue_flaming_cut_steel_wall",
+            () -> new BlockItem(ModBlocks.BLUE_FLAMING_CUT_STEEL_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BLUE_FLAMING_POLISHED_STEEL = ITEMS.register("blue_flaming_polished_steel",
+            () -> new BlockItem(ModBlocks.BLUE_FLAMING_POLISHED_STEEL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BLUE_FLAMING_POLISHED_STEEL_SLAB = ITEMS.register("blue_flaming_polished_steel_slab",
+            () -> new BlockItem(ModBlocks.BLUE_FLAMING_POLISHED_STEEL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BLUE_FLAMING_POLISHED_STEEL_VERTICAL_SLAB = ITEMS.register("blue_flaming_polished_steel_vertical_slab",
+            () -> new BlockItem(ModBlocks.BLUE_FLAMING_POLISHED_STEEL_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BLUE_FLAMING_POLISHED_STEEL_STAIRS = ITEMS.register("blue_flaming_polished_steel_stairs",
+            () -> new BlockItem(ModBlocks.BLUE_FLAMING_POLISHED_STEEL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BLUE_FLAMING_POLISHED_STEEL_WALL = ITEMS.register("blue_flaming_polished_steel_wall",
+            () -> new BlockItem(ModBlocks.BLUE_FLAMING_POLISHED_STEEL_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BLUE_FLAMING_PRESSED_STEEL = ITEMS.register("blue_flaming_pressed_steel",
+            () -> new BlockItem(ModBlocks.BLUE_FLAMING_PRESSED_STEEL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BLUE_FLAMING_PRESSED_STEEL_SLAB = ITEMS.register("blue_flaming_pressed_steel_slab",
+            () -> new BlockItem(ModBlocks.BLUE_FLAMING_PRESSED_STEEL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BLUE_FLAMING_PRESSED_STEEL_VERTICAL_SLAB = ITEMS.register("blue_flaming_pressed_steel_vertical_slab",
+            () -> new BlockItem(ModBlocks.BLUE_FLAMING_PRESSED_STEEL_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BLUE_FLAMING_PRESSED_STEEL_STAIRS = ITEMS.register("blue_flaming_pressed_steel_stairs",
+            () -> new BlockItem(ModBlocks.BLUE_FLAMING_PRESSED_STEEL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BLUE_FLAMING_PRESSED_STEEL_WALL = ITEMS.register("blue_flaming_pressed_steel_wall",
+            () -> new BlockItem(ModBlocks.BLUE_FLAMING_PRESSED_STEEL_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BLUE_FLAMING_STEEL_CASING = ITEMS.register("blue_flaming_steel_casing",
+            () -> new BlockItem(ModBlocks.BLUE_FLAMING_STEEL_CASING.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BLUE_FLAMING_STEEL_GRATE = ITEMS.register("blue_flaming_steel_grate",
+            () -> new BlockItem(ModBlocks.BLUE_FLAMING_STEEL_GRATE.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BLUE_FLAMING_STEEL_PILLAR = ITEMS.register("blue_flaming_steel_pillar",
+            () -> new BlockItem(ModBlocks.BLUE_FLAMING_STEEL_PILLAR.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BLUE_FLAMING_BOLTED_STEEL_PILLAR = ITEMS.register("blue_flaming_bolted_steel_pillar",
+            () -> new BlockItem(ModBlocks.BLUE_FLAMING_BOLTED_STEEL_PILLAR.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BROWN_FLAMING_STEEL_BLOCK = ITEMS.register("brown_flaming_steel_block",
+            () -> new BlockItem(ModBlocks.BROWN_FLAMING_STEEL_BLOCK.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BROWN_FLAMING_STEEL_BLOCK_SLAB = ITEMS.register("brown_flaming_steel_block_slab",
+            () -> new BlockItem(ModBlocks.BROWN_FLAMING_STEEL_BLOCK_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BROWN_FLAMING_STEEL_BLOCK_VERTICAL_SLAB = ITEMS.register("brown_flaming_steel_block_vertical_slab",
+            () -> new BlockItem(ModBlocks.BROWN_FLAMING_STEEL_BLOCK_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BROWN_FLAMING_STEEL_BLOCK_STAIRS = ITEMS.register("brown_flaming_steel_block_stairs",
+            () -> new BlockItem(ModBlocks.BROWN_FLAMING_STEEL_BLOCK_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BROWN_FLAMING_STEEL_BLOCK_WALL = ITEMS.register("brown_flaming_steel_block_wall",
+            () -> new BlockItem(ModBlocks.BROWN_FLAMING_STEEL_BLOCK_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BROWN_FLAMING_CUT_STEEL = ITEMS.register("brown_flaming_cut_steel",
+            () -> new BlockItem(ModBlocks.BROWN_FLAMING_CUT_STEEL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BROWN_FLAMING_CUT_STEEL_SLAB = ITEMS.register("brown_flaming_cut_steel_slab",
+            () -> new BlockItem(ModBlocks.BROWN_FLAMING_CUT_STEEL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BROWN_FLAMING_CUT_STEEL_VERTICAL_SLAB = ITEMS.register("brown_flaming_cut_steel_vertical_slab",
+            () -> new BlockItem(ModBlocks.BROWN_FLAMING_CUT_STEEL_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BROWN_FLAMING_CUT_STEEL_STAIRS = ITEMS.register("brown_flaming_cut_steel_stairs",
+            () -> new BlockItem(ModBlocks.BROWN_FLAMING_CUT_STEEL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BROWN_FLAMING_CUT_STEEL_WALL = ITEMS.register("brown_flaming_cut_steel_wall",
+            () -> new BlockItem(ModBlocks.BROWN_FLAMING_CUT_STEEL_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BROWN_FLAMING_POLISHED_STEEL = ITEMS.register("brown_flaming_polished_steel",
+            () -> new BlockItem(ModBlocks.BROWN_FLAMING_POLISHED_STEEL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BROWN_FLAMING_POLISHED_STEEL_SLAB = ITEMS.register("brown_flaming_polished_steel_slab",
+            () -> new BlockItem(ModBlocks.BROWN_FLAMING_POLISHED_STEEL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BROWN_FLAMING_POLISHED_STEEL_VERTICAL_SLAB = ITEMS.register("brown_flaming_polished_steel_vertical_slab",
+            () -> new BlockItem(ModBlocks.BROWN_FLAMING_POLISHED_STEEL_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BROWN_FLAMING_POLISHED_STEEL_STAIRS = ITEMS.register("brown_flaming_polished_steel_stairs",
+            () -> new BlockItem(ModBlocks.BROWN_FLAMING_POLISHED_STEEL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BROWN_FLAMING_POLISHED_STEEL_WALL = ITEMS.register("brown_flaming_polished_steel_wall",
+            () -> new BlockItem(ModBlocks.BROWN_FLAMING_POLISHED_STEEL_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BROWN_FLAMING_PRESSED_STEEL = ITEMS.register("brown_flaming_pressed_steel",
+            () -> new BlockItem(ModBlocks.BROWN_FLAMING_PRESSED_STEEL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BROWN_FLAMING_PRESSED_STEEL_SLAB = ITEMS.register("brown_flaming_pressed_steel_slab",
+            () -> new BlockItem(ModBlocks.BROWN_FLAMING_PRESSED_STEEL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BROWN_FLAMING_PRESSED_STEEL_VERTICAL_SLAB = ITEMS.register("brown_flaming_pressed_steel_vertical_slab",
+            () -> new BlockItem(ModBlocks.BROWN_FLAMING_PRESSED_STEEL_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BROWN_FLAMING_PRESSED_STEEL_STAIRS = ITEMS.register("brown_flaming_pressed_steel_stairs",
+            () -> new BlockItem(ModBlocks.BROWN_FLAMING_PRESSED_STEEL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BROWN_FLAMING_PRESSED_STEEL_WALL = ITEMS.register("brown_flaming_pressed_steel_wall",
+            () -> new BlockItem(ModBlocks.BROWN_FLAMING_PRESSED_STEEL_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BROWN_FLAMING_STEEL_CASING = ITEMS.register("brown_flaming_steel_casing",
+            () -> new BlockItem(ModBlocks.BROWN_FLAMING_STEEL_CASING.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BROWN_FLAMING_STEEL_GRATE = ITEMS.register("brown_flaming_steel_grate",
+            () -> new BlockItem(ModBlocks.BROWN_FLAMING_STEEL_GRATE.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BROWN_FLAMING_STEEL_PILLAR = ITEMS.register("brown_flaming_steel_pillar",
+            () -> new BlockItem(ModBlocks.BROWN_FLAMING_STEEL_PILLAR.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BROWN_FLAMING_BOLTED_STEEL_PILLAR = ITEMS.register("brown_flaming_bolted_steel_pillar",
+            () -> new BlockItem(ModBlocks.BROWN_FLAMING_BOLTED_STEEL_PILLAR.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GREEN_FLAMING_STEEL_BLOCK = ITEMS.register("green_flaming_steel_block",
+            () -> new BlockItem(ModBlocks.GREEN_FLAMING_STEEL_BLOCK.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GREEN_FLAMING_STEEL_BLOCK_SLAB = ITEMS.register("green_flaming_steel_block_slab",
+            () -> new BlockItem(ModBlocks.GREEN_FLAMING_STEEL_BLOCK_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GREEN_FLAMING_STEEL_BLOCK_VERTICAL_SLAB = ITEMS.register("green_flaming_steel_block_vertical_slab",
+            () -> new BlockItem(ModBlocks.GREEN_FLAMING_STEEL_BLOCK_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GREEN_FLAMING_STEEL_BLOCK_STAIRS = ITEMS.register("green_flaming_steel_block_stairs",
+            () -> new BlockItem(ModBlocks.GREEN_FLAMING_STEEL_BLOCK_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GREEN_FLAMING_STEEL_BLOCK_WALL = ITEMS.register("green_flaming_steel_block_wall",
+            () -> new BlockItem(ModBlocks.GREEN_FLAMING_STEEL_BLOCK_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GREEN_FLAMING_CUT_STEEL = ITEMS.register("green_flaming_cut_steel",
+            () -> new BlockItem(ModBlocks.GREEN_FLAMING_CUT_STEEL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GREEN_FLAMING_CUT_STEEL_SLAB = ITEMS.register("green_flaming_cut_steel_slab",
+            () -> new BlockItem(ModBlocks.GREEN_FLAMING_CUT_STEEL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GREEN_FLAMING_CUT_STEEL_VERTICAL_SLAB = ITEMS.register("green_flaming_cut_steel_vertical_slab",
+            () -> new BlockItem(ModBlocks.GREEN_FLAMING_CUT_STEEL_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GREEN_FLAMING_CUT_STEEL_STAIRS = ITEMS.register("green_flaming_cut_steel_stairs",
+            () -> new BlockItem(ModBlocks.GREEN_FLAMING_CUT_STEEL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GREEN_FLAMING_CUT_STEEL_WALL = ITEMS.register("green_flaming_cut_steel_wall",
+            () -> new BlockItem(ModBlocks.GREEN_FLAMING_CUT_STEEL_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GREEN_FLAMING_POLISHED_STEEL = ITEMS.register("green_flaming_polished_steel",
+            () -> new BlockItem(ModBlocks.GREEN_FLAMING_POLISHED_STEEL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GREEN_FLAMING_POLISHED_STEEL_SLAB = ITEMS.register("green_flaming_polished_steel_slab",
+            () -> new BlockItem(ModBlocks.GREEN_FLAMING_POLISHED_STEEL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GREEN_FLAMING_POLISHED_STEEL_VERTICAL_SLAB = ITEMS.register("green_flaming_polished_steel_vertical_slab",
+            () -> new BlockItem(ModBlocks.GREEN_FLAMING_POLISHED_STEEL_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GREEN_FLAMING_POLISHED_STEEL_STAIRS = ITEMS.register("green_flaming_polished_steel_stairs",
+            () -> new BlockItem(ModBlocks.GREEN_FLAMING_POLISHED_STEEL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GREEN_FLAMING_POLISHED_STEEL_WALL = ITEMS.register("green_flaming_polished_steel_wall",
+            () -> new BlockItem(ModBlocks.GREEN_FLAMING_POLISHED_STEEL_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GREEN_FLAMING_PRESSED_STEEL = ITEMS.register("green_flaming_pressed_steel",
+            () -> new BlockItem(ModBlocks.GREEN_FLAMING_PRESSED_STEEL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GREEN_FLAMING_PRESSED_STEEL_SLAB = ITEMS.register("green_flaming_pressed_steel_slab",
+            () -> new BlockItem(ModBlocks.GREEN_FLAMING_PRESSED_STEEL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GREEN_FLAMING_PRESSED_STEEL_VERTICAL_SLAB = ITEMS.register("green_flaming_pressed_steel_vertical_slab",
+            () -> new BlockItem(ModBlocks.GREEN_FLAMING_PRESSED_STEEL_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GREEN_FLAMING_PRESSED_STEEL_STAIRS = ITEMS.register("green_flaming_pressed_steel_stairs",
+            () -> new BlockItem(ModBlocks.GREEN_FLAMING_PRESSED_STEEL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GREEN_FLAMING_PRESSED_STEEL_WALL = ITEMS.register("green_flaming_pressed_steel_wall",
+            () -> new BlockItem(ModBlocks.GREEN_FLAMING_PRESSED_STEEL_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GREEN_FLAMING_STEEL_CASING = ITEMS.register("green_flaming_steel_casing",
+            () -> new BlockItem(ModBlocks.GREEN_FLAMING_STEEL_CASING.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GREEN_FLAMING_STEEL_GRATE = ITEMS.register("green_flaming_steel_grate",
+            () -> new BlockItem(ModBlocks.GREEN_FLAMING_STEEL_GRATE.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GREEN_FLAMING_STEEL_PILLAR = ITEMS.register("green_flaming_steel_pillar",
+            () -> new BlockItem(ModBlocks.GREEN_FLAMING_STEEL_PILLAR.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GREEN_FLAMING_BOLTED_STEEL_PILLAR = ITEMS.register("green_flaming_bolted_steel_pillar",
+            () -> new BlockItem(ModBlocks.GREEN_FLAMING_BOLTED_STEEL_PILLAR.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> RED_FLAMING_STEEL_BLOCK = ITEMS.register("red_flaming_steel_block",
+            () -> new BlockItem(ModBlocks.RED_FLAMING_STEEL_BLOCK.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> RED_FLAMING_STEEL_BLOCK_SLAB = ITEMS.register("red_flaming_steel_block_slab",
+            () -> new BlockItem(ModBlocks.RED_FLAMING_STEEL_BLOCK_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> RED_FLAMING_STEEL_BLOCK_VERTICAL_SLAB = ITEMS.register("red_flaming_steel_block_vertical_slab",
+            () -> new BlockItem(ModBlocks.RED_FLAMING_STEEL_BLOCK_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> RED_FLAMING_STEEL_BLOCK_STAIRS = ITEMS.register("red_flaming_steel_block_stairs",
+            () -> new BlockItem(ModBlocks.RED_FLAMING_STEEL_BLOCK_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> RED_FLAMING_STEEL_BLOCK_WALL = ITEMS.register("red_flaming_steel_block_wall",
+            () -> new BlockItem(ModBlocks.RED_FLAMING_STEEL_BLOCK_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> RED_FLAMING_CUT_STEEL = ITEMS.register("red_flaming_cut_steel",
+            () -> new BlockItem(ModBlocks.RED_FLAMING_CUT_STEEL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> RED_FLAMING_CUT_STEEL_SLAB = ITEMS.register("red_flaming_cut_steel_slab",
+            () -> new BlockItem(ModBlocks.RED_FLAMING_CUT_STEEL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> RED_FLAMING_CUT_STEEL_VERTICAL_SLAB = ITEMS.register("red_flaming_cut_steel_vertical_slab",
+            () -> new BlockItem(ModBlocks.RED_FLAMING_CUT_STEEL_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> RED_FLAMING_CUT_STEEL_STAIRS = ITEMS.register("red_flaming_cut_steel_stairs",
+            () -> new BlockItem(ModBlocks.RED_FLAMING_CUT_STEEL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> RED_FLAMING_CUT_STEEL_WALL = ITEMS.register("red_flaming_cut_steel_wall",
+            () -> new BlockItem(ModBlocks.RED_FLAMING_CUT_STEEL_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> RED_FLAMING_POLISHED_STEEL = ITEMS.register("red_flaming_polished_steel",
+            () -> new BlockItem(ModBlocks.RED_FLAMING_POLISHED_STEEL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> RED_FLAMING_POLISHED_STEEL_SLAB = ITEMS.register("red_flaming_polished_steel_slab",
+            () -> new BlockItem(ModBlocks.RED_FLAMING_POLISHED_STEEL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> RED_FLAMING_POLISHED_STEEL_VERTICAL_SLAB = ITEMS.register("red_flaming_polished_steel_vertical_slab",
+            () -> new BlockItem(ModBlocks.RED_FLAMING_POLISHED_STEEL_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> RED_FLAMING_POLISHED_STEEL_STAIRS = ITEMS.register("red_flaming_polished_steel_stairs",
+            () -> new BlockItem(ModBlocks.RED_FLAMING_POLISHED_STEEL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> RED_FLAMING_POLISHED_STEEL_WALL = ITEMS.register("red_flaming_polished_steel_wall",
+            () -> new BlockItem(ModBlocks.RED_FLAMING_POLISHED_STEEL_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> RED_FLAMING_PRESSED_STEEL = ITEMS.register("red_flaming_pressed_steel",
+            () -> new BlockItem(ModBlocks.RED_FLAMING_PRESSED_STEEL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> RED_FLAMING_PRESSED_STEEL_SLAB = ITEMS.register("red_flaming_pressed_steel_slab",
+            () -> new BlockItem(ModBlocks.RED_FLAMING_PRESSED_STEEL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> RED_FLAMING_PRESSED_STEEL_VERTICAL_SLAB = ITEMS.register("red_flaming_pressed_steel_vertical_slab",
+            () -> new BlockItem(ModBlocks.RED_FLAMING_PRESSED_STEEL_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> RED_FLAMING_PRESSED_STEEL_STAIRS = ITEMS.register("red_flaming_pressed_steel_stairs",
+            () -> new BlockItem(ModBlocks.RED_FLAMING_PRESSED_STEEL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> RED_FLAMING_PRESSED_STEEL_WALL = ITEMS.register("red_flaming_pressed_steel_wall",
+            () -> new BlockItem(ModBlocks.RED_FLAMING_PRESSED_STEEL_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> RED_FLAMING_STEEL_CASING = ITEMS.register("red_flaming_steel_casing",
+            () -> new BlockItem(ModBlocks.RED_FLAMING_STEEL_CASING.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> RED_FLAMING_STEEL_GRATE = ITEMS.register("red_flaming_steel_grate",
+            () -> new BlockItem(ModBlocks.RED_FLAMING_STEEL_GRATE.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> RED_FLAMING_STEEL_PILLAR = ITEMS.register("red_flaming_steel_pillar",
+            () -> new BlockItem(ModBlocks.RED_FLAMING_STEEL_PILLAR.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> RED_FLAMING_BOLTED_STEEL_PILLAR = ITEMS.register("red_flaming_bolted_steel_pillar",
+            () -> new BlockItem(ModBlocks.RED_FLAMING_BOLTED_STEEL_PILLAR.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BLACK_FLAMING_STEEL_BLOCK = ITEMS.register("black_flaming_steel_block",
+            () -> new BlockItem(ModBlocks.BLACK_FLAMING_STEEL_BLOCK.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BLACK_FLAMING_STEEL_BLOCK_SLAB = ITEMS.register("black_flaming_steel_block_slab",
+            () -> new BlockItem(ModBlocks.BLACK_FLAMING_STEEL_BLOCK_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BLACK_FLAMING_STEEL_BLOCK_VERTICAL_SLAB = ITEMS.register("black_flaming_steel_block_vertical_slab",
+            () -> new BlockItem(ModBlocks.BLACK_FLAMING_STEEL_BLOCK_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BLACK_FLAMING_STEEL_BLOCK_STAIRS = ITEMS.register("black_flaming_steel_block_stairs",
+            () -> new BlockItem(ModBlocks.BLACK_FLAMING_STEEL_BLOCK_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BLACK_FLAMING_STEEL_BLOCK_WALL = ITEMS.register("black_flaming_steel_block_wall",
+            () -> new BlockItem(ModBlocks.BLACK_FLAMING_STEEL_BLOCK_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BLACK_FLAMING_CUT_STEEL = ITEMS.register("black_flaming_cut_steel",
+            () -> new BlockItem(ModBlocks.BLACK_FLAMING_CUT_STEEL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BLACK_FLAMING_CUT_STEEL_SLAB = ITEMS.register("black_flaming_cut_steel_slab",
+            () -> new BlockItem(ModBlocks.BLACK_FLAMING_CUT_STEEL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BLACK_FLAMING_CUT_STEEL_VERTICAL_SLAB = ITEMS.register("black_flaming_cut_steel_vertical_slab",
+            () -> new BlockItem(ModBlocks.BLACK_FLAMING_CUT_STEEL_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BLACK_FLAMING_CUT_STEEL_STAIRS = ITEMS.register("black_flaming_cut_steel_stairs",
+            () -> new BlockItem(ModBlocks.BLACK_FLAMING_CUT_STEEL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BLACK_FLAMING_CUT_STEEL_WALL = ITEMS.register("black_flaming_cut_steel_wall",
+            () -> new BlockItem(ModBlocks.BLACK_FLAMING_CUT_STEEL_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BLACK_FLAMING_POLISHED_STEEL = ITEMS.register("black_flaming_polished_steel",
+            () -> new BlockItem(ModBlocks.BLACK_FLAMING_POLISHED_STEEL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BLACK_FLAMING_POLISHED_STEEL_SLAB = ITEMS.register("black_flaming_polished_steel_slab",
+            () -> new BlockItem(ModBlocks.BLACK_FLAMING_POLISHED_STEEL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BLACK_FLAMING_POLISHED_STEEL_VERTICAL_SLAB = ITEMS.register("black_flaming_polished_steel_vertical_slab",
+            () -> new BlockItem(ModBlocks.BLACK_FLAMING_POLISHED_STEEL_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BLACK_FLAMING_POLISHED_STEEL_STAIRS = ITEMS.register("black_flaming_polished_steel_stairs",
+            () -> new BlockItem(ModBlocks.BLACK_FLAMING_POLISHED_STEEL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BLACK_FLAMING_POLISHED_STEEL_WALL = ITEMS.register("black_flaming_polished_steel_wall",
+            () -> new BlockItem(ModBlocks.BLACK_FLAMING_POLISHED_STEEL_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BLACK_FLAMING_PRESSED_STEEL = ITEMS.register("black_flaming_pressed_steel",
+            () -> new BlockItem(ModBlocks.BLACK_FLAMING_PRESSED_STEEL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BLACK_FLAMING_PRESSED_STEEL_SLAB = ITEMS.register("black_flaming_pressed_steel_slab",
+            () -> new BlockItem(ModBlocks.BLACK_FLAMING_PRESSED_STEEL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BLACK_FLAMING_PRESSED_STEEL_VERTICAL_SLAB = ITEMS.register("black_flaming_pressed_steel_vertical_slab",
+            () -> new BlockItem(ModBlocks.BLACK_FLAMING_PRESSED_STEEL_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BLACK_FLAMING_PRESSED_STEEL_STAIRS = ITEMS.register("black_flaming_pressed_steel_stairs",
+            () -> new BlockItem(ModBlocks.BLACK_FLAMING_PRESSED_STEEL_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BLACK_FLAMING_PRESSED_STEEL_WALL = ITEMS.register("black_flaming_pressed_steel_wall",
+            () -> new BlockItem(ModBlocks.BLACK_FLAMING_PRESSED_STEEL_WALL.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BLACK_FLAMING_STEEL_CASING = ITEMS.register("black_flaming_steel_casing",
+            () -> new BlockItem(ModBlocks.BLACK_FLAMING_STEEL_CASING.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BLACK_FLAMING_STEEL_GRATE = ITEMS.register("black_flaming_steel_grate",
+            () -> new BlockItem(ModBlocks.BLACK_FLAMING_STEEL_GRATE.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BLACK_FLAMING_STEEL_PILLAR = ITEMS.register("black_flaming_steel_pillar",
+            () -> new BlockItem(ModBlocks.BLACK_FLAMING_STEEL_PILLAR.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BLACK_FLAMING_BOLTED_STEEL_PILLAR = ITEMS.register("black_flaming_bolted_steel_pillar",
+            () -> new BlockItem(ModBlocks.BLACK_FLAMING_BOLTED_STEEL_PILLAR.get(), createBlockItemProperties()));
+
+
+    public static final RegistryObject<Item> HOLLOW_OAK_LOG = ITEMS.register("hollow_oak_log",
+            () -> new BlockItem(ModBlocks.HOLLOW_OAK_LOG.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> STRIPPED_HOLLOW_OAK_LOG = ITEMS.register("stripped_hollow_oak_log",
+            () -> new BlockItem(ModBlocks.STRIPPED_HOLLOW_OAK_LOG.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> HOLLOW_SPRUCE_LOG = ITEMS.register("hollow_spruce_log",
+            () -> new BlockItem(ModBlocks.HOLLOW_SPRUCE_LOG.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> STRIPPED_HOLLOW_SPRUCE_LOG = ITEMS.register("stripped_hollow_spruce_log",
+            () -> new BlockItem(ModBlocks.STRIPPED_HOLLOW_SPRUCE_LOG.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> HOLLOW_BIRCH_LOG = ITEMS.register("hollow_birch_log",
+            () -> new BlockItem(ModBlocks.HOLLOW_BIRCH_LOG.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> STRIPPED_HOLLOW_BIRCH_LOG = ITEMS.register("stripped_hollow_birch_log",
+            () -> new BlockItem(ModBlocks.STRIPPED_HOLLOW_BIRCH_LOG.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> HOLLOW_JUNGLE_LOG = ITEMS.register("hollow_jungle_log",
+            () -> new BlockItem(ModBlocks.HOLLOW_JUNGLE_LOG.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> STRIPPED_HOLLOW_JUNGLE_LOG = ITEMS.register("stripped_hollow_jungle_log",
+            () -> new BlockItem(ModBlocks.STRIPPED_HOLLOW_JUNGLE_LOG.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> HOLLOW_ACACIA_LOG = ITEMS.register("hollow_acacia_log",
+            () -> new BlockItem(ModBlocks.HOLLOW_ACACIA_LOG.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> STRIPPED_HOLLOW_ACACIA_LOG = ITEMS.register("stripped_hollow_acacia_log",
+            () -> new BlockItem(ModBlocks.STRIPPED_HOLLOW_ACACIA_LOG.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> HOLLOW_DARK_OAK_LOG = ITEMS.register("hollow_dark_oak_log",
+            () -> new BlockItem(ModBlocks.HOLLOW_DARK_OAK_LOG.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> STRIPPED_HOLLOW_DARK_OAK_LOG = ITEMS.register("stripped_hollow_dark_oak_log",
+            () -> new BlockItem(ModBlocks.STRIPPED_HOLLOW_DARK_OAK_LOG.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> HOLLOW_CRIMSON_STEM = ITEMS.register("hollow_crimson_stem",
+            () -> new BlockItem(ModBlocks.HOLLOW_CRIMSON_STEM.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> STRIPPED_HOLLOW_CRIMSON_STEM = ITEMS.register("stripped_hollow_crimson_stem",
+            () -> new BlockItem(ModBlocks.STRIPPED_HOLLOW_CRIMSON_STEM.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> HOLLOW_WARPED_STEM = ITEMS.register("hollow_warped_stem",
+            () -> new BlockItem(ModBlocks.HOLLOW_WARPED_STEM.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> STRIPPED_HOLLOW_WARPED_STEM = ITEMS.register("stripped_hollow_warped_stem",
+            () -> new BlockItem(ModBlocks.STRIPPED_HOLLOW_WARPED_STEM.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> HOLLOW_MANGROVE_LOG = ITEMS.register("hollow_mangrove_log",
+            () -> new BlockItem(ModBlocks.HOLLOW_MANGROVE_LOG.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> STRIPPED_HOLLOW_MANGROVE_LOG = ITEMS.register("stripped_hollow_mangrove_log",
+            () -> new BlockItem(ModBlocks.STRIPPED_HOLLOW_MANGROVE_LOG.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> HOLLOW_ASHPEN_LOG = ITEMS.register("hollow_ashpen_log",
+            () -> new BlockItem(ModBlocks.HOLLOW_ASHPEN_LOG.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> STRIPPED_HOLLOW_ASHPEN_LOG = ITEMS.register("stripped_hollow_ashpen_log",
+            () -> new BlockItem(ModBlocks.STRIPPED_HOLLOW_ASHPEN_LOG.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> HOLLOW_POPLAR_LOG = ITEMS.register("hollow_poplar_log",
+            () -> new BlockItem(ModBlocks.HOLLOW_POPLAR_LOG.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> STRIPPED_HOLLOW_POPLAR_LOG = ITEMS.register("stripped_hollow_poplar_log",
+            () -> new BlockItem(ModBlocks.STRIPPED_HOLLOW_POPLAR_LOG.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> HOLLOW_PALE_OAK_LOG = ITEMS.register("hollow_pale_oak_log",
+            () -> new BlockItem(ModBlocks.HOLLOW_PALE_OAK_LOG.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> STRIPPED_HOLLOW_PALE_OAK_LOG = ITEMS.register("stripped_hollow_pale_oak_log",
+            () -> new BlockItem(ModBlocks.STRIPPED_HOLLOW_PALE_OAK_LOG.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> HOLLOW_CHERRY_LOG = ITEMS.register("hollow_cherry_log",
+            () -> new BlockItem(ModBlocks.HOLLOW_CHERRY_LOG.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> STRIPPED_HOLLOW_CHERRY_LOG = ITEMS.register("stripped_hollow_cherry_log",
+            () -> new BlockItem(ModBlocks.STRIPPED_HOLLOW_CHERRY_LOG.get(), createBlockItemProperties()));
 }
 
 

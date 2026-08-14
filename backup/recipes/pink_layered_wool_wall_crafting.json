@@ -1,0 +1,17 @@
+{
+  "key": {
+    "#": {
+      "item": "buildscape:pink_layered_wool"
+    }
+  },
+  "category": "building",
+  "pattern": [
+    "###",
+    "###"
+  ],
+  "result": {
+    "count": 6,
+    "item": "buildscape:pink_layered_wool_wall"
+  },
+  "type": "minecraft:crafting_shaped"
+}

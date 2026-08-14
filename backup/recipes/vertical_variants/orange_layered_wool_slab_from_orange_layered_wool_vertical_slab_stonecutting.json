@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "buildscape:orange_layered_wool_vertical_slab"
+  },
+  "result": "buildscape:orange_layered_wool_slab",
+  "count": 1
+}

@@ -2,16 +2,22 @@ package com.kingodogo.buildscape.particle;
 
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.*;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.util.Mth;
+import com.kingodogo.buildscape.block.ModBlocks;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT)
 public class FireflyParticle extends TextureSheetParticle {
 
+    private static final java.util.Map<BlockPos, Integer> BUSH_PARTICLE_COUNTS = new java.util.HashMap<>();
+    private static final java.util.Map<BlockPos, Integer> BUSH_LIMITS = new java.util.HashMap<>();
+
     private final SpriteSet sprites;
     private final float baseAlpha;
+    private BlockPos spawnedBushPos;
 
     protected FireflyParticle(ClientLevel level, double x, double y, double z,
                               double xSpeed, double ySpeed, double zSpeed,
@@ -19,8 +25,8 @@ public class FireflyParticle extends TextureSheetParticle {
         super(level, x, y, z, xSpeed, ySpeed, zSpeed);
         this.sprites = sprites;
 
-        // Vanilla-like lifetime: 40-80 ticks (2-4 seconds)
-        this.lifetime = 40 + level.random.nextInt(40);
+        // Custom lifetime: 200-300 game ticks (10-15 seconds)
+        this.lifetime = 200 + level.random.nextInt(101);
         this.gravity = 0.0F;
         this.hasPhysics = false;
 
@@ -29,18 +35,44 @@ public class FireflyParticle extends TextureSheetParticle {
         this.yd = ySpeed;
         this.zd = zSpeed;
 
-        // Small particle size
-        this.quadSize = 0.025F + level.random.nextFloat() * 0.02F;
+        // Small particle size - increased to 0.08F-0.13F as requested
+        this.quadSize = 0.08F + level.random.nextFloat() * 0.05F;
 
         // Start invisible, fade in then out
-        this.baseAlpha = 0.8F + level.random.nextFloat() * 0.2F;
+        this.baseAlpha = 1.0F;
         this.alpha = 0.0F;
 
-        // Warm yellowish-green glow color, like a real firefly
-        float greenVariation = 0.9F + level.random.nextFloat() * 0.1F;
-        this.setColor(1.0F, greenVariation, 0.3F + level.random.nextFloat() * 0.2F);
+        // Opaque pale yellow glow color, like requested
+        float greenVariation = 0.92F + level.random.nextFloat() * 0.06F;
+        float blueVariation = 0.55F + level.random.nextFloat() * 0.15F;
+        this.setColor(1.0F, greenVariation, blueVariation);
 
         this.pickSprite(sprites);
+
+        // Find nearest firefly bush within 6 blocks
+        BlockPos bushPos = null;
+        double minDst = Double.MAX_VALUE;
+        BlockPos particlePos = new BlockPos((int) x, (int) y, (int) z);
+        for (BlockPos p : BlockPos.betweenClosed(particlePos.offset(-6, -6, -6), particlePos.offset(6, 6, 6))) {
+            if (level.getBlockState(p).is(ModBlocks.FIREFLY_BUSH.get())) {
+                double dst = p.distSqr(particlePos);
+                if (dst < minDst) {
+                    minDst = dst;
+                    bushPos = p.immutable();
+                }
+            }
+        }
+
+        if (bushPos != null) {
+            this.spawnedBushPos = bushPos;
+            int limit = BUSH_LIMITS.computeIfAbsent(bushPos, k -> 30 + level.random.nextInt(21));
+            int currentCount = BUSH_PARTICLE_COUNTS.getOrDefault(bushPos, 0);
+            if (currentCount >= limit) {
+                this.remove();
+                return;
+            }
+            BUSH_PARTICLE_COUNTS.put(bushPos, currentCount + 1);
+        }
     }
 
     @Override
@@ -68,18 +100,31 @@ public class FireflyParticle extends TextureSheetParticle {
 
         // Fade in/out: smooth pulse
         float progress = (float) this.age / (float) this.lifetime;
-        if (progress < 0.2F) {
-            // Fade in over first 20%
-            this.alpha = this.baseAlpha * (progress / 0.2F);
+        if (progress < 0.3F) {
+            // Fade in over first 30%
+            this.alpha = this.baseAlpha * (progress / 0.3F);
         } else if (progress > 0.7F) {
             // Fade out over last 30%
-            this.alpha = this.baseAlpha * (1.0F - (progress - 0.7F) / 0.3F);
+            this.alpha = this.baseAlpha * ((1.0F - progress) / 0.3F);
         } else {
-            // Full visibility with slight pulsing
-            float pulse = (float) Math.sin(this.age * 0.3) * 0.15F;
-            this.alpha = this.baseAlpha + pulse;
+            // Remain fully opaque
+            this.alpha = this.baseAlpha;
         }
         this.alpha = Mth.clamp(this.alpha, 0.0F, 1.0F);
+    }
+
+    @Override
+    public void remove() {
+        super.remove();
+        if (this.spawnedBushPos != null) {
+            int currentCount = BUSH_PARTICLE_COUNTS.getOrDefault(this.spawnedBushPos, 0);
+            if (currentCount > 1) {
+                BUSH_PARTICLE_COUNTS.put(this.spawnedBushPos, currentCount - 1);
+            } else {
+                BUSH_PARTICLE_COUNTS.remove(this.spawnedBushPos);
+                BUSH_LIMITS.remove(this.spawnedBushPos);
+            }
+        }
     }
 
     @Override

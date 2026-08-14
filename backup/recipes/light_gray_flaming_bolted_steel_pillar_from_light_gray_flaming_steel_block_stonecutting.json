@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": {
+    "item": "buildscape:light_gray_flaming_steel_block"
+  },
+  "result": "buildscape:light_gray_flaming_bolted_steel_pillar",
+  "count": 1
+}

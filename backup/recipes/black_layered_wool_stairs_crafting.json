@@ -1,0 +1,18 @@
+{
+  "key": {
+    "#": {
+      "item": "buildscape:black_layered_wool"
+    }
+  },
+  "category": "building",
+  "pattern": [
+    "#  ",
+    "## ",
+    "###"
+  ],
+  "result": {
+    "count": 4,
+    "item": "buildscape:black_layered_wool_stairs"
+  },
+  "type": "minecraft:crafting_shaped"
+}

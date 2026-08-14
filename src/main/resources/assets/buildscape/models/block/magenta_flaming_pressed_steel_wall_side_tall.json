@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/template_wall_side_tall",
+  "textures": {
+    "wall": "buildscape:block/magenta_flaming_pressed_steel",
+    "particle": "buildscape:block/magenta_flaming_pressed_steel"
+  }
+}

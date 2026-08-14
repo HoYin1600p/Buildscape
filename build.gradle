@@ -136,19 +136,7 @@ tasks.named('processResources', ProcessResources).configure {
         expand replaceProperties + [project: project]
     }
 
-    doLast {
-        [
-                new File(destinationDir, "assets/${mod_id}/models"),
-                new File(destinationDir, "assets/${mod_id}/blockstates")
-        ].each { resourceRoot ->
-            if (resourceRoot.isDirectory()) {
-                fileTree(resourceRoot).matching { include '**/*.json' }.each { jsonFile ->
-                    def parsed = new groovy.json.JsonSlurper().parseText(jsonFile.getText('UTF-8'))
-                    jsonFile.setText(groovy.json.JsonOutput.toJson(parsed), 'UTF-8')
-                }
-            }
-        }
-    }
+    // Temporarily disabled for testing
 }
 
 

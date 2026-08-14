@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "building",
+  "ingredients": [
+    {
+      "item": "buildscape:purple_layered_wool_slab"
+    }
+  ],
+  "result": {
+    "item": "buildscape:purple_layered_wool_vertical_slab",
+    "count": 1
+  }
+}

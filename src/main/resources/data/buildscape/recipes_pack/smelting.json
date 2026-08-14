@@ -1,0 +1,20 @@
+{
+  "aliases": {
+    "BS": "buildscape:",
+    "MC": "minecraft:",
+    "F": "forge:"
+  },
+  "smelting": [
+    ["BS:black_smooth_sandstone", "BS:black_sandstone", 1],
+    ["BS:blue_smooth_sandstone", "BS:blue_sandstone", 1],
+    ["BS:green_smooth_sandstone", "BS:green_sandstone", 1],
+    ["BS:leaf_litter", "#MC:leaves", 1],
+    ["BS:orange_smooth_sandstone", "BS:orange_sandstone", 1],
+    ["BS:pink_smooth_sandstone", "BS:pink_sandstone", 1],
+    ["BS:red_smooth_sandstone", "BS:red_sandstone", 1],
+    ["BS:steel_block", "MC:iron_block", 1],
+    ["BS:steel_ingot", "MC:iron_ingot", 1],
+    ["BS:white_smooth_sandstone", "BS:white_sandstone", 1],
+    ["BS:yellow_smooth_sandstone", "BS:yellow_sandstone", 1]
+  ]
+}

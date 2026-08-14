@@ -1,0 +1,10 @@
+{
+  "aliases": {
+    "BS": "buildscape:",
+    "MC": "minecraft:",
+    "F": "forge:"
+  },
+  "smithing": [
+    ["BS:netherite_hammer", "BS:diamond_hammer", "MC:netherite_ingot"]
+  ]
+}

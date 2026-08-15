@@ -111,7 +111,7 @@ public class BuildScapeRecipeLoader implements PreparableReloadListener {
         if (resourceManager.hasResource(bundledLocation)) {
             try {
                 Resource res = resourceManager.getResource(bundledLocation);
-                List<Recipe<?>> bundled = BinaryRecipeCache.loadCacheFromStream(res.getInputStream());
+                List<Recipe<?>> bundled = BinaryRecipeCache.loadCacheFromStream(res.getInputStream(), contentHash);
                 if (!bundled.isEmpty()) {
                     loadedRecipes.addAll(bundled);
                     profiler.pop();
@@ -126,7 +126,7 @@ public class BuildScapeRecipeLoader implements PreparableReloadListener {
         // Step 2B: Check Local Disk Binary Cache
         if (BinaryRecipeCache.isCacheValid(contentHash)) {
             BuildScape.LOGGER.debug("BDRE Loader: Cache HIT! Fast-loading recipes from local binary cache...");
-            List<Recipe<?>> cached = BinaryRecipeCache.loadCache();
+            List<Recipe<?>> cached = BinaryRecipeCache.loadCache(contentHash);
             if (!cached.isEmpty()) {
                 loadedRecipes.addAll(cached);
                 profiler.pop();

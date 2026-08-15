@@ -25,7 +25,7 @@ import java.util.*;
 public class BinaryRecipeCache {
 
     private static final int MAGIC_HEADER = 0x42534342; // "BSCB"
-    private static final int CACHE_VERSION = 3;
+    private static final int CACHE_VERSION = 4;
 
     public static Path getCacheDir() {
         Path dir = FMLPaths.GAMEDIR.get().resolve("buildscape").resolve("cache");
@@ -86,6 +86,7 @@ public class BinaryRecipeCache {
                  DataOutputStream out = new DataOutputStream(finalOut)) {
                 out.writeInt(MAGIC_HEADER);
                 out.writeInt(CACHE_VERSION);
+                out.writeUTF(hash != null ? hash : "");
 
                 out.writeInt(stringPool.size());
                 for (String s : stringPool) {
@@ -113,19 +114,19 @@ public class BinaryRecipeCache {
         }
     }
 
-    public static List<Recipe<?>> loadCache() {
+    public static List<Recipe<?>> loadCache(String expectedHash) {
         Path cacheFile = getCacheDir().resolve("recipes.bscb");
         if (!Files.exists(cacheFile)) {
             return new ArrayList<>();
         }
         try {
-            return loadCacheFromStream(Files.newInputStream(cacheFile));
+            return loadCacheFromStream(Files.newInputStream(cacheFile), expectedHash);
         } catch (IOException e) {
             return new ArrayList<>();
         }
     }
 
-    public static List<Recipe<?>> loadCacheFromStream(InputStream rawStream) {
+    public static List<Recipe<?>> loadCacheFromStream(InputStream rawStream, String expectedHash) {
         List<Recipe<?>> recipes = new ArrayList<>();
         if (rawStream == null) {
             return recipes;
@@ -136,6 +137,12 @@ public class BinaryRecipeCache {
             int version = in.readInt();
             if (header != MAGIC_HEADER || version != CACHE_VERSION) {
                 BuildScape.LOGGER.warn("BDRE Binary Cache stream version mismatch.");
+                return recipes;
+            }
+
+            String cachedHash = in.readUTF();
+            if (expectedHash != null && !expectedHash.isBlank() && !expectedHash.equals(cachedHash)) {
+                BuildScape.LOGGER.warn("BDRE Binary Cache content hash mismatch; recompiling from source recipes.");
                 return recipes;
             }
 
@@ -282,14 +289,14 @@ public class BinaryRecipeCache {
             out.writeInt(campfire.getCookingTime());
         } else if (recipe instanceof UpgradeRecipe smithing) {
             out.writeByte(8); // Smithing
-            writeIngredient(out, getSafeIngredient(smithing, 0), stringPool, stringMap);
-            writeIngredient(out, getSafeIngredient(smithing, 1), stringPool, stringMap);
+            writeIngredient(out, smithing.base, stringPool, stringMap);
+            writeIngredient(out, smithing.addition, stringPool, stringMap);
         } else if (recipe instanceof com.kingodogo.buildscape.recipe.ConfettiConfigureRecipe) {
             out.writeByte(11); // Confetti Configure
         } else if (recipe instanceof com.kingodogo.buildscape.recipe.ClearShulkerFiltersRecipe) {
             out.writeByte(12); // Clear Shulker Filters
         } else {
-            out.writeByte(0); // Generic / Unsupported custom binary
+            throw new IOException("Unsupported recipe class for BDRE cache: " + recipe.getClass().getName());
         }
     }
 

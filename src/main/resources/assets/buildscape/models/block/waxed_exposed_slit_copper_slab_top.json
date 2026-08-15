@@ -1,0 +1,9 @@
+﻿{
+  "parent": "minecraft:block/slab_top",
+  "textures": {
+    "bottom": "buildscape:block/exposed_slit_copper",
+    "top": "buildscape:block/exposed_slit_copper",
+    "side": "buildscape:block/exposed_slit_copper",
+    "particle": "#side"
+  }
+}

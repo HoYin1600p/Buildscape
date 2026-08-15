@@ -9940,6 +9940,42 @@ public class ModItems {
     public static final RegistryObject<Item> WAXED_OXIDIZED_COPPER_LANTERN = ITEMS.register("waxed_oxidized_copper_lantern", () -> new BlockItem(ModBlocks.WAXED_OXIDIZED_COPPER_LANTERN.get(), createBlockItemProperties()));
 
     // --- COPPER EXPANSION ITEMS ---
+    public static final RegistryObject<Item> SLIT_COPPER = ITEMS.register("slit_copper", () -> new BlockItem(ModBlocks.SLIT_COPPER.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WAXED_SLIT_COPPER = ITEMS.register("waxed_slit_copper", () -> new BlockItem(ModBlocks.WAXED_SLIT_COPPER.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> EXPOSED_SLIT_COPPER = ITEMS.register("exposed_slit_copper", () -> new BlockItem(ModBlocks.EXPOSED_SLIT_COPPER.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WAXED_EXPOSED_SLIT_COPPER = ITEMS.register("waxed_exposed_slit_copper", () -> new BlockItem(ModBlocks.WAXED_EXPOSED_SLIT_COPPER.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WEATHERED_SLIT_COPPER = ITEMS.register("weathered_slit_copper", () -> new BlockItem(ModBlocks.WEATHERED_SLIT_COPPER.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WAXED_WEATHERED_SLIT_COPPER = ITEMS.register("waxed_weathered_slit_copper", () -> new BlockItem(ModBlocks.WAXED_WEATHERED_SLIT_COPPER.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> OXIDIZED_SLIT_COPPER = ITEMS.register("oxidized_slit_copper", () -> new BlockItem(ModBlocks.OXIDIZED_SLIT_COPPER.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WAXED_OXIDIZED_SLIT_COPPER = ITEMS.register("waxed_oxidized_slit_copper", () -> new BlockItem(ModBlocks.WAXED_OXIDIZED_SLIT_COPPER.get(), createBlockItemProperties()));
+
+    public static final RegistryObject<Item> SLIT_COPPER_STAIRS = ITEMS.register("slit_copper_stairs", () -> new BlockItem(ModBlocks.SLIT_COPPER_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WAXED_SLIT_COPPER_STAIRS = ITEMS.register("waxed_slit_copper_stairs", () -> new BlockItem(ModBlocks.WAXED_SLIT_COPPER_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> EXPOSED_SLIT_COPPER_STAIRS = ITEMS.register("exposed_slit_copper_stairs", () -> new BlockItem(ModBlocks.EXPOSED_SLIT_COPPER_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WAXED_EXPOSED_SLIT_COPPER_STAIRS = ITEMS.register("waxed_exposed_slit_copper_stairs", () -> new BlockItem(ModBlocks.WAXED_EXPOSED_SLIT_COPPER_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WEATHERED_SLIT_COPPER_STAIRS = ITEMS.register("weathered_slit_copper_stairs", () -> new BlockItem(ModBlocks.WEATHERED_SLIT_COPPER_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WAXED_WEATHERED_SLIT_COPPER_STAIRS = ITEMS.register("waxed_weathered_slit_copper_stairs", () -> new BlockItem(ModBlocks.WAXED_WEATHERED_SLIT_COPPER_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> OXIDIZED_SLIT_COPPER_STAIRS = ITEMS.register("oxidized_slit_copper_stairs", () -> new BlockItem(ModBlocks.OXIDIZED_SLIT_COPPER_STAIRS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WAXED_OXIDIZED_SLIT_COPPER_STAIRS = ITEMS.register("waxed_oxidized_slit_copper_stairs", () -> new BlockItem(ModBlocks.WAXED_OXIDIZED_SLIT_COPPER_STAIRS.get(), createBlockItemProperties()));
+
+    public static final RegistryObject<Item> SLIT_COPPER_SLAB = ITEMS.register("slit_copper_slab", () -> new BlockItem(ModBlocks.SLIT_COPPER_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WAXED_SLIT_COPPER_SLAB = ITEMS.register("waxed_slit_copper_slab", () -> new BlockItem(ModBlocks.WAXED_SLIT_COPPER_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> EXPOSED_SLIT_COPPER_SLAB = ITEMS.register("exposed_slit_copper_slab", () -> new BlockItem(ModBlocks.EXPOSED_SLIT_COPPER_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WAXED_EXPOSED_SLIT_COPPER_SLAB = ITEMS.register("waxed_exposed_slit_copper_slab", () -> new BlockItem(ModBlocks.WAXED_EXPOSED_SLIT_COPPER_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WEATHERED_SLIT_COPPER_SLAB = ITEMS.register("weathered_slit_copper_slab", () -> new BlockItem(ModBlocks.WEATHERED_SLIT_COPPER_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WAXED_WEATHERED_SLIT_COPPER_SLAB = ITEMS.register("waxed_weathered_slit_copper_slab", () -> new BlockItem(ModBlocks.WAXED_WEATHERED_SLIT_COPPER_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> OXIDIZED_SLIT_COPPER_SLAB = ITEMS.register("oxidized_slit_copper_slab", () -> new BlockItem(ModBlocks.OXIDIZED_SLIT_COPPER_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WAXED_OXIDIZED_SLIT_COPPER_SLAB = ITEMS.register("waxed_oxidized_slit_copper_slab", () -> new BlockItem(ModBlocks.WAXED_OXIDIZED_SLIT_COPPER_SLAB.get(), createBlockItemProperties()));
+
+    public static final RegistryObject<Item> SLIT_COPPER_VERTICAL_SLAB = ITEMS.register("slit_copper_vertical_slab", () -> new BlockItem(ModBlocks.SLIT_COPPER_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WAXED_SLIT_COPPER_VERTICAL_SLAB = ITEMS.register("waxed_slit_copper_vertical_slab", () -> new BlockItem(ModBlocks.WAXED_SLIT_COPPER_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> EXPOSED_SLIT_COPPER_VERTICAL_SLAB = ITEMS.register("exposed_slit_copper_vertical_slab", () -> new BlockItem(ModBlocks.EXPOSED_SLIT_COPPER_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WAXED_EXPOSED_SLIT_COPPER_VERTICAL_SLAB = ITEMS.register("waxed_exposed_slit_copper_vertical_slab", () -> new BlockItem(ModBlocks.WAXED_EXPOSED_SLIT_COPPER_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WEATHERED_SLIT_COPPER_VERTICAL_SLAB = ITEMS.register("weathered_slit_copper_vertical_slab", () -> new BlockItem(ModBlocks.WEATHERED_SLIT_COPPER_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WAXED_WEATHERED_SLIT_COPPER_VERTICAL_SLAB = ITEMS.register("waxed_weathered_slit_copper_vertical_slab", () -> new BlockItem(ModBlocks.WAXED_WEATHERED_SLIT_COPPER_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> OXIDIZED_SLIT_COPPER_VERTICAL_SLAB = ITEMS.register("oxidized_slit_copper_vertical_slab", () -> new BlockItem(ModBlocks.OXIDIZED_SLIT_COPPER_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WAXED_OXIDIZED_SLIT_COPPER_VERTICAL_SLAB = ITEMS.register("waxed_oxidized_slit_copper_vertical_slab", () -> new BlockItem(ModBlocks.WAXED_OXIDIZED_SLIT_COPPER_VERTICAL_SLAB.get(), createBlockItemProperties()));
+
     public static final RegistryObject<Item> CHISELED_COPPER = ITEMS.register("chiseled_copper", () -> new BlockItem(ModBlocks.CHISELED_COPPER.get(), createBlockItemProperties()));
     public static final RegistryObject<Item> WAXED_CHISELED_COPPER = ITEMS.register("waxed_chiseled_copper", () -> new BlockItem(ModBlocks.WAXED_CHISELED_COPPER.get(), createBlockItemProperties()));
     public static final RegistryObject<Item> EXPOSED_CHISELED_COPPER = ITEMS.register("exposed_chiseled_copper", () -> new BlockItem(ModBlocks.EXPOSED_CHISELED_COPPER.get(), createBlockItemProperties()));

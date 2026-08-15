@@ -51,6 +51,7 @@ public class RecipeIR {
 
     public record ResultSpec(
             String item,
-            int count
+            int count,
+            String nbt
     ) {}
 }

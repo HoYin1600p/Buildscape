@@ -5,7 +5,7 @@
     "F": "forge:"
   },
   "blasting": [
-    ["BS:steel_block", "MC:iron_block", 1],
-    ["BS:steel_ingot", "MC:iron_ingot", 1]
+    {"id":"steel_block_from_iron_block_blasting","input":"minecraft:iron_block","result":{"item":"buildscape:steel_block","count":1},"experience":0.7,"cookingTime":100},
+    {"id":"steel_ingot_from_iron_ingot_blasting","input":"minecraft:iron_ingot","result":{"item":"buildscape:steel_ingot","count":1},"experience":0.7,"cookingTime":100}
   ]
 }

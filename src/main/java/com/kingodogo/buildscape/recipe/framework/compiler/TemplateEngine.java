@@ -51,7 +51,7 @@ public class TemplateEngine {
         }
 
         int finalCount = outputCount > 0 ? outputCount : (template.result() != null ? template.result().count() : 1);
-        RecipeIR.ResultSpec result = new RecipeIR.ResultSpec(outputItem, finalCount);
+        RecipeIR.ResultSpec result = new RecipeIR.ResultSpec(outputItem, finalCount, null);
 
         return new RecipeIR.RecipeSpec(
                 recipeId,

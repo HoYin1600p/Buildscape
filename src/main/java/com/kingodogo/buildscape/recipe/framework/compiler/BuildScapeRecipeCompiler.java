@@ -119,6 +119,14 @@ public class BuildScapeRecipeCompiler {
             return null;
         }
         ItemStack resultStack = new ItemStack(resultItem, spec.result().count());
+        if (spec.result().nbt() != null && !spec.result().nbt().isBlank()) {
+            try {
+                resultStack.setTag(net.minecraft.nbt.TagParser.parseTag(spec.result().nbt()));
+            } catch (com.mojang.brigadier.exceptions.CommandSyntaxException e) {
+                BuildScape.LOGGER.warn("BDRE Compiler: Invalid result NBT for recipe {}", spec.id(), e);
+                return null;
+            }
+        }
         String group = spec.group() != null ? spec.group() : "";
 
         String recipeType = spec.type() != null ? spec.type().toLowerCase(Locale.ROOT) : category.toLowerCase(Locale.ROOT);

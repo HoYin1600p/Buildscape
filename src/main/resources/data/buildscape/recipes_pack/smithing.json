@@ -5,6 +5,7 @@
     "F": "forge:"
   },
   "smithing": [
-    ["BS:netherite_hammer", "BS:diamond_hammer", "MC:netherite_ingot"]
+    {"id":"netherite_biome_brush_smithing","input":"buildscape:diamond_biome_brush","ingredients":["minecraft:netherite_ingot"],"result":{"item":"buildscape:netherite_biome_brush","count":1}},
+    {"id":"netherite_hammer_smithing","input":"buildscape:diamond_hammer","ingredients":["minecraft:netherite_ingot"],"result":{"item":"buildscape:netherite_hammer","count":1}}
   ]
 }

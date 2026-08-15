@@ -25,7 +25,7 @@ import java.util.*;
 public class BinaryRecipeCache {
 
     private static final int MAGIC_HEADER = 0x42534342; // "BSCB"
-    private static final int CACHE_VERSION = 2;
+    private static final int CACHE_VERSION = 3;
 
     public static Path getCacheDir() {
         Path dir = FMLPaths.GAMEDIR.get().resolve("buildscape").resolve("cache");
@@ -222,6 +222,8 @@ public class BinaryRecipeCache {
         out.writeInt(getStringIndex(groupStr, stringPool, stringMap));
         out.writeInt(getStringIndex(resultStr, stringPool, stringMap));
         out.writeInt(recipe.getResultItem().getCount());
+        String resultNbt = recipe.getResultItem().hasTag() ? recipe.getResultItem().getTag().toString() : "";
+        out.writeInt(getStringIndex(resultNbt, stringPool, stringMap));
 
         if (recipe instanceof com.kingodogo.buildscape.recipe.ShapedDurabilityRecipe sdr) {
             out.writeByte(9); // Type Shaped Durability
@@ -284,6 +286,8 @@ public class BinaryRecipeCache {
             writeIngredient(out, getSafeIngredient(smithing, 1), stringPool, stringMap);
         } else if (recipe instanceof com.kingodogo.buildscape.recipe.ConfettiConfigureRecipe) {
             out.writeByte(11); // Confetti Configure
+        } else if (recipe instanceof com.kingodogo.buildscape.recipe.ClearShulkerFiltersRecipe) {
+            out.writeByte(12); // Clear Shulker Filters
         } else {
             out.writeByte(0); // Generic / Unsupported custom binary
         }
@@ -320,6 +324,15 @@ public class BinaryRecipeCache {
 
         int count = in.readInt();
         ItemStack result = resultItem != Items.AIR ? new ItemStack(resultItem, count) : ItemStack.EMPTY;
+        int resultNbtIdx = in.readInt();
+        String resultNbt = stringPool[resultNbtIdx];
+        if (!result.isEmpty() && resultNbt != null && !resultNbt.isEmpty()) {
+            try {
+                result.setTag(net.minecraft.nbt.TagParser.parseTag(resultNbt));
+            } catch (com.mojang.brigadier.exceptions.CommandSyntaxException e) {
+                throw new IOException("Invalid cached recipe result NBT", e);
+            }
+        }
 
         byte type = in.readByte();
         switch (type) {
@@ -394,6 +407,9 @@ public class BinaryRecipeCache {
             }
             case 11 -> { // ConfettiConfigure
                 return new com.kingodogo.buildscape.recipe.ConfettiConfigureRecipe(id);
+            }
+            case 12 -> { // ClearShulkerFilters
+                return new com.kingodogo.buildscape.recipe.ClearShulkerFiltersRecipe(id);
             }
             default -> {
                 return null;

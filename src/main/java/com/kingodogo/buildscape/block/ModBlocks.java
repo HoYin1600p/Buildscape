@@ -12133,6 +12133,46 @@ public class ModBlocks {
                         () -> new LanternBlock(BlockBehaviour.Properties.copy(Blocks.LANTERN).lightLevel(state -> 15).sound(SoundType.COPPER)));
 
         // --- COPPER EXPANSION BLOCKS ---
+        // Slit Copper
+        public static final RegistryObject<Block> SLIT_COPPER = BLOCKS.register("slit_copper", () -> new WeatheringBlock(BlockBehaviour.Properties.copy(Blocks.CUT_COPPER)));
+        public static final RegistryObject<Block> WAXED_SLIT_COPPER = BLOCKS.register("waxed_slit_copper", () -> new Block(BlockBehaviour.Properties.copy(Blocks.CUT_COPPER)));
+        public static final RegistryObject<Block> EXPOSED_SLIT_COPPER = BLOCKS.register("exposed_slit_copper", () -> new WeatheringBlock(BlockBehaviour.Properties.copy(Blocks.EXPOSED_CUT_COPPER)));
+        public static final RegistryObject<Block> WAXED_EXPOSED_SLIT_COPPER = BLOCKS.register("waxed_exposed_slit_copper", () -> new Block(BlockBehaviour.Properties.copy(Blocks.EXPOSED_CUT_COPPER)));
+        public static final RegistryObject<Block> WEATHERED_SLIT_COPPER = BLOCKS.register("weathered_slit_copper", () -> new WeatheringBlock(BlockBehaviour.Properties.copy(Blocks.WEATHERED_CUT_COPPER)));
+        public static final RegistryObject<Block> WAXED_WEATHERED_SLIT_COPPER = BLOCKS.register("waxed_weathered_slit_copper", () -> new Block(BlockBehaviour.Properties.copy(Blocks.WEATHERED_CUT_COPPER)));
+        public static final RegistryObject<Block> OXIDIZED_SLIT_COPPER = BLOCKS.register("oxidized_slit_copper", () -> new Block(BlockBehaviour.Properties.copy(Blocks.OXIDIZED_CUT_COPPER)));
+        public static final RegistryObject<Block> WAXED_OXIDIZED_SLIT_COPPER = BLOCKS.register("waxed_oxidized_slit_copper", () -> new Block(BlockBehaviour.Properties.copy(Blocks.OXIDIZED_CUT_COPPER)));
+
+        // Slit Copper Stairs
+        public static final RegistryObject<Block> SLIT_COPPER_STAIRS = BLOCKS.register("slit_copper_stairs", () -> new WeatheringStairBlock(SLIT_COPPER.get().defaultBlockState(), BlockBehaviour.Properties.copy(SLIT_COPPER.get())));
+        public static final RegistryObject<Block> WAXED_SLIT_COPPER_STAIRS = BLOCKS.register("waxed_slit_copper_stairs", () -> new ModStairBlock(WAXED_SLIT_COPPER.get().defaultBlockState(), BlockBehaviour.Properties.copy(WAXED_SLIT_COPPER.get())));
+        public static final RegistryObject<Block> EXPOSED_SLIT_COPPER_STAIRS = BLOCKS.register("exposed_slit_copper_stairs", () -> new WeatheringStairBlock(EXPOSED_SLIT_COPPER.get().defaultBlockState(), BlockBehaviour.Properties.copy(EXPOSED_SLIT_COPPER.get())));
+        public static final RegistryObject<Block> WAXED_EXPOSED_SLIT_COPPER_STAIRS = BLOCKS.register("waxed_exposed_slit_copper_stairs", () -> new ModStairBlock(WAXED_EXPOSED_SLIT_COPPER.get().defaultBlockState(), BlockBehaviour.Properties.copy(WAXED_EXPOSED_SLIT_COPPER.get())));
+        public static final RegistryObject<Block> WEATHERED_SLIT_COPPER_STAIRS = BLOCKS.register("weathered_slit_copper_stairs", () -> new WeatheringStairBlock(WEATHERED_SLIT_COPPER.get().defaultBlockState(), BlockBehaviour.Properties.copy(WEATHERED_SLIT_COPPER.get())));
+        public static final RegistryObject<Block> WAXED_WEATHERED_SLIT_COPPER_STAIRS = BLOCKS.register("waxed_weathered_slit_copper_stairs", () -> new ModStairBlock(WAXED_WEATHERED_SLIT_COPPER.get().defaultBlockState(), BlockBehaviour.Properties.copy(WAXED_WEATHERED_SLIT_COPPER.get())));
+        public static final RegistryObject<Block> OXIDIZED_SLIT_COPPER_STAIRS = BLOCKS.register("oxidized_slit_copper_stairs", () -> new ModStairBlock(OXIDIZED_SLIT_COPPER.get().defaultBlockState(), BlockBehaviour.Properties.copy(OXIDIZED_SLIT_COPPER.get())));
+        public static final RegistryObject<Block> WAXED_OXIDIZED_SLIT_COPPER_STAIRS = BLOCKS.register("waxed_oxidized_slit_copper_stairs", () -> new ModStairBlock(WAXED_OXIDIZED_SLIT_COPPER.get().defaultBlockState(), BlockBehaviour.Properties.copy(WAXED_OXIDIZED_SLIT_COPPER.get())));
+
+        // Slit Copper Slabs
+        public static final RegistryObject<Block> SLIT_COPPER_SLAB = BLOCKS.register("slit_copper_slab", () -> new WeatheringSlabBlock(BlockBehaviour.Properties.copy(SLIT_COPPER.get())));
+        public static final RegistryObject<Block> WAXED_SLIT_COPPER_SLAB = BLOCKS.register("waxed_slit_copper_slab", () -> new SlabBlock(BlockBehaviour.Properties.copy(WAXED_SLIT_COPPER.get())));
+        public static final RegistryObject<Block> EXPOSED_SLIT_COPPER_SLAB = BLOCKS.register("exposed_slit_copper_slab", () -> new WeatheringSlabBlock(BlockBehaviour.Properties.copy(EXPOSED_SLIT_COPPER.get())));
+        public static final RegistryObject<Block> WAXED_EXPOSED_SLIT_COPPER_SLAB = BLOCKS.register("waxed_exposed_slit_copper_slab", () -> new SlabBlock(BlockBehaviour.Properties.copy(WAXED_EXPOSED_SLIT_COPPER.get())));
+        public static final RegistryObject<Block> WEATHERED_SLIT_COPPER_SLAB = BLOCKS.register("weathered_slit_copper_slab", () -> new WeatheringSlabBlock(BlockBehaviour.Properties.copy(WEATHERED_SLIT_COPPER.get())));
+        public static final RegistryObject<Block> WAXED_WEATHERED_SLIT_COPPER_SLAB = BLOCKS.register("waxed_weathered_slit_copper_slab", () -> new SlabBlock(BlockBehaviour.Properties.copy(WAXED_WEATHERED_SLIT_COPPER.get())));
+        public static final RegistryObject<Block> OXIDIZED_SLIT_COPPER_SLAB = BLOCKS.register("oxidized_slit_copper_slab", () -> new SlabBlock(BlockBehaviour.Properties.copy(OXIDIZED_SLIT_COPPER.get())));
+        public static final RegistryObject<Block> WAXED_OXIDIZED_SLIT_COPPER_SLAB = BLOCKS.register("waxed_oxidized_slit_copper_slab", () -> new SlabBlock(BlockBehaviour.Properties.copy(WAXED_OXIDIZED_SLIT_COPPER.get())));
+
+        // Slit Copper Vertical Slabs
+        public static final RegistryObject<Block> SLIT_COPPER_VERTICAL_SLAB = BLOCKS.register("slit_copper_vertical_slab", () -> new WeatheringVerticalSlabBlock(SLIT_COPPER.get(), BlockBehaviour.Properties.copy(SLIT_COPPER_SLAB.get())));
+        public static final RegistryObject<Block> WAXED_SLIT_COPPER_VERTICAL_SLAB = BLOCKS.register("waxed_slit_copper_vertical_slab", () -> new VerticalSlabBlock(WAXED_SLIT_COPPER.get(), BlockBehaviour.Properties.copy(WAXED_SLIT_COPPER_SLAB.get())));
+        public static final RegistryObject<Block> EXPOSED_SLIT_COPPER_VERTICAL_SLAB = BLOCKS.register("exposed_slit_copper_vertical_slab", () -> new WeatheringVerticalSlabBlock(EXPOSED_SLIT_COPPER.get(), BlockBehaviour.Properties.copy(EXPOSED_SLIT_COPPER_SLAB.get())));
+        public static final RegistryObject<Block> WAXED_EXPOSED_SLIT_COPPER_VERTICAL_SLAB = BLOCKS.register("waxed_exposed_slit_copper_vertical_slab", () -> new VerticalSlabBlock(WAXED_EXPOSED_SLIT_COPPER.get(), BlockBehaviour.Properties.copy(WAXED_EXPOSED_SLIT_COPPER_SLAB.get())));
+        public static final RegistryObject<Block> WEATHERED_SLIT_COPPER_VERTICAL_SLAB = BLOCKS.register("weathered_slit_copper_vertical_slab", () -> new WeatheringVerticalSlabBlock(WEATHERED_SLIT_COPPER.get(), BlockBehaviour.Properties.copy(WEATHERED_SLIT_COPPER_SLAB.get())));
+        public static final RegistryObject<Block> WAXED_WEATHERED_SLIT_COPPER_VERTICAL_SLAB = BLOCKS.register("waxed_weathered_slit_copper_vertical_slab", () -> new VerticalSlabBlock(WAXED_WEATHERED_SLIT_COPPER.get(), BlockBehaviour.Properties.copy(WAXED_WEATHERED_SLIT_COPPER_SLAB.get())));
+        public static final RegistryObject<Block> OXIDIZED_SLIT_COPPER_VERTICAL_SLAB = BLOCKS.register("oxidized_slit_copper_vertical_slab", () -> new VerticalSlabBlock(OXIDIZED_SLIT_COPPER.get(), BlockBehaviour.Properties.copy(OXIDIZED_SLIT_COPPER_SLAB.get())));
+        public static final RegistryObject<Block> WAXED_OXIDIZED_SLIT_COPPER_VERTICAL_SLAB = BLOCKS.register("waxed_oxidized_slit_copper_vertical_slab", () -> new VerticalSlabBlock(WAXED_OXIDIZED_SLIT_COPPER.get(), BlockBehaviour.Properties.copy(WAXED_OXIDIZED_SLIT_COPPER_SLAB.get())));
+
         // Chiseled Copper
         public static final RegistryObject<Block> CHISELED_COPPER = BLOCKS.register("chiseled_copper", () -> new WeatheringBlock(BlockBehaviour.Properties.copy(Blocks.CUT_COPPER)));
         public static final RegistryObject<Block> WAXED_CHISELED_COPPER = BLOCKS.register("waxed_chiseled_copper", () -> new Block(BlockBehaviour.Properties.copy(Blocks.CUT_COPPER)));

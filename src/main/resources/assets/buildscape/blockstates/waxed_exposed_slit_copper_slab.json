@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "type=bottom": { "model": "buildscape:block/waxed_exposed_slit_copper_slab" },
+    "type=top": { "model": "buildscape:block/waxed_exposed_slit_copper_slab_top" },
+    "type=double": { "model": "buildscape:block/waxed_exposed_slit_copper" }
+  }
+}

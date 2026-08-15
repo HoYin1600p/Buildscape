@@ -77,6 +77,17 @@ public class RecipeValidator {
         if (rawSpec == null || rawSpec.isEmpty()) {
             return false;
         }
+
+        if (rawSpec.startsWith("[") && rawSpec.endsWith("]")) {
+            String alternatives = rawSpec.substring(1, rawSpec.length() - 1);
+            for (String alternative : alternatives.split(",")) {
+                if (validateIngredientSpec(alternative.trim(), aliasResolver)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
         String resolved = aliasResolver.resolveString(rawSpec);
         if (resolved.startsWith("#")) {
             String tagId = resolved.substring(1);

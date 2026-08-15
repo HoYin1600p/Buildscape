@@ -120,7 +120,7 @@ public class FamilyExpander {
             java.util.Map<String, String> keys = java.util.Map.of("X", inputItem);
             generated.add(new RecipeIR.RecipeSpec(
                     recipeId, defaultType, "", defaultPattern, keys, List.of(inputItem), baseItem,
-                    new RecipeIR.ResultSpec(outputItem, defaultCount), 200, 0.1f
+                    new RecipeIR.ResultSpec(outputItem, defaultCount, null), 200, 0.1f
             ));
         }
     }
@@ -137,7 +137,7 @@ public class FamilyExpander {
         java.util.Map<String, String> keys = java.util.Map.of("W", mainItem, "#", stickItem);
         generated.add(new RecipeIR.RecipeSpec(
                 recipeId, "shaped", "", pattern, keys, List.of(), mainItem,
-                new RecipeIR.ResultSpec(outputItem, count), 200, 0.1f
+                new RecipeIR.ResultSpec(outputItem, count, null), 200, 0.1f
         ));
     }
 
@@ -150,7 +150,7 @@ public class FamilyExpander {
     ) {
         generated.add(new RecipeIR.RecipeSpec(
                 recipeId, "stonecutting", "", List.of(), java.util.Map.of(), List.of(), baseItem,
-                new RecipeIR.ResultSpec(outputItem, count), 0, 0.0f
+                new RecipeIR.ResultSpec(outputItem, count, null), 0, 0.0f
         ));
     }
 

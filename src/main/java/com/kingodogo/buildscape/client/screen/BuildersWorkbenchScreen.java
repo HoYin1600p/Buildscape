@@ -433,9 +433,17 @@ public class BuildersWorkbenchScreen extends AbstractContainerScreen<BuildersWor
 
         int modifier = hoveredModifier(mouseX, mouseY);
         if (modifier >= 0 && button == 0) {
-            filterMask ^= modifier == 0
-                    ? ColorGradientSolver.FILTER_SINGLE_TEXTURE
-                    : ColorGradientSolver.FILTER_MATCH_SHAPE;
+            if (modifier == 0) {
+                filterMask ^= ColorGradientSolver.FILTER_SINGLE_TEXTURE;
+            } else if ((filterMask & ColorGradientSolver.FILTER_MATCH_SHAPE) == 0) {
+                int categoryState = ColorGradientSolver.FILTER_ALL
+                        | ColorGradientSolver.FILTER_ALL << ColorGradientSolver.STRICT_SHIFT;
+                filterMask = filterMask & ~categoryState
+                        | ColorGradientSolver.FILTER_MATCH_SHAPE
+                        | ColorGradientSolver.FILTER_NON_FULL;
+            } else {
+                filterMask &= ~ColorGradientSolver.FILTER_MATCH_SHAPE;
+            }
             resetAllResultOffsets();
             lastInputSignature = inputSignature();
             solveNow();

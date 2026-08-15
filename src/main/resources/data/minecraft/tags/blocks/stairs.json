@@ -76,6 +76,14 @@
     "buildscape:yellow_flaming_polished_steel_stairs",
     "buildscape:yellow_flaming_pressed_steel_stairs",
     "buildscape:yellow_flaming_steel_block_stairs",
-    "buildscape:yellow_layered_wool_stairs"
+    "buildscape:yellow_layered_wool_stairs",
+    "buildscape:slit_copper_stairs",
+    "buildscape:waxed_slit_copper_stairs",
+    "buildscape:exposed_slit_copper_stairs",
+    "buildscape:waxed_exposed_slit_copper_stairs",
+    "buildscape:weathered_slit_copper_stairs",
+    "buildscape:waxed_weathered_slit_copper_stairs",
+    "buildscape:oxidized_slit_copper_stairs",
+    "buildscape:waxed_oxidized_slit_copper_stairs"
   ]
 }

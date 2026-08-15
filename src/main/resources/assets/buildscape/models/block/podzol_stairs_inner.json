@@ -2,8 +2,8 @@
   "parent": "minecraft:block/inner_stairs",
   "textures": {
     "bottom": "minecraft:block/dirt",
-    "top": "buildscape:block/podzol_top",
-    "side": "buildscape:block/podzol_side",
+    "top": "minecraft:block/podzol_top",
+    "side": "minecraft:block/podzol_side",
     "particle": "#side"
   }
 }

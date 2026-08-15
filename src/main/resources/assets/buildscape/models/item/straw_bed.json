@@ -1,5 +1,6 @@
 {
-  "gui_light": "front",
+  "format_version": "1.21.6",
+  "credit": "Made with Blockbench",
   "textures": {
     "all": "buildscape:block/straw_bed",
     "particle": "buildscape:block/straw_bed_particle"
@@ -201,7 +202,7 @@
             10,
             3.25,
             10.5,
-            4.481249999999999
+            4.48125
           ],
           "texture": "#all",
           "cullface": "west"
@@ -211,7 +212,7 @@
             10.5,
             3.25,
             11,
-            4.481249999999999
+            4.48125
           ],
           "texture": "#all",
           "cullface": "west"
@@ -292,7 +293,7 @@
       "name": "pillow_frills_07",
       "from": [
         16,
-        0.05000000000000001,
+        0.05,
         16
       ],
       "to": [
@@ -327,7 +328,7 @@
       "name": "pillow_frills_08",
       "from": [
         16,
-        0.05000000000000001,
+        0.05,
         23.975
       ],
       "to": [
@@ -617,9 +618,9 @@
       "faces": {
         "up": {
           "uv": [
-            11.999999999999998,
+            12,
             6.25,
-            12.749999999999998,
+            12.75,
             10.25
           ],
           "rotation": 180,
@@ -628,9 +629,9 @@
         },
         "down": {
           "uv": [
-            12.749999999999998,
+            12.75,
             10.25,
-            13.499999999999998,
+            13.5,
             6.25
           ],
           "rotation": 180,
@@ -654,9 +655,9 @@
       "faces": {
         "up": {
           "uv": [
-            13.499999999999998,
+            13.5,
             10.25,
-            14.249999999999998,
+            14.25,
             6.25
           ],
           "rotation": 180,
@@ -665,9 +666,9 @@
         },
         "down": {
           "uv": [
-            14.249999999999998,
+            14.25,
             6.25,
-            14.999999999999998,
+            15,
             10.25
           ],
           "rotation": 180,
@@ -677,45 +678,12 @@
       }
     }
   ],
+  "gui_light": "front",
   "display": {
-    "firstperson_righthand": {
-      "rotation": [
-        0,
-        225,
-        0
-      ],
-      "translation": [
-        0,
-        3,
-        0
-      ],
-      "scale": [
-        0.375,
-        0.375,
-        0.375
-      ]
-    },
-    "firstperson_lefthand": {
-      "rotation": [
-        0,
-        225,
-        0
-      ],
-      "translation": [
-        0,
-        3,
-        0
-      ],
-      "scale": [
-        0.375,
-        0.375,
-        0.375
-      ]
-    },
     "thirdperson_righthand": {
       "rotation": [
         75,
-        225,
+        -135,
         0
       ],
       "translation": [
@@ -732,7 +700,7 @@
     "thirdperson_lefthand": {
       "rotation": [
         75,
-        225,
+        -135,
         0
       ],
       "translation": [
@@ -746,32 +714,32 @@
         0.375
       ]
     },
-    "head": {
+    "firstperson_righthand": {
       "rotation": [
         0,
-        180,
+        -135,
         0
       ],
       "translation": [
         0,
-        0,
+        3,
         0
       ],
       "scale": [
-        1,
-        1,
-        1
+        0.375,
+        0.375,
+        0.375
       ]
     },
-    "gui": {
+    "firstperson_lefthand": {
       "rotation": [
-        30,
-        45,
+        0,
+        -135,
         0
       ],
       "translation": [
         0,
-        -2,
+        3,
         0
       ],
       "scale": [
@@ -781,11 +749,6 @@
       ]
     },
     "ground": {
-      "rotation": [
-        0,
-        0,
-        0
-      ],
       "translation": [
         0,
         3,
@@ -797,15 +760,34 @@
         0.25
       ]
     },
-    "fixed": {
+    "gui": {
       "rotation": [
-        0,
-        180,
+        40,
+        140,
         0
       ],
       "translation": [
         0,
+        1.25,
+        0
+      ],
+      "scale": [
+        0.375,
+        0.375,
+        0.375
+      ]
+    },
+    "head": {
+      "rotation": [
         0,
+        -180,
+        0
+      ]
+    },
+    "fixed": {
+      "rotation": [
+        0,
+        -180,
         0
       ],
       "scale": [

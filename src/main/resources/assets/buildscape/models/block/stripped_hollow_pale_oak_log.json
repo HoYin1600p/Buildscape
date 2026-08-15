@@ -1,8 +1,7 @@
-{
-  "parent": "minecraft:block/hollow_log",
+﻿{
+  "parent": "minecraft:block/stripped_hollow_log",
   "textures": {
-    "outside": "buildscape:block/stripped_pale_oak_log",
-    "inside": "buildscape:block/stripped_pale_oak_log",
+    "stripped_logs": "buildscape:block/stripped_pale_oak_log",
     "end": "buildscape:block/stripped_pale_oak_log_top"
   }
 }

@@ -327,6 +327,43 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.OXIDIZED_CHISELED_COPPER.get()));
             items.add(new ItemStack(ModItems.WAXED_OXIDIZED_CHISELED_COPPER.get()));
 
+            // Slit Copper
+            items.add(new ItemStack(ModItems.SLIT_COPPER.get()));
+            items.add(new ItemStack(ModItems.SLIT_COPPER_STAIRS.get()));
+            items.add(new ItemStack(ModItems.SLIT_COPPER_SLAB.get()));
+            items.add(new ItemStack(ModItems.SLIT_COPPER_VERTICAL_SLAB.get()));
+            items.add(new ItemStack(ModItems.WAXED_SLIT_COPPER.get()));
+            items.add(new ItemStack(ModItems.WAXED_SLIT_COPPER_STAIRS.get()));
+            items.add(new ItemStack(ModItems.WAXED_SLIT_COPPER_SLAB.get()));
+            items.add(new ItemStack(ModItems.WAXED_SLIT_COPPER_VERTICAL_SLAB.get()));
+
+            items.add(new ItemStack(ModItems.EXPOSED_SLIT_COPPER.get()));
+            items.add(new ItemStack(ModItems.EXPOSED_SLIT_COPPER_STAIRS.get()));
+            items.add(new ItemStack(ModItems.EXPOSED_SLIT_COPPER_SLAB.get()));
+            items.add(new ItemStack(ModItems.EXPOSED_SLIT_COPPER_VERTICAL_SLAB.get()));
+            items.add(new ItemStack(ModItems.WAXED_EXPOSED_SLIT_COPPER.get()));
+            items.add(new ItemStack(ModItems.WAXED_EXPOSED_SLIT_COPPER_STAIRS.get()));
+            items.add(new ItemStack(ModItems.WAXED_EXPOSED_SLIT_COPPER_SLAB.get()));
+            items.add(new ItemStack(ModItems.WAXED_EXPOSED_SLIT_COPPER_VERTICAL_SLAB.get()));
+
+            items.add(new ItemStack(ModItems.WEATHERED_SLIT_COPPER.get()));
+            items.add(new ItemStack(ModItems.WEATHERED_SLIT_COPPER_STAIRS.get()));
+            items.add(new ItemStack(ModItems.WEATHERED_SLIT_COPPER_SLAB.get()));
+            items.add(new ItemStack(ModItems.WEATHERED_SLIT_COPPER_VERTICAL_SLAB.get()));
+            items.add(new ItemStack(ModItems.WAXED_WEATHERED_SLIT_COPPER.get()));
+            items.add(new ItemStack(ModItems.WAXED_WEATHERED_SLIT_COPPER_STAIRS.get()));
+            items.add(new ItemStack(ModItems.WAXED_WEATHERED_SLIT_COPPER_SLAB.get()));
+            items.add(new ItemStack(ModItems.WAXED_WEATHERED_SLIT_COPPER_VERTICAL_SLAB.get()));
+
+            items.add(new ItemStack(ModItems.OXIDIZED_SLIT_COPPER.get()));
+            items.add(new ItemStack(ModItems.OXIDIZED_SLIT_COPPER_STAIRS.get()));
+            items.add(new ItemStack(ModItems.OXIDIZED_SLIT_COPPER_SLAB.get()));
+            items.add(new ItemStack(ModItems.OXIDIZED_SLIT_COPPER_VERTICAL_SLAB.get()));
+            items.add(new ItemStack(ModItems.WAXED_OXIDIZED_SLIT_COPPER.get()));
+            items.add(new ItemStack(ModItems.WAXED_OXIDIZED_SLIT_COPPER_STAIRS.get()));
+            items.add(new ItemStack(ModItems.WAXED_OXIDIZED_SLIT_COPPER_SLAB.get()));
+            items.add(new ItemStack(ModItems.WAXED_OXIDIZED_SLIT_COPPER_VERTICAL_SLAB.get()));
+
             // Copper Grates
             items.add(new ItemStack(ModItems.COPPER_GRATE.get()));
             items.add(new ItemStack(ModItems.WAXED_COPPER_GRATE.get()));

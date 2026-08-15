@@ -1,8 +1,7 @@
 {
-  "parent": "minecraft:block/hollow_log",
+  "parent": "minecraft:block/stripped_hollow_log",
   "textures": {
-    "outside": "minecraft:block/stripped_birch_log",
-    "inside": "minecraft:block/stripped_birch_log",
+    "stripped_logs": "minecraft:block/stripped_birch_log",
     "end": "minecraft:block/stripped_birch_log_top"
   }
 }

@@ -420,6 +420,14 @@
     "buildscape:yellow_stained_glass_vertical_slab",
     "buildscape:yellow_terracotta_vertical_slab",
     "buildscape:yellow_tiles_vertical_slab",
-    "buildscape:yellow_wool_vertical_slab"
+    "buildscape:yellow_wool_vertical_slab",
+    "buildscape:slit_copper_vertical_slab",
+    "buildscape:waxed_slit_copper_vertical_slab",
+    "buildscape:exposed_slit_copper_vertical_slab",
+    "buildscape:waxed_exposed_slit_copper_vertical_slab",
+    "buildscape:weathered_slit_copper_vertical_slab",
+    "buildscape:waxed_weathered_slit_copper_vertical_slab",
+    "buildscape:oxidized_slit_copper_vertical_slab",
+    "buildscape:waxed_oxidized_slit_copper_vertical_slab"
   ]
 }

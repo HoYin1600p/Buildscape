@@ -1,8 +1,8 @@
 {
   "parent": "minecraft:block/hollow_log",
   "textures": {
-    "outside": "buildscape:block/poplar_log",
-    "inside": "buildscape:block/stripped_poplar_log",
+    "logs": "buildscape:block/poplar_log",
+    "stripped_logs": "buildscape:block/stripped_poplar_log",
     "end": "buildscape:block/poplar_log_top"
   }
 }

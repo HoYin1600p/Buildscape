@@ -253,13 +253,13 @@ public class StreamingRecipeParser {
         }
 
         // Add Primary Forward Recipe (Result = resultItem, Input = input)
-        RecipeIR.ResultSpec resultSpec = new RecipeIR.ResultSpec(resultItem, count);
+        RecipeIR.ResultSpec resultSpec = new RecipeIR.ResultSpec(resultItem, count, null);
         recipes.add(new RecipeIR.RecipeSpec(null, type, "", pattern, keys, ingredients, input, resultSpec, 200, 0.1f));
 
         // Add Reversal Recipe if reversible is true and input is a single item/tag
         if (isReversible && input != null && !input.isEmpty()) {
             String reverseRecipeId = sanitizeId(input + "_from_" + resultItem + "_reversal");
-            RecipeIR.ResultSpec reverseResultSpec = new RecipeIR.ResultSpec(input, 1);
+            RecipeIR.ResultSpec reverseResultSpec = new RecipeIR.ResultSpec(input, 1, null);
             recipes.add(new RecipeIR.RecipeSpec(reverseRecipeId, type, "", List.of(), Map.of(), List.of(resultItem), resultItem, reverseResultSpec, 200, 0.1f));
         }
     }
@@ -301,6 +301,7 @@ public class StreamingRecipeParser {
     private static RecipeIR.ResultSpec parseResultSpec(JsonReader reader) throws IOException {
         String item = null;
         int count = 1;
+        String nbt = null;
 
         if (reader.peek() == JsonToken.STRING) {
             item = reader.nextString();
@@ -311,13 +312,14 @@ public class StreamingRecipeParser {
                 switch (key) {
                     case "item" -> item = reader.nextString();
                     case "count" -> count = reader.nextInt();
+                    case "nbt" -> nbt = com.google.gson.JsonParser.parseReader(reader).toString();
                     default -> reader.skipValue();
                 }
             }
             reader.endObject();
         }
 
-        return new RecipeIR.ResultSpec(item, count);
+        return new RecipeIR.ResultSpec(item, count, nbt);
     }
 
     private static void parseStringList(JsonReader reader, List<String> list) throws IOException {

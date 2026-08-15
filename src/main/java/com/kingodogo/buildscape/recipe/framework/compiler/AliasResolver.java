@@ -36,6 +36,11 @@ public class AliasResolver {
             return "";
         }
 
+        boolean isTag = input.startsWith("#");
+        if (isTag) {
+            input = input.substring(1);
+        }
+
         // Direct alias match
         if (aliases.containsKey(input)) {
             input = aliases.get(input);
@@ -51,11 +56,11 @@ public class AliasResolver {
         }
 
         // Default namespace fallback if missing namespace
-        if (!input.contains(":") && !input.startsWith("#")) {
+        if (!input.contains(":")) {
             input = "buildscape:" + input;
         }
 
-        return input;
+        return isTag ? "#" + input : input;
     }
 
     public Ingredient resolveIngredient(String rawSpec) {

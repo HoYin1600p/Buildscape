@@ -133,6 +133,31 @@ public class CopperOxidationHandler {
 
         // 14. Large Copper Chains
         registerChain(ModBlocks.LARGE_COPPER_CHAIN, ModBlocks.LARGE_EXPOSED_COPPER_CHAIN, ModBlocks.LARGE_WEATHERED_COPPER_CHAIN, ModBlocks.LARGE_OXIDIZED_COPPER_CHAIN);
+
+        // 15. Slit Copper (Block, Stairs, Slab, Vertical Slab)
+        registerChain(ModBlocks.SLIT_COPPER, ModBlocks.EXPOSED_SLIT_COPPER, ModBlocks.WEATHERED_SLIT_COPPER, ModBlocks.OXIDIZED_SLIT_COPPER);
+        registerWaxPair(ModBlocks.SLIT_COPPER, ModBlocks.WAXED_SLIT_COPPER);
+        registerWaxPair(ModBlocks.EXPOSED_SLIT_COPPER, ModBlocks.WAXED_EXPOSED_SLIT_COPPER);
+        registerWaxPair(ModBlocks.WEATHERED_SLIT_COPPER, ModBlocks.WAXED_WEATHERED_SLIT_COPPER);
+        registerWaxPair(ModBlocks.OXIDIZED_SLIT_COPPER, ModBlocks.WAXED_OXIDIZED_SLIT_COPPER);
+
+        registerChain(ModBlocks.SLIT_COPPER_STAIRS, ModBlocks.EXPOSED_SLIT_COPPER_STAIRS, ModBlocks.WEATHERED_SLIT_COPPER_STAIRS, ModBlocks.OXIDIZED_SLIT_COPPER_STAIRS);
+        registerWaxPair(ModBlocks.SLIT_COPPER_STAIRS, ModBlocks.WAXED_SLIT_COPPER_STAIRS);
+        registerWaxPair(ModBlocks.EXPOSED_SLIT_COPPER_STAIRS, ModBlocks.WAXED_EXPOSED_SLIT_COPPER_STAIRS);
+        registerWaxPair(ModBlocks.WEATHERED_SLIT_COPPER_STAIRS, ModBlocks.WAXED_WEATHERED_SLIT_COPPER_STAIRS);
+        registerWaxPair(ModBlocks.OXIDIZED_SLIT_COPPER_STAIRS, ModBlocks.WAXED_OXIDIZED_SLIT_COPPER_STAIRS);
+
+        registerChain(ModBlocks.SLIT_COPPER_SLAB, ModBlocks.EXPOSED_SLIT_COPPER_SLAB, ModBlocks.WEATHERED_SLIT_COPPER_SLAB, ModBlocks.OXIDIZED_SLIT_COPPER_SLAB);
+        registerWaxPair(ModBlocks.SLIT_COPPER_SLAB, ModBlocks.WAXED_SLIT_COPPER_SLAB);
+        registerWaxPair(ModBlocks.EXPOSED_SLIT_COPPER_SLAB, ModBlocks.WAXED_EXPOSED_SLIT_COPPER_SLAB);
+        registerWaxPair(ModBlocks.WEATHERED_SLIT_COPPER_SLAB, ModBlocks.WAXED_WEATHERED_SLIT_COPPER_SLAB);
+        registerWaxPair(ModBlocks.OXIDIZED_SLIT_COPPER_SLAB, ModBlocks.WAXED_OXIDIZED_SLIT_COPPER_SLAB);
+
+        registerChain(ModBlocks.SLIT_COPPER_VERTICAL_SLAB, ModBlocks.EXPOSED_SLIT_COPPER_VERTICAL_SLAB, ModBlocks.WEATHERED_SLIT_COPPER_VERTICAL_SLAB, ModBlocks.OXIDIZED_SLIT_COPPER_VERTICAL_SLAB);
+        registerWaxPair(ModBlocks.SLIT_COPPER_VERTICAL_SLAB, ModBlocks.WAXED_SLIT_COPPER_VERTICAL_SLAB);
+        registerWaxPair(ModBlocks.EXPOSED_SLIT_COPPER_VERTICAL_SLAB, ModBlocks.WAXED_EXPOSED_SLIT_COPPER_VERTICAL_SLAB);
+        registerWaxPair(ModBlocks.WEATHERED_SLIT_COPPER_VERTICAL_SLAB, ModBlocks.WAXED_WEATHERED_SLIT_COPPER_VERTICAL_SLAB);
+        registerWaxPair(ModBlocks.OXIDIZED_SLIT_COPPER_VERTICAL_SLAB, ModBlocks.WAXED_OXIDIZED_SLIT_COPPER_VERTICAL_SLAB);
     }
 
     private static void registerChain(Supplier<Block> b0, Supplier<Block> b1, Supplier<Block> b2, Supplier<Block> b3) {

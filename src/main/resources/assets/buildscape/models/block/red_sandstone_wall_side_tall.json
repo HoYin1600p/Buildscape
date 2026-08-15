@@ -1,7 +1,7 @@
 {
   "parent": "minecraft:block/template_wall_side_tall",
   "textures": {
-    "wall": "buildscape:block/red_sandstone",
-    "particle": "buildscape:block/red_sandstone"
+    "wall": "minecraft:block/red_sandstone",
+    "particle": "minecraft:block/red_sandstone"
   }
 }

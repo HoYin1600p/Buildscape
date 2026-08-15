@@ -316,6 +316,9 @@ public final class ColorGradientSolver {
         if (isShiftExcluded(blockItem.getBlock(), filterState >>> STRICT_SHIFT & FILTER_ALL)) return false;
         Block block = blockItem.getBlock();
         String path = registryPath(block);
+        if ((filterState & FILTER_MATCH_SHAPE) != 0 && (enabled & FILTER_NON_FULL) != 0) {
+            return matchesShapeMaterialFilter(block, path, enabled);
+        }
         if (enabled == FILTER_ALL) return true;
         return switch (enabled) {
             case FILTER_SOLID -> physicalCategories == FILTER_SOLID
@@ -327,6 +330,29 @@ public final class ColorGradientSolver {
             case FILTER_SOLID | FILTER_NON_FULL -> isSolidNonFull(path);
             default -> false;
         };
+    }
+
+    private static boolean matchesShapeMaterialFilter(Block block, String path, int enabled) {
+        if (enabled == FILTER_ALL) return true;
+
+        boolean transparent = isShapeTransparent(block, path);
+        boolean solidTransparent = isSolidTransparent(block, path);
+        boolean solidEnabled = (enabled & FILTER_SOLID) != 0;
+        boolean transparentEnabled = (enabled & FILTER_TRANSPARENT) != 0;
+
+        if (solidEnabled && transparentEnabled) return true;
+        if (transparentEnabled) return transparent && !solidTransparent;
+        return !transparent && !solidTransparent;
+    }
+
+    private static boolean isShapeTransparent(Block block, String path) {
+        return block instanceof AbstractGlassBlock || block instanceof HalfTransparentBlock
+                || block instanceof StainedGlassPaneBlock || block instanceof LeavesBlock
+                || path.contains("glass") || path.contains("grate") || path.contains("leaves")
+                || path.equals("slime_block") || path.equals("honey_block")
+                || path.equals("ice") || path.equals("packed_ice") || path.equals("blue_ice")
+                || path.equals("frosted_ice") || path.equals("icicle_block")
+                || isTransparentNonFull(block, path);
     }
 
     private static ShapeFamily requiredShape(int filterMask, ItemStack input) {

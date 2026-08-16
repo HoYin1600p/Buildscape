@@ -12010,7 +12010,8 @@ public class ModBlocks {
         public static final RegistryObject<Block> PALE_MOSS_BLOCK_VERTICAL_SLAB = BLOCKS.register("pale_moss_block_vertical_slab",
                         () -> new VerticalSlabBlock(PALE_MOSS_BLOCK.get(), BlockBehaviour.Properties.copy(Blocks.MOSS_BLOCK)));
         public static final RegistryObject<Block> PALE_HANGING_MOSS = BLOCKS.register("pale_hanging_moss",
-                        () -> new HangingMossBlock(BlockBehaviour.Properties.copy(Blocks.MOSS_CARPET).noCollission().strength(0.2F)));
+                        () -> new HangingMossBlock(BlockBehaviour.Properties.copy(Blocks.MOSS_CARPET).noCollission().strength(0.2F).randomTicks()));
+
 
         // --- CREAKING HEART & RESIN SET ---
         public static final RegistryObject<Block> CREAKING_HEART = BLOCKS.register("creaking_heart",

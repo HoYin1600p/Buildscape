@@ -30,6 +30,10 @@ public final class WbRenderer {
     public static final ResourceLocation TAB_GRADIENT_HOVER = new ResourceLocation("buildscape", "textures/gui/builders_workbench/gradiant_builder_tab_hover.png");
     public static final ResourceLocation TAB_GRADIENT_SEL = new ResourceLocation("buildscape", "textures/gui/builders_workbench/gradiant_builder_tab_selected.png");
 
+    // Title graphics - baked lettering, drawn in place of the vanilla font.
+    public static final ResourceLocation TITLE_COLOR = new ResourceLocation("buildscape", "textures/gui/builders_workbench/color_builder_title.png");
+    public static final ResourceLocation TITLE_GRADIENT = new ResourceLocation("buildscape", "textures/gui/builders_workbench/gradient_builder_title.png");
+
     // Copy arrow
     public static final ResourceLocation BUILDERS_ARROW = new ResourceLocation("buildscape", "textures/gui/builders_workbench/builders_arrow.png");
     public static final ResourceLocation BUILDERS_ARROW_ACTIVE = new ResourceLocation("buildscape", "textures/gui/builders_workbench/builders_arrow_active.png");
@@ -63,6 +67,18 @@ public final class WbRenderer {
     public static final int MODIFIER_SIZE = 11;
     public static final int ARROW_W = 48;
     public static final int ARROW_H = 16;
+    /** Every title graphic is baked at (0,0) of a 128x16 sheet. */
+    public static final int TITLE_SHEET_W = 128;
+    public static final int TITLE_SHEET_H = 16;
+
+    // Title graphic metrics on their 128x16 sheets: {width, height, bodyY, bodyHeight}.
+    // bodyY/bodyHeight describe the block of actual letters. They differ from the full
+    // ink box when a glyph reaches above the caps line - the pouch apostrophe occupies
+    // row 0 on its own, and centring the full box on that row visibly drops the whole
+    // caption. Centring the letter body instead makes all three captions sit alike.
+    public static final int[] TITLE_INK_COLOR = {60, 7, 0, 7};
+    public static final int[] TITLE_INK_GRADIENT = {74, 7, 0, 7};
+    public static final int[] TITLE_INK_POUCH = {68, 8, 1, 7};
 
     private WbRenderer() {
     }
@@ -138,6 +154,32 @@ public final class WbRenderer {
                                           ResourceLocation selectedTexture) {
         RenderSystem.setShaderTexture(0, selected ? selectedTexture : hovered ? hover : normal);
         GuiComponent.blit(ps, x, y, 0, 0, MODIFIER_SIZE, MODIFIER_SIZE, MODIFIER_SIZE, MODIFIER_SIZE);
+    }
+
+    /**
+     * Draws a title graphic at native size, centred on the banner rectangle.
+     *
+     * <p>No scaling: the lettering is pixel art and any non-integer factor turns it to
+     * mush. A graphic wider than its banner therefore overhangs rather than shrinking -
+     * the artwork is the thing that gets adjusted, not the rendering.
+     *
+     * @param ink {width, height, bodyY, bodyHeight} - see the TITLE_INK_* constants
+     */
+    public static void drawTitleImage(PoseStack ps, ResourceLocation title, int[] ink,
+                                      int bannerX, int bannerY, int bannerW, int bannerH) {
+        int inkW = ink[0], inkH = ink[1], bodyY = ink[2], bodyH = ink[3];
+
+        // Integer division, not Math.round: when the leftover is odd the extra pixel has
+        // to land somewhere, and floor puts it on the right the way vanilla centres text.
+        // The banner interior is 77px while every title is an even width, so that
+        // leftover is always odd today - widening the banner to 78 in the artwork makes
+        // all three captions land dead centre with no code change.
+        int x = bannerX + (bannerW - inkW) / 2;
+        // Position the letter body in the middle, then step back to the sheet's origin.
+        int y = bannerY + (bannerH - bodyH) / 2 - bodyY;
+
+        RenderSystem.setShaderTexture(0, title);
+        GuiComponent.blit(ps, x, y, inkW, inkH, 0f, 0f, inkW, inkH, TITLE_SHEET_W, TITLE_SHEET_H);
     }
 
     /**

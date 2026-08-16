@@ -1,10 +1,16 @@
 {
   "variants": {
-    "tip=false": {
+    "sheared=false,tip=false": {
       "model": "buildscape:block/pale_hanging_moss"
     },
-    "tip=true": {
+    "sheared=false,tip=true": {
+      "model": "buildscape:block/pale_hanging_moss_tip"
+    },
+    "sheared=true,tip=false": {
+      "model": "buildscape:block/pale_hanging_moss"
+    },
+    "sheared=true,tip=true": {
       "model": "buildscape:block/pale_hanging_moss_tip"
     }
   }
-}
+}

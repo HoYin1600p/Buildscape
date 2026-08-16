@@ -2,8 +2,8 @@
   "parent": "minecraft:block/slab",
   "textures": {
     "bottom": "minecraft:block/dirt",
-    "top": "buildscape:block/mycelium_top",
-    "side": "buildscape:block/mycelium_side",
+    "top": "minecraft:block/mycelium_top",
+    "side": "minecraft:block/mycelium_side",
     "particle": "#side"
   }
-}
+}

@@ -21,6 +21,14 @@ import java.util.List;
 public class BuildersPouchMenu extends AbstractContainerMenu implements GhostFilterMenu {
     private static final int POUCH_SLOTS = BuildersPouchItem.SLOT_COUNT;
 
+    // Item positions read off builders_pouch_ui.png; the slot frames are baked into
+    // that sheet, so these must match it exactly or the items sit off-centre.
+    private static final int POUCH_X = 14;
+    private static final int POUCH_Y = 21;
+    private static final int INV_X = 14;
+    private static final int INV_Y = 52;
+    private static final int HOTBAR_Y = 110;
+
     private final BuildersPouchInventory pouchInventory;
     private final ContainerData filterData;
     private final InteractionHand hand;
@@ -61,7 +69,7 @@ public class BuildersPouchMenu extends AbstractContainerMenu implements GhostFil
 
         for (int col = 0; col < POUCH_SLOTS; col++) {
             final int pouchSlot = col;
-            addSlot(new Slot(pouchInventory, col, 8 + col * 18, 18) {
+            addSlot(new Slot(pouchInventory, col, POUCH_X + col * 18, POUCH_Y) {
                 @Override
                 public boolean mayPlace(ItemStack stack) {
                     Item filter = BuildersPouchMenu.this.buildscape$getFilterItem(pouchSlot);
@@ -72,12 +80,12 @@ public class BuildersPouchMenu extends AbstractContainerMenu implements GhostFil
 
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 9; col++) {
-                addSlot(new Slot(playerInventory, col + row * 9 + 9, 8 + col * 18, 49 + row * 18));
+                addSlot(new Slot(playerInventory, col + row * 9 + 9, INV_X + col * 18, INV_Y + row * 18));
             }
         }
         for (int col = 0; col < 9; col++) {
             final int hotbarSlot = col;
-            addSlot(new Slot(playerInventory, col, 8 + col * 18, 107) {
+            addSlot(new Slot(playerInventory, col, INV_X + col * 18, HOTBAR_Y) {
                 private boolean isOpenPouchSlot() {
                     return BuildersPouchMenu.this.hand == InteractionHand.MAIN_HAND
                             && playerInventory.selected == hotbarSlot;

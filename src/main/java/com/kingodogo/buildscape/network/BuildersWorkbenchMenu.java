@@ -17,17 +17,17 @@ public class BuildersWorkbenchMenu extends AbstractContainerMenu {
     // They are taken straight from the background artwork and MUST stay in sync
     // with the layout constants in BuildersWorkbenchScreen.
     // Colour Builder (184 x 203)
-    private static final int C_PICKER_X = 25, C_PICKER_Y = 52;
-    private static final int C_RESULT_X = 66, C_RESULT_Y = 34;
-    private static final int C_POUCH_IN_X = 51, C_POUCH_IN_Y = 94;
-    private static final int C_POUCH_OUT_X = 117, C_POUCH_OUT_Y = 94;
+    private static final int C_PICKER_X = 25, C_PICKER_Y = 42;
+    private static final int C_RESULT_X = 66, C_RESULT_Y = 24;
+    private static final int C_POUCH_IN_X = 51, C_POUCH_IN_Y = 84;
+    private static final int C_POUCH_OUT_X = 117, C_POUCH_OUT_Y = 84;
     // Gradient Builder (206 x 203)
-    private static final int G_INPUT_X = 12, G_INPUT_Y = 37;
-    private static final int G_OUTPUT_X = 12, G_OUTPUT_Y = 65;
-    private static final int G_POUCH_IN_X = 51, G_POUCH_IN_Y = 94;
-    private static final int G_POUCH_OUT_X = 117, G_POUCH_OUT_Y = 94;
+    private static final int G_INPUT_X = 12, G_INPUT_Y = 27;
+    private static final int G_OUTPUT_X = 12, G_OUTPUT_Y = 55;
+    private static final int G_POUCH_IN_X = 51, G_POUCH_IN_Y = 84;
+    private static final int G_POUCH_OUT_X = 117, G_POUCH_OUT_Y = 84;
     // Player inventory - identical on both tabs
-    private static final int INV_X = 12, INV_Y = 121, HOTBAR_Y = 179;
+    private static final int INV_X = 12, INV_Y = 111, HOTBAR_Y = 169;
 
     private final BuildersWorkbenchBlockEntity blockEntity;
 

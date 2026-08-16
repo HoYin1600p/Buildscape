@@ -4,7 +4,7 @@ license = "All Rights Reserved"
 [[mods]]
 modId = "buildscape"
 version = "${mod_version}"
-displayName = "BuildScape"
+displayName = "Buildscape"
 displayURL = "buildscape.online"
 logoFile = "buildscape.png"
 authors = "Kingodogo"

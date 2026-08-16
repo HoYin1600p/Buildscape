@@ -1,5 +1,5 @@
 {
-  "parent": "minecraft:block/stairs_inner",
+  "parent": "minecraft:block/inner_stairs",
   "textures": {
     "bottom": "buildscape:block/red_flaming_cut_steel",
     "top": "buildscape:block/red_flaming_cut_steel",

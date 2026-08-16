@@ -28,39 +28,37 @@ public class BuildersWorkbenchScreen extends AbstractContainerScreen<BuildersWor
     // BuildersWorkbenchMenu - see the LAYOUT block there.
     private static final int COLOR_WIDTH = 184;
     private static final int GRADIENT_WIDTH = 206;
-    private static final int GUI_HEIGHT = 203;
+    private static final int GUI_HEIGHT = 193;
 
     // Tab sprites are 17x17 with the icon baked in. TAB_Y = -1 keeps their bottom edge
     // exactly where the artwork expects it (GUI y = 15, one row above the panel top),
     // and the 3px gap matches the spacing drawn in the mockup.
     private static final int TAB_SIZE = 17;
-    private static final int TAB_Y = -1;
+    private static final int TAB_Y = -11;
     private static final int TAB_COLOR_X = 6;
     private static final int TAB_GRADIENT_X = 26;
 
     // Title banner (baked into the background). Every title is scaled to the same
     // usable width, so both tabs end up with an identical margin on each side even
     // though their strings differ in length.
-    private static final int TITLE_X = 58;
-    private static final int TITLE_W = 68;
-    private static final int TITLE_Y = 14;
-    private static final int TITLE_PAD = 8;   // margin left and right, identical on both tabs
-    private static final int TITLE_H = 8;     // vanilla glyph height
-    private static final float TITLE_MIN_SCALE = 0.5f;
-    /** Trailing glyph spacing that font.width() includes but nothing actually draws. */
-    private static final int TITLE_TRAILING_ADVANCE = 1;
-    private static final String TITLE_KEY_COLOR = "screen.buildscape.builders_workbench.color_builder";
-    private static final String TITLE_KEY_GRADIENT = "screen.buildscape.builders_workbench.gradient_builder";
+    // Banner interior, measured inside the dark frame baked into the background sheet.
+    // The flat face of the banner, excluding both the dark frame (x52/x131, y0/y16) and
+    // the 1px bevel inside it (x53/x130, y1/y15). Centring on the flat area rather than
+    // the frame is what makes the margins come out even on both sides.
+    private static final int TITLE_X = 54;
+    private static final int TITLE_Y = 2;
+    private static final int TITLE_W = 76;
+    private static final int TITLE_H = 13;
 
     // Filter buttons (18x18, stacked vertically)
-    private static final int FILTER_Y = 33;
+    private static final int FILTER_Y = 23;
     private static final int FILTER_SPACING = 18;
     private static final int COLOR_FILTER_X = 141;
     private static final int GRADIENT_FILTER_X = 184;
 
     // Compact modifier controls occupy the unused lower-left strip of both panels.
     // Their 11x11 hitboxes do not overlap the workbench slots or the copy arrow.
-    private static final int MODIFIER_Y = 94;
+    private static final int MODIFIER_Y = 84;
     private static final int SINGLE_TEXTURE_X = 13;
     private static final int MATCH_SHAPE_X = 27;
 
@@ -68,13 +66,13 @@ public class BuildersWorkbenchScreen extends AbstractContainerScreen<BuildersWor
     // transparent padding: the ink sits at x 4..43, y 2..12, symmetric around row 7.
     // These values put that ink in the middle of the 46px gap between the pouch slots.
     private static final int ARROW_X = 68;
-    private static final int ARROW_Y = 94;
+    private static final int ARROW_Y = 84;
 
     // Slot interiors used for the re-roll dots (must match the menu)
     private static final int COLOR_RESULT_X = 66;
-    private static final int COLOR_RESULT_Y = 34;
+    private static final int COLOR_RESULT_Y = 24;
     private static final int GRADIENT_OUTPUT_X = 12;
-    private static final int GRADIENT_OUTPUT_Y = 65;
+    private static final int GRADIENT_OUTPUT_Y = 55;
     private static final int INITIAL_DATA_SYNC_TICKS = 3;
     /** Above the item render layer (items blit around Z 100-200) so the dots stay visible. */
     private static final float REROLL_Z = 300.0f;
@@ -245,7 +243,7 @@ public class BuildersWorkbenchScreen extends AbstractContainerScreen<BuildersWor
                 x, y, imageWidth, imageHeight);
 
         drawTabs(poseStack, x, y, mouseX, mouseY);
-        drawTitle(poseStack, x, y, activeTab == 0 ? TITLE_KEY_COLOR : TITLE_KEY_GRADIENT);
+        drawTitle(poseStack, x, y);
         drawFilters(poseStack, x + filterX(), y + FILTER_Y, mouseX, mouseY);
         drawModifierFilters(poseStack, x, y, mouseX, mouseY);
         drawCopyArrow(poseStack, x + ARROW_X, y + ARROW_Y);
@@ -266,27 +264,11 @@ public class BuildersWorkbenchScreen extends AbstractContainerScreen<BuildersWor
         return activeTab == 0 ? COLOR_FILTER_X : GRADIENT_FILTER_X;
     }
 
-    private void drawTitle(PoseStack poseStack, int x, int y, String key) {
-        String title = new TranslatableComponent(key).getString();
-        int textWidth = font.width(title);
-        int usable = TITLE_W - TITLE_PAD * 2;
-
-        // Shrink to the shared usable width. Titles that already fit are left alone
-        // rather than stretched, so short localisations never look blown up.
-        float scale = textWidth > usable ? Math.max(TITLE_MIN_SCALE, (float) usable / textWidth) : 1.0f;
-
-        // font.width() counts the 1px spacing that follows every glyph, including the
-        // last one, so the visible ink is one pixel narrower than the measured width.
-        // Centring on the raw value biases the text to the left; centre on the ink.
-        float inkWidth = (textWidth - TITLE_TRAILING_ADVANCE) * scale;
-        float drawX = x + TITLE_X + (TITLE_W - inkWidth) / 2.0f;
-        float drawY = y + TITLE_Y + (TITLE_H - TITLE_H * scale) / 2.0f;
-
-        poseStack.pushPose();
-        poseStack.translate(drawX, drawY, 0.0f);
-        poseStack.scale(scale, scale, 1.0f);
-        font.draw(poseStack, title, 0.0f, 0.0f, 0xFF372211);
-        poseStack.popPose();
+    private void drawTitle(PoseStack poseStack, int x, int y) {
+        WbRenderer.drawTitleImage(poseStack,
+                activeTab == 0 ? WbRenderer.TITLE_COLOR : WbRenderer.TITLE_GRADIENT,
+                activeTab == 0 ? WbRenderer.TITLE_INK_COLOR : WbRenderer.TITLE_INK_GRADIENT,
+                x + TITLE_X, y + TITLE_Y, TITLE_W, TITLE_H);
     }
 
     private void drawFilters(PoseStack poseStack, int x, int y, int mouseX, int mouseY) {

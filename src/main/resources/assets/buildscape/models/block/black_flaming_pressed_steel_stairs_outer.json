@@ -1,5 +1,5 @@
 {
-  "parent": "minecraft:block/stairs_outer",
+  "parent": "minecraft:block/outer_stairs",
   "textures": {
     "bottom": "buildscape:block/black_flaming_pressed_steel",
     "top": "buildscape:block/black_flaming_pressed_steel",

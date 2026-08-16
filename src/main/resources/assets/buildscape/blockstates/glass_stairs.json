@@ -6,7 +6,8 @@
       "uvlock": true
     },
     "facing=east,half=bottom,shape=inner_right": {
-      "model": "buildscape:block/glass_stairs_inner"
+      "model": "buildscape:block/glass_stairs_inner",
+      "uvlock": true
     },
     "facing=east,half=bottom,shape=outer_left": {
       "model": "buildscape:block/glass_stairs_outer",
@@ -14,7 +15,8 @@
       "uvlock": true
     },
     "facing=east,half=bottom,shape=outer_right": {
-      "model": "buildscape:block/glass_stairs_outer"
+      "model": "buildscape:block/glass_stairs_outer",
+      "uvlock": true
     },
     "facing=east,half=bottom,shape=straight": {
       "model": "buildscape:block/glass_stairs"
@@ -44,7 +46,6 @@
     "facing=east,half=top,shape=straight": {
       "model": "buildscape:block/glass_stairs",
       "x": 180,
-      "y": 90,
       "uvlock": true
     },
     "facing=north,half=bottom,shape=inner_left": {
@@ -69,7 +70,7 @@
     },
     "facing=north,half=bottom,shape=straight": {
       "model": "buildscape:block/glass_stairs",
-      "y": 180,
+      "y": 270,
       "uvlock": true
     },
     "facing=north,half=top,shape=inner_left": {
@@ -97,10 +98,12 @@
     "facing=north,half=top,shape=straight": {
       "model": "buildscape:block/glass_stairs",
       "x": 180,
+      "y": 270,
       "uvlock": true
     },
     "facing=south,half=bottom,shape=inner_left": {
-      "model": "buildscape:block/glass_stairs_inner"
+      "model": "buildscape:block/glass_stairs_inner",
+      "uvlock": true
     },
     "facing=south,half=bottom,shape=inner_right": {
       "model": "buildscape:block/glass_stairs_inner",
@@ -108,7 +111,8 @@
       "uvlock": true
     },
     "facing=south,half=bottom,shape=outer_left": {
-      "model": "buildscape:block/glass_stairs_outer"
+      "model": "buildscape:block/glass_stairs_outer",
+      "uvlock": true
     },
     "facing=south,half=bottom,shape=outer_right": {
       "model": "buildscape:block/glass_stairs_outer",
@@ -117,7 +121,7 @@
     },
     "facing=south,half=bottom,shape=straight": {
       "model": "buildscape:block/glass_stairs",
-      "y": 0,
+      "y": 90,
       "uvlock": true
     },
     "facing=south,half=top,shape=inner_left": {
@@ -147,7 +151,7 @@
     "facing=south,half=top,shape=straight": {
       "model": "buildscape:block/glass_stairs",
       "x": 180,
-      "y": 180,
+      "y": 90,
       "uvlock": true
     },
     "facing=west,half=bottom,shape=inner_left": {
@@ -172,7 +176,7 @@
     },
     "facing=west,half=bottom,shape=straight": {
       "model": "buildscape:block/glass_stairs",
-      "y": 90,
+      "y": 180,
       "uvlock": true
     },
     "facing=west,half=top,shape=inner_left": {
@@ -202,7 +206,7 @@
     "facing=west,half=top,shape=straight": {
       "model": "buildscape:block/glass_stairs",
       "x": 180,
-      "y": 270,
+      "y": 180,
       "uvlock": true
     }
   }

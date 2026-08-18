@@ -203,4 +203,30 @@ public class ModBlockEntities {
                             ModBlocks.WAXED_WEATHERED_COPPER_CHEST.get(),
                             ModBlocks.WAXED_OXIDIZED_COPPER_CHEST.get()
                     ).build(null));
+
+    public static final RegistryObject<BlockEntityType<PotentSulfurBlockEntity>> POTENT_SULFUR =
+            BLOCK_ENTITIES.register("potent_sulfur",
+                    () -> BlockEntityType.Builder.of(
+                            PotentSulfurBlockEntity::new,
+                            ModBlocks.POTENT_SULFUR.get()
+                    ).build(null));
+
+    public static final RegistryObject<BlockEntityType<ShelfBlockEntity>> SHELF =
+            BLOCK_ENTITIES.register("shelf",
+                    () -> BlockEntityType.Builder.of(
+                            ShelfBlockEntity::new,
+                            ModBlocks.OAK_SHELF.get(),
+                            ModBlocks.SPRUCE_SHELF.get(),
+                            ModBlocks.BIRCH_SHELF.get(),
+                            ModBlocks.JUNGLE_SHELF.get(),
+                            ModBlocks.ACACIA_SHELF.get(),
+                            ModBlocks.DARK_OAK_SHELF.get(),
+                            ModBlocks.MANGROVE_SHELF.get(),
+                            ModBlocks.CHERRY_SHELF.get(),
+                            ModBlocks.CRIMSON_SHELF.get(),
+                            ModBlocks.WARPED_SHELF.get(),
+                            ModBlocks.BAMBOO_SHELF.get(),
+                            ModBlocks.PALE_OAK_SHELF.get(),
+                            ModBlocks.POPLAR_SHELF.get()
+                    ).build(null));
 }

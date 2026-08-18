@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/pressure_plate_up",
+  "textures": {
+    "texture": "buildscape:block/tinted_cardboard_block"
+  }
+}

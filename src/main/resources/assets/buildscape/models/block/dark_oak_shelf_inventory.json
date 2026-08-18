@@ -1,0 +1,7 @@
+{
+  "parent": "buildscape:block/template_shelf_inventory",
+  "textures": {
+    "all": "buildscape:block/dark_oak_shelf",
+    "particle": "buildscape:block/stripped_dark_oak_log"
+  }
+}

@@ -1091,5 +1091,93 @@
         "type": "event"
       }
     ]
+  },
+  "block_geyser_continuous_start": {
+    "sounds": [
+      {
+        "name": "minecraft:block/bubble_column/bubble_column_up_inside",
+        "stream": false
+      }
+    ]
+  },
+  "block_geyser_continuous_active": {
+    "sounds": [
+      {
+        "name": "minecraft:block/bubble_column/bubble_column_up",
+        "stream": false
+      }
+    ]
+  },
+  "block_geyser_eruption_start": {
+    "sounds": [
+      {
+        "name": "minecraft:entity/generic/explode",
+        "stream": false
+      }
+    ]
+  },
+  "block_geyser_eruption_active": {
+    "sounds": [
+      {
+        "name": "minecraft:block/bubble_column/bubble_column_up",
+        "stream": false
+      }
+    ]
+  },
+  "block_noxious_gas": {
+    "sounds": [
+      {
+        "name": "minecraft:block/fire/extinguish",
+        "stream": false
+      }
+    ]
+  },
+  "block_shelf_activate": {
+    "sounds": [
+      {
+        "name": "minecraft:block/wooden_trapdoor/close",
+        "stream": false
+      }
+    ]
+  },
+  "block_shelf_deactivate": {
+    "sounds": [
+      {
+        "name": "minecraft:block/wooden_trapdoor/open",
+        "stream": false
+      }
+    ]
+  },
+  "block_shelf_place_item": {
+    "sounds": [
+      {
+        "name": "minecraft:entity/item_frame/add_item",
+        "stream": false
+      }
+    ]
+  },
+  "block_shelf_take_item": {
+    "sounds": [
+      {
+        "name": "minecraft:entity/item_frame/remove_item",
+        "stream": false
+      }
+    ]
+  },
+  "block_shelf_single_swap": {
+    "sounds": [
+      {
+        "name": "minecraft:entity/item_frame/rotate_item",
+        "stream": false
+      }
+    ]
+  },
+  "block_shelf_multi_swap": {
+    "sounds": [
+      {
+        "name": "minecraft:entity/item_frame/rotate_item",
+        "stream": false
+      }
+    ]
   }
 }

@@ -60,9 +60,9 @@ public class CushionBlock extends Block implements SimpleWaterloggedBlock {
         Direction direction = context.getClickedFace();
         FluidState fluidstate = context.getLevel().getFluidState(blockpos);
         boolean isWater = fluidstate.getType() == Fluids.WATER;
-        
+
         BlockState state = this.defaultBlockState().setValue(WATERLOGGED, Boolean.valueOf(isWater));
-        
+
         if (direction == Direction.DOWN || (direction != Direction.UP && context.getClickLocation().y - (double)blockpos.getY() > 0.5D)) {
             return state.setValue(HALF, Half.TOP);
         }
@@ -120,11 +120,12 @@ public class CushionBlock extends Block implements SimpleWaterloggedBlock {
                 return InteractionResult.PASS;
             }
 
-            if (player.isPassenger()) {
+            if (player.isPassenger() && !(player.getVehicle() instanceof SeatEntity)) {
                 return InteractionResult.PASS;
             }
 
-            List<SeatEntity> seats = level.getEntitiesOfClass(SeatEntity.class, new AABB(pos));
+            List<SeatEntity> seats = level.getEntitiesOfClass(SeatEntity.class, new AABB(pos),
+                    seat -> !seat.getPassengers().isEmpty());
             if (!seats.isEmpty()) {
                 return InteractionResult.PASS;
             }

@@ -2,6 +2,6 @@
   "parent": "buildscape:block/template_shelf_inventory",
   "textures": {
     "all": "buildscape:block/crimson_shelf",
-    "particle": "buildscape:block/stripped_crimson_stem"
+    "particle": "minecraft:block/stripped_crimson_stem"
   }
 }

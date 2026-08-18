@@ -11358,6 +11358,622 @@ public static final RegistryObject<Item> FLAMING_STEEL_INGOT = ITEMS.register("f
             () -> new BlockItem(ModBlocks.HOLLOW_CHERRY_LOG.get(), createBlockItemProperties()));
     public static final RegistryObject<Item> STRIPPED_HOLLOW_CHERRY_LOG = ITEMS.register("stripped_hollow_cherry_log",
             () -> new BlockItem(ModBlocks.STRIPPED_HOLLOW_CHERRY_LOG.get(), createBlockItemProperties()));
+
+    // CARDBOARD ITEMS BEGIN
+    public static final RegistryObject<Item> CARDBOARD_BLOCK = ITEMS.register(
+            "cardboard_block",
+            () -> new BlockItem(ModBlocks.CARDBOARD_BLOCK.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> CARDBOARD_SLAB = ITEMS.register(
+            "cardboard_slab",
+            () -> new BlockItem(ModBlocks.CARDBOARD_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> CARDBOARD_STAIRS = ITEMS.register(
+            "cardboard_stairs",
+            () -> new BlockItem(ModBlocks.CARDBOARD_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> CARDBOARD_WALL = ITEMS.register(
+            "cardboard_wall",
+            () -> new BlockItem(ModBlocks.CARDBOARD_WALL.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> CARDBOARD_VERTICAL_SLAB = ITEMS.register(
+            "cardboard_vertical_slab",
+            () -> new BlockItem(ModBlocks.CARDBOARD_VERTICAL_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> CARDBOARD_TRAPDOOR = ITEMS.register(
+            "cardboard_trapdoor",
+            () -> new BlockItem(ModBlocks.CARDBOARD_TRAPDOOR.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> CARDBOARD_BUTTON = ITEMS.register(
+            "cardboard_button",
+            () -> new BlockItem(ModBlocks.CARDBOARD_BUTTON.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> CARDBOARD_PRESSURE_PLATE = ITEMS.register(
+            "cardboard_pressure_plate",
+            () -> new BlockItem(ModBlocks.CARDBOARD_PRESSURE_PLATE.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> SMOOTH_CARDBOARD_BLOCK = ITEMS.register(
+            "smooth_cardboard_block",
+            () -> new BlockItem(ModBlocks.SMOOTH_CARDBOARD_BLOCK.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> SMOOTH_CARDBOARD_SLAB = ITEMS.register(
+            "smooth_cardboard_slab",
+            () -> new BlockItem(ModBlocks.SMOOTH_CARDBOARD_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> SMOOTH_CARDBOARD_STAIRS = ITEMS.register(
+            "smooth_cardboard_stairs",
+            () -> new BlockItem(ModBlocks.SMOOTH_CARDBOARD_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> SMOOTH_CARDBOARD_WALL = ITEMS.register(
+            "smooth_cardboard_wall",
+            () -> new BlockItem(ModBlocks.SMOOTH_CARDBOARD_WALL.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> SMOOTH_CARDBOARD_VERTICAL_SLAB = ITEMS.register(
+            "smooth_cardboard_vertical_slab",
+            () -> new BlockItem(ModBlocks.SMOOTH_CARDBOARD_VERTICAL_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> BUNDLED_CARDBOARD = ITEMS.register(
+            "bundled_cardboard",
+            () -> new BlockItem(ModBlocks.BUNDLED_CARDBOARD.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> BUNDLED_CARDBOARD_SLAB = ITEMS.register(
+            "bundled_cardboard_slab",
+            () -> new BlockItem(ModBlocks.BUNDLED_CARDBOARD_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> BUNDLED_CARDBOARD_STAIRS = ITEMS.register(
+            "bundled_cardboard_stairs",
+            () -> new BlockItem(ModBlocks.BUNDLED_CARDBOARD_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> BUNDLED_CARDBOARD_WALL = ITEMS.register(
+            "bundled_cardboard_wall",
+            () -> new BlockItem(ModBlocks.BUNDLED_CARDBOARD_WALL.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> BUNDLED_CARDBOARD_VERTICAL_SLAB = ITEMS.register(
+            "bundled_cardboard_vertical_slab",
+            () -> new BlockItem(ModBlocks.BUNDLED_CARDBOARD_VERTICAL_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> PRESSED_CARDBOARD = ITEMS.register(
+            "pressed_cardboard",
+            () -> new BlockItem(ModBlocks.PRESSED_CARDBOARD.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> PRESSED_CARDBOARD_SLAB = ITEMS.register(
+            "pressed_cardboard_slab",
+            () -> new BlockItem(ModBlocks.PRESSED_CARDBOARD_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> PRESSED_CARDBOARD_STAIRS = ITEMS.register(
+            "pressed_cardboard_stairs",
+            () -> new BlockItem(ModBlocks.PRESSED_CARDBOARD_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> PRESSED_CARDBOARD_WALL = ITEMS.register(
+            "pressed_cardboard_wall",
+            () -> new BlockItem(ModBlocks.PRESSED_CARDBOARD_WALL.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> PRESSED_CARDBOARD_VERTICAL_SLAB = ITEMS.register(
+            "pressed_cardboard_vertical_slab",
+            () -> new BlockItem(ModBlocks.PRESSED_CARDBOARD_VERTICAL_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> THICK_CARDBOARD_BLOCK = ITEMS.register(
+            "thick_cardboard_block",
+            () -> new BlockItem(ModBlocks.THICK_CARDBOARD_BLOCK.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> THICK_CARDBOARD_SLAB = ITEMS.register(
+            "thick_cardboard_slab",
+            () -> new BlockItem(ModBlocks.THICK_CARDBOARD_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> THICK_CARDBOARD_STAIRS = ITEMS.register(
+            "thick_cardboard_stairs",
+            () -> new BlockItem(ModBlocks.THICK_CARDBOARD_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> THICK_CARDBOARD_WALL = ITEMS.register(
+            "thick_cardboard_wall",
+            () -> new BlockItem(ModBlocks.THICK_CARDBOARD_WALL.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> THICK_CARDBOARD_VERTICAL_SLAB = ITEMS.register(
+            "thick_cardboard_vertical_slab",
+            () -> new BlockItem(ModBlocks.THICK_CARDBOARD_VERTICAL_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> STRIPPED_CARDBOARD_BLOCK = ITEMS.register(
+            "stripped_cardboard_block",
+            () -> new BlockItem(ModBlocks.STRIPPED_CARDBOARD_BLOCK.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> STRIPPED_CARDBOARD_SLAB = ITEMS.register(
+            "stripped_cardboard_slab",
+            () -> new BlockItem(ModBlocks.STRIPPED_CARDBOARD_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> STRIPPED_CARDBOARD_STAIRS = ITEMS.register(
+            "stripped_cardboard_stairs",
+            () -> new BlockItem(ModBlocks.STRIPPED_CARDBOARD_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> STRIPPED_CARDBOARD_WALL = ITEMS.register(
+            "stripped_cardboard_wall",
+            () -> new BlockItem(ModBlocks.STRIPPED_CARDBOARD_WALL.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> STRIPPED_CARDBOARD_VERTICAL_SLAB = ITEMS.register(
+            "stripped_cardboard_vertical_slab",
+            () -> new BlockItem(ModBlocks.STRIPPED_CARDBOARD_VERTICAL_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> STRIPPED_CARDBOARD_TRAPDOOR = ITEMS.register(
+            "stripped_cardboard_trapdoor",
+            () -> new BlockItem(ModBlocks.STRIPPED_CARDBOARD_TRAPDOOR.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> STRIPPED_CARDBOARD_BUTTON = ITEMS.register(
+            "stripped_cardboard_button",
+            () -> new BlockItem(ModBlocks.STRIPPED_CARDBOARD_BUTTON.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> STRIPPED_CARDBOARD_PRESSURE_PLATE = ITEMS.register(
+            "stripped_cardboard_pressure_plate",
+            () -> new BlockItem(ModBlocks.STRIPPED_CARDBOARD_PRESSURE_PLATE.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> STRIPPED_SMOOTH_CARDBOARD_BLOCK = ITEMS.register(
+            "stripped_smooth_cardboard_block",
+            () -> new BlockItem(ModBlocks.STRIPPED_SMOOTH_CARDBOARD_BLOCK.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> STRIPPED_SMOOTH_CARDBOARD_SLAB = ITEMS.register(
+            "stripped_smooth_cardboard_slab",
+            () -> new BlockItem(ModBlocks.STRIPPED_SMOOTH_CARDBOARD_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> STRIPPED_SMOOTH_CARDBOARD_STAIRS = ITEMS.register(
+            "stripped_smooth_cardboard_stairs",
+            () -> new BlockItem(ModBlocks.STRIPPED_SMOOTH_CARDBOARD_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> STRIPPED_SMOOTH_CARDBOARD_WALL = ITEMS.register(
+            "stripped_smooth_cardboard_wall",
+            () -> new BlockItem(ModBlocks.STRIPPED_SMOOTH_CARDBOARD_WALL.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> STRIPPED_SMOOTH_CARDBOARD_VERTICAL_SLAB = ITEMS.register(
+            "stripped_smooth_cardboard_vertical_slab",
+            () -> new BlockItem(ModBlocks.STRIPPED_SMOOTH_CARDBOARD_VERTICAL_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> STRIPPED_BUNDLED_CARDBOARD = ITEMS.register(
+            "stripped_bundled_cardboard",
+            () -> new BlockItem(ModBlocks.STRIPPED_BUNDLED_CARDBOARD.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> STRIPPED_BUNDLED_CARDBOARD_SLAB = ITEMS.register(
+            "stripped_bundled_cardboard_slab",
+            () -> new BlockItem(ModBlocks.STRIPPED_BUNDLED_CARDBOARD_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> STRIPPED_BUNDLED_CARDBOARD_STAIRS = ITEMS.register(
+            "stripped_bundled_cardboard_stairs",
+            () -> new BlockItem(ModBlocks.STRIPPED_BUNDLED_CARDBOARD_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> STRIPPED_BUNDLED_CARDBOARD_WALL = ITEMS.register(
+            "stripped_bundled_cardboard_wall",
+            () -> new BlockItem(ModBlocks.STRIPPED_BUNDLED_CARDBOARD_WALL.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> STRIPPED_BUNDLED_CARDBOARD_VERTICAL_SLAB = ITEMS.register(
+            "stripped_bundled_cardboard_vertical_slab",
+            () -> new BlockItem(ModBlocks.STRIPPED_BUNDLED_CARDBOARD_VERTICAL_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> STRIPPED_PRESSED_CARDBOARD = ITEMS.register(
+            "stripped_pressed_cardboard",
+            () -> new BlockItem(ModBlocks.STRIPPED_PRESSED_CARDBOARD.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> STRIPPED_PRESSED_CARDBOARD_SLAB = ITEMS.register(
+            "stripped_pressed_cardboard_slab",
+            () -> new BlockItem(ModBlocks.STRIPPED_PRESSED_CARDBOARD_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> STRIPPED_PRESSED_CARDBOARD_STAIRS = ITEMS.register(
+            "stripped_pressed_cardboard_stairs",
+            () -> new BlockItem(ModBlocks.STRIPPED_PRESSED_CARDBOARD_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> STRIPPED_PRESSED_CARDBOARD_WALL = ITEMS.register(
+            "stripped_pressed_cardboard_wall",
+            () -> new BlockItem(ModBlocks.STRIPPED_PRESSED_CARDBOARD_WALL.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> STRIPPED_PRESSED_CARDBOARD_VERTICAL_SLAB = ITEMS.register(
+            "stripped_pressed_cardboard_vertical_slab",
+            () -> new BlockItem(ModBlocks.STRIPPED_PRESSED_CARDBOARD_VERTICAL_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> STRIPPED_THICK_CARDBOARD_BLOCK = ITEMS.register(
+            "stripped_thick_cardboard_block",
+            () -> new BlockItem(ModBlocks.STRIPPED_THICK_CARDBOARD_BLOCK.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> STRIPPED_THICK_CARDBOARD_SLAB = ITEMS.register(
+            "stripped_thick_cardboard_slab",
+            () -> new BlockItem(ModBlocks.STRIPPED_THICK_CARDBOARD_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> STRIPPED_THICK_CARDBOARD_STAIRS = ITEMS.register(
+            "stripped_thick_cardboard_stairs",
+            () -> new BlockItem(ModBlocks.STRIPPED_THICK_CARDBOARD_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> STRIPPED_THICK_CARDBOARD_WALL = ITEMS.register(
+            "stripped_thick_cardboard_wall",
+            () -> new BlockItem(ModBlocks.STRIPPED_THICK_CARDBOARD_WALL.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> STRIPPED_THICK_CARDBOARD_VERTICAL_SLAB = ITEMS.register(
+            "stripped_thick_cardboard_vertical_slab",
+            () -> new BlockItem(ModBlocks.STRIPPED_THICK_CARDBOARD_VERTICAL_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> TINTED_CARDBOARD_BLOCK = ITEMS.register(
+            "tinted_cardboard_block",
+            () -> new BlockItem(ModBlocks.TINTED_CARDBOARD_BLOCK.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> TINTED_CARDBOARD_SLAB = ITEMS.register(
+            "tinted_cardboard_slab",
+            () -> new BlockItem(ModBlocks.TINTED_CARDBOARD_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> TINTED_CARDBOARD_STAIRS = ITEMS.register(
+            "tinted_cardboard_stairs",
+            () -> new BlockItem(ModBlocks.TINTED_CARDBOARD_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> TINTED_CARDBOARD_WALL = ITEMS.register(
+            "tinted_cardboard_wall",
+            () -> new BlockItem(ModBlocks.TINTED_CARDBOARD_WALL.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> TINTED_CARDBOARD_VERTICAL_SLAB = ITEMS.register(
+            "tinted_cardboard_vertical_slab",
+            () -> new BlockItem(ModBlocks.TINTED_CARDBOARD_VERTICAL_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> TINTED_CARDBOARD_TRAPDOOR = ITEMS.register(
+            "tinted_cardboard_trapdoor",
+            () -> new BlockItem(ModBlocks.TINTED_CARDBOARD_TRAPDOOR.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> TINTED_CARDBOARD_BUTTON = ITEMS.register(
+            "tinted_cardboard_button",
+            () -> new BlockItem(ModBlocks.TINTED_CARDBOARD_BUTTON.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> TINTED_CARDBOARD_PRESSURE_PLATE = ITEMS.register(
+            "tinted_cardboard_pressure_plate",
+            () -> new BlockItem(ModBlocks.TINTED_CARDBOARD_PRESSURE_PLATE.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> TINTED_SMOOTH_CARDBOARD_BLOCK = ITEMS.register(
+            "tinted_smooth_cardboard_block",
+            () -> new BlockItem(ModBlocks.TINTED_SMOOTH_CARDBOARD_BLOCK.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> TINTED_SMOOTH_CARDBOARD_SLAB = ITEMS.register(
+            "tinted_smooth_cardboard_slab",
+            () -> new BlockItem(ModBlocks.TINTED_SMOOTH_CARDBOARD_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> TINTED_SMOOTH_CARDBOARD_STAIRS = ITEMS.register(
+            "tinted_smooth_cardboard_stairs",
+            () -> new BlockItem(ModBlocks.TINTED_SMOOTH_CARDBOARD_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> TINTED_SMOOTH_CARDBOARD_WALL = ITEMS.register(
+            "tinted_smooth_cardboard_wall",
+            () -> new BlockItem(ModBlocks.TINTED_SMOOTH_CARDBOARD_WALL.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> TINTED_SMOOTH_CARDBOARD_VERTICAL_SLAB = ITEMS.register(
+            "tinted_smooth_cardboard_vertical_slab",
+            () -> new BlockItem(ModBlocks.TINTED_SMOOTH_CARDBOARD_VERTICAL_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> TINTED_BUNDLED_CARDBOARD = ITEMS.register(
+            "tinted_bundled_cardboard",
+            () -> new BlockItem(ModBlocks.TINTED_BUNDLED_CARDBOARD.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> TINTED_BUNDLED_CARDBOARD_SLAB = ITEMS.register(
+            "tinted_bundled_cardboard_slab",
+            () -> new BlockItem(ModBlocks.TINTED_BUNDLED_CARDBOARD_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> TINTED_BUNDLED_CARDBOARD_STAIRS = ITEMS.register(
+            "tinted_bundled_cardboard_stairs",
+            () -> new BlockItem(ModBlocks.TINTED_BUNDLED_CARDBOARD_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> TINTED_BUNDLED_CARDBOARD_WALL = ITEMS.register(
+            "tinted_bundled_cardboard_wall",
+            () -> new BlockItem(ModBlocks.TINTED_BUNDLED_CARDBOARD_WALL.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> TINTED_BUNDLED_CARDBOARD_VERTICAL_SLAB = ITEMS.register(
+            "tinted_bundled_cardboard_vertical_slab",
+            () -> new BlockItem(ModBlocks.TINTED_BUNDLED_CARDBOARD_VERTICAL_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> TINTED_PRESSED_CARDBOARD = ITEMS.register(
+            "tinted_pressed_cardboard",
+            () -> new BlockItem(ModBlocks.TINTED_PRESSED_CARDBOARD.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> TINTED_PRESSED_CARDBOARD_SLAB = ITEMS.register(
+            "tinted_pressed_cardboard_slab",
+            () -> new BlockItem(ModBlocks.TINTED_PRESSED_CARDBOARD_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> TINTED_PRESSED_CARDBOARD_STAIRS = ITEMS.register(
+            "tinted_pressed_cardboard_stairs",
+            () -> new BlockItem(ModBlocks.TINTED_PRESSED_CARDBOARD_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> TINTED_PRESSED_CARDBOARD_WALL = ITEMS.register(
+            "tinted_pressed_cardboard_wall",
+            () -> new BlockItem(ModBlocks.TINTED_PRESSED_CARDBOARD_WALL.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> TINTED_PRESSED_CARDBOARD_VERTICAL_SLAB = ITEMS.register(
+            "tinted_pressed_cardboard_vertical_slab",
+            () -> new BlockItem(ModBlocks.TINTED_PRESSED_CARDBOARD_VERTICAL_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> TINTED_THICK_CARDBOARD_BLOCK = ITEMS.register(
+            "tinted_thick_cardboard_block",
+            () -> new BlockItem(ModBlocks.TINTED_THICK_CARDBOARD_BLOCK.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> TINTED_THICK_CARDBOARD_SLAB = ITEMS.register(
+            "tinted_thick_cardboard_slab",
+            () -> new BlockItem(ModBlocks.TINTED_THICK_CARDBOARD_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> TINTED_THICK_CARDBOARD_STAIRS = ITEMS.register(
+            "tinted_thick_cardboard_stairs",
+            () -> new BlockItem(ModBlocks.TINTED_THICK_CARDBOARD_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> TINTED_THICK_CARDBOARD_WALL = ITEMS.register(
+            "tinted_thick_cardboard_wall",
+            () -> new BlockItem(ModBlocks.TINTED_THICK_CARDBOARD_WALL.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> TINTED_THICK_CARDBOARD_VERTICAL_SLAB = ITEMS.register(
+            "tinted_thick_cardboard_vertical_slab",
+            () -> new BlockItem(ModBlocks.TINTED_THICK_CARDBOARD_VERTICAL_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> WASHED_CARDBOARD_BLOCK = ITEMS.register(
+            "washed_cardboard_block",
+            () -> new BlockItem(ModBlocks.WASHED_CARDBOARD_BLOCK.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> WASHED_CARDBOARD_SLAB = ITEMS.register(
+            "washed_cardboard_slab",
+            () -> new BlockItem(ModBlocks.WASHED_CARDBOARD_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> WASHED_CARDBOARD_STAIRS = ITEMS.register(
+            "washed_cardboard_stairs",
+            () -> new BlockItem(ModBlocks.WASHED_CARDBOARD_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> WASHED_CARDBOARD_WALL = ITEMS.register(
+            "washed_cardboard_wall",
+            () -> new BlockItem(ModBlocks.WASHED_CARDBOARD_WALL.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> WASHED_CARDBOARD_VERTICAL_SLAB = ITEMS.register(
+            "washed_cardboard_vertical_slab",
+            () -> new BlockItem(ModBlocks.WASHED_CARDBOARD_VERTICAL_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> WASHED_CARDBOARD_TRAPDOOR = ITEMS.register(
+            "washed_cardboard_trapdoor",
+            () -> new BlockItem(ModBlocks.WASHED_CARDBOARD_TRAPDOOR.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> WASHED_CARDBOARD_BUTTON = ITEMS.register(
+            "washed_cardboard_button",
+            () -> new BlockItem(ModBlocks.WASHED_CARDBOARD_BUTTON.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> WASHED_CARDBOARD_PRESSURE_PLATE = ITEMS.register(
+            "washed_cardboard_pressure_plate",
+            () -> new BlockItem(ModBlocks.WASHED_CARDBOARD_PRESSURE_PLATE.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> WASHED_SMOOTH_CARDBOARD_BLOCK = ITEMS.register(
+            "washed_smooth_cardboard_block",
+            () -> new BlockItem(ModBlocks.WASHED_SMOOTH_CARDBOARD_BLOCK.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> WASHED_SMOOTH_CARDBOARD_SLAB = ITEMS.register(
+            "washed_smooth_cardboard_slab",
+            () -> new BlockItem(ModBlocks.WASHED_SMOOTH_CARDBOARD_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> WASHED_SMOOTH_CARDBOARD_STAIRS = ITEMS.register(
+            "washed_smooth_cardboard_stairs",
+            () -> new BlockItem(ModBlocks.WASHED_SMOOTH_CARDBOARD_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> WASHED_SMOOTH_CARDBOARD_WALL = ITEMS.register(
+            "washed_smooth_cardboard_wall",
+            () -> new BlockItem(ModBlocks.WASHED_SMOOTH_CARDBOARD_WALL.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> WASHED_SMOOTH_CARDBOARD_VERTICAL_SLAB = ITEMS.register(
+            "washed_smooth_cardboard_vertical_slab",
+            () -> new BlockItem(ModBlocks.WASHED_SMOOTH_CARDBOARD_VERTICAL_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> WASHED_BUNDLED_CARDBOARD = ITEMS.register(
+            "washed_bundled_cardboard",
+            () -> new BlockItem(ModBlocks.WASHED_BUNDLED_CARDBOARD.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> WASHED_BUNDLED_CARDBOARD_SLAB = ITEMS.register(
+            "washed_bundled_cardboard_slab",
+            () -> new BlockItem(ModBlocks.WASHED_BUNDLED_CARDBOARD_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> WASHED_BUNDLED_CARDBOARD_STAIRS = ITEMS.register(
+            "washed_bundled_cardboard_stairs",
+            () -> new BlockItem(ModBlocks.WASHED_BUNDLED_CARDBOARD_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> WASHED_BUNDLED_CARDBOARD_WALL = ITEMS.register(
+            "washed_bundled_cardboard_wall",
+            () -> new BlockItem(ModBlocks.WASHED_BUNDLED_CARDBOARD_WALL.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> WASHED_BUNDLED_CARDBOARD_VERTICAL_SLAB = ITEMS.register(
+            "washed_bundled_cardboard_vertical_slab",
+            () -> new BlockItem(ModBlocks.WASHED_BUNDLED_CARDBOARD_VERTICAL_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> WASHED_PRESSED_CARDBOARD = ITEMS.register(
+            "washed_pressed_cardboard",
+            () -> new BlockItem(ModBlocks.WASHED_PRESSED_CARDBOARD.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> WASHED_PRESSED_CARDBOARD_SLAB = ITEMS.register(
+            "washed_pressed_cardboard_slab",
+            () -> new BlockItem(ModBlocks.WASHED_PRESSED_CARDBOARD_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> WASHED_PRESSED_CARDBOARD_STAIRS = ITEMS.register(
+            "washed_pressed_cardboard_stairs",
+            () -> new BlockItem(ModBlocks.WASHED_PRESSED_CARDBOARD_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> WASHED_PRESSED_CARDBOARD_WALL = ITEMS.register(
+            "washed_pressed_cardboard_wall",
+            () -> new BlockItem(ModBlocks.WASHED_PRESSED_CARDBOARD_WALL.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> WASHED_PRESSED_CARDBOARD_VERTICAL_SLAB = ITEMS.register(
+            "washed_pressed_cardboard_vertical_slab",
+            () -> new BlockItem(ModBlocks.WASHED_PRESSED_CARDBOARD_VERTICAL_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> WASHED_THICK_CARDBOARD_BLOCK = ITEMS.register(
+            "washed_thick_cardboard_block",
+            () -> new BlockItem(ModBlocks.WASHED_THICK_CARDBOARD_BLOCK.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> WASHED_THICK_CARDBOARD_SLAB = ITEMS.register(
+            "washed_thick_cardboard_slab",
+            () -> new BlockItem(ModBlocks.WASHED_THICK_CARDBOARD_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> WASHED_THICK_CARDBOARD_STAIRS = ITEMS.register(
+            "washed_thick_cardboard_stairs",
+            () -> new BlockItem(ModBlocks.WASHED_THICK_CARDBOARD_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> WASHED_THICK_CARDBOARD_WALL = ITEMS.register(
+            "washed_thick_cardboard_wall",
+            () -> new BlockItem(ModBlocks.WASHED_THICK_CARDBOARD_WALL.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> WASHED_THICK_CARDBOARD_VERTICAL_SLAB = ITEMS.register(
+            "washed_thick_cardboard_vertical_slab",
+            () -> new BlockItem(ModBlocks.WASHED_THICK_CARDBOARD_VERTICAL_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> BURNT_CARDBOARD_BLOCK = ITEMS.register(
+            "burnt_cardboard_block",
+            () -> new BlockItem(ModBlocks.BURNT_CARDBOARD_BLOCK.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> BURNT_CARDBOARD_SLAB = ITEMS.register(
+            "burnt_cardboard_slab",
+            () -> new BlockItem(ModBlocks.BURNT_CARDBOARD_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> BURNT_CARDBOARD_STAIRS = ITEMS.register(
+            "burnt_cardboard_stairs",
+            () -> new BlockItem(ModBlocks.BURNT_CARDBOARD_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> BURNT_CARDBOARD_WALL = ITEMS.register(
+            "burnt_cardboard_wall",
+            () -> new BlockItem(ModBlocks.BURNT_CARDBOARD_WALL.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> BURNT_CARDBOARD_VERTICAL_SLAB = ITEMS.register(
+            "burnt_cardboard_vertical_slab",
+            () -> new BlockItem(ModBlocks.BURNT_CARDBOARD_VERTICAL_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> BURNT_CARDBOARD_TRAPDOOR = ITEMS.register(
+            "burnt_cardboard_trapdoor",
+            () -> new BlockItem(ModBlocks.BURNT_CARDBOARD_TRAPDOOR.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> BURNT_CARDBOARD_BUTTON = ITEMS.register(
+            "burnt_cardboard_button",
+            () -> new BlockItem(ModBlocks.BURNT_CARDBOARD_BUTTON.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> BURNT_CARDBOARD_PRESSURE_PLATE = ITEMS.register(
+            "burnt_cardboard_pressure_plate",
+            () -> new BlockItem(ModBlocks.BURNT_CARDBOARD_PRESSURE_PLATE.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> BURNT_SMOOTH_CARDBOARD_BLOCK = ITEMS.register(
+            "burnt_smooth_cardboard_block",
+            () -> new BlockItem(ModBlocks.BURNT_SMOOTH_CARDBOARD_BLOCK.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> BURNT_SMOOTH_CARDBOARD_SLAB = ITEMS.register(
+            "burnt_smooth_cardboard_slab",
+            () -> new BlockItem(ModBlocks.BURNT_SMOOTH_CARDBOARD_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> BURNT_SMOOTH_CARDBOARD_STAIRS = ITEMS.register(
+            "burnt_smooth_cardboard_stairs",
+            () -> new BlockItem(ModBlocks.BURNT_SMOOTH_CARDBOARD_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> BURNT_SMOOTH_CARDBOARD_WALL = ITEMS.register(
+            "burnt_smooth_cardboard_wall",
+            () -> new BlockItem(ModBlocks.BURNT_SMOOTH_CARDBOARD_WALL.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> BURNT_SMOOTH_CARDBOARD_VERTICAL_SLAB = ITEMS.register(
+            "burnt_smooth_cardboard_vertical_slab",
+            () -> new BlockItem(ModBlocks.BURNT_SMOOTH_CARDBOARD_VERTICAL_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> BURNT_BUNDLED_CARDBOARD = ITEMS.register(
+            "burnt_bundled_cardboard",
+            () -> new BlockItem(ModBlocks.BURNT_BUNDLED_CARDBOARD.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> BURNT_BUNDLED_CARDBOARD_SLAB = ITEMS.register(
+            "burnt_bundled_cardboard_slab",
+            () -> new BlockItem(ModBlocks.BURNT_BUNDLED_CARDBOARD_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> BURNT_BUNDLED_CARDBOARD_STAIRS = ITEMS.register(
+            "burnt_bundled_cardboard_stairs",
+            () -> new BlockItem(ModBlocks.BURNT_BUNDLED_CARDBOARD_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> BURNT_BUNDLED_CARDBOARD_WALL = ITEMS.register(
+            "burnt_bundled_cardboard_wall",
+            () -> new BlockItem(ModBlocks.BURNT_BUNDLED_CARDBOARD_WALL.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> BURNT_BUNDLED_CARDBOARD_VERTICAL_SLAB = ITEMS.register(
+            "burnt_bundled_cardboard_vertical_slab",
+            () -> new BlockItem(ModBlocks.BURNT_BUNDLED_CARDBOARD_VERTICAL_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> BURNT_PRESSED_CARDBOARD = ITEMS.register(
+            "burnt_pressed_cardboard",
+            () -> new BlockItem(ModBlocks.BURNT_PRESSED_CARDBOARD.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> BURNT_PRESSED_CARDBOARD_SLAB = ITEMS.register(
+            "burnt_pressed_cardboard_slab",
+            () -> new BlockItem(ModBlocks.BURNT_PRESSED_CARDBOARD_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> BURNT_PRESSED_CARDBOARD_STAIRS = ITEMS.register(
+            "burnt_pressed_cardboard_stairs",
+            () -> new BlockItem(ModBlocks.BURNT_PRESSED_CARDBOARD_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> BURNT_PRESSED_CARDBOARD_WALL = ITEMS.register(
+            "burnt_pressed_cardboard_wall",
+            () -> new BlockItem(ModBlocks.BURNT_PRESSED_CARDBOARD_WALL.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> BURNT_PRESSED_CARDBOARD_VERTICAL_SLAB = ITEMS.register(
+            "burnt_pressed_cardboard_vertical_slab",
+            () -> new BlockItem(ModBlocks.BURNT_PRESSED_CARDBOARD_VERTICAL_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> BURNT_THICK_CARDBOARD_BLOCK = ITEMS.register(
+            "burnt_thick_cardboard_block",
+            () -> new BlockItem(ModBlocks.BURNT_THICK_CARDBOARD_BLOCK.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> BURNT_THICK_CARDBOARD_SLAB = ITEMS.register(
+            "burnt_thick_cardboard_slab",
+            () -> new BlockItem(ModBlocks.BURNT_THICK_CARDBOARD_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> BURNT_THICK_CARDBOARD_STAIRS = ITEMS.register(
+            "burnt_thick_cardboard_stairs",
+            () -> new BlockItem(ModBlocks.BURNT_THICK_CARDBOARD_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> BURNT_THICK_CARDBOARD_WALL = ITEMS.register(
+            "burnt_thick_cardboard_wall",
+            () -> new BlockItem(ModBlocks.BURNT_THICK_CARDBOARD_WALL.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> BURNT_THICK_CARDBOARD_VERTICAL_SLAB = ITEMS.register(
+            "burnt_thick_cardboard_vertical_slab",
+            () -> new BlockItem(ModBlocks.BURNT_THICK_CARDBOARD_VERTICAL_SLAB.get(), createBlockItemProperties())
+    );
+    // CARDBOARD ITEMS END
+
+    public static final RegistryObject<Item> OAK_SHELF = ITEMS.register(
+            "oak_shelf",
+            () -> new BlockItem(ModBlocks.OAK_SHELF.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> SPRUCE_SHELF = ITEMS.register(
+            "spruce_shelf",
+            () -> new BlockItem(ModBlocks.SPRUCE_SHELF.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> BIRCH_SHELF = ITEMS.register(
+            "birch_shelf",
+            () -> new BlockItem(ModBlocks.BIRCH_SHELF.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> JUNGLE_SHELF = ITEMS.register(
+            "jungle_shelf",
+            () -> new BlockItem(ModBlocks.JUNGLE_SHELF.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> ACACIA_SHELF = ITEMS.register(
+            "acacia_shelf",
+            () -> new BlockItem(ModBlocks.ACACIA_SHELF.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> DARK_OAK_SHELF = ITEMS.register(
+            "dark_oak_shelf",
+            () -> new BlockItem(ModBlocks.DARK_OAK_SHELF.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> MANGROVE_SHELF = ITEMS.register(
+            "mangrove_shelf",
+            () -> new BlockItem(ModBlocks.MANGROVE_SHELF.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> CHERRY_SHELF = ITEMS.register(
+            "cherry_shelf",
+            () -> new BlockItem(ModBlocks.CHERRY_SHELF.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> CRIMSON_SHELF = ITEMS.register(
+            "crimson_shelf",
+            () -> new BlockItem(ModBlocks.CRIMSON_SHELF.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> WARPED_SHELF = ITEMS.register(
+            "warped_shelf",
+            () -> new BlockItem(ModBlocks.WARPED_SHELF.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> BAMBOO_SHELF = ITEMS.register(
+            "bamboo_shelf",
+            () -> new BlockItem(ModBlocks.BAMBOO_SHELF.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> PALE_OAK_SHELF = ITEMS.register(
+            "pale_oak_shelf",
+            () -> new BlockItem(ModBlocks.PALE_OAK_SHELF.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> POPLAR_SHELF = ITEMS.register(
+            "poplar_shelf",
+            () -> new BlockItem(ModBlocks.POPLAR_SHELF.get(), createBlockItemProperties())
+    );
 }
 
 

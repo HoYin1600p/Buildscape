@@ -1,0 +1,27 @@
+package net.minecraft.network.protocol.game;
+
+import java.util.List;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.PacketType;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.vehicle.minecart.NewMinecartBehavior;
+import net.minecraft.world.level.Level;
+import org.jspecify.annotations.Nullable;
+
+public record ClientboundMoveMinecartPacket(int entityId, List lerpSteps) implements Packet {
+   public static final StreamCodec STREAM_CODEC = StreamCodec.composite(ByteBufCodecs.VAR_INT, ClientboundMoveMinecartPacket::entityId, NewMinecartBehavior.MinecartStep.STREAM_CODEC.apply(ByteBufCodecs.list()), ClientboundMoveMinecartPacket::lerpSteps, ClientboundMoveMinecartPacket::new);
+
+   public PacketType type() {
+      return GamePacketTypes.CLIENTBOUND_MOVE_MINECART_ALONG_TRACK;
+   }
+
+   public void handle(final ClientGamePacketListener listener) {
+      listener.handleMinecartAlongTrack(this);
+   }
+
+   public @Nullable Entity getEntity(final Level level) {
+      return level.getEntity(this.entityId);
+   }
+}

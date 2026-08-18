@@ -1,0 +1,73 @@
+package net.minecraft.world.entity.animal.wolf;
+
+import net.minecraft.core.Holder;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.data.worldgen.BootstrapContext;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.util.RandomSource;
+
+public class WolfSoundVariants {
+   public static final ResourceKey CLASSIC = createKey(WolfSoundVariants.SoundSet.CLASSIC);
+   public static final ResourceKey PUGLIN = createKey(WolfSoundVariants.SoundSet.PUGLIN);
+   public static final ResourceKey SAD = createKey(WolfSoundVariants.SoundSet.SAD);
+   public static final ResourceKey ANGRY = createKey(WolfSoundVariants.SoundSet.ANGRY);
+   public static final ResourceKey GRUMPY = createKey(WolfSoundVariants.SoundSet.GRUMPY);
+   public static final ResourceKey BIG = createKey(WolfSoundVariants.SoundSet.BIG);
+   public static final ResourceKey CUTE = createKey(WolfSoundVariants.SoundSet.CUTE);
+
+   private static ResourceKey createKey(final WolfSoundVariants.SoundSet wolfSoundVariant) {
+      return ResourceKey.create(Registries.WOLF_SOUND_VARIANT, Identifier.withDefaultNamespace(wolfSoundVariant.getIdentifier()));
+   }
+
+   public static void bootstrap(final BootstrapContext context) {
+      register(context, CLASSIC, WolfSoundVariants.SoundSet.CLASSIC);
+      register(context, PUGLIN, WolfSoundVariants.SoundSet.PUGLIN);
+      register(context, SAD, WolfSoundVariants.SoundSet.SAD);
+      register(context, ANGRY, WolfSoundVariants.SoundSet.ANGRY);
+      register(context, GRUMPY, WolfSoundVariants.SoundSet.GRUMPY);
+      register(context, BIG, WolfSoundVariants.SoundSet.BIG);
+      register(context, CUTE, WolfSoundVariants.SoundSet.CUTE);
+   }
+
+   private static void register(final BootstrapContext context, final ResourceKey key, final WolfSoundVariants.SoundSet wolfSoundVariant) {
+      context.register(key, (WolfSoundVariant)SoundEvents.WOLF_SOUNDS.get(wolfSoundVariant));
+   }
+
+   public static Holder pickRandomSoundVariant(final RegistryAccess registryAccess, final RandomSource random) {
+      return (Holder)registryAccess.lookupOrThrow(Registries.WOLF_SOUND_VARIANT).getRandom(random).orElseThrow();
+   }
+
+   public static enum SoundSet {
+      CLASSIC("classic", "wolf"),
+      PUGLIN("puglin", "wolf_puglin"),
+      SAD("sad", "wolf_sad"),
+      ANGRY("angry", "wolf_angry"),
+      GRUMPY("grumpy", "wolf_grumpy"),
+      BIG("big", "wolf_big"),
+      CUTE("cute", "wolf_cute");
+
+      private final String identifier;
+      private final String soundEventIdentifier;
+
+      private SoundSet(final String identifier, final String soundEventIdentifier) {
+         this.identifier = identifier;
+         this.soundEventIdentifier = soundEventIdentifier;
+      }
+
+      public String getIdentifier() {
+         return this.identifier;
+      }
+
+      public String getSoundEventIdentifier() {
+         return this.soundEventIdentifier;
+      }
+
+      // $FF: synthetic method
+      private static WolfSoundVariants.SoundSet[] $values() {
+         return new WolfSoundVariants.SoundSet[]{CLASSIC, PUGLIN, SAD, ANGRY, GRUMPY, BIG, CUTE};
+      }
+   }
+}

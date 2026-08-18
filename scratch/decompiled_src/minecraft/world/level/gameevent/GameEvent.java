@@ -1,0 +1,141 @@
+package net.minecraft.world.level.gameevent;
+
+import com.mojang.serialization.Codec;
+import net.minecraft.core.Holder;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.core.registries.codec.RegistryCodecs;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
+
+public record GameEvent(int notificationRadius) {
+   public static final Holder.Reference BLOCK_ACTIVATE = register("block_activate");
+   public static final Holder.Reference BLOCK_ATTACH = register("block_attach");
+   public static final Holder.Reference BLOCK_CHANGE = register("block_change");
+   public static final Holder.Reference BLOCK_CLOSE = register("block_close");
+   public static final Holder.Reference BLOCK_DEACTIVATE = register("block_deactivate");
+   public static final Holder.Reference BLOCK_DESTROY = register("block_destroy");
+   public static final Holder.Reference BLOCK_DETACH = register("block_detach");
+   public static final Holder.Reference BLOCK_OPEN = register("block_open");
+   public static final Holder.Reference BLOCK_PLACE = register("block_place");
+   public static final Holder.Reference BOUNCE = register("bounce");
+   public static final Holder.Reference CONTAINER_CLOSE = register("container_close");
+   public static final Holder.Reference CONTAINER_OPEN = register("container_open");
+   public static final Holder.Reference DRINK = register("drink");
+   public static final Holder.Reference EAT = register("eat");
+   public static final Holder.Reference ELYTRA_GLIDE = register("elytra_glide");
+   public static final Holder.Reference ENTITY_DAMAGE = register("entity_damage");
+   public static final Holder.Reference ENTITY_DIE = register("entity_die");
+   public static final Holder.Reference ENTITY_DISMOUNT = register("entity_dismount");
+   public static final Holder.Reference ENTITY_INTERACT = register("entity_interact");
+   public static final Holder.Reference ENTITY_MOUNT = register("entity_mount");
+   public static final Holder.Reference ENTITY_PLACE = register("entity_place");
+   public static final Holder.Reference ENTITY_ACTION = register("entity_action");
+   public static final Holder.Reference EQUIP = register("equip");
+   public static final Holder.Reference EXPLODE = register("explode");
+   public static final Holder.Reference FLAP = register("flap");
+   public static final Holder.Reference FLUID_PICKUP = register("fluid_pickup");
+   public static final Holder.Reference FLUID_PLACE = register("fluid_place");
+   public static final Holder.Reference HIT_GROUND = register("hit_ground");
+   public static final Holder.Reference INSTRUMENT_PLAY = register("instrument_play");
+   public static final Holder.Reference ITEM_INTERACT_FINISH = register("item_interact_finish");
+   public static final Holder.Reference ITEM_INTERACT_START = register("item_interact_start");
+   public static final Holder.Reference JUKEBOX_PLAY = register("jukebox_play", 10);
+   public static final Holder.Reference JUKEBOX_STOP_PLAY = register("jukebox_stop_play", 10);
+   public static final Holder.Reference LIGHTNING_STRIKE = register("lightning_strike");
+   public static final Holder.Reference NOTE_BLOCK_PLAY = register("note_block_play");
+   public static final Holder.Reference PRIME_FUSE = register("prime_fuse");
+   public static final Holder.Reference PROJECTILE_LAND = register("projectile_land");
+   public static final Holder.Reference PROJECTILE_SHOOT = register("projectile_shoot");
+   public static final Holder.Reference SCULK_SENSOR_TENDRILS_CLICKING = register("sculk_sensor_tendrils_clicking");
+   public static final Holder.Reference SHEAR = register("shear");
+   public static final Holder.Reference SHRIEK = register("shriek", 32);
+   public static final Holder.Reference SPLASH = register("splash");
+   public static final Holder.Reference STEP = register("step");
+   public static final Holder.Reference SWIM = register("swim");
+   public static final Holder.Reference TELEPORT = register("teleport");
+   public static final Holder.Reference UNEQUIP = register("unequip");
+   public static final Holder.Reference RESONATE_1 = register("resonate_1");
+   public static final Holder.Reference RESONATE_2 = register("resonate_2");
+   public static final Holder.Reference RESONATE_3 = register("resonate_3");
+   public static final Holder.Reference RESONATE_4 = register("resonate_4");
+   public static final Holder.Reference RESONATE_5 = register("resonate_5");
+   public static final Holder.Reference RESONATE_6 = register("resonate_6");
+   public static final Holder.Reference RESONATE_7 = register("resonate_7");
+   public static final Holder.Reference RESONATE_8 = register("resonate_8");
+   public static final Holder.Reference RESONATE_9 = register("resonate_9");
+   public static final Holder.Reference RESONATE_10 = register("resonate_10");
+   public static final Holder.Reference RESONATE_11 = register("resonate_11");
+   public static final Holder.Reference RESONATE_12 = register("resonate_12");
+   public static final Holder.Reference RESONATE_13 = register("resonate_13");
+   public static final Holder.Reference RESONATE_14 = register("resonate_14");
+   public static final Holder.Reference RESONATE_15 = register("resonate_15");
+   public static final int DEFAULT_NOTIFICATION_RADIUS = 16;
+   public static final Codec CODEC = RegistryCodecs.holder(Registries.GAME_EVENT);
+
+   public static Holder bootstrap(final Registry registry) {
+      return BLOCK_ACTIVATE;
+   }
+
+   private static Holder.Reference register(final String name) {
+      return register(name, 16);
+   }
+
+   private static Holder.Reference register(final String name, final int notificationRadius) {
+      return Registry.registerForHolder(BuiltInRegistries.GAME_EVENT, Identifier.withDefaultNamespace(name), new GameEvent(notificationRadius));
+   }
+
+   public static record Context(@Nullable Entity sourceEntity, @Nullable BlockState affectedState) {
+      public static GameEvent.Context of(final @Nullable Entity sourceEntity) {
+         return new GameEvent.Context(sourceEntity, (BlockState)null);
+      }
+
+      public static GameEvent.Context of(final @Nullable BlockState state) {
+         return new GameEvent.Context((Entity)null, state);
+      }
+
+      public static GameEvent.Context of(final @Nullable Entity sourceEntity, final @Nullable BlockState state) {
+         return new GameEvent.Context(sourceEntity, state);
+      }
+   }
+
+   public static final class ListenerInfo implements Comparable {
+      private final Holder gameEvent;
+      private final Vec3 source;
+      private final GameEvent.Context context;
+      private final GameEventListener recipient;
+      private final double distanceToRecipient;
+
+      public ListenerInfo(final Holder gameEvent, final Vec3 source, final GameEvent.Context context, final GameEventListener recipient, final Vec3 recipientPos) {
+         this.gameEvent = gameEvent;
+         this.source = source;
+         this.context = context;
+         this.recipient = recipient;
+         this.distanceToRecipient = source.distanceToSqr(recipientPos);
+      }
+
+      public int compareTo(final GameEvent.ListenerInfo other) {
+         return Double.compare(this.distanceToRecipient, other.distanceToRecipient);
+      }
+
+      public Holder gameEvent() {
+         return this.gameEvent;
+      }
+
+      public Vec3 source() {
+         return this.source;
+      }
+
+      public GameEvent.Context context() {
+         return this.context;
+      }
+
+      public GameEventListener recipient() {
+         return this.recipient;
+      }
+   }
+}

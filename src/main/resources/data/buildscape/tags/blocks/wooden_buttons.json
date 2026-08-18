@@ -1,7 +1,6 @@
 {
   "replace": false,
   "values": [
-    "buildscape:ashpen_white_button",
     "buildscape:ashpen_black_button",
     "buildscape:ashpen_blue_button",
     "buildscape:ashpen_brown_button",
@@ -16,9 +15,14 @@
     "buildscape:ashpen_pink_button",
     "buildscape:ashpen_purple_button",
     "buildscape:ashpen_red_button",
+    "buildscape:ashpen_white_button",
     "buildscape:ashpen_yellow_button",
     "buildscape:bamboo_block_button",
-    "buildscape:stripped_bamboo_block_button"
+    "buildscape:burnt_cardboard_button",
+    "buildscape:cardboard_button",
+    "buildscape:stripped_bamboo_block_button",
+    "buildscape:stripped_cardboard_button",
+    "buildscape:tinted_cardboard_button",
+    "buildscape:washed_cardboard_button"
   ]
 }
-

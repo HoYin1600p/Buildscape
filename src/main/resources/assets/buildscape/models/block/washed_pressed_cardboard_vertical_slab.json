@@ -1,0 +1,9 @@
+{
+  "parent": "buildscape:block/template_vertical_slab",
+  "textures": {
+    "bottom": "buildscape:block/washed_pressed_cardboard",
+    "top": "buildscape:block/washed_pressed_cardboard",
+    "side": "buildscape:block/washed_pressed_cardboard",
+    "particle": "#side"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "buildscape:block/tinted_thick_cardboard_slab"
+    },
+    "type=top": {
+      "model": "buildscape:block/tinted_thick_cardboard_slab_top"
+    },
+    "type=double": {
+      "model": "buildscape:block/tinted_thick_cardboard_block"
+    }
+  }
+}

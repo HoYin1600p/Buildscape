@@ -1,0 +1,23 @@
+package net.minecraft.network.protocol.common;
+
+import java.util.Optional;
+import net.minecraft.nbt.NbtAccounter;
+import net.minecraft.nbt.Tag;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.PacketType;
+import net.minecraft.resources.Identifier;
+
+public record ServerboundCustomClickActionPacket(Identifier id, Optional payload) implements Packet {
+   private static final StreamCodec UNTRUSTED_TAG_CODEC = ByteBufCodecs.optionalTagCodec(() -> new NbtAccounter(32768L, 16)).apply(ByteBufCodecs.lengthPrefixed(65536));
+   public static final StreamCodec STREAM_CODEC = StreamCodec.composite(Identifier.STREAM_CODEC, ServerboundCustomClickActionPacket::id, UNTRUSTED_TAG_CODEC, ServerboundCustomClickActionPacket::payload, ServerboundCustomClickActionPacket::new);
+
+   public PacketType type() {
+      return CommonPacketTypes.SERVERBOUND_CUSTOM_CLICK_ACTION;
+   }
+
+   public void handle(final ServerCommonPacketListener listener) {
+      listener.handleCustomClickAction(this);
+   }
+}

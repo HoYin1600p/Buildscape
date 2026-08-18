@@ -1,0 +1,246 @@
+package net.minecraft.client.gui.components.events;
+
+import com.mojang.datafixers.util.Pair;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Optional;
+import java.util.function.BooleanSupplier;
+import java.util.function.Supplier;
+import net.minecraft.client.gui.ComponentPath;
+import net.minecraft.client.gui.navigation.FocusNavigationEvent;
+import net.minecraft.client.gui.navigation.ScreenAxis;
+import net.minecraft.client.gui.navigation.ScreenDirection;
+import net.minecraft.client.gui.navigation.ScreenPosition;
+import net.minecraft.client.gui.navigation.ScreenRectangle;
+import net.minecraft.client.input.CharacterEvent;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.input.PreeditEvent;
+import org.joml.Vector2i;
+import org.jspecify.annotations.Nullable;
+
+public interface ContainerEventHandler extends GuiEventListener {
+   List children();
+
+   default Optional getChildAt(final double x, final double y) {
+      for(GuiEventListener child : this.children()) {
+         if (child.isMouseOver(x, y)) {
+            return Optional.of(child);
+         }
+      }
+
+      return Optional.empty();
+   }
+
+   default boolean mouseClicked(final MouseButtonEvent event, final boolean doubleClick) {
+      Optional child = this.getChildAt(event.x(), event.y());
+      if (child.isEmpty()) {
+         return false;
+      } else {
+         GuiEventListener widget = (GuiEventListener)child.get();
+         if (widget.mouseClicked(event, doubleClick) && widget.shouldTakeFocusAfterInteraction()) {
+            this.setFocused(widget);
+            if (event.button() == 1) {
+               this.setDragging(true);
+            }
+         }
+
+         return true;
+      }
+   }
+
+   default boolean mouseReleased(final MouseButtonEvent event) {
+      if (event.button() == 1 && this.isDragging()) {
+         this.setDragging(false);
+         if (this.getFocused() != null) {
+            return this.getFocused().mouseReleased(event);
+         }
+      }
+
+      return false;
+   }
+
+   default boolean mouseDragged(final MouseButtonEvent event, final double dx, final double dy) {
+      return this.getFocused() != null && this.isDragging() && event.button() == 1 ? this.getFocused().mouseDragged(event, dx, dy) : false;
+   }
+
+   boolean isDragging();
+
+   void setDragging(boolean dragging);
+
+   default boolean mouseScrolled(final double x, final double y, final double scrollX, final double scrollY) {
+      return this.getChildAt(x, y).filter((child) -> child.mouseScrolled(x, y, scrollX, scrollY)).isPresent();
+   }
+
+   default boolean keyPressed(final KeyEvent event) {
+      return this.getFocused() != null && this.getFocused().keyPressed(event);
+   }
+
+   default boolean keyReleased(final KeyEvent event) {
+      return this.getFocused() != null && this.getFocused().keyReleased(event);
+   }
+
+   default boolean charTyped(final CharacterEvent event) {
+      return this.getFocused() != null && this.getFocused().charTyped(event);
+   }
+
+   default boolean preeditUpdated(final @Nullable PreeditEvent event) {
+      return this.getFocused() != null && this.getFocused().preeditUpdated(event);
+   }
+
+   default ScreenRectangle getBorderForArrowNavigation(final ScreenDirection opposite) {
+      GuiEventListener focused = this.getFocused();
+      return focused != null ? focused.getBorderForArrowNavigation(opposite) : GuiEventListener.super.getBorderForArrowNavigation(opposite);
+   }
+
+   @Nullable GuiEventListener getFocused();
+
+   void setFocused(final @Nullable GuiEventListener focused);
+
+   default void setFocused(final boolean focused) {
+      if (!focused) {
+         this.setFocused((GuiEventListener)null);
+      }
+
+   }
+
+   default boolean isFocused() {
+      return this.getFocused() != null;
+   }
+
+   default @Nullable ComponentPath getCurrentFocusPath() {
+      GuiEventListener focused = this.getFocused();
+      return focused != null ? ComponentPath.path(this, focused.getCurrentFocusPath()) : null;
+   }
+
+   default @Nullable ComponentPath nextFocusPath(final FocusNavigationEvent navigationEvent) {
+      GuiEventListener focus = this.getFocused();
+      if (focus != null) {
+         ComponentPath focusPath = focus.nextFocusPath(navigationEvent);
+         if (focusPath != null) {
+            return ComponentPath.path(this, focusPath);
+         }
+      }
+
+      if (navigationEvent instanceof FocusNavigationEvent.TabNavigation tabNavigation) {
+         return this.handleTabNavigation(tabNavigation);
+      } else if (navigationEvent instanceof FocusNavigationEvent.ArrowNavigation arrowNavigation) {
+         return this.handleArrowNavigation(arrowNavigation);
+      } else {
+         return null;
+      }
+   }
+
+   private @Nullable ComponentPath handleTabNavigation(final FocusNavigationEvent.TabNavigation tabNavigation) {
+      boolean forward = tabNavigation.forward();
+      GuiEventListener focus = this.getFocused();
+      List sortedChildren = new ArrayList(this.children());
+      Collections.sort(sortedChildren, Comparator.comparingInt((childx) -> childx.getTabOrderGroup()));
+      int index = sortedChildren.indexOf(focus);
+      int newIndex;
+      if (focus != null && index >= 0) {
+         newIndex = index + (forward ? 1 : 0);
+      } else if (forward) {
+         newIndex = 0;
+      } else {
+         newIndex = sortedChildren.size();
+      }
+
+      ListIterator iterator = sortedChildren.listIterator(newIndex);
+      BooleanSupplier test = forward ? iterator::hasNext : iterator::hasPrevious;
+      Supplier getter = forward ? iterator::next : iterator::previous;
+
+      while(test.getAsBoolean()) {
+         GuiEventListener child = (GuiEventListener)getter.get();
+         ComponentPath focusPath = child.nextFocusPath(tabNavigation);
+         if (focusPath != null) {
+            return ComponentPath.path(this, focusPath);
+         }
+      }
+
+      return null;
+   }
+
+   private @Nullable ComponentPath handleArrowNavigation(final FocusNavigationEvent.ArrowNavigation arrowNavigation) {
+      GuiEventListener focus = this.getFocused();
+      ScreenDirection direction = arrowNavigation.direction();
+      if (focus == null) {
+         if (arrowNavigation.previousFocus() != null) {
+            return ComponentPath.path(this, this.nextFocusPathInDirection(arrowNavigation.previousFocus(), arrowNavigation.direction(), (GuiEventListener)null, arrowNavigation));
+         } else {
+            ScreenRectangle borderRectangle = this.getBorderForArrowNavigation(direction.getOpposite());
+            return ComponentPath.path(this, this.nextFocusPathInDirection(borderRectangle, direction, (GuiEventListener)null, arrowNavigation));
+         }
+      } else {
+         ScreenRectangle focusedRectangle = focus.getBorderForArrowNavigation(direction);
+         return ComponentPath.path(this, this.nextFocusPathInDirection(focusedRectangle, arrowNavigation.direction(), focus, arrowNavigation.with(focusedRectangle)));
+      }
+   }
+
+   private @Nullable ComponentPath nextFocusPathInDirection(final ScreenRectangle focusedRectangle, final ScreenDirection direction, final @Nullable GuiEventListener excluded, final FocusNavigationEvent.ArrowNavigation navigationEvent) {
+      ScreenAxis axis = direction.getAxis();
+      ScreenAxis otherAxis = axis.orthogonal();
+      ScreenDirection positiveDirectionOtherAxis = otherAxis.getPositive();
+      int focusedFirstBound = focusedRectangle.getBoundInDirection(direction.getOpposite());
+      List potentialChildren = new ArrayList();
+
+      for(GuiEventListener child : this.children()) {
+         if (child != excluded) {
+            ScreenRectangle childRectangle = child.getRectangle();
+            if (childRectangle.overlapsInAxis(focusedRectangle, otherAxis)) {
+               int childFirstBound = childRectangle.getBoundInDirection(direction.getOpposite());
+               if (direction.isAfter(childFirstBound, focusedFirstBound)) {
+                  potentialChildren.add(child);
+               } else if (childFirstBound == focusedFirstBound && direction.isAfter(childRectangle.getBoundInDirection(direction), focusedRectangle.getBoundInDirection(direction))) {
+                  potentialChildren.add(child);
+               }
+            }
+         }
+      }
+
+      Comparator primaryComparator = Comparator.comparing((childx) -> childx.getRectangle().getBoundInDirection(direction.getOpposite()), direction.coordinateValueComparator());
+      Comparator secondaryComparator = Comparator.comparing((childx) -> childx.getRectangle().getBoundInDirection(positiveDirectionOtherAxis.getOpposite()), positiveDirectionOtherAxis.coordinateValueComparator());
+      potentialChildren.sort(primaryComparator.thenComparing(secondaryComparator));
+
+      for(GuiEventListener child : potentialChildren) {
+         ComponentPath componentPath = child.nextFocusPath(navigationEvent);
+         if (componentPath != null) {
+            return componentPath;
+         }
+      }
+
+      return this.nextFocusPathVaguelyInDirection(focusedRectangle, direction, excluded, navigationEvent);
+   }
+
+   private @Nullable ComponentPath nextFocusPathVaguelyInDirection(final ScreenRectangle focusedRectangle, final ScreenDirection direction, final @Nullable GuiEventListener excluded, final FocusNavigationEvent navigationEvent) {
+      ScreenAxis axis = direction.getAxis();
+      ScreenAxis otherAxis = axis.orthogonal();
+      List potentialChildren = new ArrayList();
+      ScreenPosition focusedSideCenter = ScreenPosition.of(axis, focusedRectangle.getBoundInDirection(direction), focusedRectangle.getCenterInAxis(otherAxis));
+
+      for(GuiEventListener child : this.children()) {
+         if (child != excluded) {
+            ScreenRectangle childRectangle = child.getRectangle();
+            ScreenPosition childOpposingSideCenter = ScreenPosition.of(axis, childRectangle.getBoundInDirection(direction.getOpposite()), childRectangle.getCenterInAxis(otherAxis));
+            if (direction.isAfter(childOpposingSideCenter.getCoordinate(axis), focusedSideCenter.getCoordinate(axis))) {
+               long distanceSquared = Vector2i.distanceSquared(focusedSideCenter.x(), focusedSideCenter.y(), childOpposingSideCenter.x(), childOpposingSideCenter.y());
+               potentialChildren.add(Pair.of(child, distanceSquared));
+            }
+         }
+      }
+
+      potentialChildren.sort(Comparator.comparingDouble(Pair::getSecond));
+
+      for(Pair child : potentialChildren) {
+         ComponentPath componentPath = ((GuiEventListener)child.getFirst()).nextFocusPath(navigationEvent);
+         if (componentPath != null) {
+            return componentPath;
+         }
+      }
+
+      return null;
+   }
+}

@@ -1,0 +1,38 @@
+package net.minecraft.client.searchtree;
+
+import com.google.common.collect.AbstractIterator;
+import com.google.common.collect.Iterators;
+import com.google.common.collect.PeekingIterator;
+import java.util.Comparator;
+import java.util.Iterator;
+
+public class MergingUniqueIterator extends AbstractIterator {
+   private final PeekingIterator firstIterator;
+   private final PeekingIterator secondIterator;
+   private final Comparator comparator;
+
+   public MergingUniqueIterator(final Iterator firstIterator, final Iterator secondIterator, final Comparator comparator) {
+      this.firstIterator = Iterators.peekingIterator(firstIterator);
+      this.secondIterator = Iterators.peekingIterator(secondIterator);
+      this.comparator = comparator;
+   }
+
+   protected Object computeNext() {
+      boolean firstEmpty = !this.firstIterator.hasNext();
+      boolean secondEmpty = !this.secondIterator.hasNext();
+      if (firstEmpty && secondEmpty) {
+         return this.endOfData();
+      } else if (firstEmpty) {
+         return this.secondIterator.next();
+      } else if (secondEmpty) {
+         return this.firstIterator.next();
+      } else {
+         int compare = this.comparator.compare(this.firstIterator.peek(), this.secondIterator.peek());
+         if (compare == 0) {
+            this.secondIterator.next();
+         }
+
+         return compare <= 0 ? this.firstIterator.next() : this.secondIterator.next();
+      }
+   }
+}

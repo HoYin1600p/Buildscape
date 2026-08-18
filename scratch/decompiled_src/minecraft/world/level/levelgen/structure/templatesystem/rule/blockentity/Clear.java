@@ -1,0 +1,19 @@
+package net.minecraft.world.level.levelgen.structure.templatesystem.rule.blockentity;
+
+import com.mojang.serialization.MapCodec;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.util.RandomSource;
+import org.jspecify.annotations.Nullable;
+
+public class Clear implements RuleBlockEntityModifier {
+   private static final Clear INSTANCE = new Clear();
+   public static final MapCodec CODEC = MapCodec.unit(INSTANCE);
+
+   public CompoundTag apply(final RandomSource random, final @Nullable CompoundTag existingTag) {
+      return new CompoundTag();
+   }
+
+   public RuleBlockEntityModifierType getType() {
+      return RuleBlockEntityModifierType.CLEAR;
+   }
+}

@@ -1,0 +1,10 @@
+{
+  "replace": false,
+  "values": [
+    "buildscape:burnt_cardboard_pressure_plate",
+    "buildscape:cardboard_pressure_plate",
+    "buildscape:stripped_cardboard_pressure_plate",
+    "buildscape:tinted_cardboard_pressure_plate",
+    "buildscape:washed_cardboard_pressure_plate"
+  ]
+}

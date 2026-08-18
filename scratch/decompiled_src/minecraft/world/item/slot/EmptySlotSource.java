@@ -1,0 +1,16 @@
+package net.minecraft.world.item.slot;
+
+import com.mojang.serialization.MapCodec;
+import net.minecraft.world.level.storage.loot.LootContext;
+
+public record EmptySlotSource() implements SlotSource {
+   public static final MapCodec MAP_CODEC = MapCodec.unit(new EmptySlotSource());
+
+   public MapCodec codec() {
+      return MAP_CODEC;
+   }
+
+   public SlotCollection provide(final LootContext context) {
+      return SlotCollection.EMPTY;
+   }
+}

@@ -1,0 +1,25 @@
+package net.minecraft.server;
+
+import java.util.List;
+import net.minecraft.core.LayeredRegistryAccess;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.registries.BuiltInRegistries;
+
+public enum RegistryLayer {
+   STATIC,
+   WORLD,
+   DIMENSIONS,
+   RELOADABLE;
+
+   private static final List VALUES = List.of(values());
+   private static final RegistryAccess.Frozen STATIC_ACCESS = RegistryAccess.fromRegistryOfRegistries(BuiltInRegistries.REGISTRY);
+
+   public static LayeredRegistryAccess createRegistryAccess() {
+      return (new LayeredRegistryAccess(VALUES)).replaceFrom(STATIC, STATIC_ACCESS);
+   }
+
+   // $FF: synthetic method
+   private static RegistryLayer[] $values() {
+      return new RegistryLayer[]{STATIC, WORLD, DIMENSIONS, RELOADABLE};
+   }
+}

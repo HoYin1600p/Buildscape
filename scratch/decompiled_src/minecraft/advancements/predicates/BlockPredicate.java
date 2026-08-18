@@ -1,0 +1,131 @@
+package net.minecraft.advancements.predicates;
+
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Optional;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderGetter;
+import net.minecraft.core.HolderSet;
+import net.minecraft.core.component.DataComponentGetter;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.core.registries.codec.RegistryCodecs;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.pattern.BlockInWorld;
+import org.jspecify.annotations.Nullable;
+
+public record BlockPredicate(Optional blocks, Optional properties, Optional nbt, DataComponentMatchers components) {
+   public static final MapCodec MAP_CODEC = RecordCodecBuilder.mapCodec((i) -> i.group(RegistryCodecs.holderSet(Registries.BLOCK).optionalFieldOf("blocks").forGetter(BlockPredicate::blocks), StatePropertiesPredicate.CODEC.optionalFieldOf("state").forGetter(BlockPredicate::properties), NbtPredicate.CODEC.optionalFieldOf("nbt").forGetter(BlockPredicate::nbt), DataComponentMatchers.CODEC.forGetter(BlockPredicate::components)).apply(i, BlockPredicate::new));
+   public static final Codec CODEC = MAP_CODEC.codec();
+   public static final StreamCodec STREAM_CODEC = StreamCodec.composite(ByteBufCodecs.optional(ByteBufCodecs.holderSet(Registries.BLOCK)), BlockPredicate::blocks, ByteBufCodecs.optional(StatePropertiesPredicate.STREAM_CODEC), BlockPredicate::properties, ByteBufCodecs.optional(NbtPredicate.STREAM_CODEC), BlockPredicate::nbt, DataComponentMatchers.STREAM_CODEC, BlockPredicate::components, BlockPredicate::new);
+
+   public boolean matches(final ServerLevel level, final BlockPos pos) {
+      if (!level.isLoaded(pos)) {
+         return false;
+      } else if (!this.matchesState(level.getBlockState(pos))) {
+         return false;
+      } else {
+         if (this.nbt.isPresent() || !this.components.isEmpty()) {
+            BlockEntity blockEntity = level.getBlockEntity(pos);
+            if (!this.matchesBlockEntity(level, blockEntity)) {
+               return false;
+            }
+         }
+
+         return true;
+      }
+   }
+
+   public boolean matches(final BlockInWorld blockInWorld) {
+      if (!this.matchesState(blockInWorld.getState())) {
+         return false;
+      } else {
+         return !this.nbt.isPresent() || matchesBlockEntityData(blockInWorld.getLevel(), blockInWorld.getEntity(), (NbtPredicate)this.nbt.get());
+      }
+   }
+
+   public boolean matchesState(final BlockState state) {
+      if (this.blocks.isPresent() && !state.is((HolderSet)this.blocks.get())) {
+         return false;
+      } else {
+         return !this.properties.isPresent() || ((StatePropertiesPredicate)this.properties.get()).matches(state);
+      }
+   }
+
+   public boolean matchesBlockEntity(final LevelReader level, final @Nullable BlockEntity blockEntity) {
+      if (this.nbt.isPresent() && !matchesBlockEntityData(level, blockEntity, (NbtPredicate)this.nbt.get())) {
+         return false;
+      } else {
+         return this.components.isEmpty() || matchesComponents(blockEntity, this.components);
+      }
+   }
+
+   private static boolean matchesBlockEntityData(final LevelReader level, final @Nullable BlockEntity entity, final NbtPredicate nbt) {
+      return entity != null && nbt.matches(entity.saveWithFullMetadata(level.registryAccess()));
+   }
+
+   private static boolean matchesComponents(final @Nullable BlockEntity entity, final DataComponentMatchers components) {
+      return entity != null && components.test((DataComponentGetter)entity.collectComponents());
+   }
+
+   public boolean requiresNbt() {
+      return this.nbt.isPresent();
+   }
+
+   public static class Builder {
+      private Optional blocks = Optional.empty();
+      private Optional properties = Optional.empty();
+      private Optional nbt = Optional.empty();
+      private DataComponentMatchers components = DataComponentMatchers.ANY;
+
+      private Builder() {
+      }
+
+      public static BlockPredicate.Builder block() {
+         return new BlockPredicate.Builder();
+      }
+
+      public BlockPredicate.Builder of(final HolderGetter lookup, final Block... blocks) {
+         return this.of(lookup, Arrays.asList(blocks));
+      }
+
+      public BlockPredicate.Builder of(final HolderGetter lookup, final Collection blocks) {
+         this.blocks = Optional.of(HolderSet.direct(Block::builtInRegistryHolder, blocks));
+         return this;
+      }
+
+      public BlockPredicate.Builder of(final HolderGetter lookup, final TagKey tag) {
+         this.blocks = Optional.of(lookup.getOrThrow(tag));
+         return this;
+      }
+
+      public BlockPredicate.Builder hasNbt(final CompoundTag nbt) {
+         this.nbt = Optional.of(new NbtPredicate(nbt));
+         return this;
+      }
+
+      public BlockPredicate.Builder setProperties(final StatePropertiesPredicate.Builder properties) {
+         this.properties = properties.build();
+         return this;
+      }
+
+      public BlockPredicate.Builder components(final DataComponentMatchers components) {
+         this.components = components;
+         return this;
+      }
+
+      public BlockPredicate build() {
+         return new BlockPredicate(this.blocks, this.properties, this.nbt, this.components);
+      }
+   }
+}

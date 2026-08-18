@@ -1,0 +1,28 @@
+package net.minecraft.world.level.levelgen.blockpredicates;
+
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.core.HolderSet;
+import net.minecraft.core.Vec3i;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.core.registries.codec.RegistryCodecs;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Fluid;
+
+public class MatchingFluidsPredicate extends StateTestingPredicate {
+   public static final MapCodec CODEC = RecordCodecBuilder.mapCodec((i) -> stateTestingCodec(i).and(RegistryCodecs.holderSet(Registries.FLUID).fieldOf("fluids").forGetter((c) -> c.fluids)).apply(i, MatchingFluidsPredicate::new));
+   private final HolderSet fluids;
+
+   public MatchingFluidsPredicate(final Vec3i offset, final HolderSet fluids) {
+      super(offset);
+      this.fluids = fluids;
+   }
+
+   protected boolean test(final BlockState state) {
+      return state.getFluidState().is(this.fluids);
+   }
+
+   public BlockPredicateType type() {
+      return BlockPredicateType.MATCHING_FLUIDS;
+   }
+}

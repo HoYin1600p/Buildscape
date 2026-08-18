@@ -1,0 +1,73 @@
+package net.minecraft.client.gui.components;
+
+import net.minecraft.client.gui.ComponentPath;
+import net.minecraft.client.gui.components.events.ContainerEventHandler;
+import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.gui.navigation.FocusNavigationEvent;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.network.chat.Component;
+import org.jspecify.annotations.Nullable;
+
+public abstract class AbstractContainerWidget extends AbstractScrollArea implements ContainerEventHandler {
+   private @Nullable GuiEventListener focused;
+   private boolean isDragging;
+
+   public AbstractContainerWidget(final int x, final int y, final int width, final int height, final Component message) {
+      super(x, y, width, height, message, AbstractScrollArea.ScrollbarSettings.NO_SCROLL);
+   }
+
+   public AbstractContainerWidget(final int x, final int y, final int width, final int height, final Component message, final AbstractScrollArea.ScrollbarSettings scrollbarSettings) {
+      super(x, y, width, height, message, scrollbarSettings);
+   }
+
+   public final boolean isDragging() {
+      return this.isDragging;
+   }
+
+   public final void setDragging(final boolean dragging) {
+      this.isDragging = dragging;
+   }
+
+   public @Nullable GuiEventListener getFocused() {
+      return this.focused;
+   }
+
+   public void setFocused(final @Nullable GuiEventListener focused) {
+      if (this.focused != null) {
+         this.focused.setFocused(false);
+      }
+
+      if (focused != null) {
+         focused.setFocused(true);
+      }
+
+      this.focused = focused;
+   }
+
+   public @Nullable ComponentPath nextFocusPath(final FocusNavigationEvent navigationEvent) {
+      return ContainerEventHandler.super.nextFocusPath(navigationEvent);
+   }
+
+   public boolean mouseClicked(final MouseButtonEvent event, final boolean doubleClick) {
+      boolean scrolling = this.updateScrolling(event);
+      return ContainerEventHandler.super.mouseClicked(event, doubleClick) || scrolling;
+   }
+
+   public boolean mouseReleased(final MouseButtonEvent event) {
+      super.mouseReleased(event);
+      return ContainerEventHandler.super.mouseReleased(event);
+   }
+
+   public boolean mouseDragged(final MouseButtonEvent event, final double dx, final double dy) {
+      super.mouseDragged(event, dx, dy);
+      return ContainerEventHandler.super.mouseDragged(event, dx, dy);
+   }
+
+   public boolean isFocused() {
+      return ContainerEventHandler.super.isFocused();
+   }
+
+   public void setFocused(final boolean focused) {
+      ContainerEventHandler.super.setFocused(focused);
+   }
+}

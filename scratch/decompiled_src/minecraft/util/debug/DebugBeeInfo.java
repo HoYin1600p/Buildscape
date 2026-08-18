@@ -1,0 +1,15 @@
+package net.minecraft.util.debug;
+
+import java.util.List;
+import java.util.Optional;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+
+public record DebugBeeInfo(Optional hivePos, Optional flowerPos, int travelTicks, List blacklistedHives) {
+   public static final StreamCodec STREAM_CODEC = StreamCodec.composite(BlockPos.STREAM_CODEC.apply(ByteBufCodecs::optional), DebugBeeInfo::hivePos, BlockPos.STREAM_CODEC.apply(ByteBufCodecs::optional), DebugBeeInfo::flowerPos, ByteBufCodecs.VAR_INT, DebugBeeInfo::travelTicks, BlockPos.STREAM_CODEC.apply(ByteBufCodecs.list()), DebugBeeInfo::blacklistedHives, DebugBeeInfo::new);
+
+   public boolean hasHive(final BlockPos hivePos) {
+      return this.hivePos.isPresent() && hivePos.equals(this.hivePos.get());
+   }
+}

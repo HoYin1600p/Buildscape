@@ -1,0 +1,25 @@
+package net.minecraft.world.level.levelgen.placement;
+
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.core.BlockPos;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.biome.Biome;
+
+public record NoiseThresholdCountPlacement(double noiseLevel, int belowNoise, int aboveNoise) implements RepeatingPlacement {
+   public static final MapCodec CODEC = RecordCodecBuilder.mapCodec((i) -> i.group(Codec.DOUBLE.fieldOf("noise_level").forGetter(NoiseThresholdCountPlacement::noiseLevel), Codec.INT.fieldOf("below_noise").forGetter(NoiseThresholdCountPlacement::belowNoise), Codec.INT.fieldOf("above_noise").forGetter(NoiseThresholdCountPlacement::aboveNoise)).apply(i, NoiseThresholdCountPlacement::new));
+
+   public static NoiseThresholdCountPlacement of(final double noiseLevel, final int belowNoise, final int aboveNoise) {
+      return new NoiseThresholdCountPlacement(noiseLevel, belowNoise, aboveNoise);
+   }
+
+   public int count(final RandomSource random, final BlockPos origin) {
+      double flowerNoise = (double)Biome.BIOME_INFO_NOISE.get((double)origin.getX() / 200.0D, (double)origin.getZ() / 200.0D);
+      return flowerNoise < this.noiseLevel ? this.belowNoise : this.aboveNoise;
+   }
+
+   public MapCodec codec() {
+      return CODEC;
+   }
+}

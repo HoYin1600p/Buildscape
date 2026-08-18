@@ -1,0 +1,7 @@
+{
+  "parent": "buildscape:block/template_shelf_body",
+  "textures": {
+    "all": "buildscape:block/jungle_shelf",
+    "particle": "buildscape:block/stripped_jungle_log"
+  }
+}

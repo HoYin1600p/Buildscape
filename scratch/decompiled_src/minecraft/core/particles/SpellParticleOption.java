@@ -1,0 +1,57 @@
+package net.minecraft.core.particles;
+
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.util.ARGB;
+import net.minecraft.util.ExtraCodecs;
+
+public class SpellParticleOption implements ParticleOptions {
+   private final ParticleType type;
+   private final int color;
+   private final float power;
+
+   public static MapCodec codec(final ParticleType type) {
+      return RecordCodecBuilder.mapCodec((i) -> i.group(ExtraCodecs.RGB_COLOR_CODEC.optionalFieldOf("color", -1).forGetter((o) -> o.color), Codec.FLOAT.optionalFieldOf("power", 1.0F).forGetter((o) -> o.power)).apply(i, (color, power) -> new SpellParticleOption(type, color, power)));
+   }
+
+   public static StreamCodec streamCodec(final ParticleType type) {
+      return StreamCodec.composite(ByteBufCodecs.INT, (o) -> o.color, ByteBufCodecs.FLOAT, (o) -> o.power, (color, power) -> new SpellParticleOption(type, color, power));
+   }
+
+   private SpellParticleOption(final ParticleType type, final int color, final float power) {
+      this.type = type;
+      this.color = color;
+      this.power = power;
+   }
+
+   public ParticleType getType() {
+      return this.type;
+   }
+
+   public float getRed() {
+      return (float)ARGB.red(this.color) / 255.0F;
+   }
+
+   public float getGreen() {
+      return (float)ARGB.green(this.color) / 255.0F;
+   }
+
+   public float getBlue() {
+      return (float)ARGB.blue(this.color) / 255.0F;
+   }
+
+   public float getPower() {
+      return this.power;
+   }
+
+   public static SpellParticleOption create(final ParticleType type, final int color, final float power) {
+      return new SpellParticleOption(type, color, power);
+   }
+
+   public static SpellParticleOption create(final ParticleType type, final float red, final float green, final float blue, final float power) {
+      return create(type, ARGB.colorFromFloat(1.0F, red, green, blue), power);
+   }
+}

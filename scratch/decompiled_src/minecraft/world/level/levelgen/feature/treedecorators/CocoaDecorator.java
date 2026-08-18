@@ -1,0 +1,46 @@
+package net.minecraft.world.level.levelgen.feature.treedecorators;
+
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import java.util.List;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.CocoaBlock;
+import net.minecraft.world.level.block.state.BlockState;
+
+public class CocoaDecorator extends TreeDecorator {
+   public static final MapCodec CODEC = Codec.floatRange(0.0F, 1.0F).fieldOf("probability").xmap(CocoaDecorator::new, (d) -> d.probability);
+   private final float probability;
+
+   public CocoaDecorator(final float probability) {
+      this.probability = probability;
+   }
+
+   protected TreeDecoratorType type() {
+      return TreeDecoratorType.COCOA;
+   }
+
+   public void place(final TreeDecorator.Context context) {
+      RandomSource random = context.random();
+      if (!(random.nextFloat() >= this.probability)) {
+         List logs = context.logs();
+         if (!logs.isEmpty()) {
+            int treeY = ((BlockPos)logs.getFirst()).getY();
+            logs.stream().filter((pos) -> pos.getY() - treeY <= 2).forEach((pos) -> {
+               for(Direction direction : Direction.Plane.HORIZONTAL) {
+                  if (random.nextFloat() <= 0.25F) {
+                     Direction opposite = direction.getOpposite();
+                     BlockPos cocoaPos = pos.offset(opposite.getStepX(), 0, opposite.getStepZ());
+                     if (context.isAir(cocoaPos)) {
+                        context.setBlock(cocoaPos, (BlockState)((BlockState)Blocks.COCOA.defaultBlockState().setValue(CocoaBlock.AGE, Integer.valueOf(random.nextInt(3)))).setValue(CocoaBlock.FACING, direction));
+                     }
+                  }
+               }
+
+            });
+         }
+      }
+   }
+}

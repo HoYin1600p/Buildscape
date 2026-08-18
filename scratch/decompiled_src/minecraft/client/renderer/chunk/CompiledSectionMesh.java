@@ -1,0 +1,96 @@
+package net.minecraft.client.renderer.chunk;
+
+import com.mojang.blaze3d.vertex.MeshData;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
+import net.minecraft.core.Direction;
+import net.minecraft.util.Util;
+import org.jspecify.annotations.Nullable;
+
+public class CompiledSectionMesh implements SectionMesh {
+   public static final SectionMesh UNCOMPILED = new SectionMesh() {
+      public boolean facesCanSeeEachother(final Direction direction1, final Direction direction2) {
+         return false;
+      }
+   };
+   public static final SectionMesh EMPTY = new SectionMesh() {
+      public boolean facesCanSeeEachother(final Direction direction1, final Direction direction2) {
+         return true;
+      }
+   };
+   private final List renderableBlockEntities;
+   private final VisibilitySet visibilitySet;
+   private final MeshData.@Nullable SortState transparencyState;
+   private @Nullable TranslucencyPointOfView translucencyPointOfView;
+   private final Map draws = new EnumMap(ChunkSectionLayer.class);
+   private final Map vertexBufferUploaded = Util.makeEnumMap(ChunkSectionLayer.class, (layer) -> new AtomicBoolean());
+   private final Map indexBufferUploaded = Util.makeEnumMap(ChunkSectionLayer.class, (layer) -> new AtomicBoolean());
+
+   public CompiledSectionMesh(final TranslucencyPointOfView translucencyPointOfView, final SectionCompiler.Results results) {
+      this.translucencyPointOfView = translucencyPointOfView;
+      this.visibilitySet = results.visibilitySet;
+      this.renderableBlockEntities = results.blockEntities;
+      this.transparencyState = results.transparencyState;
+      results.renderedLayers.forEach((layer, mesh) -> this.draws.put(layer, new SectionMesh.SectionDraw(mesh.drawState().indexCount(), mesh.drawState().indexType(), mesh.indexBuffer() != null)));
+   }
+
+   public void setTranslucencyPointOfView(final TranslucencyPointOfView translucencyPointOfView) {
+      this.translucencyPointOfView = translucencyPointOfView;
+   }
+
+   public boolean isDifferentPointOfView(final TranslucencyPointOfView pointOfView) {
+      return !pointOfView.equals(this.translucencyPointOfView);
+   }
+
+   public boolean hasRenderableLayers() {
+      return !this.draws.isEmpty();
+   }
+
+   public boolean isEmpty(final ChunkSectionLayer layer) {
+      return !this.draws.containsKey(layer);
+   }
+
+   public List getRenderableBlockEntities() {
+      return this.renderableBlockEntities;
+   }
+
+   public boolean facesCanSeeEachother(final Direction direction1, final Direction direction2) {
+      return this.visibilitySet.visibilityBetween(direction1, direction2);
+   }
+
+   public SectionMesh.@Nullable SectionDraw getSectionDraw(final ChunkSectionLayer layer) {
+      return (SectionMesh.SectionDraw)this.draws.get(layer);
+   }
+
+   public boolean isVertexBufferUploaded(final ChunkSectionLayer layer) {
+      return ((AtomicBoolean)this.vertexBufferUploaded.get(layer)).get();
+   }
+
+   public boolean isIndexBufferUploaded(final ChunkSectionLayer layer) {
+      return ((AtomicBoolean)this.indexBufferUploaded.get(layer)).get();
+   }
+
+   public void setVertexBufferUploaded(final ChunkSectionLayer layer) {
+      ((AtomicBoolean)this.vertexBufferUploaded.get(layer)).set(true);
+   }
+
+   public void setIndexBufferUploaded(final ChunkSectionLayer layer) {
+      ((AtomicBoolean)this.indexBufferUploaded.get(layer)).set(true);
+   }
+
+   public boolean hasTranslucentGeometry() {
+      return this.draws.containsKey(ChunkSectionLayer.TRANSLUCENT);
+   }
+
+   public MeshData.@Nullable SortState getTransparencyState() {
+      return this.transparencyState;
+   }
+
+   public void close() {
+      this.draws.clear();
+      this.vertexBufferUploaded.clear();
+      this.indexBufferUploaded.clear();
+   }
+}

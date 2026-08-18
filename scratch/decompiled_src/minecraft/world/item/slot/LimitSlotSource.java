@@ -1,0 +1,24 @@
+package net.minecraft.world.item.slot;
+
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.core.Holder;
+import net.minecraft.util.ExtraCodecs;
+
+public class LimitSlotSource extends TransformedSlotSource {
+   public static final MapCodec MAP_CODEC = RecordCodecBuilder.mapCodec((i) -> commonFields(i).and(ExtraCodecs.POSITIVE_INT.fieldOf("limit").forGetter((t) -> t.limit)).apply(i, LimitSlotSource::new));
+   private final int limit;
+
+   private LimitSlotSource(final Holder slotSource, final int limit) {
+      super(slotSource);
+      this.limit = limit;
+   }
+
+   public MapCodec codec() {
+      return MAP_CODEC;
+   }
+
+   protected SlotCollection transform(final SlotCollection slots) {
+      return slots.limit(this.limit);
+   }
+}

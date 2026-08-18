@@ -120,6 +120,8 @@ dependencies {
 
 
 tasks.named('processResources', ProcessResources).configure {
+    doNotTrackState("18k+ resource files causes incremental builds to hang during state tracking")
+
     var replaceProperties = [minecraft_version   : minecraft_version, minecraft_version_range: minecraft_version_range,
                              forge_version       : forge_version, forge_version_range: forge_version_range,
                              loader_version_range: loader_version_range,

@@ -1,0 +1,7 @@
+{
+  "parent": "buildscape:block/template_shelf_unconnected",
+  "textures": {
+    "all": "buildscape:block/warped_shelf",
+    "particle": "buildscape:block/stripped_warped_stem"
+  }
+}

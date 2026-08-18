@@ -1,0 +1,31 @@
+package net.minecraft.client.renderer.item.properties.select;
+
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.PrimitiveCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.util.ExtraCodecs;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ItemDisplayContext;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.CustomModelData;
+import org.jspecify.annotations.Nullable;
+
+public record CustomModelDataProperty(int index) implements SelectItemModelProperty {
+   public static final PrimitiveCodec VALUE_CODEC = Codec.STRING;
+   public static final SelectItemModelProperty.Type TYPE = SelectItemModelProperty.Type.create(RecordCodecBuilder.mapCodec((i) -> i.group(ExtraCodecs.NON_NEGATIVE_INT.optionalFieldOf("index", 0).forGetter(CustomModelDataProperty::index)).apply(i, CustomModelDataProperty::new)), VALUE_CODEC);
+
+   public @Nullable String get(final ItemStack itemStack, final @Nullable ClientLevel level, final @Nullable LivingEntity owner, final int seed, final ItemDisplayContext displayContext) {
+      CustomModelData customModelData = (CustomModelData)itemStack.get(DataComponents.CUSTOM_MODEL_DATA);
+      return customModelData != null ? customModelData.getString(this.index) : null;
+   }
+
+   public SelectItemModelProperty.Type type() {
+      return TYPE;
+   }
+
+   public Codec valueCodec() {
+      return VALUE_CODEC;
+   }
+}

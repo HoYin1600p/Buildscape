@@ -1,0 +1,812 @@
+package net.minecraft.world.entity.vehicle.boat;
+
+import com.google.common.collect.Lists;
+import com.google.common.collect.UnmodifiableIterator;
+import java.util.List;
+import java.util.function.Supplier;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.network.protocol.game.ServerboundPaddleBoatPacket;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.tags.EntityTypeTags;
+import net.minecraft.tags.FluidTags;
+import net.minecraft.util.BlockUtil;
+import net.minecraft.util.Mth;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityDimensions;
+import net.minecraft.world.entity.EntityEvent;
+import net.minecraft.world.entity.EntitySelector;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.InterpolationHandler;
+import net.minecraft.world.entity.Leashable;
+import net.minecraft.world.entity.LinearInterpolationHandler;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.MoverType;
+import net.minecraft.world.entity.Pose;
+import net.minecraft.world.entity.animal.Animal;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.vehicle.DismountHelper;
+import net.minecraft.world.entity.vehicle.VehicleEntity;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.ItemLike;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.LilyPadBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.gameevent.GameEvent;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.BooleanOp;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jspecify.annotations.Nullable;
+
+public abstract class AbstractBoat extends VehicleEntity implements Leashable {
+   private static final EntityDataAccessor DATA_ID_PADDLE_LEFT = SynchedEntityData.defineId(AbstractBoat.class, EntityDataSerializers.BOOLEAN);
+   private static final EntityDataAccessor DATA_ID_PADDLE_RIGHT = SynchedEntityData.defineId(AbstractBoat.class, EntityDataSerializers.BOOLEAN);
+   private static final EntityDataAccessor DATA_ID_BUBBLE_TIME = SynchedEntityData.defineId(AbstractBoat.class, EntityDataSerializers.INT);
+   public static final int PADDLE_LEFT = 0;
+   public static final int PADDLE_RIGHT = 1;
+   private static final int TIME_TO_EJECT = 60;
+   private static final float PADDLE_SPEED = ((float)Math.PI / 8F);
+   public static final double PADDLE_SOUND_TIME = (double)((float)Math.PI / 4F);
+   public static final int BUBBLE_TIME = 60;
+   private final float[] paddlePositions = new float[2];
+   private float outOfControlTicks;
+   private float deltaRotation;
+   private boolean inputLeft;
+   private boolean inputRight;
+   private boolean inputUp;
+   private boolean inputDown;
+   private double waterLevel;
+   private float landFriction;
+   private AbstractBoat.Status status;
+   private AbstractBoat.Status oldStatus;
+   private double lastYd;
+   private boolean isAboveBubbleColumn;
+   private boolean bubbleColumnDirectionIsDown;
+   private float bubbleMultiplier;
+   private float bubbleAngle;
+   private float bubbleAngleO;
+   private Leashable.@Nullable LeashData leashData;
+   private final Supplier dropItem;
+
+   public AbstractBoat(final EntityType type, final Level level, final Supplier dropItem) {
+      super(type, level);
+      this.dropItem = dropItem;
+      this.blocksBuilding = true;
+   }
+
+   public void setInitialPos(final double x, final double y, final double z) {
+      this.setPos(x, y, z);
+      this.xo = x;
+      this.yo = y;
+      this.zo = z;
+   }
+
+   protected Entity.MovementEmission getMovementEmission() {
+      return Entity.MovementEmission.EVENTS;
+   }
+
+   protected void defineSynchedData(final SynchedEntityData.Builder entityData) {
+      super.defineSynchedData(entityData);
+      entityData.define(DATA_ID_PADDLE_LEFT, false);
+      entityData.define(DATA_ID_PADDLE_RIGHT, false);
+      entityData.define(DATA_ID_BUBBLE_TIME, 0);
+   }
+
+   public boolean canCollideWith(final Entity entity) {
+      return canVehicleCollide(this, entity);
+   }
+
+   public static boolean canVehicleCollide(final Entity vehicle, final Entity entity) {
+      return (entity.canBeCollidedWith(vehicle) || entity.isPushable()) && !vehicle.isPassengerOfSameVehicle(entity);
+   }
+
+   public boolean canBeCollidedWith(final @Nullable Entity other) {
+      return true;
+   }
+
+   public boolean isPushable() {
+      return true;
+   }
+
+   public Vec3 getRelativePortalPosition(final Direction.Axis axis, final BlockUtil.FoundRectangle portalArea) {
+      return LivingEntity.resetForwardDirectionOfRelativePortalPosition(super.getRelativePortalPosition(axis, portalArea));
+   }
+
+   protected abstract double rideHeight(final EntityDimensions dimensions);
+
+   protected Vec3 getPassengerAttachmentPoint(final Entity passenger, final EntityDimensions dimensions, final float scale) {
+      float offset = this.getSinglePassengerXOffset();
+      if (this.getPassengers().size() > 1) {
+         int index = this.getPassengers().indexOf(passenger);
+         if (index == 0) {
+            offset = 0.2F;
+         } else {
+            offset = -0.6F;
+         }
+
+         if (passenger instanceof Animal) {
+            offset += 0.2F;
+         }
+      }
+
+      return (new Vec3(0.0D, this.rideHeight(dimensions), (double)offset)).yRot(-this.getYRot() * ((float)Math.PI / 180F));
+   }
+
+   public void onAboveBubbleColumn(final boolean dragDown, final BlockPos pos) {
+      if (this.level() instanceof ServerLevel) {
+         this.isAboveBubbleColumn = true;
+         this.bubbleColumnDirectionIsDown = dragDown;
+         if (this.getBubbleTime() == 0) {
+            this.setBubbleTime(60);
+         }
+      }
+
+      if (!this.isUnderWater() && this.random.nextInt(100) == 0) {
+         this.level().playLocalSound(this.getX(), this.getY(), this.getZ(), this.getSwimSplashSound(), this.getSoundSource(), 1.0F, 0.8F + 0.4F * this.random.nextFloat(), false);
+         this.level().addParticle(ParticleTypes.SPLASH, this.getX() + (double)this.random.nextFloat(), this.getY() + 0.7D, this.getZ() + (double)this.random.nextFloat(), 0.0D, 0.0D, 0.0D);
+         this.gameEvent(GameEvent.SPLASH, this.getControllingPassenger());
+      }
+
+   }
+
+   public void push(final Entity entity) {
+      if (entity instanceof AbstractBoat) {
+         if (entity.getBoundingBox().minY < this.getBoundingBox().maxY) {
+            super.push(entity);
+         }
+      } else if (entity.getBoundingBox().minY <= this.getBoundingBox().minY) {
+         super.push(entity);
+      }
+
+   }
+
+   public void animateHurt(final float yaw) {
+      this.setHurtDir(-this.getHurtDir());
+      this.setHurtTime(10);
+      this.setDamage(this.getDamage() * 11.0F);
+   }
+
+   public boolean isPickable() {
+      return !this.isRemoved();
+   }
+
+   protected InterpolationHandler createInterpolationHandler() {
+      return LinearInterpolationHandler.create(this, 3);
+   }
+
+   public Direction getMotionDirection() {
+      return this.getDirection().getClockWise();
+   }
+
+   public void tick() {
+      this.oldStatus = this.status;
+      this.status = this.getStatus();
+      if (this.status != AbstractBoat.Status.UNDER_WATER && this.status != AbstractBoat.Status.UNDER_FLOWING_WATER) {
+         this.outOfControlTicks = 0.0F;
+      } else {
+         ++this.outOfControlTicks;
+      }
+
+      if (!this.level().isClientSide() && this.outOfControlTicks >= 60.0F) {
+         this.ejectPassengers();
+      }
+
+      if (this.getHurtTime() > 0) {
+         this.setHurtTime(this.getHurtTime() - 1);
+      }
+
+      if (this.getDamage() > 0.0F) {
+         this.setDamage(this.getDamage() - 1.0F);
+      }
+
+      super.tick();
+      if (this.isLocalInstanceAuthoritative()) {
+         if (!(this.getFirstPassenger() instanceof Player)) {
+            this.setPaddleState(false, false);
+         }
+
+         this.floatBoat();
+         if (this.level().isClientSide()) {
+            this.controlBoat();
+            this.level().sendPacketToServer(new ServerboundPaddleBoatPacket(this.getPaddleState(0), this.getPaddleState(1)));
+         }
+
+         this.move(MoverType.SELF, this.getDeltaMovement());
+      } else {
+         this.setDeltaMovement(Vec3.ZERO);
+         this.deltaRotation = 0.0F;
+      }
+
+      this.applyEffectsFromBlocks();
+      this.applyEffectsFromBlocks();
+      this.tickBubbleColumn();
+
+      for(int i = 0; i <= 1; ++i) {
+         if (this.getPaddleState(i)) {
+            if (!this.isSilent() && (double)(this.paddlePositions[i] % ((float)Math.PI * 2F)) <= (double)((float)Math.PI / 4F) && (double)((this.paddlePositions[i] + ((float)Math.PI / 8F)) % ((float)Math.PI * 2F)) >= (double)((float)Math.PI / 4F)) {
+               SoundEvent sound = this.getPaddleSound();
+               if (sound != null) {
+                  Vec3 viewVector = this.getViewVector(1.0F);
+                  double dx = i == 1 ? -viewVector.z : viewVector.z;
+                  double dz = i == 1 ? viewVector.x : -viewVector.x;
+                  this.level().playSound((Entity)null, this.getX() + dx, this.getY(), this.getZ() + dz, sound, this.getSoundSource(), 1.0F, 0.8F + 0.4F * this.random.nextFloat());
+               }
+            }
+
+            this.paddlePositions[i] += ((float)Math.PI / 8F);
+         } else {
+            this.paddlePositions[i] = 0.0F;
+         }
+      }
+
+      List entities = this.level().getEntities(this, this.getBoundingBox().inflate((double)0.2F, (double)-0.01F, (double)0.2F), EntitySelector.pushableBy(this));
+      if (!entities.isEmpty()) {
+         boolean addNewPassengers = !this.level().isClientSide() && !(this.getControllingPassenger() instanceof Player);
+
+         for(Entity entity : entities) {
+            if (!entity.hasPassenger(this)) {
+               if (addNewPassengers && this.getPassengers().size() < this.getMaxPassengers() && !entity.isPassenger() && this.hasEnoughSpaceFor(entity) && entity instanceof LivingEntity && !entity.is(EntityTypeTags.CANNOT_BE_PUSHED_ONTO_BOATS)) {
+                  entity.startRiding(this);
+               } else {
+                  this.push(entity);
+               }
+            }
+         }
+      }
+
+   }
+
+   private void tickBubbleColumn() {
+      if (this.level().isClientSide()) {
+         int clientBubbleTime = this.getBubbleTime();
+         if (clientBubbleTime > 0) {
+            this.bubbleMultiplier += 0.05F;
+         } else {
+            this.bubbleMultiplier -= 0.1F;
+         }
+
+         this.bubbleMultiplier = Mth.clamp(this.bubbleMultiplier, 0.0F, 1.0F);
+         this.bubbleAngleO = this.bubbleAngle;
+         this.bubbleAngle = 10.0F * (float)Math.sin(0.5D * (double)this.tickCount) * this.bubbleMultiplier;
+      } else {
+         if (!this.isAboveBubbleColumn) {
+            this.setBubbleTime(0);
+         }
+
+         int bubbleTime = this.getBubbleTime();
+         if (bubbleTime > 0) {
+            --bubbleTime;
+            this.setBubbleTime(bubbleTime);
+            int diff = 60 - bubbleTime - 1;
+            if (diff > 0 && bubbleTime == 0) {
+               this.setBubbleTime(0);
+               if (this.bubbleColumnDirectionIsDown) {
+                  this.ejectPassengers();
+                  this.level().broadcastEntityEvent(this, (byte)71);
+               } else {
+                  this.level().broadcastEntityEvent(this, (byte)72);
+               }
+
+               this.handleBubbleColumnEffect(this.bubbleColumnDirectionIsDown);
+            }
+
+            this.isAboveBubbleColumn = false;
+         }
+      }
+
+   }
+
+   public void handleEntityEvent(final @EntityEvent.Value byte id) {
+      super.handleEntityEvent(id);
+      if (id == 71) {
+         this.handleBubbleColumnEffect(true);
+      } else if (id == 72) {
+         this.handleBubbleColumnEffect(false);
+      }
+
+   }
+
+   protected void handleBubbleColumnEffect(final boolean dragDown) {
+      if (this.canSimulateMovement()) {
+         Vec3 movement = this.getDeltaMovement();
+         if (dragDown) {
+            this.setDeltaMovement(movement.add(0.0D, -0.7D, 0.0D));
+         } else {
+            this.setDeltaMovement(movement.x, 0.6D, movement.z);
+         }
+
+      }
+   }
+
+   protected @Nullable SoundEvent getPaddleSound() {
+      SoundEvent var10000;
+      switch (this.getStatus().ordinal()) {
+         case 0:
+         case 1:
+         case 2:
+            var10000 = SoundEvents.BOAT_PADDLE_WATER;
+            break;
+         case 3:
+            var10000 = SoundEvents.BOAT_PADDLE_LAND;
+            break;
+         default:
+            var10000 = null;
+      }
+
+      return var10000;
+   }
+
+   public void setPaddleState(final boolean left, final boolean right) {
+      this.entityData.set(DATA_ID_PADDLE_LEFT, left);
+      this.entityData.set(DATA_ID_PADDLE_RIGHT, right);
+   }
+
+   public float getRowingTime(final int side, final float a) {
+      return this.getPaddleState(side) ? Mth.clampedLerp(a, this.paddlePositions[side] - ((float)Math.PI / 8F), this.paddlePositions[side]) : 0.0F;
+   }
+
+   public Leashable.@Nullable LeashData getLeashData() {
+      return this.leashData;
+   }
+
+   public void setLeashData(final Leashable.@Nullable LeashData leashData) {
+      this.leashData = leashData;
+   }
+
+   public Vec3 getLeashOffset() {
+      return new Vec3(0.0D, (double)(0.88F * this.getBbHeight()), (double)(0.64F * this.getBbWidth()));
+   }
+
+   public boolean supportQuadLeash() {
+      return true;
+   }
+
+   public Vec3[] getQuadLeashOffsets() {
+      return Leashable.createQuadLeashOffsets(this, 0.0D, 0.64D, 0.382D, 0.88D);
+   }
+
+   private AbstractBoat.Status getStatus() {
+      AbstractBoat.Status waterStatus = this.isUnderwater();
+      if (waterStatus != null) {
+         this.waterLevel = this.getBoundingBox().maxY;
+         return waterStatus;
+      } else if (this.checkInWater()) {
+         return AbstractBoat.Status.IN_WATER;
+      } else {
+         float friction = this.getGroundFriction();
+         if (friction > 0.0F) {
+            this.landFriction = friction;
+            return AbstractBoat.Status.ON_LAND;
+         } else {
+            return AbstractBoat.Status.IN_AIR;
+         }
+      }
+   }
+
+   public float getWaterLevelAbove() {
+      AABB aabb = this.getBoundingBox();
+      int minX = Mth.floor(aabb.minX);
+      int maxX = Mth.ceil(aabb.maxX);
+      int minY = Mth.floor(aabb.maxY);
+      int maxY = Mth.ceil(aabb.maxY - this.lastYd);
+      int minZ = Mth.floor(aabb.minZ);
+      int maxZ = Mth.ceil(aabb.maxZ);
+      BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
+
+      label39:
+      for(int y = minY; y < maxY; ++y) {
+         float blockHeight = 0.0F;
+
+         for(int x = minX; x < maxX; ++x) {
+            for(int z = minZ; z < maxZ; ++z) {
+               pos.set(x, y, z);
+               FluidState fluidState = this.level().getFluidState(pos);
+               if (fluidState.is(FluidTags.WATER)) {
+                  blockHeight = Math.max(blockHeight, fluidState.getHeight(this.level(), pos));
+               }
+
+               if (blockHeight >= 1.0F) {
+                  continue label39;
+               }
+            }
+         }
+
+         if (blockHeight < 1.0F) {
+            return (float)pos.getY() + blockHeight;
+         }
+      }
+
+      return (float)(maxY + 1);
+   }
+
+   public float getGroundFriction() {
+      AABB bb = this.getBoundingBox();
+      AABB box = new AABB(bb.minX, bb.minY - 0.001D, bb.minZ, bb.maxX, bb.minY, bb.maxZ);
+      int x0 = Mth.floor(box.minX) - 1;
+      int x1 = Mth.ceil(box.maxX) + 1;
+      int y0 = Mth.floor(box.minY) - 1;
+      int y1 = Mth.ceil(box.maxY) + 1;
+      int z0 = Mth.floor(box.minZ) - 1;
+      int z1 = Mth.ceil(box.maxZ) + 1;
+      VoxelShape boatShape = Shapes.create(box);
+      float friction = 0.0F;
+      int count = 0;
+      BlockPos.MutableBlockPos blockPos = new BlockPos.MutableBlockPos();
+
+      for(int x = x0; x < x1; ++x) {
+         for(int z = z0; z < z1; ++z) {
+            int edges = (x != x0 && x != x1 - 1 ? 0 : 1) + (z != z0 && z != z1 - 1 ? 0 : 1);
+            if (edges != 2) {
+               for(int y = y0; y < y1; ++y) {
+                  if (edges <= 0 || y != y0 && y != y1 - 1) {
+                     blockPos.set(x, y, z);
+                     BlockState blockState = this.level().getBlockState(blockPos);
+                     if (!(blockState.getBlock() instanceof LilyPadBlock) && Shapes.joinIsNotEmpty(blockState.getCollisionShape(this.level(), blockPos).move(blockPos), boatShape, BooleanOp.AND)) {
+                        friction += blockState.getBlock().getFriction();
+                        ++count;
+                     }
+                  }
+               }
+            }
+         }
+      }
+
+      return friction / (float)count;
+   }
+
+   private boolean checkInWater() {
+      AABB bb = this.getBoundingBox();
+      int minX = Mth.floor(bb.minX);
+      int maxX = Mth.ceil(bb.maxX);
+      int minY = Mth.floor(bb.minY);
+      int maxY = Mth.ceil(bb.minY + 0.001D);
+      int minZ = Mth.floor(bb.minZ);
+      int maxZ = Mth.ceil(bb.maxZ);
+      boolean inWater = false;
+      this.waterLevel = -Double.MAX_VALUE;
+      BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
+
+      for(int x = minX; x < maxX; ++x) {
+         for(int y = minY; y < maxY; ++y) {
+            for(int z = minZ; z < maxZ; ++z) {
+               pos.set(x, y, z);
+               FluidState fluidState = this.level().getFluidState(pos);
+               if (fluidState.is(FluidTags.WATER)) {
+                  float height = (float)y + fluidState.getHeight(this.level(), pos);
+                  this.waterLevel = Math.max((double)height, this.waterLevel);
+                  inWater |= bb.minY < (double)height;
+               }
+            }
+         }
+      }
+
+      return inWater;
+   }
+
+   private AbstractBoat.@Nullable Status isUnderwater() {
+      AABB aabb = this.getBoundingBox();
+      double maxY = aabb.maxY + 0.001D;
+      int x0 = Mth.floor(aabb.minX);
+      int x1 = Mth.ceil(aabb.maxX);
+      int y0 = Mth.floor(aabb.maxY);
+      int y1 = Mth.ceil(maxY);
+      int z0 = Mth.floor(aabb.minZ);
+      int z1 = Mth.ceil(aabb.maxZ);
+      boolean underWater = false;
+      BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
+
+      for(int x = x0; x < x1; ++x) {
+         for(int y = y0; y < y1; ++y) {
+            for(int z = z0; z < z1; ++z) {
+               pos.set(x, y, z);
+               FluidState fluidState = this.level().getFluidState(pos);
+               if (fluidState.is(FluidTags.WATER) && maxY < (double)((float)pos.getY() + fluidState.getHeight(this.level(), pos))) {
+                  if (!fluidState.isSource()) {
+                     return AbstractBoat.Status.UNDER_FLOWING_WATER;
+                  }
+
+                  underWater = true;
+               }
+            }
+         }
+      }
+
+      return underWater ? AbstractBoat.Status.UNDER_WATER : null;
+   }
+
+   protected double getDefaultGravity() {
+      return 0.04D;
+   }
+
+   private void floatBoat() {
+      double vspeed = -this.getGravity();
+      double buoyancy = 0.0D;
+      float invFriction = 0.05F;
+      if (this.oldStatus == AbstractBoat.Status.IN_AIR && this.status != AbstractBoat.Status.IN_AIR && this.status != AbstractBoat.Status.ON_LAND) {
+         this.waterLevel = this.getY(1.0D);
+         double targetY = (double)(this.getWaterLevelAbove() - this.getBbHeight()) + 0.101D;
+         if (this.level().noCollision(this, this.getBoundingBox().move(0.0D, targetY - this.getY(), 0.0D))) {
+            this.setPos(this.getX(), targetY, this.getZ());
+            this.setDeltaMovement(this.getDeltaMovement().multiply(1.0D, 0.0D, 1.0D));
+            this.lastYd = 0.0D;
+         }
+
+         this.status = AbstractBoat.Status.IN_WATER;
+      } else {
+         if (this.status == AbstractBoat.Status.IN_WATER) {
+            buoyancy = (this.waterLevel - this.getY()) / (double)this.getBbHeight();
+            invFriction = 0.9F;
+         } else if (this.status == AbstractBoat.Status.UNDER_FLOWING_WATER) {
+            vspeed = -7.0E-4D;
+            invFriction = 0.9F;
+         } else if (this.status == AbstractBoat.Status.UNDER_WATER) {
+            buoyancy = (double)0.01F;
+            invFriction = 0.45F;
+         } else if (this.status == AbstractBoat.Status.IN_AIR) {
+            invFriction = 0.9F;
+         } else if (this.status == AbstractBoat.Status.ON_LAND) {
+            invFriction = this.landFriction;
+            if (this.getControllingPassenger() instanceof Player) {
+               this.landFriction /= 2.0F;
+            }
+         }
+
+         Vec3 movement = this.getDeltaMovement();
+         this.setDeltaMovement(movement.x * (double)invFriction, movement.y + vspeed, movement.z * (double)invFriction);
+         this.deltaRotation *= invFriction;
+         if (buoyancy > 0.0D) {
+            Vec3 deltaMovement = this.getDeltaMovement();
+            this.setDeltaMovement(deltaMovement.x, (deltaMovement.y + buoyancy * (this.getDefaultGravity() / 0.65D)) * 0.75D, deltaMovement.z);
+         }
+      }
+
+   }
+
+   protected float getAirDrag() {
+      return 1.0F;
+   }
+
+   private void controlBoat() {
+      if (this.isVehicle()) {
+         float acceleration = 0.0F;
+         if (this.inputLeft) {
+            --this.deltaRotation;
+         }
+
+         if (this.inputRight) {
+            ++this.deltaRotation;
+         }
+
+         if (this.inputRight != this.inputLeft && !this.inputUp && !this.inputDown) {
+            acceleration += 0.005F;
+         }
+
+         this.setYRot(this.getYRot() + this.deltaRotation);
+         if (this.inputUp) {
+            acceleration += 0.04F;
+         }
+
+         if (this.inputDown) {
+            acceleration -= 0.005F;
+         }
+
+         this.setDeltaMovement(this.getDeltaMovement().add((double)(Mth.sin((double)(-this.getYRot() * ((float)Math.PI / 180F))) * acceleration), 0.0D, (double)(Mth.cos((double)(this.getYRot() * ((float)Math.PI / 180F))) * acceleration)));
+         this.setPaddleState(this.inputRight && !this.inputLeft || this.inputUp, this.inputLeft && !this.inputRight || this.inputUp);
+      }
+   }
+
+   protected float getSinglePassengerXOffset() {
+      return 0.0F;
+   }
+
+   public boolean hasEnoughSpaceFor(final Entity entity) {
+      return entity.getBbWidth() < this.getBbWidth();
+   }
+
+   protected void positionRider(final Entity passenger, final Entity.MoveFunction moveFunction) {
+      super.positionRider(passenger, moveFunction);
+      if (!passenger.is(EntityTypeTags.CAN_TURN_IN_BOATS)) {
+         if (passenger.isLocalInstanceAuthoritative()) {
+            passenger.setYRot(passenger.getYRot() + this.deltaRotation);
+            passenger.setYHeadRot(passenger.getYHeadRot() + this.deltaRotation);
+         }
+
+         this.clampRotation(passenger);
+      }
+   }
+
+   public Vec3 getDismountLocationForPassenger(final LivingEntity passenger) {
+      Vec3 direction = getCollisionHorizontalEscapeVector((double)(this.getBbWidth() * Mth.SQRT_OF_TWO), (double)passenger.getBbWidth(), passenger.getYRot());
+      double targetX = this.getX() + direction.x;
+      double targetZ = this.getZ() + direction.z;
+      BlockPos targetBlockPos = BlockPos.containing(targetX, this.getBoundingBox().maxY, targetZ);
+      BlockPos belowBlockPos = targetBlockPos.below();
+      if (!this.level().isWaterAt(belowBlockPos)) {
+         List targets = Lists.newArrayList();
+         double targetFloor = this.level().getBlockFloorHeight(targetBlockPos);
+         if (DismountHelper.isBlockFloorValid(targetFloor)) {
+            targets.add(new Vec3(targetX, (double)targetBlockPos.getY() + targetFloor, targetZ));
+         }
+
+         double belowFloor = this.level().getBlockFloorHeight(belowBlockPos);
+         if (DismountHelper.isBlockFloorValid(belowFloor)) {
+            targets.add(new Vec3(targetX, (double)belowBlockPos.getY() + belowFloor, targetZ));
+         }
+
+         UnmodifiableIterator var14 = passenger.getDismountPoses().iterator();
+
+         while(var14.hasNext()) {
+            Pose dismountPose = (Pose)var14.next();
+
+            for(Vec3 target : targets) {
+               if (DismountHelper.canDismountTo(this.level(), target, passenger, dismountPose)) {
+                  passenger.setPose(dismountPose);
+                  return target;
+               }
+            }
+         }
+      }
+
+      return super.getDismountLocationForPassenger(passenger);
+   }
+
+   protected float clampRotation(final Entity passenger) {
+      float passengerBodyYRot = this.calculatePassengerBodyYRot(passenger);
+      passenger.setYBodyRot(passengerBodyYRot);
+      if (passenger instanceof Mob mob) {
+         passenger.setYRot(passengerBodyYRot);
+         mob.clampHeadRotationToBody();
+         return Mth.wrapDegrees(passengerBodyYRot - passenger.getYRot());
+      } else {
+         float delta = Mth.wrapDegrees(passenger.getYRot() - passengerBodyYRot);
+         float maxHeadRotation = 105.0F;
+         float targetDelta = Mth.clamp(delta, -105.0F, 105.0F);
+         passenger.setYRot(passenger.getYRot() + targetDelta - delta);
+         passenger.setYHeadRot(passenger.getYRot());
+         return targetDelta - delta;
+      }
+   }
+
+   private float calculatePassengerBodyYRot(final Entity passenger) {
+      return passenger instanceof Animal && this.getPassengers().size() == this.getMaxPassengers() ? this.getYRot() + (passenger.getId() % 2 == 0 ? 90.0F : 270.0F) : this.getYRot();
+   }
+
+   public void onPassengerTurned(final Entity passenger) {
+      float yDelta = this.clampRotation(passenger);
+      passenger.yRotO += yDelta;
+   }
+
+   protected void addAdditionalSaveData(final ValueOutput output) {
+      this.writeLeashData(output, this.leashData);
+   }
+
+   protected void readAdditionalSaveData(final ValueInput input) {
+      this.readLeashData(input);
+   }
+
+   public InteractionResult interact(final Player player, final InteractionHand hand, final Vec3 location) {
+      InteractionResult superInteraction = super.interact(player, hand, location);
+      if (superInteraction != InteractionResult.PASS) {
+         return superInteraction;
+      } else {
+         return (InteractionResult)(player.isSecondaryUseActive() || !(this.outOfControlTicks < 60.0F) || !this.level().isClientSide() && !player.startRiding(this) ? InteractionResult.PASS : InteractionResult.SUCCESS);
+      }
+   }
+
+   public void remove(final Entity.RemovalReason reason) {
+      if (!this.level().isClientSide() && reason.shouldDestroy() && this.isLeashed()) {
+         this.dropLeash();
+      }
+
+      super.remove(reason);
+   }
+
+   protected void checkFallDamage(final double ya, final boolean onGround, final BlockState onState, final BlockPos pos) {
+      this.lastYd = this.getDeltaMovement().y;
+      if (!this.isPassenger()) {
+         if (onGround) {
+            this.resetFallDistance();
+         } else if (!this.level().getFluidState(this.blockPosition().below()).is(FluidTags.WATER) && ya < 0.0D) {
+            this.fallDistance -= (double)((float)ya);
+         }
+
+      }
+   }
+
+   public boolean getPaddleState(final int side) {
+      return this.entityData.get(side == 0 ? DATA_ID_PADDLE_LEFT : DATA_ID_PADDLE_RIGHT) && this.getControllingPassenger() != null;
+   }
+
+   private void setBubbleTime(final int val) {
+      this.entityData.set(DATA_ID_BUBBLE_TIME, val);
+   }
+
+   private int getBubbleTime() {
+      return this.entityData.get(DATA_ID_BUBBLE_TIME);
+   }
+
+   public float getBubbleAngle(final float a) {
+      return Mth.lerp(a, this.bubbleAngleO, this.bubbleAngle);
+   }
+
+   protected boolean canAddPassenger(final Entity passenger) {
+      return this.getPassengers().size() < this.getMaxPassengers() && !this.isEyeInFluid(FluidTags.WATER);
+   }
+
+   protected int getMaxPassengers() {
+      return 2;
+   }
+
+   public @Nullable LivingEntity getControllingPassenger() {
+      Entity var2 = this.getFirstPassenger();
+      LivingEntity var10000;
+      if (var2 instanceof LivingEntity passenger) {
+         var10000 = passenger;
+      } else {
+         var10000 = super.getControllingPassenger();
+      }
+
+      return var10000;
+   }
+
+   public void setInput(final boolean left, final boolean right, final boolean up, final boolean down) {
+      this.inputLeft = left;
+      this.inputRight = right;
+      this.inputUp = up;
+      this.inputDown = down;
+   }
+
+   public boolean isUnderWater() {
+      return this.status == AbstractBoat.Status.UNDER_WATER || this.status == AbstractBoat.Status.UNDER_FLOWING_WATER;
+   }
+
+   protected final Item getDropItem() {
+      return (Item)this.dropItem.get();
+   }
+
+   public final ItemStack getPickResult() {
+      return new ItemStack((ItemLike)this.dropItem.get());
+   }
+
+   protected @Nullable AABB modifyPassengerFluidInteractionBox(final AABB passengerBox) {
+      if (this.isUnderWater()) {
+         return passengerBox;
+      } else {
+         AABB boatBox = this.getBoundingBox();
+         if (boatBox.maxY >= passengerBox.maxY) {
+            return null;
+         } else {
+            double minY = Math.max(passengerBox.minY, boatBox.maxY);
+            return new AABB(passengerBox.minX, minY, passengerBox.minZ, passengerBox.maxX, passengerBox.maxY, passengerBox.maxZ);
+         }
+      }
+   }
+
+   public static enum Status {
+      IN_WATER,
+      UNDER_WATER,
+      UNDER_FLOWING_WATER,
+      ON_LAND,
+      IN_AIR;
+
+      // $FF: synthetic method
+      private static AbstractBoat.Status[] $values() {
+         return new AbstractBoat.Status[]{IN_WATER, UNDER_WATER, UNDER_FLOWING_WATER, ON_LAND, IN_AIR};
+      }
+   }
+}

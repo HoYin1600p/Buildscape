@@ -1,0 +1,9 @@
+{
+  "parent": "minecraft:block/stairs_inner",
+  "textures": {
+    "bottom": "buildscape:block/burnt_pressed_cardboard",
+    "top": "buildscape:block/burnt_pressed_cardboard",
+    "side": "buildscape:block/burnt_pressed_cardboard",
+    "particle": "#side"
+  }
+}

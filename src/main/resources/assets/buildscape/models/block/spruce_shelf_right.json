@@ -2,6 +2,6 @@
   "parent": "buildscape:block/template_shelf_right",
   "textures": {
     "all": "buildscape:block/spruce_shelf",
-    "particle": "buildscape:block/stripped_spruce_log"
+    "particle": "minecraft:block/stripped_spruce_log"
   }
 }

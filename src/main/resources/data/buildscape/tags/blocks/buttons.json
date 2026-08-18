@@ -1,5 +1,10 @@
 {
   "values": [
-    "buildscape:mangrove_button"
+    "buildscape:burnt_cardboard_button",
+    "buildscape:cardboard_button",
+    "buildscape:mangrove_button",
+    "buildscape:stripped_cardboard_button",
+    "buildscape:tinted_cardboard_button",
+    "buildscape:washed_cardboard_button"
   ]
 }

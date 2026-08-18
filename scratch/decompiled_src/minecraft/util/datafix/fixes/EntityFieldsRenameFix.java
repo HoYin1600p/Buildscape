@@ -1,0 +1,28 @@
+package net.minecraft.util.datafix.fixes;
+
+import com.mojang.datafixers.DSL;
+import com.mojang.datafixers.Typed;
+import com.mojang.datafixers.schemas.Schema;
+import com.mojang.serialization.Dynamic;
+import java.util.Map;
+
+public class EntityFieldsRenameFix extends NamedEntityFix {
+   private final Map renames;
+
+   public EntityFieldsRenameFix(final Schema outputSchema, final String name, final String entityType, final Map renames) {
+      super(outputSchema, false, name, References.ENTITY, entityType);
+      this.renames = renames;
+   }
+
+   public Dynamic fixTag(Dynamic data) {
+      for(Map.Entry entry : this.renames.entrySet()) {
+         data = data.renameField((String)entry.getKey(), (String)entry.getValue());
+      }
+
+      return data;
+   }
+
+   protected Typed fix(final Typed entity) {
+      return entity.update(DSL.remainderFinder(), this::fixTag);
+   }
+}

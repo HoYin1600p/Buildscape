@@ -1,0 +1,100 @@
+package net.minecraft.world.level.block;
+
+import java.util.List;
+import java.util.Map;
+import java.util.stream.IntStream;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.ScheduledTickAccess;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.minecraft.world.level.pathfinder.PathComputationType;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jspecify.annotations.Nullable;
+
+public class CocoaBlock extends HorizontalDirectionalBlock implements BonemealableBlock {
+   public static final int MAX_AGE = 2;
+   public static final IntegerProperty AGE = BlockStateProperties.AGE_2;
+   private static final List SHAPES = IntStream.rangeClosed(0, 2).mapToObj((i) -> Shapes.rotateHorizontal(Block.column((double)(4 + i * 2), (double)(7 - i * 2), 12.0D).move(0.0D, 0.0D, (double)(i - 5) / 16.0D).optimize())).toList();
+
+   public CocoaBlock(final BlockBehaviour.Properties properties) {
+      super(properties);
+      this.registerDefaultState((BlockState)((BlockState)((BlockState)this.stateDefinition.any()).setValue(FACING, Direction.NORTH)).setValue(AGE, Integer.valueOf(0)));
+   }
+
+   protected boolean isRandomlyTicking(final BlockState state) {
+      return state.getValue(AGE) < 2;
+   }
+
+   protected void randomTick(final BlockState state, final ServerLevel level, final BlockPos pos, final RandomSource random) {
+      if (level.getRandom().nextInt(5) == 0) {
+         int age = state.getValue(AGE);
+         if (age < 2) {
+            level.setBlock(pos, (BlockState)state.setValue(AGE, Integer.valueOf(age + 1)), 2);
+         }
+      }
+
+   }
+
+   protected boolean canSurvive(final BlockState state, final LevelReader level, final BlockPos pos) {
+      BlockState relativeState = level.getBlockState(pos.relative((Direction)state.getValue(FACING)));
+      return relativeState.is(BlockTags.SUPPORTS_COCOA);
+   }
+
+   protected VoxelShape getShape(final BlockState state, final BlockGetter level, final BlockPos pos, final CollisionContext context) {
+      return (VoxelShape)((Map)SHAPES.get(state.getValue(AGE))).get(state.getValue(FACING));
+   }
+
+   public @Nullable BlockState getStateForPlacement(final BlockPlaceContext context) {
+      BlockState state = this.defaultBlockState();
+      LevelReader level = context.getLevel();
+      BlockPos pos = context.getClickedPos();
+
+      for(Direction direction : context.getNearestLookingDirections()) {
+         if (direction.getAxis().isHorizontal()) {
+            state = (BlockState)state.setValue(FACING, direction);
+            if (state.canSurvive(level, pos)) {
+               return state;
+            }
+         }
+      }
+
+      return null;
+   }
+
+   protected BlockState updateShape(final BlockState state, final LevelReader level, final ScheduledTickAccess ticks, final BlockPos pos, final Direction directionToNeighbour, final BlockPos neighbourPos, final BlockState neighbourState, final RandomSource random) {
+      return directionToNeighbour == state.getValue(FACING) && !state.canSurvive(level, pos) ? Blocks.AIR.defaultBlockState() : super.updateShape(state, level, ticks, pos, directionToNeighbour, neighbourPos, neighbourState, random);
+   }
+
+   public boolean isValidBonemealTarget(final LevelReader level, final BlockPos pos, final BlockState state, final BonemealSource source) {
+      return state.getValue(AGE) < 2;
+   }
+
+   public boolean isBonemealSuccess(final Level level, final RandomSource random, final BlockPos pos, final BlockState state, final BonemealSource source) {
+      return true;
+   }
+
+   public void performBonemeal(final ServerLevel level, final RandomSource random, final BlockPos pos, final BlockState state, final BonemealSource source) {
+      level.setBlock(pos, (BlockState)state.setValue(AGE, Integer.valueOf(state.getValue(AGE) + 1)), 2);
+   }
+
+   protected void createBlockStateDefinition(final StateDefinition.Builder builder) {
+      builder.add(FACING, AGE);
+   }
+
+   protected boolean isPathfindable(final BlockState state, final PathComputationType type) {
+      return false;
+   }
+}

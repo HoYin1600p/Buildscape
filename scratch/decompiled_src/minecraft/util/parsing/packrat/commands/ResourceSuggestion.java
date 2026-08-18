@@ -1,0 +1,15 @@
+package net.minecraft.util.parsing.packrat.commands;
+
+import com.mojang.brigadier.StringReader;
+import java.util.stream.Stream;
+import net.minecraft.resources.Identifier;
+import net.minecraft.util.parsing.packrat.ParseState;
+import net.minecraft.util.parsing.packrat.SuggestionSupplier;
+
+public interface ResourceSuggestion extends SuggestionSupplier {
+   Stream possibleResources();
+
+   default Stream possibleValues(final ParseState state) {
+      return this.possibleResources().map(Identifier::toString);
+   }
+}

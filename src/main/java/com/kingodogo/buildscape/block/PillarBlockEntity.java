@@ -14,10 +14,69 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraft.core.Direction;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.items.IItemHandler;
 
 public class PillarBlockEntity extends BlockEntity {
 
     private ItemStack displayedItem = ItemStack.EMPTY;
+
+    private final LazyOptional<IItemHandler> itemHandler = LazyOptional.of(() -> new IItemHandler() {
+        @Override
+        public int getSlots() {
+            return 1;
+        }
+
+        @Nonnull
+        @Override
+        public ItemStack getStackInSlot(int slot) {
+            if (slot == 0) {
+                return getTopPillar().getDisplayedItem();
+            }
+            return ItemStack.EMPTY;
+        }
+
+        @Nonnull
+        @Override
+        public ItemStack insertItem(int slot, @Nonnull ItemStack stack, boolean simulate) {
+            return stack;
+        }
+
+        @Nonnull
+        @Override
+        public ItemStack extractItem(int slot, int amount, boolean simulate) {
+            if (slot != 0 || amount <= 0) {
+                return ItemStack.EMPTY;
+            }
+            PillarBlockEntity top = getTopPillar();
+            ItemStack displayed = top.getDisplayedItem();
+            if (displayed.isEmpty()) {
+                return ItemStack.EMPTY;
+            }
+            ItemStack result = displayed.copy();
+            result.setCount(1);
+            if (!simulate) {
+                top.setDisplayedItem(ItemStack.EMPTY);
+            }
+            return result;
+        }
+
+        @Override
+        public int getSlotLimit(int slot) {
+            return 1;
+        }
+
+        @Override
+        public boolean isItemValid(int slot, @Nonnull ItemStack stack) {
+            return false;
+        }
+    });
+
     private long lastParticleTick = 0L;
     private String particlePattern = null;
     
@@ -2122,5 +2181,38 @@ public class PillarBlockEntity extends BlockEntity {
             load(tag);
             this.lastParticleTick = 0;
         }
+    }
+
+    public PillarBlockEntity getTopPillar() {
+        if (this.level == null) return this;
+        BlockPos current = this.worldPosition;
+        try {
+            while (this.level.getBlockState(current.above()).getBlock() instanceof PillarBlock &&
+                   !(this.level.getBlockState(current.above()).getBlock() instanceof AshenKingPillarBlock)) {
+                current = current.above();
+            }
+            BlockEntity be = this.level.getBlockEntity(current);
+            if (be instanceof PillarBlockEntity topPillar) {
+                return topPillar;
+            }
+        } catch (Exception ignored) {}
+        return this;
+    }
+
+    @Nonnull
+    @Override
+    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
+        if (!this.remove && cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
+            if (side == null || side == Direction.DOWN) {
+                return itemHandler.cast();
+            }
+        }
+        return super.getCapability(cap, side);
+    }
+
+    @Override
+    public void invalidateCaps() {
+        super.invalidateCaps();
+        itemHandler.invalidate();
     }
 }

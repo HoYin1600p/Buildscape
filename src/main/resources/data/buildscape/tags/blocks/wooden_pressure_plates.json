@@ -1,7 +1,6 @@
 {
   "replace": false,
   "values": [
-    "buildscape:ashpen_white_pressure_plate",
     "buildscape:ashpen_black_pressure_plate",
     "buildscape:ashpen_blue_pressure_plate",
     "buildscape:ashpen_brown_pressure_plate",
@@ -16,9 +15,14 @@
     "buildscape:ashpen_pink_pressure_plate",
     "buildscape:ashpen_purple_pressure_plate",
     "buildscape:ashpen_red_pressure_plate",
+    "buildscape:ashpen_white_pressure_plate",
     "buildscape:ashpen_yellow_pressure_plate",
     "buildscape:bamboo_block_pressure_plate",
-    "buildscape:stripped_bamboo_block_pressure_plate"
+    "buildscape:burnt_cardboard_pressure_plate",
+    "buildscape:cardboard_pressure_plate",
+    "buildscape:stripped_bamboo_block_pressure_plate",
+    "buildscape:stripped_cardboard_pressure_plate",
+    "buildscape:tinted_cardboard_pressure_plate",
+    "buildscape:washed_cardboard_pressure_plate"
   ]
 }
-

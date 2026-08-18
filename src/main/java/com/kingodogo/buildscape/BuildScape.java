@@ -1672,6 +1672,10 @@ public class BuildScape {
                         com.kingodogo.buildscape.block.ModBlockEntities.COPPER_CHEST
                                 .get(),
                         com.kingodogo.buildscape.client.renderer.CopperChestRenderer::new);
+                net.minecraft.client.renderer.blockentity.BlockEntityRenderers.register(
+                        com.kingodogo.buildscape.block.ModBlockEntities.SHELF
+                                .get(),
+                        com.kingodogo.buildscape.client.renderer.ShelfRenderer::new);
 
 /*
                 net.minecraft.client.renderer.blockentity.BlockEntityRenderers.register(
@@ -2526,6 +2530,36 @@ public class BuildScape {
                     .particleEngine.register(
                             com.kingodogo.buildscape.particle.ModParticles.COPPER_FIRE_FLAME.get(),
                             net.minecraft.client.particle.FlameParticle.Provider::new
+                    );
+
+            net.minecraft.client.Minecraft.getInstance()
+                    .particleEngine.register(
+                            com.kingodogo.buildscape.particle.ModParticles.SULFUR_BUBBLES.get(),
+                            com.kingodogo.buildscape.particle.SulfurBubbleParticle.Provider::new
+                    );
+
+            net.minecraft.client.Minecraft.getInstance()
+                    .particleEngine.register(
+                            com.kingodogo.buildscape.particle.ModParticles.GEYSER.get(),
+                            new com.kingodogo.buildscape.particle.GeyserEruptionParticle.Provider()
+                    );
+
+            net.minecraft.client.Minecraft.getInstance()
+                    .particleEngine.register(
+                            com.kingodogo.buildscape.particle.ModParticles.GEYSER_BASE.get(),
+                            com.kingodogo.buildscape.particle.GeyserBaseParticle.Provider::new
+                    );
+
+            net.minecraft.client.Minecraft.getInstance()
+                    .particleEngine.register(
+                            com.kingodogo.buildscape.particle.ModParticles.GEYSER_POOF.get(),
+                            com.kingodogo.buildscape.particle.GeyserBaseParticle.Provider::new
+                    );
+
+            net.minecraft.client.Minecraft.getInstance()
+                    .particleEngine.register(
+                            com.kingodogo.buildscape.particle.ModParticles.GEYSER_PLUME.get(),
+                            com.kingodogo.buildscape.particle.GeyserPlumeParticle.Provider::new
                     );
         }
     }

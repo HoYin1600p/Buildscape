@@ -33,8 +33,7 @@
           "block": "buildscape:mangrove_propagule",
           "condition": "minecraft:block_state_property",
           "properties": {
-            "hanging": "false",
-            "age": "4"
+            "hanging": "false"
           }
         }
       ],

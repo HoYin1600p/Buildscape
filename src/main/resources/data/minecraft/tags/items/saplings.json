@@ -2,6 +2,8 @@
   "replace": false,
   "values": [
     "buildscape:pale_oak_sapling",
-    "buildscape:cherry_sapling"
+    "buildscape:cherry_sapling",
+    "buildscape:poplar_sapling",
+    "buildscape:mangrove_propagule"
   ]
 }

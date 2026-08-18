@@ -38,10 +38,14 @@ public class BeaconBlockEntityRendererMixin {
         if (blockEntity instanceof BeaconBeamHeightAccessor) {
             int customHeight = ((BeaconBeamHeightAccessor) blockEntity).buildscape$getBeamHeight();
             if (customHeight < 1024) {
-                newHeight = Math.min(height, customHeight);
+                int remaining = customHeight - yOffset;
+                if (remaining <= 0) {
+                    return;
+                }
+                newHeight = Math.min(height, remaining);
             }
         }
-        
+
         BeaconRendererInvoker.invokeRenderBeaconBeam(
             poseStack,
             bufferSource,

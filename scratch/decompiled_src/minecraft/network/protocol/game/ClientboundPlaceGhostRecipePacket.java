@@ -1,0 +1,19 @@
+package net.minecraft.network.protocol.game;
+
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.PacketType;
+import net.minecraft.world.item.crafting.display.RecipeDisplay;
+
+public record ClientboundPlaceGhostRecipePacket(int containerId, RecipeDisplay recipeDisplay) implements Packet {
+   public static final StreamCodec STREAM_CODEC = StreamCodec.composite(ByteBufCodecs.CONTAINER_ID, ClientboundPlaceGhostRecipePacket::containerId, RecipeDisplay.STREAM_CODEC, ClientboundPlaceGhostRecipePacket::recipeDisplay, ClientboundPlaceGhostRecipePacket::new);
+
+   public PacketType type() {
+      return GamePacketTypes.CLIENTBOUND_PLACE_GHOST_RECIPE;
+   }
+
+   public void handle(final ClientGamePacketListener listener) {
+      listener.handlePlaceRecipe(this);
+   }
+}

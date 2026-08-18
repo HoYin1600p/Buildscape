@@ -1,0 +1,37 @@
+package net.minecraft.client.waypoints;
+
+import java.util.Comparator;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.waypoints.TrackedWaypoint;
+import net.minecraft.world.waypoints.TrackedWaypointManager;
+
+public class ClientWaypointManager implements TrackedWaypointManager {
+   private final Map waypoints = new ConcurrentHashMap();
+
+   public void trackWaypoint(final TrackedWaypoint waypoint) {
+      this.waypoints.put(waypoint.id(), waypoint);
+   }
+
+   public void updateWaypoint(final TrackedWaypoint waypoint) {
+      TrackedWaypoint trackedWaypoint = (TrackedWaypoint)this.waypoints.get(waypoint.id());
+      if (trackedWaypoint != null) {
+         trackedWaypoint.update(waypoint);
+      }
+
+   }
+
+   public void untrackWaypoint(final TrackedWaypoint waypoint) {
+      this.waypoints.remove(waypoint.id());
+   }
+
+   public boolean hasWaypoints() {
+      return !this.waypoints.isEmpty();
+   }
+
+   public void forEachWaypoint(final Entity fromEntity, final Consumer consumer) {
+      this.waypoints.values().stream().sorted(Comparator.comparingDouble((waypoint) -> waypoint.distanceSquared(fromEntity)).reversed()).forEachOrdered(consumer);
+   }
+}

@@ -1,0 +1,28 @@
+package net.minecraft.core.component.predicates;
+
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import java.util.Optional;
+import net.minecraft.advancements.predicates.CollectionPredicate;
+import net.minecraft.advancements.predicates.MinMaxBounds;
+import net.minecraft.advancements.predicates.SingleComponentItemPredicate;
+import net.minecraft.core.component.DataComponentType;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.item.component.FireworkExplosion;
+import net.minecraft.world.item.component.Fireworks;
+
+public record FireworksPredicate(Optional explosions, MinMaxBounds.Ints flightDuration) implements SingleComponentItemPredicate {
+   public static final Codec CODEC = RecordCodecBuilder.create((i) -> i.group(CollectionPredicate.codec(FireworkExplosionPredicate.FireworkPredicate.CODEC).optionalFieldOf("explosions").forGetter(FireworksPredicate::explosions), MinMaxBounds.Ints.CODEC.optionalFieldOf("flight_duration", MinMaxBounds.Ints.ANY).forGetter(FireworksPredicate::flightDuration)).apply(i, FireworksPredicate::new));
+
+   public DataComponentType componentType() {
+      return DataComponents.FIREWORKS;
+   }
+
+   public boolean matches(final Fireworks value) {
+      if (this.explosions.isPresent() && !((CollectionPredicate)this.explosions.get()).test(value.explosions())) {
+         return false;
+      } else {
+         return this.flightDuration.matches(value.flightDuration());
+      }
+   }
+}

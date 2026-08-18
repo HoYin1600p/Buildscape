@@ -1,0 +1,41 @@
+package net.minecraft.world.level.storage.loot.predicates;
+
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import java.util.Optional;
+import java.util.Set;
+import net.minecraft.advancements.predicates.entity.EntityPredicate;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
+import net.minecraft.world.phys.Vec3;
+
+public record LootItemEntityPropertyCondition(Optional predicate, LootContext.EntityTarget entityTarget) implements LootItemCondition {
+   public static final MapCodec MAP_CODEC = RecordCodecBuilder.mapCodec((i) -> i.group(EntityPredicate.CODEC.optionalFieldOf("predicate").forGetter(LootItemEntityPropertyCondition::predicate), LootContext.EntityTarget.CODEC.fieldOf("entity").forGetter(LootItemEntityPropertyCondition::entityTarget)).apply(i, LootItemEntityPropertyCondition::new));
+
+   public MapCodec codec() {
+      return MAP_CODEC;
+   }
+
+   public Set getReferencedContextParams() {
+      return Set.of(LootContextParams.ORIGIN, this.entityTarget.contextParam());
+   }
+
+   public boolean test(final LootContext context) {
+      Entity entity = (Entity)context.getOptionalParameter(this.entityTarget.contextParam());
+      Vec3 pos = (Vec3)context.getOptionalParameter(LootContextParams.ORIGIN);
+      return this.predicate.isEmpty() || ((EntityPredicate)this.predicate.get()).matches(context.getLevel(), pos, entity);
+   }
+
+   public static LootItemCondition.Builder entityPresent(final LootContext.EntityTarget target) {
+      return hasProperties(target, EntityPredicate.Builder.entity());
+   }
+
+   public static LootItemCondition.Builder hasProperties(final LootContext.EntityTarget target, final EntityPredicate.Builder predicate) {
+      return () -> new LootItemEntityPropertyCondition(Optional.of(predicate.build()), target);
+   }
+
+   public static LootItemCondition.Builder hasProperties(final LootContext.EntityTarget target, final EntityPredicate predicate) {
+      return () -> new LootItemEntityPropertyCondition(Optional.of(predicate), target);
+   }
+}

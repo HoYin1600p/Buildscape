@@ -1,0 +1,10 @@
+{
+  "replace": false,
+  "values": [
+    "buildscape:burnt_cardboard_trapdoor",
+    "buildscape:cardboard_trapdoor",
+    "buildscape:stripped_cardboard_trapdoor",
+    "buildscape:tinted_cardboard_trapdoor",
+    "buildscape:washed_cardboard_trapdoor"
+  ]
+}

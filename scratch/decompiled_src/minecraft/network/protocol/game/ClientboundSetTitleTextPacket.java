@@ -1,0 +1,19 @@
+package net.minecraft.network.protocol.game;
+
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.ComponentSerialization;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.PacketType;
+
+public record ClientboundSetTitleTextPacket(Component text) implements Packet {
+   public static final StreamCodec STREAM_CODEC = StreamCodec.composite(ComponentSerialization.TRUSTED_STREAM_CODEC, ClientboundSetTitleTextPacket::text, ClientboundSetTitleTextPacket::new);
+
+   public PacketType type() {
+      return GamePacketTypes.CLIENTBOUND_SET_TITLE_TEXT;
+   }
+
+   public void handle(final ClientGamePacketListener listener) {
+      listener.setTitleText(this);
+   }
+}

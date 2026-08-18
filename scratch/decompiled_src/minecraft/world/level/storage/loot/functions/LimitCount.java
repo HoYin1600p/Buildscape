@@ -1,0 +1,41 @@
+package net.minecraft.world.level.storage.loot.functions;
+
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import java.util.Optional;
+import net.minecraft.core.Holder;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.storage.loot.IntRange;
+import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.world.level.storage.loot.Validatable;
+import net.minecraft.world.level.storage.loot.ValidationContext;
+import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
+
+public class LimitCount extends LootItemConditionalFunction {
+   public static final MapCodec MAP_CODEC = RecordCodecBuilder.mapCodec((i) -> commonFields(i).and(IntRange.CODEC.fieldOf("limit").forGetter((f) -> f.limit)).apply(i, LimitCount::new));
+   private final IntRange limit;
+
+   private LimitCount(final Optional condition, final IntRange limit) {
+      super(condition);
+      this.limit = limit;
+   }
+
+   public MapCodec codec() {
+      return MAP_CODEC;
+   }
+
+   public void validate(final ValidationContext context) {
+      super.validate(context);
+      Validatable.validate(context, "limit", this.limit);
+   }
+
+   public ItemStack run(final ItemStack itemStack, final LootContext context) {
+      int newCount = this.limit.clamp(context, itemStack.getCount());
+      itemStack.setCount(newCount);
+      return itemStack;
+   }
+
+   public static LootItemConditionalFunction.Builder limitCount(final IntRange limit) {
+      return simpleBuilder((conditions) -> new LimitCount(conditions, limit));
+   }
+}

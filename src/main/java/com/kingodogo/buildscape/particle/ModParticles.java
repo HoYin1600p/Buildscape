@@ -45,4 +45,39 @@ public class ModParticles {
             PARTICLES.register("copper_fire_flame", () -> new SimpleParticleType(false));
     public static final RegistryObject<SimpleParticleType> FIREFLY =
             PARTICLES.register("firefly", () -> new SimpleParticleType(false));
+
+    public static final RegistryObject<SimpleParticleType> SULFUR_BUBBLES =
+            PARTICLES.register("sulfur_bubbles", () -> new SimpleParticleType(false));
+
+    public static final RegistryObject<ParticleType<GeyserParticleOptions>> GEYSER =
+            PARTICLES.register("geyser", () -> new net.minecraft.core.particles.ParticleType<GeyserParticleOptions>(false, GeyserParticleOptions.DESERIALIZER) {
+                @Override
+                public com.mojang.serialization.Codec<GeyserParticleOptions> codec() {
+                    return GeyserParticleOptions.CODEC;
+                }
+            });
+
+    public static final RegistryObject<ParticleType<GeyserBaseParticleOptions>> GEYSER_BASE =
+            PARTICLES.register("geyser_base", () -> new net.minecraft.core.particles.ParticleType<GeyserBaseParticleOptions>(false, GeyserBaseParticleOptions.DESERIALIZER) {
+                @Override
+                public com.mojang.serialization.Codec<GeyserBaseParticleOptions> codec() {
+                    return GeyserBaseParticleOptions.CODEC;
+                }
+            });
+
+    public static final RegistryObject<ParticleType<GeyserBaseParticleOptions>> GEYSER_POOF =
+            PARTICLES.register("geyser_poof", () -> new net.minecraft.core.particles.ParticleType<GeyserBaseParticleOptions>(false, GeyserBaseParticleOptions.DESERIALIZER) {
+                @Override
+                public com.mojang.serialization.Codec<GeyserBaseParticleOptions> codec() {
+                    return GeyserBaseParticleOptions.CODEC;
+                }
+            });
+
+    public static final RegistryObject<ParticleType<GeyserParticleOptions>> GEYSER_PLUME =
+            PARTICLES.register("geyser_plume", () -> new net.minecraft.core.particles.ParticleType<GeyserParticleOptions>(false, GeyserParticleOptions.DESERIALIZER) {
+                @Override
+                public com.mojang.serialization.Codec<GeyserParticleOptions> codec() {
+                    return GeyserParticleOptions.CODEC;
+                }
+            });
 }

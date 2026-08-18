@@ -1,0 +1,799 @@
+package net.minecraft.util.datafix.fixes;
+
+import com.google.common.base.Splitter;
+import com.mojang.datafixers.DataFix;
+import com.mojang.datafixers.DataFixUtils;
+import com.mojang.datafixers.TypeRewriteRule;
+import com.mojang.datafixers.schemas.Schema;
+import com.mojang.datafixers.util.Pair;
+import com.mojang.serialization.Dynamic;
+import com.mojang.serialization.DynamicOps;
+import com.mojang.serialization.OptionalDynamic;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.function.UnaryOperator;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import net.minecraft.util.Mth;
+import net.minecraft.util.datafix.ExtraDataFixUtils;
+import net.minecraft.util.datafix.LegacyComponentDataFixUtils;
+import net.minecraft.util.datafix.schemas.NamespacedSchema;
+import org.jspecify.annotations.Nullable;
+
+public class ItemStackComponentizationFix extends DataFix {
+   private static final int HIDE_ENCHANTMENTS = 1;
+   private static final int HIDE_MODIFIERS = 2;
+   private static final int HIDE_UNBREAKABLE = 4;
+   private static final int HIDE_CAN_DESTROY = 8;
+   private static final int HIDE_CAN_PLACE = 16;
+   private static final int HIDE_ADDITIONAL = 32;
+   private static final int HIDE_DYE = 64;
+   private static final int HIDE_UPGRADES = 128;
+   private static final Set POTION_HOLDER_IDS = Set.of("minecraft:potion", "minecraft:splash_potion", "minecraft:lingering_potion", "minecraft:tipped_arrow");
+   private static final Set BUCKETED_MOB_IDS = Set.of("minecraft:pufferfish_bucket", "minecraft:salmon_bucket", "minecraft:cod_bucket", "minecraft:tropical_fish_bucket", "minecraft:axolotl_bucket", "minecraft:tadpole_bucket");
+   private static final List BUCKETED_MOB_TAGS = List.of("NoAI", "Silent", "NoGravity", "Glowing", "Invulnerable", "Health", "Age", "Variant", "HuntingCooldown", "BucketVariantTag");
+   private static final Set BOOLEAN_BLOCK_STATE_PROPERTIES = Set.of("attached", "bottom", "conditional", "disarmed", "drag", "enabled", "extended", "eye", "falling", "hanging", "has_bottle_0", "has_bottle_1", "has_bottle_2", "has_record", "has_book", "inverted", "in_wall", "lit", "locked", "occupied", "open", "persistent", "powered", "short", "signal_fire", "snowy", "triggered", "unstable", "waterlogged", "berries", "bloom", "shrieking", "can_summon", "up", "down", "north", "east", "south", "west", "slot_0_occupied", "slot_1_occupied", "slot_2_occupied", "slot_3_occupied", "slot_4_occupied", "slot_5_occupied", "cracked", "crafting");
+   private static final Splitter PROPERTY_SPLITTER = Splitter.on(',');
+
+   public ItemStackComponentizationFix(final Schema outputSchema) {
+      super(outputSchema, true);
+   }
+
+   private static void fixItemStack(final ItemStackComponentizationFix.ItemStackData itemStack, final Dynamic dynamic) {
+      int hideFlags = itemStack.removeTag("HideFlags").asInt(0);
+      itemStack.moveTagToComponent("Damage", "minecraft:damage", dynamic.createInt(0));
+      itemStack.moveTagToComponent("RepairCost", "minecraft:repair_cost", dynamic.createInt(0));
+      itemStack.moveTagToComponent("CustomModelData", "minecraft:custom_model_data");
+      itemStack.removeTag("BlockStateTag").result().ifPresent((blockStateTag) -> itemStack.setComponent("minecraft:block_state", fixBlockStateTag(blockStateTag)));
+      itemStack.moveTagToComponent("EntityTag", "minecraft:entity_data");
+      itemStack.fixSubTag("BlockEntityTag", false, (blockEntityTag) -> {
+         String id = NamespacedSchema.ensureNamespaced(blockEntityTag.get("id").asString(""));
+         blockEntityTag = fixBlockEntityTag(itemStack, blockEntityTag, id);
+         Dynamic withoutId = blockEntityTag.remove("id");
+         return withoutId.equals(blockEntityTag.emptyMap()) ? withoutId : blockEntityTag;
+      });
+      itemStack.moveTagToComponent("BlockEntityTag", "minecraft:block_entity_data");
+      if (itemStack.removeTag("Unbreakable").asBoolean(false)) {
+         Dynamic component = dynamic.emptyMap();
+         if ((hideFlags & 4) != 0) {
+            component = component.set("show_in_tooltip", dynamic.createBoolean(false));
+         }
+
+         itemStack.setComponent("minecraft:unbreakable", component);
+      }
+
+      fixEnchantments(itemStack, dynamic, "Enchantments", "minecraft:enchantments", (hideFlags & 1) != 0);
+      if (itemStack.is("minecraft:enchanted_book")) {
+         fixEnchantments(itemStack, dynamic, "StoredEnchantments", "minecraft:stored_enchantments", (hideFlags & 32) != 0);
+      }
+
+      itemStack.fixSubTag("display", false, (display) -> fixDisplay(itemStack, display, hideFlags));
+      fixAdventureModeChecks(itemStack, dynamic, hideFlags);
+      fixAttributeModifiers(itemStack, dynamic, hideFlags);
+      Optional trim = itemStack.removeTag("Trim").result();
+      if (trim.isPresent()) {
+         Dynamic fixedTrim = (Dynamic)trim.get();
+         if ((hideFlags & 128) != 0) {
+            fixedTrim = fixedTrim.set("show_in_tooltip", fixedTrim.createBoolean(false));
+         }
+
+         itemStack.setComponent("minecraft:trim", fixedTrim);
+      }
+
+      if ((hideFlags & 32) != 0) {
+         itemStack.setComponent("minecraft:hide_additional_tooltip", dynamic.emptyMap());
+      }
+
+      if (itemStack.is("minecraft:crossbow")) {
+         itemStack.removeTag("Charged");
+         itemStack.moveTagToComponent("ChargedProjectiles", "minecraft:charged_projectiles", dynamic.createList(Stream.empty()));
+      }
+
+      if (itemStack.is("minecraft:bundle")) {
+         itemStack.moveTagToComponent("Items", "minecraft:bundle_contents", dynamic.createList(Stream.empty()));
+      }
+
+      if (itemStack.is("minecraft:filled_map")) {
+         itemStack.moveTagToComponent("map", "minecraft:map_id");
+         Map decorations = (Map)itemStack.removeTag("Decorations").asStream().map(ItemStackComponentizationFix::fixMapDecoration).collect(Collectors.toMap(Pair::getFirst, Pair::getSecond, (first, second) -> first));
+         if (!decorations.isEmpty()) {
+            itemStack.setComponent("minecraft:map_decorations", dynamic.createMap(decorations));
+         }
+      }
+
+      if (itemStack.is(POTION_HOLDER_IDS)) {
+         fixPotionContents(itemStack, dynamic);
+      }
+
+      if (itemStack.is("minecraft:writable_book")) {
+         fixWritableBook(itemStack, dynamic);
+      }
+
+      if (itemStack.is("minecraft:written_book")) {
+         fixWrittenBook(itemStack, dynamic);
+      }
+
+      if (itemStack.is("minecraft:suspicious_stew")) {
+         itemStack.moveTagToComponent("effects", "minecraft:suspicious_stew_effects");
+      }
+
+      if (itemStack.is("minecraft:debug_stick")) {
+         itemStack.moveTagToComponent("DebugProperty", "minecraft:debug_stick_state");
+      }
+
+      if (itemStack.is(BUCKETED_MOB_IDS)) {
+         fixBucketedMobData(itemStack, dynamic);
+      }
+
+      if (itemStack.is("minecraft:goat_horn")) {
+         itemStack.moveTagToComponent("instrument", "minecraft:instrument");
+      }
+
+      if (itemStack.is("minecraft:knowledge_book")) {
+         itemStack.moveTagToComponent("Recipes", "minecraft:recipes");
+      }
+
+      if (itemStack.is("minecraft:compass")) {
+         fixLodestoneTracker(itemStack, dynamic);
+      }
+
+      if (itemStack.is("minecraft:firework_rocket")) {
+         fixFireworkRocket(itemStack);
+      }
+
+      if (itemStack.is("minecraft:firework_star")) {
+         fixFireworkStar(itemStack);
+      }
+
+      if (itemStack.is("minecraft:player_head")) {
+         itemStack.removeTag("SkullOwner").result().ifPresent((skullOwner) -> itemStack.setComponent("minecraft:profile", fixProfile(skullOwner)));
+      }
+
+   }
+
+   private static Dynamic fixBlockStateTag(final Dynamic blockStateTag) {
+      return (Dynamic)DataFixUtils.orElse(blockStateTag.asMapOpt().result().map((entries) -> (Map)entries.collect(Collectors.toMap(Pair::getFirst, (entry) -> {
+            String key = ((Dynamic)entry.getFirst()).asString("");
+            Dynamic value = (Dynamic)entry.getSecond();
+            if (BOOLEAN_BLOCK_STATE_PROPERTIES.contains(key)) {
+               Optional bool = value.asBoolean().result();
+               if (bool.isPresent()) {
+                  return value.createString(String.valueOf(bool.get()));
+               }
+            }
+
+            Optional number = value.asNumber().result();
+            return number.isPresent() ? value.createString(((Number)number.get()).toString()) : value;
+         }))).map(blockStateTag::createMap), blockStateTag);
+   }
+
+   private static Dynamic fixDisplay(final ItemStackComponentizationFix.ItemStackData itemStack, Dynamic display, final int hideFlags) {
+      display.get("Name").result().filter(LegacyComponentDataFixUtils::isStrictlyValidJson).ifPresent((name) -> itemStack.setComponent("minecraft:custom_name", name));
+      OptionalDynamic lore = display.get("Lore");
+      if (lore.result().isPresent()) {
+         itemStack.setComponent("minecraft:lore", display.createList(display.get("Lore").asStream().filter(LegacyComponentDataFixUtils::isStrictlyValidJson)));
+      }
+
+      Optional color = display.get("color").asNumber().result().map(Number::intValue);
+      boolean hideDye = (hideFlags & 64) != 0;
+      if (color.isPresent() || hideDye) {
+         Dynamic dyedColor = display.emptyMap().set("rgb", display.createInt(color.orElse(10511680)));
+         if (hideDye) {
+            dyedColor = dyedColor.set("show_in_tooltip", display.createBoolean(false));
+         }
+
+         itemStack.setComponent("minecraft:dyed_color", dyedColor);
+      }
+
+      Optional locName = display.get("LocName").asString().result();
+      if (locName.isPresent()) {
+         itemStack.setComponent("minecraft:item_name", LegacyComponentDataFixUtils.createTranslatableComponent(display.getOps(), (String)locName.get()));
+      }
+
+      if (itemStack.is("minecraft:filled_map")) {
+         itemStack.setComponent("minecraft:map_color", display.get("MapColor"));
+         display = display.remove("MapColor");
+      }
+
+      return display.remove("Name").remove("Lore").remove("color").remove("LocName");
+   }
+
+   private static Dynamic fixBlockEntityTag(final ItemStackComponentizationFix.ItemStackData itemStack, Dynamic blockEntity, final String id) {
+      itemStack.setComponent("minecraft:lock", blockEntity.get("Lock"));
+      blockEntity = blockEntity.remove("Lock");
+      Optional lootTable = blockEntity.get("LootTable").result();
+      if (lootTable.isPresent()) {
+         Dynamic containerLoot = blockEntity.emptyMap().set("loot_table", (Dynamic)lootTable.get());
+         long seed = blockEntity.get("LootTableSeed").asLong(0L);
+         if (seed != 0L) {
+            containerLoot = containerLoot.set("seed", blockEntity.createLong(seed));
+         }
+
+         itemStack.setComponent("minecraft:container_loot", containerLoot);
+         blockEntity = blockEntity.remove("LootTable").remove("LootTableSeed");
+      }
+
+      Dynamic var10000;
+      switch (id) {
+         case "minecraft:skull":
+            itemStack.setComponent("minecraft:note_block_sound", blockEntity.get("note_block_sound"));
+            var10000 = blockEntity.remove("note_block_sound");
+            break;
+         case "minecraft:decorated_pot":
+            itemStack.setComponent("minecraft:pot_decorations", blockEntity.get("sherds"));
+            Optional item = blockEntity.get("item").result();
+            if (item.isPresent()) {
+               itemStack.setComponent("minecraft:container", blockEntity.createList(Stream.of(blockEntity.emptyMap().set("slot", blockEntity.createInt(0)).set("item", (Dynamic)item.get()))));
+            }
+
+            var10000 = blockEntity.remove("sherds").remove("item");
+            break;
+         case "minecraft:banner":
+            itemStack.setComponent("minecraft:banner_patterns", blockEntity.get("patterns"));
+            Optional base = blockEntity.get("Base").asNumber().result();
+            if (base.isPresent()) {
+               itemStack.setComponent("minecraft:base_color", blockEntity.createString(ExtraDataFixUtils.dyeColorIdToName(((Number)base.get()).intValue())));
+            }
+
+            var10000 = blockEntity.remove("patterns").remove("Base");
+            break;
+         case "minecraft:shulker_box":
+         case "minecraft:chest":
+         case "minecraft:trapped_chest":
+         case "minecraft:furnace":
+         case "minecraft:ender_chest":
+         case "minecraft:dispenser":
+         case "minecraft:dropper":
+         case "minecraft:brewing_stand":
+         case "minecraft:hopper":
+         case "minecraft:barrel":
+         case "minecraft:smoker":
+         case "minecraft:blast_furnace":
+         case "minecraft:campfire":
+         case "minecraft:chiseled_bookshelf":
+         case "minecraft:crafter":
+            List items = blockEntity.get("Items").asList((dynamic) -> dynamic.emptyMap().set("slot", dynamic.createInt(dynamic.get("Slot").asByte((byte)0) & 255)).set("item", dynamic.remove("Slot")));
+            if (!items.isEmpty()) {
+               itemStack.setComponent("minecraft:container", blockEntity.createList(items.stream()));
+            }
+
+            var10000 = blockEntity.remove("Items");
+            break;
+         case "minecraft:beehive":
+            itemStack.setComponent("minecraft:bees", blockEntity.get("bees"));
+            var10000 = blockEntity.remove("bees");
+            break;
+         default:
+            var10000 = blockEntity;
+      }
+
+      return var10000;
+   }
+
+   private static void fixEnchantments(final ItemStackComponentizationFix.ItemStackData itemStack, final Dynamic dynamic, final String key, final String componentType, final boolean hideInTooltip) {
+      OptionalDynamic rawEnchantments = itemStack.removeTag(key);
+      List enchantments = rawEnchantments.asList(Function.identity()).stream().flatMap((enchantmentx) -> parseEnchantment(enchantmentx).stream()).filter((enchantmentx) -> enchantmentx.getSecond() > 0).toList();
+      if (!enchantments.isEmpty() || hideInTooltip) {
+         Dynamic component = dynamic.emptyMap();
+         Dynamic levels = dynamic.emptyMap();
+
+         for(Pair enchantment : enchantments) {
+            levels = levels.set((String)enchantment.getFirst(), dynamic.createInt(enchantment.getSecond()));
+         }
+
+         component = component.set("levels", levels);
+         if (hideInTooltip) {
+            component = component.set("show_in_tooltip", dynamic.createBoolean(false));
+         }
+
+         itemStack.setComponent(componentType, component);
+      }
+
+      if (rawEnchantments.result().isPresent() && enchantments.isEmpty()) {
+         itemStack.setComponent("minecraft:enchantment_glint_override", dynamic.createBoolean(true));
+      }
+
+   }
+
+   private static Optional parseEnchantment(final Dynamic entry) {
+      return entry.get("id").asString().apply2stable((id, level) -> Pair.of(id, Mth.clamp(level.intValue(), 0, 255)), entry.get("lvl").asNumber()).result();
+   }
+
+   private static void fixAdventureModeChecks(final ItemStackComponentizationFix.ItemStackData itemStack, final Dynamic dynamic, final int hideFlags) {
+      fixBlockStatePredicates(itemStack, dynamic, "CanDestroy", "minecraft:can_break", (hideFlags & 8) != 0);
+      fixBlockStatePredicates(itemStack, dynamic, "CanPlaceOn", "minecraft:can_place_on", (hideFlags & 16) != 0);
+   }
+
+   private static void fixBlockStatePredicates(final ItemStackComponentizationFix.ItemStackData itemStack, final Dynamic dynamic, final String tag, final String componentId, final boolean hideInTooltip) {
+      Optional oldPredicate = itemStack.removeTag(tag).result();
+      if (!oldPredicate.isEmpty()) {
+         Dynamic component = dynamic.emptyMap().set("predicates", dynamic.createList(((Dynamic)oldPredicate.get()).asStream().map((value) -> (Dynamic)DataFixUtils.orElse(value.asString().map((string) -> fixBlockStatePredicate(value, string)).result(), value))));
+         if (hideInTooltip) {
+            component = component.set("show_in_tooltip", dynamic.createBoolean(false));
+         }
+
+         itemStack.setComponent(componentId, component);
+      }
+   }
+
+   private static Dynamic fixBlockStatePredicate(final Dynamic dynamic, final String string) {
+      int startProperties = string.indexOf(91);
+      int startNbt = string.indexOf(123);
+      int blockNameEnd = string.length();
+      if (startProperties != -1) {
+         blockNameEnd = startProperties;
+      }
+
+      if (startNbt != -1) {
+         blockNameEnd = Math.min(blockNameEnd, startNbt);
+      }
+
+      String blockOrTagName = string.substring(0, blockNameEnd);
+      Dynamic predicate = dynamic.emptyMap().set("blocks", dynamic.createString(blockOrTagName.trim()));
+      int endProperties = string.indexOf(93);
+      if (startProperties != -1 && endProperties != -1) {
+         Dynamic properties = dynamic.emptyMap();
+
+         for(String property : PROPERTY_SPLITTER.split(string.substring(startProperties + 1, endProperties))) {
+            int assignment = property.indexOf(61);
+            if (assignment != -1) {
+               String key = property.substring(0, assignment).trim();
+               String value = property.substring(assignment + 1).trim();
+               properties = properties.set(key, dynamic.createString(value));
+            }
+         }
+
+         predicate = predicate.set("state", properties);
+      }
+
+      int endNbt = string.indexOf(125);
+      if (startNbt != -1 && endNbt != -1) {
+         predicate = predicate.set("nbt", dynamic.createString(string.substring(startNbt, endNbt + 1)));
+      }
+
+      return predicate;
+   }
+
+   private static void fixAttributeModifiers(final ItemStackComponentizationFix.ItemStackData itemStack, final Dynamic dynamic, final int hideFlags) {
+      OptionalDynamic attributeModifiersField = itemStack.removeTag("AttributeModifiers");
+      if (!attributeModifiersField.result().isEmpty()) {
+         boolean hideInTooltip = (hideFlags & 2) != 0;
+         List attributeModifiers = attributeModifiersField.asList(ItemStackComponentizationFix::fixAttributeModifier);
+         Dynamic component = dynamic.emptyMap().set("modifiers", dynamic.createList(attributeModifiers.stream()));
+         if (hideInTooltip) {
+            component = component.set("show_in_tooltip", dynamic.createBoolean(false));
+         }
+
+         itemStack.setComponent("minecraft:attribute_modifiers", component);
+      }
+   }
+
+   private static Dynamic fixAttributeModifier(final Dynamic input) {
+      Dynamic result = input.emptyMap().set("name", input.createString("")).set("amount", input.createDouble(0.0D)).set("operation", input.createString("add_value"));
+      result = Dynamic.copyField(input, "AttributeName", result, "type");
+      result = Dynamic.copyField(input, "Slot", result, "slot");
+      result = Dynamic.copyField(input, "UUID", result, "uuid");
+      result = Dynamic.copyField(input, "Name", result, "name");
+      result = Dynamic.copyField(input, "Amount", result, "amount");
+      return Dynamic.copyAndFixField(input, "Operation", result, "operation", (operation) -> {
+         String var10001;
+         switch (operation.asInt(0)) {
+            case 1:
+               var10001 = "add_multiplied_base";
+               break;
+            case 2:
+               var10001 = "add_multiplied_total";
+               break;
+            default:
+               var10001 = "add_value";
+         }
+
+         return operation.createString(var10001);
+      });
+   }
+
+   private static Pair fixMapDecoration(final Dynamic decoration) {
+      Dynamic id = (Dynamic)DataFixUtils.orElseGet(decoration.get("id").result(), () -> decoration.createString(""));
+      Dynamic value = decoration.emptyMap().set("type", decoration.createString(fixMapDecorationType(decoration.get("type").asInt(0)))).set("x", decoration.createDouble(decoration.get("x").asDouble(0.0D))).set("z", decoration.createDouble(decoration.get("z").asDouble(0.0D))).set("rotation", decoration.createFloat((float)decoration.get("rot").asDouble(0.0D)));
+      return Pair.of(id, value);
+   }
+
+   private static String fixMapDecorationType(final int id) {
+      String var10000;
+      switch (id) {
+         case 1:
+            var10000 = "frame";
+            break;
+         case 2:
+            var10000 = "red_marker";
+            break;
+         case 3:
+            var10000 = "blue_marker";
+            break;
+         case 4:
+            var10000 = "target_x";
+            break;
+         case 5:
+            var10000 = "target_point";
+            break;
+         case 6:
+            var10000 = "player_off_map";
+            break;
+         case 7:
+            var10000 = "player_off_limits";
+            break;
+         case 8:
+            var10000 = "mansion";
+            break;
+         case 9:
+            var10000 = "monument";
+            break;
+         case 10:
+            var10000 = "banner_white";
+            break;
+         case 11:
+            var10000 = "banner_orange";
+            break;
+         case 12:
+            var10000 = "banner_magenta";
+            break;
+         case 13:
+            var10000 = "banner_light_blue";
+            break;
+         case 14:
+            var10000 = "banner_yellow";
+            break;
+         case 15:
+            var10000 = "banner_lime";
+            break;
+         case 16:
+            var10000 = "banner_pink";
+            break;
+         case 17:
+            var10000 = "banner_gray";
+            break;
+         case 18:
+            var10000 = "banner_light_gray";
+            break;
+         case 19:
+            var10000 = "banner_cyan";
+            break;
+         case 20:
+            var10000 = "banner_purple";
+            break;
+         case 21:
+            var10000 = "banner_blue";
+            break;
+         case 22:
+            var10000 = "banner_brown";
+            break;
+         case 23:
+            var10000 = "banner_green";
+            break;
+         case 24:
+            var10000 = "banner_red";
+            break;
+         case 25:
+            var10000 = "banner_black";
+            break;
+         case 26:
+            var10000 = "red_x";
+            break;
+         case 27:
+            var10000 = "village_desert";
+            break;
+         case 28:
+            var10000 = "village_plains";
+            break;
+         case 29:
+            var10000 = "village_savanna";
+            break;
+         case 30:
+            var10000 = "village_snowy";
+            break;
+         case 31:
+            var10000 = "village_taiga";
+            break;
+         case 32:
+            var10000 = "jungle_temple";
+            break;
+         case 33:
+            var10000 = "swamp_hut";
+            break;
+         default:
+            var10000 = "player";
+      }
+
+      return var10000;
+   }
+
+   private static void fixPotionContents(final ItemStackComponentizationFix.ItemStackData itemStack, final Dynamic dynamic) {
+      Dynamic component = dynamic.emptyMap();
+      Optional potion = itemStack.removeTag("Potion").asString().result().filter((id) -> !id.equals("minecraft:empty"));
+      if (potion.isPresent()) {
+         component = component.set("potion", dynamic.createString((String)potion.get()));
+      }
+
+      component = itemStack.moveTagInto("CustomPotionColor", component, "custom_color");
+      component = itemStack.moveTagInto("custom_potion_effects", component, "custom_effects");
+      if (!component.equals(dynamic.emptyMap())) {
+         itemStack.setComponent("minecraft:potion_contents", component);
+      }
+
+   }
+
+   private static void fixWritableBook(final ItemStackComponentizationFix.ItemStackData itemStack, final Dynamic dynamic) {
+      Dynamic pages = fixBookPages(itemStack, dynamic);
+      if (pages != null) {
+         itemStack.setComponent("minecraft:writable_book_content", dynamic.emptyMap().set("pages", pages));
+      }
+
+   }
+
+   private static void fixWrittenBook(final ItemStackComponentizationFix.ItemStackData itemStack, final Dynamic dynamic) {
+      Dynamic pages = fixBookPages(itemStack, dynamic);
+      String title = itemStack.removeTag("title").asString("");
+      Optional filteredTitle = itemStack.removeTag("filtered_title").asString().result();
+      Dynamic component = dynamic.emptyMap();
+      component = component.set("title", createFilteredText(dynamic, title, filteredTitle));
+      component = itemStack.moveTagInto("author", component, "author");
+      component = itemStack.moveTagInto("resolved", component, "resolved");
+      component = itemStack.moveTagInto("generation", component, "generation");
+      if (pages != null) {
+         component = component.set("pages", pages);
+      }
+
+      itemStack.setComponent("minecraft:written_book_content", component);
+   }
+
+   private static @Nullable Dynamic fixBookPages(final ItemStackComponentizationFix.ItemStackData itemStack, final Dynamic dynamic) {
+      List pages = itemStack.removeTag("pages").asList((pagex) -> pagex.asString(""));
+      Map filteredPages = itemStack.removeTag("filtered_pages").asMap((key) -> key.asString("0"), (pagex) -> pagex.asString(""));
+      if (pages.isEmpty()) {
+         return null;
+      } else {
+         List fixedPages = new ArrayList(pages.size());
+
+         for(int i = 0; i < pages.size(); ++i) {
+            String page = (String)pages.get(i);
+            String filteredPage = (String)filteredPages.get(String.valueOf(i));
+            fixedPages.add(createFilteredText(dynamic, page, Optional.ofNullable(filteredPage)));
+         }
+
+         return dynamic.createList(fixedPages.stream());
+      }
+   }
+
+   private static Dynamic createFilteredText(final Dynamic dynamic, final String text, final Optional filtered) {
+      Dynamic fixedPage = dynamic.emptyMap().set("raw", dynamic.createString(text));
+      if (filtered.isPresent()) {
+         fixedPage = fixedPage.set("filtered", dynamic.createString((String)filtered.get()));
+      }
+
+      return fixedPage;
+   }
+
+   private static void fixBucketedMobData(final ItemStackComponentizationFix.ItemStackData itemStack, final Dynamic dynamic) {
+      Dynamic data = dynamic.emptyMap();
+
+      for(String key : BUCKETED_MOB_TAGS) {
+         data = itemStack.moveTagInto(key, data, key);
+      }
+
+      if (!data.equals(dynamic.emptyMap())) {
+         itemStack.setComponent("minecraft:bucket_entity_data", data);
+      }
+
+   }
+
+   private static void fixLodestoneTracker(final ItemStackComponentizationFix.ItemStackData itemStack, final Dynamic dynamic) {
+      Optional lodestonePos = itemStack.removeTag("LodestonePos").result();
+      Optional lodestoneDimension = itemStack.removeTag("LodestoneDimension").result();
+      if (!lodestonePos.isEmpty() || !lodestoneDimension.isEmpty()) {
+         boolean lodestoneTracked = itemStack.removeTag("LodestoneTracked").asBoolean(true);
+         Dynamic component = dynamic.emptyMap();
+         if (lodestonePos.isPresent() && lodestoneDimension.isPresent()) {
+            component = component.set("target", dynamic.emptyMap().set("pos", (Dynamic)lodestonePos.get()).set("dimension", (Dynamic)lodestoneDimension.get()));
+         }
+
+         if (!lodestoneTracked) {
+            component = component.set("tracked", dynamic.createBoolean(false));
+         }
+
+         itemStack.setComponent("minecraft:lodestone_tracker", component);
+      }
+   }
+
+   private static void fixFireworkStar(final ItemStackComponentizationFix.ItemStackData itemStack) {
+      itemStack.fixSubTag("Explosion", true, (explosion) -> {
+         itemStack.setComponent("minecraft:firework_explosion", fixFireworkExplosion(explosion));
+         return explosion.remove("Type").remove("Colors").remove("FadeColors").remove("Trail").remove("Flicker");
+      });
+   }
+
+   private static void fixFireworkRocket(final ItemStackComponentizationFix.ItemStackData itemStack) {
+      itemStack.fixSubTag("Fireworks", true, (fireworks) -> {
+         Stream explosions = fireworks.get("Explosions").asStream().map(ItemStackComponentizationFix::fixFireworkExplosion);
+         int flight = fireworks.get("Flight").asInt(0);
+         itemStack.setComponent("minecraft:fireworks", fireworks.emptyMap().set("explosions", fireworks.createList(explosions)).set("flight_duration", fireworks.createByte((byte)flight)));
+         return fireworks.remove("Explosions").remove("Flight");
+      });
+   }
+
+   private static Dynamic fixFireworkExplosion(Dynamic explosion) {
+      String var10003;
+      switch (explosion.get("Type").asInt(0)) {
+         case 1:
+            var10003 = "large_ball";
+            break;
+         case 2:
+            var10003 = "star";
+            break;
+         case 3:
+            var10003 = "creeper";
+            break;
+         case 4:
+            var10003 = "burst";
+            break;
+         default:
+            var10003 = "small_ball";
+      }
+
+      explosion = explosion.set("shape", explosion.createString(var10003)).remove("Type");
+      explosion = explosion.renameField("Colors", "colors");
+      explosion = explosion.renameField("FadeColors", "fade_colors");
+      explosion = explosion.renameField("Trail", "has_trail");
+      return explosion.renameField("Flicker", "has_twinkle");
+   }
+
+   public static Dynamic fixProfile(final Dynamic dynamic) {
+      Optional simpleName = dynamic.asString().result();
+      if (simpleName.isPresent()) {
+         return isValidPlayerName((String)simpleName.get()) ? dynamic.emptyMap().set("name", dynamic.createString((String)simpleName.get())) : dynamic.emptyMap();
+      } else {
+         String name = dynamic.get("Name").asString("");
+         Optional id = dynamic.get("Id").result();
+         Dynamic properties = fixProfileProperties(dynamic.get("Properties"));
+         Dynamic profile = dynamic.emptyMap();
+         if (isValidPlayerName(name)) {
+            profile = profile.set("name", dynamic.createString(name));
+         }
+
+         if (id.isPresent()) {
+            profile = profile.set("id", (Dynamic)id.get());
+         }
+
+         if (properties != null) {
+            profile = profile.set("properties", properties);
+         }
+
+         return profile;
+      }
+   }
+
+   private static boolean isValidPlayerName(final String name) {
+      return name.length() > 16 ? false : name.chars().filter((c) -> c <= 32 || c >= 127).findAny().isEmpty();
+   }
+
+   private static @Nullable Dynamic fixProfileProperties(final OptionalDynamic dynamic) {
+      Map properties = dynamic.asMap((key) -> key.asString(""), (list) -> list.asList((property) -> {
+            String value = property.get("Value").asString("");
+            Optional signature = property.get("Signature").asString().result();
+            return Pair.of(value, signature);
+         }));
+      return properties.isEmpty() ? null : dynamic.createList(properties.entrySet().stream().flatMap((entry) -> ((List)entry.getValue()).stream().map((pair) -> {
+            Dynamic property = dynamic.emptyMap().set("name", dynamic.createString((String)entry.getKey())).set("value", dynamic.createString((String)pair.getFirst()));
+            Optional signature = (Optional)pair.getSecond();
+            return signature.isPresent() ? property.set("signature", dynamic.createString((String)signature.get())) : property;
+         })));
+   }
+
+   protected TypeRewriteRule makeRule() {
+      return this.writeFixAndRead("ItemStack componentization", this.getInputSchema().getType(References.ITEM_STACK), this.getOutputSchema().getType(References.ITEM_STACK), (dynamic) -> {
+         Optional fixedItemStack = ItemStackComponentizationFix.ItemStackData.read(dynamic).map((itemStack) -> {
+            fixItemStack(itemStack, itemStack.tag);
+            return itemStack.write();
+         });
+         return (Dynamic)DataFixUtils.orElse(fixedItemStack, dynamic);
+      });
+   }
+
+   private static class ItemStackData {
+      private final String item;
+      private final int count;
+      private Dynamic components;
+      private final Dynamic remainder;
+      private Dynamic tag;
+
+      private ItemStackData(final String item, final int count, final Dynamic remainder) {
+         this.item = NamespacedSchema.ensureNamespaced(item);
+         this.count = count;
+         this.components = remainder.emptyMap();
+         this.tag = remainder.get("tag").orElseEmptyMap();
+         this.remainder = remainder.remove("tag");
+      }
+
+      public static Optional read(final Dynamic dynamic) {
+         return dynamic.get("id").asString().apply2stable((item, count) -> new ItemStackComponentizationFix.ItemStackData(item, count.intValue(), dynamic.remove("id").remove("Count")), dynamic.get("Count").asNumber()).result();
+      }
+
+      public OptionalDynamic removeTag(final String key) {
+         OptionalDynamic value = this.tag.get(key);
+         this.tag = this.tag.remove(key);
+         return value;
+      }
+
+      public void setComponent(final String type, final Dynamic value) {
+         this.components = this.components.set(type, value);
+      }
+
+      public void setComponent(final String type, final OptionalDynamic optionalValue) {
+         optionalValue.result().ifPresent((value) -> this.components = this.components.set(type, value));
+      }
+
+      public Dynamic moveTagInto(final String fromKey, final Dynamic target, final String toKey) {
+         Optional value = this.removeTag(fromKey).result();
+         return value.isPresent() ? target.set(toKey, (Dynamic)value.get()) : target;
+      }
+
+      public void moveTagToComponent(final String key, final String type, final Dynamic defaultValue) {
+         Optional value = this.removeTag(key).result();
+         if (value.isPresent() && !((Dynamic)value.get()).equals(defaultValue)) {
+            this.setComponent(type, (Dynamic)value.get());
+         }
+
+      }
+
+      public void moveTagToComponent(final String key, final String type) {
+         this.removeTag(key).result().ifPresent((value) -> this.setComponent(type, value));
+      }
+
+      public void fixSubTag(final String key, final boolean dontFixWhenFieldIsMissing, final UnaryOperator function) {
+         OptionalDynamic value = this.tag.get(key);
+         if (!dontFixWhenFieldIsMissing || !value.result().isEmpty()) {
+            Dynamic map = value.orElseEmptyMap();
+            map = (Dynamic)function.apply(map);
+            if (map.equals(map.emptyMap())) {
+               this.tag = this.tag.remove(key);
+            } else {
+               this.tag = this.tag.set(key, map);
+            }
+
+         }
+      }
+
+      public Dynamic write() {
+         Dynamic result = this.tag.emptyMap().set("id", this.tag.createString(this.item)).set("count", this.tag.createInt(this.count));
+         if (!this.tag.equals(this.tag.emptyMap())) {
+            this.components = this.components.set("minecraft:custom_data", this.tag);
+         }
+
+         if (!this.components.equals(this.tag.emptyMap())) {
+            result = result.set("components", this.components);
+         }
+
+         return mergeRemainder(result, this.remainder);
+      }
+
+      private static Dynamic mergeRemainder(final Dynamic itemStack, final Dynamic remainder) {
+         DynamicOps ops = itemStack.getOps();
+         return (Dynamic)ops.getMap(itemStack.getValue()).flatMap((itemStackMap) -> ops.mergeToMap(remainder.convert(ops).getValue(), itemStackMap)).map((merged) -> new Dynamic(ops, merged)).result().orElse(itemStack);
+      }
+
+      public boolean is(final String id) {
+         return this.item.equals(id);
+      }
+
+      public boolean is(final Set ids) {
+         return ids.contains(this.item);
+      }
+
+      public boolean hasComponent(final String id) {
+         return this.components.get(id).result().isPresent();
+      }
+   }
+}

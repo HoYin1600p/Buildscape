@@ -1,0 +1,59 @@
+package net.minecraft.world.level.block;
+
+import java.util.function.Function;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
+
+public class LeafLitterBlock extends VegetationBlock implements SegmentableBlock {
+   public static final EnumProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
+   private final Function shapes;
+
+   public LeafLitterBlock(final BlockBehaviour.Properties properties) {
+      super(properties);
+      this.registerDefaultState((BlockState)((BlockState)((BlockState)this.stateDefinition.any()).setValue(FACING, Direction.NORTH)).setValue(this.getSegmentAmountProperty(), Integer.valueOf(1)));
+      this.shapes = this.makeShapes();
+   }
+
+   private Function makeShapes() {
+      return this.getShapeForEachState(this.getShapeCalculator(FACING, this.getSegmentAmountProperty()));
+   }
+
+   public BlockState rotate(final BlockState state, final Rotation rotation) {
+      return (BlockState)state.setValue(FACING, rotation.rotate((Direction)state.getValue(FACING)));
+   }
+
+   public BlockState mirror(final BlockState state, final Mirror mirror) {
+      return state.rotate(mirror.getRotation((Direction)state.getValue(FACING)));
+   }
+
+   public boolean canBeReplaced(final BlockState state, final BlockPlaceContext context) {
+      return this.canBeReplaced(state, context, this.getSegmentAmountProperty()) ? true : super.canBeReplaced(state, context);
+   }
+
+   protected boolean canSurvive(final BlockState state, final LevelReader level, final BlockPos pos) {
+      BlockPos belowPos = pos.below();
+      return level.getBlockState(belowPos).isFaceSturdy(level, belowPos, Direction.UP);
+   }
+
+   public VoxelShape getShape(final BlockState state, final BlockGetter level, final BlockPos pos, final CollisionContext context) {
+      return (VoxelShape)this.shapes.apply(state);
+   }
+
+   public BlockState getStateForPlacement(final BlockPlaceContext context) {
+      return this.getStateForPlacement(context, this, this.getSegmentAmountProperty(), FACING);
+   }
+
+   protected void createBlockStateDefinition(final StateDefinition.Builder builder) {
+      builder.add(FACING, this.getSegmentAmountProperty());
+   }
+}

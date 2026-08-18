@@ -1,0 +1,161 @@
+package net.minecraft.world.entity.projectile;
+
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.util.Mth;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
+
+public class EyeOfEnder extends Entity implements ItemSupplier {
+   private static final float MIN_CAMERA_DISTANCE_SQUARED = 12.25F;
+   private static final float TOO_FAR_SIGNAL_HEIGHT = 8.0F;
+   private static final float TOO_FAR_DISTANCE = 12.0F;
+   private static final EntityDataAccessor DATA_ITEM_STACK = SynchedEntityData.defineId(EyeOfEnder.class, EntityDataSerializers.ITEM_STACK);
+   private @Nullable Vec3 target;
+   private int life;
+   private boolean surviveAfterDeath;
+
+   public EyeOfEnder(final EntityType type, final Level level) {
+      super(type, level);
+   }
+
+   public EyeOfEnder(final Level level, final double x, final double y, final double z) {
+      this(EntityTypes.EYE_OF_ENDER, level);
+      this.setPos(x, y, z);
+   }
+
+   public void setItem(final ItemStack source) {
+      if (source.isEmpty()) {
+         this.getEntityData().set(DATA_ITEM_STACK, this.getDefaultItem());
+      } else {
+         this.getEntityData().set(DATA_ITEM_STACK, source.copyWithCount(1));
+      }
+
+   }
+
+   public ItemStack getItem() {
+      return (ItemStack)this.getEntityData().get(DATA_ITEM_STACK);
+   }
+
+   protected void defineSynchedData(final SynchedEntityData.Builder entityData) {
+      entityData.define(DATA_ITEM_STACK, this.getDefaultItem());
+   }
+
+   public boolean shouldRenderAtSqrDistance(final double distance) {
+      if (this.tickCount < 2 && distance < 12.25D) {
+         return false;
+      } else {
+         double size = this.getBoundingBox().getSize() * 4.0D;
+         if (Double.isNaN(size)) {
+            size = 4.0D;
+         }
+
+         size *= 64.0D;
+         return distance < size * size;
+      }
+   }
+
+   public void signalTo(final Vec3 target) {
+      Vec3 delta = target.subtract(this.position());
+      double horizontalDistance = delta.horizontalDistance();
+      if (horizontalDistance > 12.0D) {
+         this.target = this.position().add(delta.x / horizontalDistance * 12.0D, 8.0D, delta.z / horizontalDistance * 12.0D);
+      } else {
+         this.target = target;
+      }
+
+      this.life = 0;
+      this.surviveAfterDeath = this.random.nextInt(5) > 0;
+   }
+
+   public void tick() {
+      super.tick();
+      Vec3 newPosition = this.position().add(this.getDeltaMovement());
+      if (!this.level().isClientSide() && this.target != null) {
+         this.setDeltaMovement(updateDeltaMovement(this.getDeltaMovement(), newPosition, this.target));
+      }
+
+      if (this.level().isClientSide()) {
+         Vec3 particleOrigin = newPosition.subtract(this.getDeltaMovement().scale(0.25D));
+         this.spawnParticles(particleOrigin, this.getDeltaMovement());
+      }
+
+      this.setPos(newPosition);
+      if (!this.level().isClientSide()) {
+         ++this.life;
+         if (this.life > 80 && !this.level().isClientSide()) {
+            this.playSound(SoundEvents.ENDER_EYE_DEATH, 1.0F, 1.0F);
+            this.discard();
+            if (this.surviveAfterDeath) {
+               this.level().addFreshEntity(new ItemEntity(this.level(), this.getX(), this.getY(), this.getZ(), this.getItem()));
+            } else {
+               this.level().levelEvent(2003, this.blockPosition(), 0);
+            }
+         }
+      }
+
+   }
+
+   private void spawnParticles(final Vec3 origin, final Vec3 movement) {
+      if (this.isInWater()) {
+         for(int i = 0; i < 4; ++i) {
+            this.level().addParticle(ParticleTypes.BUBBLE, origin.x, origin.y, origin.z, movement.x, movement.y, movement.z);
+         }
+      } else {
+         this.level().addParticle(ParticleTypes.PORTAL, origin.x + this.random.nextDouble() * 0.6D - 0.3D, origin.y - 0.5D, origin.z + this.random.nextDouble() * 0.6D - 0.3D, movement.x, movement.y, movement.z);
+      }
+
+   }
+
+   private static Vec3 updateDeltaMovement(final Vec3 oldMovement, final Vec3 position, final Vec3 target) {
+      Vec3 horizontalDelta = new Vec3(target.x - position.x, 0.0D, target.z - position.z);
+      double horizontalLength = horizontalDelta.length();
+      double wantedSpeed = Mth.lerp(0.0025D, oldMovement.horizontalDistance(), horizontalLength);
+      double movementY = oldMovement.y;
+      if (horizontalLength < 1.0D) {
+         wantedSpeed *= 0.8D;
+         movementY *= 0.8D;
+      }
+
+      double wantedMovementY = position.y - oldMovement.y < target.y ? 1.0D : -1.0D;
+      return horizontalDelta.scale(wantedSpeed / horizontalLength).add(0.0D, movementY + (wantedMovementY - movementY) * 0.015D, 0.0D);
+   }
+
+   protected void addAdditionalSaveData(final ValueOutput output) {
+      output.store("Item", ItemStack.CODEC, this.getItem());
+   }
+
+   protected void readAdditionalSaveData(final ValueInput input) {
+      this.setItem((ItemStack)input.read("Item", ItemStack.CODEC).orElse(this.getDefaultItem()));
+   }
+
+   private ItemStack getDefaultItem() {
+      return new ItemStack(Items.ENDER_EYE);
+   }
+
+   public float getLightLevelDependentMagicValue() {
+      return 1.0F;
+   }
+
+   public boolean isAttackable() {
+      return false;
+   }
+
+   public boolean hurtServer(final ServerLevel level, final DamageSource source, final float damage) {
+      return false;
+   }
+}

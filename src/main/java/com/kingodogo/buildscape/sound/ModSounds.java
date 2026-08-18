@@ -119,6 +119,30 @@ public class ModSounds {
     public static final RegistryObject<SoundEvent> MUDDY_MANGROVE_ROOTS_FALL =
             registerSoundEvent("block.muddy_mangrove_roots.fall");
 
+    public static final RegistryObject<SoundEvent> GEYSER_CONTINUOUS_START =
+            registerSoundEvent("block.geyser_continuous.start");
+    public static final RegistryObject<SoundEvent> GEYSER_CONTINUOUS_ACTIVE =
+            registerSoundEvent("block.geyser_continuous.active");
+    public static final RegistryObject<SoundEvent> GEYSER_ERUPTION_START =
+            registerSoundEvent("block.geyser_eruption.start");
+    public static final RegistryObject<SoundEvent> GEYSER_ERUPTION_ACTIVE =
+            registerSoundEvent("block.geyser_eruption.active");
+    public static final RegistryObject<SoundEvent> NOXIOUS_GAS =
+            registerSoundEvent("block.noxious_gas");
+
+    public static final RegistryObject<SoundEvent> SHELF_ACTIVATE =
+            registerSoundEvent("block.shelf.activate");
+    public static final RegistryObject<SoundEvent> SHELF_DEACTIVATE =
+            registerSoundEvent("block.shelf.deactivate");
+    public static final RegistryObject<SoundEvent> SHELF_PLACE_ITEM =
+            registerSoundEvent("block.shelf.place_item");
+    public static final RegistryObject<SoundEvent> SHELF_TAKE_ITEM =
+            registerSoundEvent("block.shelf.take_item");
+    public static final RegistryObject<SoundEvent> SHELF_SINGLE_SWAP =
+            registerSoundEvent("block.shelf.single_swap");
+    public static final RegistryObject<SoundEvent> SHELF_MULTI_SWAP =
+            registerSoundEvent("block.shelf.multi_swap");
+
     private static ForgeSoundType copperGrateSounds = null;
     private static ForgeSoundType copperBulbSounds = null;
     private static ForgeSoundType mangroveRootsSounds = null;

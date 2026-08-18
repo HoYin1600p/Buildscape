@@ -1,0 +1,9 @@
+{
+  "parent": "minecraft:block/stairs_outer",
+  "textures": {
+    "bottom": "buildscape:block/tinted_thick_cardboard_block",
+    "top": "buildscape:block/tinted_thick_cardboard_block",
+    "side": "buildscape:block/tinted_thick_cardboard_block",
+    "particle": "#side"
+  }
+}

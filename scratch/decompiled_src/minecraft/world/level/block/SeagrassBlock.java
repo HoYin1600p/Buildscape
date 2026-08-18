@@ -1,0 +1,82 @@
+package net.minecraft.world.level.block;
+
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.FluidTags;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.ScheduledTickAccess;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jspecify.annotations.Nullable;
+
+public class SeagrassBlock extends VegetationBlock implements BonemealableBlock, LiquidBlockContainer {
+   private static final VoxelShape SHAPE = Block.column(12.0D, 0.0D, 12.0D);
+
+   protected SeagrassBlock(final BlockBehaviour.Properties properties) {
+      super(properties);
+   }
+
+   protected VoxelShape getShape(final BlockState state, final BlockGetter level, final BlockPos pos, final CollisionContext context) {
+      return SHAPE;
+   }
+
+   protected boolean mayPlaceOn(final BlockState state, final BlockGetter level, final BlockPos pos) {
+      return state.isFaceSturdy(level, pos, Direction.UP) && !state.is(BlockTags.CANNOT_SUPPORT_SEAGRASS);
+   }
+
+   public @Nullable BlockState getStateForPlacement(final BlockPlaceContext context) {
+      FluidState fluidState = context.getLevel().getFluidState(context.getClickedPos());
+      return fluidState.is(FluidTags.WATER) && fluidState.isFull() ? super.getStateForPlacement(context) : null;
+   }
+
+   protected BlockState updateShape(final BlockState state, final LevelReader level, final ScheduledTickAccess ticks, final BlockPos pos, final Direction directionToNeighbour, final BlockPos neighbourPos, final BlockState neighbourState, final RandomSource random) {
+      BlockState result = super.updateShape(state, level, ticks, pos, directionToNeighbour, neighbourPos, neighbourState, random);
+      if (!result.isAir()) {
+         ticks.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
+      }
+
+      return result;
+   }
+
+   public boolean isValidBonemealTarget(final LevelReader level, final BlockPos pos, final BlockState state, final BonemealSource source) {
+      return level.getBlockState(pos.above()).is(Blocks.WATER);
+   }
+
+   public boolean isBonemealSuccess(final Level level, final RandomSource random, final BlockPos pos, final BlockState state, final BonemealSource source) {
+      return true;
+   }
+
+   protected FluidState getFluidState(final BlockState state) {
+      return Fluids.WATER.getSource(false);
+   }
+
+   public void performBonemeal(final ServerLevel level, final RandomSource random, final BlockPos pos, final BlockState state, final BonemealSource source) {
+      BlockState lowerState = Blocks.TALL_SEAGRASS.defaultBlockState();
+      BlockState upperState = (BlockState)lowerState.setValue(TallSeagrassBlock.HALF, DoubleBlockHalf.UPPER);
+      BlockPos above = pos.above();
+      level.setBlock(pos, lowerState, 2);
+      level.setBlock(above, upperState, 2);
+   }
+
+   public boolean canPlaceLiquid(final @Nullable LivingEntity user, final BlockGetter level, final BlockPos pos, final BlockState state, final Fluid type) {
+      return false;
+   }
+
+   public boolean placeLiquid(final LevelAccessor level, final BlockPos pos, final BlockState state, final FluidState fluidState) {
+      return false;
+   }
+}

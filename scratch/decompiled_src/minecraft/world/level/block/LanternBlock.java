@@ -1,0 +1,81 @@
+package net.minecraft.world.level.block;
+
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.ScheduledTickAccess;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.level.pathfinder.PathComputationType;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jspecify.annotations.Nullable;
+
+public class LanternBlock extends Block implements SimpleWaterloggedBlock {
+   public static final BooleanProperty HANGING = BlockStateProperties.HANGING;
+   public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
+   private static final VoxelShape SHAPE_STANDING = Shapes.or(Block.column(4.0D, 7.0D, 9.0D), Block.column(6.0D, 0.0D, 7.0D));
+   private static final VoxelShape SHAPE_HANGING = SHAPE_STANDING.move(0.0D, 0.0625D, 0.0D).optimize();
+
+   public LanternBlock(final BlockBehaviour.Properties properties) {
+      super(properties);
+      this.registerDefaultState((BlockState)((BlockState)((BlockState)this.stateDefinition.any()).setValue(HANGING, Boolean.valueOf(false))).setValue(WATERLOGGED, Boolean.valueOf(false)));
+   }
+
+   public @Nullable BlockState getStateForPlacement(final BlockPlaceContext context) {
+      FluidState replacedFluidState = context.getLevel().getFluidState(context.getClickedPos());
+
+      for(Direction direction : context.getNearestLookingDirections()) {
+         if (direction.getAxis() == Direction.Axis.Y) {
+            BlockState state = (BlockState)this.defaultBlockState().setValue(HANGING, Boolean.valueOf(direction == Direction.UP));
+            if (state.canSurvive(context.getLevel(), context.getClickedPos())) {
+               return (BlockState)state.setValue(WATERLOGGED, Boolean.valueOf(replacedFluidState.is(Fluids.WATER)));
+            }
+         }
+      }
+
+      return null;
+   }
+
+   protected VoxelShape getShape(final BlockState state, final BlockGetter level, final BlockPos pos, final CollisionContext context) {
+      return state.getValue(HANGING) ? SHAPE_HANGING : SHAPE_STANDING;
+   }
+
+   protected void createBlockStateDefinition(final StateDefinition.Builder builder) {
+      builder.add(HANGING, WATERLOGGED);
+   }
+
+   protected boolean canSurvive(final BlockState state, final LevelReader level, final BlockPos pos) {
+      Direction direction = getConnectedDirection(state).getOpposite();
+      return Block.canSupportCenter(level, pos.relative(direction), direction.getOpposite());
+   }
+
+   protected static Direction getConnectedDirection(final BlockState state) {
+      return state.getValue(HANGING) ? Direction.DOWN : Direction.UP;
+   }
+
+   protected BlockState updateShape(final BlockState state, final LevelReader level, final ScheduledTickAccess ticks, final BlockPos pos, final Direction directionToNeighbour, final BlockPos neighbourPos, final BlockState neighbourState, final RandomSource random) {
+      if (state.getValue(WATERLOGGED)) {
+         ticks.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
+      }
+
+      return getConnectedDirection(state).getOpposite() == directionToNeighbour && !state.canSurvive(level, pos) ? Blocks.AIR.defaultBlockState() : super.updateShape(state, level, ticks, pos, directionToNeighbour, neighbourPos, neighbourState, random);
+   }
+
+   protected FluidState getFluidState(final BlockState state) {
+      return state.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : super.getFluidState(state);
+   }
+
+   protected boolean isPathfindable(final BlockState state, final PathComputationType type) {
+      return false;
+   }
+}

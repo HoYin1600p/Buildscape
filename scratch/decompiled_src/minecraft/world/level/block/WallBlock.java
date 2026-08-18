@@ -1,0 +1,247 @@
+package net.minecraft.world.level.block;
+
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
+import java.util.Map;
+import java.util.function.Function;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.ScheduledTickAccess;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.level.block.state.properties.Property;
+import net.minecraft.world.level.block.state.properties.WallSide;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.level.pathfinder.PathComputationType;
+import net.minecraft.world.phys.shapes.BooleanOp;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
+
+public class WallBlock extends Block implements SimpleWaterloggedBlock {
+   public static final BooleanProperty UP = BlockStateProperties.UP;
+   public static final EnumProperty EAST = BlockStateProperties.EAST_WALL;
+   public static final EnumProperty NORTH = BlockStateProperties.NORTH_WALL;
+   public static final EnumProperty SOUTH = BlockStateProperties.SOUTH_WALL;
+   public static final EnumProperty WEST = BlockStateProperties.WEST_WALL;
+   public static final Map PROPERTY_BY_DIRECTION = ImmutableMap.copyOf(Maps.newEnumMap(Map.of(Direction.NORTH, NORTH, Direction.EAST, EAST, Direction.SOUTH, SOUTH, Direction.WEST, WEST)));
+   public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
+   private final Function shapes;
+   private final Function collisionShapes;
+   private static final VoxelShape TEST_SHAPE_POST = Block.column(2.0D, 0.0D, 16.0D);
+   private static final Map TEST_SHAPES_WALL = Shapes.rotateHorizontal(Block.boxZ(2.0D, 16.0D, 0.0D, 9.0D));
+
+   public WallBlock(final BlockBehaviour.Properties properties) {
+      super(properties);
+      this.registerDefaultState((BlockState)((BlockState)((BlockState)((BlockState)((BlockState)((BlockState)((BlockState)this.stateDefinition.any()).setValue(UP, Boolean.valueOf(true))).setValue(NORTH, WallSide.NONE)).setValue(EAST, WallSide.NONE)).setValue(SOUTH, WallSide.NONE)).setValue(WEST, WallSide.NONE)).setValue(WATERLOGGED, Boolean.valueOf(false)));
+      this.shapes = this.makeShapes(16.0F, 14.0F);
+      this.collisionShapes = this.makeShapes(24.0F, 24.0F);
+   }
+
+   private Function makeShapes(final float postHeight, final float wallTop) {
+      VoxelShape post = Block.column(8.0D, 0.0D, (double)postHeight);
+      int width = 6;
+      Map low = Shapes.rotateHorizontal(Block.boxZ(6.0D, 0.0D, (double)wallTop, 0.0D, 11.0D));
+      Map tall = Shapes.rotateHorizontal(Block.boxZ(6.0D, 0.0D, (double)postHeight, 0.0D, 11.0D));
+      return this.getShapeForEachState((state) -> {
+         VoxelShape shape = state.getValue(UP) ? post : Shapes.empty();
+
+         for(Map.Entry entry : PROPERTY_BY_DIRECTION.entrySet()) {
+            VoxelShape var10001;
+            switch ((WallSide)state.getValue((Property)entry.getValue())) {
+               case NONE:
+                  var10001 = Shapes.empty();
+                  break;
+               case LOW:
+                  var10001 = (VoxelShape)low.get(entry.getKey());
+                  break;
+               case TALL:
+                  var10001 = (VoxelShape)tall.get(entry.getKey());
+                  break;
+               default:
+                  throw new MatchException((String)null, (Throwable)null);
+            }
+
+            shape = Shapes.or(shape, var10001);
+         }
+
+         return shape;
+      }, new Property[]{WATERLOGGED});
+   }
+
+   protected VoxelShape getShape(final BlockState state, final BlockGetter level, final BlockPos pos, final CollisionContext context) {
+      return (VoxelShape)this.shapes.apply(state);
+   }
+
+   protected VoxelShape getCollisionShape(final BlockState state, final BlockGetter level, final BlockPos pos, final CollisionContext context) {
+      return (VoxelShape)this.collisionShapes.apply(state);
+   }
+
+   protected boolean isPathfindable(final BlockState state, final PathComputationType type) {
+      return false;
+   }
+
+   private boolean connectsTo(final BlockState state, final boolean faceSolid, final Direction direction) {
+      Block block = state.getBlock();
+      boolean connectedFenceGate = block instanceof FenceGateBlock && FenceGateBlock.connectsToDirection(state, direction);
+      return state.is(BlockTags.WALLS) || !isExceptionForConnection(state) && faceSolid || block instanceof IronBarsBlock || connectedFenceGate;
+   }
+
+   public BlockState getStateForPlacement(final BlockPlaceContext context) {
+      LevelReader level = context.getLevel();
+      BlockPos pos = context.getClickedPos();
+      FluidState replacedFluidState = context.getLevel().getFluidState(context.getClickedPos());
+      BlockPos northPos = pos.north();
+      BlockPos eastPos = pos.east();
+      BlockPos southPos = pos.south();
+      BlockPos westPos = pos.west();
+      BlockPos topPos = pos.above();
+      BlockState northState = level.getBlockState(northPos);
+      BlockState eastState = level.getBlockState(eastPos);
+      BlockState southState = level.getBlockState(southPos);
+      BlockState westState = level.getBlockState(westPos);
+      BlockState topState = level.getBlockState(topPos);
+      boolean north = this.connectsTo(northState, northState.isFaceSturdy(level, northPos, Direction.SOUTH), Direction.SOUTH);
+      boolean east = this.connectsTo(eastState, eastState.isFaceSturdy(level, eastPos, Direction.WEST), Direction.WEST);
+      boolean south = this.connectsTo(southState, southState.isFaceSturdy(level, southPos, Direction.NORTH), Direction.NORTH);
+      boolean west = this.connectsTo(westState, westState.isFaceSturdy(level, westPos, Direction.EAST), Direction.EAST);
+      BlockState state = (BlockState)this.defaultBlockState().setValue(WATERLOGGED, Boolean.valueOf(replacedFluidState.is(Fluids.WATER)));
+      return this.updateShape(level, state, topPos, topState, north, east, south, west);
+   }
+
+   protected BlockState updateShape(final BlockState state, final LevelReader level, final ScheduledTickAccess ticks, final BlockPos pos, final Direction directionToNeighbour, final BlockPos neighbourPos, final BlockState neighbourState, final RandomSource random) {
+      if (state.getValue(WATERLOGGED)) {
+         ticks.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
+      }
+
+      if (directionToNeighbour == Direction.DOWN) {
+         return super.updateShape(state, level, ticks, pos, directionToNeighbour, neighbourPos, neighbourState, random);
+      } else {
+         return directionToNeighbour == Direction.UP ? this.topUpdate(level, state, neighbourPos, neighbourState) : this.sideUpdate(level, pos, state, neighbourPos, neighbourState, directionToNeighbour);
+      }
+   }
+
+   private static boolean isConnected(final BlockState state, final Property northWall) {
+      return state.getValue(northWall) != WallSide.NONE;
+   }
+
+   private static boolean isCovered(final VoxelShape aboveShape, final VoxelShape testShape) {
+      return !Shapes.joinIsNotEmpty(testShape, aboveShape, BooleanOp.ONLY_FIRST);
+   }
+
+   private BlockState topUpdate(final LevelReader level, final BlockState state, final BlockPos topPos, final BlockState topNeighbour) {
+      boolean north = isConnected(state, NORTH);
+      boolean east = isConnected(state, EAST);
+      boolean south = isConnected(state, SOUTH);
+      boolean west = isConnected(state, WEST);
+      return this.updateShape(level, state, topPos, topNeighbour, north, east, south, west);
+   }
+
+   private BlockState sideUpdate(final LevelReader level, final BlockPos pos, final BlockState state, final BlockPos neighbourPos, final BlockState neighbour, final Direction direction) {
+      Direction opposite = direction.getOpposite();
+      boolean isNorthConnected = direction == Direction.NORTH ? this.connectsTo(neighbour, neighbour.isFaceSturdy(level, neighbourPos, opposite), opposite) : isConnected(state, NORTH);
+      boolean isEastConnected = direction == Direction.EAST ? this.connectsTo(neighbour, neighbour.isFaceSturdy(level, neighbourPos, opposite), opposite) : isConnected(state, EAST);
+      boolean isSouthConnected = direction == Direction.SOUTH ? this.connectsTo(neighbour, neighbour.isFaceSturdy(level, neighbourPos, opposite), opposite) : isConnected(state, SOUTH);
+      boolean isWestConnected = direction == Direction.WEST ? this.connectsTo(neighbour, neighbour.isFaceSturdy(level, neighbourPos, opposite), opposite) : isConnected(state, WEST);
+      BlockPos above = pos.above();
+      BlockState aboveState = level.getBlockState(above);
+      return this.updateShape(level, state, above, aboveState, isNorthConnected, isEastConnected, isSouthConnected, isWestConnected);
+   }
+
+   private BlockState updateShape(final LevelReader level, final BlockState state, final BlockPos topPos, final BlockState topNeighbour, final boolean north, final boolean east, final boolean south, final boolean west) {
+      VoxelShape aboveShape = topNeighbour.getCollisionShape(level, topPos).getFaceShape(Direction.DOWN);
+      BlockState sidesUpdatedState = this.updateSides(state, north, east, south, west, aboveShape);
+      return (BlockState)sidesUpdatedState.setValue(UP, Boolean.valueOf(this.shouldRaisePost(sidesUpdatedState, topNeighbour, aboveShape)));
+   }
+
+   private boolean shouldRaisePost(final BlockState state, final BlockState topNeighbour, final VoxelShape aboveShape) {
+      boolean topNeighbourHasPost = topNeighbour.getBlock() instanceof WallBlock && topNeighbour.getValue(UP);
+      if (topNeighbourHasPost) {
+         return true;
+      } else {
+         WallSide northWall = (WallSide)state.getValue(NORTH);
+         WallSide southWall = (WallSide)state.getValue(SOUTH);
+         WallSide eastWall = (WallSide)state.getValue(EAST);
+         WallSide westWall = (WallSide)state.getValue(WEST);
+         boolean southNone = southWall == WallSide.NONE;
+         boolean westNone = westWall == WallSide.NONE;
+         boolean eastNone = eastWall == WallSide.NONE;
+         boolean northNone = northWall == WallSide.NONE;
+         boolean hasCorner = northNone && southNone && westNone && eastNone || northNone != southNone || westNone != eastNone;
+         if (hasCorner) {
+            return true;
+         } else {
+            boolean hasHighWall = northWall == WallSide.TALL && southWall == WallSide.TALL || eastWall == WallSide.TALL && westWall == WallSide.TALL;
+            if (hasHighWall) {
+               return false;
+            } else {
+               return topNeighbour.is(BlockTags.WALL_POST_OVERRIDE) || isCovered(aboveShape, TEST_SHAPE_POST);
+            }
+         }
+      }
+   }
+
+   private BlockState updateSides(final BlockState state, final boolean northConnection, final boolean eastConnection, final boolean southConnection, final boolean westConnection, final VoxelShape aboveShape) {
+      return (BlockState)((BlockState)((BlockState)((BlockState)state.setValue(NORTH, this.makeWallState(northConnection, aboveShape, (VoxelShape)TEST_SHAPES_WALL.get(Direction.NORTH)))).setValue(EAST, this.makeWallState(eastConnection, aboveShape, (VoxelShape)TEST_SHAPES_WALL.get(Direction.EAST)))).setValue(SOUTH, this.makeWallState(southConnection, aboveShape, (VoxelShape)TEST_SHAPES_WALL.get(Direction.SOUTH)))).setValue(WEST, this.makeWallState(westConnection, aboveShape, (VoxelShape)TEST_SHAPES_WALL.get(Direction.WEST)));
+   }
+
+   private WallSide makeWallState(final boolean connectsToSide, final VoxelShape aboveShape, final VoxelShape testShape) {
+      if (connectsToSide) {
+         return isCovered(aboveShape, testShape) ? WallSide.TALL : WallSide.LOW;
+      } else {
+         return WallSide.NONE;
+      }
+   }
+
+   protected FluidState getFluidState(final BlockState state) {
+      return state.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : super.getFluidState(state);
+   }
+
+   protected boolean propagatesSkylightDown(final BlockState state) {
+      return !state.getValue(WATERLOGGED);
+   }
+
+   protected void createBlockStateDefinition(final StateDefinition.Builder builder) {
+      builder.add(UP, NORTH, EAST, WEST, SOUTH, WATERLOGGED);
+   }
+
+   protected BlockState rotate(final BlockState state, final Rotation rotation) {
+      BlockState var10000;
+      switch (rotation) {
+         case CLOCKWISE_180:
+            var10000 = (BlockState)((BlockState)((BlockState)((BlockState)state.setValue(NORTH, (WallSide)state.getValue(SOUTH))).setValue(EAST, (WallSide)state.getValue(WEST))).setValue(SOUTH, (WallSide)state.getValue(NORTH))).setValue(WEST, (WallSide)state.getValue(EAST));
+            break;
+         case COUNTERCLOCKWISE_90:
+            var10000 = (BlockState)((BlockState)((BlockState)((BlockState)state.setValue(NORTH, (WallSide)state.getValue(EAST))).setValue(EAST, (WallSide)state.getValue(SOUTH))).setValue(SOUTH, (WallSide)state.getValue(WEST))).setValue(WEST, (WallSide)state.getValue(NORTH));
+            break;
+         case CLOCKWISE_90:
+            var10000 = (BlockState)((BlockState)((BlockState)((BlockState)state.setValue(NORTH, (WallSide)state.getValue(WEST))).setValue(EAST, (WallSide)state.getValue(NORTH))).setValue(SOUTH, (WallSide)state.getValue(EAST))).setValue(WEST, (WallSide)state.getValue(SOUTH));
+            break;
+         default:
+            var10000 = state;
+      }
+
+      return var10000;
+   }
+
+   protected BlockState mirror(final BlockState state, final Mirror mirror) {
+      switch (mirror) {
+         case LEFT_RIGHT:
+            return (BlockState)((BlockState)state.setValue(NORTH, (WallSide)state.getValue(SOUTH))).setValue(SOUTH, (WallSide)state.getValue(NORTH));
+         case FRONT_BACK:
+            return (BlockState)((BlockState)state.setValue(EAST, (WallSide)state.getValue(WEST))).setValue(WEST, (WallSide)state.getValue(EAST));
+         default:
+            return super.mirror(state, mirror);
+      }
+   }
+}

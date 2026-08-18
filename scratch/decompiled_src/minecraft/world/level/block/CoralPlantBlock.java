@@ -1,0 +1,53 @@
+package net.minecraft.world.level.block;
+
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.ScheduledTickAccess;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
+
+public class CoralPlantBlock extends BaseCoralPlantTypeBlock {
+   private final Block deadBlock;
+   private static final VoxelShape SHAPE = Block.column(12.0D, 0.0D, 15.0D);
+
+   protected CoralPlantBlock(final Block deadBlock, final BlockBehaviour.Properties properties) {
+      super(properties);
+      this.deadBlock = deadBlock;
+   }
+
+   protected void onPlace(final BlockState state, final Level level, final BlockPos pos, final BlockState oldState, final boolean movedByPiston) {
+      this.tryScheduleDieTick(state, level, level, level.getRandom(), pos);
+   }
+
+   protected void tick(final BlockState state, final ServerLevel level, final BlockPos pos, final RandomSource random) {
+      if (!scanForWater(state, level, pos)) {
+         level.setBlock(pos, (BlockState)this.deadBlock.defaultBlockState().setValue(WATERLOGGED, Boolean.valueOf(false)), 2);
+      }
+
+   }
+
+   protected BlockState updateShape(final BlockState state, final LevelReader level, final ScheduledTickAccess ticks, final BlockPos pos, final Direction directionToNeighbour, final BlockPos neighbourPos, final BlockState neighbourState, final RandomSource random) {
+      if (directionToNeighbour == Direction.DOWN && !state.canSurvive(level, pos)) {
+         return Blocks.AIR.defaultBlockState();
+      } else {
+         this.tryScheduleDieTick(state, level, ticks, random, pos);
+         if (state.getValue(WATERLOGGED)) {
+            ticks.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
+         }
+
+         return super.updateShape(state, level, ticks, pos, directionToNeighbour, neighbourPos, neighbourState, random);
+      }
+   }
+
+   protected VoxelShape getShape(final BlockState state, final BlockGetter level, final BlockPos pos, final CollisionContext context) {
+      return SHAPE;
+   }
+}

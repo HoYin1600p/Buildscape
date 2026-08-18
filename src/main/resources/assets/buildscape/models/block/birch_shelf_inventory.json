@@ -2,6 +2,6 @@
   "parent": "buildscape:block/template_shelf_inventory",
   "textures": {
     "all": "buildscape:block/birch_shelf",
-    "particle": "buildscape:block/stripped_birch_log"
+    "particle": "minecraft:block/stripped_birch_log"
   }
 }

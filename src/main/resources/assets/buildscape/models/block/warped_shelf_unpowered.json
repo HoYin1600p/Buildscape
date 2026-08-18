@@ -2,6 +2,6 @@
   "parent": "buildscape:block/template_shelf_unpowered",
   "textures": {
     "all": "buildscape:block/warped_shelf",
-    "particle": "buildscape:block/stripped_warped_stem"
+    "particle": "minecraft:block/stripped_warped_stem"
   }
 }

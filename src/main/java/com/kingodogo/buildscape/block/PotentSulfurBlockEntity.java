@@ -120,23 +120,31 @@ public class PotentSulfurBlockEntity extends BlockEntity {
 
    public static final BlockEntityTicker<PotentSulfurBlockEntity> LAUNCH_ENTITY_TICKER = (level, pos, state, entity) -> {
       BlockPos sourceBlock = findNoxiousGasSourceBlock(level, pos);
-      if (sourceBlock != null) {
-         int waterBlocks = sourceBlock.getY() - pos.getY() - 1;
-         int geyserForceHeight = getUnobstructedBlockCount(level, pos.above(), waterBlocks);
-         AABB aabb = (new AABB(pos.above())).expandTowards(0.0D, (double)(geyserForceHeight - 1), 0.0D);
+      int rawWaterBlocks = sourceBlock != null ? sourceBlock.getY() - pos.getY() - 1 : 0;
+      int waterBlocks = Math.max(1, rawWaterBlocks);
+      int geyserForceHeight = Math.max(12, getUnobstructedBlockCount(level, pos.above(), waterBlocks));
+      AABB aabb = (new AABB(pos.above())).expandTowards(0.0D, (double)(geyserForceHeight - 1), 0.0D).inflate(0.35D, 0.0D, 0.35D);
 
-         for (Entity entityToBeLaunched : level.getEntitiesOfClass(Entity.class, aabb, EFFECT_PREDICATE)) {
-            Vec3 entityVelocity = entityToBeLaunched.getDeltaMovement();
-            entityToBeLaunched.resetFallDistance();
-            if (!entityToBeLaunched.level.isClientSide() || entityToBeLaunched.isControlledByLocalInstance()) {
-               if (entityToBeLaunched instanceof Player player) {
-                  if (player.getAbilities().flying) {
-                     continue;
-                  }
+      for (Entity entityToBeLaunched : level.getEntitiesOfClass(Entity.class, aabb, EFFECT_PREDICATE)) {
+         Vec3 entityVelocity = entityToBeLaunched.getDeltaMovement();
+         entityToBeLaunched.resetFallDistance();
+
+         if (!entityToBeLaunched.isPassenger() && !entityToBeLaunched.getType().is(NOT_AFFECTED_BY_GEYSERS)) {
+            if (entityToBeLaunched instanceof Player player) {
+               if (player.getAbilities().flying) {
+                  continue;
                }
+            }
 
-               if (!entityToBeLaunched.isPassenger() && !entityToBeLaunched.getType().is(NOT_AFFECTED_BY_GEYSERS) && entityVelocity.y < (double)0.3F + (double)waterBlocks * 0.1D) {
-                  entityToBeLaunched.setDeltaMovement(entityVelocity.add(0.0D, 0.2F, 0.0D));
+            double targetMaxSpeed = 0.65D + (double)waterBlocks * 0.1D;
+            if (entityVelocity.y < targetMaxSpeed) {
+               Vec3 newVelocity = new Vec3(entityVelocity.x, Math.max(entityVelocity.y + 0.25D, 0.5D), entityVelocity.z);
+               entityToBeLaunched.setDeltaMovement(newVelocity);
+               entityToBeLaunched.hasImpulse = true;
+
+               if (entityToBeLaunched instanceof net.minecraft.server.level.ServerPlayer serverPlayer) {
+                  serverPlayer.hurtMarked = true;
+                  serverPlayer.connection.send(new net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket(serverPlayer));
                }
             }
          }
@@ -217,7 +225,8 @@ public class PotentSulfurBlockEntity extends BlockEntity {
 
    private static int getUnobstructedBlockCount(final Level level, final BlockPos pos, final int waterBlocks) {
       int geyserForceHeight = 6 * waterBlocks;
-      CollisionContext geyserPositionContext = CollisionContext.of(null); // or empty
+      // Use CollisionContext.empty() instead of CollisionContext.of(null) to avoid NullPointerException in EntityCollisionContext
+      CollisionContext geyserPositionContext = CollisionContext.empty();
 
       for (int i = 0; i < geyserForceHeight; ++i) {
          BlockPos currentPos = pos.above(i);
@@ -236,7 +245,8 @@ public class PotentSulfurBlockEntity extends BlockEntity {
 
    private static @Nullable BlockPos findNoxiousGasSourceBlock(final Level level, final BlockPos origin) {
       int maxY = origin.getY() + 4 + 1;
-      CollisionContext geyserPositionContext = CollisionContext.of(null);
+      // Use CollisionContext.empty() instead of CollisionContext.of(null) to avoid NullPointerException in EntityCollisionContext
+      CollisionContext geyserPositionContext = CollisionContext.empty();
       BlockPos.MutableBlockPos pos = origin.above(1).mutable();
 
       while (true) {
@@ -258,7 +268,8 @@ public class PotentSulfurBlockEntity extends BlockEntity {
 
    public static boolean canBeReachedByNoxiousGas(final Level level, final BlockPos sourceBlock, final Vec3 pos) {
       BlockPos blockPos = new BlockPos(pos);
-      CollisionContext geyserPositionContext = CollisionContext.of(null);
+      // Use CollisionContext.empty() instead of CollisionContext.of(null) to avoid NullPointerException in EntityCollisionContext
+      CollisionContext geyserPositionContext = CollisionContext.empty();
       if (!isGeyserPassableBlock(level.getBlockState(blockPos), level, blockPos, geyserPositionContext)) {
          return false;
       } else if (pos.distanceToSqr(Vec3.atCenterOf(sourceBlock)) > 9.0D) {
@@ -275,7 +286,8 @@ public class PotentSulfurBlockEntity extends BlockEntity {
    }
 
    private static boolean haveLineOfSight(final Level level, final Vec3 a, final Vec3 b) {
-      HitResult hitResult = level.clip(new ClipContext(a, b, Block.COLLIDER, Fluid.NONE, null));
+      // Pass null Entity into ClipContext (ClipContext constructor in 1.18.2 checks pEntity == null and assigns CollisionContext.empty())
+      HitResult hitResult = level.clip(new ClipContext(a, b, Block.COLLIDER, Fluid.NONE, (Entity) null));
       return hitResult.getType() != Type.BLOCK;
    }
 }

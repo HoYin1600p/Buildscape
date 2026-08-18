@@ -9,7 +9,6 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -17,10 +16,8 @@ import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.Mirror;
@@ -34,6 +31,7 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
@@ -110,6 +108,12 @@ public class ShelfBlock extends BaseEntityBlock implements SelectableSlotContain
       builder.add(FACING, POWERED, SIDE_CHAIN_PART, WATERLOGGED);
    }
 
+   /** Vanilla shelves cannot be pushed by pistons. */
+   @Override
+   public PushReaction getPistonPushReaction(final BlockState state) {
+      return PushReaction.BLOCK;
+   }
+
    @Override
    public void neighborChanged(final BlockState state, final Level level, final BlockPos pos, final Block block, final BlockPos fromPos, final boolean movedByPiston) {
       if (!level.isClientSide()) {
@@ -168,6 +172,9 @@ public class ShelfBlock extends BaseEntityBlock implements SelectableSlotContain
             Inventory inventory = player.getInventory();
             ItemStack itemStack = player.getItemInHand(hand);
             if (level.isClientSide()) {
+               if (state.getValue(POWERED)) {
+                  return InteractionResult.SUCCESS;
+               }
                return itemStack.isEmpty() && shelfBlockEntity.getItem(hitSlot.getAsInt()).isEmpty() ? InteractionResult.PASS : InteractionResult.SUCCESS;
             }
 
@@ -215,8 +222,8 @@ public class ShelfBlock extends BaseEntityBlock implements SelectableSlotContain
          boolean anySwapped = false;
 
          for(int shelfPartIndex = 0; shelfPartIndex < connectedBlocks.size(); ++shelfPartIndex) {
-            ShelfBlockEntity shelfPart = (ShelfBlockEntity)level.getBlockEntity(connectedBlocks.get(shelfPartIndex));
-            if (shelfPart != null) {
+            BlockEntity be = level.getBlockEntity(connectedBlocks.get(shelfPartIndex));
+            if (be instanceof ShelfBlockEntity shelfPart) {
                for(int slot = 0; slot < shelfPart.getContainerSize(); ++slot) {
                   int inventorySlot = 9 - (connectedBlocks.size() - shelfPartIndex) * shelfPart.getContainerSize() + slot;
                   if (inventorySlot >= 0 && inventorySlot < 9) {
@@ -255,9 +262,6 @@ public class ShelfBlock extends BaseEntityBlock implements SelectableSlotContain
 
    @Override
    public boolean isConnectable(final BlockState state) {
-      // In 1.18.2, tag checking is state.is(TagKey<Block>)
-      // We will define a custom tag or use state.getBlock() instanceof ShelfBlock directly!
-      // Since all shelves in our mod extend ShelfBlock, checking state.getBlock() instanceof ShelfBlock is extremely robust and avoids tag registration dependency!
       return state.getBlock() instanceof ShelfBlock && state.getValue(POWERED);
    }
 
@@ -285,6 +289,7 @@ public class ShelfBlock extends BaseEntityBlock implements SelectableSlotContain
             level.updateNeighbourForOutputSignal(pos, this);
          }
          super.onRemove(state, level, pos, newState, isMoving);
+         this.updateNeighborsAfterPoweringDown(level, pos, state);
       }
    }
 

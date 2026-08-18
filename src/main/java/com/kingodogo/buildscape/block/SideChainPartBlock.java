@@ -64,13 +64,13 @@ public interface SideChainPartBlock {
             int existingChainOnTheRight = neighbors.right().isConnectable() ? this.getAllBlocksConnectedTo(level, neighbors.right().pos()).size() : 0;
             int currentChainLength = 1;
             if (this.canConnect(existingChainOnTheLeft, currentChainLength)) {
-               newPartForSelf = newPartForSelf.whenConnectedToTheRight();
+               newPartForSelf = newPartForSelf.whenConnectedToTheLeft();
                neighbors.left().connectToTheRight();
                currentChainLength += existingChainOnTheLeft;
             }
 
             if (this.canConnect(existingChainOnTheRight, currentChainLength)) {
-               newPartForSelf = newPartForSelf.whenConnectedToTheLeft();
+               newPartForSelf = newPartForSelf.whenConnectedToTheRight();
                neighbors.right().connectToTheLeft();
             }
 

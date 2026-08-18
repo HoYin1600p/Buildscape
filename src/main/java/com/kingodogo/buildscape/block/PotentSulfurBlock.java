@@ -71,9 +71,12 @@ public class PotentSulfurBlock extends BaseEntityBlock {
          return state.setValue(STATE, PotentSulfurState.DRY);
       } else {
          BlockState belowState = level.getBlockState(pos.below());
-         if (belowState.is(CAUSES_CONTINUOUS_GEYSER_ERUPTIONS) && isSourceIfFluid(belowState)) {
+         boolean isContinuous = (belowState.is(net.minecraft.world.level.block.Blocks.LAVA) || belowState.is(CAUSES_CONTINUOUS_GEYSER_ERUPTIONS)) && isSourceIfFluid(belowState);
+         boolean isPeriodic = (belowState.is(net.minecraft.world.level.block.Blocks.MAGMA_BLOCK) || belowState.is(CAUSES_PERIODIC_GEYSER_ERUPTIONS)) && isSourceIfFluid(belowState);
+
+         if (isContinuous) {
             return state.setValue(STATE, PotentSulfurState.CONTINUOUS);
-         } else if (belowState.is(CAUSES_PERIODIC_GEYSER_ERUPTIONS) && isSourceIfFluid(belowState)) {
+         } else if (isPeriodic) {
             boolean isGeyser = state.getValue(STATE) == PotentSulfurState.ERUPTING || state.getValue(STATE) == PotentSulfurState.DORMANT;
             if (!isGeyser) {
                BlockEntity var6 = level.getBlockEntity(pos);
@@ -100,6 +103,16 @@ public class PotentSulfurBlock extends BaseEntityBlock {
       if (state.getValue(STATE) == PotentSulfurState.ERUPTING || state.getValue(STATE) == PotentSulfurState.CONTINUOUS) {
          level.blockEvent(pos, this, 0, 0);
          level.playSound(null, pos, state.getValue(STATE) == PotentSulfurState.CONTINUOUS ? ModSounds.GEYSER_CONTINUOUS_START.get() : ModSounds.GEYSER_ERUPTION_START.get(), SoundSource.BLOCKS, 1.0F, 1.0F);
+      }
+   }
+
+   @Override
+   public void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, BlockPos fromPos, boolean isMoving) {
+      if (!level.isClientSide) {
+         BlockState newState = validBlockState(state, level, pos);
+         if (newState != state) {
+            level.setBlock(pos, newState, 3);
+         }
       }
    }
 

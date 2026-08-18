@@ -77,3 +77,4 @@ THIRD_PARTY_NOTICES.md
 *.schem
 *.schematic
 /BDRE/
+/.agents/

@@ -2,6 +2,6 @@
   "parent": "buildscape:block/template_shelf_unpowered",
   "textures": {
     "all": "buildscape:block/jungle_shelf",
-    "particle": "buildscape:block/stripped_jungle_log"
+    "particle": "minecraft:block/stripped_jungle_log"
   }
 }

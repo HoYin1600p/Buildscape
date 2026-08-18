@@ -2,9 +2,12 @@ package com.kingodogo.buildscape.mixin;
 
 import com.kingodogo.buildscape.client.screen.BuildScapeConfigScreen;
 import com.kingodogo.buildscape.config.BuildscapeClientConfig;
+import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.PauseScreen;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
 import org.spongepowered.asm.mixin.Mixin;
@@ -30,17 +33,32 @@ public abstract class PauseScreenMixin extends Screen {
         int targetX = this.width / 2 + 102;
         int targetY = this.height / 4 + 48;
 
-        // Dynamically find the Statistics button to align perfectly next to it
-        for (net.minecraft.client.gui.components.events.GuiEventListener listener : this.children()) {
-            if (listener instanceof net.minecraft.client.gui.components.AbstractWidget widget) {
-                net.minecraft.network.chat.Component msg = widget.getMessage();
-                if (msg instanceof net.minecraft.network.chat.TranslatableComponent tc &&
-                    (tc.getKey().equals("menu.statistics") || tc.getKey().equals("gui.stats"))) {
-                    targetX = widget.x + widget.getWidth() + 4;
-                    targetY = widget.y;
-                    break;
+        boolean isFullPauseMenu = false;
+        AbstractWidget statsButton = null;
+		
+		// Dynamically find the Statistics button to align perfectly next to it
+        for (GuiEventListener listener : this.children()) {
+            if (listener instanceof AbstractWidget widget) {
+                Component msg = widget.getMessage();
+                if (msg instanceof TranslatableComponent tc) {
+                    String key = tc.getKey();
+                    if (key.equals("menu.returnToGame")) {
+                        isFullPauseMenu = true;
+                    } else if (statsButton == null && (key.equals("menu.statistics") || key.equals("gui.stats"))) {
+                        statsButton = widget;
+                    }
                 }
             }
+        }
+
+        if (!isFullPauseMenu) {
+            return;
+        }
+
+        // Align perfectly next to the Statistics button when it is there.
+        if (statsButton != null) {
+            targetX = statsButton.x + statsButton.getWidth() + 4;
+            targetY = statsButton.y;
         }
 
         Button configButton = new Button(
@@ -55,4 +73,3 @@ public abstract class PauseScreenMixin extends Screen {
         this.addRenderableWidget(configButton);
     }
 }
-

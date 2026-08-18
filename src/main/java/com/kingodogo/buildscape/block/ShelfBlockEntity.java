@@ -16,7 +16,7 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class ShelfBlockEntity extends BlockEntity implements Container {
    public static final int MAX_ITEMS = 3;
-   private final NonNullList<ItemStack> items = NonNullList.withSize(3, ItemStack.EMPTY);
+   private final NonNullList<ItemStack> items = NonNullList.withSize(MAX_ITEMS, ItemStack.EMPTY);
    private boolean alignItemsToBottom;
 
    public ShelfBlockEntity(final BlockPos worldPosition, final BlockState blockState) {
@@ -61,7 +61,7 @@ public class ShelfBlockEntity extends BlockEntity implements Container {
 
    @Override
    public int getContainerSize() {
-      return 3;
+      return MAX_ITEMS;
    }
 
    @Override
@@ -97,10 +97,7 @@ public class ShelfBlockEntity extends BlockEntity implements Container {
 
    @Override
    public void setItem(int slot, ItemStack stack) {
-      this.items.set(slot, stack);
-      if (stack.getCount() > this.getMaxStackSize()) {
-         stack.setCount(this.getMaxStackSize());
-      }
+      this.items.set(slot, limitToMaxStackSize(stack, this.getMaxStackSize()));
       this.setChanged();
    }
 
@@ -119,22 +116,20 @@ public class ShelfBlockEntity extends BlockEntity implements Container {
       this.setChanged();
    }
 
-   public ItemStack swapItemNoUpdate(final int slot, final ItemStack heldItemStack) {
-      ItemStack retrievedItem = this.removeItemNoUpdate(slot);
-      if (!heldItemStack.isEmpty()) {
-         ItemStack stackToInsert = heldItemStack.copy();
-         stackToInsert.setCount(1);
-         this.setItem(slot, stackToInsert);
-         if (!playerHasInfiniteMaterials(heldItemStack)) {
-            heldItemStack.shrink(1);
-         }
-      }
+   public ItemStack swapItemNoUpdate(final int slot, final ItemStack newStack) {
+      ItemStack retrievedItem = this.items.get(slot);
+      this.items.set(slot, limitToMaxStackSize(newStack.copy(), this.getMaxStackSize()));
       return retrievedItem;
    }
 
-   private static boolean playerHasInfiniteMaterials(ItemStack stack) {
-      // Swapping item reduces player hand item unless they are creative, handled in block use logic
-      return false;
+   private static ItemStack limitToMaxStackSize(final ItemStack stack, final int containerMaxStackSize) {
+      if (!stack.isEmpty()) {
+         int max = Math.min(containerMaxStackSize, stack.getMaxStackSize());
+         if (stack.getCount() > max) {
+            stack.setCount(max);
+         }
+      }
+      return stack;
    }
 
    @Override

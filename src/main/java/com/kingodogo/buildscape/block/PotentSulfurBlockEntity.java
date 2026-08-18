@@ -120,25 +120,47 @@ public class PotentSulfurBlockEntity extends BlockEntity {
 
    public static final BlockEntityTicker<PotentSulfurBlockEntity> LAUNCH_ENTITY_TICKER = (level, pos, state, entity) -> {
       BlockPos sourceBlock = findNoxiousGasSourceBlock(level, pos);
-      int rawWaterBlocks = sourceBlock != null ? sourceBlock.getY() - pos.getY() - 1 : 0;
-      int waterBlocks = Math.max(1, rawWaterBlocks);
-      int geyserForceHeight = Math.max(12, getUnobstructedBlockCount(level, pos.above(), waterBlocks));
-      AABB aabb = (new AABB(pos.above())).expandTowards(0.0D, (double)(geyserForceHeight - 1), 0.0D).inflate(0.35D, 0.0D, 0.35D);
+      if (sourceBlock != null) {
+         int rawWaterBlocks = sourceBlock.getY() - pos.getY() - 1;
+         int waterBlocks = Math.max(1, rawWaterBlocks);
+         int geyserForceHeight = getUnobstructedBlockCount(level, pos.above(), waterBlocks);
+         
+         double plumeTipY = (double)sourceBlock.getY() + (double)geyserForceHeight - 1.0D;
+         double particleSizeOffset = 1.18D + (double)(waterBlocks - 1) * 0.05D;
+         AABB aabb = (new AABB(pos.above())).expandTowards(0.0D, (double)(geyserForceHeight + 3), 0.0D).inflate(0.45D, 0.0D, 0.45D);
 
-      for (Entity entityToBeLaunched : level.getEntitiesOfClass(Entity.class, aabb, EFFECT_PREDICATE)) {
-         Vec3 entityVelocity = entityToBeLaunched.getDeltaMovement();
-         entityToBeLaunched.resetFallDistance();
+         for (Entity entityToBeLaunched : level.getEntitiesOfClass(Entity.class, aabb, EFFECT_PREDICATE)) {
+            Vec3 entityVelocity = entityToBeLaunched.getDeltaMovement();
+            entityToBeLaunched.resetFallDistance();
 
-         if (!entityToBeLaunched.isPassenger() && !entityToBeLaunched.getType().is(NOT_AFFECTED_BY_GEYSERS)) {
-            if (entityToBeLaunched instanceof Player player) {
-               if (player.getAbilities().flying) {
+            if (!entityToBeLaunched.isPassenger() && !entityToBeLaunched.getType().is(NOT_AFFECTED_BY_GEYSERS)) {
+               if (entityToBeLaunched instanceof Player player) {
+                  if (player.getAbilities().flying) {
+                     continue;
+                  }
+               }
+
+               double entityY = entityToBeLaunched.getY();
+               double bobbingTime = (double)(level.getGameTime() + (long)entityToBeLaunched.getId() * 7L) * 0.4D;
+               double bobbingOffset = Math.sin(bobbingTime) * 0.10D;
+               double bobbingVel = Math.cos(bobbingTime) * 0.07D;
+               double targetY = plumeTipY + particleSizeOffset + bobbingOffset;
+
+               Vec3 newVelocity;
+               if (entityY < targetY - 1.0D) {
+                  // Propel upwards towards the top of the cloud
+                  double targetSpeed = Math.min(0.65D, 0.4D + (double)waterBlocks * 0.06D);
+                  double newY = Math.min(targetSpeed, Math.max(entityVelocity.y + 0.18D, 0.4D));
+                  newVelocity = new Vec3(entityVelocity.x * 0.9D, newY, entityVelocity.z * 0.9D);
+               } else if (entityY <= targetY + 1.8D) {
+                  // Float & 2x pop up and down right at the cloud surface (zero gap)
+                  double hoverY = (targetY - entityY) * 0.45D + bobbingVel;
+                  newVelocity = new Vec3(entityVelocity.x * 0.85D, hoverY, entityVelocity.z * 0.85D);
+               } else {
+                  // Above target height: allow gravity to bring entity down to cloud top
                   continue;
                }
-            }
 
-            double targetMaxSpeed = 0.65D + (double)waterBlocks * 0.1D;
-            if (entityVelocity.y < targetMaxSpeed) {
-               Vec3 newVelocity = new Vec3(entityVelocity.x, Math.max(entityVelocity.y + 0.25D, 0.5D), entityVelocity.z);
                entityToBeLaunched.setDeltaMovement(newVelocity);
                entityToBeLaunched.hasImpulse = true;
 
@@ -224,7 +246,7 @@ public class PotentSulfurBlockEntity extends BlockEntity {
    }
 
    private static int getUnobstructedBlockCount(final Level level, final BlockPos pos, final int waterBlocks) {
-      int geyserForceHeight = 6 * waterBlocks;
+      int geyserForceHeight = 5 * waterBlocks;
       // Use CollisionContext.empty() instead of CollisionContext.of(null) to avoid NullPointerException in EntityCollisionContext
       CollisionContext geyserPositionContext = CollisionContext.empty();
 

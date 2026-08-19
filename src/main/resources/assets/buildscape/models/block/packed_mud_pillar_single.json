@@ -2,6 +2,6 @@
   "parent": "buildscape:block/pillar_single",
   "textures": {
     "1": "buildscape:block/packed_mud_pillar_base",
-    "particle": "minecraft:block/packed_mud"
+    "particle": "buildscape:block/packed_mud"
   }
 }

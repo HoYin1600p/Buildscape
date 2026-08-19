@@ -2,6 +2,6 @@
   "parent": "buildscape:block/pillar_single",
   "textures": {
     "1": "buildscape:block/andesite_pillar_base",
-    "particle": "minecraft:block/andesite"
+    "particle": "minecraft:block/polished_andesite"
   }
 }

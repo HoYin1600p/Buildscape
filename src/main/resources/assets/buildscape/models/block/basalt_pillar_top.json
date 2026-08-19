@@ -2,6 +2,6 @@
   "parent": "buildscape:block/pillar_top",
   "textures": {
     "2": "buildscape:block/basalt_pillar_top",
-    "particle": "minecraft:block/basalt_side"
+    "particle": "minecraft:block/polished_basalt_side"
   }
 }

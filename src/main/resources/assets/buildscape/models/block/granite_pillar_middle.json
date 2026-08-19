@@ -2,6 +2,6 @@
   "parent": "buildscape:block/pillar_middle",
   "textures": {
     "1": "buildscape:block/granite_pillar_middle",
-    "particle": "minecraft:block/granite"
+    "particle": "minecraft:block/polished_granite"
   }
 }

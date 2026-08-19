@@ -2,6 +2,6 @@
   "parent": "buildscape:block/pillar_single",
   "textures": {
     "1": "buildscape:block/deepslate_pillar_base",
-    "particle": "minecraft:block/deepslate"
+    "particle": "minecraft:block/polished_deepslate"
   }
 }

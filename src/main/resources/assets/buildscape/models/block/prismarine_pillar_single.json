@@ -2,6 +2,6 @@
   "parent": "buildscape:block/pillar_single",
   "textures": {
     "1": "buildscape:block/prismarine_pillar_base",
-    "particle": "minecraft:block/prismarine"
+    "particle": "minecraft:block/prismarine_bricks"
   }
 }

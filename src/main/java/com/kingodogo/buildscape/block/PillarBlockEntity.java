@@ -79,15 +79,15 @@ public class PillarBlockEntity extends BlockEntity {
 
     private long lastParticleTick = 0L;
     private String particlePattern = null;
-    
+
     // Per-pillar pattern settings (null means use global config)
     private Double patternSpeed = null;
     private Double patternSpread = null;
     private Double patternIntensity = null;
     // Compiled pattern for hex colour validation — avoids re-compiling the regex
     // on every call to getParticleColor().
-    private static final java.util.regex.Pattern HEX_COLOR_PATTERN =
-            java.util.regex.Pattern.compile("^#[0-9A-Fa-f]{6}$");
+    private static final java.util.regex.Pattern HEX_COLOR_PATTERN = java.util.regex.Pattern
+            .compile("^#[0-9A-Fa-f]{6}$");
     private Integer maxParticleColor = null; // Max number of colors for this pillar (1-5, null means use global config)
 
     private String pillarId = null;
@@ -98,9 +98,11 @@ public class PillarBlockEntity extends BlockEntity {
 
     private int particleColorCounter = 0;
 
-    /** Monotonically increasing version counter: incremented on every color/pattern
-     *  change so that syncColorsFromManager() can skip its O(n) list-equality
-     *  walk when nothing has changed since the last sync. */
+    /**
+     * Monotonically increasing version counter: incremented on every color/pattern
+     * change so that syncColorsFromManager() can skip its O(n) list-equality
+     * walk when nothing has changed since the last sync.
+     */
     private int colorsVersion = 0;
     private final int lastSyncedColorsVersion = -1; // version at last successful sync
 
@@ -109,7 +111,6 @@ public class PillarBlockEntity extends BlockEntity {
     public static final int MAX_DYE_COLORS = 5;
 
     private float facingYaw = 0.0f;
-
 
     private static final String[] PATTERNS = {
             "none",
@@ -136,6 +137,7 @@ public class PillarBlockEntity extends BlockEntity {
     public PillarBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.PILLAR_BLOCK_ENTITY.get(), pos, state);
     }
+
     private static final int SYNC_INTERVAL = 100; // Sync every 100 ticks (5 seconds) — colors/patterns change rarely
     private Boolean usePattern = null; // PER-PILLAR OVERRIDE for cfg.use_pattern
 
@@ -152,13 +154,9 @@ public class PillarBlockEntity extends BlockEntity {
         long time = level.getGameTime();
         if ((time - be.lastParticleTick) < 5) return;
 
-        // Use peek() — zero I/O, zero reflection; returns the last-known config
-        // snapshot.  get() is still called the first time and lazily whenever
-        // the watcher thread reloads, so hot-reloading still works.
         PillarParticleConfig cfg = PillarParticleConfig.peek();
         if (!cfg.matches(be.displayedItem)) return;
 
-        // Early-out: skip all work if the per-pillar or global pattern is "none"
         String earlyPattern = be.getParticlePattern();
         if (earlyPattern == null) earlyPattern = cfg.pattern;
         if ("none".equals(earlyPattern)) return;
@@ -194,7 +192,8 @@ public class PillarBlockEntity extends BlockEntity {
     }
 
     private void syncPatternFromStack() {
-        if (level == null || level.isClientSide) return;
+        if (level == null || level.isClientSide)
+            return;
 
         if (this.particlePattern != null) {
             propagatePatternToStack(this.particlePattern);
@@ -209,8 +208,7 @@ public class PillarBlockEntity extends BlockEntity {
                     worldPosition,
                     getBlockState(),
                     getBlockState(),
-                    3
-            );
+                    3);
         }
     }
 
@@ -225,16 +223,15 @@ public class PillarBlockEntity extends BlockEntity {
             long time,
             int i,
             int count,
-            java.util.Random rand
-    ) {
+            java.util.Random rand) {
         double sx, sy, sz, vx, vy, vz;
         float size = 1.0f;
 
-        // Check for per-pillar 'use_pattern' override first, then global config
+        String pillarPattern = be.getParticlePattern();
         boolean usePattern = be.usePattern != null ? be.usePattern : cfg.use_pattern;
 
         if (usePattern) {
-            String pattern = be.getParticlePattern();
+            String pattern = pillarPattern;
             if (pattern == null || pattern.isEmpty() || "default".equals(pattern)) {
                 pattern = cfg.pattern != null ? cfg.pattern : "ring";
             }
@@ -244,7 +241,8 @@ public class PillarBlockEntity extends BlockEntity {
                 return null; // Return null to skip particle spawning
             }
 
-            // Use pillar-specific pattern settings if available, otherwise use global config
+            // Use pillar-specific pattern settings if available, otherwise use global
+            // config
             double patternSpeed = be.patternSpeed != null ? be.patternSpeed : cfg.pattern_speed;
             double patternIntensity = be.patternIntensity != null ? be.patternIntensity : cfg.pattern_intensity;
             double patternSpread = be.patternSpread != null ? be.patternSpread : cfg.pattern_spread;
@@ -261,8 +259,7 @@ public class PillarBlockEntity extends BlockEntity {
                     vz = (rand.nextDouble() - 0.5) * speed * 0.2;
                     break;
                 case "spiral":
-                    double angle =
-                            (time * 0.1 + (i * 2.0 * Math.PI) / count) % (2.0 * Math.PI);
+                    double angle = (time * 0.1 + (i * 2.0 * Math.PI) / count) % (2.0 * Math.PI);
                     double radius = spread * 0.5;
                     sx = Math.cos(angle) * radius;
                     sy = 0.0;
@@ -350,13 +347,12 @@ public class PillarBlockEntity extends BlockEntity {
     }
 
     public void syncPatternFromManager() {
-        if (level == null || level.isClientSide) return;
+        if (level == null || level.isClientSide)
+            return;
 
-        if (
-                level.getServer() == null ||
-                        !level.getServer().isRunning() ||
-                        !com.kingodogo.buildscape.BuildScape.isServerFullyInitialized()
-        ) {
+        if (level.getServer() == null ||
+                !level.getServer().isRunning() ||
+                !com.kingodogo.buildscape.BuildScape.isServerFullyInitialized()) {
             return;
         }
 
@@ -370,16 +366,13 @@ public class PillarBlockEntity extends BlockEntity {
 
         try {
             net.minecraft.world.level.chunk.ChunkAccess chunk = level.getChunk(
-                    worldPosition
-            );
+                    worldPosition);
             if (!(chunk instanceof net.minecraft.world.level.chunk.LevelChunk)) {
                 return;
             }
-            if (
-                    !chunk
-                            .getStatus()
-                            .isOrAfter(net.minecraft.world.level.chunk.ChunkStatus.FULL)
-            ) {
+            if (!chunk
+                    .getStatus()
+                    .isOrAfter(net.minecraft.world.level.chunk.ChunkStatus.FULL)) {
                 return;
             }
         } catch (Exception e) {
@@ -396,8 +389,7 @@ public class PillarBlockEntity extends BlockEntity {
 
         String expectedPrefix = PillarIdManager.getVariantPrefix(
                 level,
-                worldPosition
-        );
+                worldPosition);
 
         String idToSync = this.pillarId;
 
@@ -436,15 +428,18 @@ public class PillarBlockEntity extends BlockEntity {
             }
 
             // Sync pattern settings
-            if (data.pattern_speed != null && (this.patternSpeed == null || !this.patternSpeed.equals(data.pattern_speed))) {
+            if (data.pattern_speed != null
+                    && (this.patternSpeed == null || !this.patternSpeed.equals(data.pattern_speed))) {
                 this.patternSpeed = data.pattern_speed;
                 needsUpdate = true;
             }
-            if (data.pattern_spread != null && (this.patternSpread == null || !this.patternSpread.equals(data.pattern_spread))) {
+            if (data.pattern_spread != null
+                    && (this.patternSpread == null || !this.patternSpread.equals(data.pattern_spread))) {
                 this.patternSpread = data.pattern_spread;
                 needsUpdate = true;
             }
-            if (data.pattern_intensity != null && (this.patternIntensity == null || !this.patternIntensity.equals(data.pattern_intensity))) {
+            if (data.pattern_intensity != null
+                    && (this.patternIntensity == null || !this.patternIntensity.equals(data.pattern_intensity))) {
                 this.patternIntensity = data.pattern_intensity;
                 needsUpdate = true;
             }
@@ -455,8 +450,7 @@ public class PillarBlockEntity extends BlockEntity {
                         worldPosition,
                         getBlockState(),
                         getBlockState(),
-                        3
-                );
+                        3);
             }
         }
     }
@@ -476,8 +470,7 @@ public class PillarBlockEntity extends BlockEntity {
                     worldPosition,
                     getBlockState(),
                     getBlockState(),
-                    3
-            );
+                    3);
         }
     }
 
@@ -489,14 +482,14 @@ public class PillarBlockEntity extends BlockEntity {
                     worldPosition,
                     getBlockState(),
                     getBlockState(),
-                    3
-            );
+                    3);
         }
     }
 
     public boolean hasDisplayItem() {
         return !displayedItem.isEmpty();
     }
+
     private static final int globalParticleColorCounter = 0;
     private final int clientSyncAttempts = 0;
     private int syncTickCounter = 0;
@@ -504,7 +497,8 @@ public class PillarBlockEntity extends BlockEntity {
     @Override
     public void onLoad() {
         super.onLoad();
-        // Force manager to load when block entity loads to ensure removal detection works immediately
+        // Force manager to load when block entity loads to ensure removal detection
+        // works immediately
         if (level != null && !level.isClientSide) {
             PillarIdManager manager = PillarIdManager.get();
             try {
@@ -525,19 +519,21 @@ public class PillarBlockEntity extends BlockEntity {
                     worldPosition,
                     getBlockState(),
                     getBlockState(),
-                    3
-            );
+                    3);
 
             // Sync with manager
             if (this.pillarId != null) {
-                PillarIdManager.get().updateDisplayedItem(this.pillarId, stack.isEmpty() ? null : net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(stack.getItem()).toString());
+                PillarIdManager.get().updateDisplayedItem(this.pillarId, stack.isEmpty() ? null
+                        : net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(stack.getItem()).toString());
             } else {
                 String stackId = getStackPillarId();
                 if (stackId != null) {
-                    PillarIdManager.get().updateDisplayedItem(stackId, stack.isEmpty() ? null : net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(stack.getItem()).toString());
+                    PillarIdManager.get().updateDisplayedItem(stackId, stack.isEmpty() ? null
+                            : net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(stack.getItem()).toString());
                 } else if (!stack.isEmpty()) {
                     // Force registration of newly placed pillar stack when an item is added
-                    PillarIdManager.get().updateDisplayedItemByPosition(level, worldPosition, net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(stack.getItem()).toString());
+                    PillarIdManager.get().updateDisplayedItemByPosition(level, worldPosition,
+                            net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(stack.getItem()).toString());
                 }
             }
         }
@@ -547,8 +543,7 @@ public class PillarBlockEntity extends BlockEntity {
             net.minecraft.world.level.Level level,
             BlockPos pos,
             BlockState state,
-            PillarBlockEntity be
-    ) {
+            PillarBlockEntity be) {
         // Sync colors and pattern from manager periodically.
         // Both syncs share the same chunk-validity / manager-ready guards,
         // so we merge them into a single if-block to halve that overhead.
@@ -571,19 +566,21 @@ public class PillarBlockEntity extends BlockEntity {
                     worldPosition,
                     getBlockState(),
                     getBlockState(),
-                    3
-            );
+                    3);
 
             // Sync with manager
             if (this.pillarId != null) {
-                PillarIdManager.get().updateDisplayedItem(this.pillarId, stack.isEmpty() ? null : net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(stack.getItem()).toString());
+                PillarIdManager.get().updateDisplayedItem(this.pillarId, stack.isEmpty() ? null
+                        : net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(stack.getItem()).toString());
             } else {
                 String stackId = getStackPillarId();
                 if (stackId != null) {
-                    PillarIdManager.get().updateDisplayedItem(stackId, stack.isEmpty() ? null : net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(stack.getItem()).toString());
+                    PillarIdManager.get().updateDisplayedItem(stackId, stack.isEmpty() ? null
+                            : net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(stack.getItem()).toString());
                 } else if (!stack.isEmpty()) {
                     // Force registration of newly placed pillar stack when an item is added
-                    PillarIdManager.get().updateDisplayedItemByPosition(level, worldPosition, net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(stack.getItem()).toString());
+                    PillarIdManager.get().updateDisplayedItemByPosition(level, worldPosition,
+                            net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(stack.getItem()).toString());
                 }
             }
         }
@@ -596,7 +593,8 @@ public class PillarBlockEntity extends BlockEntity {
      * syncPatternFromManager() sequentially, which duplicated every guard.
      */
     private void syncBothFromManager() {
-        if (level == null || level.isClientSide) return;
+        if (level == null || level.isClientSide)
+            return;
 
         // ── Shared guard block ───────────────────────────────────────────
         if (level.getServer() == null ||
@@ -604,25 +602,33 @@ public class PillarBlockEntity extends BlockEntity {
                 !com.kingodogo.buildscape.BuildScape.isServerFullyInitialized()) {
             return;
         }
-        if (level.getServer().getPlayerList().getPlayerCount() == 0) return;
-        if (!level.hasChunkAt(worldPosition)) return;
+        if (level.getServer().getPlayerList().getPlayerCount() == 0)
+            return;
+        if (!level.hasChunkAt(worldPosition))
+            return;
         try {
             net.minecraft.world.level.chunk.ChunkAccess chunk = level.getChunk(worldPosition);
-            if (!(chunk instanceof net.minecraft.world.level.chunk.LevelChunk)) return;
-            if (!chunk.getStatus().isOrAfter(net.minecraft.world.level.chunk.ChunkStatus.FULL)) return;
+            if (!(chunk instanceof net.minecraft.world.level.chunk.LevelChunk))
+                return;
+            if (!chunk.getStatus().isOrAfter(net.minecraft.world.level.chunk.ChunkStatus.FULL))
+                return;
         } catch (Exception e) {
             return;
         }
 
         PillarIdManager manager = PillarIdManager.get();
-        if (!manager.hasLoaded()) return;
+        if (!manager.hasLoaded())
+            return;
 
         // Resolve the pillar ID once
         String expectedPrefix = PillarIdManager.getVariantPrefix(level, worldPosition);
         String idToSync = (this.pillarId != null && !this.pillarId.isEmpty())
-                ? this.pillarId : getStackPillarId();
-        if (idToSync == null || idToSync.isEmpty()) return;
-        if (!idToSync.startsWith(expectedPrefix)) return;
+                ? this.pillarId
+                : getStackPillarId();
+        if (idToSync == null || idToSync.isEmpty())
+            return;
+        if (!idToSync.startsWith(expectedPrefix))
+            return;
 
         PillarIdManager.PillarData data = manager.getPillarData(idToSync);
         boolean changed = false;
@@ -639,7 +645,10 @@ public class PillarBlockEntity extends BlockEntity {
                 // Fine-grained compare only when sizes match
                 for (int i = 0; i < managerColors.size(); i++) {
                     String mc = managerColors.get(i), cc = this.particleColors.get(i);
-                    if (mc == null || !mc.equals(cc)) { colorsDiffer = true; break; }
+                    if (mc == null || !mc.equals(cc)) {
+                        colorsDiffer = true;
+                        break;
+                    }
                 }
             }
 
@@ -660,7 +669,10 @@ public class PillarBlockEntity extends BlockEntity {
             if (managerPattern != null && !managerPattern.isEmpty()) {
                 boolean validPattern = false;
                 for (String p : PATTERNS) {
-                    if (p.equals(managerPattern)) { validPattern = true; break; }
+                    if (p.equals(managerPattern)) {
+                        validPattern = true;
+                        break;
+                    }
                 }
                 if (validPattern && (this.particlePattern == null || !this.particlePattern.equals(managerPattern))) {
                     this.particlePattern = managerPattern;
@@ -673,22 +685,28 @@ public class PillarBlockEntity extends BlockEntity {
             }
 
             // Sync pattern settings
-            if (data.pattern_speed != null && (this.patternSpeed == null || !this.patternSpeed.equals(data.pattern_speed))) {
-                this.patternSpeed = data.pattern_speed;  changed = true;
+            if (data.pattern_speed != null
+                    && (this.patternSpeed == null || !this.patternSpeed.equals(data.pattern_speed))) {
+                this.patternSpeed = data.pattern_speed;
+                changed = true;
             } else if (data.pattern_speed == null && this.patternSpeed != null) {
                 this.patternSpeed = null;
                 changed = true;
             }
 
-            if (data.pattern_spread != null && (this.patternSpread == null || !this.patternSpread.equals(data.pattern_spread))) {
-                this.patternSpread = data.pattern_spread; changed = true;
+            if (data.pattern_spread != null
+                    && (this.patternSpread == null || !this.patternSpread.equals(data.pattern_spread))) {
+                this.patternSpread = data.pattern_spread;
+                changed = true;
             } else if (data.pattern_spread == null && this.patternSpread != null) {
                 this.patternSpread = null;
                 changed = true;
             }
 
-            if (data.pattern_intensity != null && (this.patternIntensity != null && !this.patternIntensity.equals(data.pattern_intensity))) {
-                this.patternIntensity = data.pattern_intensity; changed = true;
+            if (data.pattern_intensity != null
+                    && (this.patternIntensity != null && !this.patternIntensity.equals(data.pattern_intensity))) {
+                this.patternIntensity = data.pattern_intensity;
+                changed = true;
             } else if (data.pattern_intensity == null && this.patternIntensity != null) {
                 this.patternIntensity = null;
                 changed = true;
@@ -760,8 +778,10 @@ public class PillarBlockEntity extends BlockEntity {
         PillarParticleConfig cfg = PillarParticleConfig.get();
         String currentPattern = getParticlePattern(); // Returns null for new/default pillars
 
-        // If current pattern is null (default fallback state), we want to start cycling FROM the default
-        // So the first click will set it to the first pattern after "default" in the array.
+        // If current pattern is null (default fallback state), we want to start cycling
+        // FROM the default
+        // So the first click will set it to the first pattern after "default" in the
+        // array.
         if (currentPattern == null) {
             currentPattern = "default";
         }
@@ -797,13 +817,12 @@ public class PillarBlockEntity extends BlockEntity {
     }
 
     public void syncColorsFromManager() {
-        if (level == null || level.isClientSide) return;
+        if (level == null || level.isClientSide)
+            return;
 
-        if (
-                level.getServer() == null ||
-                        !level.getServer().isRunning() ||
-                        !com.kingodogo.buildscape.BuildScape.isServerFullyInitialized()
-        ) {
+        if (level.getServer() == null ||
+                !level.getServer().isRunning() ||
+                !com.kingodogo.buildscape.BuildScape.isServerFullyInitialized()) {
             return;
         }
 
@@ -817,16 +836,13 @@ public class PillarBlockEntity extends BlockEntity {
 
         try {
             net.minecraft.world.level.chunk.ChunkAccess chunk = level.getChunk(
-                    worldPosition
-            );
+                    worldPosition);
             if (!(chunk instanceof net.minecraft.world.level.chunk.LevelChunk)) {
                 return;
             }
-            if (
-                    !chunk
-                            .getStatus()
-                            .isOrAfter(net.minecraft.world.level.chunk.ChunkStatus.FULL)
-            ) {
+            if (!chunk
+                    .getStatus()
+                    .isOrAfter(net.minecraft.world.level.chunk.ChunkStatus.FULL)) {
                 return;
             }
         } catch (Exception e) {
@@ -846,8 +862,7 @@ public class PillarBlockEntity extends BlockEntity {
         }
         String expectedPrefix = PillarIdManager.getVariantPrefix(
                 level,
-                worldPosition
-        );
+                worldPosition);
 
         String idToSync = this.pillarId;
 
@@ -870,8 +885,7 @@ public class PillarBlockEntity extends BlockEntity {
                         worldPosition,
                         getBlockState(),
                         getBlockState(),
-                        3
-                );
+                        3);
             }
             return;
         }
@@ -918,8 +932,7 @@ public class PillarBlockEntity extends BlockEntity {
                         worldPosition,
                         getBlockState(),
                         getBlockState(),
-                        3
-                );
+                        3);
             }
         } else {
             // Data is null - pillar ID was removed from manager OR doesn't exist yet
@@ -969,7 +982,7 @@ public class PillarBlockEntity extends BlockEntity {
                         // Don't save immediately during sync - let recovery or explicit saves handle it
                         // Log sync only for debugging
                         // System.out.println("BuildScape: Synced " + this.particleColors.size() +
-                        //         " colors from NBT to manager for " + idToSync);
+                        // " colors from NBT to manager for " + idToSync);
                     }
                 }
             }
@@ -1006,18 +1019,16 @@ public class PillarBlockEntity extends BlockEntity {
                     worldPosition,
                     getBlockState(),
                     getBlockState(),
-                    3
-            );
+                    3);
         }
     }
 
     public BlockPos findStackTop() {
-        if (level == null) return worldPosition;
+        if (level == null)
+            return worldPosition;
 
-        if (
-                !level.isClientSide &&
-                        !com.kingodogo.buildscape.BuildScape.isServerFullyInitialized()
-        ) {
+        if (!level.isClientSide &&
+                !com.kingodogo.buildscape.BuildScape.isServerFullyInitialized()) {
             return worldPosition;
         }
 
@@ -1034,16 +1045,13 @@ public class PillarBlockEntity extends BlockEntity {
             try {
                 if (!level.isClientSide) {
                     net.minecraft.world.level.chunk.ChunkAccess chunk = level.getChunk(
-                            above
-                    );
+                            above);
                     if (!(chunk instanceof net.minecraft.world.level.chunk.LevelChunk)) {
                         break;
                     }
-                    if (
-                            !chunk
-                                    .getStatus()
-                                    .isOrAfter(net.minecraft.world.level.chunk.ChunkStatus.FULL)
-                    ) {
+                    if (!chunk
+                            .getStatus()
+                            .isOrAfter(net.minecraft.world.level.chunk.ChunkStatus.FULL)) {
                         break;
                     }
                 }
@@ -1061,21 +1069,18 @@ public class PillarBlockEntity extends BlockEntity {
     }
 
     private String getStackParticlePattern() {
-        if (level == null) return this.particlePattern;
+        if (level == null)
+            return this.particlePattern;
 
-        if (
-                !level.isClientSide &&
-                        !com.kingodogo.buildscape.BuildScape.isServerFullyInitialized()
-        ) {
+        if (!level.isClientSide &&
+                !com.kingodogo.buildscape.BuildScape.isServerFullyInitialized()) {
             return this.particlePattern;
         }
 
-        if (
-                !level.isClientSide &&
-                        (level.getServer() == null ||
-                                !level.getServer().isRunning() ||
-                                level.getServer().getPlayerList().getPlayerCount() == 0)
-        ) {
+        if (!level.isClientSide &&
+                (level.getServer() == null ||
+                        !level.getServer().isRunning() ||
+                        level.getServer().getPlayerList().getPlayerCount() == 0)) {
             return this.particlePattern;
         }
 
@@ -1085,10 +1090,8 @@ public class PillarBlockEntity extends BlockEntity {
             int maxHeight = 256;
             int checked = 0;
 
-            while (
-                    checked < maxHeight &&
-                            level.getBlockState(current).getBlock() instanceof PillarBlock
-            ) {
+            while (checked < maxHeight &&
+                    level.getBlockState(current).getBlock() instanceof PillarBlock) {
                 if (!level.hasChunkAt(current)) {
                     break;
                 }
@@ -1096,18 +1099,13 @@ public class PillarBlockEntity extends BlockEntity {
                 try {
                     if (!level.isClientSide) {
                         net.minecraft.world.level.chunk.ChunkAccess chunk = level.getChunk(
-                                current
-                        );
-                        if (
-                                !(chunk instanceof net.minecraft.world.level.chunk.LevelChunk)
-                        ) {
+                                current);
+                        if (!(chunk instanceof net.minecraft.world.level.chunk.LevelChunk)) {
                             break;
                         }
-                        if (
-                                !chunk
-                                        .getStatus()
-                                        .isOrAfter(net.minecraft.world.level.chunk.ChunkStatus.FULL)
-                        ) {
+                        if (!chunk
+                                .getStatus()
+                                .isOrAfter(net.minecraft.world.level.chunk.ChunkStatus.FULL)) {
                             break;
                         }
                     }
@@ -1115,14 +1113,11 @@ public class PillarBlockEntity extends BlockEntity {
                     break;
                 }
 
-                net.minecraft.world.level.block.entity.BlockEntity be =
-                        level.getBlockEntity(current);
+                net.minecraft.world.level.block.entity.BlockEntity be = level.getBlockEntity(current);
                 if (be instanceof PillarBlockEntity pillarBE) {
-                    if (
-                            pillarBE.particlePattern != null &&
-                                    !pillarBE.particlePattern.isEmpty() &&
-                                    !pillarBE.particlePattern.equals("default")
-                    ) {
+                    if (pillarBE.particlePattern != null &&
+                            !pillarBE.particlePattern.isEmpty() &&
+                            !pillarBE.particlePattern.equals("default")) {
                         return pillarBE.particlePattern;
                     }
                 }
@@ -1162,8 +1157,7 @@ public class PillarBlockEntity extends BlockEntity {
 
         int maxColors = Math.max(
                 1,
-                Math.min(7, Math.min(cfg.max_particle_color, colorsToUse.size()))
-        );
+                Math.min(7, Math.min(cfg.max_particle_color, colorsToUse.size())));
         int colorIndex = particleColorCounter % maxColors;
         particleColorCounter++;
         if (colorIndex < 0 || colorIndex >= colorsToUse.size()) {
@@ -1178,12 +1172,11 @@ public class PillarBlockEntity extends BlockEntity {
     }
 
     public BlockPos findStackBottom() {
-        if (level == null) return worldPosition;
+        if (level == null)
+            return worldPosition;
 
-        if (
-                !level.isClientSide &&
-                        !com.kingodogo.buildscape.BuildScape.isServerFullyInitialized()
-        ) {
+        if (!level.isClientSide &&
+                !com.kingodogo.buildscape.BuildScape.isServerFullyInitialized()) {
             return worldPosition;
         }
 
@@ -1200,16 +1193,13 @@ public class PillarBlockEntity extends BlockEntity {
             try {
                 if (!level.isClientSide) {
                     net.minecraft.world.level.chunk.ChunkAccess chunk = level.getChunk(
-                            below
-                    );
+                            below);
                     if (!(chunk instanceof net.minecraft.world.level.chunk.LevelChunk)) {
                         break;
                     }
-                    if (
-                            !chunk
-                                    .getStatus()
-                                    .isOrAfter(net.minecraft.world.level.chunk.ChunkStatus.FULL)
-                    ) {
+                    if (!chunk
+                            .getStatus()
+                            .isOrAfter(net.minecraft.world.level.chunk.ChunkStatus.FULL)) {
                         break;
                     }
                 }
@@ -1245,7 +1235,8 @@ public class PillarBlockEntity extends BlockEntity {
             // Important: always orient to foundation for ID consistency
             BlockPos bottomPos = findStackBottom();
 
-            // Use manager's consolidated dyeing logic which also syncs current world properties (item/type)
+            // Use manager's consolidated dyeing logic which also syncs current world
+            // properties (item/type)
             String stackId = manager.addDyeColor(level, bottomPos, normalizedColor);
 
             if (stackId != null) {
@@ -1281,17 +1272,16 @@ public class PillarBlockEntity extends BlockEntity {
     }
 
     public String getStackPillarId() {
-        if (level == null || level.isClientSide) return this.pillarId;
+        if (level == null || level.isClientSide)
+            return this.pillarId;
 
         if (!com.kingodogo.buildscape.BuildScape.isServerFullyInitialized()) {
             return this.pillarId;
         }
 
-        if (
-                level.getServer() == null ||
-                        !level.getServer().isRunning() ||
-                        level.getServer().getPlayerList().getPlayerCount() == 0
-        ) {
+        if (level.getServer() == null ||
+                !level.getServer().isRunning() ||
+                level.getServer().getPlayerList().getPlayerCount() == 0) {
             return this.pillarId;
         }
 
@@ -1301,34 +1291,28 @@ public class PillarBlockEntity extends BlockEntity {
             int maxHeight = 256;
             int checked = 0;
 
-            while (
-                    checked < maxHeight &&
-                            level.getBlockState(current).getBlock() instanceof PillarBlock
-            ) {
+            while (checked < maxHeight &&
+                    level.getBlockState(current).getBlock() instanceof PillarBlock) {
                 if (!level.hasChunkAt(current)) {
                     break;
                 }
 
                 try {
                     net.minecraft.world.level.chunk.ChunkAccess chunk = level.getChunk(
-                            current
-                    );
+                            current);
                     if (!(chunk instanceof net.minecraft.world.level.chunk.LevelChunk)) {
                         break;
                     }
-                    if (
-                            !chunk
-                                    .getStatus()
-                                    .isOrAfter(net.minecraft.world.level.chunk.ChunkStatus.FULL)
-                    ) {
+                    if (!chunk
+                            .getStatus()
+                            .isOrAfter(net.minecraft.world.level.chunk.ChunkStatus.FULL)) {
                         break;
                     }
                 } catch (Exception e) {
                     break;
                 }
 
-                net.minecraft.world.level.block.entity.BlockEntity be =
-                        level.getBlockEntity(current);
+                net.minecraft.world.level.block.entity.BlockEntity be = level.getBlockEntity(current);
                 if (be instanceof PillarBlockEntity pillarBE) {
                     if (pillarBE.pillarId != null && !pillarBE.pillarId.isEmpty()) {
                         return pillarBE.pillarId;
@@ -1356,14 +1340,14 @@ public class PillarBlockEntity extends BlockEntity {
     }
 
     private void propagatePatternToStack(String pattern) {
-        if (level == null || level.isClientSide) return;
+        if (level == null || level.isClientSide)
+            return;
 
         BlockPos bottom = findStackBottom();
         BlockPos current = bottom;
 
         while (level.getBlockState(current).getBlock() instanceof PillarBlock) {
-            net.minecraft.world.level.block.entity.BlockEntity be =
-                    level.getBlockEntity(current);
+            net.minecraft.world.level.block.entity.BlockEntity be = level.getBlockEntity(current);
             if (be instanceof PillarBlockEntity pillarBE) {
                 pillarBE.particlePattern = pattern;
                 pillarBE.setChanged();
@@ -1372,22 +1356,21 @@ public class PillarBlockEntity extends BlockEntity {
                         current,
                         level.getBlockState(current),
                         level.getBlockState(current),
-                        3
-                );
+                        3);
             }
             current = current.above();
         }
     }
 
     private void propagateToStack(String stackId, java.util.List<String> colors) {
-        if (level == null || level.isClientSide) return;
+        if (level == null || level.isClientSide)
+            return;
 
         BlockPos bottom = findStackBottom();
         BlockPos current = bottom;
 
         while (level.getBlockState(current).getBlock() instanceof PillarBlock) {
-            net.minecraft.world.level.block.entity.BlockEntity be =
-                    level.getBlockEntity(current);
+            net.minecraft.world.level.block.entity.BlockEntity be = level.getBlockEntity(current);
             if (be instanceof PillarBlockEntity pillarBE) {
                 pillarBE.pillarId = stackId;
                 pillarBE.particleColors = colors != null
@@ -1402,8 +1385,7 @@ public class PillarBlockEntity extends BlockEntity {
                         current,
                         level.getBlockState(current),
                         level.getBlockState(current),
-                        3
-                );
+                        3);
             }
             current = current.above();
         }
@@ -1433,8 +1415,7 @@ public class PillarBlockEntity extends BlockEntity {
                     worldPosition,
                     getBlockState(),
                     getBlockState(),
-                    3
-            );
+                    3);
         }
     }
 
@@ -1493,8 +1474,7 @@ public class PillarBlockEntity extends BlockEntity {
                     worldPosition,
                     getBlockState(),
                     getBlockState(),
-                    3
-            );
+                    3);
         }
     }
 
@@ -1519,7 +1499,8 @@ public class PillarBlockEntity extends BlockEntity {
         this.lastParticleTick = 0L; // Reset particle tick to restart particle effects immediately
 
         // Mark as changed so NBT is saved
-        // When saveAdditional is called, it won't write null fields, effectively removing them from NBT
+        // When saveAdditional is called, it won't write null fields, effectively
+        // removing them from NBT
         this.setChanged();
 
         // Force immediate save and sync
@@ -1541,7 +1522,8 @@ public class PillarBlockEntity extends BlockEntity {
      * This includes colors, pattern, speed, spread, and intensity.
      */
     public void syncFromData(PillarIdManager.PillarData data) {
-        if (data == null) return;
+        if (data == null)
+            return;
 
         boolean changed = false;
 
@@ -1659,10 +1641,10 @@ public class PillarBlockEntity extends BlockEntity {
             else if (tag.contains("ITEM", 8)) {
                 String itemId = tag.getString("ITEM");
                 try {
-                    net.minecraft.resources.ResourceLocation itemLocation =
-                            new net.minecraft.resources.ResourceLocation(itemId);
-                    net.minecraft.world.item.Item item =
-                            net.minecraftforge.registries.ForgeRegistries.ITEMS.getValue(itemLocation);
+                    net.minecraft.resources.ResourceLocation itemLocation = new net.minecraft.resources.ResourceLocation(
+                            itemId);
+                    net.minecraft.world.item.Item item = net.minecraftforge.registries.ForgeRegistries.ITEMS
+                            .getValue(itemLocation);
                     if (item != null && item != net.minecraft.world.item.Items.AIR) {
                         this.displayedItem = new ItemStack(item);
                     } else {
@@ -1740,11 +1722,9 @@ public class PillarBlockEntity extends BlockEntity {
                     for (int i = 0; i < maxColors; i++) {
                         try {
                             String color = colorList.getString(i);
-                            if (
-                                    color != null &&
-                                            !color.isEmpty() &&
-                                            color.matches("^#[0-9A-Fa-f]{6}$")
-                            ) {
+                            if (color != null &&
+                                    !color.isEmpty() &&
+                                    color.matches("^#[0-9A-Fa-f]{6}$")) {
                                 this.particleColors.add(color.toUpperCase());
                             }
                         } catch (Exception e) {
@@ -1811,18 +1791,14 @@ public class PillarBlockEntity extends BlockEntity {
         String newColor = (particleColors != null && !particleColors.isEmpty())
                 ? particleColors.get(0)
                 : null;
-        if (
-                oldColor != newColor || (oldColor != null && !oldColor.equals(newColor))
-        ) {
+        if (oldColor != newColor || (oldColor != null && !oldColor.equals(newColor))) {
             this.lastParticleTick = 0;
             this.particleColorCounter = 0;
         }
 
-        if (
-                pillarId != null &&
-                        !pillarId.isEmpty() &&
-                        (particleColors == null || particleColors.isEmpty())
-        ) {
+        if (pillarId != null &&
+                !pillarId.isEmpty() &&
+                (particleColors == null || particleColors.isEmpty())) {
             needsManagerSync = true;
         }
     }
@@ -1845,8 +1821,7 @@ public class PillarBlockEntity extends BlockEntity {
                     worldPosition,
                     getBlockState(),
                     getBlockState(),
-                    3
-            );
+                    3);
         }
     }
 
@@ -1936,12 +1911,9 @@ public class PillarBlockEntity extends BlockEntity {
     private static class ClientParticleHelper {
         // ── Particle reflection cache ────────────────────────────────────────────────
         // Look up the providers map and the internal ParticleEngine.add() once per
-        // particle type rather than on every spawn tick.  Keyed by particle type so
+        // particle type rather than on every spawn tick. Keyed by particle type so
         // both GLOW_LIME_SPARKLE and SNOWFLAKE each get their own cached provider.
-        private static final java.util.concurrent.ConcurrentHashMap<
-                net.minecraft.core.particles.ParticleType<?>,
-                net.minecraft.client.particle.ParticleProvider<?>>
-                CACHED_PROVIDERS = new java.util.concurrent.ConcurrentHashMap<>();
+        private static final java.util.concurrent.ConcurrentHashMap<net.minecraft.core.particles.ParticleType<?>, net.minecraft.client.particle.ParticleProvider<?>> CACHED_PROVIDERS = new java.util.concurrent.ConcurrentHashMap<>();
         private static volatile java.lang.reflect.Method CACHED_ADD_METHOD = null;
         private static volatile boolean REFLECTION_INIT_DONE = false;
 
@@ -1955,8 +1927,7 @@ public class PillarBlockEntity extends BlockEntity {
                 java.util.Random rand,
                 double centerX,
                 double centerY,
-                double centerZ
-        ) {
+                double centerZ) {
 
             // Get pattern to determine particle type
             String pattern = be.getParticlePattern();
@@ -1964,10 +1935,10 @@ public class PillarBlockEntity extends BlockEntity {
                 pattern = cfg.pattern != null ? cfg.pattern : "ring";
             }
             boolean isSnowflake = "snowflake".equals(pattern);
-            SimpleParticleType particleType = isSnowflake ? ModParticles.SNOWFLAKE.get() : ModParticles.GLOW_LIME_SPARKLE.get();
+            SimpleParticleType particleType = isSnowflake ? ModParticles.SNOWFLAKE.get()
+                    : ModParticles.GLOW_LIME_SPARKLE.get();
 
-            net.minecraft.client.Minecraft mc =
-                    net.minecraft.client.Minecraft.getInstance();
+            net.minecraft.client.Minecraft mc = net.minecraft.client.Minecraft.getInstance();
             if (mc == null || mc.particleEngine == null) {
                 for (int i = 0; i < count; i++) {
                     ParticleSpawnData data = calculateParticleData(
@@ -1976,9 +1947,9 @@ public class PillarBlockEntity extends BlockEntity {
                             time,
                             i,
                             count,
-                            rand
-                    );
-                    if (data == null) continue;
+                            rand);
+                    if (data == null)
+                        continue;
 
                     double particleX = centerX + data.sx;
                     double particleY = centerY + data.sy;
@@ -1991,15 +1962,13 @@ public class PillarBlockEntity extends BlockEntity {
                                 particleX,
                                 particleY,
                                 particleZ,
-                                colorCode
-                        );
+                                colorCode);
                         if (data.size != 1.0f) {
                             com.kingodogo.buildscape.particle.PillarSparkleParticle.queueSize(
                                     particleX,
                                     particleY,
                                     particleZ,
-                                    data.size
-                            );
+                                    data.size);
                         }
                     }
 
@@ -2010,22 +1979,19 @@ public class PillarBlockEntity extends BlockEntity {
                             particleZ,
                             data.vx,
                             data.vy,
-                            data.vz
-                    );
+                            data.vz);
                 }
                 return;
             }
 
-            net.minecraft.client.particle.ParticleEngine particleEngine =
-                    mc.particleEngine;
+            net.minecraft.client.particle.ParticleEngine particleEngine = mc.particleEngine;
 
             // ── Cached reflection lookup (runs at most once per particle type) ───────
             if (!REFLECTION_INIT_DONE) {
                 try {
-                    java.lang.reflect.Method addM =
-                            net.minecraft.client.particle.ParticleEngine.class
-                                    .getDeclaredMethod("add",
-                                            net.minecraft.client.particle.Particle.class);
+                    java.lang.reflect.Method addM = net.minecraft.client.particle.ParticleEngine.class
+                            .getDeclaredMethod("add",
+                                    net.minecraft.client.particle.Particle.class);
                     addM.setAccessible(true);
                     CACHED_ADD_METHOD = addM;
                 } catch (Exception ignored) {
@@ -2034,24 +2000,20 @@ public class PillarBlockEntity extends BlockEntity {
             }
 
             @SuppressWarnings("unchecked")
-            net.minecraft.client.particle.ParticleProvider<SimpleParticleType> provider =
-                    (net.minecraft.client.particle.ParticleProvider<SimpleParticleType>)
-                            CACHED_PROVIDERS.computeIfAbsent(particleType, pt -> {
-                                try {
-                                    java.lang.reflect.Field f =
-                                            net.minecraft.client.particle.ParticleEngine.class
-                                                    .getDeclaredField("providers");
-                                    f.setAccessible(true);
-                                    @SuppressWarnings("unchecked")
-                                    java.util.Map<net.minecraft.core.particles.ParticleType<?>,
-                                            net.minecraft.client.particle.ParticleProvider<?>> map =
-                                            (java.util.Map<net.minecraft.core.particles.ParticleType<?>,
-                                                    net.minecraft.client.particle.ParticleProvider<?>>) f.get(particleEngine);
-                                    return map.get(pt);
-                                } catch (Exception e) {
-                                    return null;
-                                }
-                            });
+            net.minecraft.client.particle.ParticleProvider<SimpleParticleType> provider = (net.minecraft.client.particle.ParticleProvider<SimpleParticleType>) CACHED_PROVIDERS
+                    .computeIfAbsent(particleType, pt -> {
+                        try {
+                            java.lang.reflect.Field f = net.minecraft.client.particle.ParticleEngine.class
+                                    .getDeclaredField("providers");
+                            f.setAccessible(true);
+                            @SuppressWarnings("unchecked")
+                            java.util.Map<net.minecraft.core.particles.ParticleType<?>, net.minecraft.client.particle.ParticleProvider<?>> map = (java.util.Map<net.minecraft.core.particles.ParticleType<?>, net.minecraft.client.particle.ParticleProvider<?>>) f
+                                    .get(particleEngine);
+                            return map.get(pt);
+                        } catch (Exception e) {
+                            return null;
+                        }
+                    });
 
             for (int i = 0; i < count; i++) {
                 ParticleSpawnData data = calculateParticleData(
@@ -2060,9 +2022,9 @@ public class PillarBlockEntity extends BlockEntity {
                         time,
                         i,
                         count,
-                        rand
-                );
-                if (data == null) continue;
+                        rand);
+                if (data == null)
+                    continue;
 
                 double particleX = centerX + data.sx;
                 double particleY = centerY + data.sy;
@@ -2076,32 +2038,28 @@ public class PillarBlockEntity extends BlockEntity {
                             particleX,
                             particleY,
                             particleZ,
-                            colorCode
-                    );
+                            colorCode);
                     if (data.size != 1.0f) {
                         com.kingodogo.buildscape.particle.PillarSparkleParticle.queueSize(
                                 particleX,
                                 particleY,
                                 particleZ,
-                                data.size
-                        );
+                                data.size);
                     }
                 }
 
                 java.lang.reflect.Method addMethod = CACHED_ADD_METHOD;
                 if (provider != null && addMethod != null) {
                     try {
-                        net.minecraft.client.particle.Particle particle =
-                                provider.createParticle(
-                                        particleType,
-                                        (net.minecraft.client.multiplayer.ClientLevel) level,
-                                        particleX,
-                                        particleY,
-                                        particleZ,
-                                        data.vx,
-                                        data.vy,
-                                        data.vz
-                                );
+                        net.minecraft.client.particle.Particle particle = provider.createParticle(
+                                particleType,
+                                (net.minecraft.client.multiplayer.ClientLevel) level,
+                                particleX,
+                                particleY,
+                                particleZ,
+                                data.vx,
+                                data.vy,
+                                data.vz);
 
                         if (particle != null) {
                             addMethod.invoke(particleEngine, particle);
@@ -2114,8 +2072,7 @@ public class PillarBlockEntity extends BlockEntity {
                                 particleZ,
                                 data.vx,
                                 data.vy,
-                                data.vz
-                        );
+                                data.vz);
                     }
                 } else {
                     level.addParticle(
@@ -2125,8 +2082,7 @@ public class PillarBlockEntity extends BlockEntity {
                             particleZ,
                             data.vx,
                             data.vy,
-                            data.vz
-                    );
+                            data.vz);
                 }
             }
         }
@@ -2144,7 +2100,7 @@ public class PillarBlockEntity extends BlockEntity {
     }
 
     @OnlyIn(Dist.CLIENT)
-        private record ParticleSpawnData(double sx, double sy, double sz, double vx, double vy, double vz, float size) {
+    private record ParticleSpawnData(double sx, double sy, double sz, double vx, double vy, double vz, float size) {
 
     }
 
@@ -2174,8 +2130,7 @@ public class PillarBlockEntity extends BlockEntity {
     @Override
     public void onDataPacket(
             net.minecraft.network.Connection net,
-            ClientboundBlockEntityDataPacket pkt
-    ) {
+            ClientboundBlockEntityDataPacket pkt) {
         CompoundTag tag = pkt.getTag();
         if (tag != null) {
             load(tag);
@@ -2184,18 +2139,20 @@ public class PillarBlockEntity extends BlockEntity {
     }
 
     public PillarBlockEntity getTopPillar() {
-        if (this.level == null) return this;
+        if (this.level == null)
+            return this;
         BlockPos current = this.worldPosition;
         try {
             while (this.level.getBlockState(current.above()).getBlock() instanceof PillarBlock &&
-                   !(this.level.getBlockState(current.above()).getBlock() instanceof AshenKingPillarBlock)) {
+                    !(this.level.getBlockState(current.above()).getBlock() instanceof AshenKingPillarBlock)) {
                 current = current.above();
             }
             BlockEntity be = this.level.getBlockEntity(current);
             if (be instanceof PillarBlockEntity topPillar) {
                 return topPillar;
             }
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
         return this;
     }
 

@@ -1,0 +1,7 @@
+{
+  "parent": "buildscape:block/pillar_bottom",
+  "textures": {
+    "2": "buildscape:block/blue_ice_pillar_bottom",
+    "particle": "minecraft:block/blue_ice"
+  }
+}

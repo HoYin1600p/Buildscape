@@ -1,0 +1,7 @@
+{
+  "parent": "buildscape:block/pillar_single",
+  "textures": {
+    "1": "buildscape:block/basalt_pillar_base",
+    "particle": "minecraft:block/basalt_side"
+  }
+}

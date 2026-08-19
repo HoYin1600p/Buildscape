@@ -238,7 +238,7 @@ public class PotentSulfurBlockEntity extends BlockEntity {
 
    private static void spawnGeyserParticle(final Level level, final BlockPos sulfurPos, final BlockPos sourcePos) {
       int waterBlocks = sourcePos.getY() - sulfurPos.getY() - 1;
-      level.addParticle(new GeyserParticleOptions(ModParticles.GEYSER.get(), waterBlocks), (double)sourcePos.getX() + 0.5D, (double)sourcePos.getY(), (double)sourcePos.getZ() + 0.5D, 0.0D, 0.0D, 0.0D);
+      level.addAlwaysVisibleParticle(new GeyserParticleOptions(ModParticles.GEYSER.get(), waterBlocks), (double)sourcePos.getX() + 0.5D, (double)sourcePos.getY(), (double)sourcePos.getZ() + 0.5D, 0.0D, 0.0D, 0.0D);
    }
 
    private static void spawnNoxiousGasCloudParticle(final Level level, final Vec3 pos) {

@@ -32,17 +32,17 @@ public class GeyserEruptionParticle extends NoRenderParticle {
       super.tick();
       if (this.age % 2 == 0) {
          for(int i = 0; i < 2; ++i) {
-            this.level.addAlwaysVisibleParticle(this.baseParticle, this.x, this.y, this.z, this.xa, this.ya, this.za);
+            this.level.addAlwaysVisibleParticle(this.baseParticle, true, this.x, this.y, this.z, this.xa, this.ya, this.za);
          }
       }
 
       for(int i = 0; i < this.waterBlocks + 2; ++i) {
-         this.level.addAlwaysVisibleParticle(this.plumeParticle, this.x, this.y, this.z, this.xa, this.ya, this.za);
+         this.level.addAlwaysVisibleParticle(this.plumeParticle, true, this.x, this.y, this.z, this.xa, this.ya, this.za);
       }
 
       if (this.age % 10 == 0) {
          for(int i = 0; i < 20; ++i) {
-            this.level.addAlwaysVisibleParticle(this.poofParticle, this.x, this.y, this.z, this.xa, this.ya, this.za);
+            this.level.addAlwaysVisibleParticle(this.poofParticle, true, this.x, this.y, this.z, this.xa, this.ya, this.za);
          }
       }
    }

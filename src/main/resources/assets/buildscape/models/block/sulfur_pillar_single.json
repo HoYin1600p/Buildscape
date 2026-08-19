@@ -1,0 +1,7 @@
+{
+  "parent": "buildscape:block/pillar_single",
+  "textures": {
+    "1": "buildscape:block/sulfur_pillar_base",
+    "particle": "buildscape:block/sulfur"
+  }
+}

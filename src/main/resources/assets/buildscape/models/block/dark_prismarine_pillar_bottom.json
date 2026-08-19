@@ -1,0 +1,7 @@
+{
+  "parent": "buildscape:block/pillar_bottom",
+  "textures": {
+    "2": "buildscape:block/dark_prismarine_pillar_bottom",
+    "particle": "minecraft:block/dark_prismarine"
+  }
+}

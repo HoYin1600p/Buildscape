@@ -2,6 +2,6 @@
   "parent": "buildscape:block/pillar_bottom",
   "textures": {
     "2": "buildscape:block/sculk_pillar_bottom",
-    "particle": "minecraft:block/sculk"
+    "particle": "buildscape:block/sculk"
   }
 }

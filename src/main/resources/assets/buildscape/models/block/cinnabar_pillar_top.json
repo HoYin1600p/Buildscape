@@ -2,6 +2,6 @@
   "parent": "buildscape:block/pillar_top",
   "textures": {
     "2": "buildscape:block/cinnabar_pillar_top",
-    "particle": "buildscape:block/cinnabar"
+    "particle": "buildscape:block/polished_cinnabar"
   }
 }

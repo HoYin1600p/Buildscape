@@ -2819,12 +2819,13 @@
       "BS:builders_pouch",
       [
         "S S",
-        "L L",
+        "LBL",
         " L "
       ],
       {
         "L": "MC:leather",
-        "S": "MC:string"
+        "S": "MC:string",
+        "B": "MC:blue_dye"
       },
       1
     ],

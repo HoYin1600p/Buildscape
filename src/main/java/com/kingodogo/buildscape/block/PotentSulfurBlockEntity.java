@@ -230,7 +230,7 @@ public class PotentSulfurBlockEntity extends BlockEntity {
 
    private static int getUnobstructedBlockCount(final Level level, final BlockPos pos, final int waterBlocks) {
       int geyserForceHeight = 6 * waterBlocks;
-      CollisionContext geyserPositionContext = CollisionContext.of(null); // or empty
+      CollisionContext geyserPositionContext = CollisionContext.empty(); // or empty
 
       for (int i = 0; i < geyserForceHeight; ++i) {
          BlockPos currentPos = pos.above(i);
@@ -249,7 +249,7 @@ public class PotentSulfurBlockEntity extends BlockEntity {
 
    private static @Nullable BlockPos findNoxiousGasSourceBlock(final Level level, final BlockPos origin) {
       int maxY = origin.getY() + 4 + 1;
-      CollisionContext geyserPositionContext = CollisionContext.of(null);
+      CollisionContext geyserPositionContext = CollisionContext.empty();
       BlockPos.MutableBlockPos pos = origin.above(1).mutable();
 
       while (true) {
@@ -271,7 +271,7 @@ public class PotentSulfurBlockEntity extends BlockEntity {
 
    public static boolean canBeReachedByNoxiousGas(final Level level, final BlockPos sourceBlock, final Vec3 pos) {
       BlockPos blockPos = new BlockPos(pos);
-      CollisionContext geyserPositionContext = CollisionContext.of(null);
+      CollisionContext geyserPositionContext = CollisionContext.empty();
       if (!isGeyserPassableBlock(level.getBlockState(blockPos), level, blockPos, geyserPositionContext)) {
          return false;
       } else if (pos.distanceToSqr(Vec3.atCenterOf(sourceBlock)) > 9.0D) {

@@ -2673,6 +2673,29 @@ public class ModItems {
                     new BlockItem(ModBlocks.MOSSY_PILLAR.get(), createBlockItemProperties())
     );
 
+    public static final RegistryObject<Item> AMETHYST_PILLAR = ITEMS.register("amethyst_pillar", () -> new BlockItem(ModBlocks.AMETHYST_PILLAR.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> ANDESITE_PILLAR = ITEMS.register("andesite_pillar", () -> new BlockItem(ModBlocks.ANDESITE_PILLAR.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BASALT_PILLAR = ITEMS.register("basalt_pillar", () -> new BlockItem(ModBlocks.BASALT_PILLAR.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BLACKSTONE_PILLAR = ITEMS.register("blackstone_pillar", () -> new BlockItem(ModBlocks.BLACKSTONE_PILLAR.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BLUE_ICE_PILLAR = ITEMS.register("blue_ice_pillar", () -> new BlockItem(ModBlocks.BLUE_ICE_PILLAR.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> CALCITE_PILLAR = ITEMS.register("calcite_pillar", () -> new BlockItem(ModBlocks.CALCITE_PILLAR.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> CINNABAR_PILLAR = ITEMS.register("cinnabar_pillar", () -> new BlockItem(ModBlocks.CINNABAR_PILLAR.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> COPPER_PILLAR = ITEMS.register("copper_pillar", () -> new BlockItem(ModBlocks.COPPER_PILLAR.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> DARK_PRISMARINE_PILLAR = ITEMS.register("dark_prismarine_pillar", () -> new BlockItem(ModBlocks.DARK_PRISMARINE_PILLAR.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> DIORITE_PILLAR = ITEMS.register("diorite_pillar", () -> new BlockItem(ModBlocks.DIORITE_PILLAR.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> DRIPSTONE_PILLAR = ITEMS.register("dripstone_pillar", () -> new BlockItem(ModBlocks.DRIPSTONE_PILLAR.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> EXPOSED_COPPER_PILLAR = ITEMS.register("exposed_copper_pillar", () -> new BlockItem(ModBlocks.EXPOSED_COPPER_PILLAR.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GRANITE_PILLAR = ITEMS.register("granite_pillar", () -> new BlockItem(ModBlocks.GRANITE_PILLAR.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> NETHERRACK_PILLAR = ITEMS.register("netherrack_pillar", () -> new BlockItem(ModBlocks.NETHERRACK_PILLAR.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> OBSIDIAN_PILLAR = ITEMS.register("obsidian_pillar", () -> new BlockItem(ModBlocks.OBSIDIAN_PILLAR.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> OXIDIZED_COPPER_PILLAR = ITEMS.register("oxidized_copper_pillar", () -> new BlockItem(ModBlocks.OXIDIZED_COPPER_PILLAR.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PACKED_MUD_PILLAR = ITEMS.register("packed_mud_pillar", () -> new BlockItem(ModBlocks.PACKED_MUD_PILLAR.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PRISMARINE_PILLAR = ITEMS.register("prismarine_pillar", () -> new BlockItem(ModBlocks.PRISMARINE_PILLAR.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> SCULK_PILLAR = ITEMS.register("sculk_pillar", () -> new BlockItem(ModBlocks.SCULK_PILLAR.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> SULFUR_PILLAR = ITEMS.register("sulfur_pillar", () -> new BlockItem(ModBlocks.SULFUR_PILLAR.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> TUFF_PILLAR = ITEMS.register("tuff_pillar", () -> new BlockItem(ModBlocks.TUFF_PILLAR.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WEATHERED_COPPER_PILLAR = ITEMS.register("weathered_copper_pillar", () -> new BlockItem(ModBlocks.WEATHERED_COPPER_PILLAR.get(), createBlockItemProperties()));
+
     public static final RegistryObject<Item> ASHENKING_DIAMOND_PILLAR = ITEMS.register(
             "ashenking_diamond_pillar",
             () ->

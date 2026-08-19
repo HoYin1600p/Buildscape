@@ -50,7 +50,7 @@ public class PillarSparkleParticle extends TextureSheetParticle {
         this.zd = dz;
         this.lifetime = 100;
 
-        String positionKey = String.format("%.1f,%.1f,%.1f", x, y, z);
+        String positionKey = String.format(java.util.Locale.ROOT, "%.1f,%.1f,%.1f", x, y, z);
         float[] colors = getColorForPosition(x, y, z);
         this.setColor(colors[0], colors[1], colors[2]);
 
@@ -102,7 +102,7 @@ public class PillarSparkleParticle extends TextureSheetParticle {
     }
 
     public static float[] getColorForPosition(double x, double y, double z) {
-        String positionKey = String.format("%.1f,%.1f,%.1f", x, y, z);
+        String positionKey = String.format(java.util.Locale.ROOT, "%.1f,%.1f,%.1f", x, y, z);
         ColorEntry colorEntry = POSITION_COLOR_MAP.remove(positionKey);
         String colorCode = (colorEntry != null) ? colorEntry.colorCode : null;
 
@@ -210,7 +210,7 @@ public class PillarSparkleParticle extends TextureSheetParticle {
             String colorCode
     ) {
         if (colorCode != null && !colorCode.isEmpty()) {
-            String positionKey = String.format("%.1f,%.1f,%.1f", x, y, z);
+            String positionKey = String.format(java.util.Locale.ROOT, "%.1f,%.1f,%.1f", x, y, z);
             POSITION_COLOR_MAP.put(positionKey, new ColorEntry(colorCode));
         }
     }
@@ -222,7 +222,7 @@ public class PillarSparkleParticle extends TextureSheetParticle {
             float sizeMultiplier
     ) {
         if (sizeMultiplier > 0) {
-            String positionKey = String.format("%.1f,%.1f,%.1f", x, y, z);
+            String positionKey = String.format(java.util.Locale.ROOT, "%.1f,%.1f,%.1f", x, y, z);
             POSITION_SIZE_MAP.put(positionKey, sizeMultiplier);
         }
     }

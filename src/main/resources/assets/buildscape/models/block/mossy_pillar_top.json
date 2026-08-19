@@ -6,7 +6,7 @@
   ],
   "textures": {
     "2": "buildscape:block/mossy_pillar_top",
-    "particle": "buildscape:block/mossy_pillar_top"
+    "particle": "minecraft:block/mossy_cobblestone"
   },
   "elements": [
     {

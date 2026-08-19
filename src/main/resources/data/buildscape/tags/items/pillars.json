@@ -3,7 +3,28 @@
     "buildscape:quartz_pillar",
     "buildscape:stone_pillar",
     "buildscape:deepslate_pillar",
-    "buildscape:mossy_pillar"
+    "buildscape:mossy_pillar",
+    "buildscape:amethyst_pillar",
+    "buildscape:andesite_pillar",
+    "buildscape:basalt_pillar",
+    "buildscape:blackstone_pillar",
+    "buildscape:blue_ice_pillar",
+    "buildscape:calcite_pillar",
+    "buildscape:cinnabar_pillar",
+    "buildscape:copper_pillar",
+    "buildscape:dark_prismarine_pillar",
+    "buildscape:diorite_pillar",
+    "buildscape:dripstone_pillar",
+    "buildscape:exposed_copper_pillar",
+    "buildscape:granite_pillar",
+    "buildscape:netherrack_pillar",
+    "buildscape:obsidian_pillar",
+    "buildscape:oxidized_copper_pillar",
+    "buildscape:packed_mud_pillar",
+    "buildscape:prismarine_pillar",
+    "buildscape:sculk_pillar",
+    "buildscape:sulfur_pillar",
+    "buildscape:tuff_pillar",
+    "buildscape:weathered_copper_pillar"
   ]
 }
-

@@ -1,0 +1,7 @@
+{
+  "parent": "buildscape:block/pillar_middle",
+  "textures": {
+    "1": "buildscape:block/diorite_pillar_middle",
+    "particle": "minecraft:block/diorite"
+  }
+}

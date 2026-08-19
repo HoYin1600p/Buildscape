@@ -2,6 +2,6 @@
   "parent": "minecraft:block/cube_all",
   "textures": {
     "all": "minecraft:block/quartz_pillar",
-    "particle": "#all"
+    "particle": "minecraft:block/quartz_block_side"
   }
 }

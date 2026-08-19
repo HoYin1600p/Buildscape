@@ -83,3 +83,4 @@ THIRD_PARTY_NOTICES.md
 *.schematic
 /BDRE/
 /.agents/
+/scratch/

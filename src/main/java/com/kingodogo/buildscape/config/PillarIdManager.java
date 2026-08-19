@@ -151,6 +151,52 @@ public class PillarIdManager {
                 return "AK-G";
             } else if (blockName.contains("ashenking_pillar")) {
                 return "AK-P";
+            } else if (blockName.contains("amethyst")) {
+                return "AM-P";
+            } else if (blockName.contains("andesite")) {
+                return "AN-P";
+            } else if (blockName.contains("basalt")) {
+                return "BS-P";
+            } else if (blockName.contains("blackstone")) {
+                return "BL-P";
+            } else if (blockName.contains("blue_ice")) {
+                return "BI-P";
+            } else if (blockName.contains("calcite")) {
+                return "CA-P";
+            } else if (blockName.contains("cinnabar")) {
+                return "CI-P";
+            } else if (blockName.contains("exposed_copper")) {
+                return "EC-P";
+            } else if (blockName.contains("oxidized_copper")) {
+                return "OC-P";
+            } else if (blockName.contains("weathered_copper")) {
+                return "WC-P";
+            } else if (blockName.contains("copper")) {
+                return "CO-P";
+            } else if (blockName.contains("dark_prismarine")) {
+                return "DP-P";
+            } else if (blockName.contains("prismarine")) {
+                return "PR-P";
+            } else if (blockName.contains("diorite")) {
+                return "DI-P";
+            } else if (blockName.contains("dripstone")) {
+                return "DR-P";
+            } else if (blockName.contains("granite")) {
+                return "GR-P";
+            } else if (blockName.contains("netherrack")) {
+                return "NE-P";
+            } else if (blockName.contains("obsidian")) {
+                return "OB-P";
+            } else if (blockName.contains("packed_mud")) {
+                return "PM-P";
+            } else if (blockName.contains("sculk")) {
+                return "SC-P";
+            } else if (blockName.contains("sulfur")) {
+                return "SU-P";
+            } else if (blockName.contains("tuff")) {
+                return "TU-P";
+            } else if (blockName.contains("stone")) {
+                return PREFIX_STONE + "-P";
             } else {
                 return PREFIX_STONE + "-P";
             }

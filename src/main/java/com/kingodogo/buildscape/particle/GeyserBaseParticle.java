@@ -20,6 +20,8 @@ public class GeyserBaseParticle extends BaseAshSmokeParticle {
       this.yd = Math.abs(this.yd);
       float lifetimeFactor = 0.8F + 0.2F * level.getRandom().nextFloat();
       this.lifetime = (int)(25.0F * lifetimeFactor);
+      this.setSize(3.0F, 3.0F);
+      this.setPos(x, y, z);
    }
 
    public static class Provider implements ParticleProvider<GeyserBaseParticleOptions> {

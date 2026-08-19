@@ -45,9 +45,11 @@ public class PillarParticleConfig {
     // that get() refreshes whenever the underlying config actually changes.
     private static volatile PillarParticleConfig SNAPSHOT = null;
 
-    /** Fast path for the hot client-tick loop: returns the last loaded config
-     *  without any I/O or reflection.  Falls back to the full get() path only
-     *  until the first non-null snapshot is available. */
+    /**
+     * Fast path for the hot client-tick loop: returns the last loaded config
+     * without any I/O or reflection. Falls back to the full get() path only
+     * until the first non-null snapshot is available.
+     */
     public static PillarParticleConfig peek() {
         PillarParticleConfig s = SNAPSHOT;
         return s != null ? s : get();
@@ -55,7 +57,7 @@ public class PillarParticleConfig {
 
     // ── isClientConnectedToServer cache ────────────────────────────────────
     // Class.forName + 3 reflection invocations is very expensive to call on
-    // every tick.  Cache the result and refresh at most once per ~3 seconds.
+    // every tick. Cache the result and refresh at most once per ~3 seconds.
     private static volatile boolean cachedConnectedToServer = false;
     private static volatile long connectedCacheTime = 0L;
     private static final long CONNECTED_CACHE_TTL_MS = 3000L; // 3 s
@@ -87,12 +89,10 @@ public class PillarParticleConfig {
     // ── matches() cache ───────────────────────────────────────────────────
     // matches() iterates the items set, calling new ResourceLocation() and a full
     // tag-registry lookup for every tag-prefixed entry, every 5 client ticks per
-    // active pillar.  The result only depends on the Item type (registry key +
+    // active pillar. The result only depends on the Item type (registry key +
     // tags) — not on the ItemStack NBT — so we can safely cache Boolean per Item.
     // The cache is cleared whenever the config reloads so hot-reload still works.
-    private static final java.util.concurrent.ConcurrentHashMap<
-            net.minecraft.world.item.Item, Boolean> MATCH_CACHE =
-            new java.util.concurrent.ConcurrentHashMap<>();
+    private static final java.util.concurrent.ConcurrentHashMap<net.minecraft.world.item.Item, Boolean> MATCH_CACHE = new java.util.concurrent.ConcurrentHashMap<>();
 
     private static void clearMatchCache() {
         MATCH_CACHE.clear();
@@ -123,14 +123,17 @@ public class PillarParticleConfig {
         try {
             Class<?> mcClass = Class.forName("net.minecraft.client.Minecraft");
             Object mc = mcClass.getMethod("getInstance").invoke(null);
-            if (mc == null) { result = false; }
-            else {
+            if (mc == null) {
+                result = false;
+            } else {
                 Object connection = mcClass.getMethod("getConnection").invoke(mc);
-                if (connection == null) { result = false; }
-                else {
+                if (connection == null) {
+                    result = false;
+                } else {
                     Object level = mcClass.getMethod("level").invoke(mc);
-                    if (level == null) { result = false; }
-                    else {
+                    if (level == null) {
+                        result = false;
+                    } else {
                         Boolean isClientSide = (Boolean) level.getClass()
                                 .getMethod("isClientSide").invoke(level);
                         result = isClientSide != null && isClientSide;
@@ -319,9 +322,11 @@ public class PillarParticleConfig {
                                             boolean reloaded = false;
                                             if (wasProperties) {
                                                 INSTANCE.loadPropertiesInternal();
-                                                // Check if it actually reloaded by comparing timestamps/sizes isn't easy here since loadPropertiesInternal updates them.
-                                                // But loadPropertiesInternal is only called if we are here. 
-                                                // To properly debounce, we should check if enough time passed since last reload/notify.
+                                                // Check if it actually reloaded by comparing timestamps/sizes isn't
+                                                // easy here since loadPropertiesInternal updates them.
+                                                // But loadPropertiesInternal is only called if we are here.
+                                                // To properly debounce, we should check if enough time passed since
+                                                // last reload/notify.
                                                 reloaded = true;
                                             }
                                             if (wasItems) {
@@ -330,7 +335,8 @@ public class PillarParticleConfig {
                                             }
 
                                             if (reloaded) {
-                                                // Debounce notifications: only notify if > 500ms since last notification
+                                                // Debounce notifications: only notify if > 500ms since last
+                                                // notification
                                                 long currentTime = System.currentTimeMillis();
                                                 if (currentTime - lastNotifyTime > 500) {
                                                     lastNotifyTime = currentTime;
@@ -366,7 +372,6 @@ public class PillarParticleConfig {
     public static void clearServerConfig() {
         SERVER_CONFIG = null;
     }
-
 
     private File getPropertiesFile() {
         return new File(getConfigDir(), PROPERTIES_FILE_NAME);
@@ -890,7 +895,7 @@ public class PillarParticleConfig {
                 // Auto-add any new default vanilla items that were added in mod updates
                 {
                     boolean changed = false;
-                    String[] defaultVanillaItems = new String[]{
+                    String[] defaultVanillaItems = new String[] {
                             "minecraft:diamond",
                             "minecraft:netherite_ingot",
                             "minecraft:nether_star",
@@ -981,7 +986,7 @@ public class PillarParticleConfig {
                 // Check for auto-update of Vault Hunters items
                 if (net.minecraftforge.fml.ModList.get().isLoaded("the_vault")) {
                     boolean changed = false;
-                    String[] vaultItems = new String[]{
+                    String[] vaultItems = new String[] {
                             "the_vault:echo_pog",
                             "the_vault:gem_pog",
                             "the_vault:vault_crystal",
@@ -1300,11 +1305,15 @@ public class PillarParticleConfig {
     }
 
     public boolean matches(ItemStack stack) {
-        if (stack == null || stack.isEmpty()) return false;
+        if (stack == null || stack.isEmpty())
+            return false;
 
-        // Fast path: result is cached per Item type (cleared on config reload)
+        if (items == null || items.isEmpty())
+            return true;
+
         Boolean cached = MATCH_CACHE.get(stack.getItem());
-        if (cached != null) return cached;
+        if (cached != null)
+            return cached;
 
         boolean result = matchesUncached(stack);
         MATCH_CACHE.put(stack.getItem(), result);
@@ -1341,14 +1350,14 @@ public class PillarParticleConfig {
     public void saveItems() {
         if (isClientConnectedToServer() && SERVER_CONFIG != null) {
             // Update the server's global config when changed on client
-            net.minecraftforge.fml.DistExecutor.unsafeRunWhenOn(net.minecraftforge.api.distmarker.Dist.CLIENT, () -> () -> {
-                if (net.minecraft.client.Minecraft.getInstance().player != null &&
-                        net.minecraft.client.Minecraft.getInstance().player.hasPermissions(2)) {
-                    com.kingodogo.buildscape.network.ModMessages.INSTANCE.sendToServer(
-                            new com.kingodogo.buildscape.network.UpdateConfigPacket(this)
-                    );
-                }
-            });
+            net.minecraftforge.fml.DistExecutor.unsafeRunWhenOn(net.minecraftforge.api.distmarker.Dist.CLIENT,
+                    () -> () -> {
+                        if (net.minecraft.client.Minecraft.getInstance().player != null &&
+                                net.minecraft.client.Minecraft.getInstance().player.hasPermissions(2)) {
+                            com.kingodogo.buildscape.network.ModMessages.INSTANCE.sendToServer(
+                                    new com.kingodogo.buildscape.network.UpdateConfigPacket(this));
+                        }
+                    });
             return; // Don't save on client disk when connected to server
         }
         File file = getItemsFile();
@@ -1382,14 +1391,14 @@ public class PillarParticleConfig {
     public void saveProperties() {
         if (isClientConnectedToServer() && SERVER_CONFIG != null) {
             // Update the server's global config when changed on client
-            net.minecraftforge.fml.DistExecutor.unsafeRunWhenOn(net.minecraftforge.api.distmarker.Dist.CLIENT, () -> () -> {
-                if (net.minecraft.client.Minecraft.getInstance().player != null &&
-                        net.minecraft.client.Minecraft.getInstance().player.hasPermissions(2)) {
-                    com.kingodogo.buildscape.network.ModMessages.INSTANCE.sendToServer(
-                            new com.kingodogo.buildscape.network.UpdateConfigPacket(this)
-                    );
-                }
-            });
+            net.minecraftforge.fml.DistExecutor.unsafeRunWhenOn(net.minecraftforge.api.distmarker.Dist.CLIENT,
+                    () -> () -> {
+                        if (net.minecraft.client.Minecraft.getInstance().player != null &&
+                                net.minecraft.client.Minecraft.getInstance().player.hasPermissions(2)) {
+                            com.kingodogo.buildscape.network.ModMessages.INSTANCE.sendToServer(
+                                    new com.kingodogo.buildscape.network.UpdateConfigPacket(this));
+                        }
+                    });
             return; // Don't save on client disk when connected to server
         }
         File file = getPropertiesFile();

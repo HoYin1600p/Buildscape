@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "part=single": {
+      "model": "buildscape:block/sulfur_pillar_single"
+    },
+    "part=bottom": {
+      "model": "buildscape:block/sulfur_pillar_bottom"
+    },
+    "part=middle": {
+      "model": "buildscape:block/sulfur_pillar_middle"
+    },
+    "part=top": {
+      "model": "buildscape:block/sulfur_pillar_top"
+    }
+  }
+}

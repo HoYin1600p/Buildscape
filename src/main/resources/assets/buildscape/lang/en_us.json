@@ -5823,5 +5823,17 @@
   "advancements.buildscape.a_white_christmas.title": "A White Christmas",
   "advancements.buildscape.a_white_christmas.description": "Place 100 Snowy Leaves",
   "advancements.buildscape.a_very_buildscape_christmas.title": "A Very Buildscape Christmas",
-  "advancements.buildscape.a_very_buildscape_christmas.description": "Obtain every Christmas decoration"
+  "advancements.buildscape.a_very_buildscape_christmas.description": "Obtain every Christmas decoration",
+  "item.buildscape.test_trophy": "Test Trophy",
+  "stat.buildscape.interact_with_pillar": "Pillar Interactions",
+  "stat.buildscape.blocks_placed": "Buildscape Blocks Placed",
+  "stat.buildscape.hammer_used": "Hammers Used",
+  "stat.buildscape.hollow_logs_placed": "Hollow Logs Placed",
+  "stat.buildscape.icicles_placed": "Icicles Placed",
+  "stat.buildscape.ornaments_placed": "Ornaments Placed",
+  "stat.buildscape.string_lights_placed": "String Lights Placed",
+  "stat.buildscape.stars_placed": "Stars Placed",
+  "stat.buildscape.snowy_leaves_placed": "Snowy Leaves Placed",
+  "stat.buildscape.jars_crafted": "Jars Crafted",
+  "stat.buildscape.stockings_crafted": "Stockings Crafted"
 }

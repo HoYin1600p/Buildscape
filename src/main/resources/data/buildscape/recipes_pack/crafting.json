@@ -269,7 +269,9 @@
     ["BS:brown_wool_slab", ["###"], {"#": "MC:brown_wool"}, 6],
     ["BS:brown_wool_stairs", ["C  ", "CC ", "CCC"], {"C": "MC:brown_wool"}, 4],
     ["BS:brown_wool_wall", ["   ", "BBB", "BBB"], {"B": "MC:brown_wool"}, 6],
-    ["BS:builders_pouch", ["S S", "L L", " L "], {"L": "MC:leather", "S": "MC:string"}, 1],
+    ["BS:builders_pouch", ["S S", "LBL", " L "], {"L": "MC:leather", "S": "MC:string",
+        "B": "MC:blue_dye"
+      }, 1],
     ["BS:builders_workbench", ["PPP", "ICI", "PPP"], {"C": "MC:crafting_table", "I": "MC:iron_ingot", "P": "#MC:planks"}, 1],
     ["BS:calcite_slab", ["SSS"], {"S": "MC:calcite"}, 6],
     ["BS:calcite_stairs", ["C  ", "CC ", "CCC"], {"C": "MC:calcite"}, 4],

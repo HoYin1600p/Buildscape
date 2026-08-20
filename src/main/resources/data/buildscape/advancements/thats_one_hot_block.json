@@ -1,0 +1,34 @@
+{
+  "display": {
+    "icon": {
+      "item": "buildscape:flaming_steel_ingot"
+    },
+    "title": {
+      "translate": "advancements.buildscape.thats_one_hot_block.title"
+    },
+    "description": {
+      "translate": "advancements.buildscape.thats_one_hot_block.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "parent": "buildscape:metalhead",
+  "criteria": {
+    "has_flaming_steel": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "buildscape:flaming_steel_ingot",
+              "buildscape:flaming_steel_block",
+              "buildscape:flaming_steel_nugget"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

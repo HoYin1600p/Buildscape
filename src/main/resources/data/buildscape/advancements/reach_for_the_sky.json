@@ -1,0 +1,23 @@
+{
+  "display": {
+    "icon": {
+      "item": "buildscape:tuff_pillar"
+    },
+    "title": {
+      "translate": "advancements.buildscape.reach_for_the_sky.title"
+    },
+    "description": {
+      "translate": "advancements.buildscape.reach_for_the_sky.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "parent": "buildscape:thats_a_tall_order",
+  "criteria": {
+    "custom": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

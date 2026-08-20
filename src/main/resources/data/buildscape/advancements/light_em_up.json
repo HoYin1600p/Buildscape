@@ -1,0 +1,30 @@
+{
+  "display": {
+    "icon": {
+      "item": "buildscape:multicolor_string_light"
+    },
+    "title": {
+      "translate": "advancements.buildscape.light_em_up.title"
+    },
+    "description": {
+      "translate": "advancements.buildscape.light_em_up.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "parent": "buildscape:root",
+  "rewards": {
+    "items": [
+      {
+        "item": "buildscape:multicolor_string_light"
+      }
+    ]
+  },
+  "criteria": {
+    "custom": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

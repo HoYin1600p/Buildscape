@@ -14350,6 +14350,8 @@ private static BlockBehaviour.Properties flamingSteelProperties() {
                         () -> new ShelfBlock(BlockBehaviour.Properties.copy(Blocks.WARPED_PLANKS).strength(2.0f, 3.0f)));
         public static final RegistryObject<Block> BAMBOO_SHELF = BLOCKS.register("bamboo_shelf",
                         () -> new ShelfBlock(BlockBehaviour.Properties.copy(BAMBOO_BLOCK.get()).strength(2.0f, 3.0f)));
+        public static final RegistryObject<Block> STRIPPED_BAMBOO_SHELF = BLOCKS.register("stripped_bamboo_shelf",
+                        () -> new ShelfBlock(BlockBehaviour.Properties.copy(STRIPPED_BAMBOO_BLOCK.get()).strength(2.0f, 3.0f)));
         public static final RegistryObject<Block> PALE_OAK_SHELF = BLOCKS.register("pale_oak_shelf",
                         () -> new ShelfBlock(BlockBehaviour.Properties.copy(PALE_OAK_PLANKS.get()).strength(2.0f, 3.0f)));
         public static final RegistryObject<Block> POPLAR_SHELF = BLOCKS.register("poplar_shelf",

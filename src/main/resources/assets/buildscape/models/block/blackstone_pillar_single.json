@@ -2,6 +2,6 @@
   "parent": "buildscape:block/pillar_single",
   "textures": {
     "1": "buildscape:block/blackstone_pillar_base",
-    "particle": "minecraft:block/blackstone"
+    "particle": "minecraft:block/polished_blackstone"
   }
 }

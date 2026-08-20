@@ -2,6 +2,6 @@
   "parent": "buildscape:block/pillar_top",
   "textures": {
     "2": "buildscape:block/tuff_pillar_top",
-    "particle": "minecraft:block/tuff"
+    "particle": "buildscape:block/polished_tuff"
   }
 }

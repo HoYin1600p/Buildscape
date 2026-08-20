@@ -1,0 +1,30 @@
+{
+  "display": {
+    "icon": {
+      "item": "buildscape:festive_stocking"
+    },
+    "title": {
+      "translate": "advancements.buildscape.christmas_every_day.title"
+    },
+    "description": {
+      "translate": "advancements.buildscape.christmas_every_day.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "parent": "buildscape:root",
+  "rewards": {
+    "items": [
+      {
+        "item": "buildscape:festive_stocking"
+      }
+    ]
+  },
+  "criteria": {
+    "custom": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

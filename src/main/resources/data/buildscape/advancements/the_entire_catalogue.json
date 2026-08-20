@@ -1,0 +1,212 @@
+{
+  "display": {
+    "icon": {
+      "item": "buildscape:rainbow_wallpaper"
+    },
+    "title": {
+      "translate": "advancements.buildscape.the_entire_catalogue.title"
+    },
+    "description": {
+      "translate": "advancements.buildscape.the_entire_catalogue.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "parent": "buildscape:shear_genius",
+  "criteria": {
+    "has_item_0": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "buildscape:white_wallpaper"
+            ]
+          }
+        ]
+      }
+    },
+    "has_item_1": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "buildscape:orange_wallpaper"
+            ]
+          }
+        ]
+      }
+    },
+    "has_item_2": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "buildscape:magenta_wallpaper"
+            ]
+          }
+        ]
+      }
+    },
+    "has_item_3": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "buildscape:light_blue_wallpaper"
+            ]
+          }
+        ]
+      }
+    },
+    "has_item_4": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "buildscape:yellow_wallpaper"
+            ]
+          }
+        ]
+      }
+    },
+    "has_item_5": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "buildscape:lime_wallpaper"
+            ]
+          }
+        ]
+      }
+    },
+    "has_item_6": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "buildscape:pink_wallpaper"
+            ]
+          }
+        ]
+      }
+    },
+    "has_item_7": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "buildscape:gray_wallpaper"
+            ]
+          }
+        ]
+      }
+    },
+    "has_item_8": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "buildscape:light_gray_wallpaper"
+            ]
+          }
+        ]
+      }
+    },
+    "has_item_9": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "buildscape:cyan_wallpaper"
+            ]
+          }
+        ]
+      }
+    },
+    "has_item_10": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "buildscape:purple_wallpaper"
+            ]
+          }
+        ]
+      }
+    },
+    "has_item_11": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "buildscape:blue_wallpaper"
+            ]
+          }
+        ]
+      }
+    },
+    "has_item_12": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "buildscape:brown_wallpaper"
+            ]
+          }
+        ]
+      }
+    },
+    "has_item_13": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "buildscape:green_wallpaper"
+            ]
+          }
+        ]
+      }
+    },
+    "has_item_14": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "buildscape:red_wallpaper"
+            ]
+          }
+        ]
+      }
+    },
+    "has_item_15": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "buildscape:black_wallpaper"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

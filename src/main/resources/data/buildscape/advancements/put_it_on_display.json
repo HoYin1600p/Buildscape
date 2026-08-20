@@ -1,0 +1,30 @@
+{
+  "display": {
+    "icon": {
+      "item": "buildscape:ashenking_gold_pillar"
+    },
+    "title": {
+      "translate": "advancements.buildscape.put_it_on_display.title"
+    },
+    "description": {
+      "translate": "advancements.buildscape.put_it_on_display.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "parent": "buildscape:support_system",
+  "rewards": {
+    "items": [
+      {
+        "item": "buildscape:ashenking_gold_pillar"
+      }
+    ]
+  },
+  "criteria": {
+    "custom": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

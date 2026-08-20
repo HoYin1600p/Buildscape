@@ -1,0 +1,32 @@
+{
+  "display": {
+    "icon": {
+      "item": "buildscape:builders_pouch"
+    },
+    "title": {
+      "translate": "advancements.buildscape.pocket_full_of_blocks.title"
+    },
+    "description": {
+      "translate": "advancements.buildscape.pocket_full_of_blocks.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "parent": "buildscape:root",
+  "criteria": {
+    "has_item": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "buildscape:builders_pouch"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

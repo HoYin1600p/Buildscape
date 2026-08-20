@@ -1,0 +1,47 @@
+{
+  "display": {
+    "icon": {
+      "item": "buildscape:white_wallpaper"
+    },
+    "title": {
+      "translate": "advancements.buildscape.shear_genius.title"
+    },
+    "description": {
+      "translate": "advancements.buildscape.shear_genius.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "parent": "buildscape:root",
+  "criteria": {
+    "has_item": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "buildscape:white_wallpaper",
+              "buildscape:orange_wallpaper",
+              "buildscape:magenta_wallpaper",
+              "buildscape:light_blue_wallpaper",
+              "buildscape:yellow_wallpaper",
+              "buildscape:lime_wallpaper",
+              "buildscape:pink_wallpaper",
+              "buildscape:gray_wallpaper",
+              "buildscape:light_gray_wallpaper",
+              "buildscape:cyan_wallpaper",
+              "buildscape:purple_wallpaper",
+              "buildscape:blue_wallpaper",
+              "buildscape:brown_wallpaper",
+              "buildscape:green_wallpaper",
+              "buildscape:red_wallpaper",
+              "buildscape:black_wallpaper"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

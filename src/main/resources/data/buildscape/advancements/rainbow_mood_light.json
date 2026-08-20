@@ -1,0 +1,212 @@
+{
+  "display": {
+    "icon": {
+      "item": "minecraft:ochre_froglight"
+    },
+    "title": {
+      "translate": "advancements.buildscape.rainbow_mood_light.title"
+    },
+    "description": {
+      "translate": "advancements.buildscape.rainbow_mood_light.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "parent": "buildscape:root",
+  "criteria": {
+    "has_item_0": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "minecraft:ochre_froglight"
+            ]
+          }
+        ]
+      }
+    },
+    "has_item_1": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "minecraft:pearlescent_froglight"
+            ]
+          }
+        ]
+      }
+    },
+    "has_item_2": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "minecraft:verdant_froglight"
+            ]
+          }
+        ]
+      }
+    },
+    "has_item_3": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "buildscape:russet_froglight"
+            ]
+          }
+        ]
+      }
+    },
+    "has_item_4": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "buildscape:veridian_froglight"
+            ]
+          }
+        ]
+      }
+    },
+    "has_item_5": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "buildscape:tidal_froglight"
+            ]
+          }
+        ]
+      }
+    },
+    "has_item_6": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "buildscape:coraline_froglight"
+            ]
+          }
+        ]
+      }
+    },
+    "has_item_7": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "buildscape:onyx_froglight"
+            ]
+          }
+        ]
+      }
+    },
+    "has_item_8": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "buildscape:cerulean_froglight"
+            ]
+          }
+        ]
+      }
+    },
+    "has_item_9": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "buildscape:gleaming_froglight"
+            ]
+          }
+        ]
+      }
+    },
+    "has_item_10": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "buildscape:azure_froglight"
+            ]
+          }
+        ]
+      }
+    },
+    "has_item_11": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "buildscape:iridescent_froglight"
+            ]
+          }
+        ]
+      }
+    },
+    "has_item_12": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "buildscape:ivory_froglight"
+            ]
+          }
+        ]
+      }
+    },
+    "has_item_13": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "buildscape:dusky_froglight"
+            ]
+          }
+        ]
+      }
+    },
+    "has_item_14": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "buildscape:scarlet_froglight"
+            ]
+          }
+        ]
+      }
+    },
+    "has_item_15": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "buildscape:ashen_froglight"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

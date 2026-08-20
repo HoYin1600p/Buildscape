@@ -1,0 +1,23 @@
+{
+  "display": {
+    "icon": {
+      "item": "buildscape:jar"
+    },
+    "title": {
+      "translate": "advancements.buildscape.jar_ring_display.title"
+    },
+    "description": {
+      "translate": "advancements.buildscape.jar_ring_display.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "parent": "buildscape:can_i_interest_you_in_a_jar",
+  "criteria": {
+    "custom": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

@@ -65,35 +65,61 @@ public class AdvancementEvents {
         }
     }
 
-    @SubscribeEvent
-    public static void onRightClickBlock(PlayerInteractEvent.RightClickBlock event) {
-        if (!(event.getPlayer() instanceof ServerPlayer serverPlayer)) return;
+    private static boolean checkRelativeMilestone(ServerPlayer player, String advId, int targetCount, int currentStat) {
+        Advancement adv = player.getServer().getAdvancements().getAdvancement(new ResourceLocation("buildscape", advId));
+        if (adv == null) return false;
+        AdvancementProgress progress = player.getAdvancements().getOrStartProgress(adv);
+        if (progress.isDone()) return false;
 
-        BlockState state = event.getWorld().getBlockState(event.getPos());
-        Block block = state.getBlock();
+        CompoundTag tag = player.getPersistentData();
+        String baseKey = "BS_Base_" + advId;
 
-        if (block instanceof PillarBlock || block instanceof AshenKingPillarBlock) {
-            CompoundTag tag = serverPlayer.getPersistentData();
-            int count = tag.getInt("BS_PillarInteractions") + 1;
-            tag.putInt("BS_PillarInteractions", count);
+        if (!tag.contains(baseKey)) {
+            tag.putInt(baseKey, Math.max(0, currentStat - 1));
+        }
 
-            // Ashenking Pillar Item Rewards
-            if (count >= 10 && grant(serverPlayer, "put_it_on_display")) {
-                giveItemReward(serverPlayer, ModItems.ASHENKING_GOLD_PILLAR.get(), 1);
-                // TODO: Award Gold Trophy block when registered
+        int baseStat = tag.getInt(baseKey);
+        int delta = currentStat - baseStat;
+
+        // If advancement was revoked after stat accumulated, re-snapshot baseline to count fresh from current action
+        if (delta > targetCount) {
+            tag.putInt(baseKey, Math.max(0, currentStat - 1));
+            baseStat = tag.getInt(baseKey);
+            delta = currentStat - baseStat;
+        }
+
+        if (delta >= targetCount) {
+            boolean granted = grant(player, advId);
+            if (granted) {
+                tag.remove(baseKey);
             }
-            if (count >= 69 && grant(serverPlayer, "columnist")) {
-                giveItemReward(serverPlayer, ModItems.ASHENKING_EMERALD_PILLAR.get(), 1);
-                // TODO: Award Emerald Trophy block when registered
-            }
-            if (count >= 100 && grant(serverPlayer, "art_collector")) {
-                giveItemReward(serverPlayer, ModItems.ASHENKING_DIAMOND_PILLAR.get(), 1);
-                // TODO: Award Diamond Trophy block when registered
-            }
-            if (count >= 1000 && grant(serverPlayer, "buildscape_museum")) {
-                giveItemReward(serverPlayer, ModItems.ASHENKING_NETHERITE_PILLAR.get(), 1);
-                // TODO: Award Netherite Trophy block when registered
-            }
+            return granted;
+        }
+        return false;
+    }
+
+    public static void onPillarItemInserted(ServerPlayer serverPlayer) {
+        if (serverPlayer == null) return;
+
+        serverPlayer.awardStat(com.kingodogo.buildscape.stat.ModStats.INTERACT_WITH_PILLAR);
+        int count = serverPlayer.getStats().getValue(net.minecraft.stats.Stats.CUSTOM, com.kingodogo.buildscape.stat.ModStats.INTERACT_WITH_PILLAR);
+
+        // Ashenking Pillar Item Rewards
+        if (checkRelativeMilestone(serverPlayer, "put_it_on_display", 10, count)) {
+            giveItemReward(serverPlayer, ModItems.TEST_TROPHY.get(), 1);
+            return;
+        }
+        if (checkRelativeMilestone(serverPlayer, "columnist", 69, count)) {
+            giveItemReward(serverPlayer, ModItems.TEST_TROPHY.get(), 1);
+            return;
+        }
+        if (checkRelativeMilestone(serverPlayer, "art_collector", 100, count)) {
+            giveItemReward(serverPlayer, ModItems.TEST_TROPHY.get(), 1);
+            return;
+        }
+        if (checkRelativeMilestone(serverPlayer, "buildscape_museum", 1000, count)) {
+            giveItemReward(serverPlayer, ModItems.TEST_TROPHY.get(), 1);
+            return;
         }
     }
 
@@ -115,13 +141,16 @@ public class AdvancementEvents {
 
         // Check if placed block belongs to Buildscape
         if ("buildscape".equals(modId)) {
-            int placedCount = tag.getInt("BS_PlacedBlocks") + 1;
-            tag.putInt("BS_PlacedBlocks", placedCount);
+            serverPlayer.awardStat(com.kingodogo.buildscape.stat.ModStats.BLOCKS_PLACED);
+            int placedCount = serverPlayer.getStats().getValue(net.minecraft.stats.Stats.CUSTOM, com.kingodogo.buildscape.stat.ModStats.BLOCKS_PLACED);
 
-            // TODO: Builder Trophy rewards (Tiers I, II, III) when registered
-            if (placedCount >= 100) grant(serverPlayer, "one_more_block");
-            if (placedCount >= 1000) grant(serverPlayer, "okay_one_more");
-            if (placedCount >= 10000) grant(serverPlayer, "actually_one_last");
+            if (checkRelativeMilestone(serverPlayer, "one_more_block", 100, placedCount)) {
+                giveItemReward(serverPlayer, ModItems.TEST_TROPHY.get(), 1);
+            } else if (checkRelativeMilestone(serverPlayer, "okay_one_more", 1000, placedCount)) {
+                giveItemReward(serverPlayer, ModItems.TEST_TROPHY.get(), 1);
+            } else if (checkRelativeMilestone(serverPlayer, "actually_one_last", 10000, placedCount)) {
+                giveItemReward(serverPlayer, ModItems.TEST_TROPHY.get(), 1);
+            }
         }
 
         // Stained Brick
@@ -131,55 +160,55 @@ public class AdvancementEvents {
 
         // Hollow Logs
         if (path.startsWith("hollow_")) {
-            int hollowCount = tag.getInt("BS_HollowLogsPlaced") + 1;
-            tag.putInt("BS_HollowLogsPlaced", hollowCount);
-            if (hollowCount >= 10) grant(serverPlayer, "i_vented");
+            serverPlayer.awardStat(com.kingodogo.buildscape.stat.ModStats.HOLLOW_LOGS_PLACED);
+            int hollowCount = serverPlayer.getStats().getValue(net.minecraft.stats.Stats.CUSTOM, com.kingodogo.buildscape.stat.ModStats.HOLLOW_LOGS_PLACED);
+            if (checkRelativeMilestone(serverPlayer, "i_vented", 10, hollowCount)) {
+                // Awarded
+            }
         }
 
         // Icicles
         if (path.contains("icicle")) {
-            int icicleCount = tag.getInt("BS_IciclesPlaced") + 1;
-            tag.putInt("BS_IciclesPlaced", icicleCount);
-            if (icicleCount >= 10) grant(serverPlayer, "chill_out");
+            serverPlayer.awardStat(com.kingodogo.buildscape.stat.ModStats.ICICLES_PLACED);
+            int icicleCount = serverPlayer.getStats().getValue(net.minecraft.stats.Stats.CUSTOM, com.kingodogo.buildscape.stat.ModStats.ICICLES_PLACED);
+            if (checkRelativeMilestone(serverPlayer, "chill_out", 10, icicleCount)) {
+                // Awarded
+            }
         }
 
         // Ornaments
         if (path.contains("ornament")) {
-            int ornCount = tag.getInt("BS_OrnamentsPlaced") + 1;
-            tag.putInt("BS_OrnamentsPlaced", ornCount);
-            if (ornCount >= 100 && grant(serverPlayer, "ornamental")) {
+            serverPlayer.awardStat(com.kingodogo.buildscape.stat.ModStats.ORNAMENTS_PLACED);
+            int ornCount = serverPlayer.getStats().getValue(net.minecraft.stats.Stats.CUSTOM, com.kingodogo.buildscape.stat.ModStats.ORNAMENTS_PLACED);
+            if (checkRelativeMilestone(serverPlayer, "ornamental", 100, ornCount)) {
                 giveItemReward(serverPlayer, ModItems.RED_ORNAMENT.get(), 1);
-                // TODO: Award Festive Scroll when registered
             }
         }
 
         // String Lights
         if (path.contains("string_light")) {
-            int lightCount = tag.getInt("BS_StringLightsPlaced") + 1;
-            tag.putInt("BS_StringLightsPlaced", lightCount);
-            if (lightCount >= 100 && grant(serverPlayer, "light_em_up")) {
+            serverPlayer.awardStat(com.kingodogo.buildscape.stat.ModStats.STRING_LIGHTS_PLACED);
+            int lightCount = serverPlayer.getStats().getValue(net.minecraft.stats.Stats.CUSTOM, com.kingodogo.buildscape.stat.ModStats.STRING_LIGHTS_PLACED);
+            if (checkRelativeMilestone(serverPlayer, "light_em_up", 100, lightCount)) {
                 giveItemReward(serverPlayer, ModItems.MULTICOLOR_STRING_LIGHT.get(), 1);
-                // TODO: Award Prism Light Template when registered
             }
         }
 
         // Stars
         if (path.contains("_star")) {
-            int starCount = tag.getInt("BS_StarsPlaced") + 1;
-            tag.putInt("BS_StarsPlaced", starCount);
-            if (starCount >= 100 && grant(serverPlayer, "santas_little_helper")) {
+            serverPlayer.awardStat(com.kingodogo.buildscape.stat.ModStats.STARS_PLACED);
+            int starCount = serverPlayer.getStats().getValue(net.minecraft.stats.Stats.CUSTOM, com.kingodogo.buildscape.stat.ModStats.STARS_PLACED);
+            if (checkRelativeMilestone(serverPlayer, "santas_little_helper", 100, starCount)) {
                 giveItemReward(serverPlayer, ModItems.GLOW_STAR.get(), 1);
-                // TODO: Award Starlight Template when registered
             }
         }
 
         // Snowy Leaves
         if (path.startsWith("snowy_")) {
-            int snowCount = tag.getInt("BS_SnowyLeavesPlaced") + 1;
-            tag.putInt("BS_SnowyLeavesPlaced", snowCount);
-            if (snowCount >= 100 && grant(serverPlayer, "a_white_christmas")) {
+            serverPlayer.awardStat(com.kingodogo.buildscape.stat.ModStats.SNOWY_LEAVES_PLACED);
+            int snowCount = serverPlayer.getStats().getValue(net.minecraft.stats.Stats.CUSTOM, com.kingodogo.buildscape.stat.ModStats.SNOWY_LEAVES_PLACED);
+            if (checkRelativeMilestone(serverPlayer, "a_white_christmas", 100, snowCount)) {
                 giveItemReward(serverPlayer, ModItems.SNOWY_SPRUCE_LEAVES.get(), 1);
-                // TODO: Award Frost Scroll when registered
             }
         }
 
@@ -190,26 +219,27 @@ public class AdvancementEvents {
     }
 
     private static void checkPillars(ServerPlayer player, Level level, BlockPos pos, Block pillarBlock) {
-        // Check 4 adjacent or stacked pillars of same type
-        int sameTypeCount = 0;
-        for (BlockPos check : new BlockPos[]{pos.above(), pos.below(), pos.north(), pos.south(), pos.east(), pos.west()}) {
-            if (level.getBlockState(check).is(pillarBlock)) {
-                sameTypeCount++;
+        CompoundTag tag = player.getPersistentData();
+        ResourceLocation reg = pillarBlock.getRegistryName();
+        if (reg != null) {
+            String path = reg.getPath();
+            int samePillarCount = tag.getInt("BS_PillarPlaced_" + path) + 1;
+            tag.putInt("BS_PillarPlaced_" + path, samePillarCount);
+
+            if (checkRelativeMilestone(player, "support_system", 4, samePillarCount)) {
+                // Granted 4 pillars milestone
             }
         }
-        if (sameTypeCount >= 3) {
-            grant(player, "support_system");
-        }
 
-        // Check vertical pillar height
+        // Check vertical pillar height (any pillar type) for 50-block high pillar
         int height = 1;
         BlockPos current = pos.below();
-        while (level.getBlockState(current).getBlock() instanceof PillarBlock) {
+        while (level.getBlockState(current).getBlock() instanceof PillarBlock || level.getBlockState(current).getBlock() instanceof AshenKingPillarBlock) {
             height++;
             current = current.below();
         }
         current = pos.above();
-        while (level.getBlockState(current).getBlock() instanceof PillarBlock) {
+        while (level.getBlockState(current).getBlock() instanceof PillarBlock || level.getBlockState(current).getBlock() instanceof AshenKingPillarBlock) {
             height++;
             current = current.above();
         }
@@ -220,7 +250,7 @@ public class AdvancementEvents {
 
         if (pos.getY() >= level.getMaxBuildHeight() - 1) {
             if (grant(player, "reach_for_the_sky")) {
-                // TODO: Award Pillar Master Trophy when registered
+                giveItemReward(player, ModItems.TEST_TROPHY.get(), 1);
             }
         }
     }
@@ -234,35 +264,31 @@ public class AdvancementEvents {
         if (reg == null) return;
         String path = reg.getPath();
 
-        CompoundTag tag = serverPlayer.getPersistentData();
-
         if (path.contains("jar")) {
-            int jars = tag.getInt("BS_JarsCrafted") + itemStack.getCount();
-            tag.putInt("BS_JarsCrafted", jars);
-            if (jars >= 100 && grant(serverPlayer, "jar_ring_display")) {
-                // TODO: Award Glassmaker Trophy when registered
+            serverPlayer.awardStat(com.kingodogo.buildscape.stat.ModStats.JARS_CRAFTED, itemStack.getCount());
+            int jars = serverPlayer.getStats().getValue(net.minecraft.stats.Stats.CUSTOM, com.kingodogo.buildscape.stat.ModStats.JARS_CRAFTED);
+            if (checkRelativeMilestone(serverPlayer, "jar_ring_display", 100, jars)) {
+                giveItemReward(serverPlayer, ModItems.TEST_TROPHY.get(), 1);
             }
         }
 
         if (path.contains("festive_stocking") || path.contains("stocking")) {
-            int stockings = tag.getInt("BS_StockingsCrafted") + itemStack.getCount();
-            tag.putInt("BS_StockingsCrafted", stockings);
-            if (stockings >= 365 && grant(serverPlayer, "christmas_every_day")) {
+            serverPlayer.awardStat(com.kingodogo.buildscape.stat.ModStats.STOCKINGS_CRAFTED, itemStack.getCount());
+            int stockings = serverPlayer.getStats().getValue(net.minecraft.stats.Stats.CUSTOM, com.kingodogo.buildscape.stat.ModStats.STOCKINGS_CRAFTED);
+            if (checkRelativeMilestone(serverPlayer, "christmas_every_day", 365, stockings)) {
                 giveItemReward(serverPlayer, ModItems.FESTIVE_STOCKING.get(), 1);
-                // TODO: Award Golden Shears item (Special Tool to craft Golden Stocking) when registered
             }
         }
     }
 
     public static void onHammerReplace(ServerPlayer player) {
         if (player == null) return;
-        CompoundTag tag = player.getPersistentData();
-        int count = tag.getInt("BS_HammerReplaced") + 1;
-        tag.putInt("BS_HammerReplaced", count);
+        player.awardStat(com.kingodogo.buildscape.stat.ModStats.HAMMER_USED);
+        int count = player.getStats().getValue(net.minecraft.stats.Stats.CUSTOM, com.kingodogo.buildscape.stat.ModStats.HAMMER_USED);
 
         grant(player, "fixer_upper");
-        if (count >= 1000 && grant(player, "hammer_time")) {
-            // TODO: Award Architect Trophy when registered
+        if (checkRelativeMilestone(player, "hammer_time", 1000, count)) {
+            giveItemReward(player, ModItems.TEST_TROPHY.get(), 1);
         }
     }
 }

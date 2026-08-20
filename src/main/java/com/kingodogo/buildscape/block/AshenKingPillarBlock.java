@@ -347,6 +347,10 @@ public class AshenKingPillarBlock extends PillarBlock {
             }
             pillarBE.setDisplayedItem(displayItem, facingYaw);
 
+            if (player instanceof net.minecraft.server.level.ServerPlayer serverPlayer) {
+                com.kingodogo.buildscape.event.AdvancementEvents.onPillarItemInserted(serverPlayer);
+            }
+
             if (pillarBE.getParticlePattern() == null) {
                 com.kingodogo.buildscape.config.PillarParticleConfig cfg =
                         com.kingodogo.buildscape.config.PillarParticleConfig.get();

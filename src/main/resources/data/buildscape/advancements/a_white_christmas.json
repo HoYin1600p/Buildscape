@@ -14,7 +14,7 @@
     "announce_to_chat": true,
     "hidden": false
   },
-  "parent": "buildscape:root",
+  "parent": "buildscape:a_star_is_born",
   "rewards": {
     "items": [
       {

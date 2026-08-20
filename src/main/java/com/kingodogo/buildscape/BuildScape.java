@@ -86,6 +86,7 @@ public class BuildScape {
         com.kingodogo.buildscape.world.ModGameRules.register();
 
         event.enqueueWork(() -> {
+            com.kingodogo.buildscape.stat.ModStats.registerStats();
             com.kingodogo.buildscape.network.ModMessages.register();
             try {
                 // Only set base max stack size for POTION item - the ItemMixin restricts this to water bottles only

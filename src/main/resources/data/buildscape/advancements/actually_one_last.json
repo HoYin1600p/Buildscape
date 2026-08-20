@@ -1,7 +1,7 @@
 {
   "display": {
     "icon": {
-      "item": "buildscape:smooth_cardboard_block"
+      "item": "buildscape:ashpen_light_blue_planks"
     },
     "title": {
       "translate": "advancements.buildscape.actually_one_last.title"
@@ -16,8 +16,43 @@
   },
   "parent": "buildscape:okay_one_more",
   "criteria": {
-    "custom": {
+    "red_planks": {
+      "trigger": "minecraft:item_used_on_block",
+      "conditions": {
+        "item": {
+          "items": [
+            "buildscape:ashpen_red_planks"
+          ]
+        }
+      }
+    },
+    "lime_planks": {
+      "trigger": "minecraft:item_used_on_block",
+      "conditions": {
+        "item": {
+          "items": [
+            "buildscape:ashpen_lime_planks"
+          ]
+        }
+      }
+    },
+    "light_blue_planks": {
+      "trigger": "minecraft:item_used_on_block",
+      "conditions": {
+        "item": {
+          "items": [
+            "buildscape:ashpen_light_blue_planks"
+          ]
+        }
+      }
+    },
+    "impossible": {
       "trigger": "minecraft:impossible"
     }
-  }
+  },
+  "requirements": [
+    [
+      "impossible"
+    ]
+  ]
 }

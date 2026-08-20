@@ -1,7 +1,7 @@
 {
   "display": {
     "icon": {
-      "item": "buildscape:icicle"
+      "item": "buildscape:icicle_block"
     },
     "title": {
       "translate": "advancements.buildscape.chill_out.title"

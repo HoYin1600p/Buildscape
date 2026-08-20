@@ -14,7 +14,7 @@
     "announce_to_chat": true,
     "hidden": false
   },
-  "parent": "buildscape:a_star_is_born",
+  "parent": "buildscape:a_white_christmas",
   "rewards": {
     "items": [
       {

@@ -12001,6 +12001,10 @@ public static final RegistryObject<Item> FLAMING_STEEL_INGOT = ITEMS.register("f
             "poplar_shelf",
             () -> new BlockItem(ModBlocks.POPLAR_SHELF.get(), createBlockItemProperties())
     );
+    public static final RegistryObject<Item> TEST_TROPHY = ITEMS.register(
+            "test_trophy",
+            () -> new Item(new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB))
+    );
 }
 
 

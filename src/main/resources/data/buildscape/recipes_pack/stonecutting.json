@@ -1,9 +1,5 @@
 {
-  "aliases": {
-    "BS": "buildscape:",
-    "MC": "minecraft:",
-    "F": "forge:"
-  },
+  "aliases": {"BS": "buildscape:", "MC": "minecraft:", "F": "forge:"},
   "stonecutting_reversible": [
     ["MC:chain", "BS:ancient_steel_chain", 1],
     ["BS:bit_copper_block", "BS:bit_chiseled_copper", 1],

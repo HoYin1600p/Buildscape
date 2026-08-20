@@ -1,0 +1,30 @@
+{
+  "display": {
+    "icon": {
+      "item": "buildscape:ashenking_diamond_pillar"
+    },
+    "title": {
+      "translate": "advancements.buildscape.art_collector.title"
+    },
+    "description": {
+      "translate": "advancements.buildscape.art_collector.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "parent": "buildscape:columnist",
+  "rewards": {
+    "items": [
+      {
+        "item": "buildscape:ashenking_diamond_pillar"
+      }
+    ]
+  },
+  "criteria": {
+    "custom": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

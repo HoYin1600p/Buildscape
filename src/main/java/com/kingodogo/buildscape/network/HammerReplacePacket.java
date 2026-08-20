@@ -102,6 +102,7 @@ public class HammerReplacePacket {
             // Place the replacement block
             BlockState newState = replacementBlock.defaultBlockState();
             level.setBlock(pos, newState, 3);
+            com.kingodogo.buildscape.event.AdvancementEvents.onHammerReplace(player);
 
             // Consume one block from offhand
             if (!player.isCreative()) {

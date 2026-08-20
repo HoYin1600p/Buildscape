@@ -1,0 +1,32 @@
+{
+  "display": {
+    "icon": {
+      "item": "buildscape:steel_ingot"
+    },
+    "title": {
+      "translate": "advancements.buildscape.metalhead.title"
+    },
+    "description": {
+      "translate": "advancements.buildscape.metalhead.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "parent": "buildscape:root",
+  "criteria": {
+    "has_steel_ingot": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "buildscape:steel_ingot"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "display": {
+    "icon": {
+      "item": "buildscape:ashenking_emerald_pillar"
+    },
+    "title": {
+      "translate": "advancements.buildscape.columnist.title"
+    },
+    "description": {
+      "translate": "advancements.buildscape.columnist.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "parent": "buildscape:put_it_on_display",
+  "rewards": {
+    "items": [
+      {
+        "item": "buildscape:ashenking_emerald_pillar"
+      }
+    ]
+  },
+  "criteria": {
+    "custom": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

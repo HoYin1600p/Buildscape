@@ -1,0 +1,49 @@
+{
+  "display": {
+    "icon": {
+      "item": "buildscape:spool"
+    },
+    "title": {
+      "translate": "advancements.buildscape.string_theory.title"
+    },
+    "description": {
+      "translate": "advancements.buildscape.string_theory.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "parent": "buildscape:root",
+  "criteria": {
+    "has_item": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "buildscape:spool",
+              "buildscape:glowing_spool",
+              "buildscape:white_spool",
+              "buildscape:orange_spool",
+              "buildscape:magenta_spool",
+              "buildscape:light_blue_spool",
+              "buildscape:yellow_spool",
+              "buildscape:lime_spool",
+              "buildscape:pink_spool",
+              "buildscape:gray_spool",
+              "buildscape:light_gray_spool",
+              "buildscape:cyan_spool",
+              "buildscape:purple_spool",
+              "buildscape:blue_spool",
+              "buildscape:brown_spool",
+              "buildscape:green_spool",
+              "buildscape:red_spool",
+              "buildscape:black_spool"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

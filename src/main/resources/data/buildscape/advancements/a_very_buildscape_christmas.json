@@ -14,7 +14,7 @@
     "announce_to_chat": true,
     "hidden": false
   },
-  "parent": "buildscape:christmas_every_day",
+  "parent": "buildscape:light_em_up",
   "rewards": {
     "items": [
       {
@@ -41,7 +41,23 @@
         "items": [
           {
             "items": [
-              "buildscape:red_ornament"
+              "buildscape:white_ornament",
+              "buildscape:orange_ornament",
+              "buildscape:magenta_ornament",
+              "buildscape:light_blue_ornament",
+              "buildscape:yellow_ornament",
+              "buildscape:lime_ornament",
+              "buildscape:pink_ornament",
+              "buildscape:gray_ornament",
+              "buildscape:light_gray_ornament",
+              "buildscape:cyan_ornament",
+              "buildscape:purple_ornament",
+              "buildscape:blue_ornament",
+              "buildscape:brown_ornament",
+              "buildscape:green_ornament",
+              "buildscape:red_ornament",
+              "buildscape:black_ornament",
+              "buildscape:glass_ornament"
             ]
           }
         ]

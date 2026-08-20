@@ -1,0 +1,30 @@
+{
+  "display": {
+    "icon": {
+      "item": "buildscape:snowy_spruce_leaves"
+    },
+    "title": {
+      "translate": "advancements.buildscape.a_white_christmas.title"
+    },
+    "description": {
+      "translate": "advancements.buildscape.a_white_christmas.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "parent": "buildscape:root",
+  "rewards": {
+    "items": [
+      {
+        "item": "buildscape:snowy_spruce_leaves"
+      }
+    ]
+  },
+  "criteria": {
+    "custom": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

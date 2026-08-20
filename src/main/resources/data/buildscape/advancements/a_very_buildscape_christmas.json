@@ -1,0 +1,87 @@
+{
+  "display": {
+    "icon": {
+      "item": "buildscape:red_ornament"
+    },
+    "title": {
+      "translate": "advancements.buildscape.a_very_buildscape_christmas.title"
+    },
+    "description": {
+      "translate": "advancements.buildscape.a_very_buildscape_christmas.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "parent": "buildscape:christmas_every_day",
+  "rewards": {
+    "items": [
+      {
+        "item": "buildscape:festive_wandering_homemaker_spawn_egg"
+      }
+    ]
+  },
+  "criteria": {
+    "has_item_0": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "buildscape:festive_stocking"
+            ]
+          }
+        ]
+      }
+    },
+    "has_item_1": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "buildscape:red_ornament"
+            ]
+          }
+        ]
+      }
+    },
+    "has_item_2": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "buildscape:multicolor_string_light"
+            ]
+          }
+        ]
+      }
+    },
+    "has_item_3": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "buildscape:glow_star"
+            ]
+          }
+        ]
+      }
+    },
+    "has_item_4": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "buildscape:snowy_spruce_leaves"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

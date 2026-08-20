@@ -1,5 +1,6 @@
 package com.kingodogo.buildscape.item;
 
+import net.minecraft.advancements.Advancement;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
@@ -373,6 +374,12 @@ public class BiomeBrushItem extends Item {
                 Component biomeName = new TranslatableComponent("biome." + biomeKey.getNamespace() + "." + biomeKey.getPath());
                 player.displayClientMessage(new TranslatableComponent("message.buildscape.biome_brush.captured", biomeName).withStyle(ChatFormatting.GREEN), true);
                 level.playSound(null, clickedPos, SoundEvents.BOTTLE_FILL_DRAGONBREATH, SoundSource.PLAYERS, 1.0f, 1.2f);
+                if (player instanceof ServerPlayer serverPlayer) {
+                    Advancement adv = serverPlayer.getServer().getAdvancements().getAdvancement(new ResourceLocation("buildscape", "touch_grass"));
+                    if (adv != null) {
+                        serverPlayer.getAdvancements().award(adv, "capture_biome");
+                    }
+                }
             }
         } else {
             // Set Position 1

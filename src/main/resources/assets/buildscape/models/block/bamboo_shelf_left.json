@@ -2,6 +2,6 @@
   "parent": "buildscape:block/template_shelf_left",
   "textures": {
     "all": "buildscape:block/bamboo_shelf",
-    "particle": "buildscape:block/stripped_bamboo_block"
+    "particle": "buildscape:block/bamboo_block"
   }
 }

@@ -11989,6 +11989,10 @@ public static final RegistryObject<Item> FLAMING_STEEL_INGOT = ITEMS.register("f
             "bamboo_shelf",
             () -> new BlockItem(ModBlocks.BAMBOO_SHELF.get(), createBlockItemProperties())
     );
+    public static final RegistryObject<Item> STRIPPED_BAMBOO_SHELF = ITEMS.register(
+            "stripped_bamboo_shelf",
+            () -> new BlockItem(ModBlocks.STRIPPED_BAMBOO_SHELF.get(), createBlockItemProperties())
+    );
     public static final RegistryObject<Item> PALE_OAK_SHELF = ITEMS.register(
             "pale_oak_shelf",
             () -> new BlockItem(ModBlocks.PALE_OAK_SHELF.get(), createBlockItemProperties())

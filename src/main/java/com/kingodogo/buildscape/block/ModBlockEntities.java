@@ -248,6 +248,7 @@ public class ModBlockEntities {
                             ModBlocks.CRIMSON_SHELF.get(),
                             ModBlocks.WARPED_SHELF.get(),
                             ModBlocks.BAMBOO_SHELF.get(),
+                            ModBlocks.STRIPPED_BAMBOO_SHELF.get(),
                             ModBlocks.PALE_OAK_SHELF.get(),
                             ModBlocks.POPLAR_SHELF.get()
                     ).build(null));

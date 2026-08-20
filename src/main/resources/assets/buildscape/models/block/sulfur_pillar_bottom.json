@@ -2,6 +2,6 @@
   "parent": "buildscape:block/pillar_bottom",
   "textures": {
     "2": "buildscape:block/sulfur_pillar_bottom",
-    "particle": "buildscape:block/sulfur"
+    "particle": "buildscape:block/polished_sulfur"
   }
 }

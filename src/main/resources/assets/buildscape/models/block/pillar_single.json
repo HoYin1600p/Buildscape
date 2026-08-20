@@ -6,7 +6,7 @@
   ],
   "textures": {
     "1": "buildscape:block/stone_pillar_base",
-    "particle": "buildscape:block/stone_pillar_base"
+    "particle": "minecraft:block/stone"
   },
   "elements": [
     {

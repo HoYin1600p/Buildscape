@@ -1,0 +1,32 @@
+{
+  "display": {
+    "icon": {
+      "item": "buildscape:jar"
+    },
+    "title": {
+      "translate": "advancements.buildscape.can_i_interest_you_in_a_jar.title"
+    },
+    "description": {
+      "translate": "advancements.buildscape.can_i_interest_you_in_a_jar.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "parent": "buildscape:root",
+  "criteria": {
+    "has_item": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "buildscape:jar"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

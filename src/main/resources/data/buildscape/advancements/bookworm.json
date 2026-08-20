@@ -1,0 +1,49 @@
+{
+  "display": {
+    "icon": {
+      "item": "buildscape:big_book"
+    },
+    "title": {
+      "translate": "advancements.buildscape.bookworm.title"
+    },
+    "description": {
+      "translate": "advancements.buildscape.bookworm.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "parent": "buildscape:root",
+  "criteria": {
+    "has_item": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "buildscape:big_book",
+              "buildscape:glowing_big_book",
+              "buildscape:white_big_book",
+              "buildscape:orange_big_book",
+              "buildscape:magenta_big_book",
+              "buildscape:light_blue_big_book",
+              "buildscape:yellow_big_book",
+              "buildscape:lime_big_book",
+              "buildscape:pink_big_book",
+              "buildscape:gray_big_book",
+              "buildscape:light_gray_big_book",
+              "buildscape:cyan_big_book",
+              "buildscape:purple_big_book",
+              "buildscape:blue_big_book",
+              "buildscape:brown_big_book",
+              "buildscape:green_big_book",
+              "buildscape:red_big_book",
+              "buildscape:black_big_book"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

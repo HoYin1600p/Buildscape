@@ -1,0 +1,23 @@
+{
+  "display": {
+    "icon": {
+      "item": "buildscape:pressed_cardboard"
+    },
+    "title": {
+      "translate": "advancements.buildscape.okay_one_more.title"
+    },
+    "description": {
+      "translate": "advancements.buildscape.okay_one_more.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "parent": "buildscape:one_more_block",
+  "criteria": {
+    "custom": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "display": {
+    "icon": {
+      "item": "buildscape:glow_star"
+    },
+    "title": {
+      "translate": "advancements.buildscape.santas_little_helper.title"
+    },
+    "description": {
+      "translate": "advancements.buildscape.santas_little_helper.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "parent": "buildscape:a_star_is_born",
+  "rewards": {
+    "items": [
+      {
+        "item": "buildscape:glow_star"
+      }
+    ]
+  },
+  "criteria": {
+    "custom": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

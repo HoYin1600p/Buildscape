@@ -4,6 +4,9 @@
     "buildscape:red_moss_block",
     "buildscape:orange_moss_block",
     "buildscape:yellow_moss_block",
-    "buildscape:pale_moss_block"
+    "buildscape:pale_moss_block",
+    "buildscape:mud",
+    "buildscape:muddy_mangrove_roots",
+    "minecraft:moss_block"
   ]
 }

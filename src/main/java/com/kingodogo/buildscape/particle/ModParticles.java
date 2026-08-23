@@ -80,4 +80,7 @@ public class ModParticles {
                     return GeyserParticleOptions.CODEC;
                 }
             });
+
+    public static final RegistryObject<net.minecraft.core.particles.SimpleParticleType> XP_PARTICLE =
+            PARTICLES.register("xp_particle", () -> new net.minecraft.core.particles.SimpleParticleType(false));
 }

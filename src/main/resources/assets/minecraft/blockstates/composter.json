@@ -1,0 +1,108 @@
+{
+  "multipart": [
+    {
+      "when": { "planter": "none" },
+      "apply": { "model": "minecraft:block/composter" }
+    },
+    {
+      "when": { "planter": "none", "level": "1" },
+      "apply": { "model": "minecraft:block/composter_contents1" }
+    },
+    {
+      "when": { "planter": "none", "level": "2" },
+      "apply": { "model": "minecraft:block/composter_contents2" }
+    },
+    {
+      "when": { "planter": "none", "level": "3" },
+      "apply": { "model": "minecraft:block/composter_contents3" }
+    },
+    {
+      "when": { "planter": "none", "level": "4" },
+      "apply": { "model": "minecraft:block/composter_contents4" }
+    },
+    {
+      "when": { "planter": "none", "level": "5" },
+      "apply": { "model": "minecraft:block/composter_contents5" }
+    },
+    {
+      "when": { "planter": "none", "level": "6" },
+      "apply": { "model": "minecraft:block/composter_contents6" }
+    },
+    {
+      "when": { "planter": "none", "level": "7" },
+      "apply": { "model": "minecraft:block/composter_contents7" }
+    },
+    {
+      "when": { "planter": "none", "level": "8" },
+      "apply": { "model": "minecraft:block/composter_contents_ready" }
+    },
+    {
+      "when": { "planter": "dirt" },
+      "apply": { "model": "buildscape:block/planter_dirt" }
+    },
+    {
+      "when": { "planter": "coarse_dirt" },
+      "apply": { "model": "buildscape:block/planter_coarse_dirt" }
+    },
+    {
+      "when": { "planter": "mud" },
+      "apply": { "model": "buildscape:block/planter_mud" }
+    },
+    {
+      "when": { "planter": "moss_block" },
+      "apply": { "model": "buildscape:block/planter_moss_block" }
+    },
+    {
+      "when": { "planter": "rooted_dirt" },
+      "apply": { "model": "buildscape:block/planter_rooted_dirt" }
+    },
+    {
+      "when": { "planter": "red_moss_block" },
+      "apply": { "model": "buildscape:block/planter_red_moss_block" }
+    },
+    {
+      "when": { "planter": "yellow_moss_block" },
+      "apply": { "model": "buildscape:block/planter_yellow_moss_block" }
+    },
+    {
+      "when": { "planter": "orange_moss_block" },
+      "apply": { "model": "buildscape:block/planter_orange_moss_block" }
+    },
+    {
+      "when": { "planter": "pale_moss_block" },
+      "apply": { "model": "buildscape:block/planter_pale_moss_block" }
+    },
+    {
+      "when": { "planter": "muddy_mangrove_roots" },
+      "apply": { "model": "buildscape:block/planter_muddy_mangrove_roots" }
+    },
+    {
+      "when": { "planter": "grass_block" },
+      "apply": { "model": "buildscape:block/planter_grass_block" }
+    },
+    {
+      "when": { "planter": "mycelium" },
+      "apply": { "model": "buildscape:block/planter_mycelium" }
+    },
+    {
+      "when": { "planter": "podzol" },
+      "apply": { "model": "buildscape:block/planter_podzol" }
+    },
+    {
+      "when": { "planter": "snowy_grass_block" },
+      "apply": { "model": "buildscape:block/planter_snowy_grass_block" }
+    },
+    {
+      "when": { "planter": "crimson_nylium" },
+      "apply": { "model": "buildscape:block/planter_crimson_nylium" }
+    },
+    {
+      "when": { "planter": "warped_nylium" },
+      "apply": { "model": "buildscape:block/planter_warped_nylium" }
+    },
+    {
+      "when": { "planter": "sand" },
+      "apply": { "model": "buildscape:block/planter_sand" }
+    }
+  ]
+}

@@ -25,8 +25,6 @@ public class MangroveLeavesBlock
         implements BonemealableBlock {
 
 
-    private static final ThreadLocal<Direction> BONEMEAL_DIRECTION = new ThreadLocal<>();
-
     public MangroveLeavesBlock(BlockBehaviour.Properties properties) {
         super(properties);
         this.registerDefaultState(
@@ -46,23 +44,6 @@ public class MangroveLeavesBlock
             InteractionHand hand,
             BlockHitResult hit
     ) {
-        ItemStack itemStack = player.getItemInHand(hand);
-
-        if (itemStack.getItem() instanceof BoneMealItem) {
-            Direction clickedDirection = hit.getDirection();
-            BONEMEAL_DIRECTION.set(clickedDirection);
-
-            try {
-                if (clickedDirection != Direction.DOWN) {
-                    return InteractionResult.SUCCESS;
-                }
-
-                return InteractionResult.PASS;
-            } finally {
-                BONEMEAL_DIRECTION.remove();
-            }
-        }
-
         return InteractionResult.PASS;
     }
 
@@ -74,11 +55,6 @@ public class MangroveLeavesBlock
             BlockState state,
             boolean isClient
     ) {
-        Direction bonemealDirection = BONEMEAL_DIRECTION.get();
-        if (bonemealDirection != null && bonemealDirection != Direction.DOWN) {
-            return false;
-        }
-
         BlockPos belowPos = pos.below();
         BlockState belowState = level.getBlockState(belowPos);
 
@@ -129,31 +105,19 @@ public class MangroveLeavesBlock
         }
 
         if (belowState.isAir() || belowState.is(Blocks.WATER)) {
-            boolean canPlace = true;
-            for (int i = 1; i <= 2; i++) {
-                BlockPos checkPos = belowPos.below(i);
-                BlockState checkState = level.getBlockState(checkPos);
-                if (!checkState.isAir() && !checkState.is(Blocks.WATER)) {
-                    canPlace = false;
-                    break;
-                }
+            BlockState propaguleState = ModBlocks.MANGROVE_PROPAGULE.get()
+                    .defaultBlockState()
+                    .setValue(MangrovePropaguleBlock.AGE, 0)
+                    .setValue(MangrovePropaguleBlock.HANGING, true);
+
+            if (belowState.is(Blocks.WATER)) {
+                propaguleState = propaguleState.setValue(
+                        MangrovePropaguleBlock.WATERLOGGED,
+                        true
+                );
             }
 
-            if (canPlace) {
-                BlockState propaguleState = ModBlocks.MANGROVE_PROPAGULE.get()
-                        .defaultBlockState()
-                        .setValue(MangrovePropaguleBlock.AGE, 0)
-                        .setValue(MangrovePropaguleBlock.HANGING, true);
-
-                if (belowState.is(Blocks.WATER)) {
-                    propaguleState = propaguleState.setValue(
-                            MangrovePropaguleBlock.WATERLOGGED,
-                            true
-                    );
-                }
-
-                level.setBlock(belowPos, propaguleState, 3);
-            }
+            level.setBlock(belowPos, propaguleState, 3);
         }
     }
 

@@ -12005,6 +12005,14 @@ public static final RegistryObject<Item> FLAMING_STEEL_INGOT = ITEMS.register("f
             "test_trophy",
             () -> new Item(new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB))
     );
+
+    public static final RegistryObject<Item> EXPERIENCE_BUCKET = ITEMS.register(
+            "experience_bucket",
+            () -> new ExperienceBucketItem(
+                    () -> com.kingodogo.buildscape.fluid.ModFluids.EXPERIENCE_STILL.get(),
+                    new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB).stacksTo(1).craftRemainder(net.minecraft.world.item.Items.BUCKET)
+            )
+    );
 }
 
 

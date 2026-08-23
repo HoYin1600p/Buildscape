@@ -5835,5 +5835,10 @@
   "stat.buildscape.stars_placed": "Stars Placed",
   "stat.buildscape.snowy_leaves_placed": "Snowy Leaves Placed",
   "stat.buildscape.jars_crafted": "Jars Crafted",
-  "stat.buildscape.stockings_crafted": "Stockings Crafted"
+  "stat.buildscape.stockings_crafted": "Stockings Crafted",
+  "fluid.buildscape.experience_still": "Experience",
+  "fluid.buildscape.experience_flowing": "Experience",
+  "block.buildscape.experience_liquid": "Experience",
+  "block.buildscape.experience_cauldron": "Experience Cauldron",
+  "item.buildscape.experience_bucket": "Bucket of Experience"
 }

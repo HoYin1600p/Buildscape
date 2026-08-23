@@ -11,8 +11,13 @@
           "functions": [
             {
               "function": "minecraft:set_count",
+              "count": 0.0,
+              "add": false
+            },
+            {
+              "function": "minecraft:set_count",
               "count": 1.0,
-              "add": false,
+              "add": true,
               "conditions": [
                 {
                   "condition": "minecraft:block_state_property",

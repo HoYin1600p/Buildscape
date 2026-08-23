@@ -28,4 +28,14 @@ public class ExperienceCauldronBlock extends LayeredCauldronBlock {
             level.addParticle(ModParticles.XP_PARTICLE.get(), x, y, z, 0.0D, 0.0D, 0.0D);
         }
     }
+
+    @Override
+    public net.minecraft.world.item.ItemStack getCloneItemStack(net.minecraft.world.level.BlockGetter level, BlockPos pos, BlockState state) {
+        return new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.CAULDRON);
+    }
+
+    @Override
+    public net.minecraft.world.item.ItemStack getCloneItemStack(BlockState state, net.minecraft.world.phys.HitResult target, net.minecraft.world.level.BlockGetter level, BlockPos pos, net.minecraft.world.entity.player.Player player) {
+        return new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.CAULDRON);
+    }
 }

@@ -6075,6 +6075,126 @@ public class ModItems {
             () -> new BlockItem(ModBlocks.STEEL_BLOCK.get(), createBlockItemProperties())
     );
 
+    public static final RegistryObject<Item> STEEL_PIPE = ITEMS.register(
+            "steel_pipe",
+            () -> new BlockItem(ModBlocks.STEEL_PIPE.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> HOLLOW_STEEL_PIPE = ITEMS.register(
+            "hollow_steel_pipe",
+            () -> new BlockItem(ModBlocks.HOLLOW_STEEL_PIPE.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> SCRAPED_STEEL = ITEMS.register(
+            "scraped_steel",
+            () -> new BlockItem(ModBlocks.SCRAPED_STEEL.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> RUSTIC_SCRAPED_STEEL = ITEMS.register(
+            "rustic_scraped_steel",
+            () -> new BlockItem(ModBlocks.RUSTIC_SCRAPED_STEEL.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> STACKED_STEEL = ITEMS.register(
+            "stacked_steel",
+            () -> new BlockItem(ModBlocks.STACKED_STEEL.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> STEEL_PANELS = ITEMS.register(
+            "steel_panels",
+            () -> new BlockItem(ModBlocks.STEEL_PANELS.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> CROSSED_STEEL_PANELS = ITEMS.register(
+            "crossed_steel_panels",
+            () -> new BlockItem(ModBlocks.CROSSED_STEEL_PANELS.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> STEEL_MESH_BLOCK = ITEMS.register(
+            "steel_mesh_block",
+            () -> new BlockItem(ModBlocks.STEEL_MESH_BLOCK.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> STEEL_BOLTS = ITEMS.register(
+            "steel_bolts",
+            () -> new BlockItem(ModBlocks.STEEL_BOLTS.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> SCRAPED_STEEL_SLAB = ITEMS.register(
+            "scraped_steel_slab",
+            () -> new BlockItem(ModBlocks.SCRAPED_STEEL_SLAB.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> SCRAPED_STEEL_VERTICAL_SLAB = ITEMS.register(
+            "scraped_steel_vertical_slab",
+            () -> new BlockItem(ModBlocks.SCRAPED_STEEL_VERTICAL_SLAB.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> RUSTIC_SCRAPED_STEEL_SLAB = ITEMS.register(
+            "rustic_scraped_steel_slab",
+            () -> new BlockItem(ModBlocks.RUSTIC_SCRAPED_STEEL_SLAB.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> RUSTIC_SCRAPED_STEEL_VERTICAL_SLAB = ITEMS.register(
+            "rustic_scraped_steel_vertical_slab",
+            () -> new BlockItem(ModBlocks.RUSTIC_SCRAPED_STEEL_VERTICAL_SLAB.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> STACKED_STEEL_SLAB = ITEMS.register(
+            "stacked_steel_slab",
+            () -> new BlockItem(ModBlocks.STACKED_STEEL_SLAB.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> STACKED_STEEL_VERTICAL_SLAB = ITEMS.register(
+            "stacked_steel_vertical_slab",
+            () -> new BlockItem(ModBlocks.STACKED_STEEL_VERTICAL_SLAB.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> STACKED_STEEL_STAIRS = ITEMS.register(
+            "stacked_steel_stairs",
+            () -> new BlockItem(ModBlocks.STACKED_STEEL_STAIRS.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> STEEL_PANELS_SLAB = ITEMS.register(
+            "steel_panels_slab",
+            () -> new BlockItem(ModBlocks.STEEL_PANELS_SLAB.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> STEEL_PANELS_VERTICAL_SLAB = ITEMS.register(
+            "steel_panels_vertical_slab",
+            () -> new BlockItem(ModBlocks.STEEL_PANELS_VERTICAL_SLAB.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> STEEL_PANELS_STAIRS = ITEMS.register(
+            "steel_panels_stairs",
+            () -> new BlockItem(ModBlocks.STEEL_PANELS_STAIRS.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> CROSSED_STEEL_PANELS_SLAB = ITEMS.register(
+            "crossed_steel_panels_slab",
+            () -> new BlockItem(ModBlocks.CROSSED_STEEL_PANELS_SLAB.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> CROSSED_STEEL_PANELS_VERTICAL_SLAB = ITEMS.register(
+            "crossed_steel_panels_vertical_slab",
+            () -> new BlockItem(ModBlocks.CROSSED_STEEL_PANELS_VERTICAL_SLAB.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> STEEL_MESH_BLOCK_SLAB = ITEMS.register(
+            "steel_mesh_block_slab",
+            () -> new BlockItem(ModBlocks.STEEL_MESH_BLOCK_SLAB.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> STEEL_MESH_BLOCK_VERTICAL_SLAB = ITEMS.register(
+            "steel_mesh_block_vertical_slab",
+            () -> new BlockItem(ModBlocks.STEEL_MESH_BLOCK_VERTICAL_SLAB.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> STEEL_MESH_BLOCK_STAIRS = ITEMS.register(
+            "steel_mesh_block_stairs",
+            () -> new BlockItem(ModBlocks.STEEL_MESH_BLOCK_STAIRS.get(), createBlockItemProperties())
+    );
+
     public static final RegistryObject<Item> PRESSED_STEEL = ITEMS.register(
             "pressed_steel",
             () -> new BlockItem(ModBlocks.PRESSED_STEEL.get(), createBlockItemProperties())

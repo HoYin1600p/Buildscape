@@ -181,10 +181,19 @@ public class IcicleCauldronBlock extends CauldronBlock implements EntityBlock {
                             storedIcicle.copy()
                     );
                     itemEntity.setDefaultPickUpDelay();
-                    level.addFreshEntity(itemEntity);
                 }
             }
         }
         super.onRemove(state, level, pos, newState, isMoving);
+    }
+
+    @Override
+    public net.minecraft.world.item.ItemStack getCloneItemStack(net.minecraft.world.level.BlockGetter level, BlockPos pos, BlockState state) {
+        return new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.CAULDRON);
+    }
+
+    @Override
+    public net.minecraft.world.item.ItemStack getCloneItemStack(BlockState state, net.minecraft.world.phys.HitResult target, net.minecraft.world.level.BlockGetter level, BlockPos pos, Player player) {
+        return new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.CAULDRON);
     }
 }

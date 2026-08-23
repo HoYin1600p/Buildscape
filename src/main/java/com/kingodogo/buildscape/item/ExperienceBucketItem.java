@@ -47,8 +47,8 @@ public class ExperienceBucketItem extends BucketItem {
     public ItemStack finishUsingItem(ItemStack stack, Level level, LivingEntity entity) {
         if (entity instanceof Player player) {
             if (!level.isClientSide) {
-                // Grant 120-160 XP (average of 137 XP)
-                int xp = 120 + level.random.nextInt(41);
+                // Grant 25-30 XP (average ~27.5 XP)
+                int xp = 25 + level.random.nextInt(6);
                 player.giveExperiencePoints(xp);
             }
 

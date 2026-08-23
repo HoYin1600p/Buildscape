@@ -1,0 +1,10 @@
+{
+  "parent": "buildscape:block/planter_no_overlay_template",
+  "textures": {
+    "inside_top": "buildscape:block/muddy_mangrove_roots_top",
+    "inside_side": "buildscape:block/muddy_mangrove_roots_side",
+    "particle": "buildscape:block/muddy_mangrove_roots_side",
+    "inside": "minecraft:block/composter_bottom",
+    "inside_bottom": "buildscape:block/muddy_mangrove_roots_side"
+  }
+}

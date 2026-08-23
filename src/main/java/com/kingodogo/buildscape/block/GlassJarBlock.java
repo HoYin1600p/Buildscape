@@ -320,8 +320,10 @@ public class GlassJarBlock extends Block implements EntityBlock, SimpleWaterlogg
             if (jarBE.hasLiquid()) {
                 ItemStack liquidItem = jarBE.getStoredLiquidItem();
                 if (!liquidItem.isEmpty()) {
-                    // Do not allow consuming lava from jars
-                    if (liquidItem.is(Items.LAVA_BUCKET) || (liquidItem.getItem() instanceof net.minecraft.world.item.BucketItem bucket && bucket.getFluid() == net.minecraft.world.level.material.Fluids.LAVA)) {
+                    // Do not allow consuming lava or XP liquid from jars
+                    if (liquidItem.is(Items.LAVA_BUCKET) 
+                            || (liquidItem.getItem() instanceof net.minecraft.world.item.BucketItem bucket && bucket.getFluid() == net.minecraft.world.level.material.Fluids.LAVA)
+                            || GlassJarBlockEntity.isXpLiquid(liquidItem)) {
                         return InteractionResult.PASS;
                     }
 

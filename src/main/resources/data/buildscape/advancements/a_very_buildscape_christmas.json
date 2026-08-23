@@ -29,7 +29,23 @@
         "items": [
           {
             "items": [
-              "buildscape:festive_stocking"
+              "buildscape:festive_stocking",
+              "buildscape:white_festive_stocking",
+              "buildscape:orange_festive_stocking",
+              "buildscape:magenta_festive_stocking",
+              "buildscape:light_blue_festive_stocking",
+              "buildscape:yellow_festive_stocking",
+              "buildscape:lime_festive_stocking",
+              "buildscape:pink_festive_stocking",
+              "buildscape:gray_festive_stocking",
+              "buildscape:light_gray_festive_stocking",
+              "buildscape:cyan_festive_stocking",
+              "buildscape:purple_festive_stocking",
+              "buildscape:blue_festive_stocking",
+              "buildscape:brown_festive_stocking",
+              "buildscape:green_festive_stocking",
+              "buildscape:red_festive_stocking",
+              "buildscape:black_festive_stocking"
             ]
           }
         ]
@@ -41,6 +57,7 @@
         "items": [
           {
             "items": [
+              "buildscape:glass_ornament",
               "buildscape:white_ornament",
               "buildscape:orange_ornament",
               "buildscape:magenta_ornament",
@@ -69,7 +86,23 @@
         "items": [
           {
             "items": [
-              "buildscape:multicolor_string_light"
+              "buildscape:multicolor_string_light",
+              "buildscape:white_string_light",
+              "buildscape:orange_string_light",
+              "buildscape:magenta_string_light",
+              "buildscape:light_blue_string_light",
+              "buildscape:yellow_string_light",
+              "buildscape:lime_string_light",
+              "buildscape:pink_string_light",
+              "buildscape:gray_string_light",
+              "buildscape:light_gray_string_light",
+              "buildscape:cyan_string_light",
+              "buildscape:purple_string_light",
+              "buildscape:blue_string_light",
+              "buildscape:brown_string_light",
+              "buildscape:green_string_light",
+              "buildscape:red_string_light",
+              "buildscape:black_string_light"
             ]
           }
         ]
@@ -81,7 +114,23 @@
         "items": [
           {
             "items": [
-              "buildscape:glow_star"
+              "buildscape:glow_star",
+              "buildscape:white_star",
+              "buildscape:orange_star",
+              "buildscape:magenta_star",
+              "buildscape:light_blue_star",
+              "buildscape:yellow_star",
+              "buildscape:lime_star",
+              "buildscape:pink_star",
+              "buildscape:gray_star",
+              "buildscape:light_gray_star",
+              "buildscape:cyan_star",
+              "buildscape:purple_star",
+              "buildscape:blue_star",
+              "buildscape:brown_star",
+              "buildscape:green_star",
+              "buildscape:red_star",
+              "buildscape:black_star"
             ]
           }
         ]
@@ -93,7 +142,20 @@
         "items": [
           {
             "items": [
-              "buildscape:snowy_spruce_leaves"
+              "buildscape:snowy_oak_leaves",
+              "buildscape:snowy_spruce_leaves",
+              "buildscape:snowy_birch_leaves",
+              "buildscape:snowy_jungle_leaves",
+              "buildscape:snowy_acacia_leaves",
+              "buildscape:snowy_dark_oak_leaves",
+              "buildscape:snowy_mangrove_leaves",
+              "buildscape:snowy_cherry_leaves",
+              "buildscape:snowy_pale_oak_leaves",
+              "buildscape:snowy_poplar_yellow_leaves",
+              "buildscape:snowy_poplar_orange_leaves",
+              "buildscape:snowy_poplar_red_leaves",
+              "buildscape:snowy_azalea_leaves",
+              "buildscape:snowy_flowering_azalea_leaves"
             ]
           }
         ]

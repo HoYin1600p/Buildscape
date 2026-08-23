@@ -1,0 +1,6 @@
+{
+  "parent": "buildscape:block/planter_dirt_template",
+  "textures": {
+    "dirt": "minecraft:block/sand"
+  }
+}

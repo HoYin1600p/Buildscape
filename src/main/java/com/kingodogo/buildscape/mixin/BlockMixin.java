@@ -18,6 +18,9 @@ public class BlockMixin {
                 return state.setValue(BlockStateProperties.WATERLOGGED, false);
             }
         }
+        if (state.hasProperty(com.kingodogo.buildscape.block.PlanterHelper.PLANTER)) {
+            return state.setValue(com.kingodogo.buildscape.block.PlanterHelper.PLANTER, com.kingodogo.buildscape.block.PlanterHelper.PlanterType.NONE);
+        }
         return state;
     }
 }

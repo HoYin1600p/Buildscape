@@ -1,7 +1,10 @@
 {
-  "parent": "buildscape:block/template_hollow_metal_bottom",
-  "textures": {
-    "hole": "buildscape:block/steel_pipe_hole",
-    "side": "buildscape:block/steel_pipe_bottom"
-  }
+	"format_version": "1.21.6",
+	"credit": "Made with Blockbench",
+	"parent": "buildscape:block/template_solid_metal_bottom",
+	"textures": {
+		"1": "buildscape:block/steel_pipe_hole",
+		"side": "buildscape:block/steel_pipe_bottom",
+		"particle": "buildscape:block/steel_pipe_hole"
+	}
 }

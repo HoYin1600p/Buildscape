@@ -23397,6 +23397,16 @@
       1
     ],
     [
+      "BS:steel_nugget",
+      [
+        "I"
+      ],
+      {
+        "I": "BS:steel_ingot"
+      },
+      9
+    ],
+    [
       "BS:steel_mesh",
       [
         "NNN",

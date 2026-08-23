@@ -42,6 +42,7 @@ public final class BuildscapeRenderLayers {
         if (
                 path.contains("hollow") ||
                 path.contains("wallpaper_flat") ||
+                path.contains("steel_mesh_block") ||
                 path.endsWith("_leaf_layers") ||
                 path.endsWith("_decorated_pot") ||
                 path.endsWith("_festive_stocking") ||
@@ -128,6 +129,7 @@ public final class BuildscapeRenderLayers {
                     "snowy_large_fern",
                     "snowy_short_grass",
                     "snowy_tall_grass",
+                    "steel_bolts",
                     "straw_bed",
                     "sulfur_spike",
                     "ashenking_diamond_pillar",

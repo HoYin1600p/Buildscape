@@ -150,7 +150,10 @@ public class GlassJarBlock extends Block implements EntityBlock, SimpleWaterlogg
                 ItemStack liquid = ItemStack.of(beTag.getCompound("StoredLiquidItem"));
                 int levelAmount = beTag.getInt("LiquidLevel");
                 if (!liquid.isEmpty() && levelAmount > 0) {
-                    tooltip.add(new TextComponent("Stored Liquid: ").append(liquid.getHoverName()).append(" (" + levelAmount + "/16)").withStyle(ChatFormatting.GRAY));
+                    int maxLevel = GlassJarBlockEntity.isXpLiquid(liquid)
+                            ? GlassJarBlockEntity.XP_BOTTLE_MAX
+                            : GlassJarBlockEntity.MAX_LIQUID_LEVEL;
+                    tooltip.add(new TextComponent("Stored Liquid: ").append(liquid.getHoverName()).append(" (" + levelAmount + "/" + maxLevel + ")").withStyle(ChatFormatting.GRAY));
                 }
             }
         }
@@ -250,34 +253,51 @@ public class GlassJarBlock extends Block implements EntityBlock, SimpleWaterlogg
             }
 
             // B. Extract Potion/Honey bottle (Empty hand)
-            if (handStack.isEmpty() && jarBE.hasLiquid() && !jarBE.isBucketLiquid()) {
-                if (level.isClientSide) return InteractionResult.SUCCESS;
-                ItemStack bottle = jarBE.extractBottle();
-                if (!bottle.isEmpty()) {
-                    player.setItemInHand(hand, bottle);
-                    level.playSound(null, pos, SoundEvents.BOTTLE_FILL, SoundSource.BLOCKS, 1.0F, 1.0F);
-                    return InteractionResult.SUCCESS;
-                }
-            }
-
-            // C. Empty Bucket extraction (Requires full bucket liquid level 16)
-            if (handStack.is(Items.BUCKET) && jarBE.hasLiquid() && jarBE.isBucketLiquid() && jarBE.getLiquidLevel() >= 16) {
-                if (level.isClientSide) return InteractionResult.SUCCESS;
-                ItemStack filledBucket = jarBE.extractBucket();
-                if (!filledBucket.isEmpty()) {
-                    if (!player.getAbilities().instabuild) {
-                        handStack.shrink(1);
-                        if (!player.getInventory().add(filledBucket)) {
-                            player.drop(filledBucket, false);
-                        }
+            if (handStack.isEmpty() && jarBE.hasLiquid() && jarBE.getLiquidLevel() > 0) {
+                ItemStack bottleRepresentation = jarBE.getBottleRepresentation();
+                if (!bottleRepresentation.isEmpty()) {
+                    if (level.isClientSide) return InteractionResult.SUCCESS;
+                    ItemStack bottle = jarBE.extractBottle();
+                    if (!bottle.isEmpty()) {
+                        player.setItemInHand(hand, bottle);
+                        level.playSound(null, pos, SoundEvents.BOTTLE_FILL, SoundSource.BLOCKS, 1.0F, 1.0F);
+                        return InteractionResult.SUCCESS;
                     }
-                    level.playSound(null, pos, SoundEvents.BUCKET_FILL, SoundSource.BLOCKS, 1.0F, 1.0F);
-                    return InteractionResult.SUCCESS;
                 }
             }
+        }
 
-            // D. Empty Bottle extraction (Only for Potions / Honey)
-            if (handStack.is(Items.GLASS_BOTTLE) && jarBE.hasLiquid() && !jarBE.isBucketLiquid() && jarBE.getLiquidLevel() > 0) {
+        // -------------------------------------------------------------
+        // 2.5. EXTRACTION WITH BUCKET/BOTTLE (Does not require sneaking)
+        // -------------------------------------------------------------
+        // C. Empty Bucket extraction (XP: requires XP_BOTTLE_MAX; others: requires full 16 levels)
+        if (handStack.is(Items.BUCKET) && jarBE.hasLiquid()) {
+            int required = GlassJarBlockEntity.isXpLiquid(jarBE.getStoredLiquidItem())
+                    ? GlassJarBlockEntity.XP_BOTTLE_MAX
+                    : GlassJarBlockEntity.MAX_LIQUID_LEVEL;
+            if (jarBE.getLiquidLevel() >= required) {
+                ItemStack bucketRepresentation = jarBE.getBucketRepresentation();
+                if (!bucketRepresentation.isEmpty()) {
+                    if (level.isClientSide) return InteractionResult.SUCCESS;
+                    ItemStack filledBucket = jarBE.extractBucket();
+                    if (!filledBucket.isEmpty()) {
+                        if (!player.getAbilities().instabuild) {
+                            handStack.shrink(1);
+                            if (!player.getInventory().add(filledBucket)) {
+                                player.drop(filledBucket, false);
+                            }
+                        }
+                        level.playSound(null, pos, SoundEvents.BUCKET_FILL, SoundSource.BLOCKS, 1.0F, 1.0F);
+                        return InteractionResult.SUCCESS;
+                    }
+                }
+            }
+        }
+
+        // D. Empty Bottle extraction (Requires liquid level > 0, excluding Lava)
+        if (handStack.is(Items.GLASS_BOTTLE) && jarBE.hasLiquid() && jarBE.getLiquidLevel() > 0) {
+            ItemStack bottleRepresentation = jarBE.getBottleRepresentation();
+            if (!bottleRepresentation.isEmpty()) {
                 if (level.isClientSide) return InteractionResult.SUCCESS;
                 ItemStack filledBottle = jarBE.extractBottle();
                 if (!filledBottle.isEmpty()) {

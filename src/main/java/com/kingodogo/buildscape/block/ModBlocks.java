@@ -5830,6 +5830,123 @@ public class ModBlocks {
                                                         .strength(5.0f, 6.0f)
                                                         .requiresCorrectToolForDrops()
                                                         .sound(SoundType.COPPER)));
+        public static final RegistryObject<Block> STEEL_PIPE = BLOCKS.register(
+                        "steel_pipe",
+                        () -> new PipeBlock(
+                                        BlockBehaviour.Properties.copy(STEEL_BLOCK.get())));
+        public static final RegistryObject<Block> HOLLOW_STEEL_PIPE = BLOCKS.register(
+                        "hollow_steel_pipe",
+                        () -> new HollowPipeBlock(
+                                        BlockBehaviour.Properties.copy(STEEL_BLOCK.get())));
+        public static final RegistryObject<Block> SCRAPED_STEEL = BLOCKS.register(
+                        "scraped_steel",
+                        () -> new Block(
+                                        BlockBehaviour.Properties.copy(STEEL_BLOCK.get())));
+        public static final RegistryObject<Block> RUSTIC_SCRAPED_STEEL = BLOCKS.register(
+                        "rustic_scraped_steel",
+                        () -> new Block(
+                                        BlockBehaviour.Properties.copy(STEEL_BLOCK.get())));
+        public static final RegistryObject<Block> STACKED_STEEL = BLOCKS.register(
+                        "stacked_steel",
+                        () -> new Block(
+                                        BlockBehaviour.Properties.copy(STEEL_BLOCK.get())));
+        public static final RegistryObject<Block> STEEL_PANELS = BLOCKS.register(
+                        "steel_panels",
+                        () -> new Block(
+                                        BlockBehaviour.Properties.copy(STEEL_BLOCK.get())));
+        public static final RegistryObject<Block> CROSSED_STEEL_PANELS = BLOCKS.register(
+                        "crossed_steel_panels",
+                        () -> new Block(
+                                        BlockBehaviour.Properties.copy(STEEL_BLOCK.get())));
+        public static final RegistryObject<Block> STEEL_MESH_BLOCK = BLOCKS.register(
+                        "steel_mesh_block",
+                        () -> new Block(
+                                        BlockBehaviour.Properties.copy(STEEL_BLOCK.get())));
+        public static final RegistryObject<Block> STEEL_BOLTS = BLOCKS.register(
+                        "steel_bolts",
+                        () -> new SteelBoltBlock(
+                                        BlockBehaviour.Properties.copy(STEEL_BLOCK.get())));
+
+        // Scraped Steel Slabs/Vertical Slabs
+        public static final RegistryObject<Block> SCRAPED_STEEL_SLAB = BLOCKS.register(
+                        "scraped_steel_slab",
+                        () -> new SlabBlock(
+                                        BlockBehaviour.Properties.copy(SCRAPED_STEEL.get())));
+        public static final RegistryObject<Block> SCRAPED_STEEL_VERTICAL_SLAB = BLOCKS.register(
+                        "scraped_steel_vertical_slab",
+                        () -> new VerticalSlabBlock(
+                                        SCRAPED_STEEL.get(),
+                                        BlockBehaviour.Properties.copy(SCRAPED_STEEL_SLAB.get())));
+
+        // Rustic Scraped Steel Slabs/Vertical Slabs
+        public static final RegistryObject<Block> RUSTIC_SCRAPED_STEEL_SLAB = BLOCKS.register(
+                        "rustic_scraped_steel_slab",
+                        () -> new SlabBlock(
+                                        BlockBehaviour.Properties.copy(RUSTIC_SCRAPED_STEEL.get())));
+        public static final RegistryObject<Block> RUSTIC_SCRAPED_STEEL_VERTICAL_SLAB = BLOCKS.register(
+                        "rustic_scraped_steel_vertical_slab",
+                        () -> new VerticalSlabBlock(
+                                        RUSTIC_SCRAPED_STEEL.get(),
+                                        BlockBehaviour.Properties.copy(RUSTIC_SCRAPED_STEEL_SLAB.get())));
+
+        // Stacked Steel Slabs/Vertical Slabs/Stairs
+        public static final RegistryObject<Block> STACKED_STEEL_SLAB = BLOCKS.register(
+                        "stacked_steel_slab",
+                        () -> new SlabBlock(
+                                        BlockBehaviour.Properties.copy(STACKED_STEEL.get())));
+        public static final RegistryObject<Block> STACKED_STEEL_VERTICAL_SLAB = BLOCKS.register(
+                        "stacked_steel_vertical_slab",
+                        () -> new VerticalSlabBlock(
+                                        STACKED_STEEL.get(),
+                                        BlockBehaviour.Properties.copy(STACKED_STEEL_SLAB.get())));
+        public static final RegistryObject<Block> STACKED_STEEL_STAIRS = BLOCKS.register(
+                        "stacked_steel_stairs",
+                        () -> new ModStairBlock(
+                                        STACKED_STEEL.get().defaultBlockState(),
+                                        BlockBehaviour.Properties.copy(STACKED_STEEL.get())));
+
+        // Steel Panels Slabs/Vertical Slabs/Stairs
+        public static final RegistryObject<Block> STEEL_PANELS_SLAB = BLOCKS.register(
+                        "steel_panels_slab",
+                        () -> new SlabBlock(
+                                        BlockBehaviour.Properties.copy(STEEL_PANELS.get())));
+        public static final RegistryObject<Block> STEEL_PANELS_VERTICAL_SLAB = BLOCKS.register(
+                        "steel_panels_vertical_slab",
+                        () -> new VerticalSlabBlock(
+                                        STEEL_PANELS.get(),
+                                        BlockBehaviour.Properties.copy(STEEL_PANELS_SLAB.get())));
+        public static final RegistryObject<Block> STEEL_PANELS_STAIRS = BLOCKS.register(
+                        "steel_panels_stairs",
+                        () -> new ModStairBlock(
+                                        STEEL_PANELS.get().defaultBlockState(),
+                                        BlockBehaviour.Properties.copy(STEEL_PANELS.get())));
+
+        // Crossed Steel Panels Slabs/Vertical Slabs
+        public static final RegistryObject<Block> CROSSED_STEEL_PANELS_SLAB = BLOCKS.register(
+                        "crossed_steel_panels_slab",
+                        () -> new SlabBlock(
+                                        BlockBehaviour.Properties.copy(CROSSED_STEEL_PANELS.get())));
+        public static final RegistryObject<Block> CROSSED_STEEL_PANELS_VERTICAL_SLAB = BLOCKS.register(
+                        "crossed_steel_panels_vertical_slab",
+                        () -> new VerticalSlabBlock(
+                                        CROSSED_STEEL_PANELS.get(),
+                                        BlockBehaviour.Properties.copy(CROSSED_STEEL_PANELS_SLAB.get())));
+
+        // Steel Mesh Block Slabs/Vertical Slabs/Stairs
+        public static final RegistryObject<Block> STEEL_MESH_BLOCK_SLAB = BLOCKS.register(
+                        "steel_mesh_block_slab",
+                        () -> new SlabBlock(
+                                        BlockBehaviour.Properties.copy(STEEL_MESH_BLOCK.get())));
+        public static final RegistryObject<Block> STEEL_MESH_BLOCK_VERTICAL_SLAB = BLOCKS.register(
+                        "steel_mesh_block_vertical_slab",
+                        () -> new VerticalSlabBlock(
+                                        STEEL_MESH_BLOCK.get(),
+                                        BlockBehaviour.Properties.copy(STEEL_MESH_BLOCK_SLAB.get())));
+        public static final RegistryObject<Block> STEEL_MESH_BLOCK_STAIRS = BLOCKS.register(
+                        "steel_mesh_block_stairs",
+                        () -> new ModStairBlock(
+                                        STEEL_MESH_BLOCK.get().defaultBlockState(),
+                                        BlockBehaviour.Properties.copy(STEEL_MESH_BLOCK.get())));
         // Steel Block Variants
         public static final RegistryObject<Block> STEEL_BLOCK_STAIRS = BLOCKS.register(
                         "steel_block_stairs",

@@ -1,0 +1,18 @@
+{
+  "variants": {
+    "axis=y,connected_neg=false,connected_pos=false": { "model": "buildscape:block/hollow_steel_pipe_single" },
+    "axis=y,connected_neg=true,connected_pos=false": { "model": "buildscape:block/hollow_steel_pipe_top" },
+    "axis=y,connected_neg=false,connected_pos=true": { "model": "buildscape:block/hollow_steel_pipe_bottom" },
+    "axis=y,connected_neg=true,connected_pos=true": { "model": "buildscape:block/hollow_steel_pipe_middle" },
+
+    "axis=x,connected_neg=false,connected_pos=false": { "model": "buildscape:block/hollow_steel_pipe_single", "x": 90, "y": 90 },
+    "axis=x,connected_neg=true,connected_pos=false": { "model": "buildscape:block/hollow_steel_pipe_top", "x": 90, "y": 90 },
+    "axis=x,connected_neg=false,connected_pos=true": { "model": "buildscape:block/hollow_steel_pipe_bottom", "x": 90, "y": 90 },
+    "axis=x,connected_neg=true,connected_pos=true": { "model": "buildscape:block/hollow_steel_pipe_middle", "x": 90, "y": 90 },
+
+    "axis=z,connected_neg=false,connected_pos=false": { "model": "buildscape:block/hollow_steel_pipe_single", "x": 90, "y": 0 },
+    "axis=z,connected_neg=true,connected_pos=false": { "model": "buildscape:block/hollow_steel_pipe_top", "x": 90, "y": 0 },
+    "axis=z,connected_neg=false,connected_pos=true": { "model": "buildscape:block/hollow_steel_pipe_bottom", "x": 90, "y": 0 },
+    "axis=z,connected_neg=true,connected_pos=true": { "model": "buildscape:block/hollow_steel_pipe_middle", "x": 90, "y": 0 }
+  }
+}

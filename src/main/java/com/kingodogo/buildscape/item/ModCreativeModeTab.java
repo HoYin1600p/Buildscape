@@ -61,6 +61,7 @@ public class ModCreativeModeTab {
                 items.add(stack);
                 added.add(item);
             }
+            sortItems(items);
         }
 
         private NonNullList<ItemStack> arrangeVariantItems(NonNullList<ItemStack> input) {
@@ -503,6 +504,30 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.STEEL_TRIM.get()));
             items.add(new ItemStack(ModItems.STEEL_PILLAR.get()));
             items.add(new ItemStack(ModItems.BOLTED_STEEL_PILLAR.get()));
+            items.add(new ItemStack(ModItems.STEEL_PIPE.get()));
+            items.add(new ItemStack(ModItems.HOLLOW_STEEL_PIPE.get()));
+            items.add(new ItemStack(ModItems.SCRAPED_STEEL.get()));
+            items.add(new ItemStack(ModItems.SCRAPED_STEEL_SLAB.get()));
+            items.add(new ItemStack(ModItems.SCRAPED_STEEL_VERTICAL_SLAB.get()));
+            items.add(new ItemStack(ModItems.RUSTIC_SCRAPED_STEEL.get()));
+            items.add(new ItemStack(ModItems.RUSTIC_SCRAPED_STEEL_SLAB.get()));
+            items.add(new ItemStack(ModItems.RUSTIC_SCRAPED_STEEL_VERTICAL_SLAB.get()));
+            items.add(new ItemStack(ModItems.STACKED_STEEL.get()));
+            items.add(new ItemStack(ModItems.STACKED_STEEL_STAIRS.get()));
+            items.add(new ItemStack(ModItems.STACKED_STEEL_SLAB.get()));
+            items.add(new ItemStack(ModItems.STACKED_STEEL_VERTICAL_SLAB.get()));
+            items.add(new ItemStack(ModItems.STEEL_PANELS.get()));
+            items.add(new ItemStack(ModItems.STEEL_PANELS_STAIRS.get()));
+            items.add(new ItemStack(ModItems.STEEL_PANELS_SLAB.get()));
+            items.add(new ItemStack(ModItems.STEEL_PANELS_VERTICAL_SLAB.get()));
+            items.add(new ItemStack(ModItems.CROSSED_STEEL_PANELS.get()));
+            items.add(new ItemStack(ModItems.CROSSED_STEEL_PANELS_SLAB.get()));
+            items.add(new ItemStack(ModItems.CROSSED_STEEL_PANELS_VERTICAL_SLAB.get()));
+            items.add(new ItemStack(ModItems.STEEL_MESH_BLOCK.get()));
+            items.add(new ItemStack(ModItems.STEEL_MESH_BLOCK_STAIRS.get()));
+            items.add(new ItemStack(ModItems.STEEL_MESH_BLOCK_SLAB.get()));
+            items.add(new ItemStack(ModItems.STEEL_MESH_BLOCK_VERTICAL_SLAB.get()));
+            items.add(new ItemStack(ModItems.STEEL_BOLTS.get()));
             items.add(new ItemStack(ModItems.STEEL_GRATE.get()));
             items.add(new ItemStack(ModItems.STEEL_FAN.get()));
             items.add(new ItemStack(ModItems.FLAMING_STEEL_INGOT.get()));
@@ -3068,4 +3093,90 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
 
         }
     };
+
+    public static void sortItems(NonNullList<ItemStack> items) {
+        // 1. Arrange quartz pillar variants before calcite stairs
+        int calciteStairsIdx = -1;
+        for (int i = 0; i < items.size(); ++i) {
+            ResourceLocation id = ForgeRegistries.ITEMS.getKey(items.get(i).getItem());
+            if (id != null && "buildscape".equals(id.getNamespace()) && "calcite_stairs".equals(id.getPath())) {
+                calciteStairsIdx = i;
+                break;
+            }
+        }
+        if (calciteStairsIdx != -1) {
+            List<ItemStack> toMove = new java.util.ArrayList<>();
+            for (int i = 0; i < items.size(); ) {
+                ResourceLocation id = ForgeRegistries.ITEMS.getKey(items.get(i).getItem());
+                if (id != null && "buildscape".equals(id.getNamespace()) && id.getPath().startsWith("quartz_pillar_") 
+                        && (id.getPath().endsWith("_stairs") || id.getPath().endsWith("_slab") || id.getPath().endsWith("_vertical_slab") || id.getPath().endsWith("_wall"))) {
+                    toMove.add(items.remove(i));
+                    if (i < calciteStairsIdx) {
+                        calciteStairsIdx--;
+                    }
+                } else {
+                    i++;
+                }
+            }
+            items.addAll(calciteStairsIdx, toMove);
+        }
+
+        // 2. Arrange shelves, hollow logs, ladders before bamboo block
+        int bambooBlockIdx = -1;
+        for (int i = 0; i < items.size(); ++i) {
+            ResourceLocation id = ForgeRegistries.ITEMS.getKey(items.get(i).getItem());
+            if (id != null && "buildscape".equals(id.getNamespace()) && "bamboo_block".equals(id.getPath())) {
+                bambooBlockIdx = i;
+                break;
+            }
+        }
+        if (bambooBlockIdx != -1) {
+            List<ItemStack> toMove = new java.util.ArrayList<>();
+            for (int i = 0; i < items.size(); ) {
+                ResourceLocation id = ForgeRegistries.ITEMS.getKey(items.get(i).getItem());
+                if (id != null && "buildscape".equals(id.getNamespace())) {
+                    String path = id.getPath();
+                    boolean isShelf = path.endsWith("_shelf") || path.endsWith("_shelves");
+                    boolean isHollowLog = path.contains("hollow_");
+                    boolean isLadder = path.endsWith("_ladder") || path.endsWith("_ladders");
+                    if (isShelf || isHollowLog || isLadder) {
+                        toMove.add(items.remove(i));
+                        if (i < bambooBlockIdx) {
+                            bambooBlockIdx--;
+                        }
+                    } else {
+                        i++;
+                    }
+                } else {
+                    i++;
+                }
+            }
+            items.addAll(bambooBlockIdx, toMove);
+        }
+
+        // 3. Arrange cardboard blocks after sculk sensor
+        int sculkSensorIdx = -1;
+        for (int i = 0; i < items.size(); ++i) {
+            ResourceLocation id = ForgeRegistries.ITEMS.getKey(items.get(i).getItem());
+            if (id != null && "sculk_sensor".equals(id.getPath())) {
+                sculkSensorIdx = i;
+                break;
+            }
+        }
+        if (sculkSensorIdx != -1) {
+            List<ItemStack> toMove = new java.util.ArrayList<>();
+            for (int i = 0; i < items.size(); ) {
+                ResourceLocation id = ForgeRegistries.ITEMS.getKey(items.get(i).getItem());
+                if (id != null && "buildscape".equals(id.getNamespace()) && id.getPath().contains("cardboard")) {
+                    toMove.add(items.remove(i));
+                    if (i < sculkSensorIdx) {
+                        sculkSensorIdx--;
+                    }
+                } else {
+                    i++;
+                }
+            }
+            items.addAll(sculkSensorIdx + 1, toMove);
+        }
+    }
 }

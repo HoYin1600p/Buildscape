@@ -23341,14 +23341,15 @@
     [
       "BS:steel_block",
       [
-        "###",
-        "###",
-        "###"
+        "NNN",
+        "NIN",
+        "NNN"
       ],
       {
-        "#": "BS:steel_ingot"
+        "N": "BS:steel_nugget",
+        "I": "BS:steel_ingot"
       },
-      1
+      8
     ],
     [
       "BS:steel_block_slab",
@@ -23416,6 +23417,114 @@
         "#": "BS:steel_block"
       },
       2
+    ],
+    [
+      "BS:steel_bolts",
+      [
+        "N",
+        "N",
+        "N"
+      ],
+      {
+        "N": "BS:steel_nugget"
+      },
+      12
+    ],
+    [
+      "BS:scraped_steel_slab",
+      [
+        "###"
+      ],
+      {
+        "#": "BS:scraped_steel"
+      },
+      6
+    ],
+    [
+      "BS:rustic_scraped_steel_slab",
+      [
+        "###"
+      ],
+      {
+        "#": "BS:rustic_scraped_steel"
+      },
+      6
+    ],
+    [
+      "BS:stacked_steel_slab",
+      [
+        "###"
+      ],
+      {
+        "#": "BS:stacked_steel"
+      },
+      6
+    ],
+    [
+      "BS:stacked_steel_stairs",
+      [
+        "#  ",
+        "## ",
+        "###"
+      ],
+      {
+        "#": "BS:stacked_steel"
+      },
+      4
+    ],
+    [
+      "BS:steel_panels_slab",
+      [
+        "###"
+      ],
+      {
+        "#": "BS:steel_panels"
+      },
+      6
+    ],
+    [
+      "BS:steel_panels_stairs",
+      [
+        "#  ",
+        "## ",
+        "###"
+      ],
+      {
+        "#": "BS:steel_panels"
+      },
+      4
+    ],
+    [
+      "BS:crossed_steel_panels_slab",
+      [
+        "###"
+      ],
+      {
+        "#": "BS:crossed_steel_panels"
+      },
+      6
+    ],
+    [
+      "BS:steel_mesh_block_slab",
+      [
+        "###"
+      ],
+      {
+        "#": "BS:steel_mesh_block"
+      },
+      6
+    ],
+    [
+      "BS:steel_mesh_block_stairs",
+      [
+        "#  ",
+        "## ",
+        "###"
+      ],
+      {
+        "#": "BS:steel_mesh_block"
+      },
+      4
     ],
     [
       "BS:stone_pillar",

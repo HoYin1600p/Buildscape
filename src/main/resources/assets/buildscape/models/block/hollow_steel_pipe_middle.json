@@ -1,0 +1,7 @@
+{
+  "parent": "buildscape:block/template_hollow_metal_middle",
+  "textures": {
+    "hole": "buildscape:block/steel_pipe_hole_empty",
+    "side": "buildscape:block/steel_pipe_middle"
+  }
+}

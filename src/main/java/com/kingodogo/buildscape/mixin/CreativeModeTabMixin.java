@@ -69,6 +69,7 @@ public class CreativeModeTabMixin {
 
             items.clear();
             items.addAll(ordered);
+            com.kingodogo.buildscape.item.ModCreativeModeTab.sortItems(items);
         }
     }
 }

@@ -159,7 +159,10 @@ public class GlassJarBlockEntityRenderer implements BlockEntityRenderer<GlassJar
         ResourceLocation textureLoc = new ResourceLocation("minecraft", "block/water_still");
         int color = 0xFF3F76E4;
 
-        if (liquidItem.getItem() instanceof PotionItem) {
+        if (GlassJarBlockEntity.isXpLiquid(liquidItem)) {
+            color = 0xFFFFFFFF;
+            textureLoc = new ResourceLocation("buildscape", "fluid/experience_flow");
+        } else if (liquidItem.getItem() instanceof PotionItem) {
             color = PotionUtils.getColor(liquidItem);
             if ((color & 0xFF000000) == 0) {
                 color = 0xFF000000 | color;

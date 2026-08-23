@@ -150,6 +150,10 @@ public class PotentSulfurBlockEntity extends BlockEntity {
 
                if (!entityToBeLaunched.isPassenger() && !entityToBeLaunched.getType().is(NOT_AFFECTED_BY_GEYSERS) && entityVelocity.y < (double)0.3F + (double)waterBlocks * 0.1D) {
                   entityToBeLaunched.setDeltaMovement(entityVelocity.add(0.0D, 0.2F, 0.0D));
+                  entityToBeLaunched.hasImpulse = true;
+                  if (!entityToBeLaunched.level.isClientSide()) {
+                     entityToBeLaunched.hurtMarked = true;
+                  }
                }
             }
          }

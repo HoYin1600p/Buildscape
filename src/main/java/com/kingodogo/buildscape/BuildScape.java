@@ -20,6 +20,8 @@ public class BuildScape {
     public static final String MODID = "buildscape";
     public static final Logger LOGGER = LogManager.getLogger();
 
+    public static final java.util.Map<net.minecraft.world.item.Item, net.minecraft.core.cauldron.CauldronInteraction> EXPERIENCE_CAULDRON_INTERACTIONS = net.minecraft.core.cauldron.CauldronInteraction.newInteractionMap();
+
     public static Logger getLogger() {
         return LOGGER;
     }
@@ -48,6 +50,7 @@ public class BuildScape {
         com.kingodogo.buildscape.sound.ModSounds.SOUND_EVENTS.register(modEventBus);
         ModBlocks.BLOCKS.register(modEventBus);
         ModItems.ITEMS.register(modEventBus);
+        com.kingodogo.buildscape.fluid.ModFluids.FLUIDS.register(modEventBus);
         com.kingodogo.buildscape.particle.ModParticles.PARTICLES.register(
                 modEventBus);
         com.kingodogo.buildscape.block.ModBlockEntities.BLOCK_ENTITIES.register(
@@ -376,7 +379,121 @@ public class BuildScape {
             net.minecraft.world.level.block.ComposterBlock.COMPOSTABLES
                     .put(ModItems.RED_MUSHROOM_SHELVES.get(), 0.65f);
 
+            // Cauldron interactions for Empty Cauldron
+            net.minecraft.core.cauldron.CauldronInteraction.EMPTY.put(ModItems.EXPERIENCE_BUCKET.get(), (state, level, pos, player, hand, stack) -> {
+                if (!level.isClientSide) {
+                    player.awardStat(net.minecraft.stats.Stats.FILL_CAULDRON);
+                    level.setBlockAndUpdate(pos, ModBlocks.EXPERIENCE_CAULDRON.get().defaultBlockState().setValue(net.minecraft.world.level.block.LayeredCauldronBlock.LEVEL, 3));
+                    level.playSound(null, pos, net.minecraft.sounds.SoundEvents.BUCKET_EMPTY, net.minecraft.sounds.SoundSource.BLOCKS, 1.0F, 1.0F);
+                    if (!player.getAbilities().instabuild) {
+                        player.setItemInHand(hand, new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.BUCKET));
+                    }
+                }
+                return net.minecraft.world.InteractionResult.sidedSuccess(level.isClientSide);
             });
+
+            net.minecraft.core.cauldron.CauldronInteraction.EMPTY.put(net.minecraft.world.item.Items.EXPERIENCE_BOTTLE, (state, level, pos, player, hand, stack) -> {
+                if (!level.isClientSide) {
+                    player.awardStat(net.minecraft.stats.Stats.FILL_CAULDRON);
+                    level.setBlockAndUpdate(pos, ModBlocks.EXPERIENCE_CAULDRON.get().defaultBlockState().setValue(net.minecraft.world.level.block.LayeredCauldronBlock.LEVEL, 1));
+                    level.playSound(null, pos, net.minecraft.sounds.SoundEvents.BOTTLE_EMPTY, net.minecraft.sounds.SoundSource.BLOCKS, 1.0F, 1.0F);
+                    if (!player.getAbilities().instabuild) {
+                        stack.shrink(1);
+                        net.minecraft.world.item.ItemStack returnStack = new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.GLASS_BOTTLE);
+                        if (!player.getInventory().add(returnStack)) {
+                            player.drop(returnStack, false);
+                        }
+                    }
+                }
+                return net.minecraft.world.InteractionResult.sidedSuccess(level.isClientSide);
+            });
+
+            // Cauldron interactions for Experience Cauldron
+            EXPERIENCE_CAULDRON_INTERACTIONS.put(net.minecraft.world.item.Items.BUCKET, (state, level, pos, player, hand, stack) -> {
+                int cauldronLevel = state.getValue(net.minecraft.world.level.block.LayeredCauldronBlock.LEVEL);
+                if (cauldronLevel == 3) {
+                    if (!level.isClientSide) {
+                        player.awardStat(net.minecraft.stats.Stats.USE_CAULDRON);
+                        level.setBlockAndUpdate(pos, net.minecraft.world.level.block.Blocks.CAULDRON.defaultBlockState());
+                        level.playSound(null, pos, net.minecraft.sounds.SoundEvents.BUCKET_FILL, net.minecraft.sounds.SoundSource.BLOCKS, 1.0F, 1.0F);
+                        net.minecraft.world.item.ItemStack filledBucket = new net.minecraft.world.item.ItemStack(ModItems.EXPERIENCE_BUCKET.get());
+                        if (!player.getAbilities().instabuild) {
+                            stack.shrink(1);
+                            if (stack.isEmpty()) {
+                                player.setItemInHand(hand, filledBucket);
+                            } else {
+                                if (!player.getInventory().add(filledBucket)) {
+                                    player.drop(filledBucket, false);
+                                }
+                            }
+                        }
+                    }
+                    return net.minecraft.world.InteractionResult.sidedSuccess(level.isClientSide);
+                }
+                return net.minecraft.world.InteractionResult.PASS;
+            });
+
+            EXPERIENCE_CAULDRON_INTERACTIONS.put(net.minecraft.world.item.Items.GLASS_BOTTLE, (state, level, pos, player, hand, stack) -> {
+                if (!level.isClientSide) {
+                    player.awardStat(net.minecraft.stats.Stats.USE_CAULDRON);
+                    int cauldronLevel = state.getValue(net.minecraft.world.level.block.LayeredCauldronBlock.LEVEL);
+                    if (cauldronLevel > 1) {
+                        level.setBlockAndUpdate(pos, state.setValue(net.minecraft.world.level.block.LayeredCauldronBlock.LEVEL, cauldronLevel - 1));
+                    } else {
+                        level.setBlockAndUpdate(pos, net.minecraft.world.level.block.Blocks.CAULDRON.defaultBlockState());
+                    }
+                    level.playSound(null, pos, net.minecraft.sounds.SoundEvents.BOTTLE_FILL, net.minecraft.sounds.SoundSource.BLOCKS, 1.0F, 1.0F);
+                    net.minecraft.world.item.ItemStack filledBottle = new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.EXPERIENCE_BOTTLE);
+                    if (!player.getAbilities().instabuild) {
+                        stack.shrink(1);
+                        if (stack.isEmpty()) {
+                            player.setItemInHand(hand, filledBottle);
+                        } else {
+                            if (!player.getInventory().add(filledBottle)) {
+                                player.drop(filledBottle, false);
+                            }
+                        }
+                    }
+                }
+                return net.minecraft.world.InteractionResult.sidedSuccess(level.isClientSide);
+            });
+
+            EXPERIENCE_CAULDRON_INTERACTIONS.put(net.minecraft.world.item.Items.EXPERIENCE_BOTTLE, (state, level, pos, player, hand, stack) -> {
+                int cauldronLevel = state.getValue(net.minecraft.world.level.block.LayeredCauldronBlock.LEVEL);
+                if (cauldronLevel < 3) {
+                    if (!level.isClientSide) {
+                        player.awardStat(net.minecraft.stats.Stats.FILL_CAULDRON);
+                        level.setBlockAndUpdate(pos, state.setValue(net.minecraft.world.level.block.LayeredCauldronBlock.LEVEL, cauldronLevel + 1));
+                        level.playSound(null, pos, net.minecraft.sounds.SoundEvents.BOTTLE_EMPTY, net.minecraft.sounds.SoundSource.BLOCKS, 1.0F, 1.0F);
+                        if (!player.getAbilities().instabuild) {
+                            stack.shrink(1);
+                            net.minecraft.world.item.ItemStack returnStack = new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.GLASS_BOTTLE);
+                            if (!player.getInventory().add(returnStack)) {
+                                player.drop(returnStack, false);
+                            }
+                        }
+                    }
+                    return net.minecraft.world.InteractionResult.sidedSuccess(level.isClientSide);
+                }
+                return net.minecraft.world.InteractionResult.PASS;
+            });
+
+            EXPERIENCE_CAULDRON_INTERACTIONS.put(ModItems.EXPERIENCE_BUCKET.get(), (state, level, pos, player, hand, stack) -> {
+                int cauldronLevel = state.getValue(net.minecraft.world.level.block.LayeredCauldronBlock.LEVEL);
+                if (cauldronLevel < 3) {
+                    if (!level.isClientSide) {
+                        player.awardStat(net.minecraft.stats.Stats.FILL_CAULDRON);
+                        level.setBlockAndUpdate(pos, state.setValue(net.minecraft.world.level.block.LayeredCauldronBlock.LEVEL, 3));
+                        level.playSound(null, pos, net.minecraft.sounds.SoundEvents.BUCKET_EMPTY, net.minecraft.sounds.SoundSource.BLOCKS, 1.0F, 1.0F);
+                        if (!player.getAbilities().instabuild) {
+                            player.setItemInHand(hand, new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.BUCKET));
+                        }
+                    }
+                    return net.minecraft.world.InteractionResult.sidedSuccess(level.isClientSide);
+                }
+                return net.minecraft.world.InteractionResult.PASS;
+            });
+        });
     }
 
     @SubscribeEvent
@@ -1254,14 +1371,6 @@ public class BuildScape {
             }
         }
 
-        if (state.getBlock() == ModBlocks.MANGROVE_LEAVES.get()
-                && heldItem.getItem() instanceof net.minecraft.world.item.BoneMealItem) {
-            if (event.getFace() != net.minecraft.core.Direction.DOWN) {
-                event.setCanceled(true);
-                event.setCancellationResult(net.minecraft.world.InteractionResult.FAIL);
-                return;
-            }
-        }
 
         if (state.getBlock() == ModBlocks.BAMBOO_BLOCK.get()
                 && heldItem.getItem() instanceof net.minecraft.world.item.AxeItem) {
@@ -2087,6 +2196,18 @@ public class BuildScape {
                         },
                         ModBlocks.GLOW_LIGHTS.get());
 
+                blockColors.register(
+                        (state, reader, pos, tintIndex) -> {
+                            if (tintIndex == 0) {
+                                if (reader != null && pos != null) {
+                                    return net.minecraft.client.renderer.BiomeColors.getAverageGrassColor(reader, pos);
+                                }
+                                return net.minecraft.world.level.GrassColor.get(0.5D, 1.0D);
+                            }
+                            return -1;
+                        },
+                        net.minecraft.world.level.block.Blocks.COMPOSTER);
+
                 net.minecraft.client.color.item.ItemColors itemColors = net.minecraft.client.Minecraft
                         .getInstance().getItemColors();
                 net.minecraft.client.color.item.ItemColors vanillaItemColors = net.minecraft.client.Minecraft
@@ -2562,26 +2683,46 @@ public class BuildScape {
                             com.kingodogo.buildscape.particle.ModParticles.GEYSER_PLUME.get(),
                             com.kingodogo.buildscape.particle.GeyserPlumeParticle.Provider::new
                     );
+
+            net.minecraft.client.Minecraft.getInstance()
+                    .particleEngine.register(
+                            com.kingodogo.buildscape.particle.ModParticles.XP_PARTICLE.get(),
+                            sprites -> new com.kingodogo.buildscape.particle.XpParticle.Provider(sprites)
+                    );
         }
     }
 
     @SubscribeEvent
-    public static void onEntityInteract(net.minecraftforge.event.entity.player.PlayerInteractEvent.EntityInteract event) {
-        if (event.getTarget() instanceof net.minecraft.world.entity.AgeableMob mob) {
+    public void onEntityInteract(net.minecraftforge.event.entity.player.PlayerInteractEvent.EntityInteract event) {
+        // Target any non-hostile AgeableMob (passive animals, villagers, etc.)
+        if (event.getTarget() instanceof net.minecraft.world.entity.AgeableMob mob
+                && !(event.getTarget() instanceof net.minecraft.world.entity.monster.Monster)) {
             net.minecraft.world.item.ItemStack held = event.getItemStack();
-            if (held.is(ModItems.GOLDEN_DANDELION.get()) && mob.isBaby()) {
+            if (held.is(ModItems.GOLDEN_DANDELION.get())) {
                 net.minecraft.nbt.CompoundTag data = mob.getPersistentData();
                 boolean isFrozen = data.getBoolean("buildscape:frozen_growth");
                 net.minecraft.world.level.Level level = event.getWorld();
                 if (!level.isClientSide) {
                     if (!isFrozen) {
+                        // Freeze: lock the mob's current life stage
                         data.putBoolean("buildscape:frozen_growth", true);
-                        ((net.minecraft.server.level.ServerLevel) level).sendParticles(net.minecraft.core.particles.ParticleTypes.WAX_OFF, mob.getX(), mob.getY() + mob.getBbHeight() * 0.5D, mob.getZ(), 12, 0.3D, 0.3D, 0.3D, 0.05D);
-                        level.playSound(null, mob.blockPosition(), net.minecraft.sounds.SoundEvents.HONEYCOMB_WAX_ON, net.minecraft.sounds.SoundSource.NEUTRAL, 1.0F, 1.0F);
+                        ((net.minecraft.server.level.ServerLevel) level).sendParticles(
+                                net.minecraft.core.particles.ParticleTypes.WAX_OFF,
+                                mob.getX(), mob.getY() + mob.getBbHeight() * 0.5D, mob.getZ(),
+                                12, 0.3D, 0.3D, 0.3D, 0.05D);
+                        level.playSound(null, mob.blockPosition(),
+                                net.minecraft.sounds.SoundEvents.HONEYCOMB_WAX_ON,
+                                net.minecraft.sounds.SoundSource.NEUTRAL, 1.0F, 1.0F);
                     } else {
+                        // Unfreeze: resume normal aging
                         data.remove("buildscape:frozen_growth");
-                        ((net.minecraft.server.level.ServerLevel) level).sendParticles(net.minecraft.core.particles.ParticleTypes.HAPPY_VILLAGER, mob.getX(), mob.getY() + mob.getBbHeight() * 0.5D, mob.getZ(), 12, 0.3D, 0.3D, 0.3D, 0.05D);
-                        level.playSound(null, mob.blockPosition(), net.minecraft.sounds.SoundEvents.VILLAGER_YES, net.minecraft.sounds.SoundSource.NEUTRAL, 1.0F, 1.0F);
+                        ((net.minecraft.server.level.ServerLevel) level).sendParticles(
+                                net.minecraft.core.particles.ParticleTypes.HAPPY_VILLAGER,
+                                mob.getX(), mob.getY() + mob.getBbHeight() * 0.5D, mob.getZ(),
+                                12, 0.3D, 0.3D, 0.3D, 0.05D);
+                        level.playSound(null, mob.blockPosition(),
+                                net.minecraft.sounds.SoundEvents.VILLAGER_YES,
+                                net.minecraft.sounds.SoundSource.NEUTRAL, 1.0F, 1.0F);
                     }
                     if (!event.getPlayer().getAbilities().instabuild) {
                         held.shrink(1);
@@ -2594,10 +2735,69 @@ public class BuildScape {
     }
 
     @SubscribeEvent
-    public static void onLivingUpdate(net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent event) {
-        if (event.getEntityLiving() instanceof net.minecraft.world.entity.AgeableMob mob) {
-            if (mob.getPersistentData().getBoolean("buildscape:frozen_growth") && mob.isBaby()) {
-                mob.setAge(-24000);
+    public void onLivingUpdate(net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent event) {
+        net.minecraft.world.entity.LivingEntity living = event.getEntityLiving();
+        if (living instanceof net.minecraft.world.entity.AgeableMob mob
+                && !(living instanceof net.minecraft.world.entity.monster.Monster)) {
+            if (mob.getPersistentData().getBoolean("buildscape:frozen_growth")) {
+                if (mob.isBaby()) {
+                    // Baby: lock age so it never grows into an adult
+                    mob.setAge(-24000);
+                } else {
+                    // Adult: lock age at 0 so the breeding cooldown never accumulates
+                    if (mob.getAge() != 0) {
+                        mob.setAge(0);
+                    }
+                }
+            }
+        }
+
+        // Apply swimming speed boost in XP fluid (reduced by 50%)
+        net.minecraft.world.level.material.FluidState fluid = living.level.getFluidState(living.blockPosition());
+        if (fluid.getType() == com.kingodogo.buildscape.fluid.ModFluids.EXPERIENCE_STILL.get() || fluid.getType() == com.kingodogo.buildscape.fluid.ModFluids.EXPERIENCE_FLOWING.get()) {
+            if (living.isSwimming() || living.isInWater()) {
+                net.minecraft.world.phys.Vec3 delta = living.getDeltaMovement();
+                living.setDeltaMovement(delta.x * 1.175D, delta.y * 1.06D, delta.z * 1.175D);
+            }
+        }
+
+        // Apply geyser launch force to players and other living entities (fixes players not being launched)
+        if (!living.isPassenger() && !living.getType().is(com.kingodogo.buildscape.block.PotentSulfurBlockEntity.NOT_AFFECTED_BY_GEYSERS)) {
+            if (!(living instanceof net.minecraft.world.entity.player.Player player && player.getAbilities().flying)) {
+                net.minecraft.core.BlockPos.MutableBlockPos testPos = living.blockPosition().mutable();
+                // Look down up to 24 blocks below the entity
+                for (int i = 0; i < 24; ++i) {
+                    net.minecraft.world.level.block.state.BlockState testState = living.level.getBlockState(testPos);
+                    if (testState.is(com.kingodogo.buildscape.block.ModBlocks.POTENT_SULFUR.get())) {
+                        com.kingodogo.buildscape.block.PotentSulfurState geyserState = testState.getValue(com.kingodogo.buildscape.block.PotentSulfurBlock.STATE);
+                        if (geyserState == com.kingodogo.buildscape.block.PotentSulfurState.ERUPTING || geyserState == com.kingodogo.buildscape.block.PotentSulfurState.CONTINUOUS) {
+                            // Find the source block (top of water column)
+                            net.minecraft.core.BlockPos.MutableBlockPos sourceSearch = testPos.above().mutable();
+                            while (living.level.getFluidState(sourceSearch).isSourceOfType(net.minecraft.world.level.material.Fluids.WATER)) {
+                                sourceSearch.move(net.minecraft.core.Direction.UP);
+                            }
+                            int waterBlocks = sourceSearch.getY() - testPos.getY() - 1;
+                            if (waterBlocks < 1) waterBlocks = 1;
+
+                            net.minecraft.world.phys.Vec3 entityVelocity = living.getDeltaMovement();
+                            if (entityVelocity.y < 0.3D + (double)waterBlocks * 0.1D) {
+                                living.resetFallDistance();
+                                living.setDeltaMovement(entityVelocity.add(0.0D, 0.2D, 0.0D));
+                                living.hasImpulse = true;
+                                if (!living.level.isClientSide()) {
+                                    living.hurtMarked = true;
+                                }
+                            }
+                        }
+                        break;
+                    }
+                    if (!testState.isAir() && !testState.is(net.minecraft.world.level.block.Blocks.WATER)) {
+                        if (!testState.getCollisionShape(living.level, testPos).isEmpty()) {
+                            break; // Blocked by a solid block
+                        }
+                    }
+                    testPos.move(net.minecraft.core.Direction.DOWN);
+                }
             }
         }
     }

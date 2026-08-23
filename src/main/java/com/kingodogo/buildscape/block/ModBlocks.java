@@ -14356,5 +14356,25 @@ private static BlockBehaviour.Properties flamingSteelProperties() {
                         () -> new ShelfBlock(BlockBehaviour.Properties.copy(PALE_OAK_PLANKS.get()).strength(2.0f, 3.0f)));
         public static final RegistryObject<Block> POPLAR_SHELF = BLOCKS.register("poplar_shelf",
                         () -> new ShelfBlock(BlockBehaviour.Properties.copy(POPLAR_PLANKS.get()).strength(2.0f, 3.0f)));
+
+        public static final RegistryObject<Block> EXPERIENCE_BLOCK = BLOCKS.register("experience_liquid",
+                        () -> new ExperienceFluidBlock(
+                                        () -> com.kingodogo.buildscape.fluid.ModFluids.EXPERIENCE_STILL.get(),
+                                        BlockBehaviour.Properties.of(net.minecraft.world.level.material.Material.WATER)
+                                                        .noCollission()
+                                                        .strength(100.0F)
+                                                        .noDrops()
+                                                        .lightLevel(state -> 15) // emitting max brightness
+                        ));
+
+        public static final RegistryObject<Block> EXPERIENCE_CAULDRON = BLOCKS.register("experience_cauldron",
+                        () -> new ExperienceCauldronBlock(
+                                        BlockBehaviour.Properties.of(net.minecraft.world.level.material.Material.METAL, net.minecraft.world.level.material.MaterialColor.COLOR_GRAY)
+                                                        .requiresCorrectToolForDrops()
+                                                        .strength(2.0F)
+                                                        .lightLevel(state -> 15) // emitting max brightness
+                                                        .noOcclusion(),
+                                        com.kingodogo.buildscape.BuildScape.EXPERIENCE_CAULDRON_INTERACTIONS
+                        ));
 }
 

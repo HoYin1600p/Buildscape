@@ -44,8 +44,16 @@ public class GlassJarBlockEntity extends BlockEntity {
         return storedLiquidItem != null && !storedLiquidItem.isEmpty() && liquidLevel > 0;
     }
 
+    public static boolean isXpLiquid(ItemStack stack) {
+        if (stack == null || stack.isEmpty()) return false;
+        return stack.is(net.minecraft.world.item.Items.EXPERIENCE_BOTTLE) || stack.is(com.kingodogo.buildscape.item.ModItems.EXPERIENCE_BUCKET.get());
+    }
+
     public boolean isBucketLiquid() {
         if (!hasLiquid()) return false;
+        if (isXpLiquid(storedLiquidItem)) {
+            return liquidLevel >= 16;
+        }
         return storedLiquidItem.getItem() instanceof BucketItem || storedLiquidItem.getItem() instanceof MilkBucketItem;
     }
 
@@ -95,6 +103,11 @@ public class GlassJarBlockEntity extends BlockEntity {
             return false;
         }
 
+        // Accept experience bottle
+        if (stack.is(net.minecraft.world.item.Items.EXPERIENCE_BOTTLE)) {
+            return true;
+        }
+
         // Accept normal potions & honey bottles
         if (item instanceof PotionItem || item instanceof HoneyBottleItem) {
             return true;
@@ -105,6 +118,7 @@ public class GlassJarBlockEntity extends BlockEntity {
 
     public static boolean isSameLiquid(ItemStack a, ItemStack b) {
         if (a == null || b == null || a.isEmpty() || b.isEmpty()) return false;
+        if (isXpLiquid(a) && isXpLiquid(b)) return true;
         if (a.getItem() != b.getItem()) return false;
         if (a.getItem() instanceof PotionItem) {
             return PotionUtils.getPotion(a) == PotionUtils.getPotion(b);
@@ -166,7 +180,7 @@ public class GlassJarBlockEntity extends BlockEntity {
             triggerWobble();
             sync();
             return true;
-        } else if (stack.getItem() instanceof PotionItem || stack.getItem() instanceof HoneyBottleItem) {
+        } else if (stack.getItem() instanceof PotionItem || stack.getItem() instanceof HoneyBottleItem || stack.is(net.minecraft.world.item.Items.EXPERIENCE_BOTTLE)) {
             if (isEmpty() || !hasLiquid()) {
                 storedLiquidItem = stack.copy();
                 storedLiquidItem.setCount(1);
@@ -203,8 +217,13 @@ public class GlassJarBlockEntity extends BlockEntity {
         if (!hasLiquid() || liquidLevel < 16) {
             return ItemStack.EMPTY;
         }
-        ItemStack result = storedLiquidItem.copy();
-        result.setCount(1);
+        ItemStack result;
+        if (isXpLiquid(storedLiquidItem)) {
+            result = new ItemStack(com.kingodogo.buildscape.item.ModItems.EXPERIENCE_BUCKET.get());
+        } else {
+            result = storedLiquidItem.copy();
+            result.setCount(1);
+        }
         storedLiquidItem = ItemStack.EMPTY;
         liquidLevel = 0;
         triggerWobble();
@@ -216,8 +235,13 @@ public class GlassJarBlockEntity extends BlockEntity {
         if (!hasLiquid() || liquidLevel <= 0) {
             return ItemStack.EMPTY;
         }
-        ItemStack result = storedLiquidItem.copy();
-        result.setCount(1);
+        ItemStack result;
+        if (isXpLiquid(storedLiquidItem)) {
+            result = new ItemStack(net.minecraft.world.item.Items.EXPERIENCE_BOTTLE);
+        } else {
+            result = storedLiquidItem.copy();
+            result.setCount(1);
+        }
         liquidLevel--;
         if (liquidLevel <= 0) {
             storedLiquidItem = ItemStack.EMPTY;

@@ -191,7 +191,10 @@ public class GlassJarBlockEntityRenderer implements BlockEntityRenderer<GlassJar
                 .apply(textureLoc);
         VertexConsumer buffer = bufferSource.getBuffer(RenderType.translucent());
 
-        float fillRatio = Math.min(16, level) / 16.0F;
+        int maxLevel = GlassJarBlockEntity.isXpLiquid(liquidItem)
+                ? GlassJarBlockEntity.XP_BOTTLE_MAX
+                : 16;
+        float fillRatio = Math.min(maxLevel, level) / (float) maxLevel;
         float y1 = 0.07F;
         float y2 = y1 + (fillRatio * 0.65F);
 

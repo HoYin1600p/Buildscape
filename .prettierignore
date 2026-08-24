@@ -1,0 +1,2 @@
+# Ignore compact recipe pack files to prevent auto-formatting
+src/main/resources/data/buildscape/recipes_pack/**

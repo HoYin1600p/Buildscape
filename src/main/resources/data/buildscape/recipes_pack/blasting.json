@@ -1,11 +1,8 @@
 {
-  "aliases": {
-    "BS": "buildscape:",
-    "MC": "minecraft:",
-    "F": "forge:"
-  },
+  "_comment": "BDRE Compact Recipe Pack Format: Uses compact array syntax like ['BS:result', ['pattern'], {'#':'BS:ingredient'}, count] or ['BS:result', 'BS:input', count]. Aliases: BS=buildscape:, MC=minecraft:, F=forge:.",
+  "aliases": {"BS": "buildscape:", "MC": "minecraft:", "F": "forge:"},
   "blasting": [
-    {"id":"steel_block_from_iron_block_blasting","input":"minecraft:iron_block","result":{"item":"buildscape:steel_block","count":1},"experience":0.7,"cookingTime":100},
-    {"id":"steel_ingot_from_iron_ingot_blasting","input":"minecraft:iron_ingot","result":{"item":"buildscape:steel_ingot","count":1},"experience":0.7,"cookingTime":100}
+    ["BS:steel_block", "MC:iron_block", 1],
+    ["BS:steel_ingot", "MC:iron_ingot", 1]
   ]
 }

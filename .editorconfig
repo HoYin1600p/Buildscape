@@ -1,0 +1,42 @@
+# This is the universal Text Editor Configuration for Buildscape
+# See: https://editorconfig.org/
+
+root = true
+
+# Global rules for all files
+[*]
+charset = utf-8
+end_of_line = lf
+indent_size = 4
+indent_style = space
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# Scripts requiring Windows CRLF line endings
+[*.{bat,cmd,ps1}]
+end_of_line = crlf
+
+# Java source code formatting
+[*.java]
+indent_size = 4
+indent_style = space
+max_line_length = 120
+
+# Config, web, metadata, and documentation files
+[*.{json,mcmeta,yml,yaml,md,xml,xsd,svg,properties}]
+indent_size = 2
+
+# Gradle build scripts
+[*.gradle]
+indent_size = 4
+
+# Language & Markdown files
+[*.{lang,md}]
+trim_trailing_whitespace = false
+
+# Exclude heavy recipe pack JSON files from auto-formatting to preserve single-line compact recipes
+[src/main/resources/data/buildscape/recipes_pack/*.json]
+ij_any_override_format_on_save = false
+ij_json_format_on_save = false
+ij_formatter_enabled = false
+trim_trailing_whitespace = false

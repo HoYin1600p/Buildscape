@@ -1,41 +1,68 @@
-/nul
-# Build outputs
+# A little cleanup never hurt. Much prettier now, right? -KyroWasHere
+
+# Build & Runtime Outputs
 build/
 run/
+run-data/
 out/
+bin/
 .gradle/
 
-# Forge / MCP caches
+# Forge & MCP Caches
 fg_cache/
 reobf/
 logs/
-
-# IDE files
-.idea/
-*.iml
-
-# OS / Windows junk
-nul
-Thumbs.db
-Desktop.ini
-
-# Claude / local tooling
-.claude/
-*.local.json
-/.agents/
-
-# Gradle runtime files
 **/*.jar.input
 **/*.tsrg
 **/*.srg
 **/*.refmap.json
 
-# Logs & reports
+# IDEs & Editor Directories
+.idea/
+*.iml
+/.vs/
+/.vscode/*
+!/.vscode/settings.json
+
+# AI Assistants & Local Tooling
+.claude/
+/.agents/
+/.gemini/
+/.qoder/
+/.codex-artifacts/
+/scratch/
+*.local.json
+.env*.local
+.vercel
+
+# Temporary Files, Scratch Code & OS Junk
+nul
+/nul
+Thumbs.db
+Desktop.ini
 *.log
 *.html
+old_*.java
+temp_*.java
+recent_*.java
 
+# Local Project Backups, Temporary Texts & Schematics
+/backup/
+/imports/
+/BDRE/
+states.txt
+src/main/resources/assets/buildscape/mob_states.txt
+MOB_PILLAR_STATES_DOCUMENTATION.md
+MISSING_RECIPES.md
+ADDED_RECIPES.md
+VERTICAL_VARIANTS_ADDED.md
+THIRD_PARTY_NOTICES.md
+*_map.md
+*.litematic
+*.schem
+*.schematic
 
-# Keep these (IMPORTANT)
+# Explicitly Tracked Core Files & Configs (DO NOT IGNORE)
 !src/
 !gradle/
 !gradlew
@@ -45,42 +72,7 @@ Desktop.ini
 !gradle.properties
 !README.md
 !LICENSE
-
-
-bin/
-old_*.java
-temp_*.java
-recent_*.java
-/.qoder/
-/.vs/
-/imports/
-/.gemini/
-/.vscode/
-/index.md
-MOB_PILLAR_STATES_DOCUMENTATION.md
-.gitignore
-src/main/resources/assets/buildscape/mob_states.txt
-.gitignore
-states.txt
-.gitignore
-.vercel
-.env*.local
-/backup/
-*.ps1
-*.txt
-/backup/
-/gradle/
-
-# Local generated reports and schematics
-/.codex-artifacts/
-MISSING_RECIPES.md
-ADDED_RECIPES.md
-VERTICAL_VARIANTS_ADDED.md
-THIRD_PARTY_NOTICES.md
-*_map.md
-*.litematic
-*.schem
-*.schematic
-/BDRE/
-/.agents/
-/scratch/
+!.editorconfig
+!.prettierignore
+!.gitattributes
+!.vscode/settings.json

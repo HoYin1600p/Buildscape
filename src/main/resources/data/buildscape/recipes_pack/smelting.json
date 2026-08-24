@@ -1,114 +1,25 @@
 {
-  "aliases": {
-    "BS": "buildscape:",
-    "MC": "minecraft:",
-    "F": "forge:"
-  },
+  "_comment": "BDRE Compact Recipe Pack Format: Uses compact array syntax like ['BS:result', ['pattern'], {'#':'BS:ingredient'}, count] or ['BS:result', 'BS:input', count]. Aliases: BS=buildscape:, MC=minecraft:, F=forge:.",
+  "aliases": {"BS": "buildscape:", "MC": "minecraft:", "F": "forge:"},
   "smelting": [
-    [
-      "BS:black_smooth_sandstone",
-      "BS:black_sandstone",
-      1
-    ],
-    [
-      "BS:blue_smooth_sandstone",
-      "BS:blue_sandstone",
-      1
-    ],
-    [
-      "BS:green_smooth_sandstone",
-      "BS:green_sandstone",
-      1
-    ],
-    [
-      "BS:leaf_litter",
-      "#MC:leaves",
-      1
-    ],
-    [
-      "BS:orange_smooth_sandstone",
-      "BS:orange_sandstone",
-      1
-    ],
-    [
-      "BS:pink_smooth_sandstone",
-      "BS:pink_sandstone",
-      1
-    ],
-    [
-      "BS:red_smooth_sandstone",
-      "BS:red_sandstone",
-      1
-    ],
-    [
-      "BS:white_smooth_sandstone",
-      "BS:white_sandstone",
-      1
-    ],
-    [
-      "BS:yellow_smooth_sandstone",
-      "BS:yellow_sandstone",
-      1
-    ],
-    {
-      "id": "steel_block_from_iron_block_smelting",
-      "input": "minecraft:iron_block",
-      "result": {
-        "item": "buildscape:steel_block",
-        "count": 1
-      },
-      "experience": 0.7,
-      "cookingTime": 200
-    },
-    {
-      "id": "steel_ingot_from_iron_ingot_smelting",
-      "input": "minecraft:iron_ingot",
-      "result": {
-        "item": "buildscape:steel_ingot",
-        "count": 1
-      },
-      "experience": 0.7,
-      "cookingTime": 200
-    },
-    [
-      "BS:burnt_cardboard_block",
-      "BS:cardboard_block",
-      1
-    ],
-    [
-      "BS:burnt_cardboard_trapdoor",
-      "BS:cardboard_trapdoor",
-      1
-    ],
-    [
-      "BS:burnt_cardboard_button",
-      "BS:cardboard_button",
-      1
-    ],
-    [
-      "BS:burnt_cardboard_pressure_plate",
-      "BS:cardboard_pressure_plate",
-      1
-    ],
-    [
-      "BS:burnt_smooth_cardboard_block",
-      "BS:smooth_cardboard_block",
-      1
-    ],
-    [
-      "BS:burnt_bundled_cardboard",
-      "BS:bundled_cardboard",
-      1
-    ],
-    [
-      "BS:burnt_pressed_cardboard",
-      "BS:pressed_cardboard",
-      1
-    ],
-    [
-      "BS:burnt_thick_cardboard_block",
-      "BS:thick_cardboard_block",
-      1
-    ]
+    ["BS:black_smooth_sandstone", "BS:black_sandstone", 1],
+    ["BS:blue_smooth_sandstone", "BS:blue_sandstone", 1],
+    ["BS:green_smooth_sandstone", "BS:green_sandstone", 1],
+    ["BS:leaf_litter", "#MC:leaves", 1],
+    ["BS:orange_smooth_sandstone", "BS:orange_sandstone", 1],
+    ["BS:pink_smooth_sandstone", "BS:pink_sandstone", 1],
+    ["BS:red_smooth_sandstone", "BS:red_sandstone", 1],
+    ["BS:white_smooth_sandstone", "BS:white_sandstone", 1],
+    ["BS:yellow_smooth_sandstone", "BS:yellow_sandstone", 1],
+    ["BS:steel_block", "MC:iron_block", 1],
+    ["BS:steel_ingot", "MC:iron_ingot", 1],
+    ["BS:burnt_cardboard_block", "BS:cardboard_block", 1],
+    ["BS:burnt_cardboard_trapdoor", "BS:cardboard_trapdoor", 1],
+    ["BS:burnt_cardboard_button", "BS:cardboard_button", 1],
+    ["BS:burnt_cardboard_pressure_plate", "BS:cardboard_pressure_plate", 1],
+    ["BS:burnt_smooth_cardboard_block", "BS:smooth_cardboard_block", 1],
+    ["BS:burnt_bundled_cardboard", "BS:bundled_cardboard", 1],
+    ["BS:burnt_pressed_cardboard", "BS:pressed_cardboard", 1],
+    ["BS:burnt_thick_cardboard_block", "BS:thick_cardboard_block", 1]
   ]
 }

@@ -1,0 +1,13 @@
+{
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": "explicit"
+  },
+  "[json]": {
+    "editor.formatOnSave": false
+  },
+  "json.format.enable": false,
+  "files.associations": {
+    "*.mcmeta": "json"
+  }
+}

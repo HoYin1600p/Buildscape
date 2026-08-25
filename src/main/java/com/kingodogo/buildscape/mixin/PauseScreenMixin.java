@@ -35,7 +35,7 @@ public abstract class PauseScreenMixin extends Screen {
 
         boolean isFullPauseMenu = false;
         AbstractWidget statsButton = null;
-		
+
 		// Dynamically find the Statistics button to align perfectly next to it
         for (GuiEventListener listener : this.children()) {
             if (listener instanceof AbstractWidget widget) {

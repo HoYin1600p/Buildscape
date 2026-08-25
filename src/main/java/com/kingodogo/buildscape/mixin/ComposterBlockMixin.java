@@ -92,11 +92,11 @@ public abstract class ComposterBlockMixin extends Block {
                             }
 
                             level.setBlock(pos, state.setValue(PlanterHelper.PLANTER, newType), 3);
-                            
+
                             // Play placement sound
                             net.minecraft.world.level.block.SoundType soundType = block.getSoundType(block.defaultBlockState(), level, pos, player);
                             level.playSound(null, pos, soundType.getPlaceSound(), SoundSource.BLOCKS, (soundType.getVolume() + 1.0F) / 2.0F, soundType.getPitch() * 0.8F);
-                            
+
                             if (!player.getAbilities().instabuild) {
                                 heldItem.shrink(1);
                             }

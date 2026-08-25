@@ -17,7 +17,7 @@ import net.minecraft.core.particles.SimpleParticleType;
 public class TintableHeartParticle extends TextureSheetParticle {
 
     private final TextureAtlasSprite baseSprite;
-    
+
     // Static map to store color queues for particles
     // Key: "x,y,z" string, Value: ColorEntry
     private static final Map<String, ColorEntry> POSITION_COLOR_MAP = new ConcurrentHashMap<>();
@@ -45,13 +45,13 @@ public class TintableHeartParticle extends TextureSheetParticle {
         super(level, x, y, z, dx, dy, dz);
         this.setSpriteFromAge(sprites); // Use sprite set
         this.baseSprite = this.sprite;
-        
+
         // Heart particle movement logic (similar to vanilla heart)
         this.xd = dx;
         this.yd = dy;
         this.zd = dz;
         this.lifetime = 100; // Longer life
-        
+
         // Initial upward velocity if none provided
         if (this.yd == 0) {
             this.yd = 0.1;
@@ -101,7 +101,7 @@ public class TintableHeartParticle extends TextureSheetParticle {
         if (colorCode == null || colorCode.isEmpty()) {
             return new float[]{1.0F, 0.0F, 0.0F}; // Red fallback
         }
-        
+
         if (!colorCode.startsWith("#")) {
              return new float[]{1.0F, 0.0F, 0.0F};
         }
@@ -125,12 +125,12 @@ public class TintableHeartParticle extends TextureSheetParticle {
     @Override
     public void tick() {
         super.tick();
-        
+
         // Simple float up movement
         this.xo = this.x;
         this.yo = this.y;
         this.zo = this.z;
-        
+
         if (this.age++ >= this.lifetime) {
              this.remove();
         } else {
@@ -138,7 +138,7 @@ public class TintableHeartParticle extends TextureSheetParticle {
              this.xd *= 0.99;
              this.yd *= 0.99;
              this.zd *= 0.99;
-             
+
              // Fade out
              if (this.age > this.lifetime - 20) {
                  this.alpha = (this.lifetime - this.age) / 20.0f;
@@ -150,7 +150,7 @@ public class TintableHeartParticle extends TextureSheetParticle {
     public ParticleRenderType getRenderType() {
         return ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT;
     }
-    
+
     @Override
     public int getLightColor(float partialTick) {
          return 0xF000F0; // Full brightness

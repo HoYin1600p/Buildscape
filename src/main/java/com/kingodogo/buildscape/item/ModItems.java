@@ -2634,23 +2634,7 @@ public class ModItems {
                     new BlockItem(ModBlocks.QUARTZ_PILLAR.get(), createBlockItemProperties())
     );
 
-    public static final RegistryObject<Item> QUARTZ_PILLAR_STAIRS = ITEMS.register(
-            "quartz_pillar_stairs",
-            () ->
-                    new BlockItem(ModBlocks.QUARTZ_PILLAR_STAIRS.get(), createBlockItemProperties())
-    );
 
-    public static final RegistryObject<Item> QUARTZ_PILLAR_SLAB = ITEMS.register(
-            "quartz_pillar_slab",
-            () ->
-                    new BlockItem(ModBlocks.QUARTZ_PILLAR_SLAB.get(), createBlockItemProperties())
-    );
-
-    public static final RegistryObject<Item> QUARTZ_PILLAR_WALL = ITEMS.register(
-            "quartz_pillar_wall",
-            () ->
-                    new BlockItem(ModBlocks.QUARTZ_PILLAR_WALL.get(), createBlockItemProperties())
-    );
 
     public static final RegistryObject<Item> STONE_PILLAR = ITEMS.register(
             "stone_pillar",
@@ -8699,8 +8683,6 @@ public class ModItems {
             () -> new BlockItem(ModBlocks.WHITE_CONCRETE_VERTICAL_SLAB.get(), createBlockItemProperties()));
     public static final RegistryObject<Item> YELLOW_CONCRETE_VERTICAL_SLAB = ITEMS.register("yellow_concrete_vertical_slab",
             () -> new BlockItem(ModBlocks.YELLOW_CONCRETE_VERTICAL_SLAB.get(), createBlockItemProperties()));
-    public static final RegistryObject<Item> QUARTZ_PILLAR_VERTICAL_SLAB = ITEMS.register("quartz_pillar_vertical_slab",
-            () -> new BlockItem(ModBlocks.QUARTZ_PILLAR_VERTICAL_SLAB.get(), createBlockItemProperties()));
     public static final RegistryObject<Item> HAY_BALE_VERTICAL_SLAB = ITEMS.register("hay_bale_vertical_slab",
             () -> new BlockItem(ModBlocks.HAY_BALE_VERTICAL_SLAB.get(), createBlockItemProperties()));
     public static final RegistryObject<Item> BAMBOO_BLOCK_VERTICAL_SLAB = ITEMS.register("bamboo_block_vertical_slab",

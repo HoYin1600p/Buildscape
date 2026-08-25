@@ -36,7 +36,7 @@ public class ExperienceBucketItem extends BucketItem {
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         ItemStack itemstack = player.getItemInHand(hand);
-        
+
         // If sneaking, bypass fluid block placing and drink directly
         if (player.isShiftKeyDown()) {
             player.startUsingItem(hand);
@@ -49,7 +49,7 @@ public class ExperienceBucketItem extends BucketItem {
             player.startUsingItem(hand);
             return InteractionResultHolder.consume(itemstack);
         }
-        
+
         return placementResult;
     }
 

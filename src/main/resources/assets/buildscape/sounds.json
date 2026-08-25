@@ -1095,88 +1095,88 @@
   "block_geyser_continuous_start": {
     "sounds": [
       {
-        "name": "minecraft:block/bubble_column/bubble_column_up_inside",
-        "stream": false
+        "name": "block.bubble_column.whirlpool_inside",
+        "type": "event"
       }
     ]
   },
   "block_geyser_continuous_active": {
     "sounds": [
       {
-        "name": "minecraft:block/bubble_column/bubble_column_up",
-        "stream": false
+        "name": "block.bubble_column.whirlpool_ambient",
+        "type": "event"
       }
     ]
   },
   "block_geyser_eruption_start": {
     "sounds": [
       {
-        "name": "minecraft:entity/generic/explode",
-        "stream": false
+        "name": "entity.generic.explode",
+        "type": "event"
       }
     ]
   },
   "block_geyser_eruption_active": {
     "sounds": [
       {
-        "name": "minecraft:block/bubble_column/bubble_column_up",
-        "stream": false
+        "name": "block.bubble_column.whirlpool_ambient",
+        "type": "event"
       }
     ]
   },
   "block_noxious_gas": {
     "sounds": [
       {
-        "name": "minecraft:block/fire/extinguish",
-        "stream": false
+        "name": "block.fire.extinguish",
+        "type": "event"
       }
     ]
   },
   "block_shelf_activate": {
     "sounds": [
       {
-        "name": "minecraft:block/wooden_trapdoor/close",
-        "stream": false
+        "name": "block.wooden_trapdoor.close",
+        "type": "event"
       }
     ]
   },
   "block_shelf_deactivate": {
     "sounds": [
       {
-        "name": "minecraft:block/wooden_trapdoor/open",
-        "stream": false
+        "name": "block.wooden_trapdoor.open",
+        "type": "event"
       }
     ]
   },
   "block_shelf_place_item": {
     "sounds": [
       {
-        "name": "minecraft:entity/item_frame/add_item",
-        "stream": false
+        "name": "entity.item_frame.add_item",
+        "type": "event"
       }
     ]
   },
   "block_shelf_take_item": {
     "sounds": [
       {
-        "name": "minecraft:entity/item_frame/remove_item",
-        "stream": false
+        "name": "entity.item_frame.remove_item",
+        "type": "event"
       }
     ]
   },
   "block_shelf_single_swap": {
     "sounds": [
       {
-        "name": "minecraft:entity/item_frame/rotate_item",
-        "stream": false
+        "name": "entity.item_frame.rotate_item",
+        "type": "event"
       }
     ]
   },
   "block_shelf_multi_swap": {
     "sounds": [
       {
-        "name": "minecraft:entity/item_frame/rotate_item",
-        "stream": false
+        "name": "entity.item_frame.rotate_item",
+        "type": "event"
       }
     ]
   }

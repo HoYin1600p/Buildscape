@@ -677,7 +677,7 @@ public class BuildScape {
                         serverPlayer.getLevel().getGameRules().getBoolean(com.kingodogo.buildscape.world.ModGameRules.DISABLE_GHAST_GRIEFING)
                     )
                 );
-                
+
                 // Schedule pillar ID sync - try immediately, with retries if not loaded
                 schedulePillarIdSync(server, serverPlayer, manager, 0);
             }
@@ -697,7 +697,7 @@ public class BuildScape {
                 if (entity.level.getGameRules().getBoolean(com.kingodogo.buildscape.world.ModGameRules.DISABLE_CREEPER_GRIEFING)) {
                     event.setResult(net.minecraftforge.eventbus.api.Event.Result.DENY);
                 }
-            } else if (entity instanceof net.minecraft.world.entity.monster.Ghast || 
+            } else if (entity instanceof net.minecraft.world.entity.monster.Ghast ||
                        entity instanceof net.minecraft.world.entity.projectile.LargeFireball) {
                 if (entity.level.getGameRules().getBoolean(com.kingodogo.buildscape.world.ModGameRules.DISABLE_GHAST_GRIEFING)) {
                     event.setResult(net.minecraftforge.eventbus.api.Event.Result.DENY);
@@ -718,7 +718,7 @@ public class BuildScape {
         final int RETRY_DELAY_MS = 500;
 
         if (attempt >= MAX_ATTEMPTS) {
-            // Give up after max attempts — send whatever we have 
+            // Give up after max attempts — send whatever we have
             server.execute(() -> {
                 if (player.hasDisconnected()) return;
                 sendPillarIdsToPlayer(server, player, manager);
@@ -733,7 +733,7 @@ public class BuildScape {
                 sendPillarIdsToPlayer(server, player, manager);
             });
         } else {
-            // Not loaded yet — wait on async pool and retry 
+            // Not loaded yet — wait on async pool and retry
             ASYNC_POOL.submit(() -> {
                 try {
                     Thread.sleep(RETRY_DELAY_MS);
@@ -1028,7 +1028,7 @@ public class BuildScape {
                         8,
                         1,
                         0.05f));
-        
+
         event
                 .getGenericTrades()
                 .add((trader, rand) -> new net.minecraft.world.item.trading.MerchantOffer(

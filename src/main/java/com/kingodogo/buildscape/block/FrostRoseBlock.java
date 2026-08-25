@@ -340,7 +340,7 @@ public class FrostRoseBlock extends BushBlock implements SinksOnFarmland, Boneme
         // Check for 5 Frost Roses in a 7x7x7 block radius (so offset by 3)
         int radius = 3;
         int count = 0;
-        
+
         for (BlockPos p : BlockPos.betweenClosed(pos.offset(-radius, -radius, -radius), pos.offset(radius, radius, radius))) {
             if (level.getBlockState(p).is(this)) {
                 count++;
@@ -358,7 +358,7 @@ public class FrostRoseBlock extends BushBlock implements SinksOnFarmland, Boneme
             if (random.nextDouble() < 0.20) { // 20% chance to be higher
                 particlesToSpawn = 21 + random.nextInt(30); // 21 to 50
             }
-            
+
             // Spawn snowfall over an 80 block diameter (40 block radius)
             double maxRadius = 40.0;
             for (int i = 0; i < particlesToSpawn; i++) {

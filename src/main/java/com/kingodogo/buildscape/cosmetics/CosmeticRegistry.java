@@ -14,7 +14,7 @@ import java.util.Map;
 /**
  * Registry for parsing and resolving cosmetic IDs to Minecraft registry
  * entries.
- * 
+ *
  * Cosmetic IDs are strings in format:
  * - "item:namespace:item_id" - Item cosmetic (e.g.,
  * "item:minecraft:diamond_sword")
@@ -22,7 +22,7 @@ import java.util.Map;
  * "block:minecraft:gold_block")
  * - "nbt:custom_data" - NBT-based cosmetic (custom data stored in game)
  * - "type:armor_set_1" - Type-based cosmetic (armor sets, etc.)
- * 
+ *
  * All cosmetic assets (models, textures) are built into the game.
  * This registry only resolves IDs to registry entries.
  */
@@ -107,7 +107,7 @@ public class CosmeticRegistry {
 
     /**
      * Resolve a cosmetic ID to an Item.
-     * 
+     *
      * @param cosmeticId Cosmetic ID string
      * @return Item if found, null otherwise
      */
@@ -141,7 +141,7 @@ public class CosmeticRegistry {
 
     /**
      * Resolve a cosmetic ID to a Block.
-     * 
+     *
      * @param cosmeticId Cosmetic ID string
      * @return Block if found, null otherwise
      */
@@ -177,7 +177,7 @@ public class CosmeticRegistry {
      * Resolve a cosmetic ID to an ItemStack.
      * Handles both item and block cosmetics (blocks are converted to ItemStacks).
      * For particle trails, returns a placeholder item (nether star) for display.
-     * 
+     *
      * @param cosmeticId Cosmetic ID string
      * @return ItemStack if found, null otherwise
      */
@@ -275,7 +275,7 @@ public class CosmeticRegistry {
 
     /**
      * Check if a cosmetic ID is valid and can be resolved.
-     * 
+     *
      * @param cosmeticId Cosmetic ID string
      * @return true if valid and resolvable
      */

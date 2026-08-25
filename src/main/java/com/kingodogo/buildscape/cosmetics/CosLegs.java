@@ -11,7 +11,7 @@ import net.minecraft.world.entity.Entity;
  * Base class for all custom legs cosmetics.
  */
 public abstract class CosLegs<T extends Entity> extends EntityModel<T> {
-    
+
     protected final ModelPart body; // Waist/Belt area
     protected final ModelPart leftLeg;
     protected final ModelPart rightLeg;

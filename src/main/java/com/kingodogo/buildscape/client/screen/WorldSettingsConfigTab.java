@@ -212,7 +212,7 @@ public class WorldSettingsConfigTab extends AbstractConfigTab {
             float textScale = BuildScapeConfigScreen.getStandardTextScale();
             int textX = x + BuildScapeConfigScreen.scaleSize(6);
             int textY = y + (height - (int)(mc.font.lineHeight * textScale)) / 2;
-            
+
             poseStack.pushPose();
             poseStack.translate(textX, textY, 0);
             poseStack.scale(textScale, textScale, 1.0f);
@@ -291,7 +291,7 @@ public class WorldSettingsConfigTab extends AbstractConfigTab {
             poseStack.scale(textScale, textScale, 1.0f);
             mc.font.draw(poseStack, status, 0, 0, active ? barColor : 0x888888);
             poseStack.popPose();
-            
+
             // Render lock icon if inactive
             if (!active) {
                 com.mojang.blaze3d.systems.RenderSystem.setShaderTexture(0, new net.minecraft.resources.ResourceLocation(com.kingodogo.buildscape.BuildScape.MODID, "textures/gui/lock.png"));

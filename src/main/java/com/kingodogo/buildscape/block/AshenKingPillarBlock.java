@@ -129,12 +129,12 @@ public class AshenKingPillarBlock extends PillarBlock {
         if (state.getValue(WATERLOGGED)) {
             level.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
         }
-        
+
         Direction facing = state.getValue(FACING);
         if (direction == facing.getClockWise() || direction == facing.getCounterClockWise()) {
             return updatePart(state, level, pos, facing);
         }
-        
+
         return state;
     }
 

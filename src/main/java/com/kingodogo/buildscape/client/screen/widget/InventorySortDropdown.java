@@ -12,18 +12,18 @@ public class InventorySortDropdown extends Button {
         INVENTORY(new TranslatableComponent("buildscape.config.sort.inventory")),
         ALL(new TranslatableComponent("buildscape.config.sort.all")),
         MOD_ONLY(new TranslatableComponent("buildscape.config.sort.mod_only"));
-        
+
         private final Component displayName;
-        
+
         SortMode(Component displayName) {
             this.displayName = displayName;
         }
-        
+
         public Component getDisplayName() {
             return displayName;
         }
     }
-    
+
     private SortMode currentMode = SortMode.INVENTORY;
     private boolean dropdownOpen = false;
     private final Consumer<SortMode> onModeChanged;
@@ -36,11 +36,11 @@ public class InventorySortDropdown extends Button {
         });
         this.onModeChanged = onModeChanged;
     }
-    
+
     public SortMode getCurrentMode() {
         return currentMode;
     }
-    
+
     public void setMode(SortMode mode) {
         if (this.currentMode != mode) {
             this.currentMode = mode;
@@ -50,7 +50,7 @@ public class InventorySortDropdown extends Button {
         }
         dropdownOpen = false;
     }
-    
+
     @Override
     public void renderButton(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
 
@@ -95,7 +95,7 @@ public class InventorySortDropdown extends Button {
                         icon = "M";
                         break;
                 }
-                
+
                 Minecraft.getInstance().font.draw(
                     poseStack,
                     icon + " " + mode.getDisplayName().getString(),
@@ -106,18 +106,18 @@ public class InventorySortDropdown extends Button {
             }
         }
     }
-    
+
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (!this.active || !this.visible) {
             return false;
         }
-        
+
         if (isValidClickButton(button)) {
-            boolean clicked = mouseX >= (double)this.x && mouseY >= (double)this.y && 
-                            mouseX < (double)(this.x + this.width) && 
+            boolean clicked = mouseX >= (double)this.x && mouseY >= (double)this.y &&
+                            mouseX < (double)(this.x + this.width) &&
                             mouseY < (double)(this.y + this.height);
-            
+
             if (clicked) {
                 this.playDownSound(Minecraft.getInstance().getSoundManager());
                 this.onClick(mouseX, mouseY);
@@ -127,11 +127,11 @@ public class InventorySortDropdown extends Button {
             if (dropdownOpen) {
                 int dropdownY = y + height;
                 int optionHeight = 20;
-                
+
                 for (int i = 0; i < SortMode.values().length; i++) {
                     SortMode mode = SortMode.values()[i];
                     int optionY = dropdownY + i * optionHeight;
-                    
+
                     if (mouseX >= x && mouseX < x + width &&
                         mouseY >= optionY && mouseY < optionY + optionHeight) {
                         setMode(mode);
@@ -142,7 +142,7 @@ public class InventorySortDropdown extends Button {
                 dropdownOpen = false;
             }
         }
-        
+
         return false;
     }
 }

@@ -3,7 +3,7 @@
     "particle": "buildscape:block/pale_oak_leaves",
     "texture": "buildscape:block/pale_oak_leaves"
   },
-  "parent": "minecraft:block/snow_height16",
+  "parent": "minecraft:block/block",
   "elements": [
     {
       "from": [

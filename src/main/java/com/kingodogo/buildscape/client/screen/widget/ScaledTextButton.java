@@ -4,7 +4,7 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.Component;
 
 public class ScaledTextButton extends Button {
-    
+
     public ScaledTextButton(int x, int y, int width, int height, Component message, OnPress onPress) {
         super(x, y, width, height, message, onPress);
     }
@@ -99,7 +99,7 @@ public class ScaledTextButton extends Button {
             // Render rich text component
             mc.font.drawShadow(poseStack, message, 0, 0, 0xFFFFFF); // Base white so colors pop
         }
-        
+
         poseStack.popPose();
     }
 }

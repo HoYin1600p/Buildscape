@@ -25,7 +25,7 @@ import net.minecraftforge.fml.common.Mod;
 
 /**
  * Handles custom advancement triggers, progress counters, and reward events.
- * 
+ *
  * TODO: Physical Trophy blocks/items to be awarded once registered in Buildscape.
  * TODO: Special Tools/Templates (e.g. Golden Shears) to be awarded once registered in Buildscape.
  */

@@ -19,9 +19,9 @@ public class GuiConfigManager {
         .setPrettyPrinting()
         .serializeNulls()
         .create();
-    
+
     private static final Map<String, GuiConfigData> CACHE = new HashMap<>();
-    
+
     /**
      * Get the config directory for GUI configs
      */
@@ -33,7 +33,7 @@ public class GuiConfigManager {
         }
         return dir;
     }
-    
+
     /**
      * Get the file path for a tab's GUI config
      * @param tabName The name of the tab (e.g., "PillarItems", "PillarParticles")
@@ -43,7 +43,7 @@ public class GuiConfigManager {
         String fileName = sanitizeFileName(tabName) + "-GUI.json";
         return new File(getConfigDir(), fileName);
     }
-    
+
     /**
      * Sanitize a tab name to be a valid file name
      */
@@ -51,7 +51,7 @@ public class GuiConfigManager {
         // Replace invalid characters with underscores
         return tabName.replaceAll("[^a-zA-Z0-9-_]", "_");
     }
-    
+
     /**
      * Load GUI configuration for a tab
      * @param tabName The name of the tab
@@ -59,15 +59,15 @@ public class GuiConfigManager {
      */
     public GuiConfigData loadConfig(String tabName) {
         String cacheKey = tabName.toLowerCase();
-        
+
         // Return cached config if available
         if (CACHE.containsKey(cacheKey)) {
             return CACHE.get(cacheKey);
         }
-        
+
         File file = getGuiConfigFile(tabName);
         GuiConfigData config = new GuiConfigData();
-        
+
         if (file.exists()) {
             try (FileReader reader = new FileReader(file)) {
                 config = GSON.fromJson(reader, GuiConfigData.class);
@@ -87,12 +87,12 @@ public class GuiConfigManager {
                 config = new GuiConfigData();
             }
         }
-        
+
         // Cache the config
         CACHE.put(cacheKey, config);
         return config;
     }
-    
+
     /**
      * Save GUI configuration for a tab
      * @param tabName The name of the tab
@@ -103,30 +103,30 @@ public class GuiConfigManager {
             BuildScape.getLogger().warn("Attempted to save null GUI config for tab '{}'", tabName);
             return;
         }
-        
+
         File file = getGuiConfigFile(tabName);
         try {
             File parentDir = file.getParentFile();
             if (parentDir != null && !parentDir.exists()) {
                 parentDir.mkdirs();
             }
-            
+
             try (FileWriter writer = new FileWriter(file)) {
                 GSON.toJson(config, writer);
                 writer.flush();
             }
-            
+
             // Update cache
             String cacheKey = tabName.toLowerCase();
             CACHE.put(cacheKey, config);
-            
+
 
         } catch (Exception e) {
             BuildScape.getLogger().error("Failed to save GUI config for tab '{}': {}", tabName, e.getMessage());
             e.printStackTrace();
         }
     }
-    
+
     /**
      * Clear the cache for a specific tab (useful when reloading)
      * @param tabName The name of the tab
@@ -134,19 +134,19 @@ public class GuiConfigManager {
     public void clearCache(String tabName) {
         CACHE.remove(tabName.toLowerCase());
     }
-    
+
     /**
      * Clear all cached configs
      */
     public void clearAllCache() {
         CACHE.clear();
     }
-    
+
     /**
      * Get the singleton instance
      */
     private static GuiConfigManager INSTANCE;
-    
+
     public static GuiConfigManager get() {
         if (INSTANCE == null) {
             INSTANCE = new GuiConfigManager();

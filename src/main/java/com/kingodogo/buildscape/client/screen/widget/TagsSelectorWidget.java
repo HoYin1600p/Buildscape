@@ -25,7 +25,7 @@ public class TagsSelectorWidget extends AbstractWidget {
     // Items start below this area
     private int headerAreaHeight = 26; // Default to 1px below 20px search bar
     private static final int GRID_PADDING_TOP = 5; // Headspace between separator line and tag list
-    
+
     public void setHeaderAreaHeight(int height) {
         this.headerAreaHeight = height;
         refresh();
@@ -162,7 +162,7 @@ public class TagsSelectorWidget extends AbstractWidget {
         int windowHeight = mc.getWindow().getHeight();
         int scissorX = (int) (x * guiScale);
         int scissorY = (int) (windowHeight - (y + height) * guiScale + bottomMargin * guiScale);
-        
+
         // Clip content area: Include the padding space for selection borders
         int scissorWidth = (int) ((width - 16) * guiScale);
         int scissorHeight = (int) ((height - headerAreaHeight - 1 - bottomMargin) * guiScale);
@@ -287,7 +287,7 @@ public class TagsSelectorWidget extends AbstractWidget {
             RenderSystem.disableScissor();
         }
         poseStack.popPose();
-        
+
         // Draw panel borders and separator
         int borderCol = 0xFF666666;
         fill(poseStack, x, y, x + width, y + 1, borderCol); // Top

@@ -41,7 +41,7 @@ public class SeatEntity extends Entity {
     @Override
     public void tick() {
         super.tick();
-        
+
         // Remove the seat if it has no passengers (e.g. player dismounted)
         if (!this.level.isClientSide) {
             if (this.getPassengers().isEmpty()) {

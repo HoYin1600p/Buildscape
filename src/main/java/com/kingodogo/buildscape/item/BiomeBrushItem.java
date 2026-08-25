@@ -156,7 +156,7 @@ public class BiomeBrushItem extends Item {
         stack.getOrCreateTag().put(KEY_POS2, NbtUtils.writeBlockPos(pos));
         player.displayClientMessage(new TranslatableComponent("message.buildscape.biome_brush.pos2", pos.getX(), pos.getY(), pos.getZ()).withStyle(ChatFormatting.WHITE), true);
         player.level.playSound(null, pos, SoundEvents.NOTE_BLOCK_CHIME, SoundSource.PLAYERS, 1.0f, 1.2f);
-        
+
         BlockPos pos1 = getPos1(stack);
         if (pos1 != null) {
             int width = Math.abs(pos.getX() - pos1.getX()) + 1;
@@ -424,7 +424,7 @@ public class BiomeBrushItem extends Item {
         tooltip.add(new TranslatableComponent("tooltip.buildscape.biome_brush.desc1").withStyle(ChatFormatting.GRAY));
         tooltip.add(new TranslatableComponent("tooltip.buildscape.biome_brush.desc2").withStyle(ChatFormatting.GRAY));
         tooltip.add(new TranslatableComponent("tooltip.buildscape.biome_brush.desc3").withStyle(ChatFormatting.AQUA));
-        
+
         super.appendHoverText(stack, level, tooltip, flag);
     }
 }

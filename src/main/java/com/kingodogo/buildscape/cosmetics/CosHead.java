@@ -12,7 +12,7 @@ import net.minecraft.world.entity.Entity;
  * Extend this class and register it in CosmeticManager to add new custom head models.
  */
 public abstract class CosHead<T extends Entity> extends EntityModel<T> {
-    
+
     protected final ModelPart root;
     protected final ResourceLocation texture;
 

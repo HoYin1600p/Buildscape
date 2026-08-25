@@ -47,10 +47,10 @@ public class ModCreativeModeTab {
             }
 
             rawList = arrangeVariantItems(rawList);
-            
+
             items.clear();
             Set<Item> added = new HashSet<>();
-            
+
             for (ItemStack stack : rawList) {
                 Item item = stack.getItem();
                 ResourceLocation id = ForgeRegistries.ITEMS.getKey(item);
@@ -153,7 +153,7 @@ public class ModCreativeModeTab {
             ordered.moveAfter(stack, anchor);
         }
 
-        private final class ItemStackOrder {
+        final class ItemStackOrder {
             private final Map<ItemStack, ItemStackNode> nodes = new IdentityHashMap<>();
             private ItemStackNode head;
             private ItemStackNode tail;
@@ -234,7 +234,7 @@ public class ModCreativeModeTab {
             }
         }
 
-        private final class ItemStackNode {
+        final class ItemStackNode {
             private final ItemStack stack;
             private ItemStackNode previous;
             private ItemStackNode next;
@@ -1252,6 +1252,8 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.BAMBOO_BLOCK_SLAB.get()));
             items.add(new ItemStack(ModItems.BAMBOO_BLOCK_VERTICAL_SLAB.get()));
             items.add(new ItemStack(ModItems.BAMBOO_BLOCK_WALL.get()));
+            items.add(new ItemStack(ModItems.BAMBOO_SHELF.get()));
+            items.add(new ItemStack(ModItems.STRIPPED_BAMBOO_SHELF.get()));
             items.add(new ItemStack(ModItems.BAMBOO_BLOCK_FENCE.get()));
             items.add(new ItemStack(ModItems.BAMBOO_BLOCK_FENCE_GATE.get()));
             items.add(new ItemStack(ModItems.BAMBOO_BLOCK_PRESSURE_PLATE.get()));
@@ -1302,6 +1304,7 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.MANGROVE_SLAB.get()));
             items.add(new ItemStack(ModItems.MANGROVE_VERTICAL_SLAB.get()));
             items.add(new ItemStack(ModItems.MANGROVE_WOOD_WALL.get()));
+            items.add(new ItemStack(ModItems.MANGROVE_SHELF.get()));
             items.add(new ItemStack(ModItems.MANGROVE_FENCE.get()));
             items.add(new ItemStack(ModItems.MANGROVE_FENCE_GATE.get()));
             items.add(new ItemStack(ModItems.MANGROVE_PRESSURE_PLATE.get()));
@@ -1310,7 +1313,7 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.MANGROVE_TRAPDOOR.get()));
             items.add(new ItemStack(ModItems.MANGROVE_SIGN.get()));
             items.add(new ItemStack(ModItems.STRIPPED_MANGROVE_WOOD_WALL.get()));
-    items.add(new ItemStack(ModItems.MANGROVE_BOAT.get()));
+            items.add(new ItemStack(ModItems.MANGROVE_BOAT.get()));
 
             // --- PALE OAK WOODSET ---
             items.add(new ItemStack(ModItems.PALE_OAK_LOG.get()));
@@ -1449,45 +1452,46 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.STRIPPED_POPLAR_WOOD_VERTICAL_SLAB.get()));
             items.add(new ItemStack(ModItems.POPLAR_FENCE.get()));
             items.add(new ItemStack(ModItems.POPLAR_FENCE_GATE.get()));
+            items.add(new ItemStack(ModItems.POPLAR_SHELF.get()));
             items.add(new ItemStack(ModItems.POPLAR_PRESSURE_PLATE.get()));
             items.add(new ItemStack(ModItems.POPLAR_BUTTON.get()));
             items.add(new ItemStack(ModItems.POPLAR_DOOR.get()));
             items.add(new ItemStack(ModItems.POPLAR_TRAPDOOR.get()));
             items.add(new ItemStack(ModItems.POPLAR_SAPLING.get()));
             items.add(new ItemStack(ModItems.POPLAR_BOAT.get()));
-    // Vanilla Log Slabs
-    items.add(new ItemStack(ModItems.OAK_LOG_SLAB.get()));
-    items.add(new ItemStack(ModItems.OAK_LOG_VERTICAL_SLAB.get()));
-    items.add(new ItemStack(ModItems.STRIPPED_OAK_LOG_SLAB.get()));
-    items.add(new ItemStack(ModItems.STRIPPED_OAK_LOG_VERTICAL_SLAB.get()));
-    items.add(new ItemStack(ModItems.SPRUCE_LOG_SLAB.get()));
-    items.add(new ItemStack(ModItems.SPRUCE_LOG_VERTICAL_SLAB.get()));
-    items.add(new ItemStack(ModItems.STRIPPED_SPRUCE_LOG_SLAB.get()));
-    items.add(new ItemStack(ModItems.STRIPPED_SPRUCE_LOG_VERTICAL_SLAB.get()));
-    items.add(new ItemStack(ModItems.BIRCH_LOG_SLAB.get()));
-    items.add(new ItemStack(ModItems.BIRCH_LOG_VERTICAL_SLAB.get()));
-    items.add(new ItemStack(ModItems.STRIPPED_BIRCH_LOG_SLAB.get()));
-    items.add(new ItemStack(ModItems.STRIPPED_BIRCH_LOG_VERTICAL_SLAB.get()));
-    items.add(new ItemStack(ModItems.JUNGLE_LOG_SLAB.get()));
-    items.add(new ItemStack(ModItems.JUNGLE_LOG_VERTICAL_SLAB.get()));
-    items.add(new ItemStack(ModItems.STRIPPED_JUNGLE_LOG_SLAB.get()));
-    items.add(new ItemStack(ModItems.STRIPPED_JUNGLE_LOG_VERTICAL_SLAB.get()));
-    items.add(new ItemStack(ModItems.ACACIA_LOG_SLAB.get()));
-    items.add(new ItemStack(ModItems.ACACIA_LOG_VERTICAL_SLAB.get()));
-    items.add(new ItemStack(ModItems.STRIPPED_ACACIA_LOG_SLAB.get()));
-    items.add(new ItemStack(ModItems.STRIPPED_ACACIA_LOG_VERTICAL_SLAB.get()));
-    items.add(new ItemStack(ModItems.DARK_OAK_LOG_SLAB.get()));
-    items.add(new ItemStack(ModItems.DARK_OAK_LOG_VERTICAL_SLAB.get()));
-    items.add(new ItemStack(ModItems.STRIPPED_DARK_OAK_LOG_SLAB.get()));
-    items.add(new ItemStack(ModItems.STRIPPED_DARK_OAK_LOG_VERTICAL_SLAB.get()));
-    items.add(new ItemStack(ModItems.CRIMSON_STEM_SLAB.get()));
-    items.add(new ItemStack(ModItems.CRIMSON_STEM_VERTICAL_SLAB.get()));
-    items.add(new ItemStack(ModItems.STRIPPED_CRIMSON_STEM_SLAB.get()));
-    items.add(new ItemStack(ModItems.STRIPPED_CRIMSON_STEM_VERTICAL_SLAB.get()));
-    items.add(new ItemStack(ModItems.WARPED_STEM_SLAB.get()));
-    items.add(new ItemStack(ModItems.WARPED_STEM_VERTICAL_SLAB.get()));
-    items.add(new ItemStack(ModItems.STRIPPED_WARPED_STEM_SLAB.get()));
-    items.add(new ItemStack(ModItems.STRIPPED_WARPED_STEM_VERTICAL_SLAB.get()));
+            // Vanilla Log Slabs
+            items.add(new ItemStack(ModItems.OAK_LOG_SLAB.get()));
+            items.add(new ItemStack(ModItems.OAK_LOG_VERTICAL_SLAB.get()));
+            items.add(new ItemStack(ModItems.STRIPPED_OAK_LOG_SLAB.get()));
+            items.add(new ItemStack(ModItems.STRIPPED_OAK_LOG_VERTICAL_SLAB.get()));
+            items.add(new ItemStack(ModItems.SPRUCE_LOG_SLAB.get()));
+            items.add(new ItemStack(ModItems.SPRUCE_LOG_VERTICAL_SLAB.get()));
+            items.add(new ItemStack(ModItems.STRIPPED_SPRUCE_LOG_SLAB.get()));
+            items.add(new ItemStack(ModItems.STRIPPED_SPRUCE_LOG_VERTICAL_SLAB.get()));
+            items.add(new ItemStack(ModItems.BIRCH_LOG_SLAB.get()));
+            items.add(new ItemStack(ModItems.BIRCH_LOG_VERTICAL_SLAB.get()));
+            items.add(new ItemStack(ModItems.STRIPPED_BIRCH_LOG_SLAB.get()));
+            items.add(new ItemStack(ModItems.STRIPPED_BIRCH_LOG_VERTICAL_SLAB.get()));
+            items.add(new ItemStack(ModItems.JUNGLE_LOG_SLAB.get()));
+            items.add(new ItemStack(ModItems.JUNGLE_LOG_VERTICAL_SLAB.get()));
+            items.add(new ItemStack(ModItems.STRIPPED_JUNGLE_LOG_SLAB.get()));
+            items.add(new ItemStack(ModItems.STRIPPED_JUNGLE_LOG_VERTICAL_SLAB.get()));
+            items.add(new ItemStack(ModItems.ACACIA_LOG_SLAB.get()));
+            items.add(new ItemStack(ModItems.ACACIA_LOG_VERTICAL_SLAB.get()));
+            items.add(new ItemStack(ModItems.STRIPPED_ACACIA_LOG_SLAB.get()));
+            items.add(new ItemStack(ModItems.STRIPPED_ACACIA_LOG_VERTICAL_SLAB.get()));
+            items.add(new ItemStack(ModItems.DARK_OAK_LOG_SLAB.get()));
+            items.add(new ItemStack(ModItems.DARK_OAK_LOG_VERTICAL_SLAB.get()));
+            items.add(new ItemStack(ModItems.STRIPPED_DARK_OAK_LOG_SLAB.get()));
+            items.add(new ItemStack(ModItems.STRIPPED_DARK_OAK_LOG_VERTICAL_SLAB.get()));
+            items.add(new ItemStack(ModItems.CRIMSON_STEM_SLAB.get()));
+            items.add(new ItemStack(ModItems.CRIMSON_STEM_VERTICAL_SLAB.get()));
+            items.add(new ItemStack(ModItems.STRIPPED_CRIMSON_STEM_SLAB.get()));
+            items.add(new ItemStack(ModItems.STRIPPED_CRIMSON_STEM_VERTICAL_SLAB.get()));
+            items.add(new ItemStack(ModItems.WARPED_STEM_SLAB.get()));
+            items.add(new ItemStack(ModItems.WARPED_STEM_VERTICAL_SLAB.get()));
+            items.add(new ItemStack(ModItems.STRIPPED_WARPED_STEM_SLAB.get()));
+            items.add(new ItemStack(ModItems.STRIPPED_WARPED_STEM_VERTICAL_SLAB.get()));
             // Hollow Logs
             items.add(new ItemStack(ModItems.HOLLOW_OAK_LOG.get()));
             items.add(new ItemStack(ModItems.STRIPPED_HOLLOW_OAK_LOG.get()));
@@ -1503,23 +1507,33 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.STRIPPED_HOLLOW_DARK_OAK_LOG.get()));
             items.add(new ItemStack(ModItems.HOLLOW_CRIMSON_STEM.get()));
             items.add(new ItemStack(ModItems.STRIPPED_HOLLOW_CRIMSON_STEM.get()));
+            items.add(new ItemStack(ModItems.CRIMSON_SHELF.get()));
             items.add(new ItemStack(ModItems.HOLLOW_WARPED_STEM.get()));
             items.add(new ItemStack(ModItems.STRIPPED_HOLLOW_WARPED_STEM.get()));
+            items.add(new ItemStack(ModItems.WARPED_SHELF.get()));
             items.add(new ItemStack(ModItems.OAK_WOOD_WALL.get()));
+            items.add(new ItemStack(ModItems.OAK_SHELF.get()));
             items.add(new ItemStack(ModItems.STRIPPED_OAK_WOOD_WALL.get()));
             items.add(new ItemStack(ModItems.SPRUCE_WOOD_WALL.get()));
+            items.add(new ItemStack(ModItems.SPRUCE_SHELF.get()));
             items.add(new ItemStack(ModItems.STRIPPED_SPRUCE_WOOD_WALL.get()));
             items.add(new ItemStack(ModItems.BIRCH_WOOD_WALL.get()));
+            items.add(new ItemStack(ModItems.BIRCH_SHELF.get()));
             items.add(new ItemStack(ModItems.STRIPPED_BIRCH_WOOD_WALL.get()));
             items.add(new ItemStack(ModItems.DARK_OAK_WOOD_WALL.get()));
+            items.add(new ItemStack(ModItems.DARK_OAK_SHELF.get()));
             items.add(new ItemStack(ModItems.STRIPPED_DARK_OAK_WOOD_WALL.get()));
             items.add(new ItemStack(ModItems.JUNGLE_WOOD_WALL.get()));
+            items.add(new ItemStack(ModItems.JUNGLE_SHELF.get()));
             items.add(new ItemStack(ModItems.STRIPPED_JUNGLE_WOOD_WALL.get()));
             items.add(new ItemStack(ModItems.ACACIA_WOOD_WALL.get()));
+            items.add(new ItemStack(ModItems.ACACIA_SHELF.get()));
             items.add(new ItemStack(ModItems.STRIPPED_ACACIA_WOOD_WALL.get()));
             items.add(new ItemStack(ModItems.CHERRY_WOOD_WALL.get()));
+            items.add(new ItemStack(ModItems.CHERRY_SHELF.get()));
             items.add(new ItemStack(ModItems.STRIPPED_CHERRY_WOOD_WALL.get()));
             items.add(new ItemStack(ModItems.PALE_OAK_WOOD_WALL.get()));
+            items.add(new ItemStack(ModItems.PALE_OAK_SHELF.get()));
             items.add(new ItemStack(ModItems.STRIPPED_PALE_OAK_WOOD_WALL.get()));
             items.add(new ItemStack(ModItems.ASHPEN_WOOD_WALL.get()));
             items.add(new ItemStack(ModItems.STRIPPED_ASHPEN_WOOD_WALL.get()));
@@ -2616,7 +2630,7 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.PINK_WOOL_VERTICAL_SLAB.get()));
             items.add(new ItemStack(ModItems.PINK_WOOL_STAIRS.get()));
             items.add(new ItemStack(ModItems.PINK_WOOL_WALL.get()));
-            
+
             // Wallpapers
             items.add(new ItemStack(ModItems.WHITE_WALLPAPER.get()));
             items.add(new ItemStack(ModItems.WHITE_WALLPAPER_SLAB.get()));
@@ -2973,10 +2987,6 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.END_STONE_WALL.get()));
             items.add(new ItemStack(ModItems.QUARTZ_BLOCK_WALL.get()));
             items.add(new ItemStack(ModItems.SMOOTH_QUARTZ_WALL.get()));
-            items.add(new ItemStack(ModItems.QUARTZ_PILLAR_STAIRS.get()));
-            items.add(new ItemStack(ModItems.QUARTZ_PILLAR_SLAB.get()));
-            items.add(new ItemStack(ModItems.QUARTZ_PILLAR_VERTICAL_SLAB.get()));
-            items.add(new ItemStack(ModItems.QUARTZ_PILLAR_WALL.get()));
             items.add(new ItemStack(ModItems.QUARTZ_BRICKS_STAIRS.get()));
             items.add(new ItemStack(ModItems.QUARTZ_BRICKS_SLAB.get()));
             items.add(new ItemStack(ModItems.QUARTZ_BRICKS_VERTICAL_SLAB.get()));
@@ -3072,14 +3082,6 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.PINK_GLASS_JAR.get()));
             items.add(new ItemStack(ModItems.TINTED_GLASS_JAR.get()));
 
-
-
-
-
-
-
-
-
             // --- SCULK FAMILY ---
             items.add(new ItemStack(ModItems.SCULK.get()));
             items.add(new ItemStack(ModItems.SCULK_SLAB.get()));
@@ -3090,93 +3092,156 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.SCULK_CATALYST.get()));
             items.add(new ItemStack(ModItems.SCULK_SHRIEKER.get()));
             items.add(new ItemStack(ModItems.SCULK_SENSOR.get()));
+            // --- CARDBOARD FAMILY ---
+            items.add(new ItemStack(ModItems.CARDBOARD_BLOCK.get()));
+            items.add(new ItemStack(ModItems.CARDBOARD_SLAB.get()));
+            items.add(new ItemStack(ModItems.CARDBOARD_STAIRS.get()));
+            items.add(new ItemStack(ModItems.CARDBOARD_WALL.get()));
+            items.add(new ItemStack(ModItems.CARDBOARD_VERTICAL_SLAB.get()));
+            items.add(new ItemStack(ModItems.CARDBOARD_TRAPDOOR.get()));
+            items.add(new ItemStack(ModItems.CARDBOARD_BUTTON.get()));
+            items.add(new ItemStack(ModItems.CARDBOARD_PRESSURE_PLATE.get()));
+            items.add(new ItemStack(ModItems.SMOOTH_CARDBOARD_BLOCK.get()));
+            items.add(new ItemStack(ModItems.SMOOTH_CARDBOARD_SLAB.get()));
+            items.add(new ItemStack(ModItems.SMOOTH_CARDBOARD_STAIRS.get()));
+            items.add(new ItemStack(ModItems.SMOOTH_CARDBOARD_WALL.get()));
+            items.add(new ItemStack(ModItems.SMOOTH_CARDBOARD_VERTICAL_SLAB.get()));
+            items.add(new ItemStack(ModItems.BUNDLED_CARDBOARD.get()));
+            items.add(new ItemStack(ModItems.BUNDLED_CARDBOARD_SLAB.get()));
+            items.add(new ItemStack(ModItems.BUNDLED_CARDBOARD_STAIRS.get()));
+            items.add(new ItemStack(ModItems.BUNDLED_CARDBOARD_WALL.get()));
+            items.add(new ItemStack(ModItems.BUNDLED_CARDBOARD_VERTICAL_SLAB.get()));
+            items.add(new ItemStack(ModItems.PRESSED_CARDBOARD.get()));
+            items.add(new ItemStack(ModItems.PRESSED_CARDBOARD_SLAB.get()));
+            items.add(new ItemStack(ModItems.PRESSED_CARDBOARD_STAIRS.get()));
+            items.add(new ItemStack(ModItems.PRESSED_CARDBOARD_WALL.get()));
+            items.add(new ItemStack(ModItems.PRESSED_CARDBOARD_VERTICAL_SLAB.get()));
+            items.add(new ItemStack(ModItems.THICK_CARDBOARD_BLOCK.get()));
+            items.add(new ItemStack(ModItems.THICK_CARDBOARD_SLAB.get()));
+            items.add(new ItemStack(ModItems.THICK_CARDBOARD_STAIRS.get()));
+            items.add(new ItemStack(ModItems.THICK_CARDBOARD_WALL.get()));
+            items.add(new ItemStack(ModItems.THICK_CARDBOARD_VERTICAL_SLAB.get()));
+            items.add(new ItemStack(ModItems.STRIPPED_CARDBOARD_BLOCK.get()));
+            items.add(new ItemStack(ModItems.STRIPPED_CARDBOARD_SLAB.get()));
+            items.add(new ItemStack(ModItems.STRIPPED_CARDBOARD_STAIRS.get()));
+            items.add(new ItemStack(ModItems.STRIPPED_CARDBOARD_WALL.get()));
+            items.add(new ItemStack(ModItems.STRIPPED_CARDBOARD_VERTICAL_SLAB.get()));
+            items.add(new ItemStack(ModItems.STRIPPED_CARDBOARD_TRAPDOOR.get()));
+            items.add(new ItemStack(ModItems.STRIPPED_CARDBOARD_BUTTON.get()));
+            items.add(new ItemStack(ModItems.STRIPPED_CARDBOARD_PRESSURE_PLATE.get()));
+            items.add(new ItemStack(ModItems.STRIPPED_SMOOTH_CARDBOARD_BLOCK.get()));
+            items.add(new ItemStack(ModItems.STRIPPED_SMOOTH_CARDBOARD_SLAB.get()));
+            items.add(new ItemStack(ModItems.STRIPPED_SMOOTH_CARDBOARD_STAIRS.get()));
+            items.add(new ItemStack(ModItems.STRIPPED_SMOOTH_CARDBOARD_WALL.get()));
+            items.add(new ItemStack(ModItems.STRIPPED_SMOOTH_CARDBOARD_VERTICAL_SLAB.get()));
+            items.add(new ItemStack(ModItems.STRIPPED_BUNDLED_CARDBOARD.get()));
+            items.add(new ItemStack(ModItems.STRIPPED_BUNDLED_CARDBOARD_SLAB.get()));
+            items.add(new ItemStack(ModItems.STRIPPED_BUNDLED_CARDBOARD_STAIRS.get()));
+            items.add(new ItemStack(ModItems.STRIPPED_BUNDLED_CARDBOARD_WALL.get()));
+            items.add(new ItemStack(ModItems.STRIPPED_BUNDLED_CARDBOARD_VERTICAL_SLAB.get()));
+            items.add(new ItemStack(ModItems.STRIPPED_PRESSED_CARDBOARD.get()));
+            items.add(new ItemStack(ModItems.STRIPPED_PRESSED_CARDBOARD_SLAB.get()));
+            items.add(new ItemStack(ModItems.STRIPPED_PRESSED_CARDBOARD_STAIRS.get()));
+            items.add(new ItemStack(ModItems.STRIPPED_PRESSED_CARDBOARD_WALL.get()));
+            items.add(new ItemStack(ModItems.STRIPPED_PRESSED_CARDBOARD_VERTICAL_SLAB.get()));
+            items.add(new ItemStack(ModItems.STRIPPED_THICK_CARDBOARD_BLOCK.get()));
+            items.add(new ItemStack(ModItems.STRIPPED_THICK_CARDBOARD_SLAB.get()));
+            items.add(new ItemStack(ModItems.STRIPPED_THICK_CARDBOARD_STAIRS.get()));
+            items.add(new ItemStack(ModItems.STRIPPED_THICK_CARDBOARD_WALL.get()));
+            items.add(new ItemStack(ModItems.STRIPPED_THICK_CARDBOARD_VERTICAL_SLAB.get()));
+            items.add(new ItemStack(ModItems.TINTED_CARDBOARD_BLOCK.get()));
+            items.add(new ItemStack(ModItems.TINTED_CARDBOARD_SLAB.get()));
+            items.add(new ItemStack(ModItems.TINTED_CARDBOARD_STAIRS.get()));
+            items.add(new ItemStack(ModItems.TINTED_CARDBOARD_WALL.get()));
+            items.add(new ItemStack(ModItems.TINTED_CARDBOARD_VERTICAL_SLAB.get()));
+            items.add(new ItemStack(ModItems.TINTED_CARDBOARD_TRAPDOOR.get()));
+            items.add(new ItemStack(ModItems.TINTED_CARDBOARD_BUTTON.get()));
+            items.add(new ItemStack(ModItems.TINTED_CARDBOARD_PRESSURE_PLATE.get()));
+            items.add(new ItemStack(ModItems.TINTED_SMOOTH_CARDBOARD_BLOCK.get()));
+            items.add(new ItemStack(ModItems.TINTED_SMOOTH_CARDBOARD_SLAB.get()));
+            items.add(new ItemStack(ModItems.TINTED_SMOOTH_CARDBOARD_STAIRS.get()));
+            items.add(new ItemStack(ModItems.TINTED_SMOOTH_CARDBOARD_WALL.get()));
+            items.add(new ItemStack(ModItems.TINTED_SMOOTH_CARDBOARD_VERTICAL_SLAB.get()));
+            items.add(new ItemStack(ModItems.TINTED_BUNDLED_CARDBOARD.get()));
+            items.add(new ItemStack(ModItems.TINTED_BUNDLED_CARDBOARD_SLAB.get()));
+            items.add(new ItemStack(ModItems.TINTED_BUNDLED_CARDBOARD_STAIRS.get()));
+            items.add(new ItemStack(ModItems.TINTED_BUNDLED_CARDBOARD_WALL.get()));
+            items.add(new ItemStack(ModItems.TINTED_BUNDLED_CARDBOARD_VERTICAL_SLAB.get()));
+            items.add(new ItemStack(ModItems.TINTED_PRESSED_CARDBOARD.get()));
+            items.add(new ItemStack(ModItems.TINTED_PRESSED_CARDBOARD_SLAB.get()));
+            items.add(new ItemStack(ModItems.TINTED_PRESSED_CARDBOARD_STAIRS.get()));
+            items.add(new ItemStack(ModItems.TINTED_PRESSED_CARDBOARD_WALL.get()));
+            items.add(new ItemStack(ModItems.TINTED_PRESSED_CARDBOARD_VERTICAL_SLAB.get()));
+            items.add(new ItemStack(ModItems.TINTED_THICK_CARDBOARD_BLOCK.get()));
+            items.add(new ItemStack(ModItems.TINTED_THICK_CARDBOARD_SLAB.get()));
+            items.add(new ItemStack(ModItems.TINTED_THICK_CARDBOARD_STAIRS.get()));
+            items.add(new ItemStack(ModItems.TINTED_THICK_CARDBOARD_WALL.get()));
+            items.add(new ItemStack(ModItems.TINTED_THICK_CARDBOARD_VERTICAL_SLAB.get()));
+            items.add(new ItemStack(ModItems.WASHED_CARDBOARD_BLOCK.get()));
+            items.add(new ItemStack(ModItems.WASHED_CARDBOARD_SLAB.get()));
+            items.add(new ItemStack(ModItems.WASHED_CARDBOARD_STAIRS.get()));
+            items.add(new ItemStack(ModItems.WASHED_CARDBOARD_WALL.get()));
+            items.add(new ItemStack(ModItems.WASHED_CARDBOARD_VERTICAL_SLAB.get()));
+            items.add(new ItemStack(ModItems.WASHED_CARDBOARD_TRAPDOOR.get()));
+            items.add(new ItemStack(ModItems.WASHED_CARDBOARD_BUTTON.get()));
+            items.add(new ItemStack(ModItems.WASHED_CARDBOARD_PRESSURE_PLATE.get()));
+            items.add(new ItemStack(ModItems.WASHED_SMOOTH_CARDBOARD_BLOCK.get()));
+            items.add(new ItemStack(ModItems.WASHED_SMOOTH_CARDBOARD_SLAB.get()));
+            items.add(new ItemStack(ModItems.WASHED_SMOOTH_CARDBOARD_STAIRS.get()));
+            items.add(new ItemStack(ModItems.WASHED_SMOOTH_CARDBOARD_WALL.get()));
+            items.add(new ItemStack(ModItems.WASHED_SMOOTH_CARDBOARD_VERTICAL_SLAB.get()));
+            items.add(new ItemStack(ModItems.WASHED_BUNDLED_CARDBOARD.get()));
+            items.add(new ItemStack(ModItems.WASHED_BUNDLED_CARDBOARD_SLAB.get()));
+            items.add(new ItemStack(ModItems.WASHED_BUNDLED_CARDBOARD_STAIRS.get()));
+            items.add(new ItemStack(ModItems.WASHED_BUNDLED_CARDBOARD_WALL.get()));
+            items.add(new ItemStack(ModItems.WASHED_BUNDLED_CARDBOARD_VERTICAL_SLAB.get()));
+            items.add(new ItemStack(ModItems.WASHED_PRESSED_CARDBOARD.get()));
+            items.add(new ItemStack(ModItems.WASHED_PRESSED_CARDBOARD_SLAB.get()));
+            items.add(new ItemStack(ModItems.WASHED_PRESSED_CARDBOARD_STAIRS.get()));
+            items.add(new ItemStack(ModItems.WASHED_PRESSED_CARDBOARD_WALL.get()));
+            items.add(new ItemStack(ModItems.WASHED_PRESSED_CARDBOARD_VERTICAL_SLAB.get()));
+            items.add(new ItemStack(ModItems.WASHED_THICK_CARDBOARD_BLOCK.get()));
+            items.add(new ItemStack(ModItems.WASHED_THICK_CARDBOARD_SLAB.get()));
+            items.add(new ItemStack(ModItems.WASHED_THICK_CARDBOARD_STAIRS.get()));
+            items.add(new ItemStack(ModItems.WASHED_THICK_CARDBOARD_WALL.get()));
+            items.add(new ItemStack(ModItems.WASHED_THICK_CARDBOARD_VERTICAL_SLAB.get()));
+            items.add(new ItemStack(ModItems.BURNT_CARDBOARD_BLOCK.get()));
+            items.add(new ItemStack(ModItems.BURNT_CARDBOARD_SLAB.get()));
+            items.add(new ItemStack(ModItems.BURNT_CARDBOARD_STAIRS.get()));
+            items.add(new ItemStack(ModItems.BURNT_CARDBOARD_WALL.get()));
+            items.add(new ItemStack(ModItems.BURNT_CARDBOARD_VERTICAL_SLAB.get()));
+            items.add(new ItemStack(ModItems.BURNT_CARDBOARD_TRAPDOOR.get()));
+            items.add(new ItemStack(ModItems.BURNT_CARDBOARD_BUTTON.get()));
+            items.add(new ItemStack(ModItems.BURNT_CARDBOARD_PRESSURE_PLATE.get()));
+            items.add(new ItemStack(ModItems.BURNT_SMOOTH_CARDBOARD_BLOCK.get()));
+            items.add(new ItemStack(ModItems.BURNT_SMOOTH_CARDBOARD_SLAB.get()));
+            items.add(new ItemStack(ModItems.BURNT_SMOOTH_CARDBOARD_STAIRS.get()));
+            items.add(new ItemStack(ModItems.BURNT_SMOOTH_CARDBOARD_WALL.get()));
+            items.add(new ItemStack(ModItems.BURNT_SMOOTH_CARDBOARD_VERTICAL_SLAB.get()));
+            items.add(new ItemStack(ModItems.BURNT_BUNDLED_CARDBOARD.get()));
+            items.add(new ItemStack(ModItems.BURNT_BUNDLED_CARDBOARD_SLAB.get()));
+            items.add(new ItemStack(ModItems.BURNT_BUNDLED_CARDBOARD_STAIRS.get()));
+            items.add(new ItemStack(ModItems.BURNT_BUNDLED_CARDBOARD_WALL.get()));
+            items.add(new ItemStack(ModItems.BURNT_BUNDLED_CARDBOARD_VERTICAL_SLAB.get()));
+            items.add(new ItemStack(ModItems.BURNT_PRESSED_CARDBOARD.get()));
+            items.add(new ItemStack(ModItems.BURNT_PRESSED_CARDBOARD_SLAB.get()));
+            items.add(new ItemStack(ModItems.BURNT_PRESSED_CARDBOARD_STAIRS.get()));
+            items.add(new ItemStack(ModItems.BURNT_PRESSED_CARDBOARD_WALL.get()));
+            items.add(new ItemStack(ModItems.BURNT_PRESSED_CARDBOARD_VERTICAL_SLAB.get()));
+            items.add(new ItemStack(ModItems.BURNT_THICK_CARDBOARD_BLOCK.get()));
+            items.add(new ItemStack(ModItems.BURNT_THICK_CARDBOARD_SLAB.get()));
+            items.add(new ItemStack(ModItems.BURNT_THICK_CARDBOARD_STAIRS.get()));
+            items.add(new ItemStack(ModItems.BURNT_THICK_CARDBOARD_WALL.get()));
+            items.add(new ItemStack(ModItems.BURNT_THICK_CARDBOARD_VERTICAL_SLAB.get()));
+
+            // --- MISC & REWARDS ---
+            items.add(new ItemStack(ModItems.TEST_TROPHY.get()));
+            items.add(new ItemStack(ModItems.EXPERIENCE_BUCKET.get()));
 
         }
     };
 
     public static void sortItems(NonNullList<ItemStack> items) {
-        // 1. Arrange quartz pillar variants before calcite stairs
-        int calciteStairsIdx = -1;
-        for (int i = 0; i < items.size(); ++i) {
-            ResourceLocation id = ForgeRegistries.ITEMS.getKey(items.get(i).getItem());
-            if (id != null && "buildscape".equals(id.getNamespace()) && "calcite_stairs".equals(id.getPath())) {
-                calciteStairsIdx = i;
-                break;
-            }
-        }
-        if (calciteStairsIdx != -1) {
-            List<ItemStack> toMove = new java.util.ArrayList<>();
-            for (int i = 0; i < items.size(); ) {
-                ResourceLocation id = ForgeRegistries.ITEMS.getKey(items.get(i).getItem());
-                if (id != null && "buildscape".equals(id.getNamespace()) && id.getPath().startsWith("quartz_pillar_") 
-                        && (id.getPath().endsWith("_stairs") || id.getPath().endsWith("_slab") || id.getPath().endsWith("_vertical_slab") || id.getPath().endsWith("_wall"))) {
-                    toMove.add(items.remove(i));
-                    if (i < calciteStairsIdx) {
-                        calciteStairsIdx--;
-                    }
-                } else {
-                    i++;
-                }
-            }
-            items.addAll(calciteStairsIdx, toMove);
-        }
-
-        // 2. Arrange shelves, hollow logs, ladders before bamboo block
-        int bambooBlockIdx = -1;
-        for (int i = 0; i < items.size(); ++i) {
-            ResourceLocation id = ForgeRegistries.ITEMS.getKey(items.get(i).getItem());
-            if (id != null && "buildscape".equals(id.getNamespace()) && "bamboo_block".equals(id.getPath())) {
-                bambooBlockIdx = i;
-                break;
-            }
-        }
-        if (bambooBlockIdx != -1) {
-            List<ItemStack> toMove = new java.util.ArrayList<>();
-            for (int i = 0; i < items.size(); ) {
-                ResourceLocation id = ForgeRegistries.ITEMS.getKey(items.get(i).getItem());
-                if (id != null && "buildscape".equals(id.getNamespace())) {
-                    String path = id.getPath();
-                    boolean isShelf = path.endsWith("_shelf") || path.endsWith("_shelves");
-                    boolean isHollowLog = path.contains("hollow_");
-                    boolean isLadder = path.endsWith("_ladder") || path.endsWith("_ladders");
-                    if (isShelf || isHollowLog || isLadder) {
-                        toMove.add(items.remove(i));
-                        if (i < bambooBlockIdx) {
-                            bambooBlockIdx--;
-                        }
-                    } else {
-                        i++;
-                    }
-                } else {
-                    i++;
-                }
-            }
-            items.addAll(bambooBlockIdx, toMove);
-        }
-
-        // 3. Arrange cardboard blocks after sculk sensor
-        int sculkSensorIdx = -1;
-        for (int i = 0; i < items.size(); ++i) {
-            ResourceLocation id = ForgeRegistries.ITEMS.getKey(items.get(i).getItem());
-            if (id != null && "sculk_sensor".equals(id.getPath())) {
-                sculkSensorIdx = i;
-                break;
-            }
-        }
-        if (sculkSensorIdx != -1) {
-            List<ItemStack> toMove = new java.util.ArrayList<>();
-            for (int i = 0; i < items.size(); ) {
-                ResourceLocation id = ForgeRegistries.ITEMS.getKey(items.get(i).getItem());
-                if (id != null && "buildscape".equals(id.getNamespace()) && id.getPath().contains("cardboard")) {
-                    toMove.add(items.remove(i));
-                    if (i < sculkSensorIdx) {
-                        sculkSensorIdx--;
-                    }
-                } else {
-                    i++;
-                }
-            }
-            items.addAll(sculkSensorIdx + 1, toMove);
-        }
+        // All items are explicitly listed in exact visual sequence in addHardcodedItems
     }
 }

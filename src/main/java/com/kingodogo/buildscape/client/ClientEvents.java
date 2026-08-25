@@ -131,7 +131,7 @@ public class ClientEvents {
                     overlayMessage,
                     x,
                     y,
-                    0xFFFF5555 // Red with full Alpha 
+                    0xFFFF5555 // Red with full Alpha
             );
             com.mojang.blaze3d.systems.RenderSystem.enableDepthTest();
 

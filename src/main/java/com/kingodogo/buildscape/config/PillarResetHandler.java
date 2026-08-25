@@ -16,7 +16,7 @@ public class PillarResetHandler {
      * Resets a pillar block entity to its default state (freshly placed).
      * Clears all custom particle colors, patterns, and settings from NBT,
      * but keeps the displayed item.
-     * 
+     *
      * @param dimension The dimension key (e.g., "minecraft:overworld")
      * @param pos The block position of the pillar
      */
@@ -48,11 +48,11 @@ public class PillarResetHandler {
                             if (blockEntity instanceof com.kingodogo.buildscape.block.PillarBlockEntity bottomBE) {
                                 // Find the bottom of the stack (in case pos is not the bottom)
                                 net.minecraft.core.BlockPos bottomPos = bottomBE.findStackBottom();
-                                
+
                                 // Reset ALL connected pillar blocks in the stack
                                 net.minecraft.core.BlockPos current = bottomPos;
                                 int resetCount = 0;
-                                
+
                                 while (level.getBlockState(current).getBlock() instanceof com.kingodogo.buildscape.block.PillarBlock) {
                                     net.minecraft.world.level.block.entity.BlockEntity be = level.getBlockEntity(current);
                                     if (be instanceof com.kingodogo.buildscape.block.PillarBlockEntity pillarBE) {
@@ -84,7 +84,7 @@ public class PillarResetHandler {
     /**
      * Resets a pillar block entity's particle-related fields to default values.
      * This method directly modifies the block entity's internal state.
-     * 
+     *
      * @param pillarBE The pillar block entity to reset
      */
     private static void resetPillarBlockEntity(com.kingodogo.buildscape.block.PillarBlockEntity pillarBE) {
@@ -100,7 +100,7 @@ public class PillarResetHandler {
     /**
      * Resets a pillar using PillarData from the manager.
      * This is called when a pillar ID is removed from the manager.
-     * 
+     *
      * @param data The PillarData containing dimension and position info
      */
     public static void resetPillarFromData(PillarIdManager.PillarData data) {

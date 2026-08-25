@@ -11,7 +11,7 @@ import net.minecraft.world.entity.Entity;
  * Base class for all custom feet (boots) cosmetics.
  */
 public abstract class CosFeet<T extends Entity> extends EntityModel<T> {
-    
+
     protected final ModelPart leftFoot;
     protected final ModelPart rightFoot;
     protected final ResourceLocation texture;

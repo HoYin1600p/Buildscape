@@ -40,7 +40,7 @@ public class PresetsWidget extends AbstractWidget {
     }
 
     private String appliedPresetKey = null;
-    
+
     private boolean showCreateOptions = false;
     private final Button createDefaultBtn;
     private final Button createEmptyBtn;
@@ -107,7 +107,7 @@ public class PresetsWidget extends AbstractWidget {
                 });
         createBtn.setCustomTextColors(0x00FF00, 0x55FF55);
         createButton = createBtn;
-        
+
         createDefaultBtn = new com.kingodogo.buildscape.client.screen.widget.ScaledTextButton(
                 0, 0,
                 buttonWidth, scaledButtonHeight,
@@ -192,7 +192,7 @@ public class PresetsWidget extends AbstractWidget {
         }
         // Applying explicitly sets applied key? Or assume create implies user is working on it.
         // Usually creating clears items so effectively we applied empty.
-        appliedPresetKey = "_unnamed"; 
+        appliedPresetKey = "_unnamed";
     }
 
     private void saveCurrentPreset() {
@@ -226,12 +226,12 @@ public class PresetsWidget extends AbstractWidget {
             if ("_unnamed".equals(appliedPresetKey)) {
                 appliedPresetKey = key;
             }
-            
+
             config.clearUnnamedPreset();
             refreshPresets();
             nameEditBox.setValue(name);
             nameEditBox.setEditable(true);
-            
+
             if (Minecraft.getInstance().player != null) {
                 Minecraft.getInstance().player.playSound(
                     net.minecraft.sounds.SoundEvents.NOTE_BLOCK_BELL,
@@ -249,7 +249,7 @@ public class PresetsWidget extends AbstractWidget {
                 config.clearUnnamedPreset();
                 String revertKey = appliedPresetKey != null && !appliedPresetKey.equals("_unnamed") ? appliedPresetKey : "default";
                 config.applyPreset(revertKey);
-                
+
                 if (Minecraft.getInstance().player != null) {
                     Minecraft.getInstance().player.playSound(
                         net.minecraft.sounds.SoundEvents.NOTE_BLOCK_DIDGERIDOO,
@@ -257,10 +257,10 @@ public class PresetsWidget extends AbstractWidget {
                         1.0f
                     );
                 }
-                
+
                 selectedPresetKey = revertKey;
                 appliedPresetKey = revertKey;
-                
+
                 PresetsConfig.Preset revPreset = config.getPreset(revertKey);
                 if (revPreset != null) {
                     nameEditBox.setValue(revPreset.name);
@@ -269,7 +269,7 @@ public class PresetsWidget extends AbstractWidget {
                 }
                 nameEditBox.setEditable(false);
                 refreshPresets();
-                
+
                 if (onPresetApplied != null) {
                     onPresetApplied.accept(revertKey);
                 }
@@ -302,7 +302,7 @@ public class PresetsWidget extends AbstractWidget {
             PresetsConfig config = PresetsConfig.get();
             config.applyPreset(selectedPresetKey);
             appliedPresetKey = selectedPresetKey;
-            
+
             if (onPresetApplied != null) {
                 onPresetApplied.accept(selectedPresetKey);
             }
@@ -344,7 +344,7 @@ public class PresetsWidget extends AbstractWidget {
         int availableHeight = editBoxTop - presetY - 5;
         // Approx 20+2 button height
         int maxVisiblePresets = Math.max(1, availableHeight / (getPresetButtonHeight() + PRESET_BUTTON_SPACING));
-        
+
         double maxScroll = Math.max(0, presets.size() - maxVisiblePresets);
         scrollOffset = (int) Math.max(0, Math.min(scrollOffset, maxScroll));
     }
@@ -356,9 +356,9 @@ public class PresetsWidget extends AbstractWidget {
         // Calculate button width to fit 4 buttons with spacing
         // But maybe we want them centered with a fixed width?
         // Existing logic: int buttonWidth = (width - scaledSpacing * 5) / 4;
-        // Let's keep the width calculation but center the whole group if needed, 
+        // Let's keep the width calculation but center the whole group if needed,
         // or just ensure they fill the space nicely. The previous logic filled the width.
-        // If the user wants them centered, maybe they mean the text inside? 
+        // If the user wants them centered, maybe they mean the text inside?
         // "inside there respecitive boxes" -> sounds like text inside button.
         // "centre algin the other buttons as well like create save and such" -> sounds like buttons themselves.
         // The screenshot shows "Create Save Delete Apply" left aligned?
@@ -391,7 +391,7 @@ public class PresetsWidget extends AbstractWidget {
             createButton.x = startX;
             createButton.y = buttonY;
             createButton.setWidth(buttonWidth);
-            
+
             if (createDefaultBtn != null) {
                 createDefaultBtn.x = startX;
                 createDefaultBtn.y = buttonY - scaledButtonHeight - 2;
@@ -510,7 +510,7 @@ public class PresetsWidget extends AbstractWidget {
 
             poseStack.pushPose();
             poseStack.scale(textScale, textScale, 1.0f);
-            
+
             int drawY = buttonY + (buttonHeight - (int)(9 * textScale)) / 2;
             Minecraft.getInstance().font.draw(
                     poseStack,
@@ -536,7 +536,7 @@ public class PresetsWidget extends AbstractWidget {
         saveButton.render(poseStack, mouseX, mouseY, partialTick);
         deleteButton.render(poseStack, mouseX, mouseY, partialTick);
         applyButton.render(poseStack, mouseX, mouseY, partialTick);
-        
+
         createDefaultBtn.visible = showCreateOptions;
         createEmptyBtn.visible = showCreateOptions;
 
@@ -548,7 +548,7 @@ public class PresetsWidget extends AbstractWidget {
             int bgW = createDefaultBtn.getWidth() + 4;
             int bgH = (createDefaultBtn.getHeight() * 2) + 6;
             fill(poseStack, bgX, bgY, bgX + bgW, bgY + bgH, 0xD0000000);
-            
+
             createEmptyBtn.render(poseStack, mouseX, mouseY, partialTick);
             createDefaultBtn.render(poseStack, mouseX, mouseY, partialTick);
             poseStack.popPose();

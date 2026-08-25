@@ -19,61 +19,61 @@ import net.minecraft.ChatFormatting;
 import java.util.List;
 
 public class ConfettiItem extends Item {
-    
+
     public ConfettiItem(Item.Properties properties) {
         super(properties);
     }
-    
+
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         ItemStack itemstack = player.getItemInHand(hand);
-        
+
         // Play sounds and spawn particles on server-side
         if (!level.isClientSide) {
-            level.playSound(null, player.getX(), player.getY(), player.getZ(), 
+            level.playSound(null, player.getX(), player.getY(), player.getZ(),
                 SoundEvents.FIREWORK_ROCKET_BLAST, SoundSource.PLAYERS, 0.8F, 1.4F);
-            level.playSound(null, player.getX(), player.getY(), player.getZ(), 
+            level.playSound(null, player.getX(), player.getY(), player.getZ(),
                 SoundEvents.FIREWORK_ROCKET_TWINKLE, SoundSource.PLAYERS, 0.6F, 1.6F);
-            
+
             spawnConfettiParticles((ServerLevel) level, player, itemstack);
 
             if (!player.getAbilities().instabuild) {
                 itemstack.shrink(1);
             }
         }
-        
+
         return InteractionResultHolder.sidedSuccess(itemstack, level.isClientSide());
     }
-    
+
     private void spawnConfettiParticles(ServerLevel level, Player player, ItemStack stack) {
         net.minecraft.world.phys.Vec3 look = player.getLookAngle();
         double startX = player.getX() + look.x * 0.9D;
         double startY = player.getEyeY() + look.y * 0.9D;
         double startZ = player.getZ() + look.z * 0.9D;
-        
+
         int burstLevel = 1;
         if (stack.hasTag() && stack.getTag().contains("BurstLevel")) {
             burstLevel = Math.min(5, Math.max(1, stack.getTag().getInt("BurstLevel")));
         }
-        
+
         // Explosive burst scaled by burstLevel
         int particleCount = (75 + level.random.nextInt(46)) * burstLevel;
         double speedMultiplier = 1.0 + (burstLevel - 1) * 0.2D;
         double spreadMultiplier = 1.0 + (burstLevel - 1) * 0.1D;
-        
+
         for (int i = 0; i < particleCount; i++) {
             double speed = (0.15D + level.random.nextDouble() * 0.25D) * speedMultiplier;
             double spread = (0.30D + level.random.nextDouble() * 0.35D) * spreadMultiplier;
-            
+
             double vx = look.x * speed + (level.random.nextDouble() - 0.5D) * spread;
             double vy = look.y * speed + (level.random.nextDouble() - 0.5D) * spread + 0.12D;
             double vz = look.z * speed + (level.random.nextDouble() - 0.5D) * spread;
-            
+
             double px = startX + (level.random.nextDouble() - 0.5D) * 0.4D;
             double py = startY + (level.random.nextDouble() - 0.5D) * 0.4D;
             double pz = startZ + (level.random.nextDouble() - 0.5D) * 0.4D;
-            
-            level.sendParticles((SimpleParticleType) ModParticles.CONFETTI.get(), 
+
+            level.sendParticles((SimpleParticleType) ModParticles.CONFETTI.get(),
                 px, py, pz, 0, vx, vy, vz, 1.0D);
         }
     }

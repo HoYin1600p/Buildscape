@@ -190,7 +190,7 @@ public class CopperOxidationHandler {
             if (nextState != null) {
                 if (!level.isClientSide) {
                     setBlockStateOrDoor(level, pos, state, nextState.getBlock());
-                    
+
                     if (level instanceof ServerLevel serverLevel) {
                         serverLevel.sendParticles(
                             net.minecraft.core.particles.ParticleTypes.SMOKE,
@@ -198,7 +198,7 @@ public class CopperOxidationHandler {
                             8, 0.25D, 0.25D, 0.25D, 0.05D
                         );
                     }
-                    
+
                     if (player != null && !player.getAbilities().instabuild) {
                         held.shrink(1);
                         ItemStack emptyBottle = new ItemStack(Items.GLASS_BOTTLE);
@@ -209,7 +209,7 @@ public class CopperOxidationHandler {
                         }
                     }
                 }
-                
+
                 level.playSound(player, pos, SoundEvents.FIRE_EXTINGUISH, SoundSource.BLOCKS, 0.6f, 0.8f);
                 event.setCanceled(true);
                 event.setCancellationResult(InteractionResult.sidedSuccess(level.isClientSide));
@@ -388,7 +388,7 @@ public class CopperOxidationHandler {
     public static BlockState getNextOxidationState(BlockState state) {
         init();
         Block block = state.getBlock();
-        
+
         Optional<BlockState> unwaxedOpt = getUnwaxedState(state);
         if (unwaxedOpt.isPresent()) {
             BlockState unwaxedState = unwaxedOpt.get();
@@ -401,19 +401,19 @@ public class CopperOxidationHandler {
             }
             return null;
         }
-        
+
         for (Map.Entry<Supplier<Block>, Supplier<Block>> entry : NEXT_STAGE.entrySet()) {
             if (entry.getKey().get() == block) {
                 Block targetBlock = entry.getValue().get();
                 return copyStateProperties(state, targetBlock.defaultBlockState());
             }
         }
-        
+
         net.minecraft.resources.ResourceLocation rl = net.minecraftforge.registries.ForgeRegistries.BLOCKS.getKey(block);
         if (rl != null && rl.getNamespace().equals("buildscape")) {
             String path = rl.getPath();
             String nextPath = null;
-            
+
             if (path.startsWith("bit_oxidized_")) {
                 nextPath = null;
             } else if (path.startsWith("bit_weathered_")) {
@@ -427,7 +427,7 @@ public class CopperOxidationHandler {
             } else if (!path.startsWith("waxed_")) {
                 nextPath = "bit_exposed_" + path;
             }
-            
+
             if (nextPath != null) {
                 Block targetBlock = net.minecraftforge.registries.ForgeRegistries.BLOCKS.getValue(new net.minecraft.resources.ResourceLocation("buildscape", nextPath));
                 if (targetBlock != null && targetBlock != net.minecraft.world.level.block.Blocks.AIR) {
@@ -435,12 +435,12 @@ public class CopperOxidationHandler {
                 }
             }
         }
-        
+
         Optional<Block> vanillaNext = WeatheringCopper.getNext(block);
         if (vanillaNext.isPresent()) {
             return copyStateProperties(state, vanillaNext.get().defaultBlockState());
         }
-        
+
         return null;
     }
 

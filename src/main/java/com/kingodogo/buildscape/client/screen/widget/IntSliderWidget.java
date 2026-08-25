@@ -13,7 +13,7 @@ public class IntSliderWidget extends AbstractSliderButton {
     private final int maxValue;
     private int currentValue;
     private final Consumer<Integer> onValueChanged;
-    
+
     public IntSliderWidget(int x, int y, int width, int height, Component message, int minValue, int maxValue, int initialValue, Consumer<Integer> onValueChanged) {
         super(x, y, width, height, message, (initialValue - minValue) / (double) (maxValue - minValue));
         this.minValue = minValue;
@@ -22,12 +22,12 @@ public class IntSliderWidget extends AbstractSliderButton {
         this.onValueChanged = onValueChanged;
         updateMessage();
     }
-    
+
     @Override
     protected void updateMessage() {
         this.setMessage(new TextComponent(String.valueOf(currentValue)));
     }
-    
+
     @Override
     protected void applyValue() {
         this.currentValue = (int) Math.round(minValue + value * (maxValue - minValue));
@@ -36,17 +36,17 @@ public class IntSliderWidget extends AbstractSliderButton {
         }
         updateMessage();
     }
-    
+
     public int getValue() {
         return currentValue;
     }
-    
+
     public void setValue(int value) {
         this.currentValue = Math.max(minValue, Math.min(maxValue, value));
         this.value = (currentValue - minValue) / (double) (maxValue - minValue);
         updateMessage();
     }
-    
+
     @Override
     public void renderButton(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
         Minecraft mc = Minecraft.getInstance();

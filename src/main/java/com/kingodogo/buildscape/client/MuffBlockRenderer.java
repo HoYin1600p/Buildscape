@@ -100,13 +100,13 @@ public class MuffBlockRenderer {
                 drawLine(buffer, poseStack, maxX, minY, minZ, maxX, minY, maxZ, color);
                 drawLine(buffer, poseStack, maxX, minY, maxZ, minX, minY, maxZ, color);
                 drawLine(buffer, poseStack, minX, minY, maxZ, minX, minY, minZ, color);
-                
+
                 // Top face (4 edges)
                 drawLine(buffer, poseStack, minX, maxY, minZ, maxX, maxY, minZ, color);
                 drawLine(buffer, poseStack, maxX, maxY, minZ, maxX, maxY, maxZ, color);
                 drawLine(buffer, poseStack, maxX, maxY, maxZ, minX, maxY, maxZ, color);
                 drawLine(buffer, poseStack, minX, maxY, maxZ, minX, maxY, minZ, color);
-                
+
                 // Vertical edges (4 edges)
                 drawLine(buffer, poseStack, minX, minY, minZ, minX, maxY, minZ, color);
                 drawLine(buffer, poseStack, maxX, minY, minZ, maxX, maxY, minZ, color);

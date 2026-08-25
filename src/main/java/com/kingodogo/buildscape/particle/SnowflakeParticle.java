@@ -12,7 +12,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT)
 public class SnowflakeParticle extends TextureSheetParticle {
-    
+
     protected SnowflakeParticle(ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed, SpriteSet sprites) {
         super(level, x, y, z, xSpeed, ySpeed, zSpeed);
 
@@ -32,7 +32,7 @@ public class SnowflakeParticle extends TextureSheetParticle {
         this.setColor(1.0F, 1.0F, 1.0F);
         this.alpha = 0.8F + level.random.nextFloat() * 0.2F;
     }
-    
+
     @Override
     public void tick() {
         super.tick();
@@ -50,20 +50,20 @@ public class SnowflakeParticle extends TextureSheetParticle {
             this.alpha = (1.0F - fadeProgress) * 0.8F;
         }
     }
-    
+
     @Override
     public ParticleRenderType getRenderType() {
         return ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT;
     }
-    
+
     @OnlyIn(Dist.CLIENT)
     public static class Provider implements ParticleProvider<SimpleParticleType> {
         private final SpriteSet sprites;
-        
+
         public Provider(SpriteSet sprites) {
             this.sprites = sprites;
         }
-        
+
         @Override
         public Particle createParticle(SimpleParticleType type, ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
             return new SnowflakeParticle(level, x, y, z, xSpeed, ySpeed, zSpeed, sprites);

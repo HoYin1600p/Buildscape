@@ -15,7 +15,7 @@
 			"to": [16, 2, 16],
 			"faces": {
 				"up": {"uv": [0, 0, 16, 16], "texture": "#inside"},
-				"down": {"uv": [0, 0, 16, 16], "texture": "#missing", "cullface": "down"}
+				"down": {"uv": [0, 0, 16, 16], "texture": "#inside", "cullface": "down"}
 			}
 		},
 		{

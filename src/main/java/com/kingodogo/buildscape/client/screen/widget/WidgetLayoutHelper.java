@@ -5,28 +5,28 @@ import net.minecraft.client.gui.components.EditBox;
 import com.kingodogo.buildscape.client.screen.BuildScapeConfigScreen;
 
 public class WidgetLayoutHelper {
-    
+
     public static void positionSearchBoxWithButtons(AbstractWidget parent, EditBox searchBox,
                                                     int buttonAreaWidth, int topOffset, int leftPadding) {
         if (parent == null || searchBox == null) return;
-        
+
         int searchBoxY = parent.y + topOffset;
         int searchBoxWidth = parent.getWidth() - buttonAreaWidth - leftPadding * 2;
         int searchBoxX = parent.x + leftPadding;
-        
+
         searchBox.x = searchBoxX;
         searchBox.y = searchBoxY;
         searchBox.setWidth(searchBoxWidth);
     }
-    
+
     public static void positionButtonsInRow(AbstractWidget parent, AbstractWidget[] buttons,
                                            int buttonSize, int buttonSpacing,
                                            int searchBoxWidth, int topOffset, int leftPadding) {
         if (parent == null || buttons == null) return;
-        
+
         int buttonY = parent.y + topOffset;
         int buttonsStartX = parent.x + leftPadding + searchBoxWidth + BuildScapeConfigScreen.scaleSize(10);
-        
+
         for (int i = 0; i < buttons.length; i++) {
             if (buttons[i] != null) {
                 buttons[i].x = buttonsStartX + i * (buttonSize + buttonSpacing);
@@ -43,18 +43,18 @@ public class WidgetLayoutHelper {
             }
         }
     }
-    
+
     public static void positionWidgetBelowSearchBox(AbstractWidget parent, AbstractWidget child,
                                                    int searchBoxHeight, int searchBoxOffset, int bottomPadding) {
         if (parent == null || child == null) return;
-        
+
         int childY = parent.y + searchBoxOffset + searchBoxHeight + BuildScapeConfigScreen.scaleSize(5);
         int childHeight = parent.y + parent.getHeight() - childY - bottomPadding;
-        
+
         child.x = parent.x;
         child.y = childY;
         child.setWidth(parent.getWidth());
-        
+
         try {
             java.lang.reflect.Method setHeightMethod = child.getClass().getMethod("setHeight", int.class);
             setHeightMethod.invoke(child, childHeight);
@@ -68,7 +68,7 @@ public class WidgetLayoutHelper {
         } catch (Exception e) {
         }
     }
-    
+
     public static void updateChildPositions(AbstractWidget parent, EditBox searchBox,
                                            AbstractWidget[] buttons, AbstractWidget childWidget,
                                            int buttonAreaWidth, int topOffset, int leftPadding,

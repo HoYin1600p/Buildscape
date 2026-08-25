@@ -6,11 +6,11 @@ import net.minecraft.network.chat.Component;
 public class ConfigCategoryButton extends Button {
     private boolean active = false;
     private float customTextScale = 1.0f; // Default scale
-    
+
     public ConfigCategoryButton(int x, int y, int width, int height, Component message, OnPress onPress) {
         super(x, y, width, height, message, onPress);
     }
-    
+
     public void setActive(boolean active) {
         this.active = active;
     }
@@ -18,7 +18,7 @@ public class ConfigCategoryButton extends Button {
     public void setTextScale(float scale) {
         this.customTextScale = scale;
     }
-    
+
     @Override
     public void renderButton(com.mojang.blaze3d.vertex.PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
         net.minecraft.client.Minecraft mc = net.minecraft.client.Minecraft.getInstance();

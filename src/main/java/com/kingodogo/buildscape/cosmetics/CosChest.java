@@ -11,7 +11,7 @@ import net.minecraft.world.entity.Entity;
  * Base class for all custom chest cosmetics.
  */
 public abstract class CosChest<T extends Entity> extends EntityModel<T> {
-    
+
     protected final ModelPart body;
     protected final ModelPart leftArm;
     protected final ModelPart rightArm;

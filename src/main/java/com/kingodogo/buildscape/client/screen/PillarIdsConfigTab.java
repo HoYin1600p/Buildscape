@@ -137,13 +137,13 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
                         else someChecked = true;
                     }
                 }
-                
+
                 GuiComponent.fill(poseStack, x, y, x + width, y + height, 0x80000000); // 50% dark inner bg
                 GuiComponent.fill(poseStack, x, y, x + width, y + 1, borderColor);
                 GuiComponent.fill(poseStack, x, y + height - 1, x + width, y + height, borderColor);
                 GuiComponent.fill(poseStack, x, y, x + 1, y + height, borderColor);
                 GuiComponent.fill(poseStack, x + width - 1, y, x + width, y + height, borderColor);
-                
+
                 int pad = Math.max(2, BuildScapeConfigScreen.scaleSize(2));
                 if (allChecked && someChecked) {
                     GuiComponent.fill(poseStack, x + pad, y + pad, x + width - pad, y + height - pad, 0xFF55FF55);
@@ -720,10 +720,10 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
         // Subtle 1px outline for sleek appeal
         int borderColor = header ? 0x80555555 : 0x60444444; // Slightly brighter border for header
         int bgColor = header ? 0x60222222 : 0x40111111;     // Slightly darker background for rows
-        
+
         // Fill inner background
         GuiComponent.fill(poseStack, x, y, x + width, y + height, bgColor);
-        
+
         // Render 1px outer borders cleanly
         GuiComponent.fill(poseStack, x, y, x + width, y + 1, borderColor); // Top
         GuiComponent.fill(poseStack, x, y + height - 1, x + width, y + height, borderColor); // Bottom
@@ -1476,7 +1476,7 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
             int centerY = alignmentCenterY - editBoxHeight / 2;
 
             // Position text: Mathematically perfectly centered between the cell's top and bottom border
-            int textY = rowY + (rowHeight - fontHeight) / 2 + 1; 
+            int textY = rowY + (rowHeight - fontHeight) / 2 + 1;
 
             int x = startX;
 

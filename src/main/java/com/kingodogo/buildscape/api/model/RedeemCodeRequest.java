@@ -50,7 +50,7 @@ public class RedeemCodeRequest {
     public void setAccessToken(String accessToken) {
         this.accessToken = accessToken;
     }
-    
+
     public String getCode() {
         return code;
     }

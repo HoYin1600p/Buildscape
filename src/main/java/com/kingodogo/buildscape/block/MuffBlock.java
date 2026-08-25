@@ -57,7 +57,7 @@ public class MuffBlock extends Block implements EntityBlock {
         if (nextRadius > 32) {
             nextRadius = 1;
         }
-        
+
         state = state.setValue(RADIUS, nextRadius);
         level.setBlock(pos, state, 3);
 

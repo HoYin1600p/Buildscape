@@ -208,6 +208,8 @@ public class StreamingRecipeParser {
         int count = 1;
         String type = defaultType;
         boolean isReversible = isReversibleSection;
+        int cookingTime = 200;
+        float experience = 0.1f;
 
         if (reader.hasNext()) {
             JsonToken secondToken = reader.peek();
@@ -218,35 +220,69 @@ public class StreamingRecipeParser {
                 } else {
                     parseStringList(reader, pattern);
                     type = defaultType;
-                    if (reader.hasNext() && reader.peek() == JsonToken.BEGIN_OBJECT) {
-                        parseAliases(reader, keys);
+                    if (reader.hasNext()) {
+                        JsonToken thirdToken = reader.peek();
+                        if (thirdToken == JsonToken.BEGIN_OBJECT) {
+                            parseAliases(reader, keys);
+                        } else if (thirdToken == JsonToken.BEGIN_ARRAY) {
+                            parseKeyArrayPairs(reader, keys);
+                        }
                     }
                 }
             } else if (secondToken == JsonToken.STRING) {
                 input = reader.nextString();
-                ingredients.add(input);
+                if ("smithing".equalsIgnoreCase(defaultType)) {
+                    if (reader.hasNext()) {
+                        JsonToken thirdToken = reader.peek();
+                        if (thirdToken == JsonToken.BEGIN_ARRAY) {
+                            parseStringList(reader, ingredients);
+                        } else if (thirdToken == JsonToken.STRING) {
+                            ingredients.add(reader.nextString());
+                        }
+                    }
+                } else {
+                    ingredients.add(input);
+                }
             }
         }
 
-        if (reader.hasNext()) {
-            JsonToken countToken = reader.peek();
-            if (countToken == JsonToken.NUMBER) {
-                count = reader.nextInt();
-            } else if (countToken == JsonToken.STRING) {
-                try {
-                    count = Integer.parseInt(reader.nextString());
-                } catch (NumberFormatException ignored) {}
-            } else if (countToken == JsonToken.BOOLEAN) {
+        int numIndex = 0;
+        while (reader.hasNext()) {
+            JsonToken nextToken = reader.peek();
+            if (nextToken == JsonToken.NUMBER) {
+                double val = reader.nextDouble();
+                if (numIndex == 0) {
+                    count = (int) val;
+                } else if (numIndex == 1) {
+                    if (val == (int) val) {
+                        cookingTime = (int) val;
+                    } else {
+                        experience = (float) val;
+                    }
+                } else if (numIndex == 2) {
+                    if (val == (int) val) {
+                        cookingTime = (int) val;
+                    } else {
+                        experience = (float) val;
+                    }
+                }
+                numIndex++;
+            } else if (nextToken == JsonToken.STRING) {
+                if (numIndex == 0) {
+                    try {
+                        count = Integer.parseInt(reader.nextString());
+                    } catch (NumberFormatException ignored) {}
+                    numIndex++;
+                } else {
+                    reader.skipValue();
+                }
+            } else if (nextToken == JsonToken.BOOLEAN) {
                 isReversible = reader.nextBoolean();
+            } else if (nextToken == JsonToken.END_ARRAY) {
+                break;
+            } else {
+                reader.skipValue();
             }
-        }
-
-        if (reader.hasNext() && reader.peek() == JsonToken.BOOLEAN) {
-            isReversible = reader.nextBoolean();
-        }
-
-        while (reader.hasNext() && reader.peek() != JsonToken.END_ARRAY) {
-            reader.skipValue();
         }
         if (reader.peek() == JsonToken.END_ARRAY) {
             reader.endArray();
@@ -254,14 +290,39 @@ public class StreamingRecipeParser {
 
         // Add Primary Forward Recipe (Result = resultItem, Input = input)
         RecipeIR.ResultSpec resultSpec = new RecipeIR.ResultSpec(resultItem, count, null);
-        recipes.add(new RecipeIR.RecipeSpec(null, type, "", pattern, keys, ingredients, input, resultSpec, 200, 0.1f));
+        recipes.add(new RecipeIR.RecipeSpec(null, type, "", pattern, keys, ingredients, input, resultSpec, cookingTime, experience));
 
         // Add Reversal Recipe if reversible is true and input is a single item/tag
         if (isReversible && input != null && !input.isEmpty()) {
             String reverseRecipeId = sanitizeId(input + "_from_" + resultItem + "_reversal");
             RecipeIR.ResultSpec reverseResultSpec = new RecipeIR.ResultSpec(input, 1, null);
-            recipes.add(new RecipeIR.RecipeSpec(reverseRecipeId, type, "", List.of(), Map.of(), List.of(resultItem), resultItem, reverseResultSpec, 200, 0.1f));
+            recipes.add(new RecipeIR.RecipeSpec(reverseRecipeId, type, "", List.of(), Map.of(), List.of(resultItem), resultItem, reverseResultSpec, cookingTime, experience));
         }
+    }
+
+    private static void parseKeyArrayPairs(JsonReader reader, Map<String, String> keys) throws IOException {
+        reader.beginArray();
+        while (reader.hasNext()) {
+            if (reader.peek() == JsonToken.BEGIN_ARRAY) {
+                reader.beginArray();
+                if (reader.hasNext() && reader.peek() == JsonToken.STRING) {
+                    String k = reader.nextString();
+                    if (reader.hasNext() && reader.peek() == JsonToken.STRING) {
+                        String v = reader.nextString();
+                        keys.put(k, v);
+                    }
+                }
+                while (reader.hasNext() && reader.peek() != JsonToken.END_ARRAY) {
+                    reader.skipValue();
+                }
+                if (reader.peek() == JsonToken.END_ARRAY) {
+                    reader.endArray();
+                }
+            } else {
+                reader.skipValue();
+            }
+        }
+        reader.endArray();
     }
 
     private static RecipeIR.RecipeSpec parseRecipeSpec(JsonReader reader, String defaultType) throws IOException {

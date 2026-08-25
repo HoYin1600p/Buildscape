@@ -8,10 +8,10 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT)
 public class CherryParticle extends TextureSheetParticle {
-    
+
     private final SpriteSet sprites;
     private final float rotSpeed;
-    
+
     // Static map to store color queues for particles
     // Key: "x,y,z" string, Value: ColorEntry
     private static final java.util.Map<String, ColorEntry> POSITION_COLOR_MAP = new java.util.concurrent.ConcurrentHashMap<>();
@@ -29,39 +29,39 @@ public class CherryParticle extends TextureSheetParticle {
     protected CherryParticle(ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed, SpriteSet sprites) {
         super(level, x, y, z, xSpeed, ySpeed, zSpeed);
         this.sprites = sprites;
-        
+
         this.lifetime = 60 + level.random.nextInt(40);
         this.gravity = 0.05F;
         this.hasPhysics = true;
-        
+
         this.rotSpeed = (level.random.nextFloat() - 0.5F) * 0.1F;
         this.roll = level.random.nextFloat() * ((float)Math.PI * 2F);
         this.oRoll = this.roll;
-        
+
         this.xd = xSpeed;
         this.yd = ySpeed;
         this.zd = zSpeed;
-        
+
         // Logic to select specific texture from the 12 files
         // 0-5: Shape 1 (6 color themes)
         // 6-11: Shape 2 (6 color themes)
-        
+
         // "Change color theme on the go": Cycle through 6 themes based on time
         int totalThemes = 6;
         // Randomly select a theme instead of time-based cycling
         int currentTheme = level.random.nextInt(totalThemes);
-        
+
         // "Spawn both shapes": Randomly pick Shape 1 or Shape 2 for this theme
         boolean useShape2 = level.random.nextBoolean();
         int spriteIndex = currentTheme + (useShape2 ? 6 : 0);
-        
+
         // Select the specific static sprite
         // sprites.get(i, total) maps i to the sprite at that fraction of the list
         this.setSprite(sprites.get(spriteIndex, 12));
-        
+
         // Scale down the particle
         this.quadSize *= 0.5F;
-        
+
         // Color handling logic
         String positionKey = String.format("%.1f,%.1f,%.1f", x, y, z);
         String colorCode = null;
@@ -77,12 +77,12 @@ public class CherryParticle extends TextureSheetParticle {
         } else {
             this.setColor(1.0F, 1.0F, 1.0F); // Default white
         }
-        
+
         if (POSITION_COLOR_MAP.size() > 1000) {
             cleanupOldEntries();
         }
     }
-    
+
     private static void cleanupOldEntries() {
         long now = System.currentTimeMillis();
         POSITION_COLOR_MAP.entrySet()
@@ -112,40 +112,40 @@ public class CherryParticle extends TextureSheetParticle {
             return new float[]{1.0F, 1.0F, 1.0F};
         }
     }
-    
+
     @Override
     public void tick() {
         super.tick();
         this.oRoll = this.roll;
         this.roll += this.rotSpeed;
         // Removed setSpriteFromAge to keep the selected static texture
-        
+
         if (this.age > this.lifetime * 0.7F) {
             float fadeProgress = (this.age - this.lifetime * 0.7F) / (this.lifetime * 0.3F);
             this.alpha = 1.0F - fadeProgress;
         }
     }
-    
+
     @Override
     public ParticleRenderType getRenderType() {
         return ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT;
     }
-    
+
     public static void queueColor(double x, double y, double z, String colorCode) {
         if (colorCode != null && !colorCode.isEmpty()) {
             String positionKey = String.format("%.1f,%.1f,%.1f", x, y, z);
             POSITION_COLOR_MAP.put(positionKey, new ColorEntry(colorCode));
         }
     }
-    
+
     @OnlyIn(Dist.CLIENT)
     public static class Provider implements ParticleProvider<SimpleParticleType> {
         private final SpriteSet sprites;
-        
+
         public Provider(SpriteSet sprites) {
             this.sprites = sprites;
         }
-        
+
         @Override
         public Particle createParticle(SimpleParticleType type, ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
             return new CherryParticle(level, x, y, z, xSpeed, ySpeed, zSpeed, sprites);

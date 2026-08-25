@@ -35,7 +35,7 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
     private static final int SCROLLBAR_WIDTH = 8;
     private static final int SCROLLBAR_RIGHT_MARGIN = 5;
     private static final int COMPONENT_SCROLLBAR_GAP = 10;
-    
+
     // Spacing for Color Swatches
     private static final int COLOR_SWATCH_SIZE = 14; // Small and neat
     private static final int COLOR_ROW_SPACING = 6; // Matching user's request for gap
@@ -466,7 +466,7 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
                         if (selectedColorIndex == colorIndex && sharedColorPicker != null && !sharedColorPicker.isDragging()) {
                             sharedColorPicker.setColor(newColor);
                         }
-                        
+
                         onColorChanged(colorIndex, hexText);
                         // Update swatch button color visually
                         updateSwatchButtonColor(colorIndex, newColor);
@@ -595,7 +595,7 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
         int availableWidth = colorBoxWidth - UI_PADDING * 2;
         int colSpacing = 12; // More space between columns
         int colWidth = (availableWidth - colSpacing) / 2;
-        
+
         int leftX = colorBoxX + UI_PADDING;
         int rightX = leftX + colWidth + colSpacing;
         int hexGap = 3;
@@ -606,7 +606,7 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
                 int col = i % 2;
                 int row = i / 2;
                 int startX = (col == 0) ? leftX : rightX;
-                
+
                 int y = colorBoxY + UI_PADDING + COLOR_HEADER_SPACE + row * (COLOR_SWATCH_SIZE + COLOR_ROW_SPACING) - scrollOffsetInt;
 
                 ColorSwatchButton btn = colorSwatchButtons.get(i);
@@ -735,7 +735,7 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
         colorBoxX = parent.getRightPanelX();
         colorBoxY = topY;
         colorBoxWidth = parent.getRightPanelWidth();
-        colorBoxHeight = defaultBoxHeight + middleGap + patternBoxHeight; 
+        colorBoxHeight = defaultBoxHeight + middleGap + patternBoxHeight;
 
         colorsResetButton.x = colorBoxX + colorBoxWidth - 20 - 2;
         colorsResetButton.y = colorBoxY + 2;
@@ -808,7 +808,7 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
 
         // Store base positions (without scroll offset)
         // Position buttons exactly at the header clip for a tighter look
-        defaultBaseButtonY = defaultBoxY + HEADER_CLIP; 
+        defaultBaseButtonY = defaultBoxY + HEADER_CLIP;
         defaultBaseFirstFieldY = defaultBaseButtonY + BUTTON_HEIGHT + BTN_TO_FIELD_SPACING;
 
         // Set widget X positions and widths (these don't change with scrolling)
@@ -982,7 +982,7 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
 
         // Sync color changes to server
         com.kingodogo.buildscape.network.ModMessages.INSTANCE.sendToServer(new com.kingodogo.buildscape.network.UpdateConfigPacket(config));
-        
+
         updateWorldPillars();
     }
 
@@ -1003,7 +1003,7 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
                         net.minecraft.world.level.chunk.LevelChunk chunk = mc.level.getChunk(x, z);
                         for (BlockEntity be : chunk.getBlockEntities().values()) {
                             if (be instanceof PillarBlockEntity pbe) {
-                                // Important: re-sync from manager so that the newly 'locked' 
+                                // Important: re-sync from manager so that the newly 'locked'
                                 // patterns (for customized pillars) are picked up by the BE immediately.
                                 String pid = pbe.getPillarId();
                                 if (pid != null) {
@@ -1236,7 +1236,7 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
         boolean needsScrollbarDefault = maxScrollDefault > 0;
 
         // Define header area - nothing should render above this
-        int headerBottom = defaultBoxY + HEADER_CLIP; 
+        int headerBottom = defaultBoxY + HEADER_CLIP;
         int panelTop = defaultBoxY;
         int panelBottom = defaultBoxY + defaultBoxHeight;
 
@@ -1347,7 +1347,7 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
             double scrollableAreaHeight = totalContentHeightDefault - HEADER_CLIP;
             double visibleAreaHeight = defaultBoxHeight - HEADER_CLIP - UI_PADDING;
             double visibleRatio = Math.min(1.0, visibleAreaHeight / scrollableAreaHeight);
-            
+
             defaultScrollbarRenderer.renderScrollbar(poseStack, scrollbarX, scrollbarY, scrollbarHeight,
                     defaultPropertiesScrollOffset, maxScrollDefault, visibleRatio);
         }
@@ -1490,7 +1490,7 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
 
         // Remove old manual rendering code
         poseStack.popPose();
-        poseStack.pushPose(); // Balance the popPose call that follows for "Middle Bottom" comment separation if needed, or remove completely. 
+        poseStack.pushPose(); // Balance the popPose call that follows for "Middle Bottom" comment separation if needed, or remove completely.
         // Actually, just let the flow continue.
         poseStack.popPose();
 
@@ -1664,7 +1664,7 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
 
         // Render Panel Titles AFTER all scissors are disabled to ensure they are visible
         float standardScale = BuildScapeConfigScreen.getStandardTextScale();
-        
+
         // Default Properties Title
         poseStack.pushPose();
         poseStack.translate(defaultBoxX + 10, defaultBoxY + 5, 0);
@@ -2147,7 +2147,7 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
 
             if (patternMaxScroll > 0) {
                 int scrollbarY = patternBoxY + HEADER_CLIP;
-                int scrollbarHeight = patternBoxHeight - HEADER_CLIP - UI_PADDING; 
+                int scrollbarHeight = patternBoxHeight - HEADER_CLIP - UI_PADDING;
                 double visibleRatio = patternAvailableHeight / (double) patternTotalContentHeight;
 
                 double newOffset = patternScrollbarRenderer.handleMouseDrag(mouseY, scrollbarY, scrollbarHeight,

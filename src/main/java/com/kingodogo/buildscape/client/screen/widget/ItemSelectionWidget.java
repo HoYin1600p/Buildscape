@@ -199,7 +199,7 @@ public class ItemSelectionWidget extends AbstractWidget {
         int bottomMargin = 10;
         int scissorY = (int) (windowHeight - (y + height) * guiScale + bottomMargin * guiScale);
         int scissorWidth = (int) ((width - 21) * guiScale); // Exclude scrollbar area
-        
+
         // Fix: Scissor starts exactly below the header separator. This allows padding and selection borders to be visible.
         int scissorHeight = (int) ((height - headerAreaHeight - 1 - bottomMargin) * guiScale);
 
@@ -290,7 +290,7 @@ public class ItemSelectionWidget extends AbstractWidget {
         fill(poseStack, x, y, x + 1, y + height, borderColor); // Left
         fill(poseStack, x + width - 1, y, x + width, y + height, borderColor); // Right
         fill(poseStack, x, y + headerAreaHeight + 1, x + width, y + headerAreaHeight + 2, borderColor); // Separator (moved 1px down)
-        
+
         // Render scrollbar after disabling scissor so it is not clipped
         if (getMaxScroll() > 0) {
             int scrollbarX = x + width - CustomScrollbarRenderer.getScrollbarWidth() - 4; // 4px form edge
@@ -388,11 +388,11 @@ public class ItemSelectionWidget extends AbstractWidget {
             int scrollbarY = y + headerAreaHeight + GRID_PADDING_TOP;
             int bottomMargin = 10;
             int scrollbarHeight = height - headerAreaHeight - GRID_PADDING_TOP - bottomMargin;
-            
+
             // Content area for dragging
             int contentX = x + 5;
             int contentY = y + headerAreaHeight + GRID_PADDING_TOP;
-            int contentWidth = width - 21; 
+            int contentWidth = width - 21;
             int contentHeight = scrollbarHeight;
 
             double visibleRatio = maxVisibleRows * itemsPerRow / (double) filteredItems.size();

@@ -12,9 +12,9 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT)
 public class TrailNoteParticle extends TextureSheetParticle {
-    
+
     private final SpriteSet sprites;
-    
+
     // Static map to store color queues for particles
     private static final java.util.Map<String, ColorEntry> POSITION_COLOR_MAP = new java.util.concurrent.ConcurrentHashMap<>();
 
@@ -31,19 +31,19 @@ public class TrailNoteParticle extends TextureSheetParticle {
     protected TrailNoteParticle(ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed, SpriteSet sprites) {
         super(level, x, y, z, xSpeed, ySpeed, zSpeed);
         this.sprites = sprites;
-        
+
         this.lifetime = 60 + level.random.nextInt(40);
         this.gravity = 0.05F;
         this.hasPhysics = true;
         this.quadSize = 0.2F + level.random.nextFloat() * 0.1F;
-        
+
         this.xd = xSpeed;
         this.yd = ySpeed;
         this.zd = zSpeed;
-        
+
         // Pick random texture from the set
         this.setSprite(sprites.get(level.random));
-        
+
         // Color handling logic
         String positionKey = String.format("%.1f,%.1f,%.1f", x, y, z);
         String colorCode = null;
@@ -66,12 +66,12 @@ public class TrailNoteParticle extends TextureSheetParticle {
             float b = (rgb & 0xFF) / 255.0f;
             this.setColor(r, g, b);
         }
-        
+
         if (POSITION_COLOR_MAP.size() > 1000) {
             cleanupOldEntries();
         }
     }
-    
+
     private static void cleanupOldEntries() {
         long now = System.currentTimeMillis();
         POSITION_COLOR_MAP.entrySet()
@@ -101,37 +101,37 @@ public class TrailNoteParticle extends TextureSheetParticle {
             return new float[]{1.0F, 1.0F, 1.0F};
         }
     }
-    
+
     @Override
     public void tick() {
         super.tick();
-        
+
         if (this.age > this.lifetime * 0.7F) {
             float fadeProgress = (this.age - this.lifetime * 0.7F) / (this.lifetime * 0.3F);
             this.alpha = 1.0F - fadeProgress;
         }
     }
-    
+
     @Override
     public ParticleRenderType getRenderType() {
         return ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT;
     }
-    
+
     public static void queueColor(double x, double y, double z, String colorCode) {
         if (colorCode != null && !colorCode.isEmpty()) {
             String positionKey = String.format("%.1f,%.1f,%.1f", x, y, z);
             POSITION_COLOR_MAP.put(positionKey, new ColorEntry(colorCode));
         }
     }
-    
+
     @OnlyIn(Dist.CLIENT)
     public static class Provider implements ParticleProvider<SimpleParticleType> {
         private final SpriteSet sprites;
-        
+
         public Provider(SpriteSet sprites) {
             this.sprites = sprites;
         }
-        
+
         @Override
         public Particle createParticle(SimpleParticleType type, ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
             return new TrailNoteParticle(level, x, y, z, xSpeed, ySpeed, zSpeed, sprites);

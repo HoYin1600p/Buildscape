@@ -10,11 +10,11 @@ import java.util.Map;
 
 public class GuiConfigHelper {
     private static final GuiConfigManager configManager = GuiConfigManager.get();
-    
+
     public static GuiConfigData getConfig(String tabName) {
         return configManager.loadConfig(tabName);
     }
-    
+
     public static void applyConfigToWidget(String elementId, AbstractWidget widget, GuiConfigData config,
                                           int contentX, int contentY, int screenWidth, int screenHeight) {
         if (widget == null || config == null) {
@@ -44,7 +44,7 @@ public class GuiConfigHelper {
                         elementConfig.percentX = (double)x / screenWidth;
                     }
                 }
-                
+
                 if (elementConfig.percentY != null && screenHeight > 0) {
                     y = (int)(screenHeight * elementConfig.percentY);
                 } else {
@@ -68,7 +68,7 @@ public class GuiConfigHelper {
                 } else {
                     width = elementConfig.width;
                 }
-                
+
                 if (elementConfig.percentHeight != null && screenHeight > 0) {
                     height = (int)(screenHeight * elementConfig.percentHeight);
                 } else if (screenHeight > 0) {
@@ -116,28 +116,28 @@ public class GuiConfigHelper {
                 } catch (Exception e) {
                     com.kingodogo.buildscape.BuildScape.getLogger().warn("Failed to set widget height for '{}': {}", elementId, e.getMessage());
                 }
-                
+
                 widget.visible = elementConfig.visible;
             } catch (Exception e) {
                 com.kingodogo.buildscape.BuildScape.getLogger().warn("Failed to apply config to widget '{}': {}", elementId, e.getMessage());
             }
         }
     }
-    
+
     public static void applyConfigToWidget(String elementId, AbstractWidget widget, GuiConfigData config, int contentX, int contentY) {
         applyConfigToWidget(elementId, widget, config, contentX, contentY, 0, 0);
     }
-    
+
     public static void applyConfigToWidget(String elementId, AbstractWidget widget, GuiConfigData config) {
         applyConfigToWidget(elementId, widget, config, 0, 0);
     }
-    
+
     public static void applyConfigToEditBox(String elementId, EditBox editBox, GuiConfigData config,
                                            int contentX, int contentY, int screenWidth, int screenHeight) {
         if (editBox == null || config == null) {
             return;
         }
-        
+
         GuiConfigData.ElementConfig elementConfig = config.getElementConfig(elementId);
         if (elementConfig != null) {
             int x, y, width, height;
@@ -150,7 +150,7 @@ public class GuiConfigHelper {
                     elementConfig.percentX = (double)x / screenWidth;
                 }
             }
-            
+
             if (elementConfig.percentY != null && screenHeight > 0) {
                 y = (int)(screenHeight * elementConfig.percentY);
             } else {
@@ -174,7 +174,7 @@ public class GuiConfigHelper {
             } else {
                 width = elementConfig.width;
             }
-            
+
             if (elementConfig.percentHeight != null && screenHeight > 0) {
                 height = (int)(screenHeight * elementConfig.percentHeight);
             } else if (screenHeight > 0) {
@@ -208,28 +208,28 @@ public class GuiConfigHelper {
             }
         }
     }
-    
+
     public static void applyConfigToEditBox(String elementId, EditBox editBox, GuiConfigData config) {
         applyConfigToEditBox(elementId, editBox, config, 0, 0, 0, 0);
     }
-    
+
     public static void applyConfigToEditBox(String elementId, EditBox editBox, GuiConfigData config, int contentX, int contentY) {
         applyConfigToEditBox(elementId, editBox, config, contentX, contentY, 0, 0);
     }
-    
+
     public static void saveWidgetState(String tabName, String elementId, AbstractWidget widget) {
         if (widget == null) {
             return;
         }
-        
+
         GuiConfigData config = configManager.loadConfig(tabName);
         GuiConfigData.ElementConfig elementConfig = config.getElementConfig(elementId, widget.x, widget.y, widget.getWidth(), 20);
-        
+
         elementConfig.x = widget.x;
         elementConfig.y = widget.y;
         elementConfig.width = widget.getWidth();
         elementConfig.visible = widget.visible;
-        
+
         try {
             java.lang.reflect.Field heightField = AbstractWidget.class.getDeclaredField("height");
             heightField.setAccessible(true);
@@ -237,13 +237,13 @@ public class GuiConfigHelper {
         } catch (Exception e) {
             elementConfig.height = 20;
         }
-        
+
         config.setElementConfig(elementId, elementConfig);
         configManager.saveConfig(tabName, config);
     }
-    
+
     private static final Map<String, Map<String, GuiConfigData.ElementConfig>> DEFAULT_CONFIGS = new HashMap<>();
-    
+
     public static void registerWidgetDefaults(String tabName, Map<String, GuiConfigData.ElementConfig> widgetMap) {
         DEFAULT_CONFIGS.put(tabName.toLowerCase(), new HashMap<>(widgetMap));
 
@@ -258,7 +258,7 @@ public class GuiConfigHelper {
             config.screen.height = mc.screen.height;
             config.screen.scale = (float)mc.getWindow().getGuiScale();
         }
-        
+
         for (Map.Entry<String, GuiConfigData.ElementConfig> entry : widgetMap.entrySet()) {
             String elementId = entry.getKey();
             GuiConfigData.ElementConfig defaultConfig = entry.getValue();
@@ -268,7 +268,7 @@ public class GuiConfigHelper {
 
         configManager.saveConfig(tabName, config);
     }
-    
+
     private static GuiConfigData.ElementConfig getDefaultConfig(String tabName, String elementId) {
         Map<String, GuiConfigData.ElementConfig> tabDefaults = DEFAULT_CONFIGS.get(tabName.toLowerCase());
         if (tabDefaults != null) {
@@ -276,7 +276,7 @@ public class GuiConfigHelper {
         }
         return null;
     }
-    
+
     public static void applyAllConfigs(String tabName, Map<String, AbstractWidget> widgetMap,
                                      int contentX, int contentY, int screenWidth, int screenHeight) {
         GuiConfigData config = getConfig(tabName);
@@ -294,11 +294,11 @@ public class GuiConfigHelper {
                 config.screen.scale = (float)mc.getWindow().getGuiScale();
             }
         }
-        
+
         for (Map.Entry<String, AbstractWidget> entry : widgetMap.entrySet()) {
             String elementId = entry.getKey();
             AbstractWidget widget = entry.getValue();
-            
+
             if (widget != null) {
                 GuiConfigData.ElementConfig elementConfig = null;
                 if (defaults != null && defaults.containsKey(elementId)) {
@@ -321,14 +321,14 @@ public class GuiConfigHelper {
             }
         }
     }
-    
+
     private static void applyConfigToWidgetWithConfig(String elementId, AbstractWidget widget,
                                                       GuiConfigData.ElementConfig elementConfig, GuiConfigData config,
                                                       int contentX, int contentY, int screenWidth, int screenHeight) {
         if (widget == null || elementConfig == null) {
             return;
         }
-        
+
         try {
             int x, y, width, height;
 
@@ -340,7 +340,7 @@ public class GuiConfigHelper {
                     elementConfig.percentX = (double)x / screenWidth;
                 }
             }
-            
+
             if (elementConfig.percentY != null && screenHeight > 0) {
                 y = (int)(screenHeight * elementConfig.percentY);
             } else {
@@ -359,7 +359,7 @@ public class GuiConfigHelper {
             } else {
                 width = elementConfig.width;
             }
-            
+
             if (elementConfig.percentHeight != null && screenHeight > 0) {
                 height = (int)(screenHeight * elementConfig.percentHeight);
             } else if (screenHeight > 0) {
@@ -372,7 +372,7 @@ public class GuiConfigHelper {
 
             widget.x = x;
             widget.y = y;
-            
+
             int oldWidth = widget.getWidth();
             widget.setWidth(width);
 
@@ -385,7 +385,7 @@ public class GuiConfigHelper {
                     heightField.setAccessible(true);
                     int oldHeight = heightField.getInt(widget);
                     heightField.setInt(widget, height);
-                    
+
                     if (oldHeight != height) {
                         try {
                             java.lang.reflect.Method refreshMethod = widget.getClass().getMethod("refresh");
@@ -400,21 +400,21 @@ public class GuiConfigHelper {
             } catch (Exception e) {
                 com.kingodogo.buildscape.BuildScape.getLogger().warn("Failed to set widget height for '{}': {}", elementId, e.getMessage());
             }
-            
+
             widget.visible = elementConfig.visible;
         } catch (Exception e) {
             com.kingodogo.buildscape.BuildScape.getLogger().warn("Failed to apply config to widget '{}': {}", elementId, e.getMessage());
         }
     }
-    
+
     public static void applyAllConfigs(String tabName, Map<String, AbstractWidget> widgetMap, int contentX, int contentY) {
         applyAllConfigs(tabName, widgetMap, contentX, contentY, 0, 0);
     }
-    
+
     public static void applyAllConfigs(String tabName, Map<String, AbstractWidget> widgetMap) {
         applyAllConfigs(tabName, widgetMap, 0, 0, 0, 0);
     }
-    
+
     public static void applyAllEditBoxConfigs(String tabName, Map<String, EditBox> editBoxMap,
                                              int contentX, int contentY, int screenWidth, int screenHeight) {
         GuiConfigData config = getConfig(tabName);
@@ -432,11 +432,11 @@ public class GuiConfigHelper {
                 config.screen.scale = (float)mc.getWindow().getGuiScale();
             }
         }
-        
+
         for (Map.Entry<String, EditBox> entry : editBoxMap.entrySet()) {
             String elementId = entry.getKey();
             EditBox editBox = entry.getValue();
-            
+
             if (editBox != null) {
                 GuiConfigData.ElementConfig elementConfig = null;
                 if (defaults != null && defaults.containsKey(elementId)) {
@@ -459,14 +459,14 @@ public class GuiConfigHelper {
             }
         }
     }
-    
+
     private static void applyConfigToEditBoxWithConfig(String elementId, EditBox editBox,
                                                       GuiConfigData.ElementConfig elementConfig, GuiConfigData config,
                                                       int contentX, int contentY, int screenWidth, int screenHeight) {
         if (editBox == null || elementConfig == null) {
             return;
         }
-        
+
         int x, y, width, height;
 
         if (elementConfig.percentX != null && screenWidth > 0) {
@@ -477,7 +477,7 @@ public class GuiConfigHelper {
                 elementConfig.percentX = (double)x / screenWidth;
             }
         }
-        
+
         if (elementConfig.percentY != null && screenHeight > 0) {
             y = (int)(screenHeight * elementConfig.percentY);
         } else {
@@ -496,7 +496,7 @@ public class GuiConfigHelper {
         } else {
             width = elementConfig.width;
         }
-        
+
         if (elementConfig.percentHeight != null && screenHeight > 0) {
             height = (int)(screenHeight * elementConfig.percentHeight);
         } else if (screenHeight > 0) {
@@ -506,12 +506,12 @@ public class GuiConfigHelper {
         } else {
             height = elementConfig.height;
         }
-        
+
         editBox.x = x;
         editBox.y = y;
         editBox.setWidth(width);
         editBox.visible = elementConfig.visible;
-        
+
         try {
             java.lang.reflect.Field heightField = EditBox.class.getDeclaredField("height");
             heightField.setAccessible(true);
@@ -520,11 +520,11 @@ public class GuiConfigHelper {
             com.kingodogo.buildscape.BuildScape.getLogger().debug("Failed to set EditBox height for '{}': {}", elementId, e.getMessage());
         }
     }
-    
+
     public static void applyAllEditBoxConfigs(String tabName, Map<String, EditBox> editBoxMap, int contentX, int contentY) {
         applyAllEditBoxConfigs(tabName, editBoxMap, contentX, contentY, 0, 0);
     }
-    
+
     public static void applyAllEditBoxConfigs(String tabName, Map<String, EditBox> editBoxMap) {
         applyAllEditBoxConfigs(tabName, editBoxMap, 0, 0);
     }

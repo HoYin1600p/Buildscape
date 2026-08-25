@@ -18,7 +18,7 @@ import java.util.List;
 public class PillarIdDetailConfigTab extends AbstractConfigTab {
     private static final String[] PATTERNS = {"none", "default", "beam", "spiral", "fountain", "pulse", "ring", "burst", "snowflake"};
     private static final int MAX_COLORS = 5;
-    
+
     private final String pillarId;
     private PillarIdManager.PillarData pillarData;
 
@@ -36,7 +36,7 @@ public class PillarIdDetailConfigTab extends AbstractConfigTab {
     private int selectedColorIndex = -1;
     private int currentPatternIndex = 0;
     private int currentMaxColor = 5;
-    
+
     // Panel coordinates
     private int leftBoxX, leftBoxY, leftBoxWidth, leftBoxHeight;
     private int rightBoxX, rightBoxY, rightBoxWidth, rightBoxHeight;
@@ -44,12 +44,12 @@ public class PillarIdDetailConfigTab extends AbstractConfigTab {
     private int lastScreenWidth = -1;
 
     private boolean dirty = false;
-    
+
     public PillarIdDetailConfigTab(BuildScapeConfigScreen parent, String pillarId) {
         super(parent);
         this.pillarId = pillarId;
     }
-    
+
     @Override
     public void init() {
         // IMPORTANT: Request fresh pillar data from server when opening the tab
@@ -69,13 +69,13 @@ public class PillarIdDetailConfigTab extends AbstractConfigTab {
         } catch (Exception e) {
             // Ignore reload errors
         }
-        
+
         pillarData = manager.getPillarData(pillarId);
         if (pillarData == null) {
             parent.setActiveTab(new PillarIdsConfigTab(parent));
             return;
         }
-        
+
         // Try to sync pattern from block entity
         syncPatternFromBlockEntity(manager);
         pillarData = manager.getPillarData(pillarId);
@@ -83,9 +83,9 @@ public class PillarIdDetailConfigTab extends AbstractConfigTab {
             parent.setActiveTab(new PillarIdsConfigTab(parent));
             return;
         }
-        
+
         PillarParticleConfig globalConfig = PillarParticleConfig.get();
-        
+
         // Back button
         backButton = new ScaledTextButton(
             0, 0,
@@ -95,12 +95,12 @@ public class PillarIdDetailConfigTab extends AbstractConfigTab {
         );
         backButton.setCustomTextColors(0xFFFF55, 0xFFFFFF); // Yellow/White on hover
         addTabWidget(backButton);
-        
+
         // Pattern selector
         String pattern = pillarData.pattern != null ? pillarData.pattern : "none"; // Default to "none" if null (global)
         // If pattern logic in this tab uses "none" to represent null/global
         if (pillarData.pattern == null || pillarData.pattern.isEmpty()) pattern = "none";
-        
+
         currentPatternIndex = findPatternIndex(pattern);
 
         patternSelector = new ScaledTextButton(
@@ -127,7 +127,7 @@ public class PillarIdDetailConfigTab extends AbstractConfigTab {
                 }
         );
         addTabWidget(usePatternToggle);
-        
+
         // Pattern speed
         double patternSpeed = pillarData.pattern_speed != null ? pillarData.pattern_speed : globalConfig.pattern_speed;
         patternSpeedField = new EditBox(
@@ -144,7 +144,7 @@ public class PillarIdDetailConfigTab extends AbstractConfigTab {
         patternSpeedField.setMaxLength(64);
         patternSpeedField.setResponder((text) -> dirty = true);
         addTabWidget(patternSpeedField);
-        
+
         // Pattern spread
         double patternSpread = pillarData.pattern_spread != null ? pillarData.pattern_spread : globalConfig.pattern_spread;
         patternSpreadField = new EditBox(
@@ -161,7 +161,7 @@ public class PillarIdDetailConfigTab extends AbstractConfigTab {
         patternSpreadField.setMaxLength(64);
         patternSpreadField.setResponder((text) -> dirty = true);
         addTabWidget(patternSpreadField);
-        
+
         // Pattern intensity
         double patternIntensity = pillarData.pattern_intensity != null ? pillarData.pattern_intensity : globalConfig.pattern_intensity;
         patternIntensityField = new EditBox(
@@ -178,7 +178,7 @@ public class PillarIdDetailConfigTab extends AbstractConfigTab {
         patternIntensityField.setMaxLength(64);
         patternIntensityField.setResponder((text) -> dirty = true);
         addTabWidget(patternIntensityField);
-        
+
         // Max particle color slider
         int maxColor = pillarData.max_particle_color != null ? pillarData.max_particle_color : globalConfig.max_particle_color;
         currentMaxColor = Math.max(1, Math.min(MAX_COLORS, maxColor));
@@ -191,7 +191,7 @@ public class PillarIdDetailConfigTab extends AbstractConfigTab {
         );
         maxParticleColorSlider.active = true;
         addTabWidget(maxParticleColorSlider);
-        
+
         // Save button
         saveButton = new ScaledTextButton(
             0, 0,
@@ -200,16 +200,16 @@ public class PillarIdDetailConfigTab extends AbstractConfigTab {
             (btn) -> saveConfig()
         );
         addTabWidget(saveButton);
-        
+
         // Color swatches and hex fields
         colorSwatchButtons = new ArrayList<>();
         colorHexFields = new ArrayList<>();
-        
+
         List<String> colors = pillarData.dyeColors != null ? new ArrayList<>(pillarData.dyeColors) : new ArrayList<>();
         while (colors.size() < MAX_COLORS) {
             colors.add("#FFFFFF");
         }
-        
+
         for (int i = 0; i < MAX_COLORS; i++) {
             final int colorIndex = i;
             String colorCode = i < colors.size() ? colors.get(i) : "#FFFFFF";
@@ -221,17 +221,17 @@ public class PillarIdDetailConfigTab extends AbstractConfigTab {
             } catch (NumberFormatException e) {
                 // Use default white
             }
-            
+
             ColorSwatchButton swatch = new ColorSwatchButton(
                 0, 0,
-                BuildScapeConfigScreen.getScaledEditBoxHeight(), 
+                BuildScapeConfigScreen.getScaledEditBoxHeight(),
                 BuildScapeConfigScreen.getScaledEditBoxHeight(),
                 color,
                 (btn) -> onColorSwatchClicked(colorIndex)
             );
             colorSwatchButtons.add(swatch);
             addTabWidget(swatch);
-            
+
             EditBox hexField = new EditBox(
                 Minecraft.getInstance().font,
                 0, 0,
@@ -267,7 +267,7 @@ public class PillarIdDetailConfigTab extends AbstractConfigTab {
             colorHexFields.add(hexField);
             addTabWidget(hexField);
         }
-        
+
         // Color picker - reduced size to fit in window
         colorPicker = new ColorPickerWidget(
             0, 0,
@@ -293,26 +293,26 @@ public class PillarIdDetailConfigTab extends AbstractConfigTab {
         colorPicker.visible = false;
         colorPicker.setEnabled(true);
         addTabWidget(colorPicker);
-        
+
         updateSwatchesEnabledState();
-        
+
         // Initial layout
         relayout(parent.getContentX(), parent.getContentY(), parent.getContentWidth(), parent.getContentHeight());
     }
-    
+
     private void relayout(int contentX, int contentY, int contentWidth, int contentHeight) {
         Minecraft mc = Minecraft.getInstance();
         int padding = BuildScapeConfigScreen.scaleSize(10);
-        
+
         // Use dimensions from parent screen directly to ensure consistency
         int middleX = parent.getContentX();
         int middlePanelWidth = parent.getContentWidth();
         int rightX = parent.getRightPanelX();
         int rightPanelWidth = parent.getRightPanelWidth();
-        
+
         // Button area at top for back button
         int buttonAreaHeight = BuildScapeConfigScreen.getScaledButtonHeight() + padding;
-        
+
         // Position back button
         backButton.x = contentX + padding;
         backButton.y = contentY + BuildScapeConfigScreen.scaleSize(3);
@@ -336,7 +336,7 @@ public class PillarIdDetailConfigTab extends AbstractConfigTab {
         int fieldHeight = BuildScapeConfigScreen.getScaledEditBoxHeight();
         int fieldSpacing = fieldHeight + gap;
         int currentY = leftBoxY + padding + BuildScapeConfigScreen.scaleSize(15); // Extra space for title
-        
+
         // Calculate label and field widths
         int labelWidth = BuildScapeConfigScreen.scaleSize(140);
         int fieldGap = BuildScapeConfigScreen.scaleSize(8);
@@ -377,7 +377,7 @@ public class PillarIdDetailConfigTab extends AbstractConfigTab {
         maxParticleColorSlider.y = currentY;
         maxParticleColorSlider.setWidth(fieldWidth);
         maxParticleColorSlider.setHeight(fieldHeight);
-        
+
         // Save button
         if (saveButton != null) {
             saveButton.x = leftBoxX + padding;
@@ -392,16 +392,16 @@ public class PillarIdDetailConfigTab extends AbstractConfigTab {
         int hexFieldHeight = BuildScapeConfigScreen.getScaledEditBoxHeight();
         int colorRowSpacing = BuildScapeConfigScreen.scaleSize(6);
         int startY = rightBoxY + padding + BuildScapeConfigScreen.scaleSize(18);
-        
+
         // Column spacing
         int availableWidth = rightBoxWidth - padding * 2;
         int columnSpacing = BuildScapeConfigScreen.scaleSize(10);
         int columnWidth = (availableWidth - columnSpacing) / 2;
-        
+
         int leftSwatchX = rightBoxX + padding;
         int fieldSwatchGap = BuildScapeConfigScreen.scaleSize(6);
         int leftHexFieldX = leftSwatchX + swatchSize + fieldSwatchGap;
-        
+
         int rightSwatchX = rightBoxX + padding + columnWidth + columnSpacing;
         int rightHexFieldX = rightSwatchX + swatchSize + fieldSwatchGap;
 
@@ -409,7 +409,7 @@ public class PillarIdDetailConfigTab extends AbstractConfigTab {
             int row = i / 2;
             int col = i % 2;
             int swatchY = startY + row * (swatchSize + colorRowSpacing);
-            
+
             ColorSwatchButton swatch = colorSwatchButtons.get(i);
             swatch.x = (col == 0) ? leftSwatchX : rightSwatchX;
             swatch.y = swatchY;
@@ -430,18 +430,18 @@ public class PillarIdDetailConfigTab extends AbstractConfigTab {
             int pickerY = swatchesEndY + BuildScapeConfigScreen.scaleSize(10);
             int pickerWidth = rightBoxWidth - padding * 2;
             int pickerHeight = rightBoxY + rightBoxHeight - padding - pickerY;
-            
+
             // Limit picker size to reasonable proportions
             int idealWidth = BuildScapeConfigScreen.scaleSize(260);
             int idealHeight = BuildScapeConfigScreen.scaleSize(200);
-            
+
             colorPicker.setWidth(Math.min(pickerWidth, idealWidth));
             colorPicker.setHeight(Math.min(pickerHeight, idealHeight));
             colorPicker.x = rightBoxX + (rightBoxWidth - colorPicker.getWidth()) / 2;
             colorPicker.y = pickerY;
         }
     }
-    
+
     private void onMaxParticleColorChanged(int value) {
         currentMaxColor = value;
         dirty = true;
@@ -449,7 +449,7 @@ public class PillarIdDetailConfigTab extends AbstractConfigTab {
         if (maxParticleColorSlider != null) {
             maxParticleColorSlider.setMessage(new TranslatableComponent("buildscape.config.particles.max_particle_color", currentMaxColor));
         }
-        
+
         if (selectedColorIndex >= currentMaxColor) {
             selectedColorIndex = -1;
             if (colorPicker != null) {
@@ -460,7 +460,7 @@ public class PillarIdDetailConfigTab extends AbstractConfigTab {
             }
         }
     }
-    
+
     private void updateSwatchesEnabledState() {
         for (int i = 0; i < colorSwatchButtons.size(); i++) {
             boolean enabled = i < currentMaxColor;
@@ -472,19 +472,19 @@ public class PillarIdDetailConfigTab extends AbstractConfigTab {
             }
         }
     }
-    
+
     private void onColorSwatchClicked(int colorIndex) {
         if (colorIndex >= currentMaxColor) {
             return;
         }
-        
+
         selectedColorIndex = colorIndex;
-        
+
         String hexValue = "#FFFFFF";
         if (colorIndex < pillarData.dyeColors.size()) {
             hexValue = pillarData.dyeColors.get(colorIndex);
         }
-        
+
         int color = 0xFFFFFF;
         try {
             if (hexValue.startsWith("#") && hexValue.length() == 7) {
@@ -493,37 +493,37 @@ public class PillarIdDetailConfigTab extends AbstractConfigTab {
         } catch (NumberFormatException e) {
             // Use default white
         }
-        
+
         if (colorPicker != null) {
             colorPicker.setColor(color);
             colorPicker.visible = true;
             colorPicker.setEnabled(true);
         }
-        
+
         for (int i = 0; i < colorSwatchButtons.size(); i++) {
             colorSwatchButtons.get(i).setSelected(i == colorIndex);
         }
     }
-    
+
     private void onColorChanged(int colorIndex, String hexColor) {
         if (pillarData.dyeColors == null) {
             pillarData.dyeColors = new ArrayList<>();
         }
-        
+
         while (pillarData.dyeColors.size() <= colorIndex) {
             pillarData.dyeColors.add("#FFFFFF");
         }
-        
+
         pillarData.dyeColors.set(colorIndex, hexColor);
         pillarData.modifiedTime = System.currentTimeMillis();
     }
-    
+
     private void updateSwatchButtonColor(int index, int color) {
         if (colorSwatchButtons != null && index >= 0 && index < colorSwatchButtons.size()) {
             colorSwatchButtons.get(index).setColor(color);
         }
     }
-    
+
     private int findPatternIndex(String pattern) {
         for (int i = 0; i < PATTERNS.length; i++) {
             if (PATTERNS[i].equals(pattern)) {
@@ -532,17 +532,17 @@ public class PillarIdDetailConfigTab extends AbstractConfigTab {
         }
         return 0;
     }
-    
+
     private void cyclePattern() {
         currentPatternIndex = (currentPatternIndex + 1) % PATTERNS.length;
         String pattern = PATTERNS[currentPatternIndex];
         patternSelector.setMessage(getPatternMessage(pattern));
         dirty = true;
     }
-    
+
     private void saveConfig() {
         if (pillarData == null) return;
-        
+
         if (Minecraft.getInstance().player != null) {
             Minecraft.getInstance().player.playSound(
                 net.minecraft.sounds.SoundEvents.NOTE_BLOCK_BELL,
@@ -550,42 +550,42 @@ public class PillarIdDetailConfigTab extends AbstractConfigTab {
                 1.0f
             );
         }
-        
+
         PillarParticleConfig globalConfig = PillarParticleConfig.get();
-        
+
         pillarData.pattern = PATTERNS[currentPatternIndex];
-        
+
         try {
             pillarData.pattern_speed = Double.parseDouble(patternSpeedField.getValue());
         } catch (NumberFormatException e) {
             pillarData.pattern_speed = globalConfig.pattern_speed;
         }
-        
+
         try {
             pillarData.pattern_spread = Double.parseDouble(patternSpreadField.getValue());
         } catch (NumberFormatException e) {
             pillarData.pattern_spread = globalConfig.pattern_spread;
         }
-        
+
         try {
             pillarData.pattern_intensity = Double.parseDouble(patternIntensityField.getValue());
         } catch (NumberFormatException e) {
             pillarData.pattern_intensity = globalConfig.pattern_intensity;
         }
-        
+
         pillarData.max_particle_color = currentMaxColor;
-        
+
         if (pillarData.dyeColors != null) {
             while (pillarData.dyeColors.size() > currentMaxColor) {
                 pillarData.dyeColors.remove(pillarData.dyeColors.size() - 1);
             }
-            while (!pillarData.dyeColors.isEmpty() && 
+            while (!pillarData.dyeColors.isEmpty() &&
                    (pillarData.dyeColors.get(pillarData.dyeColors.size() - 1).equals("#FFFFFF") ||
                     pillarData.dyeColors.get(pillarData.dyeColors.size() - 1).equals("#ffffff"))) {
                 pillarData.dyeColors.remove(pillarData.dyeColors.size() - 1);
             }
         }
-        
+
         pillarData.modifiedTime = System.currentTimeMillis();
 
         // Send packet to server to update pillar data
@@ -694,12 +694,12 @@ public class PillarIdDetailConfigTab extends AbstractConfigTab {
                         needsUpdate = true;
                     }
                 }
-                
+
                 // Update colors
                 if (pillarData.dyeColors != null && !pillarData.dyeColors.isEmpty()) {
                     java.util.List<String> nbtColors = bottomPillarBE.getParticleColors();
                     boolean colorsChanged = false;
-                    
+
                     if (nbtColors == null || nbtColors.size() != pillarData.dyeColors.size()) {
                         colorsChanged = true;
                     } else {
@@ -712,7 +712,7 @@ public class PillarIdDetailConfigTab extends AbstractConfigTab {
                             }
                         }
                     }
-                    
+
                     if (colorsChanged) {
                         // Clear and set colors
                         if (bottomPillarBE.getParticleColors() != null) {
@@ -726,7 +726,7 @@ public class PillarIdDetailConfigTab extends AbstractConfigTab {
                         needsUpdate = true;
                     }
                 }
-                
+
                 if (needsUpdate) {
                     bottomPillarBE.setChanged();
                     level.sendBlockUpdated(
@@ -736,12 +736,12 @@ public class PillarIdDetailConfigTab extends AbstractConfigTab {
                         3
                     );
                 }
-                
+
                 break; // Found the pillar, done
             }
         } catch (Exception e) {}
     }
-    
+
     /**
      * Sets the height of an EditBox via reflection since 1.18.2 EditBox
      * doesn't have a public setHeight method.
@@ -756,7 +756,7 @@ public class PillarIdDetailConfigTab extends AbstractConfigTab {
             // Fallback - ignore
         }
     }
-    
+
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (colorPicker != null && colorPicker.visible && colorPicker.mouseClicked(mouseX, mouseY, button)) {
@@ -764,7 +764,7 @@ public class PillarIdDetailConfigTab extends AbstractConfigTab {
         }
         return super.mouseClicked(mouseX, mouseY, button);
     }
-    
+
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
         if (colorPicker != null && colorPicker.visible && colorPicker.mouseDragged(mouseX, mouseY, button, dragX, dragY)) {
@@ -772,7 +772,7 @@ public class PillarIdDetailConfigTab extends AbstractConfigTab {
         }
         return super.mouseDragged(mouseX, mouseY, button, dragX, dragY);
     }
-    
+
     @Override
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
         if (colorPicker != null && colorPicker.visible && colorPicker.mouseReleased(mouseX, mouseY, button)) {
@@ -780,7 +780,7 @@ public class PillarIdDetailConfigTab extends AbstractConfigTab {
         }
         return super.mouseReleased(mouseX, mouseY, button);
     }
-    
+
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         if (colorPicker != null && colorPicker.visible) {
@@ -791,18 +791,18 @@ public class PillarIdDetailConfigTab extends AbstractConfigTab {
             if (colorPicker.sField != null && colorPicker.sField.keyPressed(keyCode, scanCode, modifiers)) return true;
             if (colorPicker.brightnessField != null && colorPicker.brightnessField.keyPressed(keyCode, scanCode, modifiers)) return true;
         }
-        
+
         for (EditBox hexField : colorHexFields) {
             if (hexField.keyPressed(keyCode, scanCode, modifiers)) return true;
         }
-        
+
         if (patternSpeedField.keyPressed(keyCode, scanCode, modifiers)) return true;
         if (patternSpreadField.keyPressed(keyCode, scanCode, modifiers)) return true;
         if (patternIntensityField.keyPressed(keyCode, scanCode, modifiers)) return true;
-        
+
         return super.keyPressed(keyCode, scanCode, modifiers);
     }
-    
+
     @Override
     public boolean charTyped(char codePoint, int modifiers) {
         if (colorPicker != null && colorPicker.visible) {
@@ -813,18 +813,18 @@ public class PillarIdDetailConfigTab extends AbstractConfigTab {
             if (colorPicker.sField != null && colorPicker.sField.charTyped(codePoint, modifiers)) return true;
             if (colorPicker.brightnessField != null && colorPicker.brightnessField.charTyped(codePoint, modifiers)) return true;
         }
-        
+
         for (EditBox hexField : colorHexFields) {
             if (hexField.charTyped(codePoint, modifiers)) return true;
         }
-        
+
         if (patternSpeedField.charTyped(codePoint, modifiers)) return true;
         if (patternSpreadField.charTyped(codePoint, modifiers)) return true;
         if (patternIntensityField.charTyped(codePoint, modifiers)) return true;
-        
+
         return super.charTyped(codePoint, modifiers);
     }
-    
+
     @Override
     public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
         int contentX = parent.getContentX();
@@ -834,10 +834,10 @@ public class PillarIdDetailConfigTab extends AbstractConfigTab {
 
         // Check if relayout needed
         int screenWidth = parent.width;
-        if (contentX != lastContentX || contentY != lastContentY || 
+        if (contentX != lastContentX || contentY != lastContentY ||
             contentWidth != lastContentWidth || contentHeight != lastContentHeight ||
             screenWidth != lastScreenWidth) {
-            
+
             relayout(contentX, contentY, contentWidth, contentHeight);
             lastContentX = contentX;
             lastContentY = contentY;
@@ -855,7 +855,7 @@ public class PillarIdDetailConfigTab extends AbstractConfigTab {
         // Header info (Pillar ID)
         int titleX = backButton.x + backButton.getWidth() + padding;
         int titleY = backButton.y;
-        
+
         poseStack.pushPose();
         poseStack.scale(textScale, textScale, 1.0f);
         mc.font.draw(poseStack, new TranslatableComponent("buildscape.config.ids.id").getString() + ": " + pillarId,
@@ -916,7 +916,7 @@ public class PillarIdDetailConfigTab extends AbstractConfigTab {
                     leftBoxX + padding, statusY, 0xFFFFFF);
         }
     }
-    
+
     @Override
     public String getTabName() {
         return "PillarIdDetail";

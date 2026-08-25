@@ -93,7 +93,7 @@ public class PillarItemsConfigTab extends AbstractConfigTab {
                 existingItems,
                 this::removeItem,
                 this::isItemInConfig);
-        
+
         // Dynamically calculate header height based on label position/height
         int buttonSize = BuildScapeConfigScreen.getScaledButtonHeight();
         int headerHeight = internalPaddingY + buttonSize + BuildScapeConfigScreen.scaleSize(4);
@@ -209,7 +209,7 @@ public class PillarItemsConfigTab extends AbstractConfigTab {
                 this::onItemSelected,
                 (itemId) -> isItemInConfig(itemId) ? 1 : 0);
         itemSelectionWidget.setSortMode(SortToggleButton.SortType.ALL_ITEMS);
-        
+
         // Dynamically calculate header height based on search box position/height to prevent overlap
         headerHeight = internalPaddingY + buttonSize + BuildScapeConfigScreen.scaleSize(4);
         itemSelectionWidget.setHeaderAreaHeight(headerHeight);
@@ -333,7 +333,7 @@ public class PillarItemsConfigTab extends AbstractConfigTab {
                 tagsWidth, tagsWidgetHeight,
                 this::onTagSelected);
         tagsSelectorWidget.setSortType(TagsSelectorWidget.SortType.ALL_ITEMS);
-        
+
         // Match tag selector header height for consistency
         tagsSelectorWidget.setHeaderAreaHeight(headerHeight);
         addTabWidget(tagsSelectorWidget);
@@ -384,7 +384,7 @@ public class PillarItemsConfigTab extends AbstractConfigTab {
         int topGap = parent.getContentY();
         int availableHeight = parent.getContentHeight();
         int middleGap = parent.getVerticalPanelGap(); // 0.5% consistent gap between panels
-        
+
         int internalPaddingY = (int) (screenHeight * 0.005) + 2;
 
         int topSectionHeight = (availableHeight - middleGap) / 2;
@@ -413,11 +413,11 @@ public class PillarItemsConfigTab extends AbstractConfigTab {
             itemSelectionWidget.x = leftX;
             itemSelectionWidget.y = bottomY; // Start at panel top
             itemSelectionWidget.setWidth(leftPanelWidth);
-            
+
             int buttonSize = BuildScapeConfigScreen.getScaledButtonHeight();
             int headerHeight = internalPaddingY + buttonSize + BuildScapeConfigScreen.scaleSize(4);
             itemSelectionWidget.setHeaderAreaHeight(headerHeight);
-            
+
             int itemSelectionWidgetHeight = bottomSectionHeight; // Full panel height
             try {
                 java.lang.reflect.Method setHeightMethod = itemSelectionWidget.getClass().getMethod("setHeight",
@@ -456,7 +456,7 @@ public class PillarItemsConfigTab extends AbstractConfigTab {
             tagsSelectorWidget.y = tagsY; // Start at panel top
             tagsSelectorWidget.setWidth(rightPanelWidth);
             tagsSelectorWidget.setHeight(tagsWidgetHeight);
-            
+
             int buttonSize = BuildScapeConfigScreen.getScaledButtonHeight();
             int headerHeight = internalPaddingY + buttonSize + BuildScapeConfigScreen.scaleSize(4);
             tagsSelectorWidget.setHeaderAreaHeight(headerHeight);
@@ -623,7 +623,7 @@ public class PillarItemsConfigTab extends AbstractConfigTab {
 
         // Dynamically compute maxLabelWidth to ensure searchBox is minimum 80px width
         int minSearchBoxWidth = BuildScapeConfigScreen.scaleSize(80);
-        
+
         int buttonSize = BuildScapeConfigScreen.getScaledButtonHeight();
         int buttonSpacing = BuildScapeConfigScreen.scaleSize(5);
         int totalButtonsWidth = (buttonSize * 3) + (buttonSpacing * 2);
@@ -635,7 +635,7 @@ public class PillarItemsConfigTab extends AbstractConfigTab {
         int finalSearchBoxWidth = buttonsStartX - searchBoxX - labelSpacing;
 
         searchBox.x = searchBoxX;
-        searchBox.setWidth(Math.max(minSearchBoxWidth, finalSearchBoxWidth)); 
+        searchBox.setWidth(Math.max(minSearchBoxWidth, finalSearchBoxWidth));
 
         // Update button positions
         if (inventoryButton != null && allItemsButton != null && modOnlyButton != null && searchBox != null) {
@@ -663,7 +663,7 @@ public class PillarItemsConfigTab extends AbstractConfigTab {
         Minecraft mc = Minecraft.getInstance();
         int rightX = parent.getRightPanelX();
         int rightPanelWidth = parent.getRightPanelWidth();
-        
+
         int leftPadding = BuildScapeConfigScreen.scaleSize(5);
         int labelSpacing = BuildScapeConfigScreen.scaleSize(5);
 
@@ -681,8 +681,8 @@ public class PillarItemsConfigTab extends AbstractConfigTab {
 
         int labelWidth = (int) (mc.font.width(labelText) * textScale);
         int minSearchBoxWidth = BuildScapeConfigScreen.scaleSize(50);
-        
-        int buttonSize = BuildScapeConfigScreen.getScaledButtonHeight(); 
+
+        int buttonSize = BuildScapeConfigScreen.getScaledButtonHeight();
         int buttonSpacing = BuildScapeConfigScreen.scaleSize(5);
         int totalButtonsWidth = (buttonSize * 3) + (buttonSpacing * 2);
         // Buttons end at panel right edge (no extra right gap inside panel)
@@ -693,7 +693,7 @@ public class PillarItemsConfigTab extends AbstractConfigTab {
         int finalSearchBoxWidth = buttonsStartX - searchBoxX - labelSpacing;
 
         tagsSearchBox.x = searchBoxX;
-        tagsSearchBox.setWidth(Math.max(minSearchBoxWidth, finalSearchBoxWidth)); 
+        tagsSearchBox.setWidth(Math.max(minSearchBoxWidth, finalSearchBoxWidth));
 
         if (tagsInventoryButton != null && tagsAllButton != null && tagsModOnlyButton != null) {
             tagsInventoryButton.x = buttonsStartX;
@@ -703,7 +703,7 @@ public class PillarItemsConfigTab extends AbstractConfigTab {
             tagsAllButton.x = buttonsStartX + buttonSize + buttonSpacing;
             tagsAllButton.setWidth(buttonSize);
             tagsAllButton.setHeight(buttonSize);
-            
+
             tagsModOnlyButton.x = buttonsStartX + (buttonSize + buttonSpacing) * 2;
             tagsModOnlyButton.setWidth(buttonSize);
             tagsModOnlyButton.setHeight(buttonSize);
@@ -951,7 +951,7 @@ public class PillarItemsConfigTab extends AbstractConfigTab {
             } else {
                 tagsLabel = new net.minecraft.network.chat.TextComponent("All Tags");
             }
-            
+
             int tagsLabelX = tagsSelectorWidget.x + 2;
             int textYOffset = (searchBoxHeight - (int)(mc.font.lineHeight * textScale)) / 2;
             renderScaledText(poseStack, tagsLabel, tagsLabelX, tagsSearchBox.y + textYOffset, textScale);

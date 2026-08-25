@@ -66,7 +66,7 @@ public class CopperChestRenderer extends ChestRenderer<CopperChestBlockEntity> {
         net.minecraft.world.level.block.Block block = blockEntity.getBlockState().getBlock();
         ResourceLocation blockId = net.minecraftforge.registries.ForgeRegistries.BLOCKS.getKey(block);
         String path = blockId == null ? "" : blockId.getPath();
-        
+
         if (path.contains("oxidized")) {
             return chooseMaterial(chestType, OXIDIZED, OXIDIZED_LEFT, OXIDIZED_RIGHT);
         } else if (path.contains("weathered")) {

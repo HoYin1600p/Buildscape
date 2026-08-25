@@ -197,7 +197,7 @@ public class MobStateParser {
         universalStates.add("angry");
         universalStates.add("charged");
 
-        // Size variants 
+        // Size variants
         universalStates.add("giant");
         universalStates.add("huge");
         universalStates.add("large"); // Size 4

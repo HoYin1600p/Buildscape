@@ -52,7 +52,7 @@ public class ExistingItemsWidget extends AbstractWidget {
         this.maxVisibleRows = Math.min(MAX_VISIBLE_ROWS, (height - headerAreaHeight - GRID_PADDING_TOP - 5) / (ITEM_SIZE + ITEM_SPACING));
         updateDisplayEntries();
     }
-    
+
     public void setHeaderAreaHeight(int height) {
         this.headerAreaHeight = height;
         updateDisplayEntries();
@@ -140,7 +140,7 @@ public class ExistingItemsWidget extends AbstractWidget {
         int bottomMargin = 10;
         int scissorY = (int) (windowHeight - (y + height) * guiScale + bottomMargin * guiScale);
         int scissorWidth = (int) ((width - 21) * guiScale); // Exclude scrollbar area
-        
+
         // Fix: Scissor starts exactly below the header separator. This allows padding and selection borders to be visible.
         int scissorHeight = (int) ((height - headerAreaHeight - 1 - bottomMargin) * guiScale);
 
@@ -373,11 +373,11 @@ public class ExistingItemsWidget extends AbstractWidget {
             int scrollbarY = y + headerAreaHeight + GRID_PADDING_TOP;
             int bottomMargin = 10;
             int scrollbarHeight = height - headerAreaHeight - GRID_PADDING_TOP - bottomMargin;
-            
+
             // Content area for dragging (same as grid items area)
             int contentX = x + 5;
             int contentY = y + headerAreaHeight + GRID_PADDING_TOP;
-            int contentWidth = width - 21; 
+            int contentWidth = width - 21;
             int contentHeight = scrollbarHeight;
 
             double visibleRatio = (maxVisibleRows * (ITEM_SIZE + ITEM_SPACING)) / (double) (Math.ceil((double) displayEntries.size() / itemsPerRow) * (ITEM_SIZE + ITEM_SPACING));

@@ -13,7 +13,7 @@ public class SortToggleButton extends AbstractWidget {
         ALL_ITEMS,
         MOD_ONLY
     }
-    
+
     private final SortType sortType;
     private boolean selected = false;
     private final java.util.function.BiConsumer<SortType, Boolean> onToggle;
@@ -41,19 +41,19 @@ public class SortToggleButton extends AbstractWidget {
     public void setHeight(int height) {
         this.height = height;
     }
-    
+
     public void setSelected(boolean selected) {
         this.selected = selected;
     }
-    
+
     public boolean isSelected() {
         return selected;
     }
-    
+
     public SortType getSortType() {
         return sortType;
     }
-    
+
     @Override
     public void renderButton(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
         Minecraft mc = Minecraft.getInstance();
@@ -71,7 +71,7 @@ public class SortToggleButton extends AbstractWidget {
         // Draw background
         fill(poseStack, x, y, x + width, y + height, borderColor); // Border
         fill(poseStack, x + 1, y + 1, x + width - 1, y + height - 1, bgColor); // Background
-        
+
         int centerX = x + width / 2;
         int centerY = y + (height - 8) / 2; // Center text vertically (font height 8)
 
@@ -108,12 +108,12 @@ public class SortToggleButton extends AbstractWidget {
             mc.screen.renderTooltip(poseStack, tooltip, mouseX, mouseY);
         }
     }
-    
+
     @Override
     public void onClick(double mouseX, double mouseY) {
         // This is called from mouseClicked, but we want modifiers, so we'll handle it there instead if possible
     }
-    
+
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (this.active && this.visible) {
@@ -121,7 +121,7 @@ public class SortToggleButton extends AbstractWidget {
                 boolean clicked = mouseX >= (double)this.x && mouseY >= (double)this.y &&
                         mouseX < (double) (this.x + this.width) &&
                         mouseY < (double) (this.y + this.height);
-                
+
                 if (clicked) {
                     this.playDownSound(net.minecraft.client.Minecraft.getInstance().getSoundManager());
                     boolean isCtrlDown = net.minecraft.client.gui.screens.Screen.hasControlDown();
@@ -134,7 +134,7 @@ public class SortToggleButton extends AbstractWidget {
         }
         return false;
     }
-    
+
     @Override
     public void updateNarration(NarrationElementOutput narrationElementOutput) {
     }

@@ -33,7 +33,7 @@ public class LogSlabBlock extends ModSlabBlock {
         // Only allow sitting on right-click with empty hand (or specific conditions)
         // If player is holding a block and not sneaking, they should place it (InteractionResult.PASS)
         if (hand == InteractionHand.MAIN_HAND && !player.isShiftKeyDown()) {
-            
+
             // Check if player is holding an item that might be placed
             if (!player.getItemInHand(hand).isEmpty() && player.getItemInHand(hand).getItem() instanceof net.minecraft.world.item.BlockItem) {
                 return InteractionResult.PASS;

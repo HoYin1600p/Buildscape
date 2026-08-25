@@ -2525,27 +2525,7 @@ public class ModBlocks {
                                                         .sound(net.minecraft.world.level.block.SoundType.STONE)
                                                         .noOcclusion()));
 
-        public static final RegistryObject<Block> QUARTZ_PILLAR_STAIRS = BLOCKS.register("quartz_pillar_stairs",
-                        () -> new ModStairBlock(
-                                        QUARTZ_PILLAR.get().defaultBlockState(),
-                                        BlockBehaviour.Properties.of(Material.STONE, MaterialColor.QUARTZ)
-                                                        .strength(0.8f)
-                                                        .requiresCorrectToolForDrops()
-                                                        .sound(net.minecraft.world.level.block.SoundType.STONE)));
 
-        public static final RegistryObject<Block> QUARTZ_PILLAR_SLAB = BLOCKS.register("quartz_pillar_slab",
-                        () -> new SlabBlock(
-                                        BlockBehaviour.Properties.of(Material.STONE, MaterialColor.QUARTZ)
-                                                        .strength(0.8f)
-                                                        .requiresCorrectToolForDrops()
-                                                        .sound(net.minecraft.world.level.block.SoundType.STONE)));
-
-        public static final RegistryObject<Block> QUARTZ_PILLAR_WALL = BLOCKS.register("quartz_pillar_wall",
-                        () -> new WallBlock(
-                                        BlockBehaviour.Properties.of(Material.STONE, MaterialColor.QUARTZ)
-                                                        .strength(0.8f)
-                                                        .requiresCorrectToolForDrops()
-                                                        .sound(net.minecraft.world.level.block.SoundType.STONE)));
 
         public static final RegistryObject<Block> STONE_PILLAR = BLOCKS.register(
                         "stone_pillar",
@@ -9478,11 +9458,6 @@ public class ModBlocks {
                         () -> new VerticalSlabBlock(
                                         Blocks.YELLOW_CONCRETE,
                                         BlockBehaviour.Properties.copy(YELLOW_CONCRETE_SLAB.get())));
-        public static final RegistryObject<Block> QUARTZ_PILLAR_VERTICAL_SLAB = BLOCKS.register(
-                        "quartz_pillar_vertical_slab",
-                        () -> new VerticalSlabBlock(
-                                        QUARTZ_PILLAR.get(),
-                                        BlockBehaviour.Properties.copy(QUARTZ_PILLAR_SLAB.get())));
         public static final RegistryObject<Block> HAY_BALE_VERTICAL_SLAB = BLOCKS.register("hay_bale_vertical_slab",
                         () -> new VerticalSlabBlock(
                                         Blocks.AIR,

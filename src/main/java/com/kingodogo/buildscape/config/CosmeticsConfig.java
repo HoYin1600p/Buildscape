@@ -44,7 +44,7 @@ public class CosmeticsConfig {
 
         // 2. Migrate from legacy locations
         migrateLegacyData();
-        
+
         // 3. Load global settings from private storage
         loadGlobalSettings();
     }
@@ -112,7 +112,7 @@ public class CosmeticsConfig {
                 loadedSuccessfully = true;
             } catch (Exception e) {
             }
-            
+
             if (loadedSuccessfully) {
                 // Backup or delete old JSON outside the try-with-resources to ensure file isn't locked
                 Path legacyPath = legacyJson.toPath();
@@ -153,7 +153,7 @@ public class CosmeticsConfig {
 
             if (val instanceof Map) {
                 Map<String, Object> playerData = (Map<String, Object>) val;
-                
+
                 Object cosObj = playerData.get("cosmetics");
                 if (cosObj instanceof Map) {
                     for (Map.Entry<String, Object> cosEntry : ((Map<String, Object>) cosObj).entrySet()) {
@@ -222,7 +222,7 @@ public class CosmeticsConfig {
                     }
                 }
                 playerCosmeticColors.put(uuidStr, colors);
-                
+
                 if (nbt.contains("creative_tree_breaker")) {
                     playerCreativeTreeBreaker.put(uuidStr, nbt.getBoolean("creative_tree_breaker"));
                 } else {

@@ -3,7 +3,7 @@
     "particle": "buildscape:block/red_poplar_leaves",
     "texture": "buildscape:block/red_poplar_leaves"
   },
-  "parent": "minecraft:block/snow_height16",
+  "parent": "minecraft:block/block",
   "elements": [
     {
       "from": [

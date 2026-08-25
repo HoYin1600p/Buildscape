@@ -46,7 +46,7 @@ public class PillarIdManager {
     private boolean hadColorsOnLoad = false; // Track if we had colors when we loaded
     private boolean isServerSynced = false; // Flag to indicate data came from server
     private boolean allowEmptySave = false; // Flag to allow saving empty pillar data (e.g., user removed all)
-    
+
     private static boolean recoveryScheduled = false;
     private static long recoveryScheduledTime = 0L;
     private static final long RECOVERY_DELAY_MS = 5000; // 5 seconds after world load
@@ -236,7 +236,7 @@ public class PillarIdManager {
     private File getDataFile() {
         return new File(getDataDir(), FILE_NAME);
     }
-    
+
     private File getBackupDataFile() {
         return new File(getDataDir(), BACKUP_FILE_NAME);
     }
@@ -279,7 +279,7 @@ public class PillarIdManager {
             return new File(".");
         }
     }
-    
+
     /**
      * Full reset - clears all data. Only called on server stop.
      */
@@ -288,7 +288,7 @@ public class PillarIdManager {
         worldLoadStartTime = System.currentTimeMillis();
         recoveryScheduled = false;
         recoveryScheduledTime = 0L;
-        
+
         if (INSTANCE != null) {
             INSTANCE.pillarData.clear();
             INSTANCE.positionIndex.clear(); // keep index in sync
@@ -299,7 +299,7 @@ public class PillarIdManager {
             INSTANCE.fileWasDeleted = false;
         }
     }
-    
+
     /**
      * Schedule recovery to run after world load.
      * Recovery will run automatically after RECOVERY_DELAY_MS.
@@ -308,7 +308,7 @@ public class PillarIdManager {
         recoveryScheduled = true;
         recoveryScheduledTime = System.currentTimeMillis();
     }
-    
+
     /**
      * Check if scheduled recovery should run and execute it.
      * Called from server tick event.
@@ -317,28 +317,28 @@ public class PillarIdManager {
         if (!recoveryScheduled) {
             return;
         }
-        
+
         long elapsed = System.currentTimeMillis() - recoveryScheduledTime;
         if (elapsed < RECOVERY_DELAY_MS) {
             return;
         }
-        
+
         recoveryScheduled = false;
-        
+
         MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
         if (server == null || !server.isRunning()) {
             return;
         }
-        
+
         PillarIdManager manager = get();
         if (manager == null) {
             return;
         }
-        
+
         if (!manager.hasLoaded()) {
             return;
         }
-        
+
         manager.recoverPillarsFromWorld(server, false); // false = don't clear colors
     }
 
@@ -817,7 +817,7 @@ public class PillarIdManager {
             // Clear map and index, we will rebuild them from file + existingData merge
                 pillarData.clear();
             positionIndex.clear();
-                
+
                 if (loaded != null && !loaded.isEmpty()) {
                     int migrated = 0;
                     int skipped = 0;
@@ -1003,10 +1003,10 @@ public class PillarIdManager {
             // IMPORTANT: Load from main file only (pillar-ids.dat)
             // Backup file is separate and only saved on world save/server close
             File file = getDataFile();
-            
+
             Map<String, PillarData> loadedData = null;
             File sourceFile = null;
-            
+
             // Load from main file first
             if (file.exists() && file.length() > 0) {
                 try {
@@ -1018,7 +1018,7 @@ public class PillarIdManager {
                     System.err.println("BuildScape: Error loading main file: " + e.getMessage());
                 }
             }
-            
+
             // CRITICAL: If main file has empty colors, try backup file (backup is preferred for GUI)
             // Check if main file has colors
             boolean mainFileHasColors = false;
@@ -1030,7 +1030,7 @@ public class PillarIdManager {
                     }
                 }
             }
-            
+
             // If main file has no colors, try backup file
             if (!mainFileHasColors) {
                 File backupFile = getBackupDataFile();
@@ -1046,7 +1046,7 @@ public class PillarIdManager {
                                     break;
                                 }
                             }
-                            
+
                             // If backup has colors, use it (backup is preferred for GUI)
                             if (backupHasColors) {
                                 loadedData = backupData;
@@ -1058,7 +1058,7 @@ public class PillarIdManager {
                     }
                 }
             }
-            
+
             // If file failed or doesn't exist, start fresh
             if (loadedData == null || loadedData.isEmpty()) {
                 fileWasDeleted = true;
@@ -1068,10 +1068,10 @@ public class PillarIdManager {
                 hasLoaded = true;
                 return;
             }
-            
+
             // Process loaded data
             processLoadedData(loadedData, server, sourceFile);
-            
+
         } catch (Throwable t) {
             System.err.println(
                     "BuildScape: Critical error in loadFileAsync() - will recover after world is fully loaded: " +
@@ -1085,7 +1085,7 @@ public class PillarIdManager {
             hasLoaded = true;
         }
     }
-    
+
     /**
      * Load data from a specific file.
      */
@@ -1099,7 +1099,7 @@ public class PillarIdManager {
             return GSON.fromJson(reader, type);
         }
     }
-    
+
     public void saveImmediate() {
         try {
             // IMPORTANT: Don't save during recovery - recovery will save once at the end after syncing colors
@@ -1411,7 +1411,7 @@ public class PillarIdManager {
                                                     existingData.y == pos.getY() &&
                                                     existingData.z == pos.getZ()
                                     );
-                                    
+
                                     if (positionChanged) {
 
                                         existingData.dimension = dimensionKey;
@@ -1419,7 +1419,7 @@ public class PillarIdManager {
                                         existingData.y = pos.getY();
                                         existingData.z = pos.getZ();
                                     }
-                                    
+
                                     // Update colors if NBT has colors (preserve manager colors if NBT is empty)
                                     if (!clearColors) {
                                         java.util.List<String> pillarColors =
@@ -1439,7 +1439,7 @@ public class PillarIdManager {
                                                     }
                                                 }
                                             }
-                                            
+
                                             if (colorsChanged) {
                                                 existingData.clearColors();
                                                 for (String color : pillarColors) {
@@ -1454,7 +1454,7 @@ public class PillarIdManager {
                                         existingData.clearColors();
                                         colorClearedCount++;
                                     }
-                                    
+
                                     // Don't increment recoveredCount - this is an update, not a new recovery
                                     continue;
                                 }
@@ -1498,10 +1498,10 @@ public class PillarIdManager {
             // IMPORTANT: Sync colors from NBT BEFORE saving
             // This ensures colors are loaded from NBT and saved to file
             syncColorsFromNBTToManager(server);
-            
+
             // Allow final save after syncing colors
             recoveryInProgress = false;
-            
+
             if (recoveredCount > 0 || colorClearedCount > 0) {
                 saveImmediate();
             } else {
@@ -1663,7 +1663,7 @@ public class PillarIdManager {
             System.err.println("BuildScape: Error saving to " + file.getName() + ": " + e.getMessage());
         }
     }
-    
+
     public void forceReload() {
         load();
     }
@@ -1749,7 +1749,7 @@ public class PillarIdManager {
             e.printStackTrace();
         }
     }
-    
+
     /**
      * Save the backup file (only called on world save/server close).
      */
@@ -1759,11 +1759,11 @@ public class PillarIdManager {
             if (server == null || !server.isRunning()) {
                 return;
             }
-            
+
             if (!hasLoaded) {
                 return;
             }
-            
+
             int saveCount = pillarData.size();
             int colorsCount = 0;
             for (PillarData data : pillarData.values()) {
@@ -1771,8 +1771,8 @@ public class PillarIdManager {
                     colorsCount++;
                 }
             }
-            
-            
+
+
             // Save to backup file only
             saveToFile(getBackupDataFile(), BACKUP_FILE_NAME);
         } catch (Throwable t) {
@@ -1989,14 +1989,14 @@ public class PillarIdManager {
                         // Find the bottom of the stack to get the actual block entity with colors
                         BlockPos bottomPos = pillarBE.findStackBottom();
                         net.minecraft.world.level.block.entity.BlockEntity bottomBE = level.getBlockEntity(bottomPos);
-                        
+
                         if (!(bottomBE instanceof com.kingodogo.buildscape.block.PillarBlockEntity bottomPillarBE)) {
                             continue;
                         }
 
                         // Get colors directly from NBT
                         java.util.List<String> nbtColors = bottomPillarBE.getParticleColors();
-                        
+
                         // Load colors from NBT into manager (if NBT has colors)
                         // If NBT is empty, preserve colors from file
                         if (nbtColors != null && !nbtColors.isEmpty()) {
@@ -2185,7 +2185,7 @@ public class PillarIdManager {
         }
         return snapshot;
     }
-    
+
     public void replaceAllPillarData(Map<String, PillarData> newData) {
         if (newData == null) {
             return;

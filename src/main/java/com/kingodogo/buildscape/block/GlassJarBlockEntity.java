@@ -65,7 +65,7 @@ public class GlassJarBlockEntity extends BlockEntity {
         if (isXpLiquid(storedLiquidItem)) {
             return new ItemStack(com.kingodogo.buildscape.item.ModItems.EXPERIENCE_BUCKET.get());
         }
-        if (storedLiquidItem.is(net.minecraft.world.item.Items.WATER_BUCKET) 
+        if (storedLiquidItem.is(net.minecraft.world.item.Items.WATER_BUCKET)
                 || (storedLiquidItem.getItem() instanceof PotionItem && PotionUtils.getPotion(storedLiquidItem) == net.minecraft.world.item.alchemy.Potions.WATER)) {
             return new ItemStack(net.minecraft.world.item.Items.WATER_BUCKET);
         }
@@ -88,7 +88,7 @@ public class GlassJarBlockEntity extends BlockEntity {
         if (isXpLiquid(storedLiquidItem)) {
             return new ItemStack(net.minecraft.world.item.Items.EXPERIENCE_BOTTLE);
         }
-        if (storedLiquidItem.is(net.minecraft.world.item.Items.WATER_BUCKET) 
+        if (storedLiquidItem.is(net.minecraft.world.item.Items.WATER_BUCKET)
                 || (storedLiquidItem.getItem() instanceof PotionItem && PotionUtils.getPotion(storedLiquidItem) == net.minecraft.world.item.alchemy.Potions.WATER)) {
             return PotionUtils.setPotion(new ItemStack(net.minecraft.world.item.Items.POTION), net.minecraft.world.item.alchemy.Potions.WATER);
         }
@@ -165,9 +165,9 @@ public class GlassJarBlockEntity extends BlockEntity {
     public static boolean isSameLiquid(ItemStack a, ItemStack b) {
         if (a == null || b == null || a.isEmpty() || b.isEmpty()) return false;
         if (isXpLiquid(a) && isXpLiquid(b)) return true;
-        boolean aIsWater = a.is(net.minecraft.world.item.Items.WATER_BUCKET) 
+        boolean aIsWater = a.is(net.minecraft.world.item.Items.WATER_BUCKET)
                 || (a.getItem() instanceof PotionItem && PotionUtils.getPotion(a) == net.minecraft.world.item.alchemy.Potions.WATER);
-        boolean bIsWater = b.is(net.minecraft.world.item.Items.WATER_BUCKET) 
+        boolean bIsWater = b.is(net.minecraft.world.item.Items.WATER_BUCKET)
                 || (b.getItem() instanceof PotionItem && PotionUtils.getPotion(b) == net.minecraft.world.item.alchemy.Potions.WATER);
         if (aIsWater && bIsWater) return true;
         if (a.getItem() != b.getItem()) return false;

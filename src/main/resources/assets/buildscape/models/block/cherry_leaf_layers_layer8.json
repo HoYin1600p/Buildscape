@@ -3,7 +3,7 @@
     "particle": "buildscape:block/cherry_leaves",
     "texture": "buildscape:block/cherry_leaves"
   },
-  "parent": "minecraft:block/snow_height16",
+  "parent": "minecraft:block/block",
   "elements": [
     {
       "from": [

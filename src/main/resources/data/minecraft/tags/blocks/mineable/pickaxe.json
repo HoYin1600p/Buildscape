@@ -1464,10 +1464,6 @@
     "buildscape:quartz_bricks_vertical_slab",
     "buildscape:quartz_bricks_wall",
     "buildscape:quartz_pillar",
-    "buildscape:quartz_pillar_slab",
-    "buildscape:quartz_pillar_stairs",
-    "buildscape:quartz_pillar_vertical_slab",
-    "buildscape:quartz_pillar_wall",
     "buildscape:quartz_vertical_slab",
     "buildscape:red_concrete_slab",
     "buildscape:red_concrete_stairs",
@@ -1904,6 +1900,8 @@
     "buildscape:sculk_pillar",
     "buildscape:sulfur_pillar",
     "buildscape:tuff_pillar",
-    "buildscape:weathered_copper_pillar"
+    "buildscape:weathered_copper_pillar",
+    "buildscape:steel_mesh_block",
+    "buildscape:experience_cauldron"
   ]
 }

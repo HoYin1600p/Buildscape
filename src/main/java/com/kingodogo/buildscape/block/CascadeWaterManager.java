@@ -34,9 +34,9 @@ public class CascadeWaterManager {
     public static void registerWaterTicket(Level level, BlockPos pos) {
         if (level.isClientSide) return;
         ResourceLocation dimension = level.dimension().location();
-        
+
         Map<BlockPos, AABBTicket> dimensionTickets = TICKETS.computeIfAbsent(dimension, k -> new ConcurrentHashMap<>());
-        
+
         // If ticket already exists, invalidate it before creating a new one to be safe
         AABBTicket old = dimensionTickets.remove(pos);
         if (old != null) {

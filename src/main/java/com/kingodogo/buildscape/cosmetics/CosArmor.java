@@ -12,7 +12,7 @@ import java.util.Map;
 //Base class for all custom body/armor cosmetics (Chest, Legs, Feet).
 //Handles multiple model parts (e.g. left arm, right arm, body).
 public abstract class CosArmor<T extends Entity> extends EntityModel<T> {
-    
+
     protected final Map<String, ModelPart> parts;
     protected final ResourceLocation texture;
 

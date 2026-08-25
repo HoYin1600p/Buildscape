@@ -22,7 +22,7 @@ public class GuiEditorScreen extends Screen {
     private final AbstractConfigTab sourceTab;
     private final GuiConfigData config;
     private final GuiConfigManager configManager;
-    
+
     private final List<VisualElement> visualElements = new ArrayList<>();
     private VisualElement selectedElement = null;
     private final List<VisualElement> selectedElements = new ArrayList<>();
@@ -35,7 +35,7 @@ public class GuiEditorScreen extends Screen {
     private int dragStartElementY = 0;
     private int dragStartElementWidth = 0;
     private int dragStartElementHeight = 0;
-    
+
     private Button saveButton;
     private Button resetButton;
     private Button closeButton;
@@ -47,12 +47,12 @@ public class GuiEditorScreen extends Screen {
     private boolean showPropertiesDialog = false;
     private EditBox searchTargetField;
     private Button savePropertiesButton;
-    
+
     private boolean showTextEditor = false;
     private EditBox textContentField;
     private Button saveTextButton;
     private VisualElement editingTextElement = null;
-    
+
     private EditBox opacityField;
     private EditBox backgroundColorField;
     private EditBox borderColorField;
@@ -73,11 +73,11 @@ public class GuiEditorScreen extends Screen {
         CREATE_SEARCH_BAR("Create Search Bar", "Create search box widget", 'S'),
         CREATE_TEXT_BOX("Create Text Box", "Create rectangle with text inside", 'X'),
         SELECT_GROUP("Select Group", "Select multiple elements", 'G');
-        
+
         final String displayName;
         final String description;
         final char key;
-        
+
         EditorTool(String displayName, String description, char key) {
             this.displayName = displayName;
             this.description = description;
@@ -102,7 +102,7 @@ public class GuiEditorScreen extends Screen {
     private Button scale3Button;
     private Button scale4Button;
     private Button autoScaleButton;
-    
+
     private static final int LAYERS_PANEL_WIDTH = 200;
     private int layersPanelX = 10;
     private int layersPanelY = 70;
@@ -114,7 +114,7 @@ public class GuiEditorScreen extends Screen {
     private double layersPanelDragStartY = 0;
     private int layersPanelDragStartPanelX = 0;
     private int layersPanelDragStartPanelY = 0;
-    
+
     private int toolboxX = 0;
     private int toolboxY = 10;
     private boolean isDraggingToolbox = false;
@@ -122,7 +122,7 @@ public class GuiEditorScreen extends Screen {
     private double toolboxDragStartY = 0;
     private int toolboxDragStartXPos = 0;
     private int toolboxDragStartYPos = 0;
-    
+
     private static final int HANDLE_SIZE = 10;
     private static final int BORDER_THICKNESS = 2;
     private static final int HANDLE_MARGIN = 8;
@@ -131,22 +131,22 @@ public class GuiEditorScreen extends Screen {
         String elementId;
         GuiConfigData.ElementConfig config;
         boolean selected = false;
-        
+
         VisualElement(String elementId, GuiConfigData.ElementConfig config) {
             this.elementId = elementId;
             this.config = config != null ? new GuiConfigData.ElementConfig(config) : new GuiConfigData.ElementConfig(0, 0, 100, 20);
         }
     }
-    
+
     private enum ResizeHandle {
         NONE, TOP_LEFT, TOP_RIGHT, BOTTOM_LEFT, BOTTOM_RIGHT,
         TOP, BOTTOM, LEFT, RIGHT
     }
-    
+
     public GuiEditorScreen(Screen parent, String tabName) {
         this(parent, tabName, null);
     }
-    
+
     public GuiEditorScreen(Screen parent, String tabName, AbstractConfigTab sourceTab) {
         super(new TranslatableComponent("buildscape.gui.editor.title", tabName));
         this.parentScreen = parent;
@@ -161,7 +161,7 @@ public class GuiEditorScreen extends Screen {
             contentX = configScreen.getContentX();
             contentY = configScreen.getContentY();
         }
-        
+
         for (Map.Entry<String, GuiConfigData.ElementConfig> entry : config.elements.entrySet()) {
             GuiConfigData.ElementConfig elementConfig = entry.getValue();
 
@@ -175,7 +175,7 @@ public class GuiEditorScreen extends Screen {
                 Boolean.TRUE.equals(elementConfig.properties.get("isTextElement"));
             int elementWidth = elementConfig.width;
             int elementHeight = elementConfig.height;
-            
+
             if (isTextElement && elementConfig.properties != null) {
                 String text = (String) elementConfig.properties.get("text");
                 if (text != null && !text.isEmpty()) {
@@ -188,7 +188,7 @@ public class GuiEditorScreen extends Screen {
                     }
                 }
             }
-            
+
             GuiConfigData.ElementConfig screenConfig = new GuiConfigData.ElementConfig(
                 screenX,
                 screenY,
@@ -197,7 +197,7 @@ public class GuiEditorScreen extends Screen {
                 elementConfig.scale
             );
             screenConfig.visible = elementConfig.visible;
-            screenConfig.properties = elementConfig.properties != null ? 
+            screenConfig.properties = elementConfig.properties != null ?
                 new HashMap<>(elementConfig.properties) : new HashMap<>();
             visualElements.add(new VisualElement(entry.getKey(), screenConfig));
         }
@@ -206,7 +206,7 @@ public class GuiEditorScreen extends Screen {
             loadSidebarElements((BuildScapeConfigScreen) parent);
         }
     }
-    
+
     private void loadSidebarElements(BuildScapeConfigScreen configScreen) {
         String sidebarConfigName = "Sidebar";
         GuiConfigData sidebarConfig = configManager.loadConfig(sidebarConfigName);
@@ -223,17 +223,17 @@ public class GuiEditorScreen extends Screen {
                 sidebarWidthField.setAccessible(true);
                 int sidebarWidth = sidebarWidthField.getInt(null);
                 buttonWidth = sidebarWidth - 20;
-                
+
                 java.lang.reflect.Field buttonHeightField = BuildScapeConfigScreen.class.getDeclaredField("CATEGORY_BUTTON_HEIGHT");
                 buttonHeightField.setAccessible(true);
                 buttonHeight = buttonHeightField.getInt(null);
-                
+
                 java.lang.reflect.Field spacingField = BuildScapeConfigScreen.class.getDeclaredField("CATEGORY_BUTTON_SPACING");
                 spacingField.setAccessible(true);
                 spacing = spacingField.getInt(null);
             } catch (Exception e) {
             }
-            
+
             Map<String, GuiConfigData.ElementConfig> sidebarDefaults = new HashMap<>();
             sidebarDefaults.put("pillarItemsButton", new GuiConfigData.ElementConfig(
                 sidebarX, sidebarY, buttonWidth, buttonHeight));
@@ -252,7 +252,7 @@ public class GuiEditorScreen extends Screen {
                 }
                 entry.getValue().properties.put("isSidebarElement", true);
             }
-            
+
             GuiConfigHelper.registerWidgetDefaults(sidebarConfigName, sidebarDefaults);
             sidebarConfig = configManager.loadConfig(sidebarConfigName);
         }
@@ -263,12 +263,12 @@ public class GuiEditorScreen extends Screen {
                 elementConfig.properties = new HashMap<>();
             }
             elementConfig.properties.put("isSidebarElement", true);
-            
+
             VisualElement visualElement = new VisualElement("sidebar." + entry.getKey(), elementConfig);
             visualElements.add(visualElement);
         }
     }
-    
+
     @Override
     protected void init() {
         super.init();
@@ -276,7 +276,7 @@ public class GuiEditorScreen extends Screen {
         int buttonY = height - 30;
         int buttonWidth = 100;
         int buttonSpacing = 110;
-        
+
         saveButton = new Button(
             width / 2 - buttonSpacing - buttonWidth / 2, buttonY,
             buttonWidth, 20,
@@ -284,7 +284,7 @@ public class GuiEditorScreen extends Screen {
             (button) -> saveConfig()
         );
         addRenderableWidget(saveButton);
-        
+
         resetButton = new Button(
             width / 2 - buttonWidth / 2, buttonY,
             buttonWidth, 20,
@@ -292,7 +292,7 @@ public class GuiEditorScreen extends Screen {
             (button) -> resetConfig()
         );
         addRenderableWidget(resetButton);
-        
+
         closeButton = new Button(
             width / 2 + buttonSpacing - buttonWidth / 2, buttonY,
             buttonWidth, 20,
@@ -313,7 +313,7 @@ public class GuiEditorScreen extends Screen {
             (button) -> setCurrentTool(EditorTool.MOVE)
         );
         addRenderableWidget(moveToolButton);
-        
+
         editToolButton = new Button(
             toolboxX, toolboxY + toolButtonSize + toolSpacing,
             toolButtonSize, toolButtonSize,
@@ -321,7 +321,7 @@ public class GuiEditorScreen extends Screen {
             (button) -> setCurrentTool(EditorTool.EDIT)
         );
         addRenderableWidget(editToolButton);
-        
+
         editTextToolButton = new Button(
             toolboxX, toolboxY + (toolButtonSize + toolSpacing) * 2,
             toolButtonSize, toolButtonSize,
@@ -329,7 +329,7 @@ public class GuiEditorScreen extends Screen {
             (button) -> setCurrentTool(EditorTool.EDIT_TEXT)
         );
         addRenderableWidget(editTextToolButton);
-        
+
         createTextToolButton = new Button(
             toolboxX, toolboxY + (toolButtonSize + toolSpacing) * 3,
             toolButtonSize, toolButtonSize,
@@ -337,7 +337,7 @@ public class GuiEditorScreen extends Screen {
             (button) -> setCurrentTool(EditorTool.CREATE_TEXT)
         );
         addRenderableWidget(createTextToolButton);
-        
+
         createWidgetToolButton = new Button(
             toolboxX, toolboxY + (toolButtonSize + toolSpacing) * 4,
             toolButtonSize, toolButtonSize,
@@ -372,7 +372,7 @@ public class GuiEditorScreen extends Screen {
             (button) -> setCurrentTool(EditorTool.CREATE_TEXT_BOX)
         );
         addRenderableWidget(createTextBoxButton);
-        
+
         selectGroupToolButton = new Button(
             toolboxX, toolboxY + (toolButtonSize + toolSpacing) * 8,
             toolButtonSize, toolButtonSize,
@@ -390,7 +390,7 @@ public class GuiEditorScreen extends Screen {
             (button) -> setGuiScale(1)
         );
         addRenderableWidget(scale1Button);
-        
+
         scale2Button = new Button(
             scaleX + 37, scaleY,
             35, toolButtonSize,
@@ -398,7 +398,7 @@ public class GuiEditorScreen extends Screen {
             (button) -> setGuiScale(2)
         );
         addRenderableWidget(scale2Button);
-        
+
         scale3Button = new Button(
             scaleX + 74, scaleY,
             35, toolButtonSize,
@@ -406,7 +406,7 @@ public class GuiEditorScreen extends Screen {
             (button) -> setGuiScale(3)
         );
         addRenderableWidget(scale3Button);
-        
+
         scale4Button = new Button(
             scaleX + 111, scaleY,
             35, toolButtonSize,
@@ -414,7 +414,7 @@ public class GuiEditorScreen extends Screen {
             (button) -> setGuiScale(4)
         );
         addRenderableWidget(scale4Button);
-        
+
         autoScaleButton = new Button(
             scaleX + 148, scaleY,
             50, toolButtonSize,
@@ -433,7 +433,7 @@ public class GuiEditorScreen extends Screen {
             }
         );
         addRenderableWidget(addWidgetButton);
-        
+
         updateToolButtons();
 
         deleteButton = new Button(
@@ -478,7 +478,7 @@ public class GuiEditorScreen extends Screen {
         searchTargetField.setMaxLength(64);
         searchTargetField.visible = false;
         addRenderableWidget(searchTargetField);
-        
+
         savePropertiesButton = new Button(
             width / 2 - 50, height / 2 + 35,
             100, 20,
@@ -497,7 +497,7 @@ public class GuiEditorScreen extends Screen {
         opacityField.setFilter(s -> s.matches("[0-9]*"));
         opacityField.visible = false;
         addRenderableWidget(opacityField);
-        
+
         backgroundColorField = new EditBox(
             font, width / 2 - 100, height / 2 + 10,
             200, 20,
@@ -507,7 +507,7 @@ public class GuiEditorScreen extends Screen {
         backgroundColorField.setFilter(s -> s.matches("[0-9a-fA-F]*"));
         backgroundColorField.visible = false;
         addRenderableWidget(backgroundColorField);
-        
+
         borderColorField = new EditBox(
             font, width / 2 - 100, height / 2 + 10,
             200, 20,
@@ -517,7 +517,7 @@ public class GuiEditorScreen extends Screen {
         borderColorField.setFilter(s -> s.matches("[0-9a-fA-F]*"));
         borderColorField.visible = false;
         addRenderableWidget(borderColorField);
-        
+
         borderWidthField = new EditBox(
             font, width / 2 - 100, height / 2 + 10,
             200, 20,
@@ -536,7 +536,7 @@ public class GuiEditorScreen extends Screen {
         textContentField.setMaxLength(256);
         textContentField.visible = false;
         addRenderableWidget(textContentField);
-        
+
         saveTextButton = new Button(
             width / 2 - 50, height / 2 + 15,
             100, 20,
@@ -546,7 +546,7 @@ public class GuiEditorScreen extends Screen {
         saveTextButton.visible = false;
         addRenderableWidget(saveTextButton);
     }
-    
+
     @Override
     public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
         this.renderBackground(poseStack);
@@ -554,7 +554,7 @@ public class GuiEditorScreen extends Screen {
         float scaleFactor = currentGuiScale / 2.0f;
         int scaledMouseX = mouseX;
         int scaledMouseY = mouseY;
-        
+
         if (scaleFactor != 1.0f) {
             poseStack.pushPose();
             poseStack.scale(scaleFactor, scaleFactor, 1.0f);
@@ -580,9 +580,9 @@ public class GuiEditorScreen extends Screen {
 
         String toolHint = "Tool: " + currentTool.displayName + " - " + currentTool.description;
         if (selectedElement != null) {
-            boolean isTextElement = selectedElement.config.properties != null && 
+            boolean isTextElement = selectedElement.config.properties != null &&
                 Boolean.TRUE.equals(selectedElement.config.properties.get("isTextElement"));
-            String hint = "Selected: " + selectedElement.elementId + 
+            String hint = "Selected: " + selectedElement.elementId +
                 " | Drag to move | Drag handles to resize | ";
             if (isTextElement || currentTool == EditorTool.EDIT_TEXT) {
                 hint += "Double-click to edit text | ";
@@ -613,8 +613,8 @@ public class GuiEditorScreen extends Screen {
         int toolButtonSize = 20;
         int toolSpacing = 2;
         int numTools = EditorTool.values().length;
-        
-        if (mouseX >= toolboxX && mouseX < toolboxX + toolButtonSize && 
+
+        if (mouseX >= toolboxX && mouseX < toolboxX + toolButtonSize &&
             mouseY >= toolboxY && mouseY < toolboxY + (toolButtonSize + toolSpacing) * numTools) {
             int toolIndex = (mouseY - toolboxY) / (toolButtonSize + toolSpacing);
             if (toolIndex >= 0 && toolIndex < numTools) {
@@ -641,7 +641,7 @@ public class GuiEditorScreen extends Screen {
             if (!a.selected && b.selected) return -1;
             return 0;
         });
-        
+
         for (VisualElement element : sortedElements) {
             renderVisualElement(poseStack, element, scaledMouseX, scaledMouseY);
         }
@@ -668,14 +668,14 @@ public class GuiEditorScreen extends Screen {
         }
 
         if (visualElements.isEmpty() && (sourceTab == null || scanTabButton == null)) {
-            drawCenteredString(poseStack, font, 
-                new TranslatableComponent("buildscape.gui.editor.no_elements").getString(), 
+            drawCenteredString(poseStack, font,
+                new TranslatableComponent("buildscape.gui.editor.no_elements").getString(),
                 width / 2, height / 2 - 20, 0xCCCCCC);
         }
 
         String coordText = String.format("Mouse: %d, %d | Scale: %dx", scaledMouseX, scaledMouseY, currentGuiScale);
         if (selectedElement != null) {
-            coordText += String.format(" | Element: %d, %d (%dx%d)", 
+            coordText += String.format(" | Element: %d, %d (%dx%d)",
                 selectedElement.config.x, selectedElement.config.y,
                 selectedElement.config.width, selectedElement.config.height);
         }
@@ -694,10 +694,10 @@ public class GuiEditorScreen extends Screen {
         if ((isDragging || isResizing) && selectedElement != null) {
             renderAlignmentGuides(poseStack, selectedElement);
         }
-        
+
         super.render(poseStack, mouseX, mouseY, partialTick);
     }
-    
+
     private void renderAlignmentGuides(PoseStack poseStack, VisualElement element) {
         int x = element.config.x;
         int y = element.config.y;
@@ -724,7 +724,7 @@ public class GuiEditorScreen extends Screen {
             }
         }
     }
-    
+
     private void renderVisualElement(PoseStack poseStack, VisualElement element, int mouseX, int mouseY) {
         int w = getElementWidthForScale(element, currentGuiScale);
         int h = getElementHeightForScale(element, currentGuiScale);
@@ -763,9 +763,9 @@ public class GuiEditorScreen extends Screen {
 
         boolean isBackground = element.config.properties != null &&
             Boolean.TRUE.equals(element.config.properties.get("isBackground"));
-        boolean isSearchBar = element.config.properties != null && 
+        boolean isSearchBar = element.config.properties != null &&
             Boolean.TRUE.equals(element.config.properties.get("isSearchBar"));
-        boolean isTextBox = element.config.properties != null && 
+        boolean isTextBox = element.config.properties != null &&
             Boolean.TRUE.equals(element.config.properties.get("isTextBox"));
 
         if (isBackground || isSearchBar || isTextBox) {
@@ -773,7 +773,7 @@ public class GuiEditorScreen extends Screen {
             int bgColor = 0x101010;
             int elementBorderColor = 0xFFFFFF;
             int borderWidth = 1;
-            
+
             if (element.config.properties != null) {
                 if (element.config.properties.containsKey("opacity")) {
                     Object opacityObj = element.config.properties.get("opacity");
@@ -874,7 +874,7 @@ public class GuiEditorScreen extends Screen {
         fill(poseStack, x + w - textWidth - 4, y + h - 12, x + w, y + h, 0xCC000000);
         font.draw(poseStack, sizeText, x + w - textWidth - 2, y + h - 10, 0xCCCCCC);
     }
-    
+
     private void renderResizeHandles(PoseStack poseStack, VisualElement element, ResizeHandle hoveredHandle) {
         int x = element.config.x;
         int y = element.config.y;
@@ -892,7 +892,7 @@ public class GuiEditorScreen extends Screen {
         renderHandle(poseStack, x - hs, y + h / 2 - hs, hoveredHandle == ResizeHandle.LEFT);
         renderHandle(poseStack, x + w - hs, y + h / 2 - hs, hoveredHandle == ResizeHandle.RIGHT);
     }
-    
+
     private void renderHandle(PoseStack poseStack, int x, int y, boolean hovered) {
         int outerSize = HANDLE_SIZE + 2;
         int color = hovered ? 0xFFFFFFFF : 0xFF00FFFF;
@@ -904,10 +904,10 @@ public class GuiEditorScreen extends Screen {
         fill(poseStack, x, y, x + outerSize, y + outerSize, color);
         fill(poseStack, x + 2, y + 2, x + outerSize - 2, y + outerSize - 2, 0xFF000000);
     }
-    
+
     private ResizeHandle getResizeHandle(VisualElement element, int mouseX, int mouseY) {
         if (!element.selected) return ResizeHandle.NONE;
-        
+
         int x = element.config.x;
         int y = element.config.y;
         int w = element.config.width;
@@ -932,10 +932,10 @@ public class GuiEditorScreen extends Screen {
             mouseY >= y + h / 2 - hs - margin && mouseY < y + h / 2 + hs + margin) return ResizeHandle.LEFT;
         if (mouseX >= x + w - hs - margin && mouseX < x + w + hs + margin &&
             mouseY >= y + h / 2 - hs - margin && mouseY < y + h / 2 + hs + margin) return ResizeHandle.RIGHT;
-        
+
         return ResizeHandle.NONE;
     }
-    
+
     private void renderAddWidgetDialog(PoseStack poseStack, int mouseX, int mouseY) {
         int dialogX = width / 2 - 120;
         int dialogY = height / 2 - 40;
@@ -959,10 +959,10 @@ public class GuiEditorScreen extends Screen {
         newWidgetNameField.visible = true;
         newWidgetNameField.y = dialogY + 35;
     }
-    
+
     private void renderPropertiesDialog(PoseStack poseStack, int mouseX, int mouseY) {
         if (selectedElement == null) return;
-        
+
         int dialogX = width / 2 - 150;
         int dialogY = height / 2 - 80;
         int dialogW = 300;
@@ -980,24 +980,24 @@ public class GuiEditorScreen extends Screen {
 
         boolean isSearchBox = selectedElement.elementId.contains("searchBox") ||
             selectedElement.elementId.contains("SearchBox");
-        boolean isBackground = selectedElement.config.properties != null && 
+        boolean isBackground = selectedElement.config.properties != null &&
             Boolean.TRUE.equals(selectedElement.config.properties.get("isBackground"));
-        boolean isSearchBar = selectedElement.config.properties != null && 
+        boolean isSearchBar = selectedElement.config.properties != null &&
             Boolean.TRUE.equals(selectedElement.config.properties.get("isSearchBar"));
-        boolean isTextBox = selectedElement.config.properties != null && 
+        boolean isTextBox = selectedElement.config.properties != null &&
             Boolean.TRUE.equals(selectedElement.config.properties.get("isTextBox"));
         boolean hasCustomProperties = isBackground || isSearchBar || isTextBox || isSearchBox;
-        
+
         int yOffset = 30;
-        
+
         if (isSearchBox) {
             drawString(poseStack, font, "Search Target Widget ID:", dialogX + 10, dialogY + yOffset, 0xCCCCCC);
             searchTargetField.visible = true;
             searchTargetField.x = dialogX + 10;
             searchTargetField.y = dialogY + yOffset + 15;
             searchTargetField.setWidth(dialogW - 20);
-            
-            if (selectedElement.config.properties != null && 
+
+            if (selectedElement.config.properties != null &&
                 selectedElement.config.properties.containsKey("searchTarget")) {
                 String currentTarget = (String) selectedElement.config.properties.get("searchTarget");
                 if (!searchTargetField.getValue().equals(currentTarget)) {
@@ -1012,15 +1012,15 @@ public class GuiEditorScreen extends Screen {
         } else {
             searchTargetField.visible = false;
         }
-        
+
         if (isBackground || isSearchBar || isTextBox) {
             drawString(poseStack, font, "Opacity (0-255):", dialogX + 10, dialogY + yOffset, 0xCCCCCC);
             opacityField.visible = true;
             opacityField.x = dialogX + 10;
             opacityField.y = dialogY + yOffset + 15;
             opacityField.setWidth(dialogW - 20);
-            
-            if (selectedElement.config.properties != null && 
+
+            if (selectedElement.config.properties != null &&
                 selectedElement.config.properties.containsKey("opacity")) {
                 Object opacityObj = selectedElement.config.properties.get("opacity");
                 opacityField.setValue(opacityObj != null ? opacityObj.toString() : "192");
@@ -1034,8 +1034,8 @@ public class GuiEditorScreen extends Screen {
             backgroundColorField.x = dialogX + 10;
             backgroundColorField.y = dialogY + yOffset + 15;
             backgroundColorField.setWidth(dialogW - 20);
-            
-            if (selectedElement.config.properties != null && 
+
+            if (selectedElement.config.properties != null &&
                 selectedElement.config.properties.containsKey("backgroundColor")) {
                 String color = (String) selectedElement.config.properties.get("backgroundColor");
                 backgroundColorField.setValue(color != null ? color : "101010");
@@ -1049,8 +1049,8 @@ public class GuiEditorScreen extends Screen {
             borderColorField.x = dialogX + 10;
             borderColorField.y = dialogY + yOffset + 15;
             borderColorField.setWidth(dialogW - 20);
-            
-            if (selectedElement.config.properties != null && 
+
+            if (selectedElement.config.properties != null &&
                 selectedElement.config.properties.containsKey("borderColor")) {
                 String color = (String) selectedElement.config.properties.get("borderColor");
                 borderColorField.setValue(color != null ? color : "FFFFFF");
@@ -1064,8 +1064,8 @@ public class GuiEditorScreen extends Screen {
             borderWidthField.x = dialogX + 10;
             borderWidthField.y = dialogY + yOffset + 15;
             borderWidthField.setWidth(dialogW - 20);
-            
-            if (selectedElement.config.properties != null && 
+
+            if (selectedElement.config.properties != null &&
                 selectedElement.config.properties.containsKey("borderWidth")) {
                 Object widthObj = selectedElement.config.properties.get("borderWidth");
                 borderWidthField.setValue(widthObj != null ? widthObj.toString() : "1");
@@ -1086,10 +1086,10 @@ public class GuiEditorScreen extends Screen {
         savePropertiesButton.x = dialogX + dialogW / 2 - 50;
         savePropertiesButton.y = dialogY + dialogH - 30;
     }
-    
+
     private void saveElementProperties() {
         if (selectedElement == null) return;
-        
+
         if (selectedElement.config.properties == null) {
             selectedElement.config.properties = new HashMap<>();
         }
@@ -1108,7 +1108,7 @@ public class GuiEditorScreen extends Screen {
         boolean isBackground = Boolean.TRUE.equals(selectedElement.config.properties.get("isBackground"));
         boolean isSearchBar = Boolean.TRUE.equals(selectedElement.config.properties.get("isSearchBar"));
         boolean isTextBox = Boolean.TRUE.equals(selectedElement.config.properties.get("isTextBox"));
-        
+
         if (isBackground || isSearchBar || isTextBox) {
             if (opacityField != null && !opacityField.getValue().isEmpty()) {
                 try {
@@ -1134,7 +1134,7 @@ public class GuiEditorScreen extends Screen {
                 } catch (NumberFormatException e) {}
             }
         }
-        
+
         showPropertiesDialog = false;
         searchTargetField.visible = false;
         opacityField.visible = false;
@@ -1143,7 +1143,7 @@ public class GuiEditorScreen extends Screen {
         borderWidthField.visible = false;
         savePropertiesButton.visible = false;
     }
-    
+
     private void openTextEditor(VisualElement element) {
         editingTextElement = element;
         showTextEditor = true;
@@ -1167,7 +1167,7 @@ public class GuiEditorScreen extends Screen {
                 }
             }
         }
-        
+
         textContentField.setValue(currentText);
         textContentField.visible = true;
         saveTextButton.visible = true;
@@ -1175,16 +1175,16 @@ public class GuiEditorScreen extends Screen {
         textContentField.x = width / 2 - 150;
         textContentField.y = height / 2 - 10;
         textContentField.setWidth(300);
-        
+
         saveTextButton.x = width / 2 - 50;
         saveTextButton.y = height / 2 + 15;
 
         setFocused(textContentField);
     }
-    
+
     private void renderTextEditorDialog(PoseStack poseStack, int mouseX, int mouseY) {
         if (editingTextElement == null) return;
-        
+
         int dialogX = width / 2 - 160;
         int dialogY = height / 2 - 50;
         int dialogW = 320;
@@ -1214,14 +1214,14 @@ public class GuiEditorScreen extends Screen {
         saveTextButton.x = dialogX + dialogW / 2 - 50;
         saveTextButton.y = dialogY + dialogH - 25;
     }
-    
+
     private void saveTextContent() {
         if (editingTextElement == null) return;
-        
+
         if (editingTextElement.config.properties == null) {
             editingTextElement.config.properties = new HashMap<>();
         }
-        
+
         String text = textContentField.getValue().trim();
         if (!text.isEmpty()) {
             editingTextElement.config.properties.put("text", text);
@@ -1230,13 +1230,13 @@ public class GuiEditorScreen extends Screen {
         }
 
         editingTextElement.config.properties.put("isTextElement", true);
-        
+
         showTextEditor = false;
         textContentField.visible = false;
         saveTextButton.visible = false;
         editingTextElement = null;
     }
-    
+
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         boolean isCtrlPressed = false;
@@ -1255,7 +1255,7 @@ public class GuiEditorScreen extends Screen {
                     setFocused(textContentField);
                     return true;
                 }
-                if (saveTextButton != null && saveTextButton.visible && 
+                if (saveTextButton != null && saveTextButton.visible &&
                     saveTextButton.mouseClicked(mouseX, mouseY, button)) {
                     return true;
                 }
@@ -1277,7 +1277,7 @@ public class GuiEditorScreen extends Screen {
                 if (searchTargetField != null && searchTargetField.mouseClicked(mouseX, mouseY, button)) {
                     return true;
                 }
-                if (savePropertiesButton != null && savePropertiesButton.visible && 
+                if (savePropertiesButton != null && savePropertiesButton.visible &&
                     savePropertiesButton.mouseClicked(mouseX, mouseY, button)) {
                     return true;
                 }
@@ -1350,7 +1350,7 @@ public class GuiEditorScreen extends Screen {
 
         VisualElement clickedElement = null;
         ResizeHandle handle = ResizeHandle.NONE;
-        
+
         for (VisualElement element : visualElements) {
             if (!isElementVisible(element)) continue;
             handle = getResizeHandle(element, (int)mouseX, (int)mouseY);
@@ -1391,10 +1391,10 @@ public class GuiEditorScreen extends Screen {
                     break;
                 }
             }
-            
+
             if (!clickedOnWidget && mouseY < height - 50) {
                 if (currentTool == EditorTool.CREATE_BACKGROUND ||
-                    currentTool == EditorTool.CREATE_SEARCH_BAR || 
+                    currentTool == EditorTool.CREATE_SEARCH_BAR ||
                     currentTool == EditorTool.CREATE_TEXT_BOX ||
                     currentTool == EditorTool.CREATE_TEXT ||
                     currentTool == EditorTool.CREATE_WIDGET) {
@@ -1421,7 +1421,7 @@ public class GuiEditorScreen extends Screen {
                         }
                     }
                 }
-                
+
                 if (clickedOnSidebar) {
                     selectedElements.clear();
                     for (VisualElement element : visualElements) {
@@ -1438,7 +1438,7 @@ public class GuiEditorScreen extends Screen {
                     return true;
                 }
             }
-            
+
             for (VisualElement element : visualElements) {
                 if (!isElementVisible(element)) continue;
 
@@ -1466,7 +1466,7 @@ public class GuiEditorScreen extends Screen {
                 int clickMargin = 3;
                 boolean isClickable = mouseX >= x - clickMargin && mouseX < x + w + clickMargin &&
                                      mouseY >= y - clickMargin && mouseY < y + h + clickMargin;
-                
+
                 if (isClickable) {
                     if (isCtrlPressed) {
                         if (element.selected) {
@@ -1501,7 +1501,7 @@ public class GuiEditorScreen extends Screen {
                         element.config.properties.put("dragStartY", element.config.y);
 
                         long currentTime = System.currentTimeMillis();
-                        if (lastClickTime > 0 && currentTime - lastClickTime < 300 && 
+                        if (lastClickTime > 0 && currentTime - lastClickTime < 300 &&
                             lastClickedElement == element) {
                             if (isTextElement) {
                                 openTextEditor(element);
@@ -1559,10 +1559,10 @@ public class GuiEditorScreen extends Screen {
                 return true;
             }
         }
-        
+
         return super.mouseClicked(mouseX, mouseY, button);
     }
-    
+
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
         if (button == 0) {
@@ -1624,10 +1624,10 @@ public class GuiEditorScreen extends Screen {
                 if (scale4Button != null) scale4Button.y = scaleY;
                 if (autoScaleButton != null) autoScaleButton.x = scaleX + 148;
                 if (autoScaleButton != null) autoScaleButton.y = scaleY;
-                
+
                 return true;
             }
-            
+
             if (resizingElementId != null && resizeHandle != null) {
                 VisualElement element = getElementById(resizingElementId);
                 if (element != null && isElementVisible(element)) {
@@ -1669,7 +1669,7 @@ public class GuiEditorScreen extends Screen {
             } else if (!selectedElements.isEmpty() && isDragging) {
                 double deltaX = mouseX - dragStartX;
                 double deltaY = mouseY - dragStartY;
-                
+
                 for (VisualElement selected : selectedElements) {
                     if (!isElementVisible(selected)) continue;
                     if (selected.config.properties != null) {
@@ -1692,10 +1692,10 @@ public class GuiEditorScreen extends Screen {
                 return true;
             }
         }
-        
+
         return super.mouseDragged(mouseX, mouseY, button, dragX, dragY);
     }
-    
+
     private void resizeElement(VisualElement element, double mouseX, double mouseY) {
         double deltaX = mouseX - dragStartX;
         double deltaY = mouseY - dragStartY;
@@ -1703,7 +1703,7 @@ public class GuiEditorScreen extends Screen {
         if (element.config.properties == null) {
             element.config.properties = new HashMap<>();
         }
-        
+
         switch (resizeHandle) {
             case TOP_LEFT:
                 element.config.width = Math.max(20, dragStartElementWidth - (int)deltaX);
@@ -1746,7 +1746,7 @@ public class GuiEditorScreen extends Screen {
         element.config.properties.put(widthKey, element.config.width);
         element.config.properties.put(heightKey, element.config.height);
     }
-    
+
     @Override
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
         if (button == 0) {
@@ -1765,10 +1765,10 @@ public class GuiEditorScreen extends Screen {
                 return true;
             }
         }
-        
+
         return super.mouseReleased(mouseX, mouseY, button);
     }
-    
+
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         if (showAddWidgetDialog && newWidgetNameField != null && newWidgetNameField.visible) {
@@ -1780,7 +1780,7 @@ public class GuiEditorScreen extends Screen {
                 return true;
             }
         }
-        
+
         if (keyCode == 256) {
             if (showAddWidgetDialog) {
                 showAddWidgetDialog = false;
@@ -1820,23 +1820,23 @@ public class GuiEditorScreen extends Screen {
         }
 
         if (showPropertiesDialog) {
-            if (searchTargetField != null && searchTargetField.visible && 
+            if (searchTargetField != null && searchTargetField.visible &&
                 searchTargetField.keyPressed(keyCode, scanCode, modifiers)) {
                 return true;
             }
-            if (opacityField != null && opacityField.visible && 
+            if (opacityField != null && opacityField.visible &&
                 opacityField.keyPressed(keyCode, scanCode, modifiers)) {
                 return true;
             }
-            if (backgroundColorField != null && backgroundColorField.visible && 
+            if (backgroundColorField != null && backgroundColorField.visible &&
                 backgroundColorField.keyPressed(keyCode, scanCode, modifiers)) {
                 return true;
             }
-            if (borderColorField != null && borderColorField.visible && 
+            if (borderColorField != null && borderColorField.visible &&
                 borderColorField.keyPressed(keyCode, scanCode, modifiers)) {
                 return true;
             }
-            if (borderWidthField != null && borderWidthField.visible && 
+            if (borderWidthField != null && borderWidthField.visible &&
                 borderWidthField.keyPressed(keyCode, scanCode, modifiers)) {
                 return true;
             }
@@ -1889,10 +1889,10 @@ public class GuiEditorScreen extends Screen {
                 return true;
             }
         }
-        
+
         return super.keyPressed(keyCode, scanCode, modifiers);
     }
-    
+
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double delta) {
         int layersPanelHeight = (height - layersPanelY - 50) / 2;
@@ -1909,10 +1909,10 @@ public class GuiEditorScreen extends Screen {
                 return true;
             }
         }
-        
+
         return super.mouseScrolled(mouseX, mouseY, delta);
     }
-    
+
     @Override
     public boolean charTyped(char codePoint, int modifiers) {
         if (showAddWidgetDialog && newWidgetNameField != null && newWidgetNameField.visible) {
@@ -1928,23 +1928,23 @@ public class GuiEditorScreen extends Screen {
         }
 
         if (showPropertiesDialog) {
-            if (searchTargetField != null && searchTargetField.visible && 
+            if (searchTargetField != null && searchTargetField.visible &&
                 searchTargetField.charTyped(codePoint, modifiers)) {
                 return true;
             }
-            if (opacityField != null && opacityField.visible && 
+            if (opacityField != null && opacityField.visible &&
                 opacityField.charTyped(codePoint, modifiers)) {
                 return true;
             }
-            if (backgroundColorField != null && backgroundColorField.visible && 
+            if (backgroundColorField != null && backgroundColorField.visible &&
                 backgroundColorField.charTyped(codePoint, modifiers)) {
                 return true;
             }
-            if (borderColorField != null && borderColorField.visible && 
+            if (borderColorField != null && borderColorField.visible &&
                 borderColorField.charTyped(codePoint, modifiers)) {
                 return true;
             }
-            if (borderWidthField != null && borderWidthField.visible && 
+            if (borderWidthField != null && borderWidthField.visible &&
                 borderWidthField.charTyped(codePoint, modifiers)) {
                 return true;
             }
@@ -1955,10 +1955,10 @@ public class GuiEditorScreen extends Screen {
                 return true;
             }
         }
-        
+
         return super.charTyped(codePoint, modifiers);
     }
-    
+
     private void createNewWidget() {
         String name = newWidgetNameField.getValue().trim();
         if (name.isEmpty()) {
@@ -1966,16 +1966,16 @@ public class GuiEditorScreen extends Screen {
         }
 
         createNewWidgetAt(width / 2 - 50, height / 2 - 10, name);
-        
+
         showAddWidgetDialog = false;
         newWidgetNameField.setValue("");
         newWidgetNameField.visible = false;
     }
-    
+
     private void createNewWidgetAt(int x, int y) {
         createNewWidgetAt(x, y, null);
     }
-    
+
     private void createNewWidgetAt(int x, int y, String name) {
         if (name == null || name.trim().isEmpty()) {
             name = "newWidget" + visualElements.size();
@@ -1995,11 +1995,11 @@ public class GuiEditorScreen extends Screen {
         GuiConfigData.ElementConfig newConfig = new GuiConfigData.ElementConfig(
             x - 50, y - 10, 100, 20
         );
-        
+
         if (newConfig.properties == null) {
             newConfig.properties = new HashMap<>();
         }
-        
+
         if (currentTool == EditorTool.CREATE_TEXT) {
             newConfig.properties.put("isTextElement", true);
             newConfig.properties.put("text", "New Text");
@@ -2032,7 +2032,7 @@ public class GuiEditorScreen extends Screen {
             newConfig.width = 150;
             newConfig.height = 30;
         }
-        
+
         VisualElement newElement = new VisualElement(name, newConfig);
         newElement.selected = true;
 
@@ -2041,7 +2041,7 @@ public class GuiEditorScreen extends Screen {
         }
         selectedElements.clear();
         selectedElements.add(newElement);
-        
+
         visualElements.add(newElement);
         selectedElement = newElement;
         deleteButton.visible = true;
@@ -2052,12 +2052,12 @@ public class GuiEditorScreen extends Screen {
             openTextEditor(newElement);
         }
     }
-    
+
     private void setCurrentTool(EditorTool tool) {
         currentTool = tool;
         updateToolButtons();
     }
-    
+
     private void updateToolButtons() {
         if (moveToolButton != null) {
             moveToolButton.setMessage(new TextComponent(currentTool == EditorTool.MOVE ? "●" : "M"));
@@ -2097,12 +2097,12 @@ public class GuiEditorScreen extends Screen {
         }
         updateScaleButtons();
     }
-    
+
     private void setGuiScale(int scale) {
         if (currentGuiScale != scale) {
             saveElementSizesForCurrentScale();
         }
-        
+
         currentGuiScale = scale;
 
         if (parentScreen instanceof BuildScapeConfigScreen configScreen) {
@@ -2110,11 +2110,11 @@ public class GuiEditorScreen extends Screen {
         }
 
         loadElementSizesForCurrentScale();
-        
+
         updateToolButtons();
         updateScaleButtons();
     }
-    
+
     private int getElementWidthForScale(VisualElement element, int scale) {
         if (element.config.properties != null) {
             String scaleKey = "scale" + scale + "_width";
@@ -2131,7 +2131,7 @@ public class GuiEditorScreen extends Screen {
         }
         return element.config.width;
     }
-    
+
     private int getElementHeightForScale(VisualElement element, int scale) {
         if (element.config.properties != null) {
             String scaleKey = "scale" + scale + "_height";
@@ -2148,7 +2148,7 @@ public class GuiEditorScreen extends Screen {
         }
         return element.config.height;
     }
-    
+
     private void saveElementSizesForCurrentScale() {
         for (VisualElement element : visualElements) {
             if (element.config.properties == null) {
@@ -2160,7 +2160,7 @@ public class GuiEditorScreen extends Screen {
             element.config.properties.put(heightKey, element.config.height);
         }
     }
-    
+
     private void loadElementSizesForCurrentScale() {
         for (VisualElement element : visualElements) {
             int scaleWidth = getElementWidthForScale(element, currentGuiScale);
@@ -2169,14 +2169,14 @@ public class GuiEditorScreen extends Screen {
             element.config.height = scaleHeight;
         }
     }
-    
+
     private void updateScaleButtons() {
         scale1Button.active = currentGuiScale != 1;
         scale2Button.active = currentGuiScale != 2;
         scale3Button.active = currentGuiScale != 3;
         scale4Button.active = currentGuiScale != 4;
     }
-    
+
     private boolean isElementVisible(VisualElement element) {
         if (element.config.properties != null && element.config.properties.containsKey("editorVisible")) {
             Object visible = element.config.properties.get("editorVisible");
@@ -2188,7 +2188,7 @@ public class GuiEditorScreen extends Screen {
         }
         return true;
     }
-    
+
     private void toggleElementVisibility(VisualElement element) {
         if (element.config.properties == null) {
             element.config.properties = new HashMap<>();
@@ -2207,7 +2207,7 @@ public class GuiEditorScreen extends Screen {
             }
         }
     }
-    
+
     private void renderLayersPanel(PoseStack poseStack, int mouseX, int mouseY) {
         int panelHeight = (height - layersPanelY - 50) / 2;
         int panelX = layersPanelX;
@@ -2230,7 +2230,7 @@ public class GuiEditorScreen extends Screen {
             if (i >= visualElements.size()) break;
             VisualElement element = visualElements.get(i);
             int itemY = panelY + 20 + (i - startIndex) * LAYER_ITEM_HEIGHT;
-            
+
             boolean isVisible = isElementVisible(element);
             boolean isSelected = element.selected;
             boolean isHovered = mouseX >= panelX && mouseX < panelX + LAYERS_PANEL_WIDTH &&
@@ -2258,7 +2258,7 @@ public class GuiEditorScreen extends Screen {
             if (nameWidth > maxNameWidth) {
                 elementName = font.plainSubstrByWidth(elementName, maxNameWidth - font.width("...")) + "...";
             }
-            
+
             int textColor = isVisible ? (isSelected ? 0xFFFFFF : 0xCCCCCC) : 0x888888;
             drawString(poseStack, font, elementName, nameX, itemY + 5, textColor);
         }
@@ -2267,18 +2267,18 @@ public class GuiEditorScreen extends Screen {
             int scrollbarX = panelX + LAYERS_PANEL_WIDTH - 8;
             int scrollbarHeight = panelHeight - 20;
             int scrollbarY = panelY + 20;
-            
+
             double maxScroll = Math.max(0, visualElements.size() - maxVisible);
             double scrollRatio = layersPanelScrollOffset / maxScroll;
             int thumbHeight = (int) (scrollbarHeight * (maxVisible / (double) visualElements.size()));
             thumbHeight = Math.max(20, thumbHeight);
             int thumbY = scrollbarY + (int) (scrollRatio * (scrollbarHeight - thumbHeight));
-            
+
             fill(poseStack, scrollbarX, scrollbarY, scrollbarX + 5, scrollbarY + scrollbarHeight, 0x33CCCCCC);
             fill(poseStack, scrollbarX, thumbY, scrollbarX + 5, thumbY + thumbHeight, 0x40CCCCCC);
         }
     }
-    
+
     private boolean handleLayersPanelClick(double mouseX, double mouseY) {
         int panelHeight = (height - layersPanelY - 50) / 2;
         int panelX = layersPanelX;
@@ -2287,12 +2287,12 @@ public class GuiEditorScreen extends Screen {
         int maxVisible = panelHeight / LAYER_ITEM_HEIGHT;
         int startIndex = layersPanelScrollOffset;
         int endIndex = Math.min(startIndex + maxVisible, visualElements.size());
-        
+
         for (int i = startIndex; i < endIndex; i++) {
             if (i >= visualElements.size()) break;
             VisualElement element = visualElements.get(i);
             int itemY = panelY + 20 + (i - startIndex) * LAYER_ITEM_HEIGHT;
-            
+
             if (mouseY >= itemY && mouseY < itemY + LAYER_ITEM_HEIGHT) {
                 int checkboxX = panelX + 5;
                 int checkboxY = itemY + 4;
@@ -2315,10 +2315,10 @@ public class GuiEditorScreen extends Screen {
                 return true;
             }
         }
-        
+
         return false;
     }
-    
+
     private void setAutoScale() {
         Minecraft mc = Minecraft.getInstance();
         int windowWidth = mc.getWindow().getWidth();
@@ -2337,12 +2337,12 @@ public class GuiEditorScreen extends Screen {
         } else {
             currentGuiScale = 1;
         }
-        
+
         setGuiScale(currentGuiScale);
         updateToolButtons();
         updateScaleButtons();
     }
-    
+
     private void deleteSelectedElement() {
         if (selectedElement != null) {
             visualElements.remove(selectedElement);
@@ -2351,7 +2351,7 @@ public class GuiEditorScreen extends Screen {
             deleteButton.visible = false;
         }
     }
-    
+
     private void deleteSelectedElements() {
         for (VisualElement element : selectedElements) {
             visualElements.remove(element);
@@ -2361,7 +2361,7 @@ public class GuiEditorScreen extends Screen {
         selectedElement = null;
         deleteButton.visible = false;
     }
-    
+
     private VisualElement getElementById(String id) {
         for (VisualElement element : visualElements) {
             if (element.elementId.equals(id)) {
@@ -2370,7 +2370,7 @@ public class GuiEditorScreen extends Screen {
         }
         return null;
     }
-    
+
     private void saveConfig() {
         int contentX = 0;
         int contentY = 0;
@@ -2393,7 +2393,7 @@ public class GuiEditorScreen extends Screen {
         Map<String, GuiConfigData.ElementConfig> tabElements = new HashMap<>();
 
         for (VisualElement element : visualElements) {
-            boolean isSidebarElement = element.config.properties != null && 
+            boolean isSidebarElement = element.config.properties != null &&
                 Boolean.TRUE.equals(element.config.properties.get("isSidebarElement"));
 
             int absoluteScreenX = element.config.x;
@@ -2401,7 +2401,7 @@ public class GuiEditorScreen extends Screen {
 
             int contentRelativeX = isSidebarElement ? element.config.x : element.config.x - contentX;
             int contentRelativeY = isSidebarElement ? element.config.y : element.config.y - contentY;
-            
+
             GuiConfigData.ElementConfig savedConfig = new GuiConfigData.ElementConfig(
                 contentRelativeX,
                 contentRelativeY,
@@ -2410,7 +2410,7 @@ public class GuiEditorScreen extends Screen {
                 element.config.scale
             );
             savedConfig.visible = element.config.visible;
-            savedConfig.properties = element.config.properties != null ? 
+            savedConfig.properties = element.config.properties != null ?
                 new HashMap<>(element.config.properties) : new HashMap<>();
 
             if (screenWidth > 0 && screenHeight > 0) {
@@ -2419,7 +2419,7 @@ public class GuiEditorScreen extends Screen {
                 savedConfig.percentWidth = (double)element.config.width / screenWidth;
                 savedConfig.percentHeight = (double)element.config.height / screenHeight;
             }
-            
+
             if (isSidebarElement) {
                 String elementId = element.elementId.startsWith("sidebar.") ?
                     element.elementId.substring(8) : element.elementId;
@@ -2459,30 +2459,30 @@ public class GuiEditorScreen extends Screen {
             }
             configScreen.init();
         }
-        
+
         onClose();
     }
-    
+
     private void resetConfig() {
         config.elements.clear();
         configManager.clearCache(tabName);
         GuiConfigData freshConfig = configManager.loadConfig(tabName);
         config.elements.putAll(freshConfig.elements);
-        
+
         visualElements.clear();
         for (Map.Entry<String, GuiConfigData.ElementConfig> entry : config.elements.entrySet()) {
             visualElements.add(new VisualElement(entry.getKey(), entry.getValue()));
         }
-        
+
         selectedElement = null;
         deleteButton.visible = false;
     }
-    
+
     private void scanCurrentTab() {
         if (sourceTab == null) {
             return;
         }
-        
+
         try {
             java.lang.reflect.Field[] fields = sourceTab.getClass().getDeclaredFields();
             Map<String, GuiConfigData.ElementConfig> discoveredWidgets = new HashMap<>();
@@ -2500,19 +2500,19 @@ public class GuiEditorScreen extends Screen {
                 for (java.lang.reflect.Field field : classFields) {
                 field.setAccessible(true);
                 Object value = field.get(sourceTab);
-                
+
                 if (value == null) continue;
-                
+
                 String elementId = field.getName();
                 GuiConfigData.ElementConfig elementConfig = null;
-                
+
                 if (value instanceof net.minecraft.client.gui.components.AbstractWidget widget) {
                     if (!widget.visible || widget.x < 0 || widget.y < 0) continue;
                     elementConfig = new GuiConfigData.ElementConfig(
                             widget.x - contentX, widget.y - contentY, widget.getWidth(), 20
                     );
                     try {
-                        java.lang.reflect.Field heightField = 
+                        java.lang.reflect.Field heightField =
                             net.minecraft.client.gui.components.AbstractWidget.class.getDeclaredField("height");
                         heightField.setAccessible(true);
                         elementConfig.height = heightField.getInt(widget);
@@ -2533,13 +2533,13 @@ public class GuiEditorScreen extends Screen {
                             button.x - contentX, button.y - contentY, button.getWidth(), 20
                         );
                         try {
-                            java.lang.reflect.Field heightField = 
+                            java.lang.reflect.Field heightField =
                                 net.minecraft.client.gui.components.AbstractWidget.class.getDeclaredField("height");
                             heightField.setAccessible(true);
                             elementConfig.height = heightField.getInt(button);
                         } catch (Exception e) {}
                     }
-                    
+
                     if (elementConfig != null && !discoveredWidgets.containsKey(elementId)) {
                     discoveredWidgets.put(elementId, elementConfig);
                 }
@@ -2551,7 +2551,7 @@ public class GuiEditorScreen extends Screen {
                 java.lang.reflect.Field childrenField = Screen.class.getDeclaredField("children");
                 childrenField.setAccessible(true);
                 @SuppressWarnings("unchecked")
-                List<net.minecraft.client.gui.components.events.GuiEventListener> children = 
+                List<net.minecraft.client.gui.components.events.GuiEventListener> children =
                     (List<net.minecraft.client.gui.components.events.GuiEventListener>) childrenField.get(sourceTab);
                 if (children != null) {
                     int index = 0;
@@ -2564,7 +2564,7 @@ public class GuiEditorScreen extends Screen {
                                         widget.x - contentX, widget.y - contentY, widget.getWidth(), 20
                                     );
                                     try {
-                                        java.lang.reflect.Field heightField = 
+                                        java.lang.reflect.Field heightField =
                                             net.minecraft.client.gui.components.AbstractWidget.class.getDeclaredField("height");
                                         heightField.setAccessible(true);
                                         elementConfig.height = heightField.getInt(widget);
@@ -2579,7 +2579,7 @@ public class GuiEditorScreen extends Screen {
             }
 
             scanTextLabels(discoveredWidgets, contentX, contentY);
-            
+
             if (!discoveredWidgets.isEmpty()) {
                 com.kingodogo.buildscape.client.screen.GuiConfigHelper.registerWidgetDefaults(tabName, discoveredWidgets);
                 configManager.clearCache(tabName);
@@ -2588,21 +2588,21 @@ public class GuiEditorScreen extends Screen {
                 visualElements.clear();
                 for (Map.Entry<String, GuiConfigData.ElementConfig> entry : newConfig.elements.entrySet()) {
                     GuiConfigData.ElementConfig elementConfig = entry.getValue();
-                    boolean isSidebarElement = elementConfig.properties != null && 
+                    boolean isSidebarElement = elementConfig.properties != null &&
                         Boolean.TRUE.equals(elementConfig.properties.get("isSidebarElement"));
-                    
+
                     int screenX = isSidebarElement ? elementConfig.x : elementConfig.x + contentX;
                     int screenY = isSidebarElement ? elementConfig.y : elementConfig.y + contentY;
-                    
+
                     GuiConfigData.ElementConfig screenConfig = new GuiConfigData.ElementConfig(
                         screenX, screenY, elementConfig.width, elementConfig.height, elementConfig.scale
                     );
                     screenConfig.visible = elementConfig.visible;
-                    screenConfig.properties = elementConfig.properties != null ? 
+                    screenConfig.properties = elementConfig.properties != null ?
                         new HashMap<>(elementConfig.properties) : new HashMap<>();
                     visualElements.add(new VisualElement(entry.getKey(), screenConfig));
                 }
-                
+
                 if (minecraft.player != null) {
                     minecraft.player.sendMessage(
                         new TranslatableComponent("buildscape.gui.editor.scanned", discoveredWidgets.size()),
@@ -2615,13 +2615,13 @@ public class GuiEditorScreen extends Screen {
             e.printStackTrace();
         }
     }
-    
+
     private void scanTextLabels(Map<String, GuiConfigData.ElementConfig> discoveredWidgets, int contentX, int contentY) {
         if (sourceTab == null) return;
-        
+
         try {
             if (sourceTab instanceof PillarItemsConfigTab) {
-                addTextLabel(discoveredWidgets, "pillarItemsLabel", 
+                addTextLabel(discoveredWidgets, "pillarItemsLabel",
                     new TranslatableComponent("buildscape.config.pillar_items").getString(),
                     0, 10, "buildscape.config.pillar_items");
 
@@ -2663,7 +2663,7 @@ public class GuiEditorScreen extends Screen {
                 addTextLabel(discoveredWidgets, "particleDensityLabel",
                     new TranslatableComponent("buildscape.config.particles.particle_density").getString() + " ",
                     20, 168, "buildscape.config.particles.particle_density");
-                
+
                 addTextLabel(discoveredWidgets, "patternSpeedLabel",
                     new TranslatableComponent("buildscape.config.particles.pattern_speed").getString() + " ",
                     (parentScreen.width - contentX) / 2 + 15, 90, "buildscape.config.particles.pattern_speed");
@@ -2676,7 +2676,7 @@ public class GuiEditorScreen extends Screen {
             } else if (sourceTab instanceof PillarIdsConfigTab) {
                 int tableX = 12;
                 int tableY = 32;
-                int[] columns = new int[] { 
+                int[] columns = new int[] {
                     (int)((parentScreen.width - contentX - 24) * 0.22f),
                     (int)((parentScreen.width - contentX - 24) * 0.36f),
                     (int)((parentScreen.width - contentX - 24) * 0.16f)
@@ -2693,12 +2693,12 @@ public class GuiEditorScreen extends Screen {
                     new TranslatableComponent("buildscape.config.ids.colors").getString(),
                     x + 6, headerY + 8, "buildscape.config.ids.colors");
                 x += columns[1] + 8;
-                
+
                 addTextLabel(discoveredWidgets, "dimensionHeader",
                     new TranslatableComponent("buildscape.config.ids.dimension").getString(),
                     x + 6, headerY + 8, "buildscape.config.ids.dimension");
                 x += columns[2] + 8;
-                
+
                 addTextLabel(discoveredWidgets, "coordsHeader",
                     new TranslatableComponent("buildscape.config.ids.coords").getString(),
                     x + 6, headerY + 8, "buildscape.config.ids.coords");
@@ -2712,19 +2712,19 @@ public class GuiEditorScreen extends Screen {
             e.printStackTrace();
         }
     }
-    
+
     private void addTextLabel(Map<String, GuiConfigData.ElementConfig> discoveredWidgets,
                              String elementId, String text, int x, int y, String textKey) {
         addTextLabel(discoveredWidgets, elementId, text, x, y, textKey, false);
     }
-    
+
     private void addTextLabel(Map<String, GuiConfigData.ElementConfig> discoveredWidgets,
                              String elementId, String text, int x, int y, String textKey, boolean isDynamic) {
         if (text == null || text.isEmpty()) return;
-        
+
         int textWidth = font.width(text);
         int textHeight = 12;
-        
+
         GuiConfigData.ElementConfig labelConfig = new GuiConfigData.ElementConfig(
             x, y, textWidth + 10, textHeight
         );
@@ -2739,7 +2739,7 @@ public class GuiEditorScreen extends Screen {
         }
         discoveredWidgets.put(elementId, labelConfig);
     }
-    
+
     @Override
     public void onClose() {
         minecraft.setScreen(parentScreen);

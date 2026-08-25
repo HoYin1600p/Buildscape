@@ -179,7 +179,7 @@ public class BuildScapeConfigScreen extends Screen {
         // This likely means the sidebar background is the 11% column (starting at 0.5% screen X).
         // And buttons are inside that with 0.5% padding relative to screen width?
         // Or relative to the sidebar itself? "on both side of the nav bar" implies the bar has padding.
-        // Let's interpret: 
+        // Let's interpret:
         // Sidebar Area: Starts at 0.5% screen X, Width 11% screen.
         // Buttons: Start at Sidebar X + 0.5% screen w. Width = Sidebar Width - 1% screen w.
 
@@ -455,7 +455,7 @@ public class BuildScapeConfigScreen extends Screen {
         for (int i = 0; i < text.length(); i++) {
             char c = text.charAt(i);
             String charStr = String.valueOf(c);
-            
+
             // Calculate the exact exact start x position using substring to preserve font kerning alignments
             String prefix = text.substring(0, i);
             int preciseX = startX + font.width(prefix);
@@ -644,10 +644,10 @@ public class BuildScapeConfigScreen extends Screen {
         int buttonMargin = (int) (width * 0.005);
         int frameX = sidebarStartX + buttonMargin;
         int frameWidth = calculatedSidebarWidth - (buttonMargin * 2);
-        
+
         // Use the native scaling function instead of hardcoded 20 so the frame actively shrinks naturally to match the Category buttons on high UI scales
-        int frameHeight = getScaledCategoryButtonHeight() + scaleSize(4); 
-        int frameY = scaleSize(10); 
+        int frameHeight = getScaledCategoryButtonHeight() + scaleSize(4);
+        int frameY = scaleSize(10);
 
         int titlePadding = 10;
         int maxTitleWidth = frameWidth - titlePadding * 2;
@@ -659,7 +659,7 @@ public class BuildScapeConfigScreen extends Screen {
         }
 
         // Aligning exact center using half frame height and half scaled font height.
-        int titleY = (int) (frameY + (frameHeight / 2.0f) - ((8.0f * titleScale) / 2.0f)); 
+        int titleY = (int) (frameY + (frameHeight / 2.0f) - ((8.0f * titleScale) / 2.0f));
 
         int titleX = frameX + frameWidth / 2;
 

@@ -45,7 +45,7 @@ public class CustomScrollbarRenderer {
 
     /**
      * Renders the custom scrollbar with texture.
-     * 
+     *
      * @param poseStack    The pose stack for rendering
      * @param x            X position of the scrollbar
      * @param y            Y position of the scrollbar
@@ -100,7 +100,7 @@ public class CustomScrollbarRenderer {
 
     /**
      * Handles mouse click on scrollbar or content area.
-     * 
+     *
      * @param mouseX          Mouse X position
      * @param mouseY          Mouse Y position
      * @param button          Mouse button (0 = left click)
@@ -137,7 +137,7 @@ public class CustomScrollbarRenderer {
             // If clicking on track (not thumb), jump to that position (centering thumb)
             if (mouseY < thumbY || mouseY > thumbY + scrollerHeight) {
                 thumbClickOffsetY = scrollerHeight / 2.0; // Center thumb during jump
-                double clickRatio = usableTrackHeight > 0 
+                double clickRatio = usableTrackHeight > 0
                         ? Math.max(0, Math.min(1, (mouseY - scrollbarY - thumbClickOffsetY) / usableTrackHeight))
                         : 0;
                 scrollOffset = clickRatio * maxScroll;
@@ -158,7 +158,7 @@ public class CustomScrollbarRenderer {
 
     /**
      * Handles mouse drag for scrollbar or content dragging.
-     * 
+     *
      * @param mouseY          Current mouse Y position
      * @param scrollbarY      Y position of scrollbar
      * @param scrollbarHeight Height of scrollbar
@@ -194,7 +194,7 @@ public class CustomScrollbarRenderer {
 
     /**
      * Handles mouse release to stop dragging.
-     * 
+     *
      * @param button Mouse button that was released
      * @return true if a drag was stopped, false otherwise
      */

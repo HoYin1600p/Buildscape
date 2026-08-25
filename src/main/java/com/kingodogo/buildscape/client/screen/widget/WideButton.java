@@ -5,11 +5,11 @@ import net.minecraft.network.chat.Component;
 import com.mojang.blaze3d.vertex.PoseStack;
 
 public class WideButton extends Button {
-    
+
     public WideButton(int x, int y, int width, int height, Component message, OnPress onPress) {
         super(x, y, width, height, message, onPress);
     }
-    
+
     @Override
     public void renderButton(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
         int bgColor = this.isHovered ? 0xFFE0E0E0 : 0xFFC0C0C0;
@@ -27,11 +27,11 @@ public class WideButton extends Button {
 
         int textColor = this.active ? 0xFFFFFF : 0xA0A0A0;
         net.minecraft.client.Minecraft mc = net.minecraft.client.Minecraft.getInstance();
-        drawCenteredString(poseStack, 
-            mc.font, 
-            this.getMessage(), 
-            this.x + this.width / 2, 
-            this.y + (this.height - 8) / 2, 
+        drawCenteredString(poseStack,
+            mc.font,
+            this.getMessage(),
+            this.x + this.width / 2,
+            this.y + (this.height - 8) / 2,
             textColor
         );
     }

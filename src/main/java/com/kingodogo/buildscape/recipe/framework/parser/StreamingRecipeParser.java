@@ -307,9 +307,16 @@ public class StreamingRecipeParser {
                 reader.beginArray();
                 if (reader.hasNext() && reader.peek() == JsonToken.STRING) {
                     String k = reader.nextString();
-                    if (reader.hasNext() && reader.peek() == JsonToken.STRING) {
-                        String v = reader.nextString();
-                        keys.put(k, v);
+                    if (reader.hasNext()) {
+                        JsonToken token = reader.peek();
+                        if (token == JsonToken.STRING) {
+                            String v = reader.nextString();
+                            keys.put(k, v);
+                        } else if (token == JsonToken.BEGIN_ARRAY) {
+                            List<String> list = new ArrayList<>();
+                            parseStringList(reader, list);
+                            keys.put(k, "[" + String.join(",", list) + "]");
+                        }
                     }
                 }
                 while (reader.hasNext() && reader.peek() != JsonToken.END_ARRAY) {

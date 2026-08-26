@@ -13,7 +13,7 @@ def compactify_file(filepath):
         for k_idx, key in enumerate(keys):
             val = data[key]
             comma_end = ',' if k_idx < len(keys) - 1 else ''
-            
+
             if key in ['_comment', 'aliases', 'wood_families']:
                 formatted_val = json.dumps(val, indent=2)
                 indented = '\n'.join('  ' + line if line else '' for line in formatted_val.split('\n'))

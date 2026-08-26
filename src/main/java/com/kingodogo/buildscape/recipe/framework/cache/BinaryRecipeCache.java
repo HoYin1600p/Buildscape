@@ -1,30 +1,51 @@
 package com.kingodogo.buildscape.recipe.framework.cache;
 
-import com.kingodogo.buildscape.BuildScape;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.item.crafting.*;
-import net.minecraft.core.NonNullList;
-import net.minecraftforge.fml.loading.FMLPaths;
-import net.minecraftforge.registries.ForgeRegistries;
-
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.MessageDigest;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import com.kingodogo.buildscape.BuildScape;
+
+import net.minecraft.core.NonNullList;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.BlastingRecipe;
+import net.minecraft.world.item.crafting.CampfireCookingRecipe;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.ShapedRecipe;
+import net.minecraft.world.item.crafting.ShapelessRecipe;
+import net.minecraft.world.item.crafting.SmeltingRecipe;
+import net.minecraft.world.item.crafting.SmokingRecipe;
+import net.minecraft.world.item.crafting.StonecutterRecipe;
+import net.minecraft.world.item.crafting.UpgradeRecipe;
+import net.minecraftforge.fml.loading.FMLPaths;
+import net.minecraftforge.registries.ForgeRegistries;
 
 /**
  * High-performance binary recipe cache (.bscb).
- * Serializes and deserializes compiled recipe graphs into compact binary streams with string dictionary pool interning.
- * Supports loading bundled binary cache directly from JAR resources for instant 1st boot (< 20ms).
+ * Serializes and deserializes compiled recipe graphs into compact binary
+ * streams with string dictionary pool interning.
+ * Supports loading bundled binary cache directly from JAR resources for instant
+ * 1st boot (< 20ms).
  */
 public class BinaryRecipeCache {
 
-    private static final int MAGIC_HEADER = 0x42534342; // "BSCB"
+    private static final int MAGIC_HEADER = 0x4B59524F;
     private static final int CACHE_VERSION = 4;
 
     public static Path getCacheDir() {
@@ -70,7 +91,7 @@ public class BinaryRecipeCache {
         Path hashFile = getCacheDir().resolve("recipes.bscb.hash");
 
         try (ByteArrayOutputStream recipeByteStream = new ByteArrayOutputStream();
-             DataOutputStream recipeDataOut = new DataOutputStream(recipeByteStream)) {
+                DataOutputStream recipeDataOut = new DataOutputStream(recipeByteStream)) {
 
             List<String> stringPool = new ArrayList<>();
             Map<String, Integer> stringIndexMap = new HashMap<>();
@@ -83,7 +104,7 @@ public class BinaryRecipeCache {
 
             byte[] fullCacheData;
             try (ByteArrayOutputStream finalOut = new ByteArrayOutputStream();
-                 DataOutputStream out = new DataOutputStream(finalOut)) {
+                    DataOutputStream out = new DataOutputStream(finalOut)) {
                 out.writeInt(MAGIC_HEADER);
                 out.writeInt(CACHE_VERSION);
                 out.writeUTF(hash != null ? hash : "");
@@ -101,12 +122,15 @@ public class BinaryRecipeCache {
             Files.writeString(hashFile, hash, StandardCharsets.UTF_8);
 
             try {
-                Path srcResourcePath = Path.of("src/main/resources/data/buildscape/recipes_pack/recipes.bscb");
-                if (Files.exists(srcResourcePath.getParent())) {
+                Path packDir = findWorkspaceRecipesPackDir();
+                if (packDir != null) {
+                    Path srcResourcePath = packDir.resolve("recipes.bscb");
                     Files.write(srcResourcePath, fullCacheData);
                     BuildScape.LOGGER.info("BDRE Bundled JAR Cache synced to {}", srcResourcePath.toAbsolutePath());
                 }
-            } catch (Exception ignored) {}
+            } catch (Exception e) {
+                BuildScape.LOGGER.warn("BDRE Bundled JAR Cache sync warning: {}", e.getMessage());
+            }
 
             BuildScape.LOGGER.info("BDRE Binary Cache saved successfully ({} recipes).", recipes.size());
         } catch (Exception e) {
@@ -177,7 +201,8 @@ public class BinaryRecipeCache {
                             if (item != null) {
                                 itemCache[i] = item;
                             }
-                        } catch (Exception ignored) {}
+                        } catch (Exception ignored) {
+                        }
                     }
                 }
             });
@@ -211,7 +236,8 @@ public class BinaryRecipeCache {
     }
 
     private static int getStringIndex(String str, List<String> stringPool, Map<String, Integer> stringIndexMap) {
-        if (str == null) str = "";
+        if (str == null)
+            str = "";
         return stringIndexMap.computeIfAbsent(str, s -> {
             int idx = stringPool.size();
             stringPool.add(s);
@@ -219,7 +245,8 @@ public class BinaryRecipeCache {
         });
     }
 
-    private static void writeRecipe(DataOutputStream out, Recipe<?> recipe, List<String> stringPool, Map<String, Integer> stringMap) throws IOException {
+    private static void writeRecipe(DataOutputStream out, Recipe<?> recipe, List<String> stringPool,
+            Map<String, Integer> stringMap) throws IOException {
         String idStr = recipe.getId().toString();
         String groupStr = recipe.getGroup() != null ? recipe.getGroup() : "";
         ResourceLocation resultItemKey = ForgeRegistries.ITEMS.getKey(recipe.getResultItem().getItem());
@@ -313,8 +340,7 @@ public class BinaryRecipeCache {
             String[] stringPool,
             Ingredient[] ingredientCache,
             Item[] itemCache,
-            ResourceLocation[] rlCache
-    ) throws IOException {
+            ResourceLocation[] rlCache) throws IOException {
         int idIdx = in.readInt();
         ResourceLocation id = getResourceLocation(idIdx, stringPool, rlCache);
 
@@ -325,7 +351,8 @@ public class BinaryRecipeCache {
         Item resultItem = itemCache[itemIdx];
         if (resultItem == null) {
             resultItem = ForgeRegistries.ITEMS.getValue(getResourceLocation(itemIdx, stringPool, rlCache));
-            if (resultItem == null) resultItem = Items.AIR;
+            if (resultItem == null)
+                resultItem = Items.AIR;
             itemCache[itemIdx] = resultItem;
         }
 
@@ -402,7 +429,8 @@ public class BinaryRecipeCache {
                 for (int i = 0; i < ingSize; i++) {
                     ingredients.set(i, readIngredient(in, stringPool, ingredientCache));
                 }
-                return new com.kingodogo.buildscape.recipe.ShapedDurabilityRecipe(id, group, width, height, ingredients, result, 1);
+                return new com.kingodogo.buildscape.recipe.ShapedDurabilityRecipe(id, group, width, height, ingredients,
+                        result, 1);
             }
             case 10 -> { // ShapelessDurability
                 int ingSize = in.readInt();
@@ -424,17 +452,20 @@ public class BinaryRecipeCache {
         }
     }
 
-    private static void writeIngredient(DataOutputStream out, Ingredient ing, List<String> stringPool, Map<String, Integer> stringMap) throws IOException {
+    private static void writeIngredient(DataOutputStream out, Ingredient ing, List<String> stringPool,
+            Map<String, Integer> stringMap) throws IOException {
         String jsonStr = "";
         if (ing != null && !ing.isEmpty()) {
             try {
                 jsonStr = ing.toJson().toString();
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+            }
         }
         out.writeInt(getStringIndex(jsonStr, stringPool, stringMap));
     }
 
-    private static Ingredient readIngredient(DataInputStream in, String[] stringPool, Ingredient[] ingredientCache) throws IOException {
+    private static Ingredient readIngredient(DataInputStream in, String[] stringPool, Ingredient[] ingredientCache)
+            throws IOException {
         int idx = in.readInt();
         Ingredient ing = ingredientCache[idx];
         if (ing == null) {
@@ -452,5 +483,24 @@ public class BinaryRecipeCache {
             ingredientCache[idx] = ing;
         }
         return ing;
+    }
+
+    private static Path findWorkspaceRecipesPackDir() {
+        Path relativePath = Path.of("src/main/resources/data/buildscape/recipes_pack");
+        if (Files.exists(relativePath)) return relativePath;
+
+        Path parentRelative = Path.of("../src/main/resources/data/buildscape/recipes_pack");
+        if (Files.exists(parentRelative)) return parentRelative;
+
+        try {
+            Path current = FMLPaths.GAMEDIR.get();
+            while (current != null) {
+                Path candidate = current.resolve("src/main/resources/data/buildscape/recipes_pack");
+                if (Files.exists(candidate)) return candidate;
+                current = current.getParent();
+            }
+        } catch (Exception ignored) {}
+
+        return null;
     }
 }

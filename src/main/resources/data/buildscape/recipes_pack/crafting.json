@@ -2424,7 +2424,6 @@
     ["BS:snowy_spruce_leaf_layers",["BS:spruce_leaf_layers","BS:snow_overlay"],1],
     ["BS:snowy_spruce_leaves",["MC:spruce_leaves","BS:snow_overlay"],1],
     ["BS:snowy_yellow_poplar_leaves",["BS:yellow_poplar_leaves","BS:snow_overlay"],1],
-    ["BS:steel_ingot","BS:steel_block",9],
     ["BS:steel_nugget","BS:steel_ingot",9],
     ["BS:stripped_bamboo_block_button","BS:stripped_bamboo_block",1],
     ["BS:sulfur_spike","BS:sulfur",4],

@@ -48,6 +48,28 @@ public class BinaryRecipeCache {
     private static final int MAGIC_HEADER = 0x4B59524F;
     private static final int CACHE_VERSION = 4;
 
+    private static Item getItemFromRegistry(ResourceLocation rl) {
+        if (rl == null) return Items.AIR;
+        try {
+            if (ForgeRegistries.ITEMS != null) {
+                Item item = ForgeRegistries.ITEMS.getValue(rl);
+                if (item != null) return item;
+            }
+        } catch (Throwable ignored) {}
+        return Items.AIR;
+    }
+
+    private static ResourceLocation getItemKeyFromRegistry(Item item) {
+        if (item == null) return new ResourceLocation("minecraft", "air");
+        try {
+            if (ForgeRegistries.ITEMS != null) {
+                ResourceLocation key = ForgeRegistries.ITEMS.getKey(item);
+                if (key != null) return key;
+            }
+        } catch (Throwable ignored) {}
+        return new ResourceLocation("minecraft", "air");
+    }
+
     public static Path getCacheDir() {
         Path dir = FMLPaths.GAMEDIR.get().resolve("buildscape").resolve("cache");
         try {
@@ -197,8 +219,8 @@ public class BinaryRecipeCache {
                         try {
                             ResourceLocation rl = new ResourceLocation(s);
                             rlCache[i] = rl;
-                            Item item = ForgeRegistries.ITEMS.getValue(rl);
-                            if (item != null) {
+                            Item item = getItemFromRegistry(rl);
+                            if (item != null && item != Items.AIR) {
                                 itemCache[i] = item;
                             }
                         } catch (Exception ignored) {
@@ -249,7 +271,7 @@ public class BinaryRecipeCache {
             Map<String, Integer> stringMap) throws IOException {
         String idStr = recipe.getId().toString();
         String groupStr = recipe.getGroup() != null ? recipe.getGroup() : "";
-        ResourceLocation resultItemKey = ForgeRegistries.ITEMS.getKey(recipe.getResultItem().getItem());
+        ResourceLocation resultItemKey = getItemKeyFromRegistry(recipe.getResultItem().getItem());
         String resultStr = resultItemKey != null ? resultItemKey.toString() : "minecraft:air";
 
         out.writeInt(getStringIndex(idStr, stringPool, stringMap));
@@ -350,7 +372,7 @@ public class BinaryRecipeCache {
         int itemIdx = in.readInt();
         Item resultItem = itemCache[itemIdx];
         if (resultItem == null) {
-            resultItem = ForgeRegistries.ITEMS.getValue(getResourceLocation(itemIdx, stringPool, rlCache));
+            resultItem = getItemFromRegistry(getResourceLocation(itemIdx, stringPool, rlCache));
             if (resultItem == null)
                 resultItem = Items.AIR;
             itemCache[itemIdx] = resultItem;

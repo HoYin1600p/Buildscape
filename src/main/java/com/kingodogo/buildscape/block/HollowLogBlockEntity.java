@@ -1,6 +1,8 @@
 package com.kingodogo.buildscape.block;
 
 import com.kingodogo.buildscape.event.AdvancementEvents;
+import com.kingodogo.buildscape.block.HollowPipeBlock;
+import com.kingodogo.buildscape.pipe.transport.PipeFlowState;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
@@ -30,9 +32,45 @@ public class HollowLogBlockEntity extends BlockEntity {
     private int lavaTicks = 0;
     private UUID lavaPlacedByPlayer = null;
     private UUID glassPlacedByPlayer = null;
+    private PipeFlowState pipeFlowState = new PipeFlowState();
+    private PipeFlowState pendingTargetState = null;
+    private int flowDelayTicks = 0;
 
     public HollowLogBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.HOLLOW_LOG_BLOCK_ENTITY.get(), pos, state);
+    }
+
+    public PipeFlowState getPipeFlowState() {
+        return pipeFlowState;
+    }
+
+    public void setPipeFlowState(PipeFlowState pipeFlowState) {
+        this.pipeFlowState = pipeFlowState != null ? pipeFlowState : new PipeFlowState();
+        this.pendingTargetState = null;
+        this.flowDelayTicks = 0;
+    }
+
+    /**
+     * Sets a target flow state that will become active after delayTicks server ticks.
+     * Used for natural, block-by-block animated water flow and drainage progression.
+     */
+    public void setPendingFlowState(PipeFlowState target, int delayTicks) {
+        PipeFlowState next = target != null ? target : new PipeFlowState();
+        // Neighbor updates can request the same transition repeatedly while a stream is
+        // settling. Do not restart its countdown or endpoint replacement can remain stale.
+        if (delayTicks > 0 && pendingTargetState != null && pendingTargetState.equals(next)) {
+            return;
+        }
+        if (delayTicks <= 0) {
+            this.pipeFlowState = next;
+            this.pendingTargetState = null;
+            this.flowDelayTicks = 0;
+            setChanged();
+            syncToClient();
+        } else {
+            this.pendingTargetState = next;
+            this.flowDelayTicks = delayTicks;
+        }
     }
 
     public BlockState getDecorationState() {
@@ -114,6 +152,18 @@ public class HollowLogBlockEntity extends BlockEntity {
             return;
         }
 
+        // --- Animated block-by-block flow progression ---
+        if (state.getBlock() instanceof HollowPipeBlock && blockEntity.pendingTargetState != null) {
+            blockEntity.flowDelayTicks--;
+            if (blockEntity.flowDelayTicks <= 0) {
+                blockEntity.pipeFlowState = blockEntity.pendingTargetState;
+                blockEntity.pendingTargetState = null;
+                blockEntity.setChanged();
+                blockEntity.syncToClient();
+            }
+        }
+
+        // --- Lava tick burn logic ---
         if (state.hasProperty(HollowLogBlock.LAVA_LOGGED) && state.getValue(HollowLogBlock.LAVA_LOGGED)) {
             if (blockEntity.lavaTicks > 0) {
                 blockEntity.lavaTicks--;
@@ -173,6 +223,9 @@ public class HollowLogBlockEntity extends BlockEntity {
         if (glassPlacedByPlayer != null) {
             tag.putUUID("GlassPlacedByPlayer", glassPlacedByPlayer);
         }
+        if (pipeFlowState != null && !pipeFlowState.isEmpty()) {
+            tag.put("PipeFlowState", pipeFlowState.writeToNbt(new CompoundTag()));
+        }
     }
 
     @Override
@@ -200,6 +253,11 @@ public class HollowLogBlockEntity extends BlockEntity {
         }
         if (tag.hasUUID("GlassPlacedByPlayer")) {
             glassPlacedByPlayer = tag.getUUID("GlassPlacedByPlayer");
+        }
+        if (tag.contains("PipeFlowState")) {
+            pipeFlowState = PipeFlowState.readFromNbt(tag.getCompound("PipeFlowState"));
+        } else {
+            pipeFlowState = new PipeFlowState();
         }
     }
 

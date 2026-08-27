@@ -1,18 +1,812 @@
 {
   "variants": {
-    "axis=y,connected_neg=false,connected_pos=false": { "model": "buildscape:block/hollow_steel_pipe_single" },
-    "axis=y,connected_neg=true,connected_pos=false": { "model": "buildscape:block/hollow_steel_pipe_top" },
-    "axis=y,connected_neg=false,connected_pos=true": { "model": "buildscape:block/hollow_steel_pipe_bottom" },
-    "axis=y,connected_neg=true,connected_pos=true": { "model": "buildscape:block/hollow_steel_pipe_middle" },
-
-    "axis=x,connected_neg=false,connected_pos=false": { "model": "buildscape:block/hollow_steel_pipe_single", "x": 90, "y": 90 },
-    "axis=x,connected_neg=true,connected_pos=false": { "model": "buildscape:block/hollow_steel_pipe_top", "x": 90, "y": 90 },
-    "axis=x,connected_neg=false,connected_pos=true": { "model": "buildscape:block/hollow_steel_pipe_bottom", "x": 90, "y": 90 },
-    "axis=x,connected_neg=true,connected_pos=true": { "model": "buildscape:block/hollow_steel_pipe_middle", "x": 90, "y": 90 },
-
-    "axis=z,connected_neg=false,connected_pos=false": { "model": "buildscape:block/hollow_steel_pipe_single", "x": 90, "y": 0 },
-    "axis=z,connected_neg=true,connected_pos=false": { "model": "buildscape:block/hollow_steel_pipe_top", "x": 90, "y": 0 },
-    "axis=z,connected_neg=false,connected_pos=true": { "model": "buildscape:block/hollow_steel_pipe_bottom", "x": 90, "y": 0 },
-    "axis=z,connected_neg=true,connected_pos=true": { "model": "buildscape:block/hollow_steel_pipe_middle", "x": 90, "y": 0 }
+    "axis=x,down=false,east=false,north=false,south=false,up=false,west=false": {
+      "model": "buildscape:block/hollow_steel_pipe_single",
+      "x": 90,
+      "y": 90
+    },
+    "axis=x,down=true,east=false,north=false,south=false,up=false,west=false": {
+      "model": "buildscape:block/hollow_steel_pipe_top"
+    },
+    "axis=x,down=false,east=false,north=false,south=false,up=true,west=false": {
+      "model": "buildscape:block/hollow_steel_pipe_top",
+      "x": 180
+    },
+    "axis=x,down=true,east=false,north=false,south=false,up=true,west=false": {
+      "model": "buildscape:block/hollow_steel_pipe_middle"
+    },
+    "axis=x,down=false,east=false,north=true,south=false,up=false,west=false": {
+      "model": "buildscape:block/hollow_steel_pipe_top",
+      "x": 90,
+      "y": 180
+    },
+    "axis=x,down=true,east=false,north=true,south=false,up=false,west=false": {
+      "model": "buildscape:block/hollow_steel_pipe_corner",
+      "y": 270
+    },
+    "axis=x,down=false,east=false,north=true,south=false,up=true,west=false": {
+      "model": "buildscape:block/hollow_steel_pipe_corner",
+      "x": 180,
+      "y": 270
+    },
+    "axis=x,down=true,east=false,north=true,south=false,up=true,west=false": {
+      "model": "buildscape:block/hollow_steel_pipe_t",
+      "y": 270
+    },
+    "axis=x,down=false,east=false,north=false,south=true,up=false,west=false": {
+      "model": "buildscape:block/hollow_steel_pipe_top",
+      "x": 90
+    },
+    "axis=x,down=true,east=false,north=false,south=true,up=false,west=false": {
+      "model": "buildscape:block/hollow_steel_pipe_corner",
+      "y": 90
+    },
+    "axis=x,down=false,east=false,north=false,south=true,up=true,west=false": {
+      "model": "buildscape:block/hollow_steel_pipe_corner",
+      "x": 180,
+      "y": 90
+    },
+    "axis=x,down=true,east=false,north=false,south=true,up=true,west=false": {
+      "model": "buildscape:block/hollow_steel_pipe_t",
+      "y": 90
+    },
+    "axis=x,down=false,east=false,north=true,south=true,up=false,west=false": {
+      "model": "buildscape:block/hollow_steel_pipe_middle",
+      "x": 90
+    },
+    "axis=x,down=true,east=false,north=true,south=true,up=false,west=false": {
+      "model": "buildscape:block/hollow_steel_pipe_t_vert",
+      "x": 180
+    },
+    "axis=x,down=false,east=false,north=true,south=true,up=true,west=false": {
+      "model": "buildscape:block/hollow_steel_pipe_t_vert"
+    },
+    "axis=x,down=true,east=false,north=true,south=true,up=true,west=false": {
+      "model": "buildscape:block/hollow_steel_pipe_cross",
+      "x": 90,
+      "y": 90
+    },
+    "axis=x,down=false,east=false,north=false,south=false,up=false,west=true": {
+      "model": "buildscape:block/hollow_steel_pipe_top",
+      "x": 90,
+      "y": 90
+    },
+    "axis=x,down=true,east=false,north=false,south=false,up=false,west=true": {
+      "model": "buildscape:block/hollow_steel_pipe_corner",
+      "y": 180
+    },
+    "axis=x,down=false,east=false,north=false,south=false,up=true,west=true": {
+      "model": "buildscape:block/hollow_steel_pipe_corner",
+      "x": 180,
+      "y": 180
+    },
+    "axis=x,down=true,east=false,north=false,south=false,up=true,west=true": {
+      "model": "buildscape:block/hollow_steel_pipe_t",
+      "y": 180
+    },
+    "axis=x,down=false,east=false,north=true,south=false,up=false,west=true": {
+      "model": "buildscape:block/hollow_steel_pipe_corner",
+      "x": 90,
+      "y": 180
+    },
+    "axis=x,down=true,east=false,north=true,south=false,up=false,west=true": {
+      "model": "buildscape:block/hollow_steel_pipe_tri_corner",
+      "y": 270
+    },
+    "axis=x,down=false,east=false,north=true,south=false,up=true,west=true": {
+      "model": "buildscape:block/hollow_steel_pipe_tri_corner",
+      "x": 180,
+      "y": 180
+    },
+    "axis=x,down=true,east=false,north=true,south=false,up=true,west=true": {
+      "model": "buildscape:block/hollow_steel_pipe_four_way",
+      "y": 270
+    },
+    "axis=x,down=false,east=false,north=false,south=true,up=false,west=true": {
+      "model": "buildscape:block/hollow_steel_pipe_corner",
+      "x": 90,
+      "y": 90
+    },
+    "axis=x,down=true,east=false,north=false,south=true,up=false,west=true": {
+      "model": "buildscape:block/hollow_steel_pipe_tri_corner",
+      "y": 180
+    },
+    "axis=x,down=false,east=false,north=false,south=true,up=true,west=true": {
+      "model": "buildscape:block/hollow_steel_pipe_tri_corner",
+      "x": 180,
+      "y": 90
+    },
+    "axis=x,down=true,east=false,north=false,south=true,up=true,west=true": {
+      "model": "buildscape:block/hollow_steel_pipe_four_way",
+      "y": 180
+    },
+    "axis=x,down=false,east=false,north=true,south=true,up=false,west=true": {
+      "model": "buildscape:block/hollow_steel_pipe_t",
+      "x": 90,
+      "y": 180
+    },
+    "axis=x,down=true,east=false,north=true,south=true,up=false,west=true": {
+      "model": "buildscape:block/hollow_steel_pipe_four_way",
+      "x": 90,
+      "y": 180
+    },
+    "axis=x,down=false,east=false,north=true,south=true,up=true,west=true": {
+      "model": "buildscape:block/hollow_steel_pipe_four_way",
+      "x": 270,
+      "y": 180
+    },
+    "axis=x,down=true,east=false,north=true,south=true,up=true,west=true": {
+      "model": "buildscape:block/hollow_steel_pipe_five_way",
+      "y": 180
+    },
+    "axis=x,down=false,east=true,north=false,south=false,up=false,west=false": {
+      "model": "buildscape:block/hollow_steel_pipe_top",
+      "x": 90,
+      "y": 270
+    },
+    "axis=x,down=true,east=true,north=false,south=false,up=false,west=false": {
+      "model": "buildscape:block/hollow_steel_pipe_corner"
+    },
+    "axis=x,down=false,east=true,north=false,south=false,up=true,west=false": {
+      "model": "buildscape:block/hollow_steel_pipe_corner",
+      "x": 180
+    },
+    "axis=x,down=true,east=true,north=false,south=false,up=true,west=false": {
+      "model": "buildscape:block/hollow_steel_pipe_t"
+    },
+    "axis=x,down=false,east=true,north=true,south=false,up=false,west=false": {
+      "model": "buildscape:block/hollow_steel_pipe_corner",
+      "x": 90,
+      "y": 270
+    },
+    "axis=x,down=true,east=true,north=true,south=false,up=false,west=false": {
+      "model": "buildscape:block/hollow_steel_pipe_tri_corner"
+    },
+    "axis=x,down=false,east=true,north=true,south=false,up=true,west=false": {
+      "model": "buildscape:block/hollow_steel_pipe_tri_corner",
+      "x": 180,
+      "y": 270
+    },
+    "axis=x,down=true,east=true,north=true,south=false,up=true,west=false": {
+      "model": "buildscape:block/hollow_steel_pipe_four_way"
+    },
+    "axis=x,down=false,east=true,north=false,south=true,up=false,west=false": {
+      "model": "buildscape:block/hollow_steel_pipe_corner",
+      "x": 90
+    },
+    "axis=x,down=true,east=true,north=false,south=true,up=false,west=false": {
+      "model": "buildscape:block/hollow_steel_pipe_tri_corner",
+      "y": 90
+    },
+    "axis=x,down=false,east=true,north=false,south=true,up=true,west=false": {
+      "model": "buildscape:block/hollow_steel_pipe_tri_corner",
+      "x": 180
+    },
+    "axis=x,down=true,east=true,north=false,south=true,up=true,west=false": {
+      "model": "buildscape:block/hollow_steel_pipe_four_way",
+      "y": 90
+    },
+    "axis=x,down=false,east=true,north=true,south=true,up=false,west=false": {
+      "model": "buildscape:block/hollow_steel_pipe_t",
+      "x": 90
+    },
+    "axis=x,down=true,east=true,north=true,south=true,up=false,west=false": {
+      "model": "buildscape:block/hollow_steel_pipe_four_way",
+      "x": 90
+    },
+    "axis=x,down=false,east=true,north=true,south=true,up=true,west=false": {
+      "model": "buildscape:block/hollow_steel_pipe_four_way",
+      "x": 270
+    },
+    "axis=x,down=true,east=true,north=true,south=true,up=true,west=false": {
+      "model": "buildscape:block/hollow_steel_pipe_five_way"
+    },
+    "axis=x,down=false,east=true,north=false,south=false,up=false,west=true": {
+      "model": "buildscape:block/hollow_steel_pipe_middle",
+      "x": 90,
+      "y": 90
+    },
+    "axis=x,down=true,east=true,north=false,south=false,up=false,west=true": {
+      "model": "buildscape:block/hollow_steel_pipe_t_vert",
+      "x": 180,
+      "y": 90
+    },
+    "axis=x,down=false,east=true,north=false,south=false,up=true,west=true": {
+      "model": "buildscape:block/hollow_steel_pipe_t_vert",
+      "y": 90
+    },
+    "axis=x,down=true,east=true,north=false,south=false,up=true,west=true": {
+      "model": "buildscape:block/hollow_steel_pipe_cross",
+      "x": 90
+    },
+    "axis=x,down=false,east=true,north=true,south=false,up=false,west=true": {
+      "model": "buildscape:block/hollow_steel_pipe_t",
+      "x": 90,
+      "y": 270
+    },
+    "axis=x,down=true,east=true,north=true,south=false,up=false,west=true": {
+      "model": "buildscape:block/hollow_steel_pipe_four_way",
+      "x": 90,
+      "y": 270
+    },
+    "axis=x,down=false,east=true,north=true,south=false,up=true,west=true": {
+      "model": "buildscape:block/hollow_steel_pipe_four_way",
+      "x": 270,
+      "y": 270
+    },
+    "axis=x,down=true,east=true,north=true,south=false,up=true,west=true": {
+      "model": "buildscape:block/hollow_steel_pipe_five_way",
+      "y": 270
+    },
+    "axis=x,down=false,east=true,north=false,south=true,up=false,west=true": {
+      "model": "buildscape:block/hollow_steel_pipe_t",
+      "x": 90,
+      "y": 90
+    },
+    "axis=x,down=true,east=true,north=false,south=true,up=false,west=true": {
+      "model": "buildscape:block/hollow_steel_pipe_four_way",
+      "x": 90,
+      "y": 90
+    },
+    "axis=x,down=false,east=true,north=false,south=true,up=true,west=true": {
+      "model": "buildscape:block/hollow_steel_pipe_four_way",
+      "x": 270,
+      "y": 90
+    },
+    "axis=x,down=true,east=true,north=false,south=true,up=true,west=true": {
+      "model": "buildscape:block/hollow_steel_pipe_five_way",
+      "y": 90
+    },
+    "axis=x,down=false,east=true,north=true,south=true,up=false,west=true": {
+      "model": "buildscape:block/hollow_steel_pipe_cross"
+    },
+    "axis=x,down=true,east=true,north=true,south=true,up=false,west=true": {
+      "model": "buildscape:block/hollow_steel_pipe_five_way_vert",
+      "x": 180
+    },
+    "axis=x,down=false,east=true,north=true,south=true,up=true,west=true": {
+      "model": "buildscape:block/hollow_steel_pipe_five_way_vert"
+    },
+    "axis=x,down=true,east=true,north=true,south=true,up=true,west=true": {
+      "model": "buildscape:block/hollow_steel_pipe_six_way"
+    },
+    "axis=y,down=false,east=false,north=false,south=false,up=false,west=false": {
+      "model": "buildscape:block/hollow_steel_pipe_single"
+    },
+    "axis=y,down=true,east=false,north=false,south=false,up=false,west=false": {
+      "model": "buildscape:block/hollow_steel_pipe_top"
+    },
+    "axis=y,down=false,east=false,north=false,south=false,up=true,west=false": {
+      "model": "buildscape:block/hollow_steel_pipe_top",
+      "x": 180
+    },
+    "axis=y,down=true,east=false,north=false,south=false,up=true,west=false": {
+      "model": "buildscape:block/hollow_steel_pipe_middle"
+    },
+    "axis=y,down=false,east=false,north=true,south=false,up=false,west=false": {
+      "model": "buildscape:block/hollow_steel_pipe_top",
+      "x": 90,
+      "y": 180
+    },
+    "axis=y,down=true,east=false,north=true,south=false,up=false,west=false": {
+      "model": "buildscape:block/hollow_steel_pipe_corner",
+      "y": 270
+    },
+    "axis=y,down=false,east=false,north=true,south=false,up=true,west=false": {
+      "model": "buildscape:block/hollow_steel_pipe_corner",
+      "x": 180,
+      "y": 270
+    },
+    "axis=y,down=true,east=false,north=true,south=false,up=true,west=false": {
+      "model": "buildscape:block/hollow_steel_pipe_t",
+      "y": 270
+    },
+    "axis=y,down=false,east=false,north=false,south=true,up=false,west=false": {
+      "model": "buildscape:block/hollow_steel_pipe_top",
+      "x": 90
+    },
+    "axis=y,down=true,east=false,north=false,south=true,up=false,west=false": {
+      "model": "buildscape:block/hollow_steel_pipe_corner",
+      "y": 90
+    },
+    "axis=y,down=false,east=false,north=false,south=true,up=true,west=false": {
+      "model": "buildscape:block/hollow_steel_pipe_corner",
+      "x": 180,
+      "y": 90
+    },
+    "axis=y,down=true,east=false,north=false,south=true,up=true,west=false": {
+      "model": "buildscape:block/hollow_steel_pipe_t",
+      "y": 90
+    },
+    "axis=y,down=false,east=false,north=true,south=true,up=false,west=false": {
+      "model": "buildscape:block/hollow_steel_pipe_middle",
+      "x": 90
+    },
+    "axis=y,down=true,east=false,north=true,south=true,up=false,west=false": {
+      "model": "buildscape:block/hollow_steel_pipe_t_vert",
+      "x": 180
+    },
+    "axis=y,down=false,east=false,north=true,south=true,up=true,west=false": {
+      "model": "buildscape:block/hollow_steel_pipe_t_vert"
+    },
+    "axis=y,down=true,east=false,north=true,south=true,up=true,west=false": {
+      "model": "buildscape:block/hollow_steel_pipe_cross",
+      "x": 90,
+      "y": 90
+    },
+    "axis=y,down=false,east=false,north=false,south=false,up=false,west=true": {
+      "model": "buildscape:block/hollow_steel_pipe_top",
+      "x": 90,
+      "y": 90
+    },
+    "axis=y,down=true,east=false,north=false,south=false,up=false,west=true": {
+      "model": "buildscape:block/hollow_steel_pipe_corner",
+      "y": 180
+    },
+    "axis=y,down=false,east=false,north=false,south=false,up=true,west=true": {
+      "model": "buildscape:block/hollow_steel_pipe_corner",
+      "x": 180,
+      "y": 180
+    },
+    "axis=y,down=true,east=false,north=false,south=false,up=true,west=true": {
+      "model": "buildscape:block/hollow_steel_pipe_t",
+      "y": 180
+    },
+    "axis=y,down=false,east=false,north=true,south=false,up=false,west=true": {
+      "model": "buildscape:block/hollow_steel_pipe_corner",
+      "x": 90,
+      "y": 180
+    },
+    "axis=y,down=true,east=false,north=true,south=false,up=false,west=true": {
+      "model": "buildscape:block/hollow_steel_pipe_tri_corner",
+      "y": 270
+    },
+    "axis=y,down=false,east=false,north=true,south=false,up=true,west=true": {
+      "model": "buildscape:block/hollow_steel_pipe_tri_corner",
+      "x": 180,
+      "y": 180
+    },
+    "axis=y,down=true,east=false,north=true,south=false,up=true,west=true": {
+      "model": "buildscape:block/hollow_steel_pipe_four_way",
+      "y": 270
+    },
+    "axis=y,down=false,east=false,north=false,south=true,up=false,west=true": {
+      "model": "buildscape:block/hollow_steel_pipe_corner",
+      "x": 90,
+      "y": 90
+    },
+    "axis=y,down=true,east=false,north=false,south=true,up=false,west=true": {
+      "model": "buildscape:block/hollow_steel_pipe_tri_corner",
+      "y": 180
+    },
+    "axis=y,down=false,east=false,north=false,south=true,up=true,west=true": {
+      "model": "buildscape:block/hollow_steel_pipe_tri_corner",
+      "x": 180,
+      "y": 90
+    },
+    "axis=y,down=true,east=false,north=false,south=true,up=true,west=true": {
+      "model": "buildscape:block/hollow_steel_pipe_four_way",
+      "y": 180
+    },
+    "axis=y,down=false,east=false,north=true,south=true,up=false,west=true": {
+      "model": "buildscape:block/hollow_steel_pipe_t",
+      "x": 90,
+      "y": 180
+    },
+    "axis=y,down=true,east=false,north=true,south=true,up=false,west=true": {
+      "model": "buildscape:block/hollow_steel_pipe_four_way",
+      "x": 90,
+      "y": 180
+    },
+    "axis=y,down=false,east=false,north=true,south=true,up=true,west=true": {
+      "model": "buildscape:block/hollow_steel_pipe_four_way",
+      "x": 270,
+      "y": 180
+    },
+    "axis=y,down=true,east=false,north=true,south=true,up=true,west=true": {
+      "model": "buildscape:block/hollow_steel_pipe_five_way",
+      "y": 180
+    },
+    "axis=y,down=false,east=true,north=false,south=false,up=false,west=false": {
+      "model": "buildscape:block/hollow_steel_pipe_top",
+      "x": 90,
+      "y": 270
+    },
+    "axis=y,down=true,east=true,north=false,south=false,up=false,west=false": {
+      "model": "buildscape:block/hollow_steel_pipe_corner"
+    },
+    "axis=y,down=false,east=true,north=false,south=false,up=true,west=false": {
+      "model": "buildscape:block/hollow_steel_pipe_corner",
+      "x": 180
+    },
+    "axis=y,down=true,east=true,north=false,south=false,up=true,west=false": {
+      "model": "buildscape:block/hollow_steel_pipe_t"
+    },
+    "axis=y,down=false,east=true,north=true,south=false,up=false,west=false": {
+      "model": "buildscape:block/hollow_steel_pipe_corner",
+      "x": 90,
+      "y": 270
+    },
+    "axis=y,down=true,east=true,north=true,south=false,up=false,west=false": {
+      "model": "buildscape:block/hollow_steel_pipe_tri_corner"
+    },
+    "axis=y,down=false,east=true,north=true,south=false,up=true,west=false": {
+      "model": "buildscape:block/hollow_steel_pipe_tri_corner",
+      "x": 180,
+      "y": 270
+    },
+    "axis=y,down=true,east=true,north=true,south=false,up=true,west=false": {
+      "model": "buildscape:block/hollow_steel_pipe_four_way"
+    },
+    "axis=y,down=false,east=true,north=false,south=true,up=false,west=false": {
+      "model": "buildscape:block/hollow_steel_pipe_corner",
+      "x": 90
+    },
+    "axis=y,down=true,east=true,north=false,south=true,up=false,west=false": {
+      "model": "buildscape:block/hollow_steel_pipe_tri_corner",
+      "y": 90
+    },
+    "axis=y,down=false,east=true,north=false,south=true,up=true,west=false": {
+      "model": "buildscape:block/hollow_steel_pipe_tri_corner",
+      "x": 180
+    },
+    "axis=y,down=true,east=true,north=false,south=true,up=true,west=false": {
+      "model": "buildscape:block/hollow_steel_pipe_four_way",
+      "y": 90
+    },
+    "axis=y,down=false,east=true,north=true,south=true,up=false,west=false": {
+      "model": "buildscape:block/hollow_steel_pipe_t",
+      "x": 90
+    },
+    "axis=y,down=true,east=true,north=true,south=true,up=false,west=false": {
+      "model": "buildscape:block/hollow_steel_pipe_four_way",
+      "x": 90
+    },
+    "axis=y,down=false,east=true,north=true,south=true,up=true,west=false": {
+      "model": "buildscape:block/hollow_steel_pipe_four_way",
+      "x": 270
+    },
+    "axis=y,down=true,east=true,north=true,south=true,up=true,west=false": {
+      "model": "buildscape:block/hollow_steel_pipe_five_way"
+    },
+    "axis=y,down=false,east=true,north=false,south=false,up=false,west=true": {
+      "model": "buildscape:block/hollow_steel_pipe_middle",
+      "x": 90,
+      "y": 90
+    },
+    "axis=y,down=true,east=true,north=false,south=false,up=false,west=true": {
+      "model": "buildscape:block/hollow_steel_pipe_t_vert",
+      "x": 180,
+      "y": 90
+    },
+    "axis=y,down=false,east=true,north=false,south=false,up=true,west=true": {
+      "model": "buildscape:block/hollow_steel_pipe_t_vert",
+      "y": 90
+    },
+    "axis=y,down=true,east=true,north=false,south=false,up=true,west=true": {
+      "model": "buildscape:block/hollow_steel_pipe_cross",
+      "x": 90
+    },
+    "axis=y,down=false,east=true,north=true,south=false,up=false,west=true": {
+      "model": "buildscape:block/hollow_steel_pipe_t",
+      "x": 90,
+      "y": 270
+    },
+    "axis=y,down=true,east=true,north=true,south=false,up=false,west=true": {
+      "model": "buildscape:block/hollow_steel_pipe_four_way",
+      "x": 90,
+      "y": 270
+    },
+    "axis=y,down=false,east=true,north=true,south=false,up=true,west=true": {
+      "model": "buildscape:block/hollow_steel_pipe_four_way",
+      "x": 270,
+      "y": 270
+    },
+    "axis=y,down=true,east=true,north=true,south=false,up=true,west=true": {
+      "model": "buildscape:block/hollow_steel_pipe_five_way",
+      "y": 270
+    },
+    "axis=y,down=false,east=true,north=false,south=true,up=false,west=true": {
+      "model": "buildscape:block/hollow_steel_pipe_t",
+      "x": 90,
+      "y": 90
+    },
+    "axis=y,down=true,east=true,north=false,south=true,up=false,west=true": {
+      "model": "buildscape:block/hollow_steel_pipe_four_way",
+      "x": 90,
+      "y": 90
+    },
+    "axis=y,down=false,east=true,north=false,south=true,up=true,west=true": {
+      "model": "buildscape:block/hollow_steel_pipe_four_way",
+      "x": 270,
+      "y": 90
+    },
+    "axis=y,down=true,east=true,north=false,south=true,up=true,west=true": {
+      "model": "buildscape:block/hollow_steel_pipe_five_way",
+      "y": 90
+    },
+    "axis=y,down=false,east=true,north=true,south=true,up=false,west=true": {
+      "model": "buildscape:block/hollow_steel_pipe_cross"
+    },
+    "axis=y,down=true,east=true,north=true,south=true,up=false,west=true": {
+      "model": "buildscape:block/hollow_steel_pipe_five_way_vert",
+      "x": 180
+    },
+    "axis=y,down=false,east=true,north=true,south=true,up=true,west=true": {
+      "model": "buildscape:block/hollow_steel_pipe_five_way_vert"
+    },
+    "axis=y,down=true,east=true,north=true,south=true,up=true,west=true": {
+      "model": "buildscape:block/hollow_steel_pipe_six_way"
+    },
+    "axis=z,down=false,east=false,north=false,south=false,up=false,west=false": {
+      "model": "buildscape:block/hollow_steel_pipe_single",
+      "x": 90,
+      "y": 0
+    },
+    "axis=z,down=true,east=false,north=false,south=false,up=false,west=false": {
+      "model": "buildscape:block/hollow_steel_pipe_top"
+    },
+    "axis=z,down=false,east=false,north=false,south=false,up=true,west=false": {
+      "model": "buildscape:block/hollow_steel_pipe_top",
+      "x": 180
+    },
+    "axis=z,down=true,east=false,north=false,south=false,up=true,west=false": {
+      "model": "buildscape:block/hollow_steel_pipe_middle"
+    },
+    "axis=z,down=false,east=false,north=true,south=false,up=false,west=false": {
+      "model": "buildscape:block/hollow_steel_pipe_top",
+      "x": 90,
+      "y": 180
+    },
+    "axis=z,down=true,east=false,north=true,south=false,up=false,west=false": {
+      "model": "buildscape:block/hollow_steel_pipe_corner",
+      "y": 270
+    },
+    "axis=z,down=false,east=false,north=true,south=false,up=true,west=false": {
+      "model": "buildscape:block/hollow_steel_pipe_corner",
+      "x": 180,
+      "y": 270
+    },
+    "axis=z,down=true,east=false,north=true,south=false,up=true,west=false": {
+      "model": "buildscape:block/hollow_steel_pipe_t",
+      "y": 270
+    },
+    "axis=z,down=false,east=false,north=false,south=true,up=false,west=false": {
+      "model": "buildscape:block/hollow_steel_pipe_top",
+      "x": 90
+    },
+    "axis=z,down=true,east=false,north=false,south=true,up=false,west=false": {
+      "model": "buildscape:block/hollow_steel_pipe_corner",
+      "y": 90
+    },
+    "axis=z,down=false,east=false,north=false,south=true,up=true,west=false": {
+      "model": "buildscape:block/hollow_steel_pipe_corner",
+      "x": 180,
+      "y": 90
+    },
+    "axis=z,down=true,east=false,north=false,south=true,up=true,west=false": {
+      "model": "buildscape:block/hollow_steel_pipe_t",
+      "y": 90
+    },
+    "axis=z,down=false,east=false,north=true,south=true,up=false,west=false": {
+      "model": "buildscape:block/hollow_steel_pipe_middle",
+      "x": 90
+    },
+    "axis=z,down=true,east=false,north=true,south=true,up=false,west=false": {
+      "model": "buildscape:block/hollow_steel_pipe_t_vert",
+      "x": 180
+    },
+    "axis=z,down=false,east=false,north=true,south=true,up=true,west=false": {
+      "model": "buildscape:block/hollow_steel_pipe_t_vert"
+    },
+    "axis=z,down=true,east=false,north=true,south=true,up=true,west=false": {
+      "model": "buildscape:block/hollow_steel_pipe_cross",
+      "x": 90,
+      "y": 90
+    },
+    "axis=z,down=false,east=false,north=false,south=false,up=false,west=true": {
+      "model": "buildscape:block/hollow_steel_pipe_top",
+      "x": 90,
+      "y": 90
+    },
+    "axis=z,down=true,east=false,north=false,south=false,up=false,west=true": {
+      "model": "buildscape:block/hollow_steel_pipe_corner",
+      "y": 180
+    },
+    "axis=z,down=false,east=false,north=false,south=false,up=true,west=true": {
+      "model": "buildscape:block/hollow_steel_pipe_corner",
+      "x": 180,
+      "y": 180
+    },
+    "axis=z,down=true,east=false,north=false,south=false,up=true,west=true": {
+      "model": "buildscape:block/hollow_steel_pipe_t",
+      "y": 180
+    },
+    "axis=z,down=false,east=false,north=true,south=false,up=false,west=true": {
+      "model": "buildscape:block/hollow_steel_pipe_corner",
+      "x": 90,
+      "y": 180
+    },
+    "axis=z,down=true,east=false,north=true,south=false,up=false,west=true": {
+      "model": "buildscape:block/hollow_steel_pipe_tri_corner",
+      "y": 270
+    },
+    "axis=z,down=false,east=false,north=true,south=false,up=true,west=true": {
+      "model": "buildscape:block/hollow_steel_pipe_tri_corner",
+      "x": 180,
+      "y": 180
+    },
+    "axis=z,down=true,east=false,north=true,south=false,up=true,west=true": {
+      "model": "buildscape:block/hollow_steel_pipe_four_way",
+      "y": 270
+    },
+    "axis=z,down=false,east=false,north=false,south=true,up=false,west=true": {
+      "model": "buildscape:block/hollow_steel_pipe_corner",
+      "x": 90,
+      "y": 90
+    },
+    "axis=z,down=true,east=false,north=false,south=true,up=false,west=true": {
+      "model": "buildscape:block/hollow_steel_pipe_tri_corner",
+      "y": 180
+    },
+    "axis=z,down=false,east=false,north=false,south=true,up=true,west=true": {
+      "model": "buildscape:block/hollow_steel_pipe_tri_corner",
+      "x": 180,
+      "y": 90
+    },
+    "axis=z,down=true,east=false,north=false,south=true,up=true,west=true": {
+      "model": "buildscape:block/hollow_steel_pipe_four_way",
+      "y": 180
+    },
+    "axis=z,down=false,east=false,north=true,south=true,up=false,west=true": {
+      "model": "buildscape:block/hollow_steel_pipe_t",
+      "x": 90,
+      "y": 180
+    },
+    "axis=z,down=true,east=false,north=true,south=true,up=false,west=true": {
+      "model": "buildscape:block/hollow_steel_pipe_four_way",
+      "x": 90,
+      "y": 180
+    },
+    "axis=z,down=false,east=false,north=true,south=true,up=true,west=true": {
+      "model": "buildscape:block/hollow_steel_pipe_four_way",
+      "x": 270,
+      "y": 180
+    },
+    "axis=z,down=true,east=false,north=true,south=true,up=true,west=true": {
+      "model": "buildscape:block/hollow_steel_pipe_five_way",
+      "y": 180
+    },
+    "axis=z,down=false,east=true,north=false,south=false,up=false,west=false": {
+      "model": "buildscape:block/hollow_steel_pipe_top",
+      "x": 90,
+      "y": 270
+    },
+    "axis=z,down=true,east=true,north=false,south=false,up=false,west=false": {
+      "model": "buildscape:block/hollow_steel_pipe_corner"
+    },
+    "axis=z,down=false,east=true,north=false,south=false,up=true,west=false": {
+      "model": "buildscape:block/hollow_steel_pipe_corner",
+      "x": 180
+    },
+    "axis=z,down=true,east=true,north=false,south=false,up=true,west=false": {
+      "model": "buildscape:block/hollow_steel_pipe_t"
+    },
+    "axis=z,down=false,east=true,north=true,south=false,up=false,west=false": {
+      "model": "buildscape:block/hollow_steel_pipe_corner",
+      "x": 90,
+      "y": 270
+    },
+    "axis=z,down=true,east=true,north=true,south=false,up=false,west=false": {
+      "model": "buildscape:block/hollow_steel_pipe_tri_corner"
+    },
+    "axis=z,down=false,east=true,north=true,south=false,up=true,west=false": {
+      "model": "buildscape:block/hollow_steel_pipe_tri_corner",
+      "x": 180,
+      "y": 270
+    },
+    "axis=z,down=true,east=true,north=true,south=false,up=true,west=false": {
+      "model": "buildscape:block/hollow_steel_pipe_four_way"
+    },
+    "axis=z,down=false,east=true,north=false,south=true,up=false,west=false": {
+      "model": "buildscape:block/hollow_steel_pipe_corner",
+      "x": 90
+    },
+    "axis=z,down=true,east=true,north=false,south=true,up=false,west=false": {
+      "model": "buildscape:block/hollow_steel_pipe_tri_corner",
+      "y": 90
+    },
+    "axis=z,down=false,east=true,north=false,south=true,up=true,west=false": {
+      "model": "buildscape:block/hollow_steel_pipe_tri_corner",
+      "x": 180
+    },
+    "axis=z,down=true,east=true,north=false,south=true,up=true,west=false": {
+      "model": "buildscape:block/hollow_steel_pipe_four_way",
+      "y": 90
+    },
+    "axis=z,down=false,east=true,north=true,south=true,up=false,west=false": {
+      "model": "buildscape:block/hollow_steel_pipe_t",
+      "x": 90
+    },
+    "axis=z,down=true,east=true,north=true,south=true,up=false,west=false": {
+      "model": "buildscape:block/hollow_steel_pipe_four_way",
+      "x": 90
+    },
+    "axis=z,down=false,east=true,north=true,south=true,up=true,west=false": {
+      "model": "buildscape:block/hollow_steel_pipe_four_way",
+      "x": 270
+    },
+    "axis=z,down=true,east=true,north=true,south=true,up=true,west=false": {
+      "model": "buildscape:block/hollow_steel_pipe_five_way"
+    },
+    "axis=z,down=false,east=true,north=false,south=false,up=false,west=true": {
+      "model": "buildscape:block/hollow_steel_pipe_middle",
+      "x": 90,
+      "y": 90
+    },
+    "axis=z,down=true,east=true,north=false,south=false,up=false,west=true": {
+      "model": "buildscape:block/hollow_steel_pipe_t_vert",
+      "x": 180,
+      "y": 90
+    },
+    "axis=z,down=false,east=true,north=false,south=false,up=true,west=true": {
+      "model": "buildscape:block/hollow_steel_pipe_t_vert",
+      "y": 90
+    },
+    "axis=z,down=true,east=true,north=false,south=false,up=true,west=true": {
+      "model": "buildscape:block/hollow_steel_pipe_cross",
+      "x": 90
+    },
+    "axis=z,down=false,east=true,north=true,south=false,up=false,west=true": {
+      "model": "buildscape:block/hollow_steel_pipe_t",
+      "x": 90,
+      "y": 270
+    },
+    "axis=z,down=true,east=true,north=true,south=false,up=false,west=true": {
+      "model": "buildscape:block/hollow_steel_pipe_four_way",
+      "x": 90,
+      "y": 270
+    },
+    "axis=z,down=false,east=true,north=true,south=false,up=true,west=true": {
+      "model": "buildscape:block/hollow_steel_pipe_four_way",
+      "x": 270,
+      "y": 270
+    },
+    "axis=z,down=true,east=true,north=true,south=false,up=true,west=true": {
+      "model": "buildscape:block/hollow_steel_pipe_five_way",
+      "y": 270
+    },
+    "axis=z,down=false,east=true,north=false,south=true,up=false,west=true": {
+      "model": "buildscape:block/hollow_steel_pipe_t",
+      "x": 90,
+      "y": 90
+    },
+    "axis=z,down=true,east=true,north=false,south=true,up=false,west=true": {
+      "model": "buildscape:block/hollow_steel_pipe_four_way",
+      "x": 90,
+      "y": 90
+    },
+    "axis=z,down=false,east=true,north=false,south=true,up=true,west=true": {
+      "model": "buildscape:block/hollow_steel_pipe_four_way",
+      "x": 270,
+      "y": 90
+    },
+    "axis=z,down=true,east=true,north=false,south=true,up=true,west=true": {
+      "model": "buildscape:block/hollow_steel_pipe_five_way",
+      "y": 90
+    },
+    "axis=z,down=false,east=true,north=true,south=true,up=false,west=true": {
+      "model": "buildscape:block/hollow_steel_pipe_cross"
+    },
+    "axis=z,down=true,east=true,north=true,south=true,up=false,west=true": {
+      "model": "buildscape:block/hollow_steel_pipe_five_way_vert",
+      "x": 180
+    },
+    "axis=z,down=false,east=true,north=true,south=true,up=true,west=true": {
+      "model": "buildscape:block/hollow_steel_pipe_five_way_vert"
+    },
+    "axis=z,down=true,east=true,north=true,south=true,up=true,west=true": {
+      "model": "buildscape:block/hollow_steel_pipe_six_way"
+    }
   }
 }

@@ -5,7 +5,6 @@ import com.kingodogo.buildscape.recipe.ConfettiConfigureRecipe;
 import com.kingodogo.buildscape.recipe.ShapedDurabilityRecipe;
 import com.kingodogo.buildscape.recipe.ShapelessDurabilityRecipe;
 import com.kingodogo.buildscape.recipe.framework.parser.RecipeIR;
-import com.kingodogo.buildscape.recipe.framework.util.IngredientCache;
 import com.kingodogo.buildscape.recipe.framework.validation.RecipeValidator;
 import net.minecraft.core.NonNullList;
 import net.minecraft.resources.ResourceLocation;
@@ -140,10 +139,12 @@ public class BuildScapeRecipeCompiler {
             }
             case "shaped_durability", "buildscape:shaped_durability" -> {
                 ShapedRecipe base = compileShaped(recipeId, group, spec, resultStack);
+                if (base == null) return null;
                 return new ShapedDurabilityRecipe(base.getId(), base.getGroup(), base.getWidth(), base.getHeight(), base.getIngredients(), base.getResultItem(), 1);
             }
             case "shapeless_durability", "buildscape:shapeless_durability" -> {
                 ShapelessRecipe base = compileShapeless(recipeId, group, spec, resultStack);
+                if (base == null) return null;
                 return new ShapelessDurabilityRecipe(base.getId(), base.getGroup(), base.getResultItem(), base.getIngredients(), 1);
             }
             case "stonecutting" -> {
@@ -181,6 +182,7 @@ public class BuildScapeRecipeCompiler {
 
     private ShapedRecipe compileShaped(ResourceLocation id, String group, RecipeIR.RecipeSpec spec, ItemStack result) {
         List<String> patternList = spec.pattern();
+        if (patternList == null || patternList.isEmpty()) return null;
         int height = patternList.size();
         int width = 0;
         for (String line : patternList) {

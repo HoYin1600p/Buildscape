@@ -1804,6 +1804,11 @@ public class BuildScape {
                                 .get(),
                         net.minecraft.client.renderer.blockentity.SignRenderer::new);
 
+                net.minecraft.client.renderer.blockentity.BlockEntityRenderers.register(
+                        com.kingodogo.buildscape.block.ModBlockEntities.HOLLOW_LOG_BLOCK_ENTITY
+                                .get(),
+                        com.kingodogo.buildscape.client.renderer.HollowLogBlockEntityRenderer::new);
+
                 net.minecraft.client.renderer.entity.EntityRenderers.register(
                         com.kingodogo.buildscape.entity.ModEntities.FALLING_ICICLE.get(),
                         com.kingodogo.buildscape.client.renderer.FallingIcicleRenderer::new);

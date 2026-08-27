@@ -93,7 +93,18 @@ mixin {
 }
 
 
-sourceSets.main.resources { srcDir 'src/generated/resources' }
+sourceSets {
+    main {
+        resources { srcDir 'src/generated/resources' }
+    }
+    benchmark {
+        java {
+            srcDir 'tools/benchmark'
+        }
+        compileClasspath += sourceSets.main.output + sourceSets.main.compileClasspath
+        runtimeClasspath += sourceSets.main.output + sourceSets.main.runtimeClasspath
+    }
+}
 
 repositories {
     maven { url = 'https://maven.blamejared.com' } // JEI
@@ -166,12 +177,12 @@ tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
 }
 
+tasks.register('runBenchmarks', JavaExec) {
+    classpath = sourceSets.benchmark.runtimeClasspath
+    mainClass = 'tools.benchmark.BenchmarkSuite'
+}
 
-
-
-
-
-
-
-
-
+tasks.register('runBDREBenchmark', JavaExec) {
+    classpath = sourceSets.benchmark.runtimeClasspath
+    mainClass = 'tools.benchmark.BenchmarkSuite'
+}

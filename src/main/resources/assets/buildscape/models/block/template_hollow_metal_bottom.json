@@ -1,6 +1,6 @@
 {
 	"format_version": "1.18.2",
-	"credit": "Made with Blockbench",
+	"credit": "Buildscape Bottom Pipe Template",
 	"parent": "block/block",
 	"textures": {
 		"particle": "#side"
@@ -14,7 +14,6 @@
 				"east": {"uv": [14, 0, 16, 16], "texture": "#side", "cullface": "east"},
 				"south": {"uv": [0, 0, 16, 16], "texture": "#side"},
 				"west": {"uv": [0, 0, 2, 16], "texture": "#side", "cullface": "west"},
-				"up": {"uv": [0, 0, 16, 2], "texture": "#hole", "cullface": "up"},
 				"down": {"uv": [0, 14, 16, 16], "texture": "#hole", "cullface": "down"}
 			}
 		},
@@ -26,7 +25,6 @@
 				"east": {"uv": [0, 0, 2, 16], "texture": "#side", "cullface": "east"},
 				"south": {"uv": [0, 0, 16, 16], "texture": "#side", "cullface": "south"},
 				"west": {"uv": [14, 0, 16, 16], "texture": "#side", "cullface": "west"},
-				"up": {"uv": [0, 14, 16, 16], "texture": "#hole", "cullface": "up"},
 				"down": {"uv": [0, 0, 16, 2], "texture": "#hole", "cullface": "down"}
 			}
 		},
@@ -36,7 +34,6 @@
 			"faces": {
 				"east": {"uv": [2, 0, 14, 16], "texture": "#side", "cullface": "east"},
 				"west": {"uv": [2, 0, 14, 16], "texture": "#side"},
-				"up": {"uv": [14, 2, 16, 14], "texture": "#hole", "cullface": "up"},
 				"down": {"uv": [14, 2, 16, 14], "texture": "#hole", "cullface": "down"}
 			}
 		},
@@ -46,7 +43,6 @@
 			"faces": {
 				"east": {"uv": [2, 0, 14, 16], "texture": "#side"},
 				"west": {"uv": [2, 0, 14, 16], "texture": "#side", "cullface": "west"},
-				"up": {"uv": [0, 2, 2, 14], "texture": "#hole", "cullface": "up"},
 				"down": {"uv": [0, 2, 2, 14], "texture": "#hole", "cullface": "down"}
 			}
 		}

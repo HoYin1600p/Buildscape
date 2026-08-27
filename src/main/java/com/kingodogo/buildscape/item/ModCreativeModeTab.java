@@ -2991,6 +2991,10 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.QUARTZ_BRICKS_SLAB.get()));
             items.add(new ItemStack(ModItems.QUARTZ_BRICKS_VERTICAL_SLAB.get()));
             items.add(new ItemStack(ModItems.QUARTZ_BRICKS_WALL.get()));
+            items.add(new ItemStack(ModItems.QUARTZ_PILLAR_STAIRS.get()));
+            items.add(new ItemStack(ModItems.QUARTZ_PILLAR_SLAB.get()));
+            items.add(new ItemStack(ModItems.QUARTZ_PILLAR_VERTICAL_SLAB.get()));
+            items.add(new ItemStack(ModItems.QUARTZ_PILLAR_WALL.get()));
             items.add(new ItemStack(ModItems.SMOOTH_SANDSTONE_WALL.get()));
             items.add(new ItemStack(ModItems.PRISMARINE_BRICKS_WALL.get()));
             items.add(new ItemStack(ModItems.DARK_PRISMARINE_WALL.get()));

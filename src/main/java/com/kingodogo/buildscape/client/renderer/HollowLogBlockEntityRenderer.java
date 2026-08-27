@@ -27,7 +27,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.FlowerPotBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
-import net.minecraft.world.level.material.Fluids;
 import net.minecraftforge.client.model.data.EmptyModelData;
 
 import java.util.Collections;
@@ -90,10 +89,7 @@ public class HollowLogBlockEntityRenderer implements BlockEntityRenderer<HollowL
         Fluid fluid = null;
         if (isLavaLogged || "lava".equals(fluidType)) {
             fluid = net.minecraft.world.level.material.Fluids.LAVA;
-        } else if (isWaterLogged || hasTransportWater) {
-            // NOTE: "water".equals(fluidType) is intentionally excluded here.
-            // Transport water state lives in pipeFlowState.hasWater(), not fluidType.
-            // fluidType="water" is no longer set by the transport system (it was the source bug).
+        } else if (isWaterLogged || hasTransportWater || "water".equals(fluidType)) {
             fluid = net.minecraft.world.level.material.Fluids.WATER;
         } else if ("experience".equals(fluidType) || "buildscape:experience_still".equals(fluidType) || "buildscape:experience".equals(fluidType)) {
             fluid = com.kingodogo.buildscape.fluid.ModFluids.EXPERIENCE_STILL.get();
@@ -326,22 +322,6 @@ public class HollowLogBlockEntityRenderer implements BlockEntityRenderer<HollowL
                         primaryFlow, yUpstream, yDownstream, sprite, color, light, overlay);
             }
 
-            // Render the terminal water tip one block beyond the pipe without creating
-            // a world fluid block. This is the vanilla level-7 end segment and remains
-            // stable while the server transport state is recalculated.
-            // An isolated source pipe is equivalent to a vanilla waterlogged block:
-            // it must not create an artificial outlet on its first open face. Only
-            // downstream pipes (distance > 0) render the terminal one-block tip.
-            if (flowState != null && flowState.hasWater() && flowState.isOpenEndpoint()
-                    && flowState.getDistance() > 0) {
-                for (Direction direction : flowState.getFlowDirections()) {
-                    if (direction.getAxis().isHorizontal()
-                            && HollowPipeBlock.isOpenEndpoint(blockState, direction)
-                            && isValidOutletTarget(level, pos, direction)) {
-                        renderFluidOutlet(direction, poseStack, buffer, sprite, color, light, overlay);
-                    }
-                }
-            }
         } else {
             Direction.Axis axis = blockState.hasProperty(HollowLogBlock.AXIS) ? blockState.getValue(HollowLogBlock.AXIS) : Direction.Axis.Y;
             renderStraightFluid(axis, false, false, false, false, false, false, null, 0.8125F, 0.8125F, poseStack, buffer, sprite, color, light, overlay);
@@ -364,34 +344,6 @@ public class HollowLogBlockEntityRenderer implements BlockEntityRenderer<HollowL
         return false;
     }
 
-    private static boolean isValidOutletTarget(Level level, BlockPos pos, Direction direction) {
-        BlockState target = level.getBlockState(pos.relative(direction));
-        if (target.isAir() || target.canBeReplaced(Fluids.WATER)) return true;
-        if (target.getBlock() instanceof HollowPipeBlock) {
-            return HollowPipeBlock.isOpenEndpoint(target, direction.getOpposite());
-        }
-        return false;
-    }
-
-    private static void renderFluidOutlet(Direction direction, PoseStack poseStack, VertexConsumer buffer,
-            TextureAtlasSprite sprite, int color, int light, int overlay) {
-        final float LOW = 0.125F;
-        final float TIP = 0.1875F;
-        final float MIN = 0.125F;
-        final float MAX = 0.875F;
-        switch (direction) {
-            case EAST -> renderFluidBox(poseStack, buffer, Direction.Axis.X, 1.0F, LOW, MIN, 2.0F, TIP, MAX,
-                    true, false, false, false, false, false, direction, TIP, TIP, sprite, color, light, overlay);
-            case WEST -> renderFluidBox(poseStack, buffer, Direction.Axis.X, -1.0F, LOW, MIN, 0.0F, TIP, MAX,
-                    false, true, false, false, false, false, direction, TIP, TIP, sprite, color, light, overlay);
-            case SOUTH -> renderFluidBox(poseStack, buffer, Direction.Axis.Z, MIN, LOW, 1.0F, MAX, TIP, 2.0F,
-                    false, false, true, false, false, false, direction, TIP, TIP, sprite, color, light, overlay);
-            case NORTH -> renderFluidBox(poseStack, buffer, Direction.Axis.Z, MIN, LOW, -1.0F, MAX, TIP, 0.0F,
-                    false, false, false, true, false, false, direction, TIP, TIP, sprite, color, light, overlay);
-            default -> { }
-        }
-    }
-
     /**
      * Returns the primary flow direction for slope calculations.
      * READ-ONLY: reads flowState.getFlowDirections() without modifying it.
@@ -400,6 +352,14 @@ public class HollowLogBlockEntityRenderer implements BlockEntityRenderer<HollowL
     private static Direction getPrimaryFlowDirection(PipeFlowState flowState, BlockState blockState,
             boolean connDown, boolean connUp, boolean connNorth, boolean connSouth, boolean connWest, boolean connEast) {
         if (flowState != null && !flowState.getFlowDirections().isEmpty()) {
+            // The physical open end is the downstream end. Prefer it over the
+            // EnumSet iteration order, which is not a valid flow ordering at a
+            // branch/junction and caused slopes to point sideways.
+            for (Direction dir : flowState.getFlowDirections()) {
+                if (dir.getAxis().isHorizontal() && HollowPipeBlock.isOpenEndpoint(blockState, dir)) {
+                    return dir;
+                }
+            }
             // Priority: first horizontal flow direction, then down, then up
             for (Direction dir : flowState.getFlowDirections()) {
                 if (dir.getAxis().isHorizontal()) return dir;
@@ -576,48 +536,83 @@ public class HollowLogBlockEntityRenderer implements BlockEntityRenderer<HollowL
             addVertex(matrix, buffer, x1, topNW, z1, r, g, b, a, u0, v0, light, overlay, 0, -1, 0);
         }
 
-        // 2. Bottom face (-Y) — only rendered if vertical pipe is open downwards
-        if (axis == Direction.Axis.Y && !connDown) {
+        // 2. Bottom face (-Y) — double-sided when vertical pipe is open downwards
+        if ((axis == Direction.Axis.Y || axis == null) && !connDown) {
+            // Outward bottom (-Y)
             addVertex(matrix, buffer, x1, y1, z2, r, g, b, a, u0, v1, light, overlay, 0, -1, 0);
             addVertex(matrix, buffer, x2, y1, z2, r, g, b, a, u1, v1, light, overlay, 0, -1, 0);
             addVertex(matrix, buffer, x2, y1, z1, r, g, b, a, u1, v0, light, overlay, 0, -1, 0);
             addVertex(matrix, buffer, x1, y1, z1, r, g, b, a, u0, v0, light, overlay, 0, -1, 0);
+
+            // Inward floor (+Y)
+            addVertex(matrix, buffer, x1, y1, z1, r, g, b, a, u0, v0, light, overlay, 0, 1, 0);
+            addVertex(matrix, buffer, x2, y1, z1, r, g, b, a, u1, v0, light, overlay, 0, 1, 0);
+            addVertex(matrix, buffer, x2, y1, z2, r, g, b, a, u1, v1, light, overlay, 0, 1, 0);
+            addVertex(matrix, buffer, x1, y1, z2, r, g, b, a, u0, v1, light, overlay, 0, 1, 0);
         }
 
-        // 3. North face (-Z) — open end-cap for Z-axis pipes or junctions
+        // 3. North face (-Z) — open end-cap for Z-axis pipes or junctions, rendered double-sided
         if ((axis == Direction.Axis.Z || axis == null) && !connNorth) {
             float topW = topNW, topE = topNE;
+            // Outward North (-Z)
             addVertex(matrix, buffer, x2, topE, z1, r, g, b, a, u1, v0, light, overlay, 0, 0, -1);
             addVertex(matrix, buffer, x1, topW, z1, r, g, b, a, u0, v0, light, overlay, 0, 0, -1);
             addVertex(matrix, buffer, x1, y1,   z1, r, g, b, a, u0, v1, light, overlay, 0, 0, -1);
             addVertex(matrix, buffer, x2, y1,   z1, r, g, b, a, u1, v1, light, overlay, 0, 0, -1);
+
+            // Inward North (+Z)
+            addVertex(matrix, buffer, x2, y1,   z1, r, g, b, a, u1, v1, light, overlay, 0, 0, 1);
+            addVertex(matrix, buffer, x1, y1,   z1, r, g, b, a, u0, v1, light, overlay, 0, 0, 1);
+            addVertex(matrix, buffer, x1, topW, z1, r, g, b, a, u0, v0, light, overlay, 0, 0, 1);
+            addVertex(matrix, buffer, x2, topE, z1, r, g, b, a, u1, v0, light, overlay, 0, 0, 1);
         }
 
-        // 4. South face (+Z) — open end-cap for Z-axis pipes or junctions
+        // 4. South face (+Z) — open end-cap for Z-axis pipes or junctions, rendered double-sided
         if ((axis == Direction.Axis.Z || axis == null) && !connSouth) {
             float topW = topSW, topE = topSE;
+            // Outward South (+Z)
             addVertex(matrix, buffer, x1, topW, z2, r, g, b, a, u0, v0, light, overlay, 0, 0, 1);
             addVertex(matrix, buffer, x2, topE, z2, r, g, b, a, u1, v0, light, overlay, 0, 0, 1);
             addVertex(matrix, buffer, x2, y1,   z2, r, g, b, a, u1, v1, light, overlay, 0, 0, 1);
             addVertex(matrix, buffer, x1, y1,   z2, r, g, b, a, u0, v1, light, overlay, 0, 0, 1);
+
+            // Inward South (-Z)
+            addVertex(matrix, buffer, x1, y1,   z2, r, g, b, a, u0, v1, light, overlay, 0, 0, -1);
+            addVertex(matrix, buffer, x2, y1,   z2, r, g, b, a, u1, v1, light, overlay, 0, 0, -1);
+            addVertex(matrix, buffer, x2, topE, z2, r, g, b, a, u1, v0, light, overlay, 0, 0, -1);
+            addVertex(matrix, buffer, x1, topW, z2, r, g, b, a, u0, v0, light, overlay, 0, 0, -1);
         }
 
-        // 5. West face (-X) — open end-cap for X-axis pipes or junctions
+        // 5. West face (-X) — open end-cap for X-axis pipes or junctions, rendered double-sided
         if ((axis == Direction.Axis.X || axis == null) && !connWest) {
             float topN = topNW, topS = topSW;
+            // Outward West (-X)
             addVertex(matrix, buffer, x1, topN, z1, r, g, b, a, u0, v0, light, overlay, -1, 0, 0);
             addVertex(matrix, buffer, x1, topS, z2, r, g, b, a, u1, v0, light, overlay, -1, 0, 0);
             addVertex(matrix, buffer, x1, y1,   z2, r, g, b, a, u1, v1, light, overlay, -1, 0, 0);
             addVertex(matrix, buffer, x1, y1,   z1, r, g, b, a, u0, v1, light, overlay, -1, 0, 0);
+
+            // Inward West (+X)
+            addVertex(matrix, buffer, x1, y1,   z1, r, g, b, a, u0, v1, light, overlay, 1, 0, 0);
+            addVertex(matrix, buffer, x1, y1,   z2, r, g, b, a, u1, v1, light, overlay, 1, 0, 0);
+            addVertex(matrix, buffer, x1, topS, z2, r, g, b, a, u1, v0, light, overlay, 1, 0, 0);
+            addVertex(matrix, buffer, x1, topN, z1, r, g, b, a, u0, v0, light, overlay, 1, 0, 0);
         }
 
-        // 6. East face (+X) — open end-cap for X-axis pipes or junctions
+        // 6. East face (+X) — open end-cap for X-axis pipes or junctions, rendered double-sided
         if ((axis == Direction.Axis.X || axis == null) && !connEast) {
             float topN = topNE, topS = topSE;
+            // Outward East (+X)
             addVertex(matrix, buffer, x2, topS, z2, r, g, b, a, u0, v0, light, overlay, 1, 0, 0);
             addVertex(matrix, buffer, x2, topN, z1, r, g, b, a, u1, v0, light, overlay, 1, 0, 0);
             addVertex(matrix, buffer, x2, y1,   z1, r, g, b, a, u1, v1, light, overlay, 1, 0, 0);
             addVertex(matrix, buffer, x2, y1,   z2, r, g, b, a, u0, v1, light, overlay, 1, 0, 0);
+
+            // Inward East (-X)
+            addVertex(matrix, buffer, x2, y1,   z2, r, g, b, a, u0, v1, light, overlay, -1, 0, 0);
+            addVertex(matrix, buffer, x2, y1,   z1, r, g, b, a, u1, v1, light, overlay, -1, 0, 0);
+            addVertex(matrix, buffer, x2, topN, z1, r, g, b, a, u1, v0, light, overlay, -1, 0, 0);
+            addVertex(matrix, buffer, x2, topS, z2, r, g, b, a, u0, v0, light, overlay, -1, 0, 0);
         }
 
 

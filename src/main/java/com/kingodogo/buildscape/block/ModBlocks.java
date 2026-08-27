@@ -1859,6 +1859,26 @@ public class ModBlocks {
                                                         .strength(0.8f)
                                                         .requiresCorrectToolForDrops()
                                                         .sound(net.minecraft.world.level.block.SoundType.STONE)));
+        public static final RegistryObject<Block> QUARTZ_PILLAR_STAIRS = BLOCKS.register("quartz_pillar_stairs",
+                        () -> new ModStairBlock(
+                                        Blocks.QUARTZ_PILLAR.defaultBlockState(),
+                                        BlockBehaviour.Properties.of(Material.STONE, MaterialColor.QUARTZ)
+                                                        .strength(0.8f)
+                                                        .requiresCorrectToolForDrops()
+                                                        .sound(net.minecraft.world.level.block.SoundType.STONE)));
+        public static final RegistryObject<Block> QUARTZ_PILLAR_SLAB = BLOCKS.register("quartz_pillar_slab",
+                        () -> new ModSlabBlock(
+                                        Blocks.QUARTZ_PILLAR,
+                                        BlockBehaviour.Properties.of(Material.STONE, MaterialColor.QUARTZ)
+                                                        .strength(0.8f)
+                                                        .requiresCorrectToolForDrops()
+                                                        .sound(net.minecraft.world.level.block.SoundType.STONE)));
+        public static final RegistryObject<Block> QUARTZ_PILLAR_WALL = BLOCKS.register("quartz_pillar_wall",
+                        () -> new WallBlock(
+                                        BlockBehaviour.Properties.of(Material.STONE, MaterialColor.QUARTZ)
+                                                        .strength(0.8f)
+                                                        .requiresCorrectToolForDrops()
+                                                        .sound(net.minecraft.world.level.block.SoundType.STONE)));
         public static final RegistryObject<Block> CALCITE_STAIRS = BLOCKS.register(
                         "calcite_stairs",
                         () -> new ModStairBlock(
@@ -9311,6 +9331,11 @@ public class ModBlocks {
                         () -> new VerticalSlabBlock(
                                         Blocks.QUARTZ_BRICKS,
                                         BlockBehaviour.Properties.copy(QUARTZ_BRICKS_SLAB.get())));
+        public static final RegistryObject<Block> QUARTZ_PILLAR_VERTICAL_SLAB = BLOCKS.register(
+                        "quartz_pillar_vertical_slab",
+                        () -> new VerticalSlabBlock(
+                                        Blocks.QUARTZ_PILLAR,
+                                        BlockBehaviour.Properties.copy(QUARTZ_PILLAR_SLAB.get())));
         public static final RegistryObject<Block> CALCITE_VERTICAL_SLAB = BLOCKS.register("calcite_vertical_slab",
                         () -> new VerticalSlabBlock(
                                         Blocks.CALCITE,
@@ -12177,6 +12202,64 @@ public class ModBlocks {
         public static final RegistryObject<Block> GOLDEN_DANDELION = BLOCKS.register("golden_dandelion",
                         () -> new GoldenDandelionBlock(BlockBehaviour.Properties.copy(Blocks.DANDELION)));
 
+        // --- POTTED PLANTS & FLOWERS ---
+        public static final RegistryObject<Block> POTTED_CLOSED_EYEBLOSSOM = BLOCKS.register("potted_closed_eyeblossom",
+                        () -> new FlowerPotBlock(() -> (FlowerPotBlock) Blocks.FLOWER_POT, CLOSED_EYEBLOSSOM, BlockBehaviour.Properties.copy(Blocks.POTTED_POPPY)));
+        public static final RegistryObject<Block> POTTED_OPEN_EYEBLOSSOM = BLOCKS.register("potted_open_eyeblossom",
+                        () -> new FlowerPotBlock(() -> (FlowerPotBlock) Blocks.FLOWER_POT, OPEN_EYEBLOSSOM, BlockBehaviour.Properties.copy(Blocks.POTTED_POPPY).lightLevel(state -> 7)));
+        public static final RegistryObject<Block> POTTED_GOLDEN_DANDELION = BLOCKS.register("potted_golden_dandelion",
+                        () -> new FlowerPotBlock(() -> (FlowerPotBlock) Blocks.FLOWER_POT, GOLDEN_DANDELION, BlockBehaviour.Properties.copy(Blocks.POTTED_POPPY)));
+        public static final RegistryObject<Block> POTTED_CACTUS_FLOWER = BLOCKS.register("potted_cactus_flower",
+                        () -> new FlowerPotBlock(() -> (FlowerPotBlock) Blocks.FLOWER_POT, CACTUS_FLOWER, BlockBehaviour.Properties.copy(Blocks.POTTED_POPPY)));
+        public static final RegistryObject<Block> POTTED_BUSH = BLOCKS.register("potted_bush",
+                        () -> new FlowerPotBlock(() -> (FlowerPotBlock) Blocks.FLOWER_POT, BUSH, BlockBehaviour.Properties.copy(Blocks.POTTED_POPPY)));
+        public static final RegistryObject<Block> POTTED_RED_BUSH = BLOCKS.register("potted_red_bush",
+                        () -> new FlowerPotBlock(() -> (FlowerPotBlock) Blocks.FLOWER_POT, RED_BUSH, BlockBehaviour.Properties.copy(Blocks.POTTED_POPPY)));
+        public static final RegistryObject<Block> POTTED_FIREFLY_BUSH = BLOCKS.register("potted_firefly_bush",
+                        () -> new FlowerPotBlock(() -> (FlowerPotBlock) Blocks.FLOWER_POT, FIREFLY_BUSH, BlockBehaviour.Properties.copy(Blocks.POTTED_POPPY).lightLevel(state -> 2)));
+        public static final RegistryObject<Block> POTTED_DRY_GRASS = BLOCKS.register("potted_dry_grass",
+                        () -> new FlowerPotBlock(() -> (FlowerPotBlock) Blocks.FLOWER_POT, DRY_GRASS, BlockBehaviour.Properties.copy(Blocks.POTTED_POPPY)));
+        public static final RegistryObject<Block> POTTED_FROST_ROSE = BLOCKS.register("potted_frost_rose",
+                        () -> new FlowerPotBlock(() -> (FlowerPotBlock) Blocks.FLOWER_POT, FROST_ROSE, BlockBehaviour.Properties.copy(Blocks.POTTED_POPPY)));
+        public static final RegistryObject<Block> POTTED_RED_MONETS = BLOCKS.register("potted_red_monets",
+                        () -> new FlowerPotBlock(() -> (FlowerPotBlock) Blocks.FLOWER_POT, RED_MONETS, BlockBehaviour.Properties.copy(Blocks.POTTED_POPPY)));
+        public static final RegistryObject<Block> POTTED_BLUE_MONETS = BLOCKS.register("potted_blue_monets",
+                        () -> new FlowerPotBlock(() -> (FlowerPotBlock) Blocks.FLOWER_POT, BLUE_MONETS, BlockBehaviour.Properties.copy(Blocks.POTTED_POPPY)));
+        public static final RegistryObject<Block> POTTED_PURPLE_MONETS = BLOCKS.register("potted_purple_monets",
+                        () -> new FlowerPotBlock(() -> (FlowerPotBlock) Blocks.FLOWER_POT, PURPLE_MONETS, BlockBehaviour.Properties.copy(Blocks.POTTED_POPPY)));
+        public static final RegistryObject<Block> POTTED_LIGHT_BLUE_MONETS = BLOCKS.register("potted_light_blue_monets",
+                        () -> new FlowerPotBlock(() -> (FlowerPotBlock) Blocks.FLOWER_POT, LIGHT_BLUE_MONETS, BlockBehaviour.Properties.copy(Blocks.POTTED_POPPY)));
+        public static final RegistryObject<Block> POTTED_PINK_MONETS = BLOCKS.register("potted_pink_monets",
+                        () -> new FlowerPotBlock(() -> (FlowerPotBlock) Blocks.FLOWER_POT, PINK_MONETS, BlockBehaviour.Properties.copy(Blocks.POTTED_POPPY)));
+        public static final RegistryObject<Block> POTTED_YELLOW_MONETS = BLOCKS.register("potted_yellow_monets",
+                        () -> new FlowerPotBlock(() -> (FlowerPotBlock) Blocks.FLOWER_POT, YELLOW_MONETS, BlockBehaviour.Properties.copy(Blocks.POTTED_POPPY)));
+        public static final RegistryObject<Block> POTTED_POPLAR_SAPLING = BLOCKS.register("potted_poplar_sapling",
+                        () -> new FlowerPotBlock(() -> (FlowerPotBlock) Blocks.FLOWER_POT, POPLAR_SAPLING, BlockBehaviour.Properties.copy(Blocks.POTTED_POPPY)));
+        public static final RegistryObject<Block> POTTED_PALE_OAK_SAPLING = BLOCKS.register("potted_pale_oak_sapling",
+                        () -> new FlowerPotBlock(() -> (FlowerPotBlock) Blocks.FLOWER_POT, PALE_OAK_SAPLING, BlockBehaviour.Properties.copy(Blocks.POTTED_POPPY)));
+        public static final RegistryObject<Block> POTTED_CHERRY_SAPLING = BLOCKS.register("potted_cherry_sapling",
+                        () -> new FlowerPotBlock(() -> (FlowerPotBlock) Blocks.FLOWER_POT, CHERRY_SAPLING, BlockBehaviour.Properties.copy(Blocks.POTTED_POPPY)));
+        public static final RegistryObject<Block> POTTED_MANGROVE_PROPAGULE = BLOCKS.register("potted_mangrove_propagule",
+                        () -> new FlowerPotBlock(() -> (FlowerPotBlock) Blocks.FLOWER_POT, MANGROVE_PROPAGULE, BlockBehaviour.Properties.copy(Blocks.POTTED_POPPY)));
+        public static final RegistryObject<Block> POTTED_WILDFLOWERS = BLOCKS.register("potted_wildflowers",
+                        () -> new FlowerPotBlock(() -> (FlowerPotBlock) Blocks.FLOWER_POT, WILDFLOWERS, BlockBehaviour.Properties.copy(Blocks.POTTED_POPPY)));
+        public static final RegistryObject<Block> POTTED_CLOVER = BLOCKS.register("potted_clover",
+                        () -> new FlowerPotBlock(() -> (FlowerPotBlock) Blocks.FLOWER_POT, CLOVER, BlockBehaviour.Properties.copy(Blocks.POTTED_POPPY)));
+        public static final RegistryObject<Block> POTTED_LEAF_LITTER = BLOCKS.register("potted_leaf_litter",
+                        () -> new FlowerPotBlock(() -> (FlowerPotBlock) Blocks.FLOWER_POT, LEAF_LITTER, BlockBehaviour.Properties.copy(Blocks.POTTED_POPPY)));
+        public static final RegistryObject<Block> POTTED_TALL_DRY_GRASS = BLOCKS.register("potted_tall_dry_grass",
+                        () -> new FlowerPotBlock(() -> (FlowerPotBlock) Blocks.FLOWER_POT, TALL_DRY_GRASS, BlockBehaviour.Properties.copy(Blocks.POTTED_POPPY)));
+        public static final RegistryObject<Block> POTTED_SNOWY_BUSH = BLOCKS.register("potted_snowy_bush",
+                        () -> new FlowerPotBlock(() -> (FlowerPotBlock) Blocks.FLOWER_POT, SNOWY_BUSH, BlockBehaviour.Properties.copy(Blocks.POTTED_POPPY)));
+        public static final RegistryObject<Block> POTTED_SNOWY_SHORT_GRASS = BLOCKS.register("potted_snowy_short_grass",
+                        () -> new FlowerPotBlock(() -> (FlowerPotBlock) Blocks.FLOWER_POT, SNOWY_SHORT_GRASS, BlockBehaviour.Properties.copy(Blocks.POTTED_POPPY)));
+        public static final RegistryObject<Block> POTTED_SNOWY_TALL_GRASS = BLOCKS.register("potted_snowy_tall_grass",
+                        () -> new FlowerPotBlock(() -> (FlowerPotBlock) Blocks.FLOWER_POT, SNOWY_TALL_GRASS, BlockBehaviour.Properties.copy(Blocks.POTTED_POPPY)));
+        public static final RegistryObject<Block> POTTED_SNOWY_FERN = BLOCKS.register("potted_snowy_fern",
+                        () -> new FlowerPotBlock(() -> (FlowerPotBlock) Blocks.FLOWER_POT, SNOWY_FERN, BlockBehaviour.Properties.copy(Blocks.POTTED_POPPY)));
+        public static final RegistryObject<Block> POTTED_SNOWY_LARGE_FERN = BLOCKS.register("potted_snowy_large_fern",
+                        () -> new FlowerPotBlock(() -> (FlowerPotBlock) Blocks.FLOWER_POT, SNOWY_LARGE_FERN, BlockBehaviour.Properties.copy(Blocks.POTTED_POPPY)));
+
         // --- FROGLIGHTS ---
         public static final RegistryObject<Block> OCHRE_FROGLIGHT = BLOCKS.register("ochre_froglight",
                         () -> new FroglightBlock(BlockBehaviour.Properties.copy(Blocks.SHROOMLIGHT).lightLevel(state -> 15)));
@@ -14469,4 +14552,3 @@ private static BlockBehaviour.Properties flamingSteelProperties() {
                                         com.kingodogo.buildscape.BuildScape.EXPERIENCE_CAULDRON_INTERACTIONS
                         ));
 }
-

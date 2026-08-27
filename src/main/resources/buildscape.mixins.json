@@ -31,7 +31,8 @@
     "VineBlockMixin",
     "WallBlockMixin",
     "ShulkerBoxBlockEntityMixin",
-    "ShulkerBoxMenuMixin"
+    "ShulkerBoxMenuMixin",
+    "FlowingFluidMixin"
   ],
   "client": [
     "AbstractContainerScreenMixin",

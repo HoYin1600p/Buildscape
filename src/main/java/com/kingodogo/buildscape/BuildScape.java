@@ -291,6 +291,37 @@ public class BuildScape {
             com.kingodogo.buildscape.block.ModWoodTypes.MANGROVE.getClass();
             com.kingodogo.buildscape.block.ModWoodTypes.BAMBOO.getClass();
 
+            // Potted Plants Registration
+            net.minecraft.world.level.block.FlowerPotBlock vanillaPot = (net.minecraft.world.level.block.FlowerPotBlock) net.minecraft.world.level.block.Blocks.FLOWER_POT;
+            vanillaPot.addPlant(ModBlocks.CLOSED_EYEBLOSSOM.getId(), ModBlocks.POTTED_CLOSED_EYEBLOSSOM);
+            vanillaPot.addPlant(ModBlocks.OPEN_EYEBLOSSOM.getId(), ModBlocks.POTTED_OPEN_EYEBLOSSOM);
+            vanillaPot.addPlant(ModBlocks.GOLDEN_DANDELION.getId(), ModBlocks.POTTED_GOLDEN_DANDELION);
+            vanillaPot.addPlant(ModBlocks.CACTUS_FLOWER.getId(), ModBlocks.POTTED_CACTUS_FLOWER);
+            vanillaPot.addPlant(ModBlocks.BUSH.getId(), ModBlocks.POTTED_BUSH);
+            vanillaPot.addPlant(ModBlocks.RED_BUSH.getId(), ModBlocks.POTTED_RED_BUSH);
+            vanillaPot.addPlant(ModBlocks.FIREFLY_BUSH.getId(), ModBlocks.POTTED_FIREFLY_BUSH);
+            vanillaPot.addPlant(ModBlocks.DRY_GRASS.getId(), ModBlocks.POTTED_DRY_GRASS);
+            vanillaPot.addPlant(ModBlocks.FROST_ROSE.getId(), ModBlocks.POTTED_FROST_ROSE);
+            vanillaPot.addPlant(ModBlocks.RED_MONETS.getId(), ModBlocks.POTTED_RED_MONETS);
+            vanillaPot.addPlant(ModBlocks.BLUE_MONETS.getId(), ModBlocks.POTTED_BLUE_MONETS);
+            vanillaPot.addPlant(ModBlocks.PURPLE_MONETS.getId(), ModBlocks.POTTED_PURPLE_MONETS);
+            vanillaPot.addPlant(ModBlocks.LIGHT_BLUE_MONETS.getId(), ModBlocks.POTTED_LIGHT_BLUE_MONETS);
+            vanillaPot.addPlant(ModBlocks.PINK_MONETS.getId(), ModBlocks.POTTED_PINK_MONETS);
+            vanillaPot.addPlant(ModBlocks.YELLOW_MONETS.getId(), ModBlocks.POTTED_YELLOW_MONETS);
+            vanillaPot.addPlant(ModBlocks.POPLAR_SAPLING.getId(), ModBlocks.POTTED_POPLAR_SAPLING);
+            vanillaPot.addPlant(ModBlocks.PALE_OAK_SAPLING.getId(), ModBlocks.POTTED_PALE_OAK_SAPLING);
+            vanillaPot.addPlant(ModBlocks.CHERRY_SAPLING.getId(), ModBlocks.POTTED_CHERRY_SAPLING);
+            vanillaPot.addPlant(ModBlocks.MANGROVE_PROPAGULE.getId(), ModBlocks.POTTED_MANGROVE_PROPAGULE);
+            vanillaPot.addPlant(ModBlocks.WILDFLOWERS.getId(), ModBlocks.POTTED_WILDFLOWERS);
+            vanillaPot.addPlant(ModBlocks.CLOVER.getId(), ModBlocks.POTTED_CLOVER);
+            vanillaPot.addPlant(ModBlocks.LEAF_LITTER.getId(), ModBlocks.POTTED_LEAF_LITTER);
+            vanillaPot.addPlant(ModBlocks.TALL_DRY_GRASS.getId(), ModBlocks.POTTED_TALL_DRY_GRASS);
+            vanillaPot.addPlant(ModBlocks.SNOWY_BUSH.getId(), ModBlocks.POTTED_SNOWY_BUSH);
+            vanillaPot.addPlant(ModBlocks.SNOWY_SHORT_GRASS.getId(), ModBlocks.POTTED_SNOWY_SHORT_GRASS);
+            vanillaPot.addPlant(ModBlocks.SNOWY_TALL_GRASS.getId(), ModBlocks.POTTED_SNOWY_TALL_GRASS);
+            vanillaPot.addPlant(ModBlocks.SNOWY_FERN.getId(), ModBlocks.POTTED_SNOWY_FERN);
+            vanillaPot.addPlant(ModBlocks.SNOWY_LARGE_FERN.getId(), ModBlocks.POTTED_SNOWY_LARGE_FERN);
+
 
             net.minecraft.world.level.block.ComposterBlock.COMPOSTABLES.put(ModItems.RED_ROSE_VINES.get(),
                     0.5f);

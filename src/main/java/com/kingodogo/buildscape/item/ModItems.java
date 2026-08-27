@@ -1893,6 +1893,29 @@ public class ModItems {
                             createBlockItemProperties()
                     )
     );
+    public static final RegistryObject<Item> QUARTZ_PILLAR_STAIRS =
+            ITEMS.register("quartz_pillar_stairs", () ->
+                    new BlockItem(
+                    ModBlocks.QUARTZ_PILLAR_STAIRS.get(),
+                            createBlockItemProperties()
+                    )
+            );
+    public static final RegistryObject<Item> QUARTZ_PILLAR_SLAB = ITEMS.register(
+            "quartz_pillar_slab",
+            () ->
+                    new BlockItem(
+                    ModBlocks.QUARTZ_PILLAR_SLAB.get(),
+                            createBlockItemProperties()
+                    )
+    );
+    public static final RegistryObject<Item> QUARTZ_PILLAR_WALL = ITEMS.register(
+            "quartz_pillar_wall",
+            () ->
+                    new BlockItem(
+                    ModBlocks.QUARTZ_PILLAR_WALL.get(),
+                            createBlockItemProperties()
+                    )
+    );
     public static final RegistryObject<Item> CALCITE_STAIRS = ITEMS.register(
             "calcite_stairs",
             () ->
@@ -8623,6 +8646,8 @@ public class ModItems {
             () -> new BlockItem(ModBlocks.END_STONE_VERTICAL_SLAB.get(), createBlockItemProperties()));
     public static final RegistryObject<Item> QUARTZ_BRICKS_VERTICAL_SLAB = ITEMS.register("quartz_bricks_vertical_slab",
             () -> new BlockItem(ModBlocks.QUARTZ_BRICKS_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> QUARTZ_PILLAR_VERTICAL_SLAB = ITEMS.register("quartz_pillar_vertical_slab",
+            () -> new BlockItem(ModBlocks.QUARTZ_PILLAR_VERTICAL_SLAB.get(), createBlockItemProperties()));
     public static final RegistryObject<Item> CALCITE_VERTICAL_SLAB = ITEMS.register("calcite_vertical_slab",
             () -> new BlockItem(ModBlocks.CALCITE_VERTICAL_SLAB.get(), createBlockItemProperties()));
     public static final RegistryObject<Item> OBSIDIAN_VERTICAL_SLAB = ITEMS.register("obsidian_vertical_slab",

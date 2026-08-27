@@ -44,6 +44,7 @@
     "BuildscapeModelBakeryMixin",
     "ItemRendererMixin",
     "PauseScreenMixin",
+    "LiquidBlockRendererMixin",
     "StonecutterScreenMixin"
   ],
   "injectors": {

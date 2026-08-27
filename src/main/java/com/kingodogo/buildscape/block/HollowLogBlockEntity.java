@@ -160,6 +160,11 @@ public class HollowLogBlockEntity extends BlockEntity {
                 blockEntity.pendingTargetState = null;
                 blockEntity.setChanged();
                 blockEntity.syncToClient();
+                // The transport state may become a terminal endpoint without a
+                // neighbor block update. Seed its real vanilla flowing-water
+                // outlet immediately; FluidBlock then owns all subsequent flow.
+                HollowPipeBlock.tryFlowOut(level, pos, state,
+                        HollowPipeBlock.getContainedFluid(state, blockEntity));
             }
         }
 

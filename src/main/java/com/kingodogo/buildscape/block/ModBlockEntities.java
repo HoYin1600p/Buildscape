@@ -162,16 +162,6 @@ public class ModBlockEntities {
                     ).build(null)
     );
 
-/*
-    public static final RegistryObject<BlockEntityType<MirrorBlockEntity>> MIRROR_BLOCK_ENTITY = BLOCK_ENTITIES.register(
-            "mirror_block_entity",
-            () -> BlockEntityType.Builder.of(
-                    MirrorBlockEntity::new,
-                    ModBlocks.MIRROR_BLOCK.get()
-            ).build(null)
-    );
-*/
-
     public static final RegistryObject<BlockEntityType<MuffBlockEntity>> MUFF_BLOCK_ENTITY = BLOCK_ENTITIES.register(
             "muff_block_entity",
             () -> BlockEntityType.Builder.of(
@@ -251,5 +241,38 @@ public class ModBlockEntities {
                             ModBlocks.STRIPPED_BAMBOO_SHELF.get(),
                             ModBlocks.PALE_OAK_SHELF.get(),
                             ModBlocks.POPLAR_SHELF.get()
+                    ).build(null));
+
+    public static final RegistryObject<BlockEntityType<HollowLogBlockEntity>> HOLLOW_LOG_BLOCK_ENTITY =
+            BLOCK_ENTITIES.register("hollow_log",
+                    () -> BlockEntityType.Builder.of(
+                            HollowLogBlockEntity::new,
+                            ModBlocks.HOLLOW_OAK_LOG.get(),
+                            ModBlocks.STRIPPED_HOLLOW_OAK_LOG.get(),
+                            ModBlocks.HOLLOW_SPRUCE_LOG.get(),
+                            ModBlocks.STRIPPED_HOLLOW_SPRUCE_LOG.get(),
+                            ModBlocks.HOLLOW_BIRCH_LOG.get(),
+                            ModBlocks.STRIPPED_HOLLOW_BIRCH_LOG.get(),
+                            ModBlocks.HOLLOW_JUNGLE_LOG.get(),
+                            ModBlocks.STRIPPED_HOLLOW_JUNGLE_LOG.get(),
+                            ModBlocks.HOLLOW_ACACIA_LOG.get(),
+                            ModBlocks.STRIPPED_HOLLOW_ACACIA_LOG.get(),
+                            ModBlocks.HOLLOW_DARK_OAK_LOG.get(),
+                            ModBlocks.STRIPPED_HOLLOW_DARK_OAK_LOG.get(),
+                            ModBlocks.HOLLOW_CRIMSON_STEM.get(),
+                            ModBlocks.STRIPPED_HOLLOW_CRIMSON_STEM.get(),
+                            ModBlocks.HOLLOW_WARPED_STEM.get(),
+                            ModBlocks.STRIPPED_HOLLOW_WARPED_STEM.get(),
+                            ModBlocks.HOLLOW_MANGROVE_LOG.get(),
+                            ModBlocks.STRIPPED_HOLLOW_MANGROVE_LOG.get(),
+                            ModBlocks.HOLLOW_ASHPEN_LOG.get(),
+                            ModBlocks.STRIPPED_HOLLOW_ASHPEN_LOG.get(),
+                            ModBlocks.HOLLOW_POPLAR_LOG.get(),
+                            ModBlocks.STRIPPED_HOLLOW_POPLAR_LOG.get(),
+                            ModBlocks.HOLLOW_PALE_OAK_LOG.get(),
+                            ModBlocks.STRIPPED_HOLLOW_PALE_OAK_LOG.get(),
+                            ModBlocks.HOLLOW_CHERRY_LOG.get(),
+                            ModBlocks.STRIPPED_HOLLOW_CHERRY_LOG.get(),
+                            ModBlocks.HOLLOW_STEEL_PIPE.get()
                     ).build(null));
 }

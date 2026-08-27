@@ -53,7 +53,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
-import net.minecraft.world.level.material.FlowingFluid;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
@@ -747,4 +746,3 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
         builder.add(WATERLOGGED, LAVA_LOGGED, HAS_GLASS_NEG, HAS_GLASS_POS, HAS_DECORATION);
     }
 }
-

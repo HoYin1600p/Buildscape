@@ -186,3 +186,8 @@ tasks.register('runBDREBenchmark', JavaExec) {
     classpath = sourceSets.benchmark.runtimeClasspath
     mainClass = 'tools.benchmark.BenchmarkSuite'
 }
+
+tasks.register('runPipeTransportTests', JavaExec) {
+    classpath = sourceSets.benchmark.runtimeClasspath
+    mainClass = 'tools.benchmark.PipeTransportTestSuite'
+}

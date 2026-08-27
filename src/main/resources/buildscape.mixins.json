@@ -24,6 +24,7 @@
     "IronBarsBlockMixin",
     "ItemMixin",
     "LeavesBlockMixin",
+    "LevelMixin",
     "LivingEntityMixin",
     "StonecutterMenuAccessor",
     "StonecutterMenuMixin",

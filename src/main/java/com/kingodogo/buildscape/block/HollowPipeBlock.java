@@ -2,6 +2,9 @@ package com.kingodogo.buildscape.block;
 
 import com.kingodogo.buildscape.fluid.ModFluids;
 import com.kingodogo.buildscape.item.ModItems;
+import com.kingodogo.buildscape.pipe.transport.BubbleColumnHandler;
+import com.kingodogo.buildscape.pipe.transport.HollowPipeTransportManager;
+import com.kingodogo.buildscape.pipe.transport.PipeFlowState;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
@@ -118,6 +121,15 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
         return new HollowLogBlockEntity(pos, state);
     }
 
+    @Nullable
+    @Override
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
+        if (level.isClientSide) return null;
+        return type == ModBlockEntities.HOLLOW_LOG_BLOCK_ENTITY.get()
+                ? (lvl, pos, st, be) -> HollowLogBlockEntity.serverTick(lvl, pos, st, (HollowLogBlockEntity) be)
+                : null;
+    }
+
     public static Fluid getContainedFluid(BlockState state, @Nullable BlockEntity be) {
         if (state.getValue(WATERLOGGED)) {
             return Fluids.WATER;
@@ -216,6 +228,8 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
                 SoundEvent sound = containedFluid.getAttributes().getFillSound();
                 if (sound == null) sound = (containedFluid == Fluids.LAVA) ? SoundEvents.BUCKET_FILL_LAVA : SoundEvents.BUCKET_FILL;
                 level.playSound(null, pos, sound, SoundSource.BLOCKS, 1.0F, 1.0F);
+
+                HollowPipeTransportManager.onBucketUsed(level, pos, state);
             }
             return InteractionResult.sidedSuccess(level.isClientSide);
         }
@@ -235,9 +249,17 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
                 level.setBlock(pos, state, 3);
 
                 if (hollowBe != null) {
-                    String fKey = isWater ? "water" : (isLava ? "lava" : ForgeRegistries.FLUIDS.getKey(fluidInBucket).toString());
-                    hollowBe.setFluidType(fKey);
-                    hollowBe.setLavaTicks(0);
+                    if (isWater) {
+                        // Water is tracked ONLY through WATERLOGGED blockstate — never through fluidType.
+                        // Setting fluidType="water" was the root cause of spurious source propagation.
+                        hollowBe.setLavaTicks(0);
+                    } else if (isLava) {
+                        hollowBe.setFluidType("lava");
+                        hollowBe.setLavaTicks(0);
+                    } else {
+                        hollowBe.setFluidType(ForgeRegistries.FLUIDS.getKey(fluidInBucket).toString());
+                        hollowBe.setLavaTicks(0);
+                    }
                     hollowBe.setChanged();
                 }
 
@@ -256,12 +278,15 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
                 SoundEvent sound = fluidInBucket.getAttributes().getEmptySound();
                 if (sound == null) sound = (fluidInBucket == Fluids.LAVA) ? SoundEvents.BUCKET_EMPTY_LAVA : SoundEvents.BUCKET_EMPTY;
                 level.playSound(null, pos, sound, SoundSource.BLOCKS, 1.0F, 1.0F);
+
+                HollowPipeTransportManager.onBucketUsed(level, pos, state);
             }
             return InteractionResult.sidedSuccess(level.isClientSide);
         }
 
         return InteractionResult.PASS;
     }
+
 
     public static void tryFlowOut(Level level, BlockPos pos, BlockState state, Fluid fluid) {
         if (fluid == null || fluid == Fluids.EMPTY || level.isClientSide) return;
@@ -271,17 +296,28 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
     }
 
     public static void tryFlowOutTo(Level level, BlockPos pos, BlockState state, Direction dir, Fluid fluid) {
-        if (fluid == null || fluid == Fluids.EMPTY || level.isClientSide || dir == Direction.UP) return;
+        // Water transport outlets are rendered by the block-entity renderer. Never place
+        // a ticking world fluid block: that causes source/flow feedback and visible flicker.
+        if (fluid == Fluids.WATER) return;
+        if (fluid == null || fluid == Fluids.EMPTY || level.isClientSide || dir == null) return;
         if (isOpenEndpoint(state, dir)) {
             BlockPos neighborPos = pos.relative(dir);
             BlockState neighborState = level.getBlockState(neighborPos);
 
-            // Flow out of open endpoint into the world
+            // Flow out of open endpoint into the world as natural flowing liquid (level 7), NOT a standing source block
             if (neighborState.isAir() || neighborState.canBeReplaced(fluid) || (neighborState.getBlock() instanceof LiquidBlock && !neighborState.getFluidState().isSource())) {
-                BlockState fluidBlock = fluid.defaultFluidState().createLegacyBlock();
-                if (!fluidBlock.isAir()) {
-                    level.setBlock(neighborPos, fluidBlock, 3);
-                    level.scheduleTick(neighborPos, fluid, fluid.getTickDelay(level));
+                if (fluid instanceof FlowingFluid flowing) {
+                    BlockState fluidBlock = flowing.getFlowing(7, false).createLegacyBlock();
+                    if (!fluidBlock.isAir() && !neighborState.equals(fluidBlock)) {
+                        level.setBlock(neighborPos, fluidBlock, 3);
+                        level.scheduleTick(neighborPos, flowing, flowing.getTickDelay(level));
+                    }
+                } else {
+                    BlockState fluidBlock = fluid.defaultFluidState().createLegacyBlock();
+                    if (!fluidBlock.isAir() && !neighborState.equals(fluidBlock)) {
+                        level.setBlock(neighborPos, fluidBlock, 3);
+                        level.scheduleTick(neighborPos, fluid, fluid.getTickDelay(level));
+                    }
                 }
             }
         }
@@ -421,6 +457,27 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
                 }
             }
         }
+
+        // Apply contained bubble column physics if active
+        BlockEntity be = level.getBlockEntity(pos);
+        if (be instanceof HollowLogBlockEntity hollowBe) {
+            PipeFlowState flowState = hollowBe.getPipeFlowState();
+            if (flowState != null && flowState.hasWater()) {
+                BubbleColumnHandler.handleEntityInside(level, pos, state, entity, flowState);
+            }
+        }
+    }
+
+    @Override
+    public void animateTick(BlockState state, Level level, BlockPos pos, Random random) {
+        super.animateTick(state, level, pos, random);
+        BlockEntity be = level.getBlockEntity(pos);
+        if (be instanceof HollowLogBlockEntity hollowBe) {
+            PipeFlowState flowState = hollowBe.getPipeFlowState();
+            if (flowState != null && flowState.hasWater()) {
+                BubbleColumnHandler.spawnFlowParticles(level, pos, random, flowState);
+            }
+        }
     }
 
     private boolean isEnteringHorizontalCavity(Player player, BlockPos pos) {
@@ -464,31 +521,35 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
 
             if (be instanceof HollowLogBlockEntity hollowBe) {
                 if (worldFluid != null && worldFluid != Fluids.EMPTY) {
-                    if (worldFluid == Fluids.WATER) {
-                        hollowBe.setFluidType("water");
-                    } else if (worldFluid == Fluids.LAVA) {
+                    // NOTE: WATER transport is tracked exclusively through WATERLOGGED blockstate
+                    // and pipeFlowState — never through fluidType.
+                    // Setting fluidType="water" here caused every pipe touching world water to
+                    // become a spurious transport source (isWaterSource reads getContainedFluid).
+                    if (worldFluid == Fluids.LAVA) {
                         hollowBe.setFluidType("lava");
                         hollowBe.setLavaTicks(0);
-                    } else {
+                    } else if (worldFluid != Fluids.WATER) {
+                        // Other modded fluids (experience, etc.)
                         String fKey = ForgeRegistries.FLUIDS.getKey(worldFluid).toString();
                         hollowBe.setFluidType(fKey);
                         hollowBe.setLavaTicks(0);
                     }
+                    // Water: do NOT set fluidType — WATERLOGGED blockstate is the authority.
                     hollowBe.setChanged();
                 } else if (state.getValue(LAVA_LOGGED)) {
                     hollowBe.setFluidType("lava");
                     hollowBe.setLavaTicks(0);
                     hollowBe.setChanged();
-                } else if (state.getValue(WATERLOGGED)) {
-                    hollowBe.setFluidType("water");
-                    hollowBe.setChanged();
                 }
+                // Water: WATERLOGGED blockstate already set in getStateForPlacement — don't set fluidType.
             }
             Fluid fluid = getContainedFluid(state, be);
             tryFlowOut(level, pos, state, fluid);
             notifyAndRecalculateNeighbors(level, pos);
+            HollowPipeTransportManager.onBlockPlaced(level, pos, state);
         }
     }
+
 
     @Override
     public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
@@ -499,6 +560,7 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
             super.onRemove(state, level, pos, newState, isMoving);
             if (!level.isClientSide) {
                 notifyAndRecalculateNeighbors(level, pos);
+                HollowPipeTransportManager.onBlockRemoved(level, pos, state);
 
                 // When broken, drop pipe and place fluid in world in flowing/source state
                 if (loggedFluid != null && loggedFluid != Fluids.EMPTY) {
@@ -518,15 +580,26 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
     public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
         BlockState updated = super.updateShape(state, direction, neighborState, level, pos, neighborPos);
         updated = updateConnections(level, pos, updated);
-        if (!level.isClientSide() && direction != Direction.UP && level instanceof Level lvl) {
-            if (isOpenEndpoint(updated, direction) && (neighborState.isAir() || neighborState.canBeReplaced(Fluids.WATER))) {
-                Fluid fluid = getContainedFluid(updated, lvl.getBlockEntity(pos));
-                if (fluid != Fluids.EMPTY) {
-                    tryFlowOutTo(lvl, pos, updated, direction, fluid);
+        if (!level.isClientSide() && level instanceof Level lvl) {
+            HollowPipeTransportManager.onNeighborChanged(lvl, pos, updated, neighborPos);
+            if (direction != Direction.UP) {
+                if (isOpenEndpoint(updated, direction) && (neighborState.isAir() || neighborState.canBeReplaced(Fluids.WATER))) {
+                    Fluid fluid = getContainedFluid(updated, lvl.getBlockEntity(pos));
+                    if (fluid != Fluids.EMPTY) {
+                        tryFlowOutTo(lvl, pos, updated, direction, fluid);
+                    }
                 }
             }
         }
         return updated;
+    }
+
+    @Override
+    public void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, BlockPos fromPos, boolean isMoving) {
+        super.neighborChanged(state, level, pos, block, fromPos, isMoving);
+        if (!level.isClientSide) {
+            HollowPipeTransportManager.onNeighborChanged(level, pos, state, fromPos);
+        }
     }
 
     public static BooleanProperty getPropertyForDirection(Direction dir) {
@@ -619,7 +692,13 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
 
     @Override
     public FluidState getFluidState(BlockState state) {
-        return Fluids.EMPTY.defaultFluidState();
+        if (state.getValue(WATERLOGGED)) {
+            return Fluids.WATER.getSource(false);
+        }
+        if (state.getValue(LAVA_LOGGED)) {
+            return Fluids.LAVA.getSource(false);
+        }
+        return super.getFluidState(state);
     }
 
     @Override

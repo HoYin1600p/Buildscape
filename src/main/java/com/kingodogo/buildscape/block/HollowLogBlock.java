@@ -5,6 +5,7 @@ import com.kingodogo.buildscape.item.ModItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -15,27 +16,39 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.EmptyBlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.AbstractGlassBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.BushBlock;
+import net.minecraft.world.level.block.ButtonBlock;
+import net.minecraft.world.level.block.CarpetBlock;
+import net.minecraft.world.level.block.ChainBlock;
 import net.minecraft.world.level.block.DoorBlock;
+import net.minecraft.world.level.block.EndRodBlock;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.FenceBlock;
+import net.minecraft.world.level.block.FenceGateBlock;
 import net.minecraft.world.level.block.FlowerBlock;
 import net.minecraft.world.level.block.FlowerPotBlock;
 import net.minecraft.world.level.block.GlassBlock;
 import net.minecraft.world.level.block.IronBarsBlock;
 import net.minecraft.world.level.block.LadderBlock;
 import net.minecraft.world.level.block.LanternBlock;
+import net.minecraft.world.level.block.LeverBlock;
+import net.minecraft.world.level.block.LightningRodBlock;
 import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.MushroomBlock;
+import net.minecraft.world.level.block.PointedDripstoneBlock;
+import net.minecraft.world.level.block.PressurePlateBlock;
 import net.minecraft.world.level.block.RotatedPillarBlock;
 import net.minecraft.world.level.block.SaplingBlock;
 import net.minecraft.world.level.block.SimpleWaterloggedBlock;
@@ -48,11 +61,11 @@ import net.minecraft.world.level.block.WallBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.material.FlowingFluid;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
@@ -61,6 +74,8 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.EntityCollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.Random;
@@ -130,6 +145,14 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
         return getActualShape(state);
     }
 
+    public static boolean isOpenEnd(BlockState state, Direction dir) {
+        if (dir == null || !(state.getBlock() instanceof HollowLogBlock)) return false;
+        Direction.Axis axis = state.getValue(AXIS);
+        if (dir.getAxis() != axis) return false;
+        boolean isNeg = (dir == Direction.WEST || dir == Direction.NORTH || dir == Direction.DOWN);
+        return isNeg ? !state.getValue(HAS_GLASS_NEG) : !state.getValue(HAS_GLASS_POS);
+    }
+
     @Override
     public VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         return getActualShape(state);
@@ -176,14 +199,19 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
 
         boolean hasGlassNeg = logState.getValue(HAS_GLASS_NEG);
         boolean isPotAllowed = (axis != Direction.Axis.Y) || hasGlassNeg;
+        boolean hasDecoration = logState.getValue(HAS_DECORATION);
 
-        if (item == Items.FLOWER_POT && isPotAllowed) return true;
+        // If holding empty flower pot, allowed only if log has no decoration and pot is allowed
+        if (item == Items.FLOWER_POT && isPotAllowed && !hasDecoration) return true;
 
+        // If log already has decoration, plant/flower can be inserted into an existing flower pot
+        if (hasDecoration) {
+            return getPottedBlockState(item) != null;
+        }
+
+        // Empty log: only full blocks are valid interior decoration
         if (item instanceof BlockItem blockItem) {
             Block block = blockItem.getBlock();
-            if (block instanceof FlowerBlock || block instanceof FlowerPotBlock || block instanceof SaplingBlock || block instanceof MushroomBlock || block instanceof BushBlock) {
-                return isPotAllowed;
-            }
             return isValidFullBlockDecoration(block);
         }
         return false;
@@ -251,16 +279,21 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
         if (!hasDecoration) {
             Fluid containedFluid = HollowPipeBlock.getContainedFluid(state, hollowBe);
 
+            boolean isEmptyBucket = held.is(Items.BUCKET)
+                    || (held.getItem() instanceof BucketItem bi && bi.getFluid() == Fluids.EMPTY)
+                    || (FluidUtil.getFluidHandler(held).isPresent() && FluidUtil.getFluidContained(held).orElse(FluidStack.EMPTY).isEmpty());
+
             // Empty Bucket interaction to retrieve fluid
-            if (held.is(Items.BUCKET) && containedFluid != Fluids.EMPTY) {
+            if (isEmptyBucket && containedFluid != Fluids.EMPTY) {
                 if (!level.isClientSide) {
-                    state = state.setValue(WATERLOGGED, false).setValue(LAVA_LOGGED, false);
-                    level.setBlock(pos, state, 3);
                     if (hollowBe != null) {
                         hollowBe.setFluidType("none");
                         hollowBe.setLavaTicks(0);
                         hollowBe.setChanged();
                     }
+                    state = state.setValue(WATERLOGGED, false).setValue(LAVA_LOGGED, false);
+                    level.setBlock(pos, state, 3);
+
                     ItemStack filledBucket = HollowPipeBlock.getFilledBucketForFluid(containedFluid);
                     if (!player.getAbilities().instabuild) {
                         held.shrink(1);
@@ -287,8 +320,6 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
                 if (!level.isClientSide) {
                     boolean isWater = (fluidInBucket == Fluids.WATER);
                     boolean isLava = (fluidInBucket == Fluids.LAVA);
-                    state = state.setValue(WATERLOGGED, isWater).setValue(LAVA_LOGGED, isLava);
-                    level.setBlock(pos, state, 3);
                     if (hollowBe != null) {
                         String fKey = isWater ? "water" : (isLava ? "lava" : ForgeRegistries.FLUIDS.getKey(fluidInBucket).toString());
                         hollowBe.setFluidType(fKey);
@@ -300,6 +331,8 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
                         }
                         hollowBe.setChanged();
                     }
+                    state = state.setValue(WATERLOGGED, isWater).setValue(LAVA_LOGGED, isLava);
+                    level.setBlock(pos, state, 3);
                     tryFlowOut(level, pos, state, fluidInBucket);
                     if (!player.getAbilities().instabuild) {
                         ItemStack emptyContainer = held.hasContainerItem() ? held.getContainerItem() : new ItemStack(Items.BUCKET);
@@ -326,7 +359,7 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
             }
         }
 
-        // 3. Inserting Flower/Plant into an existing Empty Flower Pot inside Hollow Log
+        // 3. Inserting Flower/Plant/Foliage into an existing Empty Flower Pot inside Hollow Log
         if (hasDecoration && hollowBe != null && hollowBe.getDecorationState().is(Blocks.FLOWER_POT)) {
             BlockState pottedState = getPottedBlockState(held.getItem());
             if (pottedState != null) {
@@ -342,25 +375,34 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
         }
 
         // 4. Hollow Log Interior Decoration — REJECT IF FLUID IS PRESENT
+        // Foliage / flowers / plants can ONLY be placed if an empty flower pot is already placed inside the log (Section 3).
         if (!hasFluid && !hasDecoration) {
+            boolean isPotAllowed = (axis != Direction.Axis.Y) || state.getValue(HAS_GLASS_NEG);
+
+            // A. Placing an empty Flower Pot
+            if (held.is(Items.FLOWER_POT) && isPotAllowed) {
+                if (!level.isClientSide) {
+                    state = state.setValue(HAS_DECORATION, true);
+                    level.setBlock(pos, state, 3);
+                    if (hollowBe != null) {
+                        hollowBe.setDecorationState(Blocks.FLOWER_POT.defaultBlockState());
+                    }
+                    if (!player.getAbilities().instabuild) {
+                        held.shrink(1);
+                    }
+                    level.playSound(null, pos, SoundEvents.STONE_PLACE, SoundSource.BLOCKS, 1.0F, 1.0F);
+                }
+                return InteractionResult.sidedSuccess(level.isClientSide);
+            }
+
+            // B. Placing a Full Block Decoration
             if (held.getItem() instanceof BlockItem blockItem) {
                 Block block = blockItem.getBlock();
+                boolean isFullBlock = isValidFullBlockDecoration(block);
 
-                boolean isPotAllowed = (axis != Direction.Axis.Y) || state.getValue(HAS_GLASS_NEG);
-                boolean isPotted = isPotAllowed && isFlowerPotOrFlower(held);
-                boolean isGlassBlock = isFullGlassBlock(held);
-                boolean isFullBlock = isValidFullBlockDecoration(block) || isGlassBlock;
-
-                if (isPotted || isFullBlock) {
+                if (isFullBlock) {
                     if (!level.isClientSide) {
-                        BlockState stateToStore;
-                        if (isPotted && !(block instanceof FlowerPotBlock)) {
-                            BlockState potted = getPottedBlockState(held.getItem());
-                            stateToStore = potted != null ? potted : Blocks.FLOWER_POT.defaultBlockState();
-                        } else {
-                            stateToStore = block.defaultBlockState();
-                        }
-
+                        BlockState stateToStore = block.defaultBlockState();
                         state = state.setValue(HAS_DECORATION, true);
                         level.setBlock(pos, state, 3);
                         if (hollowBe != null) {
@@ -369,8 +411,7 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
                         if (!player.getAbilities().instabuild) {
                             held.shrink(1);
                         }
-                        SoundEvent placeSound = isGlassBlock ? SoundEvents.GLASS_PLACE : (isFullBlock ? SoundEvents.STONE_PLACE : SoundEvents.GRASS_PLACE);
-                        level.playSound(null, pos, placeSound, SoundSource.BLOCKS, 1.0F, 1.0F);
+                        level.playSound(null, pos, SoundEvents.STONE_PLACE, SoundSource.BLOCKS, 1.0F, 1.0F);
                     }
                     return InteractionResult.sidedSuccess(level.isClientSide);
                 }
@@ -451,14 +492,14 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
             Block block = blockItem.getBlock();
 
             // Exclude Non-Full Glass Shapes (Panes, Fences, Gates, Walls, Slabs, Stairs, Jars, etc.)
-            if (block instanceof IronBarsBlock || block instanceof FenceBlock || block instanceof net.minecraft.world.level.block.FenceGateBlock
+            if (block instanceof IronBarsBlock || block instanceof FenceBlock || block instanceof FenceGateBlock
                     || block instanceof WallBlock || block instanceof SlabBlock || block instanceof StairBlock
                     || block instanceof GlassJarBlock) {
                 return false;
             }
 
             // Standard Minecraft Glass Classes
-            if (block instanceof GlassBlock || block instanceof StainedGlassBlock || block instanceof net.minecraft.world.level.block.AbstractGlassBlock) {
+            if (block instanceof GlassBlock || block instanceof StainedGlassBlock || block instanceof AbstractGlassBlock) {
                 return true;
             }
 
@@ -468,7 +509,7 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
             }
 
             // Buildscape & Modded Glass Blocks: check registry name for "glass"
-            net.minecraft.resources.ResourceLocation rl = net.minecraftforge.registries.ForgeRegistries.BLOCKS.getKey(block);
+            net.minecraft.resources.ResourceLocation rl = ForgeRegistries.BLOCKS.getKey(block);
             if (rl != null && rl.getPath().contains("glass")) {
                 String path = rl.getPath();
                 if (!path.contains("pane") && !path.contains("fence") && !path.contains("slab")
@@ -480,39 +521,46 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
         return false;
     }
 
-    private static boolean isFlowerPotOrFlower(ItemStack stack) {
-        if (stack == null || stack.isEmpty()) return false;
-        Item item = stack.getItem();
-        if (item == Items.FLOWER_POT) return true;
-        if (getPottedBlockState(item) != null) return true;
-        if (stack.getItem() instanceof BlockItem blockItem) {
-            Block block = blockItem.getBlock();
-            return block instanceof FlowerBlock || block instanceof FlowerPotBlock || block instanceof SaplingBlock || block instanceof MushroomBlock || block instanceof BushBlock;
-        }
-        return false;
-    }
-
     private static boolean isValidFullBlockDecoration(Block block) {
         if (block == null) return false;
         if (block instanceof EntityBlock) return false;
         if (block instanceof HollowLogBlock || block instanceof HollowPipeBlock) return false;
 
-        // Reject non-full-cube / partial / utility blocks (including Fences, Gates, Panes, Walls, Slabs, Stairs, etc.)
+        // Reject non-full-cube / partial / utility blocks (including Fences, Gates, Panes, Walls, Slabs, Stairs, Chains, etc.)
         if (block instanceof SlabBlock || block instanceof StairBlock || block instanceof WallBlock
-                || block instanceof FenceBlock || block instanceof net.minecraft.world.level.block.FenceGateBlock || block instanceof IronBarsBlock
+                || block instanceof FenceBlock || block instanceof FenceGateBlock || block instanceof IronBarsBlock
+                || block instanceof ChainBlock || block instanceof ClimbableChainBlock || block instanceof LargeChainBlock
+                || block instanceof SideChainPartBlock || block instanceof WeatheringClimbableChainBlock || block instanceof WeatheringLargeChainBlock
                 || block instanceof TrapDoorBlock || block instanceof DoorBlock
                 || block instanceof LadderBlock || block instanceof LanternBlock || block instanceof TorchBlock
                 || block instanceof BushBlock || block instanceof FlowerBlock || block instanceof MushroomBlock
-                || block instanceof SaplingBlock || block instanceof FlowerPotBlock || block instanceof LiquidBlock) {
+                || block instanceof SaplingBlock || block instanceof FlowerPotBlock || block instanceof LiquidBlock
+                || block instanceof CarpetBlock || block instanceof ButtonBlock || block instanceof LeverBlock
+                || block instanceof PressurePlateBlock || block instanceof EndRodBlock || block instanceof LightningRodBlock
+                || block instanceof PointedDripstoneBlock || block instanceof PointedIcicleBlock || block instanceof SulfurSpikeBlock
+                || block instanceof ShelfBlock || block instanceof GlassJarBlock) {
             return false;
         }
 
         // Reject ALL glass blocks and glass items from being placed as interior block decorations
-        if (block instanceof GlassBlock || block instanceof StainedGlassBlock || block instanceof net.minecraft.world.level.block.AbstractGlassBlock) {
+        if (block instanceof GlassBlock || block instanceof StainedGlassBlock || block instanceof AbstractGlassBlock) {
             return false;
         }
-        net.minecraft.resources.ResourceLocation rl = net.minecraftforge.registries.ForgeRegistries.BLOCKS.getKey(block);
-        if (rl != null && rl.getPath().contains("glass")) {
+        net.minecraft.resources.ResourceLocation rl = ForgeRegistries.BLOCKS.getKey(block);
+        if (rl != null) {
+            String path = rl.getPath();
+            if (path.contains("glass") || path.contains("chain") || path.contains("shelf") || path.contains("jar")) {
+                return false;
+            }
+        }
+
+        // Shape check: must be a full 1x1x1 cube block
+        try {
+            BlockState defaultState = block.defaultBlockState();
+            if (!Block.isShapeFullBlock(defaultState.getShape(EmptyBlockGetter.INSTANCE, BlockPos.ZERO))) {
+                return false;
+            }
+        } catch (Exception ignored) {
             return false;
         }
 
@@ -550,6 +598,22 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
         if (item == Items.WARPED_ROOTS) return Blocks.POTTED_WARPED_ROOTS.defaultBlockState();
         if (item == Items.AZALEA) return Blocks.POTTED_AZALEA.defaultBlockState();
         if (item == Items.FLOWERING_AZALEA) return Blocks.POTTED_FLOWERING_AZALEA.defaultBlockState();
+        if (item == Items.FERN) return Blocks.POTTED_FERN.defaultBlockState();
+        if (item instanceof BlockItem bi) {
+            Block b = bi.getBlock();
+            if (b instanceof FlowerPotBlock pot && pot != Blocks.FLOWER_POT) {
+                return pot.defaultBlockState();
+            }
+            if (Blocks.FLOWER_POT instanceof FlowerPotBlock emptyPot) {
+                net.minecraft.resources.ResourceLocation rl = b.getRegistryName();
+                if (rl != null) {
+                    java.util.function.Supplier<? extends Block> potSupplier = emptyPot.getFullPotsView().get(rl);
+                    if (potSupplier != null && potSupplier.get() != null && potSupplier.get() != Blocks.AIR) {
+                        return potSupplier.get().defaultBlockState();
+                    }
+                }
+            }
+        }
         return null;
     }
 
@@ -620,10 +684,18 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
     private static void spreadFluidToNeighbor(Level level, BlockPos neighborPos, Fluid fluid) {
         BlockState neighborState = level.getBlockState(neighborPos);
         if (neighborState.isAir() || neighborState.canBeReplaced(fluid) || (neighborState.getBlock() instanceof LiquidBlock && !neighborState.getFluidState().isSource())) {
-            BlockState fluidBlock = fluid.defaultFluidState().createLegacyBlock();
-            if (!fluidBlock.isAir()) {
-                level.setBlock(neighborPos, fluidBlock, 3);
-                level.scheduleTick(neighborPos, fluid, fluid.getTickDelay(level));
+            if (fluid instanceof FlowingFluid flowing) {
+                BlockState fluidBlock = flowing.getFlowing(7, false).createLegacyBlock();
+                if (!fluidBlock.isAir() && !neighborState.equals(fluidBlock)) {
+                    level.setBlock(neighborPos, fluidBlock, 3);
+                    level.scheduleTick(neighborPos, flowing, flowing.getTickDelay(level));
+                }
+            } else {
+                BlockState fluidBlock = fluid.defaultFluidState().createLegacyBlock();
+                if (!fluidBlock.isAir() && !neighborState.equals(fluidBlock)) {
+                    level.setBlock(neighborPos, fluidBlock, 3);
+                    level.scheduleTick(neighborPos, fluid, fluid.getTickDelay(level));
+                }
             }
         }
     }
@@ -727,17 +799,52 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
 
     @Override
     public boolean canPlaceLiquid(BlockGetter level, BlockPos pos, BlockState state, Fluid fluid) {
-        return false;
+        return !state.getValue(WATERLOGGED) && !state.getValue(LAVA_LOGGED) && fluid == Fluids.WATER;
     }
 
     @Override
     public boolean placeLiquid(LevelAccessor level, BlockPos pos, BlockState state, FluidState fluidState) {
+        if (!state.getValue(WATERLOGGED) && !state.getValue(LAVA_LOGGED) && fluidState.getType() == Fluids.WATER) {
+            if (!level.isClientSide()) {
+                level.setBlock(pos, state.setValue(WATERLOGGED, true), 3);
+                level.scheduleTick(pos, fluidState.getType(), fluidState.getType().getTickDelay(level));
+                BlockEntity be = level.getBlockEntity(pos);
+                if (be instanceof HollowLogBlockEntity hollowBe) {
+                    hollowBe.setFluidType("water");
+                    hollowBe.setChanged();
+                }
+            }
+            return true;
+        }
         return false;
     }
 
     @Override
+    public ItemStack pickupBlock(LevelAccessor level, BlockPos pos, BlockState state) {
+        BlockEntity be = level.getBlockEntity(pos);
+        HollowLogBlockEntity hollowBe = be instanceof HollowLogBlockEntity h ? h : null;
+        Fluid containedFluid = HollowPipeBlock.getContainedFluid(state, be);
+        if (containedFluid != Fluids.EMPTY) {
+            if (hollowBe != null) {
+                hollowBe.setFluidType("none");
+                hollowBe.setLavaTicks(0);
+                hollowBe.setChanged();
+            }
+            level.setBlock(pos, state.setValue(WATERLOGGED, false).setValue(LAVA_LOGGED, false), 3);
+            return HollowPipeBlock.getFilledBucketForFluid(containedFluid);
+        }
+        return ItemStack.EMPTY;
+    }
+
+    @Override
     public FluidState getFluidState(BlockState state) {
-        return Fluids.EMPTY.defaultFluidState();
+        if (state.getValue(WATERLOGGED)) {
+            return Fluids.WATER.getSource(false);
+        }
+        if (state.getValue(LAVA_LOGGED)) {
+            return Fluids.LAVA.getSource(false);
+        }
+        return super.getFluidState(state);
     }
 
     @Override

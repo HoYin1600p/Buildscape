@@ -211,8 +211,7 @@ public class WaterPipeTransport extends PipeFluidTransport {
                         }
                     }
 
-                    if (needsEnqueue && !visitedInFlow.contains(nextPos)) {
-                        visitedInFlow.add(nextPos);
+                    if (needsEnqueue) {
                         flowQueue.add(new FlowStep(nextPos, exitDir.getOpposite(), nextDist));
                     }
                 }
@@ -240,15 +239,15 @@ public class WaterPipeTransport extends PipeFluidTransport {
         // Each branch calculates its own maxDistance along its downstream path from the source.
         // This ensures every branch independently calculates its own exponential slope and reaches
         // full drop at its own end.
+        Map<BlockPos, Integer> memoMaxDist = new HashMap<>();
         for (Map.Entry<BlockPos, PipeFlowState> entry : newStates.entrySet()) {
             BlockPos pos = entry.getKey();
             PipeFlowState s = entry.getValue();
             if (s.hasWater()) {
-                int branchMax = getBranchMaxDistance(pos, newStates, new HashSet<>());
+                int branchMax = getBranchMaxDistance(pos, newStates, new HashSet<>(), memoMaxDist);
                 s.setMaxDistance(Math.max(1, Math.max(s.getDistance(), branchMax)));
 
                 // If this pipe has an open endpoint direction, mark it
-                boolean isTerminal = (s.getDistance() == s.getMaxDistance());
                 for (Direction dir : s.getFlowDirections()) {
                     BlockPos neighbor = pos.relative(dir);
                     PipeFlowState neighborState = newStates.get(neighbor);
@@ -256,9 +255,6 @@ public class WaterPipeTransport extends PipeFluidTransport {
                         s.setOpenEndpoint(true);
                         break;
                     }
-                }
-                if (isTerminal && topology.isOpenEndpoint(pos, null)) {
-                    s.setOpenEndpoint(true);
                 }
             }
         }
@@ -270,7 +266,10 @@ public class WaterPipeTransport extends PipeFluidTransport {
      * Recursively traverses downstream flow directions in the component DAG to find
      * the maximum distance reached along this specific branch.
      */
-    private int getBranchMaxDistance(BlockPos pos, Map<BlockPos, PipeFlowState> states, Set<BlockPos> visited) {
+    private int getBranchMaxDistance(BlockPos pos, Map<BlockPos, PipeFlowState> states, Set<BlockPos> visited, Map<BlockPos, Integer> memo) {
+        if (memo.containsKey(pos)) {
+            return memo.get(pos);
+        }
         PipeFlowState s = states.get(pos);
         if (s == null || !s.hasWater()) {
             return 0;
@@ -282,11 +281,12 @@ public class WaterPipeTransport extends PipeFluidTransport {
             BlockPos nextPos = pos.relative(dir);
             PipeFlowState nextState = states.get(nextPos);
             if (nextState != null && nextState.hasWater() && !visited.contains(nextPos)) {
-                maxDist = Math.max(maxDist, getBranchMaxDistance(nextPos, states, visited));
+                maxDist = Math.max(maxDist, getBranchMaxDistance(nextPos, states, visited, memo));
             }
         }
 
         visited.remove(pos);
+        memo.put(pos, maxDist);
         return maxDist;
     }
 

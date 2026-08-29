@@ -1,21 +1,53 @@
 {
-	"format_version": "1.21.6",
-	"credit": "Made with Blockbench",
-	"ambientocclusion": false,
-	"textures": {
-		"particle": "buildscape:block/steel_bolts",
-		"texture": "buildscape:block/steel_bolts"
-	},
-	"elements": [
-		{
-			"from": [0, 0, 15.95],
-			"to": [16, 16, 15.95],
-			"shade": false,
-			"rotation": {"angle": 0, "axis": "y", "origin": [0, 0, 16]},
-			"faces": {
-				"north": {"uv": [0, 0, 16, 16], "texture": "#texture"},
-				"south": {"uv": [16, 0, 0, 16], "texture": "#texture"}
-			}
-		}
-	]
+  "format_version": "1.21.6",
+  "credit": "Made with Blockbench",
+  "ambientocclusion": true,
+  "textures": {
+    "particle": "buildscape:block/steel_bolts",
+    "texture": "buildscape:block/steel_bolts"
+  },
+  "elements": [
+    {
+      "from": [
+        0,
+        0,
+        15.95
+      ],
+      "to": [
+        16,
+        16,
+        15.95
+      ],
+      "shade": true,
+      "rotation": {
+        "angle": 0,
+        "axis": "y",
+        "origin": [
+          0,
+          0,
+          16
+        ]
+      },
+      "faces": {
+        "north": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            16,
+            0,
+            0,
+            16
+          ],
+          "texture": "#texture"
+        }
+      }
+    }
+  ]
 }

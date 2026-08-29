@@ -5866,6 +5866,23 @@ public class ModBlocks {
                         "steel_bolts",
                         () -> new SteelBoltBlock(
                                         BlockBehaviour.Properties.copy(STEEL_BLOCK.get())));
+        public static final RegistryObject<Block> STEEL_DOOR = BLOCKS.register(
+                        "steel_door",
+                        () -> new ModCopperDoorBlock(
+                                        BlockBehaviour.Properties.copy(STEEL_BLOCK.get()).noOcclusion()));
+        public static final RegistryObject<Block> STEEL_TRAPDOOR = BLOCKS.register(
+                        "steel_trapdoor",
+                        () -> new ModCopperTrapdoorBlock(
+                                        BlockBehaviour.Properties.copy(STEEL_BLOCK.get()).noOcclusion()));
+        public static final RegistryObject<Block> STEEL_BUTTON = BLOCKS.register(
+                        "steel_button",
+                        () -> new ModButtonBlock(
+                                        BlockBehaviour.Properties.copy(STEEL_BLOCK.get()).noCollission().strength(0.5f)));
+        public static final RegistryObject<Block> STEEL_PRESSURE_PLATE = BLOCKS.register(
+                        "steel_pressure_plate",
+                        () -> new ModPressurePlateBlock(
+                                        150,
+                                        BlockBehaviour.Properties.copy(STEEL_BLOCK.get()).noCollission().strength(0.5f)));
 
         // Scraped Steel Slabs/Vertical Slabs
         public static final RegistryObject<Block> SCRAPED_STEEL_SLAB = BLOCKS.register(
@@ -12483,6 +12500,16 @@ public class ModBlocks {
         public static final RegistryObject<Block> OXIDIZED_COPPER_PRESSURE_PLATE = BLOCKS.register("oxidized_copper_pressure_plate", () -> new WeatheringPressurePlateBlock(150, BlockBehaviour.Properties.copy(Blocks.OXIDIZED_COPPER).noCollission().strength(0.5F).sound(SoundType.COPPER)));
         public static final RegistryObject<Block> WAXED_OXIDIZED_COPPER_PRESSURE_PLATE = BLOCKS.register("waxed_oxidized_copper_pressure_plate", () -> new ModPressurePlateBlock(150, BlockBehaviour.Properties.copy(Blocks.OXIDIZED_COPPER).noCollission().strength(0.5F).sound(SoundType.COPPER)));
 
+        // Copper Bolts
+        public static final RegistryObject<Block> COPPER_BOLTS = BLOCKS.register("copper_bolts", () -> new WeatheringBoltBlock(BlockBehaviour.Properties.copy(Blocks.COPPER_BLOCK)));
+        public static final RegistryObject<Block> WAXED_COPPER_BOLTS = BLOCKS.register("waxed_copper_bolts", () -> new SteelBoltBlock(BlockBehaviour.Properties.copy(Blocks.COPPER_BLOCK)));
+        public static final RegistryObject<Block> EXPOSED_COPPER_BOLTS = BLOCKS.register("exposed_copper_bolts", () -> new WeatheringBoltBlock(BlockBehaviour.Properties.copy(Blocks.EXPOSED_COPPER)));
+        public static final RegistryObject<Block> WAXED_EXPOSED_COPPER_BOLTS = BLOCKS.register("waxed_exposed_copper_bolts", () -> new SteelBoltBlock(BlockBehaviour.Properties.copy(Blocks.EXPOSED_COPPER)));
+        public static final RegistryObject<Block> WEATHERED_COPPER_BOLTS = BLOCKS.register("weathered_copper_bolts", () -> new WeatheringBoltBlock(BlockBehaviour.Properties.copy(Blocks.WEATHERED_COPPER)));
+        public static final RegistryObject<Block> WAXED_WEATHERED_COPPER_BOLTS = BLOCKS.register("waxed_weathered_copper_bolts", () -> new SteelBoltBlock(BlockBehaviour.Properties.copy(Blocks.WEATHERED_COPPER)));
+        public static final RegistryObject<Block> OXIDIZED_COPPER_BOLTS = BLOCKS.register("oxidized_copper_bolts", () -> new WeatheringBoltBlock(BlockBehaviour.Properties.copy(Blocks.OXIDIZED_COPPER)));
+        public static final RegistryObject<Block> WAXED_OXIDIZED_COPPER_BOLTS = BLOCKS.register("waxed_oxidized_copper_bolts", () -> new SteelBoltBlock(BlockBehaviour.Properties.copy(Blocks.OXIDIZED_COPPER)));
+
         // Glass Jars
         public static final RegistryObject<Block> GLASS_JAR = BLOCKS.register("glass_jar", () -> new GlassJarBlock(BlockBehaviour.Properties.of(net.minecraft.world.level.material.Material.GLASS).strength(0.3F).sound(SoundType.GLASS).noOcclusion().isSuffocating((state, reader, pos) -> false).isViewBlocking((state, reader, pos) -> false)));
         public static final RegistryObject<Block> WHITE_GLASS_JAR = BLOCKS.register("white_glass_jar", () -> new GlassJarBlock(BlockBehaviour.Properties.of(net.minecraft.world.level.material.Material.GLASS, net.minecraft.world.level.material.MaterialColor.SNOW).strength(0.3F).sound(SoundType.GLASS).noOcclusion().isSuffocating((state, reader, pos) -> false).isViewBlocking((state, reader, pos) -> false)));
@@ -13078,6 +13105,16 @@ private static BlockBehaviour.Properties flamingSteelProperties() {
                         () -> new RotatedPillarBlock(flamingSteelProperties()));
         public static final RegistryObject<Block> FLAMING_BOLTED_STEEL_PILLAR = BLOCKS.register("flaming_bolted_steel_pillar",
                         () -> new RotatedPillarBlock(flamingSteelProperties()));
+        public static final RegistryObject<Block> FLAMING_STEEL_BOLTS = BLOCKS.register("flaming_steel_bolts",
+                        () -> new SteelBoltBlock(flamingSteelProperties()));
+        public static final RegistryObject<Block> FLAMING_STEEL_DOOR = BLOCKS.register("flaming_steel_door",
+                        () -> new ModCopperDoorBlock(BlockBehaviour.Properties.copy(FLAMING_STEEL_BLOCK.get()).noOcclusion()));
+        public static final RegistryObject<Block> FLAMING_STEEL_TRAPDOOR = BLOCKS.register("flaming_steel_trapdoor",
+                        () -> new ModCopperTrapdoorBlock(BlockBehaviour.Properties.copy(FLAMING_STEEL_BLOCK.get()).noOcclusion()));
+        public static final RegistryObject<Block> FLAMING_STEEL_BUTTON = BLOCKS.register("flaming_steel_button",
+                        () -> new ModButtonBlock(BlockBehaviour.Properties.copy(FLAMING_STEEL_BLOCK.get()).noCollission().strength(0.5f)));
+        public static final RegistryObject<Block> FLAMING_STEEL_PRESSURE_PLATE = BLOCKS.register("flaming_steel_pressure_plate",
+                        () -> new ModPressurePlateBlock(150, BlockBehaviour.Properties.copy(FLAMING_STEEL_BLOCK.get()).noCollission().strength(0.5f)));
         public static final RegistryObject<Block> MAGENTA_FLAMING_STEEL_BLOCK = BLOCKS.register("magenta_flaming_steel_block",
                         () -> new Block(flamingSteelProperties()));
         public static final RegistryObject<Block> MAGENTA_FLAMING_STEEL_BLOCK_SLAB = BLOCKS.register("magenta_flaming_steel_block_slab",

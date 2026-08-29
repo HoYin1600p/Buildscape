@@ -100,6 +100,13 @@ public class CopperOxidationHandler {
         registerWaxPair(ModBlocks.WEATHERED_COPPER_MESH, ModBlocks.WAXED_WEATHERED_COPPER_MESH);
         registerWaxPair(ModBlocks.OXIDIZED_COPPER_MESH, ModBlocks.WAXED_OXIDIZED_COPPER_MESH);
 
+        // Copper Bolts
+        registerChain(ModBlocks.COPPER_BOLTS, ModBlocks.EXPOSED_COPPER_BOLTS, ModBlocks.WEATHERED_COPPER_BOLTS, ModBlocks.OXIDIZED_COPPER_BOLTS);
+        registerWaxPair(ModBlocks.COPPER_BOLTS, ModBlocks.WAXED_COPPER_BOLTS);
+        registerWaxPair(ModBlocks.EXPOSED_COPPER_BOLTS, ModBlocks.WAXED_EXPOSED_COPPER_BOLTS);
+        registerWaxPair(ModBlocks.WEATHERED_COPPER_BOLTS, ModBlocks.WAXED_WEATHERED_COPPER_BOLTS);
+        registerWaxPair(ModBlocks.OXIDIZED_COPPER_BOLTS, ModBlocks.WAXED_OXIDIZED_COPPER_BOLTS);
+
         // 9. Cut Copper Vertical Slab
         registerChain(ModBlocks.CUT_COPPER_VERTICAL_SLAB, ModBlocks.EXPOSED_CUT_COPPER_VERTICAL_SLAB, ModBlocks.WEATHERED_CUT_COPPER_VERTICAL_SLAB, ModBlocks.OXIDIZED_CUT_COPPER_VERTICAL_SLAB);
         registerWaxPair(ModBlocks.CUT_COPPER_VERTICAL_SLAB, ModBlocks.WAXED_CUT_COPPER_VERTICAL_SLAB);

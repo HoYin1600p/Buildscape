@@ -6127,6 +6127,26 @@ public class ModItems {
             () -> new BlockItem(ModBlocks.STEEL_BOLTS.get(), createBlockItemProperties())
     );
 
+    public static final RegistryObject<Item> STEEL_DOOR = ITEMS.register(
+            "steel_door",
+            () -> new DoubleHighBlockItem(ModBlocks.STEEL_DOOR.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> STEEL_TRAPDOOR = ITEMS.register(
+            "steel_trapdoor",
+            () -> new BlockItem(ModBlocks.STEEL_TRAPDOOR.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> STEEL_BUTTON = ITEMS.register(
+            "steel_button",
+            () -> new BlockItem(ModBlocks.STEEL_BUTTON.get(), createBlockItemProperties())
+    );
+
+    public static final RegistryObject<Item> STEEL_PRESSURE_PLATE = ITEMS.register(
+            "steel_pressure_plate",
+            () -> new BlockItem(ModBlocks.STEEL_PRESSURE_PLATE.get(), createBlockItemProperties())
+    );
+
     public static final RegistryObject<Item> SCRAPED_STEEL_SLAB = ITEMS.register(
             "scraped_steel_slab",
             () -> new BlockItem(ModBlocks.SCRAPED_STEEL_SLAB.get(), createBlockItemProperties())
@@ -10204,6 +10224,16 @@ public class ModItems {
     public static final RegistryObject<Item> OXIDIZED_COPPER_BUTTON = ITEMS.register("oxidized_copper_button", () -> new BlockItem(ModBlocks.OXIDIZED_COPPER_BUTTON.get(), createBlockItemProperties()));
     public static final RegistryObject<Item> WAXED_OXIDIZED_COPPER_BUTTON = ITEMS.register("waxed_oxidized_copper_button", () -> new BlockItem(ModBlocks.WAXED_OXIDIZED_COPPER_BUTTON.get(), createBlockItemProperties()));
 
+    // Copper Bolts
+    public static final RegistryObject<Item> COPPER_BOLTS = ITEMS.register("copper_bolts", () -> new BlockItem(ModBlocks.COPPER_BOLTS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WAXED_COPPER_BOLTS = ITEMS.register("waxed_copper_bolts", () -> new BlockItem(ModBlocks.WAXED_COPPER_BOLTS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> EXPOSED_COPPER_BOLTS = ITEMS.register("exposed_copper_bolts", () -> new BlockItem(ModBlocks.EXPOSED_COPPER_BOLTS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WAXED_EXPOSED_COPPER_BOLTS = ITEMS.register("waxed_exposed_copper_bolts", () -> new BlockItem(ModBlocks.WAXED_EXPOSED_COPPER_BOLTS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WEATHERED_COPPER_BOLTS = ITEMS.register("weathered_copper_bolts", () -> new BlockItem(ModBlocks.WEATHERED_COPPER_BOLTS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WAXED_WEATHERED_COPPER_BOLTS = ITEMS.register("waxed_weathered_copper_bolts", () -> new BlockItem(ModBlocks.WAXED_WEATHERED_COPPER_BOLTS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> OXIDIZED_COPPER_BOLTS = ITEMS.register("oxidized_copper_bolts", () -> new BlockItem(ModBlocks.OXIDIZED_COPPER_BOLTS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WAXED_OXIDIZED_COPPER_BOLTS = ITEMS.register("waxed_oxidized_copper_bolts", () -> new BlockItem(ModBlocks.WAXED_OXIDIZED_COPPER_BOLTS.get(), createBlockItemProperties()));
+
     // Copper Pressure Plates
     public static final RegistryObject<Item> COPPER_PRESSURE_PLATE = ITEMS.register("copper_pressure_plate", () -> new BlockItem(ModBlocks.COPPER_PRESSURE_PLATE.get(), createBlockItemProperties()));
     public static final RegistryObject<Item> WAXED_COPPER_PRESSURE_PLATE = ITEMS.register("waxed_copper_pressure_plate", () -> new BlockItem(ModBlocks.WAXED_COPPER_PRESSURE_PLATE.get(), createBlockItemProperties()));
@@ -10782,6 +10812,16 @@ public static final RegistryObject<Item> FLAMING_STEEL_INGOT = ITEMS.register("f
             () -> new BlockItem(ModBlocks.FLAMING_STEEL_PILLAR.get(), createBlockItemProperties()));
     public static final RegistryObject<Item> FLAMING_BOLTED_STEEL_PILLAR = ITEMS.register("flaming_bolted_steel_pillar",
             () -> new BlockItem(ModBlocks.FLAMING_BOLTED_STEEL_PILLAR.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> FLAMING_STEEL_BOLTS = ITEMS.register("flaming_steel_bolts",
+            () -> new BlockItem(ModBlocks.FLAMING_STEEL_BOLTS.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> FLAMING_STEEL_DOOR = ITEMS.register("flaming_steel_door",
+            () -> new DoubleHighBlockItem(ModBlocks.FLAMING_STEEL_DOOR.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> FLAMING_STEEL_TRAPDOOR = ITEMS.register("flaming_steel_trapdoor",
+            () -> new BlockItem(ModBlocks.FLAMING_STEEL_TRAPDOOR.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> FLAMING_STEEL_BUTTON = ITEMS.register("flaming_steel_button",
+            () -> new BlockItem(ModBlocks.FLAMING_STEEL_BUTTON.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> FLAMING_STEEL_PRESSURE_PLATE = ITEMS.register("flaming_steel_pressure_plate",
+            () -> new BlockItem(ModBlocks.FLAMING_STEEL_PRESSURE_PLATE.get(), createBlockItemProperties()));
     public static final RegistryObject<Item> MAGENTA_FLAMING_STEEL_BLOCK = ITEMS.register("magenta_flaming_steel_block",
             () -> new BlockItem(ModBlocks.MAGENTA_FLAMING_STEEL_BLOCK.get(), createBlockItemProperties()));
     public static final RegistryObject<Item> MAGENTA_FLAMING_STEEL_BLOCK_SLAB = ITEMS.register("magenta_flaming_steel_block_slab",

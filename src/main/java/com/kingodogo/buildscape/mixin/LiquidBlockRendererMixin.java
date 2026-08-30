@@ -5,10 +5,9 @@ import com.kingodogo.buildscape.block.HollowPipeBlock;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.renderer.block.LiquidBlockRenderer;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.world.level.BlockAndTintGetter;
-import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -17,9 +16,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(LiquidBlockRenderer.class)
 public class LiquidBlockRendererMixin {
-
     @Inject(method = "tesselate", at = @At("HEAD"), cancellable = true)
-    private void buildscape$cancelPipeChunkFluidRender(
+    private void buildscape$cancelHollowChunkFluidRender(
             BlockAndTintGetter level,
             BlockPos pos,
             VertexConsumer buffer,
@@ -32,47 +30,27 @@ public class LiquidBlockRendererMixin {
         }
     }
 
-    @Inject(method = "isFaceOccludedByState", at = @At("HEAD"), cancellable = true)
-    private static void buildscape$occludeFluidAgainstPipe(
-            BlockGetter level,
-            Direction face,
-            float height,
-            BlockPos pos,
-            BlockState state,
-            CallbackInfoReturnable<Boolean> cir
-    ) {
-        if (state.getBlock() instanceof HollowPipeBlock) {
-            if (!HollowPipeBlock.isOpenEndpoint(state, face.getOpposite())) {
-                cir.setReturnValue(true);
-            }
-        } else if (state.getBlock() instanceof HollowLogBlock) {
-            if (!HollowLogBlock.isOpenEnd(state, face.getOpposite())) {
-                cir.setReturnValue(true);
-            }
-        }
-    }
-
-    @Inject(method = "shouldRenderFace", at = @At("HEAD"), cancellable = true)
-    private static void buildscape$cullWaterAgainstPipeWalls(
+    @Inject(method = "getHeight(Lnet/minecraft/world/level/BlockAndTintGetter;Lnet/minecraft/world/level/material/Fluid;Lnet/minecraft/core/BlockPos;)F", at = @At("HEAD"), cancellable = true)
+    private void buildscape$hollowFluidHeight(
             BlockAndTintGetter level,
+            Fluid fluid,
             BlockPos pos,
-            FluidState fluidState,
-            BlockState blockState,
-            Direction face,
-            FluidState neighborFluidState,
-            CallbackInfoReturnable<Boolean> cir
+            CallbackInfoReturnable<Float> cir
     ) {
-        BlockPos neighborPos = pos.relative(face);
-        BlockState neighborState = level.getBlockState(neighborPos);
-        if (neighborState.getBlock() instanceof HollowPipeBlock) {
-            if (!HollowPipeBlock.isOpenEndpoint(neighborState, face.getOpposite())) {
-                cir.setReturnValue(false);
-            }
-        } else if (neighborState.getBlock() instanceof HollowLogBlock) {
-            if (!HollowLogBlock.isOpenEnd(neighborState, face.getOpposite())) {
-                cir.setReturnValue(false);
+        BlockState state = level.getBlockState(pos);
+        if (state.getBlock() instanceof HollowPipeBlock) {
+            // Steel-pipe water is rendered as internal channel state, not as a
+            // vanilla full-block fluid. Treat the pipe shell as a boundary.
+            cir.setReturnValue(-1.0F);
+            return;
+        }
+        if (state.getBlock() instanceof HollowLogBlock) {
+            FluidState fluidState = state.getFluidState();
+            if (fluidState.getType().isSame(fluid)) {
+                cir.setReturnValue(fluidState.getOwnHeight());
+            } else {
+                cir.setReturnValue(-1.0F);
             }
         }
     }
 }
-

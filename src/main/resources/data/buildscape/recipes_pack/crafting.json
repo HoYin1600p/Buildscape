@@ -1873,7 +1873,7 @@
     ["BS:spruce_wood_stairs",["B  ","BB ","BBB"],[["B","MC:spruce_wood"]],4],
     ["BS:spruce_wood_wall",["   ","BBB","BBB"],[["B","MC:spruce_log"]],6],
     ["BS:steel_bars",["III","III"],[["I","BS:steel_ingot"]],16],
-    ["BS:steel_block",["NNN","NIN","NNN"],[["N","BS:steel_nugget"],["I","BS:steel_ingot"]],8],
+    ["BS:steel_block",["III","III","III"],[["I","BS:steel_ingot"]],1],
     ["BS:steel_block_slab",["###"],[["#","BS:steel_block"]],6],
     ["BS:steel_block_stairs",["#  ","## ","###"],[["#","BS:steel_block"]],4],
     ["BS:steel_block_wall",["###","###"],[["#","BS:steel_block"]],6],

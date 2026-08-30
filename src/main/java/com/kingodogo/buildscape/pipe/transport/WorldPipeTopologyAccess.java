@@ -11,15 +11,6 @@ import net.minecraft.world.level.material.Fluids;
 /**
  * Real-world adapter implementing PipeTopologyAccess by querying Minecraft's Level / BlockGetter
  * and existing Hollow Steel Pipe blockstates.
- *
- * IMPORTANT DESIGN RULE:
- * isWaterSource() must ONLY detect EXTERNAL, EXPLICIT water sources:
- *   (a) WATERLOGGED=true blockstate (water bucket placed directly in this pipe)
- *   (b) Open endpoint touching a WORLD water SOURCE block
- *
- * It must NEVER read back from fluidType, pipeFlowState, or any other transport state.
- * Reading back from transport state would create a circular dependency:
- *   simulation writes state → state is re-read as source → all pipes become sources.
  */
 public class WorldPipeTopologyAccess implements PipeTopologyAccess {
 
@@ -59,12 +50,11 @@ public class WorldPipeTopologyAccess implements PipeTopologyAccess {
      *
      * A pipe is a source if and only if:
      *   (a) Its blockstate has WATERLOGGED=true (water bucket was placed directly into this pipe), OR
-     *   (b) It has an open endpoint that directly borders a world water SOURCE block.
+     *   (b) It has an open endpoint that directly borders an EXTERNAL world water SOURCE block.
      *
-     * This method must NEVER read from:
-     *   - be.getFluidType() (old fluid logging — causes circular source propagation)
-     *   - be.getPipeFlowState() (transport state output — creates circular dependency)
-     *   - getContainedFluid() (aggregates fluidType which is the root-cause bug)
+     * Pipe outflow is placed as flowing water, never as a source, ensuring outflows do not become false sources.
+     * WATER_LEVEL > 0 is explicitly excluded: those pipes carry BFS-transported flowing water and must not be
+     * counted as real sources or the distance limit would be broken.
      */
     @Override
     public boolean isWaterSource(BlockPos pos) {
@@ -72,25 +62,41 @@ public class WorldPipeTopologyAccess implements PipeTopologyAccess {
         BlockState state = level.getBlockState(pos);
 
         // (a) Waterlogged blockstate: a water bucket was explicitly placed into this pipe.
-        // This is the ONLY internal state that makes a pipe a legitimate source.
         if (state.hasProperty(HollowPipeBlock.WATERLOGGED) && state.getValue(HollowPipeBlock.WATERLOGGED)) {
             return true;
         }
 
-        // (b) Open endpoint bordering an EXTERNAL world water SOURCE block.
-        // The world water source feeds water into the pipe network through the open passage.
-        // Pipe outflow is placed as flowing water, never as a source, and therefore
-        // cannot satisfy the source check below.
+        return hasExternalWaterSource(pos);
+    }
+
+    @Override
+    public int getInitialWaterFlowDistance(BlockPos pos) {
+        if (level == null || pos == null) return 0;
+        BlockState state = level.getBlockState(pos);
+        if (state.hasProperty(HollowPipeBlock.WATERLOGGED) && state.getValue(HollowPipeBlock.WATERLOGGED)) {
+            return 0;
+        }
+        // The intake pipe is itself vanilla's first flowing-water block.
+        return hasExternalWaterSource(pos) ? 1 : 0;
+    }
+
+    @Override
+    public Direction getSourceInflowDirection(BlockPos pos) {
+        if (level == null || pos == null) return null;
         for (Direction dir : Direction.values()) {
-            if (isOpenEndpoint(pos, dir)) {
-                BlockPos neighborPos = pos.relative(dir);
-                FluidState fs = level.getFluidState(neighborPos);
-                if (fs.isSource() && fs.getType() == Fluids.WATER) {
-                    return true;
-                }
+            if (!isOpenEndpoint(pos, dir)) continue;
+            BlockPos neighborPos = pos.relative(dir);
+            BlockState neighborState = level.getBlockState(neighborPos);
+            if (neighborState.getBlock() instanceof HollowPipeBlock) continue;
+            FluidState fluid = level.getFluidState(neighborPos);
+            if (fluid.isSource() && fluid.getType() == Fluids.WATER) {
+                return dir;
             }
         }
+        return null;
+    }
 
-        return false;
+    private boolean hasExternalWaterSource(BlockPos pos) {
+        return getSourceInflowDirection(pos) != null;
     }
 }

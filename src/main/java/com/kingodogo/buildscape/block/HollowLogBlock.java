@@ -1,11 +1,11 @@
 package com.kingodogo.buildscape.block;
 
 import com.kingodogo.buildscape.event.AdvancementEvents;
-import com.kingodogo.buildscape.item.ModItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -13,7 +13,6 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.BucketItem;
@@ -70,6 +69,7 @@ import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.shapes.BooleanOp;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.EntityCollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
@@ -78,35 +78,36 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.registries.ForgeRegistries;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Random;
 
 public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, SimpleWaterloggedBlock {
+
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
     public static final BooleanProperty LAVA_LOGGED = BooleanProperty.create("lava_logged");
-    public static final BooleanProperty HAS_GLASS_NEG = BooleanProperty.create("has_glass_neg");
-    public static final BooleanProperty HAS_GLASS_POS = BooleanProperty.create("has_glass_pos");
-    public static final BooleanProperty HAS_DECORATION = BooleanProperty.create("has_decoration");
+    public static final BooleanProperty HAS_GLASS_NEG = BooleanProperty.create("glass_neg");
+    public static final BooleanProperty HAS_GLASS_POS = BooleanProperty.create("glass_pos");
+    public static final BooleanProperty HAS_DECORATION = BooleanProperty.create("decoration");
 
-    private static final VoxelShape Y_NORTH = Block.box(0, 0, 0, 16, 16, 2);
-    private static final VoxelShape Y_SOUTH = Block.box(0, 0, 14, 16, 16, 16);
-    private static final VoxelShape Y_WEST  = Block.box(0, 0, 2, 2, 16, 14);
-    private static final VoxelShape Y_EAST  = Block.box(14, 0, 2, 16, 16, 14);
-    private static final VoxelShape Y_SHAPE = Shapes.or(Y_NORTH, Y_SOUTH, Y_WEST, Y_EAST);
-
-    private static final VoxelShape X_NORTH = Block.box(0, 0, 0, 16, 16, 2);
-    private static final VoxelShape X_SOUTH = Block.box(0, 0, 14, 16, 16, 16);
-    private static final VoxelShape X_DOWN  = Block.box(0, 0, 2, 16, 2, 14);
-    private static final VoxelShape X_UP    = Block.box(0, 14, 2, 16, 16, 14);
-    private static final VoxelShape X_SHAPE = Shapes.or(X_NORTH, X_SOUTH, X_DOWN, X_UP);
-
-    private static final VoxelShape Z_WEST  = Block.box(0, 0, 0, 2, 16, 16);
-    private static final VoxelShape Z_EAST  = Block.box(14, 0, 0, 16, 16, 16);
-    private static final VoxelShape Z_DOWN  = Block.box(2, 0, 0, 14, 2, 16);
-    private static final VoxelShape Z_UP    = Block.box(2, 14, 0, 14, 16, 16);
-    private static final VoxelShape Z_SHAPE = Shapes.or(Z_WEST, Z_EAST, Z_DOWN, Z_UP);
+    private static final VoxelShape Y_SHAPE = Shapes.join(
+            Shapes.block(),
+            Block.box(2, 0, 2, 14, 16, 14),
+            BooleanOp.ONLY_FIRST
+    );
+    private static final VoxelShape X_SHAPE = Shapes.join(
+            Shapes.block(),
+            Block.box(0, 2, 2, 16, 14, 14),
+            BooleanOp.ONLY_FIRST
+    );
+    private static final VoxelShape Z_SHAPE = Shapes.join(
+            Shapes.block(),
+            Block.box(2, 2, 0, 14, 14, 16),
+            BooleanOp.ONLY_FIRST
+    );
 
     public HollowLogBlock(Properties properties) {
-        super(properties.noOcclusion());
+        super(properties);
         this.registerDefaultState(this.defaultBlockState()
                 .setValue(AXIS, Direction.Axis.Y)
                 .setValue(WATERLOGGED, false)
@@ -254,22 +255,13 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
                         if (targetPos) hollowBe.setGlassCoverPos(glassState);
                         else hollowBe.setGlassCoverNeg(glassState);
                         hollowBe.setGlassPlacedByPlayer(player.getUUID());
+                        hollowBe.setChanged();
                     }
                     if (!player.getAbilities().instabuild) {
                         held.shrink(1);
                     }
                     level.playSound(null, pos, SoundEvents.GLASS_PLACE, SoundSource.BLOCKS, 1.0F, 1.0F);
-
-                    if (player instanceof ServerPlayer serverPlayer) {
-                        if (state.getValue(LAVA_LOGGED) || (hollowBe != null && "lava".equals(hollowBe.getFluidType()))) {
-                            if (hollowBe != null && serverPlayer.getUUID().equals(hollowBe.getLavaPlacedByPlayer())) {
-                                AdvancementEvents.grant(serverPlayer, "finally_you_can_walk_on_lava");
-                            }
-                        }
-                        if (state.getValue(WATERLOGGED) || (hollowBe != null && "water".equals(hollowBe.getFluidType()))) {
-                            AdvancementEvents.grant(serverPlayer, "i_feel_like_jesus");
-                        }
-                    }
+                    level.updateNeighborsAt(pos, state.getBlock());
                 }
                 return InteractionResult.sidedSuccess(level.isClientSide);
             }
@@ -277,14 +269,15 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
 
         // 2. Fluid interactions (Lava, Water, Experience, or Modded Fluids) — REJECT IF DECORATION IS PRESENT
         if (!hasDecoration) {
+            Fluid sourceFluid = HollowPipeBlock.getSourceFluid(state, hollowBe);
             Fluid containedFluid = HollowPipeBlock.getContainedFluid(state, hollowBe);
 
             boolean isEmptyBucket = held.is(Items.BUCKET)
                     || (held.getItem() instanceof BucketItem bi && bi.getFluid() == Fluids.EMPTY)
                     || (FluidUtil.getFluidHandler(held).isPresent() && FluidUtil.getFluidContained(held).orElse(FluidStack.EMPTY).isEmpty());
 
-            // Empty Bucket interaction to retrieve fluid
-            if (isEmptyBucket && containedFluid != Fluids.EMPTY) {
+            // Empty Bucket interaction to retrieve fluid (SOURCE ONLY)
+            if (isEmptyBucket && sourceFluid != Fluids.EMPTY) {
                 if (!level.isClientSide) {
                     if (hollowBe != null) {
                         hollowBe.setFluidType("none");
@@ -293,8 +286,9 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
                     }
                     state = state.setValue(WATERLOGGED, false).setValue(LAVA_LOGGED, false);
                     level.setBlock(pos, state, 3);
+                    level.updateNeighborsAt(pos, state.getBlock());
 
-                    ItemStack filledBucket = HollowPipeBlock.getFilledBucketForFluid(containedFluid);
+                    ItemStack filledBucket = HollowPipeBlock.getFilledBucketForFluid(sourceFluid);
                     if (!player.getAbilities().instabuild) {
                         held.shrink(1);
                         if (held.isEmpty()) {
@@ -303,8 +297,8 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
                             player.drop(filledBucket, false);
                         }
                     }
-                    SoundEvent sound = containedFluid.getAttributes().getFillSound();
-                    if (sound == null) sound = (containedFluid == Fluids.LAVA) ? SoundEvents.BUCKET_FILL_LAVA : SoundEvents.BUCKET_FILL;
+                    SoundEvent sound = sourceFluid.getAttributes().getFillSound();
+                    if (sound == null) sound = (sourceFluid == Fluids.LAVA) ? SoundEvents.BUCKET_FILL_LAVA : SoundEvents.BUCKET_FILL;
                     level.playSound(null, pos, sound, SoundSource.BLOCKS, 1.0F, 1.0F);
                 }
                 return InteractionResult.sidedSuccess(level.isClientSide);
@@ -313,7 +307,7 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
             // Filled Fluid Bucket interaction to deposit fluid
             Fluid fluidInBucket = HollowPipeBlock.getFluidFromItem(held);
             if (fluidInBucket != Fluids.EMPTY) {
-                if (containedFluid != Fluids.EMPTY) {
+                if (sourceFluid != Fluids.EMPTY) {
                     // NEVER allow replacing an existing fluid in a log! Only one fluid type per blockspace.
                     return InteractionResult.sidedSuccess(level.isClientSide);
                 }
@@ -333,7 +327,12 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
                     }
                     state = state.setValue(WATERLOGGED, isWater).setValue(LAVA_LOGGED, isLava);
                     level.setBlock(pos, state, 3);
-                    tryFlowOut(level, pos, state, fluidInBucket);
+                    trySpreadToWorld(level, pos, state, fluidInBucket);
+                    if (fluidInBucket instanceof FlowingFluid flowing) {
+                        level.scheduleTick(pos, flowing, flowing.getTickDelay(level));
+                    }
+                    level.updateNeighborsAt(pos, state.getBlock());
+
                     if (!player.getAbilities().instabuild) {
                         ItemStack emptyContainer = held.hasContainerItem() ? held.getContainerItem() : new ItemStack(Items.BUCKET);
                         held.shrink(1);
@@ -346,14 +345,6 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
                     SoundEvent sound = fluidInBucket.getAttributes().getEmptySound();
                     if (sound == null) sound = (fluidInBucket == Fluids.LAVA) ? SoundEvents.BUCKET_EMPTY_LAVA : SoundEvents.BUCKET_EMPTY;
                     level.playSound(null, pos, sound, SoundSource.BLOCKS, 1.0F, 1.0F);
-
-                    if (player instanceof ServerPlayer serverPlayer) {
-                        if (isLava && (state.getValue(HAS_GLASS_NEG) || state.getValue(HAS_GLASS_POS))) {
-                            if (hollowBe != null && serverPlayer.getUUID().equals(hollowBe.getGlassPlacedByPlayer())) {
-                                AdvancementEvents.grant(serverPlayer, "finally_you_can_walk_on_lava");
-                            }
-                        }
-                    }
                 }
                 return InteractionResult.sidedSuccess(level.isClientSide);
             }
@@ -365,6 +356,7 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
             if (pottedState != null) {
                 if (!level.isClientSide) {
                     hollowBe.setDecorationState(pottedState);
+                    hollowBe.setChanged();
                     if (!player.getAbilities().instabuild) {
                         held.shrink(1);
                     }
@@ -386,6 +378,7 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
                     level.setBlock(pos, state, 3);
                     if (hollowBe != null) {
                         hollowBe.setDecorationState(Blocks.FLOWER_POT.defaultBlockState());
+                        hollowBe.setChanged();
                     }
                     if (!player.getAbilities().instabuild) {
                         held.shrink(1);
@@ -407,6 +400,7 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
                         level.setBlock(pos, state, 3);
                         if (hollowBe != null) {
                             hollowBe.setDecorationState(stateToStore);
+                            hollowBe.setChanged();
                         }
                         if (!player.getAbilities().instabuild) {
                             held.shrink(1);
@@ -437,8 +431,18 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
                         }
                         if (targetPos) hollowBe.setGlassCoverPos(Blocks.AIR.defaultBlockState());
                         else hollowBe.setGlassCoverNeg(Blocks.AIR.defaultBlockState());
+                        hollowBe.setChanged();
                     }
                     level.playSound(null, pos, SoundEvents.GLASS_BREAK, SoundSource.BLOCKS, 1.0F, 1.0F);
+
+                    Fluid fluid = HollowPipeBlock.getContainedFluid(state, hollowBe);
+                    if (fluid != Fluids.EMPTY) {
+                        trySpreadToWorld(level, pos, state, fluid);
+                        if (fluid instanceof FlowingFluid flowing) {
+                            level.scheduleTick(pos, flowing, flowing.getTickDelay(level));
+                        }
+                    }
+                    level.updateNeighborsAt(pos, state.getBlock());
                 }
                 return InteractionResult.sidedSuccess(level.isClientSide);
             } else if (hasAnyDecoration) {
@@ -451,8 +455,10 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
                             popResource(level, pos, drop);
                         }
                         hollowBe.setDecorationState(Blocks.AIR.defaultBlockState());
+                        hollowBe.setChanged();
                     }
                     level.playSound(null, pos, SoundEvents.GRASS_BREAK, SoundSource.BLOCKS, 1.0F, 1.0F);
+                    level.updateNeighborsAt(pos, state.getBlock());
                 }
                 return InteractionResult.sidedSuccess(level.isClientSide);
             }
@@ -461,42 +467,27 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
         return InteractionResult.PASS;
     }
 
-    public static java.util.List<ItemStack> getDecorationDrops(BlockState decorationState) {
-        java.util.List<ItemStack> drops = new java.util.ArrayList<>();
-        if (decorationState != null && !decorationState.isAir()) {
-            Block block = decorationState.getBlock();
-            if (block instanceof FlowerPotBlock potBlock) {
-                drops.add(new ItemStack(Items.FLOWER_POT));
-                Block content = potBlock.getContent();
-                if (content != null && content != Blocks.AIR) {
-                    Item plantItem = content.asItem();
-                    if (plantItem != null && plantItem != Items.AIR) {
-                        drops.add(new ItemStack(plantItem));
-                    }
-                }
+    private static List<ItemStack> getDecorationDrops(BlockState decState) {
+        if (decState == null || decState.isAir()) return Collections.emptyList();
+        if (decState.getBlock() instanceof FlowerPotBlock potBlock) {
+            if (potBlock == Blocks.FLOWER_POT) {
+                return List.of(new ItemStack(Items.FLOWER_POT));
             } else {
-                Item item = block.asItem();
-                if (item != null && item != Items.AIR) {
-                    drops.add(new ItemStack(item));
+                Block content = potBlock.getContent();
+                ItemStack plantDrop = (content != null && content != Blocks.AIR) ? new ItemStack(content) : ItemStack.EMPTY;
+                if (!plantDrop.isEmpty()) {
+                    return List.of(new ItemStack(Items.FLOWER_POT), plantDrop);
+                } else {
+                    return List.of(new ItemStack(potBlock.asItem()));
                 }
             }
         }
-        return drops;
+        return List.of(new ItemStack(decState.getBlock()));
     }
 
     private static boolean isFullGlassBlock(ItemStack stack) {
-        if (stack == null || stack.isEmpty()) return false;
-        Item item = stack.getItem();
-        if (item == Items.GLASS || item == Items.TINTED_GLASS) return true;
-        if (item instanceof BlockItem blockItem) {
+        if (stack != null && !stack.isEmpty() && stack.getItem() instanceof BlockItem blockItem) {
             Block block = blockItem.getBlock();
-
-            // Exclude Non-Full Glass Shapes (Panes, Fences, Gates, Walls, Slabs, Stairs, Jars, etc.)
-            if (block instanceof IronBarsBlock || block instanceof FenceBlock || block instanceof FenceGateBlock
-                    || block instanceof WallBlock || block instanceof SlabBlock || block instanceof StairBlock
-                    || block instanceof GlassJarBlock) {
-                return false;
-            }
 
             // Standard Minecraft Glass Classes
             if (block instanceof GlassBlock || block instanceof StainedGlassBlock || block instanceof AbstractGlassBlock) {
@@ -621,7 +612,7 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
     public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
         if (!state.is(newState.getBlock())) {
             BlockEntity be = level.getBlockEntity(pos);
-            Fluid loggedFluid = HollowPipeBlock.getContainedFluid(state, be);
+            Fluid sourceFluid = HollowPipeBlock.getSourceFluid(state, be);
             if (be instanceof HollowLogBlockEntity hollowBe) {
                 if (!hollowBe.getGlassCoverNeg().isAir()) {
                     popResource(level, pos, new ItemStack(hollowBe.getGlassCoverNeg().getBlock()));
@@ -636,67 +627,15 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
                 }
             }
             super.onRemove(state, level, pos, newState, isMoving);
-            if (!level.isClientSide && loggedFluid != null && loggedFluid != Fluids.EMPTY) {
-                BlockState fluidBlock = loggedFluid.defaultFluidState().createLegacyBlock();
+            if (!level.isClientSide && sourceFluid != null && sourceFluid != Fluids.EMPTY) {
+                BlockState fluidBlock = sourceFluid.defaultFluidState().createLegacyBlock();
                 if (!fluidBlock.isAir() && level.getBlockState(pos).isAir()) {
                     level.setBlock(pos, fluidBlock, 3);
-                    level.scheduleTick(pos, loggedFluid, loggedFluid.getTickDelay(level));
+                    level.scheduleTick(pos, sourceFluid, sourceFluid.getTickDelay(level));
                 }
             }
         } else {
             super.onRemove(state, level, pos, newState, isMoving);
-        }
-    }
-
-    @Override
-    public void tick(BlockState state, ServerLevel level, BlockPos pos, Random random) {
-        super.tick(state, level, pos, random);
-        BlockEntity be = level.getBlockEntity(pos);
-        Fluid fluid = HollowPipeBlock.getContainedFluid(state, be);
-        tryFlowOut(level, pos, state, fluid);
-    }
-
-    public static void tryFlowOut(Level level, BlockPos pos, BlockState state, Fluid fluid) {
-        if (fluid == null || fluid == Fluids.EMPTY || level.isClientSide) return;
-        Direction.Axis axis = state.getValue(AXIS);
-        Direction negDir = switch (axis) {
-            case X -> Direction.WEST;
-            case Z -> Direction.NORTH;
-            default -> Direction.DOWN;
-        };
-        Direction posDir = switch (axis) {
-            case X -> Direction.EAST;
-            case Z -> Direction.SOUTH;
-            default -> Direction.UP;
-        };
-
-        boolean hasGlassNeg = state.getValue(HAS_GLASS_NEG);
-        boolean hasGlassPos = state.getValue(HAS_GLASS_POS);
-
-        if (!hasGlassNeg && negDir != Direction.UP) {
-            spreadFluidToNeighbor(level, pos.relative(negDir), fluid);
-        }
-        if (!hasGlassPos && posDir != Direction.UP) {
-            spreadFluidToNeighbor(level, pos.relative(posDir), fluid);
-        }
-    }
-
-    private static void spreadFluidToNeighbor(Level level, BlockPos neighborPos, Fluid fluid) {
-        BlockState neighborState = level.getBlockState(neighborPos);
-        if (neighborState.isAir() || neighborState.canBeReplaced(fluid) || (neighborState.getBlock() instanceof LiquidBlock && !neighborState.getFluidState().isSource())) {
-            if (fluid instanceof FlowingFluid flowing) {
-                BlockState fluidBlock = flowing.getFlowing(7, false).createLegacyBlock();
-                if (!fluidBlock.isAir() && !neighborState.equals(fluidBlock)) {
-                    level.setBlock(neighborPos, fluidBlock, 3);
-                    level.scheduleTick(neighborPos, flowing, flowing.getTickDelay(level));
-                }
-            } else {
-                BlockState fluidBlock = fluid.defaultFluidState().createLegacyBlock();
-                if (!fluidBlock.isAir() && !neighborState.equals(fluidBlock)) {
-                    level.setBlock(neighborPos, fluidBlock, 3);
-                    level.scheduleTick(neighborPos, fluid, fluid.getTickDelay(level));
-                }
-            }
         }
     }
 
@@ -774,27 +713,70 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
                 }
             }
             Fluid fluid = HollowPipeBlock.getContainedFluid(state, be);
-            tryFlowOut(level, pos, state, fluid);
+            if (fluid != Fluids.EMPTY) {
+                trySpreadToWorld(level, pos, state, fluid);
+            }
         }
     }
 
     @Override
     public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
-        if (!level.isClientSide() && direction != Direction.UP && level instanceof Level lvl) {
-            Direction.Axis axis = state.getValue(AXIS);
-            boolean isEnd = (axis == Direction.Axis.X && (direction == Direction.WEST || direction == Direction.EAST))
-                         || (axis == Direction.Axis.Z && (direction == Direction.NORTH || direction == Direction.SOUTH))
-                         || (axis == Direction.Axis.Y && direction == Direction.DOWN);
-            boolean hasGlass = (direction == Direction.WEST || direction == Direction.NORTH || direction == Direction.DOWN)
-                    ? state.getValue(HAS_GLASS_NEG) : state.getValue(HAS_GLASS_POS);
-            if (isEnd && !hasGlass && (neighborState.isAir() || neighborState.canBeReplaced(Fluids.WATER))) {
-                Fluid fluid = HollowPipeBlock.getContainedFluid(state, lvl.getBlockEntity(pos));
-                if (fluid != Fluids.EMPTY) {
-                    spreadFluidToNeighbor(lvl, neighborPos, fluid);
-                }
+        if (!level.isClientSide() && level instanceof Level lvl) {
+            Fluid fluid = HollowPipeBlock.getContainedFluid(state, lvl.getBlockEntity(pos));
+            if (fluid != Fluids.EMPTY) {
+                trySpreadToWorld(lvl, pos, state, fluid);
             }
         }
         return super.updateShape(state, direction, neighborState, level, pos, neighborPos);
+    }
+
+    public static void trySpreadToWorld(Level level, BlockPos pos, BlockState state, Fluid fluid) {
+        if (fluid == null || fluid == Fluids.EMPTY || level.isClientSide) return;
+        Direction.Axis axis = state.getValue(AXIS);
+        Direction negDir = switch (axis) {
+            case X -> Direction.WEST;
+            case Z -> Direction.NORTH;
+            default -> Direction.DOWN;
+        };
+        Direction posDir = switch (axis) {
+            case X -> Direction.EAST;
+            case Z -> Direction.SOUTH;
+            default -> Direction.UP;
+        };
+
+        boolean hasGlassNeg = state.getValue(HAS_GLASS_NEG);
+        boolean hasGlassPos = state.getValue(HAS_GLASS_POS);
+
+        if (!hasGlassNeg && negDir != Direction.UP) {
+            spreadToWorldBlock(level, pos.relative(negDir), fluid);
+        }
+        if (!hasGlassPos && posDir != Direction.UP) {
+            spreadToWorldBlock(level, pos.relative(posDir), fluid);
+        }
+    }
+
+    private static void spreadToWorldBlock(Level level, BlockPos neighborPos, Fluid fluid) {
+        BlockState neighborState = level.getBlockState(neighborPos);
+        // Do NOT modify or infect other hollow logs or hollow pipes
+        if (neighborState.getBlock() instanceof HollowLogBlock || neighborState.getBlock() instanceof HollowPipeBlock) {
+            return;
+        }
+
+        if (neighborState.isAir() || neighborState.canBeReplaced(fluid) || (neighborState.getBlock() instanceof LiquidBlock && !neighborState.getFluidState().isSource())) {
+            if (fluid instanceof FlowingFluid flowing) {
+                BlockState fluidBlock = flowing.getFlowing(7, false).createLegacyBlock();
+                if (!fluidBlock.isAir() && !neighborState.equals(fluidBlock)) {
+                    level.setBlock(neighborPos, fluidBlock, 3);
+                    level.scheduleTick(neighborPos, flowing, flowing.getTickDelay(level));
+                }
+            } else {
+                BlockState fluidBlock = fluid.defaultFluidState().createLegacyBlock();
+                if (!fluidBlock.isAir() && !neighborState.equals(fluidBlock)) {
+                    level.setBlock(neighborPos, fluidBlock, 3);
+                    level.scheduleTick(neighborPos, fluid, fluid.getTickDelay(level));
+                }
+            }
+        }
     }
 
     @Override
@@ -806,12 +788,17 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
     public boolean placeLiquid(LevelAccessor level, BlockPos pos, BlockState state, FluidState fluidState) {
         if (!state.getValue(WATERLOGGED) && !state.getValue(LAVA_LOGGED) && fluidState.getType() == Fluids.WATER) {
             if (!level.isClientSide()) {
-                level.setBlock(pos, state.setValue(WATERLOGGED, true), 3);
+                BlockState newState = state.setValue(WATERLOGGED, true);
+                level.setBlock(pos, newState, 3);
                 level.scheduleTick(pos, fluidState.getType(), fluidState.getType().getTickDelay(level));
                 BlockEntity be = level.getBlockEntity(pos);
                 if (be instanceof HollowLogBlockEntity hollowBe) {
                     hollowBe.setFluidType("water");
                     hollowBe.setChanged();
+                }
+                if (level instanceof Level lvl) {
+                    trySpreadToWorld(lvl, pos, newState, Fluids.WATER);
+                    lvl.updateNeighborsAt(pos, newState.getBlock());
                 }
             }
             return true;
@@ -823,15 +810,15 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
     public ItemStack pickupBlock(LevelAccessor level, BlockPos pos, BlockState state) {
         BlockEntity be = level.getBlockEntity(pos);
         HollowLogBlockEntity hollowBe = be instanceof HollowLogBlockEntity h ? h : null;
-        Fluid containedFluid = HollowPipeBlock.getContainedFluid(state, be);
-        if (containedFluid != Fluids.EMPTY) {
+        Fluid sourceFluid = HollowPipeBlock.getSourceFluid(state, be);
+        if (sourceFluid != Fluids.EMPTY) {
             if (hollowBe != null) {
                 hollowBe.setFluidType("none");
                 hollowBe.setLavaTicks(0);
                 hollowBe.setChanged();
             }
             level.setBlock(pos, state.setValue(WATERLOGGED, false).setValue(LAVA_LOGGED, false), 3);
-            return HollowPipeBlock.getFilledBucketForFluid(containedFluid);
+            return HollowPipeBlock.getFilledBucketForFluid(sourceFluid);
         }
         return ItemStack.EMPTY;
     }

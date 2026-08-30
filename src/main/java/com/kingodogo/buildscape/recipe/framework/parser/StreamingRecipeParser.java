@@ -333,37 +333,56 @@ public class StreamingRecipeParser {
     }
 
     private static RecipeIR.RecipeSpec parseRecipeSpec(JsonReader reader, String defaultType) throws IOException {
-        String id = null;
-        String type = defaultType;
-        String group = "";
-        List<String> pattern = new ArrayList<>();
-        Map<String, String> keys = new HashMap<>();
-        List<String> ingredients = new ArrayList<>();
-        String input = null;
-        RecipeIR.ResultSpec result = null;
-        int cookingTime = 200;
-        float experience = 0.1f;
+        com.google.gson.JsonElement jsonElement = com.google.gson.JsonParser.parseReader(reader);
+        if (!jsonElement.isJsonObject()) {
+            return new RecipeIR.RecipeSpec(null, defaultType, "", List.of(), Map.of(), List.of(), null, null, 200, 0.1f, null);
+        }
+        com.google.gson.JsonObject json = jsonElement.getAsJsonObject();
+        String rawJson = json.toString();
 
-        reader.beginObject();
-        while (reader.hasNext()) {
-            String key = reader.nextName();
-            switch (key) {
-                case "id" -> id = reader.nextString();
-                case "type" -> type = reader.nextString();
-                case "group" -> group = reader.nextString();
-                case "pattern" -> parseStringList(reader, pattern);
-                case "keys" -> parseAliases(reader, keys);
-                case "ingredients" -> parseStringList(reader, ingredients);
-                case "input" -> input = reader.nextString();
-                case "result" -> result = parseResultSpec(reader);
-                case "cookingTime" -> cookingTime = reader.nextInt();
-                case "experience" -> experience = (float) reader.nextDouble();
-                default -> reader.skipValue();
+        String id = json.has("id") ? json.get("id").getAsString() : null;
+        String type = json.has("type") ? json.get("type").getAsString() : defaultType;
+        String group = json.has("group") ? json.get("group").getAsString() : "";
+        List<String> pattern = new ArrayList<>();
+        if (json.has("pattern") && json.get("pattern").isJsonArray()) {
+            for (com.google.gson.JsonElement el : json.getAsJsonArray("pattern")) {
+                pattern.add(el.getAsString());
             }
         }
-        reader.endObject();
+        Map<String, String> keys = new HashMap<>();
+        if (json.has("keys") && json.get("keys").isJsonObject()) {
+            for (Map.Entry<String, com.google.gson.JsonElement> e : json.getAsJsonObject("keys").entrySet()) {
+                keys.put(e.getKey(), e.getValue().getAsString());
+            }
+        } else if (json.has("key") && json.get("key").isJsonObject()) {
+            for (Map.Entry<String, com.google.gson.JsonElement> e : json.getAsJsonObject("key").entrySet()) {
+                keys.put(e.getKey(), e.getValue().toString());
+            }
+        }
+        List<String> ingredients = new ArrayList<>();
+        if (json.has("ingredients") && json.get("ingredients").isJsonArray()) {
+            for (com.google.gson.JsonElement el : json.getAsJsonArray("ingredients")) {
+                ingredients.add(el.getAsString());
+            }
+        }
+        String input = json.has("input") ? json.get("input").getAsString() : null;
+        RecipeIR.ResultSpec result = null;
+        if (json.has("result")) {
+            com.google.gson.JsonElement resEl = json.get("result");
+            if (resEl.isJsonPrimitive()) {
+                result = new RecipeIR.ResultSpec(resEl.getAsString(), 1, null);
+            } else if (resEl.isJsonObject()) {
+                com.google.gson.JsonObject resObj = resEl.getAsJsonObject();
+                String item = resObj.has("item") ? resObj.get("item").getAsString() : null;
+                int count = resObj.has("count") ? resObj.get("count").getAsInt() : 1;
+                String nbt = resObj.has("nbt") ? resObj.get("nbt").toString() : null;
+                result = new RecipeIR.ResultSpec(item, count, nbt);
+            }
+        }
+        int cookingTime = json.has("cookingtime") ? json.get("cookingtime").getAsInt() : (json.has("cookingTime") ? json.get("cookingTime").getAsInt() : 200);
+        float experience = json.has("experience") ? json.get("experience").getAsFloat() : 0.1f;
 
-        return new RecipeIR.RecipeSpec(id, type, group, pattern, keys, ingredients, input, result, cookingTime, experience);
+        return new RecipeIR.RecipeSpec(id, type, group, pattern, keys, ingredients, input, result, cookingTime, experience, rawJson);
     }
 
     private static RecipeIR.ResultSpec parseResultSpec(JsonReader reader) throws IOException {

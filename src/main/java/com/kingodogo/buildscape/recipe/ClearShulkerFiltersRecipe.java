@@ -99,16 +99,23 @@ public class ClearShulkerFiltersRecipe extends CustomRecipe {
         if (blockEntityTag == null) return;
 
         blockEntityTag.remove(FILTERS_TAG);
-        if (!blockEntityTag.contains("Items", Tag.TAG_LIST)) return;
-
-        ListTag items = blockEntityTag.getList("Items", Tag.TAG_COMPOUND);
-        for (int i = items.size() - 1; i >= 0; i--) {
-            CompoundTag item = items.getCompound(i);
-            if (item.contains("tag", Tag.TAG_COMPOUND)
-                    && item.getCompound("tag").getBoolean("ghost")) {
-                items.remove(i);
+        if (blockEntityTag.contains("Items", Tag.TAG_LIST)) {
+            ListTag items = blockEntityTag.getList("Items", Tag.TAG_COMPOUND);
+            for (int i = items.size() - 1; i >= 0; i--) {
+                CompoundTag item = items.getCompound(i);
+                if (item.contains("tag", Tag.TAG_COMPOUND)
+                        && item.getCompound("tag").getBoolean("ghost")) {
+                    items.remove(i);
+                }
+            }
+            if (items.isEmpty()) {
+                blockEntityTag.remove("Items");
+            } else {
+                blockEntityTag.put("Items", items);
             }
         }
-        blockEntityTag.put("Items", items);
+        if (blockEntityTag.isEmpty()) {
+            stack.removeTagKey(BLOCK_ENTITY_TAG);
+        }
     }
 }

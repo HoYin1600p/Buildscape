@@ -1,7 +1,7 @@
 package com.kingodogo.buildscape.block;
 
 import com.kingodogo.buildscape.event.AdvancementEvents;
-import com.kingodogo.buildscape.block.HollowPipeBlock;
+import com.kingodogo.buildscape.pipe.transport.HollowPipeTransportManager;
 import com.kingodogo.buildscape.pipe.transport.PipeFlowState;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
@@ -40,6 +40,14 @@ public class HollowLogBlockEntity extends BlockEntity {
         super(ModBlockEntities.HOLLOW_LOG_BLOCK_ENTITY.get(), pos, state);
     }
 
+    @Override
+    public void onLoad() {
+        super.onLoad();
+        if (level != null && !level.isClientSide && getBlockState().getBlock() instanceof HollowPipeBlock) {
+            HollowPipeTransportManager.markDirty(level, worldPosition);
+        }
+    }
+
     public PipeFlowState getPipeFlowState() {
         return pipeFlowState;
     }
@@ -48,6 +56,8 @@ public class HollowLogBlockEntity extends BlockEntity {
         this.pipeFlowState = pipeFlowState != null ? pipeFlowState : new PipeFlowState();
         this.pendingTargetState = null;
         this.flowDelayTicks = 0;
+        setChanged();
+        syncToClient();
     }
 
     /**
@@ -70,6 +80,19 @@ public class HollowLogBlockEntity extends BlockEntity {
         } else {
             this.pendingTargetState = next;
             this.flowDelayTicks = delayTicks;
+            if (level != null && !level.isClientSide) {
+                level.scheduleTick(worldPosition, getBlockState().getBlock(), delayTicks);
+            }
+        }
+    }
+
+    public void applyPendingFlowState(Level level, BlockPos pos, BlockState state) {
+        if (this.pendingTargetState != null) {
+            this.pipeFlowState = this.pendingTargetState;
+            this.pendingTargetState = null;
+            this.flowDelayTicks = 0;
+            setChanged();
+            syncToClient();
         }
     }
 
@@ -160,11 +183,6 @@ public class HollowLogBlockEntity extends BlockEntity {
                 blockEntity.pendingTargetState = null;
                 blockEntity.setChanged();
                 blockEntity.syncToClient();
-                // The transport state may become a terminal endpoint without a
-                // neighbor block update. Seed its real vanilla flowing-water
-                // outlet immediately; FluidBlock then owns all subsequent flow.
-                HollowPipeBlock.tryFlowOut(level, pos, state,
-                        HollowPipeBlock.getContainedFluid(state, blockEntity));
             }
         }
 
@@ -189,16 +207,6 @@ public class HollowLogBlockEntity extends BlockEntity {
                     if (!blockEntity.glassCoverPos.isAir()) {
                         Block.popResource(level, pos, new ItemStack(blockEntity.glassCoverPos.getBlock()));
                         hadGlass = true;
-                    }
-
-                    // Trigger achievement "No More Walking on Lava" strictly to the player who placed BOTH lava and glass
-                    if (hadGlass && blockEntity.lavaPlacedByPlayer != null && blockEntity.lavaPlacedByPlayer.equals(blockEntity.glassPlacedByPlayer)) {
-                        if (level.getServer() != null) {
-                            ServerPlayer player = level.getServer().getPlayerList().getPlayer(blockEntity.lavaPlacedByPlayer);
-                            if (player != null) {
-                                AdvancementEvents.grant(player, "no_more_walking_on_lava");
-                            }
-                        }
                     }
 
                     // Replace with lava or fire
@@ -268,7 +276,7 @@ public class HollowLogBlockEntity extends BlockEntity {
 
     @Override
     public CompoundTag getUpdateTag() {
-        CompoundTag tag = super.getUpdateTag();
+        CompoundTag tag = new CompoundTag();
         saveAdditional(tag);
         return tag;
     }

@@ -108,23 +108,37 @@ public class BinaryRecipeCache {
         }
     }
 
-    public static void saveCache(String hash, List<Recipe<?>> recipes) {
-        Path cacheFile = getCacheDir().resolve("recipes.bscb");
-        Path hashFile = getCacheDir().resolve("recipes.bscb.hash");
+    public static boolean isCacheable(Recipe<?> recipe) {
+        if (recipe == null) return false;
+        return recipe instanceof ShapedRecipe
+                || recipe instanceof ShapelessRecipe
+                || recipe instanceof StonecutterRecipe
+                || recipe instanceof SmeltingRecipe
+                || recipe instanceof BlastingRecipe
+                || recipe instanceof SmokingRecipe
+                || recipe instanceof CampfireCookingRecipe
+                || recipe instanceof UpgradeRecipe
+                || recipe instanceof com.kingodogo.buildscape.recipe.ShapedDurabilityRecipe
+                || recipe instanceof com.kingodogo.buildscape.recipe.ShapelessDurabilityRecipe
+                || recipe instanceof com.kingodogo.buildscape.recipe.ConfettiConfigureRecipe
+                || recipe instanceof com.kingodogo.buildscape.recipe.ClearShulkerFiltersRecipe;
+    }
 
+    public static byte[] serializeCache(String hash, List<Recipe<?>> recipes) throws IOException {
         try (ByteArrayOutputStream recipeByteStream = new ByteArrayOutputStream();
                 DataOutputStream recipeDataOut = new DataOutputStream(recipeByteStream)) {
 
             List<String> stringPool = new ArrayList<>();
             Map<String, Integer> stringIndexMap = new HashMap<>();
 
+            List<Recipe<?>> cacheable = recipes != null ? recipes.stream().filter(BinaryRecipeCache::isCacheable).toList() : List.of();
+
             // Write Recipes and build string pool dynamically
-            recipeDataOut.writeInt(recipes.size());
-            for (Recipe<?> recipe : recipes) {
+            recipeDataOut.writeInt(cacheable.size());
+            for (Recipe<?> recipe : cacheable) {
                 writeRecipe(recipeDataOut, recipe, stringPool, stringIndexMap);
             }
 
-            byte[] fullCacheData;
             try (ByteArrayOutputStream finalOut = new ByteArrayOutputStream();
                     DataOutputStream out = new DataOutputStream(finalOut)) {
                 out.writeInt(MAGIC_HEADER);
@@ -137,11 +151,29 @@ public class BinaryRecipeCache {
                 }
 
                 out.write(recipeByteStream.toByteArray());
-                fullCacheData = finalOut.toByteArray();
+                return finalOut.toByteArray();
             }
+        }
+    }
 
-            Files.write(cacheFile, fullCacheData);
-            Files.writeString(hashFile, hash, StandardCharsets.UTF_8);
+    public static void saveCacheToFile(Path targetFile, String hash, List<Recipe<?>> recipes) throws IOException {
+        byte[] fullCacheData = serializeCache(hash, recipes);
+        if (targetFile.getParent() != null) {
+            Files.createDirectories(targetFile.getParent());
+        }
+        Files.write(targetFile, fullCacheData);
+    }
+
+    public static void saveCache(String hash, List<Recipe<?>> recipes) {
+        try {
+            byte[] fullCacheData = serializeCache(hash, recipes);
+
+            try {
+                Path cacheFile = getCacheDir().resolve("recipes.bscb");
+                Path hashFile = getCacheDir().resolve("recipes.bscb.hash");
+                Files.write(cacheFile, fullCacheData);
+                Files.writeString(hashFile, hash, StandardCharsets.UTF_8);
+            } catch (Throwable ignored) {}
 
             try {
                 Path packDir = findWorkspaceRecipesPackDir();

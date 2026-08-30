@@ -1,13 +1,12 @@
 package com.kingodogo.buildscape.mixin;
 
-import com.kingodogo.buildscape.block.ClimbableChainBlock;
 import com.kingodogo.buildscape.block.ExperienceFluidBlock;
-import com.kingodogo.buildscape.block.LargeChainBlock;
 import com.kingodogo.buildscape.fluid.ModFluids;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.ChainBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
@@ -80,10 +79,11 @@ public abstract class EntityMixin {
     }
 
     private static boolean isChainBlock(BlockState state) {
-        return (
-                state.getBlock() instanceof ChainBlock ||
-                        state.getBlock() instanceof ClimbableChainBlock ||
-                        state.getBlock() instanceof LargeChainBlock
-        );
+        Block block = state.getBlock();
+        if (block instanceof ChainBlock) {
+            return true;
+        }
+        ResourceLocation key = ForgeRegistries.BLOCKS.getKey(block);
+        return key != null && key.getNamespace().equals("buildscape") && key.getPath().contains("chain");
     }
 }

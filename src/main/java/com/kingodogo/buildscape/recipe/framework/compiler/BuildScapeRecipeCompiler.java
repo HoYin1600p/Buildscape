@@ -96,6 +96,58 @@ public class BuildScapeRecipeCompiler {
             return new com.kingodogo.buildscape.recipe.ClearShulkerFiltersRecipe(shulkerId);
         }
 
+        if (spec.rawJson() != null && ("forge:conditional".equalsIgnoreCase(spec.type()) || spec.rawJson().contains("\"conditions\"") || spec.rawJson().contains("\"botanypots:crop\""))) {
+            try {
+                com.google.gson.JsonObject json = com.google.gson.JsonParser.parseString(spec.rawJson()).getAsJsonObject();
+                ResourceLocation recipeId = spec.id() != null
+                        ? new ResourceLocation(spec.id().contains(":") ? spec.id() : BuildScape.MODID + ":" + spec.id())
+                        : new ResourceLocation(BuildScape.MODID, "autogen/" + category + "/" + Math.abs(spec.rawJson().hashCode()));
+
+                if (json.has("recipes") && json.get("recipes").isJsonArray()) {
+                    com.google.gson.JsonArray recipesArr = json.getAsJsonArray("recipes");
+                    for (int i = 0; i < recipesArr.size(); i++) {
+                        com.google.gson.JsonObject entry = recipesArr.get(i).getAsJsonObject();
+                        if (entry.has("conditions")) {
+                            boolean conditionsMet = true;
+                            com.google.gson.JsonArray conds = entry.getAsJsonArray("conditions");
+                            for (int c = 0; c < conds.size(); c++) {
+                                com.google.gson.JsonObject cond = conds.get(c).getAsJsonObject();
+                                String condType = cond.has("type") ? cond.get("type").getAsString() : "";
+                                if ("forge:mod_loaded".equals(condType)) {
+                                    String modid = cond.has("modid") ? cond.get("modid").getAsString() : "";
+                                    try {
+                                        if (!net.minecraftforge.fml.ModList.get().isLoaded(modid)) {
+                                            conditionsMet = false;
+                                            break;
+                                        }
+                                    } catch (Throwable ignored) {
+                                        conditionsMet = false;
+                                        break;
+                                    }
+                                }
+                            }
+                            if (!conditionsMet) {
+                                continue;
+                            }
+                        }
+                        if (entry.has("recipe")) {
+                            com.google.gson.JsonObject innerRecipeJson = entry.getAsJsonObject("recipe");
+                            ResourceLocation innerId = new ResourceLocation(recipeId.getNamespace(), recipeId.getPath() + (recipesArr.size() > 1 ? "_" + i : ""));
+                            try {
+                                Recipe<?> compiled = RecipeManager.fromJson(innerId, innerRecipeJson);
+                                if (compiled != null) {
+                                    return compiled;
+                                }
+                            } catch (Throwable ignored) {}
+                        }
+                    }
+                    return null;
+                }
+            } catch (Throwable t) {
+                return null;
+            }
+        }
+
         if (!validator.validate(spec, aliasResolver)) {
             return null;
         }

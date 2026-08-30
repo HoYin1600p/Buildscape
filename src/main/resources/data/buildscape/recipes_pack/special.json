@@ -6,20 +6,45 @@
     "F": "forge:"
   },
   "recipes": [
-    {"type":"buildscape:clear_shulker_filters"},
-    {"type":"buildscape:confetti_configure"},
+    {
+      "type": "buildscape:clear_shulker_filters"
+    },
+    {
+      "type": "buildscape:confetti_configure"
+    },
     {
       "type": "forge:conditional",
       "recipes": [
         {
-          "conditions": [{"type": "forge:mod_loaded", "modid": "botanypots"}],
+          "conditions": [
+            {
+              "type": "forge:mod_loaded",
+              "modid": "botanypots"
+            }
+          ],
           "recipe": {
             "type": "botanypots:crop",
-            "seed": {"item": "buildscape:blue_spore_blossom"},
-            "categories": ["dirt", "farmland", "moss"],
+            "seed": {
+              "item": "buildscape:blue_spore_blossom"
+            },
+            "categories": [
+              "dirt",
+              "farmland",
+              "moss"
+            ],
             "growthTicks": 1200,
-            "display": {"block": "buildscape:blue_spore_blossom", "rotation": "X_180"},
-            "drops": [{"chance": 1, "output": {"item": "buildscape:blue_spore_blossom"}}]
+            "display": {
+              "block": "buildscape:blue_spore_blossom",
+              "rotation": "X_180"
+            },
+            "drops": [
+              {
+                "chance": 1,
+                "output": {
+                  "item": "buildscape:blue_spore_blossom"
+                }
+              }
+            ]
           }
         }
       ]
@@ -28,14 +53,35 @@
       "type": "forge:conditional",
       "recipes": [
         {
-          "conditions": [{"type": "forge:mod_loaded", "modid": "botanypots"}],
+          "conditions": [
+            {
+              "type": "forge:mod_loaded",
+              "modid": "botanypots"
+            }
+          ],
           "recipe": {
             "type": "botanypots:crop",
-            "seed": {"item": "buildscape:cyan_spore_blossom"},
-            "categories": ["dirt", "farmland", "moss"],
+            "seed": {
+              "item": "buildscape:cyan_spore_blossom"
+            },
+            "categories": [
+              "dirt",
+              "farmland",
+              "moss"
+            ],
             "growthTicks": 1200,
-            "display": {"block": "buildscape:cyan_spore_blossom", "rotation": "X_180"},
-            "drops": [{"chance": 1, "output": {"item": "buildscape:cyan_spore_blossom"}}]
+            "display": {
+              "block": "buildscape:cyan_spore_blossom",
+              "rotation": "X_180"
+            },
+            "drops": [
+              {
+                "chance": 1,
+                "output": {
+                  "item": "buildscape:cyan_spore_blossom"
+                }
+              }
+            ]
           }
         }
       ]
@@ -44,14 +90,35 @@
       "type": "forge:conditional",
       "recipes": [
         {
-          "conditions": [{"type": "forge:mod_loaded", "modid": "botanypots"}],
+          "conditions": [
+            {
+              "type": "forge:mod_loaded",
+              "modid": "botanypots"
+            }
+          ],
           "recipe": {
             "type": "botanypots:crop",
-            "seed": {"item": "buildscape:orange_spore_blossom"},
-            "categories": ["dirt", "farmland", "moss"],
+            "seed": {
+              "item": "buildscape:orange_spore_blossom"
+            },
+            "categories": [
+              "dirt",
+              "farmland",
+              "moss"
+            ],
             "growthTicks": 1200,
-            "display": {"block": "buildscape:orange_spore_blossom", "rotation": "X_180"},
-            "drops": [{"chance": 1, "output": {"item": "buildscape:orange_spore_blossom"}}]
+            "display": {
+              "block": "buildscape:orange_spore_blossom",
+              "rotation": "X_180"
+            },
+            "drops": [
+              {
+                "chance": 1,
+                "output": {
+                  "item": "buildscape:orange_spore_blossom"
+                }
+              }
+            ]
           }
         }
       ]
@@ -60,14 +127,35 @@
       "type": "forge:conditional",
       "recipes": [
         {
-          "conditions": [{"type": "forge:mod_loaded", "modid": "botanypots"}],
+          "conditions": [
+            {
+              "type": "forge:mod_loaded",
+              "modid": "botanypots"
+            }
+          ],
           "recipe": {
             "type": "botanypots:crop",
-            "seed": {"item": "buildscape:purple_spore_blossom"},
-            "categories": ["dirt", "farmland", "moss"],
+            "seed": {
+              "item": "buildscape:purple_spore_blossom"
+            },
+            "categories": [
+              "dirt",
+              "farmland",
+              "moss"
+            ],
             "growthTicks": 1200,
-            "display": {"block": "buildscape:purple_spore_blossom", "rotation": "X_180"},
-            "drops": [{"chance": 1, "output": {"item": "buildscape:purple_spore_blossom"}}]
+            "display": {
+              "block": "buildscape:purple_spore_blossom",
+              "rotation": "X_180"
+            },
+            "drops": [
+              {
+                "chance": 1,
+                "output": {
+                  "item": "buildscape:purple_spore_blossom"
+                }
+              }
+            ]
           }
         }
       ]
@@ -76,14 +164,35 @@
       "type": "forge:conditional",
       "recipes": [
         {
-          "conditions": [{"type": "forge:mod_loaded", "modid": "botanypots"}],
+          "conditions": [
+            {
+              "type": "forge:mod_loaded",
+              "modid": "botanypots"
+            }
+          ],
           "recipe": {
             "type": "botanypots:crop",
-            "seed": {"item": "buildscape:red_spore_blossom"},
-            "categories": ["dirt", "farmland", "moss"],
+            "seed": {
+              "item": "buildscape:red_spore_blossom"
+            },
+            "categories": [
+              "dirt",
+              "farmland",
+              "moss"
+            ],
             "growthTicks": 1200,
-            "display": {"block": "buildscape:red_spore_blossom", "rotation": "X_180"},
-            "drops": [{"chance": 1, "output": {"item": "buildscape:red_spore_blossom"}}]
+            "display": {
+              "block": "buildscape:red_spore_blossom",
+              "rotation": "X_180"
+            },
+            "drops": [
+              {
+                "chance": 1,
+                "output": {
+                  "item": "buildscape:red_spore_blossom"
+                }
+              }
+            ]
           }
         }
       ]

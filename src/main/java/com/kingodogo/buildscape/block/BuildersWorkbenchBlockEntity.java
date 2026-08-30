@@ -331,10 +331,18 @@ public class BuildersWorkbenchBlockEntity extends BlockEntity implements MenuPro
             filters.set(slot, itemId == null ? "" : itemId.toString());
         }
 
+        boolean hasFilter = false;
         ListTag newGhostFiltersList = new ListTag();
-        for (String filter : filters) newGhostFiltersList.add(net.minecraft.nbt.StringTag.valueOf(filter));
+        for (String filter : filters) {
+            if (!filter.isEmpty()) hasFilter = true;
+            newGhostFiltersList.add(net.minecraft.nbt.StringTag.valueOf(filter));
+        }
         ContainerHelper.saveAllItems(beTag, shulkerItems);
-        beTag.put("GhostFilters", newGhostFiltersList);
+        if (hasFilter) {
+            beTag.put("GhostFilters", newGhostFiltersList);
+        } else {
+            beTag.remove("GhostFilters");
+        }
         return true;
     }
 

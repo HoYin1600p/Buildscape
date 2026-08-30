@@ -3,10 +3,10 @@ package com.kingodogo.buildscape.client.renderer;
 import com.kingodogo.buildscape.block.HollowLogBlock;
 import com.kingodogo.buildscape.block.HollowLogBlockEntity;
 import com.kingodogo.buildscape.block.HollowPipeBlock;
+import com.kingodogo.buildscape.pipe.transport.BubbleColumnState;
 import com.kingodogo.buildscape.pipe.transport.PipeFlowState;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.math.Matrix3f;
 import com.mojang.math.Matrix4f;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BiomeColors;
@@ -23,16 +23,15 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.InventoryMenu;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.FlowerPotBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.material.Fluids;
 import net.minecraftforge.client.model.data.EmptyModelData;
 
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Random;
 import java.util.Set;
 
 public class HollowLogBlockEntityRenderer implements BlockEntityRenderer<HollowLogBlockEntity> {
@@ -45,7 +44,7 @@ public class HollowLogBlockEntityRenderer implements BlockEntityRenderer<HollowL
 
     @Override
     public int getViewDistance() {
-        return 48; // Limit interior detail rendering distance to 48 blocks
+        return 48;
     }
 
     @Override
@@ -70,61 +69,33 @@ public class HollowLogBlockEntityRenderer implements BlockEntityRenderer<HollowL
         BlockState glassPos = blockEntity.getGlassCoverPos();
 
         boolean hasDecoration = decoration != null && !decoration.isAir();
-        boolean hasGlassNeg = glassNeg != null && !glassNeg.isAir();
-        boolean hasGlassPos = glassPos != null && !glassPos.isAir();
-        String fluidType = blockEntity.getFluidType();
-        boolean isLavaLogged = blockState.hasProperty(HollowLogBlock.LAVA_LOGGED) && blockState.getValue(HollowLogBlock.LAVA_LOGGED);
-        boolean isWaterLogged = blockState.hasProperty(HollowLogBlock.WATERLOGGED) && blockState.getValue(HollowLogBlock.WATERLOGGED);
-        PipeFlowState flowState = blockEntity.getPipeFlowState();
-        boolean hasTransportWater = blockState.getBlock() instanceof HollowPipeBlock
-                && flowState != null && flowState.hasWater();
-        boolean hasFluid = isLavaLogged || isWaterLogged || hasTransportWater || (!"none".equals(fluidType) && !fluidType.isEmpty());
+        boolean hasGlassNeg = (glassNeg != null && !glassNeg.isAir())
+                || (blockState.hasProperty(HollowLogBlock.HAS_GLASS_NEG) && blockState.getValue(HollowLogBlock.HAS_GLASS_NEG));
+        boolean hasGlassPos = (glassPos != null && !glassPos.isAir())
+                || (blockState.hasProperty(HollowLogBlock.HAS_GLASS_POS) && blockState.getValue(HollowLogBlock.HAS_GLASS_POS));
 
-        // Fast early exit: skip empty Hollow Logs completely!
-        if (!hasDecoration && !hasGlassNeg && !hasGlassPos && !hasFluid) {
+        // 1. Render Contained Fluid in Hollow Pipe or Hollow Log
+        if (blockState.getBlock() instanceof HollowPipeBlock) {
+            renderPipeFluid(level, pos, blockState, blockEntity, poseStack, bufferSource, light, combinedOverlay);
+        } else if (blockState.getBlock() instanceof HollowLogBlock) {
+            renderLogFluid(level, pos, blockState, blockEntity, poseStack, bufferSource, light, combinedOverlay, hasGlassNeg, hasGlassPos);
+        }
+
+        if (!hasDecoration && !hasGlassNeg && !hasGlassPos) {
             return;
         }
 
-        // 1. Render Fluid Interior (Vanilla Water/Lava, Buildscape Experience, or any Modded Fluid)
-        Fluid fluid = null;
-        if (isLavaLogged || "lava".equals(fluidType)) {
-            fluid = net.minecraft.world.level.material.Fluids.LAVA;
-        } else if (isWaterLogged || hasTransportWater || "water".equals(fluidType)) {
-            fluid = net.minecraft.world.level.material.Fluids.WATER;
-        } else if ("experience".equals(fluidType) || "buildscape:experience_still".equals(fluidType) || "buildscape:experience".equals(fluidType)) {
-            fluid = com.kingodogo.buildscape.fluid.ModFluids.EXPERIENCE_STILL.get();
-        } else if (!"none".equals(fluidType) && !fluidType.isEmpty()) {
-            ResourceLocation rl = ResourceLocation.tryParse(fluidType);
-            if (rl != null && net.minecraftforge.registries.ForgeRegistries.FLUIDS.containsKey(rl)) {
-                fluid = net.minecraftforge.registries.ForgeRegistries.FLUIDS.getValue(rl);
-            }
-        }
-
-        if (fluid != null && fluid != net.minecraft.world.level.material.Fluids.EMPTY) {
-            ResourceLocation stillTex = fluid.getAttributes().getStillTexture();
-            if (stillTex == null) {
-                stillTex = (fluid == net.minecraft.world.level.material.Fluids.LAVA)
-                        ? new ResourceLocation("minecraft", "block/lava_still")
-                        : new ResourceLocation("minecraft", "block/water_still");
-            }
-            int color = fluid.getAttributes().getColor(level, pos);
-            if (color == 0xFFFFFFFF && fluid == net.minecraft.world.level.material.Fluids.WATER) {
-                color = (level != null && pos != null) ? BiomeColors.getAverageWaterColor(level, pos) : 0x3F76E4;
-            }
-            renderFluidInterior(level, pos, blockState, flowState, poseStack, bufferSource, stillTex, color, light, combinedOverlay);
-        }
-
-        // 2. Render Interior Decoration
+        // 2. Render Nested / Inset Decoration Block
         if (hasDecoration) {
             poseStack.pushPose();
             if (decoration.getBlock() instanceof FlowerPotBlock) {
-                // Center flower pot inside horizontal or vertical log floor, uniform scale ~0.85
                 poseStack.translate(0.5D, 0.125D, 0.5D);
                 poseStack.scale(0.85F, 0.85F, 0.85F);
                 poseStack.translate(-0.5D, 0.0D, -0.5D);
                 renderBlockState(decoration, pos, level, poseStack, bufferSource, light, combinedOverlay);
+            } else if (decoration.getBlock() instanceof HollowLogBlock) {
+                renderBlockState(decoration, pos, level, poseStack, bufferSource, light, combinedOverlay);
             } else {
-                // Recess 1x1x1 full block 1 pixel (0.0625) inside interior
                 poseStack.translate(0.0625D, 0.0625D, 0.0625D);
                 poseStack.scale(0.875F, 0.875F, 0.875F);
                 renderBlockState(decoration, pos, level, poseStack, bufferSource, light, combinedOverlay);
@@ -135,7 +106,7 @@ public class HollowLogBlockEntityRenderer implements BlockEntityRenderer<HollowL
         Direction.Axis axis = blockState.hasProperty(HollowLogBlock.AXIS) ? blockState.getValue(HollowLogBlock.AXIS) : Direction.Axis.Y;
 
         // 3. Render Glass Cover Negative Face
-        if (hasGlassNeg) {
+        if (hasGlassNeg && glassNeg != null && !glassNeg.isAir()) {
             poseStack.pushPose();
             positionGlassCover(poseStack, axis, false);
             renderBlockState(glassNeg, pos, level, poseStack, bufferSource, light, combinedOverlay);
@@ -143,12 +114,483 @@ public class HollowLogBlockEntityRenderer implements BlockEntityRenderer<HollowL
         }
 
         // 4. Render Glass Cover Positive Face
-        if (hasGlassPos) {
+        if (hasGlassPos && glassPos != null && !glassPos.isAir()) {
             poseStack.pushPose();
             positionGlassCover(poseStack, axis, true);
             renderBlockState(glassPos, pos, level, poseStack, bufferSource, light, combinedOverlay);
             poseStack.popPose();
         }
+    }
+
+    private void renderPipeFluid(Level level, BlockPos pos, BlockState state, HollowLogBlockEntity blockEntity,
+                                 PoseStack poseStack, MultiBufferSource bufferSource, int light, int overlay) {
+        PipeFlowState flowState = blockEntity.getPipeFlowState();
+        Fluid fluid = HollowPipeBlock.getContainedFluid(state, blockEntity);
+        boolean hasWater = (fluid == Fluids.WATER) || (flowState != null && flowState.hasWater());
+        boolean hasLava = (fluid == Fluids.LAVA) || (state.hasProperty(HollowPipeBlock.LAVA_LOGGED) && state.getValue(HollowPipeBlock.LAVA_LOGGED));
+        boolean hasXp = (fluid == com.kingodogo.buildscape.fluid.ModFluids.EXPERIENCE_STILL.get())
+                || (fluid == com.kingodogo.buildscape.fluid.ModFluids.EXPERIENCE_FLOWING.get());
+
+        if (fluid == null || fluid == Fluids.EMPTY) {
+            if (hasWater) {
+                fluid = Fluids.WATER;
+            } else if (hasLava) {
+                fluid = Fluids.LAVA;
+            } else {
+                return;
+            }
+        }
+
+        boolean connDown = state.getValue(HollowPipeBlock.DOWN);
+        float yFloor = connDown ? 0.0F : 0.125F;
+
+        Direction inDir = flowState != null ? flowState.getInflowDirection() : null;
+        Set<Direction> outDirs = flowState != null ? flowState.getFlowDirections() : Set.of();
+
+        boolean flowFromAbove = (inDir == Direction.UP);
+        boolean flowToAbove = outDirs.contains(Direction.UP) && (flowState != null && flowState.getBubbleColumn() == BubbleColumnState.UP);
+        boolean flowIsVertical = flowFromAbove || flowToAbove;
+
+        // Use vanilla's flowing-water levels (7/9 through 1/9) so the internal
+        // channel falls in the same sequence as the world water emitted at its
+        // downstream endpoint.
+        boolean isFlowingWater = hasWater && flowState != null && flowState.hasWater();
+        float yIn;
+        float yOut;
+        if (flowIsVertical) {
+            yIn  = 1.0F;
+            yOut = 1.0F;
+        } else if (isFlowingWater) {
+            if (state.getValue(HollowPipeBlock.WATERLOGGED)) {
+                // The source fills the channel up to its two-pixel ceiling. Its
+                // first outgoing boundary blends into vanilla flowing level 7.
+                float sourceHeight = HollowPipeBlock.WATER_SOURCE_VISUAL_HEIGHT;
+                yIn = sourceHeight;
+                yOut = outDirs.isEmpty()
+                        ? sourceHeight
+                        : (sourceHeight + getPipeFlowHeight(1)) * 0.5F;
+            } else {
+                int d = Math.min(7, Math.max(1, flowState.getDistance()));
+                float hPrev = getPipeFlowHeight(d - 1);
+                float hCurr = getPipeFlowHeight(d);
+                float hNext = getPipeFlowHeight(d + 1);
+                yIn  = (hPrev + hCurr) * 0.5F;
+                yOut = (hCurr + Math.max(yFloor, hNext)) * 0.5F;
+                yIn  = Math.max(yFloor, yIn);
+                yOut = Math.max(yFloor, yOut);
+            }
+        } else {
+            yIn  = 0.75F;
+            yOut = 0.75F;
+        }
+        float yCenter = (yIn + yOut) * 0.5F;
+
+        // Small inward offset to prevent Z-fighting where water quads would be
+        // coplanar with the pipe's inner wall geometry (0.125 / 0.875 faces).
+        final float ZB = 0.002F; // ~0.5 pixel inward bias
+
+        boolean connUp    = state.getValue(HollowPipeBlock.UP);
+        boolean connNorth = state.getValue(HollowPipeBlock.NORTH);
+        boolean connSouth = state.getValue(HollowPipeBlock.SOUTH);
+        boolean connWest  = state.getValue(HollowPipeBlock.WEST);
+        boolean connEast  = state.getValue(HollowPipeBlock.EAST);
+
+        ResourceLocation texLoc;
+        if (fluid == Fluids.LAVA) {
+            texLoc = new ResourceLocation("minecraft", "block/lava_still");
+        } else if (fluid == Fluids.WATER) {
+            // A source pipe with a downstream direction is flowing too. Using
+            // water_flow here keeps the animated flow texture continuous from
+            // the first channel segment through the final world-water block.
+            texLoc = (flowState != null && flowState.hasWater() && !flowState.getFlowDirections().isEmpty())
+                    ? new ResourceLocation("minecraft", "block/water_flow")
+                    : new ResourceLocation("minecraft", "block/water_still");
+        } else if (hasXp) {
+            texLoc = (flowState != null && !flowState.isSource())
+                    ? new ResourceLocation("buildscape", "fluid/experience_flow")
+                    : new ResourceLocation("buildscape", "fluid/experience_still");
+        } else {
+            texLoc = (flowState != null && !flowState.isSource() && fluid.getAttributes().getFlowingTexture() != null)
+                    ? fluid.getAttributes().getFlowingTexture()
+                    : fluid.getAttributes().getStillTexture();
+            if (texLoc == null) {
+                texLoc = new ResourceLocation("minecraft", "block/water_still");
+            }
+        }
+
+        TextureAtlasSprite sprite = Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(texLoc);
+
+        int fluidColor = 0xFFFFFFFF;
+        if (fluid == Fluids.WATER) {
+            fluidColor = (level != null && pos != null) ? BiomeColors.getAverageWaterColor(level, pos) : 0x3F76E4;
+            fluidColor |= 0xFF000000;
+        } else if (fluid == Fluids.LAVA || hasXp) {
+            fluidColor = 0xFFFFFFFF;
+        } else {
+            fluidColor = (level != null && pos != null) ? fluid.getAttributes().getColor(level, pos) : fluid.getAttributes().getColor();
+            if ((fluidColor & 0xFF000000) == 0) {
+                fluidColor |= 0xFF000000;
+            }
+        }
+
+        float r = ((fluidColor >> 16) & 0xFF) / 255.0F;
+        float g = ((fluidColor >> 8) & 0xFF) / 255.0F;
+        float b = (fluidColor & 0xFF) / 255.0F;
+        float a = 1.0F; // Full 1.0F vertex alpha to match vanilla Minecraft water rendering
+
+        Matrix4f matrix = poseStack.last().pose();
+        VertexConsumer buffer = bufferSource.getBuffer(RenderType.translucent());
+
+        Direction.Axis pipeAxis = state.hasProperty(HollowPipeBlock.AXIS) ? state.getValue(HollowPipeBlock.AXIS) : Direction.Axis.Y;
+
+        boolean isStraightX = (pipeAxis == Direction.Axis.X || connWest || connEast) && !connNorth && !connSouth && !flowIsVertical;
+        boolean isStraightZ = (pipeAxis == Direction.Axis.Z || connNorth || connSouth) && !connWest && !connEast && !flowIsVertical;
+
+        if (isStraightX) {
+            boolean openWest = HollowPipeBlock.isOpenEndpoint(state, Direction.WEST);
+            boolean openEast = HollowPipeBlock.isOpenEndpoint(state, Direction.EAST);
+            float x1 = (connWest || openWest) ? 0.0F : (0.125F + ZB);
+            float x2 = (connEast || openEast) ? 1.0F : (0.875F - ZB);
+            float z1 = 0.125F + ZB;
+            float z2 = 0.875F - ZB;
+
+            boolean flowWestToEast = (inDir == Direction.WEST || outDirs.contains(Direction.EAST));
+            boolean flowEastToWest = (inDir == Direction.EAST || outDirs.contains(Direction.WEST));
+
+            float yW;
+            float yE;
+            if (flowWestToEast) {
+                yW = yIn;
+                yE = yOut;
+            } else if (flowEastToWest) {
+                yW = yOut;
+                yE = yIn;
+            } else {
+                yW = yIn;
+                yE = yOut;
+            }
+
+            // Unsquished 1:1 UV mapping along flow direction
+            float uZ1 = getSpriteU(sprite, z1);
+            float uZ2 = getSpriteU(sprite, z2);
+            float vX1 = getSpriteV(sprite, flowEastToWest ? (1.0F - x1) : x1);
+            float vX2 = getSpriteV(sprite, flowEastToWest ? (1.0F - x2) : x2);
+
+            // Top surface
+            renderQuad(matrix, buffer,
+                    x1, yW, z1,
+                    x1, yW, z2,
+                    x2, yE, z2,
+                    x2, yE, z1,
+                    r, g, b, a,
+                    uZ1, vX1,
+                    uZ2, vX1,
+                    uZ2, vX2,
+                    uZ1, vX2,
+                    light, overlay, 0, 1, 0);
+
+            // West face (only if open exit to air and neighbor is not fluid)
+            if (!connWest && openWest && !isNeighborFluid(level, pos, Direction.WEST, fluid)) {
+                float uW0 = getSpriteU(sprite, z1);
+                float uW1 = getSpriteU(sprite, z2);
+                float vW0 = getSpriteV(sprite, yFloor);
+                float vW1 = getSpriteV(sprite, yW);
+                renderQuad(matrix, buffer, x1, yW, z1, x1, yFloor, z1, x1, yFloor, z2, x1, yW, z2, r, g, b, a, uW0, vW1, uW0, vW0, uW1, vW0, uW1, vW1, light, overlay, -1, 0, 0);
+                renderQuad(matrix, buffer, x1, yW, z2, x1, yFloor, z2, x1, yFloor, z1, x1, yW, z1, r, g, b, a, uW1, vW1, uW1, vW0, uW0, vW0, uW0, vW1, light, overlay, 1, 0, 0);
+            }
+
+            // East face (only if open exit to air and neighbor is not fluid)
+            if (!connEast && openEast && !isNeighborFluid(level, pos, Direction.EAST, fluid)) {
+                float uE0 = getSpriteU(sprite, z1);
+                float uE1 = getSpriteU(sprite, z2);
+                float vE0 = getSpriteV(sprite, yFloor);
+                float vE1 = getSpriteV(sprite, yE);
+                renderQuad(matrix, buffer, x2, yE, z2, x2, yFloor, z2, x2, yFloor, z1, x2, yE, z1, r, g, b, a, uE1, vE1, uE1, vE0, uE0, vE0, uE0, vE1, light, overlay, 1, 0, 0);
+                renderQuad(matrix, buffer, x2, yE, z1, x2, yFloor, z1, x2, yFloor, z2, x2, yE, z2, r, g, b, a, uE0, vE1, uE0, vE0, uE1, vE0, uE1, vE1, light, overlay, -1, 0, 0);
+            }
+            return;
+        }
+
+        if (isStraightZ) {
+            boolean openNorth = HollowPipeBlock.isOpenEndpoint(state, Direction.NORTH);
+            boolean openSouth = HollowPipeBlock.isOpenEndpoint(state, Direction.SOUTH);
+            float x1 = 0.125F + ZB;
+            float x2 = 0.875F - ZB;
+            float z1 = (connNorth || openNorth) ? 0.0F : (0.125F + ZB);
+            float z2 = (connSouth || openSouth) ? 1.0F : (0.875F - ZB);
+
+            boolean flowNorthToSouth = (inDir == Direction.NORTH || outDirs.contains(Direction.SOUTH));
+            boolean flowSouthToNorth = (inDir == Direction.SOUTH || outDirs.contains(Direction.NORTH));
+
+            float yN;
+            float yS;
+            if (flowNorthToSouth) {
+                yN = yIn;
+                yS = yOut;
+            } else if (flowSouthToNorth) {
+                yN = yOut;
+                yS = yIn;
+            } else {
+                yN = yIn;
+                yS = yOut;
+            }
+
+            // Unsquished 1:1 UV mapping along flow direction
+            float uX1 = getSpriteU(sprite, x1);
+            float uX2 = getSpriteU(sprite, x2);
+            float vZ1 = getSpriteV(sprite, flowSouthToNorth ? (1.0F - z1) : z1);
+            float vZ2 = getSpriteV(sprite, flowSouthToNorth ? (1.0F - z2) : z2);
+
+            // Top surface
+            renderQuad(matrix, buffer,
+                    x1, yN, z1,
+                    x1, yS, z2,
+                    x2, yS, z2,
+                    x2, yN, z1,
+                    r, g, b, a,
+                    uX1, vZ1,
+                    uX1, vZ2,
+                    uX2, vZ2,
+                    uX2, vZ1,
+                    light, overlay, 0, 1, 0);
+
+            // North face (only if open exit to air and neighbor is not fluid)
+            if (!connNorth && openNorth && !isNeighborFluid(level, pos, Direction.NORTH, fluid)) {
+                float uN0 = getSpriteU(sprite, x1);
+                float uN1 = getSpriteU(sprite, x2);
+                float vN0 = getSpriteV(sprite, yFloor);
+                float vN1 = getSpriteV(sprite, yN);
+                renderQuad(matrix, buffer, x2, yN, z1, x2, yFloor, z1, x1, yFloor, z1, x1, yN, z1, r, g, b, a, uN1, vN1, uN1, vN0, uN0, vN0, uN0, vN1, light, overlay, 0, 0, -1);
+                renderQuad(matrix, buffer, x1, yN, z1, x1, yFloor, z1, x2, yFloor, z1, x2, yN, z1, r, g, b, a, uN0, vN1, uN0, vN0, uN1, vN0, uN1, vN1, light, overlay, 0, 0, 1);
+            }
+
+            // South face (only if open exit to air and neighbor is not fluid)
+            if (!connSouth && openSouth && !isNeighborFluid(level, pos, Direction.SOUTH, fluid)) {
+                float uS0 = getSpriteU(sprite, x1);
+                float uS1 = getSpriteU(sprite, x2);
+                float vS0 = getSpriteV(sprite, yFloor);
+                float vS1 = getSpriteV(sprite, yS);
+                renderQuad(matrix, buffer, x1, yS, z2, x1, yFloor, z2, x2, yFloor, z2, x2, yS, z2, r, g, b, a, uS0, vS1, uS0, vS0, uS1, vS0, uS1, vS1, light, overlay, 0, 0, 1);
+                renderQuad(matrix, buffer, x2, yS, z2, x2, yFloor, z2, x1, yFloor, z2, x1, yS, z2, r, g, b, a, uS1, vS1, uS1, vS0, uS0, vS0, uS0, vS1, light, overlay, 0, 0, -1);
+            }
+            return;
+        }
+
+        // Generic Junction / Vertical Column
+        boolean openNorth = HollowPipeBlock.isOpenEndpoint(state, Direction.NORTH);
+        boolean openSouth = HollowPipeBlock.isOpenEndpoint(state, Direction.SOUTH);
+        boolean openWest  = HollowPipeBlock.isOpenEndpoint(state, Direction.WEST);
+        boolean openEast  = HollowPipeBlock.isOpenEndpoint(state, Direction.EAST);
+        float x1 = (connWest  || openWest)  ? 0.0F : (0.125F + ZB);
+        float x2 = (connEast  || openEast)  ? 1.0F : (0.875F - ZB);
+        float z1 = (connNorth || openNorth) ? 0.0F : (0.125F + ZB);
+        float z2 = (connSouth || openSouth) ? 1.0F : (0.875F - ZB);
+        float yTop = flowIsVertical ? 1.0F : yCenter;
+
+        if (!flowToAbove && !flowFromAbove) {
+            float uX1 = getSpriteU(sprite, x1);
+            float uX2 = getSpriteU(sprite, x2);
+            float vZ1 = getSpriteV(sprite, z1);
+            float vZ2 = getSpriteV(sprite, z2);
+            renderQuad(matrix, buffer,
+                    x1, yTop, z1,
+                    x1, yTop, z2,
+                    x2, yTop, z2,
+                    x2, yTop, z1,
+                    r, g, b, a,
+                    uX1, vZ1,
+                    uX1, vZ2,
+                    uX2, vZ2,
+                    uX2, vZ1,
+                    light, overlay, 0, 1, 0);
+        }
+
+        if (!connNorth && openNorth && !isNeighborFluid(level, pos, Direction.NORTH, fluid)) {
+            float uN0 = getSpriteU(sprite, x1);
+            float uN1 = getSpriteU(sprite, x2);
+            float vN0 = getSpriteV(sprite, yFloor);
+            float vN1 = getSpriteV(sprite, yTop);
+            renderQuad(matrix, buffer, x2, yTop, z1, x2, yFloor, z1, x1, yFloor, z1, x1, yTop, z1, r, g, b, a, uN1, vN1, uN1, vN0, uN0, vN0, uN0, vN1, light, overlay, 0, 0, -1);
+            renderQuad(matrix, buffer, x1, yTop, z1, x1, yFloor, z1, x2, yFloor, z1, x2, yTop, z1, r, g, b, a, uN0, vN1, uN0, vN0, uN1, vN0, uN1, vN1, light, overlay, 0, 0, 1);
+        }
+
+        if (!connSouth && openSouth && !isNeighborFluid(level, pos, Direction.SOUTH, fluid)) {
+            float uS0 = getSpriteU(sprite, x1);
+            float uS1 = getSpriteU(sprite, x2);
+            float vS0 = getSpriteV(sprite, yFloor);
+            float vS1 = getSpriteV(sprite, yTop);
+            renderQuad(matrix, buffer, x1, yTop, z2, x1, yFloor, z2, x2, yFloor, z2, x2, yTop, z2, r, g, b, a, uS0, vS1, uS0, vS0, uS1, vS0, uS1, vS1, light, overlay, 0, 0, 1);
+            renderQuad(matrix, buffer, x2, yTop, z2, x2, yFloor, z2, x1, yFloor, z2, x1, yTop, z2, r, g, b, a, uS1, vS1, uS1, vS0, uS0, vS0, uS0, vS1, light, overlay, 0, 0, -1);
+        }
+
+        if (!connWest && openWest && !isNeighborFluid(level, pos, Direction.WEST, fluid)) {
+            float uW0 = getSpriteU(sprite, z1);
+            float uW1 = getSpriteU(sprite, z2);
+            float vW0 = getSpriteV(sprite, yFloor);
+            float vW1 = getSpriteV(sprite, yTop);
+            renderQuad(matrix, buffer, x1, yTop, z1, x1, yFloor, z1, x1, yFloor, z2, x1, yTop, z2, r, g, b, a, uW0, vW1, uW0, vW0, uW1, vW0, uW1, vW1, light, overlay, -1, 0, 0);
+            renderQuad(matrix, buffer, x1, yTop, z2, x1, yFloor, z2, x1, yFloor, z1, x1, yTop, z1, r, g, b, a, uW1, vW1, uW1, vW0, uW0, vW0, uW0, vW1, light, overlay, 1, 0, 0);
+        }
+
+        if (!connEast && openEast && !isNeighborFluid(level, pos, Direction.EAST, fluid)) {
+            float uE0 = getSpriteU(sprite, z1);
+            float uE1 = getSpriteU(sprite, z2);
+            float vE0 = getSpriteV(sprite, yFloor);
+            float vE1 = getSpriteV(sprite, yTop);
+            renderQuad(matrix, buffer, x2, yTop, z2, x2, yFloor, z2, x2, yFloor, z1, x2, yTop, z1, r, g, b, a, uE1, vE1, uE1, vE0, uE0, vE0, uE0, vE1, light, overlay, 1, 0, 0);
+            renderQuad(matrix, buffer, x2, yTop, z1, x2, yFloor, z1, x2, yFloor, z2, x2, yTop, z2, r, g, b, a, uE0, vE1, uE0, vE0, uE1, vE0, uE1, vE1, light, overlay, -1, 0, 0);
+        }
+    }
+
+    public static float getOwnFluidHeight(BlockGetter level, BlockState state, BlockPos pos, Fluid fluid) {
+        if (state.getBlock() instanceof HollowPipeBlock) {
+            if (state.getValue(HollowPipeBlock.WATERLOGGED)) {
+                return HollowPipeBlock.WATER_SOURCE_VISUAL_HEIGHT;
+            }
+            int wl = state.getValue(HollowPipeBlock.WATER_LEVEL);
+            if (wl > 0) {
+                return wl / 9.0F;
+            }
+            return 8.0F / 9.0F;
+        } else if (state.getBlock() instanceof HollowLogBlock) {
+            return 0.75F;
+        }
+        FluidState fs = state.getFluidState();
+        if (fs.getType().isSame(fluid)) {
+            return fs.getOwnHeight();
+        }
+        return 8.0F / 9.0F;
+    }
+
+    /**
+     * Height of a transported water column at a given vanilla horizontal-flow
+     * distance. Distance zero is the contained source level; distances 1..7 map
+     * directly to vanilla flowing-water amounts 7..1.
+     */
+    private static float getPipeFlowHeight(int distance) {
+        if (distance <= 0) {
+            return HollowPipeBlock.WATER_SOURCE_VISUAL_HEIGHT;
+        }
+        return Math.max(0.125F, Math.max(1, 8 - Math.min(7, distance)) / 9.0F);
+    }
+
+    public static float getNeighborFluidHeight(BlockGetter level, BlockPos pos, Direction dir, Fluid fluid) {
+        if (level == null || pos == null) return -1.0F;
+        BlockPos neighborPos = pos.relative(dir);
+        BlockState neighborState = level.getBlockState(neighborPos);
+
+        // 1. Neighbor is a HollowPipeBlock:
+        if (neighborState.getBlock() instanceof HollowPipeBlock) {
+            if (neighborState.getValue(HollowPipeBlock.WATERLOGGED)) {
+                return HollowPipeBlock.WATER_SOURCE_VISUAL_HEIGHT;
+            }
+            int nWl = neighborState.getValue(HollowPipeBlock.WATER_LEVEL);
+            if (nWl > 0) {
+                return nWl / 9.0F;
+            }
+            return -1.0F;
+        }
+
+        // 2. Neighbor is a HollowLogBlock:
+        if (neighborState.getBlock() instanceof HollowLogBlock) {
+            return 0.75F;
+        }
+
+        // 3. Neighbor is a world fluid block:
+        FluidState nFluidState = neighborState.getFluidState();
+        if (nFluidState.getType().isSame(fluid)) {
+            BlockState aboveState = level.getBlockState(neighborPos.above());
+            if (aboveState.getFluidState().getType().isSame(fluid)) {
+                return 1.0F;
+            }
+            return nFluidState.getOwnHeight();
+        }
+
+        // 4. Neighbor is air at an open pipe endpoint:
+        BlockState selfState = level.getBlockState(pos);
+        if (neighborState.isAir() && HollowPipeBlock.isOpenEndpoint(selfState, dir)) {
+            return 0.125F; // Pipe floor drop
+        }
+
+        // Solid block or closed wall:
+        return -1.0F;
+    }
+
+    public static float getBoundaryHeight(float hSelf, float hNeighbor) {
+        if (hNeighbor >= 0.0F) {
+            return (hSelf + hNeighbor) * 0.5F;
+        }
+        return hSelf;
+    }
+
+    public static float calculatePipeCorner(float hSelf, float h1, float h2) {
+        if (h1 >= 0.0F && h2 >= 0.0F) {
+            return (hSelf + h1 + h2) / 3.0F;
+        } else if (h1 >= 0.0F) {
+            return (hSelf + h1) * 0.5F;
+        } else if (h2 >= 0.0F) {
+            return (hSelf + h2) * 0.5F;
+        } else {
+            return hSelf;
+        }
+    }
+
+    private static float getSpriteU(TextureAtlasSprite sprite, float coord0To1) {
+        return sprite.getU0() + (sprite.getU1() - sprite.getU0()) * coord0To1;
+    }
+
+    private static float getSpriteV(TextureAtlasSprite sprite, float coord0To1) {
+        return sprite.getV0() + (sprite.getV1() - sprite.getV0()) * coord0To1;
+    }
+
+    private static boolean isNeighborFluid(Level level, BlockPos pos, Direction dir, Fluid fluid) {
+        if (level == null || pos == null || dir == null) return false;
+        BlockPos neighborPos = pos.relative(dir);
+        BlockState neighborState = level.getBlockState(neighborPos);
+        if (neighborState.getBlock() instanceof HollowPipeBlock) {
+            if (HollowPipeBlock.isOpenEndpoint(neighborState, dir.getOpposite())) {
+                return true;
+            }
+        }
+        if (neighborState.getBlock() instanceof HollowLogBlock) {
+            Direction.Axis neighborAxis = neighborState.hasProperty(HollowLogBlock.AXIS) ? neighborState.getValue(HollowLogBlock.AXIS) : Direction.Axis.Y;
+            if (neighborAxis == dir.getAxis()) {
+                return true;
+            }
+        }
+        FluidState fs = level.getFluidState(neighborPos);
+        return fs != null && !fs.isEmpty();
+    }
+
+    private static void renderQuad(
+            Matrix4f matrix, VertexConsumer buffer,
+            float x0, float y0, float z0,
+            float x1, float y1, float z1,
+            float x2, float y2, float z2,
+            float x3, float y3, float z3,
+            float r, float g, float b, float a,
+            float u0, float v0, float u1, float v1, float u2, float v2, float u3, float v3,
+            int light, int overlay,
+            float nx, float ny, float nz
+    ) {
+        buffer.vertex(matrix, x0, y0, z0).color(r, g, b, a).uv(u0, v0).overlayCoords(overlay).uv2(light).normal(nx, ny, nz).endVertex();
+        buffer.vertex(matrix, x1, y1, z1).color(r, g, b, a).uv(u1, v1).overlayCoords(overlay).uv2(light).normal(nx, ny, nz).endVertex();
+        buffer.vertex(matrix, x2, y2, z2).color(r, g, b, a).uv(u2, v2).overlayCoords(overlay).uv2(light).normal(nx, ny, nz).endVertex();
+        buffer.vertex(matrix, x3, y3, z3).color(r, g, b, a).uv(u3, v3).overlayCoords(overlay).uv2(light).normal(nx, ny, nz).endVertex();
+    }
+
+    private static void renderQuad(
+            Matrix4f matrix, VertexConsumer buffer,
+            float x0, float y0, float z0,
+            float x1, float y1, float z1,
+            float x2, float y2, float z2,
+            float x3, float y3, float z3,
+            float r, float g, float b, float a,
+            float u0, float v0, float u1, float v1,
+            int light, int overlay,
+            float nx, float ny, float nz
+    ) {
+        renderQuad(matrix, buffer, x0, y0, z0, x1, y1, z1, x2, y2, z2, x3, y3, z3, r, g, b, a, u0, v0, u0, v1, u1, v1, u1, v0, light, overlay, nx, ny, nz);
     }
 
     private void renderBlockState(BlockState state, BlockPos pos, Level level, PoseStack poseStack, MultiBufferSource bufferSource, int light, int overlay) {
@@ -213,424 +655,185 @@ public class HollowLogBlockEntityRenderer implements BlockEntityRenderer<HollowL
         }
     }
 
-    /**
-     * Renders the fluid interior of a pipe or log.
-     *
-     * For pipes: reads connected directions from blockState to CULL internal end-cap faces
-     * between connected pipes — so a continuous chain of pipes shows a seamless stream
-     * without dividing walls between each pipe block.
-     *
-     * Top-face slope is EXPONENTIAL based on distance/maxDistance stored in flowState:
-     *   - Source pipe (distance=0)       → flat top at FULL_HEIGHT (0.8125)
-     *   - Intermediate pipes              → progressively lower top using t^1.5 curve
-     *   - Last pipe (isOpenEndpoint=true) → downstream end drops to vanilla end-slope height (~0.1875)
-     *
-     * IMPORTANT: This method is READ-ONLY. It never modifies blockState, flowState,
-     * fluidType, or any server-side state.
-     */
-    private void renderFluidInterior(Level level, BlockPos pos, BlockState blockState, PipeFlowState flowState, PoseStack poseStack, MultiBufferSource bufferSource, ResourceLocation textureLoc, int color, int light, int overlay) {
-        TextureAtlasSprite sprite = Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(textureLoc);
+    private void renderLogFluid(Level level, BlockPos pos, BlockState state, HollowLogBlockEntity blockEntity,
+                                PoseStack poseStack, MultiBufferSource bufferSource, int light, int overlay,
+                                boolean hasGlassNeg, boolean hasGlassPos) {
+        String fluidType = blockEntity.getFluidType();
+        boolean isWaterLogged = state.hasProperty(HollowLogBlock.WATERLOGGED) && state.getValue(HollowLogBlock.WATERLOGGED);
+        boolean isLavaLogged = state.hasProperty(HollowLogBlock.LAVA_LOGGED) && state.getValue(HollowLogBlock.LAVA_LOGGED);
+
+        Fluid fluid = null;
+        if (isLavaLogged || "lava".equals(fluidType)) {
+            fluid = Fluids.LAVA;
+        } else if (isWaterLogged || "water".equals(fluidType)) {
+            fluid = Fluids.WATER;
+        } else if ("experience".equals(fluidType) || "buildscape:experience_still".equals(fluidType) || "buildscape:experience".equals(fluidType)) {
+            fluid = com.kingodogo.buildscape.fluid.ModFluids.EXPERIENCE_STILL.get();
+        } else if (!"none".equals(fluidType) && !fluidType.isEmpty()) {
+            ResourceLocation rl = ResourceLocation.tryParse(fluidType);
+            if (rl != null && net.minecraftforge.registries.ForgeRegistries.FLUIDS.containsKey(rl)) {
+                fluid = net.minecraftforge.registries.ForgeRegistries.FLUIDS.getValue(rl);
+            }
+        }
+
+        if (fluid == null || fluid == Fluids.EMPTY) {
+            return;
+        }
+
+        ResourceLocation texLoc;
+        if (fluid == Fluids.LAVA) {
+            texLoc = new ResourceLocation("minecraft", "block/lava_still");
+        } else if (fluid == Fluids.WATER) {
+            texLoc = new ResourceLocation("minecraft", "block/water_still");
+        } else if (fluid == com.kingodogo.buildscape.fluid.ModFluids.EXPERIENCE_STILL.get() || fluid == com.kingodogo.buildscape.fluid.ModFluids.EXPERIENCE_FLOWING.get()) {
+            texLoc = new ResourceLocation("buildscape", "fluid/experience_still");
+        } else {
+            texLoc = fluid.getAttributes().getStillTexture();
+            if (texLoc == null) {
+                texLoc = new ResourceLocation("minecraft", "block/water_still");
+            }
+        }
+
+        TextureAtlasSprite sprite = Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(texLoc);
         VertexConsumer buffer = bufferSource.getBuffer(RenderType.translucent());
 
-        if (blockState.getBlock() instanceof HollowPipeBlock) {
-            boolean connDown  = blockState.hasProperty(HollowPipeBlock.DOWN)  && blockState.getValue(HollowPipeBlock.DOWN);
-            boolean connUp    = blockState.hasProperty(HollowPipeBlock.UP)    && blockState.getValue(HollowPipeBlock.UP);
-            boolean connNorth = blockState.hasProperty(HollowPipeBlock.NORTH) && blockState.getValue(HollowPipeBlock.NORTH);
-            boolean connSouth = blockState.hasProperty(HollowPipeBlock.SOUTH) && blockState.getValue(HollowPipeBlock.SOUTH);
-            boolean connWest  = blockState.hasProperty(HollowPipeBlock.WEST)  && blockState.getValue(HollowPipeBlock.WEST);
-            boolean connEast  = blockState.hasProperty(HollowPipeBlock.EAST)  && blockState.getValue(HollowPipeBlock.EAST);
-
-            // A topology connection is not necessarily a renderable fluid continuation:
-            // newly placed neighbors receive transport state after a short server delay.
-            // Keep an end-cap until that neighbor is actually wet, otherwise the old pipe
-            // exposes a dark hole/floating bottom while the replacement settles.
-            connDown  &= hasRenderableFluid(level, pos, Direction.DOWN);
-            connUp    &= hasRenderableFluid(level, pos, Direction.UP);
-            connNorth &= hasRenderableFluid(level, pos, Direction.NORTH);
-            connSouth &= hasRenderableFluid(level, pos, Direction.SOUTH);
-            connWest  &= hasRenderableFluid(level, pos, Direction.WEST);
-            connEast  &= hasRenderableFluid(level, pos, Direction.EAST);
-
-            int count = (connDown ? 1 : 0) + (connUp ? 1 : 0) + (connNorth ? 1 : 0)
-                      + (connSouth ? 1 : 0) + (connWest ? 1 : 0) + (connEast ? 1 : 0);
-
-            // Determine primary flow direction for slope direction.
-            // READ-ONLY: flowState is never modified here.
-            Direction primaryFlow = getPrimaryFlowDirection(flowState, blockState, connDown, connUp, connNorth, connSouth, connWest, connEast);
-
-            // --- Exponential slope calculation ---
-            // Source block (dist == 0 / isSource): stays 100% full height (0.8125F) throughout.
-            // Downstream pipes (dist > 0): slope smoothly from y(dist - 1) to y(dist),
-            // where y(d) = FULL_HEIGHT - (d / maxDist)^1.5 * MAX_DROP.
-            // At the final terminal end (dist == maxDist / isOpenEndpoint), the exit lip reaches VANILLA_END (0.1875F).
-            final float FULL_HEIGHT  = 0.8125F;  // Pipe interior ceiling (13/16)
-            final float VANILLA_END  = 0.1875F;  // Vanilla level-7 water height (3/16)
-            final float MAX_DROP     = FULL_HEIGHT - VANILLA_END;  // 0.625F total fall
-            final float EXPONENT     = 1.5F;
-
-            float yUpstream   = FULL_HEIGHT;   // top-face height at the upstream (entry) corner
-            float yDownstream = FULL_HEIGHT;   // top-face height at the downstream (exit) corner
-
-            if (flowState != null && flowState.hasWater() && primaryFlow != null
-                    && primaryFlow.getAxis().isHorizontal() && !connUp) {
-                int dist    = flowState.getDistance();
-                int maxDist = Math.max(1, flowState.getMaxDistance());
-                boolean isSource = flowState.isSource() || dist == 0;
-
-                if (isSource) {
-                    // Source block is always full height
-                    yUpstream   = FULL_HEIGHT;
-                    yDownstream = FULL_HEIGHT;
-                } else {
-                    // Entry of this pipe matches the exit of the previous pipe (dist - 1)
-                    float tIn = (float) (dist - 1) / maxDist;
-                    yUpstream = FULL_HEIGHT - (float) Math.pow(tIn, EXPONENT) * MAX_DROP;
-
-                    // Exit of this pipe reaches the level for this distance
-                    float tOut = Math.min(1.0F, (float) dist / maxDist);
-                    yDownstream = FULL_HEIGHT - (float) Math.pow(tOut, EXPONENT) * MAX_DROP;
-
-                    if (flowState.isOpenEndpoint() || dist >= maxDist) {
-                        yDownstream = VANILLA_END;
-                    }
-                }
-
-                // Clamp to valid range
-                yUpstream   = Math.max(VANILLA_END, Math.min(FULL_HEIGHT, yUpstream));
-                yDownstream = Math.max(VANILLA_END, Math.min(FULL_HEIGHT, yDownstream));
-            }
-
-            if (count == 0) {
-                // Isolated pipe — axis-based straight segment, no connections to cull
-                Direction.Axis axis = blockState.hasProperty(HollowPipeBlock.AXIS) ? blockState.getValue(HollowPipeBlock.AXIS) : Direction.Axis.Y;
-                renderStraightFluid(axis, false, false, false, false, false, false, primaryFlow, yUpstream, yDownstream, poseStack, buffer, sprite, color, light, overlay);
-            } else if (count == 1 || (count == 2 && ((connDown && connUp) || (connNorth && connSouth) || (connWest && connEast)))) {
-                // Straight segment — cull end-caps in connected directions
-                Direction.Axis axis = (connDown || connUp) ? Direction.Axis.Y : ((connNorth || connSouth) ? Direction.Axis.Z : Direction.Axis.X);
-                renderStraightFluid(axis, connDown, connUp, connNorth, connSouth, connWest, connEast, primaryFlow, yUpstream, yDownstream, poseStack, buffer, sprite, color, light, overlay);
-            } else {
-                // Multi-directional junction — expand fluid box into all connected directions
-                float x1 = connWest  ? 0.0F : 0.125F;
-                float x2 = connEast  ? 1.0F : 0.875F;
-                float y1 = connDown  ? 0.0F : 0.125F;
-                float y2 = connUp    ? 1.0F : FULL_HEIGHT;
-                float z1 = connNorth ? 0.0F : 0.125F;
-                float z2 = connSouth ? 1.0F : 0.875F;
-
-                renderFluidJunction(poseStack, buffer, x1, y1, z1, x2, y2, z2,
-                        connDown, connUp, connNorth, connSouth, connWest, connEast,
-                        primaryFlow, yUpstream, yDownstream, sprite, color, light, overlay);
-            }
-
+        int color = 0xFFFFFFFF;
+        if (fluid == Fluids.WATER) {
+            color = (level != null && pos != null) ? BiomeColors.getAverageWaterColor(level, pos) : 0x3F76E4;
+            color |= 0xFF000000;
+        } else if (fluid == Fluids.LAVA || fluid == com.kingodogo.buildscape.fluid.ModFluids.EXPERIENCE_STILL.get()) {
+            color = 0xFFFFFFFF;
         } else {
-            Direction.Axis axis = blockState.hasProperty(HollowLogBlock.AXIS) ? blockState.getValue(HollowLogBlock.AXIS) : Direction.Axis.Y;
-            renderStraightFluid(axis, false, false, false, false, false, false, null, 0.8125F, 0.8125F, poseStack, buffer, sprite, color, light, overlay);
-        }
-    }
-
-    private static boolean hasRenderableFluid(Level level, BlockPos pos, Direction direction) {
-        if (level == null || pos == null) return false;
-        BlockPos neighborPos = pos.relative(direction);
-        BlockState neighborState = level.getBlockState(neighborPos);
-        if (!(neighborState.getBlock() instanceof HollowPipeBlock)) return false;
-        if (neighborState.hasProperty(HollowPipeBlock.WATERLOGGED)
-                && neighborState.getValue(HollowPipeBlock.WATERLOGGED)) return true;
-        if (neighborState.hasProperty(HollowPipeBlock.LAVA_LOGGED)
-                && neighborState.getValue(HollowPipeBlock.LAVA_LOGGED)) return true;
-        if (level.getBlockEntity(neighborPos) instanceof HollowLogBlockEntity neighborEntity) {
-            PipeFlowState neighborFlow = neighborEntity.getPipeFlowState();
-            return neighborFlow != null && neighborFlow.hasWater();
-        }
-        return false;
-    }
-
-    /**
-     * Returns the primary flow direction for slope calculations.
-     * READ-ONLY: reads flowState.getFlowDirections() without modifying it.
-     * Falls back to blockstate axis when no flow is active.
-     */
-    private static Direction getPrimaryFlowDirection(PipeFlowState flowState, BlockState blockState,
-            boolean connDown, boolean connUp, boolean connNorth, boolean connSouth, boolean connWest, boolean connEast) {
-        if (flowState != null && !flowState.getFlowDirections().isEmpty()) {
-            // The physical open end is the downstream end. Prefer it over the
-            // EnumSet iteration order, which is not a valid flow ordering at a
-            // branch/junction and caused slopes to point sideways.
-            for (Direction dir : flowState.getFlowDirections()) {
-                if (dir.getAxis().isHorizontal() && HollowPipeBlock.isOpenEndpoint(blockState, dir)) {
-                    return dir;
-                }
+            color = (level != null && pos != null) ? fluid.getAttributes().getColor(level, pos) : fluid.getAttributes().getColor();
+            if ((color & 0xFF000000) == 0) {
+                color |= 0xFF000000;
             }
-            // Priority: first horizontal flow direction, then down, then up
-            for (Direction dir : flowState.getFlowDirections()) {
-                if (dir.getAxis().isHorizontal()) return dir;
-            }
-            for (Direction dir : flowState.getFlowDirections()) {
-                if (dir == Direction.DOWN) return dir;
-            }
-            return flowState.getFlowDirections().iterator().next();
         }
-        // Fall back to connection topology
-        if (connNorth) return Direction.NORTH;
-        if (connSouth) return Direction.SOUTH;
-        if (connEast)  return Direction.EAST;
-        if (connWest)  return Direction.WEST;
-        if (connDown)  return Direction.DOWN;
-        return null;
-    }
-
-    /**
-     * Renders a straight fluid segment along an axis.
-     *
-     * The connXxx parameters indicate which ends are topologically CONNECTED to another pipe.
-     * Connected ends have their end-cap face CULLED — the neighbour pipe's fluid will continue
-     * flush without a dividing wall between them. This creates the continuous stream appearance.
-     *
-     * @param connDown/Up/North/South/West/East — true if this end is connected to another pipe
-     * @param primaryFlow   — optional flow direction for the exponential top-face slope
-     * @param yUpstream     — water surface height at the upstream corner of this pipe
-     * @param yDownstream   — water surface height at the downstream corner of this pipe
-     */
-    private static void renderStraightFluid(
-            Direction.Axis axis,
-            boolean connDown, boolean connUp, boolean connNorth, boolean connSouth, boolean connWest, boolean connEast,
-            Direction primaryFlow,
-            float yUpstream, float yDownstream,
-            PoseStack poseStack, VertexConsumer buffer, TextureAtlasSprite sprite, int color, int light, int overlay) {
-
-        float x1 = 0.125F, x2 = 0.875F;
-        float y1 = 0.125F, y2 = 0.8125F;
-        float z1 = 0.125F, z2 = 0.875F;
-
-        // Extend fluid bounds to block face in the connected directions
-        if (connDown)  y1 = 0.0F;
-        if (connUp)    y2 = 1.0F;
-        if (connNorth) z1 = 0.0F;
-        if (connSouth) z2 = 1.0F;
-        if (connWest)  x1 = 0.0F;
-        if (connEast)  x2 = 1.0F;
-
-        // Also extend in the natural open-ends of the axis
-        switch (axis) {
-            case X: x1 = 0.0F; x2 = 1.0F; break;
-            case Z: z1 = 0.0F; z2 = 1.0F; break;
-            default: // Y
-                y1 = connDown ? 0.0F : 0.125F;
-                y2 = connUp ? 1.0F : 0.8125F;
-                break;
-        }
-
-        renderFluidBox(poseStack, buffer,
-                axis, x1, y1, z1, x2, y2, z2,
-                connDown, connUp, connNorth, connSouth, connWest, connEast,
-                primaryFlow, yUpstream, yDownstream, sprite, color, light, overlay);
-    }
-
-    private static void renderFluidJunction(
-            PoseStack poseStack, VertexConsumer buffer,
-            float x1, float y1, float z1,
-            float x2, float y2, float z2,
-            boolean connDown, boolean connUp, boolean connNorth, boolean connSouth, boolean connWest, boolean connEast,
-            Direction primaryFlow,
-            float yUpstream, float yDownstream,
-            TextureAtlasSprite sprite, int color, int light, int overlay) {
-
-        renderFluidBox(poseStack, buffer,
-                null, x1, y1, z1, x2, y2, z2,
-                connDown, connUp, connNorth, connSouth, connWest, connEast,
-                primaryFlow, yUpstream, yDownstream, sprite, color, light, overlay);
-    }
-
-    /**
-     * Renders a fluid-filled AABB box with precise face culling and exponential slope.
-     *
-     * Face culling:
-     *   - connXxx == true means the fluid continues into the adjacent pipe: cull that face.
-     *   - connXxx == false: render the face (closed wall or open end).
-     *
-     * Top-face slope:
-     *   The top face uses a per-corner height computed from yUpstream/yDownstream.
-     *   "Upstream" corners = the two corners on the side that water enters from.
-     *   "Downstream" corners = the two corners on the side that water exits toward.
-     *   This creates a planar tilt across the pipe interior in the flow direction.
-     *
-     *   For the last pipe in the chain (isOpenEndpoint), yDownstream is forced to
-     *   vanilla's level-7 height (0.1875), giving a steep end-slope identical to
-     *   how vanilla water looks at the last block before a waterfall.
-     */
-    private static void renderFluidBox(
-            PoseStack poseStack, VertexConsumer buffer,
-            Direction.Axis axis,
-            float x1, float y1, float z1,
-            float x2, float y2, float z2,
-            boolean connDown, boolean connUp, boolean connNorth, boolean connSouth, boolean connWest, boolean connEast,
-            Direction primaryFlow,
-            float yUpstream, float yDownstream,
-            TextureAtlasSprite sprite, int color, int light, int overlay) {
 
         float r = ((color >> 16) & 0xFF) / 255.0F;
         float g = ((color >> 8) & 0xFF) / 255.0F;
         float b = (color & 0xFF) / 255.0F;
-        float a = ((color >> 24) & 0xFF) / 255.0F;
-        if (a == 0.0F) a = 0.88F;
-
-        float u0 = sprite.getU0();
-        float u1 = sprite.getU1();
-        float v0 = sprite.getV0();
-        float v1 = sprite.getV1();
+        float a = 1.0F; // Full 1.0F vertex alpha to match vanilla Minecraft water rendering
 
         Matrix4f matrix = poseStack.last().pose();
+        Direction.Axis axis = state.hasProperty(HollowLogBlock.AXIS) ? state.getValue(HollowLogBlock.AXIS) : Direction.Axis.Y;
 
-        // --- Exponential top-face slope ---
-        // The top-face 4 corners are assigned heights from yUpstream/yDownstream
-        // based on which side of the pipe they are on relative to the flow direction.
-        //
-        // Corner naming (looking down at the block from above, North = -Z, East = +X):
-        //   topNW = north-west corner (x1, z1)
-        //   topNE = north-east corner (x2, z1)
-        //   topSW = south-west corner (x1, z2)
-        //   topSE = south-east corner (x2, z2)
-        //
-        // For EAST flow: upstream = west face (NW, SW), downstream = east face (NE, SE)
-        // etc.
-        float topNW = y2, topNE = y2, topSW = y2, topSE = y2;
-        if (primaryFlow != null && !connUp) {
-            switch (primaryFlow) {
-                case EAST:
-                    // Upstream = west side (NW, SW), downstream = east side (NE, SE)
-                    topNW = yUpstream;   topSW = yUpstream;
-                    topNE = yDownstream; topSE = yDownstream;
-                    break;
-                case WEST:
-                    // Upstream = east side (NE, SE), downstream = west side (NW, SW)
-                    topNE = yUpstream;   topSE = yUpstream;
-                    topNW = yDownstream; topSW = yDownstream;
-                    break;
-                case SOUTH:
-                    // Upstream = north side (NW, NE), downstream = south side (SW, SE)
-                    topNW = yUpstream;   topNE = yUpstream;
-                    topSW = yDownstream; topSE = yDownstream;
-                    break;
-                case NORTH:
-                    // Upstream = south side (SW, SE), downstream = north side (NW, NE)
-                    topSW = yUpstream;   topSE = yUpstream;
-                    topNW = yDownstream; topNE = yDownstream;
-                    break;
-                default:
-                    // DOWN/UP: no horizontal slope
-                    break;
+        float x1 = 0.125F, x2 = 0.875F;
+        float y1 = 0.125F, y2 = 0.75F;
+        float z1 = 0.125F, z2 = 0.875F;
+
+        if (axis == Direction.Axis.Z) {
+            z1 = hasGlassNeg ? 0.08F : 0.0F;
+            z2 = hasGlassPos ? 0.92F : 1.0F;
+
+            float uX1 = getSpriteU(sprite, x1);
+            float uX2 = getSpriteU(sprite, x2);
+            float vZ1 = getSpriteV(sprite, z1);
+            float vZ2 = getSpriteV(sprite, z2);
+
+            // Top surface (1:1 UV mapped, no squishing)
+            renderQuad(matrix, buffer,
+                    x1, y2, z1,
+                    x1, y2, z2,
+                    x2, y2, z2,
+                    x2, y2, z1,
+                    r, g, b, a,
+                    uX1, vZ1,
+                    uX1, vZ2,
+                    uX2, vZ2,
+                    uX2, vZ1,
+                    light, overlay, 0, 1, 0);
+
+            // North end cap (only if glass or open to air / not neighbor fluid)
+            if (hasGlassNeg || !isNeighborFluid(level, pos, Direction.NORTH, fluid)) {
+                float vY1 = getSpriteV(sprite, y1);
+                float vY2 = getSpriteV(sprite, y2);
+                renderQuad(matrix, buffer, x2, y2, z1, x2, y1, z1, x1, y1, z1, x1, y2, z1, r, g, b, a, uX2, vY2, uX2, vY1, uX1, vY1, uX1, vY2, light, overlay, 0, 0, -1);
+                renderQuad(matrix, buffer, x1, y2, z1, x1, y1, z1, x2, y1, z1, x2, y2, z1, r, g, b, a, uX1, vY2, uX1, vY1, uX2, vY1, uX2, vY2, light, overlay, 0, 0, 1);
+            }
+
+            // South end cap (only if glass or open to air / not neighbor fluid)
+            if (hasGlassPos || !isNeighborFluid(level, pos, Direction.SOUTH, fluid)) {
+                float vY1 = getSpriteV(sprite, y1);
+                float vY2 = getSpriteV(sprite, y2);
+                renderQuad(matrix, buffer, x1, y2, z2, x1, y1, z2, x2, y1, z2, x2, y2, z2, r, g, b, a, uX1, vY2, uX1, vY1, uX2, vY1, uX2, vY2, light, overlay, 0, 0, 1);
+                renderQuad(matrix, buffer, x2, y2, z2, x2, y1, z2, x1, y1, z2, x1, y2, z2, r, g, b, a, uX2, vY2, uX2, vY1, uX1, vY1, uX1, vY2, light, overlay, 0, 0, -1);
+            }
+        } else if (axis == Direction.Axis.X) {
+            x1 = hasGlassNeg ? 0.08F : 0.0F;
+            x2 = hasGlassPos ? 0.92F : 1.0F;
+
+            float uZ1 = getSpriteU(sprite, z1);
+            float uZ2 = getSpriteU(sprite, z2);
+            float vX1 = getSpriteV(sprite, x1);
+            float vX2 = getSpriteV(sprite, x2);
+
+            // Top surface (1:1 UV mapped, no squishing)
+            renderQuad(matrix, buffer,
+                    x1, y2, z1,
+                    x1, y2, z2,
+                    x2, y2, z2,
+                    x2, y2, z1,
+                    r, g, b, a,
+                    uZ1, vX1,
+                    uZ2, vX1,
+                    uZ2, vX2,
+                    uZ1, vX2,
+                    light, overlay, 0, 1, 0);
+
+            // West end cap (only if glass or open to air / not neighbor fluid)
+            if (hasGlassNeg || !isNeighborFluid(level, pos, Direction.WEST, fluid)) {
+                float vY1 = getSpriteV(sprite, y1);
+                float vY2 = getSpriteV(sprite, y2);
+                renderQuad(matrix, buffer, x1, y2, z1, x1, y1, z1, x1, y1, z2, x1, y2, z2, r, g, b, a, uZ1, vY2, uZ1, vY1, uZ2, vY1, uZ2, vY2, light, overlay, -1, 0, 0);
+                renderQuad(matrix, buffer, x1, y2, z2, x1, y1, z2, x1, y1, z1, x1, y2, z1, r, g, b, a, uZ2, vY2, uZ2, vY1, uZ1, vY1, uZ1, vY2, light, overlay, 1, 0, 0);
+            }
+
+            // East end cap (only if glass or open to air / not neighbor fluid)
+            if (hasGlassPos || !isNeighborFluid(level, pos, Direction.EAST, fluid)) {
+                float vY1 = getSpriteV(sprite, y1);
+                float vY2 = getSpriteV(sprite, y2);
+                renderQuad(matrix, buffer, x2, y2, z2, x2, y1, z2, x2, y1, z1, x2, y2, z1, r, g, b, a, uZ2, vY2, uZ2, vY1, uZ1, vY1, uZ1, vY2, light, overlay, 1, 0, 0);
+                renderQuad(matrix, buffer, x2, y2, z1, x2, y1, z1, x2, y1, z2, x2, y2, z2, r, g, b, a, uZ1, vY2, uZ1, vY1, uZ2, vY1, uZ2, vY2, light, overlay, -1, 0, 0);
+            }
+        } else { // Y axis
+            y1 = hasGlassNeg ? 0.08F : 0.0F;
+            y2 = hasGlassPos ? 0.92F : 0.75F;
+
+            float uX1 = getSpriteU(sprite, x1);
+            float uX2 = getSpriteU(sprite, x2);
+            float vZ1 = getSpriteV(sprite, z1);
+            float vZ2 = getSpriteV(sprite, z2);
+
+            // Top surface
+            if (hasGlassPos || !isNeighborFluid(level, pos, Direction.UP, fluid)) {
+                renderQuad(matrix, buffer,
+                        x1, y2, z1,
+                        x1, y2, z2,
+                        x2, y2, z2,
+                        x2, y2, z1,
+                        r, g, b, a,
+                        uX1, vZ1,
+                        uX1, vZ2,
+                        uX2, vZ2,
+                        uX2, vZ1,
+                        light, overlay, 0, 1, 0);
+            }
+
+            // Bottom surface
+            if (hasGlassNeg || !isNeighborFluid(level, pos, Direction.DOWN, fluid)) {
+                renderQuad(matrix, buffer,
+                        x1, y1, z2,
+                        x1, y1, z1,
+                        x2, y1, z1,
+                        x2, y1, z2,
+                        r, g, b, a,
+                        uX1, vZ2,
+                        uX1, vZ1,
+                        uX2, vZ1,
+                        uX2, vZ2,
+                        light, overlay, 0, -1, 0);
             }
         }
-
-        // 1. Top face (+Y) — the primary water surface, rendered double-sided
-        if (!connUp) {
-            // Outward top (+Y)
-            addVertex(matrix, buffer, x1, topNW, z1, r, g, b, a, u0, v0, light, overlay, 0, 1, 0);
-            addVertex(matrix, buffer, x2, topNE, z1, r, g, b, a, u1, v0, light, overlay, 0, 1, 0);
-            addVertex(matrix, buffer, x2, topSE, z2, r, g, b, a, u1, v1, light, overlay, 0, 1, 0);
-            addVertex(matrix, buffer, x1, topSW, z2, r, g, b, a, u0, v1, light, overlay, 0, 1, 0);
-
-            // Inward underside (-Y)
-            addVertex(matrix, buffer, x1, topSW, z2, r, g, b, a, u0, v1, light, overlay, 0, -1, 0);
-            addVertex(matrix, buffer, x2, topSE, z2, r, g, b, a, u1, v1, light, overlay, 0, -1, 0);
-            addVertex(matrix, buffer, x2, topNE, z1, r, g, b, a, u1, v0, light, overlay, 0, -1, 0);
-            addVertex(matrix, buffer, x1, topNW, z1, r, g, b, a, u0, v0, light, overlay, 0, -1, 0);
-        }
-
-        // 2. Bottom face (-Y) — double-sided when vertical pipe is open downwards
-        if ((axis == Direction.Axis.Y || axis == null) && !connDown) {
-            // Outward bottom (-Y)
-            addVertex(matrix, buffer, x1, y1, z2, r, g, b, a, u0, v1, light, overlay, 0, -1, 0);
-            addVertex(matrix, buffer, x2, y1, z2, r, g, b, a, u1, v1, light, overlay, 0, -1, 0);
-            addVertex(matrix, buffer, x2, y1, z1, r, g, b, a, u1, v0, light, overlay, 0, -1, 0);
-            addVertex(matrix, buffer, x1, y1, z1, r, g, b, a, u0, v0, light, overlay, 0, -1, 0);
-
-            // Inward floor (+Y)
-            addVertex(matrix, buffer, x1, y1, z1, r, g, b, a, u0, v0, light, overlay, 0, 1, 0);
-            addVertex(matrix, buffer, x2, y1, z1, r, g, b, a, u1, v0, light, overlay, 0, 1, 0);
-            addVertex(matrix, buffer, x2, y1, z2, r, g, b, a, u1, v1, light, overlay, 0, 1, 0);
-            addVertex(matrix, buffer, x1, y1, z2, r, g, b, a, u0, v1, light, overlay, 0, 1, 0);
-        }
-
-        // 3. North face (-Z) — open end-cap for Z-axis pipes or junctions, rendered double-sided
-        if ((axis == Direction.Axis.Z || axis == null) && !connNorth) {
-            float topW = topNW, topE = topNE;
-            // Outward North (-Z)
-            addVertex(matrix, buffer, x2, topE, z1, r, g, b, a, u1, v0, light, overlay, 0, 0, -1);
-            addVertex(matrix, buffer, x1, topW, z1, r, g, b, a, u0, v0, light, overlay, 0, 0, -1);
-            addVertex(matrix, buffer, x1, y1,   z1, r, g, b, a, u0, v1, light, overlay, 0, 0, -1);
-            addVertex(matrix, buffer, x2, y1,   z1, r, g, b, a, u1, v1, light, overlay, 0, 0, -1);
-
-            // Inward North (+Z)
-            addVertex(matrix, buffer, x2, y1,   z1, r, g, b, a, u1, v1, light, overlay, 0, 0, 1);
-            addVertex(matrix, buffer, x1, y1,   z1, r, g, b, a, u0, v1, light, overlay, 0, 0, 1);
-            addVertex(matrix, buffer, x1, topW, z1, r, g, b, a, u0, v0, light, overlay, 0, 0, 1);
-            addVertex(matrix, buffer, x2, topE, z1, r, g, b, a, u1, v0, light, overlay, 0, 0, 1);
-        }
-
-        // 4. South face (+Z) — open end-cap for Z-axis pipes or junctions, rendered double-sided
-        if ((axis == Direction.Axis.Z || axis == null) && !connSouth) {
-            float topW = topSW, topE = topSE;
-            // Outward South (+Z)
-            addVertex(matrix, buffer, x1, topW, z2, r, g, b, a, u0, v0, light, overlay, 0, 0, 1);
-            addVertex(matrix, buffer, x2, topE, z2, r, g, b, a, u1, v0, light, overlay, 0, 0, 1);
-            addVertex(matrix, buffer, x2, y1,   z2, r, g, b, a, u1, v1, light, overlay, 0, 0, 1);
-            addVertex(matrix, buffer, x1, y1,   z2, r, g, b, a, u0, v1, light, overlay, 0, 0, 1);
-
-            // Inward South (-Z)
-            addVertex(matrix, buffer, x1, y1,   z2, r, g, b, a, u0, v1, light, overlay, 0, 0, -1);
-            addVertex(matrix, buffer, x2, y1,   z2, r, g, b, a, u1, v1, light, overlay, 0, 0, -1);
-            addVertex(matrix, buffer, x2, topE, z2, r, g, b, a, u1, v0, light, overlay, 0, 0, -1);
-            addVertex(matrix, buffer, x1, topW, z2, r, g, b, a, u0, v0, light, overlay, 0, 0, -1);
-        }
-
-        // 5. West face (-X) — open end-cap for X-axis pipes or junctions, rendered double-sided
-        if ((axis == Direction.Axis.X || axis == null) && !connWest) {
-            float topN = topNW, topS = topSW;
-            // Outward West (-X)
-            addVertex(matrix, buffer, x1, topN, z1, r, g, b, a, u0, v0, light, overlay, -1, 0, 0);
-            addVertex(matrix, buffer, x1, topS, z2, r, g, b, a, u1, v0, light, overlay, -1, 0, 0);
-            addVertex(matrix, buffer, x1, y1,   z2, r, g, b, a, u1, v1, light, overlay, -1, 0, 0);
-            addVertex(matrix, buffer, x1, y1,   z1, r, g, b, a, u0, v1, light, overlay, -1, 0, 0);
-
-            // Inward West (+X)
-            addVertex(matrix, buffer, x1, y1,   z1, r, g, b, a, u0, v1, light, overlay, 1, 0, 0);
-            addVertex(matrix, buffer, x1, y1,   z2, r, g, b, a, u1, v1, light, overlay, 1, 0, 0);
-            addVertex(matrix, buffer, x1, topS, z2, r, g, b, a, u1, v0, light, overlay, 1, 0, 0);
-            addVertex(matrix, buffer, x1, topN, z1, r, g, b, a, u0, v0, light, overlay, 1, 0, 0);
-        }
-
-        // 6. East face (+X) — open end-cap for X-axis pipes or junctions, rendered double-sided
-        if ((axis == Direction.Axis.X || axis == null) && !connEast) {
-            float topN = topNE, topS = topSE;
-            // Outward East (+X)
-            addVertex(matrix, buffer, x2, topS, z2, r, g, b, a, u0, v0, light, overlay, 1, 0, 0);
-            addVertex(matrix, buffer, x2, topN, z1, r, g, b, a, u1, v0, light, overlay, 1, 0, 0);
-            addVertex(matrix, buffer, x2, y1,   z1, r, g, b, a, u1, v1, light, overlay, 1, 0, 0);
-            addVertex(matrix, buffer, x2, y1,   z2, r, g, b, a, u0, v1, light, overlay, 1, 0, 0);
-
-            // Inward East (-X)
-            addVertex(matrix, buffer, x2, y1,   z2, r, g, b, a, u0, v1, light, overlay, -1, 0, 0);
-            addVertex(matrix, buffer, x2, y1,   z1, r, g, b, a, u1, v1, light, overlay, -1, 0, 0);
-            addVertex(matrix, buffer, x2, topN, z1, r, g, b, a, u1, v0, light, overlay, -1, 0, 0);
-            addVertex(matrix, buffer, x2, topS, z2, r, g, b, a, u0, v0, light, overlay, -1, 0, 0);
-        }
-
-
-    }
-
-    private static void addVertex(
-            Matrix4f matrix, VertexConsumer buffer,
-            float x, float y, float z,
-            float r, float g, float b, float a,
-            float u, float v,
-            int light, int overlay,
-            float nx, float ny, float nz) {
-        buffer.vertex(matrix, x, y, z)
-                .color(r, g, b, a)
-                .uv(u, v)
-                .overlayCoords(overlay)
-                .uv2(light)
-                .normal(nx, ny, nz)
-                .endVertex();
     }
 }

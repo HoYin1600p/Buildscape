@@ -51,7 +51,10 @@ public class BuildersPouchMenu extends AbstractContainerMenu implements GhostFil
                 @Override
                 public int get(int index) {
                     if (index < 0 || index >= filters.size() || filters.get(index).isEmpty()) return 0;
-                    Item item = Registry.ITEM.get(new net.minecraft.resources.ResourceLocation(filters.get(index)));
+                    String filterStr = filters.get(index);
+                    if (!net.minecraft.resources.ResourceLocation.isValidResourceLocation(filterStr)) return 0;
+                    Item item = Registry.ITEM.get(new net.minecraft.resources.ResourceLocation(filterStr));
+                    if (item == null || item == net.minecraft.world.item.Items.AIR) return 0;
                     return Registry.ITEM.getId(item) + 1;
                 }
 
@@ -134,7 +137,9 @@ public class BuildersPouchMenu extends AbstractContainerMenu implements GhostFil
     public Item buildscape$getFilterItem(int menuSlot) {
         if (menuSlot < 0 || menuSlot >= POUCH_SLOTS) return null;
         int rawId = (filterData.get(menuSlot) & 0xFFFF) - 1;
-        return rawId < 0 ? null : Registry.ITEM.byId(rawId);
+        if (rawId < 0) return null;
+        Item item = Registry.ITEM.byId(rawId);
+        return (item == null || item == net.minecraft.world.item.Items.AIR) ? null : item;
     }
 
     @Override

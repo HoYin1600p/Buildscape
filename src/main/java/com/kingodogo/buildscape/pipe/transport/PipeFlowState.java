@@ -6,6 +6,7 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
 
+import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.Objects;
@@ -19,6 +20,8 @@ public class PipeFlowState {
     private boolean hasWater;
     private boolean isSource;
     private final Set<Direction> flowDirections = EnumSet.noneOf(Direction.class);
+    @Nullable
+    private Direction inflowDirection = null;
     private BubbleColumnState bubbleColumn = BubbleColumnState.NONE;
     private int distance = 0;
     /** Total distance from source to the furthest pipe in this network section. Used for slope computation. */
@@ -29,21 +32,26 @@ public class PipeFlowState {
     public PipeFlowState() {
     }
 
-    public PipeFlowState(boolean hasWater, boolean isSource, Collection<Direction> flowDirections, BubbleColumnState bubbleColumn, int distance, int maxDistance, boolean isOpenEndpoint) {
+    public PipeFlowState(boolean hasWater, boolean isSource, Collection<Direction> flowDirections, @Nullable Direction inflowDirection, BubbleColumnState bubbleColumn, int distance, int maxDistance, boolean isOpenEndpoint) {
         this.hasWater = hasWater;
         this.isSource = isSource;
         if (flowDirections != null) {
             this.flowDirections.addAll(flowDirections);
         }
+        this.inflowDirection = inflowDirection;
         this.bubbleColumn = bubbleColumn != null ? bubbleColumn : BubbleColumnState.NONE;
         this.distance = distance;
         this.maxDistance = maxDistance;
         this.isOpenEndpoint = isOpenEndpoint;
     }
 
+    public PipeFlowState(boolean hasWater, boolean isSource, Collection<Direction> flowDirections, BubbleColumnState bubbleColumn, int distance, int maxDistance, boolean isOpenEndpoint) {
+        this(hasWater, isSource, flowDirections, null, bubbleColumn, distance, maxDistance, isOpenEndpoint);
+    }
+
     /** Convenience constructor (legacy - maxDistance=0, isOpenEndpoint=false) */
     public PipeFlowState(boolean hasWater, boolean isSource, Collection<Direction> flowDirections, BubbleColumnState bubbleColumn, int distance) {
-        this(hasWater, isSource, flowDirections, bubbleColumn, distance, 0, false);
+        this(hasWater, isSource, flowDirections, null, bubbleColumn, distance, 0, false);
     }
 
     public boolean hasWater() {
@@ -87,6 +95,15 @@ public class PipeFlowState {
         this.flowDirections.clear();
     }
 
+    @Nullable
+    public Direction getInflowDirection() {
+        return inflowDirection;
+    }
+
+    public void setInflowDirection(@Nullable Direction inflowDirection) {
+        this.inflowDirection = inflowDirection;
+    }
+
     public BubbleColumnState getBubbleColumn() {
         return bubbleColumn;
     }
@@ -110,14 +127,15 @@ public class PipeFlowState {
     public void setOpenEndpoint(boolean openEndpoint) { isOpenEndpoint = openEndpoint; }
 
     public boolean isEmpty() {
-        return !hasWater && !isSource && flowDirections.isEmpty() && bubbleColumn == BubbleColumnState.NONE
-                && distance == 0 && maxDistance == 0 && !isOpenEndpoint;
+        return !hasWater && !isSource && flowDirections.isEmpty() && inflowDirection == null
+                && bubbleColumn == BubbleColumnState.NONE && distance == 0 && maxDistance == 0 && !isOpenEndpoint;
     }
 
     public void clear() {
         this.hasWater = false;
         this.isSource = false;
         this.flowDirections.clear();
+        this.inflowDirection = null;
         this.bubbleColumn = BubbleColumnState.NONE;
         this.distance = 0;
         this.maxDistance = 0;
@@ -125,7 +143,7 @@ public class PipeFlowState {
     }
 
     public PipeFlowState copy() {
-        return new PipeFlowState(this.hasWater, this.isSource, this.flowDirections, this.bubbleColumn, this.distance, this.maxDistance, this.isOpenEndpoint);
+        return new PipeFlowState(this.hasWater, this.isSource, this.flowDirections, this.inflowDirection, this.bubbleColumn, this.distance, this.maxDistance, this.isOpenEndpoint);
     }
 
     public CompoundTag writeToNbt(CompoundTag tag) {
@@ -135,6 +153,10 @@ public class PipeFlowState {
         tag.putInt("Distance", distance);
         tag.putInt("MaxDistance", maxDistance);
         tag.putBoolean("IsOpenEndpoint", isOpenEndpoint);
+
+        if (inflowDirection != null) {
+            tag.putString("InflowDir", inflowDirection.getName());
+        }
 
         ListTag list = new ListTag();
         for (Direction dir : flowDirections) {
@@ -154,6 +176,10 @@ public class PipeFlowState {
         state.distance = tag.getInt("Distance");
         state.maxDistance = tag.contains("MaxDistance") ? tag.getInt("MaxDistance") : 0;
         state.isOpenEndpoint = tag.contains("IsOpenEndpoint") && tag.getBoolean("IsOpenEndpoint");
+
+        if (tag.contains("InflowDir")) {
+            state.inflowDirection = Direction.byName(tag.getString("InflowDir"));
+        }
 
         if (tag.contains("FlowDirs", Tag.TAG_LIST)) {
             ListTag list = tag.getList("FlowDirs", Tag.TAG_STRING);
@@ -177,12 +203,13 @@ public class PipeFlowState {
                 maxDistance == that.maxDistance &&
                 isOpenEndpoint == that.isOpenEndpoint &&
                 bubbleColumn == that.bubbleColumn &&
+                inflowDirection == that.inflowDirection &&
                 Objects.equals(flowDirections, that.flowDirections);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(hasWater, isSource, flowDirections, bubbleColumn, distance, maxDistance, isOpenEndpoint);
+        return Objects.hash(hasWater, isSource, flowDirections, inflowDirection, bubbleColumn, distance, maxDistance, isOpenEndpoint);
     }
 
     @Override
@@ -191,6 +218,7 @@ public class PipeFlowState {
                 "hasWater=" + hasWater +
                 ", isSource=" + isSource +
                 ", flowDirections=" + flowDirections +
+                ", inflowDirection=" + inflowDirection +
                 ", bubbleColumn=" + bubbleColumn +
                 ", distance=" + distance +
                 ", maxDistance=" + maxDistance +

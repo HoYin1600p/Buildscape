@@ -58,32 +58,5 @@ public abstract class FlowingFluidMixin {
                 return;
             }
         }
-
-        // 5. Prevent external fluid in world from spreading backward along solid side casings
-        if (direction.getAxis().isHorizontal()) {
-            for (Direction dir : Direction.values()) {
-                if (dir.getAxis().isHorizontal() && dir != direction && dir != direction.getOpposite()) {
-                    BlockPos pipePos = toPos.relative(dir);
-                    BlockState pipeState = level.getBlockState(pipePos);
-                    if (pipeState.getBlock() instanceof HollowPipeBlock) {
-                        if (!HollowPipeBlock.isOpenEndpoint(pipeState, dir.getOpposite())) {
-                            Direction.Axis pipeAxis = HollowPipeBlock.getPrimaryAxis(pipeState);
-                            if (direction.getAxis() == pipeAxis) {
-                                cir.setReturnValue(false);
-                                return;
-                            }
-                        }
-                    } else if (pipeState.getBlock() instanceof HollowLogBlock) {
-                        if (!HollowLogBlock.isOpenEnd(pipeState, dir.getOpposite())) {
-                            Direction.Axis logAxis = pipeState.getValue(HollowLogBlock.AXIS);
-                            if (direction.getAxis() == logAxis) {
-                                cir.setReturnValue(false);
-                                return;
-                            }
-                        }
-                    }
-                }
-            }
-        }
     }
 }

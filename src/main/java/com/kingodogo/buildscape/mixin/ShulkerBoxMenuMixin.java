@@ -11,6 +11,7 @@ import net.minecraft.world.inventory.DataSlot;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.ShulkerBoxMenu;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -43,13 +44,18 @@ public abstract class ShulkerBoxMenuMixin extends AbstractContainerMenu implemen
                 @Override
                 public int get() {
                     if (buildscape$filterSource != null) {
-                        String filter = buildscape$filterSource.buildscape$getGhostFilters()[filterSlot];
-                        if (filter != null && ResourceLocation.isValidResourceLocation(filter)) {
-                            Item item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(filter));
-                            return item == null ? 0 : Registry.ITEM.getId(item) + 1;
+                        String[] ghostFilters = buildscape$filterSource.buildscape$getGhostFilters();
+                        if (ghostFilters != null && filterSlot < ghostFilters.length) {
+                            String filter = ghostFilters[filterSlot];
+                            if (filter != null && !filter.isEmpty() && ResourceLocation.isValidResourceLocation(filter)) {
+                                Item item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(filter));
+                                if (item != null && item != Items.AIR) {
+                                    return Registry.ITEM.getId(item) + 1;
+                                }
+                            }
                         }
                     }
-                    return buildscape$filterIds[filterSlot];
+                    return 0;
                 }
 
                 @Override
@@ -65,13 +71,20 @@ public abstract class ShulkerBoxMenuMixin extends AbstractContainerMenu implemen
     public Item buildscape$getFilterItem(int menuSlot) {
         if (menuSlot < 0 || menuSlot >= BUILDSCAPE_FILTER_SLOTS) return null;
         if (buildscape$filterSource != null) {
-            String filter = buildscape$filterSource.buildscape$getGhostFilters()[menuSlot];
-            if (filter != null && ResourceLocation.isValidResourceLocation(filter)) {
-                return ForgeRegistries.ITEMS.getValue(new ResourceLocation(filter));
+            String[] ghostFilters = buildscape$filterSource.buildscape$getGhostFilters();
+            if (ghostFilters != null && menuSlot < ghostFilters.length) {
+                String filter = ghostFilters[menuSlot];
+                if (filter != null && !filter.isEmpty() && ResourceLocation.isValidResourceLocation(filter)) {
+                    Item item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(filter));
+                    if (item != null && item != Items.AIR) return item;
+                }
             }
+            return null;
         }
         int rawId = buildscape$filterIds[menuSlot] - 1;
-        return rawId < 0 ? null : Registry.ITEM.byId(rawId);
+        if (rawId < 0) return null;
+        Item item = Registry.ITEM.byId(rawId);
+        return (item == null || item == Items.AIR) ? null : item;
     }
 
     @Override
@@ -79,3 +92,4 @@ public abstract class ShulkerBoxMenuMixin extends AbstractContainerMenu implemen
         return BUILDSCAPE_FILTER_SLOTS;
     }
 }
+

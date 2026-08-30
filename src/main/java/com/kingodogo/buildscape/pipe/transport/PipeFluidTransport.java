@@ -25,8 +25,9 @@ public abstract class PipeFluidTransport {
 
     /**
      * Recalculates the connected pipe network starting from the given position.
+     * Returns the set of BlockPos in the discovered connected pipe component.
      */
-    public abstract void recalculateNetwork(Level level, BlockPos startPos);
+    public abstract java.util.Set<BlockPos> recalculateNetwork(Level level, BlockPos startPos);
 
     /**
      * Checks if a blockstate is a Hollow Pipe.

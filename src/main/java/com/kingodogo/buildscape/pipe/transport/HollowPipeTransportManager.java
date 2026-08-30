@@ -2,92 +2,119 @@ package com.kingodogo.buildscape.pipe.transport;
 
 import com.kingodogo.buildscape.block.HollowPipeBlock;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
+import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-/**
- * Central coordinator and entry point for the Hollow Steel Pipe fluid transport subsystem.
- *
- * FIRE RULES:
- * - markDirty() is the single gate for all recalculations. It is always server-side only.
- * - neighborChanged() and updateShape() both call markDirty() per neighbor — this naturally
- *   fires twice per update. We deduplicate via a per-tick dirty set to avoid cascading.
- * - The renderer is READ-ONLY and must never call any method here.
- */
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+
+// Coordinator for Hollow Steel Pipe fluid transport network updates
+@Mod.EventBusSubscriber(modid = "buildscape", bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class HollowPipeTransportManager {
 
     private static final Logger LOGGER = LogManager.getLogger("PipeTransport");
-
-    /**
-     * Dedicated debug flag to enable formatted transport logging.
-     * When false (default), logging is completely silent.
-     */
     public static boolean DEBUG_TRANSPORT = false;
+    private static final Map<Level, Set<BlockPos>> PENDING_DIRTY = new ConcurrentHashMap<>();
 
-    /**
-     * Schedules or executes a network recalculation at the given position.
-     * Guards: server-side only; startPos must be a hollow pipe or directly adjacent to one.
-     */
     public static void markDirty(Level level, BlockPos pos) {
         if (level == null || level.isClientSide || pos == null) {
             return;
         }
-        WaterPipeTransport.INSTANCE.recalculateNetwork(level, pos);
+        PENDING_DIRTY.computeIfAbsent(level, k -> Collections.synchronizedSet(new LinkedHashSet<>())).add(pos.immutable());
+        processPendingRecalculations(level);
     }
 
     /**
-     * Called when a new HollowPipeBlock is placed.
-     * Always triggers a full network recalculation from the new position.
+     * Immediately processes and clears pending recalculations for the specified level.
      */
-    public static void onBlockPlaced(Level level, BlockPos pos, BlockState state) {
-        markDirty(level, pos);
-    }
-
-    /**
-     * Called when a HollowPipeBlock is removed.
-     * Triggers recalculation from all 6 adjacent positions (the removed block is gone,
-     * so we recalculate from neighbors which may now be disconnected).
-     */
-    public static void onBlockRemoved(Level level, BlockPos pos, BlockState state) {
-        markDirty(level, pos);
-    }
-
-    /**
-     * Called when a neighbor block changes adjacent to a HollowPipeBlock.
-     *
-     * Guard: Only fires recalculation if the changing neighbor is one of:
-     *   (a) Another HollowPipeBlock (topology change)
-     *   (b) A fluid source block (water/lava appearing or disappearing next to an open endpoint)
-     *
-     * This prevents spurious recalculations from decoration, glass cover, or other
-     * non-transport neighbor events, which previously caused double-fires and
-     * false source detection on every structural update.
-     */
-    public static void onNeighborChanged(Level level, BlockPos pos, BlockState state, BlockPos neighborPos) {
-        if (level == null || level.isClientSide || pos == null || neighborPos == null) {
+    public static void processPendingRecalculations(Level level) {
+        Set<BlockPos> queue = PENDING_DIRTY.remove(level);
+        if (queue == null || queue.isEmpty()) {
             return;
         }
 
-        // Only recalculate if the neighbor is relevant to transport:
-        // (a) The neighbor is another Hollow Pipe (topology may have changed)
-        // (b) The neighbor contains a water or lava fluid source
-        // (c) The neighbor occupies an open pipe endpoint.  This last case is required
-        //     for source removal: after a source becomes air it no longer satisfies
-        //     (b), but the network must still drain.
+        Set<BlockPos> pending;
+        synchronized (queue) {
+            pending = new LinkedHashSet<>(queue);
+        }
+
+        while (!pending.isEmpty()) {
+            Iterator<BlockPos> it = pending.iterator();
+            BlockPos nextPos = it.next();
+            it.remove();
+
+            Set<BlockPos> component = WaterPipeTransport.INSTANCE.recalculateNetwork(level, nextPos);
+            if (component != null && !component.isEmpty()) {
+                pending.removeAll(component);
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public static void onServerTick(TickEvent.ServerTickEvent event) {
+        if (event.phase != TickEvent.Phase.END) return;
+
+        // Process pending BFS pipe recalculations
+        if (!PENDING_DIRTY.isEmpty()) {
+            for (Level level : new ArrayList<>(PENDING_DIRTY.keySet())) {
+                processPendingRecalculations(level);
+            }
+        }
+    }
+
+    public static void onBlockPlaced(Level level, BlockPos pos, BlockState state) {
+        if (level == null || level.isClientSide || pos == null || state == null) {
+            return;
+        }
+        if (state.hasProperty(HollowPipeBlock.WATERLOGGED) && state.getValue(HollowPipeBlock.WATERLOGGED)) {
+            markDirty(level, pos);
+            return;
+        }
+        for (Direction dir : Direction.values()) {
+            BlockPos neighborPos = pos.relative(dir);
+            BlockState neighborState = level.getBlockState(neighborPos);
+            if (neighborState.getBlock() instanceof HollowPipeBlock) {
+                markDirty(level, neighborPos);
+            }
+        }
+    }
+
+    public static void onBlockRemoved(Level level, BlockPos pos, BlockState state) {
+        if (level == null || level.isClientSide || pos == null || state == null) {
+            return;
+        }
+        for (Direction dir : Direction.values()) {
+            BlockPos neighborPos = pos.relative(dir);
+            BlockState neighborState = level.getBlockState(neighborPos);
+            if (neighborState.getBlock() instanceof HollowPipeBlock) {
+                markDirty(level, neighborPos);
+            }
+        }
+    }
+
+    public static void onNeighborChanged(Level level, BlockPos pos, BlockState state, BlockPos neighborPos) {
+        if (level == null || level.isClientSide || pos == null) {
+            return;
+        }
+
         BlockState neighborState = level.getBlockState(neighborPos);
         FluidState neighborFluid = level.getFluidState(neighborPos);
 
         boolean neighborIsPipe = neighborState.getBlock() instanceof HollowPipeBlock;
-        boolean neighborIsFluidSource = neighborFluid.isSource()
-                && (neighborFluid.getType() == Fluids.WATER || neighborFluid.getType() == Fluids.LAVA);
+        boolean neighborIsFluid = !neighborFluid.isEmpty()
+                && (neighborFluid.getType() == Fluids.WATER || neighborFluid.getType() == Fluids.FLOWING_WATER
+                || neighborFluid.getType() == Fluids.LAVA || neighborFluid.getType() == Fluids.FLOWING_LAVA);
 
         boolean neighborIsOpenEndpoint = false;
-        for (net.minecraft.core.Direction direction : net.minecraft.core.Direction.values()) {
+        for (Direction direction : Direction.values()) {
             if (pos.relative(direction).equals(neighborPos)
                     && HollowPipeBlock.isOpenEndpoint(state, direction)) {
                 neighborIsOpenEndpoint = true;
@@ -95,15 +122,11 @@ public class HollowPipeTransportManager {
             }
         }
 
-        if (neighborIsPipe || neighborIsFluidSource || neighborIsOpenEndpoint) {
+        if (neighborIsPipe || neighborIsFluid || neighborIsOpenEndpoint) {
             markDirty(level, pos);
         }
     }
 
-    /**
-     * Called when a water or lava bucket is used on this pipe.
-     * Always triggers recalculation since source/drain state has explicitly changed.
-     */
     public static void onBucketUsed(Level level, BlockPos pos, BlockState state) {
         markDirty(level, pos);
     }

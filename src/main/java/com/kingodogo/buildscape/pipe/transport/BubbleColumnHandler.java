@@ -16,15 +16,9 @@ import net.minecraft.world.phys.Vec3;
 import java.util.Random;
 import java.util.Set;
 
-/**
- * Handles bubble column logic, detection, entity physics, and visual particle/sound effects
- * contained inside Hollow Steel Pipes.
- */
+// Bubble column logic and entity physics inside Hollow Steel Pipes
 public class BubbleColumnHandler {
 
-    /**
-     * Inspects the block directly below the given position to detect a Soul Sand or Magma Block base.
-     */
     public static BubbleColumnState detectBubbleColumnBase(BlockGetter level, BlockPos pos) {
         if (level == null || pos == null) return BubbleColumnState.NONE;
         BlockPos belowPos = pos.below();
@@ -39,18 +33,11 @@ public class BubbleColumnHandler {
         return BubbleColumnState.NONE;
     }
 
-    /**
-     * Checks if a blockstate is a valid bubble-column activating base block.
-     */
     public static boolean isBubbleColumnBase(BlockState state) {
         if (state == null) return false;
         return state.is(Blocks.SOUL_SAND) || state.is(Blocks.MAGMA_BLOCK);
     }
 
-    /**
-     * Applies fluid current physics and bubble column effects to entities inside the pipe's water stream.
-     * Items and entities are pushed along the flow direction, and bubble columns propel entities vertically.
-     */
     public static void handleEntityInside(Level level, BlockPos pos, BlockState state, Entity entity, PipeFlowState flowState) {
         if (entity == null || flowState == null || !flowState.hasWater()) {
             return;
@@ -112,16 +99,7 @@ public class BubbleColumnHandler {
         entity.resetFallDistance();
     }
 
-    /**
-     * Spawns contained directional flow bubble particles and bubble column effects
-     * strictly inside the 1x1 internal cavity of the pipe.
-     *
-     * Particle behavior:
-     *   - Each bubble originates near the UPSTREAM (incoming water) face of this pipe.
-     *   - It travels toward the DOWNSTREAM (outgoing water) face.
-     *   - When this is an open endpoint (isOpenEndpoint=true), extra particles are emitted
-     *     slightly OUTSIDE the pipe exit face to visually show water leaving the pipe.
-     */
+    // Spawns flow particles and bubble column effects inside pipe cavity
     public static void spawnFlowParticles(Level level, BlockPos pos, Random random, PipeFlowState flowState) {
         if (level == null || !level.isClientSide || flowState == null || !flowState.hasWater()) {
             return;
@@ -138,11 +116,27 @@ public class BubbleColumnHandler {
             // Standing contained water without flow: occasional gentle ambient bubble
             if (random.nextInt(4) == 0) {
                 double px = pos.getX() + 0.3D + random.nextDouble() * 0.4D;
-                double py = pos.getY() + 0.3D + random.nextDouble() * 0.4D;
+                double py = pos.getY() + 0.2D + random.nextDouble() * 0.3D;
                 double pz = pos.getZ() + 0.3D + random.nextDouble() * 0.4D;
                 level.addParticle(ParticleTypes.UNDERWATER, px, py, pz, 0.0D, 0.0D, 0.0D);
             }
             return;
+        }
+
+        double waterTopY;
+        if (flowState.isSource()) {
+            waterTopY = 0.75D;
+        } else {
+            waterTopY = switch (flowState.getDistance()) {
+                case 1 -> 0.70D;
+                case 2 -> 0.61D;
+                case 3 -> 0.52D;
+                case 4 -> 0.43D;
+                case 5 -> 0.34D;
+                case 6 -> 0.25D;
+                case 7 -> 0.16D;
+                default -> 0.13D;
+            };
         }
 
         // For each active flow direction:
@@ -153,7 +147,7 @@ public class BubbleColumnHandler {
         for (Direction dir : flowDirs) {
             int particleCount = 1 + random.nextInt(2); // 1–2 particles per direction per frame
             for (int i = 0; i < particleCount; i++) {
-                spawnDirectionalBubble(level, pos, random, dir);
+                spawnDirectionalBubble(level, pos, random, dir, waterTopY);
             }
 
             // Open endpoint spray: shoot extra particles outside the pipe exit face
@@ -162,7 +156,7 @@ public class BubbleColumnHandler {
                 // Check if this direction is actually the exit (not connected to another pipe)
                 // We spawn 1-3 extra particles slightly outside the face
                 if (random.nextInt(3) == 0) {
-                    spawnExitSpray(level, pos, random, dir);
+                    spawnExitSpray(level, pos, random, dir, waterTopY);
                 }
             }
         }
@@ -180,79 +174,70 @@ public class BubbleColumnHandler {
     }
 
     /**
-     * Spawns a single bubble particle that travels from the UPSTREAM entry face of this pipe
-     * toward the DOWNSTREAM exit face.
-     *
-     * The particle originates near the ENTRY face (where water comes IN) so it visually
-     * travels across the full pipe interior in the flow direction.
-     *
-     * Entry face = the face OPPOSITE to the flow direction (water enters from behind the flow).
-     * Exit face  = the face IN the flow direction (water exits toward the next pipe or the world).
+     * Spawns a single bubble particle that floats directly on the WATER SURFACE
+     * and travels from the UPSTREAM entry face of this pipe toward the DOWNSTREAM exit face.
      */
-    private static void spawnDirectionalBubble(Level level, BlockPos pos, Random random, Direction dir) {
+    private static void spawnDirectionalBubble(Level level, BlockPos pos, Random random, Direction dir, double waterTopY) {
         double px, py, pz;
         double vx = 0.0D, vy = 0.0D, vz = 0.0D;
-        double speed = 0.1D + random.nextDouble() * 0.06D;    // slightly faster = more visible
-        double jitter = (random.nextDouble() - 0.5D) * 0.012D;
+        double speed = 0.08D + random.nextDouble() * 0.04D;
+        double jitter = (random.nextDouble() - 0.5D) * 0.008D;
 
-        // Cross-section spread within the 1x1 interior (0.25 to 0.75 in non-flow axes)
-        double cs1 = 0.25D + random.nextDouble() * 0.50D;
-        double cs2 = 0.25D + random.nextDouble() * 0.50D;
+        double csX = 0.25D + random.nextDouble() * 0.50D;
+        double csZ = 0.25D + random.nextDouble() * 0.50D;
+        double csY = Math.max(0.13D, waterTopY - 0.02D); // Floats directly on the water surface!
 
-        // Particle starts near the UPSTREAM (entry) face of this pipe
-        // so it visually crosses the full pipe before exiting.
-        // Entry = OPPOSITE face of the flow direction.
         switch (dir) {
             case EAST -> {
-                // Flow: +X   |  Entry: West face (x ~ 0.25)
+                // Flow: +X
                 px = pos.getX() + 0.20D + random.nextDouble() * 0.10D;
-                py = pos.getY() + cs1;
-                pz = pos.getZ() + cs2;
+                py = pos.getY() + csY;
+                pz = pos.getZ() + csZ;
                 vx = speed;
-                vy = jitter;
+                vy = 0.0D;
                 vz = jitter;
             }
             case WEST -> {
-                // Flow: -X   |  Entry: East face (x ~ 0.75)
+                // Flow: -X
                 px = pos.getX() + 0.80D - random.nextDouble() * 0.10D;
-                py = pos.getY() + cs1;
-                pz = pos.getZ() + cs2;
+                py = pos.getY() + csY;
+                pz = pos.getZ() + csZ;
                 vx = -speed;
-                vy = jitter;
+                vy = 0.0D;
                 vz = jitter;
             }
             case SOUTH -> {
-                // Flow: +Z   |  Entry: North face (z ~ 0.25)
-                px = pos.getX() + cs1;
-                py = pos.getY() + cs2;
+                // Flow: +Z
+                px = pos.getX() + csX;
+                py = pos.getY() + csY;
                 pz = pos.getZ() + 0.20D + random.nextDouble() * 0.10D;
                 vx = jitter;
-                vy = jitter;
+                vy = 0.0D;
                 vz = speed;
             }
             case NORTH -> {
-                // Flow: -Z   |  Entry: South face (z ~ 0.75)
-                px = pos.getX() + cs1;
-                py = pos.getY() + cs2;
+                // Flow: -Z
+                px = pos.getX() + csX;
+                py = pos.getY() + csY;
                 pz = pos.getZ() + 0.80D - random.nextDouble() * 0.10D;
                 vx = jitter;
-                vy = jitter;
+                vy = 0.0D;
                 vz = -speed;
             }
             case DOWN -> {
-                // Flow: -Y   |  Entry: Top face (y ~ 0.75)
-                px = pos.getX() + cs1;
+                // Flow: -Y (Vertical Drop)
+                px = pos.getX() + csX;
                 py = pos.getY() + 0.75D - random.nextDouble() * 0.10D;
-                pz = pos.getZ() + cs2;
+                pz = pos.getZ() + csZ;
                 vx = jitter;
                 vy = -speed;
                 vz = jitter;
             }
             case UP -> {
-                // Flow: +Y   |  Entry: Bottom face (y ~ 0.25)
-                px = pos.getX() + cs1;
+                // Flow: +Y (Bubble Elevator)
+                px = pos.getX() + csX;
                 py = pos.getY() + 0.20D + random.nextDouble() * 0.10D;
-                pz = pos.getZ() + cs2;
+                pz = pos.getZ() + csZ;
                 vx = jitter;
                 vy = speed;
                 vz = jitter;
@@ -261,61 +246,39 @@ public class BubbleColumnHandler {
         }
 
         level.addParticle(ParticleTypes.BUBBLE, px, py, pz, vx, vy, vz);
+        if (random.nextInt(5) == 0 && dir != Direction.DOWN && dir != Direction.UP) {
+            level.addParticle(ParticleTypes.BUBBLE_POP, px, py + 0.01D, pz, vx * 0.3D, 0.005D, vz * 0.3D);
+        }
     }
 
     /**
      * Spawns a small spray of bubble and splash particles OUTSIDE the pipe exit face.
      * This gives the visual appearance of water leaving the pipe at the open endpoint.
-     *
-     * Particles are spawned 0.1–0.4 blocks outside the exit face, with velocity
-     * outward and slight spreading.
      */
-    private static void spawnExitSpray(Level level, BlockPos pos, Random random, Direction dir) {
+    private static void spawnExitSpray(Level level, BlockPos pos, Random random, Direction dir, double waterTopY) {
         double cx = pos.getX() + 0.5D;
-        double cy = pos.getY() + 0.5D;
+        double cy = pos.getY() + Math.max(0.13D, waterTopY - 0.02D);
         double cz = pos.getZ() + 0.5D;
 
-        // Move to the exit face center (0.5 + 0.5 outward in dir)
+        // Move to the exit face center
         cx += dir.getStepX() * 0.5D;
-        cy += dir.getStepY() * 0.5D;
         cz += dir.getStepZ() * 0.5D;
 
-        // Spread within the pipe interior cross-section (±0.2)
-        double spread = 0.2D;
+        double spread = 0.18D;
 
-        int count = 1 + random.nextInt(3);
+        int count = 1 + random.nextInt(2);
         for (int i = 0; i < count; i++) {
-            // Place particle just outside the pipe face (0.05–0.30 blocks out)
-            double outDist = 0.05D + random.nextDouble() * 0.25D;
+            double outDist = 0.05D + random.nextDouble() * 0.20D;
             double px = cx + dir.getStepX() * outDist + (random.nextDouble() - 0.5D) * spread;
-            double py = cy + dir.getStepY() * outDist + (random.nextDouble() - 0.5D) * spread;
+            double py = cy + (random.nextDouble() - 0.5D) * 0.02D;
             double pz = cz + dir.getStepZ() * outDist + (random.nextDouble() - 0.5D) * spread;
 
-            // Velocity: fast in flow direction, slight spread
-            double speed = 0.08D + random.nextDouble() * 0.08D;
-            double vx = dir.getStepX() * speed + (random.nextDouble() - 0.5D) * 0.04D;
-            double vy = dir.getStepY() * speed + (random.nextDouble() - 0.5D) * 0.04D - 0.01D; // slight gravity droop
-            double vz = dir.getStepZ() * speed + (random.nextDouble() - 0.5D) * 0.04D;
+            double speed = 0.06D + random.nextDouble() * 0.04D;
+            double vx = dir.getStepX() * speed + (random.nextDouble() - 0.5D) * 0.02D;
+            double vy = 0.0D;
+            double vz = dir.getStepZ() * speed + (random.nextDouble() - 0.5D) * 0.02D;
 
             level.addParticle(ParticleTypes.BUBBLE, px, py, pz, vx, vy, vz);
-
-            // Occasional SPLASH at the very exit
-            if (random.nextInt(4) == 0) {
-                level.addParticle(ParticleTypes.SPLASH,
-                        cx + dir.getStepX() * 0.08D,
-                        cy + dir.getStepY() * 0.08D,
-                        cz + dir.getStepZ() * 0.08D,
-                        dir.getStepX() * 0.05D,
-                        0.08D,
-                        dir.getStepZ() * 0.05D);
-            }
-        }
-
-        // Occasional bubble-pop at the pipe lip
-        if (random.nextInt(5) == 0) {
-            level.addParticle(ParticleTypes.BUBBLE_POP,
-                    cx, cy, cz,
-                    dir.getStepX() * 0.04D, 0.02D, dir.getStepZ() * 0.04D);
         }
     }
 
@@ -333,16 +296,16 @@ public class BubbleColumnHandler {
         if (bubbleState == BubbleColumnState.UP) {
             for (int i = 0; i < 2; i++) {
                 double px = minX + random.nextDouble() * 0.5D;
-                double py = pos.getY() + random.nextDouble();
+                double py = pos.getY() + 0.15D + random.nextDouble() * 0.35D;
                 double pz = minZ + random.nextDouble() * 0.5D;
-                level.addParticle(ParticleTypes.BUBBLE_COLUMN_UP, px, py, pz, 0.0D, 0.04D, 0.0D);
+                level.addParticle(ParticleTypes.BUBBLE, px, py, pz, 0.0D, 0.01D, 0.0D);
             }
 
             if (random.nextInt(6) == 0) {
                 double px = minX + random.nextDouble() * 0.5D;
-                double py = pos.getY() + 0.8D + random.nextDouble() * 0.2D;
+                double py = pos.getY() + 0.40D + random.nextDouble() * 0.1D;
                 double pz = minZ + random.nextDouble() * 0.5D;
-                level.addParticle(ParticleTypes.BUBBLE_POP, px, py, pz, 0.0D, 0.02D, 0.0D);
+                level.addParticle(ParticleTypes.BUBBLE_POP, px, py, pz, 0.0D, 0.01D, 0.0D);
             }
 
             if (random.nextInt(50) == 0) {
@@ -357,9 +320,9 @@ public class BubbleColumnHandler {
         } else if (bubbleState == BubbleColumnState.DOWN) {
             for (int i = 0; i < 2; i++) {
                 double px = minX + random.nextDouble() * 0.5D;
-                double py = pos.getY() + random.nextDouble();
+                double py = pos.getY() + 0.15D + random.nextDouble() * 0.35D;
                 double pz = minZ + random.nextDouble() * 0.5D;
-                level.addParticle(ParticleTypes.CURRENT_DOWN, px, py, pz, 0.0D, -0.04D, 0.0D);
+                level.addParticle(ParticleTypes.CURRENT_DOWN, px, py, pz, 0.0D, -0.02D, 0.0D);
             }
 
             if (random.nextInt(50) == 0) {

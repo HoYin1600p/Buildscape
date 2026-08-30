@@ -1,12 +1,13 @@
 package com.kingodogo.buildscape.mixin;
 
-import com.kingodogo.buildscape.block.ClimbableChainBlock;
-import com.kingodogo.buildscape.block.LargeChainBlock;
 import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.ChainBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.registries.ForgeRegistries;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -26,14 +27,16 @@ public abstract class LivingEntityMixin {
         if (cir.getReturnValue()) {
             BlockPos pos = self.blockPosition();
             BlockState state = self.level.getBlockState(pos);
+            Block block = state.getBlock();
 
-            if (
-                    state.getBlock() instanceof ChainBlock ||
-                            state.getBlock() instanceof ClimbableChainBlock ||
-                            state.getBlock() instanceof LargeChainBlock
-            ) {
+            if (block instanceof ChainBlock || isBuildscapeChain(block)) {
                 cir.setReturnValue(false);
             }
         }
+    }
+
+    private static boolean isBuildscapeChain(Block block) {
+        ResourceLocation key = ForgeRegistries.BLOCKS.getKey(block);
+        return key != null && key.getNamespace().equals("buildscape") && key.getPath().contains("chain");
     }
 }

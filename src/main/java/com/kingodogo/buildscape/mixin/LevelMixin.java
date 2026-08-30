@@ -5,11 +5,9 @@ import com.kingodogo.buildscape.fluid.ModFluids;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
-import net.minecraftforge.registries.ForgeRegistries;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -22,7 +20,7 @@ public abstract class LevelMixin {
     private void onAddParticle(ParticleOptions options, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed, CallbackInfo ci) {
         if (isWaterParticle(options)) {
             Level self = (Level) (Object) this;
-            BlockPos pos = new BlockPos(x, y, z);
+            BlockPos pos = new BlockPos((int) Math.floor(x), (int) Math.floor(y), (int) Math.floor(z));
             if (isExperienceFluid(self, pos)) {
                 ci.cancel();
             }
@@ -33,7 +31,7 @@ public abstract class LevelMixin {
     private void onAddParticleAlways(ParticleOptions options, boolean alwaysRender, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed, CallbackInfo ci) {
         if (isWaterParticle(options)) {
             Level self = (Level) (Object) this;
-            BlockPos pos = new BlockPos(x, y, z);
+            BlockPos pos = new BlockPos((int) Math.floor(x), (int) Math.floor(y), (int) Math.floor(z));
             if (isExperienceFluid(self, pos)) {
                 ci.cancel();
             }
@@ -53,7 +51,7 @@ public abstract class LevelMixin {
 
     private static boolean isExperienceFluid(Level level, BlockPos pos) {
         if (level == null || pos == null) return false;
-        return checkFluidOrBlock(level, pos) || checkFluidOrBlock(level, pos.below()) || checkFluidOrBlock(level, pos.above());
+        return checkFluidOrBlock(level, pos);
     }
 
     private static boolean checkFluidOrBlock(Level level, BlockPos pos) {
@@ -62,21 +60,11 @@ public abstract class LevelMixin {
             if (fluidState.getType() == ModFluids.EXPERIENCE_STILL.get() || fluidState.getType() == ModFluids.EXPERIENCE_FLOWING.get()) {
                 return true;
             }
-            ResourceLocation reg = ForgeRegistries.FLUIDS.getKey(fluidState.getType());
-            if (reg != null && (reg.getPath().contains("experience") || reg.getPath().contains("xp"))) {
-                return true;
-            }
         }
 
         BlockState blockState = level.getBlockState(pos);
         if (blockState != null && !blockState.isAir()) {
-            if (blockState.getBlock() instanceof ExperienceFluidBlock) {
-                return true;
-            }
-            ResourceLocation reg = ForgeRegistries.BLOCKS.getKey(blockState.getBlock());
-            if (reg != null && (reg.getPath().contains("experience") || reg.getPath().contains("xp"))) {
-                return true;
-            }
+            return blockState.getBlock() instanceof ExperienceFluidBlock;
         }
 
         return false;

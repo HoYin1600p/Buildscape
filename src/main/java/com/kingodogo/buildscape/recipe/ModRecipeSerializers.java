@@ -44,4 +44,18 @@ public class ModRecipeSerializers {
             () -> new SimpleRecipeSerializer<>(ClearShulkerFiltersRecipe::new)
     );
 
+    public static final RegistryObject<
+            SimpleRecipeSerializer<CustomFireworkStarRecipe>
+            > CUSTOM_FIREWORK_STAR_RECIPE = RECIPE_SERIALIZERS.register(
+            "custom_firework_star",
+            () -> new SimpleRecipeSerializer<>(CustomFireworkStarRecipe::new)
+    );
+
+    public static final RegistryObject<
+            SimpleRecipeSerializer<InfinitePhoenixFireworkStarRecipe>
+            > INFINITE_PHOENIX_FIREWORK_STAR_RECIPE = RECIPE_SERIALIZERS.register(
+            "infinite_phoenix_firework_star",
+            () -> new SimpleRecipeSerializer<>(InfinitePhoenixFireworkStarRecipe::new)
+    );
+
 }

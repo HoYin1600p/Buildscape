@@ -95,8 +95,11 @@ public class BuildScape {
                 // Only set base max stack size for POTION item - the ItemMixin restricts this to water bottles only
                 net.minecraftforge.fml.util.ObfuscationReflectionHelper.setPrivateValue(
                         net.minecraft.world.item.Item.class, net.minecraft.world.item.Items.POTION, 16, "f_41370_");
+                // Set max stack size for CAKE item to 64
+                net.minecraftforge.fml.util.ObfuscationReflectionHelper.setPrivateValue(
+                        net.minecraft.world.item.Item.class, net.minecraft.world.item.Items.CAKE, 64, "f_41370_");
             } catch (Exception e) {
-                LOGGER.error("Failed to set max stack size for potions", e);
+                LOGGER.error("Failed to set max stack size for potions or cakes", e);
             }
         });
 
@@ -543,7 +546,7 @@ public class BuildScape {
 
     @SubscribeEvent
     public void onRegisterCommands(net.minecraftforge.event.RegisterCommandsEvent event) {
-
+        com.kingodogo.buildscape.command.FireworkTestCommand.register(event.getDispatcher());
         com.mojang.brigadier.builder.LiteralArgumentBuilder<net.minecraft.commands.CommandSourceStack> buildscapeCommand = com.mojang.brigadier.builder.LiteralArgumentBuilder.<net.minecraft.commands.CommandSourceStack>literal(
                         "buildscape")
                 .then(com.mojang.brigadier.builder.LiteralArgumentBuilder.<net.minecraft.commands.CommandSourceStack>literal(
@@ -2259,6 +2262,26 @@ public class BuildScape {
                 itemColors.register(
                         (stack, tintIndex) -> tintIndex == 0 ? 0x3F76E4 : -1,
                         ModItems.CASCADE_BLOCK.get()
+                );
+
+                itemColors.register(
+                        (stack, tintIndex) -> {
+                            if (tintIndex != 1) return -1;
+                            net.minecraft.nbt.CompoundTag tag = stack.getTagElement("Explosion");
+                            int[] colors = tag != null ? tag.getIntArray("Colors") : null;
+                            if (colors != null && colors.length > 0) {
+                                if (colors.length == 1) return colors[0];
+                                int r = 0, g = 0, b = 0;
+                                for (int c : colors) {
+                                    r += (c >> 16) & 0xFF;
+                                    g += (c >> 8) & 0xFF;
+                                    b += c & 0xFF;
+                                }
+                                return ((r / colors.length) << 16) | ((g / colors.length) << 8) | (b / colors.length);
+                            }
+                            return 0xFFB000;
+                        },
+                        ModItems.INFINITE_PHOENIX_FIREWORK_STAR.get()
                 );
 
                 itemColors.register(

@@ -6077,6 +6077,11 @@ public class ModItems {
             () -> new ConfettiItem(new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB).stacksTo(64))
     );
 
+    public static final RegistryObject<Item> INFINITE_PHOENIX_FIREWORK_STAR = ITEMS.register(
+            "infinite_phoenix_firework_star",
+            () -> new InfinitePhoenixFireworkStarItem(new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB).stacksTo(1))
+    );
+
     public static final RegistryObject<Item> STEEL_BLOCK = ITEMS.register(
             "steel_block",
             () -> new BlockItem(ModBlocks.STEEL_BLOCK.get(), createBlockItemProperties())

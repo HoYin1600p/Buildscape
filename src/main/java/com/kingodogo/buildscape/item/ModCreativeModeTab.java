@@ -90,6 +90,9 @@ public class ModCreativeModeTab {
         }
 
         private String getVariantBasePath(String path) {
+            if (path.startsWith("quartz_pillar_")) {
+                return null;
+            }
             if (path.endsWith("_vertical_slab")) {
                 return path.substring(0, path.length() - "_vertical_slab".length());
             }
@@ -106,6 +109,7 @@ public class ModCreativeModeTab {
         }
 
         private void arrangeVariantGroup(ItemStackOrder ordered, Map<String, ItemStack> buildscapeItems, String basePath) {
+            if ("quartz_pillar".equals(basePath)) return;
             ItemStack parent = buildscapeItems.get(basePath);
             ItemStack stairs = buildscapeItems.get(basePath + "_stairs");
             ItemStack slab = buildscapeItems.get(basePath + "_slab");

@@ -10,6 +10,7 @@ import net.minecraft.network.chat.TranslatableComponent;
 
 public class WorldSettingsConfigTab extends AbstractConfigTab {
     private ScalableToggle creativeTreeBreakerToggle;
+    private ScalableToggle shulkerPreviewToggle;
     private ScalableToggle fastLeafDecayToggle;
     private ScalableToggle disableEndermanGriefingToggle;
     private ScalableToggle disableCreeperGriefingToggle;
@@ -34,12 +35,25 @@ public class WorldSettingsConfigTab extends AbstractConfigTab {
         int contentHeight = parent.getContentHeight();
 
         // One-time widget creation
-        boolean treeBreaker = com.kingodogo.buildscape.config.CosmeticsConfig.get().getCreativeTreeBreaker(mc.player.getUUID());
+        boolean treeBreaker = com.kingodogo.buildscape.config.CosmeticsConfig.get().getCreativeTreeBreaker(mc.player != null ? mc.player.getUUID() : null);
         creativeTreeBreakerToggle = new ScalableToggle(0, 0, 100, 20,
                 new TranslatableComponent("buildscape.config.world.tree_breaker"), treeBreaker, (btn) -> {
-            com.kingodogo.buildscape.config.CosmeticsConfig.get().setCreativeTreeBreaker(mc.player.getUUID(), ((ScalableToggle) btn).isToggled());
+            com.kingodogo.buildscape.config.CosmeticsConfig.get().setCreativeTreeBreaker(
+                    mc.player != null ? mc.player.getUUID() : null,
+                    ((ScalableToggle) btn).isToggled()
+            );
         });
         addTabWidget(creativeTreeBreakerToggle);
+
+        boolean shulkerPreview = com.kingodogo.buildscape.config.CosmeticsConfig.get().getShulkerPreview(mc.player != null ? mc.player.getUUID() : null);
+        shulkerPreviewToggle = new ScalableToggle(0, 0, 100, 20,
+                new TranslatableComponent("buildscape.config.world.shulker_preview"), shulkerPreview, (btn) -> {
+            com.kingodogo.buildscape.config.CosmeticsConfig.get().setShulkerPreview(
+                    mc.player != null ? mc.player.getUUID() : null,
+                    ((ScalableToggle) btn).isToggled()
+            );
+        });
+        addTabWidget(shulkerPreviewToggle);
 
         boolean leafDecay = mc.level.getGameRules().getBoolean(ModGameRules.FAST_LEAF_DECAY);
         fastLeafDecayToggle = new ScalableToggle(0, 0, 100, 20,
@@ -80,19 +94,16 @@ public class WorldSettingsConfigTab extends AbstractConfigTab {
     }
 
     private void relayout(int contentX, int contentY, int contentWidth, int contentHeight) {
-        int screenWidth = parent.width;
-        int screenHeight = parent.height;
-
         int fullContentHeight = parent.getContentHeight();
         int padding = BuildScapeConfigScreen.scaleSize(10);
 
-        // leftPanel
+        // leftPanel (Player Rules)
         leftBoxX = parent.getContentX();
         leftBoxY = parent.getContentY();
         leftBoxWidth = parent.getContentWidth();
         leftBoxHeight = fullContentHeight;
 
-        // rightPanel
+        // rightPanel (World Rules)
         rightBoxX = parent.getRightPanelX();
         rightBoxY = parent.getContentY();
         rightBoxWidth = parent.getRightPanelWidth();
@@ -101,14 +112,21 @@ public class WorldSettingsConfigTab extends AbstractConfigTab {
         int buttonWidth = leftBoxWidth - padding * 2;
         int buttonHeight = BuildScapeConfigScreen.getScaledButtonHeight();
         int titleHeight = BuildScapeConfigScreen.scaleSize(20);
+        int spacing = BuildScapeConfigScreen.scaleSize(5);
+
+        int leftY = leftBoxY + padding + titleHeight + BuildScapeConfigScreen.scaleSize(5);
 
         creativeTreeBreakerToggle.x = leftBoxX + padding;
-        creativeTreeBreakerToggle.y = leftBoxY + padding + titleHeight + BuildScapeConfigScreen.scaleSize(5);
+        creativeTreeBreakerToggle.y = leftY;
         creativeTreeBreakerToggle.setWidth(buttonWidth);
         creativeTreeBreakerToggle.setHeight(buttonHeight);
 
+        shulkerPreviewToggle.x = leftBoxX + padding;
+        shulkerPreviewToggle.y = leftY + buttonHeight + spacing;
+        shulkerPreviewToggle.setWidth(buttonWidth);
+        shulkerPreviewToggle.setHeight(buttonHeight);
+
         int rightY = rightBoxY + padding + titleHeight + BuildScapeConfigScreen.scaleSize(5);
-        int spacing = BuildScapeConfigScreen.scaleSize(5);
 
         fastLeafDecayToggle.x = rightBoxX + padding;
         fastLeafDecayToggle.y = rightY;
@@ -172,52 +190,14 @@ public class WorldSettingsConfigTab extends AbstractConfigTab {
         mc.font.draw(poseStack, new TranslatableComponent("buildscape.config.world.update_rules"), 0, 0, 0xFFFFFF);
         poseStack.popPose();
 
-        // Update button states from mc.level.getGameRules() to ensure they reflect sync packets
-        if (mc.level != null) {
+        // Update button states to ensure they reflect sync packets and local settings
+        if (mc.level != null && mc.player != null) {
             creativeTreeBreakerToggle.toggled = com.kingodogo.buildscape.config.CosmeticsConfig.get().getCreativeTreeBreaker(mc.player.getUUID());
+            shulkerPreviewToggle.toggled = com.kingodogo.buildscape.config.CosmeticsConfig.get().getShulkerPreview(mc.player.getUUID());
             fastLeafDecayToggle.toggled = mc.level.getGameRules().getBoolean(ModGameRules.FAST_LEAF_DECAY);
             disableEndermanGriefingToggle.toggled = mc.level.getGameRules().getBoolean(ModGameRules.DISABLE_ENDERMAN_GRIEFING);
             disableCreeperGriefingToggle.toggled = mc.level.getGameRules().getBoolean(ModGameRules.DISABLE_CREEPER_GRIEFING);
             disableGhastGriefingToggle.toggled = mc.level.getGameRules().getBoolean(ModGameRules.DISABLE_GHAST_GRIEFING);
-        }
-    }
-
-    private static class ScalableMenuButton extends net.minecraft.client.gui.components.Button {
-        private final net.minecraft.network.chat.Component baseMessage;
-
-        public ScalableMenuButton(int x, int y, int width, int height, net.minecraft.network.chat.Component message, OnPress onPress) {
-            super(x, y, width, height, TextComponent.EMPTY, onPress);
-            this.baseMessage = message;
-        }
-
-        public void setHeight(int h) {
-            this.height = h;
-        }
-
-        @Override
-        public void renderButton(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
-            Minecraft mc = Minecraft.getInstance();
-            int borderColor = (active && isHoveredOrFocused()) ? 0xFFFFFFFF : 0xFF666666;
-
-            // Draw custom button background
-            net.minecraft.client.gui.GuiComponent.fill(poseStack, x, y, x + width, y + height, 0x80000000); // 50% dark
-
-            // Draw border
-            net.minecraft.client.gui.GuiComponent.fill(poseStack, x, y, x + width, y + 1, borderColor);
-            net.minecraft.client.gui.GuiComponent.fill(poseStack, x, y + height - 1, x + width, y + height, borderColor);
-            net.minecraft.client.gui.GuiComponent.fill(poseStack, x, y, x + 1, y + height, borderColor);
-            net.minecraft.client.gui.GuiComponent.fill(poseStack, x + width - 1, y, x + width, y + height, borderColor);
-
-            // Draw left aligned text matching toggle box pattern
-            float textScale = BuildScapeConfigScreen.getStandardTextScale();
-            int textX = x + BuildScapeConfigScreen.scaleSize(6);
-            int textY = y + (height - (int)(mc.font.lineHeight * textScale)) / 2;
-
-            poseStack.pushPose();
-            poseStack.translate(textX, textY, 0);
-            poseStack.scale(textScale, textScale, 1.0f);
-            mc.font.draw(poseStack, baseMessage, 0, 0, active ? 0xFFFFFF : 0x888888);
-            poseStack.popPose();
         }
     }
 
@@ -242,7 +222,6 @@ public class WorldSettingsConfigTab extends AbstractConfigTab {
         }
 
         private void updateMessage() {
-            // Message is now handled manually in renderButton for cleaner look
             setMessage(TextComponent.EMPTY);
         }
 

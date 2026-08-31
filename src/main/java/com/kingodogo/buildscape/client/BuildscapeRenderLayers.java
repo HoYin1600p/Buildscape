@@ -55,6 +55,7 @@ public final class BuildscapeRenderLayers {
                 path.endsWith("_rose_vines") ||
                 path.endsWith("_door") ||
                 path.endsWith("_trapdoor") ||
+                path.endsWith("_bolts") ||
                 path.endsWith("_sign") ||
                 path.endsWith("_sapling") ||
                 path.endsWith("_bars") ||

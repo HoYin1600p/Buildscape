@@ -404,6 +404,14 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.WAXED_WEATHERED_COPPER_TRAPDOOR.get()));
             items.add(new ItemStack(ModItems.OXIDIZED_COPPER_TRAPDOOR.get()));
             items.add(new ItemStack(ModItems.WAXED_OXIDIZED_COPPER_TRAPDOOR.get()));
+            items.add(new ItemStack(ModItems.COPPER_BOLTS.get()));
+            items.add(new ItemStack(ModItems.WAXED_COPPER_BOLTS.get()));
+            items.add(new ItemStack(ModItems.EXPOSED_COPPER_BOLTS.get()));
+            items.add(new ItemStack(ModItems.WAXED_EXPOSED_COPPER_BOLTS.get()));
+            items.add(new ItemStack(ModItems.WEATHERED_COPPER_BOLTS.get()));
+            items.add(new ItemStack(ModItems.WAXED_WEATHERED_COPPER_BOLTS.get()));
+            items.add(new ItemStack(ModItems.OXIDIZED_COPPER_BOLTS.get()));
+            items.add(new ItemStack(ModItems.WAXED_OXIDIZED_COPPER_BOLTS.get()));
 
             // Copper Bars
             items.add(new ItemStack(ModItems.COPPER_BARS.get()));
@@ -528,6 +536,10 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.STEEL_MESH_BLOCK_SLAB.get()));
             items.add(new ItemStack(ModItems.STEEL_MESH_BLOCK_VERTICAL_SLAB.get()));
             items.add(new ItemStack(ModItems.STEEL_BOLTS.get()));
+            items.add(new ItemStack(ModItems.STEEL_DOOR.get()));
+            items.add(new ItemStack(ModItems.STEEL_TRAPDOOR.get()));
+            items.add(new ItemStack(ModItems.STEEL_BUTTON.get()));
+            items.add(new ItemStack(ModItems.STEEL_PRESSURE_PLATE.get()));
             items.add(new ItemStack(ModItems.STEEL_GRATE.get()));
             items.add(new ItemStack(ModItems.STEEL_FAN.get()));
             items.add(new ItemStack(ModItems.FLAMING_STEEL_INGOT.get()));
@@ -556,6 +568,11 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.FLAMING_STEEL_GRATE.get()));
             items.add(new ItemStack(ModItems.FLAMING_STEEL_PILLAR.get()));
             items.add(new ItemStack(ModItems.FLAMING_BOLTED_STEEL_PILLAR.get()));
+            items.add(new ItemStack(ModItems.FLAMING_STEEL_BOLTS.get()));
+            items.add(new ItemStack(ModItems.FLAMING_STEEL_DOOR.get()));
+            items.add(new ItemStack(ModItems.FLAMING_STEEL_TRAPDOOR.get()));
+            items.add(new ItemStack(ModItems.FLAMING_STEEL_BUTTON.get()));
+            items.add(new ItemStack(ModItems.FLAMING_STEEL_PRESSURE_PLATE.get()));
             items.add(new ItemStack(ModItems.LIGHT_GRAY_FLAMING_STEEL_BLOCK.get()));
             items.add(new ItemStack(ModItems.LIGHT_GRAY_FLAMING_STEEL_BLOCK_SLAB.get()));
             items.add(new ItemStack(ModItems.LIGHT_GRAY_FLAMING_STEEL_BLOCK_VERTICAL_SLAB.get()));

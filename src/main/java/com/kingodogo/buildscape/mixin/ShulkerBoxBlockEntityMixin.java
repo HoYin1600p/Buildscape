@@ -11,48 +11,39 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.Arrays;
-
 @Mixin(ShulkerBoxBlockEntity.class)
 public class ShulkerBoxBlockEntityMixin implements GhostFilterable {
     @Unique
     private final String[] buildscape$ghostFilters = new String[27];
 
-    {
-        Arrays.fill(buildscape$ghostFilters, "");
-    }
-
     @Inject(method = "load", at = @At("HEAD"))
     private void migrateStoredGhostItems(CompoundTag tag, CallbackInfo ci) {
-        if (!tag.contains("Items", 9)) return;
-        ListTag items = tag.getList("Items", 10);
-        boolean modified = false;
         ListTag filters = tag.contains("GhostFilters", 9)
                 ? tag.getList("GhostFilters", 8).copy()
                 : new ListTag();
         while (filters.size() < 27) filters.add(StringTag.valueOf(""));
 
-        for (int i = items.size() - 1; i >= 0; i--) {
-            CompoundTag item = items.getCompound(i);
-            int slot = item.getByte("Slot") & 255;
-            if (slot >= 27 || !item.contains("tag", 10)
-                    || !item.getCompound("tag").getBoolean("ghost")) continue;
+        if (tag.contains("Items", 9)) {
+            ListTag items = tag.getList("Items", 10);
+            for (int i = items.size() - 1; i >= 0; i--) {
+                CompoundTag item = items.getCompound(i);
+                int slot = item.getByte("Slot") & 255;
+                if (slot >= 27 || !item.contains("tag", 10)
+                        || !item.getCompound("tag").getBoolean("ghost")) continue;
 
-            if (filters.getString(slot).isEmpty()) {
-                filters.set(slot, StringTag.valueOf(item.getString("id")));
+                if (filters.getString(slot).isEmpty()) {
+                    filters.set(slot, StringTag.valueOf(item.getString("id")));
+                }
+                items.remove(i);
             }
-            items.remove(i);
-            modified = true;
-        }
-        if (modified) {
             tag.put("Items", items);
-            tag.put("GhostFilters", filters);
         }
+        tag.put("GhostFilters", filters);
     }
 
     @Inject(method = "load", at = @At("TAIL"))
     private void onLoad(CompoundTag tag, CallbackInfo ci) {
-        Arrays.fill(buildscape$ghostFilters, "");
+        for (int i = 0; i < 27; i++) buildscape$ghostFilters[i] = "";
         if (tag.contains("GhostFilters", 9)) {
             ListTag list = tag.getList("GhostFilters", 8);
             for (int i = 0; i < 27; i++) {
@@ -86,4 +77,3 @@ public class ShulkerBoxBlockEntityMixin implements GhostFilterable {
         return buildscape$ghostFilters;
     }
 }
-

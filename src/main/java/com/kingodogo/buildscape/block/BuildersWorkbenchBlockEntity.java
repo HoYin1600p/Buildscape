@@ -309,27 +309,46 @@ public class BuildersWorkbenchBlockEntity extends BlockEntity implements MenuPro
             }
         }
 
+        // Find the first row (0, 1, or 2) that can fit the non-empty solved filters
         int targetRow = -1;
-        for (int row = 0; row < 3 && targetRow < 0; row++) {
-            boolean available = true;
+        for (int row = 0; row < 3; row++) {
+            boolean rowCanFit = true;
+            boolean rowHasAnyConflict = false;
             for (int col = 0; col < 9; col++) {
                 int slot = row * 9 + col;
-                if (!shulkerItems.get(slot).isEmpty() || !filters.get(slot).isEmpty()) {
-                    available = false;
+                ItemStack solvedStack = solved.get(col);
+                boolean slotOccupied = !shulkerItems.get(slot).isEmpty() || !filters.get(slot).isEmpty();
+                if (slotOccupied) rowHasAnyConflict = true;
+                if (!solvedStack.isEmpty() && slotOccupied) {
+                    rowCanFit = false;
                     break;
                 }
             }
-            if (available) targetRow = row;
+            if (rowCanFit) {
+                if (!rowHasAnyConflict || targetRow < 0) {
+                    targetRow = row;
+                    if (!rowHasAnyConflict) break; // Ideal: completely empty row!
+                }
+            }
         }
+
         if (targetRow < 0) return false;
 
+        boolean wroteAnyFilter = false;
         for (int i = 0; i < 9; i++) {
             int slot = targetRow * 9 + i;
             ItemStack solvedStack = solved.get(i);
-            net.minecraft.resources.ResourceLocation itemId = solvedStack.isEmpty() ? null
-                    : net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(solvedStack.getItem());
-            filters.set(slot, itemId == null ? "" : itemId.toString());
+            if (!solvedStack.isEmpty()) {
+                net.minecraft.resources.ResourceLocation itemId =
+                        net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(solvedStack.getItem());
+                if (itemId != null) {
+                    filters.set(slot, itemId.toString());
+                    wroteAnyFilter = true;
+                }
+            }
         }
+
+        if (!wroteAnyFilter) return false;
 
         boolean hasFilter = false;
         ListTag newGhostFiltersList = new ListTag();

@@ -1760,6 +1760,13 @@ public class BuildScape {
             });
 
             event.enqueueWork(() -> {
+                net.minecraftforge.client.MinecraftForgeClient.registerTooltipComponentFactory(
+                        com.kingodogo.buildscape.client.tooltip.ShulkerBoxTooltipData.class,
+                        data -> data
+                );
+            });
+
+            event.enqueueWork(() -> {
                 com.kingodogo.buildscape.client.BuildscapeRenderLayers.register();
             });
 

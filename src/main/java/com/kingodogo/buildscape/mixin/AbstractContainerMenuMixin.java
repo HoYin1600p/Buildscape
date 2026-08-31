@@ -134,13 +134,44 @@ public abstract class AbstractContainerMenuMixin {
     }
 
     private static void moveToFilteredSlots(AbstractContainerMenu menu, GhostFilterMenu filters, ItemStack source) {
-        for (int pass = 0; pass < 2 && !source.isEmpty(); pass++) {
-            for (int i = 0; i < filters.buildscape$getFilterSlotCount() && !source.isEmpty(); i++) {
+        // Pass 0: Stack into non-empty slots with matching filter
+        for (int i = 0; i < filters.buildscape$getFilterSlotCount() && !source.isEmpty(); i++) {
+            Item filter = filters.buildscape$getFilterItem(i);
+            if (filter != null && source.getItem() == filter) {
                 net.minecraft.world.inventory.Slot target = menu.getSlot(i);
-                Item filter = filters.buildscape$getFilterItem(i);
-                if (filter != null && source.getItem() != filter) continue;
-                if ((pass == 0) == target.getItem().isEmpty()) continue;
-                target.safeInsert(source);
+                if (!target.getItem().isEmpty()) {
+                    target.safeInsert(source);
+                }
+            }
+        }
+        // Pass 1: Stack into non-empty unfiltered slots
+        for (int i = 0; i < filters.buildscape$getFilterSlotCount() && !source.isEmpty(); i++) {
+            Item filter = filters.buildscape$getFilterItem(i);
+            if (filter == null) {
+                net.minecraft.world.inventory.Slot target = menu.getSlot(i);
+                if (!target.getItem().isEmpty()) {
+                    target.safeInsert(source);
+                }
+            }
+        }
+        // Pass 2: Insert into empty slots with matching filter
+        for (int i = 0; i < filters.buildscape$getFilterSlotCount() && !source.isEmpty(); i++) {
+            Item filter = filters.buildscape$getFilterItem(i);
+            if (filter != null && source.getItem() == filter) {
+                net.minecraft.world.inventory.Slot target = menu.getSlot(i);
+                if (target.getItem().isEmpty()) {
+                    target.safeInsert(source);
+                }
+            }
+        }
+        // Pass 3: Insert into empty unfiltered slots
+        for (int i = 0; i < filters.buildscape$getFilterSlotCount() && !source.isEmpty(); i++) {
+            Item filter = filters.buildscape$getFilterItem(i);
+            if (filter == null) {
+                net.minecraft.world.inventory.Slot target = menu.getSlot(i);
+                if (target.getItem().isEmpty()) {
+                    target.safeInsert(source);
+                }
             }
         }
     }

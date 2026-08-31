@@ -6,7 +6,6 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
@@ -26,12 +25,15 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.material.MaterialColor;
+import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
 import javax.annotation.Nullable;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -96,29 +98,19 @@ public class TrophyBlock extends HorizontalDirectionalBlock implements EntityBlo
     }
 
     @Override
-    public void playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
-        BlockEntity be = level.getBlockEntity(pos);
-        if (be instanceof TrophyBlockEntity trophyBe && !level.isClientSide && !player.isCreative()) {
-            ItemStack stack = new ItemStack(this.asItem());
-            CompoundTag tag = stack.getOrCreateTag();
-            if (!trophyBe.getObtainedBy().isEmpty()) {
-                tag.putString("ObtainedBy", trophyBe.getObtainedBy());
-            }
-            if (!trophyBe.getObtainedOn().isEmpty()) {
-                tag.putString("ObtainedOn", trophyBe.getObtainedOn());
-            }
-            ItemEntity entity = new ItemEntity(level, pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D, stack);
-            entity.setDefaultPickUpDelay();
-            level.addFreshEntity(entity);
-        }
-        super.playerWillDestroy(level, pos, state, player);
+    public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
+        BlockEntity blockEntity = builder.getOptionalParameter(LootContextParams.BLOCK_ENTITY);
+        return Collections.singletonList(createTrophyStack(blockEntity));
     }
 
     @Override
     public ItemStack getCloneItemStack(BlockGetter level, BlockPos pos, BlockState state) {
-        ItemStack stack = super.getCloneItemStack(level, pos, state);
-        BlockEntity be = level.getBlockEntity(pos);
-        if (be instanceof TrophyBlockEntity trophyBe) {
+        return createTrophyStack(level.getBlockEntity(pos));
+    }
+
+    private ItemStack createTrophyStack(@Nullable BlockEntity blockEntity) {
+        ItemStack stack = new ItemStack(this.asItem());
+        if (blockEntity instanceof TrophyBlockEntity trophyBe) {
             CompoundTag tag = stack.getOrCreateTag();
             if (!trophyBe.getObtainedBy().isEmpty()) {
                 tag.putString("ObtainedBy", trophyBe.getObtainedBy());

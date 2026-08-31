@@ -15,11 +15,6 @@
     "hidden": false
   },
   "parent": "buildscape:root",
-  "rewards": {
-    "items": [
-      "buildscape:infinite_phoenix_firework_star"
-    ]
-  },
   "criteria": {
     "has_cake_star": {
       "trigger": "minecraft:inventory_changed",

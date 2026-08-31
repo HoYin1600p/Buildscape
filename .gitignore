@@ -77,3 +77,4 @@ THIRD_PARTY_NOTICES.md
 !.gitattributes
 !.vscode/settings.json
 /prv-doc/
+.identity-scan/

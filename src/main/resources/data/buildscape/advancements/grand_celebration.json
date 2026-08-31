@@ -1,0 +1,139 @@
+{
+  "display": {
+    "icon": {
+      "item": "buildscape:infinite_phoenix_firework_star"
+    },
+    "title": {
+      "translate": "advancements.buildscape.grand_celebration.title"
+    },
+    "description": {
+      "translate": "advancements.buildscape.grand_celebration.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "parent": "buildscape:root",
+  "rewards": {
+    "items": [
+      "buildscape:infinite_phoenix_firework_star"
+    ]
+  },
+  "criteria": {
+    "has_cake_star": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "minecraft:firework_star"
+            ],
+            "nbt": "{Explosion:{Type:5b}}"
+          }
+        ]
+      }
+    },
+    "has_crown_star": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "minecraft:firework_star"
+            ],
+            "nbt": "{Explosion:{Type:6b}}"
+          }
+        ]
+      }
+    },
+    "has_trophy_star": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "minecraft:firework_star"
+            ],
+            "nbt": "{Explosion:{Type:7b}}"
+          }
+        ]
+      }
+    },
+    "has_tree_star": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "minecraft:firework_star"
+            ],
+            "nbt": "{Explosion:{Type:8b}}"
+          }
+        ]
+      }
+    },
+    "has_presents_star": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "minecraft:firework_star"
+            ],
+            "nbt": "{Explosion:{Type:9b}}"
+          }
+        ]
+      }
+    },
+    "has_candy_cane_star": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "minecraft:firework_star"
+            ],
+            "nbt": "{Explosion:{Type:10b}}"
+          }
+        ]
+      }
+    },
+    "has_snowflake_star": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "minecraft:firework_star"
+            ],
+            "nbt": "{Explosion:{Type:12b}}"
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "has_cake_star"
+    ],
+    [
+      "has_crown_star"
+    ],
+    [
+      "has_trophy_star"
+    ],
+    [
+      "has_tree_star"
+    ],
+    [
+      "has_presents_star"
+    ],
+    [
+      "has_candy_cane_star"
+    ],
+    [
+      "has_snowflake_star"
+    ]
+  ]
+}

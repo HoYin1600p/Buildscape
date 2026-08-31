@@ -49,3 +49,4 @@
 - Add Poplar, Cherry, and Pale Oak sapling trades to Wandering Trader by @KyroXova
 - Add Copper Buttons and Heavy Weighted Copper Pressure Plates by @KyroXova
 - Make water bottles and potions stack up to 16 by @KyroXova
+- Add Shulker Box filter slot mechanics, progressive workbench filter application, survival drop filter retention, and graphical 9x3 tooltip container grid with dynamic Shulker Box colors and 25% ghost filter opacity by @KyroXova

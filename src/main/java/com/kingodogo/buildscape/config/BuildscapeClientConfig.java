@@ -70,7 +70,7 @@ public class BuildscapeClientConfig {
         } catch (Throwable ignored) {
         }
         if (configDir == null) {
-            configDir = Path.of("config");
+            return null;
         }
         Path buildscapeDir = configDir.resolve("buildscape");
         File dir = buildscapeDir.toFile();
@@ -89,17 +89,20 @@ public class BuildscapeClientConfig {
         } catch (Throwable ignored) {
         }
         if (configDir == null) {
-            configDir = Path.of("config");
+            return null;
         }
         return configDir.resolve("buildscape.cfg").toFile();
     }
 
     private void load() {
         File file = getConfigFile();
+        if (file == null) {
+            return;
+        }
         File legacyFile = getLegacyConfigFile();
 
         // Migrate from legacy config/buildscape.cfg if new config/buildscape/buildscape.cfg does not exist yet
-        if (!file.exists() && legacyFile.exists()) {
+        if (legacyFile != null && !file.exists() && legacyFile.exists()) {
             try {
                 Files.copy(legacyFile.toPath(), file.toPath());
                 BuildScape.getLogger().info("BuildscapeClientConfig: Migrated config/buildscape.cfg -> config/buildscape/buildscape.cfg");
@@ -145,6 +148,9 @@ public class BuildscapeClientConfig {
 
     private void save() {
         File file = getConfigFile();
+        if (file == null) {
+            return;
+        }
         try (PrintWriter writer = new PrintWriter(new FileWriter(file))) {
             writer.println("# BuildScape Configuration");
             writer.println("# Edit this file to customise BuildScape behaviour.");

@@ -55,6 +55,18 @@ public class AdvancementEvents {
     }
 
     @SubscribeEvent
+    public static void onAdvancementEarned(net.minecraftforge.event.entity.player.AdvancementEvent event) {
+        if (event.getPlayer() instanceof ServerPlayer serverPlayer) {
+            if (event.getAdvancement() != null && new ResourceLocation("buildscape", "grand_celebration").equals(event.getAdvancement().getId())) {
+                ItemStack reward = com.kingodogo.buildscape.item.InfinitePhoenixFireworkStarItem.createDefaultStack();
+                if (!serverPlayer.getInventory().add(reward)) {
+                    serverPlayer.drop(reward, false);
+                }
+            }
+        }
+    }
+
+    @SubscribeEvent
     public static void onEntityInteract(PlayerInteractEvent.EntityInteract event) {
         if (!(event.getPlayer() instanceof ServerPlayer serverPlayer)) return;
 

@@ -2422,6 +2422,97 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.CASCADE_BLOCK_NO_MIST.get()));
             items.add(new ItemStack(ModItems.BOTTLE_OF_MIST.get()));
             items.add(new ItemStack(ModItems.CONFETTI_ITEM.get()));
+
+            // Custom Firework Stars (Cake, Crown, Trophy)
+            ItemStack cakeStar = new ItemStack(Items.FIREWORK_STAR);
+            net.minecraft.nbt.CompoundTag cakeExp = cakeStar.getOrCreateTagElement("Explosion");
+            cakeExp.putByte("Type", com.kingodogo.buildscape.firework.CustomFireworkShapeRegistry.CAKE_ID);
+            cakeExp.putIntArray("Colors", new int[]{0xFFFDD0, 0x8B4513, 0xFF2D55});
+            items.add(cakeStar);
+
+            ItemStack crownStar = new ItemStack(Items.FIREWORK_STAR);
+            net.minecraft.nbt.CompoundTag crownExp = crownStar.getOrCreateTagElement("Explosion");
+            crownExp.putByte("Type", com.kingodogo.buildscape.firework.CustomFireworkShapeRegistry.CROWN_ID);
+            crownExp.putIntArray("Colors", new int[]{0xFFD700, 0xFFFF77, 0xFF0044, 0x0066FF});
+            items.add(crownStar);
+
+            ItemStack trophyStar = new ItemStack(Items.FIREWORK_STAR);
+            net.minecraft.nbt.CompoundTag trophyExp = trophyStar.getOrCreateTagElement("Explosion");
+            trophyExp.putByte("Type", com.kingodogo.buildscape.firework.CustomFireworkShapeRegistry.TROPHY_ID);
+            trophyExp.putIntArray("Colors", new int[]{0xFFD700, 0xFFFF88, 0x00FFFF});
+            items.add(trophyStar);
+
+            ItemStack treeStar = new ItemStack(Items.FIREWORK_STAR);
+            net.minecraft.nbt.CompoundTag treeExp = treeStar.getOrCreateTagElement("Explosion");
+            treeExp.putByte("Type", com.kingodogo.buildscape.firework.CustomFireworkShapeRegistry.CHRISTMAS_TREE_ID);
+            treeExp.putIntArray("Colors", new int[]{0x227733, 0xFF3030, 0xFFD700});
+            items.add(treeStar);
+
+            ItemStack presentsStar = new ItemStack(Items.FIREWORK_STAR);
+            net.minecraft.nbt.CompoundTag presentsExp = presentsStar.getOrCreateTagElement("Explosion");
+            presentsExp.putByte("Type", com.kingodogo.buildscape.firework.CustomFireworkShapeRegistry.PRESENTS_ID);
+            presentsExp.putIntArray("Colors", new int[]{0xFF2233, 0xFFD700});
+            items.add(presentsStar);
+
+            ItemStack candyCaneStar = new ItemStack(Items.FIREWORK_STAR);
+            net.minecraft.nbt.CompoundTag candyCaneExp = candyCaneStar.getOrCreateTagElement("Explosion");
+            candyCaneExp.putByte("Type", com.kingodogo.buildscape.firework.CustomFireworkShapeRegistry.CANDY_CANE_ID);
+            candyCaneExp.putIntArray("Colors", new int[]{0xFF0033});
+            items.add(candyCaneStar);
+
+            ItemStack snowflakeStar = new ItemStack(Items.FIREWORK_STAR);
+            net.minecraft.nbt.CompoundTag snowflakeExp = snowflakeStar.getOrCreateTagElement("Explosion");
+            snowflakeExp.putByte("Type", com.kingodogo.buildscape.firework.CustomFireworkShapeRegistry.SNOWFLAKE_ID);
+            snowflakeExp.putIntArray("Colors", new int[]{0xFFFFFF, 0xE0F7FF, 0x5AC8FF});
+            items.add(snowflakeStar);
+
+            items.add(com.kingodogo.buildscape.item.InfinitePhoenixFireworkStarItem.createDefaultStack());
+
+            // Custom Base Firework Rockets (Cake, Crown, Trophy, Christmas Tree, Presents, Candy Cane, Phoenix, Snowflake)
+            items.add(com.kingodogo.buildscape.command.FireworkTestCommand.createCustomFireworkRocket(
+                    com.kingodogo.buildscape.firework.CustomFireworkShapeRegistry.CAKE_ID,
+                    new int[]{0xFFFDD0, 0x8B4513, 0xFF2D55}
+            ));
+            items.add(com.kingodogo.buildscape.command.FireworkTestCommand.createCustomFireworkRocket(
+                    com.kingodogo.buildscape.firework.CustomFireworkShapeRegistry.CROWN_ID,
+                    new int[]{0xFFD700, 0xFFFF77, 0xFF0044, 0x0066FF}
+            ));
+            items.add(com.kingodogo.buildscape.command.FireworkTestCommand.createCustomFireworkRocket(
+                    com.kingodogo.buildscape.firework.CustomFireworkShapeRegistry.TROPHY_ID,
+                    new int[]{0xFFD700, 0xFFFF88, 0x00FFFF}
+            ));
+            items.add(com.kingodogo.buildscape.command.FireworkTestCommand.createCustomFireworkRocket(
+                    com.kingodogo.buildscape.firework.CustomFireworkShapeRegistry.CHRISTMAS_TREE_ID,
+                    new int[]{0x227733, 0xFF3030, 0xFFD700}
+            ));
+            items.add(com.kingodogo.buildscape.command.FireworkTestCommand.createCustomFireworkRocket(
+                    com.kingodogo.buildscape.firework.CustomFireworkShapeRegistry.PRESENTS_ID,
+                    new int[]{0xFF2233, 0xFFD700}
+            ));
+            items.add(com.kingodogo.buildscape.command.FireworkTestCommand.createCustomFireworkRocket(
+                    com.kingodogo.buildscape.firework.CustomFireworkShapeRegistry.CANDY_CANE_ID,
+                    new int[]{0xFF0033}
+            ));
+            items.add(com.kingodogo.buildscape.command.FireworkTestCommand.createCustomFireworkRocket(
+                    com.kingodogo.buildscape.firework.CustomFireworkShapeRegistry.PHOENIX_ID,
+                    new int[]{0xFFFFFF, 0xFFF200, 0xFFB000, 0xFF6500, 0xE52B00}
+            ));
+            items.add(com.kingodogo.buildscape.command.FireworkTestCommand.createCustomFireworkRocket(
+                    com.kingodogo.buildscape.firework.CustomFireworkShapeRegistry.SNOWFLAKE_ID,
+                    new int[]{0xFFFFFF, 0xE0F7FF, 0x5AC8FF}
+            ));
+            items.add(com.kingodogo.buildscape.command.FireworkTestCommand.createCustomFireworkRocket(
+                    com.kingodogo.buildscape.firework.CustomFireworkShapeRegistry.CHRISTMAS_TREE_ID,
+                    new int[]{0x227733, 0xFF3030, 0xFFD700}
+            ));
+            items.add(com.kingodogo.buildscape.command.FireworkTestCommand.createCustomFireworkRocket(
+                    com.kingodogo.buildscape.firework.CustomFireworkShapeRegistry.PRESENTS_ID,
+                    new int[]{0xFF2233, 0xFFD700}
+            ));
+            items.add(com.kingodogo.buildscape.command.FireworkTestCommand.createCustomFireworkRocket(
+                    com.kingodogo.buildscape.firework.CustomFireworkShapeRegistry.CANDY_CANE_ID,
+                    new int[]{0xFF0033}
+            ));
             items.add(new ItemStack(ModItems.BUILDERS_WORKBENCH.get()));
             items.add(new ItemStack(ModItems.BUILDERS_POUCH.get()));
             // White

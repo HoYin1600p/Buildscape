@@ -47,7 +47,9 @@
     "ItemRendererMixin",
     "PauseScreenMixin",
     "LiquidBlockRendererMixin",
-    "StonecutterScreenMixin"
+    "StonecutterScreenMixin",
+    "FireworkStarterMixin",
+    "FireworkStarItemMixin"
   ],
   "injectors": {
     "defaultRequire": 1

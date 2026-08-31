@@ -191,7 +191,8 @@ public class ModBlockEntities {
                     ModBlocks.GREEN_GLASS_JAR.get(),
                     ModBlocks.RED_GLASS_JAR.get(),
                     ModBlocks.BLACK_GLASS_JAR.get(),
-                    ModBlocks.TINTED_GLASS_JAR.get()
+                    ModBlocks.TINTED_GLASS_JAR.get(),
+                    ModBlocks.GOLDEN_JAR.get()
             ).build(null)
     );
 
@@ -241,6 +242,16 @@ public class ModBlockEntities {
                             ModBlocks.STRIPPED_BAMBOO_SHELF.get(),
                             ModBlocks.PALE_OAK_SHELF.get(),
                             ModBlocks.POPLAR_SHELF.get()
+                    ).build(null));
+
+    public static final RegistryObject<BlockEntityType<com.kingodogo.buildscape.trophy.TrophyBlockEntity>> TROPHY_BLOCK_ENTITY =
+            BLOCK_ENTITIES.register("trophy_block_entity",
+                    () -> BlockEntityType.Builder.of(
+                            com.kingodogo.buildscape.trophy.TrophyBlockEntity::new,
+                            com.kingodogo.buildscape.trophy.Trophies.getAll().stream()
+                                    .map(com.kingodogo.buildscape.trophy.TrophyDefinition::getBlock)
+                                    .filter(java.util.Objects::nonNull)
+                                    .toArray(net.minecraft.world.level.block.Block[]::new)
                     ).build(null));
 
     public static final RegistryObject<BlockEntityType<HollowLogBlockEntity>> HOLLOW_LOG_BLOCK_ENTITY =

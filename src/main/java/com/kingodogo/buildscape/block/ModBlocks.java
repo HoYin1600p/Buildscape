@@ -18,16 +18,6 @@ public class ModBlocks {
                         ForgeRegistries.BLOCKS,
                         BuildScape.MODID);
 
-        /*
-         * public static final RegistryObject<Block> MIRROR_BLOCK = BLOCKS.register(
-         * "mirror_block",
-         * () -> new MirrorBlock(
-         * BlockBehaviour.Properties.of(Material.GLASS)
-         * .strength(0.5f)
-         * .sound(net.minecraft.world.level.block.SoundType.GLASS)
-         * .noOcclusion()));
-         */
-
         public static final RegistryObject<Block> BUILDERS_WORKBENCH = BLOCKS.register(
                         "builders_workbench",
                         () -> new BuildersWorkbenchBlock(
@@ -5268,6 +5258,14 @@ public class ModBlocks {
                         "glow_star",
                         () -> new StarBlock(
                                         BlockBehaviour.Properties.of(Material.PLANT, MaterialColor.NONE)
+                                                        .noCollission()
+                                                        .instabreak()
+                                                        .sound(net.minecraft.world.level.block.SoundType.GLASS)
+                                                        .lightLevel(state -> state.getValue(StarBlock.LIT) ? 15 : 0)));
+        public static final RegistryObject<Block> FESTIVE_STAR = BLOCKS.register(
+                        "festive_star",
+                        () -> new StarBlock(
+                                        BlockBehaviour.Properties.of(Material.PLANT, MaterialColor.COLOR_RED)
                                                         .noCollission()
                                                         .instabreak()
                                                         .sound(net.minecraft.world.level.block.SoundType.GLASS)
@@ -12529,6 +12527,7 @@ public class ModBlocks {
         public static final RegistryObject<Block> RED_GLASS_JAR = BLOCKS.register("red_glass_jar", () -> new GlassJarBlock(BlockBehaviour.Properties.of(net.minecraft.world.level.material.Material.GLASS, net.minecraft.world.level.material.MaterialColor.COLOR_RED).strength(0.3F).sound(SoundType.GLASS).noOcclusion().isSuffocating((state, reader, pos) -> false).isViewBlocking((state, reader, pos) -> false)));
         public static final RegistryObject<Block> BLACK_GLASS_JAR = BLOCKS.register("black_glass_jar", () -> new GlassJarBlock(BlockBehaviour.Properties.of(net.minecraft.world.level.material.Material.GLASS, net.minecraft.world.level.material.MaterialColor.COLOR_BLACK).strength(0.3F).sound(SoundType.GLASS).noOcclusion().isSuffocating((state, reader, pos) -> false).isViewBlocking((state, reader, pos) -> false)));
         public static final RegistryObject<Block> TINTED_GLASS_JAR = BLOCKS.register("tinted_glass_jar", () -> new GlassJarBlock(BlockBehaviour.Properties.of(net.minecraft.world.level.material.Material.GLASS, net.minecraft.world.level.material.MaterialColor.COLOR_GRAY).strength(0.3F).sound(SoundType.GLASS).noOcclusion().isSuffocating((state, reader, pos) -> false).isViewBlocking((state, reader, pos) -> false)));
+        public static final RegistryObject<Block> GOLDEN_JAR = BLOCKS.register("golden_jar", () -> new GlassJarBlock(BlockBehaviour.Properties.of(net.minecraft.world.level.material.Material.GLASS, net.minecraft.world.level.material.MaterialColor.GOLD).strength(0.3F).sound(SoundType.GLASS).noOcclusion().isSuffocating((state, reader, pos) -> false).isViewBlocking((state, reader, pos) -> false)));
 
         // Snowy Poplar Leaves, Layers, and Hedges
         public static final RegistryObject<Block> SNOWY_ORANGE_POPLAR_LEAVES = BLOCKS.register("snowy_orange_poplar_leaves",

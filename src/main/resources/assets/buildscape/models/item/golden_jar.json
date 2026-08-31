@@ -1,0 +1,6 @@
+{
+  "parent": "buildscape:item/template_glass_jar",
+  "textures": {
+    "particle": "buildscape:block/golden_jar"
+  }
+}

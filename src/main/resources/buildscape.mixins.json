@@ -44,12 +44,15 @@
     "BuildscapeBlockStateCacheMixin",
     "BuildscapeForgeRegistryMixin",
     "BuildscapeModelBakeryMixin",
+    "GeneralStatisticsListMixin",
+    "GeneralStatisticsListEntryMixin",
     "ItemRendererMixin",
     "PauseScreenMixin",
     "LiquidBlockRendererMixin",
     "StonecutterScreenMixin",
     "FireworkStarterMixin",
-    "FireworkStarItemMixin"
+    "FireworkStarItemMixin",
+    "ScreenMixin"
   ],
   "injectors": {
     "defaultRequire": 1

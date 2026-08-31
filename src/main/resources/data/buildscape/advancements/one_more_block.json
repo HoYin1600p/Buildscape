@@ -16,43 +16,8 @@
   },
   "parent": "buildscape:root",
   "criteria": {
-    "red_planks": {
-      "trigger": "minecraft:item_used_on_block",
-      "conditions": {
-        "item": {
-          "items": [
-            "buildscape:ashpen_red_planks"
-          ]
-        }
-      }
-    },
-    "lime_planks": {
-      "trigger": "minecraft:item_used_on_block",
-      "conditions": {
-        "item": {
-          "items": [
-            "buildscape:ashpen_lime_planks"
-          ]
-        }
-      }
-    },
-    "light_blue_planks": {
-      "trigger": "minecraft:item_used_on_block",
-      "conditions": {
-        "item": {
-          "items": [
-            "buildscape:ashpen_light_blue_planks"
-          ]
-        }
-      }
-    },
-    "impossible": {
+    "custom": {
       "trigger": "minecraft:impossible"
     }
-  },
-  "requirements": [
-    [
-      "impossible"
-    ]
-  ]
+  }
 }

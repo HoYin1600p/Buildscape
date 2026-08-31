@@ -52,6 +52,7 @@ public final class BuildscapeRenderLayers {
                 path.endsWith("_petal") ||
                 path.endsWith("_spore_blossom") ||
                 path.endsWith("_monets") ||
+                path.endsWith("_trophy") ||
                 path.endsWith("_rose_vines") ||
                 path.endsWith("_door") ||
                 path.endsWith("_trapdoor") ||
@@ -104,6 +105,7 @@ public final class BuildscapeRenderLayers {
         return switch (path) {
             case "cascade_block",
                     "cascade_block_no_mist",
+                    "golden_jar",
                     "icicle_block",
                     "packed_icicle_block",
                     "steel_grate" -> true;

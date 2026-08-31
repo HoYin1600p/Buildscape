@@ -4,6 +4,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
@@ -88,6 +89,13 @@ public class MuffBlock extends Block implements EntityBlock {
         boolean hasSignal = level.hasNeighborSignal(pos);
         if (hasSignal != state.getValue(POWERED)) {
             level.setBlock(pos, state.setValue(POWERED, hasSignal), 3);
+            if (hasSignal && !level.isClientSide) {
+                Player nearestPlayer = level.getNearestPlayer(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 32.0, false);
+                if (nearestPlayer instanceof ServerPlayer serverPlayer) {
+                    serverPlayer.awardStat(com.kingodogo.buildscape.stat.ModStats.MUFF_BLOCKS_ACTIVATED);
+                    com.kingodogo.buildscape.event.AdvancementEvents.grant(serverPlayer, "can_you_hear_me_now");
+                }
+            }
         }
     }
 

@@ -17,7 +17,7 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * Configuration manager for equipped cosmetics.
+ * Configuration manager for equipped cosmetics and player rules.
  * Persists data in a private 'buildscape/data' directory to keep the config folder clean.
  */
 public class CosmeticsConfig {
@@ -32,6 +32,9 @@ public class CosmeticsConfig {
 
     // Cache of player UUID string to creative tree breaker boolean
     private final Map<String, Boolean> playerCreativeTreeBreaker = new HashMap<>();
+
+    // Cache of player UUID string to shulker preview boolean
+    private final Map<String, Boolean> playerShulkerPreview = new HashMap<>();
 
     // Color picker window position
     private Integer colorPickerX = null;
@@ -89,7 +92,6 @@ public class CosmeticsConfig {
                         File newFile = new File(getDataDir(), oldFile.getName());
                         if (!newFile.exists()) {
                             Files.move(oldFile.toPath(), newFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-
                         } else {
                             oldFile.delete(); // Already exists in new location
                         }
@@ -100,7 +102,7 @@ public class CosmeticsConfig {
             }
         }
 
-        // 2. Migrate from the way-old JSON format if it still exists
+        // 2. Migrate from the legacy JSON format if it still exists
         if (legacyJson.exists()) {
             boolean loadedSuccessfully = false;
             try (FileReader reader = new FileReader(legacyJson)) {
@@ -110,17 +112,16 @@ public class CosmeticsConfig {
                     processLegacyJsonMap(loaded);
                 }
                 loadedSuccessfully = true;
-            } catch (Exception e) {
+            } catch (Exception ignored) {
             }
 
             if (loadedSuccessfully) {
-                // Backup or delete old JSON outside the try-with-resources to ensure file isn't locked
                 Path legacyPath = legacyJson.toPath();
                 Path backupPath = legacyPath.resolveSibling(legacyJson.getName() + ".bak");
                 try {
                     Files.move(legacyPath, backupPath, StandardCopyOption.REPLACE_EXISTING);
                 } catch (Exception e) {
-                    legacyJson.delete(); // Last resort
+                    legacyJson.delete();
                 }
             }
         }
@@ -189,6 +190,8 @@ public class CosmeticsConfig {
         if (!file.exists()) {
             playerCosmetics.putIfAbsent(uuidStr, null);
             playerCosmeticColors.putIfAbsent(uuidStr, null);
+            playerCreativeTreeBreaker.putIfAbsent(uuidStr, false);
+            playerShulkerPreview.putIfAbsent(uuidStr, true);
             return;
         }
 
@@ -201,6 +204,8 @@ public class CosmeticsConfig {
                         BuildScape.getLogger().error("CosmeticsConfig: SECURITY MISMATCH for " + file.getName());
                         playerCosmetics.putIfAbsent(uuidStr, null);
                         playerCosmeticColors.putIfAbsent(uuidStr, null);
+                        playerCreativeTreeBreaker.putIfAbsent(uuidStr, false);
+                        playerShulkerPreview.putIfAbsent(uuidStr, true);
                         return;
                     }
                 }
@@ -228,12 +233,19 @@ public class CosmeticsConfig {
                 } else {
                     playerCreativeTreeBreaker.put(uuidStr, false);
                 }
+
+                if (nbt.contains("shulker_preview")) {
+                    playerShulkerPreview.put(uuidStr, nbt.getBoolean("shulker_preview"));
+                } else {
+                    playerShulkerPreview.put(uuidStr, true); // default ON
+                }
             }
         } catch (Exception e) {
             BuildScape.getLogger().error("CosmeticsConfig: Failed to read data for " + uuidStr, e);
             playerCosmetics.putIfAbsent(uuidStr, null);
             playerCosmeticColors.putIfAbsent(uuidStr, null);
             playerCreativeTreeBreaker.putIfAbsent(uuidStr, false);
+            playerShulkerPreview.putIfAbsent(uuidStr, true);
         }
     }
 
@@ -266,6 +278,11 @@ public class CosmeticsConfig {
         Boolean treeBreaker = playerCreativeTreeBreaker.get(uuidStr);
         if (treeBreaker != null) {
             nbt.putBoolean("creative_tree_breaker", treeBreaker);
+        }
+
+        Boolean shulkerPreview = playerShulkerPreview.get(uuidStr);
+        if (shulkerPreview != null) {
+            nbt.putBoolean("shulker_preview", shulkerPreview);
         }
 
         try {
@@ -351,31 +368,9 @@ public class CosmeticsConfig {
         String uuidStr = playerUuid != null ? playerUuid.toString() : "global";
         if (!playerCosmeticColors.containsKey(uuidStr)) loadPlayer(playerUuid);
 
-        Map<String, String> playerMap = playerCosmeticColors.computeIfAbsent(uuidStr, k -> new HashMap<>());
-        if (hexColor != null && !hexColor.isEmpty()) playerMap.put(cosmeticId, hexColor);
-        else playerMap.remove(cosmeticId);
+        Map<String, String> colors = playerCosmeticColors.computeIfAbsent(uuidStr, k -> new HashMap<>());
+        colors.put(cosmeticId, hexColor);
         savePlayer(playerUuid);
-    }
-
-    public boolean supportsColor(String cosmeticId) {
-        if (cosmeticId == null || cosmeticId.isEmpty()) return false;
-        String idLower = cosmeticId.toLowerCase();
-        return idLower.contains("particle") && idLower.contains("trail");
-    }
-
-    public Integer getColorPickerX() { return colorPickerX; }
-    public Integer getColorPickerY() { return colorPickerY; }
-
-    public void setColorPickerPosition(int x, int y) {
-        this.colorPickerX = x;
-        this.colorPickerY = y;
-        saveGlobalSettings();
-    }
-
-    public void clearColorPickerPosition() {
-        this.colorPickerX = null;
-        this.colorPickerY = null;
-        saveGlobalSettings();
     }
 
     public boolean getCreativeTreeBreaker(UUID playerUuid) {
@@ -384,10 +379,35 @@ public class CosmeticsConfig {
         return playerCreativeTreeBreaker.getOrDefault(uuidStr, false);
     }
 
-    public void setCreativeTreeBreaker(UUID playerUuid, boolean value) {
+    public void setCreativeTreeBreaker(UUID playerUuid, boolean enabled) {
         String uuidStr = playerUuid != null ? playerUuid.toString() : "global";
-        if (!playerCreativeTreeBreaker.containsKey(uuidStr)) loadPlayer(playerUuid);
-        playerCreativeTreeBreaker.put(uuidStr, value);
+        playerCreativeTreeBreaker.put(uuidStr, enabled);
         savePlayer(playerUuid);
+    }
+
+    public boolean getShulkerPreview(UUID playerUuid) {
+        String uuidStr = playerUuid != null ? playerUuid.toString() : "global";
+        if (!playerShulkerPreview.containsKey(uuidStr)) loadPlayer(playerUuid);
+        return playerShulkerPreview.getOrDefault(uuidStr, true);
+    }
+
+    public void setShulkerPreview(UUID playerUuid, boolean enabled) {
+        String uuidStr = playerUuid != null ? playerUuid.toString() : "global";
+        playerShulkerPreview.put(uuidStr, enabled);
+        savePlayer(playerUuid);
+    }
+
+    public int getColorPickerX(int defaultX) {
+        return colorPickerX != null ? colorPickerX : defaultX;
+    }
+
+    public int getColorPickerY(int defaultY) {
+        return colorPickerY != null ? colorPickerY : defaultY;
+    }
+
+    public void setColorPickerPos(int x, int y) {
+        this.colorPickerX = x;
+        this.colorPickerY = y;
+        saveGlobalSettings();
     }
 }

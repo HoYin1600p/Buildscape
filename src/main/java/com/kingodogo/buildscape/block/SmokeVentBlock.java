@@ -235,10 +235,11 @@ public class SmokeVentBlock extends Block implements EntityBlock {
                 net.minecraft.network.chat.TextComponent message =
                         new net.minecraft.network.chat.TextComponent("Smoke color: " + dyeName);
                 message.withStyle(net.minecraft.ChatFormatting.GRAY);
-                if (player instanceof net.minecraft.server.level.ServerPlayer) {
+                if (player instanceof net.minecraft.server.level.ServerPlayer serverPlayer) {
+                    serverPlayer.awardStat(com.kingodogo.buildscape.stat.ModStats.SMOKE_VENTS_DYED);
+                    com.kingodogo.buildscape.event.AdvancementEvents.grant(serverPlayer, "colorful_smoke");
                     com.kingodogo.buildscape.network.ModMessages.INSTANCE.send(
-                            net.minecraftforge.network.PacketDistributor.PLAYER.with(() ->
-                                    (net.minecraft.server.level.ServerPlayer) player),
+                            net.minecraftforge.network.PacketDistributor.PLAYER.with(() -> serverPlayer),
                             new com.kingodogo.buildscape.network.ActionBarMessagePacket(message));
                 }
 

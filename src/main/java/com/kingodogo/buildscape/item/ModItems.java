@@ -22,12 +22,6 @@ public class ModItems {
         return new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB);
     }
 
-/*
-    public static final RegistryObject<Item> MIRROR_BLOCK = ITEMS.register(
-            "mirror_block",
-            () -> new BlockItem(ModBlocks.MIRROR_BLOCK.get(), createBlockItemProperties())
-    );
-*/
 
     public static final RegistryObject<Item> BLACK_SAND = ITEMS.register(
             "black_sand",
@@ -12173,6 +12167,14 @@ public static final RegistryObject<Item> FLAMING_STEEL_INGOT = ITEMS.register("f
             "poplar_shelf",
             () -> new BlockItem(ModBlocks.POPLAR_SHELF.get(), createBlockItemProperties())
     );
+    public static final RegistryObject<Item> GOLDEN_JAR = ITEMS.register(
+            "golden_jar",
+            () -> new GoldenJarItem(ModBlocks.GOLDEN_JAR.get(), new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB).rarity(net.minecraft.world.item.Rarity.UNCOMMON)));
+
+    public static final RegistryObject<Item> FESTIVE_STAR = ITEMS.register(
+            "festive_star",
+            () -> new FestiveStarItem(ModBlocks.FESTIVE_STAR.get(), new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB).rarity(net.minecraft.world.item.Rarity.RARE)));
+
     public static final RegistryObject<Item> TEST_TROPHY = ITEMS.register(
             "test_trophy",
             () -> new Item(new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB))

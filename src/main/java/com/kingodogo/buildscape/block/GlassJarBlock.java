@@ -47,7 +47,11 @@ import java.util.List;
 public class GlassJarBlock extends Block implements EntityBlock, SimpleWaterloggedBlock {
 
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
-    protected static final VoxelShape SHAPE = Block.box(4.0D, 0.0D, 4.0D, 12.0D, 14.0D, 12.0D);
+    protected static final VoxelShape SHAPE = net.minecraft.world.phys.shapes.Shapes.or(
+            Block.box(4.0D, 0.0D, 4.0D, 12.0D, 12.0D, 12.0D),
+            Block.box(5.0D, 12.0D, 5.0D, 11.0D, 13.0D, 11.0D),
+            Block.box(4.5D, 13.0D, 4.5D, 11.5D, 14.0D, 11.5D)
+    );
 
     public GlassJarBlock(Properties properties) {
         super(properties);

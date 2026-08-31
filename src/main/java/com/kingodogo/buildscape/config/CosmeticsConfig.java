@@ -369,7 +369,11 @@ public class CosmeticsConfig {
         if (!playerCosmeticColors.containsKey(uuidStr)) loadPlayer(playerUuid);
 
         Map<String, String> colors = playerCosmeticColors.computeIfAbsent(uuidStr, k -> new HashMap<>());
-        colors.put(cosmeticId, hexColor);
+        if (hexColor == null || hexColor.isEmpty()) {
+            colors.remove(cosmeticId);
+        } else {
+            colors.put(cosmeticId, hexColor);
+        }
         savePlayer(playerUuid);
     }
 

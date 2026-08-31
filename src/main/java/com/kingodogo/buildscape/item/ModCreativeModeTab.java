@@ -27,6 +27,26 @@ public class ModCreativeModeTab {
             return new ItemStack(ModItems.BIT_OXIDIZED_COPPER_BLOCK.get());
         }
 
+        private boolean isCustomFireworkVariant(ItemStack stack) {
+            if (stack.is(Items.FIREWORK_STAR)) {
+                net.minecraft.nbt.CompoundTag explosion = stack.getTagElement("Explosion");
+                return explosion != null
+                        && com.kingodogo.buildscape.firework.CustomFireworkShapeRegistry.isCustomShape(explosion.getByte("Type"));
+            }
+            if (stack.is(Items.FIREWORK_ROCKET)) {
+                net.minecraft.nbt.CompoundTag fireworks = stack.getTagElement("Fireworks");
+                if (fireworks == null || !fireworks.contains("Explosions", 9)) return false;
+                net.minecraft.nbt.ListTag explosions = fireworks.getList("Explosions", 10);
+                for (int i = 0; i < explosions.size(); i++) {
+                    if (com.kingodogo.buildscape.firework.CustomFireworkShapeRegistry.isCustomShape(
+                            explosions.getCompound(i).getByte("Type"))) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
         @Override
         public void fillItemList(NonNullList<ItemStack> items) {
             // 1. Gather ALL potential items for this tab
@@ -54,12 +74,13 @@ public class ModCreativeModeTab {
             for (ItemStack stack : rawList) {
                 Item item = stack.getItem();
                 ResourceLocation id = ForgeRegistries.ITEMS.getKey(item);
-                if (id != null && !BuildScape.MODID.equals(id.getNamespace())) {
+                boolean customFireworkVariant = isCustomFireworkVariant(stack);
+                if (id != null && !BuildScape.MODID.equals(id.getNamespace()) && !customFireworkVariant) {
                     continue;
                 }
-                if (added.contains(item)) continue;
+                if (!customFireworkVariant && added.contains(item)) continue;
                 items.add(stack);
-                added.add(item);
+                if (!customFireworkVariant) added.add(item);
             }
             sortItems(items);
         }
@@ -2504,18 +2525,6 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(com.kingodogo.buildscape.command.FireworkTestCommand.createCustomFireworkRocket(
                     com.kingodogo.buildscape.firework.CustomFireworkShapeRegistry.SNOWFLAKE_ID,
                     new int[]{0xFFFFFF, 0xE0F7FF, 0x5AC8FF}
-            ));
-            items.add(com.kingodogo.buildscape.command.FireworkTestCommand.createCustomFireworkRocket(
-                    com.kingodogo.buildscape.firework.CustomFireworkShapeRegistry.CHRISTMAS_TREE_ID,
-                    new int[]{0x227733, 0xFF3030, 0xFFD700}
-            ));
-            items.add(com.kingodogo.buildscape.command.FireworkTestCommand.createCustomFireworkRocket(
-                    com.kingodogo.buildscape.firework.CustomFireworkShapeRegistry.PRESENTS_ID,
-                    new int[]{0xFF2233, 0xFFD700}
-            ));
-            items.add(com.kingodogo.buildscape.command.FireworkTestCommand.createCustomFireworkRocket(
-                    com.kingodogo.buildscape.firework.CustomFireworkShapeRegistry.CANDY_CANE_ID,
-                    new int[]{0xFF0033}
             ));
             items.add(new ItemStack(ModItems.BUILDERS_WORKBENCH.get()));
             items.add(new ItemStack(ModItems.BUILDERS_POUCH.get()));

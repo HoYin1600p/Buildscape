@@ -1,7 +1,7 @@
 {
   "display": {
     "icon": {
-      "item": "buildscape:red_stained_brick"
+      "item": "buildscape:red_stained_bricks"
     },
     "title": {
       "translate": "advancements.buildscape.brick_by_brick.title"

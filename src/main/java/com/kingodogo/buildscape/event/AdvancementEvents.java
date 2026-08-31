@@ -133,22 +133,18 @@ public class AdvancementEvents {
         // Ashenking Pillar Item & Trophy Rewards
         if (checkRelativeMilestone(serverPlayer, "put_it_on_display", 10, count)) {
             giveItemReward(serverPlayer, Trophies.getRewardForAdvancement("put_it_on_display"), 1);
-            giveItemReward(serverPlayer, ModItems.ASHENKING_GOLD_PILLAR.get(), 1);
             return;
         }
         if (checkRelativeMilestone(serverPlayer, "columnist", 69, count)) {
             giveItemReward(serverPlayer, Trophies.getRewardForAdvancement("columnist"), 1);
-            giveItemReward(serverPlayer, ModItems.ASHENKING_EMERALD_PILLAR.get(), 1);
             return;
         }
         if (checkRelativeMilestone(serverPlayer, "art_collector", 100, count)) {
             giveItemReward(serverPlayer, Trophies.getRewardForAdvancement("art_collector"), 1);
-            giveItemReward(serverPlayer, ModItems.ASHENKING_DIAMOND_PILLAR.get(), 1);
             return;
         }
         if (checkRelativeMilestone(serverPlayer, "buildscape_museum", 1000, count)) {
             giveItemReward(serverPlayer, Trophies.getRewardForAdvancement("buildscape_museum"), 1);
-            giveItemReward(serverPlayer, ModItems.ASHENKING_NETHERITE_PILLAR.get(), 1);
             return;
         }
     }

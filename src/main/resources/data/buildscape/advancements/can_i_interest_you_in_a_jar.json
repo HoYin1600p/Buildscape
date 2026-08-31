@@ -1,7 +1,7 @@
 {
   "display": {
     "icon": {
-      "item": "buildscape:jar"
+      "item": "buildscape:glass_jar"
     },
     "title": {
       "translate": "advancements.buildscape.can_i_interest_you_in_a_jar.title"
@@ -22,7 +22,7 @@
         "items": [
           {
             "items": [
-              "buildscape:jar"
+              "buildscape:glass_jar"
             ]
           }
         ]

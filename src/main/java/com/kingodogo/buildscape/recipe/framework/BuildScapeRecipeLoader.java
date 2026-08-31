@@ -114,6 +114,7 @@ public class BuildScapeRecipeLoader implements PreparableReloadListener {
                 List<Recipe<?>> bundled = BinaryRecipeCache.loadCacheFromStream(res.getInputStream(), contentHash);
                 if (!bundled.isEmpty()) {
                     loadedRecipes.addAll(bundled);
+                    appendNonCacheableSpecialRecipes(rawCategoryData, loadedRecipes);
                     profiler.pop();
                     BuildScape.LOGGER.info("BDRE Loader: Loaded {} recipes from binary cache in {} ms.", loadedRecipes.size(), System.currentTimeMillis() - startTime);
                     return loadedRecipes;
@@ -129,6 +130,7 @@ public class BuildScapeRecipeLoader implements PreparableReloadListener {
             List<Recipe<?>> cached = BinaryRecipeCache.loadCache(contentHash);
             if (!cached.isEmpty()) {
                 loadedRecipes.addAll(cached);
+                appendNonCacheableSpecialRecipes(rawCategoryData, loadedRecipes);
                 profiler.pop();
                 BuildScape.LOGGER.info("BDRE Loader: Loaded {} recipes from binary cache in {} ms.", loadedRecipes.size(), System.currentTimeMillis() - startTime);
                 return loadedRecipes;
@@ -164,6 +166,37 @@ public class BuildScapeRecipeLoader implements PreparableReloadListener {
 
         profiler.pop();
         return loadedRecipes;
+    }
+
+    private void appendNonCacheableSpecialRecipes(Map<String, byte[]> rawCategoryData, List<Recipe<?>> recipes) {
+        byte[] specialData = rawCategoryData.get("special");
+        if (specialData == null) return;
+
+        try (Reader reader = new InputStreamReader(new java.io.ByteArrayInputStream(specialData), StandardCharsets.UTF_8)) {
+            BuildScapeRecipeCompiler compiler = new BuildScapeRecipeCompiler();
+            RecipeIR.CategoryPack categoryPack = StreamingRecipeParser.parseCategory("special", reader);
+            BuildScapeRecipeCompiler.CompileResult result = compiler.compileCategory(categoryPack);
+
+            Set<ResourceLocation> loadedIds = new HashSet<>();
+            for (Recipe<?> recipe : recipes) {
+                loadedIds.add(recipe.getId());
+            }
+
+            int added = 0;
+            for (Recipe<?> recipe : result.recipes()) {
+                if (!BinaryRecipeCache.isCacheable(recipe) && loadedIds.add(recipe.getId())) {
+                    recipes.add(recipe);
+                    added++;
+                }
+            }
+            compiler.clear();
+
+            if (added > 0) {
+                BuildScape.LOGGER.info("BDRE Loader: Added {} runtime-only special recipes after cache load.", added);
+            }
+        } catch (Exception e) {
+            BuildScape.LOGGER.error("BDRE Loader: Failure parsing runtime-only special recipes", e);
+        }
     }
 
     private void applyRecipes(List<Recipe<?>> recipes, ProfilerFiller profiler) {

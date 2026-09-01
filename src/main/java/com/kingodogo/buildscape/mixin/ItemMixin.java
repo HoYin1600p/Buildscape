@@ -23,6 +23,13 @@ public class ItemMixin {
                 cir.setReturnValue(1);
             }
         }
-        // Splash potions, lingering potions, and non-water potions stay at vanilla stack size (1)
+    }
+
+    @Inject(method = "hasFoil", at = @At("HEAD"), cancellable = true)
+    private void buildscape$festiveHasFoil(CallbackInfoReturnable<Boolean> cir) {
+        ItemStack self = (ItemStack) (Object) this;
+        if (com.kingodogo.buildscape.util.FestiveGlintHelper.hasFestiveGlint(self)) {
+            cir.setReturnValue(true);
+        }
     }
 }

@@ -80,6 +80,7 @@ public class TagTooltipHandler {
                 }
             }
 
+
             // If player disabled Shulker Preview in Player Rules, do not touch or modify tooltips at all.
             // This leaves vanilla, Shulker Plus (Iskallia), Tweakeroo, etc. completely untouched.
             if (!isShulkerPreviewEnabled()) {

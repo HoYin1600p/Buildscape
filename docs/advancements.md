@@ -3,6 +3,7 @@
 ```text
 Achievement                                 | Requirement                                        | trophy_id                            | item_id
 --------------------------------------------|----------------------------------------------------|--------------------------------------|--------------------------------------
+Buildscape (Root)                           | Root advancement for Buildscape                    | <---X--->                            | <---X--->
 Touch Grass                                 | Capture a biome with the Biome Brush               | <---X--->                            | <---X--->
 Metalhead                                   | Obtain Steel Ingot                                 | <---X--->                            | <---X--->
 That's One Hot Block                        | Obtain Flaming Steel                               | <---X--->                            | <---X--->
@@ -29,6 +30,8 @@ Let it Cascade                              | Place 1 Cascade Block             
 Let It Out                                  | Place 5 Smoke Vent                                 | <---X--->                            | <---X--->
 Colorful Smoke                              | Dye the Smoke Vent any color                       | <---X--->                            | <---X--->
 Can You Hear Me Now?                        | Activate a Muff Block                              | <---X--->                            | <---X--->
+Are you Nuts                                | Place 20 Bolts                                     | <---X--->                            | <---X--->
+Grand Celebration                           | Craft all 7 Celebration Firework Stars             | <---X--->                            | buildscape:infinite_phoenix_firework_star
 Rainbow Mood Light                          | Obtain all 16 Froglight colors                     | buildscape:test_trophy               | <---X--->
 One More Block                              | Place 100 Buildscape blocks                        | buildscape:emerald_pillar_trophy     | <---X--->
 Okay, One More                              | Place 1,000 Buildscape blocks                      | buildscape:test_trophy               | <---X--->
@@ -44,7 +47,7 @@ Christmas Every Day                         | Craft 365 Stockings               
 Ornamental                                  | Place 100 Ornaments                                | buildscape:gold_ornament_trophy      | CUSTOM_ITEM_ID
 Light em Up                                 | Place 100 String Lights                            | buildscape:string_light_trophy       | CUSTOM_ITEM_ID
 Santa's Little Helper                       | Place 100 Stars                                    | buildscape:star_trophy               | buildscape:festive_star
-A White Christmas                           | Place 100 Snowy Leaves                             | <---X--->                            | <---X--->
+A White Christmas                           | Place 100 Snowy Leaves                             | <---X--->                            | buildscape:snowy_spruce_leaves
 A Very Buildscape Christmas                 | Obtain every Christmas decoration                  | buildscape:test_trophy               | <---X--->
 Chill Out                                   | Place 10 Icicles                                   | <---X--->                            | <---X--->
 ```
@@ -68,6 +71,8 @@ Columnist                 → buildscape:ashenking_emerald_pillar
 Art Collector             → buildscape:ashenking_diamond_pillar
 Buildscape Museum         → buildscape:ashenking_netherite_pillar
 Santa's Little Helper     → buildscape:festive_star
+Grand Celebration         → buildscape:infinite_phoenix_firework_star
+A White Christmas         → buildscape:snowy_spruce_leaves
 
 Christmas Every Day       → CUSTOM_ITEM_ID (pending item asset)
 Ornamental                → CUSTOM_ITEM_ID (pending item asset)

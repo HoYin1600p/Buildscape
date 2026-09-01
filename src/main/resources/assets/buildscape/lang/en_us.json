@@ -1,4 +1,4 @@
-{
+﻿{
   "item.buildscape.copper_biome_brush": "Copper Biome Brush",
   "item.buildscape.diamond_biome_brush": "Diamond Biome Brush",
   "item.buildscape.netherite_biome_brush": "Netherite Biome Brush",
@@ -5845,8 +5845,8 @@
   "advancements.buildscape.the_entire_catalogue.description": "Obtain all 16 Colors of Wallpaper",
   "advancements.buildscape.the_homemaker_cometh.title": "The Homemaker Cometh",
   "advancements.buildscape.the_homemaker_cometh.description": "Interact with a Wandering Homemaker",
-  "advancements.buildscape.its_beginning_to_look_a_lot_like_christmas.title": "Look a Lot Like Christmas",
-  "advancements.buildscape.its_beginning_to_look_a_lot_like_christmas.description": "Interact with Festive Wandering Homemaker",
+  "advancements.buildscape.its_beginning_to_look_a_lot_like_christmas.title": "It's Beginning to Look a Lot Like Christmas",
+  "advancements.buildscape.its_beginning_to_look_a_lot_like_christmas.description": "Interact with the Festive Wandering Homemaker",
   "advancements.buildscape.pocket_full_of_blocks.title": "Pocket Full of Blocks",
   "advancements.buildscape.pocket_full_of_blocks.description": "Obtain the Builder's Pouch",
   "advancements.buildscape.string_theory.title": "String Theory",
@@ -5961,6 +5961,9 @@
   "advancements.buildscape.colorful_smoke.description": "Dye the Smoke Vent any color",
   "advancements.buildscape.can_you_hear_me_now.title": "Can You Hear Me Now?",
   "advancements.buildscape.can_you_hear_me_now.description": "Activate a Muff Block",
+  "stat.buildscape.bolts_placed": "Bolts Placed",
+  "advancements.buildscape.are_you_nuts.title": "Are you Nuts",
+  "advancements.buildscape.are_you_nuts.description": "Place 20 Bolts",
   "block.buildscape.stone_pillar_trophy": "Stone Pillar Trophy",
   "item.buildscape.stone_pillar_trophy": "Stone Pillar Trophy",
   "block.buildscape.gold_pillar_trophy": "Gold Pillar Trophy",

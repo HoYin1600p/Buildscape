@@ -19,6 +19,9 @@
     "items": [
       {
         "item": "buildscape:festive_wandering_homemaker_spawn_egg"
+      },
+      {
+        "item": "buildscape:festive_glint_shard"
       }
     ]
   },

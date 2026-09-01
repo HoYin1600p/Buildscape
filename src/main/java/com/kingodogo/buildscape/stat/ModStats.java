@@ -24,6 +24,7 @@ public class ModStats {
     public static final ResourceLocation SMOKE_VENTS_PLACED = new ResourceLocation(BuildScape.MODID, "smoke_vents_placed");
     public static final ResourceLocation SMOKE_VENTS_DYED = new ResourceLocation(BuildScape.MODID, "smoke_vents_dyed");
     public static final ResourceLocation MUFF_BLOCKS_ACTIVATED = new ResourceLocation(BuildScape.MODID, "muff_blocks_activated");
+    public static final ResourceLocation BOLTS_PLACED = new ResourceLocation(BuildScape.MODID, "bolts_placed");
 
     // Header category marker stats
     public static final ResourceLocation HEADER_MINECRAFT = new ResourceLocation(BuildScape.MODID, "header_minecraft");
@@ -55,6 +56,7 @@ public class ModStats {
         registerCustomStat("smoke_vents_placed", SMOKE_VENTS_PLACED);
         registerCustomStat("smoke_vents_dyed", SMOKE_VENTS_DYED);
         registerCustomStat("muff_blocks_activated", MUFF_BLOCKS_ACTIVATED);
+        registerCustomStat("bolts_placed", BOLTS_PLACED);
     }
 
     private static Stat<ResourceLocation> registerCustomStat(String name, ResourceLocation id) {

@@ -8,6 +8,8 @@ import com.kingodogo.buildscape.block.CascadeBlock;
 import com.kingodogo.buildscape.block.CascadeBlockNoMist;
 import com.kingodogo.buildscape.block.SmokeVentBlock;
 import com.kingodogo.buildscape.block.MuffBlock;
+import com.kingodogo.buildscape.block.SteelBoltBlock;
+import com.kingodogo.buildscape.block.WeatheringBoltBlock;
 import com.kingodogo.buildscape.entity.WanderingHomemakerEntity;
 import com.kingodogo.buildscape.entity.FestiveWanderingHomemakerEntity;
 import com.kingodogo.buildscape.item.ModItems;
@@ -277,6 +279,15 @@ public class AdvancementEvents {
             }
         }
 
+        // Bolts ("Are you Nuts" - Place 20 Bolts)
+        if (path.endsWith("_bolts") || block instanceof SteelBoltBlock || block instanceof WeatheringBoltBlock) {
+            serverPlayer.awardStat(com.kingodogo.buildscape.stat.ModStats.BOLTS_PLACED);
+            int boltCount = serverPlayer.getStats().getValue(net.minecraft.stats.Stats.CUSTOM, com.kingodogo.buildscape.stat.ModStats.BOLTS_PLACED);
+            if (checkRelativeMilestone(serverPlayer, "are_you_nuts", 20, boltCount)) {
+                // Granted
+            }
+        }
+
         // Pillar Placement & Height Tracking
         if (block instanceof PillarBlock || block instanceof AshenKingPillarBlock) {
             checkPillars(serverPlayer, level, pos, block);
@@ -291,8 +302,8 @@ public class AdvancementEvents {
             int samePillarCount = tag.getInt("BS_PillarPlaced_" + path) + 1;
             tag.putInt("BS_PillarPlaced_" + path, samePillarCount);
 
-            if (checkRelativeMilestone(player, "support_system", 4, samePillarCount)) {
-                // Granted 4 pillars milestone
+            if (samePillarCount >= 4) {
+                grant(player, "support_system");
             }
         }
 

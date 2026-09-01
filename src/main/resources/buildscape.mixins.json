@@ -7,6 +7,7 @@
   "plugin": "com.kingodogo.buildscape.mixin.BuildscapeMixinPlugin",
   "mixins": [
     "AbstractContainerMenuMixin",
+    "AnvilMenuMixin",
     "BeaconBeamSectionAccessor",
     "BeaconBlockEntityAccessor",
     "BeaconBlockEntityMixin",
@@ -38,21 +39,27 @@
   "client": [
     "AbstractContainerScreenMixin",
     "AdvancementWidgetMixin",
+    "AnvilScreenMixin",
     "BeaconBlockEntityRendererMixin",
     "BeaconRendererInvoker",
     "BuildscapeBlockModelMixin",
     "BuildscapeBlockStateCacheMixin",
     "BuildscapeForgeRegistryMixin",
     "BuildscapeModelBakeryMixin",
+    "ElytraLayerMixin",
     "GeneralStatisticsListMixin",
     "GeneralStatisticsListEntryMixin",
+    "HumanoidArmorLayerMixin",
     "ItemRendererMixin",
     "PauseScreenMixin",
     "LiquidBlockRendererMixin",
+    "RenderBuffersMixin",
     "StonecutterScreenMixin",
     "FireworkStarterMixin",
     "FireworkStarItemMixin",
-    "ScreenMixin"
+    "ScreenMixin",
+    "ThrownTridentAccessor",
+    "ThrownTridentRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1

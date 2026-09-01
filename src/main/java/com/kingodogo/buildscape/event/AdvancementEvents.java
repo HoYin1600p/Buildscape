@@ -73,10 +73,17 @@ public class AdvancementEvents {
     @SubscribeEvent
     public static void onAdvancementEarned(net.minecraftforge.event.entity.player.AdvancementEvent event) {
         if (event.getPlayer() instanceof ServerPlayer serverPlayer) {
-            if (event.getAdvancement() != null && new ResourceLocation("buildscape", "grand_celebration").equals(event.getAdvancement().getId())) {
-                ItemStack reward = com.kingodogo.buildscape.item.InfinitePhoenixFireworkStarItem.createDefaultStack();
-                if (!serverPlayer.getInventory().add(reward)) {
-                    serverPlayer.drop(reward, false);
+            if (event.getAdvancement() != null) {
+                if (new ResourceLocation("buildscape", "grand_celebration").equals(event.getAdvancement().getId())) {
+                    ItemStack reward = com.kingodogo.buildscape.item.InfinitePhoenixFireworkStarItem.createDefaultStack();
+                    if (!serverPlayer.getInventory().add(reward)) {
+                        serverPlayer.drop(reward, false);
+                    }
+                } else if (new ResourceLocation("buildscape", "a_very_buildscape_christmas").equals(event.getAdvancement().getId())) {
+                    ItemStack reward = new ItemStack(ModItems.FESTIVE_GLINT_SHARD.get());
+                    if (!serverPlayer.getInventory().add(reward)) {
+                        serverPlayer.drop(reward, false);
+                    }
                 }
             }
         }

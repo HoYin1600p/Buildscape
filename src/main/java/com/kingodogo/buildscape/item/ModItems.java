@@ -12187,6 +12187,13 @@ public static final RegistryObject<Item> FLAMING_STEEL_INGOT = ITEMS.register("f
                     new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB).stacksTo(1).craftRemainder(net.minecraft.world.item.Items.BUCKET)
             )
     );
+
+    public static final RegistryObject<Item> FESTIVE_GLINT_SHARD = ITEMS.register(
+            "festive_glint_shard",
+            () -> new FestiveGlintShardItem(
+                    new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB).rarity(net.minecraft.world.item.Rarity.RARE)
+            )
+    );
 }
 
 

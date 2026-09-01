@@ -1,4 +1,4 @@
-﻿{
+{
   "item.buildscape.copper_biome_brush": "Copper Biome Brush",
   "item.buildscape.diamond_biome_brush": "Diamond Biome Brush",
   "item.buildscape.netherite_biome_brush": "Netherite Biome Brush",
@@ -5995,5 +5995,7 @@
   "tooltip.buildscape.trophy.obtained_on_prefix": "Obtained on:",
   "block.buildscape.golden_jar": "Golden Jar",
   "block.buildscape.festive_star": "Festive Star",
-  "itemGroup.buildscape_old": "BuildScape (Old)"
+  "itemGroup.buildscape_old": "BuildScape (Old)",
+  "item.buildscape.festive_glint_shard": "Festive Glint Shard",
+  "tooltip.buildscape.festive_glint_shard": "Combines with enchanted items in an anvil for 0 XP levels to apply a festive glint. (Infinite Uses)"
 }

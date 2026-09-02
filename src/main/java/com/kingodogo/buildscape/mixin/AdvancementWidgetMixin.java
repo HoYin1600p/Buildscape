@@ -104,7 +104,7 @@ public abstract class AdvancementWidgetMixin {
 
         long timeIndex = System.currentTimeMillis() / 1200L;
 
-        if ("one_more_block".equals(path) || "okay_one_more".equals(path) || "actually_one_last".equals(path)) {
+        if ("one_more_block".equals(path) || "okay_one_more".equals(path) || "actually_one_last".equals(path) || "one_last_one_i_promise".equals(path)) {
             int idx = (int) (timeIndex % buildscape$BUILDING_BLOCK_ICONS.size());
             return buildscape$BUILDING_BLOCK_ICONS.get(idx);
         } else if ("string_me_along".equals(path)) {

@@ -1,0 +1,23 @@
+{
+  "display": {
+    "icon": {
+      "item": "buildscape:ashpen_black_planks"
+    },
+    "title": {
+      "translate": "advancements.buildscape.one_last_one_i_promise.title"
+    },
+    "description": {
+      "translate": "advancements.buildscape.one_last_one_i_promise.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "parent": "buildscape:actually_one_last",
+  "criteria": {
+    "custom": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

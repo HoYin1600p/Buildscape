@@ -1,21 +1,21 @@
 {
   "replace": false,
   "values": [
-    "buildscape:diamond_buildscape_trophy",
-    "buildscape:diamond_hammer_trophy",
-    "buildscape:diamond_pillar_trophy",
-    "buildscape:emerald_buildscape_trophy",
-    "buildscape:emerald_pillar_trophy",
-    "buildscape:emerald_stocking_trophy",
-    "buildscape:firelight_trophy",
-    "buildscape:gold_buildscape_trophy",
-    "buildscape:gold_ornament_trophy",
-    "buildscape:gold_pillar_trophy",
-    "buildscape:golden_jar_trophy",
-    "buildscape:netherite_buildscape_trophy",
-    "buildscape:netherite_pillar_trophy",
-    "buildscape:star_trophy",
     "buildscape:stone_pillar_trophy",
-    "buildscape:string_light_trophy"
+    "buildscape:gold_pillar_trophy",
+    "buildscape:diamond_pillar_trophy",
+    "buildscape:netherite_pillar_trophy",
+    "buildscape:emerald_pillar_trophy",
+    "buildscape:golden_jar_trophy",
+    "buildscape:gold_ornament_trophy",
+    "buildscape:emerald_stocking_trophy",
+    "buildscape:star_trophy",
+    "buildscape:string_light_trophy",
+    "buildscape:firelight_trophy",
+    "buildscape:diamond_hammer_trophy",
+    "buildscape:gold_buildscape_trophy",
+    "buildscape:emerald_buildscape_trophy",
+    "buildscape:diamond_buildscape_trophy",
+    "buildscape:netherite_buildscape_trophy"
   ]
 }

@@ -12175,10 +12175,6 @@ public static final RegistryObject<Item> FLAMING_STEEL_INGOT = ITEMS.register("f
             "festive_star",
             () -> new FestiveStarItem(ModBlocks.FESTIVE_STAR.get(), new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB).rarity(net.minecraft.world.item.Rarity.RARE)));
 
-    public static final RegistryObject<Item> TEST_TROPHY = ITEMS.register(
-            "test_trophy",
-            () -> new Item(new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB))
-    );
 
     public static final RegistryObject<Item> EXPERIENCE_BUCKET = ITEMS.register(
             "experience_bucket",
@@ -12195,5 +12191,4 @@ public static final RegistryObject<Item> FLAMING_STEEL_INGOT = ITEMS.register("f
             )
     );
 }
-
 

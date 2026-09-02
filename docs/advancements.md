@@ -36,6 +36,7 @@ Rainbow Mood Light                          | Obtain all 16 Froglight colors    
 One More Block                              | Place 100 Buildscape blocks                        | buildscape:gold_buildscape_trophy    | <---X--->
 Okay, One More                              | Place 1,000 Buildscape blocks                      | buildscape:emerald_buildscape_trophy | <---X--->
 Actually, One Last                          | Place 10,000 Buildscape blocks                     | buildscape:diamond_buildscape_trophy | <---X--->
+One Last one, i promise                     | Place 100,000 Buildscape blocks                    | buildscape:netherite_buildscape_trophy| <---X--->
 Reach for the Sky                           | Build a Pillar reaching the world height limit     | buildscape:firelight_trophy          | <---X--->
 Jar-ring Display                            | Craft 100 Jars                                     | buildscape:golden_jar_trophy         | buildscape:golden_jar
 Hammer Time                                 | Replace 1000 block with a Hammer                   | buildscape:diamond_hammer_trophy     | <---X--->

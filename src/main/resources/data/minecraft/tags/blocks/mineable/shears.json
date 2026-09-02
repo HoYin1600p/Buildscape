@@ -278,6 +278,26 @@
     "buildscape:black_layered_wool_layers",
     "buildscape:black_layered_wool_carpet",
     "buildscape:black_layered_wool_wall",
-    "buildscape:black_layered_wool_vertical_slab"
+    "buildscape:black_layered_wool_vertical_slab",
+    "buildscape:mangrove_leaves",
+    "buildscape:cherry_leaves",
+    "buildscape:pale_oak_leaves",
+    "buildscape:orange_poplar_leaves",
+    "buildscape:red_poplar_leaves",
+    "buildscape:yellow_poplar_leaves",
+    "buildscape:snowy_acacia_leaves",
+    "buildscape:snowy_azalea_leaves",
+    "buildscape:snowy_birch_leaves",
+    "buildscape:snowy_cherry_leaves",
+    "buildscape:snowy_dark_oak_leaves",
+    "buildscape:snowy_jungle_leaves",
+    "buildscape:snowy_leaves",
+    "buildscape:snowy_mangrove_leaves",
+    "buildscape:snowy_oak_leaves",
+    "buildscape:snowy_orange_poplar_leaves",
+    "buildscape:snowy_pale_oak_leaves",
+    "buildscape:snowy_red_poplar_leaves",
+    "buildscape:snowy_spruce_leaves",
+    "buildscape:snowy_yellow_poplar_leaves"
   ]
 }

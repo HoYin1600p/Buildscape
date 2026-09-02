@@ -5997,5 +5997,15 @@
   "block.buildscape.festive_star": "Festive Star",
   "itemGroup.buildscape_old": "BuildScape (Old)",
   "item.buildscape.festive_glint_shard": "Festive Glint Shard",
-  "tooltip.buildscape.festive_glint_shard": "Combines with enchanted items in an anvil for 0 XP levels to apply a festive glint. (Infinite Uses)"
+  "tooltip.buildscape.festive_glint_shard": "Combines with enchanted items in an anvil for 0 XP levels to apply a festive glint. (Infinite Uses)",
+  "block.buildscape.diamond_hammer_trophy": "Diamond Hammer Trophy",
+  "item.buildscape.diamond_hammer_trophy": "Diamond Hammer Trophy",
+  "block.buildscape.gold_buildscape_trophy": "Gold Buildscape Trophy",
+  "item.buildscape.gold_buildscape_trophy": "Gold Buildscape Trophy",
+  "block.buildscape.emerald_buildscape_trophy": "Emerald Buildscape Trophy",
+  "item.buildscape.emerald_buildscape_trophy": "Emerald Buildscape Trophy",
+  "block.buildscape.diamond_buildscape_trophy": "Diamond Buildscape Trophy",
+  "item.buildscape.diamond_buildscape_trophy": "Diamond Buildscape Trophy",
+  "block.buildscape.netherite_buildscape_trophy": "Netherite Buildscape Trophy",
+  "item.buildscape.netherite_buildscape_trophy": "Netherite Buildscape Trophy"
 }

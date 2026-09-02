@@ -33,12 +33,12 @@ Can You Hear Me Now?                        | Activate a Muff Block             
 Are you Nuts                                | Place 20 Bolts                                     | <---X--->                            | <---X--->
 Grand Celebration                           | Craft all 7 Celebration Firework Stars             | <---X--->                            | buildscape:infinite_phoenix_firework_star
 Rainbow Mood Light                          | Obtain all 16 Froglight colors                     | buildscape:test_trophy               | <---X--->
-One More Block                              | Place 100 Buildscape blocks                        | buildscape:emerald_pillar_trophy     | <---X--->
-Okay, One More                              | Place 1,000 Buildscape blocks                      | buildscape:test_trophy               | <---X--->
-Actually, One Last                          | Place 10,000 Buildscape blocks                     | buildscape:test_trophy               | <---X--->
+One More Block                              | Place 100 Buildscape blocks                        | buildscape:gold_buildscape_trophy    | <---X--->
+Okay, One More                              | Place 1,000 Buildscape blocks                      | buildscape:emerald_buildscape_trophy | <---X--->
+Actually, One Last                          | Place 10,000 Buildscape blocks                     | buildscape:diamond_buildscape_trophy | <---X--->
 Reach for the Sky                           | Build a Pillar reaching the world height limit     | buildscape:firelight_trophy          | <---X--->
 Jar-ring Display                            | Craft 100 Jars                                     | buildscape:golden_jar_trophy         | buildscape:golden_jar
-Hammer Time                                 | Replace 1000 block with a Hammer                   | buildscape:test_trophy               | <---X--->
+Hammer Time                                 | Replace 1000 block with a Hammer                   | buildscape:diamond_hammer_trophy     | <---X--->
 Put It on Display                           | Interact with Pillars 10 times                     | buildscape:stone_pillar_trophy       | buildscape:ashenking_gold_pillar
 Columnist                                   | Interact with Pillars 69 Times                     | buildscape:gold_pillar_trophy        | buildscape:ashenking_emerald_pillar
 Art Collector                               | Interact with Pillars 100 times                    | buildscape:diamond_pillar_trophy     | buildscape:ashenking_diamond_pillar

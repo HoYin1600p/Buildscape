@@ -1,6 +1,21 @@
 {
   "replace": false,
   "values": [
+    "minecraft:oak_fence",
+    "minecraft:spruce_fence",
+    "minecraft:birch_fence",
+    "minecraft:jungle_fence",
+    "minecraft:acacia_fence",
+    "minecraft:dark_oak_fence",
+    "minecraft:mangrove_fence",
+    "minecraft:cherry_fence",
+    "minecraft:bamboo_fence",
+    "minecraft:crimson_fence",
+    "minecraft:warped_fence",
+    "buildscape:poplar_fence",
+    "buildscape:ashpen_fence",
+    "buildscape:cherry_fence",
+    "buildscape:pale_oak_fence",
     "buildscape:ashpen_black_fence",
     "buildscape:ashpen_blue_fence",
     "buildscape:ashpen_brown_fence",
@@ -16,13 +31,6 @@
     "buildscape:ashpen_purple_fence",
     "buildscape:ashpen_red_fence",
     "buildscape:ashpen_white_fence",
-    "buildscape:ashpen_yellow_fence",
-    "buildscape:bamboo_block_fence",
-    "buildscape:stripped_bamboo_block_fence",
-    "buildscape:mangrove_fence",
-    "buildscape:poplar_fence",
-    "buildscape:ashpen_fence",
-    "buildscape:cherry_fence",
-    "buildscape:pale_oak_fence"
+    "buildscape:ashpen_yellow_fence"
   ]
 }

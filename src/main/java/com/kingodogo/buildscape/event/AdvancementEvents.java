@@ -58,8 +58,7 @@ public class AdvancementEvents {
     public static void giveItemReward(ServerPlayer player, Item item, int count) {
         if (player == null || item == null || count <= 0) return;
         ItemStack stack = new ItemStack(item, count);
-        if (item instanceof com.kingodogo.buildscape.trophy.TrophyBlockItem || item == ModItems.TEST_TROPHY.get()
-                || item == ModItems.GOLDEN_JAR.get() || item == ModItems.FESTIVE_STAR.get()) {
+        if (item instanceof com.kingodogo.buildscape.trophy.TrophyBlockItem || item == ModItems.GOLDEN_JAR.get() || item == ModItems.FESTIVE_STAR.get()) {
             net.minecraft.nbt.CompoundTag tag = stack.getOrCreateTag();
             tag.putString("ObtainedBy", player.getScoreboardName());
             java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
@@ -185,6 +184,8 @@ public class AdvancementEvents {
                 giveItemReward(serverPlayer, Trophies.getRewardForAdvancement("okay_one_more"), 1);
             } else if (checkRelativeMilestone(serverPlayer, "actually_one_last", 10000, placedCount)) {
                 giveItemReward(serverPlayer, Trophies.getRewardForAdvancement("actually_one_last"), 1);
+            } else if (checkRelativeMilestone(serverPlayer, "one_last_one_i_promise", 100000, placedCount)) {
+                giveItemReward(serverPlayer, Trophies.getRewardForAdvancement("one_last_one_i_promise"), 1);
             }
         }
 

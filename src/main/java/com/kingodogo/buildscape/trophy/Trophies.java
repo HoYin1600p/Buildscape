@@ -215,16 +215,10 @@ public class Trophies {
                     .hardness(4.0F)
                     .resistance(12.0F)
                     .shape(BUILDSCAPE_TROPHY_SHAPES)
+                    .advancement("one_last_one_i_promise")
                     .build()
     );
 
-    // 4. Fallback Trophy (Kept for compatibility and unmapped milestone rewards)
-    public static final TrophyDefinition TEST_TROPHY = registerFallback(
-            TrophyDefinition.builder("test_trophy")
-                    .fallback(true)
-                    .fallbackItemSupplier(() -> ModItems.TEST_TROPHY.get())
-                    .build()
-    );
 
     private static TrophyDefinition register(TrophyDefinition definition) {
         REGISTRY.put(definition.getId(), definition);
@@ -249,11 +243,6 @@ public class Trophies {
         return definition;
     }
 
-    private static TrophyDefinition registerFallback(TrophyDefinition definition) {
-        REGISTRY.put(definition.getId(), definition);
-        return definition;
-    }
-
     public static Collection<TrophyDefinition> getAll() {
         return REGISTRY.values();
     }
@@ -267,7 +256,7 @@ public class Trophies {
         if (def != null && def.getItem() != null) {
             return def.getItem();
         }
-        return ModItems.TEST_TROPHY.get();
+        return null;
     }
 
     public static void init() {

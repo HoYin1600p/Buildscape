@@ -16,7 +16,7 @@ public class Trophies {
     private static final Map<String, TrophyDefinition> BY_ADVANCEMENT = new HashMap<>();
 
     // Single clean rectangular hitboxes per trophy type
-    // Tall pillar / jar / froglight trophies (exceeding 1-block height by ~2 pixels)
+    // Tall pillar / jar / froglight / hammer trophies (exceeding 1-block height by ~2 pixels)
     private static final Map<Direction, VoxelShape> PEDESTAL_SHAPES = TrophyDefinition.createDirectionalShapes(
         new double[]{4.0D, 0.0D, 4.0D, 12.0D, 1.0D, 12.0D},
         new double[]{7.0D, 0.0D, 3.0D, 9.0D, 2.0D, 5.0D},
@@ -31,6 +31,11 @@ public class Trophies {
     // Wide Christmas stand trophies (Ornament, Stocking, Star, String Light)
     private static final Map<Direction, VoxelShape> STAND_SHAPES = TrophyDefinition.createDirectionalShapes(
         1.0D, 0.0D, 3.0D, 15.0D, 16.0D, 13.0D
+    );
+
+    // Buildscape Statuette Trophies (Gold, Emerald, Diamond, Netherite)
+    private static final Map<Direction, VoxelShape> BUILDSCAPE_TROPHY_SHAPES = TrophyDefinition.createDirectionalShapes(
+        1.0D, 0.0D, 1.0D, 15.0D, 30.0D, 15.0D
     );
 
     // 1. Pillar Trophies (Stone, Gold, Diamond, Netherite, Emerald)
@@ -85,7 +90,6 @@ public class Trophies {
                     .hardness(2.5F)
                     .resistance(6.0F)
                     .shape(PEDESTAL_SHAPES)
-                    .advancement("one_more_block")
                     .build()
     );
 
@@ -159,7 +163,62 @@ public class Trophies {
                     .build()
     );
 
-    // 3. Fallback Trophy (Kept for compatibility and unmapped milestone rewards)
+    // 3. Hammer & Buildscape Milestone Trophies
+    public static final TrophyDefinition DIAMOND_HAMMER = register(
+            TrophyDefinition.builder("diamond_hammer_trophy")
+                    .tier(TrophyTier.DIAMOND)
+                    .soundType(SoundType.METAL)
+                    .hardness(3.0F)
+                    .resistance(8.0F)
+                    .shape(PEDESTAL_SHAPES)
+                    .advancement("hammer_time")
+                    .build()
+    );
+
+    public static final TrophyDefinition GOLD_BUILDSCAPE = register(
+            TrophyDefinition.builder("gold_buildscape_trophy")
+                    .tier(TrophyTier.GOLD)
+                    .soundType(SoundType.METAL)
+                    .hardness(2.0F)
+                    .resistance(6.0F)
+                    .shape(BUILDSCAPE_TROPHY_SHAPES)
+                    .advancement("one_more_block")
+                    .build()
+    );
+
+    public static final TrophyDefinition EMERALD_BUILDSCAPE = register(
+            TrophyDefinition.builder("emerald_buildscape_trophy")
+                    .tier(TrophyTier.EMERALD)
+                    .soundType(SoundType.METAL)
+                    .hardness(2.5F)
+                    .resistance(6.0F)
+                    .shape(BUILDSCAPE_TROPHY_SHAPES)
+                    .advancement("okay_one_more")
+                    .build()
+    );
+
+    public static final TrophyDefinition DIAMOND_BUILDSCAPE = register(
+            TrophyDefinition.builder("diamond_buildscape_trophy")
+                    .tier(TrophyTier.DIAMOND)
+                    .soundType(SoundType.METAL)
+                    .hardness(3.0F)
+                    .resistance(8.0F)
+                    .shape(BUILDSCAPE_TROPHY_SHAPES)
+                    .advancement("actually_one_last")
+                    .build()
+    );
+
+    public static final TrophyDefinition NETHERITE_BUILDSCAPE = register(
+            TrophyDefinition.builder("netherite_buildscape_trophy")
+                    .tier(TrophyTier.NETHERITE)
+                    .soundType(SoundType.NETHERITE_BLOCK)
+                    .hardness(4.0F)
+                    .resistance(12.0F)
+                    .shape(BUILDSCAPE_TROPHY_SHAPES)
+                    .build()
+    );
+
+    // 4. Fallback Trophy (Kept for compatibility and unmapped milestone rewards)
     public static final TrophyDefinition TEST_TROPHY = registerFallback(
             TrophyDefinition.builder("test_trophy")
                     .fallback(true)

@@ -1,0 +1,22 @@
+{
+  "replace": false,
+  "values": [
+    "minecraft:oak_trapdoor",
+    "minecraft:spruce_trapdoor",
+    "minecraft:birch_trapdoor",
+    "minecraft:jungle_trapdoor",
+    "minecraft:acacia_trapdoor",
+    "minecraft:dark_oak_trapdoor",
+    "minecraft:mangrove_trapdoor",
+    "minecraft:cherry_trapdoor",
+    "minecraft:bamboo_trapdoor",
+    "minecraft:crimson_trapdoor",
+    "minecraft:warped_trapdoor",
+    "buildscape:bamboo_trapdoor",
+    "buildscape:cherry_trapdoor",
+    "buildscape:mangrove_trapdoor",
+    "buildscape:pale_oak_trapdoor",
+    "buildscape:poplar_trapdoor",
+    "buildscape:ashpen_trapdoor"
+  ]
+}

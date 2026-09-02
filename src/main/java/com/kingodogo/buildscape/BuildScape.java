@@ -51,7 +51,6 @@ public class BuildScape {
         // Trophy definitions add their blocks and items to these deferred registers.
         // Initialize them before either register is attached to the mod event bus.
         com.kingodogo.buildscape.trophy.Trophies.init();
-        com.kingodogo.buildscape.item.TempOldCreativeModeTab.init();
         ModBlocks.BLOCKS.register(modEventBus);
         ModItems.ITEMS.register(modEventBus);
         com.kingodogo.buildscape.fluid.ModFluids.FLUIDS.register(modEventBus);

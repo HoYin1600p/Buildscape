@@ -84,7 +84,6 @@ public class ColoredMossBlock extends ModBlock implements BonemealableBlock {
 
     @Override
     public boolean isValidBonemealTarget(BlockGetter level, BlockPos pos, BlockState state, boolean isClient) {
-        // Can bonemeal if there is air or replaceable block above, or if any replaceable block is nearby
         return true;
     }
 
@@ -100,7 +99,7 @@ public class ColoredMossBlock extends ModBlock implements BonemealableBlock {
 
         for (int i = 0; i < spreadAttempts; i++) {
             int offsetX = random.nextInt(radius * 2 + 1) - radius;
-            int offsetY = random.nextInt(3) - 1; // vertical spread of -1 to 1
+            int offsetY = random.nextInt(3) - 1;
             int offsetZ = random.nextInt(radius * 2 + 1) - radius;
 
             BlockPos targetPos = pos.offset(offsetX, offsetY, offsetZ);
@@ -111,39 +110,37 @@ public class ColoredMossBlock extends ModBlock implements BonemealableBlock {
 
             if (isMoss || isReplaceable) {
                 if (isReplaceable) {
-                    // Change the block to this colored moss block
                     level.setBlock(targetPos, this.defaultBlockState(), 3);
                 }
 
-                // Try to spawn carpet/overlay/layers/sapling/flower on top
                 BlockPos abovePos = targetPos.above();
                 BlockState aboveState = level.getBlockState(abovePos);
 
                 if (aboveState.isAir() || aboveState.getMaterial().isReplaceable()) {
                     int rand = random.nextInt(100);
-                    if (rand < 25) { // 25% chance to place carpet
+                    if (rand < 25) {
                         BlockState carpetState = carpet.get().defaultBlockState();
                         if (carpetState.canSurvive(level, abovePos)) {
                             level.setBlock(abovePos, carpetState, 3);
                         }
-                    } else if (rand < 35) { // 10% chance to place overlay
+                    } else if (rand < 35) {
                         BlockState overlayState = overlay.get().defaultBlockState();
                         if (overlayState.canSurvive(level, abovePos)) {
                             level.setBlock(abovePos, overlayState, 3);
                         }
-                    } else if (rand < 45) { // 10% chance to place layers (1 layer)
+                    } else if (rand < 45) {
                         BlockState layersState = layers.get().defaultBlockState();
                         if (layersState.canSurvive(level, abovePos)) {
                             level.setBlock(abovePos, layersState, 3);
                         }
-                    } else if (rand < 58) { // 13% chance to place sapling
+                    } else if (rand < 58) {
                         if (sapling != null && sapling.get() != null) {
                             BlockState saplingState = sapling.get().defaultBlockState();
                             if (saplingState.canSurvive(level, abovePos)) {
                                 level.setBlock(abovePos, saplingState, 3);
                             }
                         }
-                    } else if (rand < 70) { // 12% chance to place flower (e.g. eyeblossom)
+                    } else if (rand < 70) {
                         if (flower != null && flower.get() != null) {
                             BlockState flowerState = flower.get().defaultBlockState();
                             if (flowerState.canSurvive(level, abovePos)) {

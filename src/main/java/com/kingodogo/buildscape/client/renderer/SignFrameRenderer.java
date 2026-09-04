@@ -19,10 +19,6 @@ import net.minecraft.world.level.block.entity.SignBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.client.model.data.EmptyModelData;
 
-/**
- * Handles rendering cosmetic frames over signs.
- * Aligns properly with both standing signs (at any rotation) and wall signs (on any wall).
- */
 public class SignFrameRenderer {
 
     public static void render(
@@ -66,7 +62,6 @@ public class SignFrameRenderer {
 
             poseStack.translate(0.5D, 0.5D, 0.5D);
             poseStack.mulPose(Vector3f.YP.rotationDegrees(-yRot));
-            // Offset from North wall sign board position to standing sign board position
             poseStack.translate(0.0D, 0.3125D, -0.4375D);
             poseStack.translate(-0.5D, -0.5D, -0.5D);
         } else {

@@ -40,7 +40,6 @@ public class TreeChopHandler {
     private static final int MAX_LOGS = 200;
     private static BlockPos targetBlockPos = null;
     private static long breakingStartTime = 0;
-    // Cache
     private static BlockPos lastLookedAtPos = null;
     private static Set<BlockPos> connectedLogsCache = new HashSet<>();
     private static long lastCacheUpdate = 0;
@@ -53,7 +52,6 @@ public class TreeChopHandler {
         Player player = mc.player;
         if (player == null || mc.level == null) return;
 
-        // Reset
         if (!player.isCreative() || !player.isShiftKeyDown() || mc.options.keyAttack == null || !mc.options.keyAttack.isDown()
                 || !com.kingodogo.buildscape.config.CosmeticsConfig.get().getCreativeTreeBreaker(player.getUUID())) {
             if (mc.level != null && targetBlockPos != null) {
@@ -97,16 +95,13 @@ public class TreeChopHandler {
             if (breakingStartTime > 0) {
                 long elapsed = System.currentTimeMillis() - breakingStartTime;
                 if (elapsed >= BREAK_DELAY_MS) {
-                    // Succeeded
                     ModMessages.INSTANCE.sendToServer(new TreeChopPacket(targetBlockPos));
-                    // Reset
                     if (mc.level != null) {
                         mc.level.destroyBlockProgress(player.getId(), targetBlockPos, -1);
                     }
                     targetBlockPos = null;
                     breakingStartTime = 0;
                 } else {
-                    // Update break progress (0-9)
                     int progress = (int) (elapsed * 10 / BREAK_DELAY_MS);
                     if (mc.level != null) {
                         mc.level.destroyBlockProgress(player.getId(), targetBlockPos, progress);
@@ -127,7 +122,6 @@ public class TreeChopHandler {
         if (!com.kingodogo.buildscape.config.CosmeticsConfig.get().getCreativeTreeBreaker(player.getUUID()))
             return;
 
-        // Check what we are looking at NOW
         HitResult hit = mc.hitResult;
         if (hit == null || hit.getType() != HitResult.Type.BLOCK) return;
 
@@ -137,7 +131,6 @@ public class TreeChopHandler {
 
         if (connectedLogsCache.isEmpty()) return;
 
-        // Render count with block name
         String blockName = state.getBlock().getName().getString();
         String text = blockName + ": " + connectedLogsCache.size();
 
@@ -146,11 +139,10 @@ public class TreeChopHandler {
         int screenWidth = event.getWindow().getGuiScaledWidth();
         int screenHeight = event.getWindow().getGuiScaledHeight();
 
-        // Position above crosshair
         int x = screenWidth / 2 - halfWidth;
         int y = screenHeight / 2 - 20;
 
-        mc.font.draw(event.getMatrixStack(), text, x, y, 0xFF00FF00); // Green text
+        mc.font.draw(event.getMatrixStack(), text, x, y, 0xFF00FF00);
     }
 
     @SubscribeEvent
@@ -171,7 +163,6 @@ public class TreeChopHandler {
 
         if (!isLog(state)) return;
 
-        // Update cache
         if (!pos.equals(lastLookedAtPos) || System.currentTimeMillis() - lastCacheUpdate > 500) {
             if (mc.level != null) {
                 connectedLogsCache = findConnectedLogs(mc.level, pos, state.getBlock());
@@ -186,7 +177,6 @@ public class TreeChopHandler {
         double camY = event.getCamera().getPosition().y;
         double camZ = event.getCamera().getPosition().z;
 
-        // Render
         for (BlockPos logPos : connectedLogsCache) {
             if (mc.level != null && !mc.level.isLoaded(logPos)) continue;
             if (mc.level != null) {
@@ -199,7 +189,7 @@ public class TreeChopHandler {
                         consumer,
                         aabb.minX - camX, aabb.minY - camY, aabb.minZ - camZ,
                         aabb.maxX - camX, aabb.maxY - camY, aabb.maxZ - camZ,
-                        0.0f, 1.0f, 1.0f, 0.8f // Cyan/Aqua color
+                        0.0f, 1.0f, 1.0f, 0.8f
                 );
             }
         }
@@ -243,7 +233,6 @@ public class TreeChopHandler {
             BlockPos current = queue.poll();
             count++;
 
-            // Check neighbors
             for (int dx = -1; dx <= 1; dx++) {
                 for (int dy = -1; dy <= 1; dy++) {
                     for (int dz = -1; dz <= 1; dz++) {

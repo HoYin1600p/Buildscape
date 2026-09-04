@@ -16,34 +16,24 @@ import java.util.Set;
 
 public class MobStateParser {
 
-    // Parsed state definitions from mob_states.txt or states.txt
     private static final Map<String, Set<String>> validMobStates = new HashMap<>();
     private static final Set<String> universalStates = new HashSet<>();
     private static boolean statesLoaded = false;
 
-    /**
-     * Load and parse the states configuration file.
-     * Supports both formats:
-     * 1. **MobName** header with bullet points
-     * 2. mob_name|state_name|description pipe-delimited
-     */
     public static void loadStates() {
         if (statesLoaded) {
             return;
         }
 
         try {
-            // Add universal states first (always available)
             addUniversalStates();
 
-            // Try to load from root directory first (user's custom file)
             java.io.File rootStatesFile = new java.io.File("states.txt");
             InputStream stream = null;
 
             if (rootStatesFile.exists()) {
                 stream = new java.io.FileInputStream(rootStatesFile);
             } else {
-                // Fallback to resource file
                 ResourceLocation statesFile = new ResourceLocation("buildscape:mob_states.txt");
                 try {
                     stream = Minecraft.getInstance()
@@ -63,20 +53,16 @@ public class MobStateParser {
                 while ((line = reader.readLine()) != null) {
                     line = line.trim();
 
-                    // Skip empty lines
                     if (line.isEmpty()) {
                         continue;
                     }
 
-                    // Format 2: mob|state|desc (Pipe-delimited)
                     if (line.contains("|")) {
                         String[] parts = line.split("\\|");
                         if (parts.length >= 2) {
                             String mobName = parts[0].trim().toLowerCase().replace(" ", "_");
                             String stateName = parts[1].trim().toLowerCase();
 
-                            // Handle combined states (e.g. "baby spin") by taking the first word or checking known states
-                            // For simplicity, we add the full string and individual words if separated
                             if (stateName.contains(" ")) {
                                 String[] stateWords = stateName.split("\\s+");
                                 for (String s : stateWords) {
@@ -86,7 +72,6 @@ public class MobStateParser {
                                 addStateToMob(mobName, stateName);
                             }
 
-                            // Also handle wildcard mob "*"
                             if (mobName.equals("*")) {
                                 universalStates.add(stateName);
                             }
@@ -94,19 +79,15 @@ public class MobStateParser {
                         continue;
                     }
 
-                    // Format 1: **MobName** header
                     if (line.startsWith("**") && line.endsWith("**")) {
                         currentMob = line.substring(2, line.length() - 2).trim().toLowerCase();
-                        // Normalize mob names (remove spaces, handle special cases)
                         currentMob = currentMob.replace(" ", "_");
                         continue;
                     }
 
-                    // Format 1: • stateName bullet point
                     if (line.startsWith("•") || line.startsWith("-") || line.startsWith("*")) {
                         if (currentMob != null) {
                             String stateName = line.substring(1).trim().toLowerCase();
-                            // Skip section headers like "Biomes:" or "Professions:"
                             if (stateName.endsWith(":")) {
                                 continue;
                             }
@@ -126,7 +107,6 @@ public class MobStateParser {
         } catch (Exception e) {
             System.err.println("[BuildScape] Failed to load states: " + e.getMessage());
             e.printStackTrace();
-            // Ensure at least universal states are loaded
             addUniversalStates();
             statesLoaded = true;
         }
@@ -143,7 +123,6 @@ public class MobStateParser {
         universalStates.add("hurt");
         universalStates.add("damage");
 
-        // Entity Specific States
         universalStates.add("hanging");
         universalStates.add("roosting");
         universalStates.add("standing");
@@ -160,22 +139,19 @@ public class MobStateParser {
         universalStates.add("acacia");
         universalStates.add("dark_oak");
         universalStates.add("darkoak");
-        universalStates.add("mangrove"); // 1.19+ but harmless
+        universalStates.add("mangrove");
 
-        // Armor Stand / End Crystal Utils
         universalStates.add("arms");
         universalStates.add("no_base");
         universalStates.add("nobase");
         universalStates.add("no_bottom");
         universalStates.add("nobottom");
 
-        // Add common states that should universally apply (especially for modded support)
         universalStates.add("baby");
         universalStates.add("saddled");
         universalStates.add("sheared");
         universalStates.add("sitting");
 
-        // Add all dye colors as universal states (for wool, collars, shulkers, horses, rabbits, etc.)
         universalStates.add("white");
         universalStates.add("orange");
         universalStates.add("magenta");
@@ -197,55 +173,48 @@ public class MobStateParser {
         universalStates.add("angry");
         universalStates.add("charged");
 
-        // Size variants
         universalStates.add("giant");
         universalStates.add("huge");
-        universalStates.add("large"); // Size 4
-        universalStates.add("medium"); // Size 2
+        universalStates.add("large");
+        universalStates.add("medium");
         universalStates.add("small");
-        universalStates.add("tiny"); // Size 1
+        universalStates.add("tiny");
 
-        // Specific vanilla variants
-        universalStates.add("shield"); // Wither
+        universalStates.add("shield");
         universalStates.add("invul");
-        universalStates.add("pumpkin"); // Snow Golem
+        universalStates.add("pumpkin");
         universalStates.add("nopumpkin");
-        universalStates.add("cracked"); // Iron Golem
+        universalStates.add("cracked");
         universalStates.add("broken");
-        universalStates.add("puff"); // Pufferfish
+        universalStates.add("puff");
         universalStates.add("full");
         universalStates.add("half");
-        universalStates.add("chest"); // Horse/Llama chest
+        universalStates.add("chest");
         universalStates.add("chested");
 
-        // New Additions
-        universalStates.add("rainbow"); // Sheep jeb_
+        universalStates.add("rainbow");
         universalStates.add("jeb");
-        universalStates.add("johnny"); // Vindicator
-        universalStates.add("cold"); // Strider / Frog
+        universalStates.add("johnny");
+        universalStates.add("cold");
         universalStates.add("shivering");
-        universalStates.add("warm"); // Frog
+        universalStates.add("warm");
         universalStates.add("temperate");
-        universalStates.add("block"); // Enderman
+        universalStates.add("block");
         universalStates.add("carrying");
-        universalStates.add("casting"); // Evoker / Illusioner
+        universalStates.add("casting");
         universalStates.add("spell");
 
-        // Horse Armor
         universalStates.add("diamond");
         universalStates.add("gold");
         universalStates.add("iron");
         universalStates.add("leather");
-        universalStates.add("armor"); // Generic armor keyword
+        universalStates.add("armor");
     }
 
     private static void addStateToMob(String mobName, String stateName) {
         validMobStates.computeIfAbsent(mobName, k -> new HashSet<>()).add(stateName);
     }
 
-    /**
-     * Parse the spawn egg's custom name to extract mob states
-     */
     public static MobState parseStates(ItemStack spawnEggStack, EntityType<?> entityType) {
         MobState state = new MobState();
 
@@ -253,46 +222,36 @@ public class MobStateParser {
             return state;
         }
 
-        // Get the custom name from NBT
         String customName = getCustomName(spawnEggStack);
         if (customName == null || customName.isEmpty()) {
             return state;
         }
 
-        // Ensure states are loaded
         loadStates();
 
-        // Get mob type name
         String mobTypeName = entityType.getDescriptionId().toLowerCase();
         if (mobTypeName.contains(".")) {
             String[] parts = mobTypeName.split("\\.");
             mobTypeName = parts[parts.length - 1];
         }
 
-        // Parse the custom name for state keywords
         String lowerName = customName.toLowerCase();
 
-        // Pre-processing for combined keywords (e.g. "no pumpkin" -> "nopumpkin")
         lowerName = lowerName.replace("no pumpkin", "nopumpkin");
         lowerName = lowerName.replace("no horns", "nohorns");
         lowerName = lowerName.replace("no ai", "noai");
 
         String[] words = lowerName.split("\\s+");
 
-        // Check each word against valid states
         for (String word : words) {
             word = resolveAlias(word.trim());
             if (word.isEmpty()) {
                 continue;
             }
 
-            // Add to parsed states for variant checking
             state.parsedStates.add(word);
 
-            // ... (Optimization: Skip isValidState check if we are just parsing broadly)
 
-            // Apply state based on keyword
-            // We use parsedStates set for most things now, but keep bools for common ones
             if (word.equals("spin")) {
                 state.spin = true;
             } else if (word.equals("dinnerbone") || word.equals("grum")) {
@@ -327,9 +286,6 @@ public class MobStateParser {
         return state;
     }
 
-    /**
-     * Resolve aliases for state names (e.g., "sit" -> "sitting")
-     */
     private static String resolveAlias(String word) {
         if (word.equals("sit")) return "sitting";
         if (word.equals("tame")) return "tamed";
@@ -345,7 +301,6 @@ public class MobStateParser {
         if (word.equals("grumm")) return "grum";
         if (word.equals("jeb_")) return "jeb";
 
-        // Comprehensive aliases for relatability
         if (word.equals("beg")) return "begging";
         if (word.equals("stand")) return "standing";
         if (word.equals("chest")) return "chested";
@@ -365,7 +320,6 @@ public class MobStateParser {
         if (word.equals("opened")) return "open";
         if (word.equals("invulnerable")) return "invul";
 
-        // Strict mapping for 'no' prefix
         if (word.equals("no_pumpkin")) return "nopumpkin";
         if (word.equals("no_horns")) return "nohorns";
         if (word.equals("no_base")) return "nobase";
@@ -374,9 +328,6 @@ public class MobStateParser {
         return word;
     }
 
-    /**
-     * Extract custom name from spawn egg ItemStack
-     */
     private static String getCustomName(ItemStack stack) {
         if (stack == null || stack.isEmpty()) {
             return null;
@@ -407,14 +358,12 @@ public class MobStateParser {
                 }
             }
         } catch (Exception e) {
-            // Fallback to raw string
             return net.minecraft.ChatFormatting.stripFormatting(nameJson.trim());
         }
 
         return null;
     }
 
-    // Explicitly expose clear cache methods if needed, essentially just reloading states
     public static void reloadStates() {
         statesLoaded = false;
         validMobStates.clear();

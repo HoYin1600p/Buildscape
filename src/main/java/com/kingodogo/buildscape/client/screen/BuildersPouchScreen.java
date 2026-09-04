@@ -16,13 +16,10 @@ public class BuildersPouchScreen extends AbstractContainerScreen<BuildersPouchMe
     private static final ResourceLocation TITLE =
             new ResourceLocation("buildscape", "textures/gui/builders_pouch/builders_pouch_title.png");
 
-    /** Artwork size; the sheet itself is 256x256 with the panel anchored at (0,0). */
     private static final int GUI_WIDTH = 188;
     private static final int GUI_HEIGHT = 134;
     private static final int SHEET_SIZE = 256;
 
-    // The flat face of the banner, excluding both the dark frame (x54/x133, y0/y16) and
-    // the 1px bevel inside it (x55/x132, y1/y15) - same 76x13 area as the workbench.
     private static final int TITLE_X = 56;
     private static final int TITLE_Y = 2;
     private static final int TITLE_W = 76;
@@ -32,8 +29,6 @@ public class BuildersPouchScreen extends AbstractContainerScreen<BuildersPouchMe
         super(menu, inventory, title);
         this.imageWidth = GUI_WIDTH;
         this.imageHeight = GUI_HEIGHT;
-        // Both captions are part of the artwork now, so the vanilla labels are pushed
-        // off-screen rather than drawn on top of it.
         this.titleLabelX = -9999;
         this.titleLabelY = -9999;
         this.inventoryLabelX = -9999;

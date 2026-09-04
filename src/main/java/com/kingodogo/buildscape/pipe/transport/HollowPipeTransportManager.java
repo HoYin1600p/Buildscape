@@ -16,7 +16,6 @@ import org.apache.logging.log4j.Logger;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-// Coordinator for Hollow Steel Pipe fluid transport network updates
 @Mod.EventBusSubscriber(modid = "buildscape", bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class HollowPipeTransportManager {
 
@@ -32,9 +31,6 @@ public class HollowPipeTransportManager {
         processPendingRecalculations(level);
     }
 
-    /**
-     * Immediately processes and clears pending recalculations for the specified level.
-     */
     public static void processPendingRecalculations(Level level) {
         Set<BlockPos> queue = PENDING_DIRTY.remove(level);
         if (queue == null || queue.isEmpty()) {
@@ -62,7 +58,6 @@ public class HollowPipeTransportManager {
     public static void onServerTick(TickEvent.ServerTickEvent event) {
         if (event.phase != TickEvent.Phase.END) return;
 
-        // Process pending BFS pipe recalculations
         if (!PENDING_DIRTY.isEmpty()) {
             for (Level level : new ArrayList<>(PENDING_DIRTY.keySet())) {
                 processPendingRecalculations(level);

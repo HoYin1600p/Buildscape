@@ -52,7 +52,6 @@ public abstract class ComposterBlockMixin extends Block {
         if (state.hasProperty(PlanterHelper.PLANTER)) {
             PlanterType planter = state.getValue(PlanterHelper.PLANTER);
             if (planter != PlanterType.NONE) {
-                // Pass to allow plant placement on top of the block
                 cir.setReturnValue(InteractionResult.PASS);
                 return;
             }
@@ -83,7 +82,6 @@ public abstract class ComposterBlockMixin extends Block {
 
                     if (newType != null) {
                         if (!level.isClientSide) {
-                            // If it's a grass block, check if block above is snow to place it as snowy grass block
                             if (newType == PlanterType.GRASS_BLOCK) {
                                 boolean isSnowy = level.getBlockState(pos.above()).is(net.minecraft.tags.BlockTags.SNOW);
                                 if (isSnowy) {
@@ -93,7 +91,6 @@ public abstract class ComposterBlockMixin extends Block {
 
                             level.setBlock(pos, state.setValue(PlanterHelper.PLANTER, newType), 3);
 
-                            // Play placement sound
                             net.minecraft.world.level.block.SoundType soundType = block.getSoundType(block.defaultBlockState(), level, pos, player);
                             level.playSound(null, pos, soundType.getPlaceSound(), SoundSource.BLOCKS, (soundType.getVolume() + 1.0F) / 2.0F, soundType.getPitch() * 0.8F);
 

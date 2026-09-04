@@ -15,7 +15,6 @@ public class TrailNoteParticle extends TextureSheetParticle {
 
     private final SpriteSet sprites;
 
-    // Static map to store color queues for particles
     private static final java.util.Map<String, ColorEntry> POSITION_COLOR_MAP = new java.util.concurrent.ConcurrentHashMap<>();
 
     private static class ColorEntry {
@@ -41,10 +40,8 @@ public class TrailNoteParticle extends TextureSheetParticle {
         this.yd = ySpeed;
         this.zd = zSpeed;
 
-        // Pick random texture from the set
         this.setSprite(sprites.get(level.random));
 
-        // Color handling logic
         String positionKey = String.format("%.1f,%.1f,%.1f", x, y, z);
         String colorCode = null;
 
@@ -57,9 +54,7 @@ public class TrailNoteParticle extends TextureSheetParticle {
             float[] color = parseColorCode(colorCode);
             this.setColor(color[0], color[1], color[2]);
         } else {
-            // Random color
             float hue = level.random.nextFloat();
-            // Use HSB for vibrant colors
             int rgb = java.awt.Color.HSBtoRGB(hue, 0.8f, 0.9f);
             float r = ((rgb >> 16) & 0xFF) / 255.0f;
             float g = ((rgb >> 8) & 0xFF) / 255.0f;

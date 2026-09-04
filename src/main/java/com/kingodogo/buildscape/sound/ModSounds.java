@@ -248,11 +248,11 @@ public class ModSounds {
 
     public static com.kingodogo.buildscape.block.CustomSoundType MUD_SOUNDS() {
         return new com.kingodogo.buildscape.block.CustomSoundType(
-                1.0f, 1.0f,   // break
-                1.0f, 1.0f,  // step
-                1.0f, 1.0f,   // place
-                1.0f, 1.0f,   // hit
-                1.0f, 1.0f,  // fall
+                1.0f, 1.0f,
+                1.0f, 1.0f,
+                1.0f, 1.0f,
+                1.0f, 1.0f,
+                1.0f, 1.0f,
                 () -> MUD_BREAK.isPresent() ? MUD_BREAK.get() : net.minecraft.sounds.SoundEvents.GRAVEL_BREAK,
                 () -> MUD_STEP.isPresent() ? MUD_STEP.get() : net.minecraft.sounds.SoundEvents.GRAVEL_STEP,
                 () -> MUD_STEP.isPresent() ? MUD_STEP.get() : net.minecraft.sounds.SoundEvents.GRAVEL_PLACE,
@@ -263,11 +263,11 @@ public class ModSounds {
 
     public static com.kingodogo.buildscape.block.CustomSoundType PACKED_MUD_SOUNDS() {
         return new com.kingodogo.buildscape.block.CustomSoundType(
-                0.3f, 1.0f,   // break
-                1.0f, 0.95f, // step
-                0.3f, 1.0f,   // place
-                1.0f, 1.0f,  // hit
-                1.0f, 1.0f,  // fall
+                0.3f, 1.0f,
+                1.0f, 0.95f,
+                0.3f, 1.0f,
+                1.0f, 1.0f,
+                1.0f, 1.0f,
                 () -> PACKED_MUD_BREAK.isPresent() ? PACKED_MUD_BREAK.get() : net.minecraft.sounds.SoundEvents.GRAVEL_BREAK,
                 () -> PACKED_MUD_STEP.isPresent() ? PACKED_MUD_STEP.get() : net.minecraft.sounds.SoundEvents.GRAVEL_STEP,
                 () -> PACKED_MUD_PLACE.isPresent() ? PACKED_MUD_PLACE.get() : net.minecraft.sounds.SoundEvents.GRAVEL_PLACE,
@@ -278,11 +278,11 @@ public class ModSounds {
 
     public static com.kingodogo.buildscape.block.CustomSoundType MUD_BRICKS_SOUNDS() {
         return new com.kingodogo.buildscape.block.CustomSoundType(
-                1.0f, 1.0f,  // break
-                1.0f, 1.0f,   // step
-                1.0f, 1.0f,  // place
-                1.0f, 1.0f,  // hit
-                1.0f, 1.0f,  // fall
+                1.0f, 1.0f,
+                1.0f, 1.0f,
+                1.0f, 1.0f,
+                1.0f, 1.0f,
+                1.0f, 1.0f,
                 () -> MUD_BRICKS_BREAK.isPresent() ? MUD_BRICKS_BREAK.get() : net.minecraft.sounds.SoundEvents.STONE_BREAK,
                 () -> MUD_BRICKS_STEP.isPresent() ? MUD_BRICKS_STEP.get() : net.minecraft.sounds.SoundEvents.STONE_STEP,
                 () -> MUD_BRICKS_PLACE.isPresent() ? MUD_BRICKS_PLACE.get() : net.minecraft.sounds.SoundEvents.STONE_PLACE,

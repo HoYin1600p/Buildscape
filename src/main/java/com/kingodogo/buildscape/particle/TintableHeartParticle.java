@@ -18,8 +18,6 @@ public class TintableHeartParticle extends TextureSheetParticle {
 
     private final TextureAtlasSprite baseSprite;
 
-    // Static map to store color queues for particles
-    // Key: "x,y,z" string, Value: ColorEntry
     private static final Map<String, ColorEntry> POSITION_COLOR_MAP = new ConcurrentHashMap<>();
 
     private static class ColorEntry {
@@ -43,21 +41,18 @@ public class TintableHeartParticle extends TextureSheetParticle {
             SpriteSet sprites
     ) {
         super(level, x, y, z, dx, dy, dz);
-        this.setSpriteFromAge(sprites); // Use sprite set
+        this.setSpriteFromAge(sprites);
         this.baseSprite = this.sprite;
 
-        // Heart particle movement logic (similar to vanilla heart)
         this.xd = dx;
         this.yd = dy;
         this.zd = dz;
-        this.lifetime = 100; // Longer life
+        this.lifetime = 100;
 
-        // Initial upward velocity if none provided
         if (this.yd == 0) {
             this.yd = 0.1;
         }
 
-        // Color handling logic (copied from PillarSparkleParticle)
         String positionKey = String.format("%.1f,%.1f,%.1f", x, y, z);
         String colorCode = null;
 
@@ -71,12 +66,12 @@ public class TintableHeartParticle extends TextureSheetParticle {
             if (cfg.particle_color != null && !cfg.particle_color.isEmpty()) {
                 colorCode = cfg.particle_color.get(0);
             } else {
-                colorCode = "#FF0000"; // Default Red for heart
+                colorCode = "#FF0000";
             }
         }
 
-        this.quadSize = 0.3F; // Default size
-        this.hasPhysics = false; // No collision
+        this.quadSize = 0.3F;
+        this.hasPhysics = false;
 
         float[] color = parseColorCode(colorCode);
         this.setColor(color[0], color[1], color[2]);
@@ -99,7 +94,7 @@ public class TintableHeartParticle extends TextureSheetParticle {
 
     private static float[] parseColorCode(String colorCode) {
         if (colorCode == null || colorCode.isEmpty()) {
-            return new float[]{1.0F, 0.0F, 0.0F}; // Red fallback
+            return new float[]{1.0F, 0.0F, 0.0F};
         }
 
         if (!colorCode.startsWith("#")) {
@@ -126,7 +121,6 @@ public class TintableHeartParticle extends TextureSheetParticle {
     public void tick() {
         super.tick();
 
-        // Simple float up movement
         this.xo = this.x;
         this.yo = this.y;
         this.zo = this.z;
@@ -139,7 +133,6 @@ public class TintableHeartParticle extends TextureSheetParticle {
              this.yd *= 0.99;
              this.zd *= 0.99;
 
-             // Fade out
              if (this.age > this.lifetime - 20) {
                  this.alpha = (this.lifetime - this.age) / 20.0f;
              }
@@ -153,7 +146,7 @@ public class TintableHeartParticle extends TextureSheetParticle {
 
     @Override
     public int getLightColor(float partialTick) {
-         return 0xF000F0; // Full brightness
+         return 0xF000F0;
     }
 
     public static class Provider implements ParticleProvider<SimpleParticleType> {

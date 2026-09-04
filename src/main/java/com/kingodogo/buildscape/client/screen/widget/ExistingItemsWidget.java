@@ -35,8 +35,8 @@ public class ExistingItemsWidget extends AbstractWidget {
     private int itemsPerRow;
     private long lastUpdateTime = 0;
     private static final long CYCLE_INTERVAL = 1000;
-    private int headerAreaHeight = 20; // Default to label area
-    private static final int GRID_PADDING_TOP = 5; // Headspace below label/separator
+    private int headerAreaHeight = 20;
+    private static final int GRID_PADDING_TOP = 5;
     private final CustomScrollbarRenderer scrollbarRenderer = new CustomScrollbarRenderer();
 
     public ExistingItemsWidget(int x, int y, int width, int height,
@@ -59,7 +59,7 @@ public class ExistingItemsWidget extends AbstractWidget {
     }
 
     private void calculateItemsPerRow() {
-        int availableWidth = width - 21; // width - 16 - 5
+        int availableWidth = width - 21;
         itemsPerRow = Math.max(1,
                 Math.min(MAX_ITEMS_PER_ROW, (availableWidth + ITEM_SPACING) / (ITEM_SIZE + ITEM_SPACING)));
     }
@@ -134,14 +134,12 @@ public class ExistingItemsWidget extends AbstractWidget {
         double guiScale = mc.getWindow().getGuiScale();
         int windowHeight = mc.getWindow().getHeight();
 
-        // Draw border around panel (Always render)
 
         int scissorX = (int) (x * guiScale);
         int bottomMargin = 10;
         int scissorY = (int) (windowHeight - (y + height) * guiScale + bottomMargin * guiScale);
-        int scissorWidth = (int) ((width - 21) * guiScale); // Exclude scrollbar area
+        int scissorWidth = (int) ((width - 21) * guiScale);
 
-        // Fix: Scissor starts exactly below the header separator. This allows padding and selection borders to be visible.
         int scissorHeight = (int) ((height - headerAreaHeight - 1 - bottomMargin) * guiScale);
 
         if (scissorHeight > 0 && scissorWidth > 0) {
@@ -170,7 +168,6 @@ public class ExistingItemsWidget extends AbstractWidget {
         for (int row = startRow; row < endRow; row++) {
             int rowY = itemY + (row - startRow) * (ITEM_SIZE + ITEM_SPACING);
 
-            // Updated visibility check - allow items slightly above the start point for smooth scrolling
             if (rowY + ITEM_SIZE < y + headerAreaHeight || rowY > y + height - bottomMargin) {
                 continue;
             }
@@ -181,9 +178,8 @@ public class ExistingItemsWidget extends AbstractWidget {
                     break;
 
                 DisplayEntry entry = displayEntries.get(index);
-                // Calculate centering offset matching ItemSelectionWidget
                 int totalRowWidth = itemsPerRow * (ITEM_SIZE + ITEM_SPACING) - ITEM_SPACING;
-                int availableAreaWidth = width - 21; // Same as in calculateItemsPerRow
+                int availableAreaWidth = width - 21;
                 int startXOffset = Math.max(0, (availableAreaWidth - totalRowWidth) / 2);
 
                 int itemX = x + 5 + startXOffset + col * (ITEM_SIZE + ITEM_SPACING);
@@ -242,18 +238,16 @@ public class ExistingItemsWidget extends AbstractWidget {
         }
         poseStack.popPose();
 
-        // Draw panel borders and separator
         int borderColor = 0xFF666666;
-        fill(poseStack, x, y, x + width, y + 1, borderColor); // Top
-        fill(poseStack, x, y + height - 1, x + width, y + height, borderColor); // Bottom
-        fill(poseStack, x, y, x + 1, y + height, borderColor); // Left
-        fill(poseStack, x + width - 1, y, x + width, y + height, borderColor); // Right
-        fill(poseStack, x, y + headerAreaHeight + 1, x + width, y + headerAreaHeight + 2, borderColor); // Separator (moved 1px down)
+        fill(poseStack, x, y, x + width, y + 1, borderColor);
+        fill(poseStack, x, y + height - 1, x + width, y + height, borderColor);
+        fill(poseStack, x, y, x + 1, y + height, borderColor);
+        fill(poseStack, x + width - 1, y, x + width, y + height, borderColor);
+        fill(poseStack, x, y + headerAreaHeight + 1, x + width, y + headerAreaHeight + 2, borderColor);
 
-        // Render scrollbar after disabling scissor so it is not clipped
         double maxScrollForBar = getMaxScroll();
         if (maxScrollForBar > 0) {
-            int scrollbarX = x + width - CustomScrollbarRenderer.getScrollbarWidth() - 4; // 4px from edge
+            int scrollbarX = x + width - CustomScrollbarRenderer.getScrollbarWidth() - 4;
             int scrollbarY = y + headerAreaHeight + GRID_PADDING_TOP;
             int scrollbarHeight = height - headerAreaHeight - GRID_PADDING_TOP - bottomMargin;
 
@@ -284,9 +278,8 @@ public class ExistingItemsWidget extends AbstractWidget {
                 continue;
             }
 
-            // Calculate centering offset matching ItemSelectionWidget
             int totalRowWidth = itemsPerRow * (ITEM_SIZE + ITEM_SPACING) - ITEM_SPACING;
-            int availableAreaWidth = width - 21; // Same as in calculateItemsPerRow
+            int availableAreaWidth = width - 21;
             int startXOffset = Math.max(0, (availableAreaWidth - totalRowWidth) / 2);
 
             for (int col = 0; col < itemsPerRow; col++) {
@@ -369,12 +362,11 @@ public class ExistingItemsWidget extends AbstractWidget {
 
         double maxScroll = getMaxScroll();
         if (maxScroll > 0) {
-            int scrollbarX = x + width - CustomScrollbarRenderer.getScrollbarWidth() - 4; // 4px from edge
+            int scrollbarX = x + width - CustomScrollbarRenderer.getScrollbarWidth() - 4;
             int scrollbarY = y + headerAreaHeight + GRID_PADDING_TOP;
             int bottomMargin = 10;
             int scrollbarHeight = height - headerAreaHeight - GRID_PADDING_TOP - bottomMargin;
 
-            // Content area for dragging (same as grid items area)
             int contentX = x + 5;
             int contentY = y + headerAreaHeight + GRID_PADDING_TOP;
             int contentWidth = width - 21;
@@ -400,14 +392,12 @@ public class ExistingItemsWidget extends AbstractWidget {
         for (int row = startRow; row < endRow; row++) {
             int rowY = itemY_fixed + (row - startRow) * (ITEM_SIZE + ITEM_SPACING);
 
-            // Updated visibility check matching renderButton
             if (rowY + ITEM_SIZE < y + headerAreaHeight || rowY > y + height - 10) {
                 continue;
             }
 
-            // Calculate centering offset matching ItemSelectionWidget
             int totalRowWidth = itemsPerRow * (ITEM_SIZE + ITEM_SPACING) - ITEM_SPACING;
-            int availableAreaWidth = width - 21; // Same as in calculateItemsPerRow
+            int availableAreaWidth = width - 21;
             int startXOffset = Math.max(0, (availableAreaWidth - totalRowWidth) / 2);
 
             for (int col = 0; col < itemsPerRow; col++) {

@@ -49,10 +49,8 @@ public class StrawBedBlock extends BedBlock {
                 BlockPos headPos = state.getValue(PART) == BedPart.HEAD ? pos : pos.relative(state.getValue(FACING));
                 BlockPos footPos = state.getValue(PART) == BedPart.HEAD ? pos.relative(state.getValue(FACING).getOpposite()) : pos;
 
-                // Destroy the head block and drop items
                 level.destroyBlock(headPos, true);
 
-                // Remove the foot block without dropping items (to avoid duplicate drops)
                 if (level.getBlockState(footPos).is(this)) {
                     level.removeBlock(footPos, false);
                 }

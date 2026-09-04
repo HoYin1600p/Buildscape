@@ -4,9 +4,6 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
-/**
- * Data holder for mob variant states parsed from spawn egg names.
- */
 public class MobState {
 
     public final Set<String> parsedStates = new HashSet<>();

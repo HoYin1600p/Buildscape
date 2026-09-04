@@ -32,20 +32,18 @@ public class WanderingHomemakerModel<T extends net.minecraft.world.entity.npc.Wa
         MeshDefinition meshdefinition = new MeshDefinition();
         PartDefinition partdefinition = meshdefinition.getRoot();
 
-        // 1. Body and its children (head, arms, backpack, spyglass)
         PartDefinition bodyDef = partdefinition.addOrReplaceChild("body", CubeListBuilder.create()
-                .texOffs(32, 45).addBox(-4.0F, 0.0F, -3.0F, 8.0F, 12.0F, 6.0F) // body upper
-                .texOffs(0, 11).addBox(-4.0F, 0.0F, -3.0F, 8.0F, 18.0F, 6.0F, new CubeDeformation(0.5F))  // body lower / robe
-                .texOffs(28, 11).addBox(-6.0F, 4.5F, 3.25F, 12.0F, 10.0F, 6.0F) // backpack main
-                .texOffs(0, 0).addBox(-7.0F, 0.5F, 3.25F, 14.0F, 4.0F, 7.0F)     // backpack top
-                .texOffs(66, 0).addBox(-8.0F, 4.5F, 4.75F, 2.0F, 8.0F, 2.0F, new CubeDeformation(0.5F))    // spyglass body
-                .texOffs(22, 13).addBox(-8.0F, 12.0F, 4.75F, 2.0F, 1.0F, 2.0F, new CubeDeformation(0.6F))  // spyglass lens
+                .texOffs(32, 45).addBox(-4.0F, 0.0F, -3.0F, 8.0F, 12.0F, 6.0F)
+                .texOffs(0, 11).addBox(-4.0F, 0.0F, -3.0F, 8.0F, 18.0F, 6.0F, new CubeDeformation(0.5F))
+                .texOffs(28, 11).addBox(-6.0F, 4.5F, 3.25F, 12.0F, 10.0F, 6.0F)
+                .texOffs(0, 0).addBox(-7.0F, 0.5F, 3.25F, 14.0F, 4.0F, 7.0F)
+                .texOffs(66, 0).addBox(-8.0F, 4.5F, 4.75F, 2.0F, 8.0F, 2.0F, new CubeDeformation(0.5F))
+                .texOffs(22, 13).addBox(-8.0F, 12.0F, 4.75F, 2.0F, 1.0F, 2.0F, new CubeDeformation(0.6F))
                 , PartPose.offset(0.0F, 0.0F, 0.0F));
 
-        // 2. Head and its children (nose, hat, brim/cube)
         PartDefinition headDef = bodyDef.addOrReplaceChild("head", CubeListBuilder.create()
-                .texOffs(28, 27).addBox(-4.0F, -10.0F, -4.0F, 8.0F, 10.0F, 8.0F) // head
-                .texOffs(0, 45).addBox(-4.0F, -8.0F, -4.0F, 8.0F, 8.0F, 8.0F, new CubeDeformation(0.55F)) // hat
+                .texOffs(28, 27).addBox(-4.0F, -10.0F, -4.0F, 8.0F, 10.0F, 8.0F)
+                .texOffs(0, 45).addBox(-4.0F, -8.0F, -4.0F, 8.0F, 8.0F, 8.0F, new CubeDeformation(0.55F))
                 , PartPose.offset(0.0F, 0.0F, 0.0F));
 
         headDef.addOrReplaceChild("nose", CubeListBuilder.create()
@@ -56,14 +54,12 @@ public class WanderingHomemakerModel<T extends net.minecraft.world.entity.npc.Wa
                 .texOffs(0, 35).addBox(-4.0F, -2.0F, -4.25F, 8.0F, 3.0F, 6.0F)
                 , PartPose.offsetAndRotation(0.0F, 0.1534F, -2.4870F, 0.6981F, 0.0F, 0.0F));
 
-        // 3. Arms (child of body)
         bodyDef.addOrReplaceChild("arms", CubeListBuilder.create()
-                .texOffs(42, 0).addBox(-4.0F, 2.0F, -2.0F, 8.0F, 4.0F, 4.0F)     // arms center
-                .texOffs(60, 43).addBox(4.0F, -2.0F, -2.0F, 4.0F, 8.0F, 4.0F)     // right arm
-                .texOffs(60, 43).addBox(-8.0F, -2.0F, -2.0F, 4.0F, 8.0F, 4.0F)    // left arm
+                .texOffs(42, 0).addBox(-4.0F, 2.0F, -2.0F, 8.0F, 4.0F, 4.0F)
+                .texOffs(60, 43).addBox(4.0F, -2.0F, -2.0F, 4.0F, 8.0F, 4.0F)
+                .texOffs(60, 43).addBox(-8.0F, -2.0F, -2.0F, 4.0F, 8.0F, 4.0F)
                 , PartPose.offsetAndRotation(0.0F, 3.0F, -1.0F, -0.75F, 0.0F, 0.0F));
 
-        // 4. Legs (root children)
         partdefinition.addOrReplaceChild("leg0", CubeListBuilder.create()
                 .texOffs(60, 27).addBox(-2.0F, 0.0F, -2.0F, 4.0F, 12.0F, 4.0F)
                 , PartPose.offset(2.0F, 12.0F, 0.0F));

@@ -83,7 +83,6 @@ public class GlassJarBlockEntityRenderer implements BlockEntityRenderer<GlassJar
             poseStack.translate(-0.5D, 0.0D, -0.5D);
         }
 
-        // 1. Render the jar block model itself (animated with wobble)
         BakedModel jarModel = blockRenderer.getBlockModel(blockState);
         RenderType jarRenderType = ItemBlockRenderTypes.getRenderType(blockState, true);
         blockRenderer.getModelRenderer().renderModel(
@@ -96,11 +95,9 @@ public class GlassJarBlockEntityRenderer implements BlockEntityRenderer<GlassJar
                 combinedOverlay,
                 EmptyModelData.INSTANCE);
 
-        // 2. Render stored liquid if present
         if (blockEntity.hasLiquid()) {
             renderLiquid(blockEntity, poseStack, bufferSource, light, combinedOverlay);
         }
-        // 3. Render stored food items if present
         else if (!blockEntity.isEmpty()) {
             ItemStack storedItem = blockEntity.getStoredItem();
             if (storedItem != null && !storedItem.isEmpty()) {
@@ -229,31 +226,26 @@ public class GlassJarBlockEntityRenderer implements BlockEntityRenderer<GlassJar
 
         Matrix4f matrix = poseStack.last().pose();
 
-        // Top face
         addVertex(matrix, buffer, x1, y2, z1, r, g, b, a, u0, v0, light, overlay, 0, 1, 0);
         addVertex(matrix, buffer, x1, y2, z2, r, g, b, a, u0, v1, light, overlay, 0, 1, 0);
         addVertex(matrix, buffer, x2, y2, z2, r, g, b, a, u1, v1, light, overlay, 0, 1, 0);
         addVertex(matrix, buffer, x2, y2, z1, r, g, b, a, u1, v0, light, overlay, 0, 1, 0);
 
-        // North face
         addVertex(matrix, buffer, x1, y2, z1, r, g, b, a, u0, v0, light, overlay, 0, 0, -1);
         addVertex(matrix, buffer, x2, y2, z1, r, g, b, a, u1, v0, light, overlay, 0, 0, -1);
         addVertex(matrix, buffer, x2, y1, z1, r, g, b, a, u1, v1, light, overlay, 0, 0, -1);
         addVertex(matrix, buffer, x1, y1, z1, r, g, b, a, u0, v1, light, overlay, 0, 0, -1);
 
-        // South face
         addVertex(matrix, buffer, x1, y1, z2, r, g, b, a, u0, v1, light, overlay, 0, 0, 1);
         addVertex(matrix, buffer, x2, y1, z2, r, g, b, a, u1, v1, light, overlay, 0, 0, 1);
         addVertex(matrix, buffer, x2, y2, z2, r, g, b, a, u1, v0, light, overlay, 0, 0, 1);
         addVertex(matrix, buffer, x1, y2, z2, r, g, b, a, u0, v0, light, overlay, 0, 0, 1);
 
-        // West face
         addVertex(matrix, buffer, x1, y1, z1, r, g, b, a, u0, v1, light, overlay, -1, 0, 0);
         addVertex(matrix, buffer, x1, y1, z2, r, g, b, a, u1, v1, light, overlay, -1, 0, 0);
         addVertex(matrix, buffer, x1, y2, z2, r, g, b, a, u1, v0, light, overlay, -1, 0, 0);
         addVertex(matrix, buffer, x1, y2, z1, r, g, b, a, u0, v0, light, overlay, -1, 0, 0);
 
-        // East face
         addVertex(matrix, buffer, x2, y2, z1, r, g, b, a, u0, v0, light, overlay, 1, 0, 0);
         addVertex(matrix, buffer, x2, y2, z2, r, g, b, a, u1, v0, light, overlay, 1, 0, 0);
         addVertex(matrix, buffer, x2, y1, z2, r, g, b, a, u1, v1, light, overlay, 1, 0, 0);

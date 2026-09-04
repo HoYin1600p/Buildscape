@@ -17,10 +17,6 @@ import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
-/**
- * Handles applying and removing cosmetic frames on signs.
- * Prioritizes normal sign behavior; only intercepts when applying or removing a frame.
- */
 @Mod.EventBusSubscriber(modid = BuildScape.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class SignFrameInteractionHandler {
 
@@ -44,7 +40,6 @@ public class SignFrameInteractionHandler {
                 || heldItem.is(net.minecraft.world.item.Items.SHEARS);
         boolean signHasFrame = SignFrameAttachment.hasFrame(sign);
 
-        // CASE 1: REMOVING THE FRAME (Right-Click a framed sign with Shears)
         if (isShears && signHasFrame) {
             event.setCanceled(true);
             event.setCancellationResult(InteractionResult.sidedSuccess(level.isClientSide()));
@@ -69,7 +64,6 @@ public class SignFrameInteractionHandler {
             return;
         }
 
-        // CASE 2: APPLYING THE STRINGLIGHT FRAME (Right-Click with Stringlight Frame item)
         if (heldItem.is(ModItems.STRINGLIGHT_FRAME.get())) {
             if (!signHasFrame) {
                 event.setCanceled(true);
@@ -88,13 +82,11 @@ public class SignFrameInteractionHandler {
                 player.swing(hand);
                 return;
             } else {
-                // Sign already has a frame attached; prevent applying a second frame
                 event.setCanceled(true);
                 event.setCancellationResult(InteractionResult.FAIL);
                 return;
             }
         }
 
-        // CASE 3: Normal sign interaction (editing, dye, glow ink, commands, etc.) - do not intercept!
     }
 }

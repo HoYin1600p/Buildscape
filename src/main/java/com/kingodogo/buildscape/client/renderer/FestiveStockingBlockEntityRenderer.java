@@ -165,4 +165,3 @@ public class FestiveStockingBlockEntityRenderer
         poseStack.popPose();
     }
 }
-// Kingodogo Finished this File on 2025-12-10 20-50-05

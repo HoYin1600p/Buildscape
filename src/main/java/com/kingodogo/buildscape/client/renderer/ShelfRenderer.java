@@ -31,7 +31,6 @@ import java.util.WeakHashMap;
 
 public class ShelfRenderer implements BlockEntityRenderer<ShelfBlockEntity> {
 
-    /** Vanilla ShelfRenderer.ITEM_SIZE. */
     private static final float ITEM_SIZE = 0.25F;
     private static final float ALIGN_ITEMS_TO_BOTTOM = -0.25F;
     private static final float SLOT_SPACING = 0.3125F;
@@ -134,7 +133,6 @@ public class ShelfRenderer implements BlockEntityRenderer<ShelfBlockEntity> {
             this.itemRenderer.renderStatic(stack, ItemTransforms.TransformType.NONE, LightTexture.FULL_BRIGHT,
                     OverlayTexture.NO_OVERLAY, new PoseStack(), collector, seed);
         } catch (Exception exception) {
-            // A model that refuses to render off-screen is not worth crashing the world over.
         }
 
         float[] bounds = collector.result();

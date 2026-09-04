@@ -27,7 +27,6 @@ public class ModStats {
     public static final ResourceLocation BOLTS_PLACED = new ResourceLocation(BuildScape.MODID, "bolts_placed");
     public static final ResourceLocation CONFETTI_USED = new ResourceLocation(BuildScape.MODID, "confetti_used");
 
-    // Header category marker stats
     public static final ResourceLocation HEADER_MINECRAFT = new ResourceLocation(BuildScape.MODID, "header_minecraft");
     public static final ResourceLocation HEADER_BUILDSCAPE = new ResourceLocation(BuildScape.MODID, "header_buildscape");
     public static final ResourceLocation HEADER_OTHER = new ResourceLocation(BuildScape.MODID, "header_other");

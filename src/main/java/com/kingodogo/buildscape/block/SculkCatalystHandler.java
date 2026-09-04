@@ -25,14 +25,12 @@ public class SculkCatalystHandler {
         if (catalystState.hasProperty(SculkCatalystBlock.BLOOM)) {
             level.setBlock(catalystPos, catalystState.setValue(SculkCatalystBlock.BLOOM, true), 3);
             if (level instanceof ServerLevel serverLevel) {
-                serverLevel.scheduleTick(catalystPos, catalystState.getBlock(), 40); // Bloom for 2s
+                serverLevel.scheduleTick(catalystPos, catalystState.getBlock(), 40);
             }
         }
 
-        // Play sounds
         level.playSound(null, catalystPos, SoundEvents.SOUL_ESCAPE, SoundSource.BLOCKS, 1.0F, 1.0F);
 
-        // Particle bloom effect
         if (level instanceof ServerLevel serverLevel) {
             serverLevel.sendParticles(ParticleTypes.SOUL_FIRE_FLAME,
                     catalystPos.getX() + 0.5, catalystPos.getY() + 1.1, catalystPos.getZ() + 0.5,
@@ -43,7 +41,6 @@ public class SculkCatalystHandler {
                     15, 0.4, 0.4, 0.4, 0.02);
         }
 
-        // Spread Sculk in radius 4-5 around death pos
         Random rand = level.getRandom();
         int spreadRadius = 4;
         for (BlockPos targetPos : BlockPos.betweenClosed(deathPos.offset(-spreadRadius, -2, -spreadRadius), deathPos.offset(spreadRadius, 2, spreadRadius))) {
@@ -52,12 +49,10 @@ public class SculkCatalystHandler {
             BlockState targetState = level.getBlockState(targetPos);
             Block targetBlock = targetState.getBlock();
 
-            // Convert natural solid blocks to Sculk
             if (isConvertibleToSculk(targetBlock)) {
-                if (rand.nextFloat() < 0.65F) { // 65% spread chance per block in radius
+                if (rand.nextFloat() < 0.65F) {
                     level.setBlock(targetPos, ModBlocks.SCULK.get().defaultBlockState(), 3);
 
-                    // Chance to spawn shrieker, sensor, or sculk vein attached to surrounding solid faces
                     float rareRoll = rand.nextFloat();
                     BlockPos abovePos = targetPos.above();
                     if (level.isEmptyBlock(abovePos)) {
@@ -70,7 +65,6 @@ public class SculkCatalystHandler {
                         }
                     }
 
-                    // Also try placing sculk veins on adjacent open faces around the converted sculk block
                     for (Direction dir : Direction.values()) {
                         if (rand.nextFloat() < 0.25F) {
                             BlockPos adjPos = targetPos.relative(dir);
@@ -101,7 +95,6 @@ public class SculkCatalystHandler {
             BlockPos neighborPos = pos.relative(dir);
             BlockState neighborState = level.getBlockState(neighborPos);
 
-            // Attach vein face ONLY if the neighbor in that direction is a sturdy solid face
             if (neighborState.isFaceSturdy(level, neighborPos, dir.getOpposite())) {
                 veinState = veinState.setValue(faceProp, true);
                 placedAnyFace = true;

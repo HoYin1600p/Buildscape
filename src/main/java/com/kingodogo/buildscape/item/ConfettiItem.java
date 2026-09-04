@@ -28,7 +28,6 @@ public class ConfettiItem extends Item {
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         ItemStack itemstack = player.getItemInHand(hand);
 
-        // Play sounds and spawn particles on server-side
         if (!level.isClientSide) {
             level.playSound(null, player.getX(), player.getY(), player.getZ(),
                 SoundEvents.FIREWORK_ROCKET_BLAST, SoundSource.PLAYERS, 0.8F, 1.4F);
@@ -60,7 +59,6 @@ public class ConfettiItem extends Item {
             burstLevel = Math.min(5, Math.max(1, stack.getTag().getInt("BurstLevel")));
         }
 
-        // Explosive burst scaled by burstLevel
         int particleCount = (75 + level.random.nextInt(46)) * burstLevel;
         double speedMultiplier = 1.0 + (burstLevel - 1) * 0.2D;
         double spreadMultiplier = 1.0 + (burstLevel - 1) * 0.1D;

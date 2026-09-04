@@ -25,12 +25,10 @@ public class BottleOfMistItem extends Item {
         ItemStack stack = player.getItemInHand(hand);
 
         if (level.isClientSide) {
-            // Spawn a burst of cascade particles that last ~2 seconds (40 ticks)
             double px = player.getX();
             double py = player.getEyeY();
             double pz = player.getZ();
 
-            // Look direction for forward offset
             net.minecraft.world.phys.Vec3 look = player.getLookAngle();
             double cx = px + look.x * 2.0;
             double cy = py + look.y * 2.0;

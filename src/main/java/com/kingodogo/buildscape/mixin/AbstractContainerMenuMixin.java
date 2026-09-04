@@ -77,13 +77,11 @@ public abstract class AbstractContainerMenuMixin {
                                     int outputMultiplier = resultPrototype.getCount();
                                     int toConsume = totalInputCount;
 
-                                    // 1. Consume from input slot first
                                     int fromInput = Math.min(toConsume, inputStack.getCount());
                                     inputStack.shrink(fromInput);
                                     menu.getSlot(0).set(inputStack);
                                     toConsume -= fromInput;
 
-                                    // 2. Consume from player inventory
                                     for (int slotIdx : playerInvSlots) {
                                         if (toConsume <= 0) break;
                                         ItemStack invStack = player.getInventory().getItem(slotIdx);
@@ -98,7 +96,6 @@ public abstract class AbstractContainerMenuMixin {
                                     int maxStackSize = resultPrototype.getMaxStackSize();
                                     int remainingOutput = totalOutput;
 
-                                    // 3. Give output stacks to the player
                                     while (remainingOutput > 0) {
                                         int toGive = Math.min(remainingOutput, maxStackSize);
                                         ItemStack outputStack = resultPrototype.copy();
@@ -109,13 +106,10 @@ public abstract class AbstractContainerMenuMixin {
                                         remainingOutput -= toGive;
                                     }
 
-                                    // 4. Award recipe
                                     player.awardRecipes(java.util.Collections.singleton(recipe));
 
-                                    // 5. Refresh the recipe list
                                     ((StonecutterMenuAccessor) menu).callSetupRecipeList(menu.container, menu.getSlot(0).getItem());
 
-                                    // 6. Broadcast changes to container
                                     menu.broadcastChanges();
                                 }
                             }
@@ -134,7 +128,6 @@ public abstract class AbstractContainerMenuMixin {
     }
 
     private static void moveToFilteredSlots(AbstractContainerMenu menu, GhostFilterMenu filters, ItemStack source) {
-        // Pass 0: Stack into non-empty slots with matching filter
         for (int i = 0; i < filters.buildscape$getFilterSlotCount() && !source.isEmpty(); i++) {
             Item filter = filters.buildscape$getFilterItem(i);
             if (filter != null && source.getItem() == filter) {
@@ -144,7 +137,6 @@ public abstract class AbstractContainerMenuMixin {
                 }
             }
         }
-        // Pass 1: Stack into non-empty unfiltered slots
         for (int i = 0; i < filters.buildscape$getFilterSlotCount() && !source.isEmpty(); i++) {
             Item filter = filters.buildscape$getFilterItem(i);
             if (filter == null) {
@@ -154,7 +146,6 @@ public abstract class AbstractContainerMenuMixin {
                 }
             }
         }
-        // Pass 2: Insert into empty slots with matching filter
         for (int i = 0; i < filters.buildscape$getFilterSlotCount() && !source.isEmpty(); i++) {
             Item filter = filters.buildscape$getFilterItem(i);
             if (filter != null && source.getItem() == filter) {
@@ -164,7 +155,6 @@ public abstract class AbstractContainerMenuMixin {
                 }
             }
         }
-        // Pass 3: Insert into empty unfiltered slots
         for (int i = 0; i < filters.buildscape$getFilterSlotCount() && !source.isEmpty(); i++) {
             Item filter = filters.buildscape$getFilterItem(i);
             if (filter == null) {

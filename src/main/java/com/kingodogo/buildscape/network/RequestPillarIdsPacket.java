@@ -8,17 +8,12 @@ import net.minecraftforge.network.NetworkEvent;
 import java.util.List;
 import java.util.function.Supplier;
 
-/**
- * Sent from client to server to request a fresh sync of pillar IDs.
- * This ensures the GUI always has the latest data when opened.
- */
 public class RequestPillarIdsPacket {
 
     public RequestPillarIdsPacket() {
     }
 
     public RequestPillarIdsPacket(FriendlyByteBuf buf) {
-        // No data needed
     }
 
     public static RequestPillarIdsPacket decode(FriendlyByteBuf buf) {
@@ -26,7 +21,6 @@ public class RequestPillarIdsPacket {
     }
 
     public void encode(FriendlyByteBuf buf) {
-        // No data needed
     }
 
     public void handle(Supplier<NetworkEvent.Context> ctx) {
@@ -36,21 +30,17 @@ public class RequestPillarIdsPacket {
                 return;
             }
 
-            // Get pillar data from server and send it to the requesting client
             PillarIdManager manager = PillarIdManager.get();
 
-            // Ensure manager is loaded
             if (!manager.hasLoaded()) {
                 manager.load();
             }
 
-            // Sync colors from NBT before sending to ensure freshest data
             net.minecraft.server.MinecraftServer server = player.getServer();
             if (server != null && server.isRunning()) {
                 manager.syncColorsFromNBTToManager(server);
             }
 
-            // Get all pillar data and send to client
             List<PillarIdManager.PillarData> pillarDataList = manager.getAllPillarDataForSync();
 
             SyncPillarIdsPacket syncPacket = new SyncPillarIdsPacket(pillarDataList);

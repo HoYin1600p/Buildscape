@@ -15,7 +15,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class WanderingHomemakerEntity extends WanderingTrader {
-    private int despawnDelay = 48000; // 40 minutes in ticks
+    private int despawnDelay = 48000;
 
     public WanderingHomemakerEntity(EntityType<? extends WanderingTrader> type, Level level) {
         super(type, level);
@@ -89,7 +89,6 @@ public class WanderingHomemakerEntity extends WanderingTrader {
         list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.WILDFLOWERS.get(), 4), 6, 1, 0.05f));
         list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.LEAF_LITTER.get(), 4), 6, 1, 0.05f));
 
-        // New Vegetation/Flora trades
         list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.DRY_GRASS.get(), 6), 8, 1, 0.05f));
         list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.TALL_DRY_GRASS.get(), 6), 8, 1, 0.05f));
         list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.BUSH.get(), 6), 8, 1, 0.05f));
@@ -99,23 +98,17 @@ public class WanderingHomemakerEntity extends WanderingTrader {
         list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.OPEN_EYEBLOSSOM.get(), 6), 8, 1, 0.05f));
         list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.CLOSED_EYEBLOSSOM.get(), 6), 8, 1, 0.05f));
 
-        // Sculk Catalyst trade
         list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.SCULK_CATALYST.get(), 2), 3, 1, 0.05f));
 
-        // Muff Block trade
         list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.MUFF_BLOCK.get(), 2), 4, 1, 0.05f));
 
-        // Mist Bottle trade
         list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.BOTTLE_OF_MIST.get(), 16), 4, 1, 0.05f));
 
-        // Confetti trade
         list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.CONFETTI_ITEM.get(), 32), 6, 1, 0.05f));
 
-        // Resin Clump & Resin Block trades
         list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.RESIN_CLUMP.get(), 16), 8, 1, 0.05f));
         list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.RESIN_BLOCK.get(), 16), 8, 1, 0.05f));
 
-        // Creaking Heart trade
         list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.CREAKING_HEART.get(), 2), 2, 1, 0.05f));
 
         Collections.shuffle(list, this.random);
@@ -123,7 +116,6 @@ public class WanderingHomemakerEntity extends WanderingTrader {
             offers.add(list.get(j));
         }
 
-        // Rare trade: 1 in 5000 chance to offer 1 scroll for 12 diamonds
         if (this.random.nextInt(5000) == 0) {
             offers.add(new MerchantOffer(new ItemStack(Items.DIAMOND, 12), new ItemStack(ModItems.ANCIENT_ASHEN_SCROLL.get(), 1), 1, 1, 0.0f));
         }

@@ -5,7 +5,7 @@ import net.minecraft.network.chat.Component;
 
 public class ConfigCategoryButton extends Button {
     private boolean active = false;
-    private float customTextScale = 1.0f; // Default scale
+    private float customTextScale = 1.0f;
 
     public ConfigCategoryButton(int x, int y, int width, int height, Component message, OnPress onPress) {
         super(x, y, width, height, message, onPress);
@@ -24,16 +24,12 @@ public class ConfigCategoryButton extends Button {
         net.minecraft.client.Minecraft mc = net.minecraft.client.Minecraft.getInstance();
         boolean hovered = mouseX >= this.x && mouseY >= this.y && mouseX < this.x + this.width && mouseY < this.y + this.height;
 
-        // Draw background with depth
         int bgColor = active ? 0xFF1E5B3D : (hovered ? 0xFF3D3D3D : 0xFF2D2D2D);
         int borderColor = active ? 0xFF50FF8A : (hovered ? 0xFF808080 : 0xFF404040);
 
-        // Border
         fill(poseStack, x, y, x + width, y + height, borderColor);
-        // Inner background
         fill(poseStack, x + 1, y + 1, x + width - 1, y + height - 1, bgColor);
 
-        // Glossy effect if active
         if (active) {
             fill(poseStack, x + 1, y + 1, x + width - 1, y + 2, 0x40FFFFFF);
         }
@@ -46,11 +42,9 @@ public class ConfigCategoryButton extends Button {
         int borderPadding = com.kingodogo.buildscape.client.screen.BuildScapeConfigScreen.scaleSize(6);
         int availableWidth = width - borderPadding * 2;
 
-        // Use the custom scale set by the parent screen
         float finalScale = this.customTextScale;
         int textWidth = mc.font.width(buttonText);
 
-        // Only truncate if it STILL doesn't fit (shouldn't happen with correct parent logic)
         if (textWidth * finalScale > availableWidth) {
             int truncatedWidth = (int) ((availableWidth) / finalScale) - mc.font.width("...");
             if (truncatedWidth > 0) {
@@ -60,7 +54,6 @@ public class ConfigCategoryButton extends Button {
         }
 
         poseStack.pushPose();
-        // Vertically center based on the scaled height
         float scaledHeight = 8 * finalScale;
         poseStack.translate(x + borderPadding, y + (height - scaledHeight) / 2.0f, 0);
         poseStack.scale(finalScale, finalScale, 1.0f);

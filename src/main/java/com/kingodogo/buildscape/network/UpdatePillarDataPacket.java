@@ -47,21 +47,16 @@ public class UpdatePillarDataPacket {
     public UpdatePillarDataPacket(FriendlyByteBuf buf) {
         this.pillarId = buf.readUtf();
 
-        // Read nullable pattern
         this.pattern = buf.readBoolean() ? buf.readUtf() : null;
 
-        // Read nullable boolean
         this.usePattern = buf.readBoolean() ? buf.readBoolean() : null;
 
-        // Read nullable doubles
         this.patternSpeed = buf.readBoolean() ? buf.readDouble() : null;
         this.patternSpread = buf.readBoolean() ? buf.readDouble() : null;
         this.patternIntensity = buf.readBoolean() ? buf.readDouble() : null;
 
-        // Read nullable integer
         this.maxParticleColor = buf.readBoolean() ? buf.readInt() : null;
 
-        // Read color list
         int colorCount = buf.readInt();
         this.dyeColors = new ArrayList<>();
         for (int i = 0; i < colorCount; i++) {
@@ -76,19 +71,16 @@ public class UpdatePillarDataPacket {
     public void encode(FriendlyByteBuf buf) {
         buf.writeUtf(pillarId);
 
-        // Write nullable pattern
         buf.writeBoolean(pattern != null);
         if (pattern != null) {
             buf.writeUtf(pattern);
         }
 
-        // Write nullable boolean
         buf.writeBoolean(usePattern != null);
         if (usePattern != null) {
             buf.writeBoolean(usePattern);
         }
 
-        // Write nullable doubles
         buf.writeBoolean(patternSpeed != null);
         if (patternSpeed != null) {
             buf.writeDouble(patternSpeed);
@@ -104,13 +96,11 @@ public class UpdatePillarDataPacket {
             buf.writeDouble(patternIntensity);
         }
 
-        // Write nullable integer
         buf.writeBoolean(maxParticleColor != null);
         if (maxParticleColor != null) {
             buf.writeInt(maxParticleColor);
         }
 
-        // Write color list
         buf.writeInt(dyeColors.size());
         for (String color : dyeColors) {
             buf.writeUtf(color);
@@ -129,7 +119,6 @@ public class UpdatePillarDataPacket {
                 return;
             }
 
-            // Update the pillar data in the manager
             boolean changed = false;
 
             if (pattern != null && !pattern.equals(data.pattern)) {
@@ -171,7 +160,6 @@ public class UpdatePillarDataPacket {
                 data.modifiedTime = System.currentTimeMillis();
                 manager.saveImmediate();
 
-                // Update the block entity NBT
                 updateBlockEntity(player.server, data);
             }
         });
@@ -183,7 +171,6 @@ public class UpdatePillarDataPacket {
             return;
         }
 
-        // Find the level for this pillar's dimension
         for (ServerLevel level : server.getAllLevels()) {
             if (level == null) continue;
 
@@ -203,7 +190,6 @@ public class UpdatePillarDataPacket {
                 continue;
             }
 
-            // Find the bottom of the stack
             BlockPos bottomPos = pillarBE.findStackBottom();
             BlockEntity bottomBE = level.getBlockEntity(bottomPos);
 
@@ -211,10 +197,8 @@ public class UpdatePillarDataPacket {
                 continue;
             }
 
-            // Update NBT with settings from manager
             boolean needsUpdate = false;
 
-            // Update pattern
             if (data.pattern != null && !data.pattern.isEmpty()) {
                 if (bottomPillarBE.getParticlePattern() == null ||
                         !bottomPillarBE.getParticlePattern().equals(data.pattern)) {
@@ -223,7 +207,6 @@ public class UpdatePillarDataPacket {
                 }
             }
 
-            // Update pattern speed
             if (data.pattern_speed != null) {
                 if (bottomPillarBE.getPatternSpeed() == null ||
                         !bottomPillarBE.getPatternSpeed().equals(data.pattern_speed)) {
@@ -232,7 +215,6 @@ public class UpdatePillarDataPacket {
                 }
             }
 
-            // Update pattern spread
             if (data.pattern_spread != null) {
                 if (bottomPillarBE.getPatternSpread() == null ||
                         !bottomPillarBE.getPatternSpread().equals(data.pattern_spread)) {
@@ -241,7 +223,6 @@ public class UpdatePillarDataPacket {
                 }
             }
 
-            // Update pattern intensity
             if (data.pattern_intensity != null) {
                 if (bottomPillarBE.getPatternIntensity() == null ||
                         !bottomPillarBE.getPatternIntensity().equals(data.pattern_intensity)) {
@@ -250,7 +231,6 @@ public class UpdatePillarDataPacket {
                 }
             }
 
-            // Update use_pattern toggle
             if (data.use_pattern != null) {
                 if (bottomPillarBE.getUsePattern() == null ||
                         !bottomPillarBE.getUsePattern().equals(data.use_pattern)) {
@@ -259,7 +239,6 @@ public class UpdatePillarDataPacket {
                 }
             }
 
-            // Update max particle color
             if (data.max_particle_color != null) {
                 if (bottomPillarBE.getMaxParticleColor() == null ||
                         !bottomPillarBE.getMaxParticleColor().equals(data.max_particle_color)) {
@@ -268,7 +247,6 @@ public class UpdatePillarDataPacket {
                 }
             }
 
-            // Update colors
             if (data.dyeColors != null) {
                 bottomPillarBE.setParticleColors(new ArrayList<>(data.dyeColors));
                 needsUpdate = true;

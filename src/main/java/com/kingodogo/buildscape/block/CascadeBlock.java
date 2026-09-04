@@ -103,10 +103,8 @@ public class CascadeBlock extends Block implements EntityBlock, SimpleWaterlogge
             InteractionHand hand, BlockHitResult hit) {
         ItemStack heldItem = player.getItemInHand(hand);
 
-        // Glass bottle on cascade block -> collect mist, replace with no-mist variant
         if (heldItem.is(Items.GLASS_BOTTLE)) {
             if (!level.isClientSide) {
-                // Preserve waterlogged property when replacing the block
                 BlockState nextState = ModBlocks.CASCADE_BLOCK_NO_MIST.get().defaultBlockState()
                         .setValue(WATERLOGGED, state.getValue(WATERLOGGED));
                 level.setBlock(pos, nextState, 3);
@@ -124,7 +122,6 @@ public class CascadeBlock extends Block implements EntityBlock, SimpleWaterlogge
             return InteractionResult.sidedSuccess(level.isClientSide);
         }
 
-        // Empty hand -> tune cascade particle density (20%, 40%, 60%, 80%, 100%)
         if (heldItem.isEmpty()) {
             if (level.getBlockEntity(pos) instanceof CascadeBlockEntity be) {
                 if (!level.isClientSide) {

@@ -16,10 +16,6 @@ import java.util.function.BiConsumer;
 
 @Mixin(TrunkPlacer.class)
 public class FeatureMixin {
-    /**
-     * Prevents tree features from replacing Composter planters with dirt
-     * when a tree grows on top of or near a planter block.
-     */
     @Inject(method = "setDirtAt", at = @At("HEAD"), cancellable = true)
     private static void onSetDirtAt(
             LevelSimulatedReader level,

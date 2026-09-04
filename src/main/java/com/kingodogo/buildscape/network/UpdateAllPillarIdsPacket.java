@@ -64,13 +64,11 @@ public class UpdateAllPillarIdsPacket {
             manager.replaceAllPillarData(newMap);
             manager.saveImmediate();
 
-            // Optionally broadcast to all players so their GUIs stay in sync
             ModMessages.INSTANCE.send(
                     net.minecraftforge.network.PacketDistributor.ALL.noArg(),
                     new SyncPillarIdsPacket(new ArrayList<>(newMap.values()))
             );
 
-            // Force sync pillars in the world
             manager.syncAllLoadedPillars(player.getServer());
         });
         ctx.get().setPacketHandled(true);

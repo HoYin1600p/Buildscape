@@ -12,12 +12,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-/**
- * Defers only Buildscape block-state caches until the block registry bake can
- * calculate them in parallel, then returns with every cache fully initialized.
- *
- * @author hoyin1600p
- */
 public final class BuildscapeBlockStateCacheCoordinator {
     private static final List<BlockState> PENDING_STATES = new ArrayList<>();
     private static volatile Set<Block> buildscapeBlocks = Set.of();

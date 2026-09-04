@@ -20,7 +20,7 @@ public class SnowflakeParticle extends TextureSheetParticle {
         this.pickSprite(sprites);
 
         this.gravity = 0.05F;
-        this.lifetime = 200 + level.random.nextInt(200); // 10-20 seconds
+        this.lifetime = 200 + level.random.nextInt(200);
         this.hasPhysics = true;
 
         this.quadSize = 0.1F + level.random.nextFloat() * 0.1F;

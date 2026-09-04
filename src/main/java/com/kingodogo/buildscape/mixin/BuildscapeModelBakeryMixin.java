@@ -42,12 +42,6 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
 
-/**
- * Accelerates Buildscape-owned model work while leaving every other namespace
- * on the standard Minecraft and Forge model pipeline.
- *
- * @author hoyin1600p
- */
 @Mixin(ModelBakery.class)
 public abstract class BuildscapeModelBakeryMixin {
     @Unique
@@ -104,8 +98,6 @@ public abstract class BuildscapeModelBakeryMixin {
             ) {
                 String json = new String(stream.readAllBytes(), StandardCharsets.UTF_8);
 
-                // Forge geometry loaders may execute mod code while parsing. Keep those
-                // models on Forge's normal sequential path.
                 if (BUILDSCAPE_CUSTOM_LOADER.matcher(json).find()) {
                     fallbackCount.incrementAndGet();
                     return;

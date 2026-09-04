@@ -4,7 +4,6 @@ import com.kingodogo.buildscape.block.HollowPipeBlock;
 import com.kingodogo.buildscape.pipe.transport.PipeFlowState;
 import net.minecraft.world.level.block.state.BlockState;
 
-/** Shared channel heights for the pipe surface and its outlet spill. Author: HoYin1600p. */
 public final class PipeWaterSurface {
     private PipeWaterSurface() {}
 

@@ -8,12 +8,6 @@ import java.lang.reflect.Method;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-/**
- * Reads optional LaunchFaster settings without introducing a dependency on
- * that mod. Buildscape yields only when LaunchFaster owns the same operation.
- *
- * @author hoyin1600p
- */
 public final class LaunchFasterInterop {
     private static final String CONFIG_CLASS = "com.ruben.launchfaster.LaunchFasterConfig";
     private static final Set<String> REPORTED_FAILURES = ConcurrentHashMap.newKeySet();

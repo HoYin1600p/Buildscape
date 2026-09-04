@@ -12,8 +12,6 @@ public class CherryParticle extends TextureSheetParticle {
     private final SpriteSet sprites;
     private final float rotSpeed;
 
-    // Static map to store color queues for particles
-    // Key: "x,y,z" string, Value: ColorEntry
     private static final java.util.Map<String, ColorEntry> POSITION_COLOR_MAP = new java.util.concurrent.ConcurrentHashMap<>();
 
     private static class ColorEntry {
@@ -42,27 +40,17 @@ public class CherryParticle extends TextureSheetParticle {
         this.yd = ySpeed;
         this.zd = zSpeed;
 
-        // Logic to select specific texture from the 12 files
-        // 0-5: Shape 1 (6 color themes)
-        // 6-11: Shape 2 (6 color themes)
 
-        // "Change color theme on the go": Cycle through 6 themes based on time
         int totalThemes = 6;
-        // Randomly select a theme instead of time-based cycling
         int currentTheme = level.random.nextInt(totalThemes);
 
-        // "Spawn both shapes": Randomly pick Shape 1 or Shape 2 for this theme
         boolean useShape2 = level.random.nextBoolean();
         int spriteIndex = currentTheme + (useShape2 ? 6 : 0);
 
-        // Select the specific static sprite
-        // sprites.get(i, total) maps i to the sprite at that fraction of the list
         this.setSprite(sprites.get(spriteIndex, 12));
 
-        // Scale down the particle
         this.quadSize *= 0.5F;
 
-        // Color handling logic
         String positionKey = String.format("%.1f,%.1f,%.1f", x, y, z);
         String colorCode = null;
 
@@ -75,7 +63,7 @@ public class CherryParticle extends TextureSheetParticle {
             float[] color = parseColorCode(colorCode);
             this.setColor(color[0], color[1], color[2]);
         } else {
-            this.setColor(1.0F, 1.0F, 1.0F); // Default white
+            this.setColor(1.0F, 1.0F, 1.0F);
         }
 
         if (POSITION_COLOR_MAP.size() > 1000) {
@@ -118,7 +106,6 @@ public class CherryParticle extends TextureSheetParticle {
         super.tick();
         this.oRoll = this.roll;
         this.roll += this.rotSpeed;
-        // Removed setSpriteFromAge to keep the selected static texture
 
         if (this.age > this.lifetime * 0.7F) {
             float fadeProgress = (this.age - this.lifetime * 0.7F) / (this.lifetime * 0.3F);

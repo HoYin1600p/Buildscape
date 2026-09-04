@@ -48,8 +48,6 @@ public class BuildScape {
         modEventBus.addListener(this::commonSetup);
 
         com.kingodogo.buildscape.sound.ModSounds.SOUND_EVENTS.register(modEventBus);
-        // Trophy definitions add their blocks and items to these deferred registers.
-        // Initialize them before either register is attached to the mod event bus.
         com.kingodogo.buildscape.trophy.Trophies.init();
         ModBlocks.BLOCKS.register(modEventBus);
         ModItems.ITEMS.register(modEventBus);
@@ -95,10 +93,8 @@ public class BuildScape {
             com.kingodogo.buildscape.stat.ModStats.registerStats();
             com.kingodogo.buildscape.network.ModMessages.register();
             try {
-                // Only set base max stack size for POTION item - the ItemMixin restricts this to water bottles only
                 net.minecraftforge.fml.util.ObfuscationReflectionHelper.setPrivateValue(
                         net.minecraft.world.item.Item.class, net.minecraft.world.item.Items.POTION, 16, "f_41370_");
-                // Set max stack size for CAKE item to 64
                 net.minecraftforge.fml.util.ObfuscationReflectionHelper.setPrivateValue(
                         net.minecraft.world.item.Item.class, net.minecraft.world.item.Items.CAKE, 64, "f_41370_");
             } catch (Exception e) {
@@ -152,7 +148,7 @@ public class BuildScape {
                     new net.minecraft.core.dispenser.AbstractProjectileDispenseBehavior() {
                         @Override
                         protected net.minecraft.world.entity.projectile.Projectile getProjectile(net.minecraft.world.level.Level level, net.minecraft.core.Position pos, net.minecraft.world.item.ItemStack stack) {
-                            return null; // Not used - we override execute instead
+                            return null;
                         }
 
                         @Override
@@ -204,8 +200,7 @@ public class BuildScape {
                             double startY = pos.getY() + 0.5;
                             double startZ = pos.getZ() + 0.5;
 
-                            // Determine which slot of the 3x3 dispenser grid fired the confetti
-                            int slotIndex = 4; // Default to center slot (4)
+                            int slotIndex = 4;
                             if (source.getEntity() instanceof net.minecraft.world.level.block.entity.DispenserBlockEntity dispenser) {
                                 int matchSlot = -1;
                                 for (int i = 0; i < dispenser.getContainerSize(); i++) {
@@ -222,17 +217,12 @@ public class BuildScape {
                                 }
                             }
 
-                            // Calculate horizontal yaw rotation offset based on slot index (0..8)
-                            // Slot 4 (center) = 0 yaw offset (straight out front face)
-                            // Slots 0..3 angle left, slots 5..8 angle right
                             double yawOffset = (slotIndex - 4) * 0.15D;
 
-                            // Main direction is always out of the front face of the dispenser
                             double forwardX = facing.getStepX();
                             double forwardY = facing.getStepY();
                             double forwardZ = facing.getStepZ();
 
-                            // Right vector relative to front face for horizontal yaw rotation
                             double rightX = 0.0, rightY = 0.0, rightZ = 0.0;
 
                             if (facing.getAxis().isHorizontal()) {
@@ -311,7 +301,6 @@ public class BuildScape {
             com.kingodogo.buildscape.block.ModWoodTypes.MANGROVE.getClass();
             com.kingodogo.buildscape.block.ModWoodTypes.BAMBOO.getClass();
 
-            // Potted Plants Registration
             net.minecraft.world.level.block.FlowerPotBlock vanillaPot = (net.minecraft.world.level.block.FlowerPotBlock) net.minecraft.world.level.block.Blocks.FLOWER_POT;
             vanillaPot.addPlant(ModBlocks.CLOSED_EYEBLOSSOM.getId(), ModBlocks.POTTED_CLOSED_EYEBLOSSOM);
             vanillaPot.addPlant(ModBlocks.OPEN_EYEBLOSSOM.getId(), ModBlocks.POTTED_OPEN_EYEBLOSSOM);
@@ -430,7 +419,6 @@ public class BuildScape {
             net.minecraft.world.level.block.ComposterBlock.COMPOSTABLES
                     .put(ModItems.RED_MUSHROOM_SHELVES.get(), 0.65f);
 
-            // Cauldron interactions for Empty Cauldron
             net.minecraft.core.cauldron.CauldronInteraction.EMPTY.put(ModItems.EXPERIENCE_BUCKET.get(), (state, level, pos, player, hand, stack) -> {
                 if (!level.isClientSide) {
                     player.awardStat(net.minecraft.stats.Stats.FILL_CAULDRON);
@@ -459,7 +447,6 @@ public class BuildScape {
                 return net.minecraft.world.InteractionResult.sidedSuccess(level.isClientSide);
             });
 
-            // Cauldron interactions for Experience Cauldron
             EXPERIENCE_CAULDRON_INTERACTIONS.put(net.minecraft.world.item.Items.BUCKET, (state, level, pos, player, hand, stack) -> {
                 int cauldronLevel = state.getValue(net.minecraft.world.level.block.LayeredCauldronBlock.LEVEL);
                 if (cauldronLevel == 3) {
@@ -556,7 +543,6 @@ public class BuildScape {
         recoveryDelayTicks = 0;
         recoveryAttempted = false;
 
-        // Reset the in-memory cache - file data will be loaded when first player joins
         com.kingodogo.buildscape.config.PillarIdManager.resetWorldCache();
     }
 
@@ -650,8 +636,6 @@ public class BuildScape {
                 com.kingodogo.buildscape.config.PillarIdManager manager = com.kingodogo.buildscape.config.PillarIdManager
                         .get();
                 if (manager != null && manager.hasLoaded()) {
-                    // Use forceSaveImmediate because at this point all players have left
-                    // and saveImmediate() would skip due to playerCount==0 guard
                     manager.forceSaveImmediate();
                     manager.saveBackupFile();
                 }
@@ -674,10 +658,7 @@ public class BuildScape {
             net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent event) {
         if (event.getPlayer() instanceof net.minecraft.server.level.ServerPlayer serverPlayer) {
 
-            // REMOVED: Don't reset pillar data on player join - it clears saved pillar IDs!
-            // PillarIdJoinSyncHandler will load the data if needed
             if (!serverFullyInitialized) {
-                // com.kingodogo.buildscape.config.PillarIdManager.resetWorldCache();
 
                 com.kingodogo.buildscape.config.PillarParticleConfig.addConfigReloadCallback((isRemote) -> {
                     if (!isRemote) {
@@ -714,11 +695,8 @@ public class BuildScape {
                     net.minecraftforge.network.PacketDistributor.PLAYER.with(() -> serverPlayer),
                     configPacket);
 
-            // IMPORTANT: Sync pillar IDs to client so GUI works on servers
-            // Use a robust delayed sync that actually waits for manager to be ready
             net.minecraft.server.MinecraftServer server = net.minecraftforge.server.ServerLifecycleHooks.getCurrentServer();
             if (server != null && server.isRunning()) {
-                // Also Sync Gamerules
                 com.kingodogo.buildscape.network.ModMessages.INSTANCE.send(
                     net.minecraftforge.network.PacketDistributor.PLAYER.with(() -> serverPlayer),
                     new com.kingodogo.buildscape.network.SyncGameRulesPacket(
@@ -729,7 +707,6 @@ public class BuildScape {
                     )
                 );
 
-                // Schedule pillar ID sync - try immediately, with retries if not loaded
                 schedulePillarIdSync(server, serverPlayer, manager, 0);
             }
 
@@ -757,10 +734,6 @@ public class BuildScape {
         }
     }
 
-    /**
-     * Schedule pillar ID sync to a player with retry logic.
-     * Uses the async pool to wait for the manager to load, then dispatches on the main thread.
-     */
     private void schedulePillarIdSync(net.minecraft.server.MinecraftServer server,
                                       net.minecraft.server.level.ServerPlayer player,
                                       com.kingodogo.buildscape.config.PillarIdManager manager,
@@ -769,7 +742,6 @@ public class BuildScape {
         final int RETRY_DELAY_MS = 500;
 
         if (attempt >= MAX_ATTEMPTS) {
-            // Give up after max attempts — send whatever we have
             server.execute(() -> {
                 if (player.hasDisconnected()) return;
                 sendPillarIdsToPlayer(server, player, manager);
@@ -778,13 +750,11 @@ public class BuildScape {
         }
 
         if (manager.hasLoaded()) {
-            // Manager ready — sync immediately on main thread
             server.execute(() -> {
                 if (player.hasDisconnected()) return;
                 sendPillarIdsToPlayer(server, player, manager);
             });
         } else {
-            // Not loaded yet — wait on async pool and retry
             ASYNC_POOL.submit(() -> {
                 try {
                     Thread.sleep(RETRY_DELAY_MS);
@@ -795,14 +765,10 @@ public class BuildScape {
         }
     }
 
-    /**
-     * Sends all pillar ID data to a specific player.
-     */
     private void sendPillarIdsToPlayer(net.minecraft.server.MinecraftServer server,
                                        net.minecraft.server.level.ServerPlayer player,
                                        com.kingodogo.buildscape.config.PillarIdManager manager) {
         try {
-            // Ensure latest colors from NBT before sending
             if (server.isRunning()) {
                 manager.syncColorsFromNBTToManager(server);
             }
@@ -843,7 +809,6 @@ public class BuildScape {
                     com.kingodogo.buildscape.config.PillarIdManager manager = com.kingodogo.buildscape.config.PillarIdManager
                             .get();
                     if (manager != null && manager.hasLoaded()) {
-                        // Use forceSaveImmediate - players may have already left
                         manager.forceSaveImmediate();
                         manager.saveBackupFile();
                     }
@@ -1596,7 +1561,6 @@ public class BuildScape {
 
             if (hitResult.getType() == net.minecraft.world.phys.HitResult.Type.MISS) {
                 if (!level.isClientSide) {
-                    // Collect mist from air
                     if (!player.getAbilities().instabuild) {
                         stack.shrink(1);
                     }
@@ -2777,7 +2741,6 @@ public class BuildScape {
 
     @SubscribeEvent
     public void onEntityInteract(net.minecraftforge.event.entity.player.PlayerInteractEvent.EntityInteract event) {
-        // Target any non-hostile AgeableMob (passive animals, villagers, etc.)
         if (event.getTarget() instanceof net.minecraft.world.entity.AgeableMob mob
                 && !(event.getTarget() instanceof net.minecraft.world.entity.monster.Monster)) {
             net.minecraft.world.item.ItemStack held = event.getItemStack();
@@ -2787,7 +2750,6 @@ public class BuildScape {
                 net.minecraft.world.level.Level level = event.getWorld();
                 if (!level.isClientSide) {
                     if (!isFrozen) {
-                        // Freeze: lock the mob's current life stage
                         data.putBoolean("buildscape:frozen_growth", true);
                         ((net.minecraft.server.level.ServerLevel) level).sendParticles(
                                 net.minecraft.core.particles.ParticleTypes.WAX_OFF,
@@ -2797,7 +2759,6 @@ public class BuildScape {
                                 net.minecraft.sounds.SoundEvents.HONEYCOMB_WAX_ON,
                                 net.minecraft.sounds.SoundSource.NEUTRAL, 1.0F, 1.0F);
                     } else {
-                        // Unfreeze: resume normal aging
                         data.remove("buildscape:frozen_growth");
                         ((net.minecraft.server.level.ServerLevel) level).sendParticles(
                                 net.minecraft.core.particles.ParticleTypes.HAPPY_VILLAGER,
@@ -2824,10 +2785,8 @@ public class BuildScape {
                 && !(living instanceof net.minecraft.world.entity.monster.Monster)) {
             if (mob.getPersistentData().getBoolean("buildscape:frozen_growth")) {
                 if (mob.isBaby()) {
-                    // Baby: lock age so it never grows into an adult
                     mob.setAge(-24000);
                 } else {
-                    // Adult: lock age at 0 so the breeding cooldown never accumulates
                     if (mob.getAge() != 0) {
                         mob.setAge(0);
                     }
@@ -2835,7 +2794,6 @@ public class BuildScape {
             }
         }
 
-        // Apply swimming speed boost in XP fluid (reduced by 50%)
         net.minecraft.world.level.material.FluidState fluid = living.level.getFluidState(living.blockPosition());
         if (fluid.getType() == com.kingodogo.buildscape.fluid.ModFluids.EXPERIENCE_STILL.get() || fluid.getType() == com.kingodogo.buildscape.fluid.ModFluids.EXPERIENCE_FLOWING.get()) {
             if (living.isSwimming() || living.isInWater()) {
@@ -2844,17 +2802,14 @@ public class BuildScape {
             }
         }
 
-        // Apply geyser launch force to players and other living entities (fixes players not being launched)
         if (!living.isPassenger() && !living.getType().is(com.kingodogo.buildscape.block.PotentSulfurBlockEntity.NOT_AFFECTED_BY_GEYSERS)) {
             if (!(living instanceof net.minecraft.world.entity.player.Player player && player.getAbilities().flying)) {
                 net.minecraft.core.BlockPos.MutableBlockPos testPos = living.blockPosition().mutable();
-                // Look down up to 24 blocks below the entity
                 for (int i = 0; i < 24; ++i) {
                     net.minecraft.world.level.block.state.BlockState testState = living.level.getBlockState(testPos);
                     if (testState.is(com.kingodogo.buildscape.block.ModBlocks.POTENT_SULFUR.get())) {
                         com.kingodogo.buildscape.block.PotentSulfurState geyserState = testState.getValue(com.kingodogo.buildscape.block.PotentSulfurBlock.STATE);
                         if (geyserState == com.kingodogo.buildscape.block.PotentSulfurState.ERUPTING || geyserState == com.kingodogo.buildscape.block.PotentSulfurState.CONTINUOUS) {
-                            // Find the source block (top of water column)
                             net.minecraft.core.BlockPos.MutableBlockPos sourceSearch = testPos.above().mutable();
                             while (living.level.getFluidState(sourceSearch).isSourceOfType(net.minecraft.world.level.material.Fluids.WATER)) {
                                 sourceSearch.move(net.minecraft.core.Direction.UP);
@@ -2876,7 +2831,7 @@ public class BuildScape {
                     }
                     if (!testState.isAir() && !testState.is(net.minecraft.world.level.block.Blocks.WATER)) {
                         if (!testState.getCollisionShape(living.level, testPos).isEmpty()) {
-                            break; // Blocked by a solid block
+                            break;
                         }
                     }
                     testPos.move(net.minecraft.core.Direction.DOWN);
@@ -2926,7 +2881,6 @@ public class BuildScape {
             net.minecraft.core.BlockPos pos = event.getPos();
             net.minecraft.world.level.block.state.BlockState state = level.getBlockState(pos);
 
-            // 1. Bonemeal Cactus Top -> Cactus Flower
             if (state.is(net.minecraft.world.level.block.Blocks.CACTUS) && event.getFace() == net.minecraft.core.Direction.UP) {
                 net.minecraft.core.BlockPos above = pos.above();
                 if (level.isEmptyBlock(above)) {
@@ -2941,7 +2895,6 @@ public class BuildScape {
                 }
             }
 
-            // 2. Bonemeal Sand -> Single-block Dry Grass
             if ((state.is(net.minecraft.world.level.block.Blocks.SAND) || state.is(net.minecraft.world.level.block.Blocks.RED_SAND)) && event.getFace() == net.minecraft.core.Direction.UP) {
                 net.minecraft.core.BlockPos above = pos.above();
                 if (level.isEmptyBlock(above)) {
@@ -2956,10 +2909,8 @@ public class BuildScape {
                 }
             }
 
-            // 3. Bonemeal Grass Block -> Generates Bushes in radius alongside vanilla grass, ferns, etc.
             if (state.is(net.minecraft.world.level.block.Blocks.GRASS_BLOCK) && event.getFace() == net.minecraft.core.Direction.UP) {
                 if (!level.isClientSide) {
-                    // Use a delayed task so vanilla vegetation (grass, fern, flowers) spawns first
                     final net.minecraft.core.BlockPos finalPos = pos;
                     ((net.minecraft.server.level.ServerLevel) level).getServer().execute(() -> {
                         net.minecraft.core.BlockPos.betweenClosedStream(finalPos.offset(-3, -1, -3), finalPos.offset(3, 1, 3)).forEach(checkPos -> {
@@ -2973,23 +2924,21 @@ public class BuildScape {
                 }
             }
 
-            // 4. Bonemeal Moss Block -> Generates Firefly Bushes, Cherry Saplings & Mangrove Propagules alongside vanilla Moss Block bonemeal
             if (state.is(net.minecraft.world.level.block.Blocks.MOSS_BLOCK) && event.getFace() == net.minecraft.core.Direction.UP) {
                 if (!level.isClientSide) {
-                    // Use a delayed task so vanilla moss vegetation (grass, azalea, etc.) spawns first
                     final net.minecraft.core.BlockPos finalMossPos = pos;
                     ((net.minecraft.server.level.ServerLevel) level).getServer().execute(() -> {
                         net.minecraft.core.BlockPos.betweenClosedStream(finalMossPos.offset(-3, -1, -3), finalMossPos.offset(3, 1, 3)).forEach(checkPos -> {
                             if (level.getBlockState(checkPos).is(net.minecraft.world.level.block.Blocks.MOSS_BLOCK) && level.isEmptyBlock(checkPos.above())) {
                                 float roll = level.random.nextFloat();
-                                if (roll < 0.10F) { // 10% chance: Firefly Bush
+                                if (roll < 0.10F) {
                                     level.setBlock(checkPos.above(), ModBlocks.FIREFLY_BUSH.get().defaultBlockState(), 3);
-                                } else if (roll < 0.15F) { // 5% chance: Cherry Sapling
+                                } else if (roll < 0.15F) {
                                     net.minecraft.world.level.block.state.BlockState saplingState = ModBlocks.CHERRY_SAPLING.get().defaultBlockState();
                                     if (saplingState.canSurvive(level, checkPos.above())) {
                                         level.setBlock(checkPos.above(), saplingState, 3);
                                     }
-                                } else if (roll < 0.20F) { // 5% chance: Mangrove Propagule
+                                } else if (roll < 0.20F) {
                                     net.minecraft.world.level.block.state.BlockState propaguleState = ModBlocks.MANGROVE_PROPAGULE.get().defaultBlockState();
                                     if (propaguleState.canSurvive(level, checkPos.above())) {
                                         level.setBlock(checkPos.above(), propaguleState, 3);
@@ -3001,7 +2950,6 @@ public class BuildScape {
                 }
             }
 
-            // 4. Bonemeal Pale Oak Leaves -> Pale Hanging Moss
             if (state.is(ModBlocks.PALE_OAK_LEAVES.get())) {
                 net.minecraft.core.BlockPos targetPos = pos.below();
                 while (level.getBlockState(targetPos).is(ModBlocks.PALE_HANGING_MOSS.get())) {
@@ -3019,7 +2967,6 @@ public class BuildScape {
                 }
             }
 
-            // 5. Bonemeal Creaking Heart -> Spawns Resin Clump blocks on heart block faces
             if (state.is(ModBlocks.CREAKING_HEART.get())) {
                 if (!level.isClientSide) {
                     if (state.getBlock() instanceof com.kingodogo.buildscape.block.CreakingHeartBlock heart) {
@@ -3054,7 +3001,6 @@ public class BuildScape {
                 return;
             }
 
-            // 7. Bonemeal Tall Dry Grass -> Drops Short Dry Grass item
             if (state.is(ModBlocks.TALL_DRY_GRASS.get())) {
                 if (!level.isClientSide) {
                     net.minecraft.world.entity.item.ItemEntity item = new net.minecraft.world.entity.item.ItemEntity(

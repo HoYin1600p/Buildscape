@@ -38,36 +38,19 @@ public class PillarParticleConfig {
     private static final List<java.util.function.Consumer<Boolean>> configReloadCallbacks = new ArrayList<>();
     private static long lastNotifyTime = 0;
 
-    // ── Cheap-read snapshot for the hot tick path ────────────────────────────────
-    // clientTick() reads config dozens of times per second. Rather than going
-    // through the full get() machinery (isClientConnectedToServer reflection +
-    // file-stat check on two files) on every call, we keep a volatile snapshot
-    // that get() refreshes whenever the underlying config actually changes.
     private static volatile PillarParticleConfig SNAPSHOT = null;
 
-    /**
-     * Fast path for the hot client-tick loop: returns the last loaded config
-     * without any I/O or reflection. Falls back to the full get() path only
-     * until the first non-null snapshot is available.
-     */
     public static PillarParticleConfig peek() {
         PillarParticleConfig s = SNAPSHOT;
         return s != null ? s : get();
     }
 
-    // ── isClientConnectedToServer cache ────────────────────────────────────
-    // Class.forName + 3 reflection invocations is very expensive to call on
-    // every tick. Cache the result and refresh at most once per ~3 seconds.
     private static volatile boolean cachedConnectedToServer = false;
     private static volatile long connectedCacheTime = 0L;
-    private static final long CONNECTED_CACHE_TTL_MS = 3000L; // 3 s
+    private static final long CONNECTED_CACHE_TTL_MS = 3000L;
 
-    // ── File-stat throttle ───────────────────────────────────────────────
-    // file.lastModified() + file.length() on two files was being called on
-    // every invocation of get() which happens every client tick per pillar.
-    // Throttle to once every 2 seconds (40 game ticks / 2000 ms).
     private static volatile long lastStatCheckTime = 0L;
-    private static final long STAT_CHECK_INTERVAL_MS = 2000L; // 2 s
+    private static final long STAT_CHECK_INTERVAL_MS = 2000L;
 
     public static void addConfigReloadCallback(java.util.function.Consumer<Boolean> callback) {
         configReloadCallbacks.add(callback);
@@ -81,17 +64,11 @@ public class PillarParticleConfig {
                 e.printStackTrace();
             }
         }
-        clearMatchCache(); // invalidate per-Item match cache on every config reload
+        clearMatchCache();
     }
 
     public Set<String> items = new HashSet<>();
 
-    // ── matches() cache ───────────────────────────────────────────────────
-    // matches() iterates the items set, calling new ResourceLocation() and a full
-    // tag-registry lookup for every tag-prefixed entry, every 5 client ticks per
-    // active pillar. The result only depends on the Item type (registry key +
-    // tags) — not on the ItemStack NBT — so we can safely cache Boolean per Item.
-    // The cache is cleared whenever the config reloads so hot-reload still works.
     private static final java.util.concurrent.ConcurrentHashMap<net.minecraft.world.item.Item, Boolean> MATCH_CACHE = new java.util.concurrent.ConcurrentHashMap<>();
 
     private static void clearMatchCache() {
@@ -160,9 +137,6 @@ public class PillarParticleConfig {
             initializeFileWatcher();
             SNAPSHOT = INSTANCE;
         } else {
-            // ── Throttled file-stat check ──────────────────────────────────
-            // Only hit the filesystem to check for config changes every 2 s.
-            // In steady-state, most calls return immediately without any I/O.
             long now = System.currentTimeMillis();
             if (now - lastStatCheckTime >= STAT_CHECK_INTERVAL_MS) {
                 lastStatCheckTime = now;
@@ -246,9 +220,9 @@ public class PillarParticleConfig {
             SERVER_CONFIG.particle_color.add("#FFB81C");
             SERVER_CONFIG.particle_color.add("#FFFFFF");
             SERVER_CONFIG.particle_color.add("#FFFF00");
-            SERVER_CONFIG.particle_color.add("#E8FEFD"); // White
-            SERVER_CONFIG.particle_color.add("#FF5C00"); // Orange
-            SERVER_CONFIG.particle_color.add("#3CDFFF"); // Light Blue
+            SERVER_CONFIG.particle_color.add("#E8FEFD");
+            SERVER_CONFIG.particle_color.add("#FF5C00");
+            SERVER_CONFIG.particle_color.add("#3CDFFF");
         }
 
         int numColors = SERVER_CONFIG.particle_color.size();
@@ -263,7 +237,7 @@ public class PillarParticleConfig {
         SERVER_CONFIG.items = new HashSet<>(
                 packet.items != null ? packet.items : new HashSet<>());
 
-        clearMatchCache(); // new server config — invalidate match cache
+        clearMatchCache();
         notifyCallbacks(true);
     }
 
@@ -308,7 +282,6 @@ public class PillarParticleConfig {
                                     if (filename.toString().equals(PROPERTIES_FILE_NAME) ||
                                             filename.toString().equals(ITEMS_FILE_NAME)) {
 
-                                        // Simple debounce: wait a bit to let file write finish
                                         Thread.sleep(100);
 
                                         if (INSTANCE != null) {
@@ -322,11 +295,6 @@ public class PillarParticleConfig {
                                             boolean reloaded = false;
                                             if (wasProperties) {
                                                 INSTANCE.loadPropertiesInternal();
-                                                // Check if it actually reloaded by comparing timestamps/sizes isn't
-                                                // easy here since loadPropertiesInternal updates them.
-                                                // But loadPropertiesInternal is only called if we are here.
-                                                // To properly debounce, we should check if enough time passed since
-                                                // last reload/notify.
                                                 reloaded = true;
                                             }
                                             if (wasItems) {
@@ -335,8 +303,6 @@ public class PillarParticleConfig {
                                             }
 
                                             if (reloaded) {
-                                                // Debounce notifications: only notify if > 500ms since last
-                                                // notification
                                                 long currentTime = System.currentTimeMillis();
                                                 if (currentTime - lastNotifyTime > 500) {
                                                     lastNotifyTime = currentTime;
@@ -724,9 +690,9 @@ public class PillarParticleConfig {
             this.particle_color.add("#FFB81C");
             this.particle_color.add("#FFFFFF");
             this.particle_color.add("#FFFF00");
-            this.particle_color.add("#E8FEFD"); // White
-            this.particle_color.add("#FF5C00"); // Orange
-            this.particle_color.add("#3CDFFF"); // Light Blue
+            this.particle_color.add("#E8FEFD");
+            this.particle_color.add("#FF5C00");
+            this.particle_color.add("#3CDFFF");
             this.max_particle_color = 3;
             lastLoadedProperties = file.lastModified();
             lastFileSizeProperties = file.length();
@@ -892,7 +858,6 @@ public class PillarParticleConfig {
                     }
                 }
 
-                // Auto-add any new default vanilla items that were added in mod updates
                 {
                     boolean changed = false;
                     String[] defaultVanillaItems = new String[] {
@@ -983,7 +948,6 @@ public class PillarParticleConfig {
                     }
                 }
 
-                // Check for auto-update of Vault Hunters items
                 if (net.minecraftforge.fml.ModList.get().isLoaded("the_vault")) {
                     boolean changed = false;
                     String[] vaultItems = new String[] {
@@ -1349,7 +1313,6 @@ public class PillarParticleConfig {
 
     public void saveItems() {
         if (isClientConnectedToServer() && SERVER_CONFIG != null) {
-            // Update the server's global config when changed on client
             net.minecraftforge.fml.DistExecutor.unsafeRunWhenOn(net.minecraftforge.api.distmarker.Dist.CLIENT,
                     () -> () -> {
                         if (net.minecraft.client.Minecraft.getInstance().player != null &&
@@ -1358,7 +1321,7 @@ public class PillarParticleConfig {
                                     new com.kingodogo.buildscape.network.UpdateConfigPacket(this));
                         }
                     });
-            return; // Don't save on client disk when connected to server
+            return;
         }
         File file = getItemsFile();
         try {
@@ -1390,7 +1353,6 @@ public class PillarParticleConfig {
 
     public void saveProperties() {
         if (isClientConnectedToServer() && SERVER_CONFIG != null) {
-            // Update the server's global config when changed on client
             net.minecraftforge.fml.DistExecutor.unsafeRunWhenOn(net.minecraftforge.api.distmarker.Dist.CLIENT,
                     () -> () -> {
                         if (net.minecraft.client.Minecraft.getInstance().player != null &&
@@ -1399,7 +1361,7 @@ public class PillarParticleConfig {
                                     new com.kingodogo.buildscape.network.UpdateConfigPacket(this));
                         }
                     });
-            return; // Don't save on client disk when connected to server
+            return;
         }
         File file = getPropertiesFile();
         try {

@@ -7,9 +7,6 @@ import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 
-/**
- * Base class for all custom chest cosmetics.
- */
 public abstract class CosChest<T extends Entity> extends EntityModel<T> {
 
     protected final ModelPart body;
@@ -34,9 +31,7 @@ public abstract class CosChest<T extends Entity> extends EntityModel<T> {
 
     @Override
     public void renderToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
-        // Body
         body.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
-        // Arms
         leftArm.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
         rightArm.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
     }

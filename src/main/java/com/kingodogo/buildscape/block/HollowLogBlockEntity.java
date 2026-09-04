@@ -60,14 +60,8 @@ public class HollowLogBlockEntity extends BlockEntity {
         syncToClient();
     }
 
-    /**
-     * Sets a target flow state that will become active after delayTicks server ticks.
-     * Used for natural, block-by-block animated water flow and drainage progression.
-     */
     public void setPendingFlowState(PipeFlowState target, int delayTicks) {
         PipeFlowState next = target != null ? target : new PipeFlowState();
-        // Neighbor updates can request the same transition repeatedly while a stream is
-        // settling. Do not restart its countdown or endpoint replacement can remain stale.
         if (delayTicks > 0 && pendingTargetState != null && pendingTargetState.equals(next)) {
             return;
         }
@@ -175,7 +169,6 @@ public class HollowLogBlockEntity extends BlockEntity {
             return;
         }
 
-        // --- Animated block-by-block flow progression ---
         if (state.getBlock() instanceof HollowPipeBlock && blockEntity.pendingTargetState != null) {
             blockEntity.flowDelayTicks--;
             if (blockEntity.flowDelayTicks <= 0) {
@@ -186,19 +179,16 @@ public class HollowLogBlockEntity extends BlockEntity {
             }
         }
 
-        // --- Lava tick burn logic ---
         if (state.hasProperty(HollowLogBlock.LAVA_LOGGED) && state.getValue(HollowLogBlock.LAVA_LOGGED)) {
             if (blockEntity.lavaTicks > 0) {
                 blockEntity.lavaTicks--;
                 if (blockEntity.lavaTicks <= 0) {
-                    // Burn away log when timer expires!
                     level.playSound(null, pos, SoundEvents.FIRE_EXTINGUISH, SoundSource.BLOCKS, 1.0F, 1.0F);
                     if (level instanceof ServerLevel serverLevel) {
                         serverLevel.sendParticles(ParticleTypes.LAVA, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 10, 0.3, 0.3, 0.3, 0.1);
                         serverLevel.sendParticles(ParticleTypes.LARGE_SMOKE, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 5, 0.2, 0.2, 0.2, 0.05);
                     }
 
-                    // Drop glass cover items if present
                     boolean hadGlass = false;
                     if (!blockEntity.glassCoverNeg.isAir()) {
                         Block.popResource(level, pos, new ItemStack(blockEntity.glassCoverNeg.getBlock()));
@@ -209,7 +199,6 @@ public class HollowLogBlockEntity extends BlockEntity {
                         hadGlass = true;
                     }
 
-                    // Replace with lava or fire
                     level.setBlockAndUpdate(pos, Blocks.LAVA.defaultBlockState());
                 }
             }
@@ -273,7 +262,6 @@ public class HollowLogBlockEntity extends BlockEntity {
         } else {
             pipeFlowState = new PipeFlowState();
         }
-        // The outlet spill lives in the adjacent water's chunk mesh, not the block entity renderer.
         if (level != null && level.isClientSide && getBlockState().getBlock() instanceof HollowPipeBlock
                 && !previousFlow.equals(pipeFlowState)) {
             for (net.minecraft.core.Direction direction : net.minecraft.core.Direction.values()) {

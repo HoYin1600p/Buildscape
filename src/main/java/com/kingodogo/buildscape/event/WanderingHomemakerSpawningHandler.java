@@ -102,10 +102,9 @@ public class WanderingHomemakerSpawningHandler {
             }
 
             if (currentTime < cooldown) {
-                return; // Cooldown active
+                return;
             }
 
-            // Despawn old homemaker if it's currently loaded
             if (player.getPersistentData().hasUUID("WanderingHomemakerUUID")) {
                 java.util.UUID oldUuid = player.getPersistentData().getUUID("WanderingHomemakerUUID");
                 for (ServerLevel sl : level.getServer().getAllLevels()) {
@@ -134,7 +133,7 @@ public class WanderingHomemakerSpawningHandler {
                     ModEntities.WANDERING_HOMEMAKER.get().create(level);
             if (homemaker != null) {
                 double angle = level.random.nextDouble() * 2.0D * Math.PI;
-                double distance = 2.0D + level.random.nextDouble() * 1.0D; // 2 to 3 blocks away
+                double distance = 2.0D + level.random.nextDouble() * 1.0D;
                 double spawnX = pos.getX() + 0.5D + Math.cos(angle) * distance;
                 double spawnY = pos.getY();
                 double spawnZ = pos.getZ() + 0.5D + Math.sin(angle) * distance;
@@ -151,7 +150,7 @@ public class WanderingHomemakerSpawningHandler {
                     level.sendParticles(ParticleTypes.CLOUD, px, py, pz, 1, 0.0D, 0.0D, 0.0D, 0.0D);
                 }
 
-                long cooldownEnd = currentTime + 1800000L; // 30 minutes in milliseconds
+                long cooldownEnd = currentTime + 1800000L;
                 player.getPersistentData().putLong("WanderingHomemakerCooldownRealTime", cooldownEnd);
                 player.getPersistentData().putUUID("WanderingHomemakerUUID", homemaker.getUUID());
 

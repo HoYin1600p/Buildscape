@@ -34,7 +34,6 @@ public class WorldSettingsConfigTab extends AbstractConfigTab {
         int contentWidth = parent.getContentWidth();
         int contentHeight = parent.getContentHeight();
 
-        // One-time widget creation
         boolean treeBreaker = com.kingodogo.buildscape.config.CosmeticsConfig.get().getCreativeTreeBreaker(mc.player != null ? mc.player.getUUID() : null);
         creativeTreeBreakerToggle = new ScalableToggle(0, 0, 100, 20,
                 new TranslatableComponent("buildscape.config.world.tree_breaker"), treeBreaker, (btn) -> {
@@ -97,13 +96,11 @@ public class WorldSettingsConfigTab extends AbstractConfigTab {
         int fullContentHeight = parent.getContentHeight();
         int padding = BuildScapeConfigScreen.scaleSize(10);
 
-        // leftPanel (Player Rules)
         leftBoxX = parent.getContentX();
         leftBoxY = parent.getContentY();
         leftBoxWidth = parent.getContentWidth();
         leftBoxHeight = fullContentHeight;
 
-        // rightPanel (World Rules)
         rightBoxX = parent.getRightPanelX();
         rightBoxY = parent.getContentY();
         rightBoxWidth = parent.getRightPanelWidth();
@@ -162,13 +159,11 @@ public class WorldSettingsConfigTab extends AbstractConfigTab {
 
         int borderColor = 0xFF666666;
 
-        // Draw Left Box (Player Rules)
         net.minecraft.client.gui.GuiComponent.fill(poseStack, leftBoxX, leftBoxY, leftBoxX + leftBoxWidth, leftBoxY + 1, borderColor);
         net.minecraft.client.gui.GuiComponent.fill(poseStack, leftBoxX, leftBoxY + leftBoxHeight - 1, leftBoxX + leftBoxWidth, leftBoxY + leftBoxHeight, borderColor);
         net.minecraft.client.gui.GuiComponent.fill(poseStack, leftBoxX, leftBoxY, leftBoxX + 1, leftBoxY + leftBoxHeight, borderColor);
         net.minecraft.client.gui.GuiComponent.fill(poseStack, leftBoxX + leftBoxWidth - 1, leftBoxY, leftBoxX + leftBoxWidth, leftBoxY + leftBoxHeight, borderColor);
 
-        // Draw Right Box (World Rules)
         net.minecraft.client.gui.GuiComponent.fill(poseStack, rightBoxX, rightBoxY, rightBoxX + rightBoxWidth, rightBoxY + 1, borderColor);
         net.minecraft.client.gui.GuiComponent.fill(poseStack, rightBoxX, rightBoxY + rightBoxHeight - 1, rightBoxX + rightBoxWidth, rightBoxY + rightBoxHeight, borderColor);
         net.minecraft.client.gui.GuiComponent.fill(poseStack, rightBoxX, rightBoxY, rightBoxX + 1, rightBoxY + rightBoxHeight, borderColor);
@@ -190,7 +185,6 @@ public class WorldSettingsConfigTab extends AbstractConfigTab {
         mc.font.draw(poseStack, new TranslatableComponent("buildscape.config.world.update_rules"), 0, 0, 0xFFFFFF);
         poseStack.popPose();
 
-        // Update button states to ensure they reflect sync packets and local settings
         if (mc.level != null && mc.player != null) {
             creativeTreeBreakerToggle.toggled = com.kingodogo.buildscape.config.CosmeticsConfig.get().getCreativeTreeBreaker(mc.player.getUUID());
             shulkerPreviewToggle.toggled = com.kingodogo.buildscape.config.CosmeticsConfig.get().getShulkerPreview(mc.player.getUUID());
@@ -201,7 +195,6 @@ public class WorldSettingsConfigTab extends AbstractConfigTab {
         }
     }
 
-    // A simple inner class for a toggle button with BuildScape visuals
     private static class ScalableToggle extends net.minecraft.client.gui.components.Button {
         private final net.minecraft.network.chat.Component baseMessage;
         private boolean toggled;
@@ -237,22 +230,18 @@ public class WorldSettingsConfigTab extends AbstractConfigTab {
             Minecraft mc = Minecraft.getInstance();
             int borderColor = (active && isHoveredOrFocused()) ? 0xFFFFFFFF : 0xFF666666;
 
-            // Draw custom button background
-            net.minecraft.client.gui.GuiComponent.fill(poseStack, x, y, x + width, y + height, 0x80000000); // 50% dark
+            net.minecraft.client.gui.GuiComponent.fill(poseStack, x, y, x + width, y + height, 0x80000000);
 
-            // Draw border
             net.minecraft.client.gui.GuiComponent.fill(poseStack, x, y, x + width, y + 1, borderColor);
             net.minecraft.client.gui.GuiComponent.fill(poseStack, x, y + height - 1, x + width, y + height, borderColor);
             net.minecraft.client.gui.GuiComponent.fill(poseStack, x, y, x + 1, y + height, borderColor);
             net.minecraft.client.gui.GuiComponent.fill(poseStack, x + width - 1, y, x + width, y + height, borderColor);
 
-            // Draw toggle status bar
             int barHeight = Math.max(2, BuildScapeConfigScreen.scaleSize(2));
             int barColor = toggled ? 0xFF55FF55 : 0xFFFF5555;
             if (!active) barColor = 0xFF555555;
             net.minecraft.client.gui.GuiComponent.fill(poseStack, x + 2, y + height - 2 - barHeight, x + width - 2, y + height - 2, barColor);
 
-            // Draw text
             float textScale = BuildScapeConfigScreen.getStandardTextScale();
             int textY = y + (height - (int)(mc.font.lineHeight * textScale)) / 2;
 
@@ -271,7 +260,6 @@ public class WorldSettingsConfigTab extends AbstractConfigTab {
             mc.font.draw(poseStack, status, 0, 0, active ? barColor : 0x888888);
             poseStack.popPose();
 
-            // Render lock icon if inactive
             if (!active) {
                 com.mojang.blaze3d.systems.RenderSystem.setShaderTexture(0, new net.minecraft.resources.ResourceLocation(com.kingodogo.buildscape.BuildScape.MODID, "textures/gui/lock.png"));
                 com.mojang.blaze3d.systems.RenderSystem.setShader(net.minecraft.client.renderer.GameRenderer::getPositionTexShader);

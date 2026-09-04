@@ -8,10 +8,6 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.*;
 
-/**
- * High-performance streaming JSON reader using GSON JsonReader.
- * Supports wood/stone family categories, reversal/reciprocal auto-recipes, and compact array recipe formats.
- */
 public class StreamingRecipeParser {
 
     public static RecipeIR.CategoryPack parseCategory(String categoryName, Reader reader) throws IOException {
@@ -288,11 +284,9 @@ public class StreamingRecipeParser {
             reader.endArray();
         }
 
-        // Add Primary Forward Recipe (Result = resultItem, Input = input)
         RecipeIR.ResultSpec resultSpec = new RecipeIR.ResultSpec(resultItem, count, null);
         recipes.add(new RecipeIR.RecipeSpec(null, type, "", pattern, keys, ingredients, input, resultSpec, cookingTime, experience));
 
-        // Add Reversal Recipe if reversible is true and input is a single item/tag
         if (isReversible && input != null && !input.isEmpty()) {
             String reverseRecipeId = sanitizeId(input + "_from_" + resultItem + "_reversal");
             RecipeIR.ResultSpec reverseResultSpec = new RecipeIR.ResultSpec(input, 1, null);

@@ -11,9 +11,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-/**
- * Cosmetic attachment item that can be applied to signs.
- */
 public class StringlightFrameItem extends Item {
 
     public StringlightFrameItem(Properties properties) {

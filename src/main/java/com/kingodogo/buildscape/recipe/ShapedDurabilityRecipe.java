@@ -129,7 +129,6 @@ public class ShapedDurabilityRecipe extends ShapedRecipe {
             int firstRow = 0;
             int lastRow = pattern.length - 1;
 
-            // Find first and last non-empty rows
             while (firstRow < pattern.length && isRowEmpty(pattern[firstRow])) {
                 firstRow++;
             }
@@ -141,7 +140,6 @@ public class ShapedDurabilityRecipe extends ShapedRecipe {
                 return new String[]{""};
             }
 
-            // Find bounds for columns
             for (int row = firstRow; row <= lastRow; row++) {
                 String line = pattern[row];
                 for (int col = 0; col < line.length(); col++) {

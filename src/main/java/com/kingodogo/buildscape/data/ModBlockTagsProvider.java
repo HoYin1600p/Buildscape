@@ -20,6 +20,5 @@ public class ModBlockTagsProvider extends BlockTagsProvider {
 
     @Override
     protected void addTags() {
-        // Vertical slab/stair tags are maintained as static tag JSON.
     }
 }

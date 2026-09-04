@@ -1,5 +1,6 @@
 package com.kingodogo.buildscape.client.renderer;
 
+import com.kingodogo.buildscape.block.HollowLogBlock;
 import com.kingodogo.buildscape.block.HollowLogBlockEntity;
 import com.kingodogo.buildscape.block.HollowPipeBlock;
 import com.kingodogo.buildscape.pipe.transport.BubbleColumnState;
@@ -10,6 +11,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 
@@ -60,32 +62,46 @@ public final class PipeSpillVertexConsumer implements VertexConsumer {
             BlockPos pipePos = pos.relative(direction);
             BlockState pipe = level.getBlockState(pipePos);
             Direction exit = direction.getOpposite();
-            if (!(pipe.getBlock() instanceof HollowPipeBlock) || !HollowPipeBlock.isOpenEndpoint(pipe, exit)
-                    || !(level.getBlockEntity(pipePos) instanceof HollowLogBlockEntity entity)) {
-                continue;
+
+            if (pipe.getBlock() instanceof HollowPipeBlock) {
+                if (!HollowPipeBlock.isOpenEndpoint(pipe, exit)
+                        || !(level.getBlockEntity(pipePos) instanceof HollowLogBlockEntity entity)) {
+                    continue;
+                }
+                PipeFlowState flow = entity.getPipeFlowState();
+                if (flow == null || !flow.hasWater() || !flow.hasFlowDirection(exit) || flow.getDistance() >= 7
+                        || flow.getInflowDirection() == Direction.UP
+                        || (flow.hasFlowDirection(Direction.UP) && flow.getBubbleColumn() == BubbleColumnState.UP)) {
+                    continue;
+                }
+                PipeWaterSurface.Heights heights = PipeWaterSurface.flowing(pipe, flow);
+                Direction.Axis axis = pipe.getValue(HollowPipeBlock.AXIS);
+                boolean straightX = (axis == Direction.Axis.X || pipe.getValue(HollowPipeBlock.WEST)
+                        || pipe.getValue(HollowPipeBlock.EAST))
+                        && !pipe.getValue(HollowPipeBlock.NORTH) && !pipe.getValue(HollowPipeBlock.SOUTH);
+                boolean straightZ = (axis == Direction.Axis.Z || pipe.getValue(HollowPipeBlock.NORTH)
+                        || pipe.getValue(HollowPipeBlock.SOUTH))
+                        && !pipe.getValue(HollowPipeBlock.WEST) && !pipe.getValue(HollowPipeBlock.EAST);
+                double height = straightX || straightZ ? heights.outlet() : heights.center();
+                // Match directed straight pipes where the inlet end is specifically chosen
+                if (straightX && exit == Direction.WEST && flow.getInflowDirection() == Direction.WEST) height = heights.inlet();
+                if (straightX && exit == Direction.EAST && flow.getInflowDirection() == Direction.EAST) height = heights.inlet();
+                if (straightZ && exit == Direction.NORTH && flow.getInflowDirection() == Direction.NORTH) height = heights.inlet();
+                if (straightZ && exit == Direction.SOUTH && flow.getInflowDirection() == Direction.SOUTH) height = heights.inlet();
+                if (outlets == null) outlets = new ArrayList<>(2);
+                outlets.add(new Outlet(direction, height));
+            } else if (pipe.getBlock() instanceof HollowLogBlock) {
+                if (!HollowLogBlock.isOpenEnd(pipe, exit)) {
+                    continue;
+                }
+                Fluid fluidInLog = HollowPipeBlock.getContainedFluid(pipe, level.getBlockEntity(pipePos));
+                if (fluidInLog != Fluids.WATER) {
+                    continue;
+                }
+                double height = HollowPipeBlock.WATER_SOURCE_VISUAL_HEIGHT;
+                if (outlets == null) outlets = new ArrayList<>(2);
+                outlets.add(new Outlet(direction, height));
             }
-            PipeFlowState flow = entity.getPipeFlowState();
-            if (flow == null || !flow.hasWater() || !flow.hasFlowDirection(exit) || flow.getDistance() >= 7
-                    || flow.getInflowDirection() == Direction.UP
-                    || (flow.hasFlowDirection(Direction.UP) && flow.getBubbleColumn() == BubbleColumnState.UP)) {
-                continue;
-            }
-            PipeWaterSurface.Heights heights = PipeWaterSurface.flowing(pipe, flow);
-            Direction.Axis axis = pipe.getValue(HollowPipeBlock.AXIS);
-            boolean straightX = (axis == Direction.Axis.X || pipe.getValue(HollowPipeBlock.WEST)
-                    || pipe.getValue(HollowPipeBlock.EAST))
-                    && !pipe.getValue(HollowPipeBlock.NORTH) && !pipe.getValue(HollowPipeBlock.SOUTH);
-            boolean straightZ = (axis == Direction.Axis.Z || pipe.getValue(HollowPipeBlock.NORTH)
-                    || pipe.getValue(HollowPipeBlock.SOUTH))
-                    && !pipe.getValue(HollowPipeBlock.WEST) && !pipe.getValue(HollowPipeBlock.EAST);
-            double height = straightX || straightZ ? heights.outlet() : heights.center();
-            // A source can flow in both directions. Match the existing renderer's chosen inlet edge too.
-            if (straightX && exit == Direction.WEST && (flow.getInflowDirection() == Direction.WEST
-                    || flow.hasFlowDirection(Direction.EAST))) height = heights.inlet();
-            if (straightZ && exit == Direction.NORTH && (flow.getInflowDirection() == Direction.NORTH
-                    || flow.hasFlowDirection(Direction.SOUTH))) height = heights.inlet();
-            if (outlets == null) outlets = new ArrayList<>(2);
-            outlets.add(new Outlet(direction, height));
         }
         return outlets == null ? List.of() : outlets;
     }

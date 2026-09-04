@@ -25,31 +25,32 @@ I Vented                                    | Place 10 Hollow Logs              
 A Star Is Born                              | Craft your first Star                              | <---X--->                            | <---X--->
 Fixer Upper                                 | Replace 1 block with a Hammer                      | <---X--->                            | <---X--->
 Ice to Meet You                             | Obtain an Icicle                                   | <---X--->                            | <---X--->
-Let it Snow                                 | Place 5 Frosty Rose together                       | <---X--->                            | <---X--->
-Let it Cascade                              | Place 1 Cascade Block                              | <---X--->                            | <---X--->
-Let It Out                                  | Place 5 Smoke Vent                                 | <---X--->                            | <---X--->
+Let It Snow                                 | Place 5 Frost Roses together                       | <---X--->                            | <---X--->
+Let It Cascade                              | Place 1 Cascade Block                              | <---X--->                            | <---X--->
+Let It Out                                  | Place 5 Smoke Vents                                | <---X--->                            | <---X--->
 Colorful Smoke                              | Dye the Smoke Vent any color                       | <---X--->                            | <---X--->
 Can You Hear Me Now?                        | Activate a Muff Block                              | <---X--->                            | <---X--->
-Are you Nuts                                | Place 20 Bolts                                     | <---X--->                            | <---X--->
+Are You Nuts                                | Place 20 Bolts                                     | <---X--->                            | <---X--->
 Grand Celebration                           | Craft all 7 Celebration Firework Stars             | <---X--->                            | buildscape:infinite_phoenix_firework_star
-Rainbow Mood Light                          | Obtain all 16 Froglight colors                     | buildscape:test_trophy               | <---X--->
+Celebrate in Style                          | Fire off Confetti 15 times                         | <---X--->                            | buildscape:music_disc_celebration
+Rainbow Mood Light                          | Obtain all 16 Froglight colors                     | <---X--->                            | <---X--->
 One More Block                              | Place 100 Buildscape blocks                        | buildscape:gold_buildscape_trophy    | <---X--->
 Okay, One More                              | Place 1,000 Buildscape blocks                      | buildscape:emerald_buildscape_trophy | <---X--->
 Actually, One Last                          | Place 10,000 Buildscape blocks                     | buildscape:diamond_buildscape_trophy | <---X--->
-One Last one, i promise                     | Place 100,000 Buildscape blocks                    | buildscape:netherite_buildscape_trophy| <---X--->
+One Last One, I Promise                     | Place 100,000 Buildscape blocks                    | buildscape:netherite_buildscape_trophy| <---X--->
 Reach for the Sky                           | Build a Pillar reaching the world height limit     | buildscape:firelight_trophy          | <---X--->
-Jar-ring Display                            | Craft 100 Jars                                     | buildscape:golden_jar_trophy         | buildscape:golden_jar
-Hammer Time                                 | Replace 1000 block with a Hammer                   | buildscape:diamond_hammer_trophy     | <---X--->
+Jar-ring Display                            | Craft 100 Jars                                     | buildscape:golden_jar_trophy         | buildscape:golden_jar_pattern
+Hammer Time                                 | Replace 1,000 blocks with a Hammer                 | buildscape:diamond_hammer_trophy     | <---X--->
 Put It on Display                           | Interact with Pillars 10 times                     | buildscape:stone_pillar_trophy       | buildscape:ashenking_gold_pillar
-Columnist                                   | Interact with Pillars 69 Times                     | buildscape:gold_pillar_trophy        | buildscape:ashenking_emerald_pillar
+Columnist                                   | Interact with Pillars 69 times                     | buildscape:gold_pillar_trophy        | buildscape:ashenking_emerald_pillar
 Art Collector                               | Interact with Pillars 100 times                    | buildscape:diamond_pillar_trophy     | buildscape:ashenking_diamond_pillar
-Buildscape Museum                           | Interact with Pillars 1000 times                   | buildscape:netherite_pillar_trophy   | buildscape:ashenking_netherite_pillar
-Christmas Every Day                         | Craft 365 Stockings                                | buildscape:emerald_stocking_trophy   | CUSTOM_ITEM_ID
-Ornamental                                  | Place 100 Ornaments                                | buildscape:gold_ornament_trophy      | CUSTOM_ITEM_ID
-Light em Up                                 | Place 100 String Lights                            | buildscape:string_light_trophy       | CUSTOM_ITEM_ID
-Santa's Little Helper                       | Place 100 Stars                                    | buildscape:star_trophy               | buildscape:festive_star
+Buildscape Museum                           | Interact with Pillars 1,000 times                  | buildscape:netherite_pillar_trophy   | buildscape:ashenking_netherite_pillar
+Christmas Every Day                         | Craft 365 Stockings                                | buildscape:emerald_stocking_trophy   | buildscape:music_disc_snowfall
+Ornamental                                  | Place 100 Ornaments                                | buildscape:gold_ornament_trophy      | buildscape:red_ornament
+Light 'Em Up                                | Place 100 String Lights                            | buildscape:string_light_trophy       | buildscape:stringlight_frame_pattern
+Santa's Little Helper                       | Place 100 Stars                                    | buildscape:star_trophy               | buildscape:festive_star_pattern
 A White Christmas                           | Place 100 Snowy Leaves                             | <---X--->                            | buildscape:snowy_spruce_leaves
-A Very Buildscape Christmas                 | Obtain every Christmas decoration                  | buildscape:test_trophy               | <---X--->
+A Very Buildscape Christmas                 | Obtain every Christmas decoration                  | <---X--->                            | buildscape:festive_glint_shard
 Chill Out                                   | Place 10 Icicles                                   | <---X--->                            | <---X--->
 ```
 
@@ -59,23 +60,22 @@ Chill Out                                   | Place 10 Icicles                  
 trophy_id   = Trophy awarded by the achievement
 item_id     = Custom achievement reward item awarded
 <---X--->   = No reward of this type
-
-CUSTOM_ITEM_ID = Custom reward item still pending implementation / texturing
 ```
 
 ### Current Custom Item Rewards
 
 ```text
-Jar-ring Display          → buildscape:golden_jar
+Jar-ring Display          → buildscape:golden_jar_pattern
 Put It on Display         → buildscape:ashenking_gold_pillar
 Columnist                 → buildscape:ashenking_emerald_pillar
 Art Collector             → buildscape:ashenking_diamond_pillar
 Buildscape Museum         → buildscape:ashenking_netherite_pillar
-Santa's Little Helper     → buildscape:festive_star
+Santa's Little Helper     → buildscape:festive_star_pattern
 Grand Celebration         → buildscape:infinite_phoenix_firework_star
+Celebrate in Style        → buildscape:music_disc_celebration
 A White Christmas         → buildscape:snowy_spruce_leaves
-
-Christmas Every Day       → CUSTOM_ITEM_ID (pending item asset)
-Ornamental                → CUSTOM_ITEM_ID (pending item asset)
-Light em Up               → CUSTOM_ITEM_ID (pending item asset)
+Christmas Every Day       → buildscape:music_disc_snowfall
+Ornamental                → buildscape:red_ornament
+Light 'Em Up              → buildscape:stringlight_frame_pattern
+A Very Buildscape Christmas → buildscape:festive_glint_shard
 ```

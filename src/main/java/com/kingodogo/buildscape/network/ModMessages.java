@@ -136,5 +136,12 @@ public class ModMessages {
                 ClearBiomeBrushPacket::decode,
                 ClearBiomeBrushPacket::handle
         );
+        INSTANCE.registerMessage(
+                id++,
+                SyncSignFramePacket.class,
+                SyncSignFramePacket::encode,
+                SyncSignFramePacket::decode,
+                SyncSignFramePacket::handle
+        );
     }
 }

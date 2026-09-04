@@ -527,6 +527,11 @@ public class ModSounds {
         );
     }
 
+    public static final RegistryObject<SoundEvent> MUSIC_DISC_CELEBRATION =
+            registerSoundEvent("music_disc_celebration");
+    public static final RegistryObject<SoundEvent> MUSIC_DISC_SNOWFALL =
+            registerSoundEvent("music_disc_snowfall");
+
     public static void register(IEventBus eventBus) {
         SOUND_EVENTS.register(eventBus);
     }

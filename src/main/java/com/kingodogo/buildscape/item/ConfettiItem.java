@@ -37,6 +37,10 @@ public class ConfettiItem extends Item {
 
             spawnConfettiParticles((ServerLevel) level, player, itemstack);
 
+            if (player instanceof net.minecraft.server.level.ServerPlayer serverPlayer) {
+                com.kingodogo.buildscape.event.AdvancementEvents.onConfettiUsed(serverPlayer);
+            }
+
             if (!player.getAbilities().instabuild) {
                 itemstack.shrink(1);
             }

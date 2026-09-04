@@ -35,6 +35,7 @@ public class CyclePillarPatternPacket {
                 .enqueueWork(() -> {
                     ServerPlayer player = ctx.get().getSender();
                     if (player == null || player.level == null) return;
+                    if (player.distanceToSqr(pillarPos.getX() + 0.5, pillarPos.getY() + 0.5, pillarPos.getZ() + 0.5) > 64.0 || !player.level.hasChunkAt(pillarPos)) return;
 
                     BlockEntity be = player.level.getBlockEntity(pillarPos);
 
@@ -63,8 +64,9 @@ public class CyclePillarPatternPacket {
                                 .pattern;
                     }
 
-                    String capitalizedPattern =
-                            pattern.substring(0, 1).toUpperCase() + pattern.substring(1);
+                    String capitalizedPattern = (pattern != null && !pattern.isEmpty())
+                            ? pattern.substring(0, 1).toUpperCase() + pattern.substring(1)
+                            : "Default";
 
                     net.minecraft.ChatFormatting color = getPatternColor(pattern);
 
@@ -91,6 +93,7 @@ public class CyclePillarPatternPacket {
     }
 
     private static net.minecraft.ChatFormatting getPatternColor(String pattern) {
+        if (pattern == null) return net.minecraft.ChatFormatting.WHITE;
         switch (pattern) {
             case "default":
                 return net.minecraft.ChatFormatting.WHITE;

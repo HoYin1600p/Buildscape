@@ -12,8 +12,6 @@ import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraft.core.Direction;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -141,7 +139,6 @@ public class PillarBlockEntity extends BlockEntity {
     private static final int SYNC_INTERVAL = 100; // Sync every 100 ticks (5 seconds) — colors/patterns change rarely
     private Boolean usePattern = null; // PER-PILLAR OVERRIDE for cfg.use_pattern
 
-    @OnlyIn(Dist.CLIENT)
     public static void clientTick(
             net.minecraft.world.level.Level level,
             BlockPos pos,
@@ -216,7 +213,6 @@ public class PillarBlockEntity extends BlockEntity {
         return displayedItem;
     }
 
-    @OnlyIn(Dist.CLIENT)
     private static ParticleSpawnData calculateParticleData(
             PillarBlockEntity be,
             PillarParticleConfig cfg,
@@ -663,7 +659,7 @@ public class PillarBlockEntity extends BlockEntity {
             }
         }
 
-        // ── Sync pattern ───────────────────────────────────────────────
+        // ── Sync pattern ──────────────────────────────────────────────
         if (data != null) {
             String managerPattern = data.pattern;
             if (managerPattern != null && !managerPattern.isEmpty()) {
@@ -1298,15 +1294,17 @@ public class PillarBlockEntity extends BlockEntity {
                 }
 
                 try {
-                    net.minecraft.world.level.chunk.ChunkAccess chunk = level.getChunk(
-                            current);
-                    if (!(chunk instanceof net.minecraft.world.level.chunk.LevelChunk)) {
-                        break;
-                    }
-                    if (!chunk
-                            .getStatus()
-                            .isOrAfter(net.minecraft.world.level.chunk.ChunkStatus.FULL)) {
-                        break;
+                    if (!level.isClientSide) {
+                        net.minecraft.world.level.chunk.ChunkAccess chunk = level.getChunk(
+                                current);
+                        if (!(chunk instanceof net.minecraft.world.level.chunk.LevelChunk)) {
+                            break;
+                        }
+                        if (!chunk
+                                .getStatus()
+                                .isOrAfter(net.minecraft.world.level.chunk.ChunkStatus.FULL)) {
+                            break;
+                        }
                     }
                 } catch (Exception e) {
                     break;
@@ -1907,9 +1905,8 @@ public class PillarBlockEntity extends BlockEntity {
         }
     }
 
-    @OnlyIn(Dist.CLIENT)
     private static class ClientParticleHelper {
-        // ── Particle reflection cache ────────────────────────────────────────────────
+        // ── Particle reflection cache ───────────────────────────────────
         // Look up the providers map and the internal ParticleEngine.add() once per
         // particle type rather than on every spawn tick. Keyed by particle type so
         // both GLOW_LIME_SPARKLE and SNOWFLAKE each get their own cached provider.
@@ -2099,7 +2096,6 @@ public class PillarBlockEntity extends BlockEntity {
         }
     }
 
-    @OnlyIn(Dist.CLIENT)
     private record ParticleSpawnData(double sx, double sy, double sz, double vx, double vy, double vz, float size) {
 
     }

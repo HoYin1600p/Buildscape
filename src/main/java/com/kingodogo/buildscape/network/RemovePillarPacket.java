@@ -40,14 +40,11 @@ public class RemovePillarPacket {
         ctx.get().enqueueWork(() -> {
             ServerPlayer player = ctx.get().getSender();
             if (player == null) return;
+            if (!player.hasPermissions(2)) return;
 
             PillarIdManager manager = PillarIdManager.get();
             boolean changed = false;
             for (String id : pillarIds) {
-                // We don't check for OP here as usually players managing the GUI should be able to remove them.
-                // If it's a global server-wide manager, maybe security is needed, but the user didn't specify.
-                // However, PillarIdManager is usually global.
-
                 PillarIdManager.PillarData data = manager.getPillarData(id);
                 if (data != null) {
                     manager.removePillar(id);

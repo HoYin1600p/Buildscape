@@ -163,7 +163,7 @@ public abstract class AdvancementWidgetMixin {
 
     @Redirect(method = "draw", at = @At(value = "INVOKE", target = "Lnet/minecraft/advancements/DisplayInfo;getIcon()Lnet/minecraft/world/item/ItemStack;"))
     private ItemStack cycleIconIfApplicable(DisplayInfo displayInfo) {
-        if (advancement == null || advancement.getId() == null) {
+        if (advancement == null || advancement.getId() == null || !"buildscape".equals(advancement.getId().getNamespace())) {
             return displayInfo.getIcon();
         }
 

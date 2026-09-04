@@ -243,6 +243,7 @@ public class HollowLogBlockEntity extends BlockEntity {
 
     @Override
     public void load(CompoundTag tag) {
+        PipeFlowState previousFlow = pipeFlowState;
         super.load(tag);
         if (tag.contains("DecorationState")) {
             decorationState = NbtUtils.readBlockState(tag.getCompound("DecorationState"));
@@ -271,6 +272,15 @@ public class HollowLogBlockEntity extends BlockEntity {
             pipeFlowState = PipeFlowState.readFromNbt(tag.getCompound("PipeFlowState"));
         } else {
             pipeFlowState = new PipeFlowState();
+        }
+        // The outlet spill lives in the adjacent water's chunk mesh, not the block entity renderer.
+        if (level != null && level.isClientSide && getBlockState().getBlock() instanceof HollowPipeBlock
+                && !previousFlow.equals(pipeFlowState)) {
+            for (net.minecraft.core.Direction direction : net.minecraft.core.Direction.Plane.HORIZONTAL) {
+                BlockPos neighbor = worldPosition.relative(direction);
+                BlockState neighborState = level.getBlockState(neighbor);
+                level.sendBlockUpdated(neighbor, neighborState, neighborState, Block.UPDATE_CLIENTS);
+            }
         }
     }
 

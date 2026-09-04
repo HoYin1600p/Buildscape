@@ -458,9 +458,11 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
             if (isOpenEndpoint(state, dir)) {
                 // Downward exits (waterfalls) always use full strength because the BFS
                 // resets the distance counter on a vertical drop, just like vanilla does.
-                int amount = (dir == Direction.DOWN) ? WaterPipeTransport.MAX_HORIZONTAL_FLOW : outflowAmount;
+                boolean fallingWater = dir == Direction.DOWN && fluid.isSame(Fluids.WATER);
+                int amount = fallingWater ? 8
+                        : (dir == Direction.DOWN ? WaterPipeTransport.MAX_HORIZONTAL_FLOW : outflowAmount);
                 if (amount <= 0) continue; // pipe has used up all 7 horizontal blocks
-                spreadToWorldBlock(level, pos.relative(dir), fluid, amount);
+                spreadToWorldBlock(level, pos.relative(dir), fluid, amount, fallingWater);
             }
         }
     }
@@ -473,6 +475,10 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
      *               than restarting it at full strength from the pipe exit.
      */
     public static void spreadToWorldBlock(Level level, BlockPos neighborPos, Fluid fluid, int amount) {
+        spreadToWorldBlock(level, neighborPos, fluid, amount, false);
+    }
+
+    private static void spreadToWorldBlock(Level level, BlockPos neighborPos, Fluid fluid, int amount, boolean falling) {
         if (amount <= 0) return;
         BlockState neighborState = level.getBlockState(neighborPos);
         if (neighborState.getBlock() instanceof HollowLogBlock || neighborState.getBlock() instanceof HollowPipeBlock) {
@@ -480,7 +486,7 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
         }
 
         if (fluid instanceof FlowingFluid flowing) {
-            BlockState fluidBlock = flowing.getFlowing(amount, false).createLegacyBlock();
+            BlockState fluidBlock = flowing.getFlowing(amount, falling).createLegacyBlock();
             if (!fluidBlock.isAir()) {
                 if (neighborState.isAir() || neighborState.canBeReplaced(fluid)
                         || (neighborState.getBlock() instanceof LiquidBlock && !neighborState.getFluidState().isSource())) {
@@ -488,7 +494,8 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
                         level.setBlock(neighborPos, fluidBlock, 3);
                     }
                     // Always reschedule so vanilla fluid tick keeps the block alive and spreads it further
-                    level.scheduleTick(neighborPos, flowing, flowing.getTickDelay(level));
+                    Fluid placedFluid = fluidBlock.getFluidState().getType();
+                    level.scheduleTick(neighborPos, placedFluid, placedFluid.getTickDelay(level));
                 }
             }
         } else {

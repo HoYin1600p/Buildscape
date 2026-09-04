@@ -26,10 +26,8 @@ public abstract class StonecutterScreenMixin extends AbstractContainerScreen<Sto
     protected void init() {
         super.init();
 
-        // Output slot is centered around x=143 and ends at x=159 (16px slot contents, 18px border/outline from x=142 to x=160).
-        // Making our button 18px wide aligns it perfectly with the output slot.
         int x = this.leftPos + 142;
-        int y = this.topPos + 10; // Moved higher up to create separation from the output slot
+        int y = this.topPos + 10;
 
         this.addRenderableWidget(new Button(x, y, 18, 10, TextComponent.EMPTY, (button) -> {
             boolean current = ((StonecutterMenuExtension) this.menu).buildscape$isCutAll();
@@ -42,15 +40,12 @@ public abstract class StonecutterScreenMixin extends AbstractContainerScreen<Sto
             public void renderButton(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
                 boolean active = ((StonecutterMenuExtension) StonecutterScreenMixin.this.menu).buildscape$isCutAll();
 
-                // Dark border
                 int borderColor = 0xFF000000;
-                // Green when active, dark grey when inactive
                 int bgColor = active ? 0xFF107C41 : 0xFF4A4A4A;
 
                 fill(poseStack, this.x, this.y, this.x + this.width, this.y + this.height, borderColor);
                 fill(poseStack, this.x + 1, this.y + 1, this.x + this.width - 1, this.y + this.height - 1, bgColor);
 
-                // Slider handle (6px wide inside an 18px wide button)
                 int thumbX = active ? this.x + this.width - 7 : this.x + 1;
                 int thumbColor = 0xFFFFFFFF;
                 fill(poseStack, thumbX, this.y + 1, thumbX + 6, this.y + this.height - 1, thumbColor);

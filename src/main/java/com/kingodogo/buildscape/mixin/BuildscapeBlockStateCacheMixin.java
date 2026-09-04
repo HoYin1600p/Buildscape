@@ -8,12 +8,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-/**
- * Collects Buildscape block-state cache work during the Forge block-registry
- * bake. Other mods and vanilla states are never intercepted.
- *
- * @author hoyin1600p
- */
 @Mixin(BlockBehaviour.BlockStateBase.class)
 public abstract class BuildscapeBlockStateCacheMixin {
     @Inject(method = "initCache", at = @At("HEAD"), cancellable = true)

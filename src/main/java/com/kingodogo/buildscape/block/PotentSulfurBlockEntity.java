@@ -163,19 +163,16 @@ public class PotentSulfurBlockEntity extends BlockEntity {
 
                Vec3 newVelocity;
                if (entityY < targetY - 1.0D) {
-                  // Propel upwards towards the top of the cloud
                   double targetSpeed = Math.min(0.65D, 0.4D + (double)waterBlocks * 0.06D);
                   double newY = Math.min(targetSpeed, Math.max(entityVelocity.y + 0.18D, 0.4D));
                   double horizDamping = isPlayer ? 1.0D : 0.9D;
                   newVelocity = new Vec3(entityVelocity.x * horizDamping, newY, entityVelocity.z * horizDamping);
                } else if (entityY <= targetY + 1.8D) {
-                  // Float & bob up and down right at the cloud surface
                   double hoverY = (targetY - entityY) * 0.45D + bobbingVel;
                   double finalY = (isPlayer && entityVelocity.y > 0.2D) ? Math.max(hoverY, entityVelocity.y) : hoverY;
                   double horizDamping = isPlayer ? 1.0D : 0.85D;
                   newVelocity = new Vec3(entityVelocity.x * horizDamping, finalY, entityVelocity.z * horizDamping);
                } else {
-                  // Above target height: allow gravity to bring entity down to cloud top
                   continue;
                }
 

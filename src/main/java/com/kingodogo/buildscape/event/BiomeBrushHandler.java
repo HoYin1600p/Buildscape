@@ -30,7 +30,6 @@ public class BiomeBrushHandler {
 
         ItemStack stack = player.getItemInHand(InteractionHand.MAIN_HAND);
         if (!stack.isEmpty() && stack.getItem() instanceof BiomeBrushItem brush) {
-            // Cancel standard block breaking
             event.setCanceled(true);
             event.setCancellationResult(InteractionResult.SUCCESS);
 
@@ -41,10 +40,8 @@ public class BiomeBrushHandler {
                 }
 
                 if (player.isShiftKeyDown()) {
-                    // Sneak + Left-click to clear biome
                     brush.clearCapturedBiome(stack, player);
                 } else {
-                    // Normal Left-click to set Position 2
                     brush.setPos2(stack, event.getPos(), player);
                 }
             }
@@ -62,7 +59,6 @@ public class BiomeBrushHandler {
                                (!offHand.isEmpty() && offHand.getItem() instanceof BiomeBrushItem);
 
         if (holdingBrush && player.isShiftKeyDown()) {
-            // Send clear packet to server
             ModMessages.INSTANCE.sendToServer(new ClearBiomeBrushPacket());
         }
     }
@@ -108,25 +104,21 @@ public class BiomeBrushHandler {
             double z1 = minZ;
             double z2 = maxZ + 1.0;
 
-            // Spawn vertical edges
             spawnEdgeParticlesY(level, x1, y1, y2, z1, random);
             spawnEdgeParticlesY(level, x1, y1, y2, z2, random);
             spawnEdgeParticlesY(level, x2, y1, y2, z1, random);
             spawnEdgeParticlesY(level, x2, y1, y2, z2, random);
 
-            // Spawn horizontal edges - X
             spawnEdgeParticlesX(level, x1, x2, y1, z1, random);
             spawnEdgeParticlesX(level, x1, x2, y1, z2, random);
             spawnEdgeParticlesX(level, x1, x2, y2, z1, random);
             spawnEdgeParticlesX(level, x1, x2, y2, z2, random);
 
-            // Spawn horizontal edges - Z
             spawnEdgeParticlesZ(level, x1, y1, z1, z2, random);
             spawnEdgeParticlesZ(level, x1, y2, z1, z2, random);
             spawnEdgeParticlesZ(level, x2, y1, z1, z2, random);
             spawnEdgeParticlesZ(level, x2, y2, z1, z2, random);
 
-            // Highlight corners/positions
             spawnPosParticles(level, pos1, random);
             spawnPosParticles(level, pos2, random);
         } else {

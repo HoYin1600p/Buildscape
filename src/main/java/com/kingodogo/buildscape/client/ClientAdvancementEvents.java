@@ -39,14 +39,12 @@ public class ClientAdvancementEvents {
             double delta = event.getScrollDelta();
 
             if (Screen.hasShiftDown()) {
-                // SHIFT + Scroll: Horizontal Scroll (Left / Right)
                 AdvancementTab tab = getSelectedTab(screen);
                 if (tab != null) {
                     tab.scroll(delta * 32.0, 0.0);
                 }
                 event.setCanceled(true);
             } else {
-                // Normal Scroll: Vertical Scroll (Up / Down)
                 AdvancementTab tab = getSelectedTab(screen);
                 if (tab != null) {
                     tab.scroll(0.0, delta * 32.0);

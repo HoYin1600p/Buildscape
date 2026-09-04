@@ -100,7 +100,6 @@ public class BiomeBrushItem extends Item {
     @Override
     public boolean canBeHurtBy(DamageSource source) {
         if (tier == BiomeBrushTier.NETHERITE && (source.isBypassInvul() || source.isFire() || source.isExplosion())) {
-            // Netheite items are immune to fire and explosions. But allow bypassInvul (void, creative-mode kill)
             if (source.isBypassInvul()) {
                 return super.canBeHurtBy(source);
             }
@@ -109,7 +108,6 @@ public class BiomeBrushItem extends Item {
         return super.canBeHurtBy(source);
     }
 
-    // Biome NBT helpers
     @Nullable
     public String getCapturedBiome(ItemStack stack) {
         CompoundTag tag = stack.getTag();
@@ -133,7 +131,6 @@ public class BiomeBrushItem extends Item {
         }
     }
 
-    // Position NBT helpers
     @Nullable
     public BlockPos getPos1(ItemStack stack) {
         CompoundTag tag = stack.getTag();
@@ -177,14 +174,12 @@ public class BiomeBrushItem extends Item {
         ItemStack stack = context.getItemInHand();
         BlockPos clickedPos = context.getClickedPos();
 
-        // 0. Check if brush is broken
         if (stack.getDamageValue() >= stack.getMaxDamage()) {
             level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.DISPENSER_FAIL, SoundSource.PLAYERS, 1.0f, 0.8f);
             player.displayClientMessage(new TranslatableComponent("message.buildscape.biome_brush.broken").withStyle(ChatFormatting.RED), true);
             return InteractionResult.FAIL;
         }
 
-        // 1. Sneak + Right-click to apply biome
         if (player.isShiftKeyDown()) {
             if (level.isClientSide()) {
                 return InteractionResult.SUCCESS;
@@ -225,7 +220,6 @@ public class BiomeBrushItem extends Item {
             int affectedBlocks = 0;
             Set<LevelChunk> modifiedChunks = new HashSet<>();
 
-            // Caching variables for fast lookup
             LevelChunk lastChunk = null;
             int lastChunkX = Integer.MIN_VALUE;
             int lastChunkZ = Integer.MIN_VALUE;
@@ -251,7 +245,6 @@ public class BiomeBrushItem extends Item {
                     int qZ = shiftedZ >> 2;
                     int localQz = qZ & 3;
 
-                    // Retrieve chunk (cached)
                     LevelChunk chunk;
                     if (chunkX == lastChunkX && chunkZ == lastChunkZ && lastChunk != null) {
                         chunk = lastChunk;
@@ -276,7 +269,6 @@ public class BiomeBrushItem extends Item {
                     }
 
                     for (int y = minY; y <= maxY; y++) {
-                        // Check durability
                         if (stack.getDamageValue() >= stack.getMaxDamage()) {
                             broken = true;
                             break;
@@ -287,7 +279,6 @@ public class BiomeBrushItem extends Item {
                         int qY = shiftedY >> 2;
                         int localQy = qY & 3;
 
-                        // Retrieve section (cached)
                         LevelChunkSection section;
                         if (sectionIndex == lastSectionIndex && lastSection != null) {
                             section = lastSection;
@@ -306,7 +297,6 @@ public class BiomeBrushItem extends Item {
                         }
 
                         if (lastBiomes != null) {
-                            // Check if the quart is different from the last set quart in this container
                             if (qX != lastQuartX || qY != lastQuartY || qZ != lastQuartZ) {
                                 lastBiomes.set(localQx, localQy, localQz, biomeHolder);
                                 lastQuartX = qX;
@@ -317,7 +307,6 @@ public class BiomeBrushItem extends Item {
 
                         affectedBlocks++;
 
-                        // Handle durability decrease
                         boolean shouldDamage = true;
                         if (unbreakingLevel > 0) {
                             shouldDamage = level.random.nextInt(unbreakingLevel + 1) == 0;
@@ -335,21 +324,17 @@ public class BiomeBrushItem extends Item {
                 }
             }
 
-            // Sync all modified chunks
             for (LevelChunk chunk : modifiedChunks) {
                 chunk.setUnsaved(true);
                 syncChunk(serverLevel, chunk);
             }
 
-            // Play sound
             level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.BONE_MEAL_USE, SoundSource.PLAYERS, 1.0f, 1.0f);
 
-            // Display feedback
             Component biomeName = new TranslatableComponent("biome." + biomeKey.getNamespace() + "." + biomeKey.getPath());
             player.displayClientMessage(new TranslatableComponent("message.buildscape.biome_brush.applied", biomeName).withStyle(ChatFormatting.GREEN), true);
             player.displayClientMessage(new TranslatableComponent("message.buildscape.biome_brush.applied_detail", affectedBlocks).withStyle(ChatFormatting.GREEN), false);
 
-            // Clear positions after application
             CompoundTag tag = stack.getTag();
             if (tag != null) {
                 tag.remove(KEY_POS1);
@@ -359,14 +344,12 @@ public class BiomeBrushItem extends Item {
             return InteractionResult.SUCCESS;
         }
 
-        // 2. Normal Right-click (Non-sneaking)
         if (level.isClientSide()) {
             return InteractionResult.SUCCESS;
         }
 
         String biomeStr = getCapturedBiome(stack);
         if (biomeStr == null) {
-            // Capture Biome
             Holder<Biome> biomeHolder = level.getBiome(clickedPos);
             ResourceLocation biomeKey = registryKey(level, biomeHolder.value());
             if (biomeKey != null) {
@@ -382,7 +365,6 @@ public class BiomeBrushItem extends Item {
                 }
             }
         } else {
-            // Set Position 1
             setPos1(stack, clickedPos, player);
         }
 

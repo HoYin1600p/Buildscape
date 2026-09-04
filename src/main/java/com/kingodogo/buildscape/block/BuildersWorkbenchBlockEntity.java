@@ -23,15 +23,6 @@ import java.util.List;
 
 public class BuildersWorkbenchBlockEntity extends BlockEntity implements MenuProvider, Container {
 
-    /**
-     * Slot layout (30 total workbench slots):
-     * 0        – Color Picker tool slot
-     * 1–9      – Color result slots
-     * 10        – Input Pouch slot
-     * 11        – Output Pouch slot
-     * 12–20     – Gradient Output slots (server-written, read-only for players)
-     * 21–29     – Gradient Input slots (user-editable)
-     */
     public static final int SLOT_COLOR_PICKER = 0;
     public static final int SLOT_PRESETS_START = 1;
     public static final int SLOT_PRESETS_END = 9;
@@ -41,19 +32,14 @@ public class BuildersWorkbenchBlockEntity extends BlockEntity implements MenuPro
     public static final int SLOT_GRADIENT_END = 20;
     public static final int SLOT_GRADIENT_INPUT_START = 21;
     public static final int SLOT_GRADIENT_INPUT_END = 29;
-    public static final int TOTAL_SLOTS = 30; // 0–29
+    public static final int TOTAL_SLOTS = 30;
 
     private static final int TAB_COUNT = 2;
     private static final int RESULT_COUNT = 9;
 
     private final NonNullList<ItemStack> items = NonNullList.withSize(TOTAL_SLOTS, ItemStack.EMPTY);
     private final int[][] resultOffsetsByTab = new int[TAB_COUNT][RESULT_COUNT];
-    // Persisted filter/tab state
-    private int activeTab = 0; // 0=ColorPicker, 1=GradientBuilder
-    /**
-     * Bumped when the meaning of the saved mask changes; older tags fall back to
-     * FILTER_DEFAULT instead of silently keeping the previous all-on state.
-     */
+    private int activeTab = 0;
     private static final int FILTER_MASK_VERSION = 3;
     private int filterMask = com.kingodogo.buildscape.util.ColorGradientSolver.FILTER_DEFAULT;
     private int copyProgress = 0;
@@ -107,7 +93,6 @@ public class BuildersWorkbenchBlockEntity extends BlockEntity implements MenuPro
         super(ModBlockEntities.BUILDERS_WORKBENCH_BE.get(), pos, state);
     }
 
-    // ── MenuProvider ──────────────────────────────────────────────────────────
 
     @Override
     public Component getDisplayName() {
@@ -120,7 +105,6 @@ public class BuildersWorkbenchBlockEntity extends BlockEntity implements MenuPro
         return new BuildersWorkbenchMenu(windowId, playerInv, this);
     }
 
-    // ── Container ─────────────────────────────────────────────────────────────
 
     @Override
     public int getContainerSize() {
@@ -228,7 +212,7 @@ public class BuildersWorkbenchBlockEntity extends BlockEntity implements MenuPro
         if (canCopy) {
             copyProgress++;
             setChanged();
-            if (copyProgress >= 40) { // 2 seconds
+            if (copyProgress >= 40) {
                 ItemStack pouchCopy = inPouch.copy();
                 if (writeSolvedToPouch(pouchCopy)) {
                     this.setItem(SLOT_OUTPUT_POUCH, pouchCopy);
@@ -309,7 +293,6 @@ public class BuildersWorkbenchBlockEntity extends BlockEntity implements MenuPro
             }
         }
 
-        // Find the first row (0, 1, or 2) that can fit the non-empty solved filters
         int targetRow = -1;
         for (int row = 0; row < 3; row++) {
             boolean rowCanFit = true;
@@ -327,7 +310,7 @@ public class BuildersWorkbenchBlockEntity extends BlockEntity implements MenuPro
             if (rowCanFit) {
                 if (!rowHasAnyConflict || targetRow < 0) {
                     targetRow = row;
-                    if (!rowHasAnyConflict) break; // Ideal: completely empty row!
+                    if (!rowHasAnyConflict) break;
                 }
             }
         }
@@ -379,7 +362,6 @@ public class BuildersWorkbenchBlockEntity extends BlockEntity implements MenuPro
         setChanged();
     }
 
-    // ── Accessors ─────────────────────────────────────────────────────────────
 
     public int getActiveTab() {
         return activeTab;
@@ -527,7 +509,6 @@ public class BuildersWorkbenchBlockEntity extends BlockEntity implements MenuPro
         return tab == 1 ? 1 : 0;
     }
 
-    // ── NBT ───────────────────────────────────────────────────────────────────
 
     @Override
     public void load(CompoundTag tag) {

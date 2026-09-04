@@ -24,23 +24,21 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
 
     private static final String[] PATTERNS = {"beam", "spiral", "fountain", "pulse", "ring", "burst", "snowflake"};
 
-    // Consolidated constants for consistent layout
     private static final int UI_PADDING = 10;
     private static final int TITLE_HEIGHT = 20;
     private static final int BUTTON_HEIGHT = 20;
     private static final int FIELD_HEIGHT = 14;
     private static final int SLIDER_HEIGHT = 14;
-    private static final int COMPONENT_SPACING = 4; // Increased for better clarity
-    private static final int BTN_TO_FIELD_SPACING = 8; // More gap between button and fields
+    private static final int COMPONENT_SPACING = 4;
+    private static final int BTN_TO_FIELD_SPACING = 8;
     private static final int SCROLLBAR_WIDTH = 8;
     private static final int SCROLLBAR_RIGHT_MARGIN = 5;
     private static final int COMPONENT_SCROLLBAR_GAP = 10;
 
-    // Spacing for Color Swatches
-    private static final int COLOR_SWATCH_SIZE = 14; // Small and neat
-    private static final int COLOR_ROW_SPACING = 6; // Matching user's request for gap
+    private static final int COLOR_SWATCH_SIZE = 14;
+    private static final int COLOR_ROW_SPACING = 6;
     private static final int COLOR_HEADER_SPACE = 16;
-    private static final int HEADER_CLIP = 16; // 5px top + ~9px font + 2px safety gap
+    private static final int HEADER_CLIP = 16;
 
     private Button usePatternToggle;
     private Button patternSelector;
@@ -52,14 +50,14 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
     private EditBox patternSpreadField;
     private EditBox patternIntensityField;
     private IntSliderWidget maxParticleColorSlider;
-    private ColorPickerWidget sharedColorPicker; // Single color picker widget (only one visible at a time)
-    private List<ColorSwatchButton> colorSwatchButtons; // 7 color swatch buttons
-    private List<EditBox> colorHexFields; // Hex code edit boxes next to color swatches
+    private ColorPickerWidget sharedColorPicker;
+    private List<ColorSwatchButton> colorSwatchButtons;
+    private List<EditBox> colorHexFields;
     private int currentPatternIndex = 0;
-    private int currentMaxColor = 7; // Always 7 swatches
-    private int selectedColorIndex = -1; // Which color swatch is currently selected (-1 = none)
-    private ColorPickerWidget activeDraggingPicker = null; // Track which picker is being dragged
-    private boolean isDraggingSlider = false; // Track if slider is being dragged
+    private int currentMaxColor = 7;
+    private int selectedColorIndex = -1;
+    private ColorPickerWidget activeDraggingPicker = null;
+    private boolean isDraggingSlider = false;
     private Button colorsResetButton;
 
     private final com.kingodogo.buildscape.client.screen.widget.CustomScrollbarRenderer defaultScrollbarRenderer = new com.kingodogo.buildscape.client.screen.widget.CustomScrollbarRenderer();
@@ -72,48 +70,47 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
 
     private Component getUsePatternMessage(boolean value) {
         TextComponent base = new TextComponent("");
-        base.append(new TextComponent("Use Pattern : ").withStyle(style -> style.withColor(TextColor.fromRgb(0x5555FF)))); // Blue
+        base.append(new TextComponent("Use Pattern : ").withStyle(style -> style.withColor(TextColor.fromRgb(0x5555FF))));
         if (value) {
-            base.append(new TextComponent("True").withStyle(style -> style.withColor(TextColor.fromRgb(0x00FF00)))); // Green
+            base.append(new TextComponent("True").withStyle(style -> style.withColor(TextColor.fromRgb(0x00FF00))));
         } else {
-            base.append(new TextComponent("False").withStyle(style -> style.withColor(TextColor.fromRgb(0xFF0000)))); // Red
+            base.append(new TextComponent("False").withStyle(style -> style.withColor(TextColor.fromRgb(0xFF0000))));
         }
         return base;
     }
 
     private Component getPatternMessage(String pattern) {
         TextComponent base = new TextComponent("");
-        base.append(new TextComponent("Pattern : ").withStyle(style -> style.withColor(TextColor.fromRgb(0x5555FF)))); // Blue
+        base.append(new TextComponent("Pattern : ").withStyle(style -> style.withColor(TextColor.fromRgb(0x5555FF))));
 
-        int color = 0xFFFFFF; // Default white
+        int color = 0xFFFFFF;
         switch (pattern) {
             case "beam":
                 color = 0x00FFFF;
-                break; // Cyan
+                break;
             case "spiral":
                 color = 0xFF00FF;
-                break; // Magenta
+                break;
             case "fountain":
                 color = 0x00FF00;
-                break; // Green
+                break;
             case "pulse":
                 color = 0xFF0000;
-                break; // Red
+                break;
             case "ring":
                 color = 0xFFAA00;
-                break; // Gold
+                break;
             case "burst":
                 color = 0xFF5555;
-                break; // Light Red
+                break;
             case "snowflake":
                 color = 0xA0FFFF;
-                break; // Light Cyan
+                break;
             default:
                 color = 0xAAAAAA;
                 break;
         }
 
-        // Translate pattern name properly if localized, or just capitalize
         String displayName = pattern.substring(0, 1).toUpperCase() + pattern.substring(1);
         final int finalColor = color;
         try {
@@ -133,19 +130,15 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
 
         PillarParticleConfig config = PillarParticleConfig.get();
 
-        // Load current values
         currentPatternIndex = findPatternIndex(config.pattern);
         currentMaxColor = Math.max(1, Math.min(7, config.max_particle_color));
 
-        // Widgets are created once; layout applied via relayout()
-        // Widgets are created once; layout applied via relayout()
         com.kingodogo.buildscape.client.screen.widget.ScaledTextButton usePatternBtn = new com.kingodogo.buildscape.client.screen.widget.ScaledTextButton(
                 0, 0,
                 100, 20,
                 getUsePatternMessage(config.use_pattern),
                 (btn) -> toggleUsePattern());
-        // Green text for "Use Pattern true" (cool looking) - handled by TextComponent colors now
-        usePatternBtn.setCustomTextColors(0, 0); // Ensure no override so component colors show
+        usePatternBtn.setCustomTextColors(0, 0);
         usePatternToggle = usePatternBtn;
         addTabWidget(usePatternToggle);
 
@@ -215,17 +208,16 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
         particleDensityField.setResponder(s -> updateConfigFromFields());
         addTabWidget(particleDensityField);
 
-        // Color swatches and single shared color picker
         colorSwatchButtons = new ArrayList<>();
         colorHexFields = new ArrayList<>();
-        sharedColorPicker = null; // Will be created in relayout
+        sharedColorPicker = null;
 
         com.kingodogo.buildscape.client.screen.widget.ScaledTextButton patternSelectorBtn = new com.kingodogo.buildscape.client.screen.widget.ScaledTextButton(
                 0, 0,
                 100, 20,
                 getPatternMessage(config.pattern),
                 (btn) -> cyclePattern());
-        patternSelectorBtn.setCustomTextColors(0, 0); // Allow component colors
+        patternSelectorBtn.setCustomTextColors(0, 0);
         patternSelector = patternSelectorBtn;
         patternSelector.active = config.use_pattern;
         addTabWidget(patternSelector);
@@ -290,7 +282,6 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
             } else {
                 resetColorsToDefault();
             }
-            // Ensure server is synchronized with the new global defaults
             com.kingodogo.buildscape.network.ModMessages.INSTANCE.sendToServer(
                     new com.kingodogo.buildscape.network.UpdateConfigPacket(PillarParticleConfig.get())
             );
@@ -304,16 +295,13 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
                 new TranslatableComponent("buildscape.config.particles.max_particle_color", currentMaxColor),
                 1, 7, currentMaxColor,
                 (value) -> onMaxParticleColorChanged(value));
-        maxParticleColorSlider.active = config.use_pattern; // Disable if use_pattern is false
+        maxParticleColorSlider.active = config.use_pattern;
         addTabWidget(maxParticleColorSlider);
 
-        // Initial layout - this will create color swatches and shared picker
         relayout(contentX, contentY, contentWidth, contentHeight);
 
-        // Update swatches enabled state based on max value
         updateSwatchesEnabledState();
 
-        // Update last dimensions to prevent immediate relayout
         lastContentX = contentX;
         lastContentY = contentY;
         lastContentWidth = contentWidth;
@@ -333,7 +321,6 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
         config.pattern_intensity = 1.0;
         config.saveProperties();
 
-        // Refresh UI state
         currentPatternIndex = findPatternIndex("ring");
         if (usePatternToggle != null) {
             usePatternToggle.setMessage(getUsePatternMessage(true));
@@ -364,15 +351,13 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
         config.max_particle_color = 3;
         config.saveProperties();
 
-        // Update local state and widgets
         currentMaxColor = 3;
         if (maxParticleColorSlider != null) {
             maxParticleColorSlider.setValue(3);
         }
-        // Re-create/Update swatches
         createColorSwatchesAndPicker(config);
-        updateColorSwatchesPositions(); // Ensure positions are updated after re-creation
-        updateSwatchesEnabledState(); // Ensure enabled state is correct
+        updateColorSwatchesPositions();
+        updateSwatchesEnabledState();
     }
 
     private void createColorSwatchesAndPicker(PillarParticleConfig config) {
@@ -383,7 +368,6 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
         int hexFieldHeight = BuildScapeConfigScreen.getScaledEditBoxHeight();
         int rowSpacing = BuildScapeConfigScreen.scaleSize(25);
 
-        // Clear existing widgets
         if (colorSwatchButtons != null) {
             colorSwatchButtons.clear();
         }
@@ -391,7 +375,6 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
             colorHexFields.clear();
         }
 
-        // Reinitialize lists if null
         if (colorSwatchButtons == null) {
             colorSwatchButtons = new ArrayList<>();
         }
@@ -399,13 +382,11 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
             colorHexFields = new ArrayList<>();
         }
 
-        // Ensure config has 7 colors
         while (config.particle_color.size() < 7) {
             config.particle_color.add("#FFFFFF");
         }
 
-        // Create 7 color swatches with hex fields in right top panel
-        int startY = colorBoxY + padding + 25; // Below title
+        int startY = colorBoxY + padding + 25;
         int swatchX = colorBoxX + padding;
         int hexFieldX = swatchX + swatchSize + swatchSpacing;
 
@@ -418,12 +399,10 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
                     color = Integer.parseInt(hexValue.substring(1), 16);
                 }
             } catch (NumberFormatException e) {
-                // Use default white
             }
 
             int swatchY = startY + i * rowSpacing;
 
-            // Create color swatch button
             ColorSwatchButton swatchButton = new ColorSwatchButton(
                     swatchX, swatchY,
                     swatchSize, swatchSize,
@@ -432,11 +411,8 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
             colorSwatchButtons.add(swatchButton);
             addTabWidget(swatchButton);
 
-            // Create hex field next to swatch (side by side, same Y position)
-            // Align hex field vertically with swatch (center it if heights differ)
-            int hexFieldY = swatchY; // Same Y position for side-by-side alignment
+            int hexFieldY = swatchY;
             if (hexFieldHeight != swatchSize) {
-                // Center vertically if heights differ
                 hexFieldY = swatchY + (swatchSize - hexFieldHeight) / 2;
             }
 
@@ -448,50 +424,39 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
             hexField.setValue(hexValue);
             hexField.setBordered(true);
             hexField.setTextColor(0xFFFFFF);
-            hexField.setMaxLength(7); // #RRGGBB
+            hexField.setMaxLength(7);
             hexField.setResponder((text) -> {
-                // Update color when hex is edited
                 try {
-                    // Handle hex with or without # prefix
                     String hexText = text;
                     if (!hexText.startsWith("#")) {
                         hexText = "#" + hexText;
                     }
 
-                    // Only process if we have a valid hex color (6 hex digits after #)
                     if (hexText.length() == 7 && hexText.matches("#[0-9A-Fa-f]{6}")) {
                         int newColor = Integer.parseInt(hexText.substring(1), 16);
 
-                        // Prevent feedback loop: don't update picker if the change came FROM the picker
                         if (selectedColorIndex == colorIndex && sharedColorPicker != null && !sharedColorPicker.isDragging()) {
                             sharedColorPicker.setColor(newColor);
                         }
 
                         onColorChanged(colorIndex, hexText);
-                        // Update swatch button color visually
                         updateSwatchButtonColor(colorIndex, newColor);
 
-                        // Update hex field value to ensure it has # prefix
                         if (!text.equals(hexText)) {
                             hexField.setValue(hexText);
                         }
                     }
                 } catch (NumberFormatException e) {
-                    // Invalid hex, ignore
                 }
             });
             colorHexFields.add(hexField);
             addTabWidget(hexField);
         }
 
-        // Create shared color picker (initially hidden, shown when swatch is clicked)
-        // Size will be recalculated during render, but set initial size for RGB/HSB
-        // sliders
         int pickerX = colorBoxX + padding + swatchSize + hexFieldWidth + swatchSpacing * 2;
-        // Moved down by 3 pixels as per request
         int pickerY = colorBoxY + padding + 25 + 3;
-        int pickerWidth = 260; // Width needed for gradient + hue + RGB/HSB sliders
-        int pickerHeight = 220; // Height needed for gradient + preview + RGB/HSB sliders
+        int pickerWidth = 260;
+        int pickerHeight = 220;
 
         sharedColorPicker = new ColorPickerWidget(
                 pickerX, pickerY,
@@ -500,41 +465,35 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
                 (hexColor) -> {
                     if (selectedColorIndex >= 0 && selectedColorIndex < 7) {
                         onColorChanged(selectedColorIndex, hexColor);
-                        // Update hex field
                         if (selectedColorIndex < colorHexFields.size()) {
                             colorHexFields.get(selectedColorIndex).setValue(hexColor);
                         }
-                        // Update swatch button color
                         try {
                             if (hexColor.startsWith("#") && hexColor.length() == 7) {
                                 int newColor = Integer.parseInt(hexColor.substring(1), 16);
                                 updateSwatchButtonColor(selectedColorIndex, newColor);
                             }
                         } catch (NumberFormatException e) {
-                            // Ignore
                         }
                     }
                 });
         sharedColorPicker.setEnabled(config.use_pattern);
-        sharedColorPicker.visible = false; // Initially hidden
+        sharedColorPicker.visible = false;
         addTabWidget(sharedColorPicker);
     }
 
     private void onColorSwatchClicked(int colorIndex) {
-        // Only allow clicking if swatch is enabled (within max range and use_pattern is
-        // true)
         if (colorIndex >= currentMaxColor) {
-            return; // Swatch is locked, don't allow clicking
+            return;
         }
 
         PillarParticleConfig config = PillarParticleConfig.get();
         if (!config.use_pattern) {
-            return; // Pattern mode not enabled
+            return;
         }
 
         selectedColorIndex = colorIndex;
 
-        // Get current color for this index
         String hexValue = config.particle_color.get(colorIndex);
         int color = 0xFFFFFF;
         try {
@@ -542,10 +501,8 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
                 color = Integer.parseInt(hexValue.substring(1), 16);
             }
         } catch (NumberFormatException e) {
-            // Use default white
         }
 
-        // Update shared color picker with this color and show it
         if (sharedColorPicker != null) {
             sharedColorPicker.setColor(color);
             sharedColorPicker.visible = true;
@@ -554,19 +511,13 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
     }
 
     private void updateSwatchButtonColor(int index, int color) {
-        // Update swatch button color
         if (colorSwatchButtons != null && index >= 0 && index < colorSwatchButtons.size()) {
             colorSwatchButtons.get(index).setColor(color);
         }
     }
 
-    // Base positions for color swatches (without scroll offset)
     private int colorBaseStartY = 0;
 
-    /**
-     * Sets the height of an EditBox via reflection since 1.18.2 EditBox
-     * doesn't have a public setHeight method.
-     */
     private static void setEditBoxHeight(EditBox editBox, int height) {
         try {
             java.lang.reflect.Field heightField = net.minecraft.client.gui.components.AbstractWidget.class
@@ -574,14 +525,12 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
             heightField.setAccessible(true);
             heightField.setInt(editBox, height);
         } catch (Exception e) {
-            // Fallback - ignore
         }
     }
 
     private int getColorSwatchesTotalHeight() {
-        // Space for reset button + Swatches in 2 columns
         int numSwatches = 7;
-        int numRows = (numSwatches + 1) / 2; // 4 rows
+        int numRows = (numSwatches + 1) / 2;
         return COLOR_HEADER_SPACE + (numRows * (COLOR_SWATCH_SIZE + COLOR_ROW_SPACING));
     }
 
@@ -593,7 +542,7 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
         int scrollOffsetInt = (int) colorSwatchesScrollOffset;
 
         int availableWidth = colorBoxWidth - UI_PADDING * 2;
-        int colSpacing = 12; // More space between columns
+        int colSpacing = 12;
         int colWidth = (availableWidth - colSpacing) / 2;
 
         int leftX = colorBoxX + UI_PADDING;
@@ -622,34 +571,24 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
         }
     }
 
-    // Box positions and sizes (stored for consistent rendering)
-    // Middle panel (44% width): Top 50% (Default Properties), Bottom 50% (Pattern
-    // Properties)
     private int defaultBoxX, defaultBoxY, defaultBoxWidth, defaultBoxHeight;
     private int patternBoxX, patternBoxY, patternBoxWidth, patternBoxHeight;
-    // Right panel (44% width): Top 50% (Color Swatches), Bottom 50% (Color Selector
-    // and Max Particles)
     private int colorBoxX, colorBoxY, colorBoxWidth, colorBoxHeight;
 
-    // Track last layout dimensions to avoid unnecessary relayouts
     private int lastContentX = -1, lastContentY = -1, lastContentWidth = -1, lastContentHeight = -1;
     private int lastScreenWidth = -1;
 
-    // Scrolling for panels
     private double defaultPropertiesScrollOffset = 0;
     private double colorSwatchesScrollOffset = 0;
 
     private double patternPropertiesScrollOffset = 0;
 
-    // Base positions for default properties (without scroll offset)
     private int defaultBaseButtonY = 0;
     private int defaultBaseFirstFieldY = 0;
 
-    // Base positions for pattern properties (without scroll offset)
     private int patternBaseButtonY = 0;
     private int patternBaseFirstFieldY = 0;
 
-    // Update widget positions with scroll offset applied
     private void updateDefaultPropertiesPositions() {
         int totalContentHeight = getDefaultPropertiesTotalHeight();
         int availableHeight = defaultBoxHeight - UI_PADDING * 2;
@@ -666,16 +605,13 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
     }
 
     private int getDefaultPropertiesTotalHeight() {
-        // Space for header clip + button + gap + fields
         return HEADER_CLIP + BUTTON_HEIGHT + BTN_TO_FIELD_SPACING + (4 * FIELD_HEIGHT) + (3 * COMPONENT_SPACING);
     }
 
     private int getPatternPropertiesTotalHeight() {
-        // Space for header clip + button + gap + 4 items (Slider + 3 Fields)
         return HEADER_CLIP + BUTTON_HEIGHT + BTN_TO_FIELD_SPACING + (4 * FIELD_HEIGHT) + (3 * COMPONENT_SPACING);
     }
 
-    // Update pattern properties widget positions with scroll offset applied
     private void updatePatternPropertiesPositions() {
         int patternAvailableHeight = patternBoxHeight - UI_PADDING * 2;
         int patternTotalContentHeight = getPatternPropertiesTotalHeight();
@@ -699,39 +635,27 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
         patternIntensityField.y = currentY;
     }
 
-    /**
-     * Recomputes positions/sizes for all widgets based on current content area and
-     * GUI scale.
-     * Layout: 11% sidebar + 44% middle + 1% gap + 44% right (all from full screen
-     * width)
-     * Middle panel: Top 50% (Default Properties), Bottom 50% (Pattern Properties)
-     * Right panel: Top 50% (Color Pickers), Bottom 50% (reserved)
-     */
     private void relayout(int contentX, int contentY, int contentWidth, int contentHeight) {
-        int padding = 10; // Internal padding within boxes
+        int padding = 10;
 
         int screenHeight = parent.height;
-        int middleGap = parent.getVerticalPanelGap(); // 0.5% consistent gap between panels
+        int middleGap = parent.getVerticalPanelGap();
         int fullContentHeight = contentHeight;
 
-        // Split for left side (Two panels with middle gap)
         int sectionHeight = (fullContentHeight - middleGap) / 2;
 
         int topY = contentY;
 
-        // Middle panel - Top 50%: Default Properties
         defaultBoxX = parent.getContentX();
         defaultBoxY = topY;
         defaultBoxWidth = parent.getContentWidth();
         defaultBoxHeight = sectionHeight;
 
-        // Middle panel - Bottom 50%: Pattern Properties
         patternBoxX = parent.getContentX();
         patternBoxY = topY + sectionHeight + middleGap;
         patternBoxWidth = parent.getContentWidth();
-        patternBoxHeight = fullContentHeight - (sectionHeight + middleGap); // Ensure bottoms perfectly align flush
+        patternBoxHeight = fullContentHeight - (sectionHeight + middleGap);
 
-        // Right panel - Matches combined height of both middle panels + gap
         colorBoxX = parent.getRightPanelX();
         colorBoxY = topY;
         colorBoxWidth = parent.getRightPanelWidth();
@@ -739,80 +663,49 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
 
         colorsResetButton.x = colorBoxX + colorBoxWidth - 20 - 2;
         colorsResetButton.y = colorBoxY + 2;
-        // Right panel - Bottom section no longer used (color picker is now in top
-        // panel)
 
-        // Layout Middle Top: Default Properties (within defaultBox bounds)
-        // Calculate all positions dynamically based on panel dimensions to ensure
-        // everything fits
         int defaultTextX = defaultBoxX + padding;
-        int labelWidth = 115; // Decreased to make value boxes wider
-        int fieldX = defaultTextX + labelWidth - 3; // Start fields earlier (overlap slightly with label end for tighter
-                                                    // layout)
+        int labelWidth = 115;
+        int fieldX = defaultTextX + labelWidth - 3;
 
-        // Calculate vertical layout - use fixed spacing, enable scrolling if needed
         float textScale = BuildScapeConfigScreen.getStandardTextScale();
         int fieldHeight = 14;
-        int titleHeight = 20; // Space for "Default Properties" title
+        int titleHeight = 20;
         int buttonHeight = 20;
-        int numFields = 4; // Particle Speed, Spread, Lifetime, Density
+        int numFields = 4;
         int fieldSpacing = 2;
 
-        // Calculate total content height needed
         int totalContentHeightDefault = getDefaultPropertiesTotalHeight();
         int defaultPanelAvailableHeight = defaultBoxHeight - padding * 2;
 
-        // Always reserve space for scrollbar to prevent fields from overlapping it
         boolean needsScrollbarDefault = totalContentHeightDefault > defaultPanelAvailableHeight;
 
-        // Calculate end position: if scrollbar exists, end before scrollbar with
-        // offset, otherwise use full width
         int componentEndX;
         if (needsScrollbarDefault) {
-            // Components end before the scrollbar with offset (scrollbar starts at panel
-            // edge - scrollbarWidth)
             componentEndX = defaultBoxX + defaultBoxWidth - SCROLLBAR_WIDTH - SCROLLBAR_RIGHT_MARGIN - COMPONENT_SCROLLBAR_GAP;
         } else {
-            // No scrollbar, use full width minus padding
             componentEndX = defaultBoxX + defaultBoxWidth - padding;
         }
 
-        // CRITICAL: Do NOT override componentEndX - it must respect scrollbar position!
-        // The fields will be narrower if needed, but they MUST end before the scrollbar
 
-        // Position button - extend from label start to component end
         int buttonStartX = defaultTextX;
-        // Calculate button width - button ends exactly at componentEndX
         int buttonWidth = componentEndX - buttonStartX;
         if (buttonWidth < 1)
-            buttonWidth = 1; // Minimum button width
+            buttonWidth = 1;
 
-        // Calculate field width - fields MUST end exactly where button ends (at
-        // componentEndX)
-        // Button ends at: buttonStartX + buttonWidth = componentEndX
-        // Fields should end at: componentEndX (same as button)
         int fieldWidth = componentEndX - fieldX;
-        // CRITICAL: Ensure fieldWidth never exceeds what it should be
         if (fieldWidth < 0)
             fieldWidth = 0;
-        // Ensure field + width never exceeds componentEndX
         if (fieldX + fieldWidth > componentEndX) {
             fieldWidth = componentEndX - fieldX;
             if (fieldWidth < 0)
                 fieldWidth = 0;
         }
 
-        // Final verification: both button and fields end at componentEndX
-        // Button end: buttonStartX + buttonWidth = componentEndX ✓
-        // Field end: fieldX + fieldWidth = componentEndX ✓
 
-        // Store base positions (without scroll offset)
-        // Position buttons exactly at the header clip for a tighter look
         defaultBaseButtonY = defaultBoxY + HEADER_CLIP;
         defaultBaseFirstFieldY = defaultBaseButtonY + BUTTON_HEIGHT + BTN_TO_FIELD_SPACING;
 
-        // Set widget X positions and widths (these don't change with scrolling)
-        // FINAL SAFETY CHECK: Ensure fieldWidth never exceeds componentEndX
         int finalFieldWidth = Math.min(fieldWidth, componentEndX - fieldX);
         if (finalFieldWidth < 0)
             finalFieldWidth = 0;
@@ -832,95 +725,62 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
         particleDensityField.x = fieldX;
         particleDensityField.setWidth(finalFieldWidth);
 
-        // Update Y positions with scroll offset
         updateDefaultPropertiesPositions();
 
-        // Layout Right Top: Color Swatches and Shared Picker
-        // Always update positions to ensure they stay within panel bounds
         if (colorSwatchButtons == null || colorSwatchButtons.isEmpty()) {
             createColorSwatchesAndPicker(PillarParticleConfig.get());
         }
-        // Always reposition to ensure they scale with panel
         updateColorSwatchesPositions();
 
-        // Layout Middle Bottom: Pattern Properties (within patternBox bounds)
         int patternTextX = patternBoxX + padding;
-        int patternLabelWidth = 115; // Decreased to make value boxes wider
-        // Use a dynamic gap based on screen height to separate text and values (requested 0.2%)
+        int patternLabelWidth = 115;
         int dynamicGap = (int) (screenHeight * 0.002);
         int patternFieldX = patternTextX + patternLabelWidth + dynamicGap;
 
-        // Define pattern properties constants first
-        int patternFieldSpacing = 2; // Reduced spacing between fields (matching user's changes)
+        int patternFieldSpacing = 2;
         int patternTitleHeight = 20;
         int patternButtonHeight = 20;
-        int patternButtonToFieldSpacing = 5 + dynamicGap; // Reduced spacing between button and first field (matching user's changes) + dynamic gap
+        int patternButtonToFieldSpacing = 5 + dynamicGap;
 
-        // Calculate field width based on available space in panel - ensure it doesn't
-        // exceed panel
-        // Always reserve space for scrollbar to prevent fields from overlapping it
-        int patternScrollbarWidth = 13; // 8px width + 5px padding
-        int patternScrollbarOffset = 10; // Increased Gap between components and scrollbar (10 pixels)
+        int patternScrollbarWidth = 13;
+        int patternScrollbarOffset = 10;
 
-        // Calculate if scrollbar is needed for pattern properties
         int patternTotalContentHeight = getPatternPropertiesTotalHeight();
         int patternAvailableHeight = patternBoxHeight - padding * 2;
         boolean needsPatternScrollbar = patternTotalContentHeight > patternAvailableHeight;
 
-        // Calculate end position: if scrollbar exists, end before scrollbar with
-        // offset, otherwise use full width
         int patternComponentEndX;
         if (needsPatternScrollbar) {
-            // Components end before the scrollbar with offset
             patternComponentEndX = patternBoxX + patternBoxWidth - SCROLLBAR_WIDTH - SCROLLBAR_RIGHT_MARGIN - COMPONENT_SCROLLBAR_GAP;
         } else {
-            // No scrollbar, use full width minus padding
             patternComponentEndX = patternBoxX + patternBoxWidth - padding;
         }
 
-        // Pattern selector button should start at label start and end at component end
         int patternButtonStartX = patternTextX;
-        // Calculate button width - button ends exactly at patternComponentEndX
         int patternButtonWidth = patternComponentEndX - patternButtonStartX;
         if (patternButtonWidth < 1)
-            patternButtonWidth = 1; // Minimum button width
+            patternButtonWidth = 1;
 
-        // Pattern Properties - position button exactly at header clip
         patternBaseButtonY = patternBoxY + HEADER_CLIP;
         patternBaseFirstFieldY = patternBaseButtonY + BUTTON_HEIGHT + BTN_TO_FIELD_SPACING;
 
-        // Calculate field width - fields MUST end exactly where button ends (at
-        // patternComponentEndX)
-        // Button ends at: patternButtonStartX + patternButtonWidth =
-        // patternComponentEndX
-        // Fields should end at: patternComponentEndX (same as button)
         int patternFieldWidth = patternComponentEndX - patternFieldX;
-        // CRITICAL: Ensure patternFieldWidth never exceeds what it should be
         if (patternFieldWidth < 0)
             patternFieldWidth = 0;
-        // Ensure field + width never exceeds patternComponentEndX
         if (patternFieldX + patternFieldWidth > patternComponentEndX) {
             patternFieldWidth = patternComponentEndX - patternFieldX;
             if (patternFieldWidth < 0)
                 patternFieldWidth = 0;
         }
 
-        // Final verification: both button and fields end at patternComponentEndX
-        // Button end: patternButtonStartX + patternButtonWidth = patternComponentEndX ✓
-        // Field end: patternFieldX + patternFieldWidth = patternComponentEndX ✓
 
         patternSelector.x = patternButtonStartX;
         patternSelector.setWidth(patternButtonWidth);
 
-        // FINAL SAFETY CHECK: Ensure patternFieldWidth never exceeds
-        // patternComponentEndX
         int finalPatternFieldWidth = Math.min(patternFieldWidth, patternComponentEndX - patternFieldX);
         if (finalPatternFieldWidth < 0)
             finalPatternFieldWidth = 0;
 
-        // Order: Pattern Selector, Max Particles (second), Pattern Speed, Pattern
-        // Spread, Pattern Intensity
-        // Positions are updated in updatePatternPropertiesPositions below
         maxParticleColorSlider.x = patternFieldX;
         maxParticleColorSlider.setWidth(finalPatternFieldWidth);
 
@@ -933,30 +793,16 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
         patternIntensityField.x = patternFieldX;
         patternIntensityField.setWidth(finalPatternFieldWidth);
 
-        // Calculate total content height for pattern box to determine if scrolling is
-        // needed
-        // Note: patternTotalContentHeight and patternAvailableHeight are already
-        // calculated above in relayout
-        // Recalculate with slider included for render method
 
-        // Start of pattern properties position update - already set above
         updatePatternPropertiesPositions();
 
-        // Layout Right Panel: Color Selector (sharedColorPicker) - now in top right
-        // panel
-        // Position shared color picker in the colorBox (top right panel, now full
-        // height)
-        // Always position it, even if not visible, so it's ready when a swatch is
-        // clicked
         if (sharedColorPicker != null) {
             int pickerPadding = 10;
             int pickerSize = Math.min(100, colorBoxWidth - pickerPadding * 2);
-            // Position picker to the right of swatches, below them
-            int swatchAreaHeight = 7 * (20 + 4) + 5; // 7 swatches with rowSpacing of 4, plus padding
-            int pickerX = colorBoxX + colorBoxWidth - pickerPadding - pickerSize; // Right side of panel
-            int pickerY = colorBoxY + padding + swatchAreaHeight; // Below swatches
+            int swatchAreaHeight = 7 * (20 + 4) + 5;
+            int pickerX = colorBoxX + colorBoxWidth - pickerPadding - pickerSize;
+            int pickerY = colorBoxY + padding + swatchAreaHeight;
 
-            // Ensure picker doesn't overflow panel
             if (pickerX + pickerSize > colorBoxX + colorBoxWidth - pickerPadding) {
                 pickerX = colorBoxX + colorBoxWidth - pickerPadding - pickerSize;
             }
@@ -967,20 +813,17 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
             sharedColorPicker.y = pickerY;
             sharedColorPicker.setWidth(pickerSize);
             sharedColorPicker.setHeight(pickerSize);
-            // Don't set visible here - it's controlled by onColorSwatchClicked
         }
     }
 
     private void onColorChanged(int index, String hexColor) {
         PillarParticleConfig config = PillarParticleConfig.get();
-        // Ensure list is large enough
         while (config.particle_color.size() <= index) {
             config.particle_color.add("#FFFFFF");
         }
         config.particle_color.set(index, hexColor);
         config.saveProperties();
 
-        // Sync color changes to server
         com.kingodogo.buildscape.network.ModMessages.INSTANCE.sendToServer(new com.kingodogo.buildscape.network.UpdateConfigPacket(config));
 
         updateWorldPillars();
@@ -990,9 +833,7 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
         Minecraft mc = Minecraft.getInstance();
         PillarIdManager manager = PillarIdManager.get();
         if (mc.level != null && mc.player != null) {
-            int renderDistance = mc.options.renderDistance; // Try field access first, widespread in 1.16-1.18
-            // If it's 1.19+, it might be renderDistance().get(). But usually 'renderDistance' works or we can guess 32.
-            // Safe fallback:
+            int renderDistance = mc.options.renderDistance;
             int range = 32;
 
             net.minecraft.world.level.ChunkPos center = mc.player.chunkPosition();
@@ -1003,8 +844,6 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
                         net.minecraft.world.level.chunk.LevelChunk chunk = mc.level.getChunk(x, z);
                         for (BlockEntity be : chunk.getBlockEntities().values()) {
                             if (be instanceof PillarBlockEntity pbe) {
-                                // Important: re-sync from manager so that the newly 'locked'
-                                // patterns (for customized pillars) are picked up by the BE immediately.
                                 String pid = pbe.getPillarId();
                                 if (pid != null) {
                                     PillarIdManager.PillarData data = manager.getPillarData(pid);
@@ -1028,7 +867,6 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
         com.kingodogo.buildscape.network.ModMessages.INSTANCE.sendToServer(new com.kingodogo.buildscape.network.UpdateConfigPacket(config));
         updateWorldPillars();
 
-        // Update UI - show "Use Pattern True" or "Use Pattern False" with correct styling
         usePatternToggle.setMessage(getUsePatternMessage(config.use_pattern));
         particleSpeedField.setEditable(!config.use_pattern);
         particleSpreadField.setEditable(!config.use_pattern);
@@ -1039,13 +877,10 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
         patternSpreadField.setEditable(config.use_pattern);
         patternIntensityField.setEditable(config.use_pattern);
 
-        // Disable/enable color swatches and max particle color slider based on
-        // use_pattern
         boolean colorControlsEnabled = config.use_pattern;
         if (maxParticleColorSlider != null) {
             maxParticleColorSlider.active = colorControlsEnabled;
         }
-        // Update swatches enabled state (considers both use_pattern and max value)
         updateSwatchesEnabledState();
         if (sharedColorPicker != null) {
             sharedColorPicker.setEnabled(colorControlsEnabled);
@@ -1061,22 +896,19 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
         String pattern = PATTERNS[currentPatternIndex];
 
         PillarParticleConfig config = PillarParticleConfig.get();
-        String oldPattern = config.pattern; // Capture old pattern for transition
+        String oldPattern = config.pattern;
         config.pattern = pattern;
-        config.use_pattern = true; // Instantly enable use_pattern to make sure the cycle takes effect visually
+        config.use_pattern = true;
         config.saveProperties();
 
-        // Transition: On the client, proactively lock patterns for any customized pillars
-        // so the UI feedback is instant and doesn't flicker to the global pattern.
         PillarIdManager manager = PillarIdManager.get();
         if (manager.hasLoaded()) {
             for (PillarIdManager.PillarData pData : manager.getAllData()) {
-                // Robust check for modification: has colors or has hardcoded pattern settings
                 boolean hasPatternOverride = pData.pattern != null && !pData.pattern.equals("default");
                 boolean isCustomized = pData.hasColors() || hasPatternOverride;
 
                 if (isCustomized && (pData.pattern == null || pData.pattern.equals("default"))) {
-                    pData.pattern = oldPattern != null ? oldPattern : "ring"; // Lock to the pattern it was using BEFORE the change
+                    pData.pattern = oldPattern != null ? oldPattern : "ring";
                 }
             }
         }
@@ -1085,12 +917,10 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
 
         updateWorldPillars();
 
-        // Update Use Pattern display to reflect it was forced on
         if (usePatternToggle != null) {
             usePatternToggle.setMessage(getUsePatternMessage(true));
         }
 
-        // Use helper method to get styled message
         patternSelector.setMessage(getPatternMessage(pattern));
     }
 
@@ -1106,11 +936,8 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
         maxParticleColorSlider.setMessage(
                 new TranslatableComponent("buildscape.config.particles.max_particle_color", currentMaxColor));
 
-        // Enable/disable swatches based on max value
-        // Only swatches up to the max value should be clickable
         updateSwatchesEnabledState();
 
-        // If currently selected swatch is beyond max, deselect it
         if (selectedColorIndex >= currentMaxColor) {
             selectedColorIndex = -1;
             if (sharedColorPicker != null) {
@@ -1125,21 +952,13 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
 
         if (colorSwatchButtons != null) {
             for (int i = 0; i < colorSwatchButtons.size(); i++) {
-                // Swatch is enabled only if:
-                // 1. use_pattern is true (pattern mode enabled)
-                // 2. Index is less than currentMaxColor (within allowed range)
                 boolean enabled = usePatternEnabled && (i < currentMaxColor);
                 colorSwatchButtons.get(i).active = enabled;
             }
         }
 
-        // Also update hex fields - they should be editable when not locked by max
-        // particles
         if (colorHexFields != null) {
             for (int i = 0; i < colorHexFields.size(); i++) {
-                // Hex field is editable if:
-                // 1. use_pattern is true (pattern mode enabled)
-                // 2. Index is less than currentMaxColor (within allowed range)
                 boolean editable = usePatternEnabled && (i < currentMaxColor);
                 colorHexFields.get(i).setEditable(editable);
             }
@@ -1162,7 +981,6 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
         int contentWidth = parent.getContentWidth();
         int contentHeight = parent.getContentHeight();
 
-        // Always check if relayout is needed (dimensions or screen size changed)
         int screenWidth = parent.width;
         boolean needsRelayout = (contentX != lastContentX || contentY != lastContentY ||
                 contentWidth != lastContentWidth || contentHeight != lastContentHeight ||
@@ -1177,70 +995,51 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
             lastScreenWidth = screenWidth;
         }
 
-        // Overall background - removed colorful background
-        // GuiComponent.fill(poseStack, contentX, contentY, contentX + contentWidth,
-        // contentY + contentHeight, 0xC0220B0B);
 
-        // Header title removed as requested
 
         Minecraft mcInstance = Minecraft.getInstance();
 
         PillarParticleConfig config = PillarParticleConfig.get();
-        int padding = 10; // Internal padding within boxes
+        int padding = 10;
 
-        // Middle Top: Default Properties - Render with scissor test to clip to panel
-        // bounds
-        // Scissor coordinates need to account for GUI scale (window pixels, not GUI
-        // pixels)
-        // Scissor uses window coordinates: X from left, Y from bottom
         double guiScale = mcInstance.getWindow().getGuiScale();
         int windowHeight = mcInstance.getWindow().getHeight();
 
-        // Draw border for Default Properties panel (Always render)
         int borderColor = 0xFF666666;
         GuiComponent.fill(poseStack, defaultBoxX, defaultBoxY, defaultBoxX + defaultBoxWidth, defaultBoxY + 1,
-                borderColor); // Top
+                borderColor);
         GuiComponent.fill(poseStack, defaultBoxX, defaultBoxY + defaultBoxHeight - 1, defaultBoxX + defaultBoxWidth,
-                defaultBoxY + defaultBoxHeight, borderColor); // Bottom
+                defaultBoxY + defaultBoxHeight, borderColor);
         GuiComponent.fill(poseStack, defaultBoxX, defaultBoxY, defaultBoxX + 1, defaultBoxY + defaultBoxHeight,
-                borderColor); // Left
+                borderColor);
         GuiComponent.fill(poseStack, defaultBoxX + defaultBoxWidth - 1, defaultBoxY, defaultBoxX + defaultBoxWidth,
-                defaultBoxY + defaultBoxHeight, borderColor); // Right
+                defaultBoxY + defaultBoxHeight, borderColor);
 
-        // Calculate a bottom offset to prevent content from touching the border (user
-        // requested ~1%)
         int bottomOffset = Math.max(5, (int) (windowHeight * 0.01 / guiScale));
 
         float textScale = BuildScapeConfigScreen.getStandardTextScale();
-        int textYOffset = (20 - (int)(mcInstance.font.lineHeight * textScale)) / 2 + 1; // Center inside top border padding
+        int textYOffset = (20 - (int)(mcInstance.font.lineHeight * textScale)) / 2 + 1;
 
 
         int scissorX = (int) (defaultBoxX * guiScale);
-        // Raise the bottom of the scissor box by bottomOffset
         int scissorY = (int) (windowHeight - (defaultBoxY + defaultBoxHeight) * guiScale + bottomOffset * guiScale);
         int scissorWidth = (int) (defaultBoxWidth * guiScale);
-        // Clip the top area (header) to prevent scrolling overlap
         int scissorHeight = (int) (defaultBoxHeight * guiScale - bottomOffset * guiScale - HEADER_CLIP * guiScale);
         if (scissorHeight > 0)
             RenderSystem.enableScissor(scissorX, scissorY, scissorWidth, scissorHeight);
 
-        // Render labels and fields for default properties - use actual widget positions
-        // (already have scroll offset applied)
         int defaultTextX = defaultBoxX + padding;
 
         int labelYOffset = (FIELD_HEIGHT - (int) (Minecraft.getInstance().font.lineHeight * textScale)) / 2;
-        // Calculate total content height and scroll range
         int totalContentHeightDefault = getDefaultPropertiesTotalHeight();
         int availableHeightDefault = defaultBoxHeight - UI_PADDING * 2;
         double maxScrollDefault = Math.max(0, totalContentHeightDefault - availableHeightDefault);
         boolean needsScrollbarDefault = maxScrollDefault > 0;
 
-        // Define header area - nothing should render above this
         int headerBottom = defaultBoxY + HEADER_CLIP;
         int panelTop = defaultBoxY;
         int panelBottom = defaultBoxY + defaultBoxHeight;
 
-        // Sync component visibility - use actual FIELD_HEIGHT for accurate clipping
         boolean particleSpeedRowVisible = particleSpeedField.y + FIELD_HEIGHT > headerBottom
                 && particleSpeedField.y < panelBottom;
         boolean particleSpreadRowVisible = particleSpreadField.y + FIELD_HEIGHT > headerBottom
@@ -1250,9 +1049,6 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
         boolean particleDensityRowVisible = particleDensityField.y + FIELD_HEIGHT > headerBottom
                 && particleDensityField.y < panelBottom;
 
-        // Render labels and widgets aligned correctly - widgets must be rendered here
-        // within scissor test
-        // Only render labels if they're below the header
         int particleSpeedLabelY = particleSpeedField.y + labelYOffset;
         if (particleSpeedRowVisible) {
             poseStack.pushPose();
@@ -1293,52 +1089,43 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
             poseStack.popPose();
         }
 
-        // Permanently hide widgets from parent - we render them manually here with
-        // scissor
         usePatternToggle.visible = false;
         particleSpeedField.visible = false;
         particleSpreadField.visible = false;
         particleLifetimeField.visible = false;
         particleDensityField.visible = false;
 
-        // Scissor region variables already defined above for visibility checks
 
-        // Hide standard button rendering by not calling super.render or manual fills
-        // But we DO need to handle tooltips if we had them. Here we just draw the text.
 
-        // Render button only if below header
-        // Render button only if some part of it is in visible area
         if (usePatternToggle.y + BUTTON_HEIGHT > headerBottom && usePatternToggle.y < panelBottom) {
-            usePatternToggle.visible = true; // Make visible for rendering
+            usePatternToggle.visible = true;
             usePatternToggle.render(poseStack, mouseX, mouseY, partialTick);
-            usePatternToggle.visible = false; // Hide again to prevent parent from rendering
+            usePatternToggle.visible = false;
         }
-        // Render text fields only if their row is visible
         int textPadding = BuildScapeConfigScreen.scaleSize(4);
         int fontHeight = Minecraft.getInstance().font.lineHeight;
 
         if (particleSpeedRowVisible) {
-            particleSpeedField.visible = true; // Make visible for rendering
+            particleSpeedField.visible = true;
             particleSpeedField.render(poseStack, mouseX, mouseY, partialTick);
             particleSpeedField.visible = false;
         }
         if (particleSpreadRowVisible) {
-            particleSpreadField.visible = true; // Make visible for rendering
+            particleSpreadField.visible = true;
             particleSpreadField.render(poseStack, mouseX, mouseY, partialTick);
             particleSpreadField.visible = false;
         }
         if (particleLifetimeRowVisible) {
-            particleLifetimeField.visible = true; // Make visible for rendering
+            particleLifetimeField.visible = true;
             particleLifetimeField.render(poseStack, mouseX, mouseY, partialTick);
             particleLifetimeField.visible = false;
         }
         if (particleDensityRowVisible) {
-            particleDensityField.visible = true; // Make visible for rendering
+            particleDensityField.visible = true;
             particleDensityField.render(poseStack, mouseX, mouseY, partialTick);
             particleDensityField.visible = false;
         }
 
-        // Render scrollbar if needed (before disabling scissor so it gets clipped)
         if (needsScrollbarDefault && maxScrollDefault > 0) {
             int scrollbarX = defaultBoxX + defaultBoxWidth - SCROLLBAR_WIDTH - SCROLLBAR_RIGHT_MARGIN;
             int scrollbarY = defaultBoxY + HEADER_CLIP;
@@ -1354,65 +1141,39 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
 
         RenderSystem.disableScissor();
 
-        // Right Top: Color Swatches and Shared Picker - Render with scissor test to
-        // clip to panel bounds
-        // Draw border for Color Swatches panel (debug mode)
-        // Right Top: Color Swatches and Shared Picker - Render with scissor test to
-        // clip to panel bounds
-        // Draw border for Color Swatches panel (debug mode)
-        // Debug border removed as permanent border is drawn below
 
         scissorX = (int) (colorBoxX * guiScale);
         scissorY = (int) (windowHeight - (colorBoxY + colorBoxHeight) * guiScale + bottomOffset * guiScale);
         scissorWidth = (int) (colorBoxWidth * guiScale);
-        // Clip top area for header
         scissorHeight = (int) (colorBoxHeight * guiScale - bottomOffset * guiScale - HEADER_CLIP * guiScale);
-        // Sync border logic with middle panels: draw inside the box dimensions
         int colorBorderColor = 0xFF666666;
-        GuiComponent.fill(poseStack, colorBoxX, colorBoxY, colorBoxX + colorBoxWidth, colorBoxY + 1, colorBorderColor); // Top
-        GuiComponent.fill(poseStack, colorBoxX, colorBoxY + colorBoxHeight - 1, colorBoxX + colorBoxWidth, colorBoxY + colorBoxHeight, colorBorderColor); // Bottom
-        GuiComponent.fill(poseStack, colorBoxX, colorBoxY, colorBoxX + 1, colorBoxY + colorBoxHeight, colorBorderColor); // Left
-        GuiComponent.fill(poseStack, colorBoxX + colorBoxWidth - 1, colorBoxY, colorBoxX + colorBoxWidth, colorBoxY + colorBoxHeight, colorBorderColor); // Right
+        GuiComponent.fill(poseStack, colorBoxX, colorBoxY, colorBoxX + colorBoxWidth, colorBoxY + 1, colorBorderColor);
+        GuiComponent.fill(poseStack, colorBoxX, colorBoxY + colorBoxHeight - 1, colorBoxX + colorBoxWidth, colorBoxY + colorBoxHeight, colorBorderColor);
+        GuiComponent.fill(poseStack, colorBoxX, colorBoxY, colorBoxX + 1, colorBoxY + colorBoxHeight, colorBorderColor);
+        GuiComponent.fill(poseStack, colorBoxX + colorBoxWidth - 1, colorBoxY, colorBoxX + colorBoxWidth, colorBoxY + colorBoxHeight, colorBorderColor);
 
         RenderSystem.enableScissor(scissorX, scissorY, scissorWidth, scissorHeight);
 
-        // Debug: Draw panel background to verify panel is visible
-        // GuiComponent.fill(poseStack, colorBoxX, colorBoxY, colorBoxX + colorBoxWidth, colorBoxY + colorBoxHeight,
-        //         0x40000000);
 
-        // Removed "Custom Properties" title text as requested
 
-        // Ensure swatches are created if they don't exist
-        // Ensure swatches are created if they don't exist
         if (colorSwatchButtons == null || colorHexFields == null || colorSwatchButtons.isEmpty()
                 || colorHexFields.isEmpty()) {
             createColorSwatchesAndPicker(config);
         }
 
-        // Update color swatches with current colors and selection state
-        // Update color swatches with current colors and selection state
         if (colorSwatchButtons != null && colorHexFields != null && colorSwatchButtons.size() > 0
                 && colorHexFields.size() > 0) {
-            // Update enabled state first (based on max value)
             updateSwatchesEnabledState();
 
-            // Calculate scroll info for color swatches (2 columns layout)
             int colorTotalContentHeight = getColorSwatchesTotalHeight();
             int colorAvailableHeight = colorBoxHeight - UI_PADDING * 2;
             double colorMaxScroll = Math.max(0, colorTotalContentHeight - colorAvailableHeight);
             boolean colorNeedsScrollbar = colorMaxScroll > 0;
 
-            // Render colors reset button (moved to after scissor)
-            colorsResetButton.visible = true; // For click handling
+            colorsResetButton.visible = true;
 
-            // Ensure positions are updated (this is critical - must be called after
-            // colorBox coordinates are set)
-            // Color positions now include header offset, managed in
-            // updateColorSwatchesPositions
             updateColorSwatchesPositions();
 
-            // Permanently hide widgets from parent - we render them manually here with
-            // scissor
             for (int i = 0; i < colorSwatchButtons.size(); i++) {
                 colorSwatchButtons.get(i).visible = false;
             }
@@ -1420,12 +1181,9 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
                 colorHexFields.get(i).visible = false;
             }
 
-            // Render swatches and hex fields - always render them, scissor test will clip
-            // them
             for (int i = 0; i < colorSwatchButtons.size() && i < colorHexFields.size(); i++) {
                 ColorSwatchButton swatchButton = colorSwatchButtons.get(i);
 
-                // Get color for this swatch
                 String hexValue = i < config.particle_color.size() ? config.particle_color.get(i) : "#FFFFFF";
                 int color = 0xFFFFFF;
                 try {
@@ -1433,29 +1191,22 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
                         color = Integer.parseInt(hexValue.substring(1), 16);
                     }
                 } catch (NumberFormatException e) {
-                    // Use default white
                 }
 
-                // Update swatch button color and selection state
                 swatchButton.setColor(color);
                 swatchButton.setSelected(selectedColorIndex == i);
 
-                // Always render swatches - scissor test will clip them to panel bounds
                 swatchButton.visible = true;
                 swatchButton.render(poseStack, mouseX, mouseY, partialTick);
                 swatchButton.visible = false;
 
-                // Always render hex fields - scissor test will clip them to panel bounds
                 colorHexFields.get(i).visible = true;
                 colorHexFields.get(i).render(poseStack, mouseX, mouseY, partialTick);
                 colorHexFields.get(i).visible = false;
             }
 
-            // Render scrollbar if needed
             if (colorNeedsScrollbar && colorMaxScroll > 0) {
-                int scrollbarX = colorBoxX + colorBoxWidth - CustomScrollbarRenderer.getScrollbarWidth() - 5; // 5px
-                                                                                                              // from
-                                                                                                              // edge
+                int scrollbarX = colorBoxX + colorBoxWidth - CustomScrollbarRenderer.getScrollbarWidth() - 5;
                 int scrollbarY = colorBoxY + UI_PADDING + COLOR_HEADER_SPACE;
                 int scrollbarHeight = colorAvailableHeight - COLOR_HEADER_SPACE;
 
@@ -1466,15 +1217,9 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
             }
         }
 
-        // Render shared color picker if a swatch is selected - hide from parent and
-        // render manually
-        // Render shared color picker if a swatch is selected - hide from parent and
-        // render manually
 
         RenderSystem.disableScissor();
 
-        // Render colors reset button AFTER scissor (Text style)
-        // Render colors reset button AFTER scissor
         if (colorsResetButton.visible) {
             colorsResetButton.render(poseStack, mouseX, mouseY, partialTick);
 
@@ -1488,31 +1233,21 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
             }
         }
 
-        // Remove old manual rendering code
         poseStack.popPose();
-        poseStack.pushPose(); // Balance the popPose call that follows for "Middle Bottom" comment separation if needed, or remove completely.
-        // Actually, just let the flow continue.
+        poseStack.pushPose();
         poseStack.popPose();
 
-        // Middle Bottom: Pattern Properties - Render with scissor test to clip to panel
-        // bounds
-        // Draw border for Pattern Properties panel (debug mode)
-        // Middle Bottom: Pattern Properties - Render with scissor test to clip to panel
-        // bounds
-        // Draw border for Pattern Properties panel (debug mode)
-        // Draw border for Pattern Properties panel (Always render)
         int patternBorderColor = 0xFF666666;
         GuiComponent.fill(poseStack, patternBoxX, patternBoxY, patternBoxX + patternBoxWidth, patternBoxY + 1,
-                patternBorderColor); // Top
+                patternBorderColor);
         GuiComponent.fill(poseStack, patternBoxX, patternBoxY + patternBoxHeight - 1, patternBoxX + patternBoxWidth,
-                patternBoxY + patternBoxHeight, patternBorderColor); // Bottom
+                patternBoxY + patternBoxHeight, patternBorderColor);
         GuiComponent.fill(poseStack, patternBoxX, patternBoxY, patternBoxX + 1, patternBoxY + patternBoxHeight,
-                patternBorderColor); // Left
+                patternBorderColor);
         GuiComponent.fill(poseStack, patternBoxX + patternBoxWidth - 1, patternBoxY, patternBoxX + patternBoxWidth,
-                patternBoxY + patternBoxHeight, patternBorderColor); // Right
+                patternBoxY + patternBoxHeight, patternBorderColor);
 
         scissorX = (int) (patternBoxX * guiScale);
-        // Raise the bottom of the scissor box by bottomOffset
         scissorY = (int) (windowHeight - (patternBoxY + patternBoxHeight) * guiScale + bottomOffset * guiScale);
         scissorWidth = (int) (patternBoxWidth * guiScale);
         scissorHeight = (int) (patternBoxHeight * guiScale - bottomOffset * guiScale - HEADER_CLIP * guiScale);
@@ -1526,47 +1261,31 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
 
         int patternLabelYOffset = (FIELD_HEIGHT - (int) (Minecraft.getInstance().font.lineHeight * textScale)) / 2;
 
-        // Calculate scroll info
         int patternTotalContentHeightRender = getPatternPropertiesTotalHeight();
         int patternAvailableHeightRender = patternBoxHeight - UI_PADDING * 2;
         double patternMaxScrollRender = Math.max(0, patternTotalContentHeightRender - patternAvailableHeightRender);
         boolean patternNeedsScrollbarRender = patternMaxScrollRender > 0;
 
-        // Define header area - nothing should render above this
         int patternHeaderBottom = patternBoxY + HEADER_CLIP;
         int patternPanelTop = patternBoxY;
         int patternPanelBottom = patternBoxY + patternBoxHeight;
 
-        // Pattern selector button label - only render if below header
-        // Use actual widget position which already has scroll offset applied
-        // Don't render text behind the button - the button itself will display the
-        // pattern name
-        // The button text is handled by the button's render method, so we don't need to
-        // render it here
 
-        // Sync component visibility - use actual FIELD_HEIGHT for accurate clipping
-        // Row 1: Pattern Selector
         boolean patternSelectorVisible = patternSelector.y + BUTTON_HEIGHT > patternHeaderBottom
                 && patternSelector.y < patternPanelBottom;
 
-        // Row 2: Max Particles (Label + Slider)
-        // Use the slider's Y as reference for the whole row
         boolean maxParticlesRowVisible = maxParticleColorSlider.y + SLIDER_HEIGHT > patternHeaderBottom
                 && maxParticleColorSlider.y < patternPanelBottom;
 
-        // Row 3: Pattern Speed (Label + Field)
         boolean patternSpeedRowVisible = patternSpeedField.y + FIELD_HEIGHT > patternHeaderBottom
                 && patternSpeedField.y < patternPanelBottom;
 
-        // Row 4: Pattern Spread (Label + Field)
         boolean patternSpreadRowVisible = patternSpreadField.y + FIELD_HEIGHT > patternHeaderBottom
                 && patternSpreadField.y < patternPanelBottom;
 
-        // Row 5: Pattern Intensity (Label + Field)
         boolean patternIntensityRowVisible = patternIntensityField.y + FIELD_HEIGHT > patternHeaderBottom
                 && patternIntensityField.y < patternPanelBottom;
 
-        // Max Particles label
         int maxParticleLabelY = maxParticleColorSlider.y + patternLabelYOffset;
         if (maxParticlesRowVisible) {
             poseStack.pushPose();
@@ -1575,7 +1294,6 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
             poseStack.popPose();
         }
 
-        // Pattern Speed label
         int patternSpeedLabelY = patternSpeedField.y + patternLabelYOffset;
         if (patternSpeedRowVisible) {
             poseStack.pushPose();
@@ -1586,7 +1304,6 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
             poseStack.popPose();
         }
 
-        // Pattern Spread label
         int patternSpreadLabelY = patternSpreadField.y + patternLabelYOffset;
         if (patternSpreadRowVisible) {
             poseStack.pushPose();
@@ -1597,7 +1314,6 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
             poseStack.popPose();
         }
 
-        // Pattern Intensity label
         int patternIntensityLabelY = patternIntensityField.y + patternLabelYOffset;
         if (patternIntensityRowVisible) {
             poseStack.pushPose();
@@ -1608,45 +1324,40 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
             poseStack.popPose();
         }
 
-        // Permanently hide widgets from parent - we render them manually here with
-        // scissor
         patternSelector.visible = false;
         patternSpeedField.visible = false;
         patternSpreadField.visible = false;
         patternIntensityField.visible = false;
         maxParticleColorSlider.visible = false;
 
-        // Render widgets for pattern properties - render within scissor test
-        // only if their row is marked visible
         if (patternSelectorVisible) {
-            patternSelector.visible = true; // Make visible for rendering
+            patternSelector.visible = true;
             patternSelector.render(poseStack, mouseX, mouseY, partialTick);
-            patternSelector.visible = false; // Hide again to prevent parent from rendering
+            patternSelector.visible = false;
         }
         if (maxParticlesRowVisible) {
-            maxParticleColorSlider.visible = true; // Make visible for rendering
+            maxParticleColorSlider.visible = true;
             maxParticleColorSlider.render(poseStack, mouseX, mouseY, partialTick);
-            maxParticleColorSlider.visible = false; // Hide again to prevent parent from rendering
+            maxParticleColorSlider.visible = false;
         }
 
 
         if (patternSpeedRowVisible) {
-            patternSpeedField.visible = true; // Make visible for rendering
+            patternSpeedField.visible = true;
             patternSpeedField.render(poseStack, mouseX, mouseY, partialTick);
             patternSpeedField.visible = false;
         }
         if (patternSpreadRowVisible) {
-            patternSpreadField.visible = true; // Make visible for rendering
+            patternSpreadField.visible = true;
             patternSpreadField.render(poseStack, mouseX, mouseY, partialTick);
             patternSpreadField.visible = false;
         }
         if (patternIntensityRowVisible) {
-            patternIntensityField.visible = true; // Make visible for rendering
+            patternIntensityField.visible = true;
             patternIntensityField.render(poseStack, mouseX, mouseY, partialTick);
             patternIntensityField.visible = false;
         }
 
-        // Render scrollbar if needed
         if (patternNeedsScrollbarRender && patternMaxScrollRender > 0) {
             int scrollbarX = patternBoxX + patternBoxWidth - SCROLLBAR_WIDTH - SCROLLBAR_RIGHT_MARGIN;
             int scrollbarY = patternBoxY + HEADER_CLIP;
@@ -1662,68 +1373,51 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
 
         RenderSystem.disableScissor();
 
-        // Render Panel Titles AFTER all scissors are disabled to ensure they are visible
         float standardScale = BuildScapeConfigScreen.getStandardTextScale();
 
-        // Default Properties Title
         poseStack.pushPose();
         poseStack.translate(defaultBoxX + 10, defaultBoxY + 5, 0);
         poseStack.scale(standardScale, standardScale, 1.0f);
         Minecraft.getInstance().font.draw(poseStack, new TranslatableComponent("buildscape.config.particles.default_properties"), 0, 0, 0xFFFFFF);
         poseStack.popPose();
 
-        // Pattern Properties Title
         poseStack.pushPose();
         poseStack.translate(patternBoxX + 10, patternBoxY + 5, 0);
         poseStack.scale(standardScale, standardScale, 1.0f);
         Minecraft.getInstance().font.draw(poseStack, new TranslatableComponent("buildscape.config.particles.pattern_properties"), 0, 0, 0xFFFFFF);
         poseStack.popPose();
 
-        // Color Swatches Title (Optional, check if needed. Keeping it clean as requested before)
-        // If the user wants it, I can add it here.
 
-        // Update config from current fields
         updateConfigFromFields();
     }
 
     @Override
     public void renderTooltips(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
         if (sharedColorPicker != null) {
-            // Always hide from parent to prevent duplicate rendering
             sharedColorPicker.visible = false;
 
-            // Render manually if a swatch is selected - always render when
-            // selectedColorIndex is valid
             if (selectedColorIndex >= 0 && selectedColorIndex < 7) {
-                // Recalculate position during render to ensure it's correct
                 int pickerPadding = 10;
                 int swatchSize = 20;
                 int rowSpacing = 4;
                 int numSwatches = 7;
-                int numRows = (numSwatches + 1) / 2; // 4 rows (3 full rows + 1 with 1 swatch)
-                int swatchAreaHeight = (numRows * swatchSize) + ((numRows - 1) * rowSpacing); // Swatch area height
+                int numRows = (numSwatches + 1) / 2;
+                int swatchAreaHeight = (numRows * swatchSize) + ((numRows - 1) * rowSpacing);
                 int colorPadding = 10;
 
-                // Calculate available space for picker
-                int availableY = colorBoxY + colorPadding + swatchAreaHeight + 20; // Start below swatches
-                int pickerAvailableHeight = colorBoxY + colorBoxHeight - pickerPadding - availableY; // Remaining height
-                int pickerAvailableWidth = colorBoxWidth - pickerPadding * 2; // Available width
+                int availableY = colorBoxY + colorPadding + swatchAreaHeight + 20;
+                int pickerAvailableHeight = colorBoxY + colorBoxHeight - pickerPadding - availableY;
+                int pickerAvailableWidth = colorBoxWidth - pickerPadding * 2;
 
-                // Ideal picker size
                 int idealWidth = 250;
                 int idealHeight = 220;
 
-                // Calculate actual picker size - shrink to fit if needed
                 int pickerWidth = Math.min(idealWidth, pickerAvailableWidth);
                 int pickerHeight = Math.min(idealHeight, pickerAvailableHeight);
 
-                // If picker is smaller than ideal, it will scale internally
-                // Position picker below the swatches, centered horizontally
-                int pickerX = colorBoxX + (colorBoxWidth - pickerWidth) / 2; // Center horizontally
-                // Moved down by an additional 15 pixels as per request (was 20 offset in availableY)
-                int pickerY = availableY + 15; // Below swatches with extra gap
+                int pickerX = colorBoxX + (colorBoxWidth - pickerWidth) / 2;
+                int pickerY = availableY + 15;
 
-                // Ensure picker doesn't overflow panel
                 if (pickerX < colorBoxX + pickerPadding) {
                     pickerX = colorBoxX + pickerPadding;
                     pickerWidth = Math.min(pickerWidth, colorBoxX + colorBoxWidth - pickerPadding - pickerX);
@@ -1732,13 +1426,11 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
                     pickerHeight = colorBoxY + colorBoxHeight - pickerPadding - pickerY;
                 }
 
-                // Set picker size and position
                 sharedColorPicker.x = pickerX;
                 sharedColorPicker.y = pickerY;
                 sharedColorPicker.setWidth(pickerWidth);
                 sharedColorPicker.setHeight(pickerHeight);
 
-                // Always render the picker - no scissor test here so it floats on top
                 poseStack.pushPose();
                 poseStack.translate(0, 0, 500);
                 sharedColorPicker.visible = true;
@@ -1749,14 +1441,12 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
         }
     }
 
-    /** Minimum allowed value for all numeric double/float config fields to prevent crashes. */
     private static final double FIELD_MIN_VALUE = 0.001;
 
     private void updateConfigFromFields() {
         PillarParticleConfig config = PillarParticleConfig.get();
         boolean changed = false;
 
-        // Update default properties
         if (!config.use_pattern) {
             try {
                 double speed = Math.max(FIELD_MIN_VALUE, Double.parseDouble(particleSpeedField.getValue()));
@@ -1765,7 +1455,6 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
                     changed = true;
                 }
             } catch (NumberFormatException e) {
-                // Invalid value, ignore
             }
 
             try {
@@ -1775,7 +1464,6 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
                     changed = true;
                 }
             } catch (NumberFormatException e) {
-                // Invalid value, ignore
             }
 
             try {
@@ -1785,7 +1473,6 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
                     changed = true;
                 }
             } catch (NumberFormatException e) {
-                // Invalid value, ignore
             }
 
             try {
@@ -1795,11 +1482,9 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
                     changed = true;
                 }
             } catch (NumberFormatException e) {
-                // Invalid value, ignore
             }
         }
 
-        // Update pattern properties
         if (config.use_pattern) {
             try {
                 double speed = Math.max(FIELD_MIN_VALUE, Double.parseDouble(patternSpeedField.getValue()));
@@ -1808,7 +1493,6 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
                     changed = true;
                 }
             } catch (NumberFormatException e) {
-                // Invalid value, ignore
             }
 
             try {
@@ -1818,7 +1502,6 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
                     changed = true;
                 }
             } catch (NumberFormatException e) {
-                // Invalid value, ignore
             }
 
             try {
@@ -1828,14 +1511,12 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
                     changed = true;
                 }
             } catch (NumberFormatException e) {
-                // Invalid value, ignore
             }
         }
 
         if (changed) {
             config.saveProperties();
 
-            // Sync field changes to server (speed, spread, intensity, etc.)
             com.kingodogo.buildscape.network.ModMessages.INSTANCE.sendToServer(new com.kingodogo.buildscape.network.UpdateConfigPacket(config));
 
             updateWorldPillars();
@@ -1850,9 +1531,7 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        // Handle scrollbar clicks for Default Properties panel
         int totalContentHeight = getDefaultPropertiesTotalHeight();
-        // Handle Default Properties scrollbar dragging
         int totalContentHeightDefault = getDefaultPropertiesTotalHeight();
         int availableHeightDefault = defaultBoxHeight - UI_PADDING * 2;
         double maxScrollDefault = Math.max(0, totalContentHeightDefault - availableHeightDefault);
@@ -1863,7 +1542,6 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
             int scrollbarHeight = defaultBoxHeight - HEADER_CLIP - UI_PADDING;
             double visibleRatio = availableHeightDefault / (double) totalContentHeightDefault;
 
-            // Pass content bounds as defaultBox for drag-to-scroll support
             double newOffset = defaultScrollbarRenderer.handleMouseClick(mouseX, mouseY, button,
                     scrollbarX, scrollbarY, scrollbarHeight,
                     defaultBoxX, defaultBoxY, defaultBoxWidth, defaultBoxHeight,
@@ -1876,7 +1554,6 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
             }
         }
 
-        // Handle Pattern Properties scrollbar dragging
         int patternTotalContentHeight = getPatternPropertiesTotalHeight();
         int patternAvailableHeight = patternBoxHeight - UI_PADDING * 2;
         double patternMaxScroll = Math.max(0, patternTotalContentHeight - patternAvailableHeight);
@@ -1901,7 +1578,6 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
             }
         }
 
-        // Handle scrollbar clicks for Color Swatches panel
         int colorPadding = 10;
         int colorAvailableHeight = colorBoxHeight - colorPadding * 2;
         int swatchSize = 20;
@@ -1930,7 +1606,6 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
             }
         }
 
-        // Handle color swatch button clicks - temporarily make visible for mouse event
         if (colorSwatchButtons != null) {
             for (int i = 0; i < colorSwatchButtons.size(); i++) {
                 net.minecraft.client.gui.components.Button swatch = colorSwatchButtons.get(i);
@@ -1945,34 +1620,26 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
             }
         }
 
-        // Handle hex field clicks
         if (colorHexFields != null) {
             for (EditBox hexField : colorHexFields) {
                 if (hexField.mouseClicked(mouseX, mouseY, button)) {
-                    activeDraggingPicker = null; // Clear any active dragging
+                    activeDraggingPicker = null;
                     return true;
                 }
             }
         }
 
-        // Handle shared color picker clicks (for dragging) - call directly like legacy
-        // version
-        // NO selectedColorIndex check - just call it if it exists
         if (sharedColorPicker != null) {
-            // Make visible temporarily for event handling
             boolean wasVisible = sharedColorPicker.visible;
             sharedColorPicker.visible = true;
             if (sharedColorPicker.mouseClicked(mouseX, mouseY, button)) {
                 sharedColorPicker.visible = wasVisible;
-                activeDraggingPicker = sharedColorPicker; // Track which picker started dragging - CRITICAL for dragging
-                                                          // to work
+                activeDraggingPicker = sharedColorPicker;
                 return true;
             }
             sharedColorPicker.visible = wasVisible;
         }
 
-        // Handle usePatternToggle button clicks - temporarily make visible for mouse
-        // event
         if (usePatternToggle != null) {
             boolean wasVisible = usePatternToggle.visible;
             usePatternToggle.visible = true;
@@ -1984,8 +1651,6 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
             usePatternToggle.visible = wasVisible;
         }
 
-        // Handle patternSelector button clicks - temporarily make visible for mouse
-        // event
         if (patternSelector != null && patternSelector.active) {
             boolean wasVisible = patternSelector.visible;
             patternSelector.visible = true;
@@ -1997,7 +1662,6 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
             patternSelector.visible = wasVisible;
         }
 
-        // Handle edit box clicks - temporarily make visible for mouse event
         if (particleSpeedField != null) {
             boolean wasVisible = particleSpeedField.visible;
             particleSpeedField.visible = true;
@@ -2069,9 +1733,7 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
             patternIntensityField.visible = wasVisible;
         }
 
-        // Handle slider clicks - temporarily make visible for mouse event
         if (maxParticleColorSlider != null && maxParticleColorSlider.active) {
-            // Check if mouse is over slider bounds manually (since widget might be hidden)
             if (mouseX >= maxParticleColorSlider.x
                     && mouseX <= maxParticleColorSlider.x + maxParticleColorSlider.getWidth() &&
                     mouseY >= maxParticleColorSlider.y
@@ -2088,31 +1750,20 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
             }
         }
 
-        // If we get here, we clicked somewhere that doesn't handle it
-        // Clear any active dragging state
         activeDraggingPicker = null;
         return super.mouseClicked(mouseX, mouseY, button);
     }
 
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
-        // PRIORITY: Handle shared color picker dragging FIRST - call directly like
-        // legacy version
-        // NO visibility checks, NO selectedColorIndex checks - just call it if it
-        // exists
-        // The picker itself will check if it's being dragged and return true/false
-        // CRITICAL: Always call mouseDragged if picker exists - it will handle its own
-        // state
         if (sharedColorPicker != null) {
-            // Make visible temporarily for event handling
             boolean wasVisible = sharedColorPicker.visible;
             sharedColorPicker.visible = true;
-            // ALWAYS call mouseDragged - it will return true if dragging, false otherwise
             boolean result = sharedColorPicker.mouseDragged(mouseX, mouseY, button, dragX, dragY);
             sharedColorPicker.visible = wasVisible;
             if (result) {
-                activeDraggingPicker = sharedColorPicker; // Track for reference
-                return true; // Return immediately if dragging
+                activeDraggingPicker = sharedColorPicker;
+                return true;
             }
         }
 
@@ -2180,13 +1831,9 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
             }
         }
 
-        // Handle slider dragging - only if we started dragging it (clicked on it first)
         if (isDraggingSlider && maxParticleColorSlider != null && maxParticleColorSlider.active) {
-            // Temporarily make visible for mouse event
             boolean wasVisible = maxParticleColorSlider.visible;
             maxParticleColorSlider.visible = true;
-            // AbstractSliderButton handles dragging internally, but we need to forward the
-            // event
             if (maxParticleColorSlider.mouseDragged(mouseX, mouseY, button, dragX, dragY)) {
                 maxParticleColorSlider.visible = wasVisible;
                 return true;
@@ -2197,10 +1844,8 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
         return false;
     }
 
-    // Not overriding Screen methods directly; return false when unhandled
     @Override
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
-        // Handle scrollbar release
         if (defaultScrollbarRenderer.handleMouseRelease(button))
             return true;
         if (patternScrollbarRenderer.handleMouseRelease(button))
@@ -2208,40 +1853,35 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
         if (colorScrollbarRenderer.handleMouseRelease(button))
             return true;
 
-        // Handle color picker release first (if we were dragging one)
         if (activeDraggingPicker != null) {
             activeDraggingPicker.mouseReleased(mouseX, mouseY, button);
-            activeDraggingPicker = null; // Clear dragging state
-            isDraggingSlider = false; // Clear slider dragging state
+            activeDraggingPicker = null;
+            isDraggingSlider = false;
             return true;
         }
 
-        // Handle slider release (only if we were dragging it)
         if (isDraggingSlider && maxParticleColorSlider != null && maxParticleColorSlider.active) {
             boolean wasVisible = maxParticleColorSlider.visible;
             maxParticleColorSlider.visible = true;
             if (maxParticleColorSlider.mouseReleased(mouseX, mouseY, button)) {
                 maxParticleColorSlider.visible = wasVisible;
-                isDraggingSlider = false; // Clear dragging state
+                isDraggingSlider = false;
                 return true;
             }
             maxParticleColorSlider.visible = wasVisible;
         }
 
-        // Handle shared color picker release - call directly like legacy version
         if (sharedColorPicker != null) {
-            // Make visible temporarily for event handling
             boolean wasVisible = sharedColorPicker.visible;
             sharedColorPicker.visible = true;
             if (sharedColorPicker.mouseReleased(mouseX, mouseY, button)) {
                 sharedColorPicker.visible = wasVisible;
-                activeDraggingPicker = null; // Clear dragging state
+                activeDraggingPicker = null;
                 return true;
             }
             sharedColorPicker.visible = wasVisible;
         }
 
-        // Always clear dragging state on release (if not already cleared above)
         if (activeDraggingPicker != null) {
             activeDraggingPicker = null;
         }
@@ -2251,10 +1891,7 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        // Handle color picker RGB/HSB field key presses - temporarily make visible if
-        // focused
         if (sharedColorPicker != null) {
-            // Check all RGB/HSB fields in the picker
             if (sharedColorPicker.rField != null && sharedColorPicker.rField.isFocused()) {
                 boolean wasVisible = sharedColorPicker.visible;
                 sharedColorPicker.visible = true;
@@ -2311,7 +1948,6 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
             }
         }
 
-        // Handle hex field key presses - temporarily make visible if focused
         if (colorHexFields != null) {
             for (EditBox hexField : colorHexFields) {
                 if (hexField.isFocused()) {
@@ -2326,7 +1962,6 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
             }
         }
 
-        // Handle edit box key presses - temporarily make visible if focused
         if (particleSpeedField != null && particleSpeedField.isFocused()) {
             boolean wasVisible = particleSpeedField.visible;
             particleSpeedField.visible = true;
@@ -2395,7 +2030,6 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double delta) {
-        // Handle scrolling for Default Properties panel
         if (mouseX >= defaultBoxX && mouseX <= defaultBoxX + defaultBoxWidth &&
                 mouseY >= defaultBoxY && mouseY <= defaultBoxY + defaultBoxHeight) {
             int totalContentHeight = getDefaultPropertiesTotalHeight();
@@ -2403,14 +2037,13 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
             double maxScroll = Math.max(0, totalContentHeight - availableHeight);
 
             if (maxScroll > 0) {
-                defaultPropertiesScrollOffset -= delta * 10; // Scroll speed
+                defaultPropertiesScrollOffset -= delta * 10;
                 defaultPropertiesScrollOffset = Math.max(0, Math.min(maxScroll, defaultPropertiesScrollOffset));
                 updateDefaultPropertiesPositions();
                 return true;
             }
         }
 
-        // Handle scrolling for Pattern Properties panel
         if (mouseX >= patternBoxX && mouseX <= patternBoxX + patternBoxWidth &&
                 mouseY >= patternBoxY && mouseY <= patternBoxY + patternBoxHeight) {
             int patternTotalContentHeight = getPatternPropertiesTotalHeight();
@@ -2418,14 +2051,13 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
             double patternMaxScroll = Math.max(0, patternTotalContentHeight - patternAvailableHeight);
 
             if (patternMaxScroll > 0) {
-                patternPropertiesScrollOffset -= delta * 10; // Scroll speed
+                patternPropertiesScrollOffset -= delta * 10;
                 patternPropertiesScrollOffset = Math.max(0, Math.min(patternMaxScroll, patternPropertiesScrollOffset));
                 updatePatternPropertiesPositions();
                 return true;
             }
         }
 
-        // Handle scrolling for Color Swatches panel
         if (mouseX >= colorBoxX && mouseX <= colorBoxX + colorBoxWidth &&
                 mouseY >= colorBoxY && mouseY <= colorBoxY + colorBoxHeight) {
             int colorTotalContentHeight = getColorSwatchesTotalHeight();
@@ -2433,7 +2065,7 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
             double colorMaxScroll = Math.max(0, colorTotalContentHeight - colorAvailableHeight);
 
             if (colorMaxScroll > 0) {
-                colorSwatchesScrollOffset -= delta * 10; // Scroll speed
+                colorSwatchesScrollOffset -= delta * 10;
                 colorSwatchesScrollOffset = Math.max(0, Math.min(colorMaxScroll, colorSwatchesScrollOffset));
                 updateColorSwatchesPositions();
                 return true;
@@ -2445,7 +2077,6 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
 
     @Override
     public boolean charTyped(char codePoint, int modifiers) {
-        // Allow typing in hex fields - temporarily make visible if focused
         if (colorHexFields != null) {
             for (EditBox hexField : colorHexFields) {
                 if (hexField.isFocused()) {
@@ -2460,7 +2091,6 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
             }
         }
 
-        // Allow typing in edit boxes - temporarily make visible if focused
         if (particleSpeedField != null && particleSpeedField.isFocused()) {
             boolean wasVisible = particleSpeedField.visible;
             particleSpeedField.visible = true;

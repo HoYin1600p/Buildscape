@@ -27,13 +27,13 @@ public class FlatIconButton extends Button {
         int bgColor = hovered ? colorHover : colorNormal;
         GuiComponent.fill(poseStack, x, y, x + width, y + height, bgColor);
 
-        GuiComponent.fill(poseStack, x, y, x + width, y + 1, colorBorder); // Top
-        GuiComponent.fill(poseStack, x, y + height - 1, x + width, y + height, colorBorder); // Bottom
-        GuiComponent.fill(poseStack, x, y, x + 1, y + height, colorBorder); // Left
-        GuiComponent.fill(poseStack, x + width - 1, y, x + width, y + height, colorBorder); // Right
+        GuiComponent.fill(poseStack, x, y, x + width, y + 1, colorBorder);
+        GuiComponent.fill(poseStack, x, y + height - 1, x + width, y + height, colorBorder);
+        GuiComponent.fill(poseStack, x, y, x + 1, y + height, colorBorder);
+        GuiComponent.fill(poseStack, x + width - 1, y, x + width, y + height, colorBorder);
 
         String text = getMessage().getString();
-        int textColor = hovered ? 0xFFFFAA00 : 0xFFCCCCCC; // Orange on hover, Gray normal
+        int textColor = hovered ? 0xFFFFAA00 : 0xFFCCCCCC;
 
         int textWidth = mc.font.width(text);
         mc.font.draw(poseStack, text, x + (width - textWidth) / 2 + 1, y + (height - 8) / 2, textColor);

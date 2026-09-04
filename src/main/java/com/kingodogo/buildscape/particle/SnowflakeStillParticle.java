@@ -15,18 +15,18 @@ public class SnowflakeStillParticle extends TextureSheetParticle {
         this.setSpriteFromAge(sprites);
         this.pickSprite(sprites);
 
-        this.gravity = 0.0F; // No gravity as requested
-        this.lifetime = 200 + level.random.nextInt(200); // Match pillar snowflake lifetime
-        this.hasPhysics = true; // Match pillar snowflake physics
+        this.gravity = 0.0F;
+        this.lifetime = 200 + level.random.nextInt(200);
+        this.hasPhysics = true;
 
-        this.quadSize = 0.1F + level.random.nextFloat() * 0.1F; // Match pillar snowflake size
+        this.quadSize = 0.1F + level.random.nextFloat() * 0.1F;
 
         this.xd = xSpeed;
         this.yd = ySpeed;
         this.zd = zSpeed;
 
         this.setColor(1.0F, 1.0F, 1.0F);
-        this.alpha = 0.8F + level.random.nextFloat() * 0.2F; // Match pillar snowflake alpha
+        this.alpha = 0.8F + level.random.nextFloat() * 0.2F;
     }
 
     @Override

@@ -8,10 +8,6 @@ import net.minecraft.world.phys.Vec3;
 import java.util.Collections;
 import java.util.List;
 
-/**
- * Encapsulates an item stack in virtual transit through a Hollow Steel Pipe network.
- * Completely eliminates server ItemEntity physics overhead and chunk collision lag.
- */
 public class PipeItemTransit {
 
     private final ItemStack stack;

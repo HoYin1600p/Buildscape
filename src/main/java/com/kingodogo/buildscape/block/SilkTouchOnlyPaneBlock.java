@@ -113,13 +113,10 @@ public class SilkTouchOnlyPaneBlock extends IronBarsBlock {
 
             String newName = null;
             if (currentName.startsWith("factory_")) {
-                // factory_white_glass_pane -> factory_red_glass_pane
                 newName = "factory_" + dyeColorName + "_glass_pane";
             } else if (currentName.contains("_mosaic_glass_pane")) {
-                // white_mosaic_glass_pane -> red_mosaic_glass_pane
                 newName = dyeColorName + "_mosaic_glass_pane";
             } else if (currentName.contains("_glazed_glass_pane")) {
-                // white_glazed_glass_pane -> red_glazed_glass_pane
                 newName = dyeColorName + "_glazed_glass_pane";
             }
 
@@ -130,7 +127,6 @@ public class SilkTouchOnlyPaneBlock extends IronBarsBlock {
                 if (newBlock != null && newBlock != this) {
                     if (!level.isClientSide) {
                         BlockState newState = newBlock.defaultBlockState();
-                        // Preserve connections (IronBarsBlock uses North, South, East, West, Waterlogged)
                         if (state.hasProperty(NORTH))
                             newState = newState.setValue(NORTH, state.getValue(NORTH));
                         if (state.hasProperty(SOUTH))

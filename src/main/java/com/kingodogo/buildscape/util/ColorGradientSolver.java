@@ -73,26 +73,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-/**
- * Nine-slot color and gradient solver. The logical server uses MapColor as a
- * safe fallback; clients replace that catalog with colors sampled from baked
- * models when the Builder's Workbench is opened.
- */
 public final class ColorGradientSolver {
     public static final int FILTER_SOLID = 1;
     public static final int FILTER_TRANSPARENT = 1 << 1;
     public static final int FILTER_NON_FULL = 1 << 2;
     public static final int FILTER_ALL = FILTER_SOLID | FILTER_TRANSPARENT | FILTER_NON_FULL;
-    // Low bits enable categories; the matching high bits apply shift-click exclusions.
     public static final int STRICT_SHIFT = 3;
     public static final int FILTER_SINGLE_TEXTURE = 1 << 6;
     public static final int FILTER_MATCH_SHAPE = 1 << 7;
     public static final int FILTER_MODIFIERS = FILTER_SINGLE_TEXTURE | FILTER_MATCH_SHAPE;
-    /**
-     * State a freshly placed workbench starts in: solid full blocks only, every other
-     * category and both modifiers switched off, so the palette opens narrow and the
-     * player widens it deliberately.
-     */
     public static final int FILTER_DEFAULT = FILTER_SOLID;
     public static final int FILTER_STATE_MASK = FILTER_ALL | FILTER_ALL << STRICT_SHIFT | FILTER_MODIFIERS;
 
@@ -216,11 +205,6 @@ public final class ColorGradientSolver {
         return solveGradient(anchors, filterMask, offsets);
     }
 
-    /**
-     * Solves each interval between occupied anchor slots independently. Slots
-     * outside the first and last anchor remain empty, and every anchor is copied
-     * exactly into the output at its input position.
-     */
     public static List<ItemStack> solveGradient(List<ItemStack> anchors, int filterMask, int[] offsets) {
         ensureRegistryPopulated();
         List<ItemStack> result = emptyResult();
@@ -432,7 +416,6 @@ public final class ColorGradientSolver {
                 return ShapeFamily.FULL_BLOCK;
             }
         } catch (RuntimeException ignored) {
-            // Unknown custom shapes do not participate in Match Shape.
         }
         return null;
     }

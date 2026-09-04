@@ -1,9 +1,5 @@
 package com.kingodogo.buildscape.api.model;
 
-/**
- * Request body for the secure authenticate endpoint.
- * POST /api/minecraft
- */
 public class AuthenticateRequest {
     private String action;
     private String uuid;
@@ -18,9 +14,6 @@ public class AuthenticateRequest {
         this.accessToken = accessToken;
     }
 
-    /**
-     * Create a standard authenticate request.
-     */
     public static AuthenticateRequest createAuthenticate(String uuid, String accessToken) {
         return new AuthenticateRequest("authenticate", uuid, accessToken);
     }

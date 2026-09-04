@@ -37,111 +37,94 @@ public class CopperOxidationHandler {
     public static void init() {
         if (!NEXT_STAGE.isEmpty()) return;
 
-        // 1. Chiseled Copper
         registerChain(ModBlocks.CHISELED_COPPER, ModBlocks.EXPOSED_CHISELED_COPPER, ModBlocks.WEATHERED_CHISELED_COPPER, ModBlocks.OXIDIZED_CHISELED_COPPER);
         registerWaxPair(ModBlocks.CHISELED_COPPER, ModBlocks.WAXED_CHISELED_COPPER);
         registerWaxPair(ModBlocks.EXPOSED_CHISELED_COPPER, ModBlocks.WAXED_EXPOSED_CHISELED_COPPER);
         registerWaxPair(ModBlocks.WEATHERED_CHISELED_COPPER, ModBlocks.WAXED_WEATHERED_CHISELED_COPPER);
         registerWaxPair(ModBlocks.OXIDIZED_CHISELED_COPPER, ModBlocks.WAXED_OXIDIZED_CHISELED_COPPER);
 
-        // 2. Copper Grate
         registerChain(ModBlocks.COPPER_GRATE, ModBlocks.EXPOSED_COPPER_GRATE, ModBlocks.WEATHERED_COPPER_GRATE, ModBlocks.OXIDIZED_COPPER_GRATE);
         registerWaxPair(ModBlocks.COPPER_GRATE, ModBlocks.WAXED_COPPER_GRATE);
         registerWaxPair(ModBlocks.EXPOSED_COPPER_GRATE, ModBlocks.WAXED_EXPOSED_COPPER_GRATE);
         registerWaxPair(ModBlocks.WEATHERED_COPPER_GRATE, ModBlocks.WAXED_WEATHERED_COPPER_GRATE);
         registerWaxPair(ModBlocks.OXIDIZED_COPPER_GRATE, ModBlocks.WAXED_OXIDIZED_COPPER_GRATE);
 
-        // 3. Copper Bulb
         registerChain(ModBlocks.COPPER_BULB, ModBlocks.EXPOSED_COPPER_BULB, ModBlocks.WEATHERED_COPPER_BULB, ModBlocks.OXIDIZED_COPPER_BULB);
         registerWaxPair(ModBlocks.COPPER_BULB, ModBlocks.WAXED_COPPER_BULB);
         registerWaxPair(ModBlocks.EXPOSED_COPPER_BULB, ModBlocks.WAXED_EXPOSED_COPPER_BULB);
         registerWaxPair(ModBlocks.WEATHERED_COPPER_BULB, ModBlocks.WAXED_WEATHERED_COPPER_BULB);
         registerWaxPair(ModBlocks.OXIDIZED_COPPER_BULB, ModBlocks.WAXED_OXIDIZED_COPPER_BULB);
 
-        // 4. Copper Rod
         registerChain(ModBlocks.COPPER_ROD, ModBlocks.EXPOSED_COPPER_ROD, ModBlocks.WEATHERED_COPPER_ROD, ModBlocks.OXIDIZED_COPPER_ROD);
         registerWaxPair(ModBlocks.COPPER_ROD, ModBlocks.WAXED_COPPER_ROD);
         registerWaxPair(ModBlocks.EXPOSED_COPPER_ROD, ModBlocks.WAXED_EXPOSED_COPPER_ROD);
         registerWaxPair(ModBlocks.WEATHERED_COPPER_ROD, ModBlocks.WAXED_WEATHERED_COPPER_ROD);
         registerWaxPair(ModBlocks.OXIDIZED_COPPER_ROD, ModBlocks.WAXED_OXIDIZED_COPPER_ROD);
 
-        // 5. Copper Lantern
         registerChain(ModBlocks.COPPER_LANTERN, ModBlocks.EXPOSED_COPPER_LANTERN, ModBlocks.WEATHERED_COPPER_LANTERN, ModBlocks.OXIDIZED_COPPER_LANTERN);
         registerWaxPair(ModBlocks.COPPER_LANTERN, ModBlocks.WAXED_COPPER_LANTERN);
         registerWaxPair(ModBlocks.EXPOSED_COPPER_LANTERN, ModBlocks.WAXED_EXPOSED_COPPER_LANTERN);
         registerWaxPair(ModBlocks.WEATHERED_COPPER_LANTERN, ModBlocks.WAXED_WEATHERED_COPPER_LANTERN);
         registerWaxPair(ModBlocks.OXIDIZED_COPPER_LANTERN, ModBlocks.WAXED_OXIDIZED_COPPER_LANTERN);
 
-        // 6. Copper Door
         registerChain(ModBlocks.COPPER_DOOR, ModBlocks.EXPOSED_COPPER_DOOR, ModBlocks.WEATHERED_COPPER_DOOR, ModBlocks.OXIDIZED_COPPER_DOOR);
         registerWaxPair(ModBlocks.COPPER_DOOR, ModBlocks.WAXED_COPPER_DOOR);
         registerWaxPair(ModBlocks.EXPOSED_COPPER_DOOR, ModBlocks.WAXED_EXPOSED_COPPER_DOOR);
         registerWaxPair(ModBlocks.WEATHERED_COPPER_DOOR, ModBlocks.WAXED_WEATHERED_COPPER_DOOR);
         registerWaxPair(ModBlocks.OXIDIZED_COPPER_DOOR, ModBlocks.WAXED_OXIDIZED_COPPER_DOOR);
 
-        // 7. Copper Trapdoor
         registerChain(ModBlocks.COPPER_TRAPDOOR, ModBlocks.EXPOSED_COPPER_TRAPDOOR, ModBlocks.WEATHERED_COPPER_TRAPDOOR, ModBlocks.OXIDIZED_COPPER_TRAPDOOR);
         registerWaxPair(ModBlocks.COPPER_TRAPDOOR, ModBlocks.WAXED_COPPER_TRAPDOOR);
         registerWaxPair(ModBlocks.EXPOSED_COPPER_TRAPDOOR, ModBlocks.WAXED_EXPOSED_COPPER_TRAPDOOR);
         registerWaxPair(ModBlocks.WEATHERED_COPPER_TRAPDOOR, ModBlocks.WAXED_WEATHERED_COPPER_TRAPDOOR);
         registerWaxPair(ModBlocks.OXIDIZED_COPPER_TRAPDOOR, ModBlocks.WAXED_OXIDIZED_COPPER_TRAPDOOR);
 
-        // 8. Copper Bars
         registerChain(ModBlocks.COPPER_BARS, ModBlocks.EXPOSED_COPPER_BARS, ModBlocks.WEATHERED_COPPER_BARS, ModBlocks.OXIDIZED_COPPER_BARS);
         registerWaxPair(ModBlocks.COPPER_BARS, ModBlocks.WAXED_COPPER_BARS);
         registerWaxPair(ModBlocks.EXPOSED_COPPER_BARS, ModBlocks.WAXED_EXPOSED_COPPER_BARS);
         registerWaxPair(ModBlocks.WEATHERED_COPPER_BARS, ModBlocks.WAXED_WEATHERED_COPPER_BARS);
         registerWaxPair(ModBlocks.OXIDIZED_COPPER_BARS, ModBlocks.WAXED_OXIDIZED_COPPER_BARS);
 
-        // Copper Meshes
         registerChain(ModBlocks.COPPER_MESH, ModBlocks.EXPOSED_COPPER_MESH, ModBlocks.WEATHERED_COPPER_MESH, ModBlocks.OXIDIZED_COPPER_MESH);
         registerWaxPair(ModBlocks.COPPER_MESH, ModBlocks.WAXED_COPPER_MESH);
         registerWaxPair(ModBlocks.EXPOSED_COPPER_MESH, ModBlocks.WAXED_EXPOSED_COPPER_MESH);
         registerWaxPair(ModBlocks.WEATHERED_COPPER_MESH, ModBlocks.WAXED_WEATHERED_COPPER_MESH);
         registerWaxPair(ModBlocks.OXIDIZED_COPPER_MESH, ModBlocks.WAXED_OXIDIZED_COPPER_MESH);
 
-        // Copper Bolts
         registerChain(ModBlocks.COPPER_BOLTS, ModBlocks.EXPOSED_COPPER_BOLTS, ModBlocks.WEATHERED_COPPER_BOLTS, ModBlocks.OXIDIZED_COPPER_BOLTS);
         registerWaxPair(ModBlocks.COPPER_BOLTS, ModBlocks.WAXED_COPPER_BOLTS);
         registerWaxPair(ModBlocks.EXPOSED_COPPER_BOLTS, ModBlocks.WAXED_EXPOSED_COPPER_BOLTS);
         registerWaxPair(ModBlocks.WEATHERED_COPPER_BOLTS, ModBlocks.WAXED_WEATHERED_COPPER_BOLTS);
         registerWaxPair(ModBlocks.OXIDIZED_COPPER_BOLTS, ModBlocks.WAXED_OXIDIZED_COPPER_BOLTS);
 
-        // 9. Cut Copper Vertical Slab
         registerChain(ModBlocks.CUT_COPPER_VERTICAL_SLAB, ModBlocks.EXPOSED_CUT_COPPER_VERTICAL_SLAB, ModBlocks.WEATHERED_CUT_COPPER_VERTICAL_SLAB, ModBlocks.OXIDIZED_CUT_COPPER_VERTICAL_SLAB);
         registerWaxPair(ModBlocks.CUT_COPPER_VERTICAL_SLAB, ModBlocks.WAXED_CUT_COPPER_VERTICAL_SLAB);
         registerWaxPair(ModBlocks.EXPOSED_CUT_COPPER_VERTICAL_SLAB, ModBlocks.WAXED_EXPOSED_CUT_COPPER_VERTICAL_SLAB);
         registerWaxPair(ModBlocks.WEATHERED_CUT_COPPER_VERTICAL_SLAB, ModBlocks.WAXED_WEATHERED_CUT_COPPER_VERTICAL_SLAB);
         registerWaxPair(ModBlocks.OXIDIZED_CUT_COPPER_VERTICAL_SLAB, ModBlocks.WAXED_OXIDIZED_CUT_COPPER_VERTICAL_SLAB);
 
-        // 10. Copper Button
         registerChain(ModBlocks.COPPER_BUTTON, ModBlocks.EXPOSED_COPPER_BUTTON, ModBlocks.WEATHERED_COPPER_BUTTON, ModBlocks.OXIDIZED_COPPER_BUTTON);
         registerWaxPair(ModBlocks.COPPER_BUTTON, ModBlocks.WAXED_COPPER_BUTTON);
         registerWaxPair(ModBlocks.EXPOSED_COPPER_BUTTON, ModBlocks.WAXED_EXPOSED_COPPER_BUTTON);
         registerWaxPair(ModBlocks.WEATHERED_COPPER_BUTTON, ModBlocks.WAXED_WEATHERED_COPPER_BUTTON);
         registerWaxPair(ModBlocks.OXIDIZED_COPPER_BUTTON, ModBlocks.WAXED_OXIDIZED_COPPER_BUTTON);
 
-        // 11. Copper Pressure Plate
         registerChain(ModBlocks.COPPER_PRESSURE_PLATE, ModBlocks.EXPOSED_COPPER_PRESSURE_PLATE, ModBlocks.WEATHERED_COPPER_PRESSURE_PLATE, ModBlocks.OXIDIZED_COPPER_PRESSURE_PLATE);
         registerWaxPair(ModBlocks.COPPER_PRESSURE_PLATE, ModBlocks.WAXED_COPPER_PRESSURE_PLATE);
         registerWaxPair(ModBlocks.EXPOSED_COPPER_PRESSURE_PLATE, ModBlocks.WAXED_EXPOSED_COPPER_PRESSURE_PLATE);
         registerWaxPair(ModBlocks.WEATHERED_COPPER_PRESSURE_PLATE, ModBlocks.WAXED_WEATHERED_COPPER_PRESSURE_PLATE);
         registerWaxPair(ModBlocks.OXIDIZED_COPPER_PRESSURE_PLATE, ModBlocks.WAXED_OXIDIZED_COPPER_PRESSURE_PLATE);
 
-        // 12. Copper Chests
         registerChain(ModBlocks.COPPER_CHEST, ModBlocks.EXPOSED_COPPER_CHEST, ModBlocks.WEATHERED_COPPER_CHEST, ModBlocks.OXIDIZED_COPPER_CHEST);
         registerWaxPair(ModBlocks.COPPER_CHEST, ModBlocks.WAXED_COPPER_CHEST);
         registerWaxPair(ModBlocks.EXPOSED_COPPER_CHEST, ModBlocks.WAXED_EXPOSED_COPPER_CHEST);
         registerWaxPair(ModBlocks.WEATHERED_COPPER_CHEST, ModBlocks.WAXED_WEATHERED_COPPER_CHEST);
         registerWaxPair(ModBlocks.OXIDIZED_COPPER_CHEST, ModBlocks.WAXED_OXIDIZED_COPPER_CHEST);
 
-        // 13. Copper Chains
         registerChain(ModBlocks.COPPER_CHAIN, ModBlocks.EXPOSED_COPPER_CHAIN, ModBlocks.WEATHERED_COPPER_CHAIN, ModBlocks.OXIDIZED_COPPER_CHAIN);
 
-        // 14. Large Copper Chains
         registerChain(ModBlocks.LARGE_COPPER_CHAIN, ModBlocks.LARGE_EXPOSED_COPPER_CHAIN, ModBlocks.LARGE_WEATHERED_COPPER_CHAIN, ModBlocks.LARGE_OXIDIZED_COPPER_CHAIN);
 
-        // 15. Slit Copper (Block, Stairs, Slab, Vertical Slab)
         registerChain(ModBlocks.SLIT_COPPER, ModBlocks.EXPOSED_SLIT_COPPER, ModBlocks.WEATHERED_SLIT_COPPER, ModBlocks.OXIDIZED_SLIT_COPPER);
         registerWaxPair(ModBlocks.SLIT_COPPER, ModBlocks.WAXED_SLIT_COPPER);
         registerWaxPair(ModBlocks.EXPOSED_SLIT_COPPER, ModBlocks.WAXED_EXPOSED_SLIT_COPPER);
@@ -191,7 +174,6 @@ public class CopperOxidationHandler {
         ItemStack held = event.getItemStack();
         Player player = event.getPlayer();
 
-        // 0. BOTTLE OF MIST OXIDATION SPEEDUP
         if (held.is(ModItems.BOTTLE_OF_MIST.get())) {
             BlockState nextState = getNextOxidationState(state);
             if (nextState != null) {
@@ -224,13 +206,12 @@ public class CopperOxidationHandler {
             }
         }
 
-        // 1. HONEYCOMB WAXING
         if (held.is(Items.HONEYCOMB)) {
             if (block instanceof EyeblossomBlock) {
                 if (!state.getValue(EyeblossomBlock.WAXED)) {
                     if (!level.isClientSide) {
                         level.setBlock(pos, state.setValue(EyeblossomBlock.WAXED, true), 3);
-                        level.levelEvent(3003, pos, 0); // Wax on particles
+                        level.levelEvent(3003, pos, 0);
                         if (player != null && !player.getAbilities().instabuild) {
                             held.shrink(1);
                         }
@@ -246,7 +227,7 @@ public class CopperOxidationHandler {
                     Block targetBlock = entry.getValue().get();
                     if (!level.isClientSide) {
                         setBlockStateOrDoor(level, pos, state, targetBlock);
-                        level.levelEvent(3003, pos, 0); // Wax on particles
+                        level.levelEvent(3003, pos, 0);
                         if (player != null && !player.getAbilities().instabuild) {
                             held.shrink(1);
                         }
@@ -259,14 +240,12 @@ public class CopperOxidationHandler {
             }
         }
 
-        // 2. AXE INTERACTION (UNWAXING & DE-OXIDIZING / SCRAPING)
         if (held.getItem() instanceof AxeItem) {
-            // Check Eyeblossom unwaxing
             if (block instanceof EyeblossomBlock) {
                 if (state.getValue(EyeblossomBlock.WAXED)) {
                     if (!level.isClientSide) {
                         level.setBlock(pos, state.setValue(EyeblossomBlock.WAXED, false), 3);
-                        level.levelEvent(3004, pos, 0); // Wax off particles
+                        level.levelEvent(3004, pos, 0);
                         if (player != null && !player.getAbilities().instabuild) {
                             held.hurtAndBreak(1, player, p -> p.broadcastBreakEvent(event.getHand()));
                         }
@@ -277,13 +256,12 @@ public class CopperOxidationHandler {
                     return true;
                 }
             }
-            // A) Check Unwaxing
             for (Map.Entry<Supplier<Block>, Supplier<Block>> entry : UNWAXED_MAP.entrySet()) {
                 if (entry.getKey().get() == block) {
                     Block targetBlock = entry.getValue().get();
                     if (!level.isClientSide) {
                         setBlockStateOrDoor(level, pos, state, targetBlock);
-                        level.levelEvent(3004, pos, 0); // Wax off particles
+                        level.levelEvent(3004, pos, 0);
                         if (player != null && !player.getAbilities().instabuild) {
                             held.hurtAndBreak(1, player, p -> p.broadcastBreakEvent(event.getHand()));
                         }
@@ -295,13 +273,12 @@ public class CopperOxidationHandler {
                 }
             }
 
-            // B) Check De-oxidizing / Scraping
             for (Map.Entry<Supplier<Block>, Supplier<Block>> entry : PREV_STAGE.entrySet()) {
                 if (entry.getKey().get() == block) {
                     Block targetBlock = entry.getValue().get();
                     if (!level.isClientSide) {
                         setBlockStateOrDoor(level, pos, state, targetBlock);
-                        level.levelEvent(3005, pos, 0); // Scrape particles
+                        level.levelEvent(3005, pos, 0);
                         if (player != null && !player.getAbilities().instabuild) {
                             held.hurtAndBreak(1, player, p -> p.broadcastBreakEvent(event.getHand()));
                         }
@@ -325,7 +302,6 @@ public class CopperOxidationHandler {
         Block block = state.getBlock();
         for (Map.Entry<Supplier<Block>, Supplier<Block>> entry : NEXT_STAGE.entrySet()) {
             if (entry.getKey().get() == block) {
-                // 1 in 16 chance on random tick to progress oxidation
                 if (level.random.nextFloat() < 0.05688889F) {
                     Block targetBlock = entry.getValue().get();
                     setBlockStateOrDoor(level, pos, state, targetBlock);
@@ -373,7 +349,6 @@ public class CopperOxidationHandler {
 
         BlockState partnerNextState = copyStateProperties(partnerState, targetBlock.defaultBlockState());
 
-        // Suppress intermediate shape updates so neither half is detached while the pair changes.
         level.setBlock(pos, nextState, 2 | 16);
         level.setBlock(partnerPos, partnerNextState, 2 | 16);
         level.updateNeighborsAt(pos, targetBlock);

@@ -15,7 +15,6 @@ public class ItemMixin {
     @Inject(method = "getMaxStackSize", at = @At("HEAD"), cancellable = true)
     private void buildscape$waterBottleMaxStackSize(CallbackInfoReturnable<Integer> cir) {
         ItemStack self = (ItemStack) (Object) this;
-        // Only water bottles should be stackable to 16
         if (self.is(Items.POTION)) {
             if (PotionUtils.getPotion(self) == Potions.WATER) {
                 cir.setReturnValue(16);

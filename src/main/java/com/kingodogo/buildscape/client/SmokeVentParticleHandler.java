@@ -19,12 +19,6 @@ import net.minecraftforge.fml.common.Mod;
 import java.util.Map;
 import java.util.Random;
 
-/**
- * Spawns smoke vent particles for vents beyond the vanilla animateTick range (~16 blocks).
- * Minecraft's animateTick only fires for blocks within 16 blocks of the player, so distant
- * smoke vents would appear inactive without this handler. This scans loaded chunks within
- * the player's render distance and spawns particles for any active smoke vent top/single blocks.
- */
 @Mod.EventBusSubscriber(
         modid = com.kingodogo.buildscape.BuildScape.MODID,
         bus = Mod.EventBusSubscriber.Bus.FORGE,
@@ -32,7 +26,6 @@ import java.util.Random;
 )
 public class SmokeVentParticleHandler {
 
-    // animateTick covers blocks within this range, so we skip them to avoid double-spawning
     private static final int VANILLA_ANIMATE_TICK_RANGE = 16;
 
     private static final Random random = new Random();
@@ -47,7 +40,6 @@ public class SmokeVentParticleHandler {
         Level level = mc.level;
         BlockPos playerPos = mc.player.blockPosition();
 
-        // Use the client's render distance in chunks to determine how far to scan
         int renderDistanceChunks = mc.options.renderDistance;
         int playerChunkX = playerPos.getX() >> 4;
         int playerChunkZ = playerPos.getZ() >> 4;
@@ -67,11 +59,9 @@ public class SmokeVentParticleHandler {
 
                     BlockPos pos = entry.getKey();
 
-                    // Skip vents within animateTick range — those are already handled by animateTick
                     double distSq = playerPos.distSqr(pos);
                     if (distSq <= VANILLA_ANIMATE_TICK_RANGE * VANILLA_ANIMATE_TICK_RANGE) continue;
 
-                    // Only spawn from top/single parts (same logic as animateTick)
                     var state = level.getBlockState(pos);
                     if (!(state.getBlock() instanceof SmokeVentBlock)) continue;
                     var part = state.getValue(SmokeVentBlock.PART);
@@ -80,14 +70,10 @@ public class SmokeVentParticleHandler {
                         continue;
                     }
 
-                    // Only spawn if active
                     if (!ventBE.isActive()) continue;
 
-                    // Since client tick runs 20 times per second, we reduce the spawn probability
-                    // to match the random, less frequent animateTick calls (approx. once per 1-1.5 seconds)
-                    if (random.nextFloat() < 0.95F) continue; // 5% chance per tick
+                    if (random.nextFloat() < 0.95F) continue;
 
-                    // Spawn particle at same positions as animateTick
                     double x = pos.getX() + 0.5 + random.nextDouble() / 3.0 * (random.nextBoolean() ? 1 : -1);
                     double y = pos.getY() + random.nextDouble() + random.nextDouble();
                     double z = pos.getZ() + 0.5 + random.nextDouble() / 3.0 * (random.nextBoolean() ? 1 : -1);

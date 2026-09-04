@@ -31,12 +31,6 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import com.kingodogo.buildscape.trophy.Trophies;
 
-/**
- * Handles custom advancement triggers, progress counters, and reward events.
- *
- * TODO: Physical Trophy blocks/items to be awarded once registered in Buildscape.
- * TODO: Special Tools/Templates (e.g. Golden Shears) to be awarded once registered in Buildscape.
- */
 @Mod.EventBusSubscriber(modid = BuildScape.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class AdvancementEvents {
 
@@ -118,7 +112,6 @@ public class AdvancementEvents {
         int baseStat = tag.getInt(baseKey);
         int delta = currentStat - baseStat;
 
-        // If advancement was revoked after stat accumulated, re-snapshot baseline to count fresh from current action
         if (delta > targetCount) {
             tag.putInt(baseKey, Math.max(0, currentStat - 1));
             baseStat = tag.getInt(baseKey);
@@ -141,7 +134,6 @@ public class AdvancementEvents {
         serverPlayer.awardStat(com.kingodogo.buildscape.stat.ModStats.INTERACT_WITH_PILLAR);
         int count = serverPlayer.getStats().getValue(net.minecraft.stats.Stats.CUSTOM, com.kingodogo.buildscape.stat.ModStats.INTERACT_WITH_PILLAR);
 
-        // Ashenking Pillar Item & Trophy Rewards
         if (checkRelativeMilestone(serverPlayer, "put_it_on_display", 10, count)) {
             giveItemReward(serverPlayer, Trophies.getRewardForAdvancement("put_it_on_display"), 1);
             return;
@@ -176,7 +168,6 @@ public class AdvancementEvents {
 
         CompoundTag tag = serverPlayer.getPersistentData();
 
-        // Check if placed block belongs to Buildscape
         if ("buildscape".equals(modId)) {
             serverPlayer.awardStat(com.kingodogo.buildscape.stat.ModStats.BLOCKS_PLACED);
             int placedCount = serverPlayer.getStats().getValue(net.minecraft.stats.Stats.CUSTOM, com.kingodogo.buildscape.stat.ModStats.BLOCKS_PLACED);
@@ -192,30 +183,24 @@ public class AdvancementEvents {
             }
         }
 
-        // Stained Brick
         if (path.contains("stained_brick")) {
             grant(serverPlayer, "brick_by_brick");
         }
 
-        // Hollow Logs
         if (path.startsWith("hollow_")) {
             serverPlayer.awardStat(com.kingodogo.buildscape.stat.ModStats.HOLLOW_LOGS_PLACED);
             int hollowCount = serverPlayer.getStats().getValue(net.minecraft.stats.Stats.CUSTOM, com.kingodogo.buildscape.stat.ModStats.HOLLOW_LOGS_PLACED);
             if (checkRelativeMilestone(serverPlayer, "i_vented", 10, hollowCount)) {
-                // Awarded
             }
         }
 
-        // Icicles
         if (path.contains("icicle")) {
             serverPlayer.awardStat(com.kingodogo.buildscape.stat.ModStats.ICICLES_PLACED);
             int icicleCount = serverPlayer.getStats().getValue(net.minecraft.stats.Stats.CUSTOM, com.kingodogo.buildscape.stat.ModStats.ICICLES_PLACED);
             if (checkRelativeMilestone(serverPlayer, "chill_out", 10, icicleCount)) {
-                // Awarded
             }
         }
 
-        // Ornaments
         if (path.contains("ornament")) {
             serverPlayer.awardStat(com.kingodogo.buildscape.stat.ModStats.ORNAMENTS_PLACED);
             int ornCount = serverPlayer.getStats().getValue(net.minecraft.stats.Stats.CUSTOM, com.kingodogo.buildscape.stat.ModStats.ORNAMENTS_PLACED);
@@ -224,7 +209,6 @@ public class AdvancementEvents {
             }
         }
 
-        // String Lights
         if (path.contains("string_light")) {
             serverPlayer.awardStat(com.kingodogo.buildscape.stat.ModStats.STRING_LIGHTS_PLACED);
             int lightCount = serverPlayer.getStats().getValue(net.minecraft.stats.Stats.CUSTOM, com.kingodogo.buildscape.stat.ModStats.STRING_LIGHTS_PLACED);
@@ -234,7 +218,6 @@ public class AdvancementEvents {
             }
         }
 
-        // Stars
         if (path.contains("_star")) {
             serverPlayer.awardStat(com.kingodogo.buildscape.stat.ModStats.STARS_PLACED);
             int starCount = serverPlayer.getStats().getValue(net.minecraft.stats.Stats.CUSTOM, com.kingodogo.buildscape.stat.ModStats.STARS_PLACED);
@@ -244,7 +227,6 @@ public class AdvancementEvents {
             }
         }
 
-        // Snowy Leaves
         if (path.startsWith("snowy_")) {
             serverPlayer.awardStat(com.kingodogo.buildscape.stat.ModStats.SNOWY_LEAVES_PLACED);
             int snowCount = serverPlayer.getStats().getValue(net.minecraft.stats.Stats.CUSTOM, com.kingodogo.buildscape.stat.ModStats.SNOWY_LEAVES_PLACED);
@@ -253,7 +235,6 @@ public class AdvancementEvents {
             }
         }
 
-        // Frosty Rose ("Let it Snow" - Place 5 Frosty Rose together)
         if (block instanceof FrostRoseBlock || path.equals("frost_rose")) {
             serverPlayer.awardStat(com.kingodogo.buildscape.stat.ModStats.FROSTY_ROSES_PLACED);
             int radius = 3;
@@ -268,22 +249,18 @@ public class AdvancementEvents {
             }
         }
 
-        // Cascade Block ("Let it Cascade" - Place 1 Cascade Block)
         if (block instanceof CascadeBlock || block instanceof CascadeBlockNoMist || path.contains("cascade_block")) {
             serverPlayer.awardStat(com.kingodogo.buildscape.stat.ModStats.CASCADE_BLOCKS_PLACED);
             grant(serverPlayer, "let_it_cascade");
         }
 
-        // Smoke Vent ("Let It Out" - Place 5 Smoke Vent)
         if (block instanceof SmokeVentBlock || path.equals("smoke_vent")) {
             serverPlayer.awardStat(com.kingodogo.buildscape.stat.ModStats.SMOKE_VENTS_PLACED);
             int ventCount = serverPlayer.getStats().getValue(net.minecraft.stats.Stats.CUSTOM, com.kingodogo.buildscape.stat.ModStats.SMOKE_VENTS_PLACED);
             if (checkRelativeMilestone(serverPlayer, "let_it_out", 5, ventCount)) {
-                // Granted
             }
         }
 
-        // Muff Block
         if (block instanceof MuffBlock || path.equals("muff_block")) {
             if (level.hasNeighborSignal(pos)) {
                 serverPlayer.awardStat(com.kingodogo.buildscape.stat.ModStats.MUFF_BLOCKS_ACTIVATED);
@@ -291,16 +268,13 @@ public class AdvancementEvents {
             }
         }
 
-        // Bolts ("Are you Nuts" - Place 20 Bolts)
         if (path.endsWith("_bolts") || block instanceof SteelBoltBlock || block instanceof WeatheringBoltBlock) {
             serverPlayer.awardStat(com.kingodogo.buildscape.stat.ModStats.BOLTS_PLACED);
             int boltCount = serverPlayer.getStats().getValue(net.minecraft.stats.Stats.CUSTOM, com.kingodogo.buildscape.stat.ModStats.BOLTS_PLACED);
             if (checkRelativeMilestone(serverPlayer, "are_you_nuts", 20, boltCount)) {
-                // Granted
             }
         }
 
-        // Pillar Placement & Height Tracking
         if (block instanceof PillarBlock || block instanceof AshenKingPillarBlock) {
             checkPillars(serverPlayer, level, pos, block);
         }
@@ -319,7 +293,6 @@ public class AdvancementEvents {
             }
         }
 
-        // Check vertical pillar height (any pillar type) for 50-block high pillar
         int height = 1;
         BlockPos current = pos.below();
         while (level.getBlockState(current).getBlock() instanceof PillarBlock || level.getBlockState(current).getBlock() instanceof AshenKingPillarBlock) {

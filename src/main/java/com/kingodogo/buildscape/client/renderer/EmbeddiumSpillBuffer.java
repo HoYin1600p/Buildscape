@@ -7,7 +7,6 @@ import me.jellysquid.mods.sodium.client.render.chunk.compile.buffers.ChunkModelB
 import me.jellysquid.mods.sodium.client.render.chunk.format.ModelVertexSink;
 import net.minecraft.core.BlockPos;
 
-/** Bridges the outlet's Forge water mesh into Embeddium's chunk buffers. Author: HoYin1600p. */
 public final class EmbeddiumSpillBuffer implements VertexConsumer {
     private final ChunkModelBuilder builder;
     private final ModelVertexSink sink;

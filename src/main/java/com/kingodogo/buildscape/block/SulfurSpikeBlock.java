@@ -180,7 +180,6 @@ public class SulfurSpikeBlock extends PointedDripstoneBlock {
                     BlockStateProperties.VERTICAL_DIRECTION
             );
 
-            // Check if the support block is actually gone
             BlockPos supportPos = direction == Direction.DOWN
                     ? pos.above()
                     : pos.below();
@@ -195,8 +194,6 @@ public class SulfurSpikeBlock extends PointedDripstoneBlock {
                             !(supportState.getBlock() instanceof SlabBlock);
 
             if (direction == Direction.DOWN) {
-                // If support is gone, force falling regardless of what's below
-                // Otherwise, only fall if the space below is free
                 if (supportGone || isFree(level, pos)) {
                     makeSulfurSpikeFall(level, pos, state);
                 } else {
@@ -215,7 +212,6 @@ public class SulfurSpikeBlock extends PointedDripstoneBlock {
     private boolean isFree(Level level, BlockPos pos) {
         BlockPos below = pos.below();
         BlockState belowState = level.getBlockState(below);
-        // Allow falling through replaceable blocks and water (water is replaceable)
         return belowState.getMaterial().isReplaceable();
     }
 
@@ -1077,4 +1073,3 @@ public class SulfurSpikeBlock extends PointedDripstoneBlock {
         );
     }
 }
-// Kingodogo Finished this File on 2025-12-10 20-50-05

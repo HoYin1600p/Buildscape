@@ -19,14 +19,12 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class GlassJarBlockEntity extends BlockEntity {
 
-    /** Standard max liquid level (1 bucket or 16 potion/honey bottles). */
     public static final int MAX_LIQUID_LEVEL = 16;
-    /** XP bottles needed to fill the jar (3 bottles = full). */
     public static final int XP_BOTTLE_MAX = 3;
 
     private ItemStack storedItem = ItemStack.EMPTY;
     private ItemStack storedLiquidItem = ItemStack.EMPTY;
-    private int liquidLevel = 0; // 0 to MAX_LIQUID_LEVEL (or XP_BOTTLE_MAX for XP liquid)
+    private int liquidLevel = 0;
     private long wobbleStartedAtTick = 0;
 
     public GlassJarBlockEntity(BlockPos pos, BlockState state) {
@@ -134,27 +132,22 @@ public class GlassJarBlockEntity extends BlockEntity {
         }
         net.minecraft.world.item.Item item = stack.getItem();
 
-        // Reject mob/fish buckets
         if (item instanceof MobBucketItem) {
             return false;
         }
 
-        // Accept standard buckets
         if (item instanceof BucketItem || item instanceof MilkBucketItem) {
             return true;
         }
 
-        // Reject splash & lingering potions
         if (item instanceof SplashPotionItem || item instanceof LingeringPotionItem) {
             return false;
         }
 
-        // Accept experience bottle
         if (stack.is(net.minecraft.world.item.Items.EXPERIENCE_BOTTLE)) {
             return true;
         }
 
-        // Accept normal potions & honey bottles
         if (item instanceof PotionItem || item instanceof HoneyBottleItem) {
             return true;
         }
@@ -188,7 +181,6 @@ public class GlassJarBlockEntity extends BlockEntity {
         if (!isEmpty() && !storedItem.isEmpty()) return false;
         if (!isLiquidItem(stack)) return false;
         if (isEmpty() || !hasLiquid()) return true;
-        // XP liquid fills up after XP_BOTTLE_MAX bottles; all others cap at MAX_LIQUID_LEVEL
         int cap = isXpLiquid(stack) ? XP_BOTTLE_MAX : MAX_LIQUID_LEVEL;
         if (liquidLevel >= cap) return false;
         return isSameLiquid(storedLiquidItem, stack);
@@ -267,7 +259,6 @@ public class GlassJarBlockEntity extends BlockEntity {
     }
 
     public ItemStack extractBucket() {
-        // XP liquid only needs XP_BOTTLE_MAX level to extract a bucket; others need MAX_LIQUID_LEVEL
         int required = isXpLiquid(storedLiquidItem) ? XP_BOTTLE_MAX : MAX_LIQUID_LEVEL;
         if (!hasLiquid() || liquidLevel < required) {
             return ItemStack.EMPTY;

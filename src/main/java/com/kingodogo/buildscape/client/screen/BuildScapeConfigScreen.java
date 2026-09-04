@@ -8,14 +8,13 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.TranslatableComponent;
 
 public class BuildScapeConfigScreen extends Screen {
-    private static final double SIDEBAR_WIDTH_PERCENT = 0.11; // 11% sidebar
-    private static final double LEFT_GAP_PERCENT = 0.005; // 0.5% gap before sidebar
-    private static final double GAP_SIDEBAR_PANEL_PERCENT = 0.005; // 0.5% gap after sidebar
-    private static final double PANEL_GAP_PERCENT = 0.005; // 0.5% gap between panels
-    private static final double RIGHT_GAP_PERCENT = 0.005; // 0.5% gap after right panel
-    private static final double PANEL_HEIGHT_GAP_PERCENT = 0.005; // 0.5% gap height
+    private static final double SIDEBAR_WIDTH_PERCENT = 0.11;
+    private static final double LEFT_GAP_PERCENT = 0.005;
+    private static final double GAP_SIDEBAR_PANEL_PERCENT = 0.005;
+    private static final double PANEL_GAP_PERCENT = 0.005;
+    private static final double RIGHT_GAP_PERCENT = 0.005;
+    private static final double PANEL_HEIGHT_GAP_PERCENT = 0.005;
 
-    // Panel Widths: (100% - 0.5 - 11 - 0.5 - 0.5 - 0.5) / 2 = (100 - 13.0) / 2 = 87.0 / 2 = 43.5%
     private static final double LEFT_CONTENT_WIDTH_PERCENT = 0.435;
     private static final double RIGHT_CONTENT_WIDTH_PERCENT = 0.435;
     private static final double CONTENT_WIDTH_PERCENT = LEFT_CONTENT_WIDTH_PERCENT;
@@ -159,7 +158,6 @@ public class BuildScapeConfigScreen extends Screen {
 
             calculatedSidebarWidth = (int) (guiScaledWidth * SIDEBAR_WIDTH_PERCENT);
         } catch (Exception e) {
-            // Silently handle - dimensions will be set correctly in init() via Minecraft's normal flow
         }
     }
 
@@ -171,26 +169,15 @@ public class BuildScapeConfigScreen extends Screen {
 
         calculatedSidebarWidth = (int) (width * SIDEBAR_WIDTH_PERCENT);
 
-        // Sidebar uses 0.5% padding on its LEFT (screen edge)
-        // Sidebar Column = 11% of screen width
-        // Buttons should have 0.5% gap on both sides within this 11% column.
-        // So Button X = Left Gap (0.5%) + Button Left Margin (0.5%)?
-        // User said: "buttons inside as we decided should leave 0.5% gap on both side of the nav bar"
-        // This likely means the sidebar background is the 11% column (starting at 0.5% screen X).
-        // And buttons are inside that with 0.5% padding relative to screen width?
-        // Or relative to the sidebar itself? "on both side of the nav bar" implies the bar has padding.
-        // Let's interpret:
-        // Sidebar Area: Starts at 0.5% screen X, Width 11% screen.
-        // Buttons: Start at Sidebar X + 0.5% screen w. Width = Sidebar Width - 1% screen w.
 
         int sidebarAreaX = (int) (width * LEFT_GAP_PERCENT);
         int sidebarAreaWidth = calculatedSidebarWidth;
 
-        int buttonMargin = (int) (width * 0.005); // 0.5% margin
+        int buttonMargin = (int) (width * 0.005);
         int buttonX = sidebarAreaX + buttonMargin;
         int buttonWidth = sidebarAreaWidth - (buttonMargin * 2);
 
-        int sidebarY = getContentY(); // Start at 5% height
+        int sidebarY = getContentY();
         int buttonHeight = getScaledCategoryButtonHeight();
         int spacing = getScaledCategoryButtonSpacing() + (int) (height * 0.005);
 
@@ -259,7 +246,7 @@ public class BuildScapeConfigScreen extends Screen {
                 setActiveTab(new WorldSettingsConfigTab(this));
             }
         } else {
-            activeTab.init(); // Explicitly re-initialize the active tab to restore custom widgets if swapping back from another Screen (like ConfirmScreen)
+            activeTab.init();
             updateButtonStates();
         }
 
@@ -276,7 +263,6 @@ public class BuildScapeConfigScreen extends Screen {
     private boolean checkOpAccessAndNotify() {
         if (hasOpAccess()) return true;
 
-        // Show message using ClientEvents overlay
         com.kingodogo.buildscape.client.ClientEvents.setOverlayMessage(
                 new TranslatableComponent("buildscape.config.op_only")
         );
@@ -396,7 +382,6 @@ public class BuildScapeConfigScreen extends Screen {
     }
 
     private void updateCategoryButtonScales() {
-        // Calculate max text width to ensure all buttons use the same scale
         float maxTextWidth = 0.0f;
         int maxAvailableWidth = 0;
 
@@ -406,7 +391,7 @@ public class BuildScapeConfigScreen extends Screen {
 
         for (ConfigCategoryButton btn : buttons) {
             if (btn != null) {
-                int width = btn.getWidth() - scaleSize(12); // Padding
+                int width = btn.getWidth() - scaleSize(12);
                 maxAvailableWidth = Math.max(maxAvailableWidth, width);
                 maxTextWidth = Math.max(maxTextWidth, font.width(btn.getMessage()));
             }
@@ -414,11 +399,9 @@ public class BuildScapeConfigScreen extends Screen {
 
         float commonScale = 1.0f;
         if (maxAvailableWidth > 0 && maxTextWidth > 0) {
-            // Apply a 0.90 multiplier as a safety margin to ensure text never touches the edge or triggers truncation
             commonScale = Math.min(1.0f, ((float) maxAvailableWidth / maxTextWidth) * 0.90f);
         }
 
-        // Apply common scale to all category buttons
         for (ConfigCategoryButton btn : buttons) {
             if (btn != null) {
                 btn.setTextScale(commonScale);
@@ -434,10 +417,8 @@ public class BuildScapeConfigScreen extends Screen {
         int textWidth = font.width(text);
         int startX = -textWidth / 2;
 
-        // Define gradient colors: Cyan -> Blue -> Purple -> Magenta -> Orange
         int[] colors = new int[]{0xFF00FFFF, 0xFF0088FF, 0xFF8800FF, 0xFFFF00FF, 0xFFFF8800};
 
-        // Draw border/shadow first
         if (drawShadow) {
             for (int ox = -1; ox <= 1; ox++) {
                 for (int oy = -1; oy <= 1; oy++) {
@@ -446,17 +427,15 @@ public class BuildScapeConfigScreen extends Screen {
                 }
             }
         } else {
-            font.draw(poseStack, text, startX + 1f, 1f, 0xFF000000); // Standard text drop shadow equivalent
+            font.draw(poseStack, text, startX + 1f, 1f, 0xFF000000);
         }
 
-        // Draw gradient text character by character
         float colorStep = (float) (colors.length - 1) / (float) text.length();
 
         for (int i = 0; i < text.length(); i++) {
             char c = text.charAt(i);
             String charStr = String.valueOf(c);
 
-            // Calculate the exact exact start x position using substring to preserve font kerning alignments
             String prefix = text.substring(0, i);
             int preciseX = startX + font.width(prefix);
 
@@ -488,7 +467,7 @@ public class BuildScapeConfigScreen extends Screen {
     }
 
     private void drawTexture(com.mojang.blaze3d.vertex.PoseStack poseStack, int x, int y, int w, int h, String texturePath) {
-        drawCroppedTexture(poseStack, x, y, w, h, w, h, texturePath); // Default passthrough without cropping UV bounds
+        drawCroppedTexture(poseStack, x, y, w, h, w, h, texturePath);
     }
 
     private void drawCroppedTexture(com.mojang.blaze3d.vertex.PoseStack poseStack, int x, int y, int w, int h, int texW, int texH, String texturePath) {
@@ -520,16 +499,11 @@ public class BuildScapeConfigScreen extends Screen {
         int btX = 1;
         int btY = 1;
 
-        // Top edge - cropped from 178x1 native width
         drawCroppedTexture(poseStack, x + cx, y, width - cx * 2, btY, 178, 1, "frame/green_vertical.png");
-        // Bottom edge - cropped from 178x1 native width
         drawCroppedTexture(poseStack, x + cx, y + height - btY, width - cx * 2, btY, 178, 1, "frame/blue_vertical.png");
-        // Left edge - cropped from 1x22 native height
         drawCroppedTexture(poseStack, x, y + cy, btX, height - cy * 2, 1, 22, "frame/middleside_horizontal.png");
-        // Right edge - cropped from 1x22 native height using the secondary right-edge asset
         drawCroppedTexture(poseStack, x + width - btX, y + cy, btX, height - cy * 2, 1, 22, "frame/middleside_horizontal-1.png");
 
-        // Corners (no cropping needed, they are exactly 6x6)
         drawCroppedTexture(poseStack, x, y, cx, cy, cx, cy, "frame/topleft_corner.png");
         drawCroppedTexture(poseStack, x + width - cx, y, cx, cy, cx, cy, "frame/topright_corner.png");
         drawCroppedTexture(poseStack, x, y + height - cy, cx, cy, cx, cy, "frame/bottomleft_corner.png");
@@ -564,9 +538,6 @@ public class BuildScapeConfigScreen extends Screen {
         return activeTab;
     }
 
-    /**
-     * Refreshes the currently active tab. Called when data is received from server.
-     */
     public void refreshCurrentTab() {
         if (activeTab != null && activeTab instanceof PillarIdsConfigTab) {
             ((PillarIdsConfigTab) activeTab).refreshFromManager();
@@ -638,14 +609,12 @@ public class BuildScapeConfigScreen extends Screen {
         calculatedSidebarWidth = (int) (width * SIDEBAR_WIDTH_PERCENT);
         int sidebarStartX = (int) (width * LEFT_GAP_PERCENT);
 
-        // Sidebar background: Draw from StartX to StartX + Width
         fill(poseStack, sidebarStartX, 0, sidebarStartX + calculatedSidebarWidth, height, 0xC0101010);
 
         int buttonMargin = (int) (width * 0.005);
         int frameX = sidebarStartX + buttonMargin;
         int frameWidth = calculatedSidebarWidth - (buttonMargin * 2);
 
-        // Use the native scaling function instead of hardcoded 20 so the frame actively shrinks naturally to match the Category buttons on high UI scales
         int frameHeight = getScaledCategoryButtonHeight() + scaleSize(4);
         int frameY = scaleSize(10);
 
@@ -658,7 +627,6 @@ public class BuildScapeConfigScreen extends Screen {
             titleScale = Math.max(0.5f, (float) maxTitleWidth / titleTextWidth);
         }
 
-        // Aligning exact center using half frame height and half scaled font height.
         int titleY = (int) (frameY + (frameHeight / 2.0f) - ((8.0f * titleScale) / 2.0f));
 
         int titleX = frameX + frameWidth / 2;
@@ -666,7 +634,6 @@ public class BuildScapeConfigScreen extends Screen {
         renderCustomFrame(poseStack, frameX, frameY, frameWidth, frameHeight);
 
         poseStack.pushPose();
-        // Use renderGradientTitle instead of drawCenteredString
         renderGradientTitle(poseStack, titleX, titleY, title.getString(), titleScale, true);
         poseStack.popPose();
 
@@ -679,9 +646,7 @@ public class BuildScapeConfigScreen extends Screen {
         com.kingodogo.buildscape.client.ClientEvents.renderOverlay(poseStack, width, height);
 
         if (activeTab != null) {
-            // Disable any scissor tests that might clip tooltips
             com.mojang.blaze3d.systems.RenderSystem.disableScissor();
-            // Render tooltips last so they appear on top of everything
             activeTab.renderTooltips(poseStack, mouseX, mouseY, partialTick);
         }
     }
@@ -754,9 +719,6 @@ public class BuildScapeConfigScreen extends Screen {
     }
 
     public int getContentY() {
-        // Content panels MUST start at exactly the same Y as the first sidebar button.
-        // The title frame sits at scaleSize(10) with frameHeight = getScaledCategoryButtonHeight() + scaleSize(4).
-        // First sidebar button Y = titleBottom + spacing (scaleSize(8)).
         int dynamicFrameHeight = getScaledCategoryButtonHeight() + scaleSize(4);
         int titleBottom = scaleSize(10) + dynamicFrameHeight;
         return titleBottom + scaleSize(8);
@@ -784,24 +746,15 @@ public class BuildScapeConfigScreen extends Screen {
 
 
     public int getContentHeight() {
-        // Total panel height: from content top down to 0.5% from bottom
         int topGap = getContentY();
-        int bottomGap = (int) (height * 0.005); // 0.5% bottom gap
+        int bottomGap = (int) (height * 0.005);
         return height - topGap - bottomGap;
     }
 
-    /**
-     * Returns the consistent 0.5% vertical gap between stacked panels.
-     * Use this everywhere instead of hard-coding (int)(height * 0.005).
-     */
     public int getVerticalPanelGap() {
         return Math.max(1, (int) (height * 0.005));
     }
 
-    /**
-     * Returns the single standard text scale for ALL label/header text across every tab.
-     * Keeps all panel text the same visual size regardless of GUI scale.
-     */
     public static float getStandardTextScale() {
         Minecraft mc = Minecraft.getInstance();
         if (mc.getWindow() == null) return 1.0f;

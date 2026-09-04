@@ -45,7 +45,6 @@ public class HammerClientHandler {
         ItemStack mainHand = player.getMainHandItem();
         if (mainHand.isEmpty() || !(mainHand.getItem() instanceof HammerItem hammer)) return;
 
-        // Must have a block in offhand
         ItemStack offHand = player.getOffhandItem();
         if (offHand.isEmpty() || !(offHand.getItem() instanceof BlockItem)) return;
 
@@ -56,7 +55,6 @@ public class HammerClientHandler {
         BlockState state = mc.level.getBlockState(pos);
         if (state.isAir()) return;
 
-        // Cancel default outline box
         event.setCanceled(true);
 
         PoseStack poseStack = event.getPoseStack();
@@ -71,7 +69,6 @@ public class HammerClientHandler {
             MultiBufferSource bufferSource = event.getMultiBufferSource();
             AABB bounds = shape.bounds();
 
-            // Pick color based on hammer tier
             float[] color = getGlowColor(hammer.getHammerTier());
             renderGlowingOutline(poseStack, bufferSource, bounds, color[0], color[1], color[2]);
         }
@@ -81,16 +78,15 @@ public class HammerClientHandler {
 
     private static float[] getGlowColor(HammerItem.HammerTier tier) {
         return switch (tier) {
-            case IRON -> new float[]{0.75f, 0.75f, 0.8f};       // Steel silver
-            case DIAMOND -> new float[]{0.3f, 0.9f, 0.95f};     // Cyan diamond
-            case NETHERITE -> new float[]{0.6f, 0.2f, 0.2f};    // Dark red
+            case IRON -> new float[]{0.75f, 0.75f, 0.8f};
+            case DIAMOND -> new float[]{0.3f, 0.9f, 0.95f};
+            case NETHERITE -> new float[]{0.6f, 0.2f, 0.2f};
         };
     }
 
     private static void renderGlowingOutline(PoseStack poseStack, MultiBufferSource bufferSource, AABB box, float r, float g, float b) {
         VertexConsumer lines = bufferSource.getBuffer(RenderType.lines());
 
-        // Base bounding box
         LevelRenderer.renderLineBox(
                 poseStack, lines,
                 box.minX, box.minY, box.minZ,
@@ -98,7 +94,6 @@ public class HammerClientHandler {
                 r, g, b, 1.0f
         );
 
-        // Slightly inflated outer glow for vibrant visual feedback
         AABB inflated = box.inflate(0.003);
         LevelRenderer.renderLineBox(
                 poseStack, lines,
@@ -110,7 +105,6 @@ public class HammerClientHandler {
 
     @SubscribeEvent
     public static void onMouseInput(InputEvent.MouseInputEvent event) {
-        // Right-click (button 1) to replace block
         if (event.getButton() != GLFW.GLFW_MOUSE_BUTTON_RIGHT) return;
         if (event.getAction() != GLFW.GLFW_PRESS) return;
 
@@ -122,7 +116,6 @@ public class HammerClientHandler {
         ItemStack mainHand = player.getMainHandItem();
         if (mainHand.isEmpty() || !(mainHand.getItem() instanceof HammerItem)) return;
 
-        // Must have a block in offhand
         ItemStack offHand = player.getOffhandItem();
         if (offHand.isEmpty() || !(offHand.getItem() instanceof BlockItem)) return;
 

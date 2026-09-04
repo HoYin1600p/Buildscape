@@ -37,13 +37,11 @@ public class ExperienceBucketItem extends BucketItem {
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         ItemStack itemstack = player.getItemInHand(hand);
 
-        // If sneaking, bypass fluid block placing and drink directly
         if (player.isShiftKeyDown()) {
             player.startUsingItem(hand);
             return InteractionResultHolder.consume(itemstack);
         }
 
-        // Try placement first
         InteractionResultHolder<ItemStack> placementResult = super.use(level, player, hand);
         if (placementResult.getResult() == net.minecraft.world.InteractionResult.PASS) {
             player.startUsingItem(hand);
@@ -57,7 +55,6 @@ public class ExperienceBucketItem extends BucketItem {
     public ItemStack finishUsingItem(ItemStack stack, Level level, LivingEntity entity) {
         if (entity instanceof Player player) {
             if (!level.isClientSide) {
-                // Grant 25-30 XP (average ~27.5 XP)
                 int xp = 25 + level.random.nextInt(6);
                 player.giveExperiencePoints(xp);
             }

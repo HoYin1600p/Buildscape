@@ -28,7 +28,6 @@ public abstract class LeavesBlockMixin extends Block implements SimpleWaterlogge
         super(properties);
     }
 
-    // --- Waterlogging ---
 
     @Inject(method = "createBlockStateDefinition", at = @At("TAIL"))
     private void buildscape$addWaterlogged(StateDefinition.Builder<Block, BlockState> builder, CallbackInfo ci) {
@@ -61,7 +60,6 @@ public abstract class LeavesBlockMixin extends Block implements SimpleWaterlogge
                 : super.getFluidState(state);
     }
 
-    // --- Fast Leaf Decay ---
 
     @Inject(method = "tick", at = @At("TAIL"))
     private void buildscape$onTick(

@@ -12,10 +12,6 @@ import java.util.EnumSet;
 import java.util.Objects;
 import java.util.Set;
 
-/**
- * Encapsulates the active fluid transport state of an individual Hollow Steel Pipe.
- * Completely decoupled from the structural blockstate (such as WATERLOGGED).
- */
 public class PipeFlowState {
     private boolean hasWater;
     private boolean isSource;
@@ -24,9 +20,7 @@ public class PipeFlowState {
     private Direction inflowDirection = null;
     private BubbleColumnState bubbleColumn = BubbleColumnState.NONE;
     private int distance = 0;
-    /** Total distance from source to the furthest pipe in this network section. Used for slope computation. */
     private int maxDistance = 0;
-    /** True when this pipe has an open endpoint (flow exits the network here). Used for slope rendering. */
     private boolean isOpenEndpoint = false;
 
     public PipeFlowState() {
@@ -49,7 +43,6 @@ public class PipeFlowState {
         this(hasWater, isSource, flowDirections, null, bubbleColumn, distance, maxDistance, isOpenEndpoint);
     }
 
-    /** Convenience constructor (legacy - maxDistance=0, isOpenEndpoint=false) */
     public PipeFlowState(boolean hasWater, boolean isSource, Collection<Direction> flowDirections, BubbleColumnState bubbleColumn, int distance) {
         this(hasWater, isSource, flowDirections, null, bubbleColumn, distance, 0, false);
     }

@@ -29,14 +29,12 @@ public abstract class PauseScreenMixin extends Screen {
 
         PauseScreen screen = (PauseScreen) (Object) this;
 
-        // Default fallback positions
         int targetX = this.width / 2 + 102;
         int targetY = this.height / 4 + 48;
 
         boolean isFullPauseMenu = false;
         AbstractWidget statsButton = null;
 
-		// Dynamically find the Statistics button to align perfectly next to it
         for (GuiEventListener listener : this.children()) {
             if (listener instanceof AbstractWidget widget) {
                 Component msg = widget.getMessage();
@@ -55,7 +53,6 @@ public abstract class PauseScreenMixin extends Screen {
             return;
         }
 
-        // Align perfectly next to the Statistics button when it is there.
         if (statsButton != null) {
             targetX = statsButton.x + statsButton.getWidth() + 4;
             targetY = statsButton.y;

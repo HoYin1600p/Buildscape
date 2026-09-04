@@ -3,10 +3,6 @@ package com.kingodogo.buildscape.recipe.framework.parser;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Intermediate Representation (IR) structures for BDRE recipes.
- * These records represent parsed template rules, family generators, and inline recipe definitions.
- */
 public class RecipeIR {
 
     public record CategoryPack(

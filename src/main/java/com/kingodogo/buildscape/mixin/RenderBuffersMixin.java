@@ -21,7 +21,6 @@ public abstract class RenderBuffersMixin {
 
     @Inject(method = "<init>", at = @At("TAIL"))
     private void buildscape$addFestiveGlintBuffers(CallbackInfo ci) {
-        // BufferSource retains this map; constructor names remain valid in production mappings.
         buildscape$addBuffer(FestiveRenderTypes.festiveArmorGlint());
         buildscape$addBuffer(FestiveRenderTypes.festiveArmorEntityGlint());
         buildscape$addBuffer(FestiveRenderTypes.festiveGlint());

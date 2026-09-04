@@ -82,4 +82,3 @@ public class FallingIcicleRenderer extends EntityRenderer<FallingIcicleEntity> {
         return net.minecraft.client.renderer.texture.TextureAtlas.LOCATION_BLOCKS;
     }
 }
-// Kingodogo Finished this File on 2025-12-10 20-50-05

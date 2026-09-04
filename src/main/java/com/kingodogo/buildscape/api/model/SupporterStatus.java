@@ -2,10 +2,6 @@ package com.kingodogo.buildscape.api.model;
 
 import java.util.List;
 
-/**
- * Response model for supporter status API endpoint.
- * GET /api/v1/supporters/status/{uuid}
- */
 public class SupporterStatus {
     private boolean connected;
     private String username;

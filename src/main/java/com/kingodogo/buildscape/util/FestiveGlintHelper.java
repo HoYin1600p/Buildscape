@@ -14,9 +14,6 @@ public final class FestiveGlintHelper {
     private FestiveGlintHelper() {
     }
 
-    /**
-     * Checks if the given item stack has the festive enchantment glint applied.
-     */
     public static boolean hasFestiveGlint(ItemStack stack) {
         if (stack == null || stack.isEmpty()) {
             return false;
@@ -30,9 +27,6 @@ public final class FestiveGlintHelper {
                 || tag.getBoolean(TAG_LEGACY_GLINT);
     }
 
-    /**
-     * Applies the festive enchantment glint to the item stack.
-     */
     public static void applyFestiveGlint(ItemStack stack) {
         if (stack == null || stack.isEmpty()) {
             return;
@@ -42,9 +36,6 @@ public final class FestiveGlintHelper {
         tag.putString(TAG_BUILDCAPE_GLINT, "festive");
     }
 
-    /**
-     * Checks if the given item stack is already enchanted (or has enchantment capability/foil).
-     */
     public static boolean isEnchantedItem(ItemStack stack) {
         if (stack == null || stack.isEmpty()) {
             return false;

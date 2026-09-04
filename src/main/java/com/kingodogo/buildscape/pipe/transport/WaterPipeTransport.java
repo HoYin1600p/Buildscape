@@ -16,11 +16,6 @@ import net.minecraft.world.level.material.Fluids;
 
 import java.util.*;
 
-/**
- * Concrete implementation of PipeFluidTransport for Water.
- * Implements deterministic flow propagation, priority rules (DOWN > Straight > Branch > UP with Bubble Column),
- * bubble-column elevators via Soul Sand / Magma, per-branch exponential slopes, and animated block-by-block flow.
- */
 public class WaterPipeTransport extends PipeFluidTransport {
 
     public static final WaterPipeTransport INSTANCE = new WaterPipeTransport();
@@ -73,13 +68,11 @@ public class WaterPipeTransport extends PipeFluidTransport {
 
         WorldPipeTopologyAccess topology = new WorldPipeTopologyAccess(level);
 
-        // 1. Discover the connected pipe component
         Set<BlockPos> component = discoverComponent(topology, startPos);
         if (component.isEmpty()) {
             return Collections.emptySet();
         }
 
-        // 2. Identify all water sources
         List<BlockPos> sources = new ArrayList<>();
         for (BlockPos pos : component) {
             if (topology.isWaterSource(pos)) {
@@ -87,14 +80,12 @@ public class WaterPipeTransport extends PipeFluidTransport {
             }
         }
 
-        // 3. If NO sources exist, clear transport state across the entire component
         if (sources.isEmpty()) {
             for (BlockPos pos : component) {
                 BlockEntity be = level.getBlockEntity(pos);
                 if (be instanceof HollowLogBlockEntity hollowBe) {
                     PipeFlowState oldState = hollowBe.getPipeFlowState();
                     if (!oldState.isEmpty()) {
-                        // Animate drainage: delay by distance * 2 ticks so water recedes naturally
                         int delay = (oldState.getDistance() + 1) * 2;
                         hollowBe.setPendingFlowState(new PipeFlowState(), delay);
                         if (HollowPipeTransportManager.DEBUG_TRANSPORT) {
@@ -102,8 +93,6 @@ public class WaterPipeTransport extends PipeFluidTransport {
                         }
                     }
                 }
-                // Clear WATER_LEVEL so the pipe stops acting as a fluid flowing state.
-                // Use flag 2 (UPDATE_CLIENTS) to avoid triggering neighborChanged/BFS loop.
                 BlockState pipeState = level.getBlockState(pos);
                 if (pipeState.hasProperty(HollowPipeBlock.WATER_LEVEL) && pipeState.getValue(HollowPipeBlock.WATER_LEVEL) > 0) {
                     level.setBlock(pos, pipeState.setValue(HollowPipeBlock.WATER_LEVEL, 0), 2);
@@ -112,25 +101,19 @@ public class WaterPipeTransport extends PipeFluidTransport {
             return component;
         }
 
-        // 4. Simulate deterministic flow propagation from sources
         Map<BlockPos, PipeFlowState> newStates = calculateFlow(topology, component, sources);
 
-        // 5. Apply new states to all block entities, update WATER_LEVEL blockstate, and handle outflows
         for (BlockPos pos : component) {
             PipeFlowState calculated = newStates.get(pos);
             if (calculated == null) {
                 calculated = new PipeFlowState();
             }
 
-            // 5a. Update block entity (PipeFlowState for renderer / bubble columns / etc.)
             BlockEntity be = level.getBlockEntity(pos);
             if (be instanceof HollowLogBlockEntity hollowBe) {
                 hollowBe.setPipeFlowState(calculated);
             }
 
-            // 5b. Sync WATER_LEVEL blockstate property (1..7 based on distance).
-            //     Flag 2 = UPDATE_CLIENTS only: sends to clients without calling neighborChanged
-            //     on adjacent blocks, which would re-trigger the BFS in an infinite loop.
             BlockState pipeState = level.getBlockState(pos);
             int targetLevel = 0;
             if (calculated.hasWater()) {
@@ -144,11 +127,9 @@ public class WaterPipeTransport extends PipeFluidTransport {
                     ? pipeState.getValue(HollowPipeBlock.WATER_LEVEL) : 0;
             if (targetLevel != currentLevel) {
                 pipeState = pipeState.setValue(HollowPipeBlock.WATER_LEVEL, targetLevel);
-                level.setBlock(pos, pipeState, 2); // flag 2 = notify clients only
+                level.setBlock(pos, pipeState, 2);
             }
 
-            // 5c. Outflow: immediately place flowing water at open endpoints and schedule
-            //     a continuous block tick so the pipe keeps refreshing those blocks.
             if (calculated.hasWater()) {
                 handleOutflowToEndpoints(level, pos, pipeState, calculated);
                 level.scheduleTick(pos, pipeState.getBlock(), Fluids.WATER.getTickDelay(level));
@@ -161,9 +142,6 @@ public class WaterPipeTransport extends PipeFluidTransport {
         return component;
     }
 
-    /**
-     * Core simulation algorithm operating through the PipeTopologyAccess interface.
-     */
     public Map<BlockPos, PipeFlowState> calculateFlow(
             PipeTopologyAccess topology,
             Set<BlockPos> component,
@@ -183,11 +161,8 @@ public class WaterPipeTransport extends PipeFluidTransport {
                 state.setHasWater(true);
                 state.setSource(true);
                 state.setDistance(initialDistance);
-                // An external source occupies an inlet face. Recording it here
-                // prevents that same face being reclassified as an outflow.
                 state.setInflowDirection(topology.getSourceInflowDirection(sourcePos));
 
-                // If source has bubble column base directly below, activate it immediately
                 BubbleColumnState baseState = topology.getBubbleColumnBase(sourcePos);
                 if (baseState != null && baseState != BubbleColumnState.NONE) {
                     state.setBubbleColumn(baseState);
@@ -214,13 +189,11 @@ public class WaterPipeTransport extends PipeFluidTransport {
                 continue;
             }
 
-            // Check if this pipe has a bubble column base directly below
             BubbleColumnState baseState = topology.getBubbleColumnBase(currPos);
             if (baseState != null && baseState != BubbleColumnState.NONE && currFlow.getBubbleColumn() == BubbleColumnState.NONE) {
                 currFlow.setBubbleColumn(baseState);
             }
 
-            // Determine prioritized exit directions to connected pipes
             List<Direction> prioritizedExits = getPrioritizedExitDirections(topology, currPos, inDir, currFlow.getBubbleColumn());
 
             for (Direction exitDir : prioritizedExits) {
@@ -232,10 +205,8 @@ public class WaterPipeTransport extends PipeFluidTransport {
                     boolean isDownwardDrop = (exitDir == Direction.DOWN);
                     boolean isUpwardBubble = (exitDir == Direction.UP && currFlow.getBubbleColumn() == BubbleColumnState.UP);
 
-                    // A downward vertical drop or upward bubble column resets the horizontal distance counter
                     int nextDist = (isDownwardDrop || isUpwardBubble) ? 0 : (dist + 1);
 
-                    // Restrict horizontal flow to vanilla-accurate 7 blocks max
                     if (!isDownwardDrop && !isUpwardBubble && nextDist > MAX_HORIZONTAL_FLOW) {
                         continue;
                     }
@@ -249,7 +220,6 @@ public class WaterPipeTransport extends PipeFluidTransport {
                         needsEnqueue = true;
                     }
 
-                    // Propagate bubble column state upward or downward through contiguous vertical column
                     if (exitDir == Direction.UP && currFlow.getBubbleColumn() == BubbleColumnState.UP) {
                         if (nextFlow.getBubbleColumn() != BubbleColumnState.UP) {
                             nextFlow.setBubbleColumn(BubbleColumnState.UP);
@@ -269,11 +239,9 @@ public class WaterPipeTransport extends PipeFluidTransport {
                 }
             }
 
-            // Also check for open endpoints (physical openings into the world) on this pipe
-            // E.g., open straight continuation, open bottom, open sides
             for (Direction dir : Direction.values()) {
                 if (inDir != null && dir == inDir) {
-                    continue; // Don't flow backward into the entry face
+                    continue;
                 }
                 if (topology.isOpenEndpoint(currPos, dir)) {
                     boolean allowed = (dir == Direction.DOWN)
@@ -287,10 +255,6 @@ public class WaterPipeTransport extends PipeFluidTransport {
             }
         }
 
-        // --- Post-processing: Compute per-branch maxDistance and mark open endpoints ---
-        // Each branch calculates its own maxDistance along its downstream path from the source.
-        // This ensures every branch independently calculates its own exponential slope and reaches
-        // full drop at its own end.
         for (Map.Entry<BlockPos, PipeFlowState> entry : newStates.entrySet()) {
             BlockPos pos = entry.getKey();
             PipeFlowState s = entry.getValue();
@@ -298,7 +262,6 @@ public class WaterPipeTransport extends PipeFluidTransport {
                 int branchMax = getBranchMaxDistance(pos, newStates, new HashSet<>());
                 s.setMaxDistance(Math.max(1, Math.max(s.getDistance(), branchMax)));
 
-                // If this pipe has an open endpoint direction, mark it
                 boolean isTerminal = (s.getDistance() == s.getMaxDistance());
                 for (Direction dir : s.getFlowDirections()) {
                     BlockPos neighbor = pos.relative(dir);
@@ -314,9 +277,6 @@ public class WaterPipeTransport extends PipeFluidTransport {
         return newStates;
     }
 
-    /**
-     * Recursively traverses downstream flow paths to find the maximum distance reachable in this branch.
-     */
     private int getBranchMaxDistance(BlockPos pos, Map<BlockPos, PipeFlowState> states, Set<BlockPos> visited) {
         if (!visited.add(pos)) {
             return 0;
@@ -341,13 +301,6 @@ public class WaterPipeTransport extends PipeFluidTransport {
         return max;
     }
 
-    /**
-     * Deterministic exit direction selector following strict priorities:
-     * 1. DOWN (Gravity first)
-     * 2. Straight line continuation (momentum along current direction)
-     * 3. Horizontal branches (deterministic order: NORTH > SOUTH > WEST > EAST)
-     * 4. UP (only enabled if Bubble Column is UP)
-     */
     public List<Direction> getPrioritizedExitDirections(
             PipeTopologyAccess topology,
             BlockPos pos,
@@ -356,12 +309,10 @@ public class WaterPipeTransport extends PipeFluidTransport {
     ) {
         List<Direction> validExits = new ArrayList<>();
 
-        // Priority 1: DOWN (gravity)
         if (inDir != Direction.DOWN && topology.isConnected(pos, Direction.DOWN)) {
             validExits.add(Direction.DOWN);
         }
 
-        // Priority 2: Straight line continuation (forward momentum)
         if (inDir != null) {
             Direction straightDir = inDir.getOpposite();
             if (straightDir != Direction.DOWN && straightDir != Direction.UP) {
@@ -371,16 +322,14 @@ public class WaterPipeTransport extends PipeFluidTransport {
             }
         }
 
-        // Priority 3: Horizontal side branches (deterministic order)
         for (Direction dir : HORIZONTAL_DIRECTIONS) {
-            if (dir == inDir) continue; // Don't flow backward into entrance
-            if (inDir != null && dir == inDir.getOpposite()) continue; // Already added straight continuation
+            if (dir == inDir) continue;
+            if (inDir != null && dir == inDir.getOpposite()) continue;
             if (topology.isConnected(pos, dir)) {
                 validExits.add(dir);
             }
         }
 
-        // Priority 4: UP (only valid with upward bubble column)
         if (bubbleColumn == BubbleColumnState.UP && inDir != Direction.UP) {
             if (topology.isConnected(pos, Direction.UP)) {
                 validExits.add(Direction.UP);
@@ -394,19 +343,11 @@ public class WaterPipeTransport extends PipeFluidTransport {
         if (level == null || level.isClientSide || pos == null || state == null || flow == null || !flow.hasWater()) {
             return;
         }
-        // Pass the directed exits as well as the BFS distance. A pipe may have
-        // more than one physical opening, but only its downstream endpoint is
-        // allowed to create a vanilla flowing-water block.
         HollowPipeBlock.trySpreadToWorld(level, pos, state, Fluids.WATER,
                 flow.getDistance(), flow.getFlowDirections());
     }
 
     private void clearOutflow(Level level, BlockPos pos) {
-        // Intentionally empty: when a pipe loses water, we simply stop refreshing
-        // the outflow blocks. Vanilla fluid physics will naturally evaporate any
-        // flowing water at the endpoints within a few ticks — no manual removal needed.
-        // Manually removing water here caused legitimate world water (rivers, other
-        // pipe networks) to be incorrectly destroyed.
     }
 
     private void logPipeDebug(BlockPos pos, PipeFlowState flow, BlockState state, BubbleColumnState base) {

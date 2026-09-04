@@ -15,11 +15,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(BaseCoralPlantTypeBlock.class)
 public class BaseCoralPlantTypeBlockMixin {
 
-    /**
-     * Allow coral plants and fans to be placed on mud blocks.
-     * MudBlock's collision shape is 15 units tall, so isFaceSturdy(UP) returns false
-     * for mud — we override canSurvive to explicitly permit placement on mud.
-     */
     @Inject(method = "canSurvive", at = @At("HEAD"), cancellable = true)
     private void onCanSurvive(BlockState state, LevelReader level, BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
         if (level.getBlockState(pos.below()).is(ModBlocks.MUD.get())) {
@@ -27,9 +22,6 @@ public class BaseCoralPlantTypeBlockMixin {
         }
     }
 
-    /**
-     * Treat adjacent mud as water so coral does not dry out when placed on mud.
-     */
     @Inject(method = "scanForWater", at = @At("HEAD"), cancellable = true)
     private static void onScanForWater(BlockState state, BlockGetter level, BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
         for (Direction dir : Direction.values()) {

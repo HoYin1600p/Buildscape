@@ -22,9 +22,8 @@ public class TagsSelectorWidget extends AbstractWidget {
     private static final int TAG_BUTTON_HEIGHT = 20;
     private static final int TAG_BUTTON_SPACING = 2;
     private static final int TAGS_PER_ROW = 1;
-    // Items start below this area
-    private int headerAreaHeight = 26; // Default to 1px below 20px search bar
-    private static final int GRID_PADDING_TOP = 5; // Headspace between separator line and tag list
+    private int headerAreaHeight = 26;
+    private static final int GRID_PADDING_TOP = 5;
 
     public void setHeaderAreaHeight(int height) {
         this.headerAreaHeight = height;
@@ -41,7 +40,6 @@ public class TagsSelectorWidget extends AbstractWidget {
     private SortType sortType = SortType.ALL_ITEMS;
     private final CustomScrollbarRenderer scrollbarRenderer = new CustomScrollbarRenderer();
 
-    // Scrolling text state
     private String currentHoveredTagId = null;
     private long hoverStartTime = 0;
 
@@ -148,11 +146,9 @@ public class TagsSelectorWidget extends AbstractWidget {
 
     @Override
     public void renderButton(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
-        // Tags should start below the header area (label, search box, buttons)
-        // Tags should start below the header area (label, search box, buttons)
         int topPadding = headerAreaHeight;
         int bottomMargin = 10;
-        int availableHeight = height - topPadding - bottomMargin; // Account for bottom margin
+        int availableHeight = height - topPadding - bottomMargin;
         maxVisibleRows = availableHeight / (TAG_BUTTON_HEIGHT + TAG_BUTTON_SPACING);
         maxVisibleRows = Math.max(1, maxVisibleRows);
 
@@ -163,7 +159,6 @@ public class TagsSelectorWidget extends AbstractWidget {
         int scissorX = (int) (x * guiScale);
         int scissorY = (int) (windowHeight - (y + height) * guiScale + bottomMargin * guiScale);
 
-        // Clip content area: Include the padding space for selection borders
         int scissorWidth = (int) ((width - 16) * guiScale);
         int scissorHeight = (int) ((height - headerAreaHeight - 1 - bottomMargin) * guiScale);
 
@@ -172,12 +167,10 @@ public class TagsSelectorWidget extends AbstractWidget {
         }
 
         int startRow = (int) Math.floor(scrollOffset);
-        int endRow = Math.min(startRow + maxVisibleRows + 2, filteredTags.size()); // +1 for smooth scrolling
+        int endRow = Math.min(startRow + maxVisibleRows + 2, filteredTags.size());
 
         double pixelOffsetInRow = (scrollOffset % 1.0) * (TAG_BUTTON_HEIGHT + TAG_BUTTON_SPACING);
-        // Tag list starts below separator + padding gap (matching items grid)
         int tagY = y + headerAreaHeight + GRID_PADDING_TOP - (int) pixelOffsetInRow;
-        // Total width - 5px left padding - 16px right reserved space = width - 21
         int tagWidth = width - CustomScrollbarRenderer.getScrollbarWidth() - 20;
 
         for (int row = startRow; row < endRow; row++) {
@@ -188,7 +181,6 @@ public class TagsSelectorWidget extends AbstractWidget {
             String tagId = "#" + tag.location();
             int rowY = tagY + (row - startRow) * (TAG_BUTTON_HEIGHT + TAG_BUTTON_SPACING);
 
-            // Updated visibility check - allow items slightly above the start point
             if (rowY + TAG_BUTTON_HEIGHT < y + headerAreaHeight || rowY > y + height - bottomMargin) {
                 continue;
             }
@@ -224,37 +216,27 @@ public class TagsSelectorWidget extends AbstractWidget {
             int textWidth = Minecraft.getInstance().font.width(displayName);
 
             if (isHovered && textWidth > availableWidth) {
-                // Scrolling text logic
                 if (!tagId.equals(currentHoveredTagId)) {
                     currentHoveredTagId = tagId;
                     hoverStartTime = System.currentTimeMillis();
                 }
 
                 long elapsed = System.currentTimeMillis() - hoverStartTime;
-                double speed = 0.001; // Speed factor
+                double speed = 0.001;
                 int maxScroll = textWidth - availableWidth;
 
-                // Sine wave scrolling: 0 -> max -> 0
-                // (1 - cos(t)) / 2 ranges from 0 to 1 to 0
                 double scrollProgress = (1.0 - Math.cos(elapsed * speed)) / 2.0;
                 int textOffset = (int) (maxScroll * scrollProgress);
 
-                // Clip text to button bounds to prevent leaking
                 int buttonScissorX = (int) ((tagX + 5) * guiScale);
-                int buttonScissorY = (int) (windowHeight - (rowY + TAG_BUTTON_HEIGHT - 6) * guiScale); // Approx bounds
+                int buttonScissorY = (int) (windowHeight - (rowY + TAG_BUTTON_HEIGHT - 6) * guiScale);
                 int buttonScissorWidth = (int) ((availableWidth) * guiScale);
                 int buttonScissorHeight = (int) (TAG_BUTTON_HEIGHT * guiScale);
 
-                // Use intersection with existing scissor (list area) to remain safe
-                // But simplified: just enabling scissor for the text line is usually enough if
-                // strictly contained
-                // Better: Use viewport intersection logic or just a tighter scissor
 
-                // Strict clipping for the text
                 int textScissorY = (int) (windowHeight - (rowY + TAG_BUTTON_HEIGHT) * guiScale);
                 int textScissorH = (int) (TAG_BUTTON_HEIGHT * guiScale);
 
-                // Apply scissor for text
                 RenderSystem.enableScissor(buttonScissorX, textScissorY, buttonScissorWidth, textScissorH);
 
                 Minecraft.getInstance().font.draw(
@@ -263,7 +245,6 @@ public class TagsSelectorWidget extends AbstractWidget {
                         tagX + 5 - textOffset, rowY + 6,
                         0xFFFFFF);
 
-                // Restore list scissor
                 if (scissorHeight > 0 && scissorWidth > 0) {
                     RenderSystem.enableScissor(scissorX, scissorY, scissorWidth, scissorHeight);
                 } else {
@@ -288,16 +269,14 @@ public class TagsSelectorWidget extends AbstractWidget {
         }
         poseStack.popPose();
 
-        // Draw panel borders and separator
         int borderCol = 0xFF666666;
-        fill(poseStack, x, y, x + width, y + 1, borderCol); // Top
-        fill(poseStack, x, y + height - 1, x + width, y + height, borderCol); // Bottom
-        fill(poseStack, x, y, x + 1, y + height, borderCol); // Left
-        fill(poseStack, x + width - 1, y, x + width, y + height, borderCol); // Right
-        fill(poseStack, x, y + headerAreaHeight + 1, x + width, y + headerAreaHeight + 2, borderCol); // Separator (moved 1px down)
+        fill(poseStack, x, y, x + width, y + 1, borderCol);
+        fill(poseStack, x, y + height - 1, x + width, y + height, borderCol);
+        fill(poseStack, x, y, x + 1, y + height, borderCol);
+        fill(poseStack, x + width - 1, y, x + width, y + height, borderCol);
+        fill(poseStack, x, y + headerAreaHeight + 1, x + width, y + headerAreaHeight + 2, borderCol);
 
         if (getMaxScroll() > 0) {
-            // Scrollbar X = width - 4px gap - 8px width = width - 12
             int scrollbarX = x + width - CustomScrollbarRenderer.getScrollbarWidth() - 4;
             bottomMargin = 10;
             int scrollbarHeight = height - headerAreaHeight - GRID_PADDING_TOP - bottomMargin - 1;
@@ -311,7 +290,6 @@ public class TagsSelectorWidget extends AbstractWidget {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        // Updated check to ignore clicks in header area
         if (!isMouseOver(mouseX, mouseY) || mouseY < y + headerAreaHeight + GRID_PADDING_TOP) {
             return false;
         }
@@ -324,7 +302,6 @@ public class TagsSelectorWidget extends AbstractWidget {
             int scrollbarHeight = height - headerAreaHeight - GRID_PADDING_TOP - bottomMargin - 1;
             int contentX = x + 5;
             int contentY = y + headerAreaHeight + GRID_PADDING_TOP + 1;
-            // Content width = width - 16px reserved - 5px left padding = width - 21
             int contentWidth = width - 21;
             int contentHeight = scrollbarHeight;
 
@@ -340,7 +317,7 @@ public class TagsSelectorWidget extends AbstractWidget {
             }
         }
 
-        int topPadding = headerAreaHeight; // Use dynamic value
+        int topPadding = headerAreaHeight;
         int bottomMargin = 10;
         int availableHeight = height - topPadding - bottomMargin;
         maxVisibleRows = availableHeight / (TAG_BUTTON_HEIGHT + TAG_BUTTON_SPACING);
@@ -360,7 +337,6 @@ public class TagsSelectorWidget extends AbstractWidget {
             String tagId = "#" + tag.location();
             int rowY = tagY + (row - startRow) * (TAG_BUTTON_HEIGHT + TAG_BUTTON_SPACING);
 
-            // Updated visibility check
             if (rowY + TAG_BUTTON_HEIGHT < y + headerAreaHeight + GRID_PADDING_TOP || rowY > y + height) {
                 continue;
             }

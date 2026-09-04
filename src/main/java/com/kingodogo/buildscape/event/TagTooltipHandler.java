@@ -37,9 +37,6 @@ import java.util.List;
 )
 public class TagTooltipHandler {
 
-    /**
-     * Checks if the player has enabled Shulker Preview in Player Rules.
-     */
     public static boolean isShulkerPreviewEnabled() {
         try {
             Minecraft mc = Minecraft.getInstance();
@@ -59,7 +56,6 @@ public class TagTooltipHandler {
             ItemStack stack = event.getItemStack();
             if (stack.isEmpty()) return;
 
-            // Festive stocking tooltip handling
             if (stack.getItem() instanceof FestiveStockingItem) {
                 CompoundTag tag = stack.getTag();
                 if (tag != null && tag.contains("StoredItem", 10)) {
@@ -81,8 +77,6 @@ public class TagTooltipHandler {
             }
 
 
-            // If player disabled Shulker Preview in Player Rules, do not touch or modify tooltips at all.
-            // This leaves vanilla, Shulker Plus (Iskallia), Tweakeroo, etc. completely untouched.
             if (!isShulkerPreviewEnabled()) {
                 return;
             }

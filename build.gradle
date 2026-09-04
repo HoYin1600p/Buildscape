@@ -108,9 +108,9 @@ sourceSets {
 
 repositories {
     maven { url = 'https://www.cursemaven.com' }
-    maven { url = 'https://maven.blamejared.com' } // JEI
-    maven { url = 'https://dvs1.progwml6.com/files/maven/' } // JEI Backup
-    maven { url = 'https://modmaven.dev' } // JEI Backup
+    maven { url = 'https://maven.blamejared.com' }
+    maven { url = 'https://dvs1.progwml6.com/files/maven/' }
+    maven { url = 'https://modmaven.dev' }
     mavenCentral()
 }
 
@@ -122,7 +122,6 @@ dependencies {
 
     runtimeOnly fg.deobf("mezz.jei:jei-${minecraft_version}:9.7.1.255")
 
-    // Optional renderer adapter only; Embeddium is neither bundled nor required at runtime.
     compileOnly fg.deobf('curse.maven:embeddium-908741:5322305')
 
 
@@ -153,7 +152,6 @@ tasks.named('processResources', ProcessResources).configure {
         expand replaceProperties + [project: project]
     }
 
-    // Temporarily disabled for testing
 }
 
 

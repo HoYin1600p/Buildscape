@@ -3,17 +3,12 @@ package com.kingodogo.buildscape.api.model;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Response from the secure authenticate endpoint.
- * POST /api/minecraft
- */
 public class AuthenticateResponse {
     private List<String> defaultCosmetics;
     private List<String> unlockedCosmetics;
     private Map<String, String> selectedCosmetics;
     private boolean isAdmin;
 
-    // Error fields (when authentication fails)
     private String error;
     private String code;
 
@@ -64,9 +59,6 @@ public class AuthenticateResponse {
         this.code = code;
     }
 
-    /**
-     * Check if the response indicates an error.
-     */
     public boolean isError() {
         return error != null && !error.isEmpty();
     }
@@ -75,9 +67,6 @@ public class AuthenticateResponse {
         this.error = error;
     }
 
-    /**
-     * Convert this response to CosmeticData format.
-     */
     public CosmeticData toCosmeticData() {
         CosmeticData data = new CosmeticData();
         data.setDefaultCosmetics(this.defaultCosmetics);

@@ -14,16 +14,10 @@ import net.minecraft.world.level.block.state.BlockState;
 
 import javax.annotation.Nullable;
 
-/**
- * Block entity for Trapped Decorated Pots.
- * Stores a single spawn egg item; when the block is right-clicked or broken
- * the mob is spawned instead of the item being dropped/returned.
- */
 public class TrappedDecoratedPotBlockEntity
         extends BlockEntity
         implements WorldlyContainer {
 
-    /** The spawn egg (or any item) stored inside the pot. */
     private ItemStack storedItem = ItemStack.EMPTY;
 
     private long wobbleStartedAtTick = 0;
@@ -41,9 +35,6 @@ public class TrappedDecoratedPotBlockEntity
         super(ModBlockEntities.TRAPPED_DECORATED_POT_BLOCK_ENTITY.get(), pos, state);
     }
 
-    // -------------------------------------------------------------------------
-    //  Stored-item API
-    // -------------------------------------------------------------------------
 
     public ItemStack getStoredItem() {
         return storedItem;
@@ -65,9 +56,6 @@ public class TrappedDecoratedPotBlockEntity
         return storedItem.isEmpty();
     }
 
-    // -------------------------------------------------------------------------
-    //  Wobble API (reused by renderer for the same wobble animation)
-    // -------------------------------------------------------------------------
 
     public void triggerWobble(WobbleStyle style) {
         if (level != null && !level.isClientSide && style != WobbleStyle.NONE) {
@@ -86,9 +74,6 @@ public class TrappedDecoratedPotBlockEntity
         return lastWobbleStyle;
     }
 
-    // -------------------------------------------------------------------------
-    //  WorldlyContainer – single-slot, only accepts from top, ejects from bottom
-    // -------------------------------------------------------------------------
 
     @Override
     public int[] getSlotsForFace(Direction side) {
@@ -182,9 +167,6 @@ public class TrappedDecoratedPotBlockEntity
         return Math.max(1, (int) Math.ceil(fillRatio * 15.0f));
     }
 
-    // -------------------------------------------------------------------------
-    //  NBT
-    // -------------------------------------------------------------------------
 
     @Override
     public void load(CompoundTag tag) {

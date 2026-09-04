@@ -24,13 +24,11 @@ public class LogStrippingHandler {
     public static void init() {
         if (!STRIP_MAP.isEmpty()) return;
 
-        // 1. Poplar
         registerPair(ModBlocks.POPLAR_LOG, ModBlocks.STRIPPED_POPLAR_LOG);
         registerPair(ModBlocks.POPLAR_WOOD, ModBlocks.STRIPPED_POPLAR_WOOD);
         registerPair(ModBlocks.POPLAR_LOG_SLAB, ModBlocks.STRIPPED_POPLAR_LOG_SLAB);
         registerPair(ModBlocks.POPLAR_LOG_VERTICAL_SLAB, ModBlocks.STRIPPED_POPLAR_LOG_VERTICAL_SLAB);
 
-        // Ashpen
         registerPair(ModBlocks.ASHPEN_LOG, ModBlocks.STRIPPED_ASHPEN_LOG);
         registerPair(ModBlocks.ASHPEN_WOOD, ModBlocks.STRIPPED_ASHPEN_WOOD);
         registerPair(ModBlocks.ASHPEN_LOG_SLAB, ModBlocks.STRIPPED_ASHPEN_LOG_SLAB);
@@ -38,7 +36,6 @@ public class LogStrippingHandler {
         registerPair(ModBlocks.ASHPEN_WOOD_SLAB, ModBlocks.STRIPPED_ASHPEN_WOOD_SLAB);
         registerPair(ModBlocks.ASHPEN_WOOD_VERTICAL_SLAB, ModBlocks.STRIPPED_ASHPEN_WOOD_VERTICAL_SLAB);
 
-        // 2. Pale Oak
         registerPair(ModBlocks.PALE_OAK_LOG, ModBlocks.STRIPPED_PALE_OAK_LOG);
         registerPair(ModBlocks.PALE_OAK_WOOD, ModBlocks.STRIPPED_PALE_OAK_WOOD);
         registerPair(ModBlocks.PALE_OAK_LOG_SLAB, ModBlocks.STRIPPED_PALE_OAK_LOG_SLAB);
@@ -46,7 +43,6 @@ public class LogStrippingHandler {
         registerPair(ModBlocks.PALE_OAK_WOOD_SLAB, ModBlocks.STRIPPED_PALE_OAK_WOOD_SLAB);
         registerPair(ModBlocks.PALE_OAK_WOOD_VERTICAL_SLAB, ModBlocks.STRIPPED_PALE_OAK_WOOD_VERTICAL_SLAB);
 
-        // 3. Cherry
         registerPair(ModBlocks.CHERRY_LOG, ModBlocks.STRIPPED_CHERRY_LOG);
         registerPair(ModBlocks.CHERRY_WOOD, ModBlocks.STRIPPED_CHERRY_WOOD);
         registerPair(ModBlocks.CHERRY_LOG_SLAB, ModBlocks.STRIPPED_CHERRY_LOG_SLAB);
@@ -54,16 +50,13 @@ public class LogStrippingHandler {
         registerPair(ModBlocks.CHERRY_WOOD_SLAB, ModBlocks.STRIPPED_CHERRY_WOOD_SLAB);
         registerPair(ModBlocks.CHERRY_WOOD_VERTICAL_SLAB, ModBlocks.STRIPPED_CHERRY_WOOD_VERTICAL_SLAB);
 
-        // 4. Mangrove
         registerPair(ModBlocks.MANGROVE_LOG, ModBlocks.STRIPPED_MANGROVE_LOG);
         registerPair(ModBlocks.MANGROVE_WOOD, ModBlocks.STRIPPED_MANGROVE_WOOD);
         registerPair(ModBlocks.MANGROVE_LOG_SLAB, ModBlocks.STRIPPED_MANGROVE_LOG_SLAB);
         registerPair(ModBlocks.MANGROVE_LOG_VERTICAL_SLAB, ModBlocks.STRIPPED_MANGROVE_LOG_VERTICAL_SLAB);
 
-        // 5. Bamboo
         registerPair(ModBlocks.BAMBOO_BLOCK, ModBlocks.STRIPPED_BAMBOO_BLOCK);
 
-        // 6. Vanilla Log Slabs
         registerPair(ModBlocks.OAK_LOG_SLAB, ModBlocks.STRIPPED_OAK_LOG_SLAB);
         registerPair(ModBlocks.SPRUCE_LOG_SLAB, ModBlocks.STRIPPED_SPRUCE_LOG_SLAB);
         registerPair(ModBlocks.BIRCH_LOG_SLAB, ModBlocks.STRIPPED_BIRCH_LOG_SLAB);
@@ -71,7 +64,6 @@ public class LogStrippingHandler {
         registerPair(ModBlocks.ACACIA_LOG_SLAB, ModBlocks.STRIPPED_ACACIA_LOG_SLAB);
         registerPair(ModBlocks.DARK_OAK_LOG_SLAB, ModBlocks.STRIPPED_DARK_OAK_LOG_SLAB);
 
-        // 7. Vanilla Log Vertical Slabs
         registerPair(ModBlocks.OAK_LOG_VERTICAL_SLAB, ModBlocks.STRIPPED_OAK_LOG_VERTICAL_SLAB);
         registerPair(ModBlocks.SPRUCE_LOG_VERTICAL_SLAB, ModBlocks.STRIPPED_SPRUCE_LOG_VERTICAL_SLAB);
         registerPair(ModBlocks.BIRCH_LOG_VERTICAL_SLAB, ModBlocks.STRIPPED_BIRCH_LOG_VERTICAL_SLAB);
@@ -79,7 +71,6 @@ public class LogStrippingHandler {
         registerPair(ModBlocks.ACACIA_LOG_VERTICAL_SLAB, ModBlocks.STRIPPED_ACACIA_LOG_VERTICAL_SLAB);
         registerPair(ModBlocks.DARK_OAK_LOG_VERTICAL_SLAB, ModBlocks.STRIPPED_DARK_OAK_LOG_VERTICAL_SLAB);
 
-        // Wood Walls
         registerPair(ModBlocks.OAK_WOOD_WALL, ModBlocks.STRIPPED_OAK_WOOD_WALL);
         registerPair(ModBlocks.SPRUCE_WOOD_WALL, ModBlocks.STRIPPED_SPRUCE_WOOD_WALL);
         registerPair(ModBlocks.BIRCH_WOOD_WALL, ModBlocks.STRIPPED_BIRCH_WOOD_WALL);
@@ -92,7 +83,6 @@ public class LogStrippingHandler {
         registerPair(ModBlocks.PALE_OAK_WOOD_WALL, ModBlocks.STRIPPED_PALE_OAK_WOOD_WALL);
         registerPair(ModBlocks.ASHPEN_WOOD_WALL, ModBlocks.STRIPPED_ASHPEN_WOOD_WALL);
 
-        // Hollow Logs
         registerPair(ModBlocks.HOLLOW_OAK_LOG, ModBlocks.STRIPPED_HOLLOW_OAK_LOG);
         registerPair(ModBlocks.HOLLOW_SPRUCE_LOG, ModBlocks.STRIPPED_HOLLOW_SPRUCE_LOG);
         registerPair(ModBlocks.HOLLOW_BIRCH_LOG, ModBlocks.STRIPPED_HOLLOW_BIRCH_LOG);

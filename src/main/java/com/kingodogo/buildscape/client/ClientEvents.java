@@ -96,27 +96,23 @@ public class ClientEvents {
             long currentTime = System.currentTimeMillis();
             long elapsed = currentTime - overlayMessageTime;
 
-            // 5 seconds duration (5000 ms)
             if (elapsed > 5000) {
                 overlayMessage = null;
                 return;
             }
 
             int x = screenWidth / 2;
-            int y = screenHeight / 2 + 30; // Move from crosshair to subtitle position
+            int y = screenHeight / 2 + 30;
 
             poseStack.pushPose();
-            poseStack.translate(0, 0, 500); // Translate Z first to be safe
+            poseStack.translate(0, 0, 500);
 
-            // Pop animation
             float elapsedSeconds = elapsed / 1000.0f;
             float scale = 1.0f;
 
             if (elapsedSeconds < 0.25f) {
-                // Pop in (0 to 0.25s)
                 scale = (elapsedSeconds / 0.25f) * 1.2f;
             } else if (elapsedSeconds < 0.4f) {
-                // Settle back to 1.0 (0.25s to 0.4s)
                 scale = 1.2f - ((elapsedSeconds - 0.25f) / 0.15f) * 0.2f;
             }
 
@@ -131,7 +127,7 @@ public class ClientEvents {
                     overlayMessage,
                     x,
                     y,
-                    0xFFFF5555 // Red with full Alpha
+                    0xFFFF5555
             );
             com.mojang.blaze3d.systems.RenderSystem.enableDepthTest();
 
@@ -145,20 +141,12 @@ public class ClientEvents {
             return;
         }
 
-        // Check for particle shape reloads
-        // ParticleShapeReloader.tick();
 
         Minecraft mc = Minecraft.getInstance();
         if (mc.level == null || mc.player == null || mc.isPaused()) {
             return;
         }
 
-        /*
-        // ── Guidebook keybind ─────────────────────────────────────────────
-        if (mc.screen == null && ModKeyBinds.OPEN_GUIDEBOOK.consumeClick()) {
-            mc.setScreen(new com.kingodogo.buildscape.client.guidebook.screen.GuideBookScreen());
-        }
-        */
 
         net.minecraft.world.entity.player.Player player = mc.player;
         if (player.isOnGround()) {
@@ -223,8 +211,6 @@ public class ClientEvents {
 
         wasZoomKeyPressed = false;
 
-        // IMPORTANT: Reset PillarIdManager cache when disconnecting from server
-        // This ensures that when you rejoin, all pillar data is properly synced again
         com.kingodogo.buildscape.config.PillarIdManager.resetWorldCache();
 
         com.kingodogo.buildscape.config.PillarParticleConfig.clearServerConfig();

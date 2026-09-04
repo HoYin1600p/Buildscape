@@ -21,7 +21,6 @@ public class ModDataGen {
         }
 
         if (event.includeClient()) {
-            // generator.addProvider(new ModItemModelProvider(generator, existingFileHelper));
         }
     }
 }

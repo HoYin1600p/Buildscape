@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.function.Supplier;
 
 public class FestiveWanderingHomemakerEntity extends WanderingTrader {
-    private int despawnDelay = 48000; // 40 minutes in ticks
+    private int despawnDelay = 48000;
 
     public FestiveWanderingHomemakerEntity(EntityType<? extends WanderingTrader> type, Level level) {
         super(type, level);
@@ -56,7 +56,6 @@ public class FestiveWanderingHomemakerEntity extends WanderingTrader {
         }
     }
 
-    // Helper to get a random item from a list of suppliers
     private Item getRandom(Supplier<Item>[] items) {
         return items[this.random.nextInt(items.length)].get();
     }
@@ -69,31 +68,24 @@ public class FestiveWanderingHomemakerEntity extends WanderingTrader {
 
         List<MerchantOffer> list = new ArrayList<>();
 
-        // 1. 1 Emerald - 8 white sand (8 trades)
         list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.WHITE_SAND.get(), 8), 8, 1,
                 0.05f));
 
-        // 2. 1 Emerald - 8 green sand (8 trades)
         list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.GREEN_SAND.get(), 8), 8, 1,
                 0.05f));
 
-        // 3. 1 Emerald - 8 red sand (8 trades)
         list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.RED_SAND.get(), 8), 8, 1,
                 0.05f));
 
-        // 4. 1 Emerald - 8 red tiles (8 trades)
         list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.RED_TILES.get(), 8), 8, 1,
                 0.05f));
 
-        // 5. 1 Emerald - 8 lime tiles (8 trades)
         list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.LIME_TILES.get(), 8), 8, 1,
                 0.05f));
 
-        // 6. 1 Emerald - 4 snow overlay (4 trades)
         list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.SNOW_OVERLAY.get(), 4), 4, 1,
                 0.05f));
 
-        // 7. 1 Emerald - 8 Dyed Festive Stockings (4 trades)
         Supplier<Item>[] stockings = new Supplier[] {
                 ModItems.BLACK_FESTIVE_STOCKING, ModItems.BLUE_FESTIVE_STOCKING, ModItems.BROWN_FESTIVE_STOCKING,
                 ModItems.CYAN_FESTIVE_STOCKING, ModItems.GRAY_FESTIVE_STOCKING, ModItems.GREEN_FESTIVE_STOCKING,
@@ -106,7 +98,6 @@ public class FestiveWanderingHomemakerEntity extends WanderingTrader {
         list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(getRandom(stockings), 8), 4, 1,
                 0.05f));
 
-        // 8. 2 Emerald - 16 Any Dyed String Lights (8 trades)
         Supplier<Item>[] stringLights = new Supplier[] {
                 ModItems.WHITE_STRING_LIGHT, ModItems.ORANGE_STRING_LIGHT, ModItems.MAGENTA_STRING_LIGHT,
                 ModItems.LIGHT_BLUE_STRING_LIGHT, ModItems.YELLOW_STRING_LIGHT, ModItems.LIME_STRING_LIGHT,
@@ -118,7 +109,6 @@ public class FestiveWanderingHomemakerEntity extends WanderingTrader {
         list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 2), new ItemStack(getRandom(stringLights), 16), 8, 1,
                 0.05f));
 
-        // 9. 1 Emerald - 8 Any Snowy Leaves (8 trades)
         Supplier<Item>[] snowyLeaves = new Supplier[] {
                 ModItems.SNOWY_LEAVES, ModItems.SNOWY_OAK_LEAVES, ModItems.SNOWY_SPRUCE_LEAVES,
                 ModItems.SNOWY_BIRCH_LEAVES, ModItems.SNOWY_JUNGLE_LEAVES, ModItems.SNOWY_ACACIA_LEAVES,
@@ -130,7 +120,6 @@ public class FestiveWanderingHomemakerEntity extends WanderingTrader {
         list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(getRandom(snowyLeaves), 8), 8, 1,
                 0.05f));
 
-        // 10. 2 Emerald - 16 Any Dyed Ornament (8 trades)
         Supplier<Item>[] ornaments = new Supplier[] {
                 ModItems.WHITE_ORNAMENT, ModItems.ORANGE_ORNAMENT, ModItems.MAGENTA_ORNAMENT,
                 ModItems.LIGHT_BLUE_ORNAMENT, ModItems.YELLOW_ORNAMENT, ModItems.LIME_ORNAMENT,
@@ -142,7 +131,6 @@ public class FestiveWanderingHomemakerEntity extends WanderingTrader {
         list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 2), new ItemStack(getRandom(ornaments), 16), 8, 1,
                 0.05f));
 
-        // 11. 1 Emerald - 8 Any Dyed Star (8 trades)
         Supplier<Item>[] stars = new Supplier[] {
                 ModItems.WHITE_STAR, ModItems.ORANGE_STAR, ModItems.MAGENTA_STAR,
                 ModItems.LIGHT_BLUE_STAR, ModItems.YELLOW_STAR, ModItems.LIME_STAR,
@@ -153,29 +141,23 @@ public class FestiveWanderingHomemakerEntity extends WanderingTrader {
         };
         list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(getRandom(stars), 8), 8, 1, 0.05f));
 
-        // 12. 1 Emerald - 8 Packed Icicle Blocks (8 trades)
         list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1),
                 new ItemStack(ModItems.PACKED_ICICLE_BLOCK.get(), 8), 8, 1, 0.05f));
 
-        // 13. 1 Emerald - 8 Any Glow Lights (8 trades)
         Supplier<Item>[] glowLights = new Supplier[] {
                 ModItems.GLOW_LIGHTS, ModItems.MULTICOLOR_GLOW_LIGHTS
         };
         list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(getRandom(glowLights), 8), 8, 1,
                 0.05f));
 
-        // 14. 1 Emerald - 8 Festive Lamp (8 trades)
         list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.FESTIVE_LAMP.get(), 8), 8, 1,
                 0.05f));
 
-        // Shuffle and pick exactly 6 trades
         Collections.shuffle(list, this.random);
         for (int j = 0; j < Math.min(6, list.size()); j++) {
             offers.add(list.get(j));
         }
 
-        // Rare trade: 5 Diamonds for 1 Frost Rose (max 5 trades), extremely rare,
-        // slightly more common on 25th Dec
         java.time.LocalDate today = java.time.LocalDate.now();
         int month = today.getMonthValue();
         int day = today.getDayOfMonth();

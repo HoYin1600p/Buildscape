@@ -12,32 +12,23 @@ public class BuildersWorkbenchMenu extends AbstractContainerMenu {
     public static final int MENU_COLOR_RESULT_START = 1;
     public static final int MENU_GRADIENT_OUTPUT_START = 48;
 
-    // ── LAYOUT ────────────────────────────────────────────────────────────────
-    // Slot coordinates are the *item* positions (the slot frame is drawn at -1/-1).
-    // They are taken straight from the background artwork and MUST stay in sync
-    // with the layout constants in BuildersWorkbenchScreen.
-    // Colour Builder (184 x 203)
     private static final int C_PICKER_X = 25, C_PICKER_Y = 42;
     private static final int C_RESULT_X = 66, C_RESULT_Y = 24;
     private static final int C_POUCH_IN_X = 51, C_POUCH_IN_Y = 84;
     private static final int C_POUCH_OUT_X = 117, C_POUCH_OUT_Y = 84;
-    // Gradient Builder (206 x 203)
     private static final int G_INPUT_X = 12, G_INPUT_Y = 27;
     private static final int G_OUTPUT_X = 12, G_OUTPUT_Y = 55;
     private static final int G_POUCH_IN_X = 51, G_POUCH_IN_Y = 84;
     private static final int G_POUCH_OUT_X = 117, G_POUCH_OUT_Y = 84;
-    // Player inventory - identical on both tabs
     private static final int INV_X = 12, INV_Y = 111, HOTBAR_Y = 169;
 
     private final BuildersWorkbenchBlockEntity blockEntity;
 
-    // ── Client-side constructor ────────────────────────────────
     public BuildersWorkbenchMenu(int windowId, Inventory playerInv, FriendlyByteBuf data) {
         this(windowId, playerInv, (BuildersWorkbenchBlockEntity)
                 playerInv.player.level.getBlockEntity(data.readBlockPos()));
     }
 
-    // ── Server-side constructor ───────────────────────────────────────────────
     public BuildersWorkbenchMenu(int windowId, Inventory playerInv, BuildersWorkbenchBlockEntity be) {
         super(ModMenuTypes.BUILDERS_WORKBENCH_MENU.get(), windowId);
         this.blockEntity = be;
@@ -45,9 +36,7 @@ public class BuildersWorkbenchMenu extends AbstractContainerMenu {
         checkContainerSize(be, BuildersWorkbenchBlockEntity.TOTAL_SLOTS);
         this.addDataSlots(be.dataAccess);
 
-        // ── Tab 0: Color Picker Layout Slots (Indices 0 to 47) ─────────────────
 
-        // Slot 0: Pipette/tool slot (index 0, active on Tab 0)
         this.addSlot(new Slot(be, 0, C_PICKER_X, C_PICKER_Y) {
             @Override
             public boolean mayPlace(ItemStack stack) {
@@ -60,7 +49,6 @@ public class BuildersWorkbenchMenu extends AbstractContainerMenu {
             }
         });
 
-        // Slots 1–9: Color Presets grid (indices 1–9, active on Tab 0) - Read-Only
         for (int i = 0; i < 9; i++) {
             int col = i % 3;
             int row = i / 3;
@@ -82,7 +70,6 @@ public class BuildersWorkbenchMenu extends AbstractContainerMenu {
             });
         }
 
-        // Slot 10: Input Pouch (index 10, active on Tab 0) - Pouch Only
         this.addSlot(new Slot(be, 10, C_POUCH_IN_X, C_POUCH_IN_Y) {
             @Override
             public boolean mayPlace(ItemStack stack) {
@@ -95,7 +82,6 @@ public class BuildersWorkbenchMenu extends AbstractContainerMenu {
             }
         });
 
-        // Slot 11: Output Pouch (index 11, active on Tab 0)
         this.addSlot(new Slot(be, 11, C_POUCH_OUT_X, C_POUCH_OUT_Y) {
             @Override
             public boolean mayPlace(ItemStack stack) {
@@ -108,7 +94,6 @@ public class BuildersWorkbenchMenu extends AbstractContainerMenu {
             }
         });
 
-        // Player Inventory slots for Tab 0 (Indices 12 to 47) - aligned with H=192 / W=176 layout
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 9; col++) {
                 this.addSlot(new Slot(playerInv, col + row * 9 + 9, INV_X + col * 18, INV_Y + row * 18) {
@@ -128,9 +113,7 @@ public class BuildersWorkbenchMenu extends AbstractContainerMenu {
             });
         }
 
-        // ── Tab 1: Gradient Builder Layout Slots (Indices 48 to 103) ───────────
 
-        // Slots 12–20: Gradient Output (indices 12–20, active on Tab 1)
         for (int i = 0; i < 9; i++) {
             this.addSlot(new WbOutputSlot(be, 12 + i, G_OUTPUT_X + i * 18, G_OUTPUT_Y) {
                 @Override
@@ -140,7 +123,6 @@ public class BuildersWorkbenchMenu extends AbstractContainerMenu {
             });
         }
 
-        // Slot 10: Input Pouch (index 10, active on Tab 1) - Pouch Only
         this.addSlot(new Slot(be, 10, G_POUCH_IN_X, G_POUCH_IN_Y) {
             @Override
             public boolean mayPlace(ItemStack stack) {
@@ -153,7 +135,6 @@ public class BuildersWorkbenchMenu extends AbstractContainerMenu {
             }
         });
 
-        // Slot 11: Output Pouch (index 11, active on Tab 1)
         this.addSlot(new Slot(be, 11, G_POUCH_OUT_X, G_POUCH_OUT_Y) {
             @Override
             public boolean mayPlace(ItemStack stack) {
@@ -166,7 +147,6 @@ public class BuildersWorkbenchMenu extends AbstractContainerMenu {
             }
         });
 
-        // Slots 21–29: Gradient Inputs row (indices 21–29, active on Tab 1)
         for (int i = 0; i < 9; i++) {
             this.addSlot(new WbInputSlot(be, 21 + i, G_INPUT_X + i * 18, G_INPUT_Y) {
                 @Override
@@ -176,7 +156,6 @@ public class BuildersWorkbenchMenu extends AbstractContainerMenu {
             });
         }
 
-        // Player Inventory slots for Tab 1 (Indices 68 to 103)
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 9; col++) {
                 this.addSlot(new Slot(playerInv, col + row * 9 + 9, INV_X + col * 18, INV_Y + row * 18) {
@@ -197,7 +176,6 @@ public class BuildersWorkbenchMenu extends AbstractContainerMenu {
         }
     }
 
-    // This method is now a no-op as all coordinates are statically set in the constructor
     public void setupSlotPositions() {
     }
 
@@ -235,7 +213,6 @@ public class BuildersWorkbenchMenu extends AbstractContainerMenu {
         return blockEntity;
     }
 
-    // ── Quick-move (shift-click) ──────────────────────────────────────────────
 
     @Override
     public ItemStack quickMoveStack(Player player, int index) {
@@ -263,10 +240,8 @@ public class BuildersWorkbenchMenu extends AbstractContainerMenu {
                     }
                 } else if (stack.getItem() instanceof net.minecraft.world.item.BlockItem) {
                     if (tab == 0) {
-                        // On Tab 0, route block items only to Slot 0 (Pipette input)
                         if (!this.moveItemStackTo(stack, 0, 1, false)) return ItemStack.EMPTY;
                     } else {
-                        // On Tab 1, route block items to Gradient Inputs (indices 59 to 67)
                         if (!this.moveItemStackTo(stack, 59, 68, false)) return ItemStack.EMPTY;
                     }
                 } else {
@@ -293,7 +268,6 @@ public class BuildersWorkbenchMenu extends AbstractContainerMenu {
         return blockEntity.stillValid(player);
     }
 
-    // ── Inner slot types ──────────────────────────────────────────────────────
 
     private static class WbInputSlot extends Slot {
         WbInputSlot(BuildersWorkbenchBlockEntity be, int index, int x, int y) {

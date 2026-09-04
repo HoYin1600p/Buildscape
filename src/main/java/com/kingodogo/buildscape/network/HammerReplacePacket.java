@@ -55,36 +55,29 @@ public class HammerReplacePacket {
             if (player.distanceToSqr(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5) > 64.0) return;
             if (!player.mayBuild() || player.blockActionRestricted(level, pos, player.gameMode.getGameModeForPlayer())) return;
 
-            // Must be holding a Hammer in main hand
             ItemStack hammerStack = player.getMainHandItem();
             if (hammerStack.isEmpty() || !(hammerStack.getItem() instanceof HammerItem hammer)) return;
 
-            // Must have a block in offhand
             ItemStack offhandStack = player.getOffhandItem();
             if (offhandStack.isEmpty() || !(offhandStack.getItem() instanceof BlockItem blockItem)) return;
 
             BlockState targetState = level.getBlockState(pos);
             if (targetState.isAir()) return;
 
-            // Never replace unmineable blocks (bedrock, barriers, command blocks, etc.)
             float destroyTime = targetState.getDestroySpeed(level, pos);
             if (destroyTime < 0) return;
 
-            // Iron hammer cannot replace obsidian-level blocks (destroyTime >= 50.0f)
             HammerItem.HammerTier tier = hammer.getHammerTier();
             if (!tier.canReplaceObsidianLevel() && destroyTime >= 50.0f) return;
 
-            // Don't replace the same block
             Block replacementBlock = blockItem.getBlock();
             if (targetState.getBlock() == replacementBlock) return;
 
-            // Get drops from the old block before removing it
             BlockEntity blockEntity = level.getBlockEntity(pos);
             boolean hasSilkTouch = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.SILK_TOUCH, hammerStack) > 0;
 
             List<ItemStack> drops;
             if (hasSilkTouch) {
-                // Silk touch: give back the block as if silk-touched
                 LootContext.Builder builder = new LootContext.Builder(level)
                         .withRandom(level.random)
                         .withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(pos))
@@ -100,27 +93,22 @@ public class HammerReplacePacket {
                 drops = targetState.getDrops(builder);
             }
 
-            // Place the replacement block
             BlockState newState = replacementBlock.defaultBlockState();
             level.setBlock(pos, newState, 3);
             com.kingodogo.buildscape.event.AdvancementEvents.onHammerReplace(player);
 
-            // Consume one block from offhand
             if (!player.isCreative()) {
                 offhandStack.shrink(1);
             }
 
-            // Drop the old block items
             for (ItemStack drop : drops) {
                 Block.popResource(level, pos, drop);
             }
 
-            // Damage the hammer
             if (!player.isCreative()) {
                 hammerStack.hurtAndBreak(1, player, (p) -> p.broadcastBreakEvent(InteractionHand.MAIN_HAND));
             }
 
-            // Effects
             level.playSound(null, pos, SoundEvents.ANVIL_PLACE, SoundSource.BLOCKS, 0.5f, 1.2f);
             level.sendParticles(
                     ParticleTypes.CRIT,

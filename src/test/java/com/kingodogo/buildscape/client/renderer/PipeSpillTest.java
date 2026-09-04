@@ -7,7 +7,6 @@ import net.minecraft.core.Direction;
 import java.util.ArrayList;
 import java.util.List;
 
-/** Standalone geometry regression tests; does not launch Minecraft. Author: HoYin1600p. */
 public final class PipeSpillTest {
     private static int checks;
 
@@ -21,8 +20,8 @@ public final class PipeSpillTest {
                 }
             }
         }
-        verifyPassThrough(0.001, 0.7); // Bottom surface.
-        verifyPassThrough(0.8, 0.7); // Receiving water already higher than the outlet.
+        verifyPassThrough(0.001, 0.7);
+        verifyPassThrough(0.8, 0.7);
         verifySide();
         verifySlopedSurface();
         verifyMultipleOutlets();

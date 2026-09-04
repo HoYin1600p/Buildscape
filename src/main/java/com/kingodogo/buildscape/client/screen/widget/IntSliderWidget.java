@@ -51,28 +51,23 @@ public class IntSliderWidget extends AbstractSliderButton {
     public void renderButton(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
         Minecraft mc = Minecraft.getInstance();
 
-        // Custom background - Dark style matching other widgets
         int borderColor = isHoveredOrFocused() ? 0xFFFFFFFF : 0xFF666666;
         int backgroundColor = 0xFF222222;
 
-        fill(poseStack, x, y, x + width, y + 1, borderColor); // Top
-        fill(poseStack, x, y + height - 1, x + width, y + height, borderColor); // Bottom
-        fill(poseStack, x, y, x + 1, y + height, borderColor); // Left
-        fill(poseStack, x + width - 1, y, x + width, y + height, borderColor); // Right
-        fill(poseStack, x + 1, y + 1, x + width - 1, y + height - 1, backgroundColor); // Background
+        fill(poseStack, x, y, x + width, y + 1, borderColor);
+        fill(poseStack, x, y + height - 1, x + width, y + height, borderColor);
+        fill(poseStack, x, y, x + 1, y + height, borderColor);
+        fill(poseStack, x + width - 1, y, x + width, y + height, borderColor);
+        fill(poseStack, x + 1, y + 1, x + width - 1, y + height - 1, backgroundColor);
 
-        // Slider handle
         int handleWidth = 8;
         int handleX = x + (int) (this.value * (width - handleWidth));
-        // Clamp handleX to be safe
         handleX = Math.max(x, Math.min(x + width - handleWidth, handleX));
 
         boolean hovered = isMouseOver(mouseX, mouseY);
-        // Handle color - lighter gray when hovered
         int handleColor = hovered ? 0xFFAAAAAA : 0xFF666666;
         fill(poseStack, handleX, y + 1, handleX + handleWidth, y + height - 1, handleColor);
 
-        // Draw text with custom color based on value
         int color = getCustomColor(currentValue);
         drawCenteredString(poseStack, mc.font, getMessage(), x + width / 2, y + (height - 8) / 2, color);
     }
@@ -80,19 +75,19 @@ public class IntSliderWidget extends AbstractSliderButton {
     private int getCustomColor(int value) {
         switch (value) {
             case 1:
-                return 0xFFFFFF; // White
+                return 0xFFFFFF;
             case 2:
-                return 0x55FF55; // Green
+                return 0x55FF55;
             case 3:
-                return 0x55FFFF; // Aqua
+                return 0x55FFFF;
             case 4:
-                return 0xFF5555; // Red
+                return 0xFF5555;
             case 5:
-                return 0xFF55FF; // Light Purple
+                return 0xFF55FF;
             case 6:
-                return 0xFFAA00; // Gold
+                return 0xFFAA00;
             case 7:
-                return 0xFFFF55; // Yellow
+                return 0xFFFF55;
             default:
                 return 0xFFFFFF;
         }

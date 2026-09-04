@@ -63,17 +63,7 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
 
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
     public static final BooleanProperty LAVA_LOGGED = BooleanProperty.create("lava_logged");
-    /**
-     * Highest water surface that fits beneath the pipe's two-pixel ceiling.
-     * This is the source level for the internal channel; flowing levels below
-     * it use vanilla's normal 7/9 through 1/9 sequence.
-     */
     public static final float WATER_SOURCE_VISUAL_HEIGHT = 14.0F / 16.0F;
-    /**
-     * Set by the BFS transport manager to represent the flowing water level inside this pipe.
-     * This is internal channel state for the block-entity renderer and transport logic, not a
-     * vanilla FluidState for the whole block volume.
-     */
     public static final IntegerProperty WATER_LEVEL = IntegerProperty.create("water_level", 0, 7);
 
     public static final BooleanProperty DOWN  = BlockStateProperties.DOWN;
@@ -111,7 +101,6 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
     private static final VoxelShape X_SHAPE_SNEAK = Shapes.or(BOX_NORTH, BOX_SOUTH, BOX_DOWN);
     private static final VoxelShape Z_SHAPE_SNEAK = Shapes.or(BOX_WEST, BOX_EAST, BOX_DOWN);
 
-    // Fast bitmask lookup table for selection/outline shapes (0..63)
     private static final VoxelShape[] SHAPES_BY_MASK = new VoxelShape[64];
 
     static {
@@ -249,16 +238,12 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
         }
         BooleanProperty prop = getPropertyForDirection(dir);
         if (prop != null && state.hasProperty(prop) && state.getValue(prop)) {
-            // A set directional property denotes a seamless connection to another
-            // pipe, never an opening into the world.
             return false;
         }
         int connections = getConnectCount(state);
         if (connections == 0) {
             return dir.getAxis() == state.getValue(AXIS);
         }
-        // A pipe with one attached segment has one exposed end along its primary
-        // axis. Junctions have no implicit world-facing endpoint.
         return connections == 1 && dir.getAxis() == getPrimaryAxis(state);
     }
 
@@ -270,7 +255,6 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
         Fluid containedFluid = getContainedFluid(state, be);
         Direction hitFace = hit.getDirection();
 
-        // 1. Wrench configuration: sneak-click rotates axis, normal click toggles open side (min 2 openings)
         if (held.is(ModItems.WRENCH.get())) {
             if (!level.isClientSide) {
                 if (player.isShiftKeyDown()) {
@@ -290,7 +274,6 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
                 if (prop != null) {
                     boolean currentVal = state.getValue(prop);
                     if (currentVal) {
-                        // Attempting to close this face: ensure at least 2 open faces remain
                         int openCount = (state.getValue(DOWN) ? 1 : 0) + (state.getValue(UP) ? 1 : 0)
                                 + (state.getValue(NORTH) ? 1 : 0) + (state.getValue(SOUTH) ? 1 : 0)
                                 + (state.getValue(WEST) ? 1 : 0) + (state.getValue(EAST) ? 1 : 0);
@@ -315,7 +298,6 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
                 || (held.getItem() instanceof BucketItem bi && bi.getFluid() == Fluids.EMPTY)
                 || (FluidUtil.getFluidHandler(held).isPresent() && FluidUtil.getFluidContained(held).orElse(FluidStack.EMPTY).isEmpty());
 
-        // 2. Empty Bucket interaction to retrieve fluid (SOURCE ONLY)
         Fluid sourceFluid = getSourceFluid(state, be);
         if (isEmptyBucket && sourceFluid != Fluids.EMPTY) {
             if (!level.isClientSide) {
@@ -346,7 +328,6 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
             return InteractionResult.sidedSuccess(level.isClientSide);
         }
 
-        // 3. Filled Fluid Bucket interaction to deposit fluid
         Fluid fluidInBucket = getFluidFromItem(held);
         if (fluidInBucket != Fluids.EMPTY) {
             if (sourceFluid != Fluids.EMPTY) {
@@ -387,15 +368,11 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
                 if (sound == null) sound = (fluidInBucket == Fluids.LAVA) ? SoundEvents.BUCKET_EMPTY_LAVA : SoundEvents.BUCKET_EMPTY;
                 level.playSound(null, pos, sound, SoundSource.BLOCKS, 1.0F, 1.0F);
 
-                // The transport manager chooses the downstream endpoint.  Do not
-                // spread from every physical opening here, because the inlet side
-                // must remain an inlet rather than creating water beside the pipe.
                 HollowPipeTransportManager.onBucketUsed(level, pos, state);
             }
             return InteractionResult.sidedSuccess(level.isClientSide);
         }
 
-        // 4. Modded Forge Fluid Handler interaction (Tanks, Universal Buckets)
         if (hollowBe != null && FluidUtil.getFluidHandler(held).isPresent()) {
             boolean interactSuccess = FluidUtil.interactWithFluidHandler(player, hand, level, pos, hitFace);
             if (interactSuccess) {
@@ -431,49 +408,27 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
         return ItemStack.EMPTY;
     }
 
-    /**
-     * Spreads fluid to the world from all open endpoints of this pipe.
-     *
-     * @param dist The BFS horizontal distance of this pipe from the source. Used to calculate
-     *             the outflow flow level so the water continues at the correct vanilla level
-     *             rather than restarting at full strength. At dist=7 (MAX_HORIZONTAL_FLOW),
-     *             outflow amount = 0, so no water is placed — matching vanilla's 7-block limit.
-     */
     public static void trySpreadToWorld(Level level, BlockPos pos, BlockState state, Fluid fluid, int dist) {
         trySpreadToWorld(level, pos, state, fluid, dist, null);
     }
 
-    /**
-     * Spreads only through transport-approved exit faces. A null set preserves
-     * the legacy behaviour for non-pipe callers; steel-pipe transport always
-     * supplies its downstream directions.
-     */
     public static void trySpreadToWorld(Level level, BlockPos pos, BlockState state, Fluid fluid, int dist,
                                         @Nullable Set<Direction> allowedDirections) {
         if (fluid == null || fluid == Fluids.EMPTY || level.isClientSide) return;
-        int outflowAmount = WaterPipeTransport.MAX_HORIZONTAL_FLOW - dist; // 7-dist
+        int outflowAmount = WaterPipeTransport.MAX_HORIZONTAL_FLOW - dist;
         for (Direction dir : Direction.values()) {
             if (dir == Direction.UP) continue;
             if (allowedDirections != null && !allowedDirections.contains(dir)) continue;
             if (isOpenEndpoint(state, dir)) {
-                // Downward exits (waterfalls) always use full strength because the BFS
-                // resets the distance counter on a vertical drop, just like vanilla does.
                 boolean fallingWater = dir == Direction.DOWN && fluid.isSame(Fluids.WATER);
                 int amount = fallingWater ? 8
                         : (dir == Direction.DOWN ? WaterPipeTransport.MAX_HORIZONTAL_FLOW : outflowAmount);
-                if (amount <= 0) continue; // pipe has used up all 7 horizontal blocks
+                if (amount <= 0) continue;
                 spreadToWorldBlock(level, pos.relative(dir), fluid, amount, fallingWater);
             }
         }
     }
 
-    /**
-     * Places a flowing fluid block at a single neighbor position.
-     *
-     * @param amount The flow amount (1–7). Amount 7 = strongest flow (adjacent to source),
-     *               amount 1 = weakest flow. This continues the vanilla flow chain rather
-     *               than restarting it at full strength from the pipe exit.
-     */
     public static void spreadToWorldBlock(Level level, BlockPos neighborPos, Fluid fluid, int amount) {
         spreadToWorldBlock(level, neighborPos, fluid, amount, false);
     }
@@ -493,7 +448,6 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
                     if (!neighborState.equals(fluidBlock)) {
                         level.setBlock(neighborPos, fluidBlock, 3);
                     }
-                    // Always reschedule so vanilla fluid tick keeps the block alive and spreads it further
                     Fluid placedFluid = fluidBlock.getFluidState().getType();
                     level.scheduleTick(neighborPos, placedFluid, placedFluid.getTickDelay(level));
                 }
@@ -519,9 +473,6 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
             if (be instanceof HollowLogBlockEntity hollowBe) {
                 PipeFlowState flow = hollowBe.getPipeFlowState();
                 if (flow != null && flow.hasWater()) {
-                    // Refresh only the endpoint selected by the directed transport
-                    // graph. This prevents water from escaping through side walls
-                    // or back through the inlet.
                     trySpreadToWorld(level, pos, state, Fluids.WATER, flow.getDistance(), flow.getFlowDirections());
                 }
             }
@@ -628,7 +579,6 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
     public void entityInside(BlockState state, Level level, BlockPos pos, Entity entity) {
         super.entityInside(state, level, pos, entity);
 
-        // Apply contained water / bubble column physics directly to players and in-world ItemEntity objects
         BlockEntity be = level.getBlockEntity(pos);
         if (be instanceof HollowLogBlockEntity hollowBe) {
             PipeFlowState flowState = hollowBe.getPipeFlowState();
@@ -734,12 +684,10 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
         if (state.getValue(LAVA_LOGGED)) {
             level.scheduleTick(pos, Fluids.LAVA, Fluids.LAVA.getTickDelay(level));
         }
-        // Schedule a block tick when carrying water so outflow endpoints stay refreshed
         if (state.getValue(WATER_LEVEL) > 0) {
             level.scheduleTick(pos, this, Fluids.WATER.getTickDelay(level));
         }
         BlockState updated = super.updateShape(state, direction, neighborState, level, pos, neighborPos);
-        // Preserve WATER_LEVEL across the updateConnections recalculation
         if (state.getValue(WATER_LEVEL) > 0 && updated.getValue(WATER_LEVEL) == 0) {
             updated = updated.setValue(WATER_LEVEL, state.getValue(WATER_LEVEL));
         }
@@ -831,9 +779,6 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
 
     @Override
     public boolean canPlaceLiquid(BlockGetter level, BlockPos pos, BlockState state, Fluid fluid) {
-        // Water in steel pipes is handled as channel transport through the hollow gap.
-        // Letting vanilla place water into the block would fill the full block volume
-        // and make outside water visually attach to the pipe shell.
         return false;
     }
 

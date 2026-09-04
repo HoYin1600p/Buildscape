@@ -37,7 +37,6 @@ public abstract class FlowingFluidMixin {
         if (vanilla.isSource() || (!vanilla.isEmpty() && vanilla.getValue(FlowingFluid.FALLING))) return;
 
         int amount = vanilla.getAmount();
-        // Query the supply only during fluid simulation; pipes remain empty to the global fluid/render APIs.
         for (Direction direction : Direction.values()) {
             if (direction == Direction.DOWN) continue;
             BlockPos pipePos = pos.relative(direction);
@@ -67,14 +66,12 @@ public abstract class FlowingFluidMixin {
             Fluid fluid,
             CallbackInfoReturnable<Boolean> cir
     ) {
-        // 1. Spreading OUT of a Hollow Pipe: strictly only allowed through open hollow endpoints
         if (fromBlockState.getBlock() instanceof HollowPipeBlock) {
             if (!HollowPipeBlock.isOpenEndpoint(fromBlockState, direction)) {
                 cir.setReturnValue(false);
                 return;
             }
         }
-        // 2. Spreading OUT of a Hollow Log: strictly only allowed through open hollow ends
         else if (fromBlockState.getBlock() instanceof HollowLogBlock) {
             if (!HollowLogBlock.isOpenEnd(fromBlockState, direction)) {
                 cir.setReturnValue(false);
@@ -82,14 +79,12 @@ public abstract class FlowingFluidMixin {
             }
         }
 
-        // 3. Spreading INTO a Hollow Pipe: strictly only allowed into open hollow endpoints
         if (toBlockState.getBlock() instanceof HollowPipeBlock) {
             if (!HollowPipeBlock.isOpenEndpoint(toBlockState, direction.getOpposite())) {
                 cir.setReturnValue(false);
                 return;
             }
         }
-        // 4. Spreading INTO a Hollow Log: strictly only allowed into open hollow ends
         else if (toBlockState.getBlock() instanceof HollowLogBlock) {
             if (!HollowLogBlock.isOpenEnd(toBlockState, direction.getOpposite())) {
                 cir.setReturnValue(false);

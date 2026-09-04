@@ -32,7 +32,6 @@ public abstract class EntityMixin {
             return;
         }
 
-        // Use Accessor to safely call methods/access fields that are final or have environment issues
         EntityAccessor accessor = (EntityAccessor) self;
         BlockPos pos = accessor.callBlockPosition();
         if (accessor.getLevel() != null && isChainBlock(accessor.getLevel().getBlockState(pos))) {

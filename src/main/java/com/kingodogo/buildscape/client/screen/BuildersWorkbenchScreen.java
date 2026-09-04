@@ -21,60 +21,37 @@ import java.util.Arrays;
 import java.util.List;
 
 public class BuildersWorkbenchScreen extends AbstractContainerScreen<BuildersWorkbenchMenu> {
-    // ── Layout ────────────────────────────────────────────────────────────────
-    // All values below are relative to leftPos/topPos and mirror the artwork in
-    // textures/gui/builders_workbench/{color,gradient}_builder_bg.png (256x256 sheets,
-    // artwork anchored at 0,0). Slot coordinates MUST stay in sync with
-    // BuildersWorkbenchMenu - see the LAYOUT block there.
     private static final int COLOR_WIDTH = 184;
     private static final int GRADIENT_WIDTH = 206;
     private static final int GUI_HEIGHT = 193;
 
-    // Tab sprites are 17x17 with the icon baked in. TAB_Y = -1 keeps their bottom edge
-    // exactly where the artwork expects it (GUI y = 15, one row above the panel top),
-    // and the 3px gap matches the spacing drawn in the mockup.
     private static final int TAB_SIZE = 17;
     private static final int TAB_Y = -11;
     private static final int TAB_COLOR_X = 6;
     private static final int TAB_GRADIENT_X = 26;
 
-    // Title banner (baked into the background). Every title is scaled to the same
-    // usable width, so both tabs end up with an identical margin on each side even
-    // though their strings differ in length.
-    // Banner interior, measured inside the dark frame baked into the background sheet.
-    // The flat face of the banner, excluding both the dark frame (x52/x131, y0/y16) and
-    // the 1px bevel inside it (x53/x130, y1/y15). Centring on the flat area rather than
-    // the frame is what makes the margins come out even on both sides.
     private static final int TITLE_X = 54;
     private static final int TITLE_Y = 2;
     private static final int TITLE_W = 76;
     private static final int TITLE_H = 13;
 
-    // Filter buttons (18x18, stacked vertically)
     private static final int FILTER_Y = 23;
     private static final int FILTER_SPACING = 18;
     private static final int COLOR_FILTER_X = 141;
     private static final int GRADIENT_FILTER_X = 184;
 
-    // Compact modifier controls occupy the unused lower-left strip of both panels.
-    // Their 11x11 hitboxes do not overlap the workbench slots or the copy arrow.
     private static final int MODIFIER_Y = 84;
     private static final int SINGLE_TEXTURE_X = 13;
     private static final int MATCH_SHAPE_X = 27;
 
-    // Copy arrow (48x16, animated) - identical position on both tabs. The sprite has
-    // transparent padding: the ink sits at x 4..43, y 2..12, symmetric around row 7.
-    // These values put that ink in the middle of the 46px gap between the pouch slots.
     private static final int ARROW_X = 68;
     private static final int ARROW_Y = 84;
 
-    // Slot interiors used for the re-roll dots (must match the menu)
     private static final int COLOR_RESULT_X = 66;
     private static final int COLOR_RESULT_Y = 24;
     private static final int GRADIENT_OUTPUT_X = 12;
     private static final int GRADIENT_OUTPUT_Y = 55;
     private static final int INITIAL_DATA_SYNC_TICKS = 3;
-    /** Above the item render layer (items blit around Z 100-200) so the dots stay visible. */
     private static final float REROLL_Z = 300.0f;
 
     private int activeTab;
@@ -103,8 +80,6 @@ public class BuildersWorkbenchScreen extends AbstractContainerScreen<BuildersWor
         }
         updateDimensions();
         super.init();
-        // AbstractContainerScreen#init recentres on imageWidth, which would undo the
-        // anchoring above, so re-apply it once the vanilla layout pass is done.
         updateDimensions();
         ClientBlockColorCatalog.ensureReady();
         lastInputSignature = inputSignature();
@@ -161,17 +136,6 @@ public class BuildersWorkbenchScreen extends AbstractContainerScreen<BuildersWor
         return 31 * signature + ClientBlockColorCatalog.generation();
     }
 
-    /**
-     * Sizes the screen for the active tab, but anchors it as if it were always the
-     * colour builder.
-     *
-     * <p>The gradient artwork is wider only because of the filter panel hanging off its
-     * right-hand side - the main body starts at x = 0 in both sheets. Centring on the
-     * real imageWidth would therefore shove the whole panel {@code (GRADIENT_WIDTH -
-     * COLOR_WIDTH) / 2} pixels to the left when switching tabs. Centring on COLOR_WIDTH
-     * instead keeps the body, its slots and the player inventory perfectly still, and
-     * lets the extra strip grow to the right.
-     */
     private void updateDimensions() {
         imageWidth = activeTab == 0 ? COLOR_WIDTH : GRADIENT_WIDTH;
         imageHeight = GUI_HEIGHT;
@@ -236,8 +200,6 @@ public class BuildersWorkbenchScreen extends AbstractContainerScreen<BuildersWor
         int y = topPos;
         RenderSystem.disableDepthTest();
 
-        // The whole static layout - panel, frames, every slot background, the player
-        // inventory and the idle arrow - lives in a single background texture.
         WbRenderer.drawBuilderBG(poseStack,
                 activeTab == 0 ? WbRenderer.BG_COLOR_BUILDER : WbRenderer.BG_GRADIENT_BUILDER,
                 x, y, imageWidth, imageHeight);
@@ -298,11 +260,6 @@ public class BuildersWorkbenchScreen extends AbstractContainerScreen<BuildersWor
         WbRenderer.drawCopyArrow(poseStack, x, y, menu.getCopyProgress() / 40.0f);
     }
 
-    /**
-     * Drawn after super.render() and lifted on the Z axis: item stacks are rendered at a
-     * blit offset of their own, so without this the dots would disappear under any item
-     * sitting in the slot.
-     */
     private void renderRerollControls(PoseStack poseStack, int mouseX, int mouseY) {
         poseStack.pushPose();
         poseStack.translate(0.0f, 0.0f, REROLL_Z);

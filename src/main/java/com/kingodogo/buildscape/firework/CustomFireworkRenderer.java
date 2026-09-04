@@ -41,7 +41,6 @@ public class CustomFireworkRenderer {
         for (FireworkPoint pt : points) {
             Vec3 pos = pt.getPosition();
 
-            // Rotate point horizontally around Y-axis by shooter's yaw
             double rx = pos.x * cos - pos.z * sin;
             double ry = pos.y;
             double rz = pos.x * sin + pos.z * cos;

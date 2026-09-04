@@ -22,10 +22,8 @@ public class ColoredSmokeParticle extends TextureSheetParticle {
         this.yd = ySpeed;
         this.zd = zSpeed;
 
-        // Pick one random sprite and keep it (no animation)
         this.pickSprite(sprites);
 
-        // Get color from position queue
         String colorCode = SmokeColorRegistry.consumeColor(x, y, z);
 
         if (colorCode != null && !colorCode.isEmpty()) {
@@ -68,7 +66,6 @@ public class ColoredSmokeParticle extends TextureSheetParticle {
         this.yd -= this.gravity;
         this.move(this.xd, this.yd, this.zd);
 
-        // Fade out
         float progress = (float) this.age / (float) this.lifetime;
         this.alpha = 0.9f * (1.0f - progress);
     }

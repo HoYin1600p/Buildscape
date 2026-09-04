@@ -27,7 +27,6 @@ public class CreakingHeartTreeDecorator extends TreeDecorator {
             return;
         }
 
-        // Guaranteed single Creaking Heart in the middle of the tree trunk
         int midIndex = logPositions.size() / 2;
         BlockPos targetPos = logPositions.get(midIndex);
 

@@ -10,10 +10,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
 
-/**
- * Extensible cosmetic frame types for signs.
- * Currently supports STRINGLIGHT, structured so future cosmetic designs can be added cleanly.
- */
 public enum SignFrameType {
     NONE("", () -> null, null),
     STRINGLIGHT("stringlight", () -> ModItems.STRINGLIGHT_FRAME.get(), new ResourceLocation(BuildScape.MODID, "block/stringlight_frame"));

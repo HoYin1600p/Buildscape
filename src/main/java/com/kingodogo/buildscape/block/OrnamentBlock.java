@@ -355,10 +355,9 @@ public class OrnamentBlock
                 state.getBlock() ==
                         com.kingodogo.buildscape.block.ModBlocks.TINTED_GLASS_ORNAMENT.get()
         ) {
-            return null; // Tinted glass won't color the beam
+            return null;
         }
 
-        // For other ornaments, use their map color to tint the beacon beam
         int color = state.getMapColor(level, pos).col;
         return new float[]{
                 ((color >> 16) & 0xFF) / 255.0f,
@@ -392,8 +391,6 @@ public class OrnamentBlock
         if (state.getBlock() == com.kingodogo.buildscape.block.ModBlocks.TINTED_GLASS_ORNAMENT.get()) {
             if (level instanceof net.minecraft.world.level.Level) {
                 try {
-                    // Check if a Beacon is what's actively checking the block's opacity.
-                    // This explicitly isolates Beacon beam checks from Grass random ticks / light engine.
                     boolean isBeacon = StackWalker.getInstance().walk(s ->
                             s.limit(20).anyMatch(f -> {
                                 String name = f.getClassName();
@@ -404,10 +401,9 @@ public class OrnamentBlock
                         return 15;
                     }
                 } catch (Throwable ignore) {
-                    // Safe fallback
                 }
             }
-            return 0; // Natural light completely passes through perfectly
+            return 0;
         }
         return super.getLightBlock(state, level, pos);
     }

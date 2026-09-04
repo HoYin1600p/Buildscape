@@ -36,13 +36,6 @@ import net.minecraft.world.item.crafting.UpgradeRecipe;
 import net.minecraftforge.fml.loading.FMLPaths;
 import net.minecraftforge.registries.ForgeRegistries;
 
-/**
- * High-performance binary recipe cache (.bscb).
- * Serializes and deserializes compiled recipe graphs into compact binary
- * streams with string dictionary pool interning.
- * Supports loading bundled binary cache directly from JAR resources for instant
- * 1st boot (< 20ms).
- */
 public class BinaryRecipeCache {
 
     private static final int MAGIC_HEADER = 0x4B59524F;
@@ -133,7 +126,6 @@ public class BinaryRecipeCache {
 
             List<Recipe<?>> cacheable = recipes != null ? recipes.stream().filter(BinaryRecipeCache::isCacheable).toList() : List.of();
 
-            // Write Recipes and build string pool dynamically
             recipeDataOut.writeInt(cacheable.size());
             for (Recipe<?> recipe : cacheable) {
                 writeRecipe(recipeDataOut, recipe, stringPool, stringIndexMap);
@@ -224,19 +216,16 @@ public class BinaryRecipeCache {
                 return recipes;
             }
 
-            // Read String Pool
             int poolSize = in.readInt();
             String[] stringPool = new String[poolSize];
             for (int i = 0; i < poolSize; i++) {
                 stringPool[i] = in.readUTF();
             }
 
-            // High-Performance Caching Pools for O(1) constant-time interning
             Ingredient[] ingredientCache = new Ingredient[poolSize];
             Item[] itemCache = new Item[poolSize];
             ResourceLocation[] rlCache = new ResourceLocation[poolSize];
 
-            // Multi-threaded Parallel Pre-Warm of String Pool Interning
             java.util.stream.IntStream.range(0, poolSize).parallel().forEach(i -> {
                 String s = stringPool[i];
                 if (s != null && !s.isEmpty()) {
@@ -261,7 +250,6 @@ public class BinaryRecipeCache {
                 }
             });
 
-            // Read Recipes
             int recipeCount = in.readInt();
             recipes = new ArrayList<>(recipeCount);
             for (int i = 0; i < recipeCount; i++) {
@@ -314,7 +302,7 @@ public class BinaryRecipeCache {
         out.writeInt(getStringIndex(resultNbt, stringPool, stringMap));
 
         if (recipe instanceof com.kingodogo.buildscape.recipe.ShapedDurabilityRecipe sdr) {
-            out.writeByte(9); // Type Shaped Durability
+            out.writeByte(9);
             out.writeInt(sdr.getWidth());
             out.writeInt(sdr.getHeight());
             NonNullList<Ingredient> ingredients = sdr.getIngredients();
@@ -323,14 +311,14 @@ public class BinaryRecipeCache {
                 writeIngredient(out, ing, stringPool, stringMap);
             }
         } else if (recipe instanceof com.kingodogo.buildscape.recipe.ShapelessDurabilityRecipe sdr) {
-            out.writeByte(10); // Type Shapeless Durability
+            out.writeByte(10);
             NonNullList<Ingredient> ingredients = sdr.getIngredients();
             out.writeInt(ingredients.size());
             for (Ingredient ing : ingredients) {
                 writeIngredient(out, ing, stringPool, stringMap);
             }
         } else if (recipe instanceof ShapedRecipe shaped) {
-            out.writeByte(1); // Type Shaped
+            out.writeByte(1);
             out.writeInt(shaped.getWidth());
             out.writeInt(shaped.getHeight());
             NonNullList<Ingredient> ingredients = shaped.getIngredients();
@@ -339,43 +327,43 @@ public class BinaryRecipeCache {
                 writeIngredient(out, ing, stringPool, stringMap);
             }
         } else if (recipe instanceof ShapelessRecipe shapeless) {
-            out.writeByte(2); // Type Shapeless
+            out.writeByte(2);
             NonNullList<Ingredient> ingredients = shapeless.getIngredients();
             out.writeInt(ingredients.size());
             for (Ingredient ing : ingredients) {
                 writeIngredient(out, ing, stringPool, stringMap);
             }
         } else if (recipe instanceof StonecutterRecipe sc) {
-            out.writeByte(3); // Type Stonecutter
+            out.writeByte(3);
             writeIngredient(out, getSafeIngredient(sc, 0), stringPool, stringMap);
         } else if (recipe instanceof SmeltingRecipe smelting) {
-            out.writeByte(4); // Smelting
+            out.writeByte(4);
             writeIngredient(out, getSafeIngredient(smelting, 0), stringPool, stringMap);
             out.writeFloat(smelting.getExperience());
             out.writeInt(smelting.getCookingTime());
         } else if (recipe instanceof BlastingRecipe blasting) {
-            out.writeByte(5); // Blasting
+            out.writeByte(5);
             writeIngredient(out, getSafeIngredient(blasting, 0), stringPool, stringMap);
             out.writeFloat(blasting.getExperience());
             out.writeInt(blasting.getCookingTime());
         } else if (recipe instanceof SmokingRecipe smoking) {
-            out.writeByte(6); // Smoking
+            out.writeByte(6);
             writeIngredient(out, getSafeIngredient(smoking, 0), stringPool, stringMap);
             out.writeFloat(smoking.getExperience());
             out.writeInt(smoking.getCookingTime());
         } else if (recipe instanceof CampfireCookingRecipe campfire) {
-            out.writeByte(7); // Campfire
+            out.writeByte(7);
             writeIngredient(out, getSafeIngredient(campfire, 0), stringPool, stringMap);
             out.writeFloat(campfire.getExperience());
             out.writeInt(campfire.getCookingTime());
         } else if (recipe instanceof UpgradeRecipe smithing) {
-            out.writeByte(8); // Smithing
+            out.writeByte(8);
             writeIngredient(out, smithing.base, stringPool, stringMap);
             writeIngredient(out, smithing.addition, stringPool, stringMap);
         } else if (recipe instanceof com.kingodogo.buildscape.recipe.ConfettiConfigureRecipe) {
-            out.writeByte(11); // Confetti Configure
+            out.writeByte(11);
         } else if (recipe instanceof com.kingodogo.buildscape.recipe.ClearShulkerFiltersRecipe) {
-            out.writeByte(12); // Clear Shulker Filters
+            out.writeByte(12);
         } else {
             throw new IOException("Unsupported recipe class for BDRE cache: " + recipe.getClass().getName());
         }
@@ -424,7 +412,7 @@ public class BinaryRecipeCache {
 
         byte type = in.readByte();
         switch (type) {
-            case 1 -> { // Shaped
+            case 1 -> {
                 int width = in.readInt();
                 int height = in.readInt();
                 int ingSize = in.readInt();
@@ -434,7 +422,7 @@ public class BinaryRecipeCache {
                 }
                 return new ShapedRecipe(id, group, width, height, ingredients, result);
             }
-            case 2 -> { // Shapeless
+            case 2 -> {
                 int ingSize = in.readInt();
                 NonNullList<Ingredient> ingredients = NonNullList.create();
                 for (int i = 0; i < ingSize; i++) {
@@ -442,40 +430,40 @@ public class BinaryRecipeCache {
                 }
                 return new ShapelessRecipe(id, group, result, ingredients);
             }
-            case 3 -> { // Stonecutter
+            case 3 -> {
                 Ingredient ing = readIngredient(in, stringPool, ingredientCache);
                 return new StonecutterRecipe(id, group, ing, result);
             }
-            case 4 -> { // Smelting
+            case 4 -> {
                 Ingredient ing = readIngredient(in, stringPool, ingredientCache);
                 float xp = in.readFloat();
                 int cookTime = in.readInt();
                 return new SmeltingRecipe(id, group, ing, result, xp, cookTime);
             }
-            case 5 -> { // Blasting
+            case 5 -> {
                 Ingredient ing = readIngredient(in, stringPool, ingredientCache);
                 float xp = in.readFloat();
                 int cookTime = in.readInt();
                 return new BlastingRecipe(id, group, ing, result, xp, cookTime);
             }
-            case 6 -> { // Smoking
+            case 6 -> {
                 Ingredient ing = readIngredient(in, stringPool, ingredientCache);
                 float xp = in.readFloat();
                 int cookTime = in.readInt();
                 return new SmokingRecipe(id, group, ing, result, xp, cookTime);
             }
-            case 7 -> { // Campfire
+            case 7 -> {
                 Ingredient ing = readIngredient(in, stringPool, ingredientCache);
                 float xp = in.readFloat();
                 int cookTime = in.readInt();
                 return new CampfireCookingRecipe(id, group, ing, result, xp, cookTime);
             }
-            case 8 -> { // Smithing (UpgradeRecipe)
+            case 8 -> {
                 Ingredient base = readIngredient(in, stringPool, ingredientCache);
                 Ingredient addition = readIngredient(in, stringPool, ingredientCache);
                 return new UpgradeRecipe(id, base, addition, result);
             }
-            case 9 -> { // ShapedDurability
+            case 9 -> {
                 int width = in.readInt();
                 int height = in.readInt();
                 int ingSize = in.readInt();
@@ -486,7 +474,7 @@ public class BinaryRecipeCache {
                 return new com.kingodogo.buildscape.recipe.ShapedDurabilityRecipe(id, group, width, height, ingredients,
                         result, 1);
             }
-            case 10 -> { // ShapelessDurability
+            case 10 -> {
                 int ingSize = in.readInt();
                 NonNullList<Ingredient> ingredients = NonNullList.create();
                 for (int i = 0; i < ingSize; i++) {
@@ -494,10 +482,10 @@ public class BinaryRecipeCache {
                 }
                 return new com.kingodogo.buildscape.recipe.ShapelessDurabilityRecipe(id, group, result, ingredients, 1);
             }
-            case 11 -> { // ConfettiConfigure
+            case 11 -> {
                 return new com.kingodogo.buildscape.recipe.ConfettiConfigureRecipe(id);
             }
-            case 12 -> { // ClearShulkerFilters
+            case 12 -> {
                 return new com.kingodogo.buildscape.recipe.ClearShulkerFiltersRecipe(id);
             }
             default -> {

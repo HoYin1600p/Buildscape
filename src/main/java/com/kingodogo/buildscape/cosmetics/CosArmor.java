@@ -9,8 +9,6 @@ import net.minecraft.world.entity.Entity;
 
 import java.util.Map;
 
-//Base class for all custom body/armor cosmetics (Chest, Legs, Feet).
-//Handles multiple model parts (e.g. left arm, right arm, body).
 public abstract class CosArmor<T extends Entity> extends EntityModel<T> {
 
     protected final Map<String, ModelPart> parts;
@@ -27,7 +25,6 @@ public abstract class CosArmor<T extends Entity> extends EntityModel<T> {
 
     @Override
     public void setupAnim(T entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
-    // Default: static cosmetic that moves with bones
     }
 
     @Override
@@ -42,8 +39,6 @@ public abstract class CosArmor<T extends Entity> extends EntityModel<T> {
     }
 
 
-    //Optional: override this to apply custom transformations before rendering.
     public void applyTransform(PoseStack poseStack) {
-        // Default: no transform
     }
 }

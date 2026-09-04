@@ -32,11 +32,6 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
-/**
- * Lazily samples the baked block models that Minecraft is already using. The
- * catalog is rebuilt only after a resource reload and never exists on a
- * dedicated server.
- */
 @OnlyIn(Dist.CLIENT)
 public final class ClientBlockColorCatalog {
     private static final int MAX_SAMPLES_PER_AXIS = 32;
@@ -163,7 +158,6 @@ public final class ClientBlockColorCatalog {
                     int resolved = blockColors.getColor(state, null, null, quad.getTintIndex());
                     if (resolved != -1) tint = resolved & 0xFFFFFF;
                 } catch (RuntimeException ignored) {
-                    // Some modded tint handlers require a live level and position.
                 }
             }
             SpriteKey key = new SpriteKey(sprite.getName(), tint);

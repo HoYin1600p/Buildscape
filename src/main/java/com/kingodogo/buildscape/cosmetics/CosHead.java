@@ -7,10 +7,6 @@ import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 
-/**
- * Base class for all custom head cosmetics.
- * Extend this class and register it in CosmeticManager to add new custom head models.
- */
 public abstract class CosHead<T extends Entity> extends EntityModel<T> {
 
     protected final ModelPart root;
@@ -27,7 +23,6 @@ public abstract class CosHead<T extends Entity> extends EntityModel<T> {
 
     @Override
     public void setupAnim(T entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
-        // Default: static cosmetic
     }
 
     @Override
@@ -35,10 +30,6 @@ public abstract class CosHead<T extends Entity> extends EntityModel<T> {
         root.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
     }
 
-    /**
-     * Optional: override this to apply custom transformations before rendering.
-     */
     public void applyTransform(PoseStack poseStack) {
-        // Default: no transform
     }
 }

@@ -28,12 +28,6 @@ import java.util.UUID;
 @Mod.EventBusSubscriber(modid = "buildscape", bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class HollowLogCrawlHandler {
 
-    /**
-     * TOGGLE:
-     * - true: Uses the original forced Pose.SWIMMING behavior.
-     * - false (Default Test Environment): Uses the new dedicated custom crawl state (0.6x0.6 cavity hitbox)
-     *   without forcing Pose.SWIMMING on the player.
-     */
     public static boolean USE_FORCED_SWIM_POSE = false;
 
     private static final Set<UUID> FORCED_PLAYERS = Collections.synchronizedSet(new HashSet<>());
@@ -80,7 +74,6 @@ public class HollowLogCrawlHandler {
         boolean enteringLog = isPlayerEnteringHollowBlock(player, level);
 
         if (USE_FORCED_SWIM_POSE) {
-            // Option A: Original forced Pose.SWIMMING handler
             if (insideLog || enteringLog) {
                 player.setPose(Pose.SWIMMING);
                 player.setForcedPose(Pose.SWIMMING);
@@ -89,13 +82,11 @@ public class HollowLogCrawlHandler {
                 clearForcedPose(player);
             }
         } else {
-            // Option B: New Custom Crawl State for hollow logs & pipes
             if (insideLog || enteringLog) {
                 if (!CUSTOM_CRAWLING_PLAYERS.contains(player.getUUID())) {
                     CUSTOM_CRAWLING_PLAYERS.add(player.getUUID());
                     player.refreshDimensions();
                 }
-                // Maintain visual crawling pose naturally while inside cavity without forcedPose
                 if (player.getPose() != Pose.SWIMMING) {
                     player.setPose(Pose.SWIMMING);
                 }
@@ -157,9 +148,6 @@ public class HollowLogCrawlHandler {
         return false;
     }
 
-    /**
-     * Checks if the player's bounding box is physically inside a horizontal hollow log or pipe cavity (12x12 pixels gap).
-     */
     public static boolean isPlayerInsideHollowBlock(Player player, Level level) {
         AABB bb = player.getBoundingBox();
         int minX = Mth.floor(bb.minX);
@@ -247,9 +235,6 @@ public class HollowLogCrawlHandler {
         return false;
     }
 
-    /**
-     * Checks if the player is actively sneaking directly at an unobstructed horizontal opening (12x12 gap entrance).
-     */
     public static boolean isPlayerEnteringHollowBlock(Player player, Level level) {
         if (!player.isShiftKeyDown() && !player.isCrouching()) {
             return false;
@@ -271,7 +256,6 @@ public class HollowLogCrawlHandler {
                     mpos.set(x, y, z);
                     BlockState state = level.getBlockState(mpos);
 
-                    // Player must be at ground level facing the cavity opening, never standing on top of the roof
                     if (bb.minY < y - 0.25 || bb.minY > y + 0.6) {
                         continue;
                     }
@@ -318,25 +302,21 @@ public class HollowLogCrawlHandler {
                                 || axis != Direction.Axis.Y;
                         if (!hasHorizontal) continue;
 
-                        // Check West entrance
                         if ((state.getValue(HollowPipeBlock.WEST) || axis == Direction.Axis.X) && !isConnectingHollowEnd(level, mpos, Direction.WEST)) {
                             if (bb.minZ < z + 0.85 && bb.maxZ > z + 0.15 && bb.maxX >= x - 0.25 && bb.minX <= x + 0.25) {
                                 return true;
                             }
                         }
-                        // Check East entrance
                         if ((state.getValue(HollowPipeBlock.EAST) || axis == Direction.Axis.X) && !isConnectingHollowEnd(level, mpos, Direction.EAST)) {
                             if (bb.minZ < z + 0.85 && bb.maxZ > z + 0.15 && bb.minX <= x + 1.25 && bb.maxX >= x + 0.75) {
                                 return true;
                             }
                         }
-                        // Check North entrance
                         if ((state.getValue(HollowPipeBlock.NORTH) || axis == Direction.Axis.Z) && !isConnectingHollowEnd(level, mpos, Direction.NORTH)) {
                             if (bb.minX < x + 0.85 && bb.maxX > x + 0.15 && bb.maxZ >= z - 0.25 && bb.minZ <= z + 0.25) {
                                 return true;
                             }
                         }
-                        // Check South entrance
                         if ((state.getValue(HollowPipeBlock.SOUTH) || axis == Direction.Axis.Z) && !isConnectingHollowEnd(level, mpos, Direction.SOUTH)) {
                             if (bb.minX < x + 0.85 && bb.maxX > x + 0.15 && bb.minZ <= z + 1.25 && bb.maxZ >= z + 0.75) {
                                 return true;

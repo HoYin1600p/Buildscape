@@ -16,10 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
-/**
- * Applies nine client-computed ghost results. No items are created: the server
- * validates every registry id and the workbench result slots remain read-only.
- */
 public final class BuildersWorkbenchResultsPacket {
     private static final int RESULT_COUNT = 9;
 

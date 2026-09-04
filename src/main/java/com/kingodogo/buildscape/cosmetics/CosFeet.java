@@ -7,9 +7,6 @@ import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 
-/**
- * Base class for all custom feet (boots) cosmetics.
- */
 public abstract class CosFeet<T extends Entity> extends EntityModel<T> {
 
     protected final ModelPart leftFoot;

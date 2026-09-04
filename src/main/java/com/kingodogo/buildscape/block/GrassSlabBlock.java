@@ -114,7 +114,6 @@ public class GrassSlabBlock extends SlabBlock implements BonemealableBlock {
     @Override
     public void randomTick(BlockState state, ServerLevel level, BlockPos pos, Random random) {
         if (!canBeGrass(state, level, pos)) {
-            // Decay to Dirt Slab
             BlockState dirtSlabState = ModBlocks.DIRT_SLAB.get().defaultBlockState()
                     .setValue(TYPE, state.getValue(TYPE))
                     .setValue(WATERLOGGED, state.getValue(WATERLOGGED));

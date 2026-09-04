@@ -48,7 +48,6 @@ public abstract class AdvancementWidgetMixin {
     private static void buildscape$initIcons() {
         if (!buildscape$STEEL_BLOCK_ICONS.isEmpty()) return;
 
-        // Steel blocks cycle (One More Block - 100 blocks, non-flaming full cubes)
         buildscape$STEEL_BLOCK_ICONS.add(new ItemStack(ModItems.STEEL_BLOCK.get()));
         buildscape$STEEL_BLOCK_ICONS.add(new ItemStack(ModItems.SCRAPED_STEEL.get()));
         buildscape$STEEL_BLOCK_ICONS.add(new ItemStack(ModItems.RUSTIC_SCRAPED_STEEL.get()));
@@ -66,7 +65,6 @@ public abstract class AdvancementWidgetMixin {
         buildscape$STEEL_BLOCK_ICONS.add(new ItemStack(ModItems.BOLTED_STEEL_PILLAR.get()));
         buildscape$STEEL_BLOCK_ICONS.add(new ItemStack(ModItems.STEEL_FAN.get()));
 
-        // Tile blocks cycle (Okay, One More - 1,000 blocks, full cubes)
         buildscape$TILE_BLOCK_ICONS.add(new ItemStack(ModItems.WHITE_TILES.get()));
         buildscape$TILE_BLOCK_ICONS.add(new ItemStack(ModItems.ORANGE_TILES.get()));
         buildscape$TILE_BLOCK_ICONS.add(new ItemStack(ModItems.MAGENTA_TILES.get()));
@@ -84,7 +82,6 @@ public abstract class AdvancementWidgetMixin {
         buildscape$TILE_BLOCK_ICONS.add(new ItemStack(ModItems.RED_TILES.get()));
         buildscape$TILE_BLOCK_ICONS.add(new ItemStack(ModItems.BLACK_TILES.get()));
 
-        // Ashpen blocks cycle (Actually, One Last - 10,000 blocks, full cubes)
         buildscape$ASHPEN_BLOCK_ICONS.add(new ItemStack(ModItems.ASHPEN_WHITE_PLANKS.get()));
         buildscape$ASHPEN_BLOCK_ICONS.add(new ItemStack(ModItems.ORANGE_ASHPEN_PLANKS.get()));
         buildscape$ASHPEN_BLOCK_ICONS.add(new ItemStack(ModItems.MAGENTA_ASHPEN_PLANKS.get()));
@@ -106,7 +103,6 @@ public abstract class AdvancementWidgetMixin {
         buildscape$ASHPEN_BLOCK_ICONS.add(new ItemStack(ModItems.ASHPEN_WOOD.get()));
         buildscape$ASHPEN_BLOCK_ICONS.add(new ItemStack(ModItems.STRIPPED_ASHPEN_WOOD.get()));
 
-        // Bit Copper blocks cycle (One Last one, i promise - 100,000 blocks, full cubes)
         buildscape$BIT_COPPER_BLOCK_ICONS.add(new ItemStack(ModItems.BIT_COPPER_BLOCK.get()));
         buildscape$BIT_COPPER_BLOCK_ICONS.add(new ItemStack(ModItems.BIT_CUT_COPPER.get()));
         buildscape$BIT_COPPER_BLOCK_ICONS.add(new ItemStack(ModItems.BIT_CHISELED_COPPER.get()));
@@ -120,7 +116,6 @@ public abstract class AdvancementWidgetMixin {
         buildscape$BIT_COPPER_BLOCK_ICONS.add(new ItemStack(ModItems.BIT_OXIDIZED_CUT_COPPER.get()));
         buildscape$BIT_COPPER_BLOCK_ICONS.add(new ItemStack(ModItems.BIT_OXIDIZED_CHISELED_COPPER.get()));
 
-        // Spool cycle
         buildscape$SPOOL_ICONS.add(new ItemStack(ModItems.WHITE_SPOOL.get()));
         buildscape$SPOOL_ICONS.add(new ItemStack(ModItems.ORANGE_SPOOL.get()));
         buildscape$SPOOL_ICONS.add(new ItemStack(ModItems.MAGENTA_SPOOL.get()));
@@ -133,7 +128,6 @@ public abstract class AdvancementWidgetMixin {
         buildscape$SPOOL_ICONS.add(new ItemStack(ModItems.BLUE_SPOOL.get()));
         buildscape$SPOOL_ICONS.add(new ItemStack(ModItems.RED_SPOOL.get()));
 
-        // Wallpaper cycle
         buildscape$WALLPAPER_ICONS.add(new ItemStack(ModItems.WHITE_WALLPAPER.get()));
         buildscape$WALLPAPER_ICONS.add(new ItemStack(ModItems.ORANGE_WALLPAPER.get()));
         buildscape$WALLPAPER_ICONS.add(new ItemStack(ModItems.MAGENTA_WALLPAPER.get()));
@@ -145,7 +139,6 @@ public abstract class AdvancementWidgetMixin {
         buildscape$WALLPAPER_ICONS.add(new ItemStack(ModItems.PURPLE_WALLPAPER.get()));
         buildscape$WALLPAPER_ICONS.add(new ItemStack(ModItems.RED_WALLPAPER.get()));
 
-        // Froglight cycle
         buildscape$FROGLIGHT_ICONS.add(new ItemStack(ModBlocks.RUSSET_FROGLIGHT.get()));
         buildscape$FROGLIGHT_ICONS.add(new ItemStack(ModBlocks.TIDAL_FROGLIGHT.get()));
         buildscape$FROGLIGHT_ICONS.add(new ItemStack(ModBlocks.SCARLET_FROGLIGHT.get()));
@@ -153,7 +146,6 @@ public abstract class AdvancementWidgetMixin {
         buildscape$FROGLIGHT_ICONS.add(new ItemStack(ModBlocks.GLEAMING_FROGLIGHT.get()));
         buildscape$FROGLIGHT_ICONS.add(new ItemStack(ModBlocks.AZURE_FROGLIGHT.get()));
 
-        // Christmas cycle
         buildscape$CHRISTMAS_ICONS.add(new ItemStack(ModItems.FESTIVE_STOCKING.get()));
         buildscape$CHRISTMAS_ICONS.add(new ItemStack(ModItems.RED_ORNAMENT.get()));
         buildscape$CHRISTMAS_ICONS.add(new ItemStack(ModItems.MULTICOLOR_STRING_LIGHT.get()));

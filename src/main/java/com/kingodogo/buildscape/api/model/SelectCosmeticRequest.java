@@ -1,9 +1,5 @@
 package com.kingodogo.buildscape.api.model;
 
-/**
- * Request body for the secure select cosmetic endpoint.
- * POST /api/cosmetics
- */
 public class SelectCosmeticRequest {
     private String action;
     private String uuid;

@@ -19,7 +19,7 @@ public class PresetsWidget extends AbstractWidget {
 
     private int getPresetButtonHeight() {
         float scale = com.kingodogo.buildscape.client.screen.BuildScapeConfigScreen.getStandardTextScale();
-        return (int)(16 * scale); // Contract snug sizing fits
+        return (int)(16 * scale);
     }
 
     private List<PresetsConfig.Preset> presets;
@@ -33,7 +33,7 @@ public class PresetsWidget extends AbstractWidget {
     private final Consumer<String> onPresetApplied;
     private int scrollOffset = 0;
     private final CustomScrollbarRenderer scrollbarRenderer = new CustomScrollbarRenderer();
-    private int headerAreaHeight = 20; // Default fallback to 20
+    private int headerAreaHeight = 20;
 
     public void setHeaderAreaHeight(int height) {
         this.headerAreaHeight = height;
@@ -60,16 +60,12 @@ public class PresetsWidget extends AbstractWidget {
             }
         }
 
-        // Initialize applied preset key
         this.appliedPresetKey = config.getLastAppliedPreset();
         if (config.hasUnnamedPreset()) {
-            // If unamed preset exists, it might be the applied one if user just edited properties
-            // But strictly speaking, applied key is what was last applied.
         }
 
         int scaledSpacing = com.kingodogo.buildscape.client.screen.BuildScapeConfigScreen.scaleSize(10);
-        int buttonY = y + height - com.kingodogo.buildscape.client.screen.BuildScapeConfigScreen.scaleSize(40); // moved
-                                                                                                                // up
+        int buttonY = y + height - com.kingodogo.buildscape.client.screen.BuildScapeConfigScreen.scaleSize(40);
         int scaledButtonHeight = com.kingodogo.buildscape.client.screen.BuildScapeConfigScreen.getScaledButtonHeight();
         int buttonWidth = (width - scaledSpacing * 5) / 4;
 
@@ -190,8 +186,6 @@ public class PresetsWidget extends AbstractWidget {
         if (onPresetApplied != null) {
             onPresetApplied.accept("_unnamed");
         }
-        // Applying explicitly sets applied key? Or assume create implies user is working on it.
-        // Usually creating clears items so effectively we applied empty.
         appliedPresetKey = "_unnamed";
     }
 
@@ -222,7 +216,6 @@ public class PresetsWidget extends AbstractWidget {
 
         if (config.savePreset(key, name, itemConfig.items)) {
             selectedPresetKey = key;
-            // If we saved the unnamed preset (which was applied), update applied key to new key
             if ("_unnamed".equals(appliedPresetKey)) {
                 appliedPresetKey = key;
             }
@@ -282,7 +275,7 @@ public class PresetsWidget extends AbstractWidget {
                     );
                 }
                 if (selectedPresetKey.equals(appliedPresetKey)) {
-                    appliedPresetKey = "default"; // Fallback
+                    appliedPresetKey = "default";
                 }
                 selectedPresetKey = "default";
                 PresetsConfig.Preset defaultPreset = config.getPreset("default");
@@ -322,7 +315,6 @@ public class PresetsWidget extends AbstractWidget {
         nameEditBox.setEditable(key == null || !key.equals("default"));
     }
 
-    // Allow external update of applied key ensuring sync
     public void setAppliedPreset(String key) {
         this.appliedPresetKey = key;
     }
@@ -342,7 +334,6 @@ public class PresetsWidget extends AbstractWidget {
         int buttonYPos = y + height - bottomAreaHeight;
         int editBoxTop = nameEditBox != null ? nameEditBox.y : buttonYPos;
         int availableHeight = editBoxTop - presetY - 5;
-        // Approx 20+2 button height
         int maxVisiblePresets = Math.max(1, availableHeight / (getPresetButtonHeight() + PRESET_BUTTON_SPACING));
 
         double maxScroll = Math.max(0, presets.size() - maxVisiblePresets);
@@ -351,38 +342,22 @@ public class PresetsWidget extends AbstractWidget {
 
     public void updateChildPositions() {
         int scaledSpacing = com.kingodogo.buildscape.client.screen.BuildScapeConfigScreen.scaleSize(10);
-        int scaledButtonHeight = 20; // Fixed 20px for vanilla button assets
+        int scaledButtonHeight = 20;
 
-        // Calculate button width to fit 4 buttons with spacing
-        // But maybe we want them centered with a fixed width?
-        // Existing logic: int buttonWidth = (width - scaledSpacing * 5) / 4;
-        // Let's keep the width calculation but center the whole group if needed,
-        // or just ensure they fill the space nicely. The previous logic filled the width.
-        // If the user wants them centered, maybe they mean the text inside?
-        // "inside there respecitive boxes" -> sounds like text inside button.
-        // "centre algin the other buttons as well like create save and such" -> sounds like buttons themselves.
-        // The screenshot shows "Create Save Delete Apply" left aligned?
-        // No, the screenshot shows them spread out.
-        // Wait, current logic: `x + scaledSpacing`, `x + scaledSpacing * 2 + buttonWidth`...
-        // This spreads them out.
-        // Let's ensuring the *vertical* alignment is centered in the bottom area.
 
         int bottomAreaHeight = com.kingodogo.buildscape.client.screen.BuildScapeConfigScreen.scaleSize(22);
         int bottomAreaY = y + height - bottomAreaHeight;
-        // Center buttons vertically in the bottom area
         int buttonY = bottomAreaY + (bottomAreaHeight - scaledButtonHeight) / 2;
 
-        // Horizontal centering of the group:
         int buttonWidth = (width - scaledSpacing * 5) / 4;
-        // Calculate total width of the group
         int totalGroupWidth = (buttonWidth * 4) + (scaledSpacing * 3);
         int startX = x + (width - totalGroupWidth) / 2;
 
         if (nameEditBox != null) {
             int editBoxHeight = com.kingodogo.buildscape.client.screen.BuildScapeConfigScreen.getScaledEditBoxHeight();
-            int editBoxY = buttonY - editBoxHeight - 5; // moved up a bit more
+            int editBoxY = buttonY - editBoxHeight - 5;
             int editBoxWidth = width - com.kingodogo.buildscape.client.screen.BuildScapeConfigScreen.scaleSize(10);
-            nameEditBox.x = x + (width - editBoxWidth) / 2; // Center edit box too
+            nameEditBox.x = x + (width - editBoxWidth) / 2;
             nameEditBox.y = editBoxY;
             nameEditBox.setWidth(editBoxWidth);
         }
@@ -426,12 +401,11 @@ public class PresetsWidget extends AbstractWidget {
     @Override
     public void renderButton(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
 
-        // Draw border around panel (always)
         int borderColor = 0xFF666666;
-        fill(poseStack, x, y, x + width, y + 1, borderColor); // Top
-        fill(poseStack, x, y + height - 1, x + width, y + height, borderColor); // Bottom
-        fill(poseStack, x, y, x + 1, y + height, borderColor); // Left
-        fill(poseStack, x + width - 1, y, x + width, y + height, borderColor); // Right
+        fill(poseStack, x, y, x + width, y + 1, borderColor);
+        fill(poseStack, x, y + height - 1, x + width, y + height, borderColor);
+        fill(poseStack, x, y, x + 1, y + height, borderColor);
+        fill(poseStack, x + width - 1, y, x + width, y + height, borderColor);
 
         float textScale = com.kingodogo.buildscape.client.screen.BuildScapeConfigScreen.getStandardTextScale();
         poseStack.pushPose();
@@ -443,14 +417,11 @@ public class PresetsWidget extends AbstractWidget {
                 0xFFFFFF);
         poseStack.popPose();
 
-        // Separator line directly below title row - moved 1px down
         fill(poseStack, x, y + headerAreaHeight + 1, x + width, y + headerAreaHeight + 2, borderColor);
 
-        int presetY = y + headerAreaHeight + 5; // Added top padding gap
+        int presetY = y + headerAreaHeight + 5;
         int scaledSpacing = com.kingodogo.buildscape.client.screen.BuildScapeConfigScreen.scaleSize(10);
-        int buttonYPos = y + height - com.kingodogo.buildscape.client.screen.BuildScapeConfigScreen.scaleSize(22); // Lift
-                                                                                                                   // buttons
-                                                                                                                   // up
+        int buttonYPos = y + height - com.kingodogo.buildscape.client.screen.BuildScapeConfigScreen.scaleSize(22);
         int editBoxTop = nameEditBox != null ? nameEditBox.y : buttonYPos;
         int availableHeight = editBoxTop - (y + headerAreaHeight);
         int buttonHeight = getPresetButtonHeight();
@@ -472,7 +443,6 @@ public class PresetsWidget extends AbstractWidget {
             if (buttonY + buttonHeight >= editBoxTop) {
                 break;
             }
-            // Hover check: x + 5 to width - 16 (scrollbar area)
             boolean isHovered = mouseX >= x + 5 && mouseX < x + width - 16
                     &&
                     mouseY >= buttonY && mouseY < buttonY + buttonHeight;
@@ -496,16 +466,12 @@ public class PresetsWidget extends AbstractWidget {
                 displayName = truncated + "...";
             }
 
-            // Text Color Logic:
-            // Selected -> Light Red (0xFFFF5555)
-            // Applied (and not selected) -> Green (0xFF55FF55)
-            // Else -> White (0xFFFFFF)
 
             int textColor = 0xFFFFFF;
             if (isSelected) {
-                textColor = 0xFFFF5555; // Light Red
+                textColor = 0xFFFF5555;
             } else if (isApplied) {
-                textColor = 0xFF55FF55; // Light Green
+                textColor = 0xFF55FF55;
             }
 
             poseStack.pushPose();
@@ -521,7 +487,7 @@ public class PresetsWidget extends AbstractWidget {
         }
 
         if (presets.size() > maxVisiblePresets) {
-            int scrollbarX = x + width - CustomScrollbarRenderer.getScrollbarWidth() - 4; // 4px form edge
+            int scrollbarX = x + width - CustomScrollbarRenderer.getScrollbarWidth() - 4;
             int scrollbarHeight = editBoxTop - presetY - 5;
             int scrollbarY = presetY;
 
@@ -542,7 +508,7 @@ public class PresetsWidget extends AbstractWidget {
 
         if (showCreateOptions) {
             poseStack.pushPose();
-            poseStack.translate(0, 0, 500); // render on top
+            poseStack.translate(0, 0, 500);
             int bgX = createDefaultBtn.x - 2;
             int bgY = createEmptyBtn.y - 2;
             int bgW = createDefaultBtn.getWidth() + 4;
@@ -563,10 +529,8 @@ public class PresetsWidget extends AbstractWidget {
             return false;
         }
 
-        int presetY = y + headerAreaHeight + 5; // Top padding gap
-        int buttonYPos = y + height - com.kingodogo.buildscape.client.screen.BuildScapeConfigScreen.scaleSize(22); // Lift
-                                                                                                                    // buttons
-                                                                                                                    // up
+        int presetY = y + headerAreaHeight + 5;
+        int buttonYPos = y + height - com.kingodogo.buildscape.client.screen.BuildScapeConfigScreen.scaleSize(22);
         int editBoxTop = nameEditBox != null ? nameEditBox.y : buttonYPos;
         int availableHeight = editBoxTop - (y + headerAreaHeight);
         int buttonHeight = getPresetButtonHeight();
@@ -574,12 +538,12 @@ public class PresetsWidget extends AbstractWidget {
 
         double maxScroll = Math.max(0, presets.size() - maxVisiblePresets);
         if (maxScroll > 0) {
-            int scrollbarX = x + width - CustomScrollbarRenderer.getScrollbarWidth() - 4; // 4px form edge
+            int scrollbarX = x + width - CustomScrollbarRenderer.getScrollbarWidth() - 4;
             int scrollbarY = presetY;
             int scrollbarHeight = editBoxTop - presetY - 5;
             int contentX = x + 5;
             int contentY = presetY;
-            int contentWidth = width - 21; // width - 16 - 5
+            int contentWidth = width - 21;
             int contentHeight = scrollbarHeight;
 
             double visibleRatio = maxVisiblePresets / (double) presets.size();
@@ -615,7 +579,6 @@ public class PresetsWidget extends AbstractWidget {
         if (showCreateOptions) {
             if (createDefaultBtn.mouseClicked(mouseX, mouseY, button)) return true;
             if (createEmptyBtn.mouseClicked(mouseX, mouseY, button)) return true;
-            // hide options if clicked elsewhere
             showCreateOptions = false;
         }
 
@@ -640,10 +603,8 @@ public class PresetsWidget extends AbstractWidget {
             return false;
         }
 
-        int presetY = y + headerAreaHeight + 5; // Top padding gap
-        int buttonYPos = y + height - com.kingodogo.buildscape.client.screen.BuildScapeConfigScreen.scaleSize(22); // Lift
-                                                                                                                   // buttons
-                                                                                                                   // up
+        int presetY = y + headerAreaHeight + 5;
+        int buttonYPos = y + height - com.kingodogo.buildscape.client.screen.BuildScapeConfigScreen.scaleSize(22);
         int editBoxTop = nameEditBox != null ? nameEditBox.y : buttonYPos;
         int availableHeight = editBoxTop - (y + headerAreaHeight);
         int buttonHeight = getPresetButtonHeight();
@@ -656,10 +617,8 @@ public class PresetsWidget extends AbstractWidget {
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
         if (scrollbarRenderer.isDragging() && button == 0) {
-            int presetY = y + headerAreaHeight + 5; // Top padding gap
-            int buttonYPos = y + height - com.kingodogo.buildscape.client.screen.BuildScapeConfigScreen.scaleSize(22); // Lift
-                                                                                                                       // buttons
-                                                                                                                       // up
+            int presetY = y + headerAreaHeight + 5;
+            int buttonYPos = y + height - com.kingodogo.buildscape.client.screen.BuildScapeConfigScreen.scaleSize(22);
             int editBoxTop = nameEditBox != null ? nameEditBox.y : buttonYPos;
             int availableHeight = editBoxTop - (y + headerAreaHeight);
             int buttonHeight = getPresetButtonHeight();

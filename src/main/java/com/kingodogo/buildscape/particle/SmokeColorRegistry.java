@@ -4,10 +4,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-/**
- * Stores pending smoke colors keyed by spawn position.
- * Not client-only so SmokeVentBlock can reference it without dist-cleaner issues.
- */
 public class SmokeColorRegistry {
 
     private static final Map<String, ColorEntry> POSITION_COLOR_MAP = new ConcurrentHashMap<>();

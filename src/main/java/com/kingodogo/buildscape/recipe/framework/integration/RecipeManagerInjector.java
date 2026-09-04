@@ -11,10 +11,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Injects compiled BDRE recipes into Minecraft's RecipeManager internal map structures.
- * Guarantees compatibility with Crafting Tables, Furnaces, Stonecutters, Network Sync, and JEI.
- */
 public class RecipeManagerInjector {
 
     private static Field recipesField;
@@ -60,7 +56,6 @@ public class RecipeManagerInjector {
                 return;
             }
 
-            // Create mutable maps if unmodifiable
             Map<RecipeType<?>, Map<ResourceLocation, Recipe<?>>> mutableRecipesMap = new HashMap<>(recipesMap);
             Map<ResourceLocation, Recipe<?>> mutableByNameMap = new HashMap<>(byNameMap);
 
@@ -80,7 +75,6 @@ public class RecipeManagerInjector {
                 injectedCount++;
             }
 
-            // Set back internal maps
             recipesField.set(recipeManager, mutableRecipesMap);
             byNameField.set(recipeManager, mutableByNameMap);
 

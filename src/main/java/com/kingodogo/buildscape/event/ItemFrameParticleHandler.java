@@ -80,7 +80,6 @@ public class ItemFrameParticleHandler {
         net.minecraft.world.entity.Entity entity = event.getEntity();
         if (entity instanceof ItemFrame itemFrame) {
             CompoundTag data = itemFrame.getPersistentData();
-            // Always register if it has custom data, otherwise just ensure it's tracked
             com.kingodogo.buildscape.config.PillarIdManager.get().registerItemFrame(itemFrame);
         } else if (entity instanceof com.kingodogo.buildscape.entity.ColoredItemFrameEntity coloredFrame) {
             CompoundTag data = coloredFrame.getPersistentData();
@@ -94,12 +93,10 @@ public class ItemFrameParticleHandler {
 
         net.minecraft.world.entity.Entity entity = event.getEntity();
         if (entity instanceof ItemFrame || entity instanceof com.kingodogo.buildscape.entity.ColoredItemFrameEntity) {
-            // Get the frame ID and remove from manager
             CompoundTag data = entity.getPersistentData();
             String frameId = data.getString("BuildScapeFrameId");
             if (frameId != null && !frameId.isEmpty()) {
                 com.kingodogo.buildscape.config.PillarIdManager.get().removePillar(frameId);
-                // Clear client caches for this entity
                 clearCaches(entity.getId());
             }
         }
@@ -109,14 +106,11 @@ public class ItemFrameParticleHandler {
     public static void onEntityInteract(
             PlayerInteractEvent.EntityInteract event
     ) {
-        // Support both vanilla ItemFrame and our ColoredItemFrameEntity
         if (!(event.getTarget() instanceof ItemFrame) &&
                 !(event.getTarget() instanceof com.kingodogo.buildscape.entity.ColoredItemFrameEntity)) {
             return;
         }
 
-        // ColoredItemFrameEntity extends HangingEntity, not ItemFrame
-        // So we need to handle it separately
         if (event.getTarget() instanceof com.kingodogo.buildscape.entity.ColoredItemFrameEntity) {
             handleColoredItemFrameInteraction(event);
             return;
@@ -133,8 +127,6 @@ public class ItemFrameParticleHandler {
                     heldItem
             );
             if (dyeInfo != null) {
-                // Remove dyeing interaction as requested.
-                // We only allow adding particle colors.
                 String dyeColor = dyeInfo.getKey();
                 String dyeName = dyeInfo.getValue();
 
@@ -255,7 +247,6 @@ public class ItemFrameParticleHandler {
         PillarParticleConfig cfg = PillarParticleConfig.get();
 
         for (net.minecraft.world.entity.Entity entity : level.entitiesForRendering()) {
-            // Handle vanilla ItemFrame
             if (entity instanceof ItemFrame itemFrame) {
                 if (itemFrame.getItem().isEmpty()) {
                     continue;
@@ -278,7 +269,6 @@ public class ItemFrameParticleHandler {
 
                 spawnItemFrameParticles(level, itemFrame, pattern, cfg, gameTime);
             }
-            // Handle ColoredItemFrameEntity
             else if (entity instanceof com.kingodogo.buildscape.entity.ColoredItemFrameEntity coloredFrame) {
                 if (coloredFrame.getItem().isEmpty()) {
                     continue;
@@ -415,10 +405,9 @@ public class ItemFrameParticleHandler {
                     vw = Math.sin(bElevation) * speed * 1.5;
                     break;
                 case "snowflake":
-                    // Snowflake pattern: Reverse of beam pattern
                     u = (rand.nextDouble() - 0.5) * spread * 0.3;
                     v = (rand.nextDouble() - 0.5) * spread * 0.3;
-                    w = 2.0; // Fixed 2 blocks far
+                    w = 2.0;
                     vu = (rand.nextDouble() - 0.5) * speed * 0.2;
                     vv = (rand.nextDouble() - 0.5) * speed * 0.2;
                     vw = -speed * (0.8 + rand.nextDouble() * 0.4);
@@ -445,13 +434,11 @@ public class ItemFrameParticleHandler {
             double particleY = centerY + sy;
             double particleZ = centerZ + sz;
 
-            // Determine particle type and color queuing based on pattern
             boolean isSnowflake = "snowflake".equals(pattern);
             SimpleParticleType particleType = isSnowflake
                     ? ModParticles.SNOWFLAKE_STILL.get()
                     : ModParticles.GLOW_LIME_SPARKLE.get();
 
-            // Only queue color for non-snowflake particles
             if (!isSnowflake) {
                 String colorCode = getNextColor(itemFrame, cfg);
                 com.kingodogo.buildscape.particle.PillarSparkleParticle.queueColor(
@@ -482,7 +469,6 @@ public class ItemFrameParticleHandler {
             java.util.List<String> cached = CLIENT_COLOR_CACHE.get(itemFrame.getId());
             if (cached != null) return cached;
 
-            // 1. Check direct NBT on the entity (immediate response)
             CompoundTag data = itemFrame.getPersistentData();
             if (data.contains(PARTICLE_COLORS_KEY)) {
                 java.util.List<String> colors = new java.util.ArrayList<>();
@@ -494,7 +480,6 @@ public class ItemFrameParticleHandler {
                 return colors;
             }
 
-            // 2. Check synced MANAGER data (fallback for persistence)
             String frameId = getFrameId(itemFrame);
             if (frameId != null && !frameId.startsWith("F-????")) {
                 com.kingodogo.buildscape.config.PillarIdManager.PillarData managerData =
@@ -583,7 +568,6 @@ public class ItemFrameParticleHandler {
             String cached = CLIENT_PATTERN_CACHE.get(itemFrame.getId());
             if (cached != null) return cached;
 
-            // 1. Check direct NBT on the entity (immediate response on rejoin)
             CompoundTag data = itemFrame.getPersistentData();
             if (data.contains(PARTICLE_PATTERN_KEY)) {
                 String pattern = data.getString(PARTICLE_PATTERN_KEY);
@@ -593,7 +577,6 @@ public class ItemFrameParticleHandler {
                 }
             }
 
-            // 2. Fallback to PillarIdManager data synced from server
             String frameId = getFrameId(itemFrame);
             if (frameId != null && !frameId.startsWith("F-????")) {
                 com.kingodogo.buildscape.config.PillarIdManager.PillarData managerData =
@@ -622,7 +605,6 @@ public class ItemFrameParticleHandler {
             CompoundTag data = itemFrame.getPersistentData();
             data.putString(PARTICLE_PATTERN_KEY, pattern);
 
-            // Generate ID if missing during pattern set
             if (!data.contains(FRAME_ID_KEY)) {
                 String frameId = generateFrameId();
                 data.putString(FRAME_ID_KEY, frameId);
@@ -737,22 +719,15 @@ public class ItemFrameParticleHandler {
             String cached = CLIENT_FRAME_ID_CACHE.get(itemFrame.getId());
             if (cached != null && !cached.equals("F-????")) return cached;
 
-            // Fallback to position-based identification on client
             String dimension = com.kingodogo.buildscape.config.PillarIdManager.getDimensionKey(itemFrame.level);
             net.minecraft.core.BlockPos pos = itemFrame.blockPosition();
             net.minecraft.core.Direction dir = itemFrame.getDirection();
 
-            // 1. Exact match (pos + direction)
             String exactKey = com.kingodogo.buildscape.config.PillarIdManager.get().positionKey(dimension, pos, dir);
             String idFromPos = com.kingodogo.buildscape.config.PillarIdManager.get().getIdForPosition(exactKey);
 
-            // 2. Fallback: If exact match fails, check if we're waiting for entity sync (dir might be wrong)
             if (idFromPos == null) {
-                // Try to find any frame ID at this exact position if there's no direction-specific index yet
-                // or if the direction is currently default (SOUTH) but the frame is actually on a side.
-                // NOTE: We only do this on the client during initial identification.
                 String fuzzyKey = com.kingodogo.buildscape.config.PillarIdManager.get().positionKey(dimension, pos, null);
-                // ID for position without direction might return a pillar, so we must verify it's a frame ID if found
                 String potentialId = com.kingodogo.buildscape.config.PillarIdManager.get().getIdForPosition(fuzzyKey);
                 if (potentialId != null && potentialId.startsWith(FRAME_PREFIX)) {
                     idFromPos = potentialId;
@@ -781,23 +756,15 @@ public class ItemFrameParticleHandler {
 
 
     private static String generateFrameId() {
-        // Use a more unique ID including coordinate hash to avoid session collisions
         return FRAME_PREFIX + Long.toHexString(Double.doubleToLongBits(Math.random())).substring(8, 12).toUpperCase();
     }
 
-    /**
-     * Generate a frame ID with color code for colored item frames.
-     * Format: I-F[COLOR]nnnn where COLOR is like W, LB, R, etc. and nnnn is 4 hex digits
-     */
     private static String generateColoredFrameId(String colorVariant) {
         String colorCode = getColorCode(colorVariant);
         String randomPart = Long.toHexString(Double.doubleToLongBits(Math.random())).substring(8, 12).toUpperCase();
         return "I-F" + colorCode + randomPart;
     }
 
-    /**
-     * Convert color name to short code.
-     */
     private static String getColorCode(String colorName) {
         if (colorName == null || colorName.isEmpty()) return "W";
         switch (colorName.toLowerCase()) {
@@ -853,7 +820,6 @@ public class ItemFrameParticleHandler {
         COLOR_COUNTERS.clear();
     }
 
-    // ========== ColoredItemFrameEntity Support ==========
 
     private static void handleColoredItemFrameInteraction(
             PlayerInteractEvent.EntityInteract event
@@ -868,8 +834,6 @@ public class ItemFrameParticleHandler {
         if (!heldItem.isEmpty() && !player.isShiftKeyDown()) {
             java.util.Map.Entry<String, String> dyeInfo = getDyeColorAndName(heldItem);
             if (dyeInfo != null) {
-                // Remove re-dyeing interaction as requested.
-                // We only allow adding particle colors.
                 String dyeColor = dyeInfo.getKey();
                 String dyeName = dyeInfo.getValue();
 
@@ -961,14 +925,12 @@ public class ItemFrameParticleHandler {
             if (cached != null) {
                 return cached;
             }
-            // Fallback: Check synchronized data for our custom frame
             String pattern = frame.getParticlePattern();
             if (pattern != null && !pattern.isEmpty() && !"none".equals(pattern)) {
                 CLIENT_PATTERN_CACHE.put(frame.getId(), pattern);
                 return pattern;
             }
 
-            // Fallback to PillarIdManager data synced from server
             String frameId = getFrameIdColored(frame);
             if (frameId != null && !frameId.startsWith("F-????")) {
                 com.kingodogo.buildscape.config.PillarIdManager.PillarData managerData =
@@ -988,7 +950,6 @@ public class ItemFrameParticleHandler {
             String p = data.getString(PARTICLE_PATTERN_KEY);
             return (p == null || p.isEmpty()) ? "none" : p;
         }
-        // Also check PATTERN tag from NBT (for /give commands)
         if (data.contains("PATTERN", 8)) {
             String p = data.getString("PATTERN");
             return (p == null || p.isEmpty()) ? "none" : p;
@@ -1017,7 +978,6 @@ public class ItemFrameParticleHandler {
             java.util.List<String> cached = CLIENT_COLOR_CACHE.get(frame.getId());
             if (cached != null) return cached;
 
-            // 1. Check direct NBT on the entity (immediate response)
             CompoundTag data = frame.getPersistentData();
             if (data.contains(PARTICLE_COLORS_KEY)) {
                 java.util.List<String> colors = new java.util.ArrayList<>();
@@ -1029,7 +989,6 @@ public class ItemFrameParticleHandler {
                 return colors;
             }
 
-            // 2. Check synchronized data for our custom frame
             String colorsStr = frame.getParticleColorsRaw();
             if (colorsStr != null && !colorsStr.isEmpty()) {
                 java.util.List<String> synchronizedColors = new java.util.ArrayList<>(java.util.Arrays.asList(colorsStr.split(";")));
@@ -1039,7 +998,6 @@ public class ItemFrameParticleHandler {
                 }
             }
 
-            // 3. Check synced MANAGER data (fallback for persistence)
             String frameId = getFrameIdColored(frame);
 
             return new java.util.ArrayList<>();
@@ -1098,16 +1056,13 @@ public class ItemFrameParticleHandler {
             String cached = CLIENT_FRAME_ID_CACHE.get(frame.getId());
             if (cached != null && !cached.equals("F-????")) return cached;
 
-            // Fallback to position-based identification on client
             String dimension = com.kingodogo.buildscape.config.PillarIdManager.getDimensionKey(frame.level);
             net.minecraft.core.BlockPos pos = frame.blockPosition();
             net.minecraft.core.Direction dir = frame.getDirection();
 
-            // 1. Exact match (pos + direction)
             String exactKey = com.kingodogo.buildscape.config.PillarIdManager.get().positionKey(dimension, pos, dir);
             String idFromPos = com.kingodogo.buildscape.config.PillarIdManager.get().getIdForPosition(exactKey);
 
-            // 2. Fallback: If exact match fails, check if we're waiting for entity sync
             if (idFromPos == null) {
                 String fuzzyKey = com.kingodogo.buildscape.config.PillarIdManager.get().positionKey(dimension, pos, null);
                 String potentialId = com.kingodogo.buildscape.config.PillarIdManager.get().getIdForPosition(fuzzyKey);
@@ -1130,7 +1085,6 @@ public class ItemFrameParticleHandler {
             if (id != null && !id.isEmpty()) return id;
         }
 
-        // Generate ID with color code for colored frames
         String colorVariant = frame.getColorVariant();
         String frameId = generateColoredFrameId(colorVariant);
         data.putString(FRAME_ID_KEY, frameId);
@@ -1290,10 +1244,9 @@ public class ItemFrameParticleHandler {
                     vw = Math.sin(bElevation) * speed;
                     break;
                 case "snowflake":
-                    // Snowflake pattern: Reverse of beam pattern
                     u = (rand.nextDouble() - 0.5) * spread * 0.3;
                     v = (rand.nextDouble() - 0.5) * spread * 0.3;
-                    w = 2.0; // Fixed 2 blocks far
+                    w = 2.0;
                     vu = (rand.nextDouble() - 0.5) * speed * 0.2;
                     vv = (rand.nextDouble() - 0.5) * speed * 0.2;
                     vw = -speed * (0.8 + rand.nextDouble() * 0.4);
@@ -1320,13 +1273,11 @@ public class ItemFrameParticleHandler {
             double particleY = centerY + sy;
             double particleZ = centerZ + sz;
 
-            // Determine particle type and color queuing based on pattern
             boolean isSnowflake = "snowflake".equals(pattern);
             SimpleParticleType particleType = isSnowflake
-                    ? ModParticles.SNOWFLAKE_STILL.get() // Use no-gravity version
+                    ? ModParticles.SNOWFLAKE_STILL.get()
                     : ModParticles.GLOW_LIME_SPARKLE.get();
 
-            // Only queue color for non-snowflake particles
             if (!isSnowflake) {
                 String colorCode = getNextColorColored(coloredFrame, cfg);
                 com.kingodogo.buildscape.particle.PillarSparkleParticle.queueColor(

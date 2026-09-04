@@ -138,7 +138,6 @@ public class PillarSparkleParticle extends TextureSheetParticle {
     protected float getU0() {
         float u0 = this.baseSprite.getU0();
         float u1 = this.baseSprite.getU1();
-        // Crop 2% from the left to remove potential halos
         return u0 + (u1 - u0) * 0.02F;
     }
 
@@ -146,7 +145,6 @@ public class PillarSparkleParticle extends TextureSheetParticle {
     protected float getU1() {
         float u0 = this.baseSprite.getU0();
         float u1 = this.baseSprite.getU1();
-        // Crop 2% from the right to remove potential halos
         return u1 - (u1 - u0) * 0.02F;
     }
 
@@ -156,7 +154,6 @@ public class PillarSparkleParticle extends TextureSheetParticle {
         float minV = this.currentFrame * frameHeight;
         float v0 = this.baseSprite.getV0();
         float v1 = this.baseSprite.getV1();
-        // Crop 2% of the frame height from the top
         return v0 + (v1 - v0) * (minV + frameHeight * 0.02F);
     }
 
@@ -166,7 +163,6 @@ public class PillarSparkleParticle extends TextureSheetParticle {
         float maxV = (this.currentFrame + 1) * frameHeight;
         float v0 = this.baseSprite.getV0();
         float v1 = this.baseSprite.getV1();
-        // Crop 2% of the frame height from the bottom
         return v0 + (v1 - v0) * (maxV - frameHeight * 0.02F);
     }
 

@@ -19,12 +19,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
 
-/**
- * Memoizes material resolution for Buildscape model instances during one
- * resource reload. New model objects naturally invalidate the cache.
- *
- * @author hoyin1600p
- */
 @Mixin(BlockModel.class)
 public abstract class BuildscapeBlockModelMixin {
     @Shadow

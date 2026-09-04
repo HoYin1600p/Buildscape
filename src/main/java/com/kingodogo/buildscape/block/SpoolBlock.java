@@ -72,7 +72,6 @@ public class SpoolBlock extends RotatedPillarBlock {
 
             return speedMultiplier / destroySpeed / 30.0F;
         } else {
-            // Hand/other tools: mine fast as well
             speedMultiplier = 2.5F;
             return speedMultiplier / destroySpeed / 100.0F;
         }
@@ -114,7 +113,6 @@ public class SpoolBlock extends RotatedPillarBlock {
                 float[] rgb = dyeColor.getTextureDiffuseColors();
                 return new Vector3f(rgb[0], rgb[1], rgb[2]);
             } catch (IllegalArgumentException e) {
-                // fallback if color not found in enum
             }
         }
         if (path.endsWith("_spool")) {
@@ -130,7 +128,6 @@ public class SpoolBlock extends RotatedPillarBlock {
                 float[] rgb = dyeColor.getTextureDiffuseColors();
                 return new Vector3f(rgb[0], rgb[1], rgb[2]);
             } catch (IllegalArgumentException e) {
-                // fallback if color not found in enum
             }
         }
         if (path.equals("spool")) {

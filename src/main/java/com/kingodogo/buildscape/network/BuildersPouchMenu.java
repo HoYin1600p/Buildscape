@@ -21,8 +21,6 @@ import java.util.List;
 public class BuildersPouchMenu extends AbstractContainerMenu implements GhostFilterMenu {
     private static final int POUCH_SLOTS = BuildersPouchItem.SLOT_COUNT;
 
-    // Item positions read off builders_pouch_ui.png; the slot frames are baked into
-    // that sheet, so these must match it exactly or the items sit off-centre.
     private static final int POUCH_X = 14;
     private static final int POUCH_Y = 21;
     private static final int INV_X = 14;

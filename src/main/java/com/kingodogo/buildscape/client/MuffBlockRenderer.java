@@ -41,7 +41,6 @@ public class MuffBlockRenderer {
             return;
         }
 
-        // Only render when holding the muff block in offhand
         if (!mc.player.getOffhandItem().is(ModItems.MUFF_BLOCK.get())) {
             return;
         }
@@ -61,13 +60,11 @@ public class MuffBlockRenderer {
 
         poseStack.pushPose();
 
-        // Offset relative to camera
         double offsetX = -cameraPos.x;
         double offsetY = -cameraPos.y;
         double offsetZ = -cameraPos.z;
 
         VertexConsumer buffer = bufferSource.getBuffer(RenderType.lines());
-        // Cyan color: R=0, G=220, B=255, A=180
         int color = (0 << 24) | (220 << 16) | (255 << 8) | 180;
 
         for (BlockPos pos : activeMuffs) {
@@ -94,20 +91,16 @@ public class MuffBlockRenderer {
                 double maxY = pos.getY() + 0.5 + radius + offsetY;
                 double maxZ = pos.getZ() + 0.5 + radius + offsetZ;
 
-                // Draw the 12 edges of the bounding box
-                // Bottom face (4 edges)
                 drawLine(buffer, poseStack, minX, minY, minZ, maxX, minY, minZ, color);
                 drawLine(buffer, poseStack, maxX, minY, minZ, maxX, minY, maxZ, color);
                 drawLine(buffer, poseStack, maxX, minY, maxZ, minX, minY, maxZ, color);
                 drawLine(buffer, poseStack, minX, minY, maxZ, minX, minY, minZ, color);
 
-                // Top face (4 edges)
                 drawLine(buffer, poseStack, minX, maxY, minZ, maxX, maxY, minZ, color);
                 drawLine(buffer, poseStack, maxX, maxY, minZ, maxX, maxY, maxZ, color);
                 drawLine(buffer, poseStack, maxX, maxY, maxZ, minX, maxY, maxZ, color);
                 drawLine(buffer, poseStack, minX, maxY, maxZ, minX, maxY, minZ, color);
 
-                // Vertical edges (4 edges)
                 drawLine(buffer, poseStack, minX, minY, minZ, minX, maxY, minZ, color);
                 drawLine(buffer, poseStack, maxX, minY, minZ, maxX, maxY, minZ, color);
                 drawLine(buffer, poseStack, maxX, minY, maxZ, maxX, maxY, maxZ, color);

@@ -14,9 +14,6 @@ import net.minecraft.world.item.crafting.*;
 
 import java.util.*;
 
-/**
- * Main compilation engine that converts intermediate category IR into native Minecraft Recipe objects.
- */
 public class BuildScapeRecipeCompiler {
 
     private final AliasResolver aliasResolver = new AliasResolver();
@@ -37,13 +34,10 @@ public class BuildScapeRecipeCompiler {
             return new CompileResult(compiledRecipes, 0, 0);
         }
 
-        // Phase 1: Register Aliases
         aliasResolver.registerAliases(pack.aliases());
 
-        // Phase 2: Register Templates
         templateEngine.registerTemplates(pack.templates());
 
-        // Phase 3: Family Expansion
         int familyCount = 0;
         if (pack.families() != null) {
             for (RecipeIR.FamilySpec family : pack.families()) {
@@ -62,7 +56,6 @@ public class BuildScapeRecipeCompiler {
             }
         }
 
-        // Phase 4: Direct Recipes
         int directCount = 0;
         if (pack.recipes() != null) {
             for (RecipeIR.RecipeSpec spec : pack.recipes()) {

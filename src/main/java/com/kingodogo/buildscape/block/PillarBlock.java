@@ -98,12 +98,10 @@ public class PillarBlock
             }
         }
 
-        // Only stack with regular PillarBlocks, NOT AshenKingPillars (they're independent)
         boolean hasAbove = above.getBlock() instanceof PillarBlock && !(above.getBlock() instanceof AshenKingPillarBlock);
         boolean hasBelow = below.getBlock() instanceof PillarBlock && !(below.getBlock() instanceof AshenKingPillarBlock);
 
         if (!level.isClientSide) {
-            // Only transfer items from stacked regular pillars, NOT AshenKingPillars
             BlockState belowState = level.getBlockState(pos.below());
             BlockState aboveState = level.getBlockState(pos.above());
 
@@ -181,7 +179,6 @@ public class PillarBlock
         if (direction == Direction.UP || direction == Direction.DOWN) {
             BlockState below = level.getBlockState(pos.below());
             BlockState above = level.getBlockState(pos.above());
-            // Only stack with regular PillarBlocks, NOT AshenKingPillars (they're independent)
             boolean hasAbove = above.getBlock() instanceof PillarBlock && !(above.getBlock() instanceof AshenKingPillarBlock);
             boolean hasBelow = below.getBlock() instanceof PillarBlock && !(below.getBlock() instanceof AshenKingPillarBlock);
 
@@ -223,12 +220,9 @@ public class PillarBlock
     ) {
 
         if (!level.isClientSide) {
-            // First, handle stack enforcement and syncing BEFORE applying NBT data
-            // This ensures the pillar is in the correct state before we add the custom item
             enforceSingleItemPerStack(level, pos);
             syncNewPillarWithStack(level, pos);
 
-            // Now apply NBT data from the placed item (ITEM and PATTERN tags)
             BlockEntity be = level.getBlockEntity(pos);
             if (be instanceof PillarBlockEntity pillarBE) {
                 Float storedYaw = PLACING_PLAYER_YAW.get();
@@ -239,8 +233,7 @@ public class PillarBlock
 
                 net.minecraft.nbt.CompoundTag storedNBT = PLACING_NBT_DATA.get();
                 if (storedNBT != null) {
-                    // Read ITEM tag and set displayed item
-                    if (storedNBT.contains("ITEM", 8)) { // 8 = String type
+                    if (storedNBT.contains("ITEM", 8)) {
                         String itemId = storedNBT.getString("ITEM");
                         try {
                             net.minecraft.resources.ResourceLocation itemLocation =
@@ -252,12 +245,10 @@ public class PillarBlock
                                 pillarBE.setDisplayedItem(displayItem);
                             }
                         } catch (Exception e) {
-                            // Invalid item ID, ignore
                         }
                     }
 
-                    // Read PATTERN tag and set particle pattern
-                    if (storedNBT.contains("PATTERN", 8)) { // 8 = String type
+                    if (storedNBT.contains("PATTERN", 8)) {
                         String pattern = storedNBT.getString("PATTERN");
                         pillarBE.setParticlePattern(pattern);
                     }
@@ -265,7 +256,6 @@ public class PillarBlock
                     PLACING_NBT_DATA.set(null);
                     pillarBE.setChanged();
 
-                    // Send block update to sync to clients
                     level.sendBlockUpdated(pos, state, state, 3);
                 }
             }
@@ -599,7 +589,6 @@ public class PillarBlock
             if (!level.isClientSide) {
                 BlockState below = level.getBlockState(pos.below());
                 BlockState above = level.getBlockState(pos.above());
-                // Only stack with regular PillarBlocks, NOT AshenKingPillars (they're independent)
                 boolean hasAbove = above.getBlock() instanceof PillarBlock && !(above.getBlock() instanceof AshenKingPillarBlock);
                 boolean hasBelow = below.getBlock() instanceof PillarBlock && !(below.getBlock() instanceof AshenKingPillarBlock);
 
@@ -639,14 +628,11 @@ public class PillarBlock
         if (!level.isClientSide) {
             com.kingodogo.buildscape.config.PillarIdManager.get().getOrCreatePillarData(level, pos);
 
-            // Store NBT data in ThreadLocal to be applied in onPlace (after the block is fully initialized)
             if (stack.hasTag()) {
                 net.minecraft.nbt.CompoundTag tag = stack.getTag();
-                // Check for direct NBT tags (from /give command)
                 if (tag.contains("ITEM", 8) || tag.contains("PATTERN", 8)) {
                     PLACING_NBT_DATA.set(tag.copy());
                 }
-                // Check for BlockEntityTag (from /fill command or middle-click with NBT)
                 else if (tag.contains("BlockEntityTag", 10)) {
                     net.minecraft.nbt.CompoundTag beTag = tag.getCompound("BlockEntityTag");
                     if (beTag.contains("ITEM", 8) || beTag.contains("PATTERN", 8)) {
@@ -661,14 +647,12 @@ public class PillarBlock
     public ItemStack getCloneItemStack(BlockState state, net.minecraft.world.phys.HitResult target, BlockGetter level, BlockPos pos, Player player) {
         ItemStack stack = super.getCloneItemStack(state, target, level, pos, player);
 
-        // Only add custom NBT data if the player is sneaking (Creative middle-click behavior)
         if (player != null && player.isShiftKeyDown()) {
             BlockEntity be = level.getBlockEntity(pos);
             if (be instanceof PillarBlockEntity pillarBE) {
                 boolean hasCustomData = false;
                 net.minecraft.nbt.CompoundTag beTag = new net.minecraft.nbt.CompoundTag();
 
-                // Write ITEM tag if the pillar has a displayed item
                 if (pillarBE.hasDisplayItem()) {
                     ItemStack displayedItem = pillarBE.getDisplayedItem();
                     if (!displayedItem.isEmpty()) {
@@ -681,14 +665,12 @@ public class PillarBlock
                     }
                 }
 
-                // Write PATTERN tag if the pillar has a pattern
                 String pattern = pillarBE.getParticlePattern();
                 if (pattern != null && !pattern.isEmpty()) {
                     beTag.putString("PATTERN", pattern);
                     hasCustomData = true;
                 }
 
-                // Only add BlockEntityTag if we have custom data
                 if (hasCustomData) {
                     net.minecraft.nbt.CompoundTag tag = stack.getOrCreateTag();
                     tag.put("BlockEntityTag", beTag);
@@ -987,8 +969,6 @@ public class PillarBlock
                 com.kingodogo.buildscape.config.PillarParticleConfig cfg =
                         com.kingodogo.buildscape.config.PillarParticleConfig.get();
                 if (cfg.use_pattern && cfg.pattern != null) {
-                    // Intentionally removed: blockEntity.setParticlePattern(cfg.pattern);
-                    // This allows untouched pillars to naturally inherit future global pattern changes.
                 }
             }
 
@@ -1035,7 +1015,6 @@ public class PillarBlock
         ItemStack firstItem = ItemStack.EMPTY;
         BlockPos current = bottom;
 
-        // Only iterate through regular PillarBlocks, NOT AshenKingPillars
         while (level.getBlockState(current).getBlock() instanceof PillarBlock &&
                !(level.getBlockState(current).getBlock() instanceof AshenKingPillarBlock)) {
             BlockEntity be = level.getBlockEntity(current);
@@ -1066,7 +1045,6 @@ public class PillarBlock
         }
 
         current = bottom;
-        // Only iterate through regular PillarBlocks, NOT AshenKingPillars
         while (level.getBlockState(current).getBlock() instanceof PillarBlock &&
                !(level.getBlockState(current).getBlock() instanceof AshenKingPillarBlock)) {
             if (!current.equals(top)) {
@@ -1089,7 +1067,6 @@ public class PillarBlock
 
     private BlockPos findBottomBlock(Level level, BlockPos pos) {
         BlockPos current = pos;
-        // Stop at AshenKingPillars - they're not part of regular pillar stacks
         while (level.getBlockState(current.below()).getBlock() instanceof PillarBlock &&
                !(level.getBlockState(current.below()).getBlock() instanceof AshenKingPillarBlock)) {
             current = current.below();
@@ -1099,7 +1076,6 @@ public class PillarBlock
 
     private BlockPos findTopBlock(Level level, BlockPos pos) {
         BlockPos current = pos;
-        // Stop at AshenKingPillars - they're not part of regular pillar stacks
         while (level.getBlockState(current.above()).getBlock() instanceof PillarBlock &&
                !(level.getBlockState(current.above()).getBlock() instanceof AshenKingPillarBlock)) {
             current = current.above();

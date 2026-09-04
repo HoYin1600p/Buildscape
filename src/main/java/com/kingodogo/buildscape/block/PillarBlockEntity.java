@@ -78,15 +78,12 @@ public class PillarBlockEntity extends BlockEntity {
     private long lastParticleTick = 0L;
     private String particlePattern = null;
 
-    // Per-pillar pattern settings (null means use global config)
     private Double patternSpeed = null;
     private Double patternSpread = null;
     private Double patternIntensity = null;
-    // Compiled pattern for hex colour validation — avoids re-compiling the regex
-    // on every call to getParticleColor().
     private static final java.util.regex.Pattern HEX_COLOR_PATTERN = java.util.regex.Pattern
             .compile("^#[0-9A-Fa-f]{6}$");
-    private Integer maxParticleColor = null; // Max number of colors for this pillar (1-5, null means use global config)
+    private Integer maxParticleColor = null;
 
     private String pillarId = null;
 
@@ -96,13 +93,8 @@ public class PillarBlockEntity extends BlockEntity {
 
     private int particleColorCounter = 0;
 
-    /**
-     * Monotonically increasing version counter: incremented on every color/pattern
-     * change so that syncColorsFromManager() can skip its O(n) list-equality
-     * walk when nothing has changed since the last sync.
-     */
     private int colorsVersion = 0;
-    private final int lastSyncedColorsVersion = -1; // version at last successful sync
+    private final int lastSyncedColorsVersion = -1;
 
     private static final int MAX_SYNC_ATTEMPTS = 5;
 
@@ -136,8 +128,8 @@ public class PillarBlockEntity extends BlockEntity {
         super(ModBlockEntities.PILLAR_BLOCK_ENTITY.get(), pos, state);
     }
 
-    private static final int SYNC_INTERVAL = 100; // Sync every 100 ticks (5 seconds) — colors/patterns change rarely
-    private Boolean usePattern = null; // PER-PILLAR OVERRIDE for cfg.use_pattern
+    private static final int SYNC_INTERVAL = 100;
+    private Boolean usePattern = null;
 
     public static void clientTick(
             net.minecraft.world.level.Level level,
@@ -232,13 +224,10 @@ public class PillarBlockEntity extends BlockEntity {
                 pattern = cfg.pattern != null ? cfg.pattern : "ring";
             }
 
-            // Handle "none" pattern - no particles
             if ("none".equals(pattern)) {
-                return null; // Return null to skip particle spawning
+                return null;
             }
 
-            // Use pillar-specific pattern settings if available, otherwise use global
-            // config
             double patternSpeed = be.patternSpeed != null ? be.patternSpeed : cfg.pattern_speed;
             double patternIntensity = be.patternIntensity != null ? be.patternIntensity : cfg.pattern_intensity;
             double patternSpread = be.patternSpread != null ? be.patternSpread : cfg.pattern_spread;
@@ -307,16 +296,15 @@ public class PillarBlockEntity extends BlockEntity {
                     size = 0.5f;
                     break;
                 case "snowflake":
-                    // Snowflake pattern: spawn particles 2 blocks above, falling down like rain
                     double sfAngle = rand.nextDouble() * 2.0 * Math.PI;
                     double sfRadius = rand.nextDouble() * spread;
                     sx = Math.cos(sfAngle) * sfRadius;
-                    sy = 2.0; // 2 blocks above the pillar
+                    sy = 2.0;
                     sz = Math.sin(sfAngle) * sfRadius;
-                    vx = (rand.nextDouble() - 0.5) * speed * 0.1; // Slight horizontal drift
-                    vy = -speed * 0.3; // Falling down
-                    vz = (rand.nextDouble() - 0.5) * speed * 0.1; // Slight horizontal drift
-                    size = 0.3f; // Smaller particles for snowflakes
+                    vx = (rand.nextDouble() - 0.5) * speed * 0.1;
+                    vy = -speed * 0.3;
+                    vz = (rand.nextDouble() - 0.5) * speed * 0.1;
+                    size = 0.3f;
                     break;
                 default:
                     sx = (rand.nextDouble() - 0.5) * spread;
@@ -328,7 +316,6 @@ public class PillarBlockEntity extends BlockEntity {
                     break;
             }
         } else {
-            // When use_pattern is false, default to ring pattern
             double rAngle = ((i * 2.0 * Math.PI) / count) + (time * 0.05);
             double rRadius = cfg.particle_spread * 0.8;
             sx = Math.cos(rAngle) * rRadius;
@@ -377,8 +364,6 @@ public class PillarBlockEntity extends BlockEntity {
 
         PillarIdManager manager = PillarIdManager.get();
 
-        // IMPORTANT: Don't sync until manager has loaded
-        // Otherwise, patterns loaded from NBT might be overwritten
         if (!manager.hasLoaded()) {
             return;
         }
@@ -406,7 +391,6 @@ public class PillarBlockEntity extends BlockEntity {
         if (data != null) {
             boolean needsUpdate = false;
 
-            // Sync pattern
             String managerPattern = data.pattern;
             if (managerPattern != null && !managerPattern.isEmpty()) {
                 boolean validPattern = false;
@@ -423,7 +407,6 @@ public class PillarBlockEntity extends BlockEntity {
                 }
             }
 
-            // Sync pattern settings
             if (data.pattern_speed != null
                     && (this.patternSpeed == null || !this.patternSpeed.equals(data.pattern_speed))) {
                 this.patternSpeed = data.pattern_speed;
@@ -493,16 +476,12 @@ public class PillarBlockEntity extends BlockEntity {
     @Override
     public void onLoad() {
         super.onLoad();
-        // Force manager to load when block entity loads to ensure removal detection
-        // works immediately
         if (level != null && !level.isClientSide) {
             PillarIdManager manager = PillarIdManager.get();
             try {
                 manager.load();
-                // Register this pillar with the manager to ensure it's tracked in the GUI
                 manager.registerPillar(this);
             } catch (Exception e) {
-                // Ignore errors during load, recovery will handle it
             }
         }
     }
@@ -517,7 +496,6 @@ public class PillarBlockEntity extends BlockEntity {
                     getBlockState(),
                     3);
 
-            // Sync with manager
             if (this.pillarId != null) {
                 PillarIdManager.get().updateDisplayedItem(this.pillarId, stack.isEmpty() ? null
                         : net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(stack.getItem()).toString());
@@ -527,7 +505,6 @@ public class PillarBlockEntity extends BlockEntity {
                     PillarIdManager.get().updateDisplayedItem(stackId, stack.isEmpty() ? null
                             : net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(stack.getItem()).toString());
                 } else if (!stack.isEmpty()) {
-                    // Force registration of newly placed pillar stack when an item is added
                     PillarIdManager.get().updateDisplayedItemByPosition(level, worldPosition,
                             net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(stack.getItem()).toString());
                 }
@@ -540,13 +517,10 @@ public class PillarBlockEntity extends BlockEntity {
             BlockPos pos,
             BlockState state,
             PillarBlockEntity be) {
-        // Sync colors and pattern from manager periodically.
-        // Both syncs share the same chunk-validity / manager-ready guards,
-        // so we merge them into a single if-block to halve that overhead.
         be.syncTickCounter++;
         if (be.syncTickCounter >= SYNC_INTERVAL) {
             be.syncTickCounter = 0;
-            be.syncBothFromManager(); // single combined sync — avoids duplicate guard checks
+            be.syncBothFromManager();
         }
     }
 
@@ -564,7 +538,6 @@ public class PillarBlockEntity extends BlockEntity {
                     getBlockState(),
                     3);
 
-            // Sync with manager
             if (this.pillarId != null) {
                 PillarIdManager.get().updateDisplayedItem(this.pillarId, stack.isEmpty() ? null
                         : net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(stack.getItem()).toString());
@@ -574,7 +547,6 @@ public class PillarBlockEntity extends BlockEntity {
                     PillarIdManager.get().updateDisplayedItem(stackId, stack.isEmpty() ? null
                             : net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(stack.getItem()).toString());
                 } else if (!stack.isEmpty()) {
-                    // Force registration of newly placed pillar stack when an item is added
                     PillarIdManager.get().updateDisplayedItemByPosition(level, worldPosition,
                             net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(stack.getItem()).toString());
                 }
@@ -582,17 +554,10 @@ public class PillarBlockEntity extends BlockEntity {
         }
     }
 
-    /**
-     * Combined server-side sync: runs the expensive guard checks ONCE and then
-     * syncs both colors and pattern in a single pass.
-     * This replaces the previous pattern of calling syncColorsFromManager() and
-     * syncPatternFromManager() sequentially, which duplicated every guard.
-     */
     private void syncBothFromManager() {
         if (level == null || level.isClientSide)
             return;
 
-        // ── Shared guard block ───────────────────────────────────────────
         if (level.getServer() == null ||
                 !level.getServer().isRunning() ||
                 !com.kingodogo.buildscape.BuildScape.isServerFullyInitialized()) {
@@ -616,7 +581,6 @@ public class PillarBlockEntity extends BlockEntity {
         if (!manager.hasLoaded())
             return;
 
-        // Resolve the pillar ID once
         String expectedPrefix = PillarIdManager.getVariantPrefix(level, worldPosition);
         String idToSync = (this.pillarId != null && !this.pillarId.isEmpty())
                 ? this.pillarId
@@ -629,7 +593,6 @@ public class PillarBlockEntity extends BlockEntity {
         PillarIdManager.PillarData data = manager.getPillarData(idToSync);
         boolean changed = false;
 
-        // ── Sync colors ───────────────────────────────────────────────
         if (data != null && data.hasColors()) {
             java.util.List<String> managerColors = data.getColors();
             boolean colorsDiffer = (this.particleColors == null ||
@@ -638,7 +601,6 @@ public class PillarBlockEntity extends BlockEntity {
                     managerColors.size() != this.particleColors.size());
 
             if (!colorsDiffer) {
-                // Fine-grained compare only when sizes match
                 for (int i = 0; i < managerColors.size(); i++) {
                     String mc = managerColors.get(i), cc = this.particleColors.get(i);
                     if (mc == null || !mc.equals(cc)) {
@@ -659,7 +621,6 @@ public class PillarBlockEntity extends BlockEntity {
             }
         }
 
-        // ── Sync pattern ──────────────────────────────────────────────
         if (data != null) {
             String managerPattern = data.pattern;
             if (managerPattern != null && !managerPattern.isEmpty()) {
@@ -675,12 +636,10 @@ public class PillarBlockEntity extends BlockEntity {
                     changed = true;
                 }
             } else if (this.particlePattern != null) {
-                // Manager pattern is null - reset to follow global
                 this.particlePattern = null;
                 changed = true;
             }
 
-            // Sync pattern settings
             if (data.pattern_speed != null
                     && (this.patternSpeed == null || !this.patternSpeed.equals(data.pattern_speed))) {
                 this.patternSpeed = data.pattern_speed;
@@ -757,27 +716,21 @@ public class PillarBlockEntity extends BlockEntity {
         }
 
         PillarIdManager manager = PillarIdManager.get();
-        // Always orient to bottom for ID consistency
         BlockPos bottomPos = findStackBottom();
         PillarIdManager.PillarData data = manager.getOrCreatePillarData(level, bottomPos);
 
         if (data != null) {
-            // Sync all world state (item, type, etc.) alongside the pattern update
             manager.syncPatternSettingsFromNBT(this, data);
             data.pattern = pattern;
             data.modifiedTime = System.currentTimeMillis();
-            manager.saveImmediate(); // This triggers immediate broadcast to all clients
+            manager.saveImmediate();
         }
     }
 
     public void cycleParticlePattern() {
         PillarParticleConfig cfg = PillarParticleConfig.get();
-        String currentPattern = getParticlePattern(); // Returns null for new/default pillars
+        String currentPattern = getParticlePattern();
 
-        // If current pattern is null (default fallback state), we want to start cycling
-        // FROM the default
-        // So the first click will set it to the first pattern after "default" in the
-        // array.
         if (currentPattern == null) {
             currentPattern = "default";
         }
@@ -845,14 +798,9 @@ public class PillarBlockEntity extends BlockEntity {
             return;
         }
 
-        // Allow sync even if colors exist - this enables updates from config GUI
-        // Only skip if we're already synced and nothing changed
-        // (Original behavior preserved for performance, but now allows forced updates)
 
         PillarIdManager manager = PillarIdManager.get();
 
-        // IMPORTANT: Don't sync (or clear colors) until manager has loaded
-        // Otherwise, colors loaded from NBT will be cleared before manager loads
         if (!manager.hasLoaded()) {
             return;
         }
@@ -895,13 +843,10 @@ public class PillarBlockEntity extends BlockEntity {
             if (this.pillarId == null || this.pillarId.isEmpty()) {
                 shouldSync = true;
             } else if (!this.pillarId.equals(idToSync)) {
-                // ID changed, need to sync
                 shouldSync = true;
             } else if (this.particleColors == null || this.particleColors.isEmpty()) {
-                // No colors but manager has them
                 shouldSync = true;
             } else {
-                // Check if colors have changed by comparing lists
                 if (managerColors.size() != this.particleColors.size()) {
                     shouldSync = true;
                 } else {
@@ -931,27 +876,18 @@ public class PillarBlockEntity extends BlockEntity {
                         3);
             }
         } else {
-            // Data is null - pillar ID was removed from manager OR doesn't exist yet
-            // IMPORTANT: NEVER clear colors that exist in NBT
-            // Colors loaded from NBT are the source of truth for rendering
-            // Only sync colors TO manager if they exist in NBT
             if (this.pillarId != null && this.pillarId.equals(idToSync) &&
                     this.particleColors != null && !this.particleColors.isEmpty()) {
-                // Colors exist in NBT but manager doesn't have them - sync TO manager
                 BlockPos bottomPos = findStackBottom();
                 PillarIdManager.PillarData newData = manager.getPillarDataByPosition(level, bottomPos);
                 if (newData == null) {
-                    // Create new data entry at bottom position
                     newData = manager.getOrCreatePillarData(level, bottomPos);
                 }
-                // If the ID matches, sync colors FROM NBT TO manager
                 if (newData != null && newData.id.equals(idToSync)) {
-                    // Only sync if manager doesn't have colors or has different colors
                     boolean needsSync = false;
                     if (!newData.hasColors()) {
                         needsSync = true;
                     } else {
-                        // Check if colors differ
                         java.util.List<String> managerColors = newData.getColors();
                         if (managerColors.size() != this.particleColors.size()) {
                             needsSync = true;
@@ -968,22 +904,15 @@ public class PillarBlockEntity extends BlockEntity {
                     }
 
                     if (needsSync) {
-                        // Sync colors FROM NBT TO manager
                         newData.clearColors();
                         for (String color : this.particleColors) {
                             if (color != null && !color.isEmpty()) {
                                 newData.addColor(color);
                             }
                         }
-                        // Don't save immediately during sync - let recovery or explicit saves handle it
-                        // Log sync only for debugging
-                        // System.out.println("BuildScape: Synced " + this.particleColors.size() +
-                        // " colors from NBT to manager for " + idToSync);
                     }
                 }
             }
-            // DO NOT clear colors here - colors loaded from NBT are preserved
-            // Only the reset handler should clear colors
         }
     }
 
@@ -999,7 +928,7 @@ public class PillarBlockEntity extends BlockEntity {
             }
         }
 
-        return null; // Signals fallback to global config
+        return null;
     }
 
     public void setParticlePattern(String pattern) {
@@ -1008,7 +937,6 @@ public class PillarBlockEntity extends BlockEntity {
         if (level != null && !level.isClientSide) {
             propagatePatternToStack(pattern);
 
-            // Update the pattern in PillarIdManager config
             updatePatternInConfig(pattern);
 
             level.sendBlockUpdated(
@@ -1228,11 +1156,8 @@ public class PillarBlockEntity extends BlockEntity {
 
         if (level != null && !level.isClientSide) {
             PillarIdManager manager = PillarIdManager.get();
-            // Important: always orient to foundation for ID consistency
             BlockPos bottomPos = findStackBottom();
 
-            // Use manager's consolidated dyeing logic which also syncs current world
-            // properties (item/type)
             String stackId = manager.addDyeColor(level, bottomPos, normalizedColor);
 
             if (stackId != null) {
@@ -1256,7 +1181,6 @@ public class PillarBlockEntity extends BlockEntity {
         this.lastParticleTick = 0;
         this.colorsInitialized = true;
 
-        // Auto-update maxParticleColor to match current color count
         int currentColorCount = this.particleColors.size();
         if (this.maxParticleColor == null || this.maxParticleColor < currentColorCount) {
             this.maxParticleColor = Math.min(currentColorCount, MAX_DYE_COLORS);
@@ -1326,13 +1250,6 @@ public class PillarBlockEntity extends BlockEntity {
         return null;
     }
 
-    /**
-     * Resets the pillar to default appearance (freshly placed state).
-     * Clears all custom particle colors, patterns, and settings.
-     * Removes the pillar ID association completely.
-     * Keeps the displayed item intact.
-     * This is called when a pillar ID is removed from the manager.
-     */
     public Boolean getUsePattern() {
         return usePattern;
     }
@@ -1461,7 +1378,6 @@ public class PillarBlockEntity extends BlockEntity {
                 this.particleColors = null;
                 this.colorsInitialized = false;
             } else {
-                // Colors are set, mark as initialized to prevent re-dyeing
                 this.colorsInitialized = true;
             }
         }
@@ -1491,47 +1407,34 @@ public class PillarBlockEntity extends BlockEntity {
         this.patternSpread = null;
         this.patternIntensity = null;
         this.usePattern = null;
-        this.pillarId = null; // Remove pillar ID association - make it freshly placed
+        this.pillarId = null;
         this.particleColorCounter = 0;
         this.colorsInitialized = false;
-        this.lastParticleTick = 0L; // Reset particle tick to restart particle effects immediately
+        this.lastParticleTick = 0L;
 
-        // Mark as changed so NBT is saved
-        // When saveAdditional is called, it won't write null fields, effectively
-        // removing them from NBT
         this.setChanged();
 
-        // Force immediate save and sync
         if (level != null && !level.isClientSide) {
-            // Mark chunk as needing save - this ensures NBT is written with cleared values
             if (level.getChunkAt(worldPosition) != null) {
                 level.getChunkAt(worldPosition).setUnsaved(true);
             }
 
-            // Force block update to sync changes to clients immediately
-            // This sends the update packet which includes the cleared NBT
             BlockState state = getBlockState();
             level.sendBlockUpdated(worldPosition, state, state, 3);
         }
     }
 
-    /**
-     * Synchronizes ALL settings from PillarData to this block entity.
-     * This includes colors, pattern, speed, spread, and intensity.
-     */
     public void syncFromData(PillarIdManager.PillarData data) {
         if (data == null)
             return;
 
         boolean changed = false;
 
-        // Sync ID
         if (this.pillarId == null || !this.pillarId.equals(data.id)) {
             this.pillarId = data.id;
             changed = true;
         }
 
-        // Sync colors
         if (data.hasColors()) {
             java.util.List<String> newColors = data.getColors();
             if (this.particleColors == null || this.particleColors.size() != newColors.size()) {
@@ -1560,7 +1463,6 @@ public class PillarBlockEntity extends BlockEntity {
             changed = true;
         }
 
-        // Sync pattern
         if (data.pattern != null && !data.pattern.equals(this.particlePattern)) {
             this.particlePattern = data.pattern;
             changed = true;
@@ -1569,7 +1471,6 @@ public class PillarBlockEntity extends BlockEntity {
             changed = true;
         }
 
-        // Sync use_pattern override
         if (data.use_pattern != null && (!data.use_pattern.equals(this.usePattern))) {
             this.usePattern = data.use_pattern;
             changed = true;
@@ -1578,7 +1479,6 @@ public class PillarBlockEntity extends BlockEntity {
             changed = true;
         }
 
-        // Sync settings
         if (data.pattern_speed != null && (!data.pattern_speed.equals(this.patternSpeed))) {
             this.patternSpeed = data.pattern_speed;
             changed = true;
@@ -1635,7 +1535,6 @@ public class PillarBlockEntity extends BlockEntity {
                 ItemStack loaded = ItemStack.of(tag.getCompound("DisplayedItem"));
                 this.displayedItem = loaded == null ? ItemStack.EMPTY : loaded;
             }
-            // Handle ITEM tag from /fill or /give commands (custom NBT format)
             else if (tag.contains("ITEM", 8)) {
                 String itemId = tag.getString("ITEM");
                 try {
@@ -1671,7 +1570,6 @@ public class PillarBlockEntity extends BlockEntity {
                 this.particlePattern = null;
             }
         }
-        // Handle PATTERN tag from /fill or /give commands (custom NBT format)
         else if (tag.contains("PATTERN", 8)) {
             this.particlePattern = tag.getString("PATTERN");
             boolean valid = false;
@@ -1688,7 +1586,6 @@ public class PillarBlockEntity extends BlockEntity {
             this.particlePattern = null;
         }
 
-        // Load pattern settings
         if (tag.contains("PatternSpeed", 6)) {
             this.patternSpeed = tag.getDouble("PatternSpeed");
         } else {
@@ -1750,13 +1647,10 @@ public class PillarBlockEntity extends BlockEntity {
         if (tag.contains("ColorsInitialized", 1)) {
             this.colorsInitialized = tag.getBoolean("ColorsInitialized");
         } else {
-            // Default: colors are initialized if they exist
             this.colorsInitialized = (this.particleColors != null &&
                     !this.particleColors.isEmpty());
         }
 
-        // If we have colors loaded from NBT, ensure colorsInitialized is true
-        // This prevents re-dyeing after world reload
         if (this.particleColors != null && !this.particleColors.isEmpty() && !this.colorsInitialized) {
             this.colorsInitialized = true;
         }
@@ -1837,7 +1731,7 @@ public class PillarBlockEntity extends BlockEntity {
         this.colorsInitialized = true;
         this.particleColorCounter = 0;
         this.lastParticleTick = 0;
-        this.colorsVersion++; // notify syncer that data changed
+        this.colorsVersion++;
 
         this.setChanged();
 
@@ -1906,10 +1800,6 @@ public class PillarBlockEntity extends BlockEntity {
     }
 
     private static class ClientParticleHelper {
-        // ── Particle reflection cache ───────────────────────────────────
-        // Look up the providers map and the internal ParticleEngine.add() once per
-        // particle type rather than on every spawn tick. Keyed by particle type so
-        // both GLOW_LIME_SPARKLE and SNOWFLAKE each get their own cached provider.
         private static final java.util.concurrent.ConcurrentHashMap<net.minecraft.core.particles.ParticleType<?>, net.minecraft.client.particle.ParticleProvider<?>> CACHED_PROVIDERS = new java.util.concurrent.ConcurrentHashMap<>();
         private static volatile java.lang.reflect.Method CACHED_ADD_METHOD = null;
         private static volatile boolean REFLECTION_INIT_DONE = false;
@@ -1926,7 +1816,6 @@ public class PillarBlockEntity extends BlockEntity {
                 double centerY,
                 double centerZ) {
 
-            // Get pattern to determine particle type
             String pattern = be.getParticlePattern();
             if (pattern == null) {
                 pattern = cfg.pattern != null ? cfg.pattern : "ring";
@@ -1952,7 +1841,6 @@ public class PillarBlockEntity extends BlockEntity {
                     double particleY = centerY + data.sy;
                     double particleZ = centerZ + data.sz;
 
-                    // Only queue color for non-snowflake particles
                     if (!isSnowflake) {
                         String colorCode = be.getParticleColor(cfg);
                         com.kingodogo.buildscape.particle.PillarSparkleParticle.queueColor(
@@ -1983,7 +1871,6 @@ public class PillarBlockEntity extends BlockEntity {
 
             net.minecraft.client.particle.ParticleEngine particleEngine = mc.particleEngine;
 
-            // ── Cached reflection lookup (runs at most once per particle type) ───────
             if (!REFLECTION_INIT_DONE) {
                 try {
                     java.lang.reflect.Method addM = net.minecraft.client.particle.ParticleEngine.class
@@ -2027,7 +1914,6 @@ public class PillarBlockEntity extends BlockEntity {
                 double particleY = centerY + data.sy;
                 double particleZ = centerZ + data.sz;
 
-                // Only queue color for non-snowflake particles
                 if (!isSnowflake) {
                     String colorCode = be.getParticleColor(cfg);
 

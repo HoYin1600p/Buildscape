@@ -57,7 +57,6 @@ public class WrenchClientHandler {
         BlockState state = mc.level.getBlockState(pos);
         if (state.isAir()) return;
 
-        // Cancel default outline box
         event.setCanceled(true);
 
         PoseStack poseStack = event.getPoseStack();
@@ -72,7 +71,6 @@ public class WrenchClientHandler {
             MultiBufferSource bufferSource = event.getMultiBufferSource();
             AABB bounds = shape.bounds();
 
-            // Render glowing highlight box around block
             renderGlowingOutline(poseStack, bufferSource, bounds);
         }
 
@@ -82,13 +80,11 @@ public class WrenchClientHandler {
     private static void renderGlowingOutline(PoseStack poseStack, MultiBufferSource bufferSource, AABB box) {
         VertexConsumer lines = bufferSource.getBuffer(RenderType.lines());
 
-        // Bright copper glowing outline (R=1.0, G=0.6, B=0.1)
         float r = 1.0f;
         float g = 0.6f;
         float b = 0.1f;
         float a = 1.0f;
 
-        // Base bounding box
         LevelRenderer.renderLineBox(
                 poseStack, lines,
                 box.minX, box.minY, box.minZ,
@@ -96,7 +92,6 @@ public class WrenchClientHandler {
                 r, g, b, a
         );
 
-        // Slightly inflated outer glow line for vibrant visual feedback
         AABB inflated = box.inflate(0.003);
         LevelRenderer.renderLineBox(
                 poseStack, lines,

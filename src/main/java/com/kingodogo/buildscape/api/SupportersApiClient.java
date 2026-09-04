@@ -64,7 +64,6 @@ public class SupportersApiClient {
 
         long timeSinceLastRequest = now - lastTime;
         if (timeSinceLastRequest < RATE_LIMIT_MS) {
-            // Suppressed debug log to prevent render loop spam
             return false;
         }
 
@@ -218,14 +217,6 @@ public class SupportersApiClient {
         return getRequest("/supporters/tiers", TiersResponse.class);
     }
 
-    /**
-     * Authenticate with the secure API using Minecraft session credentials.
-     * This is the new secure authentication method that verifies the access token with Mojang.
-     *
-     * @param uuid        The player's UUID
-     * @param accessToken The player's Minecraft access token
-     * @return CompletableFuture with AuthenticateResponse containing cosmetic data
-     */
     public CompletableFuture<AuthenticateResponse> authenticate(String uuid, String accessToken) {
         if (uuid == null || uuid.isEmpty()) {
             return CompletableFuture.failedFuture(new IllegalArgumentException("UUID cannot be null or empty"));
@@ -235,14 +226,11 @@ public class SupportersApiClient {
             return CompletableFuture.failedFuture(new IllegalArgumentException("Access token cannot be null or empty"));
         }
 
-        // Sanitize inputs
         String sanitizedUuid = sanitizeInput(uuid);
         String sanitizedToken = sanitizeInput(accessToken);
 
-        // Create request body
         AuthenticateRequest requestBody = AuthenticateRequest.createAuthenticate(sanitizedUuid, sanitizedToken);
 
-        // Make POST request to secure API
         String url = SECURE_API_URL + "/api-minecraft";
 
         if (!url.startsWith("https://")) {
@@ -278,11 +266,9 @@ public class SupportersApiClient {
                     try {
                         AuthenticateResponse authResponse = gson.fromJson(bodyStr, AuthenticateResponse.class);
 
-                        // Check for HTTP error status
                         if (response.statusCode() < 200 || response.statusCode() >= 300) {
                             BuildScape.getLogger().error("Authentication failed with status " + response.statusCode() +
                                     ": " + authResponse.getError());
-                            // Error details should be in the response body
                             return authResponse;
                         }
 
@@ -304,15 +290,6 @@ public class SupportersApiClient {
                 });
     }
 
-    /**
-     * Redeem a code for the player.
-     * This uses the secure API and requires authentication appropriately.
-     *
-     * @param uuid        The player's UUID
-     * @param accessToken The player's Minecraft access token for verification
-     * @param code        The code to redeem
-     * @return CompletableFuture with ApiResponse indicating success or failure
-     */
     public CompletableFuture<ApiResponse> redeemCode(String uuid, String accessToken, String code) {
         if (uuid == null || uuid.isEmpty()) {
             return CompletableFuture.failedFuture(new IllegalArgumentException("UUID cannot be null or empty"));
@@ -326,16 +303,12 @@ public class SupportersApiClient {
             return CompletableFuture.failedFuture(new IllegalArgumentException("Code cannot be null or empty"));
         }
 
-        // Sanitize inputs
         String sanitizedUuid = sanitizeInput(uuid);
         String sanitizedToken = sanitizeInput(accessToken);
-        // Simple alphanumeric check for code
         String sanitizedCode = sanitizeInput(code);
 
-        // Create request body
         RedeemCodeRequest requestBody = RedeemCodeRequest.createRedeemCode(sanitizedUuid, sanitizedToken, sanitizedCode);
 
-        // Make POST request to secure API
         String url = SECURE_API_URL + "/api-redeem";
 
         if (!url.startsWith("https://")) {
@@ -372,14 +345,11 @@ public class SupportersApiClient {
                     try {
                         ApiResponse apiResponse = gson.fromJson(bodyStr, ApiResponse.class);
 
-                        // Check for HTTP error status
-                        // Even if status is 4xx, the body might contain useful error message
                         if (response.statusCode() < 200 || response.statusCode() >= 300) {
                             BuildScape.getLogger().error("Redeem failed with status " + response.statusCode());
                             if (apiResponse.getError() == null || apiResponse.getError().isEmpty()) {
                                 apiResponse.setError("HTTP " + response.statusCode());
                             }
-                            // Ensure success is false if http error
                             if (apiResponse.isSuccess()) {
                                 apiResponse.setSuccess(false);
                             }
@@ -403,9 +373,6 @@ public class SupportersApiClient {
                 });
     }
 
-    /**
-     * Select a cosmetic for a player.
-     */
     public CompletableFuture<ApiResponse> selectCosmetic(String uuid, String accessToken, String cosmeticId, String cosmeticType) {
         if (uuid == null || uuid.isEmpty()) {
             return CompletableFuture.failedFuture(new IllegalArgumentException("UUID cannot be null or empty"));
@@ -423,13 +390,10 @@ public class SupportersApiClient {
             return CompletableFuture.failedFuture(new IllegalArgumentException("Cosmetic type cannot be null or empty"));
         }
 
-        // Convert string UUID to UUID object and check rate limit
-        // Handle both formats: with dashes and without dashes
         UUID uuidObj = null;
         try {
             String normalizedUuid = uuid.replace("-", "");
             if (normalizedUuid.length() == 32) {
-                // Insert dashes to make valid UUID format
                 String formattedUuid = normalizedUuid.substring(0, 8) + "-" +
                         normalizedUuid.substring(8, 12) + "-" +
                         normalizedUuid.substring(12, 16) + "-" +
@@ -452,7 +416,6 @@ public class SupportersApiClient {
 
         SelectCosmeticRequest requestBody = SelectCosmeticRequest.createSelect(sanitizedUuid, sanitizedToken, cosmeticId, cosmeticType);
 
-        // Use the secure API
         String url = SECURE_API_URL + "/api-cosmetics";
 
         String jsonBody = gson.toJson(requestBody);

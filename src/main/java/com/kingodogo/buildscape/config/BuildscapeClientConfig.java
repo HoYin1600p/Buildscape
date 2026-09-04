@@ -101,7 +101,6 @@ public class BuildscapeClientConfig {
         }
         File legacyFile = getLegacyConfigFile();
 
-        // Migrate from legacy config/buildscape.cfg if new config/buildscape/buildscape.cfg does not exist yet
         if (legacyFile != null && !file.exists() && legacyFile.exists()) {
             try {
                 Files.copy(legacyFile.toPath(), file.toPath());

@@ -35,13 +35,12 @@ public class UpdateConfigPacket {
             ServerPlayer player = ctx.get().getSender();
             if (player == null) return;
 
-            // Only OP can change global config (level 2)
             if (!player.hasPermissions(2)) {
                 return;
             }
 
             PillarParticleConfig serverConfig = PillarParticleConfig.get();
-            String oldPattern = serverConfig.pattern; // Capture old pattern for transition logic
+            String oldPattern = serverConfig.pattern;
 
             serverConfig.particle_speed = data.particle_speed;
             serverConfig.particle_spread = data.particle_spread;
@@ -63,33 +62,26 @@ public class UpdateConfigPacket {
             serverConfig.saveProperties();
             serverConfig.saveItems();
 
-            // Notify all players about the new config
             ModMessages.INSTANCE.send(
                     PacketDistributor.ALL.noArg(),
                     new SyncConfigPacket(serverConfig)
             );
 
-            // Transition logic: Identify which pillars follow the new global config and which stick to their current state.
-            // As requested, customized pillars (dyed OR pattern-overridden) should NOT be affected by the global pattern button.
             com.kingodogo.buildscape.config.PillarIdManager manager = com.kingodogo.buildscape.config.PillarIdManager.get();
             if (manager.hasLoaded()) {
                 boolean updatedAny = false;
                 boolean isPatternChanged = !data.pattern.equals(oldPattern);
 
                 for (com.kingodogo.buildscape.config.PillarIdManager.PillarData pData : manager.getAllData()) {
-                    // Robust check for modification: has colors or has hardcoded pattern settings
                     boolean hasPatternOverride = pData.pattern != null && !pData.pattern.equals("default");
                     boolean isCustomized = pData.hasColors() || hasPatternOverride;
 
                     if (isCustomized) {
-                        // If it's customized in any way but currently following the global pattern (no hard override yet),
-                        // we MUST lock its effective pattern to the OLD one before the global change takes over.
                         if (isPatternChanged && (pData.pattern == null || pData.pattern.equals("default"))) {
-                            pData.pattern = oldPattern; // Lock to the pattern it was using BEFORE this global change
+                            pData.pattern = oldPattern;
                             updatedAny = true;
                         }
                     } else {
-                        // Unmodified pillar: Clear its overrides to ensure it follows the new global config precisely.
                         if (pData.pattern != null || pData.pattern_speed != null || pData.pattern_spread != null) {
                             pData.pattern = null;
                             pData.pattern_speed = null;
@@ -104,7 +96,6 @@ public class UpdateConfigPacket {
                     manager.saveImmediate();
                 }
 
-                // Sync ALL relevant pillars to ensure they pick up their updated settings (either new global or newly locked override)
                 for (net.minecraft.server.level.ServerLevel level : player.getServer().getAllLevels()) {
                     if (level == null) continue;
                     String dimensionKey = com.kingodogo.buildscape.config.PillarIdManager.getDimensionKey(level);
@@ -119,7 +110,6 @@ public class UpdateConfigPacket {
                             net.minecraft.world.level.block.entity.BlockEntity be = level.getBlockEntity(pos);
                             if (be instanceof com.kingodogo.buildscape.block.PillarBlockEntity pillarBE) {
                                 pillarBE.syncFromData(pData);
-                                // Force block update to ensure client recognizes the pattern lock immediately
                                 level.sendBlockUpdated(pos, pillarBE.getBlockState(), pillarBE.getBlockState(), 3);
                             }
                         } catch (Exception ignored) {

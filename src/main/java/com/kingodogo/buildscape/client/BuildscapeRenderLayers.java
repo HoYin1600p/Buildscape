@@ -5,11 +5,6 @@ import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraftforge.registries.RegistryObject;
 
-/**
- * Registers non-solid render layers in one pass over Buildscape's blocks.
- *
- * @author hoyin1600p
- */
 public final class BuildscapeRenderLayers {
     private BuildscapeRenderLayers() {
     }

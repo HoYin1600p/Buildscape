@@ -28,9 +28,8 @@ public class ItemSelectionWidget extends AbstractWidget {
     private static final int HORIZONTAL_MARGIN = 10;
     private static final int MAX_ITEMS_PER_ROW = 16;
     private static final int MAX_VISIBLE_ROWS = 16;
-    // Header area: top padding (5px) + search box height (~20px) + gap (5px)
-    private int headerAreaHeight = 26; // Default to 1px below 20px search bar
-    private static final int GRID_PADDING_TOP = 5; // Fixed headspace between separator and items
+    private int headerAreaHeight = 26;
+    private static final int GRID_PADDING_TOP = 5;
 
     private final Consumer<String> onItemSelected;
     private final ToIntFunction<String> getItemState;
@@ -71,7 +70,6 @@ public class ItemSelectionWidget extends AbstractWidget {
         itemsPerRow = Math.min(16, Math.max(1, contentWidth / (ITEM_SIZE + ITEM_SPACING)));
         maxVisibleRows = (height - headerAreaHeight - GRID_PADDING_TOP - 10) / (ITEM_SIZE + ITEM_SPACING);
 
-        // Ensure scroll offset is valid after layout changes
         if (filteredItems != null) {
             scrollOffset = Math.max(0, Math.min(scrollOffset, getMaxScroll()));
         }
@@ -175,7 +173,7 @@ public class ItemSelectionWidget extends AbstractWidget {
             return 0;
 
         int totalRows = (int) Math.ceil((double) filteredItems.size() / itemsPerRow);
-        int visibleHeight = height - headerAreaHeight - GRID_PADDING_TOP - 10; // Extra padding
+        int visibleHeight = height - headerAreaHeight - GRID_PADDING_TOP - 10;
         int contentHeight = totalRows * (ITEM_SIZE + ITEM_SPACING);
         return Math.max(0, contentHeight - visibleHeight);
     }
@@ -190,17 +188,10 @@ public class ItemSelectionWidget extends AbstractWidget {
         int windowHeight = mc.getWindow().getHeight();
 
         int scissorX = (int) (x * guiScale);
-        // Exclude header area from scissor height
-        // Scissor Y is from bottom, so it remains the same (scissoring from bottom
-        // usually implies bottom origin)
-        // Correct logic: scissorY is bottom of rect. scissorHeight is height.
-        // We want to reduce height by headerAreaHeight.
-        // And we want the bottom to stay fixed.
         int bottomMargin = 10;
         int scissorY = (int) (windowHeight - (y + height) * guiScale + bottomMargin * guiScale);
-        int scissorWidth = (int) ((width - 21) * guiScale); // Exclude scrollbar area
+        int scissorWidth = (int) ((width - 21) * guiScale);
 
-        // Fix: Scissor starts exactly below the header separator. This allows padding and selection borders to be visible.
         int scissorHeight = (int) ((height - headerAreaHeight - 1 - bottomMargin) * guiScale);
 
         if (scissorHeight > 0 && scissorWidth > 0) {
@@ -212,20 +203,18 @@ public class ItemSelectionWidget extends AbstractWidget {
         int endRow = Math.min(startRow + maxVisibleRows + 2, totalRows);
 
         double pixelOffsetInRow = scrollOffset % (ITEM_SIZE + ITEM_SPACING);
-        int itemY = y + headerAreaHeight + GRID_PADDING_TOP - (int) pixelOffsetInRow; // Start below header area with padding
+        int itemY = y + headerAreaHeight + GRID_PADDING_TOP - (int) pixelOffsetInRow;
         ItemRenderer itemRenderer = Minecraft.getInstance().getItemRenderer();
 
         for (int row = startRow; row < endRow; row++) {
             int rowY = itemY + (row - startRow) * (ITEM_SIZE + ITEM_SPACING);
 
-            // Updated visibility check - allow items slightly above the start point for smooth scrolling
             if (rowY + ITEM_SIZE < y + headerAreaHeight || rowY > y + height - bottomMargin) {
                 continue;
             }
 
-            // Calculate centering offset
             int totalRowWidth = itemsPerRow * (ITEM_SIZE + ITEM_SPACING) - ITEM_SPACING;
-            int availableAreaWidth = width - 21; // Same as in calculateItemsPerRow
+            int availableAreaWidth = width - 21;
             int startXOffset = Math.max(0, (availableAreaWidth - totalRowWidth) / 2);
 
             for (int col = 0; col < itemsPerRow; col++) {
@@ -243,10 +232,10 @@ public class ItemSelectionWidget extends AbstractWidget {
                 boolean isHovered = mouseX >= itemX && mouseX < itemX + ITEM_SIZE &&
                         mouseY >= rowY && mouseY < rowY + ITEM_SIZE &&
                         mouseX >= x && mouseX < x + width &&
-                        mouseY >= y + headerAreaHeight + 1 && mouseY < y + height - bottomMargin; // Updated hover check
+                        mouseY >= y + headerAreaHeight + 1 && mouseY < y + height - bottomMargin;
 
                 String itemId = ForgeRegistries.ITEMS.getKey(item).toString();
-                int state = getItemState.applyAsInt(itemId); // 0 = none, 1 = allowed, 2 = blocklisted
+                int state = getItemState.applyAsInt(itemId);
 
                 int bgColor;
                 if (state == 1) {
@@ -283,17 +272,15 @@ public class ItemSelectionWidget extends AbstractWidget {
         }
         poseStack.popPose();
 
-        // Draw panel borders and separator
         int borderColor = 0xFF666666;
-        fill(poseStack, x, y, x + width, y + 1, borderColor); // Top
-        fill(poseStack, x, y + height - 1, x + width, y + height, borderColor); // Bottom
-        fill(poseStack, x, y, x + 1, y + height, borderColor); // Left
-        fill(poseStack, x + width - 1, y, x + width, y + height, borderColor); // Right
-        fill(poseStack, x, y + headerAreaHeight + 1, x + width, y + headerAreaHeight + 2, borderColor); // Separator (moved 1px down)
+        fill(poseStack, x, y, x + width, y + 1, borderColor);
+        fill(poseStack, x, y + height - 1, x + width, y + height, borderColor);
+        fill(poseStack, x, y, x + 1, y + height, borderColor);
+        fill(poseStack, x + width - 1, y, x + width, y + height, borderColor);
+        fill(poseStack, x, y + headerAreaHeight + 1, x + width, y + headerAreaHeight + 2, borderColor);
 
-        // Render scrollbar after disabling scissor so it is not clipped
         if (getMaxScroll() > 0) {
-            int scrollbarX = x + width - CustomScrollbarRenderer.getScrollbarWidth() - 4; // 4px form edge
+            int scrollbarX = x + width - CustomScrollbarRenderer.getScrollbarWidth() - 4;
             int scrollbarY = y + headerAreaHeight + GRID_PADDING_TOP;
             bottomMargin = 10;
             int scrollbarHeight = height - headerAreaHeight - GRID_PADDING_TOP - bottomMargin;
@@ -315,20 +302,18 @@ public class ItemSelectionWidget extends AbstractWidget {
         int endRow = Math.min(startRow + maxVisibleRows + 2, totalRows);
 
         double pixelOffsetInRow = scrollOffset % (ITEM_SIZE + ITEM_SPACING);
-        int itemY = y + headerAreaHeight + GRID_PADDING_TOP - (int) pixelOffsetInRow; // Updated to headerAreaHeight + padding
+        int itemY = y + headerAreaHeight + GRID_PADDING_TOP - (int) pixelOffsetInRow;
         Item hoveredItem = null;
 
         for (int row = startRow; row < endRow; row++) {
             int rowY = itemY + (row - startRow) * (ITEM_SIZE + ITEM_SPACING);
 
-            // Updated visibility check
             if (rowY + ITEM_SIZE < y + headerAreaHeight + GRID_PADDING_TOP || rowY > y + height) {
                 continue;
             }
 
-            // Calculate centering offset
             int totalRowWidth = itemsPerRow * (ITEM_SIZE + ITEM_SPACING) - ITEM_SPACING;
-            int availableAreaWidth = width - 21; // Same as in calculateItemsPerRow
+            int availableAreaWidth = width - 21;
             int startXOffset = Math.max(0, (availableAreaWidth - totalRowWidth) / 2);
 
             for (int col = 0; col < itemsPerRow; col++) {
@@ -346,7 +331,7 @@ public class ItemSelectionWidget extends AbstractWidget {
                 boolean isHovered = mouseX >= itemX && mouseX < itemX + ITEM_SIZE &&
                         mouseY >= rowY && mouseY < rowY + ITEM_SIZE &&
                         mouseX >= x && mouseX < x + width &&
-                        mouseY >= y + headerAreaHeight && mouseY < y + height; // Updated hover check
+                        mouseY >= y + headerAreaHeight && mouseY < y + height;
                 if (isHovered) {
                     hoveredItem = item;
                 }
@@ -371,25 +356,21 @@ public class ItemSelectionWidget extends AbstractWidget {
             }
         }
 
-        // Scrollbar is now rendered in renderButton method using
-        // CustomScrollbarRenderer
     }
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        // Updated check to ignore clicks in header area and padding gap
         if (!isMouseOver(mouseX, mouseY) || mouseY < y + headerAreaHeight + GRID_PADDING_TOP) {
             return false;
         }
 
         double maxScroll = getMaxScroll();
         if (maxScroll > 0) {
-            int scrollbarX = x + width - CustomScrollbarRenderer.getScrollbarWidth() - 4; // 4px form edge
+            int scrollbarX = x + width - CustomScrollbarRenderer.getScrollbarWidth() - 4;
             int scrollbarY = y + headerAreaHeight + GRID_PADDING_TOP;
             int bottomMargin = 10;
             int scrollbarHeight = height - headerAreaHeight - GRID_PADDING_TOP - bottomMargin;
 
-            // Content area for dragging
             int contentX = x + 5;
             int contentY = y + headerAreaHeight + GRID_PADDING_TOP;
             int contentWidth = width - 21;
@@ -417,14 +398,12 @@ public class ItemSelectionWidget extends AbstractWidget {
         for (int row = startRow; row < endRow; row++) {
             int rowY = itemY + (row - startRow) * (ITEM_SIZE + ITEM_SPACING);
 
-            // Updated visibility check
             if (rowY + ITEM_SIZE < y + headerAreaHeight + GRID_PADDING_TOP || rowY > y + height) {
                 continue;
             }
 
-            // Calculate centering offset
             int totalRowWidth = itemsPerRow * (ITEM_SIZE + ITEM_SPACING) - ITEM_SPACING;
-            int availableAreaWidth = width - 21; // Same as in calculateItemsPerRow
+            int availableAreaWidth = width - 21;
             int startXOffset = Math.max(0, (availableAreaWidth - totalRowWidth) / 2);
 
             for (int col = 0; col < itemsPerRow; col++) {
@@ -441,7 +420,7 @@ public class ItemSelectionWidget extends AbstractWidget {
                 if (mouseX >= itemX && mouseX < itemX + ITEM_SIZE &&
                         mouseY >= rowY && mouseY < rowY + ITEM_SIZE &&
                         mouseX >= x && mouseX < x + width &&
-                        mouseY >= y + headerAreaHeight + GRID_PADDING_TOP && mouseY < y + height) { // Updated click check
+                        mouseY >= y + headerAreaHeight + GRID_PADDING_TOP && mouseY < y + height) {
                     Item item = filteredItems.get(index);
                     String itemId = ForgeRegistries.ITEMS.getKey(item).toString();
                     onItemSelected.accept(itemId);

@@ -48,7 +48,6 @@ public class CustomFireworkStarRecipe extends CustomRecipe {
             }
         }
 
-        // Dyes CANNOT be used when crafting fixed-palette shapes (Cake, Crown, Trophy, Christmas Tree, Snowflake)
         if (isFixedPalette && dyeCount > 0) {
             return false;
         }

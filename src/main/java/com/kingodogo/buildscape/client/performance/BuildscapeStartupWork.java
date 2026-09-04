@@ -10,12 +10,6 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.IntConsumer;
 
-/**
- * Runs bounded, short-lived startup work without occupying Minecraft's shared
- * background executor.
- *
- * @author hoyin1600p
- */
 public final class BuildscapeStartupWork {
     private static final AtomicInteger POOL_IDS = new AtomicInteger();
 

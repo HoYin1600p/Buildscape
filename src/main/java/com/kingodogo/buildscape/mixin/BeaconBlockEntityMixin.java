@@ -21,7 +21,6 @@ import java.util.List;
 @Mixin(BeaconBlockEntity.class)
 public class BeaconBlockEntityMixin implements BeaconBeamHeightAccessor {
 
-    /** Sentinel for "nothing cuts this beam short". */
     @Unique
     private static final int BUILDSCAPE_UNLIMITED = 1024;
 

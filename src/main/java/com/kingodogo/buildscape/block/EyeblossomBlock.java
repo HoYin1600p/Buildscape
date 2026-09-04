@@ -54,11 +54,9 @@ public class EyeblossomBlock extends FlowerBlock implements BonemealableBlock {
         }
         boolean isNight = level.isNight();
         if (isOpen && !isNight) {
-            // Close flower during day
             level.setBlock(pos, ModBlocks.CLOSED_EYEBLOSSOM.get().defaultBlockState().setValue(WAXED, state.getValue(WAXED)), 3);
             level.playSound(null, pos, SoundEvents.AZALEA_LEAVES_BREAK, SoundSource.BLOCKS, 0.8F, 0.9F);
         } else if (!isOpen && isNight) {
-            // Open flower during night
             level.setBlock(pos, ModBlocks.OPEN_EYEBLOSSOM.get().defaultBlockState().setValue(WAXED, state.getValue(WAXED)), 3);
             level.playSound(null, pos, SoundEvents.AMETHYST_BLOCK_CHIME, SoundSource.BLOCKS, 1.0F, 1.2F);
         }

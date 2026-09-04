@@ -31,12 +31,10 @@ public class MudToClayHandler {
         BlockPos pos = event.getPos();
         BlockState placedState = event.getPlacedBlock();
 
-        // Case 1: Mud was placed - check for dripstone below
         if (placedState.is(ModBlocks.MUD.get())) {
             tryTrackMud(level, pos);
         }
 
-        // Case 2: Pointed dripstone placed - check for mud two blocks above
         if (placedState.is(Blocks.POINTED_DRIPSTONE) &&
                 placedState.getValue(PointedDripstoneBlock.TIP_DIRECTION) == Direction.DOWN) {
             BlockPos mudPos = pos.above(2);
@@ -45,7 +43,6 @@ public class MudToClayHandler {
             }
         }
 
-        // Case 3: Block placed between existing mud and dripstone
         BlockPos abovePos = pos.above();
         BlockPos belowPos = pos.below();
         if (level.getBlockState(abovePos).is(ModBlocks.MUD.get())) {
@@ -58,7 +55,6 @@ public class MudToClayHandler {
     }
 
     private static void tryTrackMud(ServerLevel level, BlockPos mudPos) {
-        // Avoid duplicate tracking
         for (TrackedMud tracked : trackedMud) {
             if (tracked.pos.equals(mudPos) && tracked.level == level) return;
         }
@@ -69,11 +65,9 @@ public class MudToClayHandler {
         BlockState belowState = level.getBlockState(belowMud);
         BlockState dripstoneState = level.getBlockState(dripstonePos);
 
-        // Requires: non-air block below mud, pointed dripstone facing down below that
         if (!belowState.isAir() &&
                 dripstoneState.is(Blocks.POINTED_DRIPSTONE) &&
                 dripstoneState.getValue(PointedDripstoneBlock.TIP_DIRECTION) == Direction.DOWN) {
-            // 1-2 seconds (20-40 ticks)
             int ticks = 20 + level.random.nextInt(21);
             trackedMud.add(new TrackedMud(level, mudPos, ticks));
         }
@@ -90,7 +84,6 @@ public class MudToClayHandler {
             tracked.ticksRemaining--;
 
             if (tracked.ticksRemaining <= 0) {
-                // Verify mud is still there before converting
                 if (tracked.level.getBlockState(tracked.pos).is(ModBlocks.MUD.get())) {
                     tracked.level.setBlock(tracked.pos, Blocks.CLAY.defaultBlockState(), 3);
                 }

@@ -31,7 +31,7 @@ import java.util.List;
 )
 public class InvisibleFrameOverlayRenderer {
 
-    private static final double SEARCH_RANGE = 16.0; // 1 chunk
+    private static final double SEARCH_RANGE = 16.0;
 
     @SubscribeEvent
     public static void onRenderLevelStage(RenderLevelStageEvent event) {
@@ -46,7 +46,6 @@ public class InvisibleFrameOverlayRenderer {
 
         Player player = mc.player;
 
-        // Must be sneaking and holding an invisible item frame
         if (!player.isShiftKeyDown()) {
             return;
         }
@@ -61,7 +60,6 @@ public class InvisibleFrameOverlayRenderer {
             return;
         }
 
-        // Find all invisible item frames within 1 chunk range (vanilla + modded)
         AABB searchBox = player.getBoundingBox().inflate(SEARCH_RANGE);
         List<ItemFrame> vanillaFrames = mc.level.getEntitiesOfClass(
                 ItemFrame.class, searchBox, Entity::isInvisible
@@ -79,18 +77,15 @@ public class InvisibleFrameOverlayRenderer {
         PoseStack poseStack = event.getPoseStack();
         MultiBufferSource.BufferSource bufferSource = mc.renderBuffers().bufferSource();
 
-        // Calculate pulsing alpha (0.4 to 0.8 for lines, 0.1 to 0.3 for fill)
         float time = (System.currentTimeMillis() % 2000) / 2000.0f;
         float pulse = (float) Math.sin(time * Math.PI * 2.0) * 0.5f + 0.5f;
         float lineAlpha = 0.4f + pulse * 0.4f;
         float fillAlpha = 0.1f + pulse * 0.2f;
 
-        // Light cyan color
         int r = 0;
         int g = 200;
         int b = 255;
 
-        // Render filled faces first (using lightning for a translucent, non-culled effect)
         VertexConsumer fillBuffer = bufferSource.getBuffer(RenderType.lightning());
         for (ItemFrame frame : vanillaFrames) {
             renderFilledBox(poseStack, fillBuffer, cameraPos, frame.getBoundingBox().inflate(0.002), r, g, b, fillAlpha);
@@ -99,7 +94,6 @@ public class InvisibleFrameOverlayRenderer {
             renderFilledBox(poseStack, fillBuffer, cameraPos, frame.getBoundingBox().inflate(0.002), r, g, b, fillAlpha);
         }
 
-        // Render wireframe
         VertexConsumer lineBuffer = bufferSource.getBuffer(RenderType.lines());
         for (ItemFrame frame : vanillaFrames) {
             renderOutline(poseStack, lineBuffer, cameraPos, frame.getBoundingBox().inflate(0.002), r, g, b, lineAlpha);
@@ -124,37 +118,31 @@ public class InvisibleFrameOverlayRenderer {
         Matrix4f pose = poseStack.last().pose();
         int ai = (int) (alpha * 255);
 
-        // Down
         buffer.vertex(pose, minX, minY, minZ).color(r, g, b, ai).endVertex();
         buffer.vertex(pose, maxX, minY, minZ).color(r, g, b, ai).endVertex();
         buffer.vertex(pose, maxX, minY, maxZ).color(r, g, b, ai).endVertex();
         buffer.vertex(pose, minX, minY, maxZ).color(r, g, b, ai).endVertex();
 
-        // Up
         buffer.vertex(pose, minX, maxY, minZ).color(r, g, b, ai).endVertex();
         buffer.vertex(pose, minX, maxY, maxZ).color(r, g, b, ai).endVertex();
         buffer.vertex(pose, maxX, maxY, maxZ).color(r, g, b, ai).endVertex();
         buffer.vertex(pose, maxX, maxY, minZ).color(r, g, b, ai).endVertex();
 
-        // North
         buffer.vertex(pose, minX, minY, minZ).color(r, g, b, ai).endVertex();
         buffer.vertex(pose, minX, maxY, minZ).color(r, g, b, ai).endVertex();
         buffer.vertex(pose, maxX, maxY, minZ).color(r, g, b, ai).endVertex();
         buffer.vertex(pose, maxX, minY, minZ).color(r, g, b, ai).endVertex();
 
-        // South
         buffer.vertex(pose, minX, minY, maxZ).color(r, g, b, ai).endVertex();
         buffer.vertex(pose, maxX, minY, maxZ).color(r, g, b, ai).endVertex();
         buffer.vertex(pose, maxX, maxY, maxZ).color(r, g, b, ai).endVertex();
         buffer.vertex(pose, minX, maxY, maxZ).color(r, g, b, ai).endVertex();
 
-        // West
         buffer.vertex(pose, minX, minY, minZ).color(r, g, b, ai).endVertex();
         buffer.vertex(pose, minX, minY, maxZ).color(r, g, b, ai).endVertex();
         buffer.vertex(pose, minX, maxY, maxZ).color(r, g, b, ai).endVertex();
         buffer.vertex(pose, minX, maxY, minZ).color(r, g, b, ai).endVertex();
 
-        // East
         buffer.vertex(pose, maxX, minY, minZ).color(r, g, b, ai).endVertex();
         buffer.vertex(pose, maxX, maxY, minZ).color(r, g, b, ai).endVertex();
         buffer.vertex(pose, maxX, maxY, maxZ).color(r, g, b, ai).endVertex();
@@ -176,19 +164,16 @@ public class InvisibleFrameOverlayRenderer {
         Matrix4f pose = poseStack.last().pose();
         Matrix3f normal = poseStack.last().normal();
 
-        // Bottom face edges
         drawLine(buffer, pose, normal, minX, minY, minZ, maxX, minY, minZ, r, g, b, a);
         drawLine(buffer, pose, normal, maxX, minY, minZ, maxX, minY, maxZ, r, g, b, a);
         drawLine(buffer, pose, normal, maxX, minY, maxZ, minX, minY, maxZ, r, g, b, a);
         drawLine(buffer, pose, normal, minX, minY, maxZ, minX, minY, minZ, r, g, b, a);
 
-        // Top face edges
         drawLine(buffer, pose, normal, minX, maxY, minZ, maxX, maxY, minZ, r, g, b, a);
         drawLine(buffer, pose, normal, maxX, maxY, minZ, maxX, maxY, maxZ, r, g, b, a);
         drawLine(buffer, pose, normal, maxX, maxY, maxZ, minX, maxY, maxZ, r, g, b, a);
         drawLine(buffer, pose, normal, minX, maxY, maxZ, minX, maxY, minZ, r, g, b, a);
 
-        // Vertical edges
         drawLine(buffer, pose, normal, minX, minY, minZ, minX, maxY, minZ, r, g, b, a);
         drawLine(buffer, pose, normal, maxX, minY, minZ, maxX, maxY, minZ, r, g, b, a);
         drawLine(buffer, pose, normal, maxX, minY, maxZ, maxX, maxY, maxZ, r, g, b, a);

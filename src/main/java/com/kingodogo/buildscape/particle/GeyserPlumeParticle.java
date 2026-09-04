@@ -26,7 +26,6 @@ public class GeyserPlumeParticle extends TextureSheetParticle {
       super(level, x, y, z, xa, ya, za);
       int plumeHeight = 5 * Math.max(1, options.getWaterBlocks());
       this.hasPhysics = true;
-      // In 1.18.2, speedUpWhenYMotionIsBlocked isn't a field on Particle, so we can omit it or set whatever is needed
       this.lifetime = plumeHeight * 5;
       this.yd = 0.0D;
       this.startY = y;

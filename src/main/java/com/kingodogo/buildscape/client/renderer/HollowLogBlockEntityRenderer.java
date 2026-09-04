@@ -161,24 +161,9 @@ public class HollowLogBlockEntityRenderer implements BlockEntityRenderer<HollowL
             yIn  = 1.0F;
             yOut = 1.0F;
         } else if (isFlowingWater) {
-            if (state.getValue(HollowPipeBlock.WATERLOGGED)) {
-                // The source fills the channel up to its two-pixel ceiling. Its
-                // first outgoing boundary blends into vanilla flowing level 7.
-                float sourceHeight = HollowPipeBlock.WATER_SOURCE_VISUAL_HEIGHT;
-                yIn = sourceHeight;
-                yOut = outDirs.isEmpty()
-                        ? sourceHeight
-                        : (sourceHeight + getPipeFlowHeight(1)) * 0.5F;
-            } else {
-                int d = Math.min(7, Math.max(1, flowState.getDistance()));
-                float hPrev = getPipeFlowHeight(d - 1);
-                float hCurr = getPipeFlowHeight(d);
-                float hNext = getPipeFlowHeight(d + 1);
-                yIn  = (hPrev + hCurr) * 0.5F;
-                yOut = (hCurr + Math.max(yFloor, hNext)) * 0.5F;
-                yIn  = Math.max(yFloor, yIn);
-                yOut = Math.max(yFloor, yOut);
-            }
+            PipeWaterSurface.Heights heights = PipeWaterSurface.flowing(state, flowState);
+            yIn = heights.inlet();
+            yOut = heights.outlet();
         } else {
             yIn  = 0.75F;
             yOut = 0.75F;
@@ -460,18 +445,6 @@ public class HollowLogBlockEntityRenderer implements BlockEntityRenderer<HollowL
             return fs.getOwnHeight();
         }
         return 8.0F / 9.0F;
-    }
-
-    /**
-     * Height of a transported water column at a given vanilla horizontal-flow
-     * distance. Distance zero is the contained source level; distances 1..7 map
-     * directly to vanilla flowing-water amounts 7..1.
-     */
-    private static float getPipeFlowHeight(int distance) {
-        if (distance <= 0) {
-            return HollowPipeBlock.WATER_SOURCE_VISUAL_HEIGHT;
-        }
-        return Math.max(0.125F, Math.max(1, 8 - Math.min(7, distance)) / 9.0F);
     }
 
     public static float getNeighborFluidHeight(BlockGetter level, BlockPos pos, Direction dir, Fluid fluid) {

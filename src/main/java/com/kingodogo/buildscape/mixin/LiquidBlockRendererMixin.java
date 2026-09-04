@@ -46,19 +46,12 @@ public class LiquidBlockRendererMixin {
             CallbackInfoReturnable<Float> cir
     ) {
         BlockState state = level.getBlockState(pos);
-        if (state.getBlock() instanceof HollowPipeBlock) {
-            // Steel-pipe water is rendered as internal channel state, not as a
-            // vanilla full-block fluid. Treat the pipe shell as a boundary.
+        if (state.getBlock() instanceof HollowPipeBlock || state.getBlock() instanceof HollowLogBlock) {
+            // Hollow log and steel-pipe water is rendered as internal channel state, not as a
+            // vanilla full-block fluid. Treat the block shell as a boundary so vanilla fluid
+            // does not clip through the side walls or create full-width bulges.
             cir.setReturnValue(-1.0F);
             return;
-        }
-        if (state.getBlock() instanceof HollowLogBlock) {
-            FluidState fluidState = state.getFluidState();
-            if (fluidState.getType().isSame(fluid)) {
-                cir.setReturnValue(fluidState.getOwnHeight());
-            } else {
-                cir.setReturnValue(-1.0F);
-            }
         }
     }
 }

@@ -42,7 +42,7 @@ public class Trophies {
     public static final TrophyDefinition STONE_PILLAR = register(
             TrophyDefinition.builder("stone_pillar_trophy")
                     .tier(TrophyTier.STONE)
-                    .soundType(SoundType.STONE)
+                    .soundType(SoundType.METAL)
                     .hardness(1.5F)
                     .resistance(6.0F)
                     .shape(PEDESTAL_SHAPES)
@@ -75,7 +75,7 @@ public class Trophies {
     public static final TrophyDefinition NETHERITE_PILLAR = register(
             TrophyDefinition.builder("netherite_pillar_trophy")
                     .tier(TrophyTier.NETHERITE)
-                    .soundType(SoundType.NETHERITE_BLOCK)
+                    .soundType(SoundType.METAL)
                     .hardness(4.0F)
                     .resistance(12.0F)
                     .shape(PEDESTAL_SHAPES)
@@ -97,7 +97,7 @@ public class Trophies {
     public static final TrophyDefinition GOLDEN_JAR = register(
             TrophyDefinition.builder("golden_jar_trophy")
                     .tier(TrophyTier.GOLD)
-                    .soundType(SoundType.GLASS)
+                    .soundType(SoundType.METAL)
                     .hardness(1.5F)
                     .resistance(6.0F)
                     .shape(PEDESTAL_SHAPES)
@@ -108,7 +108,7 @@ public class Trophies {
     public static final TrophyDefinition GOLD_ORNAMENT = register(
             TrophyDefinition.builder("gold_ornament_trophy")
                     .tier(TrophyTier.GOLD)
-                    .soundType(SoundType.LANTERN)
+                    .soundType(SoundType.METAL)
                     .hardness(1.5F)
                     .resistance(6.0F)
                     .shape(STAND_SHAPES)
@@ -119,7 +119,7 @@ public class Trophies {
     public static final TrophyDefinition EMERALD_STOCKING = register(
             TrophyDefinition.builder("emerald_stocking_trophy")
                     .tier(TrophyTier.EMERALD)
-                    .soundType(SoundType.WOOL)
+                    .soundType(SoundType.METAL)
                     .hardness(1.0F)
                     .resistance(4.0F)
                     .shape(STAND_SHAPES)
@@ -142,7 +142,7 @@ public class Trophies {
     public static final TrophyDefinition STRING_LIGHT = register(
             TrophyDefinition.builder("string_light_trophy")
                     .tier(TrophyTier.SPECIAL)
-                    .soundType(SoundType.LANTERN)
+                    .soundType(SoundType.METAL)
                     .lightEmission(15)
                     .hardness(1.5F)
                     .resistance(6.0F)
@@ -154,7 +154,7 @@ public class Trophies {
     public static final TrophyDefinition FIRELIGHT = register(
             TrophyDefinition.builder("firelight_trophy")
                     .tier(TrophyTier.SPECIAL)
-                    .soundType(SoundType.SHROOMLIGHT)
+                    .soundType(SoundType.METAL)
                     .lightEmission(15)
                     .hardness(2.5F)
                     .resistance(8.0F)
@@ -211,7 +211,7 @@ public class Trophies {
     public static final TrophyDefinition NETHERITE_BUILDSCAPE = register(
             TrophyDefinition.builder("netherite_buildscape_trophy")
                     .tier(TrophyTier.NETHERITE)
-                    .soundType(SoundType.NETHERITE_BLOCK)
+                    .soundType(SoundType.METAL)
                     .hardness(4.0F)
                     .resistance(12.0F)
                     .shape(BUILDSCAPE_TROPHY_SHAPES)

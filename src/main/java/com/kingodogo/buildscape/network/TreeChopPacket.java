@@ -134,6 +134,7 @@ public class TreeChopPacket {
         int end = Math.min(currentIndex + batchSize, blocks.size());
         for (int i = currentIndex; i < end; i++) {
             BlockPos pos = blocks.get(i);
+            if (!level.isLoaded(pos)) continue;
             BlockState state = level.getBlockState(pos);
 
             // Only spawn particles for every 3rd block to reduce spam
@@ -157,6 +158,7 @@ public class TreeChopPacket {
 
         // Schedule next batch with a 100ms (~2 ticks) delay without blocking the server thread
         java.util.concurrent.CompletableFuture.delayedExecutor(100, java.util.concurrent.TimeUnit.MILLISECONDS).execute(() -> {
+            if (level.getServer() == null || !level.getServer().isRunning()) return;
             level.getServer().execute(() -> {
                 scheduleNextBreak(level, blocks, nextIndex, finalNextBatchSize, nextConsecutiveTicks);
             });

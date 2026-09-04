@@ -5,6 +5,7 @@ import com.kingodogo.buildscape.block.HollowLogBlockEntity;
 import com.kingodogo.buildscape.block.HollowPipeBlock;
 import com.kingodogo.buildscape.pipe.transport.BubbleColumnState;
 import com.kingodogo.buildscape.pipe.transport.PipeFlowState;
+import com.kingodogo.buildscape.pipe.transport.PipeOutletWater;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -29,6 +30,7 @@ public final class PipeSpillVertexConsumer implements VertexConsumer {
 
     private final VertexConsumer delegate;
     private final List<Outlet> outlets;
+    private final boolean downwardOutlet;
     private final int baseX, baseY, baseZ;
     private final Vertex[] quad = new Vertex[4];
     private int count;
@@ -39,6 +41,7 @@ public final class PipeSpillVertexConsumer implements VertexConsumer {
     public PipeSpillVertexConsumer(VertexConsumer delegate, BlockPos pos, List<Outlet> outlets) {
         this.delegate = delegate;
         this.outlets = List.copyOf(outlets);
+        downwardOutlet = outlets.stream().anyMatch(outlet -> outlet.direction == Direction.UP);
         baseX = pos.getX() & 15;
         baseY = pos.getY() & 15;
         baseZ = pos.getZ() & 15;
@@ -51,9 +54,21 @@ public final class PipeSpillVertexConsumer implements VertexConsumer {
     }
 
     public static List<Outlet> findOutlets(BlockAndTintGetter level, BlockPos pos, BlockState state, FluidState fluid) {
-        // Leave sources, waterfalls, submerged water, logs and non-water fluids unchanged.
+        // A downward outlet replaces the first falling block's mesh, joining its neck to the pipe.
         if (!(state.getBlock() instanceof LiquidBlock) || !fluid.getType().isSame(Fluids.WATER)
-                || fluid.isSource() || fluid.getValue(net.minecraft.world.level.material.FlowingFluid.FALLING)
+                || fluid.isSource()) {
+            return List.of();
+        }
+        BlockPos above = pos.above();
+        BlockState pipeAbove = level.getBlockState(above);
+        if (fluid.getValue(net.minecraft.world.level.material.FlowingFluid.FALLING)
+                && pipeAbove.getBlock() instanceof HollowPipeBlock
+                && level.getBlockEntity(above) instanceof HollowLogBlockEntity entity
+                && PipeOutletWater.amount(pipeAbove, entity.getPipeFlowState(), Direction.DOWN) > 0) {
+            return List.of(new Outlet(Direction.UP, 1.0));
+        }
+        // Ordinary waterfalls and submerged water do not need a horizontal spill.
+        if (fluid.getValue(net.minecraft.world.level.material.FlowingFluid.FALLING)
                 || level.getFluidState(pos.above()).getType().isSame(Fluids.WATER)) {
             return List.of();
         }
@@ -144,6 +159,10 @@ public final class PipeSpillVertexConsumer implements VertexConsumer {
         for (Vertex corner : corners) {
             if (corner == null) { emitOriginal(); return; }
         }
+        if (downwardOutlet) {
+            renderDownwardOutlet(corners);
+            return;
+        }
         List<Spill> spills = new ArrayList<>(outlets.size());
         TreeSet<Double> cuts = new TreeSet<>(List.of(0.0, OPEN_MIN, 0.25, 0.5, 0.75, OPEN_MAX, 1.0));
         for (Outlet outlet : outlets) {
@@ -172,6 +191,26 @@ public final class PipeSpillVertexConsumer implements VertexConsumer {
                 Vertex ne = raised(corners, spills, grid[ix + 1], grid[iz]);
                 emit(nw); emit(forward ? sw : ne); emit(se); emit(forward ? ne : sw);
             }
+        }
+    }
+
+    private void renderDownwardOutlet(Vertex[] corners) {
+        Vertex[] neck = new Vertex[4];
+        for (int i = 0; i < 4; i++) {
+            double px = i < 2 ? OPEN_MIN : OPEN_MAX;
+            double pz = i == 0 || i == 3 ? OPEN_MIN : OPEN_MAX;
+            Vertex sampled = sample(corners, px, pz);
+            neck[i] = sampled.at(sampled.x, baseY + 1.0, sampled.z, sampled.u, sampled.v);
+        }
+        // Four skirts join the inner opening to vanilla's existing perimeter. Keeping that perimeter
+        // unchanged also joins adjacent flowing water without holes or overlapping translucent faces.
+        boolean forward = quad[1].z > quad[0].z;
+        for (int i = 0; i < 4; i++) {
+            int next = (i + 1) % 4;
+            emit(neck[i]);
+            emit(forward ? corners[i] : neck[next]);
+            emit(corners[next]);
+            emit(forward ? neck[next] : corners[i]);
         }
     }
 

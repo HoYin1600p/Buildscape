@@ -119,9 +119,8 @@ public abstract class ComposterBlockMixin extends Block {
                     if (planter != PlanterType.SNOWY_GRASS_BLOCK) {
                         state = state.setValue(PlanterHelper.PLANTER, PlanterType.SNOWY_GRASS_BLOCK);
                     }
-                } else if (!facingState.isAir() && !(facingState.getBlock() instanceof net.minecraft.world.level.block.BushBlock)) {
-                    // Only revert to grass block if the block above is not air and not a plant (e.g. solid block placed on top)
-                    if (planter != PlanterType.GRASS_BLOCK) {
+                } else {
+                    if (planter == PlanterType.SNOWY_GRASS_BLOCK) {
                         state = state.setValue(PlanterHelper.PLANTER, PlanterType.GRASS_BLOCK);
                     }
                 }

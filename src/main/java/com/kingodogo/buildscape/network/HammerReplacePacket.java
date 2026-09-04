@@ -53,6 +53,7 @@ public class HammerReplacePacket {
 
             if (!level.isLoaded(pos)) return;
             if (player.distanceToSqr(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5) > 64.0) return;
+            if (!player.mayBuild() || player.blockActionRestricted(level, pos, player.gameMode.getGameModeForPlayer())) return;
 
             // Must be holding a Hammer in main hand
             ItemStack hammerStack = player.getMainHandItem();

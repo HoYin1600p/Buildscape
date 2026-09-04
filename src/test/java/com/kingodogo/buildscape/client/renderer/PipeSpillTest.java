@@ -26,6 +26,11 @@ public final class PipeSpillTest {
         verifySide();
         verifySlopedSurface();
         verifyMultipleOutlets();
+        for (BlockPos pos : List.of(BlockPos.ZERO, new BlockPos(15, 15, 15), new BlockPos(-1, -17, -17))) {
+            for (boolean reverse : new boolean[]{false, true}) {
+                verifyDownwardOutlet(pos, reverse);
+            }
+        }
         System.out.println("Pipe spill geometry: " + checks + " checks passed.");
     }
 
@@ -114,6 +119,57 @@ public final class PipeSpillTest {
             require(v.y <= 0.7 + 1e-6, "intersecting spills do not stack heights");
             if (v.z == 0.5 && v.x == 0) near(v.y, 0.7, "west outlet retained");
             if (v.z == 0.5 && v.x == 1) near(v.y, 0.6, "east outlet retained");
+        }
+    }
+
+    private static void verifyDownwardOutlet(BlockPos pos, boolean reverse) {
+        Capture output = new Capture();
+        VertexConsumer c = new PipeSpillVertexConsumer(output, pos,
+                List.of(new PipeSpillVertexConsumer.Outlet(Direction.UP, 1)));
+        double x = pos.getX() & 15, y = pos.getY() & 15, z = pos.getZ() & 15;
+        top(c, pos, reverse, 0.8, 0.85, 0.8, 0.75);
+        require(output.vertices.size() == 16, "four skirts replace the water top without a cap");
+        double area = 0;
+        int neckVertices = 0, perimeterVertices = 0;
+        for (int start = 0; start < 16; start += 4) {
+            double signedArea = 0;
+            for (int i = 0; i < 4; i++) {
+                V a = output.vertices.get(start + i), b = output.vertices.get(start + (i + 1) % 4);
+                signedArea += (a.x - x) * (b.z - z) - (b.x - x) * (a.z - z);
+            }
+            require(reverse ? signedArea > 0 : signedArea < 0, "downward skirt winding preserved");
+            area += Math.abs(signedArea) / 2;
+        }
+        near(area, 1 - 0.746 * 0.746, "skirts cover exactly the ring around the open neck");
+        for (V vertex : output.vertices) {
+            double px = vertex.x - x, pz = vertex.z - z;
+            if (px > 0 && px < 1) {
+                require(Math.abs(px - 0.127) < 1e-6 || Math.abs(px - 0.873) < 1e-6, "neck width matches bore");
+                require(Math.abs(pz - 0.127) < 1e-6 || Math.abs(pz - 0.873) < 1e-6, "neck depth matches bore");
+                near(vertex.y, y + 1, "neck reaches the bottom of the pipe");
+                neckVertices++;
+            } else {
+                near(vertex.y, y + 0.8 - px * 0.05 + pz * 0.05, "perimeter joins surrounding water unchanged");
+                perimeterVertices++;
+            }
+            near(vertex.u, px, "falling water U preserved");
+            near(vertex.v, pz, "falling water V preserved");
+            require(vertex.red == 47 && vertex.green == 105 && vertex.blue == 191 && vertex.alpha == 213,
+                    "falling water biome tint and alpha preserved");
+            require(vertex.lightU == 160 && vertex.lightV == 240, "falling water light preserved");
+        }
+        require(neckVertices == 8 && perimeterVertices == 8, "each skirt connects both boundaries");
+        int beforeSide = output.vertices.size();
+        point(c, x, y + 0.8, z + 0.001, 0, 0); point(c, x, y, z + 0.001, 0, 1);
+        point(c, x + 1, y, z + 0.001, 1, 1); point(c, x + 1, y + 0.75, z + 0.001, 1, 0);
+        require(output.vertices.size() == beforeSide + 4, "vanilla side retained without duplicate geometry");
+        near(output.vertices.get(beforeSide).y, y + 0.8, "vanilla side height preserved");
+        near(output.vertices.get(beforeSide).z, z + 0.001, "vanilla side inset preserved");
+        int beforeBottom = output.vertices.size();
+        top(c, pos, reverse, 0.001, 0.001, 0.001, 0.001);
+        require(output.vertices.size() == beforeBottom + 4, "bottom face retained");
+        for (V vertex : output.vertices.subList(beforeBottom, output.vertices.size())) {
+            near(vertex.y, y + 0.001, "bottom face unchanged");
         }
     }
 

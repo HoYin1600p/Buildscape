@@ -12190,5 +12190,76 @@ public static final RegistryObject<Item> FLAMING_STEEL_INGOT = ITEMS.register("f
                     new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB).rarity(net.minecraft.world.item.Rarity.RARE)
             )
     );
+
+    public static final RegistryObject<Item> GOLDEN_JAR_PATTERN = ITEMS.register(
+            "golden_jar_pattern",
+            () -> new PatternItem(
+                    new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB).stacksTo(1).rarity(net.minecraft.world.item.Rarity.UNCOMMON),
+                    "tooltip.buildscape.golden_jar_pattern"
+            )
+    );
+
+    public static final RegistryObject<Item> FESTIVE_STAR_PATTERN = ITEMS.register(
+            "festive_star_pattern",
+            () -> new PatternItem(
+                    new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB).stacksTo(1).rarity(net.minecraft.world.item.Rarity.RARE),
+                    "tooltip.buildscape.festive_star_pattern"
+            )
+    );
+
+    public static final RegistryObject<Item> BIG_WHITE_ORNAMENT = ITEMS.register("big_white_ornament", () -> new BlockItem(ModBlocks.BIG_WHITE_ORNAMENT.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BIG_ORANGE_ORNAMENT = ITEMS.register("big_orange_ornament", () -> new BlockItem(ModBlocks.BIG_ORANGE_ORNAMENT.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BIG_MAGENTA_ORNAMENT = ITEMS.register("big_magenta_ornament", () -> new BlockItem(ModBlocks.BIG_MAGENTA_ORNAMENT.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BIG_LIGHT_BLUE_ORNAMENT = ITEMS.register("big_light_blue_ornament", () -> new BlockItem(ModBlocks.BIG_LIGHT_BLUE_ORNAMENT.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BIG_YELLOW_ORNAMENT = ITEMS.register("big_yellow_ornament", () -> new BlockItem(ModBlocks.BIG_YELLOW_ORNAMENT.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BIG_LIME_ORNAMENT = ITEMS.register("big_lime_ornament", () -> new BlockItem(ModBlocks.BIG_LIME_ORNAMENT.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BIG_PINK_ORNAMENT = ITEMS.register("big_pink_ornament", () -> new BlockItem(ModBlocks.BIG_PINK_ORNAMENT.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BIG_GRAY_ORNAMENT = ITEMS.register("big_gray_ornament", () -> new BlockItem(ModBlocks.BIG_GRAY_ORNAMENT.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BIG_LIGHT_GRAY_ORNAMENT = ITEMS.register("big_light_gray_ornament", () -> new BlockItem(ModBlocks.BIG_LIGHT_GRAY_ORNAMENT.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BIG_CYAN_ORNAMENT = ITEMS.register("big_cyan_ornament", () -> new BlockItem(ModBlocks.BIG_CYAN_ORNAMENT.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BIG_PURPLE_ORNAMENT = ITEMS.register("big_purple_ornament", () -> new BlockItem(ModBlocks.BIG_PURPLE_ORNAMENT.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BIG_BLUE_ORNAMENT = ITEMS.register("big_blue_ornament", () -> new BlockItem(ModBlocks.BIG_BLUE_ORNAMENT.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BIG_BROWN_ORNAMENT = ITEMS.register("big_brown_ornament", () -> new BlockItem(ModBlocks.BIG_BROWN_ORNAMENT.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BIG_GREEN_ORNAMENT = ITEMS.register("big_green_ornament", () -> new BlockItem(ModBlocks.BIG_GREEN_ORNAMENT.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BIG_RED_ORNAMENT = ITEMS.register("big_red_ornament", () -> new BlockItem(ModBlocks.BIG_RED_ORNAMENT.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BIG_BLACK_ORNAMENT = ITEMS.register("big_black_ornament", () -> new BlockItem(ModBlocks.BIG_BLACK_ORNAMENT.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BIG_GLASS_ORNAMENT = ITEMS.register("big_glass_ornament", () -> new BlockItem(ModBlocks.BIG_GLASS_ORNAMENT.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BIG_TINTED_GLASS_ORNAMENT = ITEMS.register("big_tinted_glass_ornament", () -> new BlockItem(ModBlocks.BIG_TINTED_GLASS_ORNAMENT.get(), createBlockItemProperties()));
+
+    public static final RegistryObject<Item> BIG_ORNAMENT_TEMPLATE = ITEMS.register(
+            "big_ornament_template",
+            () -> new Item(new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB).rarity(net.minecraft.world.item.Rarity.UNCOMMON))
+    );
+
+    public static final RegistryObject<Item> STRINGLIGHT_FRAME = ITEMS.register(
+            "stringlight_frame",
+            () -> new StringlightFrameItem(new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB))
+    );
+
+    public static final RegistryObject<Item> STRINGLIGHT_FRAME_PATTERN = ITEMS.register(
+            "stringlight_frame_pattern",
+            () -> new PatternItem(
+                    new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB).stacksTo(1).rarity(net.minecraft.world.item.Rarity.RARE),
+                    "tooltip.buildscape.stringlight_frame_pattern"
+            )
+    );
+
+    public static final RegistryObject<Item> MUSIC_DISC_CELEBRATION = ITEMS.register(
+            "music_disc_celebration",
+            () -> new net.minecraft.world.item.RecordItem(
+                    14,
+                    com.kingodogo.buildscape.sound.ModSounds.MUSIC_DISC_CELEBRATION,
+                    new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB).stacksTo(1).rarity(net.minecraft.world.item.Rarity.RARE)
+            )
+    );
+
+    public static final RegistryObject<Item> MUSIC_DISC_SNOWFALL = ITEMS.register(
+            "music_disc_snowfall",
+            () -> new net.minecraft.world.item.RecordItem(
+                    15,
+                    com.kingodogo.buildscape.sound.ModSounds.MUSIC_DISC_SNOWFALL,
+                    new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB).stacksTo(1).rarity(net.minecraft.world.item.Rarity.RARE)
+            )
+    );
 }
 

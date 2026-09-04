@@ -2245,6 +2245,27 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.GLASS_ORNAMENT.get()));
             items.add(new ItemStack(ModItems.TINTED_GLASS_ORNAMENT.get()));
 
+            // Big Ornament Template & Big Ornaments
+            items.add(new ItemStack(ModItems.BIG_ORNAMENT_TEMPLATE.get()));
+            items.add(new ItemStack(ModItems.BIG_WHITE_ORNAMENT.get()));
+            items.add(new ItemStack(ModItems.BIG_LIGHT_GRAY_ORNAMENT.get()));
+            items.add(new ItemStack(ModItems.BIG_GRAY_ORNAMENT.get()));
+            items.add(new ItemStack(ModItems.BIG_BLACK_ORNAMENT.get()));
+            items.add(new ItemStack(ModItems.BIG_BROWN_ORNAMENT.get()));
+            items.add(new ItemStack(ModItems.BIG_RED_ORNAMENT.get()));
+            items.add(new ItemStack(ModItems.BIG_ORANGE_ORNAMENT.get()));
+            items.add(new ItemStack(ModItems.BIG_YELLOW_ORNAMENT.get()));
+            items.add(new ItemStack(ModItems.BIG_LIME_ORNAMENT.get()));
+            items.add(new ItemStack(ModItems.BIG_GREEN_ORNAMENT.get()));
+            items.add(new ItemStack(ModItems.BIG_CYAN_ORNAMENT.get()));
+            items.add(new ItemStack(ModItems.BIG_LIGHT_BLUE_ORNAMENT.get()));
+            items.add(new ItemStack(ModItems.BIG_BLUE_ORNAMENT.get()));
+            items.add(new ItemStack(ModItems.BIG_PURPLE_ORNAMENT.get()));
+            items.add(new ItemStack(ModItems.BIG_MAGENTA_ORNAMENT.get()));
+            items.add(new ItemStack(ModItems.BIG_PINK_ORNAMENT.get()));
+            items.add(new ItemStack(ModItems.BIG_GLASS_ORNAMENT.get()));
+            items.add(new ItemStack(ModItems.BIG_TINTED_GLASS_ORNAMENT.get()));
+
             // Colored Stars
             items.add(new ItemStack(ModItems.GLOW_STAR.get()));
             items.add(new ItemStack(ModItems.WHITE_STAR.get()));
@@ -2264,6 +2285,7 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.MAGENTA_STAR.get()));
             items.add(new ItemStack(ModItems.PINK_STAR.get()));
             items.add(new ItemStack(ModItems.FESTIVE_STAR.get()));
+            items.add(new ItemStack(ModItems.FESTIVE_STAR_PATTERN.get()));
             items.add(new ItemStack(ModItems.WHITE_STRING_LIGHT.get()));
             items.add(new ItemStack(ModItems.LIGHT_GRAY_STRING_LIGHT.get()));
             items.add(new ItemStack(ModItems.GRAY_STRING_LIGHT.get()));
@@ -2283,6 +2305,8 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.MULTICOLOR_STRING_LIGHT.get()));
             items.add(new ItemStack(ModItems.GLOW_LIGHTS.get()));
             items.add(new ItemStack(ModItems.MULTICOLOR_GLOW_LIGHTS.get()));
+            items.add(new ItemStack(ModItems.STRINGLIGHT_FRAME.get()));
+            items.add(new ItemStack(ModItems.STRINGLIGHT_FRAME_PATTERN.get()));
 
             // --- GLASS JARS ---
             items.add(new ItemStack(ModItems.GLASS_JAR.get()));
@@ -2304,6 +2328,7 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.PINK_GLASS_JAR.get()));
             items.add(new ItemStack(ModItems.TINTED_GLASS_JAR.get()));
             items.add(new ItemStack(ModItems.GOLDEN_JAR.get()));
+            items.add(new ItemStack(ModItems.GOLDEN_JAR_PATTERN.get()));
             items.add(new ItemStack(ModItems.FESTIVE_LAMP.get()));
             items.add(new ItemStack(ModItems.WHITE_REDSTONE_LAMP.get()));
             items.add(new ItemStack(ModItems.LIGHT_GRAY_REDSTONE_LAMP.get()));
@@ -2479,6 +2504,8 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.BOTTLE_OF_MIST.get()));
             items.add(new ItemStack(ModItems.SMOKE_VENT.get()));
             items.add(new ItemStack(ModItems.CONFETTI_ITEM.get()));
+            items.add(new ItemStack(ModItems.MUSIC_DISC_CELEBRATION.get()));
+            items.add(new ItemStack(ModItems.MUSIC_DISC_SNOWFALL.get()));
 
             // Custom Firework Stars (Cake, Crown, Trophy)
             ItemStack cakeStar = new ItemStack(Items.FIREWORK_STAR);
@@ -3490,6 +3517,11 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.DRIPSTONE_BLOCK_VERTICAL_SLAB.get()));
             items.add(new ItemStack(ModItems.DRIPSTONE_BLOCK_WALL.get()));
 
+            // Amethyst
+            items.add(new ItemStack(ModItems.AMETHYST_BLOCK_STAIRS.get()));
+            items.add(new ItemStack(ModItems.AMETHYST_BLOCK_SLAB.get()));
+            items.add(new ItemStack(ModItems.AMETHYST_BLOCK_VERTICAL_SLAB.get()));
+
             // Basalt
             items.add(new ItemStack(ModItems.POLISHED_BASALT_STAIRS.get()));
             items.add(new ItemStack(ModItems.POLISHED_BASALT_SLAB.get()));
@@ -3512,6 +3544,14 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.CUT_RED_SANDSTONE_STAIRS.get()));
             items.add(new ItemStack(ModItems.CUT_RED_SANDSTONE_VERTICAL_SLAB.get()));
             items.add(new ItemStack(ModItems.SMOOTH_RED_SANDSTONE_VERTICAL_SLAB.get()));
+
+            // End Stone & Purpur
+            items.add(new ItemStack(ModItems.END_STONE_STAIRS.get()));
+            items.add(new ItemStack(ModItems.END_STONE_SLAB.get()));
+            items.add(new ItemStack(ModItems.END_STONE_VERTICAL_SLAB.get()));
+            items.add(new ItemStack(ModItems.END_STONE_WALL.get()));
+            items.add(new ItemStack(ModItems.END_STONE_BRICK_VERTICAL_SLAB.get()));
+            items.add(new ItemStack(ModItems.PURPUR_VERTICAL_SLAB.get()));
 
             // Obsidian
             items.add(new ItemStack(ModItems.OBSIDIAN_STAIRS.get()));
@@ -3541,6 +3581,22 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.SNOW_BRICKS_SLAB.get()));
             items.add(new ItemStack(ModItems.SNOW_BRICKS_VERTICAL_SLAB.get()));
             items.add(new ItemStack(ModItems.SNOW_BRICKS_WALL.get()));
+
+            // Icicles
+            items.add(new ItemStack(ModItems.ICICLE.get()));
+            items.add(new ItemStack(ModItems.ICICLE_BLOCK.get()));
+            items.add(new ItemStack(ModItems.PACKED_ICICLE_BLOCK.get()));
+
+            // Dirt, Podzol, Mycelium
+            items.add(new ItemStack(ModItems.DIRT_STAIRS.get()));
+            items.add(new ItemStack(ModItems.DIRT_SLAB.get()));
+            items.add(new ItemStack(ModItems.DIRT_VERTICAL_SLAB.get()));
+            items.add(new ItemStack(ModItems.PODZOL_STAIRS.get()));
+            items.add(new ItemStack(ModItems.PODZOL_SLAB.get()));
+            items.add(new ItemStack(ModItems.PODZOL_VERTICAL_SLAB.get()));
+            items.add(new ItemStack(ModItems.MYCELIUM_STAIRS.get()));
+            items.add(new ItemStack(ModItems.MYCELIUM_SLAB.get()));
+            items.add(new ItemStack(ModItems.MYCELIUM_VERTICAL_SLAB.get()));
 
             // Moss
             items.add(new ItemStack(ModItems.MOSS_BLOCK_SLAB.get()));

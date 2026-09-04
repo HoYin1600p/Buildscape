@@ -1,0 +1,23 @@
+{
+  "values": [
+    "buildscape:glass_jar",
+    "buildscape:white_glass_jar",
+    "buildscape:orange_glass_jar",
+    "buildscape:magenta_glass_jar",
+    "buildscape:light_blue_glass_jar",
+    "buildscape:yellow_glass_jar",
+    "buildscape:lime_glass_jar",
+    "buildscape:pink_glass_jar",
+    "buildscape:gray_glass_jar",
+    "buildscape:light_gray_glass_jar",
+    "buildscape:cyan_glass_jar",
+    "buildscape:purple_glass_jar",
+    "buildscape:blue_glass_jar",
+    "buildscape:brown_glass_jar",
+    "buildscape:green_glass_jar",
+    "buildscape:red_glass_jar",
+    "buildscape:black_glass_jar",
+    "buildscape:tinted_glass_jar",
+    "buildscape:golden_jar"
+  ]
+}

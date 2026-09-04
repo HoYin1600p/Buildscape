@@ -48,6 +48,16 @@ public abstract class FireworkStarterMixin extends Particle {
                         int[] colors = tag.getIntArray("Colors");
                         int[] fadeColors = tag.getIntArray("FadeColors");
 
+                        // Extract rotation/facing yaw (from shooter NBT or trajectory or camera)
+                        float yaw = 0.0F;
+                        if (tag.contains("ShotYaw")) {
+                            yaw = tag.getFloat("ShotYaw");
+                        } else if (Math.hypot(this.xd, this.zd) > 0.05) {
+                            yaw = (float) (net.minecraft.util.Mth.atan2(this.xd, this.zd) * (180.0F / (float) Math.PI));
+                        } else if (net.minecraft.client.Minecraft.getInstance().player != null) {
+                            yaw = net.minecraft.client.Minecraft.getInstance().player.getYRot();
+                        }
+
                         // Expand bounding box for custom shapes so long-distance viewing and wide frustums don't cull particles
                         this.setBoundingBox(this.getBoundingBox().inflate(120.0D, 120.0D, 120.0D));
 
@@ -56,6 +66,7 @@ public abstract class FireworkStarterMixin extends Particle {
                                 this.x, this.y, this.z,
                                 colors, fadeColors,
                                 trail, flicker,
+                                yaw,
                                 this::createParticle
                         );
                     }

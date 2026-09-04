@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "buildscape:festive_star_pattern"
+    },
+    {
+      "tag": "buildscape:stars"
+    }
+  ],
+  "result": {
+    "item": "buildscape:festive_star"
+  }
+}

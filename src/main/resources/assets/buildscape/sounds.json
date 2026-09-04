@@ -1125,12 +1125,7 @@
     ]
   },
   "block_noxious_gas": {
-    "sounds": [
-      {
-        "name": "block.fire.extinguish",
-        "type": "event"
-      }
-    ]
+    "sounds": []
   },
   "block_shelf_activate": {
     "sounds": [
@@ -1177,6 +1172,22 @@
       {
         "name": "entity.item_frame.rotate_item",
         "type": "event"
+      }
+    ]
+  },
+  "music_disc_celebration": {
+    "sounds": [
+      {
+        "name": "buildscape:music/celebration",
+        "stream": true
+      }
+    ]
+  },
+  "music_disc_snowfall": {
+    "sounds": [
+      {
+        "name": "buildscape:music/snowfall",
+        "stream": true
       }
     ]
   }

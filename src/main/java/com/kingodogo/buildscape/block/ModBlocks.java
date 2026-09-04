@@ -5000,6 +5000,42 @@ public class ModBlocks {
                                                         .noOcclusion()
                                                         .dynamicShape()
                                                         .lightLevel(state -> 4)));
+        public static final RegistryObject<Block> BIG_WHITE_ORNAMENT = BLOCKS.register("big_white_ornament",
+                        () -> new BigOrnamentBlock(BlockBehaviour.Properties.of(Material.GLASS, MaterialColor.SNOW).strength(0.3f).sound(net.minecraft.world.level.block.SoundType.GLASS).noOcclusion().lightLevel(state -> state.getValue(BigOrnamentBlock.LIT) ? 15 : 0)));
+        public static final RegistryObject<Block> BIG_ORANGE_ORNAMENT = BLOCKS.register("big_orange_ornament",
+                        () -> new BigOrnamentBlock(BlockBehaviour.Properties.of(Material.GLASS, MaterialColor.COLOR_ORANGE).strength(0.3f).sound(net.minecraft.world.level.block.SoundType.GLASS).noOcclusion().lightLevel(state -> state.getValue(BigOrnamentBlock.LIT) ? 15 : 0)));
+        public static final RegistryObject<Block> BIG_MAGENTA_ORNAMENT = BLOCKS.register("big_magenta_ornament",
+                        () -> new BigOrnamentBlock(BlockBehaviour.Properties.of(Material.GLASS, MaterialColor.COLOR_MAGENTA).strength(0.3f).sound(net.minecraft.world.level.block.SoundType.GLASS).noOcclusion().lightLevel(state -> state.getValue(BigOrnamentBlock.LIT) ? 15 : 0)));
+        public static final RegistryObject<Block> BIG_LIGHT_BLUE_ORNAMENT = BLOCKS.register("big_light_blue_ornament",
+                        () -> new BigOrnamentBlock(BlockBehaviour.Properties.of(Material.GLASS, MaterialColor.COLOR_LIGHT_BLUE).strength(0.3f).sound(net.minecraft.world.level.block.SoundType.GLASS).noOcclusion().lightLevel(state -> state.getValue(BigOrnamentBlock.LIT) ? 15 : 0)));
+        public static final RegistryObject<Block> BIG_YELLOW_ORNAMENT = BLOCKS.register("big_yellow_ornament",
+                        () -> new BigOrnamentBlock(BlockBehaviour.Properties.of(Material.GLASS, MaterialColor.COLOR_YELLOW).strength(0.3f).sound(net.minecraft.world.level.block.SoundType.GLASS).noOcclusion().lightLevel(state -> state.getValue(BigOrnamentBlock.LIT) ? 15 : 0)));
+        public static final RegistryObject<Block> BIG_LIME_ORNAMENT = BLOCKS.register("big_lime_ornament",
+                        () -> new BigOrnamentBlock(BlockBehaviour.Properties.of(Material.GLASS, MaterialColor.COLOR_LIGHT_GREEN).strength(0.3f).sound(net.minecraft.world.level.block.SoundType.GLASS).noOcclusion().lightLevel(state -> state.getValue(BigOrnamentBlock.LIT) ? 15 : 0)));
+        public static final RegistryObject<Block> BIG_PINK_ORNAMENT = BLOCKS.register("big_pink_ornament",
+                        () -> new BigOrnamentBlock(BlockBehaviour.Properties.of(Material.GLASS, MaterialColor.COLOR_PINK).strength(0.3f).sound(net.minecraft.world.level.block.SoundType.GLASS).noOcclusion().lightLevel(state -> state.getValue(BigOrnamentBlock.LIT) ? 15 : 0)));
+        public static final RegistryObject<Block> BIG_GRAY_ORNAMENT = BLOCKS.register("big_gray_ornament",
+                        () -> new BigOrnamentBlock(BlockBehaviour.Properties.of(Material.GLASS, MaterialColor.COLOR_GRAY).strength(0.3f).sound(net.minecraft.world.level.block.SoundType.GLASS).noOcclusion().lightLevel(state -> state.getValue(BigOrnamentBlock.LIT) ? 15 : 0)));
+        public static final RegistryObject<Block> BIG_LIGHT_GRAY_ORNAMENT = BLOCKS.register("big_light_gray_ornament",
+                        () -> new BigOrnamentBlock(BlockBehaviour.Properties.of(Material.GLASS, MaterialColor.COLOR_LIGHT_GRAY).strength(0.3f).sound(net.minecraft.world.level.block.SoundType.GLASS).noOcclusion().lightLevel(state -> state.getValue(BigOrnamentBlock.LIT) ? 15 : 0)));
+        public static final RegistryObject<Block> BIG_CYAN_ORNAMENT = BLOCKS.register("big_cyan_ornament",
+                        () -> new BigOrnamentBlock(BlockBehaviour.Properties.of(Material.GLASS, MaterialColor.COLOR_CYAN).strength(0.3f).sound(net.minecraft.world.level.block.SoundType.GLASS).noOcclusion().lightLevel(state -> state.getValue(BigOrnamentBlock.LIT) ? 15 : 0)));
+        public static final RegistryObject<Block> BIG_PURPLE_ORNAMENT = BLOCKS.register("big_purple_ornament",
+                        () -> new BigOrnamentBlock(BlockBehaviour.Properties.of(Material.GLASS, MaterialColor.COLOR_PURPLE).strength(0.3f).sound(net.minecraft.world.level.block.SoundType.GLASS).noOcclusion().lightLevel(state -> state.getValue(BigOrnamentBlock.LIT) ? 15 : 0)));
+        public static final RegistryObject<Block> BIG_BLUE_ORNAMENT = BLOCKS.register("big_blue_ornament",
+                        () -> new BigOrnamentBlock(BlockBehaviour.Properties.of(Material.GLASS, MaterialColor.COLOR_BLUE).strength(0.3f).sound(net.minecraft.world.level.block.SoundType.GLASS).noOcclusion().lightLevel(state -> state.getValue(BigOrnamentBlock.LIT) ? 15 : 0)));
+        public static final RegistryObject<Block> BIG_BROWN_ORNAMENT = BLOCKS.register("big_brown_ornament",
+                        () -> new BigOrnamentBlock(BlockBehaviour.Properties.of(Material.GLASS, MaterialColor.COLOR_BROWN).strength(0.3f).sound(net.minecraft.world.level.block.SoundType.GLASS).noOcclusion().lightLevel(state -> state.getValue(BigOrnamentBlock.LIT) ? 15 : 0)));
+        public static final RegistryObject<Block> BIG_GREEN_ORNAMENT = BLOCKS.register("big_green_ornament",
+                        () -> new BigOrnamentBlock(BlockBehaviour.Properties.of(Material.GLASS, MaterialColor.COLOR_GREEN).strength(0.3f).sound(net.minecraft.world.level.block.SoundType.GLASS).noOcclusion().lightLevel(state -> state.getValue(BigOrnamentBlock.LIT) ? 15 : 0)));
+        public static final RegistryObject<Block> BIG_RED_ORNAMENT = BLOCKS.register("big_red_ornament",
+                        () -> new BigOrnamentBlock(BlockBehaviour.Properties.of(Material.GLASS, MaterialColor.COLOR_RED).strength(0.3f).sound(net.minecraft.world.level.block.SoundType.GLASS).noOcclusion().lightLevel(state -> state.getValue(BigOrnamentBlock.LIT) ? 15 : 0)));
+        public static final RegistryObject<Block> BIG_BLACK_ORNAMENT = BLOCKS.register("big_black_ornament",
+                        () -> new BigOrnamentBlock(BlockBehaviour.Properties.of(Material.GLASS, MaterialColor.COLOR_BLACK).strength(0.3f).sound(net.minecraft.world.level.block.SoundType.GLASS).noOcclusion().lightLevel(state -> state.getValue(BigOrnamentBlock.LIT) ? 15 : 0)));
+        public static final RegistryObject<Block> BIG_GLASS_ORNAMENT = BLOCKS.register("big_glass_ornament",
+                        () -> new BigOrnamentBlock(BlockBehaviour.Properties.of(Material.GLASS, MaterialColor.NONE).strength(0.3f).sound(net.minecraft.world.level.block.SoundType.GLASS).noOcclusion().lightLevel(state -> state.getValue(BigOrnamentBlock.LIT) ? 15 : 0)));
+        public static final RegistryObject<Block> BIG_TINTED_GLASS_ORNAMENT = BLOCKS.register("big_tinted_glass_ornament",
+                        () -> new BigOrnamentBlock(BlockBehaviour.Properties.of(Material.GLASS, MaterialColor.NONE).strength(0.3f).sound(net.minecraft.world.level.block.SoundType.GLASS).noOcclusion().dynamicShape().lightLevel(state -> state.getValue(BigOrnamentBlock.LIT) ? 4 : 0), true));
         public static final RegistryObject<Block> WHITE_STRING_LIGHT = BLOCKS.register("white_string_light",
                         () -> new StringLightBlock(
                                         BlockBehaviour.Properties.of(Material.GLASS, MaterialColor.SNOW)

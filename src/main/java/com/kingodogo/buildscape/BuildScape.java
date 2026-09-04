@@ -104,6 +104,20 @@ public class BuildScape {
             } catch (Exception e) {
                 LOGGER.error("Failed to set max stack size for potions or cakes", e);
             }
+
+            try {
+                java.util.Map<net.minecraft.sounds.SoundEvent, net.minecraft.world.item.RecordItem> recordMap =
+                        net.minecraftforge.fml.util.ObfuscationReflectionHelper.getPrivateValue(
+                                net.minecraft.world.item.RecordItem.class, null, "f_43032_");
+                if (recordMap != null) {
+                    recordMap.put(com.kingodogo.buildscape.sound.ModSounds.MUSIC_DISC_CELEBRATION.get(),
+                            (net.minecraft.world.item.RecordItem) ModItems.MUSIC_DISC_CELEBRATION.get());
+                    recordMap.put(com.kingodogo.buildscape.sound.ModSounds.MUSIC_DISC_SNOWFALL.get(),
+                            (net.minecraft.world.item.RecordItem) ModItems.MUSIC_DISC_SNOWFALL.get());
+                }
+            } catch (Exception e) {
+                LOGGER.error("Failed to register custom records into RecordItem.BY_NAME", e);
+            }
         });
 
         event.enqueueWork(() -> {
@@ -2421,6 +2435,13 @@ public class BuildScape {
         @SubscribeEvent
         public static void registerLayerDefinitions(net.minecraftforge.client.event.EntityRenderersEvent.RegisterLayerDefinitions event) {
             event.registerLayerDefinition(com.kingodogo.buildscape.client.model.WanderingHomemakerModel.LAYER_LOCATION, com.kingodogo.buildscape.client.model.WanderingHomemakerModel::createBodyLayer);
+        }
+
+        @SubscribeEvent
+        public static void onModelRegistry(net.minecraftforge.client.event.ModelRegistryEvent event) {
+            net.minecraftforge.client.model.ForgeModelBakery.addSpecialModel(
+                    new net.minecraft.resources.ResourceLocation(BuildScape.MODID, "block/stringlight_frame")
+            );
         }
     }
 

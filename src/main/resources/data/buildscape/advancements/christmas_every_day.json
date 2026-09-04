@@ -18,7 +18,10 @@
   "rewards": {
     "items": [
       {
-        "item": "buildscape:festive_stocking"
+        "item": "buildscape:stocking_trophy"
+      },
+      {
+        "item": "buildscape:music_disc_snowfall"
       }
     ]
   },

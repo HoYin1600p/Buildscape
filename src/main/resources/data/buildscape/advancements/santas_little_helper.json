@@ -18,7 +18,10 @@
   "rewards": {
     "items": [
       {
-        "item": "buildscape:glow_star"
+        "item": "buildscape:star_trophy"
+      },
+      {
+        "item": "buildscape:festive_star_pattern"
       }
     ]
   },

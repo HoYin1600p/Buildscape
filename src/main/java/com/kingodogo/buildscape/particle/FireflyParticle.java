@@ -2,22 +2,48 @@ package com.kingodogo.buildscape.particle;
 
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.*;
-import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.util.Mth;
-import com.kingodogo.buildscape.block.ModBlocks;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+
+import java.util.Iterator;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 @OnlyIn(Dist.CLIENT)
 public class FireflyParticle extends TextureSheetParticle {
 
-    private static final java.util.Map<BlockPos, Integer> BUSH_PARTICLE_COUNTS = new java.util.HashMap<>();
-    private static final java.util.Map<BlockPos, Integer> BUSH_LIMITS = new java.util.HashMap<>();
+    public static final int MAX_FIREFLIES_IN_RANGE = 500;
+    public static final double RANGE = 10.0D;
+    public static final double RANGE_SQR = RANGE * RANGE;
+
+    private static final Set<FireflyParticle> ACTIVE_FIREFLIES = ConcurrentHashMap.newKeySet();
 
     private final SpriteSet sprites;
     private final float baseAlpha;
-    private BlockPos spawnedBushPos;
+
+    public static int getFireflyCountInRange(ClientLevel level, double x, double y, double z, double rangeSqr) {
+        int count = 0;
+        Iterator<FireflyParticle> it = ACTIVE_FIREFLIES.iterator();
+        while (it.hasNext()) {
+            FireflyParticle p = it.next();
+            if (!p.isAlive() || p.level != level) {
+                it.remove();
+                continue;
+            }
+            double dx = p.x - x;
+            double dy = p.y - y;
+            double dz = p.z - z;
+            if (dx * dx + dy * dy + dz * dz <= rangeSqr) {
+                count++;
+                if (count >= MAX_FIREFLIES_IN_RANGE) {
+                    return count;
+                }
+            }
+        }
+        return count;
+    }
 
     protected FireflyParticle(ClientLevel level, double x, double y, double z,
                               double xSpeed, double ySpeed, double zSpeed,
@@ -49,30 +75,11 @@ public class FireflyParticle extends TextureSheetParticle {
 
         this.pickSprite(sprites);
 
-        // Find nearest firefly bush within 6 blocks
-        BlockPos bushPos = null;
-        double minDst = Double.MAX_VALUE;
-        BlockPos particlePos = new BlockPos((int) x, (int) y, (int) z);
-        for (BlockPos p : BlockPos.betweenClosed(particlePos.offset(-6, -6, -6), particlePos.offset(6, 6, 6))) {
-            if (level.getBlockState(p).is(ModBlocks.FIREFLY_BUSH.get())) {
-                double dst = p.distSqr(particlePos);
-                if (dst < minDst) {
-                    minDst = dst;
-                    bushPos = p.immutable();
-                }
-            }
+        if (getFireflyCountInRange(level, x, y, z, RANGE_SQR) >= MAX_FIREFLIES_IN_RANGE) {
+            this.remove();
+            return;
         }
-
-        if (bushPos != null) {
-            this.spawnedBushPos = bushPos;
-            int limit = BUSH_LIMITS.computeIfAbsent(bushPos, k -> 30 + level.random.nextInt(21));
-            int currentCount = BUSH_PARTICLE_COUNTS.getOrDefault(bushPos, 0);
-            if (currentCount >= limit) {
-                this.remove();
-                return;
-            }
-            BUSH_PARTICLE_COUNTS.put(bushPos, currentCount + 1);
-        }
+        ACTIVE_FIREFLIES.add(this);
     }
 
     @Override
@@ -116,15 +123,7 @@ public class FireflyParticle extends TextureSheetParticle {
     @Override
     public void remove() {
         super.remove();
-        if (this.spawnedBushPos != null) {
-            int currentCount = BUSH_PARTICLE_COUNTS.getOrDefault(this.spawnedBushPos, 0);
-            if (currentCount > 1) {
-                BUSH_PARTICLE_COUNTS.put(this.spawnedBushPos, currentCount - 1);
-            } else {
-                BUSH_PARTICLE_COUNTS.remove(this.spawnedBushPos);
-                BUSH_LIMITS.remove(this.spawnedBushPos);
-            }
-        }
+        ACTIVE_FIREFLIES.remove(this);
     }
 
     @Override
@@ -152,6 +151,9 @@ public class FireflyParticle extends TextureSheetParticle {
         public Particle createParticle(SimpleParticleType type, ClientLevel level,
                                        double x, double y, double z,
                                        double xSpeed, double ySpeed, double zSpeed) {
+            if (getFireflyCountInRange(level, x, y, z, RANGE_SQR) >= MAX_FIREFLIES_IN_RANGE) {
+                return null;
+            }
             return new FireflyParticle(level, x, y, z, xSpeed, ySpeed, zSpeed, sprites);
         }
     }

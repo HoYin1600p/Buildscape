@@ -33,9 +33,6 @@ import java.util.Random;
 public class SmokeVentBlock extends Block implements EntityBlock {
 
     public static final EnumProperty<PillarPart> PART = EnumProperty.create("part", PillarPart.class);
-    /**
-     * Tracks current redstone power — changing this fires observers; value mirrors live signal.
-     */
     public static final BooleanProperty POWERED = BooleanProperty.create("powered");
 
     private static final VoxelShape SHAPE_SINGLE = Shapes.or(
@@ -137,7 +134,6 @@ public class SmokeVentBlock extends Block implements EntityBlock {
             setPoweredAndSync(level, pos, powered);
             applyActiveToStack(level, pos, powered);
 
-            // Notify comparators for the whole stack
             BlockPos current = findBottomBlock(level, pos);
             while (level.getBlockState(current).getBlock() instanceof SmokeVentBlock) {
                 level.updateNeighbourForOutputSignal(current, this);
@@ -149,9 +145,6 @@ public class SmokeVentBlock extends Block implements EntityBlock {
         }
     }
 
-    /**
-     * Comparator output: 15 when smoke is active, 0 when off. Reads from the BlockEntity.
-     */
     @Override
     public boolean hasAnalogOutputSignal(BlockState state) {
         return true;
@@ -159,7 +152,6 @@ public class SmokeVentBlock extends Block implements EntityBlock {
 
     @Override
     public int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos) {
-        // Read from the top block's entity so any segment next to a comparator returns correctly
         BlockPos top = findTopBlock(level, pos);
         BlockEntity be = level.getBlockEntity(top);
         if (be instanceof SmokeVentBlockEntity ventBE) {
@@ -168,11 +160,6 @@ public class SmokeVentBlock extends Block implements EntityBlock {
         return 0;
     }
 
-    /**
-     * Sets POWERED on every segment of the pillar, flag=3 so adjacent observers detect the
-     * block state change. The cascade guard in neighborChanged prevents vent segments from
-     * reacting to each other's updates.
-     */
     private void setPoweredAndSync(Level level, BlockPos pos, boolean powered) {
         BlockPos current = findBottomBlock(level, pos);
         while (level.getBlockState(current).getBlock() instanceof SmokeVentBlock) {
@@ -216,7 +203,6 @@ public class SmokeVentBlock extends Block implements EntityBlock {
 
         ItemStack heldItem = player.getItemInHand(hand);
 
-        // Dye interaction - changes smoke color for the whole stack
         if (!heldItem.isEmpty()) {
             Map.Entry<String, String> dyeInfo = getDyeColorAndName(heldItem);
             if (dyeInfo != null) {
@@ -247,7 +233,6 @@ public class SmokeVentBlock extends Block implements EntityBlock {
             }
         }
 
-        // Empty hand right-click to toggle smoke on/off
         if (heldItem.isEmpty()) {
             boolean newActive = !getStackActive(level, pos);
             applyActiveToStack(level, pos, newActive);
@@ -255,11 +240,10 @@ public class SmokeVentBlock extends Block implements EntityBlock {
             level.playSound(null, pos, net.minecraft.sounds.SoundEvents.UI_BUTTON_CLICK,
                     net.minecraft.sounds.SoundSource.BLOCKS, 0.5f, newActive ? 1.2f : 0.8f);
 
-            // VERY IMPORTANT: right-clicking didn't update comparators or observers before!
             BlockPos current = findBottomBlock(level, pos);
             while (level.getBlockState(current).getBlock() instanceof SmokeVentBlock) {
-                level.updateNeighbourForOutputSignal(current, this); // Updates comparators
-                level.updateNeighborsAt(current, this); // Updates observers
+                level.updateNeighbourForOutputSignal(current, this);
+                level.updateNeighborsAt(current, this);
                 current = current.above();
             }
 
@@ -276,7 +260,6 @@ public class SmokeVentBlock extends Block implements EntityBlock {
             return InteractionResult.SUCCESS;
         }
 
-        // Shift + click with water bucket to clear color
         if (player.isShiftKeyDown() && !heldItem.isEmpty() &&
                 heldItem.getItem() == Items.WATER_BUCKET) {
             applyColorToStack(level, pos, null);
@@ -322,11 +305,9 @@ public class SmokeVentBlock extends Block implements EntityBlock {
 
         BlockEntity be = level.getBlockEntity(pos);
         if (be instanceof SmokeVentBlockEntity ventBE && ventBE.getSmokeColor() != null) {
-            // Colored smoke - queue color then spawn custom particle
             SmokeColorRegistry.registerColorForPosition(x, y, z, ventBE.getSmokeColor());
             level.addAlwaysVisibleParticle(ModParticles.COLORED_SMOKE.get(), true, x, y, z, 0.0, 0.07, 0.0);
         } else {
-            // Default campfire smoke
             level.addAlwaysVisibleParticle(ParticleTypes.CAMPFIRE_COSY_SMOKE, true, x, y, z, 0.0, 0.07, 0.0);
         }
     }

@@ -18,7 +18,7 @@ import java.util.Random;
 public class CascadeBlockEntity extends BlockEntity {
 
     private static final Random RANDOM = new Random();
-    private int particleLevel = 5; // 1 = 20%, 2 = 40%, 3 = 60%, 4 = 80%, 5 = 100%
+    private int particleLevel = 5;
 
     public CascadeBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.CASCADE_BLOCK_ENTITY.get(), pos, state);
@@ -97,7 +97,6 @@ public class CascadeBlockEntity extends BlockEntity {
 
     private static class ClientHandler {
         private static void tick(Level level, BlockPos pos, BlockState state, CascadeBlockEntity be) {
-            // Respect Minecraft's particle settings for performance
             net.minecraft.client.Minecraft minecraft = net.minecraft.client.Minecraft.getInstance();
             net.minecraft.client.ParticleStatus particleSetting = minecraft.options.particles;
             if (particleSetting == net.minecraft.client.ParticleStatus.MINIMAL) {
@@ -106,7 +105,6 @@ public class CascadeBlockEntity extends BlockEntity {
                 if (level.getGameTime() % 2 != 0) return;
             }
 
-            // If local player holds cascade block or bottle of mist in OFF-HAND, suppress particles in their chunk
             Player player = minecraft.player;
             if (player != null) {
                 if (isMistSuppressor(player.getOffhandItem())) {

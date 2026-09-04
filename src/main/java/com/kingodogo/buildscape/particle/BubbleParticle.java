@@ -16,37 +16,30 @@ public class BubbleParticle extends TextureSheetParticle {
     protected BubbleParticle(ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed, SpriteSet sprites) {
         super(level, x, y, z, xSpeed, ySpeed, zSpeed);
 
-        // Use custom bubble sprite
         this.setSpriteFromAge(sprites);
         this.pickSprite(sprites);
 
-        // Bubble properties - match snowflake trail properties
-        this.gravity = 0.05F; // Gentle fall (same as snowflake)
-        this.lifetime = 60 + level.random.nextInt(40); // 60-100 ticks lifetime (same as snowflake)
+        this.gravity = 0.05F;
+        this.lifetime = 60 + level.random.nextInt(40);
         this.hasPhysics = true;
 
-        // Random size variation (same as snowflake)
-        this.quadSize = 0.1F + level.random.nextFloat() * 0.1F; // 0.1 to 0.2 size
+        this.quadSize = 0.1F + level.random.nextFloat() * 0.1F;
 
-        // Slight drift (same as snowflake)
         this.xd = xSpeed + (level.random.nextDouble() - 0.5) * 0.02;
         this.yd = ySpeed;
         this.zd = zSpeed + (level.random.nextDouble() - 0.5) * 0.02;
 
-        // Bubbles are white/transparent
         this.setColor(1.0F, 1.0F, 1.0F);
-        this.alpha = 0.8F + level.random.nextFloat() * 0.2F; // 0.8 to 1.0 (same as snowflake)
+        this.alpha = 0.8F + level.random.nextFloat() * 0.2F;
     }
 
     @Override
     public void tick() {
         super.tick();
 
-        // Wobble effect
         this.oRoll = this.roll;
         this.roll += 0.05F;
 
-        // Fade out before popping
         if (this.age > this.lifetime * 0.8F) {
             float fadeProgress = (this.age - this.lifetime * 0.8F) / (this.lifetime * 0.2F);
             this.alpha = (1.0F - fadeProgress) * 0.6F;
@@ -60,7 +53,7 @@ public class BubbleParticle extends TextureSheetParticle {
 
     @Override
     public int getLightColor(float partialTick) {
-        return 0xF000F0; // Full brightness
+        return 0xF000F0;
     }
 
     @OnlyIn(Dist.CLIENT)

@@ -17,7 +17,7 @@ import java.util.function.Supplier;
 
 public class TreeChopPacket {
 
-    private static final int MAX_LOGS = 200; // Limit to prevent server lag
+    private static final int MAX_LOGS = 200;
     private final BlockPos pos;
 
     public TreeChopPacket(BlockPos pos) {
@@ -90,11 +90,9 @@ public class TreeChopPacket {
 
         int count = 0;
 
-        // BFS to find all blocks
         while (!queue.isEmpty() && count < MAX_LOGS) {
             BlockPos current = queue.poll();
 
-            // Neighbors
             for (int dx = -1; dx <= 1; dx++) {
                 for (int dy = -1; dy <= 1; dy++) {
                     for (int dz = -1; dz <= 1; dz++) {
@@ -115,7 +113,6 @@ public class TreeChopPacket {
             }
         }
 
-        // Start the sequential breaking with a delay
         scheduleNextBreak(level, orderedBlocks, 0, 1, 0);
     }
 
@@ -130,22 +127,18 @@ public class TreeChopPacket {
             return;
         }
 
-        // Run this batch
         int end = Math.min(currentIndex + batchSize, blocks.size());
         for (int i = currentIndex; i < end; i++) {
             BlockPos pos = blocks.get(i);
             if (!level.isLoaded(pos)) continue;
             BlockState state = level.getBlockState(pos);
 
-            // Only spawn particles for every 3rd block to reduce spam
             if (i % 3 == 0) {
                 level.levelEvent(2001, pos, Block.getId(state));
             }
             level.destroyBlock(pos, false);
         }
 
-        // Schedule next batch with a proper delay (2 ticks = 100ms)
-        // Incremental speed: Increase batch size every 3 ticks
         int nextBatchSize = batchSize;
         int nextConsecutiveTicks = consecutiveTicks + 1;
 
@@ -156,7 +149,6 @@ public class TreeChopPacket {
         int finalNextBatchSize = nextBatchSize;
         int nextIndex = end;
 
-        // Schedule next batch with a 100ms (~2 ticks) delay without blocking the server thread
         java.util.concurrent.CompletableFuture.delayedExecutor(100, java.util.concurrent.TimeUnit.MILLISECONDS).execute(() -> {
             if (level.getServer() == null || !level.getServer().isRunning()) return;
             level.getServer().execute(() -> {

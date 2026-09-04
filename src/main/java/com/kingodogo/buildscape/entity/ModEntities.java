@@ -74,7 +74,7 @@ public class ModEntities {
                             SeatEntity::new,
                             MobCategory.MISC
                     )
-                    .sized(0.1F, 0.1F) // Small invisible entity
+                    .sized(0.1F, 0.1F)
                     .clientTrackingRange(10)
                     .updateInterval(20)
                     .build("seat")

@@ -13,11 +13,6 @@ import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.client.model.data.EmptyModelData;
 
-/**
- * Renderer for {@link TrappedDecoratedPotBlockEntity}.
- * Identical wobble logic to {@link DecoratedPotBlockEntityRenderer} but
- * operates on the trapped pot's block entity type.
- */
 public class TrappedDecoratedPotBlockEntityRenderer
         implements BlockEntityRenderer<TrappedDecoratedPotBlockEntity> {
 

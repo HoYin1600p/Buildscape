@@ -20,12 +20,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeSet;
 
-/** Replaces, rather than overlays, the world-water surface beside an outlet. Author: HoYin1600p. */
 public final class PipeSpillVertexConsumer implements VertexConsumer {
     private static final double OPEN_MIN = 0.127;
     private static final double OPEN_MAX = 1.0 - OPEN_MIN;
 
-    /** Direction points from the world-water block toward the pipe. */
     public record Outlet(Direction direction, double height) {}
 
     private final VertexConsumer delegate;
@@ -54,7 +52,6 @@ public final class PipeSpillVertexConsumer implements VertexConsumer {
     }
 
     public static List<Outlet> findOutlets(BlockAndTintGetter level, BlockPos pos, BlockState state, FluidState fluid) {
-        // A downward outlet replaces the first falling block's mesh, joining its neck to the pipe.
         if (!(state.getBlock() instanceof LiquidBlock) || !fluid.getType().isSame(Fluids.WATER)
                 || fluid.isSource()) {
             return List.of();
@@ -67,7 +64,6 @@ public final class PipeSpillVertexConsumer implements VertexConsumer {
                 && PipeOutletWater.amount(pipeAbove, entity.getPipeFlowState(), Direction.DOWN) > 0) {
             return List.of(new Outlet(Direction.UP, 1.0));
         }
-        // Ordinary waterfalls and submerged water do not need a horizontal spill.
         if (fluid.getValue(net.minecraft.world.level.material.FlowingFluid.FALLING)
                 || level.getFluidState(pos.above()).getType().isSame(Fluids.WATER)) {
             return List.of();
@@ -98,7 +94,6 @@ public final class PipeSpillVertexConsumer implements VertexConsumer {
                         || pipe.getValue(HollowPipeBlock.SOUTH))
                         && !pipe.getValue(HollowPipeBlock.WEST) && !pipe.getValue(HollowPipeBlock.EAST);
                 double height = straightX || straightZ ? heights.outlet() : heights.center();
-                // Match directed straight pipes where the inlet end is specifically chosen
                 if (straightX && exit == Direction.WEST && flow.getInflowDirection() == Direction.WEST) height = heights.inlet();
                 if (straightX && exit == Direction.EAST && flow.getInflowDirection() == Direction.EAST) height = heights.inlet();
                 if (straightZ && exit == Direction.NORTH && flow.getInflowDirection() == Direction.NORTH) height = heights.inlet();
@@ -144,7 +139,7 @@ public final class PipeSpillVertexConsumer implements VertexConsumer {
     }
 
     private void renderQuad() {
-        Vertex[] corners = new Vertex[4]; // NW, SW, SE, NE, independent of winding.
+        Vertex[] corners = new Vertex[4];
         for (Vertex vertex : quad) {
             double px = vertex.x - baseX, pz = vertex.z - baseZ;
             if (vertex.y <= baseY + 0.01 || vertex.y > baseY + 1.0
@@ -202,8 +197,6 @@ public final class PipeSpillVertexConsumer implements VertexConsumer {
             Vertex sampled = sample(corners, px, pz);
             neck[i] = sampled.at(sampled.x, baseY + 1.0, sampled.z, sampled.u, sampled.v);
         }
-        // Four skirts join the inner opening to vanilla's existing perimeter. Keeping that perimeter
-        // unchanged also joins adjacent flowing water without holes or overlapping translucent faces.
         boolean forward = quad[1].z > quad[0].z;
         for (int i = 0; i < 4; i++) {
             int next = (i + 1) % 4;
@@ -239,7 +232,6 @@ public final class PipeSpillVertexConsumer implements VertexConsumer {
     }
 
     private Vertex sample(Vertex[] c, double x, double z) {
-        // Preserve vanilla's two triangles, including UVs; bilinear interpolation would reshape the water.
         Vertex a = c[0], b = x <= z ? c[1] : c[3], d = c[2];
         double wb = Math.abs(z - x), wd = Math.min(x, z), wa = 1 - wb - wd;
         return a.at(baseX + x, a.y * wa + b.y * wb + d.y * wd, baseZ + z,

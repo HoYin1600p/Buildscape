@@ -180,7 +180,6 @@ public class PointedIcicleBlock extends PointedDripstoneBlock {
                     BlockStateProperties.VERTICAL_DIRECTION
             );
 
-            // Check if the support block is actually gone
             BlockPos supportPos = direction == Direction.DOWN
                     ? pos.above()
                     : pos.below();
@@ -195,8 +194,6 @@ public class PointedIcicleBlock extends PointedDripstoneBlock {
                             !(supportState.getBlock() instanceof SlabBlock);
 
             if (direction == Direction.DOWN) {
-                // If support is gone, force falling regardless of what's below
-                // Otherwise, only fall if the space below is free
                 if (supportGone || isFree(level, pos)) {
                     makeIcicleFall(level, pos, state);
                 } else {
@@ -225,7 +222,6 @@ public class PointedIcicleBlock extends PointedDripstoneBlock {
     private boolean isFree(Level level, BlockPos pos) {
         BlockPos below = pos.below();
         BlockState belowState = level.getBlockState(below);
-        // Allow falling through replaceable blocks and water (water is replaceable)
         return belowState.getMaterial().isReplaceable();
     }
 
@@ -808,7 +804,6 @@ public class PointedIcicleBlock extends PointedDripstoneBlock {
             return;
         }
 
-        // Traverse the entire icicle chain upward to find the source block
         BlockPos icicleBlockPos = iciclePos.above();
         for (int i = 0; i < 11; i++) {
             BlockState checkState = level.getBlockState(icicleBlockPos);
@@ -825,7 +820,6 @@ public class PointedIcicleBlock extends PointedDripstoneBlock {
 
         BlockState icicleBlockState = level.getBlockState(icicleBlockPos);
         Block icicleBlock = icicleBlockState.getBlock();
-        // Accept Packed Icicle Block or vanilla Packed Ice as the source block
         boolean isPackedIcicleBlock =
                 icicleBlock == ModBlocks.PACKED_ICICLE_BLOCK.get() ||
                         icicleBlock instanceof PackedIcicleBlock ||
@@ -853,7 +847,6 @@ public class PointedIcicleBlock extends PointedDripstoneBlock {
             if (blockEntity instanceof IcicleCauldronBlockEntity) {
                 IcicleCauldronBlockEntity cauldronEntity =
                         (IcicleCauldronBlockEntity) blockEntity;
-                // Store Packed Icicle Block in the cauldron
                 net.minecraft.world.item.Item icicleItem =
                         com.kingodogo.buildscape.item.ModItems.PACKED_ICICLE_BLOCK.get();
                 cauldronEntity.setStoredIcicle(
@@ -896,7 +889,6 @@ public class PointedIcicleBlock extends PointedDripstoneBlock {
         BlockState attachmentState = level.getBlockState(attachmentPos);
         Block attachmentBlock = attachmentState.getBlock();
 
-        // Only accept Icicle Block, not Packed Icicle (for consistency with cauldron feature)
         boolean validAttachment =
                 attachmentBlock == ModBlocks.ICICLE_BLOCK.get() ||
                         attachmentBlock instanceof IcicleBlock;
@@ -1020,7 +1012,6 @@ public class PointedIcicleBlock extends PointedDripstoneBlock {
         BlockState attachmentState = level.getBlockState(attachmentPos);
         Block attachmentBlock = attachmentState.getBlock();
 
-        // Only accept Icicle Block, not Packed Icicle (for consistency with cauldron feature)
         boolean validAttachment =
                 attachmentBlock == ModBlocks.ICICLE_BLOCK.get() ||
                         attachmentBlock instanceof IcicleBlock;
@@ -1057,7 +1048,6 @@ public class PointedIcicleBlock extends PointedDripstoneBlock {
 
     private boolean isIcicleSourceBlock(BlockState state) {
         Block block = state.getBlock();
-        // Accept normal icicle blocks, packed icicle blocks, and vanilla ice blocks as source blocks
         return (
                 block == ModBlocks.ICICLE_BLOCK.get() || block instanceof IcicleBlock ||
                 block == ModBlocks.PACKED_ICICLE_BLOCK.get() || block instanceof PackedIcicleBlock ||
@@ -1190,4 +1180,3 @@ public class PointedIcicleBlock extends PointedDripstoneBlock {
         );
     }
 }
-// Kingodogo Finished this File on 2025-12-10 20-50-05

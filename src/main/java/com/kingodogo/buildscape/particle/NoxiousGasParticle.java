@@ -22,13 +22,13 @@ public class NoxiousGasParticle extends TextureSheetParticle {
 
         this.quadSize = 0.24F + level.random.nextFloat() * 0.18F;
         this.lifetime = 60 + level.random.nextInt(40);
-        this.gravity = -0.003F; // Rise up slowly
+        this.gravity = -0.003F;
         this.hasPhysics = true;
         this.xd = xSpeed;
         this.yd = ySpeed;
         this.zd = zSpeed;
 
-        this.setColor(1.0F, 1.0F, 1.0F); // Custom texture has color
+        this.setColor(1.0F, 1.0F, 1.0F);
         this.alpha = 0.8F;
 
         this.setSpriteFromAge(sprites);
@@ -47,7 +47,6 @@ public class NoxiousGasParticle extends TextureSheetParticle {
 
         this.setSpriteFromAge(this.sprites);
 
-        // Rise up and drift
         this.yd -= this.gravity;
         this.move(this.xd, this.yd, this.zd);
 
@@ -55,7 +54,6 @@ public class NoxiousGasParticle extends TextureSheetParticle {
         this.yd *= 0.96;
         this.zd *= 0.96;
 
-        // Slow fade out
         float progress = (float) this.age / (float) this.lifetime;
         if (progress > 0.5F) {
             float fadeProgress = (progress - 0.5F) / 0.5F;

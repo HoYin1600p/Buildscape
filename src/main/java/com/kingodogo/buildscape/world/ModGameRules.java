@@ -18,7 +18,6 @@ public class ModGameRules {
 
     public static void register() {
         try {
-            // Callback that triggers when either gamerule is changed on the server
             BiConsumer<MinecraftServer, GameRules.BooleanValue> onRuleChange = (server, value) -> {
                 if (server != null) {
                     ModMessages.INSTANCE.send(PacketDistributor.ALL.noArg(),
@@ -32,15 +31,11 @@ public class ModGameRules {
                 }
             };
 
-            // Access the private create method with callback: create(boolean, BiConsumer)
-            // m_46252_ is the SRG name for the overload taking a BiConsumer
             Method createMethod = ObfuscationReflectionHelper.findMethod(GameRules.BooleanValue.class, "m_46252_", boolean.class, BiConsumer.class);
 
-            // Create the boolean value type with default value false and the sync callback
             GameRules.Type<GameRules.BooleanValue> booleanType =
                     (GameRules.Type<GameRules.BooleanValue>) createMethod.invoke(null, false, onRuleChange);
 
-            // Register the gamerules with MISC category for visibility
             FAST_LEAF_DECAY = GameRules.register(
                     "fastLeafDecay",
                     GameRules.Category.MISC,

@@ -1,9 +1,5 @@
 package com.kingodogo.buildscape.api.model;
 
-/**
- * Request body for the secure redeem code endpoint.
- * POST /api/redeem
- */
 public class RedeemCodeRequest {
     private String action;
     private String uuid;
@@ -20,9 +16,6 @@ public class RedeemCodeRequest {
         this.code = code;
     }
 
-    /**
-     * Create a standard redeem code request.
-     */
     public static RedeemCodeRequest createRedeemCode(String uuid, String accessToken, String code) {
         return new RedeemCodeRequest("redeemCode", uuid, accessToken, code);
     }

@@ -33,7 +33,6 @@ public class BuildersWorkbenchBlock extends BaseEntityBlock {
         this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.NORTH));
     }
 
-    // ── Block Entity ──────────────────────────────────────────────────────────
 
     @Nullable
     @Override
@@ -53,7 +52,6 @@ public class BuildersWorkbenchBlock extends BaseEntityBlock {
         return RenderShape.MODEL;
     }
 
-    // ── Interaction ───────────────────────────────────────────────────────────
 
     @Override
     public InteractionResult use(BlockState state, Level level, BlockPos pos,
@@ -67,7 +65,6 @@ public class BuildersWorkbenchBlock extends BaseEntityBlock {
         return InteractionResult.CONSUME;
     }
 
-    // ── Drop inventory on break ───────────────────────────────────────────────
 
     @Override
     public void onRemove(BlockState state, Level level, BlockPos pos,

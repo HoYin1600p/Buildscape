@@ -18,7 +18,6 @@ public class ExperienceFluidBlock extends LiquidBlock {
     @Override
     public void animateTick(BlockState state, Level level, BlockPos pos, Random random) {
         super.animateTick(state, level, pos, random);
-        // Spawn popping particles similar to lava but using XP particle
         if (random.nextInt(30) == 0) {
             double x = (double) pos.getX() + random.nextDouble();
             double y = (double) pos.getY() + 1.0D;

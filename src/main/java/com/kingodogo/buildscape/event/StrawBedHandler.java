@@ -22,15 +22,12 @@ public class StrawBedHandler {
             return;
         }
 
-        // Get the position where the player was sleeping
         Optional<BlockPos> sleepPosOpt = player.getSleepingPos();
         if (sleepPosOpt.isPresent()) {
             BlockPos sleepPos = sleepPosOpt.get();
             BlockState state = player.level.getBlockState(sleepPos);
 
-            // Check if the block is a Straw Bed
             if (state.getBlock() instanceof StrawBedBlock) {
-                // Destroy the straw bed block (consumable bed) on wake up
                 player.level.destroyBlock(sleepPos, false);
             }
         }

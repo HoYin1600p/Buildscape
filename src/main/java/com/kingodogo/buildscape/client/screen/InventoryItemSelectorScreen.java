@@ -41,15 +41,12 @@ public class InventoryItemSelectorScreen extends Screen {
     public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
         this.renderBackground(poseStack);
 
-        // Render title
         net.minecraft.client.gui.GuiComponent.drawCenteredString(poseStack, font, title, width / 2, 20, 0xFFFFFF);
 
-        // Render instruction
         net.minecraft.client.gui.GuiComponent.drawCenteredString(poseStack, font,
             new TranslatableComponent("buildscape.config.select_inventory.instruction"),
             width / 2, 40, 0xCCCCCC);
 
-        // Render inventory
         Minecraft mc = Minecraft.getInstance();
         if (mc.player != null) {
             Inventory inventory = mc.player.getInventory();
@@ -58,14 +55,12 @@ public class InventoryItemSelectorScreen extends Screen {
             int startX = (width - SLOTS_PER_ROW * SLOT_SIZE) / 2;
             int startY = 60;
 
-            // Render hotbar (slots 0-8)
             for (int i = 0; i < 9; i++) {
                 int x = startX + i * SLOT_SIZE;
                 int y = startY;
                 renderInventorySlot(poseStack, itemRenderer, inventory.getItem(i), x, y, mouseX, mouseY);
             }
 
-            // Render main inventory (slots 9-35)
             for (int row = 0; row < 3; row++) {
                 for (int col = 0; col < 9; col++) {
                     int slot = 9 + row * 9 + col;
@@ -81,13 +76,11 @@ public class InventoryItemSelectorScreen extends Screen {
 
     private void renderInventorySlot(PoseStack poseStack, ItemRenderer itemRenderer,
                                      ItemStack stack, int x, int y, int mouseX, int mouseY) {
-        // Render slot background
         boolean hovered = mouseX >= x && mouseX < x + SLOT_SIZE &&
                           mouseY >= y && mouseY < y + SLOT_SIZE;
         int bgColor = hovered ? 0xFF555555 : 0xFF333333;
         fill(poseStack, x, y, x + SLOT_SIZE, y + SLOT_SIZE, bgColor);
 
-        // Render item
         if (!stack.isEmpty()) {
             itemRenderer.renderGuiItem(stack, x + 1, y + 1);
             itemRenderer.renderGuiItemDecorations(font, stack, x + 1, y + 1);
@@ -100,7 +93,6 @@ public class InventoryItemSelectorScreen extends Screen {
             return true;
         }
 
-        // Check if clicking on inventory slot
         Minecraft mc = Minecraft.getInstance();
         if (mc.player != null && button == 0) {
             Inventory inventory = mc.player.getInventory();
@@ -108,7 +100,6 @@ public class InventoryItemSelectorScreen extends Screen {
             int startX = (width - SLOTS_PER_ROW * SLOT_SIZE) / 2;
             int startY = 60;
 
-            // Check hotbar
             for (int i = 0; i < 9; i++) {
                 int x = startX + i * SLOT_SIZE;
                 int y = startY;
@@ -122,7 +113,6 @@ public class InventoryItemSelectorScreen extends Screen {
                 }
             }
 
-            // Check main inventory
             for (int row = 0; row < 3; row++) {
                 for (int col = 0; col < 9; col++) {
                     int slot = 9 + row * 9 + col;
@@ -146,10 +136,8 @@ public class InventoryItemSelectorScreen extends Screen {
     private void selectItem(ItemStack stack) {
         String itemId = ForgeRegistries.ITEMS.getKey(stack.getItem()).toString();
         if (configTab != null) {
-            // Add item through the config tab
             configTab.onItemSelected(itemId);
         } else {
-            // Fallback: directly call the config
             com.kingodogo.buildscape.config.PillarParticleConfig.addItemToConfig(itemId);
         }
         onClose();
@@ -162,7 +150,7 @@ public class InventoryItemSelectorScreen extends Screen {
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        if (keyCode == 256) { // ESC
+        if (keyCode == 256) {
             onClose();
             return true;
         }

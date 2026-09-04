@@ -48,18 +48,16 @@ public class CascadeParticle extends TextureSheetParticle {
         this.setSpriteFromAge(this.sprites);
 
         if (this.level.getFluidState(new net.minecraft.core.BlockPos(this.x, this.y, this.z)).is(net.minecraft.tags.FluidTags.WATER)) {
-            this.yd += 0.005F; // Float up gently underwater
+            this.yd += 0.005F;
         } else {
-            this.yd -= this.gravity; // Fall down in air
+            this.yd -= this.gravity;
         }
 
-        // Move directly and update bounding box so particles render through water and frustum cull correctly
         this.move(this.xd, this.yd, this.zd);
 
         this.xd *= 0.95;
         this.zd *= 0.95;
 
-        // Fade out in the last 40% of lifetime
         float progress = (float) this.age / (float) this.lifetime;
         if (progress > 0.6F) {
             float fadeProgress = (progress - 0.6F) / 0.4F;
@@ -69,7 +67,6 @@ public class CascadeParticle extends TextureSheetParticle {
 
     @Override
     protected int getLightColor(float partialTick) {
-        // Full brightness so particles are visible underwater
         return 0xF000F0;
     }
 

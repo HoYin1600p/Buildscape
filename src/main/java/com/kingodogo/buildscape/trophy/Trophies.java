@@ -15,8 +15,6 @@ public class Trophies {
     private static final Map<String, TrophyDefinition> REGISTRY = new LinkedHashMap<>();
     private static final Map<String, TrophyDefinition> BY_ADVANCEMENT = new HashMap<>();
 
-    // Single clean rectangular hitboxes per trophy type
-    // Tall pillar / jar / froglight / hammer trophies (exceeding 1-block height by ~2 pixels)
     private static final Map<Direction, VoxelShape> PEDESTAL_SHAPES = TrophyDefinition.createDirectionalShapes(
         new double[]{4.0D, 0.0D, 4.0D, 12.0D, 1.0D, 12.0D},
         new double[]{7.0D, 0.0D, 3.0D, 9.0D, 2.0D, 5.0D},
@@ -28,17 +26,14 @@ public class Trophies {
         new double[]{4.875D, 11.85D, 5.0D, 10.875D, 17.85D, 11.0D}
     );
 
-    // Wide Christmas stand trophies (Ornament, Stocking, Star, String Light)
     private static final Map<Direction, VoxelShape> STAND_SHAPES = TrophyDefinition.createDirectionalShapes(
         1.0D, 0.0D, 3.0D, 15.0D, 16.0D, 13.0D
     );
 
-    // Buildscape Statuette Trophies (Gold, Emerald, Diamond, Netherite)
     private static final Map<Direction, VoxelShape> BUILDSCAPE_TROPHY_SHAPES = TrophyDefinition.createDirectionalShapes(
         1.0D, 0.0D, 1.0D, 15.0D, 30.0D, 15.0D
     );
 
-    // 1. Pillar Trophies (Stone, Gold, Diamond, Netherite, Emerald)
     public static final TrophyDefinition STONE_PILLAR = register(
             TrophyDefinition.builder("stone_pillar_trophy")
                     .tier(TrophyTier.STONE)
@@ -93,7 +88,6 @@ public class Trophies {
                     .build()
     );
 
-    // 2. Thematic / Item Trophies
     public static final TrophyDefinition GOLDEN_JAR = register(
             TrophyDefinition.builder("golden_jar_trophy")
                     .tier(TrophyTier.GOLD)
@@ -163,7 +157,6 @@ public class Trophies {
                     .build()
     );
 
-    // 3. Hammer & Buildscape Milestone Trophies
     public static final TrophyDefinition DIAMOND_HAMMER = register(
             TrophyDefinition.builder("diamond_hammer_trophy")
                     .tier(TrophyTier.DIAMOND)
@@ -226,14 +219,12 @@ public class Trophies {
             BY_ADVANCEMENT.put(definition.getAssociatedAdvancement(), definition);
         }
 
-        // Register Block
         RegistryObject<TrophyBlock> blockObj = ModBlocks.BLOCKS.register(
                 definition.getId(),
                 () -> new TrophyBlock(definition)
         );
         definition.setBlockRegistryObject(blockObj);
 
-        // Register Item
         RegistryObject<Item> itemObj = ModItems.ITEMS.register(
                 definition.getId(),
                 () -> new TrophyBlockItem(blockObj.get(), definition, new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB).stacksTo(1))

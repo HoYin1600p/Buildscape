@@ -15,8 +15,6 @@ public class CakeParticle extends TextureSheetParticle {
 
     private final SpriteSet sprites;
 
-    // Static map to store color queues for particles
-    // Key: "x,y,z" string, Value: ColorEntry
     private static final java.util.Map<String, ColorEntry> POSITION_COLOR_MAP = new java.util.concurrent.ConcurrentHashMap<>();
 
     private static class ColorEntry {
@@ -42,10 +40,8 @@ public class CakeParticle extends TextureSheetParticle {
         this.yd = ySpeed;
         this.zd = zSpeed;
 
-        // Pick random texture from the set
         this.setSprite(sprites.get(level.random));
 
-        // Color handling logic
         String positionKey = String.format("%.1f,%.1f,%.1f", x, y, z);
         String colorCode = null;
 
@@ -58,7 +54,7 @@ public class CakeParticle extends TextureSheetParticle {
             float[] color = parseColorCode(colorCode);
             this.setColor(color[0], color[1], color[2]);
         } else {
-            this.setColor(1.0F, 1.0F, 1.0F); // Default white
+            this.setColor(1.0F, 1.0F, 1.0F);
         }
 
         if (POSITION_COLOR_MAP.size() > 1000) {
@@ -99,7 +95,6 @@ public class CakeParticle extends TextureSheetParticle {
     @Override
     public void tick() {
         super.tick();
-        // Removed setSpriteFromAge to keep the selected static texture
 
         if (this.age > this.lifetime * 0.7F) {
             float fadeProgress = (this.age - this.lifetime * 0.7F) / (this.lifetime * 0.3F);

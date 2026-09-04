@@ -11,9 +11,6 @@ import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;
 
-/**
- * Synchronizes cosmetic frame attachments on signs from server to clients.
- */
 public class SyncSignFramePacket {
 
     private final BlockPos pos;

@@ -348,7 +348,6 @@ public class ColoredItemFrameEntity extends HangingEntity {
         tag.putBoolean("Invisible", this.isInvisible());
         tag.putBoolean("Fixed", this.fixed);
 
-        // Save particle pattern and colors from synchronized data
         tag.putString("BuildScapeParticlePattern", this.getParticlePattern());
         tag.putString("BuildScapeParticleColorsRaw", this.getParticleColorsRaw());
 
@@ -375,7 +374,6 @@ public class ColoredItemFrameEntity extends HangingEntity {
                 this.dropChance = tag.getFloat("ItemDropChance");
             }
         }
-        // Handle ITEM tag from /give or /summon commands (custom NBT format)
         else if (tag.contains("ITEM", 8)) {
             String itemId = tag.getString("ITEM");
             try {
@@ -388,11 +386,9 @@ public class ColoredItemFrameEntity extends HangingEntity {
                     this.setItem(itemstack, false);
                 }
             } catch (Exception e) {
-                // Invalid item ID, ignore
             }
         }
 
-        // Load particle pattern and colors from saved data
         if (tag.contains("BuildScapeParticlePattern", 8)) {
             this.setParticlePattern(tag.getString("BuildScapeParticlePattern"));
         }
@@ -405,13 +401,11 @@ public class ColoredItemFrameEntity extends HangingEntity {
             persistentData.putString("BuildScapeFrameId", tag.getString("BuildScapeFrameId"));
         }
 
-        // Handle PATTERN tag from /give or /summon commands (custom NBT format)
         if (tag.contains("PATTERN", 8)) {
             String pattern = tag.getString("PATTERN");
             this.setParticlePattern(pattern);
         }
 
-        // Handle COLORS tag from /give or /summon commands (custom NBT format)
         if (tag.contains("COLORS", 9)) {
             net.minecraft.nbt.ListTag colorList = tag.getList("COLORS", 8);
             if (colorList.size() > 0) {
@@ -450,7 +444,6 @@ public class ColoredItemFrameEntity extends HangingEntity {
         CompoundTag tag = frameItem.getOrCreateTag();
         boolean hasCustomData = false;
 
-        // If the frame has an item, add it to the NBT so it persists when placed
         if (!displayedItem.isEmpty()) {
             net.minecraft.resources.ResourceLocation itemId =
                     net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(displayedItem.getItem());
@@ -460,14 +453,12 @@ public class ColoredItemFrameEntity extends HangingEntity {
             }
         }
 
-        // Preserve particle pattern from persistent data
         CompoundTag persistentData = this.getPersistentData();
         if (persistentData.contains("BuildScapeParticlePattern", 8)) {
             tag.putString("PATTERN", persistentData.getString("BuildScapeParticlePattern"));
             hasCustomData = true;
         }
 
-        // Preserve particle colors from persistent data
         if (persistentData.contains("BuildScapeParticleColors", 9)) {
             net.minecraft.nbt.ListTag colorList = persistentData.getList("BuildScapeParticleColors", 8);
             if (colorList.size() > 0) {

@@ -12,9 +12,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
-/**
- * Syncs pillar IDs data from server to client so the GUI can display it.
- */
 public class SyncPillarIdsPacket {
 
     private static final Gson GSON = new GsonBuilder().create();
@@ -29,7 +26,7 @@ public class SyncPillarIdsPacket {
         this.pillarDataList = new ArrayList<>();
 
         for (int i = 0; i < count; i++) {
-            String json = buf.readUtf(32767); // Max string length
+            String json = buf.readUtf(32767);
             PillarIdManager.PillarData data = GSON.fromJson(json, PillarIdManager.PillarData.class);
             this.pillarDataList.add(data);
         }
@@ -55,20 +52,14 @@ public class SyncPillarIdsPacket {
                     () -> () -> {
                         PillarIdManager manager = PillarIdManager.get();
 
-                        // IMPORTANT: Clear existing data and prepare for server sync
-                        // This resets the isServerSynced flag so new data can be loaded
                         manager.clearForServerSync();
 
-                        // Add all pillar data from server
                         for (PillarIdManager.PillarData data : pillarDataList) {
                             manager.addPillarDataFromSync(data);
                         }
 
-                        // Mark as loaded so GUI can display
-                        // This also sets isServerSynced=true to indicate we have fresh server data
                         manager.markAsLoaded();
 
-                        // Refresh GUI if it's open
                         net.minecraft.client.Minecraft mc = net.minecraft.client.Minecraft.getInstance();
                         if (mc.screen instanceof com.kingodogo.buildscape.client.screen.BuildScapeConfigScreen configScreen) {
                             configScreen.refreshCurrentTab();

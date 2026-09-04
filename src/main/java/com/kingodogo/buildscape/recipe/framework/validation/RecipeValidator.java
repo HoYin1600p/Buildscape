@@ -9,10 +9,6 @@ import net.minecraftforge.registries.ForgeRegistries;
 import java.util.HashSet;
 import java.util.Set;
 
-/**
- * Validates parsed recipe specifications before building Minecraft Recipe objects.
- * Prevents registration of recipes with unregistered items, invalid shapes, or duplicate IDs.
- */
 public class RecipeValidator {
 
     private final Set<ResourceLocation> registeredIds = new HashSet<>();
@@ -22,7 +18,6 @@ public class RecipeValidator {
             return false;
         }
 
-        // Validate Result Item
         if (spec.result() == null || spec.result().item() == null || spec.result().item().isEmpty()) {
             BuildScape.LOGGER.debug("BDRE Validator: Recipe {} skipped due to missing result item.", spec.id());
             return false;
@@ -35,7 +30,6 @@ public class RecipeValidator {
             return false;
         }
 
-        // Validate Ingredients
         if ("shapeless".equalsIgnoreCase(spec.type())) {
             if (spec.ingredients() == null || spec.ingredients().isEmpty()) {
                 return false;

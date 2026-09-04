@@ -15,7 +15,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-/** Optional, outlet-only path; ordinary Embeddium water remains untouched. Author: HoYin1600p. */
 @Pseudo
 @Mixin(targets = "me.jellysquid.mods.sodium.client.render.pipeline.FluidRenderer", remap = false)
 public class EmbeddiumPipeSpillMixin {

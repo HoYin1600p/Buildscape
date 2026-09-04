@@ -53,16 +53,13 @@ public class RemovePillarPacket {
             }
 
             if (changed) {
-                // IMPORTANT: Save immediately to file so it's persistent
                 manager.saveImmediate();
 
-                // Broadcast the updated list to all players so their GUIs sync
                 ModMessages.INSTANCE.send(
                         net.minecraftforge.network.PacketDistributor.ALL.noArg(),
                         new SyncPillarIdsPacket(manager.getAllPillarDataForSync())
                 );
 
-                // Force sync pillars in the world so they stop using the removed IDs
                 manager.syncAllLoadedPillars(player.getServer());
             }
         });

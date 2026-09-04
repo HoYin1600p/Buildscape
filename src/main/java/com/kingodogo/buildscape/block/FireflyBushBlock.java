@@ -41,7 +41,6 @@ public class FireflyBushBlock extends BushBlock {
         super.onPlace(state, level, pos, oldState, isMoving);
         if (!level.isClientSide) {
             ServerLevel serverLevel = (ServerLevel) level;
-            // Spawn firefly particle when placed, but only if it's night or there's no skylight
             boolean isNight = !serverLevel.isDay();
             boolean noSkylight = serverLevel.getBrightness(LightLayer.SKY, pos) == 0;
             if (isNight || noSkylight) {
@@ -63,19 +62,15 @@ public class FireflyBushBlock extends BushBlock {
     public void tick(BlockState state, ServerLevel level, BlockPos pos, Random random) {
         super.tick(state, level, pos, random);
 
-        // Player proximity optimization for server performance
         if (!hasPlayerNearby(level, pos)) {
-            level.scheduleTick(pos, this, 20); // Check again in 1 second
+            level.scheduleTick(pos, this, 20);
             return;
         }
 
-        // On each tick, check if it's night or there's no skylight
         boolean isNight = !level.isDay();
         boolean noSkylight = level.getBrightness(LightLayer.SKY, pos) == 0;
         if (isNight || noSkylight) {
-            // a firefly bush has a 70% chance of emitting a new firefly particle
             if (random.nextFloat() < 0.70F) {
-                // in an air block up to 5 blocks above the bush and horizontally up to 5 blocks away
                 for (int i = 0; i < 10; i++) {
                     int dx = random.nextInt(11) - 5;
                     int dy = random.nextInt(6);

@@ -60,7 +60,6 @@ public class ColoredItemFrameRenderer extends EntityRenderer<ColoredItemFrameEnt
             return;
         }
 
-        // Fix dark/black rendering on ceiling and floor by sampling light from the open-air side
         if (direction == Direction.UP || direction == Direction.DOWN) {
             BlockPos lightPos = entity.blockPosition().relative(direction);
             packedLight = net.minecraft.client.renderer.LevelRenderer.getLightColor(entity.level, lightPos);
@@ -68,11 +67,9 @@ public class ColoredItemFrameRenderer extends EntityRenderer<ColoredItemFrameEnt
 
         poseStack.pushPose();
 
-        // Undo the render offset applied by EntityRenderDispatcher, matching vanilla
         Vec3 renderOffset = this.getRenderOffset(entity, partialTicks);
         poseStack.translate(-renderOffset.x(), -renderOffset.y(), -renderOffset.z());
 
-        // Translate slightly more than vanilla (0.46875) to avoid Z-fighting with the block behind
         double wallOffset = 0.469D;
         poseStack.translate(
                 (double) direction.getStepX() * wallOffset,
@@ -80,7 +77,6 @@ public class ColoredItemFrameRenderer extends EntityRenderer<ColoredItemFrameEnt
                 (double) direction.getStepZ() * wallOffset
         );
 
-        // Apply rotation using entity's xRot/yRot (set by setDirection), matching vanilla
         poseStack.mulPose(Vector3f.XP.rotationDegrees(entity.getXRot()));
         poseStack.mulPose(Vector3f.YP.rotationDegrees(180.0F - entity.getYRot()));
 
@@ -88,7 +84,6 @@ public class ColoredItemFrameRenderer extends EntityRenderer<ColoredItemFrameEnt
         ItemStack itemStack = entity.getItem();
         boolean hasMap = !itemStack.isEmpty() && MapItem.getSavedData(itemStack, entity.level) != null;
 
-        // Skip frame rendering if invisible (item still renders), matching vanilla
         if (!isInvisible) {
             ResourceLocation backTexture = getTextureForColor(entity.getColorVariant());
             if (hasMap) {
@@ -98,7 +93,6 @@ public class ColoredItemFrameRenderer extends EntityRenderer<ColoredItemFrameEnt
             }
         }
 
-        // Render the item if present
         if (!itemStack.isEmpty()) {
             renderItem(entity, itemStack, poseStack, buffer, packedLight, hasMap, isInvisible);
         }
@@ -113,18 +107,14 @@ public class ColoredItemFrameRenderer extends EntityRenderer<ColoredItemFrameEnt
         Matrix4f pose = poseStack.last().pose();
         Matrix3f normal = poseStack.last().normal();
 
-        // Back panel: from [3, 3, 15.5] to [13, 13, 16] in pixel coords (0-16 maps to 0-1)
         float backZ1 = 15.5F / 16F;
         float backZ2 = 1.0F;
 
-        // Frame border z positions: from 15 to 16
         float frameZ1 = 15F / 16F;
         float frameZ2 = 1.0F;
 
-        // Render back panel with colored texture
         VertexConsumer backConsumer = buffer.getBuffer(RenderType.entityCutoutNoCull(backTexture));
 
-        // Back panel - front face (facing the viewer)
         renderQuadWithUV(backConsumer, pose, normal, packedLight,
                 3F / 16F, 3F / 16F, backZ1,
                 13F / 16F, 3F / 16F, backZ1,
@@ -133,7 +123,6 @@ public class ColoredItemFrameRenderer extends EntityRenderer<ColoredItemFrameEnt
                 3F / 16F, 13F / 16F, 13F / 16F, 3F / 16F,
                 0, 0, -1);
 
-        // Back panel - back face
         renderQuadWithUV(backConsumer, pose, normal, packedLight,
                 13F / 16F, 3F / 16F, backZ2,
                 3F / 16F, 3F / 16F, backZ2,
@@ -142,25 +131,20 @@ public class ColoredItemFrameRenderer extends EntityRenderer<ColoredItemFrameEnt
                 3F / 16F, 13F / 16F, 13F / 16F, 3F / 16F,
                 0, 0, 1);
 
-        // Render frame border
         VertexConsumer frameConsumer = buffer.getBuffer(RenderType.entityCutoutNoCull(BIRCH_PLANKS));
 
-        // Bottom border: [3, 2] to [13, 3]
         renderBoxFaces(frameConsumer, pose, normal, packedLight,
                 3F / 16F, 2F / 16F, frameZ1,
                 13F / 16F, 3F / 16F, frameZ2);
 
-        // Top border: [3, 13] to [13, 14]
         renderBoxFaces(frameConsumer, pose, normal, packedLight,
                 3F / 16F, 13F / 16F, frameZ1,
                 13F / 16F, 14F / 16F, frameZ2);
 
-        // Left border: full height [2, 14]
         renderBoxFaces(frameConsumer, pose, normal, packedLight,
                 2F / 16F, 2F / 16F, frameZ1,
                 3F / 16F, 14F / 16F, frameZ2);
 
-        // Right border: full height [2, 14]
         renderBoxFaces(frameConsumer, pose, normal, packedLight,
                 13F / 16F, 2F / 16F, frameZ1,
                 14F / 16F, 14F / 16F, frameZ2);
@@ -175,18 +159,14 @@ public class ColoredItemFrameRenderer extends EntityRenderer<ColoredItemFrameEnt
         Matrix4f pose = poseStack.last().pose();
         Matrix3f normal = poseStack.last().normal();
 
-        // Back panel: from [1, 1, 15.001] to [15, 15, 16]
         float backZ1 = 15.001F / 16F;
         float backZ2 = 1.0F;
 
-        // Frame border
         float frameZ1 = 15.001F / 16F;
         float frameZ2 = 1.0F;
 
-        // Render back panel with colored texture
         VertexConsumer backConsumer = buffer.getBuffer(RenderType.entityCutoutNoCull(backTexture));
 
-        // Back panel - front face
         renderQuadWithUV(backConsumer, pose, normal, packedLight,
                 1F / 16F, 1F / 16F, backZ1,
                 15F / 16F, 1F / 16F, backZ1,
@@ -195,7 +175,6 @@ public class ColoredItemFrameRenderer extends EntityRenderer<ColoredItemFrameEnt
                 1F / 16F, 15F / 16F, 15F / 16F, 1F / 16F,
                 0, 0, -1);
 
-        // Back panel - back face
         renderQuadWithUV(backConsumer, pose, normal, packedLight,
                 15F / 16F, 1F / 16F, backZ2,
                 1F / 16F, 1F / 16F, backZ2,
@@ -204,25 +183,20 @@ public class ColoredItemFrameRenderer extends EntityRenderer<ColoredItemFrameEnt
                 1F / 16F, 15F / 16F, 15F / 16F, 1F / 16F,
                 0, 0, 1);
 
-        // Render frame border
         VertexConsumer frameConsumer = buffer.getBuffer(RenderType.entityCutoutNoCull(BIRCH_PLANKS));
 
-        // Bottom border: [1, 0] to [15, 1]
         renderBoxFaces(frameConsumer, pose, normal, packedLight,
                 1F / 16F, 0F, frameZ1,
                 15F / 16F, 1F / 16F, frameZ2);
 
-        // Top border: [1, 15] to [15, 16]
         renderBoxFaces(frameConsumer, pose, normal, packedLight,
                 1F / 16F, 15F / 16F, frameZ1,
                 15F / 16F, 1F, frameZ2);
 
-        // Left border: full height [0, 16]
         renderBoxFaces(frameConsumer, pose, normal, packedLight,
                 0F, 0F, frameZ1,
                 1F / 16F, 1F, frameZ2);
 
-        // Right border: full height [0, 16]
         renderBoxFaces(frameConsumer, pose, normal, packedLight,
                 15F / 16F, 0F, frameZ1,
                 1F, 1F, frameZ2);
@@ -230,9 +204,6 @@ public class ColoredItemFrameRenderer extends EntityRenderer<ColoredItemFrameEnt
         poseStack.popPose();
     }
 
-    /**
-     * Renders all 6 faces of a box defined by two corners.
-     */
     private void renderBoxFaces(VertexConsumer consumer, Matrix4f pose, Matrix3f normal, int packedLight,
                                 float x1, float y1, float z1,
                                 float x2, float y2, float z2) {
@@ -241,37 +212,31 @@ public class ColoredItemFrameRenderer extends EntityRenderer<ColoredItemFrameEnt
                 y2 -
                         y1;
 
-        // Front face (-Z)
         renderQuadWithUV(consumer, pose, normal, packedLight,
                 x2, y1, z1, x1, y1, z1, x1, y2, z1, x2, y2, z1,
                 x1, 1F - y2, x2, 1F - y1,
                 0, 0, -1);
 
-        // Back face (+Z)
         renderQuadWithUV(consumer, pose, normal, packedLight,
                 x1, y1, z2, x2, y1, z2, x2, y2, z2, x1, y2, z2,
                 x1, 1F - y2, x2, 1F - y1,
                 0, 0, 1);
 
-        // Bottom face (-Y)
         renderQuadWithUV(consumer, pose, normal, packedLight,
                 x1, y1, z2, x2, y1, z2, x2, y1, z1, x1, y1, z1,
                 x1, z1, x2, z2,
                 0, -1, 0);
 
-        // Top face (+Y)
         renderQuadWithUV(consumer, pose, normal, packedLight,
                 x1, y2, z1, x2, y2, z1, x2, y2, z2, x1, y2, z2,
                 x1, z1, x2, z2,
                 0, 1, 0);
 
-        // Left face (-X)
         renderQuadWithUV(consumer, pose, normal, packedLight,
                 x1, y1, z1, x1, y1, z2, x1, y2, z2, x1, y2, z1,
                 z1, 1F - y2, z2, 1F - y1,
                 -1, 0, 0);
 
-        // Right face (+X)
         renderQuadWithUV(consumer, pose, normal, packedLight,
                 x2, y1, z2, x2, y1, z1, x2, y2, z1, x2, y2, z2,
                 z1, 1F - y2, z2, 1F - y1,
@@ -303,10 +268,8 @@ public class ColoredItemFrameRenderer extends EntityRenderer<ColoredItemFrameEnt
                             PoseStack poseStack, MultiBufferSource buffer, int packedLight, boolean isMap, boolean isInvisible) {
         MapItemSavedData mapData = isMap ? MapItem.getSavedData(itemStack, entity.level) : null;
 
-        // When invisible, item sits at 0.5 (block face); otherwise 0.4375 (in front of frame surface)
         poseStack.translate(0.0D, 0.0D, isInvisible ? 0.5D : 0.4375D);
 
-        // Apply rotation based on item rotation value (0-7)
         int rotation;
         if (mapData != null) {
             rotation = entity.getRotation() % 4 * 2;

@@ -4,9 +4,6 @@ import com.kingodogo.buildscape.recipe.framework.parser.RecipeIR;
 
 import java.util.*;
 
-/**
- * Reusable recipe template engine. Expands parametric recipe shapes using placeholder replacement.
- */
 public class TemplateEngine {
 
     private final Map<String, RecipeIR.TemplateSpec> templates = new HashMap<>();

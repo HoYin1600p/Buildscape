@@ -81,13 +81,10 @@ public class SilkTouchOnlyGlassBlock extends AbstractGlassBlock {
 
             String newName = null;
             if (currentName.startsWith("factory_") && currentName.endsWith("_glass")) {
-                // factory_white_glass -> factory_red_glass
                 newName = "factory_" + dyeColorName + "_glass";
             } else if (currentName.endsWith("_mosaic_glass")) {
-                // white_mosaic_glass -> red_mosaic_glass
                 newName = dyeColorName + "_mosaic_glass";
             } else if (currentName.endsWith("_glazed_glass")) {
-                // white_glazed_glass -> red_glazed_glass
                 newName = dyeColorName + "_glazed_glass";
             }
 

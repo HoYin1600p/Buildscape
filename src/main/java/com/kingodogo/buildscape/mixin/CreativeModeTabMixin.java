@@ -16,11 +16,6 @@ import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.Set;
 
-/**
- * Keeps Buildscape's vanilla vertical slabs beside their horizontal variants.
- *
- * @author hoyin1600p
- */
 @Mixin(CreativeModeTab.class)
 public class CreativeModeTabMixin {
 

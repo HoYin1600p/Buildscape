@@ -27,13 +27,10 @@ public class ScaledTextButton extends Button {
         net.minecraft.client.Minecraft mc = net.minecraft.client.Minecraft.getInstance();
         boolean hovered = mouseX >= this.x && mouseY >= this.y && mouseX < this.x + this.width && mouseY < this.y + this.height;
 
-        // Draw background with depth
         int bgColor = hovered ? 0xFF3D3D3D : 0xFF2D2D2D;
         int borderColor = hovered ? 0xFF808080 : 0xFF404040;
 
-        // Border
         fill(poseStack, x, y, x + width, y + height, borderColor);
-        // Inner background
         fill(poseStack, x + 1, y + 1, x + width - 1, y + height - 1, bgColor);
 
         double guiScale = mc.getWindow().getGuiScale();
@@ -62,9 +59,8 @@ public class ScaledTextButton extends Button {
         int availableWidth = width - borderPadding * 2;
 
         float finalScale = baseTextScale;
-        int textWidth = mc.font.width(message); // Measure component width
+        int textWidth = mc.font.width(message);
 
-        // Truncation check
         boolean useRaw = textWidth * finalScale > availableWidth;
 
         poseStack.pushPose();
@@ -79,15 +75,12 @@ public class ScaledTextButton extends Button {
         if (useRaw || overrideTextColor != 0) {
             String textToRender = rawText;
             if (useRaw) {
-                // Measure and truncate
                 int maxCharsWidth = (int) (availableWidth / finalScale) - mc.font.width("...");
                 if (maxCharsWidth > 0) textToRender = mc.font.plainSubstrByWidth(textToRender, maxCharsWidth) + "...";
 
-                // Re-calculate X for centering based on truncated text
                 int newWidth = mc.font.width(textToRender);
                 float newCenteredX = this.x + (this.width - (newWidth * finalScale)) / 2.0f;
 
-                // Reset pose stack translation to use new centered X
                 poseStack.popPose();
                 poseStack.pushPose();
                 poseStack.translate(newCenteredX, centeredY, 0);
@@ -96,8 +89,7 @@ public class ScaledTextButton extends Button {
             int color = (overrideTextColor != 0) ? overrideTextColor : (hovered ? 0xFFFFFF : 0xCCCCCC);
             mc.font.drawShadow(poseStack, textToRender, 0, 0, color);
         } else {
-            // Render rich text component
-            mc.font.drawShadow(poseStack, message, 0, 0, 0xFFFFFF); // Base white so colors pop
+            mc.font.drawShadow(poseStack, message, 0, 0, 0xFFFFFF);
         }
 
         poseStack.popPose();

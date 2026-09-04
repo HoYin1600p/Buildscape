@@ -10,7 +10,7 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class SmokeVentBlockEntity extends BlockEntity {
 
-    private String smokeColor = null; // hex color string e.g. "#FF0000", null = default gray smoke
+    private String smokeColor = null;
     private boolean active = true;
 
     public SmokeVentBlockEntity(BlockPos pos, BlockState state) {

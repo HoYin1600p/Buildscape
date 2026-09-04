@@ -27,10 +27,6 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
-/**
- * Primary Datapack Reload Listener for the BuildScape Dynamic Compact Recipe Engine (BDRE).
- * Hooks into AddReloadListenerEvent to stream, compile, cache, and inject 10,000+ custom recipes.
- */
 @Mod.EventBusSubscriber(modid = BuildScape.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class BuildScapeRecipeLoader implements PreparableReloadListener {
 
@@ -86,7 +82,6 @@ public class BuildScapeRecipeLoader implements PreparableReloadListener {
 
         long startTime = System.currentTimeMillis();
 
-        // Step 1: Collect resources and compute hash
         Map<String, byte[]> rawCategoryData = new LinkedHashMap<>();
         ByteArrayOutputStream hashBuffer = new ByteArrayOutputStream();
 
@@ -106,7 +101,6 @@ public class BuildScapeRecipeLoader implements PreparableReloadListener {
 
         String contentHash = BinaryRecipeCache.computeHash(hashBuffer.toByteArray());
 
-        // Step 2A: Check Bundled JAR Binary Cache
         ResourceLocation bundledLocation = new ResourceLocation(BuildScape.MODID, "recipes_pack/recipes.bscb");
         if (resourceManager.hasResource(bundledLocation)) {
             try {
@@ -124,7 +118,6 @@ public class BuildScapeRecipeLoader implements PreparableReloadListener {
             }
         }
 
-        // Step 2B: Check Local Disk Binary Cache
         if (BinaryRecipeCache.isCacheValid(contentHash)) {
             BuildScape.LOGGER.debug("BDRE Loader: Cache HIT! Fast-loading recipes from local binary cache...");
             List<Recipe<?>> cached = BinaryRecipeCache.loadCache(contentHash);
@@ -137,7 +130,6 @@ public class BuildScapeRecipeLoader implements PreparableReloadListener {
             }
         }
 
-        // Step 3: Stream and Compile (Parallelized across CPU cores)
         BuildScape.LOGGER.debug("BDRE Loader: Cache MISS/Invalid. Parallel streaming and compiling category source files...");
         List<Recipe<?>> synchronizedLoadedRecipes = Collections.synchronizedList(loadedRecipes);
 
@@ -156,7 +148,6 @@ public class BuildScapeRecipeLoader implements PreparableReloadListener {
             }
         });
 
-        // Step 4: Save Binary Cache
         if (!loadedRecipes.isEmpty()) {
             BinaryRecipeCache.saveCache(contentHash, loadedRecipes);
         }

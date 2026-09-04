@@ -16,39 +16,27 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-/**
- * Configuration manager for equipped cosmetics and player rules.
- * Persists data in a private 'buildscape/data' directory to keep the config folder clean.
- */
 public class CosmeticsConfig {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static CosmeticsConfig INSTANCE;
 
-    // Cache of player UUID string to their equipped cosmetics by slot
     private final Map<String, Map<Integer, String>> playerCosmetics = new HashMap<>();
 
-    // Cache of player UUID string to cosmetic colors (cosmeticId -> hex color string)
     private final Map<String, Map<String, String>> playerCosmeticColors = new HashMap<>();
 
-    // Cache of player UUID string to creative tree breaker boolean
     private final Map<String, Boolean> playerCreativeTreeBreaker = new HashMap<>();
 
-    // Cache of player UUID string to shulker preview boolean
     private final Map<String, Boolean> playerShulkerPreview = new HashMap<>();
 
-    // Color picker window position
     private Integer colorPickerX = null;
     private Integer colorPickerY = null;
 
     private CosmeticsConfig() {
-        // 1. First, ensure our private data directory exists
         File dataDir = getDataDir();
         if (!dataDir.exists()) dataDir.mkdirs();
 
-        // 2. Migrate from legacy locations
         migrateLegacyData();
 
-        // 3. Load global settings from private storage
         loadGlobalSettings();
     }
 
@@ -59,9 +47,6 @@ public class CosmeticsConfig {
         return INSTANCE;
     }
 
-    /**
-     * @return The "private" data directory for BuildScape (not in config).
-     */
     private File getDataDir() {
         return FMLPaths.GAMEDIR.get().resolve("buildscape").resolve("data").toFile();
     }
@@ -75,15 +60,11 @@ public class CosmeticsConfig {
         return new File(getDataDir(), "global-settings.dat");
     }
 
-    /**
-     * Handles migration from BOTH the old JSON config AND the temporary NBT config location.
-     */
     private void migrateLegacyData() {
         Path legacyConfigDir = FMLPaths.CONFIGDIR.get().resolve(BuildScape.MODID);
         File legacyJson = legacyConfigDir.resolve("equipped-cosmetics.json").toFile();
         File legacyDataDir = legacyConfigDir.toFile();
 
-        // 1. Move any .dat files from config/buildscape/ to buildscape/data/
         if (legacyDataDir.exists() && legacyDataDir.isDirectory()) {
             File[] files = legacyDataDir.listFiles((dir, name) -> name.endsWith(".dat"));
             if (files != null) {
@@ -93,7 +74,7 @@ public class CosmeticsConfig {
                         if (!newFile.exists()) {
                             Files.move(oldFile.toPath(), newFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
                         } else {
-                            oldFile.delete(); // Already exists in new location
+                            oldFile.delete();
                         }
                     } catch (Exception e) {
                         BuildScape.getLogger().error("CosmeticsConfig: Failed to relocate " + oldFile.getName(), e);
@@ -102,7 +83,6 @@ public class CosmeticsConfig {
             }
         }
 
-        // 2. Migrate from the legacy JSON format if it still exists
         if (legacyJson.exists()) {
             boolean loadedSuccessfully = false;
             try (FileReader reader = new FileReader(legacyJson)) {
@@ -180,9 +160,6 @@ public class CosmeticsConfig {
         saveGlobalSettings();
     }
 
-    /**
-     * Internal method to load player data from their specific NBT file.
-     */
     private void loadPlayer(UUID playerUuid) {
         File file = getPlayerFile(playerUuid);
         String uuidStr = playerUuid != null ? playerUuid.toString() : "global";
@@ -237,7 +214,7 @@ public class CosmeticsConfig {
                 if (nbt.contains("shulker_preview")) {
                     playerShulkerPreview.put(uuidStr, nbt.getBoolean("shulker_preview"));
                 } else {
-                    playerShulkerPreview.put(uuidStr, true); // default ON
+                    playerShulkerPreview.put(uuidStr, true);
                 }
             }
         } catch (Exception e) {

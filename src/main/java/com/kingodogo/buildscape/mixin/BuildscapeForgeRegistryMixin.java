@@ -11,12 +11,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-/**
- * Defines the narrow registry-bake window used to parallelize Buildscape block
- * state caches without changing Forge validation or other mods' registries.
- *
- * @author hoyin1600p
- */
 @Mixin(value = ForgeRegistry.class, remap = false)
 public abstract class BuildscapeForgeRegistryMixin {
     @Unique

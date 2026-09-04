@@ -18,7 +18,6 @@ public class ClientFluidEvents {
         if (mc.level != null && mc.player != null) {
             FluidState fluidState = mc.level.getFluidState(event.getCamera().getBlockPosition());
             if (fluidState.getType() == ModFluids.EXPERIENCE_STILL.get() || fluidState.getType() == ModFluids.EXPERIENCE_FLOWING.get()) {
-                // Lime fog colors
                 event.setRed(0.3F);
                 event.setGreen(0.9F);
                 event.setBlue(0.1F);

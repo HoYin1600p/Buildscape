@@ -108,7 +108,6 @@ public class ShelfBlock extends BaseEntityBlock implements SelectableSlotContain
       builder.add(FACING, POWERED, SIDE_CHAIN_PART, WATERLOGGED);
    }
 
-   /** Vanilla shelves cannot be pushed by pistons. */
    @Override
    public PushReaction getPistonPushReaction(final BlockState state) {
       return PushReaction.BLOCK;

@@ -128,8 +128,8 @@ public class HollowLogBlockEntityRenderer implements BlockEntityRenderer<HollowL
         Fluid fluid = HollowPipeBlock.getContainedFluid(state, blockEntity);
         boolean hasWater = (fluid == Fluids.WATER) || (flowState != null && flowState.hasWater());
         boolean hasLava = (fluid == Fluids.LAVA) || (state.hasProperty(HollowPipeBlock.LAVA_LOGGED) && state.getValue(HollowPipeBlock.LAVA_LOGGED));
-        boolean hasXp = (fluid == com.kingodogo.buildscape.fluid.ModFluids.EXPERIENCE_STILL.get())
-                || (fluid == com.kingodogo.buildscape.fluid.ModFluids.EXPERIENCE_FLOWING.get());
+        boolean hasXp = (fluid == com.kingodogo.buildscape.fluid.ModFluids.EXPERIENCE_STILL.get()
+                || fluid == com.kingodogo.buildscape.fluid.ModFluids.EXPERIENCE_FLOWING.get());
 
         if (fluid == null || fluid == Fluids.EMPTY) {
             if (hasWater) {
@@ -165,8 +165,8 @@ public class HollowLogBlockEntityRenderer implements BlockEntityRenderer<HollowL
             yIn = heights.inlet();
             yOut = heights.outlet();
         } else {
-            yIn  = 0.75F;
-            yOut = 0.75F;
+            yIn  = HollowPipeBlock.WATER_SOURCE_VISUAL_HEIGHT;
+            yOut = HollowPipeBlock.WATER_SOURCE_VISUAL_HEIGHT;
         }
         float yCenter = (yIn + yOut) * 0.5F;
 
@@ -184,10 +184,12 @@ public class HollowLogBlockEntityRenderer implements BlockEntityRenderer<HollowL
         if (fluid == Fluids.LAVA) {
             texLoc = new ResourceLocation("minecraft", "block/lava_still");
         } else if (fluid == Fluids.WATER) {
-            // A source pipe with a downstream direction is flowing too. Using
+            // A source pipe with a single downstream direction is flowing too. Using
             // water_flow here keeps the animated flow texture continuous from
             // the first channel segment through the final world-water block.
-            texLoc = (flowState != null && flowState.hasWater() && !flowState.getFlowDirections().isEmpty())
+            // A stationary waterlogged pipe flowing symmetrically to both ends uses water_still.
+            boolean isStationarySource = (flowState != null && flowState.isSource() && flowState.getInflowDirection() == null && flowState.getFlowDirections().size() != 1);
+            texLoc = (flowState != null && flowState.hasWater() && !flowState.getFlowDirections().isEmpty() && !isStationarySource)
                     ? new ResourceLocation("minecraft", "block/water_flow")
                     : new ResourceLocation("minecraft", "block/water_still");
         } else if (hasXp) {
@@ -239,8 +241,8 @@ public class HollowLogBlockEntityRenderer implements BlockEntityRenderer<HollowL
             float z1 = 0.125F + ZB;
             float z2 = 0.875F - ZB;
 
-            boolean flowWestToEast = (inDir == Direction.WEST || outDirs.contains(Direction.EAST));
-            boolean flowEastToWest = (inDir == Direction.EAST || outDirs.contains(Direction.WEST));
+            boolean flowWestToEast = (inDir == Direction.WEST || (inDir == null && outDirs.contains(Direction.EAST) && !outDirs.contains(Direction.WEST)));
+            boolean flowEastToWest = (inDir == Direction.EAST || (inDir == null && outDirs.contains(Direction.WEST) && !outDirs.contains(Direction.EAST)));
 
             float yW;
             float yE;
@@ -252,7 +254,7 @@ public class HollowLogBlockEntityRenderer implements BlockEntityRenderer<HollowL
                 yE = yIn;
             } else {
                 yW = yIn;
-                yE = yOut;
+                yE = yIn;
             }
 
             // Unsquished 1:1 UV mapping along flow direction
@@ -304,8 +306,8 @@ public class HollowLogBlockEntityRenderer implements BlockEntityRenderer<HollowL
             float z1 = (connNorth || openNorth) ? 0.0F : (0.125F + ZB);
             float z2 = (connSouth || openSouth) ? 1.0F : (0.875F - ZB);
 
-            boolean flowNorthToSouth = (inDir == Direction.NORTH || outDirs.contains(Direction.SOUTH));
-            boolean flowSouthToNorth = (inDir == Direction.SOUTH || outDirs.contains(Direction.NORTH));
+            boolean flowNorthToSouth = (inDir == Direction.NORTH || (inDir == null && outDirs.contains(Direction.SOUTH) && !outDirs.contains(Direction.NORTH)));
+            boolean flowSouthToNorth = (inDir == Direction.SOUTH || (inDir == null && outDirs.contains(Direction.NORTH) && !outDirs.contains(Direction.SOUTH)));
 
             float yN;
             float yS;
@@ -317,7 +319,7 @@ public class HollowLogBlockEntityRenderer implements BlockEntityRenderer<HollowL
                 yS = yIn;
             } else {
                 yN = yIn;
-                yS = yOut;
+                yS = yIn;
             }
 
             // Unsquished 1:1 UV mapping along flow direction
@@ -438,7 +440,7 @@ public class HollowLogBlockEntityRenderer implements BlockEntityRenderer<HollowL
             }
             return 8.0F / 9.0F;
         } else if (state.getBlock() instanceof HollowLogBlock) {
-            return 0.75F;
+            return HollowPipeBlock.WATER_SOURCE_VISUAL_HEIGHT;
         }
         FluidState fs = state.getFluidState();
         if (fs.getType().isSame(fluid)) {
@@ -466,7 +468,14 @@ public class HollowLogBlockEntityRenderer implements BlockEntityRenderer<HollowL
 
         // 2. Neighbor is a HollowLogBlock:
         if (neighborState.getBlock() instanceof HollowLogBlock) {
-            return 0.75F;
+            Direction.Axis nAxis = neighborState.hasProperty(HollowLogBlock.AXIS) ? neighborState.getValue(HollowLogBlock.AXIS) : Direction.Axis.Y;
+            if (nAxis == dir.getAxis()) {
+                Fluid nFluid = HollowPipeBlock.getContainedFluid(neighborState, level.getBlockEntity(neighborPos));
+                if (nFluid != Fluids.EMPTY && (fluid == null || nFluid.isSame(fluid))) {
+                    return HollowPipeBlock.WATER_SOURCE_VISUAL_HEIGHT;
+                }
+            }
+            return -1.0F;
         }
 
         // 3. Neighbor is a world fluid block:
@@ -521,18 +530,35 @@ public class HollowLogBlockEntityRenderer implements BlockEntityRenderer<HollowL
         BlockPos neighborPos = pos.relative(dir);
         BlockState neighborState = level.getBlockState(neighborPos);
         if (neighborState.getBlock() instanceof HollowPipeBlock) {
-            if (HollowPipeBlock.isOpenEndpoint(neighborState, dir.getOpposite())) {
-                return true;
+            if (HollowPipeBlock.isOpenEndpoint(neighborState, dir.getOpposite())
+                    || (neighborState.hasProperty(HollowPipeBlock.getPropertyForDirection(dir.getOpposite()))
+                        && neighborState.getValue(HollowPipeBlock.getPropertyForDirection(dir.getOpposite())))) {
+                Fluid neighborFluid = HollowPipeBlock.getContainedFluid(neighborState, level.getBlockEntity(neighborPos));
+                if (neighborFluid != Fluids.EMPTY && (fluid == null || neighborFluid.isSame(fluid))) {
+                    return true;
+                }
             }
+            return false;
         }
         if (neighborState.getBlock() instanceof HollowLogBlock) {
             Direction.Axis neighborAxis = neighborState.hasProperty(HollowLogBlock.AXIS) ? neighborState.getValue(HollowLogBlock.AXIS) : Direction.Axis.Y;
             if (neighborAxis == dir.getAxis()) {
-                return true;
+                boolean isNeg = (dir.getOpposite() == Direction.WEST || dir.getOpposite() == Direction.NORTH || dir.getOpposite() == Direction.DOWN);
+                boolean hasNeighborGlass = isNeg
+                        ? (neighborState.hasProperty(HollowLogBlock.HAS_GLASS_NEG) && neighborState.getValue(HollowLogBlock.HAS_GLASS_NEG))
+                        : (neighborState.hasProperty(HollowLogBlock.HAS_GLASS_POS) && neighborState.getValue(HollowLogBlock.HAS_GLASS_POS));
+                if (hasNeighborGlass) {
+                    return false;
+                }
+                Fluid neighborFluid = HollowPipeBlock.getContainedFluid(neighborState, level.getBlockEntity(neighborPos));
+                if (neighborFluid != Fluids.EMPTY && (fluid == null || neighborFluid.isSame(fluid))) {
+                    return true;
+                }
             }
+            return false;
         }
         FluidState fs = level.getFluidState(neighborPos);
-        return fs != null && !fs.isEmpty();
+        return fs != null && !fs.isEmpty() && (fluid == null || fs.getType().isSame(fluid));
     }
 
     private static void renderQuad(
@@ -691,9 +717,10 @@ public class HollowLogBlockEntityRenderer implements BlockEntityRenderer<HollowL
         Matrix4f matrix = poseStack.last().pose();
         Direction.Axis axis = state.hasProperty(HollowLogBlock.AXIS) ? state.getValue(HollowLogBlock.AXIS) : Direction.Axis.Y;
 
-        float x1 = 0.125F, x2 = 0.875F;
-        float y1 = 0.125F, y2 = 0.75F;
-        float z1 = 0.125F, z2 = 0.875F;
+        final float ZB = 0.002F;
+        float x1 = 0.125F + ZB, x2 = 0.875F - ZB;
+        float y1 = 0.125F, y2 = HollowPipeBlock.WATER_SOURCE_VISUAL_HEIGHT;
+        float z1 = 0.125F + ZB, z2 = 0.875F - ZB;
 
         if (axis == Direction.Axis.Z) {
             z1 = hasGlassNeg ? 0.08F : 0.0F;
@@ -771,7 +798,7 @@ public class HollowLogBlockEntityRenderer implements BlockEntityRenderer<HollowL
             }
         } else { // Y axis
             y1 = hasGlassNeg ? 0.08F : 0.0F;
-            y2 = hasGlassPos ? 0.92F : 0.75F;
+            y2 = hasGlassPos ? 0.92F : (isNeighborFluid(level, pos, Direction.UP, fluid) ? 1.0F : HollowPipeBlock.WATER_SOURCE_VISUAL_HEIGHT);
 
             float uX1 = getSpriteU(sprite, x1);
             float uX2 = getSpriteU(sprite, x2);

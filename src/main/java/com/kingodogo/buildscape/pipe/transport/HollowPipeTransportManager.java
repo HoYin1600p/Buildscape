@@ -74,10 +74,7 @@ public class HollowPipeTransportManager {
         if (level == null || level.isClientSide || pos == null || state == null) {
             return;
         }
-        if (state.hasProperty(HollowPipeBlock.WATERLOGGED) && state.getValue(HollowPipeBlock.WATERLOGGED)) {
-            markDirty(level, pos);
-            return;
-        }
+        markDirty(level, pos);
         for (Direction dir : Direction.values()) {
             BlockPos neighborPos = pos.relative(dir);
             BlockState neighborState = level.getBlockState(neighborPos);

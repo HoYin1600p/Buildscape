@@ -593,6 +593,16 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
     }
 
     public VoxelShape getActualShape(BlockState state) {
+        int count = getConnectCount(state);
+        if (count == 0) {
+            Direction.Axis axis = state.hasProperty(AXIS) ? state.getValue(AXIS) : Direction.Axis.Y;
+            return switch (axis) {
+                case X -> X_SHAPE;
+                case Z -> Z_SHAPE;
+                default -> Y_SHAPE;
+            };
+        }
+
         int mask = 0;
         if (state.getValue(DOWN))  mask |= (1 << Direction.DOWN.get3DDataValue());
         if (state.getValue(UP))    mask |= (1 << Direction.UP.get3DDataValue());

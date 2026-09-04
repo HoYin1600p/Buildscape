@@ -53,6 +53,7 @@
     "ItemRendererMixin",
     "PauseScreenMixin",
     "LiquidBlockRendererMixin",
+    "EmbeddiumPipeSpillMixin",
     "RenderBuffersMixin",
     "StonecutterScreenMixin",
     "FireworkStarterMixin",

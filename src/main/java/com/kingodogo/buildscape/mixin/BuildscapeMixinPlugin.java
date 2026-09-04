@@ -36,6 +36,9 @@ public final class BuildscapeMixinPlugin implements IMixinConfigPlugin {
 
     @Override
     public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
+        if (mixinClassName.endsWith(".EmbeddiumPipeSpillMixin")) {
+            return classExists("me.jellysquid.mods.sodium.client.render.chunk.compile.buffers.ChunkModelBuilder");
+        }
         return !standaloneLaunchFasterPresent ||
                 !OVERLAPPING_CACHE_MIXINS.contains(mixinClassName);
     }

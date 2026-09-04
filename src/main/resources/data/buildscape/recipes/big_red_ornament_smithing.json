@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:smithing",
+  "base": {
+    "item": "buildscape:red_ornament"
+  },
+  "addition": {
+    "item": "buildscape:big_ornament_template"
+  },
+  "result": {
+    "item": "buildscape:big_red_ornament"
+  }
+}

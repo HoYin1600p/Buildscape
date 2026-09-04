@@ -153,6 +153,8 @@ public class PotentSulfurBlockEntity extends BlockEntity {
                   }
                }
 
+               boolean isPlayer = entityToBeLaunched instanceof Player;
+
                double entityY = entityToBeLaunched.getY();
                double bobbingTime = (double)(level.getGameTime() + (long)entityToBeLaunched.getId() * 7L) * 0.4D;
                double bobbingOffset = Math.sin(bobbingTime) * 0.10D;
@@ -164,11 +166,14 @@ public class PotentSulfurBlockEntity extends BlockEntity {
                   // Propel upwards towards the top of the cloud
                   double targetSpeed = Math.min(0.65D, 0.4D + (double)waterBlocks * 0.06D);
                   double newY = Math.min(targetSpeed, Math.max(entityVelocity.y + 0.18D, 0.4D));
-                  newVelocity = new Vec3(entityVelocity.x * 0.9D, newY, entityVelocity.z * 0.9D);
+                  double horizDamping = isPlayer ? 1.0D : 0.9D;
+                  newVelocity = new Vec3(entityVelocity.x * horizDamping, newY, entityVelocity.z * horizDamping);
                } else if (entityY <= targetY + 1.8D) {
                   // Float & bob up and down right at the cloud surface
                   double hoverY = (targetY - entityY) * 0.45D + bobbingVel;
-                  newVelocity = new Vec3(entityVelocity.x * 0.85D, hoverY, entityVelocity.z * 0.85D);
+                  double finalY = (isPlayer && entityVelocity.y > 0.2D) ? Math.max(hoverY, entityVelocity.y) : hoverY;
+                  double horizDamping = isPlayer ? 1.0D : 0.85D;
+                  newVelocity = new Vec3(entityVelocity.x * horizDamping, finalY, entityVelocity.z * horizDamping);
                } else {
                   // Above target height: allow gravity to bring entity down to cloud top
                   continue;
@@ -179,7 +184,9 @@ public class PotentSulfurBlockEntity extends BlockEntity {
 
                if (entityToBeLaunched instanceof net.minecraft.server.level.ServerPlayer serverPlayer) {
                   serverPlayer.hurtMarked = true;
-                  serverPlayer.connection.send(new net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket(serverPlayer));
+                  if (entityY < targetY - 1.0D && entityVelocity.y < 0.2D) {
+                     serverPlayer.connection.send(new net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket(serverPlayer));
+                  }
                }
             }
          }

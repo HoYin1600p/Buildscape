@@ -15,6 +15,16 @@
     "hidden": false
   },
   "parent": "buildscape:can_i_interest_you_in_a_jar",
+  "rewards": {
+    "items": [
+      {
+        "item": "buildscape:golden_jar_trophy"
+      },
+      {
+        "item": "buildscape:golden_jar_pattern"
+      }
+    ]
+  },
   "criteria": {
     "custom": {
       "trigger": "minecraft:impossible"

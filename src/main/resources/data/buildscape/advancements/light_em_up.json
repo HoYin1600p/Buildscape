@@ -18,7 +18,10 @@
   "rewards": {
     "items": [
       {
-        "item": "buildscape:multicolor_string_light"
+        "item": "buildscape:string_light_trophy"
+      },
+      {
+        "item": "buildscape:stringlight_frame_pattern"
       }
     ]
   },

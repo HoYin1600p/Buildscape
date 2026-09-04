@@ -122,9 +122,6 @@ public class PotentSulfurBlock extends BaseEntityBlock {
          if (level.getFluidState(pos.above()).isSourceOfType(Fluids.WATER)) {
             spawnBubbleParticlesAt(level, random, pos.getX(), pos.getY() + 1, pos.getZ());
             spawnBubbleParticlesAt(level, random, pos.getX(), pos.getY() + 1, pos.getZ());
-            if (random.nextInt(10) == 0) {
-               level.playLocalSound(pos.getX(), pos.getY(), pos.getZ(), ModSounds.NOXIOUS_GAS.get(), SoundSource.AMBIENT, 1.0F, 1.0F, false);
-            }
          }
       }
    }

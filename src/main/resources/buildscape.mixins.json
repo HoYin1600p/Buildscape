@@ -34,7 +34,8 @@
     "ShulkerBoxBlockEntityMixin",
     "ShulkerBoxBlockMixin",
     "ShulkerBoxMenuMixin",
-    "FlowingFluidMixin"
+    "FlowingFluidMixin",
+    "FireworkRocketEntityMixin"
   ],
   "client": [
     "AbstractContainerScreenMixin",
@@ -60,7 +61,8 @@
     "FireworkStarItemMixin",
     "ScreenMixin",
     "ThrownTridentAccessor",
-    "ThrownTridentRendererMixin"
+    "ThrownTridentRendererMixin",
+    "SignRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1

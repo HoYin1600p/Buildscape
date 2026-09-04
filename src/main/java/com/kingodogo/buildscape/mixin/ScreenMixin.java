@@ -54,17 +54,14 @@ public abstract class ScreenMixin {
 
     @Inject(method = "renderTooltipInternal", at = @At("TAIL"))
     private void renderCustomTooltipOutside(PoseStack poseStack, List<ClientTooltipComponent> components, int mouseX, int mouseY, CallbackInfo ci) {
-        // Recursion guard: prevent infinite loops if other mods hook into item rendering
         if (buildscape$isRenderingCustomTooltip) {
             return;
         }
 
-        // Check if player has Shulker Preview enabled in Player Rules
         if (!TagTooltipHandler.isShulkerPreviewEnabled()) {
             return;
         }
 
-        // Check if Shift key is pressed and a valid item is being hovered
         if (!Screen.hasShiftDown() || this.buildscape$currentHoverStack == null || this.buildscape$currentHoverStack.isEmpty()) {
             return;
         }
@@ -87,7 +84,6 @@ public abstract class ScreenMixin {
                 return;
             }
 
-            // 1. Calculate vanilla text tooltip bounding box
             int textTooltipWidth = 0;
             int textTooltipHeight = (components != null && components.size() == 1) ? -2 : 0;
             if (components != null) {
@@ -118,13 +114,9 @@ public abstract class ScreenMixin {
             int customWidth = customComponent.getWidth(this.font);
             int customHeight = customComponent.getHeight();
 
-            // 2. Position custom tooltip directly below the vanilla text tooltip box
-            // Vanilla tooltip box bounds: (textX - 3, textY - 3) to (textX + textTooltipWidth + 3, textY + textTooltipHeight + 3)
             int customX = textX - 3;
-            int customY = textY + textTooltipHeight + 6; // 3px border bottom + 3px gap
+            int customY = textY + textTooltipHeight + 6;
 
-            // 3. Screen bounds check for custom box:
-            // If it doesn't fit below the vanilla text tooltip, place it right above the text tooltip!
             if (customY + customHeight > this.height - 4) {
                 customY = (textY - 3) - customHeight - 3;
             }
@@ -139,7 +131,6 @@ public abstract class ScreenMixin {
                 customX = 4;
             }
 
-            // 4. Render custom tooltip image (9-slice frame & items)
             poseStack.pushPose();
             customComponent.renderImage(this.font, customX, customY, poseStack, this.itemRenderer, 400);
             poseStack.popPose();

@@ -36,16 +36,6 @@ import net.minecraftforge.common.util.ForgeSoundType;
 
 import java.util.List;
 
-/**
- * Trapped Decorated Pot – identical feature-set to {@link DecoratedPotBlock}
- * PLUS a spawn-egg trap mechanic:
- * <ul>
- *   <li>If the stored item is a {@link SpawnEggItem}, breaking the pot or
- *       right-clicking empty-handed (retrieve gesture) will SPAWN the mob
- *       instead of dropping the egg, then clear the storage.</li>
- *   <li>All other items behave exactly like normal decorated pots.</li>
- * </ul>
- */
 public class TrappedDecoratedPotBlock
         extends Block
         implements EntityBlock, SimpleWaterloggedBlock {
@@ -130,9 +120,6 @@ public class TrappedDecoratedPotBlock
         return 0;
     }
 
-    // =========================================================================
-    //  Interaction
-    // =========================================================================
 
     @Override
     public InteractionResult use(BlockState state, Level level, BlockPos pos,
@@ -144,9 +131,7 @@ public class TrappedDecoratedPotBlock
 
         ItemStack heldItem = player.getItemInHand(hand);
 
-        // ---- Shift + item in hand → store item (same logic as normal pot) ----
         if (!heldItem.isEmpty() && player.isShiftKeyDown()) {
-            // Prevent storing trapped pots inside themselves
             if (heldItem.getItem() instanceof net.minecraft.world.item.BlockItem blockItem &&
                     blockItem.getBlock() instanceof TrappedDecoratedPotBlock) {
                 return InteractionResult.PASS;
@@ -185,7 +170,6 @@ public class TrappedDecoratedPotBlock
                 return InteractionResult.sidedSuccess(level.isClientSide);
             }
 
-            // Full or incompatible
             if (!level.isClientSide) {
                 playFailSound(level, pos);
                 be.triggerWobble(TrappedDecoratedPotBlockEntity.WobbleStyle.NEGATIVE);
@@ -194,7 +178,6 @@ public class TrappedDecoratedPotBlock
             return InteractionResult.PASS;
         }
 
-        // ---- Empty hand, no shift → "poke" wobble ----
         if (heldItem.isEmpty() && !player.isShiftKeyDown()) {
             if (!level.isClientSide) {
                 level.playSound(null, pos, ModSounds.DECORATED_POT_HIT.get(), SoundSource.BLOCKS, 0.5f, 1.0f);
@@ -204,13 +187,11 @@ public class TrappedDecoratedPotBlock
             return InteractionResult.sidedSuccess(level.isClientSide);
         }
 
-        // Prevent storing trapped pots
         if (!heldItem.isEmpty() && heldItem.getItem() instanceof net.minecraft.world.item.BlockItem blockItem &&
                 blockItem.getBlock() instanceof TrappedDecoratedPotBlock) {
             return InteractionResult.PASS;
         }
 
-        // ---- Item in hand, no shift → store 1 at a time ----
         if (!heldItem.isEmpty() && !player.isShiftKeyDown()) {
             ItemStack stored = be.getStoredItem();
 
@@ -249,18 +230,14 @@ public class TrappedDecoratedPotBlock
             }
         }
 
-        // ---- Empty hand + shift → retrieve (spawn if egg, else give back) ----
         if (heldItem.isEmpty() && player.isShiftKeyDown() && !be.isEmpty()) {
             if (!level.isClientSide) {
                 ItemStack stored = be.getStoredItem().copy();
                 be.setStoredItem(ItemStack.EMPTY, true);
 
                 if (stored.getItem() instanceof SpawnEggItem spawnEgg) {
-                    // Trap fires: spawn the mob at the top of the pot
                     spawnMobFromEgg(level, pos, spawnEgg);
-                    // No egg returned – the trap is consumed
                 } else {
-                    // Normal retrieval: give item back
                     if (!player.getInventory().add(stored)) {
                         net.minecraft.world.entity.item.ItemEntity itemEntity =
                                 new net.minecraft.world.entity.item.ItemEntity(
@@ -282,9 +259,6 @@ public class TrappedDecoratedPotBlock
         return InteractionResult.PASS;
     }
 
-    // =========================================================================
-    //  Breaking – spawn egg trap fires on break too
-    // =========================================================================
 
     @Override
     public void playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
@@ -294,10 +268,8 @@ public class TrappedDecoratedPotBlock
 
             if (!level.isClientSide) {
                 if (stored.getItem() instanceof SpawnEggItem spawnEgg) {
-                    // Trap fires: spawn mob, don't drop egg
                     spawnMobFromEgg(level, pos, spawnEgg);
                 } else {
-                    // Drop non-egg items normally
                     net.minecraft.world.entity.item.ItemEntity itemEntity =
                             new net.minecraft.world.entity.item.ItemEntity(
                                     level,
@@ -333,18 +305,11 @@ public class TrappedDecoratedPotBlock
         return java.util.Collections.singletonList(new ItemStack(this));
     }
 
-    // =========================================================================
-    //  Helpers
-    // =========================================================================
 
-    /**
-     * Spawns the mob associated with the given spawn egg directly above the pot.
-     */
     private static void spawnMobFromEgg(Level level, BlockPos pos, SpawnEggItem spawnEgg) {
         if (level.isClientSide) return;
         EntityType<?> entityType = spawnEgg.getType(null);
         if (entityType != null) {
-            // Spawn in the center, just above the top of the pot
             Vec3 spawnPos = Vec3.atCenterOf(pos).add(0, 0.5, 0);
             entityType.spawn(
                     (net.minecraft.server.level.ServerLevel) level,
@@ -356,7 +321,6 @@ public class TrappedDecoratedPotBlock
                     true,
                     false
             );
-            // Poof particles
             if (level instanceof net.minecraft.server.level.ServerLevel serverLevel) {
                 serverLevel.sendParticles(
                         ParticleTypes.POOF,

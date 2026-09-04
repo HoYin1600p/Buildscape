@@ -38,7 +38,6 @@ public class FrostRoseDropHandler {
         double deathY = event.getEntityLiving().getY();
         double deathZ = event.getEntityLiving().getZ();
 
-        // Drop Frost Rose item at the Snow Golem's death position
         ItemStack frostRose = new ItemStack(ModBlocks.FROST_ROSE.get());
         ItemEntity itemEntity = new ItemEntity(
                 level,
@@ -49,11 +48,9 @@ public class FrostRoseDropHandler {
         );
         level.addFreshEntity(itemEntity);
 
-        // Track this death position to intercept Wither Rose (both block and item)
         trackedDeaths.add(new TrackedDeath(level, deathPos, deathX, deathY, deathZ, 20));
     }
 
-    // Intercept Wither Rose ITEM ENTITY spawning near a Snow Golem death position
     @SubscribeEvent(priority = EventPriority.HIGH)
     public static void onEntityJoinWorld(EntityJoinWorldEvent event) {
         if (event.getWorld().isClientSide()) return;
@@ -73,7 +70,6 @@ public class FrostRoseDropHandler {
         }
     }
 
-    // Intercept Wither Rose BLOCK placed at a Snow Golem death position
     @SubscribeEvent
     public static void onServerTick(TickEvent.ServerTickEvent event) {
         if (event.phase != TickEvent.Phase.END) return;
@@ -83,7 +79,6 @@ public class FrostRoseDropHandler {
         while (it.hasNext()) {
             TrackedDeath death = it.next();
 
-            // Check death position and one above for Wither Rose block
             if (death.level.getBlockState(death.pos).is(Blocks.WITHER_ROSE)) {
                 death.level.removeBlock(death.pos, false);
                 it.remove();

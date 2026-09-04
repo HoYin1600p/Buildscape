@@ -41,47 +41,34 @@ public class PillarItemsConfigTab extends AbstractConfigTab {
 
     @Override
     public void init() {
-        // Get screen dimensions for percentage-based calculations
         int screenWidth = parent.width;
         int screenHeight = parent.height;
 
-        // Calculate content area using percentage-based system
         int contentX = parent.getContentX();
         int contentY = parent.getContentY();
         int contentWidth = parent.getContentWidth();
         int contentHeight = parent.getContentHeight();
 
-        // Layout: 11% sidebar + 44% left content + 1% gap + 44% right content (all from
-        // full screen width)
-        // Each section takes 50% of content height
 
         int leftX = parent.getContentX();
         int leftPanelWidth = parent.getContentWidth();
         int rightX = parent.getRightPanelX();
         int rightPanelWidth = parent.getRightPanelWidth();
 
-        // Vertical Layout:
-        // Top Gap: 5% (handled by parent.getContentY())
-        // Available Height = Screen Height - Top Gap - Bottom Gap (0.5%)
-        // We have two panels separated by a middle gap (0.5%)
-        // Panel Height = (Available Height - Middle Gap) / 2
 
         int topGap = parent.getContentY();
         int availableHeight = parent.getContentHeight();
-        int middleGap = parent.getVerticalPanelGap(); // 0.5% consistent gap between panels
+        int middleGap = parent.getVerticalPanelGap();
 
         int topSectionHeight = (availableHeight - middleGap) / 2;
         int bottomSectionHeight = availableHeight - middleGap - topSectionHeight;
 
-        // Calculate positions
         int topY = topGap;
         int middleGapY = topY + topSectionHeight;
         int bottomY = middleGapY + middleGap;
 
-        // 0.5% internal padding for buttons relative to panel top
         int internalPaddingY = (int) (screenHeight * 0.005) + 2;
 
-        // Top-Left: Selected items (44% of full screen width, 50% height)
         refreshExistingItems();
         int defaultExistingItemsX = leftX;
         int defaultExistingItemsY = topY;
@@ -94,31 +81,24 @@ public class PillarItemsConfigTab extends AbstractConfigTab {
                 this::removeItem,
                 this::isItemInConfig);
 
-        // Dynamically calculate header height based on label position/height
         int buttonSize = BuildScapeConfigScreen.getScaledButtonHeight();
         int headerHeight = internalPaddingY + buttonSize + BuildScapeConfigScreen.scaleSize(4);
         existingItemsWidget.setHeaderAreaHeight(headerHeight);
         addTabWidget(existingItemsWidget);
 
-        // Bottom-Left: Item selector panel (44% width, 50% height)
-        // Create a container "panel" widget to hold all components together
         loadAvailableModNamespaces();
 
-        // Create a dummy container widget to represent the panel bounds
-        // This ensures all child components scale together
-        int scaledOffset = BuildScapeConfigScreen.scaleSize(5); // Small top padding to prevent clipping
-        int scaledButtonArea = BuildScapeConfigScreen.scaleSize(100); // Space for 3 buttons
+        int scaledOffset = BuildScapeConfigScreen.scaleSize(5);
+        int scaledButtonArea = BuildScapeConfigScreen.scaleSize(100);
         int searchBoxHeight = BuildScapeConfigScreen.getScaledEditBoxHeight();
         int leftPadding = BuildScapeConfigScreen.scaleSize(5);
 
-        // Create panel container (invisible, just for positioning reference)
         net.minecraft.client.gui.components.AbstractWidget itemSelectorPanel = new net.minecraft.client.gui.components.AbstractWidget(
                 leftX, bottomY, leftPanelWidth, bottomSectionHeight,
                 net.minecraft.network.chat.TextComponent.EMPTY) {
             @Override
             public void renderButton(com.mojang.blaze3d.vertex.PoseStack poseStack, int mouseX, int mouseY,
                     float partialTick) {
-                // Invisible container
             }
 
             @Override
@@ -127,17 +107,14 @@ public class PillarItemsConfigTab extends AbstractConfigTab {
             }
         };
 
-        // Calculate button group dimensions
         int buttonSpacing = BuildScapeConfigScreen.scaleSize(5);
         int totalButtonsWidth = (buttonSize * 3) + (buttonSpacing * 2);
 
-        // Buttons end flush at panel right edge
         int buttonsEndX = leftX + leftPanelWidth;
         int buttonsStartX = buttonsEndX - totalButtonsWidth;
 
-        int buttonY = bottomY + internalPaddingY; // Start slightly down from panel top
+        int buttonY = bottomY + internalPaddingY;
 
-        // Create toggle buttons - Right aligned
         inventoryButton = new SortToggleButton(
                 buttonsStartX, buttonY,
                 buttonSize, buttonSize,
@@ -173,8 +150,6 @@ public class PillarItemsConfigTab extends AbstractConfigTab {
         ));
         addTabWidget(modOnlyButton);
 
-        // Search box - positioned after label text, extending to buttons
-        // Label
         Minecraft mc = Minecraft.getInstance();
         net.minecraft.network.chat.Component allItemsLabel = new TranslatableComponent("buildscape.config.all_items");
         int allItemsLabelWidth = mc.font.width(allItemsLabel);
@@ -182,14 +157,13 @@ public class PillarItemsConfigTab extends AbstractConfigTab {
         float textScale = BuildScapeConfigScreen.getStandardTextScale();
 
         int searchBoxX = leftX + 2 + (int)(allItemsLabelWidth * textScale) + labelSpacing;
-        // Search box ends before buttons with some spacing
         int searchBoxEndX = buttonsStartX - labelSpacing;
         int searchBoxWidth = searchBoxEndX - searchBoxX;
 
         searchBox = new EditBox(
                 net.minecraft.client.Minecraft.getInstance().font,
-                searchBoxX, buttonY, // Align Y with buttons
-                searchBoxWidth, buttonSize, // Match height
+                searchBoxX, buttonY,
+                searchBoxWidth, buttonSize,
                 new TranslatableComponent("buildscape.config.search"));
         searchBox.setMaxLength(256);
         searchBox.setResponder((text) -> {
@@ -199,10 +173,8 @@ public class PillarItemsConfigTab extends AbstractConfigTab {
         });
         addTabWidget(searchBox);
 
-        // Create item selection widget - starts at panel top to cover entire area
-        // Widget will internally handle spacing for search box via HEADER_AREA_HEIGHT
         int defaultItemSelectionX = leftX;
-        int defaultItemSelectionY = bottomY; // Start at panel top
+        int defaultItemSelectionY = bottomY;
         itemSelectionWidget = new ItemSelectionWidget(
                 defaultItemSelectionX, defaultItemSelectionY,
                 leftPanelWidth, bottomSectionHeight,
@@ -210,12 +182,10 @@ public class PillarItemsConfigTab extends AbstractConfigTab {
                 (itemId) -> isItemInConfig(itemId) ? 1 : 0);
         itemSelectionWidget.setSortMode(SortToggleButton.SortType.ALL_ITEMS);
 
-        // Dynamically calculate header height based on search box position/height to prevent overlap
         headerHeight = internalPaddingY + buttonSize + BuildScapeConfigScreen.scaleSize(4);
         itemSelectionWidget.setHeaderAreaHeight(headerHeight);
         addTabWidget(itemSelectionWidget);
 
-        // Top-Right: Presets (44% of full screen width, 50% height)
         int presetsX = rightX;
         int presetsY = topY;
         int presetsWidth = rightPanelWidth;
@@ -227,16 +197,11 @@ public class PillarItemsConfigTab extends AbstractConfigTab {
         presetsWidget.setHeaderAreaHeight(headerHeight);
         addTabWidget(presetsWidget);
 
-        // Get create button from presets widget for GUI config
         presetCreateButton = presetsWidget.getCreateButton();
-        // Match PresetsWidget calculation: x + scaledSpacing, y + height -
-        // scaleSize(35)
         int scaledSpacing = BuildScapeConfigScreen.scaleSize(10);
         int defaultCreateButtonX = presetsX + scaledSpacing;
         int defaultCreateButtonY = presetsY + presetsHeight - BuildScapeConfigScreen.scaleSize(35);
 
-        // Bottom-Right: Tag selector panel (44% width, 50% height)
-        // Create panel container for tags section
         int tagsX = rightX;
         int tagsY = bottomY;
         int tagsWidth = rightPanelWidth;
@@ -247,7 +212,6 @@ public class PillarItemsConfigTab extends AbstractConfigTab {
             @Override
             public void renderButton(com.mojang.blaze3d.vertex.PoseStack poseStack, int mouseX, int mouseY,
                     float partialTick) {
-                // Invisible container
             }
 
             @Override
@@ -256,18 +220,14 @@ public class PillarItemsConfigTab extends AbstractConfigTab {
             }
         };
 
-        // Calculate width for tags buttons (same size/spacing)
-        // Re-calculate these local variables to be safe in case code above changes
         int tagsButtonSize = BuildScapeConfigScreen.getScaledButtonHeight();
         int tagsButtonSpacing = BuildScapeConfigScreen.scaleSize(5);
         int totalTagsButtonsWidth = (tagsButtonSize * 3) + (tagsButtonSpacing * 2);
 
-        // Buttons end flush at panel right edge
         int tagsButtonsEndX = tagsX + tagsWidth;
         int tagsButtonsStartX = tagsButtonsEndX - totalTagsButtonsWidth;
         int tagsButtonY = tagsY + internalPaddingY;
 
-        // Create tags sort buttons - Right aligned
         tagsInventoryButton = new SortToggleButton(
                 tagsButtonsStartX, tagsButtonY,
                 tagsButtonSize, tagsButtonSize,
@@ -302,7 +262,6 @@ public class PillarItemsConfigTab extends AbstractConfigTab {
         ));
         addTabWidget(tagsModOnlyButton);
 
-        // Tags Search box
         net.minecraft.network.chat.Component tagsLabel = new TranslatableComponent("buildscape.config.tags");
         int tagsLabelWidth = mc.font.width(tagsLabel);
         int tagsLabelSpacing = BuildScapeConfigScreen.scaleSize(5);
@@ -313,8 +272,8 @@ public class PillarItemsConfigTab extends AbstractConfigTab {
 
         tagsSearchBox = new EditBox(
                 net.minecraft.client.Minecraft.getInstance().font,
-                tagsSearchBoxX, tagsButtonY, // Match buttons Y
-                tagsSearchBoxWidth, tagsButtonSize, // Match buttons height
+                tagsSearchBoxX, tagsButtonY,
+                tagsSearchBoxWidth, tagsButtonSize,
                 new TranslatableComponent("buildscape.config.search_tags"));
         tagsSearchBox.setMaxLength(256);
         tagsSearchBox.setResponder((text) -> {
@@ -324,21 +283,17 @@ public class PillarItemsConfigTab extends AbstractConfigTab {
         });
         addTabWidget(tagsSearchBox);
 
-        // Create tags selector widget - starts at panel top to cover entire area
-        // Widget will internally handle spacing for search box via HEADER_AREA_HEIGHT
-        int tagsWidgetHeight = bottomSectionHeight; // Full panel height
+        int tagsWidgetHeight = bottomSectionHeight;
 
         tagsSelectorWidget = new TagsSelectorWidget(
-                tagsX, tagsY, // Start at panel top
+                tagsX, tagsY,
                 tagsWidth, tagsWidgetHeight,
                 this::onTagSelected);
         tagsSelectorWidget.setSortType(TagsSelectorWidget.SortType.ALL_ITEMS);
 
-        // Match tag selector header height for consistency
         tagsSelectorWidget.setHeaderAreaHeight(headerHeight);
         addTabWidget(tagsSelectorWidget);
 
-        // Initialize widget connections
         if (itemSelectionWidget != null) {
             searchBox.setResponder((text) -> itemSelectionWidget.setFilter(text));
         }
@@ -346,18 +301,14 @@ public class PillarItemsConfigTab extends AbstractConfigTab {
             tagsSearchBox.setResponder((text) -> tagsSelectorWidget.setFilter(text));
         }
 
-        // Update child component positions relative to their parent widgets
         updateChildComponentPositions();
 
-        // Update selected tags from config
         updateSelectedTags();
 
-        // Auto-apply preset on init (unnamed or last applied)
         PresetsConfig presetsConfig = PresetsConfig.get();
         presetsConfig.autoApplyOnLoad();
         refreshExistingItems();
         if (presetsWidget != null) {
-            // Select the preset that was applied
             String appliedKey = presetsConfig.getLastAppliedPreset();
             if (presetsConfig.hasUnnamedPreset()) {
                 appliedKey = "_unnamed";
@@ -366,13 +317,7 @@ public class PillarItemsConfigTab extends AbstractConfigTab {
         }
     }
 
-    /**
-     * Update positions of child components (search boxes, buttons) relative to
-     * their panel bounds.
-     * This ensures components stay aligned when panels resize.
-     */
     private void updateChildComponentPositions() {
-        // Get current panel bounds using parent helper methods for consistency
         int screenWidth = parent.width;
         int screenHeight = parent.height;
 
@@ -383,7 +328,7 @@ public class PillarItemsConfigTab extends AbstractConfigTab {
 
         int topGap = parent.getContentY();
         int availableHeight = parent.getContentHeight();
-        int middleGap = parent.getVerticalPanelGap(); // 0.5% consistent gap between panels
+        int middleGap = parent.getVerticalPanelGap();
 
         int internalPaddingY = (int) (screenHeight * 0.005) + 2;
 
@@ -394,13 +339,11 @@ public class PillarItemsConfigTab extends AbstractConfigTab {
         int middleGapY = topY + topSectionHeight;
         int bottomY = middleGapY + middleGap;
 
-        // Position search box Y coordinate
         if (searchBox != null) {
             int searchBoxY = bottomY + internalPaddingY;
             searchBox.y = searchBoxY;
         }
 
-        // Position buttons Y coordinate
         if (inventoryButton != null && allItemsButton != null && modOnlyButton != null) {
             int buttonY = bottomY + internalPaddingY;
             inventoryButton.y = buttonY;
@@ -408,17 +351,16 @@ public class PillarItemsConfigTab extends AbstractConfigTab {
             modOnlyButton.y = buttonY;
         }
 
-        // Update item selection widget position - starts at panel top
         if (itemSelectionWidget != null && searchBox != null) {
             itemSelectionWidget.x = leftX;
-            itemSelectionWidget.y = bottomY; // Start at panel top
+            itemSelectionWidget.y = bottomY;
             itemSelectionWidget.setWidth(leftPanelWidth);
 
             int buttonSize = BuildScapeConfigScreen.getScaledButtonHeight();
             int headerHeight = internalPaddingY + buttonSize + BuildScapeConfigScreen.scaleSize(4);
             itemSelectionWidget.setHeaderAreaHeight(headerHeight);
 
-            int itemSelectionWidgetHeight = bottomSectionHeight; // Full panel height
+            int itemSelectionWidgetHeight = bottomSectionHeight;
             try {
                 java.lang.reflect.Method setHeightMethod = itemSelectionWidget.getClass().getMethod("setHeight",
                         int.class);
@@ -430,12 +372,10 @@ public class PillarItemsConfigTab extends AbstractConfigTab {
                     heightField.setAccessible(true);
                     heightField.setInt(itemSelectionWidget, itemSelectionWidgetHeight);
                 } catch (Exception ex) {
-                    // Ignore
                 }
             }
         }
 
-        // Update tags panel components (bottom-right)
         int tagsX = rightX;
         int tagsY = bottomY;
 
@@ -449,11 +389,10 @@ public class PillarItemsConfigTab extends AbstractConfigTab {
             tagsModOnlyButton.y = tagsInventoryButton.y;
         }
 
-        // Update tags selector widget position - starts at panel top
         if (tagsSelectorWidget != null && tagsSearchBox != null) {
-            int tagsWidgetHeight = bottomSectionHeight; // Full panel height
+            int tagsWidgetHeight = bottomSectionHeight;
             tagsSelectorWidget.x = tagsX;
-            tagsSelectorWidget.y = tagsY; // Start at panel top
+            tagsSelectorWidget.y = tagsY;
             tagsSelectorWidget.setWidth(rightPanelWidth);
             tagsSelectorWidget.setHeight(tagsWidgetHeight);
 
@@ -462,12 +401,10 @@ public class PillarItemsConfigTab extends AbstractConfigTab {
             tagsSelectorWidget.setHeaderAreaHeight(headerHeight);
         }
 
-        // Update PresetsWidget internal button positions (including Create button)
         if (presetsWidget != null) {
             presetsWidget.updateChildPositions();
         }
 
-        // Update search box position/width based on current label text
         updateSearchBoxForLabel();
         updateTagsSearchBoxForLabel();
     }
@@ -479,7 +416,6 @@ public class PillarItemsConfigTab extends AbstractConfigTab {
         }
         updateSelectedTags();
 
-        // Clear unnamed preset when a preset is applied
         if (!presetKey.equals("_unnamed")) {
             PresetsConfig.get().clearUnnamedPreset();
         }
@@ -488,13 +424,11 @@ public class PillarItemsConfigTab extends AbstractConfigTab {
     private void onTagSelected(String tagId) {
         PillarParticleConfig config = PillarParticleConfig.get();
         if (config.items.contains(tagId)) {
-            // Tag is already selected, remove it
             config.removeItem(tagId);
         } else {
-            // Tag is not selected, add it
             config.addItem(tagId);
         }
-        saveToUnnamedPreset(); // Save changes to unnamed preset
+        saveToUnnamedPreset();
         refreshExistingItems();
         updateSelectedTags();
     }
@@ -522,19 +456,16 @@ public class PillarItemsConfigTab extends AbstractConfigTab {
         });
         availableModNamespaces = new ArrayList<>(namespaces);
         availableModNamespaces.sort(String::compareTo);
-        // Start with buildscape if available
         if (availableModNamespaces.contains("buildscape")) {
             currentModIndex = availableModNamespaces.indexOf("buildscape");
         }
     }
 
     private void onSortModeChanged(SortToggleButton.SortType type, boolean isCtrlDown) {
-        // Deselect all buttons
         inventoryButton.setSelected(false);
         allItemsButton.setSelected(false);
         modOnlyButton.setSelected(false);
 
-        // Select the clicked button
         switch (type) {
             case INVENTORY:
                 inventoryButton.setSelected(true);
@@ -544,7 +475,6 @@ public class PillarItemsConfigTab extends AbstractConfigTab {
                 break;
             case MOD_ONLY:
                 modOnlyButton.setSelected(true);
-                // Cycle to next/prev mod if clicking again
                 if (itemSelectionWidget != null &&
                         itemSelectionWidget.getSortMode() == SortToggleButton.SortType.MOD_ONLY) {
                     if (isCtrlDown) {
@@ -553,7 +483,6 @@ public class PillarItemsConfigTab extends AbstractConfigTab {
                         cycleToNextMod();
                     }
                 } else {
-                    // Set to first mod or buildscape if available
                     if (!availableModNamespaces.isEmpty()) {
                         if (availableModNamespaces.contains("buildscape")) {
                             currentModIndex = availableModNamespaces.indexOf("buildscape");
@@ -573,15 +502,9 @@ public class PillarItemsConfigTab extends AbstractConfigTab {
             itemSelectionWidget.setSortMode(type);
         }
 
-        // Update search box position/width when label changes
         updateSearchBoxForLabel();
     }
 
-    /**
-     * Updates the search box position and width based on the current label text.
-     * This ensures the search box auto-resizes when the label changes (e.g., "All
-     * items" -> "Inventory Items" -> "Mod Items").
-     */
     private void updateSearchBoxForLabel() {
         if (itemSelectionWidget == null || searchBox == null)
             return;
@@ -592,7 +515,6 @@ public class PillarItemsConfigTab extends AbstractConfigTab {
         int leftPadding = BuildScapeConfigScreen.scaleSize(5);
         int labelSpacing = BuildScapeConfigScreen.scaleSize(5);
 
-        // Get current label text based on sort mode
         String labelKey = "buildscape.config.filtered_items";
         net.minecraft.network.chat.Component labelText = null;
 
@@ -621,13 +543,11 @@ public class PillarItemsConfigTab extends AbstractConfigTab {
 
         int labelWidth = (int) (mc.font.width(labelText) * textScale);
 
-        // Dynamically compute maxLabelWidth to ensure searchBox is minimum 80px width
         int minSearchBoxWidth = BuildScapeConfigScreen.scaleSize(80);
 
         int buttonSize = BuildScapeConfigScreen.getScaledButtonHeight();
         int buttonSpacing = BuildScapeConfigScreen.scaleSize(5);
         int totalButtonsWidth = (buttonSize * 3) + (buttonSpacing * 2);
-        // Buttons end flush at panel right edge
         int buttonsEndX = leftX + leftPanelWidth;
         int buttonsStartX = buttonsEndX - totalButtonsWidth;
 
@@ -637,7 +557,6 @@ public class PillarItemsConfigTab extends AbstractConfigTab {
         searchBox.x = searchBoxX;
         searchBox.setWidth(Math.max(minSearchBoxWidth, finalSearchBoxWidth));
 
-        // Update button positions
         if (inventoryButton != null && allItemsButton != null && modOnlyButton != null && searchBox != null) {
             inventoryButton.x = buttonsStartX;
             inventoryButton.y = searchBox.y;
@@ -685,7 +604,6 @@ public class PillarItemsConfigTab extends AbstractConfigTab {
         int buttonSize = BuildScapeConfigScreen.getScaledButtonHeight();
         int buttonSpacing = BuildScapeConfigScreen.scaleSize(5);
         int totalButtonsWidth = (buttonSize * 3) + (buttonSpacing * 2);
-        // Buttons end at panel right edge (no extra right gap inside panel)
         int buttonsEndX = rightX + rightPanelWidth;
         int buttonsStartX = buttonsEndX - totalButtonsWidth;
 
@@ -711,12 +629,10 @@ public class PillarItemsConfigTab extends AbstractConfigTab {
     }
 
     private void onTagsSortModeChanged(SortToggleButton.SortType type, boolean isCtrlDown) {
-        // Deselect all tags buttons
         tagsInventoryButton.setSelected(false);
         tagsAllButton.setSelected(false);
         tagsModOnlyButton.setSelected(false);
 
-        // Select the clicked button
         switch (type) {
             case INVENTORY:
                 tagsInventoryButton.setSelected(true);
@@ -729,7 +645,6 @@ public class PillarItemsConfigTab extends AbstractConfigTab {
                 break;
         }
 
-        // Apply sort mode to tags selector widget
         if (tagsSelectorWidget != null) {
             tagsSelectorWidget.setSortType(convertSortType(type));
         }
@@ -757,7 +672,6 @@ public class PillarItemsConfigTab extends AbstractConfigTab {
         if (itemSelectionWidget != null) {
             itemSelectionWidget.setModNamespace(modNamespace);
         }
-        // Update search box position/width when mod changes (label text changes)
         updateSearchBoxForLabel();
     }
 
@@ -769,7 +683,6 @@ public class PillarItemsConfigTab extends AbstractConfigTab {
         if (itemSelectionWidget != null) {
             itemSelectionWidget.setModNamespace(modNamespace);
         }
-        // Update search box position/width when mod changes (label text changes)
         updateSearchBoxForLabel();
     }
 
@@ -784,22 +697,19 @@ public class PillarItemsConfigTab extends AbstractConfigTab {
 
     public void onItemSelected(String itemId) {
         PillarParticleConfig config = PillarParticleConfig.get();
-        // Only toggle if explicitly clicked - don't auto-remove on load
         boolean wasInConfig = config.items.contains(itemId);
 
         if (wasInConfig) {
-            // Item is already in config, remove it (user clicked to remove)
             if (config.removeItem(itemId)) {
-                saveToUnnamedPreset(); // Save changes to unnamed preset
+                saveToUnnamedPreset();
                 refreshExistingItems();
                 if (itemSelectionWidget != null) {
                     itemSelectionWidget.refresh();
                 }
             }
         } else {
-            // Item is not in config, add it (user clicked to add)
             if (config.addItem(itemId)) {
-                saveToUnnamedPreset(); // Save changes to unnamed preset
+                saveToUnnamedPreset();
                 refreshExistingItems();
                 if (itemSelectionWidget != null) {
                     itemSelectionWidget.refresh();
@@ -809,18 +719,14 @@ public class PillarItemsConfigTab extends AbstractConfigTab {
     }
 
     private void saveToUnnamedPreset() {
-        // Save current items to unnamed preset (unsaved changes)
         PillarParticleConfig config = PillarParticleConfig.get();
         PresetsConfig presetsConfig = PresetsConfig.get();
 
-        // Don't save if default preset is selected and no changes were made
         if (presetsWidget != null) {
             String selectedKey = presetsWidget.getSelectedPresetKey();
             if (selectedKey != null && !selectedKey.equals("default") && !selectedKey.equals("_unnamed")) {
-                // If a named preset is selected, switch to unnamed
                 presetsWidget.setSelectedPreset("_unnamed");
             } else if (selectedKey == null || selectedKey.equals("default")) {
-                // If default is selected, switch to unnamed to track changes
                 presetsWidget.setSelectedPreset("_unnamed");
             }
             presetsWidget.setAppliedPreset("_unnamed");
@@ -840,7 +746,7 @@ public class PillarItemsConfigTab extends AbstractConfigTab {
     public void removeItem(String itemId) {
         PillarParticleConfig config = PillarParticleConfig.get();
         if (config.removeItem(itemId)) {
-            saveToUnnamedPreset(); // Save changes to unnamed preset
+            saveToUnnamedPreset();
             refreshExistingItems();
             if (itemSelectionWidget != null) {
                 itemSelectionWidget.refresh();
@@ -855,25 +761,20 @@ public class PillarItemsConfigTab extends AbstractConfigTab {
         int contentWidth = parent.getContentWidth();
         int contentHeight = parent.getContentHeight();
 
-        // Calculate quadrant boundaries
-        int spacing = 15; // Match spacing from init()
+        int spacing = 15;
         int midX = contentX + (contentWidth - spacing) / 2;
         int midY = contentY + (contentHeight - spacing) / 2;
         int leftWidth = (contentWidth - spacing) / 2;
         int topHeight = (contentHeight - spacing) / 2;
         int bottomLeftY = midY + spacing;
 
-        // Render existing items widget (top-left quadrant)
         if (existingItemsWidget != null) {
             existingItemsWidget.render(poseStack, mouseX, mouseY, partialTick);
         }
 
-        // Render "Pillar items" label inside existingItemsWidget area
-        // Render AFTER widget to ensure it's visible on top with background for
-        // visibility
         if (existingItemsWidget != null) {
             poseStack.pushPose();
-            poseStack.translate(0, 0, 400); // Bring label to front with highest z-level
+            poseStack.translate(0, 0, 400);
             Minecraft mc = Minecraft.getInstance();
             int labelX = existingItemsWidget.x + 2;
             int labelY = existingItemsWidget.y + 2 + BuildScapeConfigScreen.getScaledButtonHeight() / 2 - mc.font.lineHeight / 2 + 1;
@@ -884,8 +785,6 @@ public class PillarItemsConfigTab extends AbstractConfigTab {
 
             float textScale = BuildScapeConfigScreen.getStandardTextScale();
 
-            // Render with white color and scaling for high GUI scales (no background
-            // needed)
             poseStack.pushPose();
             poseStack.translate(labelX, labelY, 0);
             poseStack.scale(textScale, textScale, 1.0f);
@@ -893,21 +792,19 @@ public class PillarItemsConfigTab extends AbstractConfigTab {
                     poseStack,
                     pillarItemsLabel,
                     0, 0,
-                    0xFFFFFFFF // Full opacity white
+                    0xFFFFFFFF
             );
             poseStack.popPose();
             poseStack.popPose();
         }
 
-        // Render labels aligned with search boxes on the same line
         poseStack.pushPose();
-        poseStack.translate(0, 0, 200); // Bring labels to front with higher z-level
+        poseStack.translate(0, 0, 200);
 
         Minecraft mc = Minecraft.getInstance();
         int searchBoxHeight = BuildScapeConfigScreen.getScaledEditBoxHeight();
         float textScale = BuildScapeConfigScreen.getStandardTextScale();
 
-        // Render Search Box Label
         if (itemSelectionWidget != null && searchBox != null) {
             String labelKey = "buildscape.config.filtered_items";
             net.minecraft.network.chat.Component labelText = null;
@@ -938,7 +835,6 @@ public class PillarItemsConfigTab extends AbstractConfigTab {
             renderScaledText(poseStack, labelText, actualLabelX, searchBox.y + textYOffset, textScale);
         }
 
-        // Render "Tags" label
         if (tagsSelectorWidget != null && tagsSearchBox != null) {
             String labelKey = "buildscape.config.tags";
             net.minecraft.network.chat.Component tagsLabel;
@@ -959,7 +855,6 @@ public class PillarItemsConfigTab extends AbstractConfigTab {
 
         poseStack.popPose();
 
-        // Render search box and toggle buttons
         if (searchBox != null) {
             searchBox.render(poseStack, mouseX, mouseY, partialTick);
         }
@@ -973,22 +868,18 @@ public class PillarItemsConfigTab extends AbstractConfigTab {
             modOnlyButton.render(poseStack, mouseX, mouseY, partialTick);
         }
 
-        // Render item selection widget
         if (itemSelectionWidget != null) {
             itemSelectionWidget.render(poseStack, mouseX, mouseY, partialTick);
         }
 
-        // Render presets widget (top-right)
         if (presetsWidget != null) {
             presetsWidget.render(poseStack, mouseX, mouseY, partialTick);
         }
 
-        // Render tags search box (bottom-right, above tags selector)
         if (tagsSearchBox != null) {
             tagsSearchBox.render(poseStack, mouseX, mouseY, partialTick);
         }
 
-        // Render tags sort buttons
         if (tagsInventoryButton != null) {
             tagsInventoryButton.render(poseStack, mouseX, mouseY, partialTick);
         }
@@ -999,7 +890,6 @@ public class PillarItemsConfigTab extends AbstractConfigTab {
             tagsModOnlyButton.render(poseStack, mouseX, mouseY, partialTick);
         }
 
-        // Render tags selector widget (bottom-right)
         if (tagsSelectorWidget != null) {
             tagsSelectorWidget.render(poseStack, mouseX, mouseY, partialTick);
         }
@@ -1007,7 +897,6 @@ public class PillarItemsConfigTab extends AbstractConfigTab {
 
     @Override
     public void renderTooltips(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
-        // Render tooltips for sort buttons
         if (inventoryButton != null) inventoryButton.renderButtonTooltip(poseStack, mouseX, mouseY);
         if (allItemsButton != null) allItemsButton.renderButtonTooltip(poseStack, mouseX, mouseY);
         if (modOnlyButton != null) modOnlyButton.renderButtonTooltip(poseStack, mouseX, mouseY);
@@ -1016,12 +905,10 @@ public class PillarItemsConfigTab extends AbstractConfigTab {
         if (tagsAllButton != null) tagsAllButton.renderButtonTooltip(poseStack, mouseX, mouseY);
         if (tagsModOnlyButton != null) tagsModOnlyButton.renderButtonTooltip(poseStack, mouseX, mouseY);
 
-        // Render tooltips for item selection widget
         if (itemSelectionWidget != null) {
             itemSelectionWidget.renderTooltip(poseStack, mouseX, mouseY);
         }
 
-        // Render tooltips for existing items widget
         if (existingItemsWidget != null) {
             existingItemsWidget.renderTooltip(poseStack, mouseX, mouseY);
         }
@@ -1090,7 +977,6 @@ public class PillarItemsConfigTab extends AbstractConfigTab {
 
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
-        // Forward to all widgets for scrollbar dragging
         if (existingItemsWidget != null && existingItemsWidget.mouseDragged(mouseX, mouseY, button, dragX, dragY)) {
             return true;
         }
@@ -1105,7 +991,6 @@ public class PillarItemsConfigTab extends AbstractConfigTab {
 
     @Override
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
-        // Forward to all widgets for scrollbar release
         if (existingItemsWidget != null && existingItemsWidget.mouseReleased(mouseX, mouseY, button)) {
             return true;
         }
@@ -1142,7 +1027,6 @@ public class PillarItemsConfigTab extends AbstractConfigTab {
 
     @Override
     public void onClose() {
-        // Clear search boxes when leaving the tab
         if (searchBox != null) {
             searchBox.setValue("");
             if (itemSelectionWidget != null) {
@@ -1150,7 +1034,6 @@ public class PillarItemsConfigTab extends AbstractConfigTab {
             }
         }
 
-        // Clear tags search box when leaving the tab
         if (tagsSearchBox != null) {
             tagsSearchBox.setValue("");
             if (tagsSelectorWidget != null) {
@@ -1158,9 +1041,8 @@ public class PillarItemsConfigTab extends AbstractConfigTab {
             }
         }
 
-        // Refresh items when tab is closed to ensure latest state
         refreshExistingItems();
-        super.onClose(); // Remove tracked widgets
+        super.onClose();
     }
 
     private void renderScaledText(PoseStack poseStack, net.minecraft.network.chat.Component text, int x, int y, float scale) {

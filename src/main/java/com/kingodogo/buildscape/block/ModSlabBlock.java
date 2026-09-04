@@ -29,7 +29,6 @@ public class ModSlabBlock extends SlabBlock {
         this.baseBlock = baseBlock;
     }
 
-    // Secondary constructor for non-glass slabs using only properties
     public ModSlabBlock(
             BlockBehaviour.Properties properties
     ) {

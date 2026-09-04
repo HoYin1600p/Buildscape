@@ -2,7 +2,6 @@ package com.kingodogo.buildscape.pipe.transport;
 
 import net.minecraft.core.Direction;
 
-/** Standalone outlet-supply regression tests. Author: HoYin1600p. */
 public final class PipeOutletWaterTest {
     private static int checks;
 

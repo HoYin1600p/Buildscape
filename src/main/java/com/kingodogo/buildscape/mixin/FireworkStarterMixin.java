@@ -48,7 +48,6 @@ public abstract class FireworkStarterMixin extends Particle {
                         int[] colors = tag.getIntArray("Colors");
                         int[] fadeColors = tag.getIntArray("FadeColors");
 
-                        // Extract rotation/facing yaw (from shooter NBT or trajectory or camera)
                         float yaw = 0.0F;
                         if (tag.contains("ShotYaw")) {
                             yaw = tag.getFloat("ShotYaw");
@@ -58,7 +57,6 @@ public abstract class FireworkStarterMixin extends Particle {
                             yaw = net.minecraft.client.Minecraft.getInstance().player.getYRot();
                         }
 
-                        // Expand bounding box for custom shapes so long-distance viewing and wide frustums don't cull particles
                         this.setBoundingBox(this.getBoundingBox().inflate(120.0D, 120.0D, 120.0D));
 
                         CustomFireworkRenderer.renderExplosion(

@@ -6,10 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-/**
- * Expands family specifications (wood family, stone family, brick family) into complete sets of crafting/stonecutting recipes.
- * Supports auto-detection, explicit wood/stone sections, variant inclusion/exclusion lists, and reversible conversions.
- */
 public class FamilyExpander {
 
     private final TemplateEngine templateEngine;
@@ -31,10 +27,9 @@ public class FamilyExpander {
         List<String> excludes = family.exclude() != null ? family.exclude() : List.of();
         boolean reversible = family.reversible();
 
-        // Intelligent auto-detection for prefix and family type if unspecified
         if (prefix == null || prefix.isEmpty()) {
             if (baseItem.endsWith("_planks")) {
-                prefix = baseItem.substring(0, baseItem.length() - "planks".length()); // e.g. BS:ashpen_gray_
+                prefix = baseItem.substring(0, baseItem.length() - "planks".length());
                 if ("auto".equals(familyType) || familyType.isEmpty()) familyType = "wood";
             } else {
                 prefix = baseItem + "_";
@@ -42,7 +37,6 @@ public class FamilyExpander {
             }
         }
 
-        // Default targets per family type
         if (targets == null || targets.isEmpty()) {
             if ("wood".equalsIgnoreCase(familyType)) {
                 targets = List.of("stairs", "slab", "fence", "fence_gate", "gate", "door", "trapdoor", "button", "pressure_plate", "stonecutter");
@@ -87,7 +81,6 @@ public class FamilyExpander {
                 }
             }
 
-            // Add stonecutter shortcut for building block variants if stone family
             if ("stone".equalsIgnoreCase(familyType) && !"stonecutter".equals(target)) {
                 String scId = sanitizeId(prefix + target + "_stonecutting");
                 int scCount = "slab".equals(target) ? 2 : 1;

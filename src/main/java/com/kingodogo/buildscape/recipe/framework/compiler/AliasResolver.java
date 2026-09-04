@@ -11,15 +11,11 @@ import net.minecraftforge.registries.ForgeRegistries;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Resolves short aliases, namespace prefixes, item IDs, and tag references.
- */
 public class AliasResolver {
 
     private final Map<String, String> aliases = new HashMap<>();
 
     public AliasResolver() {
-        // Default built-in namespace aliases
         aliases.put("BS:", "buildscape:");
         aliases.put("MC:", "minecraft:");
         aliases.put("F:", "forge:");
@@ -41,12 +37,10 @@ public class AliasResolver {
             input = input.substring(1);
         }
 
-        // Direct alias match
         if (aliases.containsKey(input)) {
             input = aliases.get(input);
         }
 
-        // Replace prefixes
         for (Map.Entry<String, String> entry : aliases.entrySet()) {
             String prefix = entry.getKey();
             if (prefix.endsWith(":") && input.startsWith(prefix)) {
@@ -55,7 +49,6 @@ public class AliasResolver {
             }
         }
 
-        // Default namespace fallback if missing namespace
         if (!input.contains(":")) {
             input = "buildscape:" + input;
         }

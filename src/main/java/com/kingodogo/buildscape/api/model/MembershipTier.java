@@ -1,9 +1,5 @@
 package com.kingodogo.buildscape.api.model;
 
-/**
- * Model for membership tier information.
- * Part of GET /api/v1/supporters/tiers response.
- */
 public class MembershipTier {
     private String id;
     private String name;

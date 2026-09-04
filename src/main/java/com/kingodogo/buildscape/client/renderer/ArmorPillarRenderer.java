@@ -19,10 +19,6 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-/**
- * Dedicated renderer for armor displayed on pillars using an ArmorStand.
- * Modeled after MobPillarRenderer for consistency and robustness.
- */
 public class ArmorPillarRenderer {
 
     private static final Map<BlockPos, ArmorStand> armorStandCache = new ConcurrentHashMap<>();
@@ -43,7 +39,6 @@ public class ArmorPillarRenderer {
     ) {
         if (itemStack == null || level == null || pos == null) return;
 
-        // Get or create cached ArmorStand
         ArmorStand armorStand = armorStandCache.get(pos);
         if (armorStand == null || !armorStand.isAlive() || armorStand.level != level) {
             if (armorStand != null) {
@@ -52,17 +47,15 @@ public class ArmorPillarRenderer {
             armorStand = createArmorStand(level, pos);
             if (armorStand != null) {
                 armorStandCache.put(pos, armorStand);
-                lastRenderedStacks.remove(pos); // Force update
+                lastRenderedStacks.remove(pos);
             } else {
-                return; // Failed to create
+                return;
             }
         }
 
-        // Identify logic
         boolean isStandItem = itemStack.getItem() instanceof net.minecraft.world.item.ArmorStandItem;
         EquipmentSlot slot = getEquipmentSlot(itemStack);
 
-        // Update Equipment / State if changed or forced
         ItemStack cachedStack = lastRenderedStacks.get(pos);
         boolean stackChanged = cachedStack == null || !ItemStack.matches(cachedStack, itemStack);
 
@@ -71,17 +64,11 @@ public class ArmorPillarRenderer {
             lastRenderedStacks.put(pos, itemStack);
         }
 
-        // Render Setup
         poseStack.pushPose();
 
-        // Calculate Scale and Offset
         float scale = 0.85f;
         double yOffset = 0.0;
 
-        // Pillar Top is at height 1.0 from block base.
-        // PoseStack starts at standard item center 1.46 from block base.
-        // Pillar top relative to PoseStack: 1.0 - 1.46 = -0.46.
-        // We want the "bottom" of the armor piece to be at -0.42 (slight 4px gap).
 
         double baseOffset = -0.42;
 
@@ -89,15 +76,11 @@ public class ArmorPillarRenderer {
             yOffset = baseOffset;
             scale = 0.8f;
         } else {
-            // Adjust yOffset so the part's bottom aligns with baseOffset
-            // These values are the Y-height of the model part's bottom in the ArmorStand model
             if (slot == EquipmentSlot.HEAD) {
                 yOffset = baseOffset - 1.42;
             } else if (slot == EquipmentSlot.CHEST || itemStack.getItem() instanceof ElytraItem) {
                 yOffset = baseOffset - 0.72;
             } else if (slot == EquipmentSlot.LEGS || slot == EquipmentSlot.FEET) {
-                // Legs and Feet cover the lower parts, which go all the way down to 0.0 on an armor stand.
-                // We use baseOffset directly to align the bottom of the model with the pillar top.
                 yOffset = baseOffset;
             } else {
                 yOffset = baseOffset - 0.72;
@@ -107,8 +90,6 @@ public class ArmorPillarRenderer {
         poseStack.scale(scale, scale, scale);
         poseStack.translate(0, yOffset, 0);
 
-        // Entity Rotation
-        // Reset local rotations on entity to avoid accumulation
         armorStand.setYRot(0);
         armorStand.yRotO = 0;
         armorStand.setYHeadRot(0);
@@ -116,11 +97,8 @@ public class ArmorPillarRenderer {
         armorStand.yBodyRot = 0;
         armorStand.yBodyRotO = 0;
 
-        // Render Entity using standard dispatcher but with robust state
         EntityRenderDispatcher dispatcher = Minecraft.getInstance().getEntityRenderDispatcher();
 
-        // If we want to guarantee rendering, we trust dispatcher.render but ensure parameters are clean.
-        // We pass 0,0,0 because PoseStack handles position.
         dispatcher.render(
                 armorStand,
                 0.0f,
@@ -139,7 +117,6 @@ public class ArmorPillarRenderer {
     private static ArmorStand createArmorStand(Level level, BlockPos pos) {
         ArmorStand armorStand = new ArmorStand(EntityType.ARMOR_STAND, level);
 
-        // Initial NBT Setup
         CompoundTag nbt = new CompoundTag();
         nbt.putBoolean("ShowArms", true);
         nbt.putBoolean("Small", false);
@@ -155,17 +132,13 @@ public class ArmorPillarRenderer {
     }
 
     private static void updateArmorStandState(ArmorStand armorStand, ItemStack stack, EquipmentSlot slot, boolean isStandItem) {
-        // Clear slots first
         for (EquipmentSlot s : EquipmentSlot.values()) {
             armorStand.setItemSlot(s, ItemStack.EMPTY);
         }
 
 
-        // Prepare to flip invisible/noBasePlate bits
         CompoundTag nbt = new CompoundTag();
 
-        // Since we are updating specific flags, we can just pass them to readAdditionalSaveData.
-        // The method merges/overwrites fields present in the tag.
 
         if (isStandItem) {
             nbt.putBoolean("Invisible", false);
@@ -174,7 +147,6 @@ public class ArmorPillarRenderer {
             nbt.putBoolean("Invisible", true);
             nbt.putBoolean("NoBasePlate", true);
 
-            // Equip Item Logic
             if (slot != null && !stack.isEmpty()) {
                 armorStand.setItemSlot(slot, stack.copy());
             } else if (stack.getItem() instanceof ElytraItem) {
@@ -185,7 +157,6 @@ public class ArmorPillarRenderer {
         try {
             armorStand.readAdditionalSaveData(nbt);
         } catch (Exception e) {
-            // NBT read error - entity may be corrupt
         }
     }
 

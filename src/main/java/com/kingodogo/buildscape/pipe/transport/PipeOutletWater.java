@@ -4,7 +4,6 @@ import com.kingodogo.buildscape.block.HollowPipeBlock;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.state.BlockState;
 
-/** Water supplied to vanilla through a directed pipe outlet. Author: HoYin1600p. */
 public final class PipeOutletWater {
     private PipeOutletWater() {}
 

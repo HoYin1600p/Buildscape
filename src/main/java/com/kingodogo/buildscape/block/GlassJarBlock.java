@@ -180,9 +180,6 @@ public class GlassJarBlock extends Block implements EntityBlock, SimpleWaterlogg
         ItemStack handStack = player.getItemInHand(hand);
         boolean isSneaking = player.isShiftKeyDown();
 
-        // -------------------------------------------------------------
-        // 1. INSERTION (Normal Right Click holding food or liquid item)
-        // -------------------------------------------------------------
         if (!isSneaking) {
             if (GlassJarBlockEntity.isLiquidItem(handStack) && jarBE.canAcceptLiquid(handStack)) {
                 if (level.isClientSide) {
@@ -224,11 +221,7 @@ public class GlassJarBlock extends Block implements EntityBlock, SimpleWaterlogg
             }
         }
 
-        // -------------------------------------------------------------
-        // 2. EXTRACTION TO HAND (Sneak + Right Click)
-        // -------------------------------------------------------------
         if (isSneaking) {
-            // A. Extract Food (Empty hand OR holding same stored food item)
             if (!jarBE.isEmpty() && !jarBE.hasLiquid()) {
                 ItemStack stored = jarBE.getStoredItem();
                 if (handStack.isEmpty()) {
@@ -256,7 +249,6 @@ public class GlassJarBlock extends Block implements EntityBlock, SimpleWaterlogg
                 }
             }
 
-            // B. Extract Potion/Honey bottle (Empty hand)
             if (handStack.isEmpty() && jarBE.hasLiquid() && jarBE.getLiquidLevel() > 0) {
                 ItemStack bottleRepresentation = jarBE.getBottleRepresentation();
                 if (!bottleRepresentation.isEmpty()) {
@@ -271,10 +263,6 @@ public class GlassJarBlock extends Block implements EntityBlock, SimpleWaterlogg
             }
         }
 
-        // -------------------------------------------------------------
-        // 2.5. EXTRACTION WITH BUCKET/BOTTLE (Does not require sneaking)
-        // -------------------------------------------------------------
-        // C. Empty Bucket extraction (XP: requires XP_BOTTLE_MAX; others: requires full 16 levels)
         if (handStack.is(Items.BUCKET) && jarBE.hasLiquid()) {
             int required = GlassJarBlockEntity.isXpLiquid(jarBE.getStoredLiquidItem())
                     ? GlassJarBlockEntity.XP_BOTTLE_MAX
@@ -298,7 +286,6 @@ public class GlassJarBlock extends Block implements EntityBlock, SimpleWaterlogg
             }
         }
 
-        // D. Empty Bottle extraction (Requires liquid level > 0, excluding Lava)
         if (handStack.is(Items.GLASS_BOTTLE) && jarBE.hasLiquid() && jarBE.getLiquidLevel() > 0) {
             ItemStack bottleRepresentation = jarBE.getBottleRepresentation();
             if (!bottleRepresentation.isEmpty()) {
@@ -317,11 +304,7 @@ public class GlassJarBlock extends Block implements EntityBlock, SimpleWaterlogg
             }
         }
 
-        // -------------------------------------------------------------
-        // 3. NORMAL RIGHT CLICK WITH EMPTY HAND (Direct Consumption/Drinking from jar)
-        // -------------------------------------------------------------
         if (!isSneaking && handStack.isEmpty()) {
-            // A. Consume food from jar if player can eat
             if (!jarBE.isEmpty() && !jarBE.hasLiquid()) {
                 if (player.canEat(false) || player.getAbilities().instabuild) {
                     if (level.isClientSide) return InteractionResult.SUCCESS;
@@ -340,11 +323,9 @@ public class GlassJarBlock extends Block implements EntityBlock, SimpleWaterlogg
                 }
             }
 
-            // B. Drink potion / liquid directly from jar
             if (jarBE.hasLiquid()) {
                 ItemStack liquidItem = jarBE.getStoredLiquidItem();
                 if (!liquidItem.isEmpty()) {
-                    // Do not allow consuming lava or XP liquid from jars
                     if (liquidItem.is(Items.LAVA_BUCKET)
                             || (liquidItem.getItem() instanceof net.minecraft.world.item.BucketItem bucket && bucket.getFluid() == net.minecraft.world.level.material.Fluids.LAVA)
                             || GlassJarBlockEntity.isXpLiquid(liquidItem)) {

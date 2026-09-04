@@ -8,10 +8,6 @@ import net.minecraft.world.level.ItemLike;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-/**
- * Caches and canonicalizes Ingredient instances across 10,000+ recipes.
- * Reusing Ingredient instances saves significant heap memory and eliminates duplicate array allocations.
- */
 public class IngredientCache {
 
     private static final Map<Item, Ingredient> ITEM_INGREDIENT_CACHE = new ConcurrentHashMap<>();

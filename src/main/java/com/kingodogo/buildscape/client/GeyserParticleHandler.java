@@ -16,10 +16,6 @@ import net.minecraftforge.fml.common.Mod;
 
 import java.util.Map;
 
-/**
- * Spawns geyser particles for sulfur blocks beyond vanilla block entity ticker range (~16 blocks).
- * Runs lightweight chunk scanning once per second (every 20 ticks) to avoid CPU overhead.
- */
 @Mod.EventBusSubscriber(
         modid = com.kingodogo.buildscape.BuildScape.MODID,
         bus = Mod.EventBusSubscriber.Bus.FORGE,
@@ -38,7 +34,6 @@ public class GeyserParticleHandler {
 
         Level level = mc.level;
 
-        // Only scan once per second (every 20 ticks) to eliminate CPU lag
         if (level.getGameTime() % 20L != 0L) return;
 
         BlockPos playerPos = mc.player.blockPosition();
@@ -62,7 +57,6 @@ public class GeyserParticleHandler {
 
                     BlockPos pos = entry.getKey();
 
-                    // Skip sulfur blocks within vanilla ticker range — those are handled by BlockEntityTicker
                     double distSq = playerPos.distSqr(pos);
                     if (distSq <= VANILLA_TICKER_RANGE * VANILLA_TICKER_RANGE) continue;
 

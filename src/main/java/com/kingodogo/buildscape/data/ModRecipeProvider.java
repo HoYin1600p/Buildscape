@@ -15,6 +15,5 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
 
     @Override
     protected void buildCraftingRecipes(Consumer<FinishedRecipe> consumer) {
-        // Vertical slab/stair conversions are maintained as static recipe JSON.
     }
 }

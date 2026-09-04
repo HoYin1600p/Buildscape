@@ -7,14 +7,6 @@ import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
 import java.util.List;
 import java.util.Set;
 
-/**
- * Prevents Buildscape's cache hooks from competing with the standalone
- * LaunchFaster mod when both jars are installed. Model loading and baking
- * remain available because they can yield to LaunchFaster at runtime based on
- * its individual configuration values.
- *
- * @author hoyin1600p
- */
 public final class BuildscapeMixinPlugin implements IMixinConfigPlugin {
     private static final Set<String> OVERLAPPING_CACHE_MIXINS = Set.of(
             "com.kingodogo.buildscape.mixin.BuildscapeBlockModelMixin",

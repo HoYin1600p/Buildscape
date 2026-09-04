@@ -21,31 +21,14 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-/**
- * Dedicated renderer for mob entities displayed on pillars.
- * Handles state parsing from spawn egg names and applies corresponding visual/behavioral modifications.
- * <p>
- * This class is designed to be modular and maintainable, allowing new states to be added
- * via the mob_states.txt configuration file without modifying core pillar logic.
- */
 public class MobPillarRenderer {
 
-    // Cache for entity instances to avoid creating new ones every frame
     private static final Map<String, Entity> entityCache = new ConcurrentHashMap<>();
 
-    // Cache for last applied states to prevent re-applying NBT every frame
-    // Key is Entity.getId() (instance ID), Value is the MobState that was applied
     private static final Map<Integer, MobState> lastAppliedStates = new ConcurrentHashMap<>();
-    /**
-     * Apply mob variant data to NBT before entity creation
-     * Uses correct 1.18.2 NBT tags for all supported mobs
-     */
-    // Standard Dye Colors Map for easy lookup
     private static final Map<String, Integer> DYE_COLORS = new HashMap<>();
 
-    // Cleanup caches if they get too large to prevent memory leaks
     static {
-        // Optional: Add a shutdown hook or periodic cleanup if needed
     }
 
     static {
@@ -67,9 +50,6 @@ public class MobPillarRenderer {
         DYE_COLORS.put("black", 15);
     }
 
-    /**
-     * Render a mob entity on a pillar with the specified states
-     */
     public static void renderMob(
             SpawnEggItem spawnEgg,
             ItemStack spawnEggStack,
@@ -92,14 +72,11 @@ public class MobPillarRenderer {
             return;
         }
 
-        // Parse states from spawn egg name
         MobState state = MobStateParser.parseStates(spawnEggStack, entityType);
 
-        // Create cache key
         String cacheKey = pos.getX() + "," + pos.getY() + "," + pos.getZ() + ":" +
                 net.minecraftforge.registries.ForgeRegistries.ENTITIES.getKey(entityType).toString();
 
-        // Get or create cached entity
         Entity entity = entityCache.get(cacheKey);
         if (entity == null || entity.getType() != entityType || !entity.isAlive()) {
             if (entity != null && entity.isAlive()) {
@@ -110,59 +87,42 @@ public class MobPillarRenderer {
             entity = createEntity(entityType, level, pos, state);
             if (entity != null) {
                 entityCache.put(cacheKey, entity);
-                // When created, state is inherently applied via createEntity -> applyVariantToNBT
-                // But applyStates does more (AI disabling etc), so we should run it once.
-                // We'll let the logic below handle it.
             }
         }
 
         if (entity != null && entity.isAlive()) {
-            // Check if state has changed or hasn't been applied fully yet
             MobState lastState = lastAppliedStates.get(entity.getId());
             boolean needsUpdate = lastState == null || !lastState.equals(state);
 
             if (needsUpdate) {
-                // Apply states to entity (expensive operation with NBT)
                 applyStates(entity, state);
                 lastAppliedStates.put(entity.getId(), state);
             }
 
-            // Update entity position and rotation (cheap operation, done every frame)
             updateEntityTransform(entity, pos, facingYaw, rotation, gameTime, state);
 
             boolean isJeb = entity.getType() == EntityType.SHEEP && (state.parsedStates.contains("rainbow") || state.parsedStates.contains("jeb"));
             float renderPartialTicks = isJeb ? (float)((gameTime * 20.0f) % 1.0f) : 0.0f;
 
-            // Render the entity
             renderEntity(entity, poseStack, bufferSource, combinedLight, renderPartialTicks, state);
         }
     }
 
-    /**
-     * Create a new entity instance with initial setup
-     */
     private static Entity createEntity(EntityType<?> entityType, Level level, BlockPos pos, MobState state) {
-        // Handle Zombie -> Giant conversion (but NOT for Rabbits)
         if (state.parsedStates.contains("giant") &&
                 (entityType == EntityType.ZOMBIE || entityType == EntityType.HUSK || entityType == EntityType.DROWNED)) {
             entityType = EntityType.GIANT;
         }
 
-        // For rabbits, "giant" should NOT convert to a different entity type
-        // The scaling happens during rendering based on parsed states
 
-        // Create NBT with variant data BEFORE creating entity
         CompoundTag nbt = new CompoundTag();
         nbt.putString("id", net.minecraftforge.registries.ForgeRegistries.ENTITIES.getKey(entityType).toString());
 
-        // Apply variant NBT before entity creation
         applyVariantToNBT(nbt, entityType, state);
 
-        // Create entity from NBT (this applies variants during creation)
         Entity entity = EntityType.loadEntityRecursive(nbt, level, (e) -> e);
 
         if (entity == null) {
-            // Fallback to normal creation if NBT creation fails
             entity = entityType.create(level);
         }
 
@@ -170,7 +130,6 @@ public class MobPillarRenderer {
             return null;
         }
 
-        // Basic setup
         entity.setNoGravity(true);
         entity.setInvulnerable(true);
         entity.setSilent(true);
@@ -180,19 +139,14 @@ public class MobPillarRenderer {
         entity.noPhysics = true;
         entity.tickCount = 0;
 
-        // Apply glowing effect
         if (state.glowing) {
             entity.setGlowingTag(true);
         }
 
-        // Apply fire effect
         if (state.fire) {
             entity.setSecondsOnFire(999999);
-            // Ensure fire flag is set in data manager for client-side rendering
-            // This is handled by setSecondsOnFire internally
         }
 
-        // Apply frozen effect
         if (state.frozen) {
             entity.setTicksFrozen(999999);
         }
@@ -200,26 +154,11 @@ public class MobPillarRenderer {
         return entity;
     }
 
-    /**
-     * Apply state-specific modifications to the entity
-     */
     private static void applyStates(Entity entity, MobState state) {
-        // Reset tick count to prevent animations
         entity.tickCount = 0;
 
-        // Force critical visual flags every frame using public methods where possible
         if (state.fire) {
-            entity.setSecondsOnFire(1); // Keep it burning
-            // If this doesn't work, we need to access the data tracker directly,
-            // but setSecondsOnFire(>0) sets the flag in base tick usually.
-            // Since we don't tick, we must force the flag.
-            // Best way without reflection:
-            // We will rely on NBT load being correct, OR we can try:
-            // entity.clearFire() then entity.setSecondsOnFire(1)?
-            // Actually, let's use the reflection helper below if needed.
-            // For now, let's assume the NBT fix in createEntity works for initial load.
-            // But if specific frame updates clear it (like if we accidentally tick it), we lose it.
-            // We do NOT call entity.tick().
+            entity.setSecondsOnFire(1);
         }
 
         if (state.glowing) {
@@ -232,19 +171,16 @@ public class MobPillarRenderer {
 
         if (entity instanceof LivingEntity livingEntity) {
 
-            // Hurt state - Force red flash
             if (state.parsedStates.contains("hurt") || state.parsedStates.contains("damage")) {
                 livingEntity.hurtTime = 10;
                 livingEntity.hurtDuration = 10;
-                livingEntity.deathTime = 0; // Ensure not dying
+                livingEntity.deathTime = 0;
             }
 
-            // Disable AI
             if (entity instanceof Mob) {
                 ((Mob) entity).setNoAi(true);
             }
 
-            // Reset animation states (only if not hurt to allow flash)
             if (!state.parsedStates.contains("hurt") && !state.parsedStates.contains("damage")) {
                 livingEntity.hurtTime = 0;
             }
@@ -259,34 +195,26 @@ public class MobPillarRenderer {
             livingEntity.setDeltaMovement(0, 0, 0);
             livingEntity.setSpeed(0.0f);
 
-            // Robust Baby State Application
             if (state.baby) {
                 boolean handled = false;
 
-                // Standard Animals / Villagers
                 if (livingEntity instanceof net.minecraft.world.entity.AgeableMob) {
                     ((net.minecraft.world.entity.AgeableMob) livingEntity).setBaby(true);
                     handled = true;
                 }
 
-                // Zombies and variants (Husk, Drowned, Zombified Piglin)
-                // Note: Zombie is not AgeableMob in 1.18 inheritance tree
                 if (!handled && livingEntity instanceof net.minecraft.world.entity.monster.Zombie) {
                     ((net.minecraft.world.entity.monster.Zombie) livingEntity).setBaby(true);
                     handled = true;
                 }
 
-                // Zoglins
                 if (!handled && livingEntity instanceof net.minecraft.world.entity.monster.Zoglin) {
                     ((net.minecraft.world.entity.monster.Zoglin) livingEntity).setBaby(true);
                     handled = true;
                 }
 
-                // AbstractPiglin (Piglin, Piglin Brute)
-                // Need to use reflection or check class name if not imported
                 if (!handled && livingEntity.getClass().getName().contains("Piglin")) {
                     try {
-                        // Piglins usually have setBaby or setIsBaby
                         java.lang.reflect.Method setBaby = livingEntity.getClass().getMethod("setBaby", boolean.class);
                         setBaby.invoke(livingEntity, true);
                         handled = true;
@@ -294,38 +222,27 @@ public class MobPillarRenderer {
                     }
                 }
 
-                // Fallback for Modded Entities: Try to find setBaby via reflection
                 if (!handled) {
                     try {
                         java.lang.reflect.Method setBaby = livingEntity.getClass().getMethod("setBaby", boolean.class);
                         setBaby.invoke(livingEntity, true);
                     } catch (Exception ignored) {
-                        // Try setIsBaby
                         try {
                             java.lang.reflect.Method setIsBaby = livingEntity.getClass().getMethod("setIsBaby", boolean.class);
                             setIsBaby.invoke(livingEntity, true);
                         } catch (Exception ignored2) {
-                            // No baby method found, relying on NBT IsBaby tag
-                            // System.out.println("Could not finding setBaby method for " + livingEntity.getClass().getName());
                         }
                     }
                 }
             }
         }
 
-        // CRITICAL: Force update of entity NBT from state to handle variants like CatType/Saddle
-        // Only done once per state change now!
         updateEntityFromState(entity, state);
 
-        // Entity-specific states
         applyEntitySpecificStates(entity, state);
     }
 
-    /**
-     * Apply entity-specific state modifications
-     */
     private static void applyEntitySpecificStates(Entity entity, MobState state) {
-        // Bees
         if (entity instanceof net.minecraft.world.entity.animal.Bee bee) {
             if (state.angry) {
                 bee.setRemainingPersistentAngerTime(999999);
@@ -334,7 +251,6 @@ public class MobPillarRenderer {
             }
         }
 
-        // Wolves
         if (entity instanceof net.minecraft.world.entity.animal.Wolf wolf) {
             if (state.angry) {
                 wolf.setRemainingPersistentAngerTime(999999);
@@ -347,7 +263,6 @@ public class MobPillarRenderer {
             }
         }
 
-        // Cats
         if (entity instanceof net.minecraft.world.entity.animal.Cat cat) {
             if (state.tamed) {
                 cat.setTame(true);
@@ -357,61 +272,41 @@ public class MobPillarRenderer {
             }
         }
 
-        // Foxes
         if (entity instanceof net.minecraft.world.entity.animal.Fox fox) {
             if (state.sitting) {
                 fox.setSitting(true);
             }
         }
 
-        // Creepers
         if (entity instanceof net.minecraft.world.entity.monster.Creeper) {
-            // net.minecraft.world.entity.monster.Creeper creeper = (net.minecraft.world.entity.monster.Creeper) entity;
             if (state.charged || state.powered) {
-                // Note: Setting powered state requires NBT manipulation or reflection
-                // For now, this state is recognized but not visually applied
-                // NBT update in applyVariantToNBT handles this for creation/update
             }
         }
 
-        // Sheep
         if (entity instanceof net.minecraft.world.entity.animal.Sheep sheep) {
             if (state.sheared) {
                 sheep.setSheared(true);
             }
         }
 
-        // Bat - Roosting/Hanging
         if (entity instanceof net.minecraft.world.entity.ambient.Bat bat) {
             bat.setResting(state.parsedStates.contains("hanging") || state.parsedStates.contains("roosting"));
         }
 
-        // Polar Bear - Standing
         if (entity instanceof net.minecraft.world.entity.animal.PolarBear bear) {
             bear.setStanding(state.parsedStates.contains("standing") || state.parsedStates.contains("rearing"));
         }
 
-        // Enderman - Screaming/Staring
         if (entity instanceof net.minecraft.world.entity.monster.EnderMan enderman) {
-            // setCreepy is usually client-side visible
-            // Check mapping name if needed, but setCreepy usually exists? No, it's 'hasBeenStaredAt' logic or data tracker.
-            // 1.18.2 Enderman uses DATA_CREEPY (18).
-            // We need to verify if setCreepy exists or strict NBT/DataTracker needed.
-            // Actually, let's assume standard accessors exist or verify later.
-            // If error, we might need reflection or specialized handling.
-            // For now, let's check NBT approach: AngerTime > 0 usually makes them scream?
             if (state.parsedStates.contains("screaming") || state.parsedStates.contains("staring")) {
-                enderman.setTarget(Minecraft.getInstance().player); // Force anger state visually?
-                // enderman.setBeenStaredAt();
+                enderman.setTarget(Minecraft.getInstance().player);
             }
         }
 
-        // Spider - Climbing
         if (entity instanceof net.minecraft.world.entity.monster.Spider spider) {
             spider.setClimbing(state.parsedStates.contains("climbing"));
         }
 
-        // Vex - Charging
         if (entity instanceof net.minecraft.world.entity.monster.Vex vex) {
             if (state.parsedStates.contains("charging")) {
                 vex.setIsCharging(true);
@@ -419,9 +314,6 @@ public class MobPillarRenderer {
         }
     }
 
-    /**
-     * Apply mob variant data to NBT before entity creation
-     */
     private static void applyVariantToNBT(CompoundTag nbt, EntityType<?> entityType, MobState state) {
         String entityTypeName = entityType.getDescriptionId().toLowerCase();
         if (entityTypeName.contains(".")) {
@@ -429,27 +321,22 @@ public class MobPillarRenderer {
             entityTypeName = parts[parts.length - 1];
         }
 
-        // --- Universal Tags ---
         nbt.putBoolean("NoAI", true);
         nbt.putBoolean("Silent", true);
         nbt.putBoolean("Invulnerable", true);
         nbt.putBoolean("PersistenceRequired", true);
         nbt.putBoolean("NoGravity", true);
 
-        // Visual Flags
         if (state.glowing) nbt.putBoolean("Glowing", true);
         if (state.fire) nbt.putShort("Fire", (short) 32767);
         if (state.invisible) nbt.putBoolean("Invisible", true);
 
-        // For client-side rendering, TicksFrozen must be set in NBT to init the data tracker correctly
         if (state.frozen) nbt.putInt("TicksFrozen", 140);
 
-        // Handedness (if user adds "lefty" or "left_handed" to states)
         if (state.parsedStates.contains("lefty") || state.parsedStates.contains("left_handed")) {
             nbt.putBoolean("LeftHanded", true);
         }
 
-        // Age (Baby/Adult)
         if (state.baby) {
             nbt.putInt("Age", -25000);
             nbt.putBoolean("IsBaby", true);
@@ -458,9 +345,7 @@ public class MobPillarRenderer {
             nbt.putBoolean("IsBaby", false);
         }
 
-        // --- Mob Specific Logic ---
 
-        // Tameable Logic (Wolf, Cat, Parrot)
         boolean isTameable = entityTypeName.equals("wolf") || entityTypeName.equals("cat") || entityTypeName.equals("parrot");
         if (isTameable) {
             if (state.tamed) {
@@ -471,25 +356,19 @@ public class MobPillarRenderer {
             nbt.putBoolean("Sitting", state.sitting);
         }
 
-        // --- Generic Mod Support: Apply common states optimistically ---
-        // These tags are harmless if the entity doesn't support them, but enable modded support.
 
         if (state.saddled) nbt.putBoolean("Saddle", true);
         if (state.sheared) nbt.putBoolean("Sheared", true);
 
-        // Chested Horse / Donkey / Mule / Llama generic
         if (state.parsedStates.contains("chested")) nbt.putBoolean("ChestedHorse", true);
 
-        // Optimistic Color Application (Sheep, Shulker, Collar for Tames)
         int genericColor = getDyeColor(state, -1);
         if (genericColor >= 0) {
-            // Only apply generic Color if not later handled specifically (though usually safe)
             if (!nbt.contains("Color")) {
                 nbt.putByte("Color", (byte) genericColor);
             }
         }
 
-        // --- Mob Specific Logic ---
 
         if (entityTypeName.equals("cat")) {
             int catType = getCatType(state);
@@ -508,16 +387,9 @@ public class MobPillarRenderer {
                 nbt.putString("CustomName", "{\"text\":\"jeb_\"}");
                 nbt.putBoolean("CustomNameVisible", false);
             } else {
-                // Color handled by generic logic above
             }
         } else if (entityTypeName.equals("strider")) {
             nbt.putBoolean("Saddle", state.saddled);
-            // Cold/Shivering requires boolean
-            // Note: Striders rely on environment for shivering, but we can't force it via NBT easily without environment.
-            // However, we can set 'Suffocating' to true via reflection or specific entity NBT if available?
-            // Actually 1.18 striders shiver if on land. Since pillars are air/land, they should shiver by default?
-            // No, they shiver if NOT in lava.
-            // We will let them be normal unless 'cold' explicitly requested? No, usually they shiver.
         } else if (entityTypeName.equals("vindicator")) {
             if (state.parsedStates.contains("johnny")) {
                 nbt.putString("CustomName", "{\"text\":\"Johnny\"}");
@@ -525,11 +397,10 @@ public class MobPillarRenderer {
             }
         } else if (entityTypeName.equals("evoker") || entityTypeName.equals("illusioner")) {
             if (state.parsedStates.contains("casting") || state.parsedStates.contains("spell")) {
-                nbt.putInt("SpellTicks", 20); // Force spell casting pose
+                nbt.putInt("SpellTicks", 20);
             }
         } else if (entityTypeName.equals("enderman")) {
             if (state.parsedStates.contains("block") || state.parsedStates.contains("carrying")) {
-                // Default to grass block if carrying
                 CompoundTag blockState = new CompoundTag();
                 blockState.putString("Name", "minecraft:grass_block");
                 nbt.put("carriedBlockState", blockState);
@@ -579,14 +450,12 @@ public class MobPillarRenderer {
             int variant = getLlamaVariant(state);
             if (variant >= 0) nbt.putInt("Variant", variant);
             nbt.putInt("Strength", 5);
-            // ChestedHorse handled by generic
             if (genericColor >= 0) nbt.putInt("DecorColor", genericColor);
         } else if (entityTypeName.contains("horse") || entityTypeName.equals("donkey") || entityTypeName.equals("mule")) {
             if (entityTypeName.equals("horse")) {
                 int variant = getHorseVariant(state);
                 if (variant >= 0) nbt.putInt("Variant", variant);
 
-                // Armor Logic
                 if (state.parsedStates.contains("diamond") || state.parsedStates.contains("diamond_armor")) {
                     CompoundTag itemTag = new CompoundTag();
                     itemTag.putString("id", "minecraft:diamond_horse_armor");
@@ -609,9 +478,7 @@ public class MobPillarRenderer {
                     nbt.put("ArmorItem", itemTag);
                 }
             }
-            // ChestedHorse handled by generic logic above
 
-            // Saddle Logic
             if (state.saddled) {
                 CompoundTag itemTag = new CompoundTag();
                 itemTag.putString("id", "minecraft:saddle");
@@ -640,24 +507,19 @@ public class MobPillarRenderer {
             else if (state.parsedStates.contains("mangrove")) type = "mangrove";
             nbt.putString("Type", type);
         } else if (entityTypeName.equals("slime") || entityTypeName.equals("magma_cube") || entityTypeName.equals("phantom")) {
-            // Size variants
-            int size = 1; // Default Small
-            if (state.parsedStates.contains("tiny")) size = 0; // Smallest
+            int size = 1;
+            if (state.parsedStates.contains("tiny")) size = 0;
             else if (state.parsedStates.contains("small")) size = 1;
-            else if (state.parsedStates.contains("medium")) size = 2; // Big
-            else if (state.parsedStates.contains("large")) size = 4; // Bigger
-            else if (state.parsedStates.contains("huge") || state.parsedStates.contains("giant")) size = 8; // Massive
+            else if (state.parsedStates.contains("medium")) size = 2;
+            else if (state.parsedStates.contains("large")) size = 4;
+            else if (state.parsedStates.contains("huge") || state.parsedStates.contains("giant")) size = 8;
 
             nbt.putInt("Size", size);
         } else if (entityTypeName.equals("iron_golem")) {
             if (state.parsedStates.contains("cracked") || state.parsedStates.contains("broken")) {
-                nbt.putFloat("Health", 10.0f); // Low health shows cracks
+                nbt.putFloat("Health", 10.0f);
             }
         } else if (entityTypeName.equals("tropical_fish")) {
-            // Variant is an int packed with size/pattern/body color/pattern color
-            // This is complex, so we will implement basic presets references
-            // For now, let's just support a few common ones if requested, or random if not specified?
-            // Vanilla defaults to random.
             if (state.parsedStates.contains("kob")) nbt.putInt("Variant", 65536);
             else if (state.parsedStates.contains("sunstreak")) nbt.putInt("Variant", 131072);
             else if (state.parsedStates.contains("snooper")) nbt.putInt("Variant", 196608);
@@ -678,12 +540,10 @@ public class MobPillarRenderer {
             nbt.putBoolean("ShowBottom", !state.parsedStates.contains("no_bottom"));
         } else if (entityTypeName.equals("wither")) {
             if (state.parsedStates.contains("shield") || state.parsedStates.contains("invul")) {
-                nbt.putInt("Invul", 100); // Renders blue shield
+                nbt.putInt("Invul", 100);
             }
         } else if (entityTypeName.equals("iron_golem")) {
             if (state.parsedStates.contains("cracked") || state.parsedStates.contains("broken")) {
-                // Lower health shows cracks (Max 100)
-                // High cracks = Low health
                 nbt.putFloat("Health", 25.0f);
             } else {
                 nbt.putFloat("Health", 100.0f);
@@ -701,7 +561,6 @@ public class MobPillarRenderer {
 
             if (profession != null || type != null) {
                 CompoundTag villagerData = new CompoundTag();
-                // Default to plains/none if not specified, but keep existing logic
                 villagerData.putString("profession", profession != null ? "minecraft:" + profession : "minecraft:none");
                 villagerData.putString("type", type != null ? "minecraft:" + type : "minecraft:plains");
                 villagerData.putInt("level", 1);
@@ -710,10 +569,6 @@ public class MobPillarRenderer {
         }
     }
 
-    /**
-     * Looks for a standard dye color in the state and returns its ID.
-     * Returns defaultValue if no color is found.
-     */
     private static int getDyeColor(MobState state, int defaultValue) {
         for (Map.Entry<String, Integer> entry : DYE_COLORS.entrySet()) {
             if (state.parsedStates.contains(entry.getKey())) {
@@ -750,14 +605,11 @@ public class MobPillarRenderer {
                 entity.load(nbt);
             }
         } catch (Exception e) {
-            // Ignore NBT errors to prevent crash
         }
     }
 
-    // --- Helper Methods ---
 
     private static int getCatType(MobState state) {
-        // 0=tabby, 1=black, 2=red, 3=siamese, 4=british, 5=calico, 6=persian, 7=ragdoll, 8=white, 9=jellie, 10=all_black
         if (state.parsedStates.contains("tabby")) return 0;
         if (state.parsedStates.contains("tuxedo") || state.parsedStates.contains("black")) return 1;
         if (state.parsedStates.contains("red") || state.parsedStates.contains("orange")) return 2;
@@ -794,7 +646,6 @@ public class MobPillarRenderer {
     }
 
     private static int getHorseVariant(MobState state) {
-        // Colors: 0=White, 1=Creamy, 2=Chestnut, 3=Brown, 4=Black, 5=Gray, 6=Dark Brown
         if (state.parsedStates.contains("white")) return 0;
         if (state.parsedStates.contains("creamy")) return 1;
         if (state.parsedStates.contains("chestnut")) return 2;
@@ -866,9 +717,6 @@ public class MobPillarRenderer {
         return -1;
     }
 
-    /**
-     * Update entity position and rotation based on states
-     */
     private static void updateEntityTransform(
             Entity entity,
             BlockPos pos,
@@ -877,7 +725,6 @@ public class MobPillarRenderer {
             float gameTime,
             MobState state
     ) {
-        // Calculate final yaw
         float finalYaw = facingYaw;
         if (state.upsideDown) {
             finalYaw = (finalYaw + 180.0f) % 360.0f;
@@ -889,12 +736,10 @@ public class MobPillarRenderer {
             finalYaw += 360.0f;
         }
 
-        // Update rotation
         float prevYRot = entity.getYRot();
         entity.setYRot(finalYaw);
         entity.yRotO = prevYRot;
 
-        // Update living entity rotations
         if (entity instanceof LivingEntity livingEntity) {
             float prevBodyRot = livingEntity.yBodyRot;
             livingEntity.yBodyRot = finalYaw;
@@ -905,13 +750,9 @@ public class MobPillarRenderer {
             livingEntity.yHeadRotO = prevHeadRot;
         }
 
-        // Add floating animation
         float bobAmount = (float) Math.sin(gameTime * 2.0f) * 0.05f;
         float baseY = pos.getY() + 1.125f;
 
-        // Sync tickCount for animated features (like jeb_ sheep or idle anims)
-        // 20 ticks per second for standard Minecraft timing
-        // Only apply "rainbow" animation/tick advancement to sheep as requested
         if (entity.getType() == EntityType.SHEEP && (state.parsedStates.contains("rainbow") || state.parsedStates.contains("jeb"))) {
             entity.tickCount = (int)(gameTime * 20);
         } else {
@@ -936,9 +777,6 @@ public class MobPillarRenderer {
         entity.setPos(pos.getX() + 0.5, baseY + bobAmount, pos.getZ() + 0.5);
     }
 
-    /**
-     * Render the entity with appropriate transformations
-     */
     private static void renderEntity(
             Entity entity,
             PoseStack poseStack,
@@ -947,44 +785,35 @@ public class MobPillarRenderer {
             float partialTicks,
             MobState state
     ) {
-        // Calculate scale
         float entityWidth = entity.getBbWidth();
         float entityHeight = entity.getBbHeight();
         float scale;
 
         if (state.parsedStates.contains("giant") || state.parsedStates.contains("huge")) {
-            // Explicitly requested GIANT size.
-            // Special case: Rabbits with "giant" should be bigger than normal
             if (entity instanceof net.minecraft.world.entity.animal.Rabbit) {
-                scale = 1.8f; // Make rabbits much bigger when renamed "giant"
+                scale = 1.8f;
             } else if (entityHeight > 6.0f) {
-                scale = 0.4f; // Massive entities (Giants) become ~4.8m
+                scale = 0.4f;
             } else {
-                scale = 1.2f; // Smaller entities (Slimes) become prominent
+                scale = 1.2f;
             }
         } else if (state.parsedStates.contains("large")) {
             scale = 0.9f;
         } else if (state.parsedStates.contains("medium")) {
             scale = 0.7f;
         } else if (state.parsedStates.contains("small") && (entity instanceof net.minecraft.world.entity.monster.Slime || entity instanceof net.minecraft.world.entity.monster.MagmaCube)) {
-            // Explicit small slime/cube should carry some size
             scale = 0.8f;
         } else if (state.parsedStates.contains("tiny") && (entity instanceof net.minecraft.world.entity.monster.Slime || entity instanceof net.minecraft.world.entity.monster.MagmaCube)) {
-            // Tiny slime (Size 0) is very small naturally
             scale = 1.0f;
         } else {
-            // Standard Auto-Scaling Logic
-            // Babies should be smaller overall to maintain proportions (prevents "giant head" effect)
             float targetSize = state.baby ? 0.45f : 0.8f;
 
             if (entityHeight <= 1.0f) {
                 float maxDimension = Math.max(entityWidth, entityHeight);
                 scale = targetSize / maxDimension;
-                // Cap baby scale lower than adults to prevent extreme scaling of tiny entities
                 scale = Math.min(state.baby ? 1.0f : 1.5f, scale);
             } else {
                 if (entityHeight > 2.5f) {
-                    // Maintain scaling ratio for large entities relative to target size
                     scale = (targetSize * 2.25f) / entityHeight;
                 } else {
                     scale = state.baby ? 0.5f : 0.9f;
@@ -993,7 +822,6 @@ public class MobPillarRenderer {
             }
         }
 
-        // Get entity renderer
         EntityRenderDispatcher dispatcher = Minecraft.getInstance().getEntityRenderDispatcher();
         @SuppressWarnings("unchecked")
         EntityRenderer<Entity> entityRenderer = (EntityRenderer<Entity>) dispatcher.getRenderer(entity);
@@ -1001,10 +829,8 @@ public class MobPillarRenderer {
         if (entityRenderer != null) {
             poseStack.pushPose();
 
-            // Apply scale
             poseStack.scale(scale, scale, scale);
 
-            // Apply upside-down rotation
             if (state.upsideDown) {
                 float centerOffset = entityHeight * 0.5f;
                 poseStack.translate(0.0, centerOffset, 0.0);
@@ -1012,7 +838,6 @@ public class MobPillarRenderer {
                 poseStack.translate(0.0, -centerOffset, 0.0);
             }
 
-            // Render
             entityRenderer.render(
                     entity,
                     entity.getYRot(),
@@ -1026,9 +851,6 @@ public class MobPillarRenderer {
         }
     }
 
-    /**
-     * Clear cached entity for a specific position
-     */
     public static void clearEntityCache(BlockPos pos) {
         entityCache.entrySet().removeIf(entry -> {
             if (entry.getKey().startsWith(pos.getX() + "," + pos.getY() + "," + pos.getZ() + ":")) {
@@ -1043,9 +865,6 @@ public class MobPillarRenderer {
         });
     }
 
-    /**
-     * Clear all cached entities
-     */
     public static void clearAllEntityCaches() {
         entityCache.values().forEach(entity -> {
             if (entity != null && entity.isAlive()) {
@@ -1056,9 +875,6 @@ public class MobPillarRenderer {
         lastAppliedStates.clear();
     }
 
-    /**
-     * Clean up stale entities
-     */
     public static void cleanupStaleEntities() {
         entityCache.entrySet().removeIf(entry -> {
             Entity entity = entry.getValue();
@@ -1069,8 +885,5 @@ public class MobPillarRenderer {
             return isStale;
         });
 
-        // Also clean up lastAppliedStates for IDs that are no longer in known entities
-        // This is a bit expensive so maybe just clear it periodically or rely on removal hooks above
-        // For now, let's keep it simple and safe
     }
 }

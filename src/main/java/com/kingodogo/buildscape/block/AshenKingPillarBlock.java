@@ -24,7 +24,6 @@ public class AshenKingPillarBlock extends PillarBlock {
     public static final DirectionProperty FACING =
             BlockStateProperties.HORIZONTAL_FACING;
 
-    // Cache shapes: [Facing Index (0:N, 1:E, 2:S, 3:W)][Part Index (0:SINGLE, 1:BOTTOM, 2:MIDDLE, 3:TOP)]
     private static final VoxelShape[][] SHAPES = new VoxelShape[4][4];
 
     static {
@@ -40,35 +39,22 @@ public class AshenKingPillarBlock extends PillarBlock {
     private static VoxelShape createShape(Direction facing, PillarPart part) {
         VoxelShape result = Shapes.empty();
 
-        // 1. Main Central Log body (always present)
-        //    Model: from [0,0,3] to [18,5.5,13] — X clamped to 16 (anchor side extends beyond block)
         result = Shapes.or(result, rotateBox(0, 0, 3, 16, 5.5, 13, facing));
 
-        // 2. Seat / cushion layers (always present) — 3 individual layers from the model, no rotation
-        //    Model: bottom padding [4,5,4.75]→[12,6.5,11.25]
         result = Shapes.or(result, rotateBox(4, 5, 4.75, 12, 6.5, 11.25, facing));
-        //    Model: middle ledge [5,6.5,5.75]→[11,7.5,10.25]
         result = Shapes.or(result, rotateBox(5, 6.5, 5.75, 11, 7.5, 10.25, facing));
-        //    Model: top rail [4,7.5,4.75]→[12,8.5,11.25]
         result = Shapes.or(result, rotateBox(4, 7.5, 4.75, 12, 8.5, 11.25, facing));
 
-        // 3. Handle side — only on SINGLE or BOTTOM
-        //    Front-face tooth prongs (model elements, no rotation): 3 small studs at z~3
         if (part == PillarPart.SINGLE || part == PillarPart.BOTTOM) {
             result = Shapes.or(result, rotateBox(2.1, 1.5, 2.1, 5.1, 4.5, 3.1, facing));
             result = Shapes.or(result, rotateBox(6.1, 1.5, 2.1, 9.1, 4.5, 3.1, facing));
             result = Shapes.or(result, rotateBox(10.1, 1.5, 2.1, 13.1, 4.5, 3.1, facing));
         }
 
-        // 4. Anchor side — only on SINGLE or TOP
-        //    Back stud (model element, no rotation): 1 stud at z~13
         if (part == PillarPart.SINGLE || part == PillarPart.TOP) {
             result = Shapes.or(result, rotateBox(9.6, 1.5, 12.95, 12.6, 4.5, 13.95, facing));
         }
 
-        // NOTE: The tilted handle column (-22.5° z) and anchor column (+22.5° z) are intentionally
-        // excluded — axis-aligned VoxelShapes cannot represent rotated geometry without creating
-        // oversized bounding boxes that visually spill far outside the actual model.
 
         return result.optimize();
     }
@@ -78,7 +64,7 @@ public class AshenKingPillarBlock extends PillarBlock {
             case EAST:  return Block.box(16 - z2, y1, x1, 16 - z1, y2, x2);
             case SOUTH: return Block.box(16 - x2, y1, 16 - z2, 16 - x1, y2, 16 - z1);
             case WEST:  return Block.box(z1, y1, 16 - x2, z2, y2, 16 - x1);
-            default:    return Block.box(x1, y1, z1, x2, y2, z2); // NORTH
+            default:    return Block.box(x1, y1, z1, x2, y2, z2);
         }
     }
 
@@ -108,13 +94,10 @@ public class AshenKingPillarBlock extends PillarBlock {
 
         BlockState state = this.defaultBlockState().setValue(FACING, facing).setValue(WATERLOGGED, fluidstate.getType() == Fluids.WATER);
 
-        // Don't interact with neighbors for item transfer - AshenKingPillars are independent
-        // Only return SINGLE state, never connect to stacks
         return state.setValue(PART, PillarPart.SINGLE);
     }
 
     private BlockState updatePart(BlockState state, LevelAccessor level, BlockPos pos, Direction facing) {
-        // Ashen King Pillars always render as SINGLE - no connection to neighbors
         return state.setValue(PART, PillarPart.SINGLE);
     }
 
@@ -157,17 +140,9 @@ public class AshenKingPillarBlock extends PillarBlock {
         return state.rotate(mirror.getRotation(state.getValue(FACING)));
     }
 
-    /**
-     * Override to prevent item transfer behavior (Ashen King Pillars don't connect/stack)
-     * Each pillar is independent - no item stacking enforcement
-     */
     @Override
     public void onPlace(BlockState state, net.minecraft.world.level.Level level, BlockPos pos, BlockState oldState, boolean isMoving) {
-        // AshenKingPillar overrides onPlace to skip the enforceSingleItemPerStack() call from parent
-        // Each pillar keeps its own item when stacked
         if (!level.isClientSide) {
-            // Don't call parent's onPlace which enforces single item transfer
-            // Just notify neighbors of the block state change
             BlockPos above = pos.above();
             BlockPos below = pos.below();
             if (level.getBlockState(above).getBlock() instanceof PillarBlock) {
@@ -179,20 +154,10 @@ public class AshenKingPillarBlock extends PillarBlock {
         }
     }
 
-    /**
-     * Override to prevent any connection or item transfer behavior
-     * Ashen King Pillars always render as SINGLE and do NOT transfer items
-     */
     @Override
     public void neighborChanged(BlockState state, net.minecraft.world.level.Level level, BlockPos pos, net.minecraft.world.level.block.Block block, BlockPos neighborPos, boolean isMoving) {
-        // Ashen King Pillars never connect to neighbors, always remain SINGLE
-        // Don't call parent's neighborChanged which enforces item transfer
     }
 
-    /**
-     * Override to prevent item interaction with stacked pillars
-     * Each AshenKingPillar is independent - no cross-pillar item logic
-     */
     @Override
     public net.minecraft.world.InteractionResult use(
             BlockState state,
@@ -213,7 +178,6 @@ public class AshenKingPillarBlock extends PillarBlock {
 
         net.minecraft.world.item.ItemStack heldItem = player.getItemInHand(hand);
 
-        // Check for dye items
         if (!heldItem.isEmpty()) {
             java.util.Map.Entry<String, String> dyeInfo = getDyeColorAndName(heldItem);
             if (dyeInfo != null) {
@@ -278,7 +242,6 @@ public class AshenKingPillarBlock extends PillarBlock {
             }
         }
 
-        // Handle shift-click for particle pattern cycling
         if (player.isShiftKeyDown()) {
             net.minecraft.world.item.ItemStack displayedItem = pillarBE.getDisplayedItem();
             boolean isSpawnEgg = !displayedItem.isEmpty() &&
@@ -315,7 +278,6 @@ public class AshenKingPillarBlock extends PillarBlock {
             }
         }
 
-        // Handle item removal - ONLY from current pillar, not from stack
         if (heldItem.isEmpty() && pillarBE.hasDisplayItem()) {
             net.minecraft.world.item.ItemStack displayedItem = pillarBE.getDisplayedItem();
             if (!displayedItem.isEmpty()) {
@@ -335,7 +297,6 @@ public class AshenKingPillarBlock extends PillarBlock {
             }
         }
 
-        // Handle item placement - ONLY on current pillar
         if (!heldItem.isEmpty() && !pillarBE.hasDisplayItem()) {
             net.minecraft.world.item.ItemStack displayItem = heldItem.copy();
             displayItem.setCount(1);
@@ -355,7 +316,6 @@ public class AshenKingPillarBlock extends PillarBlock {
                 com.kingodogo.buildscape.config.PillarParticleConfig cfg =
                         com.kingodogo.buildscape.config.PillarParticleConfig.get();
                 if (cfg.use_pattern && cfg.pattern != null) {
-                    // Intentionally removed: pillarBE.setParticlePattern(cfg.pattern);
                 }
             }
 
@@ -371,9 +331,6 @@ public class AshenKingPillarBlock extends PillarBlock {
         return net.minecraft.world.InteractionResult.PASS;
     }
 
-    /**
-     * Get dye color and name from ItemStack
-     */
     private java.util.Map.Entry<String, String> getDyeColorAndName(net.minecraft.world.item.ItemStack stack) {
         if (stack == null || stack.isEmpty()) return null;
 
@@ -414,9 +371,6 @@ public class AshenKingPillarBlock extends PillarBlock {
         return null;
     }
 
-    /**
-     * Get direction name from yaw
-     */
     private String getDirectionName(float yaw) {
         yaw = yaw % 360.0f;
         if (yaw < 0) yaw += 360.0f;
@@ -427,9 +381,6 @@ public class AshenKingPillarBlock extends PillarBlock {
         else return "East";
     }
 
-    /**
-     * Get pattern color
-     */
     private net.minecraft.ChatFormatting getPatternColor(String pattern) {
         if (pattern == null) return net.minecraft.ChatFormatting.WHITE;
 

@@ -202,15 +202,12 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
         boolean isPotAllowed = (axis != Direction.Axis.Y) || hasGlassNeg;
         boolean hasDecoration = logState.getValue(HAS_DECORATION);
 
-        // If holding empty flower pot, allowed only if log has no decoration and pot is allowed
         if (item == Items.FLOWER_POT && isPotAllowed && !hasDecoration) return true;
 
-        // If log already has decoration, plant/flower can be inserted into an existing flower pot
         if (hasDecoration) {
             return getPottedBlockState(item) != null;
         }
 
-        // Empty log: only full blocks are valid interior decoration
         if (item instanceof BlockItem blockItem) {
             Block block = blockItem.getBlock();
             return isValidFullBlockDecoration(block);
@@ -243,7 +240,6 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
                 || (hollowBe != null && !"none".equals(hollowBe.getFluidType()) && !hollowBe.getFluidType().isEmpty());
         boolean hasDecoration = state.getValue(HAS_DECORATION);
 
-        // 1. Placing Glass Cover — ONLY IF FLUID IS PRESENT
         if (hasFluid && isFullGlassBlock(held)) {
             BooleanProperty glassProp = targetPos ? HAS_GLASS_POS : HAS_GLASS_NEG;
             if (!state.getValue(glassProp)) {
@@ -267,7 +263,6 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
             }
         }
 
-        // 2. Fluid interactions (Lava, Water, Experience, or Modded Fluids) — REJECT IF DECORATION IS PRESENT
         if (!hasDecoration) {
             Fluid sourceFluid = HollowPipeBlock.getSourceFluid(state, hollowBe);
             Fluid containedFluid = HollowPipeBlock.getContainedFluid(state, hollowBe);
@@ -276,7 +271,6 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
                     || (held.getItem() instanceof BucketItem bi && bi.getFluid() == Fluids.EMPTY)
                     || (FluidUtil.getFluidHandler(held).isPresent() && FluidUtil.getFluidContained(held).orElse(FluidStack.EMPTY).isEmpty());
 
-            // Empty Bucket interaction to retrieve fluid (SOURCE ONLY)
             if (isEmptyBucket && sourceFluid != Fluids.EMPTY) {
                 if (!level.isClientSide) {
                     if (hollowBe != null) {
@@ -304,11 +298,9 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
                 return InteractionResult.sidedSuccess(level.isClientSide);
             }
 
-            // Filled Fluid Bucket interaction to deposit fluid
             Fluid fluidInBucket = HollowPipeBlock.getFluidFromItem(held);
             if (fluidInBucket != Fluids.EMPTY) {
                 if (sourceFluid != Fluids.EMPTY) {
-                    // NEVER allow replacing an existing fluid in a log! Only one fluid type per blockspace.
                     return InteractionResult.sidedSuccess(level.isClientSide);
                 }
                 if (!level.isClientSide) {
@@ -350,7 +342,6 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
             }
         }
 
-        // 3. Inserting Flower/Plant/Foliage into an existing Empty Flower Pot inside Hollow Log
         if (hasDecoration && hollowBe != null && hollowBe.getDecorationState().is(Blocks.FLOWER_POT)) {
             BlockState pottedState = getPottedBlockState(held.getItem());
             if (pottedState != null) {
@@ -366,12 +357,9 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
             }
         }
 
-        // 4. Hollow Log Interior Decoration — REJECT IF FLUID IS PRESENT
-        // Foliage / flowers / plants can ONLY be placed if an empty flower pot is already placed inside the log (Section 3).
         if (!hasFluid && !hasDecoration) {
             boolean isPotAllowed = (axis != Direction.Axis.Y) || state.getValue(HAS_GLASS_NEG);
 
-            // A. Placing an empty Flower Pot
             if (held.is(Items.FLOWER_POT) && isPotAllowed) {
                 if (!level.isClientSide) {
                     state = state.setValue(HAS_DECORATION, true);
@@ -388,7 +376,6 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
                 return InteractionResult.sidedSuccess(level.isClientSide);
             }
 
-            // B. Placing a Full Block Decoration
             if (held.getItem() instanceof BlockItem blockItem) {
                 Block block = blockItem.getBlock();
                 boolean isFullBlock = isValidFullBlockDecoration(block);
@@ -412,7 +399,6 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
             }
         }
 
-        // 5. Removing glass cover or decoration with empty hand or sneaking
         if (held.isEmpty() || player.isShiftKeyDown()) {
             BooleanProperty glassProp = targetPos ? HAS_GLASS_POS : HAS_GLASS_NEG;
             boolean hasTargetGlass = state.getValue(glassProp) || (hollowBe != null && (targetPos ? !hollowBe.getGlassCoverPos().isAir() : !hollowBe.getGlassCoverNeg().isAir()));
@@ -489,17 +475,14 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
         if (stack != null && !stack.isEmpty() && stack.getItem() instanceof BlockItem blockItem) {
             Block block = blockItem.getBlock();
 
-            // Standard Minecraft Glass Classes
             if (block instanceof GlassBlock || block instanceof StainedGlassBlock || block instanceof AbstractGlassBlock) {
                 return true;
             }
 
-            // Check Tags (forge:glass/colorless, forge:glass, etc.)
             if (stack.is(net.minecraftforge.common.Tags.Items.GLASS) || stack.is(net.minecraftforge.common.Tags.Items.GLASS_COLORLESS) || stack.is(net.minecraftforge.common.Tags.Items.STAINED_GLASS)) {
                 return true;
             }
 
-            // Buildscape & Modded Glass Blocks: check registry name for "glass"
             net.minecraft.resources.ResourceLocation rl = ForgeRegistries.BLOCKS.getKey(block);
             if (rl != null && rl.getPath().contains("glass")) {
                 String path = rl.getPath();
@@ -517,7 +500,6 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
         if (block instanceof EntityBlock) return false;
         if (block instanceof HollowLogBlock || block instanceof HollowPipeBlock) return false;
 
-        // Reject non-full-cube / partial / utility blocks (including Fences, Gates, Panes, Walls, Slabs, Stairs, Chains, etc.)
         if (block instanceof SlabBlock || block instanceof StairBlock || block instanceof WallBlock
                 || block instanceof FenceBlock || block instanceof FenceGateBlock || block instanceof IronBarsBlock
                 || block instanceof ChainBlock || block instanceof ClimbableChainBlock || block instanceof LargeChainBlock
@@ -533,7 +515,6 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
             return false;
         }
 
-        // Reject ALL glass blocks and glass items from being placed as interior block decorations
         if (block instanceof GlassBlock || block instanceof StainedGlassBlock || block instanceof AbstractGlassBlock) {
             return false;
         }
@@ -545,7 +526,6 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
             }
         }
 
-        // Shape check: must be a full 1x1x1 cube block
         try {
             BlockState defaultState = block.defaultBlockState();
             if (!Block.isShapeFullBlock(defaultState.getShape(EmptyBlockGetter.INSTANCE, BlockPos.ZERO))) {
@@ -699,7 +679,6 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
                     hollowBe.setChanged();
                 }
 
-                // Sync BlockState properties with NBT contents from copied BlockEntityTag
                 boolean hasDec = !hollowBe.getDecorationState().isAir();
                 boolean hasNeg = !hollowBe.getGlassCoverNeg().isAir();
                 boolean hasPos = !hollowBe.getGlassCoverPos().isAir();
@@ -757,7 +736,6 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
 
     private static void spreadToWorldBlock(Level level, BlockPos neighborPos, Fluid fluid) {
         BlockState neighborState = level.getBlockState(neighborPos);
-        // Do NOT modify or infect other hollow logs or hollow pipes
         if (neighborState.getBlock() instanceof HollowLogBlock || neighborState.getBlock() instanceof HollowPipeBlock) {
             return;
         }

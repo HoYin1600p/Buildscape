@@ -56,7 +56,7 @@ public class XpParticle extends TextureSheetParticle {
 
     @Override
     public int getLightColor(float partialTick) {
-        return 0xF000F0; // Full brightness
+        return 0xF000F0;
     }
 
     @OnlyIn(Dist.CLIENT)

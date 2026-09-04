@@ -49,7 +49,6 @@ public class ModCreativeModeTab {
 
         @Override
         public void fillItemList(NonNullList<ItemStack> items) {
-            // 1. Gather ALL potential items for this tab
             NonNullList<ItemStack> rawList = NonNullList.create();
             addHardcodedItems(rawList);
 
@@ -302,7 +301,6 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.BIT_OXIDIZED_COPPER_BULB.get()));
             items.add(new ItemStack(ModItems.BIT_OXIDIZED_COPPER_GRATE.get()));
             items.add(new ItemStack(ModItems.COPPER_NUGGET.get()));
-            // --- COPPER EXPANSION ---
             items.add(new ItemStack(ModItems.COPPER_TORCH.get()));
             items.add(new ItemStack(ModItems.COPPER_ROD.get()));
             items.add(new ItemStack(ModItems.WAXED_COPPER_ROD.get()));
@@ -322,7 +320,6 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.OXIDIZED_COPPER_LANTERN.get()));
             items.add(new ItemStack(ModItems.WAXED_OXIDIZED_COPPER_LANTERN.get()));
 
-            // Chiseled Copper
             items.add(new ItemStack(ModItems.CHISELED_COPPER.get()));
             items.add(new ItemStack(ModItems.WAXED_CHISELED_COPPER.get()));
             items.add(new ItemStack(ModItems.EXPOSED_CHISELED_COPPER.get()));
@@ -332,7 +329,6 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.OXIDIZED_CHISELED_COPPER.get()));
             items.add(new ItemStack(ModItems.WAXED_OXIDIZED_CHISELED_COPPER.get()));
 
-            // Slit Copper
             items.add(new ItemStack(ModItems.SLIT_COPPER.get()));
             items.add(new ItemStack(ModItems.SLIT_COPPER_STAIRS.get()));
             items.add(new ItemStack(ModItems.SLIT_COPPER_SLAB.get()));
@@ -369,7 +365,6 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.WAXED_OXIDIZED_SLIT_COPPER_SLAB.get()));
             items.add(new ItemStack(ModItems.WAXED_OXIDIZED_SLIT_COPPER_VERTICAL_SLAB.get()));
 
-            // Copper Grates
             items.add(new ItemStack(ModItems.COPPER_GRATE.get()));
             items.add(new ItemStack(ModItems.WAXED_COPPER_GRATE.get()));
             items.add(new ItemStack(ModItems.EXPOSED_COPPER_GRATE.get()));
@@ -379,7 +374,6 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.OXIDIZED_COPPER_GRATE.get()));
             items.add(new ItemStack(ModItems.WAXED_OXIDIZED_COPPER_GRATE.get()));
 
-            // Copper Bulbs
             items.add(new ItemStack(ModItems.COPPER_BULB.get()));
             items.add(new ItemStack(ModItems.WAXED_COPPER_BULB.get()));
             items.add(new ItemStack(ModItems.EXPOSED_COPPER_BULB.get()));
@@ -389,7 +383,6 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.OXIDIZED_COPPER_BULB.get()));
             items.add(new ItemStack(ModItems.WAXED_OXIDIZED_COPPER_BULB.get()));
 
-            // Copper Doors
             items.add(new ItemStack(ModItems.COPPER_DOOR.get()));
             items.add(new ItemStack(ModItems.WAXED_COPPER_DOOR.get()));
             items.add(new ItemStack(ModItems.EXPOSED_COPPER_DOOR.get()));
@@ -399,7 +392,6 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.OXIDIZED_COPPER_DOOR.get()));
             items.add(new ItemStack(ModItems.WAXED_OXIDIZED_COPPER_DOOR.get()));
 
-            // Copper Trapdoors
             items.add(new ItemStack(ModItems.COPPER_TRAPDOOR.get()));
             items.add(new ItemStack(ModItems.WAXED_COPPER_TRAPDOOR.get()));
             items.add(new ItemStack(ModItems.EXPOSED_COPPER_TRAPDOOR.get()));
@@ -409,7 +401,6 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.OXIDIZED_COPPER_TRAPDOOR.get()));
             items.add(new ItemStack(ModItems.WAXED_OXIDIZED_COPPER_TRAPDOOR.get()));
 
-            // Copper Bars
             items.add(new ItemStack(ModItems.COPPER_BARS.get()));
             items.add(new ItemStack(ModItems.WAXED_COPPER_BARS.get()));
             items.add(new ItemStack(ModItems.EXPOSED_COPPER_BARS.get()));
@@ -432,7 +423,6 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.OXIDIZED_COPPER_MESH.get()));
             items.add(new ItemStack(ModItems.WAXED_OXIDIZED_COPPER_MESH.get()));
 
-            // Copper Chests
             items.add(new ItemStack(ModItems.COPPER_CHEST.get()));
             items.add(new ItemStack(ModItems.WAXED_COPPER_CHEST.get()));
             items.add(new ItemStack(ModItems.EXPOSED_COPPER_CHEST.get()));
@@ -442,7 +432,6 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.OXIDIZED_COPPER_CHEST.get()));
             items.add(new ItemStack(ModItems.WAXED_OXIDIZED_COPPER_CHEST.get()));
 
-            // Copper Buttons
             items.add(new ItemStack(ModItems.COPPER_BUTTON.get()));
             items.add(new ItemStack(ModItems.WAXED_COPPER_BUTTON.get()));
             items.add(new ItemStack(ModItems.EXPOSED_COPPER_BUTTON.get()));
@@ -452,7 +441,6 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.OXIDIZED_COPPER_BUTTON.get()));
             items.add(new ItemStack(ModItems.WAXED_OXIDIZED_COPPER_BUTTON.get()));
 
-            // Copper Pressure Plates
             items.add(new ItemStack(ModItems.COPPER_PRESSURE_PLATE.get()));
             items.add(new ItemStack(ModItems.WAXED_COPPER_PRESSURE_PLATE.get()));
             items.add(new ItemStack(ModItems.EXPOSED_COPPER_PRESSURE_PLATE.get()));
@@ -470,7 +458,6 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.LARGE_WEATHERED_COPPER_CHAIN.get()));
             items.add(new ItemStack(ModItems.LARGE_OXIDIZED_COPPER_CHAIN.get()));
 
-            // Chains
             items.add(new ItemStack(Items.CHAIN));
             items.add(new ItemStack(ModItems.LARGE_IRON_CHAIN.get()));
             items.add(new ItemStack(ModItems.ANCIENT_STEEL_CHAIN.get()));
@@ -484,7 +471,6 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.NETHERITE_CHAIN.get()));
             items.add(new ItemStack(ModItems.LARGE_NETHERITE_CHAIN.get()));
 
-            // Bolts
             items.add(new ItemStack(ModItems.COPPER_BOLTS.get()));
             items.add(new ItemStack(ModItems.WAXED_COPPER_BOLTS.get()));
             items.add(new ItemStack(ModItems.EXPOSED_COPPER_BOLTS.get()));
@@ -1020,7 +1006,6 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.CAUTION_CITRUSCANDY_SLAB.get()));
             items.add(new ItemStack(ModItems.CAUTION_CITRUSCANDY_VERTICAL_SLAB.get()));
 
-            // Tiles
             items.add(new ItemStack(ModItems.WHITE_TILES.get()));
             items.add(new ItemStack(ModItems.WHITE_TILES_STAIRS.get()));
             items.add(new ItemStack(ModItems.WHITE_TILES_SLAB.get()));
@@ -1102,7 +1087,6 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.PINK_TILES_VERTICAL_SLAB.get()));
             items.add(new ItemStack(ModItems.PINK_TILES_WALL.get()));
 
-            // Colored Stained Bricks
             items.add(new ItemStack(ModItems.WHITE_STAINED_BRICKS.get()));
             items.add(new ItemStack(ModItems.WHITE_STAINED_BRICKS_STAIRS.get()));
             items.add(new ItemStack(ModItems.WHITE_STAINED_BRICKS_SLAB.get()));
@@ -1264,7 +1248,6 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.PINK_STAINED_BRICK_TILES_VERTICAL_SLAB.get()));
             items.add(new ItemStack(ModItems.PINK_STAINED_BRICK_TILES_WALL.get()));
 
-            // Colored Concrete
             items.add(new ItemStack(ModItems.WHITE_CONCRETE_STAIRS.get()));
             items.add(new ItemStack(ModItems.WHITE_CONCRETE_SLAB.get()));
             items.add(new ItemStack(ModItems.WHITE_CONCRETE_VERTICAL_SLAB.get()));
@@ -1330,7 +1313,6 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.PINK_CONCRETE_VERTICAL_SLAB.get()));
             items.add(new ItemStack(ModItems.PINK_CONCRETE_WALL.get()));
 
-            // Colored Polished Concrete
             items.add(new ItemStack(ModItems.POLISHED_WHITE_CONCRETE.get()));
             items.add(new ItemStack(ModItems.POLISHED_WHITE_CONCRETE_STAIRS.get()));
             items.add(new ItemStack(ModItems.POLISHED_WHITE_CONCRETE_SLAB.get()));
@@ -1412,7 +1394,6 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.POLISHED_PINK_CONCRETE_VERTICAL_SLAB.get()));
             items.add(new ItemStack(ModItems.POLISHED_PINK_CONCRETE_WALL.get()));
 
-            // Terracotta
             items.add(new ItemStack(ModItems.TERRACOTTA_SLAB.get()));
             items.add(new ItemStack(ModItems.TERRACOTTA_STAIRS.get()));
             items.add(new ItemStack(ModItems.TERRACOTTA_VERTICAL_SLAB.get()));
@@ -1465,8 +1446,6 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.BLACK_TERRACOTTA_STAIRS.get()));
             items.add(new ItemStack(ModItems.BLACK_TERRACOTTA_VERTICAL_SLAB.get()));
 
-            // Colored Wool
-            // White
             items.add(new ItemStack(ModItems.WHITE_CARPET_LAYERS.get()));
             items.add(new ItemStack(ModItems.WHITE_LAYERED_WOOL.get()));
             items.add(new ItemStack(ModItems.WHITE_LAYERED_WOOL_STAIRS.get()));
@@ -1480,7 +1459,6 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.WHITE_WOOL_VERTICAL_SLAB.get()));
             items.add(new ItemStack(ModItems.WHITE_WOOL_WALL.get()));
 
-            // Light Gray
             items.add(new ItemStack(ModItems.LIGHT_GRAY_CARPET_LAYERS.get()));
             items.add(new ItemStack(ModItems.LIGHT_GRAY_LAYERED_WOOL.get()));
             items.add(new ItemStack(ModItems.LIGHT_GRAY_LAYERED_WOOL_STAIRS.get()));
@@ -1494,7 +1472,6 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.LIGHT_GRAY_WOOL_VERTICAL_SLAB.get()));
             items.add(new ItemStack(ModItems.LIGHT_GRAY_WOOL_WALL.get()));
 
-            // Gray
             items.add(new ItemStack(ModItems.GRAY_CARPET_LAYERS.get()));
             items.add(new ItemStack(ModItems.GRAY_LAYERED_WOOL.get()));
             items.add(new ItemStack(ModItems.GRAY_LAYERED_WOOL_STAIRS.get()));
@@ -1508,7 +1485,6 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.GRAY_WOOL_VERTICAL_SLAB.get()));
             items.add(new ItemStack(ModItems.GRAY_WOOL_WALL.get()));
 
-            // Black
             items.add(new ItemStack(ModItems.BLACK_CARPET_LAYERS.get()));
             items.add(new ItemStack(ModItems.BLACK_LAYERED_WOOL.get()));
             items.add(new ItemStack(ModItems.BLACK_LAYERED_WOOL_STAIRS.get()));
@@ -1522,7 +1498,6 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.BLACK_WOOL_VERTICAL_SLAB.get()));
             items.add(new ItemStack(ModItems.BLACK_WOOL_WALL.get()));
 
-            // Brown
             items.add(new ItemStack(ModItems.BROWN_CARPET_LAYERS.get()));
             items.add(new ItemStack(ModItems.BROWN_LAYERED_WOOL.get()));
             items.add(new ItemStack(ModItems.BROWN_LAYERED_WOOL_STAIRS.get()));
@@ -1536,7 +1511,6 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.BROWN_WOOL_VERTICAL_SLAB.get()));
             items.add(new ItemStack(ModItems.BROWN_WOOL_WALL.get()));
 
-            // Red
             items.add(new ItemStack(ModItems.RED_CARPET_LAYERS.get()));
             items.add(new ItemStack(ModItems.RED_LAYERED_WOOL.get()));
             items.add(new ItemStack(ModItems.RED_LAYERED_WOOL_STAIRS.get()));
@@ -1550,7 +1524,6 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.RED_WOOL_VERTICAL_SLAB.get()));
             items.add(new ItemStack(ModItems.RED_WOOL_WALL.get()));
 
-            // Orange
             items.add(new ItemStack(ModItems.ORANGE_CARPET_LAYERS.get()));
             items.add(new ItemStack(ModItems.ORANGE_LAYERED_WOOL.get()));
             items.add(new ItemStack(ModItems.ORANGE_LAYERED_WOOL_STAIRS.get()));
@@ -1564,7 +1537,6 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.ORANGE_WOOL_VERTICAL_SLAB.get()));
             items.add(new ItemStack(ModItems.ORANGE_WOOL_WALL.get()));
 
-            // Yellow
             items.add(new ItemStack(ModItems.YELLOW_CARPET_LAYERS.get()));
             items.add(new ItemStack(ModItems.YELLOW_LAYERED_WOOL.get()));
             items.add(new ItemStack(ModItems.YELLOW_LAYERED_WOOL_STAIRS.get()));
@@ -1578,7 +1550,6 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.YELLOW_WOOL_VERTICAL_SLAB.get()));
             items.add(new ItemStack(ModItems.YELLOW_WOOL_WALL.get()));
 
-            // Lime
             items.add(new ItemStack(ModItems.LIME_CARPET_LAYERS.get()));
             items.add(new ItemStack(ModItems.LIME_LAYERED_WOOL.get()));
             items.add(new ItemStack(ModItems.LIME_LAYERED_WOOL_STAIRS.get()));
@@ -1592,7 +1563,6 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.LIME_WOOL_VERTICAL_SLAB.get()));
             items.add(new ItemStack(ModItems.LIME_WOOL_WALL.get()));
 
-            // Green
             items.add(new ItemStack(ModItems.GREEN_CARPET_LAYERS.get()));
             items.add(new ItemStack(ModItems.GREEN_LAYERED_WOOL.get()));
             items.add(new ItemStack(ModItems.GREEN_LAYERED_WOOL_STAIRS.get()));
@@ -1606,7 +1576,6 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.GREEN_WOOL_VERTICAL_SLAB.get()));
             items.add(new ItemStack(ModItems.GREEN_WOOL_WALL.get()));
 
-            // Cyan
             items.add(new ItemStack(ModItems.CYAN_CARPET_LAYERS.get()));
             items.add(new ItemStack(ModItems.CYAN_LAYERED_WOOL.get()));
             items.add(new ItemStack(ModItems.CYAN_LAYERED_WOOL_STAIRS.get()));
@@ -1620,7 +1589,6 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.CYAN_WOOL_VERTICAL_SLAB.get()));
             items.add(new ItemStack(ModItems.CYAN_WOOL_WALL.get()));
 
-            // Light Blue
             items.add(new ItemStack(ModItems.LIGHT_BLUE_CARPET_LAYERS.get()));
             items.add(new ItemStack(ModItems.LIGHT_BLUE_LAYERED_WOOL.get()));
             items.add(new ItemStack(ModItems.LIGHT_BLUE_LAYERED_WOOL_STAIRS.get()));
@@ -1634,7 +1602,6 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.LIGHT_BLUE_WOOL_VERTICAL_SLAB.get()));
             items.add(new ItemStack(ModItems.LIGHT_BLUE_WOOL_WALL.get()));
 
-            // Blue
             items.add(new ItemStack(ModItems.BLUE_CARPET_LAYERS.get()));
             items.add(new ItemStack(ModItems.BLUE_LAYERED_WOOL.get()));
             items.add(new ItemStack(ModItems.BLUE_LAYERED_WOOL_STAIRS.get()));
@@ -1648,7 +1615,6 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.BLUE_WOOL_VERTICAL_SLAB.get()));
             items.add(new ItemStack(ModItems.BLUE_WOOL_WALL.get()));
 
-            // Purple
             items.add(new ItemStack(ModItems.PURPLE_CARPET_LAYERS.get()));
             items.add(new ItemStack(ModItems.PURPLE_LAYERED_WOOL.get()));
             items.add(new ItemStack(ModItems.PURPLE_LAYERED_WOOL_STAIRS.get()));
@@ -1662,7 +1628,6 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.PURPLE_WOOL_VERTICAL_SLAB.get()));
             items.add(new ItemStack(ModItems.PURPLE_WOOL_WALL.get()));
 
-            // Magenta
             items.add(new ItemStack(ModItems.MAGENTA_CARPET_LAYERS.get()));
             items.add(new ItemStack(ModItems.MAGENTA_LAYERED_WOOL.get()));
             items.add(new ItemStack(ModItems.MAGENTA_LAYERED_WOOL_STAIRS.get()));
@@ -1676,7 +1641,6 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.MAGENTA_WOOL_VERTICAL_SLAB.get()));
             items.add(new ItemStack(ModItems.MAGENTA_WOOL_WALL.get()));
 
-            // Pink
             items.add(new ItemStack(ModItems.PINK_CARPET_LAYERS.get()));
             items.add(new ItemStack(ModItems.PINK_LAYERED_WOOL.get()));
             items.add(new ItemStack(ModItems.PINK_LAYERED_WOOL_STAIRS.get()));
@@ -1690,7 +1654,6 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.PINK_WOOL_VERTICAL_SLAB.get()));
             items.add(new ItemStack(ModItems.PINK_WOOL_WALL.get()));
 
-            // Colored Cushions
             items.add(new ItemStack(ModItems.WHITE_CUSHION.get()));
             items.add(new ItemStack(ModItems.ORANGE_CUSHION.get()));
             items.add(new ItemStack(ModItems.MAGENTA_CUSHION.get()));
@@ -1708,7 +1671,6 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.RED_CUSHION.get()));
             items.add(new ItemStack(ModItems.BLACK_CUSHION.get()));
 
-            // Colored Wallpapers
             items.add(new ItemStack(ModItems.WHITE_WALLPAPER.get()));
             items.add(new ItemStack(ModItems.WHITE_WALLPAPER_SLAB.get()));
             items.add(new ItemStack(ModItems.WHITE_WALLPAPER_VERTICAL_SLAB.get()));
@@ -1774,7 +1736,6 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.PINK_WALLPAPER_VERTICAL_SLAB.get()));
             items.add(new ItemStack(ModItems.PINK_WALLPAPER_FLAT.get()));
 
-            // Spools
             items.add(new ItemStack(ModItems.SPOOL.get()));
             items.add(new ItemStack(ModItems.GLOWING_SPOOL.get()));
             items.add(new ItemStack(ModItems.WHITE_SPOOL.get()));
@@ -1794,7 +1755,6 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.MAGENTA_SPOOL.get()));
             items.add(new ItemStack(ModItems.PINK_SPOOL.get()));
 
-            // Dye Sacks
             items.add(new ItemStack(ModItems.GLOW_INK_SACK.get()));
             items.add(new ItemStack(ModItems.WHITE_DYE_SACK.get()));
             items.add(new ItemStack(ModItems.LIGHT_GRAY_DYE_SACK.get()));
@@ -1813,7 +1773,6 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.MAGENTA_DYE_SACK.get()));
             items.add(new ItemStack(ModItems.PINK_DYE_SACK.get()));
 
-            // Big Books
             items.add(new ItemStack(ModItems.BIG_BOOK.get()));
             items.add(new ItemStack(ModItems.GLOWING_BIG_BOOK.get()));
             items.add(new ItemStack(ModItems.WHITE_BIG_BOOK.get()));
@@ -1833,7 +1792,6 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.MAGENTA_BIG_BOOK.get()));
             items.add(new ItemStack(ModItems.PINK_BIG_BOOK.get()));
 
-            // Sandstone Variants
             items.add(new ItemStack(ModItems.WHITE_SAND.get()));
             items.add(new ItemStack(ModItems.WHITE_SANDSTONE.get()));
             items.add(new ItemStack(ModItems.WHITE_SANDSTONE_STAIRS.get()));
@@ -1923,7 +1881,6 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.PINK_SMOOTH_SANDSTONE_VERTICAL_SLAB.get()));
             items.add(new ItemStack(ModItems.PINK_SMOOTH_SANDSTONE_WALL.get()));
 
-            // --- GLASS STAIRS & SLABS ---
             items.add(new ItemStack(ModItems.GLASS_SLAB.get()));
             items.add(new ItemStack(ModItems.GLASS_VERTICAL_SLAB.get()));
             items.add(new ItemStack(ModItems.GLASS_STAIRS.get()));
@@ -1979,7 +1936,6 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.PINK_STAINED_GLASS_VERTICAL_SLAB.get()));
             items.add(new ItemStack(ModItems.PINK_STAINED_GLASS_STAIRS.get()));
 
-            // --- FACTORY GLASS ---
             items.add(new ItemStack(ModItems.FACTORY_WHITE_GLASS.get()));
             items.add(new ItemStack(ModItems.FACTORY_WHITE_GLASS_SLAB.get()));
             items.add(new ItemStack(ModItems.FACTORY_WHITE_GLASS_VERTICAL_SLAB.get()));
@@ -2061,7 +2017,6 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.FACTORY_PINK_GLASS_STAIRS.get()));
             items.add(new ItemStack(ModItems.FACTORY_PINK_GLASS_PANE.get()));
 
-            // --- MOSAIC GLASS ---
             items.add(new ItemStack(ModItems.WHITE_MOSAIC_GLASS.get()));
             items.add(new ItemStack(ModItems.WHITE_MOSAIC_GLASS_SLAB.get()));
             items.add(new ItemStack(ModItems.WHITE_MOSAIC_GLASS_VERTICAL_SLAB.get()));
@@ -2143,7 +2098,6 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.PINK_MOSAIC_GLASS_STAIRS.get()));
             items.add(new ItemStack(ModItems.PINK_MOSAIC_GLASS_PANE.get()));
 
-            // --- GLAZED GLASS ---
             items.add(new ItemStack(ModItems.WHITE_GLAZED_GLASS.get()));
             items.add(new ItemStack(ModItems.WHITE_GLAZED_GLASS_SLAB.get()));
             items.add(new ItemStack(ModItems.WHITE_GLAZED_GLASS_VERTICAL_SLAB.get()));
@@ -2225,7 +2179,6 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.PINK_GLAZED_GLASS_STAIRS.get()));
             items.add(new ItemStack(ModItems.PINK_GLAZED_GLASS_PANE.get()));
 
-            // Ornaments
             items.add(new ItemStack(ModItems.WHITE_ORNAMENT.get()));
             items.add(new ItemStack(ModItems.LIGHT_GRAY_ORNAMENT.get()));
             items.add(new ItemStack(ModItems.GRAY_ORNAMENT.get()));
@@ -2245,7 +2198,6 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.GLASS_ORNAMENT.get()));
             items.add(new ItemStack(ModItems.TINTED_GLASS_ORNAMENT.get()));
 
-            // Big Ornament Template & Big Ornaments
             items.add(new ItemStack(ModItems.BIG_ORNAMENT_TEMPLATE.get()));
             items.add(new ItemStack(ModItems.BIG_WHITE_ORNAMENT.get()));
             items.add(new ItemStack(ModItems.BIG_LIGHT_GRAY_ORNAMENT.get()));
@@ -2266,7 +2218,6 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.BIG_GLASS_ORNAMENT.get()));
             items.add(new ItemStack(ModItems.BIG_TINTED_GLASS_ORNAMENT.get()));
 
-            // Colored Stars
             items.add(new ItemStack(ModItems.GLOW_STAR.get()));
             items.add(new ItemStack(ModItems.WHITE_STAR.get()));
             items.add(new ItemStack(ModItems.LIGHT_GRAY_STAR.get()));
@@ -2308,7 +2259,6 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.STRINGLIGHT_FRAME.get()));
             items.add(new ItemStack(ModItems.STRINGLIGHT_FRAME_PATTERN.get()));
 
-            // --- GLASS JARS ---
             items.add(new ItemStack(ModItems.GLASS_JAR.get()));
             items.add(new ItemStack(ModItems.WHITE_GLASS_JAR.get()));
             items.add(new ItemStack(ModItems.LIGHT_GRAY_GLASS_JAR.get()));
@@ -2347,7 +2297,6 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.MAGENTA_REDSTONE_LAMP.get()));
             items.add(new ItemStack(ModItems.PINK_REDSTONE_LAMP.get()));
 
-            // --- FROGLIGHTS ---
             items.add(new ItemStack(ModItems.GLEAMING_FROGLIGHT.get()));
             items.add(new ItemStack(ModItems.IVORY_FROGLIGHT.get()));
             items.add(new ItemStack(ModItems.ASHEN_FROGLIGHT.get()));
@@ -2365,7 +2314,6 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.PEARLESCENT_FROGLIGHT.get()));
             items.add(new ItemStack(ModItems.CORALINE_FROGLIGHT.get()));
 
-            // Colored Big Candle
             items.add(new ItemStack(ModItems.BIG_CANDLE.get()));
             items.add(new ItemStack(ModItems.BIG_WHITE_CANDLE.get()));
             items.add(new ItemStack(ModItems.BIG_LIGHT_GRAY_CANDLE.get()));
@@ -2386,7 +2334,6 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.BIG_AMETHYST_CANDLE.get()));
             items.add(new ItemStack(ModItems.BIG_SCULK_CANDLE.get()));
 
-            // Colored Item Frames
             items.add(new ItemStack(ModItems.WHITE_ITEM_FRAME.get()));
             items.add(new ItemStack(ModItems.LIGHT_GRAY_ITEM_FRAME.get()));
             items.add(new ItemStack(ModItems.GRAY_ITEM_FRAME.get()));
@@ -2456,7 +2403,6 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.PINK_DECORATED_POT.get()));
             items.add(new ItemStack(ModItems.PINK_TRAPPED_DECORATED_POT.get()));
 
-            // --- PILLARS ---
             items.add(new ItemStack(ModItems.STONE_PILLAR.get()));
             items.add(new ItemStack(ModItems.MOSSY_PILLAR.get()));
             items.add(new ItemStack(ModItems.GRANITE_PILLAR.get()));
@@ -2507,7 +2453,6 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.MUSIC_DISC_CELEBRATION.get()));
             items.add(new ItemStack(ModItems.MUSIC_DISC_SNOWFALL.get()));
 
-            // Custom Firework Stars (Cake, Crown, Trophy)
             ItemStack cakeStar = new ItemStack(Items.FIREWORK_STAR);
             net.minecraft.nbt.CompoundTag cakeExp = cakeStar.getOrCreateTagElement("Explosion");
             cakeExp.putByte("Type", com.kingodogo.buildscape.firework.CustomFireworkShapeRegistry.CAKE_ID);
@@ -2552,7 +2497,6 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
 
             items.add(com.kingodogo.buildscape.item.InfinitePhoenixFireworkStarItem.createDefaultStack());
 
-            // Custom Base Firework Rockets (Cake, Crown, Trophy, Christmas Tree, Presents, Candy Cane, Phoenix, Snowflake)
             items.add(com.kingodogo.buildscape.command.FireworkTestCommand.createCustomFireworkRocket(
                     com.kingodogo.buildscape.firework.CustomFireworkShapeRegistry.CAKE_ID,
                     new int[]{0xFFFDD0, 0x8B4513, 0xFF2D55}
@@ -2670,7 +2614,6 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.MUD_BRICK_VERTICAL_SLAB.get()));
             items.add(new ItemStack(ModItems.MUD_BRICK_WALL.get()));
 
-            // --- PALE OAK WOODSET ---
             items.add(new ItemStack(ModItems.PALE_OAK_LOG.get()));
             items.add(new ItemStack(ModItems.HOLLOW_PALE_OAK_LOG.get()));
             items.add(new ItemStack(ModItems.PALE_OAK_LOG_SLAB.get()));
@@ -2702,7 +2645,6 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.PALE_OAK_LEAVES.get()));
             items.add(new ItemStack(ModItems.PALE_OAK_SAPLING.get()));
 
-            // --- CHERRY WOODSET ---
             items.add(new ItemStack(ModItems.CHERRY_LOG.get()));
             items.add(new ItemStack(ModItems.HOLLOW_CHERRY_LOG.get()));
             items.add(new ItemStack(ModItems.CHERRY_LOG_SLAB.get()));
@@ -2734,7 +2676,6 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.CHERRY_LEAVES.get()));
             items.add(new ItemStack(ModItems.CHERRY_SAPLING.get()));
 
-            // --- PALE MOSS & HANGING MOSS ---
             items.add(new ItemStack(ModItems.PALE_MOSS_BLOCK.get()));
             items.add(new ItemStack(ModItems.PALE_MOSS_BLOCK_SLAB.get()));
             items.add(new ItemStack(ModItems.PALE_MOSS_BLOCK_VERTICAL_SLAB.get()));
@@ -2744,7 +2685,6 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.PALE_MOSS_OVERLAY.get()));
             items.add(new ItemStack(ModItems.PALE_HANGING_MOSS.get()));
 
-            // --- RESIN & CREAKING HEART ---
             items.add(new ItemStack(ModItems.CREAKING_HEART.get()));
             items.add(new ItemStack(ModItems.RESIN_CLUMP.get()));
             items.add(new ItemStack(ModItems.RESIN_BLOCK.get()));
@@ -2758,7 +2698,6 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.RESIN_BRICK_VERTICAL_SLAB.get()));
             items.add(new ItemStack(ModItems.CHISELED_RESIN_BRICKS.get()));
 
-            // Poplar Wood Set
             items.add(new ItemStack(ModItems.POPLAR_LOG.get()));
             items.add(new ItemStack(ModItems.HOLLOW_POPLAR_LOG.get()));
             items.add(new ItemStack(ModItems.POPLAR_LOG_STAIRS.get()));
@@ -2962,8 +2901,6 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.PINK_ASHPEN_FENCE_GATE.get()));
             items.add(new ItemStack(ModItems.ASHPEN_PINK_LADDER.get()));
 
-            // --- VANILLA WOOD LOG/WOOD VARIANTS (By Wood Species) ---
-            // OAK
             items.add(new ItemStack(ModItems.HOLLOW_OAK_LOG.get()));
             items.add(new ItemStack(ModItems.OAK_LOG_STAIRS.get()));
             items.add(new ItemStack(ModItems.OAK_LOG_SLAB.get()));
@@ -2983,7 +2920,6 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.STRIPPED_OAK_WOOD_WALL.get()));
             items.add(new ItemStack(ModItems.OAK_LADDER.get()));
 
-            // SPRUCE
             items.add(new ItemStack(ModItems.HOLLOW_SPRUCE_LOG.get()));
             items.add(new ItemStack(ModItems.SPRUCE_LOG_STAIRS.get()));
             items.add(new ItemStack(ModItems.SPRUCE_LOG_SLAB.get()));
@@ -3003,7 +2939,6 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.STRIPPED_SPRUCE_WOOD_WALL.get()));
             items.add(new ItemStack(ModItems.SPRUCE_LADDER.get()));
 
-            // BIRCH
             items.add(new ItemStack(ModItems.HOLLOW_BIRCH_LOG.get()));
             items.add(new ItemStack(ModItems.BIRCH_LOG_STAIRS.get()));
             items.add(new ItemStack(ModItems.BIRCH_LOG_SLAB.get()));
@@ -3023,7 +2958,6 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.STRIPPED_BIRCH_WOOD_WALL.get()));
             items.add(new ItemStack(ModItems.BIRCH_LADDER.get()));
 
-            // JUNGLE
             items.add(new ItemStack(ModItems.HOLLOW_JUNGLE_LOG.get()));
             items.add(new ItemStack(ModItems.JUNGLE_LOG_STAIRS.get()));
             items.add(new ItemStack(ModItems.JUNGLE_LOG_SLAB.get()));
@@ -3043,7 +2977,6 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.STRIPPED_JUNGLE_WOOD_WALL.get()));
             items.add(new ItemStack(ModItems.JUNGLE_LADDER.get()));
 
-            // ACACIA
             items.add(new ItemStack(ModItems.HOLLOW_ACACIA_LOG.get()));
             items.add(new ItemStack(ModItems.ACACIA_LOG_STAIRS.get()));
             items.add(new ItemStack(ModItems.ACACIA_LOG_SLAB.get()));
@@ -3063,7 +2996,6 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.STRIPPED_ACACIA_WOOD_WALL.get()));
             items.add(new ItemStack(ModItems.ACACIA_LADDER.get()));
 
-            // DARK OAK
             items.add(new ItemStack(ModItems.HOLLOW_DARK_OAK_LOG.get()));
             items.add(new ItemStack(ModItems.DARK_OAK_LOG_STAIRS.get()));
             items.add(new ItemStack(ModItems.DARK_OAK_LOG_SLAB.get()));
@@ -3083,7 +3015,6 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.STRIPPED_DARK_OAK_WOOD_WALL.get()));
             items.add(new ItemStack(ModItems.DARK_OAK_LADDER.get()));
 
-            // CRIMSON
             items.add(new ItemStack(ModItems.HOLLOW_CRIMSON_STEM.get()));
             items.add(new ItemStack(ModItems.CRIMSON_STEM_STAIRS.get()));
             items.add(new ItemStack(ModItems.CRIMSON_STEM_SLAB.get()));
@@ -3101,7 +3032,6 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.STRIPPED_CRIMSON_HYPHAE_VERTICAL_SLAB.get()));
             items.add(new ItemStack(ModItems.CRIMSON_LADDER.get()));
 
-            // WARPED
             items.add(new ItemStack(ModItems.HOLLOW_WARPED_STEM.get()));
             items.add(new ItemStack(ModItems.WARPED_STEM_STAIRS.get()));
             items.add(new ItemStack(ModItems.WARPED_STEM_SLAB.get()));
@@ -3118,7 +3048,6 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.STRIPPED_WARPED_HYPHAE_SLAB.get()));
             items.add(new ItemStack(ModItems.STRIPPED_WARPED_HYPHAE_VERTICAL_SLAB.get()));
             items.add(new ItemStack(ModItems.WARPED_LADDER.get()));
-            // --- CARDBOARD FAMILY ---
             items.add(new ItemStack(ModItems.CARDBOARD_BLOCK.get()));
             items.add(new ItemStack(ModItems.CARDBOARD_STAIRS.get()));
             items.add(new ItemStack(ModItems.CARDBOARD_SLAB.get()));
@@ -3260,26 +3189,21 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.BURNT_THICK_CARDBOARD_VERTICAL_SLAB.get()));
             items.add(new ItemStack(ModItems.BURNT_THICK_CARDBOARD_WALL.get()));
 
-            // Bush -> Red bush -> Firefly bush
             items.add(new ItemStack(ModItems.BUSH.get()));
             items.add(new ItemStack(ModItems.RED_BUSH.get()));
             items.add(new ItemStack(ModItems.FIREFLY_BUSH.get()));
 
-            // Dry grass -> Tall dry grass
             items.add(new ItemStack(ModItems.DRY_GRASS.get()));
             items.add(new ItemStack(ModItems.TALL_DRY_GRASS.get()));
 
-            // Frost rose
             items.add(new ItemStack(ModItems.FROST_ROSE.get()));
 
-            // Snowy foliage
             items.add(new ItemStack(ModItems.SNOWY_SHORT_GRASS.get()));
             items.add(new ItemStack(ModItems.SNOWY_TALL_GRASS.get()));
             items.add(new ItemStack(ModItems.SNOWY_FERN.get()));
             items.add(new ItemStack(ModItems.SNOWY_LARGE_FERN.get()));
             items.add(new ItemStack(ModItems.SNOWY_BUSH.get()));
 
-            // Snowy leaves
             items.add(new ItemStack(ModItems.SNOWY_OAK_LEAVES.get()));
             items.add(new ItemStack(ModItems.SNOWY_SPRUCE_LEAVES.get()));
             items.add(new ItemStack(ModItems.SNOWY_BIRCH_LEAVES.get()));
@@ -3295,7 +3219,6 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.SNOWY_RED_POPLAR_LEAVES.get()));
             items.add(new ItemStack(ModItems.SNOWY_YELLOW_POPLAR_LEAVES.get()));
 
-            // Leaf layers
             items.add(new ItemStack(ModItems.OAK_LEAF_LAYERS.get()));
             items.add(new ItemStack(ModItems.SPRUCE_LEAF_LAYERS.get()));
             items.add(new ItemStack(ModItems.BIRCH_LEAF_LAYERS.get()));
@@ -3311,7 +3234,6 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.CHERRY_LEAF_LAYERS.get()));
             items.add(new ItemStack(ModItems.PALE_OAK_LEAF_LAYERS.get()));
 
-            // Leaf hedge
             items.add(new ItemStack(ModItems.OAK_LEAF_HEDGE.get()));
             items.add(new ItemStack(ModItems.SPRUCE_LEAF_HEDGE.get()));
             items.add(new ItemStack(ModItems.BIRCH_LEAF_HEDGE.get()));
@@ -3327,7 +3249,6 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.CHERRY_LEAF_HEDGE.get()));
             items.add(new ItemStack(ModItems.PALE_OAK_LEAF_HEDGE.get()));
 
-            // Snowy leaf layers
             items.add(new ItemStack(ModItems.SNOWY_OAK_LEAF_LAYERS.get()));
             items.add(new ItemStack(ModItems.SNOWY_SPRUCE_LEAF_LAYERS.get()));
             items.add(new ItemStack(ModItems.SNOWY_BIRCH_LEAF_LAYERS.get()));
@@ -3343,7 +3264,6 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.SNOWY_RED_POPLAR_LEAF_LAYERS.get()));
             items.add(new ItemStack(ModItems.SNOWY_YELLOW_POPLAR_LEAF_LAYERS.get()));
 
-            // Snowy leaf hedge
             items.add(new ItemStack(ModItems.SNOWY_OAK_LEAF_HEDGE.get()));
             items.add(new ItemStack(ModItems.SNOWY_SPRUCE_LEAF_HEDGE.get()));
             items.add(new ItemStack(ModItems.SNOWY_BIRCH_LEAF_HEDGE.get()));
@@ -3359,13 +3279,11 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.SNOWY_RED_POPLAR_LEAF_HEDGE.get()));
             items.add(new ItemStack(ModItems.SNOWY_YELLOW_POPLAR_LEAF_HEDGE.get()));
 
-            // Rose vines
             items.add(new ItemStack(ModItems.RED_ROSE_VINES.get()));
             items.add(new ItemStack(ModItems.BLACK_ROSE_VINES.get()));
             items.add(new ItemStack(ModItems.BLUE_ROSE_VINES.get()));
             items.add(new ItemStack(ModItems.WHITE_ROSE_VINES.get()));
 
-            // Monets
             items.add(new ItemStack(ModItems.RED_MONETS.get()));
             items.add(new ItemStack(ModItems.BLUE_MONETS.get()));
             items.add(new ItemStack(ModItems.PURPLE_MONETS.get()));
@@ -3373,52 +3291,41 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.PINK_MONETS.get()));
             items.add(new ItemStack(ModItems.YELLOW_MONETS.get()));
 
-            // Spore blossom
             items.add(new ItemStack(ModItems.RED_SPORE_BLOSSOM.get()));
             items.add(new ItemStack(ModItems.CYAN_SPORE_BLOSSOM.get()));
             items.add(new ItemStack(ModItems.BLUE_SPORE_BLOSSOM.get()));
             items.add(new ItemStack(ModItems.PURPLE_SPORE_BLOSSOM.get()));
             items.add(new ItemStack(ModItems.ORANGE_SPORE_BLOSSOM.get()));
 
-            // Petals
             items.add(new ItemStack(ModItems.RED_PETAL.get()));
             items.add(new ItemStack(ModItems.BLUE_PETAL.get()));
             items.add(new ItemStack(ModItems.ORANGE_PETAL.get()));
             items.add(new ItemStack(ModItems.PINK_PETAL.get()));
             items.add(new ItemStack(ModItems.PURPLE_PETAL.get()));
 
-            // Wildflowers
             items.add(new ItemStack(ModItems.WILDFLOWERS.get()));
 
-            // Clover
             items.add(new ItemStack(ModItems.CLOVER.get()));
 
-            // Leaf litter
             items.add(new ItemStack(ModItems.LEAF_LITTER.get()));
 
-            // Closed eyeblossom -> Open eyeblossom
             items.add(new ItemStack(ModItems.CLOSED_EYEBLOSSOM.get()));
             items.add(new ItemStack(ModItems.OPEN_EYEBLOSSOM.get()));
 
-            // Golden dandelion & Cactus flower
             items.add(new ItemStack(ModItems.GOLDEN_DANDELION.get()));
             items.add(new ItemStack(ModItems.CACTUS_FLOWER.get()));
 
-            // Mushroom Shelves
             items.add(new ItemStack(ModItems.BROWN_MUSHROOM_SHELVES.get()));
             items.add(new ItemStack(ModItems.RED_MUSHROOM_SHELVES.get()));
 
-            // Straw Bed & Hay Bale
             items.add(new ItemStack(ModItems.STRAW_BED.get()));
             items.add(new ItemStack(ModItems.HAY_BALE_STAIRS.get()));
             items.add(new ItemStack(ModItems.HAY_BALE_SLAB.get()));
             items.add(new ItemStack(ModItems.HAY_BALE_VERTICAL_SLAB.get()));
 
-            // Stone
             items.add(new ItemStack(ModItems.STONE_WALL.get()));
             items.add(new ItemStack(ModItems.SMOOTH_STONE_STAIRS.get()));
 
-            // Quartz
             items.add(new ItemStack(ModItems.QUARTZ_PILLAR_STAIRS.get()));
             items.add(new ItemStack(ModItems.QUARTZ_PILLAR_SLAB.get()));
             items.add(new ItemStack(ModItems.QUARTZ_PILLAR_VERTICAL_SLAB.get()));
@@ -3430,7 +3337,6 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.QUARTZ_BRICKS_VERTICAL_SLAB.get()));
             items.add(new ItemStack(ModItems.QUARTZ_BRICKS_WALL.get()));
 
-            // Calcite
             items.add(new ItemStack(ModItems.CALCITE_STAIRS.get()));
             items.add(new ItemStack(ModItems.CALCITE_SLAB.get()));
             items.add(new ItemStack(ModItems.CALCITE_VERTICAL_SLAB.get()));
@@ -3441,7 +3347,6 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.MOSSY_CALCITE_VERTICAL_SLAB.get()));
             items.add(new ItemStack(ModItems.MOSSY_CALCITE_WALL.get()));
 
-            // Tuff Variants
             items.add(new ItemStack(ModItems.TUFF_STAIRS.get()));
             items.add(new ItemStack(ModItems.TUFF_SLAB.get()));
             items.add(new ItemStack(ModItems.TUFF_VERTICAL_SLAB.get()));
@@ -3459,7 +3364,6 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.TUFF_BRICK_WALL.get()));
             items.add(new ItemStack(ModItems.CHISELED_TUFF_BRICKS.get()));
 
-            // Bit Tuff Variants
             items.add(new ItemStack(ModItems.BIT_CHISELED_TUFF.get()));
             items.add(new ItemStack(ModItems.BIT_CHISELED_TUFF_BRICKS.get()));
             items.add(new ItemStack(ModItems.BIT_POLISHED_TUFF.get()));
@@ -3473,7 +3377,6 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.BIT_TUFF_BRICKS_VERTICAL_SLAB.get()));
             items.add(new ItemStack(ModItems.BIT_TUFF_BRICKS_WALL.get()));
 
-            // Sulfur
             items.add(new ItemStack(ModItems.SULFUR.get()));
             items.add(new ItemStack(ModItems.SULFUR_SLAB.get()));
             items.add(new ItemStack(ModItems.SULFUR_VERTICAL_SLAB.get()));
@@ -3493,7 +3396,6 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.POTENT_SULFUR.get()));
             items.add(new ItemStack(ModItems.SULFUR_SPIKE.get()));
 
-            // Cinnabar
             items.add(new ItemStack(ModItems.CINNABAR.get()));
             items.add(new ItemStack(ModItems.CINNABAR_SLAB.get()));
             items.add(new ItemStack(ModItems.CINNABAR_VERTICAL_SLAB.get()));
@@ -3511,18 +3413,15 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.CINNABAR_BRICKS_WALL.get()));
             items.add(new ItemStack(ModItems.CHISELED_CINNABAR.get()));
 
-            // Dripstone
             items.add(new ItemStack(ModItems.DRIPSTONE_BLOCK_STAIRS.get()));
             items.add(new ItemStack(ModItems.DRIPSTONE_BLOCK_SLAB.get()));
             items.add(new ItemStack(ModItems.DRIPSTONE_BLOCK_VERTICAL_SLAB.get()));
             items.add(new ItemStack(ModItems.DRIPSTONE_BLOCK_WALL.get()));
 
-            // Amethyst
             items.add(new ItemStack(ModItems.AMETHYST_BLOCK_STAIRS.get()));
             items.add(new ItemStack(ModItems.AMETHYST_BLOCK_SLAB.get()));
             items.add(new ItemStack(ModItems.AMETHYST_BLOCK_VERTICAL_SLAB.get()));
 
-            // Basalt
             items.add(new ItemStack(ModItems.POLISHED_BASALT_STAIRS.get()));
             items.add(new ItemStack(ModItems.POLISHED_BASALT_SLAB.get()));
             items.add(new ItemStack(ModItems.POLISHED_BASALT_VERTICAL_SLAB.get()));
@@ -3531,11 +3430,9 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.SMOOTH_BASALT_SLAB.get()));
             items.add(new ItemStack(ModItems.SMOOTH_BASALT_VERTICAL_SLAB.get()));
 
-            // Prismarine
             items.add(new ItemStack(ModItems.PRISMARINE_BRICKS_WALL.get()));
             items.add(new ItemStack(ModItems.DARK_PRISMARINE_WALL.get()));
 
-            // Sandstone
             items.add(new ItemStack(ModItems.SANDSTONE_VERTICAL_SLAB.get()));
             items.add(new ItemStack(ModItems.CUT_SANDSTONE_STAIRS.get()));
             items.add(new ItemStack(ModItems.CUT_SANDSTONE_VERTICAL_SLAB.get()));
@@ -3545,7 +3442,6 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.CUT_RED_SANDSTONE_VERTICAL_SLAB.get()));
             items.add(new ItemStack(ModItems.SMOOTH_RED_SANDSTONE_VERTICAL_SLAB.get()));
 
-            // End Stone & Purpur
             items.add(new ItemStack(ModItems.END_STONE_STAIRS.get()));
             items.add(new ItemStack(ModItems.END_STONE_SLAB.get()));
             items.add(new ItemStack(ModItems.END_STONE_VERTICAL_SLAB.get()));
@@ -3553,7 +3449,6 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.END_STONE_BRICK_VERTICAL_SLAB.get()));
             items.add(new ItemStack(ModItems.PURPUR_VERTICAL_SLAB.get()));
 
-            // Obsidian
             items.add(new ItemStack(ModItems.OBSIDIAN_STAIRS.get()));
             items.add(new ItemStack(ModItems.OBSIDIAN_SLAB.get()));
             items.add(new ItemStack(ModItems.OBSIDIAN_VERTICAL_SLAB.get()));
@@ -3561,13 +3456,11 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.CRYING_OBSIDIAN_SLAB.get()));
             items.add(new ItemStack(ModItems.CRYING_OBSIDIAN_VERTICAL_SLAB.get()));
 
-            // Bedrock
             items.add(new ItemStack(ModItems.BEDROCK_STAIRS.get()));
             items.add(new ItemStack(ModItems.BEDROCK_SLAB.get()));
             items.add(new ItemStack(ModItems.BEDROCK_WALL.get()));
             items.add(new ItemStack(ModItems.BEDROCK_PANE.get()));
 
-            // Snow & Snowy Grass
             items.add(new ItemStack(ModItems.SNOW_STAIRS.get()));
             items.add(new ItemStack(ModItems.SNOW_SLAB.get()));
             items.add(new ItemStack(ModItems.SNOW_VERTICAL_SLAB.get()));
@@ -3582,12 +3475,10 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.SNOW_BRICKS_VERTICAL_SLAB.get()));
             items.add(new ItemStack(ModItems.SNOW_BRICKS_WALL.get()));
 
-            // Icicles
             items.add(new ItemStack(ModItems.ICICLE.get()));
             items.add(new ItemStack(ModItems.ICICLE_BLOCK.get()));
             items.add(new ItemStack(ModItems.PACKED_ICICLE_BLOCK.get()));
 
-            // Dirt, Podzol, Mycelium
             items.add(new ItemStack(ModItems.DIRT_STAIRS.get()));
             items.add(new ItemStack(ModItems.DIRT_SLAB.get()));
             items.add(new ItemStack(ModItems.DIRT_VERTICAL_SLAB.get()));
@@ -3598,14 +3489,12 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.MYCELIUM_SLAB.get()));
             items.add(new ItemStack(ModItems.MYCELIUM_VERTICAL_SLAB.get()));
 
-            // Moss
             items.add(new ItemStack(ModItems.MOSS_BLOCK_SLAB.get()));
             items.add(new ItemStack(ModItems.MOSS_BLOCK_VERTICAL_SLAB.get()));
             items.add(new ItemStack(ModItems.MOSS_BLOCK_STAIRS.get()));
             items.add(new ItemStack(ModItems.MOSS_LAYERS.get()));
             items.add(new ItemStack(ModItems.MOSS_OVERLAY.get()));
 
-            // Colored Moss
             items.add(new ItemStack(ModItems.RED_MOSS_BLOCK.get()));
             items.add(new ItemStack(ModItems.RED_MOSS_BLOCK_SLAB.get()));
             items.add(new ItemStack(ModItems.RED_MOSS_BLOCK_VERTICAL_SLAB.get()));
@@ -3628,7 +3517,6 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.YELLOW_MOSS_CARPET.get()));
             items.add(new ItemStack(ModItems.YELLOW_MOSS_OVERLAY.get()));
 
-            // --- SCULK FAMILY ---
             items.add(new ItemStack(ModItems.SCULK.get()));
             items.add(new ItemStack(ModItems.SCULK_STAIRS.get()));
             items.add(new ItemStack(ModItems.SCULK_SLAB.get()));

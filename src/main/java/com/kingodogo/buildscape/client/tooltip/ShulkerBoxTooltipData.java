@@ -24,10 +24,6 @@ import java.util.Map;
 public class ShulkerBoxTooltipData implements TooltipComponent, ClientTooltipComponent {
     private static final ResourceLocation TEXTURE = new ResourceLocation(BuildScape.MODID, "textures/gui/shulker_box_tooltip.png");
 
-    // =========================================================================
-    // COLOR PALETTE (Hex Codes 0xRRGGBB)
-    // Sampled directly from GUI textures. Easily modify hex values here:
-    // =========================================================================
     public static final int COLOR_UNCOLORED = 0x975DA8;
 
     public static final Map<DyeColor, Integer> DYE_COLORS = Util.make(new EnumMap<>(DyeColor.class), map -> {
@@ -91,12 +87,12 @@ public class ShulkerBoxTooltipData implements TooltipComponent, ClientTooltipCom
 
     @Override
     public int getHeight() {
-        return 3 * 18 + 14; // 68px
+        return 3 * 18 + 14;
     }
 
     @Override
     public int getWidth(Font font) {
-        return 9 * 18 + 14; // 176px
+        return 9 * 18 + 14;
     }
 
     @Override
@@ -107,42 +103,34 @@ public class ShulkerBoxTooltipData implements TooltipComponent, ClientTooltipCom
             int width = getWidth(font);
             int height = getHeight();
 
-            // 1. Setup Texture & Shulker Color Tint
             RenderSystem.setShader(GameRenderer::getPositionTexShader);
             float[] tint = getTint(color);
             RenderSystem.setShaderColor(tint[0], tint[1], tint[2], 1.0F);
             RenderSystem.setShaderTexture(0, TEXTURE);
 
-            // 2. Render 9-Slice Background Frame
-            // Corners (7x7)
             GuiComponent.blit(poseStack, x, y, 0, 0, 7, 7, 32, 32);
             GuiComponent.blit(poseStack, x + width - 7, y, 25, 0, 7, 7, 32, 32);
             GuiComponent.blit(poseStack, x, y + height - 7, 0, 25, 7, 7, 32, 32);
             GuiComponent.blit(poseStack, x + width - 7, y + height - 7, 25, 25, 7, 7, 32, 32);
 
-            // Top & Bottom Edges (9 columns x 18px)
             for (int col = 0; col < 9; col++) {
                 GuiComponent.blit(poseStack, x + 7 + col * 18, y, 7, 0, 18, 7, 32, 32);
                 GuiComponent.blit(poseStack, x + 7 + col * 18, y + height - 7, 7, 25, 18, 7, 32, 32);
             }
 
-            // Left & Right Edges (3 rows x 18px)
             for (int row = 0; row < 3; row++) {
                 GuiComponent.blit(poseStack, x, y + 7 + row * 18, 0, 7, 7, 18, 32, 32);
                 GuiComponent.blit(poseStack, x + width - 7, y + 7 + row * 18, 25, 7, 7, 18, 32, 32);
             }
 
-            // Slots Grid (9x3 slots x 18px)
             for (int row = 0; row < 3; row++) {
                 for (int col = 0; col < 9; col++) {
                     GuiComponent.blit(poseStack, x + 7 + col * 18, y + 7 + row * 18, 7, 7, 18, 18, 32, 32);
                 }
             }
 
-            // Reset Shader Color for Item Rendering
             RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 
-            // 3. Render Item Stacks in Slots
             for (int row = 0; row < 3; row++) {
                 for (int col = 0; col < 9; col++) {
                     int index = row * 9 + col;

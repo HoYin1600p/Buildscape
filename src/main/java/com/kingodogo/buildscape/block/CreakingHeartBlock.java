@@ -43,17 +43,13 @@ public class CreakingHeartBlock extends RotatedPillarBlock {
     @Override
     public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
         if (!level.isClientSide) {
-            // Set blockstate to ACTIVE = true
             level.setBlock(pos, state.setValue(ACTIVE, true), 3);
 
-            // Spawn resin clumps directly onto sides of Creaking Heart block
             spawnResinOnHeart(level, pos);
 
-            // Play sound and particles
             level.playSound(null, pos, SoundEvents.WOOD_PLACE, SoundSource.BLOCKS, 1.0F, 1.0F);
             level.levelEvent(2005, pos, 0);
 
-            // Schedule tick to deactivate after 2 seconds (40 ticks)
             level.scheduleTick(pos, this, 40);
         }
 

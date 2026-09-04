@@ -63,7 +63,6 @@ public class RotateBlockPacket {
             ServerPlayer player = ctx.getSender();
             if (player == null) return;
 
-            // Player must be crouching and holding Wrench
             if (!player.isCrouching()) return;
 
             ItemStack mainHand = player.getMainHandItem();
@@ -104,7 +103,6 @@ public class RotateBlockPacket {
     private static BlockState calculateRotatedState(BlockState state, ArrowDirection arrowDir, Direction playerFacing) {
         BlockState newState = state;
 
-        // 1. Handle Slab Type / Half (UP / DOWN toggles top/bottom)
         if (arrowDir == ArrowDirection.UP || arrowDir == ArrowDirection.DOWN) {
             if (state.hasProperty(BlockStateProperties.HALF)) {
                 Half targetHalf = arrowDir == ArrowDirection.UP ? Half.TOP : Half.BOTTOM;
@@ -123,7 +121,6 @@ public class RotateBlockPacket {
             }
         }
 
-        // 2. Handle 6-Way Facing
         Property<?> rawFacing = state.getBlock().getStateDefinition().getProperty("facing");
         if (rawFacing instanceof Property<?> && rawFacing.getValueClass() == Direction.class) {
             Property<Direction> facingProp = (Property<Direction>) rawFacing;
@@ -141,7 +138,6 @@ public class RotateBlockPacket {
             }
         }
 
-        // 3. Handle Horizontal Facing
         if (state.hasProperty(BlockStateProperties.HORIZONTAL_FACING)) {
             Direction targetDirection = switch (arrowDir) {
                 case UP -> playerFacing;
@@ -154,7 +150,6 @@ public class RotateBlockPacket {
             }
         }
 
-        // 4. Handle Axis (Pillars / Logs)
         if (state.hasProperty(BlockStateProperties.AXIS)) {
             Direction.Axis currentAxis = state.getValue(BlockStateProperties.AXIS);
             Direction.Axis targetAxis = switch (arrowDir) {
@@ -177,7 +172,6 @@ public class RotateBlockPacket {
             }
         }
 
-        // 5. Handle 16-Rotation (Signs / Banners / Skulls)
         if (state.hasProperty(BlockStateProperties.ROTATION_16)) {
             int currentRot = state.getValue(BlockStateProperties.ROTATION_16);
             int newRot = switch (arrowDir) {
@@ -187,7 +181,6 @@ public class RotateBlockPacket {
             return state.setValue(BlockStateProperties.ROTATION_16, newRot);
         }
 
-        // 6. Generic Fallback Block Rotation
         Rotation rot = switch (arrowDir) {
             case RIGHT -> Rotation.CLOCKWISE_90;
             case LEFT -> Rotation.COUNTERCLOCKWISE_90;

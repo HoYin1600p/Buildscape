@@ -22,7 +22,6 @@ public class FestiveGlintAnvilHandler {
         }
 
         if (right.is(ModItems.FESTIVE_GLINT_SHARD.get())) {
-            // Can only be applied to already enchanted items
             if (!FestiveGlintHelper.isEnchantedItem(left)) {
                 return;
             }
@@ -31,7 +30,6 @@ public class FestiveGlintAnvilHandler {
             output.setCount(1);
             FestiveGlintHelper.applyFestiveGlint(output);
 
-            // Handle custom name if modified in anvil text field
             String name = event.getName();
             if (name != null && !name.isEmpty()) {
                 if (!name.equals(left.getHoverName().getString())) {

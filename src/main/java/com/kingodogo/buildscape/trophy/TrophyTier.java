@@ -6,11 +6,11 @@ import net.minecraft.world.level.block.SoundType;
 
 public enum TrophyTier {
     FALLBACK("Fallback", ChatFormatting.WHITE, SoundType.METAL, Rarity.COMMON),
-    STONE("Stone", ChatFormatting.GRAY, SoundType.STONE, Rarity.COMMON),
+    STONE("Stone", ChatFormatting.GRAY, SoundType.METAL, Rarity.COMMON),
     GOLD("Gold", ChatFormatting.GOLD, SoundType.METAL, Rarity.UNCOMMON),
     EMERALD("Emerald", ChatFormatting.GREEN, SoundType.METAL, Rarity.RARE),
     DIAMOND("Diamond", ChatFormatting.AQUA, SoundType.METAL, Rarity.RARE),
-    NETHERITE("Netherite", ChatFormatting.DARK_GRAY, SoundType.NETHERITE_BLOCK, Rarity.EPIC),
+    NETHERITE("Netherite", ChatFormatting.DARK_GRAY, SoundType.METAL, Rarity.EPIC),
     SPECIAL("Special", ChatFormatting.LIGHT_PURPLE, SoundType.METAL, Rarity.RARE);
 
     private final String name;

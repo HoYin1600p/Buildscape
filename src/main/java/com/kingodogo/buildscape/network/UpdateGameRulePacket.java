@@ -18,7 +18,7 @@ public class UpdateGameRulePacket {
     }
 
     public UpdateGameRulePacket(FriendlyByteBuf buffer) {
-        this.ruleName = buffer.readUtf();
+        this.ruleName = NetworkPacketLimits.readUtf(buffer, NetworkPacketLimits.MAX_RULE_NAME_LENGTH, "game rule name");
         this.value = buffer.readBoolean();
     }
 
@@ -27,7 +27,8 @@ public class UpdateGameRulePacket {
     }
 
     public void encode(FriendlyByteBuf buffer) {
-        buffer.writeUtf(ruleName);
+        NetworkPacketLimits.writeUtf(buffer, ruleName,
+                NetworkPacketLimits.MAX_RULE_NAME_LENGTH, "game rule name");
         buffer.writeBoolean(value);
     }
 

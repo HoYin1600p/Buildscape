@@ -35,7 +35,7 @@ public class UpdateConfigPacket {
             ServerPlayer player = ctx.get().getSender();
             if (player == null) return;
 
-            if (!player.hasPermissions(2)) {
+            if (!player.hasPermissions(4)) {
                 return;
             }
 

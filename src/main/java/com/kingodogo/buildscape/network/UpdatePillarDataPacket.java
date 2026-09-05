@@ -45,22 +45,24 @@ public class UpdatePillarDataPacket {
     }
 
     public UpdatePillarDataPacket(FriendlyByteBuf buf) {
-        this.pillarId = buf.readUtf();
+        this.pillarId = NetworkPacketLimits.readUtf(buf, NetworkPacketLimits.MAX_PILLAR_ID_LENGTH, "pillar id");
 
-        this.pattern = buf.readBoolean() ? buf.readUtf() : null;
+        this.pattern = buf.readBoolean()
+                ? NetworkPacketLimits.readUtf(buf, NetworkPacketLimits.MAX_PATTERN_LENGTH, "pattern") : null;
 
         this.usePattern = buf.readBoolean() ? buf.readBoolean() : null;
 
-        this.patternSpeed = buf.readBoolean() ? buf.readDouble() : null;
-        this.patternSpread = buf.readBoolean() ? buf.readDouble() : null;
-        this.patternIntensity = buf.readBoolean() ? buf.readDouble() : null;
+        this.patternSpeed = buf.readBoolean() ? NetworkPacketLimits.readFiniteDouble(buf, "pattern speed") : null;
+        this.patternSpread = buf.readBoolean() ? NetworkPacketLimits.readFiniteDouble(buf, "pattern spread") : null;
+        this.patternIntensity = buf.readBoolean() ? NetworkPacketLimits.readFiniteDouble(buf, "pattern intensity") : null;
 
-        this.maxParticleColor = buf.readBoolean() ? buf.readInt() : null;
+        this.maxParticleColor = buf.readBoolean()
+                ? NetworkPacketLimits.readBoundedInt(buf, 0, NetworkPacketLimits.MAX_DYE_COLORS, "maximum particle colors") : null;
 
-        int colorCount = buf.readInt();
+        int colorCount = NetworkPacketLimits.readCount(buf, NetworkPacketLimits.MAX_DYE_COLORS, "dye color");
         this.dyeColors = new ArrayList<>();
         for (int i = 0; i < colorCount; i++) {
-            this.dyeColors.add(buf.readUtf());
+            this.dyeColors.add(NetworkPacketLimits.readUtf(buf, NetworkPacketLimits.MAX_RESOURCE_ID_LENGTH, "dye color"));
         }
     }
 
@@ -69,11 +71,13 @@ public class UpdatePillarDataPacket {
     }
 
     public void encode(FriendlyByteBuf buf) {
-        buf.writeUtf(pillarId);
+        NetworkPacketLimits.writeUtf(buf, pillarId,
+                NetworkPacketLimits.MAX_PILLAR_ID_LENGTH, "pillar id");
 
         buf.writeBoolean(pattern != null);
         if (pattern != null) {
-            buf.writeUtf(pattern);
+            NetworkPacketLimits.writeUtf(buf, pattern,
+                    NetworkPacketLimits.MAX_PATTERN_LENGTH, "pattern");
         }
 
         buf.writeBoolean(usePattern != null);
@@ -101,9 +105,11 @@ public class UpdatePillarDataPacket {
             buf.writeInt(maxParticleColor);
         }
 
+        NetworkPacketLimits.checkCount(dyeColors.size(), NetworkPacketLimits.MAX_DYE_COLORS, "dye color");
         buf.writeInt(dyeColors.size());
         for (String color : dyeColors) {
-            buf.writeUtf(color);
+            NetworkPacketLimits.writeUtf(buf, color,
+                    NetworkPacketLimits.MAX_RESOURCE_ID_LENGTH, "dye color");
         }
     }
 

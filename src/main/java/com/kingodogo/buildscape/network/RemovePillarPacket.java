@@ -18,10 +18,10 @@ public class RemovePillarPacket {
     }
 
     public RemovePillarPacket(FriendlyByteBuf buf) {
-        int size = buf.readInt();
-        this.pillarIds = new ArrayList<>();
+        int size = NetworkPacketLimits.readCount(buf, NetworkPacketLimits.MAX_PILLARS, "pillar id");
+        this.pillarIds = new ArrayList<>(size);
         for (int i = 0; i < size; i++) {
-            this.pillarIds.add(buf.readUtf());
+            this.pillarIds.add(NetworkPacketLimits.readUtf(buf, NetworkPacketLimits.MAX_PILLAR_ID_LENGTH, "pillar id"));
         }
     }
 
@@ -30,9 +30,10 @@ public class RemovePillarPacket {
     }
 
     public void encode(FriendlyByteBuf buf) {
+        NetworkPacketLimits.checkCount(pillarIds.size(), NetworkPacketLimits.MAX_PILLARS, "pillar id");
         buf.writeInt(pillarIds.size());
         for (String id : pillarIds) {
-            buf.writeUtf(id);
+            NetworkPacketLimits.writeUtf(buf, id, NetworkPacketLimits.MAX_PILLAR_ID_LENGTH, "pillar id");
         }
     }
 

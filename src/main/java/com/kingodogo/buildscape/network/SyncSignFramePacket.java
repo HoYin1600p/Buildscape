@@ -23,12 +23,13 @@ public class SyncSignFramePacket {
 
     public SyncSignFramePacket(FriendlyByteBuf buf) {
         this.pos = buf.readBlockPos();
-        this.frameId = buf.readUtf();
+        this.frameId = NetworkPacketLimits.readUtf(buf, NetworkPacketLimits.MAX_FRAME_ID_LENGTH, "sign frame id");
     }
 
     public void encode(FriendlyByteBuf buf) {
         buf.writeBlockPos(this.pos);
-        buf.writeUtf(this.frameId);
+        NetworkPacketLimits.writeUtf(buf, this.frameId,
+                NetworkPacketLimits.MAX_FRAME_ID_LENGTH, "sign frame id");
     }
 
     public static SyncSignFramePacket decode(FriendlyByteBuf buf) {

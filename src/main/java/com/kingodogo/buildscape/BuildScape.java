@@ -33,13 +33,15 @@ public class BuildScape {
                 t.setDaemon(true);
                 return t;
             });
-    private static final int WORLD_LOAD_WAIT_TICKS = 40;
     private static final int PILLAR_SYNC_INTERVAL = 100;
+    private static final int PILLAR_SAVE_INTERVAL = 600;
+    private static final int PILLAR_BACKUP_INTERVAL = 6000;
     private static final int RECOVERY_DELAY_TICKS = 600;
+    private static final java.util.concurrent.atomic.AtomicBoolean CONFIG_CALLBACK_REGISTERED = new java.util.concurrent.atomic.AtomicBoolean();
     private static boolean serverFullyInitialized = false;
-    private static boolean pillarDataLoadStarted = false;
-    private static int worldLoadWaitTicks = 0;
     private static int pillarSyncTickCounter = 0;
+    private static int pillarSaveTickCounter = 0;
+    private static int pillarBackupTickCounter = 0;
     private static int recoveryDelayTicks = 0;
     private static boolean recoveryAttempted = false;
 
@@ -92,6 +94,10 @@ public class BuildScape {
         event.enqueueWork(() -> {
             com.kingodogo.buildscape.stat.ModStats.registerStats();
             com.kingodogo.buildscape.network.ModMessages.register();
+            if (CONFIG_CALLBACK_REGISTERED.compareAndSet(false, true)) {
+                com.kingodogo.buildscape.config.PillarParticleConfig.addConfigReloadCallback(
+                        BuildScape::onPillarConfigReload);
+            }
             try {
                 net.minecraftforge.fml.util.ObfuscationReflectionHelper.setPrivateValue(
                         net.minecraft.world.item.Item.class, net.minecraft.world.item.Items.POTION, 16, "f_41370_");
@@ -534,12 +540,27 @@ public class BuildScape {
         });
     }
 
+    private static void onPillarConfigReload(boolean isRemote) {
+        if (isRemote) {
+            return;
+        }
+        net.minecraft.server.MinecraftServer server = net.minecraftforge.server.ServerLifecycleHooks.getCurrentServer();
+        if (server == null || !server.isRunning()) {
+            return;
+        }
+        server.execute(() -> com.kingodogo.buildscape.network.ModMessages.INSTANCE.send(
+                net.minecraftforge.network.PacketDistributor.ALL.noArg(),
+                new com.kingodogo.buildscape.network.SyncConfigPacket(
+                        com.kingodogo.buildscape.config.PillarParticleConfig.get())));
+    }
+
     @SubscribeEvent
     public void onServerStarting(ServerStartingEvent event) {
 
         serverFullyInitialized = false;
-        pillarDataLoadStarted = false;
-        worldLoadWaitTicks = 0;
+        pillarSyncTickCounter = 0;
+        pillarSaveTickCounter = 0;
+        pillarBackupTickCounter = 0;
         recoveryDelayTicks = 0;
         recoveryAttempted = false;
 
@@ -621,9 +642,7 @@ public class BuildScape {
     @SubscribeEvent
     public void onServerStarted(
             net.minecraftforge.event.server.ServerStartedEvent event) {
-
-        pillarDataLoadStarted = false;
-        worldLoadWaitTicks = 0;
+        com.kingodogo.buildscape.config.PillarIdManager.get().load();
     }
 
     @SubscribeEvent
@@ -636,8 +655,7 @@ public class BuildScape {
                 com.kingodogo.buildscape.config.PillarIdManager manager = com.kingodogo.buildscape.config.PillarIdManager
                         .get();
                 if (manager != null && manager.hasLoaded()) {
-                    manager.forceSaveImmediate();
-                    manager.saveBackupFile();
+                    manager.savePeriodic(true);
                 }
             }
         } catch (Exception e) {
@@ -645,8 +663,9 @@ public class BuildScape {
         }
 
         serverFullyInitialized = false;
-        pillarDataLoadStarted = false;
-        worldLoadWaitTicks = 0;
+        pillarSyncTickCounter = 0;
+        pillarSaveTickCounter = 0;
+        pillarBackupTickCounter = 0;
         recoveryDelayTicks = 0;
         recoveryAttempted = false;
 
@@ -657,34 +676,10 @@ public class BuildScape {
     public void onPlayerJoin(
             net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent event) {
         if (event.getPlayer() instanceof net.minecraft.server.level.ServerPlayer serverPlayer) {
-
-            if (!serverFullyInitialized) {
-
-                com.kingodogo.buildscape.config.PillarParticleConfig.addConfigReloadCallback((isRemote) -> {
-                    if (!isRemote) {
-                        net.minecraft.server.MinecraftServer server = net.minecraftforge.server.ServerLifecycleHooks
-                                .getCurrentServer();
-                        if (server != null && server.isRunning()
-                                && server.getPlayerList().getPlayerCount() > 0) {
-                            com.kingodogo.buildscape.config.PillarParticleConfig serverConfig = com.kingodogo.buildscape.config.PillarParticleConfig
-                                    .get();
-                            com.kingodogo.buildscape.network.SyncConfigPacket configPacket = new com.kingodogo.buildscape.network.SyncConfigPacket(
-                                    serverConfig);
-                            com.kingodogo.buildscape.network.ModMessages.INSTANCE.send(
-                                    net.minecraftforge.network.PacketDistributor.ALL
-                                            .noArg(),
-                                    configPacket);
-                        }
-                    }
-                });
-            }
-
             com.kingodogo.buildscape.config.PillarIdManager manager = com.kingodogo.buildscape.config.PillarIdManager
                     .get();
-            if (!manager.hasLoaded()) {
+            if (!manager.hasLoaded() && !manager.isLoadInProgress()) {
                 manager.load();
-            } else {
-                serverFullyInitialized = true;
             }
 
             com.kingodogo.buildscape.config.PillarParticleConfig serverConfig = com.kingodogo.buildscape.config.PillarParticleConfig
@@ -708,6 +703,12 @@ public class BuildScape {
                 );
 
                 schedulePillarIdSync(server, serverPlayer, manager, 0);
+
+                long cooldown = serverPlayer.getPersistentData().contains("WanderingHomemakerCooldownRealTime")
+                        ? serverPlayer.getPersistentData().getLong("WanderingHomemakerCooldownRealTime") : 0L;
+                com.kingodogo.buildscape.network.ModMessages.INSTANCE.send(
+                        net.minecraftforge.network.PacketDistributor.PLAYER.with(() -> serverPlayer),
+                        new com.kingodogo.buildscape.network.SyncHomemakerCooldownPacket(cooldown));
             }
 
         }
@@ -785,16 +786,15 @@ public class BuildScape {
     }
 
     @SubscribeEvent
-    public void onPlayerLogout(
-            net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedOutEvent event) {
-
-
-        serverFullyInitialized = false;
-        pillarDataLoadStarted = false;
-        worldLoadWaitTicks = 0;
-        pillarSyncTickCounter = 0;
-        recoveryDelayTicks = 0;
-        recoveryAttempted = false;
+    public void onPlayerChangedDimension(
+            net.minecraftforge.event.entity.player.PlayerEvent.PlayerChangedDimensionEvent event) {
+        if (event.getPlayer() instanceof net.minecraft.server.level.ServerPlayer serverPlayer) {
+            long cooldown = serverPlayer.getPersistentData().contains("WanderingHomemakerCooldownRealTime")
+                    ? serverPlayer.getPersistentData().getLong("WanderingHomemakerCooldownRealTime") : 0L;
+            com.kingodogo.buildscape.network.ModMessages.INSTANCE.send(
+                    net.minecraftforge.network.PacketDistributor.PLAYER.with(() -> serverPlayer),
+                    new com.kingodogo.buildscape.network.SyncHomemakerCooldownPacket(cooldown));
+        }
     }
 
     @SubscribeEvent
@@ -809,8 +809,7 @@ public class BuildScape {
                     com.kingodogo.buildscape.config.PillarIdManager manager = com.kingodogo.buildscape.config.PillarIdManager
                             .get();
                     if (manager != null && manager.hasLoaded()) {
-                        manager.forceSaveImmediate();
-                        manager.saveBackupFile();
+                        manager.savePeriodic(true);
                     }
                 }
             } catch (Exception e) {
@@ -819,14 +818,6 @@ public class BuildScape {
                 e.printStackTrace();
             }
 
-            com.kingodogo.buildscape.config.PillarIdManager.resetWorldCache();
-
-            serverFullyInitialized = false;
-            pillarDataLoadStarted = false;
-            worldLoadWaitTicks = 0;
-            pillarSyncTickCounter = 0;
-            recoveryDelayTicks = 0;
-            recoveryAttempted = false;
         }
     }
 
@@ -867,20 +858,35 @@ public class BuildScape {
 
         net.minecraft.server.MinecraftServer server = net.minecraftforge.server.ServerLifecycleHooks
                 .getCurrentServer();
-        if (server == null
-                || !server.isRunning()
-                || server.getPlayerList().getPlayerCount() == 0) {
+        if (server == null || !server.isRunning()) {
             return;
         }
 
+        com.kingodogo.buildscape.config.PillarIdManager manager = com.kingodogo.buildscape.config.PillarIdManager.get();
         if (!serverFullyInitialized) {
-            com.kingodogo.buildscape.config.PillarIdManager manager = com.kingodogo.buildscape.config.PillarIdManager
-                    .get();
-            if (manager != null && manager.hasLoaded()) {
+            if (manager.hasLoaded()) {
                 serverFullyInitialized = true;
             } else {
+                if (!manager.isLoadInProgress()) {
+                    manager.load();
+                }
                 return;
             }
+        }
+
+        pillarSaveTickCounter++;
+        pillarBackupTickCounter++;
+        if (pillarBackupTickCounter >= PILLAR_BACKUP_INTERVAL) {
+            pillarBackupTickCounter = 0;
+            pillarSaveTickCounter = 0;
+            manager.savePeriodic(true);
+        } else if (pillarSaveTickCounter >= PILLAR_SAVE_INTERVAL) {
+            pillarSaveTickCounter = 0;
+            manager.savePeriodic(false);
+        }
+
+        if (server.getPlayerList().getPlayerCount() == 0) {
+            return;
         }
 
         com.kingodogo.buildscape.config.PillarIdManager.checkAndRunScheduledRecovery();
@@ -890,8 +896,6 @@ public class BuildScape {
                 && !recoveryAttempted
                 && serverFullyInitialized) {
             recoveryAttempted = true;
-            com.kingodogo.buildscape.config.PillarIdManager manager = com.kingodogo.buildscape.config.PillarIdManager
-                    .get();
             if (manager != null) {
                 try {
                     java.nio.file.Path worldPath = server.getWorldPath(
@@ -936,9 +940,6 @@ public class BuildScape {
             pillarSyncTickCounter = 0;
 
             try {
-                com.kingodogo.buildscape.config.PillarIdManager manager = com.kingodogo.buildscape.config.PillarIdManager
-                        .get();
-
                 for (net.minecraft.server.level.ServerLevel level : server.getAllLevels()) {
                     if (level == null) {
                         continue;

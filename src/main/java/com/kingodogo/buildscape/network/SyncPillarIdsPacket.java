@@ -3,6 +3,7 @@ package com.kingodogo.buildscape.network;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.kingodogo.buildscape.config.PillarIdManager;
+import io.netty.handler.codec.DecoderException;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
@@ -22,12 +23,15 @@ public class SyncPillarIdsPacket {
     }
 
     public SyncPillarIdsPacket(FriendlyByteBuf buf) {
-        int count = buf.readInt();
-        this.pillarDataList = new ArrayList<>();
+        int count = NetworkPacketLimits.readCount(buf, NetworkPacketLimits.MAX_PILLARS, "pillar");
+        this.pillarDataList = new ArrayList<>(count);
 
         for (int i = 0; i < count; i++) {
-            String json = buf.readUtf(32767);
+            String json = NetworkPacketLimits.readUtf(buf, NetworkPacketLimits.MAX_PILLAR_JSON_LENGTH, "pillar data");
             PillarIdManager.PillarData data = GSON.fromJson(json, PillarIdManager.PillarData.class);
+            if (data == null || data.id == null) {
+                throw new DecoderException("pillar data is missing its id");
+            }
             this.pillarDataList.add(data);
         }
     }
@@ -37,11 +41,13 @@ public class SyncPillarIdsPacket {
     }
 
     public void encode(FriendlyByteBuf buf) {
+        NetworkPacketLimits.checkCount(pillarDataList.size(), NetworkPacketLimits.MAX_PILLARS, "pillar");
         buf.writeInt(pillarDataList.size());
 
         for (PillarIdManager.PillarData data : pillarDataList) {
             String json = GSON.toJson(data);
-            buf.writeUtf(json, 32767);
+            NetworkPacketLimits.writeUtf(buf, json,
+                    NetworkPacketLimits.MAX_PILLAR_JSON_LENGTH, "pillar data");
         }
     }
 

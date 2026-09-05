@@ -1,5 +1,6 @@
 package com.kingodogo.buildscape.block;
 
+import com.kingodogo.buildscape.util.BeaconScanContext;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.sounds.SoundEvents;
@@ -91,21 +92,7 @@ public class BigOrnamentBlock extends AbstractGlassBlock implements SimpleWaterl
     @Override
     public int getLightBlock(BlockState state, BlockGetter level, BlockPos pos) {
         if (this.isTinted) {
-            if (level instanceof Level) {
-                try {
-                    boolean isBeacon = StackWalker.getInstance().walk(s ->
-                            s.limit(20).anyMatch(f -> {
-                                String name = f.getClassName();
-                                return name.contains("Beacon") || name.contains("beacon");
-                            })
-                    );
-                    if (isBeacon) {
-                        return 15;
-                    }
-                } catch (Throwable ignore) {
-                }
-            }
-            return 0;
+            return BeaconScanContext.blocksLight(level, pos) ? 15 : 0;
         }
         return super.getLightBlock(state, level, pos);
     }
@@ -118,6 +105,7 @@ public class BigOrnamentBlock extends AbstractGlassBlock implements SimpleWaterl
             BlockPos beaconPos
     ) {
         if (this.isTinted) {
+            BeaconScanContext.markBlocking(level, pos, beaconPos);
             return null;
         }
         int color = state.getMapColor(level, pos).col;

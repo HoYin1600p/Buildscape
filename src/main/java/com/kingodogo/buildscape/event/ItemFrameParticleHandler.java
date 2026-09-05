@@ -80,10 +80,10 @@ public class ItemFrameParticleHandler {
         net.minecraft.world.entity.Entity entity = event.getEntity();
         if (entity instanceof ItemFrame itemFrame) {
             CompoundTag data = itemFrame.getPersistentData();
-            com.kingodogo.buildscape.config.PillarIdManager.get().registerItemFrame(itemFrame);
+            com.kingodogo.buildscape.config.PillarIdManager.get(itemFrame.level).registerItemFrame(itemFrame);
         } else if (entity instanceof com.kingodogo.buildscape.entity.ColoredItemFrameEntity coloredFrame) {
             CompoundTag data = coloredFrame.getPersistentData();
-            com.kingodogo.buildscape.config.PillarIdManager.get().registerColoredItemFrame(coloredFrame);
+            com.kingodogo.buildscape.config.PillarIdManager.get(coloredFrame.level).registerColoredItemFrame(coloredFrame);
         }
     }
 
@@ -96,7 +96,7 @@ public class ItemFrameParticleHandler {
             CompoundTag data = entity.getPersistentData();
             String frameId = data.getString("BuildScapeFrameId");
             if (frameId != null && !frameId.isEmpty()) {
-                com.kingodogo.buildscape.config.PillarIdManager.get().removePillar(frameId);
+                com.kingodogo.buildscape.config.PillarIdManager.get(entity.level).removePillar(frameId);
                 clearCaches(entity.getId());
             }
         }
@@ -144,7 +144,7 @@ public class ItemFrameParticleHandler {
                 }
 
                 addParticleColor(itemFrame, dyeColor);
-                com.kingodogo.buildscape.config.PillarIdManager.get().registerItemFrame(itemFrame);
+                com.kingodogo.buildscape.config.PillarIdManager.get(itemFrame.level).registerItemFrame(itemFrame);
 
                 if (!player.getAbilities().instabuild) {
                     heldItem.shrink(1);
@@ -197,7 +197,7 @@ public class ItemFrameParticleHandler {
         String nextPattern = cyclePattern(currentPattern);
 
         setParticlePattern(itemFrame, nextPattern);
-        com.kingodogo.buildscape.config.PillarIdManager.get().registerItemFrame(itemFrame);
+        com.kingodogo.buildscape.config.PillarIdManager.get(itemFrame.level).registerItemFrame(itemFrame);
 
         if (!level.isClientSide) {
             level.playSound(
@@ -483,7 +483,7 @@ public class ItemFrameParticleHandler {
             String frameId = getFrameId(itemFrame);
             if (frameId != null && !frameId.startsWith("F-????")) {
                 com.kingodogo.buildscape.config.PillarIdManager.PillarData managerData =
-                        com.kingodogo.buildscape.config.PillarIdManager.get().getPillarData(frameId);
+                        com.kingodogo.buildscape.config.PillarIdManager.get(itemFrame.level).getPillarData(frameId);
                 if (managerData != null && managerData.dyeColors != null && !managerData.dyeColors.isEmpty()) {
                     java.util.List<String> mutableColors = new java.util.ArrayList<>(managerData.dyeColors);
                     CLIENT_COLOR_CACHE.put(itemFrame.getId(), mutableColors);
@@ -580,7 +580,7 @@ public class ItemFrameParticleHandler {
             String frameId = getFrameId(itemFrame);
             if (frameId != null && !frameId.startsWith("F-????")) {
                 com.kingodogo.buildscape.config.PillarIdManager.PillarData managerData =
-                        com.kingodogo.buildscape.config.PillarIdManager.get().getPillarData(frameId);
+                        com.kingodogo.buildscape.config.PillarIdManager.get(itemFrame.level).getPillarData(frameId);
                 if (managerData != null && managerData.pattern != null && !managerData.pattern.isEmpty()) {
                     CLIENT_PATTERN_CACHE.put(itemFrame.getId(), managerData.pattern);
                     return managerData.pattern;
@@ -723,12 +723,12 @@ public class ItemFrameParticleHandler {
             net.minecraft.core.BlockPos pos = itemFrame.blockPosition();
             net.minecraft.core.Direction dir = itemFrame.getDirection();
 
-            String exactKey = com.kingodogo.buildscape.config.PillarIdManager.get().positionKey(dimension, pos, dir);
-            String idFromPos = com.kingodogo.buildscape.config.PillarIdManager.get().getIdForPosition(exactKey);
+            String exactKey = com.kingodogo.buildscape.config.PillarIdManager.get(itemFrame.level).positionKey(dimension, pos, dir);
+            String idFromPos = com.kingodogo.buildscape.config.PillarIdManager.get(itemFrame.level).getIdForPosition(exactKey);
 
             if (idFromPos == null) {
-                String fuzzyKey = com.kingodogo.buildscape.config.PillarIdManager.get().positionKey(dimension, pos, null);
-                String potentialId = com.kingodogo.buildscape.config.PillarIdManager.get().getIdForPosition(fuzzyKey);
+                String fuzzyKey = com.kingodogo.buildscape.config.PillarIdManager.get(itemFrame.level).positionKey(dimension, pos, null);
+                String potentialId = com.kingodogo.buildscape.config.PillarIdManager.get(itemFrame.level).getIdForPosition(fuzzyKey);
                 if (potentialId != null && potentialId.startsWith(FRAME_PREFIX)) {
                     idFromPos = potentialId;
                 }
@@ -851,7 +851,7 @@ public class ItemFrameParticleHandler {
                 }
 
                 addParticleColorColored(coloredFrame, dyeColor);
-                com.kingodogo.buildscape.config.PillarIdManager.get().registerColoredItemFrame(coloredFrame);
+                com.kingodogo.buildscape.config.PillarIdManager.get(coloredFrame.level).registerColoredItemFrame(coloredFrame);
 
                 if (!player.getAbilities().instabuild) {
                     heldItem.shrink(1);
@@ -896,7 +896,7 @@ public class ItemFrameParticleHandler {
         String nextPattern = cyclePattern(currentPattern);
 
         setParticlePatternColored(coloredFrame, nextPattern);
-        com.kingodogo.buildscape.config.PillarIdManager.get().registerColoredItemFrame(coloredFrame);
+        com.kingodogo.buildscape.config.PillarIdManager.get(coloredFrame.level).registerColoredItemFrame(coloredFrame);
 
         if (!level.isClientSide) {
             level.playSound(
@@ -934,7 +934,7 @@ public class ItemFrameParticleHandler {
             String frameId = getFrameIdColored(frame);
             if (frameId != null && !frameId.startsWith("F-????")) {
                 com.kingodogo.buildscape.config.PillarIdManager.PillarData managerData =
-                        com.kingodogo.buildscape.config.PillarIdManager.get().getPillarData(frameId);
+                        com.kingodogo.buildscape.config.PillarIdManager.get(frame.level).getPillarData(frameId);
                 if (managerData != null) {
                     pattern = (managerData.pattern == null || managerData.pattern.isEmpty()) ? "none" : managerData.pattern;
                     CLIENT_PATTERN_CACHE.put(frame.getId(), pattern);
@@ -1060,12 +1060,12 @@ public class ItemFrameParticleHandler {
             net.minecraft.core.BlockPos pos = frame.blockPosition();
             net.minecraft.core.Direction dir = frame.getDirection();
 
-            String exactKey = com.kingodogo.buildscape.config.PillarIdManager.get().positionKey(dimension, pos, dir);
-            String idFromPos = com.kingodogo.buildscape.config.PillarIdManager.get().getIdForPosition(exactKey);
+            String exactKey = com.kingodogo.buildscape.config.PillarIdManager.get(frame.level).positionKey(dimension, pos, dir);
+            String idFromPos = com.kingodogo.buildscape.config.PillarIdManager.get(frame.level).getIdForPosition(exactKey);
 
             if (idFromPos == null) {
-                String fuzzyKey = com.kingodogo.buildscape.config.PillarIdManager.get().positionKey(dimension, pos, null);
-                String potentialId = com.kingodogo.buildscape.config.PillarIdManager.get().getIdForPosition(fuzzyKey);
+                String fuzzyKey = com.kingodogo.buildscape.config.PillarIdManager.get(frame.level).positionKey(dimension, pos, null);
+                String potentialId = com.kingodogo.buildscape.config.PillarIdManager.get(frame.level).getIdForPosition(fuzzyKey);
                 if (potentialId != null && potentialId.startsWith(FRAME_PREFIX)) {
                     idFromPos = potentialId;
                 }

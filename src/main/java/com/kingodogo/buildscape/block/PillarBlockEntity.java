@@ -362,7 +362,7 @@ public class PillarBlockEntity extends BlockEntity {
             return;
         }
 
-        PillarIdManager manager = PillarIdManager.get();
+        PillarIdManager manager = PillarIdManager.get(level);
 
         if (!manager.hasLoaded()) {
             return;
@@ -477,7 +477,7 @@ public class PillarBlockEntity extends BlockEntity {
     public void onLoad() {
         super.onLoad();
         if (level != null && !level.isClientSide) {
-            PillarIdManager manager = PillarIdManager.get();
+            PillarIdManager manager = PillarIdManager.get(level);
             try {
                 manager.load();
                 manager.registerPillar(this);
@@ -497,15 +497,15 @@ public class PillarBlockEntity extends BlockEntity {
                     3);
 
             if (this.pillarId != null) {
-                PillarIdManager.get().updateDisplayedItem(this.pillarId, stack.isEmpty() ? null
+                PillarIdManager.get(level).updateDisplayedItem(this.pillarId, stack.isEmpty() ? null
                         : net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(stack.getItem()).toString());
             } else {
                 String stackId = getStackPillarId();
                 if (stackId != null) {
-                    PillarIdManager.get().updateDisplayedItem(stackId, stack.isEmpty() ? null
+                    PillarIdManager.get(level).updateDisplayedItem(stackId, stack.isEmpty() ? null
                             : net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(stack.getItem()).toString());
                 } else if (!stack.isEmpty()) {
-                    PillarIdManager.get().updateDisplayedItemByPosition(level, worldPosition,
+                    PillarIdManager.get(level).updateDisplayedItemByPosition(level, worldPosition,
                             net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(stack.getItem()).toString());
                 }
             }
@@ -539,15 +539,15 @@ public class PillarBlockEntity extends BlockEntity {
                     3);
 
             if (this.pillarId != null) {
-                PillarIdManager.get().updateDisplayedItem(this.pillarId, stack.isEmpty() ? null
+                PillarIdManager.get(level).updateDisplayedItem(this.pillarId, stack.isEmpty() ? null
                         : net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(stack.getItem()).toString());
             } else {
                 String stackId = getStackPillarId();
                 if (stackId != null) {
-                    PillarIdManager.get().updateDisplayedItem(stackId, stack.isEmpty() ? null
+                    PillarIdManager.get(level).updateDisplayedItem(stackId, stack.isEmpty() ? null
                             : net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(stack.getItem()).toString());
                 } else if (!stack.isEmpty()) {
-                    PillarIdManager.get().updateDisplayedItemByPosition(level, worldPosition,
+                    PillarIdManager.get(level).updateDisplayedItemByPosition(level, worldPosition,
                             net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(stack.getItem()).toString());
                 }
             }
@@ -577,7 +577,7 @@ public class PillarBlockEntity extends BlockEntity {
             return;
         }
 
-        PillarIdManager manager = PillarIdManager.get();
+        PillarIdManager manager = PillarIdManager.get(level);
         if (!manager.hasLoaded())
             return;
 
@@ -715,7 +715,7 @@ public class PillarBlockEntity extends BlockEntity {
             return;
         }
 
-        PillarIdManager manager = PillarIdManager.get();
+        PillarIdManager manager = PillarIdManager.get(level);
         BlockPos bottomPos = findStackBottom();
         PillarIdManager.PillarData data = manager.getOrCreatePillarData(level, bottomPos);
 
@@ -799,7 +799,7 @@ public class PillarBlockEntity extends BlockEntity {
         }
 
 
-        PillarIdManager manager = PillarIdManager.get();
+        PillarIdManager manager = PillarIdManager.get(level);
 
         if (!manager.hasLoaded()) {
             return;
@@ -1155,7 +1155,7 @@ public class PillarBlockEntity extends BlockEntity {
         }
 
         if (level != null && !level.isClientSide) {
-            PillarIdManager manager = PillarIdManager.get();
+            PillarIdManager manager = PillarIdManager.get(level);
             BlockPos bottomPos = findStackBottom();
 
             String stackId = manager.addDyeColor(level, bottomPos, normalizedColor);
@@ -1346,7 +1346,7 @@ public class PillarBlockEntity extends BlockEntity {
         if (level != null && !level.isClientSide) {
             String stackId = getStackPillarId();
             if (stackId != null) {
-                PillarIdManager.PillarData data = PillarIdManager.get()
+                PillarIdManager.PillarData data = PillarIdManager.get(level)
                         .getPillarData(stackId);
                 if (data != null) {
                     return data.getColorCount();
@@ -1701,7 +1701,7 @@ public class PillarBlockEntity extends BlockEntity {
         clearLocalStateOnly();
 
         if (level != null && !level.isClientSide) {
-            PillarIdManager manager = PillarIdManager.get();
+            PillarIdManager manager = PillarIdManager.get(level);
 
             if (idToRemove != null && !idToRemove.isEmpty()) {
                 manager.removePillar(idToRemove);

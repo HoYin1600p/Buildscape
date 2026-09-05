@@ -58,7 +58,7 @@ public class PillarIdDetailConfigTab extends AbstractConfigTab {
             );
         }
 
-        PillarIdManager manager = PillarIdManager.get();
+        PillarIdManager manager = PillarIdManager.getClient();
         try {
             manager.checkAndReload();
         } catch (Exception e) {
@@ -567,7 +567,7 @@ public class PillarIdDetailConfigTab extends AbstractConfigTab {
 
         com.kingodogo.buildscape.network.ModMessages.INSTANCE.sendToServer(packet);
 
-        PillarIdManager manager = PillarIdManager.get();
+        PillarIdManager manager = PillarIdManager.getClient();
         manager.saveImmediate();
         this.dirty = false;
     }

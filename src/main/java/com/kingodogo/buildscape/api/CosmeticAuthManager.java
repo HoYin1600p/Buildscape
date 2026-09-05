@@ -4,6 +4,7 @@ import com.kingodogo.buildscape.BuildScape;
 import com.kingodogo.buildscape.api.model.CosmeticData;
 import net.minecraft.client.Minecraft;
 
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 public class CosmeticAuthManager {
@@ -42,33 +43,25 @@ public class CosmeticAuthManager {
             }
 
             String uuid = mc.getUser().getUuid();
-            String accessToken = mc.getUser().getAccessToken();
 
             if (uuid == null || uuid.isEmpty()) {
                 BuildScape.getLogger().warn("CosmeticAuthManager: UUID is null or empty");
                 return CompletableFuture.completedFuture(null);
             }
 
-            if (accessToken == null || accessToken.isEmpty()) {
-                BuildScape.getLogger().warn("CosmeticAuthManager: Access token is null or empty");
+            UUID playerId = parseUuid(uuid);
+            if (playerId == null) {
+                BuildScape.getLogger().warn("CosmeticAuthManager: UUID is invalid");
                 return CompletableFuture.completedFuture(null);
             }
 
             currentAuthFuture = SupportersApiClient.getInstance()
-                    .authenticate(uuid, accessToken)
-                    .thenApply(response -> {
-                        if (response == null) {
-                            BuildScape.getLogger().error("CosmeticAuthManager: Authentication returned null");
+                    .getCosmetics(playerId)
+                    .thenApply(cosmeticData -> {
+                        if (cosmeticData == null) {
+                            BuildScape.getLogger().error("CosmeticAuthManager: Cosmetic lookup returned null");
                             return null;
                         }
-
-                        if (response.isError()) {
-                            BuildScape.getLogger().error("CosmeticAuthManager: Authentication failed - " +
-                                    response.getCode() + ": " + response.getError());
-                            return null;
-                        }
-
-                        CosmeticData cosmeticData = response.toCosmeticData();
 
                         this.cachedCosmetics = cosmeticData;
                         this.authenticated = true;
@@ -87,6 +80,22 @@ public class CosmeticAuthManager {
                     });
 
             return currentAuthFuture;
+        }
+    }
+
+    private static UUID parseUuid(String value) {
+        try {
+            String normalized = value.replace("-", "");
+            if (normalized.length() != 32) {
+                return null;
+            }
+            return UUID.fromString(normalized.substring(0, 8) + "-"
+                    + normalized.substring(8, 12) + "-"
+                    + normalized.substring(12, 16) + "-"
+                    + normalized.substring(16, 20) + "-"
+                    + normalized.substring(20));
+        } catch (IllegalArgumentException exception) {
+            return null;
         }
     }
 

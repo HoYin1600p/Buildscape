@@ -2,6 +2,7 @@ package com.kingodogo.buildscape.client;
 
 import com.kingodogo.buildscape.network.ModMessages;
 import com.kingodogo.buildscape.network.TreeChopPacket;
+import com.kingodogo.buildscape.util.TreeChopTraversal;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Minecraft;
@@ -25,8 +26,6 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
 import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.Queue;
 import java.util.Set;
 
 @Mod.EventBusSubscriber(
@@ -43,6 +42,7 @@ public class TreeChopHandler {
     private static BlockPos lastLookedAtPos = null;
     private static Set<BlockPos> connectedLogsCache = new HashSet<>();
     private static long lastCacheUpdate = 0;
+    private static Level cachedLevel;
 
     @SubscribeEvent
     public static void onClientTick(TickEvent.ClientTickEvent event) {
@@ -52,23 +52,20 @@ public class TreeChopHandler {
         Player player = mc.player;
         if (player == null || mc.level == null) return;
 
+        if (cachedLevel != mc.level) {
+            resetTarget(mc, player);
+            cachedLevel = mc.level;
+        }
+
         if (!player.isCreative() || !player.isShiftKeyDown() || mc.options.keyAttack == null || !mc.options.keyAttack.isDown()
                 || !com.kingodogo.buildscape.config.CosmeticsConfig.get().getCreativeTreeBreaker(player.getUUID())) {
-            if (mc.level != null && targetBlockPos != null) {
-                mc.level.destroyBlockProgress(player.getId(), targetBlockPos, -1);
-            }
-            targetBlockPos = null;
-            breakingStartTime = 0;
+            resetTarget(mc, player);
             return;
         }
 
         HitResult hit = mc.hitResult;
         if (hit == null || hit.getType() != HitResult.Type.BLOCK) {
-            if (mc.level != null && targetBlockPos != null) {
-                mc.level.destroyBlockProgress(player.getId(), targetBlockPos, -1);
-            }
-            targetBlockPos = null;
-            breakingStartTime = 0;
+            resetTarget(mc, player);
             return;
         }
 
@@ -77,11 +74,7 @@ public class TreeChopHandler {
         BlockState state = mc.level.getBlockState(pos);
 
         if (!isLog(state)) {
-            if (mc.level != null && targetBlockPos != null) {
-                mc.level.destroyBlockProgress(player.getId(), targetBlockPos, -1);
-            }
-            targetBlockPos = null;
-            breakingStartTime = 0;
+            resetTarget(mc, player);
             return;
         }
 
@@ -101,6 +94,8 @@ public class TreeChopHandler {
                     }
                     targetBlockPos = null;
                     breakingStartTime = 0;
+                    connectedLogsCache.clear();
+                    lastLookedAtPos = null;
                 } else {
                     int progress = (int) (elapsed * 10 / BREAK_DELAY_MS);
                     if (mc.level != null) {
@@ -222,34 +217,21 @@ public class TreeChopHandler {
     }
 
     private static Set<BlockPos> findConnectedLogs(Level level, BlockPos startPos, Block targetBlock) {
-        Set<BlockPos> visited = new HashSet<>();
-        Queue<BlockPos> queue = new LinkedList<>();
+        return TreeChopTraversal.collect(
+                startPos,
+                candidate -> level.isLoaded(candidate)
+                        && level.getBlockState(candidate).getBlock() == targetBlock,
+                MAX_LOGS);
+    }
 
-        visited.add(startPos);
-        queue.add(startPos);
-
-        int count = 0;
-        while (!queue.isEmpty() && count < MAX_LOGS) {
-            BlockPos current = queue.poll();
-            count++;
-
-            for (int dx = -1; dx <= 1; dx++) {
-                for (int dy = -1; dy <= 1; dy++) {
-                    for (int dz = -1; dz <= 1; dz++) {
-                        if (dx == 0 && dy == 0 && dz == 0) continue;
-
-                        BlockPos neighbor = current.offset(dx, dy, dz);
-                        if (!visited.contains(neighbor) && level.isLoaded(neighbor)) {
-                            BlockState neighborState = level.getBlockState(neighbor);
-                            if (neighborState.getBlock() == targetBlock) {
-                                visited.add(neighbor);
-                                queue.add(neighbor);
-                            }
-                        }
-                    }
-                }
-            }
+    private static void resetTarget(Minecraft mc, Player player) {
+        if (mc.level != null && targetBlockPos != null) {
+            mc.level.destroyBlockProgress(player.getId(), targetBlockPos, -1);
         }
-        return visited;
+        targetBlockPos = null;
+        breakingStartTime = 0;
+        connectedLogsCache.clear();
+        lastLookedAtPos = null;
+        lastCacheUpdate = 0;
     }
 }

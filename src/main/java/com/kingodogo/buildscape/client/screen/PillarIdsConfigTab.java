@@ -159,7 +159,7 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
             );
         } else {
             try {
-                PillarIdManager.get().load();
+                PillarIdManager.getClient().markAsLoaded();
             } catch (Exception ignored) {
             }
         }
@@ -173,7 +173,7 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
     }
 
     public void refreshFromManager() {
-        PillarIdManager manager = PillarIdManager.get();
+        PillarIdManager manager = PillarIdManager.getClient();
         try {
             manager.checkAndReload();
         } catch (Exception ignored) {
@@ -203,7 +203,7 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
         }
         lastRefreshCheck = now;
 
-        PillarIdManager manager = PillarIdManager.get();
+        PillarIdManager manager = PillarIdManager.getClient();
         manager.checkAndReload();
         Map<String, PillarIdManager.PillarData> snapshot = manager.copyDataSnapshot();
         String signature = computeSignature(snapshot);
@@ -279,7 +279,7 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
     }
 
     private void addEmptyRow() {
-        PillarIdManager manager = PillarIdManager.get();
+        PillarIdManager manager = PillarIdManager.getClient();
         String newId = manager.generatePillarId();
 
         PillarIdManager.PillarData data = new PillarIdManager.PillarData();
@@ -331,7 +331,7 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
             );
         }
 
-        PillarIdManager manager = PillarIdManager.get();
+        PillarIdManager manager = PillarIdManager.getClient();
         manager.replaceAllPillarData(toSave);
 
         com.kingodogo.buildscape.network.ModMessages.INSTANCE.sendToServer(
@@ -877,7 +877,7 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
             }
         }
         if (!idsToRemove.isEmpty()) {
-            PillarIdManager manager = PillarIdManager.get();
+            PillarIdManager manager = PillarIdManager.getClient();
             for (String id : idsToRemove) {
                 manager.removePillar(id);
             }
@@ -907,7 +907,7 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
             }
         }
         if (!idsToRemove.isEmpty()) {
-            PillarIdManager manager = PillarIdManager.get();
+            PillarIdManager manager = PillarIdManager.getClient();
             for (String id : idsToRemove) {
                 manager.removePillar(id);
             }
@@ -1279,7 +1279,7 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
                     ? "minecraft:overworld"
                     : dimensionField.getValue().trim();
 
-            PillarIdManager manager = PillarIdManager.get();
+            PillarIdManager manager = PillarIdManager.getClient();
             PillarIdManager.PillarData existing = manager.getPillarData(id);
             if (existing != null && existing.dyeColors != null) {
                 data.dyeColors = new ArrayList<>(existing.dyeColors);

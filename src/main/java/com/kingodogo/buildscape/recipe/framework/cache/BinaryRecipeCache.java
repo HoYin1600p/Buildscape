@@ -6,12 +6,15 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,7 +42,11 @@ import net.minecraftforge.registries.ForgeRegistries;
 public class BinaryRecipeCache {
 
     private static final int MAGIC_HEADER = 0x4B59524F;
-    private static final int CACHE_VERSION = 4;
+    private static final int CACHE_VERSION = 5;
+    private static final int SOURCE_SCHEMA_VERSION = 1;
+    private static final int MAX_STRING_POOL_SIZE = 262_144;
+    private static final int MAX_RECIPE_COUNT = 262_144;
+    private static final int MAX_INGREDIENT_COUNT = 4_096;
 
     private static Item getItemFromRegistry(ResourceLocation rl) {
         if (rl == null) return Items.AIR;
@@ -73,29 +80,49 @@ public class BinaryRecipeCache {
         return dir;
     }
 
-    public static String computeHash(byte[] combinedContent) {
+    public static String computeSourceHash(String[] categoryOrder, Map<String, byte[]> categoryData) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            byte[] hashBytes = digest.digest(combinedContent);
+            updateDigestInt(digest, SOURCE_SCHEMA_VERSION);
+            updateDigestInt(digest, CACHE_VERSION);
+            for (String category : categoryOrder) {
+                byte[] name = category.getBytes(StandardCharsets.UTF_8);
+                updateDigestInt(digest, name.length);
+                digest.update(name);
+                byte[] content = categoryData.get(category);
+                digest.update((byte) (content == null ? 0 : 1));
+                if (content != null) {
+                    updateDigestInt(digest, content.length);
+                    digest.update(content);
+                }
+            }
+            byte[] hashBytes = digest.digest();
             StringBuilder hex = new StringBuilder();
             for (byte b : hashBytes) {
                 hex.append(String.format("%02x", b));
             }
             return hex.toString();
-        } catch (Exception e) {
-            return String.valueOf(Arrays.hashCode(combinedContent));
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalStateException("SHA-256 is unavailable", e);
         }
     }
 
+    private static void updateDigestInt(MessageDigest digest, int value) {
+        digest.update(ByteBuffer.allocate(Integer.BYTES).putInt(value).array());
+    }
+
     public static boolean isCacheValid(String currentHash) {
-        Path hashFile = getCacheDir().resolve("recipes.bscb.hash");
-        Path cacheFile = getCacheDir().resolve("recipes.bscb");
-        if (!Files.exists(hashFile) || !Files.exists(cacheFile)) {
+        return isCacheValid(getCacheDir().resolve("recipes.bscb"), currentHash);
+    }
+
+    public static boolean isCacheValid(Path cacheFile, String currentHash) {
+        if (!Files.isRegularFile(cacheFile)) {
             return false;
         }
-        try {
-            String cachedHash = Files.readString(hashFile, StandardCharsets.UTF_8).trim();
-            return cachedHash.equals(currentHash);
+        try (DataInputStream in = new DataInputStream(new BufferedInputStream(Files.newInputStream(cacheFile)))) {
+            return in.readInt() == MAGIC_HEADER
+                    && in.readInt() == CACHE_VERSION
+                    && in.readUTF().equals(currentHash);
         } catch (IOException e) {
             return false;
         }
@@ -150,37 +177,35 @@ public class BinaryRecipeCache {
 
     public static void saveCacheToFile(Path targetFile, String hash, List<Recipe<?>> recipes) throws IOException {
         byte[] fullCacheData = serializeCache(hash, recipes);
-        if (targetFile.getParent() != null) {
-            Files.createDirectories(targetFile.getParent());
-        }
-        Files.write(targetFile, fullCacheData);
+        writeAtomically(targetFile, fullCacheData);
     }
 
     public static void saveCache(String hash, List<Recipe<?>> recipes) {
         try {
             byte[] fullCacheData = serializeCache(hash, recipes);
-
-            try {
-                Path cacheFile = getCacheDir().resolve("recipes.bscb");
-                Path hashFile = getCacheDir().resolve("recipes.bscb.hash");
-                Files.write(cacheFile, fullCacheData);
-                Files.writeString(hashFile, hash, StandardCharsets.UTF_8);
-            } catch (Throwable ignored) {}
-
-            try {
-                Path packDir = findWorkspaceRecipesPackDir();
-                if (packDir != null) {
-                    Path srcResourcePath = packDir.resolve("recipes.bscb");
-                    Files.write(srcResourcePath, fullCacheData);
-                    BuildScape.LOGGER.info("BDRE Bundled JAR Cache synced to {}", srcResourcePath.toAbsolutePath());
-                }
-            } catch (Exception e) {
-                BuildScape.LOGGER.warn("BDRE Bundled JAR Cache sync warning: {}", e.getMessage());
-            }
-
+            writeAtomically(getCacheDir().resolve("recipes.bscb"), fullCacheData);
             BuildScape.LOGGER.info("BDRE Binary Cache saved successfully ({} recipes).", recipes.size());
-        } catch (Exception e) {
+        } catch (IOException e) {
             BuildScape.LOGGER.error("Failed to write BDRE Binary Cache", e);
+        }
+    }
+
+    private static void writeAtomically(Path targetFile, byte[] data) throws IOException {
+        Path parent = targetFile.toAbsolutePath().getParent();
+        if (parent == null) {
+            throw new IOException("Cache target has no parent directory: " + targetFile);
+        }
+        Files.createDirectories(parent);
+        Path temporaryFile = Files.createTempFile(parent, targetFile.getFileName().toString(), ".tmp");
+        try {
+            Files.write(temporaryFile, data);
+            try {
+                Files.move(temporaryFile, targetFile, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
+            } catch (AtomicMoveNotSupportedException e) {
+                Files.move(temporaryFile, targetFile, StandardCopyOption.REPLACE_EXISTING);
+            }
+        } finally {
+            Files.deleteIfExists(temporaryFile);
         }
     }
 
@@ -217,6 +242,7 @@ public class BinaryRecipeCache {
             }
 
             int poolSize = in.readInt();
+            validateSize(poolSize, MAX_STRING_POOL_SIZE, "string pool");
             String[] stringPool = new String[poolSize];
             for (int i = 0; i < poolSize; i++) {
                 stringPool[i] = in.readUTF();
@@ -251,6 +277,7 @@ public class BinaryRecipeCache {
             });
 
             int recipeCount = in.readInt();
+            validateSize(recipeCount, MAX_RECIPE_COUNT, "recipe count");
             recipes = new ArrayList<>(recipeCount);
             for (int i = 0; i < recipeCount; i++) {
                 Recipe<?> r = readRecipe(in, stringPool, ingredientCache, itemCache, rlCache);
@@ -261,14 +288,18 @@ public class BinaryRecipeCache {
 
             BuildScape.LOGGER.info("BDRE Binary Cache stream loaded successfully ({} recipes).", recipes.size());
         } catch (Exception e) {
-            BuildScape.LOGGER.error("Failed to load BDRE Binary Cache from stream", e);
+            BuildScape.LOGGER.warn("BDRE Binary Cache rejected: {}; recompiling from compact sources.", e.getMessage());
             recipes.clear();
         }
 
         return recipes;
     }
 
-    private static ResourceLocation getResourceLocation(int idx, String[] stringPool, ResourceLocation[] rlCache) {
+    private static ResourceLocation getResourceLocation(int idx, String[] stringPool, ResourceLocation[] rlCache)
+            throws IOException {
+        if (idx < 0 || idx >= stringPool.length) {
+            throw new IOException("Invalid resource location pool index: " + idx);
+        }
         ResourceLocation rl = rlCache[idx];
         if (rl == null) {
             rl = new ResourceLocation(stringPool[idx]);
@@ -383,13 +414,13 @@ public class BinaryRecipeCache {
             Ingredient[] ingredientCache,
             Item[] itemCache,
             ResourceLocation[] rlCache) throws IOException {
-        int idIdx = in.readInt();
+        int idIdx = readPoolIndex(in, stringPool.length, "recipe id");
         ResourceLocation id = getResourceLocation(idIdx, stringPool, rlCache);
 
-        int groupIdx = in.readInt();
+        int groupIdx = readPoolIndex(in, stringPool.length, "recipe group");
         String group = stringPool[groupIdx];
 
-        int itemIdx = in.readInt();
+        int itemIdx = readPoolIndex(in, stringPool.length, "result item");
         Item resultItem = itemCache[itemIdx];
         if (resultItem == null) {
             resultItem = getItemFromRegistry(getResourceLocation(itemIdx, stringPool, rlCache));
@@ -400,7 +431,7 @@ public class BinaryRecipeCache {
 
         int count = in.readInt();
         ItemStack result = resultItem != Items.AIR ? new ItemStack(resultItem, count) : ItemStack.EMPTY;
-        int resultNbtIdx = in.readInt();
+        int resultNbtIdx = readPoolIndex(in, stringPool.length, "result NBT");
         String resultNbt = stringPool[resultNbtIdx];
         if (!result.isEmpty() && resultNbt != null && !resultNbt.isEmpty()) {
             try {
@@ -416,6 +447,7 @@ public class BinaryRecipeCache {
                 int width = in.readInt();
                 int height = in.readInt();
                 int ingSize = in.readInt();
+                validateDimensions(width, height, ingSize);
                 NonNullList<Ingredient> ingredients = NonNullList.withSize(ingSize, Ingredient.EMPTY);
                 for (int i = 0; i < ingSize; i++) {
                     ingredients.set(i, readIngredient(in, stringPool, ingredientCache));
@@ -424,6 +456,7 @@ public class BinaryRecipeCache {
             }
             case 2 -> {
                 int ingSize = in.readInt();
+                validateSize(ingSize, MAX_INGREDIENT_COUNT, "shapeless ingredient count");
                 NonNullList<Ingredient> ingredients = NonNullList.create();
                 for (int i = 0; i < ingSize; i++) {
                     ingredients.add(readIngredient(in, stringPool, ingredientCache));
@@ -467,6 +500,7 @@ public class BinaryRecipeCache {
                 int width = in.readInt();
                 int height = in.readInt();
                 int ingSize = in.readInt();
+                validateDimensions(width, height, ingSize);
                 NonNullList<Ingredient> ingredients = NonNullList.withSize(ingSize, Ingredient.EMPTY);
                 for (int i = 0; i < ingSize; i++) {
                     ingredients.set(i, readIngredient(in, stringPool, ingredientCache));
@@ -476,6 +510,7 @@ public class BinaryRecipeCache {
             }
             case 10 -> {
                 int ingSize = in.readInt();
+                validateSize(ingSize, MAX_INGREDIENT_COUNT, "shapeless durability ingredient count");
                 NonNullList<Ingredient> ingredients = NonNullList.create();
                 for (int i = 0; i < ingSize; i++) {
                     ingredients.add(readIngredient(in, stringPool, ingredientCache));
@@ -489,7 +524,7 @@ public class BinaryRecipeCache {
                 return new com.kingodogo.buildscape.recipe.ClearShulkerFiltersRecipe(id);
             }
             default -> {
-                return null;
+                throw new IOException("Unsupported cached recipe type: " + type);
             }
         }
     }
@@ -508,7 +543,7 @@ public class BinaryRecipeCache {
 
     private static Ingredient readIngredient(DataInputStream in, String[] stringPool, Ingredient[] ingredientCache)
             throws IOException {
-        int idx = in.readInt();
+        int idx = readPoolIndex(in, stringPool.length, "ingredient");
         Ingredient ing = ingredientCache[idx];
         if (ing == null) {
             String jsonStr = stringPool[idx];
@@ -527,22 +562,26 @@ public class BinaryRecipeCache {
         return ing;
     }
 
-    private static Path findWorkspaceRecipesPackDir() {
-        Path relativePath = Path.of("src/main/resources/data/buildscape/recipes_pack");
-        if (Files.exists(relativePath)) return relativePath;
+    private static int readPoolIndex(DataInputStream in, int poolSize, String label) throws IOException {
+        int index = in.readInt();
+        if (index < 0 || index >= poolSize) {
+            throw new IOException("Invalid " + label + " pool index: " + index);
+        }
+        return index;
+    }
 
-        Path parentRelative = Path.of("../src/main/resources/data/buildscape/recipes_pack");
-        if (Files.exists(parentRelative)) return parentRelative;
+    private static void validateDimensions(int width, int height, int ingredientCount) throws IOException {
+        validateSize(width, 64, "recipe width");
+        validateSize(height, 64, "recipe height");
+        validateSize(ingredientCount, MAX_INGREDIENT_COUNT, "shaped ingredient count");
+        if ((long) width * height != ingredientCount) {
+            throw new IOException("Shaped recipe dimensions do not match ingredient count");
+        }
+    }
 
-        try {
-            Path current = FMLPaths.GAMEDIR.get();
-            while (current != null) {
-                Path candidate = current.resolve("src/main/resources/data/buildscape/recipes_pack");
-                if (Files.exists(candidate)) return candidate;
-                current = current.getParent();
-            }
-        } catch (Exception ignored) {}
-
-        return null;
+    private static void validateSize(int size, int maximum, String label) throws IOException {
+        if (size < 0 || size > maximum) {
+            throw new IOException("Invalid " + label + ": " + size);
+        }
     }
 }

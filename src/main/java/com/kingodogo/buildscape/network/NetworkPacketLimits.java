@@ -15,6 +15,12 @@ final class NetworkPacketLimits {
     static final int MAX_RULE_NAME_LENGTH = 64;
     static final int MAX_PILLAR_JSON_LENGTH = 32_767;
     static final int MAX_RESULT_OFFSET = 1_000_000;
+    static final double MIN_PARTICLE_RATE = 0.001D;
+    static final double MAX_PARTICLE_SPEED = 4.0D;
+    static final double MAX_PARTICLE_SPREAD = 16.0D;
+    static final double MAX_PARTICLE_INTENSITY = 64.0D;
+    static final int MAX_PARTICLE_LIFETIME = 12_000;
+    static final int MAX_PARTICLE_DENSITY = 128;
 
     private NetworkPacketLimits() {
     }
@@ -57,6 +63,21 @@ final class NetworkPacketLimits {
             throw new DecoderException(field + " must be finite");
         }
         return value;
+    }
+
+    static double readBoundedDouble(FriendlyByteBuf buffer, double minimum, double maximum, String field) {
+        double value = readFiniteDouble(buffer, field);
+        if (value < minimum || value > maximum) {
+            throw new DecoderException(field + " outside allowed range: " + value);
+        }
+        return value;
+    }
+
+    static double clamp(double value, double minimum, double maximum) {
+        if (!Double.isFinite(value)) {
+            return minimum;
+        }
+        return Math.max(minimum, Math.min(maximum, value));
     }
 
     static int readBoundedInt(FriendlyByteBuf buffer, int minimum, int maximum, String field) {

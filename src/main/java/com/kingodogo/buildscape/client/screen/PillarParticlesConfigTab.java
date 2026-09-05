@@ -831,7 +831,7 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
 
     private void updateWorldPillars() {
         Minecraft mc = Minecraft.getInstance();
-        PillarIdManager manager = PillarIdManager.get();
+        PillarIdManager manager = PillarIdManager.getClient();
         if (mc.level != null && mc.player != null) {
             int renderDistance = mc.options.renderDistance;
             int range = 32;
@@ -901,7 +901,7 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
         config.use_pattern = true;
         config.saveProperties();
 
-        PillarIdManager manager = PillarIdManager.get();
+        PillarIdManager manager = PillarIdManager.getClient();
         if (manager.hasLoaded()) {
             for (PillarIdManager.PillarData pData : manager.getAllData()) {
                 boolean hasPatternOverride = pData.pattern != null && !pData.pattern.equals("default");

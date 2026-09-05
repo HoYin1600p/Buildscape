@@ -43,10 +43,12 @@ public final class BuildersWorkbenchResultsPacket {
         this.tab = buffer.readByte();
         this.filterMask = buffer.readUnsignedByte();
         this.offsets = new int[RESULT_COUNT];
-        for (int i = 0; i < RESULT_COUNT; i++) offsets[i] = buffer.readVarInt();
+        for (int i = 0; i < RESULT_COUNT; i++) offsets[i] = NetworkPacketLimits.readResultOffset(buffer);
         this.results = new ArrayList<>(RESULT_COUNT);
         for (int i = 0; i < RESULT_COUNT; i++) {
-            results.add(buffer.readBoolean() ? buffer.readResourceLocation() : null);
+            results.add(buffer.readBoolean()
+                    ? new ResourceLocation(NetworkPacketLimits.readUtf(buffer,
+                    NetworkPacketLimits.MAX_RESOURCE_ID_LENGTH, "workbench result")) : null);
         }
     }
 
@@ -61,7 +63,10 @@ public final class BuildersWorkbenchResultsPacket {
         for (int offset : offsets) buffer.writeVarInt(Math.max(0, offset));
         for (ResourceLocation result : results) {
             buffer.writeBoolean(result != null);
-            if (result != null) buffer.writeResourceLocation(result);
+            if (result != null) {
+                NetworkPacketLimits.writeUtf(buffer, result.toString(),
+                        NetworkPacketLimits.MAX_RESOURCE_ID_LENGTH, "workbench result");
+            }
         }
     }
 

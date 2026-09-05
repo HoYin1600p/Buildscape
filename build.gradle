@@ -114,6 +114,16 @@ repositories {
     mavenCentral()
 }
 
+def rendererApi = providers.gradleProperty('renderer_api').getOrElse('embeddium')
+def rendererApiCoordinates = [
+        embeddium: 'curse.maven:embeddium-908741:5322305',
+        rubidium : 'curse.maven:rubidium-574856:4494903'
+]
+
+if (!rendererApiCoordinates.containsKey(rendererApi)) {
+    throw new GradleException("Unknown renderer_api '${rendererApi}'. Use 'embeddium' or 'rubidium'.")
+}
+
 dependencies {
 
 
@@ -122,7 +132,7 @@ dependencies {
 
     runtimeOnly fg.deobf("mezz.jei:jei-${minecraft_version}:9.7.1.255")
 
-    compileOnly fg.deobf('curse.maven:embeddium-908741:5322305')
+    compileOnly fg.deobf(rendererApiCoordinates[rendererApi])
 
 
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'

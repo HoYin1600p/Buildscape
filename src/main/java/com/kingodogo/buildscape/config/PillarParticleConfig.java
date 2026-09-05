@@ -6,6 +6,9 @@ import com.google.gson.reflect.TypeToken;
 import com.kingodogo.buildscape.BuildScape;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.fml.loading.FMLEnvironment;
 
 import java.io.File;
 import java.io.FileReader;
@@ -35,7 +38,7 @@ public class PillarParticleConfig {
     private static Thread watchThread = null;
     private static final AtomicBoolean watcherInitialized = new AtomicBoolean(
             false);
-    private static final List<java.util.function.Consumer<Boolean>> configReloadCallbacks = new ArrayList<>();
+    private static final List<java.util.function.Consumer<Boolean>> configReloadCallbacks = new java.util.concurrent.CopyOnWriteArrayList<>();
     private static long lastNotifyTime = 0;
 
     private static volatile PillarParticleConfig SNAPSHOT = null;
@@ -92,34 +95,14 @@ public class PillarParticleConfig {
     public int max_particle_color = 3;
 
     private static boolean isClientConnectedToServer() {
+        if (FMLEnvironment.dist != Dist.CLIENT) {
+            return false;
+        }
         long now = System.currentTimeMillis();
         if (now - connectedCacheTime < CONNECTED_CACHE_TTL_MS) {
             return cachedConnectedToServer;
         }
-        boolean result;
-        try {
-            Class<?> mcClass = Class.forName("net.minecraft.client.Minecraft");
-            Object mc = mcClass.getMethod("getInstance").invoke(null);
-            if (mc == null) {
-                result = false;
-            } else {
-                Object connection = mcClass.getMethod("getConnection").invoke(mc);
-                if (connection == null) {
-                    result = false;
-                } else {
-                    Object level = mcClass.getMethod("level").invoke(mc);
-                    if (level == null) {
-                        result = false;
-                    } else {
-                        Boolean isClientSide = (Boolean) level.getClass()
-                                .getMethod("isClientSide").invoke(level);
-                        result = isClientSide != null && isClientSide;
-                    }
-                }
-            }
-        } catch (Exception e) {
-            result = false;
-        }
+        boolean result = ClientConnectionState.isConnected();
         cachedConnectedToServer = result;
         connectedCacheTime = now;
         return result;
@@ -242,13 +225,7 @@ public class PillarParticleConfig {
     }
 
     private static void initializeFileWatcher() {
-        if (watcherInitialized.getAndSet(true)) {
-            return;
-        }
-
-        try {
-            Class.forName("net.minecraft.client.Minecraft");
-        } catch (ClassNotFoundException e) {
+        if (FMLEnvironment.dist != Dist.CLIENT || !watcherInitialized.compareAndSet(false, true)) {
             return;
         }
 
@@ -332,6 +309,14 @@ public class PillarParticleConfig {
             watchThread.start();
         } catch (Exception e) {
             watcherInitialized.set(false);
+        }
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    private static final class ClientConnectionState {
+        private static boolean isConnected() {
+            net.minecraft.client.Minecraft minecraft = net.minecraft.client.Minecraft.getInstance();
+            return minecraft.getConnection() != null && minecraft.level != null;
         }
     }
 

@@ -51,27 +51,27 @@ public class SyncConfigPacket {
     }
 
     public SyncConfigPacket(FriendlyByteBuf buf) {
-        this.particle_speed = buf.readDouble();
-        this.particle_spread = buf.readDouble();
-        this.particle_lifetime = buf.readInt();
-        this.particle_density = buf.readInt();
+        this.particle_speed = NetworkPacketLimits.readFiniteDouble(buf, "particle speed");
+        this.particle_spread = NetworkPacketLimits.readFiniteDouble(buf, "particle spread");
+        this.particle_lifetime = NetworkPacketLimits.readBoundedInt(buf, 1, 1_000_000, "particle lifetime");
+        this.particle_density = NetworkPacketLimits.readBoundedInt(buf, 0, 1_000_000, "particle density");
         this.use_pattern = buf.readBoolean();
-        this.pattern = buf.readUtf();
-        this.pattern_speed = buf.readDouble();
-        this.pattern_spread = buf.readDouble();
-        this.pattern_intensity = buf.readDouble();
+        this.pattern = NetworkPacketLimits.readUtf(buf, NetworkPacketLimits.MAX_PATTERN_LENGTH, "pattern");
+        this.pattern_speed = NetworkPacketLimits.readFiniteDouble(buf, "pattern speed");
+        this.pattern_spread = NetworkPacketLimits.readFiniteDouble(buf, "pattern spread");
+        this.pattern_intensity = NetworkPacketLimits.readFiniteDouble(buf, "pattern intensity");
 
-        int colorCount = buf.readInt();
+        int colorCount = NetworkPacketLimits.readCount(buf, NetworkPacketLimits.MAX_DYE_COLORS, "particle color");
         this.particle_color = new ArrayList<>();
         for (int i = 0; i < colorCount; i++) {
-            this.particle_color.add(buf.readUtf());
+            this.particle_color.add(NetworkPacketLimits.readUtf(buf, NetworkPacketLimits.MAX_RESOURCE_ID_LENGTH, "particle color"));
         }
-        this.max_particle_color = buf.readInt();
+        this.max_particle_color = NetworkPacketLimits.readBoundedInt(buf, 0, NetworkPacketLimits.MAX_DYE_COLORS, "maximum particle colors");
 
-        int itemCount = buf.readInt();
+        int itemCount = NetworkPacketLimits.readCount(buf, NetworkPacketLimits.MAX_CONFIG_ITEMS, "configured item");
         this.items = new HashSet<>();
         for (int i = 0; i < itemCount; i++) {
-            this.items.add(buf.readUtf());
+            this.items.add(NetworkPacketLimits.readUtf(buf, NetworkPacketLimits.MAX_RESOURCE_ID_LENGTH, "configured item"));
         }
     }
 
@@ -81,23 +81,30 @@ public class SyncConfigPacket {
         buf.writeInt(particle_lifetime);
         buf.writeInt(particle_density);
         buf.writeBoolean(use_pattern);
-        buf.writeUtf(pattern != null ? pattern : "ring");
+        NetworkPacketLimits.writeUtf(buf, pattern != null ? pattern : "ring",
+                NetworkPacketLimits.MAX_PATTERN_LENGTH, "pattern");
         buf.writeDouble(pattern_speed);
         buf.writeDouble(pattern_spread);
         buf.writeDouble(pattern_intensity);
 
+        NetworkPacketLimits.checkCount(particle_color != null ? particle_color.size() : 0,
+                NetworkPacketLimits.MAX_DYE_COLORS, "particle color");
         buf.writeInt(particle_color != null ? particle_color.size() : 0);
         if (particle_color != null) {
             for (String color : particle_color) {
-                buf.writeUtf(color);
+                NetworkPacketLimits.writeUtf(buf, color,
+                        NetworkPacketLimits.MAX_RESOURCE_ID_LENGTH, "particle color");
             }
         }
         buf.writeInt(max_particle_color);
 
+        NetworkPacketLimits.checkCount(items != null ? items.size() : 0,
+                NetworkPacketLimits.MAX_CONFIG_ITEMS, "configured item");
         buf.writeInt(items != null ? items.size() : 0);
         if (items != null) {
             for (String item : items) {
-                buf.writeUtf(item);
+                NetworkPacketLimits.writeUtf(buf, item,
+                        NetworkPacketLimits.MAX_RESOURCE_ID_LENGTH, "configured item");
             }
         }
     }

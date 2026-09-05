@@ -32,11 +32,15 @@ public class PillarIdManager {
     private static final String FILE_NAME = "pillar-ids.dat";
     private static final String BACKUP_FILE_NAME = "pillar-ids.bak.dat";
     private static final String FOLDER_NAME = "buildscape";
-    private static PillarIdManager INSTANCE;
+    private static final PillarIdManager SERVER_INSTANCE = new PillarIdManager(true);
+    private static final PillarIdManager CLIENT_INSTANCE = new PillarIdManager(false);
+
+    private final boolean serverAuthoritative;
 
     private final Map<String, PillarData> pillarData = new ConcurrentHashMap<>();
 
     private final Map<String, String> positionIndex = new ConcurrentHashMap<>();
+    private volatile List<PillarData> syncSnapshot = Collections.emptyList();
 
     private long lastLoadedTime = 0L;
     private long lastFileSize = 0L;
@@ -46,9 +50,11 @@ public class PillarIdManager {
     private boolean hadColorsOnLoad = false;
     private boolean isServerSynced = false;
     private boolean allowEmptySave = false;
+    private volatile boolean dirty = false;
 
     private static boolean recoveryScheduled = false;
     private static long recoveryScheduledTime = 0L;
+    private static boolean recoveryClearColors = false;
     private static final long RECOVERY_DELAY_MS = 5000;
     private static boolean recoveryInProgress = false;
 
@@ -68,24 +74,45 @@ public class PillarIdManager {
         worldLoadStartTime = System.currentTimeMillis();
         recoveryScheduled = false;
         recoveryScheduledTime = 0L;
+        recoveryClearColors = false;
+        recoveryInProgress = false;
 
-        if (INSTANCE != null) {
-            INSTANCE.isServerSynced = false;
-            INSTANCE.pillarData.clear();
-            INSTANCE.positionIndex.clear();
-            INSTANCE.hasLoaded = false;
-            INSTANCE.loadInProgress = false;
-            INSTANCE.hadColorsOnLoad = false;
-            INSTANCE.lastLoadedTime = 0L;
-            INSTANCE.lastFileSize = 0L;
-        }
+        SERVER_INSTANCE.resetState(false);
     }
 
     public static PillarIdManager get() {
-        if (INSTANCE == null) {
-            INSTANCE = new PillarIdManager();
-        }
-        return INSTANCE;
+        return SERVER_INSTANCE;
+    }
+
+    public static PillarIdManager getClient() {
+        return CLIENT_INSTANCE;
+    }
+
+    public static PillarIdManager get(Level level) {
+        return level != null && level.isClientSide ? CLIENT_INSTANCE : SERVER_INSTANCE;
+    }
+
+    public static void resetClientCache() {
+        CLIENT_INSTANCE.resetState(true);
+    }
+
+    private PillarIdManager(boolean serverAuthoritative) {
+        this.serverAuthoritative = serverAuthoritative;
+    }
+
+    private void resetState(boolean serverSynced) {
+        isServerSynced = serverSynced;
+        pillarData.clear();
+        positionIndex.clear();
+        hasLoaded = false;
+        loadInProgress = false;
+        hadColorsOnLoad = false;
+        lastLoadedTime = 0L;
+        lastFileSize = 0L;
+        allowEmptySave = false;
+        dirty = false;
+        fileWasDeleted = false;
+        syncSnapshot = Collections.emptyList();
     }
 
     public boolean hasLoaded() {
@@ -94,6 +121,10 @@ public class PillarIdManager {
 
     public boolean isLoadInProgress() {
         return loadInProgress;
+    }
+
+    public boolean needsWorldRecovery() {
+        return serverAuthoritative && hasLoaded && fileWasDeleted && pillarData.isEmpty();
     }
 
     public static String getVariantPrefix(Level level, BlockPos pos) {
@@ -284,22 +315,10 @@ public class PillarIdManager {
         worldLoadStartTime = System.currentTimeMillis();
         recoveryScheduled = false;
         recoveryScheduledTime = 0L;
+        recoveryClearColors = false;
+        recoveryInProgress = false;
 
-        if (INSTANCE != null) {
-            INSTANCE.pillarData.clear();
-            INSTANCE.positionIndex.clear();
-            INSTANCE.lastLoadedTime = 0L;
-            INSTANCE.lastFileSize = 0L;
-            INSTANCE.hasLoaded = false;
-            INSTANCE.loadInProgress = false;
-            INSTANCE.hadColorsOnLoad = false;
-            INSTANCE.fileWasDeleted = false;
-        }
-    }
-
-    public static void scheduleRecoveryAfterLoad() {
-        recoveryScheduled = true;
-        recoveryScheduledTime = System.currentTimeMillis();
+        SERVER_INSTANCE.resetState(false);
     }
 
     public static void checkAndRunScheduledRecovery() {
@@ -311,8 +330,6 @@ public class PillarIdManager {
         if (elapsed < RECOVERY_DELAY_MS) {
             return;
         }
-
-        recoveryScheduled = false;
 
         MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
         if (server == null || !server.isRunning()) {
@@ -328,7 +345,14 @@ public class PillarIdManager {
             return;
         }
 
-        manager.recoverPillarsFromWorld(server, false);
+        if (server.getPlayerList().getPlayerCount() == 0 || !isWorldReadyForRecovery()) {
+            return;
+        }
+
+        recoveryScheduled = false;
+        boolean clearColors = recoveryClearColors;
+        recoveryClearColors = false;
+        manager.recoverPillarsFromWorld(server, clearColors);
     }
 
     private static boolean isWorldReadyForRecovery() {
@@ -524,17 +548,37 @@ public class PillarIdManager {
     }
 
     public void removePillar(String pillarId) {
-        if (pillarId != null) {
-            PillarData data = pillarData.remove(pillarId);
-            if (data != null) {
-                positionIndex.remove(positionKey(data.dimension, new BlockPos(data.x, data.y, data.z)));
-                PillarResetHandler.resetPillarFromData(data);
-                if (pillarData.isEmpty()) {
-                    allowEmptySave = true;
-                }
-                saveImmediate();
-            }
+        removePillars(Collections.singleton(pillarId));
+    }
+
+    public boolean removePillars(Collection<String> pillarIds) {
+        if (pillarIds == null || pillarIds.isEmpty()) {
+            return false;
         }
+
+        boolean changed = false;
+        for (String pillarId : pillarIds) {
+            if (pillarId == null) {
+                continue;
+            }
+            PillarData data = pillarData.remove(pillarId);
+            if (data == null) {
+                continue;
+            }
+            positionIndex.remove(positionKey(data.dimension, new BlockPos(data.x, data.y, data.z)));
+            if (serverAuthoritative) {
+                PillarResetHandler.resetPillarFromData(data);
+            }
+            changed = true;
+        }
+
+        if (changed) {
+            if (pillarData.isEmpty()) {
+                allowEmptySave = true;
+            }
+            saveImmediate();
+        }
+        return changed;
     }
 
     public void updateDisplayedItem(String pillarId, String itemResourceId) {
@@ -616,6 +660,9 @@ public class PillarIdManager {
     }
 
     public void load() {
+        if (!serverAuthoritative) {
+            return;
+        }
         if (isServerSynced) {
             return;
         }
@@ -925,9 +972,8 @@ public class PillarIdManager {
                 hasLoaded = true;
 
                 updateCachedWorldDir();
+                refreshSyncSnapshot();
 
-
-                scheduleRecoveryAfterLoad();
 
         } catch (Exception e) {
             fileWasDeleted = true;
@@ -939,6 +985,7 @@ public class PillarIdManager {
             lastLoadedTime = 0L;
             lastFileSize = 0L;
             hasLoaded = true;
+            scheduleRecoveryFromWorld(server, false);
         } catch (Throwable t) {
             System.err.println(
                     "BuildScape: Critical error in loadFileAsync() - will recover after world is fully loaded: " +
@@ -950,6 +997,7 @@ public class PillarIdManager {
             lastLoadedTime = 0L;
             lastFileSize = 0L;
             hasLoaded = true;
+            scheduleRecoveryFromWorld(server, false);
         }
     }
 
@@ -1012,6 +1060,7 @@ public class PillarIdManager {
                 lastLoadedTime = 0L;
                 lastFileSize = 0L;
                 hasLoaded = true;
+                scheduleRecoveryFromWorld(server, false);
                 return;
             }
 
@@ -1028,6 +1077,7 @@ public class PillarIdManager {
             lastLoadedTime = 0L;
             lastFileSize = 0L;
             hasLoaded = true;
+            scheduleRecoveryFromWorld(server, false);
         }
     }
 
@@ -1042,30 +1092,26 @@ public class PillarIdManager {
         }
     }
 
-    public void saveImmediate() {
+    public synchronized boolean saveImmediate() {
+        if (!serverAuthoritative) {
+            return true;
+        }
+        dirty = true;
         try {
             if (recoveryInProgress) {
-                return;
+                return false;
             }
 
             MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
             if (server == null) {
-                return;
+                return false;
             }
 
             if (!com.kingodogo.buildscape.BuildScape.isServerFullyInitialized()) {
-                return;
+                return false;
             }
 
-            int saveCount = pillarData.size();
-            int colorsCount = 0;
-            for (PillarData data : pillarData.values()) {
-                if (data != null && data.hasColors()) {
-                    colorsCount++;
-                }
-            }
-
-            if (saveCount == 0 && lastFileSize > 0 && !allowEmptySave) {
+            if (pillarData.isEmpty() && lastFileSize > 0 && !allowEmptySave) {
                 boolean fileHasColors = false;
                 try {
                     File mainFile = getDataFile();
@@ -1081,21 +1127,21 @@ public class PillarIdManager {
                             }
                         }
                     }
-                } catch (Exception e) {
+                } catch (Exception exception) {
+                    com.kingodogo.buildscape.BuildScape.LOGGER.warn(
+                            "Unable to verify existing pillar data before an empty save", exception);
                 }
 
                 if (fileHasColors && !hasLoaded) {
                     load();
-                    return;
+                    return false;
                 }
             }
 
-            if (allowEmptySave) {
-                allowEmptySave = false;
+            if (!saveToFile(getDataFile(), FILE_NAME)) {
+                return false;
             }
-
-
-            saveToFile(getDataFile(), FILE_NAME);
+            allowEmptySave = false;
 
             File mainFile = getDataFile();
             if (mainFile.exists()) {
@@ -1103,18 +1149,27 @@ public class PillarIdManager {
                 lastFileSize = mainFile.length();
             }
 
-            com.kingodogo.buildscape.network.ModMessages.INSTANCE.send(
-                    net.minecraftforge.network.PacketDistributor.ALL.noArg(),
-                    new com.kingodogo.buildscape.network.SyncPillarIdsPacket(getAllPillarDataForSync())
-            );
+            dirty = false;
+            fileWasDeleted = false;
+            refreshSyncSnapshot();
+            com.kingodogo.buildscape.network.SyncPillarIdsPacket.sendToAll(getAllPillarDataForSync());
+            return true;
         } catch (Throwable t) {
+            com.kingodogo.buildscape.BuildScape.LOGGER.error("Unable to save pillar data", t);
+            return false;
         }
     }
 
-    private void scheduleRecoveryFromWorld(
+    public void scheduleRecoveryFromWorld(
             MinecraftServer server,
             boolean clearColors
     ) {
+        if (!serverAuthoritative || server == null || !server.isRunning()) {
+            return;
+        }
+        recoveryScheduled = true;
+        recoveryScheduledTime = System.currentTimeMillis();
+        recoveryClearColors = clearColors;
     }
 
     public int clearAllPillarIdsFromWorld(MinecraftServer server) {
@@ -1440,6 +1495,10 @@ public class PillarIdManager {
     }
 
     public void forceSaveImmediate() {
+        if (!serverAuthoritative) {
+            return;
+        }
+        dirty = true;
         try {
             if (recoveryInProgress) {
                 return;
@@ -1477,7 +1536,9 @@ public class PillarIdManager {
             }
 
             File saveFile = new File(saveDir, FILE_NAME);
-            saveToFile(saveFile, FILE_NAME);
+            if (!saveToFile(saveFile, FILE_NAME)) {
+                return;
+            }
 
             File backupFile = new File(saveDir, BACKUP_FILE_NAME);
             saveToFile(backupFile, BACKUP_FILE_NAME);
@@ -1487,10 +1548,10 @@ public class PillarIdManager {
                 lastFileSize = saveFile.length();
             }
 
-            com.kingodogo.buildscape.network.ModMessages.INSTANCE.send(
-                    net.minecraftforge.network.PacketDistributor.ALL.noArg(),
-                    new com.kingodogo.buildscape.network.SyncPillarIdsPacket(getAllPillarDataForSync())
-            );
+            dirty = false;
+            fileWasDeleted = false;
+            refreshSyncSnapshot();
+            com.kingodogo.buildscape.network.SyncPillarIdsPacket.sendToAll(getAllPillarDataForSync());
         } catch (Throwable t) {
             System.err.println("BuildScape: Error in forceSaveImmediate: " + t.getMessage());
             t.printStackTrace();
@@ -1498,6 +1559,9 @@ public class PillarIdManager {
     }
 
     public void savePeriodic(boolean includeBackup) {
+        if (!serverAuthoritative) {
+            return;
+        }
         if (recoveryInProgress || !hasLoaded) {
             return;
         }
@@ -1505,18 +1569,34 @@ public class PillarIdManager {
             return;
         }
 
-        File mainFile = getDataFile();
-        saveToFile(mainFile, FILE_NAME);
-        if (mainFile.exists()) {
-            lastLoadedTime = mainFile.lastModified();
-            lastFileSize = mainFile.length();
+        boolean savedPendingChanges = false;
+        if (dirty) {
+            File mainFile = getDataFile();
+            if (!saveToFile(mainFile, FILE_NAME)) {
+                return;
+            }
+            if (mainFile.exists()) {
+                lastLoadedTime = mainFile.lastModified();
+                lastFileSize = mainFile.length();
+            }
+            dirty = false;
+            allowEmptySave = false;
+            fileWasDeleted = false;
+            refreshSyncSnapshot();
+            savedPendingChanges = true;
         }
         if (includeBackup) {
             saveToFile(getBackupDataFile(), BACKUP_FILE_NAME);
         }
+        if (savedPendingChanges) {
+            com.kingodogo.buildscape.network.SyncPillarIdsPacket.sendToAll(getAllPillarDataForSync());
+        }
     }
 
     public void checkAndReload() {
+        if (!serverAuthoritative) {
+            return;
+        }
         File mainFile = getDataFile();
 
         if (mainFile.exists()) {
@@ -1530,7 +1610,7 @@ public class PillarIdManager {
         }
     }
 
-    private synchronized void saveToFile(File file, String tempFileName) {
+    private synchronized boolean saveToFile(File file, String tempFileName) {
         try {
             File parentDir = file.getParentFile();
             if (parentDir != null && !parentDir.exists()) {
@@ -1565,8 +1645,11 @@ public class PillarIdManager {
             } catch (AtomicMoveNotSupportedException exception) {
                 Files.move(tempFile.toPath(), file.toPath(), StandardCopyOption.REPLACE_EXISTING);
             }
+            return true;
         } catch (Exception e) {
-            System.err.println("BuildScape: Error saving to " + file.getName() + ": " + e.getMessage());
+            com.kingodogo.buildscape.BuildScape.LOGGER.error(
+                    "BuildScape: Error saving pillar data to " + file.getAbsolutePath(), e);
+            return false;
         }
     }
 
@@ -2010,6 +2093,7 @@ public class PillarIdManager {
                 copy.use_pattern = original.use_pattern;
                 copy.displayedItem = original.displayedItem;
                 copy.pillarType = original.pillarType;
+                copy.facing = original.facing;
                 copy.itemYaw = original.itemYaw;
                 if (original.dyeColors != null && !original.dyeColors.isEmpty()) {
                     copy.dyeColors = new ArrayList<>(original.dyeColors);
@@ -2022,28 +2106,48 @@ public class PillarIdManager {
         return snapshot;
     }
 
-    public void replaceAllPillarData(Map<String, PillarData> newData) {
+    public synchronized void replaceAllPillarData(Map<String, PillarData> newData) {
         if (newData == null) {
             return;
         }
         pillarData.clear();
         pillarData.putAll(newData);
+        rebuildPositionIndex();
+        saveImmediate();
+    }
 
-        positionIndex.clear();
-        for (PillarData data : newData.values()) {
-            if (data != null && data.dimension != null) {
-                try {
-                    net.minecraft.core.Direction facing = null;
-                    if (data.facing != null) {
-                        facing = net.minecraft.core.Direction.byName(data.facing);
-                    }
-                    positionIndex.put(positionKey(data.dimension, data.getBlockPos(), facing), data.id);
-                } catch (Exception ignored) {
+    public synchronized void replaceFromServerSync(Collection<PillarData> syncedData) {
+        if (serverAuthoritative) {
+            throw new IllegalStateException("Cannot replace authoritative pillar data from a client sync");
+        }
+        pillarData.clear();
+        if (syncedData != null) {
+            for (PillarData data : syncedData) {
+                if (data != null && data.id != null) {
+                    pillarData.put(data.id, data);
                 }
             }
         }
+        rebuildPositionIndex();
+        com.kingodogo.buildscape.event.ItemFrameParticleHandler.clearClientCaches();
+        hasLoaded = true;
+        isServerSynced = true;
+    }
 
-        saveImmediate();
+    private void rebuildPositionIndex() {
+        positionIndex.clear();
+        for (PillarData data : pillarData.values()) {
+            if (data == null || data.id == null || data.dimension == null) {
+                continue;
+            }
+            try {
+                net.minecraft.core.Direction facing = data.facing != null
+                        ? net.minecraft.core.Direction.byName(data.facing)
+                        : null;
+                positionIndex.put(positionKey(data.dimension, data.getBlockPos(), facing), data.id);
+            } catch (Exception ignored) {
+            }
+        }
     }
 
     public void clearForServerSync() {
@@ -2307,7 +2411,11 @@ public class PillarIdManager {
     }
 
     public java.util.List<PillarData> getAllPillarDataForSync() {
-        return new ArrayList<>(pillarData.values());
+        return serverAuthoritative ? syncSnapshot : new ArrayList<>(pillarData.values());
+    }
+
+    private void refreshSyncSnapshot() {
+        syncSnapshot = Collections.unmodifiableList(new ArrayList<>(copyDataSnapshot().values()));
     }
 
     public static class PillarData {

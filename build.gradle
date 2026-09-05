@@ -97,13 +97,6 @@ sourceSets {
     main {
         resources { srcDir 'src/generated/resources' }
     }
-    benchmark {
-        java {
-            srcDir 'tools/benchmark'
-        }
-        compileClasspath += sourceSets.main.output + sourceSets.main.compileClasspath
-        runtimeClasspath += sourceSets.main.output + sourceSets.main.runtimeClasspath
-    }
 }
 
 repositories {
@@ -191,6 +184,7 @@ tasks.named('jar', Jar).configure {
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
+    options.compilerArgs += ['-Xlint:-removal']
 }
 
 tasks.register('runPipeSpillTests', JavaExec) {
@@ -201,4 +195,34 @@ tasks.register('runPipeSpillTests', JavaExec) {
 tasks.register('runPipeOutletTests', JavaExec) {
     classpath = sourceSets.test.runtimeClasspath
     mainClass = 'com.kingodogo.buildscape.pipe.transport.PipeOutletWaterTest'
+}
+
+tasks.register('runRecipeManagerInjectorTests', JavaExec) {
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.kingodogo.buildscape.recipe.framework.integration.RecipeManagerInjectorTest'
+}
+
+tasks.register('runBinaryRecipeCacheTests', JavaExec) {
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.kingodogo.buildscape.recipe.framework.cache.BinaryRecipeCacheTest'
+}
+
+tasks.register('runTreeChopTraversalTests', JavaExec) {
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.kingodogo.buildscape.util.TreeChopTraversalTest'
+}
+
+tasks.register('syncBundledRecipeCache', JavaExec) {
+    group = 'buildscape'
+    description = 'Copies a verified local BDRE cache into the bundled recipe resources.'
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.kingodogo.buildscape.recipe.framework.cache.BundledRecipeCacheSync'
+    args file('src/main/resources/data/buildscape/recipes_pack').absolutePath,
+            file('run/buildscape/cache/recipes.bscb').absolutePath,
+            file('src/main/resources/data/buildscape/recipes_pack/recipes.bscb').absolutePath
+}
+
+tasks.named('check').configure {
+    dependsOn 'runPipeSpillTests', 'runPipeOutletTests',
+            'runRecipeManagerInjectorTests', 'runBinaryRecipeCacheTests', 'runTreeChopTraversalTests'
 }

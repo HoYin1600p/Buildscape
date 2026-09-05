@@ -32,34 +32,46 @@ public class SyncConfigPacket {
     }
 
     public SyncConfigPacket(PillarParticleConfig config) {
-        this.particle_speed = config.particle_speed;
-        this.particle_spread = config.particle_spread;
-        this.particle_lifetime = config.particle_lifetime;
-        this.particle_density = config.particle_density;
+        this.particle_speed = NetworkPacketLimits.clamp(config.particle_speed,
+                NetworkPacketLimits.MIN_PARTICLE_RATE, NetworkPacketLimits.MAX_PARTICLE_SPEED);
+        this.particle_spread = NetworkPacketLimits.clamp(config.particle_spread,
+                NetworkPacketLimits.MIN_PARTICLE_RATE, NetworkPacketLimits.MAX_PARTICLE_SPREAD);
+        this.particle_lifetime = clamp(config.particle_lifetime, 1, NetworkPacketLimits.MAX_PARTICLE_LIFETIME);
+        this.particle_density = clamp(config.particle_density, 0, NetworkPacketLimits.MAX_PARTICLE_DENSITY);
         this.use_pattern = config.use_pattern;
         this.pattern = config.pattern != null ? config.pattern : "ring";
-        this.pattern_speed = config.pattern_speed;
-        this.pattern_spread = config.pattern_spread;
-        this.pattern_intensity = config.pattern_intensity;
+        this.pattern_speed = NetworkPacketLimits.clamp(config.pattern_speed,
+                NetworkPacketLimits.MIN_PARTICLE_RATE, NetworkPacketLimits.MAX_PARTICLE_SPEED);
+        this.pattern_spread = NetworkPacketLimits.clamp(config.pattern_spread,
+                NetworkPacketLimits.MIN_PARTICLE_RATE, NetworkPacketLimits.MAX_PARTICLE_SPREAD);
+        this.pattern_intensity = NetworkPacketLimits.clamp(config.pattern_intensity,
+                NetworkPacketLimits.MIN_PARTICLE_RATE, NetworkPacketLimits.MAX_PARTICLE_INTENSITY);
         this.particle_color = new ArrayList<>(
                 config.particle_color != null ? config.particle_color : new ArrayList<>()
         );
-        this.max_particle_color = config.max_particle_color;
+        this.max_particle_color = clamp(config.max_particle_color, 0, NetworkPacketLimits.MAX_DYE_COLORS);
         this.items = new HashSet<>(
                 config.items != null ? config.items : new HashSet<>()
         );
     }
 
     public SyncConfigPacket(FriendlyByteBuf buf) {
-        this.particle_speed = NetworkPacketLimits.readFiniteDouble(buf, "particle speed");
-        this.particle_spread = NetworkPacketLimits.readFiniteDouble(buf, "particle spread");
-        this.particle_lifetime = NetworkPacketLimits.readBoundedInt(buf, 1, 1_000_000, "particle lifetime");
-        this.particle_density = NetworkPacketLimits.readBoundedInt(buf, 0, 1_000_000, "particle density");
+        this.particle_speed = NetworkPacketLimits.readBoundedDouble(buf, NetworkPacketLimits.MIN_PARTICLE_RATE,
+                NetworkPacketLimits.MAX_PARTICLE_SPEED, "particle speed");
+        this.particle_spread = NetworkPacketLimits.readBoundedDouble(buf, NetworkPacketLimits.MIN_PARTICLE_RATE,
+                NetworkPacketLimits.MAX_PARTICLE_SPREAD, "particle spread");
+        this.particle_lifetime = NetworkPacketLimits.readBoundedInt(buf, 1,
+                NetworkPacketLimits.MAX_PARTICLE_LIFETIME, "particle lifetime");
+        this.particle_density = NetworkPacketLimits.readBoundedInt(buf, 0,
+                NetworkPacketLimits.MAX_PARTICLE_DENSITY, "particle density");
         this.use_pattern = buf.readBoolean();
         this.pattern = NetworkPacketLimits.readUtf(buf, NetworkPacketLimits.MAX_PATTERN_LENGTH, "pattern");
-        this.pattern_speed = NetworkPacketLimits.readFiniteDouble(buf, "pattern speed");
-        this.pattern_spread = NetworkPacketLimits.readFiniteDouble(buf, "pattern spread");
-        this.pattern_intensity = NetworkPacketLimits.readFiniteDouble(buf, "pattern intensity");
+        this.pattern_speed = NetworkPacketLimits.readBoundedDouble(buf, NetworkPacketLimits.MIN_PARTICLE_RATE,
+                NetworkPacketLimits.MAX_PARTICLE_SPEED, "pattern speed");
+        this.pattern_spread = NetworkPacketLimits.readBoundedDouble(buf, NetworkPacketLimits.MIN_PARTICLE_RATE,
+                NetworkPacketLimits.MAX_PARTICLE_SPREAD, "pattern spread");
+        this.pattern_intensity = NetworkPacketLimits.readBoundedDouble(buf, NetworkPacketLimits.MIN_PARTICLE_RATE,
+                NetworkPacketLimits.MAX_PARTICLE_INTENSITY, "pattern intensity");
 
         int colorCount = NetworkPacketLimits.readCount(buf, NetworkPacketLimits.MAX_DYE_COLORS, "particle color");
         this.particle_color = new ArrayList<>();
@@ -111,6 +123,10 @@ public class SyncConfigPacket {
 
     public static SyncConfigPacket decode(FriendlyByteBuf buf) {
         return new SyncConfigPacket(buf);
+    }
+
+    private static int clamp(int value, int minimum, int maximum) {
+        return Math.max(minimum, Math.min(maximum, value));
     }
 
     public void handle(Supplier<NetworkEvent.Context> ctx) {

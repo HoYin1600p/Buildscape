@@ -211,10 +211,9 @@ public class ClientEvents {
 
         wasZoomKeyPressed = false;
 
-        com.kingodogo.buildscape.config.PillarIdManager.resetWorldCache();
-
         com.kingodogo.buildscape.config.PillarParticleConfig.clearServerConfig();
-        com.kingodogo.buildscape.config.PillarIdManager.fullReset();
+        com.kingodogo.buildscape.config.PillarIdManager.resetClientCache();
+        com.kingodogo.buildscape.network.SyncPillarIdsPacket.clearClientState();
         com.kingodogo.buildscape.client.MuffBlockManager.clear();
     }
 
@@ -228,6 +227,7 @@ public class ClientEvents {
 
         try {
             com.kingodogo.buildscape.client.renderer.PillarBlockEntityRenderer.clearEntityCache();
+            com.kingodogo.buildscape.client.renderer.ArmorPillarRenderer.clearAllCaches();
             com.kingodogo.buildscape.particle.TintedDripParticle.clearColorCache();
             com.kingodogo.buildscape.event.ItemFrameParticleHandler.clearCaches();
             com.kingodogo.buildscape.config.PillarParticleConfig.clearServerConfig();

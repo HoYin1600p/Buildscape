@@ -5,10 +5,12 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkEvent;
 
-import java.util.List;
 import java.util.function.Supplier;
 
 public class RequestPillarIdsPacket {
+
+    private static final String LAST_REQUEST_TIME = "BuildScapePillarSyncRequestTime";
+    private static final long REQUEST_COOLDOWN_MS = 5_000L;
 
     public RequestPillarIdsPacket() {
     }
@@ -30,24 +32,21 @@ public class RequestPillarIdsPacket {
                 return;
             }
 
+            long now = System.currentTimeMillis();
+            long lastRequest = player.getPersistentData().getLong(LAST_REQUEST_TIME);
+            if (lastRequest > 0L && now - lastRequest < REQUEST_COOLDOWN_MS) {
+                return;
+            }
+            player.getPersistentData().putLong(LAST_REQUEST_TIME, now);
+
             PillarIdManager manager = PillarIdManager.get();
 
             if (!manager.hasLoaded()) {
                 manager.load();
+                return;
             }
 
-            net.minecraft.server.MinecraftServer server = player.getServer();
-            if (server != null && server.isRunning()) {
-                manager.syncColorsFromNBTToManager(server);
-            }
-
-            List<PillarIdManager.PillarData> pillarDataList = manager.getAllPillarDataForSync();
-
-            SyncPillarIdsPacket syncPacket = new SyncPillarIdsPacket(pillarDataList);
-            ModMessages.INSTANCE.send(
-                    net.minecraftforge.network.PacketDistributor.PLAYER.with(() -> player),
-                    syncPacket
-            );
+            SyncPillarIdsPacket.sendToPlayer(player, manager.getAllPillarDataForSync());
         });
         ctx.get().setPacketHandled(true);
     }

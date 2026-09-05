@@ -110,7 +110,7 @@ public class UpdatePillarDataPacket {
     public void handle(Supplier<NetworkEvent.Context> ctx) {
         ctx.get().enqueueWork(() -> {
             ServerPlayer player = ctx.get().getSender();
-            if (player == null) return;
+            if (player == null || !player.hasPermissions(2)) return;
 
             PillarIdManager manager = PillarIdManager.get();
             PillarIdManager.PillarData data = manager.getPillarData(pillarId);

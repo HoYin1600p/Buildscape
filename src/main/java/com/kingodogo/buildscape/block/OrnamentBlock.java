@@ -1,5 +1,6 @@
 package com.kingodogo.buildscape.block;
 
+import com.kingodogo.buildscape.util.BeaconScanContext;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.StringRepresentable;
@@ -40,6 +41,8 @@ public class OrnamentBlock
             EnumProperty.create("string_color", StringColor.class);
     public static final net.minecraft.world.level.block.state.properties.BooleanProperty LIT =
             net.minecraft.world.level.block.state.properties.BlockStateProperties.LIT;
+
+    private final boolean isTinted;
 
     private static final VoxelShape SHAPE_FLOOR = Block.box(5, 0, 5, 11, 6, 11);
 
@@ -145,7 +148,12 @@ public class OrnamentBlock
     }
 
     public OrnamentBlock(BlockBehaviour.Properties properties) {
+        this(properties, false);
+    }
+
+    public OrnamentBlock(BlockBehaviour.Properties properties, boolean isTinted) {
         super(properties);
+        this.isTinted = isTinted;
         this.registerDefaultState(
                 this.stateDefinition.any()
                         .setValue(ATTACHMENT, AttachmentType.FLOOR)
@@ -351,10 +359,8 @@ public class OrnamentBlock
             BlockPos pos,
             BlockPos beaconPos
     ) {
-        if (
-                state.getBlock() ==
-                        com.kingodogo.buildscape.block.ModBlocks.TINTED_GLASS_ORNAMENT.get()
-        ) {
+        if (this.isTinted) {
+            BeaconScanContext.markBlocking(level, pos, beaconPos);
             return null;
         }
 
@@ -376,10 +382,7 @@ public class OrnamentBlock
             return 0;
         }
 
-        if (
-                state.getBlock() ==
-                        com.kingodogo.buildscape.block.ModBlocks.TINTED_GLASS_ORNAMENT.get()
-        ) {
+        if (this.isTinted) {
             return 4;
         }
 
@@ -388,22 +391,8 @@ public class OrnamentBlock
 
     @Override
     public int getLightBlock(BlockState state, BlockGetter level, BlockPos pos) {
-        if (state.getBlock() == com.kingodogo.buildscape.block.ModBlocks.TINTED_GLASS_ORNAMENT.get()) {
-            if (level instanceof net.minecraft.world.level.Level) {
-                try {
-                    boolean isBeacon = StackWalker.getInstance().walk(s ->
-                            s.limit(20).anyMatch(f -> {
-                                String name = f.getClassName();
-                                return name.contains("Beacon") || name.contains("beacon");
-                            })
-                    );
-                    if (isBeacon) {
-                        return 15;
-                    }
-                } catch (Throwable ignore) {
-                }
-            }
-            return 0;
+        if (this.isTinted) {
+            return BeaconScanContext.blocksLight(level, pos) ? 15 : 0;
         }
         return super.getLightBlock(state, level, pos);
     }

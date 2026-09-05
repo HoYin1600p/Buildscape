@@ -8,6 +8,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import org.apache.logging.log4j.LogManager;
@@ -20,6 +21,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public class HollowPipeTransportManager {
 
     private static final Logger LOGGER = LogManager.getLogger("PipeTransport");
+    private static final long RECALCULATION_BUDGET_NANOS = 2_000_000L;
+    private static final int MAX_NETWORKS_PER_TICK = 16;
     public static boolean DEBUG_TRANSPORT = false;
     private static final Map<Level, Set<BlockPos>> PENDING_DIRTY = new ConcurrentHashMap<>();
 
@@ -28,40 +31,72 @@ public class HollowPipeTransportManager {
             return;
         }
         PENDING_DIRTY.computeIfAbsent(level, k -> Collections.synchronizedSet(new LinkedHashSet<>())).add(pos.immutable());
-        processPendingRecalculations(level);
     }
 
-    public static void processPendingRecalculations(Level level) {
-        Set<BlockPos> queue = PENDING_DIRTY.remove(level);
-        if (queue == null || queue.isEmpty()) {
-            return;
+    private static int processPendingRecalculations(Level level, long deadlineNanos, int networkBudget) {
+        Set<BlockPos> queue = PENDING_DIRTY.get(level);
+        if (queue == null) {
+            return 0;
+        }
+        if (queue.isEmpty()) {
+            PENDING_DIRTY.remove(level, queue);
+            return 0;
         }
 
-        Set<BlockPos> pending;
-        synchronized (queue) {
-            pending = new LinkedHashSet<>(queue);
-        }
+        int processed = 0;
+        while (processed < networkBudget && System.nanoTime() < deadlineNanos) {
+            BlockPos nextPos;
+            synchronized (queue) {
+                Iterator<BlockPos> iterator = queue.iterator();
+                if (!iterator.hasNext()) {
+                    PENDING_DIRTY.remove(level, queue);
+                    break;
+                }
+                nextPos = iterator.next();
+                iterator.remove();
+            }
 
-        while (!pending.isEmpty()) {
-            Iterator<BlockPos> it = pending.iterator();
-            BlockPos nextPos = it.next();
-            it.remove();
+            if (!level.isLoaded(nextPos)) {
+                continue;
+            }
 
             Set<BlockPos> component = WaterPipeTransport.INSTANCE.recalculateNetwork(level, nextPos);
             if (component != null && !component.isEmpty()) {
-                pending.removeAll(component);
+                synchronized (queue) {
+                    queue.removeAll(component);
+                }
+            }
+            processed++;
+        }
+
+        synchronized (queue) {
+            if (queue.isEmpty()) {
+                PENDING_DIRTY.remove(level, queue);
             }
         }
+        return processed;
     }
 
     @SubscribeEvent
     public static void onServerTick(TickEvent.ServerTickEvent event) {
         if (event.phase != TickEvent.Phase.END) return;
 
+        long deadlineNanos = System.nanoTime() + RECALCULATION_BUDGET_NANOS;
+        int remainingNetworks = MAX_NETWORKS_PER_TICK;
         if (!PENDING_DIRTY.isEmpty()) {
             for (Level level : new ArrayList<>(PENDING_DIRTY.keySet())) {
-                processPendingRecalculations(level);
+                remainingNetworks -= processPendingRecalculations(level, deadlineNanos, remainingNetworks);
+                if (remainingNetworks <= 0 || System.nanoTime() >= deadlineNanos) {
+                    break;
+                }
             }
+        }
+    }
+
+    @SubscribeEvent
+    public static void onLevelUnload(WorldEvent.Unload event) {
+        if (event.getWorld() instanceof Level level) {
+            PENDING_DIRTY.remove(level);
         }
     }
 

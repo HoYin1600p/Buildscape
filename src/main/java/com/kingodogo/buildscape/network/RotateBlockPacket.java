@@ -61,7 +61,7 @@ public class RotateBlockPacket {
         NetworkEvent.Context ctx = ctxSupplier.get();
         ctx.enqueueWork(() -> {
             ServerPlayer player = ctx.getSender();
-            if (player == null) return;
+            if (player == null || !player.hasPermissions(2) || !player.mayBuild()) return;
 
             if (!player.isCrouching()) return;
 
@@ -76,6 +76,7 @@ public class RotateBlockPacket {
 
             if (!level.isLoaded(pos)) return;
             if (player.distanceToSqr(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5) > 64.0) return;
+            if (player.blockActionRestricted(level, pos, player.gameMode.getGameModeForPlayer())) return;
 
             BlockState state = level.getBlockState(pos);
             if (state.isAir()) return;

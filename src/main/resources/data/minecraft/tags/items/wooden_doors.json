@@ -7,13 +7,12 @@
     "minecraft:jungle_door",
     "minecraft:acacia_door",
     "minecraft:dark_oak_door",
-    "minecraft:mangrove_door",
-    "minecraft:cherry_door",
-    "minecraft:bamboo_door",
+    "buildscape:mangrove_door",
+    "buildscape:cherry_door",
+    "buildscape:bamboo_door",
     "minecraft:crimson_door",
     "minecraft:warped_door",
     "buildscape:pale_oak_door",
-    "buildscape:poplar_door",
-    "buildscape:ashpen_door"
+    "buildscape:poplar_door"
   ]
 }

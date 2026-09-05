@@ -16,8 +16,11 @@ import java.io.*;
 import java.lang.reflect.Type;
 import java.nio.channels.FileChannel;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.AtomicMoveNotSupportedException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -38,7 +41,8 @@ public class PillarIdManager {
     private long lastLoadedTime = 0L;
     private long lastFileSize = 0L;
 
-    private boolean hasLoaded = false;
+    private volatile boolean hasLoaded = false;
+    private volatile boolean loadInProgress = false;
     private boolean hadColorsOnLoad = false;
     private boolean isServerSynced = false;
     private boolean allowEmptySave = false;
@@ -70,6 +74,7 @@ public class PillarIdManager {
             INSTANCE.pillarData.clear();
             INSTANCE.positionIndex.clear();
             INSTANCE.hasLoaded = false;
+            INSTANCE.loadInProgress = false;
             INSTANCE.hadColorsOnLoad = false;
             INSTANCE.lastLoadedTime = 0L;
             INSTANCE.lastFileSize = 0L;
@@ -85,6 +90,10 @@ public class PillarIdManager {
 
     public boolean hasLoaded() {
         return hasLoaded;
+    }
+
+    public boolean isLoadInProgress() {
+        return loadInProgress;
     }
 
     public static String getVariantPrefix(Level level, BlockPos pos) {
@@ -239,21 +248,19 @@ public class PillarIdManager {
                 return cachedWorldSaveDir;
             }
 
-            if (com.kingodogo.buildscape.BuildScape.isServerFullyInitialized()) {
-                MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
-                if (server != null) {
-                    try {
-                        Path worldPath = server.getWorldPath(LevelResource.ROOT);
-                        if (worldPath != null) {
-                            File buildscapeDir = worldPath.resolve(FOLDER_NAME).toFile();
-                            if (!buildscapeDir.exists()) {
-                                buildscapeDir.mkdirs();
-                            }
-                            cachedWorldSaveDir = buildscapeDir;
-                            return buildscapeDir;
+            MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
+            if (server != null) {
+                try {
+                    Path worldPath = server.getWorldPath(LevelResource.ROOT);
+                    if (worldPath != null) {
+                        File buildscapeDir = worldPath.resolve(FOLDER_NAME).toFile();
+                        if (!buildscapeDir.exists()) {
+                            buildscapeDir.mkdirs();
                         }
-                    } catch (Exception e) {
+                        cachedWorldSaveDir = buildscapeDir;
+                        return buildscapeDir;
                     }
+                } catch (Exception e) {
                 }
             }
 
@@ -284,6 +291,7 @@ public class PillarIdManager {
             INSTANCE.lastLoadedTime = 0L;
             INSTANCE.lastFileSize = 0L;
             INSTANCE.hasLoaded = false;
+            INSTANCE.loadInProgress = false;
             INSTANCE.hadColorsOnLoad = false;
             INSTANCE.fileWasDeleted = false;
         }
@@ -619,6 +627,7 @@ public class PillarIdManager {
                 lastFileSize = 0L;
                 fileWasDeleted = false;
                 hasLoaded = false;
+                loadInProgress = false;
                 return;
             }
 
@@ -627,10 +636,11 @@ public class PillarIdManager {
                 hasLoaded = false;
             }
 
-            if (hasLoaded) {
+            if (hasLoaded || loadInProgress) {
                 return;
             }
 
+            loadInProgress = true;
             server.execute(() -> {
                 try {
                     loadFileAsync(server);
@@ -640,6 +650,8 @@ public class PillarIdManager {
                     );
                     e.printStackTrace();
                     hasLoaded = true;
+                } finally {
+                    loadInProgress = false;
                 }
             });
         } catch (Throwable t) {
@@ -648,6 +660,7 @@ public class PillarIdManager {
                             t.getMessage()
             );
             t.printStackTrace();
+            loadInProgress = false;
             hasLoaded = true;
             pillarData.clear();
             lastLoadedTime = 0L;
@@ -1484,6 +1497,25 @@ public class PillarIdManager {
         }
     }
 
+    public void savePeriodic(boolean includeBackup) {
+        if (recoveryInProgress || !hasLoaded) {
+            return;
+        }
+        if (pillarData.isEmpty() && lastFileSize > 0L && !allowEmptySave) {
+            return;
+        }
+
+        File mainFile = getDataFile();
+        saveToFile(mainFile, FILE_NAME);
+        if (mainFile.exists()) {
+            lastLoadedTime = mainFile.lastModified();
+            lastFileSize = mainFile.length();
+        }
+        if (includeBackup) {
+            saveToFile(getBackupDataFile(), BACKUP_FILE_NAME);
+        }
+    }
+
     public void checkAndReload() {
         File mainFile = getDataFile();
 
@@ -1498,7 +1530,7 @@ public class PillarIdManager {
         }
     }
 
-    private void saveToFile(File file, String tempFileName) {
+    private synchronized void saveToFile(File file, String tempFileName) {
         try {
             File parentDir = file.getParentFile();
             if (parentDir != null && !parentDir.exists()) {
@@ -1528,22 +1560,10 @@ public class PillarIdManager {
             }
 
             try {
-                if (file.exists()) {
-                    file.delete();
-                }
-                boolean renamed = tempFile.renameTo(file);
-
-                if (!renamed) {
-                    try {
-                        tempFile.delete();
-                    } catch (Exception cleanupEx) {
-                    }
-                }
-            } catch (Exception renameEx) {
-                try {
-                    tempFile.delete();
-                } catch (Exception cleanupEx) {
-                }
+                Files.move(tempFile.toPath(), file.toPath(),
+                        StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
+            } catch (AtomicMoveNotSupportedException exception) {
+                Files.move(tempFile.toPath(), file.toPath(), StandardCopyOption.REPLACE_EXISTING);
             }
         } catch (Exception e) {
             System.err.println("BuildScape: Error saving to " + file.getName() + ": " + e.getMessage());

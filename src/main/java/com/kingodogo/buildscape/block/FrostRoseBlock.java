@@ -26,9 +26,7 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class FrostRoseBlock extends BushBlock implements SinksOnFarmland, BonemealableBlock {
 
@@ -41,8 +39,11 @@ public class FrostRoseBlock extends BushBlock implements SinksOnFarmland, Boneme
             11.0D
     );
 
-    private static final Map<String, Long> entityDamageStart = new HashMap<>();
-    private static final Map<String, Long> entityLastDamage = new HashMap<>();
+    private static final String CONTACT_POSITION_KEY = "BuildscapeFrostRosePosition";
+    private static final String CONTACT_DIMENSION_KEY = "BuildscapeFrostRoseDimension";
+    private static final String CONTACT_START_KEY = "BuildscapeFrostRoseStart";
+    private static final String CONTACT_LAST_DAMAGE_KEY = "BuildscapeFrostRoseLastDamage";
+    private static final String CONTACT_LAST_TICK_KEY = "BuildscapeFrostRoseLastContact";
 
     public FrostRoseBlock(BlockBehaviour.Properties properties) {
         super(properties);
@@ -158,40 +159,8 @@ public class FrostRoseBlock extends BushBlock implements SinksOnFarmland, Boneme
             BlockState state,
             Entity entity
     ) {
-        if (!level.isClientSide && entity instanceof LivingEntity) {
-            LivingEntity livingEntity = (LivingEntity) entity;
-            String key =
-                    pos.getX() +
-                            "," +
-                            pos.getY() +
-                            "," +
-                            pos.getZ() +
-                            "," +
-                            entity.getUUID();
-
-            if (!entityDamageStart.containsKey(key)) {
-                long currentTime = level.getGameTime();
-                entityDamageStart.put(key, currentTime);
-                entityLastDamage.put(key, currentTime);
-
-                DamageSource freezeDamage = DamageSource.GENERIC;
-                livingEntity.hurt(freezeDamage, 1.0F);
-
-                level.playSound(
-                        null,
-                        pos,
-                        net.minecraft.sounds.SoundEvents.POWDER_SNOW_STEP,
-                        net.minecraft.sounds.SoundSource.BLOCKS,
-                        0.5f,
-                        1.0f
-                );
-
-                if (livingEntity.canFreeze()) {
-                    livingEntity.setTicksFrozen(
-                            Math.min(livingEntity.getTicksFrozen() + 140, 300)
-                    );
-                }
-            }
+        if (!level.isClientSide && entity instanceof LivingEntity livingEntity) {
+            handleContact(level, pos, livingEntity);
         }
         super.stepOn(level, pos, state, entity);
     }
@@ -203,76 +172,64 @@ public class FrostRoseBlock extends BushBlock implements SinksOnFarmland, Boneme
             BlockPos pos,
             Entity entity
     ) {
-        if (!level.isClientSide && entity instanceof LivingEntity) {
-            LivingEntity livingEntity = (LivingEntity) entity;
-            String key =
-                    pos.getX() +
-                            "," +
-                            pos.getY() +
-                            "," +
-                            pos.getZ() +
-                            "," +
-                            entity.getUUID();
-
-            long currentTime = level.getGameTime();
-            Long startTime = entityDamageStart.get(key);
-            Long lastDamageTime = entityLastDamage.get(key);
-
-            if (startTime == null) {
-                entityDamageStart.put(key, currentTime);
-                entityLastDamage.put(key, currentTime);
-
-                DamageSource freezeDamage = DamageSource.GENERIC;
-                livingEntity.hurt(freezeDamage, 1.0F);
-
-                level.playSound(
-                        null,
-                        pos,
-                        net.minecraft.sounds.SoundEvents.POWDER_SNOW_STEP,
-                        net.minecraft.sounds.SoundSource.BLOCKS,
-                        0.5f,
-                        1.0f
-                );
-
-                if (livingEntity.canFreeze()) {
-                    livingEntity.setTicksFrozen(
-                            Math.min(livingEntity.getTicksFrozen() + 140, 300)
-                    );
-                }
-            } else {
-                long elapsedTicks = currentTime - startTime;
-
-                int damageDuration = 40;
-
-                if (elapsedTicks < damageDuration) {
-                    long ticksSinceLastDamage = currentTime - lastDamageTime;
-                    if (ticksSinceLastDamage >= 20) {
-                        DamageSource freezeDamage = DamageSource.GENERIC;
-                        livingEntity.hurt(freezeDamage, 1.0F);
-
-                        level.playSound(
-                                null,
-                                pos,
-                                net.minecraft.sounds.SoundEvents.POWDER_SNOW_STEP,
-                                net.minecraft.sounds.SoundSource.BLOCKS,
-                                0.5f,
-                                1.0f
-                        );
-
-                        if (livingEntity.canFreeze()) {
-                            livingEntity.setTicksFrozen(
-                                    Math.min(livingEntity.getTicksFrozen() + 140, 300)
-                            );
-                        }
-
-                        entityLastDamage.put(key, currentTime);
-                    }
-                } else {
-                    entityDamageStart.remove(key);
-                    entityLastDamage.remove(key);
-                }
-            }
+        if (!level.isClientSide && entity instanceof LivingEntity livingEntity) {
+            handleContact(level, pos, livingEntity);
         }
+    }
+
+    private static void handleContact(Level level, BlockPos pos, LivingEntity entity) {
+        net.minecraft.nbt.CompoundTag data = entity.getPersistentData();
+        long currentTick = level.getGameTime();
+        String dimension = level.dimension().location().toString();
+        boolean continuing = data.contains(CONTACT_START_KEY)
+                && data.getLong(CONTACT_POSITION_KEY) == pos.asLong()
+                && dimension.equals(data.getString(CONTACT_DIMENSION_KEY))
+                && currentTick - data.getLong(CONTACT_LAST_TICK_KEY) <= 1L;
+
+        if (!continuing) {
+            if (!data.contains(CONTACT_START_KEY)
+                    && data.contains(CONTACT_LAST_TICK_KEY)
+                    && data.getLong(CONTACT_LAST_TICK_KEY) == currentTick) {
+                return;
+            }
+            data.putLong(CONTACT_POSITION_KEY, pos.asLong());
+            data.putString(CONTACT_DIMENSION_KEY, dimension);
+            data.putLong(CONTACT_START_KEY, currentTick);
+            data.putLong(CONTACT_LAST_DAMAGE_KEY, currentTick);
+            data.putLong(CONTACT_LAST_TICK_KEY, currentTick);
+            applyFreezeDamage(level, pos, entity);
+            return;
+        }
+
+        data.putLong(CONTACT_LAST_TICK_KEY, currentTick);
+        long elapsedTicks = currentTick - data.getLong(CONTACT_START_KEY);
+        if (elapsedTicks >= 40L) {
+            clearContact(data);
+            data.putLong(CONTACT_LAST_TICK_KEY, currentTick);
+            return;
+        }
+
+        if (currentTick - data.getLong(CONTACT_LAST_DAMAGE_KEY) >= 20L) {
+            applyFreezeDamage(level, pos, entity);
+            data.putLong(CONTACT_LAST_DAMAGE_KEY, currentTick);
+        }
+    }
+
+    private static void applyFreezeDamage(Level level, BlockPos pos, LivingEntity entity) {
+        entity.hurt(DamageSource.GENERIC, 1.0F);
+        level.playSound(null, pos, net.minecraft.sounds.SoundEvents.POWDER_SNOW_STEP,
+                net.minecraft.sounds.SoundSource.BLOCKS, 0.5F, 1.0F);
+        if (entity.canFreeze()) {
+            entity.setTicksFrozen(Math.min(entity.getTicksFrozen() + 140, 300));
+        }
+    }
+
+    private static void clearContact(net.minecraft.nbt.CompoundTag data) {
+        data.remove(CONTACT_POSITION_KEY);
+        data.remove(CONTACT_DIMENSION_KEY);
+        data.remove(CONTACT_START_KEY);
+        data.remove(CONTACT_LAST_DAMAGE_KEY);
+        data.remove(CONTACT_LAST_TICK_KEY);
     }
 
     @Override

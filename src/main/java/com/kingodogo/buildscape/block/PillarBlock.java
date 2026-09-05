@@ -387,7 +387,7 @@ public class PillarBlock
                                 com.kingodogo.buildscape.BuildScape.isServerFullyInitialized()
                 ) {
                     com.kingodogo.buildscape.config.PillarIdManager manager =
-                            com.kingodogo.buildscape.config.PillarIdManager.get();
+                            com.kingodogo.buildscape.config.PillarIdManager.get(level);
                     com.kingodogo.buildscape.config.PillarIdManager.PillarData data =
                             manager.getPillarData(stackId);
 
@@ -514,7 +514,7 @@ public class PillarBlock
                         );
 
                         com.kingodogo.buildscape.config.PillarIdManager manager =
-                                com.kingodogo.buildscape.config.PillarIdManager.get();
+                                com.kingodogo.buildscape.config.PillarIdManager.get(level);
                         com.kingodogo.buildscape.config.PillarIdManager.PillarData data =
                                 manager.getPillarData(pillarIdToPreserve);
                         if (data != null) {
@@ -547,11 +547,11 @@ public class PillarBlock
                 }
 
                 com.kingodogo.buildscape.config.PillarIdManager manager =
-                        com.kingodogo.buildscape.config.PillarIdManager.get();
+                        com.kingodogo.buildscape.config.PillarIdManager.get(level);
                 manager.removePillarByPosition(level, pos);
             } else {
                 com.kingodogo.buildscape.config.PillarIdManager manager =
-                        com.kingodogo.buildscape.config.PillarIdManager.get();
+                        com.kingodogo.buildscape.config.PillarIdManager.get(level);
                 if (pillarIdToPreserve != null && !pillarIdToPreserve.isEmpty()) {
                     manager.removePillar(pillarIdToPreserve);
                 }
@@ -626,7 +626,7 @@ public class PillarBlock
     public void setPlacedBy(Level level, BlockPos pos, BlockState state, @javax.annotation.Nullable net.minecraft.world.entity.LivingEntity placer, net.minecraft.world.item.ItemStack stack) {
         super.setPlacedBy(level, pos, state, placer, stack);
         if (!level.isClientSide) {
-            com.kingodogo.buildscape.config.PillarIdManager.get().getOrCreatePillarData(level, pos);
+            com.kingodogo.buildscape.config.PillarIdManager.get(level).getOrCreatePillarData(level, pos);
 
             if (stack.hasTag()) {
                 net.minecraft.nbt.CompoundTag tag = stack.getTag();

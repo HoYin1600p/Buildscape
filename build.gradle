@@ -154,6 +154,10 @@ tasks.named('processResources', ProcessResources).configure {
 
 }
 
+tasks.named('compileJava', JavaCompile).configure {
+    outputs.cacheIf { false }
+}
+
 
 tasks.named('jar', Jar).configure {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
@@ -177,21 +181,6 @@ tasks.named('jar', Jar).configure {
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
-}
-
-tasks.register('runBenchmarks', JavaExec) {
-    classpath = sourceSets.benchmark.runtimeClasspath
-    mainClass = 'tools.benchmark.BenchmarkSuite'
-}
-
-tasks.register('runBDREBenchmark', JavaExec) {
-    classpath = sourceSets.benchmark.runtimeClasspath
-    mainClass = 'tools.benchmark.BenchmarkSuite'
-}
-
-tasks.register('runPipeTransportTests', JavaExec) {
-    classpath = sourceSets.benchmark.runtimeClasspath
-    mainClass = 'tools.benchmark.PipeTransportTestSuite'
 }
 
 tasks.register('runPipeSpillTests', JavaExec) {

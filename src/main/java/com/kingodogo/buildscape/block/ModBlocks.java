@@ -4996,7 +4996,7 @@ public class ModBlocks {
                                                         .sound(net.minecraft.world.level.block.SoundType.GLASS)
                                                         .noOcclusion()
                                                         .dynamicShape()
-                                                        .lightLevel(state -> 4)));
+                                                        .lightLevel(state -> 4), true));
         public static final RegistryObject<Block> BIG_WHITE_ORNAMENT = BLOCKS.register("big_white_ornament",
                         () -> new BigOrnamentBlock(BlockBehaviour.Properties.of(Material.GLASS, MaterialColor.SNOW).strength(0.3f).sound(net.minecraft.world.level.block.SoundType.GLASS).noOcclusion().lightLevel(state -> state.getValue(BigOrnamentBlock.LIT) ? 15 : 0)));
         public static final RegistryObject<Block> BIG_ORANGE_ORNAMENT = BLOCKS.register("big_orange_ornament",

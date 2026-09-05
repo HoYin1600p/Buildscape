@@ -1,14 +1,12 @@
 package com.kingodogo.buildscape.mixin;
 
 import com.kingodogo.buildscape.util.BeaconBeamHeightAccessor;
+import com.kingodogo.buildscape.util.BeaconScanContext;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BeaconBlockEntity;
 import net.minecraft.world.level.block.entity.BeaconBlockEntity.BeaconBeamSection;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.levelgen.Heightmap;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -39,39 +37,15 @@ public class BeaconBlockEntityMixin implements BeaconBeamHeightAccessor {
 
     @Inject(method = "tick", at = @At("HEAD"))
     private static void buildscape$onTick(Level level, BlockPos pos, BlockState state, BeaconBlockEntity blockEntity, CallbackInfo ci) {
+        BeaconScanContext.begin(blockEntity);
         if (((BeaconBlockEntityAccessor) blockEntity).getLastCheckY() < pos.getY()) {
-            int height = buildscape$scanForTintedGlass(level, pos);
-            ((BeaconBeamHeightAccessor) blockEntity).buildscape$setBeamHeight(height);
+            ((BeaconBeamHeightAccessor) blockEntity).buildscape$setBeamHeight(BUILDSCAPE_UNLIMITED);
         }
     }
 
-    @Unique
-    private static int buildscape$scanForTintedGlass(Level level, BlockPos pos) {
-        int x = pos.getX();
-        int z = pos.getZ();
-        int top = level.getHeight(Heightmap.Types.WORLD_SURFACE, x, z);
-        BlockPos.MutableBlockPos scanPos = new BlockPos.MutableBlockPos();
-
-        for (int y = pos.getY() + 1; y <= top; y++) {
-            scanPos.set(x, y, z);
-            BlockState blockState = level.getBlockState(scanPos);
-            if (blockState.getBeaconColorMultiplier(level, scanPos, pos) != null) {
-                continue;
-            }
-            if (blockState.getLightBlock(level, scanPos) >= 15 && !blockState.is(Blocks.BEDROCK)) {
-                return buildscape$isTintedGlass(blockState) ? y - pos.getY() : BUILDSCAPE_UNLIMITED;
-            }
-        }
-        return BUILDSCAPE_UNLIMITED;
-    }
-
-    @Unique
-    private static boolean buildscape$isTintedGlass(BlockState state) {
-        if (state.is(Blocks.TINTED_GLASS)) {
-            return true;
-        }
-        ResourceLocation key = state.getBlock().getRegistryName();
-        return key != null && key.getPath().contains("tinted_glass");
+    @Inject(method = "tick", at = @At("RETURN"))
+    private static void buildscape$afterTick(Level level, BlockPos pos, BlockState state, BeaconBlockEntity blockEntity, CallbackInfo ci) {
+        BeaconScanContext.end();
     }
 
     @Redirect(
@@ -84,6 +58,11 @@ public class BeaconBlockEntityMixin implements BeaconBeamHeightAccessor {
     private static void buildscape$interceptClear(List<?> list, Level level, BlockPos pos, BlockState state, BeaconBlockEntity blockEntity) {
         int height = ((BeaconBeamHeightAccessor) blockEntity).buildscape$getBeamHeight();
         if (height >= BUILDSCAPE_UNLIMITED) {
+            list.clear();
+            return;
+        }
+
+        if (!level.isClientSide) {
             list.clear();
             return;
         }

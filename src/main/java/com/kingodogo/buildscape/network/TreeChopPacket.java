@@ -2,9 +2,9 @@ package com.kingodogo.buildscape.network;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.BlockTags;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.network.NetworkEvent;
@@ -44,16 +44,18 @@ public class TreeChopPacket {
                 return;
             }
 
-            if (!player.isCreative()) {
+            if (!player.isCreative() || !player.hasPermissions(2) || !player.mayBuild()) {
                 return;
             }
 
-            Level level = player.getLevel();
+            ServerLevel level = player.getLevel();
             if (level.isClientSide) {
                 return;
             }
 
-            if (!level.isLoaded(pos)) {
+            if (!level.isLoaded(pos)
+                    || player.distanceToSqr(pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D) > 64.0D
+                    || player.blockActionRestricted(level, pos, player.gameMode.getGameModeForPlayer())) {
                 return;
             }
 
@@ -62,7 +64,7 @@ public class TreeChopPacket {
                 return;
             }
 
-            chopTree((net.minecraft.server.level.ServerLevel) level, pos, startState.getBlock());
+            chopTree(level, player, pos, startState.getBlock());
         });
         context.setPacketHandled(true);
     }
@@ -76,7 +78,8 @@ public class TreeChopPacket {
     }
 
     private void chopTree(
-            net.minecraft.server.level.ServerLevel level,
+            ServerLevel level,
+            ServerPlayer player,
             BlockPos startPos,
             Block targetBlock
     ) {
@@ -113,11 +116,13 @@ public class TreeChopPacket {
             }
         }
 
-        scheduleNextBreak(level, orderedBlocks, 0, 1, 0);
+        scheduleNextBreak(level, player, targetBlock, orderedBlocks, 0, 1, 0);
     }
 
     private void scheduleNextBreak(
-            net.minecraft.server.level.ServerLevel level,
+            ServerLevel level,
+            ServerPlayer player,
+            Block targetBlock,
             java.util.List<BlockPos> blocks,
             int currentIndex,
             int batchSize,
@@ -131,7 +136,10 @@ public class TreeChopPacket {
         for (int i = currentIndex; i < end; i++) {
             BlockPos pos = blocks.get(i);
             if (!level.isLoaded(pos)) continue;
+            if (!player.isAlive() || !player.isCreative() || !player.hasPermissions(2) || !player.mayBuild()) return;
+            if (player.blockActionRestricted(level, pos, player.gameMode.getGameModeForPlayer())) continue;
             BlockState state = level.getBlockState(pos);
+            if (state.getBlock() != targetBlock) continue;
 
             if (i % 3 == 0) {
                 level.levelEvent(2001, pos, Block.getId(state));
@@ -152,7 +160,7 @@ public class TreeChopPacket {
         java.util.concurrent.CompletableFuture.delayedExecutor(100, java.util.concurrent.TimeUnit.MILLISECONDS).execute(() -> {
             if (level.getServer() == null || !level.getServer().isRunning()) return;
             level.getServer().execute(() -> {
-                scheduleNextBreak(level, blocks, nextIndex, finalNextBatchSize, nextConsecutiveTicks);
+                scheduleNextBreak(level, player, targetBlock, blocks, nextIndex, finalNextBatchSize, nextConsecutiveTicks);
             });
         });
     }

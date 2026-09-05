@@ -33,13 +33,11 @@ public class BuildScape {
                 t.setDaemon(true);
                 return t;
             });
-    private static final int PILLAR_SYNC_INTERVAL = 100;
     private static final int PILLAR_SAVE_INTERVAL = 600;
     private static final int PILLAR_BACKUP_INTERVAL = 6000;
     private static final int RECOVERY_DELAY_TICKS = 600;
     private static final java.util.concurrent.atomic.AtomicBoolean CONFIG_CALLBACK_REGISTERED = new java.util.concurrent.atomic.AtomicBoolean();
     private static boolean serverFullyInitialized = false;
-    private static int pillarSyncTickCounter = 0;
     private static int pillarSaveTickCounter = 0;
     private static int pillarBackupTickCounter = 0;
     private static int recoveryDelayTicks = 0;
@@ -558,7 +556,6 @@ public class BuildScape {
     public void onServerStarting(ServerStartingEvent event) {
 
         serverFullyInitialized = false;
-        pillarSyncTickCounter = 0;
         pillarSaveTickCounter = 0;
         pillarBackupTickCounter = 0;
         recoveryDelayTicks = 0;
@@ -663,7 +660,6 @@ public class BuildScape {
         }
 
         serverFullyInitialized = false;
-        pillarSyncTickCounter = 0;
         pillarSaveTickCounter = 0;
         pillarBackupTickCounter = 0;
         recoveryDelayTicks = 0;
@@ -745,7 +741,7 @@ public class BuildScape {
         if (attempt >= MAX_ATTEMPTS) {
             server.execute(() -> {
                 if (player.hasDisconnected()) return;
-                sendPillarIdsToPlayer(server, player, manager);
+                sendPillarIdsToPlayer(player, manager);
             });
             return;
         }
@@ -753,7 +749,7 @@ public class BuildScape {
         if (manager.hasLoaded()) {
             server.execute(() -> {
                 if (player.hasDisconnected()) return;
-                sendPillarIdsToPlayer(server, player, manager);
+                sendPillarIdsToPlayer(player, manager);
             });
         } else {
             ASYNC_POOL.submit(() -> {
@@ -766,20 +762,11 @@ public class BuildScape {
         }
     }
 
-    private void sendPillarIdsToPlayer(net.minecraft.server.MinecraftServer server,
-                                       net.minecraft.server.level.ServerPlayer player,
+    private void sendPillarIdsToPlayer(net.minecraft.server.level.ServerPlayer player,
                                        com.kingodogo.buildscape.config.PillarIdManager manager) {
         try {
-            if (server.isRunning()) {
-                manager.syncColorsFromNBTToManager(server);
-            }
-
-            java.util.List<com.kingodogo.buildscape.config.PillarIdManager.PillarData> pillarDataList = manager.getAllPillarDataForSync();
-            com.kingodogo.buildscape.network.SyncPillarIdsPacket pillarIdsPacket = new com.kingodogo.buildscape.network.SyncPillarIdsPacket(
-                    pillarDataList);
-            com.kingodogo.buildscape.network.ModMessages.INSTANCE.send(
-                    net.minecraftforge.network.PacketDistributor.PLAYER.with(() -> player),
-                    pillarIdsPacket);
+            com.kingodogo.buildscape.network.SyncPillarIdsPacket.sendToPlayer(
+                    player, manager.getAllPillarDataForSync());
         } catch (Exception e) {
             LOGGER.error("BuildScape: Error sending pillar IDs to player: " + e.getMessage());
         }
@@ -818,34 +805,6 @@ public class BuildScape {
                 e.printStackTrace();
             }
 
-        }
-    }
-
-    @SubscribeEvent
-    public void onChunkLoad(
-            net.minecraftforge.event.world.ChunkEvent.Load event) {
-        if (event.getWorld() instanceof net.minecraft.server.level.ServerLevel serverLevel) {
-
-            if (!serverFullyInitialized) {
-                return;
-            }
-
-            net.minecraft.server.MinecraftServer server = serverLevel.getServer();
-            if (server == null || !server.isRunning()) {
-                return;
-            }
-
-            if (server.getPlayerList().getPlayerCount() == 0) {
-                return;
-            }
-
-            if (event.getChunk() instanceof net.minecraft.world.level.chunk.LevelChunk chunk) {
-
-                if (!chunk
-                        .getStatus()
-                        .isOrAfter(net.minecraft.world.level.chunk.ChunkStatus.FULL)) {
-                }
-            }
         }
     }
 
@@ -896,113 +855,11 @@ public class BuildScape {
                 && !recoveryAttempted
                 && serverFullyInitialized) {
             recoveryAttempted = true;
-            if (manager != null) {
-                try {
-                    java.nio.file.Path worldPath = server.getWorldPath(
-                            net.minecraft.world.level.storage.LevelResource.ROOT);
-                    java.io.File dataFile = worldPath
-                            .resolve("buildscape/pillar-ids.dat")
-                            .toFile();
-
-                    boolean needsRecovery = false;
-                    if (!dataFile.exists()) {
-                        needsRecovery = true;
-                    } else if (dataFile.length() == 0) {
-                        needsRecovery = true;
-                    } else if (dataFile.length() <= 2) {
-                        try (java.io.FileReader fr = new java.io.FileReader(dataFile)) {
-                            char[] buffer = new char[10];
-                            int read = fr.read(buffer);
-                            String content = new String(buffer, 0, read).trim();
-                            if (content.equals("{}") || content.isEmpty()) {
-                                needsRecovery = true;
-                            }
-                        } catch (Exception e) {
-                            needsRecovery = true;
-                        }
-                    } else {
-                        if (manager.getPillarCount() == 0) {
-                        }
-                    }
-
-                    if (needsRecovery) {
-
-                    }
-                } catch (Exception e) {
-                    System.err.println(
-                            "BuildScape: Error during delayed recovery: " + e.getMessage());
-                }
+            if (manager.needsWorldRecovery()) {
+                manager.scheduleRecoveryFromWorld(server, false);
             }
         }
 
-        pillarSyncTickCounter++;
-        if (pillarSyncTickCounter >= PILLAR_SYNC_INTERVAL) {
-            pillarSyncTickCounter = 0;
-
-            try {
-                for (net.minecraft.server.level.ServerLevel level : server.getAllLevels()) {
-                    if (level == null) {
-                        continue;
-                    }
-
-                    if (!level.getServer().isRunning()) {
-                        continue;
-                    }
-
-                    String dimensionKey = com.kingodogo.buildscape.config.PillarIdManager
-                            .getDimensionKey(
-                                    level);
-
-                    for (String pillarId : manager.getAllPillarIds()) {
-                        try {
-                            com.kingodogo.buildscape.config.PillarIdManager.PillarData data = manager
-                                    .getPillarData(pillarId);
-                            if (data == null || !data.dimension.equals(dimensionKey)) {
-                                continue;
-                            }
-                            if (!data.hasColors()) {
-                                continue;
-                            }
-
-                            net.minecraft.core.BlockPos pos = data.getBlockPos();
-
-                            if (!level.hasChunkAt(pos)) {
-                                continue;
-                            }
-
-                            net.minecraft.world.level.chunk.ChunkAccess chunk = level
-                                    .getChunk(pos);
-                            if (!(chunk instanceof net.minecraft.world.level.chunk.LevelChunk)) {
-                                continue;
-                            }
-
-                            if (!chunk
-                                    .getStatus()
-                                    .isOrAfter(net.minecraft.world.level.chunk.ChunkStatus.FULL)) {
-                                continue;
-                            }
-
-                            net.minecraft.world.level.block.entity.BlockEntity be = level
-                                    .getBlockEntity(pos);
-                            if (be instanceof com.kingodogo.buildscape.block.PillarBlockEntity pillarBE) {
-
-                                if (pillarBE.getPillarId() == null
-                                        || !pillarBE.getPillarId()
-                                        .equals(data.id)) {
-                                    pillarBE.forceSetColors(data.getColors(),
-                                            data.id);
-
-                                }
-                            }
-                        } catch (Exception e) {
-
-                        }
-                    }
-                }
-            } catch (Exception e) {
-
-            }
-        }
     }
 
     @SubscribeEvent

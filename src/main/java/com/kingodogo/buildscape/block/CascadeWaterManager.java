@@ -1,6 +1,7 @@
 package com.kingodogo.buildscape.block;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraftforge.common.FarmlandWaterManager;
@@ -22,7 +23,7 @@ public class CascadeWaterManager {
 
     @SubscribeEvent
     public static void onWorldUnload(WorldEvent.Unload event) {
-        if (event.getWorld() instanceof Level level) {
+        if (event.getWorld() instanceof ServerLevel level) {
             ResourceLocation dimension = level.dimension().location();
             Map<BlockPos, AABBTicket> dimensionTickets = TICKETS.remove(dimension);
             if (dimensionTickets != null) {

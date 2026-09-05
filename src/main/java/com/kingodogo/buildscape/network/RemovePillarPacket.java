@@ -44,23 +44,9 @@ public class RemovePillarPacket {
             if (!player.hasPermissions(2)) return;
 
             PillarIdManager manager = PillarIdManager.get();
-            boolean changed = false;
-            for (String id : pillarIds) {
-                PillarIdManager.PillarData data = manager.getPillarData(id);
-                if (data != null) {
-                    manager.removePillar(id);
-                    changed = true;
-                }
-            }
+            boolean changed = manager.removePillars(pillarIds);
 
             if (changed) {
-                manager.saveImmediate();
-
-                ModMessages.INSTANCE.send(
-                        net.minecraftforge.network.PacketDistributor.ALL.noArg(),
-                        new SyncPillarIdsPacket(manager.getAllPillarDataForSync())
-                );
-
                 manager.syncAllLoadedPillars(player.getServer());
             }
         });

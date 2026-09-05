@@ -68,13 +68,6 @@ public class UpdateAllPillarIdsPacket {
             }
 
             manager.replaceAllPillarData(newMap);
-            manager.saveImmediate();
-
-            ModMessages.INSTANCE.send(
-                    net.minecraftforge.network.PacketDistributor.ALL.noArg(),
-                    new SyncPillarIdsPacket(new ArrayList<>(newMap.values()))
-            );
-
             manager.syncAllLoadedPillars(player.getServer());
         });
         ctx.get().setPacketHandled(true);

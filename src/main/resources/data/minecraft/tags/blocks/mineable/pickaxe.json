@@ -1940,6 +1940,27 @@
     "buildscape:yellow_tiles_stairs",
     "buildscape:yellow_tiles_vertical_slab",
     "buildscape:yellow_tiles_wall",
-    "buildscape:yellow_trapped_decorated_pot"
+    "buildscape:yellow_trapped_decorated_pot",
+    "buildscape:bone_block_slab",
+    "buildscape:bone_block_stairs",
+    "buildscape:bone_block_wall",
+    "buildscape:bone_block_vertical_slab",
+    "buildscape:stacked_bone_block",
+    "buildscape:stacked_bone_stairs",
+    "buildscape:stacked_bone_slab",
+    "buildscape:stacked_bone_vertical_slab",
+    "buildscape:stacked_bone_wall",
+    "buildscape:polished_bone_block",
+    "buildscape:polished_bone_stairs",
+    "buildscape:polished_bone_slab",
+    "buildscape:polished_bone_vertical_slab",
+    "buildscape:polished_bone_wall",
+    "buildscape:bone_bricks",
+    "buildscape:bone_brick_stairs",
+    "buildscape:bone_brick_slab",
+    "buildscape:bone_brick_vertical_slab",
+    "buildscape:bone_brick_wall",
+    "buildscape:chiseled_bone_block",
+    "buildscape:bone_pillar"
   ]
 }

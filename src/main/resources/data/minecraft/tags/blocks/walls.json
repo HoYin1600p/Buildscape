@@ -193,6 +193,10 @@
     "buildscape:cut_steel_wall",
     "buildscape:polished_steel_wall",
     "buildscape:pressed_steel_wall",
-    "buildscape:sulfur_bricks_wall"
+    "buildscape:sulfur_bricks_wall",
+    "buildscape:bone_block_wall",
+    "buildscape:stacked_bone_wall",
+    "buildscape:polished_bone_wall",
+    "buildscape:bone_brick_wall"
   ]
 }

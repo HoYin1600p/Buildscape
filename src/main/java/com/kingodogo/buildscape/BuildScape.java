@@ -114,6 +114,8 @@ public class BuildScape {
                             (net.minecraft.world.item.RecordItem) ModItems.MUSIC_DISC_CELEBRATION.get());
                     recordMap.put(com.kingodogo.buildscape.sound.ModSounds.MUSIC_DISC_SNOWFALL.get(),
                             (net.minecraft.world.item.RecordItem) ModItems.MUSIC_DISC_SNOWFALL.get());
+                    recordMap.put(com.kingodogo.buildscape.sound.ModSounds.MUSIC_DISC_BUILDER.get(),
+                            (net.minecraft.world.item.RecordItem) ModItems.MUSIC_DISC_BUILDER.get());
                 }
             } catch (Exception e) {
                 LOGGER.error("Failed to register custom records into RecordItem.BY_NAME", e);

@@ -1,0 +1,9 @@
+{
+  "parent": "minecraft:block/inner_stairs",
+  "textures": {
+    "bottom": "buildscape:block/bone_bricks",
+    "top": "buildscape:block/bone_bricks",
+    "side": "buildscape:block/bone_bricks",
+    "particle": "buildscape:block/bone_bricks"
+  }
+}

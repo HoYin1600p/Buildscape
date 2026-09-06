@@ -1925,6 +1925,91 @@ public class ModItems {
             () ->
                     new BlockItem(ModBlocks.CALCITE_WALL.get(), createBlockItemProperties())
     );
+    public static final RegistryObject<Item> BONE_BLOCK_STAIRS = ITEMS.register(
+            "bone_block_stairs",
+            () ->
+                    new BlockItem(ModBlocks.BONE_BLOCK_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> BONE_BLOCK_SLAB = ITEMS.register(
+            "bone_block_slab",
+            () ->
+                    new BlockItem(ModBlocks.BONE_BLOCK_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> BONE_BLOCK_WALL = ITEMS.register(
+            "bone_block_wall",
+            () ->
+                    new BlockItem(ModBlocks.BONE_BLOCK_WALL.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> STACKED_BONE_BLOCK = ITEMS.register(
+            "stacked_bone_block",
+            () ->
+                    new BlockItem(ModBlocks.STACKED_BONE_BLOCK.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> STACKED_BONE_STAIRS = ITEMS.register(
+            "stacked_bone_stairs",
+            () ->
+                    new BlockItem(ModBlocks.STACKED_BONE_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> STACKED_BONE_SLAB = ITEMS.register(
+            "stacked_bone_slab",
+            () ->
+                    new BlockItem(ModBlocks.STACKED_BONE_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> STACKED_BONE_WALL = ITEMS.register(
+            "stacked_bone_wall",
+            () ->
+                    new BlockItem(ModBlocks.STACKED_BONE_WALL.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> POLISHED_BONE_BLOCK = ITEMS.register(
+            "polished_bone_block",
+            () ->
+                    new BlockItem(ModBlocks.POLISHED_BONE_BLOCK.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> POLISHED_BONE_STAIRS = ITEMS.register(
+            "polished_bone_stairs",
+            () ->
+                    new BlockItem(ModBlocks.POLISHED_BONE_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> POLISHED_BONE_SLAB = ITEMS.register(
+            "polished_bone_slab",
+            () ->
+                    new BlockItem(ModBlocks.POLISHED_BONE_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> POLISHED_BONE_WALL = ITEMS.register(
+            "polished_bone_wall",
+            () ->
+                    new BlockItem(ModBlocks.POLISHED_BONE_WALL.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> BONE_BRICKS = ITEMS.register(
+            "bone_bricks",
+            () ->
+                    new BlockItem(ModBlocks.BONE_BRICKS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> BONE_BRICK_STAIRS = ITEMS.register(
+            "bone_brick_stairs",
+            () ->
+                    new BlockItem(ModBlocks.BONE_BRICK_STAIRS.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> BONE_BRICK_SLAB = ITEMS.register(
+            "bone_brick_slab",
+            () ->
+                    new BlockItem(ModBlocks.BONE_BRICK_SLAB.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> BONE_BRICK_WALL = ITEMS.register(
+            "bone_brick_wall",
+            () ->
+                    new BlockItem(ModBlocks.BONE_BRICK_WALL.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> CHISELED_BONE_BLOCK = ITEMS.register(
+            "chiseled_bone_block",
+            () ->
+                    new BlockItem(ModBlocks.CHISELED_BONE_BLOCK.get(), createBlockItemProperties())
+    );
+    public static final RegistryObject<Item> BONE_PILLAR = ITEMS.register(
+            "bone_pillar",
+            () ->
+                    new BlockItem(ModBlocks.BONE_PILLAR.get(), createBlockItemProperties())
+    );
     public static final RegistryObject<Item> BEDROCK_SLAB = ITEMS.register(
             "bedrock_slab",
             () ->
@@ -8647,6 +8732,14 @@ public class ModItems {
             () -> new BlockItem(ModBlocks.QUARTZ_PILLAR_VERTICAL_SLAB.get(), createBlockItemProperties()));
     public static final RegistryObject<Item> CALCITE_VERTICAL_SLAB = ITEMS.register("calcite_vertical_slab",
             () -> new BlockItem(ModBlocks.CALCITE_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BONE_BLOCK_VERTICAL_SLAB = ITEMS.register("bone_block_vertical_slab",
+            () -> new BlockItem(ModBlocks.BONE_BLOCK_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> STACKED_BONE_VERTICAL_SLAB = ITEMS.register("stacked_bone_vertical_slab",
+            () -> new BlockItem(ModBlocks.STACKED_BONE_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> POLISHED_BONE_VERTICAL_SLAB = ITEMS.register("polished_bone_vertical_slab",
+            () -> new BlockItem(ModBlocks.POLISHED_BONE_VERTICAL_SLAB.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BONE_BRICK_VERTICAL_SLAB = ITEMS.register("bone_brick_vertical_slab",
+            () -> new BlockItem(ModBlocks.BONE_BRICK_VERTICAL_SLAB.get(), createBlockItemProperties()));
     public static final RegistryObject<Item> OBSIDIAN_VERTICAL_SLAB = ITEMS.register("obsidian_vertical_slab",
             () -> new BlockItem(ModBlocks.OBSIDIAN_VERTICAL_SLAB.get(), createBlockItemProperties()));
     public static final RegistryObject<Item> SMOOTH_BASALT_VERTICAL_SLAB = ITEMS.register("smooth_basalt_vertical_slab",
@@ -12197,6 +12290,15 @@ public static final RegistryObject<Item> FLAMING_STEEL_INGOT = ITEMS.register("f
             () -> new net.minecraft.world.item.RecordItem(
                     15,
                     com.kingodogo.buildscape.sound.ModSounds.MUSIC_DISC_SNOWFALL,
+                    new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB).stacksTo(1).rarity(net.minecraft.world.item.Rarity.RARE)
+            )
+    );
+
+    public static final RegistryObject<Item> MUSIC_DISC_BUILDER = ITEMS.register(
+            "music_disc_builder",
+            () -> new net.minecraft.world.item.RecordItem(
+                    13,
+                    com.kingodogo.buildscape.sound.ModSounds.MUSIC_DISC_BUILDER,
                     new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB).stacksTo(1).rarity(net.minecraft.world.item.Rarity.RARE)
             )
     );

@@ -140,6 +140,10 @@
     "buildscape:yellow_sandstone_wall",
     "buildscape:yellow_smooth_sandstone_wall",
     "buildscape:yellow_tiles_wall",
-    "buildscape:yellow_wool_wall"
+    "buildscape:yellow_wool_wall",
+    "buildscape:bone_block_wall",
+    "buildscape:stacked_bone_wall",
+    "buildscape:polished_bone_wall",
+    "buildscape:bone_brick_wall"
   ]
 }

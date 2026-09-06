@@ -100,8 +100,42 @@ public class AdvancementEvents {
                         case "celebrate_in_style" -> giveItemReward(serverPlayer, ModItems.MUSIC_DISC_CELEBRATION.get(), 1);
                         case "a_white_christmas" -> giveItemReward(serverPlayer, ModItems.SNOWY_SPRUCE_LEAVES.get(), 1);
                         case "a_very_buildscape_christmas" -> giveItemReward(serverPlayer, ModItems.FESTIVE_GLINT_SHARD.get(), 1);
+                        case "a_full_buildscape_cube" -> giveItemReward(serverPlayer, ModItems.MUSIC_DISC_BUILDER.get(), 1);
                         default -> {}
                     }
+
+                    // 3. Update "A Full Buildscape Cube" progress
+                    if (!"a_full_buildscape_cube".equals(path) && !path.startsWith("recipes/")) {
+                        checkFullCubeAdvancement(serverPlayer);
+                    }
+                }
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public static void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
+        if (event.getPlayer() instanceof ServerPlayer serverPlayer) {
+            checkFullCubeAdvancement(serverPlayer);
+        }
+    }
+
+    public static void checkFullCubeAdvancement(ServerPlayer serverPlayer) {
+        if (serverPlayer == null || serverPlayer.getServer() == null) return;
+        Advancement cubeAdv = serverPlayer.getServer().getAdvancements().getAdvancement(new ResourceLocation("buildscape", "a_full_buildscape_cube"));
+        if (cubeAdv == null) return;
+        AdvancementProgress cubeProgress = serverPlayer.getAdvancements().getOrStartProgress(cubeAdv);
+        if (cubeProgress.isDone()) return;
+
+        for (String criterion : cubeAdv.getCriteria().keySet()) {
+            net.minecraft.advancements.CriterionProgress cp = cubeProgress.getCriterion(criterion);
+            if (cp != null && cp.isDone()) continue;
+
+            Advancement reqAdv = serverPlayer.getServer().getAdvancements().getAdvancement(new ResourceLocation("buildscape", criterion));
+            if (reqAdv != null) {
+                AdvancementProgress reqProgress = serverPlayer.getAdvancements().getOrStartProgress(reqAdv);
+                if (reqProgress.isDone()) {
+                    serverPlayer.getAdvancements().award(cubeAdv, criterion);
                 }
             }
         }

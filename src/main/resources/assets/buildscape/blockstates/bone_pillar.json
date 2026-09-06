@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "axis=y": {
+      "model": "buildscape:block/bone_pillar"
+    },
+    "axis=z": {
+      "model": "buildscape:block/bone_pillar_horizontal",
+      "x": 90
+    },
+    "axis=x": {
+      "model": "buildscape:block/bone_pillar_horizontal",
+      "x": 90,
+      "y": 90
+    }
+  }
+}

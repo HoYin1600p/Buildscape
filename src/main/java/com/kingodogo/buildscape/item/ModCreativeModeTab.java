@@ -247,8 +247,13 @@ public class ModCreativeModeTab {
             }
         }
 
-private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
-            items.add(new ItemStack(ModItems.BIT_COPPER_BLOCK.get()));
+    private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
+        addHardcodedItemsPart1(items);
+        addHardcodedItemsPart2(items);
+    }
+
+    private void addHardcodedItemsPart1(@NotNull NonNullList<ItemStack> items) {
+        items.add(new ItemStack(ModItems.BIT_COPPER_BLOCK.get()));
             items.add(new ItemStack(ModItems.BIT_COPPER_BLOCK_STAIRS.get()));
             items.add(new ItemStack(ModItems.BIT_COPPER_BLOCK_SLAB.get()));
             items.add(new ItemStack(ModItems.BIT_COPPER_BLOCK_VERTICAL_SLAB.get()));
@@ -1803,6 +1808,9 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.WHITE_SMOOTH_SANDSTONE_SLAB.get()));
             items.add(new ItemStack(ModItems.WHITE_SMOOTH_SANDSTONE_VERTICAL_SLAB.get()));
             items.add(new ItemStack(ModItems.WHITE_SMOOTH_SANDSTONE_WALL.get()));
+    }
+
+    private void addHardcodedItemsPart2(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.BLACK_SAND.get()));
             items.add(new ItemStack(ModItems.BLACK_SANDSTONE.get()));
             items.add(new ItemStack(ModItems.BLACK_SANDSTONE_STAIRS.get()));
@@ -2452,6 +2460,7 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.CONFETTI_ITEM.get()));
             items.add(new ItemStack(ModItems.MUSIC_DISC_CELEBRATION.get()));
             items.add(new ItemStack(ModItems.MUSIC_DISC_SNOWFALL.get()));
+            items.add(new ItemStack(ModItems.MUSIC_DISC_BUILDER.get()));
 
             ItemStack cakeStar = new ItemStack(Items.FIREWORK_STAR);
             net.minecraft.nbt.CompoundTag cakeExp = cakeStar.getOrCreateTagElement("Explosion");
@@ -3341,6 +3350,31 @@ private void addHardcodedItems(@NotNull NonNullList<ItemStack> items) {
             items.add(new ItemStack(ModItems.CALCITE_SLAB.get()));
             items.add(new ItemStack(ModItems.CALCITE_VERTICAL_SLAB.get()));
             items.add(new ItemStack(ModItems.CALCITE_WALL.get()));
+            items.add(new ItemStack(ModItems.BONE_BLOCK_STAIRS.get()));
+            items.add(new ItemStack(ModItems.BONE_BLOCK_SLAB.get()));
+            items.add(new ItemStack(ModItems.BONE_BLOCK_VERTICAL_SLAB.get()));
+            items.add(new ItemStack(ModItems.BONE_BLOCK_WALL.get()));
+
+            items.add(new ItemStack(ModItems.STACKED_BONE_BLOCK.get()));
+            items.add(new ItemStack(ModItems.STACKED_BONE_STAIRS.get()));
+            items.add(new ItemStack(ModItems.STACKED_BONE_SLAB.get()));
+            items.add(new ItemStack(ModItems.STACKED_BONE_VERTICAL_SLAB.get()));
+            items.add(new ItemStack(ModItems.STACKED_BONE_WALL.get()));
+
+            items.add(new ItemStack(ModItems.POLISHED_BONE_BLOCK.get()));
+            items.add(new ItemStack(ModItems.POLISHED_BONE_STAIRS.get()));
+            items.add(new ItemStack(ModItems.POLISHED_BONE_SLAB.get()));
+            items.add(new ItemStack(ModItems.POLISHED_BONE_VERTICAL_SLAB.get()));
+            items.add(new ItemStack(ModItems.POLISHED_BONE_WALL.get()));
+
+            items.add(new ItemStack(ModItems.BONE_BRICKS.get()));
+            items.add(new ItemStack(ModItems.BONE_BRICK_STAIRS.get()));
+            items.add(new ItemStack(ModItems.BONE_BRICK_SLAB.get()));
+            items.add(new ItemStack(ModItems.BONE_BRICK_VERTICAL_SLAB.get()));
+            items.add(new ItemStack(ModItems.BONE_BRICK_WALL.get()));
+
+            items.add(new ItemStack(ModItems.CHISELED_BONE_BLOCK.get()));
+            items.add(new ItemStack(ModItems.BONE_PILLAR.get()));
             items.add(new ItemStack(ModItems.MOSSY_CALCITE.get()));
             items.add(new ItemStack(ModItems.MOSSY_CALCITE_STAIRS.get()));
             items.add(new ItemStack(ModItems.MOSSY_CALCITE_SLAB.get()));

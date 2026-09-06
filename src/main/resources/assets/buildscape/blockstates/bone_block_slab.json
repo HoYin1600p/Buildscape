@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "buildscape:block/bone_block_slab"
+    },
+    "type=top": {
+      "model": "buildscape:block/bone_block_slab_top"
+    },
+    "type=double": {
+      "model": "minecraft:block/bone_block"
+    }
+  }
+}

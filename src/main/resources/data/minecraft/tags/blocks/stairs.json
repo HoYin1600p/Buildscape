@@ -112,6 +112,10 @@
     "buildscape:yellow_flaming_polished_steel_stairs",
     "buildscape:yellow_flaming_pressed_steel_stairs",
     "buildscape:yellow_flaming_steel_block_stairs",
-    "buildscape:yellow_layered_wool_stairs"
+    "buildscape:yellow_layered_wool_stairs",
+    "buildscape:bone_block_stairs",
+    "buildscape:stacked_bone_stairs",
+    "buildscape:polished_bone_stairs",
+    "buildscape:bone_brick_stairs"
   ]
 }

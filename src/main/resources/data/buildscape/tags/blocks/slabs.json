@@ -570,6 +570,10 @@
     "buildscape:yellow_tiles_slab",
     "buildscape:yellow_tiles_vertical_slab",
     "buildscape:yellow_wool_slab",
-    "buildscape:yellow_wool_vertical_slab"
+    "buildscape:yellow_wool_vertical_slab",
+    "buildscape:bone_block_slab",
+    "buildscape:stacked_bone_slab",
+    "buildscape:polished_bone_slab",
+    "buildscape:bone_brick_slab"
   ]
 }

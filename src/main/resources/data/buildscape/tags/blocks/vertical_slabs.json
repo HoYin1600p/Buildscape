@@ -479,6 +479,10 @@
     "buildscape:yellow_stained_glass_vertical_slab",
     "buildscape:yellow_terracotta_vertical_slab",
     "buildscape:yellow_tiles_vertical_slab",
-    "buildscape:yellow_wool_vertical_slab"
+    "buildscape:yellow_wool_vertical_slab",
+    "buildscape:bone_block_vertical_slab",
+    "buildscape:stacked_bone_vertical_slab",
+    "buildscape:polished_bone_vertical_slab",
+    "buildscape:bone_brick_vertical_slab"
   ]
 }

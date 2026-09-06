@@ -1897,6 +1897,122 @@ public class ModBlocks {
                                                         .strength(0.75f)
                                                         .requiresCorrectToolForDrops()
                                                         .sound(net.minecraft.world.level.block.SoundType.CALCITE)));
+        public static final RegistryObject<Block> BONE_BLOCK_STAIRS = BLOCKS.register(
+                        "bone_block_stairs",
+                        () -> new ModStairBlock(
+                                        Blocks.BONE_BLOCK.defaultBlockState(),
+                                        BlockBehaviour.Properties.of(
+                                                        Material.STONE,
+                                                        MaterialColor.SAND)
+                                                        .strength(2.0f)
+                                                        .requiresCorrectToolForDrops()
+                                                        .sound(net.minecraft.world.level.block.SoundType.BONE_BLOCK)));
+        public static final RegistryObject<Block> BONE_BLOCK_SLAB = BLOCKS.register(
+                        "bone_block_slab",
+                        () -> new SlabBlock(
+                                        BlockBehaviour.Properties.of(
+                                                        Material.STONE,
+                                                        MaterialColor.SAND)
+                                                        .strength(2.0f)
+                                                        .requiresCorrectToolForDrops()
+                                                        .sound(net.minecraft.world.level.block.SoundType.BONE_BLOCK)));
+        public static final RegistryObject<Block> BONE_BLOCK_WALL = BLOCKS.register(
+                        "bone_block_wall",
+                        () -> new WallBlock(
+                                        BlockBehaviour.Properties.of(
+                                                        Material.STONE,
+                                                        MaterialColor.SAND)
+                                                        .strength(2.0f)
+                                                        .requiresCorrectToolForDrops()
+                                                        .sound(net.minecraft.world.level.block.SoundType.BONE_BLOCK)));
+        public static final RegistryObject<Block> STACKED_BONE_BLOCK = BLOCKS.register(
+                        "stacked_bone_block",
+                        () -> new ModBlock(
+                                        BlockBehaviour.Properties.of(
+                                                        Material.STONE,
+                                                        MaterialColor.SAND)
+                                                        .strength(2.0f)
+                                                        .requiresCorrectToolForDrops()
+                                                        .sound(net.minecraft.world.level.block.SoundType.BONE_BLOCK)));
+        public static final RegistryObject<Block> STACKED_BONE_STAIRS = BLOCKS.register(
+                        "stacked_bone_stairs",
+                        () -> new ModStairBlock(
+                                        STACKED_BONE_BLOCK.get().defaultBlockState(),
+                                        BlockBehaviour.Properties.copy(STACKED_BONE_BLOCK.get())));
+        public static final RegistryObject<Block> STACKED_BONE_SLAB = BLOCKS.register(
+                        "stacked_bone_slab",
+                        () -> new SlabBlock(
+                                        BlockBehaviour.Properties.copy(STACKED_BONE_BLOCK.get())));
+        public static final RegistryObject<Block> STACKED_BONE_WALL = BLOCKS.register(
+                        "stacked_bone_wall",
+                        () -> new WallBlock(
+                                        BlockBehaviour.Properties.copy(STACKED_BONE_BLOCK.get())));
+
+        public static final RegistryObject<Block> POLISHED_BONE_BLOCK = BLOCKS.register(
+                        "polished_bone_block",
+                        () -> new ModBlock(
+                                        BlockBehaviour.Properties.of(
+                                                        Material.STONE,
+                                                        MaterialColor.SAND)
+                                                        .strength(2.0f)
+                                                        .requiresCorrectToolForDrops()
+                                                        .sound(net.minecraft.world.level.block.SoundType.BONE_BLOCK)));
+        public static final RegistryObject<Block> POLISHED_BONE_STAIRS = BLOCKS.register(
+                        "polished_bone_stairs",
+                        () -> new ModStairBlock(
+                                        POLISHED_BONE_BLOCK.get().defaultBlockState(),
+                                        BlockBehaviour.Properties.copy(POLISHED_BONE_BLOCK.get())));
+        public static final RegistryObject<Block> POLISHED_BONE_SLAB = BLOCKS.register(
+                        "polished_bone_slab",
+                        () -> new SlabBlock(
+                                        BlockBehaviour.Properties.copy(POLISHED_BONE_BLOCK.get())));
+        public static final RegistryObject<Block> POLISHED_BONE_WALL = BLOCKS.register(
+                        "polished_bone_wall",
+                        () -> new WallBlock(
+                                        BlockBehaviour.Properties.copy(POLISHED_BONE_BLOCK.get())));
+
+        public static final RegistryObject<Block> BONE_BRICKS = BLOCKS.register(
+                        "bone_bricks",
+                        () -> new ModBlock(
+                                        BlockBehaviour.Properties.of(
+                                                        Material.STONE,
+                                                        MaterialColor.SAND)
+                                                        .strength(2.0f)
+                                                        .requiresCorrectToolForDrops()
+                                                        .sound(net.minecraft.world.level.block.SoundType.BONE_BLOCK)));
+        public static final RegistryObject<Block> BONE_BRICK_STAIRS = BLOCKS.register(
+                        "bone_brick_stairs",
+                        () -> new ModStairBlock(
+                                        BONE_BRICKS.get().defaultBlockState(),
+                                        BlockBehaviour.Properties.copy(BONE_BRICKS.get())));
+        public static final RegistryObject<Block> BONE_BRICK_SLAB = BLOCKS.register(
+                        "bone_brick_slab",
+                        () -> new SlabBlock(
+                                        BlockBehaviour.Properties.copy(BONE_BRICKS.get())));
+        public static final RegistryObject<Block> BONE_BRICK_WALL = BLOCKS.register(
+                        "bone_brick_wall",
+                        () -> new WallBlock(
+                                        BlockBehaviour.Properties.copy(BONE_BRICKS.get())));
+
+        public static final RegistryObject<Block> CHISELED_BONE_BLOCK = BLOCKS.register(
+                        "chiseled_bone_block",
+                        () -> new ModBlock(
+                                        BlockBehaviour.Properties.of(
+                                                        Material.STONE,
+                                                        MaterialColor.SAND)
+                                                        .strength(2.0f)
+                                                        .requiresCorrectToolForDrops()
+                                                        .sound(net.minecraft.world.level.block.SoundType.BONE_BLOCK)));
+
+        public static final RegistryObject<Block> BONE_PILLAR = BLOCKS.register(
+                        "bone_pillar",
+                        () -> new RotatedPillarBlock(
+                                        BlockBehaviour.Properties.of(
+                                                        Material.STONE,
+                                                        MaterialColor.SAND)
+                                                        .strength(2.0f)
+                                                        .requiresCorrectToolForDrops()
+                                                        .sound(net.minecraft.world.level.block.SoundType.BONE_BLOCK)));
         public static final RegistryObject<Block> BEDROCK_STAIRS = BLOCKS.register(
                         "bedrock_stairs",
                         () -> new ModStairBlock(
@@ -9346,6 +9462,26 @@ public class ModBlocks {
                         () -> new VerticalSlabBlock(
                                         Blocks.CALCITE,
                                         BlockBehaviour.Properties.copy(CALCITE_SLAB.get())));
+        public static final RegistryObject<Block> BONE_BLOCK_VERTICAL_SLAB = BLOCKS.register(
+                        "bone_block_vertical_slab",
+                        () -> new VerticalSlabBlock(
+                                        Blocks.BONE_BLOCK,
+                                        BlockBehaviour.Properties.copy(BONE_BLOCK_SLAB.get())));
+        public static final RegistryObject<Block> STACKED_BONE_VERTICAL_SLAB = BLOCKS.register(
+                        "stacked_bone_vertical_slab",
+                        () -> new VerticalSlabBlock(
+                                        STACKED_BONE_BLOCK.get(),
+                                        BlockBehaviour.Properties.copy(STACKED_BONE_SLAB.get())));
+        public static final RegistryObject<Block> POLISHED_BONE_VERTICAL_SLAB = BLOCKS.register(
+                        "polished_bone_vertical_slab",
+                        () -> new VerticalSlabBlock(
+                                        POLISHED_BONE_BLOCK.get(),
+                                        BlockBehaviour.Properties.copy(POLISHED_BONE_SLAB.get())));
+        public static final RegistryObject<Block> BONE_BRICK_VERTICAL_SLAB = BLOCKS.register(
+                        "bone_brick_vertical_slab",
+                        () -> new VerticalSlabBlock(
+                                        BONE_BRICKS.get(),
+                                        BlockBehaviour.Properties.copy(BONE_BRICK_SLAB.get())));
         public static final RegistryObject<Block> OBSIDIAN_VERTICAL_SLAB = BLOCKS.register("obsidian_vertical_slab",
                         () -> new VerticalSlabBlock(
                                         Blocks.OBSIDIAN,

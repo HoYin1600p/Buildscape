@@ -9,5 +9,7 @@
   "json.format.enable": false,
   "files.associations": {
     "*.mcmeta": "json"
-  }
+  },
+  "java.compile.nullAnalysis.mode": "automatic",
+  "java.configuration.updateBuildConfiguration": "interactive"
 }

@@ -531,6 +531,8 @@ public class ModSounds {
             registerSoundEvent("music_disc_celebration");
     public static final RegistryObject<SoundEvent> MUSIC_DISC_SNOWFALL =
             registerSoundEvent("music_disc_snowfall");
+    public static final RegistryObject<SoundEvent> MUSIC_DISC_BUILDER =
+            registerSoundEvent("music_disc_builder");
 
     public static void register(IEventBus eventBus) {
         SOUND_EVENTS.register(eventBus);

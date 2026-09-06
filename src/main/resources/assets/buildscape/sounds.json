@@ -1190,5 +1190,13 @@
         "stream": true
       }
     ]
+  },
+  "music_disc_builder": {
+    "sounds": [
+      {
+        "name": "buildscape:music/builder",
+        "stream": true
+      }
+    ]
   }
 }

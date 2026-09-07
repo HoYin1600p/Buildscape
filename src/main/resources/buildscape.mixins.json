@@ -6,6 +6,7 @@
   "refmap": "buildscape.refmap.json",
   "plugin": "com.kingodogo.buildscape.mixin.BuildscapeMixinPlugin",
   "mixins": [
+    "AgeableMobMixin",
     "AbstractContainerMenuMixin",
     "AnvilMenuMixin",
     "BeaconBeamSectionAccessor",

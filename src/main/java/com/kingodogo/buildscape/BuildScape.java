@@ -2605,12 +2605,16 @@ public class BuildScape {
                 && !(event.getTarget() instanceof net.minecraft.world.entity.monster.Monster)) {
             net.minecraft.world.item.ItemStack held = event.getItemStack();
             if (held.is(ModItems.GOLDEN_DANDELION.get())) {
-                net.minecraft.nbt.CompoundTag data = mob.getPersistentData();
-                boolean isFrozen = data.getBoolean("buildscape:frozen_growth");
+                boolean isFrozen = com.kingodogo.buildscape.util.GoldenDandelionGrowth.isFrozen(mob);
+                if (!com.kingodogo.buildscape.util.GoldenDandelionGrowth.canToggle(mob.isBaby(), isFrozen)) {
+                    return;
+                }
                 net.minecraft.world.level.Level level = event.getWorld();
                 if (!level.isClientSide) {
                     if (!isFrozen) {
-                        data.putBoolean("buildscape:frozen_growth", true);
+                        if (!com.kingodogo.buildscape.util.GoldenDandelionGrowth.setFrozen(mob, true)) {
+                            return;
+                        }
                         ((net.minecraft.server.level.ServerLevel) level).sendParticles(
                                 net.minecraft.core.particles.ParticleTypes.WAX_OFF,
                                 mob.getX(), mob.getY() + mob.getBbHeight() * 0.5D, mob.getZ(),
@@ -2619,7 +2623,7 @@ public class BuildScape {
                                 net.minecraft.sounds.SoundEvents.HONEYCOMB_WAX_ON,
                                 net.minecraft.sounds.SoundSource.NEUTRAL, 1.0F, 1.0F);
                     } else {
-                        data.remove("buildscape:frozen_growth");
+                        com.kingodogo.buildscape.util.GoldenDandelionGrowth.setFrozen(mob, false);
                         ((net.minecraft.server.level.ServerLevel) level).sendParticles(
                                 net.minecraft.core.particles.ParticleTypes.HAPPY_VILLAGER,
                                 mob.getX(), mob.getY() + mob.getBbHeight() * 0.5D, mob.getZ(),
@@ -2641,19 +2645,6 @@ public class BuildScape {
     @SubscribeEvent
     public void onLivingUpdate(net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent event) {
         net.minecraft.world.entity.LivingEntity living = event.getEntityLiving();
-        if (living instanceof net.minecraft.world.entity.AgeableMob mob
-                && !(living instanceof net.minecraft.world.entity.monster.Monster)) {
-            if (mob.getPersistentData().getBoolean("buildscape:frozen_growth")) {
-                if (mob.isBaby()) {
-                    mob.setAge(-24000);
-                } else {
-                    if (mob.getAge() != 0) {
-                        mob.setAge(0);
-                    }
-                }
-            }
-        }
-
         net.minecraft.world.level.material.FluidState fluid = living.level.getFluidState(living.blockPosition());
         if (fluid.getType() == com.kingodogo.buildscape.fluid.ModFluids.EXPERIENCE_STILL.get() || fluid.getType() == com.kingodogo.buildscape.fluid.ModFluids.EXPERIENCE_FLOWING.get()) {
             if (living.isSwimming() || living.isInWater()) {

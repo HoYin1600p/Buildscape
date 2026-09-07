@@ -23,7 +23,9 @@ public final class BuildscapeBlockStateCacheCoordinator {
     public static synchronized void begin() {
         PENDING_STATES.clear();
         Set<Block> blocks = Collections.newSetFromMap(new IdentityHashMap<>());
-        ModBlocks.BLOCKS.getEntries().forEach(entry -> blocks.add(entry.get()));
+        ModBlocks.BLOCKS.getEntries().stream()
+                .filter(entry -> entry.isPresent())
+                .forEach(entry -> blocks.add(entry.get()));
         buildscapeBlocks = blocks;
         collecting = true;
     }

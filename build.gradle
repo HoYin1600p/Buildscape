@@ -222,7 +222,17 @@ tasks.register('syncBundledRecipeCache', JavaExec) {
             file('src/main/resources/data/buildscape/recipes_pack/recipes.bscb').absolutePath
 }
 
+tasks.register('verifyBundledRecipeCache', JavaExec) {
+    group = 'verification'
+    description = 'Verifies that the bundled BDRE cache matches the compact recipe sources.'
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.kingodogo.buildscape.recipe.framework.cache.BundledRecipeCacheVerify'
+    args file('src/main/resources/data/buildscape/recipes_pack').absolutePath,
+            file('src/main/resources/data/buildscape/recipes_pack/recipes.bscb').absolutePath
+}
+
 tasks.named('check').configure {
     dependsOn 'runPipeSpillTests', 'runPipeOutletTests',
-            'runRecipeManagerInjectorTests', 'runBinaryRecipeCacheTests', 'runTreeChopTraversalTests'
+            'runRecipeManagerInjectorTests', 'runBinaryRecipeCacheTests', 'runTreeChopTraversalTests',
+            'verifyBundledRecipeCache'
 }

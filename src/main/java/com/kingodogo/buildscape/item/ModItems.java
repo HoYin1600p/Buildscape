@@ -2010,6 +2010,11 @@ public class ModItems {
             () ->
                     new BlockItem(ModBlocks.BONE_PILLAR.get(), createBlockItemProperties())
     );
+    public static final RegistryObject<Item> BONE_DICE = ITEMS.register(
+            "bone_dice",
+            () ->
+                    new BlockItem(ModBlocks.BONE_DICE.get(), createBlockItemProperties())
+    );
     public static final RegistryObject<Item> BEDROCK_SLAB = ITEMS.register(
             "bedrock_slab",
             () ->

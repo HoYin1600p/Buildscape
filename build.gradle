@@ -217,6 +217,11 @@ tasks.register('runBeaconBeamScanTests', JavaExec) {
     mainClass = 'com.kingodogo.buildscape.util.BeaconBeamScanStateTest'
 }
 
+tasks.register('runGoldenDandelionGrowthTests', JavaExec) {
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.kingodogo.buildscape.util.GoldenDandelionGrowthTest'
+}
+
 tasks.register('syncBundledRecipeCache', JavaExec) {
     group = 'buildscape'
     description = 'Copies a verified local BDRE cache into the bundled recipe resources.'
@@ -239,6 +244,6 @@ tasks.register('verifyBundledRecipeCache', JavaExec) {
 tasks.named('check').configure {
     dependsOn 'runPipeSpillTests', 'runPipeOutletTests',
             'runRecipeManagerInjectorTests', 'runBinaryRecipeCacheTests', 'runTreeChopTraversalTests',
-            'runBeaconBeamScanTests',
+            'runBeaconBeamScanTests', 'runGoldenDandelionGrowthTests',
             'verifyBundledRecipeCache'
 }

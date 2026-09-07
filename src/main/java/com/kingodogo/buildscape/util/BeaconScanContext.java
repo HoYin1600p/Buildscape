@@ -1,9 +1,7 @@
 package com.kingodogo.buildscape.util;
 
-import com.kingodogo.buildscape.mixin.BeaconBlockEntityAccessor;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.entity.BeaconBlockEntity;
 
@@ -32,9 +30,6 @@ public final class BeaconScanContext {
 
         BLOCKING_POS.set(pos.immutable());
         ((BeaconBeamHeightAccessor) beacon).buildscape$markBeamBlocked(pos.getY() - beaconPos.getY());
-        if (level instanceof Level actualLevel && !actualLevel.isClientSide) {
-            ((BeaconBlockEntityAccessor) beacon).getBeamSections().clear();
-        }
     }
 
     public static boolean blocksLight(BlockGetter level, BlockPos pos) {

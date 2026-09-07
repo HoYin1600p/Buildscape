@@ -17,7 +17,6 @@ import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.HorizontalDirectionalBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
@@ -89,7 +88,6 @@ public class BoneDiceBlock extends Block {
                 Direction newFacing = Direction.Plane.HORIZONTAL.getRandomDirection(random);
                 BlockState newState = state.setValue(ROLL, newRoll).setValue(FACING, newFacing);
                 level.setBlock(pos, newState, 3);
-                level.updateNeighborsAt(pos, this);
 
                 player.displayClientMessage(
                         new TranslatableComponent("message.buildscape.bone_dice.rolled", newRoll)
@@ -119,14 +117,12 @@ public class BoneDiceBlock extends Block {
 
         for (int i = 0; i <= 4; i++) {
             double f = i / 4.0;
-            // North edge
             level.sendParticles(ParticleTypes.WAX_ON, minX + f * (maxX - minX), y, minZ, 1, 0, 0, 0, 0);
-            // South edge
             level.sendParticles(ParticleTypes.WAX_ON, minX + f * (maxX - minX), y, maxZ, 1, 0, 0, 0, 0);
-            // West edge
-            level.sendParticles(ParticleTypes.WAX_ON, minX, y, minZ + f * (maxZ - minZ), 1, 0, 0, 0, 0);
-            // East edge
-            level.sendParticles(ParticleTypes.WAX_ON, maxX, y, minZ + f * (maxZ - minZ), 1, 0, 0, 0, 0);
+            if (i > 0 && i < 4) {
+                level.sendParticles(ParticleTypes.WAX_ON, minX, y, minZ + f * (maxZ - minZ), 1, 0, 0, 0, 0);
+                level.sendParticles(ParticleTypes.WAX_ON, maxX, y, minZ + f * (maxZ - minZ), 1, 0, 0, 0, 0);
+            }
         }
 
         level.sendParticles(ParticleTypes.GLOW, pos.getX() + 0.5, y + 0.05, pos.getZ() + 0.5, 6, 0.15, 0.02, 0.15, 0.02);

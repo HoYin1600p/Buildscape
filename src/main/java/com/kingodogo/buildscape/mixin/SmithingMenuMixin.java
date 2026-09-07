@@ -24,7 +24,7 @@ public abstract class SmithingMenuMixin extends ItemCombinerMenu {
     @Inject(method = "onTake", at = @At("HEAD"))
     private void buildscape$preserveTemplateHead(Player player, ItemStack stack, CallbackInfo ci) {
         ItemStack rightSlot = this.inputSlots.getItem(1);
-        if (!rightSlot.isEmpty() && (rightSlot.is(ModItems.BIG_ORNAMENT_TEMPLATE.get()) || rightSlot.getItem().hasContainerItem(rightSlot))) {
+        if (rightSlot.is(ModItems.BIG_ORNAMENT_TEMPLATE.get())) {
             this.buildscape$savedTemplate = rightSlot.copy();
         } else {
             this.buildscape$savedTemplate = ItemStack.EMPTY;

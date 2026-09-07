@@ -1,6 +1,7 @@
 package com.kingodogo.buildscape.mixin;
 
 import com.kingodogo.buildscape.util.BeaconBeamHeightAccessor;
+import com.kingodogo.buildscape.util.BeaconBeamScanState;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BeaconRenderer;
@@ -37,7 +38,7 @@ public class BeaconBlockEntityRendererMixin {
         int newHeight = height;
         if (blockEntity instanceof BeaconBeamHeightAccessor) {
             int customHeight = ((BeaconBeamHeightAccessor) blockEntity).buildscape$getBeamHeight();
-            if (customHeight < 1024) {
+            if (customHeight < BeaconBeamScanState.UNLIMITED) {
                 int remaining = customHeight - yOffset;
                 if (remaining <= 0) {
                     return;

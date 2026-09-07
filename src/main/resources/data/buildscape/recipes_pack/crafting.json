@@ -2188,6 +2188,7 @@
     ["BS:bone_bricks",["##","##"],[["#","BS:polished_bone_block"]],4],
     ["BS:chiseled_bone_block",["#","#"],[["#","BS:polished_bone_slab"]],1],
     ["BS:bone_pillar",["#","#","#"],[["#","BS:polished_bone_block"]],3],
+    ["BS:bone_dice",[" B ","B#B"," B "],[["#","MC:bone_block"],["B","#MC:buttons"]],1],
     ["BS:stacked_bone_slab",["###"],[["#","BS:stacked_bone_block"]],6],
     ["BS:stacked_bone_stairs",["#  ","## ","###"],[["#","BS:stacked_bone_block"]],4],
     ["BS:stacked_bone_wall",["###","###"],[["#","BS:stacked_bone_block"]],6],

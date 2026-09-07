@@ -1,6 +1,7 @@
 package com.kingodogo.buildscape.mixin;
 
 import com.kingodogo.buildscape.util.BeaconBeamHeightAccessor;
+import com.kingodogo.buildscape.util.BeaconBeamScanState;
 import com.kingodogo.buildscape.util.BeaconScanContext;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
@@ -20,31 +21,46 @@ import java.util.List;
 public class BeaconBlockEntityMixin implements BeaconBeamHeightAccessor {
 
     @Unique
-    private static final int BUILDSCAPE_UNLIMITED = 1024;
-
-    @Unique
-    private int buildscape$beamHeight = BUILDSCAPE_UNLIMITED;
+    private final BeaconBeamScanState buildscape$beamScanState = new BeaconBeamScanState();
 
     @Override
     public int buildscape$getBeamHeight() {
-        return this.buildscape$beamHeight;
+        return this.buildscape$beamScanState.confirmedHeight();
     }
 
     @Override
-    public void buildscape$setBeamHeight(int height) {
-        this.buildscape$beamHeight = height;
+    public int buildscape$getPendingBeamHeight() {
+        return this.buildscape$beamScanState.pendingHeight();
+    }
+
+    @Override
+    public void buildscape$beginBeamScan() {
+        this.buildscape$beamScanState.beginScan();
+    }
+
+    @Override
+    public void buildscape$markBeamBlocked(int height) {
+        this.buildscape$beamScanState.markBlocked(height);
+    }
+
+    @Override
+    public void buildscape$completeBeamScan() {
+        this.buildscape$beamScanState.completeScan();
     }
 
     @Inject(method = "tick", at = @At("HEAD"))
     private static void buildscape$onTick(Level level, BlockPos pos, BlockState state, BeaconBlockEntity blockEntity, CallbackInfo ci) {
         BeaconScanContext.begin(blockEntity);
         if (((BeaconBlockEntityAccessor) blockEntity).getLastCheckY() < pos.getY()) {
-            ((BeaconBeamHeightAccessor) blockEntity).buildscape$setBeamHeight(BUILDSCAPE_UNLIMITED);
+            ((BeaconBeamHeightAccessor) blockEntity).buildscape$beginBeamScan();
         }
     }
 
     @Inject(method = "tick", at = @At("RETURN"))
     private static void buildscape$afterTick(Level level, BlockPos pos, BlockState state, BeaconBlockEntity blockEntity, CallbackInfo ci) {
+        if (((BeaconBlockEntityAccessor) blockEntity).getLastCheckY() < pos.getY()) {
+            ((BeaconBeamHeightAccessor) blockEntity).buildscape$completeBeamScan();
+        }
         BeaconScanContext.end();
     }
 
@@ -56,8 +72,8 @@ public class BeaconBlockEntityMixin implements BeaconBeamHeightAccessor {
         )
     )
     private static void buildscape$interceptClear(List<?> list, Level level, BlockPos pos, BlockState state, BeaconBlockEntity blockEntity) {
-        int height = ((BeaconBeamHeightAccessor) blockEntity).buildscape$getBeamHeight();
-        if (height >= BUILDSCAPE_UNLIMITED) {
+        int height = ((BeaconBeamHeightAccessor) blockEntity).buildscape$getPendingBeamHeight();
+        if (height >= BeaconBeamScanState.UNLIMITED) {
             list.clear();
             return;
         }

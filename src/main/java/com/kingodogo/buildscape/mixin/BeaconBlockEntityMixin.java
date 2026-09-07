@@ -78,11 +78,6 @@ public class BeaconBlockEntityMixin implements BeaconBeamHeightAccessor {
             return;
         }
 
-        if (!level.isClientSide) {
-            list.clear();
-            return;
-        }
-
         if (list.isEmpty()) {
             @SuppressWarnings("unchecked")
             List<BeaconBeamSection> beamList = (List<BeaconBeamSection>) list;

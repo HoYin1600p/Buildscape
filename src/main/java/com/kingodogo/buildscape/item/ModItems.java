@@ -12260,7 +12260,7 @@ public static final RegistryObject<Item> FLAMING_STEEL_INGOT = ITEMS.register("f
 
     public static final RegistryObject<Item> BIG_ORNAMENT_TEMPLATE = ITEMS.register(
             "big_ornament_template",
-            () -> new BigOrnamentTemplateItem(new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB).rarity(net.minecraft.world.item.Rarity.UNCOMMON))
+            () -> new Item(new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB).rarity(net.minecraft.world.item.Rarity.UNCOMMON))
     );
 
     public static final RegistryObject<Item> STRINGLIGHT_FRAME = ITEMS.register(

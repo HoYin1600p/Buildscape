@@ -31,7 +31,7 @@ public final class BeaconScanContext {
         }
 
         BLOCKING_POS.set(pos.immutable());
-        ((BeaconBeamHeightAccessor) beacon).buildscape$setBeamHeight(pos.getY() - beaconPos.getY());
+        ((BeaconBeamHeightAccessor) beacon).buildscape$markBeamBlocked(pos.getY() - beaconPos.getY());
         if (level instanceof Level actualLevel && !actualLevel.isClientSide) {
             ((BeaconBlockEntityAccessor) beacon).getBeamSections().clear();
         }

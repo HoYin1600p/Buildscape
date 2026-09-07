@@ -2013,6 +2013,14 @@ public class ModBlocks {
                                                         .strength(2.0f)
                                                         .requiresCorrectToolForDrops()
                                                         .sound(net.minecraft.world.level.block.SoundType.BONE_BLOCK)));
+        public static final RegistryObject<Block> BONE_DICE = BLOCKS.register(
+                        "bone_dice",
+                        () -> new BoneDiceBlock(
+                                        BlockBehaviour.Properties.of(
+                                                        Material.STONE,
+                                                        MaterialColor.SAND)
+                                                        .strength(0.2f)
+                                                        .sound(net.minecraft.world.level.block.SoundType.BONE_BLOCK)));
         public static final RegistryObject<Block> BEDROCK_STAIRS = BLOCKS.register(
                         "bedrock_stairs",
                         () -> new ModStairBlock(
@@ -6210,8 +6218,7 @@ public class ModBlocks {
                                         BlockBehaviour.Properties.of(Material.METAL, MaterialColor.STONE)
                                                         .strength(5.0f, 6.0f)
                                                         .requiresCorrectToolForDrops()
-                                                        .sound(SoundType.COPPER)
-                                                        .lightLevel((state) -> 15)));
+                                                        .sound(SoundType.COPPER)));
         public static final RegistryObject<Block> STEEL_BLOCK_SLAB = BLOCKS.register(
                         "steel_block_slab",
                         () -> new SlabBlock(

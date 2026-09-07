@@ -74,13 +74,11 @@ public class AdvancementEvents {
                 if ("buildscape".equals(id.getNamespace())) {
                     String path = id.getPath();
 
-                    // 1. Award trophy if associated with this advancement
                     Item trophyItem = Trophies.getRewardForAdvancement(path);
                     if (trophyItem != null) {
                         giveItemReward(serverPlayer, trophyItem, 1);
                     }
 
-                    // 2. Award custom item rewards as defined in docs/advancements.md
                     switch (path) {
                         case "put_it_on_display" -> giveItemReward(serverPlayer, com.kingodogo.buildscape.block.ModBlocks.ASHENKING_GOLD_PILLAR.get().asItem(), 1);
                         case "columnist" -> giveItemReward(serverPlayer, com.kingodogo.buildscape.block.ModBlocks.ASHENKING_EMERALD_PILLAR.get().asItem(), 1);
@@ -104,7 +102,6 @@ public class AdvancementEvents {
                         default -> {}
                     }
 
-                    // 3. Update "A Full Buildscape Cube" progress
                     if (!"a_full_buildscape_cube".equals(path) && !path.startsWith("recipes/")) {
                         checkFullCubeAdvancement(serverPlayer);
                     }

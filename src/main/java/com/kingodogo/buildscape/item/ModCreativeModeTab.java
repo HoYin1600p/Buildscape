@@ -3375,6 +3375,7 @@ public class ModCreativeModeTab {
 
             items.add(new ItemStack(ModItems.CHISELED_BONE_BLOCK.get()));
             items.add(new ItemStack(ModItems.BONE_PILLAR.get()));
+            items.add(new ItemStack(ModItems.BONE_DICE.get()));
             items.add(new ItemStack(ModItems.MOSSY_CALCITE.get()));
             items.add(new ItemStack(ModItems.MOSSY_CALCITE_STAIRS.get()));
             items.add(new ItemStack(ModItems.MOSSY_CALCITE_SLAB.get()));

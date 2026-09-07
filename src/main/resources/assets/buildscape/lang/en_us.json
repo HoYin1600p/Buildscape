@@ -20,6 +20,8 @@
   "block.buildscape.bone_brick_vertical_slab": "Bone Brick Vertical Slab",
   "block.buildscape.chiseled_bone_block": "Chiseled Bone Block",
   "block.buildscape.bone_pillar": "Bone Pillar",
+  "block.buildscape.bone_dice": "Bone Dice",
+  "message.buildscape.bone_dice.rolled": "Dice Rolled: %s",
   "item.buildscape.copper_biome_brush": "Copper Biome Brush",
   "item.buildscape.diamond_biome_brush": "Diamond Biome Brush",
   "item.buildscape.netherite_biome_brush": "Netherite Biome Brush",

@@ -1,0 +1,33 @@
+{
+  "variants": {
+    "facing=north,roll=1": { "model": "buildscape:block/bone_dice_1" },
+    "facing=east,roll=1":  { "model": "buildscape:block/bone_dice_1", "y": 90 },
+    "facing=south,roll=1": { "model": "buildscape:block/bone_dice_1", "y": 180 },
+    "facing=west,roll=1":  { "model": "buildscape:block/bone_dice_1", "y": 270 },
+
+    "facing=north,roll=2": { "model": "buildscape:block/bone_dice_2" },
+    "facing=east,roll=2":  { "model": "buildscape:block/bone_dice_2", "y": 90 },
+    "facing=south,roll=2": { "model": "buildscape:block/bone_dice_2", "y": 180 },
+    "facing=west,roll=2":  { "model": "buildscape:block/bone_dice_2", "y": 270 },
+
+    "facing=north,roll=3": { "model": "buildscape:block/bone_dice_3" },
+    "facing=east,roll=3":  { "model": "buildscape:block/bone_dice_3", "y": 90 },
+    "facing=south,roll=3": { "model": "buildscape:block/bone_dice_3", "y": 180 },
+    "facing=west,roll=3":  { "model": "buildscape:block/bone_dice_3", "y": 270 },
+
+    "facing=north,roll=4": { "model": "buildscape:block/bone_dice_4" },
+    "facing=east,roll=4":  { "model": "buildscape:block/bone_dice_4", "y": 90 },
+    "facing=south,roll=4": { "model": "buildscape:block/bone_dice_4", "y": 180 },
+    "facing=west,roll=4":  { "model": "buildscape:block/bone_dice_4", "y": 270 },
+
+    "facing=north,roll=5": { "model": "buildscape:block/bone_dice_5" },
+    "facing=east,roll=5":  { "model": "buildscape:block/bone_dice_5", "y": 90 },
+    "facing=south,roll=5": { "model": "buildscape:block/bone_dice_5", "y": 180 },
+    "facing=west,roll=5":  { "model": "buildscape:block/bone_dice_5", "y": 270 },
+
+    "facing=north,roll=6": { "model": "buildscape:block/bone_dice_6" },
+    "facing=east,roll=6":  { "model": "buildscape:block/bone_dice_6", "y": 90 },
+    "facing=south,roll=6": { "model": "buildscape:block/bone_dice_6", "y": 180 },
+    "facing=west,roll=6":  { "model": "buildscape:block/bone_dice_6", "y": 270 }
+  }
+}

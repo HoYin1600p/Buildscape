@@ -40,6 +40,8 @@ public final class PipeOutletWaterTest {
         testHorizontalRange();
         testBranchDistances();
         testVerticalReset();
+        testFluidIdentityPropagation();
+        testDifferentFluidsDoNotMix();
         System.out.println("Pipe outlet supply: " + checks + " checks passed.");
     }
 
@@ -91,6 +93,39 @@ public final class PipeOutletWaterTest {
         expect(7, states.get(run.get(7)).getDistance(), "full range after downward reset");
     }
 
+    private static void testFluidIdentityPropagation() {
+        TestTopology topology = new TestTopology();
+        List<BlockPos> positions = topology.addLine(BlockPos.ZERO, Direction.EAST, 4);
+        topology.sourceFluids.put(positions.get(0), "buildscape:experience_still");
+
+        Map<BlockPos, PipeFlowState> states = WaterPipeTransport.INSTANCE.calculateFlow(
+                topology, Set.copyOf(positions), List.of(positions.get(0)));
+        for (BlockPos pos : positions) {
+            expect("buildscape:experience_still", states.get(pos).getFluidId(), "XP fluid identity");
+        }
+    }
+
+    private static void testDifferentFluidsDoNotMix() {
+        TestTopology topology = new TestTopology();
+        List<BlockPos> positions = topology.addLine(BlockPos.ZERO, Direction.EAST, 5);
+        topology.sourceFluids.put(positions.get(0), PipeFlowState.WATER_FLUID_ID);
+        topology.sourceFluids.put(positions.get(4), "minecraft:lava");
+
+        Map<BlockPos, PipeFlowState> states = WaterPipeTransport.INSTANCE.calculateFlow(
+                topology, Set.copyOf(positions), List.of(positions.get(0), positions.get(4)));
+        expect(PipeFlowState.WATER_FLUID_ID, states.get(positions.get(0)).getFluidId(), "water source retained");
+        expect("minecraft:lava", states.get(positions.get(4)).getFluidId(), "lava source retained");
+        for (int index = 1; index < positions.size(); index++) {
+            String previous = states.get(positions.get(index - 1)).getFluidId();
+            String current = states.get(positions.get(index)).getFluidId();
+            if (!previous.equals(current)) {
+                expect(false, states.get(positions.get(index - 1)).hasFlowDirection(Direction.EAST),
+                        "unlike-fluid boundary has no outflow");
+                break;
+            }
+        }
+    }
+
     private static void expect(int expected, int actual, String label) {
         checks++;
         if (expected != actual) throw new AssertionError(label + ": expected " + expected + ", got " + actual);
@@ -101,9 +136,15 @@ public final class PipeOutletWaterTest {
         if (expected != actual) throw new AssertionError(label + ": expected " + expected + ", got " + actual);
     }
 
+    private static void expect(String expected, String actual, String label) {
+        checks++;
+        if (!expected.equals(actual)) throw new AssertionError(label + ": expected " + expected + ", got " + actual);
+    }
+
     private static final class TestTopology implements PipeTopologyAccess {
         private final Set<BlockPos> pipes = new HashSet<>();
         private final Set<BlockPos> sources = new HashSet<>();
+        private final Map<BlockPos, String> sourceFluids = new HashMap<>();
         private final Map<BlockPos, Set<Direction>> connections = new HashMap<>();
         private final Map<BlockPos, Set<Direction>> endpoints = new HashMap<>();
 
@@ -151,6 +192,12 @@ public final class PipeOutletWaterTest {
         @Override
         public boolean isWaterSource(BlockPos pos) {
             return sources.contains(pos);
+        }
+
+        @Override
+        public String getSourceFluidId(BlockPos pos) {
+            String fluid = sourceFluids.get(pos);
+            return fluid != null ? fluid : PipeTopologyAccess.super.getSourceFluidId(pos);
         }
     }
 }

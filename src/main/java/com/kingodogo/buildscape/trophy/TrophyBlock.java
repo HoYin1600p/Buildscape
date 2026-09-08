@@ -2,7 +2,6 @@ package com.kingodogo.buildscape.trophy;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.LivingEntity;
@@ -35,7 +34,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
-import java.util.Random;
 
 public class TrophyBlock extends HorizontalDirectionalBlock implements EntityBlock {
     public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
@@ -142,15 +140,4 @@ public class TrophyBlock extends HorizontalDirectionalBlock implements EntityBlo
         super.appendHoverText(stack, level, tooltip, flag);
     }
 
-    @Override
-    public void animateTick(BlockState state, Level level, BlockPos pos, Random random) {
-        if (definition.isFoil() || definition.getTier() == TrophyTier.SPECIAL || definition.getTier() == TrophyTier.NETHERITE) {
-            if (random.nextFloat() < 0.15F) {
-                double x = pos.getX() + 0.3D + random.nextDouble() * 0.4D;
-                double y = pos.getY() + 0.5D + random.nextDouble() * 0.5D;
-                double z = pos.getZ() + 0.3D + random.nextDouble() * 0.4D;
-                level.addParticle(ParticleTypes.END_ROD, x, y, z, 0.0D, 0.01D, 0.0D);
-            }
-        }
-    }
 }

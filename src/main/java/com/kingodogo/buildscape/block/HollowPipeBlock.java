@@ -200,8 +200,8 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
         }
         if (be instanceof HollowLogBlockEntity hollowBe) {
             PipeFlowState flow = hollowBe.getPipeFlowState();
-            if (flow != null && flow.hasWater()) {
-                return Fluids.WATER;
+            if (flow != null && flow.hasFluid()) {
+                return com.kingodogo.buildscape.pipe.transport.WorldPipeTopologyAccess.fluidById(flow.getFluidId());
             }
         }
         return Fluids.EMPTY;
@@ -330,7 +330,7 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
 
         Fluid fluidInBucket = getFluidFromItem(held);
         if (fluidInBucket != Fluids.EMPTY) {
-            if (sourceFluid != Fluids.EMPTY) {
+            if (containedFluid != Fluids.EMPTY) {
                 return InteractionResult.sidedSuccess(level.isClientSide);
             }
             if (!level.isClientSide) {
@@ -419,12 +419,14 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
         for (Direction dir : Direction.values()) {
             if (dir == Direction.UP) continue;
             if (allowedDirections != null && !allowedDirections.contains(dir)) continue;
-            if (isOpenEndpoint(state, dir)) {
-                boolean fallingWater = dir == Direction.DOWN && fluid.isSame(Fluids.WATER);
-                int amount = fallingWater ? 8
-                        : (dir == Direction.DOWN ? WaterPipeTransport.MAX_HORIZONTAL_FLOW : outflowAmount);
+            boolean openEndpoint = state.getBlock() instanceof HollowLogBlock
+                    ? HollowLogBlock.isOpenEnd(state, dir)
+                    : isOpenEndpoint(state, dir);
+            if (openEndpoint) {
+                boolean falling = dir == Direction.DOWN;
+                int amount = falling ? 8 : outflowAmount;
                 if (amount <= 0) continue;
-                spreadToWorldBlock(level, pos.relative(dir), fluid, amount, fallingWater);
+                spreadToWorldBlock(level, pos.relative(dir), fluid, amount, falling);
             }
         }
     }
@@ -467,16 +469,14 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
     @Override
     public void tick(BlockState state, ServerLevel level, BlockPos pos, Random random) {
         super.tick(state, level, pos, random);
-        boolean hasWater = state.getValue(WATERLOGGED) || state.getValue(WATER_LEVEL) > 0;
-        if (hasWater) {
-            BlockEntity be = level.getBlockEntity(pos);
-            if (be instanceof HollowLogBlockEntity hollowBe) {
-                PipeFlowState flow = hollowBe.getPipeFlowState();
-                if (flow != null && flow.hasWater()) {
-                    trySpreadToWorld(level, pos, state, Fluids.WATER, flow.getDistance(), flow.getFlowDirections());
-                }
+        BlockEntity be = level.getBlockEntity(pos);
+        if (be instanceof HollowLogBlockEntity hollowBe) {
+            PipeFlowState flow = hollowBe.getPipeFlowState();
+            if (flow != null && flow.hasFluid()) {
+                Fluid fluid = com.kingodogo.buildscape.pipe.transport.WorldPipeTopologyAccess.fluidById(flow.getFluidId());
+                trySpreadToWorld(level, pos, state, fluid, flow.getDistance(), flow.getFlowDirections());
+                level.scheduleTick(pos, this, fluid.getTickDelay(level));
             }
-            level.scheduleTick(pos, this, Fluids.WATER.getTickDelay(level));
         }
     }
 
@@ -757,6 +757,13 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
             return myChannelPointsToNeighbor || neighborChannelPointsToMe || neighborAlreadyOpenToMe || myAlreadyOpenToNeighbor;
         }
 
+        if (neighborBlock instanceof HollowLogBlock) {
+            boolean logOpen = HollowLogBlock.isOpenEnd(neighborState, dir.getOpposite());
+            boolean myChannelPointsToNeighbor = myAxis == dirAxis;
+            boolean myAlreadyOpenToNeighbor = state.getValue(getPropertyForDirection(dir));
+            return logOpen && (myChannelPointsToNeighbor || myAlreadyOpenToNeighbor);
+        }
+
         if (neighborBlock instanceof PipeBlock) {
             return neighborState.getValue(PipeBlock.AXIS) == dirAxis && (myAxis == dirAxis || (state.hasProperty(getPropertyForDirection(dir)) && state.getValue(getPropertyForDirection(dir))));
         }
@@ -773,6 +780,9 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
                 if (updated != neighborState) {
                     level.setBlock(neighborPos, updated, 3);
                 }
+            }
+            if (neighborState.getBlock() instanceof HollowLogBlock) {
+                HollowPipeTransportManager.markDirty(level, neighborPos);
             }
         }
     }

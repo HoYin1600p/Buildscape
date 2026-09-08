@@ -17,10 +17,12 @@ public class ItemMixin {
         ItemStack self = (ItemStack) (Object) this;
         if (self.is(Items.POTION)) {
             if (PotionUtils.getPotion(self) == Potions.WATER) {
-                cir.setReturnValue(16);
+                cir.setReturnValue(com.kingodogo.buildscape.world.ModGameRules.isWaterBottleStackingEnabled() ? 16 : 1);
             } else {
                 cir.setReturnValue(1);
             }
+        } else if (self.is(Items.CAKE)) {
+            cir.setReturnValue(com.kingodogo.buildscape.world.ModGameRules.isCakeStackingEnabled() ? 64 : 1);
         }
     }
 

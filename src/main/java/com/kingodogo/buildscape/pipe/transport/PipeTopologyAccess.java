@@ -15,7 +15,14 @@ public interface PipeTopologyAccess {
 
     BubbleColumnState getBubbleColumnBase(BlockPos pos);
 
-    boolean isWaterSource(BlockPos pos);
+    @Nullable
+    default String getSourceFluidId(BlockPos pos) {
+        return isWaterSource(pos) ? PipeFlowState.WATER_FLUID_ID : null;
+    }
+
+    default boolean isWaterSource(BlockPos pos) {
+        return false;
+    }
 
     default int getInitialWaterFlowDistance(BlockPos pos) {
         return 0;

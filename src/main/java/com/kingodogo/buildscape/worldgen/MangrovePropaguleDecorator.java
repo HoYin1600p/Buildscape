@@ -4,6 +4,8 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import java.util.List;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Random;
 import java.util.function.BiConsumer;
 
@@ -12,6 +14,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.util.valueproviders.IntProvider;
 import net.minecraft.world.level.LevelSimulatedReader;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.LeavesBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.feature.treedecorators.TreeDecorator;
 import net.minecraft.world.level.levelgen.feature.treedecorators.TreeDecoratorType;
@@ -74,10 +77,18 @@ public class MangrovePropaguleDecorator extends TreeDecorator {
 
         int propagulesToPlace = 2 + random.nextInt(3);
 
-        java.util.Collections.shuffle(leavesPositions, random);
+        var existingLeaves = new HashSet<BlockPos>();
+        for (BlockPos leafPos : leavesPositions) {
+            if (level.isStateAtPosition(leafPos, state -> state.getBlock() instanceof LeavesBlock)) {
+                existingLeaves.add(leafPos.immutable());
+            }
+        }
+        var supportedLeaves = new ArrayList<>(MangroveLeafSupport.findSupportedLeaves(logPositions, existingLeaves));
+        supportedLeaves.sort(BlockPos::compareTo);
+        java.util.Collections.shuffle(supportedLeaves, random);
 
         int placed = 0;
-        for (BlockPos leafPos : leavesPositions) {
+        for (BlockPos leafPos : supportedLeaves) {
             if (placed >= propagulesToPlace) {
                 break;
             }
@@ -116,6 +127,10 @@ public class MangrovePropaguleDecorator extends TreeDecorator {
                                     .setValue(
                                             com.kingodogo.buildscape.block.MangrovePropaguleBlock.HANGING,
                                             true
+                                    )
+                                    .setValue(
+                                            com.kingodogo.buildscape.block.MangrovePropaguleBlock.WATERLOGGED,
+                                            level.isStateAtPosition(belowPos, state -> state.is(Blocks.WATER))
                                     );
 
                     blockSetter.accept(belowPos, propaguleState);

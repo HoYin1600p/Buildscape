@@ -43,7 +43,9 @@ public class HollowLogBlockEntity extends BlockEntity {
     @Override
     public void onLoad() {
         super.onLoad();
-        if (level != null && !level.isClientSide && getBlockState().getBlock() instanceof HollowPipeBlock) {
+        if (level != null && !level.isClientSide
+                && (getBlockState().getBlock() instanceof HollowPipeBlock
+                || getBlockState().getBlock() instanceof HollowLogBlock)) {
             HollowPipeTransportManager.markDirty(level, worldPosition);
         }
     }
@@ -169,7 +171,7 @@ public class HollowLogBlockEntity extends BlockEntity {
             return;
         }
 
-        if (state.getBlock() instanceof HollowPipeBlock && blockEntity.pendingTargetState != null) {
+        if (blockEntity.pendingTargetState != null) {
             blockEntity.flowDelayTicks--;
             if (blockEntity.flowDelayTicks <= 0) {
                 blockEntity.pipeFlowState = blockEntity.pendingTargetState;
@@ -262,7 +264,9 @@ public class HollowLogBlockEntity extends BlockEntity {
         } else {
             pipeFlowState = new PipeFlowState();
         }
-        if (level != null && level.isClientSide && getBlockState().getBlock() instanceof HollowPipeBlock
+        if (level != null && level.isClientSide
+                && (getBlockState().getBlock() instanceof HollowPipeBlock
+                || getBlockState().getBlock() instanceof HollowLogBlock)
                 && !previousFlow.equals(pipeFlowState)) {
             for (net.minecraft.core.Direction direction : net.minecraft.core.Direction.values()) {
                 if (direction == net.minecraft.core.Direction.UP) continue;

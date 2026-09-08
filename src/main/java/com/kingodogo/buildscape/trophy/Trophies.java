@@ -41,7 +41,7 @@ public class Trophies {
                     .hardness(1.5F)
                     .resistance(6.0F)
                     .shape(PEDESTAL_SHAPES)
-                    .advancement("put_it_on_display")
+                    .advancement("reach_for_the_sky")
                     .build()
     );
 
@@ -52,7 +52,7 @@ public class Trophies {
                     .hardness(2.0F)
                     .resistance(6.0F)
                     .shape(PEDESTAL_SHAPES)
-                    .advancement("columnist")
+                    .advancement("put_it_on_display")
                     .build()
     );
 
@@ -85,6 +85,7 @@ public class Trophies {
                     .hardness(2.5F)
                     .resistance(6.0F)
                     .shape(PEDESTAL_SHAPES)
+                    .advancement("columnist")
                     .build()
     );
 
@@ -153,7 +154,7 @@ public class Trophies {
                     .hardness(2.5F)
                     .resistance(8.0F)
                     .shape(PEDESTAL_SHAPES)
-                    .advancement("reach_for_the_sky")
+                    .advancement("rainbow_mood_light")
                     .build()
     );
 

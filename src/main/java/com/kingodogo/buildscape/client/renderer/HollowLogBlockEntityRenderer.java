@@ -571,6 +571,12 @@ public class HollowLogBlockEntityRenderer implements BlockEntityRenderer<HollowL
         buffer.vertex(matrix, x1, y1, z1).color(r, g, b, a).uv(u1, v1).overlayCoords(overlay).uv2(light).normal(nx, ny, nz).endVertex();
         buffer.vertex(matrix, x2, y2, z2).color(r, g, b, a).uv(u2, v2).overlayCoords(overlay).uv2(light).normal(nx, ny, nz).endVertex();
         buffer.vertex(matrix, x3, y3, z3).color(r, g, b, a).uv(u3, v3).overlayCoords(overlay).uv2(light).normal(nx, ny, nz).endVertex();
+        if (ny > 0) {
+            buffer.vertex(matrix, x3, y3, z3).color(r, g, b, a).uv(u3, v3).overlayCoords(overlay).uv2(light).normal(-nx, -ny, -nz).endVertex();
+            buffer.vertex(matrix, x2, y2, z2).color(r, g, b, a).uv(u2, v2).overlayCoords(overlay).uv2(light).normal(-nx, -ny, -nz).endVertex();
+            buffer.vertex(matrix, x1, y1, z1).color(r, g, b, a).uv(u1, v1).overlayCoords(overlay).uv2(light).normal(-nx, -ny, -nz).endVertex();
+            buffer.vertex(matrix, x0, y0, z0).color(r, g, b, a).uv(u0, v0).overlayCoords(overlay).uv2(light).normal(-nx, -ny, -nz).endVertex();
+        }
     }
 
     private static void renderQuad(

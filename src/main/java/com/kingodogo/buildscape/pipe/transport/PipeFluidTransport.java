@@ -20,8 +20,7 @@ public abstract class PipeFluidTransport {
     public abstract java.util.Set<BlockPos> recalculateNetwork(Level level, BlockPos startPos);
 
     public static boolean isHollowPipe(BlockState state) {
-        return state != null && (state.getBlock() instanceof HollowPipeBlock
-                || state.getBlock() instanceof HollowLogBlock);
+        return state != null && state.getBlock() instanceof HollowPipeBlock;
     }
 
     public static boolean arePipesConnected(BlockState stateFrom, Direction dir, BlockState stateTo) {

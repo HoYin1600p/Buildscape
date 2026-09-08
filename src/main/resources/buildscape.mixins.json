@@ -36,6 +36,8 @@
     "ShulkerBoxMenuMixin",
     "SmithingMenuMixin",
     "FlowingFluidMixin",
+    "LavaFluidMixin",
+    "LiquidBlockMixin",
     "FireworkRocketEntityMixin"
   ],
   "client": [

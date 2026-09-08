@@ -3,6 +3,7 @@ package com.kingodogo.buildscape.mixin;
 import com.kingodogo.buildscape.block.HollowLogBlock;
 import com.kingodogo.buildscape.block.HollowPipeBlock;
 import com.kingodogo.buildscape.block.HollowLogBlockEntity;
+import com.kingodogo.buildscape.fluid.ModFluids;
 import com.kingodogo.buildscape.pipe.transport.PipeOutletWater;
 import com.kingodogo.buildscape.pipe.transport.WorldPipeTopologyAccess;
 import net.minecraft.core.BlockPos;
@@ -42,7 +43,7 @@ public abstract class FlowingFluidMixin {
             if (direction == Direction.DOWN) continue;
             BlockPos pipePos = pos.relative(direction);
             BlockState pipe = level.getBlockState(pipePos);
-            if (!(pipe.getBlock() instanceof HollowPipeBlock || pipe.getBlock() instanceof HollowLogBlock)
+            if (!(pipe.getBlock() instanceof HollowPipeBlock)
                     || !(level.getBlockEntity(pipePos) instanceof HollowLogBlockEntity entity)) continue;
             var flow = entity.getPipeFlowState();
             if (flow == null || !flow.hasFluid()) continue;
@@ -71,6 +72,15 @@ public abstract class FlowingFluidMixin {
             Fluid fluid,
             CallbackInfoReturnable<Boolean> cir
     ) {
+        if (ModFluids.cannotMix(fluid, toFluidState.getType())) {
+            cir.setReturnValue(false);
+            return;
+        }
+        if (fromBlockState.getBlock() instanceof HollowLogBlock
+                || toBlockState.getBlock() instanceof HollowLogBlock) {
+            cir.setReturnValue(false);
+            return;
+        }
         if (fromBlockState.getBlock() instanceof HollowPipeBlock) {
             if (!HollowPipeBlock.isOpenEndpoint(fromBlockState, direction)) {
                 cir.setReturnValue(false);

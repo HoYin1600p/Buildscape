@@ -20,6 +20,13 @@ public final class MangroveLeafSupportTest {
         if (!supported.isEmpty()) throw new AssertionError("Diagonal contact does not prevent leaf decay");
         supported = MangroveLeafSupport.findSupportedLeaves(List.of(BlockPos.ZERO, new BlockPos(8, 0, 0)), leaves);
         if (supported.size() != leaves.size()) throw new AssertionError("Each branch supplies its own leaves");
-        System.out.println("Mangrove leaf support: 4 checks passed.");
+        Set<BlockPos> prunedCanopy = MangroveLeafSupport.findSupportedLeaves(List.of(BlockPos.ZERO), leaves);
+        if (!MangroveLeafSupport.findSupportedLeaves(List.of(BlockPos.ZERO), prunedCanopy).equals(prunedCanopy)) {
+            throw new AssertionError("Pruning unsupported leaves must not disconnect retained leaves");
+        }
+        if (!MangroveLeafSupport.findSupportedLeaves(List.of(), prunedCanopy).isEmpty()) {
+            throw new AssertionError("Retained leaves must still lose support when logs are removed");
+        }
+        System.out.println("Mangrove leaf support: 6 checks passed.");
     }
 }

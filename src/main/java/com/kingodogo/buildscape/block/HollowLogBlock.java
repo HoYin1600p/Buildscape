@@ -753,13 +753,7 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
 
     @Override
     public FluidState getFluidState(BlockState state) {
-        if (state.getValue(WATERLOGGED)) {
-            return Fluids.WATER.getSource(false);
-        }
-        if (state.getValue(LAVA_LOGGED)) {
-            return Fluids.LAVA.getSource(false);
-        }
-        return super.getFluidState(state);
+        return Fluids.EMPTY.defaultFluidState();
     }
 
     @Override

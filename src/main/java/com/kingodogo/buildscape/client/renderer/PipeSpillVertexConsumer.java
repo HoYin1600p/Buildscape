@@ -106,23 +106,6 @@ public final class PipeSpillVertexConsumer implements VertexConsumer {
                 if (straightZ && exit == Direction.SOUTH && flow.getInflowDirection() == Direction.SOUTH) height = heights.inlet();
                 if (outlets == null) outlets = new ArrayList<>(2);
                 outlets.add(new Outlet(direction, height));
-            } else if (pipe.getBlock() instanceof HollowLogBlock) {
-                if (!HollowLogBlock.isOpenEnd(pipe, exit)) {
-                    continue;
-                }
-                if (!(level.getBlockEntity(pipePos) instanceof HollowLogBlockEntity entity)) {
-                    continue;
-                }
-                PipeFlowState flow = entity.getPipeFlowState();
-                Fluid fluidInLog = HollowPipeBlock.getContainedFluid(pipe, entity);
-                if (!fluidInLog.isSame(fluid.getType()) || !flow.hasFluid()
-                        || !flow.hasFlowDirection(exit) || flow.getDistance() >= 7) continue;
-                boolean source = HollowPipeBlock.getSourceFluid(pipe, entity) != Fluids.EMPTY;
-                PipeWaterSurface.Heights heights = PipeWaterSurface.flowing(source,
-                        pipe.getValue(HollowLogBlock.AXIS) == Direction.Axis.Y, flow);
-                double height = flow.getInflowDirection() == exit ? heights.inlet() : heights.outlet();
-                if (outlets == null) outlets = new ArrayList<>(2);
-                outlets.add(new Outlet(direction, height));
             }
         }
         return outlets == null ? List.of() : outlets;

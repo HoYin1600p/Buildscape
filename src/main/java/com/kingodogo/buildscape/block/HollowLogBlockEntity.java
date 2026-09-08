@@ -259,7 +259,7 @@ public class HollowLogBlockEntity extends BlockEntity {
         if (tag.hasUUID("GlassPlacedByPlayer")) {
             glassPlacedByPlayer = tag.getUUID("GlassPlacedByPlayer");
         }
-        if (tag.contains("PipeFlowState")) {
+        if (getBlockState().getBlock() instanceof HollowPipeBlock && tag.contains("PipeFlowState")) {
             pipeFlowState = PipeFlowState.readFromNbt(tag.getCompound("PipeFlowState"));
         } else {
             pipeFlowState = new PipeFlowState();

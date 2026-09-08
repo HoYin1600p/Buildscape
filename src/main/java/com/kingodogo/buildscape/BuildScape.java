@@ -696,7 +696,9 @@ public class BuildScape {
                         serverPlayer.getLevel().getGameRules().getBoolean(com.kingodogo.buildscape.world.ModGameRules.FAST_LEAF_DECAY),
                         serverPlayer.getLevel().getGameRules().getBoolean(com.kingodogo.buildscape.world.ModGameRules.DISABLE_ENDERMAN_GRIEFING),
                         serverPlayer.getLevel().getGameRules().getBoolean(com.kingodogo.buildscape.world.ModGameRules.DISABLE_CREEPER_GRIEFING),
-                        serverPlayer.getLevel().getGameRules().getBoolean(com.kingodogo.buildscape.world.ModGameRules.DISABLE_GHAST_GRIEFING)
+                        serverPlayer.getLevel().getGameRules().getBoolean(com.kingodogo.buildscape.world.ModGameRules.DISABLE_GHAST_GRIEFING),
+                        serverPlayer.getLevel().getGameRules().getBoolean(com.kingodogo.buildscape.world.ModGameRules.IS_CAKE_STACK),
+                        serverPlayer.getLevel().getGameRules().getBoolean(com.kingodogo.buildscape.world.ModGameRules.IS_WATER_BOTTLE_STACK)
                     )
                 );
 

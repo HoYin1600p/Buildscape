@@ -5,7 +5,8 @@ import com.kingodogo.buildscape.block.HollowLogBlockEntity;
 import com.kingodogo.buildscape.block.HollowPipeBlock;
 import com.kingodogo.buildscape.pipe.transport.BubbleColumnState;
 import com.kingodogo.buildscape.pipe.transport.PipeFlowState;
-import com.kingodogo.buildscape.pipe.transport.PipeOutletWater;
+import com.kingodogo.buildscape.pipe.transport.PipeFluidTransport;
+import com.kingodogo.buildscape.pipe.transport.WorldPipeTopologyAccess;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -52,20 +53,23 @@ public final class PipeSpillVertexConsumer implements VertexConsumer {
     }
 
     public static List<Outlet> findOutlets(BlockAndTintGetter level, BlockPos pos, BlockState state, FluidState fluid) {
-        if (!(state.getBlock() instanceof LiquidBlock) || !fluid.getType().isSame(Fluids.WATER)
+        if (!(state.getBlock() instanceof LiquidBlock) || !WorldPipeTopologyAccess.isTransportFluid(fluid.getType())
                 || fluid.isSource()) {
             return List.of();
         }
         BlockPos above = pos.above();
         BlockState pipeAbove = level.getBlockState(above);
         if (fluid.getValue(net.minecraft.world.level.material.FlowingFluid.FALLING)
-                && pipeAbove.getBlock() instanceof HollowPipeBlock
+                && PipeFluidTransport.isHollowPipe(pipeAbove)
                 && level.getBlockEntity(above) instanceof HollowLogBlockEntity entity
-                && PipeOutletWater.amount(pipeAbove, entity.getPipeFlowState(), Direction.DOWN) > 0) {
+                && entity.getPipeFlowState().hasFluid()
+                && WorldPipeTopologyAccess.fluidById(entity.getPipeFlowState().getFluidId()).isSame(fluid.getType())
+                && PipeFluidTransport.isOpenEndpoint(pipeAbove, Direction.DOWN)
+                && entity.getPipeFlowState().hasFlowDirection(Direction.DOWN)) {
             return List.of(new Outlet(Direction.UP, 1.0));
         }
         if (fluid.getValue(net.minecraft.world.level.material.FlowingFluid.FALLING)
-                || level.getFluidState(pos.above()).getType().isSame(Fluids.WATER)) {
+                || level.getFluidState(pos.above()).getType().isSame(fluid.getType())) {
             return List.of();
         }
         List<Outlet> outlets = null;
@@ -80,7 +84,9 @@ public final class PipeSpillVertexConsumer implements VertexConsumer {
                     continue;
                 }
                 PipeFlowState flow = entity.getPipeFlowState();
-                if (flow == null || !flow.hasWater() || !flow.hasFlowDirection(exit) || flow.getDistance() >= 7
+                if (flow == null || !flow.hasFluid()
+                        || !WorldPipeTopologyAccess.fluidById(flow.getFluidId()).isSame(fluid.getType())
+                        || !flow.hasFlowDirection(exit) || flow.getDistance() >= 7
                         || flow.getInflowDirection() == Direction.UP
                         || (flow.hasFlowDirection(Direction.UP) && flow.getBubbleColumn() == BubbleColumnState.UP)) {
                     continue;
@@ -104,11 +110,17 @@ public final class PipeSpillVertexConsumer implements VertexConsumer {
                 if (!HollowLogBlock.isOpenEnd(pipe, exit)) {
                     continue;
                 }
-                Fluid fluidInLog = HollowPipeBlock.getContainedFluid(pipe, level.getBlockEntity(pipePos));
-                if (fluidInLog != Fluids.WATER) {
+                if (!(level.getBlockEntity(pipePos) instanceof HollowLogBlockEntity entity)) {
                     continue;
                 }
-                double height = HollowPipeBlock.WATER_SOURCE_VISUAL_HEIGHT;
+                PipeFlowState flow = entity.getPipeFlowState();
+                Fluid fluidInLog = HollowPipeBlock.getContainedFluid(pipe, entity);
+                if (!fluidInLog.isSame(fluid.getType()) || !flow.hasFluid()
+                        || !flow.hasFlowDirection(exit) || flow.getDistance() >= 7) continue;
+                boolean source = HollowPipeBlock.getSourceFluid(pipe, entity) != Fluids.EMPTY;
+                PipeWaterSurface.Heights heights = PipeWaterSurface.flowing(source,
+                        pipe.getValue(HollowLogBlock.AXIS) == Direction.Axis.Y, flow);
+                double height = flow.getInflowDirection() == exit ? heights.inlet() : heights.outlet();
                 if (outlets == null) outlets = new ArrayList<>(2);
                 outlets.add(new Outlet(direction, height));
             }

@@ -374,7 +374,7 @@ public class MangrovePropaguleBlock
                 if (belowState.is(Blocks.GRASS_BLOCK)) {
                     level.setBlock(belowPos, Blocks.DIRT.defaultBlockState(), 3);
                 }
-                level.setBlock(pos, Blocks.AIR.defaultBlockState(), 4);
+                level.setBlock(pos, state.getFluidState().createLegacyBlock(), Block.UPDATE_ALL);
                 @SuppressWarnings("unchecked")
                 net.minecraft.world.level.levelgen.feature.configurations.TreeConfiguration treeConfig =
                         (net.minecraft.world.level.levelgen.feature.configurations.TreeConfiguration) feature.config();
@@ -394,7 +394,7 @@ public class MangrovePropaguleBlock
                                 placeContext
                         );
                 if (!success) {
-                    level.setBlock(pos, state, 4);
+                    level.setBlock(pos, state, Block.UPDATE_ALL);
                 }
             } else {
                 com.kingodogo.buildscape.BuildScape.getLogger()

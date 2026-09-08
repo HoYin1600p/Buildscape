@@ -84,7 +84,7 @@ public class AdvancementEvents {
                         case "columnist" -> giveItemReward(serverPlayer, com.kingodogo.buildscape.block.ModBlocks.ASHENKING_EMERALD_PILLAR.get().asItem(), 1);
                         case "art_collector" -> giveItemReward(serverPlayer, com.kingodogo.buildscape.block.ModBlocks.ASHENKING_DIAMOND_PILLAR.get().asItem(), 1);
                         case "buildscape_museum" -> giveItemReward(serverPlayer, com.kingodogo.buildscape.block.ModBlocks.ASHENKING_NETHERITE_PILLAR.get().asItem(), 1);
-                        case "ornamental" -> giveItemReward(serverPlayer, com.kingodogo.buildscape.block.ModBlocks.RED_ORNAMENT.get().asItem(), 1);
+                        case "ornamental" -> giveItemReward(serverPlayer, ModItems.BIG_ORNAMENT_TEMPLATE.get(), 1);
                         case "jar_ring_display" -> giveItemReward(serverPlayer, ModItems.GOLDEN_JAR_PATTERN.get(), 1);
                         case "christmas_every_day" -> giveItemReward(serverPlayer, ModItems.MUSIC_DISC_SNOWFALL.get(), 1);
                         case "light_em_up" -> giveItemReward(serverPlayer, ModItems.STRINGLIGHT_FRAME_PATTERN.get(), 1);
@@ -96,7 +96,6 @@ public class AdvancementEvents {
                             }
                         }
                         case "celebrate_in_style" -> giveItemReward(serverPlayer, ModItems.MUSIC_DISC_CELEBRATION.get(), 1);
-                        case "a_white_christmas" -> giveItemReward(serverPlayer, ModItems.SNOWY_SPRUCE_LEAVES.get(), 1);
                         case "a_very_buildscape_christmas" -> giveItemReward(serverPlayer, ModItems.FESTIVE_GLINT_SHARD.get(), 1);
                         case "a_full_buildscape_cube" -> giveItemReward(serverPlayer, ModItems.MUSIC_DISC_BUILDER.get(), 1);
                         default -> {}
@@ -388,6 +387,6 @@ public class AdvancementEvents {
         if (player == null) return;
         player.awardStat(com.kingodogo.buildscape.stat.ModStats.CONFETTI_USED);
         int count = player.getStats().getValue(net.minecraft.stats.Stats.CUSTOM, com.kingodogo.buildscape.stat.ModStats.CONFETTI_USED);
-        checkRelativeMilestone(player, "celebrate_in_style", 15, count);
+        checkRelativeMilestone(player, "celebrate_in_style", 20, count);
     }
 }

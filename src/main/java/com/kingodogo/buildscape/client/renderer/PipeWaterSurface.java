@@ -14,12 +14,16 @@ public final class PipeWaterSurface {
     }
 
     public static Heights flowing(BlockState state, PipeFlowState flow) {
-        if (state.getValue(HollowPipeBlock.WATERLOGGED)) {
-            float source = HollowPipeBlock.WATER_SOURCE_VISUAL_HEIGHT;
-            return new Heights(source, (flow == null || flow.getFlowDirections().size() != 1)
-                    ? source : (source + flowHeight(1)) * 0.5F);
+        return flowing(state.getValue(HollowPipeBlock.WATERLOGGED), state.getValue(HollowPipeBlock.DOWN), flow);
+    }
+
+    public static Heights flowing(boolean source, boolean downwardChannel, PipeFlowState flow) {
+        if (source) {
+            float sourceHeight = HollowPipeBlock.WATER_SOURCE_VISUAL_HEIGHT;
+            return new Heights(sourceHeight, (flow == null || flow.getFlowDirections().size() != 1)
+                    ? sourceHeight : (sourceHeight + flowHeight(1)) * 0.5F);
         }
-        float floor = state.getValue(HollowPipeBlock.DOWN) ? 0.0F : 0.125F;
+        float floor = downwardChannel ? 0.0F : 0.125F;
         int distance = Math.min(7, Math.max(1, flow != null ? flow.getDistance() : 0));
         float current = flowHeight(distance);
         return new Heights(Math.max(floor, (flowHeight(distance - 1) + current) * 0.5F),

@@ -28,6 +28,10 @@
     "BS:poplar_planks"
   ],
   "crafting_shaped": [
+    ["BS:ashenking_diamond_pillar",[" I ","ISI"," I "],[["S","BS:ancient_ashen_scroll"],["I","MC:diamond_block"]],1],
+    ["BS:ashenking_emerald_pillar",[" I ","ISI"," I "],[["S","BS:ancient_ashen_scroll"],["I","MC:emerald_block"]],1],
+    ["BS:ashenking_gold_pillar",[" I ","ISI"," I "],[["S","BS:ancient_ashen_scroll"],["I","MC:gold_block"]],1],
+    ["BS:ashenking_netherite_pillar",[" I ","ISI"," I "],[["S","BS:ancient_ashen_scroll"],["I","MC:netherite_block"]],1],
     ["BS:black_flaming_bolted_steel_pillar",["###","#D#","###"],[["#","BS:flaming_bolted_steel_pillar"],["D","MC:black_dye"]],8],
     ["BS:black_flaming_cut_steel",["###","#D#","###"],[["#","BS:flaming_cut_steel"],["D","MC:black_dye"]],8],
     ["BS:black_flaming_cut_steel_slab",["###"],[["#","BS:black_flaming_cut_steel"]],6],
@@ -203,7 +207,7 @@
     ["BS:flaming_pressed_steel_slab",["###"],[["#","BS:flaming_pressed_steel"]],6],
     ["BS:flaming_pressed_steel_stairs",["#  ","## ","###"],[["#","BS:flaming_pressed_steel"]],4],
     ["BS:flaming_pressed_steel_wall",["###","###"],[["#","BS:flaming_pressed_steel"]],6],
-    ["BS:flaming_steel_block",["III","III","III"],[["I","BS:flaming_steel_ingot"]],1],
+    ["BS:flaming_steel_block",["NNN","NIN","NNN"],[["N",["BS:flaming_steel_nugget","#F:nuggets/flaming_steel"]],["I","BS:flaming_steel_ingot"]],8],
     ["BS:flaming_steel_block",["SM","MS"],[["M","MC:magma_block"],["S","BS:steel_block"]],4],
     ["BS:flaming_steel_block_slab",["###"],[["#","BS:flaming_steel_block"]],6],
     ["BS:flaming_steel_block_stairs",["#  ","## ","###"],[["#","BS:flaming_steel_block"]],4],
@@ -3353,7 +3357,6 @@
     {"id":"flaming_pressed_steel_vertical_slab_from_slabs","ingredients":["buildscape:flaming_pressed_steel_slab"],"result":{"item":"buildscape:flaming_pressed_steel_vertical_slab","count":1}},
     {"id":"flaming_steel_block_slab_from_flaming_steel_block_vertical_slab","ingredients":["buildscape:flaming_steel_block_vertical_slab"],"result":{"item":"buildscape:flaming_steel_block_slab","count":1}},
     {"id":"flaming_steel_block_vertical_slab_from_slabs","ingredients":["buildscape:flaming_steel_block_slab"],"result":{"item":"buildscape:flaming_steel_block_vertical_slab","count":1}},
-    {"id":"flaming_steel_ingot_from_block","ingredients":["buildscape:flaming_steel_block"],"result":{"item":"buildscape:flaming_steel_ingot","count":9}},
     {"id":"flaming_steel_nugget","ingredients":["buildscape:flaming_steel_ingot"],"result":{"item":"buildscape:flaming_steel_nugget","count":9}},
     {"id":"gray_flaming_cut_steel_slab_from_gray_flaming_cut_steel_vertical_slab","ingredients":["buildscape:gray_flaming_cut_steel_vertical_slab"],"result":{"item":"buildscape:gray_flaming_cut_steel_slab","count":1}},
     {"id":"gray_flaming_cut_steel_vertical_slab_from_slabs","ingredients":["buildscape:gray_flaming_cut_steel_slab"],"result":{"item":"buildscape:gray_flaming_cut_steel_vertical_slab","count":1}},

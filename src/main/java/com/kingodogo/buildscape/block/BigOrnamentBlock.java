@@ -92,7 +92,7 @@ public class BigOrnamentBlock extends AbstractGlassBlock implements SimpleWaterl
     @Override
     public int getLightBlock(BlockState state, BlockGetter level, BlockPos pos) {
         if (this.isTinted) {
-            return BeaconScanContext.blocksLight(level, pos) ? 15 : 0;
+            return 0;
         }
         return super.getLightBlock(state, level, pos);
     }
@@ -106,7 +106,7 @@ public class BigOrnamentBlock extends AbstractGlassBlock implements SimpleWaterl
     ) {
         if (this.isTinted) {
             BeaconScanContext.markBlocking(level, pos, beaconPos);
-            return null;
+            return new float[]{1.0F, 1.0F, 1.0F};
         }
         int color = state.getMapColor(level, pos).col;
         return new float[]{

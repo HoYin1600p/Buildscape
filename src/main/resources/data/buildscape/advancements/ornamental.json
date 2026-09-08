@@ -15,13 +15,6 @@
     "hidden": false
   },
   "parent": "buildscape:santas_little_helper",
-  "rewards": {
-    "items": [
-      {
-        "item": "buildscape:red_ornament"
-      }
-    ]
-  },
   "criteria": {
     "custom": {
       "trigger": "minecraft:impossible"

@@ -23,6 +23,8 @@ public class BuildscapeClientConfig {
     public static final String KEY_PARALLEL_MODEL_BAKING = "OptimizeBuildscapeModelBaking";
     public static final String KEY_PARALLEL_BLOCK_STATE_CACHE = "OptimizeBuildscapeBlockStateCache";
     public static final String KEY_MAX_PIPE_NETWORK_SIZE = "MaxPipeNetworkSize";
+    public static final String KEY_CAKE_STACKING = "isCakeStack";
+    public static final String KEY_WATER_BOTTLE_STACKING = "isWaterbottleStack";
 
     private static final LinkedHashMap<String, String> DEFAULTS = new LinkedHashMap<>();
     private static volatile BuildscapeClientConfig INSTANCE;
@@ -34,6 +36,8 @@ public class BuildscapeClientConfig {
         DEFAULTS.put(KEY_PARALLEL_MODEL_BAKING, "true");
         DEFAULTS.put(KEY_PARALLEL_BLOCK_STATE_CACHE, "true");
         DEFAULTS.put(KEY_MAX_PIPE_NETWORK_SIZE, "64");
+        DEFAULTS.put(KEY_CAKE_STACKING, "true");
+        DEFAULTS.put(KEY_WATER_BOTTLE_STACKING, "true");
     }
 
     private final Map<String, String> values;
@@ -197,5 +201,13 @@ public class BuildscapeClientConfig {
 
     public int getMaxPipeNetworkSize() {
         return Math.max(1, getInt(KEY_MAX_PIPE_NETWORK_SIZE, 64));
+    }
+
+    public boolean isCakeStackingEnabled() {
+        return getBoolean(KEY_CAKE_STACKING);
+    }
+
+    public boolean isWaterBottleStackingEnabled() {
+        return getBoolean(KEY_WATER_BOTTLE_STACKING);
     }
 }

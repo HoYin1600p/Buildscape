@@ -1,12 +1,10 @@
 package com.kingodogo.buildscape.pipe.transport;
 
-import com.kingodogo.buildscape.block.HollowPipeBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
-import net.minecraft.world.level.material.Fluids;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -244,7 +242,7 @@ public class HollowPipeTransportManager {
         for (Direction dir : Direction.values()) {
             BlockPos neighborPos = pos.relative(dir);
             BlockState neighborState = level.getBlockState(neighborPos);
-            if (neighborState.getBlock() instanceof HollowPipeBlock) {
+            if (PipeFluidTransport.isHollowPipe(neighborState)) {
                 markDirty(level, neighborPos);
             }
         }
@@ -257,7 +255,7 @@ public class HollowPipeTransportManager {
         for (Direction dir : Direction.values()) {
             BlockPos neighborPos = pos.relative(dir);
             BlockState neighborState = level.getBlockState(neighborPos);
-            if (neighborState.getBlock() instanceof HollowPipeBlock) {
+            if (PipeFluidTransport.isHollowPipe(neighborState)) {
                 markDirty(level, neighborPos);
             }
         }
@@ -271,15 +269,14 @@ public class HollowPipeTransportManager {
         BlockState neighborState = level.getBlockState(neighborPos);
         FluidState neighborFluid = level.getFluidState(neighborPos);
 
-        boolean neighborIsPipe = neighborState.getBlock() instanceof HollowPipeBlock;
+        boolean neighborIsPipe = PipeFluidTransport.isHollowPipe(neighborState);
         boolean neighborIsFluid = !neighborFluid.isEmpty()
-                && (neighborFluid.getType() == Fluids.WATER || neighborFluid.getType() == Fluids.FLOWING_WATER
-                || neighborFluid.getType() == Fluids.LAVA || neighborFluid.getType() == Fluids.FLOWING_LAVA);
+                && WorldPipeTopologyAccess.isTransportFluid(neighborFluid.getType());
 
         boolean neighborIsOpenEndpoint = false;
         for (Direction direction : Direction.values()) {
             if (pos.relative(direction).equals(neighborPos)
-                    && HollowPipeBlock.isOpenEndpoint(state, direction)) {
+                    && PipeFluidTransport.isOpenEndpoint(state, direction)) {
                 neighborIsOpenEndpoint = true;
                 break;
             }

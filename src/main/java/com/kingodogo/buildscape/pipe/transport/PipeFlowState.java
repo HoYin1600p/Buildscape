@@ -13,7 +13,9 @@ import java.util.Objects;
 import java.util.Set;
 
 public class PipeFlowState {
-    private boolean hasWater;
+    public static final String WATER_FLUID_ID = "minecraft:water";
+
+    private String fluidId = "";
     private boolean isSource;
     private final Set<Direction> flowDirections = EnumSet.noneOf(Direction.class);
     @Nullable
@@ -27,7 +29,7 @@ public class PipeFlowState {
     }
 
     public PipeFlowState(boolean hasWater, boolean isSource, Collection<Direction> flowDirections, @Nullable Direction inflowDirection, BubbleColumnState bubbleColumn, int distance, int maxDistance, boolean isOpenEndpoint) {
-        this.hasWater = hasWater;
+        this.fluidId = hasWater ? WATER_FLUID_ID : "";
         this.isSource = isSource;
         if (flowDirections != null) {
             this.flowDirections.addAll(flowDirections);
@@ -48,11 +50,23 @@ public class PipeFlowState {
     }
 
     public boolean hasWater() {
-        return hasWater;
+        return WATER_FLUID_ID.equals(fluidId);
     }
 
     public void setHasWater(boolean hasWater) {
-        this.hasWater = hasWater;
+        this.fluidId = hasWater ? WATER_FLUID_ID : "";
+    }
+
+    public boolean hasFluid() {
+        return !fluidId.isEmpty();
+    }
+
+    public String getFluidId() {
+        return fluidId;
+    }
+
+    public void setFluidId(@Nullable String fluidId) {
+        this.fluidId = fluidId == null ? "" : fluidId;
     }
 
     public boolean isSource() {
@@ -120,12 +134,12 @@ public class PipeFlowState {
     public void setOpenEndpoint(boolean openEndpoint) { isOpenEndpoint = openEndpoint; }
 
     public boolean isEmpty() {
-        return !hasWater && !isSource && flowDirections.isEmpty() && inflowDirection == null
+        return !hasFluid() && !isSource && flowDirections.isEmpty() && inflowDirection == null
                 && bubbleColumn == BubbleColumnState.NONE && distance == 0 && maxDistance == 0 && !isOpenEndpoint;
     }
 
     public void clear() {
-        this.hasWater = false;
+        this.fluidId = "";
         this.isSource = false;
         this.flowDirections.clear();
         this.inflowDirection = null;
@@ -136,11 +150,17 @@ public class PipeFlowState {
     }
 
     public PipeFlowState copy() {
-        return new PipeFlowState(this.hasWater, this.isSource, this.flowDirections, this.inflowDirection, this.bubbleColumn, this.distance, this.maxDistance, this.isOpenEndpoint);
+        PipeFlowState copy = new PipeFlowState(false, this.isSource, this.flowDirections, this.inflowDirection,
+                this.bubbleColumn, this.distance, this.maxDistance, this.isOpenEndpoint);
+        copy.fluidId = this.fluidId;
+        return copy;
     }
 
     public CompoundTag writeToNbt(CompoundTag tag) {
-        tag.putBoolean("HasWater", hasWater);
+        tag.putBoolean("HasWater", hasWater());
+        if (hasFluid()) {
+            tag.putString("FluidId", fluidId);
+        }
         tag.putBoolean("IsSource", isSource);
         tag.putString("BubbleColumn", bubbleColumn.getSerializedName());
         tag.putInt("Distance", distance);
@@ -163,7 +183,9 @@ public class PipeFlowState {
         PipeFlowState state = new PipeFlowState();
         if (tag == null) return state;
 
-        state.hasWater = tag.getBoolean("HasWater");
+        state.fluidId = tag.contains("FluidId", Tag.TAG_STRING)
+                ? tag.getString("FluidId")
+                : (tag.getBoolean("HasWater") ? WATER_FLUID_ID : "");
         state.isSource = tag.getBoolean("IsSource");
         state.bubbleColumn = BubbleColumnState.byName(tag.getString("BubbleColumn"));
         state.distance = tag.getInt("Distance");
@@ -190,7 +212,7 @@ public class PipeFlowState {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof PipeFlowState that)) return false;
-        return hasWater == that.hasWater &&
+        return Objects.equals(fluidId, that.fluidId) &&
                 isSource == that.isSource &&
                 distance == that.distance &&
                 maxDistance == that.maxDistance &&
@@ -202,13 +224,13 @@ public class PipeFlowState {
 
     @Override
     public int hashCode() {
-        return Objects.hash(hasWater, isSource, flowDirections, inflowDirection, bubbleColumn, distance, maxDistance, isOpenEndpoint);
+        return Objects.hash(fluidId, isSource, flowDirections, inflowDirection, bubbleColumn, distance, maxDistance, isOpenEndpoint);
     }
 
     @Override
     public String toString() {
         return "PipeFlowState{" +
-                "hasWater=" + hasWater +
+                "fluidId='" + fluidId + '\'' +
                 ", isSource=" + isSource +
                 ", flowDirections=" + flowDirections +
                 ", inflowDirection=" + inflowDirection +

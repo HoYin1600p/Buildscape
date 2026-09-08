@@ -9,7 +9,6 @@
     "AgeableMobMixin",
     "AbstractContainerMenuMixin",
     "AnvilMenuMixin",
-    "BeaconBeamSectionAccessor",
     "BeaconBlockEntityAccessor",
     "BeaconBlockEntityMixin",
     "BlockMixin",

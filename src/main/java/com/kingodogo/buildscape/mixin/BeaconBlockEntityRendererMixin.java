@@ -1,60 +1,62 @@
 package com.kingodogo.buildscape.mixin;
 
-import com.kingodogo.buildscape.util.BeaconBeamHeightAccessor;
 import com.kingodogo.buildscape.util.BeaconBeamScanState;
+import com.kingodogo.buildscape.util.BeaconScanContext;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BeaconRenderer;
 import net.minecraft.world.level.block.entity.BeaconBlockEntity;
+import net.minecraft.world.level.block.entity.BeaconBlockEntity.BeaconBeamSection;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(BeaconRenderer.class)
+import java.util.List;
+
+@Mixin(value = BeaconRenderer.class, priority = 900)
 public class BeaconBlockEntityRendererMixin {
 
-    @Redirect(
-        method = "render(Lnet/minecraft/world/level/block/entity/BeaconBlockEntity;FLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;II)V",
-        at = @At(
-            value = "INVOKE",
-            target = "Lnet/minecraft/client/renderer/blockentity/BeaconRenderer;renderBeaconBeam(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;FJII[F)V"
-        )
+    @Inject(
+            method = "render(Lnet/minecraft/world/level/block/entity/BeaconBlockEntity;FLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;II)V",
+            at = @At("HEAD"),
+            cancellable = true
     )
-    private void buildscape$redirectRenderBeaconBeam(
-        PoseStack poseStack,
-        MultiBufferSource bufferSource,
-        float partialTicks,
-        long gameTime,
-        int yOffset,
-        int height,
-        float[] color,
-        BeaconBlockEntity blockEntity,
-        float outerPartialTicks,
-        PoseStack outerPoseStack,
-        MultiBufferSource outerBufferSource,
-        int combinedLight,
-        int combinedOverlay
+    private void buildscape$renderClippedBeam(
+            BeaconBlockEntity blockEntity,
+            float partialTicks,
+            PoseStack poseStack,
+            MultiBufferSource bufferSource,
+            int combinedLight,
+            int combinedOverlay,
+            CallbackInfo callback
     ) {
-        int newHeight = height;
-        if (blockEntity instanceof BeaconBeamHeightAccessor) {
-            int customHeight = ((BeaconBeamHeightAccessor) blockEntity).buildscape$getBeamHeight();
-            if (customHeight < BeaconBeamScanState.UNLIMITED) {
-                int remaining = customHeight - yOffset;
-                if (remaining <= 0) {
-                    return;
-                }
-                newHeight = Math.min(height, remaining);
-            }
+        int cutoff = BeaconScanContext.confirmedHeight(blockEntity.getLevel(), blockEntity.getBlockPos());
+        if (cutoff >= BeaconBeamScanState.UNLIMITED) {
+            return;
         }
 
-        BeaconRendererInvoker.invokeRenderBeaconBeam(
-            poseStack,
-            bufferSource,
-            partialTicks,
-            gameTime,
-            yOffset,
-            newHeight,
-            color
-        );
+        long gameTime = blockEntity.getLevel().getGameTime();
+        List<BeaconBeamSection> sections = blockEntity.getBeamSections();
+        int yOffset = 0;
+        for (BeaconBeamSection section : sections) {
+            int remaining = cutoff - yOffset;
+            if (remaining <= 0) {
+                break;
+            }
+
+            int sectionHeight = section.getHeight();
+            BeaconRendererInvoker.invokeRenderBeaconBeam(
+                    poseStack,
+                    bufferSource,
+                    partialTicks,
+                    gameTime,
+                    yOffset,
+                    Math.min(sectionHeight, remaining),
+                    section.getColor()
+            );
+            yOffset += sectionHeight;
+        }
+        callback.cancel();
     }
 }

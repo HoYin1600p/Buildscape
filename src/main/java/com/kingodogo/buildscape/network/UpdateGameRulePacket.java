@@ -49,6 +49,10 @@ public class UpdateGameRulePacket {
                 rules.getRule(ModGameRules.DISABLE_CREEPER_GRIEFING).set(value, player.getServer());
             } else if (ruleName.equals("disableGhastGriefing")) {
                 rules.getRule(ModGameRules.DISABLE_GHAST_GRIEFING).set(value, player.getServer());
+            } else if (ruleName.equals("isCakeStack")) {
+                rules.getRule(ModGameRules.IS_CAKE_STACK).set(value, player.getServer());
+            } else if (ruleName.equals("isWaterbottleStack")) {
+                rules.getRule(ModGameRules.IS_WATER_BOTTLE_STACK).set(value, player.getServer());
             }
         });
         context.setPacketHandled(true);

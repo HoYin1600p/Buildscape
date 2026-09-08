@@ -12,12 +12,16 @@ public class SyncGameRulesPacket {
     public final boolean disableEndermanGriefing;
     public final boolean disableCreeperGriefing;
     public final boolean disableGhastGriefing;
+    public final boolean cakeStacking;
+    public final boolean waterBottleStacking;
 
-    public SyncGameRulesPacket(boolean fastLeafDecay, boolean disableEndermanGriefing, boolean disableCreeperGriefing, boolean disableGhastGriefing) {
+    public SyncGameRulesPacket(boolean fastLeafDecay, boolean disableEndermanGriefing, boolean disableCreeperGriefing, boolean disableGhastGriefing, boolean cakeStacking, boolean waterBottleStacking) {
         this.fastLeafDecay = fastLeafDecay;
         this.disableEndermanGriefing = disableEndermanGriefing;
         this.disableCreeperGriefing = disableCreeperGriefing;
         this.disableGhastGriefing = disableGhastGriefing;
+        this.cakeStacking = cakeStacking;
+        this.waterBottleStacking = waterBottleStacking;
     }
 
     public SyncGameRulesPacket(FriendlyByteBuf buffer) {
@@ -25,6 +29,8 @@ public class SyncGameRulesPacket {
         this.disableEndermanGriefing = buffer.readBoolean();
         this.disableCreeperGriefing = buffer.readBoolean();
         this.disableGhastGriefing = buffer.readBoolean();
+        this.cakeStacking = buffer.readBoolean();
+        this.waterBottleStacking = buffer.readBoolean();
     }
 
     public static SyncGameRulesPacket decode(FriendlyByteBuf buffer) {
@@ -36,6 +42,8 @@ public class SyncGameRulesPacket {
         buffer.writeBoolean(disableEndermanGriefing);
         buffer.writeBoolean(disableCreeperGriefing);
         buffer.writeBoolean(disableGhastGriefing);
+        buffer.writeBoolean(cakeStacking);
+        buffer.writeBoolean(waterBottleStacking);
     }
 
     public void handle(Supplier<NetworkEvent.Context> supplier) {
@@ -48,6 +56,9 @@ public class SyncGameRulesPacket {
                     mc.level.getGameRules().getRule(com.kingodogo.buildscape.world.ModGameRules.DISABLE_ENDERMAN_GRIEFING).set(disableEndermanGriefing, null);
                     mc.level.getGameRules().getRule(com.kingodogo.buildscape.world.ModGameRules.DISABLE_CREEPER_GRIEFING).set(disableCreeperGriefing, null);
                     mc.level.getGameRules().getRule(com.kingodogo.buildscape.world.ModGameRules.DISABLE_GHAST_GRIEFING).set(disableGhastGriefing, null);
+                    mc.level.getGameRules().getRule(com.kingodogo.buildscape.world.ModGameRules.IS_CAKE_STACK).set(cakeStacking, null);
+                    mc.level.getGameRules().getRule(com.kingodogo.buildscape.world.ModGameRules.IS_WATER_BOTTLE_STACK).set(waterBottleStacking, null);
+                    com.kingodogo.buildscape.world.ModGameRules.setClientStackingRules(cakeStacking, waterBottleStacking);
                 }
             });
         });

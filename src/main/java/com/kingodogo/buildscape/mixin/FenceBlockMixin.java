@@ -35,7 +35,7 @@ public class FenceBlockMixin {
             return;
         }
         if (block instanceof FenceGateBlock) {
-            cir.setReturnValue(true);
+            cir.setReturnValue(FenceGateBlock.connectsToDirection(state, direction));
             return;
         }
         if (block instanceof OrnamentBlock) {

@@ -1,6 +1,7 @@
 package com.kingodogo.buildscape.block;
 
 import com.kingodogo.buildscape.event.AdvancementEvents;
+import com.kingodogo.buildscape.pipe.transport.HollowPipeTransportManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
@@ -64,7 +65,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
-import net.minecraft.world.level.material.FlowingFluid;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
@@ -80,7 +80,6 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Random;
 
 public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, SimpleWaterloggedBlock {
 
@@ -125,7 +124,6 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
         if (level.isClientSide) return null;
-        if (!state.getValue(LAVA_LOGGED)) return null;
         return type == ModBlockEntities.HOLLOW_LOG_BLOCK_ENTITY.get()
                 ? (lvl, pos, st, be) -> HollowLogBlockEntity.serverTick(lvl, pos, st, (HollowLogBlockEntity) be)
                 : null;
@@ -236,8 +234,7 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
             targetPos = (hitCoord >= 0.5);
         }
 
-        boolean hasFluid = state.getValue(WATERLOGGED) || state.getValue(LAVA_LOGGED)
-                || (hollowBe != null && !"none".equals(hollowBe.getFluidType()) && !hollowBe.getFluidType().isEmpty());
+        boolean hasFluid = HollowPipeBlock.getContainedFluid(state, hollowBe) != Fluids.EMPTY;
         boolean hasDecoration = state.getValue(HAS_DECORATION);
 
         if (hasFluid && isFullGlassBlock(held)) {
@@ -258,6 +255,7 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
                     }
                     level.playSound(null, pos, SoundEvents.GLASS_PLACE, SoundSource.BLOCKS, 1.0F, 1.0F);
                     level.updateNeighborsAt(pos, state.getBlock());
+                    HollowPipeTransportManager.markDirty(level, pos);
                 }
                 return InteractionResult.sidedSuccess(level.isClientSide);
             }
@@ -294,13 +292,14 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
                     SoundEvent sound = sourceFluid.getAttributes().getFillSound();
                     if (sound == null) sound = (sourceFluid == Fluids.LAVA) ? SoundEvents.BUCKET_FILL_LAVA : SoundEvents.BUCKET_FILL;
                     level.playSound(null, pos, sound, SoundSource.BLOCKS, 1.0F, 1.0F);
+                    HollowPipeTransportManager.onBucketUsed(level, pos, state);
                 }
                 return InteractionResult.sidedSuccess(level.isClientSide);
             }
 
             Fluid fluidInBucket = HollowPipeBlock.getFluidFromItem(held);
             if (fluidInBucket != Fluids.EMPTY) {
-                if (sourceFluid != Fluids.EMPTY) {
+                if (containedFluid != Fluids.EMPTY) {
                     return InteractionResult.sidedSuccess(level.isClientSide);
                 }
                 if (!level.isClientSide) {
@@ -319,11 +318,8 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
                     }
                     state = state.setValue(WATERLOGGED, isWater).setValue(LAVA_LOGGED, isLava);
                     level.setBlock(pos, state, 3);
-                    trySpreadToWorld(level, pos, state, fluidInBucket);
-                    if (fluidInBucket instanceof FlowingFluid flowing) {
-                        level.scheduleTick(pos, flowing, flowing.getTickDelay(level));
-                    }
                     level.updateNeighborsAt(pos, state.getBlock());
+                    HollowPipeTransportManager.onBucketUsed(level, pos, state);
 
                     if (!player.getAbilities().instabuild) {
                         ItemStack emptyContainer = held.hasContainerItem() ? held.getContainerItem() : new ItemStack(Items.BUCKET);
@@ -421,14 +417,8 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
                     }
                     level.playSound(null, pos, SoundEvents.GLASS_BREAK, SoundSource.BLOCKS, 1.0F, 1.0F);
 
-                    Fluid fluid = HollowPipeBlock.getContainedFluid(state, hollowBe);
-                    if (fluid != Fluids.EMPTY) {
-                        trySpreadToWorld(level, pos, state, fluid);
-                        if (fluid instanceof FlowingFluid flowing) {
-                            level.scheduleTick(pos, flowing, flowing.getTickDelay(level));
-                        }
-                    }
                     level.updateNeighborsAt(pos, state.getBlock());
+                    HollowPipeTransportManager.markDirty(level, pos);
                 }
                 return InteractionResult.sidedSuccess(level.isClientSide);
             } else if (hasAnyDecoration) {
@@ -607,11 +597,14 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
                 }
             }
             super.onRemove(state, level, pos, newState, isMoving);
-            if (!level.isClientSide && sourceFluid != null && sourceFluid != Fluids.EMPTY) {
-                BlockState fluidBlock = sourceFluid.defaultFluidState().createLegacyBlock();
-                if (!fluidBlock.isAir() && level.getBlockState(pos).isAir()) {
-                    level.setBlock(pos, fluidBlock, 3);
-                    level.scheduleTick(pos, sourceFluid, sourceFluid.getTickDelay(level));
+            if (!level.isClientSide) {
+                HollowPipeTransportManager.onBlockRemoved(level, pos, state);
+                if (sourceFluid != null && sourceFluid != Fluids.EMPTY) {
+                    BlockState fluidBlock = sourceFluid.defaultFluidState().createLegacyBlock();
+                    if (!fluidBlock.isAir() && level.getBlockState(pos).isAir()) {
+                        level.setBlock(pos, fluidBlock, 3);
+                        level.scheduleTick(pos, sourceFluid, sourceFluid.getTickDelay(level));
+                    }
                 }
             }
         } else {
@@ -691,69 +684,23 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
                     level.setBlock(pos, updated, 3);
                 }
             }
-            Fluid fluid = HollowPipeBlock.getContainedFluid(state, be);
-            if (fluid != Fluids.EMPTY) {
-                trySpreadToWorld(level, pos, state, fluid);
-            }
+            HollowPipeTransportManager.onBlockPlaced(level, pos, state);
         }
     }
 
     @Override
     public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
         if (!level.isClientSide() && level instanceof Level lvl) {
-            Fluid fluid = HollowPipeBlock.getContainedFluid(state, lvl.getBlockEntity(pos));
-            if (fluid != Fluids.EMPTY) {
-                trySpreadToWorld(lvl, pos, state, fluid);
-            }
+            HollowPipeTransportManager.onNeighborChanged(lvl, pos, state, neighborPos);
         }
         return super.updateShape(state, direction, neighborState, level, pos, neighborPos);
     }
 
-    public static void trySpreadToWorld(Level level, BlockPos pos, BlockState state, Fluid fluid) {
-        if (fluid == null || fluid == Fluids.EMPTY || level.isClientSide) return;
-        Direction.Axis axis = state.getValue(AXIS);
-        Direction negDir = switch (axis) {
-            case X -> Direction.WEST;
-            case Z -> Direction.NORTH;
-            default -> Direction.DOWN;
-        };
-        Direction posDir = switch (axis) {
-            case X -> Direction.EAST;
-            case Z -> Direction.SOUTH;
-            default -> Direction.UP;
-        };
-
-        boolean hasGlassNeg = state.getValue(HAS_GLASS_NEG);
-        boolean hasGlassPos = state.getValue(HAS_GLASS_POS);
-
-        if (!hasGlassNeg && negDir != Direction.UP) {
-            spreadToWorldBlock(level, pos.relative(negDir), fluid);
-        }
-        if (!hasGlassPos && posDir != Direction.UP) {
-            spreadToWorldBlock(level, pos.relative(posDir), fluid);
-        }
-    }
-
-    private static void spreadToWorldBlock(Level level, BlockPos neighborPos, Fluid fluid) {
-        BlockState neighborState = level.getBlockState(neighborPos);
-        if (neighborState.getBlock() instanceof HollowLogBlock || neighborState.getBlock() instanceof HollowPipeBlock) {
-            return;
-        }
-
-        if (neighborState.isAir() || neighborState.canBeReplaced(fluid) || (neighborState.getBlock() instanceof LiquidBlock && !neighborState.getFluidState().isSource())) {
-            if (fluid instanceof FlowingFluid flowing) {
-                BlockState fluidBlock = flowing.getFlowing(7, false).createLegacyBlock();
-                if (!fluidBlock.isAir() && !neighborState.equals(fluidBlock)) {
-                    level.setBlock(neighborPos, fluidBlock, 3);
-                    level.scheduleTick(neighborPos, flowing, flowing.getTickDelay(level));
-                }
-            } else {
-                BlockState fluidBlock = fluid.defaultFluidState().createLegacyBlock();
-                if (!fluidBlock.isAir() && !neighborState.equals(fluidBlock)) {
-                    level.setBlock(neighborPos, fluidBlock, 3);
-                    level.scheduleTick(neighborPos, fluid, fluid.getTickDelay(level));
-                }
-            }
+    @Override
+    public void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, BlockPos fromPos, boolean isMoving) {
+        super.neighborChanged(state, level, pos, block, fromPos, isMoving);
+        if (!level.isClientSide) {
+            HollowPipeTransportManager.onNeighborChanged(level, pos, state, fromPos);
         }
     }
 
@@ -775,8 +722,8 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
                     hollowBe.setChanged();
                 }
                 if (level instanceof Level lvl) {
-                    trySpreadToWorld(lvl, pos, newState, Fluids.WATER);
                     lvl.updateNeighborsAt(pos, newState.getBlock());
+                    HollowPipeTransportManager.onBucketUsed(lvl, pos, newState);
                 }
             }
             return true;
@@ -796,6 +743,9 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
                 hollowBe.setChanged();
             }
             level.setBlock(pos, state.setValue(WATERLOGGED, false).setValue(LAVA_LOGGED, false), 3);
+            if (level instanceof Level lvl) {
+                HollowPipeTransportManager.onBucketUsed(lvl, pos, state);
+            }
             return HollowPipeBlock.getFilledBucketForFluid(sourceFluid);
         }
         return ItemStack.EMPTY;

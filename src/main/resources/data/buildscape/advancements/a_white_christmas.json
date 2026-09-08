@@ -15,13 +15,6 @@
     "hidden": false
   },
   "parent": "buildscape:a_star_is_born",
-  "rewards": {
-    "items": [
-      {
-        "item": "buildscape:snowy_spruce_leaves"
-      }
-    ]
-  },
   "criteria": {
     "custom": {
       "trigger": "minecraft:impossible"

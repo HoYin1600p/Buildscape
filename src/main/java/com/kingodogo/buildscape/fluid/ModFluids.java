@@ -12,6 +12,15 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 
 public class ModFluids {
+    public static boolean isExperience(Fluid fluid) {
+        return fluid == EXPERIENCE_STILL.get() || fluid == EXPERIENCE_FLOWING.get();
+    }
+
+    public static boolean cannotMix(Fluid first, Fluid second) {
+        return (isExperience(first) && net.minecraft.world.level.material.Fluids.LAVA.isSame(second))
+                || (isExperience(second) && net.minecraft.world.level.material.Fluids.LAVA.isSame(first));
+    }
+
     public static final DeferredRegister<Fluid> FLUIDS =
             DeferredRegister.create(ForgeRegistries.FLUIDS, BuildScape.MODID);
 

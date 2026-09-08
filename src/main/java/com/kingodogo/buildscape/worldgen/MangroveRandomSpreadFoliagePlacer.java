@@ -140,7 +140,8 @@ public class MangroveRandomSpreadFoliagePlacer extends FoliagePlacer {
 
         java.util.Collections.shuffle(candidates, random);
         for (BlockPos candidate : candidates) {
-            if (isConnectedToLogOrLeaf(level, candidate, placedLeaves, config)) {
+            if (level.isStateAtPosition(candidate, BlockState::isAir)
+                    && isConnectedToLogOrLeaf(level, candidate, placedLeaves, config)) {
                 blockSetter.accept(
                         candidate,
                         config.foliageProvider.getState(random, candidate)

@@ -83,7 +83,13 @@ public class MangrovePropaguleDecorator extends TreeDecorator {
                 existingLeaves.add(leafPos.immutable());
             }
         }
-        var supportedLeaves = new ArrayList<>(MangroveLeafSupport.findSupportedLeaves(logPositions, existingLeaves));
+        var supported = MangroveLeafSupport.findSupportedLeaves(logPositions, existingLeaves);
+        for (BlockPos leafPos : existingLeaves) {
+            if (!supported.contains(leafPos)) {
+                blockSetter.accept(leafPos, Blocks.AIR.defaultBlockState());
+            }
+        }
+        var supportedLeaves = new ArrayList<>(supported);
         supportedLeaves.sort(BlockPos::compareTo);
         java.util.Collections.shuffle(supportedLeaves, random);
 

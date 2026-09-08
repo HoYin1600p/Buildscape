@@ -15,10 +15,6 @@ public final class PipeOutletWater {
             open = HollowPipeBlock.isOpenEndpoint(pipe, exit);
             containedFluid = pipe.getValue(HollowPipeBlock.WATERLOGGED)
                     || pipe.getValue(HollowPipeBlock.LAVA_LOGGED);
-        } else if (pipe.getBlock() instanceof HollowLogBlock) {
-            open = HollowLogBlock.isOpenEnd(pipe, exit);
-            containedFluid = pipe.getValue(HollowLogBlock.WATERLOGGED)
-                    || pipe.getValue(HollowLogBlock.LAVA_LOGGED);
         } else {
             return 0;
         }

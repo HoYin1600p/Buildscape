@@ -87,7 +87,7 @@ public class MangroveUpwardsBranchingTrunkPlacer extends TrunkPlacer {
             int y = elevatedStartY + i;
             mutablePos.set(pos.getX(), y, pos.getZ());
 
-            if (this.placeLog(level, blockSetter, random, mutablePos, config)) {
+            if (placeMangroveLog(level, blockSetter, random, mutablePos, config)) {
                 if (i > 0 && random.nextFloat() < placeBranchPerLogProbability) {
                     this.placeBranch(
                             level,
@@ -141,7 +141,7 @@ public class MangroveUpwardsBranchingTrunkPlacer extends TrunkPlacer {
 
         for (int i = 0; i < branchLength; i++) {
             branchEnd.move(branchDirection);
-            if (this.placeLog(level, blockSetter, random, branchEnd, config)) {
+            if (placeMangroveLog(level, blockSetter, random, branchEnd, config)) {
                 currentPos.set(branchEnd);
             } else {
                 break;
@@ -150,7 +150,7 @@ public class MangroveUpwardsBranchingTrunkPlacer extends TrunkPlacer {
 
         for (int i = 0; i < branchSteps; i++) {
             branchEnd.move(Direction.UP);
-            if (this.placeLog(level, blockSetter, random, branchEnd, config)) {
+            if (placeMangroveLog(level, blockSetter, random, branchEnd, config)) {
                 currentPos.set(branchEnd);
                 foliageAttachments.add(
                         new FoliagePlacer.FoliageAttachment(currentPos.immutable(), 0, false)
@@ -159,5 +159,13 @@ public class MangroveUpwardsBranchingTrunkPlacer extends TrunkPlacer {
                 break;
             }
         }
+    }
+
+    private static boolean placeMangroveLog(LevelSimulatedReader level,
+                                           BiConsumer<BlockPos, BlockState> blockSetter,
+                                           Random random, BlockPos pos, TreeConfiguration config) {
+        return level.isStateAtPosition(pos, state -> state.isAir()
+                || state.is(net.minecraft.world.level.block.Blocks.WATER))
+                && placeLog(level, blockSetter, random, pos, config);
     }
 }

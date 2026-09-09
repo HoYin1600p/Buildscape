@@ -1,11 +1,15 @@
 package com.kingodogo.buildscape.client.screen.widget;
 
+import com.mojang.blaze3d.platform.NativeImage;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.network.chat.TextComponent;
+import net.minecraft.resources.ResourceLocation;
 
 import java.util.function.Consumer;
 
@@ -18,6 +22,18 @@ public class ColorPickerWidget extends AbstractWidget {
     private static final int SLIDER_SPACING = 18;
     private static final int TEXT_FIELD_HEIGHT = 20;
     private static final int VALUE_TEXT_WIDTH = 40;
+    private static final int HUE_TEXTURE_Y = GRADIENT_SIZE;
+    private static final int SLIDER_TEXTURE_Y = HUE_TEXTURE_Y + HUE_SLIDER_HEIGHT;
+    private static final int TEXTURE_HEIGHT = SLIDER_TEXTURE_Y + 6;
+
+    private static DynamicTexture gradientTexture;
+    private static ResourceLocation gradientTextureLocation;
+    private static float cachedHue = Float.NaN;
+    private static float cachedSaturation = Float.NaN;
+    private static float cachedBrightness = Float.NaN;
+    private static int cachedR = -1;
+    private static int cachedG = -1;
+    private static int cachedB = -1;
 
     private int currentColor;
     private final Consumer<String> onColorChanged;
@@ -245,15 +261,9 @@ public class ColorPickerWidget extends AbstractWidget {
         int hueSliderX = gradientX + scaledGradientSize + scaledGap1;
         int hueSliderY = gradientY;
 
-        for (int py = 0; py < scaledGradientSize; py++) {
-            for (int px = 0; px < scaledGradientSize; px++) {
-                float s = px / (float) scaledGradientSize;
-                float b = 1.0f - (py / (float) scaledGradientSize);
-                int color = hsbToRgb(hue, s, b);
-                fill(poseStack, gradientX + px, gradientY + py, gradientX + px + 1, gradientY + py + 1,
-                        0xFF000000 | color);
-            }
-        }
+        ensureGradientTexture();
+        blitGradient(poseStack, gradientX, gradientY, scaledGradientSize, scaledGradientSize,
+                0, 0, GRADIENT_SIZE, GRADIENT_SIZE);
 
         fill(poseStack, gradientX - 1, gradientY - 1, gradientX + scaledGradientSize + 1, gradientY, 0xFF000000);
         fill(poseStack, gradientX - 1, gradientY + scaledGradientSize, gradientX + scaledGradientSize + 1,
@@ -262,12 +272,8 @@ public class ColorPickerWidget extends AbstractWidget {
         fill(poseStack, gradientX + scaledGradientSize, gradientY - 1, gradientX + scaledGradientSize + 1,
                 gradientY + scaledGradientSize + 1, 0xFF000000);
 
-        for (int py = 0; py < scaledHueSliderHeight; py++) {
-            float h = (py / (float) scaledHueSliderHeight) * 360.0f;
-            int color = hsbToRgb(h, 1.0f, 1.0f);
-            fill(poseStack, hueSliderX, hueSliderY + py, hueSliderX + scaledHueSliderWidth, hueSliderY + py + 1,
-                    0xFF000000 | color);
-        }
+        blitGradient(poseStack, hueSliderX, hueSliderY, scaledHueSliderWidth, scaledHueSliderHeight,
+                0, HUE_TEXTURE_Y, 1, HUE_SLIDER_HEIGHT);
 
         fill(poseStack, hueSliderX - 1, hueSliderY - 1, hueSliderX + scaledHueSliderWidth + 1, hueSliderY, 0xFF000000);
         fill(poseStack, hueSliderX - 1, hueSliderY + scaledHueSliderHeight, hueSliderX + scaledHueSliderWidth + 1,
@@ -301,20 +307,20 @@ public class ColorPickerWidget extends AbstractWidget {
 
         int rgbStartX = hueSliderX + scaledHueSliderWidth + scaledGap2;
         int rgbStartY = gradientY;
-        renderSliderScaled(poseStack, mc, rgbStartX, rgbStartY, "R", r, 0, 255, 0xFF0000, draggingR, scale, false,
+        renderSliderScaled(poseStack, mc, rgbStartX, rgbStartY, "R", r, 0, 255, 0, draggingR, scale, false,
                 mouseX, mouseY, partialTick);
-        renderSliderScaled(poseStack, mc, rgbStartX, rgbStartY + scaledSliderSpacing, "G", g, 0, 255, 0x00FF00,
+        renderSliderScaled(poseStack, mc, rgbStartX, rgbStartY + scaledSliderSpacing, "G", g, 0, 255, 1,
                 draggingG, scale, false, mouseX, mouseY, partialTick);
-        renderSliderScaled(poseStack, mc, rgbStartX, rgbStartY + scaledSliderSpacing * 2, "B", b, 0, 255, 0x0000FF,
+        renderSliderScaled(poseStack, mc, rgbStartX, rgbStartY + scaledSliderSpacing * 2, "B", b, 0, 255, 2,
                 draggingB, scale, false, mouseX, mouseY, partialTick);
 
         int hsbStartY = rgbStartY + scaledSliderSpacing * 3 + (int) (5 * scale);
-        renderSliderScaled(poseStack, mc, rgbStartX, hsbStartY, "H", (int) hue, 0, 360, -1, draggingH, scale, true,
+        renderSliderScaled(poseStack, mc, rgbStartX, hsbStartY, "H", (int) hue, 0, 360, 3, draggingH, scale, true,
                 mouseX, mouseY, partialTick);
         renderSliderScaled(poseStack, mc, rgbStartX, hsbStartY + scaledSliderSpacing, "S", (int) (saturation * 100), 0,
-                100, -1, draggingS, scale, true, mouseX, mouseY, partialTick);
+                100, 4, draggingS, scale, true, mouseX, mouseY, partialTick);
         renderSliderScaled(poseStack, mc, rgbStartX, hsbStartY + scaledSliderSpacing * 2, "B", (int) (brightness * 100),
-                0, 100, -1, draggingBrightness, scale, true, mouseX, mouseY, partialTick);
+                0, 100, 5, draggingBrightness, scale, true, mouseX, mouseY, partialTick);
 
         if (!enabled) {
             fill(poseStack, x, y, x + width, y + height, 0x80000000);
@@ -322,7 +328,7 @@ public class ColorPickerWidget extends AbstractWidget {
     }
 
     private void renderSliderScaled(PoseStack poseStack, Minecraft mc, int x, int y, String label, int value, int min,
-            int max, int gradientColor, boolean isDragging, float scale, boolean isHsb, int mouseX, int mouseY,
+            int max, int textureRow, boolean isDragging, float scale, boolean isHsb, int mouseX, int mouseY,
             float partialTick) {
         int scaledSliderWidth = (int) (SLIDER_WIDTH * scale);
         int scaledSliderHeight = (int) (SLIDER_HEIGHT * scale);
@@ -341,50 +347,8 @@ public class ColorPickerWidget extends AbstractWidget {
         int sliderX = x + labelW;
         int sliderY = y;
 
-        if (gradientColor == -1) {
-            if (label.equals("H")) {
-                for (int px = 0; px < scaledSliderWidth; px++) {
-                    float h = (px / (float) scaledSliderWidth) * 360.0f;
-                    int color = hsbToRgb(h, 1.0f, 1.0f);
-                    fill(poseStack, sliderX + px, sliderY, sliderX + px + 1, sliderY + scaledSliderHeight,
-                            0xFF000000 | color);
-                }
-            } else {
-                int baseColor = label.equals("S") ? hsbToRgb(hue, 1.0f, brightness) : hsbToRgb(hue, saturation, 1.0f);
-                for (int px = 0; px < scaledSliderWidth; px++) {
-                    float ratio = px / (float) scaledSliderWidth;
-                    int r = (baseColor >> 16) & 0xFF;
-                    int g = (baseColor >> 8) & 0xFF;
-                    int bl = baseColor & 0xFF;
-                    if (label.equals("S")) {
-                        r = (int) (128 + (r - 128) * ratio);
-                        g = (int) (128 + (g - 128) * ratio);
-                        bl = (int) (128 + (bl - 128) * ratio);
-                    } else {
-                        r = (int) (r * ratio);
-                        g = (int) (g * ratio);
-                        bl = (int) (bl * ratio);
-                    }
-                    int color = (r << 16) | (g << 8) | bl;
-                    fill(poseStack, sliderX + px, sliderY, sliderX + px + 1, sliderY + scaledSliderHeight,
-                            0xFF000000 | color);
-                }
-            }
-        } else {
-            for (int px = 0; px < scaledSliderWidth; px++) {
-                float ratio = px / (float) scaledSliderWidth;
-                int color = 0;
-                if (label.equals("R")) {
-                    color = ((int) (ratio * 255) << 16) | ((g << 8) | b);
-                } else if (label.equals("G")) {
-                    color = (r << 16) | ((int) (ratio * 255) << 8) | b;
-                } else {
-                    color = (r << 16) | (g << 8) | (int) (ratio * 255);
-                }
-                fill(poseStack, sliderX + px, sliderY, sliderX + px + 1, sliderY + scaledSliderHeight,
-                        0xFF000000 | color);
-            }
-        }
+        blitGradient(poseStack, sliderX, sliderY, scaledSliderWidth, scaledSliderHeight,
+                0, SLIDER_TEXTURE_Y + textureRow, SLIDER_WIDTH, 1);
 
         fill(poseStack, sliderX - 1, sliderY - 1, sliderX + scaledSliderWidth + 1, sliderY, 0xFF000000);
         fill(poseStack, sliderX - 1, sliderY + scaledSliderHeight, sliderX + scaledSliderWidth + 1,
@@ -416,6 +380,89 @@ public class ColorPickerWidget extends AbstractWidget {
         poseStack.scale(scale, scale, 1.0f);
         mc.font.draw(poseStack, valueStr, 0, 0, 0xFF000000);
         poseStack.popPose();
+    }
+
+    private void ensureGradientTexture() {
+        if (gradientTexture == null || gradientTexture.getPixels() == null) {
+            gradientTexture = new DynamicTexture(GRADIENT_SIZE, TEXTURE_HEIGHT, true);
+            gradientTexture.setFilter(false, false);
+            gradientTextureLocation = Minecraft.getInstance().getTextureManager()
+                    .register("buildscape_color_picker", gradientTexture);
+        }
+
+        if (Float.compare(cachedHue, hue) == 0
+                && Float.compare(cachedSaturation, saturation) == 0
+                && Float.compare(cachedBrightness, brightness) == 0
+                && cachedR == r && cachedG == g && cachedB == b) {
+            return;
+        }
+
+        NativeImage image = gradientTexture.getPixels();
+        if (image == null) {
+            return;
+        }
+
+        for (int py = 0; py < GRADIENT_SIZE; py++) {
+            float pixelBrightness = 1.0f - (py / (float) GRADIENT_SIZE);
+            for (int px = 0; px < GRADIENT_SIZE; px++) {
+                float pixelSaturation = px / (float) GRADIENT_SIZE;
+                setTexturePixel(image, px, py, hsbToRgb(hue, pixelSaturation, pixelBrightness));
+            }
+        }
+
+        for (int py = 0; py < HUE_SLIDER_HEIGHT; py++) {
+            float pixelHue = (py / (float) HUE_SLIDER_HEIGHT) * 360.0f;
+            setTexturePixel(image, 0, HUE_TEXTURE_Y + py, hsbToRgb(pixelHue, 1.0f, 1.0f));
+        }
+
+        int saturationBase = hsbToRgb(hue, 1.0f, brightness);
+        int brightnessBase = hsbToRgb(hue, saturation, 1.0f);
+        for (int px = 0; px < SLIDER_WIDTH; px++) {
+            float ratio = px / (float) SLIDER_WIDTH;
+            int variable = (int) (ratio * 255);
+            setTexturePixel(image, px, SLIDER_TEXTURE_Y, (variable << 16) | (g << 8) | b);
+            setTexturePixel(image, px, SLIDER_TEXTURE_Y + 1, (r << 16) | (variable << 8) | b);
+            setTexturePixel(image, px, SLIDER_TEXTURE_Y + 2, (r << 16) | (g << 8) | variable);
+            setTexturePixel(image, px, SLIDER_TEXTURE_Y + 3, hsbToRgb(ratio * 360.0f, 1.0f, 1.0f));
+            setTexturePixel(image, px, SLIDER_TEXTURE_Y + 4, interpolateSaturation(saturationBase, ratio));
+            setTexturePixel(image, px, SLIDER_TEXTURE_Y + 5, scaleBrightness(brightnessBase, ratio));
+        }
+
+        gradientTexture.upload();
+        cachedHue = hue;
+        cachedSaturation = saturation;
+        cachedBrightness = brightness;
+        cachedR = r;
+        cachedG = g;
+        cachedB = b;
+    }
+
+    private static int interpolateSaturation(int color, float ratio) {
+        int red = (int) (128 + (((color >> 16) & 0xFF) - 128) * ratio);
+        int green = (int) (128 + (((color >> 8) & 0xFF) - 128) * ratio);
+        int blue = (int) (128 + ((color & 0xFF) - 128) * ratio);
+        return (red << 16) | (green << 8) | blue;
+    }
+
+    private static int scaleBrightness(int color, float ratio) {
+        int red = (int) (((color >> 16) & 0xFF) * ratio);
+        int green = (int) (((color >> 8) & 0xFF) * ratio);
+        int blue = (int) ((color & 0xFF) * ratio);
+        return (red << 16) | (green << 8) | blue;
+    }
+
+    private static void setTexturePixel(NativeImage image, int x, int y, int color) {
+        int red = (color >> 16) & 0xFF;
+        int green = (color >> 8) & 0xFF;
+        int blue = color & 0xFF;
+        image.setPixelRGBA(x, y, NativeImage.combine(255, blue, green, red));
+    }
+
+    private static void blitGradient(PoseStack poseStack, int x, int y, int width, int height,
+            int textureX, int textureY, int textureWidth, int textureHeight) {
+        RenderSystem.setShaderTexture(0, gradientTextureLocation);
+        blit(poseStack, x, y, width, height, (float) textureX, (float) textureY,
+                textureWidth, textureHeight, GRADIENT_SIZE, TEXTURE_HEIGHT);
     }
 
     private void renderSlider(PoseStack poseStack, Minecraft mc, int x, int y, String label, int value, int min,

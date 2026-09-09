@@ -249,18 +249,6 @@ public class GlassJarBlock extends Block implements EntityBlock, SimpleWaterlogg
                 }
             }
 
-            if (handStack.isEmpty() && jarBE.hasLiquid() && jarBE.getLiquidLevel() > 0) {
-                ItemStack bottleRepresentation = jarBE.getBottleRepresentation();
-                if (!bottleRepresentation.isEmpty()) {
-                    if (level.isClientSide) return InteractionResult.SUCCESS;
-                    ItemStack bottle = jarBE.extractBottle();
-                    if (!bottle.isEmpty()) {
-                        player.setItemInHand(hand, bottle);
-                        level.playSound(null, pos, SoundEvents.BOTTLE_FILL, SoundSource.BLOCKS, 1.0F, 1.0F);
-                        return InteractionResult.SUCCESS;
-                    }
-                }
-            }
         }
 
         if (handStack.is(Items.BUCKET) && jarBE.hasLiquid()) {

@@ -52,32 +52,32 @@
     "sounds": [
       {
         "name": "buildscape:block/mud/break1",
-        "volume": 1,
+        "volume": 0.4,
         "pitch": 0.9
       },
       {
         "name": "buildscape:block/mud/break2",
-        "volume": 1,
+        "volume": 0.4,
         "pitch": 0.9
       },
       {
         "name": "buildscape:block/mud/break3",
-        "volume": 1,
+        "volume": 0.4,
         "pitch": 0.9
       },
       {
         "name": "buildscape:block/mud/break4",
-        "volume": 1,
+        "volume": 0.4,
         "pitch": 0.9
       },
       {
         "name": "buildscape:block/mud/break5",
-        "volume": 1,
+        "volume": 0.4,
         "pitch": 0.9
       },
       {
         "name": "buildscape:block/mud/break6",
-        "volume": 1,
+        "volume": 0.4,
         "pitch": 0.9
       }
     ]
@@ -86,32 +86,32 @@
     "sounds": [
       {
         "name": "buildscape:block/mud/step1",
-        "volume": 1,
+        "volume": 0.4,
         "pitch": 0.9
       },
       {
         "name": "buildscape:block/mud/step2",
-        "volume": 1,
+        "volume": 0.4,
         "pitch": 0.9
       },
       {
         "name": "buildscape:block/mud/step3",
-        "volume": 1,
+        "volume": 0.4,
         "pitch": 0.9
       },
       {
         "name": "buildscape:block/mud/step4",
-        "volume": 1,
+        "volume": 0.4,
         "pitch": 0.9
       },
       {
         "name": "buildscape:block/mud/step5",
-        "volume": 1,
+        "volume": 0.4,
         "pitch": 0.9
       },
       {
         "name": "buildscape:block/mud/step6",
-        "volume": 1,
+        "volume": 0.4,
         "pitch": 0.9
       }
     ]
@@ -1111,7 +1111,7 @@
   "block_geyser_eruption_start": {
     "sounds": [
       {
-        "name": "entity.generic.explode",
+        "name": "block.bubble_column.whirlpool_inside",
         "type": "event"
       }
     ]

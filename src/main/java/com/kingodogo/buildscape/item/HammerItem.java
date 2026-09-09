@@ -91,7 +91,9 @@ public class HammerItem extends Item {
     @Override
     public void appendHoverText(net.minecraft.world.item.ItemStack stack, @javax.annotation.Nullable net.minecraft.world.level.Level level, java.util.List<net.minecraft.network.chat.Component> tooltip, net.minecraft.world.item.TooltipFlag flag) {
         tooltip.add(new net.minecraft.network.chat.TranslatableComponent("tooltip.buildscape.hammer.desc1").withStyle(net.minecraft.ChatFormatting.GRAY));
-        tooltip.add(new net.minecraft.network.chat.TranslatableComponent("tooltip.buildscape.hammer.desc2").withStyle(net.minecraft.ChatFormatting.RED));
+        if (tier == HammerTier.IRON) {
+            tooltip.add(new net.minecraft.network.chat.TranslatableComponent("tooltip.buildscape.hammer.desc2").withStyle(net.minecraft.ChatFormatting.RED));
+        }
         tooltip.add(new net.minecraft.network.chat.TranslatableComponent("tooltip.buildscape.hammer.desc3").withStyle(net.minecraft.ChatFormatting.AQUA));
         super.appendHoverText(stack, level, tooltip, flag);
     }

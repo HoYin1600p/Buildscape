@@ -133,9 +133,20 @@ public final class WbRenderer {
         GuiComponent.blit(ps, x, y, inkW, inkH, 0f, 0f, inkW, inkH, TITLE_SHEET_W, TITLE_SHEET_H);
     }
 
-    public static void drawCopyArrow(PoseStack ps, int x, int y, float progress) {
+    public static void drawCopyArrow(PoseStack ps, int x, int y, float progress, boolean blocked) {
         RenderSystem.setShaderTexture(0, BUILDERS_ARROW);
         blitFloat(ps, x, y, ARROW_W, ARROW_H, 0f, 0f, 1f, 1f);
+
+        if (blocked) {
+            int centerX = x + ARROW_W / 2;
+            int centerY = y + ARROW_H / 2;
+            int color = 0xFFE84B4B;
+            for (int offset = -4; offset <= 4; offset++) {
+                GuiComponent.fill(ps, centerX + offset, centerY + offset, centerX + offset + 2, centerY + offset + 2, color);
+                GuiComponent.fill(ps, centerX + offset, centerY - offset, centerX + offset + 2, centerY - offset + 2, color);
+            }
+            return;
+        }
 
         float p = Math.max(0f, Math.min(1f, progress));
         if (p > 0f) {

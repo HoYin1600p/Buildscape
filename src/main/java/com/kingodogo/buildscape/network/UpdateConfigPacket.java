@@ -39,7 +39,7 @@ public class UpdateConfigPacket {
                 return;
             }
 
-            PillarParticleConfig serverConfig = PillarParticleConfig.get();
+            PillarParticleConfig serverConfig = PillarParticleConfig.getServerConfig();
             String oldPattern = serverConfig.pattern;
 
             serverConfig.particle_speed = data.particle_speed;
@@ -59,8 +59,8 @@ public class UpdateConfigPacket {
                 serverConfig.items = new HashSet<>(data.items);
             }
 
-            serverConfig.saveProperties();
-            serverConfig.saveItems();
+            serverConfig.savePropertiesToDisk();
+            serverConfig.saveItemsToDisk();
 
             ModMessages.INSTANCE.send(
                     PacketDistributor.ALL.noArg(),

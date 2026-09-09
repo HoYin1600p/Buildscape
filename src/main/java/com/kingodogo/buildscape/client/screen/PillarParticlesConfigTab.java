@@ -1,6 +1,5 @@
 package com.kingodogo.buildscape.client.screen;
 
-import com.kingodogo.buildscape.block.PillarBlockEntity;
 import com.kingodogo.buildscape.client.screen.widget.*;
 import com.kingodogo.buildscape.config.PillarIdManager;
 import com.kingodogo.buildscape.config.PillarParticleConfig;
@@ -15,7 +14,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextColor;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
-import net.minecraft.world.level.block.entity.BlockEntity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -282,10 +280,6 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
             } else {
                 resetColorsToDefault();
             }
-            com.kingodogo.buildscape.network.ModMessages.INSTANCE.sendToServer(
-                    new com.kingodogo.buildscape.network.UpdateConfigPacket(PillarParticleConfig.get())
-            );
-            updateWorldPillars();
         });
         addTabWidget(colorsResetButton);
 
@@ -382,8 +376,9 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
             colorHexFields = new ArrayList<>();
         }
 
-        while (config.particle_color.size() < 7) {
-            config.particle_color.add("#FFFFFF");
+        List<String> displayColors = new ArrayList<>(config.particle_color);
+        while (displayColors.size() < 7) {
+            displayColors.add("#FFFFFF");
         }
 
         int startY = colorBoxY + padding + 25;
@@ -392,7 +387,7 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
 
         for (int i = 0; i < 7; i++) {
             final int colorIndex = i;
-            String hexValue = config.particle_color.get(i);
+            String hexValue = displayColors.get(i);
             int color = 0xFFFFFF;
             try {
                 if (hexValue.startsWith("#") && hexValue.length() == 7) {
@@ -823,49 +818,12 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
         }
         config.particle_color.set(index, hexColor);
         config.saveProperties();
-
-        com.kingodogo.buildscape.network.ModMessages.INSTANCE.sendToServer(new com.kingodogo.buildscape.network.UpdateConfigPacket(config));
-
-        updateWorldPillars();
-    }
-
-    private void updateWorldPillars() {
-        Minecraft mc = Minecraft.getInstance();
-        PillarIdManager manager = PillarIdManager.getClient();
-        if (mc.level != null && mc.player != null) {
-            int renderDistance = mc.options.renderDistance;
-            int range = 32;
-
-            net.minecraft.world.level.ChunkPos center = mc.player.chunkPosition();
-
-            for (int x = center.x - range; x <= center.x + range; x++) {
-                for (int z = center.z - range; z <= center.z + range; z++) {
-                    if (mc.level.hasChunk(x, z)) {
-                        net.minecraft.world.level.chunk.LevelChunk chunk = mc.level.getChunk(x, z);
-                        for (BlockEntity be : chunk.getBlockEntities().values()) {
-                            if (be instanceof PillarBlockEntity pbe) {
-                                String pid = pbe.getPillarId();
-                                if (pid != null) {
-                                    PillarIdManager.PillarData data = manager.getPillarData(pid);
-                                    if (data != null) {
-                                        pbe.syncFromData(data);
-                                    }
-                                }
-                                pbe.resetParticleTick();
-                            }
-                        }
-                    }
-                }
-            }
-        }
     }
 
     private void toggleUsePattern() {
         PillarParticleConfig config = PillarParticleConfig.get();
         config.use_pattern = !config.use_pattern;
         config.saveProperties();
-        com.kingodogo.buildscape.network.ModMessages.INSTANCE.sendToServer(new com.kingodogo.buildscape.network.UpdateConfigPacket(config));
-        updateWorldPillars();
 
         usePatternToggle.setMessage(getUsePatternMessage(config.use_pattern));
         particleSpeedField.setEditable(!config.use_pattern);
@@ -913,10 +871,6 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
             }
         }
 
-        com.kingodogo.buildscape.network.ModMessages.INSTANCE.sendToServer(new com.kingodogo.buildscape.network.UpdateConfigPacket(config));
-
-        updateWorldPillars();
-
         if (usePatternToggle != null) {
             usePatternToggle.setMessage(getUsePatternMessage(true));
         }
@@ -930,8 +884,6 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
         PillarParticleConfig config = PillarParticleConfig.get();
         config.max_particle_color = currentMaxColor;
         config.saveProperties();
-        com.kingodogo.buildscape.network.ModMessages.INSTANCE.sendToServer(new com.kingodogo.buildscape.network.UpdateConfigPacket(config));
-        updateWorldPillars();
 
         maxParticleColorSlider.setMessage(
                 new TranslatableComponent("buildscape.config.particles.max_particle_color", currentMaxColor));
@@ -1388,7 +1340,6 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
         poseStack.popPose();
 
 
-        updateConfigFromFields();
     }
 
     @Override
@@ -1516,10 +1467,6 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
 
         if (changed) {
             config.saveProperties();
-
-            com.kingodogo.buildscape.network.ModMessages.INSTANCE.sendToServer(new com.kingodogo.buildscape.network.UpdateConfigPacket(config));
-
-            updateWorldPillars();
         }
     }
 

@@ -210,16 +210,22 @@ public class BuildersWorkbenchBlockEntity extends BlockEntity implements MenuPro
                 && hasSolvedItems();
 
         if (canCopy) {
-            copyProgress++;
+            ItemStack pouchCopy = inPouch.copy();
+            if (!writeSolvedToPouch(pouchCopy)) {
+                if (copyProgress != -1) {
+                    copyProgress = -1;
+                    setChanged();
+                }
+                return;
+            }
+
+            copyProgress = Math.max(0, copyProgress) + 1;
             setChanged();
             if (copyProgress >= 40) {
-                ItemStack pouchCopy = inPouch.copy();
-                if (writeSolvedToPouch(pouchCopy)) {
-                    this.setItem(SLOT_OUTPUT_POUCH, pouchCopy);
-                    this.setItem(SLOT_INPUT_POUCH, ItemStack.EMPTY);
-                    level.playSound(null, pos, net.minecraft.sounds.SoundEvents.EXPERIENCE_ORB_PICKUP,
-                            net.minecraft.sounds.SoundSource.BLOCKS, 0.5f, 1.0f);
-                }
+                this.setItem(SLOT_OUTPUT_POUCH, pouchCopy);
+                this.setItem(SLOT_INPUT_POUCH, ItemStack.EMPTY);
+                level.playSound(null, pos, net.minecraft.sounds.SoundEvents.EXPERIENCE_ORB_PICKUP,
+                        net.minecraft.sounds.SoundSource.BLOCKS, 0.5f, 1.0f);
                 copyProgress = 0;
                 setChanged();
             }
@@ -248,9 +254,7 @@ public class BuildersWorkbenchBlockEntity extends BlockEntity implements MenuPro
             com.kingodogo.buildscape.item.BuildersPouchInventory inventory =
                     new com.kingodogo.buildscape.item.BuildersPouchInventory(pouch);
             for (int i = 0; i < solved.size(); i++) {
-                ItemStack stored = inventory.getItem(i);
-                ItemStack filter = solved.get(i);
-                if (!stored.isEmpty() && (filter.isEmpty() || stored.getItem() != filter.getItem())) {
+                if (!inventory.getItem(i).isEmpty()) {
                     return false;
                 }
             }

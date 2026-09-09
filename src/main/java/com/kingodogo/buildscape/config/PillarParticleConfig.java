@@ -114,6 +114,14 @@ public class PillarParticleConfig {
             return SERVER_CONFIG;
         }
 
+        return getLocalConfig();
+    }
+
+    public static PillarParticleConfig getServerConfig() {
+        return getLocalConfig();
+    }
+
+    private static synchronized PillarParticleConfig getLocalConfig() {
         if (INSTANCE == null) {
             INSTANCE = new PillarParticleConfig();
             INSTANCE.loadInternal();
@@ -1308,6 +1316,10 @@ public class PillarParticleConfig {
                     });
             return;
         }
+        saveItemsToDisk();
+    }
+
+    public void saveItemsToDisk() {
         File file = getItemsFile();
         try {
             File parentDir = file.getParentFile();
@@ -1348,6 +1360,10 @@ public class PillarParticleConfig {
                     });
             return;
         }
+        savePropertiesToDisk();
+    }
+
+    public void savePropertiesToDisk() {
         File file = getPropertiesFile();
         try {
             File parentDir = file.getParentFile();

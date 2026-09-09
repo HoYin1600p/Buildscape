@@ -83,18 +83,6 @@ public class GlassJarBlockEntityRenderer implements BlockEntityRenderer<GlassJar
             poseStack.translate(-0.5D, 0.0D, -0.5D);
         }
 
-        BakedModel jarModel = blockRenderer.getBlockModel(blockState);
-        RenderType jarRenderType = ItemBlockRenderTypes.getRenderType(blockState, true);
-        blockRenderer.getModelRenderer().renderModel(
-                poseStack.last(),
-                bufferSource.getBuffer(jarRenderType),
-                blockState,
-                jarModel,
-                1.0F, 1.0F, 1.0F,
-                light,
-                combinedOverlay,
-                EmptyModelData.INSTANCE);
-
         if (blockEntity.hasLiquid()) {
             renderLiquid(blockEntity, poseStack, bufferSource, light, combinedOverlay);
         }
@@ -138,6 +126,18 @@ public class GlassJarBlockEntityRenderer implements BlockEntityRenderer<GlassJar
                 }
             }
         }
+
+        BakedModel jarModel = blockRenderer.getBlockModel(blockState);
+        RenderType jarRenderType = ItemBlockRenderTypes.getRenderType(blockState, true);
+        blockRenderer.getModelRenderer().renderModel(
+                poseStack.last(),
+                bufferSource.getBuffer(jarRenderType),
+                blockState,
+                jarModel,
+                1.0F, 1.0F, 1.0F,
+                light,
+                combinedOverlay,
+                EmptyModelData.INSTANCE);
 
         poseStack.popPose();
     }

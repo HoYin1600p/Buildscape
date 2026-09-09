@@ -44,21 +44,54 @@ public class EyeblossomBlock extends FlowerBlock implements BonemealableBlock {
 
     @Override
     public boolean isRandomlyTicking(BlockState state) {
-        return !state.getValue(WAXED);
+        return false;
     }
 
     @Override
-    public void randomTick(BlockState state, ServerLevel level, BlockPos pos, Random random) {
-        if (state.getValue(WAXED)) {
+    public void tick(BlockState state, ServerLevel level, BlockPos pos, Random random) {
+        EyeblossomTransitionHandler.track(level, pos);
+        synchronizeWithTime(level, pos, state, false);
+    }
+
+    @Override
+    public void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean isMoving) {
+        super.onPlace(state, level, pos, oldState, isMoving);
+        if (level instanceof ServerLevel serverLevel) {
+            EyeblossomTransitionHandler.track(serverLevel, pos);
+            serverLevel.scheduleTick(pos, this, 1);
+        }
+    }
+
+    @Override
+    public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
+        if (level instanceof ServerLevel serverLevel && !(newState.getBlock() instanceof EyeblossomBlock)) {
+            EyeblossomTransitionHandler.untrack(serverLevel, pos);
+        }
+        super.onRemove(state, level, pos, newState, isMoving);
+    }
+
+    void synchronizeWithTime(ServerLevel level, BlockPos pos, BlockState state, boolean playSound) {
+        boolean night = level.isNight();
+        if (!EyeblossomTransitionHandler.shouldTransition(isOpen, state.getValue(WAXED), night)) {
             return;
         }
-        boolean isNight = level.isNight();
-        if (isOpen && !isNight) {
-            level.setBlock(pos, ModBlocks.CLOSED_EYEBLOSSOM.get().defaultBlockState().setValue(WAXED, state.getValue(WAXED)), 3);
-            level.playSound(null, pos, SoundEvents.AZALEA_LEAVES_BREAK, SoundSource.BLOCKS, 0.8F, 0.9F);
-        } else if (!isOpen && isNight) {
-            level.setBlock(pos, ModBlocks.OPEN_EYEBLOSSOM.get().defaultBlockState().setValue(WAXED, state.getValue(WAXED)), 3);
-            level.playSound(null, pos, SoundEvents.AMETHYST_BLOCK_CHIME, SoundSource.BLOCKS, 1.0F, 1.2F);
+
+        BlockState replacement = (night
+                ? ModBlocks.OPEN_EYEBLOSSOM.get()
+                : ModBlocks.CLOSED_EYEBLOSSOM.get())
+                .defaultBlockState()
+                .setValue(WAXED, false);
+        level.setBlock(pos, replacement, 3);
+
+        if (playSound) {
+            level.playSound(
+                    null,
+                    pos,
+                    night ? SoundEvents.AMETHYST_BLOCK_CHIME : SoundEvents.AZALEA_LEAVES_BREAK,
+                    SoundSource.BLOCKS,
+                    night ? 1.0F : 0.8F,
+                    night ? 1.2F : 0.9F
+            );
         }
     }
 

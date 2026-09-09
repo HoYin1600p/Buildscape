@@ -257,7 +257,8 @@ public class BuildersWorkbenchScreen extends AbstractContainerScreen<BuildersWor
     }
 
     private void drawCopyArrow(PoseStack poseStack, int x, int y) {
-        WbRenderer.drawCopyArrow(poseStack, x, y, menu.getCopyProgress() / 40.0f);
+        int copyProgress = menu.getCopyProgress();
+        WbRenderer.drawCopyArrow(poseStack, x, y, copyProgress / 40.0f, copyProgress < 0);
     }
 
     private void renderRerollControls(PoseStack poseStack, int mouseX, int mouseY) {

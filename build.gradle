@@ -227,6 +227,11 @@ tasks.register('runMangroveLeafSupportTests', JavaExec) {
     mainClass = 'com.kingodogo.buildscape.worldgen.MangroveLeafSupportTest'
 }
 
+tasks.register('runEyeblossomTransitionTests', JavaExec) {
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.kingodogo.buildscape.block.EyeblossomTransitionTest'
+}
+
 tasks.register('syncBundledRecipeCache', JavaExec) {
     group = 'buildscape'
     description = 'Copies a verified local BDRE cache into the bundled recipe resources.'
@@ -250,5 +255,5 @@ tasks.named('check').configure {
     dependsOn 'runPipeSpillTests', 'runPipeOutletTests',
             'runRecipeManagerInjectorTests', 'runBinaryRecipeCacheTests', 'runTreeChopTraversalTests',
             'runBeaconBeamScanTests', 'runGoldenDandelionGrowthTests', 'runMangroveLeafSupportTests',
-            'verifyBundledRecipeCache'
+            'runEyeblossomTransitionTests', 'verifyBundledRecipeCache'
 }

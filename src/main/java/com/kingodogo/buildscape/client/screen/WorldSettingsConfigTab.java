@@ -15,6 +15,8 @@ public class WorldSettingsConfigTab extends AbstractConfigTab {
     private ScalableToggle disableEndermanGriefingToggle;
     private ScalableToggle disableCreeperGriefingToggle;
     private ScalableToggle disableGhastGriefingToggle;
+    private ScalableToggle cakeStackingToggle;
+    private ScalableToggle waterBottleStackingToggle;
     private int leftBoxX, leftBoxY, leftBoxWidth, leftBoxHeight;
     private int rightBoxX, rightBoxY, rightBoxWidth, rightBoxHeight;
     private int lastContentWidth = -1;
@@ -86,6 +88,22 @@ public class WorldSettingsConfigTab extends AbstractConfigTab {
         disableGhastGriefingToggle.active = parent.hasOpAccess();
         addTabWidget(disableGhastGriefingToggle);
 
+        boolean cakeStacking = mc.level.getGameRules().getBoolean(ModGameRules.IS_CAKE_STACK);
+        cakeStackingToggle = new ScalableToggle(0, 0, 100, 20,
+                new TranslatableComponent("buildscape.config.world.cake_stacking"), cakeStacking, (btn) -> {
+            ModMessages.INSTANCE.sendToServer(new UpdateGameRulePacket("isCakeStack", ((ScalableToggle) btn).isToggled()));
+        });
+        cakeStackingToggle.active = parent.hasOpAccess();
+        addTabWidget(cakeStackingToggle);
+
+        boolean waterBottleStacking = mc.level.getGameRules().getBoolean(ModGameRules.IS_WATER_BOTTLE_STACK);
+        waterBottleStackingToggle = new ScalableToggle(0, 0, 100, 20,
+                new TranslatableComponent("buildscape.config.world.water_bottle_stacking"), waterBottleStacking, (btn) -> {
+            ModMessages.INSTANCE.sendToServer(new UpdateGameRulePacket("isWaterbottleStack", ((ScalableToggle) btn).isToggled()));
+        });
+        waterBottleStackingToggle.active = parent.hasOpAccess();
+        addTabWidget(waterBottleStackingToggle);
+
         relayout(contentX, contentY, contentWidth, contentHeight);
 
         lastContentWidth = contentWidth;
@@ -144,6 +162,16 @@ public class WorldSettingsConfigTab extends AbstractConfigTab {
         disableGhastGriefingToggle.y = rightY + (buttonHeight + spacing) * 3;
         disableGhastGriefingToggle.setWidth(rightBoxWidth - padding * 2);
         disableGhastGriefingToggle.setHeight(buttonHeight);
+
+        cakeStackingToggle.x = rightBoxX + padding;
+        cakeStackingToggle.y = rightY + (buttonHeight + spacing) * 4;
+        cakeStackingToggle.setWidth(rightBoxWidth - padding * 2);
+        cakeStackingToggle.setHeight(buttonHeight);
+
+        waterBottleStackingToggle.x = rightBoxX + padding;
+        waterBottleStackingToggle.y = rightY + (buttonHeight + spacing) * 5;
+        waterBottleStackingToggle.setWidth(rightBoxWidth - padding * 2);
+        waterBottleStackingToggle.setHeight(buttonHeight);
     }
 
     @Override
@@ -192,6 +220,8 @@ public class WorldSettingsConfigTab extends AbstractConfigTab {
             disableEndermanGriefingToggle.toggled = mc.level.getGameRules().getBoolean(ModGameRules.DISABLE_ENDERMAN_GRIEFING);
             disableCreeperGriefingToggle.toggled = mc.level.getGameRules().getBoolean(ModGameRules.DISABLE_CREEPER_GRIEFING);
             disableGhastGriefingToggle.toggled = mc.level.getGameRules().getBoolean(ModGameRules.DISABLE_GHAST_GRIEFING);
+            cakeStackingToggle.toggled = mc.level.getGameRules().getBoolean(ModGameRules.IS_CAKE_STACK);
+            waterBottleStackingToggle.toggled = mc.level.getGameRules().getBoolean(ModGameRules.IS_WATER_BOTTLE_STACK);
         }
     }
 

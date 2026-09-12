@@ -232,6 +232,11 @@ tasks.register('runEyeblossomTransitionTests', JavaExec) {
     mainClass = 'com.kingodogo.buildscape.block.EyeblossomTransitionTest'
 }
 
+tasks.register('runParticleColorSlotsTests', JavaExec) {
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.kingodogo.buildscape.client.screen.ParticleColorSlotsTest'
+}
+
 tasks.register('syncBundledRecipeCache', JavaExec) {
     group = 'buildscape'
     description = 'Copies a verified local BDRE cache into the bundled recipe resources.'
@@ -255,5 +260,5 @@ tasks.named('check').configure {
     dependsOn 'runPipeSpillTests', 'runPipeOutletTests',
             'runRecipeManagerInjectorTests', 'runBinaryRecipeCacheTests', 'runTreeChopTraversalTests',
             'runBeaconBeamScanTests', 'runGoldenDandelionGrowthTests', 'runMangroveLeafSupportTests',
-            'runEyeblossomTransitionTests', 'verifyBundledRecipeCache'
+            'runEyeblossomTransitionTests', 'runParticleColorSlotsTests', 'verifyBundledRecipeCache'
 }

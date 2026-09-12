@@ -377,9 +377,7 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
         }
 
         List<String> displayColors = new ArrayList<>(config.particle_color);
-        while (displayColors.size() < 7) {
-            displayColors.add("#FFFFFF");
-        }
+        ParticleColorSlots.ensureCapacity(displayColors, 7);
 
         int startY = colorBoxY + padding + 25;
         int swatchX = colorBoxX + padding;
@@ -489,7 +487,7 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
 
         selectedColorIndex = colorIndex;
 
-        String hexValue = config.particle_color.get(colorIndex);
+        String hexValue = ParticleColorSlots.colorAt(config.particle_color, colorIndex);
         int color = 0xFFFFFF;
         try {
             if (hexValue.startsWith("#") && hexValue.length() == 7) {
@@ -813,9 +811,7 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
 
     private void onColorChanged(int index, String hexColor) {
         PillarParticleConfig config = PillarParticleConfig.get();
-        while (config.particle_color.size() <= index) {
-            config.particle_color.add("#FFFFFF");
-        }
+        ParticleColorSlots.ensureCapacity(config.particle_color, index + 1);
         config.particle_color.set(index, hexColor);
         config.saveProperties();
     }
@@ -883,6 +879,7 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
 
         PillarParticleConfig config = PillarParticleConfig.get();
         config.max_particle_color = currentMaxColor;
+        ParticleColorSlots.ensureCapacity(config.particle_color, currentMaxColor);
         config.saveProperties();
 
         maxParticleColorSlider.setMessage(
@@ -1136,7 +1133,7 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
             for (int i = 0; i < colorSwatchButtons.size() && i < colorHexFields.size(); i++) {
                 ColorSwatchButton swatchButton = colorSwatchButtons.get(i);
 
-                String hexValue = i < config.particle_color.size() ? config.particle_color.get(i) : "#FFFFFF";
+                String hexValue = ParticleColorSlots.colorAt(config.particle_color, i);
                 int color = 0xFFFFFF;
                 try {
                     if (hexValue.startsWith("#") && hexValue.length() == 7) {

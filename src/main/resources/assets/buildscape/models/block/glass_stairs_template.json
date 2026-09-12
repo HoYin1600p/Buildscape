@@ -8,9 +8,9 @@
   "elements": [
     {
       "from": [
+        8,
         0,
-        0,
-        8
+        0
       ],
       "to": [
         16,
@@ -21,13 +21,13 @@
         "angle": 0,
         "axis": "y",
         "origin": [
+          8,
           0,
-          0,
-          8
+          16
         ]
       },
       "faces": {
-        "east": {
+        "north": {
           "uv": [
             0,
             8,
@@ -36,7 +36,7 @@
           ],
           "texture": "#side"
         },
-        "south": {
+        "east": {
           "uv": [
             0,
             8,
@@ -45,7 +45,7 @@
           ],
           "texture": "#side"
         },
-        "west": {
+        "south": {
           "uv": [
             8,
             8,
@@ -61,7 +61,8 @@
             16,
             8
           ],
-          "texture": "#side"
+          "texture": "#side",
+          "rotation": 270
         }
       }
     },
@@ -72,12 +73,12 @@
         0
       ],
       "to": [
-        16,
         8,
-        8
+        8,
+        16
       ],
       "faces": {
-        "north": {
+        "west": {
           "uv": [
             0,
             8,
@@ -86,7 +87,7 @@
           ],
           "texture": "#side"
         },
-        "east": {
+        "north": {
           "uv": [
             8,
             8,
@@ -95,7 +96,7 @@
           ],
           "texture": "#side"
         },
-        "west": {
+        "south": {
           "uv": [
             0,
             8,
@@ -111,7 +112,8 @@
             16,
             8
           ],
-          "texture": "#side"
+          "texture": "#side",
+          "rotation": 90
         },
         "down": {
           "uv": [
@@ -120,15 +122,16 @@
             16,
             16
           ],
-          "texture": "#side"
+          "texture": "#side",
+          "rotation": 270
         }
       }
     },
     {
       "from": [
-        0,
         8,
-        8
+        8,
+        0
       ],
       "to": [
         16,
@@ -139,13 +142,13 @@
         "angle": 0,
         "axis": "y",
         "origin": [
-          0,
           8,
-          8
+          8,
+          16
         ]
       },
       "faces": {
-        "north": {
+        "west": {
           "uv": [
             0,
             0,
@@ -154,7 +157,7 @@
           ],
           "texture": "#side"
         },
-        "east": {
+        "north": {
           "uv": [
             0,
             0,
@@ -163,7 +166,7 @@
           ],
           "texture": "#side"
         },
-        "south": {
+        "east": {
           "uv": [
             0,
             0,
@@ -172,7 +175,7 @@
           ],
           "texture": "#side"
         },
-        "west": {
+        "south": {
           "uv": [
             8,
             0,
@@ -188,7 +191,8 @@
             16,
             16
           ],
-          "texture": "#side"
+          "texture": "#side",
+          "rotation": 90
         }
       }
     }

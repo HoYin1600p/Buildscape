@@ -71,15 +71,11 @@ public class ExistingItemsWidget extends AbstractWidget {
         updateDisplayEntries();
     }
 
+    @Override
     public void setHeight(int height) {
-        try {
-            java.lang.reflect.Field heightField = AbstractWidget.class.getDeclaredField("height");
-            heightField.setAccessible(true);
-            heightField.setInt(this, height);
-            this.maxVisibleRows = Math.min(MAX_VISIBLE_ROWS, (height - headerAreaHeight - GRID_PADDING_TOP - 5) / (ITEM_SIZE + ITEM_SPACING));
-            updateDisplayEntries();
-        } catch (Exception e) {
-        }
+        super.setHeight(height);
+        this.maxVisibleRows = Math.min(MAX_VISIBLE_ROWS, (height - headerAreaHeight - GRID_PADDING_TOP - 5) / (ITEM_SIZE + ITEM_SPACING));
+        updateDisplayEntries();
     }
 
     public void setItems(List<String> itemIds) {

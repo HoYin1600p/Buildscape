@@ -86,18 +86,8 @@ public class FestiveStockingEntity extends HangingEntity {
     @Override
     public void setDirection(Direction direction) {
         if (direction != null) {
-            try {
-                java.lang.reflect.Field directionField =
-                        HangingEntity.class.getDeclaredField("direction");
-                directionField.setAccessible(true);
-                directionField.set(this, direction);
-            } catch (NoSuchFieldException | IllegalAccessException e) {
-                throw new RuntimeException(
-                        "Failed to set direction for FestiveStockingEntity: " +
-                                e.getMessage(),
-                        e
-                );
-            }
+            this.direction = direction;
+
 
             if (this.pos != null) {
                 this.recalculateBoundingBox();

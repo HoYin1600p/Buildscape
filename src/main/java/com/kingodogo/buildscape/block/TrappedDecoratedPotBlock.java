@@ -142,7 +142,7 @@ public class TrappedDecoratedPotBlock
             if (stored.isEmpty()) {
                 if (!level.isClientSide) {
                     ItemStack toStore = heldItem.copy();
-                    int toTake = Math.min(heldItem.getCount(), toStore.getMaxStackSize());
+                    int toTake = Math.min(heldItem.getCount(), TrappedDecoratedPotBlockEntity.maxStoredCount(toStore));
                     toStore.setCount(toTake);
                     be.setStoredItem(toStore, false);
                     heldItem.shrink(toTake);
@@ -154,9 +154,9 @@ public class TrappedDecoratedPotBlock
                 }
                 return InteractionResult.sidedSuccess(level.isClientSide);
 
-            } else if (ItemStack.isSameItemSameTags(stored, heldItem) && stored.getCount() < stored.getMaxStackSize()) {
+            } else if (ItemStack.isSameItemSameTags(stored, heldItem) && stored.getCount() < TrappedDecoratedPotBlockEntity.maxStoredCount(stored)) {
                 if (!level.isClientSide) {
-                    int spaceAvailable = stored.getMaxStackSize() - stored.getCount();
+                    int spaceAvailable = TrappedDecoratedPotBlockEntity.maxStoredCount(stored) - stored.getCount();
                     int canAdd = Math.min(heldItem.getCount(), spaceAvailable);
                     stored.grow(canAdd);
                     be.setStoredItem(stored, true);
@@ -209,7 +209,7 @@ public class TrappedDecoratedPotBlock
                 }
                 return InteractionResult.sidedSuccess(level.isClientSide);
 
-            } else if (ItemStack.isSameItemSameTags(stored, heldItem) && stored.getCount() < stored.getMaxStackSize()) {
+            } else if (ItemStack.isSameItemSameTags(stored, heldItem) && stored.getCount() < TrappedDecoratedPotBlockEntity.maxStoredCount(stored)) {
                 if (!level.isClientSide) {
                     stored.grow(1);
                     be.setStoredItem(stored, true);
@@ -261,9 +261,9 @@ public class TrappedDecoratedPotBlock
 
 
     @Override
-    public void playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
-        BlockEntity be = level.getBlockEntity(pos);
-        if (be instanceof TrappedDecoratedPotBlockEntity potEntity && !potEntity.isEmpty()) {
+    public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
+        if (!state.is(newState.getBlock())
+                && level.getBlockEntity(pos) instanceof TrappedDecoratedPotBlockEntity potEntity && !potEntity.isEmpty()) {
             ItemStack stored = potEntity.getStoredItem().copy();
 
             if (!level.isClientSide) {
@@ -283,7 +283,7 @@ public class TrappedDecoratedPotBlock
                 }
             }
         }
-        super.playerWillDestroy(level, pos, state, player);
+        super.onRemove(state, level, pos, newState, isMoving);
     }
 
     @Override

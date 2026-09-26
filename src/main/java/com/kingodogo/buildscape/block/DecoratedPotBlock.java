@@ -383,22 +383,24 @@ public class DecoratedPotBlock
             BlockState state,
             Player player
     ) {
-        BlockEntity be = level.getBlockEntity(pos);
-        if (
-                be instanceof DecoratedPotBlockEntity potEntity && !potEntity.isEmpty()
-        ) {
-            ItemStack stored = potEntity.getStoredItem().copy();
+        super.playerWillDestroy(level, pos, state, player);
+    }
+
+    @Override
+    public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
+        if (!level.isClientSide && !state.is(newState.getBlock())
+                && level.getBlockEntity(pos) instanceof DecoratedPotBlockEntity potEntity && !potEntity.isEmpty()) {
             ItemEntity itemEntity = new ItemEntity(
                     level,
                     pos.getX() + 0.5,
                     pos.getY() + 0.5,
                     pos.getZ() + 0.5,
-                    stored
+                    potEntity.getStoredItem().copy()
             );
             itemEntity.setDefaultPickUpDelay();
             level.addFreshEntity(itemEntity);
         }
-        super.playerWillDestroy(level, pos, state, player);
+        super.onRemove(state, level, pos, newState, isMoving);
     }
 
     @Override

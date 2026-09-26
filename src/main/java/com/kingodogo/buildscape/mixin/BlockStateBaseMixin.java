@@ -26,6 +26,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class BlockStateBaseMixin {
     @Inject(method = "canSurvive", at = @At("HEAD"), cancellable = true)
     private void onCanSurvive(LevelReader level, BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
+        if (!buildscape$isPlanterPlant(((BlockState) (Object) this).getBlock())) {
+            return;
+        }
         BlockPos belowPos = pos.below();
         BlockState belowState = level.getBlockState(belowPos);
         if (belowState.is(Blocks.COMPOSTER)) {
@@ -33,6 +36,15 @@ public class BlockStateBaseMixin {
                 cir.setReturnValue(true);
             }
         }
+    }
+
+    private static boolean buildscape$isPlanterPlant(net.minecraft.world.level.block.Block block) {
+        return block instanceof net.minecraft.world.level.block.BushBlock
+                || block instanceof net.minecraftforge.common.IPlantable
+                || block instanceof net.minecraft.world.level.block.BambooBlock
+                || block instanceof net.minecraft.world.level.block.BambooSaplingBlock
+                || block instanceof net.minecraft.world.level.block.BigDripleafBlock
+                || block instanceof net.minecraft.world.level.block.BigDripleafStemBlock;
     }
 
     @Inject(method = "onRemove", at = @At("HEAD"))

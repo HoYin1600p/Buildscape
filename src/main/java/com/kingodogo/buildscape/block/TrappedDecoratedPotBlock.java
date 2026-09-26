@@ -154,7 +154,7 @@ public class TrappedDecoratedPotBlock
                 }
                 return InteractionResult.sidedSuccess(level.isClientSide);
 
-            } else if (stored.sameItem(heldItem) && stored.getCount() < stored.getMaxStackSize()) {
+            } else if (ItemStack.isSameItemSameTags(stored, heldItem) && stored.getCount() < stored.getMaxStackSize()) {
                 if (!level.isClientSide) {
                     int spaceAvailable = stored.getMaxStackSize() - stored.getCount();
                     int canAdd = Math.min(heldItem.getCount(), spaceAvailable);
@@ -209,7 +209,7 @@ public class TrappedDecoratedPotBlock
                 }
                 return InteractionResult.sidedSuccess(level.isClientSide);
 
-            } else if (stored.sameItem(heldItem) && stored.getCount() < stored.getMaxStackSize()) {
+            } else if (ItemStack.isSameItemSameTags(stored, heldItem) && stored.getCount() < stored.getMaxStackSize()) {
                 if (!level.isClientSide) {
                     stored.grow(1);
                     be.setStoredItem(stored, true);

@@ -297,7 +297,7 @@ public class FestiveStockingEntity extends HangingEntity {
                 }
                 return InteractionResult.sidedSuccess(this.level.isClientSide);
             } else if (
-                    storedItem.sameItem(heldItem) &&
+                    ItemStack.isSameItemSameTags(storedItem, heldItem) &&
                             storedItem.getCount() < storedItem.getMaxStackSize()
             ) {
                 if (!this.level.isClientSide) {

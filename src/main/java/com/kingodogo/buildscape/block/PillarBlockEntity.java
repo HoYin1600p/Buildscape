@@ -1926,6 +1926,17 @@ public class PillarBlockEntity extends BlockEntity {
     }
 
     @Override
+    public net.minecraft.world.phys.AABB getRenderBoundingBox() {
+        if (!hasDisplayItem()) {
+            return super.getRenderBoundingBox();
+        }
+        BlockPos pos = getBlockPos();
+        return new net.minecraft.world.phys.AABB(
+                pos.getX() - 2, pos.getY(), pos.getZ() - 2,
+                pos.getX() + 3, pos.getY() + 8, pos.getZ() + 3);
+    }
+
+    @Override
     public CompoundTag getUpdateTag() {
         CompoundTag tag = super.getUpdateTag();
         saveAdditional(tag);

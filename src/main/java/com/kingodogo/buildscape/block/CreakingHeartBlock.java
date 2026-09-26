@@ -19,13 +19,11 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.phys.BlockHitResult;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Random;
 
 public class CreakingHeartBlock extends RotatedPillarBlock {
     public static final BooleanProperty ACTIVE = ModBlockProperties.ACTIVE;
-    private static final Map<BlockPos, Long> COOLDOWN_MAP = new HashMap<>();
+    private static final int RESIN_COOLDOWN_TICKS = 1200;
 
     public CreakingHeartBlock(BlockBehaviour.Properties properties) {
         super(properties);
@@ -42,6 +40,12 @@ public class CreakingHeartBlock extends RotatedPillarBlock {
 
     @Override
     public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+        if (state.getValue(ACTIVE)) {
+            if (!level.isClientSide && !level.getBlockTicks().hasScheduledTick(pos, this)) {
+                level.scheduleTick(pos, this, RESIN_COOLDOWN_TICKS);
+            }
+            return InteractionResult.PASS;
+        }
         if (!level.isClientSide) {
             level.setBlock(pos, state.setValue(ACTIVE, true), 3);
 
@@ -50,7 +54,7 @@ public class CreakingHeartBlock extends RotatedPillarBlock {
             level.playSound(null, pos, SoundEvents.WOOD_PLACE, SoundSource.BLOCKS, 1.0F, 1.0F);
             level.levelEvent(2005, pos, 0);
 
-            level.scheduleTick(pos, this, 40);
+            level.scheduleTick(pos, this, RESIN_COOLDOWN_TICKS);
         }
 
         return InteractionResult.sidedSuccess(level.isClientSide);
@@ -72,7 +76,7 @@ public class CreakingHeartBlock extends RotatedPillarBlock {
                     level.setBlock(adjPos, adjState.setValue(faceProp, true), 3);
                     spawned++;
                 }
-            } else if (adjState.isAir() || adjState.getMaterial().isReplaceable()) {
+            } else if (adjState.isAir()) {
                 BlockState newState = ModBlocks.RESIN_CLUMP.get().defaultBlockState().setValue(faceProp, true);
                 level.setBlock(adjPos, newState, 3);
                 spawned++;

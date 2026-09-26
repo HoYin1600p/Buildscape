@@ -24,16 +24,28 @@ public class PillarBlockEntityRenderer
 
     private final ItemRenderer itemRenderer;
 
-    private static final Map<BlockPos, Long> clientStartTimes =
-            new ConcurrentHashMap<>();
-    private static final Map<BlockPos, Integer> itemHashes =
-            new ConcurrentHashMap<>();
-
-    private static final Map<Integer, Boolean> cachedIsFixed      = new ConcurrentHashMap<>();
-    private static final Map<Integer, Boolean> cachedIsItem       = new ConcurrentHashMap<>();
-    private static final Map<Integer, Boolean> cachedIsUpsideDown = new ConcurrentHashMap<>();
-    private static final Map<Integer, MobState> cachedMobState    = new ConcurrentHashMap<>();
+    private static final Map<BlockPos, DisplayInfo> displayInfo = new ConcurrentHashMap<>();
     private static final Map<BlockPos, Boolean> cachedIsAshenKing = new ConcurrentHashMap<>();
+    private static final java.util.Set<String> loggedRenderFailures = ConcurrentHashMap.newKeySet();
+
+    private static final class DisplayInfo {
+        final ItemStack stack;
+        final long startTime;
+        final boolean renderAsItem;
+        final boolean isSpawnEgg;
+        final boolean isFixed;
+        final MobState mobState;
+
+        DisplayInfo(ItemStack stack, long startTime, boolean renderAsItem, boolean isSpawnEgg,
+                    boolean isFixed, MobState mobState) {
+            this.stack = stack;
+            this.startTime = startTime;
+            this.renderAsItem = renderAsItem;
+            this.isSpawnEgg = isSpawnEgg;
+            this.isFixed = isFixed;
+            this.mobState = mobState;
+        }
+    }
 
     public PillarBlockEntityRenderer(
             BlockEntityRendererProvider.Context context
@@ -49,19 +61,13 @@ public class PillarBlockEntityRenderer
 
     public static void clearEntityCache(BlockPos pos) {
         MobPillarRenderer.clearEntityCache(pos);
-        clientStartTimes.remove(pos);
-        itemHashes.remove(pos);
+        displayInfo.remove(pos);
         cachedIsAshenKing.remove(pos);
     }
 
     public static void clearEntityCache() {
         MobPillarRenderer.clearAllEntityCaches();
-        clientStartTimes.clear();
-        itemHashes.clear();
-        cachedIsFixed.clear();
-        cachedIsItem.clear();
-        cachedIsUpsideDown.clear();
-        cachedMobState.clear();
+        displayInfo.clear();
         cachedIsAshenKing.clear();
     }
 
@@ -89,8 +95,7 @@ public class PillarBlockEntityRenderer
         }
 
         if (displayedItem.isEmpty()) {
-            clientStartTimes.remove(pos);
-            itemHashes.remove(pos);
+            displayInfo.remove(pos);
             return;
         }
 
@@ -107,17 +112,21 @@ public class PillarBlockEntityRenderer
             }
         }
 
+        long currentRenderTime = System.currentTimeMillis();
+        DisplayInfo info = displayInfo.get(pos);
+        if (info == null || !ItemStack.matches(info.stack, displayedItem)) {
+            info = createDisplayInfo(displayedItem, currentRenderTime);
+            displayInfo.put(pos, info);
+        }
+
+        PoseStack.Pose entryPose = poseStack.last();
+        poseStack.pushPose();
         try {
-            poseStack.pushPose();
+            boolean isSpawnEgg = info.isSpawnEgg;
 
-        int itemHash = displayedItem.hashCode();
-
-        boolean isSpawnEgg = displayedItem.getItem() instanceof SpawnEggItem
-                && !cachedIsItem.computeIfAbsent(itemHash, k -> hasItemNameTag(displayedItem));
-
-        boolean isAshenKing = cachedIsAshenKing.computeIfAbsent(
-                pos, k -> blockEntity.getBlockState().getBlock()
-                        instanceof com.kingodogo.buildscape.block.AshenKingPillarBlock);
+            boolean isAshenKing = cachedIsAshenKing.computeIfAbsent(
+                    pos, k -> blockEntity.getBlockState().getBlock()
+                            instanceof com.kingodogo.buildscape.block.AshenKingPillarBlock);
             float hoverHeight;
             if (isAshenKing) {
                 hoverHeight = isSpawnEgg ? 0.875f : 1.0f;
@@ -126,36 +135,15 @@ public class PillarBlockEntityRenderer
             }
             poseStack.translate(0.5, hoverHeight, 0.5);
 
-
-            boolean isFixed = false;
-            if (!isSpawnEgg) {
-                isFixed = cachedIsFixed.computeIfAbsent(itemHash, k -> isFixed(displayedItem));
-            }
+            boolean isFixed = info.isFixed;
             float rotationSpeed = 0.0f;
             if (!isSpawnEgg) {
                 rotationSpeed = 90.0f;
-            } else {
-                EntityType<?> entityType = ((SpawnEggItem) displayedItem.getItem()).getType(null);
-                MobState mobState = cachedMobState.computeIfAbsent(
-                        itemHash,
-                        k -> MobStateParser.parseStates(displayedItem, entityType));
-                if (mobState.spin) {
-                    rotationSpeed = 22.5f;
-                }
+            } else if (info.mobState != null && info.mobState.spin) {
+                rotationSpeed = 22.5f;
             }
 
-            long currentRenderTime = System.currentTimeMillis();
-
-            int currentItemHash = displayedItem.hashCode();
-            Integer previousItemHash = itemHashes.get(pos);
-            if (previousItemHash == null || previousItemHash != currentItemHash) {
-                clientStartTimes.put(pos, currentRenderTime);
-                itemHashes.put(pos, currentItemHash);
-            }
-
-            long startTime = clientStartTimes.get(pos);
-
-            float elapsedSeconds = (currentRenderTime - startTime) / 1000.0f;
+            float elapsedSeconds = (currentRenderTime - info.startTime) / 1000.0f;
 
             float rotation = (elapsedSeconds * rotationSpeed) % 360.0f;
 
@@ -175,7 +163,7 @@ public class PillarBlockEntityRenderer
                 poseStack.translate(0, bobAmount, 0);
             }
 
-            boolean renderAsItem = hasItemNameTag(displayedItem);
+            boolean renderAsItem = info.renderAsItem;
 
             boolean isArmor = displayedItem.getItem() instanceof net.minecraft.world.item.ArmorItem;
             boolean isElytra = displayedItem.getItem() instanceof net.minecraft.world.item.ElytraItem;
@@ -195,12 +183,11 @@ public class PillarBlockEntityRenderer
                         blockEntity.getFacingYaw(),
                         isFixed
                 );
-
-                poseStack.popPose();
                 return;
             }
 
             if (isSpawnEgg) {
+                PoseStack.Pose mobPose = poseStack.last();
                 try {
                     MobPillarRenderer.renderMob(
                             (SpawnEggItem) displayedItem.getItem(),
@@ -216,6 +203,8 @@ public class PillarBlockEntityRenderer
                             blockEntity.getFacingYaw()
                     );
                 } catch (Exception e) {
+                    logRenderFailure(displayedItem, e);
+                    restorePose(poseStack, mobPose);
                     poseStack.scale(0.5f, 0.5f, 0.5f);
                     Level level = blockEntity.getLevel();
                     BakedModel model =
@@ -322,15 +311,37 @@ public class PillarBlockEntityRenderer
                 }
             }
 
-            poseStack.popPose();
         } catch (Exception e) {
-            try {
-                poseStack.popPose();
-            } catch (Exception ignored) {
-            }
+            logRenderFailure(displayedItem, e);
+        } finally {
+            restorePose(poseStack, entryPose);
         }
     }
 
+    private DisplayInfo createDisplayInfo(ItemStack displayedItem, long startTime) {
+        boolean renderAsItem = hasItemNameTag(displayedItem);
+        boolean isSpawnEgg = displayedItem.getItem() instanceof SpawnEggItem && !renderAsItem;
+        boolean fixed = !isSpawnEgg && isFixed(displayedItem);
+        MobState mobState = null;
+        if (isSpawnEgg) {
+            EntityType<?> entityType = ((SpawnEggItem) displayedItem.getItem()).getType(null);
+            mobState = MobStateParser.parseStates(displayedItem, entityType);
+        }
+        return new DisplayInfo(displayedItem.copy(), startTime, renderAsItem, isSpawnEgg, fixed, mobState);
+    }
+
+    private static void restorePose(PoseStack poseStack, PoseStack.Pose pose) {
+        while (poseStack.last() != pose && !poseStack.clear()) {
+            poseStack.popPose();
+        }
+    }
+
+    private static void logRenderFailure(ItemStack stack, Exception e) {
+        String key = String.valueOf(net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(stack.getItem()));
+        if (loggedRenderFailures.add(key)) {
+            com.kingodogo.buildscape.BuildScape.LOGGER.warn("BuildScape: failed to render {} on a pillar", key, e);
+        }
+    }
     private net.minecraft.world.phys.AABB getOrCalculateBounds(BakedModel model) {
         return modelBoundsCache.computeIfAbsent(model, this::calculateBounds);
     }

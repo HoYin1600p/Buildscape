@@ -20,6 +20,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.BucketItem;
+import net.minecraft.world.item.MobBucketItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -209,12 +210,8 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
 
     public static Fluid getFluidFromItem(ItemStack stack) {
         if (stack.isEmpty()) return Fluids.EMPTY;
-        if (stack.getItem() instanceof BucketItem bucketItem) {
+        if (stack.getItem() instanceof BucketItem bucketItem && !(stack.getItem() instanceof MobBucketItem)) {
             return bucketItem.getFluid();
-        }
-        FluidStack fs = FluidUtil.getFluidContained(stack).orElse(FluidStack.EMPTY);
-        if (!fs.isEmpty()) {
-            return fs.getFluid();
         }
         return Fluids.EMPTY;
     }
@@ -295,8 +292,7 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
         }
 
         boolean isEmptyBucket = held.is(Items.BUCKET)
-                || (held.getItem() instanceof BucketItem bi && bi.getFluid() == Fluids.EMPTY)
-                || (FluidUtil.getFluidHandler(held).isPresent() && FluidUtil.getFluidContained(held).orElse(FluidStack.EMPTY).isEmpty());
+                || (held.getItem() instanceof BucketItem bi && bi.getFluid() == Fluids.EMPTY);
 
         Fluid sourceFluid = getSourceFluid(state, be);
         if (isEmptyBucket && sourceFluid != Fluids.EMPTY) {

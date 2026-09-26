@@ -164,7 +164,7 @@ public class AdvancementEvents {
         int baseStat = tag.getInt(baseKey);
         int delta = currentStat - baseStat;
 
-        if (delta > targetCount) {
+        if (delta < 0) {
             tag.putInt(baseKey, Math.max(0, currentStat - 1));
             baseStat = tag.getInt(baseKey);
             delta = currentStat - baseStat;

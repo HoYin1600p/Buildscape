@@ -94,6 +94,10 @@ public class ItemFrameParticleHandler {
         net.minecraft.world.entity.Entity entity = event.getEntity();
         if (entity instanceof ItemFrame || entity instanceof com.kingodogo.buildscape.entity.ColoredItemFrameEntity) {
             CompoundTag data = entity.getPersistentData();
+            net.minecraft.world.entity.Entity.RemovalReason reason = entity.getRemovalReason();
+            if (reason == null || !reason.shouldDestroy()) {
+                return;
+            }
             String frameId = data.getString("BuildScapeFrameId");
             if (frameId != null && !frameId.isEmpty()) {
                 com.kingodogo.buildscape.config.PillarIdManager.get(entity.level).removePillar(frameId);
@@ -606,7 +610,7 @@ public class ItemFrameParticleHandler {
             data.putString(PARTICLE_PATTERN_KEY, pattern);
 
             if (!data.contains(FRAME_ID_KEY)) {
-                String frameId = generateFrameId();
+                String frameId = generateFrameId(com.kingodogo.buildscape.config.PillarIdManager.get(itemFrame.level));
                 data.putString(FRAME_ID_KEY, frameId);
                 CLIENT_FRAME_ID_CACHE.put(itemFrame.getId(), frameId);
             }
@@ -748,21 +752,43 @@ public class ItemFrameParticleHandler {
             if (id != null && !id.isEmpty()) return id;
         }
 
-        String frameId = generateFrameId();
+        String frameId = generateFrameId(com.kingodogo.buildscape.config.PillarIdManager.get(itemFrame.level));
         data.putString(FRAME_ID_KEY, frameId);
         CLIENT_FRAME_ID_CACHE.put(itemFrame.getId(), frameId);
         return frameId;
     }
 
 
-    private static String generateFrameId() {
-        return FRAME_PREFIX + Long.toHexString(Double.doubleToLongBits(Math.random())).substring(8, 12).toUpperCase();
+    private static String generateFrameId(com.kingodogo.buildscape.config.PillarIdManager manager) {
+        return generateUniqueId(FRAME_PREFIX, manager);
     }
 
-    private static String generateColoredFrameId(String colorVariant) {
-        String colorCode = getColorCode(colorVariant);
-        String randomPart = Long.toHexString(Double.doubleToLongBits(Math.random())).substring(8, 12).toUpperCase();
-        return "I-F" + colorCode + randomPart;
+    private static String generateColoredFrameId(String colorVariant, com.kingodogo.buildscape.config.PillarIdManager manager) {
+        return generateUniqueId("I-F" + getColorCode(colorVariant), manager);
+    }
+
+    private static String generateUniqueId(String prefix, com.kingodogo.buildscape.config.PillarIdManager manager) {
+        java.util.concurrent.ThreadLocalRandom random = java.util.concurrent.ThreadLocalRandom.current();
+        for (int attempt = 0; attempt < 64; attempt++) {
+            String id = prefix + String.format("%04X", random.nextInt(0x10000));
+            if (manager == null || !manager.isIdTaken(id)) {
+                return id;
+            }
+        }
+        String id;
+        do {
+            id = prefix + String.format("%08X", random.nextInt() & 0x7FFFFFFF);
+        } while (manager != null && manager.isIdTaken(id));
+        return id;
+    }
+
+    public static String reassignFrameId(net.minecraft.world.entity.Entity frame) {
+        frame.getPersistentData().remove(FRAME_ID_KEY);
+        CLIENT_FRAME_ID_CACHE.remove(frame.getId());
+        if (frame instanceof com.kingodogo.buildscape.entity.ColoredItemFrameEntity coloredFrame) {
+            return getFrameIdColored(coloredFrame);
+        }
+        return getFrameId((ItemFrame) frame);
     }
 
     private static String getColorCode(String colorName) {
@@ -1042,7 +1068,7 @@ public class ItemFrameParticleHandler {
 
             if (!data.contains(FRAME_ID_KEY)) {
                 String colorVariant = frame.getColorVariant();
-                String frameId = generateColoredFrameId(colorVariant);
+                String frameId = generateColoredFrameId(colorVariant, com.kingodogo.buildscape.config.PillarIdManager.get(frame.level));
                 data.putString(FRAME_ID_KEY, frameId);
                 CLIENT_FRAME_ID_CACHE.put(frame.getId(), frameId);
             }
@@ -1086,7 +1112,7 @@ public class ItemFrameParticleHandler {
         }
 
         String colorVariant = frame.getColorVariant();
-        String frameId = generateColoredFrameId(colorVariant);
+        String frameId = generateColoredFrameId(colorVariant, com.kingodogo.buildscape.config.PillarIdManager.get(frame.level));
         data.putString(FRAME_ID_KEY, frameId);
         CLIENT_FRAME_ID_CACHE.put(frame.getId(), frameId);
         return frameId;

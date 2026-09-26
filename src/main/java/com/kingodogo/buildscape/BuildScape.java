@@ -847,6 +847,9 @@ public class BuildScape {
             pillarSaveTickCounter = 0;
             manager.savePeriodic(false);
         }
+        if (pillarSaveTickCounter % 20 == 0) {
+            manager.flushRequestedSave();
+        }
 
         if (server.getPlayerList().getPlayerCount() == 0) {
             return;

@@ -547,6 +547,33 @@ public class PillarIdManager {
         return data != null ? data.id : null;
     }
 
+    public boolean isIdTaken(String id) {
+        return id != null && pillarData.containsKey(id);
+    }
+
+    private volatile boolean saveRequested = false;
+
+    public void requestSave() {
+        if (!serverAuthoritative) {
+            return;
+        }
+        dirty = true;
+        saveRequested = true;
+    }
+
+    public void flushRequestedSave() {
+        if (saveRequested) {
+            saveRequested = false;
+            saveImmediate();
+        }
+    }
+
+    private static boolean isSameFrameLocation(PillarData data, String dimension, BlockPos pos, net.minecraft.core.Direction facing) {
+        if (!Objects.equals(data.dimension, dimension)) return false;
+        if (data.x != pos.getX() || data.y != pos.getY() || data.z != pos.getZ()) return false;
+        return data.facing == null || facing == null || data.facing.equals(facing.getSerializedName());
+    }
+
     public void removePillar(String pillarId) {
         removePillars(Collections.singleton(pillarId));
     }
@@ -565,7 +592,7 @@ public class PillarIdManager {
             if (data == null) {
                 continue;
             }
-            positionIndex.remove(positionKey(data.dimension, new BlockPos(data.x, data.y, data.z)));
+            positionIndex.values().removeIf(pillarId::equals);
             if (serverAuthoritative) {
                 PillarResetHandler.resetPillarFromData(data);
             }
@@ -892,7 +919,7 @@ public class PillarIdManager {
                                 continue;
                             }
 
-                            if (!id.matches("^[A-Z-]+[a-z0-9]+$")) {
+                            if (!id.matches("^[A-Z][A-Za-z0-9-]{1,31}$")) {
                                 skipped++;
                                 continue;
                             }
@@ -1399,6 +1426,7 @@ public class PillarIdManager {
                                         existingData.x = pos.getX();
                                         existingData.y = pos.getY();
                                         existingData.z = pos.getZ();
+                                        requestSave();
                                     }
 
                                     if (!clearColors) {
@@ -1471,6 +1499,7 @@ public class PillarIdManager {
                 }
             }
 
+            rebuildPositionIndex();
             syncColorsFromNBTToManager(server);
 
             recoveryInProgress = false;
@@ -2206,16 +2235,12 @@ public class PillarIdManager {
             pillarData.put(id, data);
             positionIndex.put(posKey, id);
 
-            if (com.kingodogo.buildscape.BuildScape.isServerFullyInitialized()) {
-                saveImmediate();
-            }
+            requestSave();
         } else {
             positionIndex.put(posKey, id);
 
             if (syncPatternSettingsFromNBT(pillar, existing)) {
-                if (com.kingodogo.buildscape.BuildScape.isServerFullyInitialized()) {
-                    saveImmediate();
-                }
+                requestSave();
             }
         }
     }
@@ -2247,6 +2272,10 @@ public class PillarIdManager {
         String posKey = positionKey(dimension, pos, facing);
 
         PillarData existing = pillarData.get(id);
+        if (existing != null && !isSameFrameLocation(existing, dimension, pos, facing)) {
+            id = com.kingodogo.buildscape.event.ItemFrameParticleHandler.reassignFrameId(frame);
+            existing = null;
+        }
         if (existing == null) {
             PillarData data = new PillarData(id, dimension, pos);
             data.pattern = pattern;
@@ -2263,9 +2292,7 @@ public class PillarIdManager {
             pillarData.put(id, data);
             positionIndex.put(posKey, id);
 
-            if (com.kingodogo.buildscape.BuildScape.isServerFullyInitialized()) {
-                saveImmediate();
-            }
+            requestSave();
         } else {
             positionIndex.put(posKey, id);
             boolean changed = false;
@@ -2300,8 +2327,8 @@ public class PillarIdManager {
                 changed = true;
             }
 
-            if (changed && com.kingodogo.buildscape.BuildScape.isServerFullyInitialized()) {
-                saveImmediate();
+            if (changed) {
+                requestSave();
             }
         }
     }
@@ -2334,6 +2361,10 @@ public class PillarIdManager {
         String posKey = positionKey(dimension, pos, facing);
 
         PillarData existing = pillarData.get(id);
+        if (existing != null && !isSameFrameLocation(existing, dimension, pos, facing)) {
+            id = com.kingodogo.buildscape.event.ItemFrameParticleHandler.reassignFrameId(frame);
+            existing = null;
+        }
         if (existing == null) {
             PillarData data = new PillarData(id, dimension, pos);
             data.pattern = pattern;
@@ -2357,9 +2388,7 @@ public class PillarIdManager {
             pillarData.put(id, data);
             positionIndex.put(posKey, id);
 
-            if (com.kingodogo.buildscape.BuildScape.isServerFullyInitialized()) {
-                saveImmediate();
-            }
+            requestSave();
         } else {
             positionIndex.put(posKey, id);
             boolean changed = false;
@@ -2399,8 +2428,8 @@ public class PillarIdManager {
                 changed = true;
             }
 
-            if (changed && com.kingodogo.buildscape.BuildScape.isServerFullyInitialized()) {
-                saveImmediate();
+            if (changed) {
+                requestSave();
             }
         }
     }

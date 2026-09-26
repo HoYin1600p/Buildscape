@@ -52,6 +52,10 @@ public class GlassJarBlockEntity extends BlockEntity {
         return stack.is(net.minecraft.world.item.Items.EXPERIENCE_BOTTLE) || stack.is(com.kingodogo.buildscape.item.ModItems.EXPERIENCE_BUCKET.get());
     }
 
+    public static int getLiquidCap(ItemStack stack) {
+        return isXpLiquid(stack) ? XP_BOTTLE_MAX : MAX_LIQUID_LEVEL;
+    }
+
     public boolean isBucketLiquid() {
         if (!hasLiquid()) return false;
         ItemStack bucket = getBucketRepresentation();
@@ -181,7 +185,8 @@ public class GlassJarBlockEntity extends BlockEntity {
         if (!isEmpty() && !storedItem.isEmpty()) return false;
         if (!isLiquidItem(stack)) return false;
         if (isEmpty() || !hasLiquid()) return true;
-        int cap = isXpLiquid(stack) ? XP_BOTTLE_MAX : MAX_LIQUID_LEVEL;
+        if (stack.getItem() instanceof BucketItem || stack.getItem() instanceof MilkBucketItem) return false;
+        int cap = getLiquidCap(stack);
         if (liquidLevel >= cap) return false;
         return isSameLiquid(storedLiquidItem, stack);
     }
@@ -221,7 +226,7 @@ public class GlassJarBlockEntity extends BlockEntity {
         if (stack.getItem() instanceof BucketItem || stack.getItem() instanceof MilkBucketItem) {
             storedLiquidItem = stack.copy();
             storedLiquidItem.setCount(1);
-            liquidLevel = 16;
+            liquidLevel = getLiquidCap(stack);
             triggerWobble();
             sync();
             return true;
@@ -231,7 +236,7 @@ public class GlassJarBlockEntity extends BlockEntity {
                 storedLiquidItem.setCount(1);
                 liquidLevel = 1;
             } else {
-                liquidLevel = Math.min(16, liquidLevel + 1);
+                liquidLevel = Math.min(getLiquidCap(stack), liquidLevel + 1);
             }
             triggerWobble();
             sync();
@@ -318,7 +323,7 @@ public class GlassJarBlockEntity extends BlockEntity {
             if (tag.contains("StoredLiquidItem", 10)) {
                 CompoundTag liquidTag = tag.getCompound("StoredLiquidItem");
                 this.storedLiquidItem = ItemStack.of(liquidTag);
-                this.liquidLevel = tag.getInt("LiquidLevel");
+                this.liquidLevel = Math.max(0, Math.min(getLiquidCap(this.storedLiquidItem), tag.getInt("LiquidLevel")));
             } else {
                 this.storedLiquidItem = ItemStack.EMPTY;
                 this.liquidLevel = 0;

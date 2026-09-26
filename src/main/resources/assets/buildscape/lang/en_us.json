@@ -2154,6 +2154,7 @@
   "item.buildscape.smoke_vent": "Smoke Vent",
   "buildscape.config.particles.reset_tooltip": "Reset Configuration",
   "buildscape.config.op_only": "It Seems like Kingo Forgot to enable it for PUBLIC ( Operator's Only ) :P",
+  "buildscape.config.server_config_only": "Only server operators (permission level 4) can change particle and item settings.",
   "block.buildscape.vertical_slab_prefix": "Vertical ",
   "block.buildscape.white_redstone_lamp": "White Redstone Lamp",
   "item.buildscape.white_redstone_lamp": "White Redstone Lamp",

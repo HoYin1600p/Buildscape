@@ -39,6 +39,7 @@ public class PillarIdManager {
 
     private final Map<String, PillarData> pillarData = new ConcurrentHashMap<>();
 
+    public static final String VALID_ID_PATTERN = "^[A-Z][A-Za-z0-9-]{1,31}$";
     private final Map<String, String> positionIndex = new ConcurrentHashMap<>();
     private volatile List<PillarData> syncSnapshot = Collections.emptyList();
 
@@ -919,7 +920,7 @@ public class PillarIdManager {
                                 continue;
                             }
 
-                            if (!id.matches("^[A-Z][A-Za-z0-9-]{1,31}$")) {
+                            if (!id.matches(VALID_ID_PATTERN)) {
                                 skipped++;
                                 continue;
                             }
@@ -1618,7 +1619,11 @@ public class PillarIdManager {
             saveToFile(getBackupDataFile(), BACKUP_FILE_NAME);
         }
         if (savedPendingChanges) {
-            com.kingodogo.buildscape.network.SyncPillarIdsPacket.sendToAll(getAllPillarDataForSync());
+            try {
+                com.kingodogo.buildscape.network.SyncPillarIdsPacket.sendToAll(getAllPillarDataForSync());
+            } catch (RuntimeException e) {
+                com.kingodogo.buildscape.BuildScape.LOGGER.error("Unable to sync pillar data to players", e);
+            }
         }
     }
 

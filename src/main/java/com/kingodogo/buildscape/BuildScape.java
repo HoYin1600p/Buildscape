@@ -2824,6 +2824,7 @@ public class BuildScape {
                 if (!level.isClientSide) {
                     if (state.getBlock() instanceof com.kingodogo.buildscape.block.CreakingHeartBlock heart) {
                         level.setBlock(pos, state.setValue(com.kingodogo.buildscape.block.CreakingHeartBlock.ACTIVE, true), 3);
+                        level.scheduleTick(pos, heart, 40);
                     }
                     java.util.List<net.minecraft.core.Direction> directions = new java.util.ArrayList<>(java.util.List.of(net.minecraft.core.Direction.NORTH, net.minecraft.core.Direction.SOUTH, net.minecraft.core.Direction.EAST, net.minecraft.core.Direction.WEST, net.minecraft.core.Direction.UP, net.minecraft.core.Direction.DOWN));
                     java.util.Collections.shuffle(directions, level.random);
@@ -2839,7 +2840,7 @@ public class BuildScape {
                                 level.setBlock(adjPos, adjState.setValue(faceProp, true), 3);
                                 spawned++;
                             }
-                        } else if (adjState.isAir() || adjState.getMaterial().isReplaceable()) {
+                        } else if (adjState.isAir()) {
                             net.minecraft.world.level.block.state.BlockState newState = ModBlocks.RESIN_CLUMP.get().defaultBlockState().setValue(faceProp, true);
                             level.setBlock(adjPos, newState, 3);
                             spawned++;

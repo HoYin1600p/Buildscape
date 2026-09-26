@@ -62,9 +62,14 @@ public class UpdateAllPillarIdsPacket {
             PillarIdManager manager = PillarIdManager.get();
             Map<String, PillarIdManager.PillarData> newMap = new LinkedHashMap<>();
             for (PillarIdManager.PillarData data : pillarDataList) {
-                if (data.id != null) {
-                    newMap.put(data.id, data);
+                if (data.id == null || !data.id.matches(PillarIdManager.VALID_ID_PATTERN)
+                        || !SyncPillarIdsPacket.canEncode(data)) {
+                    com.kingodogo.buildscape.BuildScape.LOGGER.warn(
+                            "Rejected pillar data update from {}: invalid entry {}",
+                            player.getGameProfile().getName(), data.id);
+                    return;
                 }
+                newMap.put(data.id, data);
             }
 
             manager.replaceAllPillarData(newMap);

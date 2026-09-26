@@ -35,7 +35,9 @@ public class UpdateConfigPacket {
             ServerPlayer player = ctx.get().getSender();
             if (player == null) return;
 
-            if (!player.hasPermissions(4)) {
+            if (!player.hasPermissions(PillarParticleConfig.CONFIG_PERMISSION_LEVEL)) {
+                player.displayClientMessage(new net.minecraft.network.chat.TranslatableComponent(
+                        "buildscape.config.server_config_only").withStyle(net.minecraft.ChatFormatting.RED), true);
                 return;
             }
 

@@ -178,7 +178,7 @@ public class BuildScapeConfigScreen extends Screen {
                 buttonWidth, buttonHeight,
                 new TranslatableComponent("buildscape.config.category.items"),
                 (button) -> {
-                    if (checkOpAccessAndNotify()) setActiveTab(new PillarItemsConfigTab(this));
+                    if (checkConfigAccessAndNotify()) setActiveTab(new PillarItemsConfigTab(this));
                 });
         addRenderableWidget(pillarItemsButton);
 
@@ -188,7 +188,7 @@ public class BuildScapeConfigScreen extends Screen {
                 buttonWidth, buttonHeight,
                 new TranslatableComponent("buildscape.config.category.particles"),
                 (button) -> {
-                    if (checkOpAccessAndNotify()) setActiveTab(new PillarParticlesConfigTab(this));
+                    if (checkConfigAccessAndNotify()) setActiveTab(new PillarParticlesConfigTab(this));
                 });
         addRenderableWidget(pillarParticlesButton);
 
@@ -232,7 +232,7 @@ public class BuildScapeConfigScreen extends Screen {
         addRenderableWidget(reportButton);
 
         if (activeTab == null) {
-            if (hasOpAccess()) {
+            if (hasConfigAccess()) {
                 setActiveTab(new PillarItemsConfigTab(this));
             } else {
                 setActiveTab(new WorldSettingsConfigTab(this));
@@ -250,6 +250,20 @@ public class BuildScapeConfigScreen extends Screen {
             return false;
         }
         return Minecraft.getInstance().player.hasPermissions(2);
+    }
+
+    public boolean hasConfigAccess() {
+        return Minecraft.getInstance().player != null
+                && Minecraft.getInstance().player.hasPermissions(com.kingodogo.buildscape.config.PillarParticleConfig.CONFIG_PERMISSION_LEVEL);
+    }
+
+    private boolean checkConfigAccessAndNotify() {
+        if (hasConfigAccess()) return true;
+
+        com.kingodogo.buildscape.client.ClientEvents.setOverlayMessage(
+                new TranslatableComponent("buildscape.config.server_config_only")
+        );
+        return false;
     }
 
     private boolean checkOpAccessAndNotify() {

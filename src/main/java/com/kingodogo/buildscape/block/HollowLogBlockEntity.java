@@ -200,6 +200,8 @@ public class HollowLogBlockEntity extends BlockEntity {
                         Block.popResource(level, pos, new ItemStack(blockEntity.glassCoverPos.getBlock()));
                         hadGlass = true;
                     }
+                    blockEntity.glassCoverNeg = Blocks.AIR.defaultBlockState();
+                    blockEntity.glassCoverPos = Blocks.AIR.defaultBlockState();
 
                     level.setBlockAndUpdate(pos, Blocks.LAVA.defaultBlockState());
                 }

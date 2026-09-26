@@ -23,7 +23,6 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
-import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -406,44 +405,6 @@ public class PillarBlock
     }
 
     @Override
-    public List<ItemStack> getDrops(
-            BlockState state,
-            LootContext.Builder builder
-    ) {
-        List<ItemStack> drops = super.getDrops(state, builder);
-
-        LootContext lootContext = builder
-                .withParameter(
-                        net.minecraft.world.level.storage.loot.parameters.LootContextParams.BLOCK_STATE,
-                        state
-                )
-                .create(
-                        net.minecraft.world.level.storage.loot.parameters.LootContextParamSets.BLOCK
-                );
-
-        net.minecraft.world.phys.Vec3 origin = lootContext.getParamOrNull(
-                net.minecraft.world.level.storage.loot.parameters.LootContextParams.ORIGIN
-        );
-        if (origin != null) {
-            BlockPos pos = new BlockPos(origin);
-            net.minecraft.world.level.Level level = lootContext.getLevel();
-            if (level != null) {
-                BlockEntity be = level.getBlockEntity(pos);
-                if (
-                        be instanceof PillarBlockEntity pillarBE && pillarBE.hasDisplayItem()
-                ) {
-                    ItemStack displayedItem = pillarBE.getDisplayedItem().copy();
-                    if (!displayedItem.isEmpty()) {
-                        drops.add(displayedItem);
-                    }
-                }
-            }
-        }
-
-        return drops;
-    }
-
-    @Override
     public void onRemove(
             BlockState state,
             Level level,
@@ -451,6 +412,24 @@ public class PillarBlock
             BlockState newState,
             boolean isMoving
     ) {
+        if (!level.isClientSide && !state.is(newState.getBlock())
+                && level.getBlockEntity(pos) instanceof PillarBlockEntity droppingBE
+                && droppingBE.hasDisplayItem()) {
+            ItemStack displayedItem = droppingBE.getDisplayedItem().copy();
+            if (!displayedItem.isEmpty()) {
+                net.minecraft.world.entity.item.ItemEntity itemEntity =
+                        new net.minecraft.world.entity.item.ItemEntity(
+                                level,
+                                pos.getX() + 0.5,
+                                pos.getY() + 0.5,
+                                pos.getZ() + 0.5,
+                                displayedItem
+                        );
+                itemEntity.setDefaultPickUpDelay();
+                level.addFreshEntity(itemEntity);
+            }
+        }
+
         if (
                 !level.isClientSide &&
                         !state.is(newState.getBlock()) &&
@@ -463,22 +442,6 @@ public class PillarBlock
             if (be instanceof PillarBlockEntity pillarBE) {
                 pillarIdToPreserve = pillarBE.getPillarId();
                 colorsToPreserve = pillarBE.getParticleColors();
-
-                if (pillarBE.hasDisplayItem()) {
-                    ItemStack displayedItem = pillarBE.getDisplayedItem().copy();
-                    if (!displayedItem.isEmpty()) {
-                        net.minecraft.world.entity.item.ItemEntity itemEntity =
-                                new net.minecraft.world.entity.item.ItemEntity(
-                                        level,
-                                        pos.getX() + 0.5,
-                                        pos.getY() + 0.5,
-                                        pos.getZ() + 0.5,
-                                        displayedItem
-                                );
-                        itemEntity.setDefaultPickUpDelay();
-                        level.addFreshEntity(itemEntity);
-                    }
-                }
 
                 pillarBE.clearLocalStateOnly();
             }

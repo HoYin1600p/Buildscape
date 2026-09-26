@@ -146,7 +146,11 @@ public class CustomFireworkStarRecipe extends CustomRecipe {
     }
 
     private static boolean isStockingItem(ItemStack stack) {
-        return stack.getItem() instanceof FestiveStockingItem || stack.getItem().getDescriptionId().contains("stocking");
+        if (!(stack.getItem() instanceof FestiveStockingItem)) {
+            return false;
+        }
+        CompoundTag tag = stack.getTag();
+        return tag == null || !tag.contains("StoredItem", 10) || tag.getCompound("StoredItem").isEmpty();
     }
 
     @Override

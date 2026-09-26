@@ -313,7 +313,7 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
         config.pattern_speed = 0.05;
         config.pattern_spread = 0.05;
         config.pattern_intensity = 1.0;
-        config.saveProperties();
+        requestConfigSave();
 
         currentPatternIndex = findPatternIndex("ring");
         if (usePatternToggle != null) {
@@ -343,7 +343,7 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
         config.particle_color.add("#FFFFFF");
         config.particle_color.add("#FFFF00");
         config.max_particle_color = 3;
-        config.saveProperties();
+        requestConfigSave();
 
         currentMaxColor = 3;
         if (maxParticleColorSlider != null) {
@@ -807,13 +807,13 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
         PillarParticleConfig config = PillarParticleConfig.get();
         ParticleColorSlots.ensureCapacity(config.particle_color, index + 1);
         config.particle_color.set(index, hexColor);
-        config.saveProperties();
+        requestConfigSave();
     }
 
     private void toggleUsePattern() {
         PillarParticleConfig config = PillarParticleConfig.get();
         config.use_pattern = !config.use_pattern;
-        config.saveProperties();
+        requestConfigSave();
 
         usePatternToggle.setMessage(getUsePatternMessage(config.use_pattern));
         particleSpeedField.setEditable(!config.use_pattern);
@@ -847,7 +847,7 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
         String oldPattern = config.pattern;
         config.pattern = pattern;
         config.use_pattern = true;
-        config.saveProperties();
+        requestConfigSave();
 
         PillarIdManager manager = PillarIdManager.getClient();
         if (manager.hasLoaded()) {
@@ -874,7 +874,7 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
         PillarParticleConfig config = PillarParticleConfig.get();
         config.max_particle_color = currentMaxColor;
         ParticleColorSlots.ensureCapacity(config.particle_color, currentMaxColor);
-        config.saveProperties();
+        requestConfigSave();
 
         maxParticleColorSlider.setMessage(
                 new TranslatableComponent("buildscape.config.particles.max_particle_color", currentMaxColor));
@@ -919,6 +919,7 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
 
     @Override
     public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
+        flushConfigSave(false);
         int contentX = parent.getContentX();
         int contentY = parent.getContentY();
         int contentWidth = parent.getContentWidth();
@@ -1385,6 +1386,26 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
 
     private static final double FIELD_MIN_VALUE = 0.001;
 
+    private static final long SAVE_DEBOUNCE_MS = 400L;
+    private boolean configSavePending = false;
+    private long lastConfigChangeMs = 0L;
+
+    private void requestConfigSave() {
+        configSavePending = true;
+        lastConfigChangeMs = net.minecraft.Util.getMillis();
+    }
+
+    private void flushConfigSave(boolean force) {
+        if (!configSavePending) {
+            return;
+        }
+        if (!force && net.minecraft.Util.getMillis() - lastConfigChangeMs < SAVE_DEBOUNCE_MS) {
+            return;
+        }
+        configSavePending = false;
+        PillarParticleConfig.get().saveProperties();
+    }
+
     private void updateConfigFromFields() {
         PillarParticleConfig config = PillarParticleConfig.get();
         boolean changed = false;
@@ -1457,13 +1478,14 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
         }
 
         if (changed) {
-            config.saveProperties();
+            requestConfigSave();
         }
     }
 
     @Override
     public void onClose() {
         updateConfigFromFields();
+        flushConfigSave(true);
         super.onClose();
     }
 

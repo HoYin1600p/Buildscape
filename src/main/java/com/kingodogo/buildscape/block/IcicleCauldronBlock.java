@@ -181,6 +181,7 @@ public class IcicleCauldronBlock extends CauldronBlock implements EntityBlock {
                             storedIcicle.copy()
                     );
                     itemEntity.setDefaultPickUpDelay();
+                    level.addFreshEntity(itemEntity);
                 }
             }
         }

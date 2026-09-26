@@ -19,6 +19,15 @@ public class FestiveStockingBlockEntity
         implements WorldlyContainer {
 
     private ItemStack storedItem = ItemStack.EMPTY;
+    private boolean contentsHandled = false;
+
+    public void markContentsHandled() {
+        this.contentsHandled = true;
+    }
+
+    public boolean areContentsHandled() {
+        return contentsHandled;
+    }
 
     private static final int[] SLOTS = new int[]{0};
 

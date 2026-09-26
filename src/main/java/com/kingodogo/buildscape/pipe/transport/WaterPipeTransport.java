@@ -61,6 +61,20 @@ public class WaterPipeTransport extends PipeFluidTransport {
         return visited;
     }
 
+    private static boolean isTruncated(PipeTopologyAccess topology, Set<BlockPos> component) {
+        for (BlockPos pos : component) {
+            for (Direction dir : Direction.values()) {
+                if (topology.isConnected(pos, dir)) {
+                    BlockPos neighbor = pos.relative(dir);
+                    if (!component.contains(neighbor) && topology.isHollowPipe(neighbor)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
     @Override
     public Set<BlockPos> recalculateNetwork(Level level, BlockPos startPos) {
         PreparedNetwork prepared = prepareNetwork(level, startPos);
@@ -107,7 +121,11 @@ public class WaterPipeTransport extends PipeFluidTransport {
                 sources.add(pos);
             }
         }
-        return new PreparedNetwork(Set.copyOf(component), List.copyOf(sources), new SnapshotTopology(nodes));
+        boolean truncated = isTruncated(topology, component);
+        if (truncated && sources.isEmpty()) {
+            return null;
+        }
+        return new PreparedNetwork(Set.copyOf(component), List.copyOf(sources), new SnapshotTopology(nodes), truncated);
     }
 
     public Map<BlockPos, PipeFlowState> calculatePreparedNetwork(PreparedNetwork prepared) {
@@ -149,6 +167,9 @@ public class WaterPipeTransport extends PipeFluidTransport {
             PipeFlowState calculated = newStates.get(pos);
             if (calculated == null) {
                 calculated = new PipeFlowState();
+            }
+            if (prepared.truncated() && !calculated.hasFluid()) {
+                continue;
             }
 
             BlockEntity be = level.getBlockEntity(pos);
@@ -396,11 +417,18 @@ public class WaterPipeTransport extends PipeFluidTransport {
         private final Set<BlockPos> component;
         private final List<BlockPos> sources;
         private final SnapshotTopology topology;
+        private final boolean truncated;
 
-        private PreparedNetwork(Set<BlockPos> component, List<BlockPos> sources, SnapshotTopology topology) {
+        private PreparedNetwork(Set<BlockPos> component, List<BlockPos> sources, SnapshotTopology topology,
+                                boolean truncated) {
             this.component = component;
             this.sources = sources;
             this.topology = topology;
+            this.truncated = truncated;
+        }
+
+        public boolean truncated() {
+            return truncated;
         }
 
         public Set<BlockPos> component() {

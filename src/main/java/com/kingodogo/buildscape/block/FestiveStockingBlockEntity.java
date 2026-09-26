@@ -74,7 +74,7 @@ public class FestiveStockingBlockEntity
             return true;
         }
         return (
-                storedItem.sameItem(stack) &&
+                ItemStack.isSameItemSameTags(storedItem, stack) &&
                         storedItem.getCount() < storedItem.getMaxStackSize()
         );
     }

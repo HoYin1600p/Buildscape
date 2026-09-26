@@ -696,13 +696,7 @@ public class PillarIdDetailConfigTab extends AbstractConfigTab {
     }
 
     private static void setEditBoxHeight(EditBox editBox, int height) {
-        try {
-            java.lang.reflect.Field heightField = net.minecraft.client.gui.components.AbstractWidget.class
-                    .getDeclaredField("height");
-            heightField.setAccessible(true);
-            heightField.setInt(editBox, height);
-        } catch (Exception e) {
-        }
+        editBox.setHeight(height);
     }
 
     @Override

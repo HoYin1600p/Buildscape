@@ -2511,33 +2511,19 @@ public class GuiEditorScreen extends Screen {
                     elementConfig = new GuiConfigData.ElementConfig(
                             widget.x - contentX, widget.y - contentY, widget.getWidth(), 20
                     );
-                    try {
-                        java.lang.reflect.Field heightField =
-                            net.minecraft.client.gui.components.AbstractWidget.class.getDeclaredField("height");
-                        heightField.setAccessible(true);
-                        elementConfig.height = heightField.getInt(widget);
-                    } catch (Exception e) {}
+                    elementConfig.height = widget.getHeight();
                 } else if (value instanceof EditBox editBox) {
                     if (!editBox.visible || editBox.x < 0 || editBox.y < 0) continue;
                     elementConfig = new GuiConfigData.ElementConfig(
                             editBox.x - contentX, editBox.y - contentY, editBox.getWidth(), 20
                     );
-                    try {
-                        java.lang.reflect.Field heightField = EditBox.class.getDeclaredField("height");
-                        heightField.setAccessible(true);
-                        elementConfig.height = heightField.getInt(editBox);
-                    } catch (Exception e) {}
+                    elementConfig.height = editBox.getHeight();
                     } else if (value instanceof Button button) {
                     if (!button.visible || button.x < 0 || button.y < 0) continue;
                         elementConfig = new GuiConfigData.ElementConfig(
                             button.x - contentX, button.y - contentY, button.getWidth(), 20
                         );
-                        try {
-                            java.lang.reflect.Field heightField =
-                                net.minecraft.client.gui.components.AbstractWidget.class.getDeclaredField("height");
-                            heightField.setAccessible(true);
-                            elementConfig.height = heightField.getInt(button);
-                        } catch (Exception e) {}
+                        elementConfig.height = button.getHeight();
                     }
 
                     if (elementConfig != null && !discoveredWidgets.containsKey(elementId)) {
@@ -2545,37 +2531,6 @@ public class GuiEditorScreen extends Screen {
                 }
                 }
                 currentClass = currentClass.getSuperclass();
-            }
-
-            try {
-                java.lang.reflect.Field childrenField = Screen.class.getDeclaredField("children");
-                childrenField.setAccessible(true);
-                @SuppressWarnings("unchecked")
-                List<net.minecraft.client.gui.components.events.GuiEventListener> children =
-                    (List<net.minecraft.client.gui.components.events.GuiEventListener>) childrenField.get(sourceTab);
-                if (children != null) {
-                    int index = 0;
-                    for (net.minecraft.client.gui.components.events.GuiEventListener child : children) {
-                        if (child instanceof net.minecraft.client.gui.components.AbstractWidget widget) {
-                            if (widget.visible && widget.x >= 0 && widget.y >= 0) {
-                                String elementId = "widget_" + index++;
-                                if (!discoveredWidgets.containsKey(elementId)) {
-                                    GuiConfigData.ElementConfig elementConfig = new GuiConfigData.ElementConfig(
-                                        widget.x - contentX, widget.y - contentY, widget.getWidth(), 20
-                                    );
-                                    try {
-                                        java.lang.reflect.Field heightField =
-                                            net.minecraft.client.gui.components.AbstractWidget.class.getDeclaredField("height");
-                                        heightField.setAccessible(true);
-                                        elementConfig.height = heightField.getInt(widget);
-                                    } catch (Exception e) {}
-                                    discoveredWidgets.put(elementId, elementConfig);
-                                }
-                            }
-                        }
-                    }
-                }
-            } catch (Exception e) {
             }
 
             scanTextLabels(discoveredWidgets, contentX, contentY);

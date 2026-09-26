@@ -89,7 +89,7 @@ public class TrappedDecoratedPotBlockEntity
         }
         return (direction != Direction.DOWN &&
                 (storedItem.isEmpty() ||
-                        (storedItem.sameItem(stack) &&
+                        (ItemStack.isSameItemSameTags(storedItem, stack) &&
                                 storedItem.getCount() < storedItem.getMaxStackSize())));
     }
 

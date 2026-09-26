@@ -212,7 +212,7 @@ public class DecoratedPotBlock
                     }
                     return InteractionResult.sidedSuccess(level.isClientSide);
                 } else if (
-                        stored.sameItem(heldItem) &&
+                        ItemStack.isSameItemSameTags(stored, heldItem) &&
                                 stored.getCount() < stored.getMaxStackSize()
                 ) {
                     if (!level.isClientSide) {
@@ -308,7 +308,7 @@ public class DecoratedPotBlock
                     }
                     return InteractionResult.sidedSuccess(level.isClientSide);
                 } else if (
-                        stored.sameItem(heldItem) &&
+                        ItemStack.isSameItemSameTags(stored, heldItem) &&
                                 stored.getCount() < stored.getMaxStackSize()
                 ) {
                     if (!level.isClientSide) {

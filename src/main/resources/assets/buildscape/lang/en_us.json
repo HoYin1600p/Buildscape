@@ -39,6 +39,8 @@
   "message.buildscape.biome_brush.cleared": "Biome cleared",
   "message.buildscape.biome_brush.broken": "Biome Brush is broken! Repair it to use.",
   "message.buildscape.biome_brush.cannot_apply": "Cannot apply: Please capture a biome and set both positions first.",
+  "message.buildscape.biome_brush.wrong_dimension": "Both corners must be selected in this dimension.",
+  "message.buildscape.biome_brush.too_large": "Selection is too large (max %s blocks wide on X and Z).",
   "message.buildscape.biome_brush.invalid_biome": "Invalid captured biome: %s",
   "item.buildscape.wrench": "Wrench",
   "item.buildscape.iron_hammer": "Iron Hammer",

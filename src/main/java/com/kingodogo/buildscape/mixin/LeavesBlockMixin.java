@@ -76,12 +76,6 @@ public abstract class LeavesBlockMixin extends Block implements SimpleWaterlogge
                 if (currentState.hasProperty(PERSISTENT) && !currentState.getValue(PERSISTENT)) {
                     LeavesBlock leavesBlock = (LeavesBlock) (Object) this;
                     leavesBlock.randomTick(currentState, level, pos, random);
-                    BlockState afterTick = level.getBlockState(pos);
-                    if (afterTick.getBlock() instanceof LeavesBlock &&
-                            afterTick.hasProperty(PERSISTENT) &&
-                        !afterTick.getValue(PERSISTENT)) {
-                        level.scheduleTick(pos, leavesBlock, 6);
-                    }
                 }
             }
         }

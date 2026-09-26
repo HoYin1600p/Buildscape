@@ -19,6 +19,8 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class PillarParticleConfig {
+    public static final int CONFIG_PERMISSION_LEVEL = 4;
+
 
     private static final Gson GSON = new GsonBuilder()
             .setPrettyPrinting()
@@ -1309,7 +1311,7 @@ public class PillarParticleConfig {
             net.minecraftforge.fml.DistExecutor.unsafeRunWhenOn(net.minecraftforge.api.distmarker.Dist.CLIENT,
                     () -> () -> {
                         if (net.minecraft.client.Minecraft.getInstance().player != null &&
-                                net.minecraft.client.Minecraft.getInstance().player.hasPermissions(2)) {
+                                net.minecraft.client.Minecraft.getInstance().player.hasPermissions(CONFIG_PERMISSION_LEVEL)) {
                             com.kingodogo.buildscape.network.ModMessages.INSTANCE.sendToServer(
                                     new com.kingodogo.buildscape.network.UpdateConfigPacket(this));
                         }
@@ -1353,7 +1355,7 @@ public class PillarParticleConfig {
             net.minecraftforge.fml.DistExecutor.unsafeRunWhenOn(net.minecraftforge.api.distmarker.Dist.CLIENT,
                     () -> () -> {
                         if (net.minecraft.client.Minecraft.getInstance().player != null &&
-                                net.minecraft.client.Minecraft.getInstance().player.hasPermissions(2)) {
+                                net.minecraft.client.Minecraft.getInstance().player.hasPermissions(CONFIG_PERMISSION_LEVEL)) {
                             com.kingodogo.buildscape.network.ModMessages.INSTANCE.sendToServer(
                                     new com.kingodogo.buildscape.network.UpdateConfigPacket(this));
                         }

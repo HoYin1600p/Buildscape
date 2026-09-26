@@ -3,8 +3,10 @@ package com.kingodogo.buildscape.network;
 import com.kingodogo.buildscape.item.HammerItem;
 import com.kingodogo.buildscape.item.ModItems;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.protocol.game.ClientboundBlockUpdatePacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
@@ -18,9 +20,13 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.common.ForgeHooks;
+import net.minecraftforge.common.util.BlockSnapshot;
+import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.network.NetworkEvent;
 
 import java.util.List;
@@ -54,6 +60,7 @@ public class HammerReplacePacket {
             if (!level.isLoaded(pos)) return;
             if (player.distanceToSqr(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5) > 64.0) return;
             if (!player.mayBuild() || player.blockActionRestricted(level, pos, player.gameMode.getGameModeForPlayer())) return;
+            if (!level.mayInteract(player, pos)) return;
 
             ItemStack hammerStack = player.getMainHandItem();
             if (hammerStack.isEmpty() || !(hammerStack.getItem() instanceof HammerItem hammer)) return;
@@ -72,6 +79,17 @@ public class HammerReplacePacket {
 
             Block replacementBlock = blockItem.getBlock();
             if (targetState.getBlock() == replacementBlock) return;
+            if (isMultiBlockPart(targetState)) return;
+            if (offhandStack.getTagElement("BlockEntityTag") != null) return;
+
+            BlockState newState = replacementBlock.defaultBlockState();
+            if (isMultiBlockPart(newState) || !newState.canSurvive(level, pos)) return;
+
+            if (ForgeHooks.onBlockBreakEvent(level, player.gameMode.getGameModeForPlayer(), player, pos) < 0) return;
+            if (ForgeEventFactory.onBlockPlace(player, BlockSnapshot.create(level.dimension(), level, pos), Direction.UP)) {
+                player.connection.send(new ClientboundBlockUpdatePacket(level, pos));
+                return;
+            }
 
             BlockEntity blockEntity = level.getBlockEntity(pos);
             boolean hasSilkTouch = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.SILK_TOUCH, hammerStack) > 0;
@@ -93,7 +111,6 @@ public class HammerReplacePacket {
                 drops = targetState.getDrops(builder);
             }
 
-            BlockState newState = replacementBlock.defaultBlockState();
             level.setBlock(pos, newState, 3);
             com.kingodogo.buildscape.event.AdvancementEvents.onHammerReplace(player);
 
@@ -117,6 +134,11 @@ public class HammerReplacePacket {
             );
         });
         ctx.setPacketHandled(true);
+    }
+
+    private static boolean isMultiBlockPart(BlockState state) {
+        return state.hasProperty(BlockStateProperties.DOUBLE_BLOCK_HALF)
+                || state.hasProperty(BlockStateProperties.BED_PART);
     }
 
     private static ItemStack createSilkTouchFakeTool() {

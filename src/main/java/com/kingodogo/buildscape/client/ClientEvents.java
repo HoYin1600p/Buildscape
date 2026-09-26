@@ -219,6 +219,9 @@ public class ClientEvents {
 
     @SubscribeEvent
     public static void onClientWorldUnload(WorldEvent.Unload event) {
+        if (!event.getWorld().isClientSide()) {
+            return;
+        }
         overlayMessage = null;
         overlayMessageTime = 0;
         wasPressed = false;
@@ -230,7 +233,6 @@ public class ClientEvents {
             com.kingodogo.buildscape.client.renderer.ArmorPillarRenderer.clearAllCaches();
             com.kingodogo.buildscape.particle.TintedDripParticle.clearColorCache();
             com.kingodogo.buildscape.event.ItemFrameParticleHandler.clearCaches();
-            com.kingodogo.buildscape.config.PillarParticleConfig.clearServerConfig();
             com.kingodogo.buildscape.client.MuffBlockManager.clear();
         } catch (Exception e) {
             System.err.println(

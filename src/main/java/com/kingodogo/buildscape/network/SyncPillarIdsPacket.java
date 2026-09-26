@@ -167,6 +167,18 @@ public class SyncPillarIdsPacket {
         return data;
     }
 
+    public static boolean canEncode(PillarIdManager.PillarData data) {
+        io.netty.buffer.ByteBuf scratch = io.netty.buffer.Unpooled.buffer();
+        try {
+            writePillarData(new FriendlyByteBuf(scratch), data);
+            return true;
+        } catch (RuntimeException e) {
+            return false;
+        } finally {
+            scratch.release();
+        }
+    }
+
     private static void writePillarData(FriendlyByteBuf buf, PillarIdManager.PillarData data) {
         if (data == null || data.id == null || data.dimension == null) {
             throw new EncoderException("pillar data is incomplete");

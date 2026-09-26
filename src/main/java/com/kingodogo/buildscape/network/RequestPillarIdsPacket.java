@@ -46,7 +46,11 @@ public class RequestPillarIdsPacket {
                 return;
             }
 
-            SyncPillarIdsPacket.sendToPlayer(player, manager.getAllPillarDataForSync());
+            try {
+                SyncPillarIdsPacket.sendToPlayer(player, manager.getAllPillarDataForSync());
+            } catch (RuntimeException e) {
+                com.kingodogo.buildscape.BuildScape.LOGGER.error("Unable to send pillar data to {}", player.getGameProfile().getName(), e);
+            }
         });
         ctx.get().setPacketHandled(true);
     }

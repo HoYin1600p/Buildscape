@@ -10,6 +10,7 @@ import net.minecraft.network.chat.TextComponent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.decoration.ItemFrame;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -106,7 +107,7 @@ public class ItemFrameParticleHandler {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    @SubscribeEvent
     public static void onEntityInteract(
             PlayerInteractEvent.EntityInteract event
     ) {
@@ -114,7 +115,21 @@ public class ItemFrameParticleHandler {
                 !(event.getTarget() instanceof com.kingodogo.buildscape.entity.ColoredItemFrameEntity)) {
             return;
         }
+        if (!event.getPlayer().mayBuild()
+                || !event.getWorld().mayInteract(event.getPlayer(), event.getTarget().blockPosition())) {
+            return;
+        }
 
+        try {
+            handleFrameInteraction(event);
+        } finally {
+            if (event.isCanceled() && event.getCancellationResult() == InteractionResult.PASS) {
+                event.setCancellationResult(InteractionResult.sidedSuccess(event.getWorld().isClientSide));
+            }
+        }
+    }
+
+    private static void handleFrameInteraction(PlayerInteractEvent.EntityInteract event) {
         if (event.getTarget() instanceof com.kingodogo.buildscape.entity.ColoredItemFrameEntity) {
             handleColoredItemFrameInteraction(event);
             return;

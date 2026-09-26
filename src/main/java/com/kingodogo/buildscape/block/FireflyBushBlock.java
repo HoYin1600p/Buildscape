@@ -10,17 +10,14 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LightLayer;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.BushBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
-import java.util.List;
 import java.util.Random;
 
 public class FireflyBushBlock extends BushBlock {
@@ -36,78 +33,26 @@ public class FireflyBushBlock extends BushBlock {
     }
 
     @Override
-    @SuppressWarnings("deprecation")
-    public void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean isMoving) {
-        super.onPlace(state, level, pos, oldState, isMoving);
-        if (!level.isClientSide) {
-            ServerLevel serverLevel = (ServerLevel) level;
-            boolean isNight = !serverLevel.isDay();
-            boolean noSkylight = serverLevel.getBrightness(LightLayer.SKY, pos) == 0;
-            if (isNight || noSkylight) {
-                double x = pos.getX() + 0.5D;
-                double y = pos.getY() + 0.5D;
-                double z = pos.getZ() + 0.5D;
-                double xSpeed = (serverLevel.random.nextFloat() - 0.5F) * 0.01D;
-                double ySpeed = (serverLevel.random.nextFloat() - 0.5F) * 0.005D;
-                double zSpeed = (serverLevel.random.nextFloat() - 0.5F) * 0.01D;
-                serverLevel.sendParticles(ModParticles.FIREFLY.get(), x, y, z, 0, xSpeed, ySpeed, zSpeed, 1.0D);
-            }
-
-            serverLevel.scheduleTick(pos, this, 1);
-        }
-    }
-
-    @Override
-    @SuppressWarnings("deprecation")
-    public void tick(BlockState state, ServerLevel level, BlockPos pos, Random random) {
-        super.tick(state, level, pos, random);
-
-        if (!hasPlayerNearby(level, pos)) {
-            level.scheduleTick(pos, this, 20);
-            return;
-        }
-
+    public void animateTick(BlockState state, Level level, BlockPos pos, Random random) {
         boolean isNight = !level.isDay();
         boolean noSkylight = level.getBrightness(LightLayer.SKY, pos) == 0;
-        if (isNight || noSkylight) {
-            if (random.nextFloat() < 0.70F) {
-                for (int i = 0; i < 10; i++) {
-                    int dx = random.nextInt(11) - 5;
-                    int dy = random.nextInt(6);
-                    int dz = random.nextInt(11) - 5;
-                    BlockPos targetPos = pos.offset(dx, dy, dz);
-                    if (level.getBlockState(targetPos).isAir()) {
-                        double x = targetPos.getX() + random.nextDouble();
-                        double y = targetPos.getY() + random.nextDouble();
-                        double z = targetPos.getZ() + random.nextDouble();
-
-                        double xSpeed = (random.nextFloat() - 0.5F) * 0.01D;
-                        double ySpeed = (random.nextFloat() - 0.5F) * 0.005D;
-                        double zSpeed = (random.nextFloat() - 0.5F) * 0.01D;
-
-                        level.sendParticles(ModParticles.FIREFLY.get(), x, y, z, 0, xSpeed, ySpeed, zSpeed, 1.0D);
-                        break;
-                    }
-                }
+        if (!(isNight || noSkylight) || random.nextFloat() >= 0.70F) {
+            return;
+        }
+        for (int i = 0; i < 10; i++) {
+            BlockPos targetPos = pos.offset(random.nextInt(11) - 5, random.nextInt(6), random.nextInt(11) - 5);
+            if (level.getBlockState(targetPos).isAir()) {
+                level.addParticle(
+                        ModParticles.FIREFLY.get(),
+                        targetPos.getX() + random.nextDouble(),
+                        targetPos.getY() + random.nextDouble(),
+                        targetPos.getZ() + random.nextDouble(),
+                        (random.nextFloat() - 0.5F) * 0.01D,
+                        (random.nextFloat() - 0.5F) * 0.005D,
+                        (random.nextFloat() - 0.5F) * 0.01D);
+                return;
             }
         }
-
-        level.scheduleTick(pos, this, 1);
-    }
-
-    @Override
-    @SuppressWarnings("deprecation")
-    public void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, BlockPos fromPos, boolean isMoving) {
-        super.neighborChanged(state, level, pos, block, fromPos, isMoving);
-        if (!level.isClientSide && !level.getBlockTicks().hasScheduledTick(pos, this)) {
-            level.scheduleTick(pos, this, 1);
-        }
-    }
-
-    private boolean hasPlayerNearby(Level level, BlockPos pos) {
-        AABB searchBox = new AABB(pos).inflate(24.0D);
-        List<Player> players = level.getEntitiesOfClass(Player.class, searchBox);
-        return !players.isEmpty();
     }
 
     @Override

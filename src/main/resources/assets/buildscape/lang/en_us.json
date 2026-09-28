@@ -111,6 +111,7 @@
   "tooltip.buildscape.muff_block.desc2": "Right-click to tune the radius (1-32 blocks).",
   "tooltip.buildscape.muff_block.desc3": "Hold in off-hand to visualize the radius in-world.",
   "tooltip.buildscape.wrench.desc1": "Sneak + Hover over a block & Press any arrow key to rotate the block.",
+  "tooltip.buildscape.wrench.desc2": "Sneak + Right-click a Hollow Steel Pipe to change its direction.",
   "tooltip.buildscape.hammer.desc1": "Right-click a block to replace it with the block in your off-hand.",
   "tooltip.buildscape.hammer.desc2": "Iron tier cannot replace Obsidian-level blocks.",
   "tooltip.buildscape.hammer.desc3": "Can be enchanted with Unbreaking, Mending, and Silk Touch.",

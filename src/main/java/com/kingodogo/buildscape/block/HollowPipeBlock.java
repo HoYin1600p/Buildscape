@@ -261,9 +261,8 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
                         case Z -> Direction.Axis.X;
                         case X -> Direction.Axis.Y;
                     };
-                    level.setBlock(pos, state.setValue(AXIS, nextAxis), 3);
+                    setAxisAndRefresh(level, pos, state, nextAxis);
                     level.playSound(null, pos, SoundEvents.ANVIL_USE, SoundSource.BLOCKS, 0.5F, 1.5F);
-                    HollowPipeTransportManager.markDirty(level, pos);
                     return InteractionResult.SUCCESS;
                 }
 
@@ -763,6 +762,13 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
         }
 
         return false;
+    }
+
+    public void setAxisAndRefresh(Level level, BlockPos pos, BlockState state, Direction.Axis axis) {
+        BlockState rotated = updateConnections(level, pos, state.setValue(AXIS, axis));
+        level.setBlock(pos, rotated, 3);
+        notifyAndRecalculateNeighbors(level, pos);
+        HollowPipeTransportManager.markDirty(level, pos);
     }
 
     private void notifyAndRecalculateNeighbors(Level level, BlockPos pos) {

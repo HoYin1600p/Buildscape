@@ -253,39 +253,18 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
         Direction hitFace = hit.getDirection();
 
         if (held.is(ModItems.WRENCH.get())) {
+            if (!player.isShiftKeyDown()) {
+                return InteractionResult.PASS;
+            }
             if (!level.isClientSide) {
-                if (player.isShiftKeyDown()) {
-                    Direction.Axis currentAxis = state.getValue(AXIS);
-                    Direction.Axis nextAxis = switch (currentAxis) {
-                        case Y -> Direction.Axis.Z;
-                        case Z -> Direction.Axis.X;
-                        case X -> Direction.Axis.Y;
-                    };
-                    setAxisAndRefresh(level, pos, state, nextAxis);
-                    level.playSound(null, pos, SoundEvents.ANVIL_USE, SoundSource.BLOCKS, 0.5F, 1.5F);
-                    return InteractionResult.SUCCESS;
-                }
-
-                BooleanProperty prop = getPropertyForDirection(hitFace);
-                if (prop != null) {
-                    boolean currentVal = state.getValue(prop);
-                    if (currentVal) {
-                        int openCount = (state.getValue(DOWN) ? 1 : 0) + (state.getValue(UP) ? 1 : 0)
-                                + (state.getValue(NORTH) ? 1 : 0) + (state.getValue(SOUTH) ? 1 : 0)
-                                + (state.getValue(WEST) ? 1 : 0) + (state.getValue(EAST) ? 1 : 0);
-                        if (openCount <= 2) {
-                            level.playSound(null, pos, SoundEvents.DISPENSER_FAIL, SoundSource.BLOCKS, 0.8F, 1.2F);
-                            player.displayClientMessage(new net.minecraft.network.chat.TextComponent("Pipes must have at least 2 open ends!"), true);
-                            return InteractionResult.SUCCESS;
-                        }
-                    }
-
-                    BlockState newState = state.setValue(prop, !currentVal);
-                    level.setBlock(pos, newState, 3);
-                    level.playSound(null, pos, SoundEvents.LEVER_CLICK, SoundSource.BLOCKS, 0.6F, !currentVal ? 1.2F : 0.8F);
-                    HollowPipeTransportManager.markDirty(level, pos);
-                    return InteractionResult.SUCCESS;
-                }
+                Direction.Axis currentAxis = state.getValue(AXIS);
+                Direction.Axis nextAxis = switch (currentAxis) {
+                    case Y -> Direction.Axis.Z;
+                    case Z -> Direction.Axis.X;
+                    case X -> Direction.Axis.Y;
+                };
+                setAxisAndRefresh(level, pos, state, nextAxis);
+                level.playSound(null, pos, SoundEvents.ANVIL_USE, SoundSource.BLOCKS, 0.5F, 1.5F);
             }
             return InteractionResult.sidedSuccess(level.isClientSide);
         }

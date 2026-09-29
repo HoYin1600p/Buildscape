@@ -35,6 +35,8 @@ public class SmokeVentBlock extends Block implements EntityBlock {
     public static final EnumProperty<PillarPart> PART = EnumProperty.create("part", PillarPart.class);
     public static final BooleanProperty POWERED = BooleanProperty.create("powered");
 
+    public static final double SMOKE_SPAWN_BASE = 9.0 / 16.0;
+
     private static final VoxelShape SHAPE_SINGLE = Shapes.or(
             Block.box(4, 0, 4, 12, 7, 12),
             Block.box(3, 7, 3, 13, 9, 13)
@@ -300,7 +302,7 @@ public class SmokeVentBlock extends Block implements EntityBlock {
         }
 
         double x = (double) pos.getX() + 0.5 + random.nextDouble() / 3.0 * (double) (random.nextBoolean() ? 1 : -1);
-        double y = (double) pos.getY() + random.nextDouble() + random.nextDouble();
+        double y = (double) pos.getY() + SmokeVentBlock.SMOKE_SPAWN_BASE + random.nextDouble() * (2.0 - SmokeVentBlock.SMOKE_SPAWN_BASE);
         double z = (double) pos.getZ() + 0.5 + random.nextDouble() / 3.0 * (double) (random.nextBoolean() ? 1 : -1);
 
         BlockEntity be = level.getBlockEntity(pos);

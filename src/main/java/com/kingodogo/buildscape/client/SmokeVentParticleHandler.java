@@ -75,7 +75,7 @@ public class SmokeVentParticleHandler {
                     if (random.nextFloat() < 0.95F) continue;
 
                     double x = pos.getX() + 0.5 + random.nextDouble() / 3.0 * (random.nextBoolean() ? 1 : -1);
-                    double y = pos.getY() + random.nextDouble() + random.nextDouble();
+                    double y = pos.getY() + SmokeVentBlock.SMOKE_SPAWN_BASE + random.nextDouble() * (2.0 - SmokeVentBlock.SMOKE_SPAWN_BASE);
                     double z = pos.getZ() + 0.5 + random.nextDouble() / 3.0 * (random.nextBoolean() ? 1 : -1);
 
                     String smokeColor = ventBE.getSmokeColor();

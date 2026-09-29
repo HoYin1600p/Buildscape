@@ -16,7 +16,7 @@ public class ColoredSmokeParticle extends TextureSheetParticle {
         this.quadSize = 0.3f;
         this.lifetime = 200 + level.random.nextInt(100);
         this.gravity = 3.0E-6f;
-        this.hasPhysics = false;
+        this.hasPhysics = true;
 
         this.xd = xSpeed;
         this.yd = ySpeed;

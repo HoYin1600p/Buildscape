@@ -163,7 +163,7 @@ public class ItemFrameParticleHandler {
                 }
 
                 addParticleColor(itemFrame, dyeColor);
-                com.kingodogo.buildscape.config.PillarIdManager.get(itemFrame.level).registerItemFrame(itemFrame);
+                com.kingodogo.buildscape.config.PillarIdManager.get(itemFrame.level).registerItemFrame(itemFrame, true);
 
                 if (!player.getAbilities().instabuild) {
                     heldItem.shrink(1);
@@ -216,7 +216,7 @@ public class ItemFrameParticleHandler {
         String nextPattern = cyclePattern(currentPattern);
 
         setParticlePattern(itemFrame, nextPattern);
-        com.kingodogo.buildscape.config.PillarIdManager.get(itemFrame.level).registerItemFrame(itemFrame);
+        com.kingodogo.buildscape.config.PillarIdManager.get(itemFrame.level).registerItemFrame(itemFrame, true);
 
         if (!level.isClientSide) {
             level.playSound(
@@ -892,7 +892,7 @@ public class ItemFrameParticleHandler {
                 }
 
                 addParticleColorColored(coloredFrame, dyeColor);
-                com.kingodogo.buildscape.config.PillarIdManager.get(coloredFrame.level).registerColoredItemFrame(coloredFrame);
+                com.kingodogo.buildscape.config.PillarIdManager.get(coloredFrame.level).registerColoredItemFrame(coloredFrame, true);
 
                 if (!player.getAbilities().instabuild) {
                     heldItem.shrink(1);
@@ -937,7 +937,7 @@ public class ItemFrameParticleHandler {
         String nextPattern = cyclePattern(currentPattern);
 
         setParticlePatternColored(coloredFrame, nextPattern);
-        com.kingodogo.buildscape.config.PillarIdManager.get(coloredFrame.level).registerColoredItemFrame(coloredFrame);
+        com.kingodogo.buildscape.config.PillarIdManager.get(coloredFrame.level).registerColoredItemFrame(coloredFrame, true);
 
         if (!level.isClientSide) {
             level.playSound(

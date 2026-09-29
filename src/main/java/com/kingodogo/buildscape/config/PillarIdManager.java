@@ -2250,7 +2250,19 @@ public class PillarIdManager {
         }
     }
 
+    private void saveFrameChange(boolean immediate) {
+        if (immediate) {
+            saveImmediate();
+        } else {
+            requestSave();
+        }
+    }
+
     public void registerItemFrame(net.minecraft.world.entity.decoration.ItemFrame frame) {
+        registerItemFrame(frame, false);
+    }
+
+    public void registerItemFrame(net.minecraft.world.entity.decoration.ItemFrame frame, boolean immediate) {
         if (frame == null || frame.level == null || frame.level.isClientSide) {
             return;
         }
@@ -2297,7 +2309,7 @@ public class PillarIdManager {
             pillarData.put(id, data);
             positionIndex.put(posKey, id);
 
-            requestSave();
+            saveFrameChange(immediate);
         } else {
             positionIndex.put(posKey, id);
             boolean changed = false;
@@ -2333,13 +2345,17 @@ public class PillarIdManager {
             }
 
             if (changed) {
-                requestSave();
+                saveFrameChange(immediate);
             }
         }
     }
 
 
     public void registerColoredItemFrame(com.kingodogo.buildscape.entity.ColoredItemFrameEntity frame) {
+        registerColoredItemFrame(frame, false);
+    }
+
+    public void registerColoredItemFrame(com.kingodogo.buildscape.entity.ColoredItemFrameEntity frame, boolean immediate) {
         if (frame == null || frame.level == null || frame.level.isClientSide) {
             return;
         }
@@ -2393,7 +2409,7 @@ public class PillarIdManager {
             pillarData.put(id, data);
             positionIndex.put(posKey, id);
 
-            requestSave();
+            saveFrameChange(immediate);
         } else {
             positionIndex.put(posKey, id);
             boolean changed = false;
@@ -2434,7 +2450,7 @@ public class PillarIdManager {
             }
 
             if (changed) {
-                requestSave();
+                saveFrameChange(immediate);
             }
         }
     }

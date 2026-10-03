@@ -33,12 +33,7 @@ public class WidgetLayoutHelper {
                 buttons[i].y = buttonY;
                 if (buttons[i] instanceof AbstractWidget) {
                     buttons[i].setWidth(buttonSize);
-                    try {
-                        java.lang.reflect.Field heightField = AbstractWidget.class.getDeclaredField("height");
-                        heightField.setAccessible(true);
-                        heightField.setInt(buttons[i], buttonSize);
-                    } catch (Exception e) {
-                    }
+                    buttons[i].setHeight(buttonSize);
                 }
             }
         }
@@ -59,12 +54,7 @@ public class WidgetLayoutHelper {
             java.lang.reflect.Method setHeightMethod = child.getClass().getMethod("setHeight", int.class);
             setHeightMethod.invoke(child, childHeight);
         } catch (NoSuchMethodException e) {
-            try {
-                java.lang.reflect.Field heightField = AbstractWidget.class.getDeclaredField("height");
-                heightField.setAccessible(true);
-                heightField.setInt(child, childHeight);
-            } catch (Exception ex) {
-            }
+            child.setHeight(childHeight);
         } catch (Exception e) {
         }
     }

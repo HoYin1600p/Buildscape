@@ -35,8 +35,7 @@ public class BuildScapeRecipeLoader implements PreparableReloadListener {
             "smoking", "campfire", "smithing", "special"
     };
 
-    private RecipeManager currentRecipeManager;
-    private volatile List<Recipe<?>> loadedRecipes = List.of();
+    private volatile RecipeManager currentRecipeManager;
 
     @SubscribeEvent
     public static void onAddReloadListeners(AddReloadListenerEvent event) {
@@ -45,11 +44,8 @@ public class BuildScapeRecipeLoader implements PreparableReloadListener {
     }
 
     @SubscribeEvent
-    public static void onRecipesUpdated(net.minecraftforge.client.event.RecipesUpdatedEvent event) {
-        if (!INSTANCE.loadedRecipes.isEmpty()) {
-            RecipeManagerInjector.inject(event.getRecipeManager(), INSTANCE.loadedRecipes);
-            BuildScape.LOGGER.debug("BDRE: Re-injected {} recipes into Client RecipeManager on RecipesUpdatedEvent.", INSTANCE.loadedRecipes.size());
-        }
+    public static void onServerStopped(net.minecraftforge.event.server.ServerStoppedEvent event) {
+        INSTANCE.currentRecipeManager = null;
     }
 
     @Override
@@ -209,9 +205,9 @@ public class BuildScapeRecipeLoader implements PreparableReloadListener {
 
     private void applyRecipes(List<Recipe<?>> recipes, ProfilerFiller profiler) {
         profiler.push("BDRE_ApplyRecipes");
-        loadedRecipes = List.copyOf(recipes);
-        if (currentRecipeManager != null && !loadedRecipes.isEmpty()) {
-            RecipeManagerInjector.inject(currentRecipeManager, loadedRecipes);
+        RecipeManager recipeManager = currentRecipeManager;
+        if (recipeManager != null && !recipes.isEmpty()) {
+            RecipeManagerInjector.inject(recipeManager, List.copyOf(recipes));
         }
         profiler.pop();
     }

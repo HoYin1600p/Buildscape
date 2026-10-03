@@ -61,7 +61,7 @@ public class RotateBlockPacket {
         NetworkEvent.Context ctx = ctxSupplier.get();
         ctx.enqueueWork(() -> {
             ServerPlayer player = ctx.getSender();
-            if (player == null || !player.hasPermissions(2) || !player.mayBuild()) return;
+            if (player == null || !player.mayBuild()) return;
 
             if (!player.isCrouching()) return;
 
@@ -77,6 +77,7 @@ public class RotateBlockPacket {
             if (!level.isLoaded(pos)) return;
             if (player.distanceToSqr(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5) > 64.0) return;
             if (player.blockActionRestricted(level, pos, player.gameMode.getGameModeForPlayer())) return;
+            if (!level.mayInteract(player, pos)) return;
 
             BlockState state = level.getBlockState(pos);
             if (state.isAir()) return;
@@ -84,11 +85,21 @@ public class RotateBlockPacket {
             BlockState newState = calculateRotatedState(state, msg.direction, msg.playerFacing);
 
             if (!newState.equals(state)) {
-                level.setBlock(pos, newState, 3);
-                level.updateNeighborsAt(pos, state.getBlock());
-                level.updateNeighborsAt(pos, newState.getBlock());
-                level.updateNeighbourForOutputSignal(pos, newState.getBlock());
-                newState.updateNeighbourShapes(level, pos, 3);
+                if (net.minecraftforge.event.ForgeEventFactory.onBlockPlace(player,
+                        net.minecraftforge.common.util.BlockSnapshot.create(level.dimension(), level, pos), Direction.UP)) {
+                    player.connection.send(new net.minecraft.network.protocol.game.ClientboundBlockUpdatePacket(level, pos));
+                    return;
+                }
+                if (state.getBlock() instanceof com.kingodogo.buildscape.block.HollowPipeBlock pipe
+                        && newState.hasProperty(BlockStateProperties.AXIS)) {
+                    pipe.setAxisAndRefresh(level, pos, state, newState.getValue(BlockStateProperties.AXIS));
+                } else {
+                    level.setBlock(pos, newState, 3);
+                    level.updateNeighborsAt(pos, state.getBlock());
+                    level.updateNeighborsAt(pos, newState.getBlock());
+                    level.updateNeighbourForOutputSignal(pos, newState.getBlock());
+                    newState.updateNeighbourShapes(level, pos, 3);
+                }
                 level.playSound(null, pos, SoundEvents.ITEM_FRAME_ROTATE_ITEM, SoundSource.BLOCKS, 1.0f, 1.2f);
                 level.sendParticles(
                         ParticleTypes.WAX_OFF,

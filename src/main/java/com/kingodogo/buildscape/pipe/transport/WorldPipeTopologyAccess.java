@@ -25,7 +25,7 @@ public class WorldPipeTopologyAccess implements PipeTopologyAccess {
 
     @Override
     public boolean isHollowPipe(BlockPos pos) {
-        if (level == null || pos == null) return false;
+        if (level == null || pos == null || !isLoaded(pos)) return false;
         BlockState state = level.getBlockState(pos);
         return PipeFluidTransport.isHollowPipe(state);
     }
@@ -33,12 +33,13 @@ public class WorldPipeTopologyAccess implements PipeTopologyAccess {
     @Override
     public boolean isConnected(BlockPos pos, Direction dir) {
         if (level == null || pos == null || dir == null) return false;
+        if (!isLoaded(pos) || !isLoaded(pos.relative(dir))) return false;
         return PipeFluidTransport.isTopologyConnected(level, pos, dir);
     }
 
     @Override
     public boolean isOpenEndpoint(BlockPos pos, Direction dir) {
-        if (level == null || pos == null || dir == null) return false;
+        if (level == null || pos == null || dir == null || !isLoaded(pos)) return false;
         BlockState state = level.getBlockState(pos);
         if (state.getBlock() instanceof HollowLogBlock) {
             return HollowLogBlock.isOpenEnd(state, dir) && !isConnected(pos, dir);
@@ -48,12 +49,13 @@ public class WorldPipeTopologyAccess implements PipeTopologyAccess {
 
     @Override
     public BubbleColumnState getBubbleColumnBase(BlockPos pos) {
+        if (pos == null || !isLoaded(pos.below())) return BubbleColumnState.NONE;
         return BubbleColumnHandler.detectBubbleColumnBase(level, pos);
     }
 
     @Override
     public String getSourceFluidId(BlockPos pos) {
-        if (level == null || pos == null) return null;
+        if (level == null || pos == null || !isLoaded(pos)) return null;
         BlockState state = level.getBlockState(pos);
         Fluid contained = HollowPipeBlock.getSourceFluid(state, level.getBlockEntity(pos));
         if (isTransportFluid(contained)) return fluidId(contained);
@@ -63,7 +65,7 @@ public class WorldPipeTopologyAccess implements PipeTopologyAccess {
 
     @Override
     public int getInitialWaterFlowDistance(BlockPos pos) {
-        if (level == null || pos == null) return 0;
+        if (level == null || pos == null || !isLoaded(pos)) return 0;
         BlockState state = level.getBlockState(pos);
         if (isTransportFluid(HollowPipeBlock.getSourceFluid(state, level.getBlockEntity(pos)))) {
             return 0;
@@ -83,6 +85,7 @@ public class WorldPipeTopologyAccess implements PipeTopologyAccess {
         for (Direction dir : Direction.values()) {
             if (!isOpenEndpoint(pos, dir)) continue;
             BlockPos neighborPos = pos.relative(dir);
+            if (!isLoaded(neighborPos)) continue;
             BlockState neighborState = level.getBlockState(neighborPos);
             if (PipeFluidTransport.isHollowPipe(neighborState)) continue;
             FluidState fluid = level.getFluidState(neighborPos);
@@ -95,13 +98,17 @@ public class WorldPipeTopologyAccess implements PipeTopologyAccess {
 
     private Fluid getExternalSourceFluid(BlockPos pos) {
         for (Direction dir : Direction.values()) {
-            if (!isOpenEndpoint(pos, dir)) continue;
+            if (!isOpenEndpoint(pos, dir) || !isLoaded(pos.relative(dir))) continue;
             BlockState neighborState = level.getBlockState(pos.relative(dir));
             if (PipeFluidTransport.isHollowPipe(neighborState)) continue;
             FluidState fluid = neighborState.getFluidState();
             if (fluid.isSource() && isTransportFluid(fluid.getType())) return fluid.getType();
         }
         return Fluids.EMPTY;
+    }
+
+    private boolean isLoaded(BlockPos pos) {
+        return !(level instanceof net.minecraft.world.level.LevelReader reader) || reader.hasChunkAt(pos);
     }
 
     public static boolean isTransportFluid(@Nullable Fluid fluid) {

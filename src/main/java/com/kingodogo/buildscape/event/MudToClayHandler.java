@@ -56,7 +56,7 @@ public class MudToClayHandler {
 
     private static void tryTrackMud(ServerLevel level, BlockPos mudPos) {
         for (TrackedMud tracked : trackedMud) {
-            if (tracked.pos.equals(mudPos) && tracked.level == level) return;
+            if (tracked.pos.equals(mudPos) && tracked.dimension == level.dimension()) return;
         }
 
         BlockPos belowMud = mudPos.below();
@@ -69,8 +69,13 @@ public class MudToClayHandler {
                 dripstoneState.is(Blocks.POINTED_DRIPSTONE) &&
                 dripstoneState.getValue(PointedDripstoneBlock.TIP_DIRECTION) == Direction.DOWN) {
             int ticks = 20 + level.random.nextInt(21);
-            trackedMud.add(new TrackedMud(level, mudPos, ticks));
+            trackedMud.add(new TrackedMud(level.dimension(), mudPos, ticks));
         }
+    }
+
+    @SubscribeEvent
+    public static void onServerStopping(net.minecraftforge.event.server.ServerStoppingEvent event) {
+        trackedMud.clear();
     }
 
     @SubscribeEvent
@@ -78,14 +83,21 @@ public class MudToClayHandler {
         if (event.phase != TickEvent.Phase.END) return;
         if (trackedMud.isEmpty()) return;
 
+        net.minecraft.server.MinecraftServer server = net.minecraftforge.server.ServerLifecycleHooks.getCurrentServer();
+        if (server == null) {
+            trackedMud.clear();
+            return;
+        }
         Iterator<TrackedMud> it = trackedMud.iterator();
         while (it.hasNext()) {
             TrackedMud tracked = it.next();
             tracked.ticksRemaining--;
 
             if (tracked.ticksRemaining <= 0) {
-                if (tracked.level.getBlockState(tracked.pos).is(ModBlocks.MUD.get())) {
-                    tracked.level.setBlock(tracked.pos, Blocks.CLAY.defaultBlockState(), 3);
+                ServerLevel level = server.getLevel(tracked.dimension);
+                if (level != null && level.isLoaded(tracked.pos)
+                        && level.getBlockState(tracked.pos).is(ModBlocks.MUD.get())) {
+                    level.setBlock(tracked.pos, Blocks.CLAY.defaultBlockState(), 3);
                 }
                 it.remove();
             }
@@ -93,12 +105,12 @@ public class MudToClayHandler {
     }
 
     private static class TrackedMud {
-        final ServerLevel level;
+        final net.minecraft.resources.ResourceKey<Level> dimension;
         final BlockPos pos;
         int ticksRemaining;
 
-        TrackedMud(ServerLevel level, BlockPos pos, int ticks) {
-            this.level = level;
+        TrackedMud(net.minecraft.resources.ResourceKey<Level> dimension, BlockPos pos, int ticks) {
+            this.dimension = dimension;
             this.pos = pos;
             this.ticksRemaining = ticks;
         }

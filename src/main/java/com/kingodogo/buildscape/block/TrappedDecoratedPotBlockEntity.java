@@ -89,8 +89,12 @@ public class TrappedDecoratedPotBlockEntity
         }
         return (direction != Direction.DOWN &&
                 (storedItem.isEmpty() ||
-                        (storedItem.sameItem(stack) &&
-                                storedItem.getCount() < storedItem.getMaxStackSize())));
+                        (ItemStack.isSameItemSameTags(storedItem, stack) &&
+                                storedItem.getCount() < maxStoredCount(storedItem))));
+    }
+
+    public static int maxStoredCount(ItemStack stack) {
+        return stack.getItem() instanceof net.minecraft.world.item.SpawnEggItem ? 1 : stack.getMaxStackSize();
     }
 
     @Override

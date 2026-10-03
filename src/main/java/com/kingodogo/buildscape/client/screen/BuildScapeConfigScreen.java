@@ -144,21 +144,13 @@ public class BuildScapeConfigScreen extends Screen {
         lastWindowWidth = windowWidth;
         lastWindowHeight = windowHeight;
 
-        try {
-            java.lang.reflect.Field widthField = Screen.class.getDeclaredField("width");
-            java.lang.reflect.Field heightField = Screen.class.getDeclaredField("height");
-            widthField.setAccessible(true);
-            heightField.setAccessible(true);
+        int guiScaledWidth = mc.getWindow().getGuiScaledWidth();
+        int guiScaledHeight = mc.getWindow().getGuiScaledHeight();
 
-            int guiScaledWidth = mc.getWindow().getGuiScaledWidth();
-            int guiScaledHeight = mc.getWindow().getGuiScaledHeight();
+        this.width = guiScaledWidth;
+        this.height = guiScaledHeight;
 
-            widthField.setInt(this, guiScaledWidth);
-            heightField.setInt(this, guiScaledHeight);
-
-            calculatedSidebarWidth = (int) (guiScaledWidth * SIDEBAR_WIDTH_PERCENT);
-        } catch (Exception e) {
-        }
+        calculatedSidebarWidth = (int) (guiScaledWidth * SIDEBAR_WIDTH_PERCENT);
     }
 
     @Override
@@ -186,7 +178,7 @@ public class BuildScapeConfigScreen extends Screen {
                 buttonWidth, buttonHeight,
                 new TranslatableComponent("buildscape.config.category.items"),
                 (button) -> {
-                    if (checkOpAccessAndNotify()) setActiveTab(new PillarItemsConfigTab(this));
+                    if (checkConfigAccessAndNotify()) setActiveTab(new PillarItemsConfigTab(this));
                 });
         addRenderableWidget(pillarItemsButton);
 
@@ -196,7 +188,7 @@ public class BuildScapeConfigScreen extends Screen {
                 buttonWidth, buttonHeight,
                 new TranslatableComponent("buildscape.config.category.particles"),
                 (button) -> {
-                    if (checkOpAccessAndNotify()) setActiveTab(new PillarParticlesConfigTab(this));
+                    if (checkConfigAccessAndNotify()) setActiveTab(new PillarParticlesConfigTab(this));
                 });
         addRenderableWidget(pillarParticlesButton);
 
@@ -240,7 +232,7 @@ public class BuildScapeConfigScreen extends Screen {
         addRenderableWidget(reportButton);
 
         if (activeTab == null) {
-            if (hasOpAccess()) {
+            if (hasConfigAccess()) {
                 setActiveTab(new PillarItemsConfigTab(this));
             } else {
                 setActiveTab(new WorldSettingsConfigTab(this));
@@ -258,6 +250,20 @@ public class BuildScapeConfigScreen extends Screen {
             return false;
         }
         return Minecraft.getInstance().player.hasPermissions(2);
+    }
+
+    public boolean hasConfigAccess() {
+        return Minecraft.getInstance().player != null
+                && Minecraft.getInstance().player.hasPermissions(com.kingodogo.buildscape.config.PillarParticleConfig.CONFIG_PERMISSION_LEVEL);
+    }
+
+    private boolean checkConfigAccessAndNotify() {
+        if (hasConfigAccess()) return true;
+
+        com.kingodogo.buildscape.client.ClientEvents.setOverlayMessage(
+                new TranslatableComponent("buildscape.config.server_config_only")
+        );
+        return false;
     }
 
     private boolean checkOpAccessAndNotify() {
@@ -291,13 +297,7 @@ public class BuildScapeConfigScreen extends Screen {
             pillarItemsButton.x = buttonX;
             pillarItemsButton.y = sidebarY;
             pillarItemsButton.setWidth(buttonWidth);
-            try {
-                java.lang.reflect.Field heightField = net.minecraft.client.gui.components.AbstractWidget.class
-                        .getDeclaredField("height");
-                heightField.setAccessible(true);
-                heightField.setInt(pillarItemsButton, buttonHeight);
-            } catch (Exception e) {
-            }
+            pillarItemsButton.setHeight(buttonHeight);
         }
 
         if (pillarParticlesButton != null) {
@@ -305,13 +305,7 @@ public class BuildScapeConfigScreen extends Screen {
             pillarParticlesButton.x = buttonX;
             pillarParticlesButton.y = sidebarY;
             pillarParticlesButton.setWidth(buttonWidth);
-            try {
-                java.lang.reflect.Field heightField = net.minecraft.client.gui.components.AbstractWidget.class
-                        .getDeclaredField("height");
-                heightField.setAccessible(true);
-                heightField.setInt(pillarParticlesButton, buttonHeight);
-            } catch (Exception e) {
-            }
+            pillarParticlesButton.setHeight(buttonHeight);
         }
 
         if (pillarIdsButton != null) {
@@ -319,13 +313,7 @@ public class BuildScapeConfigScreen extends Screen {
             pillarIdsButton.x = buttonX;
             pillarIdsButton.y = sidebarY;
             pillarIdsButton.setWidth(buttonWidth);
-            try {
-                java.lang.reflect.Field heightField = net.minecraft.client.gui.components.AbstractWidget.class
-                        .getDeclaredField("height");
-                heightField.setAccessible(true);
-                heightField.setInt(pillarIdsButton, buttonHeight);
-            } catch (Exception e) {
-            }
+            pillarIdsButton.setHeight(buttonHeight);
         }
 
         if (worldSettingsButton != null) {
@@ -333,13 +321,7 @@ public class BuildScapeConfigScreen extends Screen {
             worldSettingsButton.x = buttonX;
             worldSettingsButton.y = sidebarY;
             worldSettingsButton.setWidth(buttonWidth);
-            try {
-                java.lang.reflect.Field heightField = net.minecraft.client.gui.components.AbstractWidget.class
-                        .getDeclaredField("height");
-                heightField.setAccessible(true);
-                heightField.setInt(worldSettingsButton, buttonHeight);
-            } catch (Exception e) {
-            }
+            worldSettingsButton.setHeight(buttonHeight);
         }
 
         int frameHeight = getScaledCategoryButtonHeight() + scaleSize(4);
@@ -355,26 +337,14 @@ public class BuildScapeConfigScreen extends Screen {
             kofiButton.x = buttonX;
             kofiButton.y = kofiY;
             kofiButton.setWidth(buttonWidth);
-            try {
-                java.lang.reflect.Field heightField = net.minecraft.client.gui.components.AbstractWidget.class
-                        .getDeclaredField("height");
-                heightField.setAccessible(true);
-                heightField.setInt(kofiButton, frameHeight);
-            } catch (Exception e) {
-            }
+            kofiButton.setHeight(frameHeight);
         }
         if (reportButton != null) {
             int reportY = kofiY - buttonHeight - spacing - scaleSize(6);
             reportButton.x = buttonX;
             reportButton.y = reportY;
             reportButton.setWidth(buttonWidth);
-            try {
-                java.lang.reflect.Field heightField = net.minecraft.client.gui.components.AbstractWidget.class
-                        .getDeclaredField("height");
-                heightField.setAccessible(true);
-                heightField.setInt(reportButton, buttonHeight);
-            } catch (Exception e) {
-            }
+            reportButton.setHeight(buttonHeight);
         }
 
         super.resize(mc, this.width, this.height);

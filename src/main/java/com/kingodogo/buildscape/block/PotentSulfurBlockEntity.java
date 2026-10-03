@@ -122,6 +122,7 @@ public class PotentSulfurBlockEntity extends BlockEntity {
             if (entity.waitingCountdown > 0) {
                --entity.waitingCountdown;
             }
+            entity.setChanged();
 
             if (entity.waitingCountdown == 0) {
                PotentSulfurState stateToSet = state.getValue(PotentSulfurBlock.STATE) == PotentSulfurState.DORMANT ? PotentSulfurState.ERUPTING : PotentSulfurState.DORMANT;

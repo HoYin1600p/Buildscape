@@ -1,7 +1,5 @@
 package com.kingodogo.buildscape.item;
 
-import com.kingodogo.buildscape.particle.ModParticles;
-import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -19,6 +17,8 @@ import net.minecraft.ChatFormatting;
 import java.util.List;
 
 public class ConfettiItem extends Item {
+
+    private static final int USE_COOLDOWN_TICKS = 10;
 
     public ConfettiItem(Item.Properties properties) {
         super(properties);
@@ -43,6 +43,7 @@ public class ConfettiItem extends Item {
             if (!player.getAbilities().instabuild) {
                 itemstack.shrink(1);
             }
+            player.getCooldowns().addCooldown(this, USE_COOLDOWN_TICKS);
         }
 
         return InteractionResultHolder.sidedSuccess(itemstack, level.isClientSide());
@@ -59,25 +60,13 @@ public class ConfettiItem extends Item {
             burstLevel = Math.min(5, Math.max(1, stack.getTag().getInt("BurstLevel")));
         }
 
-        int particleCount = (75 + level.random.nextInt(46)) * burstLevel;
-        double speedMultiplier = 1.0 + (burstLevel - 1) * 0.2D;
-        double spreadMultiplier = 1.0 + (burstLevel - 1) * 0.1D;
-
-        for (int i = 0; i < particleCount; i++) {
-            double speed = (0.15D + level.random.nextDouble() * 0.25D) * speedMultiplier;
-            double spread = (0.30D + level.random.nextDouble() * 0.35D) * spreadMultiplier;
-
-            double vx = look.x * speed + (level.random.nextDouble() - 0.5D) * spread;
-            double vy = look.y * speed + (level.random.nextDouble() - 0.5D) * spread + 0.12D;
-            double vz = look.z * speed + (level.random.nextDouble() - 0.5D) * spread;
-
-            double px = startX + (level.random.nextDouble() - 0.5D) * 0.4D;
-            double py = startY + (level.random.nextDouble() - 0.5D) * 0.4D;
-            double pz = startZ + (level.random.nextDouble() - 0.5D) * 0.4D;
-
-            level.sendParticles((SimpleParticleType) ModParticles.CONFETTI.get(),
-                px, py, pz, 0, vx, vy, vz, 1.0D);
-        }
+        com.kingodogo.buildscape.network.ModMessages.INSTANCE.send(
+                net.minecraftforge.network.PacketDistributor.NEAR.with(() ->
+                        new net.minecraftforge.network.PacketDistributor.TargetPoint(
+                                startX, startY, startZ, 32.0D, level.dimension())),
+                new com.kingodogo.buildscape.network.ConfettiBurstPacket(
+                        startX, startY, startZ, (float) look.x, (float) look.y, (float) look.z,
+                        burstLevel, level.random.nextLong()));
     }
 
     @Override

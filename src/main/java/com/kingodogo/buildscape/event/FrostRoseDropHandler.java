@@ -48,7 +48,7 @@ public class FrostRoseDropHandler {
         );
         level.addFreshEntity(itemEntity);
 
-        trackedDeaths.add(new TrackedDeath(level, deathPos, deathX, deathY, deathZ, 20));
+        trackedDeaths.add(new TrackedDeath(level.dimension(), deathPos, deathX, deathY, deathZ, 20));
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
@@ -60,6 +60,7 @@ public class FrostRoseDropHandler {
         if (!stack.is(Items.WITHER_ROSE)) return;
 
         for (TrackedDeath death : trackedDeaths) {
+            if (death.dimension != itemEntity.level.dimension()) continue;
             double dx = itemEntity.getX() - death.x;
             double dy = itemEntity.getY() - death.y;
             double dz = itemEntity.getZ() - death.z;
@@ -71,19 +72,34 @@ public class FrostRoseDropHandler {
     }
 
     @SubscribeEvent
+    public static void onServerStopping(net.minecraftforge.event.server.ServerStoppingEvent event) {
+        trackedDeaths.clear();
+    }
+
+    @SubscribeEvent
     public static void onServerTick(TickEvent.ServerTickEvent event) {
         if (event.phase != TickEvent.Phase.END) return;
         if (trackedDeaths.isEmpty()) return;
 
+        net.minecraft.server.MinecraftServer server = net.minecraftforge.server.ServerLifecycleHooks.getCurrentServer();
+        if (server == null) {
+            trackedDeaths.clear();
+            return;
+        }
         Iterator<TrackedDeath> it = trackedDeaths.iterator();
         while (it.hasNext()) {
             TrackedDeath death = it.next();
-
-            if (death.level.getBlockState(death.pos).is(Blocks.WITHER_ROSE)) {
-                death.level.removeBlock(death.pos, false);
+            ServerLevel level = server.getLevel(death.dimension);
+            if (level == null || !level.isLoaded(death.pos)) {
                 it.remove();
-            } else if (death.level.getBlockState(death.pos.above()).is(Blocks.WITHER_ROSE)) {
-                death.level.removeBlock(death.pos.above(), false);
+                continue;
+            }
+
+            if (level.getBlockState(death.pos).is(Blocks.WITHER_ROSE)) {
+                level.removeBlock(death.pos, false);
+                it.remove();
+            } else if (level.getBlockState(death.pos.above()).is(Blocks.WITHER_ROSE)) {
+                level.removeBlock(death.pos.above(), false);
                 it.remove();
             } else {
                 death.ticksRemaining--;
@@ -95,13 +111,13 @@ public class FrostRoseDropHandler {
     }
 
     private static class TrackedDeath {
-        final ServerLevel level;
+        final net.minecraft.resources.ResourceKey<net.minecraft.world.level.Level> dimension;
         final BlockPos pos;
         final double x, y, z;
         int ticksRemaining;
 
-        TrackedDeath(ServerLevel level, BlockPos pos, double x, double y, double z, int ticks) {
-            this.level = level;
+        TrackedDeath(net.minecraft.resources.ResourceKey<net.minecraft.world.level.Level> dimension, BlockPos pos, double x, double y, double z, int ticks) {
+            this.dimension = dimension;
             this.pos = pos;
             this.x = x;
             this.y = y;

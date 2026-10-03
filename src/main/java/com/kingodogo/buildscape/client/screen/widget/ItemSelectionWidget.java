@@ -82,15 +82,11 @@ public class ItemSelectionWidget extends AbstractWidget {
         refresh();
     }
 
+    @Override
     public void setHeight(int height) {
-        try {
-            java.lang.reflect.Field heightField = AbstractWidget.class.getDeclaredField("height");
-            heightField.setAccessible(true);
-            heightField.setInt(this, height);
-            calculateLayout();
-            refresh();
-        } catch (Exception e) {
-        }
+        super.setHeight(height);
+        calculateLayout();
+        refresh();
     }
 
     public void setFilter(String filter) {

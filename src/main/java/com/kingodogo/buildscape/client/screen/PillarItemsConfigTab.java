@@ -366,13 +366,7 @@ public class PillarItemsConfigTab extends AbstractConfigTab {
                         int.class);
                 setHeightMethod.invoke(itemSelectionWidget, itemSelectionWidgetHeight);
             } catch (Exception e) {
-                try {
-                    java.lang.reflect.Field heightField = net.minecraft.client.gui.components.AbstractWidget.class
-                            .getDeclaredField("height");
-                    heightField.setAccessible(true);
-                    heightField.setInt(itemSelectionWidget, itemSelectionWidgetHeight);
-                } catch (Exception ex) {
-                }
+                itemSelectionWidget.setHeight(itemSelectionWidgetHeight);
             }
         }
 

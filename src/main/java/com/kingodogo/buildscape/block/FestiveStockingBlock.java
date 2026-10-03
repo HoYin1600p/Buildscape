@@ -422,7 +422,7 @@ public class FestiveStockingBlock
                     }
                     return InteractionResult.sidedSuccess(level.isClientSide);
                 } else if (
-                        stored.sameItem(heldItem) &&
+                        ItemStack.isSameItemSameTags(stored, heldItem) &&
                                 stored.getCount() < stored.getMaxStackSize()
                 ) {
                     if (!level.isClientSide) {
@@ -501,8 +501,27 @@ public class FestiveStockingBlock
                     level.addFreshEntity(itemEntity);
                 }
             }
+            stockingEntity.markContentsHandled();
         }
         super.playerWillDestroy(level, pos, state, player);
+    }
+
+    @Override
+    public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
+        if (!level.isClientSide && !state.is(newState.getBlock())
+                && level.getBlockEntity(pos) instanceof FestiveStockingBlockEntity stockingEntity
+                && !stockingEntity.areContentsHandled() && !stockingEntity.isEmpty()) {
+            ItemEntity itemEntity = new ItemEntity(
+                    level,
+                    pos.getX() + 0.5,
+                    pos.getY() + 0.5,
+                    pos.getZ() + 0.5,
+                    stockingEntity.getStoredItem().copy()
+            );
+            itemEntity.setDefaultPickUpDelay();
+            level.addFreshEntity(itemEntity);
+        }
+        super.onRemove(state, level, pos, newState, isMoving);
     }
 
     @Override
@@ -540,6 +559,7 @@ public class FestiveStockingBlock
                 CompoundTag storedTag = new CompoundTag();
                 stockingEntity.getStoredItem().save(storedTag);
                 tag.put("StoredItem", storedTag);
+                stockingEntity.markContentsHandled();
             }
         }
 

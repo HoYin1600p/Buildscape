@@ -75,9 +75,10 @@ public final class BuildersWorkbenchResultsPacket {
         context.enqueueWork(() -> {
             ServerPlayer player = context.getSender();
             if (player == null || player.level == null) return;
-            if (!(player.level.getBlockEntity(pos) instanceof BuildersWorkbenchBlockEntity workbench)
-                    || !(player.containerMenu instanceof BuildersWorkbenchMenu menu)
-                    || menu.getBlockEntity() != workbench
+            if (!(player.containerMenu instanceof BuildersWorkbenchMenu menu)) return;
+            BuildersWorkbenchBlockEntity workbench = menu.getBlockEntity();
+            if (workbench == null
+                    || !workbench.getBlockPos().equals(pos)
                     || !workbench.stillValid(player)
                     || tab < 0 || tab > 1
                     || tab != workbench.getActiveTab()

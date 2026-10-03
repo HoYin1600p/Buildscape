@@ -8,7 +8,7 @@ import net.minecraftforge.network.simple.SimpleChannel;
 
 public class ModMessages {
 
-    private static final String PROTOCOL_VERSION = "4";
+    private static final String PROTOCOL_VERSION = "5";
     public static final SimpleChannel INSTANCE = NetworkRegistry.newSimpleChannel(
             new ResourceLocation(BuildScape.MODID, "main"),
             () -> PROTOCOL_VERSION,
@@ -51,6 +51,8 @@ public class ModMessages {
                 ClearBiomeBrushPacket::encode, ClearBiomeBrushPacket::decode, ClearBiomeBrushPacket::handle);
         register(SyncSignFramePacket.class, 17, NetworkDirection.PLAY_TO_CLIENT,
                 SyncSignFramePacket::encode, SyncSignFramePacket::decode, SyncSignFramePacket::handle);
+        register(ConfettiBurstPacket.class, 18, NetworkDirection.PLAY_TO_CLIENT,
+                ConfettiBurstPacket::encode, ConfettiBurstPacket::decode, ConfettiBurstPacket::handle);
     }
 
     private static <T> void register(

@@ -167,10 +167,9 @@ public class PottedHazeBushBlock extends FlowerPotBlock {
             return InteractionResult.sidedSuccess(level.isClientSide);
         }
 
-        if (held.is(Items.BONE_MEAL) && !state.getValue(HAS_HAZE)) {
+        if (held.is(Items.BONE_MEAL)) {
             if (!level.isClientSide) {
-                level.setBlock(pos, state.setValue(HAS_HAZE, true), 3);
-                level.playSound(null, pos, SoundEvents.BONE_MEAL_USE, SoundSource.BLOCKS, 1.0F, 1.0F);
+                popResource(level, pos, new ItemStack(this.getContent()));
                 if (!player.getAbilities().instabuild) {
                     held.shrink(1);
                 }

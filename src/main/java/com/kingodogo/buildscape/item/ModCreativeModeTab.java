@@ -3300,6 +3300,23 @@ public class ModCreativeModeTab {
             items.add(new ItemStack(ModItems.PINK_MONETS.get()));
             items.add(new ItemStack(ModItems.YELLOW_MONETS.get()));
 
+            items.add(new ItemStack(ModItems.WHITE_HAZE_BUSH.get()));
+            items.add(new ItemStack(ModItems.LIGHT_GRAY_HAZE_BUSH.get()));
+            items.add(new ItemStack(ModItems.GRAY_HAZE_BUSH.get()));
+            items.add(new ItemStack(ModItems.BLACK_HAZE_BUSH.get()));
+            items.add(new ItemStack(ModItems.BROWN_HAZE_BUSH.get()));
+            items.add(new ItemStack(ModItems.RED_HAZE_BUSH.get()));
+            items.add(new ItemStack(ModItems.ORANGE_HAZE_BUSH.get()));
+            items.add(new ItemStack(ModItems.YELLOW_HAZE_BUSH.get()));
+            items.add(new ItemStack(ModItems.LIME_HAZE_BUSH.get()));
+            items.add(new ItemStack(ModItems.GREEN_HAZE_BUSH.get()));
+            items.add(new ItemStack(ModItems.CYAN_HAZE_BUSH.get()));
+            items.add(new ItemStack(ModItems.LIGHT_BLUE_HAZE_BUSH.get()));
+            items.add(new ItemStack(ModItems.BLUE_HAZE_BUSH.get()));
+            items.add(new ItemStack(ModItems.PURPLE_HAZE_BUSH.get()));
+            items.add(new ItemStack(ModItems.MAGENTA_HAZE_BUSH.get()));
+            items.add(new ItemStack(ModItems.PINK_HAZE_BUSH.get()));
+
             items.add(new ItemStack(ModItems.RED_SPORE_BLOSSOM.get()));
             items.add(new ItemStack(ModItems.CYAN_SPORE_BLOSSOM.get()));
             items.add(new ItemStack(ModItems.BLUE_SPORE_BLOSSOM.get()));

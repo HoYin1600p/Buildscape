@@ -45,6 +45,8 @@ public class ModParticles {
             PARTICLES.register("copper_fire_flame", () -> new SimpleParticleType(false));
     public static final RegistryObject<SimpleParticleType> FIREFLY =
             PARTICLES.register("firefly", () -> new SimpleParticleType(false));
+    public static final RegistryObject<SimpleParticleType> HAZE =
+            PARTICLES.register("haze", () -> new SimpleParticleType(true));
 
     public static final RegistryObject<SimpleParticleType> SULFUR_BUBBLES =
             PARTICLES.register("sulfur_bubbles", () -> new SimpleParticleType(false));

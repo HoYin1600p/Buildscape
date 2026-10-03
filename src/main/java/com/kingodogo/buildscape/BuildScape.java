@@ -314,6 +314,9 @@ public class BuildScape {
             vanillaPot.addPlant(ModBlocks.CACTUS_FLOWER.getId(), ModBlocks.POTTED_CACTUS_FLOWER);
             vanillaPot.addPlant(ModBlocks.BUSH.getId(), ModBlocks.POTTED_BUSH);
             vanillaPot.addPlant(ModBlocks.RED_BUSH.getId(), ModBlocks.POTTED_RED_BUSH);
+            ModBlocks.COLORED_HAZE_BUSHES.forEach((color, bush) -> {
+                vanillaPot.addPlant(bush.getId(), ModBlocks.POTTED_COLORED_HAZE_BUSHES.get(color));
+            });
             vanillaPot.addPlant(ModBlocks.FIREFLY_BUSH.getId(), ModBlocks.POTTED_FIREFLY_BUSH);
             vanillaPot.addPlant(ModBlocks.DRY_GRASS.getId(), ModBlocks.POTTED_DRY_GRASS);
             vanillaPot.addPlant(ModBlocks.FROST_ROSE.getId(), ModBlocks.POTTED_FROST_ROSE);
@@ -1412,31 +1415,6 @@ public class BuildScape {
         }
     }
 
-    @SubscribeEvent
-    public void onRightClickItem(net.minecraftforge.event.entity.player.PlayerInteractEvent.RightClickItem event) {
-        net.minecraft.world.item.ItemStack stack = event.getItemStack();
-        if (stack.is(net.minecraft.world.item.Items.GLASS_BOTTLE)) {
-            net.minecraft.world.level.Level level = event.getWorld();
-            net.minecraft.world.entity.player.Player player = event.getPlayer();
-
-            net.minecraft.world.phys.BlockHitResult hitResult = HitHelper.getHit(level, player, net.minecraft.world.level.ClipContext.Fluid.SOURCE_ONLY);
-
-            if (hitResult.getType() == net.minecraft.world.phys.HitResult.Type.MISS) {
-                if (!level.isClientSide) {
-                    if (!player.getAbilities().instabuild) {
-                        stack.shrink(1);
-                    }
-                    net.minecraft.world.item.ItemStack mistBottle = new net.minecraft.world.item.ItemStack(com.kingodogo.buildscape.item.ModItems.BOTTLE_OF_MIST.get());
-                    if (!player.getInventory().add(mistBottle.copy())) {
-                        player.drop(mistBottle, false);
-                    }
-                    level.playSound(null, player.getX(), player.getY(), player.getZ(), net.minecraft.sounds.SoundEvents.BOTTLE_FILL, net.minecraft.sounds.SoundSource.PLAYERS, 1.0F, 1.0F);
-                }
-                event.setCancellationResult(net.minecraft.world.InteractionResult.sidedSuccess(level.isClientSide));
-                event.setCanceled(true);
-            }
-        }
-    }
 
     @SubscribeEvent
     public void onItemCrafted(
@@ -2553,6 +2531,15 @@ public class BuildScape {
                             com.kingodogo.buildscape.particle.ModParticles.FIREFLY.get(),
                             sprites ->
                                     new com.kingodogo.buildscape.particle.FireflyParticle.Provider(
+                                            sprites
+                                    )
+                    );
+
+            net.minecraft.client.Minecraft.getInstance()
+                    .particleEngine.register(
+                            com.kingodogo.buildscape.particle.ModParticles.HAZE.get(),
+                            sprites ->
+                                    new com.kingodogo.buildscape.particle.HazeParticle.Provider(
                                             sprites
                                     )
                     );

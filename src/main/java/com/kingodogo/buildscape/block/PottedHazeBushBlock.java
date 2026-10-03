@@ -58,21 +58,25 @@ public class PottedHazeBushBlock extends FlowerPotBlock {
             return;
         }
 
+        net.minecraft.client.Minecraft mc = net.minecraft.client.Minecraft.getInstance();
+        if (mc.options.particles == net.minecraft.client.ParticleStatus.MINIMAL) {
+            return;
+        }
+
         com.kingodogo.buildscape.client.HazeBushParticleHandler.track(pos);
+
+        if (mc.options.particles == net.minecraft.client.ParticleStatus.DECREASED && random.nextFloat() > 0.5F) {
+            return;
+        }
 
         float[] rgb = HazeBushBlock.getPastelColor(this.color);
 
-        int count = 1 + random.nextInt(2);
+        int count = (mc.options.particles == net.minecraft.client.ParticleStatus.DECREASED) ? 1 : (1 + random.nextInt(2));
         for (int i = 0; i < count; i++) {
-            double offsetX = (random.nextDouble() - 0.5D) * 5.0D;
-            double offsetZ = (random.nextDouble() - 0.5D) * 5.0D;
-            double offsetY = 0.02D + random.nextDouble() * 0.30D;
-
-            double px = pos.getX() + 0.5D + offsetX;
-            double py = pos.getY() + offsetY;
-            double pz = pos.getZ() + 0.5D + offsetZ;
-
-            level.addAlwaysVisibleParticle(ModParticles.HAZE.get(), true, px, py, pz, rgb[0], rgb[1], rgb[2]);
+            net.minecraft.world.phys.Vec3 particlePos = com.kingodogo.buildscape.client.HazeBushParticleHandler.findHazeParticlePos(level, pos, random);
+            if (particlePos != null) {
+                level.addParticle(ModParticles.HAZE.get(), particlePos.x, particlePos.y, particlePos.z, rgb[0], rgb[1], rgb[2]);
+            }
         }
     }
 
@@ -175,6 +179,54 @@ public class PottedHazeBushBlock extends FlowerPotBlock {
             return InteractionResult.sidedSuccess(level.isClientSide);
         }
 
-        return super.use(state, level, pos, player, hand, hitResult);
+        if (HollowLogBlock.getPottedBlockState(held.getItem()) != null) {
+            return InteractionResult.CONSUME;
+        }
+
+        ItemStack plantDrop = new ItemStack(this.getContent());
+        if (!state.getValue(HAS_HAZE)) {
+            net.minecraft.nbt.CompoundTag blockStateTag = new net.minecraft.nbt.CompoundTag();
+            blockStateTag.putString("has_haze", "false");
+            plantDrop.addTagElement("BlockStateTag", blockStateTag);
+            plantDrop.getOrCreateTag().putBoolean("HasHaze", false);
+        }
+
+        if (held.isEmpty()) {
+            player.setItemInHand(hand, plantDrop);
+        } else if (!player.addItem(plantDrop)) {
+            player.drop(plantDrop, false);
+        }
+
+        level.setBlock(pos, net.minecraft.world.level.block.Blocks.FLOWER_POT.defaultBlockState(), 3);
+        level.gameEvent(player, net.minecraft.world.level.gameevent.GameEvent.BLOCK_CHANGE, pos);
+        return InteractionResult.sidedSuccess(level.isClientSide);
+    }
+
+    @Override
+    public java.util.List<ItemStack> getDrops(BlockState state, net.minecraft.world.level.storage.loot.LootContext.Builder builder) {
+        java.util.List<ItemStack> drops = super.getDrops(state, builder);
+        if (!state.getValue(HAS_HAZE)) {
+            for (ItemStack drop : drops) {
+                if (drop.getItem() instanceof net.minecraft.world.item.BlockItem bi && bi.getBlock() == this.getContent()) {
+                    net.minecraft.nbt.CompoundTag blockStateTag = new net.minecraft.nbt.CompoundTag();
+                    blockStateTag.putString("has_haze", "false");
+                    drop.addTagElement("BlockStateTag", blockStateTag);
+                    drop.getOrCreateTag().putBoolean("HasHaze", false);
+                }
+            }
+        }
+        return drops;
+    }
+
+    @Override
+    public ItemStack getCloneItemStack(net.minecraft.world.level.BlockGetter level, BlockPos pos, BlockState state) {
+        ItemStack stack = super.getCloneItemStack(level, pos, state);
+        if (!state.getValue(HAS_HAZE)) {
+            net.minecraft.nbt.CompoundTag blockStateTag = new net.minecraft.nbt.CompoundTag();
+            blockStateTag.putString("has_haze", "false");
+            stack.addTagElement("BlockStateTag", blockStateTag);
+            stack.getOrCreateTag().putBoolean("HasHaze", false);
+        }
+        return stack;
     }
 }

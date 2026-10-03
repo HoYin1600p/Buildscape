@@ -1800,9 +1800,6 @@ public class PillarBlockEntity extends BlockEntity {
     }
 
     private static class ClientParticleHelper {
-        private static final java.util.concurrent.ConcurrentHashMap<net.minecraft.core.particles.ParticleType<?>, net.minecraft.client.particle.ParticleProvider<?>> CACHED_PROVIDERS = new java.util.concurrent.ConcurrentHashMap<>();
-        private static volatile java.lang.reflect.Method CACHED_ADD_METHOD = null;
-        private static volatile boolean REFLECTION_INIT_DONE = false;
 
         private static void spawnParticles(
                 net.minecraft.world.level.Level level,
@@ -1869,36 +1866,6 @@ public class PillarBlockEntity extends BlockEntity {
                 return;
             }
 
-            net.minecraft.client.particle.ParticleEngine particleEngine = mc.particleEngine;
-
-            if (!REFLECTION_INIT_DONE) {
-                try {
-                    java.lang.reflect.Method addM = net.minecraft.client.particle.ParticleEngine.class
-                            .getDeclaredMethod("add",
-                                    net.minecraft.client.particle.Particle.class);
-                    addM.setAccessible(true);
-                    CACHED_ADD_METHOD = addM;
-                } catch (Exception ignored) {
-                }
-                REFLECTION_INIT_DONE = true;
-            }
-
-            @SuppressWarnings("unchecked")
-            net.minecraft.client.particle.ParticleProvider<SimpleParticleType> provider = (net.minecraft.client.particle.ParticleProvider<SimpleParticleType>) CACHED_PROVIDERS
-                    .computeIfAbsent(particleType, pt -> {
-                        try {
-                            java.lang.reflect.Field f = net.minecraft.client.particle.ParticleEngine.class
-                                    .getDeclaredField("providers");
-                            f.setAccessible(true);
-                            @SuppressWarnings("unchecked")
-                            java.util.Map<net.minecraft.core.particles.ParticleType<?>, net.minecraft.client.particle.ParticleProvider<?>> map = (java.util.Map<net.minecraft.core.particles.ParticleType<?>, net.minecraft.client.particle.ParticleProvider<?>>) f
-                                    .get(particleEngine);
-                            return map.get(pt);
-                        } catch (Exception e) {
-                            return null;
-                        }
-                    });
-
             for (int i = 0; i < count; i++) {
                 ParticleSpawnData data = calculateParticleData(
                         be,
@@ -1931,42 +1898,14 @@ public class PillarBlockEntity extends BlockEntity {
                     }
                 }
 
-                java.lang.reflect.Method addMethod = CACHED_ADD_METHOD;
-                if (provider != null && addMethod != null) {
-                    try {
-                        net.minecraft.client.particle.Particle particle = provider.createParticle(
-                                particleType,
-                                (net.minecraft.client.multiplayer.ClientLevel) level,
-                                particleX,
-                                particleY,
-                                particleZ,
-                                data.vx,
-                                data.vy,
-                                data.vz);
-
-                        if (particle != null) {
-                            addMethod.invoke(particleEngine, particle);
-                        }
-                    } catch (Exception e) {
-                        level.addParticle(
-                                particleType,
-                                particleX,
-                                particleY,
-                                particleZ,
-                                data.vx,
-                                data.vy,
-                                data.vz);
-                    }
-                } else {
-                    level.addParticle(
-                            particleType,
-                            particleX,
-                            particleY,
-                            particleZ,
-                            data.vx,
-                            data.vy,
-                            data.vz);
-                }
+                level.addParticle(
+                        particleType,
+                        particleX,
+                        particleY,
+                        particleZ,
+                        data.vx,
+                        data.vy,
+                        data.vz);
             }
         }
     }
@@ -1984,6 +1923,17 @@ public class PillarBlockEntity extends BlockEntity {
 
     private record ParticleSpawnData(double sx, double sy, double sz, double vx, double vy, double vz, float size) {
 
+    }
+
+    @Override
+    public net.minecraft.world.phys.AABB getRenderBoundingBox() {
+        if (!hasDisplayItem()) {
+            return super.getRenderBoundingBox();
+        }
+        BlockPos pos = getBlockPos();
+        return new net.minecraft.world.phys.AABB(
+                pos.getX() - 2, pos.getY(), pos.getZ() - 2,
+                pos.getX() + 3, pos.getY() + 8, pos.getZ() + 3);
     }
 
     @Override

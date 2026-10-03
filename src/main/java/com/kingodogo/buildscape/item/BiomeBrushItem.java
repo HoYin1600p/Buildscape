@@ -61,6 +61,9 @@ public class BiomeBrushItem extends Item {
     public static final String KEY_BIOME = "CapturedBiome";
     public static final String KEY_POS1 = "Pos1";
     public static final String KEY_POS2 = "Pos2";
+    public static final String KEY_POS1_DIMENSION = "Pos1Dimension";
+    public static final String KEY_POS2_DIMENSION = "Pos2Dimension";
+    public static final int MAX_HORIZONTAL_SIZE = 64;
 
     private final BiomeBrushTier tier;
 
@@ -131,6 +134,11 @@ public class BiomeBrushItem extends Item {
         }
     }
 
+    private static boolean isInDimension(ItemStack stack, String key, String dimension) {
+        CompoundTag tag = stack.getTag();
+        return tag == null || !tag.contains(key, 8) || tag.getString(key).equals(dimension);
+    }
+
     @Nullable
     public BlockPos getPos1(ItemStack stack) {
         CompoundTag tag = stack.getTag();
@@ -139,6 +147,7 @@ public class BiomeBrushItem extends Item {
 
     public void setPos1(ItemStack stack, BlockPos pos, Player player) {
         stack.getOrCreateTag().put(KEY_POS1, NbtUtils.writeBlockPos(pos));
+        stack.getOrCreateTag().putString(KEY_POS1_DIMENSION, player.level.dimension().location().toString());
         player.displayClientMessage(new TranslatableComponent("message.buildscape.biome_brush.pos1", pos.getX(), pos.getY(), pos.getZ()).withStyle(ChatFormatting.WHITE), true);
         player.level.playSound(null, pos, SoundEvents.NOTE_BLOCK_CHIME, SoundSource.PLAYERS, 1.0f, 1.0f);
     }
@@ -151,6 +160,7 @@ public class BiomeBrushItem extends Item {
 
     public void setPos2(ItemStack stack, BlockPos pos, Player player) {
         stack.getOrCreateTag().put(KEY_POS2, NbtUtils.writeBlockPos(pos));
+        stack.getOrCreateTag().putString(KEY_POS2_DIMENSION, player.level.dimension().location().toString());
         player.displayClientMessage(new TranslatableComponent("message.buildscape.biome_brush.pos2", pos.getX(), pos.getY(), pos.getZ()).withStyle(ChatFormatting.WHITE), true);
         player.level.playSound(null, pos, SoundEvents.NOTE_BLOCK_CHIME, SoundSource.PLAYERS, 1.0f, 1.2f);
 
@@ -216,6 +226,17 @@ public class BiomeBrushItem extends Item {
             int minZ = Math.min(pos1.getZ(), pos2.getZ());
             int maxZ = Math.max(pos1.getZ(), pos2.getZ());
 
+            String currentDimension = serverLevel.dimension().location().toString();
+            if (!isInDimension(stack, KEY_POS1_DIMENSION, currentDimension)
+                    || !isInDimension(stack, KEY_POS2_DIMENSION, currentDimension)) {
+                player.displayClientMessage(new TranslatableComponent("message.buildscape.biome_brush.wrong_dimension").withStyle(ChatFormatting.RED), true);
+                return InteractionResult.FAIL;
+            }
+            if (maxX - minX + 1 > MAX_HORIZONTAL_SIZE || maxZ - minZ + 1 > MAX_HORIZONTAL_SIZE) {
+                player.displayClientMessage(new TranslatableComponent("message.buildscape.biome_brush.too_large", MAX_HORIZONTAL_SIZE).withStyle(ChatFormatting.RED), true);
+                return InteractionResult.FAIL;
+            }
+
             int unbreakingLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.UNBREAKING, stack);
             int affectedBlocks = 0;
             Set<LevelChunk> modifiedChunks = new HashSet<>();
@@ -249,7 +270,7 @@ public class BiomeBrushItem extends Item {
                     if (chunkX == lastChunkX && chunkZ == lastChunkZ && lastChunk != null) {
                         chunk = lastChunk;
                     } else {
-                        chunk = serverLevel.getChunk(chunkX, chunkZ);
+                        chunk = serverLevel.getChunkSource().getChunkNow(chunkX, chunkZ);
                         lastChunk = chunk;
                         lastChunkX = chunkX;
                         lastChunkZ = chunkZ;
@@ -339,6 +360,8 @@ public class BiomeBrushItem extends Item {
             if (tag != null) {
                 tag.remove(KEY_POS1);
                 tag.remove(KEY_POS2);
+                tag.remove(KEY_POS1_DIMENSION);
+                tag.remove(KEY_POS2_DIMENSION);
             }
 
             return InteractionResult.SUCCESS;

@@ -6,8 +6,6 @@ import net.minecraft.client.particle.*;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.particles.SimpleParticleType;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class PillarSparkleParticle extends TextureSheetParticle {
 
@@ -15,20 +13,32 @@ public class PillarSparkleParticle extends TextureSheetParticle {
     private static final int FRAME_COUNT = 10;
     private int currentFrame = 0;
 
-    private static final Map<String, ColorEntry> POSITION_COLOR_MAP =
-            new ConcurrentHashMap<>();
+    private static final ThreadLocal<PendingSpawn> PENDING = ThreadLocal.withInitial(PendingSpawn::new);
 
-    private static final Map<String, Float> POSITION_SIZE_MAP =
-            new ConcurrentHashMap<>();
+    private static final class PendingSpawn {
+        double x;
+        double y;
+        double z;
+        String colorCode;
+        float sizeMultiplier;
 
-    private static class ColorEntry {
+        void target(double x, double y, double z) {
+            if (this.x != x || this.y != y || this.z != z) {
+                this.x = x;
+                this.y = y;
+                this.z = z;
+                this.colorCode = null;
+                this.sizeMultiplier = 0.0F;
+            }
+        }
 
-        final String colorCode;
-        final long timestamp;
+        boolean matches(double x, double y, double z) {
+            return this.x == x && this.y == y && this.z == z;
+        }
 
-        ColorEntry(String colorCode) {
-            this.colorCode = colorCode;
-            this.timestamp = System.currentTimeMillis();
+        void clear() {
+            this.colorCode = null;
+            this.sizeMultiplier = 0.0F;
         }
     }
 
@@ -50,32 +60,20 @@ public class PillarSparkleParticle extends TextureSheetParticle {
         this.zd = dz;
         this.lifetime = 100;
 
-        String positionKey = String.format(java.util.Locale.ROOT, "%.1f,%.1f,%.1f", x, y, z);
-        float[] colors = getColorForPosition(x, y, z);
+        PendingSpawn pending = PENDING.get();
+        boolean hasPending = pending.matches(x, y, z);
+        float[] colors = parseColorOrDefault(hasPending ? pending.colorCode : null);
         this.setColor(colors[0], colors[1], colors[2]);
 
-        Float sizeMultiplier = POSITION_SIZE_MAP.remove(positionKey);
-        if (sizeMultiplier == null || sizeMultiplier <= 0) {
-            sizeMultiplier = 1.0F;
+        float sizeMultiplier = hasPending && pending.sizeMultiplier > 0 ? pending.sizeMultiplier : 1.0F;
+        if (hasPending) {
+            pending.clear();
         }
 
         this.quadSize = 0.2F * sizeMultiplier;
         this.hasPhysics = false;
 
         this.alpha = 1.0F;
-
-        if (POSITION_COLOR_MAP.size() > 1000) {
-            cleanupOldEntries();
-        }
-    }
-
-    private static void cleanupOldEntries() {
-        long now = System.currentTimeMillis();
-        POSITION_COLOR_MAP.entrySet()
-                .removeIf(entry -> {
-                    ColorEntry colorEntry = entry.getValue();
-                    return (now - colorEntry.timestamp) > 1000;
-                });
     }
 
     public static float[] parseColorCode(String colorCode) {
@@ -101,11 +99,7 @@ public class PillarSparkleParticle extends TextureSheetParticle {
         }
     }
 
-    public static float[] getColorForPosition(double x, double y, double z) {
-        String positionKey = String.format(java.util.Locale.ROOT, "%.1f,%.1f,%.1f", x, y, z);
-        ColorEntry colorEntry = POSITION_COLOR_MAP.remove(positionKey);
-        String colorCode = (colorEntry != null) ? colorEntry.colorCode : null;
-
+    private static float[] parseColorOrDefault(String colorCode) {
         if (colorCode == null || colorCode.isEmpty()) {
             PillarParticleConfig cfg = PillarParticleConfig.get();
             if (cfg.particle_color != null && !cfg.particle_color.isEmpty()) {
@@ -206,8 +200,9 @@ public class PillarSparkleParticle extends TextureSheetParticle {
             String colorCode
     ) {
         if (colorCode != null && !colorCode.isEmpty()) {
-            String positionKey = String.format(java.util.Locale.ROOT, "%.1f,%.1f,%.1f", x, y, z);
-            POSITION_COLOR_MAP.put(positionKey, new ColorEntry(colorCode));
+            PendingSpawn pending = PENDING.get();
+            pending.target(x, y, z);
+            pending.colorCode = colorCode;
         }
     }
 
@@ -218,8 +213,9 @@ public class PillarSparkleParticle extends TextureSheetParticle {
             float sizeMultiplier
     ) {
         if (sizeMultiplier > 0) {
-            String positionKey = String.format(java.util.Locale.ROOT, "%.1f,%.1f,%.1f", x, y, z);
-            POSITION_SIZE_MAP.put(positionKey, sizeMultiplier);
+            PendingSpawn pending = PENDING.get();
+            pending.target(x, y, z);
+            pending.sizeMultiplier = sizeMultiplier;
         }
     }
 

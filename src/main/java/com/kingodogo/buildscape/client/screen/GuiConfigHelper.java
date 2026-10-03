@@ -95,10 +95,8 @@ public class GuiConfigHelper {
                         java.lang.reflect.Method setHeightMethod = widget.getClass().getMethod("setHeight", int.class);
                         setHeightMethod.invoke(widget, height);
                     } catch (NoSuchMethodException e) {
-                        java.lang.reflect.Field heightField = AbstractWidget.class.getDeclaredField("height");
-                        heightField.setAccessible(true);
-                        int oldHeight = heightField.getInt(widget);
-                        heightField.setInt(widget, height);
+                        int oldHeight = widget.getHeight();
+                        widget.setHeight(height);
 
                         if (oldHeight != height) {
                             try {
@@ -195,13 +193,7 @@ public class GuiConfigHelper {
             editBox.setWidth(width);
             editBox.visible = elementConfig.visible;
 
-            try {
-                java.lang.reflect.Field heightField = EditBox.class.getDeclaredField("height");
-                heightField.setAccessible(true);
-                heightField.setInt(editBox, height);
-            } catch (Exception e) {
-                com.kingodogo.buildscape.BuildScape.getLogger().debug("Failed to set EditBox height for '{}': {}", elementId, e.getMessage());
-            }
+            editBox.setHeight(height);
 
             if (elementConfig.properties != null && elementConfig.properties.containsKey("searchTarget")) {
                 String searchTarget = (String) elementConfig.properties.get("searchTarget");
@@ -230,13 +222,7 @@ public class GuiConfigHelper {
         elementConfig.width = widget.getWidth();
         elementConfig.visible = widget.visible;
 
-        try {
-            java.lang.reflect.Field heightField = AbstractWidget.class.getDeclaredField("height");
-            heightField.setAccessible(true);
-            elementConfig.height = heightField.getInt(widget);
-        } catch (Exception e) {
-            elementConfig.height = 20;
-        }
+        elementConfig.height = widget.getHeight();
 
         config.setElementConfig(elementId, elementConfig);
         configManager.saveConfig(tabName, config);
@@ -381,10 +367,8 @@ public class GuiConfigHelper {
                     java.lang.reflect.Method setHeightMethod = widget.getClass().getMethod("setHeight", int.class);
                     setHeightMethod.invoke(widget, height);
                 } catch (NoSuchMethodException e) {
-                    java.lang.reflect.Field heightField = AbstractWidget.class.getDeclaredField("height");
-                    heightField.setAccessible(true);
-                    int oldHeight = heightField.getInt(widget);
-                    heightField.setInt(widget, height);
+                    int oldHeight = widget.getHeight();
+                    widget.setHeight(height);
 
                     if (oldHeight != height) {
                         try {
@@ -512,13 +496,7 @@ public class GuiConfigHelper {
         editBox.setWidth(width);
         editBox.visible = elementConfig.visible;
 
-        try {
-            java.lang.reflect.Field heightField = EditBox.class.getDeclaredField("height");
-            heightField.setAccessible(true);
-            heightField.setInt(editBox, height);
-        } catch (Exception e) {
-            com.kingodogo.buildscape.BuildScape.getLogger().debug("Failed to set EditBox height for '{}': {}", elementId, e.getMessage());
-        }
+        editBox.setHeight(height);
     }
 
     public static void applyAllEditBoxConfigs(String tabName, Map<String, EditBox> editBoxMap, int contentX, int contentY) {

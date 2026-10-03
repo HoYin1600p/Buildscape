@@ -10,6 +10,7 @@ import net.minecraft.network.chat.TextComponent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.decoration.ItemFrame;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -94,6 +95,10 @@ public class ItemFrameParticleHandler {
         net.minecraft.world.entity.Entity entity = event.getEntity();
         if (entity instanceof ItemFrame || entity instanceof com.kingodogo.buildscape.entity.ColoredItemFrameEntity) {
             CompoundTag data = entity.getPersistentData();
+            net.minecraft.world.entity.Entity.RemovalReason reason = entity.getRemovalReason();
+            if (reason == null || !reason.shouldDestroy()) {
+                return;
+            }
             String frameId = data.getString("BuildScapeFrameId");
             if (frameId != null && !frameId.isEmpty()) {
                 com.kingodogo.buildscape.config.PillarIdManager.get(entity.level).removePillar(frameId);
@@ -102,7 +107,7 @@ public class ItemFrameParticleHandler {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    @SubscribeEvent
     public static void onEntityInteract(
             PlayerInteractEvent.EntityInteract event
     ) {
@@ -110,7 +115,21 @@ public class ItemFrameParticleHandler {
                 !(event.getTarget() instanceof com.kingodogo.buildscape.entity.ColoredItemFrameEntity)) {
             return;
         }
+        if (!event.getPlayer().mayBuild()
+                || !event.getWorld().mayInteract(event.getPlayer(), event.getTarget().blockPosition())) {
+            return;
+        }
 
+        try {
+            handleFrameInteraction(event);
+        } finally {
+            if (event.isCanceled() && event.getCancellationResult() == InteractionResult.PASS) {
+                event.setCancellationResult(InteractionResult.sidedSuccess(event.getWorld().isClientSide));
+            }
+        }
+    }
+
+    private static void handleFrameInteraction(PlayerInteractEvent.EntityInteract event) {
         if (event.getTarget() instanceof com.kingodogo.buildscape.entity.ColoredItemFrameEntity) {
             handleColoredItemFrameInteraction(event);
             return;
@@ -144,7 +163,7 @@ public class ItemFrameParticleHandler {
                 }
 
                 addParticleColor(itemFrame, dyeColor);
-                com.kingodogo.buildscape.config.PillarIdManager.get(itemFrame.level).registerItemFrame(itemFrame);
+                com.kingodogo.buildscape.config.PillarIdManager.get(itemFrame.level).registerItemFrame(itemFrame, true);
 
                 if (!player.getAbilities().instabuild) {
                     heldItem.shrink(1);
@@ -197,7 +216,7 @@ public class ItemFrameParticleHandler {
         String nextPattern = cyclePattern(currentPattern);
 
         setParticlePattern(itemFrame, nextPattern);
-        com.kingodogo.buildscape.config.PillarIdManager.get(itemFrame.level).registerItemFrame(itemFrame);
+        com.kingodogo.buildscape.config.PillarIdManager.get(itemFrame.level).registerItemFrame(itemFrame, true);
 
         if (!level.isClientSide) {
             level.playSound(
@@ -606,7 +625,7 @@ public class ItemFrameParticleHandler {
             data.putString(PARTICLE_PATTERN_KEY, pattern);
 
             if (!data.contains(FRAME_ID_KEY)) {
-                String frameId = generateFrameId();
+                String frameId = generateFrameId(com.kingodogo.buildscape.config.PillarIdManager.get(itemFrame.level));
                 data.putString(FRAME_ID_KEY, frameId);
                 CLIENT_FRAME_ID_CACHE.put(itemFrame.getId(), frameId);
             }
@@ -748,21 +767,43 @@ public class ItemFrameParticleHandler {
             if (id != null && !id.isEmpty()) return id;
         }
 
-        String frameId = generateFrameId();
+        String frameId = generateFrameId(com.kingodogo.buildscape.config.PillarIdManager.get(itemFrame.level));
         data.putString(FRAME_ID_KEY, frameId);
         CLIENT_FRAME_ID_CACHE.put(itemFrame.getId(), frameId);
         return frameId;
     }
 
 
-    private static String generateFrameId() {
-        return FRAME_PREFIX + Long.toHexString(Double.doubleToLongBits(Math.random())).substring(8, 12).toUpperCase();
+    private static String generateFrameId(com.kingodogo.buildscape.config.PillarIdManager manager) {
+        return generateUniqueId(FRAME_PREFIX, manager);
     }
 
-    private static String generateColoredFrameId(String colorVariant) {
-        String colorCode = getColorCode(colorVariant);
-        String randomPart = Long.toHexString(Double.doubleToLongBits(Math.random())).substring(8, 12).toUpperCase();
-        return "I-F" + colorCode + randomPart;
+    private static String generateColoredFrameId(String colorVariant, com.kingodogo.buildscape.config.PillarIdManager manager) {
+        return generateUniqueId("I-F" + getColorCode(colorVariant), manager);
+    }
+
+    private static String generateUniqueId(String prefix, com.kingodogo.buildscape.config.PillarIdManager manager) {
+        java.util.concurrent.ThreadLocalRandom random = java.util.concurrent.ThreadLocalRandom.current();
+        for (int attempt = 0; attempt < 64; attempt++) {
+            String id = prefix + String.format("%04X", random.nextInt(0x10000));
+            if (manager == null || !manager.isIdTaken(id)) {
+                return id;
+            }
+        }
+        String id;
+        do {
+            id = prefix + String.format("%08X", random.nextInt() & 0x7FFFFFFF);
+        } while (manager != null && manager.isIdTaken(id));
+        return id;
+    }
+
+    public static String reassignFrameId(net.minecraft.world.entity.Entity frame) {
+        frame.getPersistentData().remove(FRAME_ID_KEY);
+        CLIENT_FRAME_ID_CACHE.remove(frame.getId());
+        if (frame instanceof com.kingodogo.buildscape.entity.ColoredItemFrameEntity coloredFrame) {
+            return getFrameIdColored(coloredFrame);
+        }
+        return getFrameId((ItemFrame) frame);
     }
 
     private static String getColorCode(String colorName) {
@@ -851,7 +892,7 @@ public class ItemFrameParticleHandler {
                 }
 
                 addParticleColorColored(coloredFrame, dyeColor);
-                com.kingodogo.buildscape.config.PillarIdManager.get(coloredFrame.level).registerColoredItemFrame(coloredFrame);
+                com.kingodogo.buildscape.config.PillarIdManager.get(coloredFrame.level).registerColoredItemFrame(coloredFrame, true);
 
                 if (!player.getAbilities().instabuild) {
                     heldItem.shrink(1);
@@ -896,7 +937,7 @@ public class ItemFrameParticleHandler {
         String nextPattern = cyclePattern(currentPattern);
 
         setParticlePatternColored(coloredFrame, nextPattern);
-        com.kingodogo.buildscape.config.PillarIdManager.get(coloredFrame.level).registerColoredItemFrame(coloredFrame);
+        com.kingodogo.buildscape.config.PillarIdManager.get(coloredFrame.level).registerColoredItemFrame(coloredFrame, true);
 
         if (!level.isClientSide) {
             level.playSound(
@@ -1042,7 +1083,7 @@ public class ItemFrameParticleHandler {
 
             if (!data.contains(FRAME_ID_KEY)) {
                 String colorVariant = frame.getColorVariant();
-                String frameId = generateColoredFrameId(colorVariant);
+                String frameId = generateColoredFrameId(colorVariant, com.kingodogo.buildscape.config.PillarIdManager.get(frame.level));
                 data.putString(FRAME_ID_KEY, frameId);
                 CLIENT_FRAME_ID_CACHE.put(frame.getId(), frameId);
             }
@@ -1086,7 +1127,7 @@ public class ItemFrameParticleHandler {
         }
 
         String colorVariant = frame.getColorVariant();
-        String frameId = generateColoredFrameId(colorVariant);
+        String frameId = generateColoredFrameId(colorVariant, com.kingodogo.buildscape.config.PillarIdManager.get(frame.level));
         data.putString(FRAME_ID_KEY, frameId);
         CLIENT_FRAME_ID_CACHE.put(frame.getId(), frameId);
         return frameId;

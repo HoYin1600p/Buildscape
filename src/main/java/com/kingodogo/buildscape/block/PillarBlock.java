@@ -23,7 +23,6 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
-import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -37,8 +36,6 @@ public class PillarBlock
     public static final BooleanProperty WATERLOGGED =
             BlockStateProperties.WATERLOGGED;
     private static final ThreadLocal<Float> PLACING_PLAYER_YAW =
-            new ThreadLocal<>();
-    private static final ThreadLocal<net.minecraft.nbt.CompoundTag> PLACING_NBT_DATA =
             new ThreadLocal<>();
 
     private static final VoxelShape SHAPE_SINGLE = Shapes.or(
@@ -68,7 +65,6 @@ public class PillarBlock
                         .setValue(WATERLOGGED, false)
         );
     }
-
 
     @Override
     protected void createBlockStateDefinition(
@@ -100,49 +96,6 @@ public class PillarBlock
 
         boolean hasAbove = above.getBlock() instanceof PillarBlock && !(above.getBlock() instanceof AshenKingPillarBlock);
         boolean hasBelow = below.getBlock() instanceof PillarBlock && !(below.getBlock() instanceof AshenKingPillarBlock);
-
-        if (!level.isClientSide) {
-            BlockState belowState = level.getBlockState(pos.below());
-            BlockState aboveState = level.getBlockState(pos.above());
-
-            if (hasBelow && !hasAbove && !(belowState.getBlock() instanceof AshenKingPillarBlock)) {
-                if (
-                        level.getBlockEntity(pos.below()) instanceof PillarBlockEntity be &&
-                                be.hasDisplayItem()
-                ) {
-                    ItemStack item = be.getDisplayedItem().copy();
-                    be.setDisplayedItem(ItemStack.EMPTY);
-                    net.minecraft.world.entity.item.ItemEntity itemEntity =
-                            new net.minecraft.world.entity.item.ItemEntity(
-                                    level,
-                                    pos.getX() + 0.5,
-                                    pos.getY() + 0.5,
-                                    pos.getZ() + 0.5,
-                                    item
-                            );
-                    itemEntity.setDefaultPickUpDelay();
-                    level.addFreshEntity(itemEntity);
-                }
-            } else if (hasAbove && !hasBelow && !(aboveState.getBlock() instanceof AshenKingPillarBlock)) {
-                if (
-                        level.getBlockEntity(pos.above()) instanceof PillarBlockEntity be &&
-                                be.hasDisplayItem()
-                ) {
-                    ItemStack item = be.getDisplayedItem().copy();
-                    be.setDisplayedItem(ItemStack.EMPTY);
-                    net.minecraft.world.entity.item.ItemEntity itemEntity =
-                            new net.minecraft.world.entity.item.ItemEntity(
-                                    level,
-                                    pos.getX() + 0.5,
-                                    pos.getY() + 0.5,
-                                    pos.getZ() + 0.5,
-                                    item
-                            );
-                    itemEntity.setDefaultPickUpDelay();
-                    level.addFreshEntity(itemEntity);
-                }
-            }
-        }
 
         PillarPart part;
         if (hasAbove && hasBelow) {
@@ -220,6 +173,9 @@ public class PillarBlock
     ) {
 
         if (!level.isClientSide) {
+            if (!oldState.is(state.getBlock())) {
+                ejectNeighborDisplayItem(level, pos, state);
+            }
             enforceSingleItemPerStack(level, pos);
             syncNewPillarWithStack(level, pos);
 
@@ -231,33 +187,6 @@ public class PillarBlock
                     PLACING_PLAYER_YAW.set(null);
                 }
 
-                net.minecraft.nbt.CompoundTag storedNBT = PLACING_NBT_DATA.get();
-                if (storedNBT != null) {
-                    if (storedNBT.contains("ITEM", 8)) {
-                        String itemId = storedNBT.getString("ITEM");
-                        try {
-                            net.minecraft.resources.ResourceLocation itemLocation =
-                                    new net.minecraft.resources.ResourceLocation(itemId);
-                            net.minecraft.world.item.Item item =
-                                    net.minecraftforge.registries.ForgeRegistries.ITEMS.getValue(itemLocation);
-                            if (item != null && item != net.minecraft.world.item.Items.AIR) {
-                                ItemStack displayItem = new ItemStack(item);
-                                pillarBE.setDisplayedItem(displayItem);
-                            }
-                        } catch (Exception e) {
-                        }
-                    }
-
-                    if (storedNBT.contains("PATTERN", 8)) {
-                        String pattern = storedNBT.getString("PATTERN");
-                        pillarBE.setParticlePattern(pattern);
-                    }
-
-                    PLACING_NBT_DATA.set(null);
-                    pillarBE.setChanged();
-
-                    level.sendBlockUpdated(pos, state, state, 3);
-                }
             }
 
             BlockPos above = pos.above();
@@ -406,44 +335,6 @@ public class PillarBlock
     }
 
     @Override
-    public List<ItemStack> getDrops(
-            BlockState state,
-            LootContext.Builder builder
-    ) {
-        List<ItemStack> drops = super.getDrops(state, builder);
-
-        LootContext lootContext = builder
-                .withParameter(
-                        net.minecraft.world.level.storage.loot.parameters.LootContextParams.BLOCK_STATE,
-                        state
-                )
-                .create(
-                        net.minecraft.world.level.storage.loot.parameters.LootContextParamSets.BLOCK
-                );
-
-        net.minecraft.world.phys.Vec3 origin = lootContext.getParamOrNull(
-                net.minecraft.world.level.storage.loot.parameters.LootContextParams.ORIGIN
-        );
-        if (origin != null) {
-            BlockPos pos = new BlockPos(origin);
-            net.minecraft.world.level.Level level = lootContext.getLevel();
-            if (level != null) {
-                BlockEntity be = level.getBlockEntity(pos);
-                if (
-                        be instanceof PillarBlockEntity pillarBE && pillarBE.hasDisplayItem()
-                ) {
-                    ItemStack displayedItem = pillarBE.getDisplayedItem().copy();
-                    if (!displayedItem.isEmpty()) {
-                        drops.add(displayedItem);
-                    }
-                }
-            }
-        }
-
-        return drops;
-    }
-
-    @Override
     public void onRemove(
             BlockState state,
             Level level,
@@ -451,6 +342,24 @@ public class PillarBlock
             BlockState newState,
             boolean isMoving
     ) {
+        if (!level.isClientSide && !state.is(newState.getBlock())
+                && level.getBlockEntity(pos) instanceof PillarBlockEntity droppingBE
+                && droppingBE.hasDisplayItem()) {
+            ItemStack displayedItem = droppingBE.getDisplayedItem().copy();
+            if (!displayedItem.isEmpty()) {
+                net.minecraft.world.entity.item.ItemEntity itemEntity =
+                        new net.minecraft.world.entity.item.ItemEntity(
+                                level,
+                                pos.getX() + 0.5,
+                                pos.getY() + 0.5,
+                                pos.getZ() + 0.5,
+                                displayedItem
+                        );
+                itemEntity.setDefaultPickUpDelay();
+                level.addFreshEntity(itemEntity);
+            }
+        }
+
         if (
                 !level.isClientSide &&
                         !state.is(newState.getBlock()) &&
@@ -463,22 +372,6 @@ public class PillarBlock
             if (be instanceof PillarBlockEntity pillarBE) {
                 pillarIdToPreserve = pillarBE.getPillarId();
                 colorsToPreserve = pillarBE.getParticleColors();
-
-                if (pillarBE.hasDisplayItem()) {
-                    ItemStack displayedItem = pillarBE.getDisplayedItem().copy();
-                    if (!displayedItem.isEmpty()) {
-                        net.minecraft.world.entity.item.ItemEntity itemEntity =
-                                new net.minecraft.world.entity.item.ItemEntity(
-                                        level,
-                                        pos.getX() + 0.5,
-                                        pos.getY() + 0.5,
-                                        pos.getZ() + 0.5,
-                                        displayedItem
-                                );
-                        itemEntity.setDefaultPickUpDelay();
-                        level.addFreshEntity(itemEntity);
-                    }
-                }
 
                 pillarBE.clearLocalStateOnly();
             }
@@ -630,16 +523,65 @@ public class PillarBlock
 
             if (stack.hasTag()) {
                 net.minecraft.nbt.CompoundTag tag = stack.getTag();
+                net.minecraft.nbt.CompoundTag placementTag = null;
                 if (tag.contains("ITEM", 8) || tag.contains("PATTERN", 8)) {
-                    PLACING_NBT_DATA.set(tag.copy());
-                }
-                else if (tag.contains("BlockEntityTag", 10)) {
+                    placementTag = tag;
+                } else if (tag.contains("BlockEntityTag", 10)) {
                     net.minecraft.nbt.CompoundTag beTag = tag.getCompound("BlockEntityTag");
                     if (beTag.contains("ITEM", 8) || beTag.contains("PATTERN", 8)) {
-                        PLACING_NBT_DATA.set(beTag.copy());
+                        placementTag = beTag;
                     }
                 }
+                if (placementTag != null && level.getBlockEntity(pos) instanceof PillarBlockEntity pillarBE) {
+                    applyPlacementNbt(pillarBE, placementTag);
+                    level.sendBlockUpdated(pos, state, state, 3);
+                }
             }
+        }
+    }
+
+    private static void applyPlacementNbt(PillarBlockEntity pillarBE, net.minecraft.nbt.CompoundTag tag) {
+        if (tag.contains("ITEM", 8)) {
+            net.minecraft.resources.ResourceLocation itemLocation =
+                    net.minecraft.resources.ResourceLocation.tryParse(tag.getString("ITEM"));
+            net.minecraft.world.item.Item item = itemLocation == null ? null
+                    : net.minecraftforge.registries.ForgeRegistries.ITEMS.getValue(itemLocation);
+            if (item != null && item != net.minecraft.world.item.Items.AIR) {
+                pillarBE.setDisplayedItem(new ItemStack(item));
+            }
+        }
+        if (tag.contains("PATTERN", 8)) {
+            pillarBE.setParticlePattern(tag.getString("PATTERN"));
+        }
+        pillarBE.setChanged();
+    }
+
+    private static void ejectNeighborDisplayItem(Level level, BlockPos pos, BlockState state) {
+        PillarPart part = state.getValue(PART);
+        BlockPos neighborPos;
+        if (part == PillarPart.TOP) {
+            neighborPos = pos.below();
+        } else if (part == PillarPart.BOTTOM) {
+            neighborPos = pos.above();
+        } else {
+            return;
+        }
+        if (level.getBlockState(neighborPos).getBlock() instanceof AshenKingPillarBlock) {
+            return;
+        }
+        if (level.getBlockEntity(neighborPos) instanceof PillarBlockEntity be && be.hasDisplayItem()) {
+            ItemStack item = be.getDisplayedItem().copy();
+            be.setDisplayedItem(ItemStack.EMPTY);
+            net.minecraft.world.entity.item.ItemEntity itemEntity =
+                    new net.minecraft.world.entity.item.ItemEntity(
+                            level,
+                            pos.getX() + 0.5,
+                            pos.getY() + 0.5,
+                            pos.getZ() + 0.5,
+                            item
+                    );
+            itemEntity.setDefaultPickUpDelay();
+            level.addFreshEntity(itemEntity);
         }
     }
 

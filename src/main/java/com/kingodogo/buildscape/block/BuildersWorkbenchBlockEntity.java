@@ -2,6 +2,7 @@ package com.kingodogo.buildscape.block;
 
 import com.kingodogo.buildscape.network.BuildersWorkbenchMenu;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -10,6 +11,7 @@ import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.Container;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.MenuProvider;
+import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -21,7 +23,7 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BuildersWorkbenchBlockEntity extends BlockEntity implements MenuProvider, Container {
+public class BuildersWorkbenchBlockEntity extends BlockEntity implements MenuProvider, WorldlyContainer {
 
     public static final int SLOT_COLOR_PICKER = 0;
     public static final int SLOT_PRESETS_START = 1;
@@ -358,6 +360,35 @@ public class BuildersWorkbenchBlockEntity extends BlockEntity implements MenuPro
         if (level.getBlockEntity(worldPosition) != this) return false;
         return player.distanceToSqr(worldPosition.getX() + 0.5, worldPosition.getY() + 0.5,
                 worldPosition.getZ() + 0.5) <= 64.0;
+    }
+
+    private static final int[] AUTOMATION_SLOTS = {SLOT_INPUT_POUCH, SLOT_OUTPUT_POUCH};
+
+    private static boolean isResultSlot(int slot) {
+        return (slot >= SLOT_PRESETS_START && slot <= SLOT_PRESETS_END)
+                || (slot >= SLOT_GRADIENT_START && slot <= SLOT_GRADIENT_END);
+    }
+
+    @Override
+    public boolean canPlaceItem(int slot, ItemStack stack) {
+        if (isResultSlot(slot) || slot == SLOT_OUTPUT_POUCH) return false;
+        if (slot == SLOT_INPUT_POUCH) return isPouch(stack);
+        return true;
+    }
+
+    @Override
+    public int[] getSlotsForFace(Direction side) {
+        return AUTOMATION_SLOTS;
+    }
+
+    @Override
+    public boolean canPlaceItemThroughFace(int slot, ItemStack stack, @Nullable Direction side) {
+        return slot == SLOT_INPUT_POUCH && isPouch(stack);
+    }
+
+    @Override
+    public boolean canTakeItemThroughFace(int slot, ItemStack stack, Direction side) {
+        return slot == SLOT_OUTPUT_POUCH;
     }
 
     @Override

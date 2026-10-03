@@ -452,7 +452,8 @@ public class BinaryRecipeCache {
                 for (int i = 0; i < ingSize; i++) {
                     ingredients.set(i, readIngredient(in, stringPool, ingredientCache));
                 }
-                return new ShapedRecipe(id, group, width, height, ingredients, result);
+                com.kingodogo.buildscape.recipe.framework.util.ShapedPatternTrimmer.Trimmed trimmed = com.kingodogo.buildscape.recipe.framework.util.ShapedPatternTrimmer.trim(width, height, ingredients);
+                return new ShapedRecipe(id, group, trimmed.width(), trimmed.height(), trimmed.ingredients(), result);
             }
             case 2 -> {
                 int ingSize = in.readInt();
@@ -505,8 +506,9 @@ public class BinaryRecipeCache {
                 for (int i = 0; i < ingSize; i++) {
                     ingredients.set(i, readIngredient(in, stringPool, ingredientCache));
                 }
-                return new com.kingodogo.buildscape.recipe.ShapedDurabilityRecipe(id, group, width, height, ingredients,
-                        result, 1);
+                com.kingodogo.buildscape.recipe.framework.util.ShapedPatternTrimmer.Trimmed trimmed = com.kingodogo.buildscape.recipe.framework.util.ShapedPatternTrimmer.trim(width, height, ingredients);
+                return new com.kingodogo.buildscape.recipe.ShapedDurabilityRecipe(id, group, trimmed.width(), trimmed.height(),
+                        trimmed.ingredients(), result, 1);
             }
             case 10 -> {
                 int ingSize = in.readInt();

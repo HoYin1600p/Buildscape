@@ -266,8 +266,7 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
             Fluid containedFluid = HollowPipeBlock.getContainedFluid(state, hollowBe);
 
             boolean isEmptyBucket = held.is(Items.BUCKET)
-                    || (held.getItem() instanceof BucketItem bi && bi.getFluid() == Fluids.EMPTY)
-                    || (FluidUtil.getFluidHandler(held).isPresent() && FluidUtil.getFluidContained(held).orElse(FluidStack.EMPTY).isEmpty());
+                    || (held.getItem() instanceof BucketItem bi && bi.getFluid() == Fluids.EMPTY);
 
             if (isEmptyBucket && sourceFluid != Fluids.EMPTY) {
                 if (!level.isClientSide) {

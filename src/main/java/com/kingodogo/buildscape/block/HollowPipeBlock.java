@@ -20,6 +20,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.BucketItem;
+import net.minecraft.world.item.MobBucketItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -209,12 +210,8 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
 
     public static Fluid getFluidFromItem(ItemStack stack) {
         if (stack.isEmpty()) return Fluids.EMPTY;
-        if (stack.getItem() instanceof BucketItem bucketItem) {
+        if (stack.getItem() instanceof BucketItem bucketItem && !(stack.getItem() instanceof MobBucketItem)) {
             return bucketItem.getFluid();
-        }
-        FluidStack fs = FluidUtil.getFluidContained(stack).orElse(FluidStack.EMPTY);
-        if (!fs.isEmpty()) {
-            return fs.getFluid();
         }
         return Fluids.EMPTY;
     }
@@ -256,47 +253,24 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
         Direction hitFace = hit.getDirection();
 
         if (held.is(ModItems.WRENCH.get())) {
+            if (!player.isShiftKeyDown()) {
+                return InteractionResult.PASS;
+            }
             if (!level.isClientSide) {
-                if (player.isShiftKeyDown()) {
-                    Direction.Axis currentAxis = state.getValue(AXIS);
-                    Direction.Axis nextAxis = switch (currentAxis) {
-                        case Y -> Direction.Axis.Z;
-                        case Z -> Direction.Axis.X;
-                        case X -> Direction.Axis.Y;
-                    };
-                    level.setBlock(pos, state.setValue(AXIS, nextAxis), 3);
-                    level.playSound(null, pos, SoundEvents.ANVIL_USE, SoundSource.BLOCKS, 0.5F, 1.5F);
-                    HollowPipeTransportManager.markDirty(level, pos);
-                    return InteractionResult.SUCCESS;
-                }
-
-                BooleanProperty prop = getPropertyForDirection(hitFace);
-                if (prop != null) {
-                    boolean currentVal = state.getValue(prop);
-                    if (currentVal) {
-                        int openCount = (state.getValue(DOWN) ? 1 : 0) + (state.getValue(UP) ? 1 : 0)
-                                + (state.getValue(NORTH) ? 1 : 0) + (state.getValue(SOUTH) ? 1 : 0)
-                                + (state.getValue(WEST) ? 1 : 0) + (state.getValue(EAST) ? 1 : 0);
-                        if (openCount <= 2) {
-                            level.playSound(null, pos, SoundEvents.DISPENSER_FAIL, SoundSource.BLOCKS, 0.8F, 1.2F);
-                            player.displayClientMessage(new net.minecraft.network.chat.TextComponent("Pipes must have at least 2 open ends!"), true);
-                            return InteractionResult.SUCCESS;
-                        }
-                    }
-
-                    BlockState newState = state.setValue(prop, !currentVal);
-                    level.setBlock(pos, newState, 3);
-                    level.playSound(null, pos, SoundEvents.LEVER_CLICK, SoundSource.BLOCKS, 0.6F, !currentVal ? 1.2F : 0.8F);
-                    HollowPipeTransportManager.markDirty(level, pos);
-                    return InteractionResult.SUCCESS;
-                }
+                Direction.Axis currentAxis = state.getValue(AXIS);
+                Direction.Axis nextAxis = switch (currentAxis) {
+                    case Y -> Direction.Axis.Z;
+                    case Z -> Direction.Axis.X;
+                    case X -> Direction.Axis.Y;
+                };
+                setAxisAndRefresh(level, pos, state, nextAxis);
+                level.playSound(null, pos, SoundEvents.ANVIL_USE, SoundSource.BLOCKS, 0.5F, 1.5F);
             }
             return InteractionResult.sidedSuccess(level.isClientSide);
         }
 
         boolean isEmptyBucket = held.is(Items.BUCKET)
-                || (held.getItem() instanceof BucketItem bi && bi.getFluid() == Fluids.EMPTY)
-                || (FluidUtil.getFluidHandler(held).isPresent() && FluidUtil.getFluidContained(held).orElse(FluidStack.EMPTY).isEmpty());
+                || (held.getItem() instanceof BucketItem bi && bi.getFluid() == Fluids.EMPTY);
 
         Fluid sourceFluid = getSourceFluid(state, be);
         if (isEmptyBucket && sourceFluid != Fluids.EMPTY) {
@@ -767,6 +741,13 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
         }
 
         return false;
+    }
+
+    public void setAxisAndRefresh(Level level, BlockPos pos, BlockState state, Direction.Axis axis) {
+        BlockState rotated = updateConnections(level, pos, state.setValue(AXIS, axis));
+        level.setBlock(pos, rotated, 3);
+        notifyAndRecalculateNeighbors(level, pos);
+        HollowPipeTransportManager.markDirty(level, pos);
     }
 
     private void notifyAndRecalculateNeighbors(Level level, BlockPos pos) {

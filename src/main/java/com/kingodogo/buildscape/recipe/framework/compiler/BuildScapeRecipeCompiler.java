@@ -257,7 +257,8 @@ public class BuildScapeRecipeCompiler {
             }
         }
 
-        return new ShapedRecipe(id, group, width, height, ingredients, result);
+        com.kingodogo.buildscape.recipe.framework.util.ShapedPatternTrimmer.Trimmed trimmed = com.kingodogo.buildscape.recipe.framework.util.ShapedPatternTrimmer.trim(width, height, ingredients);
+        return new ShapedRecipe(id, group, trimmed.width(), trimmed.height(), trimmed.ingredients(), result);
     }
 
     private ShapelessRecipe compileShapeless(ResourceLocation id, String group, RecipeIR.RecipeSpec spec, ItemStack result) {

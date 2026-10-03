@@ -98,6 +98,22 @@ public class WanderingHomemakerEntity extends WanderingTrader {
         list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.OPEN_EYEBLOSSOM.get(), 6), 8, 1, 0.05f));
         list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.CLOSED_EYEBLOSSOM.get(), 6), 8, 1, 0.05f));
 
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.ORANGE_HAZE_BUSH.get(), 6), 6, 1, 0.05f));
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.MAGENTA_HAZE_BUSH.get(), 6), 6, 1, 0.05f));
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.LIGHT_BLUE_HAZE_BUSH.get(), 6), 6, 1, 0.05f));
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.YELLOW_HAZE_BUSH.get(), 6), 6, 1, 0.05f));
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.LIME_HAZE_BUSH.get(), 6), 6, 1, 0.05f));
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.PINK_HAZE_BUSH.get(), 6), 6, 1, 0.05f));
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.GRAY_HAZE_BUSH.get(), 6), 6, 1, 0.05f));
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.LIGHT_GRAY_HAZE_BUSH.get(), 6), 6, 1, 0.05f));
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.CYAN_HAZE_BUSH.get(), 6), 6, 1, 0.05f));
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.PURPLE_HAZE_BUSH.get(), 6), 6, 1, 0.05f));
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.BLUE_HAZE_BUSH.get(), 6), 6, 1, 0.05f));
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.BROWN_HAZE_BUSH.get(), 6), 6, 1, 0.05f));
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.GREEN_HAZE_BUSH.get(), 6), 6, 1, 0.05f));
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.RED_HAZE_BUSH.get(), 6), 6, 1, 0.05f));
+        list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.BLACK_HAZE_BUSH.get(), 6), 6, 1, 0.05f));
+
         list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.SCULK_CATALYST.get(), 2), 3, 1, 0.05f));
 
         list.add(new MerchantOffer(new ItemStack(Items.EMERALD, 1), new ItemStack(ModItems.MUFF_BLOCK.get(), 2), 4, 1, 0.05f));

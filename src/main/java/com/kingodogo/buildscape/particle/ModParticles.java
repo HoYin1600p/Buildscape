@@ -46,7 +46,7 @@ public class ModParticles {
     public static final RegistryObject<SimpleParticleType> FIREFLY =
             PARTICLES.register("firefly", () -> new SimpleParticleType(false));
     public static final RegistryObject<SimpleParticleType> HAZE =
-            PARTICLES.register("haze", () -> new SimpleParticleType(true));
+            PARTICLES.register("haze", () -> new SimpleParticleType(false));
 
     public static final RegistryObject<SimpleParticleType> SULFUR_BUBBLES =
             PARTICLES.register("sulfur_bubbles", () -> new SimpleParticleType(false));

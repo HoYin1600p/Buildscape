@@ -1237,6 +1237,29 @@ public class BuildScape {
             return;
         }
 
+        if (state.is(net.minecraft.world.level.block.Blocks.FLOWER_POT)) {
+            if (heldItem.getItem() instanceof com.kingodogo.buildscape.item.HazeBushItem && com.kingodogo.buildscape.item.HazeBushItem.isDrained(heldItem)) {
+                if (heldItem.getItem() instanceof net.minecraft.world.item.BlockItem blockItem && blockItem.getBlock() instanceof com.kingodogo.buildscape.block.HazeBushBlock bushBlock) {
+                    net.minecraft.world.item.DyeColor color = bushBlock.getColor();
+                    net.minecraftforge.registries.RegistryObject<net.minecraft.world.level.block.Block> pottedObj = ModBlocks.POTTED_COLORED_HAZE_BUSHES.get(color);
+                    if (pottedObj != null) {
+                        if (!event.getWorld().isClientSide) {
+                            net.minecraft.world.level.block.state.BlockState newState = pottedObj.get().defaultBlockState().setValue(com.kingodogo.buildscape.block.PottedHazeBushBlock.HAS_HAZE, false);
+                            event.getWorld().setBlock(event.getPos(), newState, 3);
+                            event.getPlayer().awardStat(net.minecraft.stats.Stats.POT_FLOWER);
+                            if (!event.getPlayer().getAbilities().instabuild) {
+                                heldItem.shrink(1);
+                            }
+                            event.getWorld().gameEvent(event.getPlayer(), net.minecraft.world.level.gameevent.GameEvent.BLOCK_CHANGE, event.getPos());
+                        }
+                        event.setCancellationResult(net.minecraft.world.InteractionResult.sidedSuccess(event.getWorld().isClientSide));
+                        event.setCanceled(true);
+                        return;
+                    }
+                }
+            }
+        }
+
         if (state.getBlock() instanceof net.minecraft.world.level.block.VineBlock) {
             if (heldItem.is(net.minecraft.world.item.Items.SHEARS)) {
                 if (state.hasProperty(com.kingodogo.buildscape.block.ModBlockProperties.SHEARED)) {
@@ -1408,13 +1431,6 @@ public class BuildScape {
                 event.setCancellationResult(
                         net.minecraft.world.InteractionResult.SUCCESS);
             }
-        }
-    }
-
-    private static class HitHelper extends net.minecraft.world.item.Item {
-        public HitHelper() { super(new net.minecraft.world.item.Item.Properties()); }
-        public static net.minecraft.world.phys.BlockHitResult getHit(net.minecraft.world.level.Level level, net.minecraft.world.entity.player.Player player, net.minecraft.world.level.ClipContext.Fluid fluidMode) {
-            return getPlayerPOVHitResult(level, player, fluidMode);
         }
     }
 
@@ -2752,6 +2768,43 @@ public class BuildScape {
                 }
             }
 
+            if (state.is(net.minecraft.world.level.block.Blocks.PODZOL) && event.getFace() == net.minecraft.core.Direction.UP) {
+                net.minecraft.core.BlockPos above = pos.above();
+                if (level.isEmptyBlock(above)) {
+                    if (!level.isClientSide) {
+                        level.setBlock(above, ModBlocks.WHITE_HAZE_BUSH.get().defaultBlockState(), 3);
+                        level.levelEvent(2005, pos, 0);
+                        if (!event.getPlayer().getAbilities().instabuild) held.shrink(1);
+                    }
+                    event.setCanceled(true);
+                    event.setCancellationResult(net.minecraft.world.InteractionResult.sidedSuccess(level.isClientSide));
+                    return;
+                } else {
+                    java.util.List<net.minecraft.core.BlockPos> validPositions = new java.util.ArrayList<>();
+                    for (int dx = -1; dx <= 1; dx++) {
+                        for (int dz = -1; dz <= 1; dz++) {
+                            if (dx == 0 && dz == 0) continue;
+                            net.minecraft.core.BlockPos nearbyGround = pos.offset(dx, 0, dz);
+                            net.minecraft.core.BlockPos nearbyAbove = nearbyGround.above();
+                            if (level.getBlockState(nearbyGround).is(net.minecraft.world.level.block.Blocks.PODZOL) && level.isEmptyBlock(nearbyAbove)) {
+                                validPositions.add(nearbyAbove);
+                            }
+                        }
+                    }
+                    if (!validPositions.isEmpty()) {
+                        if (!level.isClientSide) {
+                            net.minecraft.core.BlockPos target = validPositions.get(level.random.nextInt(validPositions.size()));
+                            level.setBlock(target, ModBlocks.WHITE_HAZE_BUSH.get().defaultBlockState(), 3);
+                            level.levelEvent(2005, pos, 0);
+                            if (!event.getPlayer().getAbilities().instabuild) held.shrink(1);
+                        }
+                        event.setCanceled(true);
+                        event.setCancellationResult(net.minecraft.world.InteractionResult.sidedSuccess(level.isClientSide));
+                        return;
+                    }
+                }
+            }
+
             if (state.is(net.minecraft.world.level.block.Blocks.GRASS_BLOCK) && event.getFace() == net.minecraft.core.Direction.UP) {
                 if (!level.isClientSide) {
                     final net.minecraft.core.BlockPos finalPos = pos;
@@ -2857,6 +2910,21 @@ public class BuildScape {
                 event.setCanceled(true);
                 event.setCancellationResult(net.minecraft.world.InteractionResult.SUCCESS);
                 return;
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public void onBonemealEvent(net.minecraftforge.event.entity.player.BonemealEvent event) {
+        if (event.getBlock().is(net.minecraft.world.level.block.Blocks.PODZOL)) {
+            net.minecraft.world.level.Level level = event.getWorld();
+            net.minecraft.core.BlockPos pos = event.getPos();
+            net.minecraft.core.BlockPos above = pos.above();
+            if (level.isEmptyBlock(above)) {
+                if (!level.isClientSide) {
+                    level.setBlock(above, ModBlocks.WHITE_HAZE_BUSH.get().defaultBlockState(), 3);
+                }
+                event.setResult(net.minecraftforge.eventbus.api.Event.Result.ALLOW);
             }
         }
     }

@@ -213,18 +213,6 @@ public class HazeBushBlock extends ModBushBlock {
             return InteractionResult.sidedSuccess(level.isClientSide);
         }
 
-        if (held.is(Items.BONE_MEAL) && !state.getValue(HAS_HAZE)) {
-            if (!level.isClientSide) {
-                level.setBlock(pos, state.setValue(HAS_HAZE, true), 3);
-                level.playSound(null, pos, SoundEvents.BONE_MEAL_USE, SoundSource.BLOCKS, 1.0F, 1.0F);
-                if (!player.getAbilities().instabuild) {
-                    held.shrink(1);
-                }
-                level.levelEvent(2005, pos, 0);
-            }
-            return InteractionResult.sidedSuccess(level.isClientSide);
-        }
-
         return super.use(state, level, pos, player, hand, hitResult);
     }
 

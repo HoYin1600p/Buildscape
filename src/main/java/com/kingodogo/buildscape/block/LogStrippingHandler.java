@@ -121,7 +121,19 @@ public class LogStrippingHandler {
                 BlockState nextState = copyStateProperties(state, targetBlock.defaultBlockState());
 
                 if (!level.isClientSide) {
+                    net.minecraft.nbt.CompoundTag carriedData = null;
+                    if (level.getBlockEntity(pos) instanceof HollowLogBlockEntity oldBe) {
+                        carriedData = oldBe.saveWithoutMetadata();
+                        oldBe.setGlassCoverNeg(null);
+                        oldBe.setGlassCoverPos(null);
+                        oldBe.setDecorationState(null);
+                    }
                     level.setBlock(pos, nextState, 11);
+                    if (carriedData != null && level.getBlockEntity(pos) instanceof HollowLogBlockEntity newBe) {
+                        newBe.load(carriedData);
+                        newBe.setChanged();
+                        newBe.syncToClient();
+                    }
                     level.playSound(null, pos, SoundEvents.AXE_STRIP, SoundSource.BLOCKS, 1.0F, 1.0F);
                     if (player != null && !player.getAbilities().instabuild) {
                         held.hurtAndBreak(1, player, p -> p.broadcastBreakEvent(event.getHand()));

@@ -213,25 +213,16 @@ public class MobPillarRenderer {
                     handled = true;
                 }
 
-                if (!handled && livingEntity.getClass().getName().contains("Piglin")) {
-                    try {
-                        java.lang.reflect.Method setBaby = livingEntity.getClass().getMethod("setBaby", boolean.class);
-                        setBaby.invoke(livingEntity, true);
-                        handled = true;
-                    } catch (Exception ignored) {
-                    }
+                if (!handled && livingEntity instanceof net.minecraft.world.entity.Mob mob) {
+                    mob.setBaby(true);
+                    handled = true;
                 }
 
                 if (!handled) {
                     try {
-                        java.lang.reflect.Method setBaby = livingEntity.getClass().getMethod("setBaby", boolean.class);
-                        setBaby.invoke(livingEntity, true);
+                        java.lang.reflect.Method setIsBaby = livingEntity.getClass().getMethod("setIsBaby", boolean.class);
+                        setIsBaby.invoke(livingEntity, true);
                     } catch (Exception ignored) {
-                        try {
-                            java.lang.reflect.Method setIsBaby = livingEntity.getClass().getMethod("setIsBaby", boolean.class);
-                            setIsBaby.invoke(livingEntity, true);
-                        } catch (Exception ignored2) {
-                        }
                     }
                 }
             }

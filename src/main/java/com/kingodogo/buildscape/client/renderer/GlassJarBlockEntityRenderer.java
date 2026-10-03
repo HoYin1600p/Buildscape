@@ -178,9 +178,16 @@ public class GlassJarBlockEntityRenderer implements BlockEntityRenderer<GlassJar
             if (fluid == Fluids.LAVA || fluid == Fluids.FLOWING_LAVA) {
                 color = 0xFFFFFFFF;
                 textureLoc = new ResourceLocation("minecraft", "block/lava_still");
-            } else {
+            } else if (fluid == Fluids.WATER || fluid == Fluids.FLOWING_WATER || fluid == Fluids.EMPTY) {
                 color = 0xFF3F76E4;
                 textureLoc = new ResourceLocation("minecraft", "block/water_still");
+            } else {
+                net.minecraftforge.fluids.FluidStack fluidStack = new net.minecraftforge.fluids.FluidStack(fluid, 1000);
+                ResourceLocation stillTexture = fluid.getAttributes().getStillTexture(fluidStack);
+                if (stillTexture != null) {
+                    textureLoc = stillTexture;
+                }
+                color = fluid.getAttributes().getColor(fluidStack);
             }
         }
 

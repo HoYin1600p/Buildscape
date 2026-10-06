@@ -100,7 +100,7 @@ sourceSets {
 }
 
 repositories {
-    maven { url = 'https://www.cursemaven.com' }
+    maven { url = 'https://maven.cursemaven.com' }
     maven { url = 'https://maven.blamejared.com' }
     maven { url = 'https://dvs1.progwml6.com/files/maven/' }
     maven { url = 'https://modmaven.dev' }
@@ -137,6 +137,7 @@ dependencies {
 
 
 tasks.named('processResources', ProcessResources).configure {
+    dependsOn 'syncBundledRecipeCache'
     doNotTrackState("18k+ resource files causes incremental builds to hang during state tracking")
 
     var replaceProperties = [minecraft_version   : minecraft_version, minecraft_version_range: minecraft_version_range,
@@ -248,14 +249,37 @@ tasks.register('runPatternBoundsTests', JavaExec) {
     mainClass = 'com.kingodogo.buildscape.recipe.framework.util.PatternBoundsTest'
 }
 
+tasks.register('runRecipePackFormatterTests', JavaExec) {
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.kingodogo.buildscape.recipe.framework.util.RecipePackFormatterTest'
+}
+
 tasks.register('syncBundledRecipeCache', JavaExec) {
     group = 'buildscape'
-    description = 'Copies a verified local BDRE cache into the bundled recipe resources.'
-    classpath = sourceSets.test.runtimeClasspath
-    mainClass = 'com.kingodogo.buildscape.recipe.framework.cache.BundledRecipeCacheSync'
+    description = 'Compiles and synchronizes the bundled BDRE binary cache (recipes.bscb) directly from source JSONs.'
+    dependsOn 'compileJava'
+    classpath = files(tasks.compileJava.destinationDirectory) + sourceSets.main.compileClasspath
+    mainClass = 'com.kingodogo.buildscape.recipe.framework.compiler.RecipeCacheGenerator'
+    inputs.files(fileTree('src/main/resources/data/buildscape/recipes_pack') { include '*.json' })
+    outputs.file file('src/main/resources/data/buildscape/recipes_pack/recipes.bscb')
     args file('src/main/resources/data/buildscape/recipes_pack').absolutePath,
-            file('run/buildscape/cache/recipes.bscb').absolutePath,
-            file('src/main/resources/data/buildscape/recipes_pack/recipes.bscb').absolutePath
+            file('src/main/resources/data/buildscape/recipes_pack/recipes.bscb').absolutePath,
+            file('run/buildscape/cache/recipes.bscb').absolutePath
+}
+
+tasks.register('compactizeRecipes', JavaExec) {
+    group = 'buildscape'
+    description = 'Formats all BDRE recipe pack JSON files into the compact canonical format.'
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'com.kingodogo.buildscape.recipe.framework.util.RecipePackFormatter'
+    args file('src/main/resources/data/buildscape/recipes_pack').absolutePath
+    finalizedBy 'syncBundledRecipeCache'
+}
+
+tasks.register('formatRecipes') {
+    group = 'buildscape'
+    description = 'Alias for compactizeRecipes.'
+    dependsOn 'compactizeRecipes'
 }
 
 tasks.register('verifyBundledRecipeCache', JavaExec) {
@@ -268,8 +292,9 @@ tasks.register('verifyBundledRecipeCache', JavaExec) {
 }
 
 tasks.named('check').configure {
-    dependsOn 'runPipeSpillTests', 'runPipeOutletTests',
-            'runRecipeManagerInjectorTests', 'runBinaryRecipeCacheTests', 'runTreeChopTraversalTests',
-            'runBeaconBeamScanTests', 'runGoldenDandelionGrowthTests', 'runMangroveLeafSupportTests',
-            'runEyeblossomTransitionTests', 'runParticleColorSlotsTests', 'runStairModelTests', 'runPatternBoundsTests', 'verifyBundledRecipeCache'
+    dependsOn 'runPipeSpillTests', 'runPipeOutletTests',\
+            'runRecipeManagerInjectorTests', 'runBinaryRecipeCacheTests', 'runTreeChopTraversalTests',\
+            'runBeaconBeamScanTests', 'runGoldenDandelionGrowthTests', 'runMangroveLeafSupportTests',\
+            'runEyeblossomTransitionTests', 'runParticleColorSlotsTests', 'runStairModelTests', 'runPatternBoundsTests',\
+            'runRecipePackFormatterTests', 'verifyBundledRecipeCache'
 }

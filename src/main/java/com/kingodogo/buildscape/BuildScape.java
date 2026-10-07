@@ -297,6 +297,7 @@ public class BuildScape {
         });
 
         event.enqueueWork(() -> {
+            com.kingodogo.buildscape.block.CopperRodHandler.registerPoi();
             com.kingodogo.buildscape.sound.ModSounds.COPPER_GRATE_SOUNDS();
             com.kingodogo.buildscape.sound.ModSounds.COPPER_BULB_SOUNDS();
             com.kingodogo.buildscape.sound.ModSounds.MANGROVE_ROOTS_SOUNDS();

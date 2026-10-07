@@ -358,13 +358,35 @@ public class CopperOxidationHandler {
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    private static BlockState copyStateProperties(BlockState from, BlockState to) {
+    public static BlockState copyStateProperties(BlockState from, BlockState to) {
         for (Property prop : from.getProperties()) {
             if (to.hasProperty(prop)) {
                 to = to.setValue(prop, from.getValue(prop));
             }
         }
         return to;
+    }
+
+    public static Block getPrevStage(Block block) {
+        init();
+        for (Map.Entry<Supplier<Block>, Supplier<Block>> entry : PREV_STAGE.entrySet()) {
+            if (entry.getKey().get() == block) {
+                return entry.getValue().get();
+            }
+        }
+        return null;
+    }
+
+    public static Block getFirstStage(Block block) {
+        Block prev = getPrevStage(block);
+        if (prev == null) return null;
+        Block current = prev;
+        while (true) {
+            Block next = getPrevStage(current);
+            if (next == null) break;
+            current = next;
+        }
+        return current;
     }
 
     public static BlockState getNextOxidationState(BlockState state) {

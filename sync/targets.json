@@ -80,7 +80,7 @@
       "loaders": [
         "fabric"
       ],
-      "branch": "port/fabric-1.18.2",
+      "branch": "port/26.2",
       "modules": [
         "fabric/1.18.2",
         "common"
@@ -95,7 +95,7 @@
       "loaders": [
         "forge"
       ],
-      "branch": "port/forge-1.21.1",
+      "branch": "port/26.2",
       "modules": [
         "forge/1.21.1",
         "common"
@@ -110,7 +110,7 @@
       "loaders": [
         "fabric"
       ],
-      "branch": "port/fabric-1.21.1",
+      "branch": "port/26.2",
       "modules": [
         "fabric/1.21.1",
         "common"
@@ -125,7 +125,7 @@
       "loaders": [
         "neoforge"
       ],
-      "branch": "port/neoforge-1.21.1",
+      "branch": "port/26.2",
       "modules": [
         "neoforge/1.21.1",
         "common"
@@ -140,7 +140,7 @@
       "loaders": [
         "forge"
       ],
-      "branch": "port/forge-26.2",
+      "branch": "port/26.2",
       "modules": [
         "forge/26.2",
         "common"
@@ -155,7 +155,7 @@
       "loaders": [
         "forge"
       ],
-      "branch": "port/forge-26.3",
+      "branch": "port/26.2",
       "modules": [
         "forge/26.3",
         "common"
@@ -171,7 +171,7 @@
       "loaders": [
         "fabric"
       ],
-      "branch": "port/fabric-26.3",
+      "branch": "port/26.2",
       "modules": [
         "fabric/26.3",
         "common"
@@ -187,7 +187,7 @@
       "loaders": [
         "neoforge"
       ],
-      "branch": "port/neoforge-26.3",
+      "branch": "port/26.2",
       "modules": [
         "neoforge/26.3",
         "common"

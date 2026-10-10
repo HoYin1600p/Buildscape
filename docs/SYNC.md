@@ -5,6 +5,8 @@ Forge 1.18.2 on `main` in `https://github.com/HoYin1600p/Buildscape.git`;
 `mc26.2` combines Fabric and NeoForge on `port/26.2`, with common's `v26x`
 VersionCluster. Other targets are scaffolded, and 26.3 is paused by owner decision.
 Scaffolded targets do not need existing branches and are skipped by `status`.
+Every target lives on the one multi-version branch (`port/26.2` today) as its own
+`<loader>/<version>` folder; there is no branch per version.
 
 The Python tool needs Python 3.9+ and Git, with no third-party Python packages.
 Run from a port checkout containing the registry. Git commands use argument

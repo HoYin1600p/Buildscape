@@ -12,7 +12,6 @@ import java.util.Random;
 
 import net.minecraft.core.Direction;
 import net.minecraft.util.valueproviders.ConstantInt;
-import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
@@ -22,7 +21,6 @@ import net.minecraft.world.level.levelgen.feature.configurations.SimpleBlockConf
 import net.minecraft.world.level.levelgen.feature.configurations.TreeConfiguration;
 import net.minecraft.world.level.levelgen.feature.featuresize.TwoLayersFeatureSize;
 import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider;
-import net.minecraft.world.level.levelgen.feature.treedecorators.BeehiveDecorator;
 
 public class ModConfiguredFeatures {
 
@@ -65,19 +63,6 @@ public class ModConfiguredFeatures {
     }
 
     public static final FeatureRegistry CONFIGURED_FEATURES = new FeatureRegistry();
-
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> MANGROVE =
-            CONFIGURED_FEATURES.register("mangrove", () ->
-                    new ConfiguredFeature<>(Feature.TREE, createMangroveTreeConfiguration())
-            );
-
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> TALL_MANGROVE =
-            CONFIGURED_FEATURES.register("tall_mangrove", () ->
-                    new ConfiguredFeature<>(
-                            Feature.TREE,
-                            createTallMangroveTreeConfiguration()
-                    )
-            );
 
     public static final FeatureHolder<ConfiguredFeature<?, ?>> POPLAR_TREE =
             CONFIGURED_FEATURES.register("poplar", () ->
@@ -998,94 +983,6 @@ public class ModConfiguredFeatures {
                 count,
                 7,
                 3
-        );
-    }
-
-    private static TreeConfiguration createMangroveTreeConfiguration() {
-        return Services.PLATFORM.createTreeConfiguration(
-                BlockStateProvider.simple(
-                        ModBlocks.MANGROVE_LOG.get().defaultBlockState()
-                ),
-                Services.PLATFORM.createMangroveUpwardsBranchingTrunkPlacer(
-                        2,
-                        1,
-                        4,
-                        UniformInt.of(1, 4),
-                        0.5F,
-                        UniformInt.of(0, 1)
-                ),
-                BlockStateProvider.simple(
-                        ModBlocks.MANGROVE_LEAVES.get().defaultBlockState()
-                ),
-                Services.PLATFORM.createMangroveRandomSpreadFoliagePlacer(
-                        ConstantInt.of(3),
-                        ConstantInt.of(0),
-                        ConstantInt.of(2),
-                        70
-                ),
-                new TwoLayersFeatureSize(2, 0, 2),
-                List.of(
-                        Services.PLATFORM.createMangroveRootDecorator(
-                                ConstantInt.of(8),
-                                ConstantInt.of(15),
-                                0.2F,
-                                UniformInt.of(1, 3)
-                        ),
-                        Services.PLATFORM.createMangroveMossCarpetDecorator(0.5F),
-                        Services.PLATFORM.createMangroveLeaveVineDecorator(0.125F),
-                        Services.PLATFORM.createMangrovePropaguleDecorator(
-                                0.14F,
-                                ConstantInt.of(1),
-                                ConstantInt.of(0),
-                                2
-                        ),
-                        new BeehiveDecorator(0.01F)
-                ),
-                true
-        );
-    }
-
-    private static TreeConfiguration createTallMangroveTreeConfiguration() {
-        return Services.PLATFORM.createTreeConfiguration(
-                BlockStateProvider.simple(
-                        ModBlocks.MANGROVE_LOG.get().defaultBlockState()
-                ),
-                Services.PLATFORM.createMangroveUpwardsBranchingTrunkPlacer(
-                        4,
-                        1,
-                        9,
-                        UniformInt.of(1, 6),
-                        0.5F,
-                        UniformInt.of(0, 1)
-                ),
-                BlockStateProvider.simple(
-                        ModBlocks.MANGROVE_LEAVES.get().defaultBlockState()
-                ),
-                Services.PLATFORM.createMangroveRandomSpreadFoliagePlacer(
-                        ConstantInt.of(3),
-                        ConstantInt.of(0),
-                        ConstantInt.of(2),
-                        70
-                ),
-                new TwoLayersFeatureSize(3, 0, 2),
-                List.of(
-                        Services.PLATFORM.createMangroveRootDecorator(
-                                ConstantInt.of(8),
-                                ConstantInt.of(15),
-                                0.2F,
-                                UniformInt.of(3, 7)
-                        ),
-                        Services.PLATFORM.createMangroveMossCarpetDecorator(0.5F),
-                        Services.PLATFORM.createMangroveLeaveVineDecorator(0.125F),
-                        Services.PLATFORM.createMangrovePropaguleDecorator(
-                                0.14F,
-                                ConstantInt.of(1),
-                                ConstantInt.of(0),
-                                2
-                        ),
-                        new BeehiveDecorator(0.01F)
-                ),
-                true
         );
     }
 

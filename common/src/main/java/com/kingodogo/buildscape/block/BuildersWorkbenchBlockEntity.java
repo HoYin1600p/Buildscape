@@ -5,6 +5,8 @@ import com.kingodogo.buildscape.menu.BuildersWorkbenchMenu;
 import com.kingodogo.buildscape.util.ColorGradientSolver;
 import com.kingodogo.buildscape.util.ComponentHelper;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
@@ -20,17 +22,13 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.ShulkerBoxBlock;
-import com.kingodogo.buildscape.block.entity.IBlockEntityReadData;
-import com.kingodogo.buildscape.block.entity.IBlockEntityWriteData;
-import com.kingodogo.buildscape.block.entity.IDataSerializable;
-import com.kingodogo.buildscape.block.entity.DataBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-public class BuildersWorkbenchBlockEntity extends DataBlockEntity implements MenuProvider, WorldlyContainer, IDataSerializable {
+public class BuildersWorkbenchBlockEntity extends BlockEntity implements MenuProvider, WorldlyContainer {
 
     public static final int SLOT_COLOR_PICKER = 0;
     public static final int SLOT_PRESETS_START = 1;
@@ -443,36 +441,75 @@ public class BuildersWorkbenchBlockEntity extends DataBlockEntity implements Men
         }
     }
     @Override
-    public void readData(IBlockEntityReadData data) {
-        for (int i = 0; i < items.size(); i++) {
-            items.set(i, data.getItemOrEmpty("Item_" + i));
-        }
-        this.activeTab = validTab(data.getIntOr("ActiveTab", 0));
-        this.filterMask = data.getIntOr("FilterMask", ColorGradientSolver.FILTER_DEFAULT);
-        this.copyProgress = data.getIntOr("CopyProgress", 0);
-        for (int tab = 0; tab < TAB_COUNT; tab++) {
-            Arrays.fill(this.resultOffsetsByTab[tab], 0);
-        }
-        for (int i = 0; i < RESULT_COUNT; i++) {
-            this.resultOffsetsByTab[0][i] = Math.max(0, data.getIntOr("ColorOffset_" + i, 0));
-            this.resultOffsetsByTab[1][i] = Math.max(0, data.getIntOr("GradientOffset_" + i, 0));
+    protected void loadAdditional(ValueInput input) {
+        super.loadAdditional(input);
+        loadItems(input, items);
+        SavedSettings saved = SavedSettings.read(input);
+        activeTab = saved.activeTab();
+        filterMask = saved.filterMask();
+        copyProgress = saved.copyProgress();
+        System.arraycopy(saved.colorOffsets(), 0, resultOffsetsByTab[0], 0, RESULT_COUNT);
+        System.arraycopy(saved.gradientOffsets(), 0, resultOffsetsByTab[1], 0, RESULT_COUNT);
+    }
+
+    @Override
+    protected void saveAdditional(ValueOutput output) {
+        super.saveAdditional(output);
+        saveItems(output, items);
+        new SavedSettings(activeTab, filterMask, copyProgress, resultOffsetsByTab[0], resultOffsetsByTab[1]).save(output);
+    }
+
+    static void loadItems(ValueInput input, NonNullList<ItemStack> items) {
+        items.clear();
+        for (ValueInput child : input.childrenListOrEmpty("Items")) {
+            int slot = child.getByteOr("Slot", (byte) -1) & 255;
+            if (slot < items.size()) items.set(slot, PillarBlockEntity.SavedItem.read(child));
         }
     }
-    @Override
-    public void writeData(IBlockEntityWriteData data) {
-        for (int i = 0; i < items.size(); i++) {
-            ItemStack stack = items.get(i);
-            if (!stack.isEmpty()) {
-                data.putItem("Item_" + i, stack);
+
+    static void saveItems(ValueOutput output, NonNullList<ItemStack> items) {
+        var list = output.childrenList("Items");
+        for (int slot = 0; slot < items.size(); slot++) {
+            ItemStack item = items.get(slot);
+            if (!item.isEmpty()) {
+                ValueOutput child = list.addChild();
+                child.putByte("Slot", (byte) slot);
+                child.store(ItemStack.MAP_CODEC, item);
             }
         }
-        data.putInt("ActiveTab", activeTab);
-        data.putInt("FilterMask", filterMask);
-        data.putInt("FilterMaskVersion", FILTER_MASK_VERSION);
-        data.putInt("CopyProgress", copyProgress);
-        for (int i = 0; i < RESULT_COUNT; i++) {
-            data.putInt("ColorOffset_" + i, resultOffsetsByTab[0][i]);
-            data.putInt("GradientOffset_" + i, resultOffsetsByTab[1][i]);
+    }
+
+    record SavedSettings(int activeTab, int filterMask, int copyProgress, int[] colorOffsets, int[] gradientOffsets) {
+        void save(ValueOutput output) {
+            output.putInt("ActiveTab", activeTab);
+            output.putInt("FilterMask", filterMask);
+            output.putInt("FilterMaskVersion", FILTER_MASK_VERSION);
+            output.putInt("CopyProgress", copyProgress);
+            output.putIntArray("ColorResultOffsets", colorOffsets);
+            output.putIntArray("GradientResultOffsets", gradientOffsets);
+        }
+
+        static SavedSettings read(ValueInput input) {
+            int tab = validTab(input.getIntOr("ActiveTab", 0));
+            int mask = input.getIntOr("FilterMaskVersion", 0) >= FILTER_MASK_VERSION
+                    ? input.getIntOr("FilterMask", 0) & ColorGradientSolver.FILTER_STATE_MASK
+                    : ColorGradientSolver.FILTER_DEFAULT;
+            var color = input.getIntArray("ColorResultOffsets");
+            var gradient = input.getIntArray("GradientResultOffsets");
+            int[] colorOffsets = offsets(color.orElseGet(() -> new int[0]));
+            int[] gradientOffsets = offsets(gradient.orElseGet(() -> new int[0]));
+            if (color.isEmpty() && gradient.isEmpty()) {
+                int[] legacy = offsets(input.getIntArray("ResultOffsets").orElseGet(() -> new int[0]));
+                if (tab == 0) colorOffsets = legacy;
+                else gradientOffsets = legacy;
+            }
+            return new SavedSettings(tab, mask, input.getIntOr("CopyProgress", 0), colorOffsets, gradientOffsets);
+        }
+
+        private static int[] offsets(int[] saved) {
+            int[] result = new int[RESULT_COUNT];
+            for (int i = 0; i < Math.min(saved.length, result.length); i++) result[i] = Math.max(0, saved[i]);
+            return result;
         }
     }
     public static boolean isPouch(ItemStack stack) {

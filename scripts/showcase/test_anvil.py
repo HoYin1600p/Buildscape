@@ -74,10 +74,14 @@ def expected_counts(layout):
     layers = layout["layers"]
     clearing = (max(layer["width"] for layer in layers) * max(layer["depth"] for layer in layers)
                 * (layers[-1]["top_y"] - layout["ground_top_y"]))
-    floors = sum(layer["width"] * layer["depth"] for layer in layers[1:])
+    with_floors = layout.get("floors", True)
+    floors = sum(layer["width"] * layer["depth"] for layer in layers[1:]) if with_floors else 0
     signs = sum(group["sign"] is not None for layer in layers for group in layer["groups"])
     cells = [cell for layer in layers for group in layer["groups"] for cell in group["cells"]]
     displays = sum(len(cell["parts"]) + (5 if cell["kind"] == "fluid" else 0) for cell in cells)
+    if not with_floors:  # one glass bottom per fluid cell above layer 1
+        displays += sum(cell["kind"] == "fluid" for layer in layers[1:]
+                        for group in layer["groups"] for cell in group["cells"])
     return clearing + floors + signs + displays, signs + 4  # two bed parts, chest, jar
 
 
@@ -267,6 +271,12 @@ class PaletteAndChunkTests(unittest.TestCase):
         cells = [cell for layer in layout["layers"] for group in layer["groups"] for cell in group["cells"]]
         self.assertTrue(all("className" in cell and "blockType" in cell for cell in cells))
         placements = list(apply.layout_placements(layout))
+        self.assertEqual(sum(p.count for p in placements), expected_counts(layout)[0])
+        self.assertEqual(sum(p.entity is not None for p in placements), expected_counts(layout)[1])
+        layout = showcase_fixture()
+        layout["floors"] = False
+        placements = list(apply.layout_placements(layout))
+        self.assertFalse(any(p.state.value["Name"].value == "minecraft:grass_block" for p in placements))
         self.assertEqual(sum(p.count for p in placements), expected_counts(layout)[0])
         self.assertEqual(sum(p.entity is not None for p in placements), expected_counts(layout)[1])
 

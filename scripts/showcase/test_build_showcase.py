@@ -107,6 +107,42 @@ class LayoutTests(unittest.TestCase):
         self.assertTrue(all(cell["position"][1] == layer["base_y"] for layer in layout["layers"]
                             for group in layer["groups"] for cell in group["cells"]))
 
+    def test_no_floors_keeps_positions_and_glasses_upper_fluid_bottoms(self):
+        blocks = (block("experience_liquid", [{"level": str(i)} for i in range(4)]), block("stone_cube"))
+        with_floors = showcase.build_layout(dump(*blocks), layer_size=4)
+        layout = showcase.build_layout(dump(*blocks), layer_size=4, floors=False)
+        self.assertTrue(with_floors["floors"])
+        self.assertFalse(layout["floors"])
+        self.assertGreater(len(layout["layers"]), 1)
+        self.assertEqual([(l["floor_y"], l["base_y"], l["top_y"]) for l in layout["layers"]],
+                         [(l["floor_y"], l["base_y"], l["top_y"]) for l in with_floors["layers"]])
+        output = list(showcase.commands(layout))
+        self.assertFalse(any("grass_block" in line for line in output))
+        self.assertTrue(any("grass_block" in line for line in showcase.commands(with_floors)))
+        self.assertIn("Floors under upper layers: off", showcase.summary(layout, [], len(output)))
+        seen_upper = False
+        for layer in layout["layers"]:
+            for group in layer["groups"]:
+                for cell in group["cells"]:
+                    if cell["kind"] != "fluid":
+                        continue
+                    x, y, z = cell["position"]
+                    placements = list(showcase.cell_blocks(cell, showcase.bottom_glass(layout, layer)))
+                    bottom = ([x + 1, y - 1, z + 1], "minecraft:glass")
+                    if layer["index"] == 1:
+                        self.assertEqual(placements, list(showcase.cell_blocks(cell)))
+                        self.assertNotIn(bottom, placements)
+                    else:
+                        seen_upper = True
+                        self.assertIn(bottom, placements)
+                        self.assertIn(f"setblock {x + 1} {y - 1} {z + 1} minecraft:glass strict", output)
+        self.assertTrue(seen_upper)
+
+    def test_layout_without_floors_key_means_floors(self):
+        layout = showcase.build_layout(dump(block("stone_cube")))
+        del layout["floors"]
+        self.assertTrue(showcase.has_floors(layout))
+
     def test_nonfluid_level_property_does_not_make_glass_cell(self):
         layout = showcase.build_layout(dump(block("icicle_cauldron", [{"level": "1"}, {"level": "2"}])))
         for cell in all_cells(layout):

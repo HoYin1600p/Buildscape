@@ -32,6 +32,12 @@ python -B scripts/showcase/build_showcase.py common/build/showcase/blockstates.j
   --include-waterlogged --include-lava-logged
 ```
 
+Add `--no-floors` to build the upper layers without the grass floor beneath them.
+Layer positions are unchanged (only the floor blocks disappear), each fluid cell above
+layer 1 gets a glass block under its fluid so it stays sealed, and layer 1 still uses
+the real ground. The layout records `"floors": false` and `apply_to_world.py` honours
+it; layouts without the key are treated as having floors.
+
 Both logged-state flags default off. `--layer-size` must be 4..200. The default
 ground top is y=-61, so the first layer's blocks sit at y=-60. Use a fresh output
 directory for each generation: existing command chunks are rejected to prevent

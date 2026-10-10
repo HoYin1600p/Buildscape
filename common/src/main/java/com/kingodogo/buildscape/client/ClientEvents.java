@@ -77,6 +77,7 @@ public class ClientEvents {
     public static void renderLevel(com.mojang.blaze3d.vertex.PoseStack poseStack, net.minecraft.client.Camera camera, Object bufferSource) {
         InvisibleFrameOverlayRenderer.renderOverlay(poseStack, camera, bufferSource);
         MuffBlockRenderer.renderMuffOutlines(poseStack, camera, bufferSource);
+        PillarMarkerRenderer.renderPillarMarkers(poseStack, camera, bufferSource);
     }
 
     public static boolean renderBlockHighlight(com.mojang.blaze3d.vertex.PoseStack poseStack, net.minecraft.client.Camera camera, Object bufferSource, net.minecraft.world.phys.HitResult target) {

@@ -18,6 +18,7 @@ public class MobPillarRenderer {
 
     private static final Map<String, Entity> entityCache = new ConcurrentHashMap<>();
     private static final Map<Integer, MobState> lastAppliedStates = new ConcurrentHashMap<>();
+    private static final Map<String, ItemStack> cachedEggs = new ConcurrentHashMap<>();
     private static final Map<String, Integer> DYE_COLORS = new HashMap<>();
 
     static {
@@ -62,7 +63,13 @@ public class MobPillarRenderer {
         String cacheKey = pos.getX() + "," + pos.getY() + "," + pos.getZ() + ":" + (itemId != null ? itemId.toString() : "");
 
         Entity entity = entityCache.get(cacheKey);
-        if (entity == null || !entity.isAlive()) {
+        boolean canBecomeGiant = itemId != null && java.util.Set.of("zombie_spawn_egg", "husk_spawn_egg", "drowned_spawn_egg")
+                .contains(itemId.getPath());
+        boolean wrongDisplayType = entity != null && canBecomeGiant
+                && "giant".equals(Services.PLATFORM.getEntityTypeId(entity.getType()).getPath()) != state.parsedStates.contains("giant");
+        ItemStack cachedEgg = cachedEggs.get(cacheKey);
+        boolean changedEgg = cachedEgg == null || !ItemStack.matches(cachedEgg, spawnEggStack);
+        if (entity == null || !entity.isAlive() || Services.PLATFORM.getEntityLevel(entity) != level || wrongDisplayType || changedEgg) {
             if (entity != null) {
                 entity.discard();
                 lastAppliedStates.remove(entity.getId());
@@ -71,6 +78,7 @@ public class MobPillarRenderer {
             entity = Services.PLATFORM.createMobPillarEntity(spawnEggStack, level, pos, state);
             if (entity != null) {
                 entityCache.put(cacheKey, entity);
+                cachedEggs.put(cacheKey, spawnEggStack.copy());
             }
         }
 
@@ -260,6 +268,7 @@ public class MobPillarRenderer {
             }
             return false;
         });
+        cachedEggs.keySet().removeIf(key -> key.startsWith(pos.getX() + "," + pos.getY() + "," + pos.getZ() + ":"));
     }
 
     public static void clearAllEntityCaches() {
@@ -269,6 +278,7 @@ public class MobPillarRenderer {
             }
         });
         entityCache.clear();
+        cachedEggs.clear();
         lastAppliedStates.clear();
     }
 
@@ -281,5 +291,6 @@ public class MobPillarRenderer {
             }
             return isStale;
         });
+        cachedEggs.keySet().removeIf(key -> !entityCache.containsKey(key));
     }
 }

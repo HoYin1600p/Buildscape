@@ -46,7 +46,7 @@ public final class RenderFactory {
         registerHelper(target, ModBlockEntities.TRAPPED_DECORATED_POT_TYPE, com.kingodogo.buildscape.client.renderer.TrappedDecoratedPotBlockEntityRenderer::render, 64);
         registerHelper(target, ModBlockEntities.ICICLE_CAULDRON_TYPE, com.kingodogo.buildscape.client.renderer.IcicleCauldronBlockEntityRenderer::render, 64);
         registerHelper(target, ModBlockEntities.FESTIVE_STOCKING_TYPE, com.kingodogo.buildscape.client.renderer.FestiveStockingBlockEntityRenderer::render, 64);
-        registerHelper(target, ModBlockEntities.GLASS_JAR_TYPE, com.kingodogo.buildscape.client.renderer.GlassJarBlockEntityRenderer::render, 64);
+        target.register(ModBlockEntities.GLASS_JAR_TYPE, context -> new com.kingodogo.buildscape.adapter.v26x.client.GlassJarRenderer());
         registerHelper(target, ModBlockEntities.SHELF_TYPE, com.kingodogo.buildscape.client.renderer.ShelfRenderer::render, 64);
         registerHelper(target, ModBlockEntities.HOLLOW_LOG_TYPE, com.kingodogo.buildscape.client.renderer.HollowLogBlockEntityRenderer::render,
                 com.kingodogo.buildscape.client.renderer.HollowLogBlockEntityRenderer.getViewDistance());
@@ -152,11 +152,13 @@ public final class RenderFactory {
             EntityRenderer renderer = dispatcher.getRenderer(entity);
             if (renderer != null && bufferSource instanceof RenderCapture capture) {
                 var state = renderer.createRenderState(entity, partialTicks);
+                state.lightCoords = packedLight;
                 capture.record(poseStack, (pose, collector, camera) -> renderer.submit(state, pose, collector, camera));
                 return;
             }
             if (renderer != null && bufferSource instanceof net.minecraft.client.renderer.SubmitNodeCollector collector) {
                 var state = renderer.createRenderState(entity, (float) partialTicks);
+                state.lightCoords = packedLight;
                 renderer.submit(state, poseStack, collector, null);
             }
         } catch (Throwable exception) { BuildscapeCommon.LOGGER.warn("Failed to render Buildscape entity", exception); }

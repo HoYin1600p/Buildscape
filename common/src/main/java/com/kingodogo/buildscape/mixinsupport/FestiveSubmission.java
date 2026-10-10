@@ -48,6 +48,10 @@ public final class FestiveSubmission {
 
     public static synchronized RenderType currentGlint(RenderType original) {
         if (!FestiveGlintHandler.isCurrentFestive()) return original;
+        return festiveGlint(original);
+    }
+
+    public static synchronized RenderType festiveGlint(RenderType original) {
         if (original != RenderTypes.glint() && original != RenderTypes.glintTranslucent()
                 && original != RenderTypes.entityGlint() && original != RenderTypes.armorEntityGlint()) return original;
         return TYPES.computeIfAbsent(original, FestiveSubmission::copyGlint);

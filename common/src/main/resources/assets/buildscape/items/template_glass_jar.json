@@ -1,6 +1,9 @@
 {
-  "model": {
-    "type": "minecraft:model",
-    "model": "buildscape:block/glass_jar"
-  }
+    "model":  {
+                  "type":  "minecraft:special",
+                  "base":  "buildscape:item/template_glass_jar",
+                  "model":  {
+                                "type":  "buildscape:glass_jar"
+                            }
+              }
 }

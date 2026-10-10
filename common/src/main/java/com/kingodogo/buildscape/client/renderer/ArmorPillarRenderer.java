@@ -55,7 +55,7 @@ public class ArmorPillarRenderer {
 
         if (stackChanged) {
             updateArmorStandState(armorStand, itemStack, slot, isStandItem);
-            lastRenderedStacks.put(pos, itemStack);
+            lastRenderedStacks.put(pos, itemStack.copy());
         }
 
         poseStack.pushPose();

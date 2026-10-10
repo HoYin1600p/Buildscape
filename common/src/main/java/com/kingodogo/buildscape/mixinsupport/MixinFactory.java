@@ -33,6 +33,10 @@ import java.util.function.Consumer;
 
 public final class MixinFactory {
 
+    public static void renderFilterPlaceholder(AbstractContainerMenu menu, Slot slot, Object graphics) {
+        INSTANCE.renderFilterPlaceholder(menu, slot, graphics);
+    }
+
     private static final IMixinFactory INSTANCE = loadFactory();
 
     private MixinFactory() {}

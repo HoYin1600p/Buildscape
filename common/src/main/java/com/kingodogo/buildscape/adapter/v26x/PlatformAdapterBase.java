@@ -84,84 +84,32 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
     @Override public boolean isReplaceable(net.minecraft.world.level.block.state.BlockState state) { return state.canBeReplaced(); }
     @Override public boolean isGlassBlock(net.minecraft.world.level.block.Block block) { return block == net.minecraft.world.level.block.Blocks.GLASS || block instanceof net.minecraft.world.level.block.StainedGlassBlock || block instanceof net.minecraft.world.level.block.TintedGlassBlock; }
     @Override
-    public net.minecraft.world.level.block.RenderShape getEntityBlockRenderShape() { return net.minecraft.world.level.block.RenderShape.MODEL; }
-    @Override
-    public int getClientParticleSetting() {
-        return net.minecraft.client.Minecraft.getInstance().options.particles().get().ordinal();
-    }
+    public net.minecraft.world.level.block.RenderShape getEntityBlockRenderShape() { return net.minecraft.world.level.block.RenderShape.INVISIBLE; }
+    @Override public int getClientParticleSetting() { return com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.getClientParticleSetting(); }
 
-    @Override
-    public Player getClientPlayer() {
-        return (net.minecraft.world.entity.player.Player) (Object) net.minecraft.client.Minecraft.getInstance().player;
-    }
+    @Override public Player getClientPlayer() { return com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.getClientPlayer(); }
 
-    @Override
-    public boolean hasShiftDown() {
-        return net.minecraft.client.Minecraft.getInstance().hasShiftDown();
-    }
+    @Override public boolean hasShiftDown() { return com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.hasShiftDown(); }
 
-    @Override
-    public boolean hasControlDown() {
-        return net.minecraft.client.Minecraft.getInstance().hasControlDown();
-    }
+    @Override public boolean hasControlDown() { return com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.hasControlDown(); }
 
-    private static net.minecraft.client.input.MouseButtonEvent mouseEvent(double mouseX, double mouseY, int button) {
-        return new net.minecraft.client.input.MouseButtonEvent(mouseX, mouseY,
-                new net.minecraft.client.input.MouseButtonInfo(button, 0));
-    }
 
-    @Override
-    public boolean widgetMouseClicked(net.minecraft.client.gui.components.AbstractWidget widget, double mouseX, double mouseY, int button) {
-        return widget != null && widget.mouseClicked(mouseEvent(mouseX, mouseY, button), false);
-    }
 
-    @Override
-    public boolean widgetKeyPressed(net.minecraft.client.gui.components.AbstractWidget widget, int keyCode, int scanCode, int modifiers) {
-        return widget != null && widget.keyPressed(new net.minecraft.client.input.KeyEvent(keyCode, scanCode, modifiers));
-    }
+    @Override public boolean widgetMouseClicked(net.minecraft.client.gui.components.AbstractWidget widget, double mouseX, double mouseY, int button) { return com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.widgetMouseClicked(widget, mouseX, mouseY, button); }
 
-    @Override
-    public boolean widgetCharTyped(net.minecraft.client.gui.components.AbstractWidget widget, char codePoint, int modifiers) {
-        return widget != null && widget.charTyped(new net.minecraft.client.input.CharacterEvent(codePoint));
-    }
+    @Override public boolean widgetKeyPressed(net.minecraft.client.gui.components.AbstractWidget widget, int keyCode, int scanCode, int modifiers) { return com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.widgetKeyPressed(widget, keyCode, scanCode, modifiers); }
 
-    @Override
-    public void setEditBoxFilter(net.minecraft.client.gui.components.EditBox editBox, java.util.function.Predicate<String> filter) {
-        editBox.setResponder(value -> {
-            if (!filter.test(value)) {
-                StringBuilder accepted = new StringBuilder(value.length());
-                for (int i = 0; i < value.length(); i++) {
-                    String candidate = accepted.toString() + value.charAt(i);
-                    if (filter.test(candidate)) accepted.append(value.charAt(i));
-                }
-                if (!accepted.toString().equals(value)) editBox.setValue(accepted.toString());
-            }
-        });
-    }
+    @Override public boolean widgetCharTyped(net.minecraft.client.gui.components.AbstractWidget widget, char codePoint, int modifiers) { return com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.widgetCharTyped(widget, codePoint, modifiers); }
 
-    @Override
-    public void enableScissor(Object graphics, int x, int y, int width, int height) {
-        if (graphics instanceof net.minecraft.client.gui.GuiGraphicsExtractor extractor) {
-            extractor.enableScissor(x, y, x + width, y + height);
-        }
-    }
+    @Override public void setEditBoxFilter(net.minecraft.client.gui.components.EditBox editBox, java.util.function.Predicate<String> filter) { com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.setEditBoxFilter(editBox, filter); }
 
-    @Override
-    public void disableScissor(Object graphics) {
-        if (graphics instanceof net.minecraft.client.gui.GuiGraphicsExtractor extractor) extractor.disableScissor();
-    }
+    @Override public void enableScissor(Object graphics, int x, int y, int width, int height) { com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.enableScissor(graphics, x, y, width, height); }
 
-    @Override
-    public CommonId registerDynamicTexture(String name, net.minecraft.client.renderer.texture.DynamicTexture texture) {
-        net.minecraft.resources.Identifier id = net.minecraft.resources.Identifier.fromNamespaceAndPath("buildscape", name);
-        net.minecraft.client.Minecraft.getInstance().getTextureManager().register(id, (net.minecraft.client.renderer.texture.AbstractTexture) (Object) texture);
-        return CommonId.of(id.getNamespace(), id.getPath());
-    }
+    @Override public void disableScissor(Object graphics) { com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.disableScissor(graphics); }
 
-    @Override
-    public net.minecraft.client.renderer.texture.DynamicTexture createDynamicTexture(String name, int width, int height, boolean clear) {
-        return new net.minecraft.client.renderer.texture.DynamicTexture(name, width, height, clear);
-    }
+    @Override public CommonId registerDynamicTexture(String name, net.minecraft.client.renderer.texture.DynamicTexture texture) { return com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.registerDynamicTexture(name, texture); }
+
+    @Override public net.minecraft.client.renderer.texture.DynamicTexture createDynamicTexture(String name, int width, int height, boolean clear) { return com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.createDynamicTexture(name, width, height, clear); }
 
     @Override
     @SuppressWarnings("unchecked")
@@ -170,54 +118,21 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
     }
 
     @Override public Iterable<net.minecraft.world.item.ItemStack> getInventoryItems(net.minecraft.world.entity.player.Inventory inventory) { return inventory.getNonEquipmentItems(); }
-    @Override
-    public boolean hasPlayerPermissions(net.minecraft.world.entity.player.Player player, int level) {
-        if (!(player instanceof net.minecraft.client.player.LocalPlayer)) return false;
-        net.minecraft.server.permissions.Permission permission = switch (Math.max(0, Math.min(4, level))) {
-            case 0 -> null;
-            case 1 -> net.minecraft.server.permissions.Permissions.COMMANDS_MODERATOR;
-            case 2 -> net.minecraft.server.permissions.Permissions.COMMANDS_GAMEMASTER;
-            case 3 -> net.minecraft.server.permissions.Permissions.COMMANDS_ADMIN;
-            default -> net.minecraft.server.permissions.Permissions.COMMANDS_OWNER;
-        };
-        return permission == null || ((net.minecraft.client.player.LocalPlayer) player).permissions().hasPermission(permission);
-    }
-    @Override public void openScreen(net.minecraft.client.gui.screens.Screen screen) { net.minecraft.client.Minecraft.getInstance().setScreenAndShow(screen); }
+    @Override public boolean hasPlayerPermissions(net.minecraft.world.entity.player.Player player, int level) { return com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.hasPlayerPermissions(player, level); }
+    @Override public void openScreen(net.minecraft.client.gui.screens.Screen screen) { com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.openScreen(screen); }
     @Override public void openUri(java.net.URI uri) { net.minecraft.util.Util.getPlatform().openUri(uri); }
     @Override public void setNativeImagePixel(com.mojang.blaze3d.platform.NativeImage image, int x, int y, int abgr) { image.setPixelABGR(x, y, abgr); }
-    @Override public void beginGuiOverlayRender() { }
-    @Override public void endGuiOverlayRender() { }
-    @Override public void resetShaderColor() { }
-    @Override public void renderPillarMarkers(com.mojang.blaze3d.vertex.PoseStack poseStack, net.minecraft.client.Camera camera) { }
+    @Override public void beginGuiOverlayRender() { com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.beginGuiOverlayRender(); }
+    @Override public void endGuiOverlayRender() { com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.endGuiOverlayRender(); }
+    @Override public void resetShaderColor() { com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.resetShaderColor(); }
+    @Override public void renderPillarMarkers(com.mojang.blaze3d.vertex.PoseStack poseStack, net.minecraft.client.Camera camera) { com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.renderPillarMarkers(poseStack, camera); }
     @Override public float getWalkDistance(net.minecraft.world.entity.player.Player player) { return player.walkAnimation.position(); }
     @Override public boolean isWalkAnimationMoving(net.minecraft.world.entity.player.Player player) { return player.walkAnimation.isMoving(); }
-    @Override public net.minecraft.network.chat.Component parseComponentJson(String json) {
-        net.minecraft.client.Minecraft minecraft = net.minecraft.client.Minecraft.getInstance();
-        return minecraft.level == null
-                ? null
-                : net.minecraft.network.chat.ComponentSerialization.CODEC.parse(
-                        net.minecraft.resources.RegistryOps.create(
-                                com.mojang.serialization.JsonOps.INSTANCE,
-                                minecraft.level.registryAccess()),
-                        com.google.gson.JsonParser.parseString(json))
-                .result()
-                .orElse(null);
-    }
-    @Override public net.minecraft.client.KeyMapping createKeyMapping(String translationKey, int keyCode, String categoryTranslationKey) {
-        net.minecraft.client.KeyMapping.Category category = net.minecraft.client.KeyMapping.Category.register(net.minecraft.resources.Identifier.fromNamespaceAndPath("buildscape", "buildscape"));
-        return new net.minecraft.client.KeyMapping(translationKey, com.mojang.blaze3d.platform.InputConstants.Type.KEYSYM, keyCode, category);
-    }
-    @Override
-    public boolean hasCurrentUser() {
-        return net.minecraft.client.Minecraft.getInstance().getUser() != null;
-    }
+    @Override public net.minecraft.network.chat.Component parseComponentJson(String json) { return com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.parseComponentJson(json); }
+    @Override public net.minecraft.client.KeyMapping createKeyMapping(String translationKey, int keyCode, String categoryTranslationKey) { return com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.createKeyMapping(translationKey, keyCode, categoryTranslationKey); }
+    @Override public boolean hasCurrentUser() { return com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.hasCurrentUser(); }
 
-    @Override
-    public String getCurrentUserUuid() {
-        net.minecraft.client.User user = net.minecraft.client.Minecraft.getInstance().getUser();
-        java.util.UUID id = user != null ? user.getProfileId() : null;
-        return id != null ? id.toString() : null;
-    }
+    @Override public String getCurrentUserUuid() { return com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.getCurrentUserUuid(); }
 
     @Override
     public Block getBlock(CommonId id) {
@@ -471,69 +386,25 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
         poseStack.mulPose(com.mojang.math.Axis.ZP.rotationDegrees(degrees));
     }
 
-    @Override
-    public void fill(Object poseStackOrGraphics, int minX, int minY, int maxX, int maxY, int color) {
-        if (poseStackOrGraphics instanceof net.minecraft.client.gui.GuiGraphicsExtractor extractor) {
-            extractor.fill(minX, minY, maxX, maxY, color);
-        }
-    }
+    @Override public void fill(Object poseStackOrGraphics, int minX, int minY, int maxX, int maxY, int color) { com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.fill(poseStackOrGraphics, minX, minY, maxX, maxY, color); }
 
-    @Override
-    public void drawShadow(Object poseStackOrGraphics, net.minecraft.client.gui.Font font, String text, int x, int y, int color) {
-        if (poseStackOrGraphics instanceof net.minecraft.client.gui.GuiGraphicsExtractor extractor) {
-            extractor.text(font, text, x, y, color, true);
-        }
-    }
+    @Override public void drawShadow(Object poseStackOrGraphics, net.minecraft.client.gui.Font font, String text, int x, int y, int color) { com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.drawShadow(poseStackOrGraphics, font, text, x, y, color); }
 
-    @Override
-    public void draw(Object poseStackOrGraphics, net.minecraft.client.gui.Font font, String text, float x, float y, int color) {
-        if (poseStackOrGraphics instanceof net.minecraft.client.gui.GuiGraphicsExtractor extractor) {
-            extractor.text(font, text, (int) x, (int) y, color, false);
-        }
-    }
+    @Override public void draw(Object poseStackOrGraphics, net.minecraft.client.gui.Font font, String text, float x, float y, int color) { com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.draw(poseStackOrGraphics, font, text, x, y, color); }
 
-    @Override
-    public void drawCenteredString(Object poseStackOrGraphics, net.minecraft.client.gui.Font font, net.minecraft.network.chat.Component component, int x, int y, int color) {
-        if (poseStackOrGraphics instanceof net.minecraft.client.gui.GuiGraphicsExtractor extractor) {
-            String text = component.getString();
-            extractor.text(font, text, (int) (x - font.width(text) / 2), y, color, true);
-        }
-    }
+    @Override public void drawCenteredString(Object poseStackOrGraphics, net.minecraft.client.gui.Font font, net.minecraft.network.chat.Component component, int x, int y, int color) { com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.drawCenteredString(poseStackOrGraphics, font, component, x, y, color); }
 
-    @Override
-    public void drawCenteredString(Object poseStackOrGraphics, net.minecraft.client.gui.Font font, String text, int x, int y, int color) {
-        if (poseStackOrGraphics instanceof net.minecraft.client.gui.GuiGraphicsExtractor extractor) {
-            extractor.text(font, text, (int) (x - font.width(text) / 2), y, color, true);
-        }
-    }
+    @Override public void drawCenteredString(Object poseStackOrGraphics, net.minecraft.client.gui.Font font, String text, int x, int y, int color) { com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.drawCenteredString(poseStackOrGraphics, font, text, x, y, color); }
 
     @Override
     public void bindTexture(CommonId id) {
     }
 
-    @Override
-    public void blit(Object poseStackOrGraphics, CommonId texture, int x, int y, float u, float v, int width, int height, int sheetW, int sheetH) {
-        if (texture != null && poseStackOrGraphics instanceof net.minecraft.client.gui.GuiGraphicsExtractor extractor) {
-            net.minecraft.resources.Identifier id = net.minecraft.resources.Identifier.fromNamespaceAndPath(texture.getNamespace(), texture.getPath());
-            extractor.blit(id, x, y, width, height, u / sheetW, v / sheetH, (u + width) / sheetW, (v + height) / sheetH);
-        }
-    }
+    @Override public void blit(Object poseStackOrGraphics, CommonId texture, int x, int y, float u, float v, int width, int height, int sheetW, int sheetH) { com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.blit(poseStackOrGraphics, texture, x, y, u, v, width, height, sheetW, sheetH); }
 
-    @Override
-    public void blit(Object poseStackOrGraphics, CommonId texture, int x, int y, int width, int height, float u, float v, int uWidth, int vHeight, int sheetW, int sheetH) {
-        if (texture != null && poseStackOrGraphics instanceof net.minecraft.client.gui.GuiGraphicsExtractor extractor) {
-            net.minecraft.resources.Identifier id = net.minecraft.resources.Identifier.fromNamespaceAndPath(texture.getNamespace(), texture.getPath());
-            extractor.blit(id, x, y, width, height, u / sheetW, v / sheetH, (u + uWidth) / sheetW, (v + vHeight) / sheetH);
-        }
-    }
+    @Override public void blit(Object poseStackOrGraphics, CommonId texture, int x, int y, int width, int height, float u, float v, int uWidth, int vHeight, int sheetW, int sheetH) { com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.blit(poseStackOrGraphics, texture, x, y, width, height, u, v, uWidth, vHeight, sheetW, sheetH); }
 
-    @Override
-    public void renderComponentTooltip(Object poseStackOrGraphics, net.minecraft.client.gui.Font font, java.util.List<net.minecraft.network.chat.Component> components, int mouseX, int mouseY) {
-        if (poseStackOrGraphics instanceof net.minecraft.client.gui.GuiGraphicsExtractor extractor
-                && components != null && !components.isEmpty()) {
-            extractor.setComponentTooltipForNextFrame(font, components, mouseX, mouseY);
-        }
-    }
+    @Override public void renderComponentTooltip(Object poseStackOrGraphics, net.minecraft.client.gui.Font font, java.util.List<net.minecraft.network.chat.Component> components, int mouseX, int mouseY) { com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.renderComponentTooltip(poseStackOrGraphics, font, components, mouseX, mouseY); }
 
     @Override
     public void registerWorldGen() {
@@ -618,36 +489,17 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
     public void registerConfiguredFeature(CommonId id, Object configuredFeature) {
     }
 
-    @Override
-    public com.mojang.blaze3d.vertex.PoseStack toPoseStack(Object poseStackOrGraphics) {
-        return com.kingodogo.buildscape.adapter.v26x.GuiProvider.toPoseStack(poseStackOrGraphics);
-    }
+    @Override public com.mojang.blaze3d.vertex.PoseStack toPoseStack(Object poseStackOrGraphics) { return com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.toPoseStack(poseStackOrGraphics); }
 
-    @Override public void pushGuiPose(Object context) {
-        if (context instanceof net.minecraft.client.gui.GuiGraphicsExtractor extractor) extractor.pose().pushMatrix();
-        else if (context instanceof com.mojang.blaze3d.vertex.PoseStack pose) pose.pushPose();
-    }
-    @Override public void popGuiPose(Object context) {
-        if (context instanceof net.minecraft.client.gui.GuiGraphicsExtractor extractor) extractor.pose().popMatrix();
-        else if (context instanceof com.mojang.blaze3d.vertex.PoseStack pose) pose.popPose();
-    }
-    @Override public void translateGuiPose(Object context, float x, float y, float z) {
-        if (context instanceof net.minecraft.client.gui.GuiGraphicsExtractor extractor) {
-            extractor.pose().translate(x, y);
-            if (z > 0.0f) extractor.nextStratum();
-        } else if (context instanceof com.mojang.blaze3d.vertex.PoseStack pose) pose.translate(x, y, z);
-    }
-    @Override public void scaleGuiPose(Object context, float x, float y) {
-        if (context instanceof net.minecraft.client.gui.GuiGraphicsExtractor extractor) extractor.pose().scale(x, y);
-        else if (context instanceof com.mojang.blaze3d.vertex.PoseStack pose) pose.scale(x, y, 1.0f);
-    }
+    @Override public void pushGuiPose(Object context) { com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.pushGuiPose(context); }
+    @Override public void popGuiPose(Object context) { com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.popGuiPose(context); }
+    @Override public void translateGuiPose(Object context, float x, float y, float z) { com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.translateGuiPose(context, x, y, z); }
+    @Override public void scaleGuiPose(Object context, float x, float y) { com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.scaleGuiPose(context, x, y); }
     @Override public void renderClientOverlay(Object context, int width, int height) {
+        com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.renderClientOverlay(context, width, height);
     }
 
-    @Override
-    public void renderWidget(Object poseStackOrGraphics, net.minecraft.client.gui.components.AbstractWidget widget, int mouseX, int mouseY, float partialTick) {
-        com.kingodogo.buildscape.adapter.v26x.GuiProvider.renderWidget(poseStackOrGraphics, widget, mouseX, mouseY, partialTick);
-    }
+    @Override public void renderWidget(Object poseStackOrGraphics, net.minecraft.client.gui.components.AbstractWidget widget, int mouseX, int mouseY, float partialTick) { com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.renderWidget(poseStackOrGraphics, widget, mouseX, mouseY, partialTick); }
 
     @Override
     public CommonId getEntityTypeId(net.minecraft.world.entity.EntityType<?> entityType) {
@@ -662,41 +514,19 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
 
     @Override
     public net.minecraft.world.entity.EquipmentSlot getEquipmentSlot(ItemStack stack) {
-        return null;
+        var equippable = stack.get(net.minecraft.core.component.DataComponents.EQUIPPABLE);
+        return equippable == null ? net.minecraft.world.entity.EquipmentSlot.MAINHAND : equippable.slot();
     }
 
-    @Override
-    public net.minecraft.world.phys.AABB getModelBounds(Object model) {
-        return model instanceof net.minecraft.client.renderer.item.ItemStackRenderState state
-                ? state.getModelBoundingBox() : new AABB(0, 0, 0, 1, 1, 1);
-    }
+    @Override public net.minecraft.world.phys.AABB getModelBounds(Object model) { return com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.getModelBounds(model); }
 
-    @Override
-    public void renderItemFixed(ItemStack stack, com.mojang.blaze3d.vertex.PoseStack poseStack, Object bufferSource, int combinedLight, int combinedOverlay, Object model) {
-        captureItem(stack, net.minecraft.world.item.ItemDisplayContext.FIXED, poseStack, bufferSource, combinedLight, combinedOverlay, 0);
-    }
+    @Override public void renderItemFixed(ItemStack stack, com.mojang.blaze3d.vertex.PoseStack poseStack, Object bufferSource, int combinedLight, int combinedOverlay, Object model) { com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.renderItemFixed(stack, poseStack, bufferSource, combinedLight, combinedOverlay, model); }
 
-    @Override
-    public void renderItemStatic(ItemStack stack, com.mojang.blaze3d.vertex.PoseStack poseStack, Object bufferSource, int combinedLight, int combinedOverlay, int seed) {
-        captureItem(stack, net.minecraft.world.item.ItemDisplayContext.GROUND, poseStack, bufferSource, combinedLight, combinedOverlay, seed);
-    }
+    @Override public void renderItemStatic(ItemStack stack, com.mojang.blaze3d.vertex.PoseStack poseStack, Object bufferSource, int combinedLight, int combinedOverlay, int seed) { com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.renderItemStatic(stack, poseStack, bufferSource, combinedLight, combinedOverlay, seed); }
 
-    private static void captureItem(ItemStack stack, net.minecraft.world.item.ItemDisplayContext context,
-            com.mojang.blaze3d.vertex.PoseStack pose, Object buffer, int light, int overlay, int seed) {
-        if (!(buffer instanceof RenderCapture capture) || stack.isEmpty()) return;
-        var state = new net.minecraft.client.renderer.item.ItemStackRenderState();
-        var client = net.minecraft.client.Minecraft.getInstance();
-        client.getItemModelResolver().updateForTopItem(state, stack, context, (net.minecraft.world.level.Level) (Object) client.level, null, seed);
-        capture.record(pose, (target, collector, camera) -> state.submit(target, collector, light, overlay, 0));
-    }
 
-    @Override
-    public Object getItemModel(ItemStack stack, Level level, int seed) {
-        var state = new net.minecraft.client.renderer.item.ItemStackRenderState();
-        net.minecraft.client.Minecraft.getInstance().getItemModelResolver().updateForTopItem(
-                state, stack, net.minecraft.world.item.ItemDisplayContext.FIXED, level, null, seed);
-        return state;
-    }
+
+    @Override public Object getItemModel(ItemStack stack, Level level, int seed) { return com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.getItemModel(stack, level, seed); }
 
     @Override
     public void registerRecipeSerializers() {
@@ -2234,23 +2064,11 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
         level.playSound(null, pos, SoundEvents.ANVIL_USE, SoundSource.BLOCKS, 0.5F, 1.5F);
     }
 
-    @Override
-    public void playButtonClick() {
-        net.minecraft.client.Minecraft.getInstance().getSoundManager().play(
-                (net.minecraft.client.resources.sounds.SoundInstance) (Object) net.minecraft.client.resources.sounds.SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
-    }
+    @Override public void playButtonClick() { com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.playButtonClick(); }
 
-    @Override
-    public void playNoteBlockBell() {
-        net.minecraft.client.Minecraft.getInstance().getSoundManager().play(
-                (net.minecraft.client.resources.sounds.SoundInstance) (Object) net.minecraft.client.resources.sounds.SimpleSoundInstance.forUI(SoundEvents.NOTE_BLOCK_BELL, 1.0F));
-    }
+    @Override public void playNoteBlockBell() { com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.playNoteBlockBell(); }
 
-    @Override
-    public void playNoteBlockDidgeridoo() {
-        net.minecraft.client.Minecraft.getInstance().getSoundManager().play(
-                (net.minecraft.client.resources.sounds.SoundInstance) (Object) net.minecraft.client.resources.sounds.SimpleSoundInstance.forUI(SoundEvents.NOTE_BLOCK_DIDGERIDOO, 1.0F));
-    }
+    @Override public void playNoteBlockDidgeridoo() { com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.playNoteBlockDidgeridoo(); }
 
     @Override
     public void playVegetationStepSound(Level level, BlockPos pos, Entity entity, SoundType sounds) {
@@ -2495,42 +2313,17 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
         });
     }
 
-    @Override
-    public void renderModelPart(net.minecraft.client.model.geom.ModelPart part, com.mojang.blaze3d.vertex.PoseStack poseStack, com.mojang.blaze3d.vertex.VertexConsumer buffer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
-        if (part != null) {
-            int a = Math.round(alpha * 255.0F);
-            int r = Math.round(red * 255.0F);
-            int g = Math.round(green * 255.0F);
-            int b = Math.round(blue * 255.0F);
-            int color = (a << 24) | (r << 16) | (g << 8) | b;
-            part.render(poseStack, buffer, packedLight, packedOverlay, color);
-        }
-    }
+    @Override public void renderModelPart(net.minecraft.client.model.geom.ModelPart part, com.mojang.blaze3d.vertex.PoseStack poseStack, com.mojang.blaze3d.vertex.VertexConsumer buffer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) { com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.renderModelPart(part, poseStack, buffer, packedLight, packedOverlay, red, green, blue, alpha); }
 
-    @Override
-    public int getRenderDistanceChunks() {
-        return net.minecraft.client.Minecraft.getInstance().options.renderDistance().get();
-    }
+    @Override public int getRenderDistanceChunks() { return com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.getRenderDistanceChunks(); }
 
-    @Override
-    public void renderLineBox(com.mojang.blaze3d.vertex.PoseStack poseStack, Object bufferSource, double minX, double minY, double minZ, double maxX, double maxY, double maxZ, float r, float g, float b, float a) {
-    }
+    @Override public void renderLineBox(com.mojang.blaze3d.vertex.PoseStack poseStack, Object bufferSource, double minX, double minY, double minZ, double maxX, double maxY, double maxZ, float r, float g, float b, float a) { com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.renderLineBox(poseStack, bufferSource, minX, minY, minZ, maxX, maxY, maxZ, r, g, b, a); }
 
-    @Override
-    public boolean isScreenOpen() {
-        return net.minecraft.client.Minecraft.getInstance() != null && net.minecraft.client.Minecraft.getInstance().gui != null && net.minecraft.client.Minecraft.getInstance().gui.screen() != null;
-    }
+    @Override public boolean isScreenOpen() { return com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.isScreenOpen(); }
 
-    @Override
-    public net.minecraft.world.phys.Vec3 getCameraPosition(net.minecraft.client.Camera camera) {
-        return camera != null ? camera.position() : net.minecraft.world.phys.Vec3.ZERO;
-    }
+    @Override public net.minecraft.world.phys.Vec3 getCameraPosition(net.minecraft.client.Camera camera) { return com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.getCameraPosition(camera); }
 
-    @Override
-    public void renderFallingIcicleBlock(net.minecraft.world.level.Level level, net.minecraft.world.level.block.state.BlockState blockState, net.minecraft.core.BlockPos blockPos, net.minecraft.core.BlockPos startPos, com.mojang.blaze3d.vertex.PoseStack poseStack, Object bufferSource) {
-        renderBlockModelWithTint(blockState, blockPos, level, poseStack, bufferSource,
-                getLightColor(level, blockPos), net.minecraft.client.renderer.texture.OverlayTexture.NO_OVERLAY);
-    }
+    @Override public void renderFallingIcicleBlock(net.minecraft.world.level.Level level, net.minecraft.world.level.block.state.BlockState blockState, net.minecraft.core.BlockPos blockPos, net.minecraft.core.BlockPos startPos, com.mojang.blaze3d.vertex.PoseStack poseStack, Object bufferSource) { com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.renderFallingIcicleBlock(level, blockState, blockPos, startPos, poseStack, bufferSource); }
 
     @Override
     public int getLightColor(net.minecraft.world.level.Level level, net.minecraft.core.BlockPos pos) {
@@ -2546,309 +2339,41 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
         return stack.getItem() instanceof net.minecraft.world.item.MapItem && net.minecraft.world.item.MapItem.getSavedData(stack, level) != null;
     }
 
-    private static final net.minecraft.resources.Identifier BIRCH_PLANKS_26 = net.minecraft.resources.Identifier.parse("minecraft:textures/block/birch_planks.png");
 
-    private void renderQuadWithUV26(com.mojang.blaze3d.vertex.VertexConsumer consumer, org.joml.Matrix4f pose, com.mojang.blaze3d.vertex.PoseStack.Pose lastPose, int packedLight,
-                                     float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3, float x4, float y4, float z4,
-                                     float u1, float v1, float u2, float v2, float nx, float ny, float nz) {
-        consumer.addVertex(pose, x1, y1, z1).setColor(255, 255, 255, 255).setUv(u1, v1).setOverlay(0).setLight(packedLight).setNormal(lastPose, nx, ny, nz);
-        consumer.addVertex(pose, x2, y2, z2).setColor(255, 255, 255, 255).setUv(u2, v1).setOverlay(0).setLight(packedLight).setNormal(lastPose, nx, ny, nz);
-        consumer.addVertex(pose, x3, y3, z3).setColor(255, 255, 255, 255).setUv(u2, v2).setOverlay(0).setLight(packedLight).setNormal(lastPose, nx, ny, nz);
-        consumer.addVertex(pose, x4, y4, z4).setColor(255, 255, 255, 255).setUv(u1, v2).setOverlay(0).setLight(packedLight).setNormal(lastPose, nx, ny, nz);
-    }
 
-    private void renderBoxFaces26(com.mojang.blaze3d.vertex.VertexConsumer consumer, org.joml.Matrix4f pose, com.mojang.blaze3d.vertex.PoseStack.Pose lastPose, int packedLight,
-                                   float x1, float y1, float z1, float x2, float y2, float z2) {
-        renderQuadWithUV26(consumer, pose, lastPose, packedLight, x2, y1, z1, x1, y1, z1, x1, y2, z1, x2, y2, z1, x1, 1F - y2, x2, 1F - y1, 0, 0, -1);
-        renderQuadWithUV26(consumer, pose, lastPose, packedLight, x1, y1, z2, x2, y1, z2, x2, y2, z2, x1, y2, z2, x1, 1F - y2, x2, 1F - y1, 0, 0, 1);
-        renderQuadWithUV26(consumer, pose, lastPose, packedLight, x1, y1, z2, x2, y1, z2, x2, y1, z1, x1, y1, z1, x1, z1, x2, z2, 0, -1, 0);
-        renderQuadWithUV26(consumer, pose, lastPose, packedLight, x1, y2, z1, x2, y2, z1, x2, y2, z2, x1, y2, z2, x1, z1, x2, z2, 0, 1, 0);
-        renderQuadWithUV26(consumer, pose, lastPose, packedLight, x1, y1, z1, x1, y1, z2, x1, y2, z2, x1, y2, z1, z1, 1F - y2, z2, 1F - y1, -1, 0, 0);
-        renderQuadWithUV26(consumer, pose, lastPose, packedLight, x2, y1, z2, x2, y1, z1, x2, y2, z1, x2, y2, z2, z1, 1F - y2, z2, 1F - y1, 1, 0, 0);
-    }
 
-    @Override
-    public void renderColoredFrame(com.mojang.blaze3d.vertex.PoseStack poseStack, Object bufferSource, int packedLight, Object backTexture, boolean hasMap) {
-        if (bufferSource instanceof RenderCapture capture) {
-            CommonId texture = (CommonId) backTexture;
-            renderColoredFrame(poseStack, capture.geometry(net.minecraft.client.renderer.rendertype.RenderTypes.entityCutout(
-                    Identifier.fromNamespaceAndPath(texture.getNamespace(), texture.getPath()))), packedLight, backTexture, hasMap);
-            return;
-        }
-        if (!(bufferSource instanceof com.mojang.blaze3d.vertex.VertexConsumer consumer)) return;
-        poseStack.pushPose();
-        poseStack.translate(-0.5D, -0.5D, -0.5D);
 
-        org.joml.Matrix4f pose = poseStack.last().pose();
-        com.mojang.blaze3d.vertex.PoseStack.Pose lastPose = poseStack.last();
 
-        float backZ1 = hasMap ? 15.001F / 16F : 15.5F / 16F;
-        float backZ2 = 1.0F;
-        float frameZ1 = hasMap ? 15.001F / 16F : 15F / 16F;
-        float frameZ2 = 1.0F;
+    @Override public void renderColoredFrame(com.mojang.blaze3d.vertex.PoseStack poseStack, Object bufferSource, int packedLight, Object backTexture, boolean hasMap) { com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.renderColoredFrame(poseStack, bufferSource, packedLight, backTexture, hasMap); }
 
-        float x1 = hasMap ? 1F / 16F : 3F / 16F;
-        float x2 = hasMap ? 15F / 16F : 13F / 16F;
-        float y1 = hasMap ? 1F / 16F : 3F / 16F;
-        float y2 = hasMap ? 15F / 16F : 13F / 16F;
+    @Override public void renderColoredFrameItem(com.kingodogo.buildscape.entity.ColoredItemFrameEntity entity, net.minecraft.world.item.ItemStack itemStack, com.mojang.blaze3d.vertex.PoseStack poseStack, Object bufferSource, int packedLight, boolean isMap, boolean isInvisible) { com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.renderColoredFrameItem(entity, itemStack, poseStack, bufferSource, packedLight, isMap, isInvisible); }
 
-        renderQuadWithUV26(consumer, pose, lastPose, packedLight, x1, y1, backZ1, x2, y1, backZ1, x2, y2, backZ1, x1, y2, backZ1, x1, y2, x2, y1, 0, 0, -1);
-        renderQuadWithUV26(consumer, pose, lastPose, packedLight, x2, y1, backZ2, x1, y1, backZ2, x1, y2, backZ2, x2, y2, backZ2, x1, y2, x2, y1, 0, 0, 1);
+    @Override public void renderStockingQuad(com.mojang.blaze3d.vertex.PoseStack poseStack, Object bufferSource, int packedLight, Object texture, boolean flipped) { com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.renderStockingQuad(poseStack, bufferSource, packedLight, texture, flipped); }
 
-        if (hasMap) {
-            renderBoxFaces26(consumer, pose, lastPose, packedLight, 1F / 16F, 0F, frameZ1, 15F / 16F, 1F / 16F, frameZ2);
-            renderBoxFaces26(consumer, pose, lastPose, packedLight, 1F / 16F, 15F / 16F, frameZ1, 15F / 16F, 1F, frameZ2);
-            renderBoxFaces26(consumer, pose, lastPose, packedLight, 0F, 0F, frameZ1, 1F / 16F, 1F, frameZ2);
-            renderBoxFaces26(consumer, pose, lastPose, packedLight, 15F / 16F, 0F, frameZ1, 1F, 1F, frameZ2);
-        } else {
-            renderBoxFaces26(consumer, pose, lastPose, packedLight, 3F / 16F, 2F / 16F, frameZ1, 13F / 16F, 3F / 16F, frameZ2);
-            renderBoxFaces26(consumer, pose, lastPose, packedLight, 3F / 16F, 13F / 16F, frameZ1, 13F / 16F, 14F / 16F, frameZ2);
-            renderBoxFaces26(consumer, pose, lastPose, packedLight, 2F / 16F, 2F / 16F, frameZ1, 3F / 16F, 14F / 16F, frameZ2);
-            renderBoxFaces26(consumer, pose, lastPose, packedLight, 13F / 16F, 2F / 16F, frameZ1, 14F / 16F, 14F / 16F, frameZ2);
-        }
-        poseStack.popPose();
-    }
+    @Override public void renderBlockModel(net.minecraft.world.level.block.state.BlockState blockState, com.mojang.blaze3d.vertex.PoseStack poseStack, Object bufferSource, int light, int overlay) { com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.renderBlockModel(blockState, poseStack, bufferSource, light, overlay); }
 
-    @Override
-    public void renderColoredFrameItem(com.kingodogo.buildscape.entity.ColoredItemFrameEntity entity, net.minecraft.world.item.ItemStack itemStack, com.mojang.blaze3d.vertex.PoseStack poseStack, Object bufferSource, int packedLight, boolean isMap, boolean isInvisible) {
-        if (!(bufferSource instanceof RenderCapture capture)) return;
-        poseStack.pushPose();
-        try {
-            poseStack.translate(0, 0, isInvisible ? 0.5 : 0.4375);
-            int rotation = entity.getRotation();
-            poseStack.mulPose(com.mojang.math.Axis.ZP.rotationDegrees((isMap ? rotation % 4 * 2 : rotation) * 45.0F));
-            if (isMap) {
-                var data = net.minecraft.world.item.MapItem.getSavedData(itemStack, (net.minecraft.world.level.Level) (Object) net.minecraft.client.Minecraft.getInstance().level);
-                var id = itemStack.get(net.minecraft.core.component.DataComponents.MAP_ID);
-                if (data != null && id != null) {
-                    var map = new net.minecraft.client.renderer.state.MapRenderState();
-                    var renderer = net.minecraft.client.Minecraft.getInstance().getMapRenderer();
-                    renderer.extractRenderState(id, data, map);
-                    poseStack.mulPose(com.mojang.math.Axis.ZP.rotationDegrees(180));
-                    poseStack.scale(1.0F / 128, 1.0F / 128, 1.0F / 128);
-                    poseStack.translate(-64, -64, 0);
-                    capture.record(poseStack, (target, collector, camera) -> renderer.render(map, target, collector, true, packedLight));
-                }
-            } else {
-                poseStack.scale(0.5F, 0.5F, 0.5F);
-                captureItem(itemStack, net.minecraft.world.item.ItemDisplayContext.FIXED, poseStack, bufferSource,
-                        packedLight, net.minecraft.client.renderer.texture.OverlayTexture.NO_OVERLAY, 0);
-            }
-        } finally {
-            poseStack.popPose();
-        }
-    }
+    @Override public void renderBlockModelWithTint(net.minecraft.world.level.block.state.BlockState state, net.minecraft.core.BlockPos pos, net.minecraft.world.level.Level level, com.mojang.blaze3d.vertex.PoseStack poseStack, Object bufferSource, int light, int overlay) { com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.renderBlockModelWithTint(state, pos, level, poseStack, bufferSource, light, overlay); }
 
-    @Override
-    public void renderStockingQuad(com.mojang.blaze3d.vertex.PoseStack poseStack, Object bufferSource, int packedLight, Object texture, boolean flipped) {
-        if (bufferSource instanceof RenderCapture capture) {
-            CommonId id = (CommonId) texture;
-            renderStockingQuad(poseStack, capture.geometry(net.minecraft.client.renderer.rendertype.RenderTypes.entityCutout(
-                    Identifier.fromNamespaceAndPath(id.getNamespace(), id.getPath()))), packedLight, texture, flipped);
-            return;
-        }
-        if (bufferSource instanceof com.mojang.blaze3d.vertex.VertexConsumer vertexConsumer) {
-            float width = 0.5F;
-            float height = 0.5F;
-            float uMin = flipped ? 1.0F : 0.0F;
-            float uMax = flipped ? 0.0F : 1.0F;
-            float vMin = 0.0F;
-            float vMax = 1.0F;
-
-            org.joml.Matrix4f pose = poseStack.last().pose();
-            com.mojang.blaze3d.vertex.PoseStack.Pose lastPose = poseStack.last();
-
-            vertexConsumer.addVertex(pose, -width, -height, 0.0F).setColor(255, 255, 255, 255).setUv(uMin, vMax).setOverlay(0).setLight(packedLight).setNormal(lastPose, 0.0F, 0.0F, 1.0F);
-            vertexConsumer.addVertex(pose, width, -height, 0.0F).setColor(255, 255, 255, 255).setUv(uMax, vMax).setOverlay(0).setLight(packedLight).setNormal(lastPose, 0.0F, 0.0F, 1.0F);
-            vertexConsumer.addVertex(pose, width, height, 0.0F).setColor(255, 255, 255, 255).setUv(uMax, vMin).setOverlay(0).setLight(packedLight).setNormal(lastPose, 0.0F, 0.0F, 1.0F);
-            vertexConsumer.addVertex(pose, -width, height, 0.0F).setColor(255, 255, 255, 255).setUv(uMin, vMin).setOverlay(0).setLight(packedLight).setNormal(lastPose, 0.0F, 0.0F, 1.0F);
-        }
-    }
-
-    @Override
-    public void renderBlockModel(net.minecraft.world.level.block.state.BlockState blockState, com.mojang.blaze3d.vertex.PoseStack poseStack, Object bufferSource, int light, int overlay) {
-        renderBlockModelWithTint(blockState, null, null, poseStack, bufferSource, light, overlay);
-    }
-
-    @Override
-    public void renderBlockModelWithTint(net.minecraft.world.level.block.state.BlockState state, net.minecraft.core.BlockPos pos, net.minecraft.world.level.Level level, com.mojang.blaze3d.vertex.PoseStack poseStack, Object bufferSource, int light, int overlay) {
-        if (!(bufferSource instanceof RenderCapture capture) || state.isAir()) return;
-        var client = net.minecraft.client.Minecraft.getInstance();
-        var model = new net.minecraft.client.renderer.block.BlockModelRenderState();
-        new net.minecraft.client.renderer.block.BlockModelResolver(client.getModelManager()).update(
-                model, state, net.minecraft.client.renderer.block.model.BlockDisplayContext.create());
-        var tints = model.tintLayers();
-        tints.clear();
-        var view = new net.minecraft.client.renderer.block.MovingBlockRenderState();
-        if (level != null && pos != null) {
-            view.blockState = state;
-            view.blockPos = pos;
-            view.randomSeedPos = pos;
-            view.biome = level.getBiome(pos);
-        }
-        for (var source : client.getBlockColors().getTintSources(state)) {
-            tints.add(level != null && pos != null ? source.colorInWorld(state, (net.minecraft.client.renderer.block.BlockAndTintGetter) (Object) view, pos) : source.color(state));
-        }
-        capture.record(poseStack, (target, collector, camera) -> model.submit(target, collector, light, overlay, 0));
-    }
-
-    @Override
-    public void renderColoredQuad(com.mojang.blaze3d.vertex.PoseStack poseStack, Object buffer,
+    @Override public void renderColoredQuad(com.mojang.blaze3d.vertex.PoseStack poseStack, Object buffer,
                                   float x0, float y0, float z0, float u0, float v0,
                                   float x1, float y1, float z1, float u1, float v1,
                                   float x2, float y2, float z2, float u2, float v2,
                                   float x3, float y3, float z3, float u3, float v3,
                                   float r, float g, float b, float a,
                                   int light, int overlay,
-                                  float nx, float ny, float nz) {
-        if (buffer instanceof RenderCapture capture) buffer = capture.translucent();
-        if (!(buffer instanceof com.mojang.blaze3d.vertex.VertexConsumer vc)) return;
-        org.joml.Matrix4f matrix = poseStack.last().pose();
-        com.mojang.blaze3d.vertex.PoseStack.Pose lastPose = poseStack.last();
-        vc.addVertex(matrix, x0, y0, z0).setColor(r, g, b, a).setUv(u0, v0).setOverlay(overlay).setLight(light).setNormal(lastPose, nx, ny, nz);
-        vc.addVertex(matrix, x1, y1, z1).setColor(r, g, b, a).setUv(u1, v1).setOverlay(overlay).setLight(light).setNormal(lastPose, nx, ny, nz);
-        vc.addVertex(matrix, x2, y2, z2).setColor(r, g, b, a).setUv(u2, v2).setOverlay(overlay).setLight(light).setNormal(lastPose, nx, ny, nz);
-        vc.addVertex(matrix, x3, y3, z3).setColor(r, g, b, a).setUv(u3, v3).setOverlay(overlay).setLight(light).setNormal(lastPose, nx, ny, nz);
-        if (ny > 0) {
-            vc.addVertex(matrix, x3, y3, z3).setColor(r, g, b, a).setUv(u3, v3).setOverlay(overlay).setLight(light).setNormal(lastPose, -nx, -ny, -nz);
-            vc.addVertex(matrix, x2, y2, z2).setColor(r, g, b, a).setUv(u2, v2).setOverlay(overlay).setLight(light).setNormal(lastPose, -nx, -ny, -nz);
-            vc.addVertex(matrix, x1, y1, z1).setColor(r, g, b, a).setUv(u1, v1).setOverlay(overlay).setLight(light).setNormal(lastPose, -nx, -ny, -nz);
-            vc.addVertex(matrix, x0, y0, z0).setColor(r, g, b, a).setUv(u0, v0).setOverlay(overlay).setLight(light).setNormal(lastPose, -nx, -ny, -nz);
-        }
-    }
+                                  float nx, float ny, float nz) { com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.renderColoredQuad(poseStack, buffer, x0, y0, z0, u0, v0, x1, y1, z1, u1, v1, x2, y2, z2, u2, v2, x3, y3, z3, u3, v3, r, g, b, a, light, overlay, nx, ny, nz); }
 
-    @Override
-    public void renderJarFluid(com.kingodogo.buildscape.block.GlassJarBlockEntity blockEntity, com.mojang.blaze3d.vertex.PoseStack poseStack, Object bufferSource, int light, int overlay) {
-        if (bufferSource instanceof RenderCapture capture) bufferSource = capture.translucent();
-        if (!(bufferSource instanceof com.mojang.blaze3d.vertex.VertexConsumer vc)) return;
-        net.minecraft.world.item.ItemStack liquidItem = blockEntity.getStoredLiquidItem();
-        int level = blockEntity.getLiquidLevel();
-        if (liquidItem == null || liquidItem.isEmpty() || level <= 0) return;
+    @Override public void renderJarFluid(com.kingodogo.buildscape.block.GlassJarBlockEntity blockEntity, com.mojang.blaze3d.vertex.PoseStack poseStack, Object bufferSource, int light, int overlay) { com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.renderJarFluid(blockEntity, poseStack, bufferSource, light, overlay); }
 
-        int color = 0xFF3F76E4;
-        if (com.kingodogo.buildscape.block.GlassJarBlockEntity.isXpLiquid(liquidItem)) {
-            color = 0xFFFFFFFF;
-        } else if (liquidItem.is(net.minecraft.world.item.Items.MILK_BUCKET) || liquidItem.is(net.minecraft.world.item.Items.LAVA_BUCKET)) {
-            color = 0xFFFFFFFF;
-        }
+    @Override public void renderGlassJar(com.kingodogo.buildscape.block.GlassJarBlockEntity blockEntity, float partialTicks, com.mojang.blaze3d.vertex.PoseStack poseStack, Object bufferSource, int combinedLight, int combinedOverlay) { com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.renderGlassJar(blockEntity, partialTicks, poseStack, bufferSource, combinedLight, combinedOverlay); }
 
-        int maxLevel = com.kingodogo.buildscape.block.GlassJarBlockEntity.isXpLiquid(liquidItem) ? com.kingodogo.buildscape.block.GlassJarBlockEntity.XP_BOTTLE_MAX : 16;
-        float fillRatio = Math.min(maxLevel, level) / (float) maxLevel;
-        float y1 = 0.07F;
-        float y2 = y1 + (fillRatio * 0.65F);
-        float x1 = 0.27F, x2 = 0.73F, z1 = 0.27F, z2 = 0.73F;
+    @Override public void renderWobblyBlock(net.minecraft.world.level.block.state.BlockState state, long currentTick, long wobbleStartTick, boolean hasWobble, float partialTicks, com.mojang.blaze3d.vertex.PoseStack poseStack, Object bufferSource, int light, int overlay) { com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.renderWobblyBlock(state, currentTick, wobbleStartTick, hasWobble, partialTicks, poseStack, bufferSource, light, overlay); }
 
-        float r = ((color >> 16) & 0xFF) / 255.0F;
-        float g = ((color >> 8) & 0xFF) / 255.0F;
-        float b = (color & 0xFF) / 255.0F;
-        float a = ((color >> 24) & 0xFF) / 255.0F;
-        if (a == 0.0F) a = 0.88F;
+    @Override public void renderCopperChest(com.kingodogo.buildscape.block.CopperChestBlockEntity blockEntity, float partialTicks, com.mojang.blaze3d.vertex.PoseStack poseStack, Object bufferSource, int combinedLight, int combinedOverlay) { com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.renderCopperChest(blockEntity, partialTicks, poseStack, bufferSource, combinedLight, combinedOverlay); }
 
-        String spriteId = com.kingodogo.buildscape.block.GlassJarBlockEntity.isXpLiquid(liquidItem)
-                ? "buildscape:fluid/experience_still"
-                : liquidItem.is(net.minecraft.world.item.Items.LAVA_BUCKET) ? "minecraft:block/lava_still" : "minecraft:block/water_still";
-        var sprite = getBlockAtlasSprite(CommonId.parse(spriteId));
-        float u0 = sprite.getU(0), u1 = sprite.getU(1), v0 = sprite.getV(0), v1 = sprite.getV(1);
-        org.joml.Matrix4f matrix = poseStack.last().pose();
-        com.mojang.blaze3d.vertex.PoseStack.Pose lastPose = poseStack.last();
+    @Override public void registerMenuScreens() { com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.registerMenuScreens(); }
 
-        vc.addVertex(matrix, x1, y2, z1).setColor(r, g, b, a).setUv(u0, v0).setOverlay(overlay).setLight(light).setNormal(lastPose, 0, 1, 0);
-        vc.addVertex(matrix, x1, y2, z2).setColor(r, g, b, a).setUv(u0, v1).setOverlay(overlay).setLight(light).setNormal(lastPose, 0, 1, 0);
-        vc.addVertex(matrix, x2, y2, z2).setColor(r, g, b, a).setUv(u1, v1).setOverlay(overlay).setLight(light).setNormal(lastPose, 0, 1, 0);
-        vc.addVertex(matrix, x2, y2, z1).setColor(r, g, b, a).setUv(u1, v0).setOverlay(overlay).setLight(light).setNormal(lastPose, 0, 1, 0);
-
-        vc.addVertex(matrix, x1, y2, z1).setColor(r, g, b, a).setUv(u0, v0).setOverlay(overlay).setLight(light).setNormal(lastPose, 0, 0, -1);
-        vc.addVertex(matrix, x2, y2, z1).setColor(r, g, b, a).setUv(u1, v0).setOverlay(overlay).setLight(light).setNormal(lastPose, 0, 0, -1);
-        vc.addVertex(matrix, x2, y1, z1).setColor(r, g, b, a).setUv(u1, v1).setOverlay(overlay).setLight(light).setNormal(lastPose, 0, 0, -1);
-        vc.addVertex(matrix, x1, y1, z1).setColor(r, g, b, a).setUv(u0, v1).setOverlay(overlay).setLight(light).setNormal(lastPose, 0, 0, -1);
-
-        vc.addVertex(matrix, x1, y1, z2).setColor(r, g, b, a).setUv(u0, v1).setOverlay(overlay).setLight(light).setNormal(lastPose, 0, 0, 1);
-        vc.addVertex(matrix, x2, y1, z2).setColor(r, g, b, a).setUv(u1, v1).setOverlay(overlay).setLight(light).setNormal(lastPose, 0, 0, 1);
-        vc.addVertex(matrix, x2, y2, z2).setColor(r, g, b, a).setUv(u1, v0).setOverlay(overlay).setLight(light).setNormal(lastPose, 0, 0, 1);
-        vc.addVertex(matrix, x1, y2, z2).setColor(r, g, b, a).setUv(u0, v0).setOverlay(overlay).setLight(light).setNormal(lastPose, 0, 0, 1);
-
-        vc.addVertex(matrix, x1, y1, z1).setColor(r, g, b, a).setUv(u0, v1).setOverlay(overlay).setLight(light).setNormal(lastPose, -1, 0, 0);
-        vc.addVertex(matrix, x1, y1, z2).setColor(r, g, b, a).setUv(u1, v1).setOverlay(overlay).setLight(light).setNormal(lastPose, -1, 0, 0);
-        vc.addVertex(matrix, x1, y2, z2).setColor(r, g, b, a).setUv(u1, v0).setOverlay(overlay).setLight(light).setNormal(lastPose, -1, 0, 0);
-        vc.addVertex(matrix, x1, y2, z1).setColor(r, g, b, a).setUv(u0, v0).setOverlay(overlay).setLight(light).setNormal(lastPose, -1, 0, 0);
-
-        vc.addVertex(matrix, x2, y2, z1).setColor(r, g, b, a).setUv(u0, v0).setOverlay(overlay).setLight(light).setNormal(lastPose, 1, 0, 0);
-        vc.addVertex(matrix, x2, y2, z2).setColor(r, g, b, a).setUv(u1, v0).setOverlay(overlay).setLight(light).setNormal(lastPose, 1, 0, 0);
-        vc.addVertex(matrix, x2, y1, z2).setColor(r, g, b, a).setUv(u1, v1).setOverlay(overlay).setLight(light).setNormal(lastPose, 1, 0, 0);
-        vc.addVertex(matrix, x2, y1, z1).setColor(r, g, b, a).setUv(u0, v1).setOverlay(overlay).setLight(light).setNormal(lastPose, 1, 0, 0);
-    }
-
-    @Override
-    public void renderGlassJar(com.kingodogo.buildscape.block.GlassJarBlockEntity blockEntity, float partialTicks, com.mojang.blaze3d.vertex.PoseStack poseStack, Object bufferSource, int combinedLight, int combinedOverlay) {
-        if (blockEntity == null) return;
-        net.minecraft.world.level.Level level = blockEntity.getLevel();
-        long currentTick = (level != null) ? level.getGameTime() : 0;
-        long wobbleStartTick = blockEntity.getWobbleStartedAtTick();
-
-        float wobbleProgress = 0.0F;
-        float wobbleDuration = 10.0F;
-        if (wobbleStartTick > 0) {
-            float ticksSinceWobble = (float) (currentTick - wobbleStartTick) + partialTicks;
-            if (ticksSinceWobble < wobbleDuration) {
-                wobbleProgress = ticksSinceWobble / wobbleDuration;
-            }
-        }
-
-        poseStack.pushPose();
-
-        if (wobbleProgress > 0.0F && wobbleProgress < 1.0F) {
-            float dampening = 1.0F - wobbleProgress;
-            float oscillation = (float) Math.sin(wobbleProgress * Math.PI * 6);
-            float rotationAngle = 8.0F * dampening * oscillation;
-
-            poseStack.translate(0.5D, 0.0D, 0.5D);
-            poseStack.mulPose(com.mojang.math.Axis.ZP.rotationDegrees(rotationAngle));
-            poseStack.translate(-0.5D, 0.0D, -0.5D);
-        }
-
-        if (blockEntity.hasLiquid()) {
-            renderJarFluid(blockEntity, poseStack, bufferSource, combinedLight, combinedOverlay);
-        }
-
-        poseStack.popPose();
-    }
-
-    @Override
-    public void renderWobblyBlock(net.minecraft.world.level.block.state.BlockState state, long currentTick, long wobbleStartTick, boolean hasWobble, float partialTicks, com.mojang.blaze3d.vertex.PoseStack poseStack, Object bufferSource, int light, int overlay) {
-        poseStack.pushPose();
-        if (hasWobble && wobbleStartTick > 0) {
-            float ticksSinceWobble = (float) (currentTick - wobbleStartTick) + partialTicks;
-            if (ticksSinceWobble < 10.0F) {
-                float wobbleProgress = ticksSinceWobble / 10.0F;
-                float dampening = 1.0F - wobbleProgress;
-                float oscillation = (float) Math.sin(wobbleProgress * Math.PI * 6);
-                float rotationAngle = 8.0F * dampening * oscillation;
-
-                poseStack.translate(0.5D, 0.0D, 0.5D);
-                poseStack.mulPose(com.mojang.math.Axis.YP.rotationDegrees(rotationAngle));
-                poseStack.translate(-0.5D, 0.0D, -0.5D);
-            }
-        }
-        renderBlockModel(state, poseStack, bufferSource, light, overlay);
-        poseStack.popPose();
-    }
-
-    @Override
-    public void renderCopperChest(com.kingodogo.buildscape.block.CopperChestBlockEntity blockEntity, float partialTicks, com.mojang.blaze3d.vertex.PoseStack poseStack, Object bufferSource, int combinedLight, int combinedOverlay) {
-    }
-
-    @Override
-    public void registerMenuScreens() {
-        if (!isClient()) return;
-        com.kingodogo.buildscape.adapter.v26x.GuiProvider.registerMenuScreens();
-        registerRenderers();
-    }
-
-    @Override
-    public void registerRenderers() {
-        if (!isClient()) return;
-        RenderFactory.registerRenderers();
-    }
+    @Override public void registerRenderers() { com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.registerRenderers(); }
 
     @Override
     public void registerLayerDefinitions(java.util.function.BiConsumer<Object, java.util.function.Supplier<Object>> registrar) {
@@ -2864,178 +2389,38 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
         if (festive != null) consumer.accept(festive, supplier);
     }
 
-    @Override
-    public void renderEntity(net.minecraft.world.entity.Entity entity, double x, double y, double z, float yaw, float partialTicks, com.mojang.blaze3d.vertex.PoseStack poseStack, Object bufferSource, int packedLight) {
-        RenderFactory.renderEntity(entity, x, y, z, yaw, partialTicks, poseStack, bufferSource, packedLight);
-    }
+    @Override public void renderEntity(net.minecraft.world.entity.Entity entity, double x, double y, double z, float yaw, float partialTicks, com.mojang.blaze3d.vertex.PoseStack poseStack, Object bufferSource, int packedLight) { com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.renderEntity(entity, x, y, z, yaw, partialTicks, poseStack, bufferSource, packedLight); }
 
-    @Override
-    public com.mojang.blaze3d.vertex.VertexConsumer getTranslucentBuffer(Object bufferSource) {
-        return RenderFactory.getTranslucentBuffer(bufferSource);
-    }
+    @Override public com.mojang.blaze3d.vertex.VertexConsumer getTranslucentBuffer(Object bufferSource) { return com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.getTranslucentBuffer(bufferSource); }
 
-    @Override
-    public net.minecraft.client.renderer.texture.TextureAtlasSprite getBlockAtlasSprite(CommonId id) {
-        return net.minecraft.client.Minecraft.getInstance().getAtlasManager()
-                .getAtlasOrThrow(net.minecraft.client.renderer.texture.TextureAtlas.LOCATION_BLOCKS)
-                .getSprite(Identifier.fromNamespaceAndPath(id.getNamespace(), id.getPath()));
-    }
+    @Override public net.minecraft.client.renderer.texture.TextureAtlasSprite getBlockAtlasSprite(CommonId id) { return com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.getBlockAtlasSprite(id); }
 
-    @Override
-    public boolean isTranslucent(net.minecraft.world.level.block.state.BlockState state) {
-        if (state == null) return false;
-        try {
-            net.minecraft.client.renderer.block.dispatch.BlockStateModel model = net.minecraft.client.Minecraft.getInstance()
-                    .getModelManager().getBlockStateModelSet().get(state);
-            java.util.List<net.minecraft.client.renderer.block.dispatch.BlockStateModelPart> parts = new java.util.ArrayList<>();
-            model.collectParts(net.minecraft.util.RandomSource.create(42L), parts);
-            for (net.minecraft.client.renderer.block.dispatch.BlockStateModelPart part : parts) {
-                if (part.particleMaterial().forceTranslucent()) return true;
-                for (net.minecraft.core.Direction side : net.minecraft.core.Direction.values()) {
-                    for (net.minecraft.client.resources.model.geometry.BakedQuad quad : part.getQuads(side)) {
-                        if (quad.materialInfo().layer().translucent()) return true;
-                    }
-                }
-            }
-        } catch (Throwable exception) {
-            com.kingodogo.buildscape.BuildscapeCommon.LOGGER.warn("Failed in 26.x isTranslucent", exception);}
-        return false;
-    }
+    @Override public boolean isTranslucent(net.minecraft.world.level.block.state.BlockState state) { return com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.isTranslucent(state); }
 
-    private static final int COLOR_MAX_SAMPLES = 32;
-    private final java.util.Map<String, double[]> v26xSpriteCache = new java.util.concurrent.ConcurrentHashMap<>();
 
-    @Override
-    public BlockColorSample sampleBlockColor(net.minecraft.world.level.block.state.BlockState state) {
-        if (state == null) return null;
-        try {
-            net.minecraft.client.Minecraft mc = net.minecraft.client.Minecraft.getInstance();
-            net.minecraft.client.renderer.block.dispatch.BlockStateModel model = mc.getModelManager()
-                    .getBlockStateModelSet().get(state);
-            java.util.List<net.minecraft.client.renderer.block.dispatch.BlockStateModelPart> parts = new java.util.ArrayList<>();
-            model.collectParts(net.minecraft.util.RandomSource.create(42L), parts);
-            double red = 0, green = 0, blue = 0;
-            int weight = 0;
-            boolean transparent = false;
-            java.util.Set<String> textures = new java.util.HashSet<>();
-            for (net.minecraft.client.renderer.block.dispatch.BlockStateModelPart part : parts) {
-                for (net.minecraft.core.Direction side : net.minecraft.core.Direction.values()) {
-                    for (net.minecraft.client.resources.model.geometry.BakedQuad quad : part.getQuads(side)) {
-                        net.minecraft.client.renderer.texture.TextureAtlasSprite sprite = quad.materialInfo().sprite();
-                        String spriteName = sprite.contents().name().toString();
-                        if (spriteName.contains("missingno")) continue;
-                        textures.add(spriteName);
-                        int tint = 0xFFFFFF;
-                        if (quad.materialInfo().isTinted()) {
-                            net.minecraft.client.color.block.BlockTintSource source = mc.getBlockColors()
-                                    .getTintSource(state, quad.materialInfo().tintIndex());
-                            if (source != null) tint = source.color(state) & 0xFFFFFF;
-                        }
-                        int resolvedTint = tint;
-                        double[] sample = v26xSpriteCache.computeIfAbsent(spriteName + "#" + tint, key -> {
-                            com.mojang.blaze3d.platform.NativeImage image = getV26SpriteImage(sprite.contents());
-                            if (image == null) return new double[]{0, 0, 0, 0, 0};
-                            int width = sprite.contents().width(), height = sprite.contents().height();
-                            int stepX = Math.max(1, (width + COLOR_MAX_SAMPLES - 1) / COLOR_MAX_SAMPLES);
-                            int stepY = Math.max(1, (height + COLOR_MAX_SAMPLES - 1) / COLOR_MAX_SAMPLES);
-                            double r = 0, g = 0, b = 0, alphaWeight = 0;
-                            boolean translucent = false;
-                            for (int y = 0; y < height; y += stepY) for (int x = 0; x < width; x += stepX) {
-                                int pixel = image.getPixel(x, y);
-                                int alpha = net.minecraft.util.ARGB.alpha(pixel);
-                                if (alpha < 250) translucent = true;
-                                if (alpha < 16) continue;
-                                double aw = alpha / 255.0;
-                                int tinted = net.minecraft.util.ARGB.multiply(pixel, 0xFF000000 | resolvedTint);
-                                r += net.minecraft.util.ARGB.srgbToLinearChannel(net.minecraft.util.ARGB.red(tinted)) * aw;
-                                g += net.minecraft.util.ARGB.srgbToLinearChannel(net.minecraft.util.ARGB.green(tinted)) * aw;
-                                b += net.minecraft.util.ARGB.srgbToLinearChannel(net.minecraft.util.ARGB.blue(tinted)) * aw;
-                                alphaWeight += aw;
-                            }
-                            return alphaWeight == 0 ? new double[]{0, 0, 0, 0, translucent ? 1 : 0}
-                                    : new double[]{r / alphaWeight, g / alphaWeight, b / alphaWeight, 1, translucent ? 1 : 0};
-                        });
-                        if (sample[3] > 0) {
-                            red += sample[0]; green += sample[1]; blue += sample[2];
-                            transparent |= sample[4] > 0.5 || quad.materialInfo().layer().translucent();
-                            weight++;
-                        }
-                    }
-                }
-            }
-            if (weight == 0) return null;
-            int rgb = (net.minecraft.util.ARGB.linearToSrgbChannel((float) (red / weight)) << 16)
-                    | (net.minecraft.util.ARGB.linearToSrgbChannel((float) (green / weight)) << 8)
-                    | net.minecraft.util.ARGB.linearToSrgbChannel((float) (blue / weight));
-            return new BlockColorSample(rgb, transparent, textures.size() == 1);
-        } catch (Throwable exception) {
-            com.kingodogo.buildscape.BuildscapeCommon.LOGGER.warn("Failed in 26.x sampleBlockColor", exception);
-            return null;
-        }
-    }
+    @Override public BlockColorSample sampleBlockColor(net.minecraft.world.level.block.state.BlockState state) { return com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.sampleBlockColor(state); }
 
-    private static com.mojang.blaze3d.platform.NativeImage getV26SpriteImage(
-            net.minecraft.client.renderer.texture.SpriteContents contents) {
-        try {
-            java.lang.reflect.Field image = net.minecraft.client.renderer.texture.SpriteContents.class
-                    .getDeclaredField("originalImage");
-            image.setAccessible(true);
-            return (com.mojang.blaze3d.platform.NativeImage) image.get(contents);
-        } catch (ReflectiveOperationException exception) {
-            com.kingodogo.buildscape.BuildscapeCommon.LOGGER.warn("Failed to read sprite image on 26.x", exception);
-            return null;
-        }
-    }
 
-    @Override
-    public net.minecraft.client.gui.screens.Screen createConfigScreen(net.minecraft.client.gui.screens.Screen parent) {
-        return com.kingodogo.buildscape.adapter.v26x.GuiProvider.createConfigScreen(parent);
-    }
 
-    @Override
-    public net.minecraft.client.gui.components.Button createButton(int x, int y, int width, int height, net.minecraft.network.chat.Component message, net.minecraft.client.gui.components.Button.OnPress onPress) {
-        return com.kingodogo.buildscape.adapter.v26x.GuiProvider.createButton(x, y, width, height, message, onPress);
-    }
+    @Override public net.minecraft.client.gui.screens.Screen createConfigScreen(net.minecraft.client.gui.screens.Screen parent) { return com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.createConfigScreen(parent); }
 
-    @Override
-    public net.minecraft.client.gui.components.Button createCustomButton(int x, int y, int width, int height, net.minecraft.network.chat.Component message, net.minecraft.client.gui.components.Button.OnPress onPress, com.kingodogo.buildscape.client.screen.widget.CustomButtonRenderer renderer) {
-        return com.kingodogo.buildscape.adapter.v26x.GuiProvider.createCustomButton(x, y, width, height, message, onPress, renderer);
-    }
+    @Override public net.minecraft.client.gui.components.Button createButton(int x, int y, int width, int height, net.minecraft.network.chat.Component message, net.minecraft.client.gui.components.Button.OnPress onPress) { return com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.createButton(x, y, width, height, message, onPress); }
 
-    @Override
-    public net.minecraft.client.gui.screens.Screen wrapScreen(net.minecraft.network.chat.Component title, net.minecraft.client.gui.screens.Screen parent, com.kingodogo.buildscape.client.screen.IScreenDelegate delegate) {
-        return com.kingodogo.buildscape.adapter.v26x.GuiProvider.wrapScreen(title, parent, delegate);
-    }
+    @Override public net.minecraft.client.gui.components.Button createCustomButton(int x, int y, int width, int height, net.minecraft.network.chat.Component message, net.minecraft.client.gui.components.Button.OnPress onPress, com.kingodogo.buildscape.client.screen.widget.CustomButtonRenderer renderer) { return com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.createCustomButton(x, y, width, height, message, onPress, renderer); }
 
-    @Override
-    public net.minecraft.client.gui.screens.Screen createGuiEditorScreen(net.minecraft.client.gui.screens.Screen parent, String tabName, com.kingodogo.buildscape.client.screen.AbstractConfigTab sourceTab) {
-        return com.kingodogo.buildscape.adapter.v26x.GuiProvider.createGuiEditorScreen(parent, tabName, sourceTab);
-    }
+    @Override public net.minecraft.client.gui.screens.Screen wrapScreen(net.minecraft.network.chat.Component title, net.minecraft.client.gui.screens.Screen parent, com.kingodogo.buildscape.client.screen.IScreenDelegate delegate) { return com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.wrapScreen(title, parent, delegate); }
 
-    @Override
-    public net.minecraft.client.gui.screens.Screen createInventoryItemSelectorScreen(net.minecraft.client.gui.screens.Screen parent, com.kingodogo.buildscape.client.screen.PillarItemsConfigTab configTab) {
-        return com.kingodogo.buildscape.adapter.v26x.GuiProvider.createInventoryItemSelectorScreen(parent, configTab);
-    }
+    @Override public net.minecraft.client.gui.screens.Screen createGuiEditorScreen(net.minecraft.client.gui.screens.Screen parent, String tabName, com.kingodogo.buildscape.client.screen.AbstractConfigTab sourceTab) { return com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.createGuiEditorScreen(parent, tabName, sourceTab); }
 
-    @Override
-    public void renderGuiItem(Object poseStackOrGraphics, net.minecraft.world.item.ItemStack stack, int x, int y) {
-        com.kingodogo.buildscape.adapter.v26x.GuiProvider.renderGuiItem(poseStackOrGraphics, stack, x, y);
-    }
+    @Override public net.minecraft.client.gui.screens.Screen createInventoryItemSelectorScreen(net.minecraft.client.gui.screens.Screen parent, com.kingodogo.buildscape.client.screen.PillarItemsConfigTab configTab) { return com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.createInventoryItemSelectorScreen(parent, configTab); }
 
-    @Override
-    public void renderGuiItemDecorations(Object poseStackOrGraphics, net.minecraft.client.gui.Font font, net.minecraft.world.item.ItemStack stack, int x, int y) {
-        com.kingodogo.buildscape.adapter.v26x.GuiProvider.renderGuiItemDecorations(poseStackOrGraphics, font, stack, x, y);
-    }
+    @Override public void renderGuiItem(Object poseStackOrGraphics, net.minecraft.world.item.ItemStack stack, int x, int y) { com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.renderGuiItem(poseStackOrGraphics, stack, x, y); }
 
-    @Override
-    public java.util.List<net.minecraft.network.chat.Component> getTooltipFromItem(net.minecraft.world.item.ItemStack stack) {
-        return com.kingodogo.buildscape.adapter.v26x.GuiProvider.getTooltipFromItem(stack);
-    }
+    @Override public void renderGuiItemDecorations(Object poseStackOrGraphics, net.minecraft.client.gui.Font font, net.minecraft.world.item.ItemStack stack, int x, int y) { com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.renderGuiItemDecorations(poseStackOrGraphics, font, stack, x, y); }
 
-    @Override
-    public net.minecraft.client.gui.components.AbstractWidget wrapCustomWidget(int x, int y, int width, int height, net.minecraft.network.chat.Component message, com.kingodogo.buildscape.client.screen.widget.ICustomWidget customWidget) {
-        return com.kingodogo.buildscape.adapter.v26x.GuiProvider.wrapCustomWidget(x, y, width, height, message, customWidget);
-    }
+    @Override public java.util.List<net.minecraft.network.chat.Component> getTooltipFromItem(net.minecraft.world.item.ItemStack stack) { return com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.getTooltipFromItem(stack); }
+
+    @Override public net.minecraft.client.gui.components.AbstractWidget wrapCustomWidget(int x, int y, int width, int height, net.minecraft.network.chat.Component message, com.kingodogo.buildscape.client.screen.widget.ICustomWidget customWidget) { return com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.wrapCustomWidget(x, y, width, height, message, customWidget); }
 
     public static class ColoredItemFrameEntityImpl extends ItemFrame implements ColoredItemFrameEntity {
 
@@ -3712,7 +3097,9 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
         }
 
         @Override
-        protected void defineSynchedData(SynchedEntityData.Builder builder) {}
+        protected void defineSynchedData(SynchedEntityData.Builder builder) {
+            // The reference seat has no custom synched data; it only carries a passenger.
+        }
 
         @Override
         public boolean hurtServer(ServerLevel level, DamageSource source, float amount) {
@@ -3720,10 +3107,14 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
         }
 
         @Override
-        protected void readAdditionalSaveData(ValueInput input) {}
+        protected void readAdditionalSaveData(ValueInput input) {
+            // The reference seat has no custom persistent state beyond Entity's position/passengers.
+        }
 
         @Override
-        protected void addAdditionalSaveData(ValueOutput output) {}
+        protected void addAdditionalSaveData(ValueOutput output) {
+            // The reference seat has no custom persistent state beyond Entity's position/passengers.
+        }
 
         @Override
         public void tick() {
@@ -3792,4 +3183,25 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
         }
     }
 
+    @Override public Entity createArmorStandEntity(Level level, double x, double y, double z) {
+        return com.kingodogo.buildscape.adapter.v26x.client.ClientPillarEntities.createArmorStand(level, x, y, z);
+    }
+    @Override public void setupArmorStand(Entity stand) {
+        com.kingodogo.buildscape.adapter.v26x.client.ClientPillarEntities.setupArmorStand(stand);
+    }
+    @Override public void updateArmorStand(Entity stand, ItemStack stack, net.minecraft.world.entity.EquipmentSlot slot, boolean standItem) {
+        com.kingodogo.buildscape.adapter.v26x.client.ClientPillarEntities.updateArmorStand(stand, stack, slot, standItem);
+    }
+    @Override public boolean isArmor(ItemStack stack) {
+        return com.kingodogo.buildscape.adapter.v26x.client.ClientPillarEntities.isArmor(stack);
+    }
+    @Override public boolean isGui3dModel(Object model) {
+        return com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.isGui3dModel(model);
+    }
+    @Override public Entity createMobPillarEntity(ItemStack egg, Level level, BlockPos pos, Object state) {
+        return com.kingodogo.buildscape.adapter.v26x.client.ClientPillarEntities.createMob(egg, level, pos, state);
+    }
+    @Override public void applyMobState(Entity entity, Object state) {
+        com.kingodogo.buildscape.adapter.v26x.client.ClientPillarEntities.applyMobState(entity, state);
+    }
 }

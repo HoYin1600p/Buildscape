@@ -75,6 +75,23 @@ class TranslationKeysTest {
     }
 
     @Test
+    void hazeBushesAndIceCrystalHaveEnglishEntries() throws Exception {
+        JsonObject lang = JsonParser.parseString(Files.readString(LANG, StandardCharsets.UTF_8)).getAsJsonObject();
+        for (String colour : List.of("white", "orange", "magenta", "light_blue", "yellow", "lime", "pink",
+                "gray", "light_gray", "cyan", "purple", "blue", "brown", "green", "red", "black")) {
+            String bush = colour + "_haze_bush";
+            for (String key : List.of("block.buildscape." + bush, "block.buildscape.potted_" + bush,
+                    "block.buildscape." + bush + ".drained")) {
+                assertTrue(lang.has(key), key);
+            }
+        }
+        for (String key : List.of("item.buildscape.bottle_of_mist", "tooltip.buildscape.bottle_of_mist.collect",
+                "tooltip.buildscape.haze_bush.drained", "block.buildscape.ice_crystal")) {
+            assertTrue(lang.has(key), key);
+        }
+    }
+
+    @Test
     void everyNameTheModShowsHasAnEnglishEntry() throws Exception {
         JsonObject lang = JsonParser.parseString(Files.readString(LANG, StandardCharsets.UTF_8)).getAsJsonObject();
         // key -> what needs it
@@ -101,6 +118,8 @@ class TranslationKeysTest {
         // Items: block items through the real factory, the rest through createItem
         int itemCount = 0;
         int blockItems = 0;
+        int addedItems = 0;
+        int addedBlockItems = 0;
         List<String> wrongPrefix = new ArrayList<>();
         for (RegistrySupplier<?> supplier : new ArrayList<>(Services.REGISTERED_ITEMS)) {
             if (!(supplier.get() instanceof ItemDefinition def)) continue;
@@ -109,8 +128,11 @@ class TranslationKeysTest {
                     ? ItemFactory.createBlockItem(def.getId(), matching, def.getProperties())
                     : ItemFactory.createItem(def);
             itemCount++;
+            boolean addedContent = def.getId().equals("ice_crystal") || def.getId().endsWith("_haze_bush");
+            if (addedContent) addedItems++;
             if (matching != null) {
                 blockItems++;
+                if (addedContent) addedBlockItems++;
                 assertInstanceOf(BlockItem.class, item, def.getId());
                 if (!matching.getDescriptionId().equals(item.getDescriptionId())) {
                     wrongPrefix.add(def.getId() + ": item key " + item.getDescriptionId() + " but block key " + matching.getDescriptionId());
@@ -122,8 +144,8 @@ class TranslationKeysTest {
         }
         // Retained inventory after the two vanilla replacement passes. Exact counts
         // catch accidental omissions while allowing the intentionally removed items.
-        assertEquals(2939, itemCount, "expected the retained item list");
-        assertEquals(2893, blockItems, "expected the retained block item list");
+        assertEquals(2939 + addedItems, itemCount, "expected the retained item list plus haze bushes and ice crystal");
+        assertEquals(2893 + addedBlockItems, blockItems, "expected the retained block item list plus new content");
 
         // Trophy blocks and their items use the block key (their block is built by the loader adapter, so check the key by id)
         for (TrophyDefinition trophy : Trophies.getAll()) {

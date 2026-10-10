@@ -8,6 +8,8 @@ import com.kingodogo.buildscape.recipe.framework.integration.RecipeManagerInject
 import com.kingodogo.buildscape.recipe.framework.parser.RecipeIR;
 import com.kingodogo.buildscape.recipe.framework.parser.StreamingRecipeParser;
 import com.kingodogo.buildscape.recipe.framework.util.IngredientCache;
+import com.kingodogo.buildscape.recipe.framework.util.RecipePackFormatter;
+import com.kingodogo.buildscape.recipe.framework.validation.RecipeValidator;
 import com.kingodogo.buildscape.util.CommonId;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.world.item.crafting.RecipeManager;
@@ -101,6 +103,7 @@ public class BuildScapeRecipeLoader {
             byte[] bytes = entry.getValue();
 
             try (Reader reader = new InputStreamReader(new ByteArrayInputStream(bytes), StandardCharsets.UTF_8)) {
+                RecipePackFormatter.validateJson(new String(bytes, StandardCharsets.UTF_8));
                 BuildScapeRecipeCompiler compiler = new BuildScapeRecipeCompiler();
                 RecipeIR.CategoryPack categoryPack = StreamingRecipeParser.parseCategory(category, reader);
                 BuildScapeRecipeCompiler.CompileResult result = compiler.compileCategory(categoryPack);
@@ -121,6 +124,8 @@ public class BuildScapeRecipeLoader {
             }
         }
 
+        recipes = RecipeValidator.filterCompiled(recipes);
+        cacheableSourceRecipes = RecipeValidator.filterCompiled(cacheableSourceRecipes);
         if (!cacheableSourceRecipes.isEmpty()) {
             BinaryRecipeCache.saveCache(contentHash, cacheableSourceRecipes);
         }
@@ -137,7 +142,7 @@ public class BuildScapeRecipeLoader {
             List<RecipeIR.CompiledRecipe> cachedRecipes) {
         Map<String, RecipeIR.CompiledRecipe> recipesById = new LinkedHashMap<>();
         for (RecipeIR.CompiledRecipe recipe : cachedRecipes) {
-            recipesById.put(recipe.id(), recipe);
+            addUnique(recipesById, recipe);
         }
 
         int added = 0;
@@ -151,12 +156,12 @@ public class BuildScapeRecipeLoader {
             }
             try (Reader reader = new InputStreamReader(
                     new ByteArrayInputStream(categoryData), StandardCharsets.UTF_8)) {
+                RecipePackFormatter.validateJson(new String(categoryData, StandardCharsets.UTF_8));
                 BuildScapeRecipeCompiler compiler = new BuildScapeRecipeCompiler();
                 RecipeIR.CategoryPack categoryPack = StreamingRecipeParser.parseCategory(category, reader);
                 BuildScapeRecipeCompiler.CompileResult result = compiler.compileCategory(categoryPack);
                 for (RecipeIR.CompiledRecipe recipe : result.recipes()) {
-                    recipesById.put(recipe.id(), recipe);
-                    added++;
+                    if (addUnique(recipesById, recipe)) added++;
                 }
                 compiler.clear();
             } catch (Exception e) {
@@ -166,7 +171,15 @@ public class BuildScapeRecipeLoader {
         if (added > 0) {
             BuildscapeCommon.LOGGER.info("BDRE Loader: Added {} runtime-only recipes after cache load.", added);
         }
-        return new ArrayList<>(recipesById.values());
+        return RecipeValidator.filterCompiled(new ArrayList<>(recipesById.values()));
+    }
+
+    private static boolean addUnique(Map<String, RecipeIR.CompiledRecipe> recipes, RecipeIR.CompiledRecipe recipe) {
+        if (recipes.putIfAbsent(recipe.id(), recipe) != null) {
+            BuildscapeCommon.LOGGER.warn("BDRE: Duplicate recipe ID {} (keeping the first recipe)", recipe.id());
+            return false;
+        }
+        return true;
     }
 
     private Set<String> findRuntimeCategories(Map<String, byte[]> rawCategoryData) {
@@ -183,7 +196,7 @@ public class BuildScapeRecipeLoader {
     }
 
     public void applyRecipes(List<RecipeIR.CompiledRecipe> recipes) {
-        preparedRecipes = recipes == null ? List.of() : List.copyOf(recipes);
+        preparedRecipes = recipes == null ? List.of() : List.copyOf(RecipeValidator.filterCompiled(recipes));
         RecipeManager recipeManager = currentRecipeManager;
         if (recipeManager != null && !preparedRecipes.isEmpty()) {
             RecipeManagerInjector.inject(recipeManager, preparedRecipes);

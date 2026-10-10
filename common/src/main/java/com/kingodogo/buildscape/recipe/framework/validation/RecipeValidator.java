@@ -9,10 +9,104 @@ import net.minecraft.world.item.Items;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Locale;
+import java.util.function.Predicate;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
+import com.kingodogo.buildscape.BuildscapeCommon;
 
 public class RecipeValidator {
 
     private final Set<CommonId> registeredIds = new HashSet<>();
+    private final Predicate<CommonId> itemExists;
+
+    public RecipeValidator() {
+        this(RecipeValidator::registryHasItem);
+    }
+
+    public RecipeValidator(Predicate<CommonId> itemExists) {
+        this.itemExists = itemExists;
+    }
+
+    /** Validates cached IR without binding tags or constructing native recipes. */
+    public boolean validateCompiled(RecipeIR.CompiledRecipe recipe) {
+        String reason = invalidReason(recipe);
+        if (reason == null) return true;
+        BuildscapeCommon.LOGGER.warn("BDRE: Dropped recipe {}: {}", recipe.id(), reason);
+        return false;
+    }
+
+    private String invalidReason(RecipeIR.CompiledRecipe recipe) {
+        if (parseId(recipe.id()) == null) return "invalid recipe id";
+        String type = recipe.type().toLowerCase(Locale.ROOT).replaceFirst("^buildscape:", "");
+        if (type.equals("confetti_configure") || type.equals("clear_shulker_filters")) return null;
+        CommonId result = parseId(recipe.resultItem());
+        if (result == null || !hasItem(result)) return "result resolves to air: " + recipe.resultItem();
+        boolean shaped = type.equals("shaped") || type.equals("shaped_durability");
+        if (shaped || type.equals("shapeless") || type.equals("shapeless_durability")) {
+            if (shaped && (recipe.width() < 1 || recipe.width() > 3 || recipe.height() < 1
+                    || recipe.height() > 3 || recipe.ingredients().size() != recipe.width() * recipe.height())) {
+                return "invalid shaped dimensions";
+            }
+            boolean occupied = false;
+            for (String ingredient : recipe.ingredients()) {
+                if (shaped && ingredient.isEmpty()) continue;
+                if (!validCompiledIngredient(ingredient)) return "invalid ingredient: " + ingredient;
+                occupied = true;
+            }
+            return occupied ? null : "all recipe slots are empty";
+        }
+        if (!validCompiledIngredient(recipe.input())) return "invalid input: " + recipe.input();
+        if (type.equals("smithing") && !validCompiledIngredient(recipe.addition())) return "invalid smithing addition";
+        return null;
+    }
+
+    private boolean validCompiledIngredient(String value) {
+        if (value == null || value.isBlank()) return false;
+        if (value.startsWith("[")) {
+            if (!value.endsWith("]")) return false;
+            String inner = value.substring(1, value.length() - 1).trim();
+            if (inner.isEmpty()) return false;
+            if (inner.startsWith("\"") || inner.startsWith("{")) {
+                try {
+                    JsonElement json = JsonParser.parseString(value);
+                    boolean valid = false;
+                    for (JsonElement entry : json.getAsJsonArray()) {
+                        if (!entry.isJsonPrimitive() || !entry.getAsJsonPrimitive().isString()
+                                || !validCompiledIngredient(entry.getAsString())) return false;
+                        valid = true;
+                    }
+                    return valid;
+                } catch (RuntimeException exception) {
+                    return false;
+                }
+            }
+            // Compact alternative lists are not JSON. At least one alternative
+            // must exist; tags remain valid before the reload binds their contents.
+            AliasResolver aliases = new AliasResolver();
+            for (String alternative : inner.split(",")) {
+                if (validCompiledIngredient(aliases.resolveString(alternative.trim()))) return true;
+            }
+            return false;
+        }
+        if (value.startsWith("{") || value.startsWith("\"")) return false;
+        boolean tag = value.startsWith("#");
+        CommonId id = parseId(tag ? value.substring(1) : value);
+        return id != null && (tag || hasItem(id));
+    }
+
+    public static List<RecipeIR.CompiledRecipe> filterCompiled(List<RecipeIR.CompiledRecipe> recipes) {
+        RecipeValidator validator = new RecipeValidator();
+        List<RecipeIR.CompiledRecipe> accepted = new ArrayList<>();
+        for (RecipeIR.CompiledRecipe recipe : recipes) {
+            if (recipe != null && validator.validateCompiled(recipe) && !validator.checkDuplicate(recipe.id())) {
+                accepted.add(recipe);
+            }
+        }
+        return accepted;
+    }
 
     public boolean validate(RecipeIR.RecipeSpec spec, AliasResolver aliasResolver) {
         if (spec == null) {
@@ -60,6 +154,7 @@ public class RecipeValidator {
         CommonId commonId = recipeId instanceof CommonId id ? id : parseId(String.valueOf(recipeId));
         if (commonId == null) return true;
         if (registeredIds.contains(commonId)) {
+            BuildscapeCommon.LOGGER.warn("BDRE: Duplicate recipe ID {} (keeping the first recipe)", commonId);
             return true;
         }
         registeredIds.add(commonId);
@@ -91,6 +186,10 @@ public class RecipeValidator {
     }
 
     private boolean hasItem(CommonId loc) {
+        return itemExists.test(loc);
+    }
+
+    private static boolean registryHasItem(CommonId loc) {
         try {
             Item item = Services.PLATFORM.getItem(loc);
             return item != null && item != Items.AIR;
@@ -109,7 +208,7 @@ public class RecipeValidator {
         String[] parts = value.split(":", 2);
         String namespace = parts.length == 2 ? parts[0] : "minecraft";
         String path = parts.length == 2 ? parts[1] : parts[0];
-        if (namespace.isBlank() || path.isBlank() || namespace.indexOf(' ') >= 0 || path.indexOf(' ') >= 0) return null;
+        if (!namespace.matches("[a-z0-9_.-]+") || !path.matches("[a-z0-9/._-]+")) return null;
         return new CommonId(namespace, path);
     }
 }

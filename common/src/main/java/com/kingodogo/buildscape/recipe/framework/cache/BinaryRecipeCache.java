@@ -51,7 +51,8 @@ public class BinaryRecipeCache {
                 byte[] data = rawCategoryData.get(category);
                 if (data != null) {
                     digest.update(category.getBytes(StandardCharsets.UTF_8));
-                    digest.update(data);
+                    digest.update(new String(data, StandardCharsets.UTF_8).replace("\r\n", "\n")
+                            .getBytes(StandardCharsets.UTF_8));
                 }
             }
 
@@ -185,9 +186,12 @@ public class BinaryRecipeCache {
             int recipeCount = in.readInt();
             validateSize(recipeCount, MAX_RECIPE_COUNT, "recipe count");
             recipes = new ArrayList<>(recipeCount);
+            var validator = new com.kingodogo.buildscape.recipe.framework.validation.RecipeValidator();
             for (int i = 0; i < recipeCount; i++) {
                 RecipeIR.CompiledRecipe r = readRecipe(in, stringPool);
-                if (r != null) {
+                // Consume the whole record before validation so a rejected recipe cannot
+                // misalign the following record in the stream.
+                if (r != null && validator.validateCompiled(r) && !validator.checkDuplicate(r.id())) {
                     recipes.add(r);
                 }
             }

@@ -16,7 +16,7 @@ public class AliasResolver {
     public AliasResolver() {
         aliases.put("BS:", "buildscape:");
         aliases.put("MC:", "minecraft:");
-        aliases.put("F:", "forge:");
+        aliases.put("F:", "c:");
     }
 
     public void registerAliases(Map<String, String> newAliases) {

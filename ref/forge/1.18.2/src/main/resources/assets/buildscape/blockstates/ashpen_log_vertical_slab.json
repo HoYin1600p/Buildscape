@@ -1,0 +1,25 @@
+{
+  "variants": {
+    "axis=z,type=bottom": {
+      "model": "buildscape:block/ashpen_log_vertical_slab"
+    },
+    "axis=z,type=top": {
+      "model": "buildscape:block/ashpen_log_vertical_slab",
+      "y": 180
+    },
+    "axis=x,type=bottom": {
+      "model": "buildscape:block/ashpen_log_vertical_slab",
+      "y": 270
+    },
+    "axis=x,type=top": {
+      "model": "buildscape:block/ashpen_log_vertical_slab",
+      "y": 90
+    },
+    "axis=z,type=double": {
+      "model": "buildscape:block/ashpen_log"
+    },
+    "axis=x,type=double": {
+      "model": "buildscape:block/ashpen_log"
+    }
+  }
+}

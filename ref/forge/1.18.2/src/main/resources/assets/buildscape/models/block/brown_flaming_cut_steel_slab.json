@@ -1,0 +1,9 @@
+{
+  "parent": "minecraft:block/slab",
+  "textures": {
+    "bottom": "buildscape:block/brown_flaming_cut_steel",
+    "top": "buildscape:block/brown_flaming_cut_steel",
+    "side": "buildscape:block/brown_flaming_cut_steel",
+    "particle": "#side"
+  }
+}

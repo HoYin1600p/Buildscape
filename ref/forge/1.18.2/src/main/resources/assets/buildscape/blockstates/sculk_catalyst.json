@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "bloom=false": {
+      "model": "buildscape:block/sculk_catalyst"
+    },
+    "bloom=true": {
+      "model": "buildscape:block/sculk_catalyst_bloom"
+    }
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "textures": {
+    "wall": "buildscape:block/magenta_layered_wool",
+    "particle": "buildscape:block/magenta_layered_wool"
+  },
+  "parent": "minecraft:block/template_wall_post"
+}

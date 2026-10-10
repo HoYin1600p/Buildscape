@@ -1,0 +1,32 @@
+{
+  "display": {
+    "icon": {
+      "item": "buildscape:glowing_big_book"
+    },
+    "title": {
+      "translate": "advancements.buildscape.light_reading.title"
+    },
+    "description": {
+      "translate": "advancements.buildscape.light_reading.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "parent": "buildscape:bookworm",
+  "criteria": {
+    "has_item": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "buildscape:glowing_big_book"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

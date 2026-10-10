@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "buildscape:golden_jar_pattern"
+    },
+    {
+      "tag": "buildscape:jars"
+    }
+  ],
+  "result": {
+    "item": "buildscape:golden_jar"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "buildscape:block/snow_slab"
+    },
+    "type=top": {
+      "model": "buildscape:block/snow_slab_top"
+    },
+    "type=double": {
+      "model": "minecraft:block/snow_block"
+    }
+  }
+}
+

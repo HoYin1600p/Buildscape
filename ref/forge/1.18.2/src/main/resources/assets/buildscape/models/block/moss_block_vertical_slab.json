@@ -1,0 +1,9 @@
+{
+  "parent": "buildscape:block/template_vertical_slab",
+  "textures": {
+    "bottom": "buildscape:block/moss_block",
+    "top": "buildscape:block/moss_block",
+    "side": "buildscape:block/moss_block",
+    "particle": "#side"
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "buildscape:block/stripped_bundled_cardboard"
+    }
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "textures": {
+    "bottom": "buildscape:block/black_layered_wool",
+    "top": "buildscape:block/black_layered_wool",
+    "side": "buildscape:block/black_layered_wool"
+  },
+  "parent": "minecraft:block/slab"
+}

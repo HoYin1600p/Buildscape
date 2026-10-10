@@ -1,0 +1,8 @@
+{
+  "parent": "block/cube_column",
+  "textures": {
+    "end": "buildscape:block/black_flaming_bolted_steel_pillar",
+    "side": "buildscape:block/black_flaming_bolted_steel_pillar",
+    "particle": "#side"
+  }
+}

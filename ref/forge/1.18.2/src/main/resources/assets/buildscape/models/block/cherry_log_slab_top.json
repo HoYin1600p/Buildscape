@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/slab_top",
+  "textures": {
+    "bottom": "buildscape:block/cherry_log_top",
+    "top": "buildscape:block/cherry_log_top",
+    "side": "buildscape:block/cherry_log"
+  }
+}

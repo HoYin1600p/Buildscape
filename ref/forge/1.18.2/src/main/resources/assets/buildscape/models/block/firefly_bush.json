@@ -1,0 +1,7 @@
+{
+  "parent": "buildscape:block/cross_emissive",
+  "textures": {
+    "cross": "buildscape:block/firefly_bush",
+    "cross_emissive": "buildscape:block/firefly_bush_emissive"
+  }
+}

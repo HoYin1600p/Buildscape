@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "buildscape:item/festive_wandering_homemaker_spawn_egg"
+  }
+}

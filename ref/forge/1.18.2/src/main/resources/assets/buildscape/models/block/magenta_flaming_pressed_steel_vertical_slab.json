@@ -1,0 +1,9 @@
+{
+  "parent": "buildscape:block/template_vertical_slab",
+  "textures": {
+    "bottom": "buildscape:block/magenta_flaming_pressed_steel",
+    "top": "buildscape:block/magenta_flaming_pressed_steel",
+    "side": "buildscape:block/magenta_flaming_pressed_steel",
+    "particle": "#side"
+  }
+}

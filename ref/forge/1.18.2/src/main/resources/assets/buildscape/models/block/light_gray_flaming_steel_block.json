@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/cube_all",
+  "textures": {
+    "all": "buildscape:block/light_gray_flaming_steel_block"
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "display": {
+    "icon": {
+      "item": "buildscape:festive_stocking"
+    },
+    "title": {
+      "translate": "advancements.buildscape.christmas_every_day.title"
+    },
+    "description": {
+      "translate": "advancements.buildscape.christmas_every_day.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "parent": "buildscape:a_very_buildscape_christmas",
+  "rewards": {
+    "items": [
+      {
+        "item": "buildscape:stocking_trophy"
+      },
+      {
+        "item": "buildscape:music_disc_snowfall"
+      }
+    ]
+  },
+  "criteria": {
+    "custom": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

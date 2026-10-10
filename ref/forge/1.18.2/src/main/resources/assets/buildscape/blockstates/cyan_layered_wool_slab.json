@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "buildscape:block/cyan_layered_wool_slab"
+    },
+    "type=top": {
+      "model": "buildscape:block/cyan_layered_wool_slab_top"
+    },
+    "type=double": {
+      "model": "buildscape:block/cyan_layered_wool"
+    }
+  }
+}

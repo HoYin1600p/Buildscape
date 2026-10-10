@@ -1,0 +1,23 @@
+{
+  "display": {
+    "icon": {
+      "item": "buildscape:netherite_hammer"
+    },
+    "title": {
+      "translate": "advancements.buildscape.hammer_time.title"
+    },
+    "description": {
+      "translate": "advancements.buildscape.hammer_time.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "parent": "buildscape:fixer_upper",
+  "criteria": {
+    "custom": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "replace": false,
+  "values": [
+    "buildscape:black_sand",
+    "buildscape:blue_sand",
+    "buildscape:green_sand",
+    "buildscape:mud",
+    "buildscape:orange_sand",
+    "buildscape:packed_mud",
+    "buildscape:pink_sand",
+    "buildscape:red_sand",
+    "buildscape:snowy_grass_block",
+    "buildscape:white_sand",
+    "buildscape:yellow_sand",
+    "buildscape:snowy_grass_block_vertical_slab",
+    "buildscape:packed_mud_vertical_slab",
+    "buildscape:dirt_stairs",
+    "buildscape:mycelium_stairs",
+    "buildscape:podzol_stairs",
+    "buildscape:snow_overlay"
+  ]
+}

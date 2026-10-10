@@ -1,0 +1,19 @@
+{
+    "variants":  {
+                     "facing=north":  {
+                                          "model":  "buildscape:block/ashpen_lime_ladder"
+                                      },
+                     "facing=south":  {
+                                          "model":  "buildscape:block/ashpen_lime_ladder",
+                                          "y":  180
+                                      },
+                     "facing=east":  {
+                                         "model":  "buildscape:block/ashpen_lime_ladder",
+                                         "y":  90
+                                     },
+                     "facing=west":  {
+                                         "model":  "buildscape:block/ashpen_lime_ladder",
+                                         "y":  270
+                                     }
+                 }
+}

@@ -1,0 +1,12 @@
+{
+  "parent": "block/cube",
+  "textures": {
+    "down": "buildscape:block/red_sandstone_bottom",
+    "up": "buildscape:block/red_sandstone_top",
+    "north": "buildscape:block/red_sandstone",
+    "south": "buildscape:block/red_sandstone",
+    "west": "buildscape:block/red_sandstone",
+    "east": "buildscape:block/red_sandstone",
+    "particle": "buildscape:block/red_sandstone"
+  }
+}

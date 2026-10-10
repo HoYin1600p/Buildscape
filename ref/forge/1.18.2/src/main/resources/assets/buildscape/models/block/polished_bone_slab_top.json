@@ -1,0 +1,9 @@
+{
+  "parent": "minecraft:block/slab_top",
+  "textures": {
+    "bottom": "buildscape:block/polished_bone_block",
+    "top": "buildscape:block/polished_bone_block",
+    "side": "buildscape:block/polished_bone_block",
+    "particle": "buildscape:block/polished_bone_block"
+  }
+}

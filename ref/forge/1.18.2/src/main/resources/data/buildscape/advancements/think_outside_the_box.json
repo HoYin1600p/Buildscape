@@ -1,0 +1,38 @@
+{
+  "display": {
+    "icon": {
+      "item": "buildscape:cardboard_block"
+    },
+    "title": {
+      "translate": "advancements.buildscape.think_outside_the_box.title"
+    },
+    "description": {
+      "translate": "advancements.buildscape.think_outside_the_box.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "parent": "buildscape:root",
+  "criteria": {
+    "has_cardboard_block": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "buildscape:cardboard_block",
+              "buildscape:smooth_cardboard_block",
+              "buildscape:thick_cardboard_block",
+              "buildscape:stripped_cardboard_block",
+              "buildscape:tinted_cardboard_block",
+              "buildscape:washed_cardboard_block",
+              "buildscape:burnt_cardboard_block"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

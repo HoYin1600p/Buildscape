@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "buildscape:block/smooth_cardboard_slab"
+    },
+    "type=top": {
+      "model": "buildscape:block/smooth_cardboard_slab_top"
+    },
+    "type=double": {
+      "model": "buildscape:block/smooth_cardboard_block"
+    }
+  }
+}

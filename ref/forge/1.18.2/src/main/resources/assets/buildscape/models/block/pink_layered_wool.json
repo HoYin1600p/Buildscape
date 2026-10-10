@@ -1,0 +1,6 @@
+{
+    "textures":  {
+                     "all":  "buildscape:block/pink_layered_wool"
+                 },
+    "parent":  "minecraft:block/cube_all"
+}

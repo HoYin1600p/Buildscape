@@ -1,0 +1,9 @@
+{
+  "parent": "buildscape:block/template_vertical_slab",
+  "textures": {
+    "bottom": "buildscape:block/stripped_cherry_log",
+    "top": "buildscape:block/stripped_cherry_log",
+    "side": "buildscape:block/stripped_cherry_log",
+    "particle": "#side"
+  }
+}

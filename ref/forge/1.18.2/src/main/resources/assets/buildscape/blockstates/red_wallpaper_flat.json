@@ -1,0 +1,57 @@
+{
+  "multipart": [
+    {
+      "when": {
+        "up": "true"
+      },
+      "apply": {
+        "model": "buildscape:block/red_wallpaper_flat",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "down": "true"
+      },
+      "apply": {
+        "model": "buildscape:block/red_wallpaper_flat",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "north": "true"
+      },
+      "apply": {
+        "model": "buildscape:block/red_wallpaper_flat"
+      }
+    },
+    {
+      "when": {
+        "east": "true"
+      },
+      "apply": {
+        "model": "buildscape:block/red_wallpaper_flat",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "south": "true"
+      },
+      "apply": {
+        "model": "buildscape:block/red_wallpaper_flat",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "west": "true"
+      },
+      "apply": {
+        "model": "buildscape:block/red_wallpaper_flat",
+        "y": 270
+      }
+    }
+  ]
+}

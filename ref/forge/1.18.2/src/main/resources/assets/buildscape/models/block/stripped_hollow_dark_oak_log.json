@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/stripped_hollow_log",
+  "textures": {
+    "stripped_logs": "minecraft:block/stripped_dark_oak_log",
+    "end": "minecraft:block/stripped_dark_oak_log_top"
+  }
+}

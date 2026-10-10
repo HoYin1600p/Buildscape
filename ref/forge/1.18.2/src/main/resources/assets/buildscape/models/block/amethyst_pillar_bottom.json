@@ -1,0 +1,7 @@
+{
+  "parent": "buildscape:block/pillar_bottom",
+  "textures": {
+    "2": "buildscape:block/amethyst_pillar_bottom",
+    "particle": "minecraft:block/amethyst_block"
+  }
+}

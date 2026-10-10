@@ -1,0 +1,23 @@
+{
+  "display": {
+    "icon": {
+      "item": "buildscape:hollow_oak_log"
+    },
+    "title": {
+      "translate": "advancements.buildscape.i_vented.title"
+    },
+    "description": {
+      "translate": "advancements.buildscape.i_vented.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "parent": "buildscape:root",
+  "criteria": {
+    "custom": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

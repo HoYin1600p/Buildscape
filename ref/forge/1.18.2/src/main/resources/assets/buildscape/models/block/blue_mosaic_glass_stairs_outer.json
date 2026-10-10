@@ -1,0 +1,9 @@
+{
+  "parent": "buildscape:block/glass_stairs_outer_template",
+  "textures": {
+    "bottom": "buildscape:block/blue_mosaic_glass",
+    "top": "buildscape:block/blue_mosaic_glass",
+    "side": "buildscape:block/blue_mosaic_glass"
+  },
+  "render_type": "minecraft:translucent"
+}

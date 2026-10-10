@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/item_frame",
+  "textures": {
+    "particle": "buildscape:block/light_blue_item_frame",
+    "wood": "buildscape:block/light_blue_item_frame",
+    "back": "buildscape:block/light_blue_item_frame"
+  }
+}

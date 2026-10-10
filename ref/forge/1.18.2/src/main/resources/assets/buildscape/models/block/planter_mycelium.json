@@ -1,0 +1,10 @@
+{
+  "parent": "buildscape:block/planter_no_overlay_template",
+  "textures": {
+    "inside_top": "minecraft:block/mycelium_top",
+    "inside_side": "minecraft:block/mycelium_side",
+    "particle": "minecraft:block/dirt",
+    "inside": "minecraft:block/composter_bottom",
+    "inside_bottom": "minecraft:block/dirt"
+  }
+}

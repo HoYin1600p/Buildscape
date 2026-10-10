@@ -39,7 +39,10 @@ public class FamilyExpander {
 
         if (targets == null || targets.isEmpty()) {
             if ("wood".equalsIgnoreCase(familyType)) {
-                targets = List.of("stairs", "slab", "fence", "fence_gate", "gate", "door", "trapdoor", "button", "pressure_plate", "stonecutter");
+                // Ashpen has no door or trapdoor blocks; other wood families do.
+                targets = baseItem.contains(":ashpen_")
+                        ? List.of("stairs", "slab", "fence", "fence_gate", "button", "pressure_plate")
+                        : List.of("stairs", "slab", "fence", "fence_gate", "door", "trapdoor", "button", "pressure_plate");
             } else {
                 targets = List.of("stairs", "slab", "wall", "chiseled", "stonecutter");
             }

@@ -6,13 +6,17 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonToken;
 
 import java.io.IOException;
+import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -40,6 +44,7 @@ public class RecipePackFormatter {
     );
 
     public static String format(String jsonString) {
+        validateJson(jsonString);
         JsonElement rootElement = JsonParser.parseString(jsonString);
         if (!rootElement.isJsonObject()) {
             return jsonString;
@@ -86,6 +91,50 @@ public class RecipePackFormatter {
         return sb.toString();
     }
 
+    // Validate before Gson constructs objects and overwrites duplicate members.
+    public static void validateJson(String content) {
+        try (JsonReader reader = new JsonReader(new StringReader(content))) {
+            reader.setLenient(false);
+            validateValue(reader);
+            if (reader.peek() != JsonToken.END_DOCUMENT) {
+                throw new IllegalArgumentException("Trailing JSON content at " + reader.getPath());
+            }
+        } catch (IOException e) {
+            throw new IllegalArgumentException("Invalid recipe JSON: " + e.getMessage(), e);
+        }
+    }
+
+    private static void validateValue(JsonReader reader) throws IOException {
+        switch (reader.peek()) {
+            case BEGIN_OBJECT -> {
+                reader.beginObject();
+                Set<String> keys = new HashSet<>();
+                while (reader.hasNext()) {
+                    String key = reader.nextName();
+                    if (!keys.add(key)) {
+                        throw new IllegalArgumentException("Duplicate JSON key '" + key + "' at " + reader.getPath());
+                    }
+                    validateValue(reader);
+                }
+                reader.endObject();
+            }
+            case BEGIN_ARRAY -> {
+                reader.beginArray();
+                while (reader.hasNext()) validateValue(reader);
+                reader.endArray();
+            }
+            case STRING, NUMBER, BOOLEAN, NULL -> reader.skipValue();
+            default -> throw new IllegalArgumentException("Expected JSON value at " + reader.getPath());
+        }
+    }
+
+    public static void checkFile(Path path) throws IOException {
+        String content = Files.readString(path, StandardCharsets.UTF_8);
+        if (!content.equals(format(content))) {
+            throw new IllegalStateException("Recipe pack needs compact formatting: " + path);
+        }
+    }
+
     public static boolean formatFile(Path path) throws IOException {
         if (!Files.isRegularFile(path)) {
             return false;
@@ -111,27 +160,42 @@ public class RecipePackFormatter {
                             boolean changed = formatFile(p);
                             System.out.println((changed ? "Formatted: " : "Unchanged: ") + p.toAbsolutePath());
                         } catch (Exception e) {
-                            System.err.println("Failed to format " + p + ": " + e.getMessage());
+                            throw new IllegalStateException("Failed to format " + p + ": " + e.getMessage(), e);
                         }
                     });
         }
     }
 
     public static void main(String[] args) throws Exception {
+        boolean checkOnly = args.length > 0 && "--check".equals(args[0]);
+        int pathIndex = checkOnly ? 1 : 0;
         Path targetDir;
-        if (args.length > 0) {
-            targetDir = Path.of(args[0]);
+        if (args.length > pathIndex) {
+            targetDir = Path.of(args[pathIndex]);
         } else {
             targetDir = Path.of("src/main/resources/data/buildscape/recipes_pack");
         }
 
         if (Files.isRegularFile(targetDir)) {
+            if (checkOnly) {
+                checkFile(targetDir);
+                return;
+            }
             boolean changed = formatFile(targetDir);
             System.out.println((changed ? "Formatted: " : "Unchanged: ") + targetDir.toAbsolutePath());
         } else if (Files.isDirectory(targetDir)) {
+            if (checkOnly) {
+                try (Stream<Path> paths = Files.walk(targetDir)) {
+                    for (Path path : paths.filter(p -> Files.isRegularFile(p) && p.toString().endsWith(".json"))
+                            .sorted().toList()) {
+                        checkFile(path);
+                    }
+                }
+                return;
+            }
             formatDirectory(targetDir);
         } else {
-            System.err.println("Target path not found: " + targetDir.toAbsolutePath());
+            throw new IllegalArgumentException("Target path not found: " + targetDir.toAbsolutePath());
         }
     }
 }

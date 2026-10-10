@@ -761,6 +761,10 @@ public class BlockFactory implements IBlockFactory {
                 public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
                     return new BambooSignBlockEntity(pos, state);
                 }
+                @Override
+                public <T extends BlockEntity> net.minecraft.world.level.block.entity.BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
+                    return createTickerHelper(type, ModBlockEntities.BAMBOO_SIGN_BLOCK_ENTITY_TYPE, net.minecraft.world.level.block.entity.SignBlockEntity::tick);
+                }
             }
             return new V26xBambooStandingSignBlock(WoodType.BAMBOO, props);
         } else if (def.isBambooWallSign()) {
@@ -771,6 +775,10 @@ public class BlockFactory implements IBlockFactory {
                 @Override
                 public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
                     return new BambooSignBlockEntity(pos, state);
+                }
+                @Override
+                public <T extends BlockEntity> net.minecraft.world.level.block.entity.BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
+                    return createTickerHelper(type, ModBlockEntities.BAMBOO_SIGN_BLOCK_ENTITY_TYPE, net.minecraft.world.level.block.entity.SignBlockEntity::tick);
                 }
             }
             return new V26xBambooWallSignBlock(WoodType.BAMBOO, props);
@@ -783,6 +791,10 @@ public class BlockFactory implements IBlockFactory {
                 public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
                     return new MangroveSignBlockEntity(pos, state);
                 }
+                @Override
+                public <T extends BlockEntity> net.minecraft.world.level.block.entity.BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
+                    return createTickerHelper(type, ModBlockEntities.MANGROVE_SIGN_BLOCK_ENTITY_TYPE, net.minecraft.world.level.block.entity.SignBlockEntity::tick);
+                }
             }
             return new V26xMangroveStandingSignBlock(WoodType.MANGROVE, props);
         } else if (def.isMangroveWallSign()) {
@@ -793,6 +805,10 @@ public class BlockFactory implements IBlockFactory {
                 @Override
                 public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
                     return new MangroveSignBlockEntity(pos, state);
+                }
+                @Override
+                public <T extends BlockEntity> net.minecraft.world.level.block.entity.BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
+                    return createTickerHelper(type, ModBlockEntities.MANGROVE_SIGN_BLOCK_ENTITY_TYPE, net.minecraft.world.level.block.entity.SignBlockEntity::tick);
                 }
             }
             return new V26xMangroveWallSignBlock(WoodType.MANGROVE, props);

@@ -8,11 +8,7 @@ import net.minecraft.world.level.block.state.BlockState;
 public class MangroveSignBlockEntity extends SignBlockEntity {
 
     public MangroveSignBlockEntity(BlockPos pos, BlockState state) {
-        super(pos, state);
-    }
-
-    @Override
-    public BlockEntityType<?> getType() {
-        return ModBlockEntities.MANGROVE_SIGN_BLOCK_ENTITY_TYPE != null ? ModBlockEntities.MANGROVE_SIGN_BLOCK_ENTITY_TYPE : super.getType();
+        // Must pass Buildscape's own type: the vanilla SIGN type rejects blocks that are not in its valid set.
+        super(ModBlockEntities.MANGROVE_SIGN_BLOCK_ENTITY_TYPE, pos, state);
     }
 }

@@ -35,6 +35,8 @@ public class RecipeCacheGenerator {
     public static final int MAGIC_HEADER = 0x4B59524F;
     public static final int CACHE_VERSION = 5;
     public static final int SOURCE_SCHEMA_VERSION = 1;
+    // Bump whenever compilation logic changes, even if the binary layout does not.
+    public static final int GENERATOR_VERSION = 2;
 
     public static final String[] CATEGORIES = {
             "crafting", "stonecutting", "smelting", "blasting",
@@ -46,6 +48,7 @@ public class RecipeCacheGenerator {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             updateDigestInt(digest, SOURCE_SCHEMA_VERSION);
             updateDigestInt(digest, CACHE_VERSION);
+            updateDigestInt(digest, GENERATOR_VERSION);
             for (String category : categoryOrder) {
                 byte[] name = category.getBytes(StandardCharsets.UTF_8);
                 updateDigestInt(digest, name.length);
@@ -53,6 +56,8 @@ public class RecipeCacheGenerator {
                 byte[] content = categoryData.get(category);
                 digest.update((byte) (content == null ? 0 : 1));
                 if (content != null) {
+                    content = new String(content, StandardCharsets.UTF_8).replace("\r\n", "\n")
+                            .getBytes(StandardCharsets.UTF_8);
                     updateDigestInt(digest, content.length);
                     digest.update(content);
                 }
@@ -92,6 +97,8 @@ public class RecipeCacheGenerator {
             Path sourceFile = sourceDirectory.resolve(category + ".json");
             if (Files.isRegularFile(sourceFile)) {
                 rawCategoryData.put(category, Files.readAllBytes(sourceFile));
+                com.kingodogo.buildscape.recipe.framework.util.RecipePackFormatter.validateJson(
+                        Files.readString(sourceFile, StandardCharsets.UTF_8));
             }
         }
 
@@ -152,6 +159,8 @@ public class RecipeCacheGenerator {
                     String recipeId = "buildscape:" + cleanPath;
 
                     if (registeredRecipeIds.contains(recipeId)) {
+                        System.err.println("WARNING: Duplicate recipe ID in " + category + ": " + recipeId
+                                + "; retaining the first recipe only");
                         continue;
                     }
                     registeredRecipeIds.add(recipeId);
@@ -426,7 +435,7 @@ public class RecipeCacheGenerator {
     public static void main(String[] args) throws Exception {
         Path sourceDir = args.length > 0 ? Path.of(args[0]) : Path.of("src/main/resources/data/buildscape/recipes_pack");
         Path targetBundledCache = args.length > 1 ? Path.of(args[1]) : sourceDir.resolve("recipes.bscb");
-        Path targetLocalCache = args.length > 2 ? Path.of(args[2]) : Path.of("run/buildscape/cache/recipes.bscb");
+        Path targetLocalCache = args.length > 2 ? Path.of(args[2]) : null;
 
         // Read sources and compute live SHA-256 hash
         Map<String, byte[]> rawCategoryData = new LinkedHashMap<>();

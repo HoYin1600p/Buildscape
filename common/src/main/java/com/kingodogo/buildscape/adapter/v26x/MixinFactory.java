@@ -54,12 +54,7 @@ public class MixinFactory implements IMixinFactory {
             "com.kingodogo.buildscape.mixin.BuildscapeBlockStateCacheMixin",
             "com.kingodogo.buildscape.mixin.BuildscapeForgeRegistryMixin",
             "com.kingodogo.buildscape.mixin.BuildscapeModelBakeryMixin",
-            "com.kingodogo.buildscape.mixin.CreativeModeTabMixin",
-            "com.kingodogo.buildscape.mixin.RenderBuffersMixin",
-            "com.kingodogo.buildscape.mixin.ScreenMixin",
-            "com.kingodogo.buildscape.mixin.AdvancementWidgetMixin",
-            "com.kingodogo.buildscape.mixin.GeneralStatisticsListMixin",
-            "com.kingodogo.buildscape.mixin.GeneralStatisticsListEntryMixin"
+            "com.kingodogo.buildscape.mixin.CreativeModeTabMixin"
     );
 
     @Override
@@ -263,6 +258,18 @@ public class MixinFactory implements IMixinFactory {
     }
 
     @Override public void setScreen(Object screen) { com.kingodogo.buildscape.adapter.v26x.client.ClientMixinHooks.setScreen(screen); }
+
+    @Override public ItemStack cycleAdvancementIcon(Object node, Object display) { return com.kingodogo.buildscape.adapter.v26x.client.ClientMixinHooks.cycleAdvancementIcon(node, display); }
+    @Override public void sortGeneralStatsList(Object list, java.util.Comparator<?> comparator) { com.kingodogo.buildscape.adapter.v26x.client.ClientMixinHooks.sortGeneralStatsList(list, comparator); }
+    @Override public boolean renderStatsEntry(Object stat, PoseStack pose, int left, int top, int width) { return renderStatsEntry(stat, (Object) com.kingodogo.buildscape.adapter.v26x.client.ClientGuiHooks.current(), left, top, width); }
+    @Override public boolean renderStatsEntry(Object stat, Object graphics, int left, int top, int width) { return com.kingodogo.buildscape.adapter.v26x.client.ClientMixinHooks.renderStatsEntry(stat, graphics, left, top, width); }
+    @Override public void registerFixedRenderBuffers(Object buffers) { com.kingodogo.buildscape.adapter.v26x.client.ClientMixinHooks.registerFixedRenderBuffers(buffers); }
+    @Override public void renderCustomScreenTooltip(net.minecraft.client.gui.screens.Screen screen, PoseStack pose, List<?> components, int x, int y, ItemStack stack, net.minecraft.client.gui.Font font, Object renderer, int width, int height) { renderCustomScreenTooltip((Object) com.kingodogo.buildscape.adapter.v26x.client.ClientGuiHooks.current(), components, x, y, stack, font); }
+    @Override public void renderCustomScreenTooltip(Object graphics, List<?> components, int x, int y, ItemStack stack, net.minecraft.client.gui.Font font) { com.kingodogo.buildscape.adapter.v26x.client.ClientMixinHooks.renderCustomScreenTooltip(graphics, components, x, y, stack, font); }
+    @Override public List<Component> prepareCustomTooltipText(ItemStack stack, List<Component> text) { return com.kingodogo.buildscape.adapter.v26x.client.ClientMixinHooks.prepareCustomTooltipText(stack, text); }
+    @Override public Object createClientTooltipComponent(Object data) { return com.kingodogo.buildscape.adapter.v26x.client.ClientMixinHooks.createClientTooltipComponent(data); }
+    @Override public void handleFireworkStarterTick(Object starter) { com.kingodogo.buildscape.adapter.v26x.client.ClientMixinHooks.handleFireworkStarterTick(starter); }
+    @Override public boolean renderCustomFireworkExplosion(Object starter, Object colors, Object fades, boolean trail, boolean flicker) { return com.kingodogo.buildscape.adapter.v26x.client.ClientMixinHooks.renderCustomFireworkExplosion(starter, colors, fades, trail, flicker); }
 
     @Override
     public void migrateStoredGhostItems(Object inputOrTag) {

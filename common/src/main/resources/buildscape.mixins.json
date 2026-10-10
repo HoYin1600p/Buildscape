@@ -42,6 +42,14 @@
     "WallBlockMixin"
   ],
   "client": [
+    "ScreenMixin",
+    "GeneralStatisticsListMixin",
+    "GeneralStatisticsListEntryMixin",
+    "AdvancementWidgetMixin",
+    "RenderBuffersMixin",
+    "client.ClientTooltipComponentMixin",
+    "client.FireworkRocketContextMixin",
+    "client.FireworkStarterShapeMixin",
     "AbstractContainerScreenMixin",
     "AnvilScreenMixin",
     "BeaconBlockEntityRendererMixin",

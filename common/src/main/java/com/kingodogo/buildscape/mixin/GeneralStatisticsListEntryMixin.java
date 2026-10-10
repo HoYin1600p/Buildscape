@@ -2,7 +2,8 @@ package com.kingodogo.buildscape.mixin;
 
 import com.kingodogo.buildscape.mixinsupport.MixinFactory;
 
-import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.components.AbstractSelectionList;
 import net.minecraft.stats.Stat;
 import org.spongepowered.asm.mixin.Dynamic;
 import org.spongepowered.asm.mixin.Final;
@@ -20,9 +21,10 @@ public abstract class GeneralStatisticsListEntryMixin {
     private Stat<?> stat;
 
     @Dynamic
-    @Inject(method = "render", at = @At("HEAD"), cancellable = true, require = 0)
-    public void onRender(PoseStack poseStack, int index, int top, int left, int width, int height, int mouseX, int mouseY, boolean isHovered, float partialTick, CallbackInfo ci) {
-        if (MixinFactory.renderStatsEntry(this.stat, poseStack, left, top, width)) {
+    @Inject(method = "extractContent(Lnet/minecraft/client/gui/GuiGraphicsExtractor;IIZF)V", at = @At("HEAD"), cancellable = true, require = 0)
+    private void buildscape$extractHeader(GuiGraphicsExtractor graphics, int mouseX, int mouseY, boolean hovered, float partialTick, CallbackInfo ci) {
+        AbstractSelectionList.Entry<?> entry = (AbstractSelectionList.Entry<?>) (Object) this;
+        if (MixinFactory.get().renderStatsEntry(this.stat, graphics, entry.getContentX(), entry.getContentY(), entry.getContentWidth())) {
             ci.cancel();
         }
     }

@@ -87,7 +87,10 @@ public class PointedIcicleBlock extends PointedDripstoneBlock {
     private boolean isAttached(BlockGetter level, BlockPos pos, Direction direction) {
         BlockPos supportPos = direction == Direction.DOWN ? pos.above() : pos.below();
         BlockState supportState = level.getBlockState(supportPos);
-        return !isIcicleBlock(supportState);
+        // Only a full face gets the ice shell; dripstone and slabs would show it floating or inside them.
+        return !isIcicleBlock(supportState)
+                && !supportState.is(Blocks.POINTED_DRIPSTONE)
+                && supportState.isFaceSturdy(level, supportPos, direction);
     }
 
     @Override

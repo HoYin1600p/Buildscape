@@ -1,7 +1,7 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "buildscape:block/icicle_down_tip"
+    "layer0": "buildscape:item/icicle"
   },
   "display": {
     "thirdperson_righthand": {

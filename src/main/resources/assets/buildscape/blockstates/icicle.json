@@ -1,35 +1,144 @@
 {
   "variants": {
-    "thickness=tip_merge,vertical_direction=down": {
-      "model": "buildscape:block/pointed_icicle_down_tip_merge"
+    "attached=false,sideless=false,thickness=base,vertical_direction=down": {
+      "model": "buildscape:block/icicle_down_base"
     },
-    "thickness=tip_merge,vertical_direction=up": {
-      "model": "buildscape:block/pointed_icicle_up_tip_merge"
+    "attached=false,sideless=false,thickness=base,vertical_direction=up": {
+      "model": "buildscape:block/icicle_down_base",
+      "x": 180
     },
-    "thickness=tip,vertical_direction=down": {
-      "model": "buildscape:block/pointed_icicle_down_tip"
+    "attached=false,sideless=false,thickness=frustum,vertical_direction=down": {
+      "model": "buildscape:block/icicle_down_frustum"
     },
-    "thickness=tip,vertical_direction=up": {
-      "model": "buildscape:block/pointed_icicle_up_tip"
+    "attached=false,sideless=false,thickness=frustum,vertical_direction=up": {
+      "model": "buildscape:block/icicle_down_frustum",
+      "x": 180
     },
-    "thickness=frustum,vertical_direction=down": {
-      "model": "buildscape:block/pointed_icicle_down_frustum"
+    "attached=false,sideless=false,thickness=middle,vertical_direction=down": {
+      "model": "buildscape:block/icicle_down_middle"
     },
-    "thickness=frustum,vertical_direction=up": {
-      "model": "buildscape:block/pointed_icicle_up_frustum"
+    "attached=false,sideless=false,thickness=middle,vertical_direction=up": {
+      "model": "buildscape:block/icicle_down_middle",
+      "x": 180
     },
-    "thickness=middle,vertical_direction=down": {
-      "model": "buildscape:block/pointed_icicle_down_middle"
+    "attached=false,sideless=false,thickness=tip,vertical_direction=down": {
+      "model": "buildscape:block/icicle_down_tip"
     },
-    "thickness=middle,vertical_direction=up": {
-      "model": "buildscape:block/pointed_icicle_up_middle"
+    "attached=false,sideless=false,thickness=tip,vertical_direction=up": {
+      "model": "buildscape:block/icicle_down_tip",
+      "x": 180
     },
-    "thickness=base,vertical_direction=down": {
-      "model": "buildscape:block/pointed_icicle_down_base"
+    "attached=false,sideless=false,thickness=tip_merge,vertical_direction=down": {
+      "model": "buildscape:block/icicle_down_tip_merge"
     },
-    "thickness=base,vertical_direction=up": {
-      "model": "buildscape:block/pointed_icicle_up_base"
+    "attached=false,sideless=false,thickness=tip_merge,vertical_direction=up": {
+      "model": "buildscape:block/icicle_down_tip_merge",
+      "x": 180
+    },
+    "attached=false,sideless=true,thickness=base,vertical_direction=down": {
+      "model": "buildscape:block/icicle_down_base_sideless"
+    },
+    "attached=false,sideless=true,thickness=base,vertical_direction=up": {
+      "model": "buildscape:block/icicle_down_base_sideless",
+      "x": 180
+    },
+    "attached=false,sideless=true,thickness=frustum,vertical_direction=down": {
+      "model": "buildscape:block/icicle_down_frustum_sideless"
+    },
+    "attached=false,sideless=true,thickness=frustum,vertical_direction=up": {
+      "model": "buildscape:block/icicle_down_frustum_sideless",
+      "x": 180
+    },
+    "attached=false,sideless=true,thickness=middle,vertical_direction=down": {
+      "model": "buildscape:block/icicle_down_middle_sideless"
+    },
+    "attached=false,sideless=true,thickness=middle,vertical_direction=up": {
+      "model": "buildscape:block/icicle_down_middle_sideless",
+      "x": 180
+    },
+    "attached=false,sideless=true,thickness=tip,vertical_direction=down": {
+      "model": "buildscape:block/icicle_down_tip_sideless"
+    },
+    "attached=false,sideless=true,thickness=tip,vertical_direction=up": {
+      "model": "buildscape:block/icicle_down_tip_sideless",
+      "x": 180
+    },
+    "attached=false,sideless=true,thickness=tip_merge,vertical_direction=down": {
+      "model": "buildscape:block/icicle_down_tip_merge_sideless"
+    },
+    "attached=false,sideless=true,thickness=tip_merge,vertical_direction=up": {
+      "model": "buildscape:block/icicle_down_tip_merge_sideless",
+      "x": 180
+    },
+    "attached=true,sideless=false,thickness=base,vertical_direction=down": {
+      "model": "buildscape:block/icicle_down_base_base"
+    },
+    "attached=true,sideless=false,thickness=base,vertical_direction=up": {
+      "model": "buildscape:block/icicle_down_base_base",
+      "x": 180
+    },
+    "attached=true,sideless=false,thickness=frustum,vertical_direction=down": {
+      "model": "buildscape:block/icicle_down_frustum_base"
+    },
+    "attached=true,sideless=false,thickness=frustum,vertical_direction=up": {
+      "model": "buildscape:block/icicle_down_frustum_base",
+      "x": 180
+    },
+    "attached=true,sideless=false,thickness=middle,vertical_direction=down": {
+      "model": "buildscape:block/icicle_down_middle_base"
+    },
+    "attached=true,sideless=false,thickness=middle,vertical_direction=up": {
+      "model": "buildscape:block/icicle_down_middle_base",
+      "x": 180
+    },
+    "attached=true,sideless=false,thickness=tip,vertical_direction=down": {
+      "model": "buildscape:block/icicle_down_tip_base"
+    },
+    "attached=true,sideless=false,thickness=tip,vertical_direction=up": {
+      "model": "buildscape:block/icicle_down_tip_base",
+      "x": 180
+    },
+    "attached=true,sideless=false,thickness=tip_merge,vertical_direction=down": {
+      "model": "buildscape:block/icicle_down_tip_merge_base"
+    },
+    "attached=true,sideless=false,thickness=tip_merge,vertical_direction=up": {
+      "model": "buildscape:block/icicle_down_tip_merge_base",
+      "x": 180
+    },
+    "attached=true,sideless=true,thickness=base,vertical_direction=down": {
+      "model": "buildscape:block/icicle_down_base_sideless"
+    },
+    "attached=true,sideless=true,thickness=base,vertical_direction=up": {
+      "model": "buildscape:block/icicle_down_base_sideless",
+      "x": 180
+    },
+    "attached=true,sideless=true,thickness=frustum,vertical_direction=down": {
+      "model": "buildscape:block/icicle_down_frustum_sideless"
+    },
+    "attached=true,sideless=true,thickness=frustum,vertical_direction=up": {
+      "model": "buildscape:block/icicle_down_frustum_sideless",
+      "x": 180
+    },
+    "attached=true,sideless=true,thickness=middle,vertical_direction=down": {
+      "model": "buildscape:block/icicle_down_middle_sideless"
+    },
+    "attached=true,sideless=true,thickness=middle,vertical_direction=up": {
+      "model": "buildscape:block/icicle_down_middle_sideless",
+      "x": 180
+    },
+    "attached=true,sideless=true,thickness=tip,vertical_direction=down": {
+      "model": "buildscape:block/icicle_down_tip_sideless"
+    },
+    "attached=true,sideless=true,thickness=tip,vertical_direction=up": {
+      "model": "buildscape:block/icicle_down_tip_sideless",
+      "x": 180
+    },
+    "attached=true,sideless=true,thickness=tip_merge,vertical_direction=down": {
+      "model": "buildscape:block/icicle_down_tip_merge_sideless"
+    },
+    "attached=true,sideless=true,thickness=tip_merge,vertical_direction=up": {
+      "model": "buildscape:block/icicle_down_tip_merge_sideless",
+      "x": 180
     }
   }
 }
-

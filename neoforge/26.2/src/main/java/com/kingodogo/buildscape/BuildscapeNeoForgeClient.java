@@ -20,6 +20,8 @@ import java.util.function.Function;
 final class BuildscapeNeoForgeClient {
     private BuildscapeNeoForgeClient() {}
     static void register(IEventBus bus) {
+        bus.addListener(BuildscapeNeoForgeClient::fluidModels);
+        bus.addListener(BuildscapeNeoForgeClient::fluidExtensions);
         bus.addListener(BuildscapeNeoForgeClient::setup);
         bus.addListener(BuildscapeNeoForgeClient::screens);
         bus.addListener(BuildscapeNeoForgeClient::particles);
@@ -31,6 +33,20 @@ final class BuildscapeNeoForgeClient {
     }
     private static void setup(FMLClientSetupEvent event) {
         event.enqueueWork(com.kingodogo.buildscape.client.ClientEvents::initializeConfigCallback);
+    }
+    private static void fluidModels(net.neoforged.neoforge.client.event.RegisterFluidModelsEvent event) {
+        event.register(com.kingodogo.buildscape.adapter.v26x.client.ExperienceFluidModel.create(),
+                com.kingodogo.buildscape.adapter.v26x.fluid.ExperienceFluids.still(),
+                com.kingodogo.buildscape.adapter.v26x.fluid.ExperienceFluids.flowing());
+    }
+    private static void fluidExtensions(net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent event) {
+        event.registerFluidType(new net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions() {
+            @Override public void modifyFogColor(net.minecraft.client.Camera camera, float partialTick,
+                    net.minecraft.client.multiplayer.ClientLevel level, int renderDistance, float darken,
+                    org.joml.Vector4f color) {
+                color.set(0.3F, 0.9F, 0.1F, 1.0F);
+            }
+        }, com.kingodogo.buildscape.fluid.NeoForgeExperienceFluids.type());
     }
     private static void tick(ClientTickEvent.Post event) { com.kingodogo.buildscape.client.ClientEvents.onClientTick(); }
     private static void screens(RegisterMenuScreensEvent event) {

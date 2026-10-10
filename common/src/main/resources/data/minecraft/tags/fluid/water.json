@@ -1,7 +1,7 @@
 {
   "replace": false,
   "values": [
-    { "id": "buildscape:experience_still", "required": false },
-    { "id": "buildscape:experience_flowing", "required": false }
+    "buildscape:experience_still",
+    "buildscape:experience_flowing"
   ]
 }

@@ -21,7 +21,11 @@ public class NeoForgeRegistryAdapter extends BaseRegistryAdapter {
     private final Set<ResourceKey<?>> completed = new HashSet<>();
     private RegisterEvent activeEvent;
 
-    public NeoForgeRegistryAdapter() { super(BuildscapeCommon.MOD_ID); }
+    public NeoForgeRegistryAdapter() {
+        super(BuildscapeCommon.MOD_ID);
+        com.kingodogo.buildscape.adapter.v26x.fluid.ExperienceFluids.setFactory(
+                com.kingodogo.buildscape.fluid.NeoForgeExperienceFluids::createPair);
+    }
 
     public <V> void enqueue(Registry<V> registry, CommonId id, V value) {
         ResourceKey<?> key = registry.key();
@@ -35,12 +39,22 @@ public class NeoForgeRegistryAdapter extends BaseRegistryAdapter {
         }
     }
 
-    @SuppressWarnings({"unchecked", "rawtypes"})
     public void onRegister(RegisterEvent event) {
+        Services.PLATFORM.wrapRegistryAction(() -> registerEntries(event));
+    }
+
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    private void registerEntries(RegisterEvent event) {
         activeEvent = event;
         try {
             var key = event.getRegistryKey();
-            if (key.equals(Registries.BLOCK)) {
+            if (key.equals(net.neoforged.neoforge.registries.NeoForgeRegistries.Keys.FLUID_TYPES)) {
+                event.register(net.neoforged.neoforge.registries.NeoForgeRegistries.Keys.FLUID_TYPES,
+                        Identifier.fromNamespaceAndPath(namespace, "experience"),
+                        com.kingodogo.buildscape.fluid.NeoForgeExperienceFluids::type);
+            } else if (key.equals(Registries.FLUID)) {
+                com.kingodogo.buildscape.adapter.v26x.fluid.ExperienceFluids.register();
+            } else if (key.equals(Registries.BLOCK)) {
                 initBlocks();
                 registerTo(BuiltInRegistries.BLOCK, modBlocks);
             } else if (key.equals(Registries.ITEM)) {

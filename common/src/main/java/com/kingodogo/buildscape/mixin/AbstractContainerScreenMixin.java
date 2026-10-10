@@ -1,6 +1,9 @@
 package com.kingodogo.buildscape.mixin;
 
-import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import com.kingodogo.buildscape.util.GhostFilterMenu;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.StonecutterScreen;
 import net.minecraft.world.inventory.Slot;
@@ -27,10 +30,14 @@ public abstract class AbstractContainerScreenMixin {
         }
     }
 
-    @Dynamic
-    @Inject(method = "renderSlot(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/world/inventory/Slot;)V", at = @At("TAIL"), require = 0)
-    private void renderFilterPlaceholder(PoseStack poseStack, Slot slot, CallbackInfo ci) {
+    @Inject(method = "extractSlot(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/world/inventory/Slot;II)V", at = @At("TAIL"))
+    private void renderFilterPlaceholder(GuiGraphicsExtractor graphics, Slot slot, int mouseX, int mouseY, CallbackInfo ci) {
         AbstractContainerScreen<?> screen = (AbstractContainerScreen<?>) (Object) this;
-        MixinFactory.renderFilterPlaceholder(screen.getMenu(), slot, poseStack);
+        if (slot.hasItem() || !slot.isActive() || !(screen.getMenu() instanceof GhostFilterMenu filters)) return;
+        Item filter = filters.buildscape$getFilterItem(slot.index);
+        if (filter == null) return;
+        graphics.fakeItem(new ItemStack(filter), slot.x, slot.y);
+        // Fade the placeholder without affecting item render state or the actual slot contents.
+        graphics.fill(slot.x, slot.y, slot.x + 16, slot.y + 16, 0x80C6C6C6);
     }
 }

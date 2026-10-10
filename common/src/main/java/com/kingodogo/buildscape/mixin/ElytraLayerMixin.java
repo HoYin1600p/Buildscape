@@ -2,30 +2,24 @@ package com.kingodogo.buildscape.mixin;
 
 import com.kingodogo.buildscape.client.renderer.FestiveGlintHandler;
 import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.LivingEntity;
-import org.spongepowered.asm.mixin.Dynamic;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Coerce;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(targets = "net.minecraft.client.renderer.entity.layers.ElytraLayer")
-public class ElytraLayerMixin {
-
-    @Dynamic
-    @Inject(method = "render(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;ILnet/minecraft/world/entity/LivingEntity;FFFFFF)V", at = @At("HEAD"), require = 0)
-    private void buildscape$pushElytraStack(PoseStack poseStack, @Coerce Object bufferSource, int packedLight, LivingEntity livingEntity, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, CallbackInfo ci) {
-        if (livingEntity != null) {
-            FestiveGlintHandler.push(livingEntity.getItemBySlot(EquipmentSlot.CHEST));
-        }
+@Mixin(targets = "net.minecraft.client.renderer.entity.layers.WingsLayer")
+public abstract class ElytraLayerMixin {
+    @Inject(method = "submit(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;ILnet/minecraft/client/renderer/entity/state/HumanoidRenderState;FF)V", at = @At("HEAD"))
+    private void buildscape$pushElytraStack(PoseStack poses, SubmitNodeCollector collector, int light,
+            HumanoidRenderState state, float yaw, float pitch, CallbackInfo ci) {
+        FestiveGlintHandler.push(state.chestEquipment);
     }
 
-    @Dynamic
-    @Inject(method = "render(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;ILnet/minecraft/world/entity/LivingEntity;FFFFFF)V", at = @At("RETURN"), require = 0)
-    private void buildscape$popElytraStack(PoseStack poseStack, @Coerce Object bufferSource, int packedLight, LivingEntity livingEntity, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, CallbackInfo ci) {
+    @Inject(method = "submit(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;ILnet/minecraft/client/renderer/entity/state/HumanoidRenderState;FF)V", at = @At("RETURN"))
+    private void buildscape$popElytraStack(PoseStack poses, SubmitNodeCollector collector, int light,
+            HumanoidRenderState state, float yaw, float pitch, CallbackInfo ci) {
         FestiveGlintHandler.pop();
     }
 }
-

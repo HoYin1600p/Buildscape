@@ -18,7 +18,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class AbstractContainerMenuMixin {
 
     @Inject(method = "clicked", at = @At("HEAD"), cancellable = true)
-    private void onBeforeClicked(int slotId, int buttonId, @Coerce Enum<?> clickType, Player player, CallbackInfo ci) {
+    private void onBeforeClicked(int slotId, int buttonId, net.minecraft.world.inventory.ContainerInput clickType, Player player, CallbackInfo ci) {
         AbstractContainerMenu containerMenu = (AbstractContainerMenu) (Object) this;
         String clickTypeName = clickType != null ? clickType.name() : "";
 

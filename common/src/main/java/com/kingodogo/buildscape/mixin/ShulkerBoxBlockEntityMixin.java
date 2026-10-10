@@ -50,13 +50,13 @@ public class ShulkerBoxBlockEntityMixin implements GhostFilterable {
         MixinFactory.writeGhostFilters(outputOrTag, this.buildscape$ghostFilters);
     }
     @Dynamic
-    @Inject(method = "loadAdditional(Lnet/minecraft/world/level/storage/ValueInput;)V", at = @At("TAIL"), require = 0)
+    @Inject(method = "loadAdditional(Lnet/minecraft/world/level/storage/ValueInput;)V", at = @At("TAIL"))
     private void buildscape$onLoad26(@Coerce Object valueInput, CallbackInfo ci) {
         MixinFactory.readGhostFilters(valueInput, this.buildscape$ghostFilters);
     }
 
     @Dynamic
-    @Inject(method = "saveAdditional(Lnet/minecraft/world/level/storage/ValueOutput;)V", at = @At("TAIL"), require = 0)
+    @Inject(method = "saveAdditional(Lnet/minecraft/world/level/storage/ValueOutput;)V", at = @At("TAIL"))
     private void buildscape$onSaveAdditional26(@Coerce Object valueOutput, CallbackInfo ci) {
         MixinFactory.writeGhostFilters(valueOutput, this.buildscape$ghostFilters);
     }

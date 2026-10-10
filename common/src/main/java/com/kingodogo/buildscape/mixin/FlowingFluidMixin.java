@@ -20,24 +20,14 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public abstract class FlowingFluidMixin {
 
     @Shadow
-    private boolean canPassThroughWall(Direction direction, BlockGetter level, BlockPos fromPos,
+    private static boolean canPassThroughWall(Direction direction, BlockGetter level, BlockPos fromPos,
                                        BlockState fromState, BlockPos toPos, BlockState toState) {
         throw new AssertionError();
     }
 
-    @Dynamic
-    @Inject(method = "getNewLiquid(Lnet/minecraft/world/level/LevelReader;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;)Lnet/minecraft/world/level/material/FluidState;", at = @At("RETURN"), cancellable = true, require = 0)
-    private void buildscape$supplyFluidFromConduit118(LevelReader level, BlockPos pos, BlockState state,
-                                                      CallbackInfoReturnable<FluidState> cir) {
-        cir.setReturnValue(FluidConduitSupply.augment((FlowingFluid) (Object) this, level, pos, state,
-                cir.getReturnValue(), (direction, fromPos, fromState, toPos, toState) ->
-                        canPassThroughWall(direction, level, fromPos, fromState, toPos, toState)));
-    }
-
-    @Dynamic
-    @Inject(method = "getNewLiquid(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;)Lnet/minecraft/world/level/material/FluidState;", at = @At("RETURN"), cancellable = true, require = 0)
-    private void buildscape$supplyFluidFromConduit121(Level level, BlockPos pos, BlockState state,
-                                                   CallbackInfoReturnable<FluidState> cir) {
+    @Inject(method = "getNewLiquid(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;)Lnet/minecraft/world/level/material/FluidState;", at = @At("RETURN"), cancellable = true)
+    private void buildscape$supplyFluidFromConduit26(net.minecraft.server.level.ServerLevel level, BlockPos pos, BlockState state,
+                                                    CallbackInfoReturnable<FluidState> cir) {
         cir.setReturnValue(FluidConduitSupply.augment((FlowingFluid) (Object) this, level, pos, state,
                 cir.getReturnValue(), (direction, fromPos, fromState, toPos, toState) ->
                         canPassThroughWall(direction, level, fromPos, fromState, toPos, toState)));

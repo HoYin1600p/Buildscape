@@ -27,8 +27,8 @@ public abstract class LevelMixin {
         }
     }
 
-    @Inject(method = "addParticle(Lnet/minecraft/core/particles/ParticleOptions;ZDDDDDD)V", at = @At("HEAD"), cancellable = true)
-    private void onAddParticleAlways(ParticleOptions options, boolean alwaysRender, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed, CallbackInfo ci) {
+    @Inject(method = "addParticle(Lnet/minecraft/core/particles/ParticleOptions;ZZDDDDDD)V", at = @At("HEAD"), cancellable = true)
+    private void onAddParticleAlways(ParticleOptions options, boolean alwaysRender, boolean overrideLimiter, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed, CallbackInfo ci) {
         if (isWaterParticle(options)) {
             Level self = (Level) (Object) this;
             BlockPos pos = new BlockPos((int) Math.floor(x), (int) Math.floor(y), (int) Math.floor(z));

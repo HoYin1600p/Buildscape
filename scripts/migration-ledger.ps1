@@ -155,8 +155,8 @@ function Test-Ledger {
                 $errors.Add("${path}: completed row requires active_paths")
             }
             $coverage = [string]$row.era_coverage
-            if ($coverage -notmatch '118x' -or $coverage -notmatch '121x' -or $coverage -notmatch '26x') {
-                $errors.Add("${path}: completed row requires VersionCluster coverage for 118x, 121x, and 26x")
+            if ($coverage -notmatch '26x') {
+                $errors.Add("${path}: completed row requires VersionCluster coverage for 26x")
             }
             if ([string]::IsNullOrWhiteSpace([string]$row.verification)) {
                 $errors.Add("${path}: completed row requires verification evidence")

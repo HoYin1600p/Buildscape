@@ -182,6 +182,10 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
     @Override
     public Fluid getFluid(CommonId id) {
         if (id == null) return null;
+        if ("buildscape".equals(id.getNamespace())) {
+            if ("experience_still".equals(id.getPath())) return com.kingodogo.buildscape.adapter.v26x.fluid.ExperienceFluids.still();
+            if ("experience_flowing".equals(id.getPath())) return com.kingodogo.buildscape.adapter.v26x.fluid.ExperienceFluids.flowing();
+        }
         Identifier rl = Identifier.fromNamespaceAndPath(id.getNamespace(), id.getPath());
         return BuiltInRegistries.FLUID.getValue(rl);
     }
@@ -1632,9 +1636,15 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
 
     @Override
     public Item createExperienceBucketItem(Item.Properties properties) {
-        return new com.kingodogo.buildscape.item.ExperienceBucketItem(properties) {
+        return new net.minecraft.world.item.BucketItem(
+                com.kingodogo.buildscape.adapter.v26x.fluid.ExperienceFluids.still(),
+                properties.stacksTo(1).craftRemainder(net.minecraft.world.item.Items.BUCKET)) {
             @Override
             public InteractionResult use(Level level, Player player, InteractionHand hand) {
+                if (!player.isShiftKeyDown()) {
+                    InteractionResult placement = super.use(level, player, hand);
+                    if (placement != InteractionResult.PASS) return placement;
+                }
                 player.startUsingItem(hand);
                 return InteractionResult.CONSUME;
             }

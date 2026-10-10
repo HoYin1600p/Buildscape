@@ -1549,6 +1549,12 @@ public class BlockFactory implements IBlockFactory {
         } else if (def.isExperienceCauldron()) {
             return new LayeredCauldronBlock(Biome.Precipitation.NONE, CauldronInteractions.EMPTY, props) {
                 @Override
+                protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos,
+                        Player player, InteractionHand hand, BlockHitResult hit) {
+                    return com.kingodogo.buildscape.adapter.v26x.fluid.ExperienceCauldronInteractions.use(
+                            stack, state, level, pos, player, hand);
+                }
+                @Override
                 public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
                     int levelVal = state.getValue(LEVEL);
                     if (levelVal > 0 && random.nextInt(25 - levelVal * 5) == 0) {
@@ -2280,8 +2286,8 @@ public class BlockFactory implements IBlockFactory {
             }
             return new V26xSnowyGrassBlock(props);
         } else if (def.isExperienceFluid()) {
-            Supplier<FlowingFluid> fluidSupplier = () -> resolveFlowingFluid(def.getParentBlockId());
-            return new ExperienceFluidBlock(fluidSupplier, props) {
+            return new ExperienceFluidBlock(com.kingodogo.buildscape.adapter.v26x.fluid.ExperienceFluids::still,
+                    props.noLootTable().replaceable().noOcclusion()) {
                 @Override
                 public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
                     super.animateTick(state, level, pos, random);

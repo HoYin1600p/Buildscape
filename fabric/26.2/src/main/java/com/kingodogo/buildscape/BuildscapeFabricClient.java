@@ -22,6 +22,10 @@ import java.util.function.Function;
 
 public class BuildscapeFabricClient implements ClientModInitializer {
     @Override public void onInitializeClient() {
+        net.fabricmc.fabric.api.client.render.fluid.v1.FluidRenderingRegistry.register(
+                com.kingodogo.buildscape.adapter.v26x.fluid.ExperienceFluids.still(),
+                com.kingodogo.buildscape.adapter.v26x.fluid.ExperienceFluids.flowing(),
+                com.kingodogo.buildscape.adapter.v26x.client.ExperienceFluidModel.create());
         com.kingodogo.buildscape.adapter.v26x.client.SpecialItemRenderers.registerFabric();
         GuiProvider.registerMenuScreens(new GuiProvider.Registrar() {
             public void registerWorkbench() {

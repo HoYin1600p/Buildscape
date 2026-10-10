@@ -12,6 +12,7 @@ public class FabricRegistryAdapter extends BaseRegistryAdapter {
     @Override
     public synchronized void init() {
         if (isInitialized()) return;
+        com.kingodogo.buildscape.adapter.v26x.fluid.ExperienceFluids.register();
         super.init();
         registerTo(BuiltInRegistries.BLOCK, modBlocks);
         registerTo(BuiltInRegistries.ITEM, modItems);

@@ -100,6 +100,8 @@ tasks.named('test', Test) {
     // Bootstrap mutates global registries; isolate suites in one JVM.
     maxParallelForks = 1
     workingDir = layout.buildDirectory.get().asFile
+    // Lets tests read Buildscape's own resources rather than vanilla files at the same path.
+    systemProperty 'buildscape.mainResources', file('src/main/resources').absolutePath
 }
 
 artifacts {

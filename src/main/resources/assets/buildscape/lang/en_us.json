@@ -6219,9 +6219,5 @@
   "block.buildscape.green_haze_bush.drained": "Drained Green Haze Bush",
   "block.buildscape.red_haze_bush.drained": "Drained Red Haze Bush",
   "block.buildscape.black_haze_bush.drained": "Drained Black Haze Bush",
-  "block.buildscape.ice_crystal": "Ice Crystal",
-  "block.buildscape.icicle": "Icicle",
-  "block.buildscape.icicle_block": "Icicle Block",
-  "block.buildscape.packed_icicle_block": "Packed Icicle Block",
-  "block.buildscape.icicle_cauldron": "Icicle Cauldron"
+  "block.buildscape.ice_crystal": "Ice Crystal"
 }

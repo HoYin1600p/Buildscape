@@ -5,6 +5,7 @@ import com.kingodogo.buildscape.registry.RegistrySupplier;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.core.particles.ParticleType;
 public class ModParticles {
+    public static final RegistrySupplier<SimpleParticleType> HAZE = registerSimple("haze");
     public static final RegistrySupplier<SimpleParticleType> GLOW_LIME_SPARKLE = registerSimple("glow_lime_sparkle");
     public static final RegistrySupplier<SimpleParticleType> TINTED_DRIP_FALL = registerSimple("tinted_drip_fall");
     public static final RegistrySupplier<SimpleParticleType> TINTED_SPORE = registerSimple("tinted_spore");

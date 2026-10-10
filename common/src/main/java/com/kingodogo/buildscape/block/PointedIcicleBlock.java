@@ -66,29 +66,55 @@ public class PointedIcicleBlock extends Block implements ICommonShapeUpdate, Sim
     public static final EnumProperty<Direction> VERTICAL_DIRECTION = BlockStateProperties.VERTICAL_DIRECTION;
     public static final EnumProperty<Thickness> THICKNESS = EnumProperty.create("thickness", Thickness.class);
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
+    public static final BooleanProperty ATTACHED = BlockStateProperties.ATTACHED;
+    public static final BooleanProperty SIDELESS = BooleanProperty.create("sideless");
+
+    private static final VoxelShape ATTACHED_BASE_DOWN = Block.box(0, 14, 0, 16, 16, 16);
+    private static final VoxelShape ATTACHED_BASE_UP = Block.box(0, 0, 0, 16, 2, 16);
 
     protected static final VoxelShape TIP_MERGE_SHAPE = Block.box(5.0D, 0.0D, 5.0D, 11.0D, 16.0D, 11.0D);
-    protected static final VoxelShape TIP_SHAPE_UP = Block.box(5.0D, 0.0D, 5.0D, 11.0D, 11.0D, 11.0D);
-    protected static final VoxelShape TIP_SHAPE_DOWN = Block.box(5.0D, 5.0D, 5.0D, 11.0D, 16.0D, 11.0D);
+    protected static final VoxelShape TIP_SHAPE_UP = Block.box(5.0D, 0.0D, 5.0D, 11.0D, 13.0D, 11.0D);
+    protected static final VoxelShape TIP_SHAPE_DOWN = Block.box(5.0D, 3.0D, 5.0D, 11.0D, 16.0D, 11.0D);
     protected static final VoxelShape FRUSTUM_SHAPE = Block.box(4.0D, 0.0D, 4.0D, 12.0D, 16.0D, 12.0D);
     protected static final VoxelShape MIDDLE_SHAPE = Block.box(3.0D, 0.0D, 3.0D, 13.0D, 16.0D, 13.0D);
-    protected static final VoxelShape BASE_SHAPE = Block.box(2.0D, 0.0D, 2.0D, 14.0D, 16.0D, 14.0D);
+    protected static final VoxelShape BASE_SHAPE = Block.box(1.0D, 0.0D, 1.0D, 15.0D, 16.0D, 15.0D);
+
+    private static final VoxelShape[] ATTACHED_DOWN_SHAPES = attachedShapes(ATTACHED_BASE_DOWN);
+    private static final VoxelShape[] ATTACHED_UP_SHAPES = attachedShapes(ATTACHED_BASE_UP);
+
+    private static VoxelShape[] attachedShapes(VoxelShape base) {
+        return new VoxelShape[]{Shapes.or(TIP_MERGE_SHAPE, base),
+                Shapes.or(base == ATTACHED_BASE_DOWN ? TIP_SHAPE_DOWN : TIP_SHAPE_UP, base),
+                Shapes.or(FRUSTUM_SHAPE, base), Shapes.or(MIDDLE_SHAPE, base), Shapes.or(BASE_SHAPE, base)};
+    }
 
     public PointedIcicleBlock(BlockBehaviour.Properties properties) {
         super(properties);
         this.registerDefaultState(this.stateDefinition.any()
-                .setValue(VERTICAL_DIRECTION, Direction.UP)
+                .setValue(VERTICAL_DIRECTION, Direction.DOWN)
                 .setValue(THICKNESS, Thickness.TIP)
-                .setValue(WATERLOGGED, Boolean.FALSE));
+                .setValue(WATERLOGGED, false)
+                .setValue(ATTACHED, false)
+                .setValue(SIDELESS, false));
     }
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(VERTICAL_DIRECTION, THICKNESS, WATERLOGGED);
+        builder.add(VERTICAL_DIRECTION, THICKNESS, WATERLOGGED, ATTACHED, SIDELESS);
     }
 
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+        if (state.getValue(ATTACHED) && !state.getValue(SIDELESS)) {
+            VoxelShape[] shapes = state.getValue(VERTICAL_DIRECTION) == Direction.DOWN
+                    ? ATTACHED_DOWN_SHAPES : ATTACHED_UP_SHAPES;
+            return shapes[state.getValue(THICKNESS).ordinal()];
+        }
+        return getCollisionShape(state, level, pos, context);
+    }
+
+    @Override
+    public VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         Thickness thickness = state.getValue(THICKNESS);
         Direction direction = state.getValue(VERTICAL_DIRECTION);
         if (thickness == Thickness.TIP_MERGE) {
@@ -104,9 +130,32 @@ public class PointedIcicleBlock extends Block implements ICommonShapeUpdate, Sim
         }
     }
 
-    @Override
-    public VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
-        return getShape(state, level, pos, context);
+    private boolean isAttached(BlockGetter level, BlockPos pos, Direction direction) {
+        BlockPos supportPos = pos.relative(direction.getOpposite());
+        BlockState support = level.getBlockState(supportPos);
+        return !isIcicleBlock(support) && !support.is(Blocks.POINTED_DRIPSTONE)
+                && support.isFaceSturdy(level, supportPos, direction);
+    }
+
+    private BlockState repairAttachment(BlockGetter level, BlockPos pos, BlockState state) {
+        return state.setValue(ATTACHED, isAttached(level, pos, state.getValue(VERTICAL_DIRECTION)));
+    }
+
+    public net.minecraft.world.InteractionResult onInteract(BlockState state, Level level, BlockPos pos,
+            net.minecraft.world.entity.player.Player player, net.minecraft.world.InteractionHand hand,
+            boolean pickaxe) {
+        if (!player.mayBuild() || player.isShiftKeyDown() || !pickaxe
+                || (!state.getValue(ATTACHED) && !state.getValue(SIDELESS))) {
+            return net.minecraft.world.InteractionResult.PASS;
+        }
+        if (!level.isClientSide()) {
+            level.setBlock(pos, state.cycle(SIDELESS), 3);
+            Services.PLATFORM.playBlockSound(level, pos, new CommonId("minecraft", "block.glass.hit"));
+            if (!player.getAbilities().instabuild) {
+                Services.PLATFORM.hurtAndBreak(player.getItemInHand(hand), 1, player, hand);
+            }
+        }
+        return Services.PLATFORM.sidedSuccess(level.isClientSide());
     }
 
     @Override
@@ -139,9 +188,9 @@ public class PointedIcicleBlock extends Block implements ICommonShapeUpdate, Sim
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         Level level = context.getLevel();
-        BlockPos clickedPos = context.getClickedPos();
+        BlockPos pos = context.getClickedPos();
         Direction clickedFace = context.getClickedFace();
-        BlockPos pos = clickedPos.relative(clickedFace);
+        BlockPos clickedPos = pos.relative(clickedFace.getOpposite());
 
         Direction verticalDirection;
         BlockState clickedState = level.getBlockState(clickedPos);
@@ -177,7 +226,9 @@ public class PointedIcicleBlock extends Block implements ICommonShapeUpdate, Sim
         boolean isWater = level.getFluidState(pos).getType() == Fluids.WATER;
         BlockState state = this.defaultBlockState()
                 .setValue(VERTICAL_DIRECTION, verticalDirection)
-                .setValue(WATERLOGGED, isWater);
+                .setValue(WATERLOGGED, isWater)
+                .setValue(ATTACHED, isAttached(level, pos, verticalDirection))
+                .setValue(SIDELESS, false);
         state = calculateCustomThickness(level, pos, state);
 
         BlockPos adjacentPos = verticalDirection == Direction.DOWN ? pos.below() : pos.above();
@@ -202,8 +253,11 @@ public class PointedIcicleBlock extends Block implements ICommonShapeUpdate, Sim
                 Thickness correctThickness = checkForMerge(level, pos, state);
                 if (correctThickness != thickness) {
                     validatedState = state.setValue(THICKNESS, correctThickness);
-                    level.setBlock(pos, validatedState, 2);
                 }
+            }
+            validatedState = repairAttachment(level, pos, validatedState);
+            if (validatedState != state) {
+                level.setBlock(pos, validatedState, 2);
             }
 
             if (level instanceof ServerLevel serverLevel) {
@@ -241,7 +295,7 @@ public class PointedIcicleBlock extends Block implements ICommonShapeUpdate, Sim
                 (double) pos.getX() + 0.5D,
                 (double) pos.getY(),
                 (double) pos.getZ() + 0.5D,
-                state
+                state.setValue(ATTACHED, false).setValue(SIDELESS, false)
         );
         if (falling != null) {
             level.addFreshEntity(falling);
@@ -335,6 +389,7 @@ public class PointedIcicleBlock extends Block implements ICommonShapeUpdate, Sim
                 if (mergeThickness != updatedState.getValue(THICKNESS)) {
                     updatedState = updatedState.setValue(THICKNESS, mergeThickness);
                 }
+                updatedState = repairAttachment(level, currentPos, updatedState);
                 if (updatedState != currentState) {
                     level.setBlock(currentPos, updatedState, 2);
                 }
@@ -400,6 +455,7 @@ public class PointedIcicleBlock extends Block implements ICommonShapeUpdate, Sim
                 BlockState updatedState = calculateCustomThickness(accessor, pos, state);
                 Thickness correctThickness = checkForMerge(accessor, pos, updatedState);
                 updatedState = updatedState.setValue(THICKNESS, correctThickness);
+                updatedState = repairAttachment(level, pos, updatedState);
 
                 if (level instanceof Level world) {
                     updateNeighborThickness(world, pos.above());
@@ -439,6 +495,7 @@ public class PointedIcicleBlock extends Block implements ICommonShapeUpdate, Sim
                 if (mergeThickness != updatedState.getValue(THICKNESS)) {
                     updatedState = updatedState.setValue(THICKNESS, mergeThickness);
                 }
+                updatedState = repairAttachment(level, pos, updatedState);
                 if (updatedState != currentState) {
                     level.setBlock(pos, updatedState, 2);
                 }
@@ -569,6 +626,7 @@ public class PointedIcicleBlock extends Block implements ICommonShapeUpdate, Sim
             BlockState updatedState = calculateCustomThickness(level, pos, neighborState);
             Thickness correctThickness = checkForMerge(level, pos, updatedState);
             updatedState = updatedState.setValue(THICKNESS, correctThickness);
+            updatedState = repairAttachment(level, pos, updatedState);
             if (updatedState != neighborState) {
                 level.setBlock(pos, updatedState, 2);
             }
@@ -577,6 +635,10 @@ public class PointedIcicleBlock extends Block implements ICommonShapeUpdate, Sim
 
     public void onRandomTick(BlockState state, ServerLevel level, BlockPos pos) {
         Direction direction = state.getValue(VERTICAL_DIRECTION);
+        BlockState repaired = repairAttachment(level, pos, state);
+        if (repaired != state) {
+            level.setBlock(pos, repaired, 2);
+        }
         Random random = new Random();
         if (direction == Direction.DOWN) {
             tryCauldronRecipe(level, pos, random);
@@ -676,13 +738,14 @@ public class PointedIcicleBlock extends Block implements ICommonShapeUpdate, Sim
         if (tipState.getValue(THICKNESS) == Thickness.TIP_MERGE) return;
 
         BlockPos growPos = tipPos.below();
-        if (level.getBlockState(growPos).isAir()) {
+        if (level.isInWorldBounds(growPos) && level.getBlockState(growPos).isAir()) {
             BlockState newTip = this.defaultBlockState()
                     .setValue(VERTICAL_DIRECTION, Direction.DOWN)
                     .setValue(THICKNESS, Thickness.TIP);
 
-            level.setBlock(growPos, newTip, 3);
-            level.setBlock(tipPos, tipState.setValue(THICKNESS, Thickness.FRUSTUM), 2);
+            if (level.setBlock(growPos, newTip, 3)) {
+                level.setBlock(tipPos, tipState.setValue(THICKNESS, Thickness.FRUSTUM), 2);
+            }
         }
     }
 
@@ -745,13 +808,14 @@ public class PointedIcicleBlock extends Block implements ICommonShapeUpdate, Sim
         if (random.nextFloat() >= 0.12F) return;
 
         BlockPos growPos = tipPos.above();
-        if (level.getBlockState(growPos).isAir()) {
+        if (level.isInWorldBounds(growPos) && level.getBlockState(growPos).isAir()) {
             BlockState newTip = this.defaultBlockState()
                     .setValue(VERTICAL_DIRECTION, Direction.UP)
                     .setValue(THICKNESS, Thickness.TIP);
 
-            level.setBlock(growPos, newTip, 3);
-            level.setBlock(tipPos, tipState.setValue(THICKNESS, Thickness.FRUSTUM), 2);
+            if (level.setBlock(growPos, newTip, 3)) {
+                level.setBlock(tipPos, tipState.setValue(THICKNESS, Thickness.FRUSTUM), 2);
+            }
         }
     }
 
@@ -822,8 +886,4 @@ public class PointedIcicleBlock extends Block implements ICommonShapeUpdate, Sim
         return 1.0F;
     }
 
-    @Override
-    public boolean skipRendering(BlockState state, BlockState adjacentBlockState, Direction side) {
-        return (adjacentBlockState.is(this) || super.skipRendering(state, adjacentBlockState, side));
-    }
 }

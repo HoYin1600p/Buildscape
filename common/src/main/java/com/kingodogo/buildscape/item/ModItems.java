@@ -5,6 +5,25 @@ import com.kingodogo.buildscape.registry.RegistrySupplier;
 
 public class ModItems {
 
+    public static final RegistrySupplier<ItemDefinition> ICE_CRYSTAL = register("ice_crystal");
+    public static final RegistrySupplier<ItemDefinition> WHITE_HAZE_BUSH = register("white_haze_bush");
+    public static final RegistrySupplier<ItemDefinition> ORANGE_HAZE_BUSH = register("orange_haze_bush");
+    public static final RegistrySupplier<ItemDefinition> MAGENTA_HAZE_BUSH = register("magenta_haze_bush");
+    public static final RegistrySupplier<ItemDefinition> LIGHT_BLUE_HAZE_BUSH = register("light_blue_haze_bush");
+    public static final RegistrySupplier<ItemDefinition> YELLOW_HAZE_BUSH = register("yellow_haze_bush");
+    public static final RegistrySupplier<ItemDefinition> LIME_HAZE_BUSH = register("lime_haze_bush");
+    public static final RegistrySupplier<ItemDefinition> PINK_HAZE_BUSH = register("pink_haze_bush");
+    public static final RegistrySupplier<ItemDefinition> GRAY_HAZE_BUSH = register("gray_haze_bush");
+    public static final RegistrySupplier<ItemDefinition> LIGHT_GRAY_HAZE_BUSH = register("light_gray_haze_bush");
+    public static final RegistrySupplier<ItemDefinition> CYAN_HAZE_BUSH = register("cyan_haze_bush");
+    public static final RegistrySupplier<ItemDefinition> PURPLE_HAZE_BUSH = register("purple_haze_bush");
+    public static final RegistrySupplier<ItemDefinition> BLUE_HAZE_BUSH = register("blue_haze_bush");
+    public static final RegistrySupplier<ItemDefinition> BROWN_HAZE_BUSH = register("brown_haze_bush");
+    public static final RegistrySupplier<ItemDefinition> GREEN_HAZE_BUSH = register("green_haze_bush");
+    public static final RegistrySupplier<ItemDefinition> RED_HAZE_BUSH = register("red_haze_bush");
+    public static final RegistrySupplier<ItemDefinition> BLACK_HAZE_BUSH = register("black_haze_bush");
+
+
     public static final RegistrySupplier<ItemDefinition> BLACK_SAND = register("black_sand");
     public static final RegistrySupplier<ItemDefinition> BLUE_SAND = register("blue_sand");
     public static final RegistrySupplier<ItemDefinition> GREEN_SAND = register("green_sand");

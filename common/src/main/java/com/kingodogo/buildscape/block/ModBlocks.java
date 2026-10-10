@@ -5,6 +5,50 @@ import com.kingodogo.buildscape.registry.RegistrySupplier;
 
 public class ModBlocks {
 
+    public static final java.util.Map<net.minecraft.world.item.DyeColor, RegistrySupplier<BlockDefinition>> COLORED_HAZE_BUSHES = new java.util.EnumMap<>(net.minecraft.world.item.DyeColor.class);
+    public static final java.util.Map<net.minecraft.world.item.DyeColor, RegistrySupplier<BlockDefinition>> POTTED_COLORED_HAZE_BUSHES = new java.util.EnumMap<>(net.minecraft.world.item.DyeColor.class);
+    public static final RegistrySupplier<BlockDefinition> WHITE_HAZE_BUSH = registerHazeBush(net.minecraft.world.item.DyeColor.WHITE, false);
+    public static final RegistrySupplier<BlockDefinition> ORANGE_HAZE_BUSH = registerHazeBush(net.minecraft.world.item.DyeColor.ORANGE, false);
+    public static final RegistrySupplier<BlockDefinition> MAGENTA_HAZE_BUSH = registerHazeBush(net.minecraft.world.item.DyeColor.MAGENTA, false);
+    public static final RegistrySupplier<BlockDefinition> LIGHT_BLUE_HAZE_BUSH = registerHazeBush(net.minecraft.world.item.DyeColor.LIGHT_BLUE, false);
+    public static final RegistrySupplier<BlockDefinition> YELLOW_HAZE_BUSH = registerHazeBush(net.minecraft.world.item.DyeColor.YELLOW, false);
+    public static final RegistrySupplier<BlockDefinition> LIME_HAZE_BUSH = registerHazeBush(net.minecraft.world.item.DyeColor.LIME, false);
+    public static final RegistrySupplier<BlockDefinition> PINK_HAZE_BUSH = registerHazeBush(net.minecraft.world.item.DyeColor.PINK, false);
+    public static final RegistrySupplier<BlockDefinition> GRAY_HAZE_BUSH = registerHazeBush(net.minecraft.world.item.DyeColor.GRAY, false);
+    public static final RegistrySupplier<BlockDefinition> LIGHT_GRAY_HAZE_BUSH = registerHazeBush(net.minecraft.world.item.DyeColor.LIGHT_GRAY, false);
+    public static final RegistrySupplier<BlockDefinition> CYAN_HAZE_BUSH = registerHazeBush(net.minecraft.world.item.DyeColor.CYAN, false);
+    public static final RegistrySupplier<BlockDefinition> PURPLE_HAZE_BUSH = registerHazeBush(net.minecraft.world.item.DyeColor.PURPLE, false);
+    public static final RegistrySupplier<BlockDefinition> BLUE_HAZE_BUSH = registerHazeBush(net.minecraft.world.item.DyeColor.BLUE, false);
+    public static final RegistrySupplier<BlockDefinition> BROWN_HAZE_BUSH = registerHazeBush(net.minecraft.world.item.DyeColor.BROWN, false);
+    public static final RegistrySupplier<BlockDefinition> GREEN_HAZE_BUSH = registerHazeBush(net.minecraft.world.item.DyeColor.GREEN, false);
+    public static final RegistrySupplier<BlockDefinition> RED_HAZE_BUSH = registerHazeBush(net.minecraft.world.item.DyeColor.RED, false);
+    public static final RegistrySupplier<BlockDefinition> BLACK_HAZE_BUSH = registerHazeBush(net.minecraft.world.item.DyeColor.BLACK, false);
+    public static final RegistrySupplier<BlockDefinition> POTTED_WHITE_HAZE_BUSH = registerHazeBush(net.minecraft.world.item.DyeColor.WHITE, true);
+    public static final RegistrySupplier<BlockDefinition> POTTED_ORANGE_HAZE_BUSH = registerHazeBush(net.minecraft.world.item.DyeColor.ORANGE, true);
+    public static final RegistrySupplier<BlockDefinition> POTTED_MAGENTA_HAZE_BUSH = registerHazeBush(net.minecraft.world.item.DyeColor.MAGENTA, true);
+    public static final RegistrySupplier<BlockDefinition> POTTED_LIGHT_BLUE_HAZE_BUSH = registerHazeBush(net.minecraft.world.item.DyeColor.LIGHT_BLUE, true);
+    public static final RegistrySupplier<BlockDefinition> POTTED_YELLOW_HAZE_BUSH = registerHazeBush(net.minecraft.world.item.DyeColor.YELLOW, true);
+    public static final RegistrySupplier<BlockDefinition> POTTED_LIME_HAZE_BUSH = registerHazeBush(net.minecraft.world.item.DyeColor.LIME, true);
+    public static final RegistrySupplier<BlockDefinition> POTTED_PINK_HAZE_BUSH = registerHazeBush(net.minecraft.world.item.DyeColor.PINK, true);
+    public static final RegistrySupplier<BlockDefinition> POTTED_GRAY_HAZE_BUSH = registerHazeBush(net.minecraft.world.item.DyeColor.GRAY, true);
+    public static final RegistrySupplier<BlockDefinition> POTTED_LIGHT_GRAY_HAZE_BUSH = registerHazeBush(net.minecraft.world.item.DyeColor.LIGHT_GRAY, true);
+    public static final RegistrySupplier<BlockDefinition> POTTED_CYAN_HAZE_BUSH = registerHazeBush(net.minecraft.world.item.DyeColor.CYAN, true);
+    public static final RegistrySupplier<BlockDefinition> POTTED_PURPLE_HAZE_BUSH = registerHazeBush(net.minecraft.world.item.DyeColor.PURPLE, true);
+    public static final RegistrySupplier<BlockDefinition> POTTED_BLUE_HAZE_BUSH = registerHazeBush(net.minecraft.world.item.DyeColor.BLUE, true);
+    public static final RegistrySupplier<BlockDefinition> POTTED_BROWN_HAZE_BUSH = registerHazeBush(net.minecraft.world.item.DyeColor.BROWN, true);
+    public static final RegistrySupplier<BlockDefinition> POTTED_GREEN_HAZE_BUSH = registerHazeBush(net.minecraft.world.item.DyeColor.GREEN, true);
+    public static final RegistrySupplier<BlockDefinition> POTTED_RED_HAZE_BUSH = registerHazeBush(net.minecraft.world.item.DyeColor.RED, true);
+    public static final RegistrySupplier<BlockDefinition> POTTED_BLACK_HAZE_BUSH = registerHazeBush(net.minecraft.world.item.DyeColor.BLACK, true);
+    public static final RegistrySupplier<BlockDefinition> ICE_CRYSTAL = reg("ice_crystal", "IceCrystalBlock", 1.5f, 1.5f, "AMETHYST_CLUSTER", "AMETHYST", "COLOR_LIGHT_BLUE", false, false, true, 3, null, null);
+
+    private static RegistrySupplier<BlockDefinition> registerHazeBush(net.minecraft.world.item.DyeColor color, boolean potted) {
+        String name = (potted ? "potted_" : "") + color.getName() + "_haze_bush";
+        RegistrySupplier<BlockDefinition> supplier = reg(name, potted ? "PottedHazeBushBlock" : "HazeBushBlock", 0, 0, potted ? "STONE" : "GRASS", "PLANT", "WOOD", false, !potted, true, 0, potted ? "Blocks.POTTED_POPPY" : null, null);
+        (potted ? POTTED_COLORED_HAZE_BUSHES : COLORED_HAZE_BUSHES).put(color, supplier);
+        return supplier;
+    }
+
+
     public static RegistrySupplier<BlockDefinition> BUILDERS_WORKBENCH;
     public static RegistrySupplier<BlockDefinition> BLACK_SAND;
     public static RegistrySupplier<BlockDefinition> BLUE_SAND;

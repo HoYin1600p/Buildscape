@@ -53,6 +53,7 @@ public final class ParticleFactory {
     }
 
     private static void registerAllProviders() {
+        register(ModParticles.HAZE.get(), com.kingodogo.buildscape.adapter.v26x.client.HazeParticle::provider);
         register(ModParticles.GLOW_LIME_SPARKLE.get(), sprites ->
             (type, level, x, y, z, dx, dy, dz, random) -> new SingleQuadParticle(level, x, y, z, dx, dy, dz, sprites.first()) {
                 private final TextureAtlasSprite baseSprite = sprites.first();

@@ -65,6 +65,21 @@ public final class ModCommonEvents {
 
     private static InteractionResult onRightClickBlockUnchecked(Player player, Level level, InteractionHand hand, BlockPos pos, net.minecraft.core.Direction face) {
         if (player == null || level == null || pos == null) return InteractionResult.PASS;
+        ItemStack potHeld = player.getItemInHand(hand);
+        if (level.getBlockState(pos).is(net.minecraft.world.level.block.Blocks.FLOWER_POT)
+                && !player.isSecondaryUseActive()
+                && potHeld.getItem() instanceof com.kingodogo.buildscape.item.HazeBushItem item
+                && com.kingodogo.buildscape.item.HazeBushItem.isDrained(potHeld)
+                && item.getBlock() instanceof com.kingodogo.buildscape.block.HazeBushBlock bush) {
+            Block pot = com.kingodogo.buildscape.block.ModBlocks.get(
+                    com.kingodogo.buildscape.block.ModBlocks.POTTED_COLORED_HAZE_BUSHES.get(bush.getColor()));
+            if (!level.isClientSide()) {
+                level.setBlock(pos, pot.defaultBlockState().setValue(com.kingodogo.buildscape.block.HazeBushBlock.HAS_HAZE, false), 3);
+                player.awardStat(net.minecraft.stats.Stats.POT_FLOWER);
+                if (!player.getAbilities().instabuild) potHeld.shrink(1);
+            }
+            return Services.PLATFORM.sidedSuccess(level.isClientSide());
+        }
         InteractionResult bonemeal = BackportBonemealHandler.use(player, level, hand, pos, face);
         if (bonemeal != InteractionResult.PASS) return bonemeal;
         BlockState state = level.getBlockState(pos);
@@ -226,30 +241,6 @@ public final class ModCommonEvents {
                 if (!player.getAbilities().instabuild) held.shrink(1);
             }
             return InteractionResult.SUCCESS;
-        }
-        if (held.is(net.minecraft.world.item.Items.GLASS_BOTTLE)) {
-            net.minecraft.world.phys.Vec3 eye = player.getEyePosition();
-            net.minecraft.world.phys.Vec3 view = player.getViewVector(1.0F);
-            net.minecraft.world.phys.HitResult hit = level.clip(new net.minecraft.world.level.ClipContext(
-                    eye, eye.add(view.scale(5.0D)), net.minecraft.world.level.ClipContext.Block.OUTLINE,
-                    net.minecraft.world.level.ClipContext.Fluid.SOURCE_ONLY, player));
-            if (hit.getType() != net.minecraft.world.phys.HitResult.Type.MISS) return InteractionResult.PASS;
-            net.minecraft.world.item.Item mistItem = Services.PLATFORM.getItem(new com.kingodogo.buildscape.util.CommonId("buildscape", "bottle_of_mist"));
-            if (mistItem == null || mistItem == net.minecraft.world.item.Items.AIR) return InteractionResult.PASS;
-            if (!level.isClientSide()) {
-                if (!player.getAbilities().instabuild) {
-                    held.shrink(1);
-                }
-                if (mistItem != null && mistItem != net.minecraft.world.item.Items.AIR) {
-                    ItemStack mistBottle = new ItemStack(mistItem);
-                    if (!player.getInventory().add(mistBottle.copy())) {
-                        player.drop(mistBottle, false);
-                    }
-                    level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.BOTTLE_FILL, SoundSource.PLAYERS, 1.0F, 1.0F);
-                }
-            }
-            player.swing(hand);
-            return Services.PLATFORM.sidedSuccess(level.isClientSide());
         }
         return InteractionResult.PASS;
     }

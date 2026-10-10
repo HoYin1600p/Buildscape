@@ -39,6 +39,22 @@ public final class BackportBonemealHandler {
         ItemStack held = player.getItemInHand(hand);
         if (!held.is(Items.BONE_MEAL)) return InteractionResult.PASS;
         BlockState state = level.getBlockState(pos);
+        if (face == Direction.UP && state.is(Blocks.PODZOL)) {
+            var positions = new java.util.ArrayList<BlockPos>();
+            if (level.isEmptyBlock(pos.above())) positions.add(pos.above());
+            else for (int dx = -1; dx <= 1; dx++) for (int dz = -1; dz <= 1; dz++) {
+                if (dx == 0 && dz == 0) continue;
+                BlockPos ground = pos.offset(dx, 0, dz);
+                if (level.getBlockState(ground).is(Blocks.PODZOL) && level.isEmptyBlock(ground.above())) positions.add(ground.above());
+            }
+            if (!positions.isEmpty()) {
+                if (!level.isClientSide()) {
+                    level.setBlock(positions.get(level.getRandom().nextInt(positions.size())),
+                            com.kingodogo.buildscape.block.ModBlocks.WHITE_HAZE_BUSH.get().defaultBlockState(), 3);
+                }
+                return consume(player, level, held, pos);
+            }
+        }
         if (face == Direction.UP && (state.is(Blocks.GRASS_BLOCK) || state.is(Blocks.MOSS_BLOCK))) {
             if (level instanceof ServerLevel serverLevel) {
                 boolean moss = state.is(Blocks.MOSS_BLOCK);

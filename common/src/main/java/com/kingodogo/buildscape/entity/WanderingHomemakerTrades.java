@@ -18,6 +18,12 @@ public final class WanderingHomemakerTrades {
 
     public static List<MerchantOffer> getStandardTrades() {
         List<MerchantOffer> list = new ArrayList<>();
+        add(list, new ItemStack(Items.EMERALD, 1), ModItems.BOTTLE_OF_MIST.get().createStack(16), 4, 1, 0.05f);
+        for (var color : net.minecraft.world.item.DyeColor.values()) {
+            if (color == net.minecraft.world.item.DyeColor.WHITE) continue;
+            var item = Services.PLATFORM.getItem(new com.kingodogo.buildscape.util.CommonId("buildscape", color.getName() + "_haze_bush"));
+            add(list, new ItemStack(Items.EMERALD, 1), new ItemStack(item, 6), 6, 1, 0.05f);
+        }
         add(list, new ItemStack(Items.EMERALD, 1), new ItemStack(Services.PLATFORM.getItem(com.kingodogo.buildscape.util.CommonId.parse("minecraft:mangrove_propagule")), 5), 8, 1, 0.05f);
         add(list, new ItemStack(Items.EMERALD, 1), ModItems.POPLAR_SAPLING.get().createStack(4), 8, 1, 0.05f);
         add(list, new ItemStack(Items.EMERALD, 1), new ItemStack(Services.PLATFORM.getItem(com.kingodogo.buildscape.util.CommonId.parse("minecraft:cherry_sapling")), 4), 8, 1, 0.05f);

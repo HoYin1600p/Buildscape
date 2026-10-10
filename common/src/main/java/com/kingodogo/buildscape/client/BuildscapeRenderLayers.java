@@ -28,6 +28,8 @@ public final class BuildscapeRenderLayers {
         }
 
         if (path.startsWith("potted_")
+                || path.endsWith("_haze_bush")
+                || path.equals("ice_crystal")
                 || path.contains("hollow")
                 || path.contains("wallpaper_flat")
                 || path.contains("steel_mesh_block")

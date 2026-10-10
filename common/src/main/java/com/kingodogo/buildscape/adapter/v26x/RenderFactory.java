@@ -77,11 +77,13 @@ public final class RenderFactory {
     @SuppressWarnings({"unchecked", "rawtypes"})
     public static void renderEntity(Entity entity, double x, double y, double z, float yaw, float partialTicks, PoseStack poseStack, Object bufferSource, int packedLight) {
         if (entity == null) return;
+        if (bufferSource instanceof com.kingodogo.buildscape.adapter.v26x.client.PillarRenderer.State state) {
+            // Let the placement renderer restore its pose and render the egg fallback
+            // when extraction fails, rather than silently leaving an empty display.
+            state.extractEntity(entity, partialTicks, poseStack, packedLight);
+            return;
+        }
         try {
-            if (bufferSource instanceof com.kingodogo.buildscape.adapter.v26x.client.PillarRenderer.State state) {
-                state.extractEntity(entity, partialTicks, poseStack, packedLight);
-                return;
-            }
             var dispatcher = Minecraft.getInstance().getEntityRenderDispatcher();
             EntityRenderer renderer = dispatcher.getRenderer(entity);
             if (renderer != null && bufferSource instanceof net.minecraft.client.renderer.SubmitNodeCollector collector) {

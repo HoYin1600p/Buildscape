@@ -967,101 +967,104 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
         int scissorY = (int) (windowHeight - (defaultBoxY + defaultBoxHeight) * guiScale + bottomOffset * guiScale);
         int scissorWidth = (int) (defaultBoxWidth * guiScale);
         int scissorHeight = (int) (defaultBoxHeight * guiScale - bottomOffset * guiScale - HEADER_CLIP * guiScale);
-        if (scissorHeight > 0)
+        boolean defaultClip = scissorHeight > 0 && scissorWidth > 0;
+        if (defaultClip)
             Services.PLATFORM.enableScissor(poseStackOrGraphics, scissorX, scissorY, scissorWidth, scissorHeight);
+        try {
+            int defaultTextX = defaultBoxX + padding;
 
-        int defaultTextX = defaultBoxX + padding;
+            int labelYOffset = (FIELD_HEIGHT - (int) (Minecraft.getInstance().font.lineHeight * textScale)) / 2;
+            int totalContentHeightDefault = getDefaultPropertiesTotalHeight();
+            int availableHeightDefault = defaultBoxHeight - UI_PADDING * 2;
+            double maxScrollDefault = Math.max(0, totalContentHeightDefault - availableHeightDefault);
+            boolean needsScrollbarDefault = maxScrollDefault > 0;
 
-        int labelYOffset = (FIELD_HEIGHT - (int) (Minecraft.getInstance().font.lineHeight * textScale)) / 2;
-        int totalContentHeightDefault = getDefaultPropertiesTotalHeight();
-        int availableHeightDefault = defaultBoxHeight - UI_PADDING * 2;
-        double maxScrollDefault = Math.max(0, totalContentHeightDefault - availableHeightDefault);
-        boolean needsScrollbarDefault = maxScrollDefault > 0;
+            int headerBottom = defaultBoxY + HEADER_CLIP;
+            int panelTop = defaultBoxY;
+            int panelBottom = defaultBoxY + defaultBoxHeight;
 
-        int headerBottom = defaultBoxY + HEADER_CLIP;
-        int panelTop = defaultBoxY;
-        int panelBottom = defaultBoxY + defaultBoxHeight;
+            boolean particleSpeedRowVisible = WidgetLayoutHelper.getY(particleSpeedField) + FIELD_HEIGHT > headerBottom
+                    && WidgetLayoutHelper.getY(particleSpeedField) < panelBottom;
+            boolean particleSpreadRowVisible = WidgetLayoutHelper.getY(particleSpreadField) + FIELD_HEIGHT > headerBottom
+                    && WidgetLayoutHelper.getY(particleSpreadField) < panelBottom;
+            boolean particleLifetimeRowVisible = WidgetLayoutHelper.getY(particleLifetimeField) + FIELD_HEIGHT > headerBottom
+                    && WidgetLayoutHelper.getY(particleLifetimeField) < panelBottom;
+            boolean particleDensityRowVisible = WidgetLayoutHelper.getY(particleDensityField) + FIELD_HEIGHT > headerBottom
+                    && WidgetLayoutHelper.getY(particleDensityField) < panelBottom;
 
-        boolean particleSpeedRowVisible = WidgetLayoutHelper.getY(particleSpeedField) + FIELD_HEIGHT > headerBottom
-                && WidgetLayoutHelper.getY(particleSpeedField) < panelBottom;
-        boolean particleSpreadRowVisible = WidgetLayoutHelper.getY(particleSpreadField) + FIELD_HEIGHT > headerBottom
-                && WidgetLayoutHelper.getY(particleSpreadField) < panelBottom;
-        boolean particleLifetimeRowVisible = WidgetLayoutHelper.getY(particleLifetimeField) + FIELD_HEIGHT > headerBottom
-                && WidgetLayoutHelper.getY(particleLifetimeField) < panelBottom;
-        boolean particleDensityRowVisible = WidgetLayoutHelper.getY(particleDensityField) + FIELD_HEIGHT > headerBottom
-                && WidgetLayoutHelper.getY(particleDensityField) < panelBottom;
+            int particleSpeedLabelY = WidgetLayoutHelper.getY(particleSpeedField) + labelYOffset;
+            if (particleSpeedRowVisible) {
+                drawScaledText(poseStackOrGraphics, ComponentHelper.translatable("buildscape.config.particles.particle_speed").getString() + " ", defaultTextX, particleSpeedLabelY, textScale);
+            }
 
-        int particleSpeedLabelY = WidgetLayoutHelper.getY(particleSpeedField) + labelYOffset;
-        if (particleSpeedRowVisible) {
-            drawScaledText(poseStackOrGraphics, ComponentHelper.translatable("buildscape.config.particles.particle_speed").getString() + " ", defaultTextX, particleSpeedLabelY, textScale);
-        }
+            int particleSpreadLabelY = WidgetLayoutHelper.getY(particleSpreadField) + labelYOffset;
+            if (particleSpreadRowVisible) {
+                drawScaledText(poseStackOrGraphics, ComponentHelper.translatable("buildscape.config.particles.particle_spread").getString() + " ", defaultTextX, particleSpreadLabelY, textScale);
+            }
 
-        int particleSpreadLabelY = WidgetLayoutHelper.getY(particleSpreadField) + labelYOffset;
-        if (particleSpreadRowVisible) {
-            drawScaledText(poseStackOrGraphics, ComponentHelper.translatable("buildscape.config.particles.particle_spread").getString() + " ", defaultTextX, particleSpreadLabelY, textScale);
-        }
+            int particleLifetimeLabelY = WidgetLayoutHelper.getY(particleLifetimeField) + labelYOffset;
+            if (particleLifetimeRowVisible) {
+                drawScaledText(poseStackOrGraphics, ComponentHelper.translatable("buildscape.config.particles.particle_lifetime").getString() + " ", defaultTextX, particleLifetimeLabelY, textScale);
+            }
 
-        int particleLifetimeLabelY = WidgetLayoutHelper.getY(particleLifetimeField) + labelYOffset;
-        if (particleLifetimeRowVisible) {
-            drawScaledText(poseStackOrGraphics, ComponentHelper.translatable("buildscape.config.particles.particle_lifetime").getString() + " ", defaultTextX, particleLifetimeLabelY, textScale);
-        }
+            int particleDensityLabelY = WidgetLayoutHelper.getY(particleDensityField) + labelYOffset;
+            if (particleDensityRowVisible) {
+                drawScaledText(poseStackOrGraphics, ComponentHelper.translatable("buildscape.config.particles.particle_density").getString() + " ", defaultTextX, particleDensityLabelY, textScale);
+            }
 
-        int particleDensityLabelY = WidgetLayoutHelper.getY(particleDensityField) + labelYOffset;
-        if (particleDensityRowVisible) {
-            drawScaledText(poseStackOrGraphics, ComponentHelper.translatable("buildscape.config.particles.particle_density").getString() + " ", defaultTextX, particleDensityLabelY, textScale);
-        }
-
-        usePatternToggle.visible = false;
-        particleSpeedField.visible = false;
-        particleSpreadField.visible = false;
-        particleLifetimeField.visible = false;
-        particleDensityField.visible = false;
-
-
-
-        if (WidgetLayoutHelper.getY(usePatternToggle) + BUTTON_HEIGHT > headerBottom && WidgetLayoutHelper.getY(usePatternToggle) < panelBottom) {
-            usePatternToggle.visible = true;
-            Services.PLATFORM.renderWidget(poseStackOrGraphics, usePatternToggle, mouseX, mouseY, partialTick);
             usePatternToggle.visible = false;
-        }
-        int textPadding = BuildScapeConfigScreen.scaleSize(4);
-        int fontHeight = Minecraft.getInstance().font.lineHeight;
-
-        if (particleSpeedRowVisible) {
-            particleSpeedField.visible = true;
-            Services.PLATFORM.renderWidget(poseStackOrGraphics, particleSpeedField, mouseX, mouseY, partialTick);
             particleSpeedField.visible = false;
-        }
-        if (particleSpreadRowVisible) {
-            particleSpreadField.visible = true;
-            Services.PLATFORM.renderWidget(poseStackOrGraphics, particleSpreadField, mouseX, mouseY, partialTick);
             particleSpreadField.visible = false;
-        }
-        if (particleLifetimeRowVisible) {
-            particleLifetimeField.visible = true;
-            Services.PLATFORM.renderWidget(poseStackOrGraphics, particleLifetimeField, mouseX, mouseY, partialTick);
             particleLifetimeField.visible = false;
-        }
-        if (particleDensityRowVisible) {
-            particleDensityField.visible = true;
-            Services.PLATFORM.renderWidget(poseStackOrGraphics, particleDensityField, mouseX, mouseY, partialTick);
             particleDensityField.visible = false;
+
+
+
+            if (WidgetLayoutHelper.getY(usePatternToggle) + BUTTON_HEIGHT > headerBottom && WidgetLayoutHelper.getY(usePatternToggle) < panelBottom) {
+                usePatternToggle.visible = true;
+                Services.PLATFORM.renderWidget(poseStackOrGraphics, usePatternToggle, mouseX, mouseY, partialTick);
+                usePatternToggle.visible = false;
+            }
+            int textPadding = BuildScapeConfigScreen.scaleSize(4);
+            int fontHeight = Minecraft.getInstance().font.lineHeight;
+
+            if (particleSpeedRowVisible) {
+                particleSpeedField.visible = true;
+                Services.PLATFORM.renderWidget(poseStackOrGraphics, particleSpeedField, mouseX, mouseY, partialTick);
+                particleSpeedField.visible = false;
+            }
+            if (particleSpreadRowVisible) {
+                particleSpreadField.visible = true;
+                Services.PLATFORM.renderWidget(poseStackOrGraphics, particleSpreadField, mouseX, mouseY, partialTick);
+                particleSpreadField.visible = false;
+            }
+            if (particleLifetimeRowVisible) {
+                particleLifetimeField.visible = true;
+                Services.PLATFORM.renderWidget(poseStackOrGraphics, particleLifetimeField, mouseX, mouseY, partialTick);
+                particleLifetimeField.visible = false;
+            }
+            if (particleDensityRowVisible) {
+                particleDensityField.visible = true;
+                Services.PLATFORM.renderWidget(poseStackOrGraphics, particleDensityField, mouseX, mouseY, partialTick);
+                particleDensityField.visible = false;
+            }
+
+            if (needsScrollbarDefault && maxScrollDefault > 0) {
+                int scrollbarX = defaultBoxX + defaultBoxWidth - SCROLLBAR_WIDTH - SCROLLBAR_RIGHT_MARGIN;
+                int scrollbarY = defaultBoxY + HEADER_CLIP;
+                int scrollbarHeight = defaultBoxHeight - HEADER_CLIP - UI_PADDING;
+
+                double scrollableAreaHeight = totalContentHeightDefault - HEADER_CLIP;
+                double visibleAreaHeight = defaultBoxHeight - HEADER_CLIP - UI_PADDING;
+                double visibleRatio = Math.min(1.0, visibleAreaHeight / scrollableAreaHeight);
+
+                defaultScrollbarRenderer.renderScrollbar(poseStackOrGraphics, scrollbarX, scrollbarY, scrollbarHeight,
+                        defaultPropertiesScrollOffset, maxScrollDefault, visibleRatio);
+            }
+
+        } finally {
+            if (defaultClip) Services.PLATFORM.disableScissor(poseStackOrGraphics);
         }
-
-        if (needsScrollbarDefault && maxScrollDefault > 0) {
-            int scrollbarX = defaultBoxX + defaultBoxWidth - SCROLLBAR_WIDTH - SCROLLBAR_RIGHT_MARGIN;
-            int scrollbarY = defaultBoxY + HEADER_CLIP;
-            int scrollbarHeight = defaultBoxHeight - HEADER_CLIP - UI_PADDING;
-
-            double scrollableAreaHeight = totalContentHeightDefault - HEADER_CLIP;
-            double visibleAreaHeight = defaultBoxHeight - HEADER_CLIP - UI_PADDING;
-            double visibleRatio = Math.min(1.0, visibleAreaHeight / scrollableAreaHeight);
-
-            defaultScrollbarRenderer.renderScrollbar(poseStackOrGraphics, scrollbarX, scrollbarY, scrollbarHeight,
-                    defaultPropertiesScrollOffset, maxScrollDefault, visibleRatio);
-        }
-
-        Services.PLATFORM.disableScissor(poseStackOrGraphics);
 
 
         scissorX = (int) (colorBoxX * guiScale);
@@ -1075,72 +1078,74 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
         Services.PLATFORM.fill(poseStackOrGraphics, colorBoxX + colorBoxWidth - 1, colorBoxY, colorBoxX + colorBoxWidth, colorBoxY + colorBoxHeight, colorBorderColor);
 
         Services.PLATFORM.enableScissor(poseStackOrGraphics, scissorX, scissorY, scissorWidth, scissorHeight);
+        try {
 
 
-
-        if (colorSwatchButtons == null || colorHexFields == null || colorSwatchButtons.isEmpty()
-                || colorHexFields.isEmpty()) {
-            createColorSwatchesAndPicker(config);
-        }
-
-        if (colorSwatchButtons != null && colorHexFields != null && colorSwatchButtons.size() > 0
-                && colorHexFields.size() > 0) {
-            updateSwatchesEnabledState();
-
-            int colorTotalContentHeight = getColorSwatchesTotalHeight();
-            int colorAvailableHeight = colorBoxHeight - UI_PADDING * 2;
-            double colorMaxScroll = Math.max(0, colorTotalContentHeight - colorAvailableHeight);
-            boolean colorNeedsScrollbar = colorMaxScroll > 0;
-
-            colorsResetButton.visible = true;
-
-            updateColorSwatchesPositions();
-
-            for (int i = 0; i < colorSwatchButtons.size(); i++) {
-                colorSwatchButtons.get(i).visible = false;
-            }
-            for (int i = 0; i < colorHexFields.size(); i++) {
-                colorHexFields.get(i).visible = false;
+            if (colorSwatchButtons == null || colorHexFields == null || colorSwatchButtons.isEmpty()
+                    || colorHexFields.isEmpty()) {
+                createColorSwatchesAndPicker(config);
             }
 
-            for (int i = 0; i < colorSwatchButtons.size() && i < colorHexFields.size(); i++) {
-                ColorSwatchButton swatchButton = colorSwatchButtons.get(i);
+            if (colorSwatchButtons != null && colorHexFields != null && colorSwatchButtons.size() > 0
+                    && colorHexFields.size() > 0) {
+                updateSwatchesEnabledState();
 
-                String hexValue = ParticleColorSlots.colorAt(config.particle_color, i);
-                int color = 0xFFFFFF;
-                try {
-                    if (hexValue.startsWith("#") && hexValue.length() == 7) {
-                        color = Integer.parseInt(hexValue.substring(1), 16);
-                    }
-                } catch (NumberFormatException e) {
+                int colorTotalContentHeight = getColorSwatchesTotalHeight();
+                int colorAvailableHeight = colorBoxHeight - UI_PADDING * 2;
+                double colorMaxScroll = Math.max(0, colorTotalContentHeight - colorAvailableHeight);
+                boolean colorNeedsScrollbar = colorMaxScroll > 0;
+
+                colorsResetButton.visible = true;
+
+                updateColorSwatchesPositions();
+
+                for (int i = 0; i < colorSwatchButtons.size(); i++) {
+                    colorSwatchButtons.get(i).visible = false;
+                }
+                for (int i = 0; i < colorHexFields.size(); i++) {
+                    colorHexFields.get(i).visible = false;
                 }
 
-                swatchButton.setColor(color);
-                swatchButton.setSelected(selectedColorIndex == i);
+                for (int i = 0; i < colorSwatchButtons.size() && i < colorHexFields.size(); i++) {
+                    ColorSwatchButton swatchButton = colorSwatchButtons.get(i);
 
-                swatchButton.visible = true;
-                swatchButton.render(poseStackOrGraphics, mouseX, mouseY, partialTick);
-                swatchButton.visible = false;
+                    String hexValue = ParticleColorSlots.colorAt(config.particle_color, i);
+                    int color = 0xFFFFFF;
+                    try {
+                        if (hexValue.startsWith("#") && hexValue.length() == 7) {
+                            color = Integer.parseInt(hexValue.substring(1), 16);
+                        }
+                    } catch (NumberFormatException e) {
+                    }
 
-                colorHexFields.get(i).visible = true;
-                Services.PLATFORM.renderWidget(poseStackOrGraphics, colorHexFields.get(i), mouseX, mouseY, partialTick);
-                colorHexFields.get(i).visible = false;
+                    swatchButton.setColor(color);
+                    swatchButton.setSelected(selectedColorIndex == i);
+
+                    swatchButton.visible = true;
+                    swatchButton.render(poseStackOrGraphics, mouseX, mouseY, partialTick);
+                    swatchButton.visible = false;
+
+                    colorHexFields.get(i).visible = true;
+                    Services.PLATFORM.renderWidget(poseStackOrGraphics, colorHexFields.get(i), mouseX, mouseY, partialTick);
+                    colorHexFields.get(i).visible = false;
+                }
+
+                if (colorNeedsScrollbar && colorMaxScroll > 0) {
+                    int scrollbarX = colorBoxX + colorBoxWidth - CustomScrollbarRenderer.getScrollbarWidth() - 5;
+                    int scrollbarY = colorBoxY + UI_PADDING + COLOR_HEADER_SPACE;
+                    int scrollbarHeight = colorAvailableHeight - COLOR_HEADER_SPACE;
+
+                    double visibleRatio = (double) scrollbarHeight / (colorTotalContentHeight - COLOR_HEADER_SPACE);
+
+                    colorScrollbarRenderer.renderScrollbar(poseStackOrGraphics, scrollbarX, scrollbarY, scrollbarHeight,
+                            colorSwatchesScrollOffset, colorMaxScroll, visibleRatio);
+                }
             }
 
-            if (colorNeedsScrollbar && colorMaxScroll > 0) {
-                int scrollbarX = colorBoxX + colorBoxWidth - CustomScrollbarRenderer.getScrollbarWidth() - 5;
-                int scrollbarY = colorBoxY + UI_PADDING + COLOR_HEADER_SPACE;
-                int scrollbarHeight = colorAvailableHeight - COLOR_HEADER_SPACE;
 
-                double visibleRatio = (double) scrollbarHeight / (colorTotalContentHeight - COLOR_HEADER_SPACE);
-
-                colorScrollbarRenderer.renderScrollbar(poseStackOrGraphics, scrollbarX, scrollbarY, scrollbarHeight,
-                        colorSwatchesScrollOffset, colorMaxScroll, visibleRatio);
-            }
+        } finally {
+            Services.PLATFORM.disableScissor(poseStackOrGraphics);
         }
-
-
-        Services.PLATFORM.disableScissor(poseStackOrGraphics);
 
         if (colorsResetButton.visible) {
             Services.PLATFORM.renderWidget(poseStackOrGraphics, colorsResetButton, mouseX, mouseY, partialTick);
@@ -1169,109 +1174,112 @@ public class PillarParticlesConfigTab extends AbstractConfigTab {
         scissorY = (int) (windowHeight - (patternBoxY + patternBoxHeight) * guiScale + bottomOffset * guiScale);
         scissorWidth = (int) (patternBoxWidth * guiScale);
         scissorHeight = (int) (patternBoxHeight * guiScale - bottomOffset * guiScale - HEADER_CLIP * guiScale);
-        if (scissorHeight > 0)
+        boolean patternClip = scissorHeight > 0 && scissorWidth > 0;
+        if (patternClip)
             Services.PLATFORM.enableScissor(poseStackOrGraphics, scissorX, scissorY, scissorWidth, scissorHeight);
-
-        float textScale_pattern = BuildScapeConfigScreen.getStandardTextScale();
-
-
-        int patternTextX = patternBoxX + padding;
-
-        int patternLabelYOffset = (FIELD_HEIGHT - (int) (Minecraft.getInstance().font.lineHeight * textScale)) / 2;
-
-        int patternTotalContentHeightRender = getPatternPropertiesTotalHeight();
-        int patternAvailableHeightRender = patternBoxHeight - UI_PADDING * 2;
-        double patternMaxScrollRender = Math.max(0, patternTotalContentHeightRender - patternAvailableHeightRender);
-        boolean patternNeedsScrollbarRender = patternMaxScrollRender > 0;
-
-        int patternHeaderBottom = patternBoxY + HEADER_CLIP;
-        int patternPanelTop = patternBoxY;
-        int patternPanelBottom = patternBoxY + patternBoxHeight;
+        try {
+            float textScale_pattern = BuildScapeConfigScreen.getStandardTextScale();
 
 
-        boolean patternSelectorVisible = WidgetLayoutHelper.getY(patternSelector) + BUTTON_HEIGHT > patternHeaderBottom
-                && WidgetLayoutHelper.getY(patternSelector) < patternPanelBottom;
+            int patternTextX = patternBoxX + padding;
 
-        boolean maxParticlesRowVisible = maxParticleColorSlider.y + SLIDER_HEIGHT > patternHeaderBottom
-                && maxParticleColorSlider.y < patternPanelBottom;
+            int patternLabelYOffset = (FIELD_HEIGHT - (int) (Minecraft.getInstance().font.lineHeight * textScale)) / 2;
 
-        boolean patternSpeedRowVisible = WidgetLayoutHelper.getY(patternSpeedField) + FIELD_HEIGHT > patternHeaderBottom
-                && WidgetLayoutHelper.getY(patternSpeedField) < patternPanelBottom;
+            int patternTotalContentHeightRender = getPatternPropertiesTotalHeight();
+            int patternAvailableHeightRender = patternBoxHeight - UI_PADDING * 2;
+            double patternMaxScrollRender = Math.max(0, patternTotalContentHeightRender - patternAvailableHeightRender);
+            boolean patternNeedsScrollbarRender = patternMaxScrollRender > 0;
 
-        boolean patternSpreadRowVisible = WidgetLayoutHelper.getY(patternSpreadField) + FIELD_HEIGHT > patternHeaderBottom
-                && WidgetLayoutHelper.getY(patternSpreadField) < patternPanelBottom;
+            int patternHeaderBottom = patternBoxY + HEADER_CLIP;
+            int patternPanelTop = patternBoxY;
+            int patternPanelBottom = patternBoxY + patternBoxHeight;
 
-        boolean patternIntensityRowVisible = WidgetLayoutHelper.getY(patternIntensityField) + FIELD_HEIGHT > patternHeaderBottom
-                && WidgetLayoutHelper.getY(patternIntensityField) < patternPanelBottom;
 
-        int maxParticleLabelY = maxParticleColorSlider.y + patternLabelYOffset;
-        if (maxParticlesRowVisible) {
-            drawScaledText(poseStackOrGraphics, "Max Particle's ", patternTextX, maxParticleLabelY, textScale);
-        }
+            boolean patternSelectorVisible = WidgetLayoutHelper.getY(patternSelector) + BUTTON_HEIGHT > patternHeaderBottom
+                    && WidgetLayoutHelper.getY(patternSelector) < patternPanelBottom;
 
-        int patternSpeedLabelY = WidgetLayoutHelper.getY(patternSpeedField) + patternLabelYOffset;
-        if (patternSpeedRowVisible) {
-            drawScaledText(poseStackOrGraphics, ComponentHelper.translatable("buildscape.config.particles.pattern_speed").getString() + " ", patternTextX, patternSpeedLabelY, textScale);
-        }
+            boolean maxParticlesRowVisible = maxParticleColorSlider.y + SLIDER_HEIGHT > patternHeaderBottom
+                    && maxParticleColorSlider.y < patternPanelBottom;
 
-        int patternSpreadLabelY = WidgetLayoutHelper.getY(patternSpreadField) + patternLabelYOffset;
-        if (patternSpreadRowVisible) {
-            drawScaledText(poseStackOrGraphics, ComponentHelper.translatable("buildscape.config.particles.pattern_spread").getString() + " ", patternTextX, patternSpreadLabelY, textScale);
-        }
+            boolean patternSpeedRowVisible = WidgetLayoutHelper.getY(patternSpeedField) + FIELD_HEIGHT > patternHeaderBottom
+                    && WidgetLayoutHelper.getY(patternSpeedField) < patternPanelBottom;
 
-        int patternIntensityLabelY = WidgetLayoutHelper.getY(patternIntensityField) + patternLabelYOffset;
-        if (patternIntensityRowVisible) {
-            drawScaledText(poseStackOrGraphics, ComponentHelper.translatable("buildscape.config.particles.pattern_intensity").getString() + " ", patternTextX, patternIntensityLabelY, textScale);
-        }
+            boolean patternSpreadRowVisible = WidgetLayoutHelper.getY(patternSpreadField) + FIELD_HEIGHT > patternHeaderBottom
+                    && WidgetLayoutHelper.getY(patternSpreadField) < patternPanelBottom;
 
-        patternSelector.visible = false;
-        patternSpeedField.visible = false;
-        patternSpreadField.visible = false;
-        patternIntensityField.visible = false;
-        maxParticleColorSlider.visible = false;
+            boolean patternIntensityRowVisible = WidgetLayoutHelper.getY(patternIntensityField) + FIELD_HEIGHT > patternHeaderBottom
+                    && WidgetLayoutHelper.getY(patternIntensityField) < patternPanelBottom;
 
-        if (patternSelectorVisible) {
-            patternSelector.visible = true;
-            Services.PLATFORM.renderWidget(poseStackOrGraphics, patternSelector, mouseX, mouseY, partialTick);
+            int maxParticleLabelY = maxParticleColorSlider.y + patternLabelYOffset;
+            if (maxParticlesRowVisible) {
+                drawScaledText(poseStackOrGraphics, "Max Particle's ", patternTextX, maxParticleLabelY, textScale);
+            }
+
+            int patternSpeedLabelY = WidgetLayoutHelper.getY(patternSpeedField) + patternLabelYOffset;
+            if (patternSpeedRowVisible) {
+                drawScaledText(poseStackOrGraphics, ComponentHelper.translatable("buildscape.config.particles.pattern_speed").getString() + " ", patternTextX, patternSpeedLabelY, textScale);
+            }
+
+            int patternSpreadLabelY = WidgetLayoutHelper.getY(patternSpreadField) + patternLabelYOffset;
+            if (patternSpreadRowVisible) {
+                drawScaledText(poseStackOrGraphics, ComponentHelper.translatable("buildscape.config.particles.pattern_spread").getString() + " ", patternTextX, patternSpreadLabelY, textScale);
+            }
+
+            int patternIntensityLabelY = WidgetLayoutHelper.getY(patternIntensityField) + patternLabelYOffset;
+            if (patternIntensityRowVisible) {
+                drawScaledText(poseStackOrGraphics, ComponentHelper.translatable("buildscape.config.particles.pattern_intensity").getString() + " ", patternTextX, patternIntensityLabelY, textScale);
+            }
+
             patternSelector.visible = false;
-        }
-        if (maxParticlesRowVisible) {
-            maxParticleColorSlider.visible = true;
-            maxParticleColorSlider.render(poseStackOrGraphics, mouseX, mouseY, partialTick);
-            maxParticleColorSlider.visible = false;
-        }
-
-
-        if (patternSpeedRowVisible) {
-            patternSpeedField.visible = true;
-            Services.PLATFORM.renderWidget(poseStackOrGraphics, patternSpeedField, mouseX, mouseY, partialTick);
             patternSpeedField.visible = false;
-        }
-        if (patternSpreadRowVisible) {
-            patternSpreadField.visible = true;
-            Services.PLATFORM.renderWidget(poseStackOrGraphics, patternSpreadField, mouseX, mouseY, partialTick);
             patternSpreadField.visible = false;
-        }
-        if (patternIntensityRowVisible) {
-            patternIntensityField.visible = true;
-            Services.PLATFORM.renderWidget(poseStackOrGraphics, patternIntensityField, mouseX, mouseY, partialTick);
             patternIntensityField.visible = false;
+            maxParticleColorSlider.visible = false;
+
+            if (patternSelectorVisible) {
+                patternSelector.visible = true;
+                Services.PLATFORM.renderWidget(poseStackOrGraphics, patternSelector, mouseX, mouseY, partialTick);
+                patternSelector.visible = false;
+            }
+            if (maxParticlesRowVisible) {
+                maxParticleColorSlider.visible = true;
+                maxParticleColorSlider.render(poseStackOrGraphics, mouseX, mouseY, partialTick);
+                maxParticleColorSlider.visible = false;
+            }
+
+
+            if (patternSpeedRowVisible) {
+                patternSpeedField.visible = true;
+                Services.PLATFORM.renderWidget(poseStackOrGraphics, patternSpeedField, mouseX, mouseY, partialTick);
+                patternSpeedField.visible = false;
+            }
+            if (patternSpreadRowVisible) {
+                patternSpreadField.visible = true;
+                Services.PLATFORM.renderWidget(poseStackOrGraphics, patternSpreadField, mouseX, mouseY, partialTick);
+                patternSpreadField.visible = false;
+            }
+            if (patternIntensityRowVisible) {
+                patternIntensityField.visible = true;
+                Services.PLATFORM.renderWidget(poseStackOrGraphics, patternIntensityField, mouseX, mouseY, partialTick);
+                patternIntensityField.visible = false;
+            }
+
+            if (patternNeedsScrollbarRender && patternMaxScrollRender > 0) {
+                int scrollbarX = patternBoxX + patternBoxWidth - SCROLLBAR_WIDTH - SCROLLBAR_RIGHT_MARGIN;
+                int scrollbarY = patternBoxY + HEADER_CLIP;
+                int scrollbarHeight = patternBoxHeight - HEADER_CLIP - UI_PADDING;
+
+                double patternScrollableAreaHeight = patternTotalContentHeightRender - HEADER_CLIP;
+                double patternVisibleAreaHeight = patternBoxHeight - HEADER_CLIP - UI_PADDING;
+                double visibleRatio = Math.min(1.0, patternVisibleAreaHeight / patternScrollableAreaHeight);
+
+                patternScrollbarRenderer.renderScrollbar(poseStackOrGraphics, scrollbarX, scrollbarY, scrollbarHeight,
+                        patternPropertiesScrollOffset, patternMaxScrollRender, visibleRatio);
+            }
+
+        } finally {
+            if (patternClip) Services.PLATFORM.disableScissor(poseStackOrGraphics);
         }
-
-        if (patternNeedsScrollbarRender && patternMaxScrollRender > 0) {
-            int scrollbarX = patternBoxX + patternBoxWidth - SCROLLBAR_WIDTH - SCROLLBAR_RIGHT_MARGIN;
-            int scrollbarY = patternBoxY + HEADER_CLIP;
-            int scrollbarHeight = patternBoxHeight - HEADER_CLIP - UI_PADDING;
-
-            double patternScrollableAreaHeight = patternTotalContentHeightRender - HEADER_CLIP;
-            double patternVisibleAreaHeight = patternBoxHeight - HEADER_CLIP - UI_PADDING;
-            double visibleRatio = Math.min(1.0, patternVisibleAreaHeight / patternScrollableAreaHeight);
-
-            patternScrollbarRenderer.renderScrollbar(poseStackOrGraphics, scrollbarX, scrollbarY, scrollbarHeight,
-                    patternPropertiesScrollOffset, patternMaxScrollRender, visibleRatio);
-        }
-
-        Services.PLATFORM.disableScissor(poseStackOrGraphics);
 
         float standardScale = BuildScapeConfigScreen.getStandardTextScale();
 

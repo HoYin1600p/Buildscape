@@ -222,79 +222,82 @@ public class ItemSelectionWidget implements ICustomWidget {
         if (scissorHeight > 0 && scissorWidth > 0) {
             Services.PLATFORM.enableScissor(poseStackOrGraphics, scissorX, scissorY, scissorWidth, scissorHeight);
         }
+        try {
 
-        int totalRows = (int) Math.ceil((double) filteredItems.size() / itemsPerRow);
-        int startRow = (int) Math.floor(scrollOffset / (ITEM_SIZE + ITEM_SPACING));
-        int endRow = Math.min(startRow + maxVisibleRows + 2, totalRows);
+            int totalRows = (int) Math.ceil((double) filteredItems.size() / itemsPerRow);
+            int startRow = (int) Math.floor(scrollOffset / (ITEM_SIZE + ITEM_SPACING));
+            int endRow = Math.min(startRow + maxVisibleRows + 2, totalRows);
 
-        double pixelOffsetInRow = scrollOffset % (ITEM_SIZE + ITEM_SPACING);
-        int itemY = y + headerAreaHeight + GRID_PADDING_TOP - (int) pixelOffsetInRow;
+            double pixelOffsetInRow = scrollOffset % (ITEM_SIZE + ITEM_SPACING);
+            int itemY = y + headerAreaHeight + GRID_PADDING_TOP - (int) pixelOffsetInRow;
 
-        for (int row = startRow; row < endRow; row++) {
-            int rowY = itemY + (row - startRow) * (ITEM_SIZE + ITEM_SPACING);
+            for (int row = startRow; row < endRow; row++) {
+                int rowY = itemY + (row - startRow) * (ITEM_SIZE + ITEM_SPACING);
 
-            if (rowY + ITEM_SIZE < y + headerAreaHeight || rowY > y + height - bottomMargin) {
-                continue;
-            }
-
-            int totalRowWidth = itemsPerRow * (ITEM_SIZE + ITEM_SPACING) - ITEM_SPACING;
-            int availableAreaWidth = width - 21;
-            int startXOffset = Math.max(0, (availableAreaWidth - totalRowWidth) / 2);
-
-            for (int col = 0; col < itemsPerRow; col++) {
-                int index = row * itemsPerRow + col;
-                if (index >= filteredItems.size())
-                    break;
-
-                Item item = filteredItems.get(index);
-                int itemX = x + 5 + startXOffset + col * (ITEM_SIZE + ITEM_SPACING);
-
-                if (itemX + ITEM_SIZE < x || itemX > x + width) {
+                if (rowY + ITEM_SIZE < y + headerAreaHeight || rowY > y + height - bottomMargin) {
                     continue;
                 }
 
-                boolean isHovered = mouseX >= itemX && mouseX < itemX + ITEM_SIZE &&
-                        mouseY >= rowY && mouseY < rowY + ITEM_SIZE &&
-                        mouseX >= x && mouseX < x + width &&
-                        mouseY >= y + headerAreaHeight + 1 && mouseY < y + height - bottomMargin;
+                int totalRowWidth = itemsPerRow * (ITEM_SIZE + ITEM_SPACING) - ITEM_SPACING;
+                int availableAreaWidth = width - 21;
+                int startXOffset = Math.max(0, (availableAreaWidth - totalRowWidth) / 2);
 
-                CommonId itemId = Services.PLATFORM.getItemId(item);
-                String itemIdStr = itemId != null ? itemId.toString() : "";
-                int state = getItemState.applyAsInt(itemIdStr);
+                for (int col = 0; col < itemsPerRow; col++) {
+                    int index = row * itemsPerRow + col;
+                    if (index >= filteredItems.size())
+                        break;
 
-                int bgColor;
-                if (state == 1) {
-                    bgColor = isHovered ? 0x6000FF00 : 0x4000FF00;
-                } else if (state == 2) {
-                    bgColor = isHovered ? 0x60FF0000 : 0x40FF0000;
-                } else {
-                    bgColor = isHovered ? 0x40CCCCCC : 0x33CCCCCC;
+                    Item item = filteredItems.get(index);
+                    int itemX = x + 5 + startXOffset + col * (ITEM_SIZE + ITEM_SPACING);
+
+                    if (itemX + ITEM_SIZE < x || itemX > x + width) {
+                        continue;
+                    }
+
+                    boolean isHovered = mouseX >= itemX && mouseX < itemX + ITEM_SIZE &&
+                            mouseY >= rowY && mouseY < rowY + ITEM_SIZE &&
+                            mouseX >= x && mouseX < x + width &&
+                            mouseY >= y + headerAreaHeight + 1 && mouseY < y + height - bottomMargin;
+
+                    CommonId itemId = Services.PLATFORM.getItemId(item);
+                    String itemIdStr = itemId != null ? itemId.toString() : "";
+                    int state = getItemState.applyAsInt(itemIdStr);
+
+                    int bgColor;
+                    if (state == 1) {
+                        bgColor = isHovered ? 0x6000FF00 : 0x4000FF00;
+                    } else if (state == 2) {
+                        bgColor = isHovered ? 0x60FF0000 : 0x40FF0000;
+                    } else {
+                        bgColor = isHovered ? 0x40CCCCCC : 0x33CCCCCC;
+                    }
+                    Services.PLATFORM.fill(poseStackOrGraphics, itemX, rowY, itemX + ITEM_SIZE, rowY + ITEM_SIZE, bgColor);
+
+                    if (state != 0) {
+                        int panelBorderColor = (state == 1) ? 0xFF00FF00 : 0xFFFF0000;
+                        Services.PLATFORM.fill(poseStackOrGraphics, itemX - 1, rowY - 1, itemX + ITEM_SIZE + 1, rowY, panelBorderColor);
+                        Services.PLATFORM.fill(poseStackOrGraphics, itemX - 1, rowY + ITEM_SIZE, itemX + ITEM_SIZE + 1, rowY + ITEM_SIZE + 1,
+                                panelBorderColor);
+                        Services.PLATFORM.fill(poseStackOrGraphics, itemX - 1, rowY - 1, itemX, rowY + ITEM_SIZE + 1, panelBorderColor);
+                        Services.PLATFORM.fill(poseStackOrGraphics, itemX + ITEM_SIZE, rowY - 1, itemX + ITEM_SIZE + 1, rowY + ITEM_SIZE + 1,
+                                panelBorderColor);
+                    }
+
+                    Services.PLATFORM.pushGuiPose(poseStackOrGraphics);
+                    Services.PLATFORM.translateGuiPose(poseStackOrGraphics, 0, 0, 100);
+                    ItemStack stack = itemStackCache.computeIfAbsent(item, ItemStack::new);
+                    Services.PLATFORM.renderGuiItem(poseStackOrGraphics, stack, itemX + 2, rowY + 2);
+                    Services.PLATFORM.renderGuiItemDecorations(poseStackOrGraphics, mc.font, stack, itemX + 2, rowY + 2);
+                    Services.PLATFORM.popGuiPose(poseStackOrGraphics);
                 }
-                Services.PLATFORM.fill(poseStackOrGraphics, itemX, rowY, itemX + ITEM_SIZE, rowY + ITEM_SIZE, bgColor);
-
-                if (state != 0) {
-                    int panelBorderColor = (state == 1) ? 0xFF00FF00 : 0xFFFF0000;
-                    Services.PLATFORM.fill(poseStackOrGraphics, itemX - 1, rowY - 1, itemX + ITEM_SIZE + 1, rowY, panelBorderColor);
-                    Services.PLATFORM.fill(poseStackOrGraphics, itemX - 1, rowY + ITEM_SIZE, itemX + ITEM_SIZE + 1, rowY + ITEM_SIZE + 1,
-                            panelBorderColor);
-                    Services.PLATFORM.fill(poseStackOrGraphics, itemX - 1, rowY - 1, itemX, rowY + ITEM_SIZE + 1, panelBorderColor);
-                    Services.PLATFORM.fill(poseStackOrGraphics, itemX + ITEM_SIZE, rowY - 1, itemX + ITEM_SIZE + 1, rowY + ITEM_SIZE + 1,
-                            panelBorderColor);
-                }
-
-                Services.PLATFORM.pushGuiPose(poseStackOrGraphics);
-                Services.PLATFORM.translateGuiPose(poseStackOrGraphics, 0, 0, 100);
-                ItemStack stack = itemStackCache.computeIfAbsent(item, ItemStack::new);
-                Services.PLATFORM.renderGuiItem(poseStackOrGraphics, stack, itemX + 2, rowY + 2);
-                Services.PLATFORM.renderGuiItemDecorations(poseStackOrGraphics, mc.font, stack, itemX + 2, rowY + 2);
-                Services.PLATFORM.popGuiPose(poseStackOrGraphics);
             }
-        }
 
-        if (scissorHeight > 0 && scissorWidth > 0) {
-            Services.PLATFORM.disableScissor(poseStackOrGraphics);
+        } finally {
+            if (scissorHeight > 0 && scissorWidth > 0) {
+                Services.PLATFORM.disableScissor(poseStackOrGraphics);
+            }
+            Services.PLATFORM.popGuiPose(poseStackOrGraphics);
         }
-        Services.PLATFORM.popGuiPose(poseStackOrGraphics);
 
         int borderColor = 0xFF666666;
         Services.PLATFORM.fill(poseStackOrGraphics, x, y, x + width, y + 1, borderColor);

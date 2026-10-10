@@ -233,26 +233,28 @@ public class MobPillarRenderer {
         }
 
         poseStack.pushPose();
-        poseStack.scale(scale, scale, scale);
+        try {
+            poseStack.scale(scale, scale, scale);
 
-        if (state.upsideDown) {
-            float centerOffset = entityHeight * 0.5f;
-            poseStack.translate(0.0, centerOffset, 0.0);
-            Services.PLATFORM.rotateX(poseStack, 180.0f);
-            poseStack.translate(0.0, -centerOffset, 0.0);
+            if (state.upsideDown) {
+                float centerOffset = entityHeight * 0.5f;
+                poseStack.translate(0.0, centerOffset, 0.0);
+                Services.PLATFORM.rotateX(poseStack, 180.0f);
+                poseStack.translate(0.0, -centerOffset, 0.0);
+            }
+
+            Services.PLATFORM.renderEntity(
+                    entity,
+                    0.0D, 0.0D, 0.0D,
+                    entity.getYRot(),
+                    partialTicks,
+                    poseStack,
+                    bufferSource,
+                    combinedLight
+            );
+        } finally {
+            poseStack.popPose();
         }
-
-        Services.PLATFORM.renderEntity(
-                entity,
-                0.0D, 0.0D, 0.0D,
-                entity.getYRot(),
-                partialTicks,
-                poseStack,
-                bufferSource,
-                combinedLight
-        );
-
-        poseStack.popPose();
     }
 
 

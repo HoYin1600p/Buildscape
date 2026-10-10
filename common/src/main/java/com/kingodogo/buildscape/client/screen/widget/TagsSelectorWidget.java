@@ -198,110 +198,111 @@ public class TagsSelectorWidget implements ICustomWidget {
         if (scissorHeight > 0 && scissorWidth > 0) {
             Services.PLATFORM.enableScissor(poseStackOrGraphics, scissorX, scissorY, scissorWidth, scissorHeight);
         }
+        try {
 
-        int startRow = (int) Math.floor(scrollOffset);
-        int endRow = Math.min(startRow + maxVisibleRows + 2, filteredTags.size());
+            int startRow = (int) Math.floor(scrollOffset);
+            int endRow = Math.min(startRow + maxVisibleRows + 2, filteredTags.size());
 
-        double pixelOffsetInRow = (scrollOffset % 1.0) * (TAG_BUTTON_HEIGHT + TAG_BUTTON_SPACING);
-        int tagY = y + headerAreaHeight + GRID_PADDING_TOP - (int) pixelOffsetInRow;
-        int tagWidth = width - CustomScrollbarRenderer.getScrollbarWidth() - 20;
+            double pixelOffsetInRow = (scrollOffset % 1.0) * (TAG_BUTTON_HEIGHT + TAG_BUTTON_SPACING);
+            int tagY = y + headerAreaHeight + GRID_PADDING_TOP - (int) pixelOffsetInRow;
+            int tagWidth = width - CustomScrollbarRenderer.getScrollbarWidth() - 20;
 
-        for (int row = startRow; row < endRow; row++) {
-            if (row < 0 || row >= filteredTags.size())
-                break;
+            for (int row = startRow; row < endRow; row++) {
+                if (row < 0 || row >= filteredTags.size())
+                    break;
 
-            TagKey<Item> tag = filteredTags.get(row);
-            String tagId = "#" + tag.location();
-            int rowY = tagY + (row - startRow) * (TAG_BUTTON_HEIGHT + TAG_BUTTON_SPACING);
+                TagKey<Item> tag = filteredTags.get(row);
+                String tagId = "#" + tag.location();
+                int rowY = tagY + (row - startRow) * (TAG_BUTTON_HEIGHT + TAG_BUTTON_SPACING);
 
-            if (rowY + TAG_BUTTON_HEIGHT < y + headerAreaHeight || rowY > y + height - bottomMargin) {
-                continue;
-            }
-
-            int tagX = x + 5;
-
-            boolean isSelected = selectedTags.contains(tagId);
-            boolean isHovered = mouseX >= tagX && mouseX < tagX + tagWidth &&
-                    mouseY >= rowY && mouseY < rowY + TAG_BUTTON_HEIGHT &&
-                    mouseX >= x && mouseX < x + width &&
-                    mouseY >= y + headerAreaHeight + 1 && mouseY < y + height - bottomMargin;
-
-            int bgColor;
-            if (isSelected) {
-                bgColor = isHovered ? 0x6000FF00 : 0x4000FF00;
-            } else {
-                bgColor = isHovered ? 0x40CCCCCC : 0x33CCCCCC;
-            }
-            Services.PLATFORM.fill(poseStackOrGraphics, tagX, rowY, tagX + tagWidth, rowY + TAG_BUTTON_HEIGHT, bgColor);
-
-            if (isSelected) {
-                int selectionBorderColor = 0xFF00FF00;
-                Services.PLATFORM.fill(poseStackOrGraphics, tagX - 1, rowY - 1, tagX + tagWidth + 1, rowY, selectionBorderColor);
-                Services.PLATFORM.fill(poseStackOrGraphics, tagX - 1, rowY + TAG_BUTTON_HEIGHT, tagX + tagWidth + 1, rowY + TAG_BUTTON_HEIGHT + 1,
-                        selectionBorderColor);
-                Services.PLATFORM.fill(poseStackOrGraphics, tagX - 1, rowY - 1, tagX, rowY + TAG_BUTTON_HEIGHT + 1, selectionBorderColor);
-                Services.PLATFORM.fill(poseStackOrGraphics, tagX + tagWidth, rowY - 1, tagX + tagWidth + 1, rowY + TAG_BUTTON_HEIGHT + 1,
-                        selectionBorderColor);
-            }
-
-            String displayName = tag.location().toString();
-            int availableWidth = tagWidth - 10;
-            int textWidth = mc.font.width(displayName);
-
-            if (isHovered && textWidth > availableWidth) {
-                if (!tagId.equals(currentHoveredTagId)) {
-                    currentHoveredTagId = tagId;
-                    hoverStartTime = System.currentTimeMillis();
+                if (rowY + TAG_BUTTON_HEIGHT < y + headerAreaHeight || rowY > y + height - bottomMargin) {
+                    continue;
                 }
 
-                long elapsed = System.currentTimeMillis() - hoverStartTime;
-                double speed = 0.001;
-                int maxScroll = textWidth - availableWidth;
+                int tagX = x + 5;
 
-                double scrollProgress = (1.0 - Math.cos(elapsed * speed)) / 2.0;
-                int textOffset = (int) (maxScroll * scrollProgress);
+                boolean isSelected = selectedTags.contains(tagId);
+                boolean isHovered = mouseX >= tagX && mouseX < tagX + tagWidth &&
+                        mouseY >= rowY && mouseY < rowY + TAG_BUTTON_HEIGHT &&
+                        mouseX >= x && mouseX < x + width &&
+                        mouseY >= y + headerAreaHeight + 1 && mouseY < y + height - bottomMargin;
 
-                int buttonScissorX = (int) ((tagX + 5) * guiScale);
-                int buttonScissorY = (int) (windowHeight - (rowY + TAG_BUTTON_HEIGHT - 6) * guiScale);
-                int buttonScissorWidth = (int) ((availableWidth) * guiScale);
-                int buttonScissorHeight = (int) (TAG_BUTTON_HEIGHT * guiScale);
-
-                int textScissorY = (int) (windowHeight - (rowY + TAG_BUTTON_HEIGHT) * guiScale);
-                int textScissorH = (int) (TAG_BUTTON_HEIGHT * guiScale);
-
-                Services.PLATFORM.enableScissor(poseStackOrGraphics, buttonScissorX, textScissorY, buttonScissorWidth, textScissorH);
-
-                Services.PLATFORM.draw(
-                        poseStackOrGraphics,
-                        mc.font,
-                        displayName,
-                        tagX + 5 - textOffset, rowY + 6,
-                        0xFFFFFF);
-
-                if (scissorHeight > 0 && scissorWidth > 0) {
-                    Services.PLATFORM.enableScissor(poseStackOrGraphics, scissorX, scissorY, scissorWidth, scissorHeight);
+                int bgColor;
+                if (isSelected) {
+                    bgColor = isHovered ? 0x6000FF00 : 0x4000FF00;
                 } else {
-                    Services.PLATFORM.disableScissor(poseStackOrGraphics);
+                    bgColor = isHovered ? 0x40CCCCCC : 0x33CCCCCC;
                 }
-            } else {
-                if (textWidth > availableWidth) {
-                    String truncated = mc.font.plainSubstrByWidth(displayName,
-                            availableWidth - mc.font.width("..."));
-                    displayName = truncated + "...";
-                }
-                Services.PLATFORM.draw(
-                        poseStackOrGraphics,
-                        mc.font,
-                        displayName,
-                        tagX + 5, rowY + 6,
-                        0xFFFFFF);
-            }
-        }
+                Services.PLATFORM.fill(poseStackOrGraphics, tagX, rowY, tagX + tagWidth, rowY + TAG_BUTTON_HEIGHT, bgColor);
 
-        if (scissorHeight > 0 && scissorWidth > 0) {
-            Services.PLATFORM.disableScissor(poseStackOrGraphics);
+                if (isSelected) {
+                    int selectionBorderColor = 0xFF00FF00;
+                    Services.PLATFORM.fill(poseStackOrGraphics, tagX - 1, rowY - 1, tagX + tagWidth + 1, rowY, selectionBorderColor);
+                    Services.PLATFORM.fill(poseStackOrGraphics, tagX - 1, rowY + TAG_BUTTON_HEIGHT, tagX + tagWidth + 1, rowY + TAG_BUTTON_HEIGHT + 1,
+                            selectionBorderColor);
+                    Services.PLATFORM.fill(poseStackOrGraphics, tagX - 1, rowY - 1, tagX, rowY + TAG_BUTTON_HEIGHT + 1, selectionBorderColor);
+                    Services.PLATFORM.fill(poseStackOrGraphics, tagX + tagWidth, rowY - 1, tagX + tagWidth + 1, rowY + TAG_BUTTON_HEIGHT + 1,
+                            selectionBorderColor);
+                }
+
+                String displayName = tag.location().toString();
+                int availableWidth = tagWidth - 10;
+                int textWidth = mc.font.width(displayName);
+
+                if (isHovered && textWidth > availableWidth) {
+                    if (!tagId.equals(currentHoveredTagId)) {
+                        currentHoveredTagId = tagId;
+                        hoverStartTime = System.currentTimeMillis();
+                    }
+
+                    long elapsed = System.currentTimeMillis() - hoverStartTime;
+                    double speed = 0.001;
+                    int maxScroll = textWidth - availableWidth;
+
+                    double scrollProgress = (1.0 - Math.cos(elapsed * speed)) / 2.0;
+                    int textOffset = (int) (maxScroll * scrollProgress);
+
+                    int buttonScissorX = (int) ((tagX + 5) * guiScale);
+                    int buttonScissorY = (int) (windowHeight - (rowY + TAG_BUTTON_HEIGHT - 6) * guiScale);
+                    int buttonScissorWidth = (int) ((availableWidth) * guiScale);
+                    int buttonScissorHeight = (int) (TAG_BUTTON_HEIGHT * guiScale);
+
+                    int textScissorY = (int) (windowHeight - (rowY + TAG_BUTTON_HEIGHT) * guiScale);
+                    int textScissorH = (int) (TAG_BUTTON_HEIGHT * guiScale);
+
+                    Services.PLATFORM.enableScissor(poseStackOrGraphics, buttonScissorX, textScissorY, buttonScissorWidth, textScissorH);
+                    try {
+                        Services.PLATFORM.draw(
+                                poseStackOrGraphics,
+                                mc.font,
+                                displayName,
+                                tagX + 5 - textOffset, rowY + 6,
+                                0xFFFFFF);
+
+                    } finally {
+                        Services.PLATFORM.disableScissor(poseStackOrGraphics);
+                    }
+                } else {
+                    if (textWidth > availableWidth) {
+                        String truncated = mc.font.plainSubstrByWidth(displayName,
+                                availableWidth - mc.font.width("..."));
+                        displayName = truncated + "...";
+                    }
+                    Services.PLATFORM.draw(
+                            poseStackOrGraphics,
+                            mc.font,
+                            displayName,
+                            tagX + 5, rowY + 6,
+                            0xFFFFFF);
+                }
+            }
+
+        } finally {
+            if (scissorHeight > 0 && scissorWidth > 0) {
+                Services.PLATFORM.disableScissor(poseStackOrGraphics);
+            }
+            Services.PLATFORM.popGuiPose(poseStackOrGraphics);
         }
-        Services.PLATFORM.popGuiPose(poseStackOrGraphics);
 
         int borderCol = 0xFF666666;
         Services.PLATFORM.fill(poseStackOrGraphics, x, y, x + width, y + 1, borderCol);

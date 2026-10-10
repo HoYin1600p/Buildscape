@@ -631,7 +631,6 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         Services.PLATFORM.renderClientOverlay(poseStackOrGraphics, width, height);
 
         if (activeTab != null) {
-            Services.PLATFORM.disableScissor(poseStackOrGraphics);
             activeTab.renderTooltips(poseStackOrGraphics, mouseX, mouseY, partialTick);
         }
     }

@@ -140,7 +140,11 @@ public final class ClientPlatformHooks {
 
     public static void enableScissor(Object graphics, int x, int y, int width, int height) {
         if (graphics instanceof net.minecraft.client.gui.GuiGraphicsExtractor extractor) {
-            extractor.enableScissor(x, y, x + width, y + height);
+            // The common GUI contract uses framebuffer pixels with a bottom-left origin.
+            // The extractor expects GUI coordinates with a top-left origin.
+            var window = net.minecraft.client.Minecraft.getInstance().getWindow();
+            var clip = FramebufferScissor.toGui(x, y, width, height, window.getHeight(), window.getGuiScale());
+            extractor.enableScissor(clip.left(), clip.top(), clip.right(), clip.bottom());
         }
     }
 

@@ -162,7 +162,7 @@ def rectangle(cells, start, width_limit, depth_limit):
 
 
 def build_layout(dump, origin_x=0, origin_z=0, ground_top_y=-61, layer_size=200,
-                 include_waterlogged=False, include_lava_logged=False):
+                 include_waterlogged=False, include_lava_logged=False, floors=True):
     if not 4 <= layer_size <= 200:
         raise ValueError("layer size must be between 4 and 200")
     if ground_top_y < -64:
@@ -243,7 +243,7 @@ def build_layout(dump, origin_x=0, origin_z=0, ground_top_y=-61, layer_size=200,
     if layers and layers[-1]["top_y"] >= 320:
         raise ValueError("Showcase exceeds Overworld y=319; increase layer size or reduce included states")
     return {"schemaVersion": 1, "minecraftVersion": "26.2", "origin": [origin_x, origin_z],
-            "ground_top_y": ground_top_y, "layer_size": layer_size,
+            "ground_top_y": ground_top_y, "layer_size": layer_size, "floors": floors,
             "include_waterlogged": include_waterlogged, "include_lava_logged": include_lava_logged,
             "filtered_states": filtered, "material_tokens": tokens,
             "groups": [dict(category=key[0], material=key[1], **counts[key]) for key in
@@ -264,12 +264,23 @@ def setblock(position, block, mode="replace"):
     return "setblock " + " ".join(map(str, position)) + f" {block} {mode}"
 
 
-def cell_blocks(cell):
+def has_floors(layout):
+    return layout.get("floors", True)
+
+
+def bottom_glass(layout, layer):
+    """Without floors, fluid cells above layer 1 need their own glass bottom."""
+    return not has_floors(layout) and layer["index"] > 1
+
+
+def cell_blocks(cell, with_bottom=False):
     x, y, z = cell["position"]
     if cell["kind"] == "fluid":
         for dx, dy, dz in ((0, 0, 1), (2, 0, 1), (1, 0, 0), (1, 0, 2), (1, 1, 1)):
             yield [x + dx, y + dy, z + dz], "minecraft:glass"
-        # The existing ground or the complete upper-layer floor seals the bottom.
+        if with_bottom:
+            yield [x + 1, y - 1, z + 1], "minecraft:glass"
+        # Otherwise the existing ground or the upper-layer floor seals the bottom.
     for part in cell["parts"]:
         yield part["position"], block_string(cell["id"], part["state"])
 
@@ -291,10 +302,11 @@ def commands(layout):
                          x + width - 1, layout["layers"][-1]["top_y"], z + depth - 1,
                          "minecraft:air")
     for layer in layout["layers"]:
-        if layer["index"] > 1:
+        if layer["index"] > 1 and has_floors(layout):
             yield from fills(x, layer["floor_y"], z, x + layer["width"] - 1,
                              layer["floor_y"], z + layer["depth"] - 1, "minecraft:grass_block")
     for layer in layout["layers"]:
+        bottom = bottom_glass(layout, layer)
         for group in layer["groups"]:
             if group["sign"] is not None:
                 # 26.2 SignText uses native Component NBT, not JSON encoded strings.
@@ -302,21 +314,23 @@ def commands(layout):
                 nbt = '{front_text:{messages:[' + label + ',"","",""],color:"black",has_glowing_text:0b},is_waxed:1b}'
                 yield setblock(group["sign"], "minecraft:oak_sign[rotation=0,waterlogged=false]" + nbt)
             for cell in group["cells"]:
-                for index, (position, block) in enumerate(cell_blocks(cell)):
+                for index, (position, block) in enumerate(cell_blocks(cell, bottom)):
                     yield setblock(position, block, "replace" if index == 0 else "strict")
     # The first command per cell uses replace as requested. That mode runs shape
     # updates; a final strict pass restores exact states without neighbour updates.
     # This also preserves unsupported wall/hanging states for static inspection.
     for layer in layout["layers"]:
+        bottom = bottom_glass(layout, layer)
         for group in layer["groups"]:
             for cell in group["cells"]:
-                for position, block in cell_blocks(cell):
+                for position, block in cell_blocks(cell, bottom):
                     yield setblock(position, block, "strict")
     yield "tick freeze"
 
 
 def summary(layout, files, command_count):
     lines = [f"Minecraft 26.2 showcase: {len(layout['layers'])} layers, {command_count} commands, {len(files)} files",
+             f"Floors under upper layers: {'on' if has_floors(layout) else 'off (glass-bottomed fluid cells)'}",
              f"Excluded logged states: {layout['filtered_states']}", "Material groups (blocks / cells / placed states):"]
     for group in layout["groups"]:
         lines.append(f"  {group['category']}/{group['material']}: {group['blocks']} / {group['cells']} / {group['placed_states']}")
@@ -370,11 +384,14 @@ def main():
     parser.add_argument("--layer-size", type=int, default=200)
     parser.add_argument("--include-waterlogged", action="store_true")
     parser.add_argument("--include-lava-logged", action="store_true")
+    parser.add_argument("--no-floors", action="store_true",
+                        help="omit the grass floors under upper layers")
     args = parser.parse_args()
     try:
         dump = json.loads(args.dump.read_text(encoding="utf-8"))
         layout = build_layout(dump, args.origin_x, args.origin_z, args.ground_top_y,
-                              args.layer_size, args.include_waterlogged, args.include_lava_logged)
+                              args.layer_size, args.include_waterlogged, args.include_lava_logged,
+                              not args.no_floors)
         print(write_output(layout, args.output), end="")
     except (OSError, ValueError, KeyError, TypeError) as error:
         parser.exit(2, f"showcase: {error}\n")

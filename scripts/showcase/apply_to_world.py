@@ -89,11 +89,12 @@ def layout_placements(layout):
                         (x + width - 1, layers[-1]["top_y"], z + depth - 1),
                         parse_state("minecraft:air"))
     for layer in layers:
-        if layer["index"] > 1:
+        if layer["index"] > 1 and build_showcase.has_floors(layout):
             yield Placement((x, layer["floor_y"], z),
                             (x + layer["width"] - 1, layer["floor_y"], z + layer["depth"] - 1),
                             parse_state("minecraft:grass_block[snowy=false]"))
     for layer in layers:
+        bottom = build_showcase.bottom_glass(layout, layer)
         for group in layer["groups"]:
             if group["sign"] is not None:
                 position = tuple(group["sign"])
@@ -101,7 +102,7 @@ def layout_placements(layout):
                 yield Placement(position, position, parse_state("minecraft:oak_sign[rotation=0,waterlogged=false]"),
                                 block_entity("minecraft:sign", position, messages))
             for cell in group["cells"]:
-                for position, text in build_showcase.cell_blocks(cell):
+                for position, text in build_showcase.cell_blocks(cell, bottom):
                     position = tuple(position)
                     state = parse_state(text)
                     identifier = entity_id(state.value["Name"].value, cell.get("className", ""),

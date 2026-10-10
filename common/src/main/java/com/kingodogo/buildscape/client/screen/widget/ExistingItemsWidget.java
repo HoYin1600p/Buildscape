@@ -161,80 +161,83 @@ public class ExistingItemsWidget implements ICustomWidget {
         if (scissorHeight > 0 && scissorWidth > 0) {
             Services.PLATFORM.enableScissor(poseStackOrGraphics, scissorX, scissorY, scissorWidth, scissorHeight);
         }
-        long currentTime = System.currentTimeMillis();
-        if (currentTime - lastUpdateTime >= CYCLE_INTERVAL) {
-            lastUpdateTime = currentTime;
-        }
-
-        if (displayEntries == null || displayEntries.isEmpty()) {
-            updateDisplayEntries();
-        }
-
-        int totalRows = (int) Math.ceil((double) displayEntries.size() / itemsPerRow);
-        int startRow = (int) Math.floor(scrollOffset / (ITEM_SIZE + ITEM_SPACING));
-        int endRow = Math.min(startRow + maxVisibleRows + 2, totalRows);
-
-        double pixelOffsetInRow = scrollOffset % (ITEM_SIZE + ITEM_SPACING);
-        int itemY = y + headerAreaHeight + GRID_PADDING_TOP - (int) pixelOffsetInRow;
-
-        for (int row = startRow; row < endRow; row++) {
-            int rowY = itemY + (row - startRow) * (ITEM_SIZE + ITEM_SPACING);
-
-            if (rowY + ITEM_SIZE < y + headerAreaHeight || rowY > y + height - bottomMargin) {
-                continue;
+        try {
+            long currentTime = System.currentTimeMillis();
+            if (currentTime - lastUpdateTime >= CYCLE_INTERVAL) {
+                lastUpdateTime = currentTime;
             }
 
-            for (int col = 0; col < itemsPerRow; col++) {
-                int index = row * itemsPerRow + col;
-                if (index >= displayEntries.size())
-                    break;
+            if (displayEntries == null || displayEntries.isEmpty()) {
+                updateDisplayEntries();
+            }
 
-                DisplayEntry entry = displayEntries.get(index);
-                int totalRowWidth = itemsPerRow * (ITEM_SIZE + ITEM_SPACING) - ITEM_SPACING;
-                int availableAreaWidth = width - 21;
-                int startXOffset = Math.max(0, (availableAreaWidth - totalRowWidth) / 2);
+            int totalRows = (int) Math.ceil((double) displayEntries.size() / itemsPerRow);
+            int startRow = (int) Math.floor(scrollOffset / (ITEM_SIZE + ITEM_SPACING));
+            int endRow = Math.min(startRow + maxVisibleRows + 2, totalRows);
 
-                int itemX = x + 5 + startXOffset + col * (ITEM_SIZE + ITEM_SPACING);
+            double pixelOffsetInRow = scrollOffset % (ITEM_SIZE + ITEM_SPACING);
+            int itemY = y + headerAreaHeight + GRID_PADDING_TOP - (int) pixelOffsetInRow;
 
-                if (itemX + ITEM_SIZE < x || itemX > x + width) {
+            for (int row = startRow; row < endRow; row++) {
+                int rowY = itemY + (row - startRow) * (ITEM_SIZE + ITEM_SPACING);
+
+                if (rowY + ITEM_SIZE < y + headerAreaHeight || rowY > y + height - bottomMargin) {
                     continue;
                 }
 
-                Item itemToDisplay = entry.getCurrentItem();
+                for (int col = 0; col < itemsPerRow; col++) {
+                    int index = row * itemsPerRow + col;
+                    if (index >= displayEntries.size())
+                        break;
 
-                int removeSize = 8;
-                int removeX = itemX + ITEM_SIZE - removeSize;
-                int removeY = rowY;
-                boolean removeHovered = mouseX >= removeX && mouseX <= itemX + ITEM_SIZE &&
-                        mouseY >= removeY && mouseY <= removeY + removeSize &&
-                        mouseX >= x && mouseX < x + width &&
-                        mouseY >= y + headerAreaHeight + 1 && mouseY < y + height - bottomMargin;
+                    DisplayEntry entry = displayEntries.get(index);
+                    int totalRowWidth = itemsPerRow * (ITEM_SIZE + ITEM_SPACING) - ITEM_SPACING;
+                    int availableAreaWidth = width - 21;
+                    int startXOffset = Math.max(0, (availableAreaWidth - totalRowWidth) / 2);
 
-                boolean itemHovered = mouseX >= itemX && mouseX < itemX + ITEM_SIZE &&
-                        mouseY >= rowY && mouseY < rowY + ITEM_SIZE &&
-                        !removeHovered &&
-                        mouseX >= x && mouseX < x + width &&
-                        mouseY >= y + headerAreaHeight + 1 && mouseY < y + height - bottomMargin;
+                    int itemX = x + 5 + startXOffset + col * (ITEM_SIZE + ITEM_SPACING);
 
-                int bgColor = itemHovered ? 0x40CCCCCC : 0x33CCCCCC;
-                Services.PLATFORM.fill(poseStackOrGraphics, itemX, rowY, itemX + ITEM_SIZE, rowY + ITEM_SIZE, bgColor);
+                    if (itemX + ITEM_SIZE < x || itemX > x + width) {
+                        continue;
+                    }
 
-                if (itemToDisplay != null) {
-                    ItemStack stack = new ItemStack(itemToDisplay);
-                    Services.PLATFORM.renderGuiItem(poseStackOrGraphics, stack, itemX + 2, rowY + 2);
-                    Services.PLATFORM.renderGuiItemDecorations(poseStackOrGraphics, mc.font, stack, itemX + 2, rowY + 2);
+                    Item itemToDisplay = entry.getCurrentItem();
+
+                    int removeSize = 8;
+                    int removeX = itemX + ITEM_SIZE - removeSize;
+                    int removeY = rowY;
+                    boolean removeHovered = mouseX >= removeX && mouseX <= itemX + ITEM_SIZE &&
+                            mouseY >= removeY && mouseY <= removeY + removeSize &&
+                            mouseX >= x && mouseX < x + width &&
+                            mouseY >= y + headerAreaHeight + 1 && mouseY < y + height - bottomMargin;
+
+                    boolean itemHovered = mouseX >= itemX && mouseX < itemX + ITEM_SIZE &&
+                            mouseY >= rowY && mouseY < rowY + ITEM_SIZE &&
+                            !removeHovered &&
+                            mouseX >= x && mouseX < x + width &&
+                            mouseY >= y + headerAreaHeight + 1 && mouseY < y + height - bottomMargin;
+
+                    int bgColor = itemHovered ? 0x40CCCCCC : 0x33CCCCCC;
+                    Services.PLATFORM.fill(poseStackOrGraphics, itemX, rowY, itemX + ITEM_SIZE, rowY + ITEM_SIZE, bgColor);
+
+                    if (itemToDisplay != null) {
+                        ItemStack stack = new ItemStack(itemToDisplay);
+                        Services.PLATFORM.renderGuiItem(poseStackOrGraphics, stack, itemX + 2, rowY + 2);
+                        Services.PLATFORM.renderGuiItemDecorations(poseStackOrGraphics, mc.font, stack, itemX + 2, rowY + 2);
+                    }
+
+                    Services.PLATFORM.fill(poseStackOrGraphics, removeX, removeY, itemX + ITEM_SIZE, removeY + removeSize,
+                            removeHovered ? 0x40CCCCCC : 0x33CCCCCC);
+                    Services.PLATFORM.draw(poseStackOrGraphics, mc.font, "×", removeX + 2, removeY - 1, 0xFFFFFF);
                 }
-
-                Services.PLATFORM.fill(poseStackOrGraphics, removeX, removeY, itemX + ITEM_SIZE, removeY + removeSize,
-                        removeHovered ? 0x40CCCCCC : 0x33CCCCCC);
-                Services.PLATFORM.draw(poseStackOrGraphics, mc.font, "×", removeX + 2, removeY - 1, 0xFFFFFF);
             }
-        }
 
-        if (scissorHeight > 0 && scissorWidth > 0) {
-            Services.PLATFORM.disableScissor(poseStackOrGraphics);
+        } finally {
+            if (scissorHeight > 0 && scissorWidth > 0) {
+                Services.PLATFORM.disableScissor(poseStackOrGraphics);
+            }
+            Services.PLATFORM.popGuiPose(poseStackOrGraphics);
         }
-        Services.PLATFORM.popGuiPose(poseStackOrGraphics);
 
         int borderColor = 0xFF666666;
         Services.PLATFORM.fill(poseStackOrGraphics, x, y, x + width, y + 1, borderColor);

@@ -481,31 +481,33 @@ public class PillarIdsConfigTab extends AbstractConfigTab {
         int scaledScissorHeight = (int) (scissorHeight * guiScale);
 
         Services.PLATFORM.enableScissor(poseStackOrGraphics, scaledScissorX, scaledScissorY, scaledScissorWidth, scaledScissorHeight);
-
-        for (PillarRow row : rows) {
-            row.resetBounds();
-        }
-
-        int rowIndex = 0;
-        int visibleAreaBottom = rowsStartY + scissorHeight;
-        int rowGap = Math.max(1, (int) (Minecraft.getInstance().getWindow().getGuiScaledHeight() * 0.002));
-        for (PillarRow row : rows) {
-            if (!row.visible)
-                continue;
-            int rowY = rowsStartY + rowIndex * (rowHeight + rowGap) - (int) scrollOffset;
-
-            if (rowY + rowHeight < rowsStartY || rowY > visibleAreaBottom) {
-                rowIndex++;
-                continue;
+        try {
+            for (PillarRow row : rows) {
+                row.resetBounds();
             }
 
-            row.setBounds(tableX, rowY, tableWidth, rowHeight);
-            row.render(poseStackOrGraphics, tableX, rowY, columns);
-            rowIndex++;
+            int rowIndex = 0;
+            int visibleAreaBottom = rowsStartY + scissorHeight;
+            int rowGap = Math.max(1, (int) (Minecraft.getInstance().getWindow().getGuiScaledHeight() * 0.002));
+            for (PillarRow row : rows) {
+                if (!row.visible)
+                    continue;
+                int rowY = rowsStartY + rowIndex * (rowHeight + rowGap) - (int) scrollOffset;
+
+                if (rowY + rowHeight < rowsStartY || rowY > visibleAreaBottom) {
+                    rowIndex++;
+                    continue;
+                }
+
+                row.setBounds(tableX, rowY, tableWidth, rowHeight);
+                row.render(poseStackOrGraphics, tableX, rowY, columns);
+                rowIndex++;
+            }
+
+
+        } finally {
+            Services.PLATFORM.disableScissor(poseStackOrGraphics);
         }
-
-
-        Services.PLATFORM.disableScissor(poseStackOrGraphics);
 
         if (maxScroll > 0) {
             int scrollbarX = tableX + actualTableWidth + BuildScapeConfigScreen.scaleSize(4);

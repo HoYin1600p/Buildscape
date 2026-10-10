@@ -25,12 +25,24 @@ import net.minecraft.world.level.storage.TagValueOutput;
 
 /** Display entities are created and mutated only while extracting client render states. */
 public final class ClientPillarEntities {
+    // Client levels do not allocate IDs in 26.2. Display entities never enter the world,
+    // but their caches and render-state extraction still require a unique, nonzero ID.
+    private static final java.util.concurrent.atomic.AtomicInteger DISPLAY_IDS =
+            new java.util.concurrent.atomic.AtomicInteger(-1);
+
     private ClientPillarEntities() {}
+
+    static int nextDisplayId() {
+        return DISPLAY_IDS.getAndDecrement();
+    }
 
     public static Entity createArmorStand(Level level, double x, double y, double z) {
         Entity[] created = new Entity[1];
         Services.PLATFORM.wrapRegistryAction(() -> created[0] = EntityTypes.ARMOR_STAND.create(level, EntitySpawnReason.LOAD));
-        if (created[0] != null) created[0].setPos(x, y, z);
+        if (created[0] != null) {
+            created[0].setId(nextDisplayId());
+            created[0].setPos(x, y, z);
+        }
         return created[0];
     }
 
@@ -69,6 +81,7 @@ public final class ClientPillarEntities {
         Services.PLATFORM.wrapRegistryAction(() -> created[0] = displayType.create(level, EntitySpawnReason.LOAD));
         Entity entity = created[0];
         if (entity != null) {
+            entity.setId(nextDisplayId());
             applyMobState(entity, state);
             entity.setPos(pos.getX() + 0.5, pos.getY() + 1.125, pos.getZ() + 0.5);
             entity.noPhysics = true;

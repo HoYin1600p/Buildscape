@@ -1,5 +1,15 @@
 plugins {
     id 'java'
+    id 'xyz.wagyourtail.unimined'
+}
+
+unimined.minecraft {
+    version '26.2'
+    defaultRemapJar = false
+    neoForged {
+        loader '88'
+        useToolchains = false
+    }
 }
 
 configurations { commonVariant }
@@ -8,8 +18,16 @@ dependencies {
     implementation project(path: ':common', configuration: 'v26xElements')
 }
 
+tasks.named('processResources') {
+    from rootProject.file('common/src/main/resources')
+    duplicatesStrategy = DuplicatesStrategy.FAIL
+}
 tasks.named('jar', Jar) {
     from configurations.commonVariant
-    from rootProject.file('common/src/main/resources')
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    duplicatesStrategy = DuplicatesStrategy.FAIL
+}
+tasks.withType(JavaExec).configureEach {
+    javaLauncher = javaToolchains.launcherFor {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
 }

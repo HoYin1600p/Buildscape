@@ -1,15 +1,37 @@
 plugins {
     id 'java'
+    id 'xyz.wagyourtail.unimined'
+}
+
+unimined.minecraft {
+    version '26.2'
+    // Minecraft 26.x ships official names; neither common nor the mod jar needs remapping.
+    defaultRemapJar = false
+    fabric {
+        loader '0.19.5'
+    }
+    mods.modImplementation {
+        catchAWNamespaceAssertion()
+    }
 }
 
 configurations { commonVariant }
 dependencies {
     commonVariant project(path: ':common', configuration: 'v26xElements')
     implementation project(path: ':common', configuration: 'v26xElements')
+    modImplementation 'net.fabricmc.fabric-api:fabric-api:0.149.0+26.2'
 }
 
+tasks.named('processResources') {
+    from rootProject.file('common/src/main/resources')
+    duplicatesStrategy = DuplicatesStrategy.FAIL
+}
 tasks.named('jar', Jar) {
     from configurations.commonVariant
-    from rootProject.file('common/src/main/resources')
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    duplicatesStrategy = DuplicatesStrategy.FAIL
+}
+tasks.withType(JavaExec).configureEach {
+    javaLauncher = javaToolchains.launcherFor {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
 }

@@ -195,8 +195,38 @@ public final class ClientPlatformHooks {
     }
 
     public static net.minecraft.client.KeyMapping createKeyMapping(String translationKey, int keyCode, String categoryTranslationKey) {
-        net.minecraft.client.KeyMapping.Category category = net.minecraft.client.KeyMapping.Category.register(net.minecraft.resources.Identifier.fromNamespaceAndPath("buildscape", "buildscape"));
+        net.minecraft.client.KeyMapping.Category category = KeyCategory.VALUE;
         return new net.minecraft.client.KeyMapping(translationKey, com.mojang.blaze3d.platform.InputConstants.Type.KEYSYM, keyCode, category);
+    }
+
+    private static final class KeyCategory {
+        private static final net.minecraft.client.KeyMapping.Category VALUE = net.minecraft.client.KeyMapping.Category.register(
+                net.minecraft.resources.Identifier.fromNamespaceAndPath("buildscape", "buildscape"));
+    }
+
+    private static final java.util.Map<net.minecraft.client.renderer.state.level.LevelRenderState,
+            com.kingodogo.buildscape.adapter.v26x.RenderCapture> HIGHLIGHTS =
+            java.util.Collections.synchronizedMap(new java.util.WeakHashMap<>());
+
+    public static boolean extractBlockHighlight(net.minecraft.client.Camera camera,
+            net.minecraft.world.phys.HitResult target, net.minecraft.client.renderer.state.level.LevelRenderState state) {
+        HIGHLIGHTS.remove(state);
+        var capture = new com.kingodogo.buildscape.adapter.v26x.RenderCapture();
+        if (!com.kingodogo.buildscape.client.ClientEvents.renderBlockHighlight(
+                new com.mojang.blaze3d.vertex.PoseStack(), camera, capture, target)) return false;
+        HIGHLIGHTS.put(state, capture);
+        return true;
+    }
+
+    public static void collectBlockHighlight(com.mojang.blaze3d.vertex.PoseStack pose,
+            net.minecraft.client.renderer.SubmitNodeCollector collector,
+            net.minecraft.client.renderer.state.level.LevelRenderState state) {
+        var capture = HIGHLIGHTS.remove(state);
+        if (capture != null) capture.submit(pose, collector, state.cameraRenderState);
+    }
+
+    public static void clearInputRenderState() {
+        HIGHLIGHTS.clear();
     }
 
     public static boolean hasCurrentUser() {

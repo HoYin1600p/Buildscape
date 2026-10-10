@@ -46,7 +46,7 @@ public class TreeChopHandler {
             cachedLevel = mc.level;
         }
 
-        if (!player.isCreative() || !player.isShiftKeyDown() || mc.options.keyAttack == null || !mc.options.keyAttack.isDown()
+        if (Services.PLATFORM.isScreenOpen() || !player.isCreative() || !player.isShiftKeyDown() || mc.options.keyAttack == null || !mc.options.keyAttack.isDown()
                 || !CosmeticsConfig.get().getCreativeTreeBreaker(player.getUUID())) {
             resetTarget(mc, player);
             return;
@@ -190,7 +190,7 @@ public class TreeChopHandler {
     }
 
     public static void resetTarget(Minecraft mc, Player player) {
-        if (mc.level != null && targetBlockPos != null) {
+        if (mc.level != null && player != null && targetBlockPos != null) {
             mc.level.destroyBlockProgress(player.getId(), targetBlockPos, -1);
         }
         targetBlockPos = null;
@@ -198,5 +198,11 @@ public class TreeChopHandler {
         connectedLogsCache.clear();
         lastLookedAtPos = null;
         lastCacheUpdate = 0;
+    }
+
+    public static void reset() {
+        Minecraft mc = Minecraft.getInstance();
+        resetTarget(mc, mc.player);
+        cachedLevel = null;
     }
 }

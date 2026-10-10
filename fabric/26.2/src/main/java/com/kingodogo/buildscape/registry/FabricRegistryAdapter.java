@@ -22,6 +22,8 @@ public class FabricRegistryAdapter extends BaseRegistryAdapter {
                 ((net.fabricmc.fabric.api.event.registry.FabricRegistry) BuiltInRegistries.ITEM)::addAlias);
         registerTo(BuiltInRegistries.BLOCK_ENTITY_TYPE, modBlockEntities);
         registerTo(BuiltInRegistries.ENTITY_TYPE, modEntities);
+        com.kingodogo.buildscape.adapter.v26x.RemovedIdAliases.register(BuiltInRegistries.ENTITY_TYPE,
+                ((net.fabricmc.fabric.api.event.registry.FabricRegistry) BuiltInRegistries.ENTITY_TYPE)::addAlias);
         registerTo(BuiltInRegistries.SOUND_EVENT, modSounds);
         registerTo(BuiltInRegistries.RECIPE_SERIALIZER, (java.util.Map) modRecipeSerializers);
         registerTo(BuiltInRegistries.MENU, modMenus);

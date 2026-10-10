@@ -8255,7 +8255,7 @@
     ],
     [
       "BS:hollow_cherry_log",
-      "BS:cherry_log",
+      "MC:cherry_log",
       1
     ],
     [
@@ -8275,7 +8275,7 @@
     ],
     [
       "BS:hollow_mangrove_log",
-      "BS:mangrove_log",
+      "MC:mangrove_log",
       1
     ],
     [
@@ -8285,7 +8285,7 @@
     ],
     [
       "BS:hollow_pale_oak_log",
-      "BS:pale_oak_log",
+      "MC:pale_oak_log",
       1
     ],
     [
@@ -9425,7 +9425,7 @@
     ],
     [
       "BS:stripped_hollow_cherry_log",
-      "BS:stripped_cherry_log",
+      "MC:stripped_cherry_log",
       1
     ],
     [
@@ -9445,7 +9445,7 @@
     ],
     [
       "BS:stripped_hollow_mangrove_log",
-      "BS:stripped_mangrove_log",
+      "MC:stripped_mangrove_log",
       1
     ],
     [
@@ -9455,7 +9455,7 @@
     ],
     [
       "BS:stripped_hollow_pale_oak_log",
-      "BS:stripped_pale_oak_log",
+      "MC:stripped_pale_oak_log",
       1
     ],
     [

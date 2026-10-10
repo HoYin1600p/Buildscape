@@ -22,7 +22,22 @@
     "BS:ashpen_red_planks",
     "BS:ashpen_white_planks",
     "BS:ashpen_yellow_planks",
-    "BS:poplar_planks"
+    "BS:poplar_planks",
+    {
+      "base": "MC:mangrove_planks",
+      "prefix": "BS:mangrove_",
+      "generate": ["vertical_slab"]
+    },
+    {
+      "base": "MC:cherry_planks",
+      "prefix": "BS:cherry_",
+      "generate": ["vertical_slab"]
+    },
+    {
+      "base": "MC:pale_oak_planks",
+      "prefix": "BS:pale_oak_",
+      "generate": ["vertical_slab"]
+    }
   ],
   "crafting_shaped": [
     [
@@ -4598,7 +4613,7 @@
       [
         [
           "#",
-          "BS:cherry_log"
+          "MC:cherry_log"
         ]
       ],
       8
@@ -4658,7 +4673,7 @@
       [
         [
           "#",
-          "BS:mangrove_log"
+          "MC:mangrove_log"
         ]
       ],
       8
@@ -4688,7 +4703,7 @@
       [
         [
           "#",
-          "BS:pale_oak_log"
+          "MC:pale_oak_log"
         ]
       ],
       8
@@ -9705,7 +9720,7 @@
       [
         [
           "#",
-          "BS:stripped_cherry_log"
+          "MC:stripped_cherry_log"
         ]
       ],
       8
@@ -9765,7 +9780,7 @@
       [
         [
           "#",
-          "BS:stripped_mangrove_log"
+          "MC:stripped_mangrove_log"
         ]
       ],
       8
@@ -9795,7 +9810,7 @@
       [
         [
           "#",
-          "BS:stripped_pale_oak_log"
+          "MC:stripped_pale_oak_log"
         ]
       ],
       8
@@ -10679,21 +10694,6 @@
         ]
       ],
       4
-    ],
-    [
-      "BS:acacia_shelf",
-      [
-        "###",
-        "   ",
-        "###"
-      ],
-      [
-        [
-          "#",
-          "MC:stripped_acacia_log"
-        ]
-      ],
-      6
     ],
     [
       "BS:acacia_wood_slab",
@@ -11822,21 +11822,6 @@
       8
     ],
     [
-      "BS:bamboo_block",
-      [
-        "BBB",
-        "BBB",
-        "BBB"
-      ],
-      [
-        [
-          "B",
-          "MC:bamboo"
-        ]
-      ],
-      1
-    ],
-    [
       "BS:bamboo_block_fence",
       [
         "BSB",
@@ -11845,7 +11830,7 @@
       [
         [
           "B",
-          "BS:bamboo_block"
+          "MC:bamboo_block"
         ],
         [
           "S",
@@ -11863,7 +11848,7 @@
       [
         [
           "B",
-          "BS:bamboo_block"
+          "MC:bamboo_block"
         ],
         [
           "S",
@@ -11880,7 +11865,7 @@
       [
         [
           "B",
-          "BS:bamboo_block"
+          "MC:bamboo_block"
         ]
       ],
       1
@@ -11893,7 +11878,7 @@
       [
         [
           "B",
-          "BS:bamboo_block"
+          "MC:bamboo_block"
         ]
       ],
       6
@@ -11908,7 +11893,7 @@
       [
         [
           "B",
-          "BS:bamboo_block"
+          "MC:bamboo_block"
         ]
       ],
       4
@@ -11923,7 +11908,7 @@
       [
         [
           "B",
-          "BS:bamboo_block"
+          "MC:bamboo_block"
         ]
       ],
       6
@@ -11942,7 +11927,7 @@
         ],
         [
           "P",
-          "BS:bamboo_block"
+          "MC:bamboo_block"
         ]
       ],
       3
@@ -11956,7 +11941,7 @@
       [
         [
           "B",
-          "BS:bamboo_block"
+          "MC:bamboo_block"
         ]
       ],
       3
@@ -12141,21 +12126,6 @@
         ]
       ],
       4
-    ],
-    [
-      "BS:birch_shelf",
-      [
-        "###",
-        "   ",
-        "###"
-      ],
-      [
-        [
-          "#",
-          "MC:stripped_birch_log"
-        ]
-      ],
-      6
     ],
     [
       "BS:birch_wood_slab",
@@ -15600,7 +15570,7 @@
         ],
         [
           "P",
-          "BS:cherry_planks"
+          "MC:cherry_planks"
         ]
       ],
       3
@@ -15615,7 +15585,7 @@
       [
         [
           "B",
-          "BS:cherry_leaves"
+          "MC:cherry_leaves"
         ]
       ],
       6
@@ -15628,7 +15598,7 @@
       [
         [
           "#",
-          "BS:cherry_leaves"
+          "MC:cherry_leaves"
         ]
       ],
       8
@@ -15641,37 +15611,10 @@
       [
         [
           "#",
-          "BS:cherry_log"
+          "MC:cherry_log"
         ]
       ],
       6
-    ],
-    [
-      "BS:cherry_planks",
-      [
-        "#"
-      ],
-      [
-        [
-          "#",
-          "BS:cherry_log"
-        ]
-      ],
-      4
-    ],
-    [
-      "BS:cherry_wood",
-      [
-        "##",
-        "##"
-      ],
-      [
-        [
-          "#",
-          "BS:cherry_log"
-        ]
-      ],
-      3
     ],
     [
       "BS:cherry_wood_slab",
@@ -15681,7 +15624,7 @@
       [
         [
           "#",
-          "BS:cherry_wood"
+          "MC:cherry_wood"
         ]
       ],
       6
@@ -15696,7 +15639,7 @@
       [
         [
           "B",
-          "BS:cherry_log"
+          "MC:cherry_log"
         ]
       ],
       6
@@ -15739,25 +15682,6 @@
         [
           "#",
           "MC:copper_ingot"
-        ]
-      ],
-      1
-    ],
-    [
-      "BS:copper_chest",
-      [
-        "###",
-        "#X#",
-        "###"
-      ],
-      [
-        [
-          "#",
-          "MC:copper_ingot"
-        ],
-        [
-          "X",
-          "MC:chest"
         ]
       ],
       1
@@ -15853,21 +15777,6 @@
         ]
       ],
       3
-    ],
-    [
-      "BS:crimson_shelf",
-      [
-        "###",
-        "   ",
-        "###"
-      ],
-      [
-        [
-          "#",
-          "MC:stripped_crimson_stem"
-        ]
-      ],
-      6
     ],
     [
       "BS:crimson_stem_slab",
@@ -16614,21 +16523,6 @@
         ]
       ],
       4
-    ],
-    [
-      "BS:dark_oak_shelf",
-      [
-        "###",
-        "   ",
-        "###"
-      ],
-      [
-        [
-          "#",
-          "MC:stripped_dark_oak_log"
-        ]
-      ],
-      6
     ],
     [
       "BS:dark_oak_wood_slab",
@@ -19316,21 +19210,6 @@
       4
     ],
     [
-      "BS:jungle_shelf",
-      [
-        "###",
-        "   ",
-        "###"
-      ],
-      [
-        [
-          "#",
-          "MC:stripped_jungle_log"
-        ]
-      ],
-      6
-    ],
-    [
       "BS:jungle_wood_slab",
       [
         "###"
@@ -21747,20 +21626,6 @@
       6
     ],
     [
-      "BS:mangrove_boat",
-      [
-        "# #",
-        "###"
-      ],
-      [
-        [
-          "#",
-          "BS:mangrove_planks"
-        ]
-      ],
-      1
-    ],
-    [
       "BS:mangrove_ladder",
       [
         "S S",
@@ -21774,7 +21639,7 @@
         ],
         [
           "P",
-          "BS:mangrove_planks"
+          "MC:mangrove_planks"
         ]
       ],
       3
@@ -21789,7 +21654,7 @@
       [
         [
           "B",
-          "BS:mangrove_leaves"
+          "MC:mangrove_leaves"
         ]
       ],
       6
@@ -21802,7 +21667,7 @@
       [
         [
           "#",
-          "BS:mangrove_leaves"
+          "MC:mangrove_leaves"
         ]
       ],
       8
@@ -21815,7 +21680,7 @@
       [
         [
           "#",
-          "BS:mangrove_log"
+          "MC:mangrove_log"
         ]
       ],
       6
@@ -21830,24 +21695,10 @@
       [
         [
           "#",
-          "BS:mangrove_log"
+          "MC:mangrove_log"
         ]
       ],
       4
-    ],
-    [
-      "BS:mangrove_wood",
-      [
-        "##",
-        "##"
-      ],
-      [
-        [
-          "#",
-          "BS:mangrove_log"
-        ]
-      ],
-      3
     ],
     [
       "BS:mangrove_wood_wall",
@@ -21859,7 +21710,7 @@
       [
         [
           "B",
-          "BS:mangrove_log"
+          "MC:mangrove_log"
         ]
       ],
       6
@@ -22242,21 +22093,6 @@
         ]
       ],
       4
-    ],
-    [
-      "BS:oak_shelf",
-      [
-        "###",
-        "   ",
-        "###"
-      ],
-      [
-        [
-          "#",
-          "MC:stripped_oak_log"
-        ]
-      ],
-      6
     ],
     [
       "BS:oak_wood_slab",
@@ -23318,7 +23154,7 @@
         ],
         [
           "P",
-          "BS:pale_oak_planks"
+          "MC:pale_oak_planks"
         ]
       ],
       3
@@ -23333,7 +23169,7 @@
       [
         [
           "B",
-          "BS:pale_oak_leaves"
+          "MC:pale_oak_leaves"
         ]
       ],
       6
@@ -23346,7 +23182,7 @@
       [
         [
           "#",
-          "BS:pale_oak_leaves"
+          "MC:pale_oak_leaves"
         ]
       ],
       8
@@ -23359,37 +23195,10 @@
       [
         [
           "#",
-          "BS:pale_oak_log"
+          "MC:pale_oak_log"
         ]
       ],
       6
-    ],
-    [
-      "BS:pale_oak_planks",
-      [
-        "#"
-      ],
-      [
-        [
-          "#",
-          "BS:pale_oak_log"
-        ]
-      ],
-      4
-    ],
-    [
-      "BS:pale_oak_wood",
-      [
-        "##",
-        "##"
-      ],
-      [
-        [
-          "#",
-          "BS:pale_oak_log"
-        ]
-      ],
-      3
     ],
     [
       "BS:pale_oak_wood_slab",
@@ -23399,7 +23208,7 @@
       [
         [
           "#",
-          "BS:pale_oak_wood"
+          "MC:pale_oak_wood"
         ]
       ],
       6
@@ -23414,7 +23223,7 @@
       [
         [
           "B",
-          "BS:pale_oak_log"
+          "MC:pale_oak_log"
         ]
       ],
       6
@@ -27749,21 +27558,6 @@
       4
     ],
     [
-      "BS:spruce_shelf",
-      [
-        "###",
-        "   ",
-        "###"
-      ],
-      [
-        [
-          "#",
-          "MC:stripped_spruce_log"
-        ]
-      ],
-      6
-    ],
-    [
       "BS:spruce_wood_slab",
       [
         "###"
@@ -28217,7 +28011,7 @@
       [
         [
           "B",
-          "BS:stripped_bamboo_block"
+          "MC:stripped_bamboo_block"
         ],
         [
           "S",
@@ -28235,7 +28029,7 @@
       [
         [
           "B",
-          "BS:stripped_bamboo_block"
+          "MC:stripped_bamboo_block"
         ],
         [
           "S",
@@ -28252,7 +28046,7 @@
       [
         [
           "B",
-          "BS:stripped_bamboo_block"
+          "MC:stripped_bamboo_block"
         ]
       ],
       1
@@ -28265,7 +28059,7 @@
       [
         [
           "#",
-          "BS:stripped_bamboo_block"
+          "MC:stripped_bamboo_block"
         ]
       ],
       6
@@ -28280,7 +28074,7 @@
       [
         [
           "B",
-          "BS:stripped_bamboo_block"
+          "MC:stripped_bamboo_block"
         ]
       ],
       4
@@ -28295,7 +28089,7 @@
       [
         [
           "B",
-          "BS:stripped_bamboo_block"
+          "MC:stripped_bamboo_block"
         ]
       ],
       6
@@ -28314,7 +28108,7 @@
         ],
         [
           "P",
-          "BS:stripped_bamboo_block"
+          "MC:stripped_bamboo_block"
         ]
       ],
       3
@@ -28329,7 +28123,7 @@
       [
         [
           "#",
-          "BS:stripped_bamboo_block"
+          "MC:stripped_bamboo_block"
         ]
       ],
       6
@@ -28343,7 +28137,7 @@
       [
         [
           "B",
-          "BS:stripped_bamboo_block"
+          "MC:stripped_bamboo_block"
         ]
       ],
       3
@@ -28568,24 +28362,10 @@
       [
         [
           "#",
-          "BS:stripped_cherry_log"
+          "MC:stripped_cherry_log"
         ]
       ],
       6
-    ],
-    [
-      "BS:stripped_cherry_wood",
-      [
-        "##",
-        "##"
-      ],
-      [
-        [
-          "#",
-          "BS:stripped_cherry_log"
-        ]
-      ],
-      3
     ],
     [
       "BS:stripped_cherry_wood_slab",
@@ -28595,7 +28375,7 @@
       [
         [
           "#",
-          "BS:stripped_cherry_wood"
+          "MC:stripped_cherry_wood"
         ]
       ],
       6
@@ -28610,7 +28390,7 @@
       [
         [
           "B",
-          "BS:stripped_cherry_log"
+          "MC:stripped_cherry_log"
         ]
       ],
       6
@@ -28821,7 +28601,7 @@
       [
         [
           "#",
-          "BS:stripped_mangrove_log"
+          "MC:stripped_mangrove_log"
         ]
       ],
       6
@@ -28836,24 +28616,10 @@
       [
         [
           "#",
-          "BS:stripped_mangrove_log"
+          "MC:stripped_mangrove_log"
         ]
       ],
       4
-    ],
-    [
-      "BS:stripped_mangrove_wood",
-      [
-        "##",
-        "##"
-      ],
-      [
-        [
-          "#",
-          "BS:stripped_mangrove_log"
-        ]
-      ],
-      3
     ],
     [
       "BS:stripped_mangrove_wood_wall",
@@ -28865,7 +28631,7 @@
       [
         [
           "B",
-          "BS:stripped_mangrove_log"
+          "MC:stripped_mangrove_log"
         ]
       ],
       6
@@ -28949,24 +28715,10 @@
       [
         [
           "#",
-          "BS:stripped_pale_oak_log"
+          "MC:stripped_pale_oak_log"
         ]
       ],
       6
-    ],
-    [
-      "BS:stripped_pale_oak_wood",
-      [
-        "##",
-        "##"
-      ],
-      [
-        [
-          "#",
-          "BS:stripped_pale_oak_log"
-        ]
-      ],
-      3
     ],
     [
       "BS:stripped_pale_oak_wood_slab",
@@ -28976,7 +28728,7 @@
       [
         [
           "#",
-          "BS:stripped_pale_oak_wood"
+          "MC:stripped_pale_oak_wood"
         ]
       ],
       6
@@ -28991,7 +28743,7 @@
       [
         [
           "B",
-          "BS:stripped_pale_oak_log"
+          "MC:stripped_pale_oak_log"
         ]
       ],
       6
@@ -29937,21 +29689,6 @@
         ]
       ],
       3
-    ],
-    [
-      "BS:warped_shelf",
-      [
-        "###",
-        "   ",
-        "###"
-      ],
-      [
-        [
-          "#",
-          "MC:stripped_warped_stem"
-        ]
-      ],
-      6
     ],
     [
       "BS:warped_stem_slab",
@@ -32321,8 +32058,16 @@
   ],
   "crafting_shapeless": [
     [
+      "MC:muddy_mangrove_roots",
+      [
+        "BS:mud",
+        "MC:mangrove_roots"
+      ],
+      1
+    ],
+    [
       "BS:bamboo_block_button",
-      "BS:bamboo_block",
+      "MC:bamboo_block",
       1
     ],
     [
@@ -33753,26 +33498,6 @@
       1
     ],
     [
-      "BS:mangrove_planks",
-      "BS:mangrove_log",
-      4
-    ],
-    [
-      "BS:mangrove_planks",
-      "BS:stripped_mangrove_log",
-      4
-    ],
-    [
-      "BS:mangrove_planks",
-      "BS:stripped_mangrove_wood",
-      4
-    ],
-    [
-      "BS:mangrove_planks",
-      "BS:mangrove_wood",
-      4
-    ],
-    [
       "BS:mossy_calcite",
       [
         "MC:calcite",
@@ -33785,14 +33510,6 @@
       [
         "BS:stone_pillar",
         "MC:moss_block"
-      ],
-      1
-    ],
-    [
-      "BS:muddy_mangrove_roots",
-      [
-        "BS:mud",
-        "BS:mangrove_roots"
       ],
       1
     ],
@@ -34218,7 +33935,7 @@
     [
       "BS:snowy_cherry_leaves",
       [
-        "BS:cherry_leaves",
+        "MC:cherry_leaves",
         "BS:snow_overlay"
       ],
       1
@@ -34322,7 +34039,7 @@
     [
       "BS:snowy_mangrove_leaves",
       [
-        "BS:mangrove_leaves",
+        "MC:mangrove_leaves",
         "BS:snow_overlay"
       ],
       1
@@ -34362,7 +34079,7 @@
     [
       "BS:snowy_pale_oak_leaves",
       [
-        "BS:pale_oak_leaves",
+        "MC:pale_oak_leaves",
         "BS:snow_overlay"
       ],
       1
@@ -34414,21 +34131,13 @@
     ],
     [
       "BS:stripped_bamboo_block_button",
-      "BS:stripped_bamboo_block",
+      "MC:stripped_bamboo_block",
       1
     ],
     [
       "BS:waxed_copper_button",
       [
         "BS:copper_button",
-        "MC:honeycomb"
-      ],
-      1
-    ],
-    [
-      "BS:waxed_copper_chest",
-      [
-        "BS:copper_chest",
         "MC:honeycomb"
       ],
       1
@@ -34450,14 +34159,6 @@
       1
     ],
     [
-      "BS:waxed_exposed_copper_chest",
-      [
-        "BS:exposed_copper_chest",
-        "MC:honeycomb"
-      ],
-      1
-    ],
-    [
       "BS:waxed_exposed_copper_pressure_plate",
       [
         "BS:exposed_copper_pressure_plate",
@@ -34474,14 +34175,6 @@
       1
     ],
     [
-      "BS:waxed_oxidized_copper_chest",
-      [
-        "BS:oxidized_copper_chest",
-        "MC:honeycomb"
-      ],
-      1
-    ],
-    [
       "BS:waxed_oxidized_copper_pressure_plate",
       [
         "BS:oxidized_copper_pressure_plate",
@@ -34493,14 +34186,6 @@
       "BS:waxed_weathered_copper_button",
       [
         "BS:weathered_copper_button",
-        "MC:honeycomb"
-      ],
-      1
-    ],
-    [
-      "BS:waxed_weathered_copper_chest",
-      [
-        "BS:weathered_copper_chest",
         "MC:honeycomb"
       ],
       1

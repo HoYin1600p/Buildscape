@@ -72,7 +72,7 @@ public abstract class MangrovePropaguleBlock extends BushBlock implements SinksO
 
     private boolean isLeavesAbove(BlockState aboveState) {
         if (aboveState.is(BlockTags.LEAVES)) return true;
-        Block leaves = com.kingodogo.buildscape.platform.Services.PLATFORM.getBlock(com.kingodogo.buildscape.util.CommonId.of("buildscape", "mangrove_leaves"));
+        Block leaves = com.kingodogo.buildscape.platform.Services.PLATFORM.getBlock(com.kingodogo.buildscape.util.CommonId.of("minecraft", "mangrove_leaves"));
         return leaves != null && aboveState.is(leaves);
     }
 
@@ -82,7 +82,7 @@ public abstract class MangrovePropaguleBlock extends BushBlock implements SinksO
     }
 
     private boolean isMuddyRootsBelow(BlockState belowState) {
-        Block roots = com.kingodogo.buildscape.platform.Services.PLATFORM.getBlock(com.kingodogo.buildscape.util.CommonId.of("buildscape", "muddy_mangrove_roots"));
+        Block roots = com.kingodogo.buildscape.platform.Services.PLATFORM.getBlock(com.kingodogo.buildscape.util.CommonId.of("minecraft", "muddy_mangrove_roots"));
         return roots != null && belowState.is(roots);
     }
 

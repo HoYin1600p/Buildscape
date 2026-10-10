@@ -97,11 +97,9 @@ class ConversionTests(unittest.TestCase):
     def test_item_definitions_and_special_fallback(self):
         self.assertEqual(c.item_definition("x", True)["model"]["model"], "buildscape:item/x")
         self.assertEqual(c.item_definition("x", False)["model"]["model"], "buildscape:block/x")
-        self.assertEqual(len(c.SPECIAL_ITEMS), 9)
+        self.assertEqual(c.SPECIAL_ITEMS, ("template_glass_jar",))
         for name in c.SPECIAL_ITEMS:
             self.assertTrue(c.item_definition(name, True)["model"]["model"].startswith("buildscape:block/"))
-        self.assertEqual(c.item_definition("waxed_copper_chest", True)["model"]["model"],
-                         "buildscape:block/copper_chest")
 
     def test_existing_special_item_definitions_are_kept(self):
         special = {"model": {"type": "minecraft:special", "base": "buildscape:item/copper_chest",
@@ -123,8 +121,8 @@ class ConversionTests(unittest.TestCase):
             self.assertEqual(c.load(root / "assets/buildscape/items/copper_chest.json"), special)
             self.assertEqual(c.load(root / "assets/buildscape/items/red_glass_jar.json"), jar_special)
             # Special items without a definition still get the plain fallback.
-            self.assertEqual(c.load(root / "assets/buildscape/items/weathered_copper_chest.json"),
-                             c.item_definition("weathered_copper_chest", True))
+            self.assertEqual(c.load(root / "assets/buildscape/items/template_glass_jar.json"),
+                             c.item_definition("template_glass_jar", True))
             self.assertEqual(c.convert(root, jar), 0)
 
     def test_vanilla_chest_baseline_language_and_bom(self):

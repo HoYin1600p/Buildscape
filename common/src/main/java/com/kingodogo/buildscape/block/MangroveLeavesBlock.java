@@ -16,7 +16,7 @@ public abstract class MangroveLeavesBlock extends Block {
     }
 
     public static Block getPropaguleBlock() {
-        return Services.PLATFORM.getBlock(CommonId.of("buildscape", "mangrove_propagule"));
+        return Services.PLATFORM.getBlock(CommonId.of("minecraft", "mangrove_propagule"));
     }
 
     public static boolean canGrowPropagule(BlockGetter level, BlockPos pos) {

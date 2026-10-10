@@ -1,12 +1,12 @@
 {
   "values": [
-    "buildscape:copper_chest",
-    "buildscape:exposed_copper_chest",
-    "buildscape:weathered_copper_chest",
-    "buildscape:oxidized_copper_chest",
-    "buildscape:waxed_copper_chest",
-    "buildscape:waxed_exposed_copper_chest",
-    "buildscape:waxed_weathered_copper_chest",
-    "buildscape:waxed_oxidized_copper_chest"
+    "minecraft:copper_chest",
+    "minecraft:exposed_copper_chest",
+    "minecraft:weathered_copper_chest",
+    "minecraft:oxidized_copper_chest",
+    "minecraft:waxed_copper_chest",
+    "minecraft:waxed_exposed_copper_chest",
+    "minecraft:waxed_weathered_copper_chest",
+    "minecraft:waxed_oxidized_copper_chest"
   ]
 }

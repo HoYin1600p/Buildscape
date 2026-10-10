@@ -22,7 +22,7 @@ public final class BackportBonemealHandler {
     private BackportBonemealHandler() {}
 
     private static Block block(String name) {
-        return Services.PLATFORM.getBlock(new CommonId("buildscape", name));
+        return Services.PLATFORM.getBlock(name.contains(":") ? CommonId.parse(name) : new CommonId("buildscape", name));
     }
 
     private static boolean is(BlockState state, String name) {
@@ -48,8 +48,8 @@ public final class BackportBonemealHandler {
                         if (!level.getBlockState(check).is(moss ? Blocks.MOSS_BLOCK : Blocks.GRASS_BLOCK)
                                 || !level.isEmptyBlock(check.above())) continue;
                         float roll = level.getRandom().nextFloat();
-                        String plant = moss ? (roll < .15F ? "cherry_sapling"
-                                : roll < .20F ? "mangrove_propagule" : null) : null;
+                        String plant = moss ? (roll < .15F ? "minecraft:cherry_sapling"
+                                : roll < .20F ? "minecraft:mangrove_propagule" : null) : null;
                         if (plant != null) {
                             Block candidate = block(plant);
                             if (candidate != null && candidate != Blocks.AIR
@@ -61,7 +61,7 @@ public final class BackportBonemealHandler {
             // Vanilla still performs and consumes its normal grass/moss bonemeal operation.
             return InteractionResult.PASS;
         }
-        if (is(state, "pale_oak_leaves")) {
+        if (state.is(block("minecraft:pale_oak_leaves"))) {
             BlockPos target = pos.below();
             while (is(level.getBlockState(target), "pale_hanging_moss")) target = target.below();
             Block moss = block("pale_hanging_moss");

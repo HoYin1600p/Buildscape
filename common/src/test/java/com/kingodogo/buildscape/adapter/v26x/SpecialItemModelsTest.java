@@ -2,8 +2,6 @@ package com.kingodogo.buildscape.adapter.v26x;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.kingodogo.buildscape.adapter.v26x.client.CopperChestRenderer;
-import net.minecraft.world.level.block.state.properties.ChestType;
 import org.junit.jupiter.api.Test;
 
 import java.io.InputStreamReader;
@@ -20,20 +18,6 @@ class SpecialItemModelsTest {
         }
     }
 
-    @Test void everyChestItemUsesThePlacedChestTextureAndASpecialModel() throws Exception {
-        for (String wax : new String[] {"", "waxed_"}) {
-            for (String oxidation : new String[] {"", "exposed_", "weathered_", "oxidized_"}) {
-                String item = wax + oxidation + "copper_chest";
-                JsonObject model = definition(item);
-                assertEquals("minecraft:special", model.get("type").getAsString());
-                assertEquals("buildscape:item/" + item.replace("waxed_", ""), model.get("base").getAsString());
-                JsonObject renderer = model.getAsJsonObject("model");
-                assertEquals("buildscape:copper_chest", renderer.get("type").getAsString());
-                assertEquals(CopperChestRenderer.textureFor(item, ChestType.SINGLE).toString(),
-                        renderer.get("texture").getAsString());
-            }
-        }
-    }
 
     @Test void everyJarVariantUsesTheSpecialRenderer() throws Exception {
         for (String item : new String[] {"template_glass_jar", "glass_jar", "tinted_glass_jar",

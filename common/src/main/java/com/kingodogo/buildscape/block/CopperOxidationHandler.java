@@ -15,11 +15,9 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.ChestBlock;
 import net.minecraft.world.level.block.DoorBlock;
 import net.minecraft.world.level.block.WeatheringCopper;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.ChestType;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraft.world.level.block.state.properties.Property;
 
@@ -68,11 +66,6 @@ public final class CopperOxidationHandler {
         registerWaxPair("weathered_copper_pressure_plate", "waxed_weathered_copper_pressure_plate");
         registerWaxPair("oxidized_copper_pressure_plate", "waxed_oxidized_copper_pressure_plate");
 
-        registerChain("copper_chest", "exposed_copper_chest", "weathered_copper_chest", "oxidized_copper_chest");
-        registerWaxPair("copper_chest", "waxed_copper_chest");
-        registerWaxPair("exposed_copper_chest", "waxed_exposed_copper_chest");
-        registerWaxPair("weathered_copper_chest", "waxed_weathered_copper_chest");
-        registerWaxPair("oxidized_copper_chest", "waxed_oxidized_copper_chest");
         registerChain("large_copper_chain", "large_exposed_copper_chain", "large_weathered_copper_chain", "large_oxidized_copper_chain");
 
         registerChain("slit_copper", "exposed_slit_copper", "weathered_slit_copper", "oxidized_slit_copper");
@@ -252,40 +245,12 @@ public final class CopperOxidationHandler {
 
             level.setBlock(lowerPos, lowerState, 2 | 16);
             level.setBlock(upperPos, upperState, 3);
-        } else if (state.getBlock() instanceof ICopperChestBlock && targetBlock instanceof ICopperChestBlock) {
-            setCopperChestState(level, pos, state, targetBlock);
         } else {
             BlockState nextState = copyStateProperties(state, targetBlock.defaultBlockState());
             level.setBlock(pos, nextState, 3);
         }
     }
 
-    private static void setCopperChestState(Level level, BlockPos pos, BlockState state, Block targetBlock) {
-        BlockState nextState = copyStateProperties(state, targetBlock.defaultBlockState());
-        ChestType chestType = state.getValue(ChestBlock.TYPE);
-
-        if (chestType == ChestType.SINGLE) {
-            level.setBlock(pos, nextState, 3);
-            return;
-        }
-
-        BlockPos partnerPos = pos.relative(ChestBlock.getConnectedDirection(state));
-        BlockState partnerState = level.getBlockState(partnerPos);
-        if (partnerState.getBlock() != state.getBlock()
-                || partnerState.getValue(ChestBlock.TYPE) == ChestType.SINGLE) {
-            level.setBlock(pos, nextState.setValue(ChestBlock.TYPE, ChestType.SINGLE), 3);
-            return;
-        }
-
-        BlockState partnerNextState = copyStateProperties(partnerState, targetBlock.defaultBlockState());
-
-        level.setBlock(pos, nextState, 2 | 16);
-        level.setBlock(partnerPos, partnerNextState, 2 | 16);
-        level.updateNeighborsAt(pos, targetBlock);
-        level.updateNeighborsAt(partnerPos, targetBlock);
-        level.updateNeighbourForOutputSignal(pos, targetBlock);
-        level.updateNeighbourForOutputSignal(partnerPos, targetBlock);
-    }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     public static BlockState copyStateProperties(BlockState from, BlockState to) {

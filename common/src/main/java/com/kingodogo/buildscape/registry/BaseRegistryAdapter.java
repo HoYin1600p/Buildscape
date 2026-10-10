@@ -218,7 +218,6 @@ public abstract class BaseRegistryAdapter implements IRegistryAdapter {
         modBlockEntities.put("muff_block_entity", ModBlockEntities.MUFF_TYPE);
         modBlockEntities.put("glass_jar_block_entity", ModBlockEntities.GLASS_JAR_TYPE);
         modBlockEntities.put("builders_workbench", ModBlockEntities.BUILDERS_WORKBENCH_TYPE);
-        modBlockEntities.put("copper_chest", ModBlockEntities.COPPER_CHEST_TYPE);
         modBlockEntities.put("shelf", ModBlockEntities.SHELF_TYPE);
         modBlockEntities.put("trophy_block_entity", ModBlockEntities.TROPHY_TYPE);
         modBlockEntities.put("hollow_log", ModBlockEntities.HOLLOW_LOG_TYPE);
@@ -233,7 +232,6 @@ public abstract class BaseRegistryAdapter implements IRegistryAdapter {
     protected void initEntities() {
         modEntities.put("falling_icicle", Services.PLATFORM.getFallingIcicleEntityType());
         modEntities.put("festive_stocking", Services.PLATFORM.getFestiveStockingEntityType());
-        modEntities.put("mangrove_boat", Services.PLATFORM.getMangroveBoatEntityType());
         modEntities.put("colored_item_frame", Services.PLATFORM.getColoredItemFrameEntityType());
         modEntities.put("seat", Services.PLATFORM.getSeatEntityType());
         modEntities.put("poplar_boat", Services.PLATFORM.getPoplarBoatEntityType());

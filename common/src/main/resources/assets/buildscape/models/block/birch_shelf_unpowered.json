@@ -1,7 +1,0 @@
-{
-  "parent": "buildscape:block/template_shelf_unpowered",
-  "textures": {
-    "all": "buildscape:block/birch_shelf",
-    "particle": "minecraft:block/stripped_birch_log"
-  }
-}

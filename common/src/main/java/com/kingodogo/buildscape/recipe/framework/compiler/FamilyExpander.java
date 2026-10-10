@@ -58,6 +58,8 @@ public class FamilyExpander {
                         List.of("X  ", "XX ", "XXX"), baseItem);
                 case "slab" -> addTemplateOrFallback(generated, recipeId, "slab", baseItem, outputItem, 6, "shaped",
                         List.of("XXX"), baseItem);
+                case "vertical_slab" -> addTemplateOrFallback(generated, recipeId, "vertical_slab", baseItem, outputItem, 6, "shaped",
+                        List.of("X", "X", "X"), baseItem);
                 case "wall" -> addTemplateOrFallback(generated, recipeId, "wall", baseItem, outputItem, 6, "shaped",
                         List.of("XXX", "XXX"), baseItem);
                 case "fence" -> addCustomShaped(generated, recipeId, List.of("W#W", "W#W"), baseItem, "minecraft:stick", outputItem, 3);

@@ -13,7 +13,6 @@ public final class SpecialItemRenderers {
     private SpecialItemRenderers() {}
 
     public static void register(BiConsumer<Identifier, MapCodec<? extends SpecialModelRenderer.Unbaked<?>>> registrar) {
-        registrar.accept(Identifier.fromNamespaceAndPath("buildscape", "copper_chest"), CopperChestSpecialRenderer.Unbaked.MAP_CODEC);
         registrar.accept(Identifier.fromNamespaceAndPath("buildscape", "glass_jar"), GlassJarSpecialRenderer.Unbaked.MAP_CODEC);
     }
 

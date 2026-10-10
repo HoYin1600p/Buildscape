@@ -5,7 +5,6 @@ import com.kingodogo.buildscape.block.HollowLogBlockEntity;
 import com.kingodogo.buildscape.block.HollowPipeBlock;
 import com.kingodogo.buildscape.block.ModBlockEntities;
 import com.kingodogo.buildscape.client.renderer.ArmorPillarRenderer;
-import com.kingodogo.buildscape.client.renderer.CopperChestRenderer;
 import com.kingodogo.buildscape.client.renderer.DecoratedPotBlockEntityRenderer;
 import com.kingodogo.buildscape.client.renderer.FestiveStockingBlockEntityRenderer;
 import com.kingodogo.buildscape.client.renderer.GlassJarBlockEntityRenderer;
@@ -92,8 +91,6 @@ public final class RenderFactory {
                     (be, pt, ps, bs, cl, co) -> DecoratedPotBlockEntityRenderer.render((com.kingodogo.buildscape.block.DecoratedPotBlockEntity) be, pt, ps, bs, cl, co));
             beProviders.put(ModBlockEntities.TRAPPED_DECORATED_POT_TYPE, (net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider) context ->
                     (be, pt, ps, bs, cl, co) -> TrappedDecoratedPotBlockEntityRenderer.render((com.kingodogo.buildscape.block.TrappedDecoratedPotBlockEntity) be, pt, ps, bs, cl, co));
-            beProviders.put(ModBlockEntities.COPPER_CHEST_TYPE, (net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider) context ->
-                    (be, pt, ps, bs, cl, co) -> CopperChestRenderer.render((com.kingodogo.buildscape.block.CopperChestBlockEntity) be, pt, ps, bs, cl, co));
 
             java.lang.reflect.Field eField = net.minecraft.client.renderer.entity.EntityRenderers.class.getDeclaredField("PROVIDERS");
             eField.setAccessible(true);

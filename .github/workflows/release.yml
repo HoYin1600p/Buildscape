@@ -2,6 +2,8 @@ name: Build and Release Jars
 
 on:
   push:
+    branches:
+      - 'port/26.2'
     tags:
       - 'v*'
   workflow_dispatch:
@@ -52,17 +54,25 @@ jobs:
             fi
             MOD_VERSION="$INPUT_VER"
             REPLACE="${{ inputs.replace_existing }}"
-          else
+          elif [ "${{ github.ref_type }}" = "tag" ]; then
             TAG="${{ github.ref_name }}"
-            # Strip leading 'v' if present for mod_version
             MOD_VERSION="${TAG#v}"
+            REPLACE="true"
+          else
+            # Triggered on branch push (e.g. port/26.2)
+            if [ -f "gradle.properties" ] && grep -q "^mod_version=" gradle.properties; then
+              MOD_VERSION=$(grep "^mod_version=" gradle.properties | cut -d'=' -f2 | tr -d ' \r\n')
+            else
+              MOD_VERSION="4.0.0"
+            fi
+            TAG="v${MOD_VERSION}"
             REPLACE="true"
           fi
 
           echo "version=${MOD_VERSION}" >> $GITHUB_OUTPUT
           echo "tag=${TAG}" >> $GITHUB_OUTPUT
           echo "replace_existing=${REPLACE}" >> $GITHUB_OUTPUT
-          echo "Building mod version: $MOD_VERSION under tag: $TAG (replace_existing: $REPLACE)"
+          echo "Target mod version: $MOD_VERSION, tag: $TAG (replace_existing: $REPLACE)"
 
       # Install Java versions for multi-cluster builds (17 for v118x, 21 for v121x, 25 for v26x)
       - name: Set up Java 17 (v118x)
@@ -126,8 +136,8 @@ jobs:
 
           echo "Target tag: $TAG_NAME"
 
-          # 1. Update Git tag if triggered via workflow_dispatch
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+          # 1. Update Git tag if triggered via branch push or workflow_dispatch
+          if [ "${{ github.ref_type }}" != "tag" ]; then
             git config user.name "github-actions[bot]"
             git config user.email "github-actions[bot]@users.noreply.github.com"
 

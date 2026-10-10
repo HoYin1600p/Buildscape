@@ -22,6 +22,46 @@ import java.util.function.Function;
 
 public class BuildscapeFabricClient implements ClientModInitializer {
     @Override public void onInitializeClient() {
+        com.kingodogo.buildscape.client.ModKeyBinds.register(
+                net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper::registerKeyMapping);
+        // Mod Menu is not on this module's classpath. Its optional config-screen
+        // integration must be added together with its API dependency and entrypoint.
+        // Fabric API has no in-game key/scroll or camera/FOV callbacks. Wrench
+        // arrow input, zoom camera hooks and brush air attacks need unified client
+        // mixins registered in buildscape.mixins.json before input parity is complete.
+        net.fabricmc.fabric.api.event.player.UseBlockCallback.EVENT.register((player, level, hand, hit) -> {
+            if (level.isClientSide() && hand == net.minecraft.world.InteractionHand.MAIN_HAND) {
+                com.kingodogo.buildscape.client.ClientEvents.onRightClick();
+            }
+            return net.minecraft.world.InteractionResult.PASS;
+        });
+        net.fabricmc.fabric.api.event.player.AttackBlockCallback.EVENT.register((player, level, hand, pos, face) -> {
+            if (level.isClientSide() && com.kingodogo.buildscape.client.TreeChopHandler.shouldCancelLeftClick(
+                    player, new net.minecraft.world.phys.BlockHitResult(
+                            net.minecraft.world.phys.Vec3.atCenterOf(pos), face, pos, false))) {
+                player.swing(hand);
+                return net.minecraft.world.InteractionResult.FAIL;
+            }
+            return net.minecraft.world.InteractionResult.PASS;
+        });
+        net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
+            com.kingodogo.buildscape.client.ClientEvents.onClientDisconnect();
+            com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.clearInputRenderState();
+        });
+        net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLevelEvents.AFTER_CLIENT_LEVEL_CHANGE.register((client, level) -> {
+            com.kingodogo.buildscape.client.ClientEvents.onClientWorldUnload();
+            com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.clearInputRenderState();
+        });
+        net.fabricmc.fabric.api.client.rendering.v1.level.LevelExtractionEvents.AFTER_BLOCK_OUTLINE_EXTRACTION.register(
+                (context, target) -> {
+                    if (com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.extractBlockHighlight(
+                            context.camera(), target, context.levelState())) {
+                        context.levelState().blockOutlineRenderState = null;
+                    }
+                });
+        net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents.COLLECT_SUBMITS.register(context ->
+                com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.collectBlockHighlight(
+                        context.poseStack(), context.submitNodeCollector(), context.levelState()));
         net.fabricmc.fabric.api.client.render.fluid.v1.FluidRenderingRegistry.register(
                 com.kingodogo.buildscape.adapter.v26x.fluid.ExperienceFluids.still(),
                 com.kingodogo.buildscape.adapter.v26x.fluid.ExperienceFluids.flowing(),

@@ -50,7 +50,8 @@ import java.util.List;
 public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, SimpleWaterloggedBlock, ICommonNeighborAware, ICommonInteractable, ICommonPlayerDestroy {
 
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
-    public static final BooleanProperty LAVA_LOGGED = BooleanProperty.create("lava_logged");
+    /** Shared with HollowPipeBlock: property lookups are by instance, and the shared fluid code reads this one on logs too. */
+    public static final BooleanProperty LAVA_LOGGED = HollowPipeBlock.LAVA_LOGGED;
     public static final BooleanProperty HAS_GLASS_NEG = BooleanProperty.create("glass_neg");
     public static final BooleanProperty HAS_GLASS_POS = BooleanProperty.create("glass_pos");
     public static final BooleanProperty HAS_DECORATION = BooleanProperty.create("decoration");

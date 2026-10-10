@@ -34,15 +34,31 @@ sourceSets {
         }
         resources.srcDirs = ['src/main/resources']
     }
+
+    test {
+        compileClasspath += sourceSets.v26x.output
+        runtimeClasspath += sourceSets.v26x.output
+    }
 }
 
 configurations {
     v118xElements { canBeResolved = false; canBeConsumed = true }
     v121xElements { canBeResolved = false; canBeConsumed = true }
     v26xElements { canBeResolved = false; canBeConsumed = true }
+    testImplementation.extendsFrom v26xCompileOnly
 }
 
 dependencies {
+    testImplementation platform('org.junit:junit-bom:5.12.2')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher:1.12.2'
+    // Vanilla bootstrap and codec dependencies for the 26.2 tests.
+    testRuntimeOnly 'com.mojang:logging:1.7.12'
+    testRuntimeOnly 'com.mojang:authlib:9.0.75'
+    testRuntimeOnly 'org.apache.logging.log4j:log4j-core:2.26.0'
+    testRuntimeOnly 'org.apache.commons:commons-lang3:3.20.0'
+    testRuntimeOnly 'io.netty:netty-codec-base:4.2.15.Final'
+    testRuntimeOnly 'com.google.code.gson:gson:2.14.0'
     [
         'org.jspecify:jspecify:1.0.0',
         'com.mojang:datafixerupper:10.0.21',
@@ -77,6 +93,14 @@ dependencies {
 tasks.named('compileV118xJava', JavaCompile) { options.release.set(17) }
 tasks.named('compileV121xJava', JavaCompile) { options.release.set(21) }
 tasks.named('compileV26xJava', JavaCompile) { options.release.set(25) }
+tasks.named('compileTestJava', JavaCompile) { options.release.set(25) }
+tasks.named('test', Test) {
+    useJUnitPlatform()
+    dependsOn tasks.named('v26xClasses')
+    // Bootstrap mutates global registries; isolate suites in one JVM.
+    maxParallelForks = 1
+    workingDir = layout.buildDirectory.get().asFile
+}
 
 artifacts {
     add('v118xElements', sourceSets.v118x.output.classesDirs.singleFile) {

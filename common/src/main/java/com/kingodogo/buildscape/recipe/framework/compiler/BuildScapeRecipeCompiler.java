@@ -3,6 +3,11 @@ package com.kingodogo.buildscape.recipe.framework.compiler;
 import com.kingodogo.buildscape.BuildscapeCommon;
 import com.kingodogo.buildscape.platform.Services;
 import com.kingodogo.buildscape.recipe.framework.parser.RecipeIR;
+import com.kingodogo.buildscape.recipe.framework.parser.StreamingRecipeParser;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import java.util.function.Predicate;
 import com.kingodogo.buildscape.recipe.framework.util.ShapedPatternTrimmer;
 import com.kingodogo.buildscape.recipe.framework.validation.RecipeValidator;
 import com.kingodogo.buildscape.util.CommonId;
@@ -10,6 +15,16 @@ import com.kingodogo.buildscape.util.CommonId;
 import java.util.*;
 
 public class BuildScapeRecipeCompiler {
+
+    private final Predicate<String> modLoaded;
+
+    public BuildScapeRecipeCompiler() {
+        this(modid -> Services.PLATFORM.isModLoaded(modid));
+    }
+
+    BuildScapeRecipeCompiler(Predicate<String> modLoaded) {
+        this.modLoaded = Objects.requireNonNull(modLoaded);
+    }
 
     private final AliasResolver aliasResolver = new AliasResolver();
     private final TemplateEngine templateEngine = new TemplateEngine();
@@ -74,6 +89,32 @@ public class BuildScapeRecipeCompiler {
     }
 
     public RecipeIR.CompiledRecipe compileSingleRecipe(String category, RecipeIR.RecipeSpec spec) {
+        if (spec == null) return null;
+        if (spec.rawJson() != null) {
+            try {
+                JsonObject json = JsonParser.parseString(spec.rawJson()).getAsJsonObject();
+                if (!conditionsMet(json.get("conditions"), modLoaded)
+                        || !conditionsMet(json.get("neoforge:conditions"), modLoaded)
+                        || !conditionsMet(json.get("fabric:load_conditions"), modLoaded)) return null;
+                if ("forge:conditional".equals(spec.type()) || "neoforge:conditional".equals(spec.type())) {
+                    if (!json.has("recipes") || !json.get("recipes").isJsonArray()) return null;
+                    for (JsonElement element : json.getAsJsonArray("recipes")) {
+                        JsonObject entry = element.getAsJsonObject();
+                        if (!conditionsMet(entry.get("conditions"), modLoaded)) continue;
+                        if (!entry.has("recipe") || !entry.get("recipe").isJsonObject()) return null;
+                        JsonObject recipe = entry.getAsJsonObject("recipe").deepCopy();
+                        if (!recipe.has("id") && spec.id() != null) recipe.addProperty("id", spec.id());
+                        String categoryJson = "{\"recipes\":[" + recipe + "]}";
+                        var parsed = StreamingRecipeParser.parseCategory(category, new java.io.StringReader(categoryJson));
+                        return compileSingleRecipe(category, parsed.recipes().get(0));
+                    }
+                    return null;
+                }
+            } catch (java.io.IOException | RuntimeException exception) {
+                BuildscapeCommon.LOGGER.warn("BDRE Compiler: Invalid recipe conditions for [{}]", spec.id());
+                return null;
+            }
+        }
         if ("confetti_configure".equalsIgnoreCase(spec.type()) || "buildscape:confetti_configure".equalsIgnoreCase(spec.type())) {
             return new RecipeIR.CompiledRecipe(
                     BuildscapeCommon.MOD_ID + ":autogen/special/confetti_configure",
@@ -85,42 +126,6 @@ public class BuildScapeRecipeCompiler {
                     BuildscapeCommon.MOD_ID + ":autogen/special/clear_shulker_filters",
                     "clear_shulker_filters", "", 0, 0, List.of(), "", "", "minecraft:air", 1, "", 0f, 0, 0
             );
-        }
-
-        if (spec.rawJson() != null && ("forge:conditional".equalsIgnoreCase(spec.type()) || spec.rawJson().contains("\"conditions\"") || spec.rawJson().contains("\"botanypots:crop\""))) {
-            try {
-                com.google.gson.JsonObject json = com.google.gson.JsonParser.parseString(spec.rawJson()).getAsJsonObject();
-                if (json.has("recipes") && json.get("recipes").isJsonArray()) {
-                    com.google.gson.JsonArray recipesArr = json.getAsJsonArray("recipes");
-                    for (int i = 0; i < recipesArr.size(); i++) {
-                        com.google.gson.JsonObject entry = recipesArr.get(i).getAsJsonObject();
-                        if (entry.has("conditions")) {
-                            boolean conditionsMet = true;
-                            com.google.gson.JsonArray conds = entry.getAsJsonArray("conditions");
-                            for (int c = 0; c < conds.size(); c++) {
-                                com.google.gson.JsonObject cond = conds.get(c).getAsJsonObject();
-                                String condType = cond.has("type") ? cond.get("type").getAsString() : "";
-                                if ("forge:mod_loaded".equals(condType) || "fabric:all_mods_loaded".equals(condType)) {
-                                    String modid = cond.has("modid") ? cond.get("modid").getAsString() : "";
-                                    try {
-                                        if (!Services.PLATFORM.isModLoaded(modid)) {
-                                            conditionsMet = false;
-                                            break;
-                                        }
-                                    } catch (Throwable ignored) {
-                                        conditionsMet = false;
-                                        break;
-                                    }
-                                }
-                            }
-                            if (!conditionsMet) {
-                                continue;
-                            }
-                        }
-                    }
-                }
-            } catch (Throwable ignored) {}
-            return null;
         }
 
         if (!validator.validate(spec, aliasResolver)) {
@@ -190,6 +195,38 @@ public class BuildScapeRecipeCompiler {
                 BuildscapeCommon.LOGGER.warn("BDRE Compiler: Unknown recipe type '{}' for id {}", recipeType, recipeId);
                 return null;
             }
+        }
+    }
+
+    static boolean conditionsMet(JsonElement conditions, Predicate<String> modLoaded) {
+        if (conditions == null) return true;
+        if (!conditions.isJsonArray()) return false;
+        for (JsonElement element : conditions.getAsJsonArray()) {
+            if (!element.isJsonObject()) return false;
+            JsonObject condition = element.getAsJsonObject();
+            String type = condition.has("type") ? condition.get("type").getAsString()
+                    : condition.has("condition") ? condition.get("condition").getAsString() : "";
+            if ("forge:mod_loaded".equals(type) || "neoforge:mod_loaded".equals(type)) {
+                if (!condition.has("modid") || !isLoaded(condition.get("modid").getAsString(), modLoaded)) return false;
+            } else if ("fabric:all_mods_loaded".equals(type)) {
+                if (condition.has("values") && condition.get("values").isJsonArray()) {
+                    for (JsonElement value : condition.getAsJsonArray("values")) {
+                        if (!isLoaded(value.getAsString(), modLoaded)) return false;
+                    }
+                } else if (!condition.has("modid") || !isLoaded(condition.get("modid").getAsString(), modLoaded)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    private static boolean isLoaded(String modid, Predicate<String> modLoaded) {
+        if (modid == null || modid.isBlank()) return false;
+        try {
+            return modLoaded.test(modid);
+        } catch (RuntimeException | LinkageError exception) {
+            return false;
         }
     }
 

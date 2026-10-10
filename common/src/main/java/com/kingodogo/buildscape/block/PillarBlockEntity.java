@@ -1,21 +1,17 @@
 package com.kingodogo.buildscape.block;
 
-import com.kingodogo.buildscape.block.entity.IBlockEntityReadData;
-import com.kingodogo.buildscape.block.entity.IBlockEntityWriteData;
-import com.kingodogo.buildscape.block.entity.IDataSerializable;
-import com.kingodogo.buildscape.block.entity.DataBlockEntity;
 import com.kingodogo.buildscape.config.PillarIdManager;
 import com.kingodogo.buildscape.config.PillarParticleConfig;
 import com.kingodogo.buildscape.particle.ModParticles;
 import com.kingodogo.buildscape.particle.PillarSparkleDataQueue;
 import com.kingodogo.buildscape.platform.Services;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import com.mojang.serialization.Codec;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.StringTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
@@ -32,7 +28,7 @@ import net.minecraft.world.phys.AABB;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
-public class PillarBlockEntity extends DataBlockEntity implements Container, IDataSerializable {
+public class PillarBlockEntity extends BlockEntity implements Container {
 
     public static final int MAX_DYE_COLORS = 5;
 
@@ -883,58 +879,111 @@ public class PillarBlockEntity extends DataBlockEntity implements Container, IDa
     }
 
     @Override
-    public void writeData(IBlockEntityWriteData data) {
+    protected void saveAdditional(ValueOutput output) {
+        super.saveAdditional(output);
         if (!displayedItem.isEmpty()) {
-            data.putItem("DisplayedItem", displayedItem);
+            output.store("DisplayedItem", ItemStack.CODEC, displayedItem);
         }
-        data.putFloat("FacingYaw", facingYaw);
-
-        if (particlePattern != null) {
-            data.putString("Pattern", particlePattern);
-        }
-        if (patternSpeed != null) {
-            data.putFloat("PatternSpeed", patternSpeed.floatValue());
-        }
-        if (patternSpread != null) {
-            data.putFloat("PatternSpread", patternSpread.floatValue());
-        }
-        if (patternIntensity != null) {
-            data.putFloat("PatternIntensity", patternIntensity.floatValue());
-        }
-        if (usePattern != null) {
-            data.putBoolean("UsePattern", usePattern);
-        }
-        if (maxParticleColor != null) {
-            data.putInt("MaxParticleColor", maxParticleColor);
-        }
-        if (pillarId != null) {
-            data.putString("PillarId", pillarId);
-        }
-
-        if (particleColors != null && !particleColors.isEmpty()) {
-            data.putStringList("ParticleColors", particleColors);
-        }
+        new SavedSettings(facingYaw, particlePattern, patternSpeed, patternSpread, patternIntensity,
+                usePattern, maxParticleColor, pillarId, particleColors, particleColorCounter, colorsInitialized)
+                .save(output);
     }
 
     @Override
-    public void readData(IBlockEntityReadData data) {
-        displayedItem = data.getItemOrEmpty("DisplayedItem");
-        facingYaw = data.getFloatOr("FacingYaw", 0.0f);
-        particlePattern = data.contains("Pattern") ? data.getStringOr("Pattern", "none") : null;
-        patternSpeed = data.contains("PatternSpeed") ? (double) data.getFloatOr("PatternSpeed", 1.0f) : null;
-        patternSpread = data.contains("PatternSpread") ? (double) data.getFloatOr("PatternSpread", 1.0f) : null;
-        patternIntensity = data.contains("PatternIntensity") ? (double) data.getFloatOr("PatternIntensity", 1.0f) : null;
-        usePattern = data.contains("UsePattern") ? data.getBooleanOr("UsePattern", false) : null;
-        maxParticleColor = data.contains("MaxParticleColor") ? data.getIntOr("MaxParticleColor", 0) : null;
-        pillarId = data.contains("PillarId") ? data.getStringOr("PillarId", "") : null;
+    protected void loadAdditional(ValueInput input) {
+        super.loadAdditional(input);
+        displayedItem = input.child("DisplayedItem").map(SavedItem::read).orElseGet(() -> {
+            // The earliest pillar saves stored just the registry name.
+            String itemId = input.getStringOr("ITEM", "minecraft:air");
+            net.minecraft.resources.Identifier id = net.minecraft.resources.Identifier.tryParse(itemId);
+            return id == null ? ItemStack.EMPTY : net.minecraft.core.registries.BuiltInRegistries.ITEM
+                    .getOptional(id).map(ItemStack::new).orElse(ItemStack.EMPTY);
+        });
+        SavedSettings saved = SavedSettings.read(input);
+        facingYaw = saved.facingYaw();
+        particlePattern = saved.particlePattern();
+        patternSpeed = saved.patternSpeed();
+        patternSpread = saved.patternSpread();
+        patternIntensity = saved.patternIntensity();
+        usePattern = saved.usePattern();
+        maxParticleColor = saved.maxParticleColor();
+        pillarId = saved.pillarId();
+        particleColors = saved.particleColors();
+        particleColorCounter = saved.particleColorCounter();
+        colorsInitialized = saved.colorsInitialized();
+        lastParticleTick = 0;
+    }
 
-        List<String> colors = data.getStringListOrEmpty("ParticleColors");
-        if (!colors.isEmpty()) {
-            particleColors = new ArrayList<>(colors);
-            colorsInitialized = true;
-        } else {
-            particleColors = null;
-            colorsInitialized = false;
+    @Override
+    public CompoundTag getUpdateTag(net.minecraft.core.HolderLookup.Provider lookup) {
+        return saveCustomOnly(lookup);
+    }
+
+    // Kept separate from block registration so the persisted layout can be tested independently.
+    record SavedSettings(float facingYaw, String particlePattern, Double patternSpeed, Double patternSpread,
+                         Double patternIntensity, Boolean usePattern, Integer maxParticleColor, String pillarId,
+                         List<String> particleColors, int particleColorCounter, boolean colorsInitialized) {
+        void save(ValueOutput output) {
+            output.putFloat("FacingYaw", facingYaw);
+            if (particlePattern != null) output.putString("ParticlePattern", particlePattern);
+            if (patternSpeed != null) output.putDouble("PatternSpeed", patternSpeed);
+            if (patternSpread != null) output.putDouble("PatternSpread", patternSpread);
+            if (patternIntensity != null) output.putDouble("PatternIntensity", patternIntensity);
+            if (usePattern != null) output.putBoolean("UsePattern", usePattern);
+            if (maxParticleColor != null) output.putInt("MaxParticleColor", maxParticleColor);
+            if (pillarId != null && !pillarId.isEmpty()) output.putString("PillarId", pillarId);
+            if (particleColors != null && !particleColors.isEmpty()) {
+                var colors = output.list("ParticleColors", Codec.STRING);
+                particleColors.forEach(colors::add);
+            }
+            output.putInt("ParticleColorCounter", particleColorCounter);
+            output.putBoolean("ColorsInitialized", colorsInitialized);
+        }
+
+        static SavedSettings read(ValueInput input) {
+            String pattern = input.getString("ParticlePattern")
+                    .orElseGet(() -> input.getString("PATTERN").orElse(input.getStringOr("Pattern", null)));
+            if (pattern != null && !java.util.Arrays.asList(PATTERNS).contains(pattern)) pattern = null;
+            List<String> colors = new ArrayList<>();
+            int colorIndex = 0;
+            for (String color : input.listOrEmpty("ParticleColors", Codec.STRING)) {
+                if (colorIndex++ >= 7) break;
+                if (HEX_COLOR_PATTERN.matcher(color).matches()) colors.add(color.toUpperCase(java.util.Locale.ROOT));
+            }
+            String id = input.getStringOr("PillarId", null);
+            if (id != null && id.isEmpty()) id = null;
+            float yaw = input.getFloatOr("FacingYaw", 0) % 360.0f;
+            if (yaw < 0) yaw += 360.0f;
+            return new SavedSettings(yaw, pattern,
+                    input.read("PatternSpeed", Codec.DOUBLE).orElse(null),
+                    input.read("PatternSpread", Codec.DOUBLE).orElse(null),
+                    input.read("PatternIntensity", Codec.DOUBLE).orElse(null),
+                    input.read("UsePattern", Codec.BOOL).orElse(null),
+                    input.getInt("MaxParticleColor").orElse(null), id,
+                    colors.isEmpty() ? null : colors,
+                    input.getIntOr("ParticleColorCounter", 0),
+                    input.getBooleanOr("ColorsInitialized", !colors.isEmpty()) || !colors.isEmpty());
+        }
+    }
+
+    static final class SavedItem {
+        private SavedItem() {}
+
+        static ItemStack read(ValueInput input) {
+            if (input.getInt("Count").isEmpty()) {
+                return input.read(ItemStack.MAP_CODEC).orElse(ItemStack.EMPTY);
+            }
+            // Custom block entity IDs are not in vanilla's schema: update their legacy stacks explicitly.
+            CompoundTag legacy = new CompoundTag();
+            legacy.putString("id", input.getStringOr("id", "minecraft:air"));
+            legacy.putByte("Count", input.getByteOr("Count", (byte) 0));
+            input.read("tag", CompoundTag.CODEC).ifPresent(tag -> legacy.put("tag", tag));
+            var fixed = net.minecraft.util.datafix.DataFixers.getDataFixer().update(
+                    net.minecraft.util.datafix.fixes.References.ITEM_STACK,
+                    new com.mojang.serialization.Dynamic<>(net.minecraft.nbt.NbtOps.INSTANCE, legacy),
+                    2975, net.minecraft.SharedConstants.getCurrentVersion().dataVersion().version());
+            return ItemStack.CODEC.parse(input.lookup().createSerializationContext(net.minecraft.nbt.NbtOps.INSTANCE),
+                    fixed.getValue()).result().orElse(ItemStack.EMPTY);
         }
     }
 

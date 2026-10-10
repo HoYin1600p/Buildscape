@@ -1,6 +1,5 @@
 package com.kingodogo.buildscape.adapter.v26x.client;
 
-import com.kingodogo.buildscape.adapter.v26x.RenderCapture;
 import com.kingodogo.buildscape.cosmetic.sign.SignFrameAttachment;
 import com.kingodogo.buildscape.cosmetic.sign.SignFrameType;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -9,7 +8,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.state.SignRenderState;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
-import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemDisplayContext;
@@ -24,26 +22,37 @@ import java.util.WeakHashMap;
 
 /** Extracts a frame into the sign's render state, including vanilla signs on either loader. */
 public final class ClientSignFrames {
-    private static final Map<SignRenderState, RenderCapture> FRAMES = Collections.synchronizedMap(new WeakHashMap<>());
+    private static final Map<SignRenderState, FrameState> FRAMES = Collections.synchronizedMap(new WeakHashMap<>());
     private ClientSignFrames() {}
+
+    private static final class FrameState {
+        final ItemStackRenderState model = new ItemStackRenderState();
+        float rotation;
+        boolean standing;
+        int light, overlay;
+    }
 
     public static void extract(SignBlockEntity sign, Object renderState, float partialTick) {
         SignRenderState state = (SignRenderState) renderState;
-        RenderCapture capture = new RenderCapture();
-        render(sign, partialTick, new PoseStack(), capture, state.lightCoords,
-                net.minecraft.client.renderer.texture.OverlayTexture.NO_OVERLAY);
-        FRAMES.put(state, capture);
+        FrameState frame = extractFrame(sign, state.lightCoords, net.minecraft.client.renderer.texture.OverlayTexture.NO_OVERLAY);
+        if (frame == null) FRAMES.remove(state);
+        else FRAMES.put(state, frame);
     }
 
     public static void submit(Object renderState, PoseStack pose, Object collector, Object camera) {
-        RenderCapture capture = FRAMES.get((SignRenderState) renderState);
-        if (capture != null) capture.submit(pose, (SubmitNodeCollector) collector, (CameraRenderState) camera);
+        FrameState frame = FRAMES.get((SignRenderState) renderState);
+        if (frame != null) submitFrame(frame, pose, (SubmitNodeCollector) collector);
     }
 
     public static void render(SignBlockEntity sign, float partialTick, PoseStack pose, Object buffer, int light, int overlay) {
-        if (sign == null || sign.getLevel() == null) return;
+        FrameState frame = extractFrame(sign, light, overlay);
+        if (frame != null && buffer instanceof SubmitNodeCollector collector) submitFrame(frame, pose, collector);
+    }
+
+    private static FrameState extractFrame(SignBlockEntity sign, int light, int overlay) {
+        if (sign == null || sign.getLevel() == null) return null;
         SignFrameType frame = SignFrameAttachment.getFrame(sign);
-        if (frame == SignFrameType.NONE || frame.getItem() == null) return;
+        if (frame == SignFrameType.NONE || frame.getItem() == null) return null;
         var state = sign.getBlockState();
         float rotation;
         boolean standing;
@@ -53,22 +62,28 @@ public final class ClientSignFrames {
         } else if (state.getBlock() instanceof StandingSignBlock) {
             rotation = state.getValue(StandingSignBlock.ROTATION) * 360.0F / 16;
             standing = true;
-        } else return;
+        } else return null;
         ItemStack item = new ItemStack(frame.getItem());
         // Resolve the frame's block mesh, not its flat inventory icon.
         item.set(DataComponents.ITEM_MODEL, Identifier.fromNamespaceAndPath("buildscape", "sign_frame"));
-        ItemStackRenderState model = new ItemStackRenderState();
-        Minecraft.getInstance().getItemModelResolver().updateForTopItem(model, item,
+        FrameState extracted = new FrameState();
+        extracted.rotation = rotation;
+        extracted.standing = standing;
+        extracted.light = light;
+        extracted.overlay = overlay;
+        Minecraft.getInstance().getItemModelResolver().updateForTopItem(extracted.model, item,
                 ItemDisplayContext.NONE, sign.getLevel(), null, 0);
+        return extracted;
+    }
+
+    private static void submitFrame(FrameState frame, PoseStack pose, SubmitNodeCollector collector) {
         pose.pushPose();
         try {
             pose.translate(0.5, 0.5, 0.5);
-            pose.mulPose(Axis.YP.rotationDegrees(-((rotation + 180) % 360)));
-            if (standing) pose.translate(0, 0.3125, -0.4375);
+            pose.mulPose(Axis.YP.rotationDegrees(-((frame.rotation + 180) % 360)));
+            if (frame.standing) pose.translate(0, 0.3125, -0.4375);
             // Item models are centred; this is the reference block-model origin.
-            if (buffer instanceof RenderCapture capture) {
-                capture.record(pose, (target, collector, camera) -> model.submit(target, collector, light, overlay, 0));
-            } else if (buffer instanceof SubmitNodeCollector collector) model.submit(pose, collector, light, overlay, 0);
+            frame.model.submit(pose, collector, frame.light, frame.overlay, 0);
         } finally { pose.popPose(); }
     }
 }

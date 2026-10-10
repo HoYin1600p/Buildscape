@@ -113,21 +113,11 @@ public class PillarBlockEntityRenderer {
             boolean isAshenKing = cachedIsAshenKing.computeIfAbsent(
                     pos, k -> blockEntity.getBlockState().getBlock()
                             instanceof com.kingodogo.buildscape.block.AshenKingPillarBlock);
-            float hoverHeight;
-            if (isAshenKing) {
-                hoverHeight = isSpawnEgg ? 0.875f : 1.0f;
-            } else {
-                hoverHeight = isSpawnEgg ? 1.125f : 1.4625f;
-            }
+            float hoverHeight = hoverHeight(isAshenKing, isSpawnEgg);
             poseStack.translate(0.5, hoverHeight, 0.5);
 
             boolean isFixed = info.isFixed;
-            float rotationSpeed = 0.0f;
-            if (!isSpawnEgg) {
-                rotationSpeed = 90.0f;
-            } else if (info.mobState != null && info.mobState.spin) {
-                rotationSpeed = 22.5f;
-            }
+            float rotationSpeed = rotationSpeed(isSpawnEgg, info.mobState != null && info.mobState.spin);
 
             float elapsedSeconds = (currentRenderTime - info.startTime) / 1000.0f;
 
@@ -270,6 +260,14 @@ public class PillarBlockEntityRenderer {
         } finally {
             poseStack.popPose();
         }
+    }
+
+    public static float hoverHeight(boolean ashenKing, boolean spawnEgg) {
+        return ashenKing ? (spawnEgg ? 0.875F : 1) : (spawnEgg ? 1.125F : 1.4625F);
+    }
+
+    public static float rotationSpeed(boolean spawnEgg, boolean spin) {
+        return spawnEgg ? (spin ? 22.5F : 0) : 90;
     }
 
     private DisplayInfo createDisplayInfo(ItemStack displayedItem, long startTime) {

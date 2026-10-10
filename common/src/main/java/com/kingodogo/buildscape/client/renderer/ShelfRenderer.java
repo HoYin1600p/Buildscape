@@ -73,7 +73,7 @@ public class ShelfRenderer {
         poseStack.popPose();
     }
 
-    private static OnShelf getOnShelfTransform(ItemStack stack, Object model) {
+    public static OnShelf getOnShelfTransform(ItemStack stack, Object model) {
         if (stack.is(Items.SHIELD)) {
             return SHIELD;
         }
@@ -105,7 +105,8 @@ public class ShelfRenderer {
         return (int)(value ^ value >>> 32);
     }
 
-    private static final class OnShelf {
+    /** Immutable item placement shared with native VersionCluster render-state extraction. */
+    public static final class OnShelf {
         private final float xRot;
         private final float yRot;
         private final float zRot;
@@ -113,7 +114,7 @@ public class ShelfRenderer {
         private final float scale;
         private final boolean recentreXZ;
 
-        private OnShelf(float xRot, float yRot, float zRot, float z, float scale, boolean recentreXZ) {
+        public OnShelf(float xRot, float yRot, float zRot, float z, float scale, boolean recentreXZ) {
             this.xRot = xRot;
             this.yRot = yRot;
             this.zRot = zRot;
@@ -122,7 +123,9 @@ public class ShelfRenderer {
             this.recentreXZ = recentreXZ;
         }
 
-        private void apply(PoseStack poseStack) {
+        public boolean recentreXZ() { return recentreXZ; }
+
+        public void apply(PoseStack poseStack) {
             if (this.z != 0.0F) {
                 poseStack.translate(0.0D, 0.0D, this.z / 16.0F);
             }
@@ -134,7 +137,7 @@ public class ShelfRenderer {
             }
         }
 
-        private double[] transformedBounds(AABB raw) {
+        public double[] transformedBounds(AABB raw) {
             double[] bounds = new double[]{raw.minX, raw.minY, raw.minZ, raw.maxX, raw.maxY, raw.maxZ};
             double[] out = {Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY,
                     Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY};
@@ -164,11 +167,12 @@ public class ShelfRenderer {
             double ry = Math.toRadians(yRot);
             double rz = Math.toRadians(zRot);
 
-            double cosX = Math.cos(rx);
-            double sinX = Math.sin(rx);
-            double y1 = y * cosX - z * sinX;
-            double z1 = y * sinX + z * cosX;
-            double x1 = x;
+            // Pose rotations are multiplied X * Y * Z, so a point is rotated Z, then Y, then X.
+            double cosZ = Math.cos(rz);
+            double sinZ = Math.sin(rz);
+            double x1 = x * cosZ - y * sinZ;
+            double y1 = x * sinZ + y * cosZ;
+            double z1 = z;
 
             double cosY = Math.cos(ry);
             double sinY = Math.sin(ry);
@@ -176,11 +180,11 @@ public class ShelfRenderer {
             double z2 = -x1 * sinY + z1 * cosY;
             double y2 = y1;
 
-            double cosZ = Math.cos(rz);
-            double sinZ = Math.sin(rz);
-            double x3 = x2 * cosZ - y2 * sinZ;
-            double y3 = x2 * sinZ + y2 * cosZ;
-            double z3 = z2;
+            double cosX = Math.cos(rx);
+            double sinX = Math.sin(rx);
+            double x3 = x2;
+            double y3 = y2 * cosX - z2 * sinX;
+            double z3 = y2 * sinX + z2 * cosX;
 
             return new double[]{x3, y3, z3};
         }

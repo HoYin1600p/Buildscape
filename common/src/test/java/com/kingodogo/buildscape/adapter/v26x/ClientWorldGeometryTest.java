@@ -13,6 +13,22 @@ import java.util.HashSet;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ClientWorldGeometryTest {
+    @Test void extractionKeepsOneNativeShapeAndDetachedTransformPerBox() {
+        var state = new ClientWorldHooks.OutlineState();
+        PoseStack pose = new PoseStack();
+        pose.translate(2, 3, 4);
+        ClientWorldHooks.renderLineBox(pose, state, -1, 2, 3, 4, 8, 10, 1, 0.5F, 0, 1);
+        pose.translate(100, 100, 100);
+        assertEquals(1, state.outlines().size());
+        var outline = state.outlines().getFirst();
+        assertEquals(new net.minecraft.world.phys.AABB(-1, 2, 3, 4, 8, 10), outline.shape().bounds());
+        assertEquals(0xFFFF8000, outline.color());
+        assertEquals(new Vector3f(2, 3, 4), outline.transform().transformPosition(new Vector3f()));
+        int[] edges = {0};
+        outline.shape().forAllEdges((x0, y0, z0, x1, y1, z1) -> edges[0]++);
+        assertEquals(12, edges[0]);
+    }
+
     @Test void markerBoxContainsExactlyItsTwelveEdges() {
         var vertices = new ArrayList<Vector3f>();
         VertexConsumer consumer = (VertexConsumer) Proxy.newProxyInstance(VertexConsumer.class.getClassLoader(),

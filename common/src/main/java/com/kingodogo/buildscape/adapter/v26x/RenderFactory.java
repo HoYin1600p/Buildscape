@@ -40,7 +40,7 @@ public final class RenderFactory {
     public static void registerBlockEntityRenderers(BlockEntityRegistrar target) {
         target.register(ModBlockEntities.MANGROVE_SIGN_BLOCK_ENTITY_TYPE, StandingSignRenderer::new);
         target.register(ModBlockEntities.BAMBOO_SIGN_BLOCK_ENTITY_TYPE, StandingSignRenderer::new);
-        target.register(ModBlockEntities.COPPER_CHEST_TYPE, net.minecraft.client.renderer.blockentity.ChestRenderer::new);
+        target.register(ModBlockEntities.COPPER_CHEST_TYPE, com.kingodogo.buildscape.adapter.v26x.client.CopperChestRenderer::new);
         registerHelper(target, ModBlockEntities.PILLAR_TYPE, new com.kingodogo.buildscape.client.renderer.PillarBlockEntityRenderer()::render, 64);
         registerHelper(target, ModBlockEntities.DECORATED_POT_TYPE, com.kingodogo.buildscape.client.renderer.DecoratedPotBlockEntityRenderer::render, 64);
         registerHelper(target, ModBlockEntities.TRAPPED_DECORATED_POT_TYPE, com.kingodogo.buildscape.client.renderer.TrappedDecoratedPotBlockEntityRenderer::render, 64);
@@ -120,6 +120,12 @@ public final class RenderFactory {
     public static void registerRenderers() {
         if (registered) return;
         java.util.Objects.requireNonNull(registrar, "Entity renderers must be registered through the loader hook");
+        registrar.register((EntityType<net.minecraft.world.entity.vehicle.boat.AbstractBoat>) Services.PLATFORM.getMangroveBoatEntityType(),
+                context -> new com.kingodogo.buildscape.adapter.v26x.client.BuildscapeBoatRenderer(context, "mangrove"));
+        registrar.register((EntityType<net.minecraft.world.entity.vehicle.boat.AbstractBoat>) Services.PLATFORM.getPoplarBoatEntityType(),
+                context -> new com.kingodogo.buildscape.adapter.v26x.client.BuildscapeBoatRenderer(context, "poplar"));
+        registrar.register((EntityType<PlatformAdapterBase.SeatEntityImpl>) Services.PLATFORM.getSeatEntityType(),
+                net.minecraft.client.renderer.entity.NoopRenderer::new);
         registrar.register((EntityType<PlatformAdapterBase.FallingIcicleEntityImpl>) Services.PLATFORM.getFallingIcicleEntityType(),
                 helperProvider(com.kingodogo.buildscape.client.renderer.FallingIcicleRenderer::render, (entity, tick) -> net.minecraft.world.phys.Vec3.ZERO));
         registrar.register((EntityType<PlatformAdapterBase.FestiveStockingEntityImpl>) Services.PLATFORM.getFestiveStockingEntityType(),

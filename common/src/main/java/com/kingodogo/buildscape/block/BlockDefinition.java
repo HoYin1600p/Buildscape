@@ -65,7 +65,7 @@ public class BlockDefinition {
     public boolean isMudSlab() { return "MudSlabBlock".equals(blockType) || "mud_slab".equals(id); }
     public boolean isMud() { return "MudBlock".equals(blockType) || "mud".equals(id); }
     public boolean isSlab() { return !isVerticalSlab() && !isGrassSlab() && !isHayBaleSlab() && !isLogSlab() && !isMudSlab() && blockType.contains("Slab"); }
-    public boolean isWall() { return blockType.contains("Wall") && !blockType.contains("WallTorch"); }
+    public boolean isWall() { return blockType.contains("Wall") && !blockType.contains("WallTorch") && !blockType.contains("Wallpaper"); }
     public boolean isFalling() { return blockType.contains("Falling"); }
     public boolean isCopperDoor() { return !isWeatheringDoor() && ("ModCopperDoorBlock".equals(blockType) || id.contains("copper_door") || "steel_door".equals(id) || "flaming_steel_door".equals(id)); }
     public boolean isDoor() { return !isWeatheringDoor() && !isCopperDoor() && blockType.contains("Door"); }

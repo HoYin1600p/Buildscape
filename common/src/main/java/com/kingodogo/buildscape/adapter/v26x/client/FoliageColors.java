@@ -52,12 +52,22 @@ public final class FoliageColors {
     }
 
     public static void register(BlockColors colors) {
+        register(colors::register);
+    }
+
+    /** Loader-neutral form: the sink may be vanilla BlockColors or a loader registry (Fabric API defers it). */
+    public static void register(BlockTintSink sink) {
         for (var block : BuiltInRegistries.BLOCK) {
             Identifier id = BuiltInRegistries.BLOCK.getKey(block);
             if (!id.getNamespace().equals("buildscape")) continue;
             BlockTintSource tint = source(id.getPath());
-            if (tint != null) colors.register(List.of(tint), block);
+            if (tint != null) sink.register(List.of(tint), block);
         }
+    }
+
+    @FunctionalInterface
+    public interface BlockTintSink {
+        void register(List<BlockTintSource> sources, net.minecraft.world.level.block.Block... blocks);
     }
 
     /** Model-bake callbacks supply item colours without changing packaged JSON resources. */

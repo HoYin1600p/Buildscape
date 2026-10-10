@@ -1,0 +1,8 @@
+{
+  "type": "neoforge:add_features",
+  "biomes": "#minecraft:buildscape/lush_caves",
+  "features": [
+    "buildscape:all_colored_spore_blossom"
+  ],
+  "step": "vegetal_decoration"
+}

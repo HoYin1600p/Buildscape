@@ -205,6 +205,11 @@ public class BlockFactory implements IBlockFactory {
     public Block createBlock(BlockDefinition def) {
         BlockBehaviour.Properties props = buildProperties(def);
 
+        if ("SaplingBlock".equals(def.getBlockType())) {
+            return new net.minecraft.world.level.block.SaplingBlock(WorldGenFactory.saplingGrower(def.getId()),
+                    props.noCollision().instabreak().sound(SoundType.GRASS).randomTicks()) {};
+        }
+
         if (def.isLargeChain()) {
             return new com.kingodogo.buildscape.block.LargeChainBlock(props) {
                 @Override protected BlockState updateShape(BlockState state, LevelReader level, ScheduledTickAccess tickAccess, BlockPos pos, Direction direction, BlockPos adjacentPos, BlockState adjacentState, RandomSource random) { if (state.getValue(WATERLOGGED)) tickAccess.scheduleTick(pos, net.minecraft.world.level.material.Fluids.WATER, net.minecraft.world.level.material.Fluids.WATER.getTickDelay(level)); return super.updateShape(state, level, tickAccess, pos, direction, adjacentPos, adjacentState, random); }
@@ -694,7 +699,7 @@ public class BlockFactory implements IBlockFactory {
         } else if (def.isMangrovePropagule()) {
             class V26xMangrovePropaguleBlock extends MangrovePropaguleBlock implements BonemealableBlock {
                 public V26xMangrovePropaguleBlock(BlockBehaviour.Properties properties) {
-                    super(properties);
+                    super(properties.noCollision().instabreak().sound(SoundType.GRASS).randomTicks());
                 }
                 @Override
                 public boolean isValidBonemealTarget(LevelReader level, BlockPos pos, BlockState state) {
@@ -706,7 +711,16 @@ public class BlockFactory implements IBlockFactory {
                 }
                 @Override
                 public void performBonemeal(ServerLevel level, RandomSource random, BlockPos pos, BlockState state) {
-                    performBonemealEffect(level, pos, state);
+                    if (state.getValue(HANGING)) performBonemealEffect(level, pos, state);
+                    else WorldGenFactory.advanceMangrove(level, pos, state, random, true);
+                }
+                @Override
+                protected void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
+                    if (!state.getValue(HANGING)
+                            && !level.getEntitiesOfClass(Player.class, new net.minecraft.world.phys.AABB(pos).inflate(32)).isEmpty()
+                            && random.nextInt(7) == 0) {
+                        WorldGenFactory.advanceMangrove(level, pos, state, random, false);
+                    }
                 }
                 @Override
                 @SuppressWarnings("unchecked")

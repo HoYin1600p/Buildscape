@@ -1,7 +1,7 @@
 #!/bin/sh
 # Copyright © 2015 the original authors.
 # Licensed under the Apache License, Version 2.0 (the "License");
-p_path=$0
+app_path=$0
 while
     APP_HOME=${app_path%"${app_path##*/}"}
     [ -h "$app_path" ]
@@ -74,7 +74,7 @@ if ! "$cygwin" && ! "$darwin" && ! "$nonstop" ; then
             warn "Could not set maximum file descriptor limit to $MAX_FD"
     esac
 fi
-f "$cygwin" || "$msys" ; then
+if "$cygwin" || "$msys" ; then
     APP_HOME=$( cygpath --path --mixed "$APP_HOME" )
 
     JAVACMD=$( cygpath --unix "$JAVACMD" )

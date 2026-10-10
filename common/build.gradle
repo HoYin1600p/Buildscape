@@ -65,9 +65,13 @@ dependencies {
     v118xCompileOnly 'io.netty:netty-buffer:4.1.97.Final'
     v121xCompileOnly 'io.netty:netty-buffer:4.1.97.Final'
     v26xCompileOnly 'io.netty:netty-buffer:4.2.15.Final'
+    v26xCompileOnly 'it.unimi.dsi:fastutil:8.5.18'
+    v26xCompileOnly 'org.jetbrains:annotations:26.0.2'
+    v26xCompileOnly 'com.google.guava:guava:33.6.0-jre'
+    v26xCompileOnly 'org.slf4j:slf4j-api:2.0.17'
     v118xCompileOnly files(rootProject.file('ref/artifacts/minecraft-1.18.2.jar'))
     v121xCompileOnly files(rootProject.file('ref/artifacts/minecraft-1.21.1.jar'))
-    v26xCompileOnly files(rootProject.file('ref/artifacts/minecraft-26.2.jar'))
+
 }
 
 tasks.named('compileV118xJava', JavaCompile) { options.release.set(17) }
@@ -87,3 +91,10 @@ artifacts {
 }
 
 tasks.named('processResources') { enabled = false }
+
+apply from: rootProject.file('gradle/minecraft.gradle')
+
+tasks.named('jar', Jar) {
+    from sourceSets.v26x.output
+}
+tasks.named('assemble') { dependsOn tasks.named('v26xClasses') }

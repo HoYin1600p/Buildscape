@@ -3181,7 +3181,7 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
         }
 
         public FallingIcicleEntityImpl(Level level, double x, double y, double z, BlockState state) {
-            this(EntityTypes.FALLING_BLOCK, level);
+            this(Services.PLATFORM.getFallingIcicleEntityType(), level);
             this.blockState = state;
             this.setPos(x, y, z);
             this.setDeltaMovement(Vec3.ZERO);
@@ -3203,7 +3203,9 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
         }
 
         @Override
-        protected void defineSynchedData(SynchedEntityData.Builder builder) {}
+        protected void defineSynchedData(SynchedEntityData.Builder builder) {
+            // The reference sends the immutable block state in the spawn packet, with no tracked fields.
+        }
 
         @Override
         public boolean hurtServer(ServerLevel level, DamageSource source, float amount) {
@@ -3274,13 +3276,41 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
         }
 
         @Override
-        protected void readAdditionalSaveData(ValueInput input) {}
+        protected void readAdditionalSaveData(ValueInput input) {
+            this.blockState = input.read("BlockState", BlockState.CODEC).orElse(Blocks.ICE.defaultBlockState());
+            if (this.blockState.isAir()) this.blockState = Blocks.ICE.defaultBlockState();
+            this.fallTime = input.getIntOr("FallTime", 0);
+            this.startPos = input.getInt("StartX")
+                    .map(x -> new BlockPos(x, input.getIntOr("StartY", 0), input.getIntOr("StartZ", 0)))
+                    .orElse(null);
+        }
 
         @Override
-        protected void addAdditionalSaveData(ValueOutput output) {}
+        protected void addAdditionalSaveData(ValueOutput output) {
+            output.store("BlockState", BlockState.CODEC, this.blockState);
+            output.putInt("FallTime", this.fallTime);
+            if (this.startPos != null) {
+                output.putInt("StartX", this.startPos.getX());
+                output.putInt("StartY", this.startPos.getY());
+                output.putInt("StartZ", this.startPos.getZ());
+            }
+        }
+
+        @Override
+        public net.minecraft.network.protocol.Packet<net.minecraft.network.protocol.game.ClientGamePacketListener>
+                getAddEntityPacket(net.minecraft.server.level.ServerEntity tracker) {
+            return new net.minecraft.network.protocol.game.ClientboundAddEntityPacket(this, tracker, Block.getId(this.blockState));
+        }
+
+        @Override
+        public void recreateFromPacket(net.minecraft.network.protocol.game.ClientboundAddEntityPacket packet) {
+            super.recreateFromPacket(packet);
+            this.blockState = Block.stateById(packet.getData());
+        }
 
         @Override
         public boolean isAttackable() {
+            // Like the reference, falling icicles are hazards rather than attackable targets.
             return false;
         }
     }

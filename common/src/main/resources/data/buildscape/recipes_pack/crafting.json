@@ -23052,7 +23052,7 @@
       [
         [
           "R",
-          "MC:packed_mud"
+          "BS:packed_mud"
         ]
       ],
       1
@@ -32054,7 +32054,8 @@
         ]
       ],
       6
-    ]
+    ],
+    ["BS:ice_crystal",[" S ","SIS"],[["S","MC:amethyst_shard"],["I","BS:icicle"]],4]
   ],
   "crafting_shapeless": [
     [
@@ -40929,6 +40930,21 @@
       "BS:bone_brick_vertical_slab",
       "BS:bone_brick_slab",
       1
-    ]
+    ],
+    ["BS:orange_haze_bush",["BS:white_haze_bush","MC:orange_dye"],1],
+    ["BS:magenta_haze_bush",["BS:white_haze_bush","MC:magenta_dye"],1],
+    ["BS:light_blue_haze_bush",["BS:white_haze_bush","MC:light_blue_dye"],1],
+    ["BS:yellow_haze_bush",["BS:white_haze_bush","MC:yellow_dye"],1],
+    ["BS:lime_haze_bush",["BS:white_haze_bush","MC:lime_dye"],1],
+    ["BS:pink_haze_bush",["BS:white_haze_bush","MC:pink_dye"],1],
+    ["BS:gray_haze_bush",["BS:white_haze_bush","MC:gray_dye"],1],
+    ["BS:light_gray_haze_bush",["BS:white_haze_bush","MC:light_gray_dye"],1],
+    ["BS:cyan_haze_bush",["BS:white_haze_bush","MC:cyan_dye"],1],
+    ["BS:purple_haze_bush",["BS:white_haze_bush","MC:purple_dye"],1],
+    ["BS:blue_haze_bush",["BS:white_haze_bush","MC:blue_dye"],1],
+    ["BS:brown_haze_bush",["BS:white_haze_bush","MC:brown_dye"],1],
+    ["BS:green_haze_bush",["BS:white_haze_bush","MC:green_dye"],1],
+    ["BS:red_haze_bush",["BS:white_haze_bush","MC:red_dye"],1],
+    ["BS:black_haze_bush",["BS:white_haze_bush","MC:black_dye"],1]
   ]
 }

@@ -39,9 +39,11 @@ public class FamilyExpander {
 
         if (targets == null || targets.isEmpty()) {
             if ("wood".equalsIgnoreCase(familyType)) {
-                targets = List.of("stairs", "slab", "fence", "fence_gate", "gate", "door", "trapdoor", "button", "pressure_plate", "stonecutter");
+                targets = baseItem.contains(":ashpen_")
+                        ? List.of("stairs", "slab", "fence", "fence_gate", "button", "pressure_plate")
+                        : List.of("stairs", "slab", "fence", "fence_gate", "door", "trapdoor", "button", "pressure_plate");
             } else {
-                targets = List.of("stairs", "slab", "wall", "chiseled", "stonecutter");
+                targets = List.of("stairs", "slab", "wall", "chiseled");
             }
         }
 
@@ -52,6 +54,10 @@ public class FamilyExpander {
 
             String recipeId = sanitizeId(prefix + target + "_from_" + baseItem);
             String outputItem = prefix + target;
+            if ("gate".equals(target) || "stonecutter".equals(target)) {
+                var item = new AliasResolver().resolveItem(outputItem);
+                if (item == null || item == net.minecraft.world.item.Items.AIR) continue;
+            }
 
             switch (target) {
                 case "stairs" -> addTemplateOrFallback(generated, recipeId, "stairs", baseItem, outputItem, 4, "shaped",

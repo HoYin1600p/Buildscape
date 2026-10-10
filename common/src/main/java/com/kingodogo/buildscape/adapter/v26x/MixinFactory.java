@@ -4,7 +4,7 @@ import com.kingodogo.buildscape.client.screen.BuildScapeConfigScreen;
 import com.kingodogo.buildscape.config.BuildscapeClientConfig;
 import com.kingodogo.buildscape.cosmetic.sign.SignFrameAttachment;
 import com.kingodogo.buildscape.cosmetic.sign.SignFrameType;
-import com.kingodogo.buildscape.mixin.IMixinFactory;
+import com.kingodogo.buildscape.mixinsupport.IMixinFactory;
 import com.kingodogo.buildscape.mixin.StonecutterMenuAccessor;
 import com.kingodogo.buildscape.platform.Services;
 import com.kingodogo.buildscape.util.StonecutterMenuExtension;
@@ -171,7 +171,7 @@ public class MixinFactory implements IMixinFactory {
             remainingOutput -= toGive;
         }
 
-        ((StonecutterMenuAccessor) menu).callSetupRecipeList(menu.container, menu.getSlot(0).getItem());
+        ((StonecutterMenuAccessor) menu).buildscape$setupRecipeList(menu.getSlot(0).getItem());
         menu.broadcastChanges();
     }
 
@@ -219,9 +219,9 @@ public class MixinFactory implements IMixinFactory {
         }
 
         Button button = Button.builder(Component.literal("BS"), b -> {
-            Minecraft.getInstance().setScreenAndShow(Services.PLATFORM.createConfigScreen(screen));
+            Minecraft.getInstance().setScreenAndShow(Services.PLATFORM.createConfigScreen((Screen) (Object) screen));
         }).bounds(targetX, targetY, 20, 20).build();
-        addWidgetToScreen(screen, button);
+        addWidgetToScreen((Screen) (Object) screen, (AbstractWidget) (Object) button);
     }
 
     @Override
@@ -234,7 +234,7 @@ public class MixinFactory implements IMixinFactory {
                 mc.gameMode.handleInventoryButtonClick(menu.containerId, -123);
             }
         }).bounds(x, y, 18, 10).build();
-        addWidgetToScreen(screen, button);
+        addWidgetToScreen((Screen) (Object) screen, (AbstractWidget) (Object) button);
     }
 
     @Override

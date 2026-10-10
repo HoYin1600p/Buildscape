@@ -1,5 +1,7 @@
 package com.kingodogo.buildscape.mixin;
 
+import com.kingodogo.buildscape.mixinsupport.MixinFactory;
+
 import com.kingodogo.buildscape.block.PlanterHelper;
 import com.kingodogo.buildscape.block.PlanterHelper.PlanterType;
 import com.kingodogo.buildscape.cosmetic.sign.SignFrameAttachment;

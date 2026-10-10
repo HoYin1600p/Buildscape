@@ -1,4 +1,4 @@
-package com.kingodogo.buildscape.mixin.support;
+package com.kingodogo.buildscape.mixinsupport;
 
 import com.kingodogo.buildscape.block.HollowLogBlock;
 import com.kingodogo.buildscape.block.HollowLogBlockEntity;

@@ -1,6 +1,6 @@
 package com.kingodogo.buildscape.client.renderer;
 
-import com.kingodogo.buildscape.mixin.MixinFactory;
+import com.kingodogo.buildscape.mixinsupport.MixinFactory;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.world.level.block.entity.SignBlockEntity;
 

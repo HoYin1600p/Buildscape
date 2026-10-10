@@ -92,7 +92,7 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
 
     @Override
     public Player getClientPlayer() {
-        return net.minecraft.client.Minecraft.getInstance().player;
+        return (net.minecraft.world.entity.player.Player) (Object) net.minecraft.client.Minecraft.getInstance().player;
     }
 
     @Override
@@ -154,7 +154,7 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
     @Override
     public CommonId registerDynamicTexture(String name, net.minecraft.client.renderer.texture.DynamicTexture texture) {
         net.minecraft.resources.Identifier id = net.minecraft.resources.Identifier.fromNamespaceAndPath("buildscape", name);
-        net.minecraft.client.Minecraft.getInstance().getTextureManager().register(id, texture);
+        net.minecraft.client.Minecraft.getInstance().getTextureManager().register(id, (net.minecraft.client.renderer.texture.AbstractTexture) (Object) texture);
         return CommonId.of(id.getNamespace(), id.getPath());
     }
 
@@ -172,7 +172,7 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
     @Override public Iterable<net.minecraft.world.item.ItemStack> getInventoryItems(net.minecraft.world.entity.player.Inventory inventory) { return inventory.getNonEquipmentItems(); }
     @Override
     public boolean hasPlayerPermissions(net.minecraft.world.entity.player.Player player, int level) {
-        if (!(player instanceof net.minecraft.client.player.LocalPlayer localPlayer)) return false;
+        if (!(player instanceof net.minecraft.client.player.LocalPlayer)) return false;
         net.minecraft.server.permissions.Permission permission = switch (Math.max(0, Math.min(4, level))) {
             case 0 -> null;
             case 1 -> net.minecraft.server.permissions.Permissions.COMMANDS_MODERATOR;
@@ -180,7 +180,7 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
             case 3 -> net.minecraft.server.permissions.Permissions.COMMANDS_ADMIN;
             default -> net.minecraft.server.permissions.Permissions.COMMANDS_OWNER;
         };
-        return permission == null || localPlayer.permissions().hasPermission(permission);
+        return permission == null || ((net.minecraft.client.player.LocalPlayer) player).permissions().hasPermission(permission);
     }
     @Override public void openScreen(net.minecraft.client.gui.screens.Screen screen) { net.minecraft.client.Minecraft.getInstance().setScreenAndShow(screen); }
     @Override public void openUri(java.net.URI uri) { net.minecraft.util.Util.getPlatform().openUri(uri); }
@@ -686,7 +686,7 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
         if (!(buffer instanceof RenderCapture capture) || stack.isEmpty()) return;
         var state = new net.minecraft.client.renderer.item.ItemStackRenderState();
         var client = net.minecraft.client.Minecraft.getInstance();
-        client.getItemModelResolver().updateForTopItem(state, stack, context, client.level, null, seed);
+        client.getItemModelResolver().updateForTopItem(state, stack, context, (net.minecraft.world.level.Level) (Object) client.level, null, seed);
         capture.record(pose, (target, collector, camera) -> state.submit(target, collector, light, overlay, 0));
     }
 
@@ -2237,19 +2237,19 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
     @Override
     public void playButtonClick() {
         net.minecraft.client.Minecraft.getInstance().getSoundManager().play(
-                net.minecraft.client.resources.sounds.SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
+                (net.minecraft.client.resources.sounds.SoundInstance) (Object) net.minecraft.client.resources.sounds.SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
     }
 
     @Override
     public void playNoteBlockBell() {
         net.minecraft.client.Minecraft.getInstance().getSoundManager().play(
-                net.minecraft.client.resources.sounds.SimpleSoundInstance.forUI(SoundEvents.NOTE_BLOCK_BELL, 1.0F));
+                (net.minecraft.client.resources.sounds.SoundInstance) (Object) net.minecraft.client.resources.sounds.SimpleSoundInstance.forUI(SoundEvents.NOTE_BLOCK_BELL, 1.0F));
     }
 
     @Override
     public void playNoteBlockDidgeridoo() {
         net.minecraft.client.Minecraft.getInstance().getSoundManager().play(
-                net.minecraft.client.resources.sounds.SimpleSoundInstance.forUI(SoundEvents.NOTE_BLOCK_DIDGERIDOO, 1.0F));
+                (net.minecraft.client.resources.sounds.SoundInstance) (Object) net.minecraft.client.resources.sounds.SimpleSoundInstance.forUI(SoundEvents.NOTE_BLOCK_DIDGERIDOO, 1.0F));
     }
 
     @Override
@@ -2618,7 +2618,7 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
             int rotation = entity.getRotation();
             poseStack.mulPose(com.mojang.math.Axis.ZP.rotationDegrees((isMap ? rotation % 4 * 2 : rotation) * 45.0F));
             if (isMap) {
-                var data = net.minecraft.world.item.MapItem.getSavedData(itemStack, net.minecraft.client.Minecraft.getInstance().level);
+                var data = net.minecraft.world.item.MapItem.getSavedData(itemStack, (net.minecraft.world.level.Level) (Object) net.minecraft.client.Minecraft.getInstance().level);
                 var id = itemStack.get(net.minecraft.core.component.DataComponents.MAP_ID);
                 if (data != null && id != null) {
                     var map = new net.minecraft.client.renderer.state.MapRenderState();
@@ -2687,7 +2687,7 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
             view.biome = level.getBiome(pos);
         }
         for (var source : client.getBlockColors().getTintSources(state)) {
-            tints.add(level != null && pos != null ? source.colorInWorld(state, view, pos) : source.color(state));
+            tints.add(level != null && pos != null ? source.colorInWorld(state, (net.minecraft.client.renderer.block.BlockAndTintGetter) (Object) view, pos) : source.color(state));
         }
         capture.record(poseStack, (target, collector, camera) -> model.submit(target, collector, light, overlay, 0));
     }

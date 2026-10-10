@@ -3,7 +3,7 @@ package com.kingodogo.buildscape.adapter.v121x;
 import com.kingodogo.buildscape.config.BuildscapeClientConfig;
 import com.kingodogo.buildscape.cosmetic.sign.SignFrameAttachment;
 import com.kingodogo.buildscape.cosmetic.sign.SignFrameType;
-import com.kingodogo.buildscape.mixin.IMixinFactory;
+import com.kingodogo.buildscape.mixinsupport.IMixinFactory;
 import com.kingodogo.buildscape.mixin.StonecutterMenuAccessor;
 import com.kingodogo.buildscape.platform.Services;
 import com.kingodogo.buildscape.util.BeaconBeamScanState;
@@ -174,7 +174,7 @@ public class MixinFactory implements IMixinFactory {
         }
 
         player.awardRecipes(Collections.singleton(recipes.get(recipeIndex)));
-        ((StonecutterMenuAccessor) menu).callSetupRecipeList(menu.container, menu.getSlot(0).getItem());
+        ((StonecutterMenuAccessor) menu).buildscape$setupRecipeList(menu.getSlot(0).getItem());
         menu.broadcastChanges();
     }
 

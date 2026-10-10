@@ -1,4 +1,4 @@
-package com.kingodogo.buildscape.mixin;
+package com.kingodogo.buildscape.mixinsupport;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;

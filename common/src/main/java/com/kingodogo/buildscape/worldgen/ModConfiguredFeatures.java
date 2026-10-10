@@ -49,7 +49,8 @@ public class ModConfiguredFeatures {
                             new CommonId(BuildscapeCommon.MOD_ID, name),
                             value
                     );
-                } catch (Throwable ignored) {
+                } catch (Throwable e) {
+                    BuildscapeCommon.LOGGER.warn("Failed to register configured feature {}", name, e);
                 }
             }
             return value;

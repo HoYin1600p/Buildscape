@@ -56,7 +56,8 @@ public class RequestPillarIdsPacket implements CommonPacket {
 
         try {
             SyncPillarIdsPacket.sendToPlayer(serverPlayer, manager.getAllPillarDataForSync());
-        } catch (RuntimeException ignored) {
+        } catch (RuntimeException e) {
+            com.kingodogo.buildscape.BuildscapeCommon.LOGGER.warn("Failed to sync pillar IDs to requesting player", e);
         }
     }
 }

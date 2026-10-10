@@ -124,7 +124,8 @@ public class CosmeticsConfig {
 
             UUID uuid = null;
             if (!key.equals("global")) {
-                try { uuid = UUID.fromString(key); } catch (Exception ignored) {
+                try { uuid = UUID.fromString(key); } catch (Exception e) {
+                    BuildscapeCommon.LOGGER.warn("Unrecognized legacy cosmetics player key {}", key, e);
                     // The reference retains the global fallback for unrecognized legacy player keys.
                 }
             }
@@ -141,7 +142,8 @@ public class CosmeticsConfig {
                         try {
                             int slot = Integer.parseInt(cosEntry.getKey());
                             if (cosEntry.getValue() instanceof String) cosmetics.put(slot, (String) cosEntry.getValue());
-                        } catch (Exception ignored) {
+                        } catch (Exception e) {
+                            BuildscapeCommon.LOGGER.warn("Skipping malformed cosmetic slot key", e);
                             // The reference skips malformed cosmetic slot keys while retaining valid slots.
                         }
                     }
@@ -195,7 +197,8 @@ public class CosmeticsConfig {
                     for (String key : Services.PLATFORM.getTagKeys(equipped)) {
                         try {
                             cosmetics.put(Integer.parseInt(key), Services.PLATFORM.getTagString(equipped, key, ""));
-                        } catch (Exception ignored) {
+                        } catch (Exception e) {
+                            BuildscapeCommon.LOGGER.warn("Skipping malformed cosmetic slot key", e);
                             // The reference skips malformed cosmetic slot keys while retaining valid slots.
                         }
                     }

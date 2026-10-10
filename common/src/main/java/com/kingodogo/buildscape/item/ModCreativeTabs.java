@@ -45,7 +45,9 @@ public final class ModCreativeTabs {
                     }
                 }
             }
-        } catch (Exception ignored) {}
+        } catch (Exception e) {
+            BuildscapeCommon.LOGGER.warn("Failed to read creative tab item list", e);
+        }
         return list;
     }
 }

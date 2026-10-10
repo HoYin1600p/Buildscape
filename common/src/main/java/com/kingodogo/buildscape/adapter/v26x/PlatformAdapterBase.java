@@ -189,6 +189,16 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter, com.kingo
 
     @Override
     public Item.Properties prepareItemProperties(CommonId id, Item.Properties properties) {
+        return itemProperties(id, properties);
+    }
+
+    @Override
+    public Item.Properties prepareBlockItemProperties(CommonId id, Item.Properties properties) {
+        return itemProperties(id, properties).useBlockDescriptionPrefix();
+    }
+
+    /** Gives the properties their registry id; 26.x derives the description key (item.* or block.*) from it. */
+    public static Item.Properties itemProperties(CommonId id, Item.Properties properties) {
         return properties.setId(net.minecraft.resources.ResourceKey.create(
                 net.minecraft.core.registries.Registries.ITEM,
                 Identifier.fromNamespaceAndPath(id.getNamespace(), id.getPath())));
@@ -657,7 +667,7 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter, com.kingo
 
     @Override
     public net.minecraft.world.item.BlockItem createTrophyBlockItem(com.kingodogo.buildscape.trophy.TrophyBlock block, com.kingodogo.buildscape.trophy.TrophyDefinition definition, Item.Properties properties) {
-        prepareItemProperties(new CommonId(com.kingodogo.buildscape.BuildscapeCommon.MOD_ID, definition.getId()), properties);
+        prepareBlockItemProperties(new CommonId(com.kingodogo.buildscape.BuildscapeCommon.MOD_ID, definition.getId()), properties);
         return new com.kingodogo.buildscape.trophy.TrophyBlockItem(block, definition, properties) {
             @Override
             public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay display, Consumer<Component> tooltip, TooltipFlag flag) {

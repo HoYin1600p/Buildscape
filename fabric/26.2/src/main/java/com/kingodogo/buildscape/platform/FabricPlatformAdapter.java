@@ -6,6 +6,11 @@ import net.fabricmc.loader.api.FabricLoader;
 
 public class FabricPlatformAdapter extends PlatformAdapterBase {
     @Override
+    public java.nio.file.Path getConfigDir() {
+        return FabricLoader.getInstance().getConfigDir();
+    }
+
+    @Override
     public String getPlatformName() {
         return "Fabric 26.2";
     }

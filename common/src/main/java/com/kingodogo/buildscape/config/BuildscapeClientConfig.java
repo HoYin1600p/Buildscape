@@ -43,7 +43,7 @@ public class BuildscapeClientConfig {
     private final Path configDirectory;
 
     private BuildscapeClientConfig() {
-        this(Path.of("config"));
+        this(ConfigPaths.root());
     }
 
     BuildscapeClientConfig(Path configDirectory) {

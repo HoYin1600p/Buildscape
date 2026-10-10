@@ -20,7 +20,7 @@ public class GuiConfigManager {
     private static final Map<String, GuiConfigData> CACHE = new HashMap<>();
 
     private File getConfigDir() {
-        String configPath = Paths.get("config", BuildscapeCommon.MOD_ID).toString();
+        String configPath = ConfigPaths.dir(BuildscapeCommon.MOD_ID).toString();
         File dir = new File(configPath);
         if (!dir.exists()) {
             dir.mkdirs();

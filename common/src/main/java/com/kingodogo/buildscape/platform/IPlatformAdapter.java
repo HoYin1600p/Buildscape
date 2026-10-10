@@ -42,6 +42,8 @@ public interface IPlatformAdapter {
         player.awardStat(net.minecraft.stats.Stats.ITEM_USED.get(boatItem));
         return BoatPlacementOutcome.SUCCESS;
     }
+    /** Loader config directory; defaults to the game-relative "config" folder. */
+    default java.nio.file.Path getConfigDir() { return java.nio.file.Path.of("config"); }
     String getPlatformName();
     boolean isModLoaded(String modId);
     boolean isClient();

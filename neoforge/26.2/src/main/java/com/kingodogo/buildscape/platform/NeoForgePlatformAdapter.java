@@ -21,6 +21,11 @@ public class NeoForgePlatformAdapter extends PlatformAdapterBase {
     }
 
     @Override
+    public java.nio.file.Path getConfigDir() {
+        return net.neoforged.fml.loading.FMLPaths.CONFIGDIR.get();
+    }
+
+    @Override
     public boolean isClient() {
         return net.neoforged.fml.loading.FMLEnvironment.getDist().isClient();
     }

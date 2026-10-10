@@ -162,7 +162,7 @@ public class PillarParticleConfig {
     }
 
     private File getConfigDir() {
-        File dir = Paths.get("config", "buildscape", "pillar").toFile();
+        File dir = ConfigPaths.dir("buildscape", "pillar").toFile();
         if (!dir.exists()) {
             dir.mkdirs();
         }

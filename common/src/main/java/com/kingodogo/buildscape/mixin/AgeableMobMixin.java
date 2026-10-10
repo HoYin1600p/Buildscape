@@ -1,7 +1,7 @@
 package com.kingodogo.buildscape.mixin;
 
 import com.kingodogo.buildscape.util.GoldenDandelionGrowth;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.entity.AgeableMob;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -24,10 +24,10 @@ public abstract class AgeableMobMixin {
         }
     }
 
-    @Inject(method = "readAdditionalSaveData", at = @At("RETURN"))
-    private void buildscape$migrateLegacyFrozenGrowth(CompoundTag entityData, CallbackInfo ci) {
+    @Inject(method = "readAdditionalSaveData(Lnet/minecraft/world/level/storage/ValueInput;)V", at = @At("RETURN"))
+    private void buildscape$migrateLegacyFrozenGrowth(ValueInput entityData, CallbackInfo ci) {
         AgeableMob mob = (AgeableMob) (Object) this;
-        if (GoldenDandelionGrowth.consumeLegacyFlag(entityData) && mob.isBaby()) {
+        if (entityData.childOrEmpty("ForgeData").getBooleanOr(GoldenDandelionGrowth.FROZEN_TAG, false) && mob.isBaby()) {
             GoldenDandelionGrowth.setFrozen(mob, true);
         }
     }

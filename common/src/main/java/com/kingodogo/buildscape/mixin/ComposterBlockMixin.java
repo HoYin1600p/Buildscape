@@ -34,9 +34,8 @@ public abstract class ComposterBlockMixin {
         pBuilder.add(PlanterHelper.PLANTER);
     }
 
-    @Dynamic
-    @Inject(method = "use", at = @At("HEAD"), cancellable = true, require = 0)
-    public void buildscape$use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit, CallbackInfoReturnable<InteractionResult> cir) {
+    @Inject(method = "useItemOn", at = @At("HEAD"), cancellable = true)
+    private void buildscape$use(ItemStack heldItem, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit, CallbackInfoReturnable<InteractionResult> cir) {
         if (state.hasProperty(PlanterHelper.PLANTER)) {
             PlanterType planter = state.getValue(PlanterHelper.PLANTER);
             if (planter != PlanterType.NONE) {
@@ -45,7 +44,6 @@ public abstract class ComposterBlockMixin {
             }
 
             if (state.getValue(ComposterBlock.LEVEL) == 0) {
-                ItemStack heldItem = player.getItemInHand(hand);
                 if (heldItem.getItem() instanceof BlockItem blockItem) {
                     Block block = blockItem.getBlock();
                     PlanterType newType = null;
@@ -98,4 +96,12 @@ public abstract class ComposterBlockMixin {
             }
         }
     }
+    @Inject(method = "useWithoutItem", at = @At("HEAD"), cancellable = true)
+    private void buildscape$preventPlanterExtraction(BlockState state, Level level, BlockPos pos,
+            Player player, BlockHitResult hit, CallbackInfoReturnable<InteractionResult> cir) {
+        if (state.hasProperty(PlanterHelper.PLANTER) && state.getValue(PlanterHelper.PLANTER) != PlanterType.NONE) {
+            cir.setReturnValue(InteractionResult.PASS);
+        }
+    }
+
 }

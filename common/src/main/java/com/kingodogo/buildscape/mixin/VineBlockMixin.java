@@ -31,14 +31,14 @@ public abstract class VineBlockMixin extends Block {
     }
 
     @Inject(method = "<init>", at = @At("RETURN"))
-    private void buildscape$setDefaultSheared(Properties properties, CallbackInfo ci) {
+    private void buildscape$setDefaultSheared(net.minecraft.world.level.block.state.BlockBehaviour.Properties properties, CallbackInfo ci) {
         if (this.defaultBlockState().hasProperty(BUILDSCAPE_SHEARED)) {
             this.registerDefaultState(this.defaultBlockState().setValue(BUILDSCAPE_SHEARED, false));
         }
     }
 
     @Dynamic
-    @Inject(method = "randomTick", at = @At("HEAD"), cancellable = true, require = 0)
+    @Inject(method = "randomTick", at = @At("HEAD"), cancellable = true)
     private void buildscape$preventGrowthWhenSheared(BlockState state, ServerLevel level, BlockPos pos, @Coerce Object random, CallbackInfo ci) {
         if (state.hasProperty(BUILDSCAPE_SHEARED) && state.getValue(BUILDSCAPE_SHEARED)) {
             ci.cancel();

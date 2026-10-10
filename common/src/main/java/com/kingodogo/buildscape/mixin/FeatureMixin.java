@@ -1,7 +1,8 @@
 package com.kingodogo.buildscape.mixin;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.LevelSimulatedReader;
+import net.minecraft.world.level.WorldGenLevel;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.feature.configurations.TreeConfiguration;
@@ -18,12 +19,11 @@ import java.util.function.BiConsumer;
 @Mixin(TrunkPlacer.class)
 public class FeatureMixin {
 
-    @Dynamic
-    @Inject(method = "setDirtAt", at = @At("HEAD"), cancellable = true, require = 0)
+    @Inject(method = "placeBelowTrunkBlock", at = @At("HEAD"), cancellable = true)
     private static void onSetDirtAt(
-            LevelSimulatedReader level,
+            WorldGenLevel level,
             BiConsumer<BlockPos, BlockState> blockSetter,
-            @Coerce Object random,
+            RandomSource random,
             BlockPos pos,
             TreeConfiguration treeConfig,
             CallbackInfo ci

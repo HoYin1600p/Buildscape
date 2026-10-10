@@ -7,7 +7,7 @@ import com.kingodogo.buildscape.cosmetic.sign.SignFrameType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.Containers;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SignBlock;
@@ -42,10 +42,10 @@ public class BlockStateBaseMixin {
         return MixinFactory.isPlanterPlant(block);
     }
 
-    @Inject(method = "onRemove", at = @At("HEAD"))
-    private void buildscape$onSignRemove(Level level, BlockPos pos, BlockState newState, boolean isMoving, CallbackInfo ci) {
+    @Inject(method = "affectNeighborsAfterRemoval(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/core/BlockPos;Z)V", at = @At("HEAD"))
+    private void buildscape$onSignRemove(ServerLevel level, BlockPos pos, boolean isMoving, CallbackInfo ci) {
         BlockState state = (BlockState) (Object) this;
-        if (!state.is(newState.getBlock()) && !level.isClientSide()) {
+        if (!state.is(level.getBlockState(pos).getBlock())) {
             if (state.getBlock() instanceof SignBlock) {
                 BlockEntity be = level.getBlockEntity(pos);
                 if (be instanceof SignBlockEntity sign) {

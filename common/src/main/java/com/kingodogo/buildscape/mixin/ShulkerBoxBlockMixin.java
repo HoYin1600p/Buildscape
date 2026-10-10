@@ -22,14 +22,18 @@ import java.util.List;
 @Mixin(ShulkerBoxBlock.class)
 public class ShulkerBoxBlockMixin {
 
-    @Inject(method = "onRemove", at = @At("HEAD"))
-    private void captureFilterOnRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving, CallbackInfo ci) {
-        if (!state.is(newState.getBlock())) {
-            BlockEntity be = level.getBlockEntity(pos);
-            if (be instanceof GhostFilterable filterable) {
-                ShulkerGhostFilterCapture.capture(filterable);
-            }
-        }
+    @Inject(method = "affectNeighborsAfterRemoval", at = @At("HEAD"))
+    private void captureFilterOnRemove(BlockState state, net.minecraft.server.level.ServerLevel level,
+            BlockPos pos, boolean isMoving, CallbackInfo ci) {
+        BlockEntity be = level.getBlockEntity(pos);
+        if (be instanceof GhostFilterable filterable) ShulkerGhostFilterCapture.capture(filterable);
+    }
+
+    @Inject(method = "getDrops", at = @At("HEAD"))
+    private void captureFilterForDrops(BlockState state, net.minecraft.world.level.storage.loot.LootParams.Builder lootParams,
+            CallbackInfoReturnable<List<ItemStack>> cir) {
+        BlockEntity be = lootParams.getOptionalParameter(net.minecraft.world.level.storage.loot.parameters.LootContextParams.BLOCK_ENTITY);
+        ShulkerGhostFilterCapture.capture(be instanceof GhostFilterable filterable ? filterable : null);
     }
 
     @Dynamic
@@ -42,7 +46,7 @@ public class ShulkerBoxBlockMixin {
     }
 
     @Dynamic
-    @Inject(method = "playerWillDestroy(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/entity/player/Player;)Lnet/minecraft/world/level/block/state/BlockState;", at = @At("HEAD"), require = 0)
+    @Inject(method = "playerWillDestroy(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/entity/player/Player;)Lnet/minecraft/world/level/block/state/BlockState;", at = @At("HEAD"))
     private void captureFilterOnDestroy121(Level level, BlockPos pos, BlockState state, Player player, CallbackInfoReturnable<?> cir) {
         BlockEntity blockEntity = level.getBlockEntity(pos);
         if (blockEntity instanceof GhostFilterable filterable) {
@@ -57,7 +61,7 @@ public class ShulkerBoxBlockMixin {
     }
 
     @Dynamic
-    @Inject(method = "getDrops(Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/storage/loot/LootParams$Builder;)Ljava/util/List;", at = @At("RETURN"), require = 0)
+    @Inject(method = "getDrops(Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/storage/loot/LootParams$Builder;)Ljava/util/List;", at = @At("RETURN"))
     private void preserveGhostFilters121(BlockState state, @Coerce Object lootParams, CallbackInfoReturnable<List<ItemStack>> cir) {
         ShulkerGhostFilterCapture.preserveInDrops(cir.getReturnValue());
     }

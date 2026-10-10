@@ -27,6 +27,7 @@
     "ItemMixin",
     "ItemInstanceMixin",
     "LavaFluidMixin",
+    "LeavesBlockMixin",
     "LevelMixin",
     "LevelChunkMixin",
     "LiquidBlockMixin",
@@ -42,6 +43,9 @@
     "WallBlockMixin"
   ],
   "client": [
+    "LiquidBlockRendererMixin",
+    "client.SoundMuffMixin",
+    "client.AdvancementsScreenMixin",
     "ScreenMixin",
     "GeneralStatisticsListMixin",
     "GeneralStatisticsListEntryMixin",

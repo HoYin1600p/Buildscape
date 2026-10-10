@@ -85,6 +85,15 @@ public class MixinFactory implements IMixinFactory {
     }
 
     @Override
+    public VertexConsumer wrapPipeSpillVertexConsumer(VertexConsumer original, Object level, BlockPos pos,
+                                                     BlockState state, net.minecraft.world.level.material.FluidState fluid) {
+        if (level instanceof net.minecraft.world.level.BlockGetter getter) {
+            return com.kingodogo.buildscape.client.renderer.PipeSpillVertexConsumer.wrap(original, getter, pos, state, fluid);
+        }
+        return original;
+    }
+
+    @Override
     public int getItemRawId(Item item) {
         return BuiltInRegistries.ITEM.getId(item);
     }

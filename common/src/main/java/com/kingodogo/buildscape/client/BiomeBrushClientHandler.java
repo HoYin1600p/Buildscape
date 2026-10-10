@@ -14,14 +14,19 @@ public final class BiomeBrushClientHandler {
     private BiomeBrushClientHandler() {}
 
     public static void onAttack(Player player, net.minecraft.world.phys.HitResult target) {
-        if (player == null || Services.PLATFORM.isScreenOpen() || !player.isShiftKeyDown()) return;
-        if (target != null && target.getType() == net.minecraft.world.phys.HitResult.Type.BLOCK) return;
-        if (player.getMainHandItem().getItem() instanceof BiomeBrushItem
-                || player.getOffhandItem().getItem() instanceof BiomeBrushItem) {
+        if (player == null || Services.PLATFORM.isScreenOpen()) return;
+        boolean holdingBrush = player.getMainHandItem().getItem() instanceof BiomeBrushItem
+                || player.getOffhandItem().getItem() instanceof BiomeBrushItem;
+        if (shouldClearSelection(player.isShiftKeyDown(), holdingBrush, target == null ? null : target.getType())) {
             com.kingodogo.buildscape.network.PacketFactory.sendToServer(
                     new com.kingodogo.buildscape.network.ClearBiomeBrushPacket());
         }
     }
+
+    static boolean shouldClearSelection(boolean sneaking, boolean holdingBrush, net.minecraft.world.phys.HitResult.Type target) {
+        return sneaking && holdingBrush && target == net.minecraft.world.phys.HitResult.Type.MISS;
+    }
+
     public static void tickClient(Player player) {
         if (player == null) return;
         Level level = Services.PLATFORM.getEntityLevel(player);

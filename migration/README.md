@@ -1,7 +1,17 @@
 # Buildscape Migration Ledger
 
-`ledger.csv` is the authoritative file-by-file record for the migration from
-`ref/forge/1.18.2`. Regenerate it with:
+`ledger.csv` is the authoritative file-by-file record for the migration from the
+frozen Forge 1.18.2 source in `ref/forge/1.18.2`.
+
+## Scope
+
+This branch targets Minecraft 26.2 only (Fabric and NeoForge). Minecraft 1.18.2
+and 1.21.1 are maintained separately; Forge 26.x and 26.3 are parked. A completed
+row therefore records where the behaviour lives in the 26.2 tree (`common`,
+`fabric/26.2`, `neoforge/26.2`) and uses `era_coverage` `26x`. The `v118x` and
+`v121x` adapter trees are not part of this scope and are not cited as evidence.
+
+Regenerate the ledger with:
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts/migration-ledger.ps1 -Mode Generate
@@ -26,17 +36,25 @@ files as `pending`. Exact same-path files in common are suggested in
    in `behavior_notes`.
 4. Implement shared behavior in common and only native API translation in the
    established `adapter/v118x`, `adapter/v121x`, and `adapter/v26x` trees.
-5. Compile all supported eras and affected loader targets.
-6. Set the final disposition, list every active destination in `active_paths`,
-   set `era_coverage` to include `118x;121x;26x`, and record the exact successful
-   command/result in `verification`.
+5. Build the 26.2 targets (`gradlew build --offline`).
+6. Set the final disposition, list every active destination in `active_paths`
+   (each path must exist), set `era_coverage` to `26x`, and record the exact
+   successful command/result and commit in `verification`. Java rows cite the
+   build and test count (plus the covering test class when there is one);
+   resource rows cite `python scripts/resources26x/check.py --mc-jar <26.2 client jar>`.
 7. Run ledger validation. A row is not complete if validation fails.
+
+Resource rows map each reference path to its converted path: `loot_tables` to
+`loot_table`, `recipes` to `recipe`, `advancements` to `advancement`, `tags/blocks`
+(and `items`, `entity_types`, `fluids`) to the singular folder, and `data/forge/tags`
+to `data/c/tags`. The empty Forge `global_loot_modifiers.json` was removed on purpose.
 
 ## Completion dispositions
 
 - `common`: behavior is fully represented by shared common code.
-- `adapter`: shared behavior is in common and changed Minecraft APIs are
-  bridged by thin VersionCluster adapters.
+- `adapter` (written `era_adapter` in `ledger.csv`): shared behavior is in common
+  and changed Minecraft APIs are bridged by thin VersionCluster adapters
+  (for 26.2, `adapter/v26x`).
 - `loader_adapter`: the responsibility is genuinely loader-specific.
 - `consolidated`: reference behavior is preserved by other named active files.
 - `build_only`: the reference file is verified development/build infrastructure;
@@ -48,10 +66,12 @@ files as `pending`. Exact same-path files in common are suggested in
 `partial`, `registered_only`, assumed equivalence, and undocumented deletion are
 not valid completion states.
 
-## VersionCluster compilation mapping
+## VersionCluster compilation mapping (historical)
 
-The active source locations remain unchanged. `common/build.gradle` exposes three
-explicit compilable views of the existing tree:
+The multi-era views below describe the earlier three-era plan and still exist in
+`common/build.gradle`, but only `v26x` is in scope for this port. The active source
+locations remain unchanged. `common/build.gradle` exposes three explicit compilable
+views of the existing tree:
 
 - `v118x`: shared sources plus `common/.../adapter/v118x`, Java 17, and
   `ref/artifacts/minecraft-1.18.2.jar`;

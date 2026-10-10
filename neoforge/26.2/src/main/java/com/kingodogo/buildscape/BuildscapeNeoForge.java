@@ -37,7 +37,10 @@ public class BuildscapeNeoForge {
         if (FMLEnvironment.getDist().isClient()) BuildscapeNeoForgeClient.register(modBus);
     }
 
-    public static void init() { BuildscapeCommon.init(); }
+    public static void init() {
+        BuildscapeCommon.init();
+        com.kingodogo.buildscape.event.LoaderDispenserSetup.register();
+    }
     private static void commonSetup(FMLCommonSetupEvent event) { event.enqueueWork(BuildscapeNeoForge::init); }
     private static void registerAttributes(EntityAttributeCreationEvent event) {
         Services.PLATFORM.registerEntityAttributes(event::put);

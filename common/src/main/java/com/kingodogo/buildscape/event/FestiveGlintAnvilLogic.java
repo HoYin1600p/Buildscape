@@ -34,6 +34,14 @@ public final class FestiveGlintAnvilLogic {
             ItemStack output = left.copy();
             output.setCount(1);
             FestiveGlintHelper.applyFestiveGlint(output);
+            if (renameText != null && !renameText.isEmpty()) {
+                if (!renameText.equals(left.getHoverName().getString())) {
+                    com.kingodogo.buildscape.platform.Services.PLATFORM.setItemCustomName(output,
+                            com.kingodogo.buildscape.util.ComponentHelper.literal(renameText));
+                }
+            } else {
+                com.kingodogo.buildscape.platform.Services.PLATFORM.setItemCustomName(output, null);
+            }
 
             return new AnvilResult(output, 0, 0);
         }

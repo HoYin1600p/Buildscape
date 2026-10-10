@@ -28,7 +28,26 @@ public final class NeoForgeGameplayEvents {
     private NeoForgeGameplayEvents() {}
 
     public static void register() {
+        AdvancementEvents.configure(new LoaderAdvancementAccess());
         var bus = NeoForge.EVENT_BUS;
+        bus.addListener(LoaderStewRecipes::prepare);
+        bus.addListener((net.neoforged.neoforge.event.server.ServerStartingEvent event) ->
+                LoaderWandererTrades.register(event.getServer()));
+        bus.addListener((net.neoforged.neoforge.event.OnDatapackSyncEvent event) ->
+                LoaderWandererTrades.register(event.getPlayerList().getServer()));
+        bus.addListener((net.neoforged.neoforge.event.level.BlockDropsEvent event) -> {
+            if (event.getBreaker() instanceof Player player) {
+                int experience = SculkExperienceLogic.experience(player, event.getState(), event.getTool());
+                if (experience >= 0) event.setDroppedExperience(experience);
+            }
+        });
+        bus.addListener((net.neoforged.neoforge.event.entity.player.AdvancementEvent.AdvancementEarnEvent event) -> {
+            if (event.getEntity() instanceof ServerPlayer player) {
+                var id = event.getAdvancement().id();
+                AdvancementEvents.onAdvancementEarned(player,
+                        new com.kingodogo.buildscape.util.CommonId(id.getNamespace(), id.getPath()));
+            }
+        });
         bus.addListener((RegisterCommandsEvent event) -> BuildscapeCommands.register(event.getDispatcher()));
         bus.addListener(NeoForgeGameplayEvents::rightClickBlock);
         bus.addListener(NeoForgeGameplayEvents::rightClickItem);
@@ -52,7 +71,7 @@ public final class NeoForgeGameplayEvents {
             if (event.getEntity() instanceof ServerPlayer player) ModCommonEvents.onPlayerLeave(player);
         });
         bus.addListener((PlayerEvent.PlayerChangedDimensionEvent event) -> {
-            if (event.getEntity() instanceof ServerPlayer player) ModCommonEvents.onPlayerJoin(player);
+            if (event.getEntity() instanceof ServerPlayer player) ModCommonEvents.onPlayerChangedDimension(player);
         });
         bus.addListener((PlayerWakeUpEvent event) -> StrawBedHandler.onPlayerWakeUp(event.getEntity()));
         bus.addListener((PlayerSetSpawnEvent event) -> {
@@ -76,7 +95,7 @@ public final class NeoForgeGameplayEvents {
     }
 
     private static void rightClickBlock(PlayerInteractEvent.RightClickBlock event) {
-        InteractionResult result = ModCommonEvents.onRightClickBlock(event.getEntity(), event.getLevel(), event.getHand(), event.getPos());
+        InteractionResult result = ModCommonEvents.onRightClickBlock(event.getEntity(), event.getLevel(), event.getHand(), event.getPos(), event.getFace());
         if (result != InteractionResult.PASS) {
             event.setCancellationResult(result);
             event.setCanceled(true);
@@ -84,7 +103,19 @@ public final class NeoForgeGameplayEvents {
     }
 
     private static void rightClickItem(PlayerInteractEvent.RightClickItem event) {
+        if (event.getEntity().isSpectator()) return;
+        var held = event.getEntity().getItemInHand(event.getHand());
+        boolean confetti = held.getItem() instanceof com.kingodogo.buildscape.item.ConfettiItem;
+        if (confetti && event.getEntity().getCooldowns().isOnCooldown(held)) {
+            event.setCancellationResult(InteractionResult.FAIL);
+            event.setCanceled(true);
+            return;
+        }
+        var cooldownStack = confetti ? held.copy() : null;
         InteractionResult result = ModCommonEvents.onRightClickItem(event.getEntity(), event.getLevel(), event.getHand());
+        if (confetti && result == InteractionResult.SUCCESS && !event.getLevel().isClientSide()) {
+            event.getEntity().getCooldowns().addCooldown(cooldownStack, 10);
+        }
         if (result != InteractionResult.PASS) {
             event.setCancellationResult(result);
             event.setCanceled(true);

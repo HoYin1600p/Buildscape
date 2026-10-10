@@ -21,7 +21,8 @@
     ]
   },
   "mixins": [
-    "buildscape.mixins.json"
+    "buildscape.mixins.json",
+    "buildscape-fabric.mixins.json"
   ],
   "depends": {
     "fabricloader": ">=0.19.5 <0.20",

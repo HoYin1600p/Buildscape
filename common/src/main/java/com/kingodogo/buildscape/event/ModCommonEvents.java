@@ -52,9 +52,26 @@ public final class ModCommonEvents {
     }
 
     public static InteractionResult onRightClickBlock(Player player, Level level, InteractionHand hand, BlockPos pos) {
+        return onRightClickBlock(player, level, hand, pos, null);
+    }
+
+    public static InteractionResult onRightClickBlock(Player player, Level level, InteractionHand hand, BlockPos pos, net.minecraft.core.Direction face) {
         if (player == null || level == null || pos == null) return InteractionResult.PASS;
+        InteractionResult bonemeal = BackportBonemealHandler.use(player, level, hand, pos, face);
+        if (bonemeal != InteractionResult.PASS) return bonemeal;
         BlockState state = level.getBlockState(pos);
         ItemStack held = player.getItemInHand(hand);
+        if (state.getBlock() instanceof com.kingodogo.buildscape.block.SmokeVentBlock vent
+                && Services.PLATFORM.getDyeColor(held) != null) {
+            InteractionResult result = vent.onInteract(level, pos, state, player, hand,
+                    new net.minecraft.world.phys.BlockHitResult(net.minecraft.world.phys.Vec3.atCenterOf(pos),
+                            face == null ? net.minecraft.core.Direction.UP : face, pos, false));
+            if (result == InteractionResult.SUCCESS && player instanceof ServerPlayer serverPlayer) {
+                AdvancementEvents.incrementStat(serverPlayer, "smoke_vents_dyed", 1);
+                AdvancementEvents.grant(serverPlayer, "colorful_smoke");
+            }
+            return result;
+        }
         InteractionResult signResult = SignFrameInteractionHandler.handleRightClick(player, level, hand, pos);
         if (signResult != InteractionResult.PASS) {
             return signResult;
@@ -136,6 +153,17 @@ public final class ModCommonEvents {
 
     public static void onLivingDeath(LivingEntity entity, DamageSource source) {
         FrostRoseDropHandler.onLivingDeath(entity, source);
+        Level level = Services.PLATFORM.getEntityLevel(entity);
+        if (!level.isClientSide()) {
+            BlockPos deathPos = entity.blockPosition();
+            for (BlockPos pos : BlockPos.betweenClosed(deathPos.offset(-8, -8, -8), deathPos.offset(8, 8, 8))) {
+                var id = Services.PLATFORM.getBlockId(level.getBlockState(pos).getBlock());
+                if (id != null && "buildscape".equals(id.getNamespace()) && "sculk_catalyst".equals(id.getPath())) {
+                    com.kingodogo.buildscape.block.SculkCatalystHandler.onMobKilledNearCatalyst(level, pos, deathPos, entity);
+                    break;
+                }
+            }
+        }
     }
 
     public static void onLivingUpdate(LivingEntity entity) {
@@ -149,7 +177,17 @@ public final class ModCommonEvents {
     }
 
     public static void onItemCrafted(Player player, ItemStack stack, net.minecraft.world.Container ingredients) {
-        onItemCrafted(player, stack);
+        onItemCrafted(player, stack, ingredients, stack.getCount());
+    }
+
+    public static void onItemCrafted(Player player, ItemStack stack, net.minecraft.world.Container ingredients, int count) {
+        if (player instanceof ServerPlayer serverPlayer) {
+            AdvancementMilestoneLogic.onItemCrafted(serverPlayer, stack, count);
+        }
+        prepareCraftedItem(player, stack, ingredients);
+    }
+
+    public static void prepareCraftedItem(Player player, ItemStack stack, net.minecraft.world.Container ingredients) {
         if (Services.PLATFORM.getEntityLevel(player).isClientSide()
                 || !stack.is(net.minecraft.world.item.Items.SUSPICIOUS_STEW)) return;
         net.minecraft.world.item.Item frostRose = Services.PLATFORM.getItem(
@@ -166,6 +204,23 @@ public final class ModCommonEvents {
     public static InteractionResult onRightClickItem(Player player, Level level, InteractionHand hand) {
         if (player == null || level == null) return InteractionResult.PASS;
         ItemStack held = player.getItemInHand(hand);
+        if (held.getItem() instanceof com.kingodogo.buildscape.item.ConfettiItem) {
+            if (!level.isClientSide()) {
+                var look = player.getViewVector(1.0F);
+                var start = player.getEyePosition().add(look.scale(.9D));
+                var data = Services.PLATFORM.getCustomData(held, false);
+                int burst = data == null ? 1 : Math.clamp(Services.PLATFORM.getTagInt(data, "BurstLevel", 1), 1, 5);
+                PacketFactory.sendToTracking(level, player.blockPosition(), new com.kingodogo.buildscape.network.ConfettiBurstPacket(
+                        start.x, start.y, start.z, (float) look.x, (float) look.y, (float) look.z, burst, level.getRandom().nextLong()));
+                level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.FIREWORK_ROCKET_BLAST,
+                        SoundSource.PLAYERS, .8F, 1.4F);
+                level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.FIREWORK_ROCKET_TWINKLE,
+                        SoundSource.PLAYERS, .6F, 1.6F);
+                if (player instanceof ServerPlayer serverPlayer) AdvancementEvents.onConfettiUsed(serverPlayer);
+                if (!player.getAbilities().instabuild) held.shrink(1);
+            }
+            return InteractionResult.SUCCESS;
+        }
         if (held.is(net.minecraft.world.item.Items.GLASS_BOTTLE)) {
             net.minecraft.world.phys.Vec3 eye = player.getEyePosition();
             net.minecraft.world.phys.Vec3 view = player.getViewVector(1.0F);
@@ -232,6 +287,7 @@ public final class ModCommonEvents {
     public static void onPlayerJoin(ServerPlayer player) {
         if (player == null) return;
         JOINED_PLAYERS.add(player.getUUID());
+        AdvancementEvents.checkFullCubeAdvancement(player);
         PillarIdManager manager = PillarIdManager.get();
         if (!manager.hasLoaded() && !manager.isLoadInProgress()) {
             manager.load();
@@ -307,7 +363,20 @@ public final class ModCommonEvents {
         JOINED_PLAYERS.remove(player.getUUID());
     }
 
+    public static void onPlayerChangedDimension(ServerPlayer player) {
+        long cooldown = Services.PLATFORM.getTagLong(Services.PLATFORM.getEntityData(player),
+                "WanderingHomemakerCooldownRealTime", 0L);
+        PacketFactory.sendToPlayer(player, new SyncHomemakerCooldownPacket(cooldown));
+    }
+
     public static InteractionResult onEntityInteract(Player player, Level level, InteractionHand hand, Entity target) {
+        if (player instanceof ServerPlayer serverPlayer) {
+            if (target instanceof com.kingodogo.buildscape.entity.FestiveWanderingHomemakerEntity) {
+                AdvancementEvents.grant(serverPlayer, "its_beginning_to_look_a_lot_like_christmas");
+            } else if (target instanceof com.kingodogo.buildscape.entity.WanderingHomemakerEntity) {
+                AdvancementEvents.grant(serverPlayer, "the_homemaker_cometh");
+            }
+        }
         InteractionResult frameResult = ItemFrameParticleHandler.onEntityInteract(player, level, hand, target);
         if (frameResult != InteractionResult.PASS) return frameResult;
 

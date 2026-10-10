@@ -76,6 +76,20 @@ public interface IMixinFactory {
 
     default void registerFixedRenderBuffers(Object renderBuffers) {}
 
+    default void renderCustomScreenTooltip(Object graphics, List<?> components, int mouseX, int mouseY, ItemStack hoverStack, Font font) {
+        if (graphics instanceof PoseStack pose) renderCustomScreenTooltip(null, pose, components, mouseX, mouseY, hoverStack, font, null, 0, 0);
+    }
+
+    default List<net.minecraft.network.chat.Component> prepareCustomTooltipText(ItemStack stack, List<net.minecraft.network.chat.Component> text) {
+        return text;
+    }
+
+    default Object createClientTooltipComponent(Object data) { return null; }
+
+    default boolean renderStatsEntry(Object stat, Object graphics, int left, int top, int width) {
+        return graphics instanceof PoseStack pose && renderStatsEntry(stat, pose, left, top, width);
+    }
+
     default ItemStack cycleAdvancementIcon(Object widget, Object displayInfo) {
         return ItemStack.EMPTY;
     }
@@ -117,6 +131,10 @@ public interface IMixinFactory {
     }
 
     default void handleFireworkStarterTick(Object starter) {}
+
+    default boolean renderCustomFireworkExplosion(Object starter, Object colors, Object fades, boolean trail, boolean flicker) {
+        return false;
+    }
 
     default void onModelBakeryPreload(Object bakery, Object resourceManager) {}
     default Object onModelBakeryLoadModel(Object location) { return null; }

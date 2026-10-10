@@ -31,8 +31,13 @@ public abstract class LightningBoltMixin {
         }
     }
 
-    @Inject(method = "clearCopperOnLightningStrike", at = @At("HEAD"))
+    /**
+     * The handler reproduces the vanilla cleaning (vanilla copper plus Buildscape copper), so it
+     * replaces the vanilla method instead of running before it; otherwise each strike cleans twice.
+     */
+    @Inject(method = "clearCopperOnLightningStrike", at = @At("HEAD"), cancellable = true)
     private static void buildscape$clearCopperOnLightningStrike(Level level, BlockPos pos, CallbackInfo ci) {
         CopperRodHandler.onLightningClearCopper(level, pos);
+        ci.cancel();
     }
 }

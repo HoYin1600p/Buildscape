@@ -10,8 +10,6 @@ import java.util.Set;
 
 @Mixin(PoiType.class)
 public interface PoiTypeAccessor {
-    @Accessor("matchingStates")
-    Set<BlockState> getMatchingStates();
 
     @Accessor("matchingStates")
     @Mutable

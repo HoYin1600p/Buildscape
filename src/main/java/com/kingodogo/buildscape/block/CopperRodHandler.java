@@ -45,17 +45,7 @@ public class CopperRodHandler {
             }
 
             ImmutableSet<BlockState> immutableStates = ImmutableSet.copyOf(newStates);
-            try {
-                ((PoiTypeAccessor) (Object) PoiType.LIGHTNING_ROD).setMatchingStates(immutableStates);
-            } catch (Throwable t) {
-                try {
-                    java.lang.reflect.Field field = net.minecraftforge.fml.util.ObfuscationReflectionHelper.findField(PoiType.class, "f_27325_");
-                    field.setAccessible(true);
-                    field.set(PoiType.LIGHTNING_ROD, immutableStates);
-                } catch (Throwable t2) {
-                    BuildScape.LOGGER.error("Failed to update PoiType.LIGHTNING_ROD matchingStates", t2);
-                }
-            }
+            ((PoiTypeAccessor) (Object) PoiType.LIGHTNING_ROD).setMatchingStates(immutableStates);
         } catch (Exception e) {
             BuildScape.LOGGER.error("Failed to register Copper Rods into PoiType.LIGHTNING_ROD", e);
         }

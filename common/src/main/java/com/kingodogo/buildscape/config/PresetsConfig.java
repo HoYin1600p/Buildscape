@@ -24,7 +24,7 @@ public class PresetsConfig {
     private static PresetsConfig INSTANCE;
 
     private File getConfigDir() {
-        String configPath = Paths.get("config", "buildscape", "pillar").toString();
+        String configPath = ConfigPaths.dir("buildscape", "pillar").toString();
         File dir = new File(configPath);
         if (!dir.exists())
             dir.mkdirs();

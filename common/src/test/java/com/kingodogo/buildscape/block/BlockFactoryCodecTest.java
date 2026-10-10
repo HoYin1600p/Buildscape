@@ -8,6 +8,9 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.LeavesBlock;
 import net.minecraft.world.level.block.TorchBlock;
 import net.minecraft.world.level.block.WallTorchBlock;
+import net.minecraft.core.MappedRegistry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -15,7 +18,24 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class BlockFactoryCodecTest {
     @BeforeAll
-    static void bootstrap() { TestBootstrap.initialize(); }
+    static void bootstrap() throws Exception {
+        TestBootstrap.initialize();
+        // Blocks create intrusive holders in their constructor; the frozen block registry must be reopened for that.
+        setField("unregisteredIntrusiveHolders", new java.util.IdentityHashMap<>());
+        setField("frozen", false);
+    }
+
+    @AfterAll
+    static void restoreRegistry() throws Exception {
+        setField("frozen", true);
+        setField("unregisteredIntrusiveHolders", null);
+    }
+
+    private static void setField(String name, Object value) throws Exception {
+        var field = MappedRegistry.class.getDeclaredField(name);
+        field.setAccessible(true);
+        field.set(BuiltInRegistries.BLOCK, value);
+    }
 
     @Test
     void leafVariantsEncodeUsingVanillaPropertiesField() {

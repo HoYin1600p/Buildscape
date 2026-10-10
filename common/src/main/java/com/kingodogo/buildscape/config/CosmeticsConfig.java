@@ -57,7 +57,7 @@ public class CosmeticsConfig {
     }
 
     private void migrateLegacyData() {
-        Path legacyConfigDir = Paths.get("config", BuildscapeCommon.MOD_ID);
+        Path legacyConfigDir = ConfigPaths.root().resolve(BuildscapeCommon.MOD_ID);
         File legacyJson = legacyConfigDir.resolve("equipped-cosmetics.json").toFile();
         File legacyDataDir = legacyConfigDir.toFile();
 

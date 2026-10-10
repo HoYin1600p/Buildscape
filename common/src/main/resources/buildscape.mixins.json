@@ -10,6 +10,7 @@
     "BaseCoralPlantTypeBlockMixin",
     "BeaconBlockEntityAccessor",
     "BeaconBlockEntityMixin",
+    "BlockEntityMigrationMixin",
     "BlockMixin",
     "BlockStateBaseMixin",
     "ChainBlockMixin",

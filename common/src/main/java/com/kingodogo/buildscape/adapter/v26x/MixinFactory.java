@@ -49,6 +49,22 @@ import java.util.function.Consumer;
 
 public class MixinFactory implements IMixinFactory {
 
+    @Override
+    public boolean loadRemovedBlockEntity(BlockPos pos, BlockState state, net.minecraft.nbt.CompoundTag tag,
+            Object lookup, Consumer<net.minecraft.world.level.block.entity.BlockEntity> result) {
+        var migration = RemovedBlockEntityData.prepare(state, tag);
+        if (migration == null) return false;
+        if (migration.tag() == null) {
+            RemovedBlockEntityData.logDropped(pos, state, tag);
+            result.accept(null);
+        } else {
+            // The rewritten vanilla ID makes the nested call bypass migration.
+            result.accept(net.minecraft.world.level.block.entity.BlockEntity.loadStatic(pos, state,
+                    migration.tag(), (net.minecraft.core.HolderLookup.Provider) lookup));
+        }
+        return true;
+    }
+
     private static final Set<String> OBSOLETE_118_MIXINS = Set.of(
             "com.kingodogo.buildscape.mixin.BuildscapeBlockModelMixin",
             "com.kingodogo.buildscape.mixin.BuildscapeBlockStateCacheMixin",

@@ -304,6 +304,10 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
         if (hasDecoration && hollowBe != null && hollowBe.getDecorationState().is(Blocks.FLOWER_POT)) {
             BlockState pottedState = getPottedBlockState(held.getItem());
             if (pottedState != null) {
+                if (pottedState.hasProperty(HazeBushBlock.HAS_HAZE)) {
+                    pottedState = pottedState.setValue(HazeBushBlock.HAS_HAZE,
+                            !com.kingodogo.buildscape.item.HazeBushItem.isDrained(held));
+                }
                 if (!level.isClientSide()) {
                     hollowBe.setDecorationState(pottedState);
                     hollowBe.setChanged();
@@ -406,6 +410,9 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
     private static List<ItemStack> getDecorationDrops(BlockState decState) {
         if (decState == null || decState.isAir()) return Collections.emptyList();
         if (decState.getBlock() instanceof FlowerPotBlock potBlock) {
+            if (potBlock instanceof PottedHazeBushBlock haze) {
+                return List.of(new ItemStack(Items.FLOWER_POT), haze.plantStack(decState));
+            }
             if (potBlock == Blocks.FLOWER_POT) {
                 return List.of(new ItemStack(Items.FLOWER_POT));
             } else {
@@ -465,6 +472,11 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
     }
 
     public static BlockState getPottedBlockState(Item item) {
+        if (item instanceof com.kingodogo.buildscape.item.HazeBushItem haze
+                && haze.getBlock() instanceof HazeBushBlock bush) {
+            Block pot = ModBlocks.get(ModBlocks.POTTED_COLORED_HAZE_BUSHES.get(bush.getColor()));
+            return pot == null ? null : pot.defaultBlockState();
+        }
         if (item == Items.POPPY) return Blocks.POTTED_POPPY.defaultBlockState();
         if (item == Items.DANDELION) return Blocks.POTTED_DANDELION.defaultBlockState();
         if (item == Items.BLUE_ORCHID) return Blocks.POTTED_BLUE_ORCHID.defaultBlockState();

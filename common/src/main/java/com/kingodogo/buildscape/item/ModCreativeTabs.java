@@ -49,6 +49,12 @@ public final class ModCreativeTabs {
         } catch (Exception e) {
             BuildscapeCommon.LOGGER.warn("Failed to read creative tab item list", e);
         }
+        List<String> haze = List.of("white", "light_gray", "gray", "black", "brown", "red", "orange", "yellow",
+                "lime", "green", "cyan", "light_blue", "blue", "purple", "magenta", "pink");
+        list.removeIf(id -> id.endsWith("_haze_bush") || id.equals("ice_crystal"));
+        int hazeIndex = list.indexOf("yellow_monets") + 1;
+        for (String color : haze) list.add(hazeIndex++, color + "_haze_bush");
+        list.add(list.indexOf("packed_icicle_block") + 1, "ice_crystal");
         return list;
     }
 }

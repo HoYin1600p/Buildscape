@@ -185,6 +185,69 @@ public class BlockFactory implements IBlockFactory {
     public Block createBlock(BlockDefinition def) {
         BlockBehaviour.Properties props = buildProperties(def);
 
+        if ("HazeBushBlock".equals(def.getBlockType())) {
+            var color = net.minecraft.world.item.DyeColor.byName(def.getId().replace("_haze_bush", ""), null);
+            return new com.kingodogo.buildscape.block.HazeBushBlock(color, props.noCollision().instabreak().sound(SoundType.GRASS)) {
+                @Override public net.minecraft.world.item.BlockItem createHazeItem(net.minecraft.world.item.Item.Properties properties) {
+                    return new HazeBushItem(this, properties);
+                }
+                @Override protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level,
+                        BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+                    var result = onInteract(state, level, pos, player, hand);
+                    return result != InteractionResult.PASS ? result : super.useItemOn(stack, state, level, pos, player, hand, hit);
+                }
+                @Override protected ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state, boolean includeData) {
+                    return cloneStack(state);
+                }
+                @Override protected java.util.List<ItemStack> getDrops(BlockState state, net.minecraft.world.level.storage.loot.LootParams.Builder builder) {
+                    var drops = super.getDrops(state, builder);
+                    if (!state.getValue(HAS_HAZE)) for (var drop : drops) {
+                        if (drop.is(asItem())) com.kingodogo.buildscape.item.HazeBushItem.markDrained(drop);
+                    }
+                    return drops;
+                }
+                @Override public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
+                    com.kingodogo.buildscape.adapter.v26x.client.HazeBushParticleHandler.animate(state, level, pos);
+                }
+                @Override public MapCodec<BushBlock> codec() { return codecForDefinition(def, BushBlock.class); }
+            };
+        }
+        if ("PottedHazeBushBlock".equals(def.getBlockType())) {
+            var color = net.minecraft.world.item.DyeColor.byName(def.getId().replace("potted_", "").replace("_haze_bush", ""), null);
+            var plant = com.kingodogo.buildscape.block.ModBlocks.get(com.kingodogo.buildscape.block.ModBlocks.COLORED_HAZE_BUSHES.get(color));
+            return new com.kingodogo.buildscape.block.PottedHazeBushBlock(color, plant, props) {
+                @Override protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level,
+                        BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+                    return onInteract(state, level, pos, player, hand);
+                }
+                @Override protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos,
+                        Player player, BlockHitResult hit) { return onInteract(state, level, pos, player, InteractionHand.MAIN_HAND); }
+                @Override protected ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state, boolean includeData) {
+                    return plantStack(state);
+                }
+                @Override protected java.util.List<ItemStack> getDrops(BlockState state, net.minecraft.world.level.storage.loot.LootParams.Builder builder) {
+                    var drops = super.getDrops(state, builder);
+                    if (!state.getValue(HAS_HAZE)) for (var drop : drops) {
+                        if (drop.is(getPlant().asItem())) com.kingodogo.buildscape.item.HazeBushItem.markDrained(drop);
+                    }
+                    return drops;
+                }
+                @Override public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
+                    com.kingodogo.buildscape.adapter.v26x.client.HazeBushParticleHandler.animate(state, level, pos);
+                }
+                @Override public MapCodec<net.minecraft.world.level.block.FlowerPotBlock> codec() {
+                    return codecForDefinition(def, net.minecraft.world.level.block.FlowerPotBlock.class);
+                }
+            };
+        }
+        if ("IceCrystalBlock".equals(def.getBlockType())) {
+            return new com.kingodogo.buildscape.block.IceCrystalBlock(props.sound(SoundType.AMETHYST_CLUSTER)) {
+                @Override public MapCodec<net.minecraft.world.level.block.AmethystClusterBlock> codec() {
+                    return codecForDefinition(def, net.minecraft.world.level.block.AmethystClusterBlock.class);
+                }
+            };
+        }
+
         if ("SaplingBlock".equals(def.getBlockType())) {
             return new net.minecraft.world.level.block.SaplingBlock(WorldGenFactory.saplingGrower(def.getId()),
                     props.noCollision().instabreak().sound(SoundType.GRASS).randomTicks()) {};
@@ -2096,11 +2159,28 @@ public class BlockFactory implements IBlockFactory {
         } else if (def.isPointedIcicle()) {
             return new PointedIcicleBlock(props) {
                 @Override
+                protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos,
+                        Player player, InteractionHand hand, BlockHitResult hit) {
+                    InteractionResult result = onInteract(state, level, pos, player, hand,
+                            stack.is(net.minecraft.tags.ItemTags.PICKAXES));
+                    return result != InteractionResult.PASS ? result
+                            : super.useItemOn(stack, state, level, pos, player, hand, hit);
+                }
+                @Override
+                protected void affectNeighborsAfterRemoval(BlockState state, ServerLevel level, BlockPos pos,
+                        boolean isMoving) {
+                    onIcicleRemove(state, level, pos, level.getBlockState(pos), isMoving);
+                    super.affectNeighborsAfterRemoval(state, level, pos, isMoving);
+                }
+                @Override
                 protected void tick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
                     onIcicleTick(state, level, pos);
                 }
                 @Override
                 protected BlockState updateShape(BlockState state, LevelReader level, ScheduledTickAccess tickAccess, BlockPos pos, Direction direction, BlockPos adjacentPos, BlockState adjacentState, RandomSource random) {
+                    if (state.getValue(WATERLOGGED)) {
+                        tickAccess.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
+                    }
                     return onUpdateShape(state, direction, adjacentState, level, pos, adjacentPos);
                 }
                 @Override

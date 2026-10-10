@@ -13,6 +13,7 @@
     "BlockEntityMigrationMixin",
     "BlockMixin",
     "BlockStateBaseMixin",
+    "BoneMealItemMixin",
     "ChainBlockMixin",
     "ComposterBlockMixin",
     "CoralBlockMixin",

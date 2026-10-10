@@ -20,6 +20,9 @@ public final class ItemFactory {
     private static BlockItem createBlockItem(com.kingodogo.buildscape.util.CommonId registryId, Block block, CommonItemProperties props) {
         String id = registryId.getPath();
         Item.Properties p = Services.PLATFORM.prepareBlockItemProperties(registryId, createProperties(props));
+        if (block instanceof com.kingodogo.buildscape.block.HazeBushBlock bush) {
+            return bush.createHazeItem(p);
+        }
         if ("muff_block".equals(id)) {
             return Services.PLATFORM.createMuffBlockItem(block, p);
         }

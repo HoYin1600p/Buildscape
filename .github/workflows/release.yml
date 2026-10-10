@@ -1,0 +1,181 @@
+name: Build and Release Jars
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Mod Version (e.g. 4.0.0)'
+        required: true
+        default: '4.0.0'
+      tag_name:
+        description: 'Git Tag (leave blank for v<version>)'
+        required: false
+        default: ''
+      replace_existing:
+        description: 'Replace existing tag and overwrite release jars if they already exist'
+        type: boolean
+        required: true
+        default: true
+      prerelease:
+        description: 'Mark as Pre-release'
+        type: boolean
+        required: false
+        default: false
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    name: Build & Release Jars
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Determine Version and Tag
+        id: vars
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            INPUT_VER="${{ inputs.version }}"
+            INPUT_TAG="${{ inputs.tag_name }}"
+            if [ -z "$INPUT_TAG" ]; then
+              TAG="v${INPUT_VER}"
+            else
+              TAG="$INPUT_TAG"
+            fi
+            MOD_VERSION="$INPUT_VER"
+            REPLACE="${{ inputs.replace_existing }}"
+          else
+            TAG="${{ github.ref_name }}"
+            # Strip leading 'v' if present for mod_version
+            MOD_VERSION="${TAG#v}"
+            REPLACE="true"
+          fi
+
+          echo "version=${MOD_VERSION}" >> $GITHUB_OUTPUT
+          echo "tag=${TAG}" >> $GITHUB_OUTPUT
+          echo "replace_existing=${REPLACE}" >> $GITHUB_OUTPUT
+          echo "Building mod version: $MOD_VERSION under tag: $TAG (replace_existing: $REPLACE)"
+
+      # Install Java versions for multi-cluster builds (17 for v118x, 21 for v121x, 25 for v26x)
+      - name: Set up Java 17 (v118x)
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Set up Java 21 (v121x)
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Set up Java 25 (v26x & Gradle Runner)
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '25'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Make Gradle Wrapper Executable
+        run: chmod +x ./gradlew
+
+      - name: Build Mod Jars
+        run: |
+          ./gradlew assemble -Pmod_version="${{ steps.vars.outputs.version }}" --console=plain
+
+      - name: Collect Output Jars
+        id: collect
+        run: |
+          mkdir -p release-jars
+
+          # Copy from root build/libs if collectModJars ran
+          if [ -d "build/libs" ] && compgen -G "build/libs/*.jar" > /dev/null; then
+            cp build/libs/*.jar release-jars/
+          fi
+
+          # Also collect from loader subprojects if present
+          find fabric neoforge forge -type f -path "*/build/libs/*.jar" \
+            ! -name "*-sources.jar" \
+            ! -name "*-javadoc.jar" \
+            ! -name "*-dev.jar" \
+            ! -name "*unmapped*.jar" \
+            -exec cp {} release-jars/ \; 2>/dev/null || true
+
+          echo "=== Jars collected for release ==="
+          ls -lh release-jars/
+
+          JAR_COUNT=$(ls -1 release-jars/*.jar 2>/dev/null | wc -l)
+          if [ "$JAR_COUNT" -eq 0 ]; then
+            echo "Error: No mod jars found to release!"
+            exit 1
+          fi
+          echo "Found $JAR_COUNT jar(s) to release."
+
+      - name: Update Tag and Publish Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG_NAME="${{ steps.vars.outputs.tag }}"
+          REPLACE_EXISTING="${{ steps.vars.outputs.replace_existing }}"
+
+          echo "Target tag: $TAG_NAME"
+
+          # 1. Update Git tag if triggered via workflow_dispatch
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+
+            if git rev-parse -q --verify "refs/tags/$TAG_NAME" >/dev/null || git ls-remote --tags origin "$TAG_NAME" | grep -q "$TAG_NAME"; then
+              if [ "$REPLACE_EXISTING" = "true" ]; then
+                echo "Tag '$TAG_NAME' exists. Updating tag to current commit..."
+                git tag -f "$TAG_NAME"
+                git push origin -f "$TAG_NAME"
+              else
+                echo "Tag '$TAG_NAME' already exists and replace_existing is false."
+              fi
+            else
+              echo "Creating tag '$TAG_NAME'..."
+              git tag "$TAG_NAME"
+              git push origin "$TAG_NAME"
+            fi
+          fi
+
+          # 2. Check if GitHub release already exists
+          if gh release view "$TAG_NAME" >/dev/null 2>&1; then
+            echo "Release '$TAG_NAME' already exists on GitHub."
+
+            # If an asset already exists (e.g. buildscape-neoforge-26.2-4.0.0.jar), delete it first to ensure clean replacement
+            for jar_path in release-jars/*.jar; do
+              [ -e "$jar_path" ] || continue
+              asset_name=$(basename "$jar_path")
+              echo "Purging old '$asset_name' from release if present..."
+              gh release delete-asset "$TAG_NAME" "$asset_name" --yes 2>/dev/null || true
+            done
+
+            # Upload the new jars into the release
+            echo "Uploading new jars to release '$TAG_NAME'..."
+            gh release upload "$TAG_NAME" release-jars/*.jar --clobber
+          else
+            echo "Creating new release '$TAG_NAME'..."
+            PRERELEASE_FLAG=""
+            if [ "${{ inputs.prerelease }}" = "true" ]; then
+              PRERELEASE_FLAG="--prerelease"
+            fi
+
+            gh release create "$TAG_NAME" release-jars/*.jar \
+              --title "Buildscape $TAG_NAME" \
+              --generate-notes \
+              $PRERELEASE_FLAG
+          fi
+
+          echo "=== Release completed successfully for $TAG_NAME ==="

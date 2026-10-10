@@ -15,11 +15,18 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.state.BlockState;
 
-/** Reference foliage colours for the resource-defined tinted hedge and layer models. */
+/** Reference foliage and water colours for resource-defined tinted block and item models. */
 public final class FoliageColors {
     private FoliageColors() {}
 
     private static BlockTintSource source(String path) {
+        if (path.equals("cascade_block") || path.equals("cascade_block_no_mist")) return new BlockTintSource() {
+            public int color(BlockState state) { return 0xFF3F76E4; }
+            public int colorInWorld(BlockState state, BlockAndTintGetter level, BlockPos pos) {
+                return level == null || pos == null ? color(state)
+                        : 0xFF000000 | BiomeColors.getAverageWaterColor(level, pos);
+            }
+        };
         if (path.equals("leaf_litter")) return new BlockTintSource() {
             public int color(BlockState state) { return 0xFF000000 | DryFoliageColor.getDefaultColor(); }
             public int colorInWorld(BlockState state, BlockAndTintGetter level, BlockPos pos) {

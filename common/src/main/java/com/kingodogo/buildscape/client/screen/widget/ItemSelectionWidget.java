@@ -1,0 +1,488 @@
+package com.kingodogo.buildscape.client.screen.widget;
+
+import com.kingodogo.buildscape.platform.Services;
+import com.kingodogo.buildscape.util.CommonId;
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Consumer;
+import java.util.function.ToIntFunction;
+import java.util.stream.Collectors;
+
+public class ItemSelectionWidget implements ICustomWidget {
+    private static final int ITEM_SIZE = 20;
+    private static final int ITEM_SPACING = 2;
+    private static final int SCROLLBAR_WIDTH = 10;
+    private static final int HORIZONTAL_MARGIN = 10;
+    private static final int MAX_ITEMS_PER_ROW = 16;
+    private static final int MAX_VISIBLE_ROWS = 16;
+    private int headerAreaHeight = 26;
+    private static final int GRID_PADDING_TOP = 5;
+
+    public int x;
+    public int y;
+    public int width;
+    public int height;
+    public boolean visible = true;
+    public boolean active = true;
+    private boolean focused = false;
+
+    private final Consumer<String> onItemSelected;
+    private final ToIntFunction<String> getItemState;
+    private final List<Item> allItems;
+    private List<Item> filteredItems;
+    private String filter = "";
+    private double scrollOffset = 0;
+    private int maxVisibleRows;
+    private int itemsPerRow;
+    private SortToggleButton.SortType sortMode = SortToggleButton.SortType.ALL_ITEMS;
+    private String currentModNamespace = "buildscape";
+    private final CustomScrollbarRenderer scrollbarRenderer = new CustomScrollbarRenderer();
+    private final Map<Item, ItemStack> itemStackCache = new HashMap<>();
+
+    public ItemSelectionWidget(int x, int y, int width, int height,
+            Consumer<String> onItemSelected,
+            ToIntFunction<String> getItemState) {
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
+        this.onItemSelected = onItemSelected;
+        this.getItemState = getItemState;
+
+        this.allItems = new ArrayList<>();
+        for (Item item : Services.PLATFORM.getAllItems()) {
+            this.allItems.add(item);
+        }
+        this.filteredItems = new ArrayList<>(allItems);
+
+        calculateLayout();
+    }
+
+    public int getX() { return x; }
+    public int getY() { return y; }
+    public int getWidth() { return width; }
+    public int getHeight() { return height; }
+    public void setPosition(int x, int y) { this.x = x; this.y = y; calculateLayout(); }
+
+    @Override
+    public boolean isFocused() { return focused; }
+
+    @Override
+    public void setFocused(boolean focused) { this.focused = focused; }
+
+    public boolean isMouseOver(double mouseX, double mouseY) {
+        return mouseX >= this.x && mouseX < this.x + this.width && mouseY >= this.y && mouseY < this.y + this.height;
+    }
+
+    public void setHeaderAreaHeight(int height) {
+        this.headerAreaHeight = height;
+        calculateLayout();
+    }
+
+    private void calculateLayout() {
+        if (width <= 0)
+            return;
+
+        int contentWidth = width - SCROLLBAR_WIDTH - 10;
+        itemsPerRow = Math.min(16, Math.max(1, contentWidth / (ITEM_SIZE + ITEM_SPACING)));
+        maxVisibleRows = (height - headerAreaHeight - GRID_PADDING_TOP - 10) / (ITEM_SIZE + ITEM_SPACING);
+
+        if (filteredItems != null) {
+            scrollOffset = Math.max(0, Math.min(scrollOffset, getMaxScroll()));
+        }
+    }
+
+    public void setWidth(int width) {
+        this.width = width;
+        calculateLayout();
+        refresh();
+    }
+
+    public void setHeight(int height) {
+        this.height = height;
+        calculateLayout();
+        refresh();
+    }
+
+    public void setFilter(String filter) {
+        this.filter = filter.toLowerCase();
+        refresh();
+    }
+
+    public void setSortMode(SortToggleButton.SortType sortMode) {
+        this.sortMode = sortMode;
+        refresh();
+    }
+
+    public void setModNamespace(String namespace) {
+        this.currentModNamespace = namespace;
+        if (sortMode == SortToggleButton.SortType.MOD_ONLY) {
+            refresh();
+        }
+    }
+
+    public String getCurrentModNamespace() {
+        return currentModNamespace;
+    }
+
+    public SortToggleButton.SortType getSortMode() {
+        return sortMode;
+    }
+
+    public void refresh() {
+        List<Item> itemsToFilter = allItems;
+
+        switch (sortMode) {
+            case INVENTORY:
+                itemsToFilter = getInventoryItems();
+                break;
+            case MOD_ONLY:
+                itemsToFilter = allItems.stream()
+                        .filter(item -> {
+                            CommonId itemId = Services.PLATFORM.getItemId(item);
+                            return itemId != null && itemId.getNamespace().equals(currentModNamespace);
+                        })
+                        .collect(Collectors.toList());
+                break;
+            case ALL_ITEMS:
+            default:
+                itemsToFilter = allItems;
+                break;
+        }
+
+        if (filter.isEmpty()) {
+            filteredItems = new ArrayList<>(itemsToFilter);
+        } else {
+            filteredItems = itemsToFilter.stream()
+                    .filter(item -> {
+                        CommonId itemId = Services.PLATFORM.getItemId(item);
+                        String idStr = itemId != null ? itemId.toString().toLowerCase() : "";
+                        String itemName = item.getName(item.getDefaultInstance()).getString().toLowerCase();
+                        return idStr.contains(filter) || itemName.contains(filter);
+                    })
+                    .collect(Collectors.toList());
+        }
+        calculateLayout();
+    }
+
+    private List<Item> getInventoryItems() {
+        Set<Item> inventoryItems = new HashSet<>();
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.player != null) {
+            Inventory inventory = mc.player.getInventory();
+            for (int i = 0; i < inventory.getContainerSize(); i++) {
+                ItemStack stack = inventory.getItem(i);
+                if (!stack.isEmpty()) {
+                    inventoryItems.add(stack.getItem());
+                }
+            }
+        }
+        return new ArrayList<>(inventoryItems);
+    }
+
+    private double getMaxScroll() {
+        if (filteredItems == null || filteredItems.isEmpty() || itemsPerRow <= 0)
+            return 0;
+
+        int totalRows = (int) Math.ceil((double) filteredItems.size() / itemsPerRow);
+        int visibleHeight = height - headerAreaHeight - GRID_PADDING_TOP - 10;
+        int contentHeight = totalRows * (ITEM_SIZE + ITEM_SPACING);
+        return Math.max(0, contentHeight - visibleHeight);
+    }
+
+    @Override
+    public void render(Object poseStackOrGraphics, int mouseX, int mouseY, float partialTick) {
+        calculateLayout();
+
+        Services.PLATFORM.pushGuiPose(poseStackOrGraphics);
+        Minecraft mc = Minecraft.getInstance();
+        double guiScale = mc.getWindow().getGuiScale();
+        int windowHeight = mc.getWindow().getHeight();
+
+        int scissorX = (int) (x * guiScale);
+        int bottomMargin = 10;
+        int scissorY = (int) (windowHeight - (y + height) * guiScale + bottomMargin * guiScale);
+        int scissorWidth = (int) ((width - 21) * guiScale);
+
+        int scissorHeight = (int) ((height - headerAreaHeight - 1 - bottomMargin) * guiScale);
+
+        if (scissorHeight > 0 && scissorWidth > 0) {
+            Services.PLATFORM.enableScissor(poseStackOrGraphics, scissorX, scissorY, scissorWidth, scissorHeight);
+        }
+
+        int totalRows = (int) Math.ceil((double) filteredItems.size() / itemsPerRow);
+        int startRow = (int) Math.floor(scrollOffset / (ITEM_SIZE + ITEM_SPACING));
+        int endRow = Math.min(startRow + maxVisibleRows + 2, totalRows);
+
+        double pixelOffsetInRow = scrollOffset % (ITEM_SIZE + ITEM_SPACING);
+        int itemY = y + headerAreaHeight + GRID_PADDING_TOP - (int) pixelOffsetInRow;
+
+        for (int row = startRow; row < endRow; row++) {
+            int rowY = itemY + (row - startRow) * (ITEM_SIZE + ITEM_SPACING);
+
+            if (rowY + ITEM_SIZE < y + headerAreaHeight || rowY > y + height - bottomMargin) {
+                continue;
+            }
+
+            int totalRowWidth = itemsPerRow * (ITEM_SIZE + ITEM_SPACING) - ITEM_SPACING;
+            int availableAreaWidth = width - 21;
+            int startXOffset = Math.max(0, (availableAreaWidth - totalRowWidth) / 2);
+
+            for (int col = 0; col < itemsPerRow; col++) {
+                int index = row * itemsPerRow + col;
+                if (index >= filteredItems.size())
+                    break;
+
+                Item item = filteredItems.get(index);
+                int itemX = x + 5 + startXOffset + col * (ITEM_SIZE + ITEM_SPACING);
+
+                if (itemX + ITEM_SIZE < x || itemX > x + width) {
+                    continue;
+                }
+
+                boolean isHovered = mouseX >= itemX && mouseX < itemX + ITEM_SIZE &&
+                        mouseY >= rowY && mouseY < rowY + ITEM_SIZE &&
+                        mouseX >= x && mouseX < x + width &&
+                        mouseY >= y + headerAreaHeight + 1 && mouseY < y + height - bottomMargin;
+
+                CommonId itemId = Services.PLATFORM.getItemId(item);
+                String itemIdStr = itemId != null ? itemId.toString() : "";
+                int state = getItemState.applyAsInt(itemIdStr);
+
+                int bgColor;
+                if (state == 1) {
+                    bgColor = isHovered ? 0x6000FF00 : 0x4000FF00;
+                } else if (state == 2) {
+                    bgColor = isHovered ? 0x60FF0000 : 0x40FF0000;
+                } else {
+                    bgColor = isHovered ? 0x40CCCCCC : 0x33CCCCCC;
+                }
+                Services.PLATFORM.fill(poseStackOrGraphics, itemX, rowY, itemX + ITEM_SIZE, rowY + ITEM_SIZE, bgColor);
+
+                if (state != 0) {
+                    int panelBorderColor = (state == 1) ? 0xFF00FF00 : 0xFFFF0000;
+                    Services.PLATFORM.fill(poseStackOrGraphics, itemX - 1, rowY - 1, itemX + ITEM_SIZE + 1, rowY, panelBorderColor);
+                    Services.PLATFORM.fill(poseStackOrGraphics, itemX - 1, rowY + ITEM_SIZE, itemX + ITEM_SIZE + 1, rowY + ITEM_SIZE + 1,
+                            panelBorderColor);
+                    Services.PLATFORM.fill(poseStackOrGraphics, itemX - 1, rowY - 1, itemX, rowY + ITEM_SIZE + 1, panelBorderColor);
+                    Services.PLATFORM.fill(poseStackOrGraphics, itemX + ITEM_SIZE, rowY - 1, itemX + ITEM_SIZE + 1, rowY + ITEM_SIZE + 1,
+                            panelBorderColor);
+                }
+
+                Services.PLATFORM.pushGuiPose(poseStackOrGraphics);
+                Services.PLATFORM.translateGuiPose(poseStackOrGraphics, 0, 0, 100);
+                ItemStack stack = itemStackCache.computeIfAbsent(item, ItemStack::new);
+                Services.PLATFORM.renderGuiItem(poseStackOrGraphics, stack, itemX + 2, rowY + 2);
+                Services.PLATFORM.renderGuiItemDecorations(poseStackOrGraphics, mc.font, stack, itemX + 2, rowY + 2);
+                Services.PLATFORM.popGuiPose(poseStackOrGraphics);
+            }
+        }
+
+        if (scissorHeight > 0 && scissorWidth > 0) {
+            Services.PLATFORM.disableScissor(poseStackOrGraphics);
+        }
+        Services.PLATFORM.popGuiPose(poseStackOrGraphics);
+
+        int borderColor = 0xFF666666;
+        Services.PLATFORM.fill(poseStackOrGraphics, x, y, x + width, y + 1, borderColor);
+        Services.PLATFORM.fill(poseStackOrGraphics, x, y + height - 1, x + width, y + height, borderColor);
+        Services.PLATFORM.fill(poseStackOrGraphics, x, y, x + 1, y + height, borderColor);
+        Services.PLATFORM.fill(poseStackOrGraphics, x + width - 1, y, x + width, y + height, borderColor);
+        Services.PLATFORM.fill(poseStackOrGraphics, x, y + headerAreaHeight + 1, x + width, y + headerAreaHeight + 2, borderColor);
+
+        if (getMaxScroll() > 0) {
+            int scrollbarX = x + width - CustomScrollbarRenderer.getScrollbarWidth() - 4;
+            int scrollbarY = y + headerAreaHeight + GRID_PADDING_TOP;
+            bottomMargin = 10;
+            int scrollbarHeight = height - headerAreaHeight - GRID_PADDING_TOP - bottomMargin;
+
+            double visibleRatio = maxVisibleRows * itemsPerRow / (double) filteredItems.size();
+            scrollbarRenderer.renderScrollbar(poseStackOrGraphics, scrollbarX, scrollbarY, scrollbarHeight,
+                    scrollOffset, getMaxScroll(), visibleRatio);
+        }
+    }
+
+    public void renderTooltip(Object poseStackOrGraphics, int mouseX, int mouseY) {
+        if (mouseX < x || mouseX >= x + width || mouseY < y || mouseY >= y + height) {
+            return;
+        }
+
+        int totalRows = (int) Math.ceil((double) filteredItems.size() / itemsPerRow);
+        int startRow = (int) Math.floor(scrollOffset / (ITEM_SIZE + ITEM_SPACING));
+        int endRow = Math.min(startRow + maxVisibleRows + 2, totalRows);
+
+        double pixelOffsetInRow = scrollOffset % (ITEM_SIZE + ITEM_SPACING);
+        int itemY = y + headerAreaHeight + GRID_PADDING_TOP - (int) pixelOffsetInRow;
+        Item hoveredItem = null;
+
+        for (int row = startRow; row < endRow; row++) {
+            int rowY = itemY + (row - startRow) * (ITEM_SIZE + ITEM_SPACING);
+
+            if (rowY + ITEM_SIZE < y + headerAreaHeight + GRID_PADDING_TOP || rowY > y + height) {
+                continue;
+            }
+
+            int totalRowWidth = itemsPerRow * (ITEM_SIZE + ITEM_SPACING) - ITEM_SPACING;
+            int availableAreaWidth = width - 21;
+            int startXOffset = Math.max(0, (availableAreaWidth - totalRowWidth) / 2);
+
+            for (int col = 0; col < itemsPerRow; col++) {
+                int index = row * itemsPerRow + col;
+                if (index >= filteredItems.size())
+                    break;
+
+                Item item = filteredItems.get(index);
+                int itemX = x + 5 + startXOffset + col * (ITEM_SIZE + ITEM_SPACING);
+
+                if (itemX + ITEM_SIZE < x || itemX > x + width) {
+                    continue;
+                }
+
+                boolean isHovered = mouseX >= itemX && mouseX < itemX + ITEM_SIZE &&
+                        mouseY >= rowY && mouseY < rowY + ITEM_SIZE &&
+                        mouseX >= x && mouseX < x + width &&
+                        mouseY >= y + headerAreaHeight && mouseY < y + height;
+                if (isHovered) {
+                    hoveredItem = item;
+                }
+            }
+        }
+
+        if (hoveredItem != null) {
+            ItemStack stack = new ItemStack(hoveredItem);
+            Minecraft mc = Minecraft.getInstance();
+            List<Component> tooltipLines = Services.PLATFORM.getTooltipFromItem(stack);
+            Services.PLATFORM.renderComponentTooltip(poseStackOrGraphics, mc.font, tooltipLines, mouseX, mouseY);
+        }
+    }
+
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if (!isMouseOver(mouseX, mouseY) || mouseY < y + headerAreaHeight + GRID_PADDING_TOP) {
+            return false;
+        }
+
+        double maxScroll = getMaxScroll();
+        if (maxScroll > 0) {
+            int scrollbarX = x + width - CustomScrollbarRenderer.getScrollbarWidth() - 4;
+            int scrollbarY = y + headerAreaHeight + GRID_PADDING_TOP;
+            int bottomMargin = 10;
+            int scrollbarHeight = height - headerAreaHeight - GRID_PADDING_TOP - bottomMargin;
+
+            int contentX = x + 5;
+            int contentY = y + headerAreaHeight + GRID_PADDING_TOP;
+            int contentWidth = width - 21;
+            int contentHeight = scrollbarHeight;
+
+            double visibleRatio = maxVisibleRows * itemsPerRow / (double) filteredItems.size();
+            double newOffset = scrollbarRenderer.handleMouseClick(mouseX, mouseY, button,
+                    scrollbarX, scrollbarY, scrollbarHeight,
+                    contentX, contentY, contentWidth, contentHeight,
+                    scrollOffset, maxScroll, visibleRatio);
+
+            if (newOffset >= 0) {
+                scrollOffset = newOffset;
+                return true;
+            }
+        }
+
+        int totalRows = (int) Math.ceil((double) filteredItems.size() / itemsPerRow);
+        int startRow = (int) Math.floor(scrollOffset / (ITEM_SIZE + ITEM_SPACING));
+        int endRow = Math.min(startRow + maxVisibleRows + 2, totalRows);
+
+        double pixelOffsetInRow = scrollOffset % (ITEM_SIZE + ITEM_SPACING);
+        int itemY = y + headerAreaHeight + GRID_PADDING_TOP - (int) pixelOffsetInRow;
+
+        for (int row = startRow; row < endRow; row++) {
+            int rowY = itemY + (row - startRow) * (ITEM_SIZE + ITEM_SPACING);
+
+            if (rowY + ITEM_SIZE < y + headerAreaHeight + GRID_PADDING_TOP || rowY > y + height) {
+                continue;
+            }
+
+            int totalRowWidth = itemsPerRow * (ITEM_SIZE + ITEM_SPACING) - ITEM_SPACING;
+            int availableAreaWidth = width - 21;
+            int startXOffset = Math.max(0, (availableAreaWidth - totalRowWidth) / 2);
+
+            for (int col = 0; col < itemsPerRow; col++) {
+                int index = row * itemsPerRow + col;
+                if (index >= filteredItems.size())
+                    break;
+
+                int itemX = x + 5 + startXOffset + col * (ITEM_SIZE + ITEM_SPACING);
+
+                if (itemX + ITEM_SIZE < x || itemX > x + width) {
+                    continue;
+                }
+
+                if (mouseX >= itemX && mouseX < itemX + ITEM_SIZE &&
+                        mouseY >= rowY && mouseY < rowY + ITEM_SIZE &&
+                        mouseX >= x && mouseX < x + width &&
+                        mouseY >= y + headerAreaHeight + GRID_PADDING_TOP && mouseY < y + height) {
+                    Item item = filteredItems.get(index);
+                    CommonId itemId = Services.PLATFORM.getItemId(item);
+                    onItemSelected.accept(itemId != null ? itemId.toString() : "");
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double delta) {
+        if (!isMouseOver(mouseX, mouseY)) {
+            return false;
+        }
+
+        double step = (ITEM_SIZE + ITEM_SPACING);
+        scrollOffset = Math.max(0, Math.min(getMaxScroll(), scrollOffset - delta * step));
+        return true;
+    }
+
+    @Override
+    public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
+        if (scrollbarRenderer.isDragging() && button == 0) {
+            double maxScroll = getMaxScroll();
+            if (maxScroll > 0) {
+                int scrollbarY = y + headerAreaHeight + GRID_PADDING_TOP;
+                int bottomMargin = 10;
+                int scrollbarHeight = height - headerAreaHeight - GRID_PADDING_TOP - bottomMargin;
+                double visibleRatio = maxVisibleRows * itemsPerRow / (double) filteredItems.size();
+
+                double newOffset = scrollbarRenderer.handleMouseDrag(mouseY, scrollbarY, scrollbarHeight,
+                        maxScroll, visibleRatio, 1.0);
+
+                if (newOffset >= 0) {
+                    scrollOffset = newOffset;
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public boolean mouseReleased(double mouseX, double mouseY, int button) {
+        return scrollbarRenderer.handleMouseRelease(button);
+    }
+
+    @Override
+    public boolean charTyped(char codePoint, int modifiers) {
+        return false;
+    }
+}

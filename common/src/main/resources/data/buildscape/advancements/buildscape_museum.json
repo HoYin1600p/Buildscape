@@ -1,0 +1,30 @@
+{
+  "display": {
+    "icon": {
+      "item": "buildscape:ashenking_netherite_pillar"
+    },
+    "title": {
+      "translate": "advancements.buildscape.buildscape_museum.title"
+    },
+    "description": {
+      "translate": "advancements.buildscape.buildscape_museum.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "parent": "buildscape:art_collector",
+  "rewards": {
+    "items": [
+      {
+        "item": "buildscape:ashenking_netherite_pillar"
+      }
+    ]
+  },
+  "criteria": {
+    "custom": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

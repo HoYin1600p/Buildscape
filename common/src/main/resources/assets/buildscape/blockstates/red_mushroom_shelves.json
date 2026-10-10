@@ -1,0 +1,20 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "buildscape:block/red_mushroom_shelves",
+      "y": 180
+    },
+    "facing=south": {
+      "model": "buildscape:block/red_mushroom_shelves"
+    },
+    "facing=west": {
+      "model": "buildscape:block/red_mushroom_shelves",
+      "y": 90
+    },
+    "facing=east": {
+      "model": "buildscape:block/red_mushroom_shelves",
+      "y": 270
+    }
+  }
+}
+

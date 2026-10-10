@@ -1,0 +1,396 @@
+package com.kingodogo.buildscape.config;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.kingodogo.buildscape.BuildscapeCommon;
+import com.kingodogo.buildscape.platform.Services;
+import net.minecraft.nbt.CompoundTag;
+
+import java.io.File;
+import java.io.FileReader;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
+public class CosmeticsConfig {
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+    private static CosmeticsConfig INSTANCE;
+
+    private final Map<String, Map<Integer, String>> playerCosmetics = new HashMap<>();
+    private final Map<String, Map<String, String>> playerCosmeticColors = new HashMap<>();
+    private final Map<String, Boolean> playerCreativeTreeBreaker = new HashMap<>();
+    private final Map<String, Boolean> playerShulkerPreview = new HashMap<>();
+
+    private Integer colorPickerX = null;
+    private Integer colorPickerY = null;
+
+    private CosmeticsConfig() {
+        File dataDir = getDataDir();
+        if (!dataDir.exists()) dataDir.mkdirs();
+
+        migrateLegacyData();
+        loadGlobalSettings();
+    }
+
+    public static CosmeticsConfig get() {
+        if (INSTANCE == null) {
+            INSTANCE = new CosmeticsConfig();
+        }
+        return INSTANCE;
+    }
+
+    private File getDataDir() {
+        return Paths.get("buildscape", "data").toFile();
+    }
+
+    private File getPlayerFile(UUID playerUuid) {
+        String fileName = (playerUuid != null ? playerUuid.toString() : "global") + "-cosmetic.dat";
+        return new File(getDataDir(), fileName);
+    }
+
+    private File getGlobalSettingsFile() {
+        return new File(getDataDir(), "global-settings.dat");
+    }
+
+    private void migrateLegacyData() {
+        Path legacyConfigDir = Paths.get("config", BuildscapeCommon.MOD_ID);
+        File legacyJson = legacyConfigDir.resolve("equipped-cosmetics.json").toFile();
+        File legacyDataDir = legacyConfigDir.toFile();
+
+        if (legacyDataDir.exists() && legacyDataDir.isDirectory()) {
+            File[] files = legacyDataDir.listFiles((dir, name) -> name.endsWith(".dat"));
+            if (files != null) {
+                for (File oldFile : files) {
+                    try {
+                        File newFile = new File(getDataDir(), oldFile.getName());
+                        if (!newFile.exists()) {
+                            Files.move(oldFile.toPath(), newFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                        } else {
+                            oldFile.delete();
+                        }
+                    } catch (Exception e) {
+                        BuildscapeCommon.logError("CosmeticsConfig: Failed to relocate " + oldFile.getName(), e);
+                    }
+                }
+            }
+        }
+
+        if (legacyJson.exists()) {
+            boolean loadedSuccessfully = false;
+            try (FileReader reader = new FileReader(legacyJson)) {
+                @SuppressWarnings("unchecked")
+                Map<String, Object> loaded = GSON.fromJson(reader, Map.class);
+                if (loaded != null) {
+                    processLegacyJsonMap(loaded);
+                }
+                loadedSuccessfully = true;
+            } catch (Exception ignored) {
+            }
+
+            if (loadedSuccessfully) {
+                Path legacyPath = legacyJson.toPath();
+                Path backupPath = legacyPath.resolveSibling(legacyJson.getName() + ".bak");
+                try {
+                    Files.move(legacyPath, backupPath, StandardCopyOption.REPLACE_EXISTING);
+                } catch (Exception e) {
+                    legacyJson.delete();
+                }
+            }
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private void processLegacyJsonMap(Map<String, Object> loaded) {
+        for (Map.Entry<String, Object> entry : loaded.entrySet()) {
+            String key = entry.getKey();
+            Object val = entry.getValue();
+
+            if (key.equals("global_settings")) {
+                if (val instanceof Map) {
+                    Map<String, Object> globalData = (Map<String, Object>) val;
+                    if (globalData.containsKey("colorPickerX") && globalData.get("colorPickerX") instanceof Number)
+                        colorPickerX = ((Number) globalData.get("colorPickerX")).intValue();
+                    if (globalData.containsKey("colorPickerY") && globalData.get("colorPickerY") instanceof Number)
+                        colorPickerY = ((Number) globalData.get("colorPickerY")).intValue();
+                }
+                continue;
+            }
+
+            UUID uuid = null;
+            if (!key.equals("global")) {
+                try { uuid = UUID.fromString(key); } catch (Exception ignored) {}
+            }
+
+            Map<Integer, String> cosmetics = new HashMap<>();
+            Map<String, String> colors = new HashMap<>();
+
+            if (val instanceof Map) {
+                Map<String, Object> playerData = (Map<String, Object>) val;
+
+                Object cosObj = playerData.get("cosmetics");
+                if (cosObj instanceof Map) {
+                    for (Map.Entry<String, Object> cosEntry : ((Map<String, Object>) cosObj).entrySet()) {
+                        try {
+                            int slot = Integer.parseInt(cosEntry.getKey());
+                            if (cosEntry.getValue() instanceof String) cosmetics.put(slot, (String) cosEntry.getValue());
+                        } catch (Exception ignored) {}
+                    }
+                }
+
+                Object colObj = playerData.get("colors");
+                if (colObj instanceof Map) {
+                    for (Map.Entry<String, Object> colEntry : ((Map<String, Object>) colObj).entrySet()) {
+                        if (colEntry.getValue() instanceof String) colors.put(colEntry.getKey(), (String) colEntry.getValue());
+                    }
+                }
+            }
+
+            playerCosmetics.put(key, cosmetics);
+            playerCosmeticColors.put(key, colors);
+            savePlayer(uuid);
+        }
+        saveGlobalSettings();
+    }
+
+    private void loadPlayer(UUID playerUuid) {
+        File file = getPlayerFile(playerUuid);
+        String uuidStr = playerUuid != null ? playerUuid.toString() : "global";
+
+        if (!file.exists()) {
+            playerCosmetics.putIfAbsent(uuidStr, null);
+            playerCosmeticColors.putIfAbsent(uuidStr, null);
+            playerCreativeTreeBreaker.putIfAbsent(uuidStr, false);
+            playerShulkerPreview.putIfAbsent(uuidStr, true);
+            return;
+        }
+
+        try {
+            CompoundTag nbt = Services.PLATFORM.readCompressedTag(file);
+            if (nbt != null) {
+                if (playerUuid != null && Services.PLATFORM.hasTagUUID(nbt, "player_uuid")) {
+                    UUID storedUuid = Services.PLATFORM.getTagUUID(nbt, "player_uuid");
+                    if (!storedUuid.equals(playerUuid)) {
+                        BuildscapeCommon.logError("CosmeticsConfig: SECURITY MISMATCH for " + file.getName());
+                        playerCosmetics.putIfAbsent(uuidStr, null);
+                        playerCosmeticColors.putIfAbsent(uuidStr, null);
+                        playerCreativeTreeBreaker.putIfAbsent(uuidStr, false);
+                        playerShulkerPreview.putIfAbsent(uuidStr, true);
+                        return;
+                    }
+                }
+
+                Map<Integer, String> cosmetics = new HashMap<>();
+                CompoundTag equipped = Services.PLATFORM.getTagCompound(nbt, "equipped_cosmetics");
+                if (equipped != null) {
+                    for (String key : Services.PLATFORM.getTagKeys(equipped)) {
+                        try {
+                            cosmetics.put(Integer.parseInt(key), Services.PLATFORM.getTagString(equipped, key, ""));
+                        } catch (Exception ignored) {}
+                    }
+                }
+                playerCosmetics.put(uuidStr, cosmetics);
+
+                Map<String, String> colors = new HashMap<>();
+                CompoundTag colorsTag = Services.PLATFORM.getTagCompound(nbt, "cosmetic_colors");
+                if (colorsTag != null) {
+                    for (String key : Services.PLATFORM.getTagKeys(colorsTag)) {
+                        colors.put(key, Services.PLATFORM.getTagString(colorsTag, key, ""));
+                    }
+                }
+                playerCosmeticColors.put(uuidStr, colors);
+
+                if (nbt.contains("creative_tree_breaker")) {
+                    playerCreativeTreeBreaker.put(uuidStr, Services.PLATFORM.getTagBoolean(nbt, "creative_tree_breaker", false));
+                } else {
+                    playerCreativeTreeBreaker.put(uuidStr, false);
+                }
+
+                if (nbt.contains("shulker_preview")) {
+                    playerShulkerPreview.put(uuidStr, Services.PLATFORM.getTagBoolean(nbt, "shulker_preview", true));
+                } else {
+                    playerShulkerPreview.put(uuidStr, true);
+                }
+            }
+        } catch (Exception e) {
+            BuildscapeCommon.logError("CosmeticsConfig: Failed to read data for " + uuidStr, e);
+            playerCosmetics.putIfAbsent(uuidStr, null);
+            playerCosmeticColors.putIfAbsent(uuidStr, null);
+            playerCreativeTreeBreaker.putIfAbsent(uuidStr, false);
+            playerShulkerPreview.putIfAbsent(uuidStr, true);
+        }
+    }
+
+    private void savePlayer(UUID playerUuid) {
+        File file = getPlayerFile(playerUuid);
+        String uuidStr = playerUuid != null ? playerUuid.toString() : "global";
+
+        Map<Integer, String> cosmetics = playerCosmetics.get(uuidStr);
+        Map<String, String> colors = playerCosmeticColors.get(uuidStr);
+
+        CompoundTag nbt = new CompoundTag();
+        if (playerUuid != null) {
+            Services.PLATFORM.putTagUUID(nbt, "player_uuid", playerUuid);
+        }
+
+        CompoundTag equippedTag = new CompoundTag();
+        if (cosmetics != null) {
+            for (Map.Entry<Integer, String> entry : cosmetics.entrySet()) {
+                equippedTag.putString(entry.getKey().toString(), entry.getValue());
+            }
+        }
+        nbt.put("equipped_cosmetics", equippedTag);
+
+        CompoundTag colorsTag = new CompoundTag();
+        if (colors != null) {
+            for (Map.Entry<String, String> entry : colors.entrySet()) {
+                colorsTag.putString(entry.getKey(), entry.getValue());
+            }
+        }
+        nbt.put("cosmetic_colors", colorsTag);
+
+        Boolean treeBreaker = playerCreativeTreeBreaker.get(uuidStr);
+        if (treeBreaker != null) {
+            nbt.putBoolean("creative_tree_breaker", treeBreaker);
+        }
+
+        Boolean shulkerPreview = playerShulkerPreview.get(uuidStr);
+        if (shulkerPreview != null) {
+            nbt.putBoolean("shulker_preview", shulkerPreview);
+        }
+
+        try {
+            Services.PLATFORM.writeCompressedTag(file, nbt);
+        } catch (Exception e) {
+            BuildscapeCommon.logError("CosmeticsConfig: Failed to write data for " + uuidStr, e);
+        }
+    }
+
+    private void loadGlobalSettings() {
+        File file = getGlobalSettingsFile();
+        if (file.exists()) {
+            try {
+                CompoundTag nbt = Services.PLATFORM.readCompressedTag(file);
+                if (nbt != null) {
+                    if (nbt.contains("colorPickerX")) colorPickerX = Services.PLATFORM.getTagInt(nbt, "colorPickerX", 0);
+                    if (nbt.contains("colorPickerY")) colorPickerY = Services.PLATFORM.getTagInt(nbt, "colorPickerY", 0);
+                }
+            } catch (Exception ignored) {}
+        }
+    }
+
+    private void saveGlobalSettings() {
+        File file = getGlobalSettingsFile();
+        CompoundTag nbt = new CompoundTag();
+        if (colorPickerX != null) nbt.putInt("colorPickerX", colorPickerX);
+        if (colorPickerY != null) nbt.putInt("colorPickerY", colorPickerY);
+
+        try {
+            Services.PLATFORM.writeCompressedTag(file, nbt);
+        } catch (Exception ignored) {}
+    }
+
+    public Map<Integer, String> getEquippedCosmetics(UUID playerUuid) {
+        String uuidStr = playerUuid != null ? playerUuid.toString() : "global";
+        if (!playerCosmetics.containsKey(uuidStr)) loadPlayer(playerUuid);
+        Map<Integer, String> cosmetics = playerCosmetics.get(uuidStr);
+        return cosmetics != null ? new HashMap<>(cosmetics) : new HashMap<>();
+    }
+
+    public void setEquippedCosmetics(UUID playerUuid, Map<Integer, String> cosmeticsBySlot) {
+        String uuidStr = playerUuid != null ? playerUuid.toString() : "global";
+        playerCosmetics.put(uuidStr, new HashMap<>(cosmeticsBySlot));
+        savePlayer(playerUuid);
+    }
+
+    public void equipCosmetic(UUID playerUuid, int slotIndex, String cosmeticId) {
+        String uuidStr = playerUuid != null ? playerUuid.toString() : "global";
+        if (!playerCosmetics.containsKey(uuidStr)) loadPlayer(playerUuid);
+
+        updateMap(playerCosmetics.computeIfAbsent(uuidStr, k -> new HashMap<>()), slotIndex, cosmeticId);
+        savePlayer(playerUuid);
+    }
+
+    private void updateMap(Map<Integer, String> map, int slot, String id) {
+        map.values().remove(id);
+        map.remove(slot);
+        if (id != null && !id.isEmpty()) map.put(slot, id);
+    }
+
+    public void unequipCosmetic(UUID playerUuid, int slotIndex) {
+        String uuidStr = playerUuid != null ? playerUuid.toString() : "global";
+        if (!playerCosmetics.containsKey(uuidStr)) loadPlayer(playerUuid);
+
+        Map<Integer, String> playerMap = playerCosmetics.get(uuidStr);
+        if (playerMap != null) {
+            playerMap.remove(slotIndex);
+            savePlayer(playerUuid);
+        }
+    }
+
+    public String getCosmeticColor(UUID playerUuid, String cosmeticId) {
+        if (cosmeticId == null) return null;
+        String uuidStr = playerUuid != null ? playerUuid.toString() : "global";
+        if (!playerCosmeticColors.containsKey(uuidStr)) loadPlayer(playerUuid);
+        Map<String, String> colors = playerCosmeticColors.get(uuidStr);
+        if (colors != null && colors.containsKey(cosmeticId)) return colors.get(cosmeticId);
+        if (!playerCosmeticColors.containsKey("global")) loadPlayer(null);
+        Map<String, String> globalColors = playerCosmeticColors.get("global");
+        return globalColors != null ? globalColors.get(cosmeticId) : null;
+    }
+
+    public void setCosmeticColor(UUID playerUuid, String cosmeticId, String hexColor) {
+        if (cosmeticId == null) return;
+        String uuidStr = playerUuid != null ? playerUuid.toString() : "global";
+        if (!playerCosmeticColors.containsKey(uuidStr)) loadPlayer(playerUuid);
+
+        Map<String, String> colors = playerCosmeticColors.computeIfAbsent(uuidStr, k -> new HashMap<>());
+        if (hexColor == null || hexColor.isEmpty()) {
+            colors.remove(cosmeticId);
+        } else {
+            colors.put(cosmeticId, hexColor);
+        }
+        savePlayer(playerUuid);
+    }
+
+    public boolean getCreativeTreeBreaker(UUID playerUuid) {
+        String uuidStr = playerUuid != null ? playerUuid.toString() : "global";
+        if (!playerCreativeTreeBreaker.containsKey(uuidStr)) loadPlayer(playerUuid);
+        return playerCreativeTreeBreaker.getOrDefault(uuidStr, false);
+    }
+
+    public void setCreativeTreeBreaker(UUID playerUuid, boolean enabled) {
+        String uuidStr = playerUuid != null ? playerUuid.toString() : "global";
+        playerCreativeTreeBreaker.put(uuidStr, enabled);
+        savePlayer(playerUuid);
+    }
+
+    public boolean getShulkerPreview(UUID playerUuid) {
+        String uuidStr = playerUuid != null ? playerUuid.toString() : "global";
+        if (!playerShulkerPreview.containsKey(uuidStr)) loadPlayer(playerUuid);
+        return playerShulkerPreview.getOrDefault(uuidStr, true);
+    }
+
+    public void setShulkerPreview(UUID playerUuid, boolean enabled) {
+        String uuidStr = playerUuid != null ? playerUuid.toString() : "global";
+        playerShulkerPreview.put(uuidStr, enabled);
+        savePlayer(playerUuid);
+    }
+
+    public int getColorPickerX(int defaultX) {
+        return colorPickerX != null ? colorPickerX : defaultX;
+    }
+
+    public int getColorPickerY(int defaultY) {
+        return colorPickerY != null ? colorPickerY : defaultY;
+    }
+
+    public void setColorPickerPos(int x, int y) {
+        this.colorPickerX = x;
+        this.colorPickerY = y;
+        saveGlobalSettings();
+    }
+}

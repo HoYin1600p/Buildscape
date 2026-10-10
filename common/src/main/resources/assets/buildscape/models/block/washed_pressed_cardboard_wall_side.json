@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/template_wall_side",
+  "textures": {
+    "wall": "buildscape:block/washed_pressed_cardboard",
+    "particle": "buildscape:block/washed_pressed_cardboard"
+  }
+}

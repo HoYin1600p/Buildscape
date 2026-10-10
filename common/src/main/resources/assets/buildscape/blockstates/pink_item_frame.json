@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "map=false": {
+      "model": "buildscape:block/pink_item_frame"
+    },
+    "map=true": {
+      "model": "buildscape:block/pink_item_frame_map"
+    }
+  }
+}

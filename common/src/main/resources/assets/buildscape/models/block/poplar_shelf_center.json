@@ -1,0 +1,7 @@
+{
+  "parent": "buildscape:block/template_shelf_center",
+  "textures": {
+    "all": "buildscape:block/poplar_shelf",
+    "particle": "buildscape:block/stripped_poplar_log"
+  }
+}

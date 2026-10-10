@@ -1,0 +1,19 @@
+plugins {
+    id 'java'
+}
+
+configurations { commonVariant }
+dependencies {
+    commonVariant project(path: ':common', configuration: 'v118xElements')
+    implementation project(path: ':common', configuration: 'v118xElements')
+}
+
+tasks.named('jar', Jar) {
+    from configurations.commonVariant
+    from(rootProject.file('common/src/main/resources')) {
+        filesMatching('assets/buildscape/models/**/*.json') {
+            filter { line -> line.replace('"neoforge_data":', '"forge_data":') }
+        }
+    }
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}

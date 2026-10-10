@@ -1,0 +1,1202 @@
+{
+  "block_copper_grate_break": {
+    "sounds": [
+      "buildscape:block/copper_grate/break1",
+      "buildscape:block/copper_grate/break2",
+      "buildscape:block/copper_grate/break3",
+      "buildscape:block/copper_grate/break4"
+    ]
+  },
+  "block_copper_grate_step": {
+    "sounds": [
+      "buildscape:block/copper_grate/step1",
+      "buildscape:block/copper_grate/step2",
+      "buildscape:block/copper_grate/step3",
+      "buildscape:block/copper_grate/step4",
+      "buildscape:block/copper_grate/step5",
+      "buildscape:block/copper_grate/step6"
+    ]
+  },
+  "block_copper_bulb_break": {
+    "sounds": [
+      "buildscape:block/copper_bulb/break1",
+      "buildscape:block/copper_bulb/break2",
+      "buildscape:block/copper_bulb/break3",
+      "buildscape:block/copper_bulb/break4"
+    ]
+  },
+  "block_copper_bulb_place": {
+    "sounds": [
+      "buildscape:block/copper_bulb/place1",
+      "buildscape:block/copper_bulb/place2",
+      "buildscape:block/copper_bulb/place3",
+      "buildscape:block/copper_bulb/place4"
+    ]
+  },
+  "block_copper_bulb_step": {
+    "sounds": [
+      "buildscape:block/copper_bulb/step1",
+      "buildscape:block/copper_bulb/step2",
+      "buildscape:block/copper_bulb/step3",
+      "buildscape:block/copper_bulb/step4",
+      "buildscape:block/copper_bulb/step5",
+      "buildscape:block/copper_bulb/step6"
+    ]
+  },
+  "block_copper_bulb_toggle": {
+    "sounds": [
+      "buildscape:block/copper_bulb/toggle"
+    ]
+  },
+  "block_mud_break": {
+    "sounds": [
+      {
+        "name": "buildscape:block/mud/break1",
+        "volume": 0.4,
+        "pitch": 0.9
+      },
+      {
+        "name": "buildscape:block/mud/break2",
+        "volume": 0.4,
+        "pitch": 0.9
+      },
+      {
+        "name": "buildscape:block/mud/break3",
+        "volume": 0.4,
+        "pitch": 0.9
+      },
+      {
+        "name": "buildscape:block/mud/break4",
+        "volume": 0.4,
+        "pitch": 0.9
+      },
+      {
+        "name": "buildscape:block/mud/break5",
+        "volume": 0.4,
+        "pitch": 0.9
+      },
+      {
+        "name": "buildscape:block/mud/break6",
+        "volume": 0.4,
+        "pitch": 0.9
+      }
+    ]
+  },
+  "block_mud_step": {
+    "sounds": [
+      {
+        "name": "buildscape:block/mud/step1",
+        "volume": 0.4,
+        "pitch": 0.9
+      },
+      {
+        "name": "buildscape:block/mud/step2",
+        "volume": 0.4,
+        "pitch": 0.9
+      },
+      {
+        "name": "buildscape:block/mud/step3",
+        "volume": 0.4,
+        "pitch": 0.9
+      },
+      {
+        "name": "buildscape:block/mud/step4",
+        "volume": 0.4,
+        "pitch": 0.9
+      },
+      {
+        "name": "buildscape:block/mud/step5",
+        "volume": 0.4,
+        "pitch": 0.9
+      },
+      {
+        "name": "buildscape:block/mud/step6",
+        "volume": 0.4,
+        "pitch": 0.9
+      }
+    ]
+  },
+  "block_decorated_pot_place": {
+    "sounds": [
+      "buildscape:block/decorated_pot/break1",
+      "buildscape:block/decorated_pot/break2",
+      "buildscape:block/decorated_pot/break3",
+      "buildscape:block/decorated_pot/break4"
+    ]
+  },
+  "block_decorated_pot_break": {
+    "sounds": [
+      "buildscape:block/decorated_pot/break1",
+      "buildscape:block/decorated_pot/break2",
+      "buildscape:block/decorated_pot/break3",
+      "buildscape:block/decorated_pot/break4"
+    ]
+  },
+  "block_decorated_pot_hit": {
+    "sounds": [
+      "buildscape:block/decorated_pot/break1",
+      "buildscape:block/decorated_pot/break2",
+      "buildscape:block/decorated_pot/break3",
+      "buildscape:block/decorated_pot/break4"
+    ]
+  },
+  "block_decorated_pot_step": {
+    "sounds": [
+      "buildscape:block/decorated_pot/step1",
+      "buildscape:block/decorated_pot/step2",
+      "buildscape:block/decorated_pot/step3",
+      "buildscape:block/decorated_pot/step4",
+      "buildscape:block/decorated_pot/step5"
+    ]
+  },
+  "block_decorated_pot_fall": {
+    "sounds": [
+      "buildscape:block/decorated_pot/break1",
+      "buildscape:block/decorated_pot/break2",
+      "buildscape:block/decorated_pot/break3",
+      "buildscape:block/decorated_pot/break4"
+    ]
+  },
+  "block_decorated_pot_insert_item": {
+    "sounds": [
+      "buildscape:block/decorated_pot/insert1",
+      "buildscape:block/decorated_pot/insert2",
+      "buildscape:block/decorated_pot/insert3",
+      "buildscape:block/decorated_pot/insert4"
+    ]
+  },
+  "block_decorated_pot_insert_fail": {
+    "sounds": [
+      "buildscape:block/decorated_pot/insert_fail1",
+      "buildscape:block/decorated_pot/insert_fail2",
+      "buildscape:block/decorated_pot/insert_fail3",
+      "buildscape:block/decorated_pot/insert_fail4",
+      "buildscape:block/decorated_pot/insert_fail5"
+    ]
+  },
+  "block_decorated_pot_shatter": {
+    "sounds": [
+      "buildscape:block/decorated_pot/shatter1",
+      "buildscape:block/decorated_pot/shatter2",
+      "buildscape:block/decorated_pot/shatter3",
+      "buildscape:block/decorated_pot/shatter4",
+      "buildscape:block/decorated_pot/shatter5"
+    ]
+  },
+  "block_flower_bed_break": {
+    "sounds": [
+      {
+        "name": "buildscape:block/flower_bed/break1",
+        "volume": 0.8,
+        "pitch": 0.96
+      },
+      {
+        "name": "buildscape:block/flower_bed/break2",
+        "volume": 0.8,
+        "pitch": 0.96
+      },
+      {
+        "name": "buildscape:block/flower_bed/break3",
+        "volume": 0.8,
+        "pitch": 0.96
+      },
+      {
+        "name": "buildscape:block/flower_bed/break4",
+        "volume": 0.8,
+        "pitch": 0.96
+      },
+      {
+        "name": "buildscape:block/flower_bed/break5",
+        "volume": 0.8,
+        "pitch": 0.96
+      }
+    ]
+  },
+  "block_flower_bed_step": {
+    "sounds": [
+      {
+        "name": "buildscape:block/flower_bed/step1",
+        "volume": 1,
+        "pitch": 1
+      },
+      {
+        "name": "buildscape:block/flower_bed/step2",
+        "volume": 1,
+        "pitch": 1
+      },
+      {
+        "name": "buildscape:block/flower_bed/step3",
+        "volume": 1,
+        "pitch": 1
+      },
+      {
+        "name": "buildscape:block/flower_bed/step4",
+        "volume": 1,
+        "pitch": 1
+      },
+      {
+        "name": "buildscape:block/flower_bed/step5",
+        "volume": 1,
+        "pitch": 1
+      }
+    ]
+  },
+  "block_flower_bed_place": {
+    "sounds": [
+      {
+        "name": "buildscape:block/flower_bed/step1",
+        "volume": 0.8,
+        "pitch": 0.96
+      },
+      {
+        "name": "buildscape:block/flower_bed/step2",
+        "volume": 0.8,
+        "pitch": 0.96
+      },
+      {
+        "name": "buildscape:block/flower_bed/step3",
+        "volume": 0.8,
+        "pitch": 0.96
+      },
+      {
+        "name": "buildscape:block/flower_bed/step4",
+        "volume": 0.8,
+        "pitch": 0.96
+      },
+      {
+        "name": "buildscape:block/flower_bed/step5",
+        "volume": 0.8,
+        "pitch": 0.96
+      }
+    ]
+  },
+  "block_flower_bed_hit": {
+    "sounds": [
+      {
+        "name": "buildscape:block/flower_bed/step1",
+        "volume": 1.0,
+        "pitch": 0.6
+      },
+      {
+        "name": "buildscape:block/flower_bed/step2",
+        "volume": 1.0,
+        "pitch": 0.6
+      },
+      {
+        "name": "buildscape:block/flower_bed/step3",
+        "volume": 1.0,
+        "pitch": 0.6
+      },
+      {
+        "name": "buildscape:block/flower_bed/step4",
+        "volume": 1.0,
+        "pitch": 0.6
+      },
+      {
+        "name": "buildscape:block/flower_bed/step5",
+        "volume": 1.0,
+        "pitch": 0.6
+      }
+    ]
+  },
+  "block_flower_bed_fall": {
+    "sounds": [
+      {
+        "name": "buildscape:block/flower_bed/step1",
+        "volume": 1.0,
+        "pitch": 0.9
+      },
+      {
+        "name": "buildscape:block/flower_bed/step2",
+        "volume": 1.0,
+        "pitch": 0.9
+      },
+      {
+        "name": "buildscape:block/flower_bed/step3",
+        "volume": 1.0,
+        "pitch": 0.9
+      },
+      {
+        "name": "buildscape:block/flower_bed/step4",
+        "volume": 1.0,
+        "pitch": 0.9
+      },
+      {
+        "name": "buildscape:block/flower_bed/step5",
+        "volume": 1.0,
+        "pitch": 0.9
+      }
+    ]
+  },
+  "block_mangrove_roots_break": {
+    "sounds": [
+      {
+        "name": "buildscape:block/mangrove_roots/break1",
+        "volume": 1.0,
+        "pitch": 0.96
+      },
+      {
+        "name": "buildscape:block/mangrove_roots/break2",
+        "volume": 1.0,
+        "pitch": 0.96
+      },
+      {
+        "name": "buildscape:block/mangrove_roots/break3",
+        "volume": 1.0,
+        "pitch": 0.96
+      },
+      {
+        "name": "buildscape:block/mangrove_roots/break4",
+        "volume": 1.0,
+        "pitch": 0.96
+      },
+      {
+        "name": "buildscape:block/mangrove_roots/break5",
+        "volume": 1.0,
+        "pitch": 0.96
+      },
+      {
+        "name": "buildscape:block/mangrove_roots/break6",
+        "volume": 1.0,
+        "pitch": 0.96
+      }
+    ],
+    "subtitle": "subtitles.block.generic.break"
+  },
+  "block_mangrove_roots_place": {
+    "sounds": [
+      {
+        "name": "buildscape:block/mangrove_roots/step1",
+        "volume": 1.0,
+        "pitch": 0.96
+      },
+      {
+        "name": "buildscape:block/mangrove_roots/step2",
+        "volume": 1.0,
+        "pitch": 0.96
+      },
+      {
+        "name": "buildscape:block/mangrove_roots/step3",
+        "volume": 1.0,
+        "pitch": 0.96
+      },
+      {
+        "name": "buildscape:block/mangrove_roots/step4",
+        "volume": 1.0,
+        "pitch": 0.96
+      },
+      {
+        "name": "buildscape:block/mangrove_roots/step5",
+        "volume": 1.0,
+        "pitch": 0.96
+      },
+      {
+        "name": "buildscape:block/mangrove_roots/step6",
+        "volume": 1.0,
+        "pitch": 0.96
+      }
+    ],
+    "subtitle": "subtitles.block.generic.place"
+  },
+  "block_mangrove_roots_hit": {
+    "sounds": [
+      {
+        "name": "buildscape:block/mangrove_roots/step1",
+        "volume": 1.0,
+        "pitch": 0.5
+      },
+      {
+        "name": "buildscape:block/mangrove_roots/step2",
+        "volume": 1.0,
+        "pitch": 0.5
+      },
+      {
+        "name": "buildscape:block/mangrove_roots/step3",
+        "volume": 1.0,
+        "pitch": 0.5
+      },
+      {
+        "name": "buildscape:block/mangrove_roots/step4",
+        "volume": 1.0,
+        "pitch": 0.5
+      },
+      {
+        "name": "buildscape:block/mangrove_roots/step5",
+        "volume": 1.0,
+        "pitch": 0.5
+      },
+      {
+        "name": "buildscape:block/mangrove_roots/step6",
+        "volume": 1.0,
+        "pitch": 0.5
+      }
+    ],
+    "subtitle": "subtitles.block.generic.hit"
+  },
+  "block_mangrove_roots_fall": {
+    "sounds": [
+      {
+        "name": "buildscape:block/mangrove_roots/step1",
+        "volume": 1.0,
+        "pitch": 0.75
+      },
+      {
+        "name": "buildscape:block/mangrove_roots/step2",
+        "volume": 1.0,
+        "pitch": 0.75
+      },
+      {
+        "name": "buildscape:block/mangrove_roots/step3",
+        "volume": 1.0,
+        "pitch": 0.75
+      },
+      {
+        "name": "buildscape:block/mangrove_roots/step4",
+        "volume": 1.0,
+        "pitch": 0.75
+      },
+      {
+        "name": "buildscape:block/mangrove_roots/step5",
+        "volume": 1.0,
+        "pitch": 0.75
+      },
+      {
+        "name": "buildscape:block/mangrove_roots/step6",
+        "volume": 1.0,
+        "pitch": 0.75
+      }
+    ],
+    "subtitle": "subtitles.block.generic.fall"
+  },
+  "block_mangrove_roots_step": {
+    "sounds": [
+      {
+        "name": "buildscape:block/mangrove_roots/step1",
+        "volume": 1.0,
+        "pitch": 1
+      },
+      {
+        "name": "buildscape:block/mangrove_roots/step2",
+        "volume": 1.0,
+        "pitch": 1
+      },
+      {
+        "name": "buildscape:block/mangrove_roots/step3",
+        "volume": 1.0,
+        "pitch": 1
+      },
+      {
+        "name": "buildscape:block/mangrove_roots/step4",
+        "volume": 1.0,
+        "pitch": 1
+      },
+      {
+        "name": "buildscape:block/mangrove_roots/step5",
+        "volume": 1.0,
+        "pitch": 1
+      },
+      {
+        "name": "buildscape:block/mangrove_roots/step6",
+        "volume": 1.0,
+        "pitch": 1
+      }
+    ],
+    "subtitle": "subtitles.block.generic.footsteps"
+  },
+  "block_muddy_mangrove_roots_break": {
+    "sounds": [
+      {
+        "name": "buildscape:block/muddy_mangrove_roots/break1",
+        "volume": 1.0,
+        "pitch": 0.96
+      },
+      {
+        "name": "buildscape:block/muddy_mangrove_roots/break2",
+        "volume": 1.0,
+        "pitch": 0.96
+      },
+      {
+        "name": "buildscape:block/muddy_mangrove_roots/break3",
+        "volume": 1.0,
+        "pitch": 0.96
+      },
+      {
+        "name": "buildscape:block/muddy_mangrove_roots/break4",
+        "volume": 1.0,
+        "pitch": 0.96
+      },
+      {
+        "name": "buildscape:block/muddy_mangrove_roots/break5",
+        "volume": 1.0,
+        "pitch": 0.96
+      },
+      {
+        "name": "buildscape:block/muddy_mangrove_roots/break6",
+        "volume": 1.0,
+        "pitch": 0.96
+      }
+    ],
+    "subtitle": "subtitles.block.generic.break"
+  },
+  "block_muddy_mangrove_roots_place": {
+    "sounds": [
+      {
+        "name": "buildscape:block/muddy_mangrove_roots/step1",
+        "volume": 1.0,
+        "pitch": 0.96
+      },
+      {
+        "name": "buildscape:block/muddy_mangrove_roots/step2",
+        "volume": 1.0,
+        "pitch": 0.96
+      },
+      {
+        "name": "buildscape:block/muddy_mangrove_roots/step3",
+        "volume": 1.0,
+        "pitch": 0.96
+      },
+      {
+        "name": "buildscape:block/muddy_mangrove_roots/step4",
+        "volume": 1.0,
+        "pitch": 0.96
+      },
+      {
+        "name": "buildscape:block/muddy_mangrove_roots/step5",
+        "volume": 1.0,
+        "pitch": 0.96
+      },
+      {
+        "name": "buildscape:block/muddy_mangrove_roots/step6",
+        "volume": 1.0,
+        "pitch": 0.96
+      }
+    ],
+    "subtitle": "subtitles.block.generic.place"
+  },
+  "block_muddy_mangrove_roots_hit": {
+    "sounds": [
+      {
+        "name": "buildscape:block/muddy_mangrove_roots/step1",
+        "volume": 1.0,
+        "pitch": 0.5
+      },
+      {
+        "name": "buildscape:block/muddy_mangrove_roots/step2",
+        "volume": 1.0,
+        "pitch": 0.5
+      },
+      {
+        "name": "buildscape:block/muddy_mangrove_roots/step3",
+        "volume": 1.0,
+        "pitch": 0.5
+      },
+      {
+        "name": "buildscape:block/muddy_mangrove_roots/step4",
+        "volume": 1.0,
+        "pitch": 0.5
+      },
+      {
+        "name": "buildscape:block/muddy_mangrove_roots/step5",
+        "volume": 1.0,
+        "pitch": 0.5
+      },
+      {
+        "name": "buildscape:block/muddy_mangrove_roots/step6",
+        "volume": 1.0,
+        "pitch": 0.5
+      }
+    ],
+    "subtitle": "subtitles.block.generic.hit"
+  },
+  "block_muddy_mangrove_roots_fall": {
+    "sounds": [
+      {
+        "name": "buildscape:block/muddy_mangrove_roots/step1",
+        "volume": 1.0,
+        "pitch": 0.75
+      },
+      {
+        "name": "buildscape:block/muddy_mangrove_roots/step2",
+        "volume": 1.0,
+        "pitch": 0.75
+      },
+      {
+        "name": "buildscape:block/muddy_mangrove_roots/step3",
+        "volume": 1.0,
+        "pitch": 0.75
+      },
+      {
+        "name": "buildscape:block/muddy_mangrove_roots/step4",
+        "volume": 1.0,
+        "pitch": 0.75
+      },
+      {
+        "name": "buildscape:block/muddy_mangrove_roots/step5",
+        "volume": 1.0,
+        "pitch": 0.75
+      },
+      {
+        "name": "buildscape:block/muddy_mangrove_roots/step6",
+        "volume": 1.0,
+        "pitch": 0.75
+      }
+    ],
+    "subtitle": "subtitles.block.generic.fall"
+  },
+  "block_muddy_mangrove_roots_step": {
+    "sounds": [
+      {
+        "name": "buildscape:block/muddy_mangrove_roots/step1",
+        "volume": 1.0,
+        "pitch": 1
+      },
+      {
+        "name": "buildscape:block/muddy_mangrove_roots/step2",
+        "volume": 1.0,
+        "pitch": 1
+      },
+      {
+        "name": "buildscape:block/muddy_mangrove_roots/step3",
+        "volume": 1.0,
+        "pitch": 1
+      },
+      {
+        "name": "buildscape:block/muddy_mangrove_roots/step4",
+        "volume": 1.0,
+        "pitch": 1
+      },
+      {
+        "name": "buildscape:block/muddy_mangrove_roots/step5",
+        "volume": 1.0,
+        "pitch": 1
+      },
+      {
+        "name": "buildscape:block/muddy_mangrove_roots/step6",
+        "volume": 1.0,
+        "pitch": 1
+      }
+    ],
+    "subtitle": "subtitles.block.generic.footsteps"
+  },
+  "block_packed_mud_break": {
+    "sounds": [
+      {
+        "name": "buildscape:block/packed_mud/break1",
+        "volume": 1,
+        "pitch": 1
+      },
+      {
+        "name": "buildscape:block/packed_mud/break2",
+        "volume": 1,
+        "pitch": 1
+      },
+      {
+        "name": "buildscape:block/packed_mud/break3",
+        "volume": 1,
+        "pitch": 1
+      },
+      {
+        "name": "buildscape:block/packed_mud/break4",
+        "volume": 1,
+        "pitch": 1
+      },
+      {
+        "name": "buildscape:block/packed_mud/break5",
+        "volume": 1,
+        "pitch": 1
+      },
+      {
+        "name": "buildscape:block/packed_mud/break6",
+        "volume": 1,
+        "pitch": 1
+      }
+    ],
+    "subtitle": "subtitles.block.generic.break"
+  },
+  "block_packed_mud_place": {
+    "sounds": [
+      {
+        "name": "buildscape:block/packed_mud/break1",
+        "volume": 1,
+        "pitch": 1
+      },
+      {
+        "name": "buildscape:block/packed_mud/break2",
+        "volume": 1,
+        "pitch": 1
+      },
+      {
+        "name": "buildscape:block/packed_mud/break3",
+        "volume": 1,
+        "pitch": 1
+      },
+      {
+        "name": "buildscape:block/packed_mud/break4",
+        "volume": 1,
+        "pitch": 1
+      },
+      {
+        "name": "buildscape:block/packed_mud/break5",
+        "volume": 1,
+        "pitch": 1
+      },
+      {
+        "name": "buildscape:block/packed_mud/break6",
+        "volume": 1,
+        "pitch": 1
+      }
+    ],
+    "subtitle": "subtitles.block.generic.place"
+  },
+  "block_packed_mud_step": {
+    "sounds": [
+      {
+        "name": "buildscape:block/packed_mud/step1",
+        "volume": 1,
+        "pitch": 1
+      },
+      {
+        "name": "buildscape:block/packed_mud/step2",
+        "volume": 1,
+        "pitch": 1
+      },
+      {
+        "name": "buildscape:block/packed_mud/step3",
+        "volume": 1,
+        "pitch": 1
+      },
+      {
+        "name": "buildscape:block/packed_mud/step4",
+        "volume": 1,
+        "pitch": 1
+      },
+      {
+        "name": "buildscape:block/packed_mud/step5",
+        "volume": 1,
+        "pitch": 1
+      },
+      {
+        "name": "buildscape:block/packed_mud/step6",
+        "volume": 1,
+        "pitch": 1
+      }
+    ],
+    "subtitle": "subtitles.block.generic.footsteps"
+  },
+  "block_packed_mud_hit": {
+    "sounds": [
+      {
+        "name": "buildscape:block/packed_mud/step1",
+        "volume": 1,
+        "pitch": 1
+      },
+      {
+        "name": "buildscape:block/packed_mud/step2",
+        "volume": 1,
+        "pitch": 1
+      },
+      {
+        "name": "buildscape:block/packed_mud/step3",
+        "volume": 1,
+        "pitch": 1
+      },
+      {
+        "name": "buildscape:block/packed_mud/step4",
+        "volume": 1,
+        "pitch": 1
+      },
+      {
+        "name": "buildscape:block/packed_mud/step5",
+        "volume": 1,
+        "pitch": 1
+      },
+      {
+        "name": "buildscape:block/packed_mud/step6",
+        "volume": 1,
+        "pitch": 1
+      }
+    ],
+    "subtitle": "subtitles.block.generic.hit"
+  },
+  "block_packed_mud_fall": {
+    "sounds": [
+      {
+        "name": "buildscape:block/packed_mud/step1",
+        "volume": 1,
+        "pitch": 1
+      },
+      {
+        "name": "buildscape:block/packed_mud/step2",
+        "volume": 1,
+        "pitch": 1
+      },
+      {
+        "name": "buildscape:block/packed_mud/step3",
+        "volume": 1,
+        "pitch": 1
+      },
+      {
+        "name": "buildscape:block/packed_mud/step4",
+        "volume": 1,
+        "pitch": 1
+      },
+      {
+        "name": "buildscape:block/packed_mud/step5",
+        "volume": 1,
+        "pitch": 1
+      },
+      {
+        "name": "buildscape:block/packed_mud/step6",
+        "volume": 1,
+        "pitch": 1
+      }
+    ],
+    "subtitle": "subtitles.block.generic.fall"
+  },
+  "block_mud_bricks_break": {
+    "sounds": [
+      {
+        "name": "buildscape:block/mud_bricks/break1",
+        "volume": 1,
+        "pitch": 1
+      },
+      {
+        "name": "buildscape:block/mud_bricks/break2",
+        "volume": 1,
+        "pitch": 1
+      },
+      {
+        "name": "buildscape:block/mud_bricks/break3",
+        "volume": 1,
+        "pitch": 1
+      },
+      {
+        "name": "buildscape:block/mud_bricks/break4",
+        "volume": 1,
+        "pitch": 1
+      },
+      {
+        "name": "buildscape:block/mud_bricks/break5",
+        "volume": 1,
+        "pitch": 1
+      },
+      {
+        "name": "buildscape:block/mud_bricks/break6",
+        "volume": 1,
+        "pitch": 1
+      }
+    ],
+    "subtitle": "subtitles.block.generic.break"
+  },
+  "block_mud_bricks_place": {
+    "sounds": [
+      {
+        "name": "buildscape:block/mud_bricks/break1",
+        "volume": 1,
+        "pitch": 1
+      },
+      {
+        "name": "buildscape:block/mud_bricks/break2",
+        "volume": 1,
+        "pitch": 1
+      },
+      {
+        "name": "buildscape:block/mud_bricks/break3",
+        "volume": 1,
+        "pitch": 1
+      },
+      {
+        "name": "buildscape:block/mud_bricks/break4",
+        "volume": 1,
+        "pitch": 1
+      },
+      {
+        "name": "buildscape:block/mud_bricks/break5",
+        "volume": 1,
+        "pitch": 1
+      },
+      {
+        "name": "buildscape:block/mud_bricks/break6",
+        "volume": 1,
+        "pitch": 1
+      }
+    ],
+    "subtitle": "subtitles.block.generic.place"
+  },
+  "block_mud_bricks_step": {
+    "sounds": [
+      {
+        "name": "buildscape:block/mud_bricks/step1",
+        "volume": 1,
+        "pitch": 1
+      },
+      {
+        "name": "buildscape:block/mud_bricks/step2",
+        "volume": 1,
+        "pitch": 1
+      },
+      {
+        "name": "buildscape:block/mud_bricks/step3",
+        "volume": 1,
+        "pitch": 1
+      },
+      {
+        "name": "buildscape:block/mud_bricks/step4",
+        "volume": 1,
+        "pitch": 1
+      },
+      {
+        "name": "buildscape:block/mud_bricks/step5",
+        "volume": 1,
+        "pitch": 1
+      },
+      {
+        "name": "buildscape:block/mud_bricks/step6",
+        "volume": 1,
+        "pitch": 1
+      }
+    ],
+    "subtitle": "subtitles.block.generic.footsteps"
+  },
+  "block_mud_bricks_hit": {
+    "sounds": [
+      {
+        "name": "buildscape:block/mud_bricks/step1",
+        "volume": 1,
+        "pitch": 1
+      },
+      {
+        "name": "buildscape:block/mud_bricks/step2",
+        "volume": 1,
+        "pitch": 1
+      },
+      {
+        "name": "buildscape:block/mud_bricks/step3",
+        "volume": 1,
+        "pitch": 1
+      },
+      {
+        "name": "buildscape:block/mud_bricks/step4",
+        "volume": 1,
+        "pitch": 1
+      },
+      {
+        "name": "buildscape:block/mud_bricks/step5",
+        "volume": 1,
+        "pitch": 1
+      },
+      {
+        "name": "buildscape:block/mud_bricks/step6",
+        "volume": 1,
+        "pitch": 1
+      }
+    ],
+    "subtitle": "subtitles.block.generic.hit"
+  },
+  "block_mud_bricks_fall": {
+    "sounds": [
+      {
+        "name": "buildscape:block/mud_bricks/step1",
+        "volume": 1,
+        "pitch": 1
+      },
+      {
+        "name": "buildscape:block/mud_bricks/step2",
+        "volume": 1,
+        "pitch": 1
+      },
+      {
+        "name": "buildscape:block/mud_bricks/step3",
+        "volume": 1,
+        "pitch": 1
+      },
+      {
+        "name": "buildscape:block/mud_bricks/step4",
+        "volume": 1,
+        "pitch": 1
+      },
+      {
+        "name": "buildscape:block/mud_bricks/step5",
+        "volume": 1,
+        "pitch": 1
+      },
+      {
+        "name": "buildscape:block/mud_bricks/step6",
+        "volume": 1,
+        "pitch": 1
+      }
+    ],
+    "subtitle": "subtitles.block.generic.fall"
+  },
+  "block_string_light_place": {
+    "sounds": [
+      {
+        "name": "minecraft:entity/leashknot/place1",
+        "type": "event"
+      },
+      {
+        "name": "minecraft:entity/leashknot/place2",
+        "type": "event"
+      },
+      {
+        "name": "minecraft:entity/leashknot/place3",
+        "type": "event"
+      }
+    ]
+  },
+  "block_string_light_connect": {
+    "sounds": [
+      {
+        "name": "minecraft:entity/leashknot/place1",
+        "type": "event"
+      },
+      {
+        "name": "minecraft:entity/leashknot/place2",
+        "type": "event"
+      },
+      {
+        "name": "minecraft:entity/leashknot/place3",
+        "type": "event"
+      }
+    ]
+  },
+  "block_string_light_disconnect": {
+    "sounds": [
+      {
+        "name": "minecraft:entity/leashknot/break1",
+        "type": "event"
+      },
+      {
+        "name": "minecraft:entity/leashknot/break2",
+        "type": "event"
+      },
+      {
+        "name": "minecraft:entity/leashknot/break3",
+        "type": "event"
+      }
+    ]
+  },
+  "block_string_light_turnon": {
+    "sounds": [
+      {
+        "name": "minecraft:random/click",
+        "type": "event"
+      }
+    ]
+  },
+  "block_string_light_turnoff": {
+    "sounds": [
+      {
+        "name": "minecraft:random/click",
+        "type": "event"
+      }
+    ]
+  },
+  "block_geyser_continuous_start": {
+    "sounds": [
+      {
+        "name": "block.bubble_column.whirlpool_inside",
+        "type": "event"
+      }
+    ]
+  },
+  "block_geyser_continuous_active": {
+    "sounds": [
+      {
+        "name": "block.bubble_column.whirlpool_ambient",
+        "type": "event"
+      }
+    ]
+  },
+  "block_geyser_eruption_start": {
+    "sounds": [
+      {
+        "name": "block.bubble_column.whirlpool_inside",
+        "type": "event"
+      }
+    ]
+  },
+  "block_geyser_eruption_active": {
+    "sounds": [
+      {
+        "name": "block.bubble_column.whirlpool_ambient",
+        "type": "event"
+      }
+    ]
+  },
+  "block_noxious_gas": {
+    "sounds": []
+  },
+  "block_shelf_activate": {
+    "sounds": [
+      {
+        "name": "block.wooden_trapdoor.close",
+        "type": "event"
+      }
+    ]
+  },
+  "block_shelf_deactivate": {
+    "sounds": [
+      {
+        "name": "block.wooden_trapdoor.open",
+        "type": "event"
+      }
+    ]
+  },
+  "block_shelf_place_item": {
+    "sounds": [
+      {
+        "name": "entity.item_frame.add_item",
+        "type": "event"
+      }
+    ]
+  },
+  "block_shelf_take_item": {
+    "sounds": [
+      {
+        "name": "entity.item_frame.remove_item",
+        "type": "event"
+      }
+    ]
+  },
+  "block_shelf_single_swap": {
+    "sounds": [
+      {
+        "name": "entity.item_frame.rotate_item",
+        "type": "event"
+      }
+    ]
+  },
+  "block_shelf_multi_swap": {
+    "sounds": [
+      {
+        "name": "entity.item_frame.rotate_item",
+        "type": "event"
+      }
+    ]
+  },
+  "music_disc_celebration": {
+    "sounds": [
+      {
+        "name": "buildscape:music/celebration",
+        "stream": true
+      }
+    ]
+  },
+  "music_disc_snowfall": {
+    "sounds": [
+      {
+        "name": "buildscape:music/snowfall",
+        "stream": true
+      }
+    ]
+  },
+  "music_disc_builder": {
+    "sounds": [
+      {
+        "name": "buildscape:music/builder",
+        "stream": true
+      }
+    ]
+  }
+}

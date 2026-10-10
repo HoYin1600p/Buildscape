@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cube_column",
+  "textures": {
+    "end": "buildscape:block/creaking_heart_top_active",
+    "side": "buildscape:block/creaking_heart_active"
+  }
+}

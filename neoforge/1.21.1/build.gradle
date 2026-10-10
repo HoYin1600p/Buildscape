@@ -1,0 +1,46 @@
+plugins {
+    id 'net.neoforged.moddev' version '2.0.146'
+}
+
+evaluationDependsOn(':common')
+
+neoForge {
+    version = '21.1.256'
+    mods {
+        buildscape {
+            sourceSet sourceSets.main
+            sourceSet project(':common').sourceSets.v121x
+        }
+    }
+    runs {
+        client {
+            client()
+            gameDirectory = file('run')
+            jvmArguments.addAll('-Xmx4G', '-Xms2G')
+        }
+    }
+}
+
+sourceSets {
+    main {
+        resources {
+            srcDir rootProject.file('common/src/main/resources')
+        }
+    }
+}
+
+configurations { commonVariant }
+dependencies {
+    commonVariant project(path: ':common', configuration: 'v121xElements')
+    implementation project(path: ':common', configuration: 'v121xElements')
+}
+
+tasks.named('processResources', ProcessResources) {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+tasks.named('jar', Jar) {
+    from configurations.commonVariant
+    from rootProject.file('common/src/main/resources')
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}

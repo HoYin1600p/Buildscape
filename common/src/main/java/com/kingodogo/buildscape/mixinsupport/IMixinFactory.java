@@ -32,6 +32,13 @@ import java.util.List;
 import java.util.function.Consumer;
 public interface IMixinFactory {
 
+    /** Earlier VersionClusters retain these blocks and use the ordinary loader. */
+    default boolean loadRemovedBlockEntity(BlockPos pos, BlockState state, net.minecraft.nbt.CompoundTag tag,
+            Object lookup, Consumer<net.minecraft.world.level.block.entity.BlockEntity> result) {
+        // False preserves ordinary loading in clusters where these identifiers are still registered.
+        return false;
+    }
+
     boolean shouldApplyMixin(String targetClassName, String mixinClassName);
 
     void handleLeafDecayTick(LeavesBlock block, BlockState state, ServerLevel level, BlockPos pos, Object random);

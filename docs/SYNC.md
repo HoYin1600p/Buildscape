@@ -71,8 +71,9 @@ Renames preserve both source paths and diffs. An identical Java counterpart can
 be renamed automatically only when its destination follows the same-relative
 mapping and the destination does not already exist. Other Java renames require
 porting. Resource renames appear as converted output additions and removals.
-Automatic resources stop on conflicting port-specific edits; they do not silently
-overwrite them. Unchanged converted outputs preserve hand-maintained target data.
+Automatic resources with conflicting port-specific edits are left unchanged in the
+target and reported as review items (with converted old/new/target copies under
+`conflicts/` beside the report) while the rest of the apply continues. Unchanged converted outputs preserve hand-maintained target data.
 
 Apply always runs the target's declared validation, including offline Gradle
 builds for the active loaders. Commands and output are written as they run to an

@@ -96,7 +96,7 @@ class TranslationKeysTest {
             String key = block.getDescriptionId();
             if (!known(lang, key)) missing.put(key, "block " + def.getId());
         }
-        assertTrue(blockCount > 3000, "expected the full block list, got " + blockCount);
+        assertTrue(blockCount > 2900, "expected the retained block list, got " + blockCount);
 
         // Items: block items through the real factory, the rest through createItem
         int itemCount = 0;
@@ -120,7 +120,7 @@ class TranslationKeysTest {
             if (!known(lang, key)) missing.put(key, "item " + def.getId());
 
         }
-        assertTrue(itemCount > 3000 && blockItems > 3000, "expected the full item list, got " + itemCount + "/" + blockItems);
+        assertTrue(itemCount > 2900 && blockItems > 2900, "expected the retained item list, got " + itemCount + "/" + blockItems);
 
         // Trophy blocks and their items use the block key (their block is built by the loader adapter, so check the key by id)
         for (TrophyDefinition trophy : Trophies.getAll()) {

@@ -57,6 +57,12 @@ it cannot be combined with `--fetch`. No remote is required for these runs.
 | Unmapped Java | New-feature port candidate requiring a scoped destination contract |
 | Build files, loader metadata, mixin configs, access transformers | Review |
 | Deleted source files | Review; keep target code/resources and mark ledger rows `needs_resync` |
+| Files retired by `sync/removals26x.json` for `mc26.2` | Report as `retired`; never copy them into the target |
+
+The 26.2 removal policy records retired ids and exact `excluded_target_paths`. Shared models
+and textures remain available. Apply filters both source resources and converted
+outputs against this policy, so later source updates cannot restore retired assets.
+Retired changes do not enter the pending review queue.
 
 The ledger's semicolon-separated `active_paths` is authoritative. A same-relative
 Java file under the declared `java_root` is the fallback. Multiple destinations
@@ -133,8 +139,8 @@ the invoking registry and that target's branch registry. Commands are argument
 arrays; placeholders are `{python}`, `{repo}` (the apply worktree), `{resources}`,
 `{mc_jar}`, and `{gradle}`. The jar can be provided by `--mc-jar`, the environment,
 or the registry. Relative jar paths resolve against the invoking checkout so
-ignored local jars need not be present in a new worktree. Tool logic contains no
-Minecraft version or loader-specific conversion rules.
+ignored local jars need not be present in a new worktree. Conversion rules live in
+the target converter; the sync tool also enforces the 26.2 retirement policy.
 
 Change `source.branch` to designate a different main source line. Also change
 its loader, Minecraft version, subtree and metadata scope when appropriate.

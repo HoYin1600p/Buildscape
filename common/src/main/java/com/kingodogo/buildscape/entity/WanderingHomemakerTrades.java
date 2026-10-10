@@ -40,20 +40,20 @@ public final class WanderingHomemakerTrades {
         add(list, new ItemStack(Items.EMERALD, 1), ModItems.PURPLE_SPORE_BLOSSOM.get().createStack(2), 6, 1, 0.05f);
         add(list, new ItemStack(Items.EMERALD, 1), ModItems.ORANGE_SPORE_BLOSSOM.get().createStack(2), 6, 1, 0.05f);
         add(list, new ItemStack(Items.EMERALD, 1), ModItems.ICICLE.get().createStack(32), 8, 1, 0.05f);
-        add(list, new ItemStack(Items.EMERALD, 1), ModItems.SULFUR_SPIKE.get().createStack(32), 8, 1, 0.05f);
+        add(list, new ItemStack(Items.EMERALD, 1), new ItemStack(Services.PLATFORM.getItem(com.kingodogo.buildscape.util.CommonId.parse("minecraft:sulfur_spike")), 32), 8, 1, 0.05f);
         add(list, new ItemStack(Items.EMERALD, 1), ModItems.PACKED_ICICLE_BLOCK.get().createStack(4), 8, 1, 0.05f);
-        add(list, new ItemStack(Items.EMERALD, 1), ModItems.SULFUR.get().createStack(4), 8, 1, 0.05f);
-        add(list, new ItemStack(Items.EMERALD, 1), ModItems.CINNABAR.get().createStack(2), 8, 1, 0.05f);
-        add(list, new ItemStack(Items.EMERALD, 1), ModItems.WILDFLOWERS.get().createStack(4), 6, 1, 0.05f);
-        add(list, new ItemStack(Items.EMERALD, 1), ModItems.LEAF_LITTER.get().createStack(4), 6, 1, 0.05f);
-        add(list, new ItemStack(Items.EMERALD, 1), ModItems.DRY_GRASS.get().createStack(6), 8, 1, 0.05f);
-        add(list, new ItemStack(Items.EMERALD, 1), ModItems.TALL_DRY_GRASS.get().createStack(6), 8, 1, 0.05f);
-        add(list, new ItemStack(Items.EMERALD, 1), ModItems.BUSH.get().createStack(6), 8, 1, 0.05f);
-        add(list, new ItemStack(Items.EMERALD, 1), ModItems.CACTUS_FLOWER.get().createStack(6), 8, 1, 0.05f);
+        add(list, new ItemStack(Items.EMERALD, 1), new ItemStack(Services.PLATFORM.getItem(com.kingodogo.buildscape.util.CommonId.parse("minecraft:sulfur")), 4), 8, 1, 0.05f);
+        add(list, new ItemStack(Items.EMERALD, 1), new ItemStack(Services.PLATFORM.getItem(com.kingodogo.buildscape.util.CommonId.parse("minecraft:cinnabar")), 2), 8, 1, 0.05f);
+        add(list, new ItemStack(Items.EMERALD, 1), new ItemStack(Services.PLATFORM.getItem(com.kingodogo.buildscape.util.CommonId.parse("minecraft:wildflowers")), 4), 6, 1, 0.05f);
+        add(list, new ItemStack(Items.EMERALD, 1), new ItemStack(Services.PLATFORM.getItem(com.kingodogo.buildscape.util.CommonId.parse("minecraft:leaf_litter")), 4), 6, 1, 0.05f);
+        add(list, new ItemStack(Items.EMERALD, 1), new ItemStack(Services.PLATFORM.getItem(com.kingodogo.buildscape.util.CommonId.parse("minecraft:short_dry_grass")), 6), 8, 1, 0.05f);
+        add(list, new ItemStack(Items.EMERALD, 1), new ItemStack(Services.PLATFORM.getItem(com.kingodogo.buildscape.util.CommonId.parse("minecraft:tall_dry_grass")), 6), 8, 1, 0.05f);
+        add(list, new ItemStack(Items.EMERALD, 1), new ItemStack(Services.PLATFORM.getItem(com.kingodogo.buildscape.util.CommonId.parse("minecraft:bush")), 6), 8, 1, 0.05f);
+        add(list, new ItemStack(Items.EMERALD, 1), new ItemStack(Services.PLATFORM.getItem(com.kingodogo.buildscape.util.CommonId.parse("minecraft:cactus_flower")), 6), 8, 1, 0.05f);
         add(list, new ItemStack(Items.EMERALD, 1), ModItems.RED_BUSH.get().createStack(6), 8, 1, 0.05f);
-        add(list, new ItemStack(Items.EMERALD, 1), ModItems.FIREFLY_BUSH.get().createStack(6), 8, 1, 0.05f);
-        add(list, new ItemStack(Items.EMERALD, 1), ModItems.OPEN_EYEBLOSSOM.get().createStack(6), 8, 1, 0.05f);
-        add(list, new ItemStack(Items.EMERALD, 1), ModItems.CLOSED_EYEBLOSSOM.get().createStack(6), 8, 1, 0.05f);
+        add(list, new ItemStack(Items.EMERALD, 1), new ItemStack(Services.PLATFORM.getItem(com.kingodogo.buildscape.util.CommonId.parse("minecraft:firefly_bush")), 6), 8, 1, 0.05f);
+        add(list, new ItemStack(Items.EMERALD, 1), new ItemStack(Services.PLATFORM.getItem(com.kingodogo.buildscape.util.CommonId.parse("minecraft:open_eyeblossom")), 6), 8, 1, 0.05f);
+        add(list, new ItemStack(Items.EMERALD, 1), new ItemStack(Services.PLATFORM.getItem(com.kingodogo.buildscape.util.CommonId.parse("minecraft:closed_eyeblossom")), 6), 8, 1, 0.05f);
         return list;
     }
 

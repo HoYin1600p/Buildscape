@@ -1,7 +1,7 @@
 {
   "display": {
     "icon": {
-      "id": "buildscape:ochre_froglight"
+      "id": "minecraft:ochre_froglight"
     },
     "title": {
       "translate": "advancements.buildscape.rainbow_mood_light.title"
@@ -22,7 +22,7 @@
         "items": [
           {
             "items": [
-              "buildscape:ochre_froglight"
+              "minecraft:ochre_froglight"
             ]
           }
         ]
@@ -34,7 +34,7 @@
         "items": [
           {
             "items": [
-              "buildscape:pearlescent_froglight"
+              "minecraft:pearlescent_froglight"
             ]
           }
         ]
@@ -46,7 +46,7 @@
         "items": [
           {
             "items": [
-              "buildscape:verdant_froglight"
+              "minecraft:verdant_froglight"
             ]
           }
         ]

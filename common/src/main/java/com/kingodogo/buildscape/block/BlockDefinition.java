@@ -82,28 +82,22 @@ public class BlockDefinition {
     public boolean isSlab() { return !isVerticalSlab() && !isGrassSlab() && !isHayBaleSlab() && !isLogSlab() && !isMudSlab() && typeIn("SlabBlock", "ModSlabBlock", "WeatheringSlabBlock"); }
     public boolean isWall() { return typeIn("WallBlock", "ModWallBlock"); }
     public boolean isFalling() { return typeIn("FallingSandBlock"); }
-    public boolean isCopperDoor() { return !isWeatheringDoor() && ("ModCopperDoorBlock".equals(blockType) || id.contains("copper_door") || "steel_door".equals(id) || "flaming_steel_door".equals(id)); }
-    public boolean isDoor() { return !isWeatheringDoor() && !isCopperDoor() && typeIn("DoorBlock", "ModDoorBlock"); }
-    public boolean isCopperTrapdoor() { return !isWeatheringTrapdoor() && ("ModCopperTrapdoorBlock".equals(blockType) || id.contains("copper_trapdoor") || "steel_trapdoor".equals(id) || "flaming_steel_trapdoor".equals(id)); }
-    public boolean isTrapdoor() { return !isWeatheringTrapdoor() && !isCopperTrapdoor() && typeIn("ModTrapdoorBlock", "TrapDoorBlock"); }
+    public boolean isCopperDoor() { return ("ModCopperDoorBlock".equals(blockType) || "steel_door".equals(id) || "flaming_steel_door".equals(id)); }
+    public boolean isDoor() { return !isCopperDoor() && typeIn("DoorBlock", "ModDoorBlock"); }
+    public boolean isCopperTrapdoor() { return ("ModCopperTrapdoorBlock".equals(blockType) || "steel_trapdoor".equals(id) || "flaming_steel_trapdoor".equals(id)); }
+    public boolean isTrapdoor() { return !isCopperTrapdoor() && typeIn("ModTrapdoorBlock", "TrapDoorBlock"); }
     public boolean isButton() { return typeIn("ModButtonBlock", "WoodButtonBlock", "WeatheringButtonBlock"); }
     public boolean isPressurePlate() { return typeIn("PressurePlateBlock", "ModPressurePlateBlock", "WeatheringPressurePlateBlock"); }
-    public boolean isWeatheringGrate() { return "WeatheringGrateBlock".equals(blockType); }
     public boolean isWeatheringBars() { return "WeatheringBarsBlock".equals(blockType); }
-    public boolean isWeatheringLantern() { return "WeatheringLanternBlock".equals(blockType); }
     public boolean isWeatheringBolt() { return "WeatheringBoltBlock".equals(blockType); }
     public boolean isWeatheringLargeChain() { return "WeatheringLargeChainBlock".equals(blockType); }
-    public boolean isWeatheringClimbableChain() { return "WeatheringClimbableChainBlock".equals(blockType); }
     public boolean isClimbableChain() { return "ClimbableChainBlock".equals(blockType); }
     public boolean isLargeChain() { return "LargeChainBlock".equals(blockType); }
     public boolean isWeatheringBlock() { return "WeatheringBlock".equals(blockType); }
     public boolean isWeatheringButton() { return "WeatheringButtonBlock".equals(blockType); }
-    public boolean isWeatheringDoor() { return "WeatheringDoorBlock".equals(blockType); }
     public boolean isWeatheringPressurePlate() { return "WeatheringPressurePlateBlock".equals(blockType); }
-    public boolean isWeatheringRod() { return "WeatheringRodBlock".equals(blockType); }
     public boolean isWeatheringSlab() { return "WeatheringSlabBlock".equals(blockType); }
     public boolean isWeatheringStair() { return "WeatheringStairBlock".equals(blockType); }
-    public boolean isWeatheringTrapdoor() { return "WeatheringTrapdoorBlock".equals(blockType); }
     public boolean isWeatheringVerticalSlab() { return "WeatheringVerticalSlabBlock".equals(blockType); }
     public boolean isMushroomShelves() { return "MushroomShelvesBlock".equals(blockType) || id.contains("mushroom_shelves"); }
     public boolean isShelf() { return !isMushroomShelves() && typeIn("ShelfBlock"); }
@@ -112,20 +106,12 @@ public class BlockDefinition {
     public boolean isSmokeVent() { return typeIn("SmokeVentBlock") || id.contains("smoke_vent"); }
     public boolean isMuff() { return typeIn("MuffBlock") || id.contains("muff"); }
     public boolean isChest() { return typeIn("CopperChestBlock") || id.contains("chest"); }
-    public boolean isBambooStandingSign() { return "ModBambooStandingSignBlock".equals(blockType) || "bamboo_sign".equals(id); }
-    public boolean isBambooWallSign() { return "ModBambooWallSignBlock".equals(blockType) || "bamboo_wall_sign".equals(id); }
-    public boolean isMangroveStandingSign() { return ("ModStandingSignBlock".equals(blockType) || "mangrove_sign".equals(id)) && !"bamboo_sign".equals(id); }
-    public boolean isMangroveWallSign() { return ("ModWallSignBlock".equals(blockType) || "mangrove_wall_sign".equals(id)) && !"bamboo_wall_sign".equals(id); }
-    public boolean isStandingSign() { return isBambooStandingSign() || isMangroveStandingSign() || typeIn("ModStandingSignBlock", "ModBambooStandingSignBlock"); }
-    public boolean isWallSign() { return isBambooWallSign() || isMangroveWallSign() || typeIn("ModWallSignBlock", "ModBambooWallSignBlock"); }
     public boolean isFenceGate() { return typeIn("FenceGateBlock"); }
     public boolean isFence() { return !isFenceGate() && typeIn("FenceBlock"); }
     public boolean isWaterloggableGrate() { return "WaterloggableGrateBlock".equals(blockType); }
-    public boolean isIronBars() { return !isWaterloggableGrate() && (typeIn("IronBarsBlock", "WeatheringBarsBlock", "WeatheringGrateBlock")); }
+    public boolean isIronBars() { return !isWaterloggableGrate() && (typeIn("IronBarsBlock", "WeatheringBarsBlock")); }
     public boolean isLadder() { return typeIn("LadderBlock"); }
-    public boolean isCopperWallTorch() { return "CopperWallTorchBlock".equals(blockType) || id.contains("copper_wall_torch"); }
-    public boolean isCopperTorch() { return !isCopperWallTorch() && ("CopperTorchBlock".equals(blockType) || id.contains("copper_torch")); }
-    public boolean isLantern() { return !isCopperTorch() && !isCopperWallTorch() && (typeIn("LanternBlock", "WeatheringLanternBlock")); }
+    public boolean isLantern() { return (typeIn("LanternBlock")); }
     public boolean isLeafHedge() { return "LeafHedgeBlock".equals(blockType) || id.endsWith("_leaf_hedge"); }
     public boolean isMangroveLeaves() { return "MangroveLeavesBlock".equals(blockType) || id.equals("mangrove_leaves"); }
     public boolean isLeaves() { return !isLeafHedge() && !isMangroveLeaves() && !isSnowyLeaves() && typeIn("LeavesBlock"); }
@@ -160,8 +146,6 @@ public class BlockDefinition {
     public boolean isIcicleCauldron() { return typeIn("IcicleCauldronBlock") || id.contains("icicle_cauldron"); }
     public boolean isPackedIcicleBlock() { return "PackedIcicleBlock".equals(blockType) || "packed_icicle_block".equals(id); }
     public boolean isIcicleBlock() { return !isPackedIcicleBlock() && ("IcicleBlock".equals(blockType) || "icicle_block".equals(id)); }
-    public boolean isPotentSulfur() { return typeIn("PotentSulfurBlock") || id.contains("potent_sulfur"); }
-    public boolean isSulfurSpike() { return typeIn("SulfurSpikeBlock") || id.contains("sulfur_spike"); }
     public boolean isBoneDice() { return typeIn("BoneDiceBlock") || id.contains("bone_dice"); }
     public boolean isCopperBulb() { return typeIn("FreshCopperBulbBlock", "ExposedCopperBulbBlock", "WeatheredCopperBulbBlock", "OxidizedCopperBulbBlock"); }
     public int copperBulbLightLevel() {
@@ -187,25 +171,19 @@ public class BlockDefinition {
     public boolean isExperienceFluid() { return "ExperienceFluidBlock".equals(blockType) || id.contains("experience_liquid"); }
     public boolean isMulticolorGlowLights() { return typeIn("MulticolorGlowLightsBlock") || id.contains("multicolor_glow_lights"); }
     public boolean isGlowLights() { return !isMulticolorGlowLights() && (typeIn("GlowLightsBlock") || id.contains("glow_lights")); }
-    public boolean isEyeblossom() { return typeIn("EyeblossomBlock") || id.contains("eyeblossom"); }
     public boolean isFrostRose() { return typeIn("FrostRoseBlock") || id.contains("frost_rose"); }
     public boolean isStrawBed() { return typeIn("StrawBedBlock") || id.contains("straw_bed"); }
-    public boolean isCactusFlower() { return "CactusFlowerBlock".equals(blockType) || id.contains("cactus_flower"); }
     public boolean isClover() { return "CloverBlock".equals(blockType) || (id.contains("clover") && !id.contains("potted_clover")); }
     public boolean isColoredMoss() { return "ColoredMossBlock".equals(blockType) || (id.endsWith("_moss_block") && !"moss_block".equals(id)); }
     public boolean isColoredSporeBlossom() { return "ColoredSporeBlossomBlock".equals(blockType) || id.contains("spore_blossom"); }
     public boolean isCreakingHeart() { return "CreakingHeartBlock".equals(blockType) || id.contains("creaking_heart"); }
-    public boolean isDryGrass() { return "DryGrassBlock".equals(blockType) || "dry_grass".equals(id); }
-    public boolean isFireflyBush() { return "FireflyBushBlock".equals(blockType) || "firefly_bush".equals(id); }
-    public boolean isGoldenDandelion() { return "GoldenDandelionBlock".equals(blockType) || ("golden_dandelion".equals(id) && !"potted_golden_dandelion".equals(id)); }
     public boolean isHangingMoss() { return "HangingMossBlock".equals(blockType) || id.contains("hanging_moss"); }
     public boolean isMonetFlower() { return "MonetFlowerBlock".equals(blockType) || id.endsWith("_monets"); }
-    public boolean isPetal() { return "PetalBlock".equals(blockType) || ((id.contains("petal") || "wildflowers".equals(id) || "leaf_litter".equals(id)) && !id.contains("potted")); }
+    public boolean isPetal() { return "PetalBlock".equals(blockType) || ((id.contains("petal")) && !id.contains("potted")); }
     public boolean isRoseVines() { return "RoseVinesBlock".equals(blockType) || id.contains("rose_vines"); }
-    public boolean isTallDryGrass() { return "TallDryGrassBlock".equals(blockType) || "tall_dry_grass".equals(id); }
     public boolean isWallpaperFlat() { return "WallpaperFlatBlock".equals(blockType) || id.contains("wallpaper_flat"); }
     public boolean isWildflowers() { return "WildflowersBlock".equals(blockType); }
-    public boolean isPlant() { return !isStar() && !isDecoratedPot() && !isTrappedDecoratedPot() && !isEyeblossom() && !isFrostRose() && !isCactusFlower() && !isClover() && !isColoredMoss() && !isColoredSporeBlossom() && !isCreakingHeart() && !isDryGrass() && !isTallDryGrass() && !isFireflyBush() && !isGoldenDandelion() && !isHangingMoss() && !isMonetFlower() && !isPetal() && !isWildflowers() && !isRoseVines() && !isSnowyBush() && !isSnowyFern() && !isSnowyLargeFern() && !isSnowyGrass() && !isSnowyShortGrass() && !isSnowyTallGrass() && (typeIn("ModBushBlock", "FlowerPotBlock", "SaplingBlock")); }
+    public boolean isPlant() { return !isStar() && !isDecoratedPot() && !isTrappedDecoratedPot() && !isFrostRose() && !isClover() && !isColoredMoss() && !isColoredSporeBlossom() && !isCreakingHeart() && !isHangingMoss() && !isMonetFlower() && !isPetal() && !isWildflowers() && !isRoseVines() && !isSnowyBush() && !isSnowyFern() && !isSnowyLargeFern() && !isSnowyGrass() && !isSnowyShortGrass() && !isSnowyTallGrass() && (typeIn("ModBushBlock", "FlowerPotBlock", "SaplingBlock")); }
     public boolean isSnowyBush() { return "SnowyBushBlock".equals(blockType) || "snowy_bush".equals(id); }
     public boolean isSnowyFern() { return "SnowyFernBlock".equals(blockType) || "snowy_fern".equals(id); }
     public boolean isSnowyLargeFern() { return "SnowyLargeFernBlock".equals(blockType) || "snowy_large_fern".equals(id); }
@@ -215,8 +193,6 @@ public class BlockDefinition {
     public boolean isSilkTouchOnlyGlass() { return "SilkTouchOnlyGlassBlock".equals(blockType); }
     public boolean isSilkTouchOnlyPane() { return "SilkTouchOnlyPaneBlock".equals(blockType); }
     public boolean isResinClump() { return "ResinClumpBlock".equals(blockType) || id.contains("resin_clump"); }
-    public boolean isSculkVein() { return "SculkVeinBlock".equals(blockType) || id.contains("sculk_vein"); }
-    public boolean isSculkCatalyst() { return "SculkCatalystBlock".equals(blockType) || id.contains("sculk_catalyst"); }
     public boolean isPointedIcicle() { return "PointedIcicleBlock".equals(blockType) || id.contains("pointed_icicle"); }
     public boolean isLamp() { return !isFestiveLamp() && !isStringLight() && !isOrnament() && !isBigOrnament() && !isGlowLights() && !isMulticolorGlowLights() && (typeIn("RedstoneLampBlock")); }
 

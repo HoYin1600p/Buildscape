@@ -2391,14 +2391,7 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
     }
 
     private void registerFlowerPotPlants() {
-        registerPot("closed_eyeblossom", "potted_closed_eyeblossom");
-        registerPot("open_eyeblossom", "potted_open_eyeblossom");
-        registerPot("golden_dandelion", "potted_golden_dandelion");
-        registerPot("cactus_flower", "potted_cactus_flower");
-        registerPot("bush", "potted_bush");
         registerPot("red_bush", "potted_red_bush");
-        registerPot("firefly_bush", "potted_firefly_bush");
-        registerPot("dry_grass", "potted_dry_grass");
         registerPot("frost_rose", "potted_frost_rose");
         registerPot("red_monets", "potted_red_monets");
         registerPot("blue_monets", "potted_blue_monets");
@@ -2410,10 +2403,7 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
         registerPot("pale_oak_sapling", "potted_pale_oak_sapling");
         registerPot("cherry_sapling", "potted_cherry_sapling");
         registerPot("mangrove_propagule", "potted_mangrove_propagule");
-        registerPot("wildflowers", "potted_wildflowers");
         registerPot("clover", "potted_clover");
-        registerPot("leaf_litter", "potted_leaf_litter");
-        registerPot("tall_dry_grass", "potted_tall_dry_grass");
         registerPot("snowy_bush", "potted_snowy_bush");
         registerPot("snowy_short_grass", "potted_snowy_short_grass");
         registerPot("snowy_tall_grass", "potted_snowy_tall_grass");
@@ -2456,7 +2446,6 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
         registerCompost("red_petal", 0.65f);
         registerCompost("blue_petal", 0.65f);
         registerCompost("orange_petal", 0.65f);
-        registerCompost("pink_petal", 0.65f);
         registerCompost("purple_petal", 0.65f);
         registerCompost("red_spore_blossom", 0.65f);
         registerCompost("cyan_spore_blossom", 0.65f);
@@ -2469,7 +2458,6 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
         registerCompost("snowy_large_fern", 0.3f);
         registerCompost("snowy_bush", 0.3f);
         registerCompost("mangrove_leaves", 0.3f);
-        registerCompost("snowy_leaves", 0.3f);
         registerCompost("snowy_oak_leaves", 0.3f);
         registerCompost("snowy_spruce_leaves", 0.3f);
         registerCompost("snowy_birch_leaves", 0.3f);

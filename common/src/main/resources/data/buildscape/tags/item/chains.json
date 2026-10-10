@@ -1,9 +1,9 @@
 {
   "values": [
-    "buildscape:copper_chain",
-    "buildscape:exposed_copper_chain",
-    "buildscape:weathered_copper_chain",
-    "buildscape:oxidized_copper_chain",
+    "minecraft:copper_chain",
+    "minecraft:exposed_copper_chain",
+    "minecraft:weathered_copper_chain",
+    "minecraft:oxidized_copper_chain",
     "buildscape:gold_chain",
     "buildscape:diamond_chain",
     "buildscape:emerald_chain",

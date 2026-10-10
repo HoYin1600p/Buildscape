@@ -6,8 +6,6 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import java.util.Set;
 public class ModBlockEntities {
-    public static final RegistrySupplier<BlockEntityDefinition> MANGROVE_SIGN_BLOCK_ENTITY = register("mangrove_sign_block_entity");
-    public static final RegistrySupplier<BlockEntityDefinition> BAMBOO_SIGN_BLOCK_ENTITY = register("bamboo_sign_block_entity");
     public static final RegistrySupplier<BlockEntityDefinition> PILLAR_BLOCK_ENTITY = register("pillar_block_entity");
     public static final RegistrySupplier<BlockEntityDefinition> DECORATED_POT_BLOCK_ENTITY = register("decorated_pot_block_entity");
     public static final RegistrySupplier<BlockEntityDefinition> TRAPPED_DECORATED_POT_BLOCK_ENTITY = register("trapped_decorated_pot_block_entity");
@@ -19,12 +17,6 @@ public class ModBlockEntities {
     public static final RegistrySupplier<BlockEntityDefinition> MUFF_BLOCK_ENTITY = register("muff_block_entity");
     public static final RegistrySupplier<BlockEntityDefinition> GLASS_JAR_BLOCK_ENTITY = register("glass_jar_block_entity");
     public static final RegistrySupplier<BlockEntityDefinition> BUILDERS_WORKBENCH_BE = register("builders_workbench");
-
-    public static final BlockEntityType<BambooSignBlockEntity> BAMBOO_SIGN_BLOCK_ENTITY_TYPE =
-            Services.PLATFORM.createBlockEntityType(BambooSignBlockEntity::new, state -> state.getBlock() instanceof net.minecraft.world.level.block.SignBlock);
-
-    public static final BlockEntityType<MangroveSignBlockEntity> MANGROVE_SIGN_BLOCK_ENTITY_TYPE =
-            Services.PLATFORM.createBlockEntityType(MangroveSignBlockEntity::new, state -> state.getBlock() instanceof net.minecraft.world.level.block.SignBlock);
 
     public static final BlockEntityType<BuildersWorkbenchBlockEntity> BUILDERS_WORKBENCH_TYPE =
             Services.PLATFORM.createBlockEntityType(BuildersWorkbenchBlockEntity::new, state -> state.getBlock() instanceof BuildersWorkbenchBlock);
@@ -59,9 +51,6 @@ public class ModBlockEntities {
     public static final BlockEntityType<IcicleCauldronBlockEntity> ICICLE_CAULDRON_TYPE =
             Services.PLATFORM.createBlockEntityType(IcicleCauldronBlockEntity::new, state -> state.getBlock() instanceof IcicleCauldronBlock);
 
-    public static final BlockEntityType<PotentSulfurBlockEntity> POTENT_SULFUR_TYPE =
-            Services.PLATFORM.createBlockEntityType(PotentSulfurBlockEntity::new, state -> state.getBlock() instanceof PotentSulfurBlock);
-
     public static final BlockEntityType<com.kingodogo.buildscape.trophy.TrophyBlockEntity> TROPHY_TYPE =
             Services.PLATFORM.createBlockEntityType(com.kingodogo.buildscape.trophy.TrophyBlockEntity::new, state -> state.getBlock() instanceof com.kingodogo.buildscape.trophy.TrophyBlock);
 
@@ -75,7 +64,6 @@ public class ModBlockEntities {
             Services.PLATFORM.createBlockEntityType(HollowLogBlockEntity::new, state -> state.getBlock() instanceof HollowLogBlock || state.getBlock() instanceof HollowPipeBlock);
 
     public static final RegistrySupplier<BlockEntityDefinition> COPPER_CHEST = register("copper_chest");
-    public static final RegistrySupplier<BlockEntityDefinition> POTENT_SULFUR = register("potent_sulfur");
     public static final RegistrySupplier<BlockEntityDefinition> SHELF = register("shelf");
     public static final RegistrySupplier<BlockEntityDefinition> TROPHY_BLOCK_ENTITY = register("trophy_block_entity");
     public static final RegistrySupplier<BlockEntityDefinition> HOLLOW_LOG_BLOCK_ENTITY = register("hollow_log");

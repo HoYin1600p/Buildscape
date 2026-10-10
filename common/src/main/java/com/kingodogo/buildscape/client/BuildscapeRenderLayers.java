@@ -49,9 +49,6 @@ public final class BuildscapeRenderLayers {
                 || path.endsWith("_bars")
                 || path.endsWith("_mesh")
                 || path.endsWith("_ladder")
-                || path.endsWith("copper_grate")
-                || path.endsWith("copper_lantern")
-                || path.endsWith("copper_rod")
                 || isBackportCutout(path)
                 || isCutoutExact(path)) {
             return Layer.CUTOUT;
@@ -61,27 +58,12 @@ public final class BuildscapeRenderLayers {
     }
     private static boolean isBackportCutout(String path) {
         return switch (path) {
-            case "bush",
-                    "cactus_flower",
-                    "closed_eyeblossom",
-                    "copper_torch",
-                    "copper_wall_torch",
-                    "dry_grass",
-                    "firefly_bush",
-                    "golden_dandelion",
-                    "leaf_litter",
-                    "open_eyeblossom",
-                    "pale_hanging_moss",
+            case "pale_hanging_moss",
                     "pale_moss_carpet",
                     "pale_moss_layers",
                     "pale_moss_overlay",
                     "red_bush",
-                    "resin_clump",
-                    "sculk_sensor",
-                    "sculk_shrieker",
-                    "sculk_vein",
-                    "tall_dry_grass",
-                    "wildflowers" -> true;
+                    "resin_clump" -> true;
             default -> false;
         };
     }
@@ -99,7 +81,6 @@ public final class BuildscapeRenderLayers {
     private static boolean isCutoutExact(String path) {
         return switch (path) {
             case "clover",
-                    "decorated_pot",
                     "festive_stocking",
                     "frost_rose",
                     "glow_lights",
@@ -118,7 +99,6 @@ public final class BuildscapeRenderLayers {
                     "snowy_tall_grass",
                     "steel_bolts",
                     "straw_bed",
-                    "sulfur_spike",
                     "ashenking_diamond_pillar",
                     "ashenking_emerald_pillar",
                     "ashenking_gold_pillar",

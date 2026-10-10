@@ -1,7 +1,5 @@
 package com.kingodogo.buildscape.adapter.v26x;
 
-import com.kingodogo.buildscape.block.SulfurSpikeBlock;
-import com.kingodogo.buildscape.block.SulfurSpikeLogic;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.SpeleothemThickness;
@@ -20,14 +18,11 @@ import com.kingodogo.buildscape.block.BigOrnamentBlock;
 import com.kingodogo.buildscape.block.BlockDefinition;
 import com.kingodogo.buildscape.block.BoneDiceBlock;
 import com.kingodogo.buildscape.block.BuildersWorkbenchBlock;
-import com.kingodogo.buildscape.block.CactusFlowerBlock;
 import com.kingodogo.buildscape.block.CloverBlock;
 import com.kingodogo.buildscape.block.ColoredMossBlock;
 import com.kingodogo.buildscape.block.ColoredSporeBlossomBlock;
-import com.kingodogo.buildscape.block.BambooSignBlockEntity;
 import com.kingodogo.buildscape.block.CascadeBlock;
 import com.kingodogo.buildscape.block.CascadeBlockNoMist;
-import com.kingodogo.buildscape.block.MangroveSignBlockEntity;
 import net.minecraft.world.level.block.StandingSignBlock;
 import net.minecraft.world.level.block.WallSignBlock;
 import net.minecraft.world.level.block.state.properties.WoodType;
@@ -35,27 +30,21 @@ import com.kingodogo.buildscape.block.CommonBlockProperties;
 import com.kingodogo.buildscape.block.CopperChestBlockEntity;
 import com.kingodogo.buildscape.block.CopperBulbBlock;
 import com.kingodogo.buildscape.block.CopperOxidationHandler;
-import com.kingodogo.buildscape.block.CopperTorchBlock;
-import com.kingodogo.buildscape.block.CopperWallTorchBlock;
 import com.kingodogo.buildscape.block.CreakingHeartBlock;
-import com.kingodogo.buildscape.block.DryGrassBlock;
 import com.kingodogo.buildscape.block.ExperienceFluidBlock;
 import com.kingodogo.buildscape.block.ICopperChestBlock;
 import com.kingodogo.buildscape.block.ICommonRemoval;
 import com.kingodogo.buildscape.block.ModBlockEntities;
 import com.kingodogo.buildscape.block.CushionBlock;
 import com.kingodogo.buildscape.block.DecoratedPotBlock;
-import com.kingodogo.buildscape.block.EyeblossomBlock;
 import com.kingodogo.buildscape.block.FallingSandBlock;
 import com.kingodogo.buildscape.block.FestiveLampBlock;
 import com.kingodogo.buildscape.block.FestiveStockingBlock;
-import com.kingodogo.buildscape.block.FireflyBushBlock;
 import com.kingodogo.buildscape.block.FroglightBlock;
 import com.kingodogo.buildscape.block.FrostRoseBlock;
 import com.kingodogo.buildscape.block.GlassJarBlock;
 import com.kingodogo.buildscape.block.GlazedGlassBlock;
 import com.kingodogo.buildscape.block.GlowLightsBlock;
-import com.kingodogo.buildscape.block.GoldenDandelionBlock;
 import com.kingodogo.buildscape.block.GrassSlabBlock;
 import com.kingodogo.buildscape.block.HangingMossBlock;
 import com.kingodogo.buildscape.block.HayBaleSlabBlock;
@@ -74,8 +63,6 @@ import com.kingodogo.buildscape.block.PackedIcicleBlock;
 import com.kingodogo.buildscape.block.PetalBlock;
 import com.kingodogo.buildscape.block.PointedIcicleBlock;
 import com.kingodogo.buildscape.block.ResinClumpBlock;
-import com.kingodogo.buildscape.block.SculkCatalystBlock;
-import com.kingodogo.buildscape.block.SculkVeinBlock;
 import com.kingodogo.buildscape.block.SilkTouchOnlyGlassBlock;
 import com.kingodogo.buildscape.block.SilkTouchOnlyPaneBlock;
 import com.kingodogo.buildscape.block.ModBlock;
@@ -100,7 +87,6 @@ import com.kingodogo.buildscape.block.OrnamentBlock;
 import com.kingodogo.buildscape.block.PillarBlock;
 import com.kingodogo.buildscape.block.PillarBlockEntity;
 import com.kingodogo.buildscape.block.PipeBlock;
-import com.kingodogo.buildscape.block.PotentSulfurBlock;
 import com.kingodogo.buildscape.block.RoseVinesBlock;
 import com.kingodogo.buildscape.block.ShelfBlock;
 import com.kingodogo.buildscape.block.SmokeVentBlock;
@@ -118,16 +104,12 @@ import com.kingodogo.buildscape.block.StarBlock;
 import com.kingodogo.buildscape.block.SteelBoltBlock;
 import com.kingodogo.buildscape.block.StrawBedBlock;
 import com.kingodogo.buildscape.block.StringLightBlock;
-import com.kingodogo.buildscape.block.TallDryGrassBlock;
 import com.kingodogo.buildscape.block.TrappedDecoratedPotBlock;
 import com.kingodogo.buildscape.block.VerticalSlabBlock;
 import com.kingodogo.buildscape.block.WallpaperFlatBlock;
 import com.kingodogo.buildscape.block.WaterloggableGrateBlock;
 import com.kingodogo.buildscape.block.WeatheringBarsBlock;
 import com.kingodogo.buildscape.block.WeatheringBoltBlock;
-import com.kingodogo.buildscape.block.WeatheringClimbableChainBlock;
-import com.kingodogo.buildscape.block.WeatheringGrateBlock;
-import com.kingodogo.buildscape.block.WeatheringLanternBlock;
 import com.kingodogo.buildscape.block.WeatheringLargeChainBlock;
 import com.kingodogo.buildscape.block.WeatheringBlockLogic;
 import com.kingodogo.buildscape.block.WildflowersBlock;
@@ -226,15 +208,6 @@ public class BlockFactory implements IBlockFactory {
                 @Override protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, @Nullable Orientation orientation, boolean isMoving) { onNeighborUpdate(level, pos, state, block, pos, isMoving); }
                 @Override protected int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos, Direction direction) { return getAnalogOutput(state, level, pos); }
             };
-        } else if (def.isWeatheringGrate()) {
-            return new WeatheringGrateBlock(props) {
-                @Override
-                protected BlockState updateShape(BlockState state, LevelReader level, ScheduledTickAccess tickAccess, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, RandomSource random) {
-                    if (state.getValue(WATERLOGGED)) tickAccess.scheduleTick(pos, net.minecraft.world.level.material.Fluids.WATER, net.minecraft.world.level.material.Fluids.WATER.getTickDelay(level));
-                    return super.updateShape(state, level, tickAccess, pos, direction, neighborPos, neighborState, random);
-                }
-                @Override protected void randomTick(BlockState state, ServerLevel level, BlockPos pos, net.minecraft.util.RandomSource random) { onRandomTick(state, level, pos); }
-            };
         } else if (def.isWaterloggableGrate()) {
             return new WaterloggableGrateBlock(props) {
                 @Override
@@ -247,20 +220,12 @@ public class BlockFactory implements IBlockFactory {
             return new WeatheringBarsBlock(props) {
                 @Override protected void randomTick(BlockState state, ServerLevel level, BlockPos pos, net.minecraft.util.RandomSource random) { onRandomTick(state, level, pos); }
             };
-        } else if (def.isWeatheringLantern()) {
-            return new WeatheringLanternBlock(props) {
-                @Override protected void randomTick(BlockState state, ServerLevel level, BlockPos pos, net.minecraft.util.RandomSource random) { onRandomTick(state, level, pos); }
-            };
         } else if (def.isWeatheringBolt()) {
             return new WeatheringBoltBlock(props) {
                 @Override protected void randomTick(BlockState state, ServerLevel level, BlockPos pos, net.minecraft.util.RandomSource random) { onRandomTick(state, level, pos); }
             };
         } else if (def.isWeatheringLargeChain()) {
             return new WeatheringLargeChainBlock(props) {
-                @Override protected void randomTick(BlockState state, ServerLevel level, BlockPos pos, net.minecraft.util.RandomSource random) { onRandomTick(state, level, pos); }
-            };
-        } else if (def.isWeatheringClimbableChain()) {
-            return new WeatheringClimbableChainBlock(props) {
                 @Override protected void randomTick(BlockState state, ServerLevel level, BlockPos pos, net.minecraft.util.RandomSource random) { onRandomTick(state, level, pos); }
             };
         } else if (def.isWeatheringBlock()) {
@@ -273,25 +238,8 @@ public class BlockFactory implements IBlockFactory {
                 @Override public boolean isRandomlyTicking(BlockState state) { return true; }
                 @Override protected void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) { WeatheringBlockLogic.randomTick(state, level, pos); }
             };
-        } else if (def.isWeatheringDoor()) {
-            return new DoorBlock(BlockSetType.OAK, props.randomTicks()) {
-                @Override public boolean isRandomlyTicking(BlockState state) { return true; }
-                @Override protected void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) { WeatheringBlockLogic.randomTick(state, level, pos); }
-                @Override protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
-                    state = state.cycle(OPEN);
-                    level.setBlock(pos, state, 10);
-                    level.playSound(player, pos, state.getValue(OPEN) ? net.minecraft.sounds.SoundEvents.WOODEN_DOOR_OPEN : net.minecraft.sounds.SoundEvents.WOODEN_DOOR_CLOSE, net.minecraft.sounds.SoundSource.BLOCKS, 1.0F, 1.0F);
-                    level.gameEvent(player, state.getValue(OPEN) ? net.minecraft.world.level.gameevent.GameEvent.BLOCK_OPEN : net.minecraft.world.level.gameevent.GameEvent.BLOCK_CLOSE, pos);
-                    return InteractionResult.SUCCESS;
-                }
-            };
         } else if (def.isWeatheringPressurePlate()) {
             return new net.minecraft.world.level.block.WeightedPressurePlateBlock(WeatheringBlockLogic.PRESSURE_PLATE_MAX_WEIGHT, BlockSetType.OAK, props.randomTicks()) {
-                @Override public boolean isRandomlyTicking(BlockState state) { return true; }
-                @Override protected void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) { WeatheringBlockLogic.randomTick(state, level, pos); }
-            };
-        } else if (def.isWeatheringRod()) {
-            return new net.minecraft.world.level.block.LightningRodBlock(props.randomTicks()) {
                 @Override public boolean isRandomlyTicking(BlockState state) { return true; }
                 @Override protected void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) { WeatheringBlockLogic.randomTick(state, level, pos); }
             };
@@ -304,18 +252,6 @@ public class BlockFactory implements IBlockFactory {
             return new ModStairBlock(getBaseState(def), props.randomTicks()) {
                 @Override public boolean isRandomlyTicking(BlockState state) { return true; }
                 @Override protected void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) { WeatheringBlockLogic.randomTick(state, level, pos); }
-            };
-        } else if (def.isWeatheringTrapdoor()) {
-            return new TrapDoorBlock(BlockSetType.OAK, props.randomTicks()) {
-                @Override public boolean isRandomlyTicking(BlockState state) { return true; }
-                @Override protected void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) { WeatheringBlockLogic.randomTick(state, level, pos); }
-                @Override protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
-                    state = state.cycle(OPEN);
-                    level.setBlock(pos, state, 2);
-                    if (state.getValue(WATERLOGGED)) level.scheduleTick(pos, net.minecraft.world.level.material.Fluids.WATER, net.minecraft.world.level.material.Fluids.WATER.getTickDelay(level));
-                    level.playSound(player, pos, state.getValue(OPEN) ? net.minecraft.sounds.SoundEvents.WOODEN_TRAPDOOR_OPEN : net.minecraft.sounds.SoundEvents.WOODEN_TRAPDOOR_CLOSE, net.minecraft.sounds.SoundSource.BLOCKS, 1.0F, 1.0F);
-                    return InteractionResult.SUCCESS;
-                }
             };
         } else if (def.isWeatheringVerticalSlab()) {
             return new VerticalSlabBlock(getBaseBlock(def), props.randomTicks()) {
@@ -646,28 +582,6 @@ public class BlockFactory implements IBlockFactory {
             return new ModIronBarsBlock(props);
         } else if (def.isLadder()) {
             return new ModLadderBlock(props);
-        } else if (def.isCopperWallTorch()) {
-            return new WallTorchBlock(net.minecraft.core.particles.ParticleTypes.FLAME, props) {
-                @Override
-                public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
-                    CopperWallTorchBlock.spawnParticles(state, level, pos);
-                }
-                @Override
-                public MapCodec<WallTorchBlock> codec() {
-                    return codecForDefinition(def, WallTorchBlock.class);
-                }
-            };
-        } else if (def.isCopperTorch()) {
-            return new TorchBlock(net.minecraft.core.particles.ParticleTypes.FLAME, props) {
-                @Override
-                public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
-                    CopperTorchBlock.spawnParticles(state, level, pos);
-                }
-                @Override
-                public MapCodec<? extends TorchBlock> codec() {
-                    return codecForDefinition(def, TorchBlock.class);
-                }
-            };
         } else if (def.isLantern()) {
             return new LanternBlock(props);
         } else if (def.isLeafHedge()) {
@@ -752,66 +666,6 @@ public class BlockFactory implements IBlockFactory {
                     return true;
                 }
             };
-        } else if (def.isBambooStandingSign()) {
-            class V26xBambooStandingSignBlock extends StandingSignBlock {
-                public V26xBambooStandingSignBlock(WoodType woodType, BlockBehaviour.Properties properties) {
-                    super(woodType, properties);
-                }
-                @Override
-                public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-                    return new BambooSignBlockEntity(pos, state);
-                }
-                @Override
-                public <T extends BlockEntity> net.minecraft.world.level.block.entity.BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
-                    return createTickerHelper(type, ModBlockEntities.BAMBOO_SIGN_BLOCK_ENTITY_TYPE, net.minecraft.world.level.block.entity.SignBlockEntity::tick);
-                }
-            }
-            return new V26xBambooStandingSignBlock(WoodType.BAMBOO, props);
-        } else if (def.isBambooWallSign()) {
-            class V26xBambooWallSignBlock extends WallSignBlock {
-                public V26xBambooWallSignBlock(WoodType woodType, BlockBehaviour.Properties properties) {
-                    super(woodType, properties);
-                }
-                @Override
-                public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-                    return new BambooSignBlockEntity(pos, state);
-                }
-                @Override
-                public <T extends BlockEntity> net.minecraft.world.level.block.entity.BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
-                    return createTickerHelper(type, ModBlockEntities.BAMBOO_SIGN_BLOCK_ENTITY_TYPE, net.minecraft.world.level.block.entity.SignBlockEntity::tick);
-                }
-            }
-            return new V26xBambooWallSignBlock(WoodType.BAMBOO, props);
-        } else if (def.isMangroveStandingSign()) {
-            class V26xMangroveStandingSignBlock extends StandingSignBlock {
-                public V26xMangroveStandingSignBlock(WoodType woodType, BlockBehaviour.Properties properties) {
-                    super(woodType, properties);
-                }
-                @Override
-                public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-                    return new MangroveSignBlockEntity(pos, state);
-                }
-                @Override
-                public <T extends BlockEntity> net.minecraft.world.level.block.entity.BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
-                    return createTickerHelper(type, ModBlockEntities.MANGROVE_SIGN_BLOCK_ENTITY_TYPE, net.minecraft.world.level.block.entity.SignBlockEntity::tick);
-                }
-            }
-            return new V26xMangroveStandingSignBlock(WoodType.MANGROVE, props);
-        } else if (def.isMangroveWallSign()) {
-            class V26xMangroveWallSignBlock extends WallSignBlock {
-                public V26xMangroveWallSignBlock(WoodType woodType, BlockBehaviour.Properties properties) {
-                    super(woodType, properties);
-                }
-                @Override
-                public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-                    return new MangroveSignBlockEntity(pos, state);
-                }
-                @Override
-                public <T extends BlockEntity> net.minecraft.world.level.block.entity.BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
-                    return createTickerHelper(type, ModBlockEntities.MANGROVE_SIGN_BLOCK_ENTITY_TYPE, net.minecraft.world.level.block.entity.SignBlockEntity::tick);
-                }
-            }
-            return new V26xMangroveWallSignBlock(WoodType.MANGROVE, props);
         } else if (def.isLeaves()) {
             return new LeavesBlock(0.01f, props) {
                 @Override
@@ -1326,36 +1180,6 @@ public class BlockFactory implements IBlockFactory {
                     return true;
                 }
             };
-        } else if (def.isPotentSulfur()) {
-            return new PotentSulfurBlock(props) {
-                @Override
-                protected BlockState updateShape(BlockState state, LevelReader level, ScheduledTickAccess tickAccess, BlockPos pos, Direction direction, BlockPos adjacentPos, BlockState adjacentState, RandomSource random) {
-                    return onUpdateShape(state, level, pos);
-                }
-
-                @Override
-                protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, @Nullable Orientation orientation, boolean isMoving) {
-                    onNeighborUpdate(level, pos, state, block, pos, isMoving);
-                }
-
-                @Override
-                protected void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean movedByPiston) {
-                    super.onPlace(state, level, pos, oldState, movedByPiston);
-                    onPlaced(state, level, pos);
-                }
-
-                @Override
-                public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
-                    onAnimateTick(state, level, pos, random::nextFloat);
-                }
-
-                @Override
-                protected boolean triggerEvent(BlockState state, Level level, BlockPos pos, int eventId, int eventParam) {
-                    return onTriggerEvent(level, pos);
-                }
-            };
-        } else if (def.isSulfurSpike()) {
-            return new V26xSulfurSpikeBlock(props);
         } else if (def.isBoneDice()) {
             return new BoneDiceBlock(props) {
                 @Override
@@ -1639,39 +1463,6 @@ public class BlockFactory implements IBlockFactory {
                     return onInteract(level, pos, state, player, InteractionHand.MAIN_HAND, hit);
                 }
             };
-        } else if (def.isEyeblossom()) {
-            boolean isOpen = def.getId().contains("open");
-            class V26xEyeblossomBlock extends EyeblossomBlock implements BonemealableBlock {
-                public V26xEyeblossomBlock(BlockBehaviour.Properties properties) {
-                    super(isOpen, properties);
-                }
-                @Override
-                protected void tick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
-                    onBlockTick(state, level, pos);
-                }
-                @Override
-                protected void affectNeighborsAfterRemoval(BlockState state, ServerLevel level, BlockPos pos, boolean isMoving) {
-                    onBlockRemoved(level, pos, state);
-                    super.affectNeighborsAfterRemoval(state, level, pos, isMoving);
-                }
-                @Override
-                public boolean isValidBonemealTarget(LevelReader level, BlockPos pos, BlockState state) {
-                    return true;
-                }
-                @Override
-                public boolean isBonemealSuccess(Level level, RandomSource random, BlockPos pos, BlockState state) {
-                    return true;
-                }
-                @Override
-                public void performBonemeal(ServerLevel level, RandomSource random, BlockPos pos, BlockState state) {
-                    performBonemeal(level, pos);
-                }
-                @Override
-                public MapCodec<BushBlock> codec() {
-                    return codecForDefinition(def, BushBlock.class);
-                }
-            }
-            return new V26xEyeblossomBlock(props);
         } else if (def.isFrostRose()) {
             return new FrostRoseBlock(props) {
                 @Override
@@ -1699,30 +1490,6 @@ public class BlockFactory implements IBlockFactory {
                 protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
                     InteractionResult res = onInteract(level, pos, state, player, InteractionHand.MAIN_HAND, hit);
                     return res != InteractionResult.PASS ? res : super.useWithoutItem(state, level, pos, player, hit);
-                }
-            };
-        } else if (def.isCactusFlower()) {
-            return new CactusFlowerBlock(props) {
-                @Override
-                protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
-                    InteractionResult result = onInteract(state, level, pos, player, hand);
-                    return result != InteractionResult.PASS ? result : super.useItemOn(stack, state, level, pos, player, hand, hit);
-                }
-                @Override
-                public MapCodec<BushBlock> codec() {
-                    return codecForDefinition(def, BushBlock.class);
-                }
-            };
-        } else if (def.isGoldenDandelion()) {
-            return new GoldenDandelionBlock(props) {
-                @Override
-                protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
-                    InteractionResult result = onInteract(state, level, pos, player, hand);
-                    return result != InteractionResult.PASS ? result : super.useItemOn(stack, state, level, pos, player, hand, hit);
-                }
-                @Override
-                public MapCodec<BushBlock> codec() {
-                    return codecForDefinition(def, BushBlock.class);
                 }
             };
         } else if (def.isHangingMoss()) {
@@ -2035,41 +1802,6 @@ public class BlockFactory implements IBlockFactory {
                 }
             }
             return new V26xCreakingHeartBlock(props);
-        } else if (def.isDryGrass()) {
-            Supplier<Block> tallDryGrass = resolveBlockSupplier("tall_dry_grass");
-            class V26xDryGrassBlock extends DryGrassBlock implements BonemealableBlock {
-                public V26xDryGrassBlock(BlockBehaviour.Properties properties) {
-                    super(properties, tallDryGrass);
-                }
-
-                @Override
-                public boolean isValidBonemealTarget(LevelReader level, BlockPos pos, BlockState state) {
-                    return true;
-                }
-
-                @Override
-                public boolean isBonemealSuccess(Level level, RandomSource random, BlockPos pos, BlockState state) {
-                    return true;
-                }
-
-                @Override
-                public void performBonemeal(ServerLevel level, RandomSource random, BlockPos pos, BlockState state) {
-                    growTall(level, pos);
-                }
-
-                @Override
-                public MapCodec<BushBlock> codec() {
-                    return codecForDefinition(def, BushBlock.class);
-                }
-            }
-            return new V26xDryGrassBlock(props);
-        } else if (def.isTallDryGrass()) {
-            return new TallDryGrassBlock(props) {
-                @Override
-                public MapCodec<BushBlock> codec() {
-                    return codecForDefinition(def, BushBlock.class);
-                }
-            };
         } else if (def.isMonetFlower()) {
             class V26xMonetFlowerBlock extends MonetFlowerBlock implements BonemealableBlock {
                 public V26xMonetFlowerBlock(BlockBehaviour.Properties properties) {
@@ -2323,42 +2055,6 @@ public class BlockFactory implements IBlockFactory {
                     }
                 }
             };
-        } else if (def.isFireflyBush()) {
-            return new FireflyBushBlock(props) {
-                @Override
-                public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
-                    boolean isNight = Services.PLATFORM.isNight(level);
-                    boolean noSkylight = level.getBrightness(LightLayer.SKY, pos) == 0;
-                    if (!(isNight || noSkylight) || random.nextFloat() >= 0.70F) {
-                        return;
-                    }
-                    for (int i = 0; i < 10; i++) {
-                        BlockPos targetPos = pos.offset(random.nextInt(11) - 5, random.nextInt(6), random.nextInt(11) - 5);
-                        if (level.getBlockState(targetPos).isAir()) {
-                            level.addParticle(
-                                    ModParticles.FIREFLY.get(),
-                                    targetPos.getX() + random.nextDouble(),
-                                    targetPos.getY() + random.nextDouble(),
-                                    targetPos.getZ() + random.nextDouble(),
-                                    (random.nextFloat() - 0.5F) * 0.01D,
-                                    (random.nextFloat() - 0.5F) * 0.005D,
-                                    (random.nextFloat() - 0.5F) * 0.01D);
-                            return;
-                        }
-                    }
-                }
-
-                @Override
-                protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
-                    InteractionResult result = onInteract(state, level, pos, player, hand);
-                    return result != InteractionResult.PASS ? result : super.useItemOn(stack, state, level, pos, player, hand, hit);
-                }
-
-                @Override
-                public MapCodec<BushBlock> codec() {
-                    return codecForDefinition(def, BushBlock.class);
-                }
-            };
         } else if (def.isSilkTouchOnlyGlass()) {
             return new SilkTouchOnlyGlassBlock(props) {
                 @Override
@@ -2395,26 +2091,11 @@ public class BlockFactory implements IBlockFactory {
                     return codecForDefinition(def, net.minecraft.world.level.block.MultifaceBlock.class);
                 }
             };
-        } else if (def.isSculkVein()) {
-            return new SculkVeinBlock(props) {
-                @Override
-                protected MapCodec<? extends net.minecraft.world.level.block.MultifaceBlock> codec() {
-                    return codecForDefinition(def, net.minecraft.world.level.block.MultifaceBlock.class);
-                }
-            };
         } else if (def.isWallpaperFlat()) {
             return new WallpaperFlatBlock(props) {
                 @Override
                 protected MapCodec<? extends net.minecraft.world.level.block.MultifaceBlock> codec() {
                     return codecForDefinition(def, net.minecraft.world.level.block.MultifaceBlock.class);
-                }
-            };
-        } else if (def.isSculkCatalyst()) {
-            props.lightLevel(state -> state.getValue(SculkCatalystBlock.BLOOM) ? 6 : 0);
-            return new SculkCatalystBlock(props) {
-                @Override
-                protected void tick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
-                    onCatalystTick(state, level, pos);
                 }
             };
         } else if (def.isPointedIcicle()) {
@@ -2667,212 +2348,4 @@ public class BlockFactory implements IBlockFactory {
             super.affectNeighborsAfterRemoval(state, level, pos, isMoving);
         }
     }
-    public final class V26xSulfurSpikeBlock extends PointedDripstoneBlock implements SulfurSpikeBlock {
-    public V26xSulfurSpikeBlock(BlockBehaviour.Properties properties) {
-        super(Blocks.DRIPSTONE_BLOCK.defaultBlockState(), properties);
-    }
-
-    @Override
-    public boolean canSurvive(BlockState state, LevelReader level, BlockPos pos) {
-        Direction direction = state.getValue(BlockStateProperties.VERTICAL_DIRECTION);
-        BlockPos supportPos = direction == Direction.DOWN ? pos.above() : pos.below();
-        BlockState support = level.getBlockState(supportPos);
-        boolean pointed = support.getBlock() instanceof PointedDripstoneBlock;
-        boolean sameDirection = pointed
-                && support.getValue(BlockStateProperties.VERTICAL_DIRECTION) == direction;
-        return SulfurSpikeLogic.canSurvive(
-                support.getBlock() instanceof SlabBlock,
-                support.isFaceSturdy(level, supportPos,
-                        direction == Direction.DOWN ? Direction.DOWN : Direction.UP),
-                pointed,
-                sameDirection);
-    }
-
-    @Override
-    public BlockState getStateForPlacement(BlockPlaceContext context) {
-        Level level = context.getLevel();
-        BlockPos clickedPos = context.getClickedPos();
-        Direction clickedFace = context.getClickedFace();
-        BlockPos pos = clickedPos.relative(clickedFace);
-        BlockState above = level.getBlockState(pos.above());
-        BlockState below = level.getBlockState(pos.below());
-        SulfurSpikeLogic.VerticalDirection chosen = SulfurSpikeLogic.placementDirection(
-                sulfurDirection(level.getBlockState(clickedPos)), clickFace(clickedFace),
-                sulfurDirection(below), sulfurDirection(above),
-                above.isFaceSturdy(level, pos.above(), Direction.DOWN),
-                below.isFaceSturdy(level, pos.below(), Direction.UP));
-        Direction nativeDirection = chosen == SulfurSpikeLogic.VerticalDirection.DOWN
-                ? Direction.DOWN : Direction.UP;
-        return applyThickness(level, pos, defaultBlockState().setValue(
-                BlockStateProperties.VERTICAL_DIRECTION, nativeDirection));
-    }
-
-    @Override
-    protected void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean isMoving) {
-        if (!level.isClientSide()) SulfurSpikeLogic.onPlaced(new Access(level), pos, state);
-    }
-
-    @Override
-    protected BlockState updateShape(BlockState state, LevelReader level, ScheduledTickAccess ticks,
-                                     BlockPos pos, Direction direction, BlockPos neighborPos,
-                                     BlockState neighborState, net.minecraft.util.RandomSource random) {
-        if (direction != Direction.UP && direction != Direction.DOWN) return state;
-        if (level instanceof Level world) {
-            return SulfurSpikeLogic.updateVerticalShape(new Access(world), pos, state);
-        }
-        return applyThickness(level, pos, state);
-    }
-
-    @Override
-    protected void tick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
-        Direction direction = state.getValue(BlockStateProperties.VERTICAL_DIRECTION);
-        BlockPos supportPos = direction == Direction.DOWN ? pos.above() : pos.below();
-        BlockState support = level.getBlockState(supportPos);
-        SulfurSpikeLogic.scheduledSurvivalTick(new Access(level), pos, state,
-                canSurvive(state, level, pos),
-                SulfurSpikeLogic.supportGone(
-                        support.isFaceSturdy(level, supportPos,
-                                direction == Direction.DOWN ? Direction.DOWN : Direction.UP),
-                        support.getBlock() instanceof PointedDripstoneBlock,
-                        support.getBlock() instanceof SlabBlock),
-                level.getBlockState(pos.below()).canBeReplaced());
-    }
-
-    @Override
-    protected void affectNeighborsAfterRemoval(BlockState state, ServerLevel level, BlockPos pos,
-                                               boolean isMoving) {
-        if (!isMoving) SulfurSpikeLogic.removed(new Access(level), pos, state);
-        super.affectNeighborsAfterRemoval(state, level, pos, isMoving);
-    }
-
-    @Override
-    protected void neighborChanged(BlockState state, Level level, BlockPos pos,
-                                   net.minecraft.world.level.block.Block neighborBlock,
-                                   net.minecraft.world.level.redstone.Orientation orientation,
-                                   boolean isMoving) {
-        if (!level.isClientSide()) {
-            SulfurSpikeLogic.neighborChanged(new Access(level), pos, state, true);
-        }
-    }
-
-    @Override
-    protected void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
-        SulfurSpikeLogic.randomGrowthTick(new Access(level), pos, state, random.nextFloat());
-    }
-
-    @Override
-    public boolean isRandomlyTicking(BlockState state) { return true; }
-
-    @Override
-    public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
-        if (!level.isClientSide()) return;
-        SulfurSpikeLogic.FluidKind fluid = SulfurSpikeLogic.dripParticleFluid(
-                new Access(level), pos, state, random.nextInt(3));
-        if (fluid != SulfurSpikeLogic.FluidKind.EMPTY) {
-            level.addParticle(fluid == SulfurSpikeLogic.FluidKind.WATER
-                            ? ParticleTypes.DRIPPING_WATER : ParticleTypes.DRIPPING_LAVA,
-                    pos.getX() + 0.5D, pos.getY() + 0.1D, pos.getZ() + 0.5D, 0D, 0D, 0D);
-        }
-    }
-
-    @Override protected VoxelShape getVisualShape(BlockState state, BlockGetter level, BlockPos pos,
-                                                   CollisionContext context) { return Shapes.empty(); }
-    @Override protected boolean useShapeForLightOcclusion(BlockState state) { return false; }
-    @Override protected boolean propagatesSkylightDown(BlockState state) { return true; }
-    @Override protected float getShadeBrightness(BlockState state, BlockGetter level, BlockPos pos) { return 1.0F; }
-    @Override protected boolean skipRendering(BlockState state, BlockState adjacent, Direction side) {
-        return adjacent.is(this) || super.skipRendering(state, adjacent, side);
-    }
-
-    private BlockState applyThickness(LevelReader level, BlockPos pos, BlockState state) {
-        return SulfurSpikeLogic.applyThickness(new SulfurSpikeLogic.NativeStateAccess() {
-            public BlockState state(BlockPos target) { return level.getBlockState(target); }
-            public boolean isSulfur(BlockState candidate) { return candidate.is(V26xSulfurSpikeBlock.this); }
-            public boolean isPointed(BlockState candidate) {
-                return candidate.getBlock() instanceof PointedDripstoneBlock;
-            }
-            public SulfurSpikeLogic.VerticalDirection direction(BlockState candidate) {
-                return toShared(candidate.getValue(BlockStateProperties.VERTICAL_DIRECTION));
-            }
-            public SulfurSpikeLogic.Thickness thickness(BlockState candidate) {
-                return SulfurSpikeLogic.Thickness.valueOf(
-                        candidate.getValue(BlockStateProperties.SPELEOTHEM_THICKNESS).name());
-            }
-            public BlockState withThickness(BlockState candidate, SulfurSpikeLogic.Thickness thickness) {
-                return candidate.setValue(BlockStateProperties.SPELEOTHEM_THICKNESS,
-                        SpeleothemThickness.valueOf(thickness.name()));
-            }
-        }, pos, state);
-    }
-
-    private SulfurSpikeLogic.VerticalDirection sulfurDirection(BlockState state) {
-        return state.is(this) ? toShared(state.getValue(BlockStateProperties.VERTICAL_DIRECTION)) : null;
-    }
-
-    private static SulfurSpikeLogic.ClickFace clickFace(Direction direction) {
-        if (direction == Direction.UP) return SulfurSpikeLogic.ClickFace.UP;
-        if (direction == Direction.DOWN) return SulfurSpikeLogic.ClickFace.DOWN;
-        return SulfurSpikeLogic.ClickFace.SIDE;
-    }
-
-    private static SulfurSpikeLogic.VerticalDirection toShared(Direction direction) {
-        return direction == Direction.DOWN ? SulfurSpikeLogic.VerticalDirection.DOWN
-                : SulfurSpikeLogic.VerticalDirection.UP;
-    }
-
-    private final class Access implements SulfurSpikeLogic.NativeMutationAccess {
-        private final Level level;
-
-        private Access(Level level) { this.level = level; }
-        public BlockState state(BlockPos pos) { return level.getBlockState(pos); }
-        public boolean isSulfur(BlockState state) { return state.is(V26xSulfurSpikeBlock.this); }
-        public boolean isPointed(BlockState state) { return state.getBlock() instanceof PointedDripstoneBlock; }
-        public SulfurSpikeLogic.VerticalDirection direction(BlockState state) {
-            return toShared(state.getValue(BlockStateProperties.VERTICAL_DIRECTION));
-        }
-        public SulfurSpikeLogic.Thickness thickness(BlockState state) {
-            return SulfurSpikeLogic.Thickness.valueOf(
-                    state.getValue(BlockStateProperties.SPELEOTHEM_THICKNESS).name());
-        }
-        public BlockState withThickness(BlockState state, SulfurSpikeLogic.Thickness thickness) {
-            return state.setValue(BlockStateProperties.SPELEOTHEM_THICKNESS,
-                    SpeleothemThickness.valueOf(thickness.name()));
-        }
-        public void setState(BlockPos pos, BlockState state, int flags) { level.setBlock(pos, state, flags); }
-        public void scheduleTick(BlockPos pos, int delay) {
-            if (level instanceof ScheduledTickAccess ticks) {
-                ticks.scheduleTick(pos, V26xSulfurSpikeBlock.this, delay);
-            }
-        }
-        public void destroy(BlockPos pos, boolean drop) { level.destroyBlock(pos, drop); }
-        public boolean isAir(BlockState state) { return state.isAir(); }
-        public boolean isSulfurSource(BlockState state) {
-            com.kingodogo.buildscape.util.CommonId id = Services.PLATFORM.getBlockId(state.getBlock());
-            if (id == null || !"buildscape".equals(id.getNamespace())) return false;
-            String path = id.getPath();
-            return path.equals("sulfur") || path.equals("polished_sulfur")
-                    || path.equals("chiseled_sulfur") || path.equals("sulfur_bricks");
-        }
-        public SulfurSpikeLogic.FluidKind fluidAt(BlockPos pos) {
-            net.minecraft.world.level.material.FluidState fluid = level.getFluidState(pos);
-            if (fluid.is(FluidTags.WATER)) return SulfurSpikeLogic.FluidKind.WATER;
-            if (fluid.is(FluidTags.LAVA)) return SulfurSpikeLogic.FluidKind.LAVA;
-            return SulfurSpikeLogic.FluidKind.EMPTY;
-        }
-        public BlockState newState(SulfurSpikeLogic.VerticalDirection direction,
-                                   SulfurSpikeLogic.Thickness thickness) {
-            return defaultBlockState()
-                    .setValue(BlockStateProperties.VERTICAL_DIRECTION,
-                            direction == SulfurSpikeLogic.VerticalDirection.DOWN ? Direction.DOWN : Direction.UP)
-                    .setValue(BlockStateProperties.SPELEOTHEM_THICKNESS,
-                            SpeleothemThickness.valueOf(thickness.name()));
-        }
-        public void notifyVanillaPointedNeighbor(BlockPos target, BlockPos source) {
-            BlockState state = level.getBlockState(target);
-            if (state.getBlock() instanceof PointedDripstoneBlock && !state.is(V26xSulfurSpikeBlock.this)) {
-                level.neighborChanged(state, target, V26xSulfurSpikeBlock.this, null, false);
-            }
-        }
-    }
-}
 }

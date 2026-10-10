@@ -16,10 +16,10 @@
     "buildscape:stripped_bamboo_block_fence_gate",
     "buildscape:stripped_bamboo_block_button",
     "buildscape:stripped_bamboo_block_pressure_plate",
-    "buildscape:bamboo_door",
-    "buildscape:bamboo_sign",
-    "buildscape:bamboo_trapdoor",
-    "buildscape:bamboo_wall_sign",
+    "minecraft:bamboo_door",
+    "minecraft:bamboo_sign",
+    "minecraft:bamboo_trapdoor",
+    "minecraft:bamboo_wall_sign",
     "buildscape:bamboo_wood",
     "buildscape:stripped_bamboo_wood"
   ]

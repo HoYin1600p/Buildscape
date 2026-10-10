@@ -30,8 +30,6 @@ public final class RenderFactory {
     }
 
     public static void registerBlockEntityRenderers(BlockEntityRegistrar target) {
-        target.register(ModBlockEntities.MANGROVE_SIGN_BLOCK_ENTITY_TYPE, StandingSignRenderer::new);
-        target.register(ModBlockEntities.BAMBOO_SIGN_BLOCK_ENTITY_TYPE, StandingSignRenderer::new);
         target.register(ModBlockEntities.COPPER_CHEST_TYPE, com.kingodogo.buildscape.adapter.v26x.client.CopperChestRenderer::new);
         target.register(ModBlockEntities.PILLAR_TYPE, context -> new com.kingodogo.buildscape.adapter.v26x.client.PillarRenderer());
         target.register(ModBlockEntities.DECORATED_POT_TYPE, context -> new com.kingodogo.buildscape.adapter.v26x.client.DecoratedPotRenderer<>());

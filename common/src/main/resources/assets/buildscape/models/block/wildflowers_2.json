@@ -1,7 +1,0 @@
-{
-  "parent": "buildscape:block/flowerbed_2",
-  "textures": {
-    "flowerbed": "buildscape:block/wildflowers",
-    "stem": "buildscape:block/wildflowers_stem"
-  }
-}

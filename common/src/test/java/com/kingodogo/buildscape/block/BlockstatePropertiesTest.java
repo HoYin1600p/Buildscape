@@ -70,7 +70,7 @@ class BlockstatePropertiesTest {
     @Test
     void everyBlockHasABlockstateUsingOnlyItsOwnProperties() throws Exception {
         List<BlockDefinition> defs = definitions();
-        assertTrue(defs.size() > 3000, "expected the full block list, got " + defs.size());
+        assertTrue(defs.size() > 2900, "expected the retained block list, got " + defs.size());
         List<String> problems = new ArrayList<>();
         int checked = 0;
         for (BlockDefinition def : defs) {

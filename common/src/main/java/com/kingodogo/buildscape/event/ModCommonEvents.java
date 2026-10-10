@@ -166,17 +166,6 @@ public final class ModCommonEvents {
 
     public static void onLivingDeath(LivingEntity entity, DamageSource source) {
         FrostRoseDropHandler.onLivingDeath(entity, source);
-        Level level = Services.PLATFORM.getEntityLevel(entity);
-        if (!level.isClientSide()) {
-            BlockPos deathPos = entity.blockPosition();
-            for (BlockPos pos : BlockPos.betweenClosed(deathPos.offset(-8, -8, -8), deathPos.offset(8, 8, 8))) {
-                var id = Services.PLATFORM.getBlockId(level.getBlockState(pos).getBlock());
-                if (id != null && "buildscape".equals(id.getNamespace()) && "sculk_catalyst".equals(id.getPath())) {
-                    com.kingodogo.buildscape.block.SculkCatalystHandler.onMobKilledNearCatalyst(level, pos, deathPos, entity);
-                    break;
-                }
-            }
-        }
     }
 
     public static void onLivingUpdate(LivingEntity entity) {
@@ -358,9 +347,6 @@ public final class ModCommonEvents {
         TreeChopJobManager.onServerTick(server);
 
         if (server != null) {
-            for (net.minecraft.server.level.ServerLevel level : server.getAllLevels()) {
-                com.kingodogo.buildscape.block.EyeblossomTransitionHandler.onWorldTick(level);
-            }
             pillarSaveTickCounter++;
             if (pillarSaveTickCounter >= PILLAR_SAVE_INTERVAL) {
                 pillarSaveTickCounter = 0;
@@ -374,7 +360,6 @@ public final class ModCommonEvents {
         MudToClayHandler.onServerStopping();
         TreeChopJobManager.onServerStopping();
         com.kingodogo.buildscape.pipe.transport.HollowPipeTransportManager.onServerStopping();
-        com.kingodogo.buildscape.block.EyeblossomTransitionHandler.onServerStopping();
         com.kingodogo.buildscape.block.CascadeWaterManager.onServerStopping();
         HollowLogCrawlHandler.onServerStopping();
         JOINED_PLAYERS.clear();
@@ -395,7 +380,6 @@ public final class ModCommonEvents {
     }
 
     public static void onLevelUnload(net.minecraft.server.level.ServerLevel level) {
-        com.kingodogo.buildscape.block.EyeblossomTransitionHandler.onWorldUnload(level);
         com.kingodogo.buildscape.pipe.transport.HollowPipeTransportManager.onLevelUnload(level);
         com.kingodogo.buildscape.block.CascadeWaterManager.onLevelUnload(level);
         TreeChopJobManager.onLevelUnload(level);
@@ -422,34 +406,6 @@ public final class ModCommonEvents {
         }
         InteractionResult frameResult = ItemFrameParticleHandler.onEntityInteract(player, level, hand, target);
         if (frameResult != InteractionResult.PASS) return frameResult;
-
-        if (target instanceof net.minecraft.world.entity.AgeableMob mob
-                && !(target instanceof net.minecraft.world.entity.monster.Monster)) {
-            ItemStack held = player.getItemInHand(hand);
-            net.minecraft.world.item.Item flower = Services.PLATFORM.getItem(
-                    new com.kingodogo.buildscape.util.CommonId("buildscape", "golden_dandelion"));
-            if (flower != null && held.is(flower)) {
-                boolean frozen = com.kingodogo.buildscape.util.GoldenDandelionGrowth.isFrozen(mob);
-                if (!com.kingodogo.buildscape.util.GoldenDandelionGrowth.canToggle(mob.isBaby(), frozen)) {
-                    return InteractionResult.PASS;
-                }
-                if (!level.isClientSide()) {
-                    if (!com.kingodogo.buildscape.util.GoldenDandelionGrowth.setFrozen(mob, !frozen)) {
-                        return InteractionResult.PASS;
-                    }
-                    if (level instanceof net.minecraft.server.level.ServerLevel serverLevel) {
-                        serverLevel.sendParticles(frozen ? net.minecraft.core.particles.ParticleTypes.HAPPY_VILLAGER
-                                        : net.minecraft.core.particles.ParticleTypes.WAX_OFF,
-                                mob.getX(), mob.getY() + mob.getBbHeight() * 0.5D, mob.getZ(),
-                                12, 0.3D, 0.3D, 0.3D, 0.05D);
-                    }
-                    level.playSound(null, mob.blockPosition(), frozen ? SoundEvents.VILLAGER_YES
-                                    : SoundEvents.HONEYCOMB_WAX_ON, SoundSource.NEUTRAL, 1.0F, 1.0F);
-                    if (!player.getAbilities().instabuild) held.shrink(1);
-                }
-                return InteractionResult.SUCCESS;
-            }
-        }
         return InteractionResult.PASS;
     }
 }

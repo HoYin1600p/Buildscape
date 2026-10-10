@@ -22,9 +22,6 @@
     "BS:ashpen_red_planks",
     "BS:ashpen_white_planks",
     "BS:ashpen_yellow_planks",
-    "BS:cherry_planks",
-    "BS:mangrove_planks",
-    "BS:pale_oak_planks",
     "BS:poplar_planks"
   ],
   "crafting_shaped": [
@@ -11932,21 +11929,6 @@
       6
     ],
     [
-      "BS:bamboo_door",
-      [
-        "BB",
-        "BB",
-        "BB"
-      ],
-      [
-        [
-          "B",
-          "BS:stripped_bamboo_block"
-        ]
-      ],
-      3
-    ],
-    [
       "BS:bamboo_ladder",
       [
         "S S",
@@ -11964,54 +11946,6 @@
         ]
       ],
       3
-    ],
-    [
-      "BS:bamboo_shelf",
-      [
-        "###",
-        "   ",
-        "###"
-      ],
-      [
-        [
-          "#",
-          "BS:bamboo_block"
-        ]
-      ],
-      6
-    ],
-    [
-      "BS:bamboo_sign",
-      [
-        "###",
-        "###",
-        " X "
-      ],
-      [
-        [
-          "#",
-          "BS:bamboo_block"
-        ],
-        [
-          "X",
-          "MC:stick"
-        ]
-      ],
-      3
-    ],
-    [
-      "BS:bamboo_trapdoor",
-      [
-        "BBB",
-        "BBB"
-      ],
-      [
-        [
-          "B",
-          "BS:stripped_bamboo_block"
-        ]
-      ],
-      2
     ],
     [
       "BS:bamboo_wood",
@@ -15726,21 +15660,6 @@
       4
     ],
     [
-      "BS:cherry_shelf",
-      [
-        "###",
-        "   ",
-        "###"
-      ],
-      [
-        [
-          "#",
-          "BS:stripped_cherry_log"
-        ]
-      ],
-      6
-    ],
-    [
       "BS:cherry_wood",
       [
         "##",
@@ -15783,34 +15702,6 @@
       6
     ],
     [
-      "BS:chiseled_cinnabar",
-      [
-        "S",
-        "S"
-      ],
-      [
-        [
-          "S",
-          "BS:polished_cinnabar_slab"
-        ]
-      ],
-      1
-    ],
-    [
-      "BS:chiseled_copper",
-      [
-        "#",
-        "#"
-      ],
-      [
-        [
-          "#",
-          "MC:cut_copper_slab"
-        ]
-      ],
-      1
-    ],
-    [
       "BS:chiseled_resin_bricks",
       [
         "#",
@@ -15825,122 +15716,6 @@
       1
     ],
     [
-      "BS:chiseled_sulfur",
-      [
-        "S",
-        "S"
-      ],
-      [
-        [
-          "S",
-          "BS:polished_sulfur_slab"
-        ]
-      ],
-      1
-    ],
-    [
-      "BS:chiseled_tuff",
-      [
-        "S",
-        "S"
-      ],
-      [
-        [
-          "S",
-          "BS:tuff_slab"
-        ]
-      ],
-      1
-    ],
-    [
-      "BS:chiseled_tuff_bricks",
-      [
-        "S",
-        "S"
-      ],
-      [
-        [
-          "S",
-          "BS:tuff_brick_slab"
-        ]
-      ],
-      1
-    ],
-    [
-      "BS:cinnabar",
-      [
-        "GS",
-        "SG"
-      ],
-      [
-        [
-          "S",
-          "BS:sulfur"
-        ],
-        [
-          "G",
-          "MC:granite"
-        ]
-      ],
-      4
-    ],
-    [
-      "BS:cinnabar_bricks",
-      [
-        "PP",
-        "PP"
-      ],
-      [
-        [
-          "P",
-          "BS:polished_cinnabar"
-        ]
-      ],
-      4
-    ],
-    [
-      "BS:cinnabar_bricks_slab",
-      [
-        "SSS"
-      ],
-      [
-        [
-          "S",
-          "BS:cinnabar_bricks"
-        ]
-      ],
-      6
-    ],
-    [
-      "BS:cinnabar_bricks_stairs",
-      [
-        "S  ",
-        "SS ",
-        "SSS"
-      ],
-      [
-        [
-          "S",
-          "BS:cinnabar_bricks"
-        ]
-      ],
-      4
-    ],
-    [
-      "BS:cinnabar_bricks_wall",
-      [
-        "SSS",
-        "SSS"
-      ],
-      [
-        [
-          "S",
-          "BS:cinnabar_bricks"
-        ]
-      ],
-      6
-    ],
-    [
       "BS:cinnabar_pillar",
       [
         " R ",
@@ -15950,89 +15725,10 @@
       [
         [
           "R",
-          "BS:cinnabar"
+          "MC:cinnabar"
         ]
       ],
       1
-    ],
-    [
-      "BS:cinnabar_slab",
-      [
-        "SSS"
-      ],
-      [
-        [
-          "S",
-          "BS:cinnabar"
-        ]
-      ],
-      6
-    ],
-    [
-      "BS:cinnabar_stairs",
-      [
-        "S  ",
-        "SS ",
-        "SSS"
-      ],
-      [
-        [
-          "S",
-          "BS:cinnabar"
-        ]
-      ],
-      4
-    ],
-    [
-      "BS:cinnabar_wall",
-      [
-        "SSS",
-        "SSS"
-      ],
-      [
-        [
-          "S",
-          "BS:cinnabar"
-        ]
-      ],
-      6
-    ],
-    [
-      "BS:copper_bars",
-      [
-        "III",
-        "III"
-      ],
-      [
-        [
-          "I",
-          "MC:copper_ingot"
-        ]
-      ],
-      16
-    ],
-    [
-      "BS:copper_bulb",
-      [
-        " C ",
-        "CBC",
-        " R "
-      ],
-      [
-        [
-          "C",
-          "MC:copper_block"
-        ],
-        [
-          "B",
-          "MC:blaze_rod"
-        ],
-        [
-          "R",
-          "MC:redstone"
-        ]
-      ],
-      4
     ],
     [
       "BS:copper_button",
@@ -16043,28 +15739,6 @@
         [
           "#",
           "MC:copper_ingot"
-        ]
-      ],
-      1
-    ],
-    [
-      "BS:copper_chain",
-      [
-        "N",
-        "I",
-        "N"
-      ],
-      [
-        [
-          "I",
-          "MC:copper_ingot"
-        ],
-        [
-          "N",
-          [
-            "BS:copper_nugget",
-            "#F:nuggets/copper"
-          ]
         ]
       ],
       1
@@ -16089,58 +15763,6 @@
       1
     ],
     [
-      "BS:copper_door",
-      [
-        "CC",
-        "CC",
-        "CC"
-      ],
-      [
-        [
-          "C",
-          "MC:copper_ingot"
-        ]
-      ],
-      3
-    ],
-    [
-      "BS:copper_grate",
-      [
-        " C ",
-        "C C",
-        " C "
-      ],
-      [
-        [
-          "C",
-          "MC:copper_block"
-        ]
-      ],
-      4
-    ],
-    [
-      "BS:copper_lantern",
-      [
-        "NNN",
-        "NTN",
-        "NNN"
-      ],
-      [
-        [
-          "N",
-          [
-            "BS:copper_nugget",
-            "#F:nuggets/copper"
-          ]
-        ],
-        [
-          "T",
-          "BS:copper_torch"
-        ]
-      ],
-      1
-    ],
-    [
       "BS:copper_mesh",
       [
         "NNN",
@@ -16150,7 +15772,7 @@
         [
           "N",
           [
-            "BS:copper_nugget",
+            "MC:copper_nugget",
             "#F:nuggets/copper"
           ]
         ]
@@ -16184,64 +15806,6 @@
         ]
       ],
       1
-    ],
-    [
-      "BS:copper_rod",
-      [
-        "I",
-        "I",
-        "I"
-      ],
-      [
-        [
-          "I",
-          "MC:copper_ingot"
-        ]
-      ],
-      1
-    ],
-    [
-      "BS:copper_torch",
-      [
-        "C",
-        "S",
-        "N"
-      ],
-      [
-        [
-          "C",
-          [
-            "MC:coal",
-            "MC:charcoal"
-          ]
-        ],
-        [
-          "S",
-          "MC:stick"
-        ],
-        [
-          "N",
-          [
-            "BS:copper_nugget",
-            "#F:nuggets/copper"
-          ]
-        ]
-      ],
-      4
-    ],
-    [
-      "BS:copper_trapdoor",
-      [
-        "CCC",
-        "CCC"
-      ],
-      [
-        [
-          "C",
-          "MC:copper_block"
-        ]
-      ],
-      2
     ],
     [
       "BS:crimson_hyphae_slab",
@@ -17140,21 +16704,6 @@
       6
     ],
     [
-      "BS:decorated_pot",
-      [
-        " B ",
-        "B B",
-        " B "
-      ],
-      [
-        [
-          "B",
-          "MC:brick"
-        ]
-      ],
-      1
-    ],
-    [
       "BS:deepslate_pillar",
       [
         " R ",
@@ -17384,20 +16933,6 @@
         ]
       ],
       6
-    ],
-    [
-      "BS:exposed_chiseled_copper",
-      [
-        "#",
-        "#"
-      ],
-      [
-        [
-          "#",
-          "MC:exposed_cut_copper_slab"
-        ]
-      ],
-      1
     ],
     [
       "BS:exposed_copper_pillar",
@@ -18325,25 +17860,6 @@
         ]
       ],
       16
-    ],
-    [
-      "BS:golden_dandelion",
-      [
-        "NNN",
-        "NDN",
-        "NNN"
-      ],
-      [
-        [
-          "N",
-          "MC:gold_nugget"
-        ],
-        [
-          "D",
-          "MC:dandelion"
-        ]
-      ],
-      1
     ],
     [
       "BS:granite_pillar",
@@ -19868,7 +19384,7 @@
         [
           "N",
           [
-            "BS:copper_nugget",
+            "MC:copper_nugget",
             "#F:nuggets/copper"
           ]
         ],
@@ -22320,40 +21836,6 @@
       4
     ],
     [
-      "BS:mangrove_shelf",
-      [
-        "###",
-        "   ",
-        "###"
-      ],
-      [
-        [
-          "#",
-          "BS:stripped_mangrove_log"
-        ]
-      ],
-      6
-    ],
-    [
-      "BS:mangrove_sign",
-      [
-        "###",
-        "###",
-        " X "
-      ],
-      [
-        [
-          "#",
-          "BS:mangrove_planks"
-        ],
-        [
-          "X",
-          "MC:stick"
-        ]
-      ],
-      3
-    ],
-    [
       "BS:mangrove_wood",
       [
         "##",
@@ -23681,20 +23163,6 @@
       6
     ],
     [
-      "BS:oxidized_chiseled_copper",
-      [
-        "#",
-        "#"
-      ],
-      [
-        [
-          "#",
-          "MC:oxidized_cut_copper_slab"
-        ]
-      ],
-      1
-    ],
-    [
       "BS:oxidized_copper_pillar",
       [
         " R ",
@@ -23908,21 +23376,6 @@
         ]
       ],
       4
-    ],
-    [
-      "BS:pale_oak_shelf",
-      [
-        "###",
-        "   ",
-        "###"
-      ],
-      [
-        [
-          "#",
-          "BS:stripped_pale_oak_log"
-        ]
-      ],
-      6
     ],
     [
       "BS:pale_oak_wood",
@@ -24871,62 +24324,6 @@
       6
     ],
     [
-      "BS:polished_cinnabar",
-      [
-        "CC",
-        "CC"
-      ],
-      [
-        [
-          "C",
-          "BS:cinnabar"
-        ]
-      ],
-      4
-    ],
-    [
-      "BS:polished_cinnabar_slab",
-      [
-        "SSS"
-      ],
-      [
-        [
-          "S",
-          "BS:polished_cinnabar"
-        ]
-      ],
-      6
-    ],
-    [
-      "BS:polished_cinnabar_stairs",
-      [
-        "S  ",
-        "SS ",
-        "SSS"
-      ],
-      [
-        [
-          "S",
-          "BS:polished_cinnabar"
-        ]
-      ],
-      4
-    ],
-    [
-      "BS:polished_cinnabar_wall",
-      [
-        "SSS",
-        "SSS"
-      ],
-      [
-        [
-          "S",
-          "BS:polished_cinnabar"
-        ]
-      ],
-      6
-    ],
-    [
       "BS:polished_cyan_concrete",
       [
         "#",
@@ -25596,118 +24993,6 @@
       6
     ],
     [
-      "BS:polished_sulfur",
-      [
-        "SS",
-        "SS"
-      ],
-      [
-        [
-          "S",
-          "BS:sulfur"
-        ]
-      ],
-      4
-    ],
-    [
-      "BS:polished_sulfur_slab",
-      [
-        "SSS"
-      ],
-      [
-        [
-          "S",
-          "BS:polished_sulfur"
-        ]
-      ],
-      6
-    ],
-    [
-      "BS:polished_sulfur_stairs",
-      [
-        "S  ",
-        "SS ",
-        "SSS"
-      ],
-      [
-        [
-          "S",
-          "BS:polished_sulfur"
-        ]
-      ],
-      4
-    ],
-    [
-      "BS:polished_sulfur_wall",
-      [
-        "SSS",
-        "SSS"
-      ],
-      [
-        [
-          "S",
-          "BS:polished_sulfur"
-        ]
-      ],
-      6
-    ],
-    [
-      "BS:polished_tuff",
-      [
-        "TT",
-        "TT"
-      ],
-      [
-        [
-          "T",
-          "MC:tuff"
-        ]
-      ],
-      4
-    ],
-    [
-      "BS:polished_tuff_slab",
-      [
-        "PPP"
-      ],
-      [
-        [
-          "P",
-          "BS:polished_tuff"
-        ]
-      ],
-      6
-    ],
-    [
-      "BS:polished_tuff_stairs",
-      [
-        "P  ",
-        "PP ",
-        "PPP"
-      ],
-      [
-        [
-          "P",
-          "BS:polished_tuff"
-        ]
-      ],
-      4
-    ],
-    [
-      "BS:polished_tuff_wall",
-      [
-        "PPP",
-        "PPP"
-      ],
-      [
-        [
-          "P",
-          "BS:polished_tuff"
-        ]
-      ],
-      6
-    ],
-    [
       "BS:polished_white_concrete",
       [
         "#",
@@ -25936,25 +25221,6 @@
         [
           "#",
           "BS:poplar_wood"
-        ]
-      ],
-      4
-    ],
-    [
-      "BS:potent_sulfur",
-      [
-        " S ",
-        "SBS",
-        " S "
-      ],
-      [
-        [
-          "S",
-          "BS:sulfur"
-        ],
-        [
-          "B",
-          "MC:blaze_powder"
         ]
       ],
       4
@@ -27711,86 +26977,6 @@
         ]
       ],
       4
-    ],
-    [
-      "BS:sculk_catalyst",
-      [
-        "GGG",
-        "EEE",
-        "BBB"
-      ],
-      [
-        [
-          "G",
-          "MC:glow_ink_sac"
-        ],
-        [
-          "E",
-          "MC:experience_bottle"
-        ],
-        [
-          "B",
-          "MC:bone_block"
-        ]
-      ],
-      1
-    ],
-    [
-      "BS:sculk_pillar",
-      [
-        " R ",
-        " R ",
-        " R "
-      ],
-      [
-        [
-          "R",
-          "MC:sculk"
-        ]
-      ],
-      1
-    ],
-    [
-      "BS:sculk_slab",
-      [
-        "###"
-      ],
-      [
-        [
-          "#",
-          "BS:sculk"
-        ]
-      ],
-      6
-    ],
-    [
-      "BS:sculk_stairs",
-      [
-        "#  ",
-        "## ",
-        "###"
-      ],
-      [
-        [
-          "#",
-          "BS:sculk"
-        ]
-      ],
-      4
-    ],
-    [
-      "BS:sculk_wall",
-      [
-        "###",
-        "###"
-      ],
-      [
-        [
-          "#",
-          "BS:sculk"
-        ]
-      ],
-      6
     ],
     [
       "BS:slit_copper",
@@ -30194,76 +29380,6 @@
       4
     ],
     [
-      "BS:sulfur",
-      [
-        "SS",
-        "SS"
-      ],
-      [
-        [
-          "S",
-          "BS:sulfur_spike"
-        ]
-      ],
-      1
-    ],
-    [
-      "BS:sulfur_bricks",
-      [
-        "PP",
-        "PP"
-      ],
-      [
-        [
-          "P",
-          "BS:polished_sulfur"
-        ]
-      ],
-      4
-    ],
-    [
-      "BS:sulfur_bricks_slab",
-      [
-        "SSS"
-      ],
-      [
-        [
-          "S",
-          "BS:sulfur_bricks"
-        ]
-      ],
-      6
-    ],
-    [
-      "BS:sulfur_bricks_stairs",
-      [
-        "S  ",
-        "SS ",
-        "SSS"
-      ],
-      [
-        [
-          "S",
-          "BS:sulfur_bricks"
-        ]
-      ],
-      4
-    ],
-    [
-      "BS:sulfur_bricks_wall",
-      [
-        "SSS",
-        "SSS"
-      ],
-      [
-        [
-          "S",
-          "BS:sulfur_bricks"
-        ]
-      ],
-      6
-    ],
-    [
       "BS:sulfur_pillar",
       [
         " R ",
@@ -30273,52 +29389,10 @@
       [
         [
           "R",
-          "BS:sulfur"
+          "MC:sulfur"
         ]
       ],
       1
-    ],
-    [
-      "BS:sulfur_slab",
-      [
-        "SSS"
-      ],
-      [
-        [
-          "S",
-          "BS:sulfur"
-        ]
-      ],
-      6
-    ],
-    [
-      "BS:sulfur_stairs",
-      [
-        "S  ",
-        "SS ",
-        "SSS"
-      ],
-      [
-        [
-          "S",
-          "BS:sulfur"
-        ]
-      ],
-      4
-    ],
-    [
-      "BS:sulfur_wall",
-      [
-        "SSS",
-        "SSS"
-      ],
-      [
-        [
-          "S",
-          "BS:sulfur"
-        ]
-      ],
-      6
     ],
     [
       "BS:terracotta_slab",
@@ -30797,66 +29871,10 @@
         ],
         [
           "P",
-          "BS:decorated_pot"
+          "MC:decorated_pot"
         ]
       ],
       1
-    ],
-    [
-      "BS:tuff_brick_slab",
-      [
-        "BBB"
-      ],
-      [
-        [
-          "B",
-          "BS:tuff_bricks"
-        ]
-      ],
-      6
-    ],
-    [
-      "BS:tuff_brick_stairs",
-      [
-        "B  ",
-        "BB ",
-        "BBB"
-      ],
-      [
-        [
-          "B",
-          "BS:tuff_bricks"
-        ]
-      ],
-      4
-    ],
-    [
-      "BS:tuff_brick_wall",
-      [
-        "BBB",
-        "BBB"
-      ],
-      [
-        [
-          "B",
-          "BS:tuff_bricks"
-        ]
-      ],
-      6
-    ],
-    [
-      "BS:tuff_bricks",
-      [
-        "PP",
-        "PP"
-      ],
-      [
-        [
-          "P",
-          "BS:polished_tuff"
-        ]
-      ],
-      4
     ],
     [
       "BS:tuff_pillar",
@@ -30872,48 +29890,6 @@
         ]
       ],
       1
-    ],
-    [
-      "BS:tuff_slab",
-      [
-        "TTT"
-      ],
-      [
-        [
-          "T",
-          "MC:tuff"
-        ]
-      ],
-      6
-    ],
-    [
-      "BS:tuff_stairs",
-      [
-        "T  ",
-        "TT ",
-        "TTT"
-      ],
-      [
-        [
-          "T",
-          "MC:tuff"
-        ]
-      ],
-      4
-    ],
-    [
-      "BS:tuff_wall",
-      [
-        "TTT",
-        "TTT"
-      ],
-      [
-        [
-          "T",
-          "MC:tuff"
-        ]
-      ],
-      6
     ],
     [
       "BS:warped_hyphae_slab",
@@ -31372,20 +30348,6 @@
         ]
       ],
       2
-    ],
-    [
-      "BS:weathered_chiseled_copper",
-      [
-        "#",
-        "#"
-      ],
-      [
-        [
-          "#",
-          "MC:weathered_cut_copper_slab"
-        ]
-      ],
-      1
     ],
     [
       "BS:weathered_copper_pillar",
@@ -32922,7 +31884,7 @@
         [
           "N",
           [
-            "BS:copper_nugget",
+            "MC:copper_nugget",
             "#F:nuggets/copper"
           ]
         ]
@@ -32991,7 +31953,7 @@
         [
           "N",
           [
-            "BS:copper_nugget",
+            "MC:copper_nugget",
             "#F:nuggets/copper"
           ]
         ]
@@ -33359,22 +32321,6 @@
   ],
   "crafting_shapeless": [
     [
-      "BS:ashen_froglight",
-      [
-        "MC:shroomlight",
-        "MC:gray_dye"
-      ],
-      1
-    ],
-    [
-      "BS:azure_froglight",
-      [
-        "MC:shroomlight",
-        "MC:blue_dye"
-      ],
-      1
-    ],
-    [
       "BS:bamboo_block_button",
       "BS:bamboo_block",
       1
@@ -33535,7 +32481,7 @@
     [
       "BS:black_decorated_pot",
       [
-        "BS:decorated_pot",
+        "MC:decorated_pot",
         "MC:black_dye"
       ],
       1
@@ -33604,7 +32550,7 @@
     [
       "BS:blue_decorated_pot",
       [
-        "BS:decorated_pot",
+        "MC:decorated_pot",
         "MC:blue_dye"
       ],
       1
@@ -33863,7 +32809,7 @@
     [
       "BS:brown_decorated_pot",
       [
-        "BS:decorated_pot",
+        "MC:decorated_pot",
         "MC:brown_dye"
       ],
       1
@@ -33915,7 +32861,7 @@
     ],
     [
       "MC:pink_dye",
-      "BS:cactus_flower",
+      "MC:cactus_flower",
       1
     ],
     [
@@ -33936,14 +32882,6 @@
       1
     ],
     [
-      "BS:cerulean_froglight",
-      [
-        "MC:shroomlight",
-        "MC:light_blue_dye"
-      ],
-      1
-    ],
-    [
       "BS:confetti",
       [
         "MC:paper",
@@ -33953,19 +32891,6 @@
         "MC:green_dye"
       ],
       12
-    ],
-    [
-      "BS:copper_nugget",
-      "MC:copper_ingot",
-      9
-    ],
-    [
-      "BS:coraline_froglight",
-      [
-        "MC:shroomlight",
-        "MC:pink_dye"
-      ],
-      1
     ],
     [
       "BS:cyan_big_book",
@@ -33978,7 +32903,7 @@
     [
       "BS:cyan_decorated_pot",
       [
-        "BS:decorated_pot",
+        "MC:decorated_pot",
         "MC:cyan_dye"
       ],
       1
@@ -34030,14 +32955,6 @@
       [
         "BS:trapped_decorated_pot",
         "MC:cyan_dye"
-      ],
-      1
-    ],
-    [
-      "BS:dusky_froglight",
-      [
-        "MC:shroomlight",
-        "MC:brown_dye"
       ],
       1
     ],
@@ -34426,14 +33343,6 @@
       1
     ],
     [
-      "BS:gleaming_froglight",
-      [
-        "MC:shroomlight",
-        "MC:white_dye"
-      ],
-      1
-    ],
-    [
       "BS:glowing_big_book",
       [
         "BS:big_book",
@@ -34465,14 +33374,14 @@
     [
       "BS:gray_decorated_pot",
       [
-        "BS:decorated_pot",
+        "MC:decorated_pot",
         "MC:gray_dye"
       ],
       1
     ],
     [
       "MC:gray_dye",
-      "BS:closed_eyeblossom",
+      "MC:closed_eyeblossom",
       1
     ],
     [
@@ -34531,7 +33440,7 @@
     [
       "BS:green_decorated_pot",
       [
-        "BS:decorated_pot",
+        "MC:decorated_pot",
         "MC:green_dye"
       ],
       1
@@ -34595,22 +33504,6 @@
       1
     ],
     [
-      "BS:iridescent_froglight",
-      [
-        "MC:shroomlight",
-        "MC:purple_dye"
-      ],
-      1
-    ],
-    [
-      "BS:ivory_froglight",
-      [
-        "MC:shroomlight",
-        "MC:light_gray_dye"
-      ],
-      1
-    ],
-    [
       "BS:light_blue_big_book",
       [
         "BS:big_book",
@@ -34621,7 +33514,7 @@
     [
       "BS:light_blue_decorated_pot",
       [
-        "BS:decorated_pot",
+        "MC:decorated_pot",
         "MC:light_blue_dye"
       ],
       1
@@ -34687,7 +33580,7 @@
     [
       "BS:light_gray_decorated_pot",
       [
-        "BS:decorated_pot",
+        "MC:decorated_pot",
         "MC:light_gray_dye"
       ],
       1
@@ -34748,7 +33641,7 @@
     [
       "BS:lime_decorated_pot",
       [
-        "BS:decorated_pot",
+        "MC:decorated_pot",
         "MC:lime_dye"
       ],
       1
@@ -34809,7 +33702,7 @@
     [
       "BS:magenta_decorated_pot",
       [
-        "BS:decorated_pot",
+        "MC:decorated_pot",
         "MC:magenta_dye"
       ],
       1
@@ -34926,22 +33819,6 @@
       1
     ],
     [
-      "BS:ochre_froglight",
-      [
-        "MC:shroomlight",
-        "MC:yellow_dye"
-      ],
-      1
-    ],
-    [
-      "BS:onyx_froglight",
-      [
-        "MC:shroomlight",
-        "MC:black_dye"
-      ],
-      1
-    ],
-    [
       "BS:orange_big_book",
       [
         "BS:big_book",
@@ -34952,7 +33829,7 @@
     [
       "BS:orange_decorated_pot",
       [
-        "BS:decorated_pot",
+        "MC:decorated_pot",
         "MC:orange_dye"
       ],
       1
@@ -34964,7 +33841,7 @@
     ],
     [
       "MC:orange_dye",
-      "BS:open_eyeblossom",
+      "MC:open_eyeblossom",
       1
     ],
     [
@@ -35029,14 +33906,6 @@
       1
     ],
     [
-      "BS:pearlescent_froglight",
-      [
-        "MC:shroomlight",
-        "MC:magenta_dye"
-      ],
-      1
-    ],
-    [
       "BS:pink_big_book",
       [
         "BS:big_book",
@@ -35047,7 +33916,7 @@
     [
       "BS:pink_decorated_pot",
       [
-        "BS:decorated_pot",
+        "MC:decorated_pot",
         "MC:pink_dye"
       ],
       1
@@ -35064,7 +33933,7 @@
     ],
     [
       "MC:pink_dye",
-      "BS:pink_petal",
+      "MC:pink_petals",
       1
     ],
     [
@@ -35138,7 +34007,7 @@
     [
       "BS:purple_decorated_pot",
       [
-        "BS:decorated_pot",
+        "MC:decorated_pot",
         "MC:purple_dye"
       ],
       1
@@ -35209,7 +34078,7 @@
     [
       "BS:red_decorated_pot",
       [
-        "BS:decorated_pot",
+        "MC:decorated_pot",
         "MC:red_dye"
       ],
       1
@@ -35273,22 +34142,6 @@
       "BS:resin_clump",
       "BS:resin_block",
       4
-    ],
-    [
-      "BS:russet_froglight",
-      [
-        "MC:shroomlight",
-        "MC:orange_dye"
-      ],
-      1
-    ],
-    [
-      "BS:scarlet_froglight",
-      [
-        "MC:shroomlight",
-        "MC:red_dye"
-      ],
-      1
     ],
     [
       "BS:snowy_acacia_leaf_hedge",
@@ -35451,14 +34304,6 @@
       1
     ],
     [
-      "BS:snowy_leaves",
-      [
-        "#MC:leaves",
-        "BS:snow_overlay"
-      ],
-      1
-    ],
-    [
       "BS:snowy_mangrove_leaf_hedge",
       [
         "BS:mangrove_leaf_hedge",
@@ -35573,59 +34418,6 @@
       1
     ],
     [
-      "BS:sulfur_spike",
-      "BS:sulfur",
-      4
-    ],
-    [
-      "BS:tidal_froglight",
-      [
-        "MC:shroomlight",
-        "MC:cyan_dye"
-      ],
-      1
-    ],
-    [
-      "BS:verdant_froglight",
-      [
-        "MC:shroomlight",
-        "MC:lime_dye"
-      ],
-      1
-    ],
-    [
-      "BS:veridian_froglight",
-      [
-        "MC:shroomlight",
-        "MC:green_dye"
-      ],
-      1
-    ],
-    [
-      "BS:waxed_chiseled_copper",
-      [
-        "BS:chiseled_copper",
-        "MC:honeycomb"
-      ],
-      1
-    ],
-    [
-      "BS:waxed_copper_bars",
-      [
-        "BS:copper_bars",
-        "MC:honeycomb"
-      ],
-      1
-    ],
-    [
-      "BS:waxed_copper_bulb",
-      [
-        "BS:copper_bulb",
-        "MC:honeycomb"
-      ],
-      1
-    ],
-    [
       "BS:waxed_copper_button",
       [
         "BS:copper_button",
@@ -35642,65 +34434,9 @@
       1
     ],
     [
-      "BS:waxed_copper_door",
-      [
-        "BS:copper_door",
-        "MC:honeycomb"
-      ],
-      1
-    ],
-    [
-      "BS:waxed_copper_grate",
-      [
-        "BS:copper_grate",
-        "MC:honeycomb"
-      ],
-      1
-    ],
-    [
       "BS:waxed_copper_pressure_plate",
       [
         "BS:copper_pressure_plate",
-        "MC:honeycomb"
-      ],
-      1
-    ],
-    [
-      "BS:waxed_copper_rod",
-      [
-        "BS:copper_rod",
-        "MC:honeycomb"
-      ],
-      1
-    ],
-    [
-      "BS:waxed_copper_trapdoor",
-      [
-        "BS:copper_trapdoor",
-        "MC:honeycomb"
-      ],
-      1
-    ],
-    [
-      "BS:waxed_exposed_chiseled_copper",
-      [
-        "BS:exposed_chiseled_copper",
-        "MC:honeycomb"
-      ],
-      1
-    ],
-    [
-      "BS:waxed_exposed_copper_bars",
-      [
-        "BS:exposed_copper_bars",
-        "MC:honeycomb"
-      ],
-      1
-    ],
-    [
-      "BS:waxed_exposed_copper_bulb",
-      [
-        "BS:exposed_copper_bulb",
         "MC:honeycomb"
       ],
       1
@@ -35722,65 +34458,9 @@
       1
     ],
     [
-      "BS:waxed_exposed_copper_door",
-      [
-        "BS:exposed_copper_door",
-        "MC:honeycomb"
-      ],
-      1
-    ],
-    [
-      "BS:waxed_exposed_copper_grate",
-      [
-        "BS:exposed_copper_grate",
-        "MC:honeycomb"
-      ],
-      1
-    ],
-    [
       "BS:waxed_exposed_copper_pressure_plate",
       [
         "BS:exposed_copper_pressure_plate",
-        "MC:honeycomb"
-      ],
-      1
-    ],
-    [
-      "BS:waxed_exposed_copper_rod",
-      [
-        "BS:exposed_copper_rod",
-        "MC:honeycomb"
-      ],
-      1
-    ],
-    [
-      "BS:waxed_exposed_copper_trapdoor",
-      [
-        "BS:exposed_copper_trapdoor",
-        "MC:honeycomb"
-      ],
-      1
-    ],
-    [
-      "BS:waxed_oxidized_chiseled_copper",
-      [
-        "BS:oxidized_chiseled_copper",
-        "MC:honeycomb"
-      ],
-      1
-    ],
-    [
-      "BS:waxed_oxidized_copper_bars",
-      [
-        "BS:oxidized_copper_bars",
-        "MC:honeycomb"
-      ],
-      1
-    ],
-    [
-      "BS:waxed_oxidized_copper_bulb",
-      [
-        "BS:oxidized_copper_bulb",
         "MC:honeycomb"
       ],
       1
@@ -35802,65 +34482,9 @@
       1
     ],
     [
-      "BS:waxed_oxidized_copper_door",
-      [
-        "BS:oxidized_copper_door",
-        "MC:honeycomb"
-      ],
-      1
-    ],
-    [
-      "BS:waxed_oxidized_copper_grate",
-      [
-        "BS:oxidized_copper_grate",
-        "MC:honeycomb"
-      ],
-      1
-    ],
-    [
       "BS:waxed_oxidized_copper_pressure_plate",
       [
         "BS:oxidized_copper_pressure_plate",
-        "MC:honeycomb"
-      ],
-      1
-    ],
-    [
-      "BS:waxed_oxidized_copper_rod",
-      [
-        "BS:oxidized_copper_rod",
-        "MC:honeycomb"
-      ],
-      1
-    ],
-    [
-      "BS:waxed_oxidized_copper_trapdoor",
-      [
-        "BS:oxidized_copper_trapdoor",
-        "MC:honeycomb"
-      ],
-      1
-    ],
-    [
-      "BS:waxed_weathered_chiseled_copper",
-      [
-        "BS:weathered_chiseled_copper",
-        "MC:honeycomb"
-      ],
-      1
-    ],
-    [
-      "BS:waxed_weathered_copper_bars",
-      [
-        "BS:weathered_copper_bars",
-        "MC:honeycomb"
-      ],
-      1
-    ],
-    [
-      "BS:waxed_weathered_copper_bulb",
-      [
-        "BS:weathered_copper_bulb",
         "MC:honeycomb"
       ],
       1
@@ -35882,41 +34506,9 @@
       1
     ],
     [
-      "BS:waxed_weathered_copper_door",
-      [
-        "BS:weathered_copper_door",
-        "MC:honeycomb"
-      ],
-      1
-    ],
-    [
-      "BS:waxed_weathered_copper_grate",
-      [
-        "BS:weathered_copper_grate",
-        "MC:honeycomb"
-      ],
-      1
-    ],
-    [
       "BS:waxed_weathered_copper_pressure_plate",
       [
         "BS:weathered_copper_pressure_plate",
-        "MC:honeycomb"
-      ],
-      1
-    ],
-    [
-      "BS:waxed_weathered_copper_rod",
-      [
-        "BS:weathered_copper_rod",
-        "MC:honeycomb"
-      ],
-      1
-    ],
-    [
-      "BS:waxed_weathered_copper_trapdoor",
-      [
-        "BS:weathered_copper_trapdoor",
         "MC:honeycomb"
       ],
       1
@@ -35932,7 +34524,7 @@
     [
       "BS:white_decorated_pot",
       [
-        "BS:decorated_pot",
+        "MC:decorated_pot",
         "MC:white_dye"
       ],
       1
@@ -35992,7 +34584,7 @@
     ],
     [
       "MC:yellow_dye",
-      "BS:wildflowers",
+      "MC:wildflowers",
       1
     ],
     [
@@ -36006,7 +34598,7 @@
     [
       "BS:yellow_decorated_pot",
       [
-        "BS:decorated_pot",
+        "MC:decorated_pot",
         "MC:yellow_dye"
       ],
       1
@@ -36883,7 +35475,7 @@
     ],
     [
       "BS:cherry_vertical_slab",
-      "BS:cherry_slab",
+      "MC:cherry_slab",
       1
     ],
     [
@@ -36897,23 +35489,13 @@
       1
     ],
     [
-      "BS:cinnabar_bricks_slab",
       "BS:cinnabar_bricks_vertical_slab",
-      1
-    ],
-    [
-      "BS:cinnabar_bricks_vertical_slab",
-      "BS:cinnabar_bricks_slab",
-      1
-    ],
-    [
-      "BS:cinnabar_slab",
-      "BS:cinnabar_vertical_slab",
+      "MC:cinnabar_brick_slab",
       1
     ],
     [
       "BS:cinnabar_vertical_slab",
-      "BS:cinnabar_slab",
+      "MC:cinnabar_slab",
       1
     ],
     [
@@ -38138,7 +36720,7 @@
     ],
     [
       "BS:mangrove_vertical_slab",
-      "BS:mangrove_slab",
+      "MC:mangrove_slab",
       1
     ],
     [
@@ -38443,7 +37025,7 @@
     ],
     [
       "BS:pale_oak_vertical_slab",
-      "BS:pale_oak_slab",
+      "MC:pale_oak_slab",
       1
     ],
     [
@@ -38657,13 +37239,8 @@
       1
     ],
     [
-      "BS:polished_cinnabar_slab",
       "BS:polished_cinnabar_vertical_slab",
-      1
-    ],
-    [
-      "BS:polished_cinnabar_vertical_slab",
-      "BS:polished_cinnabar_slab",
+      "MC:polished_cinnabar_slab",
       1
     ],
     [
@@ -38817,23 +37394,13 @@
       1
     ],
     [
-      "BS:polished_sulfur_slab",
       "BS:polished_sulfur_vertical_slab",
-      1
-    ],
-    [
-      "BS:polished_sulfur_vertical_slab",
-      "BS:polished_sulfur_slab",
-      1
-    ],
-    [
-      "BS:polished_tuff_slab",
-      "BS:polished_tuff_vertical_slab",
+      "MC:polished_sulfur_slab",
       1
     ],
     [
       "BS:polished_tuff_vertical_slab",
-      "BS:polished_tuff_slab",
+      "MC:polished_tuff_slab",
       1
     ],
     [
@@ -39232,16 +37799,6 @@
       1
     ],
     [
-      "BS:sculk_slab",
-      "BS:sculk_vertical_slab",
-      1
-    ],
-    [
-      "BS:sculk_vertical_slab",
-      "BS:sculk_slab",
-      1
-    ],
-    [
       "BS:smooth_basalt_slab",
       "BS:smooth_basalt_vertical_slab",
       1
@@ -39622,23 +38179,13 @@
       1
     ],
     [
-      "BS:sulfur_bricks_slab",
       "BS:sulfur_bricks_vertical_slab",
-      1
-    ],
-    [
-      "BS:sulfur_bricks_vertical_slab",
-      "BS:sulfur_bricks_slab",
-      1
-    ],
-    [
-      "BS:sulfur_slab",
-      "BS:sulfur_vertical_slab",
+      "MC:sulfur_brick_slab",
       1
     ],
     [
       "BS:sulfur_vertical_slab",
-      "BS:sulfur_slab",
+      "MC:sulfur_slab",
       1
     ],
     [
@@ -39662,23 +38209,13 @@
       1
     ],
     [
-      "BS:tuff_brick_slab",
       "BS:tuff_brick_vertical_slab",
-      1
-    ],
-    [
-      "BS:tuff_brick_vertical_slab",
-      "BS:tuff_brick_slab",
-      1
-    ],
-    [
-      "BS:tuff_slab",
-      "BS:tuff_vertical_slab",
+      "MC:tuff_brick_slab",
       1
     ],
     [
       "BS:tuff_vertical_slab",
-      "BS:tuff_slab",
+      "MC:tuff_slab",
       1
     ],
     [
@@ -41543,7 +40080,7 @@
         "buildscape:cherry_vertical_slab"
       ],
       "result": {
-        "item": "buildscape:cherry_slab",
+        "item": "minecraft:cherry_slab",
         "count": 1
       }
     },
@@ -41693,7 +40230,7 @@
         "buildscape:mangrove_vertical_slab"
       ],
       "result": {
-        "item": "buildscape:mangrove_slab",
+        "item": "minecraft:mangrove_slab",
         "count": 1
       }
     },
@@ -41723,7 +40260,7 @@
         "buildscape:pale_oak_vertical_slab"
       ],
       "result": {
-        "item": "buildscape:pale_oak_slab",
+        "item": "minecraft:pale_oak_slab",
         "count": 1
       }
     },

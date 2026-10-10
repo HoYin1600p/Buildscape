@@ -207,8 +207,6 @@ public abstract class BaseRegistryAdapter implements IRegistryAdapter {
     }
 
     protected void initBlockEntities() {
-        modBlockEntities.put("mangrove_sign_block_entity", ModBlockEntities.MANGROVE_SIGN_BLOCK_ENTITY_TYPE);
-        modBlockEntities.put("bamboo_sign_block_entity", ModBlockEntities.BAMBOO_SIGN_BLOCK_ENTITY_TYPE);
         modBlockEntities.put("pillar_block_entity", ModBlockEntities.PILLAR_TYPE);
         modBlockEntities.put("decorated_pot_block_entity", ModBlockEntities.DECORATED_POT_TYPE);
         modBlockEntities.put("trapped_decorated_pot_block_entity", ModBlockEntities.TRAPPED_DECORATED_POT_TYPE);
@@ -221,7 +219,6 @@ public abstract class BaseRegistryAdapter implements IRegistryAdapter {
         modBlockEntities.put("glass_jar_block_entity", ModBlockEntities.GLASS_JAR_TYPE);
         modBlockEntities.put("builders_workbench", ModBlockEntities.BUILDERS_WORKBENCH_TYPE);
         modBlockEntities.put("copper_chest", ModBlockEntities.COPPER_CHEST_TYPE);
-        modBlockEntities.put("potent_sulfur", ModBlockEntities.POTENT_SULFUR_TYPE);
         modBlockEntities.put("shelf", ModBlockEntities.SHELF_TYPE);
         modBlockEntities.put("trophy_block_entity", ModBlockEntities.TROPHY_TYPE);
         modBlockEntities.put("hollow_log", ModBlockEntities.HOLLOW_LOG_TYPE);

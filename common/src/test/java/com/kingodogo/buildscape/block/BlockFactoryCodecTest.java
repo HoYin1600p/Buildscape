@@ -45,14 +45,6 @@ class BlockFactoryCodecTest {
         }
     }
 
-    @Test
-    void copperTorchesHaveWorkingCodecsWithTheirCustomParticleOverrides() {
-        TorchBlock torch = (TorchBlock) create("copper_torch", "CopperTorchBlock");
-        WallTorchBlock wallTorch = (WallTorchBlock) create("copper_wall_torch", "CopperWallTorchBlock");
-        assertEncodes(torch.codec(), torch);
-        assertEncodes(wallTorch.codec(), wallTorch);
-    }
-
     private static Block create(String id, String type) {
         return new BlockFactory().createBlock(new BlockDefinition(id, type, CommonBlockProperties.of()));
     }

@@ -6,7 +6,6 @@
   "plugin": "com.kingodogo.buildscape.mixin.BuildscapeMixinPlugin",
   "mixins": [
     "AbstractContainerMenuMixin",
-    "AgeableMobMixin",
     "AnvilMenuMixin",
     "BaseCoralPlantTypeBlockMixin",
     "BeaconBlockEntityAccessor",

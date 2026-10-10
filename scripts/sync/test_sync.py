@@ -260,6 +260,65 @@ if (Path.cwd() / 'fail-validation').exists():
         branch = "sync/tiny/" + self.git(self.source, "rev-parse", "HEAD")[:12]
         self.assertEqual(self.git(self.repo, "rev-parse", branch), commit)
 
+    def test_mc26_removals_are_retired_and_not_restored_by_apply(self):
+        retired = self.resources + "assets/buildscape/blockstates/copper_rod.json"
+        model = self.resources + "assets/buildscape/models/block/copper_rod_horizontal.json"
+        self.write(self.source, retired, '{"variants": {}}\n')
+        self.write(self.source, model, '{"parent": "minecraft:block/cube"}\n')
+        base = self.commit(self.source, "Retired source baseline")
+        target = self.config["targets"][0]
+        target.update(id="mc26.2", base_commit=base)
+        policy = {"schema_version": 1, "target": "mc26.2",
+                  "removed_ids": [{"id": "buildscape:copper_rod",
+                                   "vanilla_equivalent": "minecraft:lightning_rod"}],
+                  "excluded_target_paths": ["common/" + model]}
+        self.write(self.repo, "sync/removals26x.json", json.dumps(policy))
+        self.write(self.repo, "sync/targets.json", json.dumps(self.config))
+        self.write(self.repo, "tools/convert.py", (self.repo / "tools/convert.py").read_text() + """
+# A converter may synthesize modern item definitions from old item models.
+p = root / 'assets/buildscape/items/copper_rod.json'
+p.parent.mkdir(parents=True, exist_ok=True)
+p.write_text(json.dumps({'converted': True, 'new': (root / 'data/kept.json').exists()}))
+""")
+        commit = self.commit(self.repo, "Record removal policy")
+        self.git(self.repo, "branch", "-f", "port/test", commit)
+        self.write(self.source, retired, '{"variants": {}, "changed": true}\n')
+        self.write(self.source, model, '{"parent": "minecraft:block/cube_all"}\n')
+        self.write(self.source, self.resources + "data/kept.json", '{"kept": true}\n')
+        self.commit(self.source, "Change retired and kept resources")
+        plan, target, config, source = sync.make_plan(self.repo, self.config, "mc26.2",
+                                                    source_repo=self.source)
+        items = {c["path"]: c for c in plan["changes"]}
+        self.assertEqual(items[retired]["classification"], "retired")
+        self.assertEqual(items[model]["classification"], "retired")
+        sync.apply_plan(self.repo, plan, target, config, source, "sync/targets.json", self.output)
+        branch = plan["apply"]["branch"]
+        for path in ("common/" + retired, "common/" + model,
+                     "common/" + self.resources + "assets/buildscape/items/copper_rod.json"):
+            self.assertIsNone(sync.blob(self.repo, branch, path, True), path)
+        self.assertIsNotNone(sync.blob(self.repo, branch, "common/" + self.resources + "data/kept.json"))
+        state = json.loads(sync.blob(self.repo, branch, target["state_file"]))
+        self.assertFalse(any(c["path"] in {retired, model} for c in state["pending"]))
+        self.assertEqual(sync.blob(self.repo, branch, "ref/source/" + retired),
+                         sync.blob(self.source, "HEAD", retired))
+
+    def test_retirement_paths_preserve_shared_assets_and_normalize_old_folders(self):
+        target = self.config["targets"][0]
+        resource_root = target["resource_root"]
+        retired = resource_root + "/data/buildscape/loot_table/blocks/copper_rod.json"
+        shared = resource_root + "/assets/buildscape/models/block/short_dry_grass.json"
+        policy = {"removed_ids": [{"id": "buildscape:copper_rod"}],
+                  "excluded_target_paths": [retired]}
+        self.assertTrue(sync.retired_path(retired.replace("/loot_table/", "/loot_tables/"),
+                                          target, policy))
+        self.assertFalse(sync.retired_path(shared, target, policy))
+
+    def test_removal_policy_does_not_affect_other_targets(self):
+        target = self.config["targets"][0]
+        self.assertEqual(sync.removal_policy(self.repo, target), {})
+        self.assertFalse(sync.retired_path("common/" + self.resources
+                                          + "assets/buildscape/items/copper_rod.json", target, {}))
+
     def test_status_plan_briefs_cli_and_planned_target_gate(self):
         self.mutate_source()
         tool = Path(sync.__file__).resolve()

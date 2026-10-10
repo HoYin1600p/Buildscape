@@ -22,9 +22,9 @@ public final class WandererTradeTable {
         trades.add(new Trade("snowy_grass_block", 1, 1, 2));
         for (String color : List.of("red", "cyan", "blue", "purple", "orange")) trades.add(new Trade(color + "_spore_blossom", 1, 1, 6));
         trades.add(new Trade("icicle", 1, 2, 6));
-        trades.add(new Trade("sulfur_spike", 1, 2, 6));
-        trades.add(new Trade("sulfur", 1, 1, 8));
-        trades.add(new Trade("cinnabar", 1, 1, 8));
+        trades.add(new Trade("minecraft:sulfur_spike", 1, 2, 6));
+        trades.add(new Trade("minecraft:sulfur", 1, 1, 8));
+        trades.add(new Trade("minecraft:cinnabar", 1, 1, 8));
         // The reference adds poplar twice, giving it twice the selection weight.
         trades.add(new Trade("poplar_sapling", 1, 2, 8));
         return List.copyOf(trades);

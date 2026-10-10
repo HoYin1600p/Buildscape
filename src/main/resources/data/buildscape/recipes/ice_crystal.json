@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " S ",
+    "SIS"
+  ],
+  "key": {
+    "S": {
+      "item": "minecraft:amethyst_shard"
+    },
+    "I": {
+      "item": "buildscape:icicle"
+    }
+  },
+  "result": {
+    "item": "buildscape:ice_crystal",
+    "count": 4
+  }
+}

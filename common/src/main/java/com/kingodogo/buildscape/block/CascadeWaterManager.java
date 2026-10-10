@@ -10,6 +10,14 @@ import java.util.concurrent.ConcurrentHashMap;
 public class CascadeWaterManager {
 
     private static final Map<ResourceKey<Level>, Set<BlockPos>> WATER_SOURCES = new ConcurrentHashMap<>();
+
+    public static void onLevelUnload(Level level) {
+        if (!level.isClientSide()) WATER_SOURCES.remove(level.dimension());
+    }
+
+    public static void onServerStopping() {
+        WATER_SOURCES.clear();
+    }
     public static void registerWaterTicket(Level level, BlockPos pos) {
         if (level.isClientSide()) return;
         WATER_SOURCES.computeIfAbsent(level.dimension(), k -> ConcurrentHashMap.newKeySet()).add(pos.immutable());

@@ -55,6 +55,12 @@ public class BiomeBrushItem extends Item {
         return tier;
     }
 
+    @Override
+    public boolean canDestroyBlock(ItemStack stack, net.minecraft.world.level.block.state.BlockState state,
+                                   Level level, BlockPos pos, net.minecraft.world.entity.LivingEntity entity) {
+        return false;
+    }
+
     public int getEnchantmentValue() {
         return 14;
     }

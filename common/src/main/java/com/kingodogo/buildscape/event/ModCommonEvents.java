@@ -115,14 +115,14 @@ public final class ModCommonEvents {
         return LogStrippingLogic.handleAxeStrip(player, level, hand, pos);
     }
 
-    public static void onLeftClickBlock(Player player, Level level, BlockPos pos) {
-        if (player == null || level == null || pos == null) return;
+    public static InteractionResult onLeftClickBlock(Player player, Level level, BlockPos pos) {
+        if (player == null || level == null || pos == null || player.isSpectator()) return InteractionResult.PASS;
         ItemStack held = player.getItemInHand(InteractionHand.MAIN_HAND);
         if (held.getItem() instanceof com.kingodogo.buildscape.item.BiomeBrushItem brush) {
             if (!level.isClientSide()) {
                 if (held.getDamageValue() >= held.getMaxDamage()) {
                     level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.DISPENSER_FAIL, SoundSource.PLAYERS, 1.0f, 0.8f);
-                    return;
+                    return InteractionResult.SUCCESS;
                 }
                 if (player.isShiftKeyDown()) {
                     brush.clearCapturedBiome(held, player);
@@ -130,7 +130,7 @@ public final class ModCommonEvents {
                     brush.setPos2(held, pos, player);
                 }
             }
-            return;
+            return InteractionResult.SUCCESS;
         }
 
         BlockState state = level.getBlockState(pos);
@@ -149,6 +149,7 @@ public final class ModCommonEvents {
                         customSound.getHitPitch());
             }
         }
+        return InteractionResult.PASS;
     }
 
     public static void onLivingDeath(LivingEntity entity, DamageSource source) {
@@ -351,7 +352,14 @@ public final class ModCommonEvents {
     public static void onServerStopping() {
         FrostRoseDropHandler.onServerStopping();
         MudToClayHandler.onServerStopping();
+        TreeChopJobManager.onServerStopping();
+        com.kingodogo.buildscape.pipe.transport.HollowPipeTransportManager.onServerStopping();
+        com.kingodogo.buildscape.block.EyeblossomTransitionHandler.onServerStopping();
+        com.kingodogo.buildscape.block.CascadeWaterManager.onServerStopping();
+        HollowLogCrawlHandler.onServerStopping();
         JOINED_PLAYERS.clear();
+        pillarSaveTickCounter = 0;
+        pillarBackupTickCounter = 0;
         try {
             PillarIdManager.get().saveImmediate();
         } catch (Exception exception) {
@@ -360,7 +368,18 @@ public final class ModCommonEvents {
     }
 
     public static void onPlayerLeave(ServerPlayer player) {
+        if (player == null) return;
         JOINED_PLAYERS.remove(player.getUUID());
+        TreeChopJobManager.onPlayerLoggedOut(player);
+        HollowLogCrawlHandler.onPlayerLoggedOut(player.getUUID());
+    }
+
+    public static void onLevelUnload(net.minecraft.server.level.ServerLevel level) {
+        com.kingodogo.buildscape.block.EyeblossomTransitionHandler.onWorldUnload(level);
+        com.kingodogo.buildscape.pipe.transport.HollowPipeTransportManager.onLevelUnload(level);
+        com.kingodogo.buildscape.block.CascadeWaterManager.onLevelUnload(level);
+        TreeChopJobManager.onLevelUnload(level);
+        FrostRoseDropHandler.onLevelUnload(level);
     }
 
     public static void onPlayerChangedDimension(ServerPlayer player) {

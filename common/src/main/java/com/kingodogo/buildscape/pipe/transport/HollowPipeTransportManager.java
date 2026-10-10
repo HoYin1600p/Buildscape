@@ -111,7 +111,11 @@ public class HollowPipeTransportManager {
                             ForkJoinPool.commonPool())
                     .whenComplete((states, error) -> {
                         ASYNC_NETWORKS.decrementAndGet();
-                        COMPLETED.add(new CompletedJob(job, states, error));
+                        synchronized (job) {
+                            if (!job.cancelled.get()) {
+                                COMPLETED.add(new CompletedJob(job, states, error));
+                            }
+                        }
                     });
 
             Set<BlockPos> component = prepared.component();
@@ -155,6 +159,7 @@ public class HollowPipeTransportManager {
                 continue;
             }
             if (completed.error() != null) {
+                com.kingodogo.buildscape.BuildscapeCommon.LOGGER.warn("Failed to calculate pipe network", completed.error());
                 requeue(job, job.prepared.component());
                 processed++;
                 continue;
@@ -193,9 +198,22 @@ public class HollowPipeTransportManager {
             PENDING_DIRTY.remove(level);
             Map<BlockPos, NetworkJob> jobs = IN_FLIGHT.remove(level);
             if (jobs != null) {
-                new HashSet<>(jobs.values()).forEach(job -> job.cancelled.set(true));
+                for (NetworkJob job : new HashSet<>(jobs.values())) {
+                    // Serialize cancellation with completion so an unloaded level cannot be enqueued later.
+                    synchronized (job) {
+                        job.cancelled.set(true);
+                    }
+                }
             }
+            COMPLETED.removeIf(completed -> completed.job().level == level);
         }
+    }
+
+    public static void onServerStopping() {
+        Set<Level> levels = new HashSet<>(PENDING_DIRTY.keySet());
+        levels.addAll(IN_FLIGHT.keySet());
+        levels.forEach(HollowPipeTransportManager::onLevelUnload);
+        COMPLETED.clear();
     }
 
     private static final class NetworkJob {

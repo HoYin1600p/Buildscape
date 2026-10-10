@@ -97,6 +97,11 @@ public final class HollowLogCrawlHandler {
             CUSTOM_CRAWLING_PLAYERS.remove(id);
         }
     }
+
+    public static void onServerStopping() {
+        FORCED_PLAYERS.clear();
+        CUSTOM_CRAWLING_PLAYERS.clear();
+    }
     public static boolean isPlayerAtHorizontalLogOpening(Player player, Level level) {
         return isPlayerInsideHollowBlock(player, level) || isPlayerEnteringHollowBlock(player, level);
     }

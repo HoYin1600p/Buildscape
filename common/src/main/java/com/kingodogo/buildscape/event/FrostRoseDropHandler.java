@@ -51,6 +51,11 @@ public final class FrostRoseDropHandler {
         level.addFreshEntity(itemEntity);
 
         TRACKED_DEATHS.add(new TrackedDeath(level.dimension(), deathPos, deathX, deathY, deathZ, 20));
+        // Fabric's AFTER_DEATH callback runs after vanilla has already created its rose.
+        for (ItemEntity drop : level.getEntitiesOfClass(ItemEntity.class,
+                entity.getBoundingBox().inflate(2.0), FrostRoseDropHandler::shouldCancelItemSpawn)) {
+            drop.discard();
+        }
     }
     public static boolean shouldCancelItemSpawn(ItemEntity itemEntity) {
         Level itemLevel = Services.PLATFORM.getEntityLevel(itemEntity);
@@ -63,11 +68,19 @@ public final class FrostRoseDropHandler {
             double dx = itemEntity.getX() - death.x;
             double dy = itemEntity.getY() - death.y;
             double dz = itemEntity.getZ() - death.z;
-            if (dx * dx + dy * dy + dz * dz < 4.0) {
+            if (isWithinDropRange(dx, dy, dz)) {
                 return true;
             }
         }
         return false;
+    }
+
+    static boolean isWithinDropRange(double dx, double dy, double dz) {
+        return dx * dx + dy * dy + dz * dz < 4.0;
+    }
+
+    public static void onLevelUnload(ServerLevel level) {
+        TRACKED_DEATHS.removeIf(death -> death.dimension.equals(level.dimension()));
     }
     public static void onServerStopping() {
         TRACKED_DEATHS.clear();

@@ -1,5 +1,5 @@
 {
-  "parent": "builtin/entity",
+  "parent": "buildscape:block/oxidized_copper_chest",
   "gui_light": "front",
   "textures": {
     "particle": "minecraft:block/oxidized_copper"

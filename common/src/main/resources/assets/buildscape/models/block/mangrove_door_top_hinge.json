@@ -1,5 +1,5 @@
 {
-  "parent": "block/door_top_rh",
+  "parent": "minecraft:block/door_top_right",
   "textures": {
     "bottom": "buildscape:block/mangrove_door_bottom",
     "top": "buildscape:block/mangrove_door_top",

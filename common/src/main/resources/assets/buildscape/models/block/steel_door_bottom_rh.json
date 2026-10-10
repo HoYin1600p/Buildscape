@@ -1,5 +1,5 @@
 {
-  "parent": "minecraft:block/door_bottom_rh",
+  "parent": "minecraft:block/door_bottom_right",
   "textures": {
     "bottom": "buildscape:block/steel_door_bottom",
     "top": "buildscape:block/steel_door_top"

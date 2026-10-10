@@ -7,13 +7,13 @@
     "buildscape:jungle_shelf",
     "buildscape:acacia_shelf",
     "buildscape:dark_oak_shelf",
-    "buildscape:mangrove_shelf",
+    "minecraft:mangrove_shelf",
     "buildscape:crimson_shelf",
     "buildscape:warped_shelf",
-    "buildscape:cherry_shelf",
-    "buildscape:pale_oak_shelf",
+    "minecraft:cherry_shelf",
+    "minecraft:pale_oak_shelf",
     "buildscape:poplar_shelf",
-    "buildscape:bamboo_shelf",
+    "minecraft:bamboo_shelf",
     "buildscape:stripped_bamboo_shelf"
   ]
 }

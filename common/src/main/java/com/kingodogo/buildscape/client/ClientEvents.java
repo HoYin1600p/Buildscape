@@ -149,7 +149,6 @@ public class ClientEvents {
 
         TreeChopHandler.clientTick();
         SmokeVentParticleHandler.clientTick();
-        GeyserParticleHandler.tickClient();
         BiomeBrushClientHandler.tickClient(mc.player);
         ZoomHandler.tick();
 

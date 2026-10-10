@@ -9,10 +9,10 @@
     "minecraft:dark_oak_trapdoor",
     "minecraft:crimson_trapdoor",
     "minecraft:warped_trapdoor",
-    "buildscape:bamboo_trapdoor",
-    "buildscape:cherry_trapdoor",
-    "buildscape:mangrove_trapdoor",
-    "buildscape:pale_oak_trapdoor",
+    "minecraft:bamboo_trapdoor",
+    "minecraft:cherry_trapdoor",
+    "minecraft:mangrove_trapdoor",
+    "minecraft:pale_oak_trapdoor",
     "buildscape:poplar_trapdoor"
   ]
 }

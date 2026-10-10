@@ -145,7 +145,43 @@ def metadata(path):
             or path.startswith("gradle/"))
 
 
-def classify(repo, source_repo, target, base, head, change, rows, source):
+def removal_policy(repo, target):
+    if target["id"] != "mc26.2":
+        return {}
+    policy = json_blob(repo, target["branch"], "sync/removals26x.json")
+    if policy.get("schema_version") != 1 or policy.get("target") != target["id"]:
+        raise SyncError("Invalid mc26.2 removal policy")
+    for path in policy.get("excluded_target_paths", []):
+        relative(path)
+    return policy
+
+
+def retired_path(path, target, policy, source=None):
+    if not policy:
+        return False
+    if source:
+        for kind in ("java", "resources"):
+            prefix = source["subtree"] + "/main/" + kind + "/"
+            if path.startswith(prefix):
+                path = target["java_root" if kind == "java" else "resource_root"] + "/" + path[len(prefix):]
+                break
+    # Old source data folders are renamed by the resource converter.
+    path = re.sub(r"(/data/[^/]+/)(loot_tables|recipes|advancements)/",
+                  lambda m: m[1] + {"loot_tables": "loot_table", "recipes": "recipe",
+                                    "advancements": "advancement"}[m[2]] + "/", path)
+    if path in policy.get("excluded_target_paths", []):
+        return True
+    prefix = target["resource_root"] + "/"
+    if not path.startswith(prefix):
+        return False
+    resource = path[len(prefix):]
+    match = re.fullmatch(r"(?:assets/buildscape/(?:blockstates|items)|"
+                         r"data/buildscape/loot_table/blocks)/([^/]+)\.json", resource)
+    return bool(match and any(entry["id"] == "buildscape:" + match[1]
+                              for entry in policy["removed_ids"]))
+
+
+def classify(repo, source_repo, target, base, head, change, rows, source, policy=None):
     entry = dict(change)
     old, path = entry["old_path"], entry["path"]
     row = next((r for r in rows if r["reference_path"] == old), None)
@@ -186,6 +222,9 @@ def classify(repo, source_repo, target, base, head, change, rows, source):
                          kind="java")
     else:
         entry["reason"] = "Unrecognized source file requires review"
+    if retired_path(path, target, policy, source) or (mapped and all(
+            retired_path(p, target, policy) for p in mapped)):
+        entry.update(classification="retired", reason="Intentionally removed by mc26.2 policy")
     entry["source_diff"] = text(git(source_repo, "diff", "--no-ext-diff", "--no-textconv",
                                      base, head, "--", old, path))
     return entry
@@ -201,9 +240,12 @@ def make_plan(repo, config, target_id, registry_path="sync/targets.json", source
     if run(["git", "merge-base", "--is-ancestor", base, head], source_root, False).returncode:
         raise SyncError("Base is not an ancestor of source head; review the source-line change")
     _, rows = read_ledger(repo, target["branch"], target["mapping_file"])
-    items = [classify(repo, source_root, target, base, head, c, rows, source)
+    policy = removal_policy(repo, target)
+    items = [classify(repo, source_root, target, base, head, c, rows, source, policy)
              for c in changes(source_root, base, head, source)]
     pending = json_blob(repo, target["branch"], target["state_file"], {"pending": []})["pending"]
+    pending = [c for c in pending if not retired_path(c["path"], target, policy, source)
+               and not (c["target_paths"] and all(retired_path(p, target, policy) for p in c["target_paths"]))]
     for c in items + pending:
         # A brief can precede apply: new source files may not yet exist in the snapshot.
         c["reference_context"] = []
@@ -215,7 +257,7 @@ def make_plan(repo, config, target_id, registry_path="sync/targets.json", source
     plan = {"schema_version": 1, "target": target_id, "target_branch": target["branch"],
             "target_commit": text(git(repo, "rev-parse", target["branch"] + "^{commit}")).strip(),
             "source": source, "base_commit": base, "source_commit": head,
-            "commits": commits, "changes": items, "pending": pending}
+            "commits": commits, "changes": items, "pending": pending, "removal_policy": policy}
     return plan, target, branch_config, source_root
 
 
@@ -296,15 +338,18 @@ def command(template, values, cwd, log):
 def resource_changes(worktree, source_repo, plan, target, values, log, temp):
     prefix = plan["source"]["subtree"] + "/main/resources/"
     old_dir, new_dir = temp / "old-resources", temp / "new-resources"
+    policy = plan.get("removal_policy", {})
     for rev, dest in ((plan["base_commit"], old_dir), (plan["source_commit"], new_dir)):
         dest.mkdir()
         for path, data in files_at(source_repo, rev, [prefix.rstrip("/")]).items():
-            if not metadata(path):
+            if not metadata(path) and not retired_path(path, target, policy, plan["source"]):
                 write_file(local(dest, path[len(prefix):]), data)
         if rev == plan["source_commit"]:
             # Source deletions require review. Keep converted outputs until accepted.
             for c in plan["changes"]:
-                if c["change"] == "deleted" and c["old_path"].startswith(prefix) and not metadata(c["old_path"]):
+                if (c["change"] == "deleted" and c["old_path"].startswith(prefix)
+                        and not metadata(c["old_path"])
+                        and not retired_path(c["old_path"], target, policy, plan["source"])):
                     write_file(local(dest, c["old_path"][len(prefix):]),
                                blob(source_repo, plan["base_commit"], c["old_path"]))
         command(target["converter"]["command"], dict(values, resources=str(dest)), worktree, log)
@@ -313,6 +358,8 @@ def resource_changes(worktree, source_repo, plan, target, values, log, temp):
     resource_root = local(worktree, target["resource_root"])
     changed = []
     for path in sorted(before.keys() | after.keys()):
+        if retired_path(target["resource_root"] + "/" + path, target, policy):
+            continue
         if before.get(path) == after.get(path):
             continue
         dest = local(resource_root, path)
@@ -338,7 +385,10 @@ def update_ledger(worktree, plan, target, fields, rows):
             rows.append(row)
         if row is None:
             continue
-        if c["classification"] == "automatic":
+        if c["classification"] == "retired":
+            row["active_paths"] = "n/a"
+            row["verification"] = "Retired by sync/removals26x.json; source " + plan["source_commit"]
+        elif c["classification"] == "automatic":
             row["reference_path"] = c["path"]
             if c["kind"] == "java":
                 row["active_paths"] = c["destination"]
@@ -421,7 +471,7 @@ def apply_plan(repo, plan, target, branch_config, source_repo, registry_path, ou
         update_ledger(worktree, plan, target, fields, rows)
         pending = list(plan["pending"])
         pending.extend(dict(c, source_commit=plan["source_commit"], base_commit=plan["base_commit"])
-                       for c in plan["changes"] if c["classification"] != "automatic")
+                       for c in plan["changes"] if c["classification"] not in {"automatic", "retired"})
         dump(local(worktree, target["state_file"]), {"schema_version": 1, "pending": pending})
         for t in branch_config["targets"]:
             if t["id"] == target["id"]:

@@ -136,7 +136,7 @@ public class ModConfiguredFeatures {
     @Deprecated
     public static final FeatureHolder<ConfiguredFeature<?, ?>> PINK_PETALS =
             CONFIGURED_FEATURES.register("pink_petals", () ->
-                    createPetalConfigurationWithRandomStates(ModBlocks.PINK_PETAL.get())
+                    createPetalConfigurationWithRandomStates(vanillaBlock("minecraft:pink_petals"))
             );
 
     @Deprecated
@@ -411,67 +411,67 @@ public class ModConfiguredFeatures {
 
     public static final FeatureHolder<ConfiguredFeature<?, ?>> PINK_PETAL_1_N =
             CONFIGURED_FEATURES.register("pink_petal_1_n", () ->
-                    createPetalConfiguration(ModBlocks.PINK_PETAL.get(), 1, Direction.NORTH)
+                    createPetalConfiguration(vanillaBlock("minecraft:pink_petals"), 1, Direction.NORTH)
             );
     public static final FeatureHolder<ConfiguredFeature<?, ?>> PINK_PETAL_1_S =
             CONFIGURED_FEATURES.register("pink_petal_1_s", () ->
-                    createPetalConfiguration(ModBlocks.PINK_PETAL.get(), 1, Direction.SOUTH)
+                    createPetalConfiguration(vanillaBlock("minecraft:pink_petals"), 1, Direction.SOUTH)
             );
     public static final FeatureHolder<ConfiguredFeature<?, ?>> PINK_PETAL_1_E =
             CONFIGURED_FEATURES.register("pink_petal_1_e", () ->
-                    createPetalConfiguration(ModBlocks.PINK_PETAL.get(), 1, Direction.EAST)
+                    createPetalConfiguration(vanillaBlock("minecraft:pink_petals"), 1, Direction.EAST)
             );
     public static final FeatureHolder<ConfiguredFeature<?, ?>> PINK_PETAL_1_W =
             CONFIGURED_FEATURES.register("pink_petal_1_w", () ->
-                    createPetalConfiguration(ModBlocks.PINK_PETAL.get(), 1, Direction.WEST)
+                    createPetalConfiguration(vanillaBlock("minecraft:pink_petals"), 1, Direction.WEST)
             );
     public static final FeatureHolder<ConfiguredFeature<?, ?>> PINK_PETAL_2_N =
             CONFIGURED_FEATURES.register("pink_petal_2_n", () ->
-                    createPetalConfiguration(ModBlocks.PINK_PETAL.get(), 2, Direction.NORTH)
+                    createPetalConfiguration(vanillaBlock("minecraft:pink_petals"), 2, Direction.NORTH)
             );
     public static final FeatureHolder<ConfiguredFeature<?, ?>> PINK_PETAL_2_S =
             CONFIGURED_FEATURES.register("pink_petal_2_s", () ->
-                    createPetalConfiguration(ModBlocks.PINK_PETAL.get(), 2, Direction.SOUTH)
+                    createPetalConfiguration(vanillaBlock("minecraft:pink_petals"), 2, Direction.SOUTH)
             );
     public static final FeatureHolder<ConfiguredFeature<?, ?>> PINK_PETAL_2_E =
             CONFIGURED_FEATURES.register("pink_petal_2_e", () ->
-                    createPetalConfiguration(ModBlocks.PINK_PETAL.get(), 2, Direction.EAST)
+                    createPetalConfiguration(vanillaBlock("minecraft:pink_petals"), 2, Direction.EAST)
             );
     public static final FeatureHolder<ConfiguredFeature<?, ?>> PINK_PETAL_2_W =
             CONFIGURED_FEATURES.register("pink_petal_2_w", () ->
-                    createPetalConfiguration(ModBlocks.PINK_PETAL.get(), 2, Direction.WEST)
+                    createPetalConfiguration(vanillaBlock("minecraft:pink_petals"), 2, Direction.WEST)
             );
     public static final FeatureHolder<ConfiguredFeature<?, ?>> PINK_PETAL_3_N =
             CONFIGURED_FEATURES.register("pink_petal_3_n", () ->
-                    createPetalConfiguration(ModBlocks.PINK_PETAL.get(), 3, Direction.NORTH)
+                    createPetalConfiguration(vanillaBlock("minecraft:pink_petals"), 3, Direction.NORTH)
             );
     public static final FeatureHolder<ConfiguredFeature<?, ?>> PINK_PETAL_3_S =
             CONFIGURED_FEATURES.register("pink_petal_3_s", () ->
-                    createPetalConfiguration(ModBlocks.PINK_PETAL.get(), 3, Direction.SOUTH)
+                    createPetalConfiguration(vanillaBlock("minecraft:pink_petals"), 3, Direction.SOUTH)
             );
     public static final FeatureHolder<ConfiguredFeature<?, ?>> PINK_PETAL_3_E =
             CONFIGURED_FEATURES.register("pink_petal_3_e", () ->
-                    createPetalConfiguration(ModBlocks.PINK_PETAL.get(), 3, Direction.EAST)
+                    createPetalConfiguration(vanillaBlock("minecraft:pink_petals"), 3, Direction.EAST)
             );
     public static final FeatureHolder<ConfiguredFeature<?, ?>> PINK_PETAL_3_W =
             CONFIGURED_FEATURES.register("pink_petal_3_w", () ->
-                    createPetalConfiguration(ModBlocks.PINK_PETAL.get(), 3, Direction.WEST)
+                    createPetalConfiguration(vanillaBlock("minecraft:pink_petals"), 3, Direction.WEST)
             );
     public static final FeatureHolder<ConfiguredFeature<?, ?>> PINK_PETAL_4_N =
             CONFIGURED_FEATURES.register("pink_petal_4_n", () ->
-                    createPetalConfiguration(ModBlocks.PINK_PETAL.get(), 4, Direction.NORTH)
+                    createPetalConfiguration(vanillaBlock("minecraft:pink_petals"), 4, Direction.NORTH)
             );
     public static final FeatureHolder<ConfiguredFeature<?, ?>> PINK_PETAL_4_S =
             CONFIGURED_FEATURES.register("pink_petal_4_s", () ->
-                    createPetalConfiguration(ModBlocks.PINK_PETAL.get(), 4, Direction.SOUTH)
+                    createPetalConfiguration(vanillaBlock("minecraft:pink_petals"), 4, Direction.SOUTH)
             );
     public static final FeatureHolder<ConfiguredFeature<?, ?>> PINK_PETAL_4_E =
             CONFIGURED_FEATURES.register("pink_petal_4_e", () ->
-                    createPetalConfiguration(ModBlocks.PINK_PETAL.get(), 4, Direction.EAST)
+                    createPetalConfiguration(vanillaBlock("minecraft:pink_petals"), 4, Direction.EAST)
             );
     public static final FeatureHolder<ConfiguredFeature<?, ?>> PINK_PETAL_4_W =
             CONFIGURED_FEATURES.register("pink_petal_4_w", () ->
-                    createPetalConfiguration(ModBlocks.PINK_PETAL.get(), 4, Direction.WEST)
+                    createPetalConfiguration(vanillaBlock("minecraft:pink_petals"), 4, Direction.WEST)
             );
 
     public static final FeatureHolder<ConfiguredFeature<?, ?>> PURPLE_PETAL_1_N =
@@ -676,7 +676,7 @@ public class ModConfiguredFeatures {
     public static final FeatureHolder<ConfiguredFeature<?, ?>> WILDFLOWERS =
             CONFIGURED_FEATURES.register("wildflowers", () ->
                     createFlowerPatchConfiguration(
-                                    ModBlocks.WILDFLOWERS.get(),
+                                    vanillaBlock("minecraft:wildflowers"),
                                     com.kingodogo.buildscape.block.WildflowersBlock.FLOWER_AMOUNT,
                                     com.kingodogo.buildscape.block.WildflowersBlock.FACING
                     )
@@ -685,7 +685,7 @@ public class ModConfiguredFeatures {
     public static final FeatureHolder<ConfiguredFeature<?, ?>> LEAF_LITTER =
             CONFIGURED_FEATURES.register("leaf_litter", () ->
                     createFlowerPatchConfiguration(
-                                    ModBlocks.LEAF_LITTER.get(),
+                                    vanillaBlock("minecraft:leaf_litter"),
                                     com.kingodogo.buildscape.block.LeafLitterBlock.FLOWER_AMOUNT,
                                     com.kingodogo.buildscape.block.LeafLitterBlock.FACING
                     )
@@ -821,6 +821,11 @@ public class ModConfiguredFeatures {
         return Services.PLATFORM.createPatchFeature(stateProvider, 32, 7, 3);
     }
 
+    private static com.kingodogo.buildscape.block.BlockDefinition vanillaBlock(String id) {
+        var definition = new com.kingodogo.buildscape.block.BlockDefinition(id);
+        definition.setBlock(Services.PLATFORM.getBlock(com.kingodogo.buildscape.util.CommonId.parse(id)));
+        return definition;
+    }
     private static ConfiguredFeature<?, ?> createAllPetalsConfigurationWithRandomStates() {
         IntegerProperty FLOWER_AMOUNT =
                 com.kingodogo.buildscape.block.PetalBlock.FLOWER_AMOUNT;
@@ -833,7 +838,7 @@ public class ModConfiguredFeatures {
                 ModBlocks.RED_PETAL.get(),
                 ModBlocks.BLUE_PETAL.get(),
                 ModBlocks.ORANGE_PETAL.get(),
-                ModBlocks.PINK_PETAL.get(),
+                vanillaBlock("minecraft:pink_petals"),
                 ModBlocks.PURPLE_PETAL.get(),
         };
 
@@ -897,6 +902,13 @@ public class ModConfiguredFeatures {
             IntegerProperty amountProp,
             net.minecraft.world.level.block.state.properties.Property<Direction> facingProp
     ) {
+        if (!block.defaultBlockState().hasProperty(amountProp)) {
+            var replacement = block.getBlock().getStateDefinition().getProperty("segment_amount");
+            if (!(replacement instanceof IntegerProperty)) {
+                throw new IllegalStateException("Missing flower patch amount property for " + block.getId());
+            }
+            amountProp = (IntegerProperty) replacement;
+        }
         List<net.minecraft.world.level.block.state.BlockState> states = new ArrayList<>();
         Direction[] facings = { Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST };
         for (int state = 1; state <= 4; state++) {

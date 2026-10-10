@@ -30,13 +30,6 @@ public final class FabricGameplayEvents {
                 BuildscapeCommands.register(dispatcher));
         UseBlockCallback.EVENT.register((player, level, hand, hit) -> player.isSpectator()
                 ? InteractionResult.PASS : ModCommonEvents.onRightClickBlock(player, level, hand, hit.getBlockPos(), hit.getDirection()));
-        net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents.AFTER.register((level, player, pos, state, blockEntity) -> {
-            if (level instanceof net.minecraft.server.level.ServerLevel serverLevel) {
-                int experience = SculkExperienceLogic.experience(player, state, player.getMainHandItem());
-                if (experience > 0) net.minecraft.world.entity.ExperienceOrb.award(serverLevel,
-                        net.minecraft.world.phys.Vec3.atCenterOf(pos), experience);
-            }
-        });
         UseItemCallback.EVENT.register((player, level, hand) -> {
             if (player.isSpectator()) return InteractionResult.PASS;
             var held = player.getItemInHand(hand);
@@ -71,10 +64,6 @@ public final class FabricGameplayEvents {
             ItemFrameParticleHandler.onEntityJoin(entity, level);
         });
         ServerEntityEvents.ENTITY_UNLOAD.register(ItemFrameParticleHandler::onEntityLeave);
-        ServerChunkEvents.CHUNK_LOAD.register((level, chunk, newChunk) ->
-                com.kingodogo.buildscape.block.EyeblossomTransitionHandler.onChunkLoad(level, chunk));
-        ServerChunkEvents.CHUNK_UNLOAD.register((level, chunk) ->
-                com.kingodogo.buildscape.block.EyeblossomTransitionHandler.onChunkUnload(level, chunk.getPos()));
         ServerLevelEvents.UNLOAD.register((server, level) -> ModCommonEvents.onLevelUnload(level));
         ServerLifecycleEvents.SERVER_STOPPING.register(server -> ModCommonEvents.onServerStopping());
         ServerLifecycleEvents.SERVER_STARTED.register(ModCommonEvents::onServerStarted);

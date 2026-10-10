@@ -486,7 +486,7 @@
         },
         {
           "data": {
-            "Name": "buildscape:pink_petal",
+            "Name": "minecraft:pink_petals",
             "Properties": {
               "flower_amount": "1",
               "facing": "north"
@@ -496,7 +496,7 @@
         },
         {
           "data": {
-            "Name": "buildscape:pink_petal",
+            "Name": "minecraft:pink_petals",
             "Properties": {
               "flower_amount": "1",
               "facing": "south"
@@ -506,7 +506,7 @@
         },
         {
           "data": {
-            "Name": "buildscape:pink_petal",
+            "Name": "minecraft:pink_petals",
             "Properties": {
               "flower_amount": "1",
               "facing": "east"
@@ -516,7 +516,7 @@
         },
         {
           "data": {
-            "Name": "buildscape:pink_petal",
+            "Name": "minecraft:pink_petals",
             "Properties": {
               "flower_amount": "1",
               "facing": "west"
@@ -526,7 +526,7 @@
         },
         {
           "data": {
-            "Name": "buildscape:pink_petal",
+            "Name": "minecraft:pink_petals",
             "Properties": {
               "flower_amount": "2",
               "facing": "north"
@@ -536,7 +536,7 @@
         },
         {
           "data": {
-            "Name": "buildscape:pink_petal",
+            "Name": "minecraft:pink_petals",
             "Properties": {
               "flower_amount": "2",
               "facing": "south"
@@ -546,7 +546,7 @@
         },
         {
           "data": {
-            "Name": "buildscape:pink_petal",
+            "Name": "minecraft:pink_petals",
             "Properties": {
               "flower_amount": "2",
               "facing": "east"
@@ -556,7 +556,7 @@
         },
         {
           "data": {
-            "Name": "buildscape:pink_petal",
+            "Name": "minecraft:pink_petals",
             "Properties": {
               "flower_amount": "2",
               "facing": "west"
@@ -566,7 +566,7 @@
         },
         {
           "data": {
-            "Name": "buildscape:pink_petal",
+            "Name": "minecraft:pink_petals",
             "Properties": {
               "flower_amount": "3",
               "facing": "north"
@@ -576,7 +576,7 @@
         },
         {
           "data": {
-            "Name": "buildscape:pink_petal",
+            "Name": "minecraft:pink_petals",
             "Properties": {
               "flower_amount": "3",
               "facing": "south"
@@ -586,7 +586,7 @@
         },
         {
           "data": {
-            "Name": "buildscape:pink_petal",
+            "Name": "minecraft:pink_petals",
             "Properties": {
               "flower_amount": "3",
               "facing": "east"
@@ -596,7 +596,7 @@
         },
         {
           "data": {
-            "Name": "buildscape:pink_petal",
+            "Name": "minecraft:pink_petals",
             "Properties": {
               "flower_amount": "3",
               "facing": "west"
@@ -606,7 +606,7 @@
         },
         {
           "data": {
-            "Name": "buildscape:pink_petal",
+            "Name": "minecraft:pink_petals",
             "Properties": {
               "flower_amount": "4",
               "facing": "north"
@@ -616,7 +616,7 @@
         },
         {
           "data": {
-            "Name": "buildscape:pink_petal",
+            "Name": "minecraft:pink_petals",
             "Properties": {
               "flower_amount": "4",
               "facing": "south"
@@ -626,7 +626,7 @@
         },
         {
           "data": {
-            "Name": "buildscape:pink_petal",
+            "Name": "minecraft:pink_petals",
             "Properties": {
               "flower_amount": "4",
               "facing": "east"
@@ -636,7 +636,7 @@
         },
         {
           "data": {
-            "Name": "buildscape:pink_petal",
+            "Name": "minecraft:pink_petals",
             "Properties": {
               "flower_amount": "4",
               "facing": "west"

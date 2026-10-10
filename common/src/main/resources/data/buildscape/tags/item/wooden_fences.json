@@ -19,9 +19,9 @@
     "buildscape:ashpen_yellow_fence",
     "buildscape:bamboo_block_fence",
     "buildscape:stripped_bamboo_block_fence",
-    "buildscape:mangrove_fence",
+    "minecraft:mangrove_fence",
     "buildscape:poplar_fence",
-    "buildscape:cherry_fence",
-    "buildscape:pale_oak_fence"
+    "minecraft:cherry_fence",
+    "minecraft:pale_oak_fence"
   ]
 }

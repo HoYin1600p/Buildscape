@@ -16,6 +16,10 @@ public class FabricRegistryAdapter extends BaseRegistryAdapter {
         super.init();
         registerTo(BuiltInRegistries.BLOCK, modBlocks);
         registerTo(BuiltInRegistries.ITEM, modItems);
+        com.kingodogo.buildscape.adapter.v26x.RemovedIdAliases.register(BuiltInRegistries.BLOCK,
+                ((net.fabricmc.fabric.api.event.registry.FabricRegistry) BuiltInRegistries.BLOCK)::addAlias);
+        com.kingodogo.buildscape.adapter.v26x.RemovedIdAliases.register(BuiltInRegistries.ITEM,
+                ((net.fabricmc.fabric.api.event.registry.FabricRegistry) BuiltInRegistries.ITEM)::addAlias);
         registerTo(BuiltInRegistries.BLOCK_ENTITY_TYPE, modBlockEntities);
         registerTo(BuiltInRegistries.ENTITY_TYPE, modEntities);
         registerTo(BuiltInRegistries.SOUND_EVENT, modSounds);

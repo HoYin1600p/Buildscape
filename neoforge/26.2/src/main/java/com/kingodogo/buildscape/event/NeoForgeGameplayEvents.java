@@ -35,12 +35,6 @@ public final class NeoForgeGameplayEvents {
                 LoaderWandererTrades.register(event.getServer()));
         bus.addListener((net.neoforged.neoforge.event.OnDatapackSyncEvent event) ->
                 LoaderWandererTrades.register(event.getPlayerList().getServer()));
-        bus.addListener((net.neoforged.neoforge.event.level.BlockDropsEvent event) -> {
-            if (event.getBreaker() instanceof Player player) {
-                int experience = SculkExperienceLogic.experience(player, event.getState(), event.getTool());
-                if (experience >= 0) event.setDroppedExperience(experience);
-            }
-        });
         bus.addListener((net.neoforged.neoforge.event.entity.player.AdvancementEvent.AdvancementEarnEvent event) -> {
             if (event.getEntity() instanceof ServerPlayer player) {
                 var id = event.getAdvancement().id();
@@ -96,16 +90,6 @@ public final class NeoForgeGameplayEvents {
             ItemFrameParticleHandler.onEntityJoin(event.getEntity(), event.getLevel());
         });
         bus.addListener((EntityLeaveLevelEvent event) -> ItemFrameParticleHandler.onEntityLeave(event.getEntity(), event.getLevel()));
-        bus.addListener((net.neoforged.neoforge.event.level.ChunkEvent.Load event) -> {
-            if (event.getLevel() instanceof ServerLevel level) {
-                com.kingodogo.buildscape.block.EyeblossomTransitionHandler.onChunkLoad(level, event.getChunk());
-            }
-        });
-        bus.addListener((net.neoforged.neoforge.event.level.ChunkEvent.Unload event) -> {
-            if (event.getLevel() instanceof ServerLevel level) {
-                com.kingodogo.buildscape.block.EyeblossomTransitionHandler.onChunkUnload(level, event.getChunk().getPos());
-            }
-        });
         bus.addListener((LevelEvent.Unload event) -> {
             if (event.getLevel() instanceof ServerLevel level) {
                 ModCommonEvents.onLevelUnload(level);

@@ -27,13 +27,6 @@ public final class FoliageColors {
                         : 0xFF000000 | BiomeColors.getAverageWaterColor(level, pos);
             }
         };
-        if (path.equals("leaf_litter")) return new BlockTintSource() {
-            public int color(BlockState state) { return 0xFF000000 | DryFoliageColor.getDefaultColor(); }
-            public int colorInWorld(BlockState state, BlockAndTintGetter level, BlockPos pos) {
-                return 0xFF000000 | DryFoliageColor.getDryFoliageColor(level, pos);
-            }
-        };
-        if (path.equals("bush")) return foliage(0x48B518);
         if (path.equals("mangrove_leaves")) return foliage(0x92C648);
         String wood;
         if (path.endsWith("_leaf_hedge")) wood = path.substring(0, path.length() - "_leaf_hedge".length());

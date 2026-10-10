@@ -39,12 +39,6 @@ public final class BackportBonemealHandler {
         ItemStack held = player.getItemInHand(hand);
         if (!held.is(Items.BONE_MEAL)) return InteractionResult.PASS;
         BlockState state = level.getBlockState(pos);
-        if (face == Direction.UP && (state.is(Blocks.CACTUS) || state.is(Blocks.SAND) || state.is(Blocks.RED_SAND))
-                && level.isEmptyBlock(pos.above())) {
-            String plant = state.is(Blocks.CACTUS) ? "cactus_flower" : "dry_grass";
-            if (!level.isClientSide() && !place(level, pos.above(), plant)) return InteractionResult.PASS;
-            return consume(player, level, held, pos);
-        }
         if (face == Direction.UP && (state.is(Blocks.GRASS_BLOCK) || state.is(Blocks.MOSS_BLOCK))) {
             if (level instanceof ServerLevel serverLevel) {
                 boolean moss = state.is(Blocks.MOSS_BLOCK);
@@ -54,8 +48,8 @@ public final class BackportBonemealHandler {
                         if (!level.getBlockState(check).is(moss ? Blocks.MOSS_BLOCK : Blocks.GRASS_BLOCK)
                                 || !level.isEmptyBlock(check.above())) continue;
                         float roll = level.getRandom().nextFloat();
-                        String plant = moss ? (roll < .10F ? "firefly_bush" : roll < .15F ? "cherry_sapling"
-                                : roll < .20F ? "mangrove_propagule" : null) : (roll < .05F ? "bush" : null);
+                        String plant = moss ? (roll < .15F ? "cherry_sapling"
+                                : roll < .20F ? "mangrove_propagule" : null) : null;
                         if (plant != null) {
                             Block candidate = block(plant);
                             if (candidate != null && candidate != Blocks.AIR
@@ -103,13 +97,6 @@ public final class BackportBonemealHandler {
                         }
                     }
                 }
-            }
-            return consume(player, level, held, pos);
-        }
-        if (is(state, "tall_dry_grass")) {
-            if (!level.isClientSide()) {
-                var item = Services.PLATFORM.getItem(new CommonId("buildscape", "dry_grass"));
-                if (item != null && item != Items.AIR) Block.popResource(level, pos, new ItemStack(item));
             }
             return consume(player, level, held, pos);
         }

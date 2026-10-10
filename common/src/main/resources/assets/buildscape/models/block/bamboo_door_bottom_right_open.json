@@ -1,8 +1,0 @@
-{
-  "parent": "minecraft:block/door_bottom_right_open",
-  "textures": {
-    "bottom": "buildscape:block/bamboo_door_bottom",
-    "top": "buildscape:block/bamboo_door_top",
-    "particle": "#top"
-  }
-}

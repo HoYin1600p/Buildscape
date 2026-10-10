@@ -38,54 +38,6 @@ public final class CopperOxidationHandler {
     public static synchronized void init() {
         if (initialized) return;
 
-        registerChain("chiseled_copper", "exposed_chiseled_copper", "weathered_chiseled_copper", "oxidized_chiseled_copper");
-        registerWaxPair("chiseled_copper", "waxed_chiseled_copper");
-        registerWaxPair("exposed_chiseled_copper", "waxed_exposed_chiseled_copper");
-        registerWaxPair("weathered_chiseled_copper", "waxed_weathered_chiseled_copper");
-        registerWaxPair("oxidized_chiseled_copper", "waxed_oxidized_chiseled_copper");
-
-        registerChain("copper_grate", "exposed_copper_grate", "weathered_copper_grate", "oxidized_copper_grate");
-        registerWaxPair("copper_grate", "waxed_copper_grate");
-        registerWaxPair("exposed_copper_grate", "waxed_exposed_copper_grate");
-        registerWaxPair("weathered_copper_grate", "waxed_weathered_copper_grate");
-        registerWaxPair("oxidized_copper_grate", "waxed_oxidized_copper_grate");
-
-        registerChain("copper_bulb", "exposed_copper_bulb", "weathered_copper_bulb", "oxidized_copper_bulb");
-        registerWaxPair("copper_bulb", "waxed_copper_bulb");
-        registerWaxPair("exposed_copper_bulb", "waxed_exposed_copper_bulb");
-        registerWaxPair("weathered_copper_bulb", "waxed_weathered_copper_bulb");
-        registerWaxPair("oxidized_copper_bulb", "waxed_oxidized_copper_bulb");
-
-        registerChain("copper_rod", "exposed_copper_rod", "weathered_copper_rod", "oxidized_copper_rod");
-        registerWaxPair("copper_rod", "waxed_copper_rod");
-        registerWaxPair("exposed_copper_rod", "waxed_exposed_copper_rod");
-        registerWaxPair("weathered_copper_rod", "waxed_weathered_copper_rod");
-        registerWaxPair("oxidized_copper_rod", "waxed_oxidized_copper_rod");
-
-        registerChain("copper_lantern", "exposed_copper_lantern", "weathered_copper_lantern", "oxidized_copper_lantern");
-        registerWaxPair("copper_lantern", "waxed_copper_lantern");
-        registerWaxPair("exposed_copper_lantern", "waxed_exposed_copper_lantern");
-        registerWaxPair("weathered_copper_lantern", "waxed_weathered_copper_lantern");
-        registerWaxPair("oxidized_copper_lantern", "waxed_oxidized_copper_lantern");
-
-        registerChain("copper_door", "exposed_copper_door", "weathered_copper_door", "oxidized_copper_door");
-        registerWaxPair("copper_door", "waxed_copper_door");
-        registerWaxPair("exposed_copper_door", "waxed_exposed_copper_door");
-        registerWaxPair("weathered_copper_door", "waxed_weathered_copper_door");
-        registerWaxPair("oxidized_copper_door", "waxed_oxidized_copper_door");
-
-        registerChain("copper_trapdoor", "exposed_copper_trapdoor", "weathered_copper_trapdoor", "oxidized_copper_trapdoor");
-        registerWaxPair("copper_trapdoor", "waxed_copper_trapdoor");
-        registerWaxPair("exposed_copper_trapdoor", "waxed_exposed_copper_trapdoor");
-        registerWaxPair("weathered_copper_trapdoor", "waxed_weathered_copper_trapdoor");
-        registerWaxPair("oxidized_copper_trapdoor", "waxed_oxidized_copper_trapdoor");
-
-        registerChain("copper_bars", "exposed_copper_bars", "weathered_copper_bars", "oxidized_copper_bars");
-        registerWaxPair("copper_bars", "waxed_copper_bars");
-        registerWaxPair("exposed_copper_bars", "waxed_exposed_copper_bars");
-        registerWaxPair("weathered_copper_bars", "waxed_weathered_copper_bars");
-        registerWaxPair("oxidized_copper_bars", "waxed_oxidized_copper_bars");
-
         registerChain("copper_mesh", "exposed_copper_mesh", "weathered_copper_mesh", "oxidized_copper_mesh");
         registerWaxPair("copper_mesh", "waxed_copper_mesh");
         registerWaxPair("exposed_copper_mesh", "waxed_exposed_copper_mesh");
@@ -121,8 +73,6 @@ public final class CopperOxidationHandler {
         registerWaxPair("exposed_copper_chest", "waxed_exposed_copper_chest");
         registerWaxPair("weathered_copper_chest", "waxed_weathered_copper_chest");
         registerWaxPair("oxidized_copper_chest", "waxed_oxidized_copper_chest");
-
-        registerChain("copper_chain", "exposed_copper_chain", "weathered_copper_chain", "oxidized_copper_chain");
         registerChain("large_copper_chain", "large_exposed_copper_chain", "large_weathered_copper_chain", "large_oxidized_copper_chain");
 
         registerChain("slit_copper", "exposed_slit_copper", "weathered_slit_copper", "oxidized_slit_copper");
@@ -209,19 +159,6 @@ public final class CopperOxidationHandler {
         }
 
         if (held.is(Items.HONEYCOMB)) {
-            if (block instanceof EyeblossomBlock) {
-                if (!state.getValue(EyeblossomBlock.WAXED)) {
-                    if (!level.isClientSide()) {
-                        level.setBlock(pos, state.setValue(EyeblossomBlock.WAXED, true), 3);
-                        level.levelEvent(3003, pos, 0);
-                        if (player != null && !player.getAbilities().instabuild) {
-                            held.shrink(1);
-                        }
-                    }
-                    Services.PLATFORM.playWaxOn(level, pos, player);
-                    return InteractionResult.SUCCESS;
-                }
-            }
 
             if (blockId != null && blockId.getNamespace().equals("buildscape")) {
                 String waxedPath = WAXED_MAP.get(blockId.getPath());
@@ -243,19 +180,6 @@ public final class CopperOxidationHandler {
         }
 
         if (held.getItem() instanceof AxeItem) {
-            if (block instanceof EyeblossomBlock) {
-                if (state.getValue(EyeblossomBlock.WAXED)) {
-                    if (!level.isClientSide()) {
-                        level.setBlock(pos, state.setValue(EyeblossomBlock.WAXED, false), 3);
-                        level.levelEvent(3004, pos, 0);
-                        if (player != null && !player.getAbilities().instabuild) {
-                            Services.PLATFORM.hurtAndBreak(held, 1, player, hand);
-                        }
-                    }
-                    Services.PLATFORM.playAxeScrape(level, pos, player);
-                    return InteractionResult.SUCCESS;
-                }
-            }
 
             if (blockId != null && blockId.getNamespace().equals("buildscape")) {
                 String unwaxedPath = UNWAXED_MAP.get(blockId.getPath());

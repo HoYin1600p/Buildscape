@@ -1,7 +1,0 @@
-{
-  "parent": "minecraft:block/template_torch",
-  "textures": {
-    "torch": "buildscape:block/copper_torch"
-  },
-  "render_type": "cutout"
-}

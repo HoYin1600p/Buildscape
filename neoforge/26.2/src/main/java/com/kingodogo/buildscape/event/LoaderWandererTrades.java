@@ -46,7 +46,7 @@ public final class LoaderWandererTrades {
                 }
             } else {
                 for (var entry : WandererTradeTable.generic()) {
-                    var item = Services.PLATFORM.getItem(new CommonId("buildscape", entry.item()));
+                    var item = Services.PLATFORM.getItem(CommonId.parse(entry.item().contains(":") ? entry.item() : "buildscape:" + entry.item()));
                     if (item != null && item != Items.AIR) {
                         trades.add(Holder.direct(new VillagerTrade(new TradeCost(Items.EMERALD, entry.emeralds()),
                                 new ItemStackTemplate(item, entry.count()), entry.maxUses(), 1, .05F,

@@ -1,0 +1,13 @@
+{
+  "pack": {
+    "description": "Buildscape resources for Minecraft 26.2",
+    "min_format": [
+      88,
+      0
+    ],
+    "max_format": [
+      107,
+      1
+    ]
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "display": {
+    "icon": {
+      "id": "buildscape:red_ornament"
+    },
+    "title": {
+      "translate": "advancements.buildscape.ornamental.title"
+    },
+    "description": {
+      "translate": "advancements.buildscape.ornamental.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "parent": "buildscape:santas_little_helper",
+  "criteria": {
+    "custom": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

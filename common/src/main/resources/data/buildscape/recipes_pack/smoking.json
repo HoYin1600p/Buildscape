@@ -1,10 +1,9 @@
 {
-  "_comment": "BDRE Compact Recipe Pack Format: Uses compact array syntax like ['BS:result', ['pattern'], {'#':'BS:ingredient'}, count] or ['BS:result', 'BS:input', count]. Aliases: BS=buildscape:, MC=minecraft:, F=forge:.",
+  "_comment": "BDRE Compact Recipe Pack Format: Uses compact array syntax like ['BS:result', ['pattern'], {'#':'BS:ingredient'}, count] or ['BS:result', 'BS:input', count]. Aliases: BS=buildscape:, MC=minecraft:, F=c:.",
   "aliases": {
     "BS": "buildscape:",
     "MC": "minecraft:",
-    "F": "forge:"
+    "F": "c:"
   },
-  "smoking": [
-  ]
+  "smoking": []
 }

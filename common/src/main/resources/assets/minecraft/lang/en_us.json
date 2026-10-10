@@ -1,5 +1,3 @@
 {
-  "block.minecraft.chain": "Iron Chain",
-  "item.minecraft.chain": "Iron Chain"
+  "block.minecraft.iron_chain": "Iron Chain"
 }
-

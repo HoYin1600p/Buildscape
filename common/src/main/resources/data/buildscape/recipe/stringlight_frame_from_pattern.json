@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    "buildscape:stringlight_frame_pattern",
+    [
+      "#minecraft:signs",
+      "minecraft:item_frame",
+      "minecraft:glow_item_frame"
+    ]
+  ],
+  "result": {
+    "id": "buildscape:stringlight_frame"
+  }
+}

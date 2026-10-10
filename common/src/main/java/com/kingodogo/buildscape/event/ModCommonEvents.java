@@ -299,9 +299,9 @@ public final class ModCommonEvents {
         if (server != null && server.isRunning()) {
             PacketFactory.sendToPlayer(player, new SyncGameRulesPacket(
                     ModGameRules.isFastLeafDecayEnabled(),
-                    ModGameRules.clientDisableEndermanGriefing,
-                    ModGameRules.clientDisableCreeperGriefing,
-                    ModGameRules.clientDisableGhastGriefing,
+                    ModGameRules.isEndermanGriefingDisabled(),
+                    ModGameRules.isCreeperGriefingDisabled(),
+                    ModGameRules.isGhastGriefingDisabled(),
                     ModGameRules.isCakeStackingEnabled(),
                     ModGameRules.isWaterBottleStackingEnabled()
             ));
@@ -317,12 +317,12 @@ public final class ModCommonEvents {
     public static boolean isMobGriefingDisabled(Entity entity, Level level) {
         if (entity == null || level == null) return false;
         if (entity instanceof net.minecraft.world.entity.monster.EnderMan) {
-            return ModGameRules.clientDisableEndermanGriefing;
+            return ModGameRules.isEndermanGriefingDisabled();
         } else if (entity instanceof net.minecraft.world.entity.monster.Creeper) {
-            return ModGameRules.clientDisableCreeperGriefing;
+            return ModGameRules.isCreeperGriefingDisabled();
         } else if (entity instanceof net.minecraft.world.entity.monster.Ghast
                 || entity.getClass().getSimpleName().toLowerCase().contains("fireball")) {
-            return ModGameRules.clientDisableGhastGriefing;
+            return ModGameRules.isGhastGriefingDisabled();
         }
         return false;
     }

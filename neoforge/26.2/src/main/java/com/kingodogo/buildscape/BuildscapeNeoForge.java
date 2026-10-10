@@ -23,8 +23,24 @@ import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 
 @Mod(BuildscapeCommon.MOD_ID)
 public class BuildscapeNeoForge {
+    private static final net.neoforged.neoforge.registries.DeferredRegister<net.neoforged.neoforge.attachment.AttachmentType<?>> ATTACHMENT_TYPES =
+            net.neoforged.neoforge.registries.DeferredRegister.create(
+                    net.neoforged.neoforge.registries.NeoForgeRegistries.Keys.ATTACHMENT_TYPES, BuildscapeCommon.MOD_ID);
+    private static final net.neoforged.neoforge.registries.DeferredHolder<net.neoforged.neoforge.attachment.AttachmentType<?>,
+            net.neoforged.neoforge.attachment.AttachmentType<net.minecraft.nbt.CompoundTag>> PERSISTENT_DATA =
+            ATTACHMENT_TYPES.register(com.kingodogo.buildscape.data.PersistentData.ATTACHMENT_PATH,
+                    () -> net.neoforged.neoforge.attachment.AttachmentType
+                            .builder(() -> new net.minecraft.nbt.CompoundTag())
+                            .serialize(com.kingodogo.buildscape.data.PersistentData.MAP_CODEC)
+                            .build());
+
     public BuildscapeNeoForge(IEventBus modBus) {
+        ATTACHMENT_TYPES.register(modBus);
+        com.kingodogo.buildscape.data.PersistentData.install(owner ->
+                ((net.neoforged.neoforge.attachment.IAttachmentHolder) owner).getData(PERSISTENT_DATA.get()));
         BuildscapeCommon.prepareRegistration();
+        NeoForge.EVENT_BUS.addListener((net.neoforged.neoforge.event.tick.ServerTickEvent.Post event) ->
+                com.kingodogo.buildscape.world.ModGameRules.syncIfChanged(event.getServer().overworld()));
         modBus.addListener(((NeoForgeRegistryAdapter) Services.REGISTRY)::onRegister);
         modBus.addListener(BuildscapeNeoForge::commonSetup);
         modBus.addListener(BuildscapeNeoForge::registerPayloads);

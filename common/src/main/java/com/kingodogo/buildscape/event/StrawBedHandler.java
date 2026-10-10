@@ -18,8 +18,12 @@ public final class StrawBedHandler {
         }
 
         Optional<BlockPos> sleepPosOpt = player.getSleepingPos();
-        if (sleepPosOpt.isPresent()) {
-            BlockPos sleepPos = sleepPosOpt.get();
+        sleepPosOpt.ifPresent(pos -> onPlayerWakeUp(player, pos));
+    }
+
+    public static void onPlayerWakeUp(Player player, BlockPos sleepPos) {
+        Level level = Services.PLATFORM.getEntityLevel(player);
+        if (level != null && !level.isClientSide()) {
             BlockState state = level.getBlockState(sleepPos);
 
             if (state.getBlock() instanceof StrawBedBlock) {

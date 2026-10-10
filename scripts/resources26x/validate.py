@@ -17,6 +17,15 @@ ID = re.compile(r"^[a-z0-9_.-]+:[a-z0-9/._-]+$")
 BUILTINS = {"minecraft:builtin/generated"}
 
 
+def item_model(model):
+    """Model id of an item definition: a plain model, or the base of a special renderer."""
+    if not isinstance(model, dict):
+        return None
+    key = {"minecraft:model": "model", "minecraft:special": "base"}.get(model.get("type"))
+    value = model.get(key) if key else None
+    return value if isinstance(value, str) else None
+
+
 def namespaced(value):
     return value if ":" in value else "minecraft:" + value
 
@@ -205,10 +214,11 @@ class Validator:
                 self.textures(path, d)
             if "/items/" in path and path.startswith("assets/"):
                 model = d.get("model") if isinstance(d, dict) else None
-                if not isinstance(model, dict) or model.get("type") != "minecraft:model" or not isinstance(model.get("model"), str):
-                    self.error(path, "expected minecraft:model item definition")
-                elif self.reference(path, model["model"], "models"):
-                    self.concrete_models.add(namespaced(model["model"]))
+                target = item_model(model)
+                if target is None:
+                    self.error(path, "expected minecraft:model or minecraft:special item definition")
+                elif self.reference(path, target, "models"):
+                    self.concrete_models.add(namespaced(target))
         for value in sorted(self.concrete_models):
             self.textures(asset_path(value, "models"), self.merged_model(value), True)
         ids = {Path(path).stem for path in self.files
@@ -228,7 +238,7 @@ class Validator:
             elif item not in SPECIAL_ITEMS:
                 kind = "item" if "assets/buildscape/models/item/" + item + ".json" in self.files else "block"
                 expected = "buildscape:" + kind + "/" + item
-                if self.json.get(path, {}).get("model", {}).get("model") != expected:
+                if item_model(self.json.get(path, {}).get("model")) != expected:
                     self.error(path, "expected model " + expected)
 
     def ingredient(self, path, value):
@@ -403,14 +413,16 @@ class Validator:
                     self.error(path, "legacy #forge tag reference")
                 if "/tags/" in path:
                     parts = path.split("/")
+                    # Worldgen tags nest one level deeper: tags/worldgen/biome/...
+                    kind = "/".join(parts[3:5]) if parts[3] == "worldgen" else parts[3]
                     if not isinstance(d, dict) or not isinstance(d.get("values"), list):
                         self.error(path, "tag needs values list")
                         continue
                     for value in d["values"]:
                         if isinstance(value, dict):
-                            self.tag(path, parts[3], value.get("id"), value.get("required", True))
+                            self.tag(path, kind, value.get("id"), value.get("required", True))
                         else:
-                            self.tag(path, parts[3], value)
+                            self.tag(path, kind, value)
                 elif "/recipe/" in path:
                     self.recipe(path, d)
                 elif "/loot_table/" in path:

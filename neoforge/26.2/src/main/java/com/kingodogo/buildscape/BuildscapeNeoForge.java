@@ -33,6 +33,7 @@ public class BuildscapeNeoForge {
         NeoForge.EVENT_BUS.addListener(BuildscapeNeoForge::addReloadListeners);
         NeoForge.EVENT_BUS.addListener(BuildscapeNeoForge::serverStarted);
         NeoForge.EVENT_BUS.addListener(BuildscapeNeoForge::serverStopped);
+        com.kingodogo.buildscape.event.NeoForgeGameplayEvents.register();
         if (FMLEnvironment.getDist().isClient()) BuildscapeNeoForgeClient.register(modBus);
     }
 

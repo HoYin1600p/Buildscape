@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(targets = {"net.minecraft.world.entity.monster.EnderMan$EndermanTakeBlockGoal",
         "net.minecraft.world.entity.monster.EnderMan$EndermanLeaveBlockGoal"})
 public abstract class EndermanGriefingMixin {
-    @Shadow @Final private EnderMan enderman;
+    @Shadow(remap = false) @Final private EnderMan enderman;
 
     @Inject(method = "canUse", at = @At("HEAD"), cancellable = true)
     private void buildscape$griefing(CallbackInfoReturnable<Boolean> cir) {

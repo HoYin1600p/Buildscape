@@ -125,12 +125,7 @@ dependencies {
 
     runtimeOnly fg.deobf("mezz.jei:jei-${minecraft_version}:9.7.1.255")
 
-    def cachedDeobfEmbeddium = file("${gradle.gradleUserHomeDir}/caches/forge_gradle/deobf_dependencies/curse/maven/embeddium-908741/5322305_mapped_official_${minecraft_version}/embeddium-908741-5322305_mapped_official_${minecraft_version}.jar")
-    if (rendererApi == 'embeddium' && cachedDeobfEmbeddium.exists()) {
-        compileOnly files(cachedDeobfEmbeddium)
-    } else {
-        compileOnly fg.deobf(rendererApiCoordinates[rendererApi])
-    }
+    compileOnly fg.deobf(rendererApiCoordinates[rendererApi])
 
 
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'

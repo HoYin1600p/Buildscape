@@ -4,7 +4,10 @@ import java.security.MessageDigest
 // SHA-1 is the checksum published by Mojang for this exact download.
 def clientSha1 = '2dc72797acbc1b63fc16a11c4ac393605f453754'
 def clientUrl = "https://piston-data.mojang.com/v1/objects/${clientSha1}/client.jar"
-def clientOutput = layout.buildDirectory.file('minecraft/minecraft-26.2-client.jar')
+// Kept in the Gradle user home, keyed by checksum, so every checkout and worktree
+// shares one verified download and offline builds keep working.
+def clientOutput = project.provider { new File(gradle.gradleUserHomeDir,
+        "caches/buildscape/minecraft/${clientSha1}/minecraft-26.2-client.jar") }
 def uniminedClient = new File(gradle.gradleUserHomeDir,
         'caches/unimined/net/minecraft/minecraft/26.2/minecraft-26.2-client.jar')
 
@@ -28,7 +31,7 @@ def downloadMinecraft = tasks.register('downloadMinecraft26x') {
             }
             digest.digest().encodeHex().toString()
         }
-        def destination = clientOutput.get().asFile
+        def destination = clientOutput.get()
         if (destination.isFile() && checksum(destination) == clientSha1) {
             return
         }

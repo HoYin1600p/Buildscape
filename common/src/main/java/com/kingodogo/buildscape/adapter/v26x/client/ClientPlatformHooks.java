@@ -10,6 +10,7 @@ import com.kingodogo.buildscape.entity.WanderingHomemakerEntity;
 import com.kingodogo.buildscape.entity.WanderingHomemakerTrades;
 import com.kingodogo.buildscape.platform.Services;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.blaze3d.vertex.PoseStack;
 import java.time.LocalDate;
 import java.util.Collections;
 import javax.annotation.Nullable;
@@ -205,24 +206,24 @@ public final class ClientPlatformHooks {
     }
 
     private static final java.util.Map<net.minecraft.client.renderer.state.level.LevelRenderState,
-            com.kingodogo.buildscape.adapter.v26x.RenderCapture> HIGHLIGHTS =
+            ClientWorldHooks.OutlineState> HIGHLIGHTS =
             java.util.Collections.synchronizedMap(new java.util.WeakHashMap<>());
 
     public static boolean extractBlockHighlight(net.minecraft.client.Camera camera,
             net.minecraft.world.phys.HitResult target, net.minecraft.client.renderer.state.level.LevelRenderState state) {
         HIGHLIGHTS.remove(state);
-        var capture = new com.kingodogo.buildscape.adapter.v26x.RenderCapture();
+        var outlines = new ClientWorldHooks.OutlineState();
         if (!com.kingodogo.buildscape.client.ClientEvents.renderBlockHighlight(
-                new com.mojang.blaze3d.vertex.PoseStack(), camera, capture, target)) return false;
-        HIGHLIGHTS.put(state, capture);
+                new com.mojang.blaze3d.vertex.PoseStack(), camera, outlines, target)) return false;
+        HIGHLIGHTS.put(state, outlines);
         return true;
     }
 
     public static void collectBlockHighlight(com.mojang.blaze3d.vertex.PoseStack pose,
             net.minecraft.client.renderer.SubmitNodeCollector collector,
             net.minecraft.client.renderer.state.level.LevelRenderState state) {
-        var capture = HIGHLIGHTS.remove(state);
-        if (capture != null) capture.submit(pose, collector, state.cameraRenderState);
+        var outlines = HIGHLIGHTS.get(state);
+        if (outlines != null) outlines.submit(pose, collector);
     }
 
     public static void clearInputRenderState() {
@@ -327,20 +328,24 @@ public final class ClientPlatformHooks {
     }
 
     public static void renderItemFixed(ItemStack stack, com.mojang.blaze3d.vertex.PoseStack poseStack, Object bufferSource, int combinedLight, int combinedOverlay, Object model) {
-        captureItem(stack, net.minecraft.world.item.ItemDisplayContext.FIXED, poseStack, bufferSource, combinedLight, combinedOverlay, 0);
+        extractOrSubmitItem(stack, net.minecraft.world.item.ItemDisplayContext.FIXED, poseStack, bufferSource, combinedLight, combinedOverlay, 0);
     }
 
     public static void renderItemStatic(ItemStack stack, com.mojang.blaze3d.vertex.PoseStack poseStack, Object bufferSource, int combinedLight, int combinedOverlay, int seed) {
-        captureItem(stack, net.minecraft.world.item.ItemDisplayContext.NONE, poseStack, bufferSource, combinedLight, combinedOverlay, seed);
+        extractOrSubmitItem(stack, net.minecraft.world.item.ItemDisplayContext.NONE, poseStack, bufferSource, combinedLight, combinedOverlay, seed);
     }
 
-    private static void captureItem(ItemStack stack, net.minecraft.world.item.ItemDisplayContext context,
+    private static void extractOrSubmitItem(ItemStack stack, net.minecraft.world.item.ItemDisplayContext context,
             com.mojang.blaze3d.vertex.PoseStack pose, Object buffer, int light, int overlay, int seed) {
-        if (!(buffer instanceof RenderCapture capture) || stack.isEmpty()) return;
+        if (buffer instanceof PillarRenderer.State state) {
+            state.extractItem(stack, context, pose, light, overlay, seed);
+            return;
+        }
+        if (!(buffer instanceof net.minecraft.client.renderer.SubmitNodeCollector collector) || stack.isEmpty()) return;
         var state = new net.minecraft.client.renderer.item.ItemStackRenderState();
         var client = net.minecraft.client.Minecraft.getInstance();
         client.getItemModelResolver().updateForTopItem(state, stack, context, client.level, null, seed);
-        capture.record(pose, (target, collector, camera) -> state.submit(target, collector, light, overlay, 0));
+        state.submit(pose, collector, light, overlay, 0);
     }
 
     public static Object getItemModel(ItemStack stack, Level level, int seed) {
@@ -421,13 +426,10 @@ public final class ClientPlatformHooks {
     }
 
     public static void renderColoredFrame(com.mojang.blaze3d.vertex.PoseStack poseStack, Object bufferSource, int packedLight, Object backTexture, boolean hasMap) {
-        if (bufferSource instanceof RenderCapture capture) {
+        if (bufferSource instanceof net.minecraft.client.renderer.SubmitNodeCollector collector) {
             CommonId texture = (CommonId) backTexture;
-            renderColoredFrameGeometry(poseStack,
-                    capture.geometry(net.minecraft.client.renderer.rendertype.RenderTypes.entityCutout(
-                            Identifier.fromNamespaceAndPath(texture.getNamespace(), texture.getPath()))),
-                    capture.geometry(net.minecraft.client.renderer.rendertype.RenderTypes.entityCutout(BIRCH_PLANKS_26)),
-                    packedLight, hasMap);
+            submitColoredFrame(poseStack, collector, packedLight,
+                    Identifier.fromNamespaceAndPath(texture.getNamespace(), texture.getPath()), hasMap);
             return;
         }
         if (!(bufferSource instanceof com.mojang.blaze3d.vertex.VertexConsumer consumer)) return;
@@ -437,10 +439,27 @@ public final class ClientPlatformHooks {
     private static void renderColoredFrameGeometry(com.mojang.blaze3d.vertex.PoseStack poseStack,
             VertexConsumer consumer, VertexConsumer frameConsumer, int packedLight, boolean hasMap) {
         poseStack.pushPose();
-        poseStack.translate(-0.5D, -0.5D, -0.5D);
+        try {
+            poseStack.translate(-0.5D, -0.5D, -0.5D);
+            coloredFrameFaces(poseStack.last(), consumer, frameConsumer, packedLight, hasMap);
+        } finally { poseStack.popPose(); }
+    }
 
-        org.joml.Matrix4f pose = poseStack.last().pose();
-        com.mojang.blaze3d.vertex.PoseStack.Pose lastPose = poseStack.last();
+    static void submitColoredFrame(PoseStack pose, net.minecraft.client.renderer.SubmitNodeCollector collector,
+            int light, Identifier texture, boolean hasMap) {
+        pose.pushPose();
+        try {
+            pose.translate(-0.5, -0.5, -0.5);
+            collector.submitCustomGeometry(pose, net.minecraft.client.renderer.rendertype.RenderTypes.entityCutout(texture),
+                    (transform, consumer) -> coloredFrameFaces(transform, consumer, null, light, hasMap));
+            collector.submitCustomGeometry(pose, net.minecraft.client.renderer.rendertype.RenderTypes.entityCutout(BIRCH_PLANKS_26),
+                    (transform, consumer) -> coloredFrameFaces(transform, null, consumer, light, hasMap));
+        } finally { pose.popPose(); }
+    }
+
+    private static void coloredFrameFaces(PoseStack.Pose lastPose, VertexConsumer consumer,
+            VertexConsumer frameConsumer, int packedLight, boolean hasMap) {
+        org.joml.Matrix4f pose = lastPose.pose();
 
         float backZ1 = hasMap ? 15.001F / 16F : 15.5F / 16F;
         float backZ2 = 1.0F;
@@ -452,8 +471,11 @@ public final class ClientPlatformHooks {
         float y1 = hasMap ? 1F / 16F : 3F / 16F;
         float y2 = hasMap ? 15F / 16F : 13F / 16F;
 
-        renderQuadWithUV26(consumer, pose, lastPose, packedLight, x1, y1, backZ1, x2, y1, backZ1, x2, y2, backZ1, x1, y2, backZ1, x1, y2, x2, y1, 0, 0, -1);
-        renderQuadWithUV26(consumer, pose, lastPose, packedLight, x2, y1, backZ2, x1, y1, backZ2, x1, y2, backZ2, x2, y2, backZ2, x1, y2, x2, y1, 0, 0, 1);
+        if (consumer != null) {
+            renderQuadWithUV26(consumer, pose, lastPose, packedLight, x1, y1, backZ1, x2, y1, backZ1, x2, y2, backZ1, x1, y2, backZ1, x1, y2, x2, y1, 0, 0, -1);
+            renderQuadWithUV26(consumer, pose, lastPose, packedLight, x2, y1, backZ2, x1, y1, backZ2, x1, y2, backZ2, x2, y2, backZ2, x1, y2, x2, y1, 0, 0, 1);
+        }
+        if (frameConsumer == null) return;
 
         if (hasMap) {
             renderBoxFaces26(frameConsumer, pose, lastPose, packedLight, 1F / 16F, 0F, frameZ1, 15F / 16F, 1F / 16F, frameZ2);
@@ -466,11 +488,10 @@ public final class ClientPlatformHooks {
             renderBoxFaces26(frameConsumer, pose, lastPose, packedLight, 2F / 16F, 2F / 16F, frameZ1, 3F / 16F, 14F / 16F, frameZ2);
             renderBoxFaces26(frameConsumer, pose, lastPose, packedLight, 13F / 16F, 2F / 16F, frameZ1, 14F / 16F, 14F / 16F, frameZ2);
         }
-        poseStack.popPose();
     }
 
     public static void renderColoredFrameItem(com.kingodogo.buildscape.entity.ColoredItemFrameEntity entity, net.minecraft.world.item.ItemStack itemStack, com.mojang.blaze3d.vertex.PoseStack poseStack, Object bufferSource, int packedLight, boolean isMap, boolean isInvisible) {
-        if (!(bufferSource instanceof RenderCapture capture)) return;
+        if (!(bufferSource instanceof net.minecraft.client.renderer.SubmitNodeCollector collector)) return;
         poseStack.pushPose();
         try {
             poseStack.translate(0, 0, isInvisible ? 0.5 : 0.4375);
@@ -486,11 +507,12 @@ public final class ClientPlatformHooks {
                     poseStack.mulPose(com.mojang.math.Axis.ZP.rotationDegrees(180));
                     poseStack.scale(1.0F / 128, 1.0F / 128, 1.0F / 128);
                     poseStack.translate(-64, -64, 0);
-                    capture.record(poseStack, (target, collector, camera) -> renderer.render(map, target, collector, true, packedLight));
+                    poseStack.translate(0, 0, -1);
+                    renderer.render(map, poseStack, collector, true, packedLight);
                 }
             } else {
                 poseStack.scale(0.5F, 0.5F, 0.5F);
-                captureItem(itemStack, net.minecraft.world.item.ItemDisplayContext.FIXED, poseStack, bufferSource,
+                extractOrSubmitItem(itemStack, net.minecraft.world.item.ItemDisplayContext.FIXED, poseStack, bufferSource,
                         packedLight, net.minecraft.client.renderer.texture.OverlayTexture.NO_OVERLAY, 0);
             }
         } finally {
@@ -499,10 +521,10 @@ public final class ClientPlatformHooks {
     }
 
     public static void renderStockingQuad(com.mojang.blaze3d.vertex.PoseStack poseStack, Object bufferSource, int packedLight, Object texture, boolean flipped) {
-        if (bufferSource instanceof RenderCapture capture) {
+        if (bufferSource instanceof net.minecraft.client.renderer.SubmitNodeCollector collector) {
             CommonId id = (CommonId) texture;
-            renderStockingQuad(poseStack, capture.geometry(net.minecraft.client.renderer.rendertype.RenderTypes.entityCutout(
-                    Identifier.fromNamespaceAndPath(id.getNamespace(), id.getPath()))), packedLight, texture, flipped);
+            StockingRenderGeometry.submit(poseStack, collector,
+                    Identifier.fromNamespaceAndPath(id.getNamespace(), id.getPath()), packedLight, flipped);
             return;
         }
         if (bufferSource instanceof com.mojang.blaze3d.vertex.VertexConsumer vertexConsumer) {
@@ -528,7 +550,7 @@ public final class ClientPlatformHooks {
     }
 
     public static void renderBlockModelWithTint(net.minecraft.world.level.block.state.BlockState state, net.minecraft.core.BlockPos pos, net.minecraft.world.level.Level level, com.mojang.blaze3d.vertex.PoseStack poseStack, Object bufferSource, int light, int overlay) {
-        if (!(bufferSource instanceof RenderCapture capture) || state.isAir()) return;
+        if (!(bufferSource instanceof net.minecraft.client.renderer.SubmitNodeCollector collector) || state.isAir()) return;
         var client = net.minecraft.client.Minecraft.getInstance();
         var model = new net.minecraft.client.renderer.block.BlockModelRenderState();
         new net.minecraft.client.renderer.block.BlockModelResolver(client.getModelManager()).update(
@@ -545,7 +567,7 @@ public final class ClientPlatformHooks {
         for (var source : client.getBlockColors().getTintSources(state)) {
             tints.add(level != null && pos != null ? source.colorInWorld(state, view, pos) : source.color(state));
         }
-        capture.record(poseStack, (target, collector, camera) -> model.submit(target, collector, light, overlay, 0));
+        model.submit(poseStack, collector, light, overlay, 0);
     }
 
     public static void renderColoredQuad(com.mojang.blaze3d.vertex.PoseStack poseStack, Object buffer,
@@ -556,7 +578,6 @@ public final class ClientPlatformHooks {
                                   float r, float g, float b, float a,
                                   int light, int overlay,
                                   float nx, float ny, float nz) {
-        if (buffer instanceof RenderCapture capture) buffer = capture.translucent();
         if (!(buffer instanceof com.mojang.blaze3d.vertex.VertexConsumer vc)) return;
         org.joml.Matrix4f matrix = poseStack.last().pose();
         com.mojang.blaze3d.vertex.PoseStack.Pose lastPose = poseStack.last();
@@ -577,12 +598,7 @@ public final class ClientPlatformHooks {
         var state = new GlassJarRenderer.State();
         GlassJarRenderer.extractContents(blockEntity, state, 0, false);
         if (state.liquidSprite == null) return;
-        if (bufferSource instanceof RenderCapture capture) {
-            capture.record(poseStack, (pose, collector, camera) -> collector.submitCustomGeometry(pose,
-                    net.minecraft.client.renderer.rendertype.RenderTypes.entityTranslucent(
-                            net.minecraft.client.renderer.texture.TextureAtlas.LOCATION_BLOCKS),
-                    (transform, consumer) -> GlassJarRenderer.submitLiquid(state, transform, consumer, light, overlay)));
-        } else if (bufferSource instanceof com.mojang.blaze3d.vertex.VertexConsumer consumer) {
+        if (bufferSource instanceof com.mojang.blaze3d.vertex.VertexConsumer consumer) {
             GlassJarRenderer.submitLiquid(state, poseStack.last(), consumer, light, overlay);
         } else if (bufferSource instanceof net.minecraft.client.renderer.SubmitNodeCollector collector) {
             collector.submitCustomGeometry(poseStack,
@@ -596,10 +612,7 @@ public final class ClientPlatformHooks {
         if (blockEntity == null) return;
         var state = new GlassJarRenderer.State();
         GlassJarRenderer.extractContents(blockEntity, state, partialTicks, true);
-        if (bufferSource instanceof RenderCapture capture) {
-            capture.record(poseStack, (pose, collector, camera) ->
-                    GlassJarRenderer.submitContents(state, pose, collector, combinedLight, combinedOverlay, 0));
-        } else if (bufferSource instanceof net.minecraft.client.renderer.SubmitNodeCollector collector) {
+        if (bufferSource instanceof net.minecraft.client.renderer.SubmitNodeCollector collector) {
             GlassJarRenderer.submitContents(state, poseStack, collector, combinedLight, combinedOverlay, 0);
         }
     }
@@ -632,9 +645,7 @@ public final class ClientPlatformHooks {
         var state = renderer.createRenderState();
         renderer.extractRenderState(blockEntity, state, partialTicks, Vec3.ZERO, null);
         state.lightCoords = combinedLight;
-        if (bufferSource instanceof RenderCapture capture) {
-            capture.record(poseStack, (pose, collector, camera) -> renderer.submit(state, pose, collector, camera));
-        } else if (bufferSource instanceof net.minecraft.client.renderer.SubmitNodeCollector collector) {
+        if (bufferSource instanceof net.minecraft.client.renderer.SubmitNodeCollector collector) {
             renderer.submit(state, poseStack, collector, null);
         }
     }

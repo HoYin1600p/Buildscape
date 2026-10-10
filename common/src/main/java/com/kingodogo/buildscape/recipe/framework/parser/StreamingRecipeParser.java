@@ -266,7 +266,9 @@ public class StreamingRecipeParser {
                 if (numIndex == 0) {
                     try {
                         count = Integer.parseInt(reader.nextString());
-                    } catch (NumberFormatException ignored) {}
+                    } catch (NumberFormatException ignored) {
+                        // The reference retains numeric defaults when a compact value cannot be parsed.
+                    }
                     numIndex++;
                 } else {
                     reader.skipValue();

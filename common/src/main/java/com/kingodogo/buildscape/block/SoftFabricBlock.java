@@ -102,6 +102,7 @@ public class SoftFabricBlock extends Block {
                 DyeColor dyeColor = DyeColor.valueOf(colorName.toUpperCase(Locale.ROOT));
                 return getDyeRgb(dyeColor);
             } catch (IllegalArgumentException ignored) {
+                // The reference ignores unrecognized dye names and uses its default color.
             }
         }
         return 0xFFFFFF;

@@ -81,6 +81,7 @@ public class PillarParticleConfig {
             try {
                 callback.accept(isRemote);
             } catch (Exception ignored) {
+                com.kingodogo.buildscape.BuildscapeCommon.LOGGER.warn("Pillar config reload callback failed", ignored);
             }
         }
         clearMatchCache();
@@ -200,6 +201,7 @@ public class PillarParticleConfig {
                 writer.write("}\n");
             }
         } catch (Exception ignored) {
+            com.kingodogo.buildscape.BuildscapeCommon.LOGGER.warn("Unable to write default pillar properties", ignored);
         }
     }
 
@@ -226,6 +228,7 @@ public class PillarParticleConfig {
                 writer.write("}\n");
             }
         } catch (Exception ignored) {
+            com.kingodogo.buildscape.BuildscapeCommon.LOGGER.warn("Unable to write default pillar items", ignored);
         }
     }
 
@@ -456,6 +459,7 @@ public class PillarParticleConfig {
             lastLoadedProperties = file.lastModified();
             lastFileSizeProperties = file.length();
         } catch (Exception ignored) {
+            com.kingodogo.buildscape.BuildscapeCommon.LOGGER.warn("Unable to load pillar properties", ignored);
         }
     }
 
@@ -507,6 +511,7 @@ public class PillarParticleConfig {
             lastLoadedItems = file.lastModified();
             lastFileSizeItems = file.length();
         } catch (Exception ignored) {
+            com.kingodogo.buildscape.BuildscapeCommon.LOGGER.warn("Unable to load pillar items", ignored);
         }
     }
 
@@ -582,6 +587,7 @@ public class PillarParticleConfig {
             lastLoadedItems = file.lastModified();
             lastFileSizeItems = file.length();
         } catch (Exception ignored) {
+            com.kingodogo.buildscape.BuildscapeCommon.LOGGER.warn("Unable to save pillar items", ignored);
         }
     }
 
@@ -613,6 +619,7 @@ public class PillarParticleConfig {
             lastLoadedProperties = file.lastModified();
             lastFileSizeProperties = file.length();
         } catch (Exception ignored) {
+            com.kingodogo.buildscape.BuildscapeCommon.LOGGER.warn("Unable to save pillar properties", ignored);
         }
     }
 

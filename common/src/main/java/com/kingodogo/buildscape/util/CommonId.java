@@ -31,6 +31,7 @@ public final class CommonId implements Comparable<CommonId> {
         try {
             return parse(location);
         } catch (Exception e) {
+            com.kingodogo.buildscape.BuildscapeCommon.LOGGER.warn("Unable to parse resource identifier", e);
             return null;
         }
     }

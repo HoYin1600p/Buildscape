@@ -96,6 +96,7 @@ public final class ColorGradientSolver {
             return !state.isAir() && state.getFluidState().isEmpty()
                     && state.getDestroySpeed(EmptyBlockGetter.INSTANCE, BlockPos.ZERO) >= 0.0F;
         } catch (RuntimeException ignored) {
+            // The reference tolerates blocks requiring world context and uses a fallback.
             return false;
         }
     }
@@ -131,6 +132,7 @@ public final class ColorGradientSolver {
             try {
                 color = block.defaultBlockState().getMapColor(EmptyBlockGetter.INSTANCE, BlockPos.ZERO).col;
             } catch (RuntimeException ignored) {
+                // The reference tolerates blocks requiring world context and uses a fallback.
                 color = 0x808080;
             }
             registerDynamicColor(item, color == 0 ? 0x808080 : color, categoriesFor(item));
@@ -401,6 +403,7 @@ public final class ColorGradientSolver {
                 return ShapeFamily.FULL_BLOCK;
             }
         } catch (RuntimeException ignored) {
+            // The reference tolerates blocks requiring world context and uses a fallback.
         }
         return null;
     }
@@ -462,6 +465,7 @@ public final class ColorGradientSolver {
             try {
                 color = blockItem.getBlock().defaultBlockState().getMapColor(EmptyBlockGetter.INSTANCE, BlockPos.ZERO).col;
             } catch (RuntimeException ignored) {
+                // The reference tolerates blocks requiring world context and uses a fallback.
                 color = 0x808080;
             }
             if (color == 0) color = 0x808080;
@@ -478,6 +482,7 @@ public final class ColorGradientSolver {
         try {
             full = Block.isShapeFullBlock(state.getShape(EmptyBlockGetter.INSTANCE, BlockPos.ZERO));
         } catch (RuntimeException ignored) {
+            // The reference tolerates blocks requiring world context and uses a fallback.
             full = false;
         }
         CommonId id = Services.PLATFORM.getBlockId(block);

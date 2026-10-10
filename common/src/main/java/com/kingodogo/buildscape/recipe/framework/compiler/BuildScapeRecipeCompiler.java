@@ -111,7 +111,7 @@ public class BuildScapeRecipeCompiler {
                     return null;
                 }
             } catch (java.io.IOException | RuntimeException exception) {
-                BuildscapeCommon.LOGGER.warn("BDRE Compiler: Invalid recipe conditions for [{}]", spec.id());
+                BuildscapeCommon.LOGGER.warn("BDRE Compiler: Invalid recipe conditions for [{}]", spec.id(), exception);
                 return null;
             }
         }
@@ -226,6 +226,7 @@ public class BuildScapeRecipeCompiler {
         try {
             return modLoaded.test(modid);
         } catch (RuntimeException | LinkageError exception) {
+            BuildscapeCommon.LOGGER.warn("BDRE Compiler: Unable to test recipe condition", exception);
             return false;
         }
     }

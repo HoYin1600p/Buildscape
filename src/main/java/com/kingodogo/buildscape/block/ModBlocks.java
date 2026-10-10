@@ -5689,6 +5689,14 @@ public class ModBlocks {
                                                         .strength(2.0f)
                                                         .sound(net.minecraft.world.level.block.SoundType.METAL)
                                                         .noOcclusion()));
+        public static final RegistryObject<Block> ICE_CRYSTAL = BLOCKS.register(
+                        "ice_crystal",
+                        () -> new IceCrystalBlock(
+                                        BlockBehaviour.Properties.of(Material.AMETHYST, MaterialColor.COLOR_LIGHT_BLUE)
+                                                        .strength(1.5f)
+                                                        .sound(SoundType.AMETHYST_CLUSTER)
+                                                        .lightLevel(state -> 3)
+                                                        .noOcclusion()));
         public static final RegistryObject<Block> MANGROVE_LOG = BLOCKS.register(
                         "mangrove_log",
                         () -> new RotatedPillarBlock(

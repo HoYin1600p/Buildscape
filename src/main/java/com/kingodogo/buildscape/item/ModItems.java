@@ -5890,6 +5890,11 @@ public class ModItems {
                     )
     );
 
+    public static final RegistryObject<Item> ICE_CRYSTAL = ITEMS.register(
+            "ice_crystal",
+            () -> new BlockItem(ModBlocks.ICE_CRYSTAL.get(), createBlockItemProperties())
+    );
+
     public static final RegistryObject<Item> COPPER_NUGGET = ITEMS.register(
             "copper_nugget",
             () -> new Item(new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB))

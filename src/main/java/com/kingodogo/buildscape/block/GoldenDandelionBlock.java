@@ -37,7 +37,7 @@ public class GoldenDandelionBlock extends FlowerBlock {
                 if (!player.getAbilities().instabuild) {
                     held.shrink(1);
                 }
-                level.levelEvent(2005, pos, 0);
+                level.levelEvent(1505, pos, 0);
             }
             return InteractionResult.sidedSuccess(level.isClientSide);
         }

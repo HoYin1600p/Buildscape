@@ -7,33 +7,20 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "buildscape:magenta_haze_bush"
-        }
-      ],
-      "conditions": [
-        {
-          "condition": "minecraft:alternative",
-          "terms": [
+          "name": "buildscape:magenta_haze_bush",
+          "functions": [
             {
-              "condition": "minecraft:match_tool",
-              "predicate": {
-                "items": [
-                  "minecraft:shears"
-                ]
-              }
-            },
-            {
-              "condition": "minecraft:match_tool",
-              "predicate": {
-                "enchantments": [
-                  {
-                    "enchantment": "minecraft:silk_touch",
-                    "levels": {
-                      "min": 1
-                    }
+              "function": "minecraft:set_nbt",
+              "tag": "{BlockStateTag:{has_haze:\"false\"},HasHaze:0b}",
+              "conditions": [
+                {
+                  "condition": "minecraft:block_state_property",
+                  "block": "buildscape:magenta_haze_bush",
+                  "properties": {
+                    "has_haze": "false"
                   }
-                ]
-              }
+                }
+              ]
             }
           ]
         }

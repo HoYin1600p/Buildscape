@@ -534,7 +534,7 @@ public class BlockFactory implements IBlockFactory {
                 }
                 @Override
                 protected MapCodec<? extends BaseEntityBlock> codec() {
-                    return null;
+                    return codecForDefinition(def, BaseEntityBlock.class);
                 }
             };
         } else if (def.isWorkbench()) {
@@ -554,7 +554,7 @@ public class BlockFactory implements IBlockFactory {
                 }
                 @Override
                 protected MapCodec<? extends BaseEntityBlock> codec() {
-                    return null;
+                    return codecForDefinition(def, BaseEntityBlock.class);
                 }
             };
         } else if (def.isGlassJar()) {
@@ -574,7 +574,7 @@ public class BlockFactory implements IBlockFactory {
                 }
                 @Override
                 protected MapCodec<? extends BaseEntityBlock> codec() {
-                    return null;
+                    return codecForDefinition(def, BaseEntityBlock.class);
                 }
             };
         } else if (def.isSmokeVent()) {
@@ -605,7 +605,7 @@ public class BlockFactory implements IBlockFactory {
                 }
                 @Override
                 protected MapCodec<? extends BaseEntityBlock> codec() {
-                    return null;
+                    return codecForDefinition(def, BaseEntityBlock.class);
                 }
             };
         } else if (def.isMuff()) {
@@ -624,7 +624,7 @@ public class BlockFactory implements IBlockFactory {
                 }
                 @Override
                 protected MapCodec<? extends BaseEntityBlock> codec() {
-                    return null;
+                    return codecForDefinition(def, BaseEntityBlock.class);
                 }
             };
         } else if (def.isChest()) {
@@ -646,7 +646,7 @@ public class BlockFactory implements IBlockFactory {
                 }
                 @Override
                 public MapCodec<WallTorchBlock> codec() {
-                    return null;
+                    return codecForDefinition(def, WallTorchBlock.class);
                 }
             };
         } else if (def.isCopperTorch()) {
@@ -657,7 +657,7 @@ public class BlockFactory implements IBlockFactory {
                 }
                 @Override
                 public MapCodec<? extends TorchBlock> codec() {
-                    return null;
+                    return codecForDefinition(def, TorchBlock.class);
                 }
             };
         } else if (def.isLantern()) {
@@ -689,10 +689,11 @@ public class BlockFactory implements IBlockFactory {
                 }
                 @Override
                 public MapCodec<? extends LeavesBlock> codec() {
-                    return null;
+                    return codecForDefinition(def, LeavesBlock.class);
                 }
                 @Override
                 protected void spawnFallingLeavesParticle(Level level, BlockPos pos, RandomSource random) {
+                    // The 1.18.2 reference leaves do not emit falling-leaf particles.
                 }
             }
             return new V26xMangroveLeavesBlock(props);
@@ -725,7 +726,7 @@ public class BlockFactory implements IBlockFactory {
                 @Override
                 @SuppressWarnings("unchecked")
                 public MapCodec<BushBlock> codec() {
-                    return null;
+                    return codecForDefinition(def, BushBlock.class);
                 }
             }
             return new V26xMangrovePropaguleBlock(props);
@@ -791,10 +792,11 @@ public class BlockFactory implements IBlockFactory {
             return new LeavesBlock(0.01f, props) {
                 @Override
                 public MapCodec<? extends LeavesBlock> codec() {
-                    return null;
+                    return codecForDefinition(def, LeavesBlock.class);
                 }
                 @Override
                 protected void spawnFallingLeavesParticle(Level level, BlockPos pos, net.minecraft.util.RandomSource random) {
+                    // The 1.18.2 reference leaves do not emit falling-leaf particles.
                 }
             };
         } else if (def.isSnowyLeaves()) {
@@ -817,10 +819,11 @@ public class BlockFactory implements IBlockFactory {
                 }
                 @Override
                 public MapCodec<? extends LeavesBlock> codec() {
-                    return null;
+                    return codecForDefinition(def, LeavesBlock.class);
                 }
                 @Override
                 protected void spawnFallingLeavesParticle(Level level, BlockPos pos, RandomSource random) {
+                    // The 1.18.2 reference leaves do not emit falling-leaf particles.
                 }
             };
         } else if (def.isColoredMossLayers()) {
@@ -886,7 +889,7 @@ public class BlockFactory implements IBlockFactory {
                 }
                 @Override
                 public MapCodec<net.minecraft.world.level.block.SnowLayerBlock> codec() {
-                    return null;
+                    return codecForDefinition(def, net.minecraft.world.level.block.SnowLayerBlock.class);
                 }
             };
         } else if (def.isLeafLayers()) {
@@ -942,7 +945,7 @@ public class BlockFactory implements IBlockFactory {
                 @Override
                 @SuppressWarnings("unchecked")
                 public MapCodec<BushBlock> codec() {
-                    return null;
+                    return codecForDefinition(def, BushBlock.class);
                 }
             }
             return new V26xLeafLitterBlock(props);
@@ -1256,7 +1259,7 @@ public class BlockFactory implements IBlockFactory {
                 }
                 @Override
                 public MapCodec<? extends HalfTransparentBlock> codec() {
-                    return null;
+                    return codecForDefinition(def, HalfTransparentBlock.class);
                 }
             };
         } else if (def.isIcicleCauldron()) {
@@ -1344,7 +1347,7 @@ public class BlockFactory implements IBlockFactory {
             return new StarBlock(props) {
                 @Override
                 public MapCodec<BushBlock> codec() {
-                    return null;
+                    return codecForDefinition(def, BushBlock.class);
                 }
                 @Override
                 protected BlockState updateShape(BlockState state, LevelReader level, ScheduledTickAccess tickAccess, BlockPos pos, Direction direction, BlockPos adjacentPos, BlockState adjacentState, RandomSource random) {
@@ -1410,7 +1413,7 @@ public class BlockFactory implements IBlockFactory {
             return new BigBookBlock(props) {
                 @Override
                 public MapCodec<? extends HorizontalDirectionalBlock> codec() {
-                    return null;
+                    return codecForDefinition(def, HorizontalDirectionalBlock.class);
                 }
             };
         } else if (def.isBigCandle()) {
@@ -1468,7 +1471,7 @@ public class BlockFactory implements IBlockFactory {
             return new SteelBoltBlock(props) {
                 @Override
                 public MapCodec<? extends Block> codec() {
-                    return null;
+                    return codecForDefinition(def, Block.class);
                 }
                 @Override
                 protected BlockState updateShape(BlockState state, LevelReader level, ScheduledTickAccess tickAccess, BlockPos pos, Direction direction, BlockPos adjacentPos, BlockState adjacentState, RandomSource random) {
@@ -1528,7 +1531,7 @@ public class BlockFactory implements IBlockFactory {
             return new StringLightBlock(props) {
                 @Override
                 public MapCodec<? extends Block> codec() {
-                    return null;
+                    return codecForDefinition(def, Block.class);
                 }
                 @Override
                 protected BlockState updateShape(BlockState state, LevelReader level, ScheduledTickAccess tickAccess, BlockPos pos, Direction direction, BlockPos adjacentPos, BlockState adjacentState, RandomSource random) {
@@ -1641,7 +1644,7 @@ public class BlockFactory implements IBlockFactory {
                 }
                 @Override
                 public MapCodec<BushBlock> codec() {
-                    return null;
+                    return codecForDefinition(def, BushBlock.class);
                 }
             }
             return new V26xEyeblossomBlock(props);
@@ -1663,7 +1666,7 @@ public class BlockFactory implements IBlockFactory {
                 }
                 @Override
                 public MapCodec<BushBlock> codec() {
-                    return null;
+                    return codecForDefinition(def, BushBlock.class);
                 }
             };
         } else if (def.isStrawBed()) {
@@ -1683,7 +1686,7 @@ public class BlockFactory implements IBlockFactory {
                 }
                 @Override
                 public MapCodec<BushBlock> codec() {
-                    return null;
+                    return codecForDefinition(def, BushBlock.class);
                 }
             };
         } else if (def.isGoldenDandelion()) {
@@ -1695,7 +1698,7 @@ public class BlockFactory implements IBlockFactory {
                 }
                 @Override
                 public MapCodec<BushBlock> codec() {
-                    return null;
+                    return codecForDefinition(def, BushBlock.class);
                 }
             };
         } else if (def.isHangingMoss()) {
@@ -1831,7 +1834,7 @@ public class BlockFactory implements IBlockFactory {
 
                 @Override
                 public MapCodec<BushBlock> codec() {
-                    return null;
+                    return codecForDefinition(def, BushBlock.class);
                 }
             }
             return new V26xCloverBlock(props);
@@ -1876,7 +1879,7 @@ public class BlockFactory implements IBlockFactory {
 
                 @Override
                 public MapCodec<BushBlock> codec() {
-                    return null;
+                    return codecForDefinition(def, BushBlock.class);
                 }
             }
             return new V26xPetalBlock(props);
@@ -1919,7 +1922,7 @@ public class BlockFactory implements IBlockFactory {
 
                 @Override
                 public MapCodec<BushBlock> codec() {
-                    return null;
+                    return codecForDefinition(def, BushBlock.class);
                 }
             }
             return new V26xWildflowersBlock(props);
@@ -1956,7 +1959,7 @@ public class BlockFactory implements IBlockFactory {
 
                 @Override
                 public MapCodec<Block> codec() {
-                    return null;
+                    return codecForDefinition(def, Block.class);
                 }
             }
             return new V26xColoredMossBlock(props);
@@ -1974,7 +1977,7 @@ public class BlockFactory implements IBlockFactory {
 
                 @Override
                 public MapCodec<SporeBlossomBlock> codec() {
-                    return null;
+                    return codecForDefinition(def, SporeBlossomBlock.class);
                 }
             }
             return new V26xColoredSporeBlossomBlock(props);
@@ -2004,7 +2007,7 @@ public class BlockFactory implements IBlockFactory {
 
                 @Override
                 public MapCodec<RotatedPillarBlock> codec() {
-                    return null;
+                    return codecForDefinition(def, RotatedPillarBlock.class);
                 }
             }
             return new V26xCreakingHeartBlock(props);
@@ -2032,7 +2035,7 @@ public class BlockFactory implements IBlockFactory {
 
                 @Override
                 public MapCodec<BushBlock> codec() {
-                    return null;
+                    return codecForDefinition(def, BushBlock.class);
                 }
             }
             return new V26xDryGrassBlock(props);
@@ -2040,7 +2043,7 @@ public class BlockFactory implements IBlockFactory {
             return new TallDryGrassBlock(props) {
                 @Override
                 public MapCodec<BushBlock> codec() {
-                    return null;
+                    return codecForDefinition(def, BushBlock.class);
                 }
             };
         } else if (def.isMonetFlower()) {
@@ -2067,7 +2070,7 @@ public class BlockFactory implements IBlockFactory {
                 }
                 @Override
                 public MapCodec<BushBlock> codec() {
-                    return null;
+                    return codecForDefinition(def, BushBlock.class);
                 }
             }
             return new V26xMonetFlowerBlock(props);
@@ -2086,7 +2089,7 @@ public class BlockFactory implements IBlockFactory {
                 }
                 @Override
                 public MapCodec<BushBlock> codec() {
-                    return null;
+                    return codecForDefinition(def, BushBlock.class);
                 }
             };
         } else if (def.isSnowyFern()) {
@@ -2120,7 +2123,7 @@ public class BlockFactory implements IBlockFactory {
                 }
                 @Override
                 public MapCodec<BushBlock> codec() {
-                    return null;
+                    return codecForDefinition(def, BushBlock.class);
                 }
             }
             return new V26xSnowyFernBlock(props);
@@ -2155,7 +2158,7 @@ public class BlockFactory implements IBlockFactory {
                 }
                 @Override
                 public MapCodec<BushBlock> codec() {
-                    return null;
+                    return codecForDefinition(def, BushBlock.class);
                 }
             }
             return new V26xSnowyShortGrassBlock(props);
@@ -2175,7 +2178,7 @@ public class BlockFactory implements IBlockFactory {
                 }
                 @Override
                 public MapCodec<? extends net.minecraft.world.level.block.DoublePlantBlock> codec() {
-                    return null;
+                    return codecForDefinition(def, net.minecraft.world.level.block.DoublePlantBlock.class);
                 }
             };
         } else if (def.isSnowyTallGrass()) {
@@ -2194,7 +2197,7 @@ public class BlockFactory implements IBlockFactory {
                 }
                 @Override
                 public MapCodec<? extends net.minecraft.world.level.block.DoublePlantBlock> codec() {
-                    return null;
+                    return codecForDefinition(def, net.minecraft.world.level.block.DoublePlantBlock.class);
                 }
             };
         } else if (def.isSnowyGrass()) {
@@ -2281,7 +2284,7 @@ public class BlockFactory implements IBlockFactory {
 
                 @Override
                 public MapCodec<? extends Block> codec() {
-                    return null;
+                    return codecForDefinition(def, Block.class);
                 }
             }
             return new V26xSnowyGrassBlock(props);
@@ -2329,7 +2332,7 @@ public class BlockFactory implements IBlockFactory {
 
                 @Override
                 public MapCodec<BushBlock> codec() {
-                    return null;
+                    return codecForDefinition(def, BushBlock.class);
                 }
             };
         } else if (def.isSilkTouchOnlyGlass()) {
@@ -2365,21 +2368,21 @@ public class BlockFactory implements IBlockFactory {
             return new ResinClumpBlock(props) {
                 @Override
                 protected MapCodec<? extends net.minecraft.world.level.block.MultifaceBlock> codec() {
-                    return null;
+                    return codecForDefinition(def, net.minecraft.world.level.block.MultifaceBlock.class);
                 }
             };
         } else if (def.isSculkVein()) {
             return new SculkVeinBlock(props) {
                 @Override
                 protected MapCodec<? extends net.minecraft.world.level.block.MultifaceBlock> codec() {
-                    return null;
+                    return codecForDefinition(def, net.minecraft.world.level.block.MultifaceBlock.class);
                 }
             };
         } else if (def.isWallpaperFlat()) {
             return new WallpaperFlatBlock(props) {
                 @Override
                 protected MapCodec<? extends net.minecraft.world.level.block.MultifaceBlock> codec() {
-                    return null;
+                    return codecForDefinition(def, net.minecraft.world.level.block.MultifaceBlock.class);
                 }
             };
         } else if (def.isSculkCatalyst()) {
@@ -2414,7 +2417,7 @@ public class BlockFactory implements IBlockFactory {
                 }
                 @Override
                 protected MapCodec<? extends Block> codec() {
-                    return null;
+                    return codecForDefinition(def, Block.class);
                 }
             };
         } else if (def.isPlant()) {
@@ -2426,7 +2429,7 @@ public class BlockFactory implements IBlockFactory {
                 }
                 @Override
                 public MapCodec<BushBlock> codec() {
-                    return null;
+                    return codecForDefinition(def, BushBlock.class);
                 }
             };
         } else {
@@ -2505,6 +2508,18 @@ public class BlockFactory implements IBlockFactory {
     }
     private BlockState getBaseState(BlockDefinition def) {
         return getBaseBlock(def).defaultBlockState();
+    }
+    /**
+     * Vanilla 26.2 properties codecs carry no settings (Properties.CODEC is a unit codec).
+     * Rebuild from the definition so the registered ID, constructor settings and custom
+     * overrides survive decoding instead of producing a plain vanilla superclass.
+     */
+    private static <B extends Block> MapCodec<B> codecForDefinition(BlockDefinition definition, Class<B> type) {
+        return Block.simpleCodec(ignoredProperties -> {
+            Block[] decoded = new Block[1];
+            Services.PLATFORM.wrapRegistryAction(() -> decoded[0] = new BlockFactory().createBlock(definition));
+            return type.cast(decoded[0]);
+        });
     }
     private BlockBehaviour.Properties buildProperties(BlockDefinition def) {
         CommonBlockProperties cp = def.getProperties();

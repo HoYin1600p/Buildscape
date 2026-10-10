@@ -1,13 +1,11 @@
 package com.kingodogo.buildscape.config;
 
 public class BuildScapeConfig {
-    private static int maxPipeNetworkSize = 64;
-
     public static int getMaxPipeNetworkSize() {
-        return maxPipeNetworkSize;
+        return BuildscapeClientConfig.get().getMaxPipeNetworkSize();
     }
 
     public static void setMaxPipeNetworkSize(int size) {
-        maxPipeNetworkSize = size;
+        BuildscapeClientConfig.get().setMaxPipeNetworkSize(size);
     }
 }

@@ -62,12 +62,13 @@ public class PresetsConfig {
                                 presets.put(entry.getKey(), preset);
                             }
                         } catch (Exception ignored) {
+                            // The reference skips malformed preset entries while loading valid ones.
                         }
                     }
                 }
             }
         } catch (Exception e) {
-            BuildscapeCommon.logError("Failed to load presets: " + e.getMessage());
+            BuildscapeCommon.LOGGER.error("Failed to load presets", e);
             initializeDefaults();
         }
 
@@ -130,7 +131,7 @@ public class PresetsConfig {
                 GSON.toJson(toSave, writer);
             }
         } catch (Exception e) {
-            BuildscapeCommon.logError("Failed to save presets: " + e.getMessage());
+            BuildscapeCommon.LOGGER.error("Failed to save presets", e);
         }
     }
 

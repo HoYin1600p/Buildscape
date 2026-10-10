@@ -82,6 +82,7 @@ public class BinaryRecipeCache {
             String cachedHash = in.readUTF();
             return expectedHash != null && !expectedHash.isBlank() && expectedHash.equals(cachedHash);
         } catch (IOException e) {
+            // The reference treats unreadable cache headers as a cache miss.
             return false;
         }
     }
@@ -124,6 +125,7 @@ public class BinaryRecipeCache {
             try {
                 Files.move(tempFile, finalFile, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
             } catch (AtomicMoveNotSupportedException e) {
+                // The reference falls back to a regular move on filesystems without atomic moves.
                 Files.move(tempFile, finalFile, StandardCopyOption.REPLACE_EXISTING);
             }
 
@@ -132,7 +134,9 @@ public class BinaryRecipeCache {
             BuildscapeCommon.LOGGER.error("BDRE Binary Cache: Failed to save recipes to cache", e);
             try {
                 Files.deleteIfExists(tempFile);
-            } catch (IOException ignored) {}
+            } catch (IOException ignored) {
+                BuildscapeCommon.LOGGER.warn("Unable to remove failed recipe cache temporary file {}", tempFile, ignored);
+            }
         }
     }
 
@@ -144,6 +148,7 @@ public class BinaryRecipeCache {
         try {
             return loadCacheFromStream(Files.newInputStream(cacheFile), expectedHash);
         } catch (IOException e) {
+            // The reference recompiles recipes when a cache file cannot be opened.
             return new ArrayList<>();
         }
     }
@@ -187,7 +192,7 @@ public class BinaryRecipeCache {
 
             BuildscapeCommon.LOGGER.info("BDRE Binary Cache stream loaded successfully ({} recipes).", recipes.size());
         } catch (Exception e) {
-            BuildscapeCommon.LOGGER.warn("BDRE Binary Cache rejected: {}; recompiling from compact sources.", e.getMessage());
+            BuildscapeCommon.LOGGER.warn("BDRE Binary Cache rejected: {}; recompiling from compact sources.", e.getMessage(), e);
             recipes.clear();
         }
 

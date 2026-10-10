@@ -456,6 +456,7 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
                 return false;
             }
         } catch (Exception ignored) {
+            // The reference rejects blocks whose shape cannot be queried without a world.
             return false;
         }
 

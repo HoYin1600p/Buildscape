@@ -9,6 +9,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -39,8 +40,14 @@ public class BuildscapeClientConfig {
     }
 
     private final Map<String, String> values;
+    private final Path configDirectory;
 
     private BuildscapeClientConfig() {
+        this(Path.of("config"));
+    }
+
+    BuildscapeClientConfig(Path configDirectory) {
+        this.configDirectory = configDirectory;
         this.values = new LinkedHashMap<>(DEFAULTS);
         load();
     }
@@ -63,16 +70,16 @@ public class BuildscapeClientConfig {
         INSTANCE = new BuildscapeClientConfig();
     }
 
-    private static File getConfigFile() {
-        File dir = new File("config/buildscape");
+    private File getConfigFile() {
+        File dir = configDirectory.resolve("buildscape").toFile();
         if (!dir.exists()) {
             dir.mkdirs();
         }
         return new File(dir, "buildscape.cfg");
     }
 
-    private static File getLegacyConfigFile() {
-        return new File("config/buildscape.cfg");
+    private File getLegacyConfigFile() {
+        return configDirectory.resolve("buildscape.cfg").toFile();
     }
 
     private void load() {
@@ -83,7 +90,7 @@ public class BuildscapeClientConfig {
             try {
                 Files.copy(legacyFile.toPath(), file.toPath());
             } catch (IOException e) {
-                BuildscapeCommon.logWarning("BuildscapeClientConfig: Failed to copy legacy config - " + e.getMessage());
+                BuildscapeCommon.LOGGER.warn("BuildscapeClientConfig: Failed to copy legacy config", e);
             }
         }
 
@@ -114,7 +121,7 @@ public class BuildscapeClientConfig {
                 }
             }
         } catch (IOException e) {
-            BuildscapeCommon.logWarning("BuildscapeClientConfig: Failed to read config - using defaults. " + e.getMessage());
+            BuildscapeCommon.LOGGER.warn("BuildscapeClientConfig: Failed to read config - using defaults", e);
         }
 
         if (loadedKeys.size() != DEFAULTS.size()) {
@@ -132,8 +139,11 @@ public class BuildscapeClientConfig {
             for (Map.Entry<String, String> entry : values.entrySet()) {
                 writer.println(entry.getKey() + " = " + entry.getValue());
             }
+            if (writer.checkError()) {
+                throw new IOException("Failed to write config " + file);
+            }
         } catch (IOException e) {
-            BuildscapeCommon.logWarning("BuildscapeClientConfig: Failed to write config - " + e.getMessage());
+            BuildscapeCommon.LOGGER.warn("BuildscapeClientConfig: Failed to write config", e);
         }
     }
 
@@ -145,6 +155,7 @@ public class BuildscapeClientConfig {
         try {
             return Integer.parseInt(values.getOrDefault(key, String.valueOf(fallback)));
         } catch (NumberFormatException e) {
+            // The reference treats malformed numeric settings as their defaults.
             return fallback;
         }
     }
@@ -171,6 +182,10 @@ public class BuildscapeClientConfig {
 
     public int getMaxPipeNetworkSize() {
         return Math.max(1, getInt(KEY_MAX_PIPE_NETWORK_SIZE, 64));
+    }
+
+    public void setMaxPipeNetworkSize(int size) {
+        values.put(KEY_MAX_PIPE_NETWORK_SIZE, String.valueOf(Math.max(1, size)));
     }
 
     public boolean isCakeStackingEnabled() {

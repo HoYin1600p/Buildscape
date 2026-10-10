@@ -1,5 +1,7 @@
 package com.kingodogo.buildscape.mixin;
 
+import com.kingodogo.buildscape.mixinsupport.MixinFactory;
+
 import net.minecraft.advancements.DisplayInfo;
 import net.minecraft.client.gui.screens.advancements.AdvancementWidget;
 import net.minecraft.world.item.ItemStack;

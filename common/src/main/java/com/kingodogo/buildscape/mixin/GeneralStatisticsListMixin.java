@@ -1,5 +1,7 @@
 package com.kingodogo.buildscape.mixin;
 
+import com.kingodogo.buildscape.mixinsupport.MixinFactory;
+
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.stats.Stat;
 import org.spongepowered.asm.mixin.Dynamic;

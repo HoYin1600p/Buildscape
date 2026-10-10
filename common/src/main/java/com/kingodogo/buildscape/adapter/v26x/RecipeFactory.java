@@ -341,9 +341,32 @@ public final class RecipeFactory {
         @Override public RecipeSerializer<? extends CustomRecipe> getSerializer() { return CUSTOM_FIREWORK_STAR.get(); }
     }
 
+    private static final com.kingodogo.buildscape.recipe.framework.compiler.AliasResolver ALIASES =
+            new com.kingodogo.buildscape.recipe.framework.compiler.AliasResolver();
+
     private static Ingredient parseIngredient(String s) {
         if (s == null || s.isEmpty() || "{}".equals(s)) return null;
         try {
+            if (s.startsWith("[") && s.length() > 1 && s.charAt(1) != '"' && s.charAt(1) != '{' && s.charAt(1) != ']') {
+                // Compiler alternative list such as [BS:a,BS:b,#F:tag]: not JSON, so resolve each entry here.
+                java.util.List<net.minecraft.core.Holder<net.minecraft.world.item.Item>> holders = new ArrayList<>();
+                for (String part : s.substring(1, s.length() - 1).split(",")) {
+                    String resolved = ALIASES.resolveString(part.trim());
+                    boolean tag = resolved.startsWith("#");
+                    Identifier partId = Identifier.tryParse(tag ? resolved.substring(1) : resolved);
+                    if (partId == null) continue;
+                    if (tag) {
+                        for (net.minecraft.core.Holder<net.minecraft.world.item.Item> holder
+                                : BuiltInRegistries.ITEM.getTagOrEmpty(net.minecraft.tags.TagKey.create(net.minecraft.core.registries.Registries.ITEM, partId))) {
+                            holders.add(holder);
+                        }
+                    } else {
+                        net.minecraft.world.item.Item item = BuiltInRegistries.ITEM.getValue(partId);
+                        if (item != null && item != net.minecraft.world.item.Items.AIR) holders.add(BuiltInRegistries.ITEM.wrapAsHolder(item));
+                    }
+                }
+                return holders.isEmpty() ? null : Ingredient.of(net.minecraft.core.HolderSet.direct(holders));
+            }
             if (s.startsWith("{") || s.startsWith("[")) {
                 return Ingredient.CODEC.parse(com.mojang.serialization.JsonOps.INSTANCE, com.google.gson.JsonParser.parseString(s)).result().orElse(null);
             } else if (s.contains(":")) {
@@ -360,16 +383,20 @@ public final class RecipeFactory {
 
     private static ItemStackTemplate parseResult(String itemStr, int count, String nbt) {
         net.minecraft.world.item.Item item = BuiltInRegistries.ITEM.getValue(Identifier.tryParse(itemStr != null && !itemStr.isBlank() ? itemStr : "minecraft:air"));
-        if (item == null) item = net.minecraft.world.item.Items.AIR;
-        ItemStack stack = new ItemStack(item, count > 0 ? count : 1);
+        if (item == null || item == net.minecraft.world.item.Items.AIR) {
+            com.kingodogo.buildscape.BuildscapeCommon.LOGGER.warn("Skipping recipe with unknown or empty result item '{}'", itemStr);
+            return null;
+        }
+        // Built without an ItemStack: item components are not bound yet while recipes are injected during reload.
+        net.minecraft.core.component.DataComponentPatch.Builder patch = net.minecraft.core.component.DataComponentPatch.builder();
         if (nbt != null && !nbt.isBlank()) {
             try {
-                stack.set(DataComponents.CUSTOM_DATA, net.minecraft.world.item.component.CustomData.of(net.minecraft.nbt.TagParser.parseCompoundFully(nbt)));
+                patch.set(DataComponents.CUSTOM_DATA, net.minecraft.world.item.component.CustomData.of(net.minecraft.nbt.TagParser.parseCompoundFully(nbt)));
             } catch (Throwable exception) {
                 com.kingodogo.buildscape.BuildscapeCommon.LOGGER.warn("Failed to parse recipe result data for {}", itemStr, exception);
             }
         }
-        return ItemStackTemplate.fromNonEmptyStack(stack);
+        return new ItemStackTemplate(BuiltInRegistries.ITEM.wrapAsHolder(item), count > 0 ? count : 1, patch.build());
     }
 
     public static RecipeHolder<?> createRecipe(com.kingodogo.buildscape.recipe.framework.parser.RecipeIR.CompiledRecipe cr) {
@@ -379,7 +406,8 @@ public final class RecipeFactory {
         ResourceKey<Recipe<?>> key = ResourceKey.create(Registries.RECIPE, id);
         String group = cr.group();
         ItemStackTemplate result = parseResult(cr.resultItem(), cr.resultCount(), cr.resultNbt());
-        String type = cr.type().toLowerCase(java.util.Locale.ROOT);
+        if (result == null) return null;
+        String type =cr.type().toLowerCase(java.util.Locale.ROOT);
         if (type.startsWith("buildscape:")) type = type.substring("buildscape:".length());
 
         Recipe.CommonInfo common = new Recipe.CommonInfo(true);
@@ -430,30 +458,36 @@ public final class RecipeFactory {
             }
             case "stonecutting" -> {
                 Ingredient input = parseIngredient(cr.input());
+                if (input == null) return null;
                 return new RecipeHolder<>(key, new net.minecraft.world.item.crafting.StonecutterRecipe(common, input, result));
             }
             case "smelting" -> {
                 Ingredient input = parseIngredient(cr.input());
+                if (input == null) return null;
                 AbstractCookingRecipe.CookingBookInfo cookBook = new AbstractCookingRecipe.CookingBookInfo(CookingBookCategory.MISC, group);
                 return new RecipeHolder<>(key, new net.minecraft.world.item.crafting.SmeltingRecipe(common, cookBook, input, result, cr.experience(), cr.cookingTime()));
             }
             case "blasting" -> {
                 Ingredient input = parseIngredient(cr.input());
+                if (input == null) return null;
                 AbstractCookingRecipe.CookingBookInfo cookBook = new AbstractCookingRecipe.CookingBookInfo(CookingBookCategory.MISC, group);
                 return new RecipeHolder<>(key, new net.minecraft.world.item.crafting.BlastingRecipe(common, cookBook, input, result, cr.experience(), cr.cookingTime()));
             }
             case "smoking" -> {
                 Ingredient input = parseIngredient(cr.input());
+                if (input == null) return null;
                 AbstractCookingRecipe.CookingBookInfo cookBook = new AbstractCookingRecipe.CookingBookInfo(CookingBookCategory.MISC, group);
                 return new RecipeHolder<>(key, new net.minecraft.world.item.crafting.SmokingRecipe(common, cookBook, input, result, cr.experience(), cr.cookingTime()));
             }
             case "campfire", "campfire_cooking" -> {
                 Ingredient input = parseIngredient(cr.input());
+                if (input == null) return null;
                 AbstractCookingRecipe.CookingBookInfo cookBook = new AbstractCookingRecipe.CookingBookInfo(CookingBookCategory.MISC, group);
                 return new RecipeHolder<>(key, new net.minecraft.world.item.crafting.CampfireCookingRecipe(common, cookBook, input, result, cr.experience(), cr.cookingTime()));
             }
             case "smithing" -> {
                 Ingredient base = parseIngredient(cr.input());
+                if (base == null) return null;
                 Ingredient addition = parseIngredient(cr.addition());
                 return new RecipeHolder<>(key, new net.minecraft.world.item.crafting.SmithingTransformRecipe(common, Optional.empty(), base, Optional.ofNullable(addition), result));
             }

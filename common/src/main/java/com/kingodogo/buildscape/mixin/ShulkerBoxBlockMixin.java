@@ -1,6 +1,6 @@
 package com.kingodogo.buildscape.mixin;
 
-import com.kingodogo.buildscape.mixin.support.ShulkerGhostFilterCapture;
+import com.kingodogo.buildscape.mixinsupport.ShulkerGhostFilterCapture;
 import com.kingodogo.buildscape.util.GhostFilterable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;

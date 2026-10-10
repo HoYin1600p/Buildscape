@@ -1,5 +1,7 @@
 package com.kingodogo.buildscape.mixin;
 
+import com.kingodogo.buildscape.mixinsupport.MixinFactory;
+
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import com.kingodogo.buildscape.util.GhostFilterMenu;
 import net.minecraft.world.item.Item;

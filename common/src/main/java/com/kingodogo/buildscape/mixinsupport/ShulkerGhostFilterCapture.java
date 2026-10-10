@@ -1,6 +1,6 @@
-package com.kingodogo.buildscape.mixin.support;
+package com.kingodogo.buildscape.mixinsupport;
 
-import com.kingodogo.buildscape.mixin.MixinFactory;
+import com.kingodogo.buildscape.mixinsupport.MixinFactory;
 import com.kingodogo.buildscape.util.GhostFilterable;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;

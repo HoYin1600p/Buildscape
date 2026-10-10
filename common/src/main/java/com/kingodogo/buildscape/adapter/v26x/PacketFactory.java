@@ -103,7 +103,7 @@ public class PacketFactory implements IPacketFactory {
                 com.kingodogo.buildscape.BuildscapeCommon.LOGGER.warn("Packet {} had {} trailing unread bytes", id, buf.readableBytes());
             }
             Minecraft mc = Minecraft.getInstance();
-            mc.execute(() -> pkt.handle(player != null ? player : mc.player));
+            mc.execute(() -> pkt.handle(player != null ? player : (Player) (Object) mc.player));
         } catch (Throwable t) {
             com.kingodogo.buildscape.BuildscapeCommon.LOGGER.error("Failed to decode or handle clientbound packet {}", id, t);
         }

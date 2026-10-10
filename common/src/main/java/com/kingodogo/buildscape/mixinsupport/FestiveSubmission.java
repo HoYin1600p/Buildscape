@@ -1,4 +1,4 @@
-package com.kingodogo.buildscape.mixin.support;
+package com.kingodogo.buildscape.mixinsupport;
 
 import com.kingodogo.buildscape.client.renderer.FestiveGlintHandler;
 import net.minecraft.client.renderer.rendertype.RenderSetup;

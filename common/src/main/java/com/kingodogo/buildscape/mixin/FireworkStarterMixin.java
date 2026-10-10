@@ -1,5 +1,7 @@
 package com.kingodogo.buildscape.mixin;
 
+import com.kingodogo.buildscape.mixinsupport.MixinFactory;
+
 import net.minecraft.client.particle.FireworkParticles;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;

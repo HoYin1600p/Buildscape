@@ -1,7 +1,7 @@
 package com.kingodogo.buildscape.mixin;
 
 import com.kingodogo.buildscape.client.renderer.FestiveGlintHandler;
-import com.kingodogo.buildscape.mixin.support.FestiveSubmission;
+import com.kingodogo.buildscape.mixinsupport.FestiveSubmission;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.ThrownTridentRenderer;

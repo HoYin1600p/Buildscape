@@ -1,6 +1,6 @@
 package com.kingodogo.buildscape.mixin;
 
-import com.kingodogo.buildscape.mixin.support.FluidConduitSupply;
+import com.kingodogo.buildscape.mixinsupport.FluidConduitSupply;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.BlockGetter;

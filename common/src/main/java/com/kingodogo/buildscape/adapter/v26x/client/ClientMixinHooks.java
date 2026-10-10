@@ -55,7 +55,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 
-import com.kingodogo.buildscape.adapter.v26x.RenderCapture;
 
 /** Client implementation of the mixin facade. */
 public final class ClientMixinHooks {
@@ -127,9 +126,7 @@ public final class ClientMixinHooks {
         if (height >= com.kingodogo.buildscape.util.BeaconBeamScanState.UNLIMITED) return;
         var state = new net.minecraft.client.renderer.blockentity.state.BeaconRenderState();
         net.minecraft.client.renderer.blockentity.BeaconRenderer.extract(blockEntity, state, partialTicks, net.minecraft.world.phys.Vec3.ZERO);
-        if (bufferSource instanceof RenderCapture capture) {
-            capture.record(poseStack, (pose, collector, camera) -> submitClippedBeam(state, pose, collector, height));
-        } else if (bufferSource instanceof net.minecraft.client.renderer.SubmitNodeCollector collector) {
+        if (bufferSource instanceof net.minecraft.client.renderer.SubmitNodeCollector collector) {
             submitClippedBeam(state, poseStack, collector, height);
         }
     }
@@ -176,19 +173,11 @@ public final class ClientMixinHooks {
 
     private static VertexConsumer foilBuffer(Object buffer, Object type,
             net.minecraft.client.renderer.rendertype.RenderType glint) {
-        var renderType = (net.minecraft.client.renderer.rendertype.RenderType) type;
-        var foil = com.kingodogo.buildscape.mixinsupport.FestiveSubmission.festiveGlint(glint);
-        if (buffer instanceof RenderCapture capture)
-            return new DualVertexConsumer(capture.geometry(renderType), capture.geometry(foil));
         if (buffer instanceof VertexConsumer consumer) return consumer;
-        if (buffer instanceof net.minecraft.client.renderer.SubmitNodeCollector collector) {
-            RenderCapture capture = new RenderCapture();
-            VertexConsumer consumer = new DualVertexConsumer(capture.geometry(renderType), capture.geometry(foil));
-            // Custom geometry consumes the captured vertex list during the later draw phase.
-            capture.submit(new PoseStack(), collector, null);
-            return consumer;
-        }
-        throw new IllegalArgumentException("Expected a captured or submitted Buildscape render buffer");
+        // Native item/equipment states carry foil through FestiveSubmission; a submit collector
+        // is not an immediate vertex buffer. These legacy signatures only accept actual consumers.
+        com.kingodogo.buildscape.BuildscapeCommon.LOGGER.error("Expected an immediate vertex consumer for a foil buffer, got {}", buffer);
+        throw new IllegalArgumentException("Expected an immediate Buildscape render buffer");
     }
 
     public static VertexConsumer getFestiveFoilBufferDirect(Object bufferSource, Object renderType, boolean noEntity) {

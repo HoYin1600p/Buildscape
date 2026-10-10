@@ -98,100 +98,99 @@ public class HollowLogBlockEntityRenderer {
         }
     }
 
-    private static void renderPipeFluid(Level level, BlockPos pos, BlockState state, HollowLogBlockEntity blockEntity,
-                                        PoseStack poseStack, Object bufferSource, int light, int overlay) {
-        PipeFlowState flowState = blockEntity.getPipeFlowState();
-        Fluid fluid = HollowPipeBlock.getContainedFluid(state, blockEntity);
-        boolean hasWater = fluid != null && fluid.isSame(Fluids.WATER);
-        boolean hasLava = (fluid == Fluids.LAVA) || (state.hasProperty(HollowPipeBlock.LAVA_LOGGED) && state.getValue(HollowPipeBlock.LAVA_LOGGED));
-        Fluid xpStill = Services.PLATFORM.getFluid(new CommonId("buildscape", "experience_still"));
-        Fluid xpFlowing = Services.PLATFORM.getFluid(new CommonId("buildscape", "experience_flow"));
-        boolean hasXp = (fluid != null && (fluid == xpStill || fluid == xpFlowing));
+    /** Immutable fluid inputs; geometry is computed at submission rather than captured as vertices. */
+    public record FluidDisplay(BlockState state, boolean pipe, TextureAtlasSprite sprite, int color,
+            Direction.Axis axis, Direction inlet, Set<Direction> outlets, PipeWaterSurface.Heights heights,
+            boolean fromAbove, boolean toAbove, int neighborMask, boolean glassNeg, boolean glassPos) {
+        public FluidDisplay {
+            outlets = Set.copyOf(outlets);
+        }
 
+        public boolean hasNeighborFluid(Direction direction) {
+            return (neighborMask & (1 << direction.ordinal())) != 0;
+        }
+    }
+
+    public static FluidDisplay extractFluid(HollowLogBlockEntity entity, boolean glassNeg, boolean glassPos) {
+        BlockState state = entity.getBlockState();
+        boolean pipe = state.getBlock() instanceof HollowPipeBlock;
+        if (!pipe && !(state.getBlock() instanceof HollowLogBlock)) return null;
+        Level level = entity.getLevel();
+        BlockPos pos = entity.getBlockPos();
+        PipeFlowState flow = entity.getPipeFlowState();
+        Fluid fluid = HollowPipeBlock.getContainedFluid(state, entity);
         if (fluid == null || fluid == Fluids.EMPTY) {
-            if (hasWater) {
-                fluid = Fluids.WATER;
-            } else if (hasLava) {
-                fluid = Fluids.LAVA;
-            } else {
-                return;
-            }
+            if (pipe && state.getValue(HollowPipeBlock.LAVA_LOGGED)) fluid = Fluids.LAVA;
+            else return null;
         }
-
-        boolean connDown = state.getValue(HollowPipeBlock.DOWN);
-        float yFloor = connDown ? 0.0F : 0.125F;
-
-        Direction inDir = flowState != null ? flowState.getInflowDirection() : null;
-        Set<Direction> outDirs = flowState != null ? flowState.getFlowDirections() : Set.of();
-
-        boolean flowFromAbove = (inDir == Direction.UP);
-        boolean flowToAbove = outDirs.contains(Direction.UP) && (flowState != null && flowState.getBubbleColumn() == BubbleColumnState.UP);
-        boolean flowIsVertical = flowFromAbove || flowToAbove;
-
-        boolean hasNetworkFlow = flowState != null && flowState.hasFluid();
-        float yIn;
-        float yOut;
-        if (flowIsVertical) {
-            yIn  = 1.0F;
-            yOut = 1.0F;
-        } else if (hasNetworkFlow) {
-            boolean directSource = HollowPipeBlock.getSourceFluid(state, blockEntity) != Fluids.EMPTY;
-            PipeWaterSurface.Heights heights = PipeWaterSurface.flowing(directSource, connDown, flowState);
-            yIn = heights.inlet();
-            yOut = heights.outlet();
-        } else {
-            yIn  = HollowPipeBlock.WATER_SOURCE_VISUAL_HEIGHT;
-            yOut = HollowPipeBlock.WATER_SOURCE_VISUAL_HEIGHT;
+        Direction.Axis axis = state.hasProperty(HollowLogBlock.AXIS) ? state.getValue(HollowLogBlock.AXIS) : Direction.Axis.Y;
+        Direction inlet = flow == null ? null : flow.getInflowDirection();
+        Set<Direction> outlets = flow == null ? Set.of() : Set.copyOf(flow.getFlowDirections());
+        boolean fromAbove = inlet == Direction.UP;
+        boolean toAbove = outlets.contains(Direction.UP) && flow != null && flow.getBubbleColumn() == BubbleColumnState.UP;
+        boolean network = flow != null && flow.hasFluid();
+        boolean directSource = HollowPipeBlock.getSourceFluid(state, entity) != Fluids.EMPTY;
+        PipeWaterSurface.Heights heights = pipe && (fromAbove || toAbove)
+                ? new PipeWaterSurface.Heights(1, 1)
+                : network ? PipeWaterSurface.flowing(directSource,
+                        pipe ? state.getValue(HollowPipeBlock.DOWN) : axis == Direction.Axis.Y, flow)
+                : new PipeWaterSurface.Heights(HollowPipeBlock.WATER_SOURCE_VISUAL_HEIGHT, HollowPipeBlock.WATER_SOURCE_VISUAL_HEIGHT);
+        boolean flowing = network && !outlets.isEmpty();
+        if (pipe && fluid == Fluids.WATER) {
+            boolean stationarySource = flow != null && flow.isSource() && inlet == null && outlets.size() != 1;
+            flowing = flow != null && flow.hasWater() && !outlets.isEmpty() && !stationarySource;
         }
-        float yCenter = (yIn + yOut) * 0.5F;
-
-        final float ZB = 0.002F;
-
-        boolean connUp    = state.getValue(HollowPipeBlock.UP);
-        boolean connNorth = state.getValue(HollowPipeBlock.NORTH);
-        boolean connSouth = state.getValue(HollowPipeBlock.SOUTH);
-        boolean connWest  = state.getValue(HollowPipeBlock.WEST);
-        boolean connEast  = state.getValue(HollowPipeBlock.EAST);
-
-        CommonId texLoc;
-        if (fluid == Fluids.LAVA) {
-            texLoc = hasNetworkFlow && !flowState.getFlowDirections().isEmpty()
-                    ? new CommonId("minecraft", "block/lava_flow")
-                    : new CommonId("minecraft", "block/lava_still");
-        } else if (fluid == Fluids.WATER) {
-            boolean isStationarySource = (flowState != null && flowState.isSource() && flowState.getInflowDirection() == null && flowState.getFlowDirections().size() != 1);
-            texLoc = (flowState != null && flowState.hasWater() && !flowState.getFlowDirections().isEmpty() && !isStationarySource)
-                    ? new CommonId("minecraft", "block/water_flow")
-                    : new CommonId("minecraft", "block/water_still");
-        } else if (hasXp) {
-            texLoc = (hasNetworkFlow && !flowState.getFlowDirections().isEmpty())
-                    ? new CommonId("buildscape", "fluid/experience_flow")
-                    : new CommonId("buildscape", "fluid/experience_still");
-        } else {
-            texLoc = new CommonId("minecraft", "block/water_still");
+        Fluid xpStill = Services.PLATFORM.getFluid(new CommonId("buildscape", "experience_still"));
+        Fluid xpFlow = Services.PLATFORM.getFluid(new CommonId("buildscape", "experience_flow"));
+        boolean xp = fluid == xpStill || fluid == xpFlow;
+        CommonId texture = fluid == Fluids.LAVA
+                ? new CommonId("minecraft", flowing ? "block/lava_flow" : "block/lava_still")
+                : xp ? new CommonId("buildscape", flowing ? "fluid/experience_flow" : "fluid/experience_still")
+                : new CommonId("minecraft", fluid == Fluids.WATER && flowing ? "block/water_flow" : "block/water_still");
+        TextureAtlasSprite sprite = Services.PLATFORM.getBlockAtlasSprite(texture);
+        if (sprite == null) {
+            com.kingodogo.buildscape.BuildscapeCommon.LOGGER.warn("Missing hollow-log fluid sprite {}", texture);
+            return null;
         }
-
-        TextureAtlasSprite sprite = Services.PLATFORM.getBlockAtlasSprite(texLoc);
-        if (sprite == null) return;
-
-        int fluidColor = 0xFFFFFFFF;
-        if (fluid == Fluids.WATER) {
-            fluidColor = (level != null && pos != null) ? Services.PLATFORM.getWaterColor(level, pos) : 0x3F76E4;
-            fluidColor |= 0xFF000000;
-        } else if (fluid == Fluids.LAVA || hasXp) {
-            fluidColor = 0xFFFFFFFF;
+        int color = fluid == Fluids.WATER ? 0xFF000000 | (level == null ? 0x3F76E4 : Services.PLATFORM.getWaterColor(level, pos)) : -1;
+        int neighbors = 0;
+        for (Direction direction : Direction.values()) {
+            if (isNeighborFluid(level, pos, direction, fluid)) neighbors |= 1 << direction.ordinal();
         }
+        return new FluidDisplay(state, pipe, sprite, color, axis, inlet, outlets, heights,
+                fromAbove, toAbove, neighbors, glassNeg, glassPos);
+    }
 
-        float r = ((fluidColor >> 16) & 0xFF) / 255.0F;
-        float g = ((fluidColor >> 8) & 0xFF) / 255.0F;
-        float b = (fluidColor & 0xFF) / 255.0F;
-        float a = 1.0F;
+    public static void submitFluid(FluidDisplay data, PoseStack pose, VertexConsumer buffer, int light, int overlay) {
+        if (data.pipe) submitPipeFluid(data, pose, buffer, light, overlay);
+        else submitLogFluid(data, pose, buffer, light, overlay);
+    }
 
+    private static void renderPipeFluid(Level level, BlockPos pos, BlockState state, HollowLogBlockEntity entity,
+            PoseStack pose, Object bufferSource, int light, int overlay) {
+        FluidDisplay data = extractFluid(entity, false, false);
         VertexConsumer buffer = Services.PLATFORM.getTranslucentBuffer(bufferSource);
-        if (buffer == null) return;
+        if (data != null && buffer != null) submitPipeFluid(data, pose, buffer, light, overlay);
+    }
 
-        Direction.Axis pipeAxis = state.hasProperty(HollowPipeBlock.AXIS) ? state.getValue(HollowPipeBlock.AXIS) : Direction.Axis.Y;
-
+    private static void submitPipeFluid(FluidDisplay data, PoseStack poseStack, VertexConsumer buffer, int light, int overlay) {
+        BlockState state = data.state;
+        TextureAtlasSprite sprite = data.sprite;
+        float r = ((data.color >> 16) & 255) / 255.0F;
+        float g = ((data.color >> 8) & 255) / 255.0F;
+        float b = (data.color & 255) / 255.0F;
+        float a = 1;
+        boolean connDown = state.getValue(HollowPipeBlock.DOWN);
+        float yFloor = connDown ? 0 : 0.125F;
+        Direction inDir = data.inlet;
+        Set<Direction> outDirs = data.outlets;
+        boolean flowFromAbove = data.fromAbove, flowToAbove = data.toAbove;
+        boolean flowIsVertical = flowFromAbove || flowToAbove;
+        float yIn = data.heights.inlet(), yOut = data.heights.outlet(), yCenter = data.heights.center();
+        final float ZB = 0.002F;
+        boolean connNorth = state.getValue(HollowPipeBlock.NORTH), connSouth = state.getValue(HollowPipeBlock.SOUTH);
+        boolean connWest = state.getValue(HollowPipeBlock.WEST), connEast = state.getValue(HollowPipeBlock.EAST);
+        Direction.Axis pipeAxis = data.axis;
         boolean isStraightX = (pipeAxis == Direction.Axis.X || connWest || connEast) && !connNorth && !connSouth && !flowIsVertical;
         boolean isStraightZ = (pipeAxis == Direction.Axis.Z || connNorth || connSouth) && !connWest && !connEast && !flowIsVertical;
 
@@ -236,7 +235,7 @@ public class HollowLogBlockEntityRenderer {
                     uZ1, vX2,
                     light, overlay, 0, 1, 0);
 
-            if (!connWest && openWest && !isNeighborFluid(level, pos, Direction.WEST, fluid)) {
+            if (!connWest && openWest && !data.hasNeighborFluid(Direction.WEST)) {
                 float uW0 = getSpriteU(sprite, z1);
                 float uW1 = getSpriteU(sprite, z2);
                 float vW0 = getSpriteV(sprite, yFloor);
@@ -245,7 +244,7 @@ public class HollowLogBlockEntityRenderer {
                 renderQuad(poseStack, buffer, x1, yW, z2, x1, yFloor, z2, x1, yFloor, z1, x1, yW, z1, r, g, b, a, uW1, vW1, uW1, vW0, uW0, vW0, uW0, vW1, light, overlay, 1, 0, 0);
             }
 
-            if (!connEast && openEast && !isNeighborFluid(level, pos, Direction.EAST, fluid)) {
+            if (!connEast && openEast && !data.hasNeighborFluid(Direction.EAST)) {
                 float uE0 = getSpriteU(sprite, z1);
                 float uE1 = getSpriteU(sprite, z2);
                 float vE0 = getSpriteV(sprite, yFloor);
@@ -297,7 +296,7 @@ public class HollowLogBlockEntityRenderer {
                     uX2, vZ1,
                     light, overlay, 0, 1, 0);
 
-            if (!connNorth && openNorth && !isNeighborFluid(level, pos, Direction.NORTH, fluid)) {
+            if (!connNorth && openNorth && !data.hasNeighborFluid(Direction.NORTH)) {
                 float uN0 = getSpriteU(sprite, x1);
                 float uN1 = getSpriteU(sprite, x2);
                 float vN0 = getSpriteV(sprite, yFloor);
@@ -306,7 +305,7 @@ public class HollowLogBlockEntityRenderer {
                 renderQuad(poseStack, buffer, x1, yN, z1, x1, yFloor, z1, x2, yFloor, z1, x2, yN, z1, r, g, b, a, uN0, vN1, uN0, vN0, uN1, vN0, uN1, vN1, light, overlay, 0, 0, 1);
             }
 
-            if (!connSouth && openSouth && !isNeighborFluid(level, pos, Direction.SOUTH, fluid)) {
+            if (!connSouth && openSouth && !data.hasNeighborFluid(Direction.SOUTH)) {
                 float uS0 = getSpriteU(sprite, x1);
                 float uS1 = getSpriteU(sprite, x2);
                 float vS0 = getSpriteV(sprite, yFloor);
@@ -345,7 +344,7 @@ public class HollowLogBlockEntityRenderer {
                     light, overlay, 0, 1, 0);
         }
 
-        if (!connNorth && openNorth && !isNeighborFluid(level, pos, Direction.NORTH, fluid)) {
+        if (!connNorth && openNorth && !data.hasNeighborFluid(Direction.NORTH)) {
             float uN0 = getSpriteU(sprite, x1);
             float uN1 = getSpriteU(sprite, x2);
             float vN0 = getSpriteV(sprite, yFloor);
@@ -354,7 +353,7 @@ public class HollowLogBlockEntityRenderer {
             renderQuad(poseStack, buffer, x1, yTop, z1, x1, yFloor, z1, x2, yFloor, z1, x2, yTop, z1, r, g, b, a, uN0, vN1, uN0, vN0, uN1, vN0, uN1, vN1, light, overlay, 0, 0, 1);
         }
 
-        if (!connSouth && openSouth && !isNeighborFluid(level, pos, Direction.SOUTH, fluid)) {
+        if (!connSouth && openSouth && !data.hasNeighborFluid(Direction.SOUTH)) {
             float uS0 = getSpriteU(sprite, x1);
             float uS1 = getSpriteU(sprite, x2);
             float vS0 = getSpriteV(sprite, yFloor);
@@ -363,7 +362,7 @@ public class HollowLogBlockEntityRenderer {
             renderQuad(poseStack, buffer, x2, yTop, z2, x2, yFloor, z2, x1, yFloor, z2, x1, yTop, z2, r, g, b, a, uS1, vS1, uS1, vS0, uS0, vS0, uS0, vS1, light, overlay, 0, 0, -1);
         }
 
-        if (!connWest && openWest && !isNeighborFluid(level, pos, Direction.WEST, fluid)) {
+        if (!connWest && openWest && !data.hasNeighborFluid(Direction.WEST)) {
             float uW0 = getSpriteU(sprite, z1);
             float uW1 = getSpriteU(sprite, z2);
             float vW0 = getSpriteV(sprite, yFloor);
@@ -372,7 +371,7 @@ public class HollowLogBlockEntityRenderer {
             renderQuad(poseStack, buffer, x1, yTop, z2, x1, yFloor, z2, x1, yFloor, z1, x1, yTop, z1, r, g, b, a, uW1, vW1, uW1, vW0, uW0, vW0, uW0, vW1, light, overlay, 1, 0, 0);
         }
 
-        if (!connEast && openEast && !isNeighborFluid(level, pos, Direction.EAST, fluid)) {
+        if (!connEast && openEast && !data.hasNeighborFluid(Direction.EAST)) {
             float uE0 = getSpriteU(sprite, z1);
             float uE1 = getSpriteU(sprite, z2);
             float vE0 = getSpriteV(sprite, yFloor);
@@ -573,7 +572,7 @@ public class HollowLogBlockEntityRenderer {
         Services.PLATFORM.renderBlockModelWithTint(state, pos, level, poseStack, bufferSource, light, overlay);
     }
 
-    private static void positionGlassCover(PoseStack poseStack, Direction.Axis axis, boolean isPositive) {
+    public static void positionGlassCover(PoseStack poseStack, Direction.Axis axis, boolean isPositive) {
         float glassThickness = 0.0625F;
         double negOffset = 0.015625D;
         double posOffset = 1.0D - 0.015625D - glassThickness;
@@ -606,67 +605,28 @@ public class HollowLogBlockEntityRenderer {
         }
     }
 
-    private static void renderLogFluid(Level level, BlockPos pos, BlockState state, HollowLogBlockEntity blockEntity,
-                                       PoseStack poseStack, Object bufferSource, int light, int overlay,
-                                boolean hasGlassNeg, boolean hasGlassPos) {
-        PipeFlowState flowState = blockEntity.getPipeFlowState();
-        Fluid fluid = HollowPipeBlock.getContainedFluid(state, blockEntity);
-
-        if (fluid == null || fluid == Fluids.EMPTY) {
-            return;
-        }
-
-        Fluid xpStill = Services.PLATFORM.getFluid(new CommonId("buildscape", "experience_still"));
-        Fluid xpFlowing = Services.PLATFORM.getFluid(new CommonId("buildscape", "experience_flow"));
-        boolean hasXp = (fluid != null && (fluid == xpStill || fluid == xpFlowing));
-
-        CommonId texLoc;
-        if (fluid == Fluids.LAVA) {
-            texLoc = flowState != null && flowState.hasFluid() && !flowState.getFlowDirections().isEmpty()
-                    ? new CommonId("minecraft", "block/lava_flow")
-                    : new CommonId("minecraft", "block/lava_still");
-        } else if (fluid == Fluids.WATER) {
-            texLoc = flowState != null && flowState.hasFluid() && !flowState.getFlowDirections().isEmpty()
-                    ? new CommonId("minecraft", "block/water_flow")
-                    : new CommonId("minecraft", "block/water_still");
-        } else if (hasXp) {
-            texLoc = flowState != null && flowState.hasFluid() && !flowState.getFlowDirections().isEmpty()
-                    ? new CommonId("buildscape", "fluid/experience_flow")
-                    : new CommonId("buildscape", "fluid/experience_still");
-        } else {
-            texLoc = new CommonId("minecraft", "block/water_still");
-        }
-
-        TextureAtlasSprite sprite = Services.PLATFORM.getBlockAtlasSprite(texLoc);
-        if (sprite == null) return;
+    private static void renderLogFluid(Level level, BlockPos pos, BlockState state, HollowLogBlockEntity entity,
+            PoseStack pose, Object bufferSource, int light, int overlay, boolean hasGlassNeg, boolean hasGlassPos) {
+        FluidDisplay data = extractFluid(entity, hasGlassNeg, hasGlassPos);
         VertexConsumer buffer = Services.PLATFORM.getTranslucentBuffer(bufferSource);
-        if (buffer == null) return;
+        if (data != null && buffer != null) submitLogFluid(data, pose, buffer, light, overlay);
+    }
 
-        int color = 0xFFFFFFFF;
-        if (fluid == Fluids.WATER) {
-            color = (level != null && pos != null) ? Services.PLATFORM.getWaterColor(level, pos) : 0x3F76E4;
-            color |= 0xFF000000;
-        } else if (fluid == Fluids.LAVA || hasXp) {
-            color = 0xFFFFFFFF;
-        }
-
-        float r = ((color >> 16) & 0xFF) / 255.0F;
-        float g = ((color >> 8) & 0xFF) / 255.0F;
-        float b = (color & 0xFF) / 255.0F;
-        float a = 1.0F;
-
-        Direction.Axis axis = state.hasProperty(HollowLogBlock.AXIS) ? state.getValue(HollowLogBlock.AXIS) : Direction.Axis.Y;
-
+    private static void submitLogFluid(FluidDisplay data, PoseStack poseStack, VertexConsumer buffer, int light, int overlay) {
+        TextureAtlasSprite sprite = data.sprite;
+        float r = ((data.color >> 16) & 255) / 255.0F;
+        float g = ((data.color >> 8) & 255) / 255.0F;
+        float b = (data.color & 255) / 255.0F;
+        float a = 1;
+        Direction.Axis axis = data.axis;
+        boolean hasGlassNeg = data.glassNeg, hasGlassPos = data.glassPos;
         final float ZB = 0.002F;
         float x1 = 0.125F + ZB, x2 = 0.875F - ZB;
         float y1 = 0.125F, y2 = HollowPipeBlock.WATER_SOURCE_VISUAL_HEIGHT;
         float z1 = 0.125F + ZB, z2 = 0.875F - ZB;
-        boolean directSource = HollowPipeBlock.getSourceFluid(state, blockEntity) != Fluids.EMPTY;
-        PipeWaterSurface.Heights surface = flowState != null && flowState.hasFluid()
-                ? PipeWaterSurface.flowing(directSource, axis == Direction.Axis.Y, flowState)
-                : new PipeWaterSurface.Heights(y2, y2);
-        Direction inDir = flowState != null ? flowState.getInflowDirection() : null;
-        Set<Direction> outDirs = flowState != null ? flowState.getFlowDirections() : Set.of();
+        PipeWaterSurface.Heights surface = data.heights;
+        Direction inDir = data.inlet;
+        Set<Direction> outDirs = data.outlets;
 
         if (axis == Direction.Axis.Z) {
             z1 = hasGlassNeg ? 0.08F : 0.0F;
@@ -695,14 +655,14 @@ public class HollowLogBlockEntityRenderer {
                     uX2, vZ1,
                     light, overlay, 0, 1, 0);
 
-            if (hasGlassNeg || !isNeighborFluid(level, pos, Direction.NORTH, fluid)) {
+            if (hasGlassNeg || !data.hasNeighborFluid(Direction.NORTH)) {
                 float vY1 = getSpriteV(sprite, y1);
                 float vY2 = getSpriteV(sprite, yNorth);
                 renderQuad(poseStack, buffer, x2, yNorth, z1, x2, y1, z1, x1, y1, z1, x1, yNorth, z1, r, g, b, a, uX2, vY2, uX2, vY1, uX1, vY1, uX1, vY2, light, overlay, 0, 0, -1);
                 renderQuad(poseStack, buffer, x1, yNorth, z1, x1, y1, z1, x2, y1, z1, x2, yNorth, z1, r, g, b, a, uX1, vY2, uX1, vY1, uX2, vY1, uX2, vY2, light, overlay, 0, 0, 1);
             }
 
-            if (hasGlassPos || !isNeighborFluid(level, pos, Direction.SOUTH, fluid)) {
+            if (hasGlassPos || !data.hasNeighborFluid(Direction.SOUTH)) {
                 float vY1 = getSpriteV(sprite, y1);
                 float vY2 = getSpriteV(sprite, ySouth);
                 renderQuad(poseStack, buffer, x1, ySouth, z2, x1, y1, z2, x2, y1, z2, x2, ySouth, z2, r, g, b, a, uX1, vY2, uX1, vY1, uX2, vY1, uX2, vY2, light, overlay, 0, 0, 1);
@@ -735,14 +695,14 @@ public class HollowLogBlockEntityRenderer {
                     uZ1, vX2,
                     light, overlay, 0, 1, 0);
 
-            if (hasGlassNeg || !isNeighborFluid(level, pos, Direction.WEST, fluid)) {
+            if (hasGlassNeg || !data.hasNeighborFluid(Direction.WEST)) {
                 float vY1 = getSpriteV(sprite, y1);
                 float vY2 = getSpriteV(sprite, yWest);
                 renderQuad(poseStack, buffer, x1, yWest, z1, x1, y1, z1, x1, y1, z2, x1, yWest, z2, r, g, b, a, uZ1, vY2, uZ1, vY1, uZ2, vY1, uZ2, vY2, light, overlay, -1, 0, 0);
                 renderQuad(poseStack, buffer, x1, yWest, z2, x1, y1, z2, x1, y1, z1, x1, yWest, z1, r, g, b, a, uZ2, vY2, uZ2, vY1, uZ1, vY1, uZ1, vY2, light, overlay, 1, 0, 0);
             }
 
-            if (hasGlassPos || !isNeighborFluid(level, pos, Direction.EAST, fluid)) {
+            if (hasGlassPos || !data.hasNeighborFluid(Direction.EAST)) {
                 float vY1 = getSpriteV(sprite, y1);
                 float vY2 = getSpriteV(sprite, yEast);
                 renderQuad(poseStack, buffer, x2, yEast, z2, x2, y1, z2, x2, y1, z1, x2, yEast, z1, r, g, b, a, uZ2, vY2, uZ2, vY1, uZ1, vY1, uZ1, vY2, light, overlay, 1, 0, 0);
@@ -750,14 +710,14 @@ public class HollowLogBlockEntityRenderer {
             }
         } else {
             y1 = hasGlassNeg ? 0.08F : 0.0F;
-            y2 = hasGlassPos ? 0.92F : (isNeighborFluid(level, pos, Direction.UP, fluid) ? 1.0F : HollowPipeBlock.WATER_SOURCE_VISUAL_HEIGHT);
+            y2 = hasGlassPos ? 0.92F : (data.hasNeighborFluid(Direction.UP) ? 1.0F : HollowPipeBlock.WATER_SOURCE_VISUAL_HEIGHT);
 
             float uX1 = getSpriteU(sprite, x1);
             float uX2 = getSpriteU(sprite, x2);
             float vZ1 = getSpriteV(sprite, z1);
             float vZ2 = getSpriteV(sprite, z2);
 
-            if (hasGlassPos || !isNeighborFluid(level, pos, Direction.UP, fluid)) {
+            if (hasGlassPos || !data.hasNeighborFluid(Direction.UP)) {
                 renderQuad(poseStack, buffer,
                         x1, y2, z1,
                         x1, y2, z2,
@@ -771,7 +731,7 @@ public class HollowLogBlockEntityRenderer {
                         light, overlay, 0, 1, 0);
             }
 
-            if (hasGlassNeg || !isNeighborFluid(level, pos, Direction.DOWN, fluid)) {
+            if (hasGlassNeg || !data.hasNeighborFluid(Direction.DOWN)) {
                 renderQuad(poseStack, buffer,
                         x1, y1, z2,
                         x1, y1, z1,

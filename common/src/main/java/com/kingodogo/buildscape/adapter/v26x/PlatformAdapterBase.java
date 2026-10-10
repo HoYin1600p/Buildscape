@@ -3,7 +3,6 @@ import com.kingodogo.buildscape.entity.ColoredItemFrameEntity;
 import com.kingodogo.buildscape.entity.FallingIcicleEntity;
 import com.kingodogo.buildscape.entity.FestiveStockingEntity;
 import com.kingodogo.buildscape.entity.FestiveWanderingHomemakerEntity;
-import com.kingodogo.buildscape.entity.MangroveBoatEntity;
 import com.kingodogo.buildscape.entity.PoplarBoatEntity;
 import com.kingodogo.buildscape.entity.SeatEntity;
 import com.kingodogo.buildscape.entity.WanderingHomemakerEntity;
@@ -256,8 +255,8 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter, com.kingo
     }
 
     @Override
-    public Entity createBoatEntity(Level level, double x, double y, double z, boolean poplar) {
-        return poplar ? new PoplarBoatEntityImpl(level, x, y, z) : new MangroveBoatEntityImpl(level, x, y, z);
+    public Entity createBoatEntity(Level level, double x, double y, double z) {
+        return new PoplarBoatEntityImpl(level, x, y, z);
     }
 
     @Override
@@ -276,7 +275,6 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter, com.kingo
 
     private EntityType<?> fallingIcicleType;
     private EntityType<?> festiveStockingType;
-    private EntityType<?> mangroveBoatType;
     private EntityType<?> coloredItemFrameType;
     private EntityType<?> seatType;
     private EntityType<?> poplarBoatType;
@@ -301,14 +299,6 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter, com.kingo
         return festiveStockingType;
     }
 
-    @Override
-    public EntityType<?> getMangroveBoatEntityType() {
-        if (mangroveBoatType == null) {
-            mangroveBoatType = EntityType.Builder.<MangroveBoatEntityImpl>of(MangroveBoatEntityImpl::new, MobCategory.MISC)
-                    .sized(1.375F, 0.5625F).clientTrackingRange(10).updateInterval(3).build(entityKey("mangrove_boat"));
-        }
-        return mangroveBoatType;
-    }
 
     @Override
     public EntityType<?> getColoredItemFrameEntityType() {
@@ -1648,10 +1638,6 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter, com.kingo
         return new com.kingodogo.buildscape.item.FestiveStockingItem(block, properties, colorVariant);
     }
 
-    @Override
-    public BlockItem createCopperChestItem(Block block, Item.Properties properties) {
-        return new com.kingodogo.buildscape.item.CopperChestItem(block, properties);
-    }
 
     @Override
     public Item createInfinitePhoenixFireworkStarItem(Item.Properties properties) {
@@ -1722,10 +1708,6 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter, com.kingo
         };
     }
 
-    @Override
-    public Item createMangroveBoatItem(Item.Properties properties) {
-        return new Item(properties);
-    }
 
     @Override
     public Item createPoplarBoatItem(Item.Properties properties) {
@@ -2229,9 +2211,6 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter, com.kingo
         registerPot("pink_monets", "potted_pink_monets");
         registerPot("yellow_monets", "potted_yellow_monets");
         registerPot("poplar_sapling", "potted_poplar_sapling");
-        registerPot("pale_oak_sapling", "potted_pale_oak_sapling");
-        registerPot("cherry_sapling", "potted_cherry_sapling");
-        registerPot("mangrove_propagule", "potted_mangrove_propagule");
         registerPot("clover", "potted_clover");
         registerPot("snowy_bush", "potted_snowy_bush");
         registerPot("snowy_short_grass", "potted_snowy_short_grass");
@@ -2287,7 +2266,6 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter, com.kingo
         registerCompost("snowy_fern", 0.3f);
         registerCompost("snowy_large_fern", 0.3f);
         registerCompost("snowy_bush", 0.3f);
-        registerCompost("mangrove_leaves", 0.3f);
         registerCompost("snowy_oak_leaves", 0.3f);
         registerCompost("snowy_spruce_leaves", 0.3f);
         registerCompost("snowy_birch_leaves", 0.3f);
@@ -2400,7 +2378,6 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter, com.kingo
 
     @Override public void renderWobblyBlock(net.minecraft.world.level.block.state.BlockState state, long currentTick, long wobbleStartTick, boolean hasWobble, float partialTicks, com.mojang.blaze3d.vertex.PoseStack poseStack, Object bufferSource, int light, int overlay) { com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.renderWobblyBlock(state, currentTick, wobbleStartTick, hasWobble, partialTicks, poseStack, bufferSource, light, overlay); }
 
-    @Override public void renderCopperChest(com.kingodogo.buildscape.block.CopperChestBlockEntity blockEntity, float partialTicks, com.mojang.blaze3d.vertex.PoseStack poseStack, Object bufferSource, int combinedLight, int combinedOverlay) { com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.renderCopperChest(blockEntity, partialTicks, poseStack, bufferSource, combinedLight, combinedOverlay); }
 
     @Override public void registerMenuScreens() { com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.registerMenuScreens(); }
 
@@ -3085,20 +3062,6 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter, com.kingo
         }
     }
 
-    public static class MangroveBoatEntityImpl extends Boat implements MangroveBoatEntity {
-
-        public MangroveBoatEntityImpl(EntityType<? extends Boat> entityType, Level level) {
-            super(entityType, level, () -> Services.PLATFORM.getItem(new CommonId("buildscape", "mangrove_boat")));
-        }
-
-        public MangroveBoatEntityImpl(Level level, double x, double y, double z) {
-            this(EntityTypes.MANGROVE_BOAT, level);
-            this.setPos(x, y, z);
-            this.xo = x;
-            this.yo = y;
-            this.zo = z;
-        }
-    }
 
     public static class PoplarBoatEntityImpl extends Boat implements PoplarBoatEntity {
 

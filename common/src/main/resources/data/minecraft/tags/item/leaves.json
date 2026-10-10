@@ -1,9 +1,9 @@
 {
   "replace": false,
   "values": [
-    "buildscape:mangrove_leaves",
-    "buildscape:cherry_leaves",
-    "buildscape:pale_oak_leaves",
+    "minecraft:mangrove_leaves",
+    "minecraft:cherry_leaves",
+    "minecraft:pale_oak_leaves",
     "buildscape:orange_poplar_leaves",
     "buildscape:red_poplar_leaves",
     "buildscape:yellow_poplar_leaves",

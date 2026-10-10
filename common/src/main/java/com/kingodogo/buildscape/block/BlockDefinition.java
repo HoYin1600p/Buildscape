@@ -12,6 +12,14 @@ public class BlockDefinition {
         this(id, "Block", CommonBlockProperties.of(), null);
     }
 
+    /** Wraps an existing vanilla block for neutral feature and family definitions. */
+    public static BlockDefinition vanilla(String id) {
+        var definition = new BlockDefinition(id);
+        definition.setBlock(com.kingodogo.buildscape.platform.Services.PLATFORM.getBlock(
+                com.kingodogo.buildscape.util.CommonId.parse(id)));
+        return definition;
+    }
+
     public BlockDefinition(String id, String blockType, CommonBlockProperties properties) {
         this(id, blockType, properties, null);
     }
@@ -54,7 +62,7 @@ public class BlockDefinition {
     }
 
     public String getNamespacedId() {
-        return BuildscapeCommon.MOD_ID + ":" + id;
+        return id.contains(":") ? id : BuildscapeCommon.MOD_ID + ":" + id;
     }
 
     /**
@@ -105,7 +113,7 @@ public class BlockDefinition {
     public boolean isGlassJar() { return typeIn("GlassJarBlock") || id.contains("glass_jar") || id.contains("golden_jar"); }
     public boolean isSmokeVent() { return typeIn("SmokeVentBlock") || id.contains("smoke_vent"); }
     public boolean isMuff() { return typeIn("MuffBlock") || id.contains("muff"); }
-    public boolean isChest() { return typeIn("CopperChestBlock") || id.contains("chest"); }
+    public boolean isChest() { return id.contains("chest"); }
     public boolean isFenceGate() { return typeIn("FenceGateBlock"); }
     public boolean isFence() { return !isFenceGate() && typeIn("FenceBlock"); }
     public boolean isWaterloggableGrate() { return "WaterloggableGrateBlock".equals(blockType); }

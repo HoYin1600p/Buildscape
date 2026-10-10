@@ -3,7 +3,6 @@ import com.kingodogo.buildscape.entity.ColoredItemFrameEntity;
 import com.kingodogo.buildscape.entity.FallingIcicleEntity;
 import com.kingodogo.buildscape.entity.FestiveStockingEntity;
 import com.kingodogo.buildscape.entity.FestiveWanderingHomemakerEntity;
-import com.kingodogo.buildscape.entity.MangroveBoatEntity;
 import com.kingodogo.buildscape.entity.PoplarBoatEntity;
 import com.kingodogo.buildscape.entity.SeatEntity;
 import com.kingodogo.buildscape.entity.WanderingHomemakerEntity;
@@ -640,19 +639,6 @@ public final class ClientPlatformHooks {
         poseStack.popPose();
     }
 
-    @SuppressWarnings({"rawtypes", "unchecked"})
-    public static void renderCopperChest(com.kingodogo.buildscape.block.CopperChestBlockEntity blockEntity, float partialTicks, com.mojang.blaze3d.vertex.PoseStack poseStack, Object bufferSource, int combinedLight, int combinedOverlay) {
-        if (blockEntity == null) return;
-        net.minecraft.client.renderer.blockentity.BlockEntityRenderer renderer = net.minecraft.client.Minecraft.getInstance()
-                .getBlockEntityRenderDispatcher().getRenderer(blockEntity);
-        if (renderer == null) return;
-        var state = renderer.createRenderState();
-        renderer.extractRenderState(blockEntity, state, partialTicks, Vec3.ZERO, null);
-        state.lightCoords = combinedLight;
-        if (bufferSource instanceof net.minecraft.client.renderer.SubmitNodeCollector collector) {
-            renderer.submit(state, poseStack, collector, null);
-        }
-    }
 
     public static void renderClientOverlay(Object context, int width, int height) {
         if (!(context instanceof net.minecraft.client.gui.GuiGraphicsExtractor graphics)) return;

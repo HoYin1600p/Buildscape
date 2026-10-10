@@ -17,11 +17,9 @@ TAG_FOLDERS = {"blocks": "block", "items": "item",
 COMMON_TAGS = {"glass": "glass_blocks", "stained_glass": "glass_blocks/dyed",
                "stained_glass_panes": "glass_panes/dyed", "stone": "stones",
                "sand": "sands"}
+# The copper chests were retired on 26.2 (vanilla has them), so only the glass jar remains special.
 SPECIAL_ITEMS = (
-    "copper_chest", "exposed_copper_chest", "oxidized_copper_chest",
-    "waxed_copper_chest", "waxed_exposed_copper_chest",
-    "waxed_oxidized_copper_chest", "waxed_weathered_copper_chest",
-    "weathered_copper_chest", "template_glass_jar",
+    "template_glass_jar",
 )
 PACK = {"pack": {"description": "Buildscape resources for Minecraft 26.2",
                   "min_format": [88, 0], "max_format": [107, 1]}}

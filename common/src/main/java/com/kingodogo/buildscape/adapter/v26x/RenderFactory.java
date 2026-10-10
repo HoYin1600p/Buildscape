@@ -30,7 +30,6 @@ public final class RenderFactory {
     }
 
     public static void registerBlockEntityRenderers(BlockEntityRegistrar target) {
-        target.register(ModBlockEntities.COPPER_CHEST_TYPE, com.kingodogo.buildscape.adapter.v26x.client.CopperChestRenderer::new);
         target.register(ModBlockEntities.PILLAR_TYPE, context -> new com.kingodogo.buildscape.adapter.v26x.client.PillarRenderer());
         target.register(ModBlockEntities.DECORATED_POT_TYPE, context -> new com.kingodogo.buildscape.adapter.v26x.client.DecoratedPotRenderer<>());
         target.register(ModBlockEntities.TRAPPED_DECORATED_POT_TYPE, context -> new com.kingodogo.buildscape.adapter.v26x.client.DecoratedPotRenderer<>());
@@ -53,8 +52,6 @@ public final class RenderFactory {
     public static void registerRenderers() {
         if (registered) return;
         java.util.Objects.requireNonNull(registrar, "Entity renderers must be registered through the loader hook");
-        registrar.register((EntityType<net.minecraft.world.entity.vehicle.boat.AbstractBoat>) Services.PLATFORM.getMangroveBoatEntityType(),
-                context -> new com.kingodogo.buildscape.adapter.v26x.client.BuildscapeBoatRenderer(context, "mangrove"));
         registrar.register((EntityType<net.minecraft.world.entity.vehicle.boat.AbstractBoat>) Services.PLATFORM.getPoplarBoatEntityType(),
                 context -> new com.kingodogo.buildscape.adapter.v26x.client.BuildscapeBoatRenderer(context, "poplar"));
         registrar.register((EntityType<PlatformAdapterBase.SeatEntityImpl>) Services.PLATFORM.getSeatEntityType(),

@@ -120,7 +120,10 @@ class TranslationKeysTest {
             if (!known(lang, key)) missing.put(key, "item " + def.getId());
 
         }
-        assertTrue(itemCount > 2900 && blockItems > 2900, "expected the retained item list, got " + itemCount + "/" + blockItems);
+        // Retained inventory after the two vanilla replacement passes. Exact counts
+        // catch accidental omissions while allowing the intentionally removed items.
+        assertEquals(2939, itemCount, "expected the retained item list");
+        assertEquals(2893, blockItems, "expected the retained block item list");
 
         // Trophy blocks and their items use the block key (their block is built by the loader adapter, so check the key by id)
         for (TrophyDefinition trophy : Trophies.getAll()) {

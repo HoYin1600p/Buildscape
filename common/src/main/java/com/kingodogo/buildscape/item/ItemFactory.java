@@ -35,9 +35,6 @@ public final class ItemFactory {
         if (id.contains("glass_jar")) {
             return Services.PLATFORM.createGlassJarItem(block, p);
         }
-        if (id.contains("copper_chest")) {
-            return Services.PLATFORM.createCopperChestItem(block, p);
-        }
         if (id.contains("festive_stocking")) {
             String color = id.equals("festive_stocking") ? null : id.replace("_festive_stocking", "");
             return Services.PLATFORM.createFestiveStockingItem(block, p, color);
@@ -66,7 +63,6 @@ public final class ItemFactory {
             case "stringlight_frame_pattern" -> Services.PLATFORM.createPatternItem(props, "tooltip.buildscape.stringlight_frame_pattern");
             case "infinite_phoenix_firework_star" -> Services.PLATFORM.createInfinitePhoenixFireworkStarItem(props);
             case "experience_bucket" -> Services.PLATFORM.createExperienceBucketItem(props);
-            case "mangrove_boat" -> Services.PLATFORM.createMangroveBoatItem(props);
             case "poplar_boat" -> Services.PLATFORM.createPoplarBoatItem(props);
             case "builders_hat" -> new BuildersHatItem(props);
             default -> {

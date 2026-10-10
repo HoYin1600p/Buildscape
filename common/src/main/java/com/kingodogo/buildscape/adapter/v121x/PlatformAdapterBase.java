@@ -3,7 +3,6 @@ import com.kingodogo.buildscape.entity.ColoredItemFrameEntity;
 import com.kingodogo.buildscape.entity.FallingIcicleEntity;
 import com.kingodogo.buildscape.entity.FestiveStockingEntity;
 import com.kingodogo.buildscape.entity.FestiveWanderingHomemakerEntity;
-import com.kingodogo.buildscape.entity.MangroveBoatEntity;
 import com.kingodogo.buildscape.entity.PoplarBoatEntity;
 import com.kingodogo.buildscape.entity.SeatEntity;
 import com.kingodogo.buildscape.entity.WanderingHomemakerEntity;
@@ -304,8 +303,8 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
     }
 
     @Override
-    public Entity createBoatEntity(Level level, double x, double y, double z, boolean poplar) {
-        return poplar ? new PoplarBoatEntityImpl(level, x, y, z) : new MangroveBoatEntityImpl(level, x, y, z);
+    public Entity createBoatEntity(Level level, double x, double y, double z) {
+        return new PoplarBoatEntityImpl(level, x, y, z);
     }
 
     @Override
@@ -320,7 +319,6 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
 
     private EntityType<?> fallingIcicleType;
     private EntityType<?> festiveStockingType;
-    private EntityType<?> mangroveBoatType;
     private EntityType<?> coloredItemFrameType;
     private EntityType<?> seatType;
     private EntityType<?> poplarBoatType;
@@ -345,14 +343,6 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
         return festiveStockingType;
     }
 
-    @Override
-    public EntityType<?> getMangroveBoatEntityType() {
-        if (mangroveBoatType == null) {
-            mangroveBoatType = EntityType.Builder.<MangroveBoatEntityImpl>of(MangroveBoatEntityImpl::new, MobCategory.MISC)
-                    .sized(1.375F, 0.5625F).clientTrackingRange(10).updateInterval(3).build("mangrove_boat");
-        }
-        return mangroveBoatType;
-    }
 
     @Override
     public EntityType<?> getColoredItemFrameEntityType() {
@@ -1806,10 +1796,6 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
         return new com.kingodogo.buildscape.item.FestiveStockingItem(block, properties, colorVariant);
     }
 
-    @Override
-    public BlockItem createCopperChestItem(Block block, Item.Properties properties) {
-        return new com.kingodogo.buildscape.item.CopperChestItem(block, properties);
-    }
 
     @Override
     public Item createInfinitePhoenixFireworkStarItem(Item.Properties properties) {
@@ -1879,10 +1865,6 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
         };
     }
 
-    @Override
-    public Item createMangroveBoatItem(Item.Properties properties) {
-        return new com.kingodogo.buildscape.item.MangroveBoatItem(properties);
-    }
 
     @Override
     public Item createPoplarBoatItem(Item.Properties properties) {
@@ -2400,9 +2382,6 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
         registerPot("pink_monets", "potted_pink_monets");
         registerPot("yellow_monets", "potted_yellow_monets");
         registerPot("poplar_sapling", "potted_poplar_sapling");
-        registerPot("pale_oak_sapling", "potted_pale_oak_sapling");
-        registerPot("cherry_sapling", "potted_cherry_sapling");
-        registerPot("mangrove_propagule", "potted_mangrove_propagule");
         registerPot("clover", "potted_clover");
         registerPot("snowy_bush", "potted_snowy_bush");
         registerPot("snowy_short_grass", "potted_snowy_short_grass");
@@ -2457,7 +2436,6 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
         registerCompost("snowy_fern", 0.3f);
         registerCompost("snowy_large_fern", 0.3f);
         registerCompost("snowy_bush", 0.3f);
-        registerCompost("mangrove_leaves", 0.3f);
         registerCompost("snowy_oak_leaves", 0.3f);
         registerCompost("snowy_spruce_leaves", 0.3f);
         registerCompost("snowy_birch_leaves", 0.3f);
@@ -2932,104 +2910,9 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
         poseStack.popPose();
     }
 
-    private net.minecraft.client.model.geom.ModelPart copperChestLid;
-    private net.minecraft.client.model.geom.ModelPart copperChestBottom;
-    private net.minecraft.client.model.geom.ModelPart copperChestLock;
-    private net.minecraft.client.model.geom.ModelPart copperChestDoubleLeftLid;
-    private net.minecraft.client.model.geom.ModelPart copperChestDoubleLeftBottom;
-    private net.minecraft.client.model.geom.ModelPart copperChestDoubleLeftLock;
-    private net.minecraft.client.model.geom.ModelPart copperChestDoubleRightLid;
-    private net.minecraft.client.model.geom.ModelPart copperChestDoubleRightBottom;
-    private net.minecraft.client.model.geom.ModelPart copperChestDoubleRightLock;
 
-    private synchronized void initCopperChestModels() {
-        if (copperChestLid != null) return;
-        net.minecraft.client.model.geom.EntityModelSet models = net.minecraft.client.Minecraft.getInstance().getEntityModels();
-        net.minecraft.client.model.geom.ModelPart single = models.bakeLayer(net.minecraft.client.model.geom.ModelLayers.CHEST);
-        this.copperChestBottom = single.getChild("bottom");
-        this.copperChestLid = single.getChild("lid");
-        this.copperChestLock = single.getChild("lock");
 
-        net.minecraft.client.model.geom.ModelPart left = models.bakeLayer(net.minecraft.client.model.geom.ModelLayers.DOUBLE_CHEST_LEFT);
-        this.copperChestDoubleLeftBottom = left.getChild("bottom");
-        this.copperChestDoubleLeftLid = left.getChild("lid");
-        this.copperChestDoubleLeftLock = left.getChild("lock");
 
-        net.minecraft.client.model.geom.ModelPart right = models.bakeLayer(net.minecraft.client.model.geom.ModelLayers.DOUBLE_CHEST_RIGHT);
-        this.copperChestDoubleRightBottom = right.getChild("bottom");
-        this.copperChestDoubleRightLid = right.getChild("lid");
-        this.copperChestDoubleRightLock = right.getChild("lock");
-    }
-
-    private net.minecraft.client.resources.model.Material getCopperChestMaterial(String path, net.minecraft.world.level.block.state.properties.ChestType chestType) {
-        String baseName = "copper_chest";
-        if (path.contains("oxidized")) baseName = "oxidized_copper_chest";
-        else if (path.contains("weathered")) baseName = "weathered_copper_chest";
-        else if (path.contains("exposed")) baseName = "exposed_copper_chest";
-
-        String suffix = "";
-        if (chestType == net.minecraft.world.level.block.state.properties.ChestType.LEFT) suffix = "_left";
-        else if (chestType == net.minecraft.world.level.block.state.properties.ChestType.RIGHT) suffix = "_right";
-
-        return new net.minecraft.client.resources.model.Material(
-                net.minecraft.client.renderer.Sheets.CHEST_SHEET,
-                net.minecraft.resources.ResourceLocation.fromNamespaceAndPath("buildscape", "entity/chest/" + baseName + suffix)
-        );
-    }
-
-    @Override
-    public void renderCopperChest(com.kingodogo.buildscape.block.CopperChestBlockEntity blockEntity, float partialTicks, com.mojang.blaze3d.vertex.PoseStack poseStack, Object bufferSource, int combinedLight, int combinedOverlay) {
-        if (blockEntity == null || !(bufferSource instanceof net.minecraft.client.renderer.MultiBufferSource mbs)) return;
-        initCopperChestModels();
-
-        Level level = blockEntity.getLevel();
-        boolean hasLevel = level != null;
-        BlockState blockState = hasLevel ? blockEntity.getBlockState() : net.minecraft.world.level.block.Blocks.CHEST.defaultBlockState().setValue(net.minecraft.world.level.block.ChestBlock.FACING, Direction.SOUTH);
-        net.minecraft.world.level.block.state.properties.ChestType chestType = blockState.hasProperty(net.minecraft.world.level.block.ChestBlock.TYPE)
-                ? blockState.getValue(net.minecraft.world.level.block.ChestBlock.TYPE)
-                : net.minecraft.world.level.block.state.properties.ChestType.SINGLE;
-
-        Block block = blockState.getBlock();
-        CommonId blockId = getBlockId(block);
-        String path = blockId == null ? "" : blockId.getPath();
-        net.minecraft.client.resources.model.Material material = getCopperChestMaterial(path, chestType);
-        com.mojang.blaze3d.vertex.VertexConsumer vertexConsumer = material.buffer(mbs, net.minecraft.client.renderer.RenderType::entityCutout);
-
-        poseStack.pushPose();
-        float yRot = blockState.hasProperty(net.minecraft.world.level.block.ChestBlock.FACING)
-                ? blockState.getValue(net.minecraft.world.level.block.ChestBlock.FACING).toYRot()
-                : 0.0F;
-        poseStack.translate(0.5D, 0.5D, 0.5D);
-        poseStack.mulPose(com.mojang.math.Axis.YP.rotationDegrees(-yRot));
-        poseStack.translate(-0.5D, -0.5D, -0.5D);
-
-        float openness = blockEntity.getOpenNess(partialTicks);
-        openness = 1.0F - openness;
-        openness = 1.0F - openness * openness * openness;
-
-        net.minecraft.client.model.geom.ModelPart lidPart, bottomPart, lockPart;
-        if (chestType == net.minecraft.world.level.block.state.properties.ChestType.LEFT) {
-            lidPart = this.copperChestDoubleLeftLid;
-            bottomPart = this.copperChestDoubleLeftBottom;
-            lockPart = this.copperChestDoubleLeftLock;
-        } else if (chestType == net.minecraft.world.level.block.state.properties.ChestType.RIGHT) {
-            lidPart = this.copperChestDoubleRightLid;
-            bottomPart = this.copperChestDoubleRightBottom;
-            lockPart = this.copperChestDoubleRightLock;
-        } else {
-            lidPart = this.copperChestLid;
-            bottomPart = this.copperChestBottom;
-            lockPart = this.copperChestLock;
-        }
-
-        lidPart.xRot = -(openness * ((float) Math.PI / 2F));
-        lockPart.xRot = lidPart.xRot;
-        lidPart.render(poseStack, vertexConsumer, combinedLight, combinedOverlay);
-        lockPart.render(poseStack, vertexConsumer, combinedLight, combinedOverlay);
-        bottomPart.render(poseStack, vertexConsumer, combinedLight, combinedOverlay);
-
-        poseStack.popPose();
-    }
 
     @Override
     public void registerMenuScreens() {
@@ -4116,27 +3999,6 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
         }
     }
 
-    public static class MangroveBoatEntityImpl extends Boat implements MangroveBoatEntity {
-
-        public MangroveBoatEntityImpl(EntityType<? extends Boat> entityType, Level level) {
-            super(entityType, level);
-            this.setVariant(Boat.Type.OAK);
-        }
-
-        public MangroveBoatEntityImpl(Level level, double x, double y, double z) {
-            this(EntityType.BOAT, level);
-            this.setPos(x, y, z);
-            this.xo = x;
-            this.yo = y;
-            this.zo = z;
-            this.setVariant(Boat.Type.OAK);
-        }
-
-        @Override
-        public Item getDropItem() {
-            return Services.PLATFORM.getItem(new CommonId("buildscape", "mangrove_boat"));
-        }
-    }
 
     public static class PoplarBoatEntityImpl extends Boat implements PoplarBoatEntity {
 

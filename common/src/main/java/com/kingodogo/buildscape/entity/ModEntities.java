@@ -7,7 +7,6 @@ public class ModEntities {
 
     public static final RegistrySupplier<EntityDefinition> FALLING_ICICLE = register("falling_icicle");
     public static final RegistrySupplier<EntityDefinition> FESTIVE_STOCKING = register("festive_stocking");
-    public static final RegistrySupplier<EntityDefinition> MANGROVE_BOAT = register("mangrove_boat");
     public static final RegistrySupplier<EntityDefinition> COLORED_ITEM_FRAME = register("colored_item_frame");
     public static final RegistrySupplier<EntityDefinition> SEAT_ENTITY = register("seat");
     public static final RegistrySupplier<EntityDefinition> POPLAR_BOAT = register("poplar_boat");

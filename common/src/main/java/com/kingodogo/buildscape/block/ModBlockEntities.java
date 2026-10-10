@@ -33,8 +33,6 @@ public class ModBlockEntities {
     public static final BlockEntityType<MuffBlockEntity> MUFF_TYPE =
             Services.PLATFORM.createBlockEntityType(MuffBlockEntity::new, state -> state.getBlock() instanceof MuffBlock);
 
-    public static final BlockEntityType<CopperChestBlockEntity> COPPER_CHEST_TYPE =
-            Services.PLATFORM.createBlockEntityType(CopperChestBlockEntity::new, state -> state.getBlock() instanceof ICopperChestBlock);
 
     public static final BlockEntityType<DecoratedPotBlockEntity> DECORATED_POT_TYPE =
             Services.PLATFORM.createBlockEntityType(DecoratedPotBlockEntity::new, state -> state.getBlock() instanceof DecoratedPotBlock && !(state.getBlock() instanceof TrappedDecoratedPotBlock));
@@ -63,7 +61,6 @@ public class ModBlockEntities {
     public static final BlockEntityType<HollowLogBlockEntity> HOLLOW_LOG_TYPE =
             Services.PLATFORM.createBlockEntityType(HollowLogBlockEntity::new, state -> state.getBlock() instanceof HollowLogBlock || state.getBlock() instanceof HollowPipeBlock);
 
-    public static final RegistrySupplier<BlockEntityDefinition> COPPER_CHEST = register("copper_chest");
     public static final RegistrySupplier<BlockEntityDefinition> SHELF = register("shelf");
     public static final RegistrySupplier<BlockEntityDefinition> TROPHY_BLOCK_ENTITY = register("trophy_block_entity");
     public static final RegistrySupplier<BlockEntityDefinition> HOLLOW_LOG_BLOCK_ENTITY = register("hollow_log");

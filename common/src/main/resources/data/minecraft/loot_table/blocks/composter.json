@@ -132,7 +132,7 @@
         },
         {
           "type": "minecraft:item",
-          "name": "buildscape:muddy_mangrove_roots",
+          "name": "minecraft:muddy_mangrove_roots",
           "conditions": [
             {
               "condition": "minecraft:block_state_property",

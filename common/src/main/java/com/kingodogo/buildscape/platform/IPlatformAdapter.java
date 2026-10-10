@@ -28,7 +28,7 @@ public interface IPlatformAdapter {
         }
         if (hit.getType() != net.minecraft.world.phys.HitResult.Type.BLOCK) return BoatPlacementOutcome.PASS;
 
-        Entity boat = createBoatEntity(level, hit.getLocation().x, hit.getLocation().y, hit.getLocation().z, true);
+        Entity boat = createBoatEntity(level, hit.getLocation().x, hit.getLocation().y, hit.getLocation().z);
         if (boat == null) return BoatPlacementOutcome.PASS;
         boat.setYRot(player.getYRot());
         if (!level.noCollision(boat, boat.getBoundingBox())) return BoatPlacementOutcome.FAIL;
@@ -97,7 +97,7 @@ public interface IPlatformAdapter {
     Entity createSeatEntity(Level level, double x, double y, double z);
     Entity createFallingIcicleEntity(Level level, double x, double y, double z, net.minecraft.world.level.block.state.BlockState state);
     Entity createWanderingHomemakerEntity(Level level, boolean festive);
-    Entity createBoatEntity(Level level, double x, double y, double z, boolean poplar);
+    Entity createBoatEntity(Level level, double x, double y, double z);
     Entity createColoredItemFrameEntity(Level level, net.minecraft.core.BlockPos pos, net.minecraft.core.Direction direction, String color);
 
     Entity createFestiveStockingEntity(Level level, net.minecraft.core.BlockPos pos, net.minecraft.core.Direction direction, String color);
@@ -110,7 +110,6 @@ public interface IPlatformAdapter {
     net.minecraft.world.entity.EntityType<?> getFallingIcicleEntityType();
 
     net.minecraft.world.entity.EntityType<?> getFestiveStockingEntityType();
-    net.minecraft.world.entity.EntityType<?> getMangroveBoatEntityType();
     net.minecraft.world.entity.EntityType<?> getColoredItemFrameEntityType();
     net.minecraft.world.entity.EntityType<?> getSeatEntityType();
     net.minecraft.world.entity.EntityType<?> getPoplarBoatEntityType();
@@ -348,11 +347,9 @@ public interface IPlatformAdapter {
     net.minecraft.world.item.BlockItem createMuffBlockItem(net.minecraft.world.level.block.Block block, net.minecraft.world.item.Item.Properties properties);
     net.minecraft.world.item.BlockItem createMistBlockItem(net.minecraft.world.level.block.Block block, net.minecraft.world.item.Item.Properties properties);
     net.minecraft.world.item.BlockItem createFestiveStockingItem(net.minecraft.world.level.block.Block block, net.minecraft.world.item.Item.Properties properties, String colorVariant);
-    net.minecraft.world.item.BlockItem createCopperChestItem(net.minecraft.world.level.block.Block block, net.minecraft.world.item.Item.Properties properties);
     net.minecraft.world.item.Item createInfinitePhoenixFireworkStarItem(net.minecraft.world.item.Item.Properties properties);
     net.minecraft.world.item.Item createColoredItemFrameItem(net.minecraft.world.item.Item.Properties properties, String colorVariant);
     net.minecraft.world.item.Item createExperienceBucketItem(net.minecraft.world.item.Item.Properties properties);
-    net.minecraft.world.item.Item createMangroveBoatItem(net.minecraft.world.item.Item.Properties properties);
     net.minecraft.world.item.Item createPoplarBoatItem(net.minecraft.world.item.Item.Properties properties);
     net.minecraft.world.item.ItemStack removeItem(java.util.List<net.minecraft.world.item.ItemStack> items, int slot, int amount);
     net.minecraft.world.item.ItemStack takeItem(java.util.List<net.minecraft.world.item.ItemStack> items, int slot);
@@ -445,7 +442,6 @@ public interface IPlatformAdapter {
     void renderBlockModelWithTint(net.minecraft.world.level.block.state.BlockState state, net.minecraft.core.BlockPos pos, net.minecraft.world.level.Level level, com.mojang.blaze3d.vertex.PoseStack poseStack, Object bufferSource, int light, int overlay);
     void renderGlassJar(com.kingodogo.buildscape.block.GlassJarBlockEntity blockEntity, float partialTicks, com.mojang.blaze3d.vertex.PoseStack poseStack, Object bufferSource, int combinedLight, int combinedOverlay);
     void renderWobblyBlock(net.minecraft.world.level.block.state.BlockState state, long currentTick, long wobbleStartTick, boolean hasWobble, float partialTicks, com.mojang.blaze3d.vertex.PoseStack poseStack, Object bufferSource, int light, int overlay);
-    void renderCopperChest(com.kingodogo.buildscape.block.CopperChestBlockEntity blockEntity, float partialTicks, com.mojang.blaze3d.vertex.PoseStack poseStack, Object bufferSource, int combinedLight, int combinedOverlay);
     void registerMenuScreens();
 
     default void registerRenderers() {

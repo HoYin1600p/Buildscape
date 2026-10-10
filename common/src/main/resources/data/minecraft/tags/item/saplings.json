@@ -1,9 +1,9 @@
 {
   "replace": false,
   "values": [
-    "buildscape:pale_oak_sapling",
-    "buildscape:cherry_sapling",
+    "minecraft:pale_oak_sapling",
+    "minecraft:cherry_sapling",
     "buildscape:poplar_sapling",
-    "buildscape:mangrove_propagule"
+    "minecraft:mangrove_propagule"
   ]
 }

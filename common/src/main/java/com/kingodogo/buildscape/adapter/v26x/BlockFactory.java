@@ -27,12 +27,10 @@ import net.minecraft.world.level.block.StandingSignBlock;
 import net.minecraft.world.level.block.WallSignBlock;
 import net.minecraft.world.level.block.state.properties.WoodType;
 import com.kingodogo.buildscape.block.CommonBlockProperties;
-import com.kingodogo.buildscape.block.CopperChestBlockEntity;
 import com.kingodogo.buildscape.block.CopperBulbBlock;
 import com.kingodogo.buildscape.block.CopperOxidationHandler;
 import com.kingodogo.buildscape.block.CreakingHeartBlock;
 import com.kingodogo.buildscape.block.ExperienceFluidBlock;
-import com.kingodogo.buildscape.block.ICopperChestBlock;
 import com.kingodogo.buildscape.block.ICommonRemoval;
 import com.kingodogo.buildscape.block.ModBlockEntities;
 import com.kingodogo.buildscape.block.CushionBlock;
@@ -571,9 +569,6 @@ public class BlockFactory implements IBlockFactory {
                     return codecForDefinition(def, BaseEntityBlock.class);
                 }
             };
-        } else if (def.isChest()) {
-            boolean isWaxed = def.getId().contains("waxed");
-            return new CopperChest(isWaxed, props);
         } else if (def.isFenceGate()) {
             return new FenceGateBlock(WoodType.OAK, props);
         } else if (def.isFence()) {
@@ -2302,50 +2297,4 @@ public class BlockFactory implements IBlockFactory {
         };
     }
 
-    private static class CopperChest extends ChestBlock implements ICopperChestBlock, ICommonRemoval {
-        private final boolean isWaxed;
-
-        public CopperChest(boolean isWaxed, BlockBehaviour.Properties properties) {
-            super(() -> (BlockEntityType<? extends ChestBlockEntity>) (Object) ModBlockEntities.COPPER_CHEST_TYPE, SoundEvents.CHEST_OPEN, SoundEvents.CHEST_CLOSE, isWaxed ? properties : properties.randomTicks());
-            this.isWaxed = isWaxed;
-        }
-
-        @Override
-        public boolean isWaxed() {
-            return isWaxed;
-        }
-
-        @Override
-        public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-            return new CopperChestBlockEntity(pos, state);
-        }
-
-        @Override
-        protected boolean isRandomlyTicking(BlockState state) {
-            return !isWaxed;
-        }
-
-        @Override
-        protected void randomTick(BlockState state, ServerLevel level, BlockPos pos, net.minecraft.util.RandomSource random) {
-            if (!isWaxed) {
-                CopperOxidationHandler.tryOxidize(level, pos, state);
-            }
-        }
-
-        @Override
-        public void onBlockRemoved(Level level, BlockPos pos, BlockState state) {
-            if (level.getBlockState(pos).getBlock() instanceof ICopperChestBlock) {
-                level.updateNeighbourForOutputSignal(pos, this);
-            }
-        }
-
-        @Override
-        protected void affectNeighborsAfterRemoval(BlockState state, ServerLevel level, BlockPos pos, boolean isMoving) {
-            if (level.getBlockState(pos).getBlock() instanceof ICopperChestBlock) {
-                level.updateNeighbourForOutputSignal(pos, this);
-                return;
-            }
-            super.affectNeighborsAfterRemoval(state, level, pos, isMoving);
-        }
-    }
 }

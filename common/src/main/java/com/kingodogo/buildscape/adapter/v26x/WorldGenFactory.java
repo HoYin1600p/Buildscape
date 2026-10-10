@@ -96,10 +96,10 @@ public final class WorldGenFactory {
             BlockState state = level.getBlockState(pos.above(y));
             if (!state.isAir() && !state.is(net.minecraft.tags.BlockTags.DIRT)
                     && !state.is(net.minecraft.tags.BlockTags.LOGS) && !state.is(net.minecraft.tags.BlockTags.PLANKS)
-                    && !state.is(com.kingodogo.buildscape.block.ModBlocks.MANGROVE_LOG.get().getBlock())
-                    && !state.is(com.kingodogo.buildscape.block.ModBlocks.MANGROVE_WOOD.get().getBlock())
-                    && !state.is(com.kingodogo.buildscape.block.ModBlocks.STRIPPED_MANGROVE_LOG.get().getBlock())
-                    && !state.is(com.kingodogo.buildscape.block.ModBlocks.STRIPPED_MANGROVE_WOOD.get().getBlock())) return false;
+                    && !state.is(com.kingodogo.buildscape.block.BlockDefinition.vanilla("minecraft:mangrove_log").getBlock())
+                    && !state.is(com.kingodogo.buildscape.block.BlockDefinition.vanilla("minecraft:mangrove_wood").getBlock())
+                    && !state.is(com.kingodogo.buildscape.block.BlockDefinition.vanilla("minecraft:stripped_mangrove_log").getBlock())
+                    && !state.is(com.kingodogo.buildscape.block.BlockDefinition.vanilla("minecraft:stripped_mangrove_wood").getBlock())) return false;
         }
         boolean nearbyGround = false;
         boolean rootLanding = false;
@@ -192,8 +192,8 @@ public final class WorldGenFactory {
         for (int x = -10; x <= 10; x++) for (int z = -10; z <= 10; z++) for (int y = -5; y <= 5; y++) {
             BlockPos pos = base.offset(x, y, z);
             if (!checked.add(pos)) continue;
-            boolean root = context.checkBlock(pos, state -> state.is(com.kingodogo.buildscape.block.ModBlocks.MANGROVE_ROOTS.get().getBlock())
-                    || state.is(com.kingodogo.buildscape.block.ModBlocks.MUDDY_MANGROVE_ROOTS.get().getBlock()));
+            boolean root = context.checkBlock(pos, state -> state.is(com.kingodogo.buildscape.block.BlockDefinition.vanilla("minecraft:mangrove_roots").getBlock())
+                    || state.is(com.kingodogo.buildscape.block.BlockDefinition.vanilla("minecraft:muddy_mangrove_roots").getBlock()));
             BlockPos above = pos.above();
             if (root && context.random().nextFloat() < probability && context.isAir(above))
                 context.setBlock(above, com.kingodogo.buildscape.block.ModBlocks.MOSS_OVERLAY.get().defaultBlockState());
@@ -224,7 +224,7 @@ public final class WorldGenFactory {
                     pos -> context.checkBlock(pos, state -> state.isAir() || state.is(Blocks.WATER)),
                     pos -> context.checkBlock(pos, state -> state.is(Blocks.WATER)), context::setBlock,
                     Blocks.AIR.defaultBlockState(), context.random()::nextInt,
-                    age -> com.kingodogo.buildscape.block.ModBlocks.MANGROVE_PROPAGULE.get().defaultBlockState()
+                    age -> com.kingodogo.buildscape.block.BlockDefinition.vanilla("minecraft:mangrove_propagule").defaultBlockState()
                             .setValue(com.kingodogo.buildscape.block.MangrovePropaguleBlock.AGE, age)
                             .setValue(com.kingodogo.buildscape.block.MangrovePropaguleBlock.HANGING, true));
         }
@@ -256,15 +256,15 @@ public final class WorldGenFactory {
                     boolean terrain = state.is(Blocks.DIRT) || state.is(Blocks.GRASS_BLOCK) || state.is(Blocks.STONE)
                             || state.is(Blocks.SAND) || state.is(Blocks.GRAVEL) || state.is(Blocks.CLAY);
                     boolean tree = state.is(net.minecraft.tags.BlockTags.LOGS)
-                            || state.is(com.kingodogo.buildscape.block.ModBlocks.MANGROVE_ROOTS.get().getBlock())
-                            || state.is(com.kingodogo.buildscape.block.ModBlocks.MUDDY_MANGROVE_ROOTS.get().getBlock());
+                            || state.is(com.kingodogo.buildscape.block.BlockDefinition.vanilla("minecraft:mangrove_roots").getBlock())
+                            || state.is(com.kingodogo.buildscape.block.BlockDefinition.vanilla("minecraft:muddy_mangrove_roots").getBlock());
                     return terrain && !tree && state.blocksMotion() && !state.canBeReplaced();
                 }),
                 pos -> context.checkBlock(pos, state -> !state.is(net.minecraft.tags.BlockTags.LOGS)
-                        && (state.is(com.kingodogo.buildscape.block.ModBlocks.MANGROVE_ROOTS.get().getBlock())
-                        || state.is(com.kingodogo.buildscape.block.ModBlocks.MUDDY_MANGROVE_ROOTS.get().getBlock())
+                        && (state.is(com.kingodogo.buildscape.block.BlockDefinition.vanilla("minecraft:mangrove_roots").getBlock())
+                        || state.is(com.kingodogo.buildscape.block.BlockDefinition.vanilla("minecraft:muddy_mangrove_roots").getBlock())
                         || state.isAir() || state.is(Blocks.WATER))), context::setBlock,
-                () -> com.kingodogo.buildscape.block.ModBlocks.MANGROVE_ROOTS.get().defaultBlockState()
+                () -> com.kingodogo.buildscape.block.BlockDefinition.vanilla("minecraft:mangrove_roots").defaultBlockState()
                         .setValue(net.minecraft.world.level.block.RotatedPillarBlock.AXIS, Direction.Axis.Y),
                 context.random()::nextInt, context.random()::nextFloat);
     }

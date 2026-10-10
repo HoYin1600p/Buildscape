@@ -31,7 +31,7 @@
     "foliage_provider": {
       "type": "minecraft:simple_state_provider",
       "state": {
-        "Name": "buildscape:cherry_leaves"
+        "Name": "minecraft:cherry_leaves"
       }
     },
     "ignore_vines": true,
@@ -50,7 +50,7 @@
     "trunk_provider": {
       "type": "minecraft:simple_state_provider",
       "state": {
-        "Name": "buildscape:cherry_log",
+        "Name": "minecraft:cherry_log",
         "Properties": {
           "axis": "y"
         }

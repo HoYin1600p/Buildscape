@@ -60,6 +60,10 @@ public abstract class ComposterBlockMixin {
                     else if (block == Blocks.CRIMSON_NYLIUM) newType = PlanterType.CRIMSON_NYLIUM;
                     else if (block == Blocks.WARPED_NYLIUM) newType = PlanterType.WARPED_NYLIUM;
                     else if (block == Blocks.SAND) newType = PlanterType.SAND;
+                    else if (block == com.kingodogo.buildscape.platform.Services.PLATFORM.getBlock(
+                            com.kingodogo.buildscape.util.CommonId.parse("minecraft:muddy_mangrove_roots"))) {
+                        newType = PlanterType.MUDDY_MANGROVE_ROOTS;
+                    }
                     else {
                         com.kingodogo.buildscape.util.CommonId blockId = com.kingodogo.buildscape.platform.Services.PLATFORM.getBlockId(block);
                         if (blockId != null && "buildscape".equals(blockId.getNamespace())) {
@@ -69,7 +73,6 @@ public abstract class ComposterBlockMixin {
                                 case "yellow_moss_block" -> newType = PlanterType.YELLOW_MOSS_BLOCK;
                                 case "orange_moss_block" -> newType = PlanterType.ORANGE_MOSS_BLOCK;
                                 case "pale_moss_block" -> newType = PlanterType.PALE_MOSS_BLOCK;
-                                case "muddy_mangrove_roots" -> newType = PlanterType.MUDDY_MANGROVE_ROOTS;
                                 case "snowy_grass_block" -> newType = PlanterType.SNOWY_GRASS_BLOCK;
                             }
                         }

@@ -981,7 +981,7 @@ public class ModConfiguredFeatures {
     private static SimpleBlockConfiguration createMangrovePropaguleConfiguration() {
         return new SimpleBlockConfiguration(
                 BlockStateProvider.simple(
-                        ModBlocks.MANGROVE_PROPAGULE.get().defaultBlockState()
+                        com.kingodogo.buildscape.block.BlockDefinition.vanilla("minecraft:mangrove_propagule").defaultBlockState()
                 )
         );
     }
@@ -991,7 +991,7 @@ public class ModConfiguredFeatures {
     ) {
         return Services.PLATFORM.createPatchFeature(
                 BlockStateProvider.simple(
-                        ModBlocks.MANGROVE_PROPAGULE.get().defaultBlockState()
+                        com.kingodogo.buildscape.block.BlockDefinition.vanilla("minecraft:mangrove_propagule").defaultBlockState()
                 ),
                 count,
                 7,
@@ -1043,9 +1043,9 @@ public class ModConfiguredFeatures {
 
     private static TreeConfiguration createPaleOakTreeConfiguration() {
         return Services.PLATFORM.createTreeConfiguration(
-                BlockStateProvider.simple(ModBlocks.PALE_OAK_LOG.get().defaultBlockState()),
+                BlockStateProvider.simple(com.kingodogo.buildscape.block.BlockDefinition.vanilla("minecraft:pale_oak_log").defaultBlockState()),
                 new net.minecraft.world.level.levelgen.feature.trunkplacers.StraightTrunkPlacer(5, 2, 1),
-                BlockStateProvider.simple(ModBlocks.PALE_OAK_LEAVES.get().defaultBlockState()),
+                BlockStateProvider.simple(com.kingodogo.buildscape.block.BlockDefinition.vanilla("minecraft:pale_oak_leaves").defaultBlockState()),
                 new net.minecraft.world.level.levelgen.feature.foliageplacers.BlobFoliagePlacer(
                         net.minecraft.util.valueproviders.ConstantInt.of(2),
                         net.minecraft.util.valueproviders.ConstantInt.of(0),
@@ -1059,9 +1059,9 @@ public class ModConfiguredFeatures {
 
     private static TreeConfiguration createCherryTreeConfiguration() {
         return Services.PLATFORM.createTreeConfiguration(
-                BlockStateProvider.simple(ModBlocks.CHERRY_LOG.get().defaultBlockState()),
+                BlockStateProvider.simple(com.kingodogo.buildscape.block.BlockDefinition.vanilla("minecraft:cherry_log").defaultBlockState()),
                 new net.minecraft.world.level.levelgen.feature.trunkplacers.StraightTrunkPlacer(4, 2, 0),
-                BlockStateProvider.simple(ModBlocks.CHERRY_LEAVES.get().defaultBlockState()),
+                BlockStateProvider.simple(com.kingodogo.buildscape.block.BlockDefinition.vanilla("minecraft:cherry_leaves").defaultBlockState()),
                 new net.minecraft.world.level.levelgen.feature.foliageplacers.BlobFoliagePlacer(
                         net.minecraft.util.valueproviders.ConstantInt.of(2),
                         net.minecraft.util.valueproviders.ConstantInt.of(0),

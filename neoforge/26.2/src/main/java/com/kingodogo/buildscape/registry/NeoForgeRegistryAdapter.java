@@ -103,6 +103,9 @@ public class NeoForgeRegistryAdapter extends BaseRegistryAdapter {
             } else if (key.equals(Registries.ITEM)) {
                 com.kingodogo.buildscape.adapter.v26x.RemovedIdAliases.register(BuiltInRegistries.ITEM,
                         BuiltInRegistries.ITEM::addAlias);
+            } else if (key.equals(Registries.ENTITY_TYPE)) {
+                com.kingodogo.buildscape.adapter.v26x.RemovedIdAliases.register(BuiltInRegistries.ENTITY_TYPE,
+                        BuiltInRegistries.ENTITY_TYPE::addAlias);
             }
             completed.add(key);
         } finally {

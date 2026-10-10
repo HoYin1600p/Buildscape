@@ -10,8 +10,8 @@ public final class WandererTradeTable {
 
     public static List<Trade> generic() {
         var trades = new ArrayList<Trade>();
-        trades.add(new Trade("mangrove_propagule", 5, 1, 8));
-        for (String item : List.of("poplar_sapling", "cherry_sapling", "pale_oak_sapling")) {
+        trades.add(new Trade("minecraft:mangrove_propagule", 5, 1, 8));
+        for (String item : List.of("poplar_sapling", "minecraft:cherry_sapling", "minecraft:pale_oak_sapling")) {
             trades.add(new Trade(item, 1, 2, 8));
         }
         for (String color : List.of("red", "blue", "purple", "light_blue", "pink", "yellow")) {

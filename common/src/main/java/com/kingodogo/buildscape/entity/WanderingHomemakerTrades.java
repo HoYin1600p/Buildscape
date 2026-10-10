@@ -18,10 +18,10 @@ public final class WanderingHomemakerTrades {
 
     public static List<MerchantOffer> getStandardTrades() {
         List<MerchantOffer> list = new ArrayList<>();
-        add(list, new ItemStack(Items.EMERALD, 1), ModItems.MANGROVE_PROPAGULE.get().createStack(5), 8, 1, 0.05f);
+        add(list, new ItemStack(Items.EMERALD, 1), new ItemStack(Services.PLATFORM.getItem(com.kingodogo.buildscape.util.CommonId.parse("minecraft:mangrove_propagule")), 5), 8, 1, 0.05f);
         add(list, new ItemStack(Items.EMERALD, 1), ModItems.POPLAR_SAPLING.get().createStack(4), 8, 1, 0.05f);
-        add(list, new ItemStack(Items.EMERALD, 1), ModItems.CHERRY_SAPLING.get().createStack(4), 8, 1, 0.05f);
-        add(list, new ItemStack(Items.EMERALD, 1), ModItems.PALE_OAK_SAPLING.get().createStack(4), 8, 1, 0.05f);
+        add(list, new ItemStack(Items.EMERALD, 1), new ItemStack(Services.PLATFORM.getItem(com.kingodogo.buildscape.util.CommonId.parse("minecraft:cherry_sapling")), 4), 8, 1, 0.05f);
+        add(list, new ItemStack(Items.EMERALD, 1), new ItemStack(Services.PLATFORM.getItem(com.kingodogo.buildscape.util.CommonId.parse("minecraft:pale_oak_sapling")), 4), 8, 1, 0.05f);
         add(list, new ItemStack(Items.EMERALD, 1), ModItems.RED_MONETS.get().createStack(2), 6, 1, 0.05f);
         add(list, new ItemStack(Items.EMERALD, 1), ModItems.BLUE_MONETS.get().createStack(2), 6, 1, 0.05f);
         add(list, new ItemStack(Items.EMERALD, 1), ModItems.PURPLE_MONETS.get().createStack(2), 6, 1, 0.05f);

@@ -102,7 +102,8 @@ class MangroveConfiguredFeaturesTest {
         assertEquals(name.equals("pale_oak") ? 5 : 4, trunk.get("base_height").getAsInt());
         assertEquals(2, trunk.get("height_rand_a").getAsInt());
         assertEquals(name.equals("pale_oak") ? 1 : 0, trunk.get("height_rand_b").getAsInt());
-        assertEquals("buildscape:" + name + "_log", config.getAsJsonObject("trunk_provider")
+        String materialNamespace = name.equals("poplar") ? "buildscape:" : "minecraft:";
+        assertEquals(materialNamespace + name + "_log", config.getAsJsonObject("trunk_provider")
                 .getAsJsonObject("state").get("Name").getAsString());
         JsonObject foliage = config.getAsJsonObject("foliage_placer");
         assertEquals("minecraft:blob_foliage_placer", foliage.get("type").getAsString());
@@ -117,7 +118,7 @@ class MangroveConfiguredFeaturesTest {
             assertEquals(Set.of("buildscape:red_poplar_leaves", "buildscape:orange_poplar_leaves",
                     "buildscape:yellow_poplar_leaves"), leaves);
         } else {
-            assertEquals("buildscape:" + name + "_leaves", config.getAsJsonObject("foliage_provider")
+            assertEquals(materialNamespace + name + "_leaves", config.getAsJsonObject("foliage_provider")
                     .getAsJsonObject("state").get("Name").getAsString());
         }
         assertEquals(name.equals("pale_oak") ? 1 : 0, config.getAsJsonArray("decorators").size());
@@ -231,8 +232,8 @@ class MangroveConfiguredFeaturesTest {
                 .parse(JsonOps.INSTANCE, config.getAsJsonArray("decorators").get(3)).isSuccess());
         assertEquals(name.equals("tall_mangrove") ? 4 : 2,
                 config.getAsJsonObject("trunk_placer").get("base_height").getAsInt());
-        assertEquals("buildscape:mangrove_log", config.getAsJsonObject("trunk_provider").getAsJsonObject("state").get("Name").getAsString());
-        assertEquals("buildscape:mangrove_leaves", config.getAsJsonObject("foliage_provider").getAsJsonObject("state").get("Name").getAsString());
+        assertEquals("minecraft:mangrove_log", config.getAsJsonObject("trunk_provider").getAsJsonObject("state").get("Name").getAsString());
+        assertEquals("minecraft:mangrove_leaves", config.getAsJsonObject("foliage_provider").getAsJsonObject("state").get("Name").getAsString());
     }
 
     private static void assertRegisteredTypes(JsonElement json, Set<String> registeredTypes) {

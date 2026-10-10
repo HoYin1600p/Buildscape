@@ -4,7 +4,11 @@ import java.util.List;
 
 /** Saved identifiers replaced by vanilla content in the 26.2 VersionCluster. */
 public final class VanillaReplacementAliases {
-    public record Alias(String source, String target, boolean block, boolean item) {}
+    public record Alias(String source, String target, boolean block, boolean item, boolean entity) {
+        public Alias(String source, String target, boolean block, boolean item) {
+            this(source, target, block, item, false);
+        }
+    }
 
     private VanillaReplacementAliases() {}
 
@@ -177,6 +181,51 @@ public final class VanillaReplacementAliases {
             new Alias("buildscape:sculk_catalyst", "minecraft:sculk_catalyst", true, true),
             new Alias("buildscape:sculk_sensor", "minecraft:sculk_sensor", true, true),
             new Alias("buildscape:sculk_shrieker", "minecraft:sculk_shrieker", true, true),
-            new Alias("buildscape:sculk_vein", "minecraft:sculk_vein", true, true)
+            new Alias("buildscape:sculk_vein", "minecraft:sculk_vein", true, true),
+            new Alias("buildscape:mangrove_leaves", "minecraft:mangrove_leaves", true, true),
+            new Alias("buildscape:mangrove_log", "minecraft:mangrove_log", true, true),
+            new Alias("buildscape:mangrove_planks", "minecraft:mangrove_planks", true, true),
+            new Alias("buildscape:mangrove_propagule", "minecraft:mangrove_propagule", true, true),
+            new Alias("buildscape:mangrove_roots", "minecraft:mangrove_roots", true, true),
+            new Alias("buildscape:mangrove_wood", "minecraft:mangrove_wood", true, true),
+            new Alias("buildscape:muddy_mangrove_roots", "minecraft:muddy_mangrove_roots", true, true),
+            new Alias("buildscape:potted_mangrove_propagule", "minecraft:potted_mangrove_propagule", true, false),
+            new Alias("buildscape:stripped_mangrove_log", "minecraft:stripped_mangrove_log", true, true),
+            new Alias("buildscape:stripped_mangrove_wood", "minecraft:stripped_mangrove_wood", true, true),
+            new Alias("buildscape:cherry_leaves", "minecraft:cherry_leaves", true, true),
+            new Alias("buildscape:cherry_log", "minecraft:cherry_log", true, true),
+            new Alias("buildscape:cherry_planks", "minecraft:cherry_planks", true, true),
+            new Alias("buildscape:cherry_sapling", "minecraft:cherry_sapling", true, true),
+            new Alias("buildscape:cherry_wood", "minecraft:cherry_wood", true, true),
+            new Alias("buildscape:potted_cherry_sapling", "minecraft:potted_cherry_sapling", true, false),
+            new Alias("buildscape:stripped_cherry_log", "minecraft:stripped_cherry_log", true, true),
+            new Alias("buildscape:stripped_cherry_wood", "minecraft:stripped_cherry_wood", true, true),
+            new Alias("buildscape:pale_oak_leaves", "minecraft:pale_oak_leaves", true, true),
+            new Alias("buildscape:pale_oak_log", "minecraft:pale_oak_log", true, true),
+            new Alias("buildscape:pale_oak_planks", "minecraft:pale_oak_planks", true, true),
+            new Alias("buildscape:pale_oak_sapling", "minecraft:pale_oak_sapling", true, true),
+            new Alias("buildscape:pale_oak_wood", "minecraft:pale_oak_wood", true, true),
+            new Alias("buildscape:potted_pale_oak_sapling", "minecraft:potted_pale_oak_sapling", true, false),
+            new Alias("buildscape:stripped_pale_oak_log", "minecraft:stripped_pale_oak_log", true, true),
+            new Alias("buildscape:stripped_pale_oak_wood", "minecraft:stripped_pale_oak_wood", true, true),
+            new Alias("buildscape:bamboo_block", "minecraft:bamboo_block", true, true),
+            new Alias("buildscape:stripped_bamboo_block", "minecraft:stripped_bamboo_block", true, true),
+            new Alias("buildscape:copper_chest", "minecraft:copper_chest", true, true),
+            new Alias("buildscape:exposed_copper_chest", "minecraft:exposed_copper_chest", true, true),
+            new Alias("buildscape:weathered_copper_chest", "minecraft:weathered_copper_chest", true, true),
+            new Alias("buildscape:oxidized_copper_chest", "minecraft:oxidized_copper_chest", true, true),
+            new Alias("buildscape:waxed_copper_chest", "minecraft:waxed_copper_chest", true, true),
+            new Alias("buildscape:waxed_exposed_copper_chest", "minecraft:waxed_exposed_copper_chest", true, true),
+            new Alias("buildscape:waxed_weathered_copper_chest", "minecraft:waxed_weathered_copper_chest", true, true),
+            new Alias("buildscape:waxed_oxidized_copper_chest", "minecraft:waxed_oxidized_copper_chest", true, true),
+            new Alias("buildscape:mangrove_boat", "minecraft:mangrove_boat", false, true, true),
+            new Alias("buildscape:acacia_shelf", "minecraft:acacia_shelf", true, true),
+            new Alias("buildscape:birch_shelf", "minecraft:birch_shelf", true, true),
+            new Alias("buildscape:crimson_shelf", "minecraft:crimson_shelf", true, true),
+            new Alias("buildscape:dark_oak_shelf", "minecraft:dark_oak_shelf", true, true),
+            new Alias("buildscape:jungle_shelf", "minecraft:jungle_shelf", true, true),
+            new Alias("buildscape:oak_shelf", "minecraft:oak_shelf", true, true),
+            new Alias("buildscape:spruce_shelf", "minecraft:spruce_shelf", true, true),
+            new Alias("buildscape:warped_shelf", "minecraft:warped_shelf", true, true)
     );
 }

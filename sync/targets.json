@@ -1,0 +1,84 @@
+{
+  "schema_version": 1,
+  "source": {
+    "remote_url": "https://github.com/HoYin1600p/Buildscape.git",
+    "branch": "main",
+    "subtree": "src",
+    "metadata_files": ["build.gradle", "settings.gradle", "gradle.properties", "gradlew", "gradlew.bat", "gradle"],
+    "loader": "forge",
+    "minecraft": "1.18.2"
+  },
+  "targets": [
+    {
+      "id": "mc26.2",
+      "status": "active",
+      "minecraft": "26.2",
+      "loaders": ["fabric", "neoforge"],
+      "branch": "port/26.2",
+      "modules": ["fabric/26.2", "neoforge/26.2", "common"],
+      "version_cluster": "v26x",
+      "base_commit": "c7d7112cbb351e3f50f9c147dde92ee628553bef",
+      "base_note": "The frozen ref/forge/1.18.2 snapshot matches this source commit except for four files. The first successful apply replaces the declared snapshot scope with exact source bytes; review those four historical differences before the first real run.",
+      "reference_snapshot": "ref/forge/1.18.2",
+      "mapping_file": "migration/ledger.csv",
+      "java_root": "common/src/main/java",
+      "resource_root": "common/src/main/resources",
+      "state_file": "sync/state/mc26.2.json",
+      "mc_jar": "ref/artifacts/minecraft-26.2.jar",
+      "converter": {
+        "path": "scripts/resources26x/convert.py",
+        "command": ["{python}", "-B", "{repo}/scripts/resources26x/convert.py", "{resources}", "{mc_jar}"]
+      },
+      "validator": {
+        "path": "scripts/resources26x/check.py"
+      },
+      "validation": [
+        ["{python}", "-B", "{repo}/scripts/resources26x/check.py", "--resources-root", "{resources}", "--mc-jar", "{mc_jar}"],
+        ["{gradle}", ":fabric:26.2:build", ":neoforge:26.2:build", "--parallel", "--max-workers=2", "--offline", "--console=plain"]
+      ]
+    },
+    {
+      "id": "fabric1.18.2", "status": "planned", "minecraft": "1.18.2",
+      "loaders": ["fabric"], "branch": "port/fabric-1.18.2",
+      "modules": ["fabric/1.18.2", "common"], "version_cluster": "v118x", "base_commit": null
+    },
+    {
+      "id": "forge1.21.1", "status": "planned", "minecraft": "1.21.1",
+      "loaders": ["forge"], "branch": "port/forge-1.21.1",
+      "modules": ["forge/1.21.1", "common"], "version_cluster": "v121x", "base_commit": null
+    },
+    {
+      "id": "fabric1.21.1", "status": "planned", "minecraft": "1.21.1",
+      "loaders": ["fabric"], "branch": "port/fabric-1.21.1",
+      "modules": ["fabric/1.21.1", "common"], "version_cluster": "v121x", "base_commit": null
+    },
+    {
+      "id": "neoforge1.21.1", "status": "planned", "minecraft": "1.21.1",
+      "loaders": ["neoforge"], "branch": "port/neoforge-1.21.1",
+      "modules": ["neoforge/1.21.1", "common"], "version_cluster": "v121x", "base_commit": null
+    },
+    {
+      "id": "forge26.2", "status": "planned", "minecraft": "26.2",
+      "loaders": ["forge"], "branch": "port/forge-26.2",
+      "modules": ["forge/26.2", "common"], "version_cluster": "v26x", "base_commit": null
+    },
+    {
+      "id": "forge26.3", "status": "paused", "minecraft": "26.3",
+      "loaders": ["forge"], "branch": "port/forge-26.3",
+      "modules": ["forge/26.3", "common"], "version_cluster": "v26x", "base_commit": null,
+      "note": "Paused by owner; activate only after the earlier target is accepted."
+    },
+    {
+      "id": "fabric26.3", "status": "paused", "minecraft": "26.3",
+      "loaders": ["fabric"], "branch": "port/fabric-26.3",
+      "modules": ["fabric/26.3", "common"], "version_cluster": "v26x", "base_commit": null,
+      "note": "Paused by owner; activate only after the earlier target is accepted."
+    },
+    {
+      "id": "neoforge26.3", "status": "paused", "minecraft": "26.3",
+      "loaders": ["neoforge"], "branch": "port/neoforge-26.3",
+      "modules": ["neoforge/26.3", "common"], "version_cluster": "v26x", "base_commit": null,
+      "note": "Paused by owner; activate only after the earlier target is accepted."
+    }
+  ]
+}

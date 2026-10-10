@@ -3,6 +3,14 @@
 `ledger.csv` is the authoritative file-by-file record for the migration from the
 frozen Forge 1.18.2 source in `ref/forge/1.18.2`.
 
+Source updates are tracked by [the sync system](../docs/SYNC.md). Successful
+sync branches mark affected review rows `needs_resync`, retain deleted-source
+rows for review, and refresh automatic verification. The legacy ledger validator
+does not accept that status: use the filtered external ledger view documented
+there until the validator gains incomplete-status and tombstone support. Keep
+sync review rows and the target's persistent review queue until the port is
+accepted; a new source baseline alone does not complete a port.
+
 ## Scope
 
 This branch targets Minecraft 26.2 only (Fabric and NeoForge). Minecraft 1.18.2

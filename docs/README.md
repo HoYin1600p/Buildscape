@@ -6,6 +6,7 @@ Welcome to the central documentation hub for the Buildscape codebase. Buildscape
 
 ## Documentation Index
 
+- [**Source Line Sync**](SYNC.md): Registry, offline plans, local sync branches, port briefs, and scheduling entry point.
 - [**Architecture Manual**](ARCHITECTURE.md): Comprehensive guide on the 3-tier VersionCluster architecture, multi-version source sets, and platform abstraction layers.
 - [**Development Rules & Standards**](RULES_AND_STANDARDS.md): Invariant engineering rules—No stubs, no copy-paste, neutrality in common, unified mixin rules, and registry safety agreements.
 - [**Maintainer Guide: Which Thing Goes Where?**](MAINTAINER_GUIDE.md): Practical feature implementation guide for blocks, items, block entities, entities, recipes, world generation, networking, screens, and mixins.

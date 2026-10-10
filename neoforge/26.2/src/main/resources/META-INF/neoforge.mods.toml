@@ -6,7 +6,7 @@ modId = "buildscape"
 version = "1.0.0"
 displayName = "Buildscape"
 displayURL = "buildscape.online"
-logoFile = "buildscape.png"
+iconFile = "buildscape.png"
 authors = "Kingodogo"
 description = '''Welcome to Buildscape the ultimate expansion for builders, architects, and creators!'''
 [[dependencies.buildscape]]

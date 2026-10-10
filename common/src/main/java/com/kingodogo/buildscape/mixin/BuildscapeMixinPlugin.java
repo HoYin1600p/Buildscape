@@ -26,8 +26,7 @@ public final class BuildscapeMixinPlugin implements IMixinConfigPlugin {
             "com.kingodogo.buildscape.mixin.ScreenMixin",
             "com.kingodogo.buildscape.mixin.AdvancementWidgetMixin",
             "com.kingodogo.buildscape.mixin.GeneralStatisticsListMixin",
-            "com.kingodogo.buildscape.mixin.GeneralStatisticsListEntryMixin",
-            "com.kingodogo.buildscape.mixin.LeavesBlockMixin"
+            "com.kingodogo.buildscape.mixin.GeneralStatisticsListEntryMixin"
     );
 
     private boolean standaloneLaunchFasterPresent;
@@ -54,6 +53,8 @@ public final class BuildscapeMixinPlugin implements IMixinConfigPlugin {
                 || mixinClassName.endsWith(".GeneralStatisticsListEntryMixin"))) return true;
         if (mixinClassName.endsWith(".WorldOverlayExtractionMixin")) return is26x;
         if (mixinClassName.endsWith(".EmbeddiumPipeSpillMixin")) {
+            // No Sodium for 26.2 is cached; the legacy renderer API is incompatible.
+            if (is26x) return false;
             return classExists("me.jellysquid.mods.sodium.client.render.chunk.compile.buffers.ChunkModelBuilder");
         }
         if (standaloneLaunchFasterPresent && OVERLAPPING_CACHE_MIXINS.contains(mixinClassName)) {
@@ -64,7 +65,7 @@ public final class BuildscapeMixinPlugin implements IMixinConfigPlugin {
             return false;
         }
         if (is26x && mixinClassName.endsWith(".LiquidBlockRendererMixin")) {
-            return false;
+            return true;
         }
         return true;
     }

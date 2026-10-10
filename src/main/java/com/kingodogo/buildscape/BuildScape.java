@@ -1238,7 +1238,7 @@ public class BuildScape {
             return;
         }
 
-        if (state.is(net.minecraft.world.level.block.Blocks.FLOWER_POT)) {
+        if (state.is(net.minecraft.world.level.block.Blocks.FLOWER_POT) && !event.getPlayer().isSecondaryUseActive()) {
             if (heldItem.getItem() instanceof com.kingodogo.buildscape.item.HazeBushItem && com.kingodogo.buildscape.item.HazeBushItem.isDrained(heldItem)) {
                 if (heldItem.getItem() instanceof net.minecraft.world.item.BlockItem blockItem && blockItem.getBlock() instanceof com.kingodogo.buildscape.block.HazeBushBlock bushBlock) {
                     net.minecraft.world.item.DyeColor color = bushBlock.getColor();

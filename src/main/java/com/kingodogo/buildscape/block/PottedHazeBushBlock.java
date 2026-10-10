@@ -81,24 +81,6 @@ public class PottedHazeBushBlock extends FlowerPotBlock {
     }
 
     @Override
-    public void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean isMoving) {
-        super.onPlace(state, level, pos, oldState, isMoving);
-        if (level.isClientSide) {
-            com.kingodogo.buildscape.client.HazeBushParticleHandler.track(pos);
-        }
-    }
-
-    @Override
-    public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
-        if (!state.is(newState.getBlock())) {
-            if (level.isClientSide) {
-                com.kingodogo.buildscape.client.HazeBushParticleHandler.untrack(pos);
-            }
-        }
-        super.onRemove(state, level, pos, newState, isMoving);
-    }
-
-    @Override
     public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
         ItemStack held = player.getItemInHand(hand);
 
@@ -173,7 +155,7 @@ public class PottedHazeBushBlock extends FlowerPotBlock {
                 if (!player.getAbilities().instabuild) {
                     held.shrink(1);
                 }
-                level.levelEvent(2005, pos, 0);
+                level.levelEvent(1505, pos, 0);
             }
             return InteractionResult.sidedSuccess(level.isClientSide);
         }

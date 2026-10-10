@@ -162,6 +162,7 @@ public class PillarIdManager {
                 }
             }
         } catch (Exception e) {
+            com.kingodogo.buildscape.BuildscapeCommon.LOGGER.debug("Unable to resolve block metadata for pillar ID prefix, using stone prefix", e);
             // The reference uses the stone prefix when block metadata cannot be resolved.
             return PREFIX_STONE + "-P";
         }
@@ -237,6 +238,7 @@ public class PillarIdManager {
                 return PREFIX_STONE + "-P";
             }
         } catch (Exception e) {
+            com.kingodogo.buildscape.BuildscapeCommon.LOGGER.debug("Unable to resolve block metadata for pillar ID prefix, using stone prefix", e);
             // The reference uses the stone prefix when block metadata cannot be resolved.
             return PREFIX_STONE + "-P";
         }
@@ -904,6 +906,7 @@ public class PillarIdManager {
                                     continue;
                                 }
                             } catch (Exception e) {
+                                com.kingodogo.buildscape.BuildscapeCommon.LOGGER.warn("Skipping unreadable pillar record", e);
                                 // The reference skips malformed or unreadable individual pillar records.
                                 skipped++;
                                 continue;

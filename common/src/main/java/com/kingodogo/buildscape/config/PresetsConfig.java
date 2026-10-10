@@ -61,7 +61,8 @@ public class PresetsConfig {
                             if (preset != null) {
                                 presets.put(entry.getKey(), preset);
                             }
-                        } catch (Exception ignored) {
+                        } catch (Exception e) {
+                            BuildscapeCommon.LOGGER.warn("Skipping malformed preset entry", e);
                             // The reference skips malformed preset entries while loading valid ones.
                         }
                     }

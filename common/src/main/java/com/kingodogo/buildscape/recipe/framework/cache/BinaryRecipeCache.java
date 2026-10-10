@@ -82,6 +82,7 @@ public class BinaryRecipeCache {
             String cachedHash = in.readUTF();
             return expectedHash != null && !expectedHash.isBlank() && expectedHash.equals(cachedHash);
         } catch (IOException e) {
+            BuildscapeCommon.LOGGER.warn("Unable to read BDRE cache header; treating as a cache miss", e);
             // The reference treats unreadable cache headers as a cache miss.
             return false;
         }
@@ -148,6 +149,7 @@ public class BinaryRecipeCache {
         try {
             return loadCacheFromStream(Files.newInputStream(cacheFile), expectedHash);
         } catch (IOException e) {
+            BuildscapeCommon.LOGGER.warn("Unable to open BDRE cache file; recompiling recipes", e);
             // The reference recompiles recipes when a cache file cannot be opened.
             return new ArrayList<>();
         }

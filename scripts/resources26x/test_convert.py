@@ -103,6 +103,30 @@ class ConversionTests(unittest.TestCase):
         self.assertEqual(c.item_definition("waxed_copper_chest", True)["model"]["model"],
                          "buildscape:block/copper_chest")
 
+    def test_existing_special_item_definitions_are_kept(self):
+        special = {"model": {"type": "minecraft:special", "base": "buildscape:item/copper_chest",
+                             "model": {"type": "buildscape:copper_chest",
+                                       "texture": "buildscape:textures/entity/chest/copper_chest.png"}}}
+        jar_special = {"model": {"type": "minecraft:special", "base": "buildscape:item/red_glass_jar",
+                                 "model": {"type": "buildscape:glass_jar"}}}
+        self.assertTrue(c.is_special_definition(special))
+        self.assertFalse(c.is_special_definition(c.item_definition("x", True)))
+        with tempfile.TemporaryDirectory() as tmp:
+            root, jar = Path(tmp) / "resources", Path(tmp) / "vanilla.jar"
+            c.write(root / "assets/buildscape/items/copper_chest.json", special)
+            c.write(root / "assets/buildscape/items/red_glass_jar.json", jar_special)
+            c.write(root / "assets/buildscape/models/item/red_glass_jar.json", {"parent": "minecraft:block/block"})
+            with zipfile.ZipFile(jar, "w") as z:
+                z.writestr("version.json", '{"id":"26.2"}')
+                z.writestr("assets/minecraft/blockstates/oak_door.json", '{"variants":{}}')
+            c.convert(root, jar)
+            self.assertEqual(c.load(root / "assets/buildscape/items/copper_chest.json"), special)
+            self.assertEqual(c.load(root / "assets/buildscape/items/red_glass_jar.json"), jar_special)
+            # Special items without a definition still get the plain fallback.
+            self.assertEqual(c.load(root / "assets/buildscape/items/weathered_copper_chest.json"),
+                             c.item_definition("weathered_copper_chest", True))
+            self.assertEqual(c.convert(root, jar), 0)
+
     def test_vanilla_chest_baseline_language_and_bom(self):
         with tempfile.TemporaryDirectory() as tmp:
             root, jar = Path(tmp) / "resources", Path(tmp) / "vanilla.jar"

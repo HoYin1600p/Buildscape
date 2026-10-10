@@ -189,6 +189,11 @@ def door_state(data, name, vanilla):
     return result, models
 
 
+def is_special_definition(data):
+    model = data.get("model") if isinstance(data, dict) else None
+    return isinstance(model, dict) and model.get("type") == "minecraft:special"
+
+
 def item_definition(item, model_exists):
     if item in SPECIAL_ITEMS:
         target = "block/glass_jar" if item == "template_glass_jar" else "block/" + item.removeprefix("waxed_")
@@ -303,6 +308,11 @@ def convert(root, jar):
                 bad.unlink()
                 changed += 1
         for item in sorted(ids):
+            # Hand-maintained minecraft:special definitions (copper chests, glass
+            # jars) render through a block entity model; never replace them.
+            existing = root / "assets/buildscape/items" / (item + ".json")
+            if existing.exists() and is_special_definition(load(existing)):
+                continue
             changed += write(root / "assets/buildscape/items" / (item + ".json"),
                              item_definition(item, (items_dir / (item + ".json")).exists()))
         changed += write(root / "pack.mcmeta", PACK)

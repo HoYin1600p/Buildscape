@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class RenderBuffersMixin {
 
     @Dynamic
-    @Inject(method = "<init>", at = @At("TAIL"), require = 0)
+    @Inject(method = "<init>(I)V", at = @At("TAIL"), require = 0)
     private void buildscape$addFestiveGlintBuffers(CallbackInfo ci) {
         MixinFactory.registerFixedRenderBuffers(this);
     }

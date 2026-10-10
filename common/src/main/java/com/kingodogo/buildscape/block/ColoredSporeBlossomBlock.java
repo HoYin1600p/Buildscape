@@ -46,6 +46,7 @@ public class ColoredSporeBlossomBlock extends SporeBlossomBlock {
             int b = Integer.parseInt(hex.substring(4, 6), 16);
             return (r << 16) | (g << 8) | b;
         } catch (Exception e) {
+            com.kingodogo.buildscape.BuildscapeCommon.LOGGER.warn("Unable to parse spore blossom particle color; using white", e);
             return 0xFFFFFF;
         }
     }

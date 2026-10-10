@@ -162,6 +162,7 @@ public class PillarIdManager {
                 }
             }
         } catch (Exception e) {
+            // The reference uses the stone prefix when block metadata cannot be resolved.
             return PREFIX_STONE + "-P";
         }
 
@@ -236,6 +237,7 @@ public class PillarIdManager {
                 return PREFIX_STONE + "-P";
             }
         } catch (Exception e) {
+            // The reference uses the stone prefix when block metadata cannot be resolved.
             return PREFIX_STONE + "-P";
         }
     }
@@ -262,9 +264,11 @@ public class PillarIdManager {
                         cachedWorldSaveDir = buildscapeDir;
                     }
                 } catch (Exception e) {
+                    com.kingodogo.buildscape.BuildscapeCommon.LOGGER.warn("PillarIdManager: failed during updateCachedWorldDir", e);
                 }
             }
         } catch (Throwable t) {
+            com.kingodogo.buildscape.BuildscapeCommon.LOGGER.warn("PillarIdManager: failed during updateCachedWorldDir", t);
         }
     }
 
@@ -295,6 +299,7 @@ public class PillarIdManager {
                         return buildscapeDir;
                     }
                 } catch (Exception e) {
+                    com.kingodogo.buildscape.BuildscapeCommon.LOGGER.warn("PillarIdManager: failed during getDataDir", e);
                 }
             }
 
@@ -309,6 +314,7 @@ public class PillarIdManager {
             }
             return dir;
         } catch (Throwable t) {
+            com.kingodogo.buildscape.BuildscapeCommon.LOGGER.warn("Unable to resolve pillar data directory", t);
             return new File(".");
         }
     }
@@ -722,21 +728,15 @@ public class PillarIdManager {
                 try {
                     loadFileAsync(server);
                 } catch (Exception e) {
-                    System.err.println(
-                            "BuildScape: Error in async file load: " + e.getMessage()
-                    );
-                    e.printStackTrace();
+                    com.kingodogo.buildscape.BuildscapeCommon.LOGGER.error("BuildScape: Error in async file load: " + e.getMessage(), e);
                     hasLoaded = true;
                 } finally {
                     loadInProgress = false;
                 }
             });
         } catch (Throwable t) {
-            System.err.println(
-                    "BuildScape: Critical error in load() - will recover from world later: " +
-                            t.getMessage()
-            );
-            t.printStackTrace();
+            com.kingodogo.buildscape.BuildscapeCommon.LOGGER.error("BuildScape: Critical error in load() - will recover from world later: " +
+                            t.getMessage(), t);
             loadInProgress = false;
             hasLoaded = true;
             pillarData.clear();
@@ -764,7 +764,7 @@ public class PillarIdManager {
                         errorType +
                         "). Creating backup and starting fresh."
         );
-        System.err.println("BuildScape: Error details: " + error.getMessage());
+        com.kingodogo.buildscape.BuildscapeCommon.LOGGER.error("BuildScape: Corrupted pillar data file", error);
 
         pillarData.clear();
         lastLoadedTime = 0L;
@@ -788,10 +788,8 @@ public class PillarIdManager {
 
                         }
                     } catch (Exception backupEx) {
-                        System.err.println(
-                                "BuildScape: Failed to backup corrupted file: " +
-                                        backupEx.getMessage()
-                        );
+                        com.kingodogo.buildscape.BuildscapeCommon.LOGGER.error("BuildScape: Failed to backup corrupted file: " +
+                                        backupEx.getMessage(), backupEx);
                     }
 
                     try {
@@ -799,20 +797,17 @@ public class PillarIdManager {
                             file.delete();
                         }
                     } catch (Exception deleteEx) {
+                        com.kingodogo.buildscape.BuildscapeCommon.LOGGER.warn("PillarIdManager: failed during handleCorruptedFile", deleteEx);
                     }
 
                     try {
                         saveImmediate();
                     } catch (Exception saveEx) {
-                        System.err.println(
-                                "BuildScape: Failed to create new pillar data file: " +
-                                        saveEx.getMessage()
-                        );
+                        com.kingodogo.buildscape.BuildscapeCommon.LOGGER.error("BuildScape: Failed to create new pillar data file: " +
+                                        saveEx.getMessage(), saveEx);
                     }
                 } catch (Exception e) {
-                    System.err.println(
-                            "BuildScape: Error in deferred file recovery: " + e.getMessage()
-                    );
+                    com.kingodogo.buildscape.BuildscapeCommon.LOGGER.error("BuildScape: Error in deferred file recovery: " + e.getMessage(), e);
                 }
             });
         } else {
@@ -831,10 +826,8 @@ public class PillarIdManager {
 
                     }
                 } catch (Exception backupEx) {
-                    System.err.println(
-                            "BuildScape: Failed to backup corrupted file: " +
-                                    backupEx.getMessage()
-                    );
+                    com.kingodogo.buildscape.BuildscapeCommon.LOGGER.error("BuildScape: Failed to backup corrupted file: " +
+                                    backupEx.getMessage(), backupEx);
                 }
 
                 try {
@@ -842,20 +835,17 @@ public class PillarIdManager {
                         file.delete();
                     }
                 } catch (Exception deleteEx) {
+                    com.kingodogo.buildscape.BuildscapeCommon.LOGGER.warn("PillarIdManager: failed during handleCorruptedFile", deleteEx);
                 }
 
                 try {
                     saveImmediate();
                 } catch (Exception saveEx) {
-                    System.err.println(
-                            "BuildScape: Failed to create new pillar data file (will retry later): " +
-                                    saveEx.getMessage()
-                    );
+                    com.kingodogo.buildscape.BuildscapeCommon.LOGGER.error("BuildScape: Failed to create new pillar data file (will retry later): " +
+                                    saveEx.getMessage(), saveEx);
                 }
             } catch (Exception e) {
-                System.err.println(
-                        "BuildScape: Error in file recovery: " + e.getMessage()
-                );
+                com.kingodogo.buildscape.BuildscapeCommon.LOGGER.error("BuildScape: Error in file recovery: " + e.getMessage(), e);
             }
         }
     }
@@ -918,6 +908,7 @@ public class PillarIdManager {
                                     continue;
                                 }
                             } catch (Exception e) {
+                                // The reference skips malformed or unreadable individual pillar records.
                                 skipped++;
                                 continue;
                             }
@@ -945,6 +936,7 @@ public class PillarIdManager {
                                 migrated++;
                             }
                         } catch (Exception e) {
+                            // The reference skips malformed or unreadable individual pillar records.
                             skipped++;
                             continue;
                         }
@@ -956,6 +948,7 @@ public class PillarIdManager {
                                 try {
                                     saveImmediate();
                                 } catch (Exception e) {
+                                    com.kingodogo.buildscape.BuildscapeCommon.LOGGER.warn("PillarIdManager: failed during processLoadedData", e);
                                 }
                             });
                         }
@@ -1007,21 +1000,15 @@ public class PillarIdManager {
 
         } catch (Exception e) {
             fileWasDeleted = true;
-            System.err.println(
-                    "BuildScape: Error processing loaded data: " + e.getMessage()
-            );
-            e.printStackTrace();
+            com.kingodogo.buildscape.BuildscapeCommon.LOGGER.error("BuildScape: Error processing loaded data: " + e.getMessage(), e);
             pillarData.clear();
             lastLoadedTime = 0L;
             lastFileSize = 0L;
             hasLoaded = true;
             scheduleRecoveryFromWorld(server, false);
         } catch (Throwable t) {
-            System.err.println(
-                    "BuildScape: Critical error in loadFileAsync() - will recover after world is fully loaded: " +
-                            t.getMessage()
-            );
-            t.printStackTrace();
+            com.kingodogo.buildscape.BuildscapeCommon.LOGGER.error("BuildScape: Critical error in loadFileAsync() - will recover after world is fully loaded: " +
+                            t.getMessage(), t);
             fileWasDeleted = true;
             pillarData.clear();
             lastLoadedTime = 0L;
@@ -1045,7 +1032,7 @@ public class PillarIdManager {
                         sourceFile = file;
                     }
                 } catch (Exception e) {
-                    System.err.println("BuildScape: Error loading main file: " + e.getMessage());
+                    com.kingodogo.buildscape.BuildscapeCommon.LOGGER.error("BuildScape: Error loading main file: " + e.getMessage(), e);
                 }
             }
 
@@ -1079,7 +1066,7 @@ public class PillarIdManager {
                             }
                         }
                     } catch (Exception e) {
-                        System.err.println("BuildScape: Error loading backup file: " + e.getMessage());
+                        com.kingodogo.buildscape.BuildscapeCommon.LOGGER.error("BuildScape: Error loading backup file: " + e.getMessage(), e);
                     }
                 }
             }
@@ -1097,11 +1084,8 @@ public class PillarIdManager {
             processLoadedData(loadedData, server, sourceFile);
 
         } catch (Throwable t) {
-            System.err.println(
-                    "BuildScape: Critical error in loadFileAsync() - will recover after world is fully loaded: " +
-                            t.getMessage()
-            );
-            t.printStackTrace();
+            com.kingodogo.buildscape.BuildscapeCommon.LOGGER.error("BuildScape: Critical error in loadFileAsync() - will recover after world is fully loaded: " +
+                            t.getMessage(), t);
             fileWasDeleted = true;
             pillarData.clear();
             lastLoadedTime = 0L;
@@ -1290,23 +1274,19 @@ public class PillarIdManager {
                                     }
                                 }
                             } catch (Exception e) {
+                                // The reference skips malformed or unreadable individual pillar records.
                                 continue;
                             }
                         }
                     }
                 } catch (Exception e) {
-                    System.err.println(
-                            "BuildScape: Error scanning chunks to clear pillar IDs: " +
-                                    e.getMessage()
-                    );
+                    com.kingodogo.buildscape.BuildscapeCommon.LOGGER.error("BuildScape: Error scanning chunks to clear pillar IDs: " +
+                                    e.getMessage(), e);
                 }
             }
 
         } catch (Exception e) {
-            System.err.println(
-                    "BuildScape: Error clearing pillar IDs from world: " + e.getMessage()
-            );
-            e.printStackTrace();
+            com.kingodogo.buildscape.BuildscapeCommon.LOGGER.error("BuildScape: Error clearing pillar IDs from world: " + e.getMessage(), e);
         }
 
         return clearedCount;
@@ -1388,6 +1368,7 @@ public class PillarIdManager {
                                     }
                                 }
                             } catch (Exception e) {
+                                // The reference skips malformed or unreadable individual pillar records.
                                 continue;
                             }
                         }
@@ -1481,17 +1462,13 @@ public class PillarIdManager {
                                 pillarData.put(pillarId, data);
                                 recoveredCount++;
                             } catch (Exception e) {
-                                System.err.println(
-                                        "BuildScape: Error processing pillar: " + e.getMessage()
-                                );
+                                com.kingodogo.buildscape.BuildscapeCommon.LOGGER.error("BuildScape: Error processing pillar: " + e.getMessage(), e);
                                 skippedCount++;
                             }
                         }
                     }
                 } catch (Exception e) {
-                    System.err.println(
-                            "BuildScape: Error scanning chunks for pillars: " + e.getMessage()
-                    );
+                    com.kingodogo.buildscape.BuildscapeCommon.LOGGER.error("BuildScape: Error scanning chunks for pillars: " + e.getMessage(), e);
                     skippedCount++;
                 }
             }
@@ -1507,10 +1484,7 @@ public class PillarIdManager {
             }
 
         } catch (Exception e) {
-            System.err.println(
-                    "BuildScape: Error during pillar recovery: " + e.getMessage()
-            );
-            e.printStackTrace();
+            com.kingodogo.buildscape.BuildscapeCommon.LOGGER.error("BuildScape: Error during pillar recovery: " + e.getMessage(), e);
         } finally {
             recoveryInProgress = false;
         }
@@ -1553,6 +1527,7 @@ public class PillarIdManager {
                         }
                     }
                 } catch (Exception e) {
+                    com.kingodogo.buildscape.BuildscapeCommon.LOGGER.warn("PillarIdManager: failed during forceSaveImmediate", e);
                 }
             }
 
@@ -1579,8 +1554,7 @@ public class PillarIdManager {
             refreshSyncSnapshot();
             com.kingodogo.buildscape.network.SyncPillarIdsPacket.sendToAll(getAllPillarDataForSync());
         } catch (Throwable t) {
-            System.err.println("BuildScape: Error in forceSaveImmediate: " + t.getMessage());
-            t.printStackTrace();
+            com.kingodogo.buildscape.BuildscapeCommon.LOGGER.error("BuildScape: Error in forceSaveImmediate: " + t.getMessage(), t);
         }
     }
 
@@ -1666,6 +1640,7 @@ public class PillarIdManager {
                     FileChannel channel = fos.getChannel();
                     channel.force(true);
                 } catch (Exception forceEx) {
+                    com.kingodogo.buildscape.BuildscapeCommon.LOGGER.warn("PillarIdManager: failed during saveToFile", forceEx);
                 }
             }
 
@@ -1673,6 +1648,7 @@ public class PillarIdManager {
                 Files.move(tempFile.toPath(), file.toPath(),
                         StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
             } catch (AtomicMoveNotSupportedException exception) {
+                // The reference falls back to a regular move on filesystems without atomic moves.
                 Files.move(tempFile.toPath(), file.toPath(), StandardCopyOption.REPLACE_EXISTING);
             }
             return true;
@@ -1743,21 +1719,16 @@ public class PillarIdManager {
                             syncedCount++;
                         }
                     } catch (Exception e) {
-                        System.err.println(
-                                "BuildScape: Error syncing pillar " +
+                        com.kingodogo.buildscape.BuildscapeCommon.LOGGER.error("BuildScape: Error syncing pillar " +
                                         (data != null ? data.id : "unknown") +
                                         ": " +
-                                        e.getMessage()
-                        );
+                                        e.getMessage(), e);
                     }
                 }
             }
 
         } catch (Exception e) {
-            System.err.println(
-                    "BuildScape: Error in syncAllLoadedPillars: " + e.getMessage()
-            );
-            e.printStackTrace();
+            com.kingodogo.buildscape.BuildscapeCommon.LOGGER.error("BuildScape: Error in syncAllLoadedPillars: " + e.getMessage(), e);
         }
     }
 
@@ -1783,7 +1754,7 @@ public class PillarIdManager {
 
             saveToFile(getBackupDataFile(), BACKUP_FILE_NAME);
         } catch (Throwable t) {
-            System.err.println("BuildScape: Error saving backup file: " + t.getMessage());
+            com.kingodogo.buildscape.BuildscapeCommon.LOGGER.error("BuildScape: Error saving backup file: " + t.getMessage(), t);
         }
     }
 
@@ -1889,11 +1860,9 @@ public class PillarIdManager {
                         }
                     } catch (Exception e) {
                         preservedCount++;
-                        System.err.println(
-                                "BuildScape: Error syncing colors from NBT for pillar " +
+                        com.kingodogo.buildscape.BuildscapeCommon.LOGGER.error("BuildScape: Error syncing colors from NBT for pillar " +
                                         (data != null ? data.id : "unknown") +
-                                        ": " + e.getMessage()
-                        );
+                                        ": " + e.getMessage(), e);
                     }
                 }
             }
@@ -1903,10 +1872,7 @@ public class PillarIdManager {
             } else if (preservedCount > 0) {
             }
         } catch (Exception e) {
-            System.err.println(
-                    "BuildScape: Error in syncColorsFromNBTToManager: " + e.getMessage()
-            );
-            e.printStackTrace();
+            com.kingodogo.buildscape.BuildscapeCommon.LOGGER.error("BuildScape: Error in syncColorsFromNBTToManager: " + e.getMessage(), e);
         }
     }
 
@@ -1972,11 +1938,9 @@ public class PillarIdManager {
                             }
                         }
                     } catch (Exception e) {
-                        System.err.println(
-                                "BuildScape: Error loading colors from NBT for pillar " +
+                        com.kingodogo.buildscape.BuildscapeCommon.LOGGER.error("BuildScape: Error loading colors from NBT for pillar " +
                                         (data != null ? data.id : "unknown") +
-                                        ": " + e.getMessage()
-                        );
+                                        ": " + e.getMessage(), e);
                     }
                 }
             }
@@ -1986,10 +1950,7 @@ public class PillarIdManager {
             } else {
             }
         } catch (Exception e) {
-            System.err.println(
-                    "BuildScape: Error in loadColorsFromNBT: " + e.getMessage()
-            );
-            e.printStackTrace();
+            com.kingodogo.buildscape.BuildscapeCommon.LOGGER.error("BuildScape: Error in loadColorsFromNBT: " + e.getMessage(), e);
         }
     }
 
@@ -2162,6 +2123,7 @@ public class PillarIdManager {
                         : null;
                 positionIndex.put(positionKey(data.dimension, data.getBlockPos(), facing), data.id);
             } catch (Exception ignored) {
+                com.kingodogo.buildscape.BuildscapeCommon.LOGGER.warn("PillarIdManager: failed during rebuildPositionIndex", ignored);
             }
         }
     }
@@ -2186,6 +2148,7 @@ public class PillarIdManager {
                 }
                 positionIndex.put(positionKey(data.dimension, data.getBlockPos(), facing), data.id);
             } catch (Exception ignored) {
+                com.kingodogo.buildscape.BuildscapeCommon.LOGGER.warn("PillarIdManager: failed during addPillarDataFromSync", ignored);
             }
         }
     }

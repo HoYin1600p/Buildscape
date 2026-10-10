@@ -89,6 +89,7 @@ public class CosmeticsConfig {
                 }
                 loadedSuccessfully = true;
             } catch (Exception ignored) {
+                BuildscapeCommon.LOGGER.warn("Unable to read legacy cosmetics JSON", ignored);
             }
 
             if (loadedSuccessfully) {
@@ -97,6 +98,7 @@ public class CosmeticsConfig {
                 try {
                     Files.move(legacyPath, backupPath, StandardCopyOption.REPLACE_EXISTING);
                 } catch (Exception e) {
+                    BuildscapeCommon.LOGGER.warn("Unable to back up migrated legacy cosmetics JSON", e);
                     legacyJson.delete();
                 }
             }
@@ -122,7 +124,9 @@ public class CosmeticsConfig {
 
             UUID uuid = null;
             if (!key.equals("global")) {
-                try { uuid = UUID.fromString(key); } catch (Exception ignored) {}
+                try { uuid = UUID.fromString(key); } catch (Exception ignored) {
+                    // The reference retains the global fallback for unrecognized legacy player keys.
+                }
             }
 
             Map<Integer, String> cosmetics = new HashMap<>();
@@ -137,7 +141,9 @@ public class CosmeticsConfig {
                         try {
                             int slot = Integer.parseInt(cosEntry.getKey());
                             if (cosEntry.getValue() instanceof String) cosmetics.put(slot, (String) cosEntry.getValue());
-                        } catch (Exception ignored) {}
+                        } catch (Exception ignored) {
+                            // The reference skips malformed cosmetic slot keys while retaining valid slots.
+                        }
                     }
                 }
 
@@ -189,7 +195,9 @@ public class CosmeticsConfig {
                     for (String key : Services.PLATFORM.getTagKeys(equipped)) {
                         try {
                             cosmetics.put(Integer.parseInt(key), Services.PLATFORM.getTagString(equipped, key, ""));
-                        } catch (Exception ignored) {}
+                        } catch (Exception ignored) {
+                            // The reference skips malformed cosmetic slot keys while retaining valid slots.
+                        }
                     }
                 }
                 playerCosmetics.put(uuidStr, cosmetics);
@@ -278,7 +286,9 @@ public class CosmeticsConfig {
                     if (nbt.contains("colorPickerX")) colorPickerX = Services.PLATFORM.getTagInt(nbt, "colorPickerX", 0);
                     if (nbt.contains("colorPickerY")) colorPickerY = Services.PLATFORM.getTagInt(nbt, "colorPickerY", 0);
                 }
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+                BuildscapeCommon.LOGGER.warn("Unable to read global cosmetic settings", ignored);
+            }
         }
     }
 
@@ -290,7 +300,9 @@ public class CosmeticsConfig {
 
         try {
             Services.PLATFORM.writeCompressedTag(file, nbt);
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+            BuildscapeCommon.LOGGER.warn("Unable to save global cosmetic settings", ignored);
+        }
     }
 
     public Map<Integer, String> getEquippedCosmetics(UUID playerUuid) {

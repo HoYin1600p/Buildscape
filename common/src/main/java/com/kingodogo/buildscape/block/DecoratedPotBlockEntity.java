@@ -171,6 +171,7 @@ public class DecoratedPotBlockEntity extends DataBlockEntity implements WorldlyC
         try {
             this.lastWobbleStyle = WobbleStyle.valueOf(data.getStringOr("LastWobbleStyle", WobbleStyle.NONE.name()));
         } catch (IllegalArgumentException e) {
+            // The reference resets unknown saved wobble styles to NONE.
             this.lastWobbleStyle = WobbleStyle.NONE;
         }
     }

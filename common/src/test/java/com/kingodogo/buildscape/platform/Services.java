@@ -21,7 +21,27 @@ public class Services {
     /** Block registrations in registration order, filled when ModBlocks initialises. */
     public static final List<RegistrySupplier<?>> REGISTERED_BLOCKS = Collections.synchronizedList(new ArrayList<>());
 
-    public static final IPlatformAdapter PLATFORM = inert(IPlatformAdapter.class);
+    public static final IPlatformAdapter PLATFORM = (IPlatformAdapter) Proxy.newProxyInstance(
+            Services.class.getClassLoader(), new Class<?>[]{IPlatformAdapter.class}, (proxy, method, args) -> {
+                if (method.getName().equals("createBlockEntityType")) {
+                    // Same construction as the real adapter, so block entities can be built headless.
+                    @SuppressWarnings("unchecked")
+                    var isValid = (java.util.function.Predicate<net.minecraft.world.level.block.state.BlockState>) args[1];
+                    return blockEntityType((BlockEntityFactory<?>) args[0], isValid);
+                }
+                return defaultValue(method.getReturnType());
+            });
+
+    private static <T extends net.minecraft.world.level.block.entity.BlockEntity>
+    net.minecraft.world.level.block.entity.BlockEntityType<T> blockEntityType(
+            BlockEntityFactory<T> factory, java.util.function.Predicate<net.minecraft.world.level.block.state.BlockState> isValid) {
+        return new net.minecraft.world.level.block.entity.BlockEntityType<>(factory::create, java.util.Set.of()) {
+            @Override
+            public boolean isValid(net.minecraft.world.level.block.state.BlockState state) {
+                return isValid.test(state);
+            }
+        };
+    }
     public static final IRegistryAdapter REGISTRY = (IRegistryAdapter) Proxy.newProxyInstance(
             Services.class.getClassLoader(), new Class<?>[]{IRegistryAdapter.class}, (proxy, method, args) -> {
                 switch (method.getName()) {

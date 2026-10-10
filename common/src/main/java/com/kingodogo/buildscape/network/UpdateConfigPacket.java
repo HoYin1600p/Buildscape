@@ -127,7 +127,8 @@ public class UpdateConfigPacket implements CommonPacket {
                             BlockPos pos = pData.getBlockPos();
                             if (!level.hasChunkAt(pos)) continue;
                             level.sendBlockUpdated(pos, level.getBlockState(pos), level.getBlockState(pos), 3);
-                        } catch (Exception ignored) {
+                        } catch (Exception e) {
+                            com.kingodogo.buildscape.BuildscapeCommon.LOGGER.warn("Failed to resend block update for pillar after config update", e);
                         }
                     }
                 }

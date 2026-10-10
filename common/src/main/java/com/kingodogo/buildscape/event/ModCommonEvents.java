@@ -40,6 +40,10 @@ public final class ModCommonEvents {
     private ModCommonEvents() {}
 
     public static void onBlockPlaced(Level level, BlockPos pos, BlockState state, @Nullable Player player) {
+        SafeEventHooks.run("onBlockPlaced", () -> onBlockPlacedUnchecked(level, pos, state, player));
+    }
+
+    private static void onBlockPlacedUnchecked(Level level, BlockPos pos, BlockState state, @Nullable Player player) {
         MudToClayHandler.onBlockPlace(level, pos, state);
 
         if (player != null) {
@@ -56,6 +60,10 @@ public final class ModCommonEvents {
     }
 
     public static InteractionResult onRightClickBlock(Player player, Level level, InteractionHand hand, BlockPos pos, net.minecraft.core.Direction face) {
+        return SafeEventHooks.call("onRightClickBlock", () -> onRightClickBlockUnchecked(player, level, hand, pos, face), InteractionResult.PASS);
+    }
+
+    private static InteractionResult onRightClickBlockUnchecked(Player player, Level level, InteractionHand hand, BlockPos pos, net.minecraft.core.Direction face) {
         if (player == null || level == null || pos == null) return InteractionResult.PASS;
         InteractionResult bonemeal = BackportBonemealHandler.use(player, level, hand, pos, face);
         if (bonemeal != InteractionResult.PASS) return bonemeal;
@@ -116,6 +124,10 @@ public final class ModCommonEvents {
     }
 
     public static InteractionResult onLeftClickBlock(Player player, Level level, BlockPos pos) {
+        return SafeEventHooks.call("onLeftClickBlock", () -> onLeftClickBlockUnchecked(player, level, pos), InteractionResult.PASS);
+    }
+
+    private static InteractionResult onLeftClickBlockUnchecked(Player player, Level level, BlockPos pos) {
         if (player == null || level == null || pos == null || player.isSpectator()) return InteractionResult.PASS;
         ItemStack held = player.getItemInHand(InteractionHand.MAIN_HAND);
         if (held.getItem() instanceof com.kingodogo.buildscape.item.BiomeBrushItem brush) {
@@ -203,6 +215,10 @@ public final class ModCommonEvents {
     }
 
     public static InteractionResult onRightClickItem(Player player, Level level, InteractionHand hand) {
+        return SafeEventHooks.call("onRightClickItem", () -> onRightClickItemUnchecked(player, level, hand), InteractionResult.PASS);
+    }
+
+    private static InteractionResult onRightClickItemUnchecked(Player player, Level level, InteractionHand hand) {
         if (player == null || level == null) return InteractionResult.PASS;
         ItemStack held = player.getItemInHand(hand);
         if (held.getItem() instanceof com.kingodogo.buildscape.item.ConfettiItem) {
@@ -250,6 +266,10 @@ public final class ModCommonEvents {
     }
 
     public static void onItemUseFinish(LivingEntity entity, ItemStack stack) {
+        SafeEventHooks.run("onItemUseFinish", () -> onItemUseFinishUnchecked(entity, stack));
+    }
+
+    private static void onItemUseFinishUnchecked(LivingEntity entity, ItemStack stack) {
         if (entity instanceof Player player && !Services.PLATFORM.getEntityLevel(player).isClientSide()
                 && stack.is(net.minecraft.world.item.Items.SUSPICIOUS_STEW)) {
             CompoundTag data = Services.PLATFORM.getCustomData(stack, false);
@@ -389,6 +409,10 @@ public final class ModCommonEvents {
     }
 
     public static InteractionResult onEntityInteract(Player player, Level level, InteractionHand hand, Entity target) {
+        return SafeEventHooks.call("onEntityInteract", () -> onEntityInteractUnchecked(player, level, hand, target), InteractionResult.PASS);
+    }
+
+    private static InteractionResult onEntityInteractUnchecked(Player player, Level level, InteractionHand hand, Entity target) {
         if (player instanceof ServerPlayer serverPlayer) {
             if (target instanceof com.kingodogo.buildscape.entity.FestiveWanderingHomemakerEntity) {
                 AdvancementEvents.grant(serverPlayer, "its_beginning_to_look_a_lot_like_christmas");

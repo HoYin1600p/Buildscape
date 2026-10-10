@@ -161,10 +161,10 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
     }
 
     public static Fluid getSourceFluid(BlockState state, @Nullable BlockEntity be) {
-        if (state.getValue(WATERLOGGED)) {
+        if (state.hasProperty(WATERLOGGED) && state.getValue(WATERLOGGED)) {
             return Fluids.WATER;
         }
-        if (state.getValue(LAVA_LOGGED)) {
+        if (state.hasProperty(LAVA_LOGGED) && state.getValue(LAVA_LOGGED)) {
             return Fluids.LAVA;
         }
         if (be instanceof HollowLogBlockEntity hollowBe) {

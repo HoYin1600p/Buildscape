@@ -32,16 +32,18 @@ public final class AdvancementEvents {
             com.kingodogo.buildscape.BuildscapeCommon.LOGGER.warn("Advancement access is not registered for {}", id);
             return false;
         }
-        return access.grant(player, id);
+        return SafeEventHooks.call("advancement grant", () -> access.grant(player, id), false);
     }
 
     public static boolean isDone(ServerPlayer player, String id) {
-        return access != null && access.isDone(player, id);
+        return player != null && access != null
+                && SafeEventHooks.call("advancement progress", () -> access.isDone(player, id), false);
     }
 
     public static int incrementStat(ServerPlayer player, String id, int amount) {
-        if (access == null) throw new IllegalStateException("Advancement access is not registered");
-        return access.incrementStat(player, new CommonId("buildscape", id), amount);
+        if (player == null || access == null) return 0;
+        return SafeEventHooks.call("custom stat increment", () ->
+                access.incrementStat(player, new CommonId("buildscape", id), amount), 0);
     }
 
     public static void onAdvancementEarned(ServerPlayer player, CommonId id) {
@@ -98,14 +100,14 @@ public final class AdvancementEvents {
     }
 
     public static void onPillarItemInserted(ServerPlayer player) {
-        AdvancementMilestoneLogic.onPillarItemInserted(player);
+        SafeEventHooks.run("pillar advancement", () -> AdvancementMilestoneLogic.onPillarItemInserted(player));
     }
 
     public static void onHammerReplace(ServerPlayer player) {
-        AdvancementMilestoneLogic.onHammerReplace(player);
+        SafeEventHooks.run("hammer advancement", () -> AdvancementMilestoneLogic.onHammerReplace(player));
     }
 
     public static void onConfettiUsed(ServerPlayer player) {
-        AdvancementMilestoneLogic.onConfettiUsed(player);
+        SafeEventHooks.run("confetti advancement", () -> AdvancementMilestoneLogic.onConfettiUsed(player));
     }
 }

@@ -317,8 +317,9 @@ public class PillarBlock extends Block implements EntityBlock, SimpleWaterlogged
     @Override
     public BlockState onUpdateShape(BlockState state, Direction direction, BlockState neighborState, LevelReader level, BlockPos pos, BlockPos neighborPos) {
         if (direction == Direction.UP || direction == Direction.DOWN) {
-            BlockState below = level.getBlockState(pos.below());
-            BlockState above = level.getBlockState(pos.above());
+            // The shape-update argument is authoritative, including during replacement/removal.
+            BlockState below = direction == Direction.DOWN ? neighborState : level.getBlockState(pos.below());
+            BlockState above = direction == Direction.UP ? neighborState : level.getBlockState(pos.above());
             boolean hasAbove = above.getBlock() instanceof PillarBlock && !(above.getBlock() instanceof AshenKingPillarBlock);
             boolean hasBelow = below.getBlock() instanceof PillarBlock && !(below.getBlock() instanceof AshenKingPillarBlock);
 

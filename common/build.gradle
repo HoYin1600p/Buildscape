@@ -124,3 +124,21 @@ tasks.named('jar', Jar) {
     from sourceSets.v26x.output
 }
 tasks.named('assemble') { dependsOn tasks.named('v26xClasses') }
+
+// Explicit tooling only: no dependency from test, check, assemble or build.
+tasks.register('dumpBlockStates', JavaExec) {
+    group = 'showcase'
+    description = 'Dumps every Buildscape block state against Minecraft 26.2'
+    dependsOn tasks.named('testClasses'), tasks.named('v26xClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.kingodogo.buildscape.showcase.DumpBlockStates'
+    javaLauncher = javaToolchains.launcherFor { languageVersion = JavaLanguageVersion.of(25) }
+    workingDir = layout.buildDirectory.get().asFile
+    systemProperty 'buildscape.mainResources', file('src/main/resources').absolutePath
+    doFirst {
+        workingDir.mkdirs()
+        args = [providers.gradleProperty('showcaseOutput')
+                .map { file(it).absolutePath }
+                .getOrElse(layout.buildDirectory.file('showcase/blockstates.json').get().asFile.absolutePath)]
+    }
+}

@@ -402,9 +402,12 @@ p.write_text(json.dumps({'converted': True, 'new': (root / 'data/kept.json').exi
         self.assertEqual(config["source"]["remote_url"], "https://github.com/HoYin1600p/Buildscape.git")
         active = [t for t in config["targets"] if t["status"] == "active"]
         self.assertEqual([t["id"] for t in active], ["mc26.2"])
-        self.assertEqual(active[0]["base_commit"], "c7d7112cbb351e3f50f9c147dde92ee628553bef")
+        # The base advances with every applied sync, so only its shape is fixed.
+        self.assertRegex(active[0]["base_commit"], r"^[0-9a-f]{40}$")
         self.assertEqual(active[0]["loaders"], ["fabric", "neoforge"])
         for t in config["targets"]:
+            # Every version is a folder on the one multi-version branch.
+            self.assertEqual(t["branch"], "port/26.2")
             if t["status"] != "active":
                 self.assertIsNone(t["base_commit"])
             if t["minecraft"] == "26.3":

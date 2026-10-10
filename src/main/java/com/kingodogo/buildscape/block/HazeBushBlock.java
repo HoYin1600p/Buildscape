@@ -21,15 +21,12 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
-import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.registries.RegistryObject;
 
 import javax.annotation.Nullable;
-import java.util.Collections;
-import java.util.List;
 import java.util.Random;
 
 public class HazeBushBlock extends ModBushBlock {
@@ -127,24 +124,6 @@ public class HazeBushBlock extends ModBushBlock {
     }
 
     @Override
-    public void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean isMoving) {
-        super.onPlace(state, level, pos, oldState, isMoving);
-        if (level.isClientSide) {
-            com.kingodogo.buildscape.client.HazeBushParticleHandler.track(pos);
-        }
-    }
-
-    @Override
-    public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
-        if (!state.is(newState.getBlock())) {
-            if (level.isClientSide) {
-                com.kingodogo.buildscape.client.HazeBushParticleHandler.untrack(pos);
-            }
-        }
-        super.onRemove(state, level, pos, newState, isMoving);
-    }
-
-    @Override
     public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
         ItemStack held = player.getItemInHand(hand);
 
@@ -214,18 +193,6 @@ public class HazeBushBlock extends ModBushBlock {
         }
 
         return super.use(state, level, pos, player, hand, hitResult);
-    }
-
-    @Override
-    public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
-        ItemStack stack = new ItemStack(this);
-        if (!state.getValue(HAS_HAZE)) {
-            CompoundTag blockStateTag = new CompoundTag();
-            blockStateTag.putString("has_haze", "false");
-            stack.addTagElement("BlockStateTag", blockStateTag);
-            stack.getOrCreateTag().putBoolean("HasHaze", false);
-        }
-        return Collections.singletonList(stack);
     }
 
     @Override

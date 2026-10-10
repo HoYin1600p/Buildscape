@@ -12330,7 +12330,8 @@ public class ModBlocks {
 
         private static RegistryObject<Block> registerHazeBush(DyeColor color) {
                 RegistryObject<Block> obj = BLOCKS.register(color.getName() + "_haze_bush",
-                                () -> new HazeBushBlock(color, BlockBehaviour.Properties.copy(Blocks.DEAD_BUSH)));
+                                () -> new HazeBushBlock(color, BlockBehaviour.Properties.of(Material.PLANT, MaterialColor.WOOD)
+                                                .noCollission().instabreak().sound(SoundType.GRASS)));
                 COLORED_HAZE_BUSHES.put(color, obj);
                 return obj;
         }

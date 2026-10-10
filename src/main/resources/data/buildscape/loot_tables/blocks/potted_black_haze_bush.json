@@ -26,16 +26,7 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "buildscape:black_haze_bush",
-          "functions": [
-            {
-              "block": "buildscape:potted_black_haze_bush",
-              "function": "minecraft:copy_state",
-              "properties": [
-                "has_haze"
-              ]
-            }
-          ]
+          "name": "buildscape:black_haze_bush"
         }
       ],
       "rolls": 1.0

@@ -26,16 +26,7 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "buildscape:gray_haze_bush",
-          "functions": [
-            {
-              "block": "buildscape:potted_gray_haze_bush",
-              "function": "minecraft:copy_state",
-              "properties": [
-                "has_haze"
-              ]
-            }
-          ]
+          "name": "buildscape:gray_haze_bush"
         }
       ],
       "rolls": 1.0

@@ -12,14 +12,6 @@ import com.kingodogo.buildscape.world.ModGameRules;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.components.AbstractWidget;
-import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.components.events.GuiEventListener;
-import net.minecraft.client.gui.screens.PauseScreen;
-import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.screens.inventory.StonecutterScreen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
@@ -175,108 +167,61 @@ public class MixinFactory implements IMixinFactory {
         menu.broadcastChanges();
     }
 
-    @Override
-    public void renderSignFrame(SignBlockEntity blockEntity, float partialTicks, PoseStack poseStack, Object bufferSource, int combinedLight, int combinedOverlay) {
-    }
+    @Override public void renderSignFrame(SignBlockEntity blockEntity, float partialTicks, PoseStack poseStack, Object bufferSource, int combinedLight, int combinedOverlay) { com.kingodogo.buildscape.adapter.v26x.client.ClientMixinHooks.renderSignFrame(blockEntity, partialTicks, poseStack, bufferSource, combinedLight, combinedOverlay); }
 
-    private static void addWidgetToScreen(Screen screen, AbstractWidget widget) {
-        try {
-            for (java.lang.reflect.Method m : Screen.class.getDeclaredMethods()) {
-                if (m.getParameterCount() == 1 && (m.getName().equals("addRenderableWidget") || m.getName().equals("m_142416_"))) {
-                    m.setAccessible(true);
-                    m.invoke(screen, widget);
-                    return;
-                }
-            }
-            for (java.lang.reflect.Field f : Screen.class.getDeclaredFields()) {
-                if (java.util.List.class.isAssignableFrom(f.getType())) {
-                    f.setAccessible(true);
-                    java.util.List list = (java.util.List) f.get(screen);
-                    if (list != null) list.add(widget);
-                }
-            }
-        } catch (Throwable exception) {
-            com.kingodogo.buildscape.BuildscapeCommon.LOGGER.warn("Failed to add Buildscape screen widget", exception);
-        }
-    }
 
-    @Override
-    public void addPauseScreenButton(PauseScreen screen, int width, int height, List<? extends GuiEventListener> children) {
-        if (BuildscapeClientConfig.get().isConfigButtonHidden()) return;
 
-        int targetX = width / 2 + 104;
-        int targetY = height / 4 + 48;
+    @Override public void addPauseScreenButton(net.minecraft.client.gui.screens.PauseScreen screen, int width, int height, List<? extends net.minecraft.client.gui.components.events.GuiEventListener> children) { com.kingodogo.buildscape.adapter.v26x.client.ClientMixinHooks.addPauseScreenButton(screen, width, height, children); }
 
-        for (GuiEventListener listener : children) {
-            if (listener instanceof AbstractWidget widget) {
-                String text = widget.getMessage().getString();
-                if (text.contains("Stats") || text.contains("Statistics")) {
-                    targetX = widget.getX() + widget.getWidth() + 4;
-                    targetY = widget.getY();
-                    break;
-                }
-            }
-        }
+    @Override public void addStonecutterCutAllButton(net.minecraft.client.gui.screens.inventory.StonecutterScreen screen, int x, int y, StonecutterMenu menu) { com.kingodogo.buildscape.adapter.v26x.client.ClientMixinHooks.addStonecutterCutAllButton(screen, x, y, menu); }
 
-        Button button = Button.builder(Component.literal("BS"), b -> {
-            Minecraft.getInstance().setScreenAndShow(Services.PLATFORM.createConfigScreen((Screen) (Object) screen));
-        }).bounds(targetX, targetY, 20, 20).build();
-        addWidgetToScreen((Screen) (Object) screen, (AbstractWidget) (Object) button);
-    }
+    @Override public void renderClippedBeaconBeam(BeaconBlockEntity blockEntity, float partialTicks, PoseStack poseStack, Object bufferSource, int combinedLight, int combinedOverlay) { com.kingodogo.buildscape.adapter.v26x.client.ClientMixinHooks.renderClippedBeaconBeam(blockEntity, partialTicks, poseStack, bufferSource, combinedLight, combinedOverlay); }
 
-    @Override
-    public void addStonecutterCutAllButton(StonecutterScreen screen, int x, int y, StonecutterMenu menu) {
-        Button button = Button.builder(Component.literal("All"), b -> {
-            boolean active = !((StonecutterMenuExtension) menu).buildscape$isCutAll();
-            ((StonecutterMenuExtension) menu).buildscape$setCutAll(active);
-            Minecraft mc = Minecraft.getInstance();
-            if (mc.gameMode != null) {
-                mc.gameMode.handleInventoryButtonClick(menu.containerId, -123);
-            }
-        }).bounds(x, y, 18, 10).build();
-        addWidgetToScreen((Screen) (Object) screen, (AbstractWidget) (Object) button);
-    }
+    @Override public void renderFilterPlaceholder(AbstractContainerMenu menu, Slot slot, PoseStack poseStack) { com.kingodogo.buildscape.adapter.v26x.client.ClientMixinHooks.renderFilterPlaceholder(menu, slot, poseStack); }
 
-    @Override
-    public void renderClippedBeaconBeam(BeaconBlockEntity blockEntity, float partialTicks, PoseStack poseStack, Object bufferSource, int combinedLight, int combinedOverlay) {
-    }
-
-    @Override
-    public void renderFilterPlaceholder(AbstractContainerMenu menu, Slot slot, PoseStack poseStack) {
-    }
-
-    @Override
-    public void renderAnvilZeroCostLabel(Object anvilScreen, Object poseStack) {
-    }
+    @Override public void renderAnvilZeroCostLabel(Object anvilScreen, Object poseStack) { com.kingodogo.buildscape.adapter.v26x.client.ClientMixinHooks.renderAnvilZeroCostLabel(anvilScreen, poseStack); }
 
     @Override
     public void arrangeCreativeTabs(CreativeModeTab tab, NonNullList<ItemStack> items) {
+        var key = BuiltInRegistries.CREATIVE_MODE_TAB.getKey(tab);
+        if (key == null || !key.getNamespace().equals("minecraft")
+                || !(key.getPath().equals("building_blocks") || key.getPath().equals("functional_blocks"))) return;
+        java.util.Map<net.minecraft.resources.Identifier, ItemStack> byId = new java.util.HashMap<>();
+        for (ItemStack stack : items) byId.put(BuiltInRegistries.ITEM.getKey(stack.getItem()), stack);
+        java.util.Map<ItemStack, ItemStack> insertAfter = new java.util.IdentityHashMap<>();
+        Set<ItemStack> moved = java.util.Collections.newSetFromMap(new java.util.IdentityHashMap<>());
+        for (ItemStack stack : items) {
+            var id = BuiltInRegistries.ITEM.getKey(stack.getItem());
+            if (!id.getNamespace().equals("buildscape") || !id.getPath().endsWith("_vertical_slab")) continue;
+            String base = id.getPath().substring(0, id.getPath().length() - "_vertical_slab".length());
+            ItemStack anchor = byId.get(net.minecraft.resources.Identifier.withDefaultNamespace(base + "_slab"));
+            if (anchor == null) anchor = byId.get(net.minecraft.resources.Identifier.withDefaultNamespace(base));
+            if (anchor != null) { insertAfter.put(anchor, stack); moved.add(stack); }
+        }
+        NonNullList<ItemStack> ordered = NonNullList.create();
+        for (ItemStack stack : items) {
+            if (moved.contains(stack)) continue;
+            ordered.add(stack);
+            ItemStack following = insertAfter.get(stack);
+            if (following != null) ordered.add(following);
+        }
+        items.clear();
+        items.addAll(ordered);
     }
 
-    @Override
-    public VertexConsumer getFestiveFoilBufferDirect(Object bufferSource, Object renderType, boolean noEntity) {
-        return null;
+    @Override public void renderFilterPlaceholder(AbstractContainerMenu menu, Slot slot, Object graphics) {
+        com.kingodogo.buildscape.adapter.v26x.client.ClientMixinHooks.renderFilterPlaceholder(menu, slot, graphics);
     }
 
-    @Override
-    public VertexConsumer getFestiveFoilBuffer(Object bufferSource, Object renderType, boolean isItem) {
-        return null;
-    }
+    @Override public VertexConsumer getFestiveFoilBufferDirect(Object bufferSource, Object renderType, boolean noEntity) { return com.kingodogo.buildscape.adapter.v26x.client.ClientMixinHooks.getFestiveFoilBufferDirect(bufferSource, renderType, noEntity); }
 
-    @Override
-    public VertexConsumer getFestiveArmorFoilBuffer(Object bufferSource, Object renderType, boolean isItem) {
-        return null;
-    }
+    @Override public VertexConsumer getFestiveFoilBuffer(Object bufferSource, Object renderType, boolean isItem) { return com.kingodogo.buildscape.adapter.v26x.client.ClientMixinHooks.getFestiveFoilBuffer(bufferSource, renderType, isItem); }
 
-    @Override
-    public VertexConsumer getFestiveCompassFoilBuffer(Object bufferSource, Object renderType, PoseStack.Pose pose) {
-        return null;
-    }
+    @Override public VertexConsumer getFestiveArmorFoilBuffer(Object bufferSource, Object renderType, boolean isItem) { return com.kingodogo.buildscape.adapter.v26x.client.ClientMixinHooks.getFestiveArmorFoilBuffer(bufferSource, renderType, isItem); }
 
-    @Override
-    public VertexConsumer getFestiveCompassFoilBufferDirect(Object bufferSource, Object renderType, PoseStack.Pose pose) {
-        return null;
-    }
+    @Override public VertexConsumer getFestiveCompassFoilBuffer(Object bufferSource, Object renderType, PoseStack.Pose pose) { return com.kingodogo.buildscape.adapter.v26x.client.ClientMixinHooks.getFestiveCompassFoilBuffer(bufferSource, renderType, pose); }
+
+    @Override public VertexConsumer getFestiveCompassFoilBufferDirect(Object bufferSource, Object renderType, PoseStack.Pose pose) { return com.kingodogo.buildscape.adapter.v26x.client.ClientMixinHooks.getFestiveCompassFoilBufferDirect(bufferSource, renderType, pose); }
 
     @Override
     public boolean isPlanterPlant(Block block) {
@@ -317,12 +262,7 @@ public class MixinFactory implements IMixinFactory {
         }
     }
 
-    @Override
-    public void setScreen(Object screen) {
-        if (Minecraft.getInstance() != null) {
-            Minecraft.getInstance().setScreenAndShow((net.minecraft.client.gui.screens.Screen) screen);
-        }
-    }
+    @Override public void setScreen(Object screen) { com.kingodogo.buildscape.adapter.v26x.client.ClientMixinHooks.setScreen(screen); }
 
     @Override
     public void migrateStoredGhostItems(Object inputOrTag) {
@@ -420,24 +360,24 @@ public class MixinFactory implements IMixinFactory {
                 default -> "item.minecraft.firework_star.shape.custom";
             };
 
-            tooltip.add(com.kingodogo.buildscape.platform.Services.PLATFORM.translatable(shapeTranslationKey).withStyle(net.minecraft.ChatFormatting.GRAY));
+            tooltip.add(net.minecraft.network.chat.Component.translatable(shapeTranslationKey).withStyle(net.minecraft.ChatFormatting.GRAY));
 
             int[] colors = tag.getIntArray("Colors").orElse(new int[0]);
             if (colors.length > 0) {
-                tooltip.add(appendFireworkColors(com.kingodogo.buildscape.platform.Services.PLATFORM.literal("").withStyle(net.minecraft.ChatFormatting.GRAY), colors));
+                tooltip.add(appendFireworkColors(net.minecraft.network.chat.Component.literal("").withStyle(net.minecraft.ChatFormatting.GRAY), colors));
             }
 
             int[] fadeColors = tag.getIntArray("FadeColors").orElse(new int[0]);
             if (fadeColors.length > 0) {
-                tooltip.add(appendFireworkColors(com.kingodogo.buildscape.platform.Services.PLATFORM.translatable("item.minecraft.firework_star.fade_to").append(" ").withStyle(net.minecraft.ChatFormatting.GRAY), fadeColors));
+                tooltip.add(appendFireworkColors(net.minecraft.network.chat.Component.translatable("item.minecraft.firework_star.fade_to").append(" ").withStyle(net.minecraft.ChatFormatting.GRAY), fadeColors));
             }
 
             if (tag.getBooleanOr("Flicker", false)) {
-                tooltip.add(com.kingodogo.buildscape.platform.Services.PLATFORM.translatable("item.minecraft.firework_star.flicker").withStyle(net.minecraft.ChatFormatting.GRAY));
+                tooltip.add(net.minecraft.network.chat.Component.translatable("item.minecraft.firework_star.flicker").withStyle(net.minecraft.ChatFormatting.GRAY));
             }
 
             if (tag.getBooleanOr("Trail", false)) {
-                tooltip.add(com.kingodogo.buildscape.platform.Services.PLATFORM.translatable("item.minecraft.firework_star.trail").withStyle(net.minecraft.ChatFormatting.GRAY));
+                tooltip.add(net.minecraft.network.chat.Component.translatable("item.minecraft.firework_star.trail").withStyle(net.minecraft.ChatFormatting.GRAY));
             }
 
             return true;
@@ -446,7 +386,7 @@ public class MixinFactory implements IMixinFactory {
     }
 
     private static net.minecraft.network.chat.Component appendFireworkColors(net.minecraft.network.chat.MutableComponent component, int[] colors) {
-        net.minecraft.network.chat.MutableComponent textcomponent = com.kingodogo.buildscape.platform.Services.PLATFORM.literal("");
+        net.minecraft.network.chat.MutableComponent textcomponent = net.minecraft.network.chat.Component.literal("");
         for (int i = 0; i < colors.length; ++i) {
             if (i > 0) {
                 textcomponent.append(", ");
@@ -459,9 +399,9 @@ public class MixinFactory implements IMixinFactory {
     private static net.minecraft.network.chat.Component getFireworkColorName(int color) {
         net.minecraft.world.item.DyeColor dyecolor = net.minecraft.world.item.DyeColor.byFireworkColor(color);
         if (dyecolor == null) {
-            return com.kingodogo.buildscape.platform.Services.PLATFORM.translatable("item.minecraft.firework_star.custom_color");
+            return net.minecraft.network.chat.Component.translatable("item.minecraft.firework_star.custom_color");
         } else {
-            return com.kingodogo.buildscape.platform.Services.PLATFORM.translatable("item.minecraft.firework_star." + dyecolor.getName());
+            return net.minecraft.network.chat.Component.translatable("item.minecraft.firework_star." + dyecolor.getName());
         }
     }
 

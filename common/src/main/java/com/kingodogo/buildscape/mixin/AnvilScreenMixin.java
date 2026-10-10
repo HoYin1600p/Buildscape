@@ -13,12 +13,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class AnvilScreenMixin {
     @Inject(method = "extractLabels(Lnet/minecraft/client/gui/GuiGraphicsExtractor;II)V", at = @At("TAIL"))
     private void buildscape$renderZeroCostLabel(GuiGraphicsExtractor graphics, int mouseX, int mouseY, CallbackInfo ci) {
-        AnvilScreen screen = (AnvilScreen) (Object) this;
-        if (screen.getMenu().getCost() != 0 || !screen.getMenu().getSlot(2).hasItem()) return;
-        var font = Minecraft.getInstance().font;
-        Component label = Component.translatable("container.repair.cost", 0);
-        int x = 166 - font.width(label);
-        graphics.fill(x - 2, 67, 168, 79, 0x4F000000);
-        graphics.text(font, label, x, 69, 0xFF80FF20);
+        com.kingodogo.buildscape.mixinsupport.MixinFactory.renderAnvilZeroCostLabel(this, graphics);
     }
 }

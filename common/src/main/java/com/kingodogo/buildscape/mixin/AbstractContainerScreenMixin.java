@@ -35,11 +35,6 @@ public abstract class AbstractContainerScreenMixin {
     @Inject(method = "extractSlot(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/world/inventory/Slot;II)V", at = @At("TAIL"))
     private void renderFilterPlaceholder(GuiGraphicsExtractor graphics, Slot slot, int mouseX, int mouseY, CallbackInfo ci) {
         AbstractContainerScreen<?> screen = (AbstractContainerScreen<?>) (Object) this;
-        if (slot.hasItem() || !slot.isActive() || !(screen.getMenu() instanceof GhostFilterMenu filters)) return;
-        Item filter = filters.buildscape$getFilterItem(slot.index);
-        if (filter == null) return;
-        graphics.fakeItem(new ItemStack(filter), slot.x, slot.y);
-        // Fade the placeholder without affecting item render state or the actual slot contents.
-        graphics.fill(slot.x, slot.y, slot.x + 16, slot.y + 16, 0x80C6C6C6);
+        MixinFactory.renderFilterPlaceholder(screen.getMenu(), slot, graphics);
     }
 }

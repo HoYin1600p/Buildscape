@@ -4,7 +4,6 @@ import com.kingodogo.buildscape.network.CommonPacket;
 import com.kingodogo.buildscape.network.IPacketFactory;
 import com.kingodogo.buildscape.network.PacketDirection;
 import com.kingodogo.buildscape.util.CommonId;
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
@@ -102,8 +101,7 @@ public class PacketFactory implements IPacketFactory {
             if (buf.readableBytes() > 0) {
                 com.kingodogo.buildscape.BuildscapeCommon.LOGGER.warn("Packet {} had {} trailing unread bytes", id, buf.readableBytes());
             }
-            Minecraft mc = Minecraft.getInstance();
-            mc.execute(() -> pkt.handle(player != null ? player : (Player) (Object) mc.player));
+            com.kingodogo.buildscape.adapter.v26x.client.ClientPacketHooks.handle(pkt, player);
         } catch (Throwable t) {
             com.kingodogo.buildscape.BuildscapeCommon.LOGGER.error("Failed to decode or handle clientbound packet {}", id, t);
         }
@@ -178,11 +176,7 @@ public class PacketFactory implements IPacketFactory {
     @Override
     public void sendToServer(CommonPacket packet) {
         try {
-            Minecraft mc = Minecraft.getInstance();
-            if (mc.getConnection() != null) {
-                CustomPacketPayload payload = createPayload(packet);
-                mc.getConnection().send(new ServerboundCustomPayloadPacket(payload));
-            }
+            com.kingodogo.buildscape.adapter.v26x.client.ClientPacketHooks.send(createPayload(packet));
         } catch (Throwable t) {
             com.kingodogo.buildscape.BuildscapeCommon.LOGGER.error("Failed to send packet to server: {}", packet.getId(), t);
         }
@@ -210,9 +204,10 @@ public class PacketFactory implements IPacketFactory {
         }
 
         try {
-            Minecraft mc = Minecraft.getInstance();
-            if (mc.hasSingleplayerServer() && mc.getSingleplayerServer() != null) {
-                for (ServerPlayer player : mc.getSingleplayerServer().getPlayerList().getPlayers()) {
+            if (!com.kingodogo.buildscape.platform.Services.PLATFORM.isClient()) return;
+            MinecraftServer integrated = com.kingodogo.buildscape.adapter.v26x.client.ClientPacketHooks.integratedServer();
+            if (integrated != null) {
+                for (ServerPlayer player : integrated.getPlayerList().getPlayers()) {
                     sendToPlayer(player, packet);
                 }
             }

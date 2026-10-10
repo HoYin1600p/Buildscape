@@ -54,6 +54,10 @@ public interface IMixinFactory {
 
     void renderFilterPlaceholder(AbstractContainerMenu menu, Slot slot, PoseStack poseStack);
 
+    default void renderFilterPlaceholder(AbstractContainerMenu menu, Slot slot, Object graphics) {
+        if (graphics instanceof PoseStack pose) renderFilterPlaceholder(menu, slot, pose);
+    }
+
     void renderAnvilZeroCostLabel(Object anvilScreen, Object poseStack);
 
     void arrangeCreativeTabs(CreativeModeTab tab, NonNullList<ItemStack> items);

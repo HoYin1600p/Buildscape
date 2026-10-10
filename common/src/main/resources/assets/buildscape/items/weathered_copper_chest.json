@@ -1,6 +1,10 @@
 {
-  "model": {
-    "type": "minecraft:model",
-    "model": "buildscape:block/weathered_copper_chest"
-  }
+    "model":  {
+                  "type":  "minecraft:special",
+                  "base":  "buildscape:item/weathered_copper_chest",
+                  "model":  {
+                                "type":  "buildscape:copper_chest",
+                                "texture":  "buildscape:textures/entity/chest/weathered_copper_chest.png"
+                            }
+              }
 }

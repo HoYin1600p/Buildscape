@@ -45,16 +45,22 @@
     "AbstractContainerScreenMixin",
     "AnvilScreenMixin",
     "BeaconBlockEntityRendererMixin",
+    "CreativeModeTabMixin",
     "ElytraLayerMixin",
     "FireworkStarterMixin",
+    "FireworkStarItemMixin",
+    "GlassJarRenderShapeMixin",
     "HumanoidArmorLayerMixin",
     "ItemRendererMixin",
     "PauseScreenMixin",
+    "SignRendererMixin",
     "ThrownTridentRendererMixin",
     "ItemModelResolverMixin",
     "ItemStackRenderStateMixin",
     "ItemFeatureSubmitMixin",
-    "ModelSubmitMixin"
+    "ModelSubmitMixin",
+    "SpellcasterIllagerMixin",
+    "WorldOverlayExtractionMixin"
   ],
   "injectors": {
     "defaultRequire": 1

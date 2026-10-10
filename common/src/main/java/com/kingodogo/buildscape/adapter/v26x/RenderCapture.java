@@ -13,16 +13,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 /** Captures the existing helpers' drawing during extraction, without retaining live entities. */
-final class RenderCapture {
+public final class RenderCapture {
     @FunctionalInterface
-    interface Draw {
+    public interface Draw {
         void submit(PoseStack pose, SubmitNodeCollector collector, CameraRenderState camera);
     }
 
     private final List<Draw> draws = new ArrayList<>();
     private VertexConsumer translucent;
 
-    void record(PoseStack pose, Draw draw) {
+    public void record(PoseStack pose, Draw draw) {
         Matrix4f transform = new Matrix4f(pose.last().pose());
         draws.add((targetPose, collector, camera) -> {
             targetPose.pushPose();
@@ -35,16 +35,16 @@ final class RenderCapture {
         });
     }
 
-    void submit(PoseStack pose, SubmitNodeCollector collector, CameraRenderState camera) {
+    public void submit(PoseStack pose, SubmitNodeCollector collector, CameraRenderState camera) {
         for (Draw draw : draws) draw.submit(pose, collector, camera);
     }
 
-    VertexConsumer translucent() {
+    public VertexConsumer translucent() {
         if (translucent == null) translucent = geometry(RenderTypes.entityTranslucent(TextureAtlas.LOCATION_BLOCKS));
         return translucent;
     }
 
-    VertexConsumer geometry(RenderType type) {
+    public VertexConsumer geometry(RenderType type) {
         List<Vertex> vertices = new ArrayList<>();
         draws.add((pose, collector, camera) -> collector.submitCustomGeometry(pose, type, (transform, consumer) -> {
             for (Vertex vertex : vertices) {

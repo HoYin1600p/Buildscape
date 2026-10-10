@@ -65,9 +65,11 @@ public final class GuiProvider {
                             @Override
                             public void extractContents(net.minecraft.client.gui.GuiGraphicsExtractor extractor,
                                                         int mouseX, int mouseY, float partialTick) {
-                                delegate.renderBg(extractor, partialTick, mouseX, mouseY, delegateLeft(), this.topPos);
+                                com.kingodogo.buildscape.adapter.v26x.client.ClientGuiHooks.withGraphics(extractor,
+                                        () -> delegate.renderBg(extractor, partialTick, mouseX, mouseY, delegateLeft(), this.topPos));
                                 super.extractContents(extractor, mouseX, mouseY, partialTick);
-                                delegate.renderRerollControls(extractor, mouseX, mouseY, delegateLeft(), this.topPos);
+                                com.kingodogo.buildscape.adapter.v26x.client.ClientGuiHooks.withGraphics(extractor,
+                                        () -> delegate.renderRerollControls(extractor, mouseX, mouseY, delegateLeft(), this.topPos));
                             }
 
                             @Override
@@ -101,7 +103,8 @@ public final class GuiProvider {
                             @Override
                             public void extractContents(net.minecraft.client.gui.GuiGraphicsExtractor extractor,
                                                         int mouseX, int mouseY, float partialTick) {
-                                delegate.renderBg(extractor, partialTick, mouseX, mouseY, this.leftPos, this.topPos);
+                                com.kingodogo.buildscape.adapter.v26x.client.ClientGuiHooks.withGraphics(extractor,
+                                        () -> delegate.renderBg(extractor, partialTick, mouseX, mouseY, this.leftPos, this.topPos));
                                 super.extractContents(extractor, mouseX, mouseY, partialTick);
                             }
                         };
@@ -118,8 +121,10 @@ public final class GuiProvider {
             @Override
             public void extractRenderState(net.minecraft.client.gui.GuiGraphicsExtractor extractor, int mouseX, int mouseY, float partialTick) {
                 super.extractRenderState(extractor, mouseX, mouseY, partialTick);
-                delegate.render(extractor, mouseX, mouseY, partialTick);
-                delegate.renderAfterWidgets(extractor, mouseX, mouseY, partialTick);
+                com.kingodogo.buildscape.adapter.v26x.client.ClientGuiHooks.withGraphics(extractor, () -> {
+                    delegate.render(extractor, mouseX, mouseY, partialTick);
+                    delegate.renderAfterWidgets(extractor, mouseX, mouseY, partialTick);
+                });
             }
 
             @Override
@@ -246,7 +251,8 @@ public final class GuiProvider {
         return new net.minecraft.client.gui.components.Button(x, y, width, height, message, onPress, supplier -> supplier.get()) {
             @Override
             protected void extractContents(net.minecraft.client.gui.GuiGraphicsExtractor extractor, int mouseX, int mouseY, float partialTick) {
-                renderer.render(this, extractor, mouseX, mouseY, partialTick);
+                com.kingodogo.buildscape.adapter.v26x.client.ClientGuiHooks.withGraphics(extractor,
+                        () -> renderer.render(this, extractor, mouseX, mouseY, partialTick));
             }
         };
     }
@@ -261,7 +267,8 @@ public final class GuiProvider {
         return new net.minecraft.client.gui.components.AbstractWidget(x, y, width, height, message) {
             @Override
             protected void extractWidgetRenderState(net.minecraft.client.gui.GuiGraphicsExtractor extractor, int mouseX, int mouseY, float partialTick) {
-                customWidget.render(extractor, mouseX, mouseY, partialTick);
+                com.kingodogo.buildscape.adapter.v26x.client.ClientGuiHooks.withGraphics(extractor,
+                        () -> customWidget.render(extractor, mouseX, mouseY, partialTick));
             }
 
             @Override

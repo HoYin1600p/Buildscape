@@ -24,7 +24,10 @@ final class BuildscapeNeoForgeClient {
         bus.addListener(BuildscapeNeoForgeClient::screens);
         bus.addListener(BuildscapeNeoForgeClient::particles);
         bus.addListener(BuildscapeNeoForgeClient::renderers);
+        bus.addListener(BuildscapeNeoForgeClient::specialModels);
+        bus.addListener(BuildscapeNeoForgeClient::guiLayers);
         NeoForge.EVENT_BUS.addListener(BuildscapeNeoForgeClient::tick);
+        NeoForge.EVENT_BUS.addListener(BuildscapeNeoForgeClient::worldOverlays);
     }
     private static void setup(FMLClientSetupEvent event) {
         event.enqueueWork(com.kingodogo.buildscape.client.ClientEvents::initializeConfigCallback);
@@ -49,5 +52,17 @@ final class BuildscapeNeoForgeClient {
     private static void renderers(EntityRenderersEvent.RegisterRenderers event) {
         RenderFactory.registerRenderers(event::registerEntityRenderer);
         RenderFactory.registerBlockEntityRenderers(event::registerBlockEntityRenderer);
+    }
+    private static void specialModels(net.neoforged.neoforge.client.event.RegisterSpecialModelRendererEvent event) {
+        com.kingodogo.buildscape.adapter.v26x.client.SpecialItemRenderers.register(event::register);
+    }
+    private static void guiLayers(net.neoforged.neoforge.client.event.RegisterGuiLayersEvent event) {
+        event.registerAboveAll(net.minecraft.resources.Identifier.fromNamespaceAndPath("buildscape", "overlay"),
+                (graphics, delta) -> com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.renderClientOverlay(
+                        graphics, graphics.guiWidth(), graphics.guiHeight()));
+    }
+    private static void worldOverlays(net.neoforged.neoforge.client.event.SubmitCustomGeometryEvent event) {
+        com.kingodogo.buildscape.adapter.v26x.client.ClientWorldHooks.collectWorldOverlays(
+                event.getPoseStack(), event.getSubmitNodeCollector(), event.getLevelRenderState());
     }
 }

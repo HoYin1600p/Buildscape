@@ -91,32 +91,28 @@ jobs:
 
       - name: Build Mod Jars
         run: |
-          ./gradlew assemble -Pmod_version="${{ steps.vars.outputs.version }}" --console=plain
+          ./gradlew clean assemble -Pmod_version="${{ steps.vars.outputs.version }}" --console=plain
 
       - name: Collect Output Jars
         id: collect
         run: |
           mkdir -p release-jars
+          VERSION="${{ steps.vars.outputs.version }}"
 
-          # Copy from root build/libs if collectModJars ran
-          if [ -d "build/libs" ] && compgen -G "build/libs/*.jar" > /dev/null; then
-            cp build/libs/*.jar release-jars/
-          fi
-
-          # Also collect from loader subprojects if present
-          find fabric neoforge forge -type f -path "*/build/libs/*.jar" \
+          # Collect only jars corresponding to the target version
+          find . -type f -name "buildscape-*-${VERSION}.jar" \
             ! -name "*-sources.jar" \
             ! -name "*-javadoc.jar" \
             ! -name "*-dev.jar" \
             ! -name "*unmapped*.jar" \
-            -exec cp {} release-jars/ \; 2>/dev/null || true
+            -exec cp {} release-jars/ \;
 
-          echo "=== Jars collected for release ==="
+          echo "=== Jars collected for release ($VERSION) ==="
           ls -lh release-jars/
 
           JAR_COUNT=$(ls -1 release-jars/*.jar 2>/dev/null | wc -l)
           if [ "$JAR_COUNT" -eq 0 ]; then
-            echo "Error: No mod jars found to release!"
+            echo "Error: No matching mod jars found for version $VERSION!"
             exit 1
           fi
           echo "Found $JAR_COUNT jar(s) to release."

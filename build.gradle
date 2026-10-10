@@ -120,6 +120,8 @@ if (!rendererApiCoordinates.containsKey(rendererApi)) {
 dependencies {
 
 
+    testImplementation 'junit:junit:4.13.2'
+
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
 
 
@@ -229,6 +231,17 @@ tasks.register('runMangroveLeafSupportTests', JavaExec) {
     mainClass = 'com.kingodogo.buildscape.worldgen.MangroveLeafSupportTest'
 }
 
+tasks.register('runCopperRodLogicTests', JavaExec) {
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.kingodogo.buildscape.block.CopperRodLogicTest'
+}
+
+
+tasks.register('runHazeBushResourcesTests', JavaExec) {
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.kingodogo.buildscape.block.HazeBushResourcesTest'
+}
+
 tasks.register('runEyeblossomTransitionTests', JavaExec) {
     classpath = sourceSets.test.runtimeClasspath
     mainClass = 'com.kingodogo.buildscape.block.EyeblossomTransitionTest'
@@ -270,7 +283,8 @@ tasks.register('syncBundledRecipeCache', JavaExec) {
 tasks.register('compactizeRecipes', JavaExec) {
     group = 'buildscape'
     description = 'Formats all BDRE recipe pack JSON files into the compact canonical format.'
-    classpath = sourceSets.main.runtimeClasspath
+    dependsOn 'compileJava'
+    classpath = files(tasks.compileJava.destinationDirectory) + sourceSets.main.compileClasspath
     mainClass = 'com.kingodogo.buildscape.recipe.framework.util.RecipePackFormatter'
     args file('src/main/resources/data/buildscape/recipes_pack').absolutePath
     finalizedBy 'syncBundledRecipeCache'
@@ -285,16 +299,31 @@ tasks.register('formatRecipes') {
 tasks.register('verifyBundledRecipeCache', JavaExec) {
     group = 'verification'
     description = 'Verifies that the bundled BDRE cache matches the compact recipe sources.'
-    classpath = sourceSets.test.runtimeClasspath
-    mainClass = 'com.kingodogo.buildscape.recipe.framework.cache.BundledRecipeCacheVerify'
+    dependsOn 'compileJava'
+    classpath = files(tasks.compileJava.destinationDirectory) + sourceSets.main.compileClasspath
+    mainClass = 'com.kingodogo.buildscape.recipe.framework.compiler.BundledRecipeCacheVerify'
     args file('src/main/resources/data/buildscape/recipes_pack').absolutePath,
             file('src/main/resources/data/buildscape/recipes_pack/recipes.bscb').absolutePath
 }
 
+tasks.register('checkRecipePackFormat', JavaExec) {
+    group = 'verification'
+    description = 'Checks that recipe pack JSON has canonical compact formatting and unique keys.'
+    dependsOn 'compileJava'
+    classpath = files(tasks.compileJava.destinationDirectory) + sourceSets.main.compileClasspath
+    mainClass = 'com.kingodogo.buildscape.recipe.framework.util.RecipePackFormatter'
+    args '--check', file('src/main/resources/data/buildscape/recipes_pack').absolutePath
+}
+
+// When check/build includes synchronization, inspect committed inputs before any writes.
+tasks.named('syncBundledRecipeCache').configure {
+    mustRunAfter 'verifyBundledRecipeCache', 'checkRecipePackFormat', 'compactizeRecipes'
+}
 tasks.named('check').configure {
-    dependsOn 'runPipeSpillTests', 'runPipeOutletTests',\
-            'runRecipeManagerInjectorTests', 'runBinaryRecipeCacheTests', 'runTreeChopTraversalTests',\
-            'runBeaconBeamScanTests', 'runGoldenDandelionGrowthTests', 'runMangroveLeafSupportTests',\
-            'runEyeblossomTransitionTests', 'runParticleColorSlotsTests', 'runStairModelTests', 'runPatternBoundsTests',\
-            'runRecipePackFormatterTests', 'verifyBundledRecipeCache'
+    dependsOn 'runPipeSpillTests', 'runPipeOutletTests',
+            'runRecipeManagerInjectorTests', 'runBinaryRecipeCacheTests', 'runTreeChopTraversalTests',
+            'runBeaconBeamScanTests', 'runGoldenDandelionGrowthTests', 'runMangroveLeafSupportTests',
+            'runEyeblossomTransitionTests', 'runCopperRodLogicTests', 'runHazeBushResourcesTests',
+            'runParticleColorSlotsTests', 'runStairModelTests', 'runPatternBoundsTests',
+            'runRecipePackFormatterTests', 'verifyBundledRecipeCache', 'checkRecipePackFormat'
 }

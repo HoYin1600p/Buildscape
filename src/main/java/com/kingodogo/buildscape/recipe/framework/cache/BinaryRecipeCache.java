@@ -6,14 +6,10 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -43,7 +39,6 @@ public class BinaryRecipeCache {
 
     private static final int MAGIC_HEADER = 0x4B59524F;
     private static final int CACHE_VERSION = 5;
-    private static final int SOURCE_SCHEMA_VERSION = 1;
     private static final int MAX_STRING_POOL_SIZE = 262_144;
     private static final int MAX_RECIPE_COUNT = 262_144;
     private static final int MAX_INGREDIENT_COUNT = 4_096;
@@ -81,34 +76,8 @@ public class BinaryRecipeCache {
     }
 
     public static String computeSourceHash(String[] categoryOrder, Map<String, byte[]> categoryData) {
-        try {
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            updateDigestInt(digest, SOURCE_SCHEMA_VERSION);
-            updateDigestInt(digest, CACHE_VERSION);
-            for (String category : categoryOrder) {
-                byte[] name = category.getBytes(StandardCharsets.UTF_8);
-                updateDigestInt(digest, name.length);
-                digest.update(name);
-                byte[] content = categoryData.get(category);
-                digest.update((byte) (content == null ? 0 : 1));
-                if (content != null) {
-                    updateDigestInt(digest, content.length);
-                    digest.update(content);
-                }
-            }
-            byte[] hashBytes = digest.digest();
-            StringBuilder hex = new StringBuilder();
-            for (byte b : hashBytes) {
-                hex.append(String.format("%02x", b));
-            }
-            return hex.toString();
-        } catch (NoSuchAlgorithmException e) {
-            throw new IllegalStateException("SHA-256 is unavailable", e);
-        }
-    }
-
-    private static void updateDigestInt(MessageDigest digest, int value) {
-        digest.update(ByteBuffer.allocate(Integer.BYTES).putInt(value).array());
+        return com.kingodogo.buildscape.recipe.framework.compiler.RecipeCacheGenerator
+                .computeSourceHash(categoryOrder, categoryData);
     }
 
     public static boolean isCacheValid(String currentHash) {
@@ -260,7 +229,7 @@ public class BinaryRecipeCache {
                             com.google.gson.JsonElement jsonElement = com.google.gson.JsonParser.parseString(s);
                             ingredientCache[i] = Ingredient.fromJson(jsonElement);
                         } catch (Exception e) {
-                            ingredientCache[i] = Ingredient.EMPTY;
+                            ingredientCache[i] = null;
                         }
                     } else if (s.contains(":")) {
                         try {
@@ -408,7 +377,7 @@ public class BinaryRecipeCache {
         return Ingredient.EMPTY;
     }
 
-    private static Recipe<?> readRecipe(
+    static Recipe<?> readRecipe(
             DataInputStream in,
             String[] stringPool,
             Ingredient[] ingredientCache,
@@ -423,7 +392,7 @@ public class BinaryRecipeCache {
         int itemIdx = readPoolIndex(in, stringPool.length, "result item");
         Item resultItem = itemCache[itemIdx];
         if (resultItem == null) {
-            resultItem = getItemFromRegistry(getResourceLocation(itemIdx, stringPool, rlCache));
+            resultItem = getItemFromRegistry(ResourceLocation.tryParse(stringPool[itemIdx]));
             if (resultItem == null)
                 resultItem = Items.AIR;
             itemCache[itemIdx] = resultItem;
@@ -442,7 +411,8 @@ public class BinaryRecipeCache {
         }
 
         byte type = in.readByte();
-        switch (type) {
+        RecipeValidation validation = new RecipeValidation();
+        Recipe<?> recipe = switch (type) {
             case 1 -> {
                 int width = in.readInt();
                 int height = in.readInt();
@@ -450,52 +420,55 @@ public class BinaryRecipeCache {
                 validateDimensions(width, height, ingSize);
                 NonNullList<Ingredient> ingredients = NonNullList.withSize(ingSize, Ingredient.EMPTY);
                 for (int i = 0; i < ingSize; i++) {
-                    ingredients.set(i, readIngredient(in, stringPool, ingredientCache));
+                    ingredients.set(i, readIngredient(in, stringPool, ingredientCache, validation));
+                }
+                if (ingredients.stream().allMatch(Ingredient::isEmpty)) {
+                    validation.reason = "all shaped slots are empty";
                 }
                 com.kingodogo.buildscape.recipe.framework.util.ShapedPatternTrimmer.Trimmed trimmed = com.kingodogo.buildscape.recipe.framework.util.ShapedPatternTrimmer.trim(width, height, ingredients);
-                return new ShapedRecipe(id, group, trimmed.width(), trimmed.height(), trimmed.ingredients(), result);
+                yield new ShapedRecipe(id, group, trimmed.width(), trimmed.height(), trimmed.ingredients(), result);
             }
             case 2 -> {
                 int ingSize = in.readInt();
                 validateSize(ingSize, MAX_INGREDIENT_COUNT, "shapeless ingredient count");
                 NonNullList<Ingredient> ingredients = NonNullList.create();
                 for (int i = 0; i < ingSize; i++) {
-                    ingredients.add(readIngredient(in, stringPool, ingredientCache));
+                    ingredients.add(readIngredient(in, stringPool, ingredientCache, validation));
                 }
-                return new ShapelessRecipe(id, group, result, ingredients);
+                yield new ShapelessRecipe(id, group, result, ingredients);
             }
             case 3 -> {
-                Ingredient ing = readIngredient(in, stringPool, ingredientCache);
-                return new StonecutterRecipe(id, group, ing, result);
+                Ingredient ing = readIngredient(in, stringPool, ingredientCache, validation);
+                yield new StonecutterRecipe(id, group, ing, result);
             }
             case 4 -> {
-                Ingredient ing = readIngredient(in, stringPool, ingredientCache);
+                Ingredient ing = readIngredient(in, stringPool, ingredientCache, validation);
                 float xp = in.readFloat();
                 int cookTime = in.readInt();
-                return new SmeltingRecipe(id, group, ing, result, xp, cookTime);
+                yield new SmeltingRecipe(id, group, ing, result, xp, cookTime);
             }
             case 5 -> {
-                Ingredient ing = readIngredient(in, stringPool, ingredientCache);
+                Ingredient ing = readIngredient(in, stringPool, ingredientCache, validation);
                 float xp = in.readFloat();
                 int cookTime = in.readInt();
-                return new BlastingRecipe(id, group, ing, result, xp, cookTime);
+                yield new BlastingRecipe(id, group, ing, result, xp, cookTime);
             }
             case 6 -> {
-                Ingredient ing = readIngredient(in, stringPool, ingredientCache);
+                Ingredient ing = readIngredient(in, stringPool, ingredientCache, validation);
                 float xp = in.readFloat();
                 int cookTime = in.readInt();
-                return new SmokingRecipe(id, group, ing, result, xp, cookTime);
+                yield new SmokingRecipe(id, group, ing, result, xp, cookTime);
             }
             case 7 -> {
-                Ingredient ing = readIngredient(in, stringPool, ingredientCache);
+                Ingredient ing = readIngredient(in, stringPool, ingredientCache, validation);
                 float xp = in.readFloat();
                 int cookTime = in.readInt();
-                return new CampfireCookingRecipe(id, group, ing, result, xp, cookTime);
+                yield new CampfireCookingRecipe(id, group, ing, result, xp, cookTime);
             }
             case 8 -> {
-                Ingredient base = readIngredient(in, stringPool, ingredientCache);
-                Ingredient addition = readIngredient(in, stringPool, ingredientCache);
-                return new UpgradeRecipe(id, base, addition, result);
+                Ingredient base = readIngredient(in, stringPool, ingredientCache, validation);
+                Ingredient addition = readIngredient(in, stringPool, ingredientCache, validation);
+                yield new UpgradeRecipe(id, base, addition, result);
             }
             case 9 -> {
                 int width = in.readInt();
@@ -504,10 +477,13 @@ public class BinaryRecipeCache {
                 validateDimensions(width, height, ingSize);
                 NonNullList<Ingredient> ingredients = NonNullList.withSize(ingSize, Ingredient.EMPTY);
                 for (int i = 0; i < ingSize; i++) {
-                    ingredients.set(i, readIngredient(in, stringPool, ingredientCache));
+                    ingredients.set(i, readIngredient(in, stringPool, ingredientCache, validation));
+                }
+                if (ingredients.stream().allMatch(Ingredient::isEmpty)) {
+                    validation.reason = "all shaped slots are empty";
                 }
                 com.kingodogo.buildscape.recipe.framework.util.ShapedPatternTrimmer.Trimmed trimmed = com.kingodogo.buildscape.recipe.framework.util.ShapedPatternTrimmer.trim(width, height, ingredients);
-                return new com.kingodogo.buildscape.recipe.ShapedDurabilityRecipe(id, group, trimmed.width(), trimmed.height(),
+                yield new com.kingodogo.buildscape.recipe.ShapedDurabilityRecipe(id, group, trimmed.width(), trimmed.height(),
                         trimmed.ingredients(), result, 1);
             }
             case 10 -> {
@@ -515,20 +491,32 @@ public class BinaryRecipeCache {
                 validateSize(ingSize, MAX_INGREDIENT_COUNT, "shapeless durability ingredient count");
                 NonNullList<Ingredient> ingredients = NonNullList.create();
                 for (int i = 0; i < ingSize; i++) {
-                    ingredients.add(readIngredient(in, stringPool, ingredientCache));
+                    ingredients.add(readIngredient(in, stringPool, ingredientCache, validation));
                 }
-                return new com.kingodogo.buildscape.recipe.ShapelessDurabilityRecipe(id, group, result, ingredients, 1);
+                yield new com.kingodogo.buildscape.recipe.ShapelessDurabilityRecipe(id, group, result, ingredients, 1);
             }
             case 11 -> {
-                return new com.kingodogo.buildscape.recipe.ConfettiConfigureRecipe(id);
+                yield new com.kingodogo.buildscape.recipe.ConfettiConfigureRecipe(id);
             }
             case 12 -> {
-                return new com.kingodogo.buildscape.recipe.ClearShulkerFiltersRecipe(id);
+                yield new com.kingodogo.buildscape.recipe.ClearShulkerFiltersRecipe(id);
             }
             default -> {
                 throw new IOException("Unsupported cached recipe type: " + type);
             }
+        };
+        if (resultItem == Items.AIR) {
+            validation.reason = "result resolves to air: " + stringPool[itemIdx];
         }
+        if (validation.reason != null) {
+            BuildScape.LOGGER.warn("BDRE Binary Cache: Dropped recipe {}: {}", id, validation.reason);
+            return null;
+        }
+        return recipe;
+    }
+
+    private static final class RecipeValidation {
+        private String reason;
     }
 
     private static void writeIngredient(DataOutputStream out, Ingredient ing, List<String> stringPool,
@@ -543,20 +531,21 @@ public class BinaryRecipeCache {
         out.writeInt(getStringIndex(jsonStr, stringPool, stringMap));
     }
 
-    private static Ingredient readIngredient(DataInputStream in, String[] stringPool, Ingredient[] ingredientCache)
-            throws IOException {
+    private static Ingredient readIngredient(DataInputStream in, String[] stringPool, Ingredient[] ingredientCache,
+            RecipeValidation validation) throws IOException {
         int idx = readPoolIndex(in, stringPool.length, "ingredient");
         Ingredient ing = ingredientCache[idx];
         if (ing == null) {
             String jsonStr = stringPool[idx];
-            if (jsonStr == null || jsonStr.isEmpty() || "{}".equals(jsonStr)) {
+            if (jsonStr == null || jsonStr.isEmpty()) {
                 ing = Ingredient.EMPTY;
             } else {
                 try {
-                    com.google.gson.JsonElement jsonElement = com.google.gson.JsonParser.parseString(jsonStr);
-                    ing = Ingredient.fromJson(jsonElement);
+                    ing = Ingredient.fromJson(com.google.gson.JsonParser.parseString(jsonStr));
                 } catch (Exception e) {
-                    ing = Ingredient.EMPTY;
+                    validation.reason = "invalid ingredient: " + jsonStr;
+                    // Do not cache failures as EMPTY: every referring recipe must be dropped.
+                    return Ingredient.EMPTY;
                 }
             }
             ingredientCache[idx] = ing;

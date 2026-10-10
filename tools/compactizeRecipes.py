@@ -27,8 +27,16 @@ def find_workspace_root() -> Path:
         current = current.parent
     return Path.cwd()
 
+def reject_duplicate_keys(pairs):
+    data = {}
+    for key, value in pairs:
+        if key in data:
+            raise ValueError(f"Duplicate JSON key: {key!r}")
+        data[key] = value
+    return data
+
 def compactize_content(json_str: str) -> str:
-    data = json.loads(json_str)
+    data = json.loads(json_str, object_pairs_hook=reject_duplicate_keys)
     if not isinstance(data, dict):
         return json_str
 
@@ -59,7 +67,7 @@ def compactize_content(json_str: str) -> str:
 
 def compactize_file(filepath: Path, check_only: bool = False) -> bool:
     try:
-        with open(filepath, "r", encoding="utf-8") as f:
+        with open(filepath, "r", encoding="utf-8", newline="") as f:
             original = f.read()
 
         compacted = compactize_content(original)
@@ -68,13 +76,13 @@ def compactize_file(filepath: Path, check_only: bool = False) -> bool:
             return False
 
         if not check_only:
-            with open(filepath, "w", encoding="utf-8", newline="\n") as f:
+            with open(filepath, "w", encoding="utf-8", newline="") as f:
                 f.write(compacted)
 
         return True
     except Exception as e:
         print(f"Error processing {filepath}: {e}", file=sys.stderr)
-        return False
+        raise
 
 def main():
     parser = argparse.ArgumentParser(description="Compactize BDRE Recipe Pack JSON files.")

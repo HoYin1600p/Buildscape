@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/template_trapdoor_top",
+  "textures": {
+    "texture": "buildscape:block/flaming_steel_trapdoor"
+  },
+  "render_type": "cutout"
+}

@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "buildscape:block/stripped_pressed_cardboard_slab"
+    },
+    "type=top": {
+      "model": "buildscape:block/stripped_pressed_cardboard_slab_top"
+    },
+    "type=double": {
+      "model": "buildscape:block/stripped_pressed_cardboard"
+    }
+  }
+}

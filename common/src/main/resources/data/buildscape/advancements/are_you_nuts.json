@@ -1,0 +1,23 @@
+{
+  "display": {
+    "icon": {
+      "item": "buildscape:steel_bolts"
+    },
+    "title": {
+      "translate": "advancements.buildscape.are_you_nuts.title"
+    },
+    "description": {
+      "translate": "advancements.buildscape.are_you_nuts.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "parent": "buildscape:metalhead",
+  "criteria": {
+    "custom": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

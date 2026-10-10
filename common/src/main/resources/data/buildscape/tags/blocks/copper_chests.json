@@ -1,0 +1,12 @@
+{
+  "values": [
+    "buildscape:copper_chest",
+    "buildscape:exposed_copper_chest",
+    "buildscape:weathered_copper_chest",
+    "buildscape:oxidized_copper_chest",
+    "buildscape:waxed_copper_chest",
+    "buildscape:waxed_exposed_copper_chest",
+    "buildscape:waxed_weathered_copper_chest",
+    "buildscape:waxed_oxidized_copper_chest"
+  ]
+}

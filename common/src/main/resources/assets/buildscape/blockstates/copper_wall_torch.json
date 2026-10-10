@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "buildscape:block/copper_wall_torch",
+      "y": 270
+    },
+    "facing=east": {
+      "model": "buildscape:block/copper_wall_torch"
+    },
+    "facing=south": {
+      "model": "buildscape:block/copper_wall_torch",
+      "y": 90
+    },
+    "facing=west": {
+      "model": "buildscape:block/copper_wall_torch",
+      "y": 180
+    }
+  }
+}

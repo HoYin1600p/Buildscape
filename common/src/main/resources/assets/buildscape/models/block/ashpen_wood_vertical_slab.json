@@ -1,0 +1,9 @@
+{
+  "parent": "buildscape:block/template_vertical_slab",
+  "textures": {
+    "bottom": "buildscape:block/ashpen_log",
+    "top": "buildscape:block/ashpen_log",
+    "side": "buildscape:block/ashpen_log",
+    "particle": "#side"
+  }
+}

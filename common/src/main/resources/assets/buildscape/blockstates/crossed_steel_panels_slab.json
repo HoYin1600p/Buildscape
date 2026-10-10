@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "buildscape:block/crossed_steel_panels_slab"
+    },
+    "type=top": {
+      "model": "buildscape:block/crossed_steel_panels_slab_top"
+    },
+    "type=double": {
+      "model": "buildscape:block/crossed_steel_panels"
+    }
+  }
+}

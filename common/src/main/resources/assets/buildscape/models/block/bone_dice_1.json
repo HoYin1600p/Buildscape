@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "particle": "buildscape:block/bone_dice_1",
+    "up": "buildscape:block/bone_dice_1",
+    "down": "buildscape:block/bone_dice_6",
+    "north": "buildscape:block/bone_dice_2",
+    "south": "buildscape:block/bone_dice_5",
+    "east": "buildscape:block/bone_dice_3",
+    "west": "buildscape:block/bone_dice_4"
+  }
+}

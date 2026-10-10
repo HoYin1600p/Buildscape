@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/carpet",
+  "textures": {
+    "wool": "buildscape:block/pale_moss_carpet"
+  }
+}

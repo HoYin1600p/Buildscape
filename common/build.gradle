@@ -1,0 +1,89 @@
+plugins {
+    id 'java-library'
+}
+
+sourceSets {
+    main {
+        java.srcDirs = []
+        resources.srcDirs = []
+    }
+
+    v118x {
+        java {
+            srcDirs = ['src/main/java']
+            exclude 'com/kingodogo/buildscape/adapter/v121x/**'
+            exclude 'com/kingodogo/buildscape/adapter/v26x/**'
+        }
+        resources.srcDirs = ['src/main/resources']
+    }
+
+    v121x {
+        java {
+            srcDirs = ['src/main/java']
+            exclude 'com/kingodogo/buildscape/adapter/v118x/**'
+            exclude 'com/kingodogo/buildscape/adapter/v26x/**'
+        }
+        resources.srcDirs = ['src/main/resources']
+    }
+
+    v26x {
+        java {
+            srcDirs = ['src/main/java']
+            exclude 'com/kingodogo/buildscape/adapter/v118x/**'
+            exclude 'com/kingodogo/buildscape/adapter/v121x/**'
+        }
+        resources.srcDirs = ['src/main/resources']
+    }
+}
+
+configurations {
+    v118xElements { canBeResolved = false; canBeConsumed = true }
+    v121xElements { canBeResolved = false; canBeConsumed = true }
+    v26xElements { canBeResolved = false; canBeConsumed = true }
+}
+
+dependencies {
+    [
+        'org.jspecify:jspecify:1.0.0',
+        'com.mojang:datafixerupper:10.0.21',
+        'com.mojang:brigadier:1.3.10',
+        'org.joml:joml:1.10.8',
+        'org.spongepowered:mixin:0.8.5',
+        'org.ow2.asm:asm:9.7.1',
+        'org.ow2.asm:asm-tree:9.7.1'
+    ].each { dependency ->
+        v118xCompileOnly dependency
+        v121xCompileOnly dependency
+        v26xCompileOnly dependency
+    }
+
+    ['v118xCompileOnly', 'v121xCompileOnly', 'v26xCompileOnly'].each { configurationName ->
+        add(configurationName, 'com.google.code.gson:gson:2.10.1')
+    }
+
+    v118xCompileOnly 'net.fabricmc.fabric-api:fabric-api:0.76.0+1.18.2'
+    v118xCompileOnly 'io.netty:netty-buffer:4.1.97.Final'
+    v121xCompileOnly 'io.netty:netty-buffer:4.1.97.Final'
+    v26xCompileOnly 'io.netty:netty-buffer:4.2.15.Final'
+    v118xCompileOnly files(rootProject.file('ref/artifacts/minecraft-1.18.2.jar'))
+    v121xCompileOnly files(rootProject.file('ref/artifacts/minecraft-1.21.1.jar'))
+    v26xCompileOnly files(rootProject.file('ref/artifacts/minecraft-26.2.jar'))
+}
+
+tasks.named('compileV118xJava', JavaCompile) { options.release.set(17) }
+tasks.named('compileV121xJava', JavaCompile) { options.release.set(21) }
+tasks.named('compileV26xJava', JavaCompile) { options.release.set(25) }
+
+artifacts {
+    add('v118xElements', sourceSets.v118x.output.classesDirs.singleFile) {
+        builtBy tasks.named('compileV118xJava')
+    }
+    add('v121xElements', sourceSets.v121x.output.classesDirs.singleFile) {
+        builtBy tasks.named('compileV121xJava')
+    }
+    add('v26xElements', sourceSets.v26x.output.classesDirs.singleFile) {
+        builtBy tasks.named('compileV26xJava')
+    }
+}
+
+tasks.named('processResources') { enabled = false }

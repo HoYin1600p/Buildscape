@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "buildscape:block/mycelium_slab"
+    },
+    "type=top": {
+      "model": "buildscape:block/mycelium_slab_top"
+    },
+    "type=double": {
+      "model": "buildscape:block/mycelium_slab_double"
+    }
+  }
+}

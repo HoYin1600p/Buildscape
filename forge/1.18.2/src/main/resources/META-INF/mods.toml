@@ -1,0 +1,26 @@
+modLoader = "javafml"
+loaderVersion = "[40,)"
+license = "All Rights Reserved"
+[[mods]]
+modId = "buildscape"
+version = "1.0.0"
+displayName = "Buildscape"
+displayURL = "buildscape.online"
+authors = "Kingodogo"
+description = '''Welcome to Buildscape the ultimate expansion for builders, architects, and creators!'''
+[[dependencies.buildscape]]
+    modId="forge"
+    mandatory=true
+    versionRange="[40,)"
+    ordering="NONE"
+    side="BOTH"
+[[dependencies.buildscape]]
+    modId="minecraft"
+    mandatory=true
+    versionRange="[1.18.2,1.19)"
+    ordering="AFTER"
+    side = "BOTH"
+
+[[mixins]]
+config = "buildscape.mixins.json"
+

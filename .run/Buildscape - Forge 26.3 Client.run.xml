@@ -1,0 +1,13 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Buildscape - Forge 26.3 Client" type="GradleRunConfiguration" factoryName="Gradle">
+    <ExternalSystemSettings>
+      <option name="externalProjectPath" value="$PROJECT_DIR$" />
+      <option name="externalSystemIdString" value="GRADLE" />
+      <option name="scriptParameters" value="--console=plain" />
+      <option name="taskNames"><list><option value=":forge:26.3:runClient" /></list></option>
+    </ExternalSystemSettings>
+    <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
+    <ExternalSystemReRunMapping>true</ExternalSystemReRunMapping>
+    <method v="2" />
+  </configuration>
+</component>

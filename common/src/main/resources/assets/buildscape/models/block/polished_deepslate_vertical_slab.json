@@ -1,0 +1,9 @@
+{
+  "parent": "buildscape:block/template_vertical_slab",
+  "textures": {
+    "bottom": "minecraft:block/polished_deepslate",
+    "top": "minecraft:block/polished_deepslate",
+    "side": "minecraft:block/polished_deepslate",
+    "particle": "#side"
+  }
+}

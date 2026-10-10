@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/slab_top",
+  "textures": {
+    "bottom": "buildscape:block/resin_bricks",
+    "side": "buildscape:block/resin_bricks",
+    "top": "buildscape:block/resin_bricks"
+  }
+}

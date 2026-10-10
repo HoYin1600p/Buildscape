@@ -1,0 +1,8 @@
+{
+  "parent": "buildscape:block/template_wall_inventory_tinted",
+  "textures": {
+    "wall": "buildscape:block/yellow_poplar_leaves",
+    "tint": "buildscape:block/yellow_poplar_leaves",
+    "particle": "buildscape:block/yellow_poplar_leaves"
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "display": {
+    "icon": {
+      "item": "buildscape:muff_block"
+    },
+    "title": {
+      "translate": "advancements.buildscape.can_you_hear_me_now.title"
+    },
+    "description": {
+      "translate": "advancements.buildscape.can_you_hear_me_now.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "parent": "buildscape:root",
+  "criteria": {
+    "custom": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

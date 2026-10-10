@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/template_wall_post",
+  "textures": {
+    "wall": "buildscape:block/burnt_pressed_cardboard",
+    "particle": "buildscape:block/burnt_pressed_cardboard"
+  }
+}

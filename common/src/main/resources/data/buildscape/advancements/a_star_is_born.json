@@ -1,0 +1,48 @@
+{
+  "display": {
+    "icon": {
+      "item": "buildscape:white_star"
+    },
+    "title": {
+      "translate": "advancements.buildscape.a_star_is_born.title"
+    },
+    "description": {
+      "translate": "advancements.buildscape.a_star_is_born.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "parent": "buildscape:root",
+  "criteria": {
+    "has_item": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "buildscape:white_star",
+              "buildscape:black_star",
+              "buildscape:glow_star",
+              "buildscape:pink_star",
+              "buildscape:purple_star",
+              "buildscape:gray_star",
+              "buildscape:orange_star",
+              "buildscape:light_blue_star",
+              "buildscape:green_star",
+              "buildscape:yellow_star",
+              "buildscape:lime_star",
+              "buildscape:magenta_star",
+              "buildscape:cyan_star",
+              "buildscape:brown_star",
+              "buildscape:light_gray_star",
+              "buildscape:red_star",
+              "buildscape:blue_star"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

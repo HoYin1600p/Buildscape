@@ -1,0 +1,244 @@
+plugins {
+    id 'base'
+    id 'idea'
+}
+
+defaultTasks 'build'
+
+subprojects {
+    if (childProjects.isEmpty()) {
+        apply plugin: 'java'
+        apply plugin: 'idea'
+
+        def versionCluster = "26x"
+        if (project.path.contains('1.18.2')) {
+            versionCluster = '118x'
+        } else if (project.path.contains('1.21.1')) {
+            versionCluster = '121x'
+        } else if (project.path.contains('26.')) {
+            versionCluster = '26x'
+        } else {
+            versionCluster = project.findProperty("buildscape.target_cluster") ?: project.findProperty("buildscape.target_era") ?: "26x"
+        }
+
+        java {
+            toolchain {
+                if (versionCluster == '118x') {
+                    languageVersion = JavaLanguageVersion.of(17)
+                } else if (versionCluster == '121x') {
+                    languageVersion = JavaLanguageVersion.of(21)
+                } else {
+                    languageVersion = JavaLanguageVersion.of(25)
+                }
+            }
+        }
+
+        repositories {
+            mavenCentral()
+            maven { url = 'https://libraries.minecraft.net/' }
+            maven { url = 'https://maven.fabricmc.net/' }
+            maven { url = 'https://maven.neoforged.net/releases/' }
+            maven { url = 'https://repo.spongepowered.org/repository/maven-public/' }
+            maven { url = 'https://maven.minecraftforge.net/' }
+        }
+
+        def mcClientJar = null
+        if (versionCluster == '118x') {
+            mcClientJar = rootProject.file("ref/artifacts/minecraft-1.18.2.jar")
+        } else if (versionCluster == '121x') {
+            mcClientJar = rootProject.file("ref/artifacts/minecraft-1.21.1.jar")
+        } else {
+            mcClientJar = rootProject.file("ref/artifacts/minecraft-26.2.jar")
+        }
+
+        dependencies {
+            compileOnly 'org.jspecify:jspecify:1.0.0'
+            compileOnly 'io.netty:netty-buffer:4.1.97.Final'
+            if (versionCluster == '26x') {
+                compileOnly 'com.mojang:datafixerupper:10.0.21'
+                compileOnly 'com.mojang:brigadier:1.3.10'
+                compileOnly 'org.joml:joml:1.10.8'
+            }
+            if (project.path.contains(':fabric:')) {
+                compileOnly 'net.fabricmc:fabric-loader:0.15.11'
+                if (versionCluster == '118x') {
+                    compileOnly 'net.fabricmc.fabric-api:fabric-api:0.76.0+1.18.2'
+                }
+            } else if (project.path.contains(':forge:')) {
+                if (versionCluster == '118x') {
+                    compileOnly 'net.minecraftforge:fmlloader:1.18.2-40.2.0'
+                } else if (versionCluster == '121x') {
+                    compileOnly 'net.minecraftforge:fmlloader:1.21.1-52.1.16'
+                }
+            } else if (project.path.contains(':neoforge:')) {
+                if (versionCluster == '121x' && project.path != ':neoforge:1.21.1') {
+                    compileOnly 'net.neoforged:neoforge:21.1.256'
+                    runtimeOnly 'net.neoforged.fancymodloader:loader:4.0.45'
+                } else if (project.path.contains('26.2')) {
+                    compileOnly 'net.neoforged:neoforge:26.2.0.88'
+                } else if (project.path.contains('26.3')) {
+                    compileOnly 'net.neoforged:neoforge:26.3.0.57-beta'
+                }
+            }
+            if (mcClientJar != null && mcClientJar.exists() && project.path != ':neoforge:1.21.1') {
+                compileOnly files(mcClientJar)
+            }
+            def loaderStubsJar = rootProject.file('ref/artifacts/loader-stubs.jar')
+            if (loaderStubsJar.exists()) {
+                compileOnly files(loaderStubsJar)
+            }
+            if (project.path != ':common' && project.path != ':neoforge:1.21.1') {
+                runtimeOnly 'net.sf.jopt-simple:jopt-simple:5.0.4'
+                runtimeOnly 'org.apache.logging.log4j:log4j-api:2.22.1'
+                runtimeOnly 'org.apache.logging.log4j:log4j-core:2.22.1'
+                runtimeOnly 'org.slf4j:slf4j-api:2.0.12'
+                runtimeOnly 'com.google.code.gson:gson:2.10.1'
+                runtimeOnly 'com.google.guava:guava:33.0.0-jre'
+                runtimeOnly 'org.apache.commons:commons-lang3:3.14.0'
+                runtimeOnly 'commons-io:commons-io:2.15.1'
+                runtimeOnly 'it.unimi.dsi:fastutil:8.5.12'
+                runtimeOnly 'org.joml:joml:1.10.8'
+                runtimeOnly 'io.netty:netty-codec:4.1.97.Final'
+                runtimeOnly 'io.netty:netty-common:4.1.97.Final'
+                runtimeOnly 'io.netty:netty-buffer:4.1.97.Final'
+                runtimeOnly 'io.netty:netty-transport:4.1.97.Final'
+                runtimeOnly 'io.netty:netty-handler:4.1.97.Final'
+                runtimeOnly 'com.mojang:brigadier:1.3.10'
+                runtimeOnly 'com.mojang:blocklist:1.0.10'
+                runtimeOnly 'com.mojang:patchy:2.2.10'
+                runtimeOnly 'com.github.oshi:oshi-core:6.4.5'
+                if (versionCluster == '118x') {
+                    runtimeOnly 'net.fabricmc.fabric-api:fabric-api:0.76.0+1.18.2'
+                    runtimeOnly 'com.mojang:javabridge:1.2.24'
+                    runtimeOnly 'com.mojang:datafixerupper:4.1.27'
+                    runtimeOnly 'com.mojang:authlib:3.3.39'
+                    runtimeOnly 'com.mojang:logging:1.0.0'
+                    runtimeOnly 'com.mojang:text2speech:1.12.4'
+                } else if (versionCluster == '121x') {
+                    runtimeOnly 'com.mojang:datafixerupper:8.0.16'
+                    runtimeOnly 'com.mojang:authlib:6.0.54'
+                    runtimeOnly 'com.mojang:logging:1.2.7'
+                    runtimeOnly 'com.mojang:text2speech:1.17.9'
+                    runtimeOnly 'com.ibm.icu:icu4j:73.2'
+                    runtimeOnly 'commons-codec:commons-codec:1.16.0'
+                    runtimeOnly 'org.apache.commons:commons-compress:1.26.0'
+                    runtimeOnly 'org.apache.httpcomponents:httpclient:4.5.13'
+                    runtimeOnly 'org.apache.httpcomponents:httpcore:4.4.16'
+                    runtimeOnly 'org.lz4:lz4-java:1.8.0'
+                    runtimeOnly 'org.jcraft:jorbis:0.0.17'
+                    runtimeOnly 'net.neoforged.fancymodloader:loader:4.0.45'
+                } else {
+                    runtimeOnly 'com.mojang:datafixerupper:10.0.21'
+                    runtimeOnly 'com.mojang:authlib:6.0.55'
+                    runtimeOnly 'com.mojang:logging:1.2.7'
+                }
+                if (mcClientJar != null && mcClientJar.exists()) {
+                    runtimeOnly files(mcClientJar)
+                }
+                def vanillaClientJar = rootProject.file("ref/artifacts/minecraft-1.21.1-client.jar")
+                if (vanillaClientJar.exists() && versionCluster == '121x') {
+                    runtimeOnly files(vanillaClientJar)
+                }
+                def lwjglVersion = "3.3.3"
+                def osName = System.getProperty("os.name").toLowerCase()
+                def lwjglNatives = osName.contains("win") ? "natives-windows" : (osName.contains("mac") ? "natives-macos" : "natives-linux")
+                [
+                    "org.lwjgl:lwjgl:${lwjglVersion}",
+                    "org.lwjgl:lwjgl-glfw:${lwjglVersion}",
+                    "org.lwjgl:lwjgl-opengl:${lwjglVersion}",
+                    "org.lwjgl:lwjgl-openal:${lwjglVersion}",
+                    "org.lwjgl:lwjgl-stb:${lwjglVersion}",
+                    "org.lwjgl:lwjgl-tinyfd:${lwjglVersion}",
+                    "org.lwjgl:lwjgl-freetype:${lwjglVersion}",
+                    "org.lwjgl:lwjgl-jemalloc:${lwjglVersion}"
+                ].each { dep ->
+                    runtimeOnly dep
+                    runtimeOnly "${dep}:${lwjglNatives}"
+                }
+            }
+        }
+
+        tasks.withType(JavaCompile).configureEach {
+            options.encoding = 'UTF-8'
+        }
+        if (project.path != ':common' && project.parent != null && project.parent != rootProject) {
+            def loader = project.parent.name
+            def mcVersion = project.name
+
+            tasks.named('jar', Jar) {
+                archiveBaseName = "buildscape-${loader}-${mcVersion}"
+                archiveVersion = project.findProperty('mod_version') ?: '1.0.0'
+            }
+
+            if (!(loader == 'neoforge' && mcVersion == '1.21.1')) {
+                tasks.register('runClient', JavaExec) {
+                group = 'execution'
+                description = "Launches Minecraft ${mcVersion} client with Buildscape (${loader})"
+                classpath = sourceSets.main.runtimeClasspath + configurations.commonVariant + (mcClientJar != null && mcClientJar.exists() ? files(mcClientJar) : files())
+                mainClass = 'net.minecraft.client.main.Main'
+                workingDir = file('run')
+                doFirst {
+                    file('run').mkdirs()
+                    file('run/assets').mkdirs()
+                }
+                jvmArgs = [
+                    '-Xmx2G',
+                    '-Xms1G'
+                ]
+                args = [
+                    '--version', mcVersion,
+                    '--gameDir', file('run').absolutePath,
+                    '--assetsDir', file('run/assets').absolutePath,
+                    '--assetIndex', (versionCluster == '118x' ? '1.18' : (versionCluster == '121x' ? '17' : '26')),
+                    '--accessToken', '0',
+                    '--username', 'Dev'
+                ]
+            }
+        }
+
+            tasks.register('runDevInit', JavaExec) {
+                group = 'execution'
+                description = "Executes Buildscape (${loader} ${mcVersion}) initialization and registry verification"
+                classpath = sourceSets.main.runtimeClasspath + configurations.commonVariant + (mcClientJar != null && mcClientJar.exists() ? files(mcClientJar) : files())
+                mainClass = 'com.kingodogo.buildscape.BuildscapeCommon'
+            }
+
+            tasks.named('jar', Jar) {
+                manifest {
+                    attributes(
+                        'Specification-Title': 'buildscape',
+                        'Specification-Vendor': 'kingodogo',
+                        'Specification-Version': '1',
+                        'Implementation-Title': project.name,
+                        'Implementation-Version': '1.0.0',
+                        'Implementation-Vendor': 'kingodogo',
+                        'MixinConfigs': 'buildscape.mixins.json'
+                    )
+                }
+            }
+        }
+    }
+}
+def collectModJars = tasks.register('collectModJars', Copy) {
+    group = 'build'
+    description = 'Collects all built mod JARs from subprojects into root build/libs'
+    destinationDir = layout.buildDirectory.dir('libs').get().asFile
+    subprojects { sub ->
+        if (sub.path != ':common' && sub.childProjects.isEmpty()) {
+            from(sub.tasks.matching { it.name == 'jar' })
+        }
+    }
+}
+
+tasks.named('assemble') {
+    dependsOn collectModJars
+}
+
+tasks.named('build') {
+    dependsOn 'assemble'
+    subprojects { sub ->
+        if (sub.childProjects.isEmpty()) {
+            dependsOn sub.tasks.matching { it.name == 'build' }
+        }
+    }
+}

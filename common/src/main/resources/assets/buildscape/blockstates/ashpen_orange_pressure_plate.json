@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "powered=false": {
+      "model": "buildscape:block/ashpen_orange_pressure_plate"
+    },
+    "powered=true": {
+      "model": "buildscape:block/ashpen_orange_pressure_plate_down"
+    }
+  }
+}

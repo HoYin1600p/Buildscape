@@ -1,0 +1,18 @@
+{
+  "variants": {
+    "part=single": {
+      "model": "buildscape:block/deepslate_pillar_single"
+    },
+    "part=bottom": {
+      "model": "buildscape:block/deepslate_pillar_bottom"
+    },
+    "part=middle": {
+      "model": "buildscape:block/deepslate_pillar_middle"
+    },
+    "part=top": {
+      "model": "buildscape:block/deepslate_pillar_top"
+    }
+  }
+}
+
+

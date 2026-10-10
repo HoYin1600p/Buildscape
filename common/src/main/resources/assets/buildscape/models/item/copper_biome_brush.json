@@ -1,0 +1,7 @@
+{
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "buildscape:item/copper_biome_brush",
+    "layer1": "buildscape:item/biome_brush_paint"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "buildscape:block/white_sandstone_slab"
+    },
+    "type=top": {
+      "model": "buildscape:block/white_sandstone_slab_top"
+    },
+    "type=double": {
+      "model": "buildscape:block/white_sandstone"
+    }
+  }
+}

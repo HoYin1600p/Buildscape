@@ -1,0 +1,23 @@
+{
+  "display": {
+    "icon": {
+      "item": "buildscape:festive_wandering_homemaker_spawn_egg"
+    },
+    "title": {
+      "translate": "advancements.buildscape.its_beginning_to_look_a_lot_like_christmas.title"
+    },
+    "description": {
+      "translate": "advancements.buildscape.its_beginning_to_look_a_lot_like_christmas.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "parent": "buildscape:the_homemaker_cometh",
+  "criteria": {
+    "custom": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

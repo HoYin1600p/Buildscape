@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/wall_inventory",
+  "textures": {
+    "wall": "buildscape:block/bit_weathered_cut_copper"
+  }
+}

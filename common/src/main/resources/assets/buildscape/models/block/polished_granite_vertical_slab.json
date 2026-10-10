@@ -1,0 +1,9 @@
+{
+  "parent": "buildscape:block/template_vertical_slab",
+  "textures": {
+    "bottom": "minecraft:block/polished_granite",
+    "top": "minecraft:block/polished_granite",
+    "side": "minecraft:block/polished_granite",
+    "particle": "#side"
+  }
+}

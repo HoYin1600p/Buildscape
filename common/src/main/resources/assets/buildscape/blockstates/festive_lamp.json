@@ -1,0 +1,11 @@
+{
+  "variants": {
+    "lit=false": {
+      "model": "buildscape:block/festive_lamp"
+    },
+    "lit=true": {
+      "model": "buildscape:block/festive_lamp_on"
+    }
+  }
+}
+

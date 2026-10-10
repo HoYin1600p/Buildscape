@@ -1,0 +1,7 @@
+{
+    "textures":  {
+                     "particle":  "buildscape:block/ashpen_pink_ladder",
+                     "texture":  "buildscape:block/ashpen_pink_ladder"
+                 },
+    "parent":  "minecraft:block/ladder"
+}

@@ -1,0 +1,9 @@
+{
+  "parent": "buildscape:block/template_vertical_slab",
+  "textures": {
+    "bottom": "minecraft:block/hay_block_top",
+    "top": "minecraft:block/hay_block_top",
+    "side": "minecraft:block/hay_block_side",
+    "particle": "#side"
+  }
+}

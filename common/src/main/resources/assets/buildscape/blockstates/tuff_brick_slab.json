@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "buildscape:block/tuff_brick_slab"
+    },
+    "type=top": {
+      "model": "buildscape:block/tuff_brick_slab_top"
+    },
+    "type=double": {
+      "model": "buildscape:block/tuff_bricks"
+    }
+  }
+}

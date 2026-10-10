@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "buildscape:block/magenta_big_book"
+    },
+    "facing=south": {
+      "model": "buildscape:block/magenta_big_book",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "buildscape:block/magenta_big_book",
+      "y": 270
+    },
+    "facing=east": {
+      "model": "buildscape:block/magenta_big_book",
+      "y": 90
+    }
+  }
+}

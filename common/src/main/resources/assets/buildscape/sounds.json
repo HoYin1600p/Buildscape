@@ -5,7 +5,8 @@
       "buildscape:block/copper_grate/break2",
       "buildscape:block/copper_grate/break3",
       "buildscape:block/copper_grate/break4"
-    ]
+    ],
+    "subtitle": "subtitles.block.generic.break"
   },
   "block_copper_grate_step": {
     "sounds": [
@@ -15,7 +16,8 @@
       "buildscape:block/copper_grate/step4",
       "buildscape:block/copper_grate/step5",
       "buildscape:block/copper_grate/step6"
-    ]
+    ],
+    "subtitle": "subtitles.block.generic.footsteps"
   },
   "block_copper_bulb_break": {
     "sounds": [
@@ -23,7 +25,8 @@
       "buildscape:block/copper_bulb/break2",
       "buildscape:block/copper_bulb/break3",
       "buildscape:block/copper_bulb/break4"
-    ]
+    ],
+    "subtitle": "subtitles.block.generic.break"
   },
   "block_copper_bulb_place": {
     "sounds": [
@@ -31,7 +34,8 @@
       "buildscape:block/copper_bulb/place2",
       "buildscape:block/copper_bulb/place3",
       "buildscape:block/copper_bulb/place4"
-    ]
+    ],
+    "subtitle": "subtitles.block.generic.place"
   },
   "block_copper_bulb_step": {
     "sounds": [
@@ -41,12 +45,14 @@
       "buildscape:block/copper_bulb/step4",
       "buildscape:block/copper_bulb/step5",
       "buildscape:block/copper_bulb/step6"
-    ]
+    ],
+    "subtitle": "subtitles.block.generic.footsteps"
   },
   "block_copper_bulb_toggle": {
     "sounds": [
       "buildscape:block/copper_bulb/toggle"
-    ]
+    ],
+    "subtitle": "subtitles.buildscape.block_copper_bulb_toggle"
   },
   "block_mud_break": {
     "sounds": [
@@ -80,7 +86,8 @@
         "volume": 0.4,
         "pitch": 0.9
       }
-    ]
+    ],
+    "subtitle": "subtitles.block.generic.break"
   },
   "block_mud_step": {
     "sounds": [
@@ -114,7 +121,8 @@
         "volume": 0.4,
         "pitch": 0.9
       }
-    ]
+    ],
+    "subtitle": "subtitles.block.generic.footsteps"
   },
   "block_decorated_pot_place": {
     "sounds": [
@@ -122,7 +130,8 @@
       "buildscape:block/decorated_pot/break2",
       "buildscape:block/decorated_pot/break3",
       "buildscape:block/decorated_pot/break4"
-    ]
+    ],
+    "subtitle": "subtitles.block.generic.place"
   },
   "block_decorated_pot_break": {
     "sounds": [
@@ -130,7 +139,8 @@
       "buildscape:block/decorated_pot/break2",
       "buildscape:block/decorated_pot/break3",
       "buildscape:block/decorated_pot/break4"
-    ]
+    ],
+    "subtitle": "subtitles.block.generic.break"
   },
   "block_decorated_pot_hit": {
     "sounds": [
@@ -138,7 +148,8 @@
       "buildscape:block/decorated_pot/break2",
       "buildscape:block/decorated_pot/break3",
       "buildscape:block/decorated_pot/break4"
-    ]
+    ],
+    "subtitle": "subtitles.block.generic.hit"
   },
   "block_decorated_pot_step": {
     "sounds": [
@@ -147,7 +158,8 @@
       "buildscape:block/decorated_pot/step3",
       "buildscape:block/decorated_pot/step4",
       "buildscape:block/decorated_pot/step5"
-    ]
+    ],
+    "subtitle": "subtitles.block.generic.footsteps"
   },
   "block_decorated_pot_fall": {
     "sounds": [
@@ -155,7 +167,8 @@
       "buildscape:block/decorated_pot/break2",
       "buildscape:block/decorated_pot/break3",
       "buildscape:block/decorated_pot/break4"
-    ]
+    ],
+    "subtitle": "subtitles.block.generic.fall"
   },
   "block_decorated_pot_insert_item": {
     "sounds": [
@@ -163,7 +176,8 @@
       "buildscape:block/decorated_pot/insert2",
       "buildscape:block/decorated_pot/insert3",
       "buildscape:block/decorated_pot/insert4"
-    ]
+    ],
+    "subtitle": "subtitles.buildscape.block_decorated_pot_insert_item"
   },
   "block_decorated_pot_insert_fail": {
     "sounds": [
@@ -172,7 +186,8 @@
       "buildscape:block/decorated_pot/insert_fail3",
       "buildscape:block/decorated_pot/insert_fail4",
       "buildscape:block/decorated_pot/insert_fail5"
-    ]
+    ],
+    "subtitle": "subtitles.buildscape.block_decorated_pot_insert_fail"
   },
   "block_decorated_pot_shatter": {
     "sounds": [
@@ -181,7 +196,8 @@
       "buildscape:block/decorated_pot/shatter3",
       "buildscape:block/decorated_pot/shatter4",
       "buildscape:block/decorated_pot/shatter5"
-    ]
+    ],
+    "subtitle": "subtitles.buildscape.block_decorated_pot_shatter"
   },
   "block_flower_bed_break": {
     "sounds": [
@@ -210,7 +226,8 @@
         "volume": 0.8,
         "pitch": 0.96
       }
-    ]
+    ],
+    "subtitle": "subtitles.block.generic.break"
   },
   "block_flower_bed_step": {
     "sounds": [
@@ -239,7 +256,8 @@
         "volume": 1,
         "pitch": 1
       }
-    ]
+    ],
+    "subtitle": "subtitles.block.generic.footsteps"
   },
   "block_flower_bed_place": {
     "sounds": [
@@ -268,7 +286,8 @@
         "volume": 0.8,
         "pitch": 0.96
       }
-    ]
+    ],
+    "subtitle": "subtitles.block.generic.place"
   },
   "block_flower_bed_hit": {
     "sounds": [
@@ -297,7 +316,8 @@
         "volume": 1.0,
         "pitch": 0.6
       }
-    ]
+    ],
+    "subtitle": "subtitles.block.generic.hit"
   },
   "block_flower_bed_fall": {
     "sounds": [
@@ -326,7 +346,8 @@
         "volume": 1.0,
         "pitch": 0.9
       }
-    ]
+    ],
+    "subtitle": "subtitles.block.generic.fall"
   },
   "block_mangrove_roots_break": {
     "sounds": [
@@ -1042,7 +1063,8 @@
         "name": "minecraft:entity/leashknot/place3",
         "type": "event"
       }
-    ]
+    ],
+    "subtitle": "subtitles.block.generic.place"
   },
   "block_string_light_connect": {
     "sounds": [
@@ -1058,7 +1080,8 @@
         "name": "minecraft:entity/leashknot/place3",
         "type": "event"
       }
-    ]
+    ],
+    "subtitle": "subtitles.buildscape.block_string_light_connect"
   },
   "block_string_light_disconnect": {
     "sounds": [
@@ -1074,7 +1097,8 @@
         "name": "minecraft:entity/leashknot/break3",
         "type": "event"
       }
-    ]
+    ],
+    "subtitle": "subtitles.buildscape.block_string_light_disconnect"
   },
   "block_string_light_turnon": {
     "sounds": [
@@ -1082,7 +1106,8 @@
         "name": "minecraft:random/click",
         "type": "event"
       }
-    ]
+    ],
+    "subtitle": "subtitles.buildscape.block_string_light_turnon"
   },
   "block_string_light_turnoff": {
     "sounds": [
@@ -1090,7 +1115,8 @@
         "name": "minecraft:random/click",
         "type": "event"
       }
-    ]
+    ],
+    "subtitle": "subtitles.buildscape.block_string_light_turnoff"
   },
   "block_geyser_continuous_start": {
     "sounds": [
@@ -1098,7 +1124,8 @@
         "name": "block.bubble_column.whirlpool_inside",
         "type": "event"
       }
-    ]
+    ],
+    "subtitle": "subtitles.buildscape.block_geyser_continuous_start"
   },
   "block_geyser_continuous_active": {
     "sounds": [
@@ -1106,7 +1133,8 @@
         "name": "block.bubble_column.whirlpool_ambient",
         "type": "event"
       }
-    ]
+    ],
+    "subtitle": "subtitles.buildscape.block_geyser_continuous_active"
   },
   "block_geyser_eruption_start": {
     "sounds": [
@@ -1114,7 +1142,8 @@
         "name": "block.bubble_column.whirlpool_inside",
         "type": "event"
       }
-    ]
+    ],
+    "subtitle": "subtitles.buildscape.block_geyser_eruption_start"
   },
   "block_geyser_eruption_active": {
     "sounds": [
@@ -1122,10 +1151,12 @@
         "name": "block.bubble_column.whirlpool_ambient",
         "type": "event"
       }
-    ]
+    ],
+    "subtitle": "subtitles.buildscape.block_geyser_eruption_active"
   },
   "block_noxious_gas": {
-    "sounds": []
+    "sounds": [],
+    "subtitle": "subtitles.buildscape.block_noxious_gas"
   },
   "block_shelf_activate": {
     "sounds": [
@@ -1133,7 +1164,8 @@
         "name": "block.wooden_trapdoor.close",
         "type": "event"
       }
-    ]
+    ],
+    "subtitle": "subtitles.buildscape.block_shelf_activate"
   },
   "block_shelf_deactivate": {
     "sounds": [
@@ -1141,7 +1173,8 @@
         "name": "block.wooden_trapdoor.open",
         "type": "event"
       }
-    ]
+    ],
+    "subtitle": "subtitles.buildscape.block_shelf_deactivate"
   },
   "block_shelf_place_item": {
     "sounds": [
@@ -1149,7 +1182,8 @@
         "name": "entity.item_frame.add_item",
         "type": "event"
       }
-    ]
+    ],
+    "subtitle": "subtitles.buildscape.block_shelf_place_item"
   },
   "block_shelf_take_item": {
     "sounds": [
@@ -1157,7 +1191,8 @@
         "name": "entity.item_frame.remove_item",
         "type": "event"
       }
-    ]
+    ],
+    "subtitle": "subtitles.buildscape.block_shelf_take_item"
   },
   "block_shelf_single_swap": {
     "sounds": [
@@ -1165,7 +1200,8 @@
         "name": "entity.item_frame.rotate_item",
         "type": "event"
       }
-    ]
+    ],
+    "subtitle": "subtitles.buildscape.block_shelf_single_swap"
   },
   "block_shelf_multi_swap": {
     "sounds": [
@@ -1173,7 +1209,8 @@
         "name": "entity.item_frame.rotate_item",
         "type": "event"
       }
-    ]
+    ],
+    "subtitle": "subtitles.buildscape.block_shelf_multi_swap"
   },
   "music_disc_celebration": {
     "sounds": [
@@ -1181,7 +1218,8 @@
         "name": "buildscape:music/celebration",
         "stream": true
       }
-    ]
+    ],
+    "subtitle": "subtitles.buildscape.music_disc"
   },
   "music_disc_snowfall": {
     "sounds": [
@@ -1189,7 +1227,8 @@
         "name": "buildscape:music/snowfall",
         "stream": true
       }
-    ]
+    ],
+    "subtitle": "subtitles.buildscape.music_disc"
   },
   "music_disc_builder": {
     "sounds": [
@@ -1197,6 +1236,7 @@
         "name": "buildscape:music/builder",
         "stream": true
       }
-    ]
+    ],
+    "subtitle": "subtitles.buildscape.music_disc"
   }
 }

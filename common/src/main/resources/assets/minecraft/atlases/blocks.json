@@ -3,6 +3,14 @@
     {
       "type": "minecraft:single",
       "resource": "buildscape:block/string_light_string"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "buildscape:fluid/experience_still"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "buildscape:fluid/experience_flow"
     }
   ]
 }

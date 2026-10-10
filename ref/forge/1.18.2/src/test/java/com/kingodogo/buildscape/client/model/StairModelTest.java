@@ -67,6 +67,7 @@ public final class StairModelTest {
     private static void checkGlassGeometry(String kind) throws IOException {
         JsonObject model = read(ASSETS.resolve("models/block/glass_stairs"
                 + (kind.equals("straight") ? "" : "_" + kind) + "_template.json"));
+        // Sample every model-space voxel so split transparent elements match vanilla's solid shape.
         for (int x = 0; x < 16; x++) {
             for (int y = 0; y < 16; y++) {
                 for (int z = 0; z < 16; z++) {

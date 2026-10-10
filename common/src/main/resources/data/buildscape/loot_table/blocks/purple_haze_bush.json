@@ -1,0 +1,30 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "rolls": 1,
+      "bonus_rolls": 0,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "buildscape:purple_haze_bush",
+          "functions": [
+            {
+              "function": "minecraft:set_nbt",
+              "tag": "{BlockStateTag:{has_haze:\"false\"},HasHaze:0b}",
+              "conditions": [
+                {
+                  "condition": "minecraft:block_state_property",
+                  "block": "buildscape:purple_haze_bush",
+                  "properties": {
+                    "has_haze": "false"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

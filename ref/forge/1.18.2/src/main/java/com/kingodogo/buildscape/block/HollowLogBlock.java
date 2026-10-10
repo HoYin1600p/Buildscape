@@ -340,6 +340,10 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
         if (hasDecoration && hollowBe != null && hollowBe.getDecorationState().is(Blocks.FLOWER_POT)) {
             BlockState pottedState = getPottedBlockState(held.getItem());
             if (pottedState != null) {
+                if (pottedState.hasProperty(PottedHazeBushBlock.HAS_HAZE)) {
+                    boolean hasHaze = !com.kingodogo.buildscape.item.HazeBushItem.isDrained(held);
+                    pottedState = pottedState.setValue(PottedHazeBushBlock.HAS_HAZE, hasHaze);
+                }
                 if (!level.isClientSide) {
                     hollowBe.setDecorationState(pottedState);
                     hollowBe.setChanged();
@@ -451,6 +455,12 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
                 Block content = potBlock.getContent();
                 ItemStack plantDrop = (content != null && content != Blocks.AIR) ? new ItemStack(content) : ItemStack.EMPTY;
                 if (!plantDrop.isEmpty()) {
+                    if (decState.hasProperty(PottedHazeBushBlock.HAS_HAZE) && !decState.getValue(PottedHazeBushBlock.HAS_HAZE)) {
+                        net.minecraft.nbt.CompoundTag blockStateTag = new net.minecraft.nbt.CompoundTag();
+                        blockStateTag.putString("has_haze", "false");
+                        plantDrop.addTagElement("BlockStateTag", blockStateTag);
+                        plantDrop.getOrCreateTag().putBoolean("HasHaze", false);
+                    }
                     return List.of(new ItemStack(Items.FLOWER_POT), plantDrop);
                 } else {
                     return List.of(new ItemStack(potBlock.asItem()));

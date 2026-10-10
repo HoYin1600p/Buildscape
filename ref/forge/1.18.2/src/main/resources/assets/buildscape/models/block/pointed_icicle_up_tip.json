@@ -1,8 +1,6 @@
 {
-  "parent": "minecraft:block/pointed_dripstone_up_tip",
+  "parent": "buildscape:block/icicle",
   "textures": {
-    "cross": "buildscape:block/icicle_up_tip",
-    "particle": "#cross"
-  },
-  "render_type": "minecraft:cutout_mipped"
+    "cross": "buildscape:block/icicle_up_tip"
+  }
 }

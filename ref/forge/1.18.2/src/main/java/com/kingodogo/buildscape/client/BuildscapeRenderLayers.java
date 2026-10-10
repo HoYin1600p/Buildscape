@@ -36,6 +36,7 @@ public final class BuildscapeRenderLayers {
 
         if (
                 path.startsWith("potted_") ||
+                path.endsWith("_haze_bush") ||
                 path.contains("hollow") ||
                 path.contains("wallpaper_flat") ||
                 path.contains("steel_mesh_block") ||
@@ -115,6 +116,7 @@ public final class BuildscapeRenderLayers {
                     "festive_stocking",
                     "frost_rose",
                     "glow_lights",
+                    "ice_crystal",
                     "icicle",
                     "mangrove_propagule",
                     "mangrove_roots",

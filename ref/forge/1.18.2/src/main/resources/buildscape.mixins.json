@@ -38,7 +38,9 @@
     "FlowingFluidMixin",
     "LavaFluidMixin",
     "LiquidBlockMixin",
-    "FireworkRocketEntityMixin"
+    "FireworkRocketEntityMixin",
+    "LightningBoltMixin",
+    "PoiTypeAccessor"
   ],
   "client": [
     "AbstractContainerScreenMixin",

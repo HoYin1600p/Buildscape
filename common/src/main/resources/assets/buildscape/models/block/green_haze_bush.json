@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cross",
+  "textures": {
+    "cross": "buildscape:block/green_haze_bush"
+  },
+  "render_type": "cutout"
+}

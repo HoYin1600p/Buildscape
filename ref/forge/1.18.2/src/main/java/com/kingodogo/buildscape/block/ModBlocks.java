@@ -3,6 +3,7 @@ package com.kingodogo.buildscape.block;
 import com.kingodogo.buildscape.BuildScape;
 import com.kingodogo.buildscape.item.ModItems;
 import com.kingodogo.buildscape.sound.ModSounds;
+import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -11,6 +12,9 @@ import net.minecraft.world.level.material.MaterialColor;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
+
+import java.util.EnumMap;
+import java.util.Map;
 
 public class ModBlocks {
 
@@ -5684,6 +5688,14 @@ public class ModBlocks {
                                         BlockBehaviour.Properties.of(Material.METAL, MaterialColor.METAL)
                                                         .strength(2.0f)
                                                         .sound(net.minecraft.world.level.block.SoundType.METAL)
+                                                        .noOcclusion()));
+        public static final RegistryObject<Block> ICE_CRYSTAL = BLOCKS.register(
+                        "ice_crystal",
+                        () -> new IceCrystalBlock(
+                                        BlockBehaviour.Properties.of(Material.AMETHYST, MaterialColor.COLOR_LIGHT_BLUE)
+                                                        .strength(1.5f)
+                                                        .sound(SoundType.AMETHYST_CLUSTER)
+                                                        .lightLevel(state -> 3)
                                                         .noOcclusion()));
         public static final RegistryObject<Block> MANGROVE_LOG = BLOCKS.register(
                         "mangrove_log",
@@ -12313,6 +12325,40 @@ public class ModBlocks {
                         () -> new ModBushBlock(BlockBehaviour.Properties.copy(Blocks.DEAD_BUSH)));
         public static final RegistryObject<Block> RED_BUSH = BLOCKS.register("red_bush",
                         () -> new ModBushBlock(BlockBehaviour.Properties.copy(Blocks.DEAD_BUSH)));
+        public static final Map<DyeColor, RegistryObject<Block>> COLORED_HAZE_BUSHES = new EnumMap<>(DyeColor.class);
+        public static final Map<DyeColor, RegistryObject<Block>> POTTED_COLORED_HAZE_BUSHES = new EnumMap<>(DyeColor.class);
+
+        private static RegistryObject<Block> registerHazeBush(DyeColor color) {
+                RegistryObject<Block> obj = BLOCKS.register(color.getName() + "_haze_bush",
+                                () -> new HazeBushBlock(color, BlockBehaviour.Properties.of(Material.PLANT, MaterialColor.WOOD)
+                                                .noCollission().instabreak().sound(SoundType.GRASS)));
+                COLORED_HAZE_BUSHES.put(color, obj);
+                return obj;
+        }
+
+        private static RegistryObject<Block> registerPottedHazeBush(DyeColor color, RegistryObject<Block> bush) {
+                RegistryObject<Block> obj = BLOCKS.register("potted_" + color.getName() + "_haze_bush",
+                                () -> new PottedHazeBushBlock(color, () -> (FlowerPotBlock) Blocks.FLOWER_POT, bush, BlockBehaviour.Properties.copy(Blocks.POTTED_POPPY)));
+                POTTED_COLORED_HAZE_BUSHES.put(color, obj);
+                return obj;
+        }
+
+        public static final RegistryObject<Block> WHITE_HAZE_BUSH = registerHazeBush(DyeColor.WHITE);
+        public static final RegistryObject<Block> ORANGE_HAZE_BUSH = registerHazeBush(DyeColor.ORANGE);
+        public static final RegistryObject<Block> MAGENTA_HAZE_BUSH = registerHazeBush(DyeColor.MAGENTA);
+        public static final RegistryObject<Block> LIGHT_BLUE_HAZE_BUSH = registerHazeBush(DyeColor.LIGHT_BLUE);
+        public static final RegistryObject<Block> YELLOW_HAZE_BUSH = registerHazeBush(DyeColor.YELLOW);
+        public static final RegistryObject<Block> LIME_HAZE_BUSH = registerHazeBush(DyeColor.LIME);
+        public static final RegistryObject<Block> PINK_HAZE_BUSH = registerHazeBush(DyeColor.PINK);
+        public static final RegistryObject<Block> GRAY_HAZE_BUSH = registerHazeBush(DyeColor.GRAY);
+        public static final RegistryObject<Block> LIGHT_GRAY_HAZE_BUSH = registerHazeBush(DyeColor.LIGHT_GRAY);
+        public static final RegistryObject<Block> CYAN_HAZE_BUSH = registerHazeBush(DyeColor.CYAN);
+        public static final RegistryObject<Block> PURPLE_HAZE_BUSH = registerHazeBush(DyeColor.PURPLE);
+        public static final RegistryObject<Block> BLUE_HAZE_BUSH = registerHazeBush(DyeColor.BLUE);
+        public static final RegistryObject<Block> BROWN_HAZE_BUSH = registerHazeBush(DyeColor.BROWN);
+        public static final RegistryObject<Block> GREEN_HAZE_BUSH = registerHazeBush(DyeColor.GREEN);
+        public static final RegistryObject<Block> RED_HAZE_BUSH = registerHazeBush(DyeColor.RED);
+        public static final RegistryObject<Block> BLACK_HAZE_BUSH = registerHazeBush(DyeColor.BLACK);
         public static final RegistryObject<Block> FIREFLY_BUSH = BLOCKS.register("firefly_bush",
                         () -> new FireflyBushBlock(BlockBehaviour.Properties.copy(Blocks.GRASS).lightLevel(state -> 2).hasPostProcess((state, getter, pos) -> true).emissiveRendering((state, getter, pos) -> true)));
         public static final RegistryObject<Block> DRY_GRASS = BLOCKS.register("dry_grass",
@@ -12334,6 +12380,22 @@ public class ModBlocks {
                         () -> new FlowerPotBlock(() -> (FlowerPotBlock) Blocks.FLOWER_POT, BUSH, BlockBehaviour.Properties.copy(Blocks.POTTED_POPPY)));
         public static final RegistryObject<Block> POTTED_RED_BUSH = BLOCKS.register("potted_red_bush",
                         () -> new FlowerPotBlock(() -> (FlowerPotBlock) Blocks.FLOWER_POT, RED_BUSH, BlockBehaviour.Properties.copy(Blocks.POTTED_POPPY)));
+        public static final RegistryObject<Block> POTTED_WHITE_HAZE_BUSH = registerPottedHazeBush(DyeColor.WHITE, WHITE_HAZE_BUSH);
+        public static final RegistryObject<Block> POTTED_ORANGE_HAZE_BUSH = registerPottedHazeBush(DyeColor.ORANGE, ORANGE_HAZE_BUSH);
+        public static final RegistryObject<Block> POTTED_MAGENTA_HAZE_BUSH = registerPottedHazeBush(DyeColor.MAGENTA, MAGENTA_HAZE_BUSH);
+        public static final RegistryObject<Block> POTTED_LIGHT_BLUE_HAZE_BUSH = registerPottedHazeBush(DyeColor.LIGHT_BLUE, LIGHT_BLUE_HAZE_BUSH);
+        public static final RegistryObject<Block> POTTED_YELLOW_HAZE_BUSH = registerPottedHazeBush(DyeColor.YELLOW, YELLOW_HAZE_BUSH);
+        public static final RegistryObject<Block> POTTED_LIME_HAZE_BUSH = registerPottedHazeBush(DyeColor.LIME, LIME_HAZE_BUSH);
+        public static final RegistryObject<Block> POTTED_PINK_HAZE_BUSH = registerPottedHazeBush(DyeColor.PINK, PINK_HAZE_BUSH);
+        public static final RegistryObject<Block> POTTED_GRAY_HAZE_BUSH = registerPottedHazeBush(DyeColor.GRAY, GRAY_HAZE_BUSH);
+        public static final RegistryObject<Block> POTTED_LIGHT_GRAY_HAZE_BUSH = registerPottedHazeBush(DyeColor.LIGHT_GRAY, LIGHT_GRAY_HAZE_BUSH);
+        public static final RegistryObject<Block> POTTED_CYAN_HAZE_BUSH = registerPottedHazeBush(DyeColor.CYAN, CYAN_HAZE_BUSH);
+        public static final RegistryObject<Block> POTTED_PURPLE_HAZE_BUSH = registerPottedHazeBush(DyeColor.PURPLE, PURPLE_HAZE_BUSH);
+        public static final RegistryObject<Block> POTTED_BLUE_HAZE_BUSH = registerPottedHazeBush(DyeColor.BLUE, BLUE_HAZE_BUSH);
+        public static final RegistryObject<Block> POTTED_BROWN_HAZE_BUSH = registerPottedHazeBush(DyeColor.BROWN, BROWN_HAZE_BUSH);
+        public static final RegistryObject<Block> POTTED_GREEN_HAZE_BUSH = registerPottedHazeBush(DyeColor.GREEN, GREEN_HAZE_BUSH);
+        public static final RegistryObject<Block> POTTED_RED_HAZE_BUSH = registerPottedHazeBush(DyeColor.RED, RED_HAZE_BUSH);
+        public static final RegistryObject<Block> POTTED_BLACK_HAZE_BUSH = registerPottedHazeBush(DyeColor.BLACK, BLACK_HAZE_BUSH);
         public static final RegistryObject<Block> POTTED_FIREFLY_BUSH = BLOCKS.register("potted_firefly_bush",
                         () -> new FlowerPotBlock(() -> (FlowerPotBlock) Blocks.FLOWER_POT, FIREFLY_BUSH, BlockBehaviour.Properties.copy(Blocks.POTTED_POPPY).lightLevel(state -> 2)));
         public static final RegistryObject<Block> POTTED_DRY_GRASS = BLOCKS.register("potted_dry_grass",

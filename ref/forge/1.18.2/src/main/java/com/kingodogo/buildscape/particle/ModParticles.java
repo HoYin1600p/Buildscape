@@ -45,6 +45,9 @@ public class ModParticles {
             PARTICLES.register("copper_fire_flame", () -> new SimpleParticleType(false));
     public static final RegistryObject<SimpleParticleType> FIREFLY =
             PARTICLES.register("firefly", () -> new SimpleParticleType(false));
+    public static final RegistryObject<SimpleParticleType> HAZE =
+            // Keep the handler's 32-block scan range consistent with this limiter flag.
+            PARTICLES.register("haze", () -> new SimpleParticleType(false));
 
     public static final RegistryObject<SimpleParticleType> SULFUR_BUBBLES =
             PARTICLES.register("sulfur_bubbles", () -> new SimpleParticleType(false));

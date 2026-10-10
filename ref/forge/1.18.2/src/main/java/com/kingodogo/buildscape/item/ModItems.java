@@ -5890,6 +5890,11 @@ public class ModItems {
                     )
     );
 
+    public static final RegistryObject<Item> ICE_CRYSTAL = ITEMS.register(
+            "ice_crystal",
+            () -> new BlockItem(ModBlocks.ICE_CRYSTAL.get(), createBlockItemProperties())
+    );
+
     public static final RegistryObject<Item> COPPER_NUGGET = ITEMS.register(
             "copper_nugget",
             () -> new Item(new Item.Properties().tab(ModCreativeModeTab.BUILDSCAPE_TAB))
@@ -10102,6 +10107,22 @@ public class ModItems {
     public static final RegistryObject<Item> CACTUS_FLOWER = ITEMS.register("cactus_flower", () -> new BlockItem(ModBlocks.CACTUS_FLOWER.get(), createBlockItemProperties()));
     public static final RegistryObject<Item> BUSH = ITEMS.register("bush", () -> new BlockItem(ModBlocks.BUSH.get(), createBlockItemProperties()));
     public static final RegistryObject<Item> RED_BUSH = ITEMS.register("red_bush", () -> new BlockItem(ModBlocks.RED_BUSH.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> WHITE_HAZE_BUSH = ITEMS.register("white_haze_bush", () -> new HazeBushItem(ModBlocks.WHITE_HAZE_BUSH.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> ORANGE_HAZE_BUSH = ITEMS.register("orange_haze_bush", () -> new HazeBushItem(ModBlocks.ORANGE_HAZE_BUSH.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> MAGENTA_HAZE_BUSH = ITEMS.register("magenta_haze_bush", () -> new HazeBushItem(ModBlocks.MAGENTA_HAZE_BUSH.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIGHT_BLUE_HAZE_BUSH = ITEMS.register("light_blue_haze_bush", () -> new HazeBushItem(ModBlocks.LIGHT_BLUE_HAZE_BUSH.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> YELLOW_HAZE_BUSH = ITEMS.register("yellow_haze_bush", () -> new HazeBushItem(ModBlocks.YELLOW_HAZE_BUSH.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIME_HAZE_BUSH = ITEMS.register("lime_haze_bush", () -> new HazeBushItem(ModBlocks.LIME_HAZE_BUSH.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PINK_HAZE_BUSH = ITEMS.register("pink_haze_bush", () -> new HazeBushItem(ModBlocks.PINK_HAZE_BUSH.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GRAY_HAZE_BUSH = ITEMS.register("gray_haze_bush", () -> new HazeBushItem(ModBlocks.GRAY_HAZE_BUSH.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> LIGHT_GRAY_HAZE_BUSH = ITEMS.register("light_gray_haze_bush", () -> new HazeBushItem(ModBlocks.LIGHT_GRAY_HAZE_BUSH.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> CYAN_HAZE_BUSH = ITEMS.register("cyan_haze_bush", () -> new HazeBushItem(ModBlocks.CYAN_HAZE_BUSH.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> PURPLE_HAZE_BUSH = ITEMS.register("purple_haze_bush", () -> new HazeBushItem(ModBlocks.PURPLE_HAZE_BUSH.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BLUE_HAZE_BUSH = ITEMS.register("blue_haze_bush", () -> new HazeBushItem(ModBlocks.BLUE_HAZE_BUSH.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BROWN_HAZE_BUSH = ITEMS.register("brown_haze_bush", () -> new HazeBushItem(ModBlocks.BROWN_HAZE_BUSH.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> GREEN_HAZE_BUSH = ITEMS.register("green_haze_bush", () -> new HazeBushItem(ModBlocks.GREEN_HAZE_BUSH.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> RED_HAZE_BUSH = ITEMS.register("red_haze_bush", () -> new HazeBushItem(ModBlocks.RED_HAZE_BUSH.get(), createBlockItemProperties()));
+    public static final RegistryObject<Item> BLACK_HAZE_BUSH = ITEMS.register("black_haze_bush", () -> new HazeBushItem(ModBlocks.BLACK_HAZE_BUSH.get(), createBlockItemProperties()));
     public static final RegistryObject<Item> FIREFLY_BUSH = ITEMS.register("firefly_bush", () -> new BlockItem(ModBlocks.FIREFLY_BUSH.get(), createBlockItemProperties()));
     public static final RegistryObject<Item> DRY_GRASS = ITEMS.register("dry_grass", () -> new BlockItem(ModBlocks.DRY_GRASS.get(), createBlockItemProperties()));
     public static final RegistryObject<Item> TALL_DRY_GRASS = ITEMS.register("tall_dry_grass", () -> new BlockItem(ModBlocks.TALL_DRY_GRASS.get(), createBlockItemProperties()));

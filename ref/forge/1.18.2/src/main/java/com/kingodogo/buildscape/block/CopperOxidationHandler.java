@@ -10,6 +10,9 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.LightningRodBlock;
+import net.minecraft.world.level.block.ButtonBlock;
+import net.minecraft.world.level.block.WeightedPressurePlateBlock;
 import net.minecraft.world.level.block.ChestBlock;
 import net.minecraft.world.level.block.DoorBlock;
 import net.minecraft.world.level.block.state.BlockState;
@@ -34,7 +37,7 @@ public class CopperOxidationHandler {
     private static final Map<Supplier<Block>, Supplier<Block>> WAXED_MAP = new HashMap<>();
     private static final Map<Supplier<Block>, Supplier<Block>> UNWAXED_MAP = new HashMap<>();
 
-    public static void init() {
+    public static synchronized void init() {
         if (!NEXT_STAGE.isEmpty()) return;
 
         registerChain(ModBlocks.CHISELED_COPPER, ModBlocks.EXPOSED_CHISELED_COPPER, ModBlocks.WEATHERED_CHISELED_COPPER, ModBlocks.OXIDIZED_CHISELED_COPPER);
@@ -151,13 +154,18 @@ public class CopperOxidationHandler {
     }
 
     private static void registerChain(Supplier<Block> b0, Supplier<Block> b1, Supplier<Block> b2, Supplier<Block> b3) {
-        NEXT_STAGE.put(b0, b1);
-        NEXT_STAGE.put(b1, b2);
-        NEXT_STAGE.put(b2, b3);
+        registerChain(NEXT_STAGE, PREV_STAGE, b0, b1, b2, b3);
+    }
 
-        PREV_STAGE.put(b3, b2);
-        PREV_STAGE.put(b2, b1);
-        PREV_STAGE.put(b1, b0);
+    static <T> void registerChain(Map<Supplier<T>, Supplier<T>> next, Map<Supplier<T>, Supplier<T>> previous,
+                                  Supplier<T> b0, Supplier<T> b1, Supplier<T> b2, Supplier<T> b3) {
+        next.put(b0, b1);
+        next.put(b1, b2);
+        next.put(b2, b3);
+
+        previous.put(b3, b2);
+        previous.put(b2, b1);
+        previous.put(b1, b0);
     }
 
     private static void registerWaxPair(Supplier<Block> unwaxed, Supplier<Block> waxed) {
@@ -311,7 +319,7 @@ public class CopperOxidationHandler {
         }
     }
 
-    private static void setBlockStateOrDoor(Level level, BlockPos pos, BlockState state, Block targetBlock) {
+    static void setBlockStateOrDoor(Level level, BlockPos pos, BlockState state, Block targetBlock) {
         if (state.hasProperty(DoorBlock.HALF)) {
             DoubleBlockHalf half = state.getValue(DoorBlock.HALF);
             BlockPos lowerPos = half == DoubleBlockHalf.LOWER ? pos : pos.below();
@@ -326,6 +334,19 @@ public class CopperOxidationHandler {
             setCopperChestState(level, pos, state, targetBlock);
         } else {
             BlockState nextState = copyStateProperties(state, targetBlock.defaultBlockState());
+            // Scheduled ticks belong to a block type, so the old block's tick cannot reset its replacement.
+            // Schedule before placement: LightningRodBlock.onPlace otherwise clears POWERED without
+            // notifying neighbours, leaving the circuit powered while the rod itself is unpowered.
+            if (!level.isClientSide && state.getBlock() != targetBlock) {
+                if (targetBlock instanceof LightningRodBlock && nextState.getValue(LightningRodBlock.POWERED)) {
+                    level.scheduleTick(pos, targetBlock, 8);
+                } else if (targetBlock instanceof ButtonBlock && nextState.getValue(ButtonBlock.POWERED)) {
+                    level.scheduleTick(pos, targetBlock, 20);
+                } else if (targetBlock instanceof WeightedPressurePlateBlock
+                        && nextState.getValue(WeightedPressurePlateBlock.POWER) > 0) {
+                    level.scheduleTick(pos, targetBlock, 10);
+                }
+            }
             level.setBlock(pos, nextState, 3);
         }
     }
@@ -358,13 +379,54 @@ public class CopperOxidationHandler {
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    private static BlockState copyStateProperties(BlockState from, BlockState to) {
+    public static BlockState copyStateProperties(BlockState from, BlockState to) {
         for (Property prop : from.getProperties()) {
             if (to.hasProperty(prop)) {
                 to = to.setValue(prop, from.getValue(prop));
             }
         }
         return to;
+    }
+
+    public static Block getPrevStage(Block block) {
+        init();
+        return getMappedStage(block, PREV_STAGE);
+    }
+
+    static <T> T getMappedStage(T stage, Map<Supplier<T>, Supplier<T>> stages) {
+        for (Map.Entry<Supplier<T>, Supplier<T>> entry : stages.entrySet()) {
+            if (entry.getKey().get() == stage) {
+                return entry.getValue().get();
+            }
+        }
+        return null;
+    }
+
+    public static Block getFirstStage(Block block) {
+        init();
+        return getFirstStage(block, NEXT_STAGE, PREV_STAGE);
+    }
+
+    public static boolean isWeatheringCopper(Block block) {
+        init();
+        return block instanceof WeatheringCopper || isWeatheringStage(block, NEXT_STAGE, PREV_STAGE);
+    }
+
+    static <T> boolean isWeatheringStage(T stage, Map<Supplier<T>, Supplier<T>> next,
+                                         Map<Supplier<T>, Supplier<T>> previous) {
+        return getMappedStage(stage, next) != null || getMappedStage(stage, previous) != null;
+    }
+
+    static <T> T getFirstStage(T stage, Map<Supplier<T>, Supplier<T>> next,
+                               Map<Supplier<T>, Supplier<T>> previous) {
+        if (!isWeatheringStage(stage, next, previous)) return null;
+        T current = stage;
+        while (true) {
+            T prev = getMappedStage(current, previous);
+            if (prev == null) break;
+            current = prev;
+        }
+        return current;
     }
 
     public static BlockState getNextOxidationState(BlockState state) {

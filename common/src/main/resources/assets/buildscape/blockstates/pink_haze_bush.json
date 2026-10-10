@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "has_haze=true": {
+      "model": "buildscape:block/pink_haze_bush"
+    },
+    "has_haze=false": {
+      "model": "buildscape:block/pink_haze_bush"
+    }
+  }
+}

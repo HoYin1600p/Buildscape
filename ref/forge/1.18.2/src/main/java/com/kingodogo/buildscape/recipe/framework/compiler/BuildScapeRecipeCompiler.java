@@ -5,12 +5,16 @@ import com.kingodogo.buildscape.recipe.ConfettiConfigureRecipe;
 import com.kingodogo.buildscape.recipe.ShapedDurabilityRecipe;
 import com.kingodogo.buildscape.recipe.ShapelessDurabilityRecipe;
 import com.kingodogo.buildscape.recipe.framework.parser.RecipeIR;
+import com.kingodogo.buildscape.recipe.framework.util.IngredientCache;
 import com.kingodogo.buildscape.recipe.framework.validation.RecipeValidator;
 import net.minecraft.core.NonNullList;
+import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.*;
 
@@ -158,7 +162,7 @@ public class BuildScapeRecipeCompiler {
             return null;
         }
 
-        Item resultItem = aliasResolver.resolveItem(spec.result().item());
+        Item resultItem = resolveItem(spec.result().item());
         if (resultItem == null) {
             return null;
         }
@@ -193,29 +197,29 @@ public class BuildScapeRecipeCompiler {
                 return new ShapelessDurabilityRecipe(base.getId(), base.getGroup(), base.getResultItem(), base.getIngredients(), 1);
             }
             case "stonecutting" -> {
-                Ingredient input = aliasResolver.resolveIngredient(spec.input());
+                Ingredient input = resolveIngredient(spec.input());
                 return new StonecutterRecipe(recipeId, group, input, resultStack);
             }
             case "smelting" -> {
-                Ingredient input = aliasResolver.resolveIngredient(spec.input());
+                Ingredient input = resolveIngredient(spec.input());
                 return new SmeltingRecipe(recipeId, group, input, resultStack, spec.experience(), spec.cookingTime());
             }
             case "blasting" -> {
-                Ingredient input = aliasResolver.resolveIngredient(spec.input());
+                Ingredient input = resolveIngredient(spec.input());
                 return new BlastingRecipe(recipeId, group, input, resultStack, spec.experience(), spec.cookingTime());
             }
             case "smoking" -> {
-                Ingredient input = aliasResolver.resolveIngredient(spec.input());
+                Ingredient input = resolveIngredient(spec.input());
                 return new SmokingRecipe(recipeId, group, input, resultStack, spec.experience(), spec.cookingTime());
             }
             case "campfire", "campfire_cooking" -> {
-                Ingredient input = aliasResolver.resolveIngredient(spec.input());
+                Ingredient input = resolveIngredient(spec.input());
                 return new CampfireCookingRecipe(recipeId, group, input, resultStack, spec.experience(), spec.cookingTime());
             }
             case "smithing" -> {
-                Ingredient base = aliasResolver.resolveIngredient(spec.input());
+                Ingredient base = resolveIngredient(spec.input());
                 Ingredient addition = spec.ingredients() != null && !spec.ingredients().isEmpty()
-                        ? aliasResolver.resolveIngredient(spec.ingredients().get(0)) : Ingredient.EMPTY;
+                    ? resolveIngredient(spec.ingredients().get(0)) : Ingredient.EMPTY;
                 return new UpgradeRecipe(recipeId, base, addition, resultStack);
             }
             default -> {
@@ -239,7 +243,7 @@ public class BuildScapeRecipeCompiler {
             for (Map.Entry<String, String> entry : spec.keys().entrySet()) {
                 if (entry.getKey().length() > 0) {
                     char c = entry.getKey().charAt(0);
-                    Ingredient ing = aliasResolver.resolveIngredient(entry.getValue());
+                    Ingredient ing = resolveIngredient(entry.getValue());
                     keyMap.put(c, ing);
                 }
             }
@@ -265,13 +269,57 @@ public class BuildScapeRecipeCompiler {
         NonNullList<Ingredient> ingredients = NonNullList.create();
         if (spec.ingredients() != null) {
             for (String ingStr : spec.ingredients()) {
-                Ingredient ing = aliasResolver.resolveIngredient(ingStr);
+                Ingredient ing = resolveIngredient(ingStr);
                 if (!ing.isEmpty()) {
                     ingredients.add(ing);
                 }
             }
         }
         return new ShapelessRecipe(id, group, result, ingredients);
+    }
+
+    public Ingredient resolveIngredient(String rawSpec) {
+        if (rawSpec == null || rawSpec.isEmpty()) {
+            return Ingredient.EMPTY;
+        }
+
+        if (rawSpec.startsWith("[") && rawSpec.endsWith("]")) {
+            String inner = rawSpec.substring(1, rawSpec.length() - 1);
+            String[] parts = inner.split(",");
+            List<Ingredient> ingredients = new ArrayList<>();
+            for (String part : parts) {
+                Ingredient ing = resolveIngredient(part.trim());
+                if (!ing.isEmpty()) {
+                    ingredients.add(ing);
+                }
+            }
+            return ingredients.isEmpty() ? Ingredient.EMPTY : Ingredient.merge(ingredients);
+        }
+
+        String resolved = aliasResolver.resolveString(rawSpec);
+
+        if (resolved.startsWith("#")) {
+            String tagId = resolved.substring(1);
+            TagKey<Item> tagKey = TagKey.create(Registry.ITEM_REGISTRY, new ResourceLocation(tagId));
+            return IngredientCache.get(tagKey);
+        }
+
+        ResourceLocation loc = new ResourceLocation(resolved);
+        Item item = ForgeRegistries.ITEMS.getValue(loc);
+        if (item != null && ForgeRegistries.ITEMS.containsKey(loc)) {
+            return IngredientCache.get(item);
+        }
+
+        return Ingredient.EMPTY;
+    }
+
+    public Item resolveItem(String rawSpec) {
+        if (rawSpec == null || rawSpec.isEmpty()) {
+            return null;
+        }
+        String resolved = aliasResolver.resolveString(rawSpec);
+        ResourceLocation loc = new ResourceLocation(resolved);
+        return ForgeRegistries.ITEMS.getValue(loc);
     }
 
     private String generateRecipeId(RecipeIR.RecipeSpec spec) {

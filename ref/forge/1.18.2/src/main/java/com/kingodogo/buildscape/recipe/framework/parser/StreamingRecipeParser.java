@@ -2,7 +2,6 @@ package com.kingodogo.buildscape.recipe.framework.parser;
 
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
-import com.kingodogo.buildscape.BuildScape;
 
 import java.io.IOException;
 import java.io.Reader;

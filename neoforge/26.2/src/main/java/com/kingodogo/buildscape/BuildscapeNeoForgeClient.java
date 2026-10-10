@@ -32,6 +32,8 @@ final class BuildscapeNeoForgeClient {
         bus.addListener(BuildscapeNeoForgeClient::renderers);
         bus.addListener(BuildscapeNeoForgeClient::specialModels);
         bus.addListener(BuildscapeNeoForgeClient::guiLayers);
+        bus.addListener(BuildscapeNeoForgeClient::blockColors);
+        bus.addListener(BuildscapeNeoForgeClient::itemColors);
         NeoForge.EVENT_BUS.addListener(BuildscapeNeoForgeClient::tick);
         NeoForge.EVENT_BUS.addListener(BuildscapeNeoForgeClient::worldOverlays);
         NeoForge.EVENT_BUS.addListener(BuildscapeNeoForgeClient::keyInput);
@@ -43,6 +45,13 @@ final class BuildscapeNeoForgeClient {
         NeoForge.EVENT_BUS.addListener(BuildscapeNeoForgeClient::camera);
         NeoForge.EVENT_BUS.addListener(BuildscapeNeoForgeClient::disconnect);
         NeoForge.EVENT_BUS.addListener(BuildscapeNeoForgeClient::unload);
+    }
+    private static void blockColors(net.neoforged.neoforge.client.event.RegisterColorHandlersEvent.BlockTintSources event) {
+        com.kingodogo.buildscape.adapter.v26x.client.FoliageColors.register(event.getBlockColors());
+    }
+    private static void itemColors(net.neoforged.neoforge.client.event.ModelEvent.ModifyBakingResult event) {
+        event.getBakingResult().itemStackModels().replaceAll(
+                com.kingodogo.buildscape.adapter.v26x.client.FoliageColors::tintItem);
     }
     private static void keys(net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent event) {
         com.kingodogo.buildscape.client.ModKeyBinds.register(event::register);
@@ -104,7 +113,12 @@ final class BuildscapeNeoForgeClient {
             @Override public void modifyFogColor(net.minecraft.client.Camera camera, float partialTick,
                     net.minecraft.client.multiplayer.ClientLevel level, int renderDistance, float darken,
                     org.joml.Vector4f color) {
-                color.set(0.3F, 0.9F, 0.1F, 1.0F);
+                com.kingodogo.buildscape.adapter.v26x.client.ExperienceFluidFog.color(color);
+            }
+            @Override public void modifyFogRender(net.minecraft.client.Camera camera,
+                    net.minecraft.client.renderer.fog.environment.FogEnvironment environment,
+                    float renderDistance, float partialTick, net.minecraft.client.renderer.fog.FogData fog) {
+                com.kingodogo.buildscape.adapter.v26x.client.ExperienceFluidFog.distances(fog);
             }
         }, com.kingodogo.buildscape.fluid.NeoForgeExperienceFluids.type());
     }

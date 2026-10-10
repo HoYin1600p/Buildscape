@@ -641,6 +641,19 @@ public final class ClientPlatformHooks {
 
     public static void renderClientOverlay(Object context, int width, int height) {
         if (!(context instanceof net.minecraft.client.gui.GuiGraphicsExtractor graphics)) return;
+        var minecraft = net.minecraft.client.Minecraft.getInstance();
+        if (minecraft.player == null || minecraft.level == null || minecraft.gui.hud.isHidden()) return;
+        ClientGuiHooks.withGraphics(graphics, () -> {
+            beginGuiOverlayRender();
+            try {
+                com.kingodogo.buildscape.client.PillarOverlayHandler.renderOverlay(graphics);
+                String logs = com.kingodogo.buildscape.client.TreeChopHandler.getOverlayText(
+                        minecraft.player, minecraft.hitResult);
+                if (logs != null) {
+                    graphics.centeredText(minecraft.font, logs, width / 2, height / 2 + 10, 0xFF00FFFF);
+                }
+            } finally { endGuiOverlayRender(); }
+        });
         var message = com.kingodogo.buildscape.client.ClientEvents.getOverlayMessage();
         long elapsed = System.currentTimeMillis() - com.kingodogo.buildscape.client.ClientEvents.getOverlayMessageTime();
         if (message == null) return;

@@ -95,6 +95,7 @@ public class RecipeValidator {
             Item item = Services.PLATFORM.getItem(loc);
             return item != null && item != Items.AIR;
         } catch (Throwable ignored) {
+            com.kingodogo.buildscape.BuildscapeCommon.LOGGER.warn("Unable to resolve recipe result item", ignored);
             return false;
         }
     }

@@ -102,6 +102,7 @@ public class SpoolBlock extends RotatedPillarBlock {
                 float[] rgb = Services.PLATFORM.getDyeDiffuseColors(dyeColor);
                 return ((int) (rgb[0] * 255.0F) << 16) | ((int) (rgb[1] * 255.0F) << 8) | (int) (rgb[2] * 255.0F);
             } catch (IllegalArgumentException ignored) {
+                // The reference ignores unrecognized dye names and uses its default color.
             }
         }
         if (path.endsWith("_spool")) {
@@ -117,6 +118,7 @@ public class SpoolBlock extends RotatedPillarBlock {
                 float[] rgb = Services.PLATFORM.getDyeDiffuseColors(dyeColor);
                 return ((int) (rgb[0] * 255.0F) << 16) | ((int) (rgb[1] * 255.0F) << 8) | (int) (rgb[2] * 255.0F);
             } catch (IllegalArgumentException ignored) {
+                // The reference ignores unrecognized dye names and uses its default color.
             }
         }
         return 0xFFFFFF;

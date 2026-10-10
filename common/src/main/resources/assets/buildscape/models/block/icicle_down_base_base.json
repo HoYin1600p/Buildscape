@@ -1,0 +1,8 @@
+{
+  "parent": "buildscape:block/icicle_base",
+  "textures": {
+    "cross": "buildscape:block/icicle_down_base",
+    "side": "buildscape:block/icicle_side",
+    "top": "buildscape:block/icicle_top"
+  }
+}

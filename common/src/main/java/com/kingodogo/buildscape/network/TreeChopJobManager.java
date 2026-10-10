@@ -57,6 +57,10 @@ public final class TreeChopJobManager {
         JOBS.clear();
     }
 
+    public static void onLevelUnload(ServerLevel level) {
+        JOBS.values().removeIf(job -> job.level == level);
+    }
+
     private static final class TreeChopJob {
         private final ServerLevel level;
         private final Block targetBlock;

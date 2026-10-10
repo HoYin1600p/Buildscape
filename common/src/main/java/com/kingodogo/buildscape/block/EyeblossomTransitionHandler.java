@@ -96,6 +96,10 @@ public final class EyeblossomTransitionHandler {
         TRACKERS.remove(level);
     }
 
+    public static void onServerStopping() {
+        TRACKERS.clear();
+    }
+
     private static Tracker tracker(ServerLevel level) {
         return TRACKERS.computeIfAbsent(level, ignored -> new Tracker(com.kingodogo.buildscape.platform.Services.PLATFORM.isNight(level)));
     }

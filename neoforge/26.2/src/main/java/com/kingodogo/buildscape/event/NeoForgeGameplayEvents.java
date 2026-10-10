@@ -52,8 +52,12 @@ public final class NeoForgeGameplayEvents {
         bus.addListener(NeoForgeGameplayEvents::rightClickBlock);
         bus.addListener(NeoForgeGameplayEvents::rightClickItem);
         bus.addListener(NeoForgeGameplayEvents::entityInteract);
-        bus.addListener((PlayerInteractEvent.LeftClickBlock event) ->
-                ModCommonEvents.onLeftClickBlock(event.getEntity(), event.getLevel(), event.getPos()));
+        bus.addListener((PlayerInteractEvent.LeftClickBlock event) -> {
+            InteractionResult result = ModCommonEvents.onLeftClickBlock(event.getEntity(), event.getLevel(), event.getPos());
+            if (result != InteractionResult.PASS) {
+                event.setCanceled(true);
+            }
+        });
         bus.addListener((BlockEvent.EntityPlaceEvent event) -> {
             if (event.getLevel() instanceof Level level) {
                 ModCommonEvents.onBlockPlaced(level, event.getPos(), event.getPlacedBlock(),
@@ -83,14 +87,32 @@ public final class NeoForgeGameplayEvents {
             }
         });
         bus.addListener(NeoForgeGameplayEvents::anvilUpdate);
-        bus.addListener((EntityJoinLevelEvent event) -> ItemFrameParticleHandler.onEntityJoin(event.getEntity(), event.getLevel()));
+        bus.addListener((EntityJoinLevelEvent event) -> {
+            if (event.getEntity() instanceof net.minecraft.world.entity.item.ItemEntity item
+                    && FrostRoseDropHandler.shouldCancelItemSpawn(item)) {
+                event.setCanceled(true);
+                return;
+            }
+            ItemFrameParticleHandler.onEntityJoin(event.getEntity(), event.getLevel());
+        });
         bus.addListener((EntityLeaveLevelEvent event) -> ItemFrameParticleHandler.onEntityLeave(event.getEntity(), event.getLevel()));
+        bus.addListener((net.neoforged.neoforge.event.level.ChunkEvent.Load event) -> {
+            if (event.getLevel() instanceof ServerLevel level) {
+                com.kingodogo.buildscape.block.EyeblossomTransitionHandler.onChunkLoad(level, event.getChunk());
+            }
+        });
+        bus.addListener((net.neoforged.neoforge.event.level.ChunkEvent.Unload event) -> {
+            if (event.getLevel() instanceof ServerLevel level) {
+                com.kingodogo.buildscape.block.EyeblossomTransitionHandler.onChunkUnload(level, event.getChunk().getPos());
+            }
+        });
         bus.addListener((LevelEvent.Unload event) -> {
             if (event.getLevel() instanceof ServerLevel level) {
-                com.kingodogo.buildscape.block.EyeblossomTransitionHandler.onWorldUnload(level);
+                ModCommonEvents.onLevelUnload(level);
             }
         });
         bus.addListener((ServerStartedEvent event) -> ModCommonEvents.onServerStarted(event.getServer()));
+        bus.addListener((net.neoforged.neoforge.event.server.ServerStoppingEvent event) -> ModCommonEvents.onServerStopping());
         bus.addListener((ServerTickEvent.Post event) -> ModCommonEvents.onServerTick(event.getServer()));
     }
 

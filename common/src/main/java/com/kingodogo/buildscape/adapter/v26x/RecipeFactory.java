@@ -381,10 +381,10 @@ public final class RecipeFactory {
         return null;
     }
 
-    private static ItemStackTemplate parseResult(String itemStr, int count, String nbt) {
+    private static ItemStackTemplate parseResult(String recipeId, String itemStr, int count, String nbt) {
         net.minecraft.world.item.Item item = BuiltInRegistries.ITEM.getValue(Identifier.tryParse(itemStr != null && !itemStr.isBlank() ? itemStr : "minecraft:air"));
         if (item == null || item == net.minecraft.world.item.Items.AIR) {
-            com.kingodogo.buildscape.BuildscapeCommon.LOGGER.warn("Skipping recipe with unknown or empty result item '{}'", itemStr);
+            com.kingodogo.buildscape.BuildscapeCommon.LOGGER.warn("Skipping recipe {} with unknown or empty result item '{}'", recipeId, itemStr);
             return null;
         }
         // Built without an ItemStack: item components are not bound yet while recipes are injected during reload.
@@ -405,10 +405,13 @@ public final class RecipeFactory {
         if (id == null) return null;
         ResourceKey<Recipe<?>> key = ResourceKey.create(Registries.RECIPE, id);
         String group = cr.group();
-        ItemStackTemplate result = parseResult(cr.resultItem(), cr.resultCount(), cr.resultNbt());
-        if (result == null) return null;
         String type =cr.type().toLowerCase(java.util.Locale.ROOT);
         if (type.startsWith("buildscape:")) type = type.substring("buildscape:".length());
+        // Special recipes have no result item, so they must not go through the result check below.
+        if (type.equals("confetti_configure")) return new RecipeHolder<>(key, CONFETTI_CONFIGURE_RECIPE);
+        if (type.equals("clear_shulker_filters")) return new RecipeHolder<>(key, CLEAR_SHULKER_FILTERS_RECIPE);
+        ItemStackTemplate result = parseResult(cr.id(), cr.resultItem(), cr.resultCount(), cr.resultNbt());
+        if (result == null) return null;
 
         Recipe.CommonInfo common = new Recipe.CommonInfo(true);
         CraftingRecipe.CraftingBookInfo book = new CraftingRecipe.CraftingBookInfo(CraftingBookCategory.MISC, group);

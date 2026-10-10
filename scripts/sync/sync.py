@@ -276,6 +276,11 @@ def write_report(plan, output):
     if plan["pending"]:
         lines += ["", "## Outstanding review queue", ""]
         lines += [f"- {c['path']}: {c['classification']} ({c['source_commit']})" for c in plan["pending"]]
+    conflicts = plan.get("apply", {}).get("conflicts", [])
+    if conflicts:
+        lines += ["", "## Resource conflicts (review required)", "",
+                  "Left unchanged in the target; converted old/new/target copies are under `conflicts/`.", ""]
+        lines += [f"- {c['path']}: {c['reason']}" for c in conflicts]
     if "apply" in plan:
         lines += ["", "## Apply result", "", "```json", json.dumps(plan["apply"], indent=2), "```"]
     (output / (stem + ".md")).write_text("\n".join(lines) + "\n", encoding="utf-8")
@@ -335,7 +340,7 @@ def command(template, values, cwd, log):
         raise SyncError(f"Validation/conversion failed ({code}); see {log}")
 
 
-def resource_changes(worktree, source_repo, plan, target, values, log, temp):
+def resource_changes(worktree, source_repo, plan, target, values, log, temp, conflict_dir):
     prefix = plan["source"]["subtree"] + "/main/resources/"
     old_dir, new_dir = temp / "old-resources", temp / "new-resources"
     policy = plan.get("removal_policy", {})
@@ -356,7 +361,7 @@ def resource_changes(worktree, source_repo, plan, target, values, log, temp):
     before = {p.relative_to(old_dir).as_posix(): p.read_bytes() for p in old_dir.rglob("*") if p.is_file()}
     after = {p.relative_to(new_dir).as_posix(): p.read_bytes() for p in new_dir.rglob("*") if p.is_file()}
     resource_root = local(worktree, target["resource_root"])
-    changed = []
+    changed, conflicts = [], []
     for path in sorted(before.keys() | after.keys()):
         if retired_path(target["resource_root"] + "/" + path, target, policy):
             continue
@@ -366,16 +371,21 @@ def resource_changes(worktree, source_repo, plan, target, values, log, temp):
         # Do not silently replace port-specific resource edits or unrelated files.
         current = dest.read_bytes() if dest.exists() else None
         if current not in (before.get(path), after.get(path)):
-            raise SyncError("Converted resource conflicts with target edits: " + str(dest))
+            # Port-specific edit: leave the target file alone and keep review material.
+            for suffix, data in ((".old", before.get(path)), (".new", after.get(path)), (".target", current)):
+                if data is not None:
+                    write_file(local(conflict_dir, path + suffix), data)
+            conflicts.append({"path": target["resource_root"] + "/" + path, "reason": "port-specific edit"})
+            continue
         if path in after:
             write_file(dest, after[path])
         elif dest.exists():
             dest.unlink()
         changed.append(target["resource_root"] + "/" + path)
-    return changed
+    return changed, conflicts
 
 
-def update_ledger(worktree, plan, target, fields, rows):
+def update_ledger(worktree, plan, target, fields, rows, conflicts=()):
     by_path = {r["reference_path"]: r for r in rows}
     for c in plan["changes"]:
         row = by_path.get(c["old_path"])
@@ -396,6 +406,11 @@ def update_ledger(worktree, plan, target, fields, rows):
         else:
             row["status"] = "needs_resync"
             row["verification"] = "Review required for source " + plan["source_commit"]
+    conflicted = {c["path"] for c in conflicts}
+    for row in rows:
+        if row.get("kind") == "resource" and row.get("active_paths") in conflicted:
+            row["status"] = "needs_resync"
+            row["verification"] = "Review required for source " + plan["source_commit"] + ": port-specific edit"
     with local(worktree, target["mapping_file"]).open("w", encoding="utf-8", newline="") as stream:
         writer = csv.DictWriter(stream, fieldnames=fields)
         writer.writeheader()
@@ -435,11 +450,15 @@ def apply_plan(repo, plan, target, branch_config, source_repo, registry_path, ou
     plan["apply"] = {"status": "in-progress", "branch": branch, "worktree": str(worktree), "log": str(log)}
     write_report(plan, output)
     try:
-        resource_paths = []
+        resource_paths, conflicts = [], []
         with tempfile.TemporaryDirectory(prefix="buildscape-sync-") as tmp:
             temp = Path(tmp)
             if any(c.get("kind") == "resource" and c["classification"] == "automatic" for c in plan["changes"]):
-                resource_paths = resource_changes(worktree, source_repo, plan, target, values, log, temp)
+                resource_paths, conflicts = resource_changes(worktree, source_repo, plan, target, values, log, temp,
+                                                             output / "conflicts")
+                if conflicts:
+                    plan["apply"]["conflicts"] = conflicts
+                    write_report(plan, output)
             for c in plan["changes"]:
                 if c.get("kind") != "java" or c["classification"] != "automatic":
                     continue
@@ -468,10 +487,14 @@ def apply_plan(repo, plan, target, branch_config, source_repo, registry_path, ou
         for check in target["validation"]:
             command(check, values, worktree, log)
         fields, rows = read_ledger(repo, plan["target_commit"], target["mapping_file"])
-        update_ledger(worktree, plan, target, fields, rows)
+        update_ledger(worktree, plan, target, fields, rows, conflicts)
         pending = list(plan["pending"])
         pending.extend(dict(c, source_commit=plan["source_commit"], base_commit=plan["base_commit"])
                        for c in plan["changes"] if c["classification"] not in {"automatic", "retired"})
+        pending.extend({"path": c["path"], "old_path": c["path"], "change": "modified", "kind": "resource",
+                        "classification": "review", "reason": c["reason"], "target_paths": [c["path"]],
+                        "source_diff": "", "source_commit": plan["source_commit"],
+                        "base_commit": plan["base_commit"]} for c in conflicts)
         dump(local(worktree, target["state_file"]), {"schema_version": 1, "pending": pending})
         for t in branch_config["targets"]:
             if t["id"] == target["id"]:

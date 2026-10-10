@@ -250,15 +250,33 @@ if (Path.cwd() / 'fail-validation').exists():
         with self.assertRaisesRegex(sync.SyncError, "incomplete sync branch"):
             self.apply()
 
-    def test_resource_conflict_keeps_baseline(self):
-        self.write(self.repo, "common/" + self.resources + "data/old.json", '{"port_specific": true}\n')
+    def test_resource_conflict_is_reported_and_target_left_untouched(self):
+        edited = '{"port_specific": true, "converted": true}\n'
+        self.write(self.repo, "common/" + self.resources + "data/old.json", edited)
         commit = self.commit(self.repo, "Port-specific resource")
         self.git(self.repo, "branch", "-f", "port/test", commit)
         self.mutate_source()
-        with self.assertRaisesRegex(sync.SyncError, "conflicts with target edits"):
-            self.apply()
-        branch = "sync/tiny/" + self.git(self.source, "rev-parse", "HEAD")[:12]
-        self.assertEqual(self.git(self.repo, "rev-parse", branch), commit)
+        plan = self.apply()
+        self.assertEqual(plan["apply"]["status"], "complete")
+        branch = plan["apply"]["branch"]
+        rel = "common/" + self.resources + "data/"
+        conflict = "common/" + self.resources + "data/old.json"
+        self.assertEqual(plan["apply"]["conflicts"], [{"path": conflict, "reason": "port-specific edit"}])
+        # Conflicting file is untouched; the clean resource is applied.
+        self.assertEqual(sync.blob(self.repo, branch, rel + "old.json"), edited.encode())
+        self.assertEqual(json.loads(sync.blob(self.repo, branch, rel + "new.json")), {"value": 3, "converted": True})
+        # Review material sits next to the report.
+        review = self.output / "conflicts" / "data" / "old.json"
+        self.assertEqual(json.loads(Path(str(review) + ".old").read_text()), {"value": 1, "converted": True})
+        self.assertEqual(json.loads(Path(str(review) + ".new").read_text()), {"value": 2, "converted": True})
+        self.assertEqual(Path(str(review) + ".target").read_text(), edited)
+        # JSON and Markdown reports list it; the review queue carries it.
+        report = json.loads(next(self.output.glob("*.json")).read_text())
+        self.assertEqual(report["apply"]["conflicts"][0]["path"], conflict)
+        self.assertIn(conflict, next(self.output.glob("*.md")).read_text())
+        state = json.loads(sync.blob(self.repo, branch, "sync/state/tiny.json"))
+        self.assertTrue(any(c["path"] == conflict and c["classification"] == "review" for c in state["pending"]))
+        self.assertEqual(self.read_csv(branch)[self.resources + "data/old.json"]["status"], "needs_resync")
 
     def test_mc26_removals_are_retired_and_not_restored_by_apply(self):
         retired = self.resources + "assets/buildscape/blockstates/copper_rod.json"

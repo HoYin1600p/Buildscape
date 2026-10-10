@@ -30,6 +30,8 @@ public class HazeBushParticleHandler {
     private static final Map<Long, Set<BlockPos>> POSITIONS_BY_CHUNK = new HashMap<>();
     private static final Random RANDOM = new Random();
     private static final int VANILLA_TICK_RANGE = 16;
+    // HAZE does not override the particle limiter; LevelRenderer discards it beyond 32 blocks.
+    private static final int HAZE_PARTICLE_RANGE = 32;
 
     public static void track(BlockPos pos) {
         if (pos == null) return;
@@ -116,8 +118,8 @@ public class HazeBushParticleHandler {
         Level level = mc.level;
         BlockPos playerPos = mc.player.blockPosition();
 
-        int renderDistBlocks = mc.options.renderDistance * 16;
-        double maxDistSq = (double) renderDistBlocks * renderDistBlocks;
+        net.minecraft.world.phys.Vec3 cameraPos = mc.gameRenderer.getMainCamera().getPosition();
+        double maxDistSq = (double) HAZE_PARTICLE_RANGE * HAZE_PARTICLE_RANGE;
         double minDistSq = (double) VANILLA_TICK_RANGE * VANILLA_TICK_RANGE;
         float chance = (mc.options.particles == net.minecraft.client.ParticleStatus.DECREASED) ? 0.08F : 0.20F;
 
@@ -129,7 +131,7 @@ public class HazeBushParticleHandler {
                 BlockPos pos = it.next();
                 double distSq = playerPos.distSqr(pos);
 
-                if (distSq > maxDistSq) continue;
+                if (cameraPos.distanceToSqr(pos.getX() + 0.5D, pos.getY() + 0.4D, pos.getZ() + 0.5D) > maxDistSq) continue;
                 if (distSq <= minDistSq) continue;
 
                 BlockState state = level.getBlockState(pos);

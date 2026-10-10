@@ -128,6 +128,8 @@ def make_cells(block, include_waterlogged=False, include_lava_logged=False):
             width = depth = 3
             height, kind = 2, "fluid"
         cells.append({"id": block["id"], "state": state, "kind": kind,
+                      "className": block.get("className", ""),
+                      "blockType": block.get("blockType", ""),
                       "width": width, "depth": depth, "height": height, "parts": parts})
     return cells, filtered
 

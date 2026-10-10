@@ -99,6 +99,67 @@ Force-loaded chunks and changed gamerules remain until explicitly restored.
 The names, sign `front_text.messages` Component NBT (native strings, not embedded
 JSON), and state APIs were inspected in the cached official 26.2 client jar.
 
+## Write the layout directly into a world
+
+Create a dedicated Minecraft **26.2** save with Buildscape installed, explore the
+entire planned showcase footprint so its chunks exist, then close that save and
+the game. Keep the original pristine save separately. The offline editor requires
+Python 3 only; it uses the origin, ground height, dimensions and exact cell/part
+coordinates recorded in `layout.json`, including clearing the build volume,
+upper floors, glass fluid cells and material signs.
+
+```powershell
+python -B scripts/showcase/apply_to_world.py "path/to/Buildscape Showcase" build/showcase-out/layout.json --dry-run
+python -B scripts/showcase/apply_to_world.py "path/to/Buildscape Showcase" build/showcase-out/layout.json
+# Optional new backup location, or explicitly reuse a previous region backup:
+python -B scripts/showcase/apply_to_world.py "path/to/Buildscape Showcase" build/showcase-out/layout.json --backup-dir "path/to/region-backup"
+```
+
+The tool holds the game's `session.lock` throughout preparation and writing and
+refuses a save opened by a client/server. A dry run validates and encodes all
+affected chunks without writing files or making a backup. Its JSON report gives
+DataVersions, edited chunk/region counts, placement counts (including clears and
+floor fills), block entities added and missing chunks. **Require zero skipped
+placements** for a complete showcase; reopen the game and generate any reported
+missing chunks before retrying. The tool never creates missing chunks.
+
+Before a write, the editor copies the complete Overworld region folder to
+`<world>/showcase-region-backup` by default. `--backup-dir` instead names the
+directory that receives the region folder's contents; an existing explicit
+backup must already contain its region files and is left intact. An existing
+default backup requires an explicit `--backup-dir` on subsequent runs. Backups
+must be separate from the source region folder. Restore by closing the game and
+copying these saved region files back to the original Overworld region folder.
+This is a terrain backup; keep a separate full save backup as well.
+
+The editor accepts `dimensions/minecraft/overworld/region` (26.2) and the legacy
+`region` location, checks both `level.dat` and each chunk for DataVersion 4903,
+and refuses unfinished chunks or incompatible versions. Chunk records use zlib
+on writing; gzip and uncompressed records are readable. External oversized `.mcc`
+chunks and unsupported compression are explicitly refused before any writes.
+Unedited compressed chunks and their timestamps are preserved. Edited sections
+have minimal block palettes, neighbour-derived biomes for new sections, minimal
+block entities and native 26.2 sign text. Lighting and heightmaps are invalidated
+for recomputation, and scheduled block/fluid ticks at replaced positions are
+removed. Entity files, POI and other dimensions are left intact.
+
+Open the save with Buildscape installed after writing. The same 26.2 save can be
+copied between Fabric and NeoForge instances with matching Buildscape versions:
+close both clients first, copy the **whole save folder** into the destination
+instance's `saves` directory, then select it there. Keep the original copy until
+the destination loads successfully. This editor does not change gamerules or
+persist a tick freeze; freeze ticks immediately when viewing unsupported states
+and fluid displays, as described above.
+
+The sign fields were verified with `javap` on the official 26.2
+`SignBlockEntity.saveAdditional`, `SignText.DIRECT_CODEC` and
+`ComponentSerialization` code. `BlockEntity.saveMetadata` supplies `id/x/y/z`,
+and `SerializableChunkData` reads `keepPacked`. The real pristine 26.2 save
+confirmed DataVersion 4903, section `block_states`/`biomes`, `isLightOn`,
+`Heightmaps` and the tick list names. New generated layouts retain each cell's
+dump class/type metadata to identify custom block entities; existing layouts
+remain supported by known block ID families.
+
 ## Run through CMA native plans
 
 Use an existing CMA client connected to this 26.2 showcase world, with operator
@@ -163,4 +224,10 @@ python -B -m unittest discover -s scripts/showcase -p 'test_*.py' -v
 
 The fixtures cover spacing, layer bounds and stacking, pairs, fluid glass cells,
 material groups, logged-state flags, chunking, setup and fill limits without
-requiring a client or loading Minecraft classes.
+requiring a client or loading Minecraft classes. Anvil tests cover every NBT tag
+type, modified UTF-8, region sectors/compression/timestamps, non-spanning palette
+packing, section boundaries, block entities, ticks, locking and backups. When the
+retained pristine 26.2 world exists under `WORKSPACES`, an integration test copies
+it to a temporary directory and runs the CLI dry run with pairs, fluid glass,
+signs and custom containers, checking zero skipped placements and unchanged
+region fingerprints. The pristine backup is never modified.

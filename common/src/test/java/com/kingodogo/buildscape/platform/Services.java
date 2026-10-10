@@ -21,8 +21,34 @@ public class Services {
     /** Block registrations in registration order, filled when ModBlocks initialises. */
     public static final List<RegistrySupplier<?>> REGISTERED_BLOCKS = Collections.synchronizedList(new ArrayList<>());
 
+    /** Item, entity and sound registrations in registration order (recorded like the blocks). */
+    public static final List<RegistrySupplier<?>> REGISTERED_ITEMS = Collections.synchronizedList(new ArrayList<>());
+    public static final List<RegistrySupplier<?>> REGISTERED_ENTITIES = Collections.synchronizedList(new ArrayList<>());
+    public static final List<RegistrySupplier<?>> REGISTERED_SOUNDS = Collections.synchronizedList(new ArrayList<>());
+
     public static final IPlatformAdapter PLATFORM = (IPlatformAdapter) Proxy.newProxyInstance(
             Services.class.getClassLoader(), new Class<?>[]{IPlatformAdapter.class}, (proxy, method, args) -> {
+                // Item properties get their registry id (and so their description key) exactly as the 26.x adapter does it.
+                if (method.getName().equals("prepareItemProperties")) {
+                    return com.kingodogo.buildscape.adapter.v26x.PlatformAdapterBase.itemProperties(
+                            (com.kingodogo.buildscape.util.CommonId) args[0], (net.minecraft.world.item.Item.Properties) args[1]);
+                }
+                if (method.getName().equals("prepareBlockItemProperties")) {
+                    return com.kingodogo.buildscape.adapter.v26x.PlatformAdapterBase.itemProperties(
+                            (com.kingodogo.buildscape.util.CommonId) args[0], (net.minecraft.world.item.Item.Properties) args[1])
+                            .useBlockDescriptionPrefix();
+                }
+                // The special item classes need the loader adapter; a plain item with the same properties has the same description key.
+                if (method.getName().startsWith("create") && method.getName().endsWith("Item")
+                        && args != null) {
+                    for (int i = 0; i < args.length; i++) {
+                        if (args[i] instanceof net.minecraft.world.item.Item.Properties p) {
+                            return i > 0 && args[0] instanceof net.minecraft.world.level.block.Block b
+                                    ? new net.minecraft.world.item.BlockItem(b, p)
+                                    : new net.minecraft.world.item.Item(p);
+                        }
+                    }
+                }
                 if (method.getName().equals("createBlockEntityType")) {
                     // Same construction as the real adapter, so block entities can be built headless.
                     @SuppressWarnings("unchecked")
@@ -54,9 +80,22 @@ public class Services {
                         Collection<RegistrySupplier<?>> blocks = REGISTERED_BLOCKS;
                         return blocks;
                     }
+                    case "getRegisteredItems" -> {
+                        return REGISTERED_ITEMS;
+                    }
+                    case "getRegisteredEntities" -> {
+                        return REGISTERED_ENTITIES;
+                    }
                     default -> {
                         if (method.getName().startsWith("register")) {
-                            return new SimpleRegistrySupplier<>("buildscape", (String) args[0], (Supplier<?>) args[1]);
+                            RegistrySupplier<?> supplier = new SimpleRegistrySupplier<>("buildscape", (String) args[0], (Supplier<?>) args[1]);
+                            switch (method.getName()) {
+                                case "registerItem" -> REGISTERED_ITEMS.add(supplier);
+                                case "registerEntity" -> REGISTERED_ENTITIES.add(supplier);
+                                case "registerSound" -> REGISTERED_SOUNDS.add(supplier);
+                                default -> { }
+                            }
+                            return supplier;
                         }
                         return defaultValue(method.getReturnType());
                     }

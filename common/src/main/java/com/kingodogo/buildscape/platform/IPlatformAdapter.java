@@ -85,6 +85,8 @@ public interface IPlatformAdapter {
     default Item.Properties prepareItemProperties(CommonId id, Item.Properties properties) {
         return properties;
     }
+    /** Same as {@link #prepareItemProperties} for items that place a block: they use the block.* description key, as vanilla block items do. */
+    default Item.Properties prepareBlockItemProperties(CommonId id, Item.Properties properties) { return prepareItemProperties(id, properties); }
     int getItemRawId(Item item);
     Item getItemByRawId(int rawId);
 

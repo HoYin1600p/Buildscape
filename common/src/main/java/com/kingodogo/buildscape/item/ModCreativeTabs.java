@@ -16,13 +16,14 @@ import java.util.List;
 import java.util.Map;
 public final class ModCreativeTabs {
     public static final CommonId TAB_ID = CommonId.of(BuildscapeCommon.MOD_ID, "buildscape_tab");
+    public static final String TAB_TRANSLATION_KEY = "itemGroup.buildscape";
     private static final List<String> ORDERED_ITEM_IDS = loadOrderedItemIds();
 
     private ModCreativeTabs() {}
     public static CreativeModeTab createTab(Map<String, Item> modItems) {
         return Services.PLATFORM.createCreativeTab(
                 TAB_ID,
-                "itemGroup.buildscape",
+                TAB_TRANSLATION_KEY,
                 () -> {
                     Item iconItem = modItems.get("bit_oxidized_copper_block");
                     return new ItemStack(iconItem != null ? iconItem : modItems.values().iterator().next());

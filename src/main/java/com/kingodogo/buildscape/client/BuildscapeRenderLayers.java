@@ -116,6 +116,7 @@ public final class BuildscapeRenderLayers {
                     "festive_stocking",
                     "frost_rose",
                     "glow_lights",
+                    "ice_crystal",
                     "icicle",
                     "mangrove_propagule",
                     "mangrove_roots",

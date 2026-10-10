@@ -3530,6 +3530,7 @@ public class ModCreativeModeTab {
             items.add(new ItemStack(ModItems.ICICLE.get()));
             items.add(new ItemStack(ModItems.ICICLE_BLOCK.get()));
             items.add(new ItemStack(ModItems.PACKED_ICICLE_BLOCK.get()));
+            items.add(new ItemStack(ModItems.ICE_CRYSTAL.get()));
 
             items.add(new ItemStack(ModItems.DIRT_STAIRS.get()));
             items.add(new ItemStack(ModItems.DIRT_SLAB.get()));

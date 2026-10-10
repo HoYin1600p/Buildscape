@@ -1961,6 +1961,7 @@
     "buildscape:bone_brick_vertical_slab",
     "buildscape:bone_brick_wall",
     "buildscape:chiseled_bone_block",
-    "buildscape:bone_pillar"
+    "buildscape:bone_pillar",
+    "buildscape:ice_crystal"
   ]
 }

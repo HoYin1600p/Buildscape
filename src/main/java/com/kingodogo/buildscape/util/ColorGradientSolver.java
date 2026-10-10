@@ -584,7 +584,7 @@ public final class ColorGradientSolver {
     private static boolean isTransparentNonFull(Block block, String path) {
         return block instanceof StainedGlassPaneBlock || path.contains("glass_pane")
                 || path.contains("leaf_layer") || path.contains("ornament")
-                || path.contains("string_light") || path.equals("icicle");
+                || path.contains("string_light") || path.equals("icicle") || path.equals("ice_crystal");
     }
 
     private static boolean isSolidNonFull(String path) {

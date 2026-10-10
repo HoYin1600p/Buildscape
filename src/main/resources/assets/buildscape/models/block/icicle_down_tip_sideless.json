@@ -1,5 +1,5 @@
 {
-  "parent": "buildscape:block/icicle",
+  "parent": "buildscape:block/icicle_base_sideless",
   "textures": {
     "cross": "buildscape:block/icicle_down_tip"
   }

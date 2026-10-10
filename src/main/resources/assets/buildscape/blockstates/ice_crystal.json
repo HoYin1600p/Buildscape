@@ -1,0 +1,30 @@
+{
+  "variants": {
+    "facing=down": {
+      "model": "buildscape:block/ice_crystal",
+      "x": 180
+    },
+    "facing=east": {
+      "model": "buildscape:block/ice_crystal",
+      "x": 90,
+      "y": 90
+    },
+    "facing=north": {
+      "model": "buildscape:block/ice_crystal",
+      "x": 90
+    },
+    "facing=south": {
+      "model": "buildscape:block/ice_crystal",
+      "x": 90,
+      "y": 180
+    },
+    "facing=up": {
+      "model": "buildscape:block/ice_crystal"
+    },
+    "facing=west": {
+      "model": "buildscape:block/ice_crystal",
+      "x": 90,
+      "y": 270
+    }
+  }
+}

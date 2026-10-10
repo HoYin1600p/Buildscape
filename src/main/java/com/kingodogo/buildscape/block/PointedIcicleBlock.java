@@ -20,6 +20,7 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.DripstoneThickness;
+import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -182,6 +183,7 @@ public class PointedIcicleBlock extends PointedDripstoneBlock {
         BlockState state =
                 this.defaultBlockState()
                         .setValue(BlockStateProperties.VERTICAL_DIRECTION, verticalDirection)
+                        .setValue(WATERLOGGED, level.getFluidState(pos).getType() == Fluids.WATER)
                         .setValue(ATTACHED, isAttached(level, pos, verticalDirection))
                         .setValue(SIDELESS, false);
 
@@ -279,7 +281,7 @@ public class PointedIcicleBlock extends PointedDripstoneBlock {
                         (double) pos.getX() + 0.5D,
                         (double) pos.getY(),
                         (double) pos.getZ() + 0.5D,
-                        state
+                        state.setValue(ATTACHED, false).setValue(SIDELESS, false)
                 );
 
         level.setBlock(pos, Blocks.AIR.defaultBlockState(), 3);
@@ -524,6 +526,10 @@ public class PointedIcicleBlock extends PointedDripstoneBlock {
             BlockPos pos,
             BlockPos neighborPos
     ) {
+        if (state.getValue(WATERLOGGED)) {
+            level.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
+        }
+
         if (direction == Direction.UP || direction == Direction.DOWN) {
             BlockState updatedState = calculateCustomThickness(level, pos, state);
 
@@ -845,6 +851,11 @@ public class PointedIcicleBlock extends PointedDripstoneBlock {
                 BlockStateProperties.VERTICAL_DIRECTION
         );
 
+        boolean attached = isAttached(level, pos, direction);
+        if (state.getValue(ATTACHED) != attached) {
+            level.setBlock(pos, state.setValue(ATTACHED, attached), 2);
+        }
+
         if (direction == Direction.DOWN) {
             tryCauldronRecipe(level, pos, random);
             tryStalactiteGrowth(level, pos, random);
@@ -1005,19 +1016,20 @@ public class PointedIcicleBlock extends PointedDripstoneBlock {
         }
 
         BlockPos growPos = tipPos.below();
-        if (level.getBlockState(growPos).isAir()) {
+        if (level.isInWorldBounds(growPos) && level.getBlockState(growPos).isAir()) {
             BlockState newTip =
                     this.defaultBlockState()
                             .setValue(BlockStateProperties.VERTICAL_DIRECTION, Direction.DOWN)
                             .setValue(THICKNESS, DripstoneThickness.TIP)
                             .setValue(ATTACHED, false);
 
-            level.setBlock(growPos, newTip, 3);
-            level.setBlock(
-                    tipPos,
-                    tipState.setValue(THICKNESS, DripstoneThickness.FRUSTUM),
-                    2
-            );
+            if (level.setBlock(growPos, newTip, 3)) {
+                level.setBlock(
+                        tipPos,
+                        tipState.setValue(THICKNESS, DripstoneThickness.FRUSTUM),
+                        2
+                );
+            }
         }
     }
 
@@ -1109,19 +1121,20 @@ public class PointedIcicleBlock extends PointedDripstoneBlock {
         }
 
         BlockPos growPos = tipPos.above();
-        if (level.getBlockState(growPos).isAir()) {
+        if (level.isInWorldBounds(growPos) && level.getBlockState(growPos).isAir()) {
             BlockState newTip =
                     this.defaultBlockState()
                             .setValue(BlockStateProperties.VERTICAL_DIRECTION, Direction.UP)
                             .setValue(THICKNESS, DripstoneThickness.TIP)
                             .setValue(ATTACHED, false);
 
-            level.setBlock(growPos, newTip, 3);
-            level.setBlock(
-                    tipPos,
-                    tipState.setValue(THICKNESS, DripstoneThickness.FRUSTUM),
-                    2
-            );
+            if (level.setBlock(growPos, newTip, 3)) {
+                level.setBlock(
+                        tipPos,
+                        tipState.setValue(THICKNESS, DripstoneThickness.FRUSTUM),
+                        2
+                );
+            }
         }
     }
 
@@ -1312,6 +1325,10 @@ public class PointedIcicleBlock extends PointedDripstoneBlock {
             InteractionHand hand,
             BlockHitResult hitResult
     ) {
+        if (!player.mayBuild() || player.isShiftKeyDown()) {
+            return InteractionResult.PASS;
+        }
+
         ItemStack heldItem = player.getItemInHand(hand);
         if (heldItem.getItem() instanceof PickaxeItem
                 || heldItem.canPerformAction(ToolActions.PICKAXE_DIG)) {
@@ -1327,7 +1344,7 @@ public class PointedIcicleBlock extends PointedDripstoneBlock {
                             1.0F,
                             1.0F
                     );
-                    if (player != null && !player.getAbilities().instabuild) {
+                    if (!player.getAbilities().instabuild) {
                         heldItem.hurtAndBreak(1, player, p -> p.broadcastBreakEvent(hand));
                     }
                 }

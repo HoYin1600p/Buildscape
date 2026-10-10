@@ -26,15 +26,8 @@ public class BuildscapeFabricClient implements ClientModInitializer {
                 net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper::registerKeyMapping);
         // Mod Menu is not on this module's classpath. Its optional config-screen
         // integration must be added together with its API dependency and entrypoint.
-        // Fabric API has no in-game key/scroll or camera/FOV callbacks. Wrench
-        // arrow input, zoom camera hooks and brush air attacks need unified client
-        // mixins registered in buildscape.mixins.json before input parity is complete.
-        net.fabricmc.fabric.api.event.player.UseBlockCallback.EVENT.register((player, level, hand, hit) -> {
-            if (level.isClientSide() && hand == net.minecraft.world.InteractionHand.MAIN_HAND) {
-                com.kingodogo.buildscape.client.ClientEvents.onRightClick();
-            }
-            return net.minecraft.world.InteractionResult.PASS;
-        });
+        // Raw input and camera hooks live in the client-only entries of
+        // buildscape-fabric.mixins.json. Hammer input runs once per mouse press.
         net.fabricmc.fabric.api.event.player.AttackBlockCallback.EVENT.register((player, level, hand, pos, face) -> {
             if (level.isClientSide() && com.kingodogo.buildscape.client.TreeChopHandler.shouldCancelLeftClick(
                     player, new net.minecraft.world.phys.BlockHitResult(

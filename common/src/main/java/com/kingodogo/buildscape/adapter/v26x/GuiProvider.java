@@ -16,40 +16,27 @@ public final class GuiProvider {
         return null;
     }
 
-    public static void registerMenuScreens() {
-        try {
-            java.lang.reflect.Field field = net.minecraft.client.gui.screens.MenuScreens.class.getDeclaredField("SCREENS");
-            field.setAccessible(true);
-            @SuppressWarnings("unchecked")
-            java.util.Map<net.minecraft.world.inventory.MenuType<?>, Object> screens =
-                    (java.util.Map<net.minecraft.world.inventory.MenuType<?>, Object>) field.get(null);
+    public interface Registrar {
+        void registerWorkbench();
+        void registerPouch();
+    }
+    private static Registrar registrar;
+    private static boolean registered;
 
-            Class<?> constructorType = Class.forName("net.minecraft.client.gui.screens.MenuScreens$ScreenConstructor");
-            Object wbProxy = java.lang.reflect.Proxy.newProxyInstance(
-                    constructorType.getClassLoader(), new Class<?>[]{constructorType},
-                    (proxy, method, args) -> "create".equals(method.getName())
-                            ? createWorkbenchScreen(
-                                    (com.kingodogo.buildscape.menu.BuildersWorkbenchMenu) args[0],
-                                    (net.minecraft.world.entity.player.Inventory) args[1],
-                                    (net.minecraft.network.chat.Component) args[2])
-                            : null);
-            screens.put(ModMenuTypes.BUILDERS_WORKBENCH_MENU, wbProxy);
-
-            Object pouchProxy = java.lang.reflect.Proxy.newProxyInstance(
-                    constructorType.getClassLoader(), new Class<?>[]{constructorType},
-                    (proxy, method, args) -> "create".equals(method.getName())
-                            ? createPouchScreen(
-                                    (com.kingodogo.buildscape.menu.BuildersPouchMenu) args[0],
-                                    (net.minecraft.world.entity.player.Inventory) args[1],
-                                    (net.minecraft.network.chat.Component) args[2])
-                            : null);
-            screens.put(ModMenuTypes.BUILDERS_POUCH_MENU, pouchProxy);
-        } catch (ReflectiveOperationException exception) {
-            throw new IllegalStateException("Unable to register Buildscape 26.x menu screens", exception);
-        }
+    public static void registerMenuScreens(Registrar target) {
+        registrar = java.util.Objects.requireNonNull(target);
+        registerMenuScreens();
     }
 
-    private static Screen createWorkbenchScreen(
+    public static void registerMenuScreens() {
+        if (registered) return;
+        java.util.Objects.requireNonNull(registrar, "Menu screens must be registered through the loader hook");
+        registrar.registerWorkbench();
+        registrar.registerPouch();
+        registered = true;
+    }
+
+    public static net.minecraft.client.gui.screens.inventory.AbstractContainerScreen<com.kingodogo.buildscape.menu.BuildersWorkbenchMenu> createWorkbenchScreen(
             com.kingodogo.buildscape.menu.BuildersWorkbenchMenu menu,
             net.minecraft.world.entity.player.Inventory inventory,
             net.minecraft.network.chat.Component title) {
@@ -101,7 +88,7 @@ public final class GuiProvider {
                         };
     }
 
-    private static Screen createPouchScreen(
+    public static net.minecraft.client.gui.screens.inventory.AbstractContainerScreen<com.kingodogo.buildscape.menu.BuildersPouchMenu> createPouchScreen(
             com.kingodogo.buildscape.menu.BuildersPouchMenu menu,
             net.minecraft.world.entity.player.Inventory inventory,
             net.minecraft.network.chat.Component title) {
@@ -204,6 +191,7 @@ public final class GuiProvider {
                     (com.kingodogo.buildscape.client.screen.IScreenDelegate) clazz.getConstructor(Screen.class).newInstance(parent);
             return wrapScreen(com.kingodogo.buildscape.util.ComponentHelper.translatable("buildscape.config.title"), parent, delegate);
         } catch (Throwable t) {
+            com.kingodogo.buildscape.BuildscapeCommon.LOGGER.warn("Failed to create Buildscape config screen", t);
             return null;
         }
     }
@@ -215,6 +203,7 @@ public final class GuiProvider {
                     (com.kingodogo.buildscape.client.screen.IScreenDelegate) clazz.getConstructor(Screen.class, String.class, com.kingodogo.buildscape.client.screen.AbstractConfigTab.class).newInstance(parent, tabName, sourceTab);
             return wrapScreen(com.kingodogo.buildscape.util.ComponentHelper.translatable("buildscape.gui.editor.title"), parent, delegate);
         } catch (Throwable t) {
+            com.kingodogo.buildscape.BuildscapeCommon.LOGGER.warn("Failed to create Buildscape GUI editor screen", t);
             return null;
         }
     }
@@ -226,6 +215,7 @@ public final class GuiProvider {
                     (com.kingodogo.buildscape.client.screen.IScreenDelegate) clazz.getConstructor(Screen.class, com.kingodogo.buildscape.client.screen.PillarItemsConfigTab.class).newInstance(parent, configTab);
             return wrapScreen(com.kingodogo.buildscape.util.ComponentHelper.translatable("buildscape.config.select_inventory"), parent, delegate);
         } catch (Throwable t) {
+            com.kingodogo.buildscape.BuildscapeCommon.LOGGER.warn("Failed to create Buildscape inventory selector screen", t);
             return null;
         }
     }

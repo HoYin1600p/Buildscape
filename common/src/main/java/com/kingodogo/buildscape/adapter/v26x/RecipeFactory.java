@@ -352,7 +352,9 @@ public final class RecipeFactory {
                     return Ingredient.of(item);
                 }
             }
-        } catch (Throwable ignored) {}
+        } catch (Throwable exception) {
+            com.kingodogo.buildscape.BuildscapeCommon.LOGGER.warn("Failed to parse recipe ingredient {}", s, exception);
+        }
         return null;
     }
 
@@ -363,7 +365,9 @@ public final class RecipeFactory {
         if (nbt != null && !nbt.isBlank()) {
             try {
                 stack.set(DataComponents.CUSTOM_DATA, net.minecraft.world.item.component.CustomData.of(net.minecraft.nbt.TagParser.parseCompoundFully(nbt)));
-            } catch (Throwable ignored) {}
+            } catch (Throwable exception) {
+                com.kingodogo.buildscape.BuildscapeCommon.LOGGER.warn("Failed to parse recipe result data for {}", itemStr, exception);
+            }
         }
         return ItemStackTemplate.fromNonEmptyStack(stack);
     }

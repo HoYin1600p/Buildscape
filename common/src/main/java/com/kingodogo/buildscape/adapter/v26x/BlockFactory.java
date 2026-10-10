@@ -2488,7 +2488,9 @@ public class BlockFactory implements IBlockFactory {
     }
     private BlockBehaviour.Properties buildProperties(BlockDefinition def) {
         CommonBlockProperties cp = def.getProperties();
-        BlockBehaviour.Properties props = BlockBehaviour.Properties.of();
+        BlockBehaviour.Properties props = BlockBehaviour.Properties.of().setId(
+                net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK,
+                        Identifier.fromNamespaceAndPath(com.kingodogo.buildscape.BuildscapeCommon.MOD_ID, def.getId())));
         props.strength(cp.getHardness(), cp.getResistance());
         if (cp.requiresCorrectTool()) {
             props.requiresCorrectToolForDrops();

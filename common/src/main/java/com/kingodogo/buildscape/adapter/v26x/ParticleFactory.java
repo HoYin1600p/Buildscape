@@ -5,11 +5,9 @@ import com.kingodogo.buildscape.particle.GeyserParticleOptions;
 import com.kingodogo.buildscape.particle.ModParticles;
 import com.kingodogo.buildscape.particle.PillarSparkleParticleLogic;
 import com.kingodogo.buildscape.particle.TintedParticleColorTracker;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.BaseAshSmokeParticle;
 import net.minecraft.client.particle.FlameParticle;
 import net.minecraft.client.particle.NoRenderParticle;
-import net.minecraft.client.particle.ParticleEngine;
 import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.client.particle.ParticleRenderType;
 import net.minecraft.client.particle.SingleQuadParticle;
@@ -18,9 +16,6 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
 import java.util.function.Function;
 
 public final class ParticleFactory {
@@ -29,50 +24,35 @@ public final class ParticleFactory {
 
     private ParticleFactory() {}
 
-    @SuppressWarnings("unchecked")
-    private static <T extends ParticleOptions> void register(
-            ParticleType<T> type,
-            Function<SpriteSet, ParticleProvider<T>> factory) {
-        try {
-            Class<?> spriteRegClass = Class.forName("net.minecraft.client.particle.ParticleResources$SpriteParticleRegistration");
-            Object proxy = Proxy.newProxyInstance(
-                    spriteRegClass.getClassLoader(),
-                    new Class<?>[]{spriteRegClass},
-                    (p, method, args) -> {
-                        if ("create".equals(method.getName())) {
-                            return factory.apply((SpriteSet) args[0]);
-                        }
-                        return null;
-                    }
-            );
-            ParticleEngine pe = Minecraft.getInstance().particleEngine;
-            Field f = ParticleEngine.class.getDeclaredField("resourceManager");
-            f.setAccessible(true);
-            Object res = f.get(pe);
-            Method m = res.getClass().getDeclaredMethod("register", ParticleType.class, spriteRegClass);
-            m.setAccessible(true);
-            m.invoke(res, type, proxy);
-        } catch (Throwable t) {
-        }
+    public interface Registrar {
+        <T extends ParticleOptions> void register(ParticleType<T> type, Function<SpriteSet, ParticleProvider<T>> factory);
+        <T extends ParticleOptions> void registerDirect(ParticleType<T> type, ParticleProvider<T> provider);
+    }
+    private static Registrar registrar;
+    private static boolean registered;
+
+    public static void registerProviders(Registrar target) {
+        registrar = java.util.Objects.requireNonNull(target);
+        registerProviders();
     }
 
-    @SuppressWarnings("unchecked")
-    private static <T extends ParticleOptions> void registerDirect(
-            ParticleType<T> type,
-            ParticleProvider<T> provider) {
-        try {
-            ParticleEngine pe = Minecraft.getInstance().particleEngine;
-            Field f = ParticleEngine.class.getDeclaredField("resourceManager");
-            f.setAccessible(true);
-            Object res = f.get(pe);
-            Method m = res.getClass().getDeclaredMethod("register", ParticleType.class, ParticleProvider.class);
-            m.setAccessible(true);
-            m.invoke(res, type, provider);
-        } catch (Throwable t) {
-        }
+    private static <T extends ParticleOptions> void register(ParticleType<T> type,
+            Function<SpriteSet, ParticleProvider<T>> factory) {
+        registrar.register(type, factory);
+    }
+
+    private static <T extends ParticleOptions> void registerDirect(ParticleType<T> type, ParticleProvider<T> provider) {
+        registrar.registerDirect(type, provider);
     }
 
     public static void registerProviders() {
+        if (registered) return;
+        java.util.Objects.requireNonNull(registrar, "Particle providers must be registered through the loader hook");
+        registerAllProviders();
+        registered = true;
+    }
+
+    private static void registerAllProviders() {
         register(ModParticles.GLOW_LIME_SPARKLE.get(), sprites ->
             (type, level, x, y, z, dx, dy, dz, random) -> new SingleQuadParticle(level, x, y, z, dx, dy, dz, sprites.first()) {
                 private final TextureAtlasSprite baseSprite = sprites.first();

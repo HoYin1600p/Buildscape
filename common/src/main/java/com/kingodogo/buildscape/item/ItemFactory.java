@@ -9,10 +9,17 @@ public final class ItemFactory {
 
     private ItemFactory() {}
     public static BlockItem createBlockItem(Block block, CommonItemProperties props) {
-        return createBlockItem("", block, props);
+        com.kingodogo.buildscape.util.CommonId id = Services.PLATFORM.getBlockId(block);
+        if (id == null) throw new IllegalArgumentException("Block item requires the block's registry id");
+        return createBlockItem(id, block, props);
     }
     public static BlockItem createBlockItem(String id, Block block, CommonItemProperties props) {
-        Item.Properties p = createProperties(props);
+        return createBlockItem(new com.kingodogo.buildscape.util.CommonId(
+                com.kingodogo.buildscape.BuildscapeCommon.MOD_ID, id), block, props);
+    }
+    private static BlockItem createBlockItem(com.kingodogo.buildscape.util.CommonId registryId, Block block, CommonItemProperties props) {
+        String id = registryId.getPath();
+        Item.Properties p = Services.PLATFORM.prepareItemProperties(registryId, createProperties(props));
         if ("muff_block".equals(id)) {
             return Services.PLATFORM.createMuffBlockItem(block, p);
         }
@@ -39,7 +46,7 @@ public final class ItemFactory {
     }
     public static Item createItem(ItemDefinition def) {
         String id = def.getId();
-        Item.Properties props = createProperties(def.getProperties());
+        Item.Properties props = createProperties(id, def.getProperties());
         return switch (id) {
             case "builders_pouch" -> com.kingodogo.buildscape.platform.Services.PLATFORM.createBuildersPouchItem(props);
             case "wrench" -> Services.PLATFORM.createWrenchItem(props);
@@ -91,6 +98,11 @@ public final class ItemFactory {
         }
 
         return p;
+    }
+    public static Item.Properties createProperties(String id, CommonItemProperties props) {
+        return Services.PLATFORM.prepareItemProperties(
+                new com.kingodogo.buildscape.util.CommonId(com.kingodogo.buildscape.BuildscapeCommon.MOD_ID, id),
+                createProperties(props));
     }
     public static Rarity resolveRarity(String rarity) {
         if (rarity == null) return Rarity.COMMON;

@@ -3,12 +3,51 @@ plugins {
     id 'xyz.wagyourtail.unimined'
 }
 
+// Unimined does not collect Fabric API's nested transitive wideners on 26.x.
+// Feed the API's official-name widener to its Minecraft compile-jar patcher;
+// Fabric API itself applies the same file at runtime.
+def fabricApi = configurations.detachedConfiguration(
+        dependencies.create('net.fabricmc.fabric-api:fabric-api:0.149.0+26.2'))
+fabricApi.transitive = false
+def apiWidener = layout.buildDirectory.file('generated/accessWideners/fabric-api.accesswidener').get().asFile
+def apiJar = new java.util.zip.ZipFile(fabricApi.singleFile)
+try {
+    def nestedEntry = apiJar.entries().find {
+        it.name.startsWith('META-INF/jars/fabric-transitive-access-wideners-v1-') && it.name.endsWith('.jar')
+    }
+    if (nestedEntry == null) throw new GradleException('Fabric API transitive access widener module is missing')
+    def nested = new java.util.zip.ZipInputStream(apiJar.getInputStream(nestedEntry))
+    try {
+        def entry
+        def widenerText
+        while ((entry = nested.nextEntry) != null) {
+            if (entry.name.endsWith('.classtweaker') || entry.name.endsWith('.accesswidener')) {
+                widenerText = new String(nested.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8)
+                break
+            }
+        }
+        if (widenerText == null || !widenerText.startsWith('accessWidener v2 official')) {
+            throw new GradleException('Expected Fabric API access widener in official names')
+        }
+        apiWidener.parentFile.mkdirs()
+        if (!apiWidener.exists() || apiWidener.getText('UTF-8') != widenerText) {
+            apiWidener.setText(widenerText, 'UTF-8')
+        }
+    } finally {
+        nested.close()
+    }
+} finally {
+    apiJar.close()
+}
+
 unimined.minecraft {
     version '26.2'
     // Minecraft 26.x ships official names; neither common nor the mod jar needs remapping.
     defaultRemapJar = false
     fabric {
         loader '0.19.5'
+        accessWidener apiWidener
+        skipInsertAw = true
     }
     mods.modImplementation {
         catchAWNamespaceAssertion()
@@ -31,6 +70,10 @@ tasks.named('jar', Jar) {
     duplicatesStrategy = DuplicatesStrategy.FAIL
 }
 tasks.withType(JavaExec).configureEach {
+    if (providers.gradleProperty('bootstrapSmokeTest').isPresent()) {
+        workingDir layout.buildDirectory.dir('bootstrap-smoke').get().asFile
+        doFirst { workingDir.mkdirs() }
+    }
     javaLauncher = javaToolchains.launcherFor {
         languageVersion = JavaLanguageVersion.of(25)
     }

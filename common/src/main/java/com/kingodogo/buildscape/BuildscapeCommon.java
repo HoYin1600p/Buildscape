@@ -12,35 +12,25 @@ public class BuildscapeCommon {
     public static final String MOD_ID = "buildscape";
 
     public static class ModLogger {
-        public void info(String msg, Object... args) { System.out.println("[Buildscape] INFO: " + format(msg, args)); }
-        public void warn(String msg, Object... args) { System.out.println("[Buildscape] WARN: " + format(msg, args)); }
-        public void error(String msg, Object... args) { System.err.println("[Buildscape] ERROR: " + format(msg, args)); }
-        public void debug(String msg, Object... args) { }
-        private String format(String msg, Object... args) {
-            if (args == null || args.length == 0) return msg;
-            for (Object arg : args) {
-                if (arg instanceof Throwable t) {
-                    msg = msg.replaceFirst("\\{\\}", String.valueOf(t.getMessage()));
-                } else {
-                    msg = msg.replaceFirst("\\{\\}", String.valueOf(arg));
-                }
-            }
-            return msg;
-        }
+        private final org.slf4j.Logger delegate = org.slf4j.LoggerFactory.getLogger(MOD_ID);
+        public void info(String msg, Object... args) { delegate.info(msg, args); }
+        public void warn(String msg, Object... args) { delegate.warn(msg, args); }
+        public void error(String msg, Object... args) { delegate.error(msg, args); }
+        public void debug(String msg, Object... args) { delegate.debug(msg, args); }
     }
 
     public static final ModLogger LOGGER = new ModLogger();
 
     public static void logError(String message) {
-        System.err.println("[Buildscape] ERROR: " + message);
+        LOGGER.error(message);
     }
 
     public static void logError(String message, Throwable throwable) {
-        logError(message + ": " + throwable.getMessage());
+        LOGGER.error(message, throwable);
     }
 
     public static void logWarning(String message) {
-        System.err.println("[Buildscape] WARN: " + message);
+        LOGGER.warn(message);
     }
 
     private static volatile boolean serverFullyInitialized = false;
@@ -53,22 +43,32 @@ public class BuildscapeCommon {
         serverFullyInitialized = initialized;
     }
 
+    private static final com.kingodogo.buildscape.registry.StartupOnce PREPARATION = new com.kingodogo.buildscape.registry.StartupOnce();
+    private static final com.kingodogo.buildscape.registry.StartupOnce STARTUP = new com.kingodogo.buildscape.registry.StartupOnce();
+
+    public static void prepareRegistration() {
+        PREPARATION.run(() -> {
+            LOGGER.info("Preparing Buildscape on platform: {}", Services.PLATFORM.getPlatformName());
+            ModBlocks.init();
+            ModItems.init();
+            com.kingodogo.buildscape.trophy.Trophies.init();
+            ModEntities.init();
+            ModSounds.init();
+            com.kingodogo.buildscape.particle.ModParticles.init();
+            Services.PLATFORM.registerWorldGen();
+            Services.PLATFORM.registerRecipeSerializers();
+            com.kingodogo.buildscape.network.ModPackets.registerAll();
+        });
+    }
+
     public static void init() {
-        System.out.println("Initializing Buildscape Core on platform: " + Services.PLATFORM.getPlatformName());
-        ModBlocks.init();
-        ModItems.init();
-        com.kingodogo.buildscape.trophy.Trophies.init();
-        ModBlockEntities.init();
-        ModEntities.init();
-        ModSounds.init();
-        com.kingodogo.buildscape.particle.ModParticles.init();
-        Services.PLATFORM.registerWorldGen();
-        Services.PLATFORM.registerRecipeSerializers();
-        Services.REGISTRY.init();
-        ModStats.registerStats();
-        com.kingodogo.buildscape.block.CopperOxidationHandler.init();
-        com.kingodogo.buildscape.network.ModPackets.registerAll();
-        Services.PLATFORM.registerCommonLifecycleInteractions();
+        STARTUP.run(() -> {
+            prepareRegistration();
+            Services.REGISTRY.init();
+            ModStats.registerStats();
+            com.kingodogo.buildscape.block.CopperOxidationHandler.init();
+            Services.PLATFORM.registerCommonLifecycleInteractions();
+        });
     }
 
     public static void main(String[] args) {

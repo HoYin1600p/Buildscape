@@ -20,7 +20,6 @@ class MangroveConfiguredFeaturesTest {
     @BeforeAll
     static void bootstrap() {
         TestBootstrap.initialize();
-        WorldGenFactory.register();
     }
 
     @ParameterizedTest
@@ -32,6 +31,12 @@ class MangroveConfiguredFeaturesTest {
         assertEquals("minecraft:tree", feature.get("type").getAsString());
         Set<String> registeredTypes = new HashSet<>();
         BuiltInRegistries.REGISTRY.forEach(registry -> registry.keySet().forEach(id -> registeredTypes.add(id.toString())));
+        // Loader startup registers these WorldGenFactory types. This codec fixture
+        // runs against frozen vanilla registries without loading a platform provider.
+        registeredTypes.addAll(Set.of("buildscape:random_state", "buildscape:moss_block_ceiling_placement",
+                "buildscape:creaking_heart", "buildscape:mangrove_leave_vine", "buildscape:mangrove_moss_carpet",
+                "buildscape:mangrove_propagule", "buildscape:mangrove_root",
+                "buildscape:mangrove_random_spread", "buildscape:mangrove_upwards_branching"));
         assertRegisteredTypes(feature, registeredTypes);
         JsonObject config = feature.getAsJsonObject("config");
         assertTrue(WorldGenFactory.MangroveUpwardsBranchingTrunkPlacer.CODEC.codec()

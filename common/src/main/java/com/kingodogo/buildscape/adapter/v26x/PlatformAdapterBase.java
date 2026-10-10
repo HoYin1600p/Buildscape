@@ -248,6 +248,13 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
     }
 
     @Override
+    public Item.Properties prepareItemProperties(CommonId id, Item.Properties properties) {
+        return properties.setId(net.minecraft.resources.ResourceKey.create(
+                net.minecraft.core.registries.Registries.ITEM,
+                Identifier.fromNamespaceAndPath(id.getNamespace(), id.getPath())));
+    }
+
+    @Override
     public int getItemRawId(Item item) {
         return item != null ? BuiltInRegistries.ITEM.getId(item) : -1;
     }
@@ -409,89 +416,20 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
         return net.minecraft.core.registries.Registries.ITEM;
     }
 
-    public static <V, T extends V> T safeRegister(Registry<V> registry, Identifier rl, T value) {
-        if (registry instanceof net.minecraft.core.MappedRegistry<?> mapped) {
-            boolean wasFrozen = false;
-            try {
-                java.lang.reflect.Field frozenField = net.minecraft.core.MappedRegistry.class.getDeclaredField("frozen");
-                frozenField.setAccessible(true);
-                wasFrozen = frozenField.getBoolean(mapped);
-                if (wasFrozen) {
-                    frozenField.setBoolean(mapped, false);
-                }
-
-
-                return Registry.register(registry, rl, value);
-            } catch (Throwable t) {
-                return Registry.register(registry, rl, value);
-            } finally {
-                if (wasFrozen) {
-                    try {
-                        java.lang.reflect.Field frozenField = net.minecraft.core.MappedRegistry.class.getDeclaredField("frozen");
-                        frozenField.setAccessible(true);
-                        frozenField.setBoolean(mapped, true);
-                    } catch (Throwable ignored) {}
-                }
-            }
-        }
-        return Registry.register(registry, rl, value);
+    public static <V, T extends V> T safeRegister(Registry<V> registry, Identifier id, T value) {
+        com.kingodogo.buildscape.platform.Services.PLATFORM.register(registry,
+                new CommonId(id.getNamespace(), id.getPath()), value);
+        return value;
     }
 
     @Override
     public void wrapRegistryAction(Runnable action) {
-        Registry<?>[] registries = new Registry<?>[] {
-            BuiltInRegistries.BLOCK,
-            BuiltInRegistries.ITEM,
-            BuiltInRegistries.BLOCK_ENTITY_TYPE,
-            BuiltInRegistries.ENTITY_TYPE,
-            BuiltInRegistries.FLUID
-        };
-        boolean[] wasFrozen = new boolean[registries.length];
-        Object[] prevHolders = new Object[registries.length];
-        java.lang.reflect.Field frozenField = null;
-        java.lang.reflect.Field holdersField = null;
-        try {
-            frozenField = net.minecraft.core.MappedRegistry.class.getDeclaredField("frozen");
-            frozenField.setAccessible(true);
-            holdersField = net.minecraft.core.MappedRegistry.class.getDeclaredField("unregisteredIntrusiveHolders");
-            holdersField.setAccessible(true);
-            for (int i = 0; i < registries.length; i++) {
-                if (registries[i] instanceof net.minecraft.core.MappedRegistry<?> mapped) {
-                    wasFrozen[i] = frozenField.getBoolean(mapped);
-                    if (wasFrozen[i]) {
-                        frozenField.setBoolean(mapped, false);
-                    }
-                    prevHolders[i] = holdersField.get(mapped);
-                    if (prevHolders[i] == null) {
-                        holdersField.set(mapped, new java.util.IdentityHashMap<>());
-                    }
-                }
-            }
-            action.run();
-        } catch (Throwable t) {
-            throw new RuntimeException("Failed during registry action", t);
-        } finally {
-            if (frozenField != null && holdersField != null) {
-                for (int i = 0; i < registries.length; i++) {
-                    if (registries[i] instanceof net.minecraft.core.MappedRegistry<?> mapped) {
-                        try {
-                            if (wasFrozen[i]) {
-                                frozenField.setBoolean(mapped, true);
-                            }
-                            if (prevHolders[i] == null) {
-                                holdersField.set(mapped, null);
-                            }
-                        } catch (Throwable ignored) {}
-                    }
-                }
-            }
-        }
+        action.run();
     }
 
     @Override
     public <V> void register(Registry<V> registry, CommonId id, V value) {
-        Identifier rl = Identifier.fromNamespaceAndPath(id.getNamespace(), id.getPath());
-        safeRegister(registry, rl, value);
+        Registry.register(registry, Identifier.fromNamespaceAndPath(id.getNamespace(), id.getPath()), value);
     }
 
     @Override
@@ -729,15 +667,35 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
 
     @Override
     public net.minecraft.world.phys.AABB getModelBounds(Object model) {
-        return new net.minecraft.world.phys.AABB(0, 0, 0, 1, 1, 1);
+        return model instanceof net.minecraft.client.renderer.item.ItemStackRenderState state
+                ? state.getModelBoundingBox() : new AABB(0, 0, 0, 1, 1, 1);
     }
 
     @Override
     public void renderItemFixed(ItemStack stack, com.mojang.blaze3d.vertex.PoseStack poseStack, Object bufferSource, int combinedLight, int combinedOverlay, Object model) {
+        captureItem(stack, net.minecraft.world.item.ItemDisplayContext.FIXED, poseStack, bufferSource, combinedLight, combinedOverlay, 0);
     }
 
     @Override
     public void renderItemStatic(ItemStack stack, com.mojang.blaze3d.vertex.PoseStack poseStack, Object bufferSource, int combinedLight, int combinedOverlay, int seed) {
+        captureItem(stack, net.minecraft.world.item.ItemDisplayContext.GROUND, poseStack, bufferSource, combinedLight, combinedOverlay, seed);
+    }
+
+    private static void captureItem(ItemStack stack, net.minecraft.world.item.ItemDisplayContext context,
+            com.mojang.blaze3d.vertex.PoseStack pose, Object buffer, int light, int overlay, int seed) {
+        if (!(buffer instanceof RenderCapture capture) || stack.isEmpty()) return;
+        var state = new net.minecraft.client.renderer.item.ItemStackRenderState();
+        var client = net.minecraft.client.Minecraft.getInstance();
+        client.getItemModelResolver().updateForTopItem(state, stack, context, client.level, null, seed);
+        capture.record(pose, (target, collector, camera) -> state.submit(target, collector, light, overlay, 0));
+    }
+
+    @Override
+    public Object getItemModel(ItemStack stack, Level level, int seed) {
+        var state = new net.minecraft.client.renderer.item.ItemStackRenderState();
+        net.minecraft.client.Minecraft.getInstance().getItemModelResolver().updateForTopItem(
+                state, stack, net.minecraft.world.item.ItemDisplayContext.FIXED, level, null, seed);
+        return state;
     }
 
     @Override
@@ -756,7 +714,8 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
                     return stream.readAllBytes();
                 }
             }
-        } catch (Throwable ignored) {}
+        } catch (Throwable exception) {
+            com.kingodogo.buildscape.BuildscapeCommon.LOGGER.warn("Failed in 26.x readResourceBytes", exception);}
         return null;
     }
 
@@ -833,6 +792,7 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
 
     @Override
     public net.minecraft.world.item.BlockItem createTrophyBlockItem(com.kingodogo.buildscape.trophy.TrophyBlock block, com.kingodogo.buildscape.trophy.TrophyDefinition definition, Item.Properties properties) {
+        prepareItemProperties(new CommonId(com.kingodogo.buildscape.BuildscapeCommon.MOD_ID, definition.getId()), properties);
         return new com.kingodogo.buildscape.trophy.TrophyBlockItem(block, definition, properties) {
             @Override
             public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay display, Consumer<Component> tooltip, TooltipFlag flag) {
@@ -845,6 +805,8 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
     @Override
     public com.kingodogo.buildscape.trophy.TrophyBlock createTrophyBlock(com.kingodogo.buildscape.trophy.TrophyDefinition definition) {
         return new com.kingodogo.buildscape.trophy.TrophyBlock(definition, BlockBehaviour.Properties.ofFullCopy(Blocks.STONE)
+                .setId(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK,
+                        Identifier.fromNamespaceAndPath(com.kingodogo.buildscape.BuildscapeCommon.MOD_ID, definition.getId())))
                 .strength(definition.getHardness(), definition.getResistance())
                 .sound(definition.getSoundType())
                 .lightLevel(state -> definition.getLightEmission())
@@ -1242,7 +1204,8 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
             net.minecraft.tags.TagKey<net.minecraft.world.item.Item> tagKey =
                     net.minecraft.tags.TagKey.create(net.minecraft.core.registries.Registries.ITEM, id);
             return stack.is(tagKey);
-        } catch (Exception e) {
+        } catch (Exception exception) {
+            com.kingodogo.buildscape.BuildscapeCommon.LOGGER.warn("Failed in 26.x isItemInTag", exception);
             return false;
         }
     }
@@ -1255,7 +1218,8 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
             net.minecraft.tags.TagKey<net.minecraft.world.level.block.Block> tagKey =
                     net.minecraft.tags.TagKey.create(net.minecraft.core.registries.Registries.BLOCK, id);
             return block.defaultBlockState().is(tagKey);
-        } catch (Exception e) {
+        } catch (Exception exception) {
+            com.kingodogo.buildscape.BuildscapeCommon.LOGGER.warn("Failed in 26.x isBlockInTag", exception);
             return false;
         }
     }
@@ -1268,7 +1232,8 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
             net.minecraft.tags.TagKey<net.minecraft.world.entity.EntityType<?>> tagKey =
                     net.minecraft.tags.TagKey.create(net.minecraft.core.registries.Registries.ENTITY_TYPE, id);
             return entity.getType().builtInRegistryHolder().is(tagKey);
-        } catch (Exception e) {
+        } catch (Exception exception) {
+            com.kingodogo.buildscape.BuildscapeCommon.LOGGER.warn("Failed in 26.x isEntityTypeInTag", exception);
             return false;
         }
     }
@@ -1585,7 +1550,8 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
         if (tag == null || !tag.contains(key)) return null;
         try {
             return java.util.UUID.fromString(tag.getString(key).orElse(""));
-        } catch (Exception e) {
+        } catch (Exception exception) {
+            com.kingodogo.buildscape.BuildscapeCommon.LOGGER.warn("Failed to read UUID from tag key {}", key, exception);
             return null;
         }
     }
@@ -2390,7 +2356,6 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
     public void registerCommonLifecycleInteractions() {
         registerFlowerPotPlants();
         registerCompostables();
-        registerCauldronInteractions();
     }
 
     private void registerFlowerPotPlants() {
@@ -2440,7 +2405,8 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
                         }
                     }
                 }
-            } catch (Throwable ignored) {}
+            } catch (Throwable exception) {
+            com.kingodogo.buildscape.BuildscapeCommon.LOGGER.warn("Failed in 26.x registerPot", exception);}
         }
     }
 
@@ -2493,52 +2459,40 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
         }
     }
 
-    @SuppressWarnings("unchecked")
-    private void registerCauldronInteractions() {
-        try {
-            Item xpBucket = getItem(new CommonId("buildscape", "experience_bucket"));
-            Block xpCauldron = getBlock(new CommonId("buildscape", "experience_cauldron"));
-            if (xpBucket != null && xpCauldron != null) {
-                Object emptyObj = net.minecraft.core.cauldron.CauldronInteractions.EMPTY;
-                java.util.Map<Item, Object> map = null;
-                try {
-                    map = (java.util.Map<Item, Object>) emptyObj.getClass().getMethod("map").invoke(emptyObj);
-                } catch (Throwable t) {
-                    if (emptyObj instanceof java.util.Map) {
-                        map = (java.util.Map<Item, Object>) emptyObj;
-                    }
-                }
-                if (map != null) {
-                    map.put(xpBucket, (net.minecraft.core.cauldron.CauldronInteraction) (state, level, pos, player, hand, stack) -> {
-                        if (!level.isClientSide()) {
-                            player.awardStat(net.minecraft.stats.Stats.FILL_CAULDRON);
-                            level.setBlockAndUpdate(pos, xpCauldron.defaultBlockState().setValue(net.minecraft.world.level.block.LayeredCauldronBlock.LEVEL, 3));
-                            level.playSound(null, pos, SoundEvents.BUCKET_EMPTY, SoundSource.BLOCKS, 1.0F, 1.0F);
-                            if (!player.getAbilities().instabuild) {
-                                player.setItemInHand(hand, new ItemStack(net.minecraft.world.item.Items.BUCKET));
-                            }
-                        }
-                        return sidedSuccess(level.isClientSide());
-                    });
-                    map.put(net.minecraft.world.item.Items.EXPERIENCE_BOTTLE, (net.minecraft.core.cauldron.CauldronInteraction) (state, level, pos, player, hand, stack) -> {
-                        if (!level.isClientSide()) {
-                            player.awardStat(net.minecraft.stats.Stats.FILL_CAULDRON);
-                            level.setBlockAndUpdate(pos, xpCauldron.defaultBlockState().setValue(net.minecraft.world.level.block.LayeredCauldronBlock.LEVEL, 1));
-                            level.playSound(null, pos, SoundEvents.BOTTLE_EMPTY, SoundSource.BLOCKS, 1.0F, 1.0F);
-                            if (!player.getAbilities().instabuild) {
-                                stack.shrink(1);
-                                ItemStack returnStack = new ItemStack(net.minecraft.world.item.Items.GLASS_BOTTLE);
-                                if (!player.getInventory().add(returnStack)) {
-                                    player.drop(returnStack, false);
-                                }
-                            }
-                        }
-                        return sidedSuccess(level.isClientSide());
-                    });
+    public void registerExperienceCauldronInteractions(java.util.function.BiConsumer<Item,
+            net.minecraft.core.cauldron.CauldronInteraction> registrar) {
+        Item xpBucket = getItem(new CommonId("buildscape", "experience_bucket"));
+        Block xpCauldron = getBlock(new CommonId("buildscape", "experience_cauldron"));
+        if (xpBucket == null || xpBucket == net.minecraft.world.item.Items.AIR
+                || xpCauldron == null || xpCauldron == net.minecraft.world.level.block.Blocks.AIR) {
+            throw new IllegalStateException("Experience cauldron entries are not registered");
+        }
+        registrar.accept(xpBucket, (net.minecraft.core.cauldron.CauldronInteraction) (state, level, pos, player, hand, stack) -> {
+            if (!level.isClientSide()) {
+                player.awardStat(net.minecraft.stats.Stats.FILL_CAULDRON);
+                level.setBlockAndUpdate(pos, xpCauldron.defaultBlockState().setValue(net.minecraft.world.level.block.LayeredCauldronBlock.LEVEL, 3));
+                level.playSound(null, pos, SoundEvents.BUCKET_EMPTY, SoundSource.BLOCKS, 1.0F, 1.0F);
+                if (!player.getAbilities().instabuild) {
+                    player.setItemInHand(hand, new ItemStack(net.minecraft.world.item.Items.BUCKET));
                 }
             }
-        } catch (Throwable ignored) {
-        }
+            return sidedSuccess(level.isClientSide());
+        });
+        registrar.accept(net.minecraft.world.item.Items.EXPERIENCE_BOTTLE, (net.minecraft.core.cauldron.CauldronInteraction) (state, level, pos, player, hand, stack) -> {
+            if (!level.isClientSide()) {
+                player.awardStat(net.minecraft.stats.Stats.FILL_CAULDRON);
+                level.setBlockAndUpdate(pos, xpCauldron.defaultBlockState().setValue(net.minecraft.world.level.block.LayeredCauldronBlock.LEVEL, 1));
+                level.playSound(null, pos, SoundEvents.BOTTLE_EMPTY, SoundSource.BLOCKS, 1.0F, 1.0F);
+                if (!player.getAbilities().instabuild) {
+                    stack.shrink(1);
+                    ItemStack returnStack = new ItemStack(net.minecraft.world.item.Items.GLASS_BOTTLE);
+                    if (!player.getInventory().add(returnStack)) {
+                        player.drop(returnStack, false);
+                    }
+                }
+            }
+            return sidedSuccess(level.isClientSide());
+        });
     }
 
     @Override
@@ -2574,6 +2528,8 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
 
     @Override
     public void renderFallingIcicleBlock(net.minecraft.world.level.Level level, net.minecraft.world.level.block.state.BlockState blockState, net.minecraft.core.BlockPos blockPos, net.minecraft.core.BlockPos startPos, com.mojang.blaze3d.vertex.PoseStack poseStack, Object bufferSource) {
+        renderBlockModelWithTint(blockState, blockPos, level, poseStack, bufferSource,
+                getLightColor(level, blockPos), net.minecraft.client.renderer.texture.OverlayTexture.NO_OVERLAY);
     }
 
     @Override
@@ -2613,6 +2569,12 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
 
     @Override
     public void renderColoredFrame(com.mojang.blaze3d.vertex.PoseStack poseStack, Object bufferSource, int packedLight, Object backTexture, boolean hasMap) {
+        if (bufferSource instanceof RenderCapture capture) {
+            CommonId texture = (CommonId) backTexture;
+            renderColoredFrame(poseStack, capture.geometry(net.minecraft.client.renderer.rendertype.RenderTypes.entityCutout(
+                    Identifier.fromNamespaceAndPath(texture.getNamespace(), texture.getPath()))), packedLight, backTexture, hasMap);
+            return;
+        }
         if (!(bufferSource instanceof com.mojang.blaze3d.vertex.VertexConsumer consumer)) return;
         poseStack.pushPose();
         poseStack.translate(-0.5D, -0.5D, -0.5D);
@@ -2649,10 +2611,42 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
 
     @Override
     public void renderColoredFrameItem(com.kingodogo.buildscape.entity.ColoredItemFrameEntity entity, net.minecraft.world.item.ItemStack itemStack, com.mojang.blaze3d.vertex.PoseStack poseStack, Object bufferSource, int packedLight, boolean isMap, boolean isInvisible) {
+        if (!(bufferSource instanceof RenderCapture capture)) return;
+        poseStack.pushPose();
+        try {
+            poseStack.translate(0, 0, isInvisible ? 0.5 : 0.4375);
+            int rotation = entity.getRotation();
+            poseStack.mulPose(com.mojang.math.Axis.ZP.rotationDegrees((isMap ? rotation % 4 * 2 : rotation) * 45.0F));
+            if (isMap) {
+                var data = net.minecraft.world.item.MapItem.getSavedData(itemStack, net.minecraft.client.Minecraft.getInstance().level);
+                var id = itemStack.get(net.minecraft.core.component.DataComponents.MAP_ID);
+                if (data != null && id != null) {
+                    var map = new net.minecraft.client.renderer.state.MapRenderState();
+                    var renderer = net.minecraft.client.Minecraft.getInstance().getMapRenderer();
+                    renderer.extractRenderState(id, data, map);
+                    poseStack.mulPose(com.mojang.math.Axis.ZP.rotationDegrees(180));
+                    poseStack.scale(1.0F / 128, 1.0F / 128, 1.0F / 128);
+                    poseStack.translate(-64, -64, 0);
+                    capture.record(poseStack, (target, collector, camera) -> renderer.render(map, target, collector, true, packedLight));
+                }
+            } else {
+                poseStack.scale(0.5F, 0.5F, 0.5F);
+                captureItem(itemStack, net.minecraft.world.item.ItemDisplayContext.FIXED, poseStack, bufferSource,
+                        packedLight, net.minecraft.client.renderer.texture.OverlayTexture.NO_OVERLAY, 0);
+            }
+        } finally {
+            poseStack.popPose();
+        }
     }
 
     @Override
     public void renderStockingQuad(com.mojang.blaze3d.vertex.PoseStack poseStack, Object bufferSource, int packedLight, Object texture, boolean flipped) {
+        if (bufferSource instanceof RenderCapture capture) {
+            CommonId id = (CommonId) texture;
+            renderStockingQuad(poseStack, capture.geometry(net.minecraft.client.renderer.rendertype.RenderTypes.entityCutout(
+                    Identifier.fromNamespaceAndPath(id.getNamespace(), id.getPath()))), packedLight, texture, flipped);
+            return;
+        }
         if (bufferSource instanceof com.mojang.blaze3d.vertex.VertexConsumer vertexConsumer) {
             float width = 0.5F;
             float height = 0.5F;
@@ -2673,10 +2667,29 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
 
     @Override
     public void renderBlockModel(net.minecraft.world.level.block.state.BlockState blockState, com.mojang.blaze3d.vertex.PoseStack poseStack, Object bufferSource, int light, int overlay) {
+        renderBlockModelWithTint(blockState, null, null, poseStack, bufferSource, light, overlay);
     }
 
     @Override
     public void renderBlockModelWithTint(net.minecraft.world.level.block.state.BlockState state, net.minecraft.core.BlockPos pos, net.minecraft.world.level.Level level, com.mojang.blaze3d.vertex.PoseStack poseStack, Object bufferSource, int light, int overlay) {
+        if (!(bufferSource instanceof RenderCapture capture) || state.isAir()) return;
+        var client = net.minecraft.client.Minecraft.getInstance();
+        var model = new net.minecraft.client.renderer.block.BlockModelRenderState();
+        new net.minecraft.client.renderer.block.BlockModelResolver(client.getModelManager()).update(
+                model, state, net.minecraft.client.renderer.block.model.BlockDisplayContext.create());
+        var tints = model.tintLayers();
+        tints.clear();
+        var view = new net.minecraft.client.renderer.block.MovingBlockRenderState();
+        if (level != null && pos != null) {
+            view.blockState = state;
+            view.blockPos = pos;
+            view.randomSeedPos = pos;
+            view.biome = level.getBiome(pos);
+        }
+        for (var source : client.getBlockColors().getTintSources(state)) {
+            tints.add(level != null && pos != null ? source.colorInWorld(state, view, pos) : source.color(state));
+        }
+        capture.record(poseStack, (target, collector, camera) -> model.submit(target, collector, light, overlay, 0));
     }
 
     @Override
@@ -2688,6 +2701,7 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
                                   float r, float g, float b, float a,
                                   int light, int overlay,
                                   float nx, float ny, float nz) {
+        if (buffer instanceof RenderCapture capture) buffer = capture.translucent();
         if (!(buffer instanceof com.mojang.blaze3d.vertex.VertexConsumer vc)) return;
         org.joml.Matrix4f matrix = poseStack.last().pose();
         com.mojang.blaze3d.vertex.PoseStack.Pose lastPose = poseStack.last();
@@ -2705,6 +2719,7 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
 
     @Override
     public void renderJarFluid(com.kingodogo.buildscape.block.GlassJarBlockEntity blockEntity, com.mojang.blaze3d.vertex.PoseStack poseStack, Object bufferSource, int light, int overlay) {
+        if (bufferSource instanceof RenderCapture capture) bufferSource = capture.translucent();
         if (!(bufferSource instanceof com.mojang.blaze3d.vertex.VertexConsumer vc)) return;
         net.minecraft.world.item.ItemStack liquidItem = blockEntity.getStoredLiquidItem();
         int level = blockEntity.getLiquidLevel();
@@ -2729,7 +2744,11 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
         float a = ((color >> 24) & 0xFF) / 255.0F;
         if (a == 0.0F) a = 0.88F;
 
-        float u0 = 0.0F, u1 = 1.0F, v0 = 0.0F, v1 = 1.0F;
+        String spriteId = com.kingodogo.buildscape.block.GlassJarBlockEntity.isXpLiquid(liquidItem)
+                ? "buildscape:fluid/experience_still"
+                : liquidItem.is(net.minecraft.world.item.Items.LAVA_BUCKET) ? "minecraft:block/lava_still" : "minecraft:block/water_still";
+        var sprite = getBlockAtlasSprite(CommonId.parse(spriteId));
+        float u0 = sprite.getU(0), u1 = sprite.getU(1), v0 = sprite.getV(0), v1 = sprite.getV(1);
         org.joml.Matrix4f matrix = poseStack.last().pose();
         com.mojang.blaze3d.vertex.PoseStack.Pose lastPose = poseStack.last();
 
@@ -2856,6 +2875,13 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
     }
 
     @Override
+    public net.minecraft.client.renderer.texture.TextureAtlasSprite getBlockAtlasSprite(CommonId id) {
+        return net.minecraft.client.Minecraft.getInstance().getAtlasManager()
+                .getAtlasOrThrow(net.minecraft.client.renderer.texture.TextureAtlas.LOCATION_BLOCKS)
+                .getSprite(Identifier.fromNamespaceAndPath(id.getNamespace(), id.getPath()));
+    }
+
+    @Override
     public boolean isTranslucent(net.minecraft.world.level.block.state.BlockState state) {
         if (state == null) return false;
         try {
@@ -2871,7 +2897,8 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
                     }
                 }
             }
-        } catch (Throwable ignored) {}
+        } catch (Throwable exception) {
+            com.kingodogo.buildscape.BuildscapeCommon.LOGGER.warn("Failed in 26.x isTranslucent", exception);}
         return false;
     }
 
@@ -2941,7 +2968,8 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
                     | (net.minecraft.util.ARGB.linearToSrgbChannel((float) (green / weight)) << 8)
                     | net.minecraft.util.ARGB.linearToSrgbChannel((float) (blue / weight));
             return new BlockColorSample(rgb, transparent, textures.size() == 1);
-        } catch (Throwable ignored) {
+        } catch (Throwable exception) {
+            com.kingodogo.buildscape.BuildscapeCommon.LOGGER.warn("Failed in 26.x sampleBlockColor", exception);
             return null;
         }
     }
@@ -2953,7 +2981,8 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
                     .getDeclaredField("originalImage");
             image.setAccessible(true);
             return (com.mojang.blaze3d.platform.NativeImage) image.get(contents);
-        } catch (ReflectiveOperationException ignored) {
+        } catch (ReflectiveOperationException exception) {
+            com.kingodogo.buildscape.BuildscapeCommon.LOGGER.warn("Failed to read sprite image on 26.x", exception);
             return null;
         }
     }

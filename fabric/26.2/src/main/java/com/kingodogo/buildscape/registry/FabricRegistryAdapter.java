@@ -10,7 +10,8 @@ public class FabricRegistryAdapter extends BaseRegistryAdapter {
     }
 
     @Override
-    public void init() {
+    public synchronized void init() {
+        if (isInitialized()) return;
         super.init();
         registerTo(BuiltInRegistries.BLOCK, modBlocks);
         registerTo(BuiltInRegistries.ITEM, modItems);

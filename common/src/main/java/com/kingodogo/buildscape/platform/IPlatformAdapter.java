@@ -80,6 +80,9 @@ public interface IPlatformAdapter {
 
     Item getItem(CommonId id);
     CommonId getItemId(Item item);
+    default Item.Properties prepareItemProperties(CommonId id, Item.Properties properties) {
+        return properties;
+    }
     int getItemRawId(Item item);
     Item getItemByRawId(int rawId);
 

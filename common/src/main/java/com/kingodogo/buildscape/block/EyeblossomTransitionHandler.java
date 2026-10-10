@@ -7,10 +7,11 @@ import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunk;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
-import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 public final class EyeblossomTransitionHandler {
@@ -56,23 +57,24 @@ public final class EyeblossomTransitionHandler {
         }
         tracker.night = night;
 
+        // Work on a copy: changing a block re-tracks or untracks it, which edits these sets.
+        List<Long> snapshot = new ArrayList<>();
         for (Set<Long> positions : tracker.positionsByChunk.values()) {
-            Iterator<Long> iterator = positions.iterator();
-            while (iterator.hasNext()) {
-                BlockPos pos = BlockPos.of(iterator.next());
-                if (!level.hasChunkAt(pos)) {
-                    continue;
-                }
+            snapshot.addAll(positions);
+        }
+        for (long packed : snapshot) {
+            BlockPos pos = BlockPos.of(packed);
+            if (!level.hasChunkAt(pos)) {
+                continue;
+            }
 
-                BlockState state = level.getBlockState(pos);
-                if (state.getBlock() instanceof EyeblossomBlock eyeblossom) {
-                    eyeblossom.synchronizeWithTime(level, pos, state, true);
-                } else {
-                    iterator.remove();
-                }
+            BlockState state = level.getBlockState(pos);
+            if (state.getBlock() instanceof EyeblossomBlock eyeblossom) {
+                eyeblossom.synchronizeWithTime(level, pos, state, true);
+            } else {
+                untrack(level, pos);
             }
         }
-        tracker.positionsByChunk.values().removeIf(Set::isEmpty);
     }
     public static void onChunkLoad(ServerLevel level, LevelChunk chunk) {
         Tracker existingTracker = TRACKERS.get(level);

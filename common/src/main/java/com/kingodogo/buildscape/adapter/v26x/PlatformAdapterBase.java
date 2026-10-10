@@ -80,7 +80,7 @@ import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
-public abstract class PlatformAdapterBase implements IPlatformAdapter {
+public abstract class PlatformAdapterBase implements IPlatformAdapter, com.kingodogo.buildscape.world.GameRuleAccess {
     @Override public boolean isReplaceable(net.minecraft.world.level.block.state.BlockState state) { return state.canBeReplaced(); }
     @Override public boolean isGlassBlock(net.minecraft.world.level.block.Block block) { return block == net.minecraft.world.level.block.Blocks.GLASS || block instanceof net.minecraft.world.level.block.StainedGlassBlock || block instanceof net.minecraft.world.level.block.TintedGlassBlock; }
     @Override
@@ -114,7 +114,32 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
     @Override
     @SuppressWarnings("unchecked")
     public boolean getGameRuleBoolean(net.minecraft.world.level.Level level, Object ruleKey, boolean fallback) {
+        if (level instanceof ServerLevel serverLevel
+                && ruleKey instanceof net.minecraft.world.level.gamerules.GameRule<?> rule
+                && rule.valueClass() == Boolean.class) {
+            return serverLevel.getServer().getGameRules().get((net.minecraft.world.level.gamerules.GameRule<Boolean>) rule);
+        }
         return fallback;
+    }
+
+    @Override
+    public Object registerBooleanRule(com.kingodogo.buildscape.world.ModGameRules.Definition definition) {
+        net.minecraft.world.level.gamerules.GameRule<Boolean> rule = new net.minecraft.world.level.gamerules.GameRule<>(
+                net.minecraft.world.level.gamerules.GameRuleCategory.MISC,
+                net.minecraft.world.level.gamerules.GameRuleType.BOOL,
+                com.mojang.brigadier.arguments.BoolArgumentType.bool(),
+                net.minecraft.world.level.gamerules.GameRuleTypeVisitor::visitBoolean,
+                com.mojang.serialization.Codec.BOOL, value -> value ? 1 : 0,
+                definition.defaultValue(), net.minecraft.world.flag.FeatureFlagSet.of());
+        Services.PLATFORM.wrapRegistryAction(() -> safeRegister(BuiltInRegistries.GAME_RULE,
+                Identifier.fromNamespaceAndPath("buildscape", definition.registryPath()), rule));
+        return rule;
+    }
+
+    @Override
+    public Level currentServerRuleLevel() {
+        net.minecraft.server.MinecraftServer server = PacketFactory.getServer();
+        return server != null && server.isSameThread() ? server.overworld() : null;
     }
 
     @Override public Iterable<net.minecraft.world.item.ItemStack> getInventoryItems(net.minecraft.world.entity.player.Inventory inventory) { return inventory.getNonEquipmentItems(); }
@@ -1354,19 +1379,19 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
         level.playSound(null, pos, net.minecraft.sounds.SoundEvents.NOTE_BLOCK_CHIME.value(), net.minecraft.sounds.SoundSource.PLAYERS, 1.0f, pitch);
     }
 
-    private static final java.util.Map<java.util.UUID, net.minecraft.nbt.CompoundTag> V26X_ENTITY_DATA = new java.util.concurrent.ConcurrentHashMap<>();
-    private static final java.util.Map<net.minecraft.world.level.block.entity.BlockEntity, net.minecraft.nbt.CompoundTag> V26X_BLOCK_ENTITY_DATA = new java.util.concurrent.ConcurrentHashMap<>();
-
     @Override
     public net.minecraft.nbt.CompoundTag getEntityData(net.minecraft.world.entity.Entity entity) {
         if (entity == null) return new net.minecraft.nbt.CompoundTag();
-        return V26X_ENTITY_DATA.computeIfAbsent(entity.getUUID(), k -> new net.minecraft.nbt.CompoundTag());
+        return com.kingodogo.buildscape.data.PersistentData.get(entity);
     }
 
     @Override
     public net.minecraft.nbt.CompoundTag getBlockEntityData(net.minecraft.world.level.block.entity.BlockEntity be) {
         if (be == null) return new net.minecraft.nbt.CompoundTag();
-        return V26X_BLOCK_ENTITY_DATA.computeIfAbsent(be, k -> new net.minecraft.nbt.CompoundTag());
+        net.minecraft.nbt.CompoundTag data = com.kingodogo.buildscape.data.PersistentData.get(be);
+        // The caller mutates the returned tag in place; ensure the containing chunk is saved.
+        if (be.getLevel() instanceof ServerLevel && !be.isRemoved()) be.setChanged();
+        return data;
     }
 
     @Override
@@ -2149,18 +2174,10 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
         net.minecraft.world.level.gamerules.GameRules rules = server.getGameRules();
         if (rules == null) return;
 
-        if (ruleName.equals("fastLeafDecay") && com.kingodogo.buildscape.world.ModGameRules.FAST_LEAF_DECAY instanceof net.minecraft.world.level.gamerules.GameRule<?> rule) {
+        Object key = com.kingodogo.buildscape.world.ModGameRules.ruleByName(ruleName);
+        if (key instanceof net.minecraft.world.level.gamerules.GameRule<?> rule && rule.valueClass() == Boolean.class) {
             rules.set((net.minecraft.world.level.gamerules.GameRule<Boolean>) rule, value, server);
-        } else if (ruleName.equals("disableEndermanGriefing") && com.kingodogo.buildscape.world.ModGameRules.DISABLE_ENDERMAN_GRIEFING instanceof net.minecraft.world.level.gamerules.GameRule<?> rule) {
-            rules.set((net.minecraft.world.level.gamerules.GameRule<Boolean>) rule, value, server);
-        } else if (ruleName.equals("disableCreeperGriefing") && com.kingodogo.buildscape.world.ModGameRules.DISABLE_CREEPER_GRIEFING instanceof net.minecraft.world.level.gamerules.GameRule<?> rule) {
-            rules.set((net.minecraft.world.level.gamerules.GameRule<Boolean>) rule, value, server);
-        } else if (ruleName.equals("disableGhastGriefing") && com.kingodogo.buildscape.world.ModGameRules.DISABLE_GHAST_GRIEFING instanceof net.minecraft.world.level.gamerules.GameRule<?> rule) {
-            rules.set((net.minecraft.world.level.gamerules.GameRule<Boolean>) rule, value, server);
-        } else if (ruleName.equals("isCakeStack") && com.kingodogo.buildscape.world.ModGameRules.IS_CAKE_STACK instanceof net.minecraft.world.level.gamerules.GameRule<?> rule) {
-            rules.set((net.minecraft.world.level.gamerules.GameRule<Boolean>) rule, value, server);
-        } else if (ruleName.equals("isWaterbottleStack") && com.kingodogo.buildscape.world.ModGameRules.IS_WATER_BOTTLE_STACK instanceof net.minecraft.world.level.gamerules.GameRule<?> rule) {
-            rules.set((net.minecraft.world.level.gamerules.GameRule<Boolean>) rule, value, server);
+            com.kingodogo.buildscape.world.ModGameRules.syncIfChanged(server.overworld());
         }
     }
 

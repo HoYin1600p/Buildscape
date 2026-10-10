@@ -49,6 +49,7 @@ public class BuildscapeCommon {
     public static void prepareRegistration() {
         PREPARATION.run(() -> {
             LOGGER.info("Preparing Buildscape on platform: {}", Services.PLATFORM.getPlatformName());
+            com.kingodogo.buildscape.world.ModGameRules.register();
             ModBlocks.init();
             ModItems.init();
             com.kingodogo.buildscape.trophy.Trophies.init();

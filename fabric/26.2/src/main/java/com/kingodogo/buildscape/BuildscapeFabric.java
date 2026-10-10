@@ -22,6 +22,7 @@ public class BuildscapeFabric implements ModInitializer {
     public static void init() {
         STARTUP.run(() -> {
             BuildscapeCommon.init();
+            com.kingodogo.buildscape.event.LoaderDispenserSetup.register();
             com.kingodogo.buildscape.worldgen.ModBiomeModifications.register();
             Services.PLATFORM.registerEntityAttributes(FabricDefaultAttributeRegistry::register);
             ((PlatformAdapterBase) Services.PLATFORM).registerExperienceCauldronInteractions(

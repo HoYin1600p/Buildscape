@@ -19,16 +19,41 @@ public final class AdvancementMilestoneLogic {
 
     public static void grant(ServerPlayer player, String id) {
         if (player == null) return;
-        Services.PLATFORM.awardAdvancement(player, new CommonId("buildscape", id), id);
+        AdvancementEvents.grant(player, id);
     }
 
     private static boolean checkMilestone(ServerPlayer player, String advId, int targetCount, String counterKey) {
-        CompoundTag tag = Services.PLATFORM.getEntityData(player);
-        int currentCount = Services.PLATFORM.getTagInt(tag, counterKey, 0) + 1;
-        tag.putInt(counterKey, currentCount);
+        return checkMilestone(player, advId, targetCount, counterKey, 1);
+    }
 
-        if (currentCount >= targetCount) {
-            grant(player, advId);
+    private static boolean checkMilestone(ServerPlayer player, String advId, int targetCount, String counterKey, int amount) {
+        String stat = switch (counterKey) {
+            case "BS_Stat_HammerUsed" -> "hammer_used";
+            case "BS_Stat_ConfettiUsed" -> "confetti_used";
+            case "BS_Stat_JarsCrafted" -> "jars_crafted";
+            case "BS_Stat_StockingsCrafted" -> "stockings_crafted";
+            case "BS_Stat_HollowPlaced" -> "hollow_logs_placed";
+            case "BS_Stat_IciclesPlaced" -> "icicles_placed";
+            case "BS_Stat_OrnamentsPlaced" -> "ornaments_placed";
+            case "BS_Stat_StringLightsPlaced" -> "string_lights_placed";
+            case "BS_Stat_StarsPlaced" -> "stars_placed";
+            case "BS_Stat_SnowyLeavesPlaced" -> "snowy_leaves_placed";
+            case "BS_Stat_SmokeVentsPlaced" -> "smoke_vents_placed";
+            case "BS_Stat_BoltsPlaced" -> "bolts_placed";
+            default -> throw new IllegalArgumentException("Unknown milestone counter: " + counterKey);
+        };
+        return checkRelativeMilestone(player, advId, targetCount, AdvancementEvents.incrementStat(player, stat, amount));
+    }
+
+    private static boolean checkRelativeMilestone(ServerPlayer player, String advId, int targetCount, int currentCount) {
+        if (AdvancementEvents.isDone(player, advId)) return false;
+        CompoundTag tag = Services.PLATFORM.getEntityData(player);
+        String key = "BS_Base_" + advId;
+        Integer previous = tag.contains(key) ? Services.PLATFORM.getTagInt(tag, key, 0) : null;
+        int baseline = MilestoneCounter.baseline(currentCount, previous);
+        tag.putInt(key, baseline);
+        if (MilestoneCounter.reached(currentCount, baseline, targetCount) && AdvancementEvents.grant(player, advId)) {
+            tag.remove(key);
             return true;
         }
         return false;
@@ -36,14 +61,11 @@ public final class AdvancementMilestoneLogic {
 
     public static void onPillarItemInserted(ServerPlayer serverPlayer) {
         if (serverPlayer == null) return;
-        CompoundTag tag = Services.PLATFORM.getEntityData(serverPlayer);
-        int count = Services.PLATFORM.getTagInt(tag, "BS_Stat_PillarsInteracted", 0) + 1;
-        tag.putInt("BS_Stat_PillarsInteracted", count);
-
-        if (count >= 10) grant(serverPlayer, "put_it_on_display");
-        if (count >= 69) grant(serverPlayer, "columnist");
-        if (count >= 100) grant(serverPlayer, "art_collector");
-        if (count >= 1000) grant(serverPlayer, "buildscape_museum");
+        int count = AdvancementEvents.incrementStat(serverPlayer, "interact_with_pillar", 1);
+        if (checkRelativeMilestone(serverPlayer, "put_it_on_display", 10, count)) return;
+        if (checkRelativeMilestone(serverPlayer, "columnist", 69, count)) return;
+        if (checkRelativeMilestone(serverPlayer, "art_collector", 100, count)) return;
+        checkRelativeMilestone(serverPlayer, "buildscape_museum", 1000, count);
     }
 
     public static void onHammerReplace(ServerPlayer player) {
@@ -58,17 +80,21 @@ public final class AdvancementMilestoneLogic {
     }
 
     public static void onItemCrafted(ServerPlayer serverPlayer, ItemStack itemStack) {
+        onItemCrafted(serverPlayer, itemStack, itemStack.getCount());
+    }
+
+    public static void onItemCrafted(ServerPlayer serverPlayer, ItemStack itemStack, int amount) {
         if (serverPlayer == null || itemStack.isEmpty()) return;
         CommonId id = Services.PLATFORM.getItemId(itemStack.getItem());
         if (id == null) return;
         String path = id.getPath();
 
         if (path.contains("jar") && !path.contains("pattern")) {
-            checkMilestone(serverPlayer, "jar_ring_display", 100, "BS_Stat_JarsCrafted");
+            checkMilestone(serverPlayer, "jar_ring_display", 100, "BS_Stat_JarsCrafted", amount);
         }
 
         if (path.contains("festive_stocking") || path.contains("stocking")) {
-            checkMilestone(serverPlayer, "christmas_every_day", 365, "BS_Stat_StockingsCrafted");
+            checkMilestone(serverPlayer, "christmas_every_day", 365, "BS_Stat_StockingsCrafted", amount);
         }
     }
 
@@ -83,14 +109,12 @@ public final class AdvancementMilestoneLogic {
         String path = id.getPath();
 
         if ("buildscape".equals(modId)) {
-            CompoundTag tag = Services.PLATFORM.getEntityData(serverPlayer);
-            int placedCount = Services.PLATFORM.getTagInt(tag, "BS_Stat_BlocksPlaced", 0) + 1;
-            tag.putInt("BS_Stat_BlocksPlaced", placedCount);
-
-            if (placedCount >= 100) grant(serverPlayer, "one_more_block");
-            if (placedCount >= 1000) grant(serverPlayer, "okay_one_more");
-            if (placedCount >= 10000) grant(serverPlayer, "actually_one_last");
-            if (placedCount >= 100000) grant(serverPlayer, "one_last_one_i_promise");
+            int placedCount = AdvancementEvents.incrementStat(serverPlayer, "blocks_placed", 1);
+            if (!checkRelativeMilestone(serverPlayer, "one_more_block", 100, placedCount)
+                    && !checkRelativeMilestone(serverPlayer, "okay_one_more", 1000, placedCount)
+                    && !checkRelativeMilestone(serverPlayer, "actually_one_last", 10000, placedCount)) {
+                checkRelativeMilestone(serverPlayer, "one_last_one_i_promise", 100000, placedCount);
+            }
         }
 
         if (path.contains("stained_brick")) {
@@ -122,6 +146,7 @@ public final class AdvancementMilestoneLogic {
         }
 
         if (block instanceof FrostRoseBlock || path.equals("frost_rose")) {
+            AdvancementEvents.incrementStat(serverPlayer, "frosty_roses_placed", 1);
             int radius = 3;
             int roseCount = 0;
             for (BlockPos p : BlockPos.betweenClosed(pos.offset(-radius, -radius, -radius), pos.offset(radius, radius, radius))) {
@@ -135,6 +160,7 @@ public final class AdvancementMilestoneLogic {
         }
 
         if (path.contains("cascade_block")) {
+            AdvancementEvents.incrementStat(serverPlayer, "cascade_blocks_placed", 1);
             grant(serverPlayer, "let_it_cascade");
         }
 
@@ -143,6 +169,7 @@ public final class AdvancementMilestoneLogic {
         }
 
         if (path.equals("muff_block") && level.hasNeighborSignal(pos)) {
+            AdvancementEvents.incrementStat(serverPlayer, "muff_blocks_activated", 1);
             grant(serverPlayer, "can_you_hear_me_now");
         }
 

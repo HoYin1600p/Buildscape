@@ -1,0 +1,20 @@
+{
+  "required": true,
+  "package": "com.kingodogo.buildscape.mixin.fabric",
+  "compatibilityLevel": "JAVA_25",
+  "mixins": [
+    "BlockPlacementMixin",
+    "CraftingMixin",
+    "CraftingResultPreparationMixin",
+    "PlayerDimensionMixin",
+    "ItemUseFinishMixin",
+    "AdvancementCompletionMixin",
+    "AnvilUpdateMixin",
+    "EndermanGriefingMixin",
+    "FireballGriefingMixin",
+    "ExplosionGriefingMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

@@ -10,8 +10,17 @@ import java.util.List;
 
 /** 26.2 advancement access, installed before gameplay callbacks are registered. */
 public final class LoaderAdvancementAccess implements AdvancementEvents.Access {
+    private static final java.util.Set<Identifier> UNREGISTERED = java.util.concurrent.ConcurrentHashMap.newKeySet();
+
     @Override public int incrementStat(ServerPlayer player, com.kingodogo.buildscape.util.CommonId id, int amount) {
-        var stat = net.minecraft.stats.Stats.CUSTOM.get(Identifier.fromNamespaceAndPath(id.getNamespace(), id.getPath()));
+        Identifier key = Identifier.fromNamespaceAndPath(id.getNamespace(), id.getPath());
+        Identifier registered = net.minecraft.core.registries.BuiltInRegistries.CUSTOM_STAT.getValue(key);
+        if (registered == null) {
+            if (UNREGISTERED.add(key)) com.kingodogo.buildscape.BuildscapeCommon.LOGGER.warn(
+                    "Skipping unregistered Buildscape custom stat {}", key);
+            return 0;
+        }
+        var stat = net.minecraft.stats.Stats.CUSTOM.get(registered, net.minecraft.stats.StatFormatter.DEFAULT);
         int current = player.getStats().getValue(stat);
         int updated = MilestoneCounter.advance(current, amount);
         if (updated > current) player.awardStat(stat, updated - current);

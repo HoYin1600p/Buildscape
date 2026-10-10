@@ -379,8 +379,14 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter, com.kingo
     @Override
     public net.minecraft.stats.Stat<?> registerCustomStat(String registryName, CommonId statId) {
         Identifier value = Identifier.fromNamespaceAndPath(statId.getNamespace(), statId.getPath());
-        safeRegister(BuiltInRegistries.CUSTOM_STAT, Identifier.withDefaultNamespace(registryName), value);
-        return net.minecraft.stats.Stats.CUSTOM.get(value, net.minecraft.stats.StatFormatter.DEFAULT);
+        Services.PLATFORM.wrapRegistryAction(() -> {
+            if (!BuiltInRegistries.CUSTOM_STAT.containsKey(value)) {
+                safeRegister(BuiltInRegistries.CUSTOM_STAT, value, value);
+            }
+        });
+        Identifier registered = BuiltInRegistries.CUSTOM_STAT.getValue(value);
+        if (registered == null) throw new IllegalStateException("Custom stat registration did not complete: " + value);
+        return net.minecraft.stats.Stats.CUSTOM.get(registered, net.minecraft.stats.StatFormatter.DEFAULT);
     }
 
     @Override

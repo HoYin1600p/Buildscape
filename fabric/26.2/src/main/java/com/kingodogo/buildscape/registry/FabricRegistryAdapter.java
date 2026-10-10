@@ -24,6 +24,8 @@ public class FabricRegistryAdapter extends BaseRegistryAdapter {
         if (creativeTab != null) {
             com.kingodogo.buildscape.platform.Services.PLATFORM.register(BuiltInRegistries.CREATIVE_MODE_TAB, ModCreativeTabs.TAB_ID, creativeTab);
         }
+        // Fabric registers custom stats during onInitialize, while the registries are writable.
+        com.kingodogo.buildscape.stat.ModStats.registerStats();
         System.out.println("[Buildscape Fabric 26.2] Successfully registered " + modBlocks.size() + " blocks, " + modItems.size() + " items, " + modBlockEntities.size() + " block entities, " + modEntities.size() + " entities, " + modSounds.size() + " sounds, and " + modMenus.size() + " menus.");
     }
 }

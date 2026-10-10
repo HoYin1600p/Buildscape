@@ -95,6 +95,39 @@ class BlockstatePropertiesTest {
                     problems.add(def + ": hollow block lacks the shared WATERLOGGED/LAVA_LOGGED properties");
                 }
             }
+            if (def.isHollowLog() || def.isHollowPipe() || def.isPipe()) {
+                try {
+                    var state = block.defaultBlockState();
+                    if (def.isHollowPipe()) assertInstanceOf(HollowPipeBlock.class, block, def.getId());
+                    else if (def.isHollowLog()) assertInstanceOf(HollowLogBlock.class, block, def.getId());
+                    else assertInstanceOf(PipeBlock.class, block, def.getId());
+                    state.getFluidState();
+                    HollowPipeBlock.getSourceFluid(state, null);
+                    HollowPipeBlock.getContainedFluid(state, null);
+                    if (block instanceof HollowLogBlock || block instanceof HollowPipeBlock) {
+                        assertFalse(state.getValue(HollowPipeBlock.WATERLOGGED));
+                        assertFalse(state.getValue(HollowPipeBlock.LAVA_LOGGED));
+                        var water = state.setValue(HollowPipeBlock.WATERLOGGED, true);
+                        var lava = state.setValue(HollowPipeBlock.LAVA_LOGGED, true);
+                        assertSame(net.minecraft.world.level.material.Fluids.WATER, HollowPipeBlock.getSourceFluid(water, null));
+                        assertSame(net.minecraft.world.level.material.Fluids.LAVA, HollowPipeBlock.getSourceFluid(lava, null));
+                        water.getFluidState();
+                        lava.getFluidState();
+                    }
+                    if (block instanceof HollowPipeBlock pipe) {
+                        pipe.getActualShape(state);
+                        HollowPipeBlock.getConnectCount(state);
+                        HollowPipeBlock.getPrimaryAxis(state);
+                        com.kingodogo.buildscape.client.renderer.PipeWaterSurface.flowing(state, null);
+                        for (var direction : net.minecraft.core.Direction.values()) {
+                            HollowPipeBlock.isOpenEndpoint(state, direction);
+                            com.kingodogo.buildscape.pipe.transport.PipeOutletWater.amount(state, null, direction);
+                        }
+                    }
+                } catch (Throwable failure) {
+                    problems.add(def + ": pipe/hollow getters failed (" + failure + ")");
+                }
+            }
             Map<String, Property<?>> props = new LinkedHashMap<>();
             block.getStateDefinition().getProperties().forEach(p -> props.put(p.getName(), p));
             JsonObject json = JsonParser.parseString(Files.readString(file, StandardCharsets.UTF_8)).getAsJsonObject();
@@ -120,6 +153,44 @@ class BlockstatePropertiesTest {
         System.out.println("BlockstatePropertiesTest: " + defs.size() + " blocks, " + checked + " blockstates checked, "
                 + SKIPS.size() + " skipped");
         assertTrue(problems.isEmpty(), problems.size() + " problem(s):\n" + String.join("\n", problems));
+    }
+
+    @Test
+    void pillarShapeUpdatesConnectStacksAndDisconnectRemovedNeighbors() throws Exception {
+        var factory = new BlockFactory();
+        var lower = factory.createBlock(new BlockDefinition("stone_pillar", "PillarBlock", CommonBlockProperties.of()));
+        var upper = factory.createBlock(new BlockDefinition("copper_pillar", "PillarBlock", CommonBlockProperties.of()));
+        var origin = net.minecraft.core.BlockPos.ZERO;
+        var neighbors = new java.util.HashMap<net.minecraft.core.BlockPos, net.minecraft.world.level.block.state.BlockState>();
+        var air = net.minecraft.world.level.block.Blocks.AIR.defaultBlockState();
+        var reader = (net.minecraft.world.level.LevelReader) java.lang.reflect.Proxy.newProxyInstance(
+                getClass().getClassLoader(), new Class<?>[]{net.minecraft.world.level.LevelReader.class},
+                (proxy, method, args) -> {
+                    if (method.getName().equals("getBlockState")) return neighbors.getOrDefault(args[0], air);
+                    throw new AssertionError("Unexpected level query: " + method.getName());
+                });
+        var update = lower.getClass().getDeclaredMethod("updateShape",
+                net.minecraft.world.level.block.state.BlockState.class, net.minecraft.world.level.LevelReader.class,
+                net.minecraft.world.level.ScheduledTickAccess.class, net.minecraft.core.BlockPos.class,
+                net.minecraft.core.Direction.class, net.minecraft.core.BlockPos.class,
+                net.minecraft.world.level.block.state.BlockState.class, net.minecraft.util.RandomSource.class);
+        update.setAccessible(true);
+        var single = lower.defaultBlockState();
+        var above = upper.defaultBlockState();
+        var random = net.minecraft.util.RandomSource.create(1);
+        var bottom = (net.minecraft.world.level.block.state.BlockState) update.invoke(lower, single, reader, null,
+                origin, net.minecraft.core.Direction.UP, origin.above(), above, random);
+        assertEquals(PillarPart.BOTTOM, bottom.getValue(PillarBlock.PART));
+        neighbors.put(origin.below(), above);
+        var middle = (net.minecraft.world.level.block.state.BlockState) update.invoke(lower, bottom, reader, null,
+                origin, net.minecraft.core.Direction.UP, origin.above(), above, random);
+        assertEquals(PillarPart.MIDDLE, middle.getValue(PillarBlock.PART));
+        var top = (net.minecraft.world.level.block.state.BlockState) update.invoke(lower, middle, reader, null,
+                origin, net.minecraft.core.Direction.UP, origin.above(), air, random);
+        assertEquals(PillarPart.TOP, top.getValue(PillarBlock.PART));
+        var disconnected = (net.minecraft.world.level.block.state.BlockState) update.invoke(lower, top, reader, null,
+                origin, net.minecraft.core.Direction.DOWN, origin.below(), air, random);
+        assertEquals(PillarPart.SINGLE, disconnected.getValue(PillarBlock.PART));
     }
 
     /** Models name the experience fluid sprites; they only exist in the block atlas if the atlas source lists them. */

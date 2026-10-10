@@ -52,12 +52,13 @@ public class SyncGameRulesPacket implements CommonPacket {
 
     @Override
     public void write(FriendlyByteBuf buffer) {
-        buffer.writeBoolean(fastLeafDecay);
-        buffer.writeBoolean(disableEndermanGriefing);
-        buffer.writeBoolean(disableCreeperGriefing);
-        buffer.writeBoolean(disableGhastGriefing);
-        buffer.writeBoolean(cakeStacking);
-        buffer.writeBoolean(waterBottleStacking);
+        SyncGameRulesPacket state = ModGameRules.serverSnapshotOr(this);
+        buffer.writeBoolean(state.fastLeafDecay);
+        buffer.writeBoolean(state.disableEndermanGriefing);
+        buffer.writeBoolean(state.disableCreeperGriefing);
+        buffer.writeBoolean(state.disableGhastGriefing);
+        buffer.writeBoolean(state.cakeStacking);
+        buffer.writeBoolean(state.waterBottleStacking);
     }
 
     @Override

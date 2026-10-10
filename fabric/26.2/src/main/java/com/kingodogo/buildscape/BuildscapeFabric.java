@@ -21,7 +21,17 @@ public class BuildscapeFabric implements ModInitializer {
 
     public static void init() {
         STARTUP.run(() -> {
+            net.fabricmc.fabric.api.attachment.v1.AttachmentType<net.minecraft.nbt.CompoundTag> persistentData =
+                    net.fabricmc.fabric.api.attachment.v1.AttachmentRegistry.<net.minecraft.nbt.CompoundTag>builder()
+                            .initializer(net.minecraft.nbt.CompoundTag::new)
+                            .persistent(com.kingodogo.buildscape.data.PersistentData.CODEC)
+                            .buildAndRegister(Identifier.fromNamespaceAndPath(
+                                    BuildscapeCommon.MOD_ID, com.kingodogo.buildscape.data.PersistentData.ATTACHMENT_PATH));
+            com.kingodogo.buildscape.data.PersistentData.install(owner ->
+                    ((net.fabricmc.fabric.api.attachment.v1.AttachmentTarget) owner).getAttachedOrCreate(persistentData));
             BuildscapeCommon.init();
+            net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents.END_SERVER_TICK.register(server ->
+                    com.kingodogo.buildscape.world.ModGameRules.syncIfChanged(server.overworld()));
             com.kingodogo.buildscape.event.LoaderDispenserSetup.register();
             com.kingodogo.buildscape.worldgen.ModBiomeModifications.register();
             Services.PLATFORM.registerEntityAttributes(FabricDefaultAttributeRegistry::register);

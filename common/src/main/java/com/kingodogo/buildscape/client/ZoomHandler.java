@@ -49,7 +49,10 @@ public class ZoomHandler {
     public static void tick() {
         Minecraft mc = Minecraft.getInstance();
         if (mc.player == null) return;
+        advanceZoom();
+    }
 
+    static void advanceZoom() {
         float zoomDiff = targetZoomLevel - currentZoomLevel;
         currentZoomLevel += zoomDiff * ZOOM_SPEED;
 

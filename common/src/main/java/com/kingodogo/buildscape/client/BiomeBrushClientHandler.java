@@ -12,6 +12,16 @@ import java.util.concurrent.ThreadLocalRandom;
 public final class BiomeBrushClientHandler {
 
     private BiomeBrushClientHandler() {}
+
+    public static void onAttack(Player player, net.minecraft.world.phys.HitResult target) {
+        if (player == null || Services.PLATFORM.isScreenOpen() || !player.isShiftKeyDown()) return;
+        if (target != null && target.getType() == net.minecraft.world.phys.HitResult.Type.BLOCK) return;
+        if (player.getMainHandItem().getItem() instanceof BiomeBrushItem
+                || player.getOffhandItem().getItem() instanceof BiomeBrushItem) {
+            com.kingodogo.buildscape.network.PacketFactory.sendToServer(
+                    new com.kingodogo.buildscape.network.ClearBiomeBrushPacket());
+        }
+    }
     public static void tickClient(Player player) {
         if (player == null) return;
         Level level = Services.PLATFORM.getEntityLevel(player);

@@ -1378,6 +1378,7 @@
   "block.buildscape.tinted_glass_ornament": "Tinted Glass Ornaments",
   "item.buildscape.tinted_glass_ornament": "Tinted Glass Ornaments",
   "key.categories.buildscape": "BuildScape",
+  "key.category.buildscape.buildscape": "BuildScape",
   "key.buildscape.cycle_pillar_pattern": "Cycle Pillar Particle Pattern",
   "block.buildscape.black_glazed_glass": "Black Glazed Glass",
   "block.buildscape.black_glazed_glass_pane": "Black Glazed Glass Pane",

@@ -20,6 +20,10 @@ import java.util.function.Function;
 final class BuildscapeNeoForgeClient {
     private BuildscapeNeoForgeClient() {}
     static void register(IEventBus bus) {
+        net.neoforged.fml.ModLoadingContext.get().registerExtensionPoint(
+                net.neoforged.neoforge.client.gui.IConfigScreenFactory.class,
+                () -> (container, parent) -> com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.createConfigScreen(parent));
+        bus.addListener(BuildscapeNeoForgeClient::keys);
         bus.addListener(BuildscapeNeoForgeClient::fluidModels);
         bus.addListener(BuildscapeNeoForgeClient::fluidExtensions);
         bus.addListener(BuildscapeNeoForgeClient::setup);
@@ -30,6 +34,62 @@ final class BuildscapeNeoForgeClient {
         bus.addListener(BuildscapeNeoForgeClient::guiLayers);
         NeoForge.EVENT_BUS.addListener(BuildscapeNeoForgeClient::tick);
         NeoForge.EVENT_BUS.addListener(BuildscapeNeoForgeClient::worldOverlays);
+        NeoForge.EVENT_BUS.addListener(BuildscapeNeoForgeClient::keyInput);
+        NeoForge.EVENT_BUS.addListener(BuildscapeNeoForgeClient::mouseInput);
+        NeoForge.EVENT_BUS.addListener(BuildscapeNeoForgeClient::scroll);
+        NeoForge.EVENT_BUS.addListener(BuildscapeNeoForgeClient::interaction);
+        NeoForge.EVENT_BUS.addListener(BuildscapeNeoForgeClient::highlight);
+        NeoForge.EVENT_BUS.addListener(BuildscapeNeoForgeClient::fov);
+        NeoForge.EVENT_BUS.addListener(BuildscapeNeoForgeClient::camera);
+        NeoForge.EVENT_BUS.addListener(BuildscapeNeoForgeClient::disconnect);
+        NeoForge.EVENT_BUS.addListener(BuildscapeNeoForgeClient::unload);
+    }
+    private static void keys(net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent event) {
+        com.kingodogo.buildscape.client.ModKeyBinds.register(event::register);
+    }
+    private static void keyInput(net.neoforged.neoforge.client.event.InputEvent.Key event) {
+        com.kingodogo.buildscape.client.ClientEvents.onKeyInput(event.getKey(), event.getAction());
+    }
+    private static void mouseInput(net.neoforged.neoforge.client.event.InputEvent.MouseButton.Post event) {
+        if (event.getButton() == 1 && event.getAction() == 1) com.kingodogo.buildscape.client.ClientEvents.onRightClick();
+    }
+    private static void scroll(net.neoforged.neoforge.client.event.InputEvent.MouseScrollingEvent event) {
+        if (!com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.isScreenOpen()
+                && com.kingodogo.buildscape.client.ZoomHandler.isZooming()) {
+            com.kingodogo.buildscape.client.ZoomHandler.handleScroll(event.getScrollDeltaY());
+            event.setCanceled(true);
+        }
+    }
+    private static void interaction(net.neoforged.neoforge.client.event.InputEvent.InteractionKeyMappingTriggered event) {
+        var mc = net.minecraft.client.Minecraft.getInstance();
+        if (event.isAttack()) com.kingodogo.buildscape.client.BiomeBrushClientHandler.onAttack(mc.player, mc.hitResult);
+        if (event.isAttack() && !com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.isScreenOpen()
+                && com.kingodogo.buildscape.client.TreeChopHandler.shouldCancelLeftClick(mc.player, mc.hitResult)) {
+            event.setCanceled(true);
+            event.setSwingHand(true);
+        }
+    }
+    private static void highlight(net.neoforged.neoforge.client.event.ExtractBlockOutlineRenderStateEvent event) {
+        if (com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.extractBlockHighlight(
+                event.getCamera(), event.getHitResult(), event.getLevelRenderState())) event.setCanceled(true);
+    }
+    private static void fov(net.neoforged.neoforge.client.event.ViewportEvent.ComputeFov event) {
+        event.setFOV(event.getFOV() * com.kingodogo.buildscape.client.ZoomHandler.getZoomLevel());
+    }
+    private static void camera(net.neoforged.neoforge.client.event.ViewportEvent.ComputeCameraAngles event) {
+        float[] rotation = com.kingodogo.buildscape.client.ZoomHandler.getSmoothedRotation(event.getYaw(), event.getPitch());
+        event.setYaw(rotation[0]);
+        event.setPitch(rotation[1]);
+    }
+    private static void disconnect(net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent.LoggingOut event) {
+        com.kingodogo.buildscape.client.ClientEvents.onClientDisconnect();
+        com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.clearInputRenderState();
+    }
+    private static void unload(net.neoforged.neoforge.event.level.LevelEvent.Unload event) {
+        if (event.getLevel().isClientSide()) {
+            com.kingodogo.buildscape.client.ClientEvents.onClientWorldUnload();
+            com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.clearInputRenderState();
+        }
     }
     private static void setup(FMLClientSetupEvent event) {
         event.enqueueWork(com.kingodogo.buildscape.client.ClientEvents::initializeConfigCallback);
@@ -79,6 +139,8 @@ final class BuildscapeNeoForgeClient {
     }
     private static void worldOverlays(net.neoforged.neoforge.client.event.SubmitCustomGeometryEvent event) {
         com.kingodogo.buildscape.adapter.v26x.client.ClientWorldHooks.collectWorldOverlays(
+                event.getPoseStack(), event.getSubmitNodeCollector(), event.getLevelRenderState());
+        com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.collectBlockHighlight(
                 event.getPoseStack(), event.getSubmitNodeCollector(), event.getLevelRenderState());
     }
 }

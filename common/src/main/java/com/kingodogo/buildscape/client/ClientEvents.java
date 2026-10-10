@@ -81,6 +81,20 @@ public class ClientEvents {
     }
 
     public static boolean renderBlockHighlight(com.mojang.blaze3d.vertex.PoseStack poseStack, net.minecraft.client.Camera camera, Object bufferSource, net.minecraft.world.phys.HitResult target) {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.level == null || mc.player == null) return false;
+        if (target instanceof net.minecraft.world.phys.BlockHitResult blockHit) {
+            BlockPos pos = blockHit.getBlockPos();
+            BlockState state = mc.level.getBlockState(pos);
+            if (WrenchClientHandler.shouldCancelBlockHighlight(mc.player, target)) {
+                WrenchClientHandler.renderWrenchHighlight(poseStack, bufferSource, camera, pos, state, mc.player);
+                return true;
+            }
+            if (TreeChopHandler.shouldCancelHighlight(mc.player, target)) {
+                TreeChopHandler.renderConnectedLogHighlights(poseStack, bufferSource, camera, pos, state);
+                return true;
+            }
+        }
         return HammerClientHandler.renderBlockHighlight(poseStack, camera, bufferSource, target);
     }
 
@@ -124,12 +138,19 @@ public class ClientEvents {
 
     public static void onClientTick() {
         Minecraft mc = Minecraft.getInstance();
+        if (mc.level == null || mc.player == null) {
+            while (ModKeyBinds.CINEMATIC_ZOOM.consumeClick()) { }
+            return;
+        }
+        ModKeyBinds.tick();
         if (mc.level == null || mc.player == null || mc.isPaused()) {
             return;
         }
 
         TreeChopHandler.clientTick();
         SmokeVentParticleHandler.clientTick();
+        GeyserParticleHandler.tickClient();
+        BiomeBrushClientHandler.tickClient(mc.player);
         ZoomHandler.tick();
 
         Player player = mc.player;
@@ -180,6 +201,7 @@ public class ClientEvents {
     }
 
     public static void onClientDisconnect() {
+        onClientWorldUnload();
         overlayMessage = null;
         overlayMessageTime = 0;
         lastHedgeStep = -1;
@@ -191,22 +213,22 @@ public class ClientEvents {
     }
 
     public static void onClientWorldUnload() {
+        ZoomHandler.reset();
+        TreeChopHandler.reset();
+        ModKeyBinds.CINEMATIC_ZOOM.setDown(false);
+        while (ModKeyBinds.CINEMATIC_ZOOM.consumeClick()) { }
         overlayMessage = null;
         overlayMessageTime = 0;
         lastHedgeStep = -1;
 
         try {
-            try {
-                Class.forName("com.kingodogo.buildscape.client.renderer.PillarBlockEntityRenderer").getMethod("clearEntityCache").invoke(null);
-            } catch (Throwable ignored) {}
-            try {
-                Class.forName("com.kingodogo.buildscape.client.renderer.ArmorPillarRenderer").getMethod("clearAllCaches").invoke(null);
-            } catch (Throwable ignored) {}
+            com.kingodogo.buildscape.client.renderer.PillarBlockEntityRenderer.clearEntityCache();
+            com.kingodogo.buildscape.client.renderer.ArmorPillarRenderer.clearAllCaches();
             com.kingodogo.buildscape.particle.TintedParticleColorTracker.clear();
             com.kingodogo.buildscape.event.ItemFrameParticleHandler.clearCaches();
             MuffBlockManager.clear();
         } catch (Exception e) {
-            System.err.println("BuildScape: Error clearing caches on world unload: " + e.getMessage());
+            com.kingodogo.buildscape.BuildscapeCommon.LOGGER.warn("Error clearing client caches on world unload", e);
         }
     }
 }

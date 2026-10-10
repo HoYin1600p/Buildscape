@@ -496,6 +496,14 @@ public class BlockFactory implements IBlockFactory {
             return new TrapDoorBlock(BlockSetType.OAK, props) {};
         } else if (def.isButton()) {
             return new ButtonBlock(BlockSetType.OAK, 30, props) {};
+        } else if (def.isWeightedPressurePlate()) {
+            // 1.18.2 ModPressurePlateBlock: a weighted plate (max weight 150) with the 'power' property.
+            return new net.minecraft.world.level.block.WeightedPressurePlateBlock(150, BlockSetType.OAK, props) {};
+        } else if (def.isRedstoneLamp()) {
+            return new net.minecraft.world.level.block.RedstoneLampBlock(props.lightLevel(
+                    state -> state.getValue(net.minecraft.world.level.block.state.properties.BlockStateProperties.LIT) ? 15 : 0));
+        } else if (def.isLightningRod()) {
+            return new net.minecraft.world.level.block.LightningRodBlock(props);
         } else if (def.isPressurePlate()) {
             return new PressurePlateBlock(BlockSetType.OAK, props) {};
         } else if (def.isMushroomShelves()) {

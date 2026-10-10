@@ -45,6 +45,79 @@ public final class WorldGenFactory {
 
     private WorldGenFactory() {}
 
+    private static net.minecraft.resources.ResourceKey<ConfiguredFeature<?, ?>> treeKey(String name) {
+        return net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.CONFIGURED_FEATURE,
+                Identifier.fromNamespaceAndPath(BuildscapeCommon.MOD_ID, name));
+    }
+
+    public static final net.minecraft.resources.ResourceKey<ConfiguredFeature<?, ?>> POPLAR = treeKey("poplar");
+    public static final net.minecraft.resources.ResourceKey<ConfiguredFeature<?, ?>> CHERRY = treeKey("cherry");
+    public static final net.minecraft.resources.ResourceKey<ConfiguredFeature<?, ?>> PALE_OAK = treeKey("pale_oak");
+    public static final net.minecraft.resources.ResourceKey<ConfiguredFeature<?, ?>> MANGROVE = treeKey("mangrove");
+    public static final net.minecraft.resources.ResourceKey<ConfiguredFeature<?, ?>> TALL_MANGROVE = treeKey("tall_mangrove");
+
+    private static net.minecraft.world.level.block.grower.TreeGrower grower(String name,
+            net.minecraft.resources.ResourceKey<ConfiguredFeature<?, ?>> tree) {
+        return new net.minecraft.world.level.block.grower.TreeGrower("buildscape:" + name,
+                java.util.Optional.empty(), java.util.Optional.of(tree), java.util.Optional.empty());
+    }
+
+    public static final net.minecraft.world.level.block.grower.TreeGrower POPLAR_GROWER = grower("poplar", POPLAR);
+    public static final net.minecraft.world.level.block.grower.TreeGrower CHERRY_GROWER = grower("cherry", CHERRY);
+    public static final net.minecraft.world.level.block.grower.TreeGrower PALE_OAK_GROWER = grower("pale_oak", PALE_OAK);
+    public static final net.minecraft.world.level.block.grower.TreeGrower MANGROVE_GROWER =
+            new net.minecraft.world.level.block.grower.TreeGrower("buildscape:mangrove", 0.85F,
+                    java.util.Optional.empty(), java.util.Optional.empty(), java.util.Optional.of(MANGROVE),
+                    java.util.Optional.of(TALL_MANGROVE), java.util.Optional.empty(), java.util.Optional.empty());
+
+    public static net.minecraft.world.level.block.grower.TreeGrower saplingGrower(String id) {
+        return switch (id) {
+            case "poplar_sapling" -> POPLAR_GROWER;
+            case "cherry_sapling" -> CHERRY_GROWER;
+            case "pale_oak_sapling" -> PALE_OAK_GROWER;
+            default -> throw new IllegalArgumentException("Unknown sapling: " + id);
+        };
+    }
+
+    public static void advanceMangrove(net.minecraft.server.level.ServerLevel level, BlockPos pos,
+            BlockState state, RandomSource random, boolean bonemeal) {
+        var stage = com.kingodogo.buildscape.block.MangrovePropaguleBlock.STAGE;
+        if (state.getValue(com.kingodogo.buildscape.block.MangrovePropaguleBlock.HANGING)) return;
+        if (state.getValue(stage) == 0) {
+            level.setBlock(pos, state.setValue(stage, 1), 4);
+        } else if (bonemeal || canGrowMangrove(level, pos)) {
+            MANGROVE_GROWER.growTree(level, level.getChunkSource().getGenerator(), pos, state, random);
+        }
+    }
+
+    private static boolean canGrowMangrove(net.minecraft.server.level.ServerLevel level, BlockPos pos) {
+        if (level.getMaxLocalRawBrightness(pos) < 9) return false;
+        for (int y = 1; y <= 6; y++) {
+            BlockState state = level.getBlockState(pos.above(y));
+            if (!state.isAir() && !state.is(net.minecraft.tags.BlockTags.DIRT)
+                    && !state.is(net.minecraft.tags.BlockTags.LOGS) && !state.is(net.minecraft.tags.BlockTags.PLANKS)
+                    && !state.is(com.kingodogo.buildscape.block.ModBlocks.MANGROVE_LOG.get().getBlock())
+                    && !state.is(com.kingodogo.buildscape.block.ModBlocks.MANGROVE_WOOD.get().getBlock())
+                    && !state.is(com.kingodogo.buildscape.block.ModBlocks.STRIPPED_MANGROVE_LOG.get().getBlock())
+                    && !state.is(com.kingodogo.buildscape.block.ModBlocks.STRIPPED_MANGROVE_WOOD.get().getBlock())) return false;
+        }
+        boolean nearbyGround = false;
+        boolean rootLanding = false;
+        for (int x = -4; x <= 4; x++) for (int z = -4; z <= 4; z++) {
+            if (x != 0 || z != 0) for (int y = -4; y <= 4 && !nearbyGround; y++)
+                nearbyGround = solidMangroveGround(level, pos.offset(x, y, z));
+            for (int y = 1; y <= 11 && !rootLanding; y++)
+                rootLanding = solidMangroveGround(level, pos.offset(x, -y, z));
+        }
+        return nearbyGround && rootLanding;
+    }
+
+    private static boolean solidMangroveGround(net.minecraft.server.level.ServerLevel level, BlockPos pos) {
+        BlockState state = level.getBlockState(pos);
+        return !state.is(com.kingodogo.buildscape.block.ModBlocks.MUD.get().getBlock())
+                && state.isFaceSturdy(level, pos, Direction.UP) && state.blocksMotion() && !state.canBeReplaced();
+    }
+
     public static void register() {
         if (randomStateType != null) return;
         randomStateType = PlatformAdapterBase.safeRegister(BuiltInRegistries.BLOCKSTATE_PROVIDER_TYPE,

@@ -1,0 +1,810 @@
+{
+  "type": "minecraft:simple_block",
+  "config": {
+    "to_place": {
+      "type": "minecraft:weighted_state_provider",
+      "entries": [
+        {
+          "data": {
+            "Name": "buildscape:red_petal",
+            "Properties": {
+              "flower_amount": "1",
+              "facing": "north"
+            }
+          },
+          "weight": 1
+        },
+        {
+          "data": {
+            "Name": "buildscape:red_petal",
+            "Properties": {
+              "flower_amount": "1",
+              "facing": "south"
+            }
+          },
+          "weight": 1
+        },
+        {
+          "data": {
+            "Name": "buildscape:red_petal",
+            "Properties": {
+              "flower_amount": "1",
+              "facing": "east"
+            }
+          },
+          "weight": 1
+        },
+        {
+          "data": {
+            "Name": "buildscape:red_petal",
+            "Properties": {
+              "flower_amount": "1",
+              "facing": "west"
+            }
+          },
+          "weight": 1
+        },
+        {
+          "data": {
+            "Name": "buildscape:red_petal",
+            "Properties": {
+              "flower_amount": "2",
+              "facing": "north"
+            }
+          },
+          "weight": 1
+        },
+        {
+          "data": {
+            "Name": "buildscape:red_petal",
+            "Properties": {
+              "flower_amount": "2",
+              "facing": "south"
+            }
+          },
+          "weight": 1
+        },
+        {
+          "data": {
+            "Name": "buildscape:red_petal",
+            "Properties": {
+              "flower_amount": "2",
+              "facing": "east"
+            }
+          },
+          "weight": 1
+        },
+        {
+          "data": {
+            "Name": "buildscape:red_petal",
+            "Properties": {
+              "flower_amount": "2",
+              "facing": "west"
+            }
+          },
+          "weight": 1
+        },
+        {
+          "data": {
+            "Name": "buildscape:red_petal",
+            "Properties": {
+              "flower_amount": "3",
+              "facing": "north"
+            }
+          },
+          "weight": 1
+        },
+        {
+          "data": {
+            "Name": "buildscape:red_petal",
+            "Properties": {
+              "flower_amount": "3",
+              "facing": "south"
+            }
+          },
+          "weight": 1
+        },
+        {
+          "data": {
+            "Name": "buildscape:red_petal",
+            "Properties": {
+              "flower_amount": "3",
+              "facing": "east"
+            }
+          },
+          "weight": 1
+        },
+        {
+          "data": {
+            "Name": "buildscape:red_petal",
+            "Properties": {
+              "flower_amount": "3",
+              "facing": "west"
+            }
+          },
+          "weight": 1
+        },
+        {
+          "data": {
+            "Name": "buildscape:red_petal",
+            "Properties": {
+              "flower_amount": "4",
+              "facing": "north"
+            }
+          },
+          "weight": 1
+        },
+        {
+          "data": {
+            "Name": "buildscape:red_petal",
+            "Properties": {
+              "flower_amount": "4",
+              "facing": "south"
+            }
+          },
+          "weight": 1
+        },
+        {
+          "data": {
+            "Name": "buildscape:red_petal",
+            "Properties": {
+              "flower_amount": "4",
+              "facing": "east"
+            }
+          },
+          "weight": 1
+        },
+        {
+          "data": {
+            "Name": "buildscape:red_petal",
+            "Properties": {
+              "flower_amount": "4",
+              "facing": "west"
+            }
+          },
+          "weight": 1
+        },
+        {
+          "data": {
+            "Name": "buildscape:blue_petal",
+            "Properties": {
+              "flower_amount": "1",
+              "facing": "north"
+            }
+          },
+          "weight": 1
+        },
+        {
+          "data": {
+            "Name": "buildscape:blue_petal",
+            "Properties": {
+              "flower_amount": "1",
+              "facing": "south"
+            }
+          },
+          "weight": 1
+        },
+        {
+          "data": {
+            "Name": "buildscape:blue_petal",
+            "Properties": {
+              "flower_amount": "1",
+              "facing": "east"
+            }
+          },
+          "weight": 1
+        },
+        {
+          "data": {
+            "Name": "buildscape:blue_petal",
+            "Properties": {
+              "flower_amount": "1",
+              "facing": "west"
+            }
+          },
+          "weight": 1
+        },
+        {
+          "data": {
+            "Name": "buildscape:blue_petal",
+            "Properties": {
+              "flower_amount": "2",
+              "facing": "north"
+            }
+          },
+          "weight": 1
+        },
+        {
+          "data": {
+            "Name": "buildscape:blue_petal",
+            "Properties": {
+              "flower_amount": "2",
+              "facing": "south"
+            }
+          },
+          "weight": 1
+        },
+        {
+          "data": {
+            "Name": "buildscape:blue_petal",
+            "Properties": {
+              "flower_amount": "2",
+              "facing": "east"
+            }
+          },
+          "weight": 1
+        },
+        {
+          "data": {
+            "Name": "buildscape:blue_petal",
+            "Properties": {
+              "flower_amount": "2",
+              "facing": "west"
+            }
+          },
+          "weight": 1
+        },
+        {
+          "data": {
+            "Name": "buildscape:blue_petal",
+            "Properties": {
+              "flower_amount": "3",
+              "facing": "north"
+            }
+          },
+          "weight": 1
+        },
+        {
+          "data": {
+            "Name": "buildscape:blue_petal",
+            "Properties": {
+              "flower_amount": "3",
+              "facing": "south"
+            }
+          },
+          "weight": 1
+        },
+        {
+          "data": {
+            "Name": "buildscape:blue_petal",
+            "Properties": {
+              "flower_amount": "3",
+              "facing": "east"
+            }
+          },
+          "weight": 1
+        },
+        {
+          "data": {
+            "Name": "buildscape:blue_petal",
+            "Properties": {
+              "flower_amount": "3",
+              "facing": "west"
+            }
+          },
+          "weight": 1
+        },
+        {
+          "data": {
+            "Name": "buildscape:blue_petal",
+            "Properties": {
+              "flower_amount": "4",
+              "facing": "north"
+            }
+          },
+          "weight": 1
+        },
+        {
+          "data": {
+            "Name": "buildscape:blue_petal",
+            "Properties": {
+              "flower_amount": "4",
+              "facing": "south"
+            }
+          },
+          "weight": 1
+        },
+        {
+          "data": {
+            "Name": "buildscape:blue_petal",
+            "Properties": {
+              "flower_amount": "4",
+              "facing": "east"
+            }
+          },
+          "weight": 1
+        },
+        {
+          "data": {
+            "Name": "buildscape:blue_petal",
+            "Properties": {
+              "flower_amount": "4",
+              "facing": "west"
+            }
+          },
+          "weight": 1
+        },
+        {
+          "data": {
+            "Name": "buildscape:orange_petal",
+            "Properties": {
+              "flower_amount": "1",
+              "facing": "north"
+            }
+          },
+          "weight": 1
+        },
+        {
+          "data": {
+            "Name": "buildscape:orange_petal",
+            "Properties": {
+              "flower_amount": "1",
+              "facing": "south"
+            }
+          },
+          "weight": 1
+        },
+        {
+          "data": {
+            "Name": "buildscape:orange_petal",
+            "Properties": {
+              "flower_amount": "1",
+              "facing": "east"
+            }
+          },
+          "weight": 1
+        },
+        {
+          "data": {
+            "Name": "buildscape:orange_petal",
+            "Properties": {
+              "flower_amount": "1",
+              "facing": "west"
+            }
+          },
+          "weight": 1
+        },
+        {
+          "data": {
+            "Name": "buildscape:orange_petal",
+            "Properties": {
+              "flower_amount": "2",
+              "facing": "north"
+            }
+          },
+          "weight": 1
+        },
+        {
+          "data": {
+            "Name": "buildscape:orange_petal",
+            "Properties": {
+              "flower_amount": "2",
+              "facing": "south"
+            }
+          },
+          "weight": 1
+        },
+        {
+          "data": {
+            "Name": "buildscape:orange_petal",
+            "Properties": {
+              "flower_amount": "2",
+              "facing": "east"
+            }
+          },
+          "weight": 1
+        },
+        {
+          "data": {
+            "Name": "buildscape:orange_petal",
+            "Properties": {
+              "flower_amount": "2",
+              "facing": "west"
+            }
+          },
+          "weight": 1
+        },
+        {
+          "data": {
+            "Name": "buildscape:orange_petal",
+            "Properties": {
+              "flower_amount": "3",
+              "facing": "north"
+            }
+          },
+          "weight": 1
+        },
+        {
+          "data": {
+            "Name": "buildscape:orange_petal",
+            "Properties": {
+              "flower_amount": "3",
+              "facing": "south"
+            }
+          },
+          "weight": 1
+        },
+        {
+          "data": {
+            "Name": "buildscape:orange_petal",
+            "Properties": {
+              "flower_amount": "3",
+              "facing": "east"
+            }
+          },
+          "weight": 1
+        },
+        {
+          "data": {
+            "Name": "buildscape:orange_petal",
+            "Properties": {
+              "flower_amount": "3",
+              "facing": "west"
+            }
+          },
+          "weight": 1
+        },
+        {
+          "data": {
+            "Name": "buildscape:orange_petal",
+            "Properties": {
+              "flower_amount": "4",
+              "facing": "north"
+            }
+          },
+          "weight": 1
+        },
+        {
+          "data": {
+            "Name": "buildscape:orange_petal",
+            "Properties": {
+              "flower_amount": "4",
+              "facing": "south"
+            }
+          },
+          "weight": 1
+        },
+        {
+          "data": {
+            "Name": "buildscape:orange_petal",
+            "Properties": {
+              "flower_amount": "4",
+              "facing": "east"
+            }
+          },
+          "weight": 1
+        },
+        {
+          "data": {
+            "Name": "buildscape:orange_petal",
+            "Properties": {
+              "flower_amount": "4",
+              "facing": "west"
+            }
+          },
+          "weight": 1
+        },
+        {
+          "data": {
+            "Name": "buildscape:pink_petal",
+            "Properties": {
+              "flower_amount": "1",
+              "facing": "north"
+            }
+          },
+          "weight": 1
+        },
+        {
+          "data": {
+            "Name": "buildscape:pink_petal",
+            "Properties": {
+              "flower_amount": "1",
+              "facing": "south"
+            }
+          },
+          "weight": 1
+        },
+        {
+          "data": {
+            "Name": "buildscape:pink_petal",
+            "Properties": {
+              "flower_amount": "1",
+              "facing": "east"
+            }
+          },
+          "weight": 1
+        },
+        {
+          "data": {
+            "Name": "buildscape:pink_petal",
+            "Properties": {
+              "flower_amount": "1",
+              "facing": "west"
+            }
+          },
+          "weight": 1
+        },
+        {
+          "data": {
+            "Name": "buildscape:pink_petal",
+            "Properties": {
+              "flower_amount": "2",
+              "facing": "north"
+            }
+          },
+          "weight": 1
+        },
+        {
+          "data": {
+            "Name": "buildscape:pink_petal",
+            "Properties": {
+              "flower_amount": "2",
+              "facing": "south"
+            }
+          },
+          "weight": 1
+        },
+        {
+          "data": {
+            "Name": "buildscape:pink_petal",
+            "Properties": {
+              "flower_amount": "2",
+              "facing": "east"
+            }
+          },
+          "weight": 1
+        },
+        {
+          "data": {
+            "Name": "buildscape:pink_petal",
+            "Properties": {
+              "flower_amount": "2",
+              "facing": "west"
+            }
+          },
+          "weight": 1
+        },
+        {
+          "data": {
+            "Name": "buildscape:pink_petal",
+            "Properties": {
+              "flower_amount": "3",
+              "facing": "north"
+            }
+          },
+          "weight": 1
+        },
+        {
+          "data": {
+            "Name": "buildscape:pink_petal",
+            "Properties": {
+              "flower_amount": "3",
+              "facing": "south"
+            }
+          },
+          "weight": 1
+        },
+        {
+          "data": {
+            "Name": "buildscape:pink_petal",
+            "Properties": {
+              "flower_amount": "3",
+              "facing": "east"
+            }
+          },
+          "weight": 1
+        },
+        {
+          "data": {
+            "Name": "buildscape:pink_petal",
+            "Properties": {
+              "flower_amount": "3",
+              "facing": "west"
+            }
+          },
+          "weight": 1
+        },
+        {
+          "data": {
+            "Name": "buildscape:pink_petal",
+            "Properties": {
+              "flower_amount": "4",
+              "facing": "north"
+            }
+          },
+          "weight": 1
+        },
+        {
+          "data": {
+            "Name": "buildscape:pink_petal",
+            "Properties": {
+              "flower_amount": "4",
+              "facing": "south"
+            }
+          },
+          "weight": 1
+        },
+        {
+          "data": {
+            "Name": "buildscape:pink_petal",
+            "Properties": {
+              "flower_amount": "4",
+              "facing": "east"
+            }
+          },
+          "weight": 1
+        },
+        {
+          "data": {
+            "Name": "buildscape:pink_petal",
+            "Properties": {
+              "flower_amount": "4",
+              "facing": "west"
+            }
+          },
+          "weight": 1
+        },
+        {
+          "data": {
+            "Name": "buildscape:purple_petal",
+            "Properties": {
+              "flower_amount": "1",
+              "facing": "north"
+            }
+          },
+          "weight": 1
+        },
+        {
+          "data": {
+            "Name": "buildscape:purple_petal",
+            "Properties": {
+              "flower_amount": "1",
+              "facing": "south"
+            }
+          },
+          "weight": 1
+        },
+        {
+          "data": {
+            "Name": "buildscape:purple_petal",
+            "Properties": {
+              "flower_amount": "1",
+              "facing": "east"
+            }
+          },
+          "weight": 1
+        },
+        {
+          "data": {
+            "Name": "buildscape:purple_petal",
+            "Properties": {
+              "flower_amount": "1",
+              "facing": "west"
+            }
+          },
+          "weight": 1
+        },
+        {
+          "data": {
+            "Name": "buildscape:purple_petal",
+            "Properties": {
+              "flower_amount": "2",
+              "facing": "north"
+            }
+          },
+          "weight": 1
+        },
+        {
+          "data": {
+            "Name": "buildscape:purple_petal",
+            "Properties": {
+              "flower_amount": "2",
+              "facing": "south"
+            }
+          },
+          "weight": 1
+        },
+        {
+          "data": {
+            "Name": "buildscape:purple_petal",
+            "Properties": {
+              "flower_amount": "2",
+              "facing": "east"
+            }
+          },
+          "weight": 1
+        },
+        {
+          "data": {
+            "Name": "buildscape:purple_petal",
+            "Properties": {
+              "flower_amount": "2",
+              "facing": "west"
+            }
+          },
+          "weight": 1
+        },
+        {
+          "data": {
+            "Name": "buildscape:purple_petal",
+            "Properties": {
+              "flower_amount": "3",
+              "facing": "north"
+            }
+          },
+          "weight": 1
+        },
+        {
+          "data": {
+            "Name": "buildscape:purple_petal",
+            "Properties": {
+              "flower_amount": "3",
+              "facing": "south"
+            }
+          },
+          "weight": 1
+        },
+        {
+          "data": {
+            "Name": "buildscape:purple_petal",
+            "Properties": {
+              "flower_amount": "3",
+              "facing": "east"
+            }
+          },
+          "weight": 1
+        },
+        {
+          "data": {
+            "Name": "buildscape:purple_petal",
+            "Properties": {
+              "flower_amount": "3",
+              "facing": "west"
+            }
+          },
+          "weight": 1
+        },
+        {
+          "data": {
+            "Name": "buildscape:purple_petal",
+            "Properties": {
+              "flower_amount": "4",
+              "facing": "north"
+            }
+          },
+          "weight": 1
+        },
+        {
+          "data": {
+            "Name": "buildscape:purple_petal",
+            "Properties": {
+              "flower_amount": "4",
+              "facing": "south"
+            }
+          },
+          "weight": 1
+        },
+        {
+          "data": {
+            "Name": "buildscape:purple_petal",
+            "Properties": {
+              "flower_amount": "4",
+              "facing": "east"
+            }
+          },
+          "weight": 1
+        },
+        {
+          "data": {
+            "Name": "buildscape:purple_petal",
+            "Properties": {
+              "flower_amount": "4",
+              "facing": "west"
+            }
+          },
+          "weight": 1
+        }
+      ]
+    }
+  }
+}

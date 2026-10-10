@@ -43,7 +43,7 @@ public final class ModCommonEvents {
         MudToClayHandler.onBlockPlace(level, pos, state);
 
         if (player != null) {
-            WanderingHomemakerSpawningLogic.onBlockPlaced(level, pos, state, player);
+            WanderingHomemakerSpawningHandler.onBlockPlaced(level, pos, state, player);
 
             if (player instanceof ServerPlayer serverPlayer) {
                 AdvancementMilestoneLogic.onBlockPlaced(serverPlayer, level, pos, state);
@@ -139,7 +139,7 @@ public final class ModCommonEvents {
     }
 
     public static void onLivingUpdate(LivingEntity entity) {
-        ChainMobLogic.onLivingUpdate(entity);
+        ChainMobHandler.onLivingUpdate(entity);
     }
 
     public static void onItemCrafted(Player player, ItemStack stack) {
@@ -148,15 +148,37 @@ public final class ModCommonEvents {
         }
     }
 
+    public static void onItemCrafted(Player player, ItemStack stack, net.minecraft.world.Container ingredients) {
+        onItemCrafted(player, stack);
+        if (Services.PLATFORM.getEntityLevel(player).isClientSide()
+                || !stack.is(net.minecraft.world.item.Items.SUSPICIOUS_STEW)) return;
+        net.minecraft.world.item.Item frostRose = Services.PLATFORM.getItem(
+                new com.kingodogo.buildscape.util.CommonId("buildscape", "frost_rose"));
+        if (frostRose == null) return;
+        for (int slot = 0; slot < ingredients.getContainerSize(); slot++) {
+            if (ingredients.getItem(slot).is(frostRose)) {
+                Services.PLATFORM.updateCustomData(stack, data -> data.putInt("FrostRoseStew", 1));
+                return;
+            }
+        }
+    }
+
     public static InteractionResult onRightClickItem(Player player, Level level, InteractionHand hand) {
         if (player == null || level == null) return InteractionResult.PASS;
         ItemStack held = player.getItemInHand(hand);
         if (held.is(net.minecraft.world.item.Items.GLASS_BOTTLE)) {
+            net.minecraft.world.phys.Vec3 eye = player.getEyePosition();
+            net.minecraft.world.phys.Vec3 view = player.getViewVector(1.0F);
+            net.minecraft.world.phys.HitResult hit = level.clip(new net.minecraft.world.level.ClipContext(
+                    eye, eye.add(view.scale(5.0D)), net.minecraft.world.level.ClipContext.Block.OUTLINE,
+                    net.minecraft.world.level.ClipContext.Fluid.SOURCE_ONLY, player));
+            if (hit.getType() != net.minecraft.world.phys.HitResult.Type.MISS) return InteractionResult.PASS;
+            net.minecraft.world.item.Item mistItem = Services.PLATFORM.getItem(new com.kingodogo.buildscape.util.CommonId("buildscape", "bottle_of_mist"));
+            if (mistItem == null || mistItem == net.minecraft.world.item.Items.AIR) return InteractionResult.PASS;
             if (!level.isClientSide()) {
                 if (!player.getAbilities().instabuild) {
                     held.shrink(1);
                 }
-                net.minecraft.world.item.Item mistItem = Services.PLATFORM.getItem(new com.kingodogo.buildscape.util.CommonId("buildscape", "bottle_of_mist"));
                 if (mistItem != null && mistItem != net.minecraft.world.item.Items.AIR) {
                     ItemStack mistBottle = new ItemStack(mistItem);
                     if (!player.getInventory().add(mistBottle.copy())) {
@@ -172,7 +194,8 @@ public final class ModCommonEvents {
     }
 
     public static void onItemUseFinish(LivingEntity entity, ItemStack stack) {
-        if (entity instanceof Player player && stack.is(net.minecraft.world.item.Items.SUSPICIOUS_STEW)) {
+        if (entity instanceof Player player && !Services.PLATFORM.getEntityLevel(player).isClientSide()
+                && stack.is(net.minecraft.world.item.Items.SUSPICIOUS_STEW)) {
             CompoundTag data = Services.PLATFORM.getCustomData(stack, false);
             if (data != null && Services.PLATFORM.getTagInt(data, "FrostRoseStew", 0) == 1) {
                 CompoundTag playerData = Services.PLATFORM.getEntityData(player);
@@ -189,12 +212,6 @@ public final class ModCommonEvents {
 
         Level level = Services.PLATFORM.getEntityLevel(player);
         if (level.isClientSide()) return;
-
-        if (player instanceof ServerPlayer serverPlayer) {
-            if (JOINED_PLAYERS.add(serverPlayer.getUUID())) {
-                onPlayerJoin(serverPlayer);
-            }
-        }
 
         CompoundTag playerData = Services.PLATFORM.getEntityData(player);
         int damageTicks = Services.PLATFORM.getTagInt(playerData, "FrostRoseStewDamageTicks", 0);
@@ -214,6 +231,7 @@ public final class ModCommonEvents {
 
     public static void onPlayerJoin(ServerPlayer player) {
         if (player == null) return;
+        JOINED_PLAYERS.add(player.getUUID());
         PillarIdManager manager = PillarIdManager.get();
         if (!manager.hasLoaded() && !manager.isLoadInProgress()) {
             manager.load();
@@ -280,6 +298,46 @@ public final class ModCommonEvents {
         JOINED_PLAYERS.clear();
         try {
             PillarIdManager.get().saveImmediate();
-        } catch (Exception ignored) {}
+        } catch (Exception exception) {
+            com.kingodogo.buildscape.BuildscapeCommon.LOGGER.error("Failed to save pillar data during server shutdown", exception);
+        }
+    }
+
+    public static void onPlayerLeave(ServerPlayer player) {
+        JOINED_PLAYERS.remove(player.getUUID());
+    }
+
+    public static InteractionResult onEntityInteract(Player player, Level level, InteractionHand hand, Entity target) {
+        InteractionResult frameResult = ItemFrameParticleHandler.onEntityInteract(player, level, hand, target);
+        if (frameResult != InteractionResult.PASS) return frameResult;
+
+        if (target instanceof net.minecraft.world.entity.AgeableMob mob
+                && !(target instanceof net.minecraft.world.entity.monster.Monster)) {
+            ItemStack held = player.getItemInHand(hand);
+            net.minecraft.world.item.Item flower = Services.PLATFORM.getItem(
+                    new com.kingodogo.buildscape.util.CommonId("buildscape", "golden_dandelion"));
+            if (flower != null && held.is(flower)) {
+                boolean frozen = com.kingodogo.buildscape.util.GoldenDandelionGrowth.isFrozen(mob);
+                if (!com.kingodogo.buildscape.util.GoldenDandelionGrowth.canToggle(mob.isBaby(), frozen)) {
+                    return InteractionResult.PASS;
+                }
+                if (!level.isClientSide()) {
+                    if (!com.kingodogo.buildscape.util.GoldenDandelionGrowth.setFrozen(mob, !frozen)) {
+                        return InteractionResult.PASS;
+                    }
+                    if (level instanceof net.minecraft.server.level.ServerLevel serverLevel) {
+                        serverLevel.sendParticles(frozen ? net.minecraft.core.particles.ParticleTypes.HAPPY_VILLAGER
+                                        : net.minecraft.core.particles.ParticleTypes.WAX_OFF,
+                                mob.getX(), mob.getY() + mob.getBbHeight() * 0.5D, mob.getZ(),
+                                12, 0.3D, 0.3D, 0.3D, 0.05D);
+                    }
+                    level.playSound(null, mob.blockPosition(), frozen ? SoundEvents.VILLAGER_YES
+                                    : SoundEvents.HONEYCOMB_WAX_ON, SoundSource.NEUTRAL, 1.0F, 1.0F);
+                    if (!player.getAbilities().instabuild) held.shrink(1);
+                }
+                return InteractionResult.SUCCESS;
+            }
+        }
+        return InteractionResult.PASS;
     }
 }

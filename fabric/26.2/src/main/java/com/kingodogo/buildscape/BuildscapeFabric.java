@@ -54,6 +54,7 @@ public class BuildscapeFabric implements ModInitializer {
             });
             ServerLifecycleEvents.SERVER_STARTED.register(server -> BuildscapeCommon.setServerFullyInitialized(true));
             registerNetworking();
+            com.kingodogo.buildscape.event.FabricGameplayEvents.register();
         });
     }
 

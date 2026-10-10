@@ -164,17 +164,32 @@ public abstract class BaseRegistryAdapter implements IRegistryAdapter {
         return creativeTab;
     }
     public void initModEntries() {
+        initBlocks();
+        initItems();
+        initBlockEntities();
+        initEntities();
+        initSounds();
+        initParticles();
+        initRecipeSerializers();
+        initMenus();
+    }
+
+    protected void initBlocks() {
         for (Map.Entry<String, RegistrySupplier<?>> entry : blocks.entrySet()) {
             Object obj = entry.getValue().get();
             if (obj instanceof Block block) {
                 modBlocks.put(entry.getKey(), block);
             } else if (obj instanceof BlockDefinition def) {
-                Block block = BlockFactory.createBlock(def);
+                Block block = def.getBlock();
+                if (block == null) block = BlockFactory.createBlock(def);
                 def.setBlock(block);
                 modBlocks.put(entry.getKey(), block);
             }
         }
 
+    }
+
+    protected void initItems() {
         for (Map.Entry<String, RegistrySupplier<?>> entry : items.entrySet()) {
             String id = entry.getKey();
             Object obj = entry.getValue().get();
@@ -189,6 +204,9 @@ public abstract class BaseRegistryAdapter implements IRegistryAdapter {
                 }
             }
         }
+    }
+
+    protected void initBlockEntities() {
         modBlockEntities.put("mangrove_sign_block_entity", ModBlockEntities.MANGROVE_SIGN_BLOCK_ENTITY_TYPE);
         modBlockEntities.put("bamboo_sign_block_entity", ModBlockEntities.BAMBOO_SIGN_BLOCK_ENTITY_TYPE);
         modBlockEntities.put("pillar_block_entity", ModBlockEntities.PILLAR_TYPE);
@@ -213,6 +231,9 @@ public abstract class BaseRegistryAdapter implements IRegistryAdapter {
                 modBlockEntities.put(entry.getKey(), beType);
             }
         }
+    }
+
+    protected void initEntities() {
         modEntities.put("falling_icicle", Services.PLATFORM.getFallingIcicleEntityType());
         modEntities.put("festive_stocking", Services.PLATFORM.getFestiveStockingEntityType());
         modEntities.put("mangrove_boat", Services.PLATFORM.getMangroveBoatEntityType());
@@ -227,6 +248,9 @@ public abstract class BaseRegistryAdapter implements IRegistryAdapter {
                 modEntities.put(entry.getKey(), eType);
             }
         }
+    }
+
+    protected void initSounds() {
         for (Map.Entry<String, RegistrySupplier<?>> entry : sounds.entrySet()) {
             Object obj = entry.getValue().get();
             if (obj instanceof SoundEvent soundEvent) {
@@ -234,6 +258,9 @@ public abstract class BaseRegistryAdapter implements IRegistryAdapter {
             }
         }
 
+    }
+
+    protected void initParticles() {
         for (Map.Entry<String, RegistrySupplier<?>> entry : particles.entrySet()) {
             Object obj = entry.getValue().get();
             if (obj instanceof net.minecraft.core.particles.ParticleType<?> p) {
@@ -241,12 +268,18 @@ public abstract class BaseRegistryAdapter implements IRegistryAdapter {
             }
         }
 
+    }
+
+    protected void initRecipeSerializers() {
         for (Map.Entry<String, RegistrySupplier<?>> entry : recipeSerializers.entrySet()) {
             Object obj = entry.getValue().get();
             if (obj != null) {
                 modRecipeSerializers.put(entry.getKey(), obj);
             }
         }
+    }
+
+    protected void initMenus() {
         modMenus.put("builders_workbench", com.kingodogo.buildscape.menu.ModMenuTypes.BUILDERS_WORKBENCH_MENU);
         modMenus.put("builders_pouch", com.kingodogo.buildscape.menu.ModMenuTypes.BUILDERS_POUCH_MENU);
     }

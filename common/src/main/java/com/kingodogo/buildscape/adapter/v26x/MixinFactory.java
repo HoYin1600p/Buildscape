@@ -195,7 +195,9 @@ public class MixinFactory implements IMixinFactory {
                     if (list != null) list.add(widget);
                 }
             }
-        } catch (Throwable ignored) {}
+        } catch (Throwable exception) {
+            com.kingodogo.buildscape.BuildscapeCommon.LOGGER.warn("Failed to add Buildscape screen widget", exception);
+        }
     }
 
     @Override

@@ -27,6 +27,10 @@ tasks.named('jar', Jar) {
     duplicatesStrategy = DuplicatesStrategy.FAIL
 }
 tasks.withType(JavaExec).configureEach {
+    if (providers.gradleProperty('bootstrapSmokeTest').isPresent()) {
+        workingDir layout.buildDirectory.dir('bootstrap-smoke').get().asFile
+        doFirst { workingDir.mkdirs() }
+    }
     javaLauncher = javaToolchains.launcherFor {
         languageVersion = JavaLanguageVersion.of(25)
     }

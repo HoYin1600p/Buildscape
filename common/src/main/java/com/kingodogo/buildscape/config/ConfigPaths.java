@@ -22,6 +22,7 @@ final class ConfigPaths {
                 return dir;
             }
         } catch (Throwable t) {
+            BuildscapeCommon.LOGGER.debug("Platform config directory unavailable, using legacy location", t);
             // Platform not available (for example in unit tests): use the legacy relative location.
         }
         return LEGACY_ROOT;

@@ -18,7 +18,9 @@
     "client.KeyboardInputMixin",
     "client.MouseInputMixin",
     "client.CameraInputMixin",
-    "client.AttackInputMixin"
+    "client.AttackInputMixin",
+    "client.FogRendererMixin",
+    "client.ModelBakeryMixin"
   ],
   "injectors": {
     "defaultRequire": 1

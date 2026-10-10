@@ -22,6 +22,8 @@ import java.util.function.Function;
 
 public class BuildscapeFabricClient implements ClientModInitializer {
     @Override public void onInitializeClient() {
+        com.kingodogo.buildscape.adapter.v26x.client.FoliageColors.register(
+                net.minecraft.client.Minecraft.getInstance().getBlockColors());
         com.kingodogo.buildscape.client.ModKeyBinds.register(
                 net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper::registerKeyMapping);
         // Mod Menu is not on this module's classpath. Its optional config-screen

@@ -7,8 +7,6 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
-import net.minecraft.client.renderer.entity.WanderingTraderRenderer;
-import net.minecraft.client.renderer.entity.state.VillagerRenderState;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.StandingSignRenderer;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
@@ -21,11 +19,6 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.npc.wanderingtrader.WanderingTrader;
 
 public final class RenderFactory {
-
-    private static final Identifier HOMEMAKER_TEXTURE = Identifier.fromNamespaceAndPath(
-            BuildscapeCommon.MOD_ID, "textures/entity/wandering_homemaker.png");
-    private static final Identifier FESTIVE_HOMEMAKER_TEXTURE = Identifier.fromNamespaceAndPath(
-            BuildscapeCommon.MOD_ID, "textures/entity/festive_wandering_homemaker.png");
 
     private RenderFactory() {}
 
@@ -134,13 +127,9 @@ public final class RenderFactory {
                 helperProvider(com.kingodogo.buildscape.client.renderer.ColoredItemFrameRenderer::render,
                         com.kingodogo.buildscape.client.renderer.ColoredItemFrameRenderer::getRenderOffset));
         registrar.register((EntityType<WanderingTrader>) Services.PLATFORM.getWanderingHomemakerEntityType(),
-                context -> new WanderingTraderRenderer(context) {
-                    @Override public Identifier getTextureLocation(VillagerRenderState state) { return HOMEMAKER_TEXTURE; }
-                });
+                context -> new com.kingodogo.buildscape.adapter.v26x.client.WanderingHomemakerRenderer(context, false));
         registrar.register((EntityType<WanderingTrader>) Services.PLATFORM.getFestiveWanderingHomemakerEntityType(),
-                context -> new WanderingTraderRenderer(context) {
-                    @Override public Identifier getTextureLocation(VillagerRenderState state) { return FESTIVE_HOMEMAKER_TEXTURE; }
-                });
+                context -> new com.kingodogo.buildscape.adapter.v26x.client.WanderingHomemakerRenderer(context, true));
         registered = true;
     }
 

@@ -11,6 +11,11 @@ import java.util.Set;
 @Mixin(PoiType.class)
 public interface PoiTypeAccessor {
 
+    @Accessor("ALL_STATES")
+    static Set<BlockState> getAllStates() {
+        throw new AssertionError();
+    }
+
     @Accessor("matchingStates")
     @Mutable
     void setMatchingStates(Set<BlockState> matchingStates);

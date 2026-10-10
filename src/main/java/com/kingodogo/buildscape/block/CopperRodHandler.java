@@ -46,6 +46,7 @@ public class CopperRodHandler {
 
             ImmutableSet<BlockState> immutableStates = ImmutableSet.copyOf(newStates);
             ((PoiTypeAccessor) (Object) PoiType.LIGHTNING_ROD).setMatchingStates(immutableStates);
+            PoiTypeAccessor.getAllStates().addAll(immutableStates);
         } catch (Exception e) {
             BuildScape.LOGGER.error("Failed to register Copper Rods into PoiType.LIGHTNING_ROD", e);
         }
@@ -54,58 +55,46 @@ public class CopperRodHandler {
     public static void onLightningClearCopper(Level level, BlockPos strikePos) {
         BlockState state = level.getBlockState(strikePos);
         BlockPos basePos;
-        boolean cleanedOrigin = false;
-
         if (state.getBlock() instanceof LightningRodBlock) {
-            if (deoxidizeRod(level, strikePos, state)) {
-                cleanedOrigin = true;
-            }
+            deoxidizeRod(level, strikePos, state);
             basePos = strikePos.relative(state.getValue(LightningRodBlock.FACING).getOpposite());
         } else {
             basePos = strikePos;
         }
 
         BlockState baseState = level.getBlockState(basePos);
+        if (!CopperOxidationHandler.isWeatheringCopper(baseState.getBlock())) {
+            return;
+        }
         if (baseState.getBlock() instanceof WeatheringCopper) {
             level.setBlockAndUpdate(basePos, WeatheringCopper.getFirst(baseState));
-            cleanedOrigin = true;
-        } else if (deoxidizeBuildscapeCopperFirst(level, basePos, baseState)) {
-            cleanedOrigin = true;
+        } else {
+            deoxidizeBuildscapeCopperFirst(level, basePos, baseState);
         }
 
-        if (cleanedOrigin) {
-            BlockPos.MutableBlockPos mutable = strikePos.mutable();
-            int steps = level.random.nextInt(3) + 3;
-            for (int i = 0; i < steps; ++i) {
-                int dist = level.random.nextInt(8) + 1;
-                randomWalkCleanCopper(level, basePos, mutable, dist);
-            }
+        BlockPos.MutableBlockPos mutable = strikePos.mutable();
+        int steps = level.random.nextInt(3) + 3;
+        for (int i = 0; i < steps; ++i) {
+            int dist = level.random.nextInt(8) + 1;
+            randomWalkCleanCopper(level, basePos, mutable, dist);
         }
     }
 
-    private static boolean deoxidizeRod(Level level, BlockPos pos, BlockState state) {
+    private static void deoxidizeRod(Level level, BlockPos pos, BlockState state) {
         Block block = state.getBlock();
         Block cleanRod = ModBlocks.COPPER_ROD.get();
         if (block == ModBlocks.EXPOSED_COPPER_ROD.get()
                 || block == ModBlocks.WEATHERED_COPPER_ROD.get()
                 || block == ModBlocks.OXIDIZED_COPPER_ROD.get()) {
-            BlockState newState = CopperOxidationHandler.copyStateProperties(state, cleanRod.defaultBlockState());
-            level.setBlockAndUpdate(pos, newState);
-            level.levelEvent(3002, pos, -1);
-            return true;
+            CopperOxidationHandler.setBlockStateOrDoor(level, pos, state, cleanRod);
         }
-        return false;
     }
 
-    private static boolean deoxidizeBuildscapeCopperFirst(Level level, BlockPos pos, BlockState state) {
+    private static void deoxidizeBuildscapeCopperFirst(Level level, BlockPos pos, BlockState state) {
         Block firstStage = CopperOxidationHandler.getFirstStage(state.getBlock());
         if (firstStage != null) {
-            BlockState newState = CopperOxidationHandler.copyStateProperties(state, firstStage.defaultBlockState());
-            level.setBlockAndUpdate(pos, newState);
-            level.levelEvent(3002, pos, -1);
-            return true;
+            CopperOxidationHandler.setBlockStateOrDoor(level, pos, state, firstStage);
         }
-        return false;
     }
 
     private static void randomWalkCleanCopper(Level level, BlockPos center, BlockPos.MutableBlockPos mutable, int maxSteps) {
@@ -122,21 +111,19 @@ public class CopperRodHandler {
     private static Optional<BlockPos> randomStepCleanCopper(Level level, BlockPos pos) {
         for (BlockPos testPos : BlockPos.randomInCube(level.random, 10, pos, 1)) {
             BlockState testState = level.getBlockState(testPos);
+            if (!CopperOxidationHandler.isWeatheringCopper(testState.getBlock())) {
+                continue;
+            }
             if (testState.getBlock() instanceof WeatheringCopper) {
-                WeatheringCopper.getPrevious(testState).ifPresent(s -> {
-                    level.setBlockAndUpdate(testPos, s);
-                    level.levelEvent(3002, testPos, -1);
-                });
-                return Optional.of(testPos);
+                WeatheringCopper.getPrevious(testState).ifPresent(s -> level.setBlockAndUpdate(testPos, s));
             } else {
                 Block prev = CopperOxidationHandler.getPrevStage(testState.getBlock());
                 if (prev != null) {
-                    BlockState newState = CopperOxidationHandler.copyStateProperties(testState, prev.defaultBlockState());
-                    level.setBlockAndUpdate(testPos, newState);
-                    level.levelEvent(3002, testPos, -1);
-                    return Optional.of(testPos);
+                    CopperOxidationHandler.setBlockStateOrDoor(level, testPos, testState, prev);
                 }
             }
+            level.levelEvent(3002, testPos, -1);
+            return Optional.of(testPos);
         }
         return Optional.empty();
     }

@@ -11,11 +11,11 @@ sourceSets {
 
     v118x {
         java {
-            srcDirs = ['src/main/java']
+            srcDirs = ['src/main/java', 'src/v118x/java']
             exclude 'com/kingodogo/buildscape/adapter/v121x/**'
             exclude 'com/kingodogo/buildscape/adapter/v26x/**'
         }
-        resources.srcDirs = ['src/main/resources']
+        resources.srcDirs = ['src/main/resources', 'src/v118x/resources']
     }
 
     v121x {
@@ -29,11 +29,11 @@ sourceSets {
 
     v26x {
         java {
-            srcDirs = ['src/main/java']
+            srcDirs = ['src/main/java', 'src/v26x/java']
             exclude 'com/kingodogo/buildscape/adapter/v118x/**'
             exclude 'com/kingodogo/buildscape/adapter/v121x/**'
         }
-        resources.srcDirs = ['src/main/resources']
+        resources.srcDirs = ['src/main/resources', 'src/v26x/resources']
     }
 
     test {
@@ -115,6 +115,14 @@ tasks.named('test', Test) {
     systemProperty 'buildscape.mainResources', file('src/main/resources').absolutePath
 }
 
+// Loader modules already copy shared resources directly. Supply only the cluster
+// resources through their common variant, avoiding duplicate shared jar entries.
+def v26xClusterResourcesDir = layout.buildDirectory.dir('resources/v26xCluster')
+def v26xClusterResources = tasks.register('v26xClusterResources', Sync) {
+    from 'src/v26x/resources'
+    into v26xClusterResourcesDir
+}
+
 artifacts {
     add('v118xElements', sourceSets.v118x.output.classesDirs.singleFile) {
         builtBy tasks.named('compileV118xJava')
@@ -124,6 +132,9 @@ artifacts {
     }
     add('v26xElements', sourceSets.v26x.output.classesDirs.singleFile) {
         builtBy tasks.named('compileV26xJava')
+    }
+    add('v26xElements', v26xClusterResourcesDir.get().asFile) {
+        builtBy v26xClusterResources
     }
 }
 

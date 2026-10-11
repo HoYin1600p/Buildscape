@@ -12,13 +12,23 @@ and a Java 17 toolchain available. The gate is required; without it the standalo
 build only has the base plugin and does not resolve Minecraft or Unimined.
 
 ```powershell
-.\gradlew.bat -p tools/parity-dumper build '-Pbuildscape.parityDumper=true' --offline --console=plain --parallel --max-workers=2
+.\gradlew.bat -p tools/parity-dumper build '-Pbuildscape.parityDumper=true' --offline --no-daemon --console=plain --parallel --max-workers=4
 ```
 
-The production, SRG-remapped jar is
-`tools/parity-dumper/mod/build/libs/buildscape-parity-dumper-TEST-ONLY-1.0.0.jar`.
-Use this jar, not the `-dev` jar. Dependencies and Unimined's Forge 40.3.12
-caches must already be populated by the lead in a network-enabled environment.
+The build produces two jars in `tools/parity-dumper/mod/build/libs/`:
+
+- `buildscape-parity-dumper-TEST-ONLY-1.0.0-dev.jar` uses Mojang names. Use it
+  in the repository's Unimined dev runs, in `forge/1.18.2/run/server/mods`
+  and `forge/1.18.2/run/client/mods`. Buildscape is supplied by the dev run's
+  classpath; do not add a second Buildscape jar to those folders.
+- `buildscape-parity-dumper-TEST-ONLY-1.0.0.jar` is remapped to SRG. Use it in
+  a production Forge 40.3.12 Prism instance's Minecraft `mods` folder beside
+  exactly one production Buildscape jar.
+
+Install only the appropriate variant in each run; both have the same mod ID.
+Dependencies and Unimined's Forge 40.3.12 caches must already be populated
+by the working `forge/1.18.2` build. The standalone build uses the same
+Unimined version, mappings, Java target and pinned jopt-simple dependency.
 The default Buildscape build does not configure this project, even when the
 gate is set: `-p tools/parity-dumper` selects the separate build.
 
@@ -27,11 +37,11 @@ gate is set: `-p tools/parity-dumper` selects the separate build.
 1. Pin the baseline main commit and candidate jar. Prepare two equivalent
    Forge 40.3.12 runs, with identical other mods, configuration, datapacks,
    resource packs, graphics options and fresh equivalent worlds.
-2. Put the helper jar in each run's `mods` folder beside exactly one Buildscape
-   production jar. For the repository's Unimined Forge runs the folders are
-   `forge/1.18.2/run/server/mods` and `forge/1.18.2/run/client/mods`; check the
-   actual run's working directory when using another launcher. The helper is
-   not added automatically to any run classpath.
+2. Put the appropriate helper variant from the build instructions in each
+   run's `mods` folder. Use the `-dev` jar for Unimined runs and the SRG jar
+   for Prism production runs. Check the actual run's working directory when
+   using another launcher. The helper is not added automatically to any run
+   classpath.
 3. Start each dedicated server normally. After `ServerStartedEvent` it writes
    `<gameDir>/parity-dump/server/`. No commands, players or display are needed.
 4. Start each client. After resource loading has completed and the reload
@@ -106,6 +116,13 @@ Both scripts use only the Python standard library. Exit status: **0** parity,
 **1** differences, **2** invalid input or incomplete dumps.
 
 ## Validation
+
+The gated `build` and `check` tasks run `:dumper:selfCheck`, a Java 17 main
+using the dump writer without bootstrapping Minecraft or opening a display.
+It checks byte equality across object insertion orders, recursive key sorting,
+array order, nulls, UTF-8/LF output, non-mutating canonicalization and sorted
+snapshot/manifest filenames. It needs no additional test framework dependency;
+its output files stay under `mod/build/self-check/`.
 
 Before accepting parity evidence, run the unittest command above, the
 standalone gated build, and dedicated-server/client smoke runs against both

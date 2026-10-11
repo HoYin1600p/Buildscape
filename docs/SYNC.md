@@ -2,8 +2,9 @@
 
 `sync/targets.json` registers the source line and every port. Today the source is
 Forge 1.18.2 on `main` in `https://github.com/HoYin1600p/Buildscape.git`;
-`mc26.2` combines Fabric and NeoForge on `port/26.2`, with common's `v26x`
-VersionCluster. Other targets are scaffolded, and 26.3 is paused by owner decision.
+`mc26.2` combines Fabric and NeoForge on `port/26.2` and also syncs Forge 1.18.2,
+covering common's `v26x` and `v118x` VersionClusters in one apply. Other targets
+are scaffolded, and 26.3 is paused by owner decision.
 Scaffolded targets do not need existing branches and are skipped by `status`.
 Every target lives on the one multi-version branch (`port/26.2` today) as its own
 `<loader>/<version>` folder; there is no branch per version.
@@ -67,7 +68,9 @@ outputs against this policy, so later source updates cannot restore retired asse
 Retired changes do not enter the pending review queue.
 
 The ledger's semicolon-separated `active_paths` is authoritative. A same-relative
-Java file under the declared `java_root` is the fallback. Multiple destinations
+Java file under the declared `java_root` or `java_roots` is the fallback. Missing
+old shared paths resolve to their existing cluster-root counterparts. Both cluster
+counterparts enter the same review brief. Multiple destinations
 require review even when one is identical, since a coupled adapter can need work.
 Renames preserve both source paths and diffs. An identical Java counterpart can
 be renamed automatically only when its destination follows the same-relative
@@ -85,6 +88,27 @@ A successful run refreshes the declared frozen snapshot scope, advances
 `base_commit` on the new local branch, refreshes automatic ledger verification,
 and marks other affected ledger rows `needs_resync`. Snapshot metadata is kept
 as reference material; it is never copied into target build files.
+
+Every `mc26.2` apply keeps `ref/forge/1.18.2` equal to main's exact bytes within
+the declared source scope (Java, resources, tests and build metadata), independently
+of the 26.2 resource converter and retirement policy. Shared Java and the
+`common/src/v118x/java`, `common/src/v26x/java` and adapter destinations use the
+ledger; a single identical cluster counterpart supports automatic edits and renames.
+Plans report `affected_clusters` per change and both clusters' validation commands.
+Ledger `era_coverage` includes `118x`; coverage describes scope, while status and
+verification still distinguish pending ports and historical validation.
+
+Validation runs the existing 26.2 checks plus `:common:compileV118xJava`, then
+the gated Forge build/check with these arguments (quote dotted properties in PowerShell):
+
+```powershell
+.\gradlew.bat :forge:1.18.2:build :forge:1.18.2:check '-Pbuildscape.v118x=true' '-Pbuildscape.v118xSource=common' --no-daemon --parallel --max-workers=2 --offline --console=plain
+```
+
+Only a reported offline cache miss skips the gated Forge step, with a clear note
+in the log and apply report. It never enables network access. Compile or test
+failures fail the apply. When Forge is skipped, refreshed ledger verification is
+`PARTIAL`, so the branch still needs Forge validation before acceptance.
 
 The initial snapshot corresponds to `c7d7112cbb351e3f50f9c147dde92ee628553bef`
 with **four differing files**, as recorded in the registry. Review these historical
@@ -120,8 +144,8 @@ switched off per cluster, not deleted.
 S4 moves the following files without content changes. The first column is
 relative to the former `common/src/main/` root; the second is repository-relative.
 Use the ledger's explicit `active_paths` for these files rather than the shared
-`java_root` fallback. Renames into a cluster root require review under the existing
-sync rules.
+`java_root` fallback. Renames within a single same-relative cluster mapping are
+automatic when the counterpart equals the old source and the new path is unused.
 
 | Former shared path | Active cluster path |
 | --- | --- |

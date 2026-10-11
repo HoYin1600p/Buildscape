@@ -1,0 +1,33 @@
+{
+  "display": {
+    "icon": {
+      "id": "buildscape:glow_star"
+    },
+    "title": {
+      "translate": "advancements.buildscape.santas_little_helper.title"
+    },
+    "description": {
+      "translate": "advancements.buildscape.santas_little_helper.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "parent": "buildscape:a_white_christmas",
+  "rewards": {
+    "items": [
+      {
+        "item": "buildscape:star_trophy"
+      },
+      {
+        "item": "buildscape:festive_star_pattern"
+      }
+    ]
+  },
+  "criteria": {
+    "custom": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

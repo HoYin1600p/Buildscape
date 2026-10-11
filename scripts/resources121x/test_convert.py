@@ -106,6 +106,50 @@ class ConversionTests(unittest.TestCase):
         self.assertEqual(out["recipes"], [{"type": "buildscape:clear_shulker_filters"}])
         self.assertEqual(len(report), 1)
 
+    def test_reference_check_and_pruning_without_client_jar(self):
+        resources = {
+            "data/buildscape/advancement/child.json": {"parent": "buildscape:orphan"},
+            "data/buildscape/advancement/orphan.json": {"rewards": {"recipes": ["buildscape:copper_chest"]}},
+            "data/buildscape/advancement/keep.json": {"rewards": {"recipes": ["buildscape:keep"]}},
+            "data/buildscape/recipe/keep.json": {},
+            "data/buildscape/recipes_pack/crafting.json": {"crafting_shaped": [["buildscape:copper_chest"]]},
+            "data/buildscape/worldgen/placed_feature/mangrove_checked.json": {"feature": "buildscape:mangrove"},
+            "data/buildscape/worldgen/placed_feature/tall_mangrove_checked.json": {"feature": "buildscape:tall_mangrove"},
+            "data/buildscape/worldgen/configured_feature/selector.json": {
+                "config": {"features": [{"feature": "buildscape:mangrove_checked"}],
+                           "default": "buildscape:tall_mangrove_checked"}},
+            "data/buildscape/worldgen/placed_feature/selector.json": {"feature": "buildscape:selector"},
+            "data/buildscape/worldgen/configured_feature/keep.json": {},
+            "data/buildscape/worldgen/placed_feature/keep.json": {"feature": "buildscape:keep"},
+            "data/buildscape/tags/worldgen/placed_feature/trees.json": {
+                "values": ["buildscape:selector", {"id": "buildscape:mangrove_checked", "required": False}]},
+            "data/buildscape/tags/worldgen/placed_feature/mixed.json": {
+                "values": ["#buildscape:trees", "buildscape:keep", "minecraft:oak_checked"]},
+            "data/buildscape/biome_modifier/trees.json": {"features": "#buildscape:trees"}}
+        generated = {Path(path): data for path, data in resources.items()}
+        errors = [(path.as_posix(), kind, value) for path, data in generated.items()
+                  for kind, value in c.missing_data_references(path, data, generated)]
+        self.assertIn(("data/buildscape/advancement/orphan.json", "recipe", "buildscape:copper_chest"), errors)
+        self.assertIn(("data/buildscape/worldgen/placed_feature/mangrove_checked.json",
+                       "worldgen/configured_feature", "buildscape:mangrove"), errors)
+        report = []
+        c.prune_dependencies(generated, report)
+        self.assertEqual({path.as_posix() for path in generated}, {
+            "data/buildscape/advancement/keep.json", "data/buildscape/recipe/keep.json",
+            "data/buildscape/recipes_pack/crafting.json",
+            "data/buildscape/worldgen/configured_feature/keep.json",
+            "data/buildscape/worldgen/placed_feature/keep.json",
+            "data/buildscape/tags/worldgen/placed_feature/mixed.json"})
+        self.assertEqual(generated[Path("data/buildscape/tags/worldgen/placed_feature/mixed.json")]["values"],
+                         ["buildscape:keep", "minecraft:oak_checked"])
+        self.assertFalse([ref for path, data in generated.items()
+                          for ref in c.missing_data_references(path, data, generated)])
+        self.assertTrue(any("copper_chest" in line and "dropped" in line for line in report))
+        self.assertTrue(any("mangrove" in line and "dropped" in line for line in report))
+        count = len(report)
+        c.prune_dependencies(generated, report)
+        self.assertEqual(len(report), count)
+
     def test_generation_is_repeatable_preserves_source_and_mixin_reports_drops(self):
         with tempfile.TemporaryDirectory() as tmp:
             base = Path(tmp)
@@ -114,12 +158,16 @@ class ConversionTests(unittest.TestCase):
             c.write(manifest, {"schema_version": 1, "target": "mc1.21.1", "removed_ids": [
                 {"id": "buildscape:cherry_planks", "vanilla_equivalent": "minecraft:cherry_planks"}]})
             fixtures = {
+                "assets/buildscape/models/block/quartz_pillar_slab.json": {
+                    "textures": {"side": "minecraft:block/quartz_pillar", "end": "block/quartz_pillar_top"}},
                 "assets/buildscape/models/item/cherry_planks.json": {"parent": "buildscape:block/cherry_planks"},
                 "assets/buildscape/models/item/sculk_slab.json": {"parent": "buildscape:block/sculk_slab"},
                 "data/buildscape/recipes/keep.json": {"type": "minecraft:stonecutting", "ingredient": {"item": "buildscape:cherry_planks"},
                                                      "result": "buildscape:sculk_slab", "count": 2},
                 "data/forge/loot_modifiers/global_loot_modifiers.json": {"entries": []},
                 "data/buildscape/recipes/conditional.json": {"type": "forge:conditional"},
+                "data/buildscape/advancements/recipes/copper_chest.json": {
+                    "rewards": {"recipes": ["buildscape:copper_chest"]}},
                 "data/buildscape/worldgen/placed_feature/cherry.json": {"feature": "buildscape:cherry", "placement": []}}
             for path, data in fixtures.items():
                 c.write(source / path, data)
@@ -140,6 +188,10 @@ class ConversionTests(unittest.TestCase):
             self.assertFalse((output / "assets/buildscape/items").exists())
             self.assertFalse((output / "assets/buildscape/models/item/cherry_planks.json").exists())
             self.assertTrue((output / "assets/buildscape/models/item/sculk_slab.json").exists())
+            self.assertEqual(c.load(output / "assets/buildscape/models/block/quartz_pillar_slab.json"),
+                             fixtures["assets/buildscape/models/block/quartz_pillar_slab.json"])
+            self.assertFalse((output / "data/buildscape/advancement/recipes/copper_chest.json").exists())
+            self.assertFalse((output / "data/buildscape/worldgen/placed_feature/cherry.json").exists())
             self.assertEqual(c.load(output / "data/buildscape/recipe/keep.json")["ingredient"], {"item": "minecraft:cherry_planks"})
             self.assertEqual(before, {p.relative_to(source): p.read_bytes() for p in source.rglob("*") if p.is_file()})
 

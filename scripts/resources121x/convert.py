@@ -25,8 +25,8 @@ def shared_module(name):
 
 
 shared = shared_module("convert")
-load, write, loot, door_parent, door_state = (
-    shared.load, shared.write, shared.loot, shared.door_parent, shared.door_state)
+load, write, door_parent, door_state = (
+    shared.load, shared.write, shared.door_parent, shared.door_state)
 FOLDERS = shared.FOLDERS | {"structures": "structure"}
 TAG_FOLDERS = shared.TAG_FOLDERS | {"game_events": "game_event"}
 # The shared folder/common-tag and door-parent mappings already apply in
@@ -39,6 +39,136 @@ SPECIAL_ITEMS = ()  # 1.21.1 uses ordinary item models, including BEWLR items.
 PACK = {"pack": {"description": "Buildscape resources for Minecraft 1.21.1",
                  "pack_format": 34,
                  "supported_formats": {"min_inclusive": 34, "max_inclusive": 48}}}
+
+# LootItemFunctions' vanilla registry in 1.21.1, including functions absent from
+# the source pack. Do not infer support from which functions vanilla tables use.
+LOOT_FUNCTIONS = frozenset("minecraft:" + name for name in """
+    set_count set_item enchant_with_levels enchant_randomly set_enchantments
+    furnace_smelt enchanted_count_increase set_damage set_attributes set_name exploration_map
+    set_stew_effect banner_duplicate set_lore fill_player_head copy_name copy_state
+    set_banner_pattern set_potion set_contents set_loot_table set_instrument
+    set_book_cover set_writable_book_pages set_written_book_pages filtered sequence
+    reference set_custom_data copy_custom_data set_components copy_components modify_contents
+    set_fireworks set_firework_explosion set_ominous_bottle_amplifier toggle_tooltips
+    apply_bonus explosion_decay limit_count
+""".split())
+
+
+def snbt_parts(text, delimiter):
+    """Split at top level only, preserving nested SNBT and quoted delimiters."""
+    parts, start, nesting, quote, escaped = [], 0, [], None, False
+    for index, char in enumerate(text):
+        if quote:
+            if escaped:
+                escaped = False
+            elif char == "\\":
+                escaped = True
+            elif char == quote:
+                quote = None
+        elif char in "\"'":
+            quote = char
+        elif char in "{[":
+            nesting.append(char)
+        elif char in "}]":
+            if not nesting or nesting.pop() != {"}": "{", "]": "["}[char]:
+                raise ValueError("Unbalanced SNBT: " + text)
+        elif char == delimiter and not nesting:
+            parts.append(text[start:index].strip())
+            start = index + 1
+    if quote or nesting:
+        raise ValueError("Unterminated SNBT: " + text)
+    parts.append(text[start:].strip())
+    return parts
+
+
+def snbt_string(text):
+    text = text.strip()
+    if not text:
+        raise ValueError("Empty SNBT string")
+    if text[0] not in "\"'":
+        if any(char.isspace() or char in "{}[],:\\\"'" for char in text):
+            raise ValueError("Expected scalar SNBT string: " + text)
+        return text
+    quote, result, index = text[0], [], 1
+    while index < len(text):
+        char = text[index]
+        if char == quote:
+            if index != len(text) - 1:
+                raise ValueError("Trailing SNBT string content: " + text)
+            return "".join(result)
+        if char == "\\":
+            index += 1
+            if index >= len(text) or text[index] not in (quote, "\\"):
+                raise ValueError("Invalid SNBT escape: " + text)
+            char = text[index]
+        result.append(char)
+        index += 1
+    raise ValueError("Unterminated SNBT string: " + text)
+
+
+def snbt_compound(text):
+    """Return decoded keys and raw values; custom data retains its NBT types."""
+    text = text.strip()
+    if not text.startswith("{") or not text.endswith("}"):
+        raise ValueError("Expected SNBT compound: " + text)
+    result = {}
+    for entry in snbt_parts(text[1:-1], ",") if text[1:-1].strip() else []:
+        fields = snbt_parts(entry, ":")
+        if len(fields) != 2 or not fields[1]:
+            raise ValueError("Invalid SNBT compound entry: " + entry)
+        key = snbt_string(fields[0])
+        if key in result:
+            raise ValueError("Duplicate SNBT key: " + key)
+        result[key] = fields[1]
+    return result
+
+
+def set_nbt_functions(function):
+    root = snbt_compound(function["tag"])
+    state = root.pop("BlockStateTag", None)
+    common = {key: copy.deepcopy(value) for key, value in function.items()
+              if key not in {"function", "tag"}}
+    result = []
+    if state is not None:
+        properties = {key: snbt_string(value) for key, value in snbt_compound(state).items()}
+        result.append(dict(copy.deepcopy(common), function="minecraft:set_components",
+                           components={"minecraft:block_state": properties}))
+    if root or state is None:
+        tag = "{" + ",".join('"' + key.replace("\\", "\\\\").replace('"', '\\"') + '":' + value
+                             for key, value in root.items()) + "}"
+        result.append(dict(copy.deepcopy(common), function="minecraft:set_custom_data", tag=tag))
+    return result
+
+
+def loot(value):
+    """Apply common migrations, expanding legacy functions without nested lists."""
+    def expand(value):
+        if isinstance(value, list):
+            result = []
+            for child in value:
+                if isinstance(child, dict) and child.get("function") in {"minecraft:set_nbt", "set_nbt"}:
+                    result.extend(set_nbt_functions({key: expand(v) for key, v in child.items()}))
+                else:
+                    result.append(expand(child))
+            return result
+        if isinstance(value, dict):
+            result = {key: expand(child) for key, child in value.items()}
+            if result.get("function") in {"minecraft:set_nbt", "set_nbt"}:
+                # A filtered function holds one function rather than a list.
+                functions = set_nbt_functions(result)
+                return functions[0] if len(functions) == 1 else {
+                    "function": "minecraft:sequence", "functions": functions}
+            return result
+        return value
+
+    return expand(shared.loot(value))
+
+
+def unsupported_loot_functions(data):
+    return sorted({str(obj["function"]) for obj in objects(data) if "function" in obj
+                   and (not isinstance(obj["function"], str)
+                        or (obj["function"] if ":" in obj["function"] else "minecraft:" + obj["function"])
+                        not in LOOT_FUNCTIONS)})
 
 
 def removals(path=None):
@@ -377,6 +507,11 @@ def convert(source, output, jar, manifest=None):
                 generated[rel] = json.loads(vanilla.read(rel.as_posix()))
                 generated[rel]["pools"].extend(bonuses)
     prune_dependencies(generated, report)
+    problems = [str(rel) + ": unsupported 1.21.1 loot function " + function
+                for rel, data in generated.items() if "loot_table" in rel.parts
+                for function in unsupported_loot_functions(data)]
+    if problems:
+        raise ValueError("\n".join(problems))
     generated[Path("pack.mcmeta")] = PACK
     changed = 0
     for rel, data in sorted(generated.items()):

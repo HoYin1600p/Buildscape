@@ -100,6 +100,11 @@ class Validator(shared.Validator):
         else:
             self.error(path, "1.21.1 ingredient needs an item/tag object")
 
+    def loot(self, path, data):
+        super().loot(path, data)
+        for function in c.unsupported_loot_functions(data):
+            self.error(path, "unsupported 1.21.1 loot function " + function)
+
     def advancement(self, path, data):
         display = data.get("display", {})
         if display:

@@ -12,6 +12,63 @@ import validate as v
 
 
 class ConversionTests(unittest.TestCase):
+    def test_haze_set_nbt_splits_components_and_custom_data_with_conditions(self):
+        path = c.REPO / "ref/forge/1.18.2/src/main/resources/data/buildscape/loot_tables/blocks/red_haze_bush.json"
+        original = c.load(path)
+        before = json.dumps(original)
+        functions = c.loot(original)["pools"][0]["entries"][0]["functions"]
+        self.assertEqual(len(functions), 2)
+        self.assertEqual(functions[0]["function"], "minecraft:set_components")
+        self.assertEqual(functions[0]["components"], {"minecraft:block_state": {"has_haze": "false"}})
+        self.assertEqual(functions[1]["function"], "minecraft:set_custom_data")
+        self.assertEqual(c.snbt_compound(functions[1]["tag"]), {"HasHaze": "0b"})
+        conditions = original["pools"][0]["entries"][0]["functions"][0]["conditions"]
+        for function in functions:
+            self.assertEqual(function["conditions"], conditions)
+            self.assertNotIn("BlockStateTag", json.dumps(function))
+        functions[0]["conditions"][0]["properties"]["has_haze"] = "true"
+        self.assertEqual(functions[1]["conditions"], conditions)
+        self.assertEqual(json.dumps(original), before)
+
+    def test_set_nbt_preserves_nested_snbt_types_and_quoted_delimiters(self):
+        tag = "{Other:{Text:'a,b:c',List:[{x:1b},{x:2s}]},BlockStateTag:{'has_haze':'false',age:'2'},Bytes:[B;1b,0b]}"
+        functions = c.loot({"functions": [{"function": "minecraft:set_nbt", "tag": tag}]})["functions"]
+        self.assertEqual(functions[0]["components"]["minecraft:block_state"], {"has_haze": "false", "age": "2"})
+        self.assertEqual(c.snbt_compound(functions[1]["tag"]), {
+            "Other": "{Text:'a,b:c',List:[{x:1b},{x:2s}]}", "Bytes": "[B;1b,0b]"})
+        self.assertNotIn("conditions", functions[0])
+        for tag, expected in (("{BlockStateTag:{has_haze:false}}", "minecraft:set_components"),
+                              ("{HasHaze:0b}", "minecraft:set_custom_data"),
+                              ("{}", "minecraft:set_custom_data")):
+            functions = c.loot({"functions": [{"function": "set_nbt", "tag": tag}]})["functions"]
+            self.assertEqual(len(functions), 1)
+            self.assertEqual(functions[0]["function"], expected)
+
+    def test_set_nbt_single_function_slot_and_invalid_snbt(self):
+        converted = c.loot({"function": "minecraft:filtered", "item_filter": {}, "modifier": {
+            "function": "minecraft:set_nbt", "tag": '{BlockStateTag:{has_haze:"false"},HasHaze:0b}'}})
+        self.assertEqual(converted["modifier"]["function"], "minecraft:sequence")
+        self.assertEqual(len(converted["modifier"]["functions"]), 2)
+        self.assertEqual(c.unsupported_loot_functions(converted), [])
+        for tag in ("{BlockStateTag:[]}", "{BlockStateTag:{has_haze:{bad:1}}}", "{Other:[1,2}",
+                    "{Other:'unfinished}", "{HasHaze:0b,HasHaze:1b}"):
+            with self.subTest(tag=tag), self.assertRaises(ValueError):
+                c.loot({"functions": [{"function": "minecraft:set_nbt", "tag": tag}]})
+
+    def test_every_source_loot_table_converts_to_known_121x_functions(self):
+        root = c.REPO / "ref/forge/1.18.2/src/main/resources/data"
+        tables = list(root.rglob("loot_tables/**/*.json"))
+        self.assertTrue(tables)
+        for path in tables:
+            if "loot_modifiers" in path.parts:
+                continue
+            with self.subTest(path=path.relative_to(root)):
+                self.assertEqual(c.unsupported_loot_functions(c.loot(c.load(path))), [])
+        for function in ("minecraft:set_nbt", "minecraft:looting_enchant", "minecraft:future_function", "other:unknown"):
+            self.assertEqual(c.unsupported_loot_functions({"functions": [{"function": function}]}), [function])
+        self.assertEqual(c.unsupported_loot_functions({"functions": [{"function": "set_count"},
+            {"function": "minecraft:copy_custom_data"}, {"function": "minecraft:enchanted_count_increase"}]}), [])
+
     def test_recipe_ingredients_are_objects_and_source_is_unchanged(self):
         original = {"type": "minecraft:crafting_shaped", "pattern": ["   ", " # ", "   "],
                     "key": {"#": {"tag": "c:ingots/steel"}}, "result": {"item": "buildscape:steel_block"}}
@@ -166,6 +223,8 @@ class ConversionTests(unittest.TestCase):
                                                      "result": "buildscape:sculk_slab", "count": 2},
                 "data/forge/loot_modifiers/global_loot_modifiers.json": {"entries": []},
                 "data/buildscape/recipes/conditional.json": {"type": "forge:conditional"},
+                "data/buildscape/loot_tables/blocks/haze.json": {"pools": [{"entries": [{"functions": [
+                    {"function": "minecraft:set_nbt", "tag": '{BlockStateTag:{has_haze:"false"},HasHaze:0b}'}]}]}]},
                 "data/buildscape/advancements/recipes/copper_chest.json": {
                     "rewards": {"recipes": ["buildscape:copper_chest"]}},
                 "data/buildscape/worldgen/placed_feature/cherry.json": {"feature": "buildscape:cherry", "placement": []}}
@@ -193,6 +252,14 @@ class ConversionTests(unittest.TestCase):
             self.assertFalse((output / "data/buildscape/advancement/recipes/copper_chest.json").exists())
             self.assertFalse((output / "data/buildscape/worldgen/placed_feature/cherry.json").exists())
             self.assertEqual(c.load(output / "data/buildscape/recipe/keep.json")["ingredient"], {"item": "minecraft:cherry_planks"})
+            converted = c.load(output / "data/buildscape/loot_table/blocks/haze.json")
+            self.assertEqual(len(converted["pools"][0]["entries"][0]["functions"]), 2)
+            self.assertEqual(c.unsupported_loot_functions(converted), [])
+            c.write(source / "data/buildscape/loot_tables/unknown.json", {"functions": [
+                {"function": "minecraft:future_function"}]})
+            with self.assertRaisesRegex(ValueError, "unknown.json.*unsupported 1.21.1 loot function minecraft:future_function"):
+                c.convert(source, output, jar, manifest)
+            (source / "data/buildscape/loot_tables/unknown.json").unlink()
             self.assertEqual(before, {p.relative_to(source): p.read_bytes() for p in source.rglob("*") if p.is_file()})
 
     def test_validator_rejects_later_ingredients_and_unknown_vanilla_ids(self):
@@ -203,6 +270,10 @@ class ConversionTests(unittest.TestCase):
                 archive.writestr("assets/minecraft/models/item/stone.json", '{}')
             with zipfile.ZipFile(jar) as archive:
                 validator = v.Validator(Path(tmp) / "resources", archive)
+                validator.loot("fixture", {"functions": [{"function": "minecraft:set_nbt"}]})
+                self.assertTrue(any("unsupported 1.21.1 loot function minecraft:set_nbt" in error
+                                    for error in validator.errors))
+                validator.errors.clear()
                 validator.ingredient("fixture", {"item": "minecraft:stone"})
                 self.assertEqual(validator.errors, [])
                 validator.ingredient("fixture", "minecraft:stone")

@@ -10,8 +10,6 @@
           "name": "buildscape:gray_haze_bush",
           "functions": [
             {
-              "function": "minecraft:set_nbt",
-              "tag": "{BlockStateTag:{has_haze:\"false\"},HasHaze:0b}",
               "conditions": [
                 {
                   "condition": "minecraft:block_state_property",
@@ -20,7 +18,26 @@
                     "has_haze": "false"
                   }
                 }
-              ]
+              ],
+              "function": "minecraft:set_components",
+              "components": {
+                "minecraft:block_state": {
+                  "has_haze": "false"
+                }
+              }
+            },
+            {
+              "conditions": [
+                {
+                  "condition": "minecraft:block_state_property",
+                  "block": "buildscape:gray_haze_bush",
+                  "properties": {
+                    "has_haze": "false"
+                  }
+                }
+              ],
+              "function": "minecraft:set_custom_data",
+              "tag": "{\"HasHaze\":0b}"
             }
           ]
         }

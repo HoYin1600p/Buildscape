@@ -46,7 +46,6 @@ import com.kingodogo.buildscape.block.IcicleBlock;
 import com.kingodogo.buildscape.block.IcicleCauldronBlock;
 import com.kingodogo.buildscape.block.LeafHedgeBlock;
 import com.kingodogo.buildscape.block.LeafLayersBlock;
-import com.kingodogo.buildscape.block.LeafLitterBlock;
 import com.kingodogo.buildscape.block.MangroveLeavesBlock;
 import com.kingodogo.buildscape.block.MangrovePropaguleBlock;
 import com.kingodogo.buildscape.block.MangroveRootsBlock;
@@ -393,6 +392,13 @@ public class BlockFactory implements IBlockFactory {
                 @Override public void randomTick(BlockState state, ServerLevel level, BlockPos pos, Random random) { WeatheringBlockLogic.randomTick(state, level, pos); }
             };
         } else if (def.isStair()) {
+            // These reference registrations use vanilla stairs, preserving both the
+            // state-bearing base and the supplied properties without safe flattening.
+            if (def.getId().equals("stripped_bamboo_block_stairs")
+                    || def.getId().equals("framed_caution_stairs")
+                    || (def.getId().startsWith("caution_") && def.getId().endsWith("_stairs"))) {
+                return new net.minecraft.world.level.block.StairBlock(getBaseState(def), props) {};
+            }
             return new ModStairBlock(getBaseState(def), referenceStairProperties(getBaseState(def), props)) {
                 @Override public boolean propagatesSkylightDown(BlockState state, BlockGetter level, BlockPos pos) { return !isTintedBase() && super.propagatesSkylightDown(state, level, pos); }
                 @Override public int getLightBlock(BlockState state, BlockGetter level, BlockPos pos) { return isTintedBase() ? 15 : super.getLightBlock(state, level, pos); }
@@ -878,30 +884,6 @@ public class BlockFactory implements IBlockFactory {
                     return true;
                 }
             };
-        } else if (def.isLeafLitter()) {
-            class V118xLeafLitterBlock extends LeafLitterBlock implements BonemealableBlock {
-                public V118xLeafLitterBlock(BlockBehaviour.Properties properties) {
-                    super(properties);
-                }
-                @Override
-                public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
-                    InteractionResult res = onInteract(level, pos, state, player, hand, hit);
-                    return res != InteractionResult.PASS ? res : super.use(state, level, pos, player, hand, hit);
-                }
-                @Override
-                public boolean isValidBonemealTarget(BlockGetter level, BlockPos pos, BlockState state, boolean isClient) {
-                    return true;
-                }
-                @Override
-                public boolean isBonemealSuccess(Level level, java.util.Random random, BlockPos pos, BlockState state) {
-                    return true;
-                }
-                @Override
-                public void performBonemeal(ServerLevel level, java.util.Random random, BlockPos pos, BlockState state) {
-                    performBonemealEffect(level, pos, state);
-                }
-            }
-            return new V118xLeafLitterBlock(props);
         } else if (def.isLayer()) {
             return new ModLayerBlock(props);
         } else if (def.isAshenKingPillar()) {
@@ -1576,7 +1558,7 @@ public class BlockFactory implements IBlockFactory {
                 }
             }
             return new V118xCloverBlock(props);
-        } else if (def.isPetal()) {
+        } else if (def.isPetal() || def.isLeafLitter()) {
             props.sound(com.kingodogo.buildscape.sound.ModSounds.FLOWER_BED_SOUNDS());
             class V118xPetalBlock extends PetalBlock implements BonemealableBlock {
                 public V118xPetalBlock(BlockBehaviour.Properties properties) {

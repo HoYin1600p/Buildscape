@@ -25,9 +25,9 @@ import net.minecraft.world.level.block.ShulkerBoxBlock;
 
 public final class RecipeFactory {
     public static final RegistrySupplier<RecipeSerializer<ShapedDurabilityRecipe>> SHAPED_DURABILITY =
-            Services.REGISTRY.registerRecipeSerializer("shaped_durability", ShapedDurabilitySerializer::new);
+            Services.REGISTRY.registerRecipeSerializer("shaped_durability", () -> create(new ShapedDurabilitySerializer()));
     public static final RegistrySupplier<RecipeSerializer<ShapelessDurabilityRecipe>> SHAPELESS_DURABILITY =
-            Services.REGISTRY.registerRecipeSerializer("shapeless_durability", ShapelessDurabilitySerializer::new);
+            Services.REGISTRY.registerRecipeSerializer("shapeless_durability", () -> create(new ShapelessDurabilitySerializer()));
     public static final RegistrySupplier<RecipeSerializer<ConfettiConfigureRecipe>> CONFETTI_CONFIGURE =
             Services.REGISTRY.registerRecipeSerializer("confetti_configure", () -> new net.minecraft.world.item.crafting.SimpleRecipeSerializer<>(ConfettiConfigureRecipe::new));
     public static final RegistrySupplier<RecipeSerializer<ClearShulkerFiltersRecipe>> CLEAR_SHULKER_FILTERS =
@@ -36,6 +36,21 @@ public final class RecipeFactory {
             Services.REGISTRY.registerRecipeSerializer("custom_firework_star", () -> new net.minecraft.world.item.crafting.SimpleRecipeSerializer<>(CustomFireworkStarRecipe::new));
     public static final RegistrySupplier<RecipeSerializer<InfinitePhoenixFireworkStarRecipe>> INFINITE_PHOENIX =
             Services.REGISTRY.registerRecipeSerializer("infinite_phoenix_firework_star", () -> new net.minecraft.world.item.crafting.SimpleRecipeSerializer<>(InfinitePhoenixFireworkStarRecipe::new));
+
+    /**
+     * Loader-neutral serializer behaviour. It deliberately does not implement RecipeSerializer:
+     * on Forge 1.18.2 that interface is patched to extend IForgeRegistryEntry, so the loader
+     * builds the concrete serializer object around this logic.
+     */
+    public interface SerializerLogic<T extends net.minecraft.world.item.crafting.Recipe<?>> {
+        T fromJson(ResourceLocation id, com.google.gson.JsonObject json);
+        T fromNetwork(ResourceLocation id, FriendlyByteBuf buffer);
+        void toNetwork(FriendlyByteBuf buffer, T recipe);
+    }
+
+    private static <T extends net.minecraft.world.item.crafting.Recipe<?>> RecipeSerializer<T> create(SerializerLogic<T> logic) {
+        return ((PlatformAdapterBase) Services.PLATFORM).createRecipeSerializer(logic);
+    }
 
     private RecipeFactory() {}
     public static void register() {}
@@ -56,7 +71,7 @@ public final class RecipeFactory {
         @Override public RecipeSerializer<?> getSerializer() { return SHAPED_DURABILITY.get(); }
     }
 
-    private static final class ShapedDurabilitySerializer implements RecipeSerializer<ShapedDurabilityRecipe> {
+    private static final class ShapedDurabilitySerializer implements SerializerLogic<ShapedDurabilityRecipe> {
         @Override public ShapedDurabilityRecipe fromJson(ResourceLocation id, com.google.gson.JsonObject json) {
             ShapedRecipe base = RecipeSerializer.SHAPED_RECIPE.fromJson(id, json);
             return new ShapedDurabilityRecipe(id, base.getGroup(), base.getWidth(), base.getHeight(),
@@ -89,7 +104,7 @@ public final class RecipeFactory {
         @Override public RecipeSerializer<?> getSerializer() { return SHAPELESS_DURABILITY.get(); }
     }
 
-    private static final class ShapelessDurabilitySerializer implements RecipeSerializer<ShapelessDurabilityRecipe> {
+    private static final class ShapelessDurabilitySerializer implements SerializerLogic<ShapelessDurabilityRecipe> {
         @Override public ShapelessDurabilityRecipe fromJson(ResourceLocation id, com.google.gson.JsonObject json) {
             ShapelessRecipe base = RecipeSerializer.SHAPELESS_RECIPE.fromJson(id, json);
             return new ShapelessDurabilityRecipe(id, base.getGroup(), base.getResultItem(),

@@ -169,6 +169,12 @@ import java.util.List;
 import java.util.Random;
 import java.util.function.Supplier;
 public class BlockFactory implements IBlockFactory {
+    private static java.util.function.BiFunction<Supplier<FlowingFluid>, BlockBehaviour.Properties, Block> experienceFluidFactory;
+
+    public static void installExperienceFluidFactory(
+            java.util.function.BiFunction<Supplier<FlowingFluid>, BlockBehaviour.Properties, Block> factory) {
+        experienceFluidFactory = java.util.Objects.requireNonNull(factory);
+    }
 
     private static final class WoodDoor extends DoorBlock {
         private WoodDoor(BlockBehaviour.Properties properties) { super(properties); }
@@ -200,6 +206,36 @@ public class BlockFactory implements IBlockFactory {
                     restoredBlock(def.getId().substring("potted_".length())), props);
         }
         switch (def.getBlockType()) {
+            case "HazeBushBlock": {
+                var color = net.minecraft.world.item.DyeColor.byName(def.getId().replace("_haze_bush", ""), null);
+                return new com.kingodogo.buildscape.block.HazeBushBlock(color, props.noCollission().instabreak().sound(SoundType.GRASS)) {
+                    @Override public net.minecraft.world.item.BlockItem createHazeItem(net.minecraft.world.item.Item.Properties properties) {
+                        return new HazeBushItem(this, properties);
+                    }
+                    @Override public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player,
+                            InteractionHand hand, BlockHitResult hit) {
+                        InteractionResult result = onInteract(state, level, pos, player, hand);
+                        return result != InteractionResult.PASS ? result : super.use(state, level, pos, player, hand, hit);
+                    }
+                    @Override public ItemStack getCloneItemStack(BlockGetter level, BlockPos pos, BlockState state) {
+                        return cloneStack(state);
+                    }
+                };
+            }
+            case "PottedHazeBushBlock": {
+                var color = net.minecraft.world.item.DyeColor.byName(
+                        def.getId().replace("potted_", "").replace("_haze_bush", ""), null);
+                var plant = com.kingodogo.buildscape.block.ModBlocks.get(com.kingodogo.buildscape.block.ModBlocks.COLORED_HAZE_BUSHES.get(color));
+                return new com.kingodogo.buildscape.block.PottedHazeBushBlock(color, plant, props) {
+                    @Override public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player,
+                            InteractionHand hand, BlockHitResult hit) {
+                        return onInteract(state, level, pos, player, hand);
+                    }
+                    @Override public ItemStack getCloneItemStack(BlockGetter level, BlockPos pos, BlockState state) {
+                        return plantStack(state);
+                    }
+                };
+            }
             case "CopperTorchBlock": return new com.kingodogo.buildscape.block.CopperTorchBlock(props);
             case "CopperWallTorchBlock": return new com.kingodogo.buildscape.block.CopperWallTorchBlock(props);
             case "CopperChestBlock": return new com.kingodogo.buildscape.block.CopperChestBlock(
@@ -1304,7 +1340,7 @@ public class BlockFactory implements IBlockFactory {
                 }
             };
         } else if (def.isExperienceCauldron()) {
-            return new LayeredCauldronBlock(props, (precipitation) -> false, CauldronInteraction.EMPTY) {
+            return new LayeredCauldronBlock(props, (precipitation) -> false, ExperienceCauldronInteractions.INTERACTIONS) {
                 @Override
                 public void animateTick(BlockState state, Level level, BlockPos pos, Random random) {
                     int levelVal = state.getValue(LEVEL);
@@ -1866,6 +1902,7 @@ public class BlockFactory implements IBlockFactory {
             return new V118xSnowyGrassBlock(props);
         } else if (def.isExperienceFluid()) {
             Supplier<FlowingFluid> fluidSupplier = () -> resolveFlowingFluid(def.getParentBlockId());
+            if (experienceFluidFactory != null) return experienceFluidFactory.apply(fluidSupplier, props);
             return new ExperienceFluidBlock(fluidSupplier, props) {
                 @Override
                 public void animateTick(BlockState state, Level level, BlockPos pos, Random random) {

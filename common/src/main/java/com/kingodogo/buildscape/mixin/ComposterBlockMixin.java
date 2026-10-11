@@ -36,7 +36,7 @@ public abstract class ComposterBlockMixin {
         pBuilder.add(PlanterHelper.PLANTER);
     }
 
-    @Inject(method = "useItemOn", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "useItemOn", at = @At("HEAD"), cancellable = true, require = 0)
     private void buildscape$use(ItemStack heldItem, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit, CallbackInfoReturnable<InteractionResult> cir) {
         if (state.hasProperty(PlanterHelper.PLANTER)) {
             PlanterType planter = state.getValue(PlanterHelper.PLANTER);
@@ -101,7 +101,14 @@ public abstract class ComposterBlockMixin {
             }
         }
     }
-    @Inject(method = "useWithoutItem", at = @At("HEAD"), cancellable = true)
+    // 1.18.2 has a single use(...) entry point for both cases.
+    @Inject(method = "use", at = @At("HEAD"), cancellable = true, require = 0)
+    private void buildscape$useLegacy(BlockState state, Level level, BlockPos pos, Player player,
+            InteractionHand hand, BlockHitResult hit, CallbackInfoReturnable<InteractionResult> cir) {
+        buildscape$use(player.getItemInHand(hand), state, level, pos, player, hand, hit, cir);
+    }
+
+    @Inject(method = "useWithoutItem", at = @At("HEAD"), cancellable = true, require = 0)
     private void buildscape$preventPlanterExtraction(BlockState state, Level level, BlockPos pos,
             Player player, BlockHitResult hit, CallbackInfoReturnable<InteractionResult> cir) {
         if (state.hasProperty(PlanterHelper.PLANTER) && state.getValue(PlanterHelper.PLANTER) != PlanterType.NONE) {

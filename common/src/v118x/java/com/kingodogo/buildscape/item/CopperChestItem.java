@@ -1,7 +1,5 @@
 package com.kingodogo.buildscape.item;
 
-import com.kingodogo.buildscape.client.renderer.CopperChestItemRenderer;
-import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.level.block.Block;
 
@@ -10,8 +8,7 @@ public class CopperChestItem extends BlockItem {
         super(block, properties);
     }
 
-    // TODO S7b: expose this renderer through Forge's client item extension in loader glue.
-    public BlockEntityWithoutLevelRenderer getItemStackRenderer() {
-        return CopperChestItemRenderer.INSTANCE;
-    }
+    // TODO S7b: the built-in item renderer (CopperChestItemRenderer.INSTANCE) is exposed through
+    // Forge's IItemRenderProperties in the loader glue. It cannot be referenced from this class:
+    // the dedicated server verifies it and must not resolve client renderer types.
 }

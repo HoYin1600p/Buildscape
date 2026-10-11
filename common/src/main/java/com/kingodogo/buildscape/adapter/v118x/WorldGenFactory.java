@@ -54,35 +54,42 @@ public final class WorldGenFactory {
 
     public static void register() {
         if (randomStateType != null) return;
-        randomStateType = Registry.register(Registry.BLOCKSTATE_PROVIDER_TYPES,
+        randomStateType = registerType(Registry.BLOCKSTATE_PROVIDER_TYPES,
                 new ResourceLocation(BuildscapeCommon.MOD_ID, "random_state"),
                 WorldGenTypeHelper.createBlockStateProviderType(RandomStateProvider.CODEC));
-        mossCeilingType = Registry.register(Registry.PLACEMENT_MODIFIERS,
+        PlacementModifierType<MossBlockCeilingPlacement> mossCeiling = () -> MossBlockCeilingPlacement.CODEC;
+        mossCeilingType = registerType(Registry.PLACEMENT_MODIFIERS,
                 new ResourceLocation(BuildscapeCommon.MOD_ID, "moss_block_ceiling_placement"),
-                () -> MossBlockCeilingPlacement.CODEC);
-        creakingHeartType = Registry.register(Registry.TREE_DECORATOR_TYPES,
+                mossCeiling);
+        creakingHeartType = registerType(Registry.TREE_DECORATOR_TYPES,
                 new ResourceLocation(BuildscapeCommon.MOD_ID, "creaking_heart"),
                 WorldGenTypeHelper.createTreeDecoratorType(CreakingHeartTreeDecorator.CODEC));
-        mangroveLeaveVineType = Registry.register(Registry.TREE_DECORATOR_TYPES,
+        mangroveLeaveVineType = registerType(Registry.TREE_DECORATOR_TYPES,
                 new ResourceLocation(BuildscapeCommon.MOD_ID, "mangrove_leave_vine"),
                 WorldGenTypeHelper.createTreeDecoratorType(MangroveLeaveVineDecorator.CODEC));
-        mangroveMossCarpetType = Registry.register(Registry.TREE_DECORATOR_TYPES,
+        mangroveMossCarpetType = registerType(Registry.TREE_DECORATOR_TYPES,
                 new ResourceLocation(BuildscapeCommon.MOD_ID, "mangrove_moss_carpet"),
                 WorldGenTypeHelper.createTreeDecoratorType(MangroveMossCarpetDecorator.CODEC));
-        mangrovePropaguleType = Registry.register(Registry.TREE_DECORATOR_TYPES,
+        mangrovePropaguleType = registerType(Registry.TREE_DECORATOR_TYPES,
                 new ResourceLocation(BuildscapeCommon.MOD_ID, "mangrove_propagule"),
                 WorldGenTypeHelper.createTreeDecoratorType(MangrovePropaguleDecorator.CODEC));
-        mangroveRootType = Registry.register(Registry.TREE_DECORATOR_TYPES,
+        mangroveRootType = registerType(Registry.TREE_DECORATOR_TYPES,
                 new ResourceLocation(BuildscapeCommon.MOD_ID, "mangrove_root"),
                 WorldGenTypeHelper.createTreeDecoratorType(MangroveRootDecorator.CODEC));
-        mangroveRandomSpreadFoliageType = Registry.register(Registry.FOLIAGE_PLACER_TYPES,
+        mangroveRandomSpreadFoliageType = registerType(Registry.FOLIAGE_PLACER_TYPES,
                 new ResourceLocation(BuildscapeCommon.MOD_ID, "mangrove_random_spread"),
                 WorldGenTypeHelper.createFoliagePlacerType(MangroveRandomSpreadFoliagePlacer.CODEC));
-        mangroveUpwardsBranchingTrunkType = Registry.register(Registry.TRUNK_PLACER_TYPES,
+        mangroveUpwardsBranchingTrunkType = registerType(Registry.TRUNK_PLACER_TYPES,
                 new ResourceLocation(BuildscapeCommon.MOD_ID, "mangrove_upwards_branching"),
                 WorldGenTypeHelper.createTrunkPlacerType(MangroveUpwardsBranchingTrunkPlacer.CODEC));
     }
 
+    private static <T, V extends T> V registerType(Registry<T> registry, ResourceLocation id, V value) {
+        com.kingodogo.buildscape.platform.Services.PLATFORM.wrapRegistryAction(() ->
+                com.kingodogo.buildscape.platform.Services.PLATFORM.register(registry,
+                        new com.kingodogo.buildscape.util.CommonId(id.getNamespace(), id.getPath()), value));
+        return value;
+    }
     public static final class CreakingHeartTreeDecorator extends TreeDecorator {
         public static final CreakingHeartTreeDecorator INSTANCE = new CreakingHeartTreeDecorator();
         public static final Codec<CreakingHeartTreeDecorator> CODEC = WorldGenTypeHelper.unitCodec(INSTANCE);
@@ -386,6 +393,31 @@ public final class WorldGenFactory {
     }
     public static FoliagePlacer createMangroveRandomSpreadFoliagePlacer(IntProvider radius, IntProvider offset, IntProvider foliageHeight, int leafPlacementAttempts) {
         return new MangroveRandomSpreadFoliagePlacer(radius, offset, foliageHeight, leafPlacementAttempts);
+    }
+    /**
+     * The mangrove trees 26.2 takes from vanilla but 1.18.2 still generates itself
+     * ("mangrove" and "tall_mangrove"); values mirror the 1.18.2 reference configuration.
+     */
+    public static ConfiguredFeature<?, ?> createMangroveTreeFeature(boolean tall) {
+        net.minecraft.world.level.levelgen.feature.configurations.TreeConfiguration config =
+                new net.minecraft.world.level.levelgen.feature.configurations.TreeConfiguration.TreeConfigurationBuilder(
+                        BlockStateProvider.simple(com.kingodogo.buildscape.block.ModBlocks.MANGROVE_LOG.get().defaultBlockState()),
+                        createMangroveUpwardsBranchingTrunkPlacer(tall ? 4 : 2, 1, tall ? 9 : 4,
+                                net.minecraft.util.valueproviders.UniformInt.of(1, tall ? 6 : 4), 0.5F,
+                                net.minecraft.util.valueproviders.UniformInt.of(0, 1)),
+                        BlockStateProvider.simple(com.kingodogo.buildscape.block.ModBlocks.MANGROVE_LEAVES.get().defaultBlockState()),
+                        createMangroveRandomSpreadFoliagePlacer(ConstantInt.of(3), ConstantInt.of(0), ConstantInt.of(2), 70),
+                        new net.minecraft.world.level.levelgen.feature.featuresize.TwoLayersFeatureSize(tall ? 3 : 2, 0, 2))
+                        .decorators(List.of(
+                                createMangroveRootDecorator(ConstantInt.of(8), ConstantInt.of(15), 0.2F,
+                                        net.minecraft.util.valueproviders.UniformInt.of(tall ? 3 : 1, tall ? 7 : 3)),
+                                createMangroveMossCarpetDecorator(0.5F),
+                                createMangroveLeaveVineDecorator(0.125F),
+                                createMangrovePropaguleDecorator(0.14F, ConstantInt.of(1), ConstantInt.of(0), 2),
+                                new net.minecraft.world.level.levelgen.feature.treedecorators.BeehiveDecorator(0.01F)))
+                        .ignoreVines()
+                        .build();
+        return new ConfiguredFeature<>(Feature.TREE, config);
     }
     public static ConfiguredFeature<?, ?> createPatchFeature(
             BlockStateProvider stateProvider,

@@ -44,24 +44,38 @@ public class BlockStateBaseMixin {
         return MixinFactory.isPlanterPlant(block);
     }
 
-    @Inject(method = "affectNeighborsAfterRemoval(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/core/BlockPos;Z)V", at = @At("HEAD"))
+    // 26.2 removal hook; absent on 1.18.2 (require = 0 keeps each cluster's missing hook non-fatal).
+    @Inject(method = "affectNeighborsAfterRemoval(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/core/BlockPos;Z)V", at = @At("HEAD"), require = 0)
     private void buildscape$onSignRemove(ServerLevel level, BlockPos pos, boolean isMoving, CallbackInfo ci) {
         BlockState state = (BlockState) (Object) this;
         if (!state.is(level.getBlockState(pos).getBlock())) {
-            if (state.getBlock() instanceof SignBlock) {
-                BlockEntity be = level.getBlockEntity(pos);
-                if (be instanceof SignBlockEntity sign) {
-                    SignFrameType frame = SignFrameAttachment.getFrame(sign);
-                    if (frame != SignFrameType.NONE && frame.getItem() != null) {
-                        Containers.dropItemStack(
-                                level,
-                                (double) pos.getX() + 0.5D,
-                                (double) pos.getY() + 0.5D,
-                                (double) pos.getZ() + 0.5D,
-                                new ItemStack(frame.getItem())
-                        );
-                        SignFrameAttachment.setFrame(sign, SignFrameType.NONE);
-                    }
+            buildscape$dropSignFrame(state, level, pos);
+        }
+    }
+
+    // 1.18.2 removal hook (BlockStateBase.onRemove).
+    @Inject(method = "onRemove", at = @At("HEAD"), require = 0)
+    private void buildscape$onSignRemoveLegacy(net.minecraft.world.level.Level level, BlockPos pos, BlockState newState, boolean isMoving, CallbackInfo ci) {
+        BlockState state = (BlockState) (Object) this;
+        if (!state.is(newState.getBlock()) && !level.isClientSide()) {
+            buildscape$dropSignFrame(state, level, pos);
+        }
+    }
+
+    private static void buildscape$dropSignFrame(BlockState state, net.minecraft.world.level.Level level, BlockPos pos) {
+        if (state.getBlock() instanceof SignBlock) {
+            BlockEntity be = level.getBlockEntity(pos);
+            if (be instanceof SignBlockEntity sign) {
+                SignFrameType frame = SignFrameAttachment.getFrame(sign);
+                if (frame != SignFrameType.NONE && frame.getItem() != null) {
+                    Containers.dropItemStack(
+                            level,
+                            (double) pos.getX() + 0.5D,
+                            (double) pos.getY() + 0.5D,
+                            (double) pos.getZ() + 0.5D,
+                            new ItemStack(frame.getItem())
+                    );
+                    SignFrameAttachment.setFrame(sign, SignFrameType.NONE);
                 }
             }
         }

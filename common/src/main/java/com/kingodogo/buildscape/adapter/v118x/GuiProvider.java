@@ -241,7 +241,7 @@ public final class GuiProvider {
 
     public static java.util.List<net.minecraft.network.chat.Component> getTooltipFromItem(net.minecraft.world.item.ItemStack stack) {
         net.minecraft.client.Minecraft minecraft = net.minecraft.client.Minecraft.getInstance();
-        return stack.getTooltipLines(minecraft.player, net.minecraft.world.item.TooltipFlag.Default.NORMAL);
+        return stack.getTooltipLines(com.kingodogo.buildscape.adapter.v118x.client.ClientAccess.player(), net.minecraft.world.item.TooltipFlag.Default.NORMAL);
     }
 
     public static net.minecraft.client.gui.components.Button createButton(int x, int y, int width, int height, net.minecraft.network.chat.Component message, net.minecraft.client.gui.components.Button.OnPress onPress) {

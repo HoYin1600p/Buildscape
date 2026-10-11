@@ -4,12 +4,8 @@ plugins {
 }
 
 def sourceMode = providers.gradleProperty('buildscape.v118xSource').getOrElse('ref')
-if (sourceMode == 'common') {
-    // Later integration stage: neutral common code plus the v118x adapter and Forge glue.
-    throw new GradleException("buildscape.v118xSource=common is not implemented yet. Use 'ref' for the Forge 1.18.2 toolchain spike.")
-}
-if (sourceMode != 'ref') {
-    throw new GradleException("Unknown buildscape.v118xSource '${sourceMode}'. Use 'ref'; 'common' is reserved for later integration.")
+if (!(sourceMode in ['ref', 'common'])) {
+    throw new GradleException("Unknown buildscape.v118xSource '${sourceMode}'. Use 'ref' or 'common'.")
 }
 
 def referenceProject = rootProject.file('ref/forge/1.18.2')
@@ -34,9 +30,25 @@ def java17Launcher = javaToolchains.launcherFor {
 }
 
 sourceSets.main {
-    // Ref mode compiles the frozen mod verbatim, without the future common-mode glue.
-    java.setSrcDirs([new File(referenceProject, 'src/main/java')])
-    resources.setSrcDirs([new File(referenceProject, 'src/main/resources')])
+    if (sourceMode == 'common') {
+        // Compile the same source variant as common, against Forge's Mojang dev jar.
+        // Keeping the classes in this compilation also lets remapJar see every mixin.
+        java.setSrcDirs(['src/main/java', rootProject.file('common/src/main/java'),
+                         rootProject.file('common/src/v118x/java')])
+        java.exclude 'com/kingodogo/buildscape/adapter/v121x/**'
+        java.exclude 'com/kingodogo/buildscape/adapter/v26x/**'
+        // Neutral mixins that target 26.2-only signatures and have a 1.18.2 replacement in this module.
+        java.exclude 'com/kingodogo/buildscape/mixin/FlowingFluidMixin.java'
+        java.exclude 'com/kingodogo/buildscape/mixin/StonecutterMenuAccessor.java'
+        // First root wins duplicate paths: cluster mixins and loader service bindings
+        // override the frozen reference, whose assets/recipes stay authoritative.
+        resources.setSrcDirs([rootProject.file('common/src/v118x/resources'),
+                              file('src/main/resources'),
+                              new File(referenceProject, 'src/main/resources')])
+    } else {
+        java.setSrcDirs([new File(referenceProject, 'src/main/java')])
+        resources.setSrcDirs([new File(referenceProject, 'src/main/resources')])
+    }
 }
 
 repositories {
@@ -94,6 +106,11 @@ dependencies {
     testImplementation 'junit:junit:4.13.2'
     // ForgeGradle's userdev classpath carries javax.annotation (jsr305); unimined's does not.
     compileOnly 'com.google.code.findbugs:jsr305:3.0.2'
+    if (sourceMode == 'common') {
+        compileOnly 'org.jetbrains:annotations:26.0.2'
+        implementation 'org.joml:joml:1.10.8'
+        compileOnly 'org.jspecify:jspecify:1.0.0'
+    }
     modRuntimeOnly 'mezz.jei:jei-1.18.2:9.7.1.255'
     modCompileOnly 'curse.maven:embeddium-908741:5322305'
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
@@ -113,6 +130,8 @@ tasks.named('compileJava', JavaCompile) {
 }
 tasks.withType(JavaExec).configureEach {
     javaLauncher = java17Launcher
+    // Lets a dev server read console commands (for example "stop") from the shell's stdin.
+    standardInput = System.in
 }
 
 // The ref/ tree is checked out with CRLF on Windows (core.autocrlf), while Git and the

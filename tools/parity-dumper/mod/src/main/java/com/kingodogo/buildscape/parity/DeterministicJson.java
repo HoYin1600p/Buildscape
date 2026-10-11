@@ -6,6 +6,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
+import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -46,6 +47,33 @@ final class DeterministicJson {
     }
 
     static void write(Path path, JsonElement value) throws IOException {
-        Files.writeString(path, GSON.toJson(canonical(value)) + "\n", StandardCharsets.UTF_8);
+        try (var output = Files.newBufferedWriter(path, StandardCharsets.UTF_8);
+             JsonWriter writer = GSON.newJsonWriter(output)) {
+            writer.setHtmlSafe(false);
+            writer.setSerializeNulls(true);
+            writeSorted(writer, value);
+            writer.flush();
+            output.write('\n');
+        }
+    }
+
+    // Sort only the current object's keys, without copying the JSON tree or
+    // accumulating the serialized document in a StringWriter.
+    private static void writeSorted(JsonWriter writer, JsonElement value) throws IOException {
+        if (value.isJsonObject()) {
+            writer.beginObject();
+            JsonObject object = value.getAsJsonObject();
+            for (String key : object.keySet().stream().sorted().toList()) {
+                writer.name(key);
+                writeSorted(writer, object.get(key));
+            }
+            writer.endObject();
+        } else if (value.isJsonArray()) {
+            writer.beginArray();
+            for (JsonElement element : value.getAsJsonArray()) writeSorted(writer, element);
+            writer.endArray();
+        } else {
+            GSON.toJson(value, writer);
+        }
     }
 }

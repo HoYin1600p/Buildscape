@@ -1,19 +1,170 @@
 plugins {
     id 'java'
+    id 'xyz.wagyourtail.unimined'
 }
 
-configurations { commonVariant }
+def sourceMode = providers.gradleProperty('buildscape.v118xSource').getOrElse('ref')
+if (sourceMode == 'common') {
+    // Later integration stage: neutral common code plus the v118x adapter and Forge glue.
+    throw new GradleException("buildscape.v118xSource=common is not implemented yet. Use 'ref' for the Forge 1.18.2 toolchain spike.")
+}
+if (sourceMode != 'ref') {
+    throw new GradleException("Unknown buildscape.v118xSource '${sourceMode}'. Use 'ref'; 'common' is reserved for later integration.")
+}
+
+def referenceProject = rootProject.file('ref/forge/1.18.2')
+def referenceProperties = new Properties()
+new File(referenceProject, 'gradle.properties').withInputStream {
+    referenceProperties.load(it)
+}
+def replaceProperties = [
+    'minecraft_version', 'minecraft_version_range', 'forge_version', 'forge_version_range',
+    'loader_version_range', 'mod_id', 'mod_name', 'mod_license', 'mod_version',
+    'mod_authors', 'mod_description'
+].collectEntries { key -> [(key): referenceProperties.getProperty(key)] }
+
+group = referenceProperties.getProperty('mod_group_id')
+version = providers.gradleProperty('mod_version_v118x').get()
+base.archivesName = referenceProperties.getProperty('mod_id')
+replaceProperties.mod_version = version.toString()
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+def java17Launcher = javaToolchains.launcherFor {
+    languageVersion = JavaLanguageVersion.of(17)
+}
+
+sourceSets.main {
+    // Ref mode compiles the frozen mod verbatim, without the future common-mode glue.
+    java.setSrcDirs([new File(referenceProject, 'src/main/java')])
+    resources.setSrcDirs([new File(referenceProject, 'src/main/resources')])
+}
+
+repositories {
+    maven { url = 'https://www.cursemaven.com' }
+    maven { url = 'https://maven.blamejared.com' }
+    maven { url = 'https://dvs1.progwml6.com/files/maven/' }
+    maven { url = 'https://modmaven.dev' }
+}
+
+// Unimined applies a user access transformer to the mojmap dev jar without translating SRG ids
+// (f_xxxx_), so the dev copy replaces each id by the mojmap name from the line's trailing comment.
+// The shipped META-INF/accesstransformer.cfg stays the byte-identical SRG original.
+def devAccessTransformer = layout.buildDirectory.file('dev-at/accesstransformer.cfg').get().asFile
+devAccessTransformer.parentFile.mkdirs()
+devAccessTransformer.text = new File(referenceProject, 'src/main/resources/META-INF/accesstransformer.cfg')
+        .readLines('UTF-8').collect { String line ->
+    def m = line =~ /^(\s*(?:public|protected|private|default)(?:[-+]f)?\s+\S+\s+)([fm]_\d+_)(\S*)\s*#\s*(\w+)\s*$/
+    if (m.matches()) {
+        return m.group(1) + m.group(4) + m.group(3)
+    }
+    if (line =~ /^[^#]*\b[fm]_\d+_/) {
+        throw new GradleException("Access transformer line has an SRG id without a mojmap name comment: ${line}")
+    }
+    return line
+}.join('\n') + '\n'
+
+configurations {
+    // Mod jars (SRG-named) that unimined remaps to the dev namespace; see unimined.minecraft.mods.
+    modCompileOnly
+    compileOnly.extendsFrom(modCompileOnly)
+    modRuntimeOnly
+    runtimeOnly.extendsFrom(modRuntimeOnly)
+}
+
+unimined.minecraft {
+    version '1.18.2'
+    mappings {
+        mojmap()
+        searge()
+    }
+    defaultRemapJar = true
+    minecraftForge {
+        loader '40.3.12'
+        useToolchains = false
+        mixinConfig 'buildscape.mixins.json'
+        accessTransformer devAccessTransformer
+    }
+    mods {
+        remap(configurations.modCompileOnly)
+        remap(configurations.modRuntimeOnly)
+    }
+}
+
 dependencies {
-    commonVariant project(path: ':common', configuration: 'v118xElements')
-    implementation project(path: ':common', configuration: 'v118xElements')
+    testImplementation 'junit:junit:4.13.2'
+    // ForgeGradle's userdev classpath carries javax.annotation (jsr305); unimined's does not.
+    compileOnly 'com.google.code.findbugs:jsr305:3.0.2'
+    modRuntimeOnly 'mezz.jei:jei-1.18.2:9.7.1.255'
+    modCompileOnly 'curse.maven:embeddium-908741:5322305'
+    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
+    implementation('net.sf.jopt-simple:jopt-simple:5.0.4') {
+        version { strictly '5.0.4' }
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.release = 17
+    options.encoding = 'UTF-8'
+    // Unimined generates the SRG refmap during remapJar instead of the ForgeGradle AP.
+    options.compilerArgs += ['-Xlint:-removal', '-proc:none']
+}
+tasks.named('compileJava', JavaCompile) {
+    outputs.cacheIf { false }
+}
+tasks.withType(JavaExec).configureEach {
+    javaLauncher = java17Launcher
+}
+
+// The ref/ tree is checked out with CRLF on Windows (core.autocrlf), while Git and the
+// ForgeGradle baseline hold LF. Text resources are normalised to LF so jar bytes do not
+// depend on the checkout's line endings (a no-op on an LF checkout).
+class CrlfToLfReader extends FilterReader {
+    CrlfToLfReader(Reader reader) {
+        super(new StringReader(reader.text.replace('\r\n', '\n')))
+    }
+}
+
+tasks.named('processResources', ProcessResources) {
+    doNotTrackState('18k+ resource files causes incremental builds to hang during state tracking')
+    filteringCharset = 'UTF-8'
+    filesMatching(['**/*.json', '**/*.cfg', '**/*.toml', '**/*.mcmeta', '**/*.txt', '**/*.lang']) {
+        filter(CrlfToLfReader)
+    }
+    inputs.properties replaceProperties
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    exclude '**/*.refmap.json'
+    filesMatching(['META-INF/mods.toml', 'pack.mcmeta']) {
+        expand replaceProperties + [project: project]
+    }
+    // Use the frozen recipes.bscb; do not run main's generator against ref/ inputs.
 }
 
 tasks.named('jar', Jar) {
-    from configurations.commonVariant
-    from(rootProject.file('common/src/main/resources')) {
-        filesMatching('assets/buildscape/models/**/*.json') {
-            filter { line -> line.replace('"neoforge_data":', '"forge_data":') }
-        }
-    }
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    manifest {
+        attributes([
+            'Specification-Title': 'buildscape',
+            'Specification-Vendor': 'kingodogo',
+            'Specification-Version': '1',
+            // Match the frozen reference's root project name, not this subproject name.
+            'Implementation-Title': 'buildscape',
+            'Implementation-Version': version.toString(),
+            'Implementation-Vendor': 'kingodogo',
+            'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
+            'MixinConfigs': 'buildscape.mixins.json'
+        ])
+    }
+    exclude { it.path.startsWith('.') || it.path.contains('..') }
+}
+
+// Unimined registers its default remap task after project evaluation. Keep this lazy.
+tasks.matching { it.name == 'remapJar' }.configureEach {
+    prodNamespace 'searge'
+    archiveClassifier = ''
+    mixinRemap {
+        enableBaseMixin()
+    }
+}
+tasks.named('assemble') {
+    dependsOn 'remapJar'
 }

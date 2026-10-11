@@ -51,33 +51,38 @@ public final class WorldGenFactory {
 
     public static void register() {
         if (randomStateType != null) return;
+        com.kingodogo.buildscape.platform.Services.PLATFORM.wrapRegistryAction(WorldGenFactory::registerTypes);
+    }
+
+    private static void registerTypes() {
+        PlatformAdapterBase platform = (PlatformAdapterBase) com.kingodogo.buildscape.platform.Services.PLATFORM;
         randomStateType = PlatformAdapterBase.safeRegister(BuiltInRegistries.BLOCKSTATE_PROVIDER_TYPE,
                 ResourceLocation.fromNamespaceAndPath(BuildscapeCommon.MOD_ID, "random_state"),
-                new BlockStateProviderType<>(RandomStateProvider.CODEC));
+                platform.createBlockStateProviderType(RandomStateProvider.CODEC));
         mossCeilingType = PlatformAdapterBase.safeRegister(BuiltInRegistries.PLACEMENT_MODIFIER_TYPE,
                 ResourceLocation.fromNamespaceAndPath(BuildscapeCommon.MOD_ID, "moss_block_ceiling_placement"),
                 () -> MossBlockCeilingPlacement.CODEC);
         creakingHeartType = PlatformAdapterBase.safeRegister(BuiltInRegistries.TREE_DECORATOR_TYPE,
                 ResourceLocation.fromNamespaceAndPath(BuildscapeCommon.MOD_ID, "creaking_heart"),
-                new TreeDecoratorType<>(CreakingHeartTreeDecorator.CODEC));
+                platform.createTreeDecoratorType(CreakingHeartTreeDecorator.CODEC));
         mangroveLeaveVineType = PlatformAdapterBase.safeRegister(BuiltInRegistries.TREE_DECORATOR_TYPE,
                 ResourceLocation.fromNamespaceAndPath(BuildscapeCommon.MOD_ID, "mangrove_leave_vine"),
-                new TreeDecoratorType<>(MangroveLeaveVineDecorator.CODEC));
+                platform.createTreeDecoratorType(MangroveLeaveVineDecorator.CODEC));
         mangroveMossCarpetType = PlatformAdapterBase.safeRegister(BuiltInRegistries.TREE_DECORATOR_TYPE,
                 ResourceLocation.fromNamespaceAndPath(BuildscapeCommon.MOD_ID, "mangrove_moss_carpet"),
-                new TreeDecoratorType<>(MangroveMossCarpetDecorator.CODEC));
+                platform.createTreeDecoratorType(MangroveMossCarpetDecorator.CODEC));
         mangrovePropaguleType = PlatformAdapterBase.safeRegister(BuiltInRegistries.TREE_DECORATOR_TYPE,
                 ResourceLocation.fromNamespaceAndPath(BuildscapeCommon.MOD_ID, "mangrove_propagule"),
-                new TreeDecoratorType<>(MangrovePropaguleDecorator.CODEC));
+                platform.createTreeDecoratorType(MangrovePropaguleDecorator.CODEC));
         mangroveRootType = PlatformAdapterBase.safeRegister(BuiltInRegistries.TREE_DECORATOR_TYPE,
                 ResourceLocation.fromNamespaceAndPath(BuildscapeCommon.MOD_ID, "mangrove_root"),
-                new TreeDecoratorType<>(MangroveRootDecorator.CODEC));
+                platform.createTreeDecoratorType(MangroveRootDecorator.CODEC));
         mangroveRandomSpreadFoliageType = PlatformAdapterBase.safeRegister(BuiltInRegistries.FOLIAGE_PLACER_TYPE,
                 ResourceLocation.fromNamespaceAndPath(BuildscapeCommon.MOD_ID, "mangrove_random_spread"),
-                new FoliagePlacerType<>(MangroveRandomSpreadFoliagePlacer.CODEC));
+                platform.createFoliagePlacerType(MangroveRandomSpreadFoliagePlacer.CODEC));
         mangroveUpwardsBranchingTrunkType = PlatformAdapterBase.safeRegister(BuiltInRegistries.TRUNK_PLACER_TYPE,
                 ResourceLocation.fromNamespaceAndPath(BuildscapeCommon.MOD_ID, "mangrove_upwards_branching"),
-                new TrunkPlacerType<>(MangroveUpwardsBranchingTrunkPlacer.CODEC));
+                platform.createTrunkPlacerType(MangroveUpwardsBranchingTrunkPlacer.CODEC));
     }
 
     public static final class CreakingHeartTreeDecorator extends TreeDecorator {

@@ -124,6 +124,18 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 public abstract class PlatformAdapterBase implements IPlatformAdapter {
+    // Loader implementations construct these types through access-widened vanilla APIs.
+    public abstract <T extends net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider>
+            net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProviderType<T> createBlockStateProviderType(com.mojang.serialization.MapCodec<T> codec);
+    public abstract <T extends net.minecraft.world.level.levelgen.feature.treedecorators.TreeDecorator>
+            net.minecraft.world.level.levelgen.feature.treedecorators.TreeDecoratorType<T> createTreeDecoratorType(com.mojang.serialization.MapCodec<T> codec);
+    public abstract <T extends net.minecraft.world.level.levelgen.feature.foliageplacers.FoliagePlacer>
+            net.minecraft.world.level.levelgen.feature.foliageplacers.FoliagePlacerType<T> createFoliagePlacerType(com.mojang.serialization.MapCodec<T> codec);
+    public abstract <T extends net.minecraft.world.level.levelgen.feature.trunkplacers.TrunkPlacer>
+            net.minecraft.world.level.levelgen.feature.trunkplacers.TrunkPlacerType<T> createTrunkPlacerType(com.mojang.serialization.MapCodec<T> codec);
+    /** Loader access to the original sprite image; the returned image remains owned by Minecraft. */
+    protected abstract com.mojang.blaze3d.platform.NativeImage getSpriteImage(net.minecraft.client.renderer.texture.SpriteContents contents);
+
     @Override public boolean isReplaceable(net.minecraft.world.level.block.state.BlockState state) { return state.canBeReplaced(); }
     @Override public boolean isGlassBlock(net.minecraft.world.level.block.Block block) { return block == net.minecraft.world.level.block.Blocks.GLASS || block instanceof net.minecraft.world.level.block.StainedGlassBlock || block instanceof net.minecraft.world.level.block.TintedGlassBlock; }
     @Override
@@ -280,12 +292,7 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
     }
 
     @Override
-    public Fluid getBucketFluid(Item item) {
-        if (item instanceof BucketItem bi) {
-            return bi.content;
-        }
-        return Fluids.EMPTY;
-    }
+    public abstract Fluid getBucketFluid(Item item);
 
     @Override
     public Entity createSeatEntity(Level level, double x, double y, double z) {
@@ -405,89 +412,16 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
     }
 
     public static <V, T extends V> T safeRegister(Registry<V> registry, ResourceLocation rl, T value) {
-        if (registry instanceof net.minecraft.core.MappedRegistry<?> mapped) {
-            boolean wasFrozen = false;
-            try {
-                java.lang.reflect.Field frozenField = net.minecraft.core.MappedRegistry.class.getDeclaredField("frozen");
-                frozenField.setAccessible(true);
-                wasFrozen = frozenField.getBoolean(mapped);
-                if (wasFrozen) {
-                    frozenField.setBoolean(mapped, false);
-                }
-
-
-                return Registry.register(registry, rl, value);
-            } catch (Throwable t) {
-                return Registry.register(registry, rl, value);
-            } finally {
-                if (wasFrozen) {
-                    try {
-                        java.lang.reflect.Field frozenField = net.minecraft.core.MappedRegistry.class.getDeclaredField("frozen");
-                        frozenField.setAccessible(true);
-                        frozenField.setBoolean(mapped, true);
-                    } catch (Throwable ignored) {}
-                }
-            }
-        }
-        return Registry.register(registry, rl, value);
+        Services.PLATFORM.wrapRegistryAction(() -> Services.PLATFORM.register(registry,
+                new CommonId(rl.getNamespace(), rl.getPath()), value));
+        return value;
     }
 
     @Override
-    public void wrapRegistryAction(Runnable action) {
-        Registry<?>[] registries = new Registry<?>[] {
-            BuiltInRegistries.BLOCK,
-            BuiltInRegistries.ITEM,
-            BuiltInRegistries.BLOCK_ENTITY_TYPE,
-            BuiltInRegistries.ENTITY_TYPE,
-            BuiltInRegistries.FLUID
-        };
-        boolean[] wasFrozen = new boolean[registries.length];
-        Object[] prevHolders = new Object[registries.length];
-        java.lang.reflect.Field frozenField = null;
-        java.lang.reflect.Field holdersField = null;
-        try {
-            frozenField = net.minecraft.core.MappedRegistry.class.getDeclaredField("frozen");
-            frozenField.setAccessible(true);
-            holdersField = net.minecraft.core.MappedRegistry.class.getDeclaredField("unregisteredIntrusiveHolders");
-            holdersField.setAccessible(true);
-            for (int i = 0; i < registries.length; i++) {
-                if (registries[i] instanceof net.minecraft.core.MappedRegistry<?> mapped) {
-                    wasFrozen[i] = frozenField.getBoolean(mapped);
-                    if (wasFrozen[i]) {
-                        frozenField.setBoolean(mapped, false);
-                    }
-                    prevHolders[i] = holdersField.get(mapped);
-                    if (prevHolders[i] == null) {
-                        holdersField.set(mapped, new java.util.IdentityHashMap<>());
-                    }
-                }
-            }
-            action.run();
-        } catch (Throwable t) {
-            throw new RuntimeException("Failed during registry action", t);
-        } finally {
-            if (frozenField != null && holdersField != null) {
-                for (int i = 0; i < registries.length; i++) {
-                    if (registries[i] instanceof net.minecraft.core.MappedRegistry<?> mapped) {
-                        try {
-                            if (wasFrozen[i]) {
-                                frozenField.setBoolean(mapped, true);
-                            }
-                            if (prevHolders[i] == null) {
-                                holdersField.set(mapped, null);
-                            }
-                        } catch (Throwable ignored) {}
-                    }
-                }
-            }
-        }
-    }
+    public abstract void wrapRegistryAction(Runnable action);
 
     @Override
-    public <V> void register(Registry<V> registry, CommonId id, V value) {
-        ResourceLocation rl = ResourceLocation.fromNamespaceAndPath(id.getNamespace(), id.getPath());
-        safeRegister(registry, rl, value);
-    }
+    public abstract <V> void register(Registry<V> registry, CommonId id, V value);
 
     @Override
     public net.minecraft.stats.Stat<?> registerCustomStat(String registryName, CommonId statId) {
@@ -503,10 +437,7 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
     }
 
     @Override
-    public void registerParticleProviders() {
-        if (!isClient()) return;
-        com.kingodogo.buildscape.adapter.v121x.ParticleFactory.registerProviders();
-    }
+    public abstract void registerParticleProviders();
 
     @Override
     public void registerCopperFireFlameParticle() {
@@ -707,10 +638,7 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
     }
 
     @Override
-    public net.minecraft.world.entity.EquipmentSlot getEquipmentSlot(ItemStack stack) {
-        if (stack == null || stack.isEmpty()) return null;
-        return stack.getEquipmentSlot();
-    }
+    public abstract net.minecraft.world.entity.EquipmentSlot getEquipmentSlot(ItemStack stack);
 
     private final java.util.Map<net.minecraft.client.resources.model.BakedModel, net.minecraft.world.phys.AABB> v121xModelBoundsCache = new java.util.WeakHashMap<>();
 
@@ -806,7 +734,7 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
 
     @Override
     public CreativeModeTab createCreativeTab(CommonId tabId, String titleKey, Supplier<ItemStack> iconSupplier, List<String> orderedItemIds, Map<String, Item> items) {
-        return CreativeModeTab.builder()
+        return CreativeModeTab.builder(CreativeModeTab.Row.TOP, 0)
                 .title(Component.translatable(titleKey))
                 .icon(iconSupplier)
                 .displayItems((params, output) -> {
@@ -1447,37 +1375,7 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
     }
 
     @Override
-    public <T extends BlockEntity> BlockEntityType<T> createBlockEntityType(BlockEntityFactory<T> factory, Predicate<BlockState> isValid) {
-        net.minecraft.core.MappedRegistry<?> registry = (net.minecraft.core.MappedRegistry<?>) net.minecraft.core.registries.BuiltInRegistries.BLOCK_ENTITY_TYPE;
-        boolean wasFrozen = false;
-        try {
-            java.lang.reflect.Field frozenField = net.minecraft.core.MappedRegistry.class.getDeclaredField("frozen");
-            frozenField.setAccessible(true);
-            wasFrozen = frozenField.getBoolean(registry);
-            frozenField.setBoolean(registry, false);
-
-            java.lang.reflect.Field holdersField = net.minecraft.core.MappedRegistry.class.getDeclaredField("unregisteredIntrusiveHolders");
-            holdersField.setAccessible(true);
-            if (holdersField.get(registry) == null) {
-                holdersField.set(registry, new java.util.IdentityHashMap<>());
-            }
-
-            return new BlockEntityType<>(factory::create, Set.of(), null) {
-                @Override
-                public boolean isValid(BlockState state) {
-                    return isValid.test(state);
-                }
-            };
-        } catch (Throwable t) {
-            throw new RuntimeException("Failed to create BlockEntityType", t);
-        } finally {
-            try {
-                java.lang.reflect.Field frozenField = net.minecraft.core.MappedRegistry.class.getDeclaredField("frozen");
-                frozenField.setAccessible(true);
-                frozenField.setBoolean(registry, wasFrozen);
-            } catch (Throwable ignored) {}
-        }
-    }
+    public abstract <T extends BlockEntity> BlockEntityType<T> createBlockEntityType(BlockEntityFactory<T> factory, Predicate<BlockState> isValid);
 
     @Override
     public boolean isOnGround(Entity entity) {
@@ -2915,11 +2813,7 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
 
 
     @Override
-    public void registerMenuScreens() {
-        if (!isClient()) return;
-        com.kingodogo.buildscape.adapter.v121x.GuiProvider.registerMenuScreens();
-        registerRenderers();
-    }
+    public abstract void registerMenuScreens();
 
     @Override
     public void registerRenderers() {
@@ -2995,7 +2889,7 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
                     }
                     int resolvedTint = tint;
                     double[] sample = v121xSpriteCache.computeIfAbsent(spriteName + "#" + tint, key -> {
-                        com.mojang.blaze3d.platform.NativeImage image = sprite.contents().getOriginalImage();
+                        com.mojang.blaze3d.platform.NativeImage image = getSpriteImage(sprite.contents());
                         int width = sprite.contents().width(), height = sprite.contents().height();
                         int stepX = Math.max(1, (width + COLOR_MAX_SAMPLES - 1) / COLOR_MAX_SAMPLES);
                         int stepY = Math.max(1, (height + COLOR_MAX_SAMPLES - 1) / COLOR_MAX_SAMPLES);

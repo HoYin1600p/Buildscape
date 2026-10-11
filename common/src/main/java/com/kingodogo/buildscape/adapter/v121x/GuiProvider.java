@@ -8,7 +8,7 @@ import com.kingodogo.buildscape.menu.BuildersWorkbenchMenu;
 import com.kingodogo.buildscape.menu.ModMenuTypes;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.screens.MenuScreens;
+import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 public final class GuiProvider {
@@ -27,89 +27,92 @@ public final class GuiProvider {
         return null;
     }
 
-    public static void registerMenuScreens() {
-        try {
-            java.lang.reflect.Field field = MenuScreens.class.getDeclaredField("SCREENS");
-            field.setAccessible(true);
-            @SuppressWarnings("unchecked")
-            java.util.Map<net.minecraft.world.inventory.MenuType<?>, Object> screens =
-                    (java.util.Map<net.minecraft.world.inventory.MenuType<?>, Object>) field.get(null);
+    @FunctionalInterface
+    public interface ScreenFactory<M extends AbstractContainerMenu> {
+        AbstractContainerScreen<M> create(M menu, net.minecraft.world.entity.player.Inventory inventory,
+                                          net.minecraft.network.chat.Component title);
+    }
 
-            MenuScreens.ScreenConstructor<BuildersWorkbenchMenu, AbstractContainerScreen<BuildersWorkbenchMenu>> wbConstructor =
-                    (menu, inventory, title) -> {
-                        BuildersWorkbenchScreen delegate = new BuildersWorkbenchScreen(menu, inventory, title);
-                        return new AbstractContainerScreen<BuildersWorkbenchMenu>(menu, inventory, title) {
-                            @Override
-                            protected void init() {
-                                this.imageWidth = delegate.getImageWidth();
-                                this.imageHeight = delegate.getImageHeight();
-                                super.init();
-                                delegate.init(this.leftPos, this.topPos, this.width, this.height);
-                            }
+    /** The loader adapts these factories to its menu screen registration event/API. */
+    public interface Registrar {
+        <M extends AbstractContainerMenu> void register(net.minecraft.world.inventory.MenuType<M> type, ScreenFactory<M> factory);
+    }
 
-                            @Override
-                            public void containerTick() {
-                                super.containerTick();
-                                delegate.containerTick();
-                            }
+    public static void registerMenuScreens(Registrar registrar) {
+        ScreenFactory<BuildersWorkbenchMenu> wbConstructor =
+                (menu, inventory, title) -> {
+                    BuildersWorkbenchScreen delegate = new BuildersWorkbenchScreen(menu, inventory, title);
+                    return new AbstractContainerScreen<BuildersWorkbenchMenu>(menu, inventory, title) {
+                        @Override
+                        protected void init() {
+                            this.imageWidth = delegate.getImageWidth();
+                            this.imageHeight = delegate.getImageHeight();
+                            super.init();
+                            delegate.init(this.leftPos, this.topPos, this.width, this.height);
+                        }
 
-                            @Override
-                            protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
-                                delegate.renderBg(guiGraphics, partialTick, mouseX, mouseY, this.leftPos, this.topPos);
-                            }
+                        @Override
+                        public void containerTick() {
+                            super.containerTick();
+                            delegate.containerTick();
+                        }
 
-                            @Override
-                            public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-                                super.render(guiGraphics, mouseX, mouseY, partialTick);
-                                delegate.renderRerollControls(guiGraphics, mouseX, mouseY, this.leftPos, this.topPos);
-                                renderTooltip(guiGraphics, mouseX, mouseY);
-                            }
+                        @Override
+                        protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
+                            delegate.renderBg(guiGraphics, partialTick, mouseX, mouseY, this.leftPos, this.topPos);
+                        }
 
-                            @Override
-                            protected void renderTooltip(GuiGraphics guiGraphics, int mouseX, int mouseY) {
-                                if (delegate.renderCustomTooltip(guiGraphics, mouseX, mouseY, this.leftPos, this.topPos)) {
-                                    return;
-                                }
-                                super.renderTooltip(guiGraphics, mouseX, mouseY);
-                            }
+                        @Override
+                        public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+                            super.render(guiGraphics, mouseX, mouseY, partialTick);
+                            delegate.renderRerollControls(guiGraphics, mouseX, mouseY, this.leftPos, this.topPos);
+                            renderTooltip(guiGraphics, mouseX, mouseY);
+                        }
 
-                            @Override
-                            public boolean mouseClicked(double mouseX, double mouseY, int button) {
-                                if (delegate.mouseClicked(mouseX, mouseY, button, this.leftPos, this.topPos)) {
-                                    return true;
-                                }
-                                return super.mouseClicked(mouseX, mouseY, button);
+                        @Override
+                        protected void renderTooltip(GuiGraphics guiGraphics, int mouseX, int mouseY) {
+                            if (delegate.renderCustomTooltip(guiGraphics, mouseX, mouseY, this.leftPos, this.topPos)) {
+                                return;
                             }
-                        };
+                            super.renderTooltip(guiGraphics, mouseX, mouseY);
+                        }
+
+                        @Override
+                        public boolean mouseClicked(double mouseX, double mouseY, int button) {
+                            if (delegate.mouseClicked(mouseX, mouseY, button, this.leftPos, this.topPos)) {
+                                return true;
+                            }
+                            return super.mouseClicked(mouseX, mouseY, button);
+                        }
                     };
-            screens.put(ModMenuTypes.BUILDERS_WORKBENCH_MENU, wbConstructor);
+                };
+        registrar.register(ModMenuTypes.BUILDERS_WORKBENCH_MENU, wbConstructor);
 
-            MenuScreens.ScreenConstructor<BuildersPouchMenu, AbstractContainerScreen<BuildersPouchMenu>> pouchConstructor =
-                    (menu, inventory, title) -> {
-                        BuildersPouchScreen delegate = new BuildersPouchScreen(menu, inventory, title);
-                        return new AbstractContainerScreen<BuildersPouchMenu>(menu, inventory, title) {
-                            @Override
-                            protected void init() {
-                                this.imageWidth = BuildersPouchScreen.GUI_WIDTH;
-                                this.imageHeight = BuildersPouchScreen.GUI_HEIGHT;
-                                super.init();
-                            }
+        ScreenFactory<BuildersPouchMenu> pouchConstructor =
+                (menu, inventory, title) -> {
+                    BuildersPouchScreen delegate = new BuildersPouchScreen(menu, inventory, title);
+                    return new AbstractContainerScreen<BuildersPouchMenu>(menu, inventory, title) {
+                        @Override
+                        protected void init() {
+                            this.imageWidth = BuildersPouchScreen.GUI_WIDTH;
+                            this.imageHeight = BuildersPouchScreen.GUI_HEIGHT;
+                            super.init();
+                        }
 
-                            @Override
-                            protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
-                                delegate.renderBg(guiGraphics.pose(), partialTick, mouseX, mouseY, this.leftPos, this.topPos);
-                            }
+                        @Override
+                        protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
+                            delegate.renderBg(guiGraphics.pose(), partialTick, mouseX, mouseY, this.leftPos, this.topPos);
+                        }
 
-                            @Override
-                            public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-                                super.render(guiGraphics, mouseX, mouseY, partialTick);
-                                renderTooltip(guiGraphics, mouseX, mouseY);
-                            }
-                        };
+                        @Override
+                        public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+                            super.render(guiGraphics, mouseX, mouseY, partialTick);
+                            renderTooltip(guiGraphics, mouseX, mouseY);
+                        }
                     };
-            screens.put(ModMenuTypes.BUILDERS_POUCH_MENU, pouchConstructor);
-        } catch (Throwable ignored) {
-        }
+                };
+        registrar.register(ModMenuTypes.BUILDERS_POUCH_MENU, pouchConstructor);
+
     }
 
     public static Screen wrapScreen(net.minecraft.network.chat.Component title, Screen parent, com.kingodogo.buildscape.client.screen.IScreenDelegate delegate) {

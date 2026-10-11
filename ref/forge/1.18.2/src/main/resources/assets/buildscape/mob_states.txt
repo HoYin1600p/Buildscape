@@ -1,0 +1,120 @@
+# Mob Pillar States Configuration
+# Format: mob_name|state_name|description
+
+# Universal States (Work on almost any mob)
+*|spin|Makes the mob rotate continuously
+*|dinnerbone|Renders the mob upside-down
+*|grum|Renders the mob upside-down
+*|baby|Renders as a baby version
+*|glowing|Adds glowing effect
+*|fire|Renders on fire
+*|frozen|Renders frozen/shaking
+*|hurt|Flashes red (damage effect)
+*|invisible|Renders completely invisible
+
+# PASSIVE MOBS (Farm Animals & Pets)
+pig|saddled|Pig with saddle
+cow|baby|Baby cow
+sheep|sheared|Sheared sheep
+sheep|jeb|Rainbow sheep (jeb_)
+chicken|baby|Baby chicken
+horse|saddled|Saddled horse
+horse|diamond_armor|Diamond horse armor
+horse|gold_armor|Gold horse armor
+horse|iron_armor|Iron horse armor
+horse|leather_armor|Leather horse armor
+donkey|chested|Donkey with chests
+mule|chested|Mule with chests
+llama|chested|Llama with chests
+cat|tamed|Tamed cat (with collar)
+cat|sitting|Sitting cat
+wolf|angry|Angry wolf
+wolf|tamed|Tamed wolf (with collar)
+wolf|sitting|Sitting wolf
+fox|sleeping|Sleeping fox
+fox|sitting|Sitting fox
+rabbit|toast|Toast rabbit skin
+parrot|sitting|Sitting parrot
+axolotl|baby|Baby axolotl
+goat|screaming|Screaming goat
+goat|nohorns|Goat with no horns
+mooshroom|brown|Brown mooshroom
+strider|saddled|Saddled strider
+bee|nectar|Bee carrying nectar
+bee|angry|Angry bee
+turtle|baby|Baby turtle
+panda|baby|Baby panda
+
+# HOSTILE MOBS (Monsters)
+creeper|charged|Charged creeper (blue aura)
+creeper|ignited|About to explode (white flash)
+zombie|giant|Becomes a massive Giant entity
+husk|giant|Becomes a massive Giant entity
+drowned|giant|Becomes a massive Giant entity
+skeleton|baby|Baby skeleton
+stray|baby|Baby stray
+enderman|carrying|Holding a grass block
+spider|baby|Baby spider
+cave_spider|baby|Baby cave spider
+slime|tiny|Smallest slime size (0)
+slime|huge|Massive slime size (8)
+magma_cube|tiny|Smallest magma cube
+phantom|huge|Massive phantom
+shulker|open|Shulker peeking out
+blaze|fire|Burning blaze
+ghast|giant|Natural massive ghast size
+wither_skeleton|baby|Baby wither skeleton
+hoglin|baby|Baby hoglin
+piglin|baby|Baby piglin
+zombified_piglin|baby|Baby zombified piglin
+zoglin|baby|Baby zoglin
+evoker|casting|Casting spell (hands up)
+vindicator|johnny|Aggressive (axe raised)
+pillager|baby|Baby pillager
+ravager|baby|Baby ravager (uncommon but supported)
+witch|baby|Baby witch
+guardian|baby|Baby guardian
+elder_guardian|baby|Baby elder guardian
+silverfish|baby|Baby silverfish
+endermite|baby|Baby endermite
+vex|charging|Charging vex
+
+# AQUATIC MOBS
+squid|baby|Baby squid
+glow_squid|baby|Baby glow squid
+dolphin|baby|Baby dolphin
+cod|baby|Baby cod
+salmon|baby|Baby salmon
+pufferfish|puff|Fully puffed up
+pufferfish|baby|Baby pufferfish
+tropical_fish|kob|Kob variant
+tropical_fish|betty|Betty variant
+
+# SPECIAL OBJECTS
+armor_stand|arms|Show arms
+armor_stand|nobase|Hide base plate
+armor_stand|small|Small stand
+end_crystal|nobottom|Hide base bedrock
+item_frame|invisible|Invisible frame (if supported)
+boat|chest|Chest boat variant
+minecart|chest|Chest minecart variant
+
+# VILLAGERS
+villager|baby|Baby villager
+wandering_trader|baby|Baby wandering trader
+zombie_villager|baby|Baby zombie villager
+
+# BOSSES
+wither|invul|Wither with blue shield
+ender_dragon|sitting|Sitting dragon (if supported)
+warden|emerging|Emerging warden (animation state)
+
+# MISC
+bat|hanging|Hanging bat (if supported)
+polar_bear|baby|Baby polar bear
+snow_golem|nopumpkin|Snow golem without pumpkin
+iron_golem|cracked|Damaged golem texture
+tadpole|baby|Baby tadpole
+frog|cold|Cold biome frog (green)
+frog|warm|Warm biome frog (white)
+allay|item|Holding item

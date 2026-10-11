@@ -67,7 +67,9 @@ public class GlowLightsBlockEntity extends DataBlockEntity implements IDataSeria
 
     @Override
     public void writeData(IBlockEntityWriteData data) {
-        if (!this.dyeColors.isEmpty()) {
+        // The 1.18.2 save format retains DyeColors even when the list is empty.
+        if (!this.dyeColors.isEmpty()
+                || com.kingodogo.buildscape.platform.Services.isVersionCluster("v118x")) {
             data.putStringList("DyeColors", this.dyeColors);
         }
     }

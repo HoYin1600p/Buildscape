@@ -10,6 +10,7 @@ import net.minecraft.world.entity.EntityDimensions;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.RotatedPillarBlock;
 import net.minecraft.world.level.block.state.BlockState;
@@ -106,7 +107,7 @@ public final class HollowLogCrawlHandler {
         return isPlayerInsideHollowBlock(player, level) || isPlayerEnteringHollowBlock(player, level);
     }
 
-    private static boolean isConnectingHollowEnd(Level level, BlockPos pos, Direction dir) {
+    private static boolean isConnectingHollowEnd(BlockGetter level, BlockPos pos, Direction dir) {
         BlockPos neighborPos = pos.relative(dir);
         BlockState neighborState = level.getBlockState(neighborPos);
         Block block = neighborState.getBlock();
@@ -210,11 +211,14 @@ public final class HollowLogCrawlHandler {
         return false;
     }
     public static boolean isPlayerEnteringHollowBlock(Player player, Level level) {
-        if (!player.isShiftKeyDown() && !player.isCrouching()) {
+        return isEnteringHollowBlock(player.getBoundingBox(), player.isShiftKeyDown(), player.isCrouching(), level);
+    }
+
+    public static boolean isEnteringHollowBlock(AABB bb, boolean shiftDown, boolean crouching, BlockGetter level) {
+        if (!shiftDown && !crouching) {
             return false;
         }
 
-        AABB bb = player.getBoundingBox();
         int minY = Mth.floor(bb.minY - 0.2);
         int maxY = Mth.floor(bb.maxY + 0.2);
         int minX = Mth.floor(bb.minX - 0.3);

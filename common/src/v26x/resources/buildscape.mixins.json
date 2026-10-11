@@ -33,6 +33,7 @@
     "LevelChunkMixin",
     "LiquidBlockMixin",
     "LivingEntityMixin",
+    "HollowLogPlayerPoseMixin",
     "MinecraftServerMixin",
     "ShulkerBoxBlockEntityMixin",
     "ShulkerBoxBlockMixin",

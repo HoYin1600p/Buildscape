@@ -227,6 +227,10 @@ public class BlockFactory implements IBlockFactory {
             case "HazeBushBlock": {
                 var color = net.minecraft.world.item.DyeColor.byName(def.getId().replace("_haze_bush", ""), null);
                 return new com.kingodogo.buildscape.block.HazeBushBlock(color, props.noCollission().instabreak().sound(SoundType.GRASS)) {
+                    @Override public void animateTick(BlockState state, Level level, BlockPos pos, Random random) {
+                        super.animateTick(state, level, pos, random);
+                        HazeAnimation118x.animate(state, level, pos, random);
+                    }
                     @Override public net.minecraft.world.item.BlockItem createHazeItem(net.minecraft.world.item.Item.Properties properties) {
                         return new HazeBushItem(this, properties);
                     }
@@ -245,6 +249,10 @@ public class BlockFactory implements IBlockFactory {
                         def.getId().replace("potted_", "").replace("_haze_bush", ""), null);
                 var plant = com.kingodogo.buildscape.block.ModBlocks.get(com.kingodogo.buildscape.block.ModBlocks.COLORED_HAZE_BUSHES.get(color));
                 return new com.kingodogo.buildscape.block.PottedHazeBushBlock(color, plant, props) {
+                    @Override public void animateTick(BlockState state, Level level, BlockPos pos, Random random) {
+                        super.animateTick(state, level, pos, random);
+                        HazeAnimation118x.animate(state, level, pos, random);
+                    }
                     @Override public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player,
                             InteractionHand hand, BlockHitResult hit) {
                         return onInteract(state, level, pos, player, hand);

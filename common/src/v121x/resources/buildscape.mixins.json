@@ -27,6 +27,7 @@
     "ItemMixin",
     "LavaFluidMixin",
     "LevelMixin",
+    "LevelParticleV121xMixin",
     "LiquidBlockMixin",
     "LivingEntityMixin",
     "MinecraftServerMixin",

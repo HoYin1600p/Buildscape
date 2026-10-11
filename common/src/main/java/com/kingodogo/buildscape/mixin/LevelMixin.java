@@ -27,23 +27,6 @@ public abstract class LevelMixin {
         }
     }
 
-    @Inject(method = "addParticle(Lnet/minecraft/core/particles/ParticleOptions;ZZDDDDDD)V", at = @At("HEAD"), cancellable = true, require = 0)
-    private void onAddParticleAlways(ParticleOptions options, boolean alwaysRender, boolean overrideLimiter, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed, CallbackInfo ci) {
-        if (isWaterParticle(options)) {
-            Level self = (Level) (Object) this;
-            BlockPos pos = new BlockPos((int) Math.floor(x), (int) Math.floor(y), (int) Math.floor(z));
-            if (isExperienceFluid(self, pos)) {
-                ci.cancel();
-            }
-        }
-    }
-
-    // 1.18.2 signature (single alwaysRender flag).
-    @Inject(method = "addParticle(Lnet/minecraft/core/particles/ParticleOptions;ZDDDDDD)V", at = @At("HEAD"), cancellable = true, require = 0)
-    private void onAddParticleAlwaysLegacy(ParticleOptions options, boolean alwaysRender, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed, CallbackInfo ci) {
-        onAddParticle(options, x, y, z, xSpeed, ySpeed, zSpeed, ci);
-    }
-
     private static boolean isWaterParticle(ParticleOptions options) {
         if (options == null) return false;
         return options.getType() == ParticleTypes.SPLASH ||

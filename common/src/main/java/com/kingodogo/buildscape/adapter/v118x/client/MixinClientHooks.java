@@ -791,32 +791,39 @@ public final class MixinClientHooks {
     }
 
     private static List<ResourceLocation> buildscape$listBundledModels() {
+        var models = new java.util.TreeSet<ResourceLocation>(java.util.Comparator.comparing(ResourceLocation::toString));
+        String prefix = "assets/buildscape/models/";
         try {
-            Class<?> modListClass = Class.forName("net.minecraftforge.fml.ModList");
-            Object modList = modListClass.getMethod("get").invoke(null);
-            Object modFile = modListClass.getMethod("getModFileById", String.class).invoke(modList, "buildscape");
-            if (modFile != null) {
-                Object fileObj = modFile.getClass().getMethod("getFile").invoke(modFile);
-                java.nio.file.Path modelRoot = (java.nio.file.Path) fileObj.getClass().getMethod("findResource", String[].class).invoke(fileObj, (Object) new String[]{"assets", "buildscape", "models"});
-                if (modelRoot != null && java.nio.file.Files.isDirectory(modelRoot)) {
-                    try (var paths = java.nio.file.Files.walk(modelRoot)) {
-                        return paths
-                                .filter(java.nio.file.Files::isRegularFile)
-                                .map(modelRoot::relativize)
-                                .map(java.nio.file.Path::toString)
+            java.net.URL location = com.kingodogo.buildscape.BuildscapeCommon.class
+                    .getProtectionDomain().getCodeSource().getLocation();
+            java.nio.file.Path source = java.nio.file.Path.of(location.toURI());
+            if (java.nio.file.Files.isRegularFile(source)) {
+                try (var jar = new java.util.jar.JarFile(source.toFile())) {
+                    jar.stream().map(java.util.jar.JarEntry::getName)
+                            .filter(name -> name.startsWith(prefix) && name.endsWith(".json"))
+                            .map(name -> new ResourceLocation("buildscape", "models/" + name.substring(prefix.length())))
+                            .forEach(models::add);
+                }
+            } else {
+                // Development loaders keep compiled classes and resources in separate roots.
+                var roots = com.kingodogo.buildscape.BuildscapeCommon.class.getClassLoader().getResources(prefix);
+                while (roots.hasMoreElements()) {
+                    var rootUrl = roots.nextElement();
+                    if (!rootUrl.getProtocol().equals("file")) continue;
+                    var root = java.nio.file.Path.of(rootUrl.toURI());
+                    try (var paths = java.nio.file.Files.walk(root)) {
+                        paths.filter(java.nio.file.Files::isRegularFile).map(root::relativize)
+                                .map(path -> path.toString().replace(java.io.File.separatorChar, '/'))
                                 .filter(path -> path.endsWith(".json"))
-                                .map(path -> new ResourceLocation(
-                                        "buildscape",
-                                        "models/" + path.replace('\\', '/')
-                                ))
-                                .sorted(java.util.Comparator.comparing(ResourceLocation::toString))
-                                .toList();
+                                .map(path -> new ResourceLocation("buildscape", "models/" + path))
+                                .forEach(models::add);
                     }
                 }
             }
-        } catch (Throwable ignored) {
+        } catch (Exception exception) {
+            com.kingodogo.buildscape.BuildscapeCommon.LOGGER.debug("Cannot enumerate bundled models", exception);
         }
-        return List.of();
+        return List.copyOf(models);
     }
 
     public void handleFireworkStarterTick(Object starterObj) {
@@ -907,3 +914,4 @@ public final class MixinClientHooks {
         }
     }
 }
+

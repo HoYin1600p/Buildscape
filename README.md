@@ -41,3 +41,17 @@ Existing parity tooling can keep its explicit shared-code flags:
 
 The [parity harness](tools/parity-dumper/README.md) is a separate opt-in,
 test-only build and is never included in production jars.
+
+Fabric 1.18.2 server support is opt-in. It uses Fabric Loader 0.16.14,
+Fabric API 0.77.0+1.18.2 and the same Java 17 toolchain and v118x version
+as Forge. After caching the Fabric dependencies, build its intermediary
+release jar with:
+
+```powershell
+.\gradlew.bat :fabric:1.18.2:build '-Pbuildscape.fabric118x=true' --offline --console=plain --parallel --max-workers=8
+```
+
+The jar is written to `fabric/1.18.2/build/libs`. For a development dedicated
+server, accept Minecraft's EULA in `fabric/1.18.2/run/eula.txt` and run
+`:fabric:1.18.2:runServer` with the same opt-in property. Client setup remains
+under development.

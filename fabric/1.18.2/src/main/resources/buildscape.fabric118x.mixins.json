@@ -1,0 +1,32 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.kingodogo.buildscape.mixin.fabric",
+  "compatibilityLevel": "JAVA_17",
+  "refmap": "buildscape.fabric118x.refmap.json",
+  "mixins": [
+    "AdvancementCompletionMixin",
+    "AnvilUpdateMixin",
+    "BlockPlacementMixin",
+    "CraftingMixin",
+    "CraftingResultPreparationMixin",
+    "CreativeTabAllocationMixin",
+    "EndermanGriefingMixin",
+    "EndermanLeaveBlockGriefingMixin",
+    "ExplosionGriefingMixin",
+    "ItemUseFinishMixin",
+    "LivingDeathMixin",
+    "PlayerDimensionMixin",
+    "EntityDataMixin",
+    "BlockEntityDataMixin",
+    "ItemStackSizeAccessor",
+    "PoiMapAccessor",
+    "RecipeManagerMixin",
+    "BonemealMixin",
+    "BlockExperienceMixin",
+    "BucketFluidAccessor",
+    "FlowerPotPlantsAccessor",
+    "EntityTypeBuilderMixin"
+  ],
+  "injectors": { "defaultRequire": 1 }
+}

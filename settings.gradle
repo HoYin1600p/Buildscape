@@ -18,6 +18,11 @@ include 'common', 'fabric:26.2', 'neoforge:26.2'
 project(':fabric:26.2').projectDir = file('fabric/26.2')
 project(':neoforge:26.2').projectDir = file('neoforge/26.2')
 
+if (providers.gradleProperty('buildscape.fabric118x').getOrElse('false') == 'true') {
+    include ':fabric:1.18.2'
+    project(':fabric:1.18.2').projectDir = file('fabric/1.18.2')
+}
+
 // Milestone 1: shared-code Forge 1.18.2 joins the default build.
 // Use -Pbuildscape.v118x=false for the 26.2-only loader graph.
 def v118xEnabled = gradle.startParameter.projectProperties.get('buildscape.v118x') ?:
@@ -30,5 +35,5 @@ if (v118xEnabled == 'true') {
 
 // Parked by owner decision: Forge 26.x has no working toolchain;
 // 26.3 follows after 26.2; Forge 1.18.2 is enabled above unless opted out.
-// fabric:1.18.2, neoforge:1.21.1, fabric:1.21.1,
+// neoforge:1.21.1, fabric:1.21.1,
 // forge:1.21.1, forge:26.2, forge:26.3, fabric:26.3, neoforge:26.3

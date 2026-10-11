@@ -47,6 +47,8 @@ public final class BuildscapeMixinPlugin implements IMixinConfigPlugin {
 
     @Override
     public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
+        if (mixinClassName.endsWith(".BuildscapeForgeRegistryMixin")
+                && !classExists("net.minecraftforge.registries.ForgeRegistry")) return false;
         if (mixinClassName.endsWith(".BlockEntityMigrationMixin")) return is26x;
         if (mixinClassName.startsWith("com.kingodogo.buildscape.mixin.client.")) return is26x || mixinClassName.endsWith(".SoundMuffMixin");
         if (is26x && (mixinClassName.endsWith(".ScreenMixin") || mixinClassName.endsWith(".RenderBuffersMixin")

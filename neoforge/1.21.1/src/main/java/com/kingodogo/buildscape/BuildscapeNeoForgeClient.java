@@ -101,14 +101,9 @@ public final class BuildscapeNeoForgeClient {
                     for (var block : net.minecraft.core.registries.BuiltInRegistries.BLOCK) {
                         var id = net.minecraft.core.registries.BuiltInRegistries.BLOCK.getKey(block);
                         if (!BuildscapeCommon.MOD_ID.equals(id.getNamespace())) continue;
-                        var layer = com.kingodogo.buildscape.client.BuildscapeRenderLayers.getRenderLayer(id.getPath());
-                        var renderType = switch (layer) {
-                            case SOLID -> net.minecraft.client.renderer.RenderType.solid();
-                            case CUTOUT -> net.minecraft.client.renderer.RenderType.cutout();
-                            case CUTOUT_MIPPED -> net.minecraft.client.renderer.RenderType.cutoutMipped();
-                            case TRANSLUCENT -> net.minecraft.client.renderer.RenderType.translucent();
-                        };
-                        net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(block, renderType);
+                        // main's full 1.18.2 list: 1.21.1 keeps content 26.2 retired (eyeblossoms, 1.21.5 plants, ...).
+                        var renderType = com.kingodogo.buildscape.adapter.v121x.client.BuildscapeRenderLayers.getRenderType(id.getPath());
+                        if (renderType != null) net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(block, renderType); // null = solid
                     }
                 }));
         var gameBus = net.neoforged.neoforge.common.NeoForge.EVENT_BUS;

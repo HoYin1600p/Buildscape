@@ -181,6 +181,57 @@ def retired_path(path, target, policy, source=None):
                               for entry in policy["removed_ids"]))
 
 
+def java_roots(target):
+    return list(dict.fromkeys([target["java_root"], *target.get("java_roots", [])]))
+
+
+def mapped_java(repo, target, old, row, source):
+    paths = [relative(p.strip()) for p in (row or {}).get("active_paths", "").split(";")
+             if p.strip() and p.strip() != "n/a"]
+    prefix = source["subtree"] + "/main/java/"
+    roots = java_roots(target)
+    resolved = []
+    for path in paths:
+        # Older ledger rows can still name a file before its cluster-root move.
+        if blob(repo, target["branch"], path, True) is None:
+            root = next((r for r in roots if path.startswith(r + "/")), None)
+            alternatives = [r + path[len(root):] for r in roots if r != root] if root else []
+            moved = [p for p in alternatives if blob(repo, target["branch"], p, True) is not None]
+            resolved.extend(moved or [path])
+        else:
+            resolved.append(path)
+    if old.startswith(prefix):
+        counterparts = [r + "/" + old[len(prefix):] for r in roots]
+        resolved.extend(p for p in counterparts if p not in resolved
+                        and blob(repo, target["branch"], p, True) is not None)
+    return list(dict.fromkeys(resolved))
+
+
+def affected_clusters(paths, target, source_path=""):
+    clusters = target.get("version_clusters", [target.get("version_cluster", "")])
+    result = set()
+    for path in paths:
+        match = re.search(r"/(?:src|adapter)/(v\w+)/", path)
+        if match:
+            result.add(match[1])
+        elif path.startswith(target["java_root"] + "/"):
+            result.update(clusters)
+    # The reference snapshot (resources and metadata included) feeds Forge 1.18.2.
+    if source_path and "v118x" in clusters:
+        result.add("v118x")
+    if "/resources/" in source_path:
+        result.add(target.get("version_cluster", ""))
+    return sorted(result - {""})
+
+
+def retired_change(entry, target, policy, source):
+    paths = entry["target_paths"]
+    if entry["path"].endswith(".java") and paths:
+        return all(retired_path(p, target, policy) for p in paths)
+    return (retired_path(entry["path"], target, policy, source)
+            or bool(paths and all(retired_path(p, target, policy) for p in paths)))
+
+
 def classify(repo, source_repo, target, base, head, change, rows, source, policy=None):
     entry = dict(change)
     old, path = entry["old_path"], entry["path"]
@@ -189,16 +240,19 @@ def classify(repo, source_repo, target, base, head, change, rows, source, policy
               if p.strip() and p.strip() != "n/a"]
     java_prefix = source["subtree"] + "/main/java/"
     resource_prefix = source["subtree"] + "/main/resources/"
-    canonical = target["java_root"] + "/" + old[len(java_prefix):] if old.startswith(java_prefix) else None
-    if not mapped and canonical and blob(repo, target["branch"], canonical, True) is not None:
-        mapped = [canonical]
+    is_java = old.endswith(".java") or path.endswith(".java")
+    if is_java:
+        mapped = mapped_java(repo, target, old, row, source)
+    canonical_root = next((r for r in java_roots(target)
+                           if mapped == [r + "/" + old[len(java_prefix):]]), None) if old.startswith(java_prefix) else None
+    canonical = canonical_root + "/" + old[len(java_prefix):] if canonical_root else None
     entry["target_paths"] = mapped
+    entry["affected_clusters"] = affected_clusters(mapped, target, path)
     entry["classification"] = "review"
     entry["reason"] = "Build or metadata change requires review"
-    is_java = old.endswith(".java") or path.endswith(".java")
     if entry["change"] == "deleted":
         entry["reason"] = "Deleted source: retain target code and mark ledger for review"
-    elif metadata(old) or metadata(path):
+    elif not is_java and (metadata(old) or metadata(path)):
         pass
     elif path.startswith(resource_prefix):
         entry.update(classification="automatic", reason="Resource conversion and validation", kind="resource")
@@ -208,7 +262,7 @@ def classify(repo, source_repo, target, base, head, change, rows, source, policy
                      blob(repo, target["branch"], mapped[0], True) == old_bytes)
         rename_ok = entry["change"] != "renamed" or (mapped == [canonical] and path.startswith(java_prefix))
         if identical and rename_ok:
-            destination = (target["java_root"] + "/" + path[len(java_prefix):]
+            destination = (canonical_root + "/" + path[len(java_prefix):]
                            if entry["change"] == "renamed" else mapped[0])
             if destination != mapped[0] and blob(repo, target["branch"], destination, True) is not None:
                 identical = False
@@ -222,8 +276,7 @@ def classify(repo, source_repo, target, base, head, change, rows, source, policy
                          kind="java")
     else:
         entry["reason"] = "Unrecognized source file requires review"
-    if retired_path(path, target, policy, source) or (mapped and all(
-            retired_path(p, target, policy) for p in mapped)):
+    if retired_change(entry, target, policy, source):
         entry.update(classification="retired", reason="Intentionally removed by mc26.2 policy")
     entry["source_diff"] = text(git(source_repo, "diff", "--no-ext-diff", "--no-textconv",
                                      base, head, "--", old, path))
@@ -244,8 +297,13 @@ def make_plan(repo, config, target_id, registry_path="sync/targets.json", source
     items = [classify(repo, source_root, target, base, head, c, rows, source, policy)
              for c in changes(source_root, base, head, source)]
     pending = json_blob(repo, target["branch"], target["state_file"], {"pending": []})["pending"]
-    pending = [c for c in pending if not retired_path(c["path"], target, policy, source)
-               and not (c["target_paths"] and all(retired_path(p, target, policy) for p in c["target_paths"]))]
+    for c in pending:
+        if c["path"].endswith(".java"):
+            row = next((r for r in rows if r["reference_path"] in {c["old_path"], c["path"]}), None)
+            c["target_paths"] = mapped_java(repo, target, c["old_path"], row or
+                                            {"active_paths": ";".join(c["target_paths"])}, source)
+        c["affected_clusters"] = affected_clusters(c["target_paths"], target, c["path"])
+    pending = [c for c in pending if not retired_change(c, target, policy, source)]
     for c in items + pending:
         # A brief can precede apply: new source files may not yet exist in the snapshot.
         c["reference_context"] = []
@@ -257,7 +315,9 @@ def make_plan(repo, config, target_id, registry_path="sync/targets.json", source
     plan = {"schema_version": 1, "target": target_id, "target_branch": target["branch"],
             "target_commit": text(git(repo, "rev-parse", target["branch"] + "^{commit}")).strip(),
             "source": source, "base_commit": base, "source_commit": head,
-            "commits": commits, "changes": items, "pending": pending, "removal_policy": policy}
+            "commits": commits, "changes": items, "pending": pending, "removal_policy": policy,
+            "version_clusters": target.get("version_clusters", [target.get("version_cluster", "")]),
+            "validation": target.get("validation", []), "gated_validation": target.get("gated_validation", [])}
     return plan, target, branch_config, source_root
 
 
@@ -272,6 +332,7 @@ def write_report(plan, output):
     for c in plan["changes"]:
         lines += ["", f"## {c['path']}", "", f"{c['change']}: **{c['classification']}**. {c['reason']}.",
                   "Targets: " + (", ".join(c["target_paths"]) or "unmapped"), "",
+                  "VersionClusters: " + (", ".join(c.get("affected_clusters", [])) or "review"), "",
                   "```diff", c["source_diff"].rstrip(), "```"]
     if plan["pending"]:
         lines += ["", "## Outstanding review queue", ""]
@@ -340,6 +401,35 @@ def command(template, values, cwd, log):
         raise SyncError(f"Validation/conversion failed ({code}); see {log}")
 
 
+def validate(target, values, worktree, log):
+    if not target.get("validation"):
+        raise SyncError("Active target must declare validation commands")
+    results = []
+    for check in target["validation"]:
+        command(check, values, worktree, log)
+        results.append({"command": check, "status": "passed"})
+    for check in target.get("gated_validation", []):
+        start = log.stat().st_size if log.exists() else 0
+        try:
+            command(check["command"], values, worktree, log)
+        except SyncError:
+            with log.open("rb") as stream:
+                stream.seek(start)
+                output = stream.read().decode("utf-8", "replace")
+            cache_miss = re.search(r"(?:No cached [^\n]+(?:offline mode|offline)|"
+                                   r"Cannot [^\n]+ in offline mode)", output, re.IGNORECASE)
+            if not check.get("skip_on_offline_cache_miss") or not cache_miss:
+                raise
+            note = "Forge 1.18.2 validation skipped: offline cache lacks required artifacts; -Pbuildscape.v118x=true needs network."
+            with log.open("a", encoding="utf-8") as stream:
+                stream.write(note + "\n")
+            print(note)
+            results.append({"command": check["command"], "status": "skipped", "reason": note})
+        else:
+            results.append({"command": check["command"], "status": "passed"})
+    return results
+
+
 def resource_changes(worktree, source_repo, plan, target, values, log, temp, conflict_dir):
     prefix = plan["source"]["subtree"] + "/main/resources/"
     old_dir, new_dir = temp / "old-resources", temp / "new-resources"
@@ -403,11 +493,18 @@ def update_ledger(worktree, plan, target, fields, rows, conflicts=()):
             if c["kind"] == "java":
                 row["active_paths"] = c["destination"]
             row["verification"] = "Sync validation PASS for source " + plan["source_commit"]
+            if any(r["status"] == "skipped" for r in plan.get("apply", {}).get("validation", [])):
+                row["verification"] = "Sync validation PARTIAL (Forge 1.18.2 offline cache missing) for source " + plan["source_commit"]
         else:
+            if c.get("kind") == "java":
+                row["active_paths"] = ";".join(c["target_paths"]) or "n/a"
             row["status"] = "needs_resync"
             row["verification"] = "Review required for source " + plan["source_commit"]
     conflicted = {c["path"] for c in conflicts}
     for row in rows:
+        if "era_coverage" in fields:
+            coverage = [p for p in row["era_coverage"].split(";") if p]
+            row["era_coverage"] = ";".join(dict.fromkeys(coverage + target.get("ledger_coverage", [])))
         if row.get("kind") == "resource" and row.get("active_paths") in conflicted:
             row["status"] = "needs_resync"
             row["verification"] = "Review required for source " + plan["source_commit"] + ": port-specific edit"
@@ -482,10 +579,7 @@ def apply_plan(repo, plan, target, branch_config, source_repo, registry_path, ou
                 local(snapshot, rel).unlink()
         for path, data in wanted.items():
             write_file(local(snapshot, path), data)
-        if not target.get("validation"):
-            raise SyncError("Active target must declare validation commands")
-        for check in target["validation"]:
-            command(check, values, worktree, log)
+        plan["apply"]["validation"] = validate(target, values, worktree, log)
         fields, rows = read_ledger(repo, plan["target_commit"], target["mapping_file"])
         update_ledger(worktree, plan, target, fields, rows, conflicts)
         pending = list(plan["pending"])
@@ -503,7 +597,7 @@ def apply_plan(repo, plan, target, branch_config, source_repo, registry_path, ou
         branch_config["source"] = plan["source"]
         dump(local(worktree, registry_path), branch_config)
         git(worktree, "add", "--", registry_path, target["mapping_file"], target["reference_snapshot"],
-            target["java_root"], target["resource_root"], target["state_file"])
+            *java_roots(target), target["resource_root"], target["state_file"])
         git(worktree, "add", "-f", "--", target["reference_snapshot"])
         git(worktree, "-c", "user.name=HoY", "-c", "user.email=hoyin1600p@gmail.com", "commit", "-m",
             f"Sync {target['id']} from {plan['base_commit'][:12]} to {plan['source_commit'][:12]}")
@@ -549,6 +643,7 @@ def briefs(plan, target, output):
                     "mc_jar": os.environ.get("BUILDSCAPE_SYNC_MC_JAR") or target.get("mc_jar", ""),
                     "gradle": "gradlew.bat" if os.name == "nt" else "./gradlew"})
                     for a in target["validation"][-1]],
+                "gated_validation": target.get("gated_validation", []),
                 "source_changes": group}
         dump(output / (task["task_id"] + ".json"), task)
     return len(groups)

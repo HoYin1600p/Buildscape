@@ -413,6 +413,122 @@ p.write_text(json.dumps({'converted': True, 'new': (root / 'data/kept.json').exi
             if t["minecraft"] == "26.3":
                 self.assertEqual(t["status"], "paused")
 
+    def cluster_target(self):
+        target = self.config["targets"][0]
+        target.update(id="mc26.2", version_cluster="v26x", version_clusters=["v26x", "v118x"],
+                      java_roots=["common/src/main/java", "common/src/v118x/java", "common/src/v26x/java"],
+                      ledger_coverage=["26x", "118x"], reference_snapshot="ref/forge/1.18.2")
+        (self.repo / "ref/source").rename(self.repo / "ref/forge-tmp")
+        (self.repo / "ref/forge").mkdir()
+        (self.repo / "ref/forge-tmp").rename(self.repo / "ref/forge/1.18.2")
+        for name, cluster in (("Same", "v118x"), ("Fallback", "v26x"), ("Rename", "v118x")):
+            old = "common/" + self.java + name + ".java"
+            dest = "common/src/" + cluster + "/java/example/" + name + ".java"
+            self.write(self.repo, dest, (self.repo / old).read_bytes())
+            (self.repo / old).unlink()
+        # A removal on 26.2 must not retire a restored v118x counterpart.
+        self.write(self.repo, "sync/removals26x.json", json.dumps({"schema_version": 1, "target": "mc26.2",
+            "removed_ids": [], "excluded_target_paths": ["common/" + self.java + "Same.java"]}))
+        self.write(self.repo, "sync/targets.json", json.dumps(self.config))
+        commit = self.commit(self.repo, "Cluster roots")
+        self.git(self.repo, "branch", "-f", "port/test", commit)
+        return target
+
+    def test_one_plan_and_apply_cover_both_clusters_and_exact_reference(self):
+        self.cluster_target()
+        self.mutate_source()
+        self.write(self.source, self.resources + "binary.dat", b"\x00\xff\r\nunchanged bytes\r\n")
+        self.write(self.source, "src/test/java/example/Parity.java", b"class Parity {}\r\n")
+        head = self.commit(self.source, "Reference binary and test inputs")
+        plan, target, config, source = sync.make_plan(self.repo, self.config, "mc26.2", source_repo=self.source)
+        changes = {c["path"]: c for c in plan["changes"]}
+        for name, cluster in (("Same", "v118x"), ("Fallback", "v26x")):
+            entry = changes[self.java + name + ".java"]
+            self.assertEqual(entry["classification"], "automatic")
+            self.assertEqual(entry["destination"], "common/src/" + cluster + "/java/example/" + name + ".java")
+            self.assertIn(cluster, entry["affected_clusters"])
+        self.assertEqual(changes[self.java + "Mapped.java"]["affected_clusters"], ["v118x", "v26x"])
+        rename = changes[self.java + "Renamed.java"]
+        self.assertEqual(rename["classification"], "automatic")
+        self.assertEqual(rename["destination"], "common/src/v118x/java/example/Renamed.java")
+        sync.apply_plan(self.repo, plan, target, config, source, "sync/targets.json", self.output)
+        branch = plan["apply"]["branch"]
+        snapshot = sync.files_at(self.repo, branch, [target["reference_snapshot"]])
+        actual = {p[len(target["reference_snapshot"]) + 1:]: data for p, data in snapshot.items()}
+        self.assertEqual(actual, sync.files_at(self.source, head, sync.scope(self.config["source"])))
+        self.assertIsNone(sync.blob(self.repo, branch, "common/src/v118x/java/example/Rename.java", True))
+        self.assertEqual(sync.blob(self.repo, branch, "common/src/v118x/java/example/Same.java"),
+                         sync.blob(self.source, head, self.java + "Same.java"))
+        rows = self.read_csv(branch)
+        self.assertEqual(rows[self.java + "Same.java"]["active_paths"], "common/src/v118x/java/example/Same.java")
+        self.assertTrue(all("118x" in r["era_coverage"].split(";") for r in rows.values()))
+
+    def test_single_identical_v118x_mixin_can_sync(self):
+        target = self.cluster_target()
+        path = self.java + "ExampleMixin.java"
+        old = b"class ExampleMixin {}\n"
+        self.write(self.source, path, old)
+        base = self.commit(self.source, "Mixin baseline")
+        dest = "common/src/v118x/java/example/ExampleMixin.java"
+        self.write(self.repo, dest, old)
+        commit = self.commit(self.repo, "Mixin counterpart")
+        self.git(self.repo, "branch", "-f", "port/test", commit)
+        self.write(self.source, path, b"class ExampleMixin { int added; }\n")
+        head = self.commit(self.source, "Mixin change")
+        entry = sync.classify(self.repo, self.source, target, base, head,
+                             {"path": path, "old_path": path, "change": "modified"}, [], self.config["source"])
+        self.assertEqual(entry["classification"], "automatic")
+        self.assertEqual(entry["destination"], dest)
+
+    def test_validation_commands_cover_both_clusters_and_preserve_dotted_properties(self):
+        root = Path(__file__).resolve().parents[2]
+        target = json.loads((root / "sync/targets.json").read_text())["targets"][0]
+        mandatory = target["validation"][-1]
+        self.assertIn(":common:compileV118xJava", mandatory)
+        self.assertIn(":fabric:26.2:build", mandatory)
+        self.assertIn(":neoforge:26.2:build", mandatory)
+        gated = target["gated_validation"][0]["command"]
+        for token in (":forge:1.18.2:build", ":forge:1.18.2:check", "-Pbuildscape.v118x=true",
+                      "-Pbuildscape.v118xSource=common", "--offline", "--console=plain", "--no-daemon"):
+            self.assertIn(token, gated)
+        values = {"gradle": str(self.root / "space's tools/gradlew.bat")}
+        log = self.root / "validation.log"
+        with mock.patch("sync.subprocess.run", return_value=subprocess.CompletedProcess([], 0)) as execute:
+            sync.command(gated, values, self.root, log)
+        self.assertEqual(execute.call_args.args[0], [a.format_map(values) for a in gated])
+        # Argument arrays preserve dotted -P values; durable logs quote them for inspection.
+        self.assertIn("'-Pbuildscape.v118x=true'", log.read_text())
+        self.assertIn("'-Pbuildscape.v118xSource=common'", log.read_text())
+
+    def test_gated_forge_cache_miss_is_partial_and_code_failure_is_fatal(self):
+        log = self.root / "validation.log"
+        target = {"validation": [["required"]], "gated_validation": [
+            {"command": ["forge"], "skip_on_offline_cache_miss": True}]}
+        def cache_miss(check, values, cwd, logfile):
+            with logfile.open("a") as stream:
+                stream.write("No cached version of forge:40.3.12 available for offline mode.\n")
+            if check == ["forge"]:
+                raise sync.SyncError("Validation/conversion failed")
+        with mock.patch("sync.command", side_effect=cache_miss):
+            results = sync.validate(target, {}, self.repo, log)
+        self.assertEqual([r["status"] for r in results], ["passed", "skipped"])
+        self.assertIn("needs network", results[-1]["reason"])
+        # A previous cache warning must not hide a later compiler failure.
+        def compiler_error(check, values, cwd, logfile):
+            with logfile.open("a") as stream:
+                stream.write("error: cannot find symbol\n")
+            if check == ["forge"]:
+                raise sync.SyncError("Validation/conversion failed")
+        with mock.patch("sync.command", side_effect=compiler_error):
+            with self.assertRaises(sync.SyncError):
+                sync.validate(target, {}, self.repo, log)
+        row = dict(self.rows[0])
+        plan = {"source_commit": self.base, "changes": [{"old_path": row["reference_path"],
+            "path": row["reference_path"], "classification": "automatic", "kind": "java",
+            "destination": row["active_paths"]}], "apply": {"validation": results}}
+        sync.update_ledger(self.repo, plan, self.config["targets"][0], list(row), [row])
+        self.assertIn("PARTIAL", row["verification"])
+
     def test_default_output_is_ignored_build_folder_unless_overridden(self):
         with mock.patch.dict(os.environ, {}, clear=True):
             self.assertEqual(sync.default_output(self.root), self.root / "build" / "sync-reports")

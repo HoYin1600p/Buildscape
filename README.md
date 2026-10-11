@@ -13,7 +13,7 @@ already be cached for offline builds.
 .\gradlew.bat build --offline --console=plain --parallel --max-workers=8
 ```
 
-At Milestone 1, the default build includes Fabric and NeoForge 26.2 and
+The default build includes Fabric and NeoForge 26.2 and
 Forge 1.18.2 using shared code (`buildscape.v118xSource=common`). It runs
 `:common:v118xTest`, all `:common:v118xRun*Tests` tasks and the v118x recipe
 checks alongside the 26.2 tests. The Forge production jar is

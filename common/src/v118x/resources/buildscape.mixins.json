@@ -35,13 +35,12 @@
                    "ShulkerBoxBlockEntityV118xMixin",
                    "ShulkerBoxBlockMixin",
                    "ShulkerBoxMenuMixin",
-                   "SmithingMenuMixin",
+                   "SmithingMenuV118xMixin",
                    "FlowingFluidV118xMixin",
                    "LavaFluidMixin",
                    "LiquidBlockMixin",
                    "FireworkRocketEntityMixin",
                    "LightningBoltMixin",
-                   "LevelChunkMixin",
                    "PoiTypeAccessor"
                ],
     "client":  [
@@ -70,9 +69,7 @@
                    "ThrownTridentAccessor",
                    "ThrownTridentRendererMixin",
                    "SignRendererMixin",
-                   "client.SoundMuffMixin",
-                   "HazeBushAnimateMixin",
-                   "HazeBushTrackingMixin"
+                   "client.SoundMuffMixin"
                ],
     "injectors":  {
                       "defaultRequire":  1

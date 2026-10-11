@@ -92,6 +92,14 @@ public final class CopperOxidationHandler {
         registerWaxPair("weathered_slit_copper_vertical_slab", "waxed_weathered_slit_copper_vertical_slab");
         registerWaxPair("oxidized_slit_copper_vertical_slab", "waxed_oxidized_slit_copper_vertical_slab");
 
+        if (Services.isVersionCluster("v121x")) {
+            for (String family : java.util.List.of("copper_bars", "copper_chain", "copper_lantern", "copper_chest", "copper_rod")) {
+                registerChain(family, "exposed_" + family, "weathered_" + family, "oxidized_" + family);
+                for (String prefix : java.util.List.of("", "exposed_", "weathered_", "oxidized_")) {
+                    registerWaxPair(prefix + family, "waxed_" + prefix + family);
+                }
+            }
+        }
         initialized = true;
     }
 

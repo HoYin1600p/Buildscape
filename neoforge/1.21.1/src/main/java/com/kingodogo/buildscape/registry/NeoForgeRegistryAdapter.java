@@ -46,7 +46,12 @@ public class NeoForgeRegistryAdapter extends BaseRegistryAdapter {
         activeEvent = event;
         try {
             var key = event.getRegistryKey();
-            if (key.equals(Registries.BLOCK)) {
+            if (key.equals(Registries.FLUID)) {
+                Services.PLATFORM.register(BuiltInRegistries.FLUID, new CommonId(namespace, "experience_still"),
+                        com.kingodogo.buildscape.adapter.v121x.ExperienceFluids.still());
+                Services.PLATFORM.register(BuiltInRegistries.FLUID, new CommonId(namespace, "experience_flowing"),
+                        com.kingodogo.buildscape.adapter.v121x.ExperienceFluids.flowing());
+            } else if (key.equals(Registries.BLOCK)) {
                 initBlocks();
                 registerTo(BuiltInRegistries.BLOCK, modBlocks);
             } else if (key.equals(Registries.ITEM)) {
@@ -88,6 +93,16 @@ public class NeoForgeRegistryAdapter extends BaseRegistryAdapter {
                     entry.register().accept(event);
                     iterator.remove();
                 }
+            }
+            if (key.equals(Registries.BLOCK)) {
+                com.kingodogo.buildscape.adapter.v121x.RemovedIdAliases.register(BuiltInRegistries.BLOCK,
+                        BuiltInRegistries.BLOCK::addAlias);
+            } else if (key.equals(Registries.ITEM)) {
+                com.kingodogo.buildscape.adapter.v121x.RemovedIdAliases.register(BuiltInRegistries.ITEM,
+                        BuiltInRegistries.ITEM::addAlias);
+            } else if (key.equals(Registries.ENTITY_TYPE)) {
+                com.kingodogo.buildscape.adapter.v121x.RemovedIdAliases.register(BuiltInRegistries.ENTITY_TYPE,
+                        BuiltInRegistries.ENTITY_TYPE::addAlias);
             }
             completed.add(key);
         } finally {

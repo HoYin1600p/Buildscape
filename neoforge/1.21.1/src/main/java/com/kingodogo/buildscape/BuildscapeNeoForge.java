@@ -5,6 +5,17 @@ import net.neoforged.fml.common.Mod;
 @Mod("buildscape")
 public class BuildscapeNeoForge {
     public BuildscapeNeoForge(net.neoforged.bus.api.IEventBus modEventBus) {
+        com.kingodogo.buildscape.adapter.v121x.ExperienceFluids.installFactories(
+                () -> new com.kingodogo.buildscape.adapter.v121x.ExperienceFluids.Source() {
+                    @Override public net.neoforged.neoforge.fluids.FluidType getFluidType() {
+                        return net.neoforged.neoforge.common.NeoForgeMod.WATER_TYPE.value();
+                    }
+                },
+                () -> new com.kingodogo.buildscape.adapter.v121x.ExperienceFluids.Flowing() {
+                    @Override public net.neoforged.neoforge.fluids.FluidType getFluidType() {
+                        return net.neoforged.neoforge.common.NeoForgeMod.WATER_TYPE.value();
+                    }
+                });
         com.kingodogo.buildscape.BuildscapeCommon.prepareRegistration();
         modEventBus.addListener(((com.kingodogo.buildscape.registry.NeoForgeRegistryAdapter)
                 com.kingodogo.buildscape.platform.Services.REGISTRY)::onRegister);

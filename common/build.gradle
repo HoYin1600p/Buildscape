@@ -55,7 +55,7 @@ sourceSets {
 
     v121xTest {
         java.srcDirs = ['src/v121xTest/java']
-        resources.srcDirs = []
+        resources.srcDirs = ['src/v121xTest/resources']
         def minecraftClasspath = files(provider { tasks.named('compileV121xJava', JavaCompile).get().classpath })
         compileClasspath += sourceSets.v121x.output + minecraftClasspath
         runtimeClasspath += sourceSets.v121x.output + sourceSets.v121x.runtimeClasspath + minecraftClasspath

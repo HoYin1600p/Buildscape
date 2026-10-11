@@ -62,10 +62,12 @@ public abstract class BaseRegistryAdapter implements IRegistryAdapter {
 
     @Override
     public <T> RegistrySupplier<T> registerBlockEntity(String name, Supplier<T> blockEntitySupplier) {
-        if (Services.isVersionCluster("v118x")) {
+        if (Services.isVersionCluster("v118x") || Services.isVersionCluster("v121x")) {
             if (name.equals("pillar_block_entity")) {
-                registerClusterBlockEntity("mangrove_sign_block_entity");
-                registerClusterBlockEntity("bamboo_sign_block_entity");
+                if (Services.isVersionCluster("v118x")) {
+                    registerClusterBlockEntity("mangrove_sign_block_entity");
+                    registerClusterBlockEntity("bamboo_sign_block_entity");
+                }
             } else if (name.equals("shelf")) {
                 registerClusterBlockEntity("copper_chest");
                 registerClusterBlockEntity("potent_sulfur");
@@ -211,7 +213,7 @@ public abstract class BaseRegistryAdapter implements IRegistryAdapter {
                 modItems.put(id, item);
             } else if (obj instanceof ItemDefinition def) {
                 Block matchingBlock = modBlocks.get(id);
-                modItems.put(id, Services.isVersionCluster("v118x")
+                modItems.put(id, (Services.isVersionCluster("v118x") || Services.isVersionCluster("v121x"))
                         ? Services.PLATFORM.createRegisteredItem(def, matchingBlock)
                         : matchingBlock != null ? ItemFactory.createBlockItem(id, matchingBlock, def.getProperties())
                         : ItemFactory.createItem(def));
@@ -220,9 +222,9 @@ public abstract class BaseRegistryAdapter implements IRegistryAdapter {
     }
 
     protected void initBlockEntities() {
-        Map<String, BlockEntityType<?>> clusterTypes = Services.isVersionCluster("v118x")
+        Map<String, BlockEntityType<?>> clusterTypes = (Services.isVersionCluster("v118x") || Services.isVersionCluster("v121x"))
                 ? Services.PLATFORM.createClusterBlockEntityTypes(modBlocks) : Map.of();
-        if (!clusterTypes.isEmpty()) {
+        if (Services.isVersionCluster("v118x") && !clusterTypes.isEmpty()) {
             modBlockEntities.put("mangrove_sign_block_entity", clusterTypes.get("mangrove_sign_block_entity"));
             modBlockEntities.put("bamboo_sign_block_entity", clusterTypes.get("bamboo_sign_block_entity"));
         }

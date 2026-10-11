@@ -102,9 +102,13 @@ would construct; two different lambdas in the same class can share that
 identity. Context-dependent color callbacks report `requiresContext` rather
 than inventing a color. These snapshots compare registrations and sampled
 properties; in-game behavior and save compatibility still need the later
-integration stages. Private client maps use pinned 1.18.2 mojmap/SRG field
-names; Mixin inspection is pinned to its 0.8.5 implementation. Inspection
-failures invalidate the dump.
+integration stages. Private client maps try literal 1.18.2 Mojang and SRG field
+names, including Forge's SRG-named delegate-keyed color maps on dev clients.
+If names differ, an unambiguous generic map type identifies the table; color
+delegates are resolved to registry IDs. A client table failure does not stop
+the remaining tables: the manifest records it under `errors`, keyed by the
+table's filename, and keeps `complete` false. Mixin inspection is pinned to
+its 0.8.5 implementation. Inspection failures invalidate the dump.
 
 ## Compare
 

@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.Registry;
@@ -42,10 +43,16 @@ final class RegistryDump {
 
     static Map<String, JsonElement> common() {
         Map<String, JsonElement> files = new TreeMap<>();
-        files.put("blocks.json", entries(Registry.BLOCK, RegistryDump::block));
-        files.put("items.json", entries(Registry.ITEM, RegistryDump::item));
-        files.put("creative-tabs.json", tabs());
-        files.put("block-entities.json", entries(Registry.BLOCK_ENTITY_TYPE, type -> {
+        commonTables().forEach((filename, supplier) -> files.put(filename, supplier.get()));
+        return files;
+    }
+
+    static Map<String, Supplier<JsonElement>> commonTables() {
+        Map<String, Supplier<JsonElement>> files = new TreeMap<>();
+        files.put("blocks.json", () -> entries(Registry.BLOCK, RegistryDump::block));
+        files.put("items.json", () -> entries(Registry.ITEM, RegistryDump::item));
+        files.put("creative-tabs.json", RegistryDump::tabs);
+        files.put("block-entities.json", () -> entries(Registry.BLOCK_ENTITY_TYPE, type -> {
             List<String> valid = new ArrayList<>();
             // isValid queries the real set without instantiating block entities.
             Registry.BLOCK.keySet().stream().sorted().forEach(id -> {
@@ -53,19 +60,21 @@ final class RegistryDump {
             });
             return DumpIO.object("implementation", DumpIO.implementation(type), "validBlocks", valid);
         }));
-        files.put("entities.json", entries(Registry.ENTITY_TYPE, type -> DumpIO.object(
+        files.put("entities.json", () -> entries(Registry.ENTITY_TYPE, type -> DumpIO.object(
                 "implementation", DumpIO.implementation(type), "category", type.getCategory().getName(),
                 "width", type.getWidth(), "height", type.getHeight(), "save", type.canSerialize(),
                 "summon", type.canSummon(), "trackingRange", type.clientTrackingRange(), "updateInterval", type.updateInterval())));
-        files.put("menus.json", entries(Registry.MENU, type -> DumpIO.object("implementation", DumpIO.implementation(type))));
-        files.put("particles.json", entries(Registry.PARTICLE_TYPE, type -> DumpIO.object(
+        files.put("menus.json", () -> entries(Registry.MENU, type -> DumpIO.object("implementation", DumpIO.implementation(type))));
+        files.put("particles.json", () -> entries(Registry.PARTICLE_TYPE, type -> DumpIO.object(
                 "implementation", DumpIO.implementation(type), "overrideLimiter", type.getOverrideLimiter())));
-        files.put("sounds.json", entries(Registry.SOUND_EVENT, sound -> DumpIO.object("location", sound.getLocation())));
-        JsonObject allRegistries = new JsonObject();
-        Registry.REGISTRY.forEach(registry -> allRegistries.add(registry.key().location().toString(),
-                entries(registry, entry -> DumpIO.object("implementation", DumpIO.implementation(entry)))));
-        files.put("registry-entries.json", allRegistries);
-        files.put("mixins.json", MixinDump.snapshot());
+        files.put("sounds.json", () -> entries(Registry.SOUND_EVENT, sound -> DumpIO.object("location", sound.getLocation())));
+        files.put("registry-entries.json", () -> {
+            JsonObject allRegistries = new JsonObject();
+            Registry.REGISTRY.forEach(registry -> allRegistries.add(registry.key().location().toString(),
+                    entries(registry, entry -> DumpIO.object("implementation", DumpIO.implementation(entry)))));
+            return allRegistries;
+        });
+        files.put("mixins.json", MixinDump::snapshot);
         return files;
     }
 

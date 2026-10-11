@@ -4,7 +4,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import java.util.Map;
-import java.util.TreeMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.color.block.BlockColor;
 import net.minecraft.client.color.block.BlockColors;
@@ -12,10 +11,13 @@ import net.minecraft.client.color.item.ItemColor;
 import net.minecraft.client.color.item.ItemColors;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.particle.ParticleEngine;
+import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderDispatcher;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
+import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
@@ -69,7 +71,7 @@ public final class ClientDump {
         Minecraft minecraft = Minecraft.getInstance();
         if (event.phase != TickEvent.Phase.END || !pending || minecraft.getOverlay() != null) return;
         pending = false;
-        DumpIO.capture(FMLPaths.GAMEDIR.get().resolve("parity-dump/client"), "client", ClientDump::snapshot);
+        DumpIO.captureTables(FMLPaths.GAMEDIR.get().resolve("parity-dump/client"), "client", ClientDump::snapshot);
     }
 
     private static ResourceLocation id(Object key) {
@@ -92,14 +94,10 @@ public final class ClientDump {
         return result;
     }
 
-    private static Map<?, ?> readMap(Class<?> owner, Object value, String mojmap, String searge) {
-        return (Map<?, ?>) DumpIO.field(owner, value, mojmap, searge);
-    }
-
-    private static Map<String, JsonElement> snapshot() {
+    private static void snapshot(DumpIO.TableWriter writer) {
         Minecraft minecraft = Minecraft.getInstance();
-        Map<String, JsonElement> files = new TreeMap<>(RegistryDump.common());
-        JsonObject layers = RegistryDump.entries(Registry.BLOCK, block -> {
+        RegistryDump.commonTables().forEach(writer::table);
+        writer.table("render-layers.json", () -> RegistryDump.entries(Registry.BLOCK, block -> {
             JsonObject states = new JsonObject();
             block.getStateDefinition().getPossibleStates().forEach(state -> {
                 JsonArray allowed = new JsonArray();
@@ -108,20 +106,21 @@ public final class ClientDump {
                 states.add(RegistryDump.stateId(state), allowed);
             });
             return states;
-        });
-        files.put("render-layers.json", layers);
-        Map<?, ?> blockColors = readMap(BlockColors.class, minecraft.getBlockColors(), "blockColors", "f_92571_");
-        Map<?, ?> itemColors = readMap(ItemColors.class, minecraft.getItemColors(), "itemColors", "f_92674_");
-        files.put("block-colors.json", blockColors(blockColors));
-        files.put("item-colors.json", itemColors(itemColors));
-        files.put("block-entity-renderers.json", registrations(readMap(BlockEntityRenderDispatcher.class,
-                minecraft.getBlockEntityRenderDispatcher(), "renderers", "f_112251_")));
-        files.put("entity-renderers.json", registrations(readMap(EntityRenderDispatcher.class,
-                minecraft.getEntityRenderDispatcher(), "renderers", "f_114362_")));
-        files.put("screens.json", registrations(readMap(MenuScreens.class, null, "SCREENS", "f_96196_")));
-        files.put("particle-providers.json", registrations(readMap(ParticleEngine.class, minecraft.particleEngine,
-                "providers", "f_107293_")));
-        return files;
+        }));
+        writer.table("block-colors.json", () -> blockColors(DumpIO.table(BlockColors.class,
+                minecraft.getBlockColors(), null, BlockColor.class, "blockColors", "f_92571_")));
+        writer.table("item-colors.json", () -> itemColors(DumpIO.table(ItemColors.class,
+                minecraft.getItemColors(), null, ItemColor.class, "itemColors", "f_92674_")));
+        writer.table("block-entity-renderers.json", () -> registrations(DumpIO.table(BlockEntityRenderDispatcher.class,
+                minecraft.getBlockEntityRenderDispatcher(), BlockEntityType.class, BlockEntityRenderer.class, "renderers", "f_112251_")));
+        writer.table("entity-renderers.json", () -> registrations(DumpIO.table(EntityRenderDispatcher.class,
+                minecraft.getEntityRenderDispatcher(), EntityType.class, EntityRenderer.class, "renderers", "f_114362_")));
+        // ScreenConstructor is private in vanilla; the sole static Map is sufficient
+        // to identify this table without a compile-time reference to that type.
+        writer.table("screens.json", () -> registrations(DumpIO.table(MenuScreens.class,
+                null, MenuType.class, null, "SCREENS", "f_96196_")));
+        writer.table("particle-providers.json", () -> registrations(DumpIO.table(ParticleEngine.class,
+                minecraft.particleEngine, ResourceLocation.class, ParticleProvider.class, "providers", "f_107293_")));
     }
 
     private static JsonElement blockColors(Map<?, ?> handlers) {

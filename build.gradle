@@ -43,4 +43,7 @@ def collectModJars = tasks.register('collectModJars', Copy) {
 tasks.named('assemble') { dependsOn collectModJars }
 tasks.named('build') {
     dependsOn ':common:build', ':fabric:26.2:build', ':neoforge:26.2:build'
+    if (findProject(':forge:1.18.2') != null) {
+        dependsOn ':forge:1.18.2:build'
+    }
 }

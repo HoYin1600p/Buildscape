@@ -3,7 +3,8 @@ plugins {
     id 'xyz.wagyourtail.unimined'
 }
 
-def sourceMode = providers.gradleProperty('buildscape.v118xSource').getOrElse('ref')
+// Shared code is the production default; ref remains an opt-in parity baseline.
+def sourceMode = providers.gradleProperty('buildscape.v118xSource').getOrElse('common')
 if (!(sourceMode in ['ref', 'common'])) {
     throw new GradleException("Unknown buildscape.v118xSource '${sourceMode}'. Use 'ref' or 'common'.")
 }

@@ -32,6 +32,25 @@ Unimined version, mappings, Java target and pinned jopt-simple dependency.
 The default Buildscape build does not configure this project, even when the
 gate is set: `-p tools/parity-dumper` selects the separate build.
 
+At Milestone 1, the repository's default `build` includes shared-code Forge
+1.18.2 alongside the 26.2 loaders, runs the common v118x tests, and produces
+`forge/1.18.2/build/libs/buildscape-4.0.3.jar`. Gradle 9.6 runs on JDK 25;
+Forge compilation and v118x test execution use the locally available Java 17
+toolchain. All dependencies must already be cached for offline use.
+
+```powershell
+.\gradlew.bat build --offline --console=plain --parallel --max-workers=8
+.\gradlew.bat :forge:1.18.2:build '-Pbuildscape.v118xSource=ref' --offline --console=plain --parallel --max-workers=8
+.\gradlew.bat :forge:1.18.2:build '-Pbuildscape.v118x=true' '-Pbuildscape.v118xSource=common' --offline --console=plain --parallel --max-workers=8
+```
+
+Use `ref` for the frozen parity baseline and `common` (the default) for the
+shared-code candidate. The explicit `buildscape.v118x=true` gate remains
+compatible with existing parity tooling. For fast 26.2-only builds, pass
+`-Pbuildscape.v118x=false`; this omits the Forge project and skips v118x
+verification in `common:check`. It does not control this standalone helper's
+separate `buildscape.parityDumper` gate.
+
 ## Collect paired dumps
 
 1. Pin the baseline main commit and candidate jar. Prepare two equivalent

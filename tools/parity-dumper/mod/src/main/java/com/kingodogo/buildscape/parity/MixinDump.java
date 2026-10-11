@@ -31,7 +31,7 @@ final class MixinDump {
         TreeMap<String, TreeSet<String>> targets = new TreeMap<>();
         TreeMap<String, TreeMap<String, TreeSet<String>>> applied = new TreeMap<>();
         // Prepared configs are removed from Mixins.getConfigs(), so also read the active processor.
-        Mixins.getConfigs().forEach(config -> addConfig(config.get(), targets));
+        Mixins.getConfigs().forEach(config -> addConfig(config.getConfig(), targets));
         Object transformer = MixinEnvironment.getCurrentEnvironment().getActiveTransformer();
         if (transformer == null) throw new IllegalStateException("No active mixin transformer");
         Object processor = field(transformer, transformer.getClass(), "processor");

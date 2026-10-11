@@ -108,6 +108,56 @@ branch is accepted, both branches start from the target baseline; they are
 alternatives, not independent patches to merge together. Accept one before the
 next sync cycle. Builds use two workers; run one full build at a time.
 
+## Cluster source mapping (owner-approved 2026-10-10)
+
+Shared code lives in `common/src/main`. Code that can only compile for one
+VersionCluster lives in `common/src/<cluster>/java` under its original package;
+it is placed, never excluded to bypass compilation errors. Adapter implementations
+stay under `adapter/<cluster>`. Each cluster ships its own
+`common/src/<cluster>/resources/buildscape.mixins.json`. Removed content is
+switched off per cluster, not deleted.
+
+S4 moves the following files without content changes. The first column is
+relative to the former `common/src/main/` root; the second is repository-relative.
+Use the ledger's explicit `active_paths` for these files rather than the shared
+`java_root` fallback. Renames into a cluster root require review under the existing
+sync rules.
+
+| Former shared path | Active cluster path |
+| --- | --- |
+| `java/com/kingodogo/buildscape/mixin/BeaconBlockEntityRendererMixin.java` | `common/src/v26x/java/com/kingodogo/buildscape/mixin/BeaconBlockEntityRendererMixin.java` |
+| `java/com/kingodogo/buildscape/mixin/ElytraLayerMixin.java` | `common/src/v26x/java/com/kingodogo/buildscape/mixin/ElytraLayerMixin.java` |
+| `java/com/kingodogo/buildscape/mixin/HumanoidArmorLayerMixin.java` | `common/src/v26x/java/com/kingodogo/buildscape/mixin/HumanoidArmorLayerMixin.java` |
+| `java/com/kingodogo/buildscape/mixin/ItemFeatureSubmitMixin.java` | `common/src/v26x/java/com/kingodogo/buildscape/mixin/ItemFeatureSubmitMixin.java` |
+| `java/com/kingodogo/buildscape/mixin/ItemInstanceMixin.java` | `common/src/v26x/java/com/kingodogo/buildscape/mixin/ItemInstanceMixin.java` |
+| `java/com/kingodogo/buildscape/mixin/ItemModelResolverMixin.java` | `common/src/v26x/java/com/kingodogo/buildscape/mixin/ItemModelResolverMixin.java` |
+| `java/com/kingodogo/buildscape/mixin/ItemRendererMixin.java` | `common/src/v26x/java/com/kingodogo/buildscape/mixin/ItemRendererMixin.java` |
+| `java/com/kingodogo/buildscape/mixin/ItemStackRenderStateMixin.java` | `common/src/v26x/java/com/kingodogo/buildscape/mixin/ItemStackRenderStateMixin.java` |
+| `java/com/kingodogo/buildscape/mixin/LiquidBlockRendererMixin.java` | `common/src/v26x/java/com/kingodogo/buildscape/mixin/LiquidBlockRendererMixin.java` |
+| `java/com/kingodogo/buildscape/mixin/ModelSubmitMixin.java` | `common/src/v26x/java/com/kingodogo/buildscape/mixin/ModelSubmitMixin.java` |
+| `java/com/kingodogo/buildscape/mixin/SignRendererMixin.java` | `common/src/v26x/java/com/kingodogo/buildscape/mixin/SignRendererMixin.java` |
+| `java/com/kingodogo/buildscape/mixin/ThrownTridentRendererMixin.java` | `common/src/v26x/java/com/kingodogo/buildscape/mixin/ThrownTridentRendererMixin.java` |
+| `java/com/kingodogo/buildscape/mixin/WorldOverlayExtractionMixin.java` | `common/src/v26x/java/com/kingodogo/buildscape/mixin/WorldOverlayExtractionMixin.java` |
+| `java/com/kingodogo/buildscape/mixin/FireworkStarItemMixin.java` | `common/src/v26x/java/com/kingodogo/buildscape/mixin/FireworkStarItemMixin.java` |
+| `java/com/kingodogo/buildscape/mixinsupport/FestiveSubmission.java` | `common/src/v26x/java/com/kingodogo/buildscape/mixinsupport/FestiveSubmission.java` |
+| `java/com/kingodogo/buildscape/mixinsupport/PipeSpillOutput.java` | `common/src/v26x/java/com/kingodogo/buildscape/mixinsupport/PipeSpillOutput.java` |
+| `java/com/kingodogo/buildscape/mixinsupport/TooltipPreviewComponent.java` | `common/src/v26x/java/com/kingodogo/buildscape/mixinsupport/TooltipPreviewComponent.java` |
+| `java/com/kingodogo/buildscape/client/renderer/PipeSpillVertexConsumer.java` | `common/src/v26x/java/com/kingodogo/buildscape/client/renderer/PipeSpillVertexConsumer.java` |
+| `resources/buildscape.mixins.json` | `common/src/v26x/resources/buildscape.mixins.json` |
+
+The existing reference rows also map the new 26.2 helper classes: `ItemMixin`
+maps `ItemInstanceMixin`; `ItemRendererMixin` maps the item submission/resolver/state
+mixins and `FestiveSubmission`; `RenderBuffersMixin` maps `ModelSubmitMixin`;
+`LiquidBlockRendererMixin` maps `PipeSpillOutput`; and `ClientEvents` maps
+`WorldOverlayExtractionMixin` and `TooltipPreviewComponent`. The previously
+unmapped reference `PipeSpillVertexConsumer` now maps its cluster implementation.
+Existing adapter destinations remain in the same ledger rows.
+
+S5 must add `common/src/v118x/resources/buildscape.mixins.json`, listing the shared
+mixins and restored v118x-only implementations, and restore the v118x pipe-spill,
+tooltip preview, festive rendering, beacon/trident/liquid/item renderer and sign
+frame behavior. Shared API fixes remain in `src/main`; S4 does not implement them.
+
 ## Ledger compatibility
 
 The existing `scripts/migration-ledger.ps1` does not accept `needs_resync` and

@@ -20,9 +20,13 @@ This file is automatically loaded by AI coding assistants (Antigravity, Codex, C
 - **VersionCluster & Adapter Terminology:**
   - Targets are **VersionClusters** (`v118x`, `v121x`, `v26x`) and **Adapters**. NEVER use the word "Era" or "activeEra".
   - In Gradle scripts, use `versionCluster` or `activeCluster`.
-- **Zero Stubs & Zero Temporary Exclusions:**
+- **Zero Stubs:**
   - Never create empty stubs or `throw new UnsupportedOperationException()`.
-  - Never exclude files from Gradle compilation to bypass build errors. Fix the underlying API contract.
+- **Cluster Source Placement (owner-approved 2026-10-10):**
+  - Shared code lives in `common/src/main`. Code that can only compile for one VersionCluster lives in `common/src/<cluster>/java` under its original package: placed, never excluded to bypass build errors.
+  - Each cluster ships its own `common/src/<cluster>/resources/buildscape.mixins.json`.
+  - Adapter implementations stay under `adapter/<cluster>`.
+  - Removed content is switched off per cluster, not deleted.
 - **Common Neutrality Rule:**
   - Code under `common/src/main/java/com/kingodogo/buildscape/` (outside `adapter/`) must NOT import loader packages (`net.minecraftforge`, `net.fabricmc`, `net.neoforged`) or invoke version-divergent methods directly.
   - Delegate version-dependent operations to `Services.PLATFORM`, `MixinFactory`, or VersionCluster factories.
@@ -30,8 +34,8 @@ This file is automatically loaded by AI coding assistants (Antigravity, Codex, C
   - Wrap all registration and instantiation calls with `Services.PLATFORM.wrapRegistryAction(() -> { ... });`.
   - Track `prevHolders` to prevent nested calls from wiping out intrusive holder maps prematurely.
   - Only attach intrusive holder maps to registries that use them (`BLOCK`, `ITEM`, `BLOCK_ENTITY_TYPE`, `ENTITY_TYPE`, `FLUID`).
-- **Single Unified Mixin Config:**
-  - All mixins live in `common/src/main/java/com/kingodogo/buildscape/mixin/` and are registered in a single `buildscape.mixins.json`.
+- **Per-Cluster Mixin Configs:**
+  - Shared mixins live in `common/src/main/java/com/kingodogo/buildscape/mixin/`; cluster-only mixins keep that package under `common/src/<cluster>/java` and are registered in that cluster's `buildscape.mixins.json`.
   - Use `@Dynamic` with `require = 0` for version-specific injection points. Avoid method references or lambdas capturing `this`.
 
 ---

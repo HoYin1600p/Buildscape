@@ -35,7 +35,7 @@ Buildscape-com/
 │       ├── entity/                              # Neutral entity definitions
 │       ├── network/                             # Neutral packet contracts & dispatchers
 │       ├── platform/                            # Platform & Registry Service SPIs
-│       ├── mixin/                               # Unified Mixin interfaces & injectors
+│       ├── mixin/                               # Shared Mixin interfaces & injectors
 │       │   ├── IMixinFactory.java               # VersionCluster Mixin capability interface
 │       │   └── MixinFactory.java                # Factory delegator
 │       └── adapter/                             # VERSIONCLUSTER ADAPTERS (Source Sets)
@@ -62,6 +62,21 @@ Buildscape-com/
 ---
 
 ## 3. The Three Functional Tiers
+
+### Cluster source placement (owner-approved 2026-10-10)
+Shared code and resources live in `common/src/main`. Code that can only compile
+for one VersionCluster lives in `common/src/<cluster>/java` under its original
+package; it is placed in that cluster's source root, never excluded to bypass
+compile errors. `v118x` and `v26x` each combine their cluster Java and resource
+roots with the shared roots. Adapter implementations remain under
+`adapter/<cluster>`.
+
+Each cluster ships its own `common/src/<cluster>/resources/buildscape.mixins.json`,
+listing shared and cluster-only mixins. Removed content is switched off per
+cluster, not deleted. S4 places the unchanged 26.2 config in `src/v26x/resources`;
+S5 must supply the v118x config and restored v118x client/render implementations.
+Common's `v26xElements` variant supplies cluster-only resources alongside classes
+to the 26.2 loader jars, whose resource tasks already copy the shared resources.
 
 ### Tier 1: Neutral Common Core (`common/src/main/java/...`)
 Contains all game logic, business logic, block state rules, recipes, definitions, packet contracts, and registries that are invariant across versions and loaders.

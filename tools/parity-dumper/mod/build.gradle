@@ -1,0 +1,46 @@
+plugins {
+    id 'java'
+    id 'xyz.wagyourtail.unimined' version '1.4.41-kappa'
+}
+
+group = 'com.kingodogo.buildscape.tools'
+version = '1.0.0'
+base.archivesName = 'buildscape-parity-dumper-TEST-ONLY'
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+
+repositories {
+    mavenCentral()
+    maven { url = 'https://libraries.minecraft.net/' }
+    maven { url = 'https://maven.minecraftforge.net/' }
+    maven { url = 'https://repo.spongepowered.org/repository/maven-public/' }
+}
+
+unimined.minecraft {
+    version '1.18.2'
+    mappings {
+        mojmap()
+        searge()
+    }
+    defaultRemapJar = true
+    minecraftForge {
+        loader '40.3.12'
+        useToolchains = false
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.release = 17
+    options.encoding = 'UTF-8'
+    options.compilerArgs += ['-proc:none']
+}
+tasks.withType(JavaExec).configureEach {
+    javaLauncher = javaToolchains.launcherFor { languageVersion = JavaLanguageVersion.of(17) }
+}
+tasks.matching { it.name == 'remapJar' }.configureEach {
+    prodNamespace 'searge'
+    archiveClassifier = ''
+}
+tasks.named('assemble') { dependsOn 'remapJar' }
+tasks.named('jar', Jar) {
+    manifest { attributes('Implementation-Title': 'TEST ONLY parity dumper') }
+}

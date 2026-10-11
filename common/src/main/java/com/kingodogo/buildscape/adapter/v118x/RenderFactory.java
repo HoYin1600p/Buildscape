@@ -66,6 +66,91 @@ public final class RenderFactory {
 
     private RenderFactory() {}
 
+    public interface Registrar {
+        <T extends net.minecraft.world.level.block.entity.BlockEntity> void registerBlockEntity(
+                net.minecraft.world.level.block.entity.BlockEntityType<T> type,
+                net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider<T> provider);
+        <T extends Entity> void registerEntity(EntityType<T> type,
+                net.minecraft.client.renderer.entity.EntityRendererProvider<T> provider);
+    }
+
+    /** Called by a client-only loader event, after all content types have been registered. */
+    @SuppressWarnings("unchecked")
+    public static void registerRenderers(Registrar registrar) {
+        PillarBlockEntityRenderer pillar = new PillarBlockEntityRenderer();
+        registrar.registerBlockEntity(ModBlockEntities.PILLAR_TYPE, context -> pillar::render);
+        registrar.registerBlockEntity(ModBlockEntities.HOLLOW_LOG_TYPE, context -> HollowLogBlockEntityRenderer::render);
+        registrar.registerBlockEntity(ModBlockEntities.SHELF_TYPE, context -> ShelfRenderer::render);
+        registrar.registerBlockEntity(ModBlockEntities.FESTIVE_STOCKING_TYPE, context -> FestiveStockingBlockEntityRenderer::render);
+        registrar.registerBlockEntity(ModBlockEntities.GLASS_JAR_TYPE, context -> GlassJarBlockEntityRenderer::render);
+        registrar.registerBlockEntity(ModBlockEntities.ICICLE_CAULDRON_TYPE, context -> IcicleCauldronBlockEntityRenderer::render);
+        registrar.registerBlockEntity(ModBlockEntities.DECORATED_POT_TYPE, context -> DecoratedPotBlockEntityRenderer::render);
+        registrar.registerBlockEntity(ModBlockEntities.TRAPPED_DECORATED_POT_TYPE, context -> TrappedDecoratedPotBlockEntityRenderer::render);
+        registrar.registerBlockEntity(RestoredContentTypes.<com.kingodogo.buildscape.block.CopperChestBlockEntity>blockEntity("copper_chest"),
+                com.kingodogo.buildscape.client.renderer.CopperChestRenderer::new);
+        registrar.registerBlockEntity(RestoredContentTypes.<net.minecraft.world.level.block.entity.SignBlockEntity>blockEntity("mangrove_sign_block_entity"),
+                net.minecraft.client.renderer.blockentity.SignRenderer::new);
+        registrar.registerBlockEntity(RestoredContentTypes.<net.minecraft.world.level.block.entity.SignBlockEntity>blockEntity("bamboo_sign_block_entity"),
+                net.minecraft.client.renderer.blockentity.SignRenderer::new);
+        registrar.registerEntity((EntityType<WanderingTrader>) Services.PLATFORM.getWanderingHomemakerEntityType(),
+                context -> homemakerRenderer(context, HOMEMAKER_TEXTURE));
+        registrar.registerEntity((EntityType<WanderingTrader>) Services.PLATFORM.getFestiveWanderingHomemakerEntityType(),
+                context -> homemakerRenderer(context, FESTIVE_HOMEMAKER_TEXTURE));
+        registrar.registerEntity(RestoredContentTypes.<net.minecraft.world.entity.vehicle.Boat>entity("mangrove_boat"),
+                com.kingodogo.buildscape.client.renderer.MangroveBoatRenderer::new);
+        registrar.registerEntity((EntityType<net.minecraft.world.entity.vehicle.Boat>) Services.PLATFORM.getPoplarBoatEntityType(),
+                context -> new com.kingodogo.buildscape.client.renderer.MangroveBoatRenderer(context,
+                        new ResourceLocation(BuildscapeCommon.MOD_ID, "textures/entity/boat/poplar.png")));
+        registrar.registerEntity((EntityType<Entity>) Services.PLATFORM.getSeatEntityType(),
+                net.minecraft.client.renderer.entity.NoopRenderer::new);
+        registrar.registerEntity((EntityType<PlatformAdapterBase.FallingIcicleEntityImpl>) Services.PLATFORM.getFallingIcicleEntityType(),
+                context -> new EntityRenderer<PlatformAdapterBase.FallingIcicleEntityImpl>(context) {
+                    @Override public ResourceLocation getTextureLocation(PlatformAdapterBase.FallingIcicleEntityImpl entity) {
+                        return net.minecraft.client.renderer.texture.TextureAtlas.LOCATION_BLOCKS;
+                    }
+                    @Override public void render(PlatformAdapterBase.FallingIcicleEntityImpl entity, float yaw, float partialTick,
+                            PoseStack pose, MultiBufferSource buffers, int light) {
+                        com.kingodogo.buildscape.client.renderer.FallingIcicleRenderer.render(entity, yaw, partialTick, pose, buffers, light);
+                        super.render(entity, yaw, partialTick, pose, buffers, light);
+                    }
+                });
+        registrar.registerEntity((EntityType<PlatformAdapterBase.ColoredItemFrameEntityImpl>) Services.PLATFORM.getColoredItemFrameEntityType(),
+                context -> new EntityRenderer<PlatformAdapterBase.ColoredItemFrameEntityImpl>(context) {
+                    @Override public ResourceLocation getTextureLocation(PlatformAdapterBase.ColoredItemFrameEntityImpl entity) {
+                        return new ResourceLocation(com.kingodogo.buildscape.adapter.v118x.client.ColoredFrameRendering
+                                .getTextureForColor(entity.getColorVariant()).toString());
+                    }
+                    @Override public net.minecraft.world.phys.Vec3 getRenderOffset(PlatformAdapterBase.ColoredItemFrameEntityImpl entity, float partialTick) {
+                        return com.kingodogo.buildscape.adapter.v118x.client.ColoredFrameRendering.getRenderOffset(entity, partialTick);
+                    }
+                    @Override public void render(PlatformAdapterBase.ColoredItemFrameEntityImpl entity, float yaw, float partialTick,
+                            PoseStack pose, MultiBufferSource buffers, int light) {
+                        com.kingodogo.buildscape.adapter.v118x.client.ColoredFrameRendering.render(entity, yaw, partialTick, pose, buffers, light);
+                        super.render(entity, yaw, partialTick, pose, buffers, light);
+                    }
+                });
+        registrar.registerEntity((EntityType<PlatformAdapterBase.FestiveStockingEntityImpl>) Services.PLATFORM.getFestiveStockingEntityType(),
+                context -> new EntityRenderer<PlatformAdapterBase.FestiveStockingEntityImpl>(context) {
+                    @Override public ResourceLocation getTextureLocation(PlatformAdapterBase.FestiveStockingEntityImpl entity) {
+                        return new ResourceLocation(com.kingodogo.buildscape.adapter.v118x.client.StockingRendering
+                                .getTextureForColor(entity.getColorVariant()).toString());
+                    }
+                    @Override public void render(PlatformAdapterBase.FestiveStockingEntityImpl entity, float yaw, float partialTick,
+                            PoseStack pose, MultiBufferSource buffers, int light) {
+                        com.kingodogo.buildscape.adapter.v118x.client.StockingRendering.render(entity, yaw, partialTick, pose, buffers, light);
+                        super.render(entity, yaw, partialTick, pose, buffers, light);
+                    }
+                });
+    }
+
+    private static MobRenderer<WanderingTrader, WanderingHomemakerModel<WanderingTrader>> homemakerRenderer(
+            net.minecraft.client.renderer.entity.EntityRendererProvider.Context context, ResourceLocation texture) {
+        return new MobRenderer<WanderingTrader, WanderingHomemakerModel<WanderingTrader>>(
+                context, new WanderingHomemakerModel<>(context.bakeLayer(HOMEMAKER_LAYER)), 0.5F) {
+            @Override public ResourceLocation getTextureLocation(WanderingTrader entity) { return texture; }
+        };
+    }
+
     @SuppressWarnings("unchecked")
     public static void registerRenderers() {
         try {

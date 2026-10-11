@@ -69,7 +69,10 @@
                    "ThrownTridentAccessor",
                    "ThrownTridentRendererMixin",
                    "SignRendererMixin",
-                   "client.SoundMuffMixin"
+                   "client.SoundMuffMixin",
+                   "CopperChestItemClientMixin",
+                   "HazeBushAnimateMixin",
+                   "HazeBushTrackingMixin"
                ],
     "injectors":  {
                       "defaultRequire":  1

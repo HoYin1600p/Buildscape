@@ -37,6 +37,7 @@ public final class GuiProvider {
                                 default -> throw new IllegalStateException("Unexpected Object method: " + method);
                             };
                         }
+                        if (method.isDefault()) return java.lang.reflect.InvocationHandler.invokeDefault(proxy, method, args);
                         return factory.create((M) args[0], (net.minecraft.world.entity.player.Inventory) args[1],
                                 (net.minecraft.network.chat.Component) args[2]);
                     });

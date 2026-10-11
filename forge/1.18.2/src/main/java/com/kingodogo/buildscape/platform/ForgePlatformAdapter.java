@@ -184,9 +184,11 @@ public final class ForgePlatformAdapter extends PlatformAdapterBase implements c
     @Override
     public net.minecraft.stats.Stat<?> registerCustomStat(String registryName, CommonId statId) {
         // CUSTOM_STAT is a vanilla registry, not an IForgeRegistryEntry registry.
+        // Main registers the key in the minecraft namespace; player stats files store that key.
         ResourceLocation value = new ResourceLocation(statId.getNamespace(), statId.getPath());
+        ResourceLocation key = new ResourceLocation(registryName);
         wrapRegistryAction(() -> {
-            if (!Registry.CUSTOM_STAT.containsKey(value)) Registry.register(Registry.CUSTOM_STAT, value, value);
+            if (!Registry.CUSTOM_STAT.containsKey(key)) Registry.register(Registry.CUSTOM_STAT, key, value);
         });
         return net.minecraft.stats.Stats.CUSTOM.get(value, net.minecraft.stats.StatFormatter.DEFAULT);
     }

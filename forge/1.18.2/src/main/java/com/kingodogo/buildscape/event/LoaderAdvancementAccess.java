@@ -14,7 +14,9 @@ public final class LoaderAdvancementAccess implements AdvancementEvents.Access {
 
     @Override public int incrementStat(ServerPlayer player, com.kingodogo.buildscape.util.CommonId id, int amount) {
         ResourceLocation key = new ResourceLocation(id.getNamespace(), id.getPath());
-        ResourceLocation registered = net.minecraft.core.Registry.CUSTOM_STAT.getOptional(key).orElse(null);
+        // Stats are registered under minecraft:<path> like main; the value is the Buildscape id.
+        ResourceLocation registered = net.minecraft.core.Registry.CUSTOM_STAT.getOptional(new ResourceLocation(id.getPath()))
+                .or(() -> net.minecraft.core.Registry.CUSTOM_STAT.getOptional(key)).orElse(null);
         if (registered == null) {
             if (UNREGISTERED.add(key)) com.kingodogo.buildscape.BuildscapeCommon.LOGGER.warn(
                     "Skipping unregistered Buildscape custom stat {}", key);

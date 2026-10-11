@@ -24,6 +24,7 @@
                    "FeatureMixin",
                    "IronBarsBlockMixin",
                    "ItemMixin",
+                   "ItemCombinerMenuAccessor",
                    "LeavesBlockMixin",
                    "LevelMixin",
                    "LivingEntityMixin",
@@ -70,7 +71,6 @@
                    "ThrownTridentRendererMixin",
                    "SignRendererMixin",
                    "client.SoundMuffMixin",
-                   "CopperChestItemClientMixin",
                    "HazeBushAnimateMixin",
                    "HazeBushTrackingMixin"
                ],

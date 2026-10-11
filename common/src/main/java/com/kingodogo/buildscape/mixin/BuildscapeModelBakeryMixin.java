@@ -15,7 +15,7 @@ public abstract class BuildscapeModelBakeryMixin {
 
     @Dynamic
     @Inject(method = "processLoading", at = @At("HEAD"), remap = false, require = 0)
-    private void buildscape$parseModelsInParallel(Object profiler, int maxMipmapLevel, CallbackInfo callback) {
+    private void buildscape$parseModelsInParallel(@Coerce Object profiler, int maxMipmapLevel, CallbackInfo callback) {
         Object rm = net.minecraft.client.Minecraft.getInstance() != null ? net.minecraft.client.Minecraft.getInstance().getResourceManager() : null;
         MixinFactory.onModelBakeryPreload(this, rm);
     }
@@ -37,7 +37,7 @@ public abstract class BuildscapeModelBakeryMixin {
 
     @Dynamic
     @Inject(method = "processLoading", at = @At("TAIL"), remap = false, require = 0)
-    private void buildscape$releaseParsedModels(Object profiler, int maxMipmapLevel, CallbackInfo callback) {
+    private void buildscape$releaseParsedModels(@Coerce Object profiler, int maxMipmapLevel, CallbackInfo callback) {
         MixinFactory.onModelBakeryRelease();
     }
 
@@ -51,7 +51,7 @@ public abstract class BuildscapeModelBakeryMixin {
             ),
             require = 0
     )
-    private void buildscape$bakeModelsInParallel(Object textureManager, Object profiler, CallbackInfoReturnable<?> callback) {
+    private void buildscape$bakeModelsInParallel(@Coerce Object textureManager, @Coerce Object profiler, CallbackInfoReturnable<?> callback) {
         MixinFactory.onModelBakeryBakeParallel(this);
     }
 }

@@ -41,6 +41,18 @@ class MixinTargetCompatibilityTest {
     private static final String CALLBACK = "Lorg/spongepowered/asm/mixin/injection/callback/CallbackInfo;";
     private static final String RETURN_CALLBACK = "Lorg/spongepowered/asm/mixin/injection/callback/CallbackInfoReturnable;";
     private static final Set<String> INJECTIONS = Set.of("Inject", "Redirect", "ModifyArg", "ModifyVariable");
+    // Forge classes are absent from this Minecraft-only bytecode classpath; Embeddium is optional.
+    private static final Set<String> EXPECTED_MISSING_CLASSES = Set.of(
+            "com/kingodogo/buildscape/mixin/BuildscapeForgeRegistryMixin -> net.minecraftforge.registries.ForgeRegistry",
+            "com/kingodogo/buildscape/mixin/EmbeddiumPipeSpillMixin -> me.jellysquid.mods.sodium.client.render.pipeline.FluidRenderer"
+    );
+    // Only these selectors may miss: 26.2's parallel-model lifecycle and the production SRG alias
+    // alongside ItemStack's Mojang-named getMaxStackSize. Invalid callbacks/@At sites still fail.
+    private static final Set<String> EXPECTED_MISSING_METHODS = Set.of(
+            "com/kingodogo/buildscape/mixin/BuildscapeModelBakeryMixin -> net/minecraft/client/resources/model/ModelBakery#buildscape$parseModelsInParallel#processLoading",
+            "com/kingodogo/buildscape/mixin/BuildscapeModelBakeryMixin -> net/minecraft/client/resources/model/ModelBakery#buildscape$releaseParsedModels#processLoading",
+            "com/kingodogo/buildscape/mixin/ItemMixin -> net/minecraft/world/item/ItemStack#buildscape$legacyCakeMaxStackSize#m_41741_()I"
+    );
 
     @Test
     void allConfiguredTargetsMatchMinecraft1182() throws IOException {
@@ -75,7 +87,7 @@ class MixinTargetCompatibilityTest {
     }
 
     @Test
-    void auditCollectsMissingMembersAndInvalidCallbacksAndHonoursOptionality() throws IOException {
+    void auditRejectsUnexpectedOptionalMissesAndInvalidCallbacks() throws IOException {
         Audit audit = new Audit();
         ClassNode target = new ClassNode();
         target.name = "fixture/Target";
@@ -94,13 +106,40 @@ class MixinTargetCompatibilityTest {
         optional.visibleAnnotations = List.of(annotation(injectionDescriptor("Inject"), "method", List.of("absent"), "require", 0));
         mixin.methods.add(optional);
         audit.mixin(mixin, 1);
-        assertEquals(2, audit.failures.size(), String.join("\n", audit.failures));
-        assertEquals(1, audit.warnings.size());
+        assertEquals(3, audit.failures.size(), String.join("\n", audit.failures));
+        assertEquals(0, audit.warnings.size());
         badCallback.invisibleParameterAnnotations = parameterAnnotations(annotation(COERCE));
         Audit coerced = new Audit();
         coerced.classes.put(target.name, target);
         coerced.mixin(mixin, 1);
-        assertEquals(1, coerced.failures.size(), "@Coerce Object must accept reference arguments");
+        assertEquals(2, coerced.failures.size(), "@Coerce Object must accept reference arguments; optional misses still fail");
+    }
+
+    @Test
+    void auditAllowsOnlyListedOptionalMissingTargets() throws IOException {
+        Audit audit = new Audit();
+        ClassNode target = new ClassNode();
+        target.name = "net/minecraft/client/resources/model/ModelBakery";
+        audit.classes.put(target.name, target);
+        ClassNode mixin = new ClassNode();
+        mixin.name = "com/kingodogo/buildscape/mixin/BuildscapeModelBakeryMixin";
+        mixin.invisibleAnnotations = List.of(annotation(MIXIN, "targets", List.of(target.name)));
+        MethodNode allowed = new MethodNode(0, "buildscape$parseModelsInParallel", "(" + CALLBACK + ")V", null, null);
+        allowed.visibleAnnotations = List.of(annotation(injectionDescriptor("Inject"), "method", List.of("processLoading"), "require", 0));
+        mixin.methods.add(allowed);
+        audit.mixin(mixin, 1);
+        assertEquals(0, audit.failures.size());
+        assertEquals(1, audit.warnings.size());
+
+        // Even an allowlisted selector fails when required, or when present with a bad callback.
+        allowed.visibleAnnotations = List.of(annotation(injectionDescriptor("Inject"), "method", List.of("processLoading"), "require", 1));
+        audit.mixin(mixin, 1);
+        assertEquals(1, audit.failures.size());
+        target.methods.add(new MethodNode(0, "processLoading", "()I", null, null));
+        allowed.visibleAnnotations = List.of(annotation(injectionDescriptor("Inject"), "method", List.of("processLoading"), "require", 0));
+        audit.mixin(mixin, 1);
+        assertEquals(2, audit.failures.size());
+        assertEquals(1, audit.warnings.size());
     }
 
     @SuppressWarnings("unchecked")
@@ -164,7 +203,12 @@ class MixinTargetCompatibilityTest {
         }
 
         void problem(boolean optional, String message) {
-            (optional ? warnings : failures).add(message);
+            // require=0 controls runtime applicability, never permission to silently lose behaviour.
+            failures.add(message);
+        }
+
+        void missingTarget(boolean optional, boolean expected, String message) {
+            (optional && expected ? warnings : failures).add(message);
         }
 
         void mixin(ClassNode mixin, int defaultRequire) throws IOException {
@@ -183,7 +227,9 @@ class MixinTargetCompatibilityTest {
             for (String name : targets) {
                 ClassNode target = read(name.replace('.', '/'));
                 if (target == null) {
-                    problem(find(classAnnotations, PSEUDO) != null, mixin.name + " -> " + name + ": target class is missing");
+                    String key = mixin.name + " -> " + name;
+                    missingTarget(find(classAnnotations, PSEUDO) != null, EXPECTED_MISSING_CLASSES.contains(key),
+                            key + ": target class is missing");
                     continue;
                 }
                 for (FieldNode field : mixin.fields) {
@@ -234,7 +280,11 @@ class MixinTargetCompatibilityTest {
             List<MethodNode> matches = new ArrayList<>();
             for (String selector : strings(value(annotation, "method", List.of()))) {
                 List<MethodNode> selected = target.methods.stream().filter(method -> selects(selector, method)).toList();
-                if (selected.isEmpty()) problem(optional, context + "target method " + selector + " is missing");
+                if (selected.isEmpty()) {
+                    String key = mixin.name + " -> " + target.name + "#" + handler.name + "#" + selector;
+                    missingTarget(optional, EXPECTED_MISSING_METHODS.contains(key),
+                            context + "target method " + selector + " is missing");
+                }
                 matches.addAll(selected);
             }
             for (MethodNode method : matches) {

@@ -4,11 +4,10 @@ import com.kingodogo.buildscape.network.CommonPacket;
 import com.kingodogo.buildscape.network.IPacketFactory;
 import com.kingodogo.buildscape.network.PacketDirection;
 import com.kingodogo.buildscape.util.CommonId;
-import net.minecraft.client.Minecraft;
+import com.kingodogo.buildscape.adapter.v121x.client.ClientPackets;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
-import net.minecraft.network.protocol.common.ServerboundCustomPayloadPacket;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
@@ -102,8 +101,7 @@ public class PacketFactory implements IPacketFactory {
             if (buf.readableBytes() > 0) {
                 com.kingodogo.buildscape.BuildscapeCommon.LOGGER.warn("Packet {} had {} trailing unread bytes", id, buf.readableBytes());
             }
-            Minecraft mc = Minecraft.getInstance();
-            mc.execute(() -> pkt.handle(player != null ? player : mc.player));
+            ClientPackets.handleOnClientThread(pkt, player);
         } catch (Throwable t) {
             com.kingodogo.buildscape.BuildscapeCommon.LOGGER.error("Failed to decode or handle clientbound packet {}", id, t);
         }
@@ -178,11 +176,7 @@ public class PacketFactory implements IPacketFactory {
     @Override
     public void sendToServer(CommonPacket packet) {
         try {
-            Minecraft mc = Minecraft.getInstance();
-            if (mc.getConnection() != null) {
-                CustomPacketPayload payload = createPayload(packet);
-                mc.getConnection().send(new ServerboundCustomPayloadPacket(payload));
-            }
+            ClientPackets.sendToServer(() -> createPayload(packet));
         } catch (Throwable t) {
             com.kingodogo.buildscape.BuildscapeCommon.LOGGER.error("Failed to send packet to server: {}", packet.getId(), t);
         }
@@ -209,13 +203,10 @@ public class PacketFactory implements IPacketFactory {
             return;
         }
 
+        if (!com.kingodogo.buildscape.platform.Services.PLATFORM.isClient()) return;
+
         try {
-            Minecraft mc = Minecraft.getInstance();
-            if (mc.hasSingleplayerServer() && mc.getSingleplayerServer() != null) {
-                for (ServerPlayer player : mc.getSingleplayerServer().getPlayerList().getPlayers()) {
-                    sendToPlayer(player, packet);
-                }
-            }
+            ClientPackets.forEachIntegratedServerPlayer(player -> sendToPlayer(player, packet));
         } catch (Throwable t) {
             com.kingodogo.buildscape.BuildscapeCommon.LOGGER.error("Failed to send packet to all players: {}", packet.getId(), t);
         }

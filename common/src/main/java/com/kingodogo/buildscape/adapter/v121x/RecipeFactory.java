@@ -327,9 +327,11 @@ public final class RecipeFactory {
         if (s == null || s.isEmpty() || "{}".equals(s)) return Ingredient.EMPTY;
         try {
             if (s.startsWith("{") || s.startsWith("[")) {
-                return Ingredient.CODEC.parse(com.mojang.serialization.JsonOps.INSTANCE, com.google.gson.JsonParser.parseString(s)).result().orElse(Ingredient.EMPTY);
+                com.google.gson.JsonElement json = com.google.gson.JsonParser.parseString(s);
+                resolveIngredientItems(json);
+                return Ingredient.CODEC.parse(com.mojang.serialization.JsonOps.INSTANCE, json).result().orElse(Ingredient.EMPTY);
             } else if (s.contains(":")) {
-                net.minecraft.world.item.Item item = net.minecraft.core.registries.BuiltInRegistries.ITEM.get(ResourceLocation.tryParse(s));
+                net.minecraft.world.item.Item item = Services.PLATFORM.getItem(com.kingodogo.buildscape.util.CommonId.parse(s));
                 if (item != null && item != net.minecraft.world.item.Items.AIR) {
                     return Ingredient.of(item);
                 }
@@ -338,8 +340,25 @@ public final class RecipeFactory {
         return Ingredient.EMPTY;
     }
 
+    private static void resolveIngredientItems(com.google.gson.JsonElement json) {
+        if (json.isJsonArray()) {
+            for (com.google.gson.JsonElement entry : json.getAsJsonArray()) resolveIngredientItems(entry);
+        } else if (json.isJsonObject()) {
+            com.google.gson.JsonObject object = json.getAsJsonObject();
+            if (object.has("item") && object.get("item").isJsonPrimitive()
+                    && object.get("item").getAsJsonPrimitive().isString()) {
+                net.minecraft.world.item.Item item = Services.PLATFORM.getItem(
+                        com.kingodogo.buildscape.util.CommonId.parse(object.get("item").getAsString()));
+                if (item != null && item != net.minecraft.world.item.Items.AIR) {
+                    object.addProperty("item", Services.PLATFORM.getItemId(item).toString());
+                }
+            }
+            for (var entry : object.entrySet()) resolveIngredientItems(entry.getValue());
+        }
+    }
+
     private static ItemStack parseResult(String itemStr, int count, String nbt) {
-        net.minecraft.world.item.Item item = net.minecraft.core.registries.BuiltInRegistries.ITEM.get(ResourceLocation.tryParse(itemStr != null && !itemStr.isBlank() ? itemStr : "minecraft:air"));
+        net.minecraft.world.item.Item item = Services.PLATFORM.getItem(com.kingodogo.buildscape.util.CommonId.parse(itemStr != null && !itemStr.isBlank() ? itemStr : "minecraft:air"));
         if (item == null) item = net.minecraft.world.item.Items.AIR;
         ItemStack stack = new ItemStack(item, count > 0 ? count : 1);
         if (nbt != null && !nbt.isBlank()) {

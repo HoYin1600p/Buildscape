@@ -1,4 +1,4 @@
-package com.kingodogo.buildscape.adapter.v121x;
+package com.kingodogo.buildscape.adapter.v121x.client;
 
 import com.kingodogo.buildscape.BuildscapeCommon;
 import com.kingodogo.buildscape.block.ModBlockEntities;
@@ -47,6 +47,10 @@ public final class RenderFactory {
             BuildscapeCommon.MOD_ID, "textures/entity/festive_wandering_homemaker.png");
 
     private RenderFactory() {}
+
+    public static void registerLayerDefinitions(java.util.function.BiConsumer<Object, java.util.function.Supplier<Object>> registrar) {
+        registrar.accept(HOMEMAKER_LAYER, RenderFactory::createBodyLayer);
+    }
 
     @SuppressWarnings("unchecked")
     public static void registerRenderers() {

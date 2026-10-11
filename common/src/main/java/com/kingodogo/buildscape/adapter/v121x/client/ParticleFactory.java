@@ -1,4 +1,4 @@
-package com.kingodogo.buildscape.adapter.v121x;
+package com.kingodogo.buildscape.adapter.v121x.client;
 
 import com.kingodogo.buildscape.particle.ModParticles;
 import com.kingodogo.buildscape.particle.PillarSparkleParticleLogic;

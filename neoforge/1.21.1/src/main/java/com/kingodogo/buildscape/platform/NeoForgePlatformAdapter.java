@@ -52,7 +52,9 @@ public final class NeoForgePlatformAdapter extends PlatformAdapterBase implement
     @Override public <T extends TreeDecorator> TreeDecoratorType<T> createTreeDecoratorType(MapCodec<T> codec) { return new TreeDecoratorType<>(codec); }
     @Override public <T extends FoliagePlacer> FoliagePlacerType<T> createFoliagePlacerType(MapCodec<T> codec) { return new FoliagePlacerType<>(codec); }
     @Override public <T extends TrunkPlacer> TrunkPlacerType<T> createTrunkPlacerType(MapCodec<T> codec) { return new TrunkPlacerType<>(codec); }
-    @Override protected com.mojang.blaze3d.platform.NativeImage getSpriteImage(net.minecraft.client.renderer.texture.SpriteContents contents) { return contents.originalImage; }
+    @Override protected com.mojang.blaze3d.platform.NativeImage getSpriteImage(net.minecraft.client.renderer.texture.SpriteContents contents) {
+        return com.kingodogo.buildscape.platform.client.NeoForgeClientAccess.spriteImage(contents);
+    }
     @Override public void registerParticleProviders() {
         if (isClient()) com.kingodogo.buildscape.BuildscapeNeoForgeClient.registerParticleProviders();
     }

@@ -75,84 +75,84 @@ public class ModSounds {
     public static final RegistrySupplier<SoundEvent> MUSIC_DISC_BUILDER = registerSound("music_disc_builder");
 
     public static SoundType COPPER_GRATE_SOUNDS() {
-        return soundType(1f, 1f, sound(COPPER_GRATE_BREAK, SoundEvents.COPPER_BREAK),
-                sound(COPPER_GRATE_STEP, SoundEvents.COPPER_STEP), sound(COPPER_GRATE_PLACE, SoundEvents.COPPER_STEP),
-                sound(COPPER_GRATE_HIT, SoundEvents.COPPER_STEP), sound(COPPER_GRATE_FALL, SoundEvents.COPPER_STEP));
+        return soundType(1f, 1f, () -> sound(COPPER_GRATE_BREAK, SoundEvents.COPPER_BREAK),
+                () -> sound(COPPER_GRATE_STEP, SoundEvents.COPPER_STEP), () -> sound(COPPER_GRATE_PLACE, SoundEvents.COPPER_STEP),
+                () -> sound(COPPER_GRATE_HIT, SoundEvents.COPPER_STEP), () -> sound(COPPER_GRATE_FALL, SoundEvents.COPPER_STEP));
     }
 
     public static SoundType COPPER_BULB_SOUNDS() {
-        return soundType(1f, 1f, sound(COPPER_BULB_BREAK, SoundEvents.COPPER_BREAK),
-                sound(COPPER_BULB_STEP, SoundEvents.COPPER_STEP), sound(COPPER_BULB_PLACE, SoundEvents.COPPER_STEP),
-                sound(COPPER_BULB_HIT, SoundEvents.COPPER_STEP), sound(COPPER_BULB_FALL, SoundEvents.COPPER_STEP));
+        return soundType(1f, 1f, () -> sound(COPPER_BULB_BREAK, SoundEvents.COPPER_BREAK),
+                () -> sound(COPPER_BULB_STEP, SoundEvents.COPPER_STEP), () -> sound(COPPER_BULB_PLACE, SoundEvents.COPPER_STEP),
+                () -> sound(COPPER_BULB_HIT, SoundEvents.COPPER_STEP), () -> sound(COPPER_BULB_FALL, SoundEvents.COPPER_STEP));
     }
 
     public static SoundType DECORATED_POT_SOUNDS() {
-        return soundType(1f, 1f, sound(DECORATED_POT_BREAK, SoundEvents.STONE_BREAK),
-                sound(DECORATED_POT_STEP, SoundEvents.STONE_STEP), sound(DECORATED_POT_PLACE, SoundEvents.STONE_PLACE),
-                sound(DECORATED_POT_HIT, SoundEvents.STONE_HIT), sound(DECORATED_POT_FALL, SoundEvents.STONE_FALL));
+        return soundType(1f, 1f, () -> sound(DECORATED_POT_BREAK, SoundEvents.STONE_BREAK),
+                () -> sound(DECORATED_POT_STEP, SoundEvents.STONE_STEP), () -> sound(DECORATED_POT_PLACE, SoundEvents.STONE_PLACE),
+                () -> sound(DECORATED_POT_HIT, SoundEvents.STONE_HIT), () -> sound(DECORATED_POT_FALL, SoundEvents.STONE_FALL));
     }
 
     public static CustomSoundType MUD_SOUNDS() {
         return custom(1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f,
-                sound(MUD_BREAK, SoundEvents.GRAVEL_BREAK), sound(MUD_STEP, SoundEvents.GRAVEL_STEP),
-                sound(MUD_PLACE, SoundEvents.GRAVEL_PLACE), sound(MUD_HIT, SoundEvents.GRAVEL_HIT),
-                sound(MUD_FALL, SoundEvents.GRAVEL_FALL));
+                () -> sound(MUD_BREAK, SoundEvents.GRAVEL_BREAK), () -> sound(MUD_STEP, SoundEvents.GRAVEL_STEP),
+                () -> sound(MUD_PLACE, SoundEvents.GRAVEL_PLACE), () -> sound(MUD_HIT, SoundEvents.GRAVEL_HIT),
+                () -> sound(MUD_FALL, SoundEvents.GRAVEL_FALL));
     }
 
     public static CustomSoundType PACKED_MUD_SOUNDS() {
         return custom(.3f, 1f, 1f, .95f, .3f, 1f, 1f, 1f, 1f, 1f,
-                sound(PACKED_MUD_BREAK, SoundEvents.GRAVEL_BREAK), sound(PACKED_MUD_STEP, SoundEvents.GRAVEL_STEP),
-                sound(PACKED_MUD_PLACE, SoundEvents.GRAVEL_PLACE), sound(PACKED_MUD_HIT, SoundEvents.GRAVEL_HIT),
-                sound(PACKED_MUD_FALL, SoundEvents.GRAVEL_FALL));
+                () -> sound(PACKED_MUD_BREAK, SoundEvents.GRAVEL_BREAK), () -> sound(PACKED_MUD_STEP, SoundEvents.GRAVEL_STEP),
+                () -> sound(PACKED_MUD_PLACE, SoundEvents.GRAVEL_PLACE), () -> sound(PACKED_MUD_HIT, SoundEvents.GRAVEL_HIT),
+                () -> sound(PACKED_MUD_FALL, SoundEvents.GRAVEL_FALL));
     }
 
     public static CustomSoundType MUD_BRICKS_SOUNDS() {
         return custom(1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f,
-                sound(MUD_BRICKS_BREAK, SoundEvents.STONE_BREAK), sound(MUD_BRICKS_STEP, SoundEvents.STONE_STEP),
-                sound(MUD_BRICKS_PLACE, SoundEvents.STONE_PLACE), sound(MUD_BRICKS_HIT, SoundEvents.STONE_HIT),
-                sound(MUD_BRICKS_FALL, SoundEvents.STONE_FALL));
+                () -> sound(MUD_BRICKS_BREAK, SoundEvents.STONE_BREAK), () -> sound(MUD_BRICKS_STEP, SoundEvents.STONE_STEP),
+                () -> sound(MUD_BRICKS_PLACE, SoundEvents.STONE_PLACE), () -> sound(MUD_BRICKS_HIT, SoundEvents.STONE_HIT),
+                () -> sound(MUD_BRICKS_FALL, SoundEvents.STONE_FALL));
     }
 
     public static CustomSoundType PETAL_CLOVER_SOUNDS() {
         return custom(.8f, .96f, .12f, 1.2f, .8f, .96f, .2f, .6f, .4f, .9f,
-                SoundEvents.FLOWERING_AZALEA_BREAK, SoundEvents.FLOWERING_AZALEA_STEP,
-                SoundEvents.FLOWERING_AZALEA_PLACE, SoundEvents.FLOWERING_AZALEA_HIT,
-                SoundEvents.FLOWERING_AZALEA_FALL);
+                () -> SoundEvents.FLOWERING_AZALEA_BREAK, () -> SoundEvents.FLOWERING_AZALEA_STEP,
+                () -> SoundEvents.FLOWERING_AZALEA_PLACE, () -> SoundEvents.FLOWERING_AZALEA_HIT,
+                () -> SoundEvents.FLOWERING_AZALEA_FALL);
     }
 
     public static CustomSoundType FLOWER_BED_SOUNDS() {
         return custom(.8f, .96f, .25f, 1.2f, .8f, .96f, .2f, .6f, .4f, .9f,
-                sound(FLOWER_BED_BREAK, SoundEvents.FLOWERING_AZALEA_BREAK),
-                sound(FLOWER_BED_STEP, SoundEvents.FLOWERING_AZALEA_STEP),
-                sound(FLOWER_BED_PLACE, SoundEvents.FLOWERING_AZALEA_PLACE),
-                sound(FLOWER_BED_HIT, SoundEvents.FLOWERING_AZALEA_HIT),
-                sound(FLOWER_BED_FALL, SoundEvents.FLOWERING_AZALEA_FALL));
+                () -> sound(FLOWER_BED_BREAK, SoundEvents.FLOWERING_AZALEA_BREAK),
+                () -> sound(FLOWER_BED_STEP, SoundEvents.FLOWERING_AZALEA_STEP),
+                () -> sound(FLOWER_BED_PLACE, SoundEvents.FLOWERING_AZALEA_PLACE),
+                () -> sound(FLOWER_BED_HIT, SoundEvents.FLOWERING_AZALEA_HIT),
+                () -> sound(FLOWER_BED_FALL, SoundEvents.FLOWERING_AZALEA_FALL));
     }
 
     public static CustomSoundType VINE_SOUNDS() {
         return custom(.9f, .8f, .15f, 1f, .9f, .8f, .25f, .5f, .5f, .75f,
-                SoundEvents.VINE_BREAK, SoundEvents.VINE_STEP, SoundEvents.VINE_PLACE,
-                SoundEvents.VINE_HIT, SoundEvents.VINE_FALL);
+                () -> SoundEvents.VINE_BREAK, () -> SoundEvents.VINE_STEP, () -> SoundEvents.VINE_PLACE,
+                () -> SoundEvents.VINE_HIT, () -> SoundEvents.VINE_FALL);
     }
 
     public static CustomSoundType AZALEA_SOUNDS() {
         return custom(1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f,
-                SoundEvents.AZALEA_BREAK, SoundEvents.AZALEA_STEP, SoundEvents.AZALEA_PLACE,
-                SoundEvents.AZALEA_HIT, SoundEvents.AZALEA_FALL);
+                () -> SoundEvents.AZALEA_BREAK, () -> SoundEvents.AZALEA_STEP, () -> SoundEvents.AZALEA_PLACE,
+                () -> SoundEvents.AZALEA_HIT, () -> SoundEvents.AZALEA_FALL);
     }
 
     public static SoundType MANGROVE_ROOTS_SOUNDS() {
-        return soundType(1f, 1f, sound(MANGROVE_ROOTS_BREAK, SoundEvents.WOOD_BREAK),
-                sound(MANGROVE_ROOTS_STEP, SoundEvents.WOOD_STEP), sound(MANGROVE_ROOTS_PLACE, SoundEvents.WOOD_PLACE),
-                sound(MANGROVE_ROOTS_HIT, SoundEvents.WOOD_HIT), sound(MANGROVE_ROOTS_FALL, SoundEvents.WOOD_FALL));
+        return soundType(1f, 1f, () -> sound(MANGROVE_ROOTS_BREAK, SoundEvents.WOOD_BREAK),
+                () -> sound(MANGROVE_ROOTS_STEP, SoundEvents.WOOD_STEP), () -> sound(MANGROVE_ROOTS_PLACE, SoundEvents.WOOD_PLACE),
+                () -> sound(MANGROVE_ROOTS_HIT, SoundEvents.WOOD_HIT), () -> sound(MANGROVE_ROOTS_FALL, SoundEvents.WOOD_FALL));
     }
 
     public static SoundType MUDDY_MANGROVE_ROOTS_SOUNDS() {
-        return soundType(1f, 1f, sound(MUDDY_MANGROVE_ROOTS_BREAK, SoundEvents.WOOD_BREAK),
-                sound(MUDDY_MANGROVE_ROOTS_STEP, SoundEvents.WOOD_STEP),
-                sound(MUDDY_MANGROVE_ROOTS_PLACE, SoundEvents.WOOD_PLACE),
-                sound(MUDDY_MANGROVE_ROOTS_HIT, SoundEvents.WOOD_HIT),
-                sound(MUDDY_MANGROVE_ROOTS_FALL, SoundEvents.WOOD_FALL));
+        return soundType(1f, 1f, () -> sound(MUDDY_MANGROVE_ROOTS_BREAK, SoundEvents.WOOD_BREAK),
+                () -> sound(MUDDY_MANGROVE_ROOTS_STEP, SoundEvents.WOOD_STEP),
+                () -> sound(MUDDY_MANGROVE_ROOTS_PLACE, SoundEvents.WOOD_PLACE),
+                () -> sound(MUDDY_MANGROVE_ROOTS_HIT, SoundEvents.WOOD_HIT),
+                () -> sound(MUDDY_MANGROVE_ROOTS_FALL, SoundEvents.WOOD_FALL));
     }
 
     private static SoundEvent sound(RegistrySupplier<SoundEvent> supplier, SoundEvent fallback) {
@@ -164,17 +164,48 @@ public class ModSounds {
         }
     }
 
-    private static SoundType soundType(float volume, float pitch, SoundEvent breakSound, SoundEvent stepSound,
-                                       SoundEvent placeSound, SoundEvent hitSound, SoundEvent fallSound) {
-        return new SoundType(volume, pitch, breakSound, stepSound, placeSound, hitSound, fallSound);
+    private static SoundType soundType(float volume, float pitch,
+                                       java.util.function.Supplier<SoundEvent> breakSound,
+                                       java.util.function.Supplier<SoundEvent> stepSound,
+                                       java.util.function.Supplier<SoundEvent> placeSound,
+                                       java.util.function.Supplier<SoundEvent> hitSound,
+                                       java.util.function.Supplier<SoundEvent> fallSound) {
+        if (Services.isVersionCluster("v118x")) {
+            return new SoundType(volume, pitch, SoundEvents.STONE_BREAK, SoundEvents.STONE_STEP,
+                    SoundEvents.STONE_PLACE, SoundEvents.STONE_HIT, SoundEvents.STONE_FALL) {
+                @Override public SoundEvent getBreakSound() { return breakSound.get(); }
+                @Override public SoundEvent getStepSound() { return stepSound.get(); }
+                @Override public SoundEvent getPlaceSound() { return placeSound.get(); }
+                @Override public SoundEvent getHitSound() { return hitSound.get(); }
+                @Override public SoundEvent getFallSound() { return fallSound.get(); }
+            };
+        }
+        return new SoundType(volume, pitch, breakSound.get(), stepSound.get(), placeSound.get(),
+                hitSound.get(), fallSound.get());
     }
 
     private static CustomSoundType custom(float breakVolume, float breakPitch, float stepVolume, float stepPitch,
                                           float placeVolume, float placePitch, float hitVolume, float hitPitch,
-                                          float fallVolume, float fallPitch, SoundEvent breakSound, SoundEvent stepSound,
-                                          SoundEvent placeSound, SoundEvent hitSound, SoundEvent fallSound) {
+                                          float fallVolume, float fallPitch,
+                                          java.util.function.Supplier<SoundEvent> breakSound,
+                                          java.util.function.Supplier<SoundEvent> stepSound,
+                                          java.util.function.Supplier<SoundEvent> placeSound,
+                                          java.util.function.Supplier<SoundEvent> hitSound,
+                                          java.util.function.Supplier<SoundEvent> fallSound) {
+        if (Services.isVersionCluster("v118x")) {
+            return new CustomSoundType(breakVolume, breakPitch, stepVolume, stepPitch, placeVolume, placePitch,
+                    hitVolume, hitPitch, fallVolume, fallPitch, SoundEvents.STONE_BREAK, SoundEvents.STONE_STEP,
+                    SoundEvents.STONE_PLACE, SoundEvents.STONE_HIT, SoundEvents.STONE_FALL) {
+                @Override public SoundEvent getBreakSound() { return breakSound.get(); }
+                @Override public SoundEvent getStepSound() { return stepSound.get(); }
+                @Override public SoundEvent getPlaceSound() { return placeSound.get(); }
+                @Override public SoundEvent getHitSound() { return hitSound.get(); }
+                @Override public SoundEvent getFallSound() { return fallSound.get(); }
+            };
+        }
         return new CustomSoundType(breakVolume, breakPitch, stepVolume, stepPitch, placeVolume, placePitch,
-                hitVolume, hitPitch, fallVolume, fallPitch, breakSound, stepSound, placeSound, hitSound, fallSound);
+                hitVolume, hitPitch, fallVolume, fallPitch, breakSound.get(), stepSound.get(), placeSound.get(),
+                hitSound.get(), fallSound.get());
     }
     private static RegistrySupplier<SoundEvent> registerSound(String path) {
         String sanitized = path.replace('.', '_');

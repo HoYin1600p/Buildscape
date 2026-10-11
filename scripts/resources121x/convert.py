@@ -29,6 +29,10 @@ load, write, loot, door_parent, door_state = (
     shared.load, shared.write, shared.loot, shared.door_parent, shared.door_state)
 FOLDERS = shared.FOLDERS | {"structures": "structure"}
 TAG_FOLDERS = shared.TAG_FOLDERS | {"game_events": "game_event"}
+# The shared folder/common-tag and door-parent mappings already apply in
+# 1.21.1. Its recipe ingredients and advancement backgrounds differ (handled
+# below); quartz_pillar_side, iron_chain and item definitions are later changes
+# and must not be copied from the 26.2 conversion pipeline.
 SPECIAL_ITEMS = ()  # 1.21.1 uses ordinary item models, including BEWLR items.
 # A single pack.mcmeta serves both packs. 1.21.1 supports ranges: resource
 # format 34 and data format 48 must both be included in supported_formats.
@@ -191,6 +195,88 @@ def compact_pack(data, removed, vanilla_files, report=None):
     return result
 
 
+def holder_ids(value):
+    """Read holder ids from lists; inline objects are visited by objects()."""
+    if isinstance(value, str):
+        yield value
+    elif isinstance(value, list):
+        for child in value:
+            yield from holder_ids(child)
+
+
+def data_path(kind, value):
+    raw = value.removeprefix("#")
+    ns, sep, name = raw.partition(":")
+    if not sep:
+        ns, name = "minecraft", ns
+    return Path("data", ns, "tags" if value.startswith("#") else "", kind, name + ".json")
+
+
+def data_references(rel, data):
+    """File-backed advancement/worldgen dependencies, without a client jar."""
+    parts = rel.parts
+    if len(parts) < 4 or parts[0] != "data" or not isinstance(data, dict):
+        return
+    if parts[2] == "advancement":
+        for value in data.get("rewards", {}).get("recipes", []):
+            yield "recipe", value
+        if "parent" in data:
+            yield "advancement", data["parent"]
+    elif parts[2:4] == ("tags", "worldgen"):
+        kind = "/".join(parts[3:5])
+        for value in data.get("values", []):
+            yield kind, value.get("id") if isinstance(value, dict) else value
+    elif parts[2] == "worldgen":
+        for obj in objects(data):
+            if isinstance(obj.get("feature"), str):
+                # Selector entries contain placed features; placed_feature's
+                # root feature is a configured feature (or an inline object).
+                kind = "configured_feature" if parts[3] == "placed_feature" and obj is data else "placed_feature"
+                yield "worldgen/" + kind, obj["feature"]
+            for value in holder_ids(obj.get("features", [])):
+                yield "worldgen/placed_feature", value
+            if isinstance(obj.get("default"), str):
+                yield "worldgen/placed_feature", obj["default"]
+    elif parts[2] in {"biome_modifier", "forge", "neoforge"}:
+        for value in holder_ids(data.get("features", [])):
+            yield "worldgen/placed_feature", value
+
+
+def missing_data_references(rel, data, files):
+    return [(kind, value) for kind, value in data_references(rel, data)
+            if isinstance(value, str) and value.removeprefix("#").startswith("buildscape:")
+            and data_path(kind, value) not in files]
+
+
+def prune_dependencies(generated, report):
+    """Remove orphan unlocks and worldgen chains after loader/removal filtering.
+
+    Compact packs are runtime recipes, not vanilla recipe resources. They cannot
+    satisfy a vanilla advancement reward. Keep their recipes and drop the unlock
+    with a report instead. Repeat to handle parents and nested worldgen tags.
+    """
+    while True:
+        changed = False
+        for rel, data in list(generated.items()):
+            missing = missing_data_references(rel, data, generated)
+            if not missing:
+                continue
+            if rel.parts[2:4] == ("tags", "worldgen"):
+                ids = {value for _, value in missing}
+                data["values"] = [value for value in data["values"]
+                                  if (value.get("id") if isinstance(value, dict) else value) not in ids]
+                if data["values"]:
+                    report.append(str(rel) + ": pruned removed worldgen entries " + ", ".join(sorted(ids)))
+                    changed = True
+                    continue
+            del generated[rel]
+            report.append(str(rel) + ": dropped missing dependency " +
+                          ", ".join(kind + " " + value for kind, value in missing))
+            changed = True
+        if not changed:
+            return
+
+
 def convert(source, output, jar, manifest=None):
     source, output = Path(source).resolve(), Path(output).resolve()
     if source == output or source in output.parents or output in source.parents:
@@ -248,9 +334,6 @@ def convert(source, output, jar, manifest=None):
                 elif "models" in rel.parts:
                     if "parent" in data:
                         data["parent"] = door_parent(data["parent"])
-                    for key, value in data.get("textures", {}).items():
-                        if value in ("minecraft:block/quartz_pillar", "block/quartz_pillar"):
-                            data["textures"][key] = "minecraft:block/quartz_pillar_side"
                 elif "lang" in rel.parts:
                     data = {k: v for k, v in data.items() if not any(
                         k in {"block." + old.replace(":", "."), "item." + old.replace(":", ".")}
@@ -293,6 +376,7 @@ def convert(source, output, jar, manifest=None):
                 bonuses = [pool for pool in generated[rel]["pools"] if "buildscape:" in json.dumps(pool)]
                 generated[rel] = json.loads(vanilla.read(rel.as_posix()))
                 generated[rel]["pools"].extend(bonuses)
+    prune_dependencies(generated, report)
     generated[Path("pack.mcmeta")] = PACK
     changed = 0
     for rel, data in sorted(generated.items()):

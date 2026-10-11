@@ -132,8 +132,11 @@ class Validator(shared.Validator):
             self.error("pack.mcmeta", "expected resource 34 / data 48 supported range")
         self.models()
         removed = c.removals()
+        files = {Path(path) for path in self.files} | {Path(path) for path in self.jar_files}
         for path, data in self.json.items():
             if path.startswith("data/"):
+                for kind, value in c.missing_data_references(Path(path), data, files):
+                    self.error(path, "missing " + kind + " dependency " + value)
                 reason = c.unsupported_loader_data(data)
                 if reason:
                     self.error(path, reason)
@@ -161,8 +164,8 @@ class Validator(shared.Validator):
                     for obj in objects(data):
                         if "Name" in obj:
                             self.tag(path, "block", obj["Name"])
-                        if isinstance(obj.get("feature"), str):
-                            self.tag(path, "worldgen/configured_feature", obj["feature"])
+                    for kind, value in c.data_references(Path(path), data):
+                        self.tag(path, kind, value)
                 elif "/recipes_pack/" in path:
                     aliases = data.get("aliases", {})
                     if aliases.get("F") != "c:":

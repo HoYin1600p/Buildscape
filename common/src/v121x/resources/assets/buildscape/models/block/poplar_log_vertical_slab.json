@@ -1,0 +1,9 @@
+{
+  "parent": "buildscape:block/template_vertical_slab",
+  "textures": {
+    "bottom": "buildscape:block/poplar_log_top",
+    "top": "buildscape:block/poplar_log_top",
+    "side": "buildscape:block/poplar_log",
+    "particle": "#side"
+  }
+}

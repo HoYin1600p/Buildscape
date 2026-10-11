@@ -1,0 +1,9 @@
+{
+  "parent": "minecraft:block/stairs",
+  "textures": {
+    "bottom": "buildscape:block/white_stained_brick_tiles",
+    "top": "buildscape:block/white_stained_brick_tiles",
+    "side": "buildscape:block/white_stained_brick_tiles",
+    "particle": "#side"
+  }
+}

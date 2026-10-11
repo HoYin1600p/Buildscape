@@ -1,0 +1,36 @@
+{
+  "variants": {
+    "layers=1": {
+      "particle": "buildscape:block/snowy_azalea_leaves",
+      "model": "buildscape:block/snowy_azalea_leaf_layers_layer1"
+    },
+    "layers=2": {
+      "particle": "buildscape:block/snowy_azalea_leaves",
+      "model": "buildscape:block/snowy_azalea_leaf_layers_layer2"
+    },
+    "layers=3": {
+      "particle": "buildscape:block/snowy_azalea_leaves",
+      "model": "buildscape:block/snowy_azalea_leaf_layers_layer3"
+    },
+    "layers=4": {
+      "particle": "buildscape:block/snowy_azalea_leaves",
+      "model": "buildscape:block/snowy_azalea_leaf_layers_layer4"
+    },
+    "layers=5": {
+      "particle": "buildscape:block/snowy_azalea_leaves",
+      "model": "buildscape:block/snowy_azalea_leaf_layers_layer5"
+    },
+    "layers=6": {
+      "particle": "buildscape:block/snowy_azalea_leaves",
+      "model": "buildscape:block/snowy_azalea_leaf_layers_layer6"
+    },
+    "layers=7": {
+      "particle": "buildscape:block/snowy_azalea_leaves",
+      "model": "buildscape:block/snowy_azalea_leaf_layers_layer7"
+    },
+    "layers=8": {
+      "particle": "buildscape:block/snowy_azalea_leaves",
+      "model": "buildscape:block/snowy_azalea_leaf_layers_layer8"
+    }
+  }
+}

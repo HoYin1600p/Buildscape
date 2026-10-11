@@ -1,0 +1,10 @@
+{
+  "pack": {
+    "description": "Buildscape resources for Minecraft 1.21.1",
+    "pack_format": 34,
+    "supported_formats": {
+      "min_inclusive": 34,
+      "max_inclusive": 48
+    }
+  }
+}

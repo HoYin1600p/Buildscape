@@ -1,0 +1,7 @@
+{
+  "parent": "buildscape:block/pillar_top",
+  "textures": {
+    "2": "buildscape:block/calcite_pillar_top",
+    "particle": "minecraft:block/calcite"
+  }
+}

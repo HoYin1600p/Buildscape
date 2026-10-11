@@ -1,0 +1,32 @@
+{
+  "variants": {
+    "lit=false,vertical_direction=up,waterlogged=false": {
+      "model": "buildscape:block/yellow_star"
+    },
+    "lit=false,vertical_direction=up,waterlogged=true": {
+      "model": "buildscape:block/yellow_star"
+    },
+    "lit=false,vertical_direction=down,waterlogged=false": {
+      "model": "buildscape:block/yellow_star",
+      "x": 180
+    },
+    "lit=false,vertical_direction=down,waterlogged=true": {
+      "model": "buildscape:block/yellow_star",
+      "x": 180
+    },
+    "lit=true,vertical_direction=up,waterlogged=false": {
+      "model": "buildscape:block/yellow_star"
+    },
+    "lit=true,vertical_direction=up,waterlogged=true": {
+      "model": "buildscape:block/yellow_star"
+    },
+    "lit=true,vertical_direction=down,waterlogged=false": {
+      "model": "buildscape:block/yellow_star",
+      "x": 180
+    },
+    "lit=true,vertical_direction=down,waterlogged=true": {
+      "model": "buildscape:block/yellow_star",
+      "x": 180
+    }
+  }
+}

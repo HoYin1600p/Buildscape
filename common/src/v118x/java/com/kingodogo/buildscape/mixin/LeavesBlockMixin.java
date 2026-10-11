@@ -32,7 +32,7 @@ public abstract class LeavesBlockMixin extends Block implements SimpleWaterlogge
 
 
     @Dynamic
-    @Inject(require = 0, method = {"createBlockStateDefinition", "m_7926_"}, remap = false, at = @At("TAIL"))
+    @Inject(require = 0, method = "createBlockStateDefinition", at = @At("TAIL"))
     private void buildscape$addWaterlogged(StateDefinition.Builder<Block, BlockState> builder, CallbackInfo ci) {
         builder.add(BlockStateProperties.WATERLOGGED);
     }

@@ -195,50 +195,14 @@ public class PillarBlockEntityRenderer {
 
                     double lenX = bounds.maxX - bounds.minX;
                     double lenY = bounds.maxY - bounds.minY;
-                    double visualLength = Math.sqrt(lenX * lenX + lenY * lenY);
-                    if (visualLength < 0.1) visualLength = 1.0;
+                    boolean isSword = isSwordLike(displayedItem);
+                    boolean isAxe = isAxeLike(displayedItem);
 
-                    float scale = 0.8f;
-                    double standardLength = 0.85;
-
-                    boolean isSword = Services.PLATFORM.isSwordLike(displayedItem);
-                    boolean isAxe = Services.PLATFORM.isAxeLike(displayedItem);
-
-                    if (isSword) {
-                        double baseTransY = -0.5;
-
-                        double extraLength = Math.max(0, visualLength - standardLength);
-                        double transY = baseTransY + (extraLength * 0.7 * scale);
-
-                        double tipDist = (visualLength / 2.0) * scale;
-                        double tipY = (1.4625 + transY) - tipDist;
-
-                        if (tipY < 0.05) {
-                            double correctiveLift = 0.05 - tipY;
-                            transY += correctiveLift;
-                        }
-
-                        poseStack.translate(0, transY, 0);
-                        Services.PLATFORM.rotateZ(poseStack, 135);
-                        poseStack.scale(scale, scale, scale);
-
-                    } else if (isAxe) {
-                        double baseTransY = -0.55;
-
-                        double extraLength = Math.max(0, visualLength - standardLength);
-                        double transY = baseTransY + (extraLength * 0.7 * scale);
-
-                        double tipDist = (visualLength / 2.0) * scale;
-                        double tipY = (1.4625 + transY) - tipDist;
-
-                        if (tipY < 0.05) {
-                            double correctiveLift = 0.05 - tipY;
-                            transY += correctiveLift;
-                        }
-
-                        poseStack.translate(0, transY, 0);
-                        Services.PLATFORM.rotateZ(poseStack, 190);
-                        poseStack.scale(scale, scale, scale);
+                    if (isSword || isAxe) {
+                        var transform = PillarItemDisplay.fixedTool(isSword, lenX, lenY);
+                        poseStack.translate(0, transform.translateY(), 0);
+                        Services.PLATFORM.rotateZ(poseStack, transform.rotateZ());
+                        poseStack.scale(transform.scale(), transform.scale(), transform.scale());
                     } else {
                         poseStack.scale(0.5f, 0.5f, 0.5f);
                     }
@@ -303,17 +267,19 @@ public class PillarBlockEntityRenderer {
     private boolean hasItemNameTag(ItemStack stack) {
         if (stack == null || stack.isEmpty()) return false;
         if (!Services.PLATFORM.hasCustomHoverName(stack)) return false;
-        String name = net.minecraft.ChatFormatting.stripFormatting(stack.getHoverName().getString().trim());
-        return name.equalsIgnoreCase("item");
+        return PillarItemDisplay.parse(stack.getHoverName().getString(), false) == PillarItemDisplay.Mode.ITEM;
     }
 
     private boolean isFixed(ItemStack stack) {
         if (stack == null || stack.isEmpty()) return false;
         if (!Services.PLATFORM.hasCustomHoverName(stack)) return false;
-        String name = net.minecraft.ChatFormatting.stripFormatting(stack.getHoverName().getString().trim().toLowerCase(java.util.Locale.ROOT));
-        if (name.contains("fixed")) {
-            return Services.PLATFORM.isWeaponOrTool(stack);
-        }
-        return false;
+        return PillarItemDisplay.parse(stack.getHoverName().getString(), isWeaponOrTool(stack))
+                == PillarItemDisplay.Mode.FIXED;
     }
+
+    protected boolean isSwordLike(ItemStack stack) { return Services.PLATFORM.isSwordLike(stack); }
+
+    protected boolean isAxeLike(ItemStack stack) { return Services.PLATFORM.isAxeLike(stack); }
+
+    protected boolean isWeaponOrTool(ItemStack stack) { return Services.PLATFORM.isWeaponOrTool(stack); }
 }

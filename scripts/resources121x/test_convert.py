@@ -1,5 +1,6 @@
 """Independent 1.21.1 fixtures, including boundaries with later formats."""
 import contextlib
+import copy
 import io
 import json
 from pathlib import Path
@@ -12,6 +13,108 @@ import validate as v
 
 
 class ConversionTests(unittest.TestCase):
+    def test_model_migration_preserves_face_data_and_nonzero_rotations(self):
+        original = {"elements": [
+            {"rotation": {"x": 0, "y": 0, "z": 0, "origin": [14, 13, 14]},
+             "faces": {"north": {"texture": "#light", "forge_data": {
+                 "block_light": 15, "sky_light": 15}}}},
+            {"rotation": {"angle": 0, "origin": [0, 0, 0]}, "faces": {}},
+            {"rotation": {"angle": 22.5, "axis": "y", "origin": [8, 8, 8]}, "faces": {}},
+            {"rotation": {"angle": 22.5, "origin": [8, 8, 8]}, "faces": {}},
+            {"rotation": {"x": 15, "origin": [8, 8, 8]}, "faces": {}}]}
+        before = copy.deepcopy(original)
+        result = c.model(original)
+        self.assertEqual(original, before)
+        for element in result["elements"][:2]:
+            self.assertNotIn("rotation", element)
+        for index in (2, 3, 4):
+            self.assertEqual(result["elements"][index], original["elements"][index])
+        face = result["elements"][0]["faces"]["north"]
+        self.assertEqual(face, {"texture": "#light", "neoforge_data": {"block_light": 15, "sky_light": 15}})
+        self.assertEqual(c.model(result), result)
+        with self.assertRaisesRegex(ValueError, "Conflicting"):
+            c.model({"elements": [{"faces": {"up": {"forge_data": {}, "neoforge_data": {"block_light": 1}}}}]})
+
+    def test_validator_model_and_blockstate_deserializer_fields(self):
+        good = {"elements": [{"from": [0, 0, 0], "to": [16, 16, 16],
+                "rotation": {"axis": "y", "angle": 22.5, "origin": [8, 8, 8]},
+                "faces": {"north": {"texture": "#side", "uv": [0, 0, 16, 16], "rotation": 270,
+                                      "neoforge_data": {"block_light": 15}}}}]}
+        cases = [
+            ("axis", lambda d: d["elements"][0]["rotation"].pop("axis")),
+            ("angle", lambda d: d["elements"][0]["rotation"].update(angle=30)),
+            ("origin", lambda d: d["elements"][0]["rotation"].update(origin=[0, 0])),
+            ("rescale", lambda d: d["elements"][0]["rotation"].update(rescale="yes")),
+            ("shade", lambda d: d["elements"][0].update(shade=1)),
+            ("outside", lambda d: d["elements"][0].update(to=[33, 16, 16])),
+            ("face rotation", lambda d: d["elements"][0]["faces"]["north"].update(rotation=45)),
+            ("face uv", lambda d: d["elements"][0]["faces"]["north"].update(uv=[0, 1])),
+            ("forge_data", lambda d: d["elements"][0]["faces"]["north"].update(forge_data={})),
+            ("textures", lambda d: d.update(textures={"side": {"sprite": "minecraft:block/stone"}})),
+            ("predicate", lambda d: d.update(overrides=[{"model": "minecraft:block/stone", "predicate": {"a": "bad"}}]))]
+        with tempfile.TemporaryDirectory() as tmp:
+            jar = Path(tmp) / "vanilla.jar"
+            with zipfile.ZipFile(jar, "w"):
+                pass
+            with zipfile.ZipFile(jar) as archive:
+                validator = v.Validator(Path(tmp) / "resources", archive)
+                self.assertTrue(validator.model_fields("model", good))
+                self.assertEqual(validator.errors, [])
+                for expected, mutate in cases:
+                    with self.subTest(field=expected):
+                        validator.errors.clear()
+                        bad = copy.deepcopy(good)
+                        mutate(bad)
+                        self.assertFalse(validator.model_fields("model", bad))
+                        self.assertTrue(any(expected in error for error in validator.errors))
+                validator.errors.clear()
+                validator.blockstate_fields("state", {"variants": {"": [
+                    {"model": "minecraft:block/stone", "x": 90, "y": -90, "weight": 2}]},
+                    "multipart": [{"apply": {"model": "minecraft:block/stone", "y": 360}}]})
+                self.assertEqual(validator.errors, [])
+                for data in ({"variants": {"": []}}, {"variants": {"": {"model": "m", "x": 45}}},
+                             {"multipart": [{"apply": {"model": "m", "weight": 0}}]},
+                             {"variants": {"": {"model": "m", "uvlock": "true"}}},
+                             {"multipart": [{}]}, {"variants": []}):
+                    with self.subTest(data=data):
+                        validator.errors.clear()
+                        validator.blockstate_fields("state", data)
+                        self.assertTrue(validator.errors)
+
+    def test_subtitle_lookup_and_offline_validation(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            jar = Path(tmp) / "vanilla.jar"
+            with zipfile.ZipFile(jar, "w") as archive:
+                archive.writestr("assets/minecraft/lang/en_us.json", '{"subtitles.block.generic.hit":"Hit"}')
+            with zipfile.ZipFile(jar) as archive:
+                validator = v.Validator(Path(tmp) / "resources", archive)
+                validator.json = {
+                    "assets/buildscape/lang/fr_fr.json": {"subtitles.buildscape.light": "Lumiere"},
+                    "assets/buildscape/sounds.json": {
+                        "vanilla": {"subtitle": "subtitles.block.generic.hit", "sounds": ["block/stone/hit1"]},
+                        "custom": {"subtitle": "subtitles.buildscape.light", "sounds": []},
+                        "silent": {"sounds": []},
+                        **{event: {"subtitle": "subtitles.block.generic.fall", "sounds": []} for event in (
+                            "block_packed_mud_fall", "block_muddy_mangrove_roots_fall",
+                            "block_mud_bricks_fall", "block_mangrove_roots_fall")}}}
+                validator.sounds()
+                self.assertEqual(len(validator.errors), 4)
+                generated = {Path(path): copy.deepcopy(data) for path, data in validator.json.items()}
+                report = []
+                c.prune_subtitles(generated, c.translation_keys(
+                    validator.get_vanilla("assets/minecraft/lang/en_us.json"), generated), report)
+                self.assertEqual(len(report), 4)
+                for error in validator.errors:
+                    event = error.split(": ")[1]
+                    self.assertTrue(any(event in line and "subtitles.block.generic.fall" in line for line in report))
+                sounds = generated[Path("assets/buildscape/sounds.json")]
+                self.assertEqual(sounds["vanilla"], validator.json["assets/buildscape/sounds.json"]["vanilla"])
+                self.assertEqual(sounds["custom"], validator.json["assets/buildscape/sounds.json"]["custom"])
+                validator.json = {path.as_posix(): data for path, data in generated.items()}
+                validator.errors.clear()
+                validator.sounds()
+                self.assertEqual(validator.errors, [])
+
     def test_haze_set_nbt_splits_components_and_custom_data_with_conditions(self):
         path = c.REPO / "ref/forge/1.18.2/src/main/resources/data/buildscape/loot_tables/blocks/red_haze_bush.json"
         original = c.load(path)
@@ -219,6 +322,14 @@ class ConversionTests(unittest.TestCase):
                     "textures": {"side": "minecraft:block/quartz_pillar", "end": "block/quartz_pillar_top"}},
                 "assets/buildscape/models/item/cherry_planks.json": {"parent": "buildscape:block/cherry_planks"},
                 "assets/buildscape/models/item/sculk_slab.json": {"parent": "buildscape:block/sculk_slab"},
+                "assets/buildscape/models/block/light.json": {"elements": [{
+                    "from": [0, 0, 0], "to": [16, 16, 16], "rotation": {"x": 0, "y": 0, "z": 0},
+                    "faces": {"up": {"texture": "#light", "forge_data": {"block_light": 15}}}}]},
+                "assets/buildscape/lang/en_us.json": {"subtitles.buildscape.light": "Light"},
+                "assets/buildscape/sounds.json": {
+                    "missing": {"subtitle": "subtitles.block.generic.fall", "sounds": []},
+                    "custom": {"subtitle": "subtitles.buildscape.light", "sounds": []},
+                    "vanilla": {"subtitle": "subtitles.block.generic.hit", "sounds": []}},
                 "data/buildscape/recipes/keep.json": {"type": "minecraft:stonecutting", "ingredient": {"item": "buildscape:cherry_planks"},
                                                      "result": "buildscape:sculk_slab", "count": 2},
                 "data/forge/loot_modifiers/global_loot_modifiers.json": {"entries": []},
@@ -237,11 +348,20 @@ class ConversionTests(unittest.TestCase):
                 archive.writestr("version.json", '{"id":"1.21.1"}')
                 archive.writestr("assets/minecraft/models/item/cherry_planks.json", '{}')
                 archive.writestr("assets/minecraft/blockstates/oak_door.json", '{"variants":{}}')
+                archive.writestr("assets/minecraft/lang/en_us.json", '{"subtitles.block.generic.hit":"Hit"}')
             report = io.StringIO()
             with contextlib.redirect_stdout(report):
                 self.assertGreater(c.convert(source, output, jar, manifest), 0)
                 self.assertEqual(c.convert(source, output, jar, manifest), 0)
             self.assertIn("dropped", report.getvalue())
+            self.assertIn("missing: dropped unknown subtitle subtitles.block.generic.fall", report.getvalue())
+            light = c.load(output / "assets/buildscape/models/block/light.json")
+            self.assertEqual(light, c.model(fixtures["assets/buildscape/models/block/light.json"]))
+            sounds = c.load(output / "assets/buildscape/sounds.json")
+            self.assertNotIn("subtitle", sounds["missing"])
+            self.assertEqual(sounds["missing"]["sounds"], [])
+            self.assertIn("subtitle", sounds["custom"])
+            self.assertIn("subtitle", sounds["vanilla"])
             self.assertEqual(c.load(output / "pack.mcmeta"), c.PACK)
             self.assertTrue((output / "buildscape.mixins.json").exists())
             self.assertFalse((output / "assets/buildscape/items").exists())

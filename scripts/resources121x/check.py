@@ -1,4 +1,4 @@
-"""Run converter tests, then validate the generated Minecraft 1.21.1 tree."""
+"""Run converter tests and offline 1.21.1 model, subtitle and data checks."""
 import sys
 import unittest
 from pathlib import Path

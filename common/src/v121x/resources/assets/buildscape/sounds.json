@@ -465,8 +465,7 @@
         "volume": 1.0,
         "pitch": 0.75
       }
-    ],
-    "subtitle": "subtitles.block.generic.fall"
+    ]
   },
   "block_mangrove_roots_step": {
     "sounds": [
@@ -640,8 +639,7 @@
         "volume": 1.0,
         "pitch": 0.75
       }
-    ],
-    "subtitle": "subtitles.block.generic.fall"
+    ]
   },
   "block_muddy_mangrove_roots_step": {
     "sounds": [
@@ -850,8 +848,7 @@
         "volume": 1,
         "pitch": 1
       }
-    ],
-    "subtitle": "subtitles.block.generic.fall"
+    ]
   },
   "block_mud_bricks_break": {
     "sounds": [
@@ -1025,8 +1022,7 @@
         "volume": 1,
         "pitch": 1
       }
-    ],
-    "subtitle": "subtitles.block.generic.fall"
+    ]
   },
   "block_string_light_place": {
     "sounds": [

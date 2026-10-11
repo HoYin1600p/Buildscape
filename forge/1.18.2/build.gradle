@@ -21,7 +21,7 @@ def replaceProperties = [
 ].collectEntries { key -> [(key): referenceProperties.getProperty(key)] }
 
 group = referenceProperties.getProperty('mod_group_id')
-version = providers.gradleProperty('mod_version_v118x').get()
+version = providers.gradleProperty('mod_version').get()
 base.archivesName = referenceProperties.getProperty('mod_id')
 replaceProperties.mod_version = version.toString()
 

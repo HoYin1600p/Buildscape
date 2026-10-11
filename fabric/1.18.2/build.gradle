@@ -3,7 +3,7 @@ plugins {
     id 'xyz.wagyourtail.unimined'
 }
 
-version = providers.gradleProperty('mod_version_v118x').get()
+version = providers.gradleProperty('mod_version').get()
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
 unimined.minecraft {

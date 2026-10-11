@@ -6,6 +6,7 @@
     "refmap":  "buildscape.refmap.json",
     "plugin":  "com.kingodogo.buildscape.mixin.BuildscapeMixinPlugin",
     "mixins":  [
+                   "AgeableMobMixin",
                    "AbstractContainerMenuMixin",
                    "AnvilMenuMixin",
                    "BeaconBlockEntityAccessor",
@@ -38,13 +39,16 @@
                    "LavaFluidMixin",
                    "LiquidBlockMixin",
                    "FireworkRocketEntityMixin",
-                   "LevelChunkMixin"
+                   "LightningBoltMixin",
+                   "LevelChunkMixin",
+                   "PoiTypeAccessor"
                ],
     "client":  [
                    "AbstractContainerScreenMixin",
                    "AdvancementWidgetMixin",
                    "AnvilScreenMixin",
                    "BeaconBlockEntityRendererMixin",
+                   "BeaconRendererInvoker",
                    "BuildscapeBlockModelMixin",
                    "BuildscapeBlockStateCacheMixin",
                    "BuildscapeForgeRegistryMixin",
@@ -58,9 +62,11 @@
                    "LiquidBlockRendererMixin",
                    "EmbeddiumPipeSpillMixin",
                    "RenderBuffersMixin",
+                   "StonecutterScreenMixin",
                    "FireworkStarterMixin",
                    "FireworkStarItemMixin",
                    "ScreenMixin",
+                   "ThrownTridentAccessor",
                    "ThrownTridentRendererMixin",
                    "SignRendererMixin",
                    "client.SoundMuffMixin"

@@ -7,7 +7,6 @@ import com.kingodogo.buildscape.util.GhostFilterMenu;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import net.minecraft.client.gui.screens.inventory.StonecutterScreen;
 import net.minecraft.world.inventory.Slot;
 import org.spongepowered.asm.mixin.Dynamic;
 import org.spongepowered.asm.mixin.Mixin;
@@ -24,14 +23,6 @@ public abstract class AbstractContainerScreenMixin {
 
     @Shadow
     protected int topPos;
-
-    @Dynamic
-    @Inject(require = 0, method = "init", at = @At("TAIL"))
-    protected void buildscape$initStonecutterCutAll(CallbackInfo ci) {
-        if ((Object) this instanceof StonecutterScreen screen) {
-            MixinFactory.addStonecutterCutAllButton(screen, this.leftPos + 142, this.topPos + 10, screen.getMenu());
-        }
-    }
 
     @Dynamic
     @Inject(require = 0, method = "renderSlot(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/world/inventory/Slot;)V", at = @At("TAIL"))

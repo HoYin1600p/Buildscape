@@ -1,0 +1,125 @@
+package com.kingodogo.buildscape.block;
+
+import com.kingodogo.buildscape.platform.Services;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.chunk.LevelChunk;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.IdentityHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+public final class EyeblossomTransitionHandler {
+    // TODO S7a: wire these callbacks to Forge END level tick and server chunk/level lifecycle events.
+    private static final Map<ServerLevel, Tracker> TRACKERS = new IdentityHashMap<>();
+
+    private EyeblossomTransitionHandler() {
+    }
+
+    static boolean shouldTransition(boolean currentlyOpen, boolean waxed, boolean night) {
+        return !waxed && currentlyOpen != night;
+    }
+
+    static void track(ServerLevel level, BlockPos pos) {
+        tracker(level).positionsByChunk
+                .computeIfAbsent(chunkKey(pos), ignored -> new HashSet<>())
+                .add(pos.asLong());
+    }
+
+    static void untrack(ServerLevel level, BlockPos pos) {
+        Tracker tracker = TRACKERS.get(level);
+        if (tracker == null) {
+            return;
+        }
+
+        long chunkKey = chunkKey(pos);
+        Set<Long> positions = tracker.positionsByChunk.get(chunkKey);
+        if (positions != null) {
+            positions.remove(pos.asLong());
+            if (positions.isEmpty()) {
+                tracker.positionsByChunk.remove(chunkKey);
+            }
+        }
+    }
+
+    public static void onWorldTick(ServerLevel level) {
+        Tracker tracker = TRACKERS.get(level);
+        if (tracker == null) {
+            return;
+        }
+
+        boolean night = level.isNight();
+        if (tracker.night == night) {
+            return;
+        }
+        tracker.night = night;
+
+        // Work on a copy: changing a block re-tracks or untracks it, which edits these sets.
+        List<Long> snapshot = new ArrayList<>();
+        for (Set<Long> positions : tracker.positionsByChunk.values()) {
+            snapshot.addAll(positions);
+        }
+        for (long packed : snapshot) {
+            BlockPos pos = BlockPos.of(packed);
+            if (!level.hasChunkAt(pos)) {
+                continue;
+            }
+
+            BlockState state = level.getBlockState(pos);
+            if (state.getBlock() instanceof EyeblossomBlock eyeblossom) {
+                eyeblossom.synchronizeWithTime(level, pos, state, true);
+            } else {
+                untrack(level, pos);
+            }
+        }
+    }
+
+    public static void onChunkLoad(ServerLevel level, LevelChunk chunk) {
+        Tracker existingTracker = TRACKERS.get(level);
+        long chunkKey = chunk.getPos().toLong();
+        if (existingTracker != null) {
+            existingTracker.positionsByChunk.remove(chunkKey);
+        }
+
+        Services.PLATFORM.scanChunkForBlock(level, chunk,
+                state -> state.getBlock() instanceof EyeblossomBlock,
+                (pos, state) -> {
+                    track(level, pos);
+                    level.scheduleTick(pos, state.getBlock(), 1);
+                });
+    }
+
+    public static void onChunkUnload(ServerLevel level, ChunkPos chunkPos) {
+        Tracker tracker = TRACKERS.get(level);
+        if (tracker != null) {
+            tracker.positionsByChunk.remove(chunkPos.toLong());
+        }
+    }
+
+    public static void onWorldUnload(ServerLevel level) {
+        TRACKERS.remove(level);
+    }
+
+    private static Tracker tracker(ServerLevel level) {
+        return TRACKERS.computeIfAbsent(level, ignored -> new Tracker(level.isNight()));
+    }
+
+    private static long chunkKey(BlockPos pos) {
+        return ChunkPos.asLong(pos.getX() >> 4, pos.getZ() >> 4);
+    }
+
+    private static final class Tracker {
+        private final Map<Long, Set<Long>> positionsByChunk = new HashMap<>();
+        private boolean night;
+
+        private Tracker(boolean night) {
+            this.night = night;
+        }
+    }
+}

@@ -29,6 +29,52 @@ final class RestoredBlockFactory {
 
     static Block create(BlockDefinition def, BlockBehaviour.Properties props) {
         return switch (def.getBlockType()) {
+            case "HazeBushBlock" -> new HazeBushBlock(
+                    net.minecraft.world.item.DyeColor.byName(def.getId().replace("_haze_bush", ""), null), props) {
+                @Override public net.minecraft.world.item.BlockItem createHazeItem(net.minecraft.world.item.Item.Properties properties) {
+                    return new HazeBushItem(this, properties);
+                }
+                @Override protected com.mojang.serialization.MapCodec<? extends net.minecraft.world.level.block.BushBlock> codec() {
+                    return com.mojang.serialization.MapCodec.unit(this);
+                }
+                @Override protected net.minecraft.world.ItemInteractionResult useItemOn(net.minecraft.world.item.ItemStack stack,
+                        BlockState state, net.minecraft.world.level.Level level, BlockPos pos,
+                        net.minecraft.world.entity.player.Player player, net.minecraft.world.InteractionHand hand,
+                        net.minecraft.world.phys.BlockHitResult hit) {
+                    return itemResult(onInteract(state, level, pos, player, hand));
+                }
+                @Override public net.minecraft.world.item.ItemStack getCloneItemStack(
+                        net.minecraft.world.level.LevelReader level, BlockPos pos, BlockState state) {
+                    return cloneStack(state);
+                }
+            };
+            case "PottedHazeBushBlock" -> new PottedHazeBushBlock(
+                    net.minecraft.world.item.DyeColor.byName(def.getId().replace("potted_", "").replace("_haze_bush", ""), null),
+                    registeredBlock(def.getId().substring(7)), props) {
+                @Override protected net.minecraft.world.ItemInteractionResult useItemOn(net.minecraft.world.item.ItemStack stack,
+                        BlockState state, net.minecraft.world.level.Level level, BlockPos pos,
+                        net.minecraft.world.entity.player.Player player, net.minecraft.world.InteractionHand hand,
+                        net.minecraft.world.phys.BlockHitResult hit) {
+                    return itemResult(onInteract(state, level, pos, player, hand));
+                }
+                @Override protected net.minecraft.world.InteractionResult useWithoutItem(BlockState state,
+                        net.minecraft.world.level.Level level, BlockPos pos, net.minecraft.world.entity.player.Player player,
+                        net.minecraft.world.phys.BlockHitResult hit) {
+                    return onInteract(state, level, pos, player, net.minecraft.world.InteractionHand.MAIN_HAND);
+                }
+                @Override public net.minecraft.world.item.ItemStack getCloneItemStack(
+                        net.minecraft.world.level.LevelReader level, BlockPos pos, BlockState state) {
+                    return plantStack(state);
+                }
+                @Override protected java.util.List<net.minecraft.world.item.ItemStack> getDrops(BlockState state,
+                        net.minecraft.world.level.storage.loot.LootParams.Builder builder) {
+                    var drops = super.getDrops(state, builder);
+                    if (!state.getValue(HAS_HAZE)) for (var drop : drops) {
+                        if (drop.is(getPlant().asItem())) com.kingodogo.buildscape.item.HazeBushItem.markDrained(drop);
+                    }
+                    return drops;
+                }
+            };
             case "CopperTorchBlock" -> new CopperTorchBlock(props);
             case "CopperWallTorchBlock" -> new CopperWallTorchBlock(props);
             case "CopperChestBlock" -> new CopperChestBlock(def.getId().startsWith("waxed_"), props,
@@ -68,6 +114,13 @@ final class RestoredBlockFactory {
                     Optional.empty()), props) {};
             default -> null;
         };
+    }
+
+    private static net.minecraft.world.ItemInteractionResult itemResult(net.minecraft.world.InteractionResult result) {
+        if (result == net.minecraft.world.InteractionResult.SUCCESS) return net.minecraft.world.ItemInteractionResult.SUCCESS;
+        if (result == net.minecraft.world.InteractionResult.CONSUME) return net.minecraft.world.ItemInteractionResult.CONSUME;
+        if (result == net.minecraft.world.InteractionResult.FAIL) return net.minecraft.world.ItemInteractionResult.FAIL;
+        return net.minecraft.world.ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
     }
 
     static Block registeredBlock(String id) {

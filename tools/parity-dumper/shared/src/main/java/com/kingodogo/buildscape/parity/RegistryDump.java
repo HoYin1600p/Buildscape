@@ -112,7 +112,7 @@ final class RegistryDump {
 
     private static JsonElement item(Item item) {
         ItemStack stack = new ItemStack(item);
-        FoodProperties food = item.getFoodProperties(stack, null);
+        FoodProperties food = LoaderAccess.food(item, stack);
         JsonElement foodJson = null;
         if (food != null) {
             JsonArray effects = new JsonArray();
@@ -122,8 +122,8 @@ final class RegistryDump {
             foodJson = DumpIO.object("nutrition", food.getNutrition(), "saturation", food.getSaturationModifier(),
                     "meat", food.isMeat(), "alwaysEat", food.canAlwaysEat(), "fast", food.isFastFood(), "effects", effects);
         }
-        // Forge supports multiple tabs; enumerate those instead of only the vanilla primary tab.
-        List<String> tabs = item.getCreativeTabs().stream().filter(java.util.Objects::nonNull)
+        // The loader adapter preserves Forge's multiple tabs and vanilla's primary tab.
+        List<String> tabs = LoaderAccess.creativeTabs(item).stream().filter(java.util.Objects::nonNull)
                 .map(RegistryDump::tabId).sorted().toList();
         return DumpIO.object("implementation", DumpIO.implementation(item), "maxStack", stack.getMaxStackSize(),
                 "creativeTabs", tabs, "rarity", item.getRarity(stack).name(), "food", foodJson,

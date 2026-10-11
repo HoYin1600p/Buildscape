@@ -11,7 +11,9 @@ java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 // A dedicated source set keeps Gradle's framework-based test task empty.
 // Only the main output and cached Gson are needed, not Minecraft or a test framework.
 sourceSets {
+    main.java.srcDir '../shared/src/main/java'
     selfCheck {
+        java.srcDir '../shared/src/selfCheck/java'
         compileClasspath += sourceSets.main.output
         runtimeClasspath += sourceSets.main.output
     }

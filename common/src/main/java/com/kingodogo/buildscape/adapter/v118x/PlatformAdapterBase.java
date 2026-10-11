@@ -149,6 +149,19 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
     public Item createRegisteredItem(com.kingodogo.buildscape.item.ItemDefinition definition, Block block) {
         String id = definition.getId();
         Item.Properties properties = com.kingodogo.buildscape.item.ItemFactory.createProperties(id, definition.getProperties());
+        if (id.equals("snowy_leaves")) return new BlockItem(block,
+                com.kingodogo.buildscape.item.ItemFactory.createProperties(definition.getProperties()));
+        if (block != null && id.endsWith("_vertical_slab")) {
+            return new BlockItem(block, properties) {
+                @Override
+                public void fillItemCategory(CreativeModeTab tab, NonNullList<ItemStack> stacks) {
+                    super.fillItemCategory(tab, stacks);
+                    if (tab == CreativeModeTab.TAB_BUILDING_BLOCKS || tab == CreativeModeTab.TAB_DECORATIONS) {
+                        com.kingodogo.buildscape.mixinsupport.MixinFactory.arrangeCreativeTabs(tab, stacks);
+                    }
+                }
+            };
+        }
         if (block instanceof net.minecraft.world.level.block.BedBlock) return new net.minecraft.world.item.BedItem(block, properties);
         if (id.equals("mangrove_boat")) return new com.kingodogo.buildscape.item.MangroveBoatItem(properties.stacksTo(1));
         if (id.equals("mangrove_sign") || id.equals("bamboo_sign")) {
@@ -826,7 +839,8 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
 
     @Override
     public net.minecraft.world.item.BlockItem createTrophyBlockItem(com.kingodogo.buildscape.trophy.TrophyBlock block, com.kingodogo.buildscape.trophy.TrophyDefinition definition, Item.Properties properties) {
-        return new com.kingodogo.buildscape.trophy.TrophyBlockItem(block, definition, properties) {
+        return new com.kingodogo.buildscape.trophy.TrophyBlockItem(block, definition,
+                properties.tab(CreativeTabs118x.tabFor(new CommonId("buildscape", definition.getId())))) {
             @Override
             public void appendHoverText(ItemStack stack, @org.jetbrains.annotations.Nullable Level level, List<Component> tooltip, net.minecraft.world.item.TooltipFlag flag) {
                 super.appendHoverText(stack, level, tooltip, flag);

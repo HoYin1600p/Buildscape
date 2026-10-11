@@ -62,9 +62,23 @@ public abstract class BaseRegistryAdapter implements IRegistryAdapter {
 
     @Override
     public <T> RegistrySupplier<T> registerBlockEntity(String name, Supplier<T> blockEntitySupplier) {
+        if (Services.isVersionCluster("v118x")) {
+            if (name.equals("pillar_block_entity")) {
+                registerClusterBlockEntity("mangrove_sign_block_entity");
+                registerClusterBlockEntity("bamboo_sign_block_entity");
+            } else if (name.equals("shelf")) {
+                registerClusterBlockEntity("copper_chest");
+                registerClusterBlockEntity("potent_sulfur");
+            }
+        }
         RegistrySupplier<T> supplier = createSupplier(name, blockEntitySupplier);
         blockEntities.put(name, supplier);
         return supplier;
+    }
+
+    private void registerClusterBlockEntity(String name) {
+        Services.PLATFORM.wrapRegistryAction(() -> blockEntities.put(name, createSupplier(name,
+                () -> new com.kingodogo.buildscape.block.BlockEntityDefinition(name))));
     }
 
     @Override
@@ -197,16 +211,21 @@ public abstract class BaseRegistryAdapter implements IRegistryAdapter {
                 modItems.put(id, item);
             } else if (obj instanceof ItemDefinition def) {
                 Block matchingBlock = modBlocks.get(id);
-                if (matchingBlock != null) {
-                    modItems.put(id, ItemFactory.createBlockItem(id, matchingBlock, def.getProperties()));
-                } else {
-                    modItems.put(id, ItemFactory.createItem(def));
-                }
+                modItems.put(id, Services.isVersionCluster("v118x")
+                        ? Services.PLATFORM.createRegisteredItem(def, matchingBlock)
+                        : matchingBlock != null ? ItemFactory.createBlockItem(id, matchingBlock, def.getProperties())
+                        : ItemFactory.createItem(def));
             }
         }
     }
 
     protected void initBlockEntities() {
+        Map<String, BlockEntityType<?>> clusterTypes = Services.isVersionCluster("v118x")
+                ? Services.PLATFORM.createClusterBlockEntityTypes(modBlocks) : Map.of();
+        if (!clusterTypes.isEmpty()) {
+            modBlockEntities.put("mangrove_sign_block_entity", clusterTypes.get("mangrove_sign_block_entity"));
+            modBlockEntities.put("bamboo_sign_block_entity", clusterTypes.get("bamboo_sign_block_entity"));
+        }
         modBlockEntities.put("pillar_block_entity", ModBlockEntities.PILLAR_TYPE);
         modBlockEntities.put("decorated_pot_block_entity", ModBlockEntities.DECORATED_POT_TYPE);
         modBlockEntities.put("trapped_decorated_pot_block_entity", ModBlockEntities.TRAPPED_DECORATED_POT_TYPE);
@@ -218,6 +237,10 @@ public abstract class BaseRegistryAdapter implements IRegistryAdapter {
         modBlockEntities.put("muff_block_entity", ModBlockEntities.MUFF_TYPE);
         modBlockEntities.put("glass_jar_block_entity", ModBlockEntities.GLASS_JAR_TYPE);
         modBlockEntities.put("builders_workbench", ModBlockEntities.BUILDERS_WORKBENCH_TYPE);
+        if (!clusterTypes.isEmpty()) {
+            modBlockEntities.put("copper_chest", clusterTypes.get("copper_chest"));
+            modBlockEntities.put("potent_sulfur", clusterTypes.get("potent_sulfur"));
+        }
         modBlockEntities.put("shelf", ModBlockEntities.SHELF_TYPE);
         modBlockEntities.put("trophy_block_entity", ModBlockEntities.TROPHY_TYPE);
         modBlockEntities.put("hollow_log", ModBlockEntities.HOLLOW_LOG_TYPE);
@@ -232,6 +255,7 @@ public abstract class BaseRegistryAdapter implements IRegistryAdapter {
     protected void initEntities() {
         modEntities.put("falling_icicle", Services.PLATFORM.getFallingIcicleEntityType());
         modEntities.put("festive_stocking", Services.PLATFORM.getFestiveStockingEntityType());
+        if (Services.isVersionCluster("v118x")) modEntities.putAll(Services.PLATFORM.createClusterEntityTypes());
         modEntities.put("colored_item_frame", Services.PLATFORM.getColoredItemFrameEntityType());
         modEntities.put("seat", Services.PLATFORM.getSeatEntityType());
         modEntities.put("poplar_boat", Services.PLATFORM.getPoplarBoatEntityType());

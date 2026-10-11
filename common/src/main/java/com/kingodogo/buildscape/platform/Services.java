@@ -12,6 +12,15 @@ public class Services {
     public static final IBlockFactory BLOCK_FACTORY = load(IBlockFactory.class);
     public static final com.kingodogo.buildscape.network.IPacketFactory PACKET_FACTORY = load(com.kingodogo.buildscape.network.IPacketFactory.class);
 
+    /** The service-selected block factory identifies the active VersionCluster. */
+    public static boolean isVersionCluster(String cluster) {
+        String packageName = "com.kingodogo.buildscape.adapter." + cluster;
+        for (Class<?> type = BLOCK_FACTORY.getClass(); type != null; type = type.getSuperclass()) {
+            if (type.getPackageName().equals(packageName)) return true;
+        }
+        return false;
+    }
+
     public static <T> T load(Class<T> clazz) {
         List<T> providers = ServiceLoader.load(clazz).stream()
                 .map(ServiceLoader.Provider::get)

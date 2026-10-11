@@ -115,6 +115,57 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 public abstract class PlatformAdapterBase implements IPlatformAdapter {
+    @Override
+    public Map<String, BlockEntityType<?>> createClusterBlockEntityTypes(Map<String, Block> blocks) {
+        return RestoredContentTypes.createBlockEntities(blocks);
+    }
+
+    @Override
+    public Map<String, EntityType<?>> createClusterEntityTypes() {
+        return RestoredContentTypes.createEntities();
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public <T extends BlockEntity> BlockEntityType<T> createBlockEntityTypeForBlocks(
+            BlockEntityFactory<T> factory, Block... blocks) {
+        try {
+            Class<?> supplierClass = Class.forName("net.minecraft.world.level.block.entity.BlockEntityType$BlockEntitySupplier");
+            Object proxy = java.lang.reflect.Proxy.newProxyInstance(BlockEntityType.class.getClassLoader(),
+                    new Class<?>[]{supplierClass}, (proxyObject, method, args) -> {
+                        if (method.getName().equals("create")) return factory.create((BlockPos) args[0], (BlockState) args[1]);
+                        return null;
+                    });
+            var constructor = BlockEntityType.class.getDeclaredConstructor(
+                    supplierClass, Set.class, com.mojang.datafixers.types.Type.class);
+            constructor.setAccessible(true);
+            return (BlockEntityType<T>) constructor.newInstance(proxy, Set.of(blocks), null);
+        } catch (ReflectiveOperationException exception) {
+            throw new IllegalStateException("Cannot construct restored block entity type", exception);
+        }
+    }
+
+    @Override
+    public Item createRegisteredItem(com.kingodogo.buildscape.item.ItemDefinition definition, Block block) {
+        String id = definition.getId();
+        Item.Properties properties = com.kingodogo.buildscape.item.ItemFactory.createProperties(definition.getProperties());
+        if (id.equals("mangrove_boat")) return new com.kingodogo.buildscape.item.MangroveBoatItem(properties.stacksTo(1));
+        if (id.equals("mangrove_sign") || id.equals("bamboo_sign")) {
+            Block wall = com.kingodogo.buildscape.block.ModBlocks.get(id.equals("mangrove_sign")
+                    ? com.kingodogo.buildscape.block.ModBlocks.MANGROVE_WALL_SIGN
+                    : com.kingodogo.buildscape.block.ModBlocks.BAMBOO_WALL_SIGN);
+            return new net.minecraft.world.item.SignItem(properties.stacksTo(16), block, wall);
+        }
+        if (id.equals("copper_torch")) {
+            return new net.minecraft.world.item.StandingAndWallBlockItem(block,
+                    com.kingodogo.buildscape.block.ModBlocks.get(com.kingodogo.buildscape.block.ModBlocks.COPPER_WALL_TORCH), properties);
+        }
+        if (block instanceof net.minecraft.world.level.block.DoorBlock || id.equals("tall_dry_grass")) {
+            return new net.minecraft.world.item.DoubleHighBlockItem(block, properties);
+        }
+        return IPlatformAdapter.super.createRegisteredItem(definition, block);
+    }
+
     @Override public boolean isReplaceable(net.minecraft.world.level.block.state.BlockState state) { return state.getMaterial().isReplaceable(); }
     @Override public boolean isGlassBlock(net.minecraft.world.level.block.Block block) { return block instanceof net.minecraft.world.level.block.AbstractGlassBlock; }
     @Override
@@ -737,6 +788,17 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
             @Override
             public ItemStack makeIcon() {
                 return iconSupplier.get();
+            }
+            @Override
+            public void fillItemList(NonNullList<ItemStack> stacks) {
+                Set<String> added = new HashSet<>();
+                for (String id : orderedItemIds) {
+                    Item item = items.get(id);
+                    if (item != null && added.add(id)) stacks.add(new ItemStack(item));
+                }
+                items.forEach((id, item) -> {
+                    if (added.add(id)) stacks.add(new ItemStack(item));
+                });
             }
         };
     }

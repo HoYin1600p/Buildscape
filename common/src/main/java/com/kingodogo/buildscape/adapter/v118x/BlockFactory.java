@@ -159,6 +159,7 @@ import net.minecraft.world.level.material.FlowingFluid;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.material.MaterialColor;
+import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
@@ -194,6 +195,70 @@ public class BlockFactory implements IBlockFactory {
     public Block createBlock(BlockDefinition def) {
         BlockBehaviour.Properties props = buildProperties(def);
 
+        if (def.getBlockType().equals("FlowerPotBlock")) {
+            return new net.minecraft.world.level.block.FlowerPotBlock(
+                    restoredBlock(def.getId().substring("potted_".length())), props);
+        }
+        switch (def.getBlockType()) {
+            case "CopperTorchBlock": return new com.kingodogo.buildscape.block.CopperTorchBlock(props);
+            case "CopperWallTorchBlock": return new com.kingodogo.buildscape.block.CopperWallTorchBlock(props);
+            case "CopperChestBlock": return new com.kingodogo.buildscape.block.CopperChestBlock(
+                    def.getId().startsWith("waxed_"), props, () -> RestoredContentTypes.blockEntity("copper_chest"));
+            case "PotentSulfurBlock": return new com.kingodogo.buildscape.block.PotentSulfurBlock(props);
+            case "SulfurSpikeBlock": return new com.kingodogo.buildscape.block.SulfurSpikeBlock(props);
+            case "SculkCatalystBlock": return new com.kingodogo.buildscape.block.SculkCatalystBlock(props);
+            case "SculkVeinBlock": return new com.kingodogo.buildscape.block.SculkVeinBlock(props);
+            case "EyeblossomBlock": return new com.kingodogo.buildscape.block.EyeblossomBlock(
+                    def.getId().equals("open_eyeblossom"), def.getId().equals("open_eyeblossom")
+                    ? net.minecraft.world.effect.MobEffects.CONFUSION : net.minecraft.world.effect.MobEffects.BLINDNESS, 7, props);
+            case "CactusFlowerBlock": return new com.kingodogo.buildscape.block.CactusFlowerBlock(props);
+            case "DryGrassBlock": return new com.kingodogo.buildscape.block.DryGrassBlock(props);
+            case "TallDryGrassBlock": return new com.kingodogo.buildscape.block.TallDryGrassBlock(props);
+            case "FireflyBushBlock": return new com.kingodogo.buildscape.block.FireflyBushBlock(props);
+            case "GoldenDandelionBlock": return new com.kingodogo.buildscape.block.GoldenDandelionBlock(props);
+            case "WeatheringGrateBlock": return new com.kingodogo.buildscape.block.WeatheringGrateBlock(props);
+            case "WeatheringLanternBlock": return new com.kingodogo.buildscape.block.WeatheringLanternBlock(props);
+            case "WeatheringClimbableChainBlock": return new com.kingodogo.buildscape.block.WeatheringClimbableChainBlock(props) {
+                @Override public BlockState updateShape(BlockState state, Direction direction, BlockState neighbor,
+                        LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
+                    if (state.getValue(WATERLOGGED)) level.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
+                    return super.updateShape(state, direction, neighbor, level, pos, neighborPos);
+                }
+            };
+            case "WeatheringRodBlock": return new net.minecraft.world.level.block.LightningRodBlock(props.randomTicks()) {
+                @Override public void randomTick(BlockState state, ServerLevel level, BlockPos pos, Random random) {
+                    RestoredCopperOxidation.tryOxidize(level, pos, state);
+                }
+            };
+            case "WeatheringDoorBlock": return restoredCopperDoor(props, true);
+            case "WeatheringTrapdoorBlock": return restoredCopperTrapdoor(props, true);
+            case "ModStandingSignBlock", "ModBambooStandingSignBlock": {
+                boolean bamboo = def.getId().startsWith("bamboo_");
+                return new StandingSignBlock(props, bamboo ? BAMBOO_WOOD_TYPE : MANGROVE_WOOD_TYPE) {
+                    @Override public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+                        return bamboo ? new com.kingodogo.buildscape.block.BambooSignBlockEntity(pos, state)
+                                : new com.kingodogo.buildscape.block.MangroveSignBlockEntity(pos, state);
+                    }
+                };
+            }
+            case "ModWallSignBlock", "ModBambooWallSignBlock": {
+                boolean bamboo = def.getId().startsWith("bamboo_");
+                return new WallSignBlock(props, bamboo ? BAMBOO_WOOD_TYPE : MANGROVE_WOOD_TYPE) {
+                    @Override public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+                        return bamboo ? new com.kingodogo.buildscape.block.BambooSignBlockEntity(pos, state)
+                                : new com.kingodogo.buildscape.block.MangroveSignBlockEntity(pos, state);
+                    }
+                };
+            }
+            case "SaplingBlock": {
+                net.minecraft.world.level.block.grower.AbstractTreeGrower grower = def.getId().equals("cherry_sapling")
+                        ? new com.kingodogo.buildscape.worldgen.CherryTreeGrower()
+                        : new com.kingodogo.buildscape.worldgen.PaleOakTreeGrower();
+                return new net.minecraft.world.level.block.SaplingBlock(grower, props) {};
+            }
+            default: break;
+        }
+
         if (def.isLargeChain()) {
             return new com.kingodogo.buildscape.block.LargeChainBlock(props) {
                 @Override public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos pos, BlockPos neighborPos) { if (state.getValue(WATERLOGGED)) level.scheduleTick(pos, net.minecraft.world.level.material.Fluids.WATER, net.minecraft.world.level.material.Fluids.WATER.getTickDelay(level)); return super.updateShape(state, direction, neighborState, level, pos, neighborPos); }
@@ -209,8 +274,10 @@ public class BlockFactory implements IBlockFactory {
                 @Override public boolean propagatesSkylightDown(BlockState state, BlockGetter level, BlockPos pos) { return true; }
             };
         } else if (def.isCopperBulb()) {
+            if (!def.getId().startsWith("waxed_") && !def.getId().startsWith("oxidized_")) props.randomTicks();
             return new CopperBulbBlock(props, def.copperBulbLightLevel()) {
-                @Override public void randomTick(BlockState state, ServerLevel level, BlockPos pos, Random random) { onRandomTick(state, level, pos); }
+                @Override public boolean isRandomlyTicking(BlockState state) { return !def.getId().startsWith("waxed_") && !def.getId().startsWith("oxidized_"); }
+                @Override public void randomTick(BlockState state, ServerLevel level, BlockPos pos, Random random) { RestoredCopperOxidation.tryOxidize(level, pos, state); }
                 @Override public void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, BlockPos fromPos, boolean isMoving) { onNeighborUpdate(level, pos, state, block, fromPos, isMoving); }
                 @Override public int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos) { return getAnalogOutput(state, level, pos); }
             };
@@ -224,7 +291,10 @@ public class BlockFactory implements IBlockFactory {
             };
         } else if (def.isWeatheringBars()) {
             return new WeatheringBarsBlock(props) {
-                @Override public void randomTick(BlockState state, ServerLevel level, BlockPos pos, Random random) { onRandomTick(state, level, pos); }
+                @Override public void randomTick(BlockState state, ServerLevel level, BlockPos pos, Random random) {
+                    if (def.getId().endsWith("copper_bars")) RestoredCopperOxidation.tryOxidize(level, pos, state);
+                    else onRandomTick(state, level, pos);
+                }
             };
         } else if (def.isWeatheringBolt()) {
             return new WeatheringBoltBlock(props) {
@@ -237,7 +307,10 @@ public class BlockFactory implements IBlockFactory {
         } else if (def.isWeatheringBlock()) {
             return new Block(props.randomTicks()) {
                 @Override public boolean isRandomlyTicking(BlockState state) { return true; }
-                @Override public void randomTick(BlockState state, ServerLevel level, BlockPos pos, Random random) { WeatheringBlockLogic.randomTick(state, level, pos); }
+                @Override public void randomTick(BlockState state, ServerLevel level, BlockPos pos, Random random) {
+                    if (def.getId().endsWith("chiseled_copper")) RestoredCopperOxidation.tryOxidize(level, pos, state);
+                    else WeatheringBlockLogic.randomTick(state, level, pos);
+                }
             };
         } else if (def.isWeatheringButton()) {
             return new net.minecraft.world.level.block.StoneButtonBlock(props.randomTicks()) {
@@ -1878,10 +1951,70 @@ public class BlockFactory implements IBlockFactory {
         return 0xFFFFFF;
     }
 
+    private Block restoredCopperDoor(BlockBehaviour.Properties props, boolean weathering) {
+        return new DoorBlock(weathering ? props.randomTicks() : props) {
+            @Override public void randomTick(BlockState state, ServerLevel level, BlockPos pos, Random random) {
+                if (weathering) RestoredCopperOxidation.tryOxidize(level, pos, state);
+            }
+            @Override public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player,
+                    InteractionHand hand, BlockHitResult hit) {
+                state = state.cycle(OPEN);
+                level.setBlock(pos, state, 10);
+                level.playSound(player, pos, state.getValue(OPEN) ? net.minecraft.sounds.SoundEvents.WOODEN_DOOR_OPEN
+                        : net.minecraft.sounds.SoundEvents.WOODEN_DOOR_CLOSE, net.minecraft.sounds.SoundSource.BLOCKS, 1, 1);
+                level.gameEvent(player, state.getValue(OPEN) ? net.minecraft.world.level.gameevent.GameEvent.BLOCK_OPEN
+                        : net.minecraft.world.level.gameevent.GameEvent.BLOCK_CLOSE, pos);
+                return InteractionResult.sidedSuccess(level.isClientSide);
+            }
+        };
+    }
+
+    private Block restoredCopperTrapdoor(BlockBehaviour.Properties props, boolean weathering) {
+        return new TrapDoorBlock(weathering ? props.randomTicks() : props) {
+            @Override public void randomTick(BlockState state, ServerLevel level, BlockPos pos, Random random) {
+                if (weathering) RestoredCopperOxidation.tryOxidize(level, pos, state);
+            }
+            @Override public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player,
+                    InteractionHand hand, BlockHitResult hit) {
+                state = state.cycle(OPEN);
+                level.setBlock(pos, state, 2);
+                if (state.getValue(WATERLOGGED)) level.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
+                level.playSound(player, pos, state.getValue(OPEN) ? net.minecraft.sounds.SoundEvents.WOODEN_TRAPDOOR_OPEN
+                        : net.minecraft.sounds.SoundEvents.WOODEN_TRAPDOOR_CLOSE, net.minecraft.sounds.SoundSource.BLOCKS, 1, 1);
+                return InteractionResult.sidedSuccess(level.isClientSide);
+            }
+        };
+    }
+
+    private Block findDefinedBlock(String path) {
+        for (var supplier : Services.REGISTRY.getRegisteredBlocks()) {
+            if (!supplier.getPath().equals(path)) continue;
+            Object value = supplier.get();
+            if (value instanceof Block block) return block;
+            if (value instanceof BlockDefinition definition) {
+                Block block = definition.getBlock();
+                if (block == null) {
+                    block = createBlock(definition);
+                    definition.setBlock(block);
+                }
+                return block;
+            }
+        }
+        return null;
+    }
+
+    private Block restoredBlock(String path) {
+        Block block = findDefinedBlock(path);
+        if (block == null) throw new IllegalStateException("Missing restored block dependency: " + path);
+        return block;
+    }
+
     private Block getBaseBlock(BlockDefinition def) {
         String parentId = def.getParentBlockId();
         if (parentId != null) {
             String cleanId = parentId.toLowerCase().replace("blocks.", "").replace("modblocks.", "").replace(".get(", "");
+            Block defined = findDefinedBlock(cleanId.contains(":") ? cleanId.substring(cleanId.indexOf(':') + 1) : cleanId);
+            if (defined != null) return defined;
             ResourceLocation rl = ResourceLocation.tryParse(cleanId.contains(":") ? cleanId : "buildscape:" + cleanId);
             if (rl != null) {
                 Block b = Registry.BLOCK.get(rl);
@@ -1900,6 +2033,8 @@ public class BlockFactory implements IBlockFactory {
         String namespace = cleanId.contains(":") ? cleanId.substring(0, cleanId.indexOf(":")) : "buildscape";
         String path = cleanId.contains(":") ? cleanId.substring(cleanId.indexOf(":") + 1) : cleanId;
         return () -> {
+            Block defined = findDefinedBlock(path);
+            if (defined != null) return defined;
             ResourceLocation rl = new ResourceLocation(namespace, path);
             Block b = Registry.BLOCK.get(rl);
             if (b != null && b != Blocks.AIR) return b;
@@ -1941,7 +2076,241 @@ public class BlockFactory implements IBlockFactory {
         return getBaseBlock(def).defaultBlockState();
     }
 
+    /** Reference properties for content retired only on 26.2. */
+    private BlockBehaviour.Properties restoredProperties(String id) {
+        return switch (id) {
+            case "sculk_pillar" -> BlockBehaviour.Properties.of(Material.SCULK, MaterialColor.COLOR_BLACK).strength(0.6f, 0.6f).sound(net.minecraft.world.level.block.SoundType.SCULK_SENSOR).noOcclusion();
+            case "decorated_pot" -> BlockBehaviour.Properties.of(Material.STONE).strength(0.0f).sound(com.kingodogo.buildscape.sound.ModSounds.DECORATED_POT_SOUNDS()).noOcclusion();
+            case "bamboo_block" -> BlockBehaviour.Properties.of(Material.WOOD, MaterialColor.COLOR_YELLOW) .strength(2.0f) .sound(net.minecraft.world.level.block.SoundType.BAMBOO);
+            case "stripped_bamboo_block" -> BlockBehaviour.Properties.of(Material.WOOD, MaterialColor.COLOR_YELLOW) .strength(2.0f) .sound(net.minecraft.world.level.block.SoundType.BAMBOO);
+            case "bamboo_door" -> BlockBehaviour.Properties.of(Material.WOOD, MaterialColor.COLOR_YELLOW) .strength(3.0f) .sound(net.minecraft.world.level.block.SoundType.BAMBOO) .noOcclusion();
+            case "bamboo_trapdoor" -> BlockBehaviour.Properties.of(Material.WOOD, MaterialColor.COLOR_YELLOW) .strength(3.0f) .sound(net.minecraft.world.level.block.SoundType.BAMBOO) .noOcclusion() .isValidSpawn((state, reader, pos, entityType) -> false);
+            case "bamboo_sign" -> BlockBehaviour.Properties.of(Material.WOOD, MaterialColor.COLOR_YELLOW) .strength(1.0f) .sound(net.minecraft.world.level.block.SoundType.BAMBOO) .noCollission();
+            case "bamboo_wall_sign" -> BlockBehaviour.Properties.of(Material.WOOD, MaterialColor.COLOR_YELLOW) .strength(1.0f) .sound(net.minecraft.world.level.block.SoundType.BAMBOO) .noCollission() .dropsLike(restoredBlock("bamboo_sign"));
+            case "copper_chain" -> BlockBehaviour.Properties.of(Material.METAL, MaterialColor.COLOR_ORANGE) .strength(3.0f, 6.0f) .requiresCorrectToolForDrops() .sound(net.minecraft.world.level.block.SoundType.CHAIN) .noOcclusion() .isSuffocating((state, reader, pos) -> false) .isViewBlocking((state, reader, pos) -> false);
+            case "exposed_copper_chain" -> BlockBehaviour.Properties.of( Material.METAL, MaterialColor.TERRACOTTA_ORANGE) .strength(3.0f, 6.0f) .requiresCorrectToolForDrops() .sound(net.minecraft.world.level.block.SoundType.CHAIN) .noOcclusion() .isSuffocating((state, reader, pos) -> false) .isViewBlocking((state, reader, pos) -> false);
+            case "weathered_copper_chain" -> BlockBehaviour.Properties.of( Material.METAL, MaterialColor.WARPED_WART_BLOCK) .strength(3.0f, 6.0f) .requiresCorrectToolForDrops() .sound(net.minecraft.world.level.block.SoundType.CHAIN) .noOcclusion() .isSuffocating((state, reader, pos) -> false) .isViewBlocking((state, reader, pos) -> false);
+            case "oxidized_copper_chain" -> BlockBehaviour.Properties.of( Material.METAL, MaterialColor.WARPED_NYLIUM) .strength(3.0f, 6.0f) .requiresCorrectToolForDrops() .sound(net.minecraft.world.level.block.SoundType.CHAIN) .noOcclusion() .isSuffocating((state, reader, pos) -> false) .isViewBlocking((state, reader, pos) -> false);
+            case "pink_petal" -> BlockBehaviour.Properties.of(Material.PLANT, MaterialColor.COLOR_PINK) .noCollission() .instabreak() .sound(SoundType.GRASS);
+            case "snowy_leaves" -> BlockBehaviour.Properties.of(Material.LEAVES) .strength(0.2f) .sound(net.minecraft.world.level.block.SoundType.GRASS) .noOcclusion() .isValidSpawn((state, reader, pos, entityType) -> false) .isSuffocating((state, reader, pos) -> false) .isViewBlocking((state, reader, pos) -> false);
+            case "mangrove_log" -> BlockBehaviour.Properties.of(Material.WOOD, MaterialColor.COLOR_RED) .strength(2.0f) .sound(net.minecraft.world.level.block.SoundType.WOOD);
+            case "stripped_mangrove_log" -> BlockBehaviour.Properties.of(Material.WOOD, MaterialColor.COLOR_RED) .strength(2.0f) .sound(net.minecraft.world.level.block.SoundType.WOOD);
+            case "mangrove_wood" -> BlockBehaviour.Properties.of(Material.WOOD, MaterialColor.COLOR_RED) .strength(2.0f) .sound(net.minecraft.world.level.block.SoundType.WOOD);
+            case "stripped_mangrove_wood" -> BlockBehaviour.Properties.of(Material.WOOD, MaterialColor.COLOR_RED) .strength(2.0f) .sound(net.minecraft.world.level.block.SoundType.WOOD);
+            case "mangrove_leaves" -> BlockBehaviour.Properties.of(Material.LEAVES, MaterialColor.COLOR_GREEN) .strength(0.2f) .randomTicks() .sound(net.minecraft.world.level.block.SoundType.GRASS) .noOcclusion() .isValidSpawn((state, reader, pos, entityType) -> false) .isSuffocating((state, reader, pos) -> false) .isViewBlocking((state, reader, pos) -> false);
+            case "mangrove_roots" -> BlockBehaviour.Properties.of(Material.WOOD, MaterialColor.COLOR_RED) .strength(0.7f) .sound( com.kingodogo.buildscape.sound.ModSounds .MANGROVE_ROOTS_SOUNDS()) .noOcclusion();
+            case "muddy_mangrove_roots" -> BlockBehaviour.Properties.of(Material.WOOD, MaterialColor.COLOR_BROWN) .strength(0.7f) .sound( com.kingodogo.buildscape.sound.ModSounds .MUDDY_MANGROVE_ROOTS_SOUNDS()) .noOcclusion();
+            case "mangrove_propagule" -> BlockBehaviour.Properties.of(Material.PLANT, MaterialColor.COLOR_GREEN) .strength(0.0f) .randomTicks() .sound(net.minecraft.world.level.block.SoundType.GRASS) .noCollission() .noOcclusion();
+            case "mangrove_planks" -> BlockBehaviour.Properties.of(Material.WOOD, MaterialColor.COLOR_RED) .strength(2.0f, 3.0f) .sound(net.minecraft.world.level.block.SoundType.WOOD);
+            case "mangrove_stairs" -> BlockBehaviour.Properties.of(Material.WOOD, MaterialColor.COLOR_RED) .strength(2.0f, 3.0f) .sound(net.minecraft.world.level.block.SoundType.WOOD);
+            case "mangrove_slab" -> BlockBehaviour.Properties.of(Material.WOOD, MaterialColor.COLOR_RED) .strength(2.0f, 3.0f) .sound(net.minecraft.world.level.block.SoundType.WOOD);
+            case "mangrove_fence" -> BlockBehaviour.Properties.of(Material.WOOD, MaterialColor.COLOR_RED) .strength(2.0f, 3.0f) .sound(net.minecraft.world.level.block.SoundType.WOOD);
+            case "mangrove_fence_gate" -> BlockBehaviour.Properties.of(Material.WOOD, MaterialColor.COLOR_RED) .strength(2.0f, 3.0f) .sound(net.minecraft.world.level.block.SoundType.WOOD);
+            case "mangrove_door" -> BlockBehaviour.Properties.of(Material.WOOD, MaterialColor.COLOR_RED) .strength(3.0f) .sound(net.minecraft.world.level.block.SoundType.WOOD) .noOcclusion();
+            case "mangrove_trapdoor" -> BlockBehaviour.Properties.of(Material.WOOD, MaterialColor.COLOR_RED) .strength(3.0f) .sound(net.minecraft.world.level.block.SoundType.WOOD) .noOcclusion() .isValidSpawn((state, reader, pos, entityType) -> false);
+            case "mangrove_button" -> BlockBehaviour.Properties.of( Material.DECORATION, MaterialColor.COLOR_RED) .strength(0.5f) .sound(net.minecraft.world.level.block.SoundType.WOOD) .noCollission();
+            case "mangrove_pressure_plate" -> BlockBehaviour.Properties.of(Material.WOOD, MaterialColor.COLOR_RED) .strength(0.5f) .sound(net.minecraft.world.level.block.SoundType.WOOD) .noCollission();
+            case "mangrove_sign" -> BlockBehaviour.Properties.of(Material.WOOD, MaterialColor.COLOR_RED) .strength(1.0f) .sound(net.minecraft.world.level.block.SoundType.WOOD) .noCollission();
+            case "mangrove_wall_sign" -> BlockBehaviour.Properties.of(Material.WOOD, MaterialColor.COLOR_RED) .strength(1.0f) .sound(net.minecraft.world.level.block.SoundType.WOOD) .noCollission() .dropsLike(restoredBlock("mangrove_sign"));
+            case "sulfur" -> BlockBehaviour.Properties.copy(Blocks.STONE);
+            case "polished_sulfur" -> BlockBehaviour.Properties.copy(restoredBlock("sulfur"));
+            case "chiseled_sulfur" -> BlockBehaviour.Properties.copy(restoredBlock("sulfur"));
+            case "sulfur_bricks" -> BlockBehaviour.Properties.copy(restoredBlock("sulfur"));
+            case "sulfur_stairs" -> BlockBehaviour.Properties.copy(restoredBlock("sulfur"));
+            case "sulfur_slab" -> BlockBehaviour.Properties.copy(restoredBlock("sulfur"));
+            case "sulfur_wall" -> BlockBehaviour.Properties.copy(restoredBlock("sulfur"));
+            case "polished_sulfur_stairs" -> BlockBehaviour.Properties.copy(restoredBlock("polished_sulfur"));
+            case "polished_sulfur_slab" -> BlockBehaviour.Properties.copy(restoredBlock("polished_sulfur"));
+            case "polished_sulfur_wall" -> BlockBehaviour.Properties.copy(restoredBlock("polished_sulfur"));
+            case "sulfur_bricks_stairs" -> BlockBehaviour.Properties.copy(restoredBlock("sulfur_bricks"));
+            case "sulfur_bricks_slab" -> BlockBehaviour.Properties.copy(restoredBlock("sulfur_bricks"));
+            case "sulfur_bricks_wall" -> BlockBehaviour.Properties.copy(restoredBlock("sulfur_bricks"));
+            case "sulfur_spike" -> BlockBehaviour.Properties.copy(Blocks.POINTED_DRIPSTONE);
+            case "potent_sulfur" -> BlockBehaviour.Properties.copy(Blocks.STONE);
+            case "cinnabar" -> BlockBehaviour.Properties.copy(Blocks.STONE);
+            case "polished_cinnabar" -> BlockBehaviour.Properties.copy(restoredBlock("cinnabar"));
+            case "chiseled_cinnabar" -> BlockBehaviour.Properties.copy(restoredBlock("cinnabar"));
+            case "cinnabar_bricks" -> BlockBehaviour.Properties.copy(restoredBlock("cinnabar"));
+            case "cinnabar_stairs" -> BlockBehaviour.Properties.copy(restoredBlock("cinnabar"));
+            case "cinnabar_slab" -> BlockBehaviour.Properties.copy(restoredBlock("cinnabar"));
+            case "cinnabar_wall" -> BlockBehaviour.Properties.copy(restoredBlock("cinnabar"));
+            case "polished_cinnabar_stairs" -> BlockBehaviour.Properties.copy(restoredBlock("polished_cinnabar"));
+            case "polished_cinnabar_slab" -> BlockBehaviour.Properties.copy(restoredBlock("polished_cinnabar"));
+            case "polished_cinnabar_wall" -> BlockBehaviour.Properties.copy(restoredBlock("polished_cinnabar"));
+            case "cinnabar_bricks_stairs" -> BlockBehaviour.Properties.copy(restoredBlock("cinnabar_bricks"));
+            case "cinnabar_bricks_slab" -> BlockBehaviour.Properties.copy(restoredBlock("cinnabar_bricks"));
+            case "cinnabar_bricks_wall" -> BlockBehaviour.Properties.copy(restoredBlock("cinnabar_bricks"));
+            case "tuff_slab" -> BlockBehaviour.Properties.copy(Blocks.TUFF);
+            case "tuff_stairs" -> BlockBehaviour.Properties.copy(Blocks.TUFF);
+            case "tuff_wall" -> BlockBehaviour.Properties.copy(Blocks.TUFF);
+            case "polished_tuff" -> BlockBehaviour.Properties.copy(Blocks.TUFF);
+            case "polished_tuff_slab" -> BlockBehaviour.Properties.copy(restoredBlock("polished_tuff"));
+            case "polished_tuff_stairs" -> BlockBehaviour.Properties.copy(restoredBlock("polished_tuff"));
+            case "polished_tuff_wall" -> BlockBehaviour.Properties.copy(restoredBlock("polished_tuff"));
+            case "chiseled_tuff" -> BlockBehaviour.Properties.copy(Blocks.TUFF);
+            case "tuff_bricks" -> BlockBehaviour.Properties.copy(Blocks.TUFF);
+            case "tuff_brick_slab" -> BlockBehaviour.Properties.copy(restoredBlock("tuff_bricks"));
+            case "tuff_brick_stairs" -> BlockBehaviour.Properties.copy(restoredBlock("tuff_bricks"));
+            case "tuff_brick_wall" -> BlockBehaviour.Properties.copy(restoredBlock("tuff_bricks"));
+            case "chiseled_tuff_bricks" -> BlockBehaviour.Properties.copy(Blocks.TUFF);
+            case "pale_oak_log" -> BlockBehaviour.Properties.copy(Blocks.OAK_LOG);
+            case "stripped_pale_oak_log" -> BlockBehaviour.Properties.copy(Blocks.STRIPPED_OAK_LOG);
+            case "pale_oak_wood" -> BlockBehaviour.Properties.copy(Blocks.OAK_WOOD);
+            case "stripped_pale_oak_wood" -> BlockBehaviour.Properties.copy(Blocks.STRIPPED_OAK_WOOD);
+            case "pale_oak_planks" -> BlockBehaviour.Properties.copy(Blocks.OAK_PLANKS);
+            case "pale_oak_stairs" -> BlockBehaviour.Properties.copy(Blocks.OAK_STAIRS);
+            case "pale_oak_slab" -> BlockBehaviour.Properties.copy(Blocks.OAK_SLAB);
+            case "pale_oak_fence" -> BlockBehaviour.Properties.copy(Blocks.OAK_FENCE);
+            case "pale_oak_fence_gate" -> BlockBehaviour.Properties.copy(Blocks.OAK_FENCE_GATE);
+            case "pale_oak_door" -> BlockBehaviour.Properties.copy(Blocks.OAK_DOOR);
+            case "pale_oak_trapdoor" -> BlockBehaviour.Properties.copy(Blocks.OAK_TRAPDOOR);
+            case "pale_oak_button" -> BlockBehaviour.Properties.copy(Blocks.OAK_BUTTON);
+            case "pale_oak_pressure_plate" -> BlockBehaviour.Properties.copy(Blocks.OAK_PRESSURE_PLATE);
+            case "pale_oak_leaves" -> BlockBehaviour.Properties.copy(Blocks.OAK_LEAVES);
+            case "pale_oak_sapling" -> BlockBehaviour.Properties.copy(Blocks.OAK_SAPLING);
+            case "cherry_log" -> BlockBehaviour.Properties.copy(Blocks.OAK_LOG);
+            case "stripped_cherry_log" -> BlockBehaviour.Properties.copy(Blocks.STRIPPED_OAK_LOG);
+            case "cherry_wood" -> BlockBehaviour.Properties.copy(Blocks.OAK_WOOD);
+            case "stripped_cherry_wood" -> BlockBehaviour.Properties.copy(Blocks.STRIPPED_OAK_WOOD);
+            case "cherry_planks" -> BlockBehaviour.Properties.copy(Blocks.OAK_PLANKS);
+            case "cherry_stairs" -> BlockBehaviour.Properties.copy(Blocks.OAK_STAIRS);
+            case "cherry_slab" -> BlockBehaviour.Properties.copy(Blocks.OAK_SLAB);
+            case "cherry_fence" -> BlockBehaviour.Properties.copy(Blocks.OAK_FENCE);
+            case "cherry_fence_gate" -> BlockBehaviour.Properties.copy(Blocks.OAK_FENCE_GATE);
+            case "cherry_door" -> BlockBehaviour.Properties.copy(Blocks.OAK_DOOR);
+            case "cherry_trapdoor" -> BlockBehaviour.Properties.copy(Blocks.OAK_TRAPDOOR);
+            case "cherry_button" -> BlockBehaviour.Properties.copy(Blocks.OAK_BUTTON);
+            case "cherry_pressure_plate" -> BlockBehaviour.Properties.copy(Blocks.OAK_PRESSURE_PLATE);
+            case "cherry_leaves" -> BlockBehaviour.Properties.copy(Blocks.OAK_LEAVES);
+            case "cherry_sapling" -> BlockBehaviour.Properties.copy(Blocks.OAK_SAPLING);
+            case "closed_eyeblossom" -> BlockBehaviour.Properties.copy(Blocks.POPPY);
+            case "open_eyeblossom" -> BlockBehaviour.Properties.copy(Blocks.POPPY).lightLevel(state -> 7).hasPostProcess((state, getter, pos) -> true).emissiveRendering((state, getter, pos) -> true);
+            case "wildflowers" -> BlockBehaviour.Properties.copy(Blocks.MOSS_CARPET).noCollission().sound(SoundType.GRASS);
+            case "leaf_litter" -> BlockBehaviour.Properties.copy(Blocks.MOSS_CARPET).noCollission().sound(SoundType.GRASS);
+            case "cactus_flower" -> BlockBehaviour.Properties.copy(Blocks.DANDELION);
+            case "bush" -> BlockBehaviour.Properties.copy(Blocks.DEAD_BUSH);
+            case "firefly_bush" -> BlockBehaviour.Properties.copy(Blocks.GRASS).lightLevel(state -> 2).hasPostProcess((state, getter, pos) -> true).emissiveRendering((state, getter, pos) -> true);
+            case "dry_grass" -> BlockBehaviour.Properties.copy(Blocks.GRASS);
+            case "tall_dry_grass" -> BlockBehaviour.Properties.copy(Blocks.TALL_GRASS);
+            case "golden_dandelion" -> BlockBehaviour.Properties.copy(Blocks.DANDELION);
+            case "potted_closed_eyeblossom" -> BlockBehaviour.Properties.copy(Blocks.POTTED_POPPY);
+            case "potted_open_eyeblossom" -> BlockBehaviour.Properties.copy(Blocks.POTTED_POPPY).lightLevel(state -> 7);
+            case "potted_golden_dandelion" -> BlockBehaviour.Properties.copy(Blocks.POTTED_POPPY);
+            case "potted_cactus_flower" -> BlockBehaviour.Properties.copy(Blocks.POTTED_POPPY);
+            case "potted_bush" -> BlockBehaviour.Properties.copy(Blocks.POTTED_POPPY);
+            case "potted_firefly_bush" -> BlockBehaviour.Properties.copy(Blocks.POTTED_POPPY).lightLevel(state -> 2);
+            case "potted_dry_grass" -> BlockBehaviour.Properties.copy(Blocks.POTTED_POPPY);
+            case "potted_pale_oak_sapling" -> BlockBehaviour.Properties.copy(Blocks.POTTED_POPPY);
+            case "potted_cherry_sapling" -> BlockBehaviour.Properties.copy(Blocks.POTTED_POPPY);
+            case "potted_mangrove_propagule" -> BlockBehaviour.Properties.copy(Blocks.POTTED_POPPY);
+            case "potted_wildflowers" -> BlockBehaviour.Properties.copy(Blocks.POTTED_POPPY);
+            case "potted_leaf_litter" -> BlockBehaviour.Properties.copy(Blocks.POTTED_POPPY);
+            case "potted_tall_dry_grass" -> BlockBehaviour.Properties.copy(Blocks.POTTED_POPPY);
+            case "ochre_froglight" -> BlockBehaviour.Properties.copy(Blocks.SHROOMLIGHT).lightLevel(state -> 15);
+            case "pearlescent_froglight" -> BlockBehaviour.Properties.copy(Blocks.SHROOMLIGHT).lightLevel(state -> 15);
+            case "verdant_froglight" -> BlockBehaviour.Properties.copy(Blocks.SHROOMLIGHT).lightLevel(state -> 15);
+            case "sculk" -> BlockBehaviour.Properties.copy(Blocks.SCULK_SENSOR);
+            case "sculk_slab" -> BlockBehaviour.Properties.copy(Blocks.SCULK_SENSOR);
+            case "sculk_stairs" -> BlockBehaviour.Properties.copy(Blocks.SCULK_SENSOR);
+            case "sculk_wall" -> BlockBehaviour.Properties.copy(Blocks.SCULK_SENSOR);
+            case "sculk_vertical_slab" -> BlockBehaviour.Properties.copy(Blocks.SCULK_SENSOR);
+            case "sculk_vein" -> BlockBehaviour.Properties.copy(Blocks.GLOW_LICHEN);
+            case "sculk_catalyst" -> BlockBehaviour.Properties.copy(Blocks.SCULK_SENSOR).lightLevel(state -> 6);
+            case "sculk_shrieker" -> BlockBehaviour.Properties.copy(Blocks.SCULK_SENSOR).noOcclusion();
+            case "sculk_sensor" -> BlockBehaviour.Properties.copy(Blocks.SCULK_SENSOR).lightLevel(state -> 1).noOcclusion();
+            case "copper_torch" -> BlockBehaviour.Properties.copy(Blocks.TORCH).lightLevel(state -> 14);
+            case "copper_wall_torch" -> BlockBehaviour.Properties.copy(Blocks.WALL_TORCH).lightLevel(state -> 14);
+            case "copper_rod" -> BlockBehaviour.Properties.copy(Blocks.LIGHTNING_ROD);
+            case "waxed_copper_rod" -> BlockBehaviour.Properties.copy(Blocks.LIGHTNING_ROD);
+            case "exposed_copper_rod" -> BlockBehaviour.Properties.copy(Blocks.LIGHTNING_ROD);
+            case "waxed_exposed_copper_rod" -> BlockBehaviour.Properties.copy(Blocks.LIGHTNING_ROD);
+            case "weathered_copper_rod" -> BlockBehaviour.Properties.copy(Blocks.LIGHTNING_ROD);
+            case "waxed_weathered_copper_rod" -> BlockBehaviour.Properties.copy(Blocks.LIGHTNING_ROD);
+            case "oxidized_copper_rod" -> BlockBehaviour.Properties.copy(Blocks.LIGHTNING_ROD);
+            case "waxed_oxidized_copper_rod" -> BlockBehaviour.Properties.copy(Blocks.LIGHTNING_ROD);
+            case "copper_lantern" -> BlockBehaviour.Properties.copy(Blocks.LANTERN).lightLevel(state -> 15).sound(SoundType.COPPER);
+            case "waxed_copper_lantern" -> BlockBehaviour.Properties.copy(Blocks.LANTERN).lightLevel(state -> 15).sound(SoundType.COPPER);
+            case "exposed_copper_lantern" -> BlockBehaviour.Properties.copy(Blocks.LANTERN).lightLevel(state -> 15).sound(SoundType.COPPER);
+            case "waxed_exposed_copper_lantern" -> BlockBehaviour.Properties.copy(Blocks.LANTERN).lightLevel(state -> 15).sound(SoundType.COPPER);
+            case "weathered_copper_lantern" -> BlockBehaviour.Properties.copy(Blocks.LANTERN).lightLevel(state -> 15).sound(SoundType.COPPER);
+            case "waxed_weathered_copper_lantern" -> BlockBehaviour.Properties.copy(Blocks.LANTERN).lightLevel(state -> 15).sound(SoundType.COPPER);
+            case "oxidized_copper_lantern" -> BlockBehaviour.Properties.copy(Blocks.LANTERN).lightLevel(state -> 15).sound(SoundType.COPPER);
+            case "waxed_oxidized_copper_lantern" -> BlockBehaviour.Properties.copy(Blocks.LANTERN).lightLevel(state -> 15).sound(SoundType.COPPER);
+            case "chiseled_copper" -> BlockBehaviour.Properties.copy(Blocks.CUT_COPPER);
+            case "waxed_chiseled_copper" -> BlockBehaviour.Properties.copy(Blocks.CUT_COPPER);
+            case "exposed_chiseled_copper" -> BlockBehaviour.Properties.copy(Blocks.EXPOSED_CUT_COPPER);
+            case "waxed_exposed_chiseled_copper" -> BlockBehaviour.Properties.copy(Blocks.EXPOSED_CUT_COPPER);
+            case "weathered_chiseled_copper" -> BlockBehaviour.Properties.copy(Blocks.WEATHERED_CUT_COPPER);
+            case "waxed_weathered_chiseled_copper" -> BlockBehaviour.Properties.copy(Blocks.WEATHERED_CUT_COPPER);
+            case "oxidized_chiseled_copper" -> BlockBehaviour.Properties.copy(Blocks.OXIDIZED_CUT_COPPER);
+            case "waxed_oxidized_chiseled_copper" -> BlockBehaviour.Properties.copy(Blocks.OXIDIZED_CUT_COPPER);
+            case "copper_grate" -> BlockBehaviour.Properties.copy(Blocks.CUT_COPPER).noOcclusion().sound(com.kingodogo.buildscape.sound.ModSounds.COPPER_GRATE_SOUNDS());
+            case "waxed_copper_grate" -> BlockBehaviour.Properties.copy(Blocks.CUT_COPPER).noOcclusion().sound(com.kingodogo.buildscape.sound.ModSounds.COPPER_GRATE_SOUNDS());
+            case "exposed_copper_grate" -> BlockBehaviour.Properties.copy(Blocks.EXPOSED_CUT_COPPER).noOcclusion().sound(com.kingodogo.buildscape.sound.ModSounds.COPPER_GRATE_SOUNDS());
+            case "waxed_exposed_copper_grate" -> BlockBehaviour.Properties.copy(Blocks.EXPOSED_CUT_COPPER).noOcclusion().sound(com.kingodogo.buildscape.sound.ModSounds.COPPER_GRATE_SOUNDS());
+            case "weathered_copper_grate" -> BlockBehaviour.Properties.copy(Blocks.WEATHERED_CUT_COPPER).noOcclusion().sound(com.kingodogo.buildscape.sound.ModSounds.COPPER_GRATE_SOUNDS());
+            case "waxed_weathered_copper_grate" -> BlockBehaviour.Properties.copy(Blocks.WEATHERED_CUT_COPPER).noOcclusion().sound(com.kingodogo.buildscape.sound.ModSounds.COPPER_GRATE_SOUNDS());
+            case "oxidized_copper_grate" -> BlockBehaviour.Properties.copy(Blocks.OXIDIZED_CUT_COPPER).noOcclusion().sound(com.kingodogo.buildscape.sound.ModSounds.COPPER_GRATE_SOUNDS());
+            case "waxed_oxidized_copper_grate" -> BlockBehaviour.Properties.copy(Blocks.OXIDIZED_CUT_COPPER).noOcclusion().sound(com.kingodogo.buildscape.sound.ModSounds.COPPER_GRATE_SOUNDS());
+            case "copper_bulb" -> BlockBehaviour.Properties.copy(Blocks.COPPER_BLOCK) .lightLevel((state) -> state.getValue(CopperBulbBlock.LIT) ? 15 : 0) .sound(com.kingodogo.buildscape.sound.ModSounds.COPPER_BULB_SOUNDS()) .isRedstoneConductor((state, reader, pos) -> false);
+            case "waxed_copper_bulb" -> BlockBehaviour.Properties.copy(Blocks.COPPER_BLOCK) .lightLevel((state) -> state.getValue(CopperBulbBlock.LIT) ? 15 : 0) .sound(com.kingodogo.buildscape.sound.ModSounds.COPPER_BULB_SOUNDS()) .isRedstoneConductor((state, reader, pos) -> false);
+            case "exposed_copper_bulb" -> BlockBehaviour.Properties.copy(Blocks.EXPOSED_COPPER) .lightLevel((state) -> state.getValue(CopperBulbBlock.LIT) ? 12 : 0) .sound(com.kingodogo.buildscape.sound.ModSounds.COPPER_BULB_SOUNDS()) .isRedstoneConductor((state, reader, pos) -> false);
+            case "waxed_exposed_copper_bulb" -> BlockBehaviour.Properties.copy(Blocks.EXPOSED_COPPER) .lightLevel((state) -> state.getValue(CopperBulbBlock.LIT) ? 12 : 0) .sound(com.kingodogo.buildscape.sound.ModSounds.COPPER_BULB_SOUNDS()) .isRedstoneConductor((state, reader, pos) -> false);
+            case "weathered_copper_bulb" -> BlockBehaviour.Properties.copy(Blocks.WEATHERED_COPPER) .lightLevel((state) -> state.getValue(CopperBulbBlock.LIT) ? 8 : 0) .sound(com.kingodogo.buildscape.sound.ModSounds.COPPER_BULB_SOUNDS()) .isRedstoneConductor((state, reader, pos) -> false);
+            case "waxed_weathered_copper_bulb" -> BlockBehaviour.Properties.copy(Blocks.WEATHERED_COPPER) .lightLevel((state) -> state.getValue(CopperBulbBlock.LIT) ? 8 : 0) .sound(com.kingodogo.buildscape.sound.ModSounds.COPPER_BULB_SOUNDS()) .isRedstoneConductor((state, reader, pos) -> false);
+            case "oxidized_copper_bulb" -> BlockBehaviour.Properties.copy(Blocks.OXIDIZED_COPPER) .lightLevel((state) -> state.getValue(CopperBulbBlock.LIT) ? 4 : 0) .sound(com.kingodogo.buildscape.sound.ModSounds.COPPER_BULB_SOUNDS()) .isRedstoneConductor((state, reader, pos) -> false);
+            case "waxed_oxidized_copper_bulb" -> BlockBehaviour.Properties.copy(Blocks.OXIDIZED_COPPER) .lightLevel((state) -> state.getValue(CopperBulbBlock.LIT) ? 4 : 0) .sound(com.kingodogo.buildscape.sound.ModSounds.COPPER_BULB_SOUNDS()) .isRedstoneConductor((state, reader, pos) -> false);
+            case "copper_door" -> BlockBehaviour.Properties.copy(Blocks.COPPER_BLOCK).noOcclusion().sound(SoundType.COPPER);
+            case "waxed_copper_door" -> BlockBehaviour.Properties.copy(Blocks.COPPER_BLOCK).noOcclusion().sound(SoundType.COPPER);
+            case "exposed_copper_door" -> BlockBehaviour.Properties.copy(Blocks.EXPOSED_COPPER).noOcclusion().sound(SoundType.COPPER);
+            case "waxed_exposed_copper_door" -> BlockBehaviour.Properties.copy(Blocks.EXPOSED_COPPER).noOcclusion().sound(SoundType.COPPER);
+            case "weathered_copper_door" -> BlockBehaviour.Properties.copy(Blocks.WEATHERED_COPPER).noOcclusion().sound(SoundType.COPPER);
+            case "waxed_weathered_copper_door" -> BlockBehaviour.Properties.copy(Blocks.WEATHERED_COPPER).noOcclusion().sound(SoundType.COPPER);
+            case "oxidized_copper_door" -> BlockBehaviour.Properties.copy(Blocks.OXIDIZED_COPPER).noOcclusion().sound(SoundType.COPPER);
+            case "waxed_oxidized_copper_door" -> BlockBehaviour.Properties.copy(Blocks.OXIDIZED_COPPER).noOcclusion().sound(SoundType.COPPER);
+            case "copper_trapdoor" -> BlockBehaviour.Properties.copy(Blocks.COPPER_BLOCK).noOcclusion().sound(SoundType.COPPER);
+            case "waxed_copper_trapdoor" -> BlockBehaviour.Properties.copy(Blocks.COPPER_BLOCK).noOcclusion().sound(SoundType.COPPER);
+            case "exposed_copper_trapdoor" -> BlockBehaviour.Properties.copy(Blocks.EXPOSED_COPPER).noOcclusion().sound(SoundType.COPPER);
+            case "waxed_exposed_copper_trapdoor" -> BlockBehaviour.Properties.copy(Blocks.EXPOSED_COPPER).noOcclusion().sound(SoundType.COPPER);
+            case "weathered_copper_trapdoor" -> BlockBehaviour.Properties.copy(Blocks.WEATHERED_COPPER).noOcclusion().sound(SoundType.COPPER);
+            case "waxed_weathered_copper_trapdoor" -> BlockBehaviour.Properties.copy(Blocks.WEATHERED_COPPER).noOcclusion().sound(SoundType.COPPER);
+            case "oxidized_copper_trapdoor" -> BlockBehaviour.Properties.copy(Blocks.OXIDIZED_COPPER).noOcclusion().sound(SoundType.COPPER);
+            case "waxed_oxidized_copper_trapdoor" -> BlockBehaviour.Properties.copy(Blocks.OXIDIZED_COPPER).noOcclusion().sound(SoundType.COPPER);
+            case "copper_bars" -> BlockBehaviour.Properties.copy(Blocks.IRON_BARS).sound(SoundType.COPPER);
+            case "waxed_copper_bars" -> BlockBehaviour.Properties.copy(Blocks.IRON_BARS).sound(SoundType.COPPER);
+            case "exposed_copper_bars" -> BlockBehaviour.Properties.copy(Blocks.IRON_BARS).sound(SoundType.COPPER);
+            case "waxed_exposed_copper_bars" -> BlockBehaviour.Properties.copy(Blocks.IRON_BARS).sound(SoundType.COPPER);
+            case "weathered_copper_bars" -> BlockBehaviour.Properties.copy(Blocks.IRON_BARS).sound(SoundType.COPPER);
+            case "waxed_weathered_copper_bars" -> BlockBehaviour.Properties.copy(Blocks.IRON_BARS).sound(SoundType.COPPER);
+            case "oxidized_copper_bars" -> BlockBehaviour.Properties.copy(Blocks.IRON_BARS).sound(SoundType.COPPER);
+            case "waxed_oxidized_copper_bars" -> BlockBehaviour.Properties.copy(Blocks.IRON_BARS).sound(SoundType.COPPER);
+            case "copper_chest" -> BlockBehaviour.Properties.copy(net.minecraft.world.level.block.Blocks.CHEST).sound(net.minecraft.world.level.block.SoundType.COPPER);
+            case "exposed_copper_chest" -> BlockBehaviour.Properties.copy(net.minecraft.world.level.block.Blocks.CHEST).sound(net.minecraft.world.level.block.SoundType.COPPER);
+            case "weathered_copper_chest" -> BlockBehaviour.Properties.copy(net.minecraft.world.level.block.Blocks.CHEST).sound(net.minecraft.world.level.block.SoundType.COPPER);
+            case "oxidized_copper_chest" -> BlockBehaviour.Properties.copy(net.minecraft.world.level.block.Blocks.CHEST).sound(net.minecraft.world.level.block.SoundType.COPPER);
+            case "waxed_copper_chest" -> BlockBehaviour.Properties.copy(net.minecraft.world.level.block.Blocks.CHEST).sound(net.minecraft.world.level.block.SoundType.COPPER);
+            case "waxed_exposed_copper_chest" -> BlockBehaviour.Properties.copy(net.minecraft.world.level.block.Blocks.CHEST).sound(net.minecraft.world.level.block.SoundType.COPPER);
+            case "waxed_weathered_copper_chest" -> BlockBehaviour.Properties.copy(net.minecraft.world.level.block.Blocks.CHEST).sound(net.minecraft.world.level.block.SoundType.COPPER);
+            case "waxed_oxidized_copper_chest" -> BlockBehaviour.Properties.copy(net.minecraft.world.level.block.Blocks.CHEST).sound(net.minecraft.world.level.block.SoundType.COPPER);
+            case "oak_shelf" -> BlockBehaviour.Properties.copy(Blocks.OAK_PLANKS).strength(2.0f, 3.0f);
+            case "spruce_shelf" -> BlockBehaviour.Properties.copy(Blocks.SPRUCE_PLANKS).strength(2.0f, 3.0f);
+            case "birch_shelf" -> BlockBehaviour.Properties.copy(Blocks.BIRCH_PLANKS).strength(2.0f, 3.0f);
+            case "jungle_shelf" -> BlockBehaviour.Properties.copy(Blocks.JUNGLE_PLANKS).strength(2.0f, 3.0f);
+            case "acacia_shelf" -> BlockBehaviour.Properties.copy(Blocks.ACACIA_PLANKS).strength(2.0f, 3.0f);
+            case "dark_oak_shelf" -> BlockBehaviour.Properties.copy(Blocks.DARK_OAK_PLANKS).strength(2.0f, 3.0f);
+            case "mangrove_shelf" -> BlockBehaviour.Properties.copy(restoredBlock("mangrove_planks")).strength(2.0f, 3.0f);
+            case "cherry_shelf" -> BlockBehaviour.Properties.copy(restoredBlock("cherry_planks")).strength(2.0f, 3.0f);
+            case "crimson_shelf" -> BlockBehaviour.Properties.copy(Blocks.CRIMSON_PLANKS).strength(2.0f, 3.0f);
+            case "warped_shelf" -> BlockBehaviour.Properties.copy(Blocks.WARPED_PLANKS).strength(2.0f, 3.0f);
+            case "bamboo_shelf" -> BlockBehaviour.Properties.copy(restoredBlock("bamboo_block")).strength(2.0f, 3.0f);
+            case "pale_oak_shelf" -> BlockBehaviour.Properties.copy(restoredBlock("pale_oak_planks")).strength(2.0f, 3.0f);
+            default -> null;
+        };
+    }
+
     private BlockBehaviour.Properties buildProperties(BlockDefinition def) {
+        BlockBehaviour.Properties restored = restoredProperties(def.getId());
+        if (restored != null) return restored;
         CommonBlockProperties cp = def.getProperties();
         net.minecraft.world.level.material.Material mat = mapMaterial(cp.getMaterial());
         MaterialColor color = mapColor(cp.getMapColor());

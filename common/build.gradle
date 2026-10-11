@@ -20,11 +20,11 @@ sourceSets {
 
     v121x {
         java {
-            srcDirs = ['src/main/java']
+            srcDirs = ['src/main/java', 'src/v121x/java']
             exclude 'com/kingodogo/buildscape/adapter/v118x/**'
             exclude 'com/kingodogo/buildscape/adapter/v26x/**'
         }
-        resources.srcDirs = ['src/main/resources']
+        resources.srcDirs = ['src/main/resources', 'src/v121x/resources']
     }
 
     v26x {
@@ -57,6 +57,13 @@ sourceSets {
 // Keep this compile in check so shared API changes are verified for both clusters.
 unimined.minecraft(sourceSets.v118x) {
     version '1.18.2'
+    mappings { mojmap() }
+    defaultRemapJar = false
+}
+
+// Resolve Mojang-mapped 1.21.1 and its own vanilla library manifest publicly.
+unimined.minecraft(sourceSets.v121x) {
+    version '1.21.1'
     mappings { mojmap() }
     defaultRemapJar = false
 }
@@ -95,24 +102,24 @@ dependencies {
         // Minecraft 1.18.2 supplies its own DFU and Brigadier versions through
         // Unimined. Newer versions change serialization methods used at bootstrap.
         if (!dependency.startsWith('com.mojang:')) v118xCompileOnly dependency
-        v121xCompileOnly dependency
+        // 1.21.1 supplies DFU, Brigadier and JOML through its own manifest.
+        if (!dependency.startsWith('com.mojang:') && !dependency.startsWith('org.joml:')) {
+            v121xCompileOnly dependency
+        }
         v26xCompileOnly dependency
     }
 
-    ['v121xCompileOnly', 'v26xCompileOnly'].each { configurationName ->
-        add(configurationName, 'com.google.code.gson:gson:2.10.1')
-    }
+    v26xCompileOnly 'com.google.code.gson:gson:2.10.1'
 
     // Gson and Netty for v118x also come from Minecraft's library manifest.
     // Nullable was previously supplied transitively by the newer DFU dependency.
     v118xCompileOnly 'com.google.code.findbugs:jsr305:3.0.2'
-    v121xCompileOnly 'io.netty:netty-buffer:4.1.97.Final'
+    // Gson and Netty for v121x also come from Minecraft's library manifest.
     v26xCompileOnly 'io.netty:netty-buffer:4.2.15.Final'
     v26xCompileOnly 'it.unimi.dsi:fastutil:8.5.18'
     v26xCompileOnly 'org.jetbrains:annotations:26.0.2'
     v26xCompileOnly 'com.google.guava:guava:33.6.0-jre'
     v26xCompileOnly 'org.slf4j:slf4j-api:2.0.17'
-    v121xCompileOnly files(rootProject.file('ref/artifacts/minecraft-1.21.1.jar'))
 
 }
 
@@ -121,7 +128,12 @@ tasks.named('compileV118xJava', JavaCompile) {
     // Preserve the migration baseline beyond javac's default 100-error limit.
     options.compilerArgs += ['-Xmaxerrs', '10000']
 }
-tasks.named('compileV121xJava', JavaCompile) { options.release.set(21) }
+tasks.named('compileV121xJava', JavaCompile) {
+    javaCompiler = javaToolchains.compilerFor { languageVersion = JavaLanguageVersion.of(21) }
+    options.release.set(21)
+    // Capture the migration baseline beyond javac's default 100-error limit.
+    options.compilerArgs += ['-Xmaxerrs', '10000']
+}
 tasks.named('compileV118xTestJava', JavaCompile) { options.release.set(17) }
 tasks.named('compileV26xJava', JavaCompile) { options.release.set(25) }
 tasks.named('compileTestJava', JavaCompile) { options.release.set(25) }
@@ -149,6 +161,12 @@ def v118xClusterResources = tasks.register('v118xClusterResources', Sync) {
     into v118xClusterResourcesDir
 }
 
+def v121xClusterResourcesDir = layout.buildDirectory.dir('resources/v121xCluster')
+def v121xClusterResources = tasks.register('v121xClusterResources', Sync) {
+    from 'src/v121x/resources'
+    into v121xClusterResourcesDir
+}
+
 artifacts {
     add('v118xElements', sourceSets.v118x.output.classesDirs.singleFile) {
         builtBy tasks.named('compileV118xJava')
@@ -158,6 +176,9 @@ artifacts {
     }
     add('v121xElements', sourceSets.v121x.output.classesDirs.singleFile) {
         builtBy tasks.named('compileV121xJava')
+    }
+    add('v121xElements', v121xClusterResourcesDir.get().asFile) {
+        builtBy v121xClusterResources
     }
     add('v26xElements', sourceSets.v26x.output.classesDirs.singleFile) {
         builtBy tasks.named('compileV26xJava')
@@ -177,8 +198,10 @@ tasks.named('jar', Jar) {
 tasks.named('assemble') { dependsOn tasks.named('v26xClasses') }
 // Follow the settings inclusion decision so the opt-out skips v118x verification.
 def v118xEnabled = rootProject.findProject(':forge:1.18.2') != null
+def v121xEnabled = providers.gradleProperty('buildscape.v121x').getOrElse('false') == 'true'
 tasks.named('check') {
     if (v118xEnabled) dependsOn tasks.named('compileV118xJava')
+    if (v121xEnabled) dependsOn tasks.named('compileV121xJava')
 }
 
 def v118xStandaloneTests = [

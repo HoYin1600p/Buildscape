@@ -46,11 +46,47 @@ client at a time, asynchronously when diagnosing startup. Inspect the run's
 running window may display a mod loading failure; confirm the title screen
 or the actual startup error and then close the development client.
 
+## Forge 1.18.2 toolchain spike
+
+Forge 1.18.2 is configured only with `-Pbuildscape.v118x=true`. Without that
+property, the default 26.2 build does not configure or resolve this project.
+It uses the same Unimined plugin, Forge 40.3.12, Mojang development mappings
+and SRG production mappings, and a Java 17 toolchain for compilation and runs.
+Keep JDK 25 available for Gradle and the 26.2 projects, and JDK 17 for this target.
+
+Once Forge 40.3.12 and the other dependencies have been cached:
+
+```powershell
+.\gradlew.bat :forge:1.18.2:build '-Pbuildscape.v118x=true' '-Pbuildscape.v118xSource=ref' --offline --console=plain --parallel --max-workers=8
+```
+
+Quote the dotted `-P` arguments in PowerShell so they reach Gradle intact.
+
+`buildscape.v118xSource` defaults to `ref`, compiling the frozen Java sources
+and packaging resources from `ref/forge/1.18.2/src/main`. The reserved `common`
+mode fails with an explanatory message until shared-code integration is ready.
+`mod_version_v118x=4.0.3` controls this jar independently of the 26.2 version.
+The production jar is `forge/1.18.2/build/libs/buildscape-4.0.3.jar`
+(the `-dev` jar is not a production artifact). It is the output of `remapJar`,
+which remaps classes to SRG names and generates the SRG mixin refmap. Text
+resources are normalised from CRLF to LF so the jar does not depend on the
+checkout's line endings. The bundled recipe cache is copied unchanged from the
+frozen reference. The development access transformer is derived at configuration
+time from the reference file (unimined does not translate SRG ids in it); the
+jar ships the original.
+
+A clean cache needs dependency population in a network-enabled environment
+before this offline command can work; cached Forge 40.2.10 is insufficient.
+
+`:forge:1.18.2:runServer` (same two `-P` properties) runs a dedicated server in
+`forge/1.18.2/run/server`; accept the EULA there yourself first. Gradle does not
+forward stdin, so stop it by ending only the server's Java process.
+
 ## Parked targets
 
 By owner decision, `forge:26.2` and `forge:26.3` are parked because Forge 26.x
 has no working toolchain. `fabric:26.3` and `neoforge:26.3` follow after 26.2.
-`forge:1.18.2`, `fabric:1.18.2`, `neoforge:1.21.1`, `fabric:1.21.1`, and
+`fabric:1.18.2`, `neoforge:1.21.1`, `fabric:1.21.1`, and
 `forge:1.21.1` are maintained separately. Their directories remain on disk
 and are excluded from settings, so their builds and runs are unavailable in
 the default project graph.

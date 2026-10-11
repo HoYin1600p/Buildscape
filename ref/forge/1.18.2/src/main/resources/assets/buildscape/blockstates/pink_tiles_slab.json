@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "buildscape:block/pink_tiles_slab"
+    },
+    "type=top": {
+      "model": "buildscape:block/pink_tiles_slab_top"
+    },
+    "type=double": {
+      "model": "buildscape:block/pink_tiles"
+    }
+  }
+}

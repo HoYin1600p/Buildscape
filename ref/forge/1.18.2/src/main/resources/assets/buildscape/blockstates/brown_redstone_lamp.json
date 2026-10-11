@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "lit=false": {
+      "model": "buildscape:block/brown_redstone_lamp"
+    },
+    "lit=true": {
+      "model": "buildscape:block/brown_redstone_lamp_on"
+    }
+  }
+}

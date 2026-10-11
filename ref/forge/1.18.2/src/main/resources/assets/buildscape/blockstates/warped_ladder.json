@@ -1,0 +1,19 @@
+{
+    "variants":  {
+                     "facing=north":  {
+                                          "model":  "buildscape:block/warped_ladder"
+                                      },
+                     "facing=south":  {
+                                          "model":  "buildscape:block/warped_ladder",
+                                          "y":  180
+                                      },
+                     "facing=east":  {
+                                         "model":  "buildscape:block/warped_ladder",
+                                         "y":  90
+                                     },
+                     "facing=west":  {
+                                         "model":  "buildscape:block/warped_ladder",
+                                         "y":  270
+                                     }
+                 }
+}

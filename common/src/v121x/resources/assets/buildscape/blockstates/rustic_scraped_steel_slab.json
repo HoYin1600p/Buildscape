@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "buildscape:block/rustic_scraped_steel_slab"
+    },
+    "type=top": {
+      "model": "buildscape:block/rustic_scraped_steel_slab_top"
+    },
+    "type=double": {
+      "model": "buildscape:block/rustic_scraped_steel"
+    }
+  }
+}

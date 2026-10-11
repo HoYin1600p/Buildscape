@@ -1,0 +1,9 @@
+{
+  "parent": "buildscape:block/template_hollow_metal_pipe_t",
+  "textures": {
+    "cross": "buildscape:block/steel_pipe_cross",
+    "side": "buildscape:block/steel_pipe_t",
+    "back": "buildscape:block/steel_pipe_middle_smooth",
+    "particle": "buildscape:block/steel_pipe_t"
+  }
+}

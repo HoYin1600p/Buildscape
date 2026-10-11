@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "buildscape:block/green_factory_mesh_slab"
+    },
+    "type=double": {
+      "model": "buildscape:block/green_factory_mesh"
+    },
+    "type=top": {
+      "model": "buildscape:block/green_factory_mesh_slab_top"
+    }
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "buildscape:block/snowy_grass_block_slab"
+    },
+    "type=top": {
+      "model": "buildscape:block/snowy_grass_block_slab_top"
+    },
+    "type=double": {
+      "model": "buildscape:block/snowy_grass_block"
+    }
+  }
+}
+

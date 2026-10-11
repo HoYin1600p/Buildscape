@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "buildscape:block/cascade_block"
+    }
+  }
+}

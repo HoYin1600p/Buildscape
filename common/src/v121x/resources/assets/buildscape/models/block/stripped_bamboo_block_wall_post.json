@@ -1,0 +1,7 @@
+{
+  "textures": {
+    "wall": "minecraft:block/stripped_bamboo_block",
+    "particle": "minecraft:block/stripped_bamboo_block"
+  },
+  "parent": "minecraft:block/template_wall_post"
+}

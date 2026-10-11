@@ -1,8 +1,0 @@
-{
-  "type": "minecraft:stonecutting",
-  "ingredient": {
-    "item": "buildscape:factory_purple_glass_stairs"
-  },
-  "result": "buildscape:factory_purple_glass",
-  "count": 1
-}

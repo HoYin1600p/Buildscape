@@ -1,0 +1,9 @@
+{
+  "parent": "minecraft:block/slab",
+  "textures": {
+    "bottom": "buildscape:block/bundled_cardboard",
+    "top": "buildscape:block/bundled_cardboard",
+    "side": "buildscape:block/bundled_cardboard",
+    "particle": "#side"
+  }
+}

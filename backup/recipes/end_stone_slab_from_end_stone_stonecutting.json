@@ -1,9 +1,0 @@
-{
-  "type": "minecraft:stonecutting",
-  "ingredient": {
-    "item": "minecraft:end_stone"
-  },
-  "result": "buildscape:end_stone_slab",
-  "count": 2
-}
-

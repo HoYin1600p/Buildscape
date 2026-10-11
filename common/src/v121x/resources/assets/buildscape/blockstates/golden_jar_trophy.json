@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "buildscape:block/trophy/golden_jar_trophy"
+    },
+    "facing=south": {
+      "model": "buildscape:block/trophy/golden_jar_trophy",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "buildscape:block/trophy/golden_jar_trophy",
+      "y": 270
+    },
+    "facing=east": {
+      "model": "buildscape:block/trophy/golden_jar_trophy",
+      "y": 90
+    }
+  }
+}

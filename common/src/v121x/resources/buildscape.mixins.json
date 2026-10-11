@@ -1,0 +1,53 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.kingodogo.buildscape.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "refmap": "buildscape.refmap.json",
+  "plugin": "com.kingodogo.buildscape.mixin.BuildscapeMixinPlugin",
+  "mixins": [
+    "AnvilMenuMixin",
+    "BaseCoralPlantTypeBlockMixin",
+    "BeaconBlockEntityAccessor",
+    "BeaconBlockEntityMixin",
+    "BlockMixin",
+    "BlockStateBaseMixin",
+    "BoneMealItemMixin",
+    "ChainBlockMixin",
+    "ComposterBlockV121xMixin",
+    "CoralBlockMixin",
+    "EntityAccessor",
+    "EntityMixin",
+    "FenceBlockMixin",
+    "FireworkRocketEntityMixin",
+    "FlowingFluidV121xMixin",
+    "IronBarsBlockMixin",
+    "ItemCombinerMenuAccessor",
+    "ItemMixin",
+    "LavaFluidMixin",
+    "LevelMixin",
+    "LiquidBlockMixin",
+    "LivingEntityMixin",
+    "MinecraftServerMixin",
+    "ShulkerBoxBlockEntityMixin",
+    "ShulkerBoxMenuMixin",
+    "SmithingMenuMixin",
+    "StonecutterMenuV121xAccessor",
+    "StonecutterMenuMixin",
+    "VineBlockMixin",
+    "WallBlockMixin"
+  ],
+  "client": [
+    "FireworkStarterMixin",
+    "GlassJarRenderShapeMixin",
+    "PauseScreenMixin",
+    "client.AdvancementsScreenMixin",
+    "client.ClientTooltipComponentMixin",
+    "client.FireworkRocketContextMixin",
+    "client.FireworkStarterShapeV121xMixin",
+    "client.SoundMuffMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

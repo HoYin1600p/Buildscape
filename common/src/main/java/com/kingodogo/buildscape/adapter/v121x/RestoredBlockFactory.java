@@ -131,11 +131,69 @@ final class RestoredBlockFactory {
         return net.minecraft.world.ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
     }
 
+    private static final java.util.Map<String, Block> REFERENCE_BASES = new java.util.HashMap<>();
+    private static final java.util.Set<String> CONSTRUCTING = new java.util.HashSet<>();
+
     static Block registeredBlock(String id) {
         for (var entry : Services.REGISTRY.getRegisteredBlocks()) {
-            if (entry.getPath().equals(id) && entry.get() instanceof BlockDefinition definition
-                    && definition.getBlock() != null) return definition.getBlock();
+            if (!entry.getPath().equals(id)) continue;
+            Object value = entry.get();
+            if (value instanceof Block block) return block;
+            if (value instanceof BlockDefinition definition) {
+                if (definition.getBlock() == null) {
+                    if (!CONSTRUCTING.add(id)) throw new IllegalStateException("Circular block dependency: " + id);
+                    try {
+                        Services.PLATFORM.wrapRegistryAction(() -> definition.setBlock(new BlockFactory().createBlock(definition)));
+                    } finally {
+                        CONSTRUCTING.remove(id);
+                    }
+                }
+                return definition.getBlock();
+            }
         }
-        return Services.PLATFORM.getBlock(new CommonId("buildscape", id));
+        // Retained variants must copy main's original base properties, not the newer
+        // vanilla replacement's sound/hardness. These unregistered bases are internal
+        // constructor references only; removed content stays out of the registry.
+        for (var removal : com.kingodogo.buildscape.registry.ContentRemovalPolicy.V121X) {
+            if (!removal.block() || !removal.id().equals("buildscape:" + id)) continue;
+            Block cached = REFERENCE_BASES.get(id);
+            if (cached != null) return cached;
+            Services.PLATFORM.wrapRegistryAction(() -> {
+                var props = ReferenceBlockProperties.create(id, RestoredBlockFactory::registeredBlock);
+                if (props == null) throw new IllegalStateException("Missing reference base properties: " + id);
+                Block base;
+                if (id.endsWith("_log") || id.endsWith("_wood") || id.equals("bamboo_block") || id.equals("stripped_bamboo_block")) {
+                    base = new net.minecraft.world.level.block.RotatedPillarBlock(props);
+                } else if (id.endsWith("_slab")) {
+                    base = new net.minecraft.world.level.block.SlabBlock(props);
+                } else if (id.endsWith("_sign")) {
+                    base = new net.minecraft.world.level.block.StandingSignBlock(
+                            net.minecraft.world.level.block.state.properties.WoodType.OAK, props);
+                } else {
+                    base = new Block(props);
+                }
+                REFERENCE_BASES.put(id, base);
+                // The base is never registered; drop its intrusive holder so the registry freeze accepts the set.
+                // Unit tests run without mixins, so the accessor is only present in the game.
+                if ((Object) net.minecraft.core.registries.BuiltInRegistries.BLOCK
+                        instanceof com.kingodogo.buildscape.mixin.MappedRegistryV121xAccessor<?> accessor) {
+                    var holders = accessor.buildscape$unregisteredIntrusiveHolders();
+                    if (holders != null) holders.remove(base);
+                }
+            });
+            return REFERENCE_BASES.get(id);
+        }
+        Block block = Services.PLATFORM.getBlock(new CommonId("buildscape", id));
+        if (block == null || block == net.minecraft.world.level.block.Blocks.AIR) {
+            block = net.minecraft.core.registries.BuiltInRegistries.BLOCK.get(
+                    ResourceLocation.tryParse(id));
+        }
+        if (block == null || block == net.minecraft.world.level.block.Blocks.AIR) {
+            throw new IllegalStateException("Missing block dependency: " + id);
+        }
+        return block;
     }
 }
+
+
+

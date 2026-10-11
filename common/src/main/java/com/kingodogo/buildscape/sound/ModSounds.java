@@ -170,7 +170,7 @@ public class ModSounds {
                                        java.util.function.Supplier<SoundEvent> placeSound,
                                        java.util.function.Supplier<SoundEvent> hitSound,
                                        java.util.function.Supplier<SoundEvent> fallSound) {
-        if (Services.isVersionCluster("v118x")) {
+        if (Services.isVersionCluster("v118x") || Services.isVersionCluster("v121x")) {
             return new SoundType(volume, pitch, SoundEvents.STONE_BREAK, SoundEvents.STONE_STEP,
                     SoundEvents.STONE_PLACE, SoundEvents.STONE_HIT, SoundEvents.STONE_FALL) {
                 @Override public SoundEvent getBreakSound() { return breakSound.get(); }
@@ -192,7 +192,7 @@ public class ModSounds {
                                           java.util.function.Supplier<SoundEvent> placeSound,
                                           java.util.function.Supplier<SoundEvent> hitSound,
                                           java.util.function.Supplier<SoundEvent> fallSound) {
-        if (Services.isVersionCluster("v118x")) {
+        if (Services.isVersionCluster("v118x") || Services.isVersionCluster("v121x")) {
             return new CustomSoundType(breakVolume, breakPitch, stepVolume, stepPitch, placeVolume, placePitch,
                     hitVolume, hitPitch, fallVolume, fallPitch, SoundEvents.STONE_BREAK, SoundEvents.STONE_STEP,
                     SoundEvents.STONE_PLACE, SoundEvents.STONE_HIT, SoundEvents.STONE_FALL) {
@@ -214,3 +214,4 @@ public class ModSounds {
     public static void init() {
     }
 }
+

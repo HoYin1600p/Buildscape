@@ -1,5 +1,6 @@
 package com.kingodogo.buildscape.adapter.v118x.client;
 
+import com.kingodogo.buildscape.adapter.v118x.EntitylessClipContext;
 import com.kingodogo.buildscape.block.HazeBushBlock;
 import com.kingodogo.buildscape.block.PottedHazeBushBlock;
 import com.kingodogo.buildscape.particle.ModParticles;
@@ -174,7 +175,7 @@ public class HazeBushParticleHandler {
 
             net.minecraft.world.phys.Vec3 start = new net.minecraft.world.phys.Vec3(bushPos.getX() + 0.5D, bushPos.getY() + 0.4D, bushPos.getZ() + 0.5D);
             net.minecraft.world.phys.Vec3 end = new net.minecraft.world.phys.Vec3(px, py + 0.05D, pz);
-            net.minecraft.world.phys.BlockHitResult hit = level.clip(new net.minecraft.world.level.ClipContext(start, end, net.minecraft.world.level.ClipContext.Block.COLLIDER, net.minecraft.world.level.ClipContext.Fluid.NONE, null));
+            net.minecraft.world.phys.BlockHitResult hit = EntitylessClipContext.clipCollider(level, start, end);
             if (hit.getType() != net.minecraft.world.phys.HitResult.Type.MISS) {
                 if (hit.getBlockPos().getX() != blockX || hit.getBlockPos().getZ() != blockZ) {
                     continue;

@@ -3,6 +3,7 @@ package com.kingodogo.buildscape.block;
 import java.util.List;
 import java.util.Random;
 import java.util.function.Predicate;
+import com.kingodogo.buildscape.adapter.v118x.EntitylessClipContext;
 import com.kingodogo.buildscape.block.entity.DataBlockEntity;
 import com.kingodogo.buildscape.block.entity.IBlockEntityReadData;
 import com.kingodogo.buildscape.block.entity.IBlockEntityWriteData;
@@ -24,10 +25,7 @@ import net.minecraft.world.entity.EntitySelector;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.ClipContext.Block;
-import net.minecraft.world.level.ClipContext.Fluid;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
@@ -314,7 +312,7 @@ public class PotentSulfurBlockEntity extends DataBlockEntity {
    }
 
    private static boolean haveLineOfSight(final Level level, final Vec3 a, final Vec3 b) {
-      HitResult hitResult = level.clip(new ClipContext(a, b, Block.COLLIDER, Fluid.NONE, null));
+      HitResult hitResult = EntitylessClipContext.clipCollider(level, a, b);
       return hitResult.getType() != Type.BLOCK;
    }
 }

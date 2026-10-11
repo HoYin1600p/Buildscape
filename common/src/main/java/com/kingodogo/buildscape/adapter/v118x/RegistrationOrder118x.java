@@ -11,7 +11,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-/** Registry order from the 1.18.2 ModItems declarations, independent of tab display order. */
+/** Registry order from the 1.18.2 ModItems declarations and subsequent trophy registrations. */
 public final class RegistrationOrder118x {
     private static final List<String> ITEM_IDS = loadItemIds();
 

@@ -16,7 +16,7 @@ public class GeyserParticleHandler {
 
     private static final int VANILLA_TICKER_RANGE = 16;
 
-    // TODO S7b: call at the END of each client tick.
+    // The client loader calls this at the END of each client tick.
     public static void onClientTick() {
 
 

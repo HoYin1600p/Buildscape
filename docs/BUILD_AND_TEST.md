@@ -124,8 +124,9 @@ and packaging resources from `ref/forge/1.18.2/src/main`. The opt-in `common`
 mode compiles the Forge loader, shared sources and the v118x source root (including
 the v118x adapter). It packages the v118x mixin configuration and Forge service
 bindings ahead of the reference resources, preserving the reference recipe pack,
-cache, metadata expansion and access transformer. Client registrations are a
-separate integration stage. Use `--no-daemon` for every Forge invocation.
+cache, metadata expansion and access transformer. Client registrations are
+provided by physical-client-only Forge subscribers and the v118x client
+factories. Use `--no-daemon` for every Forge invocation.
 `mod_version_v118x=4.0.3` controls this jar independently of the 26.2 version.
 The production jar is `forge/1.18.2/build/libs/buildscape-4.0.3.jar`
 (the `-dev` jar is not a production artifact). It is the output of `remapJar`,
@@ -142,6 +143,29 @@ before this offline command can work; cached Forge 40.2.10 is insufficient.
 `:forge:1.18.2:runServer` (same two `-P` properties) runs a dedicated server in
 `forge/1.18.2/run/server`; accept the EULA there yourself first. Gradle does not
 forward stdin, so stop it by ending only the server's Java process.
+
+### Forge 1.18.2 client verification
+
+The common-source client registers render layers, reference block/item tints,
+block entity and entity renderers, copper chest and jar item renderers, menu
+screens, particle providers, the cinematic zoom key, input and render events,
+texture stitching, hedge model baking, shulker tooltip components and the
+Mods-menu config screen. Experience fluid uses the reference fog colour and
+distances. Haze bushes emit nearby particles through a client-only
+`animateTick` mixin and track loaded chunks and block changes for distant haze.
+The client mixin list retains every reference client entry; new item-extension
+and haze mixins also belong exclusively to that list. Their package names
+remain in the root mixin package to pass the existing cluster-selection plugin.
+
+Implementation has received source review only. The build and dedicated-server
+smoke test must pass before Milestone 1 acceptance. A running client is still
+needed to verify title-screen startup, world loading, resource-pack reloads,
+transparency and tints, all renderers (including chest oxidation variants and
+both boats), chest/jar inventory models, workbench/pouch interactions, shulker
+tooltips, particles at each particle setting, haze drainage and chunk reloads,
+zoom and tool input, world overlays, fluid fog and config-screen navigation.
+Compare these behaviours with the reference jar and inspect `latest.log` for
+client errors. These visual and interaction checks have not been run.
 
 ## Parked targets
 

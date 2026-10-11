@@ -23,6 +23,12 @@ public final class ParticleFactory {
 
     private ParticleFactory() {}
 
+    /** Loader-owned registration keeps obfuscated Minecraft method names out of this adapter. */
+    public interface Registrar {
+        <T extends ParticleOptions> void register(ParticleType<T> type, Function<SpriteSet, ParticleProvider<T>> factory);
+        <T extends ParticleOptions> void registerDirect(ParticleType<T> type, ParticleProvider<T> provider);
+    }
+
     @SuppressWarnings("unchecked")
     private static <T extends ParticleOptions> void register(
             ParticleType<T> type,
@@ -77,7 +83,19 @@ public final class ParticleFactory {
     }
 
     public static void registerProviders() {
-        register(ModParticles.GLOW_LIME_SPARKLE.get(), sprites ->
+        registerProviders(new Registrar() {
+            public <T extends ParticleOptions> void register(ParticleType<T> type, Function<SpriteSet, ParticleProvider<T>> factory) {
+                ParticleFactory.register(type, factory);
+            }
+            public <T extends ParticleOptions> void registerDirect(ParticleType<T> type, ParticleProvider<T> provider) {
+                ParticleFactory.registerDirect(type, provider);
+            }
+        });
+    }
+
+    public static void registerProviders(Registrar registrar) {
+        registrar.register(ModParticles.HAZE.get(), com.kingodogo.buildscape.adapter.v118x.client.HazeParticle.Provider::new);
+        registrar.register(ModParticles.GLOW_LIME_SPARKLE.get(), sprites ->
             (type, level, x, y, z, dx, dy, dz) -> new TextureSheetParticle(level, x, y, z, dx, dy, dz) {
                 private final TextureAtlasSprite baseSprite;
                 private int currentFrame;
@@ -104,11 +122,11 @@ public final class ParticleFactory {
                 @Override public int getLightColor(float partialTick) { return 0xF000F0; }
             }
         );
-        register(ModParticles.TINTED_DRIP_FALL.get(), ParticleFactory::tintedDripProvider);
-        register(ModParticles.TINTED_SPORE.get(), ParticleFactory::tintedSporeProvider);
-        register(ModParticles.SNOWFLAKE.get(), sprites -> snowflakeProvider(sprites, false));
-        register(ModParticles.SNOWFLAKE_STILL.get(), sprites -> snowflakeProvider(sprites, true));
-        register(ModParticles.CONFETTI.get(), sprites ->
+        registrar.register(ModParticles.TINTED_DRIP_FALL.get(), ParticleFactory::tintedDripProvider);
+        registrar.register(ModParticles.TINTED_SPORE.get(), ParticleFactory::tintedSporeProvider);
+        registrar.register(ModParticles.SNOWFLAKE.get(), sprites -> snowflakeProvider(sprites, false));
+        registrar.register(ModParticles.SNOWFLAKE_STILL.get(), sprites -> snowflakeProvider(sprites, true));
+        registrar.register(ModParticles.CONFETTI.get(), sprites ->
             (type, level, x, y, z, dx, dy, dz) -> new TextureSheetParticle(level, x, y, z, dx, dy, dz) {
                 private final float rotationSpeed;
                 {
@@ -133,8 +151,8 @@ public final class ParticleFactory {
                 @Override public ParticleRenderType getRenderType() { return ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT; }
             }
         );
-        register(ModParticles.TINTABLE_HEART.get(), ParticleFactory::tintableHeartProvider);
-        register(ModParticles.CAKE.get(), sprites ->
+        registrar.register(ModParticles.TINTABLE_HEART.get(), ParticleFactory::tintableHeartProvider);
+        registrar.register(ModParticles.CAKE.get(), sprites ->
             (type, level, x, y, z, dx, dy, dz) -> new TextureSheetParticle(level, x, y, z, dx, dy, dz) {
                 {
                     setSpriteFromAge(sprites);
@@ -151,7 +169,7 @@ public final class ParticleFactory {
                 @Override public ParticleRenderType getRenderType() { return ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT; }
             }
         );
-        register(ModParticles.CHERRY.get(), sprites ->
+        registrar.register(ModParticles.CHERRY.get(), sprites ->
             (type, level, x, y, z, dx, dy, dz) -> new TextureSheetParticle(level, x, y, z, dx, dy, dz) {
                 private final float rotationSpeed = (level.random.nextFloat() - 0.5F) * 0.1F;
                 {
@@ -174,7 +192,7 @@ public final class ParticleFactory {
                 @Override public ParticleRenderType getRenderType() { return ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT; }
             }
         );
-        register(ModParticles.BUBBLE.get(), sprites ->
+        registrar.register(ModParticles.BUBBLE.get(), sprites ->
             (type, level, x, y, z, dx, dy, dz) -> new TextureSheetParticle(level, x, y, z, dx, dy, dz) {
                 {
                     setSpriteFromAge(sprites);
@@ -199,8 +217,8 @@ public final class ParticleFactory {
                 @Override public ParticleRenderType getRenderType() { return ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT; }
             }
         );
-        register(ModParticles.TRAIL_NOTE.get(), ParticleFactory::trailNoteProvider);
-        register(ModParticles.COLORED_SMOKE.get(), sprites ->
+        registrar.register(ModParticles.TRAIL_NOTE.get(), ParticleFactory::trailNoteProvider);
+        registrar.register(ModParticles.COLORED_SMOKE.get(), sprites ->
             (type, level, x, y, z, dx, dy, dz) -> new TextureSheetParticle(level, x, y, z) {
                 {
                     this.quadSize = 0.3F;
@@ -223,16 +241,16 @@ public final class ParticleFactory {
                 @Override public ParticleRenderType getRenderType() { return ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT; }
             }
         );
-        register(ModParticles.CASCADE.get(), ParticleFactory::cascadeProvider);
-        register(ModParticles.NOXIOUS_GAS.get(), ParticleFactory::noxiousGasProvider);
-        register(ModParticles.COPPER_FIRE_FLAME.get(), FlameParticle.Provider::new);
-        register(ModParticles.FIREFLY.get(), ParticleFactory::fireflyProvider);
-        register(ModParticles.SULFUR_BUBBLES.get(), ParticleFactory::sulfurBubbleProvider);
-        registerDirect(ModParticles.GEYSER.get(), geyserEruptionProvider());
-        register(ModParticles.GEYSER_BASE.get(), ParticleFactory::geyserBaseProvider);
-        register(ModParticles.GEYSER_POOF.get(), ParticleFactory::geyserBaseProvider);
-        register(ModParticles.GEYSER_PLUME.get(), ParticleFactory::geyserPlumeProvider);
-        register(ModParticles.XP_PARTICLE.get(), ParticleFactory::xpProvider);
+        registrar.register(ModParticles.CASCADE.get(), ParticleFactory::cascadeProvider);
+        registrar.register(ModParticles.NOXIOUS_GAS.get(), ParticleFactory::noxiousGasProvider);
+        registrar.register(ModParticles.COPPER_FIRE_FLAME.get(), FlameParticle.Provider::new);
+        registrar.register(ModParticles.FIREFLY.get(), ParticleFactory::fireflyProvider);
+        registrar.register(ModParticles.SULFUR_BUBBLES.get(), ParticleFactory::sulfurBubbleProvider);
+        registrar.registerDirect(ModParticles.GEYSER.get(), geyserEruptionProvider());
+        registrar.register(ModParticles.GEYSER_BASE.get(), ParticleFactory::geyserBaseProvider);
+        registrar.register(ModParticles.GEYSER_POOF.get(), ParticleFactory::geyserBaseProvider);
+        registrar.register(ModParticles.GEYSER_PLUME.get(), ParticleFactory::geyserPlumeProvider);
+        registrar.register(ModParticles.XP_PARTICLE.get(), ParticleFactory::xpProvider);
     }
 
     private static ParticleProvider<com.kingodogo.buildscape.particle.GeyserParticleOptions> geyserEruptionProvider() {

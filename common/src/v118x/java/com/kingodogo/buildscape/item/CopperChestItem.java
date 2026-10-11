@@ -8,7 +8,7 @@ public class CopperChestItem extends BlockItem {
         super(block, properties);
     }
 
-    // TODO S7b: the built-in item renderer (CopperChestItemRenderer.INSTANCE) is exposed through
-    // Forge's IItemRenderProperties in the loader glue. It cannot be referenced from this class:
+    // The client-only Forge mixin supplies IItemRenderProperties through initializeClient.
+    // The renderer cannot be referenced from this class:
     // the dedicated server verifies it and must not resolve client renderer types.
 }

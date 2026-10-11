@@ -20,13 +20,17 @@ import net.minecraft.world.entity.vehicle.Boat;
 
 public class MangroveBoatRenderer extends EntityRenderer<Boat> {
 
-    private static final ResourceLocation MANGROVE_BOAT_TEXTURE =
-            new ResourceLocation(BuildscapeCommon.MOD_ID, "textures/entity/boat/mangrove.png");
+    private final ResourceLocation boatTexture;
 
     private final BoatModel boatModel;
 
     public MangroveBoatRenderer(EntityRendererProvider.Context context) {
+        this(context, new ResourceLocation(BuildscapeCommon.MOD_ID, "textures/entity/boat/mangrove.png"));
+    }
+
+    public MangroveBoatRenderer(EntityRendererProvider.Context context, ResourceLocation texture) {
         super(context);
+        this.boatTexture = texture;
         this.shadowRadius = 0.8F;
         this.boatModel = new BoatModel(
                 context.bakeLayer(ModelLayers.createBoatModelName(Boat.Type.OAK))
@@ -34,7 +38,7 @@ public class MangroveBoatRenderer extends EntityRenderer<Boat> {
     }
 
     public Pair<ResourceLocation, BoatModel> getModelWithLocation(Boat boat) {
-        return Pair.of(MANGROVE_BOAT_TEXTURE, this.boatModel);
+        return Pair.of(boatTexture, this.boatModel);
     }
 
     @Override
@@ -56,7 +60,7 @@ public class MangroveBoatRenderer extends EntityRenderer<Boat> {
         poseStack.scale(-1.0F, -1.0F, 1.0F);
         poseStack.mulPose(Vector3f.YP.rotationDegrees(90.0F));
         boatModel.setupAnim(boat, partialTicks, 0.0F, -0.1F, 0.0F, 0.0F);
-        VertexConsumer vertices = buffers.getBuffer(boatModel.renderType(MANGROVE_BOAT_TEXTURE));
+        VertexConsumer vertices = buffers.getBuffer(boatModel.renderType(boatTexture));
         boatModel.renderToBuffer(poseStack, vertices, light, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
         if (!boat.isUnderWater()) {
             boatModel.waterPatch().render(poseStack, buffers.getBuffer(RenderType.waterMask()), light, OverlayTexture.NO_OVERLAY);
@@ -68,6 +72,6 @@ public class MangroveBoatRenderer extends EntityRenderer<Boat> {
     @Override
     @Deprecated
     public ResourceLocation getTextureLocation(Boat boat) {
-        return MANGROVE_BOAT_TEXTURE;
+        return boatTexture;
     }
 }

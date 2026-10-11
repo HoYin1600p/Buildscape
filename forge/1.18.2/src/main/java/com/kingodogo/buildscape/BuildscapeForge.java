@@ -30,7 +30,7 @@ public final class BuildscapeForge {
         MinecraftForge.EVENT_BUS.addListener(BuildscapeForge::serverStarted);
         MinecraftForge.EVENT_BUS.addListener(BuildscapeForge::serverStopped);
         ForgeGameplayEvents.register();
-        // TODO S7b: client registrations belong in a separate, Dist.CLIENT-only class.
+        // BuildscapeForgeClient is discovered through a Dist.CLIENT-only mod-bus subscriber.
     }
 
     public static void init() {

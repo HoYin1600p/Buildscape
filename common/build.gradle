@@ -1,5 +1,6 @@
 plugins {
     id 'java-library'
+    id 'xyz.wagyourtail.unimined'
 }
 
 sourceSets {
@@ -41,6 +42,14 @@ sourceSets {
     }
 }
 
+// Compile shared 1.18.2 code against vanilla Mojang names, without a loader or ATs.
+// This source set remains explicit tooling until its API migration is complete.
+unimined.minecraft(sourceSets.v118x) {
+    version '1.18.2'
+    mappings { mojmap() }
+    defaultRemapJar = false
+}
+
 configurations {
     v118xElements { canBeResolved = false; canBeConsumed = true }
     v121xElements { canBeResolved = false; canBeConsumed = true }
@@ -77,7 +86,6 @@ dependencies {
         add(configurationName, 'com.google.code.gson:gson:2.10.1')
     }
 
-    v118xCompileOnly 'net.fabricmc.fabric-api:fabric-api:0.76.0+1.18.2'
     v118xCompileOnly 'io.netty:netty-buffer:4.1.97.Final'
     v121xCompileOnly 'io.netty:netty-buffer:4.1.97.Final'
     v26xCompileOnly 'io.netty:netty-buffer:4.2.15.Final'
@@ -85,12 +93,15 @@ dependencies {
     v26xCompileOnly 'org.jetbrains:annotations:26.0.2'
     v26xCompileOnly 'com.google.guava:guava:33.6.0-jre'
     v26xCompileOnly 'org.slf4j:slf4j-api:2.0.17'
-    v118xCompileOnly files(rootProject.file('ref/artifacts/minecraft-1.18.2.jar'))
     v121xCompileOnly files(rootProject.file('ref/artifacts/minecraft-1.21.1.jar'))
 
 }
 
-tasks.named('compileV118xJava', JavaCompile) { options.release.set(17) }
+tasks.named('compileV118xJava', JavaCompile) {
+    options.release.set(17)
+    // Preserve the migration baseline beyond javac's default 100-error limit.
+    options.compilerArgs += ['-Xmaxerrs', '10000']
+}
 tasks.named('compileV121xJava', JavaCompile) { options.release.set(21) }
 tasks.named('compileV26xJava', JavaCompile) { options.release.set(25) }
 tasks.named('compileTestJava', JavaCompile) { options.release.set(25) }

@@ -2,7 +2,7 @@ package com.kingodogo.buildscape.registry;
 
 import java.util.List;
 
-/** Saved identifiers replaced by vanilla content in the 26.2 VersionCluster. */
+/** Saved identifiers replaced by vanilla content, selected by VersionCluster. */
 public final class VanillaReplacementAliases {
     public record Alias(String source, String target, boolean block, boolean item, boolean entity) {
         public Alias(String source, String target, boolean block, boolean item) {
@@ -11,6 +11,19 @@ public final class VanillaReplacementAliases {
     }
 
     private VanillaReplacementAliases() {}
+
+    public static List<Alias> forCluster(String cluster) {
+        if ("v118x".equals(cluster)) return List.of();
+        if ("v26x".equals(cluster)) return ALL;
+        var aliases = new java.util.ArrayList<>(ContentRemovalPolicy.removals(cluster).stream()
+                .filter(removal -> removal.vanillaEquivalent() != null)
+                .map(removal -> new Alias(removal.id(), removal.vanillaEquivalent(),
+                        removal.block(), removal.item()))
+                .toList());
+        // 1.21.1 uses one boat entity type with wood variants; separate boat types arrived later.
+        aliases.add(new Alias("buildscape:mangrove_boat", "minecraft:boat", false, false, true));
+        return List.copyOf(aliases);
+    }
 
     public static final List<Alias> ALL = List.of(
             new Alias("buildscape:copper_trapdoor", "minecraft:copper_trapdoor", true, true),

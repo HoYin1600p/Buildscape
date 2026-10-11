@@ -127,6 +127,24 @@ import com.kingodogo.buildscape.adapter.v121x.client.ClientAccess;
 import com.kingodogo.buildscape.adapter.v121x.client.RenderFactory;
 
 public abstract class PlatformAdapterBase implements IPlatformAdapter {
+    @Override
+    public Map<String, BlockEntityType<?>> createClusterBlockEntityTypes(Map<String, Block> blocks) {
+        return RestoredContentTypes.createBlockEntities(blocks);
+    }
+
+    @Override
+    public Item createRegisteredItem(com.kingodogo.buildscape.item.ItemDefinition definition, Block block) {
+        String id = definition.getId();
+        var properties = com.kingodogo.buildscape.item.ItemFactory.createProperties(id, definition.getProperties());
+        if (id.equals("copper_torch")) {
+            return new net.minecraft.world.item.StandingAndWallBlockItem(block,
+                    getBlock(new CommonId("buildscape", "copper_wall_torch")), properties, Direction.DOWN);
+        }
+        if (block instanceof net.minecraft.world.level.block.DoorBlock) {
+            return new net.minecraft.world.item.DoubleHighBlockItem(block, properties);
+        }
+        return IPlatformAdapter.super.createRegisteredItem(definition, block);
+    }
     // Cache keys stay opaque here; only client helpers interpret baked models.
     private final Map<Object, AABB> v121xModelBoundsCache = new java.util.WeakHashMap<>();
     private final Map<String, double[]> v121xSpriteCache = new java.util.concurrent.ConcurrentHashMap<>();
@@ -280,6 +298,12 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
     private static <T> T getClusterContent(Registry<T> registry, CommonId id) {
         ResourceLocation requested = ResourceLocation.fromNamespaceAndPath(id.getNamespace(), id.getPath());
         if (registry.containsKey(requested)) return registry.get(requested);
+        for (var alias : com.kingodogo.buildscape.registry.VanillaReplacementAliases.forCluster("v121x")) {
+            if (alias.source().equals(id.toString())) {
+                ResourceLocation replacement = ResourceLocation.parse(alias.target());
+                if (registry.containsKey(replacement)) return registry.get(replacement);
+            }
+        }
         String counterpart = switch (id.getNamespace()) {
             case "minecraft" -> "buildscape";
             case "buildscape" -> "minecraft";

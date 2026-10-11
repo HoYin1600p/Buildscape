@@ -6355,11 +6355,12 @@ public class ModBlocks {
     }
 
 
-    /** Retired 26.2 content retains its original registration position on v118x. */
+    /** Retired content retains its original position in clusters that still need it. */
     private static RegistrySupplier<BlockDefinition> regV118x(
             String id, String type, float h, float r, String sound, String mat, String col,
             boolean tool, boolean noCol, boolean noOcc, int light, String copy, String parent) {
-        if (!Services.isVersionCluster("v118x")) return null;
+        if (!Services.isVersionCluster("v118x") && (!Services.isVersionCluster("v121x")
+                || com.kingodogo.buildscape.registry.ContentRemovalPolicy.removes("v121x", id))) return null;
         var result = new java.util.concurrent.atomic.AtomicReference<RegistrySupplier<BlockDefinition>>();
         Services.PLATFORM.wrapRegistryAction(() -> result.set(
                 reg(id, type, h, r, sound, mat, col, tool, noCol, noOcc, light, copy, parent)));
@@ -6369,6 +6370,8 @@ public class ModBlocks {
     public static RegistrySupplier<BlockDefinition> reg(
             String id, String type, float h, float r, String sound, String mat, String col,
             boolean tool, boolean noCol, boolean noOcc, int light, String copy, String parent) {
+        if (Services.isVersionCluster("v121x")
+                && com.kingodogo.buildscape.registry.ContentRemovalPolicy.removes("v121x", id)) return null;
         CommonBlockProperties p = CommonBlockProperties.of()
                 .strength(h, r)
                 .sound(sound)

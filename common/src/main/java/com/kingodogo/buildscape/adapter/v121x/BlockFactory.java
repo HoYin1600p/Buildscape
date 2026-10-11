@@ -188,6 +188,9 @@ public class BlockFactory implements IBlockFactory {
     public Block createBlock(BlockDefinition def) {
         BlockBehaviour.Properties props = buildProperties(def);
 
+        Block restored = RestoredBlockFactory.create(def, props);
+        if (restored != null) return restored;
+
         if (def.isLargeChain()) {
             return new com.kingodogo.buildscape.block.LargeChainBlock(props) {
                 @Override protected BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos pos, BlockPos neighborPos) { if (state.getValue(WATERLOGGED)) level.scheduleTick(pos, net.minecraft.world.level.material.Fluids.WATER, net.minecraft.world.level.material.Fluids.WATER.getTickDelay(level)); return super.updateShape(state, direction, neighborState, level, pos, neighborPos); }
@@ -2118,6 +2121,10 @@ public class BlockFactory implements IBlockFactory {
         String parentId = def.getParentBlockId();
         if (parentId != null) {
             String cleanId = parentId.toLowerCase().replace("blocks.", "").replace("modblocks.", "").replace(".get(", "");
+            if (!cleanId.contains(":") || cleanId.startsWith("buildscape:")) {
+                Block constructed = RestoredBlockFactory.registeredBlock(cleanId.replace("buildscape:", ""));
+                if (constructed != null && constructed != Blocks.AIR) return constructed;
+            }
             ResourceLocation rl = ResourceLocation.tryParse(cleanId.contains(":") ? cleanId : "buildscape:" + cleanId);
             if (rl != null) {
                 Block b = BuiltInRegistries.BLOCK.get(rl);
@@ -2174,6 +2181,8 @@ public class BlockFactory implements IBlockFactory {
         String cleanId = id.toLowerCase().replace("fluids.", "").replace("modfluids.", "").replace(".get(", "").replace(")", "").trim();
         String namespace = cleanId.contains(":") ? cleanId.substring(0, cleanId.indexOf(":")) : "buildscape";
         String path = cleanId.contains(":") ? cleanId.substring(cleanId.indexOf(":") + 1) : cleanId;
+        if (namespace.equals("buildscape") && path.equals("experience_still")) return ExperienceFluids.still();
+        if (namespace.equals("buildscape") && path.equals("experience_flowing")) return ExperienceFluids.flowing();
         ResourceLocation rl = ResourceLocation.fromNamespaceAndPath(namespace, path);
         Fluid f = BuiltInRegistries.FLUID.get(rl);
         if (f instanceof FlowingFluid flowing && f != Fluids.EMPTY) {

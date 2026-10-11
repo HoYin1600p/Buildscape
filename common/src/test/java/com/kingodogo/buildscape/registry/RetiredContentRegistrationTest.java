@@ -59,7 +59,8 @@ class RetiredContentRegistrationTest {
                     "\\b" + register + "\\.register\\(\\s*\\\"([^\\\"]+)\\\"")
                     .stream().filter(expected::contains).toList();
             assertEquals(referenceOrder, actual, kind + " registrations differ from main's order");
-            assertTrue(source.contains("if (!Services.isVersionCluster(\"v118x\")) return null;"));
+            assertTrue(source.contains("if (!Services.isVersionCluster(\"v118x\") && (!Services.isVersionCluster(\"v121x\")"));
+            assertTrue(source.contains("ContentRemovalPolicy.removes(\"v121x\", " + (kind.equals("block") ? "id" : "name") + ")"));
         }
     }
 

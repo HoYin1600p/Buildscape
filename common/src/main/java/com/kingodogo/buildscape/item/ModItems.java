@@ -3176,13 +3176,16 @@ public class ModItems {
     public static final RegistrySupplier<ItemDefinition> MUSIC_DISC_BUILDER = register("music_disc_builder");
 
     private static RegistrySupplier<ItemDefinition> registerV118x(String id) {
-        if (!Services.isVersionCluster("v118x")) return null;
+        if (!Services.isVersionCluster("v118x") && (!Services.isVersionCluster("v121x")
+                || com.kingodogo.buildscape.registry.ContentRemovalPolicy.removes("v121x", id))) return null;
         var result = new java.util.concurrent.atomic.AtomicReference<RegistrySupplier<ItemDefinition>>();
         Services.PLATFORM.wrapRegistryAction(() -> result.set(register(id)));
         return result.get();
     }
 
     public static RegistrySupplier<ItemDefinition> register(String name) {
+        if (Services.isVersionCluster("v121x")
+                && com.kingodogo.buildscape.registry.ContentRemovalPolicy.removes("v121x", name)) return null;
         return Services.REGISTRY.registerItem(name, () -> new ItemDefinition(name, Services.isVersionCluster("v118x")
                 ? LegacyItemProperties.forItem(name) : CommonItemProperties.of()));
     }

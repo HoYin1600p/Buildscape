@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -85,9 +86,22 @@ class RetiredContentRegistrationTest {
                 "common/src/main/java/com/kingodogo/buildscape/item/ModCreativeTabs.java"));
         String referenceTabs = Files.readString(root.resolve(
                 "ref/forge/1.18.2/src/main/java/com/kingodogo/buildscape/item/ModCreativeModeTab.java"));
+        String referenceItems = Files.readString(root.resolve(
+                "ref/forge/1.18.2/src/main/java/com/kingodogo/buildscape/item/ModItems.java"));
+        var referenceItemIds = new HashMap<String, String>();
+        var registrations = Pattern.compile(
+                "\\b([A-Z0-9_]+)\\s*=\\s*ITEMS\\.register\\(\\s*\"([a-z0-9_]+)\"")
+                .matcher(referenceItems);
+        while (registrations.find()) {
+            referenceItemIds.put(registrations.group(1), registrations.group(2));
+        }
         List<String> referenceOrder = ids(referenceTabs,
                 "items\\.add\\(new ItemStack\\(ModItems\\.([A-Z0-9_]+)\\.get\\(\\)\\)\\)")
-                .stream().map(id -> id.toLowerCase(java.util.Locale.ROOT)).toList();
+                .stream().map(constant -> {
+                    String id = referenceItemIds.get(constant);
+                    assertNotNull(id, "Missing reference item registration for " + constant);
+                    return id;
+                }).toList();
         String orderMethod = tabs.substring(tabs.indexOf("private static List<String> v118xItemOrder()"),
                 tabs.indexOf("private static List<String> loadOrderedItemIds()"));
         assertEquals(referenceOrder, ids(orderMethod, "\\\"([a-z0-9_]+)\\\""));

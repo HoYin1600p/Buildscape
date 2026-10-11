@@ -50,7 +50,7 @@ public final class BuildscapeMixinPlugin implements IMixinConfigPlugin {
         if (mixinClassName.endsWith(".BuildscapeForgeRegistryMixin")
                 && !classExists("net.minecraftforge.registries.ForgeRegistry")) return false;
         if (mixinClassName.endsWith(".BlockEntityMigrationMixin")) return is26x;
-        if (mixinClassName.startsWith("com.kingodogo.buildscape.mixin.client.")) return is26x || mixinClassName.endsWith(".SoundMuffMixin");
+        if (mixinClassName.startsWith("com.kingodogo.buildscape.mixin.client.")) return isPost118 || mixinClassName.endsWith(".SoundMuffMixin");
         if (is26x && (mixinClassName.endsWith(".ScreenMixin") || mixinClassName.endsWith(".RenderBuffersMixin")
                 || mixinClassName.endsWith(".AdvancementWidgetMixin") || mixinClassName.endsWith(".GeneralStatisticsListMixin")
                 || mixinClassName.endsWith(".GeneralStatisticsListEntryMixin"))) return true;

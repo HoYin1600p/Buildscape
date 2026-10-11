@@ -9,12 +9,11 @@ base.archivesName = 'buildscape-parity-dumper-TEST-ONLY'
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
 // A dedicated source set keeps Gradle's framework-based test task empty.
-// Reuse the cached Minecraft/Gson classpath rather than resolve a test framework.
+// Only the main output and cached Gson are needed, not Minecraft or a test framework.
 sourceSets {
     selfCheck {
-        // Unimined finishes configuring main's classpaths after evaluation.
-        compileClasspath += files({ sourceSets.main.output }, { sourceSets.main.compileClasspath })
-        runtimeClasspath += files({ sourceSets.main.output }, { sourceSets.main.runtimeClasspath })
+        compileClasspath += sourceSets.main.output
+        runtimeClasspath += sourceSets.main.output
     }
 }
 
@@ -26,6 +25,8 @@ repositories {
 }
 
 dependencies {
+    // Match Minecraft 1.18.2's Gson on both self-check classpaths.
+    selfCheckImplementation 'com.google.code.gson:gson:2.8.9'
     // Match the working Forge module: Unimined's classpath does not supply jsr305.
     compileOnly 'com.google.code.findbugs:jsr305:3.0.2'
     // Forge 40's cached/runtime command-line parser is 5.0.4, not Unimined's default.

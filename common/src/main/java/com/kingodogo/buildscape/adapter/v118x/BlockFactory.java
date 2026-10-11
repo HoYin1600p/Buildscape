@@ -201,6 +201,25 @@ public class BlockFactory implements IBlockFactory {
     public Block createBlock(BlockDefinition def) {
         BlockBehaviour.Properties props = buildProperties(def);
 
+        // Choose vanilla state-bearing classes before the shared family predicates.
+        if (def.isLightningRod()) {
+            return new net.minecraft.world.level.block.LightningRodBlock(props);
+        }
+        if (def.isWeightedPressurePlate()) {
+            return new net.minecraft.world.level.block.WeightedPressurePlateBlock(150, props) {};
+        }
+        if (def.getBlockType().equals("CarpetBlock")) {
+            return new net.minecraft.world.level.block.CarpetBlock(props) {};
+        }
+        if (def.getId().equals("snowy_grass_block_slab")) {
+            return new SlabBlock(props);
+        }
+        if (def.getBlockType().equals("IceCrystalBlock")) {
+            return new net.minecraft.world.level.block.AmethystClusterBlock(7, 3, props);
+        }
+        if (def.getId().endsWith("_redstone_lamp")) {
+            return new net.minecraft.world.level.block.RedstoneLampBlock(props);
+        }
         if (def.getBlockType().equals("FlowerPotBlock")) {
             return new net.minecraft.world.level.block.FlowerPotBlock(
                     restoredBlock(def.getId().substring("potted_".length())), props);
@@ -364,7 +383,7 @@ public class BlockFactory implements IBlockFactory {
                 @Override public void randomTick(BlockState state, ServerLevel level, BlockPos pos, Random random) { WeatheringBlockLogic.randomTick(state, level, pos); }
             };
         } else if (def.isWeatheringStair()) {
-            return new ModStairBlock(getBaseState(def), props.randomTicks()) {
+            return new ModStairBlock(getBaseState(def), referenceStairProperties(getBaseState(def), props.randomTicks())) {
                 @Override public boolean isRandomlyTicking(BlockState state) { return true; }
                 @Override public void randomTick(BlockState state, ServerLevel level, BlockPos pos, Random random) { WeatheringBlockLogic.randomTick(state, level, pos); }
             };
@@ -374,7 +393,7 @@ public class BlockFactory implements IBlockFactory {
                 @Override public void randomTick(BlockState state, ServerLevel level, BlockPos pos, Random random) { WeatheringBlockLogic.randomTick(state, level, pos); }
             };
         } else if (def.isStair()) {
-            return new ModStairBlock(getBaseState(def), props) {
+            return new ModStairBlock(getBaseState(def), referenceStairProperties(getBaseState(def), props)) {
                 @Override public boolean propagatesSkylightDown(BlockState state, BlockGetter level, BlockPos pos) { return !isTintedBase() && super.propagatesSkylightDown(state, level, pos); }
                 @Override public int getLightBlock(BlockState state, BlockGetter level, BlockPos pos) { return isTintedBase() ? 15 : super.getLightBlock(state, level, pos); }
             };
@@ -503,7 +522,7 @@ public class BlockFactory implements IBlockFactory {
                 }
             };
         } else if (def.isLogSlab()) {
-            return new LogSlabBlock(getBaseBlock(def), props) {
+            return new LogSlabBlock(getBaseBlock(def), referenceSlabProperties(def, props)) {
                 public float[] getBeaconColorMultiplier(BlockState state, LevelReader level, BlockPos pos, BlockPos beaconPos) { return null; }
                 @Override public boolean propagatesSkylightDown(BlockState state, BlockGetter level, BlockPos pos) { return !isTintedBase() && (isRegularGlassLike() || super.propagatesSkylightDown(state, level, pos)); }
                 @Override public int getLightBlock(BlockState state, BlockGetter level, BlockPos pos) { return isTintedBase() ? 15 : super.getLightBlock(state, level, pos); }
@@ -514,7 +533,7 @@ public class BlockFactory implements IBlockFactory {
                 }
             };
         } else if (def.isSlab()) {
-            return new ModSlabBlock(getBaseBlock(def), props) {
+            return new ModSlabBlock(getBaseBlock(def), referenceSlabProperties(def, props)) {
                 public float[] getBeaconColorMultiplier(BlockState state, LevelReader level, BlockPos pos, BlockPos beaconPos) { return null; }
                 @Override public boolean propagatesSkylightDown(BlockState state, BlockGetter level, BlockPos pos) { return !isTintedBase() && (isRegularGlassLike() || super.propagatesSkylightDown(state, level, pos)); }
                 @Override public int getLightBlock(BlockState state, BlockGetter level, BlockPos pos) { return isTintedBase() ? 15 : super.getLightBlock(state, level, pos); }
@@ -735,6 +754,9 @@ public class BlockFactory implements IBlockFactory {
             return new V118xMangrovePropaguleBlock(props);
         } else if (def.isMangroveRoots()) {
             return new MangroveRootsBlock(props) {
+                {
+                    registerDefaultState(stateDefinition.any().setValue(WATERLOGGED, false));
+                }
                 @Override
                 public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
                     if (state.getValue(WATERLOGGED)) {
@@ -1297,7 +1319,7 @@ public class BlockFactory implements IBlockFactory {
             return new FestiveLampBlock(props);
         } else if (def.isBigOrnament()) {
             boolean tinted = def.isBigTintedOrnament();
-            props.lightLevel(state -> state.getValue(BigOrnamentBlock.LIT) ? (tinted ? 4 : 15) : 0);
+            // Light is supplied by the 1.18.2 reference catalog.
             if (tinted) props.dynamicShape();
             return new BigOrnamentBlock(props, tinted) {
                 @Override
@@ -1320,7 +1342,7 @@ public class BlockFactory implements IBlockFactory {
             };
         } else if (def.isOrnament()) {
             boolean tinted = def.isTintedOrnament();
-            props.lightLevel(state -> state.getValue(OrnamentBlock.LIT) ? (tinted ? 4 : 15) : 0);
+            // Light is supplied by the 1.18.2 reference catalog.
             if (tinted) props.dynamicShape();
             return new OrnamentBlock(props, tinted) {
                 @Override public int getLightBlock(BlockState state, BlockGetter level, BlockPos pos) { return isTinted() ? 0 : super.getLightBlock(state, level, pos); }
@@ -1936,9 +1958,17 @@ public class BlockFactory implements IBlockFactory {
             };
         } else if (def.isResinClump()) {
             props.lightLevel(state -> 7);
-            return new ResinClumpBlock(props) {
+            return new net.minecraft.world.level.block.GlowLichenBlock(props) {
                 public int getLightEmission(BlockState state, BlockGetter level, BlockPos pos) {
                     return 7;
+                }
+                @Override
+                public boolean isValidBonemealTarget(BlockGetter level, BlockPos pos, BlockState state, boolean isClient) {
+                    return false;
+                }
+                @Override
+                public boolean isBonemealSuccess(Level level, Random random, BlockPos pos, BlockState state) {
+                    return false;
                 }
             };
         } else if (def.isWallpaperFlat()) {
@@ -2031,7 +2061,9 @@ public class BlockFactory implements IBlockFactory {
             if (value instanceof BlockDefinition definition) {
                 Block block = definition.getBlock();
                 if (block == null) {
-                    block = createBlock(definition);
+                    var created = new java.util.concurrent.atomic.AtomicReference<Block>();
+                    Services.PLATFORM.wrapRegistryAction(() -> created.set(createBlock(definition)));
+                    block = created.get();
                     definition.setBlock(block);
                 }
                 return block;
@@ -2047,6 +2079,8 @@ public class BlockFactory implements IBlockFactory {
     }
 
     private Block getBaseBlock(BlockDefinition def) {
+        Block reference = ReferenceBlockBases.find(def.getId(), this::restoredBlock);
+        if (reference != null) return reference;
         String parentId = def.getParentBlockId();
         if (parentId != null) {
             String cleanId = parentId.toLowerCase().replace("blocks.", "").replace("modblocks.", "").replace(".get(", "");
@@ -2109,6 +2143,31 @@ public class BlockFactory implements IBlockFactory {
         return (FlowingFluid) Fluids.WATER;
     }
 
+    private BlockBehaviour.Properties referenceSlabProperties(BlockDefinition def, BlockBehaviour.Properties properties) {
+        // The properties-only reference constructor keeps its supplied properties.
+        // Only its base-block constructor applies ModSlabBlock.safeProperties.
+        Block base = ReferenceBlockBases.find(def.getId(), this::restoredBlock);
+        return base == null ? properties : referenceStairProperties(base.defaultBlockState(), properties);
+    }
+
+    /**
+     * Reference ModSlabBlock and ModStairBlock flatten properties of state-bearing base blocks
+     * before delegating to vanilla slabs or stairs. This is specific to the 1.18.2 catalog.
+     */
+    private BlockBehaviour.Properties referenceStairProperties(BlockState baseState, BlockBehaviour.Properties properties) {
+        if (baseState.getProperties().isEmpty()) return properties;
+        Block base = baseState.getBlock();
+        float hardness = 2.0F;
+        if (base == Blocks.AZALEA_LEAVES || base == Blocks.FLOWERING_AZALEA_LEAVES) hardness = 0.2F;
+        else if (base == Blocks.REDSTONE_LAMP) hardness = 0.3F;
+        else if (base == Blocks.HAY_BLOCK) hardness = 0.5F;
+        else if (base == Blocks.CARVED_PUMPKIN || base == Blocks.TARGET) hardness = 1.0F;
+        else if (base == Blocks.PURPUR_PILLAR) hardness = 1.5F;
+        BlockBehaviour.Properties result = BlockBehaviour.Properties.of(baseState.getMaterial())
+                .strength(hardness, base.getExplosionResistance()).sound(base.getSoundType(baseState));
+        if (baseState.requiresCorrectToolForDrops()) result.requiresCorrectToolForDrops();
+        return result;
+    }
     private BlockState getBaseState(BlockDefinition def) {
         return getBaseBlock(def).defaultBlockState();
     }
@@ -2346,6 +2405,13 @@ public class BlockFactory implements IBlockFactory {
     }
 
     private BlockBehaviour.Properties buildProperties(BlockDefinition def) {
+        BlockBehaviour.Properties reference = ReferenceBlockProperties.create(def.getId(), this::restoredBlock);
+        if (reference != null) return reference;
+        if (def.getId().endsWith("_redstone_lamp")) {
+            return BlockBehaviour.Properties.of(Material.BUILDABLE_GLASS)
+                    .strength(0.3F).sound(SoundType.GLASS)
+                    .lightLevel(state -> state.getValue(BlockStateProperties.LIT) ? 15 : 0);
+        }
         BlockBehaviour.Properties restored = restoredProperties(def.getId());
         if (restored != null) return restored;
         CommonBlockProperties cp = def.getProperties();

@@ -1,20 +1,15 @@
 package com.kingodogo.buildscape.parity;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.function.Supplier;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -27,7 +22,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 final class DumpIO {
-    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().serializeNulls().create();
     private static final Logger LOGGER = LogManager.getLogger("BuildscapeParityDumper");
 
     private DumpIO() {}
@@ -66,10 +60,8 @@ final class DumpIO {
     }
 
     static JsonElement json(Object value) {
-        if (value == null) return JsonNull.INSTANCE;
-        if (value instanceof JsonElement element) return element;
         if (value instanceof ResourceLocation id) return new JsonPrimitive(id.toString());
-        return GSON.toJsonTree(value);
+        return DeterministicJson.json(value);
     }
 
     static JsonElement nbt(Tag tag) {
@@ -89,24 +81,8 @@ final class DumpIO {
         return object("type", tag.getId(), "value", tag.getAsString());
     }
 
-    static JsonElement canonical(JsonElement value) {
-        if (value.isJsonObject()) {
-            JsonObject result = new JsonObject();
-            TreeMap<String, JsonElement> keys = new TreeMap<>();
-            value.getAsJsonObject().entrySet().forEach(entry -> keys.put(entry.getKey(), entry.getValue()));
-            keys.forEach((key, element) -> result.add(key, canonical(element)));
-            return result;
-        }
-        if (value.isJsonArray()) {
-            JsonArray result = new JsonArray();
-            value.getAsJsonArray().forEach(element -> result.add(canonical(element)));
-            return result;
-        }
-        return value;
-    }
-
     private static void write(Path path, JsonElement value) throws IOException {
-        Files.writeString(path, GSON.toJson(canonical(value)) + "\n", StandardCharsets.UTF_8);
+        DeterministicJson.write(path, value);
     }
 
     static synchronized void capture(Path folder, String side, Supplier<Map<String, JsonElement>> supplier) {
@@ -116,7 +92,7 @@ final class DumpIO {
             Files.createDirectories(folder);
             // Invalidate a previous snapshot before evaluating or writing any new data.
             write(folder.resolve("manifest.json"), manifest);
-            Map<String, JsonElement> files = new TreeMap<>(supplier.get());
+            Map<String, JsonElement> files = DeterministicJson.sortedFiles(supplier.get());
             for (var entry : files.entrySet()) write(folder.resolve(entry.getKey()), entry.getValue());
             manifest.add("files", json(files.keySet()));
             manifest.addProperty("complete", true);

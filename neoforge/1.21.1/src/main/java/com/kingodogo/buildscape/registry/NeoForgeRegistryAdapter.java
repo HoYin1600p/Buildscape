@@ -2,83 +2,107 @@ package com.kingodogo.buildscape.registry;
 
 import com.kingodogo.buildscape.BuildscapeCommon;
 import com.kingodogo.buildscape.item.ModCreativeTabs;
+import com.kingodogo.buildscape.platform.Services;
+import com.kingodogo.buildscape.util.CommonId;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
-import net.neoforged.bus.api.IEventBus;
+import net.minecraft.resources.ResourceKey;
 import net.neoforged.neoforge.registries.RegisterEvent;
-
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.function.Consumer;
 
 public class NeoForgeRegistryAdapter extends BaseRegistryAdapter {
-    private static IEventBus savedEventBus;
-
-    public static void setEventBus(IEventBus eventBus) {
-        savedEventBus = eventBus;
-    }
+    private record Pending(ResourceKey<?> key, Consumer<RegisterEvent> register) {}
+    private final ArrayList<Pending> pending = new ArrayList<>();
+    private final Set<ResourceKey<?>> completed = new HashSet<>();
+    private RegisterEvent activeEvent;
 
     public NeoForgeRegistryAdapter() {
         super(BuildscapeCommon.MOD_ID);
     }
 
-    @Override
-    public void init() {
-        if (savedEventBus != null) {
-            savedEventBus.addListener(RegisterEvent.class, this::onRegister);
+    public <V> void enqueue(Registry<V> registry, CommonId id, V value) {
+        ResourceKey<?> key = registry.key();
+        Consumer<RegisterEvent> registration = event -> event.register(registry.key(),
+                ResourceLocation.fromNamespaceAndPath(id.getNamespace(), id.getPath()), () -> value);
+        if (activeEvent != null && activeEvent.getRegistryKey().equals(key)) {
+            registration.accept(activeEvent);
         } else {
-            super.init();
+            if (completed.contains(key)) throw new IllegalStateException("Late registration: " + id);
+            pending.add(new Pending(key, registration));
         }
     }
 
-    @SuppressWarnings("unchecked")
-    private void onRegister(RegisterEvent event) {
-        super.init();
+    public void onRegister(RegisterEvent event) {
+        Services.PLATFORM.wrapRegistryAction(() -> registerEntries(event));
+    }
 
-        event.register(Registries.BLOCK, helper -> {
-            for (Map.Entry<String, net.minecraft.world.level.block.Block> entry : modBlocks.entrySet()) {
-                helper.register(ResourceLocation.fromNamespaceAndPath(BuildscapeCommon.MOD_ID, entry.getKey()), entry.getValue());
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    private void registerEntries(RegisterEvent event) {
+        activeEvent = event;
+        try {
+            var key = event.getRegistryKey();
+            if (key.equals(Registries.BLOCK)) {
+                initBlocks();
+                registerTo(BuiltInRegistries.BLOCK, modBlocks);
+            } else if (key.equals(Registries.ITEM)) {
+                initItems();
+                registerTo(BuiltInRegistries.ITEM, modItems);
+            } else if (key.equals(Registries.BLOCK_ENTITY_TYPE)) {
+                initBlockEntities();
+                registerTo(BuiltInRegistries.BLOCK_ENTITY_TYPE, modBlockEntities);
+            } else if (key.equals(Registries.ENTITY_TYPE)) {
+                initEntities();
+                registerTo(BuiltInRegistries.ENTITY_TYPE, modEntities);
+            } else if (key.equals(Registries.SOUND_EVENT)) {
+                initSounds();
+                registerTo(BuiltInRegistries.SOUND_EVENT, modSounds);
+            } else if (key.equals(Registries.PARTICLE_TYPE)) {
+                initParticles();
+                registerTo(BuiltInRegistries.PARTICLE_TYPE, modParticles);
+            } else if (key.equals(Registries.RECIPE_SERIALIZER)) {
+                initRecipeSerializers();
+                registerTo(BuiltInRegistries.RECIPE_SERIALIZER, (java.util.Map) modRecipeSerializers);
+            } else if (key.equals(Registries.MENU)) {
+                initMenus();
+                registerTo(BuiltInRegistries.MENU, modMenus);
+            } else if (key.equals(Registries.CREATIVE_MODE_TAB)) {
+                creativeTab = ModCreativeTabs.createTab(modItems);
+                Services.PLATFORM.register(BuiltInRegistries.CREATIVE_MODE_TAB, ModCreativeTabs.TAB_ID, creativeTab);
+                for (var entry : creativeTabs.entrySet()) {
+                    Services.PLATFORM.register(BuiltInRegistries.CREATIVE_MODE_TAB,
+                            new CommonId(namespace, entry.getKey()),
+                            (net.minecraft.world.item.CreativeModeTab) entry.getValue().get());
+                }
+            } else if (key.equals(Registries.CUSTOM_STAT)) {
+                com.kingodogo.buildscape.stat.ModStats.registerStats();
             }
-        });
+            var iterator = pending.iterator();
+            while (iterator.hasNext()) {
+                Pending entry = iterator.next();
+                if (entry.key().equals(key)) {
+                    entry.register().accept(event);
+                    iterator.remove();
+                }
+            }
+            completed.add(key);
+        } finally {
+            activeEvent = null;
+        }
+    }
 
-        event.register(Registries.ITEM, helper -> {
-            for (Map.Entry<String, net.minecraft.world.item.Item> entry : modItems.entrySet()) {
-                helper.register(ResourceLocation.fromNamespaceAndPath(BuildscapeCommon.MOD_ID, entry.getKey()), entry.getValue());
-            }
-        });
-
-        event.register(Registries.BLOCK_ENTITY_TYPE, helper -> {
-            for (Map.Entry<String, net.minecraft.world.level.block.entity.BlockEntityType<?>> entry : modBlockEntities.entrySet()) {
-                helper.register(ResourceLocation.fromNamespaceAndPath(BuildscapeCommon.MOD_ID, entry.getKey()), entry.getValue());
-            }
-        });
-
-        event.register(Registries.ENTITY_TYPE, helper -> {
-            for (Map.Entry<String, net.minecraft.world.entity.EntityType<?>> entry : modEntities.entrySet()) {
-                helper.register(ResourceLocation.fromNamespaceAndPath(BuildscapeCommon.MOD_ID, entry.getKey()), entry.getValue());
-            }
-        });
-
-        event.register(Registries.SOUND_EVENT, helper -> {
-            for (Map.Entry<String, net.minecraft.sounds.SoundEvent> entry : modSounds.entrySet()) {
-                helper.register(ResourceLocation.fromNamespaceAndPath(BuildscapeCommon.MOD_ID, entry.getKey()), entry.getValue());
-            }
-        });
-
-        event.register(Registries.RECIPE_SERIALIZER, helper -> {
-            for (Map.Entry<String, Object> entry : modRecipeSerializers.entrySet()) {
-                helper.register(ResourceLocation.fromNamespaceAndPath(BuildscapeCommon.MOD_ID, entry.getKey()), (net.minecraft.world.item.crafting.RecipeSerializer<?>) entry.getValue());
-            }
-        });
-
-        event.register(Registries.MENU, helper -> {
-            for (Map.Entry<String, net.minecraft.world.inventory.MenuType<?>> entry : modMenus.entrySet()) {
-                helper.register(ResourceLocation.fromNamespaceAndPath(BuildscapeCommon.MOD_ID, entry.getKey()), entry.getValue());
-            }
-        });
-
-        event.register(Registries.CREATIVE_MODE_TAB, helper -> {
-            if (creativeTab != null) {
-                helper.register(ResourceLocation.fromNamespaceAndPath(BuildscapeCommon.MOD_ID, ModCreativeTabs.TAB_ID.getPath()), creativeTab);
-            }
-        });
+    @Override
+    public synchronized void init() {
+        if (initialized) return;
+        if (!pending.isEmpty() || modBlocks.isEmpty() || modItems.isEmpty()) {
+            throw new IllegalStateException("Buildscape registry events have not completed");
+        }
+        initialized = true;
+        BuildscapeCommon.LOGGER.info("Registered {} blocks and {} items through NeoForge events",
+                modBlocks.size(), modItems.size());
     }
 }

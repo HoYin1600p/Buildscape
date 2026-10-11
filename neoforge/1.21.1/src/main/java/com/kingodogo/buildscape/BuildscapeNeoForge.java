@@ -5,51 +5,37 @@ import net.neoforged.fml.common.Mod;
 @Mod("buildscape")
 public class BuildscapeNeoForge {
     public BuildscapeNeoForge(net.neoforged.bus.api.IEventBus modEventBus) {
-        com.kingodogo.buildscape.registry.NeoForgeRegistryAdapter.setEventBus(modEventBus);
-        init();
+        com.kingodogo.buildscape.BuildscapeCommon.prepareRegistration();
+        modEventBus.addListener(((com.kingodogo.buildscape.registry.NeoForgeRegistryAdapter)
+                com.kingodogo.buildscape.platform.Services.REGISTRY)::onRegister);
+        modEventBus.addListener((net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent event) -> event.enqueueWork(BuildscapeNeoForge::init));
         registerPayloadHandlers(modEventBus);
         registerServerRecipeReloading();
-        modEventBus.addListener(net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent.class, event -> {
-            com.kingodogo.buildscape.platform.Services.PLATFORM.registerEntityAttributes(event::put);
+        modEventBus.addListener((net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent event) ->
+                com.kingodogo.buildscape.platform.Services.PLATFORM.registerEntityAttributes(event::put));
+        net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener((net.neoforged.neoforge.event.server.ServerStartedEvent event) -> {
+            com.kingodogo.buildscape.adapter.v121x.PacketFactory.setServer(event.getServer());
+            BuildscapeCommon.setServerFullyInitialized(true);
         });
-        if (net.neoforged.fml.loading.FMLEnvironment.dist == net.neoforged.api.distmarker.Dist.CLIENT) {
-            modEventBus.addListener(net.neoforged.neoforge.client.event.RegisterMenuScreensEvent.class, event -> {
-                com.kingodogo.buildscape.platform.Services.PLATFORM.registerMenuScreens();
-            });
-            modEventBus.addListener(net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent.class, event -> {
-                com.kingodogo.buildscape.particle.ParticleFactory.registerProviders();
-            });
-            modEventBus.addListener(net.neoforged.neoforge.client.event.EntityRenderersEvent.RegisterRenderers.class, event -> {
-                com.kingodogo.buildscape.platform.Services.PLATFORM.registerRenderers();
-            });
-            modEventBus.addListener(net.neoforged.neoforge.client.event.EntityRenderersEvent.RegisterLayerDefinitions.class, event -> {
-                com.kingodogo.buildscape.platform.Services.PLATFORM.registerLayerDefinitions((layer, defSupplier) -> {
-                    if (layer instanceof net.minecraft.client.model.geom.ModelLayerLocation mll && defSupplier != null) {
-                        event.registerLayerDefinition(mll, () -> (net.minecraft.client.model.geom.builders.LayerDefinition) defSupplier.get());
-                    }
-                });
-            });
-            net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(net.neoforged.neoforge.client.event.ClientTickEvent.Post.class, event -> {
-                com.kingodogo.buildscape.client.ClientEvents.onClientTick();
-            });
-            com.kingodogo.buildscape.client.ClientEvents.initializeConfigCallback();
-        }
+        com.kingodogo.buildscape.event.NeoForgeGameplayEvents.register();
+        if (net.neoforged.fml.loading.FMLEnvironment.dist.isClient()) BuildscapeNeoForgeClient.register(modEventBus);
     }
-
     private void registerServerRecipeReloading() {
-        net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(net.neoforged.neoforge.event.AddReloadListenerEvent.class, event -> {
+        net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener((net.neoforged.neoforge.event.AddReloadListenerEvent event) -> {
             com.kingodogo.buildscape.recipe.framework.BuildScapeRecipeLoader.INSTANCE
                     .setCurrentRecipeManager(event.getServerResources().getRecipeManager());
             event.addListener(com.kingodogo.buildscape.platform.Services.PLATFORM.createRecipeReloadListener());
         });
-        net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(net.neoforged.neoforge.event.server.ServerStoppedEvent.class, event -> {
+        net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener((net.neoforged.neoforge.event.server.ServerStoppedEvent event) -> {
             com.kingodogo.buildscape.recipe.framework.BuildScapeRecipeLoader.INSTANCE
                     .setCurrentRecipeManager(null);
+            com.kingodogo.buildscape.adapter.v121x.PacketFactory.setServer(null);
+            BuildscapeCommon.setServerFullyInitialized(false);
         });
     }
 
     private void registerPayloadHandlers(net.neoforged.bus.api.IEventBus modEventBus) {
-        modEventBus.addListener(net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent.class, event -> {
+        modEventBus.addListener((net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent event) -> {
             net.neoforged.neoforge.network.registration.PayloadRegistrar registrar = event.registrar(BuildscapeCommon.MOD_ID);
             for (com.kingodogo.buildscape.network.IPacketFactory.PacketDescriptor desc : com.kingodogo.buildscape.network.PacketFactory.getRegisteredDescriptors()) {
                 net.minecraft.resources.ResourceLocation loc = net.minecraft.resources.ResourceLocation.fromNamespaceAndPath(desc.id().getNamespace(), desc.id().getPath());
@@ -79,5 +65,6 @@ public class BuildscapeNeoForge {
 
     public static void init() {
         BuildscapeCommon.init();
+        com.kingodogo.buildscape.event.LoaderDispenserSetup.register();
     }
 }

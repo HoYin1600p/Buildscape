@@ -6,6 +6,14 @@ plugins {
 
 defaultTasks 'build'
 
+// Enabling the 1.21.1 loader also enables shared v121x verification, even when
+// buildscape.v121x was not supplied separately on the command line.
+if (findProject(':neoforge:1.21.1') != null) {
+    project(':common').tasks.matching { it.name == 'check' }.configureEach {
+        dependsOn ':common:compileV121xJava'
+    }
+}
+
 subprojects {
     if (childProjects.isEmpty()) {
         apply plugin: 'java'
@@ -45,5 +53,8 @@ tasks.named('build') {
     dependsOn ':common:build', ':fabric:26.2:build', ':neoforge:26.2:build'
     if (findProject(':forge:1.18.2') != null) {
         dependsOn ':forge:1.18.2:build'
+    }
+    if (findProject(':neoforge:1.21.1') != null) {
+        dependsOn ':neoforge:1.21.1:build'
     }
 }

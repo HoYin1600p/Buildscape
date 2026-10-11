@@ -44,7 +44,11 @@ public final class PillarRenderer implements BlockEntityRenderer<PillarBlockEnti
         }
     }
 
-    private final PillarBlockEntityRenderer placement = new PillarBlockEntityRenderer();
+    private final PillarBlockEntityRenderer placement = new PillarBlockEntityRenderer() {
+        @Override protected boolean isSwordLike(ItemStack stack) { return PillarToolDisplay.swordLike(stack); }
+        @Override protected boolean isAxeLike(ItemStack stack) { return PillarToolDisplay.axeLike(stack); }
+        @Override protected boolean isWeaponOrTool(ItemStack stack) { return isSwordLike(stack) || isAxeLike(stack); }
+    };
 
     @Override public State createRenderState() { return new State(); }
 

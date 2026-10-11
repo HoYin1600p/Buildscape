@@ -14,9 +14,13 @@ public class AliasResolver {
     private final Map<String, String> aliases = new HashMap<>();
 
     public AliasResolver() {
+        this("c");
+    }
+
+    public AliasResolver(String commonTagNamespace) {
         aliases.put("BS:", "buildscape:");
         aliases.put("MC:", "minecraft:");
-        aliases.put("F:", "c:");
+        aliases.put("F:", commonTagNamespace + ":");
     }
 
     public void registerAliases(Map<String, String> newAliases) {

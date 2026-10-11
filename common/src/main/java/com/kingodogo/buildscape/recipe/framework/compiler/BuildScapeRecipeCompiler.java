@@ -19,16 +19,22 @@ public class BuildScapeRecipeCompiler {
     private final Predicate<String> modLoaded;
 
     public BuildScapeRecipeCompiler() {
-        this(modid -> Services.PLATFORM.isModLoaded(modid));
+        this(modid -> Services.PLATFORM.isModLoaded(modid), Services.isVersionCluster("v118x"));
     }
 
     BuildScapeRecipeCompiler(Predicate<String> modLoaded) {
-        this.modLoaded = Objects.requireNonNull(modLoaded);
+        this(modLoaded, false);
     }
 
-    private final AliasResolver aliasResolver = new AliasResolver();
+    private BuildScapeRecipeCompiler(Predicate<String> modLoaded, boolean referencePack) {
+        this.modLoaded = Objects.requireNonNull(modLoaded);
+        this.aliasResolver = new AliasResolver(referencePack ? "forge" : "c");
+        this.familyExpander = new FamilyExpander(templateEngine, referencePack);
+    }
+
+    private final AliasResolver aliasResolver;
     private final TemplateEngine templateEngine = new TemplateEngine();
-    private final FamilyExpander familyExpander = new FamilyExpander(templateEngine);
+    private final FamilyExpander familyExpander;
     private final RecipeValidator validator = new RecipeValidator();
 
     public static record CompileResult(
@@ -166,29 +172,29 @@ public class BuildScapeRecipeCompiler {
                 return compileShapeless(recipeId.toString(), group, spec, resultItem, resultCount, resultNbt, true);
             }
             case "stonecutting" -> {
-                String input = aliasResolver.resolveString(spec.input());
+                String input = resolveIngredientSpec(spec.input());
                 return new RecipeIR.CompiledRecipe(recipeId.toString(), "stonecutting", group, 0, 0, List.of(), input, "", resultItem, resultCount, resultNbt, 0f, 0, 0);
             }
             case "smelting" -> {
-                String input = aliasResolver.resolveString(spec.input());
+                String input = resolveIngredientSpec(spec.input());
                 return new RecipeIR.CompiledRecipe(recipeId.toString(), "smelting", group, 0, 0, List.of(), input, "", resultItem, resultCount, resultNbt, spec.experience(), spec.cookingTime(), 0);
             }
             case "blasting" -> {
-                String input = aliasResolver.resolveString(spec.input());
+                String input = resolveIngredientSpec(spec.input());
                 return new RecipeIR.CompiledRecipe(recipeId.toString(), "blasting", group, 0, 0, List.of(), input, "", resultItem, resultCount, resultNbt, spec.experience(), spec.cookingTime(), 0);
             }
             case "smoking" -> {
-                String input = aliasResolver.resolveString(spec.input());
+                String input = resolveIngredientSpec(spec.input());
                 return new RecipeIR.CompiledRecipe(recipeId.toString(), "smoking", group, 0, 0, List.of(), input, "", resultItem, resultCount, resultNbt, spec.experience(), spec.cookingTime(), 0);
             }
             case "campfire", "campfire_cooking" -> {
-                String input = aliasResolver.resolveString(spec.input());
+                String input = resolveIngredientSpec(spec.input());
                 return new RecipeIR.CompiledRecipe(recipeId.toString(), "campfire", group, 0, 0, List.of(), input, "", resultItem, resultCount, resultNbt, spec.experience(), spec.cookingTime(), 0);
             }
             case "smithing" -> {
-                String input = aliasResolver.resolveString(spec.input());
+                String input = resolveIngredientSpec(spec.input());
                 String addition = (spec.ingredients() != null && !spec.ingredients().isEmpty())
-                        ? aliasResolver.resolveString(spec.ingredients().get(0)) : "";
+                        ? resolveIngredientSpec(spec.ingredients().get(0)) : "";
                 return new RecipeIR.CompiledRecipe(recipeId.toString(), "smithing", group, 0, 0, List.of(), input, addition, resultItem, resultCount, resultNbt, 0f, 0, 0);
             }
             default -> {
@@ -245,7 +251,7 @@ public class BuildScapeRecipeCompiler {
             for (Map.Entry<String, String> entry : spec.keys().entrySet()) {
                 if (entry.getKey().length() > 0) {
                     char c = entry.getKey().charAt(0);
-                    String ingStr = aliasResolver.resolveString(entry.getValue());
+                    String ingStr = resolveIngredientSpec(entry.getValue());
                     keyMap.put(c, ingStr);
                 }
             }
@@ -290,7 +296,7 @@ public class BuildScapeRecipeCompiler {
         List<String> ingredients = new ArrayList<>();
         if (spec.ingredients() != null) {
             for (String ingStr : spec.ingredients()) {
-                String ing = aliasResolver.resolveString(ingStr);
+                String ing = resolveIngredientSpec(ingStr);
                 if (!ing.isEmpty()) {
                     ingredients.add(ing);
                 }
@@ -314,6 +320,16 @@ public class BuildScapeRecipeCompiler {
         );
     }
 
+    private String resolveIngredientSpec(String raw) {
+        if (raw == null || raw.isEmpty()) return "";
+        if (raw.startsWith("{")) return raw;
+        if (raw.startsWith("[")) {
+            String inner = raw.substring(1).stripLeading();
+            if (inner.startsWith("{") || inner.startsWith("\"")) return raw;
+            return RecipeCacheGenerator.resolveIngredientJson(raw, aliasResolver);
+        }
+        return aliasResolver.resolveString(raw);
+    }
     private String generateRecipeId(RecipeIR.RecipeSpec spec) {
         String res = (spec.result() != null && spec.result().item() != null) ? spec.result().item() : "unknown";
         return sanitizePath(res) + "_" + Math.abs(spec.hashCode());

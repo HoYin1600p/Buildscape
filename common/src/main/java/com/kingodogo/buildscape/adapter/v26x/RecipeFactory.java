@@ -368,7 +368,13 @@ public final class RecipeFactory {
                 return holders.isEmpty() ? null : Ingredient.of(net.minecraft.core.HolderSet.direct(holders));
             }
             if (s.startsWith("{") || s.startsWith("[")) {
-                return Ingredient.CODEC.parse(com.mojang.serialization.JsonOps.INSTANCE, com.google.gson.JsonParser.parseString(s)).result().orElse(null);
+                java.util.List<net.minecraft.core.Holder<net.minecraft.world.item.Item>> holders = new ArrayList<>();
+                collectIngredientHolders(com.google.gson.JsonParser.parseString(s), holders);
+                return holders.isEmpty() ? null : Ingredient.of(net.minecraft.core.HolderSet.direct(holders));
+            } else if (s.startsWith("#")) {
+                java.util.List<net.minecraft.core.Holder<net.minecraft.world.item.Item>> holders = new ArrayList<>();
+                collectIngredientHolders(new com.google.gson.JsonPrimitive(s), holders);
+                return holders.isEmpty() ? null : Ingredient.of(net.minecraft.core.HolderSet.direct(holders));
             } else if (s.contains(":")) {
                 net.minecraft.world.item.Item item = BuiltInRegistries.ITEM.getValue(Identifier.tryParse(s));
                 if (item != null && item != net.minecraft.world.item.Items.AIR) {
@@ -379,6 +385,33 @@ public final class RecipeFactory {
             com.kingodogo.buildscape.BuildscapeCommon.LOGGER.warn("Failed to parse recipe ingredient {}", s, exception);
         }
         return null;
+    }
+
+    private static void collectIngredientHolders(com.google.gson.JsonElement json,
+            java.util.List<net.minecraft.core.Holder<net.minecraft.world.item.Item>> holders) {
+        if (json.isJsonArray()) {
+            for (com.google.gson.JsonElement entry : json.getAsJsonArray()) collectIngredientHolders(entry, holders);
+            return;
+        }
+        String value;
+        if (json.isJsonObject()) {
+            var object = json.getAsJsonObject();
+            if (object.has("item")) value = object.get("item").getAsString();
+            else if (object.has("tag")) value = "#" + object.get("tag").getAsString();
+            else return;
+        } else if (json.isJsonPrimitive() && json.getAsJsonPrimitive().isString()) {
+            value = json.getAsString();
+        } else return;
+        boolean tag = value.startsWith("#");
+        Identifier id = Identifier.tryParse(tag ? value.substring(1) : value);
+        if (id == null) return;
+        if (tag) {
+            for (var holder : BuiltInRegistries.ITEM.getTagOrEmpty(
+                    net.minecraft.tags.TagKey.create(Registries.ITEM, id))) holders.add(holder);
+        } else {
+            var item = BuiltInRegistries.ITEM.getValue(id);
+            if (item != null && item != net.minecraft.world.item.Items.AIR) holders.add(BuiltInRegistries.ITEM.wrapAsHolder(item));
+        }
     }
 
     private static ItemStackTemplate parseResult(String recipeId, String itemStr, int count, String nbt) {
@@ -503,14 +536,13 @@ public final class RecipeFactory {
     public static void injectRecipes(net.minecraft.world.item.crafting.RecipeManager recipeManager,
                                      java.util.List<com.kingodogo.buildscape.recipe.framework.parser.RecipeIR.CompiledRecipe> recipes) {
         if (recipeManager == null || recipes == null || recipes.isEmpty()) return;
-        java.util.Map<ResourceKey<Recipe<?>>, RecipeHolder<?>> merged = new java.util.LinkedHashMap<>();
-        for (RecipeHolder<?> existing : recipeManager.getRecipes()) {
-            if (existing != null) merged.put(existing.id(), existing);
-        }
+        java.util.List<RecipeHolder<?>> nativeRecipes = new ArrayList<>();
         for (com.kingodogo.buildscape.recipe.framework.parser.RecipeIR.CompiledRecipe cr : recipes) {
             RecipeHolder<?> holder = createRecipe(cr);
-            if (holder != null) merged.put(holder.id(), holder);
+            if (holder != null) nativeRecipes.add(holder);
         }
+        var merged = com.kingodogo.buildscape.recipe.framework.integration.RecipeManagerInjector
+                .mergeById(recipeManager.getRecipes(), nativeRecipes, holder -> holder.id());
         try {
             net.minecraft.world.item.crafting.RecipeMap map = net.minecraft.world.item.crafting.RecipeMap.create(merged.values());
             java.lang.reflect.Field field = net.minecraft.world.item.crafting.RecipeManager.class.getDeclaredField("recipes");

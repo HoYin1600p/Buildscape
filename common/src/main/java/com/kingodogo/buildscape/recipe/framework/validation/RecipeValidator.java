@@ -74,8 +74,9 @@ public class RecipeValidator {
                     JsonElement json = JsonParser.parseString(value);
                     boolean valid = false;
                     for (JsonElement entry : json.getAsJsonArray()) {
-                        if (!entry.isJsonPrimitive() || !entry.getAsJsonPrimitive().isString()
-                                || !validCompiledIngredient(entry.getAsString())) return false;
+                        String ingredient = entry.isJsonPrimitive() && entry.getAsJsonPrimitive().isString()
+                                ? entry.getAsString() : entry.toString();
+                        if (!validCompiledIngredient(ingredient)) return false;
                         valid = true;
                     }
                     return valid;
@@ -91,7 +92,20 @@ public class RecipeValidator {
             }
             return false;
         }
-        if (value.startsWith("{") || value.startsWith("\"")) return false;
+        if (value.startsWith("{")) {
+            try {
+                com.kingodogo.buildscape.recipe.framework.util.RecipePackFormatter.validateJson(value);
+                var object = JsonParser.parseString(value).getAsJsonObject();
+                if (object.has("item") == object.has("tag")) return false;
+                String member = object.has("item") ? "item" : "tag";
+                JsonElement id = object.get(member);
+                if (!id.isJsonPrimitive() || !id.getAsJsonPrimitive().isString()) return false;
+                return validCompiledIngredient((member.equals("tag") ? "#" : "") + id.getAsString());
+            } catch (RuntimeException exception) {
+                return false;
+            }
+        }
+        if (value.startsWith("\"")) return false;
         boolean tag = value.startsWith("#");
         CommonId id = parseId(tag ? value.substring(1) : value);
         return id != null && (tag || hasItem(id));
@@ -164,6 +178,11 @@ public class RecipeValidator {
     private boolean validateIngredientSpec(String rawSpec, AliasResolver aliasResolver) {
         if (rawSpec == null || rawSpec.isEmpty()) {
             return false;
+        }
+
+        if (rawSpec.startsWith("{") || (rawSpec.startsWith("[") && rawSpec.length() > 1
+                && (rawSpec.charAt(1) == '{' || rawSpec.charAt(1) == '"'))) {
+            return validCompiledIngredient(rawSpec);
         }
 
         if (rawSpec.startsWith("[") && rawSpec.endsWith("]")) {

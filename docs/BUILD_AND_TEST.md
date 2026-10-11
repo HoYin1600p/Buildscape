@@ -24,14 +24,70 @@ Common remains a plain `java-library`. Its `v26x` compile jar is the official,
 unobfuscated Mojang client jar downloaded from an immutable public URL and
 verified against Mojang's published SHA-1. The build can reuse Unimined's
 verified official client cache. No files under `ref/artifacts` are needed for
-26.2. The `v118x` and `v121x` source sets remain defined for separately
-maintained targets, but the default build compiles only `v26x`.
+26.2. The default build also compiles `v118x` and checks its recipe tooling;
+`v121x` remains defined for a separately maintained target.
 
 Each loader jar includes the compiled common `v26x` classes, common resources,
 its own metadata, service bindings, and the unified `buildscape.mixins.json`.
 The jars are collected in root `build/libs` and also remain in each loader's
 `build/libs` directory. Minecraft 26.x uses official names, so these jars do
 not need remapping.
+
+## Shared 1.18.2 recipe checks
+
+`common:check` includes fifteen standalone JavaExec runners, the seven-test
+`v118xTest` JUnit regression suite, `v118xVerifyBundledRecipeCache`, and
+`v118xCheckRecipePackFormat`. The last two use the frozen pack under
+`ref/forge/1.18.2/src/main/resources/data/buildscape/recipes_pack`.
+Verification compares the entire generated cache with the bundled bytes;
+format checking rejects duplicate JSON keys and noncanonical formatting.
+
+The `v118xTest` source set compiles Java 17 bytecode against the shared
+v118x output and the final `compileV118xJava` classpath, including Unimined's
+mapped Minecraft jar. Runners use JDK 17 and Minecraft 1.18.2's resolved
+library versions. The existing 26.2 `common:test` task is unchanged.
+
+```powershell
+.\gradlew.bat :common:check --offline --no-daemon --console=plain --max-workers=8
+.\gradlew.bat :common:v118xVerifyBundledRecipeCache :common:v118xCheckRecipePackFormat --offline --no-daemon --console=plain --max-workers=8
+.\gradlew.bat :common:v118xSyncBundledRecipeCache --offline --no-daemon --console=plain --max-workers=8
+```
+
+Explicit synchronization writes `common/build/generated/v118xRecipeCache/recipes.bscb`.
+It does not modify the frozen pack and is not required by `check`.
+
+| Reference test | Shared task |
+| --- | --- |
+| PipeSpillTest | v118xRunPipeSpillTests |
+| PipeOutletWaterTest | v118xRunPipeOutletTests |
+| RecipeManagerInjectorTest | v118xRunRecipeManagerInjectorTests |
+| BinaryRecipeCacheTest | v118xRunBinaryRecipeCacheTests |
+| TreeChopTraversalTest | v118xRunTreeChopTraversalTests |
+| BeaconBeamScanStateTest | v118xRunBeaconBeamScanTests |
+| GoldenDandelionGrowthTest | v118xRunGoldenDandelionGrowthTests |
+| MangroveLeafSupportTest | v118xRunMangroveLeafSupportTests |
+| EyeblossomTransitionTest | v118xRunEyeblossomTransitionTests |
+| CopperRodLogicTest | v118xRunCopperRodLogicTests |
+| HazeBushResourcesTest | v118xRunHazeBushResourcesTests |
+| ParticleColorSlotsTest | v118xRunParticleColorSlotsTests |
+| StairModelTest | v118xRunStairModelTests |
+| PatternBoundsTest | v118xRunPatternBoundsTests |
+| RecipePackFormatterTest | v118xRunRecipePackFormatterTests |
+| RecipeCacheRegressionTest | v118xTest |
+
+No reference test is excluded. Copper rod checks use the relocated v118x
+oxidation helpers after vanilla bootstrap. The regression suite uses JUnit 5
+and validates shared recipe records with known items, replacing Forge event
+bootstrap and pre-resolved native caches. It retains the reference checks for
+hash normalization, duplicate keys and IDs, formatting, tampering, family
+defaults, invalid records and unbound tags. Resource checks read the frozen
+1.18.2 resources first; runners write temporary data under ordinary build output.
+
+The shared generator uses main's schema, cache and generator versions for its
+hash, including category boundaries and normalized line endings. Runtime cache
+hashing delegates to that generator. The binary layout remains version 5.
+Reference-pack family expansion and the `forge:` tag alias are selected for
+1.18.2; the existing 26.2 family defaults and `c:` alias remain in use for 26.2.
 
 ## Development clients
 

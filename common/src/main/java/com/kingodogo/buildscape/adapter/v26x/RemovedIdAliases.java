@@ -13,6 +13,7 @@ public final class RemovedIdAliases {
     private RemovedIdAliases() {}
 
     public static void register(Registry<?> registry, BiConsumer<Identifier, Identifier> install) {
+        if (Services.isVersionCluster("v118x")) return;
         boolean blocks = registry.key().equals(Registries.BLOCK);
         boolean items = registry.key().equals(Registries.ITEM);
         boolean entities = registry.key().equals(Registries.ENTITY_TYPE);

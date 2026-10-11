@@ -18,6 +18,8 @@ import java.util.function.Supplier;
  * build them from the mod's own definitions.
  */
 public class Services {
+    public static boolean isVersionCluster(String cluster) { return false; }
+
     /** Block registrations in registration order, filled when ModBlocks initialises. */
     public static final List<RegistrySupplier<?>> REGISTERED_BLOCKS = Collections.synchronizedList(new ArrayList<>());
 

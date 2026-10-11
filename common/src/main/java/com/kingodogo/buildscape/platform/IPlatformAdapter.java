@@ -7,6 +7,29 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.material.Fluid;
 public interface IPlatformAdapter {
+    /** Cluster content supplements the shared registrations; most clusters need none. */
+    default java.util.Map<String, net.minecraft.world.level.block.entity.BlockEntityType<?>>
+    createClusterBlockEntityTypes(java.util.Map<String, Block> blocks) {
+        return java.util.Map.of();
+    }
+
+    default java.util.Map<String, net.minecraft.world.entity.EntityType<?>> createClusterEntityTypes() {
+        return java.util.Map.of();
+    }
+
+    default <T extends net.minecraft.world.level.block.entity.BlockEntity>
+    net.minecraft.world.level.block.entity.BlockEntityType<T> createBlockEntityTypeForBlocks(
+            BlockEntityFactory<T> factory, Block... blocks) {
+        java.util.Set<Block> valid = java.util.Set.of(blocks);
+        return createBlockEntityType(factory, state -> valid.contains(state.getBlock()));
+    }
+
+    default Item createRegisteredItem(com.kingodogo.buildscape.item.ItemDefinition definition, Block block) {
+        return block != null
+                ? com.kingodogo.buildscape.item.ItemFactory.createBlockItem(definition.getId(), block, definition.getProperties())
+                : com.kingodogo.buildscape.item.ItemFactory.createItem(definition);
+    }
+
     enum BoatPlacementOutcome { PASS, FAIL, SUCCESS }
 
     default BoatPlacementOutcome placePoplarBoat(net.minecraft.world.item.Item boatItem, Level level,

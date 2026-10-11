@@ -1,4 +1,4 @@
-# Forge 1.18.2 ModItems declaration order. Keep in sync with ref/forge/1.18.2.
+# Forge 1.18.2 ModItems declarations, then Trophies declarations. Keep in sync with ref/forge/1.18.2.
 # This is registry order, not the Buildscape creative tab display order.
 black_sand
 blue_sand
@@ -3167,3 +3167,21 @@ stringlight_frame_pattern
 music_disc_celebration
 music_disc_snowfall
 music_disc_builder
+# BuildScape calls Trophies.init() before attaching ModItems.ITEMS to the event bus.
+# The first trophy's ModItems.ITEMS access initializes every ModItems declaration first.
+stone_pillar_trophy
+gold_pillar_trophy
+diamond_pillar_trophy
+netherite_pillar_trophy
+emerald_pillar_trophy
+golden_jar_trophy
+gold_ornament_trophy
+emerald_stocking_trophy
+star_trophy
+string_light_trophy
+firelight_trophy
+diamond_hammer_trophy
+gold_buildscape_trophy
+emerald_buildscape_trophy
+diamond_buildscape_trophy
+netherite_buildscape_trophy

@@ -93,8 +93,10 @@ unimined.minecraft {
     minecraftForge {
         loader '40.3.12'
         useToolchains = false
-        mixinConfig 'buildscape.mixins.json'
-        if (sourceMode == 'common') mixinConfig 'buildscape.forge118x.mixins.json'
+        // One call with the full list: each mixinConfig call replaces the dev-run list.
+        mixinConfig(sourceMode == 'common'
+                ? ['buildscape.mixins.json', 'buildscape.forge118x.mixins.json']
+                : ['buildscape.mixins.json'])
         accessTransformer devAccessTransformer
     }
     mods {

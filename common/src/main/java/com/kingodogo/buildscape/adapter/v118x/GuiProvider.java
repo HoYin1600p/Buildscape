@@ -13,8 +13,46 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 public final class GuiProvider {
     private GuiProvider() {}
 
+    @FunctionalInterface
+    private interface ScreenFactory<M extends net.minecraft.world.inventory.AbstractContainerMenu> {
+        AbstractContainerScreen<M> create(M menu, net.minecraft.world.entity.player.Inventory inventory,
+                                         net.minecraft.network.chat.Component title);
+    }
+
+    // Vanilla keeps this SPI private. Match its signature so runtime SRG names need no reflection strings.
+    @SuppressWarnings("unchecked")
+    private static <M extends net.minecraft.world.inventory.AbstractContainerMenu> void registerMenuScreen(
+            net.minecraft.world.inventory.MenuType<M> menuType, ScreenFactory<M> factory) {
+        for (java.lang.reflect.Method registration : MenuScreens.class.getDeclaredMethods()) {
+            Class<?>[] parameters = registration.getParameterTypes();
+            if (!java.lang.reflect.Modifier.isStatic(registration.getModifiers()) || parameters.length != 2
+                    || parameters[0] != net.minecraft.world.inventory.MenuType.class || !parameters[1].isInterface()) continue;
+            Object constructor = java.lang.reflect.Proxy.newProxyInstance(MenuScreens.class.getClassLoader(),
+                    new Class<?>[]{parameters[1]}, (proxy, method, args) -> {
+                        if (method.getDeclaringClass() == Object.class) {
+                            return switch (method.getName()) {
+                                case "toString" -> "Buildscape menu screen factory";
+                                case "hashCode" -> System.identityHashCode(proxy);
+                                case "equals" -> proxy == args[0];
+                                default -> throw new IllegalStateException("Unexpected Object method: " + method);
+                            };
+                        }
+                        return factory.create((M) args[0], (net.minecraft.world.entity.player.Inventory) args[1],
+                                (net.minecraft.network.chat.Component) args[2]);
+                    });
+            try {
+                registration.setAccessible(true);
+                registration.invoke(null, menuType, constructor);
+                return;
+            } catch (ReflectiveOperationException exception) {
+                throw new IllegalStateException("Could not register Buildscape menu screen", exception);
+            }
+        }
+        throw new IllegalStateException("Minecraft menu screen registration SPI was not found");
+    }
+
     public static void registerMenuScreens() {
-        MenuScreens.<BuildersWorkbenchMenu, AbstractContainerScreen<BuildersWorkbenchMenu>>register(
+        GuiProvider.<BuildersWorkbenchMenu>registerMenuScreen(
                 ModMenuTypes.BUILDERS_WORKBENCH_MENU,
                 (menu, inventory, title) -> {
                     BuildersWorkbenchScreen delegate = new BuildersWorkbenchScreen(menu, inventory, title);
@@ -65,7 +103,7 @@ public final class GuiProvider {
                 }
         );
 
-        MenuScreens.<BuildersPouchMenu, AbstractContainerScreen<BuildersPouchMenu>>register(
+        GuiProvider.<BuildersPouchMenu>registerMenuScreen(
                 ModMenuTypes.BUILDERS_POUCH_MENU,
                 (menu, inventory, title) -> {
                     BuildersPouchScreen delegate = new BuildersPouchScreen(menu, inventory, title);

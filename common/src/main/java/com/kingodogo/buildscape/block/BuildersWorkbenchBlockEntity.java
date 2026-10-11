@@ -5,8 +5,9 @@ import com.kingodogo.buildscape.menu.BuildersWorkbenchMenu;
 import com.kingodogo.buildscape.util.ColorGradientSolver;
 import com.kingodogo.buildscape.util.ComponentHelper;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.level.storage.ValueOutput;
+import com.kingodogo.buildscape.block.entity.DataBlockEntity;
+import com.kingodogo.buildscape.block.entity.IBlockEntityReadData;
+import com.kingodogo.buildscape.block.entity.IBlockEntityWriteData;
 import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
@@ -28,7 +29,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-public class BuildersWorkbenchBlockEntity extends BlockEntity implements MenuProvider, WorldlyContainer {
+public class BuildersWorkbenchBlockEntity extends DataBlockEntity implements MenuProvider, WorldlyContainer {
 
     public static final int SLOT_COLOR_PICKER = 0;
     public static final int SLOT_PRESETS_START = 1;
@@ -441,8 +442,7 @@ public class BuildersWorkbenchBlockEntity extends BlockEntity implements MenuPro
         }
     }
     @Override
-    protected void loadAdditional(ValueInput input) {
-        super.loadAdditional(input);
+    public void readData(IBlockEntityReadData input) {
         loadItems(input, items);
         SavedSettings saved = SavedSettings.read(input);
         activeTab = saved.activeTab();
@@ -453,34 +453,23 @@ public class BuildersWorkbenchBlockEntity extends BlockEntity implements MenuPro
     }
 
     @Override
-    protected void saveAdditional(ValueOutput output) {
-        super.saveAdditional(output);
+    public void writeData(IBlockEntityWriteData output) {
         saveItems(output, items);
         new SavedSettings(activeTab, filterMask, copyProgress, resultOffsetsByTab[0], resultOffsetsByTab[1]).save(output);
     }
 
-    static void loadItems(ValueInput input, NonNullList<ItemStack> items) {
+    static void loadItems(IBlockEntityReadData input, NonNullList<ItemStack> items) {
         items.clear();
-        for (ValueInput child : input.childrenListOrEmpty("Items")) {
-            int slot = child.getByteOr("Slot", (byte) -1) & 255;
-            if (slot < items.size()) items.set(slot, PillarBlockEntity.SavedItem.read(child));
-        }
+        List<ItemStack> saved = input.getSavedItemListOrEmpty("Items", items.size());
+        for (int slot = 0; slot < items.size(); slot++) items.set(slot, saved.get(slot));
     }
 
-    static void saveItems(ValueOutput output, NonNullList<ItemStack> items) {
-        var list = output.childrenList("Items");
-        for (int slot = 0; slot < items.size(); slot++) {
-            ItemStack item = items.get(slot);
-            if (!item.isEmpty()) {
-                ValueOutput child = list.addChild();
-                child.putByte("Slot", (byte) slot);
-                child.store(ItemStack.MAP_CODEC, item);
-            }
-        }
+    static void saveItems(IBlockEntityWriteData output, NonNullList<ItemStack> items) {
+        output.putSavedItemList("Items", items);
     }
 
     record SavedSettings(int activeTab, int filterMask, int copyProgress, int[] colorOffsets, int[] gradientOffsets) {
-        void save(ValueOutput output) {
+        void save(IBlockEntityWriteData output) {
             output.putInt("ActiveTab", activeTab);
             output.putInt("FilterMask", filterMask);
             output.putInt("FilterMaskVersion", FILTER_MASK_VERSION);
@@ -489,7 +478,7 @@ public class BuildersWorkbenchBlockEntity extends BlockEntity implements MenuPro
             output.putIntArray("GradientResultOffsets", gradientOffsets);
         }
 
-        static SavedSettings read(ValueInput input) {
+        static SavedSettings read(IBlockEntityReadData input) {
             int tab = validTab(input.getIntOr("ActiveTab", 0));
             int mask = input.getIntOr("FilterMaskVersion", 0) >= FILTER_MASK_VERSION
                     ? input.getIntOr("FilterMask", 0) & ColorGradientSolver.FILTER_STATE_MASK

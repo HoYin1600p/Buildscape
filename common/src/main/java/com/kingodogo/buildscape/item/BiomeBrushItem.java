@@ -19,7 +19,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
 
 import java.util.List;
-public class BiomeBrushItem extends Item {
+public class BiomeBrushItem extends BiomeBrushItemBase {
 
     public enum BiomeBrushTier {
         COPPER(1024),
@@ -53,12 +53,6 @@ public class BiomeBrushItem extends Item {
 
     public BiomeBrushTier getTier() {
         return tier;
-    }
-
-    @Override
-    public boolean canDestroyBlock(ItemStack stack, net.minecraft.world.level.block.state.BlockState state,
-                                   Level level, BlockPos pos, net.minecraft.world.entity.LivingEntity entity) {
-        return false;
     }
 
     public int getEnchantmentValue() {

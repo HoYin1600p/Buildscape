@@ -230,7 +230,7 @@ public final class ModCommonEvents {
                 var look = player.getViewVector(1.0F);
                 var start = player.getEyePosition().add(look.scale(.9D));
                 var data = Services.PLATFORM.getCustomData(held, false);
-                int burst = data == null ? 1 : Math.clamp(Services.PLATFORM.getTagInt(data, "BurstLevel", 1), 1, 5);
+                int burst = data == null ? 1 : Math.max(1, Math.min(5, Services.PLATFORM.getTagInt(data, "BurstLevel", 1)));
                 PacketFactory.sendToTracking(level, player.blockPosition(), new com.kingodogo.buildscape.network.ConfettiBurstPacket(
                         start.x, start.y, start.z, (float) look.x, (float) look.y, (float) look.z, burst, level.getRandom().nextLong()));
                 level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.FIREWORK_ROCKET_BLAST,

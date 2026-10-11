@@ -43,7 +43,7 @@ sourceSets {
 }
 
 // Compile shared 1.18.2 code against vanilla Mojang names, without a loader or ATs.
-// This source set remains explicit tooling until its API migration is complete.
+// Keep this compile in check so shared API changes are verified for both clusters.
 unimined.minecraft(sourceSets.v118x) {
     version '1.18.2'
     mappings { mojmap() }
@@ -123,9 +123,18 @@ def v26xClusterResources = tasks.register('v26xClusterResources', Sync) {
     into v26xClusterResourcesDir
 }
 
+def v118xClusterResourcesDir = layout.buildDirectory.dir('resources/v118xCluster')
+def v118xClusterResources = tasks.register('v118xClusterResources', Sync) {
+    from 'src/v118x/resources'
+    into v118xClusterResourcesDir
+}
+
 artifacts {
     add('v118xElements', sourceSets.v118x.output.classesDirs.singleFile) {
         builtBy tasks.named('compileV118xJava')
+    }
+    add('v118xElements', v118xClusterResourcesDir.get().asFile) {
+        builtBy v118xClusterResources
     }
     add('v121xElements', sourceSets.v121x.output.classesDirs.singleFile) {
         builtBy tasks.named('compileV121xJava')
@@ -146,6 +155,7 @@ tasks.named('jar', Jar) {
     from sourceSets.v26x.output
 }
 tasks.named('assemble') { dependsOn tasks.named('v26xClasses') }
+tasks.named('check') { dependsOn tasks.named('compileV118xJava') }
 
 // Explicit tooling only: no dependency from test, check, assemble or build.
 tasks.register('dumpBlockStates', JavaExec) {

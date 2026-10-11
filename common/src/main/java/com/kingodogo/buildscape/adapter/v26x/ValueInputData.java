@@ -18,6 +18,42 @@ public class ValueInputData implements IBlockEntityReadData {
         this.input = input;
     }
 
+    @Override public Optional<Double> getDouble(String key) { return input.read(key, com.mojang.serialization.Codec.DOUBLE); }
+    @Override public Optional<int[]> getIntArray(String key) { return input.getIntArray(key); }
+    @Override public Optional<Integer> getInt(String key) { return input.getInt(key); }
+    @Override public Optional<Boolean> getBoolean(String key) { return input.read(key, com.mojang.serialization.Codec.BOOL); }
+
+    @Override public ItemStack getSavedItemOrEmpty(String key) {
+        return input.child(key).map(ValueInputData::readSavedItem).orElse(ItemStack.EMPTY);
+    }
+
+    @Override public List<ItemStack> getSavedItemListOrEmpty(String key, int size) {
+        List<ItemStack> items = new ArrayList<>();
+        for (int i = 0; i < size; i++) items.add(ItemStack.EMPTY);
+        for (ValueInput child : input.childrenListOrEmpty(key)) {
+            int slot = child.getByteOr("Slot", (byte) -1) & 255;
+            if (slot < size) items.set(slot, readSavedItem(child));
+        }
+        return items;
+    }
+
+    public static ItemStack readSavedItem(ValueInput input) {
+        if (input.getInt("Count").isEmpty()) {
+            return input.read(ItemStack.MAP_CODEC).orElse(ItemStack.EMPTY);
+        }
+        // Custom block entity IDs are not in vanilla's schema: update legacy stacks explicitly.
+        net.minecraft.nbt.CompoundTag legacy = new net.minecraft.nbt.CompoundTag();
+        legacy.putString("id", input.getStringOr("id", "minecraft:air"));
+        legacy.putByte("Count", input.getByteOr("Count", (byte) 0));
+        input.read("tag", net.minecraft.nbt.CompoundTag.CODEC).ifPresent(tag -> legacy.put("tag", tag));
+        var fixed = net.minecraft.util.datafix.DataFixers.getDataFixer().update(
+                net.minecraft.util.datafix.fixes.References.ITEM_STACK,
+                new com.mojang.serialization.Dynamic<>(net.minecraft.nbt.NbtOps.INSTANCE, legacy),
+                2975, net.minecraft.SharedConstants.getCurrentVersion().dataVersion().version());
+        return ItemStack.CODEC.parse(input.lookup().createSerializationContext(net.minecraft.nbt.NbtOps.INSTANCE),
+                fixed.getValue()).result().orElse(ItemStack.EMPTY);
+    }
+
     @Override
     public String getStringOr(String key, String defaultValue) {
         return input.getStringOr(key, defaultValue);

@@ -6,9 +6,9 @@ import com.kingodogo.buildscape.particle.ModParticles;
 import com.kingodogo.buildscape.particle.PillarSparkleDataQueue;
 import com.kingodogo.buildscape.platform.Services;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.level.storage.ValueOutput;
-import com.mojang.serialization.Codec;
+import com.kingodogo.buildscape.block.entity.DataBlockEntity;
+import com.kingodogo.buildscape.block.entity.IBlockEntityReadData;
+import com.kingodogo.buildscape.block.entity.IBlockEntityWriteData;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
@@ -28,7 +28,7 @@ import net.minecraft.world.phys.AABB;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
-public class PillarBlockEntity extends BlockEntity implements Container {
+public class PillarBlockEntity extends DataBlockEntity implements Container {
 
     public static final int MAX_DYE_COLORS = 5;
 
@@ -879,10 +879,9 @@ public class PillarBlockEntity extends BlockEntity implements Container {
     }
 
     @Override
-    protected void saveAdditional(ValueOutput output) {
-        super.saveAdditional(output);
+    public void writeData(IBlockEntityWriteData output) {
         if (!displayedItem.isEmpty()) {
-            output.store("DisplayedItem", ItemStack.CODEC, displayedItem);
+            output.putSavedItem("DisplayedItem", displayedItem);
         }
         new SavedSettings(facingYaw, particlePattern, patternSpeed, patternSpread, patternIntensity,
                 usePattern, maxParticleColor, pillarId, particleColors, particleColorCounter, colorsInitialized)
@@ -890,15 +889,16 @@ public class PillarBlockEntity extends BlockEntity implements Container {
     }
 
     @Override
-    protected void loadAdditional(ValueInput input) {
-        super.loadAdditional(input);
-        displayedItem = input.child("DisplayedItem").map(SavedItem::read).orElseGet(() -> {
+    public void readData(IBlockEntityReadData input) {
+        if (input.getSubData("DisplayedItem").isPresent()) {
+            displayedItem = SavedItem.read(input);
+        } else {
             // The earliest pillar saves stored just the registry name.
             String itemId = input.getStringOr("ITEM", "minecraft:air");
-            net.minecraft.resources.Identifier id = net.minecraft.resources.Identifier.tryParse(itemId);
-            return id == null ? ItemStack.EMPTY : net.minecraft.core.registries.BuiltInRegistries.ITEM
-                    .getOptional(id).map(ItemStack::new).orElse(ItemStack.EMPTY);
-        });
+            var id = com.kingodogo.buildscape.util.CommonId.tryParse(itemId);
+            var item = id == null ? null : Services.PLATFORM.getItem(id);
+            displayedItem = item == null ? ItemStack.EMPTY : new ItemStack(item);
+        }
         SavedSettings saved = SavedSettings.read(input);
         facingYaw = saved.facingYaw();
         particlePattern = saved.particlePattern();
@@ -915,15 +915,19 @@ public class PillarBlockEntity extends BlockEntity implements Container {
     }
 
     @Override
-    public CompoundTag getUpdateTag(net.minecraft.core.HolderLookup.Provider lookup) {
-        return saveCustomOnly(lookup);
+    protected boolean syncCustomData() { return true; }
+
+    @Override
+    protected void writeUpdateData(IBlockEntityWriteData output) {
+        writeData(output);
+        if (displayedItem.isEmpty()) output.putSavedItem("DisplayedItem", ItemStack.EMPTY);
     }
 
     // Kept separate from block registration so the persisted layout can be tested independently.
     record SavedSettings(float facingYaw, String particlePattern, Double patternSpeed, Double patternSpread,
                          Double patternIntensity, Boolean usePattern, Integer maxParticleColor, String pillarId,
                          List<String> particleColors, int particleColorCounter, boolean colorsInitialized) {
-        void save(ValueOutput output) {
+        void save(IBlockEntityWriteData output) {
             output.putFloat("FacingYaw", facingYaw);
             if (particlePattern != null) output.putString("ParticlePattern", particlePattern);
             if (patternSpeed != null) output.putDouble("PatternSpeed", patternSpeed);
@@ -933,20 +937,19 @@ public class PillarBlockEntity extends BlockEntity implements Container {
             if (maxParticleColor != null) output.putInt("MaxParticleColor", maxParticleColor);
             if (pillarId != null && !pillarId.isEmpty()) output.putString("PillarId", pillarId);
             if (particleColors != null && !particleColors.isEmpty()) {
-                var colors = output.list("ParticleColors", Codec.STRING);
-                particleColors.forEach(colors::add);
+                output.putStringList("ParticleColors", particleColors);
             }
             output.putInt("ParticleColorCounter", particleColorCounter);
             output.putBoolean("ColorsInitialized", colorsInitialized);
         }
 
-        static SavedSettings read(ValueInput input) {
-            String pattern = input.getString("ParticlePattern")
-                    .orElseGet(() -> input.getString("PATTERN").orElse(input.getStringOr("Pattern", null)));
+        static SavedSettings read(IBlockEntityReadData input) {
+            String pattern = input.getStringOr("ParticlePattern",
+                    input.getStringOr("PATTERN", input.getStringOr("Pattern", null)));
             if (pattern != null && !java.util.Arrays.asList(PATTERNS).contains(pattern)) pattern = null;
             List<String> colors = new ArrayList<>();
             int colorIndex = 0;
-            for (String color : input.listOrEmpty("ParticleColors", Codec.STRING)) {
+            for (String color : input.getStringListOrEmpty("ParticleColors")) {
                 if (colorIndex++ >= 7) break;
                 if (HEX_COLOR_PATTERN.matcher(color).matches()) colors.add(color.toUpperCase(java.util.Locale.ROOT));
             }
@@ -955,10 +958,10 @@ public class PillarBlockEntity extends BlockEntity implements Container {
             float yaw = input.getFloatOr("FacingYaw", 0) % 360.0f;
             if (yaw < 0) yaw += 360.0f;
             return new SavedSettings(yaw, pattern,
-                    input.read("PatternSpeed", Codec.DOUBLE).orElse(null),
-                    input.read("PatternSpread", Codec.DOUBLE).orElse(null),
-                    input.read("PatternIntensity", Codec.DOUBLE).orElse(null),
-                    input.read("UsePattern", Codec.BOOL).orElse(null),
+                    input.getDouble("PatternSpeed").orElse(null),
+                    input.getDouble("PatternSpread").orElse(null),
+                    input.getDouble("PatternIntensity").orElse(null),
+                    input.getBoolean("UsePattern").orElse(null),
                     input.getInt("MaxParticleColor").orElse(null), id,
                     colors.isEmpty() ? null : colors,
                     input.getIntOr("ParticleColorCounter", 0),
@@ -969,22 +972,7 @@ public class PillarBlockEntity extends BlockEntity implements Container {
     static final class SavedItem {
         private SavedItem() {}
 
-        static ItemStack read(ValueInput input) {
-            if (input.getInt("Count").isEmpty()) {
-                return input.read(ItemStack.MAP_CODEC).orElse(ItemStack.EMPTY);
-            }
-            // Custom block entity IDs are not in vanilla's schema: update their legacy stacks explicitly.
-            CompoundTag legacy = new CompoundTag();
-            legacy.putString("id", input.getStringOr("id", "minecraft:air"));
-            legacy.putByte("Count", input.getByteOr("Count", (byte) 0));
-            input.read("tag", CompoundTag.CODEC).ifPresent(tag -> legacy.put("tag", tag));
-            var fixed = net.minecraft.util.datafix.DataFixers.getDataFixer().update(
-                    net.minecraft.util.datafix.fixes.References.ITEM_STACK,
-                    new com.mojang.serialization.Dynamic<>(net.minecraft.nbt.NbtOps.INSTANCE, legacy),
-                    2975, net.minecraft.SharedConstants.getCurrentVersion().dataVersion().version());
-            return ItemStack.CODEC.parse(input.lookup().createSerializationContext(net.minecraft.nbt.NbtOps.INSTANCE),
-                    fixed.getValue()).result().orElse(ItemStack.EMPTY);
-        }
+        static ItemStack read(IBlockEntityReadData input) { return input.getSavedItemOrEmpty("DisplayedItem"); }
     }
 
     private record ParticleSpawnData(double sx, double sy, double sz, double vx, double vy, double vz, float size) {

@@ -38,7 +38,7 @@ public final class DispenserEffects {
         dy /= length;
         dz /= length;
         var data = Services.PLATFORM.getCustomData(stack, false);
-        int burst = data == null ? 1 : Math.clamp(Services.PLATFORM.getTagInt(data, "BurstLevel", 1), 1, 5);
+        int burst = data == null ? 1 : Math.max(1, Math.min(5, Services.PLATFORM.getTagInt(data, "BurstLevel", 1)));
         int count = (65 + level.getRandom().nextInt(36)) * burst;
         for (int i = 0; i < count; i++) {
             double speed = (.08 + level.getRandom().nextDouble() * .12) * (1 + (burst - 1) * .2);

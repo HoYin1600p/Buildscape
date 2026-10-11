@@ -32,6 +32,7 @@
     "client.KeyboardInputMixin",
     "client.MouseInputMixin",
     "client.ClientWorldInputMixin",
+    "client.ExperimentalSettingsMixin",
     "client.CameraInputMixin",
     "client.GameRendererMixin",
     "client.AdvancementsScreenMixin",

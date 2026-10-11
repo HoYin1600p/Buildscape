@@ -257,6 +257,49 @@ def advancement(data):
     return result
 
 
+def model(data):
+    """Migrate face metadata and remove legacy identity element rotations."""
+    result = copy.deepcopy(data)
+    for element in result.get("elements", []):
+        rotation = element.get("rotation")
+        # Old exports use x/y/z instead of angle/axis. Only discard identities;
+        # a nonzero rotation without an axis must be diagnosed, never guessed.
+        if (isinstance(rotation, dict) and "axis" not in rotation
+                and rotation.get("angle", 0) == 0
+                and all(rotation.get(axis, 0) == 0 for axis in ("x", "y", "z"))):
+            del element["rotation"]
+        for face in element.get("faces", {}).values():
+            if "forge_data" in face:
+                legacy = face.pop("forge_data")
+                if "neoforge_data" in face and face["neoforge_data"] != legacy:
+                    raise ValueError("Conflicting forge_data and neoforge_data")
+                face["neoforge_data"] = legacy
+    if "parent" in result:
+        result["parent"] = door_parent(result["parent"])
+    return result
+
+
+def translation_keys(vanilla_lang, resources):
+    """Subtitle lookup: vanilla English plus the pack's own language files."""
+    keys = set(vanilla_lang)
+    for path, data in resources.items():
+        parts = Path(path).parts
+        if (len(parts) == 4 and parts[:3] == ("assets", "buildscape", "lang")
+                and parts[3].endswith(".json") and isinstance(data, dict)):
+            keys.update(data)
+    return keys
+
+
+def prune_subtitles(generated, keys, report):
+    for rel, data in generated.items():
+        if rel.parts[0] != "assets" or rel.name != "sounds.json":
+            continue
+        for event, definition in data.items():
+            if "subtitle" in definition and definition["subtitle"] not in keys:
+                subtitle = definition.pop("subtitle")
+                report.append(str(rel) + ": " + event + ": dropped unknown subtitle " + str(subtitle))
+
+
 def objects(value):
     if isinstance(value, dict):
         yield value
@@ -417,6 +460,7 @@ def convert(source, output, jar, manifest=None):
         if json.loads(vanilla.read("version.json")).get("id") != "1.21.1":
             raise ValueError("Expected Minecraft 1.21.1 client jar")
         vanilla_files = set(vanilla.namelist())
+        vanilla_lang = json.loads(vanilla.read("assets/minecraft/lang/en_us.json"))
         for key, value in removed.items():
             name = value.split(":")[1]
             if not any("assets/minecraft/" + kind + "/" + name + ".json" in vanilla_files
@@ -462,8 +506,7 @@ def convert(source, output, jar, manifest=None):
                 elif "advancement" in rel.parts:
                     data = advancement(data)
                 elif "models" in rel.parts:
-                    if "parent" in data:
-                        data["parent"] = door_parent(data["parent"])
+                    data = model(data)
                 elif "lang" in rel.parts:
                     data = {k: v for k, v in data.items() if not any(
                         k in {"block." + old.replace(":", "."), "item." + old.replace(":", ".")}
@@ -495,17 +538,18 @@ def convert(source, output, jar, manifest=None):
             base = Path("assets/buildscape/models/block") / (rel.stem + "_bottom.json")
             if base not in generated and rel.stem.startswith("waxed_"):
                 base = base.with_name(rel.stem.removeprefix("waxed_") + "_bottom.json")
-            model = generated.get(base)
-            if model is None:
+            door_bottom = generated.get(base)
+            if door_bottom is None:
                 raise ValueError("Missing retained door template: " + str(base))
             for suffix, parent in models.items():
-                generated[base.with_name(rel.stem + "_" + suffix + ".json")] = dict(copy.deepcopy(model), parent=parent)
+                generated[base.with_name(rel.stem + "_" + suffix + ".json")] = dict(copy.deepcopy(door_bottom), parent=parent)
         for name in ("end_city_treasure", "woodland_mansion"):
             rel = Path("data/minecraft/loot_table/chests") / (name + ".json")
             if rel in generated:
                 bonuses = [pool for pool in generated[rel]["pools"] if "buildscape:" in json.dumps(pool)]
                 generated[rel] = json.loads(vanilla.read(rel.as_posix()))
                 generated[rel]["pools"].extend(bonuses)
+    prune_subtitles(generated, translation_keys(vanilla_lang, generated), report)
     prune_dependencies(generated, report)
     problems = [str(rel) + ": unsupported 1.21.1 loot function " + function
                 for rel, data in generated.items() if "loot_table" in rel.parts

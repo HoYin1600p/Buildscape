@@ -5,6 +5,7 @@ This does not replace registry bootstrap or Minecraft codec validation.
 """
 import argparse
 import json
+import math
 from pathlib import Path
 import sys
 import zipfile
@@ -18,6 +19,140 @@ objects, strings, namespaced, asset_path = (
 
 
 class Validator(shared.Validator):
+    @staticmethod
+    def number(value):
+        return isinstance(value, (int, float)) and not isinstance(value, bool) and math.isfinite(value)
+
+    def vector(self, path, value, size, label, bounds=None):
+        if (not isinstance(value, list) or len(value) != size
+                or not all(self.number(v) for v in value)):
+            self.error(path, label + " needs " + str(size) + " numbers")
+        elif bounds and any(v < bounds[0] or v > bounds[1] for v in value):
+            self.error(path, label + " outside " + str(bounds))
+
+    def model_fields(self, path, data):
+        """Check the strict BlockElement/Face/UV deserializer fields in 1.21.1."""
+        start = len(self.errors)
+        for obj in objects(data):
+            if "forge_data" in obj:
+                self.error(path, "forge_data should be replaced by neoforge_data")
+        elements = data.get("elements", [])
+        if not isinstance(elements, list):
+            self.error(path, "elements must be an array")
+            return False
+        for element in elements:
+            if not isinstance(element, dict):
+                self.error(path, "element must be an object")
+                continue
+            for field in ("from", "to"):
+                self.vector(path, element.get(field), 3, "element " + field, (-16, 32))
+            if "shade" in element and not isinstance(element["shade"], bool):
+                self.error(path, "element shade must be a boolean")
+            if "rotation" in element:
+                rotation = element["rotation"]
+                if not isinstance(rotation, dict):
+                    self.error(path, "element rotation must be an object")
+                else:
+                    if rotation.get("axis") not in ("x", "y", "z"):
+                        self.error(path, "element rotation needs axis x, y or z")
+                    angle = rotation.get("angle")
+                    if not self.number(angle) or angle not in (-45, -22.5, 0, 22.5, 45):
+                        self.error(path, "element rotation needs angle 0, +/-22.5 or +/-45")
+                    self.vector(path, rotation.get("origin"), 3, "element rotation origin")
+                    if "rescale" in rotation and not isinstance(rotation["rescale"], bool):
+                        self.error(path, "element rotation rescale must be a boolean")
+            faces = element.get("faces")
+            if not isinstance(faces, dict) or not 1 <= len(faces) <= 6:
+                self.error(path, "element needs 1 to 6 faces")
+                continue
+            for direction, face in faces.items():
+                if direction not in ("down", "up", "north", "south", "west", "east"):
+                    self.error(path, "invalid face direction " + direction)
+                if not isinstance(face, dict):
+                    self.error(path, "face must be an object")
+                    continue
+                if not isinstance(face.get("texture"), str):
+                    self.error(path, "face needs a texture string")
+                if "uv" in face:
+                    self.vector(path, face["uv"], 4, "face uv")
+                rotation = face.get("rotation", 0)
+                if not self.number(rotation) or rotation not in (0, 90, 180, 270):
+                    self.error(path, "face rotation must be 0, 90, 180 or 270")
+        textures = data.get("textures", {})
+        if not isinstance(textures, dict) or not all(isinstance(v, str) for v in textures.values()):
+            self.error(path, "1.21.1 textures must map names to strings")
+        overrides = data.get("overrides", [])
+        if not isinstance(overrides, list):
+            self.error(path, "overrides must be an array")
+        else:
+            for override in overrides:
+                if not isinstance(override, dict) or not isinstance(override.get("model"), str):
+                    self.error(path, "override needs a model string")
+                elif (not isinstance(override.get("predicate"), dict)
+                      or not all(self.number(v) for v in override["predicate"].values())):
+                    self.error(path, "override needs numeric predicates")
+        if "parent" in data and not isinstance(data["parent"], str):
+            self.error(path, "parent must be a string")
+        return len(self.errors) == start
+
+    def blockstate_fields(self, path, data):
+        def variant(value):
+            if isinstance(value, list):
+                if not value:
+                    self.error(path, "variant alternatives must not be empty")
+                for child in value:
+                    if isinstance(child, dict):
+                        variant(child)
+                    else:
+                        self.error(path, "variant must be an object")
+                return
+            if not isinstance(value, dict):
+                self.error(path, "variant must be an object")
+                return
+            if not isinstance(value.get("model"), str):
+                self.error(path, "variant needs a model string")
+            for axis in ("x", "y"):
+                angle = value.get(axis, 0)
+                if not self.number(angle) or angle % 90 != 0:
+                    self.error(path, "variant " + axis + " must be a multiple of 90")
+            weight = value.get("weight", 1)
+            if not isinstance(weight, int) or isinstance(weight, bool) or weight < 1:
+                self.error(path, "variant weight must be a positive integer")
+            if "uvlock" in value and not isinstance(value["uvlock"], bool):
+                self.error(path, "variant uvlock must be a boolean")
+
+        if "variants" in data:
+            if not isinstance(data["variants"], dict):
+                self.error(path, "variants must be an object")
+            else:
+                for value in data["variants"].values():
+                    variant(value)
+        if "multipart" in data:
+            if not isinstance(data["multipart"], list):
+                self.error(path, "multipart must be an array")
+            else:
+                for part in data["multipart"]:
+                    if not isinstance(part, dict) or "apply" not in part:
+                        self.error(path, "multipart entry needs apply")
+                    else:
+                        variant(part["apply"])
+
+    def sounds(self):
+        keys = c.translation_keys(self.get_vanilla("assets/minecraft/lang/en_us.json"), self.json)
+        for path, data in self.json.items():
+            if not path.startswith("assets/") or not path.endswith("/sounds.json"):
+                continue
+            if not isinstance(data, dict):
+                self.error(path, "sounds must be an object")
+                continue
+            for event, definition in data.items():
+                if not isinstance(definition, dict):
+                    self.error(path, event + ": sound event must be an object")
+                elif "subtitle" in definition:
+                    subtitle = definition["subtitle"]
+                    if not isinstance(subtitle, str) or subtitle not in keys:
+                        self.error(path, event + ": unknown subtitle " + repr(subtitle))
+
     def registry_id(self, kind, value):
         if kind == "item":
             if not isinstance(value, str) or not shared.ID.fullmatch(value):
@@ -63,12 +198,15 @@ class Validator(shared.Validator):
                 if not isinstance(data, dict) or not ("variants" in data or "multipart" in data):
                     self.error(path, "expected variants or multipart")
                     continue
+                self.blockstate_fields(path, data)
                 for obj in objects(data):
                     if "model" in obj and self.reference(path, obj["model"], "models"):
                         self.concrete_models.add(namespaced(obj["model"]))
             if "/models/" in path:
                 if not isinstance(data, dict):
                     self.error(path, "model must be an object")
+                    continue
+                if not self.model_fields(path, data):
                     continue
                 parent = data.get("parent")
                 if parent and namespaced(parent) not in shared.BUILTINS | {"minecraft:builtin/entity"}:
@@ -82,7 +220,26 @@ class Validator(shared.Validator):
                     ns, name = path.split("/")[1], path.split("/models/", 1)[1][:-5]
                     self.concrete_models.add(ns + ":" + name)
         for value in sorted(self.concrete_models):
-            self.textures(asset_path(value, "models"), self.merged_model(value), True)
+            path = asset_path(value, "models")
+            # The shared merge assumes well-formed parent and texture fields.
+            # Diagnose malformed ancestors before they can raise TypeError.
+            ancestor, seen, valid = value, set(), True
+            while ancestor:
+                ancestor = namespaced(ancestor)
+                if ancestor in seen or ancestor in shared.BUILTINS | {"minecraft:builtin/entity"}:
+                    break
+                seen.add(ancestor)
+                ancestor_path = asset_path(ancestor, "models")
+                data = self.get(ancestor_path)
+                if not isinstance(data, dict) or not self.model_fields(ancestor_path, data):
+                    valid = False
+                    break
+                ancestor = data.get("parent")
+            if not valid:
+                continue
+            merged = self.merged_model(value)
+            if self.model_fields(path, merged):
+                self.textures(path, merged, True)
 
     def ingredient(self, path, value):
         if isinstance(value, list):
@@ -136,6 +293,7 @@ class Validator(shared.Validator):
         if self.json.get("pack.mcmeta") != c.PACK:
             self.error("pack.mcmeta", "expected resource 34 / data 48 supported range")
         self.models()
+        self.sounds()
         removed = c.removals()
         files = {Path(path) for path in self.files} | {Path(path) for path in self.jar_files}
         for path, data in self.json.items():

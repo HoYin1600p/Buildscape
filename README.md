@@ -2,6 +2,10 @@
 
 Buildscape shares gameplay code across VersionClusters and uses loader-specific adapters.
 
+Every loader uses the single `mod_version=4.0.3` key in `gradle.properties`
+for its jar version and loader metadata. Update that key to change the version
+across all VersionClusters.
+
 ## Build
 
 Run the repository's Gradle 9.6 wrapper on JDK 25. Have a Java 17 toolchain
@@ -43,7 +47,7 @@ The [parity harness](tools/parity-dumper/README.md) is a separate opt-in,
 test-only build and is never included in production jars.
 
 Fabric 1.18.2 server support is opt-in. It uses Fabric Loader 0.16.14,
-Fabric API 0.77.0+1.18.2 and the same Java 17 toolchain and v118x version
+Fabric API 0.77.0+1.18.2 and the same Java 17 toolchain and unified mod version
 as Forge. After caching the Fabric dependencies, build its intermediary
 release jar with:
 

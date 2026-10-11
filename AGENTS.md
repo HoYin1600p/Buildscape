@@ -42,6 +42,8 @@ This file is automatically loaded by AI coding assistants (Antigravity, Codex, C
 
 ## 3. Execution & Verification Standards
 
+- **Unified Mod Version:**
+  - Every loader's jar and metadata version comes from `mod_version` in the root `gradle.properties` (currently `4.0.3`). Do not introduce per-cluster version keys or hardcode loader metadata versions.
 - **Offline Gradle Execution:**
   - Always append `--offline --console=plain` to every `./gradlew` command.
 - **Default Build (Milestone 1):**

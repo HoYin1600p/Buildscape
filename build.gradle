@@ -19,7 +19,7 @@ subprojects {
         apply plugin: 'java'
         apply plugin: 'idea'
         group = 'com.kingodogo.buildscape'
-        version = findProperty('mod_version') ?: '1.0.0'
+        version = providers.gradleProperty('mod_version').get()
 
         java.toolchain.languageVersion = JavaLanguageVersion.of(25)
         repositories {
@@ -34,6 +34,15 @@ subprojects {
         }
         if (path != ':common') {
             base.archivesName = "buildscape-${parent.name}-${name}"
+            // These loaders already expand metadata in their module build scripts.
+            if (!(path in [':forge:1.18.2', ':fabric:1.18.2', ':neoforge:1.21.1'])) {
+                tasks.named('processResources', ProcessResources) {
+                    inputs.property('mod_version', project.version)
+                    filesMatching(['fabric.mod.json', 'META-INF/mods.toml', 'META-INF/neoforge.mods.toml']) {
+                        expand(mod_version: project.version, version: project.version)
+                    }
+                }
+            }
         }
     }
 }

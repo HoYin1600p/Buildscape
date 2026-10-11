@@ -77,7 +77,7 @@ public final class BuildscapeFabricClient implements ClientModInitializer {
             }
         });
         ModKeyBinds.register(KeyBindingHelper::registerKeyBinding);
-        GuiProvider.registerMenuScreens();
+        GuiProvider.registerMenuScreens(com.kingodogo.buildscape.platform.FabricPlatformAdapter.menuScreenRegistrar());
         ClientEvents.initializeConfigCallback();
         for (Block block : Registry.BLOCK) {
             ResourceLocation id = Registry.BLOCK.getKey(block);

@@ -7,6 +7,9 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.material.Fluid;
 public interface IPlatformAdapter {
+    <T extends net.minecraft.world.inventory.AbstractContainerMenu> net.minecraft.world.inventory.MenuType<T>
+    createMenuType(com.kingodogo.buildscape.menu.MenuTypeBridge.MenuFactory<T> factory);
+
     /** Cluster content supplements the shared registrations; most clusters need none. */
     default java.util.Map<String, net.minecraft.world.level.block.entity.BlockEntityType<?>>
     createClusterBlockEntityTypes(java.util.Map<String, Block> blocks) {

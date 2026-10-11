@@ -23,6 +23,8 @@ import com.kingodogo.buildscape.platform.Services;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Minecraft;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.client.model.HierarchicalModel;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.ModelPart;
@@ -151,63 +153,17 @@ public final class RenderFactory {
         };
     }
 
-    @SuppressWarnings("unchecked")
     public static void registerRenderers() {
-        try {
-            java.lang.reflect.Field beField = net.minecraft.client.renderer.blockentity.BlockEntityRenderers.class.getDeclaredField("PROVIDERS");
-            beField.setAccessible(true);
-            java.util.Map<net.minecraft.world.level.block.entity.BlockEntityType<?>, Object> beProviders =
-                    (java.util.Map<net.minecraft.world.level.block.entity.BlockEntityType<?>, Object>) beField.get(null);
-
-            PillarBlockEntityRenderer pillarRenderer = new PillarBlockEntityRenderer();
-            beProviders.put(ModBlockEntities.PILLAR_TYPE, (net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider) context ->
-                    (be, pt, ps, bs, cl, co) -> pillarRenderer.render((com.kingodogo.buildscape.block.PillarBlockEntity) be, pt, ps, bs, cl, co));
-            beProviders.put(ModBlockEntities.HOLLOW_LOG_TYPE, (net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider) context ->
-                    (be, pt, ps, bs, cl, co) -> HollowLogBlockEntityRenderer.render((com.kingodogo.buildscape.block.HollowLogBlockEntity) be, pt, ps, bs, cl, co));
-            beProviders.put(ModBlockEntities.SHELF_TYPE, (net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider) context ->
-                    (be, pt, ps, bs, cl, co) -> ShelfRenderer.render((com.kingodogo.buildscape.block.ShelfBlockEntity) be, pt, ps, bs, cl, co));
-            beProviders.put(ModBlockEntities.FESTIVE_STOCKING_TYPE, (net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider) context ->
-                    (be, pt, ps, bs, cl, co) -> FestiveStockingBlockEntityRenderer.render((com.kingodogo.buildscape.block.FestiveStockingBlockEntity) be, pt, ps, bs, cl, co));
-            beProviders.put(ModBlockEntities.GLASS_JAR_TYPE, (net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider) context ->
-                    (be, pt, ps, bs, cl, co) -> GlassJarBlockEntityRenderer.render((com.kingodogo.buildscape.block.GlassJarBlockEntity) be, pt, ps, bs, cl, co));
-            beProviders.put(ModBlockEntities.ICICLE_CAULDRON_TYPE, (net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider) context ->
-                    (be, pt, ps, bs, cl, co) -> IcicleCauldronBlockEntityRenderer.render((com.kingodogo.buildscape.block.IcicleCauldronBlockEntity) be, pt, ps, bs, cl, co));
-            beProviders.put(ModBlockEntities.DECORATED_POT_TYPE, (net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider) context ->
-                    (be, pt, ps, bs, cl, co) -> DecoratedPotBlockEntityRenderer.render((com.kingodogo.buildscape.block.DecoratedPotBlockEntity) be, pt, ps, bs, cl, co));
-            beProviders.put(ModBlockEntities.TRAPPED_DECORATED_POT_TYPE, (net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider) context ->
-                    (be, pt, ps, bs, cl, co) -> TrappedDecoratedPotBlockEntityRenderer.render((com.kingodogo.buildscape.block.TrappedDecoratedPotBlockEntity) be, pt, ps, bs, cl, co));
-
-            java.lang.reflect.Field eField = net.minecraft.client.renderer.entity.EntityRenderers.class.getDeclaredField("PROVIDERS");
-            eField.setAccessible(true);
-            java.util.Map<net.minecraft.world.entity.EntityType<?>, Object> eProviders =
-                    (java.util.Map<net.minecraft.world.entity.EntityType<?>, Object>) eField.get(null);
-
-            var homemakerType = (EntityType<WanderingTrader>) Services.PLATFORM.getWanderingHomemakerEntityType();
-            if (homemakerType != null) {
-                eProviders.put(homemakerType, (net.minecraft.client.renderer.entity.EntityRendererProvider) context ->
-                        new MobRenderer<WanderingTrader, WanderingHomemakerModel<WanderingTrader>>(
-                                context, new WanderingHomemakerModel<>(context.bakeLayer(HOMEMAKER_LAYER)), 0.5F) {
-                            @Override
-                            public ResourceLocation getTextureLocation(WanderingTrader entity) {
-                                return HOMEMAKER_TEXTURE;
-                            }
-                        }
-                );
+        registerRenderers(new Registrar() {
+            public <T extends BlockEntity> void registerBlockEntity(BlockEntityType<T> type,
+                    net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider<T> provider) {
+                com.kingodogo.buildscape.mixin.BlockEntityRenderersV118xInvoker.buildscape$register(type, provider);
             }
-
-            var festiveType = (EntityType<WanderingTrader>) Services.PLATFORM.getFestiveWanderingHomemakerEntityType();
-            if (festiveType != null) {
-                eProviders.put(festiveType, (net.minecraft.client.renderer.entity.EntityRendererProvider) context ->
-                        new MobRenderer<WanderingTrader, WanderingHomemakerModel<WanderingTrader>>(
-                                context, new WanderingHomemakerModel<>(context.bakeLayer(HOMEMAKER_LAYER)), 0.5F) {
-                            @Override
-                            public ResourceLocation getTextureLocation(WanderingTrader entity) {
-                                return FESTIVE_HOMEMAKER_TEXTURE;
-                            }
-                        }
-                );
+            public <T extends Entity> void registerEntity(EntityType<T> type,
+                    net.minecraft.client.renderer.entity.EntityRendererProvider<T> provider) {
+                com.kingodogo.buildscape.mixin.EntityRenderersV118xInvoker.buildscape$register(type, provider);
             }
-        } catch (Throwable ignored) {}
+        });
     }
 
     public static void renderEntity(Entity entity, double x, double y, double z, float yaw, float partialTicks, PoseStack poseStack, Object bufferSource, int packedLight) {

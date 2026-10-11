@@ -41,7 +41,7 @@ public final class BuildscapeForgeClient {
             net.minecraftforge.client.MinecraftForgeClient.registerTooltipComponentFactory(
                     com.kingodogo.buildscape.client.tooltip.ShulkerBoxTooltipData.class,
                     com.kingodogo.buildscape.adapter.v118x.client.ShulkerTooltipComponent::new);
-            GuiProvider.registerMenuScreens();
+            GuiProvider.registerMenuScreens(com.kingodogo.buildscape.platform.ForgePlatformAdapter.menuScreenRegistrar());
             com.kingodogo.buildscape.adapter.v118x.client.FoliageColors.register(
                     Minecraft.getInstance().getBlockColors(), Minecraft.getInstance().getItemColors());
             ItemBlockRenderTypes.setRenderLayer(com.kingodogo.buildscape.fluid.ForgeExperienceFluids.EXPERIENCE_STILL.get(), net.minecraft.client.renderer.RenderType.translucent());

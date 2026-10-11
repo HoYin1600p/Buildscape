@@ -2,9 +2,7 @@ package com.kingodogo.buildscape.adapter.v118x;
 
 import com.kingodogo.buildscape.particle.ModParticles;
 import com.kingodogo.buildscape.particle.PillarSparkleParticleLogic;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.FlameParticle;
-import net.minecraft.client.particle.ParticleEngine;
 import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.client.particle.ParticleRenderType;
 import net.minecraft.client.particle.SpriteSet;
@@ -13,8 +11,6 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
 
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
 import java.util.function.Function;
 
 public final class ParticleFactory {
@@ -27,70 +23,6 @@ public final class ParticleFactory {
     public interface Registrar {
         <T extends ParticleOptions> void register(ParticleType<T> type, Function<SpriteSet, ParticleProvider<T>> factory);
         <T extends ParticleOptions> void registerDirect(ParticleType<T> type, ParticleProvider<T> provider);
-    }
-
-    @SuppressWarnings("unchecked")
-    private static <T extends ParticleOptions> void register(
-            ParticleType<T> type,
-            Function<SpriteSet, ParticleProvider<T>> factory) {
-        try {
-            Class<?> spriteRegClass = Class.forName("net.minecraft.client.particle.ParticleEngine$SpriteParticleRegistration");
-            Object proxy = Proxy.newProxyInstance(
-                    spriteRegClass.getClassLoader(),
-                    new Class<?>[]{spriteRegClass},
-                    (p, method, args) -> {
-                        if ("create".equals(method.getName())) {
-                            return factory.apply((SpriteSet) args[0]);
-                        }
-                        return null;
-                    }
-            );
-            ParticleEngine pe = Minecraft.getInstance().particleEngine;
-            Method m = ParticleEngine.class.getDeclaredMethod("register", ParticleType.class, spriteRegClass);
-            m.setAccessible(true);
-            m.invoke(pe, type, proxy);
-        } catch (Throwable t) {
-            try {
-                for (Method m : ParticleEngine.class.getMethods()) {
-                    if ("register".equals(m.getName()) && m.getParameterCount() == 2) {
-                        m.invoke(Minecraft.getInstance().particleEngine, type, factory);
-                        return;
-                    }
-                }
-            } catch (Throwable ignored) {}
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    private static <T extends ParticleOptions> void registerDirect(
-            ParticleType<T> type,
-            ParticleProvider<T> provider) {
-        try {
-            ParticleEngine pe = Minecraft.getInstance().particleEngine;
-            Method m = ParticleEngine.class.getDeclaredMethod("register", ParticleType.class, ParticleProvider.class);
-            m.setAccessible(true);
-            m.invoke(pe, type, provider);
-        } catch (Throwable t) {
-            try {
-                for (Method m : ParticleEngine.class.getMethods()) {
-                    if ("register".equals(m.getName()) && m.getParameterCount() == 2) {
-                        m.invoke(Minecraft.getInstance().particleEngine, type, provider);
-                        return;
-                    }
-                }
-            } catch (Throwable ignored) {}
-        }
-    }
-
-    public static void registerProviders() {
-        registerProviders(new Registrar() {
-            public <T extends ParticleOptions> void register(ParticleType<T> type, Function<SpriteSet, ParticleProvider<T>> factory) {
-                ParticleFactory.register(type, factory);
-            }
-            public <T extends ParticleOptions> void registerDirect(ParticleType<T> type, ParticleProvider<T> provider) {
-                ParticleFactory.registerDirect(type, provider);
-            }
-        });
     }
 
     public static void registerProviders(Registrar registrar) {

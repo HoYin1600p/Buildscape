@@ -194,23 +194,7 @@ public class BlockFactory implements IBlockFactory {
         }
 
         private static WoodType createRegistered(String name) {
-            // WoodType.register is private on the vanilla shared classpath; the
-            // reference Forge access transformer does not apply here. Locate it
-            // by signature so this also works with production's remapped names.
-            for (java.lang.reflect.Method method : WoodType.class.getDeclaredMethods()) {
-                if (java.lang.reflect.Modifier.isStatic(method.getModifiers())
-                        && method.getReturnType() == WoodType.class
-                        && method.getParameterCount() == 1
-                        && method.getParameterTypes()[0] == WoodType.class) {
-                    try {
-                        method.setAccessible(true);
-                        return (WoodType) method.invoke(null, new CustomWoodType(name));
-                    } catch (ReflectiveOperationException exception) {
-                        throw new IllegalStateException("Cannot register sign wood type " + name, exception);
-                    }
-                }
-            }
-            throw new IllegalStateException("Cannot find WoodType registration method for " + name);
+            return com.kingodogo.buildscape.mixin.WoodTypeV118xInvoker.buildscape$register(new CustomWoodType(name));
         }
     }
     // Block setup initializes this factory before the client builds its sign models.

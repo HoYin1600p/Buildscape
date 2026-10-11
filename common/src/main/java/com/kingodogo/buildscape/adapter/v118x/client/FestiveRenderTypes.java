@@ -11,33 +11,15 @@ public class FestiveRenderTypes extends RenderType {
 
     public static final ResourceLocation FESTIVE_GLINT_LOCATION = new ResourceLocation("buildscape", "textures/misc/festive_glint.png");
 
-    private static final java.lang.reflect.Method CREATE_RENDER_TYPE = findCreateRenderType();
-
-    // Vanilla's seven-argument factory and its return class are private/package-private.
-    // Match the signature instead of a method name so this also works after SRG remapping.
-    private static java.lang.reflect.Method findCreateRenderType() {
-        Class<?>[] parameters = {String.class, VertexFormat.class, VertexFormat.Mode.class,
-                int.class, boolean.class, boolean.class, RenderType.CompositeState.class};
-        for (java.lang.reflect.Method method : RenderType.class.getDeclaredMethods()) {
-            if (java.lang.reflect.Modifier.isStatic(method.getModifiers())
-                    && RenderType.class.isAssignableFrom(method.getReturnType())
-                    && java.util.Arrays.equals(parameters, method.getParameterTypes())) {
-                method.setAccessible(true);
-                return method;
-            }
-        }
-        throw new IllegalStateException("Vanilla render type factory was not found");
-    }
-
     private static RenderType createFestive(String name, VertexFormat format, VertexFormat.Mode mode,
                                             int bufferSize, boolean affectsCrumbling, boolean sortOnUpload,
                                             RenderType.CompositeState state) {
-        try {
-            return (RenderType) CREATE_RENDER_TYPE.invoke(null, name, format, mode, bufferSize,
-                    affectsCrumbling, sortOnUpload, state);
-        } catch (ReflectiveOperationException exception) {
-            throw new IllegalStateException("Could not create festive render type " + name, exception);
-        }
+        // These glint states do not participate in outlines. Use RenderType's compiled
+        // constructor and the same ordered state setup/clear as CompositeRenderType.
+        var states = ((com.kingodogo.buildscape.mixin.RenderCompositeStateV118xAccessor) (Object) state).buildscape$getStates();
+        return new FestiveRenderTypes(name, format, mode, bufferSize, affectsCrumbling, sortOnUpload,
+                () -> states.forEach(RenderStateShard::setupRenderState),
+                () -> states.forEach(RenderStateShard::clearRenderState));
     }
 
     private static final RenderType FESTIVE_GLINT = createFestive(

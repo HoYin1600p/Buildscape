@@ -322,16 +322,8 @@ public class MixinFactory implements IMixinFactory {
     @Override
     public ItemStack getThrownTridentItem(Object thrownTrident) {
         if (thrownTrident instanceof net.minecraft.world.entity.projectile.ThrownTrident trident) {
-            try {
-                for (java.lang.reflect.Field f : net.minecraft.world.entity.projectile.ThrownTrident.class.getDeclaredFields()) {
-                    if (f.getType() == ItemStack.class) {
-                        f.setAccessible(true);
-                        ItemStack res = (ItemStack) f.get(trident);
-                        if (res != null && !res.isEmpty()) return res;
-                    }
-                }
-            } catch (Throwable ignored) {
-            }
+            ItemStack res = ((com.kingodogo.buildscape.mixin.ThrownTridentAccessor) trident).getTridentItem();
+            if (res != null && !res.isEmpty()) return res;
             return new ItemStack(net.minecraft.world.item.Items.TRIDENT);
         }
         return ItemStack.EMPTY;

@@ -80,6 +80,70 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 public abstract class PlatformAdapterBase implements IPlatformAdapter, com.kingodogo.buildscape.world.GameRuleAccess {
+    @Override
+    public <T extends net.minecraft.world.inventory.AbstractContainerMenu> net.minecraft.world.inventory.MenuType<T>
+    createMenuType(com.kingodogo.buildscape.menu.MenuTypeBridge.MenuFactory<T> factory) {
+        return LegacyMenuTypes.create(factory);
+    }
+
+    // Preserve this cluster's existing feature-flag constructor behavior.
+    private static final class LegacyMenuTypes {
+        private static final java.lang.reflect.Constructor<?> CONSTRUCTOR;
+        private static final Class<?> SUPPLIER_CLASS;
+        private static final Object FEATURE_FLAGS;
+    
+        static {
+            try {
+                Class<?> supplierClass = null;
+                for (Class<?> inner : net.minecraft.world.inventory.MenuType.class.getDeclaredClasses()) {
+                    if (inner.getSimpleName().equals("MenuSupplier")) {
+                        supplierClass = inner;
+                        break;
+                    }
+                }
+                SUPPLIER_CLASS = supplierClass;
+    
+                java.lang.reflect.Constructor<?> ctor = null;
+                Object flags = null;
+                try {
+                    Class<?> flagsClass = Class.forName("net.minecraft.world.flag.FeatureFlagSet");
+                    Class<?> featuresClass = Class.forName("net.minecraft.world.flag.FeatureFlags");
+                    java.lang.reflect.Field vanillaSetField = featuresClass.getField("VANILLA_SET");
+                    flags = vanillaSetField.get(null);
+                    ctor = net.minecraft.world.inventory.MenuType.class.getDeclaredConstructor(SUPPLIER_CLASS, flagsClass);
+                } catch (ClassNotFoundException ignored) {
+                    ctor = net.minecraft.world.inventory.MenuType.class.getDeclaredConstructor(SUPPLIER_CLASS);
+                }
+                CONSTRUCTOR = ctor;
+                CONSTRUCTOR.setAccessible(true);
+                FEATURE_FLAGS = flags;
+            } catch (Exception e) {
+                throw new RuntimeException("Failed to access MenuType constructor", e);
+            }
+        }
+        @SuppressWarnings("unchecked")
+        public static <T extends net.minecraft.world.inventory.AbstractContainerMenu> net.minecraft.world.inventory.MenuType<T> create(com.kingodogo.buildscape.menu.MenuTypeBridge.MenuFactory<T> factory) {
+            try {
+                Object supplierProxy = java.lang.reflect.Proxy.newProxyInstance(
+                        net.minecraft.world.inventory.MenuType.class.getClassLoader(),
+                        new Class<?>[]{SUPPLIER_CLASS},
+                        (proxy, method, args) -> {
+                            if ("create".equals(method.getName())) {
+                                return factory.create((Integer) args[0], (net.minecraft.world.entity.player.Inventory) args[1]);
+                            }
+                            return null;
+                        });
+                if (FEATURE_FLAGS != null) {
+                    return (net.minecraft.world.inventory.MenuType<T>) CONSTRUCTOR.newInstance(supplierProxy, FEATURE_FLAGS);
+                } else {
+                    return (net.minecraft.world.inventory.MenuType<T>) CONSTRUCTOR.newInstance(supplierProxy);
+                }
+            } catch (Exception e) {
+                throw new RuntimeException("Failed to create MenuType", e);
+            }
+        }
+    }
+
     @Override public boolean isReplaceable(net.minecraft.world.level.block.state.BlockState state) { return state.canBeReplaced(); }
     @Override public boolean isGlassBlock(net.minecraft.world.level.block.Block block) { return block == net.minecraft.world.level.block.Blocks.GLASS || block instanceof net.minecraft.world.level.block.StainedGlassBlock || block instanceof net.minecraft.world.level.block.TintedGlassBlock; }
     @Override

@@ -134,22 +134,7 @@ public final class MixinClientHooks {
     }
 
     private static void addWidgetToScreen(net.minecraft.client.gui.screens.Screen screen, AbstractWidget widget) {
-        try {
-            for (java.lang.reflect.Method m : net.minecraft.client.gui.screens.Screen.class.getDeclaredMethods()) {
-                if (m.getParameterCount() == 1 && (m.getName().equals("addRenderableWidget") || m.getName().equals("m_142416_"))) {
-                    m.setAccessible(true);
-                    m.invoke(screen, widget);
-                    return;
-                }
-            }
-            for (java.lang.reflect.Field f : net.minecraft.client.gui.screens.Screen.class.getDeclaredFields()) {
-                if (java.util.List.class.isAssignableFrom(f.getType())) {
-                    f.setAccessible(true);
-                    java.util.List list = (java.util.List) f.get(screen);
-                    if (list != null) list.add(widget);
-                }
-            }
-        } catch (Throwable ignored) {}
+        ((com.kingodogo.buildscape.mixin.ScreenV118xInvoker) screen).buildscape$addRenderableWidget(widget);
     }
 
     public void addPauseScreenButton(PauseScreen screen, int width, int height, List<? extends GuiEventListener> children) {
@@ -244,35 +229,14 @@ public final class MixinClientHooks {
         long gameTime = blockEntity.getLevel().getGameTime();
         List<BeaconBlockEntity.BeaconBeamSection> sections = blockEntity.getBeamSections();
         int yOffset = 0;
-        try {
-            java.lang.reflect.Method targetMethod = null;
-            for (java.lang.reflect.Method m : net.minecraft.client.renderer.blockentity.BeaconRenderer.class.getDeclaredMethods()) {
-                if (m.getParameterCount() == 7 && m.getParameterTypes()[0] == PoseStack.class) {
-                    m.setAccessible(true);
-                    targetMethod = m;
-                    break;
-                }
-            }
-            if (targetMethod != null) {
-                for (BeaconBlockEntity.BeaconBeamSection section : sections) {
-                    int remaining = cutoff - yOffset;
-                    if (remaining <= 0) break;
-
-                    int sectionHeight = section.getHeight();
-                    targetMethod.invoke(
-                            null,
-                            poseStack,
-                            bufferSource,
-                            partialTicks,
-                            gameTime,
-                            yOffset,
-                            Math.min(sectionHeight, remaining),
-                            section.getColor()
-                    );
-                    yOffset += sectionHeight;
-                }
-            }
-        } catch (Throwable ignored) {
+        for (BeaconBlockEntity.BeaconBeamSection section : sections) {
+            int remaining = cutoff - yOffset;
+            if (remaining <= 0) break;
+            int sectionHeight = section.getHeight();
+            com.kingodogo.buildscape.mixin.BeaconRendererInvoker.invokeRenderBeaconBeam(
+                    poseStack, bufferSource, partialTicks, gameTime, yOffset,
+                    Math.min(sectionHeight, remaining), section.getColor());
+            yOffset += sectionHeight;
         }
     }
 
@@ -310,12 +274,7 @@ public final class MixinClientHooks {
             AnvilMenu menu = screen.getMenu();
             if (menu.getCost() == 0 && menu.getSlot(2).hasItem()) {
                 Font font = Minecraft.getInstance().font;
-                int imageWidth = 176;
-                try {
-                    java.lang.reflect.Field f = net.minecraft.client.gui.screens.inventory.AbstractContainerScreen.class.getDeclaredField("imageWidth");
-                    f.setAccessible(true);
-                    imageWidth = f.getInt(screen);
-                } catch (Throwable ignored) {}
+                int imageWidth = ((com.kingodogo.buildscape.mixin.ContainerScreenV118xAccessor) screen).buildscape$getImageWidth();
                 Component component = new TranslatableComponent("container.repair.cost", 0);
                 int k = imageWidth - 8 - font.width(component) - 2;
                 GuiComponentBridge.fill(ps, k - 2, 67, imageWidth - 8, 79, 0x4F000000);
@@ -695,17 +654,9 @@ public final class MixinClientHooks {
     public void onModelBakeryDetectCustomGeometry(Object locationObj, Object modelObj) {
         if (locationObj instanceof ResourceLocation location && modelObj instanceof net.minecraft.client.renderer.block.model.BlockModel model) {
             if ("buildscape".equals(location.getNamespace())) {
-                try {
-                    java.lang.reflect.Field customDataField = model.getClass().getDeclaredField("customData");
-                    customDataField.setAccessible(true);
-                    Object customData = customDataField.get(model);
-                    if (customData != null) {
-                        java.lang.reflect.Method hasCustom = customData.getClass().getMethod("hasCustomGeometry");
-                        if ((boolean) hasCustom.invoke(customData)) {
-                            buildscape$hasCustomGeometry = true;
-                        }
-                    }
-                } catch (Throwable ignored) {
+                if (model instanceof com.kingodogo.buildscape.adapter.v118x.client.CustomGeometryAccess access
+                        && access.buildscape$hasCustomGeometry()) {
+                    buildscape$hasCustomGeometry = true;
                 }
             }
         }
@@ -731,32 +682,25 @@ public final class MixinClientHooks {
 
         try {
             ModelBakery bakery = (ModelBakery) bakeryObj;
-            java.lang.reflect.Field topLevelField = ModelBakery.class.getDeclaredField("topLevelModels");
-            topLevelField.setAccessible(true);
-            Map<ResourceLocation, ?> topLevelModels = (Map<ResourceLocation, ?>) topLevelField.get(bakery);
+            var access = (com.kingodogo.buildscape.mixin.ModelBakeryV118xAccessor) bakery;
+            Map<ResourceLocation, ?> topLevelModels = access.buildscape$getTopLevelModels();
 
             List<ResourceLocation> candidates = topLevelModels.keySet().stream()
                     .filter(location -> "buildscape".equals(location.getNamespace()))
                     .toList();
             if (candidates.isEmpty()) return;
 
-            java.lang.reflect.Field bakedCacheField = ModelBakery.class.getDeclaredField("bakedCache");
-            bakedCacheField.setAccessible(true);
-            Map<?, ?> origCache = (Map<?, ?>) bakedCacheField.get(bakery);
-            Map newCache = new java.util.concurrent.ConcurrentHashMap<>(origCache);
-            bakedCacheField.set(bakery, newCache);
+            Map<?, ?> origCache = access.buildscape$getBakedCache();
+            access.buildscape$setBakedCache(new java.util.concurrent.ConcurrentHashMap<>(origCache));
 
             long startedAt = System.nanoTime();
             java.util.Set<ResourceLocation> completed = java.util.concurrent.ConcurrentHashMap.newKeySet();
             java.util.concurrent.atomic.AtomicInteger fallbackCount = new java.util.concurrent.atomic.AtomicInteger();
 
-            java.lang.reflect.Method bakeMethod = ModelBakery.class.getDeclaredMethod("bake", ResourceLocation.class, net.minecraft.client.resources.model.ModelState.class);
-            bakeMethod.setAccessible(true);
-
             com.kingodogo.buildscape.client.performance.BuildscapeStartupWork.forEachIndex(candidates.size(), index -> {
                 ResourceLocation location = candidates.get(index);
                 try {
-                    Object bakedModel = bakeMethod.invoke(bakery, location, net.minecraft.client.resources.model.BlockModelRotation.X0_Y0);
+                    Object bakedModel = bakery.bake(location, net.minecraft.client.resources.model.BlockModelRotation.X0_Y0);
                     if (bakedModel != null) {
                         completed.add(location);
                     } else {
@@ -829,20 +773,11 @@ public final class MixinClientHooks {
     public void handleFireworkStarterTick(Object starterObj) {
         if (!(starterObj instanceof net.minecraft.client.particle.Particle particle)) return;
         try {
-            java.lang.reflect.Field ageField = net.minecraft.client.particle.Particle.class.getDeclaredField("age");
-            ageField.setAccessible(true);
-            int age = ageField.getInt(particle);
-            if (age != 0) return;
-
-            java.lang.reflect.Field explosionsField = starterObj.getClass().getDeclaredField("explosions");
-            explosionsField.setAccessible(true);
-            net.minecraft.nbt.ListTag explosions = (net.minecraft.nbt.ListTag) explosionsField.get(starterObj);
+            var particleAccess = (com.kingodogo.buildscape.mixin.ParticleV118xAccessor) particle;
+            if (particleAccess.buildscape$getAge() != 0) return;
+            if (!(starterObj instanceof com.kingodogo.buildscape.mixin.FireworkStarterV118xAccessor starter)) return;
+            net.minecraft.nbt.ListTag explosions = starter.buildscape$getExplosions();
             if (explosions == null || explosions.isEmpty()) return;
-
-            java.lang.reflect.Method createParticleMethod = starterObj.getClass().getDeclaredMethod("createParticle",
-                    double.class, double.class, double.class, double.class, double.class, double.class,
-                    int[].class, int[].class, boolean.class, boolean.class);
-            createParticleMethod.setAccessible(true);
 
             net.minecraft.nbt.ListTag vanillaExplosions = new net.minecraft.nbt.ListTag();
 
@@ -859,25 +794,11 @@ public final class MixinClientHooks {
                         int[] colors = tag.getIntArray("Colors");
                         int[] fadeColors = tag.getIntArray("FadeColors");
 
-                        java.lang.reflect.Field xField = net.minecraft.client.particle.Particle.class.getDeclaredField("x");
-                        xField.setAccessible(true);
-                        double pxVal = xField.getDouble(particle);
-
-                        java.lang.reflect.Field yField = net.minecraft.client.particle.Particle.class.getDeclaredField("y");
-                        yField.setAccessible(true);
-                        double pyVal = yField.getDouble(particle);
-
-                        java.lang.reflect.Field zField = net.minecraft.client.particle.Particle.class.getDeclaredField("z");
-                        zField.setAccessible(true);
-                        double pzVal = zField.getDouble(particle);
-
-                        java.lang.reflect.Field xdField = net.minecraft.client.particle.Particle.class.getDeclaredField("xd");
-                        xdField.setAccessible(true);
-                        double pxdVal = xdField.getDouble(particle);
-
-                        java.lang.reflect.Field zdField = net.minecraft.client.particle.Particle.class.getDeclaredField("zd");
-                        zdField.setAccessible(true);
-                        double pzdVal = zdField.getDouble(particle);
+                        double pxVal = particleAccess.buildscape$getX();
+                        double pyVal = particleAccess.buildscape$getY();
+                        double pzVal = particleAccess.buildscape$getZ();
+                        double pxdVal = particleAccess.buildscape$getXd();
+                        double pzdVal = particleAccess.buildscape$getZd();
 
                         float yaw = 0.0F;
                         if (tag.contains("ShotYaw")) {
@@ -898,7 +819,7 @@ public final class MixinClientHooks {
                                 yaw,
                                 (px, py, pz, vx, vy, vz, c, fc, tr, fl) -> {
                                     try {
-                                        createParticleMethod.invoke(starterObj, px, py, pz, vx, vy, vz, c, fc, tr, fl);
+                                        starter.buildscape$createParticle(px, py, pz, vx, vy, vz, c, fc, tr, fl);
                                     } catch (Throwable ignored) {}
                                 }
                         );
@@ -908,7 +829,7 @@ public final class MixinClientHooks {
                 }
             }
 
-            explosionsField.set(starterObj, vanillaExplosions);
+            starter.buildscape$setExplosions(vanillaExplosions);
         } catch (Throwable t) {
             com.kingodogo.buildscape.BuildscapeCommon.LOGGER.debug("Custom firework starter tick failed: {}", t.getMessage());
         }

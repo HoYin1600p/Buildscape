@@ -388,7 +388,6 @@ public class BlockFactory implements IBlockFactory {
             };
         } else if (def.isLogSlab()) {
             return new LogSlabBlock(getBaseBlock(def), props) {
-                @Override public Integer getBeaconColorMultiplier(BlockState state, LevelReader level, BlockPos pos, BlockPos beaconPos) { return null; }
                 @Override protected boolean propagatesSkylightDown(BlockState state, BlockGetter level, BlockPos pos) { return !isTintedBase() && (isRegularGlassLike() || super.propagatesSkylightDown(state, level, pos)); }
                 @Override protected int getLightBlock(BlockState state, BlockGetter level, BlockPos pos) { return isTintedBase() ? 15 : super.getLightBlock(state, level, pos); }
                 @Override
@@ -402,7 +401,6 @@ public class BlockFactory implements IBlockFactory {
             };
         } else if (def.isSlab()) {
             return new ModSlabBlock(getBaseBlock(def), props) {
-                @Override public Integer getBeaconColorMultiplier(BlockState state, LevelReader level, BlockPos pos, BlockPos beaconPos) { return null; }
                 @Override protected boolean propagatesSkylightDown(BlockState state, BlockGetter level, BlockPos pos) { return !isTintedBase() && (isRegularGlassLike() || super.propagatesSkylightDown(state, level, pos)); }
                 @Override protected int getLightBlock(BlockState state, BlockGetter level, BlockPos pos) { return isTintedBase() ? 15 : super.getLightBlock(state, level, pos); }
             };
@@ -1302,10 +1300,6 @@ public class BlockFactory implements IBlockFactory {
                     return isTinted() ? 0 : super.getLightBlock(state, level, pos);
                 }
                 @Override
-                public Integer getBeaconColorMultiplier(BlockState state, LevelReader level, BlockPos pos, BlockPos beaconPos) {
-                    return getBeaconColor(state, level, pos, beaconPos);
-                }
-                @Override
                 protected BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
                     if (state.getValue(WATERLOGGED)) level.scheduleTick(pos, net.minecraft.world.level.material.Fluids.WATER, net.minecraft.world.level.material.Fluids.WATER.getTickDelay(level));
                     return super.updateShape(state, direction, neighborState, level, pos, neighborPos);
@@ -1325,7 +1319,6 @@ public class BlockFactory implements IBlockFactory {
             if (tinted) props.dynamicShape();
             return new OrnamentBlock(props, tinted) {
                 @Override protected int getLightBlock(BlockState state, BlockGetter level, BlockPos pos) { return isTinted() ? 0 : super.getLightBlock(state, level, pos); }
-                @Override public Integer getBeaconColorMultiplier(BlockState state, LevelReader level, BlockPos pos, BlockPos beaconPos) { return getBeaconColor(state, level, pos, beaconPos); }
                 @Override protected BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos pos, BlockPos neighborPos) { if (state.getValue(WATERLOGGED)) level.scheduleTick(pos, net.minecraft.world.level.material.Fluids.WATER, net.minecraft.world.level.material.Fluids.WATER.getTickDelay(level)); if (!canSurvive(state, level, pos) && level instanceof ServerLevel) level.scheduleTick(pos, this, 1); return super.updateShape(state, direction, neighborState, level, pos, neighborPos); }
                 @Override protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) { return toItemInteractionResult(onInteract(level, pos, state, player, hand, hit)); }
                 @Override protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) { return onInteract(level, pos, state, player, InteractionHand.MAIN_HAND, hit); }

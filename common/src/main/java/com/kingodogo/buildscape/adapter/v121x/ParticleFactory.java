@@ -2,9 +2,12 @@ package com.kingodogo.buildscape.adapter.v121x;
 
 import com.kingodogo.buildscape.particle.ModParticles;
 import com.kingodogo.buildscape.particle.PillarSparkleParticleLogic;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.FlameParticle;
-import net.minecraft.client.particle.ParticleEngine;
+import net.minecraft.client.particle.ParticleProvider;
+import net.minecraft.client.particle.SpriteSet;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleType;
+import java.util.function.Function;
 import net.minecraft.client.particle.ParticleRenderType;
 import net.minecraft.client.particle.TextureSheetParticle;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -15,8 +18,13 @@ public final class ParticleFactory {
 
     private ParticleFactory() {}
 
-    public static void registerProviders() {
-        ParticleEngine pe = Minecraft.getInstance().particleEngine;
+    /** Registration is supplied by the loader, which can access vanilla's private registration API. */
+    public interface Registrar {
+        <T extends ParticleOptions> void register(ParticleType<T> type, Function<SpriteSet, ParticleProvider<T>> factory);
+        <T extends ParticleOptions> void registerDirect(ParticleType<T> type, ParticleProvider<T> provider);
+    }
+
+    public static void registerProviders(Registrar pe) {
         pe.register(ModParticles.GLOW_LIME_SPARKLE.get(), sprites ->
             (type, level, x, y, z, dx, dy, dz) -> new TextureSheetParticle(level, x, y, z, dx, dy, dz) {
                 private final TextureAtlasSprite baseSprite;
@@ -168,7 +176,7 @@ public final class ParticleFactory {
         pe.register(ModParticles.COPPER_FIRE_FLAME.get(), FlameParticle.Provider::new);
         pe.register(ModParticles.FIREFLY.get(), ParticleFactory::fireflyProvider);
         pe.register(ModParticles.SULFUR_BUBBLES.get(), ParticleFactory::sulfurBubbleProvider);
-        pe.register(ModParticles.GEYSER.get(), geyserEruptionProvider());
+        pe.registerDirect(ModParticles.GEYSER.get(), geyserEruptionProvider());
         pe.register(ModParticles.GEYSER_BASE.get(), ParticleFactory::geyserBaseProvider);
         pe.register(ModParticles.GEYSER_POOF.get(), ParticleFactory::geyserBaseProvider);
         pe.register(ModParticles.GEYSER_PLUME.get(), ParticleFactory::geyserPlumeProvider);

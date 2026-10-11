@@ -189,7 +189,7 @@ public class MixinFactory implements IMixinFactory {
         ModelManager modelManager = Minecraft.getInstance().getModelManager();
         com.kingodogo.buildscape.util.CommonId modelLoc = frameType.getModelLocation();
         net.minecraft.resources.ResourceLocation rl = net.minecraft.resources.ResourceLocation.fromNamespaceAndPath(modelLoc.getNamespace(), modelLoc.getPath());
-        net.minecraft.client.resources.model.ModelResourceLocation mrl = net.minecraft.client.resources.model.ModelResourceLocation.standalone(rl);
+        net.minecraft.client.resources.model.ModelResourceLocation mrl = new net.minecraft.client.resources.model.ModelResourceLocation(rl, "standalone");
         BakedModel frameModel = modelManager.getModel(mrl);
         if (frameModel == null || frameModel == modelManager.getMissingModel()) return;
 

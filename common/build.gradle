@@ -114,6 +114,7 @@ dependencies {
     // Gson and Netty for v118x also come from Minecraft's library manifest.
     // Nullable was previously supplied transitively by the newer DFU dependency.
     v118xCompileOnly 'com.google.code.findbugs:jsr305:3.0.2'
+    v121xCompileOnly 'com.google.code.findbugs:jsr305:3.0.2'
     // Gson and Netty for v121x also come from Minecraft's library manifest.
     v26xCompileOnly 'io.netty:netty-buffer:4.2.15.Final'
     v26xCompileOnly 'it.unimi.dsi:fastutil:8.5.18'

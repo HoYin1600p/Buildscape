@@ -164,7 +164,7 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
         Item item = stack.getItem();
 
         boolean hasGlassNeg = logState.getValue(HAS_GLASS_NEG);
-        boolean isPotAllowed = (axis != Direction.Axis.Y) || hasGlassNeg;
+        boolean isPotAllowed = isPotAllowed(axis, hasGlassNeg);
         boolean hasDecoration = logState.getValue(HAS_DECORATION);
 
         if (item == Items.FLOWER_POT && isPotAllowed && !hasDecoration) return true;
@@ -321,7 +321,7 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
         }
 
         if (!hasFluid && !hasDecoration) {
-            boolean isPotAllowed = (axis != Direction.Axis.Y) || state.getValue(HAS_GLASS_NEG);
+            boolean isPotAllowed = isPotAllowed(axis, state.getValue(HAS_GLASS_NEG));
 
             if (held.is(Items.FLOWER_POT) && isPotAllowed) {
                 if (!level.isClientSide()) {
@@ -422,9 +422,22 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
         return List.of(new ItemStack(decState.getBlock()));
     }
 
-    private static boolean isFullGlassBlock(ItemStack stack) {
+    public static boolean isPotAllowed(Direction.Axis axis, boolean hasBottomGlass) {
+        return axis != Direction.Axis.Y || hasBottomGlass;
+    }
+
+    public static boolean isFullGlassBlock(ItemStack stack) {
         if (stack != null && !stack.isEmpty() && stack.getItem() instanceof BlockItem blockItem) {
             Block block = blockItem.getBlock();
+
+            // Glass pane classes can also contain "Glass"; covers require a full block.
+            try {
+                if (!Block.isShapeFullBlock(block.defaultBlockState().getShape(EmptyBlockGetter.INSTANCE, BlockPos.ZERO))) {
+                    return false;
+                }
+            } catch (Exception ignored) {
+                return false;
+            }
 
             if (block.getClass().getSimpleName().contains("Glass") || block.getClass().getSimpleName().contains("Transparent")) {
                 return true;
@@ -442,7 +455,7 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
         return false;
     }
 
-    private static boolean isValidFullBlockDecoration(Block block) {
+    public static boolean isValidFullBlockDecoration(Block block) {
         if (block == null || block instanceof EntityBlock || block instanceof HollowLogBlock || block instanceof HollowPipeBlock) {
             return false;
         }

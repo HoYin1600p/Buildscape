@@ -695,7 +695,7 @@ public final class ClientPlatformHooks {
 
     public static net.minecraft.client.renderer.texture.TextureAtlasSprite getBlockAtlasSprite(CommonId id) {
         return net.minecraft.client.Minecraft.getInstance().getAtlasManager()
-                .getAtlasOrThrow(net.minecraft.client.renderer.texture.TextureAtlas.LOCATION_BLOCKS)
+                .getAtlasOrThrow(com.kingodogo.buildscape.adapter.v26x.AtlasIds.blocks())
                 .getSprite(Identifier.fromNamespaceAndPath(id.getNamespace(), id.getPath()));
     }
 

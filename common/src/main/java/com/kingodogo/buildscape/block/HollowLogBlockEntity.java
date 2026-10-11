@@ -42,6 +42,11 @@ public class HollowLogBlockEntity extends DataBlockEntity implements IDataSerial
     }
 
     @Override
+    protected boolean syncCustomData() {
+        return true;
+    }
+
+    @Override
     public void setLevel(Level level) {
         super.setLevel(level);
         if (level != null && !level.isClientSide()

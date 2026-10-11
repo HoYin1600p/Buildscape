@@ -55,7 +55,7 @@ loader-specific lifecycle hooks and registry extensions stay in `mod` and
 
 At Milestone 1, the repository's default `build` includes shared-code Forge
 1.18.2 alongside the 26.2 loaders, runs the common v118x tests, and produces
-`forge/1.18.2/build/libs/buildscape-4.0.3.jar`. Gradle 9.6 runs on JDK 25;
+`forge/1.18.2/build/libs/buildscape-forge-1.18.2-4.0.3.jar`. Gradle 9.6 runs on JDK 25;
 Forge compilation and v118x test execution use the locally available Java 17
 toolchain. All dependencies must already be cached for offline use.
 

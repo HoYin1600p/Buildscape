@@ -71,6 +71,7 @@ configurations {
 dependencies {
     v118xTestImplementation platform('org.junit:junit-bom:5.12.2')
     v118xTestImplementation 'org.junit.jupiter:junit-jupiter'
+    v118xTestImplementation 'org.ow2.asm:asm-tree:9.7.1'
     v118xTestRuntimeOnly 'org.junit.platform:junit-platform-launcher:1.12.2'
     testImplementation platform('org.junit:junit-bom:5.12.2')
     testImplementation 'org.junit.jupiter:junit-jupiter'
@@ -219,6 +220,8 @@ def v118xTestTask = tasks.register('v118xTest', Test) {
     testClassesDirs = sourceSets.v118xTest.output.classesDirs
     classpath = sourceSets.v118xTest.runtimeClasspath
     useJUnitPlatform()
+    inputs.file(file('src/v118x/resources/buildscape.mixins.json'))
+    systemProperty 'buildscape.v118xMixinConfig', file('src/v118x/resources/buildscape.mixins.json').absolutePath
     javaLauncher = javaToolchains.launcherFor { languageVersion = JavaLanguageVersion.of(17) }
     // Bootstrap and stderr capture mutate JVM globals.
     maxParallelForks = 1

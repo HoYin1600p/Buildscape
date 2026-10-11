@@ -148,7 +148,8 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
     @Override
     public Item createRegisteredItem(com.kingodogo.buildscape.item.ItemDefinition definition, Block block) {
         String id = definition.getId();
-        Item.Properties properties = com.kingodogo.buildscape.item.ItemFactory.createProperties(definition.getProperties());
+        Item.Properties properties = com.kingodogo.buildscape.item.ItemFactory.createProperties(id, definition.getProperties());
+        if (block instanceof net.minecraft.world.level.block.BedBlock) return new net.minecraft.world.item.BedItem(block, properties);
         if (id.equals("mangrove_boat")) return new com.kingodogo.buildscape.item.MangroveBoatItem(properties.stacksTo(1));
         if (id.equals("mangrove_sign") || id.equals("bamboo_sign")) {
             Block wall = com.kingodogo.buildscape.block.ModBlocks.get(id.equals("mangrove_sign")
@@ -166,6 +167,10 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
         return IPlatformAdapter.super.createRegisteredItem(definition, block);
     }
 
+    @Override
+    public Item.Properties prepareItemProperties(CommonId id, Item.Properties properties) {
+        return properties.tab(CreativeTabs118x.tabFor(id));
+    }
     @Override public boolean isReplaceable(net.minecraft.world.level.block.state.BlockState state) { return state.getMaterial().isReplaceable(); }
     @Override public boolean isGlassBlock(net.minecraft.world.level.block.Block block) { return block instanceof net.minecraft.world.level.block.AbstractGlassBlock; }
     @Override
@@ -792,23 +797,7 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
 
     @Override
     public CreativeModeTab createCreativeTab(CommonId tabId, String titleKey, Supplier<ItemStack> iconSupplier, List<String> orderedItemIds, Map<String, Item> items) {
-        return new CreativeModeTab(CreativeModeTab.TABS.length, titleKey) {
-            @Override
-            public ItemStack makeIcon() {
-                return iconSupplier.get();
-            }
-            @Override
-            public void fillItemList(NonNullList<ItemStack> stacks) {
-                Set<String> added = new HashSet<>();
-                for (String id : orderedItemIds) {
-                    Item item = items.get(id);
-                    if (item != null && added.add(id)) stacks.add(new ItemStack(item));
-                }
-                items.forEach((id, item) -> {
-                    if (added.add(id)) stacks.add(new ItemStack(item));
-                });
-            }
-        };
+        return CreativeTabs118x.configure(iconSupplier, orderedItemIds, items);
     }
 
     @Override
@@ -4251,3 +4240,4 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
         }
     }
 }
+

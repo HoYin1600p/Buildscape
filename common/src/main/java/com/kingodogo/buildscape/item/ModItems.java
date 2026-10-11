@@ -3183,10 +3183,12 @@ public class ModItems {
     }
 
     public static RegistrySupplier<ItemDefinition> register(String name) {
-        return Services.REGISTRY.registerItem(name, () -> new ItemDefinition(name));
+        return Services.REGISTRY.registerItem(name, () -> new ItemDefinition(name, Services.isVersionCluster("v118x")
+                ? LegacyItemProperties.forItem(name) : CommonItemProperties.of()));
     }
 
     public static void init() {
         System.out.println("ModItems initialized: " + Services.REGISTRY.getRegisteredItems().size() + " items registered.");
     }
 }
+

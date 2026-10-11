@@ -1,6 +1,7 @@
-# Forge 1.18.2 parity harness
+# Forge and Fabric 1.18.2 parity harness
 
-This is a **test-only** helper for Forge **40.3.12** and Java 17. Never upload
+This is a **test-only** helper for Forge **40.3.12**, Fabric Loader **0.16.14**
+(Fabric API **0.77.0+1.18.2**) and Java 17. Never upload
 its jar, include it in a release archive, or ship it to players. It registers
 no content and has no Buildscape compile dependency. Its independent settings
 are not included in the repository's main settings or jar collection tasks.
@@ -31,6 +32,26 @@ by the working `forge/1.18.2` build. The standalone build uses the same
 Unimined version, mappings, Java target and pinned jopt-simple dependency.
 The default Buildscape build does not configure this project, even when the
 gate is set: `-p tools/parity-dumper` selects the separate build.
+
+The same gated command also builds the Fabric variant in
+`tools/parity-dumper/fabric/build/libs/`:
+
+- `buildscape-parity-dumper-fabric-TEST-ONLY-1.0.0-dev.jar` uses Mojang names.
+  Put it in `fabric/1.18.2/run/server/mods` and
+  `fabric/1.18.2/run/client/mods` for the repository's Unimined dev runs.
+- `buildscape-parity-dumper-fabric-TEST-ONLY-1.0.0.jar` uses intermediary names
+  for production Fabric 1.18.2 instances with the pinned Loader and Fabric API.
+
+Fabric API must be present in the run. Do not install the Forge helper on
+Fabric or both helper jars together. Dependencies and the Fabric Unimined
+caches must already be populated by the working `fabric/1.18.2` build.
+Without `-Pbuildscape.parityDumper=true`, neither loader subproject is included.
+
+The loader variants compile the same `shared/src/main/java` source directory
+and `shared/src/selfCheck/java` self-check source set. Registry, state, recipe,
+tag, loot, creative-tab, mixin and client table serialization is shared;
+loader-specific lifecycle hooks and registry extensions stay in `mod` and
+`fabric`. Forge keeps its original manifest and serialization behavior.
 
 At Milestone 1, the repository's default `build` includes shared-code Forge
 1.18.2 alongside the 26.2 loaders, runs the common v118x tests, and produces
@@ -72,6 +93,25 @@ separate `buildscape.parityDumper` gate.
    leave an incomplete manifest; they cannot count as a parity pass. Save
    paired snapshots in the task's external workspace before another run
    overwrites them. Remove the helper from the run when finished.
+
+For a Fabric candidate, use equivalent Fabric 1.18.2 server and client runs
+instead of the candidate Forge runs. `ServerLifecycleEvents.SERVER_STARTED`
+writes `parity-dump/server/`. Client startup and resource reloads request the
+client snapshot, which is written at the end of a tick after the reload
+overlay closes. A client-only tag-packet mixin requests another snapshot
+after tags are bound on joining a world. Integrated servers also write the
+server snapshot. The helper's mixin config deliberately does not match the
+Buildscape config filter, so it is absent from `mixins.json`.
+
+Fabric produces the same table filenames, schema version and field shapes
+as Forge. Its manifest records `"loader": "fabric"` and `"fabric": "0.16.14"`
+instead of Forge's `"forge": "40.3.12"`; these provenance differences are
+expected in a direct `dumpdiff` comparison. Loader-dependent registrations
+and mixins may also differ and should be reviewed, rather than suppressed.
+Fabric reads vanilla's primary creative tab and food properties, Fabric's
+colour-provider registry, vanilla render layers and the vanilla numeric
+particle-provider table. Forge retains its multiple-tab, context-aware food,
+multi-layer and delegate-keyed colour reads.
 
 All `buildscape:` and `minecraft:` entries are included, so vanilla mutations
 are covered without a fragile manual allowlist. Server snapshots contain
@@ -140,15 +180,19 @@ Both scripts use only the Python standard library. Exit status: **0** parity,
 
 ## Validation
 
-The gated `build` and `check` tasks run `:dumper:selfCheck`, a Java 17 main
+The gated `build` and `check` tasks run `:dumper:selfCheck` and
+`:fabric:selfCheck`, a Java 17 main
 using the dump writer without bootstrapping Minecraft or opening a display.
 It checks byte equality across object insertion orders, recursive key sorting,
 array order, nulls, UTF-8/LF output, non-mutating canonicalization and sorted
 snapshot/manifest filenames. It needs no additional test framework dependency;
-its output files stay under `mod/build/self-check/`.
+its output files stay under each variant's `build/self-check/`.
 
 Before accepting parity evidence, run the unittest command above, the
 standalone gated build, and dedicated-server/client smoke runs against both
 pinned jars. Verify Java API compilation, Unimined remapping, production SRG
 field lookup, Mixin cache inspection, resource-load timing and paired dump
-equality. A Python test pass alone does not verify the helper mod.
+equality. For Fabric, also verify intermediary remapping of the tag-packet
+hook, numeric particle-provider lookup and Fabric colour handlers in both
+dev and production clients. A Python test pass alone does not verify the
+helper mod.

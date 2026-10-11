@@ -22,7 +22,6 @@ import net.minecraft.nbt.NumericTag;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -50,7 +49,7 @@ final class DumpIO {
                 field = owner.getDeclaredField(mojmap);
                 field.setAccessible(true);
             } catch (NoSuchFieldException ignored) {
-                field = ObfuscationReflectionHelper.findField(owner, searge);
+                field = LoaderAccess.findField(owner, searge);
             }
             return field.get(instance);
         } catch (ReflectiveOperationException failure) {
@@ -149,7 +148,8 @@ final class DumpIO {
 
     static synchronized void capture(Path folder, String side, Supplier<Map<String, JsonElement>> supplier) {
         JsonObject manifest = object("schema", 1, "side", side, "minecraft", "1.18.2",
-                "forge", "40.3.12", "complete", false, "files", new ArrayList<String>());
+                "complete", false, "files", new ArrayList<String>());
+        LoaderAccess.manifest(manifest);
         try {
             Files.createDirectories(folder);
             write(folder.resolve("manifest.json"), manifest);
@@ -172,7 +172,8 @@ final class DumpIO {
         TableWriter writer = new TableWriter(folder);
         JsonObject tableErrors = writer.errors;
         JsonObject manifest = object("schema", 1, "side", side, "minecraft", "1.18.2",
-                "forge", "40.3.12", "complete", false, "files", new ArrayList<String>());
+                "complete", false, "files", new ArrayList<String>());
+        LoaderAccess.manifest(manifest);
         try {
             Files.createDirectories(folder);
             // Invalidate a previous snapshot before evaluating or writing any new data.

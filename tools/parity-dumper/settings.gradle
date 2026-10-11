@@ -17,4 +17,5 @@ rootProject.name = 'parity-dumper-bootstrap'
 if (providers.gradleProperty('buildscape.parityDumper').getOrElse('false') == 'true') {
     include ':dumper'
     project(':dumper').projectDir = file('mod')
+    include ':fabric'
 }

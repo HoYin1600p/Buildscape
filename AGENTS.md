@@ -44,6 +44,12 @@ This file is automatically loaded by AI coding assistants (Antigravity, Codex, C
 
 - **Offline Gradle Execution:**
   - Always append `--offline --console=plain` to every `./gradlew` command.
+- **Default Build (Milestone 1):**
+  - `./gradlew build --offline --console=plain` builds Fabric and NeoForge 26.2 plus shared-code Forge 1.18.2, including `:common:v118xTest` and all `:common:v118xRun*Tests` tasks.
+  - Use Gradle 9.6 on JDK 25 with a locally available Java 17 toolchain for Forge 1.18.2 compilation and v118x test execution. Offline builds require the wrapper and dependencies to be cached.
+  - `-Pbuildscape.v118x=false` omits `:forge:1.18.2` and skips v118x verification in `:common:check` for fast 26.2-only builds.
+  - `-Pbuildscape.v118xSource=ref` selects the frozen reference for Forge parity comparisons; the default is `common`. The explicit `-Pbuildscape.v118x=true -Pbuildscape.v118xSource=common` flags remain supported.
+  - The Forge production jar is `forge/1.18.2/build/libs/buildscape-4.0.3.jar`; the root `build/libs` collection continues to contain the 26.2 loader jars.
 - **Non-Blocking Client Diagnostics:**
   - Run `:neoforge:1.21.1:runClient` as an asynchronous background task.
   - Monitor `run/logs/latest.log` periodically with non-blocking timers.

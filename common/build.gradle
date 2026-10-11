@@ -175,7 +175,11 @@ tasks.named('jar', Jar) {
     from sourceSets.v26x.output
 }
 tasks.named('assemble') { dependsOn tasks.named('v26xClasses') }
-tasks.named('check') { dependsOn tasks.named('compileV118xJava') }
+// Follow the settings inclusion decision so the opt-out skips v118x verification.
+def v118xEnabled = rootProject.findProject(':forge:1.18.2') != null
+tasks.named('check') {
+    if (v118xEnabled) dependsOn tasks.named('compileV118xJava')
+}
 
 def v118xStandaloneTests = [
         v118xRunPipeSpillTests: 'com.kingodogo.buildscape.client.renderer.PipeSpillTest',
@@ -210,7 +214,9 @@ v118xStandaloneTests.each { taskName, testClass ->
             layout.buildDirectory.dir('tmp/v118xTests').get().asFile.mkdirs()
         }
     }
-    tasks.named('check') { dependsOn runner }
+    tasks.named('check') {
+        if (v118xEnabled) dependsOn runner
+    }
 }
 
 def v118xTestTask = tasks.register('v118xTest', Test) {
@@ -232,7 +238,9 @@ def v118xTestTask = tasks.register('v118xTest', Test) {
         layout.buildDirectory.dir('tmp/v118xTests').get().asFile.mkdirs()
     }
 }
-tasks.named('check') { dependsOn v118xTestTask }
+tasks.named('check') {
+    if (v118xEnabled) dependsOn v118xTestTask
+}
 
 def v118xRecipePack = rootProject.file('ref/forge/1.18.2/src/main/resources/data/buildscape/recipes_pack')
 def v118xRecipeToolClasspath = sourceSets.v118x.output +
@@ -255,7 +263,9 @@ def v118xCheckRecipePackFormat = tasks.register('v118xCheckRecipePackFormat', Ja
     javaLauncher = javaToolchains.launcherFor { languageVersion = JavaLanguageVersion.of(17) }
     args '--check', v118xRecipePack.absolutePath
 }
-tasks.named('check') { dependsOn v118xVerifyBundledRecipeCache, v118xCheckRecipePackFormat }
+tasks.named('check') {
+    if (v118xEnabled) dependsOn v118xVerifyBundledRecipeCache, v118xCheckRecipePackFormat
+}
 
 // Explicit synchronization writes build output; the frozen reference remains an input.
 tasks.register('v118xSyncBundledRecipeCache', JavaExec) {

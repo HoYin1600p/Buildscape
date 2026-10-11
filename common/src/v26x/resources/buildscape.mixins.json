@@ -30,6 +30,7 @@
     "LavaFluidMixin",
     "LeavesBlockMixin",
     "LevelMixin",
+    "LevelParticleV26xMixin",
     "LevelChunkMixin",
     "LiquidBlockMixin",
     "LivingEntityMixin",

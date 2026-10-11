@@ -36,8 +36,7 @@ public final class CreativeTabs118x {
             NonNullList<ItemStack> raw = NonNullList.create();
             Set<Item> added = new HashSet<>();
             for (String id : orderedIds) {
-                // The order mirrors main's ModItems constant names; CONFETTI_ITEM registers as "confetti".
-                ResourceLocation key = new ResourceLocation("buildscape", id.equals("confetti_item") ? "confetti" : id);
+                ResourceLocation key = new ResourceLocation("buildscape", id);
                 Item item = Registry.ITEM.containsKey(key) ? Registry.ITEM.get(key) : modItems.get(id);
                 if (item != null && added.add(item)) {
                     raw.add(new ItemStack(item));

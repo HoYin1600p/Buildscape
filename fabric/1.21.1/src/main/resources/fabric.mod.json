@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
   "id": "buildscape",
-  "version": "${version}",
+  "version": "${mod_version}",
   "name": "Buildscape",
-  "description": "The ultimate expansion for builders, architects, and creators!",
+  "description": "Welcome to Buildscape the ultimate expansion for builders, architects, and creators!",
   "authors": [
     "Kingodogo"
   ],
@@ -21,10 +21,13 @@
     ]
   },
   "mixins": [
-    "buildscape.mixins.json"
+    "buildscape.mixins.json",
+    "buildscape.fabric121.mixins.json"
   ],
+  "accessWidener": "buildscape.accesswidener",
   "depends": {
-    "fabricloader": ">=0.15.0",
+    "fabricloader": ">=0.16.14",
+    "fabric-api": ">=0.116.0+1.21.1",
     "minecraft": "~1.21.1",
     "java": ">=21"
   }

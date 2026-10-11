@@ -1,0 +1,23 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.kingodogo.buildscape.mixin.fabric",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "RegistryStateAccessor",
+    "EntityDataMixin",
+    "BlockEntityDataMixin",
+    "RecipeManagerMixin",
+    "AdvancementCompletionMixin",
+    "AnvilUpdateMixin",
+    "BlockPlacementMixin",
+    "CraftingMixin",
+    "CraftingResultPreparationMixin",
+    "ItemUseFinishMixin",
+    "PlayerDimensionMixin",
+    "EndermanGriefingMixin",
+    "EndermanLeaveBlockGriefingMixin",
+    "ExplosionGriefingMixin"
+  ],
+  "injectors": {"defaultRequire": 1}
+}

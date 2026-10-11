@@ -37,6 +37,22 @@ import com.kingodogo.buildscape.platform.IPlatformAdapter.BlockColorSample;
 
 /** Client bodies are isolated so dedicated servers can verify the platform adapter. */
 public final class ClientAccess {
+    private static final ThreadLocal<net.minecraft.client.gui.GuiGraphics> GUI_GRAPHICS = new ThreadLocal<>();
+
+    public static void withGuiGraphics(net.minecraft.client.gui.GuiGraphics graphics, Runnable action) {
+        var previous = GUI_GRAPHICS.get();
+        GUI_GRAPHICS.set(graphics);
+        try { action.run(); }
+        finally {
+            if (previous == null) GUI_GRAPHICS.remove();
+            else GUI_GRAPHICS.set(previous);
+        }
+    }
+
+    private static Object graphics(Object context) {
+        return context instanceof com.mojang.blaze3d.vertex.PoseStack && GUI_GRAPHICS.get() != null
+                ? GUI_GRAPHICS.get() : context;
+    }
     public static com.mojang.blaze3d.vertex.PoseStack toPoseStack(Object context) {
         return GuiProvider.toPoseStack(context);
     }
@@ -126,31 +142,31 @@ public final class ClientAccess {
     }
 
     public static void fill(Object poseStackOrGraphics, int minX, int minY, int maxX, int maxY, int color) {
-        if (poseStackOrGraphics instanceof net.minecraft.client.gui.GuiGraphics gg) {
+        if (graphics(poseStackOrGraphics) instanceof net.minecraft.client.gui.GuiGraphics gg) {
             gg.fill(minX, minY, maxX, maxY, color);
         }
     }
 
     public static void drawShadow(Object poseStackOrGraphics, net.minecraft.client.gui.Font font, String text, int x, int y, int color) {
-        if (poseStackOrGraphics instanceof net.minecraft.client.gui.GuiGraphics gg) {
+        if (graphics(poseStackOrGraphics) instanceof net.minecraft.client.gui.GuiGraphics gg) {
             gg.drawString(font, text, x, y, color, true);
         }
     }
 
     public static void draw(Object poseStackOrGraphics, net.minecraft.client.gui.Font font, String text, float x, float y, int color) {
-        if (poseStackOrGraphics instanceof net.minecraft.client.gui.GuiGraphics gg) {
+        if (graphics(poseStackOrGraphics) instanceof net.minecraft.client.gui.GuiGraphics gg) {
             gg.drawString(font, text, (int) x, (int) y, color, false);
         }
     }
 
     public static void drawCenteredString(Object poseStackOrGraphics, net.minecraft.client.gui.Font font, net.minecraft.network.chat.Component component, int x, int y, int color) {
-        if (poseStackOrGraphics instanceof net.minecraft.client.gui.GuiGraphics gg) {
+        if (graphics(poseStackOrGraphics) instanceof net.minecraft.client.gui.GuiGraphics gg) {
             gg.drawCenteredString(font, component, x, y, color);
         }
     }
 
     public static void drawCenteredString(Object poseStackOrGraphics, net.minecraft.client.gui.Font font, String text, int x, int y, int color) {
-        if (poseStackOrGraphics instanceof net.minecraft.client.gui.GuiGraphics gg) {
+        if (graphics(poseStackOrGraphics) instanceof net.minecraft.client.gui.GuiGraphics gg) {
             gg.drawCenteredString(font, text, x, y, color);
         }
     }
@@ -164,7 +180,7 @@ public final class ClientAccess {
     public static void blit(Object poseStackOrGraphics, CommonId texture, int x, int y, float u, float v, int width, int height, int sheetW, int sheetH) {
         if (texture != null) {
             ResourceLocation rl = ResourceLocation.fromNamespaceAndPath(texture.getNamespace(), texture.getPath());
-            if (poseStackOrGraphics instanceof net.minecraft.client.gui.GuiGraphics gg) {
+            if (graphics(poseStackOrGraphics) instanceof net.minecraft.client.gui.GuiGraphics gg) {
                 gg.blit(rl, x, y, (int) u, (int) v, width, height, sheetW, sheetH);
             }
         }
@@ -173,14 +189,14 @@ public final class ClientAccess {
     public static void blit(Object poseStackOrGraphics, CommonId texture, int x, int y, int width, int height, float u, float v, int uWidth, int vHeight, int sheetW, int sheetH) {
         if (texture != null) {
             ResourceLocation rl = ResourceLocation.fromNamespaceAndPath(texture.getNamespace(), texture.getPath());
-            if (poseStackOrGraphics instanceof net.minecraft.client.gui.GuiGraphics gg) {
+            if (graphics(poseStackOrGraphics) instanceof net.minecraft.client.gui.GuiGraphics gg) {
                 gg.blit(rl, x, y, width, height, u, v, uWidth, vHeight, sheetW, sheetH);
             }
         }
     }
 
     public static void renderComponentTooltip(Object poseStackOrGraphics, net.minecraft.client.gui.Font font, java.util.List<net.minecraft.network.chat.Component> components, int mouseX, int mouseY) {
-        if (poseStackOrGraphics instanceof net.minecraft.client.gui.GuiGraphics gg) {
+        if (graphics(poseStackOrGraphics) instanceof net.minecraft.client.gui.GuiGraphics gg) {
             gg.renderComponentTooltip(font, components, mouseX, mouseY);
         }
     }
@@ -720,3 +736,4 @@ public final class ClientAccess {
     }
 
 }
+

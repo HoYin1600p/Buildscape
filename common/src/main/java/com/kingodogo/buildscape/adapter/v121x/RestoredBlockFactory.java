@@ -34,6 +34,10 @@ final class RestoredBlockFactory {
                 @Override public net.minecraft.world.item.BlockItem createHazeItem(net.minecraft.world.item.Item.Properties properties) {
                     return new HazeBushItem(this, properties);
                 }
+                @Override public void animateTick(BlockState state, net.minecraft.world.level.Level level,
+                        BlockPos pos, net.minecraft.util.RandomSource random) {
+                    com.kingodogo.buildscape.adapter.v121x.client.HazeBushParticleHandler.animateTick(state, level, pos, random);
+                }
                 @Override protected com.mojang.serialization.MapCodec<? extends net.minecraft.world.level.block.BushBlock> codec() {
                     return com.mojang.serialization.MapCodec.unit(this);
                 }
@@ -51,6 +55,10 @@ final class RestoredBlockFactory {
             case "PottedHazeBushBlock" -> new PottedHazeBushBlock(
                     net.minecraft.world.item.DyeColor.byName(def.getId().replace("potted_", "").replace("_haze_bush", ""), null),
                     registeredBlock(def.getId().substring(7)), props) {
+                @Override public void animateTick(BlockState state, net.minecraft.world.level.Level level,
+                        BlockPos pos, net.minecraft.util.RandomSource random) {
+                    com.kingodogo.buildscape.adapter.v121x.client.HazeBushParticleHandler.animateTick(state, level, pos, random);
+                }
                 @Override protected net.minecraft.world.ItemInteractionResult useItemOn(net.minecraft.world.item.ItemStack stack,
                         BlockState state, net.minecraft.world.level.Level level, BlockPos pos,
                         net.minecraft.world.entity.player.Player player, net.minecraft.world.InteractionHand hand,

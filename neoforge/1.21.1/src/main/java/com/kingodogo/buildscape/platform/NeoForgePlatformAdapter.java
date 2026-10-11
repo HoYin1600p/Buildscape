@@ -61,11 +61,10 @@ public final class NeoForgePlatformAdapter extends PlatformAdapterBase implement
     @Override public void registerMenuScreens() {
         if (isClient()) {
             com.kingodogo.buildscape.BuildscapeNeoForgeClient.registerMenuScreens();
-            registerRenderers();
         }
     }
     @Override public void registerRenderers() {
-        if (isClient()) com.kingodogo.buildscape.LoaderRenderers.registerRenderers();
+        if (isClient()) com.kingodogo.buildscape.adapter.v121x.client.RenderFactory.registerRenderers();
     }
     @Override public net.minecraft.world.level.Level currentServerRuleLevel() {
         var server = net.neoforged.neoforge.server.ServerLifecycleHooks.getCurrentServer();

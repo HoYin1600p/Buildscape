@@ -25,6 +25,7 @@ public final class ParticleFactory {
     }
 
     public static void registerProviders(Registrar pe) {
+        pe.register(ModParticles.HAZE.get(), HazeParticle.Provider::new);
         pe.register(ModParticles.GLOW_LIME_SPARKLE.get(), sprites ->
             (type, level, x, y, z, dx, dy, dz) -> new TextureSheetParticle(level, x, y, z, dx, dy, dz) {
                 private final TextureAtlasSprite baseSprite;
@@ -454,3 +455,4 @@ public final class ParticleFactory {
         };
     }
 }
+

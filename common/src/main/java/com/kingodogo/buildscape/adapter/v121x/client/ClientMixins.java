@@ -84,23 +84,15 @@ public final class ClientMixins {
         poseStack.popPose();
     }
 
+    private static java.util.function.BiConsumer<Screen, AbstractWidget> widgetRegistrar;
+
+    public static void installWidgetRegistrar(java.util.function.BiConsumer<Screen, AbstractWidget> registrar) {
+        widgetRegistrar = java.util.Objects.requireNonNull(registrar);
+    }
+
     private static void addWidgetToScreen(Screen screen, AbstractWidget widget) {
-        try {
-            for (java.lang.reflect.Method m : Screen.class.getDeclaredMethods()) {
-                if (m.getParameterCount() == 1 && (m.getName().equals("addRenderableWidget") || m.getName().equals("m_142416_"))) {
-                    m.setAccessible(true);
-                    m.invoke(screen, widget);
-                    return;
-                }
-            }
-            for (java.lang.reflect.Field f : Screen.class.getDeclaredFields()) {
-                if (java.util.List.class.isAssignableFrom(f.getType())) {
-                    f.setAccessible(true);
-                    java.util.List list = (java.util.List) f.get(screen);
-                    if (list != null) list.add(widget);
-                }
-            }
-        } catch (Throwable ignored) {}
+        if (widgetRegistrar == null) throw new IllegalStateException("Client widget access has not been installed");
+        widgetRegistrar.accept(screen, widget);
     }
 
     public static void addPauseScreenButton(PauseScreen screen, int width, int height, List<? extends GuiEventListener> children) {

@@ -177,7 +177,7 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
 
     @Override
     public Player getClientPlayer() {
-        return net.minecraft.client.Minecraft.getInstance().player;
+        return com.kingodogo.buildscape.adapter.v118x.client.ClientAccess.player();
     }
 
     @Override
@@ -222,8 +222,7 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
 
     @Override
     public CommonId registerDynamicTexture(String name, net.minecraft.client.renderer.texture.DynamicTexture texture) {
-        net.minecraft.resources.ResourceLocation id = net.minecraft.client.Minecraft.getInstance().getTextureManager().register(name, texture);
-        return CommonId.of(id.getNamespace(), id.getPath());
+        return com.kingodogo.buildscape.adapter.v118x.client.ClientAccess.registerDynamicTexture(name, texture);
     }
 
     @Override
@@ -741,6 +740,15 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
     @Override
     public void registerRecipeSerializers() {
         RecipeFactory.register();
+    }
+
+    /**
+     * Loader hook: builds the concrete RecipeSerializer for neutral serializer logic. Forge 1.18.2
+     * patches RecipeSerializer to extend IForgeRegistryEntry, so only the loader can implement it.
+     */
+    public <T extends net.minecraft.world.item.crafting.Recipe<?>> net.minecraft.world.item.crafting.RecipeSerializer<T>
+    createRecipeSerializer(RecipeFactory.SerializerLogic<T> logic) {
+        throw new UnsupportedOperationException("This loader does not provide recipe serializers");
     }
 
     @Override
@@ -2192,20 +2200,17 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
 
     @Override
     public void playButtonClick() {
-        net.minecraft.client.Minecraft.getInstance().getSoundManager().play(
-                net.minecraft.client.resources.sounds.SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
+        com.kingodogo.buildscape.adapter.v118x.client.UiSounds.play(SoundEvents.UI_BUTTON_CLICK);
     }
 
     @Override
     public void playNoteBlockBell() {
-        net.minecraft.client.Minecraft.getInstance().getSoundManager().play(
-                net.minecraft.client.resources.sounds.SimpleSoundInstance.forUI(SoundEvents.NOTE_BLOCK_BELL, 1.0F));
+        com.kingodogo.buildscape.adapter.v118x.client.UiSounds.play(SoundEvents.NOTE_BLOCK_BELL);
     }
 
     @Override
     public void playNoteBlockDidgeridoo() {
-        net.minecraft.client.Minecraft.getInstance().getSoundManager().play(
-                net.minecraft.client.resources.sounds.SimpleSoundInstance.forUI(SoundEvents.NOTE_BLOCK_DIDGERIDOO, 1.0F));
+        com.kingodogo.buildscape.adapter.v118x.client.UiSounds.play(SoundEvents.NOTE_BLOCK_DIDGERIDOO);
     }
 
     @Override
@@ -2306,7 +2311,7 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
         registerCauldronInteractions();
     }
 
-    private void registerFlowerPotPlants() {
+    protected void registerFlowerPotPlants() {
         registerPot("red_bush", "potted_red_bush");
         registerPot("frost_rose", "potted_frost_rose");
         registerPot("red_monets", "potted_red_monets");
@@ -2390,7 +2395,7 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
         }
     }
 
-    private void registerCauldronInteractions() {
+    protected void registerCauldronInteractions() {
         try {
             Item xpBucket = getItem(new CommonId("buildscape", "experience_bucket"));
             Block xpCauldron = getBlock(new CommonId("buildscape", "experience_cauldron"));

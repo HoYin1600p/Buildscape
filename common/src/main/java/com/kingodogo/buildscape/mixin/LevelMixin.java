@@ -27,7 +27,7 @@ public abstract class LevelMixin {
         }
     }
 
-    @Inject(method = "addParticle(Lnet/minecraft/core/particles/ParticleOptions;ZZDDDDDD)V", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "addParticle(Lnet/minecraft/core/particles/ParticleOptions;ZZDDDDDD)V", at = @At("HEAD"), cancellable = true, require = 0)
     private void onAddParticleAlways(ParticleOptions options, boolean alwaysRender, boolean overrideLimiter, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed, CallbackInfo ci) {
         if (isWaterParticle(options)) {
             Level self = (Level) (Object) this;
@@ -36,6 +36,12 @@ public abstract class LevelMixin {
                 ci.cancel();
             }
         }
+    }
+
+    // 1.18.2 signature (single alwaysRender flag).
+    @Inject(method = "addParticle(Lnet/minecraft/core/particles/ParticleOptions;ZDDDDDD)V", at = @At("HEAD"), cancellable = true, require = 0)
+    private void onAddParticleAlwaysLegacy(ParticleOptions options, boolean alwaysRender, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed, CallbackInfo ci) {
+        onAddParticle(options, x, y, z, xSpeed, ySpeed, zSpeed, ci);
     }
 
     private static boolean isWaterParticle(ParticleOptions options) {

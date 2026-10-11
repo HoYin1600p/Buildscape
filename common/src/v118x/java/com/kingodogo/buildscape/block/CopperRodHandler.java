@@ -34,7 +34,7 @@ public class CopperRodHandler {
             () -> Services.PLATFORM.getBlock(new CommonId("buildscape", "waxed_oxidized_copper_rod"))
     );
 
-    // TODO S7a: pass Forge GameData's POI map after S6b registers the rods.
+    // The Forge loader supplies GameData's POI map during common setup.
     public static void registerPoi(Map<BlockState, PoiType> poiMap) {
         try {
 

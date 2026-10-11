@@ -10,7 +10,7 @@ public final class SculkExperienceLogic {
 
     /** -1 leaves the loader event's existing experience unchanged. */
     public static int experience(Player player, BlockState state, ItemStack tool) {
-        // TODO S7a: apply non-negative results in Forge's block break event.
+        // The Forge loader applies non-negative results to its block break event.
         if (player == null || player.getAbilities().instabuild) return -1;
         // The reference suppresses experience for any Silk Touch break handled by this event.
         if (Services.PLATFORM.hasSilkTouch(tool)) return 0;

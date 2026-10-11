@@ -57,14 +57,19 @@ Keep JDK 25 available for Gradle and the 26.2 projects, and JDK 17 for this targ
 Once Forge 40.3.12 and the other dependencies have been cached:
 
 ```powershell
-.\gradlew.bat :forge:1.18.2:build '-Pbuildscape.v118x=true' '-Pbuildscape.v118xSource=ref' --offline --console=plain --parallel --max-workers=8
+.\gradlew.bat :forge:1.18.2:build '-Pbuildscape.v118x=true' '-Pbuildscape.v118xSource=ref' --offline --no-daemon --console=plain --parallel --max-workers=8
+.\gradlew.bat :forge:1.18.2:build '-Pbuildscape.v118x=true' '-Pbuildscape.v118xSource=common' --offline --no-daemon --console=plain --parallel --max-workers=8
 ```
 
 Quote the dotted `-P` arguments in PowerShell so they reach Gradle intact.
 
 `buildscape.v118xSource` defaults to `ref`, compiling the frozen Java sources
-and packaging resources from `ref/forge/1.18.2/src/main`. The reserved `common`
-mode fails with an explanatory message until shared-code integration is ready.
+and packaging resources from `ref/forge/1.18.2/src/main`. The opt-in `common`
+mode compiles the Forge loader, shared sources and the v118x source root (including
+the v118x adapter). It packages the v118x mixin configuration and Forge service
+bindings ahead of the reference resources, preserving the reference recipe pack,
+cache, metadata expansion and access transformer. Client registrations are a
+separate integration stage. Use `--no-daemon` for every Forge invocation.
 `mod_version_v118x=4.0.3` controls this jar independently of the 26.2 version.
 The production jar is `forge/1.18.2/build/libs/buildscape-4.0.3.jar`
 (the `-dev` jar is not a production artifact). It is the output of `remapJar`,

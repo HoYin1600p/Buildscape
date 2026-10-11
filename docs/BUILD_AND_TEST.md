@@ -128,7 +128,7 @@ cache, metadata expansion and access transformer. Client registrations are
 provided by physical-client-only Forge subscribers and the v118x client
 factories. Use `--no-daemon` for every Forge invocation.
 `mod_version` (4.0.3) in gradle.properties sets this jar and every other loader jar.
-The production jar is `forge/1.18.2/build/libs/buildscape-4.0.3.jar`
+The production jar is `forge/1.18.2/build/libs/buildscape-forge-1.18.2-4.0.3.jar`
 (the `-dev` jar is not a production artifact). It is the output of `remapJar`,
 which remaps classes to SRG names and generates the SRG mixin refmap. Text
 resources are normalised from CRLF to LF so the jar does not depend on the

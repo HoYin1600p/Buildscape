@@ -22,7 +22,8 @@ def replaceProperties = [
 
 group = referenceProperties.getProperty('mod_group_id')
 version = providers.gradleProperty('mod_version').get()
-base.archivesName = referenceProperties.getProperty('mod_id')
+// Release jars carry loader and Minecraft version (owner decision); ref mode keeps main's name for jar comparisons.
+base.archivesName = sourceMode == 'ref' ? referenceProperties.getProperty('mod_id') : 'buildscape-forge-1.18.2'
 replaceProperties.mod_version = version.toString()
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)

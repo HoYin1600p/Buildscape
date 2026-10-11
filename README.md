@@ -21,7 +21,7 @@ The default build includes Fabric and NeoForge 26.2 and
 Forge 1.18.2 using shared code (`buildscape.v118xSource=common`). It runs
 `:common:v118xTest`, all `:common:v118xRun*Tests` tasks and the v118x recipe
 checks alongside the 26.2 tests. The Forge production jar is
-`forge/1.18.2/build/libs/buildscape-4.0.3.jar`. The 26.2 loader jars are
+`forge/1.18.2/build/libs/buildscape-forge-1.18.2-4.0.3.jar`. The 26.2 loader jars are
 collected into the root `build/libs` directory.
 
 For a fast 26.2-only build, omit the Forge 1.18.2 project and skip v118x

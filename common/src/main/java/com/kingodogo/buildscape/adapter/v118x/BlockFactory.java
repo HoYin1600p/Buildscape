@@ -169,6 +169,19 @@ import java.util.Random;
 import java.util.function.Supplier;
 public class BlockFactory implements IBlockFactory {
 
+    private static final class WoodDoor extends DoorBlock {
+        private WoodDoor(BlockBehaviour.Properties properties) { super(properties); }
+    }
+    private static final class WoodTrapdoor extends TrapDoorBlock {
+        private WoodTrapdoor(BlockBehaviour.Properties properties) { super(properties); }
+    }
+    private static final class WoodButton extends WoodButtonBlock {
+        private WoodButton(BlockBehaviour.Properties properties) { super(properties); }
+    }
+    private static final class WoodPressurePlate extends PressurePlateBlock {
+        private WoodPressurePlate(BlockBehaviour.Properties properties) { super(Sensitivity.EVERYTHING, properties); }
+    }
+
     private static class CustomWoodType extends WoodType {
         public CustomWoodType(String name) {
             super(name);
@@ -433,7 +446,7 @@ public class BlockFactory implements IBlockFactory {
                 }
             };
         } else if (def.isDoor()) {
-            return new DoorBlock(props);
+            return new WoodDoor(props);
         } else if (def.isCopperTrapdoor()) {
             return new TrapDoorBlock(props) {
                 @Override public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
@@ -445,11 +458,11 @@ public class BlockFactory implements IBlockFactory {
                 }
             };
         } else if (def.isTrapdoor()) {
-            return new TrapDoorBlock(props);
+            return new WoodTrapdoor(props);
         } else if (def.isButton()) {
-            return new WoodButtonBlock(props);
+            return new WoodButton(props);
         } else if (def.isPressurePlate()) {
-            return new PressurePlateBlock(PressurePlateBlock.Sensitivity.EVERYTHING, props);
+            return new WoodPressurePlate(props);
         } else if (def.isMushroomShelves()) {
             return new MushroomShelvesBlock(props) {
                 @Override

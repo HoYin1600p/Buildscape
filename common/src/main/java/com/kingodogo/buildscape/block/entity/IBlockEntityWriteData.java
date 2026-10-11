@@ -19,4 +19,8 @@ public interface IBlockEntityWriteData {
     void putSubData(String key, IBlockEntityWriteData data);
     IBlockEntityWriteData createChild();
     default void copyTo(IBlockEntityWriteData target) {}
+    void putDouble(String key, double value);
+    void putIntArray(String key, int[] value);
+    default void putSavedItem(String key, ItemStack item) { putItem(key, item); }
+    default void putSavedItemList(String key, List<ItemStack> items) { putItemList(key, items); }
 }

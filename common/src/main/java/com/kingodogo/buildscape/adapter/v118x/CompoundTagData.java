@@ -22,6 +22,11 @@ public final class CompoundTagData implements IBlockEntityData {
     @Override public void putInt(String key, int value) { tag.putInt(key, value); }
     @Override public void putLong(String key, long value) { tag.putLong(key, value); }
     @Override public void putFloat(String key, float value) { tag.putFloat(key, value); }
+    @Override public void putDouble(String key, double value) { tag.putDouble(key, value); }
+    @Override public void putIntArray(String key, int[] value) { tag.putIntArray(key, value); }
+    @Override public void putSavedItem(String key, ItemStack item) {
+        if (item != null) tag.put(key, item.save(new CompoundTag()));
+    }
     @Override public void putBoolean(String key, boolean value) { tag.putBoolean(key, value); }
     @Override public void putUUID(String key, UUID value) { if (value != null) tag.putUUID(key, value); }
     @Override public void putStringList(String key, List<String> values) {
@@ -59,6 +64,10 @@ public final class CompoundTagData implements IBlockEntityData {
     @Override public int getIntOr(String key, int fallback) { return tag.contains(key, Tag.TAG_INT) ? tag.getInt(key) : fallback; }
     @Override public long getLongOr(String key, long fallback) { return tag.contains(key, Tag.TAG_LONG) ? tag.getLong(key) : fallback; }
     @Override public float getFloatOr(String key, float fallback) { return tag.contains(key, Tag.TAG_FLOAT) ? tag.getFloat(key) : fallback; }
+    @Override public Optional<Double> getDouble(String key) { return tag.contains(key, Tag.TAG_DOUBLE) ? Optional.of(tag.getDouble(key)) : Optional.empty(); }
+    @Override public Optional<int[]> getIntArray(String key) { return tag.contains(key, Tag.TAG_INT_ARRAY) ? Optional.of(tag.getIntArray(key)) : Optional.empty(); }
+    @Override public Optional<Integer> getInt(String key) { return tag.contains(key, Tag.TAG_INT) ? Optional.of(tag.getInt(key)) : Optional.empty(); }
+    @Override public Optional<Boolean> getBoolean(String key) { return tag.contains(key, Tag.TAG_BYTE) ? Optional.of(tag.getBoolean(key)) : Optional.empty(); }
     @Override public boolean getBooleanOr(String key, boolean fallback) { return tag.contains(key, Tag.TAG_BYTE) ? tag.getBoolean(key) : fallback; }
     @Override public UUID getUUIDOrNull(String key) { return tag.hasUUID(key) ? tag.getUUID(key) : null; }
     @Override public List<String> getStringListOrEmpty(String key) {

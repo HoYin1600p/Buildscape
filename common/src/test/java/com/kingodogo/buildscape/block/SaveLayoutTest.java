@@ -1,6 +1,8 @@
 package com.kingodogo.buildscape.block;
 
 import com.kingodogo.buildscape.TestBootstrap;
+import com.kingodogo.buildscape.adapter.v26x.ValueInputData;
+import com.kingodogo.buildscape.adapter.v26x.ValueOutputData;
 import com.kingodogo.buildscape.util.ColorGradientSolver;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.RegistryAccess;
@@ -30,7 +32,7 @@ class SaveLayoutTest {
                 2.345678901234, 3.456789012345, false, 7, "mangrove_42",
                 List.of("#ABCDEF", "#123456"), 19, true);
         var output = output();
-        settings.save(output);
+        settings.save(new ValueOutputData(output));
         CompoundTag tag = output.buildResult();
         assertEquals(Set.of("FacingYaw", "ParticlePattern", "PatternSpeed", "PatternSpread", "PatternIntensity",
                 "UsePattern", "MaxParticleColor", "PillarId", "ParticleColors", "ParticleColorCounter", "ColorsInitialized"), tag.keySet());
@@ -60,7 +62,7 @@ class SaveLayoutTest {
         int[] gradients = {8, 7, 6, 5, 4, 3, 2, 1, 0};
         var settings = new BuildersWorkbenchBlockEntity.SavedSettings(1, ColorGradientSolver.FILTER_DEFAULT, 27, colors, gradients);
         var output = output();
-        settings.save(output);
+        settings.save(new ValueOutputData(output));
         CompoundTag tag = output.buildResult();
         assertEquals(Set.of("ActiveTab", "FilterMask", "FilterMaskVersion", "CopyProgress",
                 "ColorResultOffsets", "GradientResultOffsets"), tag.keySet());
@@ -92,7 +94,7 @@ class SaveLayoutTest {
         items.set(0, new ItemStack(Items.STONE, 17));
         items.set(29, new ItemStack(Items.DIRT, 23));
         var output = output();
-        BuildersWorkbenchBlockEntity.saveItems(output, items);
+        BuildersWorkbenchBlockEntity.saveItems(new ValueOutputData(output), items);
         CompoundTag tag = output.buildResult();
         assertEquals(Set.of("Items"), tag.keySet());
         ListTag list = tag.getList("Items").orElseThrow();
@@ -118,7 +120,9 @@ class SaveLayoutTest {
         CompoundTag custom = new CompoundTag();
         custom.putString("buildscape_test", "retained");
         legacy.put("tag", custom);
-        ItemStack pillarItem = PillarBlockEntity.SavedItem.read(input(legacy));
+        CompoundTag pillar = new CompoundTag();
+        pillar.put("DisplayedItem", legacy);
+        ItemStack pillarItem = PillarBlockEntity.SavedItem.read(input(pillar));
         assertEquals(37, pillarItem.getCount());
         assertEquals("retained", pillarItem.get(net.minecraft.core.component.DataComponents.CUSTOM_DATA)
                 .copyTag().getString("buildscape_test").orElseThrow());
@@ -133,9 +137,9 @@ class SaveLayoutTest {
         assertEquals(Items.STONE, items.get(29).getItem());
     }
 
-    private static ValueInput input(CompoundTag tag) {
-        return TagValueInput.create(ProblemReporter.DISCARDING,
-                RegistryAccess.fromRegistryOfRegistries(BuiltInRegistries.REGISTRY), tag);
+    private static ValueInputData input(CompoundTag tag) {
+        return new ValueInputData(TagValueInput.create(ProblemReporter.DISCARDING,
+                RegistryAccess.fromRegistryOfRegistries(BuiltInRegistries.REGISTRY), tag));
     }
 
     private static TagValueOutput output() {

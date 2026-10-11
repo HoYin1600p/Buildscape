@@ -16,6 +16,21 @@ public class ValueOutputData implements IBlockEntityWriteData {
         this.output = output;
     }
 
+    @Override public void putDouble(String key, double value) { output.putDouble(key, value); }
+    @Override public void putIntArray(String key, int[] value) { output.putIntArray(key, value); }
+
+    @Override public void putSavedItemList(String key, List<ItemStack> items) {
+        var list = output.childrenList(key);
+        for (int slot = 0; slot < items.size(); slot++) {
+            ItemStack item = items.get(slot);
+            if (item != null && !item.isEmpty()) {
+                var child = list.addChild();
+                child.putByte("Slot", (byte) slot);
+                child.store(ItemStack.MAP_CODEC, item);
+            }
+        }
+    }
+
     @Override
     public void putString(String key, String value) {
         if (value != null) {

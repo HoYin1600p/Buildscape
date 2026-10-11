@@ -587,12 +587,43 @@ public class MixinFactory implements IMixinFactory {
     }
 
     @Override
-    public ItemStack cycleAdvancementIcon(Object widget, Object displayInfo) {
-        if (displayInfo instanceof net.minecraft.advancements.DisplayInfo di) {
-            return di.getIcon();
+    public ItemStack cycleAdvancementIcon(Object node, Object displayObject) {
+        var display = (net.minecraft.advancements.DisplayInfo) displayObject;
+        ItemStack fallback = display.getIcon();
+        if (!(node instanceof net.minecraft.advancements.Advancement advancement)) return fallback;
+        var id = advancement.getId();
+        if (!id.getNamespace().equals("buildscape")) return fallback;
+        List<String> names = ADVANCEMENT_ICONS.get(id.getPath());
+        if (names == null) return fallback;
+        List<Item> items = new ArrayList<>();
+        for (String name : names) {
+            Item item = net.minecraft.core.Registry.ITEM.get(new net.minecraft.resources.ResourceLocation("buildscape", name));
+            if (item != null && item != net.minecraft.world.item.Items.AIR) items.add(item);
         }
-        return ItemStack.EMPTY;
+        if (items.isEmpty()) return fallback;
+        return new ItemStack(items.get((int) ((System.currentTimeMillis() / 1200L) % items.size())));
     }
+
+    private static final java.util.Map<String, List<String>> ADVANCEMENT_ICONS = java.util.Map.of(
+            "one_more_block", List.of("steel_block", "scraped_steel", "rustic_scraped_steel", "stacked_steel", "steel_panels", "crossed_steel_panels", "steel_mesh_block", "pressed_steel", "cut_steel", "polished_steel", "factory_steel_panel", "steel_casing", "steel_trim", "steel_pillar", "bolted_steel_pillar", "steel_fan"),
+            "okay_one_more", coloredNames("", "_tiles", true),
+            "actually_one_last", List.of("ashpen_white_planks", "orange_ashpen_planks", "magenta_ashpen_planks", "light_blue_ashpen_planks", "yellow_ashpen_planks", "lime_ashpen_planks", "pink_ashpen_planks", "gray_ashpen_planks", "light_gray_ashpen_planks", "cyan_ashpen_planks", "purple_ashpen_planks", "blue_ashpen_planks", "brown_ashpen_planks", "green_ashpen_planks", "red_ashpen_planks", "black_ashpen_planks", "ashpen_log", "stripped_ashpen_log", "ashpen_wood", "stripped_ashpen_wood"),
+            "one_last_one_i_promise", List.of("bit_copper_block", "bit_cut_copper", "bit_chiseled_copper", "bit_exposed_copper_block", "bit_exposed_cut_copper", "bit_exposed_chiseled_copper", "bit_weathered_copper_block", "bit_weathered_cut_copper", "bit_weathered_chiseled_copper", "bit_oxidized_copper_block", "bit_oxidized_cut_copper", "bit_oxidized_chiseled_copper"),
+            "string_me_along", coloredNames("", "_spool", false),
+            "the_entire_catalogue", List.of("white_wallpaper", "orange_wallpaper", "magenta_wallpaper", "light_blue_wallpaper", "yellow_wallpaper", "lime_wallpaper", "pink_wallpaper", "cyan_wallpaper", "purple_wallpaper", "red_wallpaper"),
+            "rainbow_mood_light", List.of("russet_froglight", "tidal_froglight", "scarlet_froglight", "cerulean_froglight", "gleaming_froglight", "azure_froglight"),
+            "a_very_buildscape_christmas", List.of("festive_stocking", "red_ornament", "multicolor_string_light", "glow_star", "snowy_spruce_leaves"));
+
+    private static List<String> coloredNames(String prefix, String suffix, boolean allColors) {
+        List<String> names = new ArrayList<>();
+        String[] colors = allColors
+                ? new String[]{"white", "orange", "magenta", "light_blue", "yellow", "lime", "pink", "gray", "light_gray", "cyan", "purple", "blue", "brown", "green", "red", "black"}
+                : new String[]{"white", "orange", "magenta", "light_blue", "yellow", "lime", "pink", "cyan", "purple", "blue", "red"};
+        for (String color : colors) names.add(prefix + color + suffix);
+        return List.copyOf(names);
+    }
+
+
 
     @Override
     public void setScreen(Object screen) {

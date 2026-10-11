@@ -17,6 +17,8 @@ public final class BufferedBlockEntityData implements IBlockEntityData {
     @Override public void putInt(String key, int value) { values.put(key, value); }
     @Override public void putLong(String key, long value) { values.put(key, value); }
     @Override public void putFloat(String key, float value) { values.put(key, value); }
+    @Override public void putDouble(String key, double value) { values.put(key, value); }
+    @Override public void putIntArray(String key, int[] value) { values.put(key, value.clone()); }
     @Override public void putBoolean(String key, boolean value) { values.put(key, value); }
     @Override public void putUUID(String key, UUID value) { if (value != null) values.put(key, value); }
     @Override public void putStringList(String key, List<String> list) { values.put(key, list == null ? List.of() : new ArrayList<>(list)); }
@@ -47,6 +49,10 @@ public final class BufferedBlockEntityData implements IBlockEntityData {
     @Override public BlockState getBlockStateOrAir(String key) { Object value = values.get(key); return value instanceof BlockState state ? state : Blocks.AIR.defaultBlockState(); }
     @Override public Optional<IBlockEntityData> getSubData(String key) { Object value = values.get(key); return value instanceof BufferedBlockEntityData child ? Optional.of(child) : Optional.empty(); }
     @Override public boolean contains(String key) { return values.containsKey(key); }
+    @Override public Optional<Double> getDouble(String key) { Object value = values.get(key); return value instanceof Double number ? Optional.of(number) : Optional.empty(); }
+    @Override public Optional<int[]> getIntArray(String key) { Object value = values.get(key); return value instanceof int[] array ? Optional.of(array.clone()) : Optional.empty(); }
+    @Override public Optional<Integer> getInt(String key) { Object value = values.get(key); return value instanceof Integer number ? Optional.of(number) : Optional.empty(); }
+    @Override public Optional<Boolean> getBoolean(String key) { Object value = values.get(key); return value instanceof Boolean bool ? Optional.of(bool) : Optional.empty(); }
 
     public void copyTo(IBlockEntityWriteData target) {
         for (Map.Entry<String, Object> entry : values.entrySet()) {
@@ -55,6 +61,8 @@ public final class BufferedBlockEntityData implements IBlockEntityData {
             else if (value instanceof Integer number) target.putInt(key, number);
             else if (value instanceof Long number) target.putLong(key, number);
             else if (value instanceof Float number) target.putFloat(key, number);
+            else if (value instanceof Double number) target.putDouble(key, number);
+            else if (value instanceof int[] array) target.putIntArray(key, array.clone());
             else if (value instanceof Boolean bool) target.putBoolean(key, bool);
             else if (value instanceof UUID uuid) target.putUUID(key, uuid);
             else if (value instanceof ItemStack stack) target.putItem(key, stack);

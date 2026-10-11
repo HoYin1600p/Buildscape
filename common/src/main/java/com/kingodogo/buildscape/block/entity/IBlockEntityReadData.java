@@ -19,4 +19,14 @@ public interface IBlockEntityReadData {
     BlockState getBlockStateOrAir(String key);
     Optional<? extends IBlockEntityReadData> getSubData(String key);
     boolean contains(String key);
+    Optional<Double> getDouble(String key);
+    Optional<int[]> getIntArray(String key);
+    default Optional<Integer> getInt(String key) {
+        return contains(key) ? Optional.of(getIntOr(key, 0)) : Optional.empty();
+    }
+    default Optional<Boolean> getBoolean(String key) {
+        return contains(key) ? Optional.of(getBooleanOr(key, false)) : Optional.empty();
+    }
+    default ItemStack getSavedItemOrEmpty(String key) { return getItemOrEmpty(key); }
+    default List<ItemStack> getSavedItemListOrEmpty(String key, int size) { return getItemListOrEmpty(key, size); }
 }

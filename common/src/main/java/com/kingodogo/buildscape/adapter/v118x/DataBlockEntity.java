@@ -7,6 +7,8 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 public abstract class DataBlockEntity extends BlockEntity implements IDataSerializable {
     protected DataBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) { super(type, pos, state); }
+    protected boolean syncCustomData() { return false; }
+    protected void writeUpdateData(IBlockEntityWriteData output) { writeData(output); }
 
     @Override public void load(CompoundTag tag) {
         super.load(tag);
@@ -20,7 +22,7 @@ public abstract class DataBlockEntity extends BlockEntity implements IDataSerial
 
     @Override public CompoundTag getUpdateTag() {
         CompoundTag tag = super.getUpdateTag();
-        writeData(new CompoundTagData(tag));
+        writeUpdateData(new CompoundTagData(tag));
         return tag;
     }
 }

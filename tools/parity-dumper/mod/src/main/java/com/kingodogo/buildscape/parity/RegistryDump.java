@@ -130,7 +130,13 @@ final class RegistryDump {
         for (CreativeModeTab tab : CreativeModeTab.TABS) {
             if (tab == null) continue;
             NonNullList<ItemStack> items = NonNullList.create();
-            tab.fillItemList(items);
+            try {
+                tab.fillItemList(items);
+            } catch (RuntimeException clientOnly) {
+                // The vanilla hotbar tab only fills on the client; record that instead of failing the dump.
+                result.addProperty(tabId(tab), "unavailable: " + clientOnly.getMessage());
+                continue;
+            }
             JsonArray order = new JsonArray();
             // Keep absolute indices so ordering relative to other mods is visible.
             for (int index = 0; index < items.size(); index++) {

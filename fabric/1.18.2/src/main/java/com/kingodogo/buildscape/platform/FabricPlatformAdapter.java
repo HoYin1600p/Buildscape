@@ -15,6 +15,41 @@ import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 
 public final class FabricPlatformAdapter extends PlatformAdapterBase implements GameRuleAccess {
+    @Override public void registerMenuScreens() {
+        if (!isClient()) return;
+        com.kingodogo.buildscape.adapter.v118x.GuiProvider.registerMenuScreens(menuScreenRegistrar());
+        registerRenderers();
+    }
+
+    public static com.kingodogo.buildscape.adapter.v118x.GuiProvider.Registrar menuScreenRegistrar() {
+        return new com.kingodogo.buildscape.adapter.v118x.GuiProvider.Registrar() {
+            public <M extends net.minecraft.world.inventory.AbstractContainerMenu> void register(
+                    net.minecraft.world.inventory.MenuType<M> type,
+                    com.kingodogo.buildscape.adapter.v118x.GuiProvider.ScreenFactory<M> factory) {
+                net.fabricmc.fabric.api.client.screenhandler.v1.ScreenRegistry
+                        .<M, net.minecraft.client.gui.screens.inventory.AbstractContainerScreen<M>>register(
+                                type, (menu, inventory, title) -> factory.create(menu, inventory, title));
+            }
+        };
+    }
+    @Override public void registerParticleProviders() {
+        if (!isClient()) return;
+        com.kingodogo.buildscape.adapter.v118x.ParticleFactory.registerProviders(new com.kingodogo.buildscape.adapter.v118x.ParticleFactory.Registrar() {
+            public <T extends net.minecraft.core.particles.ParticleOptions> void register(net.minecraft.core.particles.ParticleType<T> type,
+                    java.util.function.Function<net.minecraft.client.particle.SpriteSet, net.minecraft.client.particle.ParticleProvider<T>> factory) {
+                net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry.getInstance().register(type, sprites -> factory.apply(sprites));
+            }
+            public <T extends net.minecraft.core.particles.ParticleOptions> void registerDirect(net.minecraft.core.particles.ParticleType<T> type, net.minecraft.client.particle.ParticleProvider<T> provider) {
+                net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry.getInstance().register(type, provider);
+            }
+        });
+    }
+    @Override public <T extends net.minecraft.world.inventory.AbstractContainerMenu>
+    net.minecraft.world.inventory.MenuType<T> createMenuType(com.kingodogo.buildscape.menu.MenuTypeBridge.MenuFactory<T> factory) {
+        // Fabric's screen-handler API widens both the constructor and its supplier type.
+        return new net.minecraft.world.inventory.MenuType<>((id, inventory) -> factory.create(id, inventory));
+    }
+
     private static final ThreadLocal<Integer> REGISTRY_DEPTH = ThreadLocal.withInitial(() -> 0);
     private boolean worldGenPrepared;
     private boolean worldGenRegistered;

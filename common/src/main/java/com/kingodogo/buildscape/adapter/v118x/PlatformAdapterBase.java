@@ -126,24 +126,8 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public <T extends BlockEntity> BlockEntityType<T> createBlockEntityTypeForBlocks(
-            BlockEntityFactory<T> factory, Block... blocks) {
-        try {
-            Class<?> supplierClass = Class.forName("net.minecraft.world.level.block.entity.BlockEntityType$BlockEntitySupplier");
-            Object proxy = java.lang.reflect.Proxy.newProxyInstance(BlockEntityType.class.getClassLoader(),
-                    new Class<?>[]{supplierClass}, (proxyObject, method, args) -> {
-                        if (method.getName().equals("create")) return factory.create((BlockPos) args[0], (BlockState) args[1]);
-                        return null;
-                    });
-            var constructor = BlockEntityType.class.getDeclaredConstructor(
-                    supplierClass, Set.class, com.mojang.datafixers.types.Type.class);
-            constructor.setAccessible(true);
-            return (BlockEntityType<T>) constructor.newInstance(proxy, Set.of(blocks), null);
-        } catch (ReflectiveOperationException exception) {
-            throw new IllegalStateException("Cannot construct restored block entity type", exception);
-        }
-    }
+    public abstract <T extends BlockEntity> BlockEntityType<T> createBlockEntityTypeForBlocks(
+            BlockEntityFactory<T> factory, Block... blocks);
 
     @Override
     public Item createRegisteredItem(com.kingodogo.buildscape.item.ItemDefinition definition, Block block) {
@@ -336,23 +320,7 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
     }
 
     @Override
-    public Fluid getBucketFluid(Item item) {
-        if (item == Items.WATER_BUCKET) return Fluids.WATER;
-        if (item == Items.LAVA_BUCKET) return Fluids.LAVA;
-        if (item instanceof BucketItem) {
-            try {
-                java.lang.reflect.Field field = BucketItem.class.getDeclaredField("content");
-                field.setAccessible(true);
-                return (Fluid) field.get(item);
-            } catch (Exception ignored) {
-                try {
-                    java.lang.reflect.Method method = item.getClass().getMethod("getFluid");
-                    return (Fluid) method.invoke(item);
-                } catch (Exception ignored2) {}
-            }
-        }
-        return Fluids.EMPTY;
-    }
+    public abstract Fluid getBucketFluid(Item item);
 
     @Override
     public Entity createSeatEntity(Level level, double x, double y, double z) {
@@ -492,10 +460,7 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
 
 
     @Override
-    public void registerParticleProviders() {
-        if (!isClient()) return;
-        com.kingodogo.buildscape.adapter.v118x.ParticleFactory.registerProviders();
-    }
+    public abstract void registerParticleProviders();
 
     @Override
     public void registerCopperFireFlameParticle() {
@@ -1386,46 +1351,8 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public <T extends BlockEntity> BlockEntityType<T> createBlockEntityType(BlockEntityFactory<T> factory, Predicate<BlockState> isValid) {
-        try {
-            Class<?> supplierClass = Class.forName("net.minecraft.world.level.block.entity.BlockEntityType$BlockEntitySupplier");
-            Object proxy = java.lang.reflect.Proxy.newProxyInstance(
-                    BlockEntityType.class.getClassLoader(),
-                    new Class<?>[]{supplierClass},
-                    (proxyObj, method, args) -> {
-                        if ("create".equals(method.getName())) {
-                            return factory.create((BlockPos) args[0], (BlockState) args[1]);
-                        }
-                        return null;
-                    }
-            );
-            Set<Block> validBlocks = new java.util.AbstractSet<>() {
-                @Override
-                public boolean contains(Object o) {
-                    if (o instanceof Block b) {
-                        return isValid.test(b.defaultBlockState());
-                    }
-                    return false;
-                }
-
-                @Override
-                public java.util.Iterator<Block> iterator() {
-                    return java.util.Collections.emptyIterator();
-                }
-
-                @Override
-                public int size() {
-                    return 0;
-                }
-            };
-            java.lang.reflect.Constructor<BlockEntityType> constructor = BlockEntityType.class.getDeclaredConstructor(supplierClass, Set.class, com.mojang.datafixers.types.Type.class);
-            constructor.setAccessible(true);
-            return (BlockEntityType<T>) constructor.newInstance(proxy, validBlocks, null);
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to create BlockEntityType for 1.18.2", e);
-        }
-    }
+    public abstract <T extends BlockEntity> BlockEntityType<T> createBlockEntityType(
+            BlockEntityFactory<T> factory, Predicate<BlockState> isValid);
 
     @Override
     public boolean isOnGround(Entity entity) {
@@ -2314,43 +2241,7 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
         registerCauldronInteractions();
     }
 
-    protected void registerFlowerPotPlants() {
-        registerPot("red_bush", "potted_red_bush");
-        registerPot("frost_rose", "potted_frost_rose");
-        registerPot("red_monets", "potted_red_monets");
-        registerPot("blue_monets", "potted_blue_monets");
-        registerPot("purple_monets", "potted_purple_monets");
-        registerPot("light_blue_monets", "potted_light_blue_monets");
-        registerPot("pink_monets", "potted_pink_monets");
-        registerPot("yellow_monets", "potted_yellow_monets");
-        registerPot("poplar_sapling", "potted_poplar_sapling");
-        registerPot("clover", "potted_clover");
-        registerPot("snowy_bush", "potted_snowy_bush");
-        registerPot("snowy_short_grass", "potted_snowy_short_grass");
-        registerPot("snowy_tall_grass", "potted_snowy_tall_grass");
-        registerPot("snowy_fern", "potted_snowy_fern");
-        registerPot("snowy_large_fern", "potted_snowy_large_fern");
-    }
-
-    private void registerPot(String flowerId, String pottedId) {
-        Block flower = getBlock(new CommonId("buildscape", flowerId));
-        Block potted = getBlock(new CommonId("buildscape", pottedId));
-        if (flower != null && potted != null) {
-            try {
-                for (java.lang.reflect.Field f : net.minecraft.world.level.block.FlowerPotBlock.class.getDeclaredFields()) {
-                    if (java.util.Map.class.isAssignableFrom(f.getType()) && java.lang.reflect.Modifier.isStatic(f.getModifiers())) {
-                        f.setAccessible(true);
-                        @SuppressWarnings("unchecked")
-                        java.util.Map<Block, Block> map = (java.util.Map<Block, Block>) f.get(null);
-                        if (map != null) {
-                            map.put(flower, potted);
-                            break;
-                        }
-                    }
-                }
-            } catch (Throwable ignored) {}
-        }
-    }
+    protected abstract void registerFlowerPotPlants();
 
     private void registerCompostables() {
         registerCompost("red_rose_vines", 0.5f);
@@ -2846,11 +2737,7 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
 
 
     @Override
-    public void registerMenuScreens() {
-        if (!isClient()) return;
-        com.kingodogo.buildscape.adapter.v118x.GuiProvider.registerMenuScreens();
-        registerRenderers();
-    }
+    public abstract void registerMenuScreens();
 
     @Override
     public void registerRenderers() {
@@ -2897,23 +2784,8 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
     private final Map<String, double[]> v118xSpriteCache = new java.util.concurrent.ConcurrentHashMap<>();
 
     private static com.mojang.blaze3d.platform.NativeImage getSpriteImage(net.minecraft.client.renderer.texture.TextureAtlasSprite sprite) {
-        try {
-            java.lang.reflect.Field field = net.minecraft.client.renderer.texture.TextureAtlasSprite.class.getDeclaredField("mainImage");
-            field.setAccessible(true);
-            com.mojang.blaze3d.platform.NativeImage[] images = (com.mojang.blaze3d.platform.NativeImage[]) field.get(sprite);
-            if (images != null && images.length > 0) return images[0];
-        } catch (Throwable ignored) {
-            try {
-                for (java.lang.reflect.Field f : net.minecraft.client.renderer.texture.TextureAtlasSprite.class.getDeclaredFields()) {
-                    if (f.getType().isArray() && f.getType().getComponentType() == com.mojang.blaze3d.platform.NativeImage.class) {
-                        f.setAccessible(true);
-                        com.mojang.blaze3d.platform.NativeImage[] images = (com.mojang.blaze3d.platform.NativeImage[]) f.get(sprite);
-                        if (images != null && images.length > 0) return images[0];
-                    }
-                }
-            } catch (Throwable ignored2) {}
-        }
-        return null;
+        var images = ((com.kingodogo.buildscape.mixin.SpriteV118xAccessor) sprite).buildscape$getImages();
+        return images != null && images.length > 0 ? images[0] : null;
     }
 
     @Override

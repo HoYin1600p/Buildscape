@@ -20,6 +20,7 @@
       "com.kingodogo.buildscape.BuildscapeFabricClient"
     ]
   },
+  "accessWidener": "buildscape.accesswidener",
   "mixins": [
     "buildscape.mixins.json",
     "buildscape.fabric118x.mixins.json"

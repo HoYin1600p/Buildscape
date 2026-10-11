@@ -13,7 +13,11 @@ unimined.minecraft {
         mojmap()
     }
     defaultRemapJar = true
-    fabric { loader '0.16.14' }
+    fabric {
+        loader '0.16.14'
+        // Fabric API widens MenuType at runtime only; our compile and release jar need it too.
+        accessWidener file('src/main/resources/buildscape.accesswidener')
+    }
 }
 
 configurations { commonVariant }

@@ -40,6 +40,17 @@ sourceSets {
         compileClasspath += sourceSets.v26x.output
         runtimeClasspath += sourceSets.v26x.output
     }
+
+    v118xTest {
+        java.srcDirs = ['src/v118xTest/java']
+        resources.srcDirs = []
+        // Unimined may add the mapped Minecraft jar directly to the compile task.
+        // Use that task's final classpath, including its vanilla libraries.
+        def minecraftClasspath = files(provider { tasks.named('compileV118xJava', JavaCompile).get().classpath })
+        compileClasspath += sourceSets.v118x.output + minecraftClasspath
+        runtimeClasspath = files(rootProject.file('ref/forge/1.18.2/src/main/resources')) +
+                runtimeClasspath + sourceSets.v118x.output + sourceSets.v118x.runtimeClasspath + minecraftClasspath
+    }
 }
 
 // Compile shared 1.18.2 code against vanilla Mojang names, without a loader or ATs.
@@ -58,6 +69,9 @@ configurations {
 }
 
 dependencies {
+    v118xTestImplementation platform('org.junit:junit-bom:5.12.2')
+    v118xTestImplementation 'org.junit.jupiter:junit-jupiter'
+    v118xTestRuntimeOnly 'org.junit.platform:junit-platform-launcher:1.12.2'
     testImplementation platform('org.junit:junit-bom:5.12.2')
     testImplementation 'org.junit.jupiter:junit-jupiter'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher:1.12.2'
@@ -77,16 +91,20 @@ dependencies {
         'org.ow2.asm:asm:9.7.1',
         'org.ow2.asm:asm-tree:9.7.1'
     ].each { dependency ->
-        v118xCompileOnly dependency
+        // Minecraft 1.18.2 supplies its own DFU and Brigadier versions through
+        // Unimined. Newer versions change serialization methods used at bootstrap.
+        if (!dependency.startsWith('com.mojang:')) v118xCompileOnly dependency
         v121xCompileOnly dependency
         v26xCompileOnly dependency
     }
 
-    ['v118xCompileOnly', 'v121xCompileOnly', 'v26xCompileOnly'].each { configurationName ->
+    ['v121xCompileOnly', 'v26xCompileOnly'].each { configurationName ->
         add(configurationName, 'com.google.code.gson:gson:2.10.1')
     }
 
-    v118xCompileOnly 'io.netty:netty-buffer:4.1.97.Final'
+    // Gson and Netty for v118x also come from Minecraft's library manifest.
+    // Nullable was previously supplied transitively by the newer DFU dependency.
+    v118xCompileOnly 'com.google.code.findbugs:jsr305:3.0.2'
     v121xCompileOnly 'io.netty:netty-buffer:4.1.97.Final'
     v26xCompileOnly 'io.netty:netty-buffer:4.2.15.Final'
     v26xCompileOnly 'it.unimi.dsi:fastutil:8.5.18'
@@ -103,6 +121,7 @@ tasks.named('compileV118xJava', JavaCompile) {
     options.compilerArgs += ['-Xmaxerrs', '10000']
 }
 tasks.named('compileV121xJava', JavaCompile) { options.release.set(21) }
+tasks.named('compileV118xTestJava', JavaCompile) { options.release.set(17) }
 tasks.named('compileV26xJava', JavaCompile) { options.release.set(25) }
 tasks.named('compileTestJava', JavaCompile) { options.release.set(25) }
 tasks.named('test', Test) {
@@ -156,6 +175,99 @@ tasks.named('jar', Jar) {
 }
 tasks.named('assemble') { dependsOn tasks.named('v26xClasses') }
 tasks.named('check') { dependsOn tasks.named('compileV118xJava') }
+
+def v118xStandaloneTests = [
+        v118xRunPipeSpillTests: 'com.kingodogo.buildscape.client.renderer.PipeSpillTest',
+        v118xRunPipeOutletTests: 'com.kingodogo.buildscape.pipe.transport.PipeOutletWaterTest',
+        v118xRunTreeChopTraversalTests: 'com.kingodogo.buildscape.util.TreeChopTraversalTest',
+        v118xRunBeaconBeamScanTests: 'com.kingodogo.buildscape.util.BeaconBeamScanStateTest',
+        v118xRunGoldenDandelionGrowthTests: 'com.kingodogo.buildscape.util.GoldenDandelionGrowthTest',
+        v118xRunMangroveLeafSupportTests: 'com.kingodogo.buildscape.worldgen.MangroveLeafSupportTest',
+        v118xRunEyeblossomTransitionTests: 'com.kingodogo.buildscape.block.EyeblossomTransitionTest',
+        v118xRunCopperRodLogicTests: 'com.kingodogo.buildscape.adapter.v118x.CopperRodLogicTest',
+        v118xRunHazeBushResourcesTests: 'com.kingodogo.buildscape.block.HazeBushResourcesTest',
+        v118xRunParticleColorSlotsTests: 'com.kingodogo.buildscape.client.screen.ParticleColorSlotsTest',
+        v118xRunStairModelTests: 'com.kingodogo.buildscape.client.model.StairModelTest',
+        v118xRunPatternBoundsTests: 'com.kingodogo.buildscape.recipe.framework.util.PatternBoundsTest',
+        v118xRunRecipePackFormatterTests: 'com.kingodogo.buildscape.recipe.framework.util.RecipePackFormatterTest',
+        v118xRunRecipeManagerInjectorTests: 'com.kingodogo.buildscape.recipe.framework.integration.RecipeManagerInjectorTest',
+        v118xRunBinaryRecipeCacheTests: 'com.kingodogo.buildscape.recipe.framework.cache.BinaryRecipeCacheTest'
+]
+v118xStandaloneTests.each { taskName, testClass ->
+    def runner = tasks.register(taskName, JavaExec) {
+        group = 'verification'
+        description = "Runs ${testClass.tokenize('.').last()} against shared Minecraft 1.18.2 classes"
+        dependsOn tasks.named('v118xTestClasses'), tasks.named('v118xClasses')
+        classpath = sourceSets.v118xTest.runtimeClasspath
+        mainClass = testClass
+        javaLauncher = javaToolchains.launcherFor { languageVersion = JavaLanguageVersion.of(17) }
+        workingDir = layout.buildDirectory.get().asFile
+        systemProperty 'buildscape.mainResources', rootProject.file('ref/forge/1.18.2/src/main/resources').absolutePath
+        systemProperty 'java.io.tmpdir', layout.buildDirectory.dir('tmp/v118xTests').get().asFile.absolutePath
+        doFirst {
+            workingDir.mkdirs()
+            layout.buildDirectory.dir('tmp/v118xTests').get().asFile.mkdirs()
+        }
+    }
+    tasks.named('check') { dependsOn runner }
+}
+
+def v118xTestTask = tasks.register('v118xTest', Test) {
+    group = 'verification'
+    description = 'Runs the reference recipe regression suite against shared 1.18.2 code'
+    dependsOn tasks.named('v118xTestClasses'), tasks.named('v118xClasses')
+    testClassesDirs = sourceSets.v118xTest.output.classesDirs
+    classpath = sourceSets.v118xTest.runtimeClasspath
+    useJUnitPlatform()
+    javaLauncher = javaToolchains.launcherFor { languageVersion = JavaLanguageVersion.of(17) }
+    // Bootstrap and stderr capture mutate JVM globals.
+    maxParallelForks = 1
+    workingDir = layout.buildDirectory.get().asFile
+    systemProperty 'java.io.tmpdir', layout.buildDirectory.dir('tmp/v118xTests').get().asFile.absolutePath
+    doFirst {
+        workingDir.mkdirs()
+        layout.buildDirectory.dir('tmp/v118xTests').get().asFile.mkdirs()
+    }
+}
+tasks.named('check') { dependsOn v118xTestTask }
+
+def v118xRecipePack = rootProject.file('ref/forge/1.18.2/src/main/resources/data/buildscape/recipes_pack')
+def v118xRecipeToolClasspath = sourceSets.v118x.output +
+        files(provider { tasks.named('compileV118xJava', JavaCompile).get().classpath })
+def v118xVerifyBundledRecipeCache = tasks.register('v118xVerifyBundledRecipeCache', JavaExec) {
+    group = 'verification'
+    description = 'Verifies the frozen 1.18.2 bundled cache byte for byte against shared tooling'
+    dependsOn tasks.named('v118xClasses')
+    classpath = v118xRecipeToolClasspath
+    mainClass = 'com.kingodogo.buildscape.recipe.framework.compiler.BundledRecipeCacheVerify'
+    javaLauncher = javaToolchains.launcherFor { languageVersion = JavaLanguageVersion.of(17) }
+    args v118xRecipePack.absolutePath, new File(v118xRecipePack, 'recipes.bscb').absolutePath
+}
+def v118xCheckRecipePackFormat = tasks.register('v118xCheckRecipePackFormat', JavaExec) {
+    group = 'verification'
+    description = 'Checks canonical formatting and duplicate keys in the frozen 1.18.2 recipe pack'
+    dependsOn tasks.named('v118xClasses')
+    classpath = v118xRecipeToolClasspath
+    mainClass = 'com.kingodogo.buildscape.recipe.framework.util.RecipePackFormatter'
+    javaLauncher = javaToolchains.launcherFor { languageVersion = JavaLanguageVersion.of(17) }
+    args '--check', v118xRecipePack.absolutePath
+}
+tasks.named('check') { dependsOn v118xVerifyBundledRecipeCache, v118xCheckRecipePackFormat }
+
+// Explicit synchronization writes build output; the frozen reference remains an input.
+tasks.register('v118xSyncBundledRecipeCache', JavaExec) {
+    group = 'buildscape'
+    description = 'Generates the 1.18.2 cache under common/build without changing reference inputs'
+    dependsOn tasks.named('v118xClasses')
+    classpath = v118xRecipeToolClasspath
+    mainClass = 'com.kingodogo.buildscape.recipe.framework.compiler.RecipeCacheGenerator'
+    javaLauncher = javaToolchains.launcherFor { languageVersion = JavaLanguageVersion.of(17) }
+    inputs.files(fileTree(v118xRecipePack) { include '*.json' })
+    def generatedCache = layout.buildDirectory.file('generated/v118xRecipeCache/recipes.bscb')
+    outputs.file generatedCache
+    args v118xRecipePack.absolutePath, generatedCache.get().asFile.absolutePath
+    mustRunAfter v118xVerifyBundledRecipeCache, v118xCheckRecipePackFormat
+}
 
 // Explicit tooling only: no dependency from test, check, assemble or build.
 tasks.register('dumpBlockStates', JavaExec) {

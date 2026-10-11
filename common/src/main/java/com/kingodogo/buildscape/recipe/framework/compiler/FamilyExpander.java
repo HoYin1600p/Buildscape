@@ -9,9 +9,16 @@ import java.util.Locale;
 public class FamilyExpander {
 
     private final TemplateEngine templateEngine;
+    private final boolean referencePack;
 
     public FamilyExpander(TemplateEngine templateEngine) {
+        this(templateEngine, false);
+    }
+
+    /** Reference 1.18.2 packs must expand without consulting live registries. */
+    public FamilyExpander(TemplateEngine templateEngine, boolean referencePack) {
         this.templateEngine = templateEngine;
+        this.referencePack = referencePack;
     }
 
     public List<RecipeIR.RecipeSpec> expandFamily(RecipeIR.FamilySpec family) {
@@ -43,7 +50,9 @@ public class FamilyExpander {
                         ? List.of("stairs", "slab", "fence", "fence_gate", "button", "pressure_plate")
                         : List.of("stairs", "slab", "fence", "fence_gate", "door", "trapdoor", "button", "pressure_plate");
             } else {
-                targets = List.of("stairs", "slab", "wall", "chiseled");
+                targets = referencePack
+                        ? List.of("stairs", "slab", "wall", "chiseled", "stonecutter")
+                        : List.of("stairs", "slab", "wall", "chiseled");
             }
         }
 
@@ -54,7 +63,7 @@ public class FamilyExpander {
 
             String recipeId = sanitizeId(prefix + target + "_from_" + baseItem);
             String outputItem = prefix + target;
-            if ("gate".equals(target) || "stonecutter".equals(target)) {
+            if (!referencePack && ("gate".equals(target) || "stonecutter".equals(target))) {
                 var item = new AliasResolver().resolveItem(outputItem);
                 if (item == null || item == net.minecraft.world.item.Items.AIR) continue;
             }

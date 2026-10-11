@@ -6,15 +6,11 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.AtomicMoveNotSupportedException;
+
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -27,7 +23,7 @@ public class BinaryRecipeCache {
 
     private static final int MAGIC_HEADER = 0x4B59524F;
     private static final int CACHE_VERSION = 5;
-    private static final int SOURCE_SCHEMA_VERSION = 1;
+
     private static final int MAX_STRING_POOL_SIZE = 262_144;
     private static final int MAX_RECIPE_COUNT = 262_144;
     private static final int MAX_INGREDIENT_COUNT = 4_096;
@@ -43,105 +39,74 @@ public class BinaryRecipeCache {
     }
 
     public static String computeSourceHash(String[] categories, Map<String, byte[]> rawCategoryData) {
-        try {
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            digest.update(ByteBuffer.allocate(4).putInt(SOURCE_SCHEMA_VERSION).array());
-
-            for (String category : categories) {
-                byte[] data = rawCategoryData.get(category);
-                if (data != null) {
-                    digest.update(category.getBytes(StandardCharsets.UTF_8));
-                    digest.update(new String(data, StandardCharsets.UTF_8).replace("\r\n", "\n")
-                            .getBytes(StandardCharsets.UTF_8));
-                }
-            }
-
-            byte[] hashBytes = digest.digest();
-            StringBuilder hexString = new StringBuilder();
-            for (byte b : hashBytes) {
-                hexString.append(String.format("%02x", b));
-            }
-            return hexString.toString();
-        } catch (NoSuchAlgorithmException e) {
-            BuildscapeCommon.LOGGER.error("BDRE Cache: SHA-256 algorithm not available", e);
-            return "";
-        }
+        return com.kingodogo.buildscape.recipe.framework.compiler.RecipeCacheGenerator
+                .computeSourceHash(categories, rawCategoryData);
     }
 
     public static boolean isCacheValid(String expectedHash) {
-        Path cacheFile = getCacheDir().resolve("recipes.bscb");
-        if (!Files.exists(cacheFile)) {
-            return false;
-        }
-
-        try (DataInputStream in = new DataInputStream(new BufferedInputStream(Files.newInputStream(cacheFile)))) {
-            int header = in.readInt();
-            int version = in.readInt();
-            if (header != MAGIC_HEADER || version != CACHE_VERSION) {
-                return false;
-            }
-            String cachedHash = in.readUTF();
-            return expectedHash != null && !expectedHash.isBlank() && expectedHash.equals(cachedHash);
-        } catch (IOException e) {
-            BuildscapeCommon.LOGGER.warn("Unable to read BDRE cache header; treating as a cache miss", e);
-            // The reference treats unreadable cache headers as a cache miss.
-            return false;
-        }
+        return isCacheValid(getCacheDir().resolve("recipes.bscb"), expectedHash);
     }
 
-    public static void saveCache(String contentHash, List<RecipeIR.CompiledRecipe> recipes) {
-        Path cacheDir = getCacheDir();
-        Path tempFile = cacheDir.resolve("recipes.bscb.tmp." + System.nanoTime());
-        Path finalFile = cacheDir.resolve("recipes.bscb");
+    public static boolean isCacheValid(Path cacheFile, String expectedHash) {
+        return com.kingodogo.buildscape.recipe.framework.compiler.RecipeCacheGenerator
+                .isCacheValid(cacheFile, expectedHash);
+    }
 
-        try {
-            List<String> stringPool = new ArrayList<>();
-            Map<String, Integer> stringMap = new HashMap<>();
-
-            ByteArrayOutputStream recipeByteStream = new ByteArrayOutputStream(recipes.size() * 128);
-            DataOutputStream recipeDataOut = new DataOutputStream(recipeByteStream);
-
+    public static byte[] serializeCache(String contentHash, List<RecipeIR.CompiledRecipe> recipes) throws IOException {
+        List<String> stringPool = new ArrayList<>();
+        Map<String, Integer> stringMap = new HashMap<>();
+        try (ByteArrayOutputStream recipeBytes = new ByteArrayOutputStream();
+                DataOutputStream recipeOut = new DataOutputStream(recipeBytes)) {
             int savedCount = 0;
-            for (RecipeIR.CompiledRecipe r : recipes) {
-                if (r == null) continue;
-                writeRecipe(recipeDataOut, r, stringPool, stringMap);
-                savedCount++;
+            if (recipes != null) {
+                for (RecipeIR.CompiledRecipe recipe : recipes) {
+                    if (!isCacheable(recipe)) continue;
+                    writeRecipe(recipeOut, recipe, stringPool, stringMap);
+                    savedCount++;
+                }
             }
-            recipeDataOut.flush();
-
-            try (DataOutputStream out = new DataOutputStream(Files.newOutputStream(tempFile))) {
+            recipeOut.flush();
+            try (ByteArrayOutputStream cacheBytes = new ByteArrayOutputStream();
+                    DataOutputStream out = new DataOutputStream(cacheBytes)) {
                 out.writeInt(MAGIC_HEADER);
                 out.writeInt(CACHE_VERSION);
                 out.writeUTF(contentHash != null ? contentHash : "");
-
                 out.writeInt(stringPool.size());
-                for (String s : stringPool) {
-                    out.writeUTF(s);
-                }
-
+                for (String value : stringPool) out.writeUTF(value);
                 out.writeInt(savedCount);
-                out.write(recipeByteStream.toByteArray());
+                out.write(recipeBytes.toByteArray());
                 out.flush();
-            }
-
-            try {
-                Files.move(tempFile, finalFile, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
-            } catch (AtomicMoveNotSupportedException e) {
-                // The reference falls back to a regular move on filesystems without atomic moves.
-                Files.move(tempFile, finalFile, StandardCopyOption.REPLACE_EXISTING);
-            }
-
-            BuildscapeCommon.LOGGER.info("BDRE Binary Cache saved successfully ({} recipes).", savedCount);
-        } catch (Exception e) {
-            BuildscapeCommon.LOGGER.error("BDRE Binary Cache: Failed to save recipes to cache", e);
-            try {
-                Files.deleteIfExists(tempFile);
-            } catch (IOException ignored) {
-                BuildscapeCommon.LOGGER.warn("Unable to remove failed recipe cache temporary file {}", tempFile, ignored);
+                return cacheBytes.toByteArray();
             }
         }
     }
 
+    public static boolean isCacheable(RecipeIR.CompiledRecipe recipe) {
+        if (recipe == null) return false;
+        String type = recipe.type().toLowerCase(java.util.Locale.ROOT).replaceFirst("^buildscape:", "");
+        return switch (type) {
+            case "shaped", "shapeless", "stonecutting", "smelting", "blasting", "smoking",
+                    "campfire", "campfire_cooking", "smithing", "shaped_durability", "shapeless_durability",
+                    "confetti_configure", "clear_shulker_filters" -> true;
+            default -> false;
+        };
+    }
+
+    public static void saveCacheToFile(Path targetFile, String contentHash,
+            List<RecipeIR.CompiledRecipe> recipes) throws IOException {
+        com.kingodogo.buildscape.recipe.framework.compiler.RecipeCacheGenerator
+                .writeAtomically(targetFile, serializeCache(contentHash, recipes));
+    }
+
+    public static void saveCache(String contentHash, List<RecipeIR.CompiledRecipe> recipes) {
+        try {
+            saveCacheToFile(getCacheDir().resolve("recipes.bscb"), contentHash, recipes);
+            BuildscapeCommon.LOGGER.info("BDRE Binary Cache saved successfully ({} recipes).",
+                    recipes == null ? 0 : recipes.stream().filter(java.util.Objects::nonNull).count());
+        } catch (IOException e) {
+            BuildscapeCommon.LOGGER.error("BDRE Binary Cache: Failed to save recipes to cache", e);
+        }
+    }
     public static List<RecipeIR.CompiledRecipe> loadCache(String expectedHash) {
         Path cacheFile = getCacheDir().resolve("recipes.bscb");
         if (!Files.exists(cacheFile)) {
@@ -188,10 +153,10 @@ public class BinaryRecipeCache {
             recipes = new ArrayList<>(recipeCount);
             var validator = new com.kingodogo.buildscape.recipe.framework.validation.RecipeValidator();
             for (int i = 0; i < recipeCount; i++) {
-                RecipeIR.CompiledRecipe r = readRecipe(in, stringPool);
+                RecipeIR.CompiledRecipe r = readRecipe(in, stringPool, validator);
                 // Consume the whole record before validation so a rejected recipe cannot
                 // misalign the following record in the stream.
-                if (r != null && validator.validateCompiled(r) && !validator.checkDuplicate(r.id())) {
+                if (r != null && !validator.checkDuplicate(r.id())) {
                     recipes.add(r);
                 }
             }
@@ -311,7 +276,23 @@ public class BinaryRecipeCache {
         }
     }
 
-    private static RecipeIR.CompiledRecipe readRecipe(DataInputStream in, String[] stringPool) throws IOException {
+    static RecipeIR.CompiledRecipe readRecipe(DataInputStream in, String[] stringPool,
+            com.kingodogo.buildscape.recipe.framework.validation.RecipeValidator validator) throws IOException {
+        RecipeIR.CompiledRecipe recipe = readRecord(in, stringPool);
+        // Validate after consuming the whole record, including malformed ingredients.
+        if (!validator.validateCompiled(recipe)) return null;
+        if (recipe.type().equals("shaped") || recipe.type().equals("shaped_durability")) {
+            var trimmed = com.kingodogo.buildscape.recipe.framework.util.ShapedPatternTrimmer
+                    .trimStrings(recipe.width(), recipe.height(), recipe.ingredients());
+            return new RecipeIR.CompiledRecipe(recipe.id(), recipe.type(), recipe.group(),
+                    trimmed.width(), trimmed.height(), trimmed.ingredients(), recipe.input(), recipe.addition(),
+                    recipe.resultItem(), recipe.resultCount(), recipe.resultNbt(), recipe.experience(),
+                    recipe.cookingTime(), recipe.damageAmount());
+        }
+        return recipe;
+    }
+
+    private static RecipeIR.CompiledRecipe readRecord(DataInputStream in, String[] stringPool) throws IOException {
         int idIdx = readPoolIndex(in, stringPool.length, "recipe id");
         int groupIdx = readPoolIndex(in, stringPool.length, "group");
         int resultItemIdx = readPoolIndex(in, stringPool.length, "result item");

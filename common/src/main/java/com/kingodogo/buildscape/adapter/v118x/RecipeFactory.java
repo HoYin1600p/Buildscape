@@ -286,49 +286,54 @@ public final class RecipeFactory {
         @Override public RecipeSerializer<?> getSerializer() { return CUSTOM_FIREWORK_STAR.get(); }
     }
 
-    private static Ingredient parseIngredient(String s) {
-        if (s == null || s.isEmpty() || "{}".equals(s)) return Ingredient.EMPTY;
+    private static final com.kingodogo.buildscape.recipe.framework.compiler.AliasResolver ALIASES =
+            new com.kingodogo.buildscape.recipe.framework.compiler.AliasResolver("forge");
+
+    private static Ingredient parseIngredient(String value) {
+        if (value == null || value.isEmpty()) return Ingredient.EMPTY;
         try {
-            if (s.startsWith("{") || s.startsWith("[")) {
-                return Ingredient.fromJson(com.google.gson.JsonParser.parseString(s));
-            } else if (s.contains(":")) {
-                Item item = Registry.ITEM.get(new ResourceLocation(s));
-                if (item != null && item != net.minecraft.world.item.Items.AIR) {
-                    return Ingredient.of(item);
-                }
+            String json = value;
+            if (!value.startsWith("{") && (!value.startsWith("[")
+                    || (value.length() > 1 && value.charAt(1) != '{' && value.charAt(1) != '"'))) {
+                json = com.kingodogo.buildscape.recipe.framework.compiler.RecipeCacheGenerator
+                        .resolveIngredientJson(value, ALIASES);
             }
-        } catch (Throwable ignored) {}
-        return Ingredient.EMPTY;
+            return Ingredient.fromJson(com.google.gson.JsonParser.parseString(json));
+        } catch (RuntimeException exception) {
+            com.kingodogo.buildscape.BuildscapeCommon.LOGGER.warn("Invalid recipe ingredient {}", value, exception);
+            return Ingredient.EMPTY;
+        }
     }
 
     private static ItemStack parseResult(String itemStr, int count, String nbt) {
-        Item item = Registry.ITEM.get(new ResourceLocation(itemStr != null && !itemStr.isBlank() ? itemStr : "minecraft:air"));
-        if (item == null) item = net.minecraft.world.item.Items.AIR;
+        Item item = Registry.ITEM.get(new ResourceLocation(itemStr));
+        if (item == null || item == net.minecraft.world.item.Items.AIR) return null;
         ItemStack stack = new ItemStack(item, count > 0 ? count : 1);
         if (nbt != null && !nbt.isBlank()) {
             try {
                 stack.setTag(net.minecraft.nbt.TagParser.parseTag(nbt));
-            } catch (Throwable ignored) {}
+            } catch (com.mojang.brigadier.exceptions.CommandSyntaxException exception) {
+                com.kingodogo.buildscape.BuildscapeCommon.LOGGER.warn("Invalid recipe result NBT for {}", itemStr, exception);
+                return null;
+            }
         }
         return stack;
     }
-
     public static net.minecraft.world.item.crafting.Recipe<?> createRecipe(com.kingodogo.buildscape.recipe.framework.parser.RecipeIR.CompiledRecipe cr) {
         if (cr == null) return null;
         ResourceLocation id = ResourceLocation.tryParse(cr.id());
         if (id == null) return null;
         String group = cr.group();
-        ItemStack result = parseResult(cr.resultItem(), cr.resultCount(), cr.resultNbt());
+
         String type = cr.type().toLowerCase(java.util.Locale.ROOT);
         if (type.startsWith("buildscape:")) type = type.substring("buildscape:".length());
 
+        if (type.equals("confetti_configure")) return new ConfettiConfigureRecipe(id);
+        if (type.equals("clear_shulker_filters")) return new ClearShulkerFiltersRecipe(id);
+        ItemStack result = parseResult(cr.resultItem(), cr.resultCount(), cr.resultNbt());
+        if (result == null) return null;
+
         switch (type) {
-            case "confetti_configure" -> {
-                return new ConfettiConfigureRecipe(id);
-            }
-            case "clear_shulker_filters" -> {
-                return new ClearShulkerFiltersRecipe(id);
-            }
             case "shaped" -> {
                 NonNullList<Ingredient> ings = NonNullList.withSize(cr.ingredients().size(), Ingredient.EMPTY);
                 for (int i = 0; i < cr.ingredients().size(); i++) {
@@ -395,14 +400,13 @@ public final class RecipeFactory {
     public static void injectRecipes(net.minecraft.world.item.crafting.RecipeManager recipeManager,
                                      java.util.List<com.kingodogo.buildscape.recipe.framework.parser.RecipeIR.CompiledRecipe> recipes) {
         if (recipeManager == null || recipes == null || recipes.isEmpty()) return;
-        java.util.Map<ResourceLocation, net.minecraft.world.item.crafting.Recipe<?>> merged = new java.util.LinkedHashMap<>();
-        for (net.minecraft.world.item.crafting.Recipe<?> existing : recipeManager.getRecipes()) {
-            if (existing != null) merged.put(existing.getId(), existing);
+        java.util.List<net.minecraft.world.item.crafting.Recipe<?>> nativeRecipes = new java.util.ArrayList<>();
+        for (com.kingodogo.buildscape.recipe.framework.parser.RecipeIR.CompiledRecipe recipe : recipes) {
+            net.minecraft.world.item.crafting.Recipe<?> nativeRecipe = createRecipe(recipe);
+            if (nativeRecipe != null) nativeRecipes.add(nativeRecipe);
         }
-        for (com.kingodogo.buildscape.recipe.framework.parser.RecipeIR.CompiledRecipe cr : recipes) {
-            net.minecraft.world.item.crafting.Recipe<?> r = createRecipe(cr);
-            if (r != null) merged.put(r.getId(), r);
-        }
+        var merged = com.kingodogo.buildscape.recipe.framework.integration.RecipeManagerInjector
+                .mergeById(recipeManager.getRecipes(), nativeRecipes, recipe -> recipe.getId());
         recipeManager.replaceRecipes(merged.values());
     }
 }

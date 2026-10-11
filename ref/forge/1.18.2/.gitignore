@@ -38,7 +38,6 @@ recent_*.java
 /imports/
 /BDRE/
 states.txt
-src/main/resources/assets/buildscape/mob_states.txt
 MOB_PILLAR_STATES_DOCUMENTATION.md
 MISSING_RECIPES.md
 ADDED_RECIPES.md

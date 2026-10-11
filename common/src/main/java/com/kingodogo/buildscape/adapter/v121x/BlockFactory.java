@@ -2122,9 +2122,12 @@ public class BlockFactory implements IBlockFactory {
             if (rl != null) {
                 Block b = BuiltInRegistries.BLOCK.get(rl);
                 if (b != null && b != Blocks.AIR) return b;
-                ResourceLocation mcRl = ResourceLocation.withDefaultNamespace(cleanId);
-                b = BuiltInRegistries.BLOCK.get(mcRl);
-                if (b != null && b != Blocks.AIR) return b;
+                // Parse complete identifiers unchanged; only bare paths default to Minecraft.
+                ResourceLocation mcRl = ResourceLocation.tryParse(cleanId);
+                if (mcRl != null) {
+                    b = BuiltInRegistries.BLOCK.get(mcRl);
+                    if (b != null && b != Blocks.AIR) return b;
+                }
             }
         }
         return Blocks.OAK_PLANKS;
@@ -2139,9 +2142,11 @@ public class BlockFactory implements IBlockFactory {
                 Block b = BuiltInRegistries.BLOCK.get(rl);
                 if (b != null && b != Blocks.AIR) return b;
             }
-            ResourceLocation mcRl = ResourceLocation.withDefaultNamespace(cleanId);
-            Block b = BuiltInRegistries.BLOCK.get(mcRl);
-            if (b != null && b != Blocks.AIR) return b;
+            ResourceLocation mcRl = ResourceLocation.tryParse(cleanId);
+            if (mcRl != null) {
+                Block b = BuiltInRegistries.BLOCK.get(mcRl);
+                if (b != null && b != Blocks.AIR) return b;
+            }
             return null;
         };
     }
@@ -2155,9 +2160,11 @@ public class BlockFactory implements IBlockFactory {
                 Item it = BuiltInRegistries.ITEM.get(rl);
                 if (it != null && it != Items.AIR) return it;
             }
-            ResourceLocation mcRl = ResourceLocation.withDefaultNamespace(cleanId);
-            Item it = BuiltInRegistries.ITEM.get(mcRl);
-            if (it != null && it != Items.AIR) return it;
+            ResourceLocation mcRl = ResourceLocation.tryParse(cleanId);
+            if (mcRl != null) {
+                Item it = BuiltInRegistries.ITEM.get(mcRl);
+                if (it != null && it != Items.AIR) return it;
+            }
             return null;
         };
     }

@@ -1,7 +1,7 @@
 package com.kingodogo.buildscape;
 
-import com.kingodogo.buildscape.adapter.v121x.GuiProvider;
-import com.kingodogo.buildscape.adapter.v121x.ParticleFactory;
+import com.kingodogo.buildscape.adapter.v121x.client.GuiProvider;
+import com.kingodogo.buildscape.adapter.v121x.client.ParticleFactory;
 import com.kingodogo.buildscape.platform.Services;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;

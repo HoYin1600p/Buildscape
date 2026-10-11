@@ -49,8 +49,8 @@ public final class LoaderRenderers {
         var homemakerType = (EntityType<WanderingTrader>) Services.PLATFORM.getWanderingHomemakerEntityType();
         if (homemakerType != null) {
             EntityRenderers.register(homemakerType, (net.minecraft.client.renderer.entity.EntityRendererProvider) context ->
-                    new MobRenderer<WanderingTrader, com.kingodogo.buildscape.adapter.v121x.RenderFactory.WanderingHomemakerModel<WanderingTrader>>(
-                            context, new com.kingodogo.buildscape.adapter.v121x.RenderFactory.WanderingHomemakerModel<>(context.bakeLayer(com.kingodogo.buildscape.adapter.v121x.RenderFactory.HOMEMAKER_LAYER)), 0.5F) {
+                    new MobRenderer<WanderingTrader, com.kingodogo.buildscape.adapter.v121x.client.RenderFactory.WanderingHomemakerModel<WanderingTrader>>(
+                            context, new com.kingodogo.buildscape.adapter.v121x.client.RenderFactory.WanderingHomemakerModel<>(context.bakeLayer(com.kingodogo.buildscape.adapter.v121x.client.RenderFactory.HOMEMAKER_LAYER)), 0.5F) {
                         @Override
                         public ResourceLocation getTextureLocation(WanderingTrader entity) {
                             return HOMEMAKER_TEXTURE;
@@ -62,8 +62,8 @@ public final class LoaderRenderers {
         var festiveType = (EntityType<WanderingTrader>) Services.PLATFORM.getFestiveWanderingHomemakerEntityType();
         if (festiveType != null) {
             EntityRenderers.register(festiveType, (net.minecraft.client.renderer.entity.EntityRendererProvider) context ->
-                    new MobRenderer<WanderingTrader, com.kingodogo.buildscape.adapter.v121x.RenderFactory.WanderingHomemakerModel<WanderingTrader>>(
-                            context, new com.kingodogo.buildscape.adapter.v121x.RenderFactory.WanderingHomemakerModel<>(context.bakeLayer(com.kingodogo.buildscape.adapter.v121x.RenderFactory.HOMEMAKER_LAYER)), 0.5F) {
+                    new MobRenderer<WanderingTrader, com.kingodogo.buildscape.adapter.v121x.client.RenderFactory.WanderingHomemakerModel<WanderingTrader>>(
+                            context, new com.kingodogo.buildscape.adapter.v121x.client.RenderFactory.WanderingHomemakerModel<>(context.bakeLayer(com.kingodogo.buildscape.adapter.v121x.client.RenderFactory.HOMEMAKER_LAYER)), 0.5F) {
                         @Override
                         public ResourceLocation getTextureLocation(WanderingTrader entity) {
                             return FESTIVE_HOMEMAKER_TEXTURE;

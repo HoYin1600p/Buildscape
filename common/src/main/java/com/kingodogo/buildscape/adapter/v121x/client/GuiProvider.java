@@ -1,4 +1,4 @@
-package com.kingodogo.buildscape.adapter.v121x;
+package com.kingodogo.buildscape.adapter.v121x.client;
 
 import com.kingodogo.buildscape.client.screen.BuildScapeConfigScreen;
 import com.kingodogo.buildscape.client.screen.BuildersPouchScreen;

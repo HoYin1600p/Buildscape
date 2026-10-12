@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - buildscape-com
+      - multiversion
       - 'port/**'
   pull_request:
 

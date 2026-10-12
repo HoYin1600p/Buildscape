@@ -19,5 +19,16 @@
     "EndermanLeaveBlockGriefingMixin",
     "ExplosionGriefingMixin"
   ],
+  "client": [
+    "client.ScreenWidgetAccess",
+    "client.BiomeClimateAccess",
+    "client.BoatRendererAccess",
+    "client.CameraInputMixin",
+    "client.KeyboardInputMixin",
+    "client.MouseInputMixin",
+    "client.ClientWorldInputMixin",
+    "client.GameRendererMixin",
+    "client.FogRendererMixin"
+  ],
   "injectors": {"defaultRequire": 1}
 }

@@ -47,4 +47,24 @@ public final class FabricClientAccess {
             }
         });
     }
+
+    @SuppressWarnings("unchecked")
+    public static void registerPoplarBoatRenderer() {
+        net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry.register(
+                (net.minecraft.world.entity.EntityType<net.minecraft.world.entity.vehicle.Boat>)
+                        com.kingodogo.buildscape.platform.Services.PLATFORM.getPoplarBoatEntityType(), context -> {
+                    var renderer = new net.minecraft.client.renderer.entity.BoatRenderer(context, false);
+                    var access = (com.kingodogo.buildscape.mixin.fabric.client.BoatRendererAccess) renderer;
+                    var resources = new java.util.EnumMap<net.minecraft.world.entity.vehicle.Boat.Type,
+                            com.mojang.datafixers.util.Pair<net.minecraft.resources.ResourceLocation,
+                                    net.minecraft.client.model.ListModel<net.minecraft.world.entity.vehicle.Boat>>>(
+                            net.minecraft.world.entity.vehicle.Boat.Type.class);
+                    var texture = net.minecraft.resources.ResourceLocation.fromNamespaceAndPath(
+                            "buildscape", "textures/entity/boat/poplar.png");
+                    access.buildscape$resources().forEach((type, pair) ->
+                            resources.put(type, com.mojang.datafixers.util.Pair.of(texture, pair.getSecond())));
+                    access.buildscape$resources(resources);
+                    return renderer;
+                });
+    }
 }

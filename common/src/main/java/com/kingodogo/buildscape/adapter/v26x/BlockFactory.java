@@ -185,6 +185,30 @@ public class BlockFactory implements IBlockFactory {
     public Block createBlock(BlockDefinition def) {
         BlockBehaviour.Properties props = buildProperties(def);
 
+        Block vanillaPotPlant = switch (def.getId()) {
+            case "potted_bush" -> Blocks.BUSH;
+            case "potted_dry_grass" -> Blocks.SHORT_DRY_GRASS;
+            case "potted_tall_dry_grass" -> Blocks.TALL_DRY_GRASS;
+            case "potted_firefly_bush" -> Blocks.FIREFLY_BUSH;
+            case "potted_wildflowers" -> Blocks.WILDFLOWERS;
+            case "potted_leaf_litter" -> Blocks.LEAF_LITTER;
+            case "potted_cactus_flower" -> Blocks.CACTUS_FLOWER;
+            default -> null;
+        };
+        if (vanillaPotPlant != null) {
+            props = BlockBehaviour.Properties.ofFullCopy(Blocks.POTTED_POPPY).setId(
+                    net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.BLOCK,
+                            Identifier.fromNamespaceAndPath(com.kingodogo.buildscape.BuildscapeCommon.MOD_ID, def.getId())));
+            if (def.getProperties().getLightLevel() > 0) {
+                props.lightLevel(state -> def.getProperties().getLightLevel());
+            }
+            return new net.minecraft.world.level.block.FlowerPotBlock(vanillaPotPlant, props) {
+                @Override public MapCodec<net.minecraft.world.level.block.FlowerPotBlock> codec() {
+                    return codecForDefinition(def, net.minecraft.world.level.block.FlowerPotBlock.class);
+                }
+            };
+        }
+
         if ("HazeBushBlock".equals(def.getBlockType())) {
             var color = net.minecraft.world.item.DyeColor.byName(def.getId().replace("_haze_bush", ""), null);
             return new com.kingodogo.buildscape.block.HazeBushBlock(color, props.noCollision().instabreak().sound(SoundType.GRASS)) {

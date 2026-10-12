@@ -725,48 +725,6 @@
                         },
                         {
                             "request":  "6",
-                            "id":  "buildscape:potted_bush",
-                            "kind":  "block",
-                            "vanilla_equivalent":  null
-                        },
-                        {
-                            "request":  "6",
-                            "id":  "buildscape:potted_dry_grass",
-                            "kind":  "block",
-                            "vanilla_equivalent":  null
-                        },
-                        {
-                            "request":  "6",
-                            "id":  "buildscape:potted_tall_dry_grass",
-                            "kind":  "block",
-                            "vanilla_equivalent":  null
-                        },
-                        {
-                            "request":  "6",
-                            "id":  "buildscape:potted_firefly_bush",
-                            "kind":  "block",
-                            "vanilla_equivalent":  null
-                        },
-                        {
-                            "request":  "6",
-                            "id":  "buildscape:potted_wildflowers",
-                            "kind":  "block",
-                            "vanilla_equivalent":  null
-                        },
-                        {
-                            "request":  "6",
-                            "id":  "buildscape:potted_leaf_litter",
-                            "kind":  "block",
-                            "vanilla_equivalent":  null
-                        },
-                        {
-                            "request":  "6",
-                            "id":  "buildscape:potted_cactus_flower",
-                            "kind":  "block",
-                            "vanilla_equivalent":  null
-                        },
-                        {
-                            "request":  "6",
                             "id":  "buildscape:potted_open_eyeblossom",
                             "kind":  "block",
                             "vanilla_equivalent":  "minecraft:potted_open_eyeblossom"
@@ -1469,16 +1427,9 @@
                                   "common/src/main/resources/assets/buildscape/blockstates/polished_tuff_stairs.json",
                                   "common/src/main/resources/assets/buildscape/blockstates/polished_tuff_wall.json",
                                   "common/src/main/resources/assets/buildscape/blockstates/potent_sulfur.json",
-                                  "common/src/main/resources/assets/buildscape/blockstates/potted_bush.json",
-                                  "common/src/main/resources/assets/buildscape/blockstates/potted_cactus_flower.json",
                                   "common/src/main/resources/assets/buildscape/blockstates/potted_closed_eyeblossom.json",
-                                  "common/src/main/resources/assets/buildscape/blockstates/potted_dry_grass.json",
-                                  "common/src/main/resources/assets/buildscape/blockstates/potted_firefly_bush.json",
                                   "common/src/main/resources/assets/buildscape/blockstates/potted_golden_dandelion.json",
-                                  "common/src/main/resources/assets/buildscape/blockstates/potted_leaf_litter.json",
                                   "common/src/main/resources/assets/buildscape/blockstates/potted_open_eyeblossom.json",
-                                  "common/src/main/resources/assets/buildscape/blockstates/potted_tall_dry_grass.json",
-                                  "common/src/main/resources/assets/buildscape/blockstates/potted_wildflowers.json",
                                   "common/src/main/resources/assets/buildscape/blockstates/sculk.json",
                                   "common/src/main/resources/assets/buildscape/blockstates/sculk_catalyst.json",
                                   "common/src/main/resources/assets/buildscape/blockstates/sculk_pillar.json",
@@ -2036,16 +1987,9 @@
                                   "common/src/main/resources/assets/buildscape/models/block/polished_tuff_wall_side.json",
                                   "common/src/main/resources/assets/buildscape/models/block/polished_tuff_wall_side_tall.json",
                                   "common/src/main/resources/assets/buildscape/models/block/potent_sulfur.json",
-                                  "common/src/main/resources/assets/buildscape/models/block/potted_bush.json",
-                                  "common/src/main/resources/assets/buildscape/models/block/potted_cactus_flower.json",
                                   "common/src/main/resources/assets/buildscape/models/block/potted_closed_eyeblossom.json",
-                                  "common/src/main/resources/assets/buildscape/models/block/potted_dry_grass.json",
-                                  "common/src/main/resources/assets/buildscape/models/block/potted_firefly_bush.json",
                                   "common/src/main/resources/assets/buildscape/models/block/potted_golden_dandelion.json",
-                                  "common/src/main/resources/assets/buildscape/models/block/potted_leaf_litter.json",
                                   "common/src/main/resources/assets/buildscape/models/block/potted_open_eyeblossom.json",
-                                  "common/src/main/resources/assets/buildscape/models/block/potted_tall_dry_grass.json",
-                                  "common/src/main/resources/assets/buildscape/models/block/potted_wildflowers.json",
                                   "common/src/main/resources/assets/buildscape/models/block/sculk.json",
                                   "common/src/main/resources/assets/buildscape/models/block/sculk_catalyst.json",
                                   "common/src/main/resources/assets/buildscape/models/block/sculk_catalyst_bloom.json",
@@ -2551,16 +2495,9 @@
                                   "common/src/main/resources/data/buildscape/loot_table/blocks/polished_tuff_stairs.json",
                                   "common/src/main/resources/data/buildscape/loot_table/blocks/polished_tuff_wall.json",
                                   "common/src/main/resources/data/buildscape/loot_table/blocks/potent_sulfur.json",
-                                  "common/src/main/resources/data/buildscape/loot_table/blocks/potted_bush.json",
-                                  "common/src/main/resources/data/buildscape/loot_table/blocks/potted_cactus_flower.json",
                                   "common/src/main/resources/data/buildscape/loot_table/blocks/potted_closed_eyeblossom.json",
-                                  "common/src/main/resources/data/buildscape/loot_table/blocks/potted_dry_grass.json",
-                                  "common/src/main/resources/data/buildscape/loot_table/blocks/potted_firefly_bush.json",
                                   "common/src/main/resources/data/buildscape/loot_table/blocks/potted_golden_dandelion.json",
-                                  "common/src/main/resources/data/buildscape/loot_table/blocks/potted_leaf_litter.json",
                                   "common/src/main/resources/data/buildscape/loot_table/blocks/potted_open_eyeblossom.json",
-                                  "common/src/main/resources/data/buildscape/loot_table/blocks/potted_tall_dry_grass.json",
-                                  "common/src/main/resources/data/buildscape/loot_table/blocks/potted_wildflowers.json",
                                   "common/src/main/resources/data/buildscape/loot_table/blocks/sculk.json",
                                   "common/src/main/resources/data/buildscape/loot_table/blocks/sculk_catalyst.json",
                                   "common/src/main/resources/data/buildscape/loot_table/blocks/sculk_pillar.json",

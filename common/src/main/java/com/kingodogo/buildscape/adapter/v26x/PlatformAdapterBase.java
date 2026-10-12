@@ -2266,6 +2266,13 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter, com.kingo
     }
 
     private void registerFlowerPotPlants() {
+        registerPot(Blocks.BUSH, "potted_bush");
+        registerPot(Blocks.SHORT_DRY_GRASS, "potted_dry_grass");
+        registerPot(Blocks.TALL_DRY_GRASS, "potted_tall_dry_grass");
+        registerPot(Blocks.FIREFLY_BUSH, "potted_firefly_bush");
+        registerPot(Blocks.WILDFLOWERS, "potted_wildflowers");
+        registerPot(Blocks.LEAF_LITTER, "potted_leaf_litter");
+        registerPot(Blocks.CACTUS_FLOWER, "potted_cactus_flower");
         registerPot("red_bush", "potted_red_bush");
         registerPot("frost_rose", "potted_frost_rose");
         registerPot("red_monets", "potted_red_monets");
@@ -2285,6 +2292,10 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter, com.kingo
 
     private void registerPot(String flowerId, String pottedId) {
         Block flower = getBlock(new CommonId("buildscape", flowerId));
+        registerPot(flower, pottedId);
+    }
+
+    private void registerPot(Block flower, String pottedId) {
         Block potted = getBlock(new CommonId("buildscape", pottedId));
         if (flower != null && potted != null) {
             try {

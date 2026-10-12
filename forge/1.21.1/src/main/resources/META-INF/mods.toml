@@ -1,5 +1,5 @@
 modLoader = "javafml"
-loaderVersion = "[51,)"
+loaderVersion = "[52,)"
 license = "All Rights Reserved"
 [[mods]]
 modId = "buildscape"
@@ -11,13 +11,13 @@ description = '''Welcome to Buildscape the ultimate expansion for builders, arch
 [[dependencies.buildscape]]
     modId="forge"
     mandatory=true
-    versionRange="[51,)"
+    versionRange="[52,)"
     ordering="NONE"
     side="BOTH"
 [[dependencies.buildscape]]
     modId="minecraft"
     mandatory=true
-    versionRange="[1.21.1,1.22)"
+    versionRange="[1.21.1]"
     ordering="AFTER"
     side = "BOTH"
 

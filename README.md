@@ -2,6 +2,8 @@
 
 Buildscape shares gameplay code across VersionClusters and uses loader-specific adapters.
 
+Forge 1.21.1 dev runs are not supported yet; the release jar is tested in a real client.
+
 Every loader uses the single `mod_version=4.0.3` key in `gradle.properties`
 for its jar version and loader metadata. Update that key to change the version
 across all VersionClusters.

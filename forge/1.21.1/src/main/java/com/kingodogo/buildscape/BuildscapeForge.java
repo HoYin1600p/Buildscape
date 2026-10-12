@@ -39,6 +39,9 @@ public final class BuildscapeForge {
         MinecraftForge.EVENT_BUS.addListener(BuildscapeForge::serverStarted);
         MinecraftForge.EVENT_BUS.addListener(BuildscapeForge::serverStopped);
         ForgeGameplayEvents.register();
+        if (net.minecraftforge.fml.loading.FMLEnvironment.dist == net.minecraftforge.api.distmarker.Dist.CLIENT) {
+            BuildscapeForgeClient.register(modBus);
+        }
     }
 
     private static void commonSetup(FMLCommonSetupEvent event) {

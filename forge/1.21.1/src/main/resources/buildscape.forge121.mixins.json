@@ -4,5 +4,6 @@
   "package": "com.kingodogo.buildscape.mixin.forge121",
   "compatibilityLevel": "JAVA_21",
   "mixins": ["BlockEntityDataMixin"],
+  "client": ["ItemClientExtensionsMixin"],
   "injectors": { "defaultRequire": 1 }
 }

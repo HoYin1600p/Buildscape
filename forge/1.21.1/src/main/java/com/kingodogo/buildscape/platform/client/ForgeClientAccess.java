@@ -18,7 +18,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 
-/** Only the required platform hooks live here; Forge client features are a separate port. */
+/** Client-only menu, particle and image access for the platform adapter. */
 @Mod.EventBusSubscriber(modid = "buildscape", bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public final class ForgeClientAccess {
     private static RegisterParticleProvidersEvent particleEvent;

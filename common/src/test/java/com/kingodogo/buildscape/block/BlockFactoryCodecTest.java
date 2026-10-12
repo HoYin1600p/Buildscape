@@ -5,6 +5,10 @@ import com.kingodogo.buildscape.adapter.v26x.BlockFactory;
 import com.mojang.serialization.JsonOps;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.FlowerPotBlock;
+import com.kingodogo.buildscape.platform.Services;
+import com.kingodogo.buildscape.registry.VanillaReplacementAliases;
 import net.minecraft.world.level.block.LeavesBlock;
 import net.minecraft.world.level.block.TorchBlock;
 import net.minecraft.world.level.block.WallTorchBlock;
@@ -42,6 +46,32 @@ class BlockFactoryCodecTest {
         for (String type : new String[]{"LeavesBlock", "MangroveLeavesBlock", "SnowyLeavesBlock"}) {
             LeavesBlock block = (LeavesBlock) create(type.toLowerCase(), type);
             assertEncodes(block.codec(), block);
+        }
+    }
+
+    @Test
+    void restored26xPotsAreRegisteredWithVanillaPlants() {
+        ModBlocks.init();
+        var plants = java.util.Map.of(
+                "potted_bush", Blocks.BUSH,
+                "potted_dry_grass", Blocks.SHORT_DRY_GRASS,
+                "potted_tall_dry_grass", Blocks.TALL_DRY_GRASS,
+                "potted_firefly_bush", Blocks.FIREFLY_BUSH,
+                "potted_wildflowers", Blocks.WILDFLOWERS,
+                "potted_leaf_litter", Blocks.LEAF_LITTER,
+                "potted_cactus_flower", Blocks.CACTUS_FLOWER);
+        for (var entry : plants.entrySet()) {
+            String id = "buildscape:" + entry.getKey();
+            var registrations = Services.REGISTERED_BLOCKS.stream()
+                    .filter(supplier -> supplier.getId().toString().equals(id)).toList();
+            assertEquals(1, registrations.size(), id);
+            var definition = (BlockDefinition) registrations.getFirst().get();
+            assertEquals("FlowerPotBlock", definition.getBlockType(), id);
+            var block = new BlockFactory().createBlock(definition);
+            var pot = assertInstanceOf(FlowerPotBlock.class, block, id);
+            assertSame(entry.getValue(), pot.getPotted(), id);
+            assertSame(entry.getValue().asItem(), pot.getPotted().asItem(), id);
+            assertTrue(VanillaReplacementAliases.ALL.stream().noneMatch(alias -> alias.source().equals(id)), id);
         }
     }
 

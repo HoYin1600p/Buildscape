@@ -59,6 +59,18 @@ public final class FoliageColors {
         for (var block : BuiltInRegistries.BLOCK) {
             Identifier id = BuiltInRegistries.BLOCK.getKey(block);
             if (!id.getNamespace().equals("buildscape")) continue;
+            // Match vanilla 26.2 BlockColors, including wildflowers' untinted flower layer.
+            // Short/tall dry grass, firefly bush and cactus flower have no vanilla tint.
+            List<BlockTintSource> potSources = switch (id.getPath()) {
+                case "potted_bush" -> List.of(BlockTintSources.grass());
+                case "potted_leaf_litter" -> List.of(BlockTintSources.dryFoliage());
+                case "potted_wildflowers" -> List.of(BlockTintSources.constant(-1), BlockTintSources.grass());
+                default -> null;
+            };
+            if (potSources != null) {
+                sink.register(potSources, block);
+                continue;
+            }
             BlockTintSource tint = source(id.getPath());
             if (tint != null) sink.register(List.of(tint), block);
         }

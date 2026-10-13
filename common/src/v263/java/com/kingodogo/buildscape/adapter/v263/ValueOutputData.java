@@ -98,7 +98,17 @@ public class ValueOutputData implements IBlockEntityWriteData {
     @Override
     public void putBlockState(String key, BlockState state) {
         if (state != null) {
-            output.store(key, BlockState.CODEC, state);
+            // Keep the reference's compound format, including default block states.
+            BlockState.FULL_CODEC.encodeStart(net.minecraft.nbt.NbtOps.INSTANCE, state).result().ifPresent(encoded -> {
+                net.minecraft.nbt.CompoundTag tag = ((net.minecraft.nbt.CompoundTag) encoded).copy();
+                tag.putString("Name", tag.getStringOr("id", "minecraft:air"));
+                tag.remove("id");
+                if (tag.get("properties") != null) {
+                    tag.put("Properties", tag.get("properties"));
+                }
+                tag.remove("properties");
+                output.store(key, net.minecraft.nbt.CompoundTag.CODEC, tag);
+            });
         }
     }
 

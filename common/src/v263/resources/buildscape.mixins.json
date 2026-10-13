@@ -56,7 +56,7 @@
     "RenderBuffersMixin",
     "client.ClientTooltipComponentMixin",
     "client.FireworkRocketContextMixin",
-    "client.FireworkStarterShapeMixin",
+    "client.FireworkStarterShapeV263Mixin",
     "AbstractContainerScreenMixin",
     "AnvilScreenMixin",
     "BeaconBlockEntityRendererMixin",

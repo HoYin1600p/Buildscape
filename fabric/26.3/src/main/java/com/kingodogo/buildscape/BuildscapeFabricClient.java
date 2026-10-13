@@ -48,7 +48,7 @@ public class BuildscapeFabricClient implements ClientModInitializer {
             for (com.kingodogo.buildscape.network.IPacketFactory.PacketDescriptor desc : com.kingodogo.buildscape.network.PacketFactory.getRegisteredDescriptors()) {
                 if (desc.direction() == com.kingodogo.buildscape.network.PacketDirection.SERVER_TO_CLIENT) {
                     net.minecraft.resources.Identifier loc = net.minecraft.resources.Identifier.fromNamespaceAndPath(desc.id().getNamespace(), desc.id().getPath());
-                    net.minecraft.network.protocol.common.custom.CustomPacketPayload.Type<com.kingodogo.buildscape.adapter.v26x.PacketFactory.BuildscapeCustomPayload> type =
+                    net.minecraft.network.protocol.common.custom.CustomPacketPayload.Type<com.kingodogo.buildscape.adapter.v263.PacketFactory.BuildscapeCustomPayload> type =
                             new net.minecraft.network.protocol.common.custom.CustomPacketPayload.Type<>(loc);
 
                     Object handler = java.lang.reflect.Proxy.newProxyInstance(
@@ -56,8 +56,8 @@ public class BuildscapeFabricClient implements ClientModInitializer {
                             new Class<?>[]{clientReceiverClass},
                             (proxy, method, args) -> {
                                 if (method.getName().equals("receive") && args != null && args.length >= 2) {
-                                    com.kingodogo.buildscape.adapter.v26x.PacketFactory.BuildscapeCustomPayload payload =
-                                            (com.kingodogo.buildscape.adapter.v26x.PacketFactory.BuildscapeCustomPayload) args[0];
+                                    com.kingodogo.buildscape.adapter.v263.PacketFactory.BuildscapeCustomPayload payload =
+                                            (com.kingodogo.buildscape.adapter.v263.PacketFactory.BuildscapeCustomPayload) args[0];
                                     com.kingodogo.buildscape.network.PacketFactory.handleClientbound(desc.id(), payload.data(), net.minecraft.client.Minecraft.getInstance().player);
                                 }
                                 return null;

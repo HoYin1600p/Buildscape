@@ -25,6 +25,7 @@
     "FlowingFluidV121xMixin",
     "IronBarsBlockMixin",
     "ItemCombinerMenuAccessor",
+    "ItemDefaultsV121xMixin",
     "ItemV121xMixin",
     "LavaFluidMixin",
     "LeavesBlockV121xMixin",

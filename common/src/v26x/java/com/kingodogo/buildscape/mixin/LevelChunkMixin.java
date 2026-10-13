@@ -1,5 +1,7 @@
 package com.kingodogo.buildscape.mixin;
 
+import com.kingodogo.buildscape.block.HollowLogBlock;
+import com.kingodogo.buildscape.block.HollowPipeBlock;
 import com.kingodogo.buildscape.cosmetic.sign.SignFrameAttachment;
 import com.kingodogo.buildscape.cosmetic.sign.SignFrameType;
 import net.minecraft.core.BlockPos;
@@ -11,7 +13,9 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunk;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(LevelChunk.class)
 public abstract class LevelChunkMixin {
@@ -28,5 +32,28 @@ public abstract class LevelChunkMixin {
             }
         }
         entity.preRemoveSideEffects(pos, state);
+    }
+
+    // Main's onRemove ran for every replacement, including the setblock command. 26.2 only calls
+    // preRemoveSideEffects/affectNeighborsAfterRemoval when side effects are allowed (the command passes
+    // flag 256), and removes the block entity before affectNeighborsAfterRemoval, so hollow logs and pipes
+    // run their removal here while the covers, decoration and fluid data are still readable.
+    @Inject(method = "setBlockState", at = @At(value = "INVOKE", ordinal = 0,
+            target = "Lnet/minecraft/world/level/chunk/LevelChunk;removeBlockEntity(Lnet/minecraft/core/BlockPos;)V"))
+    private void buildscape$hollowRemoved(BlockPos pos, BlockState newState, int flags, CallbackInfoReturnable<BlockState> cir) {
+        LevelChunk chunk = (LevelChunk) (Object) this;
+        if (chunk.getLevel().isClientSide()) {
+            return;
+        }
+        BlockEntity entity = chunk.getBlockEntity(pos);
+        if (entity == null) {
+            return;
+        }
+        BlockState oldState = entity.getBlockState();
+        if (oldState.getBlock() instanceof HollowLogBlock log) {
+            log.onBlockRemoved(chunk.getLevel(), pos, oldState);
+        } else if (oldState.getBlock() instanceof HollowPipeBlock pipe) {
+            pipe.onBlockRemoved(chunk.getLevel(), pos, oldState);
+        }
     }
 }

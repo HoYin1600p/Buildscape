@@ -27,6 +27,11 @@ public interface IPlatformAdapter {
         return createBlockEntityType(factory, state -> valid.contains(state.getBlock()));
     }
 
+    /** Item for the snowy tall grass and large fern; other clusters place them with the plain block item. */
+    default net.minecraft.world.item.BlockItem createDoublePlantBlockItem(net.minecraft.world.level.block.Block block, net.minecraft.world.item.Item.Properties properties) {
+        return new net.minecraft.world.item.BlockItem(block, properties);
+    }
+
     default Item createRegisteredItem(com.kingodogo.buildscape.item.ItemDefinition definition, Block block) {
         return block != null
                 ? com.kingodogo.buildscape.item.ItemFactory.createBlockItem(definition.getId(), block, definition.getProperties())

@@ -54,8 +54,8 @@ public final class ColoredItemFrameEntityRenderer extends ItemFrameRenderer<Plat
                 pose.translate(-offset.x, -offset.y, -offset.z);
                 pose.translate(state.direction.getStepX() * 0.469, state.direction.getStepY() * 0.469,
                         state.direction.getStepZ() * 0.469);
-                pose.mulPose(Axis.XP.rotationDegrees(frame.pitch));
-                pose.mulPose(Axis.YP.rotationDegrees(frame.yaw));
+                pose.rotate(Axis.XP.rotationDegrees(frame.pitch));
+                pose.rotate(Axis.YP.rotationDegrees(frame.yaw));
                 ClientPlatformHooks.submitColoredFrame(pose, collector, state.lightCoords, frame.texture, state.mapId != null);
             } finally { pose.popPose(); }
         }

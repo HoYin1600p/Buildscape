@@ -55,7 +55,7 @@ public final class DecoratedPotRenderer<T extends DecoratedPotBlockEntity>
         pose.pushPose();
         try {
             pose.translate(0.5, 0, 0.5);
-            pose.mulPose(Axis.YP.rotationDegrees(state.wobbleAngle));
+            pose.rotate(Axis.YP.rotationDegrees(state.wobbleAngle));
             pose.translate(-0.5, 0, -0.5);
             state.body.submit(pose, collector, state.lightCoords, OverlayTexture.NO_OVERLAY, 0);
         } finally { pose.popPose(); }

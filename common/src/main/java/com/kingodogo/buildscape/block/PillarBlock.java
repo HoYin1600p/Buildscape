@@ -598,6 +598,10 @@ public class PillarBlock extends Block implements EntityBlock, SimpleWaterlogged
         return false;
     }
 
+    public void reconcileStackDisplays(Level level, BlockPos pos) {
+        enforceSingleItemPerStack(level, pos);
+    }
+
     private void enforceSingleItemPerStack(Level level, BlockPos anyPosInStack) {
         BlockPos top = findTopBlock(level, anyPosInStack);
         BlockPos bottom = findBottomBlock(level, anyPosInStack);

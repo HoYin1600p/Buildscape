@@ -1030,6 +1030,16 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
     }
 
     @Override
+    public boolean isAxeItem(ItemStack stack) {
+        return stack.getItem() instanceof net.minecraft.world.item.AxeItem;
+    }
+
+    @Override
+    public boolean isHoeItem(ItemStack stack) {
+        return stack.getItem() instanceof net.minecraft.world.item.HoeItem;
+    }
+
+    @Override
     public float getHoeMiningSpeed(ItemStack stack) {
         if (stack != null && stack.getItem() instanceof net.minecraft.world.item.DiggerItem digger) {
             return digger.getTier().getSpeed();

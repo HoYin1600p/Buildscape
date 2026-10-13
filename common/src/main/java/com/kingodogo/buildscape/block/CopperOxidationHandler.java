@@ -8,7 +8,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.AxeItem;
 import net.minecraft.world.item.HoneycombItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -180,7 +179,7 @@ public final class CopperOxidationHandler {
             }
         }
 
-        if (held.getItem() instanceof AxeItem) {
+        if (Services.PLATFORM.isAxeItem(held)) {
 
             if (blockId != null && blockId.getNamespace().equals("buildscape")) {
                 String unwaxedPath = UNWAXED_MAP.get(blockId.getPath());

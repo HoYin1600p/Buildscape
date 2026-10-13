@@ -146,6 +146,7 @@ public interface IPlatformAdapter {
     void dropPlayerItem(net.minecraft.world.entity.player.Player player, net.minecraft.world.item.ItemStack stack, boolean randomThrow);
     void swingPlayerHand(net.minecraft.world.entity.player.Player player, net.minecraft.world.InteractionHand hand);
     void resetSwingAnimation(net.minecraft.world.entity.LivingEntity entity);
+    boolean isEnderman(Entity entity);
 
     Iterable<Item> getAllItems();
     net.minecraft.resources.ResourceKey<net.minecraft.core.Registry<Item>> getItemRegistryKey();
@@ -192,6 +193,7 @@ public interface IPlatformAdapter {
     void injectRecipes(net.minecraft.world.item.crafting.RecipeManager recipeManager, java.util.List<com.kingodogo.buildscape.recipe.framework.parser.RecipeIR.CompiledRecipe> recipes);
 
     net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider createRandomStateProvider(java.util.List<net.minecraft.world.level.block.state.BlockState> states);
+    net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider createSimpleStateProvider(net.minecraft.world.level.block.state.BlockState state);
     net.minecraft.world.level.levelgen.feature.treedecorators.TreeDecorator getCreakingHeartTreeDecorator();
     net.minecraft.world.level.levelgen.feature.treedecorators.TreeDecorator createMangroveLeaveVineDecorator(float probability);
     net.minecraft.world.level.levelgen.feature.treedecorators.TreeDecorator createMangroveMossCarpetDecorator(float probability);

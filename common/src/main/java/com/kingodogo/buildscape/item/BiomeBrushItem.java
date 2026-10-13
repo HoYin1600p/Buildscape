@@ -100,25 +100,46 @@ public class BiomeBrushItem extends BiomeBrushItemBase {
         return Services.PLATFORM.getTagString(tag, key, "").equals(dimension);
     }
 
-    public BlockPos getPos1(ItemStack stack) {
-        CompoundTag tag = Services.PLATFORM.getCustomData(stack, false);
+    /** Reads a corner stored as a nested {X,Y,Z} compound (reference format), or the older flat keys. */
+    private static BlockPos readCorner(CompoundTag tag, String key) {
         if (tag == null) return null;
-        if (tag.contains(KEY_POS1 + "X")) {
+        CompoundTag corner = Services.PLATFORM.getTagCompound(tag, key);
+        if (corner != null) {
             return new BlockPos(
-                    Services.PLATFORM.getTagInt(tag, KEY_POS1 + "X", 0),
-                    Services.PLATFORM.getTagInt(tag, KEY_POS1 + "Y", 0),
-                    Services.PLATFORM.getTagInt(tag, KEY_POS1 + "Z", 0)
+                    Services.PLATFORM.getTagInt(corner, "X", 0),
+                    Services.PLATFORM.getTagInt(corner, "Y", 0),
+                    Services.PLATFORM.getTagInt(corner, "Z", 0)
+            );
+        }
+        if (tag.contains(key + "X")) {
+            return new BlockPos(
+                    Services.PLATFORM.getTagInt(tag, key + "X", 0),
+                    Services.PLATFORM.getTagInt(tag, key + "Y", 0),
+                    Services.PLATFORM.getTagInt(tag, key + "Z", 0)
             );
         }
         return null;
     }
 
+    private static void writeCorner(CompoundTag tag, String key, BlockPos pos) {
+        tag.remove(key + "X");
+        tag.remove(key + "Y");
+        tag.remove(key + "Z");
+        CompoundTag corner = new CompoundTag();
+        corner.putInt("X", pos.getX());
+        corner.putInt("Y", pos.getY());
+        corner.putInt("Z", pos.getZ());
+        tag.put(key, corner);
+    }
+
+    public BlockPos getPos1(ItemStack stack) {
+        return readCorner(Services.PLATFORM.getCustomData(stack, false), KEY_POS1);
+    }
+
     public void setPos1(ItemStack stack, BlockPos pos, Player player) {
         String dimension = Services.PLATFORM.getDimensionId(Services.PLATFORM.getEntityLevel(player)).toString();
         Services.PLATFORM.updateCustomData(stack, tag -> {
-            tag.putInt(KEY_POS1 + "X", pos.getX());
-            tag.putInt(KEY_POS1 + "Y", pos.getY());
-            tag.putInt(KEY_POS1 + "Z", pos.getZ());
+            writeCorner(tag, KEY_POS1, pos);
             tag.putString(KEY_POS1_DIMENSION, dimension);
         });
         Component msg = ComponentHelper.translatable("message.buildscape.biome_brush.pos1", pos.getX(), pos.getY(), pos.getZ()).withStyle(ChatFormatting.WHITE);
@@ -127,24 +148,13 @@ public class BiomeBrushItem extends BiomeBrushItemBase {
     }
 
     public BlockPos getPos2(ItemStack stack) {
-        CompoundTag tag = Services.PLATFORM.getCustomData(stack, false);
-        if (tag == null) return null;
-        if (tag.contains(KEY_POS2 + "X")) {
-            return new BlockPos(
-                    Services.PLATFORM.getTagInt(tag, KEY_POS2 + "X", 0),
-                    Services.PLATFORM.getTagInt(tag, KEY_POS2 + "Y", 0),
-                    Services.PLATFORM.getTagInt(tag, KEY_POS2 + "Z", 0)
-            );
-        }
-        return null;
+        return readCorner(Services.PLATFORM.getCustomData(stack, false), KEY_POS2);
     }
 
     public void setPos2(ItemStack stack, BlockPos pos, Player player) {
         String dimension = Services.PLATFORM.getDimensionId(Services.PLATFORM.getEntityLevel(player)).toString();
         Services.PLATFORM.updateCustomData(stack, tag -> {
-            tag.putInt(KEY_POS2 + "X", pos.getX());
-            tag.putInt(KEY_POS2 + "Y", pos.getY());
-            tag.putInt(KEY_POS2 + "Z", pos.getZ());
+            writeCorner(tag, KEY_POS2, pos);
             tag.putString(KEY_POS2_DIMENSION, dimension);
         });
         Component msg = ComponentHelper.translatable("message.buildscape.biome_brush.pos2", pos.getX(), pos.getY(), pos.getZ()).withStyle(ChatFormatting.WHITE);
@@ -229,6 +239,8 @@ public class BiomeBrushItem extends BiomeBrushItemBase {
             Services.PLATFORM.sendSystemMessage(player, ComponentHelper.translatable("message.buildscape.biome_brush.applied_detail", affectedBlocks).withStyle(ChatFormatting.GREEN));
 
             Services.PLATFORM.updateCustomData(stack, tag -> {
+                tag.remove(KEY_POS1);
+                tag.remove(KEY_POS2);
                 tag.remove(KEY_POS1 + "X");
                 tag.remove(KEY_POS1 + "Y");
                 tag.remove(KEY_POS1 + "Z");

@@ -76,6 +76,8 @@ if (v263Enabled) {
                 exclude 'com/kingodogo/buildscape/adapter/v118x/**'
                 exclude 'com/kingodogo/buildscape/adapter/v121x/**'
                 exclude 'com/kingodogo/buildscape/adapter/v26x/**'
+                // Only the v118x adapter uses this helper; 26.3 removed BlockStateProviderType.
+                exclude 'com/kingodogo/buildscape/worldgen/WorldGenTypeHelper.java'
             }
             resources.srcDirs = ['src/main/resources', 'src/v263/resources']
         }

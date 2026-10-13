@@ -268,7 +268,7 @@ public final class WorldGenFactory {
                 context.random()::nextInt, context.random()::nextFloat);
     }
 
-    public static final class RandomStateProvider extends BlockStateProvider {
+    public static final class RandomStateProvider implements BlockStateProvider {
         public static final MapCodec<RandomStateProvider> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
                 BlockState.CODEC.listOf().fieldOf("states").forGetter(provider -> provider.states)
         ).apply(instance, RandomStateProvider::new));
@@ -278,18 +278,18 @@ public final class WorldGenFactory {
 
         @Override public MapCodec<RandomStateProvider> codec() { return CODEC; }
 
-        @Override public BlockState getState(WorldGenLevel level, RandomSource random, BlockPos pos) {
+        @Override public BlockState getState(net.minecraft.world.level.LevelAccessor level, RandomSource random, BlockPos pos) {
             return states.isEmpty() ? Blocks.AIR.defaultBlockState() : states.get(random.nextInt(states.size()));
         }
     }
 
-    public static final class MossBlockCeilingPlacement extends PlacementModifier {
+    public static final class MossBlockCeilingPlacement implements PlacementModifier {
         public static final MossBlockCeilingPlacement INSTANCE = new MossBlockCeilingPlacement();
         public static final MapCodec<MossBlockCeilingPlacement> CODEC = MapCodec.unit(INSTANCE);
 
         private MossBlockCeilingPlacement() {}
 
-        @Override public Stream<BlockPos> getPositions(PlacementContext context, RandomSource random, BlockPos pos) {
+        @Override public void modify(PlacementContext context, RandomSource random, BlockPos pos, java.util.function.Consumer<BlockPos> output) {
             WorldGenLevel level = context.getLevel();
             BlockPos.MutableBlockPos cursor = new BlockPos.MutableBlockPos();
             for (int y = pos.getY(); y < pos.getY() + 64; y++) {
@@ -298,11 +298,11 @@ public final class WorldGenFactory {
                     BlockPos placePos = cursor.below();
                     if (level.getBlockState(placePos).isAir()
                             && level.getBlockState(cursor).isFaceSturdy(level, cursor, Direction.DOWN)) {
-                        return Stream.of(placePos);
+                        output.accept(placePos);
+                        return;
                     }
                 }
             }
-            return Stream.empty();
         }
 
         @Override public MapCodec<MossBlockCeilingPlacement> codec() { return CODEC; }

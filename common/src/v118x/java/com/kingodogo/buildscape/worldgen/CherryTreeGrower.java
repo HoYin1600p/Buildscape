@@ -11,6 +11,6 @@ public class CherryTreeGrower extends AbstractTreeGrower {
     @Nullable
     @Override
     protected Holder<? extends ConfiguredFeature<?, ?>> getConfiguredFeature(Random random, boolean hasFlowers) {
-        return Holder.direct((ConfiguredFeature<?, ?>) ModConfiguredFeatures.CHERRY_TREE.get());
+        return Holder.direct(com.kingodogo.buildscape.adapter.v118x.WorldGenFactory.configuredFeature(ModConfiguredFeatures.CHERRY_TREE.get()));
     }
 }

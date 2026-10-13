@@ -317,7 +317,7 @@ public final class ModCommonEvents {
 
     public static boolean isMobGriefingDisabled(Entity entity, Level level) {
         if (entity == null || level == null) return false;
-        if (entity instanceof net.minecraft.world.entity.monster.EnderMan) {
+        if (Services.PLATFORM.isEnderman(entity)) {
             return ModGameRules.isEndermanGriefingDisabled();
         } else if (entity instanceof net.minecraft.world.entity.monster.Creeper) {
             return ModGameRules.isCreeperGriefingDisabled();

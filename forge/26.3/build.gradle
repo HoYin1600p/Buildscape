@@ -9,6 +9,17 @@ version = providers.gradleProperty('mod_version').get()
 base.archivesName = 'buildscape-forge-26.3'
 java.toolchain.languageVersion = JavaLanguageVersion.of(25)
 
+// Testing: the unimined dev runs (:forge:26.3:runServer / runClient) do not work yet with Forge 66.0.11. Findings,
+// each fixed only for the next failure to show up (changes not kept):
+//  1. FML wants a classpath jar named forge-26.3-66.0.11*, unimined names it minecraft_forge_*  -> copy/rename it.
+//  2. unimined passes MOD_CLASSES=${source_roots} literally in Gradle runs -> set buildscape%%classes;buildscape%%resources,
+//     and drop the classes dir from the classpath, or FML loads a second module "main" with the same packages.
+//  3. runClient: unimined's union-relauncher cannot see jdk.nio.zipfs.ZipPath on JDK 25 -> use ForgeBootstrap directly.
+//  4. Then both runs stop in ImmediateWindowHandler$DummyProvider.updateModuleReads (NoSuchElementException):
+//     Class.forName(forge module, "net.minecraftforge.client.loading.NoVizFallback") returns null.
+// So test this module with the release jar in the Prism instance "CMA 26.3 - Forge":
+//   gradlew :forge:26.3:build -Pbuildscape.v263=true -Pbuildscape.forge263=true
+//   then copy forge/26.3/build/libs/buildscape-forge-26.3-<version>.jar into the instance's mods folder.
 unimined.minecraft {
     version '26.3'
     // Minecraft 26.x ships official names in development and production.

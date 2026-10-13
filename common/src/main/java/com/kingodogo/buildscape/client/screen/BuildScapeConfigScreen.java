@@ -194,7 +194,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         if (activeTab != null) {
             activeTab.onClose();
         }
-        Minecraft.getInstance().setScreen(parent);
+        Services.PLATFORM.openScreen(parent);
     }
 
     // Dimension and scaling helper methods for new tabs

@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "condition": {
+        "type": "minecraft:survives_explosion"
+      },
+      "bonus_rolls": 0,
+      "rolls": 1,
+      "entries": [
+        {
+          "name": "buildscape:light_blue_festive_stocking",
+          "type": "minecraft:item"
+        }
+      ]
+    }
+  ]
+}

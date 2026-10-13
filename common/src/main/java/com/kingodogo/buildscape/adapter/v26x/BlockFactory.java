@@ -516,6 +516,10 @@ public class BlockFactory implements IBlockFactory {
         } else if (def.isTrapdoor()) {
             return new TrapDoorBlock(BlockSetType.OAK, props) {};
         } else if (def.isButton()) {
+            // Reference ModButtonBlock extends StoneButtonBlock: stone set (arrows cannot press) and 20 ticks pressed.
+            if (def.getBlockType().equals("ModButtonBlock")) {
+                return new ButtonBlock(BlockSetType.STONE, 20, props) {};
+            }
             return new ButtonBlock(BlockSetType.OAK, 30, props) {};
         } else if (def.isWeightedPressurePlate()) {
             // 1.18.2 ModPressurePlateBlock: a weighted plate (max weight 150) with the 'power' property.

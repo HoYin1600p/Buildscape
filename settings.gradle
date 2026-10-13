@@ -14,45 +14,112 @@ pluginManagement {
 }
 
 rootProject.name = 'Buildscape'
-include 'common', 'fabric:26.2', 'neoforge:26.2'
-project(':fabric:26.2').projectDir = file('fabric/26.2')
-project(':neoforge:26.2').projectDir = file('neoforge/26.2')
 
-if (providers.gradleProperty('buildscape.neoforge121').getOrElse('false') == 'true') {
-    include ':neoforge:1.21.1'
-    project(':neoforge:1.21.1').projectDir = file('neoforge/1.21.1')
+def resolveBuildscapeTarget() {
+    def targetProp = gradle.startParameter.projectProperties.get('buildscape.target') ?:
+            providers.gradleProperty('buildscape.target').orNull
+    if (targetProp != null && !targetProp.trim().isEmpty()) {
+        def normalized = targetProp.trim().toLowerCase().replaceAll('^:', '')
+        if (normalized == 'neoforge' || normalized == 'neoforge262') return 'neoforge:26.2'
+        if (normalized == 'fabric' || normalized == 'fabric262') return 'fabric:26.2'
+        if (normalized == 'forge' || normalized == 'forge118' || normalized == 'forge1182') return 'forge:1.18.2'
+        return normalized
+    }
+
+    def tasks = gradle.startParameter.taskNames
+    if (tasks.isEmpty()) {
+        return 'all'
+    }
+
+    def rootAggregateTasks = ['build', 'check', 'assemble', 'collectModJars', 'clean', 'tasks', 'help', 'projects', 'properties']
+    if (tasks.any { rootAggregateTasks.contains(it) }) {
+        return 'all'
+    }
+
+    def hasNeoforge262 = tasks.any { it.contains('neoforge:26.2') }
+    def hasFabric262 = tasks.any { it.contains('fabric:26.2') }
+    def hasForge118 = tasks.any { it.contains('forge:1.18.2') }
+    def hasNeoforge121 = tasks.any { it.contains('neoforge:1.21.1') }
+    def hasFabric121 = tasks.any { it.contains('fabric:1.21.1') }
+    def hasForge121 = tasks.any { it.contains('forge:1.21.1') }
+
+    def matches = []
+    if (hasNeoforge262) matches.add('neoforge:26.2')
+    if (hasFabric262) matches.add('fabric:26.2')
+    if (hasForge118) matches.add('forge:1.18.2')
+    if (hasNeoforge121) matches.add('neoforge:1.21.1')
+    if (hasFabric121) matches.add('fabric:1.21.1')
+    if (hasForge121) matches.add('forge:1.21.1')
+
+    if (matches.size() == 1) {
+        return matches[0]
+    }
+
+    return 'all'
 }
 
-if (providers.gradleProperty('buildscape.fabric118x').getOrElse('false') == 'true') {
-    include ':fabric:1.18.2'
-    project(':fabric:1.18.2').projectDir = file('fabric/1.18.2')
-}
+def activeTarget = resolveBuildscapeTarget()
 
-if (providers.gradleProperty('buildscape.fabric121').getOrElse('false') == 'true') {
-    include ':fabric:1.21.1'
-    project(':fabric:1.21.1').projectDir = file('fabric/1.21.1')
-}
+include 'common'
 
-// Milestone 1: shared-code Forge 1.18.2 joins the default build.
-// Use -Pbuildscape.v118x=false for the 26.2-only loader graph.
-def v118xEnabled = gradle.startParameter.projectProperties.get('buildscape.v118x') ?:
-        providers.gradleProperty('buildscape.v118x').getOrElse('true')
-if (v118xEnabled == 'true') {
+if (activeTarget == 'neoforge:26.2') {
+    include 'neoforge:26.2'
+    project(':neoforge:26.2').projectDir = file('neoforge/26.2')
+} else if (activeTarget == 'fabric:26.2') {
+    include 'fabric:26.2'
+    project(':fabric:26.2').projectDir = file('fabric/26.2')
+} else if (activeTarget == 'forge:1.18.2') {
     include ':forge', ':forge:1.18.2'
     project(':forge').projectDir = file('forge')
     project(':forge:1.18.2').projectDir = file('forge/1.18.2')
-}
-
-if (providers.gradleProperty('buildscape.forge262').getOrElse('false') == 'true') {
-    include ':forge', ':forge:26.2'
-    project(':forge').projectDir = file('forge')
-    project(':forge:26.2').projectDir = file('forge/26.2')
-}
-
-// 26.3 follows after 26.2: forge:26.3, fabric:26.3, neoforge:26.3
-
-if (providers.gradleProperty('buildscape.forge121').getOrElse('false') == 'true') {
+} else if (activeTarget == 'neoforge:1.21.1') {
+    include ':neoforge:1.21.1'
+    project(':neoforge:1.21.1').projectDir = file('neoforge/1.21.1')
+} else if (activeTarget == 'fabric:1.21.1') {
+    include ':fabric:1.21.1'
+    project(':fabric:1.21.1').projectDir = file('fabric/1.21.1')
+} else if (activeTarget == 'forge:1.21.1') {
     include ':forge', ':forge:1.21.1'
     project(':forge').projectDir = file('forge')
     project(':forge:1.21.1').projectDir = file('forge/1.21.1')
+} else {
+    // Default / 'all' mode
+    include 'fabric:26.2', 'neoforge:26.2'
+    project(':fabric:26.2').projectDir = file('fabric/26.2')
+    project(':neoforge:26.2').projectDir = file('neoforge/26.2')
+
+    if (providers.gradleProperty('buildscape.neoforge121').getOrElse('false') == 'true') {
+        include ':neoforge:1.21.1'
+        project(':neoforge:1.21.1').projectDir = file('neoforge/1.21.1')
+    }
+
+    if (providers.gradleProperty('buildscape.fabric118x').getOrElse('false') == 'true') {
+        include ':fabric:1.18.2'
+        project(':fabric:1.18.2').projectDir = file('fabric/1.18.2')
+    }
+
+    if (providers.gradleProperty('buildscape.fabric121').getOrElse('false') == 'true') {
+        include ':fabric:1.21.1'
+        project(':fabric:1.21.1').projectDir = file('fabric/1.21.1')
+    }
+
+    def v118xEnabled = gradle.startParameter.projectProperties.get('buildscape.v118x') ?:
+            providers.gradleProperty('buildscape.v118x').getOrElse('true')
+    if (v118xEnabled == 'true') {
+        include ':forge', ':forge:1.18.2'
+        project(':forge').projectDir = file('forge')
+        project(':forge:1.18.2').projectDir = file('forge/1.18.2')
+    }
+
+    if (providers.gradleProperty('buildscape.forge262').getOrElse('false') == 'true') {
+        include ':forge', ':forge:26.2'
+        project(':forge').projectDir = file('forge')
+        project(':forge:26.2').projectDir = file('forge/26.2')
+    }
+
+    if (providers.gradleProperty('buildscape.forge121').getOrElse('false') == 'true') {
+        include ':forge', ':forge:1.21.1'
+        project(':forge').projectDir = file('forge')
+        project(':forge:1.21.1').projectDir = file('forge/1.21.1')
+    }
 }

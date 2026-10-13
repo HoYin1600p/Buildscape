@@ -411,7 +411,214 @@ p.write_text(json.dumps({'converted': True, 'new': (root / 'data/kept.json').exi
             if t["status"] != "active":
                 self.assertIsNone(t["base_commit"])
             if t["minecraft"] == "26.3":
-                self.assertEqual(t["status"], "paused")
+                # mc26.3 is the planned 26.3 target; the older per-loader placeholders stay paused.
+                self.assertEqual(t["status"], "planned" if t["id"] == "mc26.3" else "paused")
+
+    def test_registry_declares_inactive_mc263_target(self):
+        root = Path(__file__).resolve().parents[2]
+        config = json.loads((root / "sync/targets.json").read_text())
+        target = next(t for t in config["targets"] if t["id"] == "mc26.3")
+        self.assertEqual(target["status"], "planned")
+        self.assertIsNone(target["base_commit"])
+        self.assertEqual(target["loaders"], ["fabric", "neoforge"])
+        self.assertEqual(target["version_cluster"], "v263")
+        self.assertEqual(target["version_clusters"], ["v263"])
+        self.assertEqual(target["java_roots"], ["common/src/main/java", "common/src/v263/java"])
+        self.assertEqual(target["resource_root"], "common/src/v263/resources")
+        self.assertEqual(target["state_file"], "sync/state/mc26.3.json")
+        self.assertEqual(target["ledger_coverage"], ["263"])
+        self.assertEqual(target["converter"]["profile"], "26.3")
+        self.assertIn("26.3", target["converter"]["command"])
+        self.assertIn("26.3", target["validation"][0])
+        self.assertIn("build263", target["validation"][1])
+        self.assertIn("-Pbuildscape.v263=true", target["validation"][1])
+        self.assertEqual(target["removal_policy"]["file"], "sync/removals26x.json")
+        self.assertEqual(target["removal_policy"]["inherits"], "mc26.2")
+        # 26.2 keeps its legacy, implicit policy and its own roots.
+        old = next(t for t in config["targets"] if t["id"] == "mc26.2")
+        self.assertNotIn("removal_policy", old)
+        self.assertEqual(old["resource_root"], "common/src/main/resources")
+        self.assertEqual(old["version_clusters"], ["v26x", "v118x"])
+        self.assertEqual(old["ledger_coverage"], ["26x", "118x"])
+        state = json.loads((root / target["state_file"]).read_text())
+        self.assertEqual(state, {"schema_version": 1, "pending": []})
+        # Only active targets are synchronized by default.
+        self.assertEqual([t["id"] for t in config["targets"] if t["status"] == "active"], ["mc26.2"])
+
+    def test_mc263_inherits_exactly_the_approved_26x_removals(self):
+        root = Path(__file__).resolve().parents[2]
+        config = json.loads((root / "sync/targets.json").read_text())
+        target = next(t for t in config["targets"] if t["id"] == "mc26.3")
+        spec = target["removal_policy"]
+        approved = json.loads((root / spec["file"]).read_text())
+        inherited = sync.inherited_policy(approved, spec, target)
+        self.assertEqual(inherited["removed_ids"], approved["removed_ids"])
+        self.assertEqual(inherited["inherited_from"], "mc26.2")
+        self.assertEqual(len(inherited["excluded_target_paths"]), len(approved["excluded_target_paths"]))
+        self.assertEqual(len(set(inherited["excluded_target_paths"])), len(set(approved["excluded_target_paths"])))
+        old_root, new_root = "common/src/main/resources/", "common/src/v263/resources/"
+        resources = 0
+        for old, new in zip(approved["excluded_target_paths"], inherited["excluded_target_paths"]):
+            if old.startswith(old_root):
+                resources += 1
+                self.assertEqual(new, new_root + old[len(old_root):])
+            else:
+                # Shared Java and test sources keep their approved path.
+                self.assertEqual(new, old)
+        self.assertGreater(resources, 1000)
+        # The approved file is only read, never rewritten, and the same object is not mutated.
+        self.assertTrue(all(p.startswith(old_root) or p.startswith("common/src/")
+                            for p in approved["excluded_target_paths"]))
+        self.assertNotIn("inherited_from", approved)
+        # Targets that own the policy get it back untouched.
+        own = sync.inherited_policy(approved, {"inherits": "mc26.2"}, {"id": "mc26.2"})
+        self.assertIs(own, approved)
+
+    def policy_files(self):
+        retired = self.resources + "assets/buildscape/blockstates/copper_rod.json"
+        model = self.resources + "assets/buildscape/models/block/copper_rod_horizontal.json"
+        self.write(self.source, retired, '{"variants": {}}\n')
+        self.write(self.source, model, '{"parent": "minecraft:block/cube"}\n')
+        base = self.commit(self.source, "Retired source baseline")
+        policy = {"schema_version": 1, "target": "mc26.2",
+                  "removed_ids": [{"id": "buildscape:copper_rod", "vanilla_equivalent": "minecraft:lightning_rod"}],
+                  "excluded_target_paths": ["common/" + model,
+                                            "common/src/main/java/example/Mapped.java"]}
+        return retired, model, base, policy
+
+    def test_26_2_removal_policy_is_returned_exactly_as_approved(self):
+        retired, model, base, policy = self.policy_files()
+        target = self.config["targets"][0]
+        target.update(id="mc26.2", base_commit=base)
+        self.write(self.repo, "sync/removals26x.json", json.dumps(policy))
+        self.write(self.repo, "sync/targets.json", json.dumps(self.config))
+        commit = self.commit(self.repo, "Record removal policy")
+        self.git(self.repo, "branch", "-f", "port/test", commit)
+        self.assertEqual(sync.removal_policy(self.repo, target), policy)
+        # A policy approved for another target is rejected instead of silently applied.
+        self.write(self.repo, "sync/removals26x.json", json.dumps(dict(policy, target="other")))
+        commit = self.commit(self.repo, "Wrong policy owner")
+        self.git(self.repo, "branch", "-f", "port/test", commit)
+        with self.assertRaisesRegex(sync.SyncError, "Invalid mc26.2 removal policy"):
+            sync.removal_policy(self.repo, target)
+
+    def test_mc263_inherits_policy_plans_and_applies_in_the_v263_root(self):
+        retired, model, base, policy = self.policy_files()
+        target = self.config["targets"][0]
+        target.update(id="mc26.3", base_commit=base, version_cluster="v263", version_clusters=["v263"],
+                      java_roots=["common/src/main/java", "common/src/v263/java"],
+                      resource_root="common/src/v263/resources", ledger_coverage=["263"],
+                      removal_policy={"file": "sync/removals26x.json", "inherits": "mc26.2",
+                                      "inherited_resource_root": "common/src/main/resources"})
+        self.write(self.repo, "sync/removals26x.json", json.dumps(policy))
+        self.write(self.repo, "sync/targets.json", json.dumps(self.config))
+        self.write(self.repo, "tools/convert.py", (self.repo / "tools/convert.py").read_text() + """
+# A converter may synthesize modern item definitions from old item models.
+p = root / 'assets/buildscape/items/copper_rod.json'
+p.parent.mkdir(parents=True, exist_ok=True)
+p.write_text(json.dumps({'converted': True, 'new': (root / 'data/kept.json').exists()}))
+""")
+        for path in (self.repo / "common/src/main/resources").rglob("*"):
+            if path.is_file():
+                self.write(self.repo, "common/src/v263/resources/"
+                           + path.relative_to(self.repo / "common/src/main/resources").as_posix(),
+                           path.read_bytes())
+        self.write(self.repo, "common/src/v263/java/example/Adapter.java", "class Adapter {}\n")
+        commit = self.commit(self.repo, "Record removal policy and 26.3 resource root")
+        self.git(self.repo, "branch", "-f", "port/test", commit)
+        self.write(self.source, retired, '{"variants": {}, "changed": true}\n')
+        self.write(self.source, model, '{"parent": "minecraft:block/cube_all"}\n')
+        self.write(self.source, self.resources + "data/kept.json", '{"kept": true}\n')
+        self.commit(self.source, "Change retired and kept resources")
+        plan, target, config, source = sync.make_plan(self.repo, self.config, "mc26.3",
+                                                    source_repo=self.source)
+        approved = {k: v for k, v in policy.items() if k != "excluded_target_paths"}
+        for key, value in approved.items():
+            self.assertEqual(plan["removal_policy"][key], value)
+        self.assertEqual(plan["removal_policy"]["inherited_from"], "mc26.2")
+        self.assertEqual(plan["removal_policy"]["excluded_target_paths"],
+                         ["common/src/v263/resources/" + model[len("src/main/resources/"):],
+                          "common/src/main/java/example/Mapped.java"])
+        self.assertEqual(plan["version_clusters"], ["v263"])
+        items = {c["path"]: c for c in plan["changes"]}
+        self.assertEqual(items[retired]["classification"], "retired")
+        self.assertEqual(items[model]["classification"], "retired")
+        self.assertEqual(items[self.resources + "data/kept.json"]["classification"], "automatic")
+        before_main = sync.files_at(self.repo, plan["target_commit"], ["common/src/main/resources"])
+        sync.apply_plan(self.repo, plan, target, config, source, "sync/targets.json", self.output)
+        branch = plan["apply"]["branch"]
+        v263 = "common/src/v263/resources/"
+        for path in (retired, model, self.resources + "assets/buildscape/items/copper_rod.json"):
+            self.assertIsNone(sync.blob(self.repo, branch, v263 + path[len("src/main/resources/"):], True), path)
+        self.assertIsNotNone(sync.blob(self.repo, branch, v263 + "data/kept.json"))
+        # 26.3 never writes into the 26.2 resource root.
+        self.assertEqual(sync.files_at(self.repo, branch, ["common/src/main/resources"]), before_main)
+        state = json.loads(sync.blob(self.repo, branch, "sync/state/tiny.json"))
+        self.assertFalse(any(c["path"] in {retired, model} for c in state["pending"]))
+        rows = self.read_csv(branch)
+        self.assertTrue(all("263" in r["era_coverage"].split(";") for r in rows.values()))
+
+    def test_target_without_policy_declaration_has_no_removals(self):
+        target = self.config["targets"][0]
+        for target_id in ("tiny", "mc26.3"):
+            self.assertEqual(sync.removal_policy(self.repo, dict(target, id=target_id)), {})
+
+    def test_foreign_cluster_ledger_paths_are_never_mapped(self):
+        registry = {"targets": [
+            {"id": "mc26.2", "version_cluster": "v26x", "version_clusters": ["v26x", "v118x"]},
+            {"id": "mc26.3", "version_cluster": "v263", "version_clusters": ["v263"]},
+            {"id": "mc1.21.1", "version_cluster": "v121x"},
+            {"id": "nothing"}]}
+        self.assertEqual(sync.foreign_clusters(registry, registry["targets"][0]), ["v121x", "v263"])
+        self.assertEqual(sync.foreign_clusters(registry, registry["targets"][1]), ["v118x", "v121x", "v26x"])
+        base = "common/src/main/java/example/Base.java"
+        v26x = "common/src/v26x/java/example/adapter/v26x/Adapter.java"
+        v118x = "common/src/main/java/example/adapter/v118x/Adapter.java"
+        v263 = "common/src/v263/java/example/adapter/v263/Adapter.java"
+        for path in (base, v26x, v118x, v263):
+            self.write(self.repo, path, "class X {}\n")
+        commit = self.commit(self.repo, "Cluster adapters")
+        self.git(self.repo, "branch", "-f", "port/test", commit)
+        row = {"active_paths": ";".join([base, v26x, v118x, v263])}
+        source = self.config["source"]
+
+        def mapped(clusters, foreign):
+            target = {"branch": "port/test", "java_root": "common/src/main/java",
+                      "java_roots": ["common/src/main/java", *["common/src/" + c + "/java" for c in clusters]],
+                      "foreign_clusters": foreign}
+            return sync.mapped_java(self.repo, target, "src/main/java/example/Unmapped.java", row, source)
+
+        self.assertEqual(mapped(["v26x", "v118x"], ["v121x", "v263"]), [base, v26x, v118x])
+        self.assertEqual(mapped(["v263"], ["v118x", "v121x", "v26x"]), [base, v263])
+        # Without a declaration nothing is filtered, as before.
+        self.assertEqual(mapped(["v26x"], []), [base, v26x, v118x, v263])
+
+    def test_target_config_keeps_the_registry_unchanged(self):
+        config = json.loads(json.dumps(self.config))
+        config["targets"][0].update(version_cluster="v26x", version_clusters=["v26x"])
+        config["targets"][1]["version_cluster"] = "v263"
+        self.write(self.repo, "sync/targets.json", json.dumps(config))
+        commit = self.commit(self.repo, "Cluster registry")
+        self.git(self.repo, "branch", "-f", "port/test", commit)
+        target, branch_config = sync.target_config(self.repo, config, "tiny", "sync/targets.json")
+        self.assertEqual(target["foreign_clusters"], ["v263"])
+        # apply writes branch_config back into the registry; the helper key must not leak into it.
+        self.assertTrue(all("foreign_clusters" not in t for t in branch_config["targets"]))
+
+    def test_real_ledger_v263_paths_exist_and_are_marked(self):
+        root = Path(__file__).resolve().parents[2]
+        with (root / "migration/ledger.csv").open(encoding="utf-8", newline="") as stream:
+            rows = list(csv.DictReader(stream))
+        marked = [r for r in rows if any("/v263/" in p or "/src/v263/" in p for p in r["active_paths"].split(";"))]
+        self.assertGreater(len(marked), 200)
+        for row in marked:
+            self.assertIn("263", row["era_coverage"].split(";"), row["reference_path"])
+            for path in row["active_paths"].split(";"):
+                if "/v263/" in path:
+                    self.assertTrue((root / path).is_file(), path)
+        # Rows without a 26.3 counterpart stay on their existing coverage.
+        marked_ids = {id(r) for r in marked}
+        self.assertTrue(all("263" not in r["era_coverage"].split(";") for r in rows if id(r) not in marked_ids))
 
     def cluster_target(self):
         target = self.config["targets"][0]

@@ -973,6 +973,16 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter, com.kingo
     }
 
     @Override
+    public boolean isAxeItem(net.minecraft.world.item.ItemStack stack) {
+        return stack.getItem() instanceof net.minecraft.world.item.AxeItem;
+    }
+
+    @Override
+    public boolean isHoeItem(net.minecraft.world.item.ItemStack stack) {
+        return stack.getItem() instanceof net.minecraft.world.item.HoeItem;
+    }
+
+    @Override
     public float getHoeMiningSpeed(net.minecraft.world.item.ItemStack stack) {
         if (stack != null && !stack.isEmpty()) {
             net.minecraft.world.item.component.Tool tool = stack.get(net.minecraft.core.component.DataComponents.TOOL);

@@ -8,7 +8,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.AxeItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -21,7 +20,7 @@ public final class LogStrippingLogic {
     public static InteractionResult handleAxeStrip(Player player, Level level, InteractionHand hand, BlockPos pos) {
         if (player == null || level == null || pos == null) return InteractionResult.PASS;
         ItemStack held = player.getItemInHand(hand);
-        if (!(held.getItem() instanceof AxeItem)) return InteractionResult.PASS;
+        if (!Services.PLATFORM.isAxeItem(held)) return InteractionResult.PASS;
 
         BlockState state = level.getBlockState(pos);
         Block block = state.getBlock();

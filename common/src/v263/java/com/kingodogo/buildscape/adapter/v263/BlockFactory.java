@@ -115,7 +115,6 @@ import com.kingodogo.buildscape.block.WoolLayersBlock;
 import com.kingodogo.buildscape.particle.ModParticles;
 import com.kingodogo.buildscape.platform.Services;
 import com.kingodogo.buildscape.util.CommonId;
-import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.cauldron.CauldronInteractions;
@@ -148,6 +147,7 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.BonemealSource;
 import net.minecraft.world.level.block.BonemealableBlock;
 import net.minecraft.world.level.block.BushBlock;
 import java.util.function.Supplier;
@@ -160,6 +160,7 @@ import net.minecraft.world.level.block.HorizontalDirectionalBlock;
 import net.minecraft.world.level.block.LanternBlock;
 import net.minecraft.world.level.block.LayeredCauldronBlock;
 import net.minecraft.world.level.block.LeavesBlock;
+import net.minecraft.world.level.block.sounds.AmbientLeavesBlockSoundPlayer;
 import net.minecraft.world.level.block.PointedDripstoneBlock;
 import net.minecraft.world.level.block.PressurePlateBlock;
 import net.minecraft.world.level.block.RotatedPillarBlock;
@@ -203,9 +204,6 @@ public class BlockFactory implements IBlockFactory {
                 props.lightLevel(state -> def.getProperties().getLightLevel());
             }
             return new net.minecraft.world.level.block.FlowerPotBlock(vanillaPotPlant, props) {
-                @Override public MapCodec<net.minecraft.world.level.block.FlowerPotBlock> codec() {
-                    return codecForDefinition(def, net.minecraft.world.level.block.FlowerPotBlock.class);
-                }
             };
         }
 
@@ -233,7 +231,6 @@ public class BlockFactory implements IBlockFactory {
                 @Override public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
                     com.kingodogo.buildscape.adapter.v263.client.HazeBushParticleHandler.animate(state, level, pos);
                 }
-                @Override public MapCodec<BushBlock> codec() { return codecForDefinition(def, BushBlock.class); }
             };
         }
         if ("PottedHazeBushBlock".equals(def.getBlockType())) {
@@ -259,16 +256,10 @@ public class BlockFactory implements IBlockFactory {
                 @Override public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
                     com.kingodogo.buildscape.adapter.v263.client.HazeBushParticleHandler.animate(state, level, pos);
                 }
-                @Override public MapCodec<net.minecraft.world.level.block.FlowerPotBlock> codec() {
-                    return codecForDefinition(def, net.minecraft.world.level.block.FlowerPotBlock.class);
-                }
             };
         }
         if ("IceCrystalBlock".equals(def.getBlockType())) {
             return new com.kingodogo.buildscape.block.IceCrystalBlock(props.sound(SoundType.AMETHYST_CLUSTER)) {
-                @Override public MapCodec<net.minecraft.world.level.block.AmethystClusterBlock> codec() {
-                    return codecForDefinition(def, net.minecraft.world.level.block.AmethystClusterBlock.class);
-                }
             };
         }
 
@@ -417,10 +408,10 @@ public class BlockFactory implements IBlockFactory {
                 @Override
                 protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
                     if (stack.getItem() instanceof net.minecraft.world.item.BoneMealItem) {
-                        if (isValidBonemealTarget(level, pos, state)) {
+                        if (isValidBonemealTarget(level, pos, state, BonemealSource.INTERACTION)) {
                             if (level instanceof ServerLevel serverLevel) {
-                                if (isBonemealSuccess(level, serverLevel.getRandom(), pos, state)) {
-                                    performBonemeal(serverLevel, serverLevel.getRandom(), pos, state);
+                                if (isBonemealSuccess(level, serverLevel.getRandom(), pos, state, BonemealSource.INTERACTION)) {
+                                    performBonemeal(serverLevel, serverLevel.getRandom(), pos, state, BonemealSource.INTERACTION);
                                     if (!player.getAbilities().instabuild) {
                                         stack.shrink(1);
                                     }
@@ -435,17 +426,17 @@ public class BlockFactory implements IBlockFactory {
                 }
 
                 @Override
-                public boolean isValidBonemealTarget(LevelReader level, BlockPos pos, BlockState state) {
+                public boolean isValidBonemealTarget(LevelReader level, BlockPos pos, BlockState state, BonemealSource source) {
                     return level.getBlockState(pos.above()).isAir();
                 }
 
                 @Override
-                public boolean isBonemealSuccess(Level level, RandomSource random, BlockPos pos, BlockState state) {
+                public boolean isBonemealSuccess(Level level, RandomSource random, BlockPos pos, BlockState state, BonemealSource source) {
                     return true;
                 }
 
                 @Override
-                public void performBonemeal(ServerLevel level, RandomSource random, BlockPos pos, BlockState state) {
+                public void performBonemeal(ServerLevel level, RandomSource random, BlockPos pos, BlockState state, BonemealSource source) {
                     BlockPos abovePos = pos.above();
                     Supplier<Block> snowyShortGrassSupplier = resolveBlockSupplier("snowy_short_grass");
                     BlockState foliage = Blocks.SHORT_GRASS.defaultBlockState();
@@ -561,10 +552,6 @@ public class BlockFactory implements IBlockFactory {
                 protected int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos, Direction direction) {
                     return getAnalogOutput(state, level, pos);
                 }
-                @Override
-                protected MapCodec<? extends BaseEntityBlock> codec() {
-                    return codecForDefinition(def, BaseEntityBlock.class);
-                }
             };
         } else if (def.isWorkbench()) {
             return new BuildersWorkbenchBlock(props) {
@@ -581,10 +568,6 @@ public class BlockFactory implements IBlockFactory {
                     onBlockRemoved(level, pos, state);
                     super.affectNeighborsAfterRemoval(state, level, pos, isMoving);
                 }
-                @Override
-                protected MapCodec<? extends BaseEntityBlock> codec() {
-                    return codecForDefinition(def, BaseEntityBlock.class);
-                }
             };
         } else if (def.isGlassJar()) {
             return new GlassJarBlock(props) {
@@ -600,10 +583,6 @@ public class BlockFactory implements IBlockFactory {
                 @Override
                 protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
                     return onInteract(level, pos, state, player, InteractionHand.MAIN_HAND, hit);
-                }
-                @Override
-                protected MapCodec<? extends BaseEntityBlock> codec() {
-                    return codecForDefinition(def, BaseEntityBlock.class);
                 }
             };
         } else if (def.isSmokeVent()) {
@@ -632,10 +611,6 @@ public class BlockFactory implements IBlockFactory {
                 protected int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos, Direction direction) {
                     return getAnalogOutput(state, level, pos);
                 }
-                @Override
-                protected MapCodec<? extends BaseEntityBlock> codec() {
-                    return codecForDefinition(def, BaseEntityBlock.class);
-                }
             };
         } else if (def.isMuff()) {
             return new MuffBlock(props) {
@@ -650,10 +625,6 @@ public class BlockFactory implements IBlockFactory {
                 @Override
                 protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, @Nullable Orientation orientation, boolean isMoving) {
                     onNeighborUpdate(level, pos, state, block, null, isMoving);
-                }
-                @Override
-                protected MapCodec<? extends BaseEntityBlock> codec() {
-                    return codecForDefinition(def, BaseEntityBlock.class);
                 }
             };
         } else if (def.isFenceGate()) {
@@ -677,27 +648,19 @@ public class BlockFactory implements IBlockFactory {
         } else if (def.isMangroveLeaves()) {
             class V26xMangroveLeavesBlock extends LeavesBlock implements BonemealableBlock {
                 public V26xMangroveLeavesBlock(BlockBehaviour.Properties properties) {
-                    super(0.01f, properties);
+                    super(AmbientLeavesBlockSoundPlayer.noAmbientSound(), properties);
                 }
                 @Override
-                public boolean isValidBonemealTarget(LevelReader level, BlockPos pos, BlockState state) {
+                public boolean isValidBonemealTarget(LevelReader level, BlockPos pos, BlockState state, BonemealSource source) {
                     return MangroveLeavesBlock.canGrowPropagule(level, pos);
                 }
                 @Override
-                public boolean isBonemealSuccess(Level level, RandomSource random, BlockPos pos, BlockState state) {
+                public boolean isBonemealSuccess(Level level, RandomSource random, BlockPos pos, BlockState state, BonemealSource source) {
                     return true;
                 }
                 @Override
-                public void performBonemeal(ServerLevel level, RandomSource random, BlockPos pos, BlockState state) {
+                public void performBonemeal(ServerLevel level, RandomSource random, BlockPos pos, BlockState state, BonemealSource source) {
                     MangroveLeavesBlock.growPropagule(level, pos);
-                }
-                @Override
-                public MapCodec<? extends LeavesBlock> codec() {
-                    return codecForDefinition(def, LeavesBlock.class);
-                }
-                @Override
-                protected void spawnFallingLeavesParticle(Level level, BlockPos pos, RandomSource random) {
-                    // The 1.18.2 reference leaves do not emit falling-leaf particles.
                 }
             }
             return new V26xMangroveLeavesBlock(props);
@@ -707,15 +670,15 @@ public class BlockFactory implements IBlockFactory {
                     super(properties.noCollision().instabreak().sound(SoundType.GRASS).randomTicks());
                 }
                 @Override
-                public boolean isValidBonemealTarget(LevelReader level, BlockPos pos, BlockState state) {
+                public boolean isValidBonemealTarget(LevelReader level, BlockPos pos, BlockState state, BonemealSource source) {
                     return canBonemeal(level, pos, state);
                 }
                 @Override
-                public boolean isBonemealSuccess(Level level, RandomSource random, BlockPos pos, BlockState state) {
+                public boolean isBonemealSuccess(Level level, RandomSource random, BlockPos pos, BlockState state, BonemealSource source) {
                     return true;
                 }
                 @Override
-                public void performBonemeal(ServerLevel level, RandomSource random, BlockPos pos, BlockState state) {
+                public void performBonemeal(ServerLevel level, RandomSource random, BlockPos pos, BlockState state, BonemealSource source) {
                     if (state.getValue(HANGING)) performBonemealEffect(level, pos, state);
                     else WorldGenFactory.advanceMangrove(level, pos, state, random, true);
                 }
@@ -726,11 +689,6 @@ public class BlockFactory implements IBlockFactory {
                             && random.nextInt(7) == 0) {
                         WorldGenFactory.advanceMangrove(level, pos, state, random, false);
                     }
-                }
-                @Override
-                @SuppressWarnings("unchecked")
-                public MapCodec<BushBlock> codec() {
-                    return codecForDefinition(def, BushBlock.class);
                 }
             }
             return new V26xMangrovePropaguleBlock(props);
@@ -749,18 +707,10 @@ public class BlockFactory implements IBlockFactory {
                 }
             };
         } else if (def.isLeaves()) {
-            return new LeavesBlock(0.01f, props) {
-                @Override
-                public MapCodec<? extends LeavesBlock> codec() {
-                    return codecForDefinition(def, LeavesBlock.class);
-                }
-                @Override
-                protected void spawnFallingLeavesParticle(Level level, BlockPos pos, net.minecraft.util.RandomSource random) {
-                    // The 1.18.2 reference leaves do not emit falling-leaf particles.
-                }
+            return new LeavesBlock(AmbientLeavesBlockSoundPlayer.noAmbientSound(), props) {
             };
         } else if (def.isSnowyLeaves()) {
-            return new LeavesBlock(0.01f, props) {
+            return new LeavesBlock(AmbientLeavesBlockSoundPlayer.noAmbientSound(), props) {
                 @Override
                 public VoxelShape getVisualShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
                     return net.minecraft.world.phys.shapes.Shapes.empty();
@@ -776,14 +726,6 @@ public class BlockFactory implements IBlockFactory {
                 @Override
                 protected boolean propagatesSkylightDown(BlockState state) {
                     return true;
-                }
-                @Override
-                public MapCodec<? extends LeavesBlock> codec() {
-                    return codecForDefinition(def, LeavesBlock.class);
-                }
-                @Override
-                protected void spawnFallingLeavesParticle(Level level, BlockPos pos, RandomSource random) {
-                    // The 1.18.2 reference leaves do not emit falling-leaf particles.
                 }
             };
         } else if (def.isColoredMossLayers()) {
@@ -847,10 +789,6 @@ public class BlockFactory implements IBlockFactory {
                 public List<ItemStack> getDrops(BlockState state, net.minecraft.world.level.storage.loot.LootParams.Builder builder) {
                     return getReferenceDrops(state);
                 }
-                @Override
-                public MapCodec<net.minecraft.world.level.block.SnowLayerBlock> codec() {
-                    return codecForDefinition(def, net.minecraft.world.level.block.SnowLayerBlock.class);
-                }
             };
         } else if (def.isLeafLayers()) {
             return new LeafLayersBlock(props) {
@@ -888,25 +826,20 @@ public class BlockFactory implements IBlockFactory {
                 }
 
                 @Override
-                public boolean isValidBonemealTarget(LevelReader level, BlockPos pos, BlockState state) {
+                public boolean isValidBonemealTarget(LevelReader level, BlockPos pos, BlockState state, BonemealSource source) {
                     return true;
                 }
 
                 @Override
-                public boolean isBonemealSuccess(Level level, RandomSource random, BlockPos pos, BlockState state) {
+                public boolean isBonemealSuccess(Level level, RandomSource random, BlockPos pos, BlockState state, BonemealSource source) {
                     return true;
                 }
 
                 @Override
-                public void performBonemeal(ServerLevel level, RandomSource random, BlockPos pos, BlockState state) {
+                public void performBonemeal(ServerLevel level, RandomSource random, BlockPos pos, BlockState state, BonemealSource source) {
                     performBonemealEffect(level, pos, state);
                 }
 
-                @Override
-                @SuppressWarnings("unchecked")
-                public MapCodec<BushBlock> codec() {
-                    return codecForDefinition(def, BushBlock.class);
-                }
             }
             return new V26xLeafLitterBlock(props);
         } else if (def.isLayer()) {
@@ -1217,10 +1150,6 @@ public class BlockFactory implements IBlockFactory {
                 protected boolean useShapeForLightOcclusion(BlockState state) {
                     return false;
                 }
-                @Override
-                public MapCodec<? extends HalfTransparentBlock> codec() {
-                    return codecForDefinition(def, HalfTransparentBlock.class);
-                }
             };
         } else if (def.isIcicleCauldron()) {
             return new IcicleCauldronBlock(props) {
@@ -1275,10 +1204,6 @@ public class BlockFactory implements IBlockFactory {
             };
         } else if (def.isStar()) {
             return new StarBlock(props) {
-                @Override
-                public MapCodec<BushBlock> codec() {
-                    return codecForDefinition(def, BushBlock.class);
-                }
                 @Override
                 protected BlockState updateShape(BlockState state, LevelReader level, ScheduledTickAccess tickAccess, BlockPos pos, Direction direction, BlockPos adjacentPos, BlockState adjacentState, RandomSource random) {
                     if (state.getValue(WATERLOGGED)) {
@@ -1341,10 +1266,6 @@ public class BlockFactory implements IBlockFactory {
             };
         } else if (def.isBigBook()) {
             return new BigBookBlock(props) {
-                @Override
-                public MapCodec<? extends HorizontalDirectionalBlock> codec() {
-                    return codecForDefinition(def, HorizontalDirectionalBlock.class);
-                }
             };
         } else if (def.isBigCandle()) {
             props.lightLevel(state -> state.getValue(BigCandleBlock.LIT) ? BigCandleBlock.LIGHT_LEVEL : 0);
@@ -1399,10 +1320,6 @@ public class BlockFactory implements IBlockFactory {
             return new SpoolBlock(props);
         } else if (def.isSteelBolt()) {
             return new SteelBoltBlock(props) {
-                @Override
-                public MapCodec<? extends Block> codec() {
-                    return codecForDefinition(def, Block.class);
-                }
                 @Override
                 protected BlockState updateShape(BlockState state, LevelReader level, ScheduledTickAccess tickAccess, BlockPos pos, Direction direction, BlockPos adjacentPos, BlockState adjacentState, RandomSource random) {
                     if (state.getValue(WATERLOGGED)) {
@@ -1459,10 +1376,6 @@ public class BlockFactory implements IBlockFactory {
             };
         } else if (def.isStringLight()) {
             return new StringLightBlock(props) {
-                @Override
-                public MapCodec<? extends Block> codec() {
-                    return codecForDefinition(def, Block.class);
-                }
                 @Override
                 protected BlockState updateShape(BlockState state, LevelReader level, ScheduledTickAccess tickAccess, BlockPos pos, Direction direction, BlockPos adjacentPos, BlockState adjacentState, RandomSource random) {
                     if (state.getValue(WATERLOGGED)) {
@@ -1561,10 +1474,6 @@ public class BlockFactory implements IBlockFactory {
                 public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
                     onAnimateTick(state, level, pos, random::nextDouble, random::nextInt);
                 }
-                @Override
-                public MapCodec<BushBlock> codec() {
-                    return codecForDefinition(def, BushBlock.class);
-                }
             };
         } else if (def.isStrawBed()) {
             return new StrawBedBlock(props) {
@@ -1632,7 +1541,7 @@ public class BlockFactory implements IBlockFactory {
                 }
 
                 @Override
-                public boolean isValidBonemealTarget(LevelReader level, BlockPos pos, BlockState state) {
+                public boolean isValidBonemealTarget(LevelReader level, BlockPos pos, BlockState state, BonemealSource source) {
                     BlockPos tipPos = findTip(level, pos, this);
                     BlockState tipState = level.getBlockState(tipPos);
                     if (tipState.hasProperty(SHEARED) && tipState.getValue(SHEARED)) {
@@ -1644,14 +1553,14 @@ public class BlockFactory implements IBlockFactory {
                 }
 
                 @Override
-                public boolean isBonemealSuccess(Level level, RandomSource random, BlockPos pos, BlockState state) {
+                public boolean isBonemealSuccess(Level level, RandomSource random, BlockPos pos, BlockState state, BonemealSource source) {
                     BlockPos tipPos = findTip(level, pos, this);
                     BlockState tipState = level.getBlockState(tipPos);
                     return !(tipState.hasProperty(SHEARED) && tipState.getValue(SHEARED));
                 }
 
                 @Override
-                public void performBonemeal(ServerLevel level, RandomSource random, BlockPos pos, BlockState state) {
+                public void performBonemeal(ServerLevel level, RandomSource random, BlockPos pos, BlockState state, BonemealSource source) {
                     BlockPos tipPos = findTip(level, pos, this);
                     BlockState tipState = level.getBlockState(tipPos);
                     if (tipState.hasProperty(SHEARED) && tipState.getValue(SHEARED)) {
@@ -1691,24 +1600,20 @@ public class BlockFactory implements IBlockFactory {
                 }
 
                 @Override
-                public boolean isValidBonemealTarget(LevelReader level, BlockPos pos, BlockState state) {
+                public boolean isValidBonemealTarget(LevelReader level, BlockPos pos, BlockState state, BonemealSource source) {
                     return true;
                 }
 
                 @Override
-                public boolean isBonemealSuccess(Level level, RandomSource random, BlockPos pos, BlockState state) {
+                public boolean isBonemealSuccess(Level level, RandomSource random, BlockPos pos, BlockState state, BonemealSource source) {
                     return true;
                 }
 
                 @Override
-                public void performBonemeal(ServerLevel level, RandomSource random, BlockPos pos, BlockState state) {
+                public void performBonemeal(ServerLevel level, RandomSource random, BlockPos pos, BlockState state, BonemealSource source) {
                     growClover(level, pos, state);
                 }
 
-                @Override
-                public MapCodec<BushBlock> codec() {
-                    return codecForDefinition(def, BushBlock.class);
-                }
             }
             return new V26xCloverBlock(props);
         } else if (def.isPetal()) {
@@ -1736,24 +1641,20 @@ public class BlockFactory implements IBlockFactory {
                 }
 
                 @Override
-                public boolean isValidBonemealTarget(LevelReader level, BlockPos pos, BlockState state) {
+                public boolean isValidBonemealTarget(LevelReader level, BlockPos pos, BlockState state, BonemealSource source) {
                     return true;
                 }
 
                 @Override
-                public boolean isBonemealSuccess(Level level, RandomSource random, BlockPos pos, BlockState state) {
+                public boolean isBonemealSuccess(Level level, RandomSource random, BlockPos pos, BlockState state, BonemealSource source) {
                     return true;
                 }
 
                 @Override
-                public void performBonemeal(ServerLevel level, RandomSource random, BlockPos pos, BlockState state) {
+                public void performBonemeal(ServerLevel level, RandomSource random, BlockPos pos, BlockState state, BonemealSource source) {
                     growPetal(level, pos, state);
                 }
 
-                @Override
-                public MapCodec<BushBlock> codec() {
-                    return codecForDefinition(def, BushBlock.class);
-                }
             }
             return new V26xPetalBlock(props);
         } else if (def.isWildflowers()) {
@@ -1774,17 +1675,17 @@ public class BlockFactory implements IBlockFactory {
                 }
 
                 @Override
-                public boolean isValidBonemealTarget(LevelReader level, BlockPos pos, BlockState state) {
+                public boolean isValidBonemealTarget(LevelReader level, BlockPos pos, BlockState state, BonemealSource source) {
                     return true;
                 }
 
                 @Override
-                public boolean isBonemealSuccess(Level level, RandomSource random, BlockPos pos, BlockState state) {
+                public boolean isBonemealSuccess(Level level, RandomSource random, BlockPos pos, BlockState state, BonemealSource source) {
                     return true;
                 }
 
                 @Override
-                public void performBonemeal(ServerLevel level, RandomSource random, BlockPos pos, BlockState state) {
+                public void performBonemeal(ServerLevel level, RandomSource random, BlockPos pos, BlockState state, BonemealSource source) {
                     growFlowers(level, pos, state);
                 }
 
@@ -1793,10 +1694,6 @@ public class BlockFactory implements IBlockFactory {
                     return getReferenceDrops(state);
                 }
 
-                @Override
-                public MapCodec<BushBlock> codec() {
-                    return codecForDefinition(def, BushBlock.class);
-                }
             }
             return new V26xWildflowersBlock(props);
         } else if (def.isColoredMoss()) {
@@ -1816,24 +1713,20 @@ public class BlockFactory implements IBlockFactory {
                 }
 
                 @Override
-                public boolean isValidBonemealTarget(LevelReader level, BlockPos pos, BlockState state) {
+                public boolean isValidBonemealTarget(LevelReader level, BlockPos pos, BlockState state, BonemealSource source) {
                     return true;
                 }
 
                 @Override
-                public boolean isBonemealSuccess(Level level, RandomSource random, BlockPos pos, BlockState state) {
+                public boolean isBonemealSuccess(Level level, RandomSource random, BlockPos pos, BlockState state, BonemealSource source) {
                     return true;
                 }
 
                 @Override
-                public void performBonemeal(ServerLevel level, RandomSource random, BlockPos pos, BlockState state) {
+                public void performBonemeal(ServerLevel level, RandomSource random, BlockPos pos, BlockState state, BonemealSource source) {
                     growMoss(level, pos, state, random::nextInt);
                 }
 
-                @Override
-                public MapCodec<Block> codec() {
-                    return codecForDefinition(def, Block.class);
-                }
             }
             return new V26xColoredMossBlock(props);
         } else if (def.isColoredSporeBlossom()) {
@@ -1848,10 +1741,6 @@ public class BlockFactory implements IBlockFactory {
                     onAnimateTick(state, level, pos, random::nextDouble, random::nextInt);
                 }
 
-                @Override
-                public MapCodec<SporeBlossomBlock> codec() {
-                    return codecForDefinition(def, SporeBlossomBlock.class);
-                }
             }
             return new V26xColoredSporeBlossomBlock(props);
         } else if (def.isCreakingHeart()) {
@@ -1878,10 +1767,6 @@ public class BlockFactory implements IBlockFactory {
                     onScheduledTick(state, level, pos);
                 }
 
-                @Override
-                public MapCodec<RotatedPillarBlock> codec() {
-                    return codecForDefinition(def, RotatedPillarBlock.class);
-                }
             }
             return new V26xCreakingHeartBlock(props);
         } else if (def.isMonetFlower()) {
@@ -1890,25 +1775,21 @@ public class BlockFactory implements IBlockFactory {
                     super(properties);
                 }
                 @Override
-                public boolean isValidBonemealTarget(LevelReader level, BlockPos pos, BlockState state) {
+                public boolean isValidBonemealTarget(LevelReader level, BlockPos pos, BlockState state, BonemealSource source) {
                     return true;
                 }
                 @Override
-                public boolean isBonemealSuccess(Level level, RandomSource random, BlockPos pos, BlockState state) {
+                public boolean isBonemealSuccess(Level level, RandomSource random, BlockPos pos, BlockState state, BonemealSource source) {
                     return true;
                 }
                 @Override
-                public void performBonemeal(ServerLevel level, RandomSource random, BlockPos pos, BlockState state) {
+                public void performBonemeal(ServerLevel level, RandomSource random, BlockPos pos, BlockState state, BonemealSource source) {
                     performBonemealAction(level, pos, this);
                 }
                 @Override
                 protected BlockState updateShape(BlockState state, LevelReader level, ScheduledTickAccess tickAccess, BlockPos pos, Direction direction, BlockPos adjacentPos, BlockState adjacentState, RandomSource random) {
                     BlockState adjusted = onUpdateShape(state, direction, adjacentState, level, pos, adjacentPos);
                     return super.updateShape(adjusted, level, tickAccess, pos, direction, adjacentPos, adjacentState, random);
-                }
-                @Override
-                public MapCodec<BushBlock> codec() {
-                    return codecForDefinition(def, BushBlock.class);
                 }
             }
             return new V26xMonetFlowerBlock(props);
@@ -1925,10 +1806,6 @@ public class BlockFactory implements IBlockFactory {
                     net.minecraft.world.item.ItemInstance tool = builder.getOptionalParameter(net.minecraft.world.level.storage.loot.parameters.LootContextParams.TOOL);
                     return getReferenceDrops(tool instanceof ItemStack is ? is : ItemStack.EMPTY);
                 }
-                @Override
-                public MapCodec<BushBlock> codec() {
-                    return codecForDefinition(def, BushBlock.class);
-                }
             };
         } else if (def.isSnowyFern()) {
             Supplier<Block> snowBricks = resolveBlockSupplier("snow_bricks");
@@ -1943,25 +1820,21 @@ public class BlockFactory implements IBlockFactory {
                     return onUpdateShape(state, direction, neighborState, level, pos, neighborPos);
                 }
                 @Override
-                public boolean isValidBonemealTarget(LevelReader level, BlockPos pos, BlockState state) {
+                public boolean isValidBonemealTarget(LevelReader level, BlockPos pos, BlockState state, BonemealSource source) {
                     return isValidBonemeal(level, pos);
                 }
                 @Override
-                public boolean isBonemealSuccess(Level level, RandomSource random, BlockPos pos, BlockState state) {
+                public boolean isBonemealSuccess(Level level, RandomSource random, BlockPos pos, BlockState state, BonemealSource source) {
                     return true;
                 }
                 @Override
-                public void performBonemeal(ServerLevel level, RandomSource random, BlockPos pos, BlockState state) {
+                public void performBonemeal(ServerLevel level, RandomSource random, BlockPos pos, BlockState state, BonemealSource source) {
                     performBonemealGrowth(level, pos);
                 }
                 @Override
                 public List<ItemStack> getDrops(BlockState state, net.minecraft.world.level.storage.loot.LootParams.Builder builder) {
                     net.minecraft.world.item.ItemInstance tool = builder.getOptionalParameter(net.minecraft.world.level.storage.loot.parameters.LootContextParams.TOOL);
                     return getReferenceDrops(tool instanceof ItemStack is ? is : ItemStack.EMPTY);
-                }
-                @Override
-                public MapCodec<BushBlock> codec() {
-                    return codecForDefinition(def, BushBlock.class);
                 }
             }
             return new V26xSnowyFernBlock(props);
@@ -1978,25 +1851,21 @@ public class BlockFactory implements IBlockFactory {
                     return onUpdateShape(state, direction, neighborState, level, pos, neighborPos);
                 }
                 @Override
-                public boolean isValidBonemealTarget(LevelReader level, BlockPos pos, BlockState state) {
+                public boolean isValidBonemealTarget(LevelReader level, BlockPos pos, BlockState state, BonemealSource source) {
                     return isValidBonemeal(level, pos);
                 }
                 @Override
-                public boolean isBonemealSuccess(Level level, RandomSource random, BlockPos pos, BlockState state) {
+                public boolean isBonemealSuccess(Level level, RandomSource random, BlockPos pos, BlockState state, BonemealSource source) {
                     return true;
                 }
                 @Override
-                public void performBonemeal(ServerLevel level, RandomSource random, BlockPos pos, BlockState state) {
+                public void performBonemeal(ServerLevel level, RandomSource random, BlockPos pos, BlockState state, BonemealSource source) {
                     performBonemealGrowth(level, pos);
                 }
                 @Override
                 public List<ItemStack> getDrops(BlockState state, net.minecraft.world.level.storage.loot.LootParams.Builder builder) {
                     net.minecraft.world.item.ItemInstance tool = builder.getOptionalParameter(net.minecraft.world.level.storage.loot.parameters.LootContextParams.TOOL);
                     return getReferenceDrops(tool instanceof ItemStack is ? is : ItemStack.EMPTY);
-                }
-                @Override
-                public MapCodec<BushBlock> codec() {
-                    return codecForDefinition(def, BushBlock.class);
                 }
             }
             return new V26xSnowyShortGrassBlock(props);
@@ -2014,10 +1883,6 @@ public class BlockFactory implements IBlockFactory {
                     net.minecraft.world.item.ItemInstance tool = builder.getOptionalParameter(net.minecraft.world.level.storage.loot.parameters.LootContextParams.TOOL);
                     return getReferenceDrops(state, tool instanceof ItemStack is ? is : ItemStack.EMPTY);
                 }
-                @Override
-                public MapCodec<? extends net.minecraft.world.level.block.DoublePlantBlock> codec() {
-                    return codecForDefinition(def, net.minecraft.world.level.block.DoublePlantBlock.class);
-                }
             };
         } else if (def.isSnowyTallGrass()) {
             Supplier<Block> snowBricks = resolveBlockSupplier("snow_bricks");
@@ -2032,10 +1897,6 @@ public class BlockFactory implements IBlockFactory {
                 public List<ItemStack> getDrops(BlockState state, net.minecraft.world.level.storage.loot.LootParams.Builder builder) {
                     net.minecraft.world.item.ItemInstance tool = builder.getOptionalParameter(net.minecraft.world.level.storage.loot.parameters.LootContextParams.TOOL);
                     return getReferenceDrops(state, tool instanceof ItemStack is ? is : ItemStack.EMPTY);
-                }
-                @Override
-                public MapCodec<? extends net.minecraft.world.level.block.DoublePlantBlock> codec() {
-                    return codecForDefinition(def, net.minecraft.world.level.block.DoublePlantBlock.class);
                 }
             };
         } else if (def.isSnowyGrass()) {
@@ -2100,17 +1961,17 @@ public class BlockFactory implements IBlockFactory {
                 }
 
                 @Override
-                public boolean isValidBonemealTarget(LevelReader level, BlockPos pos, BlockState state) {
+                public boolean isValidBonemealTarget(LevelReader level, BlockPos pos, BlockState state, BonemealSource source) {
                     return isValidBonemeal(level, pos);
                 }
 
                 @Override
-                public boolean isBonemealSuccess(Level level, RandomSource random, BlockPos pos, BlockState state) {
+                public boolean isBonemealSuccess(Level level, RandomSource random, BlockPos pos, BlockState state, BonemealSource source) {
                     return true;
                 }
 
                 @Override
-                public void performBonemeal(ServerLevel level, RandomSource random, BlockPos pos, BlockState state) {
+                public void performBonemeal(ServerLevel level, RandomSource random, BlockPos pos, BlockState state, BonemealSource source) {
                     performBonemealFoliage(level, pos);
                 }
 
@@ -2120,10 +1981,6 @@ public class BlockFactory implements IBlockFactory {
                     return getReferenceDrops(tool instanceof ItemStack is ? is : ItemStack.EMPTY);
                 }
 
-                @Override
-                public MapCodec<? extends Block> codec() {
-                    return codecForDefinition(def, Block.class);
-                }
             }
             return new V26xSnowyGrassBlock(props);
         } else if (def.isExperienceFluid()) {
@@ -2168,17 +2025,9 @@ public class BlockFactory implements IBlockFactory {
         } else if (def.isResinClump()) {
             props.lightLevel(state -> 7);
             return new ResinClumpBlock(props) {
-                @Override
-                protected MapCodec<? extends net.minecraft.world.level.block.MultifaceBlock> codec() {
-                    return codecForDefinition(def, net.minecraft.world.level.block.MultifaceBlock.class);
-                }
             };
         } else if (def.isWallpaperFlat()) {
             return new WallpaperFlatBlock(props) {
-                @Override
-                protected MapCodec<? extends net.minecraft.world.level.block.MultifaceBlock> codec() {
-                    return codecForDefinition(def, net.minecraft.world.level.block.MultifaceBlock.class);
-                }
             };
         } else if (def.isPointedIcicle()) {
             return new PointedIcicleBlock(props) {
@@ -2219,10 +2068,6 @@ public class BlockFactory implements IBlockFactory {
                 public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
                     onAnimateTick(state, level, pos);
                 }
-                @Override
-                protected MapCodec<? extends Block> codec() {
-                    return codecForDefinition(def, Block.class);
-                }
             };
         } else if (def.isPlant()) {
             return new ModBushBlock(props) {
@@ -2230,10 +2075,6 @@ public class BlockFactory implements IBlockFactory {
                 protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
                     InteractionResult result = onInteract(state, level, pos, player, hand);
                     return result != InteractionResult.PASS ? result : super.useItemOn(stack, state, level, pos, player, hand, hit);
-                }
-                @Override
-                public MapCodec<BushBlock> codec() {
-                    return codecForDefinition(def, BushBlock.class);
                 }
             };
         } else {
@@ -2312,18 +2153,6 @@ public class BlockFactory implements IBlockFactory {
     }
     private BlockState getBaseState(BlockDefinition def) {
         return getBaseBlock(def).defaultBlockState();
-    }
-    /**
-     * Vanilla 26.2 properties codecs carry no settings (Properties.CODEC is a unit codec).
-     * Rebuild from the definition so the registered ID, constructor settings and custom
-     * overrides survive decoding instead of producing a plain vanilla superclass.
-     */
-    private static <B extends Block> MapCodec<B> codecForDefinition(BlockDefinition definition, Class<B> type) {
-        return Block.simpleCodec(ignoredProperties -> {
-            Block[] decoded = new Block[1];
-            Services.PLATFORM.wrapRegistryAction(() -> decoded[0] = new BlockFactory().createBlock(definition));
-            return type.cast(decoded[0]);
-        });
     }
     private BlockBehaviour.Properties buildProperties(BlockDefinition def) {
         CommonBlockProperties cp = def.getProperties();

@@ -1058,6 +1058,16 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
     public void awardStat(ServerPlayer player, CommonId statId) {
         if (player == null || statId == null) return;
         ResourceLocation id = new ResourceLocation(statId.getNamespace(), statId.getPath());
+        // 1.18.2's custom-stat registry and StatType map are identity-keyed: main awards with the registered
+        // instance, so use that one rather than an equal copy (which cannot be found and fails with an NPE).
+        ResourceLocation registered = Registry.CUSTOM_STAT.getOptional(new ResourceLocation(statId.getPath()))
+                .filter(id::equals).orElse(null);
+        if (registered == null) {
+            for (ResourceLocation candidate : Registry.CUSTOM_STAT) {
+                if (candidate.equals(id)) { registered = candidate; break; }
+            }
+        }
+        if (registered != null) id = registered;
         net.minecraft.stats.Stat<ResourceLocation> stat = net.minecraft.stats.Stats.CUSTOM.get(id);
         if (stat != null) {
             player.awardStat(stat);

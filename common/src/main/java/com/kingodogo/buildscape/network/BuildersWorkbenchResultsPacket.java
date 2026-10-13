@@ -90,7 +90,7 @@ public final class BuildersWorkbenchResultsPacket implements CommonPacket {
 
         BuildersWorkbenchBlockEntity workbench = menu.getBlockEntity();
         if (workbench == null
-                || !workbench.getBlockPos().equals(pos)
+
                 || !workbench.stillValid(serverPlayer)
                 || tab < 0 || tab > 1
                 || tab != workbench.getActiveTab()

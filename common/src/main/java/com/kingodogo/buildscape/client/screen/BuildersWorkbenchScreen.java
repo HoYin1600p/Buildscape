@@ -178,14 +178,13 @@ public class BuildersWorkbenchScreen {
     }
 
     private int inputSignature() {
-        BuildersWorkbenchBlockEntity workbench = menu.getBlockEntity();
         int hash = 31 + activeTab;
         hash = 31 * hash + filterMask;
         if (activeTab == 0) {
-            hash = stackHash(hash, workbench.getItem(BuildersWorkbenchBlockEntity.SLOT_COLOR_PICKER));
+            hash = stackHash(hash, menu.getWorkbenchItem(BuildersWorkbenchBlockEntity.SLOT_COLOR_PICKER));
         } else {
             for (int i = 0; i < 9; i++) {
-                hash = stackHash(hash, workbench.getItem(BuildersWorkbenchBlockEntity.SLOT_GRADIENT_INPUT_START + i));
+                hash = stackHash(hash, menu.getWorkbenchItem(BuildersWorkbenchBlockEntity.SLOT_GRADIENT_INPUT_START + i));
             }
         }
         return hash;
@@ -196,21 +195,20 @@ public class BuildersWorkbenchScreen {
     }
 
     private void sendSolvedResults(int solveSignature) {
-        BuildersWorkbenchBlockEntity workbench = menu.getBlockEntity();
         List<ItemStack> solved;
         if (activeTab == 0) {
             solved = ColorGradientSolver.solveColorPicker(
-                    workbench.getItem(BuildersWorkbenchBlockEntity.SLOT_COLOR_PICKER), filterMask,
+                    menu.getWorkbenchItem(BuildersWorkbenchBlockEntity.SLOT_COLOR_PICKER), filterMask,
                     currentResultOffsets());
         } else {
             List<ItemStack> anchors = new ArrayList<>(9);
             for (int i = 0; i < 9; i++) {
-                anchors.add(workbench.getItem(BuildersWorkbenchBlockEntity.SLOT_GRADIENT_INPUT_START + i));
+                anchors.add(menu.getWorkbenchItem(BuildersWorkbenchBlockEntity.SLOT_GRADIENT_INPUT_START + i));
             }
             solved = ColorGradientSolver.solveGradient(anchors, filterMask, currentResultOffsets());
         }
         PacketFactory.sendToServer(new BuildersWorkbenchResultsPacket(
-                workbench.getBlockPos(), activeTab, filterMask, currentResultOffsets(), solved));
+                net.minecraft.core.BlockPos.ZERO, activeTab, filterMask, currentResultOffsets(), solved));
         lastSentSignature = solveSignature;
     }
 
@@ -465,7 +463,7 @@ public class BuildersWorkbenchScreen {
     }
 
     private boolean isGradientAnchor(int slot) {
-        return !menu.getBlockEntity().getItem(BuildersWorkbenchBlockEntity.SLOT_GRADIENT_INPUT_START + slot).isEmpty();
+        return !menu.getWorkbenchItem(BuildersWorkbenchBlockEntity.SLOT_GRADIENT_INPUT_START + slot).isEmpty();
     }
 
     private static boolean isIn(double mouseX, double mouseY, int x, int y, int width, int height) {

@@ -737,6 +737,11 @@ public class BlockFactory implements IBlockFactory {
             class V118xMangroveLeavesBlock extends LeavesBlock implements BonemealableBlock {
                 public V118xMangroveLeavesBlock(BlockBehaviour.Properties properties) {
                     super(properties);
+                    BlockState base = this.stateDefinition.any();
+                    if (base.hasProperty(BlockStateProperties.WATERLOGGED)) {
+                        base = base.setValue(BlockStateProperties.WATERLOGGED, false);
+                    }
+                    this.registerDefaultState(base.setValue(DISTANCE, 7).setValue(PERSISTENT, false));
                 }
                 @Override
                 public boolean isValidBonemealTarget(BlockGetter level, BlockPos pos, BlockState state, boolean isClient) {
@@ -753,9 +758,45 @@ public class BlockFactory implements IBlockFactory {
             }
             return new V118xMangroveLeavesBlock(props);
         } else if (def.isMangrovePropagule()) {
+            Supplier<Block> propaguleLeaves = resolveBlockSupplier("mangrove_leaves");
+            Supplier<Block> propaguleMud = resolveBlockSupplier("mud");
+            Supplier<Block> propaguleMuddyRoots = resolveBlockSupplier("muddy_mangrove_roots");
             class V118xMangrovePropaguleBlock extends MangrovePropaguleBlock implements BonemealableBlock {
                 public V118xMangrovePropaguleBlock(BlockBehaviour.Properties properties) {
                     super(properties);
+                }
+                private boolean isLeavesAbove(BlockState aboveState) {
+                    return aboveState.is(net.minecraft.tags.BlockTags.LEAVES) || aboveState.is(propaguleLeaves.get());
+                }
+                @Override
+                public boolean canSurvive(BlockState state, LevelReader level, BlockPos pos) {
+                    if (state.getValue(HANGING)) {
+                        return isLeavesAbove(level.getBlockState(pos.above()));
+                    }
+                    BlockState belowState = level.getBlockState(pos.below());
+                    return (belowState.is(net.minecraft.tags.BlockTags.DIRT) && !belowState.is(Blocks.DIRT_PATH))
+                            || belowState.is(Blocks.FARMLAND)
+                            || belowState.is(Blocks.MOSS_BLOCK)
+                            || belowState.is(propaguleMud.get())
+                            || belowState.is(Blocks.CLAY)
+                            || belowState.is(propaguleMuddyRoots.get());
+                }
+                @Override
+                public BlockState updateShape(BlockState state, Direction direction, BlockState adjacentState, LevelAccessor level, BlockPos pos, BlockPos adjacentPos) {
+                    if (state.getValue(WATERLOGGED)) {
+                        level.scheduleTick(pos, net.minecraft.world.level.material.Fluids.WATER, net.minecraft.world.level.material.Fluids.WATER.getTickDelay(level));
+                    }
+                    if (state.getValue(HANGING)) {
+                        if (direction == Direction.UP && !isLeavesAbove(level.getBlockState(pos.above()))) {
+                            return Blocks.AIR.defaultBlockState();
+                        }
+                    } else if (direction == Direction.DOWN) {
+                        if (!canSurvive(state, level, pos)) {
+                            return Blocks.AIR.defaultBlockState();
+                        }
+                        return state.setValue(ON_FARMLAND, shouldSink(level, pos));
+                    }
+                    return super.updateShape(state, direction, adjacentState, level, pos, adjacentPos);
                 }
                 @Override
                 public boolean isValidBonemealTarget(BlockGetter level, BlockPos pos, BlockState state, boolean isClient) {
@@ -767,7 +808,95 @@ public class BlockFactory implements IBlockFactory {
                 }
                 @Override
                 public void performBonemeal(ServerLevel level, java.util.Random random, BlockPos pos, BlockState state) {
+                    if (!state.getValue(HANGING) && state.getValue(STAGE) >= 1) {
+                        advanceTree(level, pos, state, random, true);
+                        return;
+                    }
                     performBonemealEffect(level, pos, state);
+                }
+                @Override
+                public boolean isRandomlyTicking(BlockState state) {
+                    return !state.getValue(HANGING);
+                }
+                @Override
+                public void randomTick(BlockState state, ServerLevel level, BlockPos pos, java.util.Random random) {
+                    if (state.getValue(HANGING)) return;
+                    if (level.getEntitiesOfClass(Player.class, new net.minecraft.world.phys.AABB(pos).inflate(32)).isEmpty()) return;
+                    if (random.nextInt(7) == 0) advanceTree(level, pos, state, random, false);
+                }
+                private void advanceTree(ServerLevel level, BlockPos pos, BlockState state, java.util.Random random, boolean bonemeal) {
+                    if (state.getValue(HANGING)) return;
+                    if (state.getValue(STAGE) < 1) {
+                        level.setBlock(pos, state.setValue(STAGE, state.getValue(STAGE) + 1), 4);
+                        return;
+                    }
+                    if (!bonemeal && !canGrowTree(level, pos)) return;
+                    String variant = com.kingodogo.buildscape.worldgen.ModConfiguredFeatures.getRandomMangroveTreeVariant(random);
+                    ResourceLocation featureLocation = new ResourceLocation("buildscape", variant);
+                    var featureHolder = level.registryAccess().registry(Registry.CONFIGURED_FEATURE_REGISTRY)
+                            .flatMap(registry -> registry.getHolder(net.minecraft.resources.ResourceKey.create(Registry.CONFIGURED_FEATURE_REGISTRY, featureLocation)));
+                    if (featureHolder.isEmpty()) {
+                        com.kingodogo.buildscape.BuildscapeCommon.LOGGER.warn("Mangrove tree feature {} not found in registry! Cannot grow tree.", featureLocation);
+                        level.setBlock(pos, state, 4);
+                        return;
+                    }
+                    var feature = featureHolder.get().value();
+                    if (feature.feature() != net.minecraft.world.level.levelgen.feature.Feature.TREE) {
+                        com.kingodogo.buildscape.BuildscapeCommon.LOGGER.warn("Mangrove tree feature {} is not a tree feature!", featureLocation);
+                        level.setBlock(pos, state, 4);
+                        return;
+                    }
+                    BlockPos belowPos = pos.below();
+                    if (level.getBlockState(belowPos).is(Blocks.GRASS_BLOCK)) {
+                        level.setBlock(belowPos, Blocks.DIRT.defaultBlockState(), 3);
+                    }
+                    level.setBlock(pos, state.getFluidState().createLegacyBlock(), Block.UPDATE_ALL);
+                    @SuppressWarnings("unchecked")
+                    net.minecraft.world.level.levelgen.feature.configurations.TreeConfiguration treeConfig =
+                            (net.minecraft.world.level.levelgen.feature.configurations.TreeConfiguration) feature.config();
+                    var placeContext = new net.minecraft.world.level.levelgen.feature.FeaturePlaceContext<>(
+                            java.util.Optional.empty(), level, level.getChunkSource().getGenerator(), random, pos, treeConfig);
+                    if (!net.minecraft.world.level.levelgen.feature.Feature.TREE.place(placeContext)) {
+                        level.setBlock(pos, state, Block.UPDATE_ALL);
+                    }
+                }
+                private boolean canGrowTree(LevelReader level, BlockPos pos) {
+                    if (level.getMaxLocalRawBrightness(pos) < 9) return false;
+                    for (int y = 1; y <= 6; y++) {
+                        BlockState check = level.getBlockState(pos.above(y));
+                        if (!check.isAir() && !check.is(net.minecraft.tags.BlockTags.DIRT) && !isLogOrWood(check)) return false;
+                    }
+                    boolean solidNearby = false;
+                    for (int x = -4; x <= 4 && !solidNearby; x++) {
+                        for (int z = -4; z <= 4 && !solidNearby; z++) {
+                            if (x == 0 && z == 0) continue;
+                            for (int y = -4; y <= 4; y++) {
+                                BlockPos check = pos.offset(x, y, z);
+                                if (isSolidBlock(level, check, level.getBlockState(check))) { solidNearby = true; break; }
+                            }
+                        }
+                    }
+                    if (!solidNearby) return false;
+                    for (int x = -4; x <= 4; x++) {
+                        for (int z = -4; z <= 4; z++) {
+                            for (int y = 1; y <= 11; y++) {
+                                BlockPos check = pos.offset(x, -y, z);
+                                if (isSolidBlock(level, check, level.getBlockState(check))) return true;
+                            }
+                        }
+                    }
+                    return false;
+                }
+                private boolean isLogOrWood(BlockState state) {
+                    return state.is(net.minecraft.tags.BlockTags.LOGS) || state.is(net.minecraft.tags.BlockTags.PLANKS)
+                            || state.getBlock() == resolveBlockSupplier("mangrove_log").get()
+                            || state.getBlock() == resolveBlockSupplier("mangrove_wood").get()
+                            || state.getBlock() == resolveBlockSupplier("stripped_mangrove_log").get()
+                            || state.getBlock() == resolveBlockSupplier("stripped_mangrove_wood").get();
+                }
+                private boolean isSolidBlock(BlockGetter level, BlockPos pos, BlockState state) {
+                    if (state.is(propaguleMud.get())) return false;
+                    return state.isFaceSturdy(level, pos, Direction.UP) && state.getMaterial().isSolid() && !state.getMaterial().isReplaceable();
                 }
             }
             return new V118xMangrovePropaguleBlock(props);
@@ -947,7 +1076,9 @@ public class BlockFactory implements IBlockFactory {
                 }
                 @Override
                 public void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, BlockPos fromPos, boolean isMoving) {
-                    onNeighborUpdate(level, pos, state, block, fromPos, isMoving);
+                    if (fromPos.equals(pos.above()) || fromPos.equals(pos.below())) {
+                        onNeighborUpdate(level, pos, state, block, fromPos, isMoving);
+                    }
                 }
                 @Override
                 public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
@@ -1597,6 +1728,7 @@ public class BlockFactory implements IBlockFactory {
                 @Override
                 public BlockState updateShape(BlockState state, Direction direction, BlockState adjacentState, LevelAccessor level, BlockPos pos, BlockPos adjacentPos) {
                     BlockState adjusted = onUpdateShape(state, direction, adjacentState, level, pos, adjacentPos);
+                    if (direction == Direction.DOWN) return adjusted;
                     return super.updateShape(adjusted, direction, adjacentState, level, pos, adjacentPos);
                 }
 
@@ -1637,6 +1769,7 @@ public class BlockFactory implements IBlockFactory {
                 @Override
                 public BlockState updateShape(BlockState state, Direction direction, BlockState adjacentState, LevelAccessor level, BlockPos pos, BlockPos adjacentPos) {
                     BlockState adjusted = onUpdateShape(state, direction, adjacentState, level, pos, adjacentPos);
+                    if (direction == Direction.DOWN) return adjusted;
                     return super.updateShape(adjusted, direction, adjacentState, level, pos, adjacentPos);
                 }
 
@@ -1777,6 +1910,7 @@ public class BlockFactory implements IBlockFactory {
                 @Override
                 public BlockState updateShape(BlockState state, Direction direction, BlockState adjacentState, LevelAccessor level, BlockPos pos, BlockPos adjacentPos) {
                     BlockState adjusted = onUpdateShape(state, direction, adjacentState, level, pos, adjacentPos);
+                    if (direction == Direction.DOWN) return adjusted;
                     return super.updateShape(adjusted, direction, adjacentState, level, pos, adjacentPos);
                 }
             }
@@ -1786,7 +1920,7 @@ public class BlockFactory implements IBlockFactory {
             return new SnowyBushBlock(props, snowBricks) {
                 @Override
                 public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
-                    if (!state.canSurvive(level, pos)) return Blocks.AIR.defaultBlockState();
+                    if (direction != Direction.DOWN && !state.canSurvive(level, pos)) return Blocks.AIR.defaultBlockState();
                     return onUpdateShape(state, direction, neighborState, level, pos, neighborPos);
                 }
                 @Override
@@ -1803,7 +1937,7 @@ public class BlockFactory implements IBlockFactory {
                 }
                 @Override
                 public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
-                    if (!state.canSurvive(level, pos)) return Blocks.AIR.defaultBlockState();
+                    if (direction != Direction.DOWN && !state.canSurvive(level, pos)) return Blocks.AIR.defaultBlockState();
                     return onUpdateShape(state, direction, neighborState, level, pos, neighborPos);
                 }
                 @Override
@@ -1833,7 +1967,7 @@ public class BlockFactory implements IBlockFactory {
                 }
                 @Override
                 public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
-                    if (!state.canSurvive(level, pos)) return Blocks.AIR.defaultBlockState();
+                    if (direction != Direction.DOWN && !state.canSurvive(level, pos)) return Blocks.AIR.defaultBlockState();
                     return onUpdateShape(state, direction, neighborState, level, pos, neighborPos);
                 }
                 @Override

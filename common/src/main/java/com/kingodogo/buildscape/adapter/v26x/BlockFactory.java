@@ -1011,11 +1011,6 @@ public class BlockFactory implements IBlockFactory {
                     return onInteract(level, pos, state, player, InteractionHand.MAIN_HAND, hit);
                 }
                 @Override
-                public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
-                    onPlayerDestroy(level, pos, state, player);
-                    return super.playerWillDestroy(level, pos, state, player);
-                }
-                @Override
                 public boolean canPlaceLiquid(@Nullable LivingEntity entity, BlockGetter level, BlockPos pos, BlockState state, Fluid fluid) {
                     return canPlaceLiquid(level, pos, state, fluid);
                 }
@@ -1035,9 +1030,37 @@ public class BlockFactory implements IBlockFactory {
                     return onInteract(level, pos, state, player, InteractionHand.MAIN_HAND, hit);
                 }
                 @Override
-                public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
-                    onPlayerDestroy(level, pos, state, player);
-                    return super.playerWillDestroy(level, pos, state, player);
+                protected BlockState updateShape(BlockState state, LevelReader level, ScheduledTickAccess tickAccess, BlockPos pos, Direction direction, BlockPos adjacentPos, BlockState adjacentState, RandomSource random) {
+                    if (state.getValue(WATERLOGGED)) {
+                        tickAccess.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
+                    }
+                    if (state.getValue(LAVA_LOGGED)) {
+                        tickAccess.scheduleTick(pos, Fluids.LAVA, Fluids.LAVA.getTickDelay(level));
+                    }
+                    if (state.getValue(WATER_LEVEL) > 0) {
+                        tickAccess.scheduleTick(pos, this, Fluids.WATER.getTickDelay(level));
+                    }
+                    BlockState updated = super.updateShape(state, level, tickAccess, pos, direction, adjacentPos, adjacentState, random);
+                    if (state.getValue(WATER_LEVEL) > 0 && updated.getValue(WATER_LEVEL) == 0) {
+                        updated = updated.setValue(WATER_LEVEL, state.getValue(WATER_LEVEL));
+                    }
+                    updated = updateConnections(level, pos, updated);
+                    if (!level.isClientSide() && level instanceof Level lvl) {
+                        com.kingodogo.buildscape.pipe.transport.HollowPipeTransportManager.onNeighborChanged(lvl, pos, updated, adjacentPos);
+                    }
+                    return updated;
+                }
+                @Override
+                protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, @Nullable Orientation orientation, boolean isMoving) {
+                    // 26.x passes an orientation instead of the changed position, so check every side (main passes the real fromPos).
+                    for (Direction side : Direction.values()) {
+                        onNeighborUpdate(level, pos, state, block, pos.relative(side), isMoving);
+                    }
+                }
+                @Override
+                protected void tick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
+                    super.tick(state, level, pos, random);
+                    onBlockTick(level, pos, state);
                 }
                 @Override
                 public boolean canPlaceLiquid(@Nullable LivingEntity entity, BlockGetter level, BlockPos pos, BlockState state, Fluid fluid) {

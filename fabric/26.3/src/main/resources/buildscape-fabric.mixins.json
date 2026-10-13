@@ -12,7 +12,9 @@
     "fabric.AnvilUpdateMixin",
     "fabric.EndermanGriefingMixin",
     "fabric.FireballGriefingMixin",
-    "fabric.ExplosionGriefingMixin"
+    "fabric.ExplosionGriefingMixin",
+    "fabric.SneakBypassUseMixin",
+    "fabric.StrawBedSpawnMixin"
   ],
   "client": [
     "client.KeyboardInputMixin",

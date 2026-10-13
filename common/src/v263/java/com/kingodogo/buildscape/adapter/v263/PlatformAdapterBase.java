@@ -1079,7 +1079,10 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter, com.kingo
     public void awardStat(net.minecraft.server.level.ServerPlayer player, CommonId statId) {
         if (player == null || statId == null) return;
         Identifier id = Identifier.fromNamespaceAndPath(statId.getNamespace(), statId.getPath());
-        net.minecraft.stats.Stat<Identifier> stat = net.minecraft.stats.Stats.CUSTOM.get(id);
+        // StatType keys use the registered identifier instance.
+        Identifier registered = BuiltInRegistries.CUSTOM_STAT.getValue(id);
+        if (registered != null) id = registered;
+        net.minecraft.stats.Stat<Identifier> stat = net.minecraft.stats.Stats.CUSTOM.get(id, net.minecraft.stats.StatFormatter.DEFAULT);
         if (stat != null) {
             player.awardStat(stat);
         }
@@ -1715,6 +1718,17 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter, com.kingo
             public void appendHoverText(ItemStack stack, Item.TooltipContext context, TooltipDisplay displayContext, Consumer<Component> tooltip, TooltipFlag flag) {
                 super.appendHoverText(stack, context, displayContext, tooltip, flag);
                 appendPatternTooltip(stack, tooltip);
+            }
+        };
+    }
+
+    @Override
+    public BlockItem createDoublePlantBlockItem(Block block, Item.Properties properties) {
+        return new BlockItem(block, properties) {
+            @Override
+            protected boolean placeBlock(net.minecraft.world.item.context.BlockPlaceContext context, net.minecraft.world.level.block.state.BlockState state) {
+                // Place the upper half before the lower half receives shape updates.
+                return context.getLevel().setBlock(context.getClickedPos(), state, 11 | 16);
             }
         };
     }
@@ -3236,8 +3250,9 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter, com.kingo
             super(entityType, level, () -> Services.PLATFORM.getItem(new CommonId("buildscape", "poplar_boat")));
         }
 
+        @SuppressWarnings("unchecked")
         public PoplarBoatEntityImpl(Level level, double x, double y, double z) {
-            this(EntityTypes.OAK_BOAT, level);
+            this((EntityType<? extends Boat>) Services.PLATFORM.getPoplarBoatEntityType(), level);
             this.setPos(x, y, z);
             this.xo = x;
             this.yo = y;
@@ -3253,7 +3268,7 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter, com.kingo
         }
 
         public SeatEntityImpl(Level level, double x, double y, double z) {
-            this(EntityTypes.MARKER, level);
+            this(Services.PLATFORM.getSeatEntityType(), level);
             this.setPos(x, y, z);
         }
 

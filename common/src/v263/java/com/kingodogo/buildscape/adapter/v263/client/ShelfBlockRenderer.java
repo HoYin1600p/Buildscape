@@ -75,7 +75,7 @@ public final class ShelfBlockRenderer implements BlockEntityRenderer<ShelfBlockE
             pose.pushPose();
             try {
                 pose.translate(0.5, 0.5, 0.5);
-                pose.mulPose(Axis.YP.rotationDegrees(state.yaw));
+                pose.rotate(Axis.YP.rotationDegrees(state.yaw));
                 pose.translate((i - 1) * 0.3125F, state.alignToBottom ? -0.25F : 0, -0.25F);
                 pose.scale(0.25F, 0.25F, 0.25F);
                 pose.translate(slot.offset.x(), slot.offset.y(), slot.offset.z());

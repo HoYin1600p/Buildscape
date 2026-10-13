@@ -1,144 +1,100 @@
 package com.kingodogo.buildscape;
 
+import com.kingodogo.buildscape.adapter.v263.PlatformAdapterBase;
+import com.kingodogo.buildscape.adapter.v263.PacketFactory.BuildscapeCustomPayload;
+import com.kingodogo.buildscape.network.PacketDirection;
+import com.kingodogo.buildscape.platform.Services;
+import com.kingodogo.buildscape.recipe.framework.BuildScapeRecipeLoader;
+import com.kingodogo.buildscape.registry.NeoForgeRegistryAdapter;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.Identifier;
+import net.minecraft.server.level.ServerPlayer;
+import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.neoforged.fml.loading.FMLEnvironment;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.AddServerReloadListenersEvent;
+import net.neoforged.neoforge.event.RegisterCauldronInteractionEvent;
+import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
+import net.neoforged.neoforge.event.server.ServerStartedEvent;
+import net.neoforged.neoforge.event.server.ServerStoppedEvent;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 
-@Mod("buildscape")
+@Mod(BuildscapeCommon.MOD_ID)
 public class BuildscapeNeoForge {
-    public BuildscapeNeoForge() {
-        init();
-        tryRegisterPayloadHandlers();
-        tryRegisterRecipeReloading();
-        tryRegisterClient();
-    }
+    private static final net.neoforged.neoforge.registries.DeferredRegister<net.neoforged.neoforge.attachment.AttachmentType<?>> ATTACHMENT_TYPES =
+            net.neoforged.neoforge.registries.DeferredRegister.create(
+                    net.neoforged.neoforge.registries.NeoForgeRegistries.Keys.ATTACHMENT_TYPES, BuildscapeCommon.MOD_ID);
+    private static final net.neoforged.neoforge.registries.DeferredHolder<net.neoforged.neoforge.attachment.AttachmentType<?>,
+            net.neoforged.neoforge.attachment.AttachmentType<net.minecraft.nbt.CompoundTag>> PERSISTENT_DATA =
+            ATTACHMENT_TYPES.register(com.kingodogo.buildscape.data.PersistentData.ATTACHMENT_PATH,
+                    () -> net.neoforged.neoforge.attachment.AttachmentType
+                            .builder(() -> new net.minecraft.nbt.CompoundTag())
+                            .serialize(com.kingodogo.buildscape.data.PersistentData.MAP_CODEC)
+                            .build());
 
-    private void tryRegisterRecipeReloading() {
-        try {
-            Class<?> neoForgeClass = Class.forName("net.neoforged.neoforge.common.NeoForge");
-            Object eventBus = neoForgeClass.getField("EVENT_BUS").get(null);
-            java.lang.reflect.Method addListener = eventBus.getClass().getMethod("addListener", Class.class, java.util.function.Consumer.class);
-
-            Class<?> addReloadListenerEventClass = Class.forName("net.neoforged.neoforge.event.AddReloadListenerEvent");
-            java.util.function.Consumer<Object> reloadConsumer = event -> {
-                try {
-                    Object serverResources = event.getClass().getMethod("getServerResources").invoke(event);
-                    Object recipeManager = serverResources.getClass().getMethod("getRecipeManager").invoke(serverResources);
-                    com.kingodogo.buildscape.recipe.framework.BuildScapeRecipeLoader.INSTANCE
-                            .setCurrentRecipeManager((net.minecraft.world.item.crafting.RecipeManager) recipeManager);
-                    event.getClass().getMethod("addListener", net.minecraft.server.packs.resources.PreparableReloadListener.class)
-                            .invoke(event, com.kingodogo.buildscape.platform.Services.PLATFORM.createRecipeReloadListener());
-                } catch (Throwable t) {
-                    BuildscapeCommon.LOGGER.error("Failed to register NeoForge 26.3 dynamic recipe reload listener", t);
-                }
-            };
-            addListener.invoke(eventBus, addReloadListenerEventClass, reloadConsumer);
-
-            Class<?> serverStoppedEventClass = Class.forName("net.neoforged.neoforge.event.server.ServerStoppedEvent");
-            java.util.function.Consumer<Object> stoppedConsumer = event -> {
-                com.kingodogo.buildscape.recipe.framework.BuildScapeRecipeLoader.INSTANCE.setCurrentRecipeManager(null);
-            };
-            addListener.invoke(eventBus, serverStoppedEventClass, stoppedConsumer);
-        } catch (Throwable t) {
-            BuildscapeCommon.LOGGER.debug("NeoForge 26.3 recipe reloading hooks deferred or unavailable: {}", t.getMessage());
-        }
-    }
-
-    private void tryRegisterPayloadHandlers() {
-        try {
-            Class<?> modBusClass = Class.forName("net.neoforged.bus.api.IEventBus");
-            Class<?> contextClass = Class.forName("net.neoforged.fml.ModLoadingContext");
-            Object context = contextClass.getMethod("get").invoke(null);
-            Object activeContainer = contextClass.getMethod("getActiveContainer").invoke(context);
-            Object bus = activeContainer.getClass().getMethod("getEventBus").invoke(activeContainer);
-            if (bus != null) {
-                Class<?> eventClass = Class.forName("net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent");
-                java.lang.reflect.Method addListener = bus.getClass().getMethod("addListener", Class.class, java.util.function.Consumer.class);
-                java.util.function.Consumer<Object> handler = event -> {
-                    try {
-                        Object registrar = event.getClass().getMethod("registrar", String.class).invoke(event, BuildscapeCommon.MOD_ID);
-                        for (com.kingodogo.buildscape.network.IPacketFactory.PacketDescriptor desc : com.kingodogo.buildscape.network.PacketFactory.getRegisteredDescriptors()) {
-                            net.minecraft.resources.Identifier loc = net.minecraft.resources.Identifier.fromNamespaceAndPath(desc.id().getNamespace(), desc.id().getPath());
-                            net.minecraft.network.protocol.common.custom.CustomPacketPayload.Type<com.kingodogo.buildscape.adapter.v263.PacketFactory.BuildscapeCustomPayload> type =
-                                    new net.minecraft.network.protocol.common.custom.CustomPacketPayload.Type<>(loc);
-                            net.minecraft.network.codec.StreamCodec<net.minecraft.network.FriendlyByteBuf, com.kingodogo.buildscape.adapter.v263.PacketFactory.BuildscapeCustomPayload> codec =
-                                    com.kingodogo.buildscape.adapter.v263.PacketFactory.BuildscapeCustomPayload.codec(type);
-
-                            if (desc.direction() == com.kingodogo.buildscape.network.PacketDirection.CLIENT_TO_SERVER) {
-                                java.lang.reflect.Method playToServer = registrar.getClass().getMethod("playToServer",
-                                        net.minecraft.network.protocol.common.custom.CustomPacketPayload.Type.class,
-                                        net.minecraft.network.codec.StreamCodec.class,
-                                        Class.forName("net.neoforged.neoforge.network.handling.IPayloadHandler"));
-                                Object payloadHandler = java.lang.reflect.Proxy.newProxyInstance(
-                                        Class.forName("net.neoforged.neoforge.network.handling.IPayloadHandler").getClassLoader(),
-                                        new Class<?>[]{Class.forName("net.neoforged.neoforge.network.handling.IPayloadHandler")},
-                                        (proxy, m, args) -> {
-                                            if (m.getName().equals("handle") && args != null && args.length >= 2) {
-                                                com.kingodogo.buildscape.adapter.v263.PacketFactory.BuildscapeCustomPayload p =
-                                                        (com.kingodogo.buildscape.adapter.v263.PacketFactory.BuildscapeCustomPayload) args[0];
-                                                Object ctx = args[1];
-                                                java.lang.reflect.Method playerMethod = ctx.getClass().getMethod("player");
-                                                Object playerObj = playerMethod.invoke(ctx);
-                                                if (playerObj instanceof net.minecraft.server.level.ServerPlayer player) {
-                                                    com.kingodogo.buildscape.network.PacketFactory.handleServerbound(desc.id(), p.data(), player);
-                                                }
-                                            }
-                                            return null;
-                                        }
-                                );
-                                playToServer.invoke(registrar, type, codec, payloadHandler);
-                            } else {
-                                java.lang.reflect.Method playToClient = registrar.getClass().getMethod("playToClient",
-                                        net.minecraft.network.protocol.common.custom.CustomPacketPayload.Type.class,
-                                        net.minecraft.network.codec.StreamCodec.class,
-                                        Class.forName("net.neoforged.neoforge.network.handling.IPayloadHandler"));
-                                Object payloadHandler = java.lang.reflect.Proxy.newProxyInstance(
-                                        Class.forName("net.neoforged.neoforge.network.handling.IPayloadHandler").getClassLoader(),
-                                        new Class<?>[]{Class.forName("net.neoforged.neoforge.network.handling.IPayloadHandler")},
-                                        (proxy, m, args) -> {
-                                            if (m.getName().equals("handle") && args != null && args.length >= 2) {
-                                                com.kingodogo.buildscape.adapter.v263.PacketFactory.BuildscapeCustomPayload p =
-                                                        (com.kingodogo.buildscape.adapter.v263.PacketFactory.BuildscapeCustomPayload) args[0];
-                                                Object ctx = args[1];
-                                                java.lang.reflect.Method playerMethod = ctx.getClass().getMethod("player");
-                                                Object playerObj = playerMethod.invoke(ctx);
-                                                if (playerObj instanceof net.minecraft.world.entity.player.Player player) {
-                                                    com.kingodogo.buildscape.network.PacketFactory.handleClientbound(desc.id(), p.data(), player);
-                                                }
-                                            }
-                                            return null;
-                                        }
-                                );
-                                playToClient.invoke(registrar, type, codec, payloadHandler);
-                            }
-                        }
-                    } catch (Throwable t) {
-                        BuildscapeCommon.LOGGER.warn("Failed to register NeoForge 26.3 payload: {}", t.getMessage());
-                    }
-                };
-                addListener.invoke(bus, eventClass, handler);
-            }
-        } catch (Throwable t) {
-            BuildscapeCommon.LOGGER.debug("NeoForge 26.3 payload handlers registration deferred or unavailable: {}", t.getMessage());
-        }
+    public BuildscapeNeoForge(IEventBus modBus) {
+        ATTACHMENT_TYPES.register(modBus);
+        com.kingodogo.buildscape.data.PersistentData.install(owner ->
+                ((net.neoforged.neoforge.attachment.IAttachmentHolder) owner).getData(PERSISTENT_DATA.get()));
+        BuildscapeCommon.prepareRegistration();
+        NeoForge.EVENT_BUS.addListener((net.neoforged.neoforge.event.tick.ServerTickEvent.Post event) ->
+                com.kingodogo.buildscape.world.ModGameRules.syncIfChanged(event.getServer().overworld()));
+        modBus.addListener(((NeoForgeRegistryAdapter) Services.REGISTRY)::onRegister);
+        modBus.addListener(BuildscapeNeoForge::commonSetup);
+        modBus.addListener(BuildscapeNeoForge::registerPayloads);
+        modBus.addListener(BuildscapeNeoForge::registerAttributes);
+        modBus.addListener(BuildscapeNeoForge::registerCauldronInteractions);
+        NeoForge.EVENT_BUS.addListener(BuildscapeNeoForge::addReloadListeners);
+        NeoForge.EVENT_BUS.addListener(BuildscapeNeoForge::serverStarted);
+        NeoForge.EVENT_BUS.addListener(BuildscapeNeoForge::serverStopped);
+        com.kingodogo.buildscape.event.NeoForgeGameplayEvents.register();
+        if (FMLEnvironment.getDist().isClient()) BuildscapeNeoForgeClient.register(modBus);
     }
 
     public static void init() {
         BuildscapeCommon.init();
+        com.kingodogo.buildscape.event.LoaderDispenserSetup.register();
     }
-
-    @SuppressWarnings("unchecked")
-    private void tryRegisterClient() {
-        try {
-            Class<?> distEnum = Class.forName("net.neoforged.api.distmarker.Dist");
-            Object clientDist = Enum.valueOf((Class<Enum>) distEnum, "CLIENT");
-            Class<?> fmlEnv = Class.forName("net.neoforged.fml.loading.FMLEnvironment");
-            Object currentDist = fmlEnv.getField("dist").get(null);
-            if (clientDist.equals(currentDist)) {
-                com.kingodogo.buildscape.platform.Services.PLATFORM.registerMenuScreens();
-                com.kingodogo.buildscape.particle.ParticleFactory.registerProviders();
-                com.kingodogo.buildscape.client.ClientEvents.initializeConfigCallback();
+    private static void commonSetup(FMLCommonSetupEvent event) { event.enqueueWork(BuildscapeNeoForge::init); }
+    private static void registerAttributes(EntityAttributeCreationEvent event) {
+        Services.PLATFORM.registerEntityAttributes(event::put);
+    }
+    private static void registerCauldronInteractions(RegisterCauldronInteractionEvent.Interaction event) {
+        ((PlatformAdapterBase) Services.PLATFORM).registerExperienceCauldronInteractions((item, interaction) ->
+                event.register(Identifier.withDefaultNamespace("empty"), item, interaction));
+    }
+    private static void addReloadListeners(AddServerReloadListenersEvent event) {
+        BuildScapeRecipeLoader.INSTANCE.setCurrentRecipeManager(event.getServerResources().getRecipeManager());
+        event.addListener(Identifier.fromNamespaceAndPath(BuildscapeCommon.MOD_ID, "dynamic_recipes"),
+                Services.PLATFORM.createRecipeReloadListener());
+    }
+    private static void serverStarted(ServerStartedEvent event) {
+        com.kingodogo.buildscape.adapter.v263.PacketFactory.setServer(event.getServer());
+        BuildscapeCommon.setServerFullyInitialized(true);
+    }
+    private static void serverStopped(ServerStoppedEvent event) {
+        BuildScapeRecipeLoader.INSTANCE.setCurrentRecipeManager(null);
+        com.kingodogo.buildscape.adapter.v263.PacketFactory.setServer(null);
+        BuildscapeCommon.setServerFullyInitialized(false);
+    }
+    private static void registerPayloads(RegisterPayloadHandlersEvent event) {
+        var registrar = event.registrar("1");
+        for (var descriptor : com.kingodogo.buildscape.network.PacketFactory.getRegisteredDescriptors()) {
+            var type = new CustomPacketPayload.Type<BuildscapeCustomPayload>(Identifier.fromNamespaceAndPath(
+                    descriptor.id().getNamespace(), descriptor.id().getPath()));
+            var codec = BuildscapeCustomPayload.codec(type);
+            if (descriptor.direction() == PacketDirection.CLIENT_TO_SERVER) {
+                registrar.playToServer(type, codec, (payload, context) -> {
+                    if (context.player() instanceof ServerPlayer player) {
+                        com.kingodogo.buildscape.network.PacketFactory.handleServerbound(descriptor.id(), payload.data(), player);
+                    }
+                });
+            } else {
+                registrar.playToClient(type, codec, (payload, context) ->
+                        com.kingodogo.buildscape.network.PacketFactory.handleClientbound(descriptor.id(), payload.data(), context.player()));
             }
-        } catch (Throwable t) {
-            BuildscapeCommon.LOGGER.warn("Failed to register NeoForge 26.3 client handlers: {}", t.getMessage());
         }
     }
 }

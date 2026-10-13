@@ -16,12 +16,10 @@ import net.minecraft.world.item.trading.VillagerTrade;
 import net.minecraft.world.level.storage.loot.predicates.LootItemRandomChanceCondition;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.WeakHashMap;
 
-/** Extend the 26.2 data-driven pools while retaining vanilla selection and predicates. */
+/** Extend the 26.3 data-driven pools while retaining vanilla selection and predicates. */
 public final class LoaderWandererTrades {
     private static final Set<TradeSet> EXTENDED = Collections.newSetFromMap(new WeakHashMap<>());
     private LoaderWandererTrades() {}
@@ -36,25 +34,24 @@ public final class LoaderWandererTrades {
         if (EXTENDED.contains(set)) return;
         try {
             var trades = new ArrayList<Holder<VillagerTrade>>();
-            set.getTrades().forEach(trades::add);
+            set.trades().forEach(trades::add);
             if (rare) {
                 var scroll = Services.PLATFORM.getItem(new CommonId("buildscape", "ancient_ashen_scroll"));
                 if (scroll != null && scroll != Items.AIR) {
-                    trades.add(Holder.direct(new VillagerTrade(new TradeCost(Items.DIAMOND, 12),
-                            new ItemStackTemplate(scroll, 1), 1, 1, 0,
-                            Optional.of(LootItemRandomChanceCondition.randomChance(1F / 5000F).build()), List.of())));
+                    trades.add(Holder.direct(VillagerTrade.builder(new TradeCost(Items.DIAMOND, 12),
+                            new ItemStackTemplate(scroll, 1), 1, 1, 0).merchantPredicate(Holder.direct(
+                                    LootItemRandomChanceCondition.randomChance(1F / 5000F).build())).build()));
                 }
             } else {
                 for (var entry : WandererTradeTable.generic()) {
                     var item = Services.PLATFORM.getItem(CommonId.parse(entry.item().contains(":") ? entry.item() : "buildscape:" + entry.item()));
                     if (item != null && item != Items.AIR) {
-                        trades.add(Holder.direct(new VillagerTrade(new TradeCost(Items.EMERALD, entry.emeralds()),
-                                new ItemStackTemplate(item, entry.count()), entry.maxUses(), 1, .05F,
-                                Optional.empty(), List.of())));
+                        trades.add(Holder.direct(VillagerTrade.builder(new TradeCost(Items.EMERALD, entry.emeralds()),
+                                new ItemStackTemplate(item, entry.count()), entry.maxUses(), 1, .05F).build()));
                     }
                 }
             }
-            // 26.2 exposes no pool-extension event or setter on either loader.
+            // Forge exposes no pool-extension event or setter.
             // Only the holder list changes; count, duplicate policy, and random sequence remain intact.
             ((com.kingodogo.buildscape.mixin.forge263.TradeSetAccessor) (Object) set).buildscape$setTrades(HolderSet.direct(trades));
             EXTENDED.add(set);

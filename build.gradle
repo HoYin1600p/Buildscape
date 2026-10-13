@@ -47,7 +47,9 @@ subprojects {
     }
 }
 
-def loaderProjects = [project(':fabric:26.2'), project(':neoforge:26.2')]
+def loaderProjects = []
+if (findProject(':fabric:26.2') != null) loaderProjects.add(project(':fabric:26.2'))
+if (findProject(':neoforge:26.2') != null) loaderProjects.add(project(':neoforge:26.2'))
 if (findProject(':forge:26.2') != null) loaderProjects.add(project(':forge:26.2'))
 def collectModJars = tasks.register('collectModJars', Copy) {
     group = 'build'

@@ -1115,9 +1115,9 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                     int removeW = 50;
                     int removeX = x + w - removeW - 6;
                     int removeY = custY;
-                    boolean hoverRem = mouseX >= removeX && mouseX <= removeX + removeW && mouseY >= removeY && mouseY <= removeY + removeH;
-                    Services.PLATFORM.fill(poseStackOrGraphics, removeX, removeY, removeX + removeW, removeY + removeH, applyAlpha(hoverRem ? 0xFF3D1616 : 0xFF241414, alpha));
-                    drawBorder(poseStackOrGraphics, removeX, removeY, removeW, removeH, applyAlpha(hoverRem ? 0xFFE05050 : 0xFF882828, alpha));
+                    boolean hoverRem = mouseX >= removeX && mouseX <= removeX + removeW && mouseY >= removeY && mouseY <= removeY + btnH;
+                    Services.PLATFORM.fill(poseStackOrGraphics, removeX, removeY, removeX + removeW, removeY + btnH, applyAlpha(hoverRem ? 0xFF3D1616 : 0xFF241414, alpha));
+                    drawBorder(poseStackOrGraphics, removeX, removeY, removeW, btnH, applyAlpha(hoverRem ? 0xFFE05050 : 0xFF882828, alpha));
                     Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "Remove", removeX + removeW / 2, removeY + 3, applyAlpha(hoverRem ? 0xFFFFFFFF : 0xFFE05050, alpha));
                 }
                 curY += h + gap;

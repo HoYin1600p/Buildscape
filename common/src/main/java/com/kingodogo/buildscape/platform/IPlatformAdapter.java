@@ -143,6 +143,9 @@ public interface IPlatformAdapter {
     net.minecraft.world.entity.EntityType<?> getFestiveWanderingHomemakerEntityType();
 
     Level getEntityLevel(Entity entity);
+    void dropPlayerItem(net.minecraft.world.entity.player.Player player, net.minecraft.world.item.ItemStack stack, boolean randomThrow);
+    void swingPlayerHand(net.minecraft.world.entity.player.Player player, net.minecraft.world.InteractionHand hand);
+    void resetSwingAnimation(net.minecraft.world.entity.LivingEntity entity);
 
     Iterable<Item> getAllItems();
     net.minecraft.resources.ResourceKey<net.minecraft.core.Registry<Item>> getItemRegistryKey();
@@ -196,7 +199,8 @@ public interface IPlatformAdapter {
     net.minecraft.world.level.levelgen.feature.treedecorators.TreeDecorator createMangroveRootDecorator(net.minecraft.util.valueproviders.IntProvider p1, net.minecraft.util.valueproviders.IntProvider p2, float probability, net.minecraft.util.valueproviders.IntProvider p3);
     net.minecraft.world.level.levelgen.feature.trunkplacers.TrunkPlacer createMangroveUpwardsBranchingTrunkPlacer(int baseHeight, int heightRandA, int heightRandB, net.minecraft.util.valueproviders.IntProvider extraBranchSteps, float placeBranchPerLogProbability, net.minecraft.util.valueproviders.IntProvider extraBranchLength);
     net.minecraft.world.level.levelgen.feature.foliageplacers.FoliagePlacer createMangroveRandomSpreadFoliagePlacer(net.minecraft.util.valueproviders.IntProvider radius, net.minecraft.util.valueproviders.IntProvider offset, net.minecraft.util.valueproviders.IntProvider foliageHeight, int leafPlacementAttempts);
-    net.minecraft.world.level.levelgen.feature.configurations.TreeConfiguration createTreeConfiguration(
+    /** Cluster-owned tree configuration; callers pass it only to createTreeFeature. */
+    Object createTreeConfiguration(
             net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider trunkProvider,
             net.minecraft.world.level.levelgen.feature.trunkplacers.TrunkPlacer trunkPlacer,
             net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider foliageProvider,
@@ -209,7 +213,10 @@ public interface IPlatformAdapter {
             java.util.List<net.minecraft.world.level.block.state.BlockState> states,
             java.util.List<java.lang.Integer> weights
     );
-    net.minecraft.world.level.levelgen.feature.ConfiguredFeature<?, ?> createPatchFeature(
+    Object createTreeFeature(Object configuration);
+    Object createSimpleBlockConfiguration(net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider stateProvider);
+    Object createSimpleBlockFeature(Object configuration);
+    Object createPatchFeature(
             net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider stateProvider,
             int tries,
             int xzSpread,

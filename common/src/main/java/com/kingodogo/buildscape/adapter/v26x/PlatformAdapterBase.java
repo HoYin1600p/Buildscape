@@ -144,6 +144,20 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter, com.kingo
         }
     }
 
+    @Override
+    public void dropPlayerItem(net.minecraft.world.entity.player.Player player, net.minecraft.world.item.ItemStack stack, boolean randomThrow) {
+        player.drop(stack, randomThrow);
+    }
+    @Override
+    public void swingPlayerHand(net.minecraft.world.entity.player.Player player, net.minecraft.world.InteractionHand hand) {
+        player.swing(hand);
+    }
+    @Override
+    public void resetSwingAnimation(net.minecraft.world.entity.LivingEntity entity) {
+        entity.swingTime = 0;
+        entity.attackAnim = 0.0F;
+        entity.oAttackAnim = 0.0F;
+    }
     @Override public boolean isReplaceable(net.minecraft.world.level.block.state.BlockState state) { return state.canBeReplaced(); }
     @Override public boolean isGlassBlock(net.minecraft.world.level.block.Block block) { return block == net.minecraft.world.level.block.Blocks.GLASS || block instanceof net.minecraft.world.level.block.StainedGlassBlock || block instanceof net.minecraft.world.level.block.TintedGlassBlock; }
     @Override
@@ -574,6 +588,19 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter, com.kingo
             builder.add(states.get(i), weights.get(i));
         }
         return new net.minecraft.world.level.levelgen.feature.stateproviders.WeightedStateProvider(builder);
+    }
+    @Override
+    public net.minecraft.world.level.levelgen.feature.ConfiguredFeature<?, ?> createTreeFeature(Object configuration) {
+        return WorldGenFactory.createTreeFeature(configuration);
+    }
+    @Override
+    public net.minecraft.world.level.levelgen.feature.configurations.SimpleBlockConfiguration createSimpleBlockConfiguration(
+            net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider stateProvider) {
+        return WorldGenFactory.createSimpleBlockConfiguration(stateProvider);
+    }
+    @Override
+    public net.minecraft.world.level.levelgen.feature.ConfiguredFeature<?, ?> createSimpleBlockFeature(Object configuration) {
+        return WorldGenFactory.createSimpleBlockFeature(configuration);
     }
     @Override
     public net.minecraft.world.level.levelgen.feature.ConfiguredFeature<?, ?> createPatchFeature(

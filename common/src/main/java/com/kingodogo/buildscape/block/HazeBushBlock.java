@@ -99,7 +99,7 @@ public abstract class HazeBushBlock extends ModBushBlock {
         ItemStack held = player.getItemInHand(hand);
         if (!player.getAbilities().instabuild) held.shrink(1);
         if (held.isEmpty()) player.setItemInHand(hand, result);
-        else if (!player.getInventory().add(result)) player.drop(result, false);
+        else if (!player.getInventory().add(result)) Services.PLATFORM.dropPlayerItem(player, result, false);
     }
 
     public static float[] getPastelColor(DyeColor color) {

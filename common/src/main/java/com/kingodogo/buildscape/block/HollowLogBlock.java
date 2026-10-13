@@ -254,7 +254,7 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
                         if (held.isEmpty()) {
                             player.setItemInHand(hand, filledBucket);
                         } else if (!player.getInventory().add(filledBucket)) {
-                            player.drop(filledBucket, false);
+                            Services.PLATFORM.dropPlayerItem(player, filledBucket, false);
                         }
                     }
                     Services.PLATFORM.playBucketFillFluid(level, pos, sourceFluid == Fluids.LAVA);
@@ -292,7 +292,7 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
                         if (held.isEmpty()) {
                             player.setItemInHand(hand, emptyContainer);
                         } else if (!player.getInventory().add(emptyContainer)) {
-                            player.drop(emptyContainer, false);
+                            Services.PLATFORM.dropPlayerItem(player, emptyContainer, false);
                         }
                     }
                     Services.PLATFORM.playBucketEmptyFluid(level, pos, fluidInBucket == Fluids.LAVA);

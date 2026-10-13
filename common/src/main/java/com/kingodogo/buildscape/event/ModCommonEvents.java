@@ -111,7 +111,7 @@ public final class ModCommonEvents {
                     level.playSound(null, pos, SoundEvents.GROWING_PLANT_CROP, SoundSource.BLOCKS, 1.0F, 1.0F);
                     Services.PLATFORM.hurtAndBreak(held, 1, player, hand);
                 }
-                player.swing(hand);
+                Services.PLATFORM.swingPlayerHand(player, hand);
                 return Services.PLATFORM.sidedSuccess(level.isClientSide());
             }
         }
@@ -127,12 +127,12 @@ public final class ModCommonEvents {
                         if (held.isEmpty()) {
                             player.setItemInHand(hand, bottle);
                         } else if (!player.getInventory().add(bottle)) {
-                            player.drop(bottle, false);
+                            Services.PLATFORM.dropPlayerItem(player, bottle, false);
                         }
                     }
                 }
             }
-            player.swing(hand);
+            Services.PLATFORM.swingPlayerHand(player, hand);
             return Services.PLATFORM.sidedSuccess(level.isClientSide());
         }
         return LogStrippingLogic.handleAxeStrip(player, level, hand, pos);

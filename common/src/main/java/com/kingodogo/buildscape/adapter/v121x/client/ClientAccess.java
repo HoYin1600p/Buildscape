@@ -719,14 +719,6 @@ public final class ClientAccess {
         return com.kingodogo.buildscape.adapter.v121x.client.GuiProvider.wrapScreen(title, parent, delegate);
     }
 
-    public static net.minecraft.client.gui.screens.Screen createGuiEditorScreen(net.minecraft.client.gui.screens.Screen parent, String tabName, com.kingodogo.buildscape.client.screen.AbstractConfigTab sourceTab) {
-        return com.kingodogo.buildscape.adapter.v121x.client.GuiProvider.createGuiEditorScreen(parent, tabName, sourceTab);
-    }
-
-    public static net.minecraft.client.gui.screens.Screen createInventoryItemSelectorScreen(net.minecraft.client.gui.screens.Screen parent, com.kingodogo.buildscape.client.screen.PillarItemsConfigTab configTab) {
-        return com.kingodogo.buildscape.adapter.v121x.client.GuiProvider.createInventoryItemSelectorScreen(parent, configTab);
-    }
-
     public static void renderGuiItemDecorations(Object poseStackOrGraphics, net.minecraft.client.gui.Font font, net.minecraft.world.item.ItemStack stack, int x, int y) {
         com.kingodogo.buildscape.adapter.v121x.client.GuiProvider.renderGuiItemDecorations(poseStackOrGraphics, font, stack, x, y);
     }

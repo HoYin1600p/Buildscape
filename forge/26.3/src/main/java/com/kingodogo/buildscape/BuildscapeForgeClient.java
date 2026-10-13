@@ -1,8 +1,8 @@
 package com.kingodogo.buildscape;
 
-import com.kingodogo.buildscape.adapter.v26x.GuiProvider;
-import com.kingodogo.buildscape.adapter.v26x.ParticleFactory;
-import com.kingodogo.buildscape.adapter.v26x.RenderFactory;
+import com.kingodogo.buildscape.adapter.v263.GuiProvider;
+import com.kingodogo.buildscape.adapter.v263.ParticleFactory;
+import com.kingodogo.buildscape.adapter.v263.RenderFactory;
 import com.kingodogo.buildscape.menu.ModMenuTypes;
 import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.client.particle.SpriteSet;
@@ -21,8 +21,8 @@ final class BuildscapeForgeClient {
     private BuildscapeForgeClient() {}
     static void register(BusGroup group) {
         net.minecraftforge.common.MinecraftForge.registerConfigScreen(
-                com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks::createConfigScreen);
-        com.kingodogo.buildscape.adapter.v26x.client.SpecialItemRenderers.register(
+                com.kingodogo.buildscape.adapter.v263.client.ClientPlatformHooks::createConfigScreen);
+        com.kingodogo.buildscape.adapter.v263.client.SpecialItemRenderers.register(
                 com.kingodogo.buildscape.mixin.forge263.SpecialModelRenderersAccessor.buildscape$getMapper()::put);
         net.minecraftforge.client.event.RegisterKeyMappingsEvent.BUS.addListener(BuildscapeForgeClient::keys);
         FMLClientSetupEvent.getBus(group).addListener(BuildscapeForgeClient::setup);
@@ -38,7 +38,7 @@ final class BuildscapeForgeClient {
         net.minecraftforge.client.event.InputEvent.Key.BUS.addListener(BuildscapeForgeClient::keyInput);
         net.minecraftforge.client.event.InputEvent.MouseButton.Post.BUS.addListener(BuildscapeForgeClient::mouseInput);
         net.minecraftforge.client.event.InputEvent.MouseScrollingEvent.BUS.addListener(BuildscapeForgeClient::scroll);
-        net.minecraftforge.client.event.InputEvent.InteractionKeyMappingTriggered.BUS.addListener(BuildscapeForgeClient::interaction);
+        net.minecraftforge.client.event.InputEvent.InteractionKeyMappingTriggered.Attack.BUS.addListener(BuildscapeForgeClient::interaction);
         net.minecraftforge.client.event.RenderHighlightEvent.Block.BUS.addListener(BuildscapeForgeClient::highlight);
         net.minecraftforge.client.event.ViewportEvent.ComputeFov.BUS.addListener(BuildscapeForgeClient::fov);
         net.minecraftforge.client.event.ViewportEvent.ComputeCameraAngles.BUS.addListener(BuildscapeForgeClient::camera);
@@ -46,16 +46,16 @@ final class BuildscapeForgeClient {
         net.minecraftforge.event.level.LevelEvent.Unload.BUS.addListener(BuildscapeForgeClient::unload);
     }
     private static void blockColors(net.minecraftforge.client.event.RegisterColorHandlersEvent.Block event) {
-        com.kingodogo.buildscape.adapter.v26x.client.FoliageColors.register(event.getBlockColors());
+        com.kingodogo.buildscape.adapter.v263.client.FoliageColors.register(event.getBlockColors());
     }
     private static void fluidModels(net.minecraftforge.client.event.ModelEvent.BakeFluidModels event) {
-        var model = com.kingodogo.buildscape.adapter.v26x.client.ExperienceFluidModel.create()
+        var model = com.kingodogo.buildscape.adapter.v263.client.ExperienceFluidModel.create()
                 .bake(event.materials(), () -> "buildscape:experience");
-        event.register(com.kingodogo.buildscape.adapter.v26x.fluid.ExperienceFluids.still(), model);
-        event.register(com.kingodogo.buildscape.adapter.v26x.fluid.ExperienceFluids.flowing(), model);
+        event.register(com.kingodogo.buildscape.adapter.v263.fluid.ExperienceFluids.still(), model);
+        event.register(com.kingodogo.buildscape.adapter.v263.fluid.ExperienceFluids.flowing(), model);
     }
     private static void fogColor(net.minecraftforge.client.event.ViewportEvent.ComputeFogColor event) {
-        if (com.kingodogo.buildscape.adapter.v26x.client.ExperienceFluidFog.isExperienceFluid(
+        if (com.kingodogo.buildscape.adapter.v263.client.ExperienceFluidFog.isExperienceFluid(
                 event.getCamera(), net.minecraft.client.Minecraft.getInstance().level)) {
             event.setRed(0.3F);
             event.setGreen(0.9F);
@@ -63,9 +63,9 @@ final class BuildscapeForgeClient {
         }
     }
     private static boolean fogDistances(net.minecraftforge.client.event.ViewportEvent.RenderFog event) {
-        if (com.kingodogo.buildscape.adapter.v26x.client.ExperienceFluidFog.isExperienceFluid(
+        if (com.kingodogo.buildscape.adapter.v263.client.ExperienceFluidFog.isExperienceFluid(
                 event.getCamera(), net.minecraft.client.Minecraft.getInstance().level)) {
-            com.kingodogo.buildscape.adapter.v26x.client.ExperienceFluidFog.distances(event.getData());
+            com.kingodogo.buildscape.adapter.v263.client.ExperienceFluidFog.distances(event.getData());
             event.setNearPlaneDistance(0.5F);
             event.setFarPlaneDistance(12.0F);
             return true;
@@ -74,7 +74,7 @@ final class BuildscapeForgeClient {
     }
     private static void itemColors(net.minecraftforge.client.event.ModelEvent.ModifyBakingResult event) {
         event.getResults().itemStackModels().replaceAll(
-                com.kingodogo.buildscape.adapter.v26x.client.FoliageColors::tintItem);
+                com.kingodogo.buildscape.adapter.v263.client.FoliageColors::tintItem);
     }
     private static void keys(net.minecraftforge.client.event.RegisterKeyMappingsEvent event) {
         com.kingodogo.buildscape.client.ModKeyBinds.register(event::register);
@@ -86,17 +86,17 @@ final class BuildscapeForgeClient {
         if (event.getButton() == 1 && event.getAction() == 1) com.kingodogo.buildscape.client.ClientEvents.onRightClick();
     }
     private static boolean scroll(net.minecraftforge.client.event.InputEvent.MouseScrollingEvent event) {
-        if (!com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.isScreenOpen()
+        if (!com.kingodogo.buildscape.adapter.v263.client.ClientPlatformHooks.isScreenOpen()
                 && com.kingodogo.buildscape.client.ZoomHandler.isZooming()) {
             com.kingodogo.buildscape.client.ZoomHandler.handleScroll(event.getDeltaY());
             return true;
         }
         return false;
     }
-    private static boolean interaction(net.minecraftforge.client.event.InputEvent.InteractionKeyMappingTriggered event) {
+    private static boolean interaction(net.minecraftforge.client.event.InputEvent.InteractionKeyMappingTriggered.Attack event) {
         var mc = net.minecraft.client.Minecraft.getInstance();
-        if (event.isAttack()) com.kingodogo.buildscape.client.BiomeBrushClientHandler.onAttack(mc.player, mc.hitResult);
-        if (event.isAttack() && !com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.isScreenOpen()
+        com.kingodogo.buildscape.client.BiomeBrushClientHandler.onAttack(mc.player, mc.hitResult);
+        if (!com.kingodogo.buildscape.adapter.v263.client.ClientPlatformHooks.isScreenOpen()
                 && com.kingodogo.buildscape.client.TreeChopHandler.shouldCancelLeftClick(mc.player, mc.hitResult)) {
             event.setSwingHand(true);
             return true;
@@ -104,10 +104,10 @@ final class BuildscapeForgeClient {
         return false;
     }
     private static void highlight(net.minecraftforge.client.event.RenderHighlightEvent.Block event) {
-        if (com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.extractBlockHighlight(
+        if (com.kingodogo.buildscape.adapter.v263.client.ClientPlatformHooks.extractBlockHighlight(
                 event.getCamera(), event.getTarget(), event.getLevelRenderState())) {
             event.setCustomRenderer((collector, pose, state) ->
-                    com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.collectBlockHighlight(pose, collector, state));
+                    com.kingodogo.buildscape.adapter.v263.client.ClientPlatformHooks.collectBlockHighlight(pose, collector, state));
         }
     }
     private static void fov(net.minecraftforge.client.event.ViewportEvent.ComputeFov event) {
@@ -120,14 +120,14 @@ final class BuildscapeForgeClient {
     }
     private static void disconnect(net.minecraftforge.client.event.ClientPlayerNetworkEvent.LoggingOut event) {
         com.kingodogo.buildscape.client.ClientEvents.onClientDisconnect();
-        com.kingodogo.buildscape.adapter.v26x.client.HazeBushParticleHandler.clear();
-        com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.clearInputRenderState();
+        com.kingodogo.buildscape.adapter.v263.client.HazeBushParticleHandler.clear();
+        com.kingodogo.buildscape.adapter.v263.client.ClientPlatformHooks.clearInputRenderState();
     }
     private static void unload(net.minecraftforge.event.level.LevelEvent.Unload event) {
         if (event.getLevel().isClientSide()) {
             com.kingodogo.buildscape.client.ClientEvents.onClientWorldUnload();
-            com.kingodogo.buildscape.adapter.v26x.client.HazeBushParticleHandler.clear();
-            com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.clearInputRenderState();
+            com.kingodogo.buildscape.adapter.v263.client.HazeBushParticleHandler.clear();
+            com.kingodogo.buildscape.adapter.v263.client.ClientPlatformHooks.clearInputRenderState();
         }
     }
     private static void setup(FMLClientSetupEvent event) {
@@ -138,7 +138,7 @@ final class BuildscapeForgeClient {
     }
     private static void tick(ClientTickEvent.Post event) {
         com.kingodogo.buildscape.client.ClientEvents.onClientTick();
-        com.kingodogo.buildscape.adapter.v26x.client.HazeBushParticleHandler.clientTick();
+        com.kingodogo.buildscape.adapter.v263.client.HazeBushParticleHandler.clientTick();
     }
     private static void screens() {
         GuiProvider.registerMenuScreens(new GuiProvider.Registrar() {
@@ -151,7 +151,7 @@ final class BuildscapeForgeClient {
             public <T extends ParticleOptions> void register(ParticleType<T> type, Function<SpriteSet, ParticleProvider<T>> factory) {
                 // Replace the age-based confetti provider with the reference's random shapes.
                 Function<SpriteSet, ParticleProvider<T>> selected = type.equals(com.kingodogo.buildscape.particle.ModParticles.CONFETTI.get())
-                        ? com.kingodogo.buildscape.adapter.v26x.client.ConfettiParticle::provider : factory;
+                        ? com.kingodogo.buildscape.adapter.v263.client.ConfettiParticle::provider : factory;
                 event.registerSpriteSet(type, selected::apply);
             }
             public <T extends ParticleOptions> void registerDirect(ParticleType<T> type, ParticleProvider<T> provider) {
@@ -165,7 +165,7 @@ final class BuildscapeForgeClient {
     }
     private static void guiLayers(net.minecraftforge.client.event.AddGuiOverlayLayersEvent event) {
         event.getLayeredDraw().add(net.minecraftforge.client.gui.overlay.ForgeLayeredDraw.POST_SLEEP_STACK,net.minecraft.resources.Identifier.fromNamespaceAndPath("buildscape", "overlay"),
-                (graphics, delta) -> com.kingodogo.buildscape.adapter.v26x.client.ClientPlatformHooks.renderClientOverlay(
+                (graphics, delta) -> com.kingodogo.buildscape.adapter.v263.client.ClientPlatformHooks.renderClientOverlay(
                         graphics, graphics.guiWidth(), graphics.guiHeight()));
     }
 }

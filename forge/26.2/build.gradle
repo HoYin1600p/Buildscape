@@ -44,7 +44,14 @@ tasks.named('processResources') {
 }
 tasks.named('jar', Jar) {
     // Shared classes are already merged into main's output; retain cluster resources here.
-    from(configurations.commonVariant) { exclude '**/*.class' }
+    from(configurations.commonVariant) {
+        exclude '**/*.class'
+        // Forge 26.2 ships Mixin 0.8.7, whose newest compatibility level is JAVA_21; an unknown level
+        // throws MixinInitialisationError and the client exits silently while the config is registered.
+        filesMatching('buildscape.mixins.json') {
+            filter { line -> line.replace('"JAVA_25"', '"JAVA_21"') }
+        }
+    }
     duplicatesStrategy = DuplicatesStrategy.FAIL
     manifest { attributes 'MixinConfigs': 'buildscape.mixins.json,buildscape.forge262.mixins.json' }
 }

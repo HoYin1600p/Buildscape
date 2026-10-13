@@ -20,6 +20,7 @@ import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -31,8 +32,8 @@ import java.util.function.Consumer;
 /**
  * Unified Single-Panel Buildscape Configuration Screen.
  * Design Invariants:
- * - 1 Big Unified Panel with sleek 1-pixel wide metallic border gradient.
- * - Items Tab with authentic inventory slot grid and toggle selection.
+ * - 1 Big Unified Panel with beveled chassis gap between the outer 1px metallic gradient and inner black borders.
+ * - Items Tab with authentic inventory slot matrix and full registered Minecraft Tags Panel.
  * - Draggable 2D Color Picker (Saturation x Brightness + Hue spectrum slider).
  * - Pillar IDs Tab with placed pillar listing and full per-pillar customization.
  * - Spill-proof scrollable viewport (no rows spill past bottom frame).
@@ -66,15 +67,16 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
     // --- Palette Constants (Solid Opaque) ---
     public static final int COLOR_OVERLAY = 0xD808080A;
-    public static final int COLOR_PANEL_BG = 0xFF161618;
-    public static final int COLOR_INNER_DARK = 0xFF101012;
-    public static final int COLOR_HEADER_BG = 0xFF1E1E22;
+    public static final int COLOR_PANEL_BG = 0xFF141416;
+    public static final int COLOR_CHASSIS_BODY = 0xFF1E1E24;
+    public static final int COLOR_INNER_DARK = 0xFF0F0F12;
+    public static final int COLOR_HEADER_BG = 0xFF18181D;
 
     // Metallic Beveled Border Gradients (1px wide)
     public static final int COLOR_FRAME_BLACK = 0xFF000000;
-    public static final int COLOR_BORDER_GRADIENT_START = 0xFF848492;
-    public static final int COLOR_BORDER_GRADIENT_END = 0xFF3C3C44;
-    public static final int COLOR_BORDER_SHADOW = 0xFF18181E;
+    public static final int COLOR_BORDER_GRADIENT_START = 0xFF9E9EB0;
+    public static final int COLOR_BORDER_GRADIENT_END = 0xFF444450;
+    public static final int COLOR_BORDER_SHADOW = 0xFF181820;
 
     // Text & Accents
     public static final int COLOR_TEXT_WHITE = 0xFFFFFFFF;
@@ -82,9 +84,9 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
     public static final int COLOR_TEXT_MUTED = 0xFF84848C;
 
     // Interactive Widget Colors
-    public static final int COLOR_ROW_BG = 0xFF18181D;
-    public static final int COLOR_ROW_BG_HOVER = 0xFF22222A;
-    public static final int COLOR_ROW_BORDER = 0xFF282830;
+    public static final int COLOR_ROW_BG = 0xFF16161B;
+    public static final int COLOR_ROW_BG_HOVER = 0xFF202028;
+    public static final int COLOR_ROW_BORDER = 0xFF24242C;
     public static final int COLOR_ROW_BORDER_HOVER = 0xFF4E4E5C;
 
     public static final int COLOR_TOGGLE_ON_BG = 0xFF142E18;
@@ -96,8 +98,8 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
     public static final int COLOR_TOGGLE_OFF_TEXT = 0xFF888890;
 
     public static final int COLOR_BTN_BG = 0xFF202028;
-    public static final int COLOR_BTN_BORDER = 0xFF444452;
-    public static final int COLOR_BTN_BORDER_HOVER = 0xFF707082;
+    public static final int COLOR_BTN_BORDER = 0xFF3C3C48;
+    public static final int COLOR_BTN_BORDER_HOVER = 0xFF666678;
 
     // --- Sidenav Specification ---
     public static class NavItem {
@@ -127,10 +129,18 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
             "none", "ring", "beam", "spiral", "fountain", "pulse", "burst", "snowflake"
     };
 
-    // --- Presets & Item Cache ---
+    // --- Presets & Items State ---
     private int selectedPresetIndex = 0;
+    private int itemsSubTab = 0; // 0 = Items Matrix, 1 = Registered Tags Panel
     private int itemFilterMode = 0; // 0=All Items, 1=Inventory, 2=Configured
+    private int tagFilterMode = 0; // 0=All Tags, 1=Active Only, 2=Inventory Tags
+    private String tagSearchFilter = "";
+    private final String[] TAG_CATEGORY_CHIPS = {"All", "keys", "gems", "ores", "vault", "swords", "gear"};
+    private int activeTagChipIndex = 0;
+
     private final List<Item> availableItems = new ArrayList<>();
+    private final List<String> allRegisteredTags = new ArrayList<>();
+    private final Map<String, Integer> tagItemCounts = new HashMap<>();
     private final Map<Item, ItemStack> itemStackCache = new HashMap<>();
     private final Map<String, ItemStack> stringToStackCache = new HashMap<>();
 
@@ -172,11 +182,12 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         this.openStartTime = System.currentTimeMillis();
         initNavItems();
         cacheAvailableItems();
+        loadRegisteredTags();
     }
 
     private void initNavItems() {
         navItems.clear();
-        navItems.add(new NavItem("items", "☵", "Items", "Configure activation trigger items and presets"));
+        navItems.add(new NavItem("items", "☵", "Items & Tags", "Configure activation triggers, tags, and presets"));
         navItems.add(new NavItem("particles", "✦", "Particles", "Configure kinetic trajectory and emission mechanics"));
         navItems.add(new NavItem("pillars", "▲", "Pillar IDs", "Manage and customize in-world synchronized pillar columns"));
         navItems.add(new NavItem("world", "⚙", "World Settings", "Control world griefing, felling, and inventory mechanics"));
@@ -198,6 +209,23 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                 }
             }
         }
+    }
+
+    private void loadRegisteredTags() {
+        if (!allRegisteredTags.isEmpty()) return;
+        Set<String> seen = new HashSet<>();
+        for (Item item : availableItems) {
+            try {
+                item.builtInRegistryHolder().tags().forEach(tagKey -> {
+                    String id = "#" + tagKey.location().toString();
+                    if (seen.add(id)) {
+                        allRegisteredTags.add(id);
+                    }
+                    tagItemCounts.put(id, tagItemCounts.getOrDefault(id, 0) + 1);
+                });
+            } catch (Exception ignored) {}
+        }
+        allRegisteredTags.sort(String.CASE_INSENSITIVE_ORDER);
     }
 
     private List<Item> getPlayerInventoryItems() {
@@ -229,6 +257,42 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
             }
         }
         return result;
+    }
+
+    private List<String> getFilteredTagsList() {
+        loadRegisteredTags();
+        PillarParticleConfig cfg = PillarParticleConfig.get();
+        List<Item> invItems = tagFilterMode == 2 ? getPlayerInventoryItems() : Collections.emptyList();
+        List<String> list = new ArrayList<>();
+
+        String chipFilter = activeTagChipIndex > 0 ? TAG_CATEGORY_CHIPS[activeTagChipIndex].toLowerCase() : "";
+
+        for (String tagId : allRegisteredTags) {
+            String tagLower = tagId.toLowerCase();
+            if (!chipFilter.isEmpty() && !tagLower.contains(chipFilter)) {
+                continue;
+            }
+            if (!tagSearchFilter.isEmpty() && !tagLower.contains(tagSearchFilter.toLowerCase())) {
+                continue;
+            }
+            if (tagFilterMode == 1 && !cfg.items.contains(tagId)) {
+                continue;
+            }
+            if (tagFilterMode == 2) {
+                boolean matchesInv = false;
+                for (Item invItem : invItems) {
+                    try {
+                        if (invItem.builtInRegistryHolder().tags().anyMatch(tk -> ("#" + tk.location().toString()).equals(tagId))) {
+                            matchesInv = true;
+                            break;
+                        }
+                    } catch (Exception ignored) {}
+                }
+                if (!matchesInv) continue;
+            }
+            list.add(tagId);
+        }
+        return list;
     }
 
     private ItemStack getStackForIdentifier(String identifier) {
@@ -482,50 +546,50 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
         // 2. Geometry: 1 Big Unified Panel centered on screen
         int panelW = Math.min(width - 20, 560);
-        int panelH = Math.min(height - 16, 304);
+        int panelH = Math.min(height - 16, 308);
         int panelX = (width - panelW) / 2;
         int panelY = (height - panelH) / 2;
 
         int offsetY = Math.round((1.0f - alpha) * 8.0f);
         panelY += offsetY;
 
-        // 3. Render 1 Big Frame with sleek 1-pixel wide metallic gradient
+        // 3. Render 1 Big Frame with 7px beveled chassis gap and 1-pixel wide metallic gradient
         drawVaultHuntersFrame(poseStackOrGraphics, panelX, panelY, panelW, panelH, COLOR_PANEL_BG, alpha);
 
-        // 4. Header Bar
-        int headerH = 26;
-        int headerX = panelX + 3;
-        int headerY = panelY + 3;
-        int headerW = panelW - 6;
+        // 4. Header Bar (indented 7px from outer frame)
+        int headerH = 24;
+        int headerX = panelX + 7;
+        int headerY = panelY + 7;
+        int headerW = panelW - 14;
         Services.PLATFORM.fill(poseStackOrGraphics, headerX, headerY, headerX + headerW, headerY + headerH, applyAlpha(COLOR_HEADER_BG, alpha));
-        drawGroove(poseStackOrGraphics, headerX, headerY + headerH, headerW, true, alpha);
+        drawBorder(poseStackOrGraphics, headerX, headerY, headerW, headerH, applyAlpha(COLOR_FRAME_BLACK, alpha));
 
         // Header Title
-        drawText(poseStackOrGraphics, font, "⚙ Buildscape Configuration", headerX + 8, headerY + 8, applyAlpha(COLOR_TEXT_WHITE, alpha));
+        drawText(poseStackOrGraphics, font, "⚙ Buildscape Configuration", headerX + 8, headerY + 7, applyAlpha(COLOR_TEXT_WHITE, alpha));
 
         // Target version indicator
         String versionTag = "v4.0.3 · NeoForge 26.2";
         int tagW = font.width(versionTag);
-        drawText(poseStackOrGraphics, font, versionTag, headerX + headerW - tagW - 28, headerY + 8, applyAlpha(COLOR_TEXT_MUTED, alpha));
+        drawText(poseStackOrGraphics, font, versionTag, headerX + headerW - tagW - 28, headerY + 7, applyAlpha(COLOR_TEXT_MUTED, alpha));
 
         // Close Button [ ✕ ]
         int closeBtnSize = 14;
-        int closeBtnX = headerX + headerW - closeBtnSize - 6;
-        int closeBtnY = headerY + 6;
+        int closeBtnX = headerX + headerW - closeBtnSize - 5;
+        int closeBtnY = headerY + 5;
         boolean hoverClose = mouseX >= closeBtnX && mouseX <= closeBtnX + closeBtnSize && mouseY >= closeBtnY && mouseY <= closeBtnY + closeBtnSize;
-        Services.PLATFORM.fill(poseStackOrGraphics, closeBtnX, closeBtnY, closeBtnX + closeBtnSize, closeBtnY + closeBtnSize, applyAlpha(hoverClose ? 0xFF383844 : 0xFF222228, alpha));
-        drawBorder(poseStackOrGraphics, closeBtnX, closeBtnY, closeBtnSize, closeBtnSize, applyAlpha(hoverClose ? 0xFF6C6C7C : 0xFF34343E, alpha));
+        Services.PLATFORM.fill(poseStackOrGraphics, closeBtnX, closeBtnY, closeBtnX + closeBtnSize, closeBtnY + closeBtnSize, applyAlpha(hoverClose ? 0xFF383844 : 0xFF202026, alpha));
+        drawBorder(poseStackOrGraphics, closeBtnX, closeBtnY, closeBtnSize, closeBtnSize, applyAlpha(hoverClose ? 0xFF6C6C7C : 0xFF32323C, alpha));
         Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "✕", closeBtnX + closeBtnSize / 2, closeBtnY + 3, applyAlpha(hoverClose ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
 
-        // 5. Layout Sidenav & Content Container
+        // 5. Layout Sidenav & Content Container (with distinct 7px chassis margin)
         int navW = navExpanded ? 106 : 30;
-        int navX = panelX + 4;
-        int navY = headerY + headerH + 4;
-        int navH = panelH - headerH - 12;
+        int navX = panelX + 7;
+        int navY = headerY + headerH + 5;
+        int navH = panelH - headerH - 19;
 
-        int contentX = navX + navW + 4;
+        int contentX = navX + navW + 5;
         int contentY = navY;
-        int contentW = (panelX + panelW - 4) - contentX;
+        int contentW = (panelX + panelW - 7) - contentX;
         int contentH = navH;
 
         // Render Left Navigation Strip
@@ -548,7 +612,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
     // --- Sidenav Rendering ---
     private void renderSidenav(Object poseStackOrGraphics, Font font, int x, int y, int w, int h, int mouseX, int mouseY, float alpha) {
-        drawInsetBox(poseStackOrGraphics, x, y, w, h, 0xFF111113, alpha);
+        drawInsetBox(poseStackOrGraphics, x, y, w, h, COLOR_INNER_DARK, alpha);
 
         int tabH = 26;
         int tabGap = 3;
@@ -640,7 +704,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         int startY = viewY + 2 - (int) scrollOffset;
 
         switch (current.id) {
-            case "items" -> renderItemInventoryGrid(poseStackOrGraphics, font, rowX, startY, rowW, viewY, viewH, mouseX, mouseY, alpha);
+            case "items" -> renderItemAndTagsPanel(poseStackOrGraphics, font, rowX, startY, rowW, viewY, viewH, mouseX, mouseY, alpha);
             case "particles" -> renderParticleSettingsRows(poseStackOrGraphics, font, rowX, startY, rowW, rowH, rowGap, viewY, viewH, mouseX, mouseY, alpha);
             case "pillars" -> {
                 if (selectedPillarDetailId != null) {
@@ -668,12 +732,19 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
     private int calculateTotalContentHeight(String tabId, int contentW, int rowH, int gap) {
         if ("items".equals(tabId)) {
-            int slotSize = 20;
-            int slotGap = 2;
-            int cols = Math.max(1, (contentW - 12) / (slotSize + slotGap));
-            List<Item> items = getFilteredItemsList();
-            int rows = (int) Math.ceil((double) items.size() / cols);
-            return 64 + rows * (slotSize + slotGap) + 16;
+            if (itemsSubTab == 0) {
+                int slotSize = 20;
+                int slotGap = 2;
+                int cols = Math.max(1, (contentW - 12) / (slotSize + slotGap));
+                List<Item> items = getFilteredItemsList();
+                int rows = (int) Math.ceil((double) items.size() / cols);
+                return 62 + rows * (slotSize + slotGap) + 16;
+            } else {
+                List<String> tags = getFilteredTagsList();
+                int tagRowH = 22;
+                int tagRowGap = 2;
+                return 62 + tags.size() * (tagRowH + tagRowGap) + 16;
+            }
         }
         if ("pillars".equals(tabId) && selectedPillarDetailId != null) {
             return 8 * (rowH + gap) + 16;
@@ -696,8 +767,8 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         };
     }
 
-    // --- Tab 0: Items (Authentic Inventory Slot Matrix & Toggle Selection) ---
-    private void renderItemInventoryGrid(Object poseStackOrGraphics, Font font, int x, int startY, int w, int clipY, int clipH, int mouseX, int mouseY, float alpha) {
+    // --- Tab 0: Items & Tags Dual Panel with Presets & Registered Tags ---
+    private void renderItemAndTagsPanel(Object poseStackOrGraphics, Font font, int x, int startY, int w, int clipY, int clipH, int mouseX, int mouseY, float alpha) {
         PillarParticleConfig cfg = PillarParticleConfig.get();
         PresetsConfig presetsCfg = PresetsConfig.get();
         List<PresetsConfig.Preset> presets = presetsCfg.getPresets();
@@ -705,15 +776,16 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
         int curY = startY;
 
-        // Top Bar 1: Preset & Mode Filters
-        int topBarH = 22;
-        if (curY >= clipY - topBarH && curY + topBarH <= clipY + clipH + topBarH) {
-            if (curY >= clipY && curY + topBarH <= clipY + clipH) {
-                // Preset cycle
+        // Bar 1: Presets Management Bar
+        int bar1H = 20;
+        if (curY >= clipY - bar1H && curY + bar1H <= clipY + clipH + bar1H) {
+            if (curY >= clipY && curY + bar1H <= clipY + clipH) {
+                drawText(poseStackOrGraphics, font, "Preset:", x + 2, curY + 4, applyAlpha(COLOR_TEXT_MUTED, alpha));
+
                 int cycleW = 74;
                 int btnH = 14;
-                int cycleX = x + 2;
-                int cycleY = curY + 4;
+                int cycleX = x + 44;
+                int cycleY = curY + 2;
                 boolean hoverCycle = mouseX >= cycleX && mouseX <= cycleX + cycleW && mouseY >= cycleY && mouseY <= cycleY + btnH;
                 Services.PLATFORM.fill(poseStackOrGraphics, cycleX, cycleY, cycleX + cycleW, cycleY + btnH, applyAlpha(hoverCycle ? 0xFF2E2E38 : COLOR_BTN_BG, alpha));
                 drawBorder(poseStackOrGraphics, cycleX, cycleY, cycleW, btnH, applyAlpha(hoverCycle ? COLOR_BTN_BORDER_HOVER : COLOR_BTN_BORDER, alpha));
@@ -733,117 +805,202 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                 drawBorder(poseStackOrGraphics, saveX, cycleY, saveW, btnH, applyAlpha(hoverSave ? COLOR_BTN_BORDER_HOVER : COLOR_BTN_BORDER, alpha));
                 Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "Save", saveX + saveW / 2, cycleY + 3, applyAlpha(hoverSave ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
 
-                // Filter Buttons: [All] [Inventory] [Configured]
-                String[] filterLabels = {"All Items", "Inventory", "Active (" + cfg.items.size() + ")"};
-                int filterW = 60;
-                int rightFiltersX = x + w - (filterLabels.length * (filterW + 3));
-                for (int f = 0; f < filterLabels.length; f++) {
-                    int fx = rightFiltersX + f * (filterW + 3);
-                    boolean isFActive = (itemFilterMode == f);
-                    boolean hoverF = mouseX >= fx && mouseX <= fx + filterW && mouseY >= cycleY && mouseY <= cycleY + btnH;
-                    int fBg = isFActive ? 0xFF2A2A38 : (hoverF ? 0xFF24242C : 0xFF16161A);
-                    int fBorder = isFActive ? 0xFF64647C : (hoverF ? 0xFF40404C : 0xFF26262E);
-                    Services.PLATFORM.fill(poseStackOrGraphics, fx, cycleY, fx + filterW, cycleY + btnH, applyAlpha(fBg, alpha));
-                    drawBorder(poseStackOrGraphics, fx, cycleY, filterW, btnH, applyAlpha(fBorder, alpha));
-                    int fText = isFActive ? COLOR_TEXT_WHITE : (hoverF ? COLOR_TEXT_SILVER : COLOR_TEXT_MUTED);
-                    Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, filterLabels[f], fx + filterW / 2, cycleY + 3, applyAlpha(fText, alpha));
+                int newW = 38;
+                int newX = saveX + saveW + 3;
+                boolean hoverNew = mouseX >= newX && mouseX <= newX + newW && mouseY >= cycleY && mouseY <= cycleY + btnH;
+                Services.PLATFORM.fill(poseStackOrGraphics, newX, cycleY, newX + newW, cycleY + btnH, applyAlpha(hoverNew ? 0xFF2E2E38 : COLOR_BTN_BG, alpha));
+                drawBorder(poseStackOrGraphics, newX, cycleY, newW, btnH, applyAlpha(hoverNew ? COLOR_BTN_BORDER_HOVER : COLOR_BTN_BORDER, alpha));
+                Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "+ New", newX + newW / 2, cycleY + 3, applyAlpha(hoverNew ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
+
+                int defW = 54;
+                int defX = x + w - defW - 2;
+                boolean hoverDef = mouseX >= defX && mouseX <= defX + defW && mouseY >= cycleY && mouseY <= cycleY + btnH;
+                Services.PLATFORM.fill(poseStackOrGraphics, defX, cycleY, defX + defW, cycleY + btnH, applyAlpha(hoverDef ? 0xFF2E2E38 : COLOR_BTN_BG, alpha));
+                drawBorder(poseStackOrGraphics, defX, cycleY, defW, btnH, applyAlpha(hoverDef ? COLOR_BTN_BORDER_HOVER : COLOR_BTN_BORDER, alpha));
+                Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "↺ Reset", defX + defW / 2, cycleY + 3, applyAlpha(hoverDef ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
+            }
+        }
+        curY += bar1H;
+
+        // Bar 2: Sub-View Switcher: [ ▦ Item Triggers ] vs [ 🏷 Registered Tags Panel ]
+        int bar2H = 20;
+        if (curY >= clipY && curY + bar2H <= clipY + clipH) {
+            int subBtnW = (w - 8) / 2;
+            int btnH = 15;
+
+            // Sub-Tab 0 Button: Item Triggers
+            int sub0X = x + 2;
+            int sub0Y = curY + 2;
+            boolean isSub0 = (itemsSubTab == 0);
+            boolean hoverSub0 = mouseX >= sub0X && mouseX <= sub0X + subBtnW && mouseY >= sub0Y && mouseY <= sub0Y + btnH;
+            Services.PLATFORM.fill(poseStackOrGraphics, sub0X, sub0Y, sub0X + subBtnW, sub0Y + btnH, applyAlpha(isSub0 ? 0xFF2A2A38 : (hoverSub0 ? 0xFF202028 : 0xFF141418), alpha));
+            drawBorder(poseStackOrGraphics, sub0X, sub0Y, subBtnW, btnH, applyAlpha(isSub0 ? 0xFF6E6E84 : (hoverSub0 ? 0xFF444452 : 0xFF22222A), alpha));
+            String sub0Label = "▦ Item Triggers (" + cfg.items.stream().filter(s -> !s.startsWith("#")).count() + ")";
+            Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, sub0Label, sub0X + subBtnW / 2, sub0Y + 3, applyAlpha(isSub0 ? COLOR_TEXT_WHITE : COLOR_TEXT_MUTED, alpha));
+
+            // Sub-Tab 1 Button: Registered Tags Panel
+            int sub1X = sub0X + subBtnW + 4;
+            int sub1Y = sub0Y;
+            boolean isSub1 = (itemsSubTab == 1);
+            boolean hoverSub1 = mouseX >= sub1X && mouseX <= sub1X + subBtnW && mouseY >= sub1Y && mouseY <= sub1Y + btnH;
+            Services.PLATFORM.fill(poseStackOrGraphics, sub1X, sub1Y, sub1X + subBtnW, sub1Y + btnH, applyAlpha(isSub1 ? 0xFF2A2A38 : (hoverSub1 ? 0xFF202028 : 0xFF141418), alpha));
+            drawBorder(poseStackOrGraphics, sub1X, sub1Y, subBtnW, btnH, applyAlpha(isSub1 ? 0xFF6E6E84 : (hoverSub1 ? 0xFF444452 : 0xFF22222A), alpha));
+            String sub1Label = "🏷 Registered Tags Panel (" + cfg.items.stream().filter(s -> s.startsWith("#")).count() + ")";
+            Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, sub1Label, sub1X + subBtnW / 2, sub1Y + 3, applyAlpha(isSub1 ? COLOR_TEXT_WHITE : COLOR_TEXT_MUTED, alpha));
+        }
+        curY += bar2H + 2;
+
+        if (itemsSubTab == 0) {
+            // --- SUB-VIEW 0: Item Triggers Slot Matrix ---
+            // Bar 3: Filter Pills: [All Items] [Inventory] [Active Only]
+            int bar3H = 18;
+            if (curY >= clipY && curY + bar3H <= clipY + clipH) {
+                String[] filterLabels = {"All Items (" + availableItems.size() + ")", "Inventory (" + getPlayerInventoryItems().size() + ")", "Active Only (" + getConfiguredItemsList().size() + ")"};
+                int pillW = (w - 12) / 3;
+                int pillH = 13;
+                for (int f = 0; f < 3; f++) {
+                    int px = x + 2 + f * (pillW + 4);
+                    boolean isF = (itemFilterMode == f);
+                    boolean hoverPill = mouseX >= px && mouseX <= px + pillW && mouseY >= curY + 2 && mouseY <= curY + 2 + pillH;
+                    int pBg = isF ? 0xFF282834 : (hoverPill ? 0xFF1E1E26 : 0xFF141418);
+                    int pBorder = isF ? 0xFF58586E : (hoverPill ? 0xFF3E3E4C : 0xFF222228);
+                    Services.PLATFORM.fill(poseStackOrGraphics, px, curY + 2, px + pillW, curY + 2 + pillH, applyAlpha(pBg, alpha));
+                    drawBorder(poseStackOrGraphics, px, curY + 2, pillW, pillH, applyAlpha(pBorder, alpha));
+                    int pText = isF ? COLOR_TEXT_WHITE : (hoverPill ? COLOR_TEXT_SILVER : COLOR_TEXT_MUTED);
+                    Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, filterLabels[f], px + pillW / 2, curY + 4, applyAlpha(pText, alpha));
                 }
             }
-        }
-        curY += topBarH;
+            curY += bar3H + 4;
 
-        // Top Bar 2: Quick Tag Chips Row
-        int tagBarH = 18;
-        if (curY >= clipY && curY + tagBarH <= clipY + clipH) {
-            drawText(poseStackOrGraphics, font, "Tags:", x + 4, curY + 4, applyAlpha(COLOR_TEXT_MUTED, alpha));
+            // Slot Matrix
+            List<Item> itemsToDisplay = getFilteredItemsList();
+            int slotSize = 20;
+            int slotGap = 2;
+            int cols = Math.max(1, (w - 12) / (slotSize + slotGap));
+            int gridStartX = x + 4;
 
-            String[] tagIds = {"#the_vault:keys", "#the_vault:gems", "#c:ores", "#the_vault:vault_gear"};
-            String[] tagNames = {"#keys", "#gems", "#ores", "#vault"};
-            int chipW = 54;
-            int chipH = 13;
-            int chipStartX = x + 38;
+            ItemStack hoveredStack = null;
+            boolean hoveredIsActive = false;
 
-            for (int t = 0; t < tagIds.length; t++) {
-                int chipX = chipStartX + t * (chipW + 4);
-                boolean isTagActive = cfg.items.contains(tagIds[t]);
-                boolean hoverChip = mouseX >= chipX && mouseX <= chipX + chipW && mouseY >= curY + 2 && mouseY <= curY + 2 + chipH;
+            for (int i = 0; i < itemsToDisplay.size(); i++) {
+                Item item = itemsToDisplay.get(i);
+                int col = i % cols;
+                int row = i / cols;
+                int slotX = gridStartX + col * (slotSize + slotGap);
+                int slotY = curY + row * (slotSize + slotGap);
 
-                int chipBg = isTagActive ? 0xFF142E18 : (hoverChip ? 0xFF2A2A34 : 0xFF18181E);
-                int chipBorder = isTagActive ? 0xFF4ADE80 : (hoverChip ? 0xFF545464 : 0xFF2C2C36);
-                Services.PLATFORM.fill(poseStackOrGraphics, chipX, curY + 2, chipX + chipW, curY + 2 + chipH, applyAlpha(chipBg, alpha));
-                drawBorder(poseStackOrGraphics, chipX, curY + 2, chipW, chipH, applyAlpha(chipBorder, alpha));
+                if (slotY + slotSize < clipY || slotY > clipY + clipH) {
+                    continue;
+                }
 
-                int chipText = isTagActive ? COLOR_TOGGLE_ON_TEXT : (hoverChip ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER);
-                Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, tagNames[t], chipX + chipW / 2, curY + 4, applyAlpha(chipText, alpha));
+                CommonId cid = Services.PLATFORM.getItemId(item);
+                String idStr = cid != null ? cid.toString() : "";
+                boolean isSelected = cfg.items.contains(idStr);
+
+                boolean hover = mouseX >= slotX && mouseX <= slotX + slotSize && mouseY >= slotY && mouseY <= slotY + slotSize &&
+                        mouseY >= clipY && mouseY <= clipY + clipH;
+
+                int bg = isSelected ? 0xFF142E18 : (hover ? 0xFF24242C : 0xFF121216);
+                Services.PLATFORM.fill(poseStackOrGraphics, slotX, slotY, slotX + slotSize, slotY + slotSize, applyAlpha(bg, alpha));
+
+                int border = isSelected ? 0xFF4ADE80 : (hover ? 0xFF6A6A7A : 0xFF24242C);
+                drawBorder(poseStackOrGraphics, slotX, slotY, slotSize, slotSize, applyAlpha(border, alpha));
+
+                ItemStack stack = itemStackCache.computeIfAbsent(item, ItemStack::new);
+                Services.PLATFORM.renderGuiItem(poseStackOrGraphics, stack, slotX + 2, slotY + 2);
+
+                if (isSelected) {
+                    Services.PLATFORM.fill(poseStackOrGraphics, slotX + slotSize - 6, slotY, slotX + slotSize, slotY + 6, applyAlpha(0xFF4ADE80, alpha));
+                }
+
+                if (hover) {
+                    hoveredStack = stack;
+                    hoveredIsActive = isSelected;
+                }
             }
 
-            // Defaults button
-            int defBtnW = 60;
-            int defBtnX = x + w - defBtnW - 2;
-            boolean hoverDef = mouseX >= defBtnX && mouseX <= defBtnX + defBtnW && mouseY >= curY + 2 && mouseY <= curY + 2 + chipH;
-            Services.PLATFORM.fill(poseStackOrGraphics, defBtnX, curY + 2, defBtnX + defBtnW, curY + 2 + chipH, applyAlpha(hoverDef ? 0xFF2E2E38 : COLOR_BTN_BG, alpha));
-            drawBorder(poseStackOrGraphics, defBtnX, curY + 2, defBtnW, chipH, applyAlpha(hoverDef ? COLOR_BTN_BORDER_HOVER : COLOR_BTN_BORDER, alpha));
-            Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "↺ Defaults", defBtnX + defBtnW / 2, curY + 4, applyAlpha(hoverDef ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
-        }
-        curY += tagBarH + 4;
-
-        // Inventory Slot Matrix
-        List<Item> itemsToDisplay = getFilteredItemsList();
-        int slotSize = 20;
-        int slotGap = 2;
-        int cols = Math.max(1, (w - 12) / (slotSize + slotGap));
-        int gridStartX = x + 4;
-
-        ItemStack hoveredStack = null;
-        boolean hoveredIsActive = false;
-
-        for (int i = 0; i < itemsToDisplay.size(); i++) {
-            Item item = itemsToDisplay.get(i);
-            int col = i % cols;
-            int row = i / cols;
-            int slotX = gridStartX + col * (slotSize + slotGap);
-            int slotY = curY + row * (slotSize + slotGap);
-
-            if (slotY + slotSize < clipY || slotY > clipY + clipH) {
-                continue;
+            if (hoveredStack != null) {
+                List<Component> tooltip = new ArrayList<>();
+                tooltip.add(hoveredStack.getHoverName());
+                tooltip.add(ComponentHelper.literal(hoveredIsActive ? "§a[Active Trigger - Click to Remove]" : "§7[Click to Add Trigger]"));
+                Services.PLATFORM.renderComponentTooltip(poseStackOrGraphics, font, tooltip, mouseX + 12, mouseY);
             }
-
-            CommonId cid = Services.PLATFORM.getItemId(item);
-            String idStr = cid != null ? cid.toString() : "";
-            boolean isSelected = cfg.items.contains(idStr);
-
-            boolean hover = mouseX >= slotX && mouseX <= slotX + slotSize && mouseY >= slotY && mouseY <= slotY + slotSize &&
-                    mouseY >= clipY && mouseY <= clipY + clipH;
-
-            // Slot Background (Beveled inventory slot look)
-            int bg = isSelected ? 0xFF142E18 : (hover ? 0xFF24242C : 0xFF121216);
-            Services.PLATFORM.fill(poseStackOrGraphics, slotX, slotY, slotX + slotSize, slotY + slotSize, applyAlpha(bg, alpha));
-
-            // Slot Border
-            int border = isSelected ? 0xFF4ADE80 : (hover ? 0xFF6A6A7A : 0xFF24242C);
-            drawBorder(poseStackOrGraphics, slotX, slotY, slotSize, slotSize, applyAlpha(border, alpha));
-
-            // 3D Item Render
-            ItemStack stack = itemStackCache.computeIfAbsent(item, ItemStack::new);
-            Services.PLATFORM.renderGuiItem(poseStackOrGraphics, stack, slotX + 2, slotY + 2);
-
-            // Active check badge indicator
-            if (isSelected) {
-                Services.PLATFORM.fill(poseStackOrGraphics, slotX + slotSize - 6, slotY, slotX + slotSize, slotY + 6, applyAlpha(0xFF4ADE80, alpha));
+        } else {
+            // --- SUB-VIEW 1: Dedicated Registered Tags Panel ---
+            // Bar 3: Category Pills (All, keys, gems, ores, vault, swords, gear)
+            int bar3H = 18;
+            if (curY >= clipY && curY + bar3H <= clipY + clipH) {
+                int chipCount = TAG_CATEGORY_CHIPS.length;
+                int chipW = (w - 12) / chipCount;
+                int chipH = 13;
+                for (int c = 0; c < chipCount; c++) {
+                    int cx = x + 2 + c * (chipW + 2);
+                    boolean isC = (activeTagChipIndex == c);
+                    boolean hoverChip = mouseX >= cx && mouseX <= cx + chipW && mouseY >= curY + 2 && mouseY <= curY + 2 + chipH;
+                    int cBg = isC ? 0xFF282834 : (hoverChip ? 0xFF1E1E26 : 0xFF141418);
+                    int cBorder = isC ? 0xFF58586E : (hoverChip ? 0xFF3E3E4C : 0xFF222228);
+                    Services.PLATFORM.fill(poseStackOrGraphics, cx, curY + 2, cx + chipW, curY + 2 + chipH, applyAlpha(cBg, alpha));
+                    drawBorder(poseStackOrGraphics, cx, curY + 2, chipW, chipH, applyAlpha(cBorder, alpha));
+                    int cText = isC ? COLOR_TEXT_WHITE : (hoverChip ? COLOR_TEXT_SILVER : COLOR_TEXT_MUTED);
+                    Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, TAG_CATEGORY_CHIPS[c], cx + chipW / 2, curY + 4, applyAlpha(cText, alpha));
+                }
             }
+            curY += bar3H + 4;
 
-            if (hover) {
-                hoveredStack = stack;
-                hoveredIsActive = isSelected;
+            // Registered Tag Rows
+            List<String> tagsToDisplay = getFilteredTagsList();
+            int tagRowH = 22;
+            int tagRowGap = 2;
+
+            for (String tagId : tagsToDisplay) {
+                int rowY = curY;
+                if (rowY >= clipY && rowY + tagRowH <= clipY + clipH) {
+                    boolean isActive = cfg.items.contains(tagId);
+                    boolean hover = mouseX >= x && mouseX <= x + w && mouseY >= rowY && mouseY <= rowY + tagRowH;
+
+                    int rBg = isActive ? 0xFF142418 : (hover ? 0xFF1E1E26 : 0xFF131317);
+                    Services.PLATFORM.fill(poseStackOrGraphics, x, rowY, x + w, rowY + tagRowH, applyAlpha(rBg, alpha));
+
+                    int rBorder = isActive ? 0xFF2E6E38 : (hover ? 0xFF3E3E4C : 0xFF202026);
+                    drawBorder(poseStackOrGraphics, x, rowY, w, tagRowH, applyAlpha(rBorder, alpha));
+
+                    // Emblem '#'
+                    int emblemSize = 14;
+                    int emblemX = x + 5;
+                    int emblemY = rowY + (tagRowH - emblemSize) / 2;
+                    int embCol = isActive ? 0xFF4ADE80 : 0xFF84848C;
+                    Services.PLATFORM.fill(poseStackOrGraphics, emblemX, emblemY, emblemX + emblemSize, emblemY + emblemSize, applyAlpha(isActive ? 0xFF1A3820 : 0xFF1A1A20, alpha));
+                    drawBorder(poseStackOrGraphics, emblemX, emblemY, emblemSize, emblemSize, applyAlpha(isActive ? 0xFF4ADE80 : 0xFF2C2C36, alpha));
+                    Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "#", emblemX + emblemSize / 2, emblemY + 3, applyAlpha(embCol, alpha));
+
+                    // Tag Name
+                    int textCol = isActive ? COLOR_TEXT_WHITE : (hover ? COLOR_TEXT_SILVER : COLOR_TEXT_MUTED);
+                    drawText(poseStackOrGraphics, font, tagId, emblemX + emblemSize + 6, rowY + 7, applyAlpha(textCol, alpha));
+
+                    // Registered Items Count Badge
+                    int count = tagItemCounts.getOrDefault(tagId, 1);
+                    String countStr = count + " items";
+                    int countW = font.width(countStr) + 8;
+                    int countX = x + w - countW - 52;
+                    int countY = rowY + (tagRowH - 12) / 2;
+                    Services.PLATFORM.fill(poseStackOrGraphics, countX, countY, countX + countW, countY + 12, applyAlpha(0xFF101014, alpha));
+                    drawBorder(poseStackOrGraphics, countX, countY, countW, 12, applyAlpha(0xFF24242C, alpha));
+                    Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, countStr, countX + countW / 2, countY + 2, applyAlpha(COLOR_TEXT_MUTED, alpha));
+
+                    // Toggle Button [ ACTIVE ] / [ OFF ]
+                    int tBtnW = 42;
+                    int tBtnH = 14;
+                    int tBtnX = x + w - tBtnW - 6;
+                    int tBtnY = rowY + (tagRowH - tBtnH) / 2;
+                    int tbBg = isActive ? COLOR_TOGGLE_ON_BG : COLOR_TOGGLE_OFF_BG;
+                    int tbBorder = isActive ? COLOR_TOGGLE_ON_BORDER : COLOR_TOGGLE_OFF_BORDER;
+                    int tbText = isActive ? COLOR_TOGGLE_ON_TEXT : COLOR_TOGGLE_OFF_TEXT;
+                    Services.PLATFORM.fill(poseStackOrGraphics, tBtnX, tBtnY, tBtnX + tBtnW, tBtnY + tBtnH, applyAlpha(tbBg, alpha));
+                    drawBorder(poseStackOrGraphics, tBtnX, tBtnY, tBtnW, tBtnH, applyAlpha(tbBorder, alpha));
+                    Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, isActive ? "ON" : "OFF", tBtnX + tBtnW / 2, tBtnY + 3, applyAlpha(tbText, alpha));
+                }
+                curY += tagRowH + tagRowGap;
             }
-        }
-
-        // Render hover tooltip
-        if (hoveredStack != null) {
-            List<Component> tooltip = new ArrayList<>();
-            tooltip.add(hoveredStack.getHoverName());
-            tooltip.add(ComponentHelper.literal(hoveredIsActive ? "§a[Active Trigger - Click to Remove]" : "§7[Click to Add Trigger]"));
-            Services.PLATFORM.renderComponentTooltip(poseStackOrGraphics, font, tooltip, mouseX + 12, mouseY);
         }
     }
 
@@ -958,9 +1115,9 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                     int removeW = 50;
                     int removeX = x + w - removeW - 6;
                     int removeY = custY;
-                    boolean hoverRem = mouseX >= removeX && mouseX <= removeX + removeW && mouseY >= removeY && mouseY <= removeY + btnH;
-                    Services.PLATFORM.fill(poseStackOrGraphics, removeX, removeY, removeX + removeW, removeY + btnH, applyAlpha(hoverRem ? 0xFF3D1616 : 0xFF241414, alpha));
-                    drawBorder(poseStackOrGraphics, removeX, removeY, removeW, btnH, applyAlpha(hoverRem ? 0xFFE05050 : 0xFF882828, alpha));
+                    boolean hoverRem = mouseX >= removeX && mouseX <= removeX + removeW && mouseY >= removeY && mouseY <= removeY + removeH;
+                    Services.PLATFORM.fill(poseStackOrGraphics, removeX, removeY, removeX + removeW, removeY + removeH, applyAlpha(hoverRem ? 0xFF3D1616 : 0xFF241414, alpha));
+                    drawBorder(poseStackOrGraphics, removeX, removeY, removeW, removeH, applyAlpha(hoverRem ? 0xFFE05050 : 0xFF882828, alpha));
                     Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "Remove", removeX + removeW / 2, removeY + 3, applyAlpha(hoverRem ? 0xFFFFFFFF : 0xFFE05050, alpha));
                 }
                 curY += h + gap;
@@ -1112,15 +1269,15 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         drawVaultHuntersFrame(poseStackOrGraphics, modalX, modalY, modalW, modalH, COLOR_PANEL_BG, alpha);
 
         int headH = 24;
-        Services.PLATFORM.fill(poseStackOrGraphics, modalX + 3, modalY + 3, modalX + modalW - 3, modalY + headH, applyAlpha(COLOR_HEADER_BG, alpha));
-        drawGroove(poseStackOrGraphics, modalX + 3, modalY + headH, modalW - 6, true, alpha);
+        Services.PLATFORM.fill(poseStackOrGraphics, modalX + 7, modalY + 7, modalX + modalW - 7, modalY + headH, applyAlpha(COLOR_HEADER_BG, alpha));
+        drawBorder(poseStackOrGraphics, modalX + 7, modalY + 7, modalW - 14, headH - 7, applyAlpha(COLOR_FRAME_BLACK, alpha));
         String modalTitle = isEditingPillarColor ? "Customize Pillar Color" : "Customize Particle Color";
-        drawText(poseStackOrGraphics, font, modalTitle, modalX + 8, modalY + 8, applyAlpha(COLOR_TEXT_WHITE, alpha));
+        drawText(poseStackOrGraphics, font, modalTitle, modalX + 12, modalY + 9, applyAlpha(COLOR_TEXT_WHITE, alpha));
 
         // Close button
         int closeSize = 14;
-        int closeX = modalX + modalW - closeSize - 6;
-        int closeY = modalY + 5;
+        int closeX = modalX + modalW - closeSize - 10;
+        int closeY = modalY + 7;
         boolean hoverClose = mouseX >= closeX && mouseX <= closeX + closeSize && mouseY >= closeY && mouseY <= closeY + closeSize;
         Services.PLATFORM.fill(poseStackOrGraphics, closeX, closeY, closeX + closeSize, closeY + closeSize, applyAlpha(hoverClose ? 0xFF3D1616 : 0xFF241414, alpha));
         drawBorder(poseStackOrGraphics, closeX, closeY, closeSize, closeSize, applyAlpha(hoverClose ? 0xFFE05050 : 0xFF882828, alpha));
@@ -1132,7 +1289,6 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         int gradBoxW = 110;
         int gradBoxH = 88;
 
-        // Render 2D Gradient Box (Hue as base, Saturation horizontally, Brightness vertically)
         for (int x = 0; x < gradBoxW; x += 2) {
             float sat = x / (float) gradBoxW;
             int topRgb = hsbToRgb(pickerHue, sat, 1.0f);
@@ -1163,7 +1319,6 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         }
         drawBorder(poseStackOrGraphics, hueX - 1, hueY - 1, hueW + 2, hueH + 2, applyAlpha(COLOR_FRAME_BLACK, alpha));
 
-        // Hue Slider Pointer
         int curHueY = hueY + (int) ((pickerHue / 360.0f) * hueH);
         Services.PLATFORM.fill(poseStackOrGraphics, hueX - 2, curHueY - 1, hueX + hueW + 2, curHueY + 2, applyAlpha(COLOR_TEXT_WHITE, alpha));
         drawBorder(poseStackOrGraphics, hueX - 2, curHueY - 1, hueW + 4, 3, applyAlpha(COLOR_FRAME_BLACK, alpha));
@@ -1206,19 +1361,20 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "✓ Apply Color", applyX + applyW / 2, applyY + 4, applyAlpha(COLOR_TOGGLE_ON_TEXT, alpha));
     }
 
-    // --- Vault Hunters Border & Bevel Engine (Sleek 1-Pixel Wide Metallic Gradient) ---
+    // --- Vault Hunters Border & Bevel Engine (Chassis Gap & Metallic Gradient) ---
     private void drawVaultHuntersFrame(Object poseStackOrGraphics, int x, int y, int w, int h, int bgRgb, float alpha) {
-        Services.PLATFORM.fill(poseStackOrGraphics, x, y, x + w, y + h, applyAlpha(bgRgb, alpha));
+        // 1. Outer Chassis Body Fill (Solid metallic chassis backing)
+        Services.PLATFORM.fill(poseStackOrGraphics, x, y, x + w, y + h, applyAlpha(COLOR_CHASSIS_BODY, alpha));
 
         int black = applyAlpha(COLOR_FRAME_BLACK, alpha);
 
-        // 1. Layer 1: Outermost 1px Black Border
+        // 2. Outermost 1px Black Border
         Services.PLATFORM.fill(poseStackOrGraphics, x, y, x + w, y + 1, black);
         Services.PLATFORM.fill(poseStackOrGraphics, x, y + h - 1, x + w, y + h, black);
         Services.PLATFORM.fill(poseStackOrGraphics, x, y, x + 1, y + h, black);
         Services.PLATFORM.fill(poseStackOrGraphics, x + w - 1, y, x + w, y + h, black);
 
-        // 2. Layer 2: Strictly 1-Pixel Wide Metallic Gradient Highlight (Top & Left) & Recessed Shadow (Bottom & Right)
+        // 3. 1-Pixel Wide Metallic Gradient Highlight (Top & Left) & Deep Shadow (Bottom & Right)
         for (int i = 1; i < w - 1; i++) {
             float t = (float) (i - 1) / Math.max(1, w - 2);
             int col = lerpColor(COLOR_BORDER_GRADIENT_START, COLOR_BORDER_GRADIENT_END, t);
@@ -1230,15 +1386,20 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
             Services.PLATFORM.fill(poseStackOrGraphics, x + 1, y + j, x + 2, y + j + 1, applyAlpha(col, alpha));
         }
         int shadow = applyAlpha(COLOR_BORDER_SHADOW, alpha);
-        Services.PLATFORM.fill(poseStackOrGraphics, x + 1, y + h - 2, x + w - 1, y + h - 1, shadow);
+        Services.PLATFORM.fill(poseStackOrGraphics, x + 1, y + h - 2, x + w - 1, y + h - 2, shadow);
         Services.PLATFORM.fill(poseStackOrGraphics, x + w - 2, y + 1, x + w - 1, y + h - 1, shadow);
 
-        // 3. Layer 3: Recessed 1px Inner Dark Shadow
-        int innerDark = applyAlpha(0xFF101012, alpha);
-        Services.PLATFORM.fill(poseStackOrGraphics, x + 2, y + 2, x + w - 2, y + 3, innerDark);
-        Services.PLATFORM.fill(poseStackOrGraphics, x + 2, y + 2, x + 3, y + h - 2, innerDark);
-        Services.PLATFORM.fill(poseStackOrGraphics, x + 2, y + h - 3, x + w - 2, y + h - 2, innerDark);
-        Services.PLATFORM.fill(poseStackOrGraphics, x + w - 3, y + 2, x + w - 2, y + h - 2, innerDark);
+        // 4. Chassis Gap / Body: 4px metallic gray bevel spacing between outer gradient and inner groove
+        // Offset 5: Recessed Bevel Groove / Shadow Line that separates the chassis rim from the interior
+        int bevelShadow = applyAlpha(0xFF101014, alpha);
+        int bevelHighlight = applyAlpha(0xFF2C2C36, alpha);
+        Services.PLATFORM.fill(poseStackOrGraphics, x + 5, y + 5, x + w - 5, y + 6, bevelShadow);
+        Services.PLATFORM.fill(poseStackOrGraphics, x + 5, y + 5, x + 6, y + h - 5, bevelShadow);
+        Services.PLATFORM.fill(poseStackOrGraphics, x + 5, y + h - 6, x + w - 5, y + h - 5, bevelHighlight);
+        Services.PLATFORM.fill(poseStackOrGraphics, x + w - 6, y + 5, x + w - 5, y + h - 5, bevelHighlight);
+
+        // 5. Main Interior Dark Plate (from offset 6 inward)
+        Services.PLATFORM.fill(poseStackOrGraphics, x + 6, y + 6, x + w - 6, y + h - 6, applyAlpha(bgRgb, alpha));
     }
 
     private void drawInsetBox(Object poseStackOrGraphics, int x, int y, int w, int h, int fillRgb, float alpha) {
@@ -1248,7 +1409,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
     private void drawGroove(Object poseStackOrGraphics, int x, int y, int w, boolean horizontal, float alpha) {
         int dark = applyAlpha(COLOR_FRAME_BLACK, alpha);
-        int light = applyAlpha(COLOR_BORDER_SHADOW, alpha);
+        int light = applyAlpha(0xFF26262E, alpha);
         if (horizontal) {
             Services.PLATFORM.fill(poseStackOrGraphics, x, y, x + w, y + 1, dark);
             Services.PLATFORM.fill(poseStackOrGraphics, x, y + 1, x + w, y + 2, light);
@@ -1515,25 +1676,24 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (isClosing) return true;
 
-        // Modal Clicks Handle First
         if (showColorModal) {
             return handleColorModalClick(mouseX, mouseY);
         }
 
         int panelW = Math.min(width - 20, 560);
-        int panelH = Math.min(height - 16, 304);
+        int panelH = Math.min(height - 16, 308);
         int panelX = (width - panelW) / 2;
         int panelY = (height - panelH) / 2;
 
-        int headerH = 26;
-        int headerX = panelX + 3;
-        int headerY = panelY + 3;
-        int headerW = panelW - 6;
+        int headerH = 24;
+        int headerX = panelX + 7;
+        int headerY = panelY + 7;
+        int headerW = panelW - 14;
 
         // 1. Close Button [ ✕ ]
         int closeBtnSize = 14;
-        int closeBtnX = headerX + headerW - closeBtnSize - 6;
-        int closeBtnY = headerY + 6;
+        int closeBtnX = headerX + headerW - closeBtnSize - 5;
+        int closeBtnY = headerY + 5;
         if (mouseX >= closeBtnX && mouseX <= closeBtnX + closeBtnSize && mouseY >= closeBtnY && mouseY <= closeBtnY + closeBtnSize) {
             startClosing();
             return true;
@@ -1541,9 +1701,9 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
         // 2. Sidenav Tabs & Toggle
         int navW = navExpanded ? 106 : 30;
-        int navX = panelX + 4;
-        int navY = headerY + headerH + 4;
-        int navH = panelH - headerH - 12;
+        int navX = panelX + 7;
+        int navY = headerY + headerH + 5;
+        int navH = panelH - headerH - 19;
 
         int toggleH = 16;
         int toggleW = navW - 6;
@@ -1572,9 +1732,9 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         }
 
         // 3. Right Content Viewport Controls
-        int contentX = navX + navW + 4;
+        int contentX = navX + navW + 5;
         int contentY = navY;
-        int contentW = (panelX + panelW - 4) - contentX;
+        int contentW = (panelX + panelW - 7) - contentX;
         int contentH = navH;
 
         int catHeaderH = 22;
@@ -1604,13 +1764,15 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                 PresetsConfig presetsCfg = PresetsConfig.get();
                 List<PresetsConfig.Preset> presets = presetsCfg.getPresets();
 
-                // Top Bar 1: Preset management & filter buttons
-                int topBarH = 22;
-                if (curY >= clipY && curY + topBarH <= clipY + clipH) {
+                // Bar 1: Presets
+                int bar1H = 20;
+                if (curY >= clipY && curY + bar1H <= clipY + clipH) {
                     int cycleW = 74;
                     int btnH = 14;
-                    int cycleX = x + 2;
-                    int cycleY = curY + 4;
+                    int cycleX = x + 44;
+                    int cycleY = curY + 2;
+
+                    // Cycle Preset
                     if (mouseX >= cycleX && mouseX <= cycleX + cycleW && mouseY >= cycleY && mouseY <= cycleY + btnH) {
                         if (!presets.isEmpty()) {
                             selectedPresetIndex = (selectedPresetIndex + 1) % presets.size();
@@ -1618,104 +1780,161 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                         return true;
                     }
 
+                    // Apply Preset
                     int applyW = 38;
                     int applyX = cycleX + cycleW + 3;
                     if (mouseX >= applyX && mouseX <= applyX + applyW && mouseY >= cycleY && mouseY <= cycleY + btnH) {
                         if (!presets.isEmpty()) {
-                            PresetsConfig.Preset p = presets.get(Math.min(selectedPresetIndex, presets.size() - 1));
-                            cfg.items.clear();
-                            cfg.items.addAll(p.items);
-                            cfg.saveItemsToDisk();
+                            List<String> keys = presetsCfg.getPresetKeys();
+                            if (selectedPresetIndex < keys.size()) {
+                                presetsCfg.applyPreset(keys.get(selectedPresetIndex));
+                            }
                         }
                         return true;
                     }
 
+                    // Save Preset
                     int saveW = 36;
                     int saveX = applyX + applyW + 3;
                     if (mouseX >= saveX && mouseX <= saveX + saveW && mouseY >= cycleY && mouseY <= cycleY + btnH) {
-                        cfg.saveItems();
+                        if (!presets.isEmpty()) {
+                            List<String> keys = presetsCfg.getPresetKeys();
+                            if (selectedPresetIndex < keys.size()) {
+                                String key = keys.get(selectedPresetIndex);
+                                presetsCfg.savePreset(key, presets.get(selectedPresetIndex).name, new HashSet<>(cfg.items));
+                            }
+                        }
                         return true;
                     }
 
-                    // Filter Buttons: [All] [Inventory] [Configured]
-                    int filterW = 60;
-                    int rightFiltersX = x + w - (3 * (filterW + 3));
-                    for (int f = 0; f < 3; f++) {
-                        int fx = rightFiltersX + f * (filterW + 3);
-                        if (mouseX >= fx && mouseX <= fx + filterW && mouseY >= cycleY && mouseY <= cycleY + btnH) {
-                            itemFilterMode = f;
-                            return true;
-                        }
-                    }
-                }
-                curY += topBarH;
-
-                // Top Bar 2: Tag Presets Quick Buttons & Defaults
-                int tagBarH = 18;
-                if (curY >= clipY && curY + tagBarH <= clipY + clipH) {
-                    String[] tagIds = {"#the_vault:keys", "#the_vault:gems", "#c:ores", "#the_vault:vault_gear"};
-                    int chipW = 54;
-                    int chipH = 13;
-                    int chipStartX = x + 38;
-
-                    for (int t = 0; t < tagIds.length; t++) {
-                        int chipX = chipStartX + t * (chipW + 4);
-                        if (mouseX >= chipX && mouseX <= chipX + chipW && mouseY >= curY + 2 && mouseY <= curY + 2 + chipH) {
-                            if (cfg.items.contains(tagIds[t])) {
-                                cfg.items.remove(tagIds[t]);
-                            } else {
-                                cfg.items.add(tagIds[t]);
-                            }
-                            cfg.saveItemsToDisk();
-                            return true;
-                        }
+                    // + New Preset
+                    int newW = 38;
+                    int newX = saveX + saveW + 3;
+                    if (mouseX >= newX && mouseX <= newX + newW && mouseY >= cycleY && mouseY <= cycleY + btnH) {
+                        String newKey = presetsCfg.generatePresetKey();
+                        presetsCfg.savePreset(newKey, "Custom " + (presets.size()), new HashSet<>(cfg.items));
+                        selectedPresetIndex = presetsCfg.getPresets().size() - 1;
+                        return true;
                     }
 
-                    int defBtnW = 60;
-                    int defBtnX = x + w - defBtnW - 2;
-                    if (mouseX >= defBtnX && mouseX <= defBtnX + defBtnW && mouseY >= curY + 2 && mouseY <= curY + 2 + chipH) {
-                        cfg.items.clear();
-                        cfg.items.add("minecraft:diamond");
-                        cfg.items.add("minecraft:netherite_ingot");
-                        cfg.items.add("minecraft:nether_star");
-                        cfg.items.add("the_vault:echo_pog");
-                        cfg.items.add("#the_vault:keys");
-                        cfg.saveItemsToDisk();
+                    // Reset to Defaults
+                    int defW = 54;
+                    int defX = x + w - defW - 2;
+                    if (mouseX >= defX && mouseX <= defX + defW && mouseY >= cycleY && mouseY <= cycleY + btnH) {
+                        presetsCfg.applyPreset("default");
                         return true;
                     }
                 }
-                curY += tagBarH + 4;
+                curY += bar1H;
 
-                // Slot clicks
-                List<Item> itemsToDisplay = getFilteredItemsList();
-                int slotSize = 20;
-                int slotGap = 2;
-                int cols = Math.max(1, (w - 12) / (slotSize + slotGap));
-                int gridStartX = x + 4;
+                // Bar 2: Sub-View Switcher: [ ▦ Item Triggers ] vs [ 🏷 Registered Tags Panel ]
+                int bar2H = 20;
+                if (curY >= clipY && curY + bar2H <= clipY + clipH) {
+                    int subBtnW = (w - 8) / 2;
+                    int btnH = 15;
 
-                for (int i = 0; i < itemsToDisplay.size(); i++) {
-                    Item item = itemsToDisplay.get(i);
-                    int col = i % cols;
-                    int row = i / cols;
-                    int slotX = gridStartX + col * (slotSize + slotGap);
-                    int slotY = curY + row * (slotSize + slotGap);
-
-                    if (slotY + slotSize < clipY || slotY > clipY + clipH) {
-                        continue;
+                    int sub0X = x + 2;
+                    int sub0Y = curY + 2;
+                    if (mouseX >= sub0X && mouseX <= sub0X + subBtnW && mouseY >= sub0Y && mouseY <= sub0Y + btnH) {
+                        itemsSubTab = 0;
+                        scrollOffset = 0;
+                        return true;
                     }
 
-                    if (mouseX >= slotX && mouseX <= slotX + slotSize && mouseY >= slotY && mouseY <= slotY + slotSize) {
-                        CommonId cid = Services.PLATFORM.getItemId(item);
-                        if (cid != null) {
-                            String idStr = cid.toString();
-                            if (cfg.items.contains(idStr)) {
-                                cfg.items.remove(idStr);
-                            } else {
-                                cfg.items.add(idStr);
-                            }
-                            cfg.saveItemsToDisk();
-                        }
+                    int sub1X = sub0X + subBtnW + 4;
+                    if (mouseX >= sub1X && mouseX <= sub1X + subBtnW && mouseY >= sub0Y && mouseY <= sub0Y + btnH) {
+                        itemsSubTab = 1;
+                        scrollOffset = 0;
                         return true;
+                    }
+                }
+                curY += bar2H + 2;
+
+                if (itemsSubTab == 0) {
+                    // Item Filter Pills Bar
+                    int bar3H = 18;
+                    if (curY >= clipY && curY + bar3H <= clipY + clipH) {
+                        int pillW = (w - 12) / 3;
+                        int pillH = 13;
+                        for (int f = 0; f < 3; f++) {
+                            int px = x + 2 + f * (pillW + 4);
+                            if (mouseX >= px && mouseX <= px + pillW && mouseY >= curY + 2 && mouseY <= curY + 2 + pillH) {
+                                itemFilterMode = f;
+                                return true;
+                            }
+                        }
+                    }
+                    curY += bar3H + 4;
+
+                    // Slot clicks
+                    List<Item> itemsToDisplay = getFilteredItemsList();
+                    int slotSize = 20;
+                    int slotGap = 2;
+                    int cols = Math.max(1, (w - 12) / (slotSize + slotGap));
+                    int gridStartX = x + 4;
+
+                    for (int i = 0; i < itemsToDisplay.size(); i++) {
+                        Item item = itemsToDisplay.get(i);
+                        int col = i % cols;
+                        int row = i / cols;
+                        int slotX = gridStartX + col * (slotSize + slotGap);
+                        int slotY = curY + row * (slotSize + slotGap);
+
+                        if (slotY + slotSize < clipY || slotY > clipY + clipH) {
+                            continue;
+                        }
+
+                        if (mouseX >= slotX && mouseX <= slotX + slotSize && mouseY >= slotY && mouseY <= slotY + slotSize) {
+                            CommonId cid = Services.PLATFORM.getItemId(item);
+                            if (cid != null) {
+                                String idStr = cid.toString();
+                                if (cfg.items.contains(idStr)) {
+                                    cfg.items.remove(idStr);
+                                } else {
+                                    cfg.items.add(idStr);
+                                }
+                                cfg.saveItemsToDisk();
+                            }
+                            return true;
+                        }
+                    }
+                } else {
+                    // Tag Category Chips Bar
+                    int bar3H = 18;
+                    if (curY >= clipY && curY + bar3H <= clipY + clipH) {
+                        int chipCount = TAG_CATEGORY_CHIPS.length;
+                        int chipW = (w - 12) / chipCount;
+                        int chipH = 13;
+                        for (int c = 0; c < chipCount; c++) {
+                            int cx = x + 2 + c * (chipW + 2);
+                            if (mouseX >= cx && mouseX <= cx + chipW && mouseY >= curY + 2 && mouseY <= curY + 2 + chipH) {
+                                activeTagChipIndex = c;
+                                scrollOffset = 0;
+                                return true;
+                            }
+                        }
+                    }
+                    curY += bar3H + 4;
+
+                    // Registered Tag Rows clicks
+                    List<String> tagsToDisplay = getFilteredTagsList();
+                    int tagRowH = 22;
+                    int tagRowGap = 2;
+
+                    for (String tagId : tagsToDisplay) {
+                        int rowY = curY;
+                        if (rowY >= clipY && rowY + tagRowH <= clipY + clipH) {
+                            if (mouseX >= x && mouseX <= x + w && mouseY >= rowY && mouseY <= rowY + tagRowH) {
+                                if (cfg.items.contains(tagId)) {
+                                    cfg.items.remove(tagId);
+                                } else {
+                                    cfg.items.add(tagId);
+                                }
+                                cfg.saveItemsToDisk();
+                                return true;
+                            }
+                        }
+                        curY += tagRowH + tagRowGap;
                     }
                 }
             }
@@ -2156,8 +2375,8 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         int modalY = (height - modalH) / 2;
 
         int closeSize = 14;
-        int closeX = modalX + modalW - closeSize - 6;
-        int closeY = modalY + 5;
+        int closeX = modalX + modalW - closeSize - 10;
+        int closeY = modalY + 7;
         if (mouseX >= closeX && mouseX <= closeX + closeSize && mouseY >= closeY && mouseY <= closeY + closeSize) {
             showColorModal = false;
             draggingGradient = false;

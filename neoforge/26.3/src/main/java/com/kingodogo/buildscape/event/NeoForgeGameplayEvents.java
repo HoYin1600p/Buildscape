@@ -30,6 +30,17 @@ public final class NeoForgeGameplayEvents {
     public static void register() {
         AdvancementEvents.configure(new LoaderAdvancementAccess());
         var bus = NeoForge.EVENT_BUS;
+        // 26.3 binds item components after mod init and again on every data reload (compostables need them).
+        bus.addListener((net.neoforged.neoforge.event.server.ServerStartingEvent event) ->
+                ((com.kingodogo.buildscape.adapter.v263.PlatformAdapterBase) com.kingodogo.buildscape.platform.Services.PLATFORM)
+                        .registerDeferredServerData(event.getServer()));
+        bus.addListener((net.neoforged.neoforge.event.OnDatapackSyncEvent event) -> {
+            // A null player means a /reload, not a player joining.
+            if (event.getPlayer() == null) {
+                ((com.kingodogo.buildscape.adapter.v263.PlatformAdapterBase) com.kingodogo.buildscape.platform.Services.PLATFORM)
+                        .registerDeferredServerData(event.getPlayerList().getServer());
+            }
+        });
         bus.addListener((net.neoforged.neoforge.event.entity.player.AdvancementEvent.AdvancementEarnEvent event) -> {
             if (event.getEntity() instanceof ServerPlayer player) {
                 var id = event.getAdvancement().id();

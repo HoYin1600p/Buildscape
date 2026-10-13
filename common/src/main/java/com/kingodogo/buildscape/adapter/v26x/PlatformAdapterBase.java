@@ -304,6 +304,11 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter, com.kingo
     }
 
     @Override
+    public Block getFlowerPotPlant(net.minecraft.world.level.block.FlowerPotBlock pot) {
+        return pot.getPotted();
+    }
+
+    @Override
     public Entity createSeatEntity(Level level, double x, double y, double z) {
         return new SeatEntityImpl(level, x, y, z);
     }

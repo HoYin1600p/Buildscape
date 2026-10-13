@@ -1063,6 +1063,16 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
     public void awardStat(ServerPlayer player, CommonId statId) {
         if (player == null || statId == null) return;
         ResourceLocation id = new ResourceLocation(statId.getNamespace(), statId.getPath());
+        // 1.18.2's custom-stat registry and StatType map are identity-keyed: main awards with the registered
+        // instance, so use that one rather than an equal copy (which cannot be found and fails with an NPE).
+        ResourceLocation registered = Registry.CUSTOM_STAT.getOptional(new ResourceLocation(statId.getPath()))
+                .filter(id::equals).orElse(null);
+        if (registered == null) {
+            for (ResourceLocation candidate : Registry.CUSTOM_STAT) {
+                if (candidate.equals(id)) { registered = candidate; break; }
+            }
+        }
+        if (registered != null) id = registered;
         net.minecraft.stats.Stat<ResourceLocation> stat = net.minecraft.stats.Stats.CUSTOM.get(id);
         if (stat != null) {
             player.awardStat(stat);
@@ -1757,6 +1767,12 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
                 };
             }
         };
+    }
+
+    @Override
+    public net.minecraft.world.InteractionResult handleCopperRightClick(Level level, BlockPos pos, BlockState state,
+            ItemStack held, net.minecraft.world.entity.player.Player player, net.minecraft.world.InteractionHand hand) {
+        return RestoredCopperOxidation.handleRightClick(level, pos, state, held, player, hand);
     }
 
     @Override
@@ -3889,8 +3905,9 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
             this.setType(Boat.Type.OAK);
         }
 
+        @SuppressWarnings("unchecked")
         public PoplarBoatEntityImpl(Level level, double x, double y, double z) {
-            this(EntityType.BOAT, level);
+            this((EntityType<? extends Boat>) Services.PLATFORM.getPoplarBoatEntityType(), level);
             this.setPos(x, y, z);
             this.xo = x;
             this.yo = y;
@@ -3912,8 +3929,13 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
         }
 
         public SeatEntityImpl(Level level, double x, double y, double z) {
-            this(EntityType.MARKER, level);
+            this(Services.PLATFORM.getSeatEntityType(), level);
             this.setPos(x, y, z);
+        }
+
+        @Override
+        public double getPassengersRidingOffset() {
+            return 0.0;
         }
 
         @Override

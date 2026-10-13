@@ -246,9 +246,6 @@ public class BuildersWorkbenchMenu extends AbstractContainerMenu {
 
         return false;
     }
-    public ItemStack getWorkbenchItem(int containerIndex) {
-        return this.container.getItem(containerIndex);
-    }
     public BuildersWorkbenchBlockEntity getBlockEntity() {
         return blockEntity;
     }

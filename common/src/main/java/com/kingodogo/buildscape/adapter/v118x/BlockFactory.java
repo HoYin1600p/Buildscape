@@ -846,7 +846,7 @@ public class BlockFactory implements IBlockFactory {
                 // Reference: drops one layer item per layer, ignoring the loot table (which gives a single item).
                 @Override
                 public List<ItemStack> getDrops(BlockState state, net.minecraft.world.level.storage.loot.LootContext.Builder builder) {
-                    return List.of(new ItemStack(this.asItem(), state.getValue(LAYERS)));
+                    return List.of(new ItemStack(net.minecraft.core.Registry.ITEM.get(net.minecraft.core.Registry.BLOCK.getKey(this)), state.getValue(LAYERS)));
                 }
             };
         } else if (def.isMossLayers()) {
@@ -876,7 +876,7 @@ public class BlockFactory implements IBlockFactory {
                 // Reference: drops one layer item per layer, ignoring the loot table (which gives a single item).
                 @Override
                 public List<ItemStack> getDrops(BlockState state, net.minecraft.world.level.storage.loot.LootContext.Builder builder) {
-                    return List.of(new ItemStack(this.asItem(), state.getValue(LAYERS)));
+                    return List.of(new ItemStack(net.minecraft.core.Registry.ITEM.get(net.minecraft.core.Registry.BLOCK.getKey(this)), state.getValue(LAYERS)));
                 }
             };
         } else if (def.isWoolLayers()) {

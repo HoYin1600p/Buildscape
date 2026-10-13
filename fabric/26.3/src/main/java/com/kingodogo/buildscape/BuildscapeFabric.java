@@ -1,128 +1,90 @@
 package com.kingodogo.buildscape;
 
+import com.kingodogo.buildscape.adapter.v263.PlatformAdapterBase;
+import com.kingodogo.buildscape.adapter.v263.PacketFactory.BuildscapeCustomPayload;
+import com.kingodogo.buildscape.network.PacketDirection;
+import com.kingodogo.buildscape.platform.Services;
+import com.kingodogo.buildscape.recipe.framework.BuildScapeRecipeLoader;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
+import net.fabricmc.fabric.api.resource.v1.ResourceLoader;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.Identifier;
+import net.minecraft.server.packs.PackType;
 
 public class BuildscapeFabric implements ModInitializer {
-    public BuildscapeFabric() {
-        init();
-    }
-
-    @Override
-    public void onInitialize() {
-        init();
-    }
+    @Override public void onInitialize() { init(); }
+    private static final com.kingodogo.buildscape.registry.StartupOnce STARTUP = new com.kingodogo.buildscape.registry.StartupOnce();
 
     public static void init() {
-        BuildscapeCommon.init();
-        registerRecipeReloading();
-        registerNetworking();
-    }
-
-    private static boolean recipeReloadingRegistered;
-
-    private static synchronized void registerRecipeReloading() {
-        if (recipeReloadingRegistered) return;
-        recipeReloadingRegistered = true;
-        try {
-            net.minecraft.server.packs.resources.PreparableReloadListener baseListener = com.kingodogo.buildscape.platform.Services.PLATFORM.createRecipeReloadListener();
-            Class<?> listenerType = Class.forName("net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener");
-            Object listener = java.lang.reflect.Proxy.newProxyInstance(listenerType.getClassLoader(),
-                    new Class<?>[]{listenerType}, (proxy, method, args) -> {
-                        if (method.getName().equals("getFabricId")) {
-                            return net.minecraft.resources.Identifier.fromNamespaceAndPath(BuildscapeCommon.MOD_ID, "dynamic_recipes");
-                        }
-                        if (method.getName().equals("reload")) {
-                            return method.invoke(baseListener, args);
-                        }
-                        return null;
-                    });
-            Class<?> helperType = Class.forName("net.fabricmc.fabric.api.resource.ResourceManagerHelper");
-            Object helper = helperType.getMethod("get", net.minecraft.server.packs.PackType.class)
-                    .invoke(null, net.minecraft.server.packs.PackType.SERVER_DATA);
-            helperType.getMethod("registerReloadListener", listenerType).invoke(helper, listener);
-
-            Class<?> events = Class.forName("net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents");
-            registerLifecycleCallback(events.getField("SERVER_STARTING").get(null), server -> {
-                try {
-                    Object manager = server.getClass().getMethod("getRecipeManager").invoke(server);
-                    com.kingodogo.buildscape.recipe.framework.BuildScapeRecipeLoader.INSTANCE
-                            .setCurrentRecipeManager((net.minecraft.world.item.crafting.RecipeManager) manager);
-                } catch (ReflectiveOperationException e) {
-                    BuildscapeCommon.LOGGER.error("Failed to obtain Fabric server recipe manager", e);
-                }
+        STARTUP.run(() -> {
+            net.fabricmc.fabric.api.attachment.v1.AttachmentType<net.minecraft.nbt.CompoundTag> persistentData =
+                    net.fabricmc.fabric.api.attachment.v1.AttachmentRegistry.<net.minecraft.nbt.CompoundTag>builder()
+                            .initializer(net.minecraft.nbt.CompoundTag::new)
+                            .persistent(com.kingodogo.buildscape.data.PersistentData.CODEC)
+                            .buildAndRegister(Identifier.fromNamespaceAndPath(
+                                    BuildscapeCommon.MOD_ID, com.kingodogo.buildscape.data.PersistentData.ATTACHMENT_PATH));
+            com.kingodogo.buildscape.data.PersistentData.install(owner ->
+                    ((net.fabricmc.fabric.api.attachment.v1.AttachmentTarget) owner).getAttachedOrCreate(persistentData));
+            BuildscapeCommon.init();
+            net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents.END_SERVER_TICK.register(server ->
+                    com.kingodogo.buildscape.world.ModGameRules.syncIfChanged(server.overworld()));
+            com.kingodogo.buildscape.event.LoaderDispenserSetup.register();
+            com.kingodogo.buildscape.worldgen.ModBiomeModifications.register();
+            Services.PLATFORM.registerEntityAttributes(FabricDefaultAttributeRegistry::register);
+            ((PlatformAdapterBase) Services.PLATFORM).registerExperienceCauldronInteractions(
+                    net.minecraft.core.cauldron.BuildscapeCauldronRegistration::register);
+            ResourceLoader.get(PackType.SERVER_DATA).registerReloadListener(
+                    Identifier.fromNamespaceAndPath(BuildscapeCommon.MOD_ID, "dynamic_recipes"),
+                    Services.PLATFORM.createRecipeReloadListener());
+            // 26.3 builds a fresh RecipeManager per data reload and no longer exposes it to reload
+            // listeners, so the new manager is taken from the finished resources (and from the server on
+            // first start). Recipes are injected into it, then its derived tables are rebuilt.
+            ServerLifecycleEvents.SERVER_STARTING.register(server -> {
+                ((PlatformAdapterBase) Services.PLATFORM).registerDeferredServerData(server);
+                useRecipeManager(server, server.getRecipeManager());
+                com.kingodogo.buildscape.adapter.v263.PacketFactory.setServer(server);
             });
-            registerLifecycleCallback(events.getField("SERVER_STOPPED").get(null), server ->
-                    com.kingodogo.buildscape.recipe.framework.BuildScapeRecipeLoader.INSTANCE.setCurrentRecipeManager(null));
-        } catch (ReflectiveOperationException e) {
-            BuildscapeCommon.LOGGER.error("Failed to attach Fabric dynamic recipe lifecycle hooks", e);
-        }
+            ServerLifecycleEvents.END_DATA_PACK_RELOAD.register((server, resources, success) -> {
+                if (!success) return;
+                ((PlatformAdapterBase) Services.PLATFORM).registerDeferredServerData(server);
+                useRecipeManager(server, server.getRecipeManager());
+            });
+            ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
+                BuildScapeRecipeLoader.INSTANCE.setCurrentRecipeManager(null);
+                com.kingodogo.buildscape.adapter.v263.PacketFactory.setServer(null);
+                BuildscapeCommon.setServerFullyInitialized(false);
+            });
+            ServerLifecycleEvents.SERVER_STARTED.register(server -> BuildscapeCommon.setServerFullyInitialized(true));
+            registerNetworking();
+            com.kingodogo.buildscape.event.FabricGameplayEvents.register();
+        });
     }
 
-    private static void registerLifecycleCallback(Object event, java.util.function.Consumer<Object> callback)
-            throws ReflectiveOperationException {
-        java.lang.reflect.Method register = java.util.Arrays.stream(event.getClass().getMethods())
-                .filter(method -> method.getName().equals("register") && method.getParameterCount() == 1)
-                .findFirst().orElseThrow();
-        Class<?> callbackType = register.getParameterTypes()[0];
-        Object proxy = java.lang.reflect.Proxy.newProxyInstance(callbackType.getClassLoader(), new Class<?>[]{callbackType},
-                (ignored, method, args) -> {
-                    if (args != null && args.length == 1) callback.accept(args[0]);
-                    return null;
-                });
-        register.invoke(event, proxy);
+    private static void useRecipeManager(net.minecraft.server.MinecraftServer server,
+            net.minecraft.world.item.crafting.RecipeManager manager) {
+        BuildScapeRecipeLoader.INSTANCE.setCurrentRecipeManager(manager);
+        // The server finalized the manager before this point; rebuild the recipe-book, property and
+        // stonecutter tables so they include the injected recipes.
+        manager.finalizeRecipeLoading(server.getWorldData().enabledFeatures());
     }
 
     private static void registerNetworking() {
-        try {
-            Class<?> payloadRegistryClass = Class.forName("net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry");
-            Object playC2S = payloadRegistryClass.getMethod("playC2S").invoke(null);
-            Object playS2C = payloadRegistryClass.getMethod("playS2C").invoke(null);
-            java.lang.reflect.Method registerC2S = playC2S.getClass().getMethod("register",
-                    net.minecraft.network.protocol.common.custom.CustomPacketPayload.Type.class,
-                    net.minecraft.network.codec.StreamCodec.class);
-            java.lang.reflect.Method registerS2C = playS2C.getClass().getMethod("register",
-                    net.minecraft.network.protocol.common.custom.CustomPacketPayload.Type.class,
-                    net.minecraft.network.codec.StreamCodec.class);
-
-            Class<?> serverNetworking = Class.forName("net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking");
-            Class<?> serverReceiverClass = Class.forName("net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking$PlayPayloadHandler");
-            java.lang.reflect.Method registerServerReceiver = serverNetworking.getMethod("registerGlobalReceiver",
-                    net.minecraft.network.protocol.common.custom.CustomPacketPayload.Type.class,
-                    serverReceiverClass);
-
-            for (com.kingodogo.buildscape.network.IPacketFactory.PacketDescriptor desc : com.kingodogo.buildscape.network.PacketFactory.getRegisteredDescriptors()) {
-                net.minecraft.resources.Identifier loc = net.minecraft.resources.Identifier.fromNamespaceAndPath(desc.id().getNamespace(), desc.id().getPath());
-                net.minecraft.network.protocol.common.custom.CustomPacketPayload.Type<com.kingodogo.buildscape.adapter.v263.PacketFactory.BuildscapeCustomPayload> type =
-                        new net.minecraft.network.protocol.common.custom.CustomPacketPayload.Type<>(loc);
-                net.minecraft.network.codec.StreamCodec<net.minecraft.network.FriendlyByteBuf, com.kingodogo.buildscape.adapter.v263.PacketFactory.BuildscapeCustomPayload> codec =
-                        com.kingodogo.buildscape.adapter.v263.PacketFactory.BuildscapeCustomPayload.codec(type);
-
-                if (desc.direction() == com.kingodogo.buildscape.network.PacketDirection.CLIENT_TO_SERVER) {
-                    registerC2S.invoke(playC2S, type, codec);
-                    Object handler = java.lang.reflect.Proxy.newProxyInstance(
-                            serverReceiverClass.getClassLoader(),
-                            new Class<?>[]{serverReceiverClass},
-                            (proxy, method, args) -> {
-                                if (method.getName().equals("receive") && args != null && args.length >= 2) {
-                                    com.kingodogo.buildscape.adapter.v263.PacketFactory.BuildscapeCustomPayload payload =
-                                            (com.kingodogo.buildscape.adapter.v263.PacketFactory.BuildscapeCustomPayload) args[0];
-                                    Object ctx = args[1];
-                                    java.lang.reflect.Method playerMethod = ctx.getClass().getMethod("player");
-                                    Object playerObj = playerMethod.invoke(ctx);
-                                    if (playerObj instanceof net.minecraft.server.level.ServerPlayer player) {
-                                        com.kingodogo.buildscape.network.PacketFactory.handleServerbound(desc.id(), payload.data(), player);
-                                    }
-                                }
-                                return null;
-                            }
-                    );
-                    registerServerReceiver.invoke(null, type, handler);
-                } else {
-                    registerS2C.invoke(playS2C, type, codec);
-                }
+        for (var descriptor : com.kingodogo.buildscape.network.PacketFactory.getRegisteredDescriptors()) {
+            var type = new CustomPacketPayload.Type<BuildscapeCustomPayload>(Identifier.fromNamespaceAndPath(
+                    descriptor.id().getNamespace(), descriptor.id().getPath()));
+            var codec = BuildscapeCustomPayload.codec(type);
+            if (descriptor.direction() == PacketDirection.CLIENT_TO_SERVER) {
+                PayloadTypeRegistry.serverboundPlay().register(type, codec);
+                ServerPlayNetworking.registerGlobalReceiver(type, (payload, context) ->
+                        com.kingodogo.buildscape.network.PacketFactory.handleServerbound(
+                                descriptor.id(), payload.data(), context.player()));
+            } else {
+                PayloadTypeRegistry.clientboundPlay().register(type, codec);
             }
-        } catch (Throwable t) {
-            BuildscapeCommon.LOGGER.debug("Fabric 26.3 networking registration deferred or unavailable: {}", t.getMessage());
         }
     }
 }

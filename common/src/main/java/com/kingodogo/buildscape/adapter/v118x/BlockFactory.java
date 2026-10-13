@@ -737,6 +737,11 @@ public class BlockFactory implements IBlockFactory {
             class V118xMangroveLeavesBlock extends LeavesBlock implements BonemealableBlock {
                 public V118xMangroveLeavesBlock(BlockBehaviour.Properties properties) {
                     super(properties);
+                    BlockState base = this.stateDefinition.any();
+                    if (base.hasProperty(BlockStateProperties.WATERLOGGED)) {
+                        base = base.setValue(BlockStateProperties.WATERLOGGED, false);
+                    }
+                    this.registerDefaultState(base.setValue(DISTANCE, 7).setValue(PERSISTENT, false));
                 }
                 @Override
                 public boolean isValidBonemealTarget(BlockGetter level, BlockPos pos, BlockState state, boolean isClient) {
@@ -753,9 +758,45 @@ public class BlockFactory implements IBlockFactory {
             }
             return new V118xMangroveLeavesBlock(props);
         } else if (def.isMangrovePropagule()) {
+            Supplier<Block> propaguleLeaves = resolveBlockSupplier("mangrove_leaves");
+            Supplier<Block> propaguleMud = resolveBlockSupplier("mud");
+            Supplier<Block> propaguleMuddyRoots = resolveBlockSupplier("muddy_mangrove_roots");
             class V118xMangrovePropaguleBlock extends MangrovePropaguleBlock implements BonemealableBlock {
                 public V118xMangrovePropaguleBlock(BlockBehaviour.Properties properties) {
                     super(properties);
+                }
+                private boolean isLeavesAbove(BlockState aboveState) {
+                    return aboveState.is(net.minecraft.tags.BlockTags.LEAVES) || aboveState.is(propaguleLeaves.get());
+                }
+                @Override
+                public boolean canSurvive(BlockState state, LevelReader level, BlockPos pos) {
+                    if (state.getValue(HANGING)) {
+                        return isLeavesAbove(level.getBlockState(pos.above()));
+                    }
+                    BlockState belowState = level.getBlockState(pos.below());
+                    return (belowState.is(net.minecraft.tags.BlockTags.DIRT) && !belowState.is(Blocks.DIRT_PATH))
+                            || belowState.is(Blocks.FARMLAND)
+                            || belowState.is(Blocks.MOSS_BLOCK)
+                            || belowState.is(propaguleMud.get())
+                            || belowState.is(Blocks.CLAY)
+                            || belowState.is(propaguleMuddyRoots.get());
+                }
+                @Override
+                public BlockState updateShape(BlockState state, Direction direction, BlockState adjacentState, LevelAccessor level, BlockPos pos, BlockPos adjacentPos) {
+                    if (state.getValue(WATERLOGGED)) {
+                        level.scheduleTick(pos, net.minecraft.world.level.material.Fluids.WATER, net.minecraft.world.level.material.Fluids.WATER.getTickDelay(level));
+                    }
+                    if (state.getValue(HANGING)) {
+                        if (direction == Direction.UP && !isLeavesAbove(level.getBlockState(pos.above()))) {
+                            return Blocks.AIR.defaultBlockState();
+                        }
+                    } else if (direction == Direction.DOWN) {
+                        if (!canSurvive(state, level, pos)) {
+                            return Blocks.AIR.defaultBlockState();
+                        }
+                        return state.setValue(ON_FARMLAND, shouldSink(level, pos));
+                    }
+                    return super.updateShape(state, direction, adjacentState, level, pos, adjacentPos);
                 }
                 @Override
                 public boolean isValidBonemealTarget(BlockGetter level, BlockPos pos, BlockState state, boolean isClient) {
@@ -947,7 +988,9 @@ public class BlockFactory implements IBlockFactory {
                 }
                 @Override
                 public void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, BlockPos fromPos, boolean isMoving) {
-                    onNeighborUpdate(level, pos, state, block, fromPos, isMoving);
+                    if (fromPos.equals(pos.above()) || fromPos.equals(pos.below())) {
+                        onNeighborUpdate(level, pos, state, block, fromPos, isMoving);
+                    }
                 }
                 @Override
                 public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
@@ -1547,6 +1590,7 @@ public class BlockFactory implements IBlockFactory {
                 @Override
                 public BlockState updateShape(BlockState state, Direction direction, BlockState adjacentState, LevelAccessor level, BlockPos pos, BlockPos adjacentPos) {
                     BlockState adjusted = onUpdateShape(state, direction, adjacentState, level, pos, adjacentPos);
+                    if (direction == Direction.DOWN) return adjusted;
                     return super.updateShape(adjusted, direction, adjacentState, level, pos, adjacentPos);
                 }
 
@@ -1587,6 +1631,7 @@ public class BlockFactory implements IBlockFactory {
                 @Override
                 public BlockState updateShape(BlockState state, Direction direction, BlockState adjacentState, LevelAccessor level, BlockPos pos, BlockPos adjacentPos) {
                     BlockState adjusted = onUpdateShape(state, direction, adjacentState, level, pos, adjacentPos);
+                    if (direction == Direction.DOWN) return adjusted;
                     return super.updateShape(adjusted, direction, adjacentState, level, pos, adjacentPos);
                 }
 
@@ -1727,6 +1772,7 @@ public class BlockFactory implements IBlockFactory {
                 @Override
                 public BlockState updateShape(BlockState state, Direction direction, BlockState adjacentState, LevelAccessor level, BlockPos pos, BlockPos adjacentPos) {
                     BlockState adjusted = onUpdateShape(state, direction, adjacentState, level, pos, adjacentPos);
+                    if (direction == Direction.DOWN) return adjusted;
                     return super.updateShape(adjusted, direction, adjacentState, level, pos, adjacentPos);
                 }
             }
@@ -1736,7 +1782,7 @@ public class BlockFactory implements IBlockFactory {
             return new SnowyBushBlock(props, snowBricks) {
                 @Override
                 public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
-                    if (!state.canSurvive(level, pos)) return Blocks.AIR.defaultBlockState();
+                    if (direction != Direction.DOWN && !state.canSurvive(level, pos)) return Blocks.AIR.defaultBlockState();
                     return onUpdateShape(state, direction, neighborState, level, pos, neighborPos);
                 }
                 @Override
@@ -1753,7 +1799,7 @@ public class BlockFactory implements IBlockFactory {
                 }
                 @Override
                 public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
-                    if (!state.canSurvive(level, pos)) return Blocks.AIR.defaultBlockState();
+                    if (direction != Direction.DOWN && !state.canSurvive(level, pos)) return Blocks.AIR.defaultBlockState();
                     return onUpdateShape(state, direction, neighborState, level, pos, neighborPos);
                 }
                 @Override
@@ -1783,7 +1829,7 @@ public class BlockFactory implements IBlockFactory {
                 }
                 @Override
                 public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
-                    if (!state.canSurvive(level, pos)) return Blocks.AIR.defaultBlockState();
+                    if (direction != Direction.DOWN && !state.canSurvive(level, pos)) return Blocks.AIR.defaultBlockState();
                     return onUpdateShape(state, direction, neighborState, level, pos, neighborPos);
                 }
                 @Override

@@ -1358,7 +1358,7 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
 
     @Override
     public boolean isSameItemSameComponents(ItemStack a, ItemStack b) {
-        return ItemStack.matches(a, b);
+        return ItemStack.isSameItemSameComponents(a, b);
     }
 
     @Override

@@ -1653,6 +1653,22 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter, com.kingo
         };
     }
 
+    /**
+     * Forge/NeoForge capture the block snapshots of an item use, so the neighbour updates of the lower half run only
+     * after the upper half is placed. Without it (Fabric) the replaced vegetation above the lower half dies from the
+     * update, the lower half sees air above and removes itself, and the second half is never placed. Placing the lower
+     * half without shape updates (flag 16) and letting setPlacedBy place the upper half reproduces that order.
+     */
+    @Override
+    public BlockItem createDoublePlantBlockItem(Block block, Item.Properties properties) {
+        return new BlockItem(block, properties) {
+            @Override
+            protected boolean placeBlock(net.minecraft.world.item.context.BlockPlaceContext context, net.minecraft.world.level.block.state.BlockState state) {
+                return context.getLevel().setBlock(context.getClickedPos(), state, 11 | 16);
+            }
+        };
+    }
+
     @Override
     public BlockItem createGlassJarItem(Block block, Item.Properties properties) {
         return new com.kingodogo.buildscape.item.GlassJarItem(block, properties);

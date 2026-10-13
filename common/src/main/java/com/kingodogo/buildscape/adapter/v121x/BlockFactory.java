@@ -464,7 +464,8 @@ public class BlockFactory implements IBlockFactory {
         } else if (def.isTrapdoor()) {
             return new TrapDoorBlock(BlockSetType.OAK, props) {};
         } else if (def.isButton()) {
-            return new ButtonBlock(BlockSetType.OAK, 30, props) {
+            boolean stoneButton = def.getBlockType().equals("ModButtonBlock");
+            return new ButtonBlock(stoneButton ? BlockSetType.STONE : BlockSetType.OAK, stoneButton ? 20 : 30, props) {
                 @Override public SoundType getSoundType(BlockState state) { return referenceControlSound(def); }
             };
         } else if (def.isPressurePlate()) {
@@ -854,7 +855,9 @@ public class BlockFactory implements IBlockFactory {
                 }
                 @Override
                 protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, BlockPos fromPos, boolean isMoving) {
-                    onNeighborUpdate(level, pos, state, block, fromPos, isMoving);
+                    if (fromPos.equals(pos.above()) || fromPos.equals(pos.below())) {
+                        onNeighborUpdate(level, pos, state, block, fromPos, isMoving);
+                    }
                 }
                 @Override
                 protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
@@ -1598,6 +1601,7 @@ public class BlockFactory implements IBlockFactory {
                 @Override
                 protected BlockState updateShape(BlockState state, Direction direction, BlockState adjacentState, LevelAccessor level, BlockPos pos, BlockPos adjacentPos) {
                     BlockState adjusted = onUpdateShape(state, direction, adjacentState, level, pos, adjacentPos);
+                    if (direction == Direction.DOWN) return adjusted;
                     return super.updateShape(adjusted, direction, adjacentState, level, pos, adjacentPos);
                 }
 
@@ -1820,6 +1824,7 @@ public class BlockFactory implements IBlockFactory {
                 @Override
                 protected BlockState updateShape(BlockState state, Direction direction, BlockState adjacentState, LevelAccessor level, BlockPos pos, BlockPos adjacentPos) {
                     BlockState adjusted = onUpdateShape(state, direction, adjacentState, level, pos, adjacentPos);
+                    if (direction == Direction.DOWN) return adjusted;
                     return super.updateShape(adjusted, direction, adjacentState, level, pos, adjacentPos);
                 }
                 @Override
@@ -1833,7 +1838,7 @@ public class BlockFactory implements IBlockFactory {
             return new SnowyBushBlock(props, snowBricks) {
                 @Override
                 protected BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
-                    if (!state.canSurvive(level, pos)) return Blocks.AIR.defaultBlockState();
+                    if (direction != Direction.DOWN && !state.canSurvive(level, pos)) return Blocks.AIR.defaultBlockState();
                     return onUpdateShape(state, direction, neighborState, level, pos, neighborPos);
                 }
                 @Override
@@ -1854,7 +1859,7 @@ public class BlockFactory implements IBlockFactory {
                 }
                 @Override
                 protected BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
-                    if (!state.canSurvive(level, pos)) return Blocks.AIR.defaultBlockState();
+                    if (direction != Direction.DOWN && !state.canSurvive(level, pos)) return Blocks.AIR.defaultBlockState();
                     return onUpdateShape(state, direction, neighborState, level, pos, neighborPos);
                 }
                 @Override

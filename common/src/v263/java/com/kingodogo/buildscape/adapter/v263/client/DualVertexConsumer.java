@@ -12,6 +12,7 @@ final class DualVertexConsumer implements VertexConsumer {
     public VertexConsumer setUv(float u, float v) { base.setUv(u, v); foil.setUv(u, v); return this; }
     public VertexConsumer setUv1(int u, int v) { base.setUv1(u, v); foil.setUv1(u, v); return this; }
     public VertexConsumer setUv2(int u, int v) { base.setUv2(u, v); foil.setUv2(u, v); return this; }
+    public VertexConsumer setUv3(float u, float v) { base.setUv3(u, v); foil.setUv3(u, v); return this; }
     public VertexConsumer setNormal(float x, float y, float z) { base.setNormal(x, y, z); foil.setNormal(x, y, z); return this; }
     public VertexConsumer setLineWidth(float width) { base.setLineWidth(width); foil.setLineWidth(width); return this; }
 }

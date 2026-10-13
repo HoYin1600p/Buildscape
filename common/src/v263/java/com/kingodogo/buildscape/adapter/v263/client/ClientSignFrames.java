@@ -80,7 +80,7 @@ public final class ClientSignFrames {
         pose.pushPose();
         try {
             pose.translate(0.5, 0.5, 0.5);
-            pose.mulPose(Axis.YP.rotationDegrees(-((frame.rotation + 180) % 360)));
+            pose.rotate(Axis.YP.rotationDegrees(-((frame.rotation + 180) % 360)));
             if (frame.standing) pose.translate(0, 0.3125, -0.4375);
             // Item models are centred; this is the reference block-model origin.
             frame.model.submit(pose, collector, frame.light, frame.overlay, 0);

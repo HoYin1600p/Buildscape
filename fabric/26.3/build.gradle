@@ -63,13 +63,19 @@ dependencies {
 
 // common/src/v263/resources overlays the 26.2 resources: copy only the main files it leaves alone.
 apply from: rootProject.file('gradle/v263-resources.gradle')
+// The overlay is copied here as well (not only through commonVariant): a dev run puts the common
+// outputs on the classpath as plain folders that Fabric does not treat as part of the mod, so the
+// overlay data would otherwise be missing from the mod's resources.
 tasks.named('processResources') {
     v263MainResources(delegate)
+    from(v263OverlayDir)
     inputs.dir(v263OverlayDir)
     duplicatesStrategy = DuplicatesStrategy.FAIL
 }
 tasks.named('jar', Jar) {
-    from configurations.commonVariant
+    from(configurations.commonVariant) {
+        exclude { element -> new File(v263OverlayDir, element.relativePath.pathString).isFile() }
+    }
     duplicatesStrategy = DuplicatesStrategy.FAIL
 }
 tasks.withType(JavaExec).configureEach {

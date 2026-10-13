@@ -410,7 +410,8 @@ public class BlockFactory implements IBlockFactory {
         } else if (def.isWeatheringPressurePlate()) {
             return new net.minecraft.world.level.block.WeightedPressurePlateBlock(WeatheringBlockLogic.PRESSURE_PLATE_MAX_WEIGHT, props.randomTicks()) {
                 @Override public boolean isRandomlyTicking(BlockState state) { return true; }
-                @Override public void randomTick(BlockState state, ServerLevel level, BlockPos pos, Random random) { WeatheringBlockLogic.randomTick(state, level, pos); }
+                // Reference oxidation schedules the powered replacement's release tick.
+                @Override public void randomTick(BlockState state, ServerLevel level, BlockPos pos, Random random) { RestoredCopperOxidation.tryOxidize(level, pos, state); }
             };
         } else if (def.isWeatheringSlab()) {
             return new net.minecraft.world.level.block.SlabBlock(props.randomTicks()) {
@@ -719,6 +720,10 @@ public class BlockFactory implements IBlockFactory {
                     onNeighborUpdate(level, pos, state, block, fromPos, isMoving);
                 }
                 @Override
+                public void animateTick(BlockState state, Level level, BlockPos pos, Random random) {
+                    onAnimateTick(state, level, pos);
+                }
+                @Override
                 public boolean hasAnalogOutputSignal(BlockState state) {
                     return true;
                 }
@@ -989,7 +994,13 @@ public class BlockFactory implements IBlockFactory {
                     return isCommonPathfindable(state, type);
                 }
             }
-            return new V118xColoredMossLayersBlock(props);
+            return new V118xColoredMossLayersBlock(props) {
+                // Reference: drops one layer item per layer, ignoring the loot table (which gives a single item).
+                @Override
+                public List<ItemStack> getDrops(BlockState state, net.minecraft.world.level.storage.loot.LootContext.Builder builder) {
+                    return List.of(new ItemStack(net.minecraft.core.Registry.ITEM.get(net.minecraft.core.Registry.BLOCK.getKey(this)), state.getValue(LAYERS)));
+                }
+            };
         } else if (def.isMossLayers()) {
             class V118xMossLayersBlock extends MossLayersBlock {
                 public V118xMossLayersBlock(BlockBehaviour.Properties properties) {
@@ -1013,7 +1024,13 @@ public class BlockFactory implements IBlockFactory {
                     return isCommonPathfindable(state, type);
                 }
             }
-            return new V118xMossLayersBlock(props);
+            return new V118xMossLayersBlock(props) {
+                // Reference: drops one layer item per layer, ignoring the loot table (which gives a single item).
+                @Override
+                public List<ItemStack> getDrops(BlockState state, net.minecraft.world.level.storage.loot.LootContext.Builder builder) {
+                    return List.of(new ItemStack(net.minecraft.core.Registry.ITEM.get(net.minecraft.core.Registry.BLOCK.getKey(this)), state.getValue(LAYERS)));
+                }
+            };
         } else if (def.isWoolLayers()) {
             String color = def.getId().replace("_carpet_layers", "").replace("_layered_wool_layers", "");
             Supplier<Item> carpetSupplier = resolveItemSupplier(color + "_carpet_layers");

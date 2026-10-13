@@ -88,6 +88,23 @@ public final class ForgeGameplayEvents {
         bus.addListener((WorldEvent.Unload event) -> {
             if (event.getWorld() instanceof ServerLevel level) {
                 ModCommonEvents.onLevelUnload(level);
+                com.kingodogo.buildscape.block.EyeblossomTransitionHandler.onWorldUnload(level);
+            }
+        });
+        bus.addListener((TickEvent.WorldTickEvent event) -> {
+            if (event.phase == TickEvent.Phase.END && event.world instanceof ServerLevel level) {
+                com.kingodogo.buildscape.block.EyeblossomTransitionHandler.onWorldTick(level);
+            }
+        });
+        bus.addListener((net.minecraftforge.event.world.ChunkEvent.Load event) -> {
+            if (event.getWorld() instanceof ServerLevel level
+                    && event.getChunk() instanceof net.minecraft.world.level.chunk.LevelChunk chunk) {
+                com.kingodogo.buildscape.block.EyeblossomTransitionHandler.onChunkLoad(level, chunk);
+            }
+        });
+        bus.addListener((net.minecraftforge.event.world.ChunkEvent.Unload event) -> {
+            if (event.getWorld() instanceof ServerLevel level) {
+                com.kingodogo.buildscape.block.EyeblossomTransitionHandler.onChunkUnload(level, event.getChunk().getPos());
             }
         });
         bus.addListener((ServerStartedEvent event) -> ModCommonEvents.onServerStarted(event.getServer()));

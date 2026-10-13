@@ -14,11 +14,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(ItemStack.class)
 public class ItemMixin {
 
-    @Dynamic("Forge 1.18.2 cake stacking; other VersionClusters retain their existing stack limits")
+    @Dynamic("Forge 1.18.2 and 26.x cake stacking (NeoForge 26.x ItemStack overrides the ItemInstance default); other VersionClusters retain their existing stack limits")
     @Inject(method = {"getMaxStackSize()I", "m_41741_()I"}, at = @At("HEAD"),
             cancellable = true, require = 0, remap = false)
     private void buildscape$legacyCakeMaxStackSize(CallbackInfoReturnable<Integer> cir) {
-        if (!Services.isVersionCluster("v118x")) return;
+        if (!Services.isVersionCluster("v118x") && !Services.isVersionCluster("v26x")) return;
         ItemStack self = (ItemStack) (Object) this;
         if (self.is(Items.POTION)) {
             cir.setReturnValue(Services.PLATFORM.isWaterPotion(self)

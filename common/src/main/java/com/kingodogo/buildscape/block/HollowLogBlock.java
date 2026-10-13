@@ -416,7 +416,13 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
             if (potBlock == Blocks.FLOWER_POT) {
                 return List.of(new ItemStack(Items.FLOWER_POT));
             } else {
-                return List.of(new ItemStack(potBlock.asItem()));
+                Block content = Services.PLATFORM.getFlowerPotPlant(potBlock);
+                ItemStack plantDrop = (content != null && content != Blocks.AIR) ? new ItemStack(content) : ItemStack.EMPTY;
+                if (!plantDrop.isEmpty()) {
+                    return List.of(new ItemStack(Items.FLOWER_POT), plantDrop);
+                } else {
+                    return List.of(new ItemStack(potBlock.asItem()));
+                }
             }
         }
         return List.of(new ItemStack(decState.getBlock()));
@@ -526,6 +532,11 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
 
     @Override
     public void onPlayerDestroy(Level level, BlockPos pos, BlockState state, Player player) {
+        onBlockRemoved(level, pos, state);
+    }
+
+    /** Drops the stored covers and decoration, notifies transport and restores a source fluid. Runs when the log is removed or replaced. */
+    public void onBlockRemoved(Level level, BlockPos pos, BlockState state) {
         BlockEntity be = level.getBlockEntity(pos);
         Fluid sourceFluid = HollowPipeBlock.getSourceFluid(state, be);
         if (be instanceof HollowLogBlockEntity hollowBe) {
@@ -632,7 +643,7 @@ public class HollowLogBlock extends RotatedPillarBlock implements EntityBlock, S
     @Override
     public void onNeighborUpdate(Level level, BlockPos pos, BlockState state, Block neighborBlock, BlockPos neighborPos, boolean isMoving) {
         if (!level.isClientSide()) {
-            HollowPipeTransportManager.onNeighborChanged(level, pos, state, pos);
+            HollowPipeTransportManager.onNeighborChanged(level, pos, state, neighborPos);
         }
     }
 

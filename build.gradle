@@ -57,9 +57,10 @@ subprojects {
 }
 
 def loaderProjects = [project(':fabric:26.2'), project(':neoforge:26.2')]
+if (findProject(':forge:26.2') != null) loaderProjects.add(project(':forge:26.2'))
 def collectModJars = tasks.register('collectModJars', Copy) {
     group = 'build'
-    description = 'Collects the Fabric and NeoForge 26.2 mod jars into build/libs'
+    description = 'Collects the enabled 26.2 loader mod jars into build/libs'
     into layout.buildDirectory.dir('libs')
     loaderProjects.each { loader ->
         from loader.tasks.named('jar')
@@ -69,6 +70,9 @@ def collectModJars = tasks.register('collectModJars', Copy) {
 tasks.named('assemble') { dependsOn collectModJars }
 tasks.named('build') {
     dependsOn ':common:build', ':fabric:26.2:build', ':neoforge:26.2:build'
+    if (findProject(':forge:26.2') != null) {
+        dependsOn ':forge:26.2:build'
+    }
     if (findProject(':forge:1.18.2') != null) {
         dependsOn ':forge:1.18.2:build'
     }

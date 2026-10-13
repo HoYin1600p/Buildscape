@@ -3,6 +3,8 @@ plugins {
     id 'xyz.wagyourtail.unimined'
 }
 
+def v263Enabled = providers.gradleProperty('buildscape.v263').getOrElse('false') == 'true'
+
 sourceSets {
     main {
         java.srcDirs = []
@@ -14,6 +16,7 @@ sourceSets {
             srcDirs = ['src/main/java', 'src/v118x/java']
             exclude 'com/kingodogo/buildscape/adapter/v121x/**'
             exclude 'com/kingodogo/buildscape/adapter/v26x/**'
+            exclude 'com/kingodogo/buildscape/adapter/v263/**'
         }
         resources.srcDirs = ['src/main/resources', 'src/v118x/resources']
     }
@@ -23,6 +26,7 @@ sourceSets {
             srcDirs = ['src/main/java', 'src/v121x/java']
             exclude 'com/kingodogo/buildscape/adapter/v118x/**'
             exclude 'com/kingodogo/buildscape/adapter/v26x/**'
+            exclude 'com/kingodogo/buildscape/adapter/v263/**'
         }
         // This cluster supplies a complete 1.21.1 resource tree.
         resources.srcDirs = ['src/v121x/resources']
@@ -33,6 +37,7 @@ sourceSets {
             srcDirs = ['src/main/java', 'src/v26x/java']
             exclude 'com/kingodogo/buildscape/adapter/v118x/**'
             exclude 'com/kingodogo/buildscape/adapter/v121x/**'
+            exclude 'com/kingodogo/buildscape/adapter/v263/**'
         }
         resources.srcDirs = ['src/main/resources', 'src/v26x/resources']
     }
@@ -59,6 +64,41 @@ sourceSets {
         def minecraftClasspath = files(provider { tasks.named('compileV121xJava', JavaCompile).get().classpath })
         compileClasspath += sourceSets.v121x.output + minecraftClasspath
         runtimeClasspath += sourceSets.v121x.output + sourceSets.v121x.runtimeClasspath + minecraftClasspath
+    }
+}
+
+// v26x remains 26.2. Only the opt-in graph creates the independent 26.3 cluster.
+if (v263Enabled) {
+    sourceSets {
+        v263 {
+            java {
+                srcDirs = ['src/main/java', 'src/v263/java']
+                exclude 'com/kingodogo/buildscape/adapter/v118x/**'
+                exclude 'com/kingodogo/buildscape/adapter/v121x/**'
+                exclude 'com/kingodogo/buildscape/adapter/v26x/**'
+            }
+            resources.srcDirs = ['src/main/resources', 'src/v263/resources']
+        }
+    }
+    configurations {
+        v263Elements { canBeResolved = false; canBeConsumed = true }
+    }
+    tasks.named('compileV263Java', JavaCompile) {
+        options.release.set(25)
+        options.compilerArgs += ['-Xmaxerrs', '100000', '-Xmaxwarns', '100000']
+    }
+    def v263ClusterResourcesDir = layout.buildDirectory.dir('resources/v263Cluster')
+    def v263ClusterResources = tasks.register('v263ClusterResources', Sync) {
+        from 'src/v263/resources'
+        into v263ClusterResourcesDir
+    }
+    artifacts {
+        add('v263Elements', sourceSets.v263.output.classesDirs.singleFile) {
+            builtBy tasks.named('compileV263Java')
+        }
+        add('v263Elements', v263ClusterResourcesDir.get().asFile) {
+            builtBy v263ClusterResources
+        }
     }
 }
 
@@ -120,6 +160,7 @@ dependencies {
             v121xCompileOnly dependency
         }
         v26xCompileOnly dependency
+        if (v263Enabled) add('v263CompileOnly', dependency)
     }
 
     v26xCompileOnly 'com.google.code.gson:gson:2.10.1'
@@ -134,6 +175,15 @@ dependencies {
     v26xCompileOnly 'org.jetbrains:annotations:26.0.2'
     v26xCompileOnly 'com.google.guava:guava:33.6.0-jre'
     v26xCompileOnly 'org.slf4j:slf4j-api:2.0.17'
+
+    if (v263Enabled) {
+        v263CompileOnly 'com.google.code.gson:gson:2.10.1'
+        v263CompileOnly 'io.netty:netty-buffer:4.2.15.Final'
+        v263CompileOnly 'it.unimi.dsi:fastutil:8.5.18'
+        v263CompileOnly 'org.jetbrains:annotations:26.0.2'
+        v263CompileOnly 'com.google.guava:guava:33.6.0-jre'
+        v263CompileOnly 'org.slf4j:slf4j-api:2.0.17'
+    }
 
 }
 

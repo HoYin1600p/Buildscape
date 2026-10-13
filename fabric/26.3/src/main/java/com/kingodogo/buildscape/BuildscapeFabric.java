@@ -92,10 +92,10 @@ public class BuildscapeFabric implements ModInitializer {
 
             for (com.kingodogo.buildscape.network.IPacketFactory.PacketDescriptor desc : com.kingodogo.buildscape.network.PacketFactory.getRegisteredDescriptors()) {
                 net.minecraft.resources.Identifier loc = net.minecraft.resources.Identifier.fromNamespaceAndPath(desc.id().getNamespace(), desc.id().getPath());
-                net.minecraft.network.protocol.common.custom.CustomPacketPayload.Type<com.kingodogo.buildscape.adapter.v26x.PacketFactory.BuildscapeCustomPayload> type =
+                net.minecraft.network.protocol.common.custom.CustomPacketPayload.Type<com.kingodogo.buildscape.adapter.v263.PacketFactory.BuildscapeCustomPayload> type =
                         new net.minecraft.network.protocol.common.custom.CustomPacketPayload.Type<>(loc);
-                net.minecraft.network.codec.StreamCodec<net.minecraft.network.FriendlyByteBuf, com.kingodogo.buildscape.adapter.v26x.PacketFactory.BuildscapeCustomPayload> codec =
-                        com.kingodogo.buildscape.adapter.v26x.PacketFactory.BuildscapeCustomPayload.codec(type);
+                net.minecraft.network.codec.StreamCodec<net.minecraft.network.FriendlyByteBuf, com.kingodogo.buildscape.adapter.v263.PacketFactory.BuildscapeCustomPayload> codec =
+                        com.kingodogo.buildscape.adapter.v263.PacketFactory.BuildscapeCustomPayload.codec(type);
 
                 if (desc.direction() == com.kingodogo.buildscape.network.PacketDirection.CLIENT_TO_SERVER) {
                     registerC2S.invoke(playC2S, type, codec);
@@ -104,8 +104,8 @@ public class BuildscapeFabric implements ModInitializer {
                             new Class<?>[]{serverReceiverClass},
                             (proxy, method, args) -> {
                                 if (method.getName().equals("receive") && args != null && args.length >= 2) {
-                                    com.kingodogo.buildscape.adapter.v26x.PacketFactory.BuildscapeCustomPayload payload =
-                                            (com.kingodogo.buildscape.adapter.v26x.PacketFactory.BuildscapeCustomPayload) args[0];
+                                    com.kingodogo.buildscape.adapter.v263.PacketFactory.BuildscapeCustomPayload payload =
+                                            (com.kingodogo.buildscape.adapter.v263.PacketFactory.BuildscapeCustomPayload) args[0];
                                     Object ctx = args[1];
                                     java.lang.reflect.Method playerMethod = ctx.getClass().getMethod("player");
                                     Object playerObj = playerMethod.invoke(ctx);

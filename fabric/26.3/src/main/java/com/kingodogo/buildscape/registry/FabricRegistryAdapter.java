@@ -10,18 +10,28 @@ public class FabricRegistryAdapter extends BaseRegistryAdapter {
     }
 
     @Override
-    public void init() {
+    public synchronized void init() {
+        if (isInitialized()) return;
+        com.kingodogo.buildscape.adapter.v263.fluid.ExperienceFluids.register();
         super.init();
         registerTo(BuiltInRegistries.BLOCK, modBlocks);
         registerTo(BuiltInRegistries.ITEM, modItems);
+        com.kingodogo.buildscape.adapter.v263.RemovedIdAliases.register(BuiltInRegistries.BLOCK,
+                ((net.fabricmc.fabric.api.event.registry.FabricRegistry) BuiltInRegistries.BLOCK)::addAlias);
+        com.kingodogo.buildscape.adapter.v263.RemovedIdAliases.register(BuiltInRegistries.ITEM,
+                ((net.fabricmc.fabric.api.event.registry.FabricRegistry) BuiltInRegistries.ITEM)::addAlias);
         registerTo(BuiltInRegistries.BLOCK_ENTITY_TYPE, modBlockEntities);
         registerTo(BuiltInRegistries.ENTITY_TYPE, modEntities);
+        com.kingodogo.buildscape.adapter.v263.RemovedIdAliases.register(BuiltInRegistries.ENTITY_TYPE,
+                ((net.fabricmc.fabric.api.event.registry.FabricRegistry) BuiltInRegistries.ENTITY_TYPE)::addAlias);
         registerTo(BuiltInRegistries.SOUND_EVENT, modSounds);
         registerTo(BuiltInRegistries.RECIPE_SERIALIZER, (java.util.Map) modRecipeSerializers);
         registerTo(BuiltInRegistries.MENU, modMenus);
         if (creativeTab != null) {
             com.kingodogo.buildscape.platform.Services.PLATFORM.register(BuiltInRegistries.CREATIVE_MODE_TAB, ModCreativeTabs.TAB_ID, creativeTab);
         }
-        System.out.println("[Buildscape Fabric 26.3] Successfully registered " + modBlocks.size() + " blocks, " + modItems.size() + " items, " + modBlockEntities.size() + " block entities, " + modEntities.size() + " entities, and " + modSounds.size() + " sounds, and " + modMenus.size() + " menus.");
+        // Fabric registers custom stats during onInitialize, while the registries are writable.
+        com.kingodogo.buildscape.stat.ModStats.registerStats();
+        System.out.println("[Buildscape Fabric 26.3] Successfully registered " + modBlocks.size() + " blocks, " + modItems.size() + " items, " + modBlockEntities.size() + " block entities, " + modEntities.size() + " entities, " + modSounds.size() + " sounds, and " + modMenus.size() + " menus.");
     }
 }

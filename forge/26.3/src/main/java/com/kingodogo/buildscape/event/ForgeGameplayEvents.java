@@ -31,10 +31,19 @@ public final class ForgeGameplayEvents {
         AdvancementEvents.configure(new LoaderAdvancementAccess());
 
 
-        net.minecraftforge.event.server.ServerStartingEvent.BUS.addListener((net.minecraftforge.event.server.ServerStartingEvent event) ->
-                LoaderWandererTrades.register(event.getServer()));
-        net.minecraftforge.event.OnDatapackSyncEvent.BUS.addListener((net.minecraftforge.event.OnDatapackSyncEvent event) ->
-                LoaderWandererTrades.register(event.getPlayerList().getServer()));
+        net.minecraftforge.event.server.ServerStartingEvent.BUS.addListener((net.minecraftforge.event.server.ServerStartingEvent event) -> {
+            ((com.kingodogo.buildscape.adapter.v263.PlatformAdapterBase) Services.PLATFORM)
+                    .registerDeferredServerData(event.getServer());
+            LoaderWandererTrades.register(event.getServer());
+        });
+        net.minecraftforge.event.OnDatapackSyncEvent.BUS.addListener((net.minecraftforge.event.OnDatapackSyncEvent event) -> {
+            // A null player means a data reload rather than a player joining.
+            if (event.getPlayer() == null) {
+                ((com.kingodogo.buildscape.adapter.v263.PlatformAdapterBase) Services.PLATFORM)
+                        .registerDeferredServerData(event.getPlayerList().getServer());
+            }
+            LoaderWandererTrades.register(event.getPlayerList().getServer());
+        });
         net.minecraftforge.event.entity.player.AdvancementEvent.AdvancementEarnEvent.BUS.addListener((net.minecraftforge.event.entity.player.AdvancementEvent.AdvancementEarnEvent event) -> {
             if (event.getEntity() instanceof ServerPlayer player) {
                 var id = event.getAdvancement().id();

@@ -23,7 +23,7 @@ public class ForgeRegistryAdapter extends BaseRegistryAdapter {
 
     public ForgeRegistryAdapter() {
         super(BuildscapeCommon.MOD_ID);
-        com.kingodogo.buildscape.adapter.v26x.fluid.ExperienceFluids.setFactory(
+        com.kingodogo.buildscape.adapter.v263.fluid.ExperienceFluids.setFactory(
                 com.kingodogo.buildscape.fluid.ForgeExperienceFluids::createPair);
     }
 
@@ -53,7 +53,7 @@ public class ForgeRegistryAdapter extends BaseRegistryAdapter {
                         Identifier.fromNamespaceAndPath(namespace, "experience"),
                         com.kingodogo.buildscape.fluid.ForgeExperienceFluids::type);
             } else if (key.equals(Registries.FLUID)) {
-                com.kingodogo.buildscape.adapter.v26x.fluid.ExperienceFluids.register();
+                com.kingodogo.buildscape.adapter.v263.fluid.ExperienceFluids.register();
             } else if (key.equals(Registries.BLOCK)) {
                 initBlocks();
                 registerTo(BuiltInRegistries.BLOCK, modBlocks);
@@ -98,13 +98,13 @@ public class ForgeRegistryAdapter extends BaseRegistryAdapter {
                 }
             }
             if (key.equals(Registries.BLOCK)) {
-                com.kingodogo.buildscape.adapter.v26x.RemovedIdAliases.register(BuiltInRegistries.BLOCK,
+                com.kingodogo.buildscape.adapter.v263.RemovedIdAliases.register(BuiltInRegistries.BLOCK,
                         ((net.minecraftforge.registries.ForgeRegistry<?>) event.getForgeRegistry())::addAlias);
             } else if (key.equals(Registries.ITEM)) {
-                com.kingodogo.buildscape.adapter.v26x.RemovedIdAliases.register(BuiltInRegistries.ITEM,
+                com.kingodogo.buildscape.adapter.v263.RemovedIdAliases.register(BuiltInRegistries.ITEM,
                         ((net.minecraftforge.registries.ForgeRegistry<?>) event.getForgeRegistry())::addAlias);
             } else if (key.equals(Registries.ENTITY_TYPE)) {
-                com.kingodogo.buildscape.adapter.v26x.RemovedIdAliases.register(BuiltInRegistries.ENTITY_TYPE,
+                com.kingodogo.buildscape.adapter.v263.RemovedIdAliases.register(BuiltInRegistries.ENTITY_TYPE,
                         ((net.minecraftforge.registries.ForgeRegistry<?>) event.getForgeRegistry())::addAlias);
             }
             completed.add(key);

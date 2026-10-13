@@ -1,7 +1,7 @@
 package com.kingodogo.buildscape.fluid;
 
-import com.kingodogo.buildscape.adapter.v26x.fluid.ExperienceFluid;
-import com.kingodogo.buildscape.adapter.v26x.fluid.ExperienceFluids;
+import com.kingodogo.buildscape.adapter.v263.fluid.ExperienceFluid;
+import com.kingodogo.buildscape.adapter.v263.fluid.ExperienceFluids;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;

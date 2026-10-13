@@ -41,7 +41,7 @@ public final class BuildscapeForge {
     public static void init() {
         BuildscapeCommon.init();
         LoaderDispenserSetup.register();
-        ((com.kingodogo.buildscape.adapter.v26x.PlatformAdapterBase) Services.PLATFORM)
+        ((com.kingodogo.buildscape.adapter.v263.PlatformAdapterBase) Services.PLATFORM)
                 .registerExperienceCauldronInteractions(
                         ((com.kingodogo.buildscape.mixin.forge263.CauldronDispatcherInvoker) (Object)
                                 net.minecraft.core.cauldron.CauldronInteractions.EMPTY)::buildscape$put);
@@ -51,12 +51,12 @@ public final class BuildscapeForge {
         event.addListener(Services.PLATFORM.createRecipeReloadListener());
     }
     private static void serverStarted(ServerStartedEvent event) {
-        com.kingodogo.buildscape.adapter.v26x.PacketFactory.setServer(event.getServer());
+        com.kingodogo.buildscape.adapter.v263.PacketFactory.setServer(event.getServer());
         BuildscapeCommon.setServerFullyInitialized(true);
     }
     private static void serverStopped(ServerStoppedEvent event) {
         BuildScapeRecipeLoader.INSTANCE.setCurrentRecipeManager(null);
-        com.kingodogo.buildscape.adapter.v26x.PacketFactory.setServer(null);
+        com.kingodogo.buildscape.adapter.v263.PacketFactory.setServer(null);
         BuildscapeCommon.setServerFullyInitialized(false);
     }
 }

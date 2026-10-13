@@ -14,9 +14,27 @@ pluginManagement {
 }
 
 rootProject.name = 'Buildscape'
-include 'common', 'fabric:26.2', 'neoforge:26.2'
-project(':fabric:26.2').projectDir = file('fabric/26.2')
-project(':neoforge:26.2').projectDir = file('neoforge/26.2')
+
+def requestedTasks = gradle.startParameter.taskNames
+def hasExplicitForge = requestedTasks.any { it.contains(':forge:') || it.startsWith('forge:') || it == 'forge' }
+def hasExplicitFabric = requestedTasks.any { it.contains(':fabric:') || it.startsWith('fabric:') || it == 'fabric' }
+def hasExplicitNeoforge = requestedTasks.any { it.contains(':neoforge:') || it.startsWith('neoforge:') || it == 'neoforge' }
+def isFullBuild = requestedTasks.any { it == 'build' || it == 'check' || it.endsWith(':build') || it.endsWith(':check') } || requestedTasks.isEmpty()
+
+def isNeoforge262Only = hasExplicitNeoforge && !hasExplicitFabric && !hasExplicitForge && !isFullBuild
+def isFabric262Only = hasExplicitFabric && !hasExplicitNeoforge && !hasExplicitForge && !isFullBuild
+
+include 'common'
+
+if (!isFabric262Only) {
+    include 'neoforge:26.2'
+    project(':neoforge:26.2').projectDir = file('neoforge/26.2')
+}
+
+if (!isNeoforge262Only) {
+    include 'fabric:26.2'
+    project(':fabric:26.2').projectDir = file('fabric/26.2')
+}
 
 if (providers.gradleProperty('buildscape.neoforge121').getOrElse('false') == 'true') {
     include ':neoforge:1.21.1'
@@ -35,8 +53,9 @@ if (providers.gradleProperty('buildscape.fabric121').getOrElse('false') == 'true
 
 // Milestone 1: shared-code Forge 1.18.2 joins the default build.
 // Use -Pbuildscape.v118x=false for the 26.2-only loader graph.
-def v118xEnabled = gradle.startParameter.projectProperties.get('buildscape.v118x') ?:
-        providers.gradleProperty('buildscape.v118x').getOrElse('true')
+def v118xEnabled = (isNeoforge262Only || isFabric262Only) ? 'false' :
+        (gradle.startParameter.projectProperties.get('buildscape.v118x') ?:
+        providers.gradleProperty('buildscape.v118x').getOrElse('true'))
 if (v118xEnabled == 'true') {
     include ':forge', ':forge:1.18.2'
     project(':forge').projectDir = file('forge')

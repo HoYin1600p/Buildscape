@@ -42,6 +42,10 @@ public final class ItemFactory {
             String color = id.equals("festive_stocking") ? null : id.replace("_festive_stocking", "");
             return Services.PLATFORM.createFestiveStockingItem(block, p, color);
         }
+        if (block instanceof com.kingodogo.buildscape.block.SnowyLargeFernBlock
+                || block instanceof com.kingodogo.buildscape.block.SnowyTallGrassBlock) {
+            return Services.PLATFORM.createDoublePlantBlockItem(block, p);
+        }
         return new BlockItem(block, p);
     }
     public static Item createItem(ItemDefinition def) {

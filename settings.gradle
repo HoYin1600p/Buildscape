@@ -56,7 +56,14 @@ if (providers.gradleProperty('buildscape.forge262').getOrElse('false') == 'true'
     project(':forge:26.2').projectDir = file('forge/26.2')
 }
 
-// forge:26.3 follows after Forge 26.2 (fabric:26.3 and neoforge:26.3 are included above with buildscape.v263).
+// forge:26.3 needs both the 26.3 common variant and its own opt-in (fabric:26.3 and neoforge:26.3 are
+// included above with buildscape.v263).
+if (providers.gradleProperty('buildscape.v263').getOrElse('false') == 'true'
+        && providers.gradleProperty('buildscape.forge263').getOrElse('false') == 'true') {
+    include ':forge', ':forge:26.3'
+    project(':forge').projectDir = file('forge')
+    project(':forge:26.3').projectDir = file('forge/26.3')
+}
 
 if (providers.gradleProperty('buildscape.forge121').getOrElse('false') == 'true') {
     include ':forge', ':forge:1.21.1'

@@ -119,6 +119,8 @@ public interface IPlatformAdapter {
     Fluid getFluid(CommonId id);
     CommonId getFluidId(Fluid fluid);
     Fluid getBucketFluid(Item item);
+    /** The plant a filled vanilla flower pot holds (FlowerPotBlock.getContent / getPotted by version). */
+    Block getFlowerPotPlant(net.minecraft.world.level.block.FlowerPotBlock pot);
 
     Entity createSeatEntity(Level level, double x, double y, double z);
     Entity createFallingIcicleEntity(Level level, double x, double y, double z, net.minecraft.world.level.block.state.BlockState state);

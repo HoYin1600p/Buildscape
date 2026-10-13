@@ -15,10 +15,6 @@ import net.minecraft.util.valueproviders.ConstantInt;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
-import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
-import net.minecraft.world.level.levelgen.feature.Feature;
-import net.minecraft.world.level.levelgen.feature.configurations.SimpleBlockConfiguration;
-import net.minecraft.world.level.levelgen.feature.configurations.TreeConfiguration;
 import net.minecraft.world.level.levelgen.feature.featuresize.TwoLayersFeatureSize;
 import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider;
 
@@ -58,229 +54,220 @@ public class ModConfiguredFeatures {
     }
 
     public static class FeatureRegistry {
-        public <T extends ConfiguredFeature<?, ?>> FeatureHolder<T> register(String name, java.util.function.Supplier<T> supplier) {
+        public <T> FeatureHolder<T> register(String name, java.util.function.Supplier<T> supplier) {
             return new FeatureHolder<>(name, supplier);
         }
     }
 
     public static final FeatureRegistry CONFIGURED_FEATURES = new FeatureRegistry();
 
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> POPLAR_TREE =
+    public static final FeatureHolder<Object> POPLAR_TREE =
             CONFIGURED_FEATURES.register("poplar", () ->
-                    new ConfiguredFeature<>(
-                            Feature.TREE,
-                            createPoplarTreeConfiguration()
-                    )
+                    Services.PLATFORM.createTreeFeature(createPoplarTreeConfiguration())
             );
 
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> PALE_OAK_TREE =
+    public static final FeatureHolder<Object> PALE_OAK_TREE =
             CONFIGURED_FEATURES.register("pale_oak", () ->
-                    new ConfiguredFeature<>(
-                            Feature.TREE,
-                            createPaleOakTreeConfiguration()
-                    )
+                    Services.PLATFORM.createTreeFeature(createPaleOakTreeConfiguration())
             );
 
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> CHERRY_TREE =
+    public static final FeatureHolder<Object> CHERRY_TREE =
             CONFIGURED_FEATURES.register("cherry", () ->
-                    new ConfiguredFeature<>(
-                            Feature.TREE,
-                            createCherryTreeConfiguration()
-                    )
+                    Services.PLATFORM.createTreeFeature(createCherryTreeConfiguration())
             );
 
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> RED_MONETS =
+    public static final FeatureHolder<Object> RED_MONETS =
             CONFIGURED_FEATURES.register("red_monets", () ->
                     createMonetConfiguration(ModBlocks.RED_MONETS.get())
             );
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> BLUE_MONETS =
+    public static final FeatureHolder<Object> BLUE_MONETS =
             CONFIGURED_FEATURES.register("blue_monets", () ->
                     createMonetConfiguration(ModBlocks.BLUE_MONETS.get())
             );
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> PURPLE_MONETS =
+    public static final FeatureHolder<Object> PURPLE_MONETS =
             CONFIGURED_FEATURES.register("purple_monets", () ->
                     createMonetConfiguration(ModBlocks.PURPLE_MONETS.get())
             );
     public static final FeatureHolder<
-            ConfiguredFeature<?, ?>
+            Object
             > LIGHT_BLUE_MONETS = CONFIGURED_FEATURES.register("light_blue_monets", () ->
             createMonetConfiguration(ModBlocks.LIGHT_BLUE_MONETS.get())
     );
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> PINK_MONETS =
+    public static final FeatureHolder<Object> PINK_MONETS =
             CONFIGURED_FEATURES.register("pink_monets", () ->
                     createMonetConfiguration(ModBlocks.PINK_MONETS.get())
             );
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> YELLOW_MONETS =
+    public static final FeatureHolder<Object> YELLOW_MONETS =
             CONFIGURED_FEATURES.register("yellow_monets", () ->
                     createMonetConfiguration(ModBlocks.YELLOW_MONETS.get())
             );
 
     @Deprecated
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> RED_PETALS =
+    public static final FeatureHolder<Object> RED_PETALS =
             CONFIGURED_FEATURES.register("red_petals", () ->
                     createPetalConfigurationWithRandomStates(ModBlocks.RED_PETAL.get())
             );
 
     @Deprecated
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> BLUE_PETALS =
+    public static final FeatureHolder<Object> BLUE_PETALS =
             CONFIGURED_FEATURES.register("blue_petals", () ->
                     createPetalConfigurationWithRandomStates(ModBlocks.BLUE_PETAL.get())
             );
 
     @Deprecated
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> ORANGE_PETALS =
+    public static final FeatureHolder<Object> ORANGE_PETALS =
             CONFIGURED_FEATURES.register("orange_petals", () ->
                     createPetalConfigurationWithRandomStates(ModBlocks.ORANGE_PETAL.get())
             );
 
     @Deprecated
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> PINK_PETALS =
+    public static final FeatureHolder<Object> PINK_PETALS =
             CONFIGURED_FEATURES.register("pink_petals", () ->
                     createPetalConfigurationWithRandomStates(vanillaBlock("minecraft:pink_petals"))
             );
 
     @Deprecated
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> PURPLE_PETALS =
+    public static final FeatureHolder<Object> PURPLE_PETALS =
             CONFIGURED_FEATURES.register("purple_petals", () ->
                     createPetalConfigurationWithRandomStates(ModBlocks.PURPLE_PETAL.get())
             );
 
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> ALL_PETALS =
+    public static final FeatureHolder<Object> ALL_PETALS =
             CONFIGURED_FEATURES.register("all_petals", () ->
                     createAllPetalsConfigurationWithRandomStates()
             );
 
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> RED_PETAL_1_N =
+    public static final FeatureHolder<Object> RED_PETAL_1_N =
             CONFIGURED_FEATURES.register("red_petal_1_n", () ->
                     createPetalConfiguration(ModBlocks.RED_PETAL.get(), 1, Direction.NORTH)
             );
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> RED_PETAL_1_S =
+    public static final FeatureHolder<Object> RED_PETAL_1_S =
             CONFIGURED_FEATURES.register("red_petal_1_s", () ->
                     createPetalConfiguration(ModBlocks.RED_PETAL.get(), 1, Direction.SOUTH)
             );
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> RED_PETAL_1_E =
+    public static final FeatureHolder<Object> RED_PETAL_1_E =
             CONFIGURED_FEATURES.register("red_petal_1_e", () ->
                     createPetalConfiguration(ModBlocks.RED_PETAL.get(), 1, Direction.EAST)
             );
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> RED_PETAL_1_W =
+    public static final FeatureHolder<Object> RED_PETAL_1_W =
             CONFIGURED_FEATURES.register("red_petal_1_w", () ->
                     createPetalConfiguration(ModBlocks.RED_PETAL.get(), 1, Direction.WEST)
             );
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> RED_PETAL_2_N =
+    public static final FeatureHolder<Object> RED_PETAL_2_N =
             CONFIGURED_FEATURES.register("red_petal_2_n", () ->
                     createPetalConfiguration(ModBlocks.RED_PETAL.get(), 2, Direction.NORTH)
             );
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> RED_PETAL_2_S =
+    public static final FeatureHolder<Object> RED_PETAL_2_S =
             CONFIGURED_FEATURES.register("red_petal_2_s", () ->
                     createPetalConfiguration(ModBlocks.RED_PETAL.get(), 2, Direction.SOUTH)
             );
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> RED_PETAL_2_E =
+    public static final FeatureHolder<Object> RED_PETAL_2_E =
             CONFIGURED_FEATURES.register("red_petal_2_e", () ->
                     createPetalConfiguration(ModBlocks.RED_PETAL.get(), 2, Direction.EAST)
             );
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> RED_PETAL_2_W =
+    public static final FeatureHolder<Object> RED_PETAL_2_W =
             CONFIGURED_FEATURES.register("red_petal_2_w", () ->
                     createPetalConfiguration(ModBlocks.RED_PETAL.get(), 2, Direction.WEST)
             );
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> RED_PETAL_3_N =
+    public static final FeatureHolder<Object> RED_PETAL_3_N =
             CONFIGURED_FEATURES.register("red_petal_3_n", () ->
                     createPetalConfiguration(ModBlocks.RED_PETAL.get(), 3, Direction.NORTH)
             );
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> RED_PETAL_3_S =
+    public static final FeatureHolder<Object> RED_PETAL_3_S =
             CONFIGURED_FEATURES.register("red_petal_3_s", () ->
                     createPetalConfiguration(ModBlocks.RED_PETAL.get(), 3, Direction.SOUTH)
             );
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> RED_PETAL_3_E =
+    public static final FeatureHolder<Object> RED_PETAL_3_E =
             CONFIGURED_FEATURES.register("red_petal_3_e", () ->
                     createPetalConfiguration(ModBlocks.RED_PETAL.get(), 3, Direction.EAST)
             );
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> RED_PETAL_3_W =
+    public static final FeatureHolder<Object> RED_PETAL_3_W =
             CONFIGURED_FEATURES.register("red_petal_3_w", () ->
                     createPetalConfiguration(ModBlocks.RED_PETAL.get(), 3, Direction.WEST)
             );
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> RED_PETAL_4_N =
+    public static final FeatureHolder<Object> RED_PETAL_4_N =
             CONFIGURED_FEATURES.register("red_petal_4_n", () ->
                     createPetalConfiguration(ModBlocks.RED_PETAL.get(), 4, Direction.NORTH)
             );
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> RED_PETAL_4_S =
+    public static final FeatureHolder<Object> RED_PETAL_4_S =
             CONFIGURED_FEATURES.register("red_petal_4_s", () ->
                     createPetalConfiguration(ModBlocks.RED_PETAL.get(), 4, Direction.SOUTH)
             );
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> RED_PETAL_4_E =
+    public static final FeatureHolder<Object> RED_PETAL_4_E =
             CONFIGURED_FEATURES.register("red_petal_4_e", () ->
                     createPetalConfiguration(ModBlocks.RED_PETAL.get(), 4, Direction.EAST)
             );
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> RED_PETAL_4_W =
+    public static final FeatureHolder<Object> RED_PETAL_4_W =
             CONFIGURED_FEATURES.register("red_petal_4_w", () ->
                     createPetalConfiguration(ModBlocks.RED_PETAL.get(), 4, Direction.WEST)
             );
 
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> BLUE_PETAL_1_N =
+    public static final FeatureHolder<Object> BLUE_PETAL_1_N =
             CONFIGURED_FEATURES.register("blue_petal_1_n", () ->
                     createPetalConfiguration(ModBlocks.BLUE_PETAL.get(), 1, Direction.NORTH)
             );
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> BLUE_PETAL_1_S =
+    public static final FeatureHolder<Object> BLUE_PETAL_1_S =
             CONFIGURED_FEATURES.register("blue_petal_1_s", () ->
                     createPetalConfiguration(ModBlocks.BLUE_PETAL.get(), 1, Direction.SOUTH)
             );
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> BLUE_PETAL_1_E =
+    public static final FeatureHolder<Object> BLUE_PETAL_1_E =
             CONFIGURED_FEATURES.register("blue_petal_1_e", () ->
                     createPetalConfiguration(ModBlocks.BLUE_PETAL.get(), 1, Direction.EAST)
             );
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> BLUE_PETAL_1_W =
+    public static final FeatureHolder<Object> BLUE_PETAL_1_W =
             CONFIGURED_FEATURES.register("blue_petal_1_w", () ->
                     createPetalConfiguration(ModBlocks.BLUE_PETAL.get(), 1, Direction.WEST)
             );
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> BLUE_PETAL_2_N =
+    public static final FeatureHolder<Object> BLUE_PETAL_2_N =
             CONFIGURED_FEATURES.register("blue_petal_2_n", () ->
                     createPetalConfiguration(ModBlocks.BLUE_PETAL.get(), 2, Direction.NORTH)
             );
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> BLUE_PETAL_2_S =
+    public static final FeatureHolder<Object> BLUE_PETAL_2_S =
             CONFIGURED_FEATURES.register("blue_petal_2_s", () ->
                     createPetalConfiguration(ModBlocks.BLUE_PETAL.get(), 2, Direction.SOUTH)
             );
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> BLUE_PETAL_2_E =
+    public static final FeatureHolder<Object> BLUE_PETAL_2_E =
             CONFIGURED_FEATURES.register("blue_petal_2_e", () ->
                     createPetalConfiguration(ModBlocks.BLUE_PETAL.get(), 2, Direction.EAST)
             );
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> BLUE_PETAL_2_W =
+    public static final FeatureHolder<Object> BLUE_PETAL_2_W =
             CONFIGURED_FEATURES.register("blue_petal_2_w", () ->
                     createPetalConfiguration(ModBlocks.BLUE_PETAL.get(), 2, Direction.WEST)
             );
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> BLUE_PETAL_3_N =
+    public static final FeatureHolder<Object> BLUE_PETAL_3_N =
             CONFIGURED_FEATURES.register("blue_petal_3_n", () ->
                     createPetalConfiguration(ModBlocks.BLUE_PETAL.get(), 3, Direction.NORTH)
             );
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> BLUE_PETAL_3_S =
+    public static final FeatureHolder<Object> BLUE_PETAL_3_S =
             CONFIGURED_FEATURES.register("blue_petal_3_s", () ->
                     createPetalConfiguration(ModBlocks.BLUE_PETAL.get(), 3, Direction.SOUTH)
             );
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> BLUE_PETAL_3_E =
+    public static final FeatureHolder<Object> BLUE_PETAL_3_E =
             CONFIGURED_FEATURES.register("blue_petal_3_e", () ->
                     createPetalConfiguration(ModBlocks.BLUE_PETAL.get(), 3, Direction.EAST)
             );
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> BLUE_PETAL_3_W =
+    public static final FeatureHolder<Object> BLUE_PETAL_3_W =
             CONFIGURED_FEATURES.register("blue_petal_3_w", () ->
                     createPetalConfiguration(ModBlocks.BLUE_PETAL.get(), 3, Direction.WEST)
             );
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> BLUE_PETAL_4_N =
+    public static final FeatureHolder<Object> BLUE_PETAL_4_N =
             CONFIGURED_FEATURES.register("blue_petal_4_n", () ->
                     createPetalConfiguration(ModBlocks.BLUE_PETAL.get(), 4, Direction.NORTH)
             );
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> BLUE_PETAL_4_S =
+    public static final FeatureHolder<Object> BLUE_PETAL_4_S =
             CONFIGURED_FEATURES.register("blue_petal_4_s", () ->
                     createPetalConfiguration(ModBlocks.BLUE_PETAL.get(), 4, Direction.SOUTH)
             );
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> BLUE_PETAL_4_E =
+    public static final FeatureHolder<Object> BLUE_PETAL_4_E =
             CONFIGURED_FEATURES.register("blue_petal_4_e", () ->
                     createPetalConfiguration(ModBlocks.BLUE_PETAL.get(), 4, Direction.EAST)
             );
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> BLUE_PETAL_4_W =
+    public static final FeatureHolder<Object> BLUE_PETAL_4_W =
             CONFIGURED_FEATURES.register("blue_petal_4_w", () ->
                     createPetalConfiguration(ModBlocks.BLUE_PETAL.get(), 4, Direction.WEST)
             );
 
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> ORANGE_PETAL_1_N =
+    public static final FeatureHolder<Object> ORANGE_PETAL_1_N =
             CONFIGURED_FEATURES.register("orange_petal_1_n", () ->
                     createPetalConfiguration(
                                     ModBlocks.ORANGE_PETAL.get(),
@@ -288,7 +275,7 @@ public class ModConfiguredFeatures {
                                     Direction.NORTH
                     )
             );
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> ORANGE_PETAL_1_S =
+    public static final FeatureHolder<Object> ORANGE_PETAL_1_S =
             CONFIGURED_FEATURES.register("orange_petal_1_s", () ->
                     createPetalConfiguration(
                                     ModBlocks.ORANGE_PETAL.get(),
@@ -296,7 +283,7 @@ public class ModConfiguredFeatures {
                                     Direction.SOUTH
                     )
             );
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> ORANGE_PETAL_1_E =
+    public static final FeatureHolder<Object> ORANGE_PETAL_1_E =
             CONFIGURED_FEATURES.register("orange_petal_1_e", () ->
                     createPetalConfiguration(
                                     ModBlocks.ORANGE_PETAL.get(),
@@ -304,7 +291,7 @@ public class ModConfiguredFeatures {
                                     Direction.EAST
                     )
             );
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> ORANGE_PETAL_1_W =
+    public static final FeatureHolder<Object> ORANGE_PETAL_1_W =
             CONFIGURED_FEATURES.register("orange_petal_1_w", () ->
                     createPetalConfiguration(
                                     ModBlocks.ORANGE_PETAL.get(),
@@ -312,7 +299,7 @@ public class ModConfiguredFeatures {
                                     Direction.WEST
                     )
             );
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> ORANGE_PETAL_2_N =
+    public static final FeatureHolder<Object> ORANGE_PETAL_2_N =
             CONFIGURED_FEATURES.register("orange_petal_2_n", () ->
                     createPetalConfiguration(
                                     ModBlocks.ORANGE_PETAL.get(),
@@ -320,7 +307,7 @@ public class ModConfiguredFeatures {
                                     Direction.NORTH
                     )
             );
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> ORANGE_PETAL_2_S =
+    public static final FeatureHolder<Object> ORANGE_PETAL_2_S =
             CONFIGURED_FEATURES.register("orange_petal_2_s", () ->
                     createPetalConfiguration(
                                     ModBlocks.ORANGE_PETAL.get(),
@@ -328,7 +315,7 @@ public class ModConfiguredFeatures {
                                     Direction.SOUTH
                     )
             );
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> ORANGE_PETAL_2_E =
+    public static final FeatureHolder<Object> ORANGE_PETAL_2_E =
             CONFIGURED_FEATURES.register("orange_petal_2_e", () ->
                     createPetalConfiguration(
                                     ModBlocks.ORANGE_PETAL.get(),
@@ -336,7 +323,7 @@ public class ModConfiguredFeatures {
                                     Direction.EAST
                     )
             );
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> ORANGE_PETAL_2_W =
+    public static final FeatureHolder<Object> ORANGE_PETAL_2_W =
             CONFIGURED_FEATURES.register("orange_petal_2_w", () ->
                     createPetalConfiguration(
                                     ModBlocks.ORANGE_PETAL.get(),
@@ -344,7 +331,7 @@ public class ModConfiguredFeatures {
                                     Direction.WEST
                     )
             );
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> ORANGE_PETAL_3_N =
+    public static final FeatureHolder<Object> ORANGE_PETAL_3_N =
             CONFIGURED_FEATURES.register("orange_petal_3_n", () ->
                     createPetalConfiguration(
                                     ModBlocks.ORANGE_PETAL.get(),
@@ -352,7 +339,7 @@ public class ModConfiguredFeatures {
                                     Direction.NORTH
                     )
             );
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> ORANGE_PETAL_3_S =
+    public static final FeatureHolder<Object> ORANGE_PETAL_3_S =
             CONFIGURED_FEATURES.register("orange_petal_3_s", () ->
                     createPetalConfiguration(
                                     ModBlocks.ORANGE_PETAL.get(),
@@ -360,7 +347,7 @@ public class ModConfiguredFeatures {
                                     Direction.SOUTH
                     )
             );
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> ORANGE_PETAL_3_E =
+    public static final FeatureHolder<Object> ORANGE_PETAL_3_E =
             CONFIGURED_FEATURES.register("orange_petal_3_e", () ->
                     createPetalConfiguration(
                                     ModBlocks.ORANGE_PETAL.get(),
@@ -368,7 +355,7 @@ public class ModConfiguredFeatures {
                                     Direction.EAST
                     )
             );
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> ORANGE_PETAL_3_W =
+    public static final FeatureHolder<Object> ORANGE_PETAL_3_W =
             CONFIGURED_FEATURES.register("orange_petal_3_w", () ->
                     createPetalConfiguration(
                                     ModBlocks.ORANGE_PETAL.get(),
@@ -376,7 +363,7 @@ public class ModConfiguredFeatures {
                                     Direction.WEST
                     )
             );
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> ORANGE_PETAL_4_N =
+    public static final FeatureHolder<Object> ORANGE_PETAL_4_N =
             CONFIGURED_FEATURES.register("orange_petal_4_n", () ->
                     createPetalConfiguration(
                                     ModBlocks.ORANGE_PETAL.get(),
@@ -384,7 +371,7 @@ public class ModConfiguredFeatures {
                                     Direction.NORTH
                     )
             );
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> ORANGE_PETAL_4_S =
+    public static final FeatureHolder<Object> ORANGE_PETAL_4_S =
             CONFIGURED_FEATURES.register("orange_petal_4_s", () ->
                     createPetalConfiguration(
                                     ModBlocks.ORANGE_PETAL.get(),
@@ -392,7 +379,7 @@ public class ModConfiguredFeatures {
                                     Direction.SOUTH
                     )
             );
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> ORANGE_PETAL_4_E =
+    public static final FeatureHolder<Object> ORANGE_PETAL_4_E =
             CONFIGURED_FEATURES.register("orange_petal_4_e", () ->
                     createPetalConfiguration(
                                     ModBlocks.ORANGE_PETAL.get(),
@@ -400,7 +387,7 @@ public class ModConfiguredFeatures {
                                     Direction.EAST
                     )
             );
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> ORANGE_PETAL_4_W =
+    public static final FeatureHolder<Object> ORANGE_PETAL_4_W =
             CONFIGURED_FEATURES.register("orange_petal_4_w", () ->
                     createPetalConfiguration(
                                     ModBlocks.ORANGE_PETAL.get(),
@@ -409,72 +396,72 @@ public class ModConfiguredFeatures {
                     )
             );
 
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> PINK_PETAL_1_N =
+    public static final FeatureHolder<Object> PINK_PETAL_1_N =
             CONFIGURED_FEATURES.register("pink_petal_1_n", () ->
                     createPetalConfiguration(vanillaBlock("minecraft:pink_petals"), 1, Direction.NORTH)
             );
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> PINK_PETAL_1_S =
+    public static final FeatureHolder<Object> PINK_PETAL_1_S =
             CONFIGURED_FEATURES.register("pink_petal_1_s", () ->
                     createPetalConfiguration(vanillaBlock("minecraft:pink_petals"), 1, Direction.SOUTH)
             );
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> PINK_PETAL_1_E =
+    public static final FeatureHolder<Object> PINK_PETAL_1_E =
             CONFIGURED_FEATURES.register("pink_petal_1_e", () ->
                     createPetalConfiguration(vanillaBlock("minecraft:pink_petals"), 1, Direction.EAST)
             );
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> PINK_PETAL_1_W =
+    public static final FeatureHolder<Object> PINK_PETAL_1_W =
             CONFIGURED_FEATURES.register("pink_petal_1_w", () ->
                     createPetalConfiguration(vanillaBlock("minecraft:pink_petals"), 1, Direction.WEST)
             );
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> PINK_PETAL_2_N =
+    public static final FeatureHolder<Object> PINK_PETAL_2_N =
             CONFIGURED_FEATURES.register("pink_petal_2_n", () ->
                     createPetalConfiguration(vanillaBlock("minecraft:pink_petals"), 2, Direction.NORTH)
             );
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> PINK_PETAL_2_S =
+    public static final FeatureHolder<Object> PINK_PETAL_2_S =
             CONFIGURED_FEATURES.register("pink_petal_2_s", () ->
                     createPetalConfiguration(vanillaBlock("minecraft:pink_petals"), 2, Direction.SOUTH)
             );
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> PINK_PETAL_2_E =
+    public static final FeatureHolder<Object> PINK_PETAL_2_E =
             CONFIGURED_FEATURES.register("pink_petal_2_e", () ->
                     createPetalConfiguration(vanillaBlock("minecraft:pink_petals"), 2, Direction.EAST)
             );
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> PINK_PETAL_2_W =
+    public static final FeatureHolder<Object> PINK_PETAL_2_W =
             CONFIGURED_FEATURES.register("pink_petal_2_w", () ->
                     createPetalConfiguration(vanillaBlock("minecraft:pink_petals"), 2, Direction.WEST)
             );
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> PINK_PETAL_3_N =
+    public static final FeatureHolder<Object> PINK_PETAL_3_N =
             CONFIGURED_FEATURES.register("pink_petal_3_n", () ->
                     createPetalConfiguration(vanillaBlock("minecraft:pink_petals"), 3, Direction.NORTH)
             );
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> PINK_PETAL_3_S =
+    public static final FeatureHolder<Object> PINK_PETAL_3_S =
             CONFIGURED_FEATURES.register("pink_petal_3_s", () ->
                     createPetalConfiguration(vanillaBlock("minecraft:pink_petals"), 3, Direction.SOUTH)
             );
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> PINK_PETAL_3_E =
+    public static final FeatureHolder<Object> PINK_PETAL_3_E =
             CONFIGURED_FEATURES.register("pink_petal_3_e", () ->
                     createPetalConfiguration(vanillaBlock("minecraft:pink_petals"), 3, Direction.EAST)
             );
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> PINK_PETAL_3_W =
+    public static final FeatureHolder<Object> PINK_PETAL_3_W =
             CONFIGURED_FEATURES.register("pink_petal_3_w", () ->
                     createPetalConfiguration(vanillaBlock("minecraft:pink_petals"), 3, Direction.WEST)
             );
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> PINK_PETAL_4_N =
+    public static final FeatureHolder<Object> PINK_PETAL_4_N =
             CONFIGURED_FEATURES.register("pink_petal_4_n", () ->
                     createPetalConfiguration(vanillaBlock("minecraft:pink_petals"), 4, Direction.NORTH)
             );
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> PINK_PETAL_4_S =
+    public static final FeatureHolder<Object> PINK_PETAL_4_S =
             CONFIGURED_FEATURES.register("pink_petal_4_s", () ->
                     createPetalConfiguration(vanillaBlock("minecraft:pink_petals"), 4, Direction.SOUTH)
             );
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> PINK_PETAL_4_E =
+    public static final FeatureHolder<Object> PINK_PETAL_4_E =
             CONFIGURED_FEATURES.register("pink_petal_4_e", () ->
                     createPetalConfiguration(vanillaBlock("minecraft:pink_petals"), 4, Direction.EAST)
             );
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> PINK_PETAL_4_W =
+    public static final FeatureHolder<Object> PINK_PETAL_4_W =
             CONFIGURED_FEATURES.register("pink_petal_4_w", () ->
                     createPetalConfiguration(vanillaBlock("minecraft:pink_petals"), 4, Direction.WEST)
             );
 
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> PURPLE_PETAL_1_N =
+    public static final FeatureHolder<Object> PURPLE_PETAL_1_N =
             CONFIGURED_FEATURES.register("purple_petal_1_n", () ->
                     createPetalConfiguration(
                                     ModBlocks.PURPLE_PETAL.get(),
@@ -482,7 +469,7 @@ public class ModConfiguredFeatures {
                                     Direction.NORTH
                     )
             );
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> PURPLE_PETAL_1_S =
+    public static final FeatureHolder<Object> PURPLE_PETAL_1_S =
             CONFIGURED_FEATURES.register("purple_petal_1_s", () ->
                     createPetalConfiguration(
                                     ModBlocks.PURPLE_PETAL.get(),
@@ -490,7 +477,7 @@ public class ModConfiguredFeatures {
                                     Direction.SOUTH
                     )
             );
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> PURPLE_PETAL_1_E =
+    public static final FeatureHolder<Object> PURPLE_PETAL_1_E =
             CONFIGURED_FEATURES.register("purple_petal_1_e", () ->
                     createPetalConfiguration(
                                     ModBlocks.PURPLE_PETAL.get(),
@@ -498,7 +485,7 @@ public class ModConfiguredFeatures {
                                     Direction.EAST
                     )
             );
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> PURPLE_PETAL_1_W =
+    public static final FeatureHolder<Object> PURPLE_PETAL_1_W =
             CONFIGURED_FEATURES.register("purple_petal_1_w", () ->
                     createPetalConfiguration(
                                     ModBlocks.PURPLE_PETAL.get(),
@@ -506,7 +493,7 @@ public class ModConfiguredFeatures {
                                     Direction.WEST
                     )
             );
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> PURPLE_PETAL_2_N =
+    public static final FeatureHolder<Object> PURPLE_PETAL_2_N =
             CONFIGURED_FEATURES.register("purple_petal_2_n", () ->
                     createPetalConfiguration(
                                     ModBlocks.PURPLE_PETAL.get(),
@@ -514,7 +501,7 @@ public class ModConfiguredFeatures {
                                     Direction.NORTH
                     )
             );
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> PURPLE_PETAL_2_S =
+    public static final FeatureHolder<Object> PURPLE_PETAL_2_S =
             CONFIGURED_FEATURES.register("purple_petal_2_s", () ->
                     createPetalConfiguration(
                                     ModBlocks.PURPLE_PETAL.get(),
@@ -522,7 +509,7 @@ public class ModConfiguredFeatures {
                                     Direction.SOUTH
                     )
             );
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> PURPLE_PETAL_2_E =
+    public static final FeatureHolder<Object> PURPLE_PETAL_2_E =
             CONFIGURED_FEATURES.register("purple_petal_2_e", () ->
                     createPetalConfiguration(
                                     ModBlocks.PURPLE_PETAL.get(),
@@ -530,7 +517,7 @@ public class ModConfiguredFeatures {
                                     Direction.EAST
                     )
             );
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> PURPLE_PETAL_2_W =
+    public static final FeatureHolder<Object> PURPLE_PETAL_2_W =
             CONFIGURED_FEATURES.register("purple_petal_2_w", () ->
                     createPetalConfiguration(
                                     ModBlocks.PURPLE_PETAL.get(),
@@ -538,7 +525,7 @@ public class ModConfiguredFeatures {
                                     Direction.WEST
                     )
             );
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> PURPLE_PETAL_3_N =
+    public static final FeatureHolder<Object> PURPLE_PETAL_3_N =
             CONFIGURED_FEATURES.register("purple_petal_3_n", () ->
                     createPetalConfiguration(
                                     ModBlocks.PURPLE_PETAL.get(),
@@ -546,7 +533,7 @@ public class ModConfiguredFeatures {
                                     Direction.NORTH
                     )
             );
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> PURPLE_PETAL_3_S =
+    public static final FeatureHolder<Object> PURPLE_PETAL_3_S =
             CONFIGURED_FEATURES.register("purple_petal_3_s", () ->
                     createPetalConfiguration(
                                     ModBlocks.PURPLE_PETAL.get(),
@@ -554,7 +541,7 @@ public class ModConfiguredFeatures {
                                     Direction.SOUTH
                     )
             );
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> PURPLE_PETAL_3_E =
+    public static final FeatureHolder<Object> PURPLE_PETAL_3_E =
             CONFIGURED_FEATURES.register("purple_petal_3_e", () ->
                     createPetalConfiguration(
                                     ModBlocks.PURPLE_PETAL.get(),
@@ -562,7 +549,7 @@ public class ModConfiguredFeatures {
                                     Direction.EAST
                     )
             );
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> PURPLE_PETAL_3_W =
+    public static final FeatureHolder<Object> PURPLE_PETAL_3_W =
             CONFIGURED_FEATURES.register("purple_petal_3_w", () ->
                     createPetalConfiguration(
                                     ModBlocks.PURPLE_PETAL.get(),
@@ -570,7 +557,7 @@ public class ModConfiguredFeatures {
                                     Direction.WEST
                     )
             );
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> PURPLE_PETAL_4_N =
+    public static final FeatureHolder<Object> PURPLE_PETAL_4_N =
             CONFIGURED_FEATURES.register("purple_petal_4_n", () ->
                     createPetalConfiguration(
                                     ModBlocks.PURPLE_PETAL.get(),
@@ -578,7 +565,7 @@ public class ModConfiguredFeatures {
                                     Direction.NORTH
                     )
             );
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> PURPLE_PETAL_4_S =
+    public static final FeatureHolder<Object> PURPLE_PETAL_4_S =
             CONFIGURED_FEATURES.register("purple_petal_4_s", () ->
                     createPetalConfiguration(
                                     ModBlocks.PURPLE_PETAL.get(),
@@ -586,7 +573,7 @@ public class ModConfiguredFeatures {
                                     Direction.SOUTH
                     )
             );
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> PURPLE_PETAL_4_E =
+    public static final FeatureHolder<Object> PURPLE_PETAL_4_E =
             CONFIGURED_FEATURES.register("purple_petal_4_e", () ->
                     createPetalConfiguration(
                                     ModBlocks.PURPLE_PETAL.get(),
@@ -594,7 +581,7 @@ public class ModConfiguredFeatures {
                                     Direction.EAST
                     )
             );
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> PURPLE_PETAL_4_W =
+    public static final FeatureHolder<Object> PURPLE_PETAL_4_W =
             CONFIGURED_FEATURES.register("purple_petal_4_w", () ->
                     createPetalConfiguration(
                                     ModBlocks.PURPLE_PETAL.get(),
@@ -603,77 +590,77 @@ public class ModConfiguredFeatures {
                     )
             );
 
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> CLOVER_1_N =
+    public static final FeatureHolder<Object> CLOVER_1_N =
             CONFIGURED_FEATURES.register("clover_1_n", () ->
                     createCloverConfiguration(1, Direction.NORTH)
             );
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> CLOVER_1_S =
+    public static final FeatureHolder<Object> CLOVER_1_S =
             CONFIGURED_FEATURES.register("clover_1_s", () ->
                     createCloverConfiguration(1, Direction.SOUTH)
             );
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> CLOVER_1_E =
+    public static final FeatureHolder<Object> CLOVER_1_E =
             CONFIGURED_FEATURES.register("clover_1_e", () ->
                     createCloverConfiguration(1, Direction.EAST)
             );
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> CLOVER_1_W =
+    public static final FeatureHolder<Object> CLOVER_1_W =
             CONFIGURED_FEATURES.register("clover_1_w", () ->
                     createCloverConfiguration(1, Direction.WEST)
             );
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> CLOVER_2_N =
+    public static final FeatureHolder<Object> CLOVER_2_N =
             CONFIGURED_FEATURES.register("clover_2_n", () ->
                     createCloverConfiguration(2, Direction.NORTH)
             );
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> CLOVER_2_S =
+    public static final FeatureHolder<Object> CLOVER_2_S =
             CONFIGURED_FEATURES.register("clover_2_s", () ->
                     createCloverConfiguration(2, Direction.SOUTH)
             );
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> CLOVER_2_E =
+    public static final FeatureHolder<Object> CLOVER_2_E =
             CONFIGURED_FEATURES.register("clover_2_e", () ->
                     createCloverConfiguration(2, Direction.EAST)
             );
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> CLOVER_2_W =
+    public static final FeatureHolder<Object> CLOVER_2_W =
             CONFIGURED_FEATURES.register("clover_2_w", () ->
                     createCloverConfiguration(2, Direction.WEST)
             );
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> CLOVER_3_N =
+    public static final FeatureHolder<Object> CLOVER_3_N =
             CONFIGURED_FEATURES.register("clover_3_n", () ->
                     createCloverConfiguration(3, Direction.NORTH)
             );
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> CLOVER_3_S =
+    public static final FeatureHolder<Object> CLOVER_3_S =
             CONFIGURED_FEATURES.register("clover_3_s", () ->
                     createCloverConfiguration(3, Direction.SOUTH)
             );
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> CLOVER_3_E =
+    public static final FeatureHolder<Object> CLOVER_3_E =
             CONFIGURED_FEATURES.register("clover_3_e", () ->
                     createCloverConfiguration(3, Direction.EAST)
             );
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> CLOVER_3_W =
+    public static final FeatureHolder<Object> CLOVER_3_W =
             CONFIGURED_FEATURES.register("clover_3_w", () ->
                     createCloverConfiguration(3, Direction.WEST)
             );
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> CLOVER_4_N =
+    public static final FeatureHolder<Object> CLOVER_4_N =
             CONFIGURED_FEATURES.register("clover_4_n", () ->
                     createCloverConfiguration(4, Direction.NORTH)
             );
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> CLOVER_4_S =
+    public static final FeatureHolder<Object> CLOVER_4_S =
             CONFIGURED_FEATURES.register("clover_4_s", () ->
                     createCloverConfiguration(4, Direction.SOUTH)
             );
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> CLOVER_4_E =
+    public static final FeatureHolder<Object> CLOVER_4_E =
             CONFIGURED_FEATURES.register("clover_4_e", () ->
                     createCloverConfiguration(4, Direction.EAST)
             );
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> CLOVER_4_W =
+    public static final FeatureHolder<Object> CLOVER_4_W =
             CONFIGURED_FEATURES.register("clover_4_w", () ->
                     createCloverConfiguration(4, Direction.WEST)
             );
 
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> CLOVER =
+    public static final FeatureHolder<Object> CLOVER =
             CONFIGURED_FEATURES.register("clover", () ->
                     createCloverConfigurationWithRandomStates(ModBlocks.CLOVER.get())
             );
 
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> WILDFLOWERS =
+    public static final FeatureHolder<Object> WILDFLOWERS =
             CONFIGURED_FEATURES.register("wildflowers", () ->
                     createFlowerPatchConfiguration(
                                     vanillaBlock("minecraft:wildflowers"),
@@ -682,7 +669,7 @@ public class ModConfiguredFeatures {
                     )
             );
 
-    public static final FeatureHolder<ConfiguredFeature<?, ?>> LEAF_LITTER =
+    public static final FeatureHolder<Object> LEAF_LITTER =
             CONFIGURED_FEATURES.register("leaf_litter", () ->
                     createFlowerPatchConfiguration(
                                     vanillaBlock("minecraft:leaf_litter"),
@@ -693,96 +680,87 @@ public class ModConfiguredFeatures {
 
     @Deprecated
     public static final FeatureHolder<
-            ConfiguredFeature<?, ?>
+            Object
             > COLORED_SPORE_BLOSSOM = CONFIGURED_FEATURES.register(
             "colored_spore_blossom",
             () ->
-                    new ConfiguredFeature<>(
-                            Feature.SIMPLE_BLOCK,
-                            createColoredSporeBlossomConfiguration()
-                    )
+                    Services.PLATFORM.createSimpleBlockFeature(createColoredSporeBlossomConfiguration())
     );
 
     public static final FeatureHolder<
-            ConfiguredFeature<?, ?>
+            Object
             > ALL_COLORED_SPORE_BLOSSOM = CONFIGURED_FEATURES.register(
             "all_colored_spore_blossom",
             () ->
-                    new ConfiguredFeature<>(
-                            Feature.SIMPLE_BLOCK,
-                            createAllColoredSporeBlossomConfiguration()
-                    )
+                    Services.PLATFORM.createSimpleBlockFeature(createAllColoredSporeBlossomConfiguration())
     );
 
     public static final FeatureHolder<
-            ConfiguredFeature<?, ?>
+            Object
             > MANGROVE_PROPAGULE = CONFIGURED_FEATURES.register(
             "mangrove_propagule",
             () ->
-                    new ConfiguredFeature<>(
-                            Feature.SIMPLE_BLOCK,
-                            createMangrovePropaguleConfiguration()
-                    )
+                    Services.PLATFORM.createSimpleBlockFeature(createMangrovePropaguleConfiguration())
     );
 
     public static final FeatureHolder<
-            ConfiguredFeature<?, ?>
+            Object
             > MANGROVE_PROPAGULE_PATCH_1 = CONFIGURED_FEATURES.register(
             "mangrove_propagule_patch_1",
             () ->
                     createMangrovePropagulePatchConfiguration(1)
     );
     public static final FeatureHolder<
-            ConfiguredFeature<?, ?>
+            Object
             > MANGROVE_PROPAGULE_PATCH_2 = CONFIGURED_FEATURES.register(
             "mangrove_propagule_patch_2",
             () ->
                     createMangrovePropagulePatchConfiguration(2)
     );
     public static final FeatureHolder<
-            ConfiguredFeature<?, ?>
+            Object
             > MANGROVE_PROPAGULE_PATCH_3 = CONFIGURED_FEATURES.register(
             "mangrove_propagule_patch_3",
             () ->
                     createMangrovePropagulePatchConfiguration(3)
     );
     public static final FeatureHolder<
-            ConfiguredFeature<?, ?>
+            Object
             > MANGROVE_PROPAGULE_PATCH_4 = CONFIGURED_FEATURES.register(
             "mangrove_propagule_patch_4",
             () ->
                     createMangrovePropagulePatchConfiguration(4)
     );
     public static final FeatureHolder<
-            ConfiguredFeature<?, ?>
+            Object
             > MANGROVE_PROPAGULE_PATCH_5 = CONFIGURED_FEATURES.register(
             "mangrove_propagule_patch_5",
             () ->
                     createMangrovePropagulePatchConfiguration(5)
     );
     public static final FeatureHolder<
-            ConfiguredFeature<?, ?>
+            Object
             > MANGROVE_PROPAGULE_PATCH_6 = CONFIGURED_FEATURES.register(
             "mangrove_propagule_patch_6",
             () ->
                     createMangrovePropagulePatchConfiguration(6)
     );
     public static final FeatureHolder<
-            ConfiguredFeature<?, ?>
+            Object
             > MANGROVE_PROPAGULE_PATCH_7 = CONFIGURED_FEATURES.register(
             "mangrove_propagule_patch_7",
             () ->
                     createMangrovePropagulePatchConfiguration(7)
     );
     public static final FeatureHolder<
-            ConfiguredFeature<?, ?>
+            Object
             > MANGROVE_PROPAGULE_PATCH_8 = CONFIGURED_FEATURES.register(
             "mangrove_propagule_patch_8",
             () ->
                     createMangrovePropagulePatchConfiguration(8)
     );
 
-    private static ConfiguredFeature<?, ?> createMonetConfiguration(
+    private static Object createMonetConfiguration(
             com.kingodogo.buildscape.block.BlockDefinition monetBlock
     ) {
         return Services.PLATFORM.createPatchFeature(
@@ -791,7 +769,7 @@ public class ModConfiguredFeatures {
         );
     }
 
-    private static ConfiguredFeature<?, ?> createPetalConfigurationWithRandomStates(
+    private static Object createPetalConfigurationWithRandomStates(
             com.kingodogo.buildscape.block.BlockDefinition petalBlock
     ) {
         IntegerProperty FLOWER_AMOUNT =
@@ -836,7 +814,7 @@ public class ModConfiguredFeatures {
         definition.setBlock(Services.PLATFORM.getBlock(com.kingodogo.buildscape.util.CommonId.parse(id)));
         return definition;
     }
-    private static ConfiguredFeature<?, ?> createAllPetalsConfigurationWithRandomStates() {
+    private static Object createAllPetalsConfigurationWithRandomStates() {
         IntegerProperty FLOWER_AMOUNT =
                 com.kingodogo.buildscape.block.PetalBlock.FLOWER_AMOUNT;
         Property<Direction> FACING_PROP = BlockStateProperties.HORIZONTAL_FACING;
@@ -876,7 +854,7 @@ public class ModConfiguredFeatures {
         return Services.PLATFORM.createPatchFeature(stateProvider, 192, 7, 3);
     }
 
-    private static ConfiguredFeature<?, ?> createCloverConfigurationWithRandomStates(
+    private static Object createCloverConfigurationWithRandomStates(
             com.kingodogo.buildscape.block.BlockDefinition cloverBlock
     ) {
         IntegerProperty FLOWER_AMOUNT =
@@ -907,7 +885,7 @@ public class ModConfiguredFeatures {
         return Services.PLATFORM.createPatchFeature(stateProvider, 64, 7, 3);
     }
 
-    private static ConfiguredFeature<?, ?> createFlowerPatchConfiguration(
+    private static Object createFlowerPatchConfiguration(
             com.kingodogo.buildscape.block.BlockDefinition block,
             IntegerProperty amountProp,
             net.minecraft.world.level.block.state.properties.Property<Direction> facingProp
@@ -930,7 +908,7 @@ public class ModConfiguredFeatures {
         return Services.PLATFORM.createPatchFeature(stateProvider, 64, 7, 3);
     }
 
-    private static ConfiguredFeature<?, ?> createPetalConfiguration(
+    private static Object createPetalConfiguration(
             com.kingodogo.buildscape.block.BlockDefinition petalBlock,
             int flowerAmount,
             Direction facing
@@ -948,7 +926,7 @@ public class ModConfiguredFeatures {
         return Services.PLATFORM.createPatchFeature(BlockStateProvider.simple(state), 64, 7, 3);
     }
 
-    private static ConfiguredFeature<?, ?> createCloverConfiguration(
+    private static Object createCloverConfiguration(
             int flowerAmount,
             Direction facing
     ) {
@@ -965,15 +943,15 @@ public class ModConfiguredFeatures {
         return Services.PLATFORM.createPatchFeature(BlockStateProvider.simple(state), 64, 7, 3);
     }
 
-    private static SimpleBlockConfiguration createColoredSporeBlossomConfiguration() {
-        return new SimpleBlockConfiguration(
+    private static Object createColoredSporeBlossomConfiguration() {
+        return Services.PLATFORM.createSimpleBlockConfiguration(
                 BlockStateProvider.simple(
                         ModBlocks.RED_SPORE_BLOSSOM.get().defaultBlockState()
                 )
         );
     }
 
-    private static SimpleBlockConfiguration createAllColoredSporeBlossomConfiguration() {
+    private static Object createAllColoredSporeBlossomConfiguration() {
         List<net.minecraft.world.level.block.state.BlockState> states =
                 new ArrayList<>();
 
@@ -985,18 +963,18 @@ public class ModConfiguredFeatures {
 
         BlockStateProvider stateProvider = Services.PLATFORM.createRandomStateProvider(states);
 
-        return new SimpleBlockConfiguration(stateProvider);
+        return Services.PLATFORM.createSimpleBlockConfiguration(stateProvider);
     }
 
-    private static SimpleBlockConfiguration createMangrovePropaguleConfiguration() {
-        return new SimpleBlockConfiguration(
+    private static Object createMangrovePropaguleConfiguration() {
+        return Services.PLATFORM.createSimpleBlockConfiguration(
                 BlockStateProvider.simple(
                         vanillaBlock("minecraft:mangrove_propagule").defaultBlockState()
                 )
         );
     }
 
-    private static ConfiguredFeature<?, ?> createMangrovePropagulePatchConfiguration(
+    private static Object createMangrovePropagulePatchConfiguration(
             int count
     ) {
         return Services.PLATFORM.createPatchFeature(
@@ -1022,7 +1000,7 @@ public class ModConfiguredFeatures {
         return new CommonId(BuildscapeCommon.MOD_ID, variant);
     }
 
-    private static TreeConfiguration createPoplarTreeConfiguration() {
+    private static Object createPoplarTreeConfiguration() {
         return Services.PLATFORM.createTreeConfiguration(
                 BlockStateProvider.simple(
                         ModBlocks.POPLAR_LOG.get().defaultBlockState()
@@ -1051,7 +1029,7 @@ public class ModConfiguredFeatures {
         );
     }
 
-    private static TreeConfiguration createPaleOakTreeConfiguration() {
+    private static Object createPaleOakTreeConfiguration() {
         return Services.PLATFORM.createTreeConfiguration(
                 BlockStateProvider.simple(vanillaBlock("minecraft:pale_oak_log").defaultBlockState()),
                 new net.minecraft.world.level.levelgen.feature.trunkplacers.StraightTrunkPlacer(5, 2, 1),
@@ -1067,7 +1045,7 @@ public class ModConfiguredFeatures {
         );
     }
 
-    private static TreeConfiguration createCherryTreeConfiguration() {
+    private static Object createCherryTreeConfiguration() {
         return Services.PLATFORM.createTreeConfiguration(
                 BlockStateProvider.simple(vanillaBlock("minecraft:cherry_log").defaultBlockState()),
                 new net.minecraft.world.level.levelgen.feature.trunkplacers.StraightTrunkPlacer(4, 2, 0),

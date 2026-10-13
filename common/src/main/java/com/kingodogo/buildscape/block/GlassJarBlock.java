@@ -101,7 +101,7 @@ public abstract class GlassJarBlock extends BaseEntityBlock implements SimpleWat
                         held.shrink(1);
                         ItemStack returnItem = isBucket ? new ItemStack(Items.BUCKET) : new ItemStack(Items.GLASS_BOTTLE);
                         if (!player.getInventory().add(returnItem)) {
-                            player.drop(returnItem, false);
+                            Services.PLATFORM.dropPlayerItem(player, returnItem, false);
                         }
                     }
                     if (isBucket) {
@@ -148,7 +148,7 @@ public abstract class GlassJarBlock extends BaseEntityBlock implements SimpleWat
                             held.grow(1);
                         } else {
                             if (!player.getInventory().add(item)) {
-                                player.drop(item, false);
+                                Services.PLATFORM.dropPlayerItem(player, item, false);
                             }
                         }
                         Services.PLATFORM.playItemPickup(level, pos, 0.8F, 0.9F);
@@ -170,7 +170,7 @@ public abstract class GlassJarBlock extends BaseEntityBlock implements SimpleWat
                         if (!player.getAbilities().instabuild) {
                             held.shrink(1);
                             if (!player.getInventory().add(filledBucket)) {
-                                player.drop(filledBucket, false);
+                                Services.PLATFORM.dropPlayerItem(player, filledBucket, false);
                             }
                         }
                         Services.PLATFORM.playBucketFill(level, pos);
@@ -188,7 +188,7 @@ public abstract class GlassJarBlock extends BaseEntityBlock implements SimpleWat
                     if (!player.getAbilities().instabuild) {
                         held.shrink(1);
                         if (!player.getInventory().add(filledBottle)) {
-                            player.drop(filledBottle, false);
+                            Services.PLATFORM.dropPlayerItem(player, filledBottle, false);
                         }
                     }
                     Services.PLATFORM.playBottleFill(level, pos);

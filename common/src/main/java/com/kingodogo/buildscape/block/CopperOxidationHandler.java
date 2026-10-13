@@ -148,7 +148,7 @@ public final class CopperOxidationHandler {
                         if (held.isEmpty()) {
                             player.setItemInHand(hand, emptyBottle);
                         } else if (!player.getInventory().add(emptyBottle)) {
-                            player.drop(emptyBottle, false);
+                            Services.PLATFORM.dropPlayerItem(player, emptyBottle, false);
                         }
                     }
                 }

@@ -273,7 +273,7 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
                     if (held.isEmpty()) {
                         player.setItemInHand(hand, filledBucket);
                     } else if (!player.getInventory().add(filledBucket)) {
-                        player.drop(filledBucket, false);
+                        Services.PLATFORM.dropPlayerItem(player, filledBucket, false);
                     }
                 }
 
@@ -316,7 +316,7 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
                     if (held.isEmpty()) {
                         player.setItemInHand(hand, emptyContainer);
                     } else if (!player.getInventory().add(emptyContainer)) {
-                        player.drop(emptyContainer, false);
+                        Services.PLATFORM.dropPlayerItem(player, emptyContainer, false);
                     }
                 }
 

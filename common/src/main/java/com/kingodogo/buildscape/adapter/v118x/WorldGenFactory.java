@@ -419,6 +419,19 @@ public final class WorldGenFactory {
                         .build();
         return new ConfiguredFeature<>(Feature.TREE, config);
     }
+    public static ConfiguredFeature<?, ?> createTreeFeature(Object configuration) {
+        return new ConfiguredFeature<>(Feature.TREE,
+                (net.minecraft.world.level.levelgen.feature.configurations.TreeConfiguration) configuration);
+    }
+
+    public static SimpleBlockConfiguration createSimpleBlockConfiguration(BlockStateProvider stateProvider) {
+        return new SimpleBlockConfiguration(stateProvider);
+    }
+
+    public static ConfiguredFeature<?, ?> createSimpleBlockFeature(Object configuration) {
+        return new ConfiguredFeature<>(Feature.SIMPLE_BLOCK, (SimpleBlockConfiguration) configuration);
+    }
+
     public static ConfiguredFeature<?, ?> createPatchFeature(
             BlockStateProvider stateProvider,
             int tries,

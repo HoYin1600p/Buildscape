@@ -11,6 +11,6 @@ public class PaleOakTreeGrower extends AbstractTreeGrower {
     @Nullable
     @Override
     protected Holder<? extends ConfiguredFeature<?, ?>> getConfiguredFeature(Random random, boolean hasFlowers) {
-        return Holder.direct(ModConfiguredFeatures.PALE_OAK_TREE.get());
+        return Holder.direct((ConfiguredFeature<?, ?>) ModConfiguredFeatures.PALE_OAK_TREE.get());
     }
 }

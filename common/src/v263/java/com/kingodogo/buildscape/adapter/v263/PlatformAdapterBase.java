@@ -156,6 +156,10 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter, com.kingo
     public void resetSwingAnimation(net.minecraft.world.entity.LivingEntity entity) {
         SwingAnimationAccess.reset(entity);
     }
+    @Override
+    public boolean isEnderman(net.minecraft.world.entity.Entity entity) {
+        return entity instanceof net.minecraft.world.entity.monster.Enderman;
+    }
     private static final class SwingAnimationAccess {
         private static final java.lang.reflect.Field STATE = field(LivingEntity.class, "swingState");
         private static final java.lang.reflect.Field TICKS = field(LivingEntity.SwingState.class, "ticks");
@@ -248,7 +252,7 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter, com.kingo
     @Override public Iterable<net.minecraft.world.item.ItemStack> getInventoryItems(net.minecraft.world.entity.player.Inventory inventory) { return inventory.getNonEquipmentItems(); }
     @Override public boolean hasPlayerPermissions(net.minecraft.world.entity.player.Player player, int level) { return com.kingodogo.buildscape.adapter.v263.client.ClientPlatformHooks.hasPlayerPermissions(player, level); }
     @Override public void openScreen(net.minecraft.client.gui.screens.Screen screen) { com.kingodogo.buildscape.adapter.v263.client.ClientPlatformHooks.openScreen(screen); }
-    @Override public void openUri(java.net.URI uri) { net.minecraft.util.Util.getPlatform().openUri(uri); }
+    @Override public void openUri(java.net.URI uri) { com.mojang.blaze3d.Blaze3D.openUri(uri); }
     @Override public void setNativeImagePixel(com.mojang.blaze3d.platform.NativeImage image, int x, int y, int abgr) { image.setPixelABGR(x, y, abgr); }
     @Override public void beginGuiOverlayRender() { com.kingodogo.buildscape.adapter.v263.client.ClientPlatformHooks.beginGuiOverlayRender(); }
     @Override public void endGuiOverlayRender() { com.kingodogo.buildscape.adapter.v263.client.ClientPlatformHooks.endGuiOverlayRender(); }
@@ -512,17 +516,17 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter, com.kingo
 
     @Override
     public void rotateX(com.mojang.blaze3d.vertex.PoseStack poseStack, float degrees) {
-        poseStack.mulPose(com.mojang.math.Axis.XP.rotationDegrees(degrees));
+        poseStack.rotate(com.mojang.math.Axis.XP.rotationDegrees(degrees));
     }
 
     @Override
     public void rotateY(com.mojang.blaze3d.vertex.PoseStack poseStack, float degrees) {
-        poseStack.mulPose(com.mojang.math.Axis.YP.rotationDegrees(degrees));
+        poseStack.rotate(com.mojang.math.Axis.YP.rotationDegrees(degrees));
     }
 
     @Override
     public void rotateZ(com.mojang.blaze3d.vertex.PoseStack poseStack, float degrees) {
-        poseStack.mulPose(com.mojang.math.Axis.ZP.rotationDegrees(degrees));
+        poseStack.rotate(com.mojang.math.Axis.ZP.rotationDegrees(degrees));
     }
 
     @Override public void fill(Object poseStackOrGraphics, int minX, int minY, int maxX, int maxY, int color) { com.kingodogo.buildscape.adapter.v263.client.ClientPlatformHooks.fill(poseStackOrGraphics, minX, minY, maxX, maxY, color); }
@@ -553,6 +557,10 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter, com.kingo
     @Override
     public net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider createRandomStateProvider(List<BlockState> states) {
         return WorldGenFactory.createRandomStateProvider(states);
+    }
+    @Override
+    public net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider createSimpleStateProvider(BlockState state) {
+        return net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider.of(state);
     }
     @Override
     public net.minecraft.world.level.levelgen.feature.treedecorators.TreeDecorator getCreakingHeartTreeDecorator() {
@@ -595,7 +603,7 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter, com.kingo
         net.minecraft.world.level.levelgen.feature.TreeFeature.Builder builder =
                 new net.minecraft.world.level.levelgen.feature.TreeFeature.Builder(
                         trunkProvider, trunkPlacer, foliageProvider, foliagePlacer, featureSize,
-                        net.minecraft.core.Holder.direct(net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider.simple(net.minecraft.world.level.block.Blocks.DIRT)));
+                        net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider.holderOf(net.minecraft.world.level.block.Blocks.DIRT));
         if (decorators != null && !decorators.isEmpty()) {
             builder.decorators(decorators);
         }
@@ -794,11 +802,6 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter, com.kingo
                 .lightLevel(state -> definition.getLightEmission())
                 .emissiveRendering(state -> true)
                 .noOcclusion()) {
-            @Override
-            protected MapCodec<? extends HorizontalDirectionalBlock> codec() {
-                return null;
-            }
-
             @Override
             public ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state, boolean includeData) {
                 return createTrophyStack(level.getBlockEntity(pos));
@@ -1242,7 +1245,7 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter, com.kingo
 
     @Override
     public boolean doesBedExplode(Level level) {
-        return level.environmentAttributes().getDimensionValue(net.minecraft.world.attribute.EnvironmentAttributes.BED_RULE).explodes();
+        return level.environmentAttributes().getDimensionValue(net.minecraft.world.attribute.EnvironmentAttributes.BED_RULE).destroyOnUse();
     }
 
     @Override
@@ -2079,17 +2082,17 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter, com.kingo
 
     @Override
     public void playWaxOff(Level level, Player player, BlockPos pos) {
-        level.playSound(player, pos, SoundEvents.AXE_WAX_OFF, SoundSource.BLOCKS, 1.0f, 1.0f);
+        level.playSound(player, pos, SoundEvents.AXE_WAX_OFF.value(), SoundSource.BLOCKS, 1.0f, 1.0f);
     }
 
     @Override
     public void playAxeScrape(Level level, Player player, BlockPos pos) {
-        level.playSound(player, pos, SoundEvents.AXE_SCRAPE, SoundSource.BLOCKS, 1.0f, 1.0f);
+        level.playSound(player, pos, SoundEvents.AXE_SCRAPE.value(), SoundSource.BLOCKS, 1.0f, 1.0f);
     }
 
     @Override
     public void playAxeStrip(Level level, BlockPos pos) {
-        level.playSound(null, pos, SoundEvents.AXE_STRIP, SoundSource.BLOCKS, 1.0F, 1.0F);
+        level.playSound(null, pos, SoundEvents.AXE_STRIP.value(), SoundSource.BLOCKS, 1.0F, 1.0F);
     }
 
     @Override

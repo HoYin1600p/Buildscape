@@ -764,7 +764,7 @@ public class ModConfiguredFeatures {
             com.kingodogo.buildscape.block.BlockDefinition monetBlock
     ) {
         return Services.PLATFORM.createPatchFeature(
-                BlockStateProvider.simple(monetBlock.defaultBlockState()),
+                Services.PLATFORM.createSimpleStateProvider(monetBlock.defaultBlockState()),
                 64, 7, 3
         );
     }
@@ -923,7 +923,7 @@ public class ModConfiguredFeatures {
                 .setValue(FLOWER_AMOUNT, flowerAmount)
                 .setValue(FACING_PROP, facing);
 
-        return Services.PLATFORM.createPatchFeature(BlockStateProvider.simple(state), 64, 7, 3);
+        return Services.PLATFORM.createPatchFeature(Services.PLATFORM.createSimpleStateProvider(state), 64, 7, 3);
     }
 
     private static Object createCloverConfiguration(
@@ -940,12 +940,12 @@ public class ModConfiguredFeatures {
                 .setValue(FLOWER_AMOUNT, flowerAmount)
                 .setValue(FACING_PROP, facing);
 
-        return Services.PLATFORM.createPatchFeature(BlockStateProvider.simple(state), 64, 7, 3);
+        return Services.PLATFORM.createPatchFeature(Services.PLATFORM.createSimpleStateProvider(state), 64, 7, 3);
     }
 
     private static Object createColoredSporeBlossomConfiguration() {
         return Services.PLATFORM.createSimpleBlockConfiguration(
-                BlockStateProvider.simple(
+                Services.PLATFORM.createSimpleStateProvider(
                         ModBlocks.RED_SPORE_BLOSSOM.get().defaultBlockState()
                 )
         );
@@ -968,7 +968,7 @@ public class ModConfiguredFeatures {
 
     private static Object createMangrovePropaguleConfiguration() {
         return Services.PLATFORM.createSimpleBlockConfiguration(
-                BlockStateProvider.simple(
+                Services.PLATFORM.createSimpleStateProvider(
                         vanillaBlock("minecraft:mangrove_propagule").defaultBlockState()
                 )
         );
@@ -978,7 +978,7 @@ public class ModConfiguredFeatures {
             int count
     ) {
         return Services.PLATFORM.createPatchFeature(
-                BlockStateProvider.simple(
+                Services.PLATFORM.createSimpleStateProvider(
                         vanillaBlock("minecraft:mangrove_propagule").defaultBlockState()
                 ),
                 count,
@@ -1002,7 +1002,7 @@ public class ModConfiguredFeatures {
 
     private static Object createPoplarTreeConfiguration() {
         return Services.PLATFORM.createTreeConfiguration(
-                BlockStateProvider.simple(
+                Services.PLATFORM.createSimpleStateProvider(
                         ModBlocks.POPLAR_LOG.get().defaultBlockState()
                 ),
                 new net.minecraft.world.level.levelgen.feature.trunkplacers.StraightTrunkPlacer(
@@ -1031,9 +1031,9 @@ public class ModConfiguredFeatures {
 
     private static Object createPaleOakTreeConfiguration() {
         return Services.PLATFORM.createTreeConfiguration(
-                BlockStateProvider.simple(vanillaBlock("minecraft:pale_oak_log").defaultBlockState()),
+                Services.PLATFORM.createSimpleStateProvider(vanillaBlock("minecraft:pale_oak_log").defaultBlockState()),
                 new net.minecraft.world.level.levelgen.feature.trunkplacers.StraightTrunkPlacer(5, 2, 1),
-                BlockStateProvider.simple(vanillaBlock("minecraft:pale_oak_leaves").defaultBlockState()),
+                Services.PLATFORM.createSimpleStateProvider(vanillaBlock("minecraft:pale_oak_leaves").defaultBlockState()),
                 new net.minecraft.world.level.levelgen.feature.foliageplacers.BlobFoliagePlacer(
                         net.minecraft.util.valueproviders.ConstantInt.of(2),
                         net.minecraft.util.valueproviders.ConstantInt.of(0),
@@ -1047,9 +1047,9 @@ public class ModConfiguredFeatures {
 
     private static Object createCherryTreeConfiguration() {
         return Services.PLATFORM.createTreeConfiguration(
-                BlockStateProvider.simple(vanillaBlock("minecraft:cherry_log").defaultBlockState()),
+                Services.PLATFORM.createSimpleStateProvider(vanillaBlock("minecraft:cherry_log").defaultBlockState()),
                 new net.minecraft.world.level.levelgen.feature.trunkplacers.StraightTrunkPlacer(4, 2, 0),
-                BlockStateProvider.simple(vanillaBlock("minecraft:cherry_leaves").defaultBlockState()),
+                Services.PLATFORM.createSimpleStateProvider(vanillaBlock("minecraft:cherry_leaves").defaultBlockState()),
                 new net.minecraft.world.level.levelgen.feature.foliageplacers.BlobFoliagePlacer(
                         net.minecraft.util.valueproviders.ConstantInt.of(2),
                         net.minecraft.util.valueproviders.ConstantInt.of(0),

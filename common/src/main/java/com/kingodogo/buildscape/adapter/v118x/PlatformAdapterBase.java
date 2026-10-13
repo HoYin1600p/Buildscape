@@ -182,6 +182,10 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
         entity.attackAnim = 0.0F;
         entity.oAttackAnim = 0.0F;
     }
+    @Override
+    public boolean isEnderman(net.minecraft.world.entity.Entity entity) {
+        return entity instanceof net.minecraft.world.entity.monster.EnderMan;
+    }
     @Override public boolean isReplaceable(net.minecraft.world.level.block.state.BlockState state) { return state.getMaterial().isReplaceable(); }
     @Override public boolean isGlassBlock(net.minecraft.world.level.block.Block block) { return block instanceof net.minecraft.world.level.block.AbstractGlassBlock; }
     @Override
@@ -577,6 +581,10 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
     @Override
     public net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider createRandomStateProvider(List<BlockState> states) {
         return WorldGenFactory.createRandomStateProvider(states);
+    }
+    @Override
+    public net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider createSimpleStateProvider(BlockState state) {
+        return net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider.simple(state);
     }
     @Override
     public net.minecraft.world.level.levelgen.feature.treedecorators.TreeDecorator getCreakingHeartTreeDecorator() {

@@ -419,6 +419,11 @@ public final class WorldGenFactory {
                         .build();
         return new ConfiguredFeature<>(Feature.TREE, config);
     }
+    /** Typed view of a shared ModConfiguredFeatures handle; in this cluster it is always a ConfiguredFeature. */
+    public static ConfiguredFeature<?, ?> configuredFeature(Object handle) {
+        return (ConfiguredFeature<?, ?>) handle;
+    }
+
     public static ConfiguredFeature<?, ?> createTreeFeature(Object configuration) {
         return new ConfiguredFeature<>(Feature.TREE,
                 (net.minecraft.world.level.levelgen.feature.configurations.TreeConfiguration) configuration);

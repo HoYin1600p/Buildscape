@@ -153,7 +153,7 @@ public final class GuiProvider {
 
             @Override
             public boolean keyPressed(net.minecraft.client.input.KeyEvent event) {
-                if (delegate.keyPressed(event.key(), event.scancode(), event.modifiers())) return true;
+                if (delegate.keyPressed(event.key(), event.keycode(), event.modifiers())) return true;
                 return super.keyPressed(event);
             }
 
@@ -297,7 +297,7 @@ public final class GuiProvider {
 
             @Override
             public boolean keyPressed(net.minecraft.client.input.KeyEvent event) {
-                if (customWidget.keyPressed(event.key(), event.scancode(), event.modifiers())) return true;
+                if (customWidget.keyPressed(event.key(), event.keycode(), event.modifiers())) return true;
                 return super.keyPressed(event);
             }
 

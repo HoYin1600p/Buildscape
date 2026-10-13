@@ -2328,6 +2328,14 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter, com.kingo
     @Override
     public void registerCommonLifecycleInteractions() {
         registerFlowerPotPlants();
+    }
+
+    /**
+     * Registration that needs bound item components. 26.3 binds them only when the server resources
+     * load (after mod initialisation) and binds them again on every data reload, so a loader calls this
+     * at server starting and after each data pack reload.
+     */
+    public void registerDeferredServerData(net.minecraft.server.MinecraftServer server) {
         registerCompostables();
     }
 

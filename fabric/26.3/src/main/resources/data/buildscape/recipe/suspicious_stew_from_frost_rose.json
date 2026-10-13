@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "group": "suspicious_stew",
+  "ingredients": [
+    "minecraft:bowl",
+    "minecraft:brown_mushroom",
+    "minecraft:red_mushroom",
+    "buildscape:frost_rose"
+  ],
+  "result": {
+    "id": "minecraft:suspicious_stew",
+    "components": {
+      "minecraft:custom_data": {"FrostRoseStew": 1}
+    }
+  }
+}

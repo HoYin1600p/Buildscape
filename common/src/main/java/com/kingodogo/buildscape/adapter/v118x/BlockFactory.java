@@ -181,6 +181,18 @@ public class BlockFactory implements IBlockFactory {
     private static final class WoodTrapdoor extends TrapDoorBlock {
         private WoodTrapdoor(BlockBehaviour.Properties properties) { super(properties); }
     }
+    /** Reference sign filter: only dyes, glow ink and an empty, non-crouching hand reach vanilla sign use. */
+    private static boolean signUseFilter(boolean bamboo, Level level, BlockPos pos, Player player, InteractionHand hand) {
+        BlockEntity blockEntity = level.getBlockEntity(pos);
+        ItemStack heldItem = player.getItemInHand(hand);
+        if (!heldItem.isEmpty() && (heldItem.getItem() instanceof net.minecraft.world.item.DyeItem
+                || heldItem.getItem() == net.minecraft.world.item.Items.GLOW_INK_SAC)) {
+            return true;
+        }
+        return (bamboo ? blockEntity instanceof com.kingodogo.buildscape.block.BambooSignBlockEntity
+                : blockEntity instanceof com.kingodogo.buildscape.block.MangroveSignBlockEntity)
+                && !player.isCrouching() && heldItem.isEmpty();
+    }
     private static final class WoodButton extends WoodButtonBlock {
         private WoodButton(BlockBehaviour.Properties properties) { super(properties); }
     }
@@ -306,6 +318,11 @@ public class BlockFactory implements IBlockFactory {
                         return bamboo ? new com.kingodogo.buildscape.block.BambooSignBlockEntity(pos, state)
                                 : new com.kingodogo.buildscape.block.MangroveSignBlockEntity(pos, state);
                     }
+                    @Override public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player,
+                            InteractionHand hand, BlockHitResult hit) {
+                        return signUseFilter(bamboo, level, pos, player, hand)
+                                ? super.use(state, level, pos, player, hand, hit) : InteractionResult.PASS;
+                    }
                 };
             }
             case "ModWallSignBlock", "ModBambooWallSignBlock": {
@@ -315,8 +332,14 @@ public class BlockFactory implements IBlockFactory {
                         return bamboo ? new com.kingodogo.buildscape.block.BambooSignBlockEntity(pos, state)
                                 : new com.kingodogo.buildscape.block.MangroveSignBlockEntity(pos, state);
                     }
+                    @Override public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player,
+                            InteractionHand hand, BlockHitResult hit) {
+                        return signUseFilter(bamboo, level, pos, player, hand)
+                                ? super.use(state, level, pos, player, hand, hit) : InteractionResult.PASS;
+                    }
                 };
             }
+            case "ModButtonBlock": return new net.minecraft.world.level.block.StoneButtonBlock(props) {};
             case "SaplingBlock": {
                 net.minecraft.world.level.block.grower.AbstractTreeGrower grower = def.getId().equals("cherry_sapling")
                         ? new com.kingodogo.buildscape.worldgen.CherryTreeGrower()
@@ -387,7 +410,8 @@ public class BlockFactory implements IBlockFactory {
         } else if (def.isWeatheringPressurePlate()) {
             return new net.minecraft.world.level.block.WeightedPressurePlateBlock(WeatheringBlockLogic.PRESSURE_PLATE_MAX_WEIGHT, props.randomTicks()) {
                 @Override public boolean isRandomlyTicking(BlockState state) { return true; }
-                @Override public void randomTick(BlockState state, ServerLevel level, BlockPos pos, Random random) { WeatheringBlockLogic.randomTick(state, level, pos); }
+                // Reference oxidation schedules the powered replacement's release tick.
+                @Override public void randomTick(BlockState state, ServerLevel level, BlockPos pos, Random random) { RestoredCopperOxidation.tryOxidize(level, pos, state); }
             };
         } else if (def.isWeatheringSlab()) {
             return new net.minecraft.world.level.block.SlabBlock(props.randomTicks()) {
@@ -696,6 +720,10 @@ public class BlockFactory implements IBlockFactory {
                     onNeighborUpdate(level, pos, state, block, fromPos, isMoving);
                 }
                 @Override
+                public void animateTick(BlockState state, Level level, BlockPos pos, Random random) {
+                    onAnimateTick(state, level, pos);
+                }
+                @Override
                 public boolean hasAnalogOutputSignal(BlockState state) {
                     return true;
                 }
@@ -737,6 +765,11 @@ public class BlockFactory implements IBlockFactory {
             class V118xMangroveLeavesBlock extends LeavesBlock implements BonemealableBlock {
                 public V118xMangroveLeavesBlock(BlockBehaviour.Properties properties) {
                     super(properties);
+                    BlockState base = this.stateDefinition.any();
+                    if (base.hasProperty(BlockStateProperties.WATERLOGGED)) {
+                        base = base.setValue(BlockStateProperties.WATERLOGGED, false);
+                    }
+                    this.registerDefaultState(base.setValue(DISTANCE, 7).setValue(PERSISTENT, false));
                 }
                 @Override
                 public boolean isValidBonemealTarget(BlockGetter level, BlockPos pos, BlockState state, boolean isClient) {
@@ -753,9 +786,45 @@ public class BlockFactory implements IBlockFactory {
             }
             return new V118xMangroveLeavesBlock(props);
         } else if (def.isMangrovePropagule()) {
+            Supplier<Block> propaguleLeaves = resolveBlockSupplier("mangrove_leaves");
+            Supplier<Block> propaguleMud = resolveBlockSupplier("mud");
+            Supplier<Block> propaguleMuddyRoots = resolveBlockSupplier("muddy_mangrove_roots");
             class V118xMangrovePropaguleBlock extends MangrovePropaguleBlock implements BonemealableBlock {
                 public V118xMangrovePropaguleBlock(BlockBehaviour.Properties properties) {
                     super(properties);
+                }
+                private boolean isLeavesAbove(BlockState aboveState) {
+                    return aboveState.is(net.minecraft.tags.BlockTags.LEAVES) || aboveState.is(propaguleLeaves.get());
+                }
+                @Override
+                public boolean canSurvive(BlockState state, LevelReader level, BlockPos pos) {
+                    if (state.getValue(HANGING)) {
+                        return isLeavesAbove(level.getBlockState(pos.above()));
+                    }
+                    BlockState belowState = level.getBlockState(pos.below());
+                    return (belowState.is(net.minecraft.tags.BlockTags.DIRT) && !belowState.is(Blocks.DIRT_PATH))
+                            || belowState.is(Blocks.FARMLAND)
+                            || belowState.is(Blocks.MOSS_BLOCK)
+                            || belowState.is(propaguleMud.get())
+                            || belowState.is(Blocks.CLAY)
+                            || belowState.is(propaguleMuddyRoots.get());
+                }
+                @Override
+                public BlockState updateShape(BlockState state, Direction direction, BlockState adjacentState, LevelAccessor level, BlockPos pos, BlockPos adjacentPos) {
+                    if (state.getValue(WATERLOGGED)) {
+                        level.scheduleTick(pos, net.minecraft.world.level.material.Fluids.WATER, net.minecraft.world.level.material.Fluids.WATER.getTickDelay(level));
+                    }
+                    if (state.getValue(HANGING)) {
+                        if (direction == Direction.UP && !isLeavesAbove(level.getBlockState(pos.above()))) {
+                            return Blocks.AIR.defaultBlockState();
+                        }
+                    } else if (direction == Direction.DOWN) {
+                        if (!canSurvive(state, level, pos)) {
+                            return Blocks.AIR.defaultBlockState();
+                        }
+                        return state.setValue(ON_FARMLAND, shouldSink(level, pos));
+                    }
+                    return super.updateShape(state, direction, adjacentState, level, pos, adjacentPos);
                 }
                 @Override
                 public boolean isValidBonemealTarget(BlockGetter level, BlockPos pos, BlockState state, boolean isClient) {
@@ -767,7 +836,95 @@ public class BlockFactory implements IBlockFactory {
                 }
                 @Override
                 public void performBonemeal(ServerLevel level, java.util.Random random, BlockPos pos, BlockState state) {
+                    if (!state.getValue(HANGING) && state.getValue(STAGE) >= 1) {
+                        advanceTree(level, pos, state, random, true);
+                        return;
+                    }
                     performBonemealEffect(level, pos, state);
+                }
+                @Override
+                public boolean isRandomlyTicking(BlockState state) {
+                    return !state.getValue(HANGING);
+                }
+                @Override
+                public void randomTick(BlockState state, ServerLevel level, BlockPos pos, java.util.Random random) {
+                    if (state.getValue(HANGING)) return;
+                    if (level.getEntitiesOfClass(Player.class, new net.minecraft.world.phys.AABB(pos).inflate(32)).isEmpty()) return;
+                    if (random.nextInt(7) == 0) advanceTree(level, pos, state, random, false);
+                }
+                private void advanceTree(ServerLevel level, BlockPos pos, BlockState state, java.util.Random random, boolean bonemeal) {
+                    if (state.getValue(HANGING)) return;
+                    if (state.getValue(STAGE) < 1) {
+                        level.setBlock(pos, state.setValue(STAGE, state.getValue(STAGE) + 1), 4);
+                        return;
+                    }
+                    if (!bonemeal && !canGrowTree(level, pos)) return;
+                    String variant = com.kingodogo.buildscape.worldgen.ModConfiguredFeatures.getRandomMangroveTreeVariant(random);
+                    ResourceLocation featureLocation = new ResourceLocation("buildscape", variant);
+                    var featureHolder = level.registryAccess().registry(Registry.CONFIGURED_FEATURE_REGISTRY)
+                            .flatMap(registry -> registry.getHolder(net.minecraft.resources.ResourceKey.create(Registry.CONFIGURED_FEATURE_REGISTRY, featureLocation)));
+                    if (featureHolder.isEmpty()) {
+                        com.kingodogo.buildscape.BuildscapeCommon.LOGGER.warn("Mangrove tree feature {} not found in registry! Cannot grow tree.", featureLocation);
+                        level.setBlock(pos, state, 4);
+                        return;
+                    }
+                    var feature = featureHolder.get().value();
+                    if (feature.feature() != net.minecraft.world.level.levelgen.feature.Feature.TREE) {
+                        com.kingodogo.buildscape.BuildscapeCommon.LOGGER.warn("Mangrove tree feature {} is not a tree feature!", featureLocation);
+                        level.setBlock(pos, state, 4);
+                        return;
+                    }
+                    BlockPos belowPos = pos.below();
+                    if (level.getBlockState(belowPos).is(Blocks.GRASS_BLOCK)) {
+                        level.setBlock(belowPos, Blocks.DIRT.defaultBlockState(), 3);
+                    }
+                    level.setBlock(pos, state.getFluidState().createLegacyBlock(), Block.UPDATE_ALL);
+                    @SuppressWarnings("unchecked")
+                    net.minecraft.world.level.levelgen.feature.configurations.TreeConfiguration treeConfig =
+                            (net.minecraft.world.level.levelgen.feature.configurations.TreeConfiguration) feature.config();
+                    var placeContext = new net.minecraft.world.level.levelgen.feature.FeaturePlaceContext<>(
+                            java.util.Optional.empty(), level, level.getChunkSource().getGenerator(), random, pos, treeConfig);
+                    if (!net.minecraft.world.level.levelgen.feature.Feature.TREE.place(placeContext)) {
+                        level.setBlock(pos, state, Block.UPDATE_ALL);
+                    }
+                }
+                private boolean canGrowTree(LevelReader level, BlockPos pos) {
+                    if (level.getMaxLocalRawBrightness(pos) < 9) return false;
+                    for (int y = 1; y <= 6; y++) {
+                        BlockState check = level.getBlockState(pos.above(y));
+                        if (!check.isAir() && !check.is(net.minecraft.tags.BlockTags.DIRT) && !isLogOrWood(check)) return false;
+                    }
+                    boolean solidNearby = false;
+                    for (int x = -4; x <= 4 && !solidNearby; x++) {
+                        for (int z = -4; z <= 4 && !solidNearby; z++) {
+                            if (x == 0 && z == 0) continue;
+                            for (int y = -4; y <= 4; y++) {
+                                BlockPos check = pos.offset(x, y, z);
+                                if (isSolidBlock(level, check, level.getBlockState(check))) { solidNearby = true; break; }
+                            }
+                        }
+                    }
+                    if (!solidNearby) return false;
+                    for (int x = -4; x <= 4; x++) {
+                        for (int z = -4; z <= 4; z++) {
+                            for (int y = 1; y <= 11; y++) {
+                                BlockPos check = pos.offset(x, -y, z);
+                                if (isSolidBlock(level, check, level.getBlockState(check))) return true;
+                            }
+                        }
+                    }
+                    return false;
+                }
+                private boolean isLogOrWood(BlockState state) {
+                    return state.is(net.minecraft.tags.BlockTags.LOGS) || state.is(net.minecraft.tags.BlockTags.PLANKS)
+                            || state.getBlock() == resolveBlockSupplier("mangrove_log").get()
+                            || state.getBlock() == resolveBlockSupplier("mangrove_wood").get()
+                            || state.getBlock() == resolveBlockSupplier("stripped_mangrove_log").get()
+                            || state.getBlock() == resolveBlockSupplier("stripped_mangrove_wood").get();
+                }
+                private boolean isSolidBlock(BlockGetter level, BlockPos pos, BlockState state) {
+                    if (state.is(propaguleMud.get())) return false;
+                    return state.isFaceSturdy(level, pos, Direction.UP) && state.getMaterial().isSolid() && !state.getMaterial().isReplaceable();
                 }
             }
             return new V118xMangrovePropaguleBlock(props);
@@ -837,7 +994,13 @@ public class BlockFactory implements IBlockFactory {
                     return isCommonPathfindable(state, type);
                 }
             }
-            return new V118xColoredMossLayersBlock(props);
+            return new V118xColoredMossLayersBlock(props) {
+                // Reference: drops one layer item per layer, ignoring the loot table (which gives a single item).
+                @Override
+                public List<ItemStack> getDrops(BlockState state, net.minecraft.world.level.storage.loot.LootContext.Builder builder) {
+                    return List.of(new ItemStack(net.minecraft.core.Registry.ITEM.get(net.minecraft.core.Registry.BLOCK.getKey(this)), state.getValue(LAYERS)));
+                }
+            };
         } else if (def.isMossLayers()) {
             class V118xMossLayersBlock extends MossLayersBlock {
                 public V118xMossLayersBlock(BlockBehaviour.Properties properties) {
@@ -861,7 +1024,13 @@ public class BlockFactory implements IBlockFactory {
                     return isCommonPathfindable(state, type);
                 }
             }
-            return new V118xMossLayersBlock(props);
+            return new V118xMossLayersBlock(props) {
+                // Reference: drops one layer item per layer, ignoring the loot table (which gives a single item).
+                @Override
+                public List<ItemStack> getDrops(BlockState state, net.minecraft.world.level.storage.loot.LootContext.Builder builder) {
+                    return List.of(new ItemStack(net.minecraft.core.Registry.ITEM.get(net.minecraft.core.Registry.BLOCK.getKey(this)), state.getValue(LAYERS)));
+                }
+            };
         } else if (def.isWoolLayers()) {
             String color = def.getId().replace("_carpet_layers", "").replace("_layered_wool_layers", "");
             Supplier<Item> carpetSupplier = resolveItemSupplier(color + "_carpet_layers");
@@ -947,7 +1116,9 @@ public class BlockFactory implements IBlockFactory {
                 }
                 @Override
                 public void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, BlockPos fromPos, boolean isMoving) {
-                    onNeighborUpdate(level, pos, state, block, fromPos, isMoving);
+                    if (fromPos.equals(pos.above()) || fromPos.equals(pos.below())) {
+                        onNeighborUpdate(level, pos, state, block, fromPos, isMoving);
+                    }
                 }
                 @Override
                 public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
@@ -983,9 +1154,23 @@ public class BlockFactory implements IBlockFactory {
                     return onInteract(level, pos, state, player, hand, hit);
                 }
                 @Override
-                public void playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
-                    onPlayerDestroy(level, pos, state, player);
-                    super.playerWillDestroy(level, pos, state, player);
+                public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
+                    if (!state.is(newState.getBlock())) {
+                        onBlockRemoved(level, pos, state);
+                    }
+                    super.onRemove(state, level, pos, newState, isMoving);
+                }
+                @Override
+                public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
+                    if (!level.isClientSide() && level instanceof Level lvl) {
+                        com.kingodogo.buildscape.pipe.transport.HollowPipeTransportManager.onNeighborChanged(lvl, pos, state, neighborPos);
+                    }
+                    return super.updateShape(state, direction, neighborState, level, pos, neighborPos);
+                }
+                @Override
+                public void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, BlockPos fromPos, boolean isMoving) {
+                    super.neighborChanged(state, level, pos, block, fromPos, isMoving);
+                    onNeighborUpdate(level, pos, state, block, fromPos, isMoving);
                 }
             };
         } else if (def.isHollowPipe()) {
@@ -995,9 +1180,45 @@ public class BlockFactory implements IBlockFactory {
                     return onInteract(level, pos, state, player, hand, hit);
                 }
                 @Override
-                public void playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
-                    onPlayerDestroy(level, pos, state, player);
-                    super.playerWillDestroy(level, pos, state, player);
+                public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
+                    if (!state.is(newState.getBlock())) {
+                        onBlockRemoved(level, pos, state);
+                    }
+                    super.onRemove(state, level, pos, newState, isMoving);
+                }
+                @Override
+                public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
+                    if (state.getValue(WATERLOGGED)) {
+                        level.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
+                    }
+                    if (state.getValue(LAVA_LOGGED)) {
+                        level.scheduleTick(pos, Fluids.LAVA, Fluids.LAVA.getTickDelay(level));
+                    }
+                    if (state.getValue(WATER_LEVEL) > 0) {
+                        level.scheduleTick(pos, this, Fluids.WATER.getTickDelay(level));
+                    }
+                    BlockState updated = super.updateShape(state, direction, neighborState, level, pos, neighborPos);
+                    if (state.getValue(WATER_LEVEL) > 0 && updated.getValue(WATER_LEVEL) == 0) {
+                        updated = updated.setValue(WATER_LEVEL, state.getValue(WATER_LEVEL));
+                    }
+                    updated = updateConnections(level, pos, updated);
+                    if (!level.isClientSide() && level instanceof Level lvl) {
+                        com.kingodogo.buildscape.pipe.transport.HollowPipeTransportManager.onNeighborChanged(lvl, pos, updated, neighborPos);
+                    }
+                    return updated;
+                }
+                @Override
+                public void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, BlockPos fromPos, boolean isMoving) {
+                    super.neighborChanged(state, level, pos, block, fromPos, isMoving);
+                    onNeighborUpdate(level, pos, state, block, fromPos, isMoving);
+                }
+                @Override
+                public void tick(BlockState state, ServerLevel level, BlockPos pos, Random random) {
+                    super.tick(state, level, pos, random);
+                    onBlockTick(level, pos, state);
+                }
+                public boolean isLadder(BlockState state, LevelReader level, BlockPos pos, net.minecraft.world.entity.LivingEntity entity) {
+                    return hasVerticalChannel(state);
                 }
                 @Override
                 public void entityInside(BlockState state, Level level, BlockPos pos, Entity entity) {
@@ -1547,6 +1768,7 @@ public class BlockFactory implements IBlockFactory {
                 @Override
                 public BlockState updateShape(BlockState state, Direction direction, BlockState adjacentState, LevelAccessor level, BlockPos pos, BlockPos adjacentPos) {
                     BlockState adjusted = onUpdateShape(state, direction, adjacentState, level, pos, adjacentPos);
+                    if (direction == Direction.DOWN) return adjusted;
                     return super.updateShape(adjusted, direction, adjacentState, level, pos, adjacentPos);
                 }
 
@@ -1587,6 +1809,7 @@ public class BlockFactory implements IBlockFactory {
                 @Override
                 public BlockState updateShape(BlockState state, Direction direction, BlockState adjacentState, LevelAccessor level, BlockPos pos, BlockPos adjacentPos) {
                     BlockState adjusted = onUpdateShape(state, direction, adjacentState, level, pos, adjacentPos);
+                    if (direction == Direction.DOWN) return adjusted;
                     return super.updateShape(adjusted, direction, adjacentState, level, pos, adjacentPos);
                 }
 
@@ -1727,6 +1950,7 @@ public class BlockFactory implements IBlockFactory {
                 @Override
                 public BlockState updateShape(BlockState state, Direction direction, BlockState adjacentState, LevelAccessor level, BlockPos pos, BlockPos adjacentPos) {
                     BlockState adjusted = onUpdateShape(state, direction, adjacentState, level, pos, adjacentPos);
+                    if (direction == Direction.DOWN) return adjusted;
                     return super.updateShape(adjusted, direction, adjacentState, level, pos, adjacentPos);
                 }
             }
@@ -1736,7 +1960,7 @@ public class BlockFactory implements IBlockFactory {
             return new SnowyBushBlock(props, snowBricks) {
                 @Override
                 public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
-                    if (!state.canSurvive(level, pos)) return Blocks.AIR.defaultBlockState();
+                    if (direction != Direction.DOWN && !state.canSurvive(level, pos)) return Blocks.AIR.defaultBlockState();
                     return onUpdateShape(state, direction, neighborState, level, pos, neighborPos);
                 }
                 @Override
@@ -1753,7 +1977,7 @@ public class BlockFactory implements IBlockFactory {
                 }
                 @Override
                 public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
-                    if (!state.canSurvive(level, pos)) return Blocks.AIR.defaultBlockState();
+                    if (direction != Direction.DOWN && !state.canSurvive(level, pos)) return Blocks.AIR.defaultBlockState();
                     return onUpdateShape(state, direction, neighborState, level, pos, neighborPos);
                 }
                 @Override
@@ -1783,7 +2007,7 @@ public class BlockFactory implements IBlockFactory {
                 }
                 @Override
                 public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
-                    if (!state.canSurvive(level, pos)) return Blocks.AIR.defaultBlockState();
+                    if (direction != Direction.DOWN && !state.canSurvive(level, pos)) return Blocks.AIR.defaultBlockState();
                     return onUpdateShape(state, direction, neighborState, level, pos, neighborPos);
                 }
                 @Override

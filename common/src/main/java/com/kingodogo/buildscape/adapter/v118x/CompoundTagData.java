@@ -80,7 +80,11 @@ public final class CompoundTagData implements IBlockEntityData {
         if (!tag.contains(key, Tag.TAG_COMPOUND)) return ItemStack.EMPTY;
         CompoundTag itemTag = tag.getCompound(key);
         ItemStack stack = ItemStack.of(itemTag);
-        if (!stack.isEmpty() && itemTag.contains("RealCount", Tag.TAG_INT)) stack.setCount(itemTag.getInt("RealCount"));
+        // RealCount only extends the byte Count; a Count edited afterwards (data merge) makes it stale.
+        if (!stack.isEmpty() && itemTag.contains("RealCount", Tag.TAG_INT)
+                && (byte) itemTag.getInt("RealCount") == itemTag.getByte("Count")) {
+            stack.setCount(itemTag.getInt("RealCount"));
+        }
         return stack;
     }
     @Override public List<ItemStack> getItemListOrEmpty(String key, int size) {

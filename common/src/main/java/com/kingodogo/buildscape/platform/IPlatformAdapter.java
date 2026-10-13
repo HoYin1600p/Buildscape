@@ -33,6 +33,13 @@ public interface IPlatformAdapter {
                 : com.kingodogo.buildscape.item.ItemFactory.createItem(definition);
     }
 
+    /** Copper waxing, scraping and bottle-of-mist interaction; clusters with restored copper content override it. */
+    default net.minecraft.world.InteractionResult handleCopperRightClick(Level level, net.minecraft.core.BlockPos pos,
+            net.minecraft.world.level.block.state.BlockState state, net.minecraft.world.item.ItemStack held,
+            net.minecraft.world.entity.player.Player player, net.minecraft.world.InteractionHand hand) {
+        return com.kingodogo.buildscape.block.CopperOxidationHandler.handleRightClick(level, pos, state, held, player, hand);
+    }
+
     enum BoatPlacementOutcome { PASS, FAIL, SUCCESS }
 
     default BoatPlacementOutcome placePoplarBoat(net.minecraft.world.item.Item boatItem, Level level,
@@ -119,6 +126,8 @@ public interface IPlatformAdapter {
     Fluid getFluid(CommonId id);
     CommonId getFluidId(Fluid fluid);
     Fluid getBucketFluid(Item item);
+    /** The plant a filled vanilla flower pot holds (FlowerPotBlock.getContent / getPotted by version). */
+    Block getFlowerPotPlant(net.minecraft.world.level.block.FlowerPotBlock pot);
 
     Entity createSeatEntity(Level level, double x, double y, double z);
     Entity createFallingIcicleEntity(Level level, double x, double y, double z, net.minecraft.world.level.block.state.BlockState state);

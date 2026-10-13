@@ -7,6 +7,7 @@
   "plugin": "com.kingodogo.buildscape.mixin.BuildscapeMixinPlugin",
   "mixins": [
     "AgeableMobMixin",
+    "AbstractContainerMenuMixin",
     "AnvilMenuMixin",
     "BaseCoralPlantTypeBlockMixin",
     "BeaconBlockEntityAccessor",
@@ -45,6 +46,7 @@
     "WallBlockMixin"
   ],
   "client": [
+    "AbstractContainerScreenMixin",
     "FireworkStarterMixin",
     "GlassJarRenderShapeMixin",
     "PauseScreenMixin",

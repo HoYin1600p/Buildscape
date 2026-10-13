@@ -3169,8 +3169,9 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter, com.kingo
             super(entityType, level, () -> Services.PLATFORM.getItem(new CommonId("buildscape", "poplar_boat")));
         }
 
+        @SuppressWarnings("unchecked")
         public PoplarBoatEntityImpl(Level level, double x, double y, double z) {
-            this(EntityTypes.OAK_BOAT, level);
+            this((EntityType<? extends Boat>) Services.PLATFORM.getPoplarBoatEntityType(), level);
             this.setPos(x, y, z);
             this.xo = x;
             this.yo = y;

@@ -2526,6 +2526,8 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                     return true;
                 }
             }
+                }
+            }
         }
 
         return false;

@@ -584,6 +584,11 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
 
     @Override
     public void onPlayerDestroy(Level level, BlockPos pos, BlockState state, Player player) {
+        onBlockRemoved(level, pos, state);
+    }
+
+    /** Refreshes neighbours, notifies transport and restores a source fluid. Runs when the pipe is removed or replaced. */
+    public void onBlockRemoved(Level level, BlockPos pos, BlockState state) {
         BlockEntity be = level.getBlockEntity(pos);
         Fluid sourceFluid = getSourceFluid(state, be);
 
@@ -604,7 +609,7 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
     @Override
     public void onNeighborUpdate(Level level, BlockPos pos, BlockState state, Block neighborBlock, BlockPos neighborPos, boolean isMoving) {
         if (!level.isClientSide()) {
-            HollowPipeTransportManager.onNeighborChanged(level, pos, state, pos);
+            HollowPipeTransportManager.onNeighborChanged(level, pos, state, neighborPos);
         }
     }
 

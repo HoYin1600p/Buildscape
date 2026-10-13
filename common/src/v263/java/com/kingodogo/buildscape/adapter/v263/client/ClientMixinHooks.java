@@ -182,26 +182,26 @@ public final class ClientMixinHooks {
 
     public static VertexConsumer getFestiveFoilBufferDirect(Object bufferSource, Object renderType, boolean noEntity) {
         return foilBuffer(bufferSource, renderType, noEntity
-                ? net.minecraft.client.renderer.rendertype.RenderTypes.glint()
-                : net.minecraft.client.renderer.rendertype.RenderTypes.entityGlint());
+                ? FestiveRenderTypes.glint()
+                : FestiveRenderTypes.entityGlint());
     }
 
     public static VertexConsumer getFestiveFoilBuffer(Object bufferSource, Object renderType, boolean isItem) {
         return foilBuffer(bufferSource, renderType, isItem
-                ? net.minecraft.client.renderer.rendertype.RenderTypes.glint()
-                : net.minecraft.client.renderer.rendertype.RenderTypes.entityGlint());
+                ? FestiveRenderTypes.glint()
+                : FestiveRenderTypes.entityGlint());
     }
 
     public static VertexConsumer getFestiveArmorFoilBuffer(Object bufferSource, Object renderType, boolean isItem) {
-        return foilBuffer(bufferSource, renderType, net.minecraft.client.renderer.rendertype.RenderTypes.armorEntityGlint());
+        return foilBuffer(bufferSource, renderType, FestiveRenderTypes.armorEntityGlint());
     }
 
     public static VertexConsumer getFestiveCompassFoilBuffer(Object bufferSource, Object renderType, PoseStack.Pose pose) {
-        return foilBuffer(bufferSource, renderType, net.minecraft.client.renderer.rendertype.RenderTypes.glint());
+        return foilBuffer(bufferSource, renderType, FestiveRenderTypes.glint());
     }
 
     public static VertexConsumer getFestiveCompassFoilBufferDirect(Object bufferSource, Object renderType, PoseStack.Pose pose) {
-        return foilBuffer(bufferSource, renderType, net.minecraft.client.renderer.rendertype.RenderTypes.glint());
+        return foilBuffer(bufferSource, renderType, FestiveRenderTypes.glint());
     }
 
     public static void setScreen(Object screen) {
@@ -212,7 +212,7 @@ public final class ClientMixinHooks {
 
     public static ItemStack cycleAdvancementIcon(Object node, Object displayObject) {
         var display = (net.minecraft.advancements.DisplayInfo) displayObject;
-        ItemStack fallback = display.getIcon().create();
+        ItemStack fallback = display.icon().create();
         if (!(node instanceof net.minecraft.advancements.AdvancementNode advancement)) return fallback;
         var id = advancement.holder().id();
         if (!id.getNamespace().equals("buildscape")) return fallback;
@@ -295,19 +295,19 @@ public final class ClientMixinHooks {
         // Initialize every festive setup here; the item/model submission mixins select these
         // same cached types and the staged buffer allocates their draws when submitted.
         try {
-            com.kingodogo.buildscape.mixinsupport.FestiveSubmission.festiveGlint(net.minecraft.client.renderer.rendertype.RenderTypes.glint());
-            com.kingodogo.buildscape.mixinsupport.FestiveSubmission.festiveGlint(net.minecraft.client.renderer.rendertype.RenderTypes.glintTranslucent());
-            com.kingodogo.buildscape.mixinsupport.FestiveSubmission.festiveGlint(net.minecraft.client.renderer.rendertype.RenderTypes.entityGlint());
-            com.kingodogo.buildscape.mixinsupport.FestiveSubmission.festiveGlint(net.minecraft.client.renderer.rendertype.RenderTypes.armorEntityGlint());
+            com.kingodogo.buildscape.mixinsupport.FestiveSubmission.festiveGlint(FestiveRenderTypes.glint());
+            com.kingodogo.buildscape.mixinsupport.FestiveSubmission.festiveGlint(FestiveRenderTypes.glintTranslucent());
+            com.kingodogo.buildscape.mixinsupport.FestiveSubmission.festiveGlint(FestiveRenderTypes.entityGlint());
+            com.kingodogo.buildscape.mixinsupport.FestiveSubmission.festiveGlint(FestiveRenderTypes.armorEntityGlint());
         } catch (RuntimeException exception) {
             com.kingodogo.buildscape.BuildscapeCommon.LOGGER.error("Failed to initialize festive glint render types", exception);
         }
     }
 
     private static boolean shiftDown() {
-        var window = Minecraft.getInstance().getWindow();
-        return com.mojang.blaze3d.platform.InputConstants.isKeyDown(window, 340)
-                || com.mojang.blaze3d.platform.InputConstants.isKeyDown(window, 344);
+        // 26.3 reads the SDL keyboard state, indexed by scancode (340/344 were the GLFW shift keys).
+        return com.mojang.blaze3d.platform.InputConstants.isKeyDown(com.mojang.blaze3d.platform.InputConstants.KEY_LSHIFT)
+                || com.mojang.blaze3d.platform.InputConstants.isKeyDown(com.mojang.blaze3d.platform.InputConstants.KEY_RSHIFT);
     }
 
     public static List<Component> prepareCustomTooltipText(ItemStack stack, List<Component> original) {

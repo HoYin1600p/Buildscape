@@ -1,9 +1,14 @@
 package com.kingodogo.buildscape.mixinsupport;
 
 import com.kingodogo.buildscape.client.renderer.FestiveGlintHandler;
+import com.mojang.renderpearl.api.pipeline.RenderPipeline;
+import com.mojang.renderpearl.api.textures.GpuSampler;
+import net.minecraft.client.renderer.feature.ItemFeatureRenderer;
+import net.minecraft.client.renderer.oit.OitPipelineSet;
+import net.minecraft.client.renderer.rendertype.LayeringTransform;
 import net.minecraft.client.renderer.rendertype.RenderSetup;
 import net.minecraft.client.renderer.rendertype.RenderType;
-import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.client.renderer.rendertype.TextureTransform;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 
@@ -14,6 +19,7 @@ import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Supplier;
 
 /** Carries stack identity through deferred extraction, submission and glint preparation. */
@@ -22,6 +28,13 @@ public final class FestiveSubmission {
     private static final Map<IdentityReference, ItemStack> STACKS = new HashMap<>();
     private static final Map<RenderType, RenderType> TYPES = new IdentityHashMap<>();
     private static final Identifier TEXTURE = Identifier.fromNamespaceAndPath("buildscape", "textures/misc/festive_glint.png");
+    // Minecraft 26.3 builds glint render types per texture, so they are recognised by name. The
+    // names are the item, entity-model and armor glint types plus the two fixed glint types.
+    private static final Set<String> GLINT_NAMES = Set.of(
+            "item_cutout_glint", "item_cutout_glint_special",
+            "item_translucent_glint", "item_translucent_glint_special",
+            "entity_solid_glint", "armor_cutout_no_cull_glint",
+            "patterned_shield_glint", "trimmed_armor_glint");
 
     private FestiveSubmission() {
     }
@@ -52,40 +65,53 @@ public final class FestiveSubmission {
     }
 
     public static synchronized RenderType festiveGlint(RenderType original) {
-        if (original != RenderTypes.glint() && original != RenderTypes.glintTranslucent()
-                && original != RenderTypes.entityGlint() && original != RenderTypes.armorEntityGlint()) return original;
+        if (!isGlint(original)) return original;
         return TYPES.computeIfAbsent(original, FestiveSubmission::copyGlint);
     }
 
-    // The private render-type factory has no public counterpart in 26.2. Copy the verified
-    // setup so blending, decal transforms, output targets and sampler behavior stay intact.
+    private static boolean isGlint(RenderType original) {
+        try {
+            return GLINT_NAMES.contains((String) field(original, "name"));
+        } catch (ReflectiveOperationException exception) {
+            throw new IllegalStateException("Cannot read the Minecraft 26.3 render type name", exception);
+        }
+    }
+
+    // The private render-type factory has no public counterpart in 26.3. Rebuild the verified
+    // setup through the public builder so the pipeline, blending, texture transform, layering and
+    // sampler behavior stay intact; only the glint texture binding is replaced.
+    @SuppressWarnings("unchecked")
     private static RenderType copyGlint(RenderType original) {
         try {
             RenderSetup setup = (RenderSetup) field(original, "state");
             Map<?, ?> textures = (Map<?, ?>) field(setup, "textures");
-            Map<Object, Object> replacements = new HashMap<>();
+            RenderSetup.RenderSetupBuilder builder = RenderSetup.builder((RenderPipeline) field(setup, "pipeline"));
+            OitPipelineSet oitPipelineSet = (OitPipelineSet) field(setup, "oitPipelineSet");
+            if (oitPipelineSet != null) builder.setOitPipelines(oitPipelineSet);
             for (var entry : textures.entrySet()) {
                 Object binding = entry.getValue();
-                Constructor<?> constructor = binding.getClass().getDeclaredConstructor(Identifier.class, Supplier.class);
-                constructor.setAccessible(true);
-                replacements.put(entry.getKey(), constructor.newInstance(TEXTURE, field(binding, "sampler")));
+                Identifier location = (Identifier) field(binding, "location");
+                boolean glintTexture = location.equals(ItemFeatureRenderer.ENCHANTED_GLINT_ITEM)
+                        || location.equals(ItemFeatureRenderer.ENCHANTED_GLINT_ARMOR);
+                builder.withTexture((String) entry.getKey(), glintTexture ? TEXTURE : location,
+                        (Supplier<GpuSampler>) field(binding, "sampler"));
             }
-            Constructor<?> setupConstructor = RenderSetup.class.getDeclaredConstructor(
-                    com.mojang.blaze3d.pipeline.RenderPipeline.class, Map.class, boolean.class, boolean.class,
-                    net.minecraft.client.renderer.rendertype.LayeringTransform.class,
-                    net.minecraft.client.renderer.rendertype.OutputTarget.class,
-                    net.minecraft.client.renderer.rendertype.TextureTransform.class,
-                    RenderSetup.OutlineProperty.class, boolean.class, boolean.class);
-            setupConstructor.setAccessible(true);
-            Object replacement = setupConstructor.newInstance(field(setup, "pipeline"), replacements,
-                    field(setup, "useLightmap"), field(setup, "useOverlay"), field(setup, "layeringTransform"),
-                    field(setup, "outputTarget"), field(setup, "textureTransform"), field(setup, "outlineProperty"),
-                    field(setup, "affectsCrumbling"), field(setup, "sortOnUpload"));
+            if ((boolean) field(setup, "useLightmap")) builder.useLightmap();
+            if ((boolean) field(setup, "useOverlay")) builder.useOverlay();
+            builder.setLayeringTransform((LayeringTransform) field(setup, "layeringTransform"));
+            builder.setTextureTransform((TextureTransform) field(setup, "textureTransform"));
+            RenderSetup.OutlineProperty outlineProperty = (RenderSetup.OutlineProperty) field(setup, "outlineProperty");
+            String outlineTextureName = (String) field(setup, "outlineTextureName");
+            if (outlineTextureName == null) builder.setOutline(outlineProperty);
+            else builder.setOutline(outlineProperty, outlineTextureName);
+            if ((boolean) field(setup, "affectsCrumbling")) builder.affectsCrumbling();
+            if ((boolean) field(setup, "sortOnUpload")) builder.sortOnUpload();
+            if ((boolean) field(setup, "forceSolidModelPhase")) builder.withForcedSolidModelPhase();
             Constructor<RenderType> typeConstructor = RenderType.class.getDeclaredConstructor(String.class, RenderSetup.class);
             typeConstructor.setAccessible(true);
-            return typeConstructor.newInstance("buildscape_festive_" + field(original, "name"), replacement);
+            return typeConstructor.newInstance("buildscape_festive_" + field(original, "name"), builder.createRenderSetup());
         } catch (ReflectiveOperationException exception) {
-            throw new IllegalStateException("Cannot construct the Minecraft 26.2 festive glint render setup", exception);
+            throw new IllegalStateException("Cannot construct the Minecraft 26.3 festive glint render setup", exception);
         }
     }
 

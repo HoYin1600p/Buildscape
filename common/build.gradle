@@ -78,6 +78,16 @@ if (v263Enabled) {
                 exclude 'com/kingodogo/buildscape/adapter/v26x/**'
                 // Only the v118x adapter uses this helper; 26.3 removed BlockStateProviderType.
                 exclude 'com/kingodogo/buildscape/worldgen/WorldGenTypeHelper.java'
+                // 26.3 changed Block.playerDestroy and made BlockItem.updateCustomBlockEntityTag static;
+                // the v263 cluster supplies its own copies of these two shared classes, so drop only the
+                // src/main/java versions (a plain exclude pattern would also drop the src/v263 copies).
+                exclude { element ->
+                    element.file.toURI().path.contains('/src/main/java/') &&
+                            element.relativePath.pathString in [
+                                    'com/kingodogo/buildscape/block/DecoratedPotBlock.java',
+                                    'com/kingodogo/buildscape/item/FestiveStockingItem.java'
+                            ]
+                }
             }
             resources.srcDirs = ['src/main/resources', 'src/v263/resources']
         }

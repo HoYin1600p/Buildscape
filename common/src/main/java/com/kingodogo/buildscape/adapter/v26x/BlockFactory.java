@@ -1408,6 +1408,9 @@ public class BlockFactory implements IBlockFactory {
                     if (state.getValue(WATERLOGGED)) {
                         tickAccess.scheduleTick(pos, net.minecraft.world.level.material.Fluids.WATER, net.minecraft.world.level.material.Fluids.WATER.getTickDelay(level));
                     }
+                    if (direction.getOpposite() == state.getValue(FACING) && !state.canSurvive(level, pos)) {
+                        return Blocks.AIR.defaultBlockState();
+                    }
                     return super.updateShape(state, level, tickAccess, pos, direction, adjacentPos, adjacentState, random);
                 }
                 @Override
@@ -1556,6 +1559,17 @@ public class BlockFactory implements IBlockFactory {
                 @Override
                 protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity, InsideBlockEffectApplier applier, boolean isMoving) {
                     onEntityInside(level, pos, state, entity);
+                }
+                @Override
+                public boolean isValidBonemealTarget(LevelReader level, BlockPos pos, BlockState state) {
+                    return false;
+                }
+                @Override
+                public boolean isBonemealSuccess(Level level, RandomSource random, BlockPos pos, BlockState state) {
+                    return false;
+                }
+                @Override
+                public void performBonemeal(ServerLevel level, RandomSource random, BlockPos pos, BlockState state) {
                 }
                 @Override
                 public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {

@@ -8,6 +8,10 @@ Every loader uses the single `mod_version=4.0.3` key in `gradle.properties`
 for its jar version and loader metadata. Update that key to change the version
 across all VersionClusters.
 
+MinecraftForge 26.2 is opt-in with `-Pbuildscape.forge262=true` and pins Forge
+65.1.4. Build `:forge:26.2:build` with that property to produce
+`forge/26.2/build/libs/buildscape-forge-26.2-<mod_version>.jar`.
+
 ## Build
 
 Run the repository's Gradle 9.6 wrapper on JDK 25. Have a Java 17 toolchain

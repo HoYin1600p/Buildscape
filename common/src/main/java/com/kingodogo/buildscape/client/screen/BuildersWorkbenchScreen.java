@@ -178,7 +178,7 @@ public class BuildersWorkbenchScreen {
     }
 
     private int inputSignature() {
-        BuildersWorkbenchBlockEntity workbench = menu.getBlockEntity();
+        net.minecraft.world.Container workbench = menu.getContainer();
         int hash = 31 + activeTab;
         hash = 31 * hash + filterMask;
         if (activeTab == 0) {
@@ -195,8 +195,18 @@ public class BuildersWorkbenchScreen {
         return 31 * hash + (stack == null || stack.isEmpty() ? 0 : Services.PLATFORM.getItemRawId(stack.getItem()) + 1);
     }
 
+    /** The client menu has no block entity (the 26.x menu factory carries no position), so fall back to the targeted block. */
+    private net.minecraft.core.BlockPos workbenchPos() {
+        BuildersWorkbenchBlockEntity be = menu.getBlockEntity();
+        if (be != null) return be.getBlockPos();
+        if (Minecraft.getInstance().hitResult instanceof net.minecraft.world.phys.BlockHitResult hit) return hit.getBlockPos();
+        return null;
+    }
+
     private void sendSolvedResults(int solveSignature) {
-        BuildersWorkbenchBlockEntity workbench = menu.getBlockEntity();
+        net.minecraft.world.Container workbench = menu.getContainer();
+        net.minecraft.core.BlockPos workbenchPos = workbenchPos();
+        if (workbenchPos == null) return;
         List<ItemStack> solved;
         if (activeTab == 0) {
             solved = ColorGradientSolver.solveColorPicker(
@@ -210,7 +220,7 @@ public class BuildersWorkbenchScreen {
             solved = ColorGradientSolver.solveGradient(anchors, filterMask, currentResultOffsets());
         }
         PacketFactory.sendToServer(new BuildersWorkbenchResultsPacket(
-                workbench.getBlockPos(), activeTab, filterMask, currentResultOffsets(), solved));
+                workbenchPos, activeTab, filterMask, currentResultOffsets(), solved));
         lastSentSignature = solveSignature;
     }
 
@@ -465,7 +475,7 @@ public class BuildersWorkbenchScreen {
     }
 
     private boolean isGradientAnchor(int slot) {
-        return !menu.getBlockEntity().getItem(BuildersWorkbenchBlockEntity.SLOT_GRADIENT_INPUT_START + slot).isEmpty();
+        return !menu.getContainer().getItem(BuildersWorkbenchBlockEntity.SLOT_GRADIENT_INPUT_START + slot).isEmpty();
     }
 
     private static boolean isIn(double mouseX, double mouseY, int x, int y, int width, int height) {

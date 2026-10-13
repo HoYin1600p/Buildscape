@@ -953,6 +953,10 @@ public class BlockFactory implements IBlockFactory {
                     if (state.getValue(PillarBlock.WATERLOGGED)) {
                         tickAccess.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
                     }
+                    // The setblock command calls updateShape on the candidate state before it is placed; only reconcile a placed pillar.
+                    if ((direction == Direction.UP || direction == Direction.DOWN) && level instanceof Level realLevel && !realLevel.isClientSide() && level.getBlockState(pos).is(state.getBlock())) {
+                        reconcileStackDisplays(realLevel, pos);
+                    }
                     return onUpdateShape(state, direction, adjacentState, level, pos, adjacentPos);
                 }
                 @Override
@@ -965,7 +969,8 @@ public class BlockFactory implements IBlockFactory {
                 }
                 @Override
                 protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block neighborBlock, @Nullable Orientation orientation, boolean isMoving) {
-                    onNeighborUpdate(level, pos, state, neighborBlock, null, isMoving);
+                    // 26.2 passes no neighbour position here (the orientation is null outside the redstone
+                    // experiment), so the vertical-only reconcile of the reference runs from updateShape above.
                 }
                 @Override
                 protected void affectNeighborsAfterRemoval(BlockState state, ServerLevel level, BlockPos pos, boolean isMoving) {
@@ -1682,6 +1687,7 @@ public class BlockFactory implements IBlockFactory {
                 @Override
                 protected BlockState updateShape(BlockState state, LevelReader level, ScheduledTickAccess tickAccess, BlockPos pos, Direction direction, BlockPos adjacentPos, BlockState adjacentState, RandomSource random) {
                     BlockState adjusted = onUpdateShape(state, direction, adjacentState, level, pos, adjacentPos);
+                    if (direction == Direction.DOWN) return adjusted;
                     return super.updateShape(adjusted, level, tickAccess, pos, direction, adjacentPos, adjacentState, random);
                 }
 
@@ -1904,6 +1910,7 @@ public class BlockFactory implements IBlockFactory {
                 @Override
                 protected BlockState updateShape(BlockState state, LevelReader level, ScheduledTickAccess tickAccess, BlockPos pos, Direction direction, BlockPos adjacentPos, BlockState adjacentState, RandomSource random) {
                     BlockState adjusted = onUpdateShape(state, direction, adjacentState, level, pos, adjacentPos);
+                    if (direction == Direction.DOWN) return adjusted;
                     return super.updateShape(adjusted, level, tickAccess, pos, direction, adjacentPos, adjacentState, random);
                 }
                 @Override

@@ -196,14 +196,6 @@ public final class GuiProvider {
         return wrapScreen(com.kingodogo.buildscape.util.ComponentHelper.translatable("buildscape.config.title"), parent, new BuildScapeConfigScreen(parent));
     }
 
-    public static Screen createGuiEditorScreen(Screen parent, String tabName, com.kingodogo.buildscape.client.screen.AbstractConfigTab sourceTab) {
-        return wrapScreen(com.kingodogo.buildscape.util.ComponentHelper.translatable("buildscape.gui.editor.title"), parent, new com.kingodogo.buildscape.client.screen.GuiEditorScreen(parent, tabName, sourceTab));
-    }
-
-    public static Screen createInventoryItemSelectorScreen(Screen parent, com.kingodogo.buildscape.client.screen.PillarItemsConfigTab configTab) {
-        return wrapScreen(com.kingodogo.buildscape.util.ComponentHelper.translatable("buildscape.config.select_inventory"), parent, new com.kingodogo.buildscape.client.screen.InventoryItemSelectorScreen(parent, configTab));
-    }
-
     public static void renderGuiItem(Object poseStackOrGraphics, net.minecraft.world.item.ItemStack stack, int x, int y) {
         if (poseStackOrGraphics instanceof GuiGraphics gfx) {
             gfx.renderItem(stack, x, y);

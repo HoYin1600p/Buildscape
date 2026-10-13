@@ -200,7 +200,7 @@ public final class ClientPlatformHooks {
 
     public static net.minecraft.client.KeyMapping createKeyMapping(String translationKey, int keyCode, String categoryTranslationKey) {
         net.minecraft.client.KeyMapping.Category category = KeyCategory.VALUE;
-        return new net.minecraft.client.KeyMapping(translationKey, com.mojang.blaze3d.platform.InputConstants.Type.KEYSYM, keyCode, category);
+        return new net.minecraft.client.KeyMapping(translationKey, com.mojang.blaze3d.platform.InputConstants.Type.KEYBOARD, keyCode, category);
     }
 
     private static final class KeyCategory {
@@ -499,7 +499,7 @@ public final class ClientPlatformHooks {
         try {
             poseStack.translate(0, 0, isInvisible ? 0.5 : 0.4375);
             int rotation = entity.getRotation();
-            poseStack.mulPose(com.mojang.math.Axis.ZP.rotationDegrees((isMap ? rotation % 4 * 2 : rotation) * 45.0F));
+            poseStack.rotate(com.mojang.math.Axis.ZP.rotationDegrees((isMap ? rotation % 4 * 2 : rotation) * 45.0F));
             if (isMap) {
                 var data = net.minecraft.world.item.MapItem.getSavedData(itemStack, net.minecraft.client.Minecraft.getInstance().level);
                 var id = itemStack.get(net.minecraft.core.component.DataComponents.MAP_ID);
@@ -507,7 +507,7 @@ public final class ClientPlatformHooks {
                     var map = new net.minecraft.client.renderer.state.MapRenderState();
                     var renderer = net.minecraft.client.Minecraft.getInstance().getMapRenderer();
                     renderer.extractRenderState(id, data, map);
-                    poseStack.mulPose(com.mojang.math.Axis.ZP.rotationDegrees(180));
+                    poseStack.rotate(com.mojang.math.Axis.ZP.rotationDegrees(180));
                     poseStack.scale(1.0F / 128, 1.0F / 128, 1.0F / 128);
                     poseStack.translate(-64, -64, 0);
                     poseStack.translate(0, 0, -1);
@@ -631,7 +631,7 @@ public final class ClientPlatformHooks {
                 float rotationAngle = 8.0F * dampening * oscillation;
 
                 poseStack.translate(0.5D, 0.0D, 0.5D);
-                poseStack.mulPose(com.mojang.math.Axis.YP.rotationDegrees(rotationAngle));
+                poseStack.rotate(com.mojang.math.Axis.YP.rotationDegrees(rotationAngle));
                 poseStack.translate(-0.5D, 0.0D, -0.5D);
             }
         }

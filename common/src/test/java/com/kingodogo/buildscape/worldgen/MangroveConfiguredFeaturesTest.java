@@ -81,12 +81,12 @@ class MangroveConfiguredFeaturesTest {
         // Catch missing additions, accidental patch-count changes and references to
         // removed 1.18 feature types (notably random_patch).
         for (String color : Set.of("red", "blue", "purple", "light_blue", "pink", "yellow"))
-            assertPatch(placed.get("buildscape:" + color + "_monets"), 4, 64);
-        assertPatch(placed.get("buildscape:all_petals"), 11, 192);
-        assertPatch(placed.get("buildscape:clover"), 32, 64);
-        assertPatch(placed.get("buildscape:wildflowers"), 11, 64);
-        assertPatch(placed.get("buildscape:leaf_litter"), 11, 64);
-        assertPatch(placed.get("buildscape:clover_swamp"), 16, 64);
+            assertPatch(scatter(placed, configured, "buildscape:" + color + "_monets"), 4, 64);
+        assertPatch(scatter(placed, configured, "buildscape:all_petals"), 11, 192);
+        assertPatch(scatter(placed, configured, "buildscape:clover"), 32, 64);
+        assertPatch(scatter(placed, configured, "buildscape:wildflowers"), 11, 64);
+        assertPatch(scatter(placed, configured, "buildscape:leaf_litter"), 11, 64);
+        assertPatch(scatter(placed, configured, "buildscape:clover_swamp"), 16, 64);
         int[] rarities = {5, 5, 5, 40, 53, 107, 160, 320};
         for (int n = 1; n <= 8; n++)
             assertPatch(placed.get("buildscape:mangrove_propagule_patch_" + n), rarities[n - 1], n);
@@ -139,6 +139,16 @@ class MangroveConfiguredFeaturesTest {
         dataResource("/data/minecraft/tags/worldgen/biome/buildscape/" + name + ".json")
                 .getAsJsonArray("values").forEach(value -> values.add(value.getAsString()));
         return values;
+    }
+
+    // The scatter (count and random offset) lives in the configured feature so that /place feature scatters too.
+    private static JsonObject scatter(Map<String, JsonObject> placed, Map<String, JsonObject> configured, String id) {
+        JsonObject result = placed.get(id).deepCopy();
+        JsonObject feature = configured.get(result.get("feature").getAsString());
+        assertEquals("minecraft:simple_random_selector", feature.get("type").getAsString(), id);
+        JsonObject inner = feature.getAsJsonObject("config").getAsJsonArray("features").get(0).getAsJsonObject();
+        inner.getAsJsonArray("placement").forEach(result.getAsJsonArray("placement")::add);
+        return result;
     }
 
     private static void assertPatch(JsonObject json, int rarity, int tries) {

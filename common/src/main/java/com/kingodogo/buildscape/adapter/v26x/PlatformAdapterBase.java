@@ -1013,7 +1013,11 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter, com.kingo
     public void awardStat(net.minecraft.server.level.ServerPlayer player, CommonId statId) {
         if (player == null || statId == null) return;
         Identifier id = Identifier.fromNamespaceAndPath(statId.getNamespace(), statId.getPath());
-        net.minecraft.stats.Stat<Identifier> stat = net.minecraft.stats.Stats.CUSTOM.get(id);
+        // The custom-stat registry and StatType map are identity-keyed: main awards with the registered instance,
+        // so look that one up (as registerCustomStat does) instead of using an equal copy.
+        Identifier registered = BuiltInRegistries.CUSTOM_STAT.getValue(id);
+        if (registered != null) id = registered;
+        net.minecraft.stats.Stat<Identifier> stat = net.minecraft.stats.Stats.CUSTOM.get(id, net.minecraft.stats.StatFormatter.DEFAULT);
         if (stat != null) {
             player.awardStat(stat);
         }
@@ -3166,7 +3170,7 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter, com.kingo
         }
 
         public SeatEntityImpl(Level level, double x, double y, double z) {
-            this(EntityTypes.MARKER, level);
+            this(Services.PLATFORM.getSeatEntityType(), level);
             this.setPos(x, y, z);
         }
 

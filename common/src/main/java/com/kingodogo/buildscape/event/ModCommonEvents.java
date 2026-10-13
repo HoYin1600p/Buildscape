@@ -99,7 +99,7 @@ public final class ModCommonEvents {
         if (signResult != InteractionResult.PASS) {
             return signResult;
         }
-        InteractionResult copperResult = com.kingodogo.buildscape.block.CopperOxidationHandler.handleRightClick(level, pos, state, held, player, hand);
+        InteractionResult copperResult = Services.PLATFORM.handleCopperRightClick(level, pos, state, held, player, hand);
         if (copperResult != InteractionResult.PASS) {
             return copperResult;
         }

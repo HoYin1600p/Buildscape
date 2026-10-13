@@ -44,11 +44,14 @@ public class BuildscapeFabric implements ModInitializer {
             // listeners, so the new manager is taken from the finished resources (and from the server on
             // first start). Recipes are injected into it, then its derived tables are rebuilt.
             ServerLifecycleEvents.SERVER_STARTING.register(server -> {
+                ((PlatformAdapterBase) Services.PLATFORM).registerDeferredServerData(server);
                 useRecipeManager(server, server.getRecipeManager());
                 com.kingodogo.buildscape.adapter.v263.PacketFactory.setServer(server);
             });
             ServerLifecycleEvents.END_DATA_PACK_RELOAD.register((server, resources, success) -> {
-                if (success) useRecipeManager(server, server.getRecipeManager());
+                if (!success) return;
+                ((PlatformAdapterBase) Services.PLATFORM).registerDeferredServerData(server);
+                useRecipeManager(server, server.getRecipeManager());
             });
             ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
                 BuildScapeRecipeLoader.INSTANCE.setCurrentRecipeManager(null);

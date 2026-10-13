@@ -140,7 +140,7 @@ public abstract class SmokeVentBlock extends BaseEntityBlock implements ICommonN
             if (powered == wasPowered) return;
 
             setPoweredAndSync(level, pos, powered);
-            applyActiveToStack(level, pos, !powered);
+            applyActiveToStack(level, pos, powered);
 
             BlockPos current = findBottomBlock(level, pos);
             while (level.getBlockState(current).getBlock() instanceof SmokeVentBlock) {
@@ -274,7 +274,13 @@ public abstract class SmokeVentBlock extends BaseEntityBlock implements ICommonN
         double y = (double) pos.getY() + SMOKE_SPAWN_BASE + random.nextDouble() * (2.0 - SMOKE_SPAWN_BASE);
         double z = (double) pos.getZ() + 0.5 + random.nextDouble() / 3.0 * (random.nextBoolean() ? 1 : -1);
 
-        level.addAlwaysVisibleParticle(ParticleTypes.CAMPFIRE_COSY_SMOKE, true, x, y, z, 0.0, 0.07, 0.0);
+        BlockEntity be = level.getBlockEntity(pos);
+        if (be instanceof SmokeVentBlockEntity ventBE && ventBE.getSmokeColor() != null) {
+            com.kingodogo.buildscape.particle.SmokeColorRegistry.registerColorForPosition(x, y, z, ventBE.getSmokeColor());
+            level.addAlwaysVisibleParticle(com.kingodogo.buildscape.particle.ModParticles.COLORED_SMOKE.get(), true, x, y, z, 0.0, 0.07, 0.0);
+        } else {
+            level.addAlwaysVisibleParticle(ParticleTypes.CAMPFIRE_COSY_SMOKE, true, x, y, z, 0.0, 0.07, 0.0);
+        }
     }
 
     private boolean getStackActive(Level level, BlockPos pos) {
@@ -330,12 +336,26 @@ public abstract class SmokeVentBlock extends BaseEntityBlock implements ICommonN
         if (stack == null || stack.isEmpty()) return null;
 
         DyeColor color = com.kingodogo.buildscape.platform.Services.PLATFORM.getDyeColor(stack);
-        if (color != null) {
-            String hex = String.format("#%06X", (0xFFFFFF & com.kingodogo.buildscape.platform.Services.PLATFORM.getDyeColorValue(color)));
-            String name = color.getName().substring(0, 1).toUpperCase() + color.getName().substring(1);
-            return Map.entry(hex, name);
-        }
+        if (color == null) return null;
 
-        return null;
+        // Reference smoke colours: fixed per dye, not the vanilla firework colours.
+        return switch (color) {
+            case WHITE -> Map.entry("#E8FEFD", "White");
+            case ORANGE -> Map.entry("#FF5C00", "Orange");
+            case MAGENTA -> Map.entry("#FF00FF", "Magenta");
+            case LIGHT_BLUE -> Map.entry("#3CDFFF", "Light Blue");
+            case YELLOW -> Map.entry("#FFFF00", "Yellow");
+            case LIME -> Map.entry("#BFFE00", "Lime");
+            case PINK -> Map.entry("#F686B7", "Pink");
+            case GRAY -> Map.entry("#232526", "Gray");
+            case LIGHT_GRAY -> Map.entry("#B1B8C5", "Light Gray");
+            case CYAN -> Map.entry("#00FFFF", "Cyan");
+            case PURPLE -> Map.entry("#AB87FF", "Purple");
+            case BLUE -> Map.entry("#1919EA", "Blue");
+            case BROWN -> Map.entry("#411900", "Brown");
+            case GREEN -> Map.entry("#39FF14", "Green");
+            case RED -> Map.entry("#FF0000", "Red");
+            case BLACK -> Map.entry("#07010C", "Black");
+        };
     }
 }

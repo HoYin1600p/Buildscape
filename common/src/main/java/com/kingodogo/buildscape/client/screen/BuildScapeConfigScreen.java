@@ -553,16 +553,22 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         int offsetY = Math.round((1.0f - alpha) * 8.0f);
         panelY += offsetY;
 
-        // 3. Render 1 Big Frame with 7px beveled chassis gap and 1-pixel wide metallic gradient
-        drawVaultHuntersFrame(poseStackOrGraphics, panelX, panelY, panelW, panelH, COLOR_PANEL_BG, alpha);
+        // Expand outer border outwards by 5px for rich bevel depth while keeping inner components as placed rn
+        int bevelExpansion = 5;
+        int frameX = panelX - bevelExpansion;
+        int frameY = panelY - bevelExpansion;
+        int frameW = panelW + bevelExpansion * 2;
+        int frameH = panelH + bevelExpansion * 2;
 
-        // 4. Header Bar (indented 7px from outer frame)
+        // 3. Render 1 Big Frame with expanded chassis gap and metallic gradient
+        drawVaultHuntersFrame(poseStackOrGraphics, frameX, frameY, frameW, frameH, COLOR_PANEL_BG, alpha);
+
+        // 4. Header Bar (kept exactly as placed rn, with top-left metallic gradient artifact)
         int headerH = 24;
         int headerX = panelX + 7;
         int headerY = panelY + 7;
         int headerW = panelW - 14;
-        Services.PLATFORM.fill(poseStackOrGraphics, headerX, headerY, headerX + headerW, headerY + headerH, applyAlpha(COLOR_HEADER_BG, alpha));
-        drawBorder(poseStackOrGraphics, headerX, headerY, headerW, headerH, applyAlpha(COLOR_FRAME_BLACK, alpha));
+        drawBeveledComponent(poseStackOrGraphics, headerX, headerY, headerW, headerH, COLOR_HEADER_BG, alpha);
 
         // Header Title
         drawText(poseStackOrGraphics, font, "⚙ Buildscape Configuration", headerX + 8, headerY + 7, applyAlpha(COLOR_TEXT_WHITE, alpha));
@@ -572,13 +578,12 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         int tagW = font.width(versionTag);
         drawText(poseStackOrGraphics, font, versionTag, headerX + headerW - tagW - 28, headerY + 7, applyAlpha(COLOR_TEXT_MUTED, alpha));
 
-        // Close Button [ ✕ ]
+        // Close Button [ ✕ ] with top-left metallic highlight
         int closeBtnSize = 14;
         int closeBtnX = headerX + headerW - closeBtnSize - 5;
         int closeBtnY = headerY + 5;
         boolean hoverClose = mouseX >= closeBtnX && mouseX <= closeBtnX + closeBtnSize && mouseY >= closeBtnY && mouseY <= closeBtnY + closeBtnSize;
-        Services.PLATFORM.fill(poseStackOrGraphics, closeBtnX, closeBtnY, closeBtnX + closeBtnSize, closeBtnY + closeBtnSize, applyAlpha(hoverClose ? 0xFF383844 : 0xFF202026, alpha));
-        drawBorder(poseStackOrGraphics, closeBtnX, closeBtnY, closeBtnSize, closeBtnSize, applyAlpha(hoverClose ? 0xFF6C6C7C : 0xFF32323C, alpha));
+        drawBeveledButton(poseStackOrGraphics, closeBtnX, closeBtnY, closeBtnSize, closeBtnSize, hoverClose ? 0xFF383844 : 0xFF202026, hoverClose, false, alpha);
         Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "✕", closeBtnX + closeBtnSize / 2, closeBtnY + 3, applyAlpha(hoverClose ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
 
         // 5. Layout Sidenav & Content Container (with distinct 7px chassis margin)
@@ -612,7 +617,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
     // --- Sidenav Rendering ---
     private void renderSidenav(Object poseStackOrGraphics, Font font, int x, int y, int w, int h, int mouseX, int mouseY, float alpha) {
-        drawInsetBox(poseStackOrGraphics, x, y, w, h, COLOR_INNER_DARK, alpha);
+        drawBeveledComponent(poseStackOrGraphics, x, y, w, h, COLOR_INNER_DARK, alpha);
 
         int tabH = 26;
         int tabGap = 3;
@@ -629,10 +634,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
             boolean hover = mouseX >= tabX && mouseX <= tabX + tabW && mouseY >= tabY && mouseY <= tabY + tabH;
 
             int bg = isSelected ? 0xFF24242C : (hover ? 0xFF1A1A20 : 0xFF131316);
-            Services.PLATFORM.fill(poseStackOrGraphics, tabX, tabY, tabX + tabW, tabY + tabH, applyAlpha(bg, alpha));
-
-            int border = isSelected ? 0xFF585866 : (hover ? 0xFF363640 : 0xFF1C1C22);
-            drawBorder(poseStackOrGraphics, tabX, tabY, tabW, tabH, applyAlpha(border, alpha));
+            drawBeveledButton(poseStackOrGraphics, tabX, tabY, tabW, tabH, bg, hover, isSelected, alpha);
 
             if (isSelected) {
                 Services.PLATFORM.fill(poseStackOrGraphics, tabX, tabY, tabX + 2, tabY + tabH, applyAlpha(COLOR_TEXT_WHITE, alpha));
@@ -661,8 +663,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         int toggleY = y + h - toggleH - 3;
         boolean hoverToggle = mouseX >= toggleX && mouseX <= toggleX + toggleW && mouseY >= toggleY && mouseY <= toggleY + toggleH;
 
-        Services.PLATFORM.fill(poseStackOrGraphics, toggleX, toggleY, toggleX + toggleW, toggleY + toggleH, applyAlpha(hoverToggle ? 0xFF282832 : 0xFF18181E, alpha));
-        drawBorder(poseStackOrGraphics, toggleX, toggleY, toggleW, toggleH, applyAlpha(hoverToggle ? 0xFF50505E : 0xFF26262E, alpha));
+        drawBeveledButton(poseStackOrGraphics, toggleX, toggleY, toggleW, toggleH, hoverToggle ? 0xFF282832 : 0xFF18181E, hoverToggle, false, alpha);
 
         String toggleLabel = navExpanded ? "◀ Collapse" : "▶";
         Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, toggleLabel, toggleX + toggleW / 2, toggleY + 4, applyAlpha(hoverToggle ? COLOR_TEXT_WHITE : COLOR_TEXT_MUTED, alpha));
@@ -678,7 +679,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
     // --- Content Area Rendering ---
     private void renderContentArea(Object poseStackOrGraphics, Font font, int x, int y, int w, int h, int mouseX, int mouseY, float alpha) {
-        drawInsetBox(poseStackOrGraphics, x, y, w, h, COLOR_INNER_DARK, alpha);
+        drawBeveledComponent(poseStackOrGraphics, x, y, w, h, COLOR_INNER_DARK, alpha);
 
         if (selectedTabIndex < 0 || selectedTabIndex >= navItems.size()) return;
         NavItem current = navItems.get(selectedTabIndex);
@@ -688,45 +689,49 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         drawText(poseStackOrGraphics, font, current.subtitle, x + 8 + font.width(current.icon + "  " + current.title.toUpperCase()) + 10, y + 7, applyAlpha(COLOR_TEXT_MUTED, alpha));
         drawGroove(poseStackOrGraphics, x + 2, y + catHeaderH, w - 4, true, alpha);
 
-        // Strict Spill-Proof Viewport
-        int viewY = y + catHeaderH + 4;
-        int viewH = h - catHeaderH - 8;
-        int rowH = 26;
-        int rowGap = 3;
+        if ("items".equals(current.id)) {
+            renderItemAndTagsPanel(poseStackOrGraphics, font, x, y, w, h, catHeaderH, mouseX, mouseY, alpha);
+        } else {
+            int viewY = y + catHeaderH + 4;
+            int viewH = h - catHeaderH - 8;
+            int rowH = 26;
+            int rowGap = 3;
 
-        int rowW = w - 14;
-        int rowX = x + 6;
-
-        int totalContentHeight = calculateTotalContentHeight(current.id, rowW, rowH, rowGap);
-        maxScroll = Math.max(0, totalContentHeight - viewH);
-        scrollOffset = Math.max(0, Math.min(maxScroll, scrollOffset));
-
-        int startY = viewY + 2 - (int) scrollOffset;
-
-        switch (current.id) {
-            case "items" -> renderItemAndTagsPanel(poseStackOrGraphics, font, rowX, startY, rowW, viewY, viewH, mouseX, mouseY, alpha);
-            case "particles" -> renderParticleSettingsRows(poseStackOrGraphics, font, rowX, startY, rowW, rowH, rowGap, viewY, viewH, mouseX, mouseY, alpha);
-            case "pillars" -> {
-                if (selectedPillarDetailId != null) {
-                    renderPillarDetailRows(poseStackOrGraphics, font, rowX, startY, rowW, rowH, rowGap, viewY, viewH, mouseX, mouseY, alpha);
-                } else {
-                    renderPillarIdRows(poseStackOrGraphics, font, rowX, startY, rowW, rowH, rowGap, viewY, viewH, mouseX, mouseY, alpha);
-                }
-            }
-            case "world" -> renderWorldSettingsRows(poseStackOrGraphics, font, rowX, startY, rowW, rowH, rowGap, viewY, viewH, mouseX, mouseY, alpha);
-            case "system" -> renderSystemRows(poseStackOrGraphics, font, rowX, startY, rowW, rowH, rowGap, viewY, viewH, mouseX, mouseY, alpha);
-        }
-
-        // Custom Scrollbar
-        if (maxScroll > 0) {
             int scrollbarW = 4;
-            int scrollbarX = x + w - scrollbarW - 4;
-            int trackH = viewH;
-            int thumbH = Math.max(16, (int) ((viewH / (float) totalContentHeight) * trackH));
-            int thumbY = viewY + (int) ((scrollOffset / maxScroll) * (trackH - thumbH));
+            int scrollbarTrackX = x + w - scrollbarW - 5;
+            int rowW = (scrollbarTrackX - 6) - (x + 6);
+            int rowX = x + 6;
 
-            Services.PLATFORM.fill(poseStackOrGraphics, scrollbarX, viewY, scrollbarX + scrollbarW, viewY + trackH, applyAlpha(0xFF141418, alpha));
-            Services.PLATFORM.fill(poseStackOrGraphics, scrollbarX, thumbY, scrollbarX + scrollbarW, thumbY + thumbH, applyAlpha(0xFF4C4C58, alpha));
+            int totalContentHeight = calculateTotalContentHeight(current.id, rowW, rowH, rowGap);
+            maxScroll = Math.max(0, totalContentHeight - viewH);
+            scrollOffset = Math.max(0, Math.min(maxScroll, scrollOffset));
+
+            int startY = viewY + 2 - (int) scrollOffset;
+
+            enableGuiScissor(poseStackOrGraphics, x + 4, viewY, w - 8, viewH);
+            switch (current.id) {
+                case "particles" -> renderParticleSettingsRows(poseStackOrGraphics, font, rowX, startY, rowW, rowH, rowGap, viewY, viewH, mouseX, mouseY, alpha);
+                case "pillars" -> {
+                    if (selectedPillarDetailId != null) {
+                        renderPillarDetailRows(poseStackOrGraphics, font, rowX, startY, rowW, rowH, rowGap, viewY, viewH, mouseX, mouseY, alpha);
+                    } else {
+                        renderPillarIdRows(poseStackOrGraphics, font, rowX, startY, rowW, rowH, rowGap, viewY, viewH, mouseX, mouseY, alpha);
+                    }
+                }
+                case "world" -> renderWorldSettingsRows(poseStackOrGraphics, font, rowX, startY, rowW, rowH, rowGap, viewY, viewH, mouseX, mouseY, alpha);
+                case "system" -> renderSystemRows(poseStackOrGraphics, font, rowX, startY, rowW, rowH, rowGap, viewY, viewH, mouseX, mouseY, alpha);
+            }
+            disableGuiScissor(poseStackOrGraphics);
+
+            // Custom Scrollbar in dedicated right gutter
+            if (maxScroll > 0) {
+                int trackH = viewH;
+                int thumbH = Math.max(16, (int) ((viewH / (float) totalContentHeight) * trackH));
+                int thumbY = viewY + (int) ((scrollOffset / maxScroll) * (trackH - thumbH));
+
+                Services.PLATFORM.fill(poseStackOrGraphics, scrollbarTrackX, viewY, scrollbarTrackX + scrollbarW, viewY + trackH, applyAlpha(0xFF141418, alpha));
+                drawBeveledButton(poseStackOrGraphics, scrollbarTrackX, thumbY, scrollbarW, thumbH, 0xFF3E3E4C, false, false, alpha);
+            }
         }
     }
 
@@ -735,15 +740,16 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
             if (itemsSubTab == 0) {
                 int slotSize = 20;
                 int slotGap = 2;
-                int cols = Math.max(1, (contentW - 12) / (slotSize + slotGap));
+                int step = slotSize + slotGap;
+                int cols = Math.max(1, contentW / step);
                 List<Item> items = getFilteredItemsList();
                 int rows = (int) Math.ceil((double) items.size() / cols);
-                return 62 + rows * (slotSize + slotGap) + 16;
+                return rows * step + 6;
             } else {
                 List<String> tags = getFilteredTagsList();
                 int tagRowH = 22;
                 int tagRowGap = 2;
-                return 62 + tags.size() * (tagRowH + tagRowGap) + 16;
+                return tags.size() * (tagRowH + tagRowGap) + 6;
             }
         }
         if ("pillars".equals(tabId) && selectedPillarDetailId != null) {
@@ -767,156 +773,215 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         };
     }
 
-    // --- Tab 0: Items & Tags Dual Panel with Presets & Registered Tags ---
-    private void renderItemAndTagsPanel(Object poseStackOrGraphics, Font font, int x, int startY, int w, int clipY, int clipH, int mouseX, int mouseY, float alpha) {
+    // --- Tab 0: Items & Tags Dual Panel with Fixed Toolbars, Scissor Clipping & Beveled Slots ---
+    private void renderItemAndTagsPanel(Object poseStackOrGraphics, Font font, int x, int y, int w, int h, int catHeaderH, int mouseX, int mouseY, float alpha) {
         PillarParticleConfig cfg = PillarParticleConfig.get();
         PresetsConfig presetsCfg = PresetsConfig.get();
         List<PresetsConfig.Preset> presets = presetsCfg.getPresets();
         String currentPresetName = presets.isEmpty() ? "Default" : presets.get(Math.min(selectedPresetIndex, presets.size() - 1)).name;
 
-        int curY = startY;
+        int curY = y + catHeaderH + 4;
 
-        // Bar 1: Presets Management Bar
+        // Bar 1: Presets Management Bar (Fixed at top)
         int bar1H = 20;
-        if (curY >= clipY - bar1H && curY + bar1H <= clipY + clipH + bar1H) {
-            if (curY >= clipY && curY + bar1H <= clipY + clipH) {
-                drawText(poseStackOrGraphics, font, "Preset:", x + 2, curY + 4, applyAlpha(COLOR_TEXT_MUTED, alpha));
+        int btnH = 14;
+        int cycleY = curY + (bar1H - btnH) / 2;
 
-                int cycleW = 74;
-                int btnH = 14;
-                int cycleX = x + 44;
-                int cycleY = curY + 2;
-                boolean hoverCycle = mouseX >= cycleX && mouseX <= cycleX + cycleW && mouseY >= cycleY && mouseY <= cycleY + btnH;
-                Services.PLATFORM.fill(poseStackOrGraphics, cycleX, cycleY, cycleX + cycleW, cycleY + btnH, applyAlpha(hoverCycle ? 0xFF2E2E38 : COLOR_BTN_BG, alpha));
-                drawBorder(poseStackOrGraphics, cycleX, cycleY, cycleW, btnH, applyAlpha(hoverCycle ? COLOR_BTN_BORDER_HOVER : COLOR_BTN_BORDER, alpha));
-                Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "‹ " + currentPresetName + " ›", cycleX + cycleW / 2, cycleY + 3, applyAlpha(hoverCycle ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
+        drawText(poseStackOrGraphics, font, "Preset:", x + 8, cycleY + 3, applyAlpha(COLOR_TEXT_SILVER, alpha));
 
-                int applyW = 38;
-                int applyX = cycleX + cycleW + 3;
-                boolean hoverApply = mouseX >= applyX && mouseX <= applyX + applyW && mouseY >= cycleY && mouseY <= cycleY + btnH;
-                Services.PLATFORM.fill(poseStackOrGraphics, applyX, cycleY, applyX + applyW, cycleY + btnH, applyAlpha(hoverApply ? 0xFF1C3C22 : COLOR_TOGGLE_ON_BG, alpha));
-                drawBorder(poseStackOrGraphics, applyX, cycleY, applyW, btnH, applyAlpha(COLOR_TOGGLE_ON_BORDER, alpha));
-                Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "Apply", applyX + applyW / 2, cycleY + 3, applyAlpha(COLOR_TOGGLE_ON_TEXT, alpha));
+        int cycleW = 86;
+        int cycleX = x + 44;
+        boolean hoverCycle = mouseX >= cycleX && mouseX <= cycleX + cycleW && mouseY >= cycleY && mouseY <= cycleY + btnH;
+        drawBeveledButton(poseStackOrGraphics, cycleX, cycleY, cycleW, btnH, hoverCycle ? 0xFF2C2C36 : COLOR_BTN_BG, hoverCycle, false, alpha);
+        Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "‹ " + currentPresetName + " ›", cycleX + cycleW / 2, cycleY + 3, applyAlpha(hoverCycle ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
 
-                int saveW = 36;
-                int saveX = applyX + applyW + 3;
-                boolean hoverSave = mouseX >= saveX && mouseX <= saveX + saveW && mouseY >= cycleY && mouseY <= cycleY + btnH;
-                Services.PLATFORM.fill(poseStackOrGraphics, saveX, cycleY, saveX + saveW, cycleY + btnH, applyAlpha(hoverSave ? 0xFF2E2E38 : COLOR_BTN_BG, alpha));
-                drawBorder(poseStackOrGraphics, saveX, cycleY, saveW, btnH, applyAlpha(hoverSave ? COLOR_BTN_BORDER_HOVER : COLOR_BTN_BORDER, alpha));
-                Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "Save", saveX + saveW / 2, cycleY + 3, applyAlpha(hoverSave ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
+        int applyW = 38;
+        int applyX = cycleX + cycleW + 4;
+        boolean hoverApply = mouseX >= applyX && mouseX <= applyX + applyW && mouseY >= cycleY && mouseY <= cycleY + btnH;
+        drawBeveledGreenButton(poseStackOrGraphics, applyX, cycleY, applyW, btnH, hoverApply, alpha);
+        Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "Apply", applyX + applyW / 2, cycleY + 3, applyAlpha(hoverApply ? 0xFFFFFFFF : COLOR_TOGGLE_ON_TEXT, alpha));
 
-                int newW = 38;
-                int newX = saveX + saveW + 3;
-                boolean hoverNew = mouseX >= newX && mouseX <= newX + newW && mouseY >= cycleY && mouseY <= cycleY + btnH;
-                Services.PLATFORM.fill(poseStackOrGraphics, newX, cycleY, newX + newW, cycleY + btnH, applyAlpha(hoverNew ? 0xFF2E2E38 : COLOR_BTN_BG, alpha));
-                drawBorder(poseStackOrGraphics, newX, cycleY, newW, btnH, applyAlpha(hoverNew ? COLOR_BTN_BORDER_HOVER : COLOR_BTN_BORDER, alpha));
-                Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "+ New", newX + newW / 2, cycleY + 3, applyAlpha(hoverNew ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
+        int saveW = 36;
+        int saveX = applyX + applyW + 4;
+        boolean hoverSave = mouseX >= saveX && mouseX <= saveX + saveW && mouseY >= cycleY && mouseY <= cycleY + btnH;
+        drawBeveledButton(poseStackOrGraphics, saveX, cycleY, saveW, btnH, hoverSave ? 0xFF2C2C36 : COLOR_BTN_BG, hoverSave, false, alpha);
+        Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "Save", saveX + saveW / 2, cycleY + 3, applyAlpha(hoverSave ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
 
-                int defW = 54;
-                int defX = x + w - defW - 2;
-                boolean hoverDef = mouseX >= defX && mouseX <= defX + defW && mouseY >= cycleY && mouseY <= cycleY + btnH;
-                Services.PLATFORM.fill(poseStackOrGraphics, defX, cycleY, defX + defW, cycleY + btnH, applyAlpha(hoverDef ? 0xFF2E2E38 : COLOR_BTN_BG, alpha));
-                drawBorder(poseStackOrGraphics, defX, cycleY, defW, btnH, applyAlpha(hoverDef ? COLOR_BTN_BORDER_HOVER : COLOR_BTN_BORDER, alpha));
-                Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "↺ Reset", defX + defW / 2, cycleY + 3, applyAlpha(hoverDef ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
-            }
-        }
-        curY += bar1H;
+        int newW = 38;
+        int newX = saveX + saveW + 4;
+        boolean hoverNew = mouseX >= newX && mouseX <= newX + newW && mouseY >= cycleY && mouseY <= cycleY + btnH;
+        drawBeveledButton(poseStackOrGraphics, newX, cycleY, newW, btnH, hoverNew ? 0xFF2C2C36 : COLOR_BTN_BG, hoverNew, false, alpha);
+        Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "+ New", newX + newW / 2, cycleY + 3, applyAlpha(hoverNew ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
 
-        // Bar 2: Sub-View Switcher: [ ▦ Item Triggers ] vs [ 🏷 Registered Tags Panel ]
-        int bar2H = 20;
-        if (curY >= clipY && curY + bar2H <= clipY + clipH) {
-            int subBtnW = (w - 8) / 2;
-            int btnH = 15;
+        int defW = 54;
+        int defX = x + w - defW - 8;
+        boolean hoverDef = mouseX >= defX && mouseX <= defX + defW && mouseY >= cycleY && mouseY <= cycleY + btnH;
+        drawBeveledButton(poseStackOrGraphics, defX, cycleY, defW, btnH, hoverDef ? 0xFF2C2C36 : COLOR_BTN_BG, hoverDef, false, alpha);
+        Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "↺ Reset", defX + defW / 2, cycleY + 3, applyAlpha(hoverDef ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
 
-            // Sub-Tab 0 Button: Item Triggers
-            int sub0X = x + 2;
-            int sub0Y = curY + 2;
-            boolean isSub0 = (itemsSubTab == 0);
-            boolean hoverSub0 = mouseX >= sub0X && mouseX <= sub0X + subBtnW && mouseY >= sub0Y && mouseY <= sub0Y + btnH;
-            Services.PLATFORM.fill(poseStackOrGraphics, sub0X, sub0Y, sub0X + subBtnW, sub0Y + btnH, applyAlpha(isSub0 ? 0xFF2A2A38 : (hoverSub0 ? 0xFF202028 : 0xFF141418), alpha));
-            drawBorder(poseStackOrGraphics, sub0X, sub0Y, subBtnW, btnH, applyAlpha(isSub0 ? 0xFF6E6E84 : (hoverSub0 ? 0xFF444452 : 0xFF22222A), alpha));
-            String sub0Label = "▦ Item Triggers (" + cfg.items.stream().filter(s -> !s.startsWith("#")).count() + ")";
-            Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, sub0Label, sub0X + subBtnW / 2, sub0Y + 3, applyAlpha(isSub0 ? COLOR_TEXT_WHITE : COLOR_TEXT_MUTED, alpha));
+        curY += bar1H + 2;
 
-            // Sub-Tab 1 Button: Registered Tags Panel
-            int sub1X = sub0X + subBtnW + 4;
-            int sub1Y = sub0Y;
-            boolean isSub1 = (itemsSubTab == 1);
-            boolean hoverSub1 = mouseX >= sub1X && mouseX <= sub1X + subBtnW && mouseY >= sub1Y && mouseY <= sub1Y + btnH;
-            Services.PLATFORM.fill(poseStackOrGraphics, sub1X, sub1Y, sub1X + subBtnW, sub1Y + btnH, applyAlpha(isSub1 ? 0xFF2A2A38 : (hoverSub1 ? 0xFF202028 : 0xFF141418), alpha));
-            drawBorder(poseStackOrGraphics, sub1X, sub1Y, subBtnW, btnH, applyAlpha(isSub1 ? 0xFF6E6E84 : (hoverSub1 ? 0xFF444452 : 0xFF22222A), alpha));
-            String sub1Label = "🏷 Registered Tags Panel (" + cfg.items.stream().filter(s -> s.startsWith("#")).count() + ")";
-            Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, sub1Label, sub1X + subBtnW / 2, sub1Y + 3, applyAlpha(isSub1 ? COLOR_TEXT_WHITE : COLOR_TEXT_MUTED, alpha));
-        }
+        // Bar 2: Sub-View Switcher: [ ▦ Item Triggers ] vs [ 🏷 Registered Tags Panel ] (Fixed at top)
+        int bar2H = 18;
+        int subBtnW = (w - 18) / 2;
+        int subBtnH = 15;
+        int subY = curY + 1;
+
+        int sub0X = x + 6;
+        boolean isSub0 = (itemsSubTab == 0);
+        boolean hoverSub0 = mouseX >= sub0X && mouseX <= sub0X + subBtnW && mouseY >= subY && mouseY <= subY + subBtnH;
+        drawBeveledButton(poseStackOrGraphics, sub0X, subY, subBtnW, subBtnH, isSub0 ? 0xFF282834 : (hoverSub0 ? 0xFF202028 : 0xFF141418), hoverSub0, isSub0, alpha);
+        String sub0Label = "▦ Item Triggers (" + cfg.items.stream().filter(s -> !s.startsWith("#")).count() + ")";
+        Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, sub0Label, sub0X + subBtnW / 2, subY + 3, applyAlpha(isSub0 ? COLOR_TEXT_WHITE : COLOR_TEXT_MUTED, alpha));
+
+        int sub1X = sub0X + subBtnW + 6;
+        boolean isSub1 = (itemsSubTab == 1);
+        boolean hoverSub1 = mouseX >= sub1X && mouseX <= sub1X + subBtnW && mouseY >= subY && mouseY <= subY + subBtnH;
+        drawBeveledButton(poseStackOrGraphics, sub1X, subY, subBtnW, subBtnH, isSub1 ? 0xFF282834 : (hoverSub1 ? 0xFF202028 : 0xFF141418), hoverSub1, isSub1, alpha);
+        String sub1Label = "🏷 Registered Tags Panel (" + cfg.items.stream().filter(s -> s.startsWith("#")).count() + ")";
+        Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, sub1Label, sub1X + subBtnW / 2, subY + 3, applyAlpha(isSub1 ? COLOR_TEXT_WHITE : COLOR_TEXT_MUTED, alpha));
+
         curY += bar2H + 2;
 
+        // Bar 3: Filter Bar (Fixed at top)
+        int bar3H = 16;
         if (itemsSubTab == 0) {
-            // --- SUB-VIEW 0: Item Triggers Slot Matrix ---
-            // Bar 3: Filter Pills: [All Items] [Inventory] [Active Only]
-            int bar3H = 18;
-            if (curY >= clipY && curY + bar3H <= clipY + clipH) {
-                String[] filterLabels = {"All Items (" + availableItems.size() + ")", "Inventory (" + getPlayerInventoryItems().size() + ")", "Active Only (" + getConfiguredItemsList().size() + ")"};
-                int pillW = (w - 12) / 3;
-                int pillH = 13;
-                for (int f = 0; f < 3; f++) {
-                    int px = x + 2 + f * (pillW + 4);
-                    boolean isF = (itemFilterMode == f);
-                    boolean hoverPill = mouseX >= px && mouseX <= px + pillW && mouseY >= curY + 2 && mouseY <= curY + 2 + pillH;
-                    int pBg = isF ? 0xFF282834 : (hoverPill ? 0xFF1E1E26 : 0xFF141418);
-                    int pBorder = isF ? 0xFF58586E : (hoverPill ? 0xFF3E3E4C : 0xFF222228);
-                    Services.PLATFORM.fill(poseStackOrGraphics, px, curY + 2, px + pillW, curY + 2 + pillH, applyAlpha(pBg, alpha));
-                    drawBorder(poseStackOrGraphics, px, curY + 2, pillW, pillH, applyAlpha(pBorder, alpha));
-                    int pText = isF ? COLOR_TEXT_WHITE : (hoverPill ? COLOR_TEXT_SILVER : COLOR_TEXT_MUTED);
-                    Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, filterLabels[f], px + pillW / 2, curY + 4, applyAlpha(pText, alpha));
-                }
+            String[] filterLabels = {"All Items (" + availableItems.size() + ")", "Inventory (" + getPlayerInventoryItems().size() + ")", "Active Only (" + getConfiguredItemsList().size() + ")"};
+            int pillW = (w - 20) / 3;
+            int pillH = 13;
+            int pillY = curY + 1;
+            for (int f = 0; f < 3; f++) {
+                int px = x + 6 + f * (pillW + 4);
+                boolean isF = (itemFilterMode == f);
+                boolean hoverPill = mouseX >= px && mouseX <= px + pillW && mouseY >= pillY && mouseY <= pillY + pillH;
+                drawBeveledButton(poseStackOrGraphics, px, pillY, pillW, pillH, isF ? 0xFF262632 : (hoverPill ? 0xFF1E1E26 : 0xFF131317), hoverPill, isF, alpha);
+                int pText = isF ? COLOR_TEXT_WHITE : (hoverPill ? COLOR_TEXT_SILVER : COLOR_TEXT_MUTED);
+                Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, filterLabels[f], px + pillW / 2, pillY + 3, applyAlpha(pText, alpha));
             }
-            curY += bar3H + 4;
+        } else {
+            int chipCount = TAG_CATEGORY_CHIPS.length;
+            int chipW = (w - 20) / chipCount;
+            int chipH = 13;
+            int chipY = curY + 1;
+            for (int c = 0; c < chipCount; c++) {
+                int cx = x + 6 + c * (chipW + 2);
+                boolean isC = (activeTagChipIndex == c);
+                boolean hoverChip = mouseX >= cx && mouseX <= cx + chipW && mouseY >= chipY && mouseY <= chipY + chipH;
+                drawBeveledButton(poseStackOrGraphics, cx, chipY, chipW, chipH, isC ? 0xFF262632 : (hoverChip ? 0xFF1E1E26 : 0xFF131317), hoverChip, isC, alpha);
+                int cText = isC ? COLOR_TEXT_WHITE : (hoverChip ? COLOR_TEXT_SILVER : COLOR_TEXT_MUTED);
+                Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, TAG_CATEGORY_CHIPS[c], cx + chipW / 2, chipY + 3, applyAlpha(cText, alpha));
+            }
+        }
 
+        curY += bar3H + 4;
+
+        // Viewport bounds for scrollable content strictly below fixed toolbars
+        int viewportY = curY;
+        int viewportH = (y + h - 6) - viewportY;
+
+        int scrollbarW = 4;
+        int scrollbarTrackX = x + w - scrollbarW - 5;
+        int availGridW = (scrollbarTrackX - 6) - (x + 6);
+
+        ItemStack hoveredStack = null;
+        boolean hoveredIsActive = false;
+
+        if (itemsSubTab == 0) {
             // Slot Matrix
             List<Item> itemsToDisplay = getFilteredItemsList();
             int slotSize = 20;
             int slotGap = 2;
-            int cols = Math.max(1, (w - 12) / (slotSize + slotGap));
-            int gridStartX = x + 4;
+            int step = slotSize + slotGap;
+            int cols = Math.max(1, availGridW / step);
+            int totalGridW = cols * step - slotGap;
+            int gridStartX = x + 6 + (availGridW - totalGridW) / 2;
 
-            ItemStack hoveredStack = null;
-            boolean hoveredIsActive = false;
+            int rows = (int) Math.ceil((double) itemsToDisplay.size() / cols);
+            int totalContentHeight = rows * step + 6;
+            maxScroll = Math.max(0, totalContentHeight - viewportH);
+            scrollOffset = Math.max(0, Math.min(maxScroll, scrollOffset));
 
-            for (int i = 0; i < itemsToDisplay.size(); i++) {
-                Item item = itemsToDisplay.get(i);
-                int col = i % cols;
-                int row = i / cols;
-                int slotX = gridStartX + col * (slotSize + slotGap);
-                int slotY = curY + row * (slotSize + slotGap);
+            int startY = viewportY + 2 - (int) scrollOffset;
 
-                if (slotY + slotSize < clipY || slotY > clipY + clipH) {
-                    continue;
+            enableGuiScissor(poseStackOrGraphics, x + 4, viewportY, w - 8, viewportH);
+
+            int startRow = Math.max(0, (int) (scrollOffset / step) - 1);
+            int endRow = Math.min(rows, (int) ((scrollOffset + viewportH) / step) + 2);
+
+            for (int r = startRow; r < endRow; r++) {
+                for (int c = 0; c < cols; c++) {
+                    int index = r * cols + c;
+                    if (index >= itemsToDisplay.size()) break;
+
+                    Item item = itemsToDisplay.get(index);
+                    int slotX = gridStartX + c * step;
+                    int slotY = startY + r * step;
+
+                    CommonId cid = Services.PLATFORM.getItemId(item);
+                    String idStr = cid != null ? cid.toString() : "";
+                    boolean isSelected = cfg.items.contains(idStr);
+
+                    boolean hover = mouseX >= slotX && mouseX <= slotX + slotSize && mouseY >= slotY && mouseY <= slotY + slotSize &&
+                            mouseY >= viewportY && mouseY <= viewportY + viewportH;
+
+                    int bg = isSelected ? 0xFF142E18 : (hover ? 0xFF22222A : 0xFF121215);
+                    Services.PLATFORM.fill(poseStackOrGraphics, slotX + 1, slotY + 1, slotX + slotSize - 1, slotY + slotSize - 1, applyAlpha(bg, alpha));
+
+                    if (isSelected) {
+                        int emStart = hover ? 0xFF86EFAC : 0xFF4ADE80;
+                        int emEnd = hover ? 0xFF22C55E : 0xFF16A34A;
+                        int emShadow = applyAlpha(0xFF14532D, alpha);
+                        for (int si = 0; si < slotSize; si++) {
+                            int sc = lerpColor(emStart, emEnd, (float) si / slotSize);
+                            Services.PLATFORM.fill(poseStackOrGraphics, slotX + si, slotY, slotX + si + 1, slotY + 1, applyAlpha(sc, alpha));
+                        }
+                        for (int sj = 0; sj < slotSize; sj++) {
+                            int sc = lerpColor(emStart, emEnd, (float) sj / slotSize);
+                            Services.PLATFORM.fill(poseStackOrGraphics, slotX, slotY + sj, slotX + 1, slotY + sj + 1, applyAlpha(sc, alpha));
+                        }
+                        Services.PLATFORM.fill(poseStackOrGraphics, slotX, slotY + slotSize - 1, slotX + slotSize, slotY + slotSize, emShadow);
+                        Services.PLATFORM.fill(poseStackOrGraphics, slotX + slotSize - 1, slotY, slotX + slotSize, slotY + slotSize, emShadow);
+                        Services.PLATFORM.fill(poseStackOrGraphics, slotX + slotSize - 5, slotY + 1, slotX + slotSize - 1, slotY + 5, applyAlpha(0xFF4ADE80, alpha));
+                    } else if (hover) {
+                        for (int si = 0; si < slotSize; si++) {
+                            int sc = lerpColor(0xFFFFFFFF, 0xFF707080, (float) si / slotSize);
+                            Services.PLATFORM.fill(poseStackOrGraphics, slotX + si, slotY, slotX + si + 1, slotY + 1, applyAlpha(sc, alpha));
+                        }
+                        for (int sj = 0; sj < slotSize; sj++) {
+                            int sc = lerpColor(0xFFFFFFFF, 0xFF505060, (float) sj / slotSize);
+                            Services.PLATFORM.fill(poseStackOrGraphics, slotX, slotY + sj, slotX + 1, slotY + sj + 1, applyAlpha(sc, alpha));
+                        }
+                        int sh = applyAlpha(0xFF09090C, alpha);
+                        Services.PLATFORM.fill(poseStackOrGraphics, slotX, slotY + slotSize - 1, slotX + slotSize, slotY + slotSize, sh);
+                        Services.PLATFORM.fill(poseStackOrGraphics, slotX + slotSize - 1, slotY, slotX + slotSize, slotY + slotSize, sh);
+                    } else {
+                        int dark = applyAlpha(0xFF0A0A0D, alpha);
+                        int light = applyAlpha(0xFF262630, alpha);
+                        Services.PLATFORM.fill(poseStackOrGraphics, slotX, slotY, slotX + slotSize, slotY + 1, dark);
+                        Services.PLATFORM.fill(poseStackOrGraphics, slotX, slotY + 1, slotX + 1, slotY + slotSize, dark);
+                        Services.PLATFORM.fill(poseStackOrGraphics, slotX, slotY + slotSize - 1, slotX + slotSize, slotY + slotSize, light);
+                        Services.PLATFORM.fill(poseStackOrGraphics, slotX + slotSize - 1, slotY, slotX + slotSize, slotY + slotSize, light);
+                    }
+
+                    ItemStack stack = itemStackCache.computeIfAbsent(item, ItemStack::new);
+                    Services.PLATFORM.renderGuiItem(poseStackOrGraphics, stack, slotX + 2, slotY + 2);
+
+                    if (hover) {
+                        hoveredStack = stack;
+                        hoveredIsActive = isSelected;
+                    }
                 }
+            }
+            disableGuiScissor(poseStackOrGraphics);
 
-                CommonId cid = Services.PLATFORM.getItemId(item);
-                String idStr = cid != null ? cid.toString() : "";
-                boolean isSelected = cfg.items.contains(idStr);
+            // Scrollbar (Only for viewport gutter)
+            if (maxScroll > 0) {
+                int trackH = viewportH;
+                int thumbH = Math.max(16, (int) ((viewportH / (float) totalContentHeight) * trackH));
+                int thumbY = viewportY + (int) ((scrollOffset / maxScroll) * (trackH - thumbH));
 
-                boolean hover = mouseX >= slotX && mouseX <= slotX + slotSize && mouseY >= slotY && mouseY <= slotY + slotSize &&
-                        mouseY >= clipY && mouseY <= clipY + clipH;
-
-                int bg = isSelected ? 0xFF142E18 : (hover ? 0xFF24242C : 0xFF121216);
-                Services.PLATFORM.fill(poseStackOrGraphics, slotX, slotY, slotX + slotSize, slotY + slotSize, applyAlpha(bg, alpha));
-
-                int border = isSelected ? 0xFF4ADE80 : (hover ? 0xFF6A6A7A : 0xFF24242C);
-                drawBorder(poseStackOrGraphics, slotX, slotY, slotSize, slotSize, applyAlpha(border, alpha));
-
-                ItemStack stack = itemStackCache.computeIfAbsent(item, ItemStack::new);
-                Services.PLATFORM.renderGuiItem(poseStackOrGraphics, stack, slotX + 2, slotY + 2);
-
-                if (isSelected) {
-                    Services.PLATFORM.fill(poseStackOrGraphics, slotX + slotSize - 6, slotY, slotX + slotSize, slotY + 6, applyAlpha(0xFF4ADE80, alpha));
-                }
-
-                if (hover) {
-                    hoveredStack = stack;
-                    hoveredIsActive = isSelected;
-                }
+                Services.PLATFORM.fill(poseStackOrGraphics, scrollbarTrackX, viewportY, scrollbarTrackX + scrollbarW, viewportY + trackH, applyAlpha(0xFF141418, alpha));
+                drawBeveledButton(poseStackOrGraphics, scrollbarTrackX, thumbY, scrollbarW, thumbH, 0xFF3E3E4C, false, false, alpha);
             }
 
             if (hoveredStack != null) {
@@ -926,80 +991,75 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                 Services.PLATFORM.renderComponentTooltip(poseStackOrGraphics, font, tooltip, mouseX + 12, mouseY);
             }
         } else {
-            // --- SUB-VIEW 1: Dedicated Registered Tags Panel ---
-            // Bar 3: Category Pills (All, keys, gems, ores, vault, swords, gear)
-            int bar3H = 18;
-            if (curY >= clipY && curY + bar3H <= clipY + clipH) {
-                int chipCount = TAG_CATEGORY_CHIPS.length;
-                int chipW = (w - 12) / chipCount;
-                int chipH = 13;
-                for (int c = 0; c < chipCount; c++) {
-                    int cx = x + 2 + c * (chipW + 2);
-                    boolean isC = (activeTagChipIndex == c);
-                    boolean hoverChip = mouseX >= cx && mouseX <= cx + chipW && mouseY >= curY + 2 && mouseY <= curY + 2 + chipH;
-                    int cBg = isC ? 0xFF282834 : (hoverChip ? 0xFF1E1E26 : 0xFF141418);
-                    int cBorder = isC ? 0xFF58586E : (hoverChip ? 0xFF3E3E4C : 0xFF222228);
-                    Services.PLATFORM.fill(poseStackOrGraphics, cx, curY + 2, cx + chipW, curY + 2 + chipH, applyAlpha(cBg, alpha));
-                    drawBorder(poseStackOrGraphics, cx, curY + 2, chipW, chipH, applyAlpha(cBorder, alpha));
-                    int cText = isC ? COLOR_TEXT_WHITE : (hoverChip ? COLOR_TEXT_SILVER : COLOR_TEXT_MUTED);
-                    Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, TAG_CATEGORY_CHIPS[c], cx + chipW / 2, curY + 4, applyAlpha(cText, alpha));
-                }
-            }
-            curY += bar3H + 4;
-
-            // Registered Tag Rows
+            // Sub-Tab 1: Registered Tags Panel
             List<String> tagsToDisplay = getFilteredTagsList();
             int tagRowH = 22;
             int tagRowGap = 2;
+            int totalContentHeight = tagsToDisplay.size() * (tagRowH + tagRowGap) + 6;
+            maxScroll = Math.max(0, totalContentHeight - viewportH);
+            scrollOffset = Math.max(0, Math.min(maxScroll, scrollOffset));
 
-            for (String tagId : tagsToDisplay) {
-                int rowY = curY;
-                if (rowY >= clipY && rowY + tagRowH <= clipY + clipH) {
-                    boolean isActive = cfg.items.contains(tagId);
-                    boolean hover = mouseX >= x && mouseX <= x + w && mouseY >= rowY && mouseY <= rowY + tagRowH;
+            int startY = viewportY + 2 - (int) scrollOffset;
+            int rowW = availGridW;
+            int rowX = x + 6;
 
-                    int rBg = isActive ? 0xFF142418 : (hover ? 0xFF1E1E26 : 0xFF131317);
-                    Services.PLATFORM.fill(poseStackOrGraphics, x, rowY, x + w, rowY + tagRowH, applyAlpha(rBg, alpha));
+            enableGuiScissor(poseStackOrGraphics, x + 4, viewportY, w - 8, viewportH);
 
-                    int rBorder = isActive ? 0xFF2E6E38 : (hover ? 0xFF3E3E4C : 0xFF202026);
-                    drawBorder(poseStackOrGraphics, x, rowY, w, tagRowH, applyAlpha(rBorder, alpha));
+            for (int ti = 0; ti < tagsToDisplay.size(); ti++) {
+                String tagId = tagsToDisplay.get(ti);
+                int rowY = startY + ti * (tagRowH + tagRowGap);
+                if (rowY + tagRowH < viewportY || rowY > viewportY + viewportH) continue;
 
-                    // Emblem '#'
-                    int emblemSize = 14;
-                    int emblemX = x + 5;
-                    int emblemY = rowY + (tagRowH - emblemSize) / 2;
-                    int embCol = isActive ? 0xFF4ADE80 : 0xFF84848C;
-                    Services.PLATFORM.fill(poseStackOrGraphics, emblemX, emblemY, emblemX + emblemSize, emblemY + emblemSize, applyAlpha(isActive ? 0xFF1A3820 : 0xFF1A1A20, alpha));
-                    drawBorder(poseStackOrGraphics, emblemX, emblemY, emblemSize, emblemSize, applyAlpha(isActive ? 0xFF4ADE80 : 0xFF2C2C36, alpha));
-                    Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "#", emblemX + emblemSize / 2, emblemY + 3, applyAlpha(embCol, alpha));
+                boolean isActive = cfg.items.contains(tagId);
+                boolean hover = mouseX >= rowX && mouseX <= rowX + rowW && mouseY >= rowY && mouseY <= rowY + tagRowH &&
+                        mouseY >= viewportY && mouseY <= viewportY + viewportH;
 
-                    // Tag Name
-                    int textCol = isActive ? COLOR_TEXT_WHITE : (hover ? COLOR_TEXT_SILVER : COLOR_TEXT_MUTED);
-                    drawText(poseStackOrGraphics, font, tagId, emblemX + emblemSize + 6, rowY + 7, applyAlpha(textCol, alpha));
+                int rBg = isActive ? 0xFF142418 : (hover ? 0xFF1E1E26 : 0xFF131317);
+                drawBeveledButton(poseStackOrGraphics, rowX, rowY, rowW, tagRowH, rBg, hover, isActive, alpha);
 
-                    // Registered Items Count Badge
-                    int count = tagItemCounts.getOrDefault(tagId, 1);
-                    String countStr = count + " items";
-                    int countW = font.width(countStr) + 8;
-                    int countX = x + w - countW - 52;
-                    int countY = rowY + (tagRowH - 12) / 2;
-                    Services.PLATFORM.fill(poseStackOrGraphics, countX, countY, countX + countW, countY + 12, applyAlpha(0xFF101014, alpha));
-                    drawBorder(poseStackOrGraphics, countX, countY, countW, 12, applyAlpha(0xFF24242C, alpha));
-                    Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, countStr, countX + countW / 2, countY + 2, applyAlpha(COLOR_TEXT_MUTED, alpha));
+                // Emblem '#'
+                int emblemSize = 14;
+                int emblemX = rowX + 5;
+                int emblemY = rowY + (tagRowH - emblemSize) / 2;
+                int embCol = isActive ? 0xFF4ADE80 : 0xFF84848C;
+                drawBeveledButton(poseStackOrGraphics, emblemX, emblemY, emblemSize, emblemSize, isActive ? 0xFF1A3820 : 0xFF1A1A20, false, isActive, alpha);
+                Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "#", emblemX + emblemSize / 2, emblemY + 3, applyAlpha(embCol, alpha));
 
-                    // Toggle Button [ ACTIVE ] / [ OFF ]
-                    int tBtnW = 42;
-                    int tBtnH = 14;
-                    int tBtnX = x + w - tBtnW - 6;
-                    int tBtnY = rowY + (tagRowH - tBtnH) / 2;
-                    int tbBg = isActive ? COLOR_TOGGLE_ON_BG : COLOR_TOGGLE_OFF_BG;
-                    int tbBorder = isActive ? COLOR_TOGGLE_ON_BORDER : COLOR_TOGGLE_OFF_BORDER;
-                    int tbText = isActive ? COLOR_TOGGLE_ON_TEXT : COLOR_TOGGLE_OFF_TEXT;
-                    Services.PLATFORM.fill(poseStackOrGraphics, tBtnX, tBtnY, tBtnX + tBtnW, tBtnY + tBtnH, applyAlpha(tbBg, alpha));
-                    drawBorder(poseStackOrGraphics, tBtnX, tBtnY, tBtnW, tBtnH, applyAlpha(tbBorder, alpha));
-                    Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, isActive ? "ON" : "OFF", tBtnX + tBtnW / 2, tBtnY + 3, applyAlpha(tbText, alpha));
+                // Tag Name
+                int textCol = isActive ? COLOR_TEXT_WHITE : (hover ? COLOR_TEXT_SILVER : COLOR_TEXT_MUTED);
+                drawText(poseStackOrGraphics, font, tagId, emblemX + emblemSize + 6, rowY + 7, applyAlpha(textCol, alpha));
+
+                // Registered Items Count Badge
+                int count = tagItemCounts.getOrDefault(tagId, 1);
+                String countStr = count + " items";
+                int countW = font.width(countStr) + 8;
+                int countX = rowX + rowW - countW - 52;
+                int countY = rowY + (tagRowH - 12) / 2;
+                drawBeveledButton(poseStackOrGraphics, countX, countY, countW, 12, 0xFF101014, false, false, alpha);
+                Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, countStr, countX + countW / 2, countY + 2, applyAlpha(COLOR_TEXT_MUTED, alpha));
+
+                // Toggle Button [ ON ] / [ OFF ]
+                int tBtnW = 42;
+                int tBtnH = 14;
+                int tBtnX = rowX + rowW - tBtnW - 6;
+                int tBtnY = rowY + (tagRowH - tBtnH) / 2;
+                if (isActive) {
+                    drawBeveledGreenButton(poseStackOrGraphics, tBtnX, tBtnY, tBtnW, tBtnH, hover, alpha);
+                } else {
+                    drawBeveledButton(poseStackOrGraphics, tBtnX, tBtnY, tBtnW, tBtnH, COLOR_TOGGLE_OFF_BG, hover, false, alpha);
                 }
-                curY += tagRowH + tagRowGap;
+                Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, isActive ? "ON" : "OFF", tBtnX + tBtnW / 2, tBtnY + 3, applyAlpha(isActive ? COLOR_TOGGLE_ON_TEXT : COLOR_TOGGLE_OFF_TEXT, alpha));
+            }
+            disableGuiScissor(poseStackOrGraphics);
+
+            // Scrollbar (Only for viewport gutter)
+            if (maxScroll > 0) {
+                int trackH = viewportH;
+                int thumbH = Math.max(16, (int) ((viewportH / (float) totalContentHeight) * trackH));
+                int thumbY = viewportY + (int) ((scrollOffset / maxScroll) * (trackH - thumbH));
+
+                Services.PLATFORM.fill(poseStackOrGraphics, scrollbarTrackX, viewportY, scrollbarTrackX + scrollbarW, viewportY + trackH, applyAlpha(0xFF141418, alpha));
+                drawBeveledButton(poseStackOrGraphics, scrollbarTrackX, thumbY, scrollbarW, thumbH, 0xFF3E3E4C, false, false, alpha);
             }
         }
     }
@@ -1361,7 +1421,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "✓ Apply Color", applyX + applyW / 2, applyY + 4, applyAlpha(COLOR_TOGGLE_ON_TEXT, alpha));
     }
 
-    // --- Vault Hunters Border & Bevel Engine (Chassis Gap & Metallic Gradient) ---
+    // --- Vault Hunters Border & Bevel Engine (Expanded Chassis Gap & Metallic Gradient) ---
     private void drawVaultHuntersFrame(Object poseStackOrGraphics, int x, int y, int w, int h, int bgRgb, float alpha) {
         // 1. Outer Chassis Body Fill (Solid metallic chassis backing)
         Services.PLATFORM.fill(poseStackOrGraphics, x, y, x + w, y + h, applyAlpha(COLOR_CHASSIS_BODY, alpha));
@@ -1389,22 +1449,116 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         Services.PLATFORM.fill(poseStackOrGraphics, x + 1, y + h - 2, x + w - 1, y + h - 2, shadow);
         Services.PLATFORM.fill(poseStackOrGraphics, x + w - 2, y + 1, x + w - 1, y + h - 1, shadow);
 
-        // 4. Chassis Gap / Body: 4px metallic gray bevel spacing between outer gradient and inner groove
-        // Offset 5: Recessed Bevel Groove / Shadow Line that separates the chassis rim from the interior
-        int bevelShadow = applyAlpha(0xFF101014, alpha);
-        int bevelHighlight = applyAlpha(0xFF2C2C36, alpha);
+        // 4. Outer Chassis Band (offset 2 to 4)
+        int band = applyAlpha(0xFF22222A, alpha);
+        drawBorder(poseStackOrGraphics, x + 2, y + 2, w - 4, h - 4, band);
+        drawBorder(poseStackOrGraphics, x + 3, y + 3, w - 6, h - 6, band);
+
+        // 5. Stepped Bevel Ridge & Groove at offset 5
+        int bevelShadow = applyAlpha(0xFF0E0E12, alpha);
+        int bevelHighlight = applyAlpha(0xFF383848, alpha);
         Services.PLATFORM.fill(poseStackOrGraphics, x + 5, y + 5, x + w - 5, y + 6, bevelShadow);
         Services.PLATFORM.fill(poseStackOrGraphics, x + 5, y + 5, x + 6, y + h - 5, bevelShadow);
         Services.PLATFORM.fill(poseStackOrGraphics, x + 5, y + h - 6, x + w - 5, y + h - 5, bevelHighlight);
         Services.PLATFORM.fill(poseStackOrGraphics, x + w - 6, y + 5, x + w - 5, y + h - 5, bevelHighlight);
 
-        // 5. Main Interior Dark Plate (from offset 6 inward)
-        Services.PLATFORM.fill(poseStackOrGraphics, x + 6, y + 6, x + w - 6, y + h - 6, applyAlpha(bgRgb, alpha));
+        // 6. Secondary soft metallic transition at offset 8
+        int softGroove = applyAlpha(0xFF16161C, alpha);
+        drawBorder(poseStackOrGraphics, x + 8, y + 8, w - 16, h - 16, softGroove);
+    }
+
+    // Top & Left Metallic Gradient Component Frame
+    private void drawBeveledComponent(Object poseStackOrGraphics, int x, int y, int w, int h, int bgRgb, float alpha) {
+        // 1. Interior Fill
+        Services.PLATFORM.fill(poseStackOrGraphics, x + 1, y + 1, x + w - 1, y + h - 1, applyAlpha(bgRgb, alpha));
+
+        // 2. Bottom & Right dark recessed shadow
+        int dark = applyAlpha(0xFF08080C, alpha);
+        Services.PLATFORM.fill(poseStackOrGraphics, x, y + h - 1, x + w, y + h, dark);
+        Services.PLATFORM.fill(poseStackOrGraphics, x + w - 1, y, x + w, y + h, dark);
+
+        // 3. Top Edge: Metallic White Gradient Artifact (Bright white on left fading to slate on right)
+        for (int i = 0; i < w - 1; i++) {
+            float t = (float) i / Math.max(1, w - 2);
+            int col = lerpColor(0xFFFFFFFF, 0xFF585868, t);
+            Services.PLATFORM.fill(poseStackOrGraphics, x + i, y, x + i + 1, y + 1, applyAlpha(col, alpha));
+        }
+
+        // 4. Left Edge: Metallic White Gradient Artifact (Bright white at top fading to slate at bottom)
+        for (int j = 0; j < h - 1; j++) {
+            float t = (float) j / Math.max(1, h - 2);
+            int col = lerpColor(0xFFFFFFFF, 0xFF444452, t);
+            Services.PLATFORM.fill(poseStackOrGraphics, x, y + j, x + 1, y + j + 1, applyAlpha(col, alpha));
+        }
+    }
+
+    // Top & Left Metallic Gradient Button Frame
+    private void drawBeveledButton(Object poseStackOrGraphics, int x, int y, int w, int h, int bgRgb, boolean hover, boolean active, float alpha) {
+        int bg = active ? (hover ? 0xFF282836 : 0xFF22222E) : (hover ? 0xFF202028 : bgRgb);
+        Services.PLATFORM.fill(poseStackOrGraphics, x + 1, y + 1, x + w - 1, y + h - 1, applyAlpha(bg, alpha));
+
+        int dark = applyAlpha(0xFF08080C, alpha);
+        Services.PLATFORM.fill(poseStackOrGraphics, x, y + h - 1, x + w, y + h, dark);
+        Services.PLATFORM.fill(poseStackOrGraphics, x + w - 1, y, x + w, y + h, dark);
+
+        int startCol = active ? 0xFFFFFFFF : (hover ? 0xFFEEEEF6 : 0xFF9696A8);
+        int endCol = active ? 0xFF707085 : (hover ? 0xFF585868 : 0xFF383844);
+
+        for (int i = 0; i < w - 1; i++) {
+            float t = (float) i / Math.max(1, w - 2);
+            int col = lerpColor(startCol, endCol, t);
+            Services.PLATFORM.fill(poseStackOrGraphics, x + i, y, x + i + 1, y + 1, applyAlpha(col, alpha));
+        }
+        for (int j = 0; j < h - 1; j++) {
+            float t = (float) j / Math.max(1, h - 2);
+            int col = lerpColor(startCol, endCol, t);
+            Services.PLATFORM.fill(poseStackOrGraphics, x, y + j, x + 1, y + j + 1, applyAlpha(col, alpha));
+        }
+    }
+
+    // Top & Left Metallic Green Button (for Apply / ON states)
+    private void drawBeveledGreenButton(Object poseStackOrGraphics, int x, int y, int w, int h, boolean hover, float alpha) {
+        int bg = hover ? 0xFF1E4828 : COLOR_TOGGLE_ON_BG;
+        Services.PLATFORM.fill(poseStackOrGraphics, x + 1, y + 1, x + w - 1, y + h - 1, applyAlpha(bg, alpha));
+
+        int dark = applyAlpha(0xFF0A2412, alpha);
+        Services.PLATFORM.fill(poseStackOrGraphics, x, y + h - 1, x + w, y + h, dark);
+        Services.PLATFORM.fill(poseStackOrGraphics, x + w - 1, y, x + w, y + h, dark);
+
+        int startCol = hover ? 0xFFCEFFE0 : 0xFF86EFAC;
+        int endCol = hover ? 0xFF4ADE80 : 0xFF22C55E;
+        for (int i = 0; i < w - 1; i++) {
+            float t = (float) i / Math.max(1, w - 2);
+            int col = lerpColor(startCol, endCol, t);
+            Services.PLATFORM.fill(poseStackOrGraphics, x + i, y, x + i + 1, y + 1, applyAlpha(col, alpha));
+        }
+        for (int j = 0; j < h - 1; j++) {
+            float t = (float) j / Math.max(1, h - 2);
+            int col = lerpColor(startCol, endCol, t);
+            Services.PLATFORM.fill(poseStackOrGraphics, x, y + j, x + 1, y + j + 1, applyAlpha(col, alpha));
+        }
+    }
+
+    // Viewport Scissor Helpers
+    private void enableGuiScissor(Object poseStackOrGraphics, int guiX, int guiY, int guiW, int guiH) {
+        Minecraft mc = Minecraft.getInstance();
+        double scale = mc.getWindow().getGuiScale();
+        int winH = mc.getWindow().getHeight();
+        int sx = (int) Math.round(guiX * scale);
+        int sy = (int) Math.round(winH - (guiY + guiH) * scale);
+        int sw = (int) Math.round(guiW * scale);
+        int sh = (int) Math.round(guiH * scale);
+        if (sw > 0 && sh > 0) {
+            Services.PLATFORM.enableScissor(poseStackOrGraphics, sx, sy, sw, sh);
+        }
+    }
+
+    private void disableGuiScissor(Object poseStackOrGraphics) {
+        Services.PLATFORM.disableScissor(poseStackOrGraphics);
     }
 
     private void drawInsetBox(Object poseStackOrGraphics, int x, int y, int w, int h, int fillRgb, float alpha) {
-        Services.PLATFORM.fill(poseStackOrGraphics, x, y, x + w, y + h, applyAlpha(fillRgb, alpha));
-        drawBorder(poseStackOrGraphics, x, y, w, h, applyAlpha(COLOR_FRAME_BLACK, alpha));
+        drawBeveledComponent(poseStackOrGraphics, x, y, w, h, fillRgb, alpha);
     }
 
     private void drawGroove(Object poseStackOrGraphics, int x, int y, int w, boolean horizontal, float alpha) {
@@ -1448,17 +1602,16 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
     // --- Config Row Render Helpers ---
     private void renderRowCardBase(Object poseStackOrGraphics, Font font, int x, int y, int w, int h, int clipY, int clipH, String label, String desc, int mouseX, int mouseY, float alpha) {
-        if (y < clipY || y + h > clipY + clipH) return;
+        if (y + h < clipY || y > clipY + clipH) return;
 
-        boolean hover = mouseX >= x && mouseX <= x + w && mouseY >= y && mouseY <= y + h;
+        boolean hover = mouseX >= x && mouseX <= x + w && mouseY >= y && mouseY <= y + h && mouseY >= clipY && mouseY <= clipY + clipH;
         int bg = hover ? COLOR_ROW_BG_HOVER : COLOR_ROW_BG;
-        Services.PLATFORM.fill(poseStackOrGraphics, x, y, x + w, y + h, applyAlpha(bg, alpha));
-
-        int border = hover ? COLOR_ROW_BORDER_HOVER : COLOR_ROW_BORDER;
-        drawBorder(poseStackOrGraphics, x, y, w, h, applyAlpha(border, alpha));
+        drawBeveledButton(poseStackOrGraphics, x, y, w, h, bg, hover, false, alpha);
 
         drawText(poseStackOrGraphics, font, label, x + 6, y + 5, applyAlpha(COLOR_TEXT_WHITE, alpha));
-        drawText(poseStackOrGraphics, font, desc, x + 6, y + 15, applyAlpha(COLOR_TEXT_MUTED, alpha));
+        if (desc != null && !desc.isEmpty()) {
+            drawText(poseStackOrGraphics, font, desc, x + 6, y + 15, applyAlpha(COLOR_TEXT_MUTED, alpha));
+        }
     }
 
     private void renderConfigRowToggle(Object poseStackOrGraphics, Font font, int x, int y, int w, int h, int clipY, int clipH, String label, String desc, boolean value, int mouseX, int mouseY, float alpha) {
@@ -1471,12 +1624,12 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         int btnY = y + (h - btnH) / 2;
 
         boolean hoverBtn = mouseX >= btnX && mouseX <= btnX + btnW && mouseY >= btnY && mouseY <= btnY + btnH;
-        int bg = value ? COLOR_TOGGLE_ON_BG : COLOR_TOGGLE_OFF_BG;
-        int border = value ? COLOR_TOGGLE_ON_BORDER : (hoverBtn ? 0xFF585868 : COLOR_TOGGLE_OFF_BORDER);
+        if (value) {
+            drawBeveledGreenButton(poseStackOrGraphics, btnX, btnY, btnW, btnH, hoverBtn, alpha);
+        } else {
+            drawBeveledButton(poseStackOrGraphics, btnX, btnY, btnW, btnH, COLOR_TOGGLE_OFF_BG, hoverBtn, false, alpha);
+        }
         int textCol = value ? COLOR_TOGGLE_ON_TEXT : (hoverBtn ? COLOR_TEXT_WHITE : COLOR_TOGGLE_OFF_TEXT);
-
-        Services.PLATFORM.fill(poseStackOrGraphics, btnX, btnY, btnX + btnW, btnY + btnH, applyAlpha(bg, alpha));
-        drawBorder(poseStackOrGraphics, btnX, btnY, btnW, btnH, applyAlpha(border, alpha));
         Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, value ? "ON" : "OFF", btnX + btnW / 2, btnY + 3, applyAlpha(textCol, alpha));
     }
 
@@ -1490,12 +1643,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         int btnY = y + (h - btnH) / 2;
 
         boolean hoverBtn = mouseX >= btnX && mouseX <= btnX + btnW && mouseY >= btnY && mouseY <= btnY + btnH;
-        int bg = hoverBtn ? 0xFF2E2E38 : COLOR_BTN_BG;
-        Services.PLATFORM.fill(poseStackOrGraphics, btnX, btnY, btnX + btnW, btnY + btnH, applyAlpha(bg, alpha));
-
-        int border = hoverBtn ? COLOR_BTN_BORDER_HOVER : COLOR_BTN_BORDER;
-        drawBorder(poseStackOrGraphics, btnX, btnY, btnW, btnH, applyAlpha(border, alpha));
-
+        drawBeveledButton(poseStackOrGraphics, btnX, btnY, btnW, btnH, hoverBtn ? 0xFF2E2E38 : COLOR_BTN_BG, hoverBtn, false, alpha);
         Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "‹ " + currentVal + " ›", btnX + btnW / 2, btnY + 3, applyAlpha(hoverBtn ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
     }
 
@@ -1510,8 +1658,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         int stepBtnW = 14;
 
         boolean hoverMinus = mouseX >= counterX && mouseX <= counterX + stepBtnW && mouseY >= counterY && mouseY <= counterY + counterH;
-        Services.PLATFORM.fill(poseStackOrGraphics, counterX, counterY, counterX + stepBtnW, counterY + counterH, applyAlpha(hoverMinus ? 0xFF30303C : COLOR_BTN_BG, alpha));
-        drawBorder(poseStackOrGraphics, counterX, counterY, stepBtnW, counterH, applyAlpha(hoverMinus ? COLOR_BTN_BORDER_HOVER : COLOR_BTN_BORDER, alpha));
+        drawBeveledButton(poseStackOrGraphics, counterX, counterY, stepBtnW, counterH, hoverMinus ? 0xFF30303C : COLOR_BTN_BG, hoverMinus, false, alpha);
         Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "−", counterX + stepBtnW / 2, counterY + 3, applyAlpha(COLOR_TEXT_WHITE, alpha));
 
         int valX = counterX + stepBtnW;
@@ -1522,8 +1669,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
         int plusX = counterX + counterW - stepBtnW;
         boolean hoverPlus = mouseX >= plusX && mouseX <= plusX + stepBtnW && mouseY >= counterY && mouseY <= counterY + counterH;
-        Services.PLATFORM.fill(poseStackOrGraphics, plusX, counterY, plusX + stepBtnW, counterY + counterH, applyAlpha(hoverPlus ? 0xFF30303C : COLOR_BTN_BG, alpha));
-        drawBorder(poseStackOrGraphics, plusX, counterY, stepBtnW, counterH, applyAlpha(hoverPlus ? COLOR_BTN_BORDER_HOVER : COLOR_BTN_BORDER, alpha));
+        drawBeveledButton(poseStackOrGraphics, plusX, counterY, stepBtnW, counterH, hoverPlus ? 0xFF30303C : COLOR_BTN_BG, hoverPlus, false, alpha);
         Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "+", plusX + stepBtnW / 2, counterY + 3, applyAlpha(COLOR_TEXT_WHITE, alpha));
     }
 
@@ -1537,12 +1683,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         int btnY = y + (h - btnH) / 2;
 
         boolean hoverBtn = mouseX >= btnX && mouseX <= btnX + btnW && mouseY >= btnY && mouseY <= btnY + btnH;
-        int bg = hoverBtn ? 0xFF2E2E38 : COLOR_BTN_BG;
-        Services.PLATFORM.fill(poseStackOrGraphics, btnX, btnY, btnX + btnW, btnY + btnH, applyAlpha(bg, alpha));
-
-        int border = hoverBtn ? COLOR_BTN_BORDER_HOVER : COLOR_BTN_BORDER;
-        drawBorder(poseStackOrGraphics, btnX, btnY, btnW, btnH, applyAlpha(border, alpha));
-
+        drawBeveledButton(poseStackOrGraphics, btnX, btnY, btnW, btnH, hoverBtn ? 0xFF2E2E38 : COLOR_BTN_BG, hoverBtn, false, alpha);
         Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, btnText, btnX + btnW / 2, btnY + 3, applyAlpha(hoverBtn ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
     }
 
@@ -1741,8 +1882,8 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         int viewY = contentY + catHeaderH + 4;
         int viewH = contentH - catHeaderH - 8;
 
-        if (mouseX >= contentX && mouseX <= contentX + contentW && mouseY >= viewY && mouseY <= viewY + viewH) {
-            if (handleContentClick(mouseX, mouseY, contentX + 6, viewY + 2 - (int) scrollOffset, contentW - 14, 26, 3, viewY, viewH)) {
+        if (mouseX >= contentX && mouseX <= contentX + contentW && mouseY >= contentY && mouseY <= contentY + contentH) {
+            if (handleContentClick(mouseX, mouseY, contentX, contentY, contentW, contentH, catHeaderH)) {
                 return true;
             }
         }
@@ -1754,9 +1895,8 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         return false;
     }
 
-    private boolean handleContentClick(double mouseX, double mouseY, int x, int startY, int w, int h, int gap, int clipY, int clipH) {
+    private boolean handleContentClick(double mouseX, double mouseY, int contentX, int contentY, int contentW, int contentH, int catHeaderH) {
         NavItem current = navItems.get(selectedTabIndex);
-        int curY = startY;
 
         switch (current.id) {
             case "items" -> {
@@ -1764,167 +1904,174 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                 PresetsConfig presetsCfg = PresetsConfig.get();
                 List<PresetsConfig.Preset> presets = presetsCfg.getPresets();
 
-                // Bar 1: Presets
+                int curY = contentY + catHeaderH + 4;
+
+                // Bar 1: Presets Toolbar
                 int bar1H = 20;
-                if (curY >= clipY && curY + bar1H <= clipY + clipH) {
-                    int cycleW = 74;
-                    int btnH = 14;
-                    int cycleX = x + 44;
-                    int cycleY = curY + 2;
+                int btnH = 14;
+                int cycleY = curY + (bar1H - btnH) / 2;
 
-                    // Cycle Preset
-                    if (mouseX >= cycleX && mouseX <= cycleX + cycleW && mouseY >= cycleY && mouseY <= cycleY + btnH) {
-                        if (!presets.isEmpty()) {
-                            selectedPresetIndex = (selectedPresetIndex + 1) % presets.size();
-                        }
-                        return true;
+                int cycleW = 86;
+                int cycleX = contentX + 44;
+                if (mouseX >= cycleX && mouseX <= cycleX + cycleW && mouseY >= cycleY && mouseY <= cycleY + btnH) {
+                    if (!presets.isEmpty()) {
+                        selectedPresetIndex = (selectedPresetIndex + 1) % presets.size();
                     }
-
-                    // Apply Preset
-                    int applyW = 38;
-                    int applyX = cycleX + cycleW + 3;
-                    if (mouseX >= applyX && mouseX <= applyX + applyW && mouseY >= cycleY && mouseY <= cycleY + btnH) {
-                        if (!presets.isEmpty()) {
-                            List<String> keys = presetsCfg.getPresetKeys();
-                            if (selectedPresetIndex < keys.size()) {
-                                presetsCfg.applyPreset(keys.get(selectedPresetIndex));
-                            }
-                        }
-                        return true;
-                    }
-
-                    // Save Preset
-                    int saveW = 36;
-                    int saveX = applyX + applyW + 3;
-                    if (mouseX >= saveX && mouseX <= saveX + saveW && mouseY >= cycleY && mouseY <= cycleY + btnH) {
-                        if (!presets.isEmpty()) {
-                            List<String> keys = presetsCfg.getPresetKeys();
-                            if (selectedPresetIndex < keys.size()) {
-                                String key = keys.get(selectedPresetIndex);
-                                presetsCfg.savePreset(key, presets.get(selectedPresetIndex).name, new HashSet<>(cfg.items));
-                            }
-                        }
-                        return true;
-                    }
-
-                    // + New Preset
-                    int newW = 38;
-                    int newX = saveX + saveW + 3;
-                    if (mouseX >= newX && mouseX <= newX + newW && mouseY >= cycleY && mouseY <= cycleY + btnH) {
-                        String newKey = presetsCfg.generatePresetKey();
-                        presetsCfg.savePreset(newKey, "Custom " + (presets.size()), new HashSet<>(cfg.items));
-                        selectedPresetIndex = presetsCfg.getPresets().size() - 1;
-                        return true;
-                    }
-
-                    // Reset to Defaults
-                    int defW = 54;
-                    int defX = x + w - defW - 2;
-                    if (mouseX >= defX && mouseX <= defX + defW && mouseY >= cycleY && mouseY <= cycleY + btnH) {
-                        presetsCfg.applyPreset("default");
-                        return true;
-                    }
+                    return true;
                 }
-                curY += bar1H;
 
-                // Bar 2: Sub-View Switcher: [ ▦ Item Triggers ] vs [ 🏷 Registered Tags Panel ]
-                int bar2H = 20;
-                if (curY >= clipY && curY + bar2H <= clipY + clipH) {
-                    int subBtnW = (w - 8) / 2;
-                    int btnH = 15;
-
-                    int sub0X = x + 2;
-                    int sub0Y = curY + 2;
-                    if (mouseX >= sub0X && mouseX <= sub0X + subBtnW && mouseY >= sub0Y && mouseY <= sub0Y + btnH) {
-                        itemsSubTab = 0;
-                        scrollOffset = 0;
-                        return true;
+                int applyW = 38;
+                int applyX = cycleX + cycleW + 4;
+                if (mouseX >= applyX && mouseX <= applyX + applyW && mouseY >= cycleY && mouseY <= cycleY + btnH) {
+                    if (!presets.isEmpty()) {
+                        List<String> keys = presetsCfg.getPresetKeys();
+                        if (selectedPresetIndex < keys.size()) {
+                            presetsCfg.applyPreset(keys.get(selectedPresetIndex));
+                        }
                     }
-
-                    int sub1X = sub0X + subBtnW + 4;
-                    if (mouseX >= sub1X && mouseX <= sub1X + subBtnW && mouseY >= sub0Y && mouseY <= sub0Y + btnH) {
-                        itemsSubTab = 1;
-                        scrollOffset = 0;
-                        return true;
-                    }
+                    return true;
                 }
+
+                int saveW = 36;
+                int saveX = applyX + applyW + 4;
+                if (mouseX >= saveX && mouseX <= saveX + saveW && mouseY >= cycleY && mouseY <= cycleY + btnH) {
+                    if (!presets.isEmpty()) {
+                        List<String> keys = presetsCfg.getPresetKeys();
+                        if (selectedPresetIndex < keys.size()) {
+                            String key = keys.get(selectedPresetIndex);
+                            presetsCfg.savePreset(key, presets.get(selectedPresetIndex).name, new HashSet<>(cfg.items));
+                        }
+                    }
+                    return true;
+                }
+
+                int newW = 38;
+                int newX = saveX + saveW + 4;
+                if (mouseX >= newX && mouseX <= newX + newW && mouseY >= cycleY && mouseY <= cycleY + btnH) {
+                    String newKey = presetsCfg.generatePresetKey();
+                    presetsCfg.savePreset(newKey, "Custom " + (presets.size()), new HashSet<>(cfg.items));
+                    selectedPresetIndex = presetsCfg.getPresets().size() - 1;
+                    return true;
+                }
+
+                int defW = 54;
+                int defX = contentX + contentW - defW - 8;
+                if (mouseX >= defX && mouseX <= defX + defW && mouseY >= cycleY && mouseY <= cycleY + btnH) {
+                    presetsCfg.applyPreset("default");
+                    return true;
+                }
+
+                curY += bar1H + 2;
+
+                // Bar 2: Sub-View Switcher
+                int bar2H = 18;
+                int subBtnW = (contentW - 18) / 2;
+                int subBtnH = 15;
+                int subY = curY + 1;
+
+                int sub0X = contentX + 6;
+                if (mouseX >= sub0X && mouseX <= sub0X + subBtnW && mouseY >= subY && mouseY <= subY + subBtnH) {
+                    itemsSubTab = 0;
+                    scrollOffset = 0;
+                    return true;
+                }
+
+                int sub1X = sub0X + subBtnW + 6;
+                if (mouseX >= sub1X && mouseX <= sub1X + subBtnW && mouseY >= subY && mouseY <= subY + subBtnH) {
+                    itemsSubTab = 1;
+                    scrollOffset = 0;
+                    return true;
+                }
+
                 curY += bar2H + 2;
 
+                // Bar 3: Filter Bar
+                int bar3H = 16;
                 if (itemsSubTab == 0) {
-                    // Item Filter Pills Bar
-                    int bar3H = 18;
-                    if (curY >= clipY && curY + bar3H <= clipY + clipH) {
-                        int pillW = (w - 12) / 3;
-                        int pillH = 13;
-                        for (int f = 0; f < 3; f++) {
-                            int px = x + 2 + f * (pillW + 4);
-                            if (mouseX >= px && mouseX <= px + pillW && mouseY >= curY + 2 && mouseY <= curY + 2 + pillH) {
-                                itemFilterMode = f;
-                                return true;
-                            }
-                        }
-                    }
-                    curY += bar3H + 4;
-
-                    // Slot clicks
-                    List<Item> itemsToDisplay = getFilteredItemsList();
-                    int slotSize = 20;
-                    int slotGap = 2;
-                    int cols = Math.max(1, (w - 12) / (slotSize + slotGap));
-                    int gridStartX = x + 4;
-
-                    for (int i = 0; i < itemsToDisplay.size(); i++) {
-                        Item item = itemsToDisplay.get(i);
-                        int col = i % cols;
-                        int row = i / cols;
-                        int slotX = gridStartX + col * (slotSize + slotGap);
-                        int slotY = curY + row * (slotSize + slotGap);
-
-                        if (slotY + slotSize < clipY || slotY > clipY + clipH) {
-                            continue;
-                        }
-
-                        if (mouseX >= slotX && mouseX <= slotX + slotSize && mouseY >= slotY && mouseY <= slotY + slotSize) {
-                            CommonId cid = Services.PLATFORM.getItemId(item);
-                            if (cid != null) {
-                                String idStr = cid.toString();
-                                if (cfg.items.contains(idStr)) {
-                                    cfg.items.remove(idStr);
-                                } else {
-                                    cfg.items.add(idStr);
-                                }
-                                cfg.saveItemsToDisk();
-                            }
+                    int pillW = (contentW - 20) / 3;
+                    int pillH = 13;
+                    int pillY = curY + 1;
+                    for (int f = 0; f < 3; f++) {
+                        int px = contentX + 6 + f * (pillW + 4);
+                        if (mouseX >= px && mouseX <= px + pillW && mouseY >= pillY && mouseY <= pillY + pillH) {
+                            itemFilterMode = f;
+                            scrollOffset = 0;
                             return true;
                         }
                     }
                 } else {
-                    // Tag Category Chips Bar
-                    int bar3H = 18;
-                    if (curY >= clipY && curY + bar3H <= clipY + clipH) {
-                        int chipCount = TAG_CATEGORY_CHIPS.length;
-                        int chipW = (w - 12) / chipCount;
-                        int chipH = 13;
-                        for (int c = 0; c < chipCount; c++) {
-                            int cx = x + 2 + c * (chipW + 2);
-                            if (mouseX >= cx && mouseX <= cx + chipW && mouseY >= curY + 2 && mouseY <= curY + 2 + chipH) {
-                                activeTagChipIndex = c;
-                                scrollOffset = 0;
-                                return true;
-                            }
+                    int chipCount = TAG_CATEGORY_CHIPS.length;
+                    int chipW = (contentW - 20) / chipCount;
+                    int chipH = 13;
+                    int chipY = curY + 1;
+                    for (int c = 0; c < chipCount; c++) {
+                        int cx = contentX + 6 + c * (chipW + 2);
+                        if (mouseX >= cx && mouseX <= cx + chipW && mouseY >= chipY && mouseY <= chipY + chipH) {
+                            activeTagChipIndex = c;
+                            scrollOffset = 0;
+                            return true;
                         }
                     }
-                    curY += bar3H + 4;
+                }
 
-                    // Registered Tag Rows clicks
-                    List<String> tagsToDisplay = getFilteredTagsList();
-                    int tagRowH = 22;
-                    int tagRowGap = 2;
+                curY += bar3H + 4;
 
-                    for (String tagId : tagsToDisplay) {
-                        int rowY = curY;
-                        if (rowY >= clipY && rowY + tagRowH <= clipY + clipH) {
-                            if (mouseX >= x && mouseX <= x + w && mouseY >= rowY && mouseY <= rowY + tagRowH) {
+                // Viewport Clicks
+                int viewportY = curY;
+                int viewportH = (contentY + contentH - 6) - viewportY;
+
+                if (mouseY >= viewportY && mouseY <= viewportY + viewportH) {
+                    int scrollbarW = 4;
+                    int scrollbarTrackX = contentX + contentW - scrollbarW - 5;
+                    int availGridW = (scrollbarTrackX - 6) - (contentX + 6);
+
+                    if (itemsSubTab == 0) {
+                        List<Item> itemsToDisplay = getFilteredItemsList();
+                        int slotSize = 20;
+                        int slotGap = 2;
+                        int step = slotSize + slotGap;
+                        int cols = Math.max(1, availGridW / step);
+                        int totalGridW = cols * step - slotGap;
+                        int gridStartX = contentX + 6 + (availGridW - totalGridW) / 2;
+
+                        int col = (int) (mouseX - gridStartX) / step;
+                        int row = (int) ((mouseY - (viewportY + 2 - (int) scrollOffset)) / step);
+
+                        if (col >= 0 && col < cols && row >= 0) {
+                            int index = row * cols + col;
+                            if (index < itemsToDisplay.size()) {
+                                int slotX = gridStartX + col * step;
+                                int slotY = viewportY + 2 - (int) scrollOffset + row * step;
+                                if (mouseX >= slotX && mouseX <= slotX + slotSize && mouseY >= slotY && mouseY <= slotY + slotSize) {
+                                    Item item = itemsToDisplay.get(index);
+                                    CommonId cid = Services.PLATFORM.getItemId(item);
+                                    if (cid != null) {
+                                        String idStr = cid.toString();
+                                        if (cfg.items.contains(idStr)) {
+                                            cfg.items.remove(idStr);
+                                        } else {
+                                            cfg.items.add(idStr);
+                                        }
+                                        cfg.saveItemsToDisk();
+                                    }
+                                    return true;
+                                }
+                            }
+                        }
+                    } else {
+                        List<String> tagsToDisplay = getFilteredTagsList();
+                        int tagRowH = 22;
+                        int tagRowGap = 2;
+                        int startY = viewportY + 2 - (int) scrollOffset;
+                        int rowW = availGridW;
+                        int rowX = contentX + 6;
+
+                        for (int ti = 0; ti < tagsToDisplay.size(); ti++) {
+                            int rowY = startY + ti * (tagRowH + tagRowGap);
+                            if (rowY + tagRowH < viewportY || rowY > viewportY + viewportH) continue;
+
+                            if (mouseX >= rowX && mouseX <= rowX + rowW && mouseY >= rowY && mouseY <= rowY + tagRowH) {
+                                String tagId = tagsToDisplay.get(ti);
                                 if (cfg.items.contains(tagId)) {
                                     cfg.items.remove(tagId);
                                 } else {
@@ -1934,10 +2081,26 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                                 return true;
                             }
                         }
-                        curY += tagRowH + tagRowGap;
                     }
                 }
             }
+            default -> {
+                int viewY = contentY + catHeaderH + 4;
+                int viewH = contentH - catHeaderH - 8;
+                int scrollbarW = 4;
+                int scrollbarTrackX = contentX + contentW - scrollbarW - 5;
+                int rowW = (scrollbarTrackX - 6) - (contentX + 6);
+                int rowX = contentX + 6;
+                int startY = viewY + 2 - (int) scrollOffset;
+                int h = 26;
+                int gap = 3;
+                int curY = startY;
+                int clipY = viewY;
+                int clipH = viewH;
+                int x = rowX;
+                int w = rowW;
+
+                switch (current.id) {
             case "particles" -> {
                 PillarParticleConfig cfg = PillarParticleConfig.get();
 

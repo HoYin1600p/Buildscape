@@ -181,6 +181,18 @@ public class BlockFactory implements IBlockFactory {
     private static final class WoodTrapdoor extends TrapDoorBlock {
         private WoodTrapdoor(BlockBehaviour.Properties properties) { super(properties); }
     }
+    /** Reference sign filter: only dyes, glow ink and an empty, non-crouching hand reach vanilla sign use. */
+    private static boolean signUseFilter(boolean bamboo, Level level, BlockPos pos, Player player, InteractionHand hand) {
+        BlockEntity blockEntity = level.getBlockEntity(pos);
+        ItemStack heldItem = player.getItemInHand(hand);
+        if (!heldItem.isEmpty() && (heldItem.getItem() instanceof net.minecraft.world.item.DyeItem
+                || heldItem.getItem() == net.minecraft.world.item.Items.GLOW_INK_SAC)) {
+            return true;
+        }
+        return (bamboo ? blockEntity instanceof com.kingodogo.buildscape.block.BambooSignBlockEntity
+                : blockEntity instanceof com.kingodogo.buildscape.block.MangroveSignBlockEntity)
+                && !player.isCrouching() && heldItem.isEmpty();
+    }
     private static final class WoodButton extends WoodButtonBlock {
         private WoodButton(BlockBehaviour.Properties properties) { super(properties); }
     }
@@ -306,6 +318,11 @@ public class BlockFactory implements IBlockFactory {
                         return bamboo ? new com.kingodogo.buildscape.block.BambooSignBlockEntity(pos, state)
                                 : new com.kingodogo.buildscape.block.MangroveSignBlockEntity(pos, state);
                     }
+                    @Override public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player,
+                            InteractionHand hand, BlockHitResult hit) {
+                        return signUseFilter(bamboo, level, pos, player, hand)
+                                ? super.use(state, level, pos, player, hand, hit) : InteractionResult.PASS;
+                    }
                 };
             }
             case "ModWallSignBlock", "ModBambooWallSignBlock": {
@@ -315,8 +332,14 @@ public class BlockFactory implements IBlockFactory {
                         return bamboo ? new com.kingodogo.buildscape.block.BambooSignBlockEntity(pos, state)
                                 : new com.kingodogo.buildscape.block.MangroveSignBlockEntity(pos, state);
                     }
+                    @Override public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player,
+                            InteractionHand hand, BlockHitResult hit) {
+                        return signUseFilter(bamboo, level, pos, player, hand)
+                                ? super.use(state, level, pos, player, hand, hit) : InteractionResult.PASS;
+                    }
                 };
             }
+            case "ModButtonBlock": return new net.minecraft.world.level.block.StoneButtonBlock(props) {};
             case "SaplingBlock": {
                 net.minecraft.world.level.block.grower.AbstractTreeGrower grower = def.getId().equals("cherry_sapling")
                         ? new com.kingodogo.buildscape.worldgen.CherryTreeGrower()

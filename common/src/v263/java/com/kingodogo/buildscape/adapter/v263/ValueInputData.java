@@ -112,6 +112,18 @@ public class ValueInputData implements IBlockEntityReadData {
 
     @Override
     public BlockState getBlockStateOrAir(String key) {
+        if (input.child(key).flatMap(child -> child.getString("Name")).isPresent()) {
+            net.minecraft.nbt.CompoundTag state = input.read(key, net.minecraft.nbt.CompoundTag.CODEC)
+                    .orElseGet(net.minecraft.nbt.CompoundTag::new).copy();
+            state.putString("id", state.getStringOr("Name", "minecraft:air"));
+            state.remove("Name");
+            if (state.get("Properties") != null) {
+                state.put("properties", state.get("Properties"));
+            }
+            state.remove("Properties");
+            return BlockState.FULL_CODEC.parse(net.minecraft.nbt.NbtOps.INSTANCE, state)
+                    .result().orElse(Blocks.AIR.defaultBlockState());
+        }
         return input.read(key, BlockState.CODEC).orElse(Blocks.AIR.defaultBlockState());
     }
 

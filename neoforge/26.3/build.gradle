@@ -18,8 +18,11 @@ dependencies {
     implementation project(path: ':common', configuration: 'v263Elements')
 }
 
+// common/src/v263/resources overlays the 26.2 resources: copy only the main files it leaves alone.
+apply from: rootProject.file('gradle/v263-resources.gradle')
 tasks.named('processResources') {
-    from rootProject.file('common/src/main/resources')
+    v263MainResources(delegate)
+    inputs.dir(v263OverlayDir)
     duplicatesStrategy = DuplicatesStrategy.FAIL
 }
 tasks.named('jar', Jar) {

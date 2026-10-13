@@ -1,0 +1,26 @@
+// Minecraft 26.3 resources: common/src/v263/resources is a layer over common/src/main/resources.
+// It holds only what differs from the 26.2 resources (regenerate it with
+// scripts/resources26x/convert.py --profile 26.3 --derive-from, see that script).
+//
+// A main file must not be copied next to the overlay file that replaces it (the loader
+// modules fail on duplicate paths), nor may a folder 26.3 renamed survive from main.
+// Applied by common and by the 26.3 loader modules.
+ext.v263OverlayDir = rootProject.file('common/src/v263/resources')
+// Folders renamed in 26.3 (configured_feature is now feature, configured_carver is now carver).
+ext.v263RetiredMainResources = [
+    'data/*/worldgen/configured_feature/**',
+    'data/*/worldgen/configured_carver/**',
+    'data/*/tags/worldgen/configured_feature/**',
+]
+// True for a main resource that the overlay replaces.
+ext.v263ReplacedByOverlay = { FileTreeElement element ->
+    new File(v263OverlayDir, element.relativePath.pathString).isFile()
+}
+
+// The main resources as the 26.3 loader modules copy them.
+ext.v263MainResources = { CopySpec spec ->
+    spec.from(rootProject.file('common/src/main/resources')) {
+        exclude v263RetiredMainResources
+        exclude v263ReplacedByOverlay
+    }
+}

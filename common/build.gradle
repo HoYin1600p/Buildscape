@@ -79,8 +79,14 @@ if (v263Enabled) {
                 // Only the v118x adapter uses this helper; 26.3 removed BlockStateProviderType.
                 exclude 'com/kingodogo/buildscape/worldgen/WorldGenTypeHelper.java'
             }
-            resources.srcDirs = ['src/main/resources', 'src/v263/resources']
+            // The 26.3 overlay comes first: with EXCLUDE (below) it wins over same-path main resources.
+            resources.srcDirs = ['src/v263/resources', 'src/main/resources']
         }
+    }
+    apply from: rootProject.file('gradle/v263-resources.gradle')
+    tasks.named('processV263Resources') {
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+        exclude v263RetiredMainResources
     }
     configurations {
         v263Elements { canBeResolved = false; canBeConsumed = true }

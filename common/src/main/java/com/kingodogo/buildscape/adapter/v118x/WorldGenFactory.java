@@ -184,7 +184,7 @@ public final class WorldGenFactory {
                 pos -> level.isStateAtPosition(pos, state -> state.isAir() || state.is(Blocks.WATER)),
                 pos -> level.isStateAtPosition(pos, state -> state.is(Blocks.WATER)), setter,
                 Blocks.AIR.defaultBlockState(), random::nextInt,
-                age -> com.kingodogo.buildscape.block.BlockDefinition.vanilla("minecraft:mangrove_propagule").defaultBlockState()
+                age -> com.kingodogo.buildscape.block.BlockDefinition.vanilla("buildscape:mangrove_propagule").defaultBlockState()
                         .setValue(com.kingodogo.buildscape.block.MangrovePropaguleBlock.AGE, age)
                         .setValue(com.kingodogo.buildscape.block.MangrovePropaguleBlock.HANGING, true));
     }

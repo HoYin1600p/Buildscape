@@ -5,6 +5,7 @@ import com.kingodogo.buildscape.block.HollowPipeBlock;
 import com.kingodogo.buildscape.block.HollowLogBlockEntity;
 import com.kingodogo.buildscape.pipe.transport.PipeOutletWater;
 import com.kingodogo.buildscape.pipe.transport.WorldPipeTopologyAccess;
+import com.kingodogo.buildscape.fluid.ModFluids;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.BlockGetter;
@@ -13,6 +14,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FlowingFluid;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.material.Fluids;
+import org.spongepowered.asm.mixin.Dynamic;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -60,5 +63,21 @@ public abstract class FlowingFluidV121xMixin {
         if (amount > vanilla.getAmount()) cir.setReturnValue(flowingFluid.getFlowing(amount, false));
     }
 
+    @Dynamic
+    @Inject(method = "canSpreadTo", at = @At("HEAD"), cancellable = true, require = 0)
+    private void buildscape$strictHollowFluidSpreading(BlockGetter level, BlockPos fromPos,
+            BlockState fromState, Direction direction, BlockPos toPos, BlockState toState,
+            FluidState toFluidState, Fluid fluid, CallbackInfoReturnable<Boolean> cir) {
+        if ((ModFluids.isExperience(fluid) && Fluids.LAVA.isSame(toFluidState.getType()))
+                || (ModFluids.isExperience(toFluidState.getType()) && Fluids.LAVA.isSame(fluid))
+                || fromState.getBlock() instanceof HollowLogBlock
+                || toState.getBlock() instanceof HollowLogBlock
+                || (fromState.getBlock() instanceof HollowPipeBlock
+                    && !HollowPipeBlock.isOpenEndpoint(fromState, direction))
+                || (toState.getBlock() instanceof HollowPipeBlock
+                    && !HollowPipeBlock.isOpenEndpoint(toState, direction.getOpposite()))) {
+            cir.setReturnValue(false);
+        }
+    }
 }
 

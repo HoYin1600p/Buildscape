@@ -238,6 +238,9 @@ public class MixinFactory implements IMixinFactory {
     @Override
     public void preserveGhostFilters(ItemStack stack, net.minecraft.nbt.ListTag filterList) {
         net.minecraft.world.item.component.CustomData.update(net.minecraft.core.component.DataComponents.BLOCK_ENTITY_DATA, stack, tag -> {
+            if (!tag.contains("id", net.minecraft.nbt.Tag.TAG_STRING)) {
+                tag.putString("id", "minecraft:shulker_box");
+            }
             tag.put("GhostFilters", filterList.copy());
         });
     }

@@ -31,7 +31,7 @@ public final class BuildscapeBoatRenderer extends AbstractBoatRenderer {
             SubmitNodeCollector collector, int light) {
         if (!state.isUnderWater) {
             collector.submitModel(waterPatch, Unit.INSTANCE, pose, texture, light,
-                    OverlayTexture.NO_OVERLAY, state.outlineColor, null);
+                    OverlayTexture.NO_OVERLAY, state.outlineColor);
         }
     }
 }

@@ -16,8 +16,8 @@ public final class StockingRenderGeometry {
     public record Placement(double x, double y, double z, float yaw, float pitch) {
         void apply(PoseStack pose) {
             pose.translate(x, y, z);
-            pose.mulPose(Axis.YP.rotationDegrees(yaw));
-            pose.mulPose(Axis.XP.rotationDegrees(pitch));
+            pose.rotate(Axis.YP.rotationDegrees(yaw));
+            pose.rotate(Axis.XP.rotationDegrees(pitch));
         }
     }
 

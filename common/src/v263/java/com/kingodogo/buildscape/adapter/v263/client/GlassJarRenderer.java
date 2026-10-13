@@ -115,7 +115,7 @@ public final class GlassJarRenderer implements BlockEntityRenderer<GlassJarBlock
         pose.pushPose();
         try {
             pose.translate(0.5, 0, 0.5);
-            pose.mulPose(Axis.ZP.rotationDegrees(state.wobbleAngle));
+            pose.rotate(Axis.ZP.rotationDegrees(state.wobbleAngle));
             pose.translate(-0.5, 0, -0.5);
             if (state.liquidSprite != null) {
                 collector.submitCustomGeometry(pose, RenderTypes.entityTranslucent(TextureAtlas.LOCATION_BLOCKS),
@@ -126,8 +126,8 @@ public final class GlassJarRenderer implements BlockEntityRenderer<GlassJarBlock
                 try {
                     pose.translate(0.5 + jitter(state.seedPos, i, 1) * 0.025F, 0.07F + i * 0.019F,
                             0.5 + jitter(state.seedPos, i, 2) * 0.025F);
-                    pose.mulPose(Axis.YP.rotationDegrees(angle(state.seedPos, i)));
-                    pose.mulPose(Axis.XP.rotationDegrees(90));
+                    pose.rotate(Axis.YP.rotationDegrees(angle(state.seedPos, i)));
+                    pose.rotate(Axis.XP.rotationDegrees(90));
                     pose.scale(0.42F, 0.42F, 0.42F);
                     state.food.submit(pose, collector, light, overlay, outlineColor);
                 } finally { pose.popPose(); }

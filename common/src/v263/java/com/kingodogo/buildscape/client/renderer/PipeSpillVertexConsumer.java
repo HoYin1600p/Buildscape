@@ -138,6 +138,9 @@ public final class PipeSpillVertexConsumer implements VertexConsumer {
     @Override public VertexConsumer setUv2(int u, int v) {
         delegate.setUv2(u, v); return this;
     }
+    @Override public VertexConsumer setUv3(float u, float v) {
+        delegate.setUv3(u, v); return this;
+    }
     @Override public VertexConsumer setNormal(float x, float y, float z) {
         delegate.setNormal(x, y, z); return this;
     }

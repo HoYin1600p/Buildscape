@@ -273,6 +273,133 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         }
     }
 
+    // --- Compatibility Methods for Legacy Widgets & Tabs ---
+    private static final int REFERENCE_WIDTH = 1920;
+    private static final int REFERENCE_HEIGHT = 1080;
+    private static final double REFERENCE_GUI_SCALE = 2.0;
+
+    public static double calculateScaleFactor() {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.getWindow() == null) return 1.0;
+        int windowWidth = mc.getWindow().getWidth();
+        int windowHeight = mc.getWindow().getHeight();
+        double currentGuiScale = mc.getWindow().getGuiScale();
+        int effectiveWidth = (int) (windowWidth / currentGuiScale);
+        int effectiveHeight = (int) (windowHeight / currentGuiScale);
+        double widthScale = (double) effectiveWidth / REFERENCE_WIDTH;
+        double heightScale = (double) effectiveHeight / REFERENCE_HEIGHT;
+        double resolutionScale = Math.min(widthScale, heightScale);
+        double guiScaleFactor = currentGuiScale / REFERENCE_GUI_SCALE;
+        double combinedScale = (resolutionScale * 0.7) + (guiScaleFactor * 0.3);
+        return Math.max(0.5, Math.min(2.0, combinedScale));
+    }
+
+    public static int scaleSize(int baseSize) {
+        double scaleFactor = calculateScaleFactor();
+        int scaled = (int) (baseSize * scaleFactor);
+        return (scaled / 2) * 2;
+    }
+
+    public static int scaleSizeConstrained(int baseSize, int minSize, int maxSize) {
+        int scaled = scaleSize(baseSize);
+        return Math.max(minSize, Math.min(maxSize, scaled));
+    }
+
+    public static int getScaledSpacing() {
+        return scaleSizeConstrained(10, 6, 20);
+    }
+
+    public static int getScaledCategoryButtonHeight() {
+        return scaleSizeConstrained(20, 16, 32);
+    }
+
+    public static int getScaledCategoryButtonSpacing() {
+        return scaleSize(2);
+    }
+
+    public static int getScaledButtonHeight() {
+        return scaleSizeConstrained(20, 16, 32);
+    }
+
+    public static int getScaledEditBoxHeight() {
+        return scaleSizeConstrained(20, 16, 32);
+    }
+
+    public static float getStandardTextScale() {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.getWindow() == null) return 1.0f;
+        double guiScale = mc.getWindow().getGuiScale();
+        if (guiScale >= 3.0) return 0.75f;
+        if (guiScale >= 2.5) return 0.85f;
+        return 1.0f;
+    }
+
+    public int getContentX() {
+        return (int) (width * 0.15);
+    }
+
+    public int getContentY() {
+        return 30;
+    }
+
+    public int getContentWidth() {
+        return (int) (width * 0.42);
+    }
+
+    public int getRightPanelX() {
+        return getContentX() + getContentWidth() + 10;
+    }
+
+    public int getRightPanelWidth() {
+        return (int) (width * 0.42);
+    }
+
+    public int getContentHeight() {
+        return height - 40;
+    }
+
+    public int getVerticalPanelGap() {
+        return 4;
+    }
+
+    public AbstractConfigTab getActiveTab() {
+        return activeTab;
+    }
+
+    public void setActiveTab(AbstractConfigTab tab) {
+        if (this.activeTab != null) {
+            this.activeTab.onClose();
+        }
+        this.activeTab = tab;
+        if (this.activeTab != null) {
+            this.activeTab.init();
+        }
+    }
+
+    public void addTabWidget(GuiEventListener widget) {
+        if (widget instanceof AbstractWidget abstractWidget && addWidgetConsumer != null) {
+            this.addWidgetConsumer.accept(abstractWidget);
+        }
+        tabWidgets.add(widget);
+    }
+
+    public GuiEventListener addCustomWidget(com.kingodogo.buildscape.client.screen.widget.ICustomWidget widget) {
+        if (widget == null || addWidgetConsumer == null) return null;
+        AbstractWidget nativeWidget = Services.PLATFORM.wrapCustomWidget(
+                widget.getX(), widget.getY(), widget.getWidth(), widget.getHeight(),
+                ComponentHelper.literal(""), widget);
+        addWidgetConsumer.accept(nativeWidget);
+        tabWidgets.add(nativeWidget);
+        return nativeWidget;
+    }
+
+    public void removeTabWidget(GuiEventListener widget) {
+        if (widget != null && removeWidgetConsumer != null) {
+            this.removeWidgetConsumer.accept(widget);
+        }
+        tabWidgets.remove(widget);
+    }
+
     // --- Animation Handling ---
     private float updateAnimations() {
         long now = System.currentTimeMillis();

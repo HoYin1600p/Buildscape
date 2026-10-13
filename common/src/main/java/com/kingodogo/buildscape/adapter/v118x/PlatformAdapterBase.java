@@ -1755,6 +1755,12 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
     }
 
     @Override
+    public net.minecraft.world.InteractionResult handleCopperRightClick(Level level, BlockPos pos, BlockState state,
+            ItemStack held, net.minecraft.world.entity.player.Player player, net.minecraft.world.InteractionHand hand) {
+        return RestoredCopperOxidation.handleRightClick(level, pos, state, held, player, hand);
+    }
+
+    @Override
     public ItemStack removeItem(List<ItemStack> items, int slot, int amount) {
         return ContainerHelper.removeItem(items, slot, amount);
     }
@@ -3884,8 +3890,9 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
             this.setType(Boat.Type.OAK);
         }
 
+        @SuppressWarnings("unchecked")
         public PoplarBoatEntityImpl(Level level, double x, double y, double z) {
-            this(EntityType.BOAT, level);
+            this((EntityType<? extends Boat>) Services.PLATFORM.getPoplarBoatEntityType(), level);
             this.setPos(x, y, z);
             this.xo = x;
             this.yo = y;
@@ -3907,8 +3914,13 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
         }
 
         public SeatEntityImpl(Level level, double x, double y, double z) {
-            this(EntityType.MARKER, level);
+            this(Services.PLATFORM.getSeatEntityType(), level);
             this.setPos(x, y, z);
+        }
+
+        @Override
+        public double getPassengersRidingOffset() {
+            return 0.0;
         }
 
         @Override

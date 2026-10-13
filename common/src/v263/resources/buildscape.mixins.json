@@ -39,6 +39,7 @@
     "ShulkerBoxBlockEntityV26xMixin",
     "ShulkerBoxBlockMixin",
     "ShulkerBoxMenuMixin",
+    "SignFrameRemovalV26xMixin",
     "SmithingMenuMixin",
     "StonecutterMenuAccessor",
     "StonecutterMenuMixin",

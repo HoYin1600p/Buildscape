@@ -20,13 +20,18 @@ dependencies {
 
 // common/src/v263/resources overlays the 26.2 resources: copy only the main files it leaves alone.
 apply from: rootProject.file('gradle/v263-resources.gradle')
+// The dev run reads the mixin config and the other overlay files from this module's own resources folder,
+// so the overlay is copied here too; the jar then drops the overlay copies carried by the common variant.
 tasks.named('processResources') {
     v263MainResources(delegate)
+    from(v263OverlayDir)
     inputs.dir(v263OverlayDir)
     duplicatesStrategy = DuplicatesStrategy.FAIL
 }
 tasks.named('jar', Jar) {
-    from configurations.commonVariant
+    from(configurations.commonVariant) {
+        exclude v263ReplacedByOverlay
+    }
     duplicatesStrategy = DuplicatesStrategy.FAIL
 }
 tasks.withType(JavaExec).configureEach {

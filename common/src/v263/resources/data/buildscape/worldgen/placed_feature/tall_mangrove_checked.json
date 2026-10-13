@@ -1,0 +1,18 @@
+{
+  "feature": "buildscape:tall_mangrove",
+  "placement": [
+    {
+      "type": "minecraft:block_predicate_filter",
+      "predicate": {
+        "type": "minecraft:would_survive",
+        "state": {
+          "id": "minecraft:mangrove_propagule",
+          "properties": {
+            "age": "0",
+            "hanging": "false"
+          }
+        }
+      }
+    }
+  ]
+}

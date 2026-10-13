@@ -1,23 +1,24 @@
 modLoader = "javafml"
-loaderVersion = "[26,)"
+loaderVersion = "[11,)"
 license = "All Rights Reserved"
 [[mods]]
 modId = "buildscape"
 version = "${mod_version}"
 displayName = "Buildscape"
 displayURL = "buildscape.online"
+iconFile = "buildscape.png"
 authors = "Kingodogo"
 description = '''Welcome to Buildscape the ultimate expansion for builders, architects, and creators!'''
 [[dependencies.buildscape]]
     modId="neoforge"
-    mandatory=true
-    versionRange="[26,)"
+    type="required"
+    versionRange="[26.3.0.57-beta,26.4)"
     ordering="NONE"
     side="BOTH"
 [[dependencies.buildscape]]
     modId="minecraft"
-    mandatory=true
-    versionRange="[26,)"
+    type="required"
+    versionRange="[26.3,26.4)"
     ordering="AFTER"
     side = "BOTH"
 

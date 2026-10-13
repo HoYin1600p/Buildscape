@@ -1,6 +1,6 @@
 package com.kingodogo.buildscape.platform;
 
-import com.kingodogo.buildscape.adapter.v26x.PlatformAdapterBase;
+import com.kingodogo.buildscape.adapter.v263.PlatformAdapterBase;
 
 public class NeoForgePlatformAdapter extends PlatformAdapterBase {
     @Override

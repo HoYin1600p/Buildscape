@@ -272,6 +272,8 @@ public interface IPlatformAdapter {
     net.minecraft.world.item.ItemStack getCraftingRemainingItem(net.minecraft.world.item.ItemStack stack);
     int getEfficiencyLevel(net.minecraft.world.item.ItemStack stack);
     float getHoeMiningSpeed(net.minecraft.world.item.ItemStack stack);
+    boolean isAxeItem(net.minecraft.world.item.ItemStack stack);
+    boolean isHoeItem(net.minecraft.world.item.ItemStack stack);
     boolean hasSilkTouch(net.minecraft.world.item.ItemStack stack);
     boolean isReplaceable(net.minecraft.world.level.block.state.BlockState state);
     boolean isGlassBlock(net.minecraft.world.level.block.Block block);

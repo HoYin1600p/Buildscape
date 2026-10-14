@@ -20,11 +20,12 @@ dependencies {
 
 tasks.named('processResources') {
     from rootProject.file('common/src/main/resources')
-    duplicatesStrategy = DuplicatesStrategy.FAIL
+    from rootProject.file('common/src/v26x/resources')
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 tasks.named('jar', Jar) {
     from configurations.commonVariant
-    duplicatesStrategy = DuplicatesStrategy.FAIL
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 tasks.withType(JavaExec).configureEach {
     if (providers.gradleProperty('bootstrapSmokeTest').isPresent()) {

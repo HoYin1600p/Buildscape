@@ -46,13 +46,15 @@ public final class GuiProvider {
                                 menu, inventory, title,
                                 com.kingodogo.buildscape.client.screen.BuildersWorkbenchScreen.GRADIENT_WIDTH,
                                 com.kingodogo.buildscape.client.screen.BuildersWorkbenchScreen.GUI_HEIGHT) {
+                            // Keep slots and the delegate at one origin across tabs; the gradient background grows right.
                             private int delegateLeft() {
-                                return (this.width - delegate.getImageWidth()) / 2;
+                                return this.leftPos;
                             }
 
                             @Override
                             protected void init() {
                                 super.init();
+                                this.leftPos = (this.width - com.kingodogo.buildscape.client.screen.BuildersWorkbenchScreen.COLOR_WIDTH) / 2;
                                 delegate.init(delegateLeft(), this.topPos, this.width, this.height);
                             }
 

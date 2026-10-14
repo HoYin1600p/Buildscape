@@ -43,7 +43,7 @@ public class BuildersPouchMenu extends AbstractContainerMenu implements GhostFil
         this.pouchInventory = new BuildersPouchInventory(pouch);
         List<String> filters = BuildersPouchItem.getFilters(pouch);
 
-        if (Services.PLATFORM.isClient()) {
+        if (Services.PLATFORM.getEntityLevel(playerInventory.player).isClientSide()) {
             this.filterData = new SimpleContainerData(POUCH_SLOTS);
         } else {
             this.filterData = new ContainerData() {

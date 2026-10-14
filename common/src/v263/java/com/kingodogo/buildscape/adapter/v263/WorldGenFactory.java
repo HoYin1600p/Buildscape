@@ -487,6 +487,20 @@ public final class WorldGenFactory {
             int xzSpread,
             int ySpread
     ) {
-        return new SimpleBlockFeature(net.minecraft.core.Holder.direct(stateProvider));
+        Feature simpleBlockFeature = new SimpleBlockFeature(net.minecraft.core.Holder.direct(stateProvider));
+        // 26.3 stores Feature objects directly and scatters patches with placement modifiers.
+        net.minecraft.world.level.levelgen.placement.PlacedFeature placedFeature =
+                new net.minecraft.world.level.levelgen.placement.PlacedFeature(
+                        net.minecraft.core.Holder.direct(simpleBlockFeature),
+                        List.of(
+                                net.minecraft.world.level.levelgen.placement.CountPlacement.of(tries),
+                                net.minecraft.world.level.levelgen.placement.OffsetPlacement.of(
+                                        net.minecraft.util.valueproviders.TrapezoidInt.of(-xzSpread, xzSpread, 0),
+                                        net.minecraft.util.valueproviders.TrapezoidInt.of(-ySpread, ySpread, 0)),
+                                net.minecraft.world.level.levelgen.placement.BlockPredicateFilter.forPredicate(
+                                        net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate.matchesBlocks(Blocks.AIR)))
+                );
+        return new net.minecraft.world.level.levelgen.feature.SimpleRandomSelectorFeature(
+                net.minecraft.core.HolderSet.direct(net.minecraft.core.Holder.direct(placedFeature)));
     }
 }

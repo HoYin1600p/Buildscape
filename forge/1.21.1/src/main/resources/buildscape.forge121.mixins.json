@@ -3,7 +3,7 @@
   "minVersion": "0.8",
   "package": "com.kingodogo.buildscape.mixin.forge121",
   "compatibilityLevel": "JAVA_21",
-  "mixins": ["BlockEntityDataMixin"],
+  "mixins": ["BlockEntityDataMixin", "FluidInteractionMixin"],
   "client": ["ItemClientExtensionsMixin"],
   "injectors": { "defaultRequire": 1 }
 }

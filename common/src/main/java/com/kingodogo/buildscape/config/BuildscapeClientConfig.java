@@ -24,6 +24,7 @@ public class BuildscapeClientConfig {
     public static final String KEY_MAX_PIPE_NETWORK_SIZE = "MaxPipeNetworkSize";
     public static final String KEY_CAKE_STACKING = "isCakeStack";
     public static final String KEY_WATER_BOTTLE_STACKING = "isWaterbottleStack";
+    public static final String KEY_UI_THEME = "UITheme";
 
     private static final LinkedHashMap<String, String> DEFAULTS = new LinkedHashMap<>();
     private static volatile BuildscapeClientConfig INSTANCE;
@@ -37,6 +38,7 @@ public class BuildscapeClientConfig {
         DEFAULTS.put(KEY_MAX_PIPE_NETWORK_SIZE, "64");
         DEFAULTS.put(KEY_CAKE_STACKING, "true");
         DEFAULTS.put(KEY_WATER_BOTTLE_STACKING, "true");
+        DEFAULTS.put(KEY_UI_THEME, "dark");
     }
 
     private final Map<String, String> values;
@@ -194,5 +196,14 @@ public class BuildscapeClientConfig {
 
     public boolean isWaterBottleStackingEnabled() {
         return getBoolean(KEY_WATER_BOTTLE_STACKING);
+    }
+
+    public String getUiTheme() {
+        return values.getOrDefault(KEY_UI_THEME, "dark");
+    }
+
+    public void setUiTheme(String theme) {
+        values.put(KEY_UI_THEME, theme != null ? theme : "dark");
+        save();
     }
 }

@@ -412,14 +412,15 @@ class Validator:
         for key in lang:
             if key not in vanilla_lang:
                 self.error(path, "unknown vanilla translation key " + key)
-        for name in ("end_city_treasure", "woodland_mansion"):
-            path = "data/minecraft/loot_table/chests/" + name + ".json"
+        for path in ("data/minecraft/loot_table/chests/end_city_treasure.json",
+                     "data/minecraft/loot_table/chests/woodland_mansion.json",
+                     "data/minecraft/loot_table/gameplay/sniffer_digging.json"):
             d = self.json.get(path)
             if d:
                 baseline = json.loads(json.dumps(d))
                 baseline["pools"] = [p for p in d["pools"] if "buildscape:" not in json.dumps(p)]
                 if baseline != self.get_vanilla(path):
-                    self.error(path, "chest loot vanilla baseline differs from " + self.version)
+                    self.error(path, "vanilla loot baseline differs from " + self.version)
         # Snow and planter loot intentionally change gameplay, but keep the
         # vanilla recipe/table serializer and output/base composter drop.
         path = "data/minecraft/recipe/snow.json"

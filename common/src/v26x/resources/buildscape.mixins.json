@@ -45,7 +45,9 @@
     "StonecutterMenuAccessor",
     "StonecutterMenuMixin",
     "VineBlockMixin",
-    "WallBlockMixin"
+    "WallBlockMixin",
+    "SulfurCubeMixin",
+    "SulfurCubePassengerDamageMixin"
   ],
   "client": [
     "LiquidBlockRendererMixin",
@@ -77,9 +79,13 @@
     "ItemFeatureSubmitMixin",
     "ModelSubmitMixin",
     "SpellcasterIllagerMixin",
-    "WorldOverlayExtractionMixin"
+    "WorldOverlayExtractionMixin",
+    "SulfurCubeRenderStateMixin",
+    "SulfurCubeRendererMixin",
+    "SulfurCubeInnerLayerMixin"
   ],
   "injectors": {
     "defaultRequire": 1
   }
 }
+

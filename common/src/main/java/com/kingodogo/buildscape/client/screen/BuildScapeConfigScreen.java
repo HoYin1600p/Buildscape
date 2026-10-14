@@ -183,6 +183,63 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
     // --- Per-Pillar Customization Detail View ---
     private String selectedPillarDetailId = null;
 
+    // --- Connected Right Side Panel (Sliding Modifier Drawer) ---
+    public enum SidePanelType {
+        NONE,
+        PILLAR_DETAIL,
+        COLOR_PICKER
+    }
+
+    private SidePanelType sidePanelType = SidePanelType.NONE;
+    private SidePanelType returnSidePanelType = SidePanelType.NONE;
+    private float sidePanelProgress = 0.0f;
+    private boolean isSidePanelOpening = false;
+    private boolean isSidePanelClosing = false;
+    private long sidePanelAnimStartTime = 0L;
+    private static final int SIDE_PANEL_ANIM_MS = 220;
+    private int sidePanelScrollOffset = 0;
+    private int sidePanelMaxScroll = 0;
+
+    public void openSidePanel(SidePanelType type) {
+        if (sidePanelType == type && (isSidePanelOpening || sidePanelProgress >= 1.0f)) {
+            return;
+        }
+        sidePanelType = type;
+        isSidePanelOpening = true;
+        isSidePanelClosing = false;
+        sidePanelAnimStartTime = System.currentTimeMillis() - (long) (sidePanelProgress * SIDE_PANEL_ANIM_MS);
+    }
+
+    public void closeSidePanel() {
+        if (sidePanelType == SidePanelType.NONE && sidePanelProgress <= 0.0f) {
+            return;
+        }
+        isSidePanelClosing = true;
+        isSidePanelOpening = false;
+        sidePanelAnimStartTime = System.currentTimeMillis() - (long) ((1.0f - sidePanelProgress) * SIDE_PANEL_ANIM_MS);
+    }
+
+    private void updateSidePanelAnimation() {
+        if (!isSidePanelOpening && !isSidePanelClosing) return;
+        long elapsed = System.currentTimeMillis() - sidePanelAnimStartTime;
+        if (isSidePanelOpening) {
+            float t = Math.min(1.0f, (float) elapsed / SIDE_PANEL_ANIM_MS);
+            sidePanelProgress = 1.0f - (float) Math.pow(1.0f - t, 3);
+            if (t >= 1.0f) {
+                sidePanelProgress = 1.0f;
+                isSidePanelOpening = false;
+            }
+        } else if (isSidePanelClosing) {
+            float t = Math.min(1.0f, (float) elapsed / SIDE_PANEL_ANIM_MS);
+            sidePanelProgress = 1.0f - (float) Math.pow(t, 3);
+            if (t >= 1.0f) {
+                sidePanelProgress = 0.0f;
+                isSidePanelClosing = false;
+                sidePanelType = SidePanelType.NONE;
+            }
+        }
+    }
+
     // --- Local Client Preferences ---
     private boolean autoSnappingEnabled = true;
     private boolean strictBoundsCheck = true;
@@ -747,7 +804,24 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         // Render Right Main Configuration Content Area
         renderContentArea(poseStackOrGraphics, font, contentX, contentY, contentW, contentH, mouseX, mouseY, alpha);
 
-        // 6. Render Draggable Color Picker Modal
+        // 6. Connected Sliding Right Side Panel (Modifiers / Color Picker / Pillar Details)
+        updateSidePanelAnimation();
+        if (sidePanelProgress > 0.001f && sidePanelType != SidePanelType.NONE) {
+            int frameRight = frameX + frameW;
+            int availRight = width - frameRight - 6;
+            int sidePanelTargetW = Math.max(180, Math.min(220, availRight > 100 ? availRight : 210));
+            int sidePanelH = frameH;
+            int sidePanelY = frameY;
+            int dockX = frameRight - 4;
+            int slideOffset = (int) ((1.0f - sidePanelProgress) * (sidePanelTargetW + 10));
+            int sidePanelX = dockX - slideOffset;
+
+            enableGuiScissor(poseStackOrGraphics, dockX, 0, Math.max(1, width - dockX), height);
+            renderSidePanel(poseStackOrGraphics, font, sidePanelX, sidePanelY, sidePanelTargetW, sidePanelH, mouseX, mouseY, alpha);
+            disableGuiScissor(poseStackOrGraphics);
+        }
+
+        // 7. Fallback Color Picker Modal if explicitly toggled
         if (showColorModal) {
             renderColorPickerModal(poseStackOrGraphics, font, mouseX, mouseY, alpha);
         }
@@ -1243,11 +1317,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
     // --- Tab 2: Pillar IDs Panel (Authoritative in-world synchronized columns) ---
     private void renderPillarsPanel(Object poseStackOrGraphics, Font font, int x, int y, int w, int h, int catHeaderH, int mouseX, int mouseY, float alpha) {
-        if (selectedPillarDetailId != null) {
-            renderPillarDetailPanel(poseStackOrGraphics, font, x, y, w, h, catHeaderH, mouseX, mouseY, alpha);
-        } else {
-            renderPillarTablePanel(poseStackOrGraphics, font, x, y, w, h, catHeaderH, mouseX, mouseY, alpha);
-        }
+        renderPillarTablePanel(poseStackOrGraphics, font, x, y, w, h, catHeaderH, mouseX, mouseY, alpha);
     }
 
     private void renderPillarTablePanel(Object poseStackOrGraphics, Font font, int x, int y, int w, int h, int catHeaderH, int mouseX, int mouseY, float alpha) {
@@ -1397,11 +1467,12 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                 if (rowY + rowH < viewportY || rowY > viewportY + viewportH) continue;
 
                 boolean isSelected = selectedPillarIds.contains(data.id);
+                boolean isEditingInSidePanel = sidePanelProgress > 0.05f && sidePanelType == SidePanelType.PILLAR_DETAIL && Objects.equals(selectedPillarDetailId, data.id);
                 boolean hover = mouseX >= colX && mouseX <= colX + availW && mouseY >= rowY && mouseY <= rowY + rowH &&
                         mouseY >= viewportY && mouseY <= viewportY + viewportH;
 
-                int rowBg = isSelected ? 0xFF16241A : (hover ? COLOR_ROW_BG_HOVER : COLOR_ROW_BG);
-                drawBeveledButton(poseStackOrGraphics, colX, rowY, availW, rowH, rowBg, hover, isSelected, alpha);
+                int rowBg = isEditingInSidePanel ? 0xFF1C2C22 : (isSelected ? 0xFF16241A : (hover ? COLOR_ROW_BG_HOVER : COLOR_ROW_BG));
+                drawBeveledButton(poseStackOrGraphics, colX, rowY, availW, rowH, rowBg, hover, isSelected || isEditingInSidePanel, alpha);
 
                 // Row Checkbox
                 int rChkX = colX + (chkW - chkBoxSize) / 2;
@@ -1829,7 +1900,368 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         drawBorder(poseStackOrGraphics, x + 8, y + 8, w - 16, h - 16, softGroove);
     }
 
-    // Top & Left Metallic Gradient Component Frame
+    // --- Connected Right Side Panel Frame (Docked Seamlessly to Main Frame) ---
+    private void drawConnectedSidePanelFrame(Object poseStackOrGraphics, int x, int y, int w, int h, int bgRgb, float alpha) {
+        // 1. Outer Chassis Body Fill
+        Services.PLATFORM.fill(poseStackOrGraphics, x, y, x + w, y + h, applyAlpha(COLOR_CHASSIS_BODY, alpha));
+
+        int black = applyAlpha(COLOR_FRAME_BLACK, alpha);
+
+        // 2. Outermost 1px Black Border (top, right, bottom; left seam line)
+        Services.PLATFORM.fill(poseStackOrGraphics, x, y, x + w, y + 1, black);
+        Services.PLATFORM.fill(poseStackOrGraphics, x, y + h - 1, x + w, y + h, black);
+        Services.PLATFORM.fill(poseStackOrGraphics, x + w - 1, y, x + w, y + h, black);
+        Services.PLATFORM.fill(poseStackOrGraphics, x, y, x + 1, y + h, applyAlpha(0xFF101014, alpha));
+
+        // 3. 1-Pixel Wide Metallic Gradient Highlight (Top) & Shadow (Bottom & Right)
+        for (int i = 1; i < w - 1; i++) {
+            float t = (float) (i - 1) / Math.max(1, w - 2);
+            int col = lerpColor(COLOR_BORDER_GRADIENT_START, COLOR_BORDER_GRADIENT_END, t);
+            Services.PLATFORM.fill(poseStackOrGraphics, x + i, y + 1, x + i + 1, y + 2, applyAlpha(col, alpha));
+        }
+        int shadow = applyAlpha(COLOR_BORDER_SHADOW, alpha);
+        Services.PLATFORM.fill(poseStackOrGraphics, x + 1, y + h - 2, x + w - 1, y + h - 2, shadow);
+        Services.PLATFORM.fill(poseStackOrGraphics, x + w - 2, y + 1, x + w - 1, y + h - 1, shadow);
+
+        // 4. Outer Chassis Band (offset 2 to 4)
+        int band = applyAlpha(0xFF22222A, alpha);
+        Services.PLATFORM.fill(poseStackOrGraphics, x + 2, y + 2, x + w - 2, y + 3, band);
+        Services.PLATFORM.fill(poseStackOrGraphics, x + 2, y + h - 3, x + w - 2, y + h - 2, band);
+        Services.PLATFORM.fill(poseStackOrGraphics, x + w - 3, y + 2, x + w - 2, y + h - 2, band);
+
+        // 5. Stepped Bevel Ridge & Groove at offset 5
+        int bevelShadow = applyAlpha(0xFF0E0E12, alpha);
+        int bevelHighlight = applyAlpha(0xFF383848, alpha);
+        Services.PLATFORM.fill(poseStackOrGraphics, x + 4, y + 4, x + w - 4, y + 5, bevelShadow);
+        Services.PLATFORM.fill(poseStackOrGraphics, x + 4, y + h - 5, x + w - 4, y + h - 4, bevelHighlight);
+        Services.PLATFORM.fill(poseStackOrGraphics, x + w - 5, y + 4, x + w - 4, y + h - 4, bevelHighlight);
+
+        // 6. Mechanical docking hinges / brackets at the seam
+        int hingeBg = applyAlpha(0xFF2E2E3A, alpha);
+        int hingeH = 14;
+        int hingeW = 4;
+        int hingeY1 = y + 20;
+        int hingeY2 = y + h - 34;
+        Services.PLATFORM.fill(poseStackOrGraphics, x - 2, hingeY1, x + hingeW, hingeY1 + hingeH, hingeBg);
+        drawBorder(poseStackOrGraphics, x - 2, hingeY1, hingeW + 2, hingeH, black);
+        Services.PLATFORM.fill(poseStackOrGraphics, x - 2, hingeY2, x + hingeW, hingeY2 + hingeH, hingeBg);
+        drawBorder(poseStackOrGraphics, x - 2, hingeY2, hingeW + 2, hingeH, black);
+    }
+
+    private void renderSidePanel(Object poseStackOrGraphics, Font font, int x, int y, int w, int h, int mouseX, int mouseY, float alpha) {
+        if (sidePanelType == SidePanelType.NONE) return;
+
+        // 1. Chassis Frame
+        drawConnectedSidePanelFrame(poseStackOrGraphics, x, y, w, h, COLOR_PANEL_BG, alpha);
+
+        // 2. Header
+        int sHeadX = x + 6;
+        int sHeadY = y + 7;
+        int sHeadW = w - 12;
+        int sHeadH = 22;
+        drawBeveledComponent(poseStackOrGraphics, sHeadX, sHeadY, sHeadW, sHeadH, COLOR_HEADER_BG, alpha);
+
+        String titleText = "Modifiers";
+        if (sidePanelType == SidePanelType.PILLAR_DETAIL) {
+            PillarIdManager.PillarData data = PillarIdManager.getClient().getPillarData(selectedPillarDetailId);
+            if (data != null && data.id != null) {
+                titleText = "Pillar: " + font.plainSubstrByWidth(data.id, sHeadW - 32);
+            } else {
+                titleText = "Pillar Modifiers";
+            }
+        } else if (sidePanelType == SidePanelType.COLOR_PICKER) {
+            titleText = isEditingPillarColor ? "Pillar Color" : "Particle Color";
+        }
+        drawText(poseStackOrGraphics, font, titleText, sHeadX + 6, sHeadY + 7, applyAlpha(COLOR_TEXT_WHITE, alpha));
+
+        // Close Button [ ✕ ]
+        int closeSize = 14;
+        int closeX = sHeadX + sHeadW - closeSize - 4;
+        int closeY = sHeadY + 4;
+        boolean hoverClose = mouseX >= closeX && mouseX <= closeX + closeSize && mouseY >= closeY && mouseY <= closeY + closeSize;
+        drawBeveledButton(poseStackOrGraphics, closeX, closeY, closeSize, closeSize, hoverClose ? 0xFF3D1616 : 0xFF241414, hoverClose, false, alpha);
+        Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "✕", closeX + closeSize / 2, closeY + 3, applyAlpha(hoverClose ? 0xFFFFFFFF : 0xFFE05050, alpha));
+
+        // 3. Content Area
+        int sContentX = x + 6;
+        int sContentY = sHeadY + sHeadH + 4;
+        int sContentW = sHeadW;
+        int sContentH = (y + h - 7) - sContentY;
+
+        if (sidePanelType == SidePanelType.PILLAR_DETAIL) {
+            renderSidePanelPillarDetail(poseStackOrGraphics, font, sContentX, sContentY, sContentW, sContentH, mouseX, mouseY, alpha);
+        } else if (sidePanelType == SidePanelType.COLOR_PICKER) {
+            renderSidePanelColorPicker(poseStackOrGraphics, font, sContentX, sContentY, sContentW, sContentH, mouseX, mouseY, alpha);
+        }
+    }
+
+    private void renderSidePanelPillarDetail(Object poseStackOrGraphics, Font font, int x, int y, int w, int h, int mouseX, int mouseY, float alpha) {
+        PillarIdManager.PillarData data = PillarIdManager.getClient().getPillarData(selectedPillarDetailId);
+        if (data == null) {
+            drawBeveledComponent(poseStackOrGraphics, x, y, w, h, COLOR_INNER_DARK, alpha);
+            Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "No pillar selected", x + w / 2, y + h / 2 - 4, applyAlpha(COLOR_TEXT_MUTED, alpha));
+            return;
+        }
+
+        drawBeveledComponent(poseStackOrGraphics, x, y, w, h, COLOR_INNER_DARK, alpha);
+
+        PillarParticleConfig globalCfg = PillarParticleConfig.get();
+        enableGuiScissor(poseStackOrGraphics, x + 2, y + 2, Math.max(1, w - 4), Math.max(1, h - 4));
+
+        int curY = y + 4 - sidePanelScrollOffset;
+        int rowH = 22;
+        int rowGap = 3;
+        int rowX = x + 4;
+        int rowW = w - 8;
+
+        // Row 0: Coordinates & Dimension badge
+        String dimStr = formatDimensionName(data.dimension);
+        String locStr = String.format("%s · %d, %d, %d", dimStr, data.x, data.y, data.z);
+        drawBeveledButton(poseStackOrGraphics, rowX, curY, rowW, 15, 0xFF141418, false, false, alpha);
+        Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, font.plainSubstrByWidth(locStr, rowW - 4), rowX + rowW / 2, curY + 4, applyAlpha(COLOR_TEXT_SILVER, alpha));
+        curY += 15 + rowGap;
+
+        // Row 1: Custom Pattern Toggle
+        boolean usePat = data.use_pattern != null ? data.use_pattern : globalCfg.use_pattern;
+        renderSideRowToggle(poseStackOrGraphics, font, rowX, curY, rowW, rowH, "Custom Pattern", usePat, mouseX, mouseY, alpha);
+        curY += rowH + rowGap;
+
+        // Row 2: Trajectory Pattern Cycle
+        String curPat = data.pattern != null && !data.pattern.isEmpty() ? data.pattern : "default";
+        String patDisplay = curPat.substring(0, 1).toUpperCase() + curPat.substring(1);
+        renderSideRowCycle(poseStackOrGraphics, font, rowX, curY, rowW, rowH, "Pattern", patDisplay, mouseX, mouseY, alpha);
+        curY += rowH + rowGap;
+
+        // Row 3: Speed Counter
+        double speed = data.pattern_speed != null ? data.pattern_speed : globalCfg.pattern_speed;
+        renderSideRowCounter(poseStackOrGraphics, font, rowX, curY, rowW, rowH, "Speed", String.format("%.2f", speed), mouseX, mouseY, alpha);
+        curY += rowH + rowGap;
+
+        // Row 4: Spread Counter
+        double spread = data.pattern_spread != null ? data.pattern_spread : globalCfg.pattern_spread;
+        renderSideRowCounter(poseStackOrGraphics, font, rowX, curY, rowW, rowH, "Spread", String.format("%.2f", spread), mouseX, mouseY, alpha);
+        curY += rowH + rowGap;
+
+        // Row 5: Intensity Counter
+        double intensity = data.pattern_intensity != null ? data.pattern_intensity : globalCfg.pattern_intensity;
+        renderSideRowCounter(poseStackOrGraphics, font, rowX, curY, rowW, rowH, "Intensity", String.format("%.1fx", intensity), mouseX, mouseY, alpha);
+        curY += rowH + rowGap;
+
+        // Row 6: Per-Pillar Colors Palette
+        List<String> colors = (data.dyeColors != null && !data.dyeColors.isEmpty()) ? data.dyeColors : new ArrayList<>(globalCfg.particle_color);
+        int maxColors = data.max_particle_color != null ? data.max_particle_color : (globalCfg.max_particle_color != 0 ? globalCfg.max_particle_color : Math.min(5, Math.max(1, colors.size())));
+        renderSideRowPalette(poseStackOrGraphics, font, rowX, curY, rowW, 30, colors, maxColors, mouseX, mouseY, alpha);
+        curY += 30 + rowGap;
+
+        // Row 7: Save Button
+        int btnH = 16;
+        boolean hoverSave = mouseX >= rowX && mouseX <= rowX + rowW && mouseY >= curY && mouseY <= curY + btnH;
+        drawBeveledGreenButton(poseStackOrGraphics, rowX, curY, rowW, btnH, hoverSave, alpha);
+        Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "✓ Save Pillar", rowX + rowW / 2, curY + 4, applyAlpha(hoverSave ? 0xFFFFFFFF : COLOR_TOGGLE_ON_TEXT, alpha));
+        curY += btnH + rowGap;
+
+        // Row 8: Locate in World
+        boolean hoverLoc = mouseX >= rowX && mouseX <= rowX + rowW && mouseY >= curY && mouseY <= curY + btnH;
+        drawBeveledButton(poseStackOrGraphics, rowX, curY, rowW, btnH, hoverLoc ? 0xFF2A2A38 : COLOR_BTN_BG, hoverLoc, false, alpha);
+        Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "⌖ Locate in World", rowX + rowW / 2, curY + 4, applyAlpha(hoverLoc ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
+        curY += btnH + rowGap;
+
+        disableGuiScissor(poseStackOrGraphics);
+
+        int totalH = (curY + sidePanelScrollOffset) - (y + 4);
+        sidePanelMaxScroll = Math.max(0, totalH - (h - 8));
+    }
+
+    private void renderSidePanelColorPicker(Object poseStackOrGraphics, Font font, int x, int y, int w, int h, int mouseX, int mouseY, float alpha) {
+        drawBeveledComponent(poseStackOrGraphics, x, y, w, h, COLOR_INNER_DARK, alpha);
+
+        int pad = 6;
+        int curY = y + pad;
+
+        // 1. 2D Sat x Bri Box & Hue Slider side by side
+        int hueW = 14;
+        int gradW = w - pad * 3 - hueW;
+        int gradH = 82;
+        int gradX = x + pad;
+        int gradY = curY;
+        int hueX = gradX + gradW + pad;
+        int hueY = gradY;
+        int hueH = gradH;
+
+        for (int gx = 0; gx < gradW; gx += 2) {
+            float sat = gx / (float) gradW;
+            int topRgb = hsbToRgb(pickerHue, sat, 1.0f);
+            for (int gy = 0; gy < gradH; gy += 2) {
+                float bri = 1.0f - (gy / (float) gradH);
+                int pixelCol = scaleBrightness(topRgb, bri);
+                Services.PLATFORM.fill(poseStackOrGraphics, gradX + gx, gradY + gy, gradX + gx + 2, gradY + gy + 2, applyAlpha(pixelCol, alpha));
+            }
+        }
+        drawBorder(poseStackOrGraphics, gradX - 1, gradY - 1, gradW + 2, gradH + 2, applyAlpha(COLOR_FRAME_BLACK, alpha));
+
+        // Crosshair
+        int crossX = gradX + (int) (pickerSat * gradW);
+        int crossY = gradY + (int) ((1.0f - pickerBri) * gradH);
+        drawBorder(poseStackOrGraphics, crossX - 3, crossY - 3, 6, 6, applyAlpha(COLOR_FRAME_BLACK, alpha));
+        drawBorder(poseStackOrGraphics, crossX - 2, crossY - 2, 4, 4, applyAlpha(COLOR_TEXT_WHITE, alpha));
+
+        // Hue Slider
+        for (int hy = 0; hy < hueH; hy += 2) {
+            float hVal = (hy / (float) hueH) * 360.0f;
+            int col = hsbToRgb(hVal, 1.0f, 1.0f);
+            Services.PLATFORM.fill(poseStackOrGraphics, hueX, hueY + hy, hueX + hueW, hueY + hy + 2, applyAlpha(col, alpha));
+        }
+        drawBorder(poseStackOrGraphics, hueX - 1, hueY - 1, hueW + 2, hueH + 2, applyAlpha(COLOR_FRAME_BLACK, alpha));
+
+        int thumbY = hueY + (int) ((pickerHue / 360.0f) * hueH);
+        Services.PLATFORM.fill(poseStackOrGraphics, hueX - 2, thumbY - 1, hueX + hueW + 2, thumbY + 2, applyAlpha(COLOR_TEXT_WHITE, alpha));
+        drawBorder(poseStackOrGraphics, hueX - 2, thumbY - 1, hueW + 4, 3, applyAlpha(COLOR_FRAME_BLACK, alpha));
+
+        curY += gradH + 8;
+
+        // 2. Preview & Hex
+        int currentColorInt = hsbToRgb(pickerHue, pickerSat, pickerBri);
+        int r = (currentColorInt >> 16) & 0xFF;
+        int g = (currentColorInt >> 8) & 0xFF;
+        int b = currentColorInt & 0xFF;
+        String hexString = String.format("#%02X%02X%02X", r, g, b);
+
+        int prevSize = 20;
+        Services.PLATFORM.fill(poseStackOrGraphics, gradX, curY, gradX + prevSize, curY + prevSize, applyAlpha(currentColorInt, alpha));
+        drawBorder(poseStackOrGraphics, gradX, curY, prevSize, prevSize, applyAlpha(COLOR_FRAME_BLACK, alpha));
+        drawText(poseStackOrGraphics, font, hexString, gradX + prevSize + 6, curY + 5, applyAlpha(COLOR_TEXT_WHITE, alpha));
+
+        curY += prevSize + 8;
+
+        // 3. Preset Swatches
+        drawText(poseStackOrGraphics, font, "Presets:", gradX, curY, applyAlpha(COLOR_TEXT_MUTED, alpha));
+        curY += 11;
+        int pSize = 13;
+        int pGap = 3;
+        int pCols = Math.max(1, (w - pad * 2) / (pSize + pGap));
+        for (int p = 0; p < PALETTE_PRESETS.length; p++) {
+            int px = gradX + (p % pCols) * (pSize + pGap);
+            int py = curY + (p / pCols) * (pSize + pGap);
+            Services.PLATFORM.fill(poseStackOrGraphics, px, py, px + pSize, py + pSize, applyAlpha(PALETTE_PRESETS[p], alpha));
+            drawBorder(poseStackOrGraphics, px, py, pSize, pSize, applyAlpha(0xFF000000, alpha));
+        }
+        int pRows = (int) Math.ceil((double) PALETTE_PRESETS.length / pCols);
+        curY += pRows * (pSize + pGap) + 10;
+
+        // 4. Buttons
+        int btnW = w - pad * 2;
+        int btnH = 16;
+        boolean hoverApply = mouseX >= gradX && mouseX <= gradX + btnW && mouseY >= curY && mouseY <= curY + btnH;
+        drawBeveledGreenButton(poseStackOrGraphics, gradX, curY, btnW, btnH, hoverApply, alpha);
+        Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "✓ Apply Color", gradX + btnW / 2, curY + 4, applyAlpha(hoverApply ? 0xFFFFFFFF : COLOR_TOGGLE_ON_TEXT, alpha));
+        curY += btnH + 4;
+
+        if (returnSidePanelType == SidePanelType.PILLAR_DETAIL) {
+            boolean hoverBack = mouseX >= gradX && mouseX <= gradX + btnW && mouseY >= curY && mouseY <= curY + btnH;
+            drawBeveledButton(poseStackOrGraphics, gradX, curY, btnW, btnH, hoverBack ? 0xFF2C2C36 : COLOR_BTN_BG, hoverBack, false, alpha);
+            Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "◀ Back to Pillar", gradX + btnW / 2, curY + 4, applyAlpha(hoverBack ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
+        }
+    }
+
+    private void renderSideRowToggle(Object poseStackOrGraphics, Font font, int x, int y, int w, int h, String label, boolean val, int mouseX, int mouseY, float alpha) {
+        drawBeveledButton(poseStackOrGraphics, x, y, w, h, 0xFF141418, false, false, alpha);
+        drawText(poseStackOrGraphics, font, label, x + 4, y + 7, applyAlpha(COLOR_TEXT_WHITE, alpha));
+
+        int btnW = 32;
+        int btnH = 13;
+        int btnX = x + w - btnW - 4;
+        int btnY = y + (h - btnH) / 2;
+        boolean hover = mouseX >= btnX && mouseX <= btnX + btnW && mouseY >= btnY && mouseY <= btnY + btnH;
+        int bg = val ? (hover ? 0xFF1E4828 : COLOR_TOGGLE_ON_BG) : (hover ? 0xFF361818 : COLOR_TOGGLE_OFF_BG);
+        int border = val ? COLOR_TOGGLE_ON_BORDER : COLOR_TOGGLE_OFF_BORDER;
+        int textCol = val ? COLOR_TOGGLE_ON_TEXT : COLOR_TOGGLE_OFF_TEXT;
+
+        drawBeveledButton(poseStackOrGraphics, btnX, btnY, btnW, btnH, bg, hover, val, alpha);
+        drawBorder(poseStackOrGraphics, btnX, btnY, btnW, btnH, applyAlpha(border, alpha));
+        Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, val ? "ON" : "OFF", btnX + btnW / 2, btnY + 3, applyAlpha(textCol, alpha));
+    }
+
+    private void renderSideRowCycle(Object poseStackOrGraphics, Font font, int x, int y, int w, int h, String label, String value, int mouseX, int mouseY, float alpha) {
+        drawBeveledButton(poseStackOrGraphics, x, y, w, h, 0xFF141418, false, false, alpha);
+        drawText(poseStackOrGraphics, font, label, x + 4, y + 7, applyAlpha(COLOR_TEXT_WHITE, alpha));
+
+        int btnW = 58;
+        int btnH = 13;
+        int btnX = x + w - btnW - 4;
+        int btnY = y + (h - btnH) / 2;
+        boolean hover = mouseX >= btnX && mouseX <= btnX + btnW && mouseY >= btnY && mouseY <= btnY + btnH;
+        drawBeveledButton(poseStackOrGraphics, btnX, btnY, btnW, btnH, hover ? 0xFF2A2A36 : COLOR_BTN_BG, hover, false, alpha);
+        Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, font.plainSubstrByWidth(value, btnW - 4), btnX + btnW / 2, btnY + 3, applyAlpha(hover ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
+    }
+
+    private void renderSideRowCounter(Object poseStackOrGraphics, Font font, int x, int y, int w, int h, String label, String value, int mouseX, int mouseY, float alpha) {
+        drawBeveledButton(poseStackOrGraphics, x, y, w, h, 0xFF141418, false, false, alpha);
+        drawText(poseStackOrGraphics, font, label, x + 4, y + 7, applyAlpha(COLOR_TEXT_WHITE, alpha));
+
+        int counterW = 58;
+        int counterH = 13;
+        int counterX = x + w - counterW - 4;
+        int counterY = y + (h - counterH) / 2;
+        int stepW = 11;
+
+        boolean hoverMinus = mouseX >= counterX && mouseX <= counterX + stepW && mouseY >= counterY && mouseY <= counterY + counterH;
+        drawBeveledButton(poseStackOrGraphics, counterX, counterY, stepW, counterH, hoverMinus ? 0xFF30303C : COLOR_BTN_BG, hoverMinus, false, alpha);
+        Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "−", counterX + stepW / 2, counterY + 3, applyAlpha(COLOR_TEXT_WHITE, alpha));
+
+        int valX = counterX + stepW;
+        int valW = counterW - stepW * 2;
+        Services.PLATFORM.fill(poseStackOrGraphics, valX, counterY, valX + valW, counterY + counterH, applyAlpha(0xFF101014, alpha));
+        drawBorder(poseStackOrGraphics, valX, counterY, valW, counterH, applyAlpha(COLOR_BTN_BORDER, alpha));
+        Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, value, valX + valW / 2, counterY + 3, applyAlpha(COLOR_TEXT_WHITE, alpha));
+
+        int plusX = counterX + counterW - stepW;
+        boolean hoverPlus = mouseX >= plusX && mouseX <= plusX + stepW && mouseY >= counterY && mouseY <= counterY + counterH;
+        drawBeveledButton(poseStackOrGraphics, plusX, counterY, stepW, counterH, hoverPlus ? 0xFF30303C : COLOR_BTN_BG, hoverPlus, false, alpha);
+        Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "+", plusX + stepW / 2, counterY + 3, applyAlpha(COLOR_TEXT_WHITE, alpha));
+    }
+
+    private void renderSideRowPalette(Object poseStackOrGraphics, Font font, int x, int y, int w, int h, List<String> colors, int maxColors, int mouseX, int mouseY, float alpha) {
+        drawBeveledButton(poseStackOrGraphics, x, y, w, h, 0xFF141418, false, false, alpha);
+        drawText(poseStackOrGraphics, font, "Colors (" + maxColors + "/" + colors.size() + ")", x + 4, y + 4, applyAlpha(COLOR_TEXT_WHITE, alpha));
+
+        int counterW = 46;
+        int counterH = 11;
+        int counterX = x + w - counterW - 4;
+        int counterY = y + 3;
+        int stepW = 10;
+
+        boolean hoverMinus = mouseX >= counterX && mouseX <= counterX + stepW && mouseY >= counterY && mouseY <= counterY + counterH;
+        drawBeveledButton(poseStackOrGraphics, counterX, counterY, stepW, counterH, hoverMinus ? 0xFF30303C : COLOR_BTN_BG, hoverMinus, false, alpha);
+        Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "−", counterX + stepW / 2, counterY + 2, applyAlpha(COLOR_TEXT_WHITE, alpha));
+
+        int valX = counterX + stepW;
+        int valW = counterW - stepW * 2;
+        Services.PLATFORM.fill(poseStackOrGraphics, valX, counterY, valX + valW, counterY + counterH, applyAlpha(0xFF101014, alpha));
+        drawBorder(poseStackOrGraphics, valX, counterY, valW, counterH, applyAlpha(COLOR_BTN_BORDER, alpha));
+        Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, String.valueOf(maxColors), valX + valW / 2, counterY + 2, applyAlpha(COLOR_TEXT_WHITE, alpha));
+
+        int plusX = counterX + counterW - stepW;
+        boolean hoverPlus = mouseX >= plusX && mouseX <= plusX + stepW && mouseY >= counterY && mouseY <= counterY + counterH;
+        drawBeveledButton(poseStackOrGraphics, plusX, counterY, stepW, counterH, hoverPlus ? 0xFF30303C : COLOR_BTN_BG, hoverPlus, false, alpha);
+        Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "+", plusX + stepW / 2, counterY + 2, applyAlpha(COLOR_TEXT_WHITE, alpha));
+
+        int swSize = 11;
+        int swGap = 3;
+        int swY = y + 16;
+        for (int i = 0; i < Math.min(8, colors.size()); i++) {
+            int swX = x + 4 + i * (swSize + swGap);
+            int colInt = 0xFFFFFFFF;
+            try {
+                String hex = colors.get(i).replace("#", "");
+                colInt = 0xFF000000 | Integer.parseInt(hex, 16);
+            } catch (Exception ignored) {}
+
+            boolean active = i < maxColors;
+            Services.PLATFORM.fill(poseStackOrGraphics, swX, swY, swX + swSize, swY + swSize, applyAlpha(colInt, active ? alpha : alpha * 0.35f));
+            int borderCol = active ? 0xFFFFFFFF : 0xFF404048;
+            drawBorder(poseStackOrGraphics, swX, swY, swSize, swSize, applyAlpha(borderCol, alpha));
+        }
+    }
     private void drawBeveledComponent(Object poseStackOrGraphics, int x, int y, int w, int h, int bgRgb, float alpha) {
         // 1. Interior Fill
         Services.PLATFORM.fill(poseStackOrGraphics, x + 1, y + 1, x + w - 1, y + h - 1, applyAlpha(bgRgb, alpha));
@@ -3199,6 +3631,331 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         }
 
         return true;
+    }
+
+    private boolean checkSideRowToggleClick(double mouseX, double mouseY, int x, int y, int w, int h) {
+        int btnW = 32;
+        int btnH = 13;
+        int btnX = x + w - btnW - 4;
+        int btnY = y + (h - btnH) / 2;
+        return mouseX >= btnX && mouseX <= btnX + btnW && mouseY >= btnY && mouseY <= btnY + btnH;
+    }
+
+    private boolean checkSideRowCycleClick(double mouseX, double mouseY, int x, int y, int w, int h) {
+        int btnW = 58;
+        int btnH = 13;
+        int btnX = x + w - btnW - 4;
+        int btnY = y + (h - btnH) / 2;
+        return mouseX >= btnX && mouseX <= btnX + btnW && mouseY >= btnY && mouseY <= btnY + btnH;
+    }
+
+    private int checkSideRowCounterClick(double mouseX, double mouseY, int x, int y, int w, int h) {
+        int counterW = 58;
+        int counterH = 13;
+        int counterX = x + w - counterW - 4;
+        int counterY = y + (h - counterH) / 2;
+        int stepW = 11;
+        if (mouseY >= counterY && mouseY <= counterY + counterH) {
+            if (mouseX >= counterX && mouseX <= counterX + stepW) {
+                return -1;
+            } else if (mouseX >= counterX + counterW - stepW && mouseX <= counterX + counterW) {
+                return 1;
+            }
+        }
+        return 0;
+    }
+
+    private boolean handleSidePanelClick(double mouseX, double mouseY, int button, int x, int y, int w, int h) {
+        int sHeadX = x + 6;
+        int sHeadY = y + 7;
+        int sHeadW = w - 12;
+        int sHeadH = 22;
+
+        // Close button [ ✕ ]
+        int closeSize = 14;
+        int closeX = sHeadX + sHeadW - closeSize - 4;
+        int closeY = sHeadY + 4;
+        if (mouseX >= closeX && mouseX <= closeX + closeSize && mouseY >= closeY && mouseY <= closeY + closeSize) {
+            closeSidePanel();
+            return true;
+        }
+
+        int sContentX = x + 6;
+        int sContentY = sHeadY + sHeadH + 4;
+        int sContentW = sHeadW;
+        int sContentH = (y + h - 7) - sContentY;
+
+        if (sidePanelType == SidePanelType.PILLAR_DETAIL) {
+            return handleSidePanelPillarClick(mouseX, mouseY, button, sContentX, sContentY, sContentW, sContentH);
+        } else if (sidePanelType == SidePanelType.COLOR_PICKER) {
+            return handleSidePanelColorPickerClick(mouseX, mouseY, button, sContentX, sContentY, sContentW, sContentH);
+        }
+
+        return false;
+    }
+
+    private boolean handleSidePanelPillarClick(double mouseX, double mouseY, int button, int x, int y, int w, int h) {
+        PillarIdManager.PillarData data = PillarIdManager.getClient().getPillarData(selectedPillarDetailId);
+        if (data == null) return false;
+
+        PillarParticleConfig globalCfg = PillarParticleConfig.get();
+        int curY = y + 4 - sidePanelScrollOffset;
+        int rowH = 22;
+        int rowGap = 3;
+        int rowX = x + 4;
+        int rowW = w - 8;
+
+        // Skip row 0 (coordinates badge)
+        curY += 15 + rowGap;
+
+        // Row 1: Custom Pattern Toggle
+        if (checkSideRowToggleClick(mouseX, mouseY, rowX, curY, rowW, rowH)) {
+            boolean cur = data.use_pattern != null ? data.use_pattern : globalCfg.use_pattern;
+            data.use_pattern = !cur;
+            PillarIdManager.getClient().updatePillarData(data);
+            PacketFactory.sendToServer(new UpdatePillarDataPacket(data));
+            return true;
+        }
+        curY += rowH + rowGap;
+
+        // Row 2: Pattern Cycle
+        if (checkSideRowCycleClick(mouseX, mouseY, rowX, curY, rowW, rowH)) {
+            String curPat = data.pattern != null && !data.pattern.isEmpty() ? data.pattern : "default";
+            int idx = 0;
+            for (int i = 0; i < PARTICLE_PATTERNS.length; i++) {
+                if (PARTICLE_PATTERNS[i].equalsIgnoreCase(curPat)) {
+                    idx = i;
+                    break;
+                }
+            }
+            data.pattern = PARTICLE_PATTERNS[(idx + 1) % PARTICLE_PATTERNS.length];
+            PillarIdManager.getClient().updatePillarData(data);
+            PacketFactory.sendToServer(new UpdatePillarDataPacket(data));
+            return true;
+        }
+        curY += rowH + rowGap;
+
+        // Row 3: Speed Counter
+        int speedStep = checkSideRowCounterClick(mouseX, mouseY, rowX, curY, rowW, rowH);
+        if (speedStep != 0) {
+            double cur = data.pattern_speed != null ? data.pattern_speed : globalCfg.pattern_speed;
+            data.pattern_speed = Math.max(0.01D, Math.min(0.50D, Math.round((cur + speedStep * 0.01D) * 100.0) / 100.0));
+            PillarIdManager.getClient().updatePillarData(data);
+            PacketFactory.sendToServer(new UpdatePillarDataPacket(data));
+            return true;
+        }
+        curY += rowH + rowGap;
+
+        // Row 4: Spread Counter
+        int spreadStep = checkSideRowCounterClick(mouseX, mouseY, rowX, curY, rowW, rowH);
+        if (spreadStep != 0) {
+            double cur = data.pattern_spread != null ? data.pattern_spread : globalCfg.pattern_spread;
+            data.pattern_spread = Math.max(0.01D, Math.min(0.50D, Math.round((cur + spreadStep * 0.01D) * 100.0) / 100.0));
+            PillarIdManager.getClient().updatePillarData(data);
+            PacketFactory.sendToServer(new UpdatePillarDataPacket(data));
+            return true;
+        }
+        curY += rowH + rowGap;
+
+        // Row 5: Intensity Counter
+        int intStep = checkSideRowCounterClick(mouseX, mouseY, rowX, curY, rowW, rowH);
+        if (intStep != 0) {
+            double cur = data.pattern_intensity != null ? data.pattern_intensity : globalCfg.pattern_intensity;
+            data.pattern_intensity = Math.max(0.1D, Math.min(5.0D, Math.round((cur + intStep * 0.1D) * 10.0) / 10.0));
+            PillarIdManager.getClient().updatePillarData(data);
+            PacketFactory.sendToServer(new UpdatePillarDataPacket(data));
+            return true;
+        }
+        curY += rowH + rowGap;
+
+        // Row 6: Palette & Swatches
+        List<String> colors = (data.dyeColors != null && !data.dyeColors.isEmpty()) ? data.dyeColors : new ArrayList<>(globalCfg.particle_color);
+        int maxColors = data.max_particle_color != null ? data.max_particle_color : (globalCfg.max_particle_color != 0 ? globalCfg.max_particle_color : Math.min(5, Math.max(1, colors.size())));
+
+        int counterW = 46;
+        int counterH = 11;
+        int counterX = rowX + rowW - counterW - 4;
+        int counterY = curY + 3;
+        int stepW = 10;
+        if (mouseY >= counterY && mouseY <= counterY + counterH) {
+            if (mouseX >= counterX && mouseX <= counterX + stepW) {
+                data.max_particle_color = Math.max(1, maxColors - 1);
+                if (data.dyeColors == null) data.dyeColors = new ArrayList<>(colors);
+                PillarIdManager.getClient().updatePillarData(data);
+                PacketFactory.sendToServer(new UpdatePillarDataPacket(data));
+                return true;
+            } else if (mouseX >= counterX + counterW - stepW && mouseX <= counterX + counterW) {
+                data.max_particle_color = Math.min(colors.size(), maxColors + 1);
+                if (data.dyeColors == null) data.dyeColors = new ArrayList<>(colors);
+                PillarIdManager.getClient().updatePillarData(data);
+                PacketFactory.sendToServer(new UpdatePillarDataPacket(data));
+                return true;
+            }
+        }
+
+        // Swatches click
+        int swSize = 11;
+        int swGap = 3;
+        int swY = curY + 16;
+        for (int i = 0; i < Math.min(8, colors.size()); i++) {
+            int swX = rowX + 4 + i * (swSize + swGap);
+            if (mouseX >= swX && mouseX <= swX + swSize && mouseY >= swY && mouseY <= swY + swSize) {
+                editingColorIndex = i;
+                isEditingPillarColor = true;
+                editingPillarId = data.id;
+                returnSidePanelType = SidePanelType.PILLAR_DETAIL;
+                String hex = colors.get(i).replace("#", "");
+                try {
+                    int rgb = Integer.parseInt(hex, 16);
+                    float[] hsb = new float[3];
+                    rgbToHsb(rgb, hsb);
+                    pickerHue = hsb[0];
+                    pickerSat = hsb[1];
+                    pickerBri = hsb[2];
+                } catch (Exception ignored) {}
+                openSidePanel(SidePanelType.COLOR_PICKER);
+                return true;
+            }
+        }
+        curY += 30 + rowGap;
+
+        // Row 7: Save Button
+        int btnH = 16;
+        if (mouseX >= rowX && mouseX <= rowX + rowW && mouseY >= curY && mouseY <= curY + btnH) {
+            PillarIdManager.getClient().saveAllPillars();
+            PacketFactory.sendToServer(new UpdatePillarDataPacket(data));
+            return true;
+        }
+        curY += btnH + rowGap;
+
+        // Row 8: Locate in World
+        if (mouseX >= rowX && mouseX <= rowX + rowW && mouseY >= curY && mouseY <= curY + btnH) {
+            Minecraft mc = Minecraft.getInstance();
+            if (mc.player != null && mc.level != null) {
+                String curDim = Services.PLATFORM.getDimensionId(mc.level).toString();
+                if (data.dimension != null && data.dimension.equals(curDim)) {
+                    BlockPos pillarPos = new BlockPos(data.x, data.y, data.z);
+                    PillarMarkerManager.get().markPillar(data.id, pillarPos, data.dimension);
+                    double dx = pillarPos.getX() - mc.player.getX();
+                    double dz = pillarPos.getZ() - mc.player.getZ();
+                    float yaw = (float) (Math.atan2(dz, dx) * 180.0 / Math.PI) - 90.0f;
+                    mc.player.setYRot(yaw);
+                    mc.player.setXRot(0.0f);
+                    this.onClose();
+                    return true;
+                }
+            }
+            return true;
+        }
+
+        return false;
+    }
+
+    private boolean handleSidePanelColorPickerClick(double mouseX, double mouseY, int button, int x, int y, int w, int h) {
+        int pad = 6;
+        int curY = y + pad;
+
+        int hueW = 14;
+        int gradW = w - pad * 3 - hueW;
+        int gradH = 82;
+        int gradX = x + pad;
+        int gradY = curY;
+        int hueX = gradX + gradW + pad;
+        int hueY = gradY;
+        int hueH = gradH;
+
+        // 1. Click in 2D Box -> start drag
+        if (mouseX >= gradX && mouseX <= gradX + gradW && mouseY >= gradY && mouseY <= gradY + gradH) {
+            draggingGradient = true;
+            pickerSat = Math.max(0.0f, Math.min(1.0f, (float) (mouseX - gradX) / gradW));
+            pickerBri = Math.max(0.0f, Math.min(1.0f, 1.0f - ((float) (mouseY - gradY) / gradH)));
+            return true;
+        }
+
+        // 2. Click in Hue Slider -> start drag
+        if (mouseX >= hueX && mouseX <= hueX + hueW && mouseY >= hueY && mouseY <= hueY + hueH) {
+            draggingHue = true;
+            pickerHue = Math.max(0.0f, Math.min(360.0f, ((float) (mouseY - hueY) / hueH) * 360.0f));
+            return true;
+        }
+
+        curY += gradH + 8;
+        int prevSize = 20;
+        curY += prevSize + 8;
+
+        // 3. Preset Swatches
+        curY += 11;
+        int pSize = 13;
+        int pGap = 3;
+        int pCols = Math.max(1, (w - pad * 2) / (pSize + pGap));
+        for (int p = 0; p < PALETTE_PRESETS.length; p++) {
+            int px = gradX + (p % pCols) * (pSize + pGap);
+            int py = curY + (p / pCols) * (pSize + pGap);
+            if (mouseX >= px && mouseX <= px + pSize && mouseY >= py && mouseY <= py + pSize) {
+                int col = PALETTE_PRESETS[p];
+                float[] hsb = new float[3];
+                rgbToHsb(col, hsb);
+                pickerHue = hsb[0];
+                pickerSat = hsb[1];
+                pickerBri = hsb[2];
+                return true;
+            }
+        }
+        int pRows = (int) Math.ceil((double) PALETTE_PRESETS.length / pCols);
+        curY += pRows * (pSize + pGap) + 10;
+
+        // 4. Apply Button
+        int btnW = w - pad * 2;
+        int btnH = 16;
+        if (mouseX >= gradX && mouseX <= gradX + btnW && mouseY >= curY && mouseY <= curY + btnH) {
+            int currentColorInt = hsbToRgb(pickerHue, pickerSat, pickerBri);
+            int r = (currentColorInt >> 16) & 0xFF;
+            int g = (currentColorInt >> 8) & 0xFF;
+            int b = currentColorInt & 0xFF;
+            String hexString = String.format("#%02X%02X%02X", r, g, b);
+
+            if (isEditingPillarColor && editingPillarId != null) {
+                PillarIdManager.PillarData data = PillarIdManager.getClient().getPillarData(editingPillarId);
+                if (data != null) {
+                    if (data.dyeColors == null) {
+                        data.dyeColors = new ArrayList<>(PillarParticleConfig.get().particle_color);
+                    }
+                    if (editingColorIndex < data.dyeColors.size()) {
+                        data.dyeColors.set(editingColorIndex, hexString);
+                    } else {
+                        data.dyeColors.add(hexString);
+                    }
+                    PillarIdManager.getClient().updatePillarData(data);
+                    PacketFactory.sendToServer(new UpdatePillarDataPacket(data));
+                }
+            } else {
+                PillarParticleConfig cfg = PillarParticleConfig.get();
+                if (editingColorIndex < cfg.particle_color.size()) {
+                    cfg.particle_color.set(editingColorIndex, hexString);
+                } else {
+                    cfg.particle_color.add(hexString);
+                }
+                cfg.saveProperties();
+            }
+
+            if (returnSidePanelType == SidePanelType.PILLAR_DETAIL) {
+                openSidePanel(SidePanelType.PILLAR_DETAIL);
+            } else {
+                closeSidePanel();
+            }
+            return true;
+        }
+        curY += btnH + 4;
+
+        // Back to Pillar Button
+        if (returnSidePanelType == SidePanelType.PILLAR_DETAIL) {
+            if (mouseX >= gradX && mouseX <= gradX + btnW && mouseY >= curY && mouseY <= curY + btnH) {
+                openSidePanel(SidePanelType.PILLAR_DETAIL);
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private boolean checkToggleClick(double mouseX, double mouseY, int x, int y, int w, int h, int clipY, int clipH) {

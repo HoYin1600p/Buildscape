@@ -107,7 +107,13 @@ public class ConfigThemes {
         }
 
         public boolean isLight() {
-            return "light".equalsIgnoreCase(this.id) || (this.id != null && (this.id.toLowerCase(java.util.Locale.ROOT).startsWith("light") || "silver".equalsIgnoreCase(this.id)));
+            if (this.id == null) return false;
+            String lower = this.id.toLowerCase(java.util.Locale.ROOT);
+            return "light".equals(lower)
+                    || lower.startsWith("light_")
+                    || "silver".equals(lower)
+                    || "white".equals(lower)
+                    || "pink".equals(lower);
         }
 
         public boolean isDark() {
@@ -817,34 +823,385 @@ public class ConfigThemes {
             0x60E4E4E7  // accentGlow
     );
 
-    // Backward compatibility aliases for legacy theme IDs
-    public static final Theme CRIMSON = RED;
-    public static final Theme COBALT = BLUE;
-    public static final Theme EMERALD = GREEN;
-    public static final Theme AMETHYST = PURPLE;
-    public static final Theme AMBER = ORANGE;
-    public static final Theme PRISMARINE = CYAN;
-    public static final Theme OBSIDIAN = BLACK;
+    public static final Theme WHITE = new Theme(
+            "white", "White",
+            0x70000000, // overlay
+            0xFFFFFFFF, // panelBg
+            0xFFF1F5F9, // chassisBody
+            0xFFF8FAFC, // innerDark
+            0xFFE2E8F0, // headerBg
+            0xFF0F172A, // frameBlack
+            0xFFFFFFFF, // borderGradientStart
+            0xFFCBD5E1, // borderGradientEnd
+            0xFF94A3B8, // borderShadow
+            0xFFE2E8F0, // chassisBand
+            0xFFCBD5E1, // bevelShadow
+            0xFFFFFFFF, // bevelHighlight
+            0xFF0F172A, // textWhite
+            0xFF334155, // textSilver
+            0xFF64748B, // textMuted
+            0xFFFFFFFF, // rowBg
+            0xFFF1F5F9, // rowBgHover
+            0xFFE2E8F0, // rowBorder
+            0xFF0284C7, // rowBorderHover
+            0xFFDCFCE7, // toggleOnBg
+            0xFF22C55E, // toggleOnBorder
+            0xFF15803D, // toggleOnText
+            0xFFF1F5F9, // toggleOffBg
+            0xFFCBD5E1, // toggleOffBorder
+            0xFF64748B, // toggleOffText
+            0xFFFFFFFF, // btnBg
+            0xFFF1F5F9, // btnBgHover
+            0xFFE2E8F0, // btnBgActive
+            0xFFCBD5E1, // btnBorder
+            0xFF0284C7, // btnBorderHover
+            0xFFF8FAFC, // slotBg
+            0xFFF1F5F9, // slotBgHover
+            0xFFCBD5E1, // slotBorder
+            0xFF0284C7, // accent
+            0x500284C7  // accentGlow
+    );
+
+    public static final Theme PINK = new Theme(
+            "pink", "Pink",
+            0x70200814, // overlay
+            0xFFFFF0F5, // panelBg
+            0xFFFCE7F0, // chassisBody
+            0xFFFFF5F9, // innerDark
+            0xFFFAD1E2, // headerBg
+            0xFF330818, // frameBlack
+            0xFFFFFFFF, // borderGradientStart
+            0xFFF4B8D1, // borderGradientEnd
+            0xFFE594B8, // borderShadow
+            0xFFF6C8DC, // chassisBand
+            0xFFEAA6C4, // bevelShadow
+            0xFFFFFFFF, // bevelHighlight
+            0xFF38081A, // textWhite
+            0xFF601732, // textSilver
+            0xFF964567, // textMuted
+            0xFFFFFFFF, // rowBg
+            0xFFFFF0F6, // rowBgHover
+            0xFFF7CADA, // rowBorder
+            0xFFEC4899, // rowBorderHover
+            0xFFFCE7F3, // toggleOnBg
+            0xFFEC4899, // toggleOnBorder
+            0xFFBE185D, // toggleOnText
+            0xFFF9EEF3, // toggleOffBg
+            0xFFE0C0CE, // toggleOffBorder
+            0xFF8A6273, // toggleOffText
+            0xFFFFFFFF, // btnBg
+            0xFFFDF2F7, // btnBgHover
+            0xFFFCE7F3, // btnBgActive
+            0xFFF4B8D1, // btnBorder
+            0xFFEC4899, // btnBorderHover
+            0xFFFCECF2, // slotBg
+            0xFFFDF4F8, // slotBgHover
+            0xFFF0BDD2, // slotBorder
+            0xFFEC4899, // accent
+            0x50EC4899  // accentGlow
+    );
+
+    public static final Theme BROWN = new Theme(
+            "brown", "Brown",
+            0xD81A1008, // overlay
+            0xFF221710, // panelBg
+            0xFF2E2018, // chassisBody
+            0xFF19100B, // innerDark
+            0xFF281C15, // headerBg
+            0xFF0A0704, // frameBlack
+            0xFFA16207, // borderGradientStart
+            0xFF451A03, // borderGradientEnd
+            0xFF150C06, // borderShadow
+            0xFF36261D, // chassisBand
+            0xFF140D08, // bevelShadow
+            0xFFB45309, // bevelHighlight
+            0xFFFEF3C7, // textWhite
+            0xFFE7D0B7, // textSilver
+            0xFFA3866E, // textMuted
+            0xFF231811, // rowBg
+            0xFF2F2119, // rowBgHover
+            0xFF4E3628, // rowBorder
+            0xFFB45309, // rowBorderHover
+            0xFF451A03, // toggleOnBg
+            0xFFD97706, // toggleOnBorder
+            0xFFFDE68A, // toggleOnText
+            0xFF241913, // toggleOffBg
+            0xFF432F23, // toggleOffBorder
+            0xFF886A55, // toggleOffText
+            0xFF2A1E16, // btnBg
+            0xFF37281E, // btnBgHover
+            0xFF443226, // btnBgActive
+            0xFF5A3E2F, // btnBorder
+            0xFFB45309, // btnBorderHover
+            0xFF17100B, // slotBg
+            0xFF261B13, // slotBgHover
+            0xFF3E2B20, // slotBorder
+            0xFFD97706, // accent
+            0x60D97706  // accentGlow
+    );
+
+    public static final Theme LIGHT_BROWN = new Theme(
+            "light_brown", "Light Brown",
+            0x70181008, // overlay
+            0xFFF7F2EE, // panelBg
+            0xFFEAE1D8, // chassisBody
+            0xFFF2ECE5, // innerDark
+            0xFFE2D6CB, // headerBg
+            0xFF281C14, // frameBlack
+            0xFFFFFFFF, // borderGradientStart
+            0xFFCBB9A7, // borderGradientEnd
+            0xFFAA9581, // borderShadow
+            0xFFD8C9B9, // chassisBand
+            0xFFBCA693, // bevelShadow
+            0xFFFFFFFF, // bevelHighlight
+            0xFF2A1D15, // textWhite
+            0xFF4F392B, // textSilver
+            0xFF7D6553, // textMuted
+            0xFFFFFFFF, // rowBg
+            0xFFF5EFEA, // rowBgHover
+            0xFFD6C6B7, // rowBorder
+            0xFF92400E, // rowBorderHover
+            0xFFFEF3C7, // toggleOnBg
+            0xFFB45309, // toggleOnBorder
+            0xFF78350F, // toggleOnText
+            0xFFEDE5DE, // toggleOffBg
+            0xFFC8B7A8, // toggleOffBorder
+            0xFF736050, // toggleOffText
+            0xFFFFFFFF, // btnBg
+            0xFFF7F1EB, // btnBgHover
+            0xFFEBE2D9, // btnBgActive
+            0xFFCAB8A8, // btnBorder
+            0xFF92400E, // btnBorderHover
+            0xFFEFE7E0, // slotBg
+            0xFFF7F2EC, // slotBgHover
+            0xFFC6B4A3, // slotBorder
+            0xFF92400E, // accent
+            0x5092400E  // accentGlow
+    );
+
+    public static final Theme YELLOW = new Theme(
+            "yellow", "Yellow",
+            0xD81A1602, // overlay
+            0xFF201D0B, // panelBg
+            0xFF2C2812, // chassisBody
+            0xFF171507, // innerDark
+            0xFF282410, // headerBg
+            0xFF0A0902, // frameBlack
+            0xFFFACC15, // borderGradientStart
+            0xFF854D0E, // borderGradientEnd
+            0xFF141203, // borderShadow
+            0xFF363216, // chassisBand
+            0xFF131105, // bevelShadow
+            0xFFEAB308, // bevelHighlight
+            0xFFFEFCE8, // textWhite
+            0xFFFEF08A, // textSilver
+            0xFFB3A85C, // textMuted
+            0xFF211E0C, // rowBg
+            0xFF2C2812, // rowBgHover
+            0xFF4D461E, // rowBorder
+            0xFFEAB308, // rowBorderHover
+            0xFF423805, // toggleOnBg
+            0xFFEAB308, // toggleOnBorder
+            0xFFFEF08A, // toggleOnText
+            0xFF211E0F, // toggleOffBg
+            0xFF413B1F, // toggleOffBorder
+            0xFF877F54, // toggleOffText
+            0xFF292510, // btnBg
+            0xFF363116, // btnBgHover
+            0xFF443E1C, // btnBgActive
+            0xFF5A5224, // btnBorder
+            0xFFEAB308, // btnBorderHover
+            0xFF161407, // slotBg
+            0xFF25210D, // slotBgHover
+            0xFF3E3718, // slotBorder
+            0xFFEAB308, // accent
+            0x60EAB308  // accentGlow
+    );
+
+    public static final Theme LIGHT_YELLOW = new Theme(
+            "light_yellow", "Light Yellow",
+            0x70181604, // overlay
+            0xFFFEFDF5, // panelBg
+            0xFFF9F5DE, // chassisBody
+            0xFFFCF9EB, // innerDark
+            0xFFF5EFC7, // headerBg
+            0xFF2E2A0A, // frameBlack
+            0xFFFFFFFF, // borderGradientStart
+            0xFFE8DFA8, // borderGradientEnd
+            0xFFC7BC7A, // borderShadow
+            0xFFEFE7BC, // chassisBand
+            0xFFD1C588, // bevelShadow
+            0xFFFFFFFF, // bevelHighlight
+            0xFF332D06, // textWhite
+            0xFF574E12, // textSilver
+            0xFF82772E, // textMuted
+            0xFFFFFFFF, // rowBg
+            0xFFFEFCE8, // rowBgHover
+            0xFFECE4B2, // rowBorder
+            0xFFCA8A04, // rowBorderHover
+            0xFFFEF9C3, // toggleOnBg
+            0xFFCA8A04, // toggleOnBorder
+            0xFF854D0E, // toggleOnText
+            0xFFF7F3E2, // toggleOffBg
+            0xFFD8D0A8, // toggleOffBorder
+            0xFF7D754C, // toggleOffText
+            0xFFFFFFFF, // btnBg
+            0xFFFEFBE8, // btnBgHover
+            0xFFF9F4D4, // btnBgActive
+            0xFFE4DAA0, // btnBorder
+            0xFFCA8A04, // btnBorderHover
+            0xFFF6F0D0, // slotBg
+            0xFFFCF8E3, // slotBgHover
+            0xFFDECFA0, // slotBorder
+            0xFFCA8A04, // accent
+            0x50CA8A04  // accentGlow
+    );
+
+    public static final Theme LIME = new Theme(
+            "lime", "Lime",
+            0xD8081604, // overlay
+            0xFF121F0D, // panelBg
+            0xFF1A2D14, // chassisBody
+            0xFF0C1608, // innerDark
+            0xFF172812, // headerBg
+            0xFF050B03, // frameBlack
+            0xFF84CC16, // borderGradientStart
+            0xFF365314, // borderGradientEnd
+            0xFF081005, // borderShadow
+            0xFF203718, // chassisBand
+            0xFF0A1306, // bevelShadow
+            0xFF65A30D, // bevelHighlight
+            0xFFF7FEE7, // textWhite
+            0xFFD9F99D, // textSilver
+            0xFF84CC16, // textMuted
+            0xFF13210E, // rowBg
+            0xFF1C3115, // rowBgHover
+            0xFF2C4C20, // rowBorder
+            0xFF84CC16, // rowBorderHover
+            0xFF1A2E05, // toggleOnBg
+            0xFF84CC16, // toggleOnBorder
+            0xFFBEF264, // toggleOnText
+            0xFF132111, // toggleOffBg
+            0xFF253B1F, // toggleOffBorder
+            0xFF68855F, // toggleOffText
+            0xFF192B13, // btnBg
+            0xFF223A1A, // btnBgHover
+            0xFF2B4A21, // btnBgActive
+            0xFF375D2A, // btnBorder
+            0xFF84CC16, // btnBorderHover
+            0xFF0E180A, // slotBg
+            0xFF1A2C14, // slotBgHover
+            0xFF29461F, // slotBorder
+            0xFF65A30D, // accent
+            0x6084CC16  // accentGlow
+    );
+
+    public static final Theme LIGHT_LIME = new Theme(
+            "light_lime", "Light Lime",
+            0x70081804, // overlay
+            0xFFF7FCF2, // panelBg
+            0xFFEBF7E2, // chassisBody
+            0xFFF1FAEA, // innerDark
+            0xFFE0F3D3, // headerBg
+            0xFF142B0A, // frameBlack
+            0xFFFFFFFF, // borderGradientStart
+            0xFFCDEAB8, // borderGradientEnd
+            0xFFA5CD88, // borderShadow
+            0xFFD6EFC4, // chassisBand
+            0xFFB4DC94, // bevelShadow
+            0xFFFFFFFF, // bevelHighlight
+            0xFF163308, // textWhite
+            0xFF264F12, // textSilver
+            0xFF507E34, // textMuted
+            0xFFFFFFFF, // rowBg
+            0xFFF4FBEF, // rowBgHover
+            0xFFCEE8B8, // rowBorder
+            0xFF65A30D, // rowBorderHover
+            0xFFECFCCB, // toggleOnBg
+            0xFF65A30D, // toggleOnBorder
+            0xFF3F6212, // toggleOnText
+            0xFFF1F6EC, // toggleOffBg
+            0xFFC2D4B8, // toggleOffBorder
+            0xFF697C60, // toggleOffText
+            0xFFFFFFFF, // btnBg
+            0xFFF2FAE9, // btnBgHover
+            0xFFE6F5D9, // btnBgActive
+            0xFFC2E4A6, // btnBorder
+            0xFF65A30D, // btnBorderHover
+            0xFFE5F3DC, // slotBg
+            0xFFEFF8EA, // slotBgHover
+            0xFFBEDE9E, // slotBorder
+            0xFF65A30D, // accent
+            0x5065A30D  // accentGlow
+    );
+
+    public static final Theme MAGENTA = new Theme(
+            "magenta", "Magenta",
+            0xD81A0416, // overlay
+            0xFF220C1F, // panelBg
+            0xFF30122C, // chassisBody
+            0xFF180816, // innerDark
+            0xFF2A0F26, // headerBg
+            0xFF0A0309, // frameBlack
+            0xFFE879F9, // borderGradientStart
+            0xFF701A75, // borderGradientEnd
+            0xFF140412, // borderShadow
+            0xFF3A1735, // chassisBand
+            0xFF120511, // bevelShadow
+            0xFFC026D3, // bevelHighlight
+            0xFFFDF4FF, // textWhite
+            0xFFF5D0FE, // textSilver
+            0xFFE879F9, // textMuted
+            0xFF230D20, // rowBg
+            0xFF32132D, // rowBgHover
+            0xFF561C4E, // rowBorder
+            0xFFC026D3, // rowBorderHover
+            0xFF4A044E, // toggleOnBg
+            0xFFC026D3, // toggleOnBorder
+            0xFFF0ABFC, // toggleOnText
+            0xFF241021, // toggleOffBg
+            0xFF441F3E, // toggleOffBorder
+            0xFF885781, // toggleOffText
+            0xFF2C1128, // btnBg
+            0xFF3A1835, // btnBgHover
+            0xFF481F43, // btnBgActive
+            0xFF5E2457, // btnBorder
+            0xFFC026D3, // btnBorderHover
+            0xFF180816, // slotBg
+            0xFF2B0F27, // slotBgHover
+            0xFF42173D, // slotBorder
+            0xFFC026D3, // accent
+            0x60C026D3  // accentGlow
+    );
 
     private static final List<Theme> THEMES = Arrays.asList(
             DARK,
             LIGHT,
             BLACK,
+            WHITE,
             GRAY,
             LIGHT_GRAY,
             SILVER,
             GOLD,
             RED,
             LIGHT_RED,
+            PINK,
             ORANGE,
             LIGHT_ORANGE,
+            BROWN,
+            LIGHT_BROWN,
+            YELLOW,
+            LIGHT_YELLOW,
+            LIME,
+            LIGHT_LIME,
             GREEN,
             LIGHT_GREEN,
             CYAN,
             BLUE,
             LIGHT_BLUE,
             PURPLE,
-            LIGHT_PURPLE
+            LIGHT_PURPLE,
+            MAGENTA
     );
     private static int activeThemeIndex = 0;
 
@@ -886,25 +1243,10 @@ public class ConfigThemes {
         }
     }
 
-    private static String normalizeId(String id) {
-        if (id == null) return "dark";
-        return switch (id.toLowerCase(java.util.Locale.ROOT)) {
-            case "crimson" -> "red";
-            case "cobalt" -> "blue";
-            case "emerald" -> "green";
-            case "amethyst" -> "purple";
-            case "amber" -> "orange";
-            case "prismarine" -> "cyan";
-            case "obsidian" -> "black";
-            default -> id;
-        };
-    }
-
     public static void setThemeById(String id) {
         if (id == null) return;
-        String normalized = normalizeId(id);
         for (int i = 0; i < THEMES.size(); i++) {
-            if (THEMES.get(i).id.equalsIgnoreCase(normalized) || THEMES.get(i).id.equalsIgnoreCase(id)) {
+            if (THEMES.get(i).id.equalsIgnoreCase(id)) {
                 activeThemeIndex = i;
                 return;
             }
@@ -913,9 +1255,8 @@ public class ConfigThemes {
 
     public static Theme getById(String id) {
         if (id == null) return DARK;
-        String normalized = normalizeId(id);
         for (Theme t : THEMES) {
-            if (t.id.equalsIgnoreCase(normalized) || t.id.equalsIgnoreCase(id)) return t;
+            if (t.id.equalsIgnoreCase(id)) return t;
         }
         return DARK;
     }

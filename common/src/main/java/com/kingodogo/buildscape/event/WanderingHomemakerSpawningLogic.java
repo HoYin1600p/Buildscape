@@ -122,10 +122,12 @@ public final class WanderingHomemakerSpawningLogic {
             Services.PLATFORM.playEvokerPrepareSummon(serverLevel, spawnPos);
 
             Entity homemaker = Services.PLATFORM.createWanderingHomemakerEntity(serverLevel, spawnFestive);
+            if (Services.isVersionCluster("v121x") && homemaker == null) return;
             if (homemaker != null) {
                 homemaker.setPos(spawnX, spawnY, spawnZ);
                 homemaker.setYRot(level.getRandom().nextFloat() * 360F);
-                serverLevel.addFreshEntity(homemaker);
+                boolean added = serverLevel.addFreshEntity(homemaker);
+                if (Services.isVersionCluster("v121x") && !added) return;
                 Services.PLATFORM.putTagUUID(data, "WanderingHomemakerUUID", homemaker.getUUID());
             }
 
@@ -138,6 +140,10 @@ public final class WanderingHomemakerSpawningLogic {
 
             long cooldownEnd = currentTime + 1800000L;
             data.putLong("WanderingHomemakerCooldownRealTime", cooldownEnd);
+            if ((Services.isVersionCluster("v121x") || Services.isVersionCluster("v26x")) && player instanceof ServerPlayer serverPlayer) {
+                com.kingodogo.buildscape.network.PacketFactory.sendToPlayer(serverPlayer,
+                        new com.kingodogo.buildscape.network.SyncHomemakerCooldownPacket(cooldownEnd));
+            }
         }
     }
 }

@@ -338,7 +338,9 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter, com.kingo
 
     @Override
     public Entity createWanderingHomemakerEntity(Level level, boolean festive) {
-        return festive ? new FestiveWanderingHomemakerEntityImpl(level) : new WanderingHomemakerEntityImpl(level);
+        return festive
+                ? new FestiveWanderingHomemakerEntityImpl((EntityType<? extends WanderingTrader>) getFestiveWanderingHomemakerEntityType(), level)
+                : new WanderingHomemakerEntityImpl((EntityType<? extends WanderingTrader>) getWanderingHomemakerEntityType(), level);
     }
 
     @Override
@@ -3331,6 +3333,10 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter, com.kingo
     }
     @Override public void updateArmorStand(Entity stand, ItemStack stack, net.minecraft.world.entity.EquipmentSlot slot, boolean standItem) {
         com.kingodogo.buildscape.adapter.v26x.client.ClientPillarEntities.updateArmorStand(stand, stack, slot, standItem);
+    }
+    // 26.x spawn eggs are plain items carrying the spawn_egg data, not SpawnEggItem instances.
+    @Override public boolean isSpawnEgg(ItemStack stack) {
+        return net.minecraft.world.item.SpawnEggItem.getType(stack) != null;
     }
     @Override public boolean isArmor(ItemStack stack) {
         return com.kingodogo.buildscape.adapter.v26x.client.ClientPillarEntities.isArmor(stack);

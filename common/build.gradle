@@ -64,7 +64,13 @@ sourceSets {
 
 // Compile shared 1.18.2 code against vanilla Mojang names, without a loader or ATs.
 // Keep this compile in check so shared API changes are verified for both clusters.
-if (rootProject.findProject(':forge:1.18.2') != null || gradle.startParameter.projectProperties.get('buildscape.v118x') == 'true') {
+def v118xActive = rootProject.findProject(':forge:1.18.2') != null ||
+        rootProject.findProject(':fabric:1.18.2') != null ||
+        providers.gradleProperty('buildscape.v118x').getOrElse('false') == 'true' ||
+        gradle.startParameter.projectProperties.get('buildscape.v118x') == 'true' ||
+        gradle.startParameter.taskNames.any { it.contains('118x') }
+
+if (v118xActive) {
     unimined.minecraft(sourceSets.v118x) {
         version '1.18.2'
         mappings { mojmap() }
@@ -73,7 +79,14 @@ if (rootProject.findProject(':forge:1.18.2') != null || gradle.startParameter.pr
 }
 
 // Resolve Mojang-mapped 1.21.1 and its own vanilla library manifest publicly.
-if (providers.gradleProperty('buildscape.v121x').getOrElse('false') == 'true') {
+def v121xActive = rootProject.findProject(':neoforge:1.21.1') != null ||
+        rootProject.findProject(':fabric:1.21.1') != null ||
+        rootProject.findProject(':forge:1.21.1') != null ||
+        providers.gradleProperty('buildscape.v121x').getOrElse('false') == 'true' ||
+        gradle.startParameter.projectProperties.get('buildscape.v121x') == 'true' ||
+        gradle.startParameter.taskNames.any { it.contains('121x') }
+
+if (v121xActive) {
     unimined.minecraft(sourceSets.v121x) {
         version '1.21.1'
         mappings { mojmap() }
@@ -190,22 +203,16 @@ def v121xClusterResources = tasks.register('v121xClusterResources', Sync) {
 }
 
 artifacts {
-    add('v118xElements', sourceSets.v118x.output.classesDirs.singleFile) {
-        builtBy tasks.named('compileV118xJava')
-    }
-    add('v118xElements', v118xClusterResourcesDir.get().asFile) {
+    add('v118xElements', tasks.named('compileV118xJava').flatMap { it.destinationDirectory })
+    add('v118xElements', v118xClusterResourcesDir) {
         builtBy v118xClusterResources
     }
-    add('v121xElements', sourceSets.v121x.output.classesDirs.singleFile) {
-        builtBy tasks.named('compileV121xJava')
-    }
-    add('v121xElements', v121xClusterResourcesDir.get().asFile) {
+    add('v121xElements', tasks.named('compileV121xJava').flatMap { it.destinationDirectory })
+    add('v121xElements', v121xClusterResourcesDir) {
         builtBy v121xClusterResources
     }
-    add('v26xElements', sourceSets.v26x.output.classesDirs.singleFile) {
-        builtBy tasks.named('compileV26xJava')
-    }
-    add('v26xElements', v26xClusterResourcesDir.get().asFile) {
+    add('v26xElements', tasks.named('compileV26xJava').flatMap { it.destinationDirectory })
+    add('v26xElements', v26xClusterResourcesDir) {
         builtBy v26xClusterResources
     }
 }
@@ -219,8 +226,8 @@ tasks.named('jar', Jar) {
 }
 tasks.named('assemble') { dependsOn tasks.named('v26xClasses') }
 // Follow the settings inclusion decision so the opt-out skips v118x verification.
-def v118xEnabled = rootProject.findProject(':forge:1.18.2') != null
-def v121xEnabled = providers.gradleProperty('buildscape.v121x').getOrElse('false') == 'true'
+def v118xEnabled = v118xActive
+def v121xEnabled = v121xActive
 def v121xTestTask = tasks.register('v121xTest', Test) {
     group = 'verification'
     description = 'Audits every configured mixin against Minecraft 1.21.1 bytecode'

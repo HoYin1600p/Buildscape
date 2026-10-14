@@ -84,17 +84,23 @@ public class HazeBushParticleHandler {
     public static void clear() { POSITIONS_BY_CHUNK.clear(); }
 
     public static void animateTick(BlockState state, Level level, BlockPos pos, net.minecraft.util.RandomSource random) {
-        track(pos);
-        if (random.nextFloat() >= 0.20F) return;
         float[] rgb;
         if (state.getBlock() instanceof HazeBushBlock bush && state.getValue(HazeBushBlock.HAS_HAZE)) {
             rgb = HazeBushBlock.getPastelColor(bush.getColor());
         } else if (state.getBlock() instanceof PottedHazeBushBlock bush && state.getValue(PottedHazeBushBlock.HAS_HAZE)) {
             rgb = HazeBushBlock.getPastelColor(bush.getColor());
         } else return;
-        var particlePos = findHazeParticlePos(level, pos, RANDOM);
-        if (particlePos != null) level.addAlwaysVisibleParticle(ModParticles.HAZE.get(), false,
-                particlePos.x, particlePos.y, particlePos.z, rgb[0], rgb[1], rgb[2]);
+        var setting = Minecraft.getInstance().options.particles().get();
+        if (setting == net.minecraft.client.ParticleStatus.MINIMAL) return;
+        track(pos);
+        boolean decreased = setting == net.minecraft.client.ParticleStatus.DECREASED;
+        if (decreased && random.nextFloat() > 0.5F) return;
+        int count = decreased ? 1 : (1 + random.nextInt(2));
+        for (int i = 0; i < count; i++) {
+            var particlePos = findHazeParticlePos(level, pos, RANDOM);
+            if (particlePos != null) level.addAlwaysVisibleParticle(ModParticles.HAZE.get(), false,
+                    particlePos.x, particlePos.y, particlePos.z, rgb[0], rgb[1], rgb[2]);
+        }
     }
 
     public static void clientTick() {

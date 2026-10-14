@@ -277,6 +277,14 @@ public class BlockFactory implements IBlockFactory {
                     @Override public ItemStack getCloneItemStack(BlockGetter level, BlockPos pos, BlockState state) {
                         return plantStack(state);
                     }
+                    @Override public java.util.List<ItemStack> getDrops(BlockState state,
+                            net.minecraft.world.level.storage.loot.LootContext.Builder builder) {
+                        var drops = super.getDrops(state, builder);
+                        if (!state.getValue(HAS_HAZE)) for (var drop : drops) {
+                            if (drop.is(getPlant().asItem())) com.kingodogo.buildscape.item.HazeBushItem.markDrained(drop);
+                        }
+                        return drops;
+                    }
                 };
             }
             case "CopperTorchBlock": return new com.kingodogo.buildscape.block.CopperTorchBlock(props);
@@ -1104,6 +1112,8 @@ public class BlockFactory implements IBlockFactory {
         } else if (def.isPillar()) {
             return new PillarBlock(props) {
                 @Override
+                public boolean propagatesSkylightDown(BlockState state, net.minecraft.world.level.BlockGetter level, BlockPos pos) { return true; }
+                @Override
                 public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
                     if (state.getValue(PillarBlock.WATERLOGGED)) {
                         level.scheduleTick(pos, net.minecraft.world.level.material.Fluids.WATER, net.minecraft.world.level.material.Fluids.WATER.getTickDelay(level));
@@ -1323,6 +1333,8 @@ public class BlockFactory implements IBlockFactory {
                 public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
                     return onInteract(level, pos, state, player, hand, hit);
                 }
+                @Override
+                public int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos) { return getAnalogOutput(state, level, pos); }
             };
         } else if (def.isCascadeNoMist()) {
             return new CascadeBlockNoMist(props) {

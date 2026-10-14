@@ -174,14 +174,6 @@ public final class ClientPillarEntities {
                     mob.setBaby(true);
                     handled = true;
                 }
-
-                if (!handled) {
-                    try {
-                        java.lang.reflect.Method setIsBaby = livingEntity.getClass().getMethod("setIsBaby", boolean.class);
-                        setIsBaby.invoke(livingEntity, true);
-                    } catch (Exception ignored) {
-                    }
-                }
             }
         }
 

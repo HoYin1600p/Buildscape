@@ -70,6 +70,8 @@ public final class ItemFactory {
             case "stringlight_frame_pattern" -> Services.PLATFORM.createPatternItem(props, "tooltip.buildscape.stringlight_frame_pattern");
             case "infinite_phoenix_firework_star" -> Services.PLATFORM.createInfinitePhoenixFireworkStarItem(props);
             case "experience_bucket" -> Services.PLATFORM.createExperienceBucketItem(props);
+            case "wandering_homemaker_spawn_egg" -> Services.PLATFORM.createHomemakerSpawnEggItem(props, false);
+            case "festive_wandering_homemaker_spawn_egg" -> Services.PLATFORM.createHomemakerSpawnEggItem(props, true);
             case "poplar_boat" -> Services.PLATFORM.createPoplarBoatItem(props);
             case "builders_hat" -> new BuildersHatItem(props);
             default -> {

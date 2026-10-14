@@ -7,11 +7,15 @@ public class BuildscapeNeoForge {
     public BuildscapeNeoForge(net.neoforged.bus.api.IEventBus modEventBus) {
         com.kingodogo.buildscape.adapter.v121x.ExperienceFluids.installFactories(
                 () -> new com.kingodogo.buildscape.adapter.v121x.ExperienceFluids.Source() {
+                    @Override public boolean canConvertToSource(net.minecraft.world.level.material.FluidState state,
+                            net.minecraft.world.level.Level level, net.minecraft.core.BlockPos pos) { return false; }
                     @Override public net.neoforged.neoforge.fluids.FluidType getFluidType() {
                         return net.neoforged.neoforge.common.NeoForgeMod.WATER_TYPE.value();
                     }
                 },
                 () -> new com.kingodogo.buildscape.adapter.v121x.ExperienceFluids.Flowing() {
+                    @Override public boolean canConvertToSource(net.minecraft.world.level.material.FluidState state,
+                            net.minecraft.world.level.Level level, net.minecraft.core.BlockPos pos) { return false; }
                     @Override public net.neoforged.neoforge.fluids.FluidType getFluidType() {
                         return net.neoforged.neoforge.common.NeoForgeMod.WATER_TYPE.value();
                     }

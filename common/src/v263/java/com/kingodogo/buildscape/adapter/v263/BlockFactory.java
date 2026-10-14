@@ -1676,7 +1676,7 @@ public class BlockFactory implements IBlockFactory {
             }
             return new V26xHangingMossBlock(props);
         } else if (def.isClover()) {
-            props.sound(com.kingodogo.buildscape.sound.ModSounds.FLOWER_BED_SOUNDS());
+            props.instabreak().sound(com.kingodogo.buildscape.sound.ModSounds.FLOWER_BED_SOUNDS());
             class V26xCloverBlock extends CloverBlock implements BonemealableBlock {
                 public V26xCloverBlock(BlockBehaviour.Properties properties) {
                     super(properties);
@@ -1718,7 +1718,7 @@ public class BlockFactory implements IBlockFactory {
             }
             return new V26xCloverBlock(props);
         } else if (def.isPetal()) {
-            props.sound(com.kingodogo.buildscape.sound.ModSounds.FLOWER_BED_SOUNDS());
+            props.instabreak().sound(com.kingodogo.buildscape.sound.ModSounds.FLOWER_BED_SOUNDS());
             class V26xPetalBlock extends PetalBlock implements BonemealableBlock {
                 public V26xPetalBlock(BlockBehaviour.Properties properties) {
                     super(properties);

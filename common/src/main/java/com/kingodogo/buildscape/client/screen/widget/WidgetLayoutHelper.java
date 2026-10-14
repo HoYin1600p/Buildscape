@@ -57,6 +57,7 @@ public class WidgetLayoutHelper {
 
     public static int getX(AbstractWidget widget) {
         if (widget == null) return 0;
+        if (widget instanceof IWidgetBounds bounds) return bounds.buildscape$getX();
         if (getXMethod != null) {
             try {
                 return (int) getXMethod.invoke(widget);
@@ -72,6 +73,7 @@ public class WidgetLayoutHelper {
 
     public static int getY(AbstractWidget widget) {
         if (widget == null) return 0;
+        if (widget instanceof IWidgetBounds bounds) return bounds.buildscape$getY();
         if (getYMethod != null) {
             try {
                 return (int) getYMethod.invoke(widget);
@@ -87,6 +89,7 @@ public class WidgetLayoutHelper {
 
     public static int getHeight(AbstractWidget widget) {
         if (widget == null) return 0;
+        if (widget instanceof IWidgetBounds bounds) return bounds.buildscape$getHeight();
         try {
             Method getHeightMethod = widget.getClass().getMethod("getHeight");
             return (int) getHeightMethod.invoke(widget);
@@ -101,6 +104,10 @@ public class WidgetLayoutHelper {
 
     public static void setX(AbstractWidget widget, int x) {
         if (widget == null) return;
+        if (widget instanceof IWidgetBounds bounds) {
+            bounds.buildscape$setX(x);
+            return;
+        }
         if (setXMethod != null) {
             try {
                 setXMethod.invoke(widget, x);
@@ -116,6 +123,10 @@ public class WidgetLayoutHelper {
 
     public static void setY(AbstractWidget widget, int y) {
         if (widget == null) return;
+        if (widget instanceof IWidgetBounds bounds) {
+            bounds.buildscape$setY(y);
+            return;
+        }
         if (setYMethod != null) {
             try {
                 setYMethod.invoke(widget, y);
@@ -131,6 +142,11 @@ public class WidgetLayoutHelper {
 
     public static void setPosition(AbstractWidget widget, int x, int y) {
         if (widget == null) return;
+        if (widget instanceof IWidgetBounds bounds) {
+            bounds.buildscape$setX(x);
+            bounds.buildscape$setY(y);
+            return;
+        }
         if (setPositionMethod != null) {
             try {
                 setPositionMethod.invoke(widget, x, y);
@@ -143,6 +159,10 @@ public class WidgetLayoutHelper {
 
     public static void setWidgetHeight(AbstractWidget widget, int height) {
         if (widget == null) return;
+        if (widget instanceof IWidgetBounds bounds) {
+            bounds.buildscape$setHeight(height);
+            return;
+        }
         try {
             Method setHeightMethod = widget.getClass().getMethod("setHeight", int.class);
             setHeightMethod.invoke(widget, height);

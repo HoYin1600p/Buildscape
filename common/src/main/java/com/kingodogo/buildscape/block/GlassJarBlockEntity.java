@@ -272,6 +272,11 @@ public class GlassJarBlockEntity extends DataBlockEntity implements IDataSeriali
             this.liquidLevel = 0;
         } else {
             this.storedItem = data.getItemOrEmpty("StoredItem");
+            // Jar saves use RealCount as the authoritative quantity, including legacy item tags.
+            var storedItemData = data.getSubData("StoredItem");
+            if (storedItemData.isPresent()) {
+                this.storedItem.setCount(storedItemData.get().getIntOr("RealCount", this.storedItem.getCount()));
+            }
             this.storedLiquidItem = data.getItemOrEmpty("StoredLiquidItem");
             this.liquidLevel = Math.max(0, Math.min(getLiquidCap(this.storedLiquidItem), data.getIntOr("LiquidLevel", 0)));
         }

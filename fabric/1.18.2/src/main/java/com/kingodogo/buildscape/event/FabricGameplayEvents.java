@@ -20,10 +20,22 @@ public final class FabricGameplayEvents {
         LoaderWandererTrades.register();
         CommandRegistrationCallback.EVENT.register((dispatcher, dedicated) ->
                 com.kingodogo.buildscape.command.BuildscapeCommands.register(dispatcher));
-        UseBlockCallback.EVENT.register((player, level, hand, hit) -> player.isSpectator() ? InteractionResult.PASS
-                : ModCommonEvents.onRightClickBlock(player, level, hand, hit.getBlockPos(), hit.getDirection()));
-        UseEntityCallback.EVENT.register((player, level, hand, entity, hit) -> player.isSpectator() ? InteractionResult.PASS
-                : ModCommonEvents.onEntityInteract(player, level, hand, entity));
+        UseBlockCallback.EVENT.register((player, level, hand, hit) -> {
+            if (player.isSpectator()) return InteractionResult.PASS;
+            // Forge asks the item whether sneaking still uses the block (the wrench on pipes); vanilla and Fabric skip the block when sneaking with an item.
+            var held = player.getItemInHand(hand);
+            if (player.isSecondaryUseActive() && held.getItem() instanceof com.kingodogo.buildscape.item.WrenchItem wrench
+                    && wrench.doesSneakBypassUse(held, level, hit.getBlockPos(), player)) {
+                var used = level.getBlockState(hit.getBlockPos()).use(level, player, hand, hit);
+                if (used.consumesAction()) return used;
+            }
+            return ModCommonEvents.onRightClickBlock(player, level, hand, hit.getBlockPos(), hit.getDirection());
+        });
+        UseEntityCallback.EVENT.register((player, level, hand, entity, hit) -> {
+            if (player.isSpectator()) return InteractionResult.PASS;
+            var golden = GoldenDandelionHandler.onEntityInteract(player, level, hand, entity);
+            return golden != InteractionResult.PASS ? golden : ModCommonEvents.onEntityInteract(player, level, hand, entity);
+        });
         AttackBlockCallback.EVENT.register((player, level, hand, pos, direction) -> player.isSpectator() ? InteractionResult.PASS
                 : ModCommonEvents.onLeftClickBlock(player, level, pos));
         UseItemCallback.EVENT.register((player, level, hand) -> {
@@ -50,7 +62,16 @@ public final class FabricGameplayEvents {
             ItemFrameParticleHandler.onEntityJoin(entity, level);
         });
         ServerEntityEvents.ENTITY_UNLOAD.register(ItemFrameParticleHandler::onEntityLeave);
-        ServerWorldEvents.UNLOAD.register((server, level) -> ModCommonEvents.onLevelUnload(level));
+        ServerWorldEvents.UNLOAD.register((server, level) -> {
+            ModCommonEvents.onLevelUnload(level);
+            com.kingodogo.buildscape.block.EyeblossomTransitionHandler.onWorldUnload(level);
+        });
+        net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents.END_WORLD_TICK.register(
+                com.kingodogo.buildscape.block.EyeblossomTransitionHandler::onWorldTick);
+        net.fabricmc.fabric.api.event.lifecycle.v1.ServerChunkEvents.CHUNK_LOAD.register(
+                com.kingodogo.buildscape.block.EyeblossomTransitionHandler::onChunkLoad);
+        net.fabricmc.fabric.api.event.lifecycle.v1.ServerChunkEvents.CHUNK_UNLOAD.register((level, chunk) ->
+                com.kingodogo.buildscape.block.EyeblossomTransitionHandler.onChunkUnload(level, chunk.getPos()));
     }
     public static void livingDeath(net.minecraft.world.entity.LivingEntity entity, net.minecraft.world.damagesource.DamageSource source) {
         ModCommonEvents.onLivingDeath(entity, source);

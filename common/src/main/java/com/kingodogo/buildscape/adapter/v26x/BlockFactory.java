@@ -279,11 +279,15 @@ public class BlockFactory implements IBlockFactory {
 
         if (def.isLargeChain()) {
             return new com.kingodogo.buildscape.block.LargeChainBlock(props) {
+                @Override protected int getLightDampening(BlockState state) { return 0; }
+                @Override protected boolean propagatesSkylightDown(BlockState state) { return true; }
                 @Override protected BlockState updateShape(BlockState state, LevelReader level, ScheduledTickAccess tickAccess, BlockPos pos, Direction direction, BlockPos adjacentPos, BlockState adjacentState, RandomSource random) { if (state.getValue(WATERLOGGED)) tickAccess.scheduleTick(pos, net.minecraft.world.level.material.Fluids.WATER, net.minecraft.world.level.material.Fluids.WATER.getTickDelay(level)); return super.updateShape(state, level, tickAccess, pos, direction, adjacentPos, adjacentState, random); }
                 @Override protected boolean isPathfindable(BlockState state, net.minecraft.world.level.pathfinder.PathComputationType type) { return true; }
             };
         } else if (def.isClimbableChain()) {
             return new com.kingodogo.buildscape.block.ClimbableChainBlock(props) {
+                @Override protected int getLightDampening(BlockState state) { return 0; }
+                @Override protected boolean propagatesSkylightDown(BlockState state) { return true; }
                 @Override protected BlockState updateShape(BlockState state, LevelReader level, ScheduledTickAccess tickAccess, BlockPos pos, Direction direction, BlockPos adjacentPos, BlockState adjacentState, RandomSource random) { if (state.getValue(WATERLOGGED)) tickAccess.scheduleTick(pos, net.minecraft.world.level.material.Fluids.WATER, net.minecraft.world.level.material.Fluids.WATER.getTickDelay(level)); return super.updateShape(state, level, tickAccess, pos, direction, adjacentPos, adjacentState, random); }
                 @Override protected boolean isPathfindable(BlockState state, net.minecraft.world.level.pathfinder.PathComputationType type) { return true; }
             };
@@ -320,11 +324,13 @@ public class BlockFactory implements IBlockFactory {
             };
         } else if (def.isWeatheringButton()) {
             return new ButtonBlock(BlockSetType.STONE, 20, props.randomTicks()) {
+                @Override protected SoundType getSoundType(BlockState state) { return SoundType.COPPER; }
                 @Override public boolean isRandomlyTicking(BlockState state) { return true; }
                 @Override protected void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) { WeatheringBlockLogic.randomTick(state, level, pos); }
             };
         } else if (def.isWeatheringPressurePlate()) {
             return new net.minecraft.world.level.block.WeightedPressurePlateBlock(WeatheringBlockLogic.PRESSURE_PLATE_MAX_WEIGHT, BlockSetType.OAK, props.randomTicks()) {
+                @Override protected SoundType getSoundType(BlockState state) { return SoundType.COPPER; }
                 @Override public boolean isRandomlyTicking(BlockState state) { return true; }
                 @Override protected void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
                     WeatheringBlockLogic.randomTick(state, level, pos);
@@ -487,8 +493,15 @@ public class BlockFactory implements IBlockFactory {
                 }
             };
         } else if (def.isSlab()) {
+            // 26.x caches useShapeForLightOcclusion in the BlockState constructor, before ModSlabBlock's baseBlock field is set,
+            // so the shared glass check cannot see it there; decide from the definition instead.
+            boolean glassSlab = com.kingodogo.buildscape.platform.Services.PLATFORM.isGlassBlock(getBaseBlock(def))
+                    && getBaseBlock(def) != net.minecraft.world.level.block.Blocks.TINTED_GLASS;
             return new ModSlabBlock(getBaseBlock(def), props) {
+                @Override public boolean useShapeForLightOcclusion(BlockState state) { return !glassSlab && super.useShapeForLightOcclusion(state); }
                 public Integer getBeaconColorMultiplier(BlockState state, LevelReader level, BlockPos pos, BlockPos beaconPos) { return null; }
+                @Override protected int getLightDampening(BlockState state) { return isTintedBase() ? 15 : super.getLightDampening(state); }
+                @Override protected boolean propagatesSkylightDown(BlockState state) { return !isTintedBase() && (isRegularGlassLike() || super.propagatesSkylightDown(state)); }
             };
         } else if (def.isMudSlab()) {
             return new MudSlabBlock(props);
@@ -516,11 +529,15 @@ public class BlockFactory implements IBlockFactory {
                 @Override protected void tick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) { onScheduledTick(state, level, pos); }
             };
         } else if (def.isCopperDoor()) {
-            return new DoorBlock(BlockSetType.COPPER, props) {};
+            return new DoorBlock(BlockSetType.COPPER, props) {
+                @Override protected SoundType getSoundType(BlockState state) { return def.getId().startsWith("flaming_steel") ? SoundType.NETHERITE_BLOCK : SoundType.COPPER; }
+            };
         } else if (def.isDoor()) {
             return new DoorBlock(BlockSetType.OAK, props) {};
         } else if (def.isCopperTrapdoor()) {
-            return new TrapDoorBlock(BlockSetType.COPPER, props) {};
+            return new TrapDoorBlock(BlockSetType.COPPER, props) {
+                @Override protected SoundType getSoundType(BlockState state) { return def.getId().startsWith("flaming_steel") ? SoundType.NETHERITE_BLOCK : SoundType.COPPER; }
+            };
         } else if (def.isTrapdoor()) {
             return new TrapDoorBlock(BlockSetType.OAK, props) {};
         } else if (def.isButton()) {
@@ -531,14 +548,18 @@ public class BlockFactory implements IBlockFactory {
             return new ButtonBlock(BlockSetType.OAK, 30, props) {};
         } else if (def.isWeightedPressurePlate()) {
             // 1.18.2 ModPressurePlateBlock: a weighted plate (max weight 150) with the 'power' property.
-            return new net.minecraft.world.level.block.WeightedPressurePlateBlock(150, BlockSetType.OAK, props) {};
+            return new net.minecraft.world.level.block.WeightedPressurePlateBlock(150, BlockSetType.OAK, props) {
+                @Override protected SoundType getSoundType(BlockState state) { return def.getId().contains("flaming_steel") ? SoundType.NETHERITE_BLOCK : SoundType.COPPER; }
+            };
         } else if (def.isRedstoneLamp()) {
             return new net.minecraft.world.level.block.RedstoneLampBlock(props.lightLevel(
                     state -> state.getValue(net.minecraft.world.level.block.state.properties.BlockStateProperties.LIT) ? 15 : 0));
         } else if (def.isLightningRod()) {
             return new net.minecraft.world.level.block.LightningRodBlock(props);
         } else if (def.isPressurePlate()) {
-            return new PressurePlateBlock(BlockSetType.OAK, props) {};
+            return new PressurePlateBlock(BlockSetType.OAK, props) {
+                @Override protected SoundType getSoundType(BlockState state) { return referenceControlSound(def); }
+            };
         } else if (def.isMushroomShelves()) {
             return new MushroomShelvesBlock(props) {
                 @Override
@@ -568,6 +589,7 @@ public class BlockFactory implements IBlockFactory {
                 protected void affectNeighborsAfterRemoval(BlockState state, ServerLevel level, BlockPos pos, boolean isMoving) {
                     onBlockRemoved(level, pos, state);
                     super.affectNeighborsAfterRemoval(state, level, pos, isMoving);
+                    updateNeighborsAfterPoweringDown(level, pos, state);
                 }
                 @Override
                 protected int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos, Direction direction) {
@@ -620,6 +642,10 @@ public class BlockFactory implements IBlockFactory {
             };
         } else if (def.isSmokeVent()) {
             return new SmokeVentBlock(props) {
+                @Override
+                public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
+                    onAnimateTick(state, level, pos);
+                }
                 @Override
                 protected BlockState updateShape(BlockState state, LevelReader level, ScheduledTickAccess tickAccess, BlockPos pos, Direction direction, BlockPos adjacentPos, BlockState adjacentState, RandomSource random) {
                     return onUpdateShape(state, direction, adjacentState, level, pos, adjacentPos);
@@ -1026,6 +1052,21 @@ public class BlockFactory implements IBlockFactory {
                 @Override
                 protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
                     return onInteract(level, pos, state, player, InteractionHand.MAIN_HAND, hit);
+                }
+                @Override
+                protected BlockState updateShape(BlockState state, LevelReader level, ScheduledTickAccess tickAccess, BlockPos pos, Direction direction, BlockPos adjacentPos, BlockState adjacentState, RandomSource random) {
+                    if (!level.isClientSide() && level instanceof Level lvl) {
+                        com.kingodogo.buildscape.pipe.transport.HollowPipeTransportManager.onNeighborChanged(lvl, pos, state, adjacentPos);
+                    }
+                    return super.updateShape(state, level, tickAccess, pos, direction, adjacentPos, adjacentState, random);
+                }
+                @Override
+                protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, @Nullable Orientation orientation, boolean isMoving) {
+                    super.neighborChanged(state, level, pos, block, orientation, isMoving);
+                    // 26.x passes an orientation instead of the changed position, so check every side (main passes the real fromPos).
+                    for (Direction side : Direction.values()) {
+                        onNeighborUpdate(level, pos, state, block, pos.relative(side), isMoving);
+                    }
                 }
                 @Override
                 public boolean canPlaceLiquid(@Nullable LivingEntity entity, BlockGetter level, BlockPos pos, BlockState state, Fluid fluid) {
@@ -1473,6 +1514,7 @@ public class BlockFactory implements IBlockFactory {
             props.lightLevel(state -> state.getValue(BigOrnamentBlock.LIT) ? (tinted ? 4 : 15) : 0);
             if (tinted) props.dynamicShape();
             return new BigOrnamentBlock(props, tinted) {
+                @Override protected int getLightDampening(BlockState state) { return isTinted() ? 0 : super.getLightDampening(state); }
                 public Integer getBeaconColorMultiplier(BlockState state, LevelReader level, BlockPos pos, BlockPos beaconPos) {
                     return getBeaconColor(state, level, pos, beaconPos);
                 }
@@ -1496,6 +1538,7 @@ public class BlockFactory implements IBlockFactory {
             if (tinted) props.dynamicShape();
             return new OrnamentBlock(props, tinted) {
                 public Integer getBeaconColorMultiplier(BlockState state, LevelReader level, BlockPos pos, BlockPos beaconPos) { return getBeaconColor(state, level, pos, beaconPos); }
+                @Override protected int getLightDampening(BlockState state) { return isTinted() ? 0 : super.getLightDampening(state); }
                 @Override protected BlockState updateShape(BlockState state, LevelReader level, ScheduledTickAccess tickAccess, BlockPos pos, Direction direction, BlockPos adjacentPos, BlockState adjacentState, RandomSource random) { if (state.getValue(WATERLOGGED)) tickAccess.scheduleTick(pos, net.minecraft.world.level.material.Fluids.WATER, net.minecraft.world.level.material.Fluids.WATER.getTickDelay(level)); if (!canSurvive(state, level, pos)) tickAccess.scheduleTick(pos, this, 1); return super.updateShape(state, level, tickAccess, pos, direction, adjacentPos, adjacentState, random); }
                 @Override protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) { return onInteract(level, pos, state, player, hand, hit); }
                 @Override protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) { return onInteract(level, pos, state, player, InteractionHand.MAIN_HAND, hit); }
@@ -1558,7 +1601,7 @@ public class BlockFactory implements IBlockFactory {
                     if (state.getValue(WATERLOGGED)) {
                         scheduledTicks.scheduleTick(pos, net.minecraft.world.level.material.Fluids.WATER, net.minecraft.world.level.material.Fluids.WATER.getTickDelay(level));
                     }
-                    return GlowLightsBlock.updateGlowLightShape(state, direction, neighborState, level, neighborPos);
+                    return MulticolorGlowLightsBlock.updateMulticolorShape(state, direction, neighborState, level, neighborPos);
                 }
                 @Override
                 protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
@@ -2408,6 +2451,13 @@ public class BlockFactory implements IBlockFactory {
             props.mapColor(resolveMapColor(cp.getMapColor()));
         }
         return props;
+    }
+    private SoundType referenceControlSound(BlockDefinition def) {
+        String id = def.getId();
+        if (id.startsWith("flaming_steel")) return SoundType.NETHERITE_BLOCK;
+        if (id.startsWith("steel_")) return SoundType.COPPER;
+        if (id.startsWith("pale_oak_") || id.startsWith("poplar_")) return SoundType.WOOD;
+        return resolveSoundType(def.getProperties().getSound());
     }
     private SoundType resolveSoundType(String sound) {
         if (sound == null) return SoundType.STONE;

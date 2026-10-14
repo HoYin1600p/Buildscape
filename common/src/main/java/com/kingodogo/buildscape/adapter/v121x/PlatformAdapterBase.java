@@ -781,6 +781,70 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
     }
 
     @Override
+    public void renderFillBox(com.mojang.blaze3d.vertex.PoseStack poseStack, Object bufferSource, double minX, double minY, double minZ, double maxX, double maxY, double maxZ, float r, float g, float b, float a) {
+        ClientAccess.renderFillBox(poseStack, bufferSource, minX, minY, minZ, maxX, maxY, maxZ, r, g, b, a);
+    }
+
+    @Override
+    public Object getItemModel(ItemStack stack, Level level, int seed) {
+        return ClientAccess.getItemModel(stack, level, seed);
+    }
+
+    @Override
+    public boolean isGui3dModel(Object model) {
+        return ClientAccess.isGui3dModel(model);
+    }
+
+    @Override
+    public void applyMobState(Entity entity, Object mobState) {
+        com.kingodogo.buildscape.adapter.v121x.client.ClientPillarEntities.applyMobState(entity, mobState);
+    }
+
+    @Override
+    public Entity createMobPillarEntity(ItemStack egg, Level level, net.minecraft.core.BlockPos pos, Object mobState) {
+        return com.kingodogo.buildscape.adapter.v121x.client.ClientPillarEntities.createMob(egg, level, pos, mobState);
+    }
+
+    @Override
+    public Entity createArmorStandEntity(Level level, double x, double y, double z) {
+        return com.kingodogo.buildscape.adapter.v121x.client.ClientPillarEntities.createArmorStand(level, x, y, z);
+    }
+
+    @Override
+    public void setupArmorStand(Entity entity) {
+        com.kingodogo.buildscape.adapter.v121x.client.ClientPillarEntities.setupArmorStand(entity);
+    }
+
+    @Override
+    public void updateArmorStand(Entity entity, ItemStack stack, net.minecraft.world.entity.EquipmentSlot slot, boolean isStandItem) {
+        com.kingodogo.buildscape.adapter.v121x.client.ClientPillarEntities.updateArmorStand(entity, stack, slot, isStandItem);
+    }
+
+    @Override
+    public boolean isArmor(ItemStack stack) {
+        return stack != null && stack.getItem() instanceof net.minecraft.world.item.ArmorItem
+                && !(stack.getItem() instanceof net.minecraft.world.item.AnimalArmorItem);
+    }
+
+    @Override
+    public boolean isSwordLike(ItemStack stack) {
+        if (stack == null || stack.isEmpty()) return false;
+        net.minecraft.world.item.Item item = stack.getItem();
+        return item instanceof net.minecraft.world.item.SwordItem
+                || item instanceof net.minecraft.world.item.TridentItem
+                || item instanceof net.minecraft.world.item.ShovelItem;
+    }
+
+    @Override
+    public boolean isAxeLike(ItemStack stack) {
+        if (stack == null || stack.isEmpty()) return false;
+        net.minecraft.world.item.Item item = stack.getItem();
+        return item instanceof net.minecraft.world.item.AxeItem
+                || item instanceof net.minecraft.world.item.PickaxeItem
+                || item instanceof net.minecraft.world.item.HoeItem;
+    }
+
+    @Override
     public void renderItemFixed(ItemStack stack, com.mojang.blaze3d.vertex.PoseStack poseStack, Object bufferSource, int combinedLight, int combinedOverlay, Object model) {
         ClientAccess.renderItemFixed(stack, poseStack, bufferSource, combinedLight, combinedOverlay, model);
     }

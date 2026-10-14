@@ -419,6 +419,36 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
+    public Item createHomemakerSpawnEggItem(Item.Properties properties, boolean festive) {
+        EntityType<? extends net.minecraft.world.entity.Mob> type =
+                (EntityType<? extends net.minecraft.world.entity.Mob>) (festive
+                        ? getFestiveWanderingHomemakerEntityType() : getWanderingHomemakerEntityType());
+        return new SpawnEggItem(type, festive ? 0x990000 : 0x5c3c24, festive ? 0x009900 : 0xe4b484, properties) {
+            @Override public int getColor(int tintIndex) { return -1; }
+
+            @Override
+            public void appendHoverText(ItemStack stack, @javax.annotation.Nullable Level level, List<Component> tooltip, net.minecraft.world.item.TooltipFlag flag) {
+                super.appendHoverText(stack, level, tooltip, flag);
+                tooltip.add(new TranslatableComponent("tooltip.buildscape." + (festive
+                        ? "festive_wandering_homemaker_spawn_egg" : "wandering_homemaker_spawn_egg") + ".spawn_info"));
+                if (level != null) {
+                    long remaining = com.kingodogo.buildscape.client.HomemakerCooldownTracker.cooldownEndTime
+                            - System.currentTimeMillis();
+                    if (remaining > 0) {
+                        long seconds = remaining / 1000;
+                        tooltip.add(new TranslatableComponent("tooltip.buildscape.wandering_homemaker_spawn_egg.cooldown_active",
+                                seconds / 60, seconds % 60).withStyle(net.minecraft.ChatFormatting.RED));
+                    } else {
+                        tooltip.add(new TranslatableComponent("tooltip.buildscape.wandering_homemaker_spawn_egg.cooldown_ready")
+                                .withStyle(net.minecraft.ChatFormatting.GREEN));
+                    }
+                }
+            }
+        };
+    }
+
+    @Override
     public Entity createBoatEntity(Level level, double x, double y, double z) {
         return new PoplarBoatEntityImpl(level, x, y, z);
     }
@@ -2464,7 +2494,7 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
     }
 
     @Override
-    public void renderFilledBox(com.mojang.blaze3d.vertex.PoseStack poseStack, Object bufferSource, double minX, double minY, double minZ, double maxX, double maxY, double maxZ, float r, float g, float b, float a) {
+    public void renderFillBox(com.mojang.blaze3d.vertex.PoseStack poseStack, Object bufferSource, double minX, double minY, double minZ, double maxX, double maxY, double maxZ, float r, float g, float b, float a) {
         if (bufferSource instanceof net.minecraft.client.renderer.MultiBufferSource mbs) {
             com.mojang.blaze3d.vertex.VertexConsumer buffer = mbs.getBuffer(net.minecraft.client.renderer.RenderType.lightning());
             com.mojang.math.Matrix4f pose = poseStack.last().pose();

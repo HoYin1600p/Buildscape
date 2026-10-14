@@ -472,10 +472,6 @@ public interface IPlatformAdapter {
     void renderModelPart(net.minecraft.client.model.geom.ModelPart part, com.mojang.blaze3d.vertex.PoseStack poseStack, com.mojang.blaze3d.vertex.VertexConsumer buffer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha);
     int getRenderDistanceChunks();
     void renderLineBox(com.mojang.blaze3d.vertex.PoseStack poseStack, Object bufferSource, double minX, double minY, double minZ, double maxX, double maxY, double maxZ, float r, float g, float b, float a);
-
-    /** Translucent filled box (1.18.2 only so far; other versions draw the outline alone). */
-    default void renderFilledBox(com.mojang.blaze3d.vertex.PoseStack poseStack, Object bufferSource, double minX, double minY, double minZ, double maxX, double maxY, double maxZ, float r, float g, float b, float a) {
-    }
     boolean isScreenOpen();
     net.minecraft.world.phys.Vec3 getCameraPosition(net.minecraft.client.Camera camera);
     void renderFallingIcicleBlock(net.minecraft.world.level.Level level, net.minecraft.world.level.block.state.BlockState blockState, net.minecraft.core.BlockPos blockPos, net.minecraft.core.BlockPos startPos, com.mojang.blaze3d.vertex.PoseStack poseStack, Object bufferSource);
@@ -509,6 +505,10 @@ public interface IPlatformAdapter {
     }
 
     default void renderEntity(net.minecraft.world.entity.Entity entity, double x, double y, double z, float yaw, float partialTicks, com.mojang.blaze3d.vertex.PoseStack poseStack, Object bufferSource, int packedLight) {
+    }
+
+    /** Translucent filled box in camera-relative coordinates; versions without an implementation draw nothing. */
+    default void renderFillBox(com.mojang.blaze3d.vertex.PoseStack poseStack, Object bufferSource, double minX, double minY, double minZ, double maxX, double maxY, double maxZ, float r, float g, float b, float a) {
     }
 
     default com.mojang.blaze3d.vertex.VertexConsumer getTranslucentBuffer(Object bufferSource) {

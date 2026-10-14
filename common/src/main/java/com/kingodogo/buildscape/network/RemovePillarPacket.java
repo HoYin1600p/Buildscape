@@ -19,6 +19,14 @@ public class RemovePillarPacket implements CommonPacket {
         this.pillarIds = new ArrayList<>(pillarIds);
     }
 
+    public RemovePillarPacket(String pillarId) {
+        this(java.util.Collections.singletonList(pillarId));
+    }
+
+    public RemovePillarPacket(java.util.Collection<String> pillarIds) {
+        this(new ArrayList<>(pillarIds));
+    }
+
     public RemovePillarPacket(FriendlyByteBuf buf) {
         int size = NetworkPacketLimits.readCount(buf, NetworkPacketLimits.MAX_PILLARS, "pillar id");
         this.pillarIds = new ArrayList<>(size);
@@ -58,6 +66,7 @@ public class RemovePillarPacket implements CommonPacket {
         boolean changed = manager.removePillars(pillarIds);
         if (changed) {
             manager.syncAllLoadedPillars(com.kingodogo.buildscape.platform.Services.PLATFORM.getServer(serverPlayer));
+            SyncPillarIdsPacket.sendToAll(manager.getAllPillarDataForSync());
         }
     }
 }

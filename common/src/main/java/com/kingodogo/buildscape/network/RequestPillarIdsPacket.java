@@ -13,7 +13,7 @@ public class RequestPillarIdsPacket implements CommonPacket {
     public static final CommonId ID = new CommonId("buildscape", "request_pillar_ids");
 
     private static final String LAST_REQUEST_TIME = "BuildScapePillarSyncRequestTime";
-    private static final long REQUEST_COOLDOWN_MS = 5_000L;
+    private static final long REQUEST_COOLDOWN_MS = 250L;
 
     public RequestPillarIdsPacket() {}
 

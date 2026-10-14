@@ -1480,6 +1480,13 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
     }
 
     @Override
+    public void hurtGenericDamage(LivingEntity entity, float amount) {
+        if (entity != null) {
+            entity.hurt(DamageSource.GENERIC, amount);
+        }
+    }
+
+    @Override
     public void hurtFreezeDamage(LivingEntity entity, float amount) {
         if (entity != null) {
             entity.hurt(DamageSource.FREEZE, amount);

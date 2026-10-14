@@ -17,7 +17,11 @@ import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-public abstract class GlazedGlassBlock extends HalfTransparentBlock {
+public abstract class GlazedGlassBlock extends HalfTransparentBlock implements net.minecraft.world.level.block.BeaconBeamBlock {
+
+    /** Marks the block as a beam colour source for vanilla's scan (Fabric); the real colour comes from {@link #getBeaconColor}. */
+    @Override
+    public net.minecraft.world.item.DyeColor getColor() { return net.minecraft.world.item.DyeColor.WHITE; }
 
     public static final EnumProperty<Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
 

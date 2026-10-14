@@ -138,6 +138,9 @@ public final class WanderingHomemakerSpawningLogic {
 
             long cooldownEnd = currentTime + 1800000L;
             data.putLong("WanderingHomemakerCooldownRealTime", cooldownEnd);
+            if (player instanceof ServerPlayer serverPlayer) {
+                com.kingodogo.buildscape.network.PacketFactory.sendToPlayer(serverPlayer, new com.kingodogo.buildscape.network.SyncHomemakerCooldownPacket(cooldownEnd));
+            }
         }
     }
 }

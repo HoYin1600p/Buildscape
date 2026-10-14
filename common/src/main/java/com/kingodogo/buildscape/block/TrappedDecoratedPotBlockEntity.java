@@ -13,7 +13,7 @@ public class TrappedDecoratedPotBlockEntity extends DecoratedPotBlockEntity {
         super(ModBlockEntities.TRAPPED_DECORATED_POT_TYPE, worldPosition, blockState);
     }
     public static int maxStoredCount(ItemStack stack) {
-        return stack.getItem() instanceof SpawnEggItem ? 1 : stack.getMaxStackSize();
+        return com.kingodogo.buildscape.platform.Services.PLATFORM.isSpawnEgg(stack) ? 1 : stack.getMaxStackSize();
     }
 
     @Override
@@ -30,7 +30,7 @@ public class TrappedDecoratedPotBlockEntity extends DecoratedPotBlockEntity {
     public void dropContents(net.minecraft.world.level.Level level, BlockPos pos) {
         if (!level.isClientSide() && !this.isEmpty()) {
             ItemStack stored = this.getStoredItem().copy();
-            if (stored.getItem() instanceof SpawnEggItem && level instanceof ServerLevel serverLevel) {
+            if (com.kingodogo.buildscape.platform.Services.PLATFORM.isSpawnEgg(stored) && level instanceof ServerLevel serverLevel) {
                 com.kingodogo.buildscape.platform.Services.PLATFORM.spawnMobFromEgg(serverLevel, pos, stored);
             } else {
                 Containers.dropItemStack(level, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, stored);

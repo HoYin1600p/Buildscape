@@ -523,6 +523,10 @@ public interface IPlatformAdapter {
         return false;
     }
 
+    default boolean isSpawnEgg(net.minecraft.world.item.ItemStack stack) {
+        return stack.getItem() instanceof net.minecraft.world.item.SpawnEggItem;
+    }
+
     default boolean isElytra(net.minecraft.world.item.ItemStack stack) {
         return stack != null && stack.is(net.minecraft.world.item.Items.ELYTRA);
     }

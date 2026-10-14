@@ -943,8 +943,8 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         int closeBtnX = headerX + headerW - closeBtnSize - 5;
         int closeBtnY = headerY + 5;
         boolean hoverClose = mouseX >= closeBtnX && mouseX <= closeBtnX + closeBtnSize && mouseY >= closeBtnY && mouseY <= closeBtnY + closeBtnSize;
-        drawBeveledButton(poseStackOrGraphics, closeBtnX, closeBtnY, closeBtnSize, closeBtnSize, hoverClose ? 0xFF383844 : 0xFF202026, hoverClose, false, alpha);
-        Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "✕", closeBtnX + closeBtnSize / 2, closeBtnY + 3, applyAlpha(hoverClose ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
+        drawBeveledButton(poseStackOrGraphics, closeBtnX, closeBtnY, closeBtnSize, closeBtnSize, hoverClose ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverClose, false, alpha);
+        drawCenteredText(poseStackOrGraphics, font, "✕", closeBtnX + closeBtnSize / 2, closeBtnY + 3, applyAlpha(hoverClose ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
 
         // 5. Layout Sidenav & Content Container (with distinct 7px chassis margin)
         updateNavAnimation();
@@ -976,11 +976,6 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
             int dockX = frameRight + dockGap;
             int slideOffset = (int) ((1.0f - sidePanelProgress) * (sidePanelTargetW + dockGap + 10));
             int sidePanelX = dockX - slideOffset;
-
-            // Mechanical connector bridges across the gap between main frame and side panel
-            if (sidePanelX > frameRight - 4) {
-                renderDockingBridges(poseStackOrGraphics, frameRight, sidePanelX, sidePanelY, sidePanelH, alpha);
-            }
 
             enableGuiScissor(poseStackOrGraphics, frameRight, 0, Math.max(1, width - frameRight), height);
             renderSidePanel(poseStackOrGraphics, font, sidePanelX, sidePanelY, sidePanelTargetW, sidePanelH, mouseX, mouseY, alpha);
@@ -1083,10 +1078,10 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
         if (navAnimProgress > 0.4f) {
             float toggleAlpha = alpha * Math.min(1.0f, (navAnimProgress - 0.4f) / 0.6f);
-            Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "◀ Collapse", toggleX + toggleW / 2, toggleY + 4, applyAlpha(hoverToggle ? COLOR_TEXT_WHITE : COLOR_TEXT_MUTED, toggleAlpha));
+            drawCenteredText(poseStackOrGraphics, font, "◀ Collapse", toggleX + toggleW / 2, toggleY + 4, applyAlpha(hoverToggle ? COLOR_TEXT_WHITE : COLOR_TEXT_MUTED, toggleAlpha));
         } else {
             float toggleAlpha = alpha * Math.min(1.0f, (1.0f - navAnimProgress / 0.4f));
-            Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "▶", toggleX + toggleW / 2, toggleY + 4, applyAlpha(hoverToggle ? COLOR_TEXT_WHITE : COLOR_TEXT_MUTED, toggleAlpha));
+            drawCenteredText(poseStackOrGraphics, font, "▶", toggleX + toggleW / 2, toggleY + 4, applyAlpha(hoverToggle ? COLOR_TEXT_WHITE : COLOR_TEXT_MUTED, toggleAlpha));
         }
 
         disableGuiScissor(poseStackOrGraphics);
@@ -1217,31 +1212,31 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         int cycleX = x + 44;
         boolean hoverCycle = mouseX >= cycleX && mouseX <= cycleX + cycleW && mouseY >= cycleY && mouseY <= cycleY + btnH;
         drawBeveledButton(poseStackOrGraphics, cycleX, cycleY, cycleW, btnH, hoverCycle ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverCycle, false, alpha);
-        Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "‹ " + currentPresetName + " ›", cycleX + cycleW / 2, cycleY + 3, applyAlpha(hoverCycle ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
+        drawCenteredText(poseStackOrGraphics, font, "‹ " + currentPresetName + " ›", cycleX + cycleW / 2, cycleY + 3, applyAlpha(hoverCycle ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
 
         int applyW = 38;
         int applyX = cycleX + cycleW + 4;
         boolean hoverApply = mouseX >= applyX && mouseX <= applyX + applyW && mouseY >= cycleY && mouseY <= cycleY + btnH;
         drawBeveledGreenButton(poseStackOrGraphics, applyX, cycleY, applyW, btnH, hoverApply, alpha);
-        Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "Apply", applyX + applyW / 2, cycleY + 3, applyAlpha(hoverApply ? 0xFFFFFFFF : COLOR_TOGGLE_ON_TEXT, alpha));
+        drawCenteredText(poseStackOrGraphics, font, "Apply", applyX + applyW / 2, cycleY + 3, applyAlpha(hoverApply ? (currentTheme.isLight() ? 0xFF14532D : 0xFFFFFFFF) : COLOR_TOGGLE_ON_TEXT, alpha));
 
         int saveW = 36;
         int saveX = applyX + applyW + 4;
         boolean hoverSave = mouseX >= saveX && mouseX <= saveX + saveW && mouseY >= cycleY && mouseY <= cycleY + btnH;
         drawBeveledButton(poseStackOrGraphics, saveX, cycleY, saveW, btnH, hoverSave ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverSave, false, alpha);
-        Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "Save", saveX + saveW / 2, cycleY + 3, applyAlpha(hoverSave ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
+        drawCenteredText(poseStackOrGraphics, font, "Save", saveX + saveW / 2, cycleY + 3, applyAlpha(hoverSave ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
 
         int newW = 38;
         int newX = saveX + saveW + 4;
         boolean hoverNew = mouseX >= newX && mouseX <= newX + newW && mouseY >= cycleY && mouseY <= cycleY + btnH;
         drawBeveledButton(poseStackOrGraphics, newX, cycleY, newW, btnH, hoverNew ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverNew, false, alpha);
-        Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "+ New", newX + newW / 2, cycleY + 3, applyAlpha(hoverNew ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
+        drawCenteredText(poseStackOrGraphics, font, "+ New", newX + newW / 2, cycleY + 3, applyAlpha(hoverNew ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
 
         int defW = 54;
         int defX = x + w - defW - 8;
         boolean hoverDef = mouseX >= defX && mouseX <= defX + defW && mouseY >= cycleY && mouseY <= cycleY + btnH;
         drawBeveledButton(poseStackOrGraphics, defX, cycleY, defW, btnH, hoverDef ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverDef, false, alpha);
-        Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "↺ Reset", defX + defW / 2, cycleY + 3, applyAlpha(hoverDef ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
+        drawCenteredText(poseStackOrGraphics, font, "↺ Reset", defX + defW / 2, cycleY + 3, applyAlpha(hoverDef ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
 
         curY += bar1H + 2;
 
@@ -1256,14 +1251,14 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         boolean hoverSub0 = mouseX >= sub0X && mouseX <= sub0X + subBtnW && mouseY >= subY && mouseY <= subY + subBtnH;
         drawBeveledButton(poseStackOrGraphics, sub0X, subY, subBtnW, subBtnH, isSub0 ? COLOR_BTN_BG_ACTIVE : COLOR_BTN_BG, hoverSub0, isSub0, alpha);
         String sub0Label = "▦ Display Items (" + cachedActiveItems.size() + ")";
-        Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, sub0Label, sub0X + subBtnW / 2, subY + 3, applyAlpha(isSub0 ? COLOR_TEXT_WHITE : COLOR_TEXT_MUTED, alpha));
+        drawCenteredText(poseStackOrGraphics, font, sub0Label, sub0X + subBtnW / 2, subY + 3, applyAlpha(isSub0 ? COLOR_TEXT_WHITE : COLOR_TEXT_MUTED, alpha));
 
         int sub1X = sub0X + subBtnW + 6;
         boolean isSub1 = (itemsSubTab == 1);
         boolean hoverSub1 = mouseX >= sub1X && mouseX <= sub1X + subBtnW && mouseY >= subY && mouseY <= subY + subBtnH;
         drawBeveledButton(poseStackOrGraphics, sub1X, subY, subBtnW, subBtnH, isSub1 ? COLOR_BTN_BG_ACTIVE : COLOR_BTN_BG, hoverSub1, isSub1, alpha);
         String sub1Label = "🏷 Display Tags (" + cachedActiveTags.size() + ")";
-        Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, sub1Label, sub1X + subBtnW / 2, subY + 3, applyAlpha(isSub1 ? COLOR_TEXT_WHITE : COLOR_TEXT_MUTED, alpha));
+        drawCenteredText(poseStackOrGraphics, font, sub1Label, sub1X + subBtnW / 2, subY + 3, applyAlpha(isSub1 ? COLOR_TEXT_WHITE : COLOR_TEXT_MUTED, alpha));
 
         curY += bar2H + 2;
 
@@ -1289,7 +1284,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                 boolean hoverPill = mouseX >= px && mouseX <= px + pillW && mouseY >= pillY && mouseY <= pillY + pillH;
                 drawBeveledButton(poseStackOrGraphics, px, pillY, pillW, pillH, isF ? COLOR_BTN_BG_ACTIVE : COLOR_BTN_BG, hoverPill, isF, alpha);
                 int pText = isF ? COLOR_TEXT_WHITE : (hoverPill ? COLOR_TEXT_SILVER : COLOR_TEXT_MUTED);
-                Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, filterLabels[f], px + pillW / 2, pillY + 3, applyAlpha(pText, alpha));
+                drawCenteredText(poseStackOrGraphics, font, filterLabels[f], px + pillW / 2, pillY + 3, applyAlpha(pText, alpha));
             }
         } else {
             int chipCount = TAG_CATEGORY_CHIPS.length;
@@ -1302,7 +1297,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                 boolean hoverChip = mouseX >= cx && mouseX <= cx + chipW && mouseY >= chipY && mouseY <= chipY + chipH;
                 drawBeveledButton(poseStackOrGraphics, cx, chipY, chipW, chipH, isC ? COLOR_BTN_BG_ACTIVE : COLOR_BTN_BG, hoverChip, isC, alpha);
                 int cText = isC ? COLOR_TEXT_WHITE : (hoverChip ? COLOR_TEXT_SILVER : COLOR_TEXT_MUTED);
-                Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, TAG_CATEGORY_CHIPS[c], cx + chipW / 2, chipY + 3, applyAlpha(cText, alpha));
+                drawCenteredText(poseStackOrGraphics, font, TAG_CATEGORY_CHIPS[c], cx + chipW / 2, chipY + 3, applyAlpha(cText, alpha));
             }
         }
 
@@ -1445,9 +1440,9 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                 int emblemSize = 14;
                 int emblemX = rowX + 5;
                 int emblemY = rowY + (tagRowH - emblemSize) / 2;
-                int embCol = isActive ? 0xFF4ADE80 : COLOR_TEXT_SILVER;
-                drawBeveledButton(poseStackOrGraphics, emblemX, emblemY, emblemSize, emblemSize, isActive ? 0xFF1A3820 : COLOR_BTN_BG, false, isActive, alpha);
-                Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "#", emblemX + emblemSize / 2, emblemY + 3, applyAlpha(embCol, alpha));
+                int embCol = isActive ? (currentTheme.isLight() ? 0xFF15803D : 0xFF4ADE80) : COLOR_TEXT_SILVER;
+                drawBeveledButton(poseStackOrGraphics, emblemX, emblemY, emblemSize, emblemSize, isActive ? (currentTheme.isLight() ? 0xFFDCFCE7 : 0xFF1A3820) : COLOR_BTN_BG, false, isActive, alpha);
+                drawCenteredText(poseStackOrGraphics, font, "#", emblemX + emblemSize / 2, emblemY + 3, applyAlpha(embCol, alpha));
 
                 // Tag Name
                 int textCol = isActive ? COLOR_TEXT_WHITE : (hover ? COLOR_TEXT_SILVER : COLOR_TEXT_MUTED);
@@ -1460,7 +1455,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                 int countX = rowX + rowW - countW - 52;
                 int countY = rowY + (tagRowH - 12) / 2;
                 drawBeveledButton(poseStackOrGraphics, countX, countY, countW, 12, COLOR_SLOT_BG, false, false, alpha);
-                Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, countStr, countX + countW / 2, countY + 2, applyAlpha(COLOR_TEXT_MUTED, alpha));
+                drawCenteredText(poseStackOrGraphics, font, countStr, countX + countW / 2, countY + 2, applyAlpha(COLOR_TEXT_MUTED, alpha));
 
                 // Toggle Button [ ON ] / [ OFF ]
                 int tBtnW = 42;
@@ -1472,7 +1467,8 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                 } else {
                     drawBeveledButton(poseStackOrGraphics, tBtnX, tBtnY, tBtnW, tBtnH, COLOR_TOGGLE_OFF_BG, hover, false, alpha);
                 }
-                Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, isActive ? "ON" : "OFF", tBtnX + tBtnW / 2, tBtnY + 3, applyAlpha(isActive ? COLOR_TOGGLE_ON_TEXT : COLOR_TOGGLE_OFF_TEXT, alpha));
+                int tBtnTextCol = isActive ? (hover ? (currentTheme.isLight() ? 0xFF14532D : 0xFFFFFFFF) : COLOR_TOGGLE_ON_TEXT) : (hover ? (currentTheme.isLight() ? 0xFF1E293B : 0xFFFFFFFF) : COLOR_TOGGLE_OFF_TEXT);
+                drawCenteredText(poseStackOrGraphics, font, isActive ? "ON" : "OFF", tBtnX + tBtnW / 2, tBtnY + 3, applyAlpha(tBtnTextCol, alpha));
             }
             disableGuiScissor(poseStackOrGraphics);
 
@@ -1561,7 +1557,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         int relX = x + 6;
         boolean hoverRel = mouseX >= relX && mouseX <= relX + relW && mouseY >= barY && mouseY <= barY + btnH;
         drawBeveledButton(poseStackOrGraphics, relX, barY, relW, btnH, hoverRel ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverRel, false, alpha);
-        Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "⟳ Reload", relX + relW / 2, barY + 3, applyAlpha(hoverRel ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
+        drawCenteredText(poseStackOrGraphics, font, "⟳ Reload", relX + relW / 2, barY + 3, applyAlpha(hoverRel ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
 
         // [ ✕ Remove Selected (<N>) ]
         int selCount = selectedPillarIds.size();
@@ -1569,35 +1565,35 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         int remSelX = relX + relW + 4;
         boolean hasSel = selCount > 0;
         boolean hoverRemSel = hasSel && mouseX >= remSelX && mouseX <= remSelX + remSelW && mouseY >= barY && mouseY <= barY + btnH;
-        int remSelBg = hasSel ? (hoverRemSel ? 0xFF3D1616 : 0xFF241414) : COLOR_BTN_BG;
+        int remSelBg = hasSel ? (hoverRemSel ? (currentTheme.isLight() ? 0xFFFEE2E2 : 0xFF3D1616) : (currentTheme.isLight() ? 0xFFF1F5F9 : 0xFF241414)) : COLOR_BTN_BG;
         drawBeveledButton(poseStackOrGraphics, remSelX, barY, remSelW, btnH, remSelBg, hoverRemSel, false, alpha);
         String remSelLabel = hasSel ? ("✕ Remove (" + selCount + ")") : "✕ Remove Selected";
-        int remSelTextCol = hasSel ? (hoverRemSel ? 0xFFFFFFFF : 0xFFE05050) : COLOR_TEXT_MUTED;
-        Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, remSelLabel, remSelX + remSelW / 2, barY + 3, applyAlpha(remSelTextCol, alpha));
+        int remSelTextCol = hasSel ? (hoverRemSel ? (currentTheme.isLight() ? 0xFFDC2626 : 0xFFFFFFFF) : 0xFFE05050) : COLOR_TEXT_MUTED;
+        drawCenteredText(poseStackOrGraphics, font, remSelLabel, remSelX + remSelW / 2, barY + 3, applyAlpha(remSelTextCol, alpha));
 
         // [ ✕ Remove All ]
         int remAllW = 75;
         int remAllX = remSelX + remSelW + 4;
         boolean hasAny = !pillarList.isEmpty();
         boolean hoverRemAll = hasAny && mouseX >= remAllX && mouseX <= remAllX + remAllW && mouseY >= barY && mouseY <= barY + btnH;
-        int remAllBg = hasAny ? (hoverRemAll ? 0xFF3D1616 : 0xFF241414) : COLOR_BTN_BG;
+        int remAllBg = hasAny ? (hoverRemAll ? (currentTheme.isLight() ? 0xFFFEE2E2 : 0xFF3D1616) : (currentTheme.isLight() ? 0xFFF1F5F9 : 0xFF241414)) : COLOR_BTN_BG;
         drawBeveledButton(poseStackOrGraphics, remAllX, barY, remAllW, btnH, remAllBg, hoverRemAll, false, alpha);
-        int remAllTextCol = hasAny ? (hoverRemAll ? 0xFFFFFFFF : 0xFFE05050) : COLOR_TEXT_MUTED;
-        Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "✕ Remove All", remAllX + remAllW / 2, barY + 3, applyAlpha(remAllTextCol, alpha));
+        int remAllTextCol = hasAny ? (hoverRemAll ? (currentTheme.isLight() ? 0xFFDC2626 : 0xFFFFFFFF) : 0xFFE05050) : COLOR_TEXT_MUTED;
+        drawCenteredText(poseStackOrGraphics, font, "✕ Remove All", remAllX + remAllW / 2, barY + 3, applyAlpha(remAllTextCol, alpha));
 
         // [ ✓ Save ]
         int saveW = 50;
         int saveX = remAllX + remAllW + 4;
         boolean hoverSave = mouseX >= saveX && mouseX <= saveX + saveW && mouseY >= barY && mouseY <= barY + btnH;
         drawBeveledGreenButton(poseStackOrGraphics, saveX, barY, saveW, btnH, hoverSave, alpha);
-        Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "✓ Save", saveX + saveW / 2, barY + 3, applyAlpha(hoverSave ? 0xFFFFFFFF : COLOR_TOGGLE_ON_TEXT, alpha));
+        drawCenteredText(poseStackOrGraphics, font, "✓ Save", saveX + saveW / 2, barY + 3, applyAlpha(hoverSave ? (currentTheme.isLight() ? 0xFF14532D : 0xFFFFFFFF) : COLOR_TOGGLE_ON_TEXT, alpha));
 
         // Right Count Badge
         String badgeText = pillarList.size() + (pillarList.size() == 1 ? " Pillar Placed" : " Pillars Placed");
         int badgeW = font.width(badgeText) + 10;
         int badgeX = x + w - badgeW - 6;
         drawBeveledButton(poseStackOrGraphics, badgeX, barY, badgeW, btnH, COLOR_BTN_BG, false, false, alpha);
-        Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, badgeText, badgeX + badgeW / 2, barY + 3, applyAlpha(COLOR_TEXT_SILVER, alpha));
+        drawCenteredText(poseStackOrGraphics, font, badgeText, badgeX + badgeW / 2, barY + 3, applyAlpha(COLOR_TEXT_SILVER, alpha));
 
         curY += bar1H + 2;
 
@@ -1639,15 +1635,15 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         curColX += idColW + gap;
 
         // ITEM Header
-        Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "ITEM", curColX + iconColW / 2, curY + 4, applyAlpha(COLOR_TEXT_SILVER, alpha));
+        drawCenteredText(poseStackOrGraphics, font, "ITEM", curColX + iconColW / 2, curY + 4, applyAlpha(COLOR_TEXT_SILVER, alpha));
         curColX += iconColW + gap;
 
         // COLORS Header
-        Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "COLORS", curColX + colorsColW / 2, curY + 4, applyAlpha(COLOR_TEXT_SILVER, alpha));
+        drawCenteredText(poseStackOrGraphics, font, "COLORS", curColX + colorsColW / 2, curY + 4, applyAlpha(COLOR_TEXT_SILVER, alpha));
         curColX += colorsColW + gap;
 
         // DIMENSION Header
-        Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "DIMENSION", curColX + dimColW / 2, curY + 4, applyAlpha(COLOR_TEXT_SILVER, alpha));
+        drawCenteredText(poseStackOrGraphics, font, "DIMENSION", curColX + dimColW / 2, curY + 4, applyAlpha(COLOR_TEXT_SILVER, alpha));
         curColX += dimColW + gap;
 
         // COORDINATES Header (X, Y, Z colored)
@@ -1660,7 +1656,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         curColX += coordsColW + gap;
 
         // ACTIONS Header
-        Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "ACTIONS", curColX + actionsColW / 2, curY + 4, applyAlpha(COLOR_TEXT_SILVER, alpha));
+        drawCenteredText(poseStackOrGraphics, font, "ACTIONS", curColX + actionsColW / 2, curY + 4, applyAlpha(COLOR_TEXT_SILVER, alpha));
 
         curY += headH + 3;
 
@@ -1681,8 +1677,8 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         if (pillarList.isEmpty()) {
             int emptyY = startY + 8;
             drawBeveledButton(poseStackOrGraphics, colX, emptyY, availW, 36, COLOR_ROW_BG, false, false, alpha);
-            Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "No placed pillars found in world.", colX + availW / 2, emptyY + 8, applyAlpha(COLOR_TEXT_SILVER, alpha));
-            Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "Place and customize pillar columns to synchronize their IDs.", colX + availW / 2, emptyY + 20, applyAlpha(COLOR_TEXT_MUTED, alpha));
+            drawCenteredText(poseStackOrGraphics, font, "No placed pillars found in world.", colX + availW / 2, emptyY + 8, applyAlpha(COLOR_TEXT_SILVER, alpha));
+            drawCenteredText(poseStackOrGraphics, font, "Place and customize pillar columns to synchronize their IDs.", colX + availW / 2, emptyY + 20, applyAlpha(COLOR_TEXT_MUTED, alpha));
         } else {
             for (int r = 0; r < pillarList.size(); r++) {
                 PillarIdManager.PillarData data = pillarList.get(r);
@@ -1727,7 +1723,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                         Services.PLATFORM.renderGuiItem(poseStackOrGraphics, dispStack, iconStartX + 18, iconY);
                     }
                 } else {
-                    Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "—", rcX + iconColW / 2, rowY + 8, applyAlpha(COLOR_TEXT_MUTED, alpha));
+                    drawCenteredText(poseStackOrGraphics, font, "—", rcX + iconColW / 2, rowY + 8, applyAlpha(COLOR_TEXT_MUTED, alpha));
                 }
                 rcX += iconColW + gap;
 
@@ -1751,13 +1747,13 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                         drawBorder(poseStackOrGraphics, swX, swY, swSize, swSize, applyAlpha(0xFF000000, alpha));
                     }
                 } else {
-                    Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "—", rcX + colorsColW / 2, rowY + 8, applyAlpha(COLOR_TEXT_MUTED, alpha));
+                    drawCenteredText(poseStackOrGraphics, font, "—", rcX + colorsColW / 2, rowY + 8, applyAlpha(COLOR_TEXT_MUTED, alpha));
                 }
                 rcX += colorsColW + gap;
 
                 // DIMENSION Column
                 String dimName = formatDimensionName(data.dimension);
-                Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, font.plainSubstrByWidth(dimName, dimColW - 2), rcX + dimColW / 2, rowY + 8, applyAlpha(COLOR_TEXT_MUTED, alpha));
+                drawCenteredText(poseStackOrGraphics, font, font.plainSubstrByWidth(dimName, dimColW - 2), rcX + dimColW / 2, rowY + 8, applyAlpha(COLOR_TEXT_MUTED, alpha));
                 rcX += dimColW + gap;
 
                 // COORDINATES Column (colored X, Y, Z)
@@ -1782,13 +1778,15 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                 int editX = rcX + 2;
                 boolean hoverEdit = mouseX >= editX && mouseX <= editX + editW && mouseY >= actY && mouseY <= actY + actH;
                 drawBeveledButton(poseStackOrGraphics, editX, actY, editW, actH, hoverEdit ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverEdit, false, alpha);
-                Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "✎ Edit", editX + editW / 2, actY + 2, applyAlpha(hoverEdit ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
+                drawCenteredText(poseStackOrGraphics, font, "✎ Edit", editX + editW / 2, actY + 2, applyAlpha(hoverEdit ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
 
                 int delW = 16;
                 int delX = editX + editW + 4;
                 boolean hoverDel = mouseX >= delX && mouseX <= delX + delW && mouseY >= actY && mouseY <= actY + actH;
-                drawBeveledButton(poseStackOrGraphics, delX, actY, delW, actH, hoverDel ? 0xFF3D1616 : 0xFF241414, hoverDel, false, alpha);
-                Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "✕", delX + delW / 2, actY + 2, applyAlpha(hoverDel ? 0xFFFFFFFF : 0xFFE05050, alpha));
+                int delBg = hoverDel ? (currentTheme.isLight() ? 0xFFFEE2E2 : 0xFF3D1616) : (currentTheme.isLight() ? 0xFFF1F5F9 : 0xFF241414);
+                drawBeveledButton(poseStackOrGraphics, delX, actY, delW, actH, delBg, hoverDel, false, alpha);
+                int delTextCol = hoverDel ? (currentTheme.isLight() ? 0xFFDC2626 : 0xFFFFFFFF) : 0xFFE05050;
+                drawCenteredText(poseStackOrGraphics, font, "✕", delX + delW / 2, actY + 2, applyAlpha(delTextCol, alpha));
             }
         }
 
@@ -1827,7 +1825,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         int backX = x + 6;
         boolean hoverBack = mouseX >= backX && mouseX <= backX + backW && mouseY >= barY && mouseY <= barY + btnH;
         drawBeveledButton(poseStackOrGraphics, backX, barY, backW, btnH, hoverBack ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverBack, false, alpha);
-        Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "◀ Back", backX + backW / 2, barY + 3, applyAlpha(hoverBack ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
+        drawCenteredText(poseStackOrGraphics, font, "◀ Back", backX + backW / 2, barY + 3, applyAlpha(hoverBack ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
 
         // Title: Pillar ID + coords badge
         String titleText = "Pillar: " + data.id;
@@ -1841,7 +1839,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         int saveX = x + w - saveW - 6;
         boolean hoverSave = mouseX >= saveX && mouseX <= saveX + saveW && mouseY >= barY && mouseY <= barY + btnH;
         drawBeveledGreenButton(poseStackOrGraphics, saveX, barY, saveW, btnH, hoverSave, alpha);
-        Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "✓ Save Pillar", saveX + saveW / 2, barY + 3, applyAlpha(hoverSave ? 0xFFFFFFFF : COLOR_TOGGLE_ON_TEXT, alpha));
+        drawCenteredText(poseStackOrGraphics, font, "✓ Save Pillar", saveX + saveW / 2, barY + 3, applyAlpha(hoverSave ? 0xFFFFFFFF : COLOR_TOGGLE_ON_TEXT, alpha));
 
         curY += bar1H + 3;
 
@@ -2001,9 +1999,10 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         int closeX = modalX + modalW - closeSize - 10;
         int closeY = modalY + 7;
         boolean hoverClose = mouseX >= closeX && mouseX <= closeX + closeSize && mouseY >= closeY && mouseY <= closeY + closeSize;
-        Services.PLATFORM.fill(poseStackOrGraphics, closeX, closeY, closeX + closeSize, closeY + closeSize, applyAlpha(hoverClose ? 0xFF3D1616 : 0xFF241414, alpha));
-        drawBorder(poseStackOrGraphics, closeX, closeY, closeSize, closeSize, applyAlpha(hoverClose ? 0xFFE05050 : 0xFF882828, alpha));
-        Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "✕", closeX + closeSize / 2, closeY + 3, applyAlpha(hoverClose ? 0xFFFFFFFF : 0xFFE05050, alpha));
+        int closeBg = hoverClose ? (currentTheme.isLight() ? 0xFFFEE2E2 : 0xFF3D1616) : (currentTheme.isLight() ? 0xFFF1F5F9 : 0xFF241414);
+        drawBeveledButton(poseStackOrGraphics, closeX, closeY, closeSize, closeSize, closeBg, hoverClose, false, alpha);
+        int closeCol = hoverClose ? (currentTheme.isLight() ? 0xFFDC2626 : 0xFFFFFFFF) : 0xFFE05050;
+        drawCenteredText(poseStackOrGraphics, font, "✕", closeX + closeSize / 2, closeY + 3, applyAlpha(closeCol, alpha));
 
         // 1. 2D Saturation x Brightness Draggable Box
         int gradBoxX = modalX + 16;
@@ -2081,9 +2080,9 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         int applyX = modalX + modalW - applyW - 16;
         int applyY = modalY + modalH - applyH - 12;
         boolean hoverApply = mouseX >= applyX && mouseX <= applyX + applyW && mouseY >= applyY && mouseY <= applyY + applyH;
-        Services.PLATFORM.fill(poseStackOrGraphics, applyX, applyY, applyX + applyW, applyY + applyH, applyAlpha(hoverApply ? 0xFF1C3C22 : COLOR_TOGGLE_ON_BG, alpha));
-        drawBorder(poseStackOrGraphics, applyX, applyY, applyW, applyH, applyAlpha(COLOR_TOGGLE_ON_BORDER, alpha));
-        Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "✓ Apply Color", applyX + applyW / 2, applyY + 4, applyAlpha(COLOR_TOGGLE_ON_TEXT, alpha));
+        drawBeveledGreenButton(poseStackOrGraphics, applyX, applyY, applyW, applyH, hoverApply, alpha);
+        int applyTextCol = hoverApply ? (currentTheme.isLight() ? 0xFF14532D : 0xFFFFFFFF) : COLOR_TOGGLE_ON_TEXT;
+        drawCenteredText(poseStackOrGraphics, font, "✓ Apply Color", applyX + applyW / 2, applyY + 4, applyAlpha(applyTextCol, alpha));
     }
 
     // --- Vault Hunters Border & Bevel Engine (Expanded Chassis Gap & Metallic Gradient) ---
@@ -2139,7 +2138,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
         // 3. 1-Pixel Wide Metallic Gradient Highlight (Top & Left) & Shadow (Bottom & Right)
         drawHorizontalGradientLine(poseStackOrGraphics, x + 1, y + 1, w - 2, COLOR_BORDER_GRADIENT_START, COLOR_BORDER_GRADIENT_END, alpha);
-        Services.PLATFORM.fill(poseStackOrGraphics, x + 1, y + 1, x + 2, y + h - 1, applyAlpha(COLOR_BORDER_GRADIENT_START, alpha));
+        drawVerticalGradientLine(poseStackOrGraphics, x + 1, y + 1, h - 2, COLOR_BORDER_GRADIENT_START, COLOR_BORDER_SHADOW, alpha);
         int shadow = applyAlpha(COLOR_BORDER_SHADOW, alpha);
         Services.PLATFORM.fill(poseStackOrGraphics, x + 1, y + h - 2, x + w - 1, y + h - 2, shadow);
         Services.PLATFORM.fill(poseStackOrGraphics, x + w - 2, y + 1, x + w - 1, y + h - 1, shadow);
@@ -2158,48 +2157,6 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         Services.PLATFORM.fill(poseStackOrGraphics, x + 4, y + h - 5, x + w - 4, y + h - 4, sideBevelHighlight);
         Services.PLATFORM.fill(poseStackOrGraphics, x + w - 5, y + 4, x + w - 4, y + h - 4, sideBevelHighlight);
         Services.PLATFORM.fill(poseStackOrGraphics, x + 4, y + 4, x + 5, y + h - 4, sideBevelShadow);
-    }
-
-    private void renderDockingBridges(Object poseStackOrGraphics, int frameRight, int sidePanelX, int sidePanelY, int sidePanelH, float alpha) {
-        int bridgeLeft = frameRight - 2;
-        int bridgeRight = sidePanelX + 2;
-        if (bridgeRight <= bridgeLeft) return;
-        int bridgeW = bridgeRight - bridgeLeft;
-        int bridgeH = 12;
-
-        int bY1 = sidePanelY + 30;
-        int bY2 = sidePanelY + sidePanelH - 44;
-
-        int black = applyAlpha(COLOR_FRAME_BLACK, alpha);
-        int fill = applyAlpha(COLOR_CHASSIS_BODY, alpha);
-        int topHighlight = applyAlpha(COLOR_BORDER_GRADIENT_START, alpha);
-        int bottomShadow = applyAlpha(COLOR_BORDER_SHADOW, alpha);
-
-        // Top Connector Bridge
-        Services.PLATFORM.fill(poseStackOrGraphics, bridgeLeft, bY1, bridgeRight, bY1 + bridgeH, fill);
-        Services.PLATFORM.fill(poseStackOrGraphics, bridgeLeft, bY1, bridgeRight, bY1 + 1, topHighlight);
-        Services.PLATFORM.fill(poseStackOrGraphics, bridgeLeft, bY1 + bridgeH - 1, bridgeRight, bY1 + bridgeH, bottomShadow);
-        drawBorder(poseStackOrGraphics, bridgeLeft, bY1, bridgeW, bridgeH, black);
-
-        // Bottom Connector Bridge
-        Services.PLATFORM.fill(poseStackOrGraphics, bridgeLeft, bY2, bridgeRight, bY2 + bridgeH, fill);
-        Services.PLATFORM.fill(poseStackOrGraphics, bridgeLeft, bY2, bridgeRight, bY2 + 1, topHighlight);
-        Services.PLATFORM.fill(poseStackOrGraphics, bridgeLeft, bY2 + bridgeH - 1, bridgeRight, bY2 + bridgeH, bottomShadow);
-        drawBorder(poseStackOrGraphics, bridgeLeft, bY2, bridgeW, bridgeH, black);
-
-        // Central mounting pin / rivet if gap is visible (>= 4px)
-        int gapW = sidePanelX - frameRight;
-        if (gapW >= 4) {
-            int midX = (frameRight + sidePanelX) / 2;
-            int pinCol = applyAlpha(0xFF7E8496, alpha);
-            int pinSheen = applyAlpha(0xFFDDE0EC, alpha);
-
-            Services.PLATFORM.fill(poseStackOrGraphics, midX - 1, bY1 + 4, midX + 2, bY1 + 8, pinCol);
-            Services.PLATFORM.fill(poseStackOrGraphics, midX, bY1 + 5, midX + 1, bY1 + 7, pinSheen);
-
-            Services.PLATFORM.fill(poseStackOrGraphics, midX - 1, bY2 + 4, midX + 2, bY2 + 8, pinCol);
-            Services.PLATFORM.fill(poseStackOrGraphics, midX, bY2 + 5, midX + 1, bY2 + 7, pinSheen);
-        }
     }
 
     private void renderSidePanel(Object poseStackOrGraphics, Font font, int x, int y, int w, int h, int mouseX, int mouseY, float alpha) {
@@ -2233,8 +2190,10 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         int closeX = sHeadX + sHeadW - closeSize - 4;
         int closeY = sHeadY + 4;
         boolean hoverClose = mouseX >= closeX && mouseX <= closeX + closeSize && mouseY >= closeY && mouseY <= closeY + closeSize;
-        drawBeveledButton(poseStackOrGraphics, closeX, closeY, closeSize, closeSize, hoverClose ? 0xFF3D1616 : 0xFF241414, hoverClose, false, alpha);
-        Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "✕", closeX + closeSize / 2, closeY + 3, applyAlpha(hoverClose ? 0xFFFFFFFF : 0xFFE05050, alpha));
+        int closeBg = hoverClose ? (currentTheme.isLight() ? 0xFFFEE2E2 : 0xFF3D1616) : (currentTheme.isLight() ? 0xFFF1F5F9 : 0xFF241414);
+        drawBeveledButton(poseStackOrGraphics, closeX, closeY, closeSize, closeSize, closeBg, hoverClose, false, alpha);
+        int closeCol = hoverClose ? (currentTheme.isLight() ? 0xFFDC2626 : 0xFFFFFFFF) : 0xFFE05050;
+        drawCenteredText(poseStackOrGraphics, font, "✕", closeX + closeSize / 2, closeY + 3, applyAlpha(closeCol, alpha));
 
         // 3. Content Area
         int sContentX = x + 6;
@@ -2253,7 +2212,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         PillarIdManager.PillarData data = PillarIdManager.getClient().getPillarData(selectedPillarDetailId);
         if (data == null) {
             drawBeveledComponent(poseStackOrGraphics, x, y, w, h, COLOR_INNER_DARK, alpha);
-            Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "No pillar selected", x + w / 2, y + h / 2 - 4, applyAlpha(COLOR_TEXT_MUTED, alpha));
+            drawCenteredText(poseStackOrGraphics, font, "No pillar selected", x + w / 2, y + h / 2 - 4, applyAlpha(COLOR_TEXT_MUTED, alpha));
             return;
         }
 
@@ -2273,7 +2232,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         String dimStr = formatDimensionName(data.dimension);
         String locStr = String.format("%s · %d, %d, %d", dimStr, data.x, data.y, data.z);
         drawBeveledButton(poseStackOrGraphics, rowX, curY, rowW, 15, COLOR_BTN_BG, false, false, alpha);
-        Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, font.plainSubstrByWidth(locStr, rowW - 4), rowX + rowW / 2, curY + 4, applyAlpha(COLOR_TEXT_SILVER, alpha));
+        drawCenteredText(poseStackOrGraphics, font, font.plainSubstrByWidth(locStr, rowW - 4), rowX + rowW / 2, curY + 4, applyAlpha(COLOR_TEXT_SILVER, alpha));
         curY += 15 + rowGap;
 
         // Row 1: Custom Pattern Toggle
@@ -2315,13 +2274,13 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         int btnH = 16;
         boolean hoverSave = mouseX >= rowX && mouseX <= rowX + rowW && mouseY >= curY && mouseY <= curY + btnH;
         drawBeveledGreenButton(poseStackOrGraphics, rowX, curY, rowW, btnH, hoverSave, alpha);
-        Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "✓ Save Pillar", rowX + rowW / 2, curY + 4, applyAlpha(hoverSave ? 0xFFFFFFFF : COLOR_TOGGLE_ON_TEXT, alpha));
+        drawCenteredText(poseStackOrGraphics, font, "✓ Save Pillar", rowX + rowW / 2, curY + 4, applyAlpha(hoverSave ? (currentTheme.isLight() ? 0xFF14532D : 0xFFFFFFFF) : COLOR_TOGGLE_ON_TEXT, alpha));
         curY += btnH + rowGap;
 
         // Row 8: Locate in World
         boolean hoverLoc = mouseX >= rowX && mouseX <= rowX + rowW && mouseY >= curY && mouseY <= curY + btnH;
         drawBeveledButton(poseStackOrGraphics, rowX, curY, rowW, btnH, hoverLoc ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverLoc, false, alpha);
-        Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "⌖ Locate in World", rowX + rowW / 2, curY + 4, applyAlpha(hoverLoc ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
+        drawCenteredText(poseStackOrGraphics, font, "⌖ Locate in World", rowX + rowW / 2, curY + 4, applyAlpha(hoverLoc ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
     }
 
     private void renderSidePanelColorPicker(Object poseStackOrGraphics, Font font, int x, int y, int w, int h, int mouseX, int mouseY, float alpha) {
@@ -2408,13 +2367,13 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         int btnH = 16;
         boolean hoverApply = mouseX >= gradX && mouseX <= gradX + btnW && mouseY >= curY && mouseY <= curY + btnH;
         drawBeveledGreenButton(poseStackOrGraphics, gradX, curY, btnW, btnH, hoverApply, alpha);
-        Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "✓ Apply Color", gradX + btnW / 2, curY + 4, applyAlpha(hoverApply ? 0xFFFFFFFF : COLOR_TOGGLE_ON_TEXT, alpha));
+        drawCenteredText(poseStackOrGraphics, font, "✓ Apply Color", gradX + btnW / 2, curY + 4, applyAlpha(hoverApply ? (currentTheme.isLight() ? 0xFF14532D : 0xFFFFFFFF) : COLOR_TOGGLE_ON_TEXT, alpha));
         curY += btnH + 4;
 
         if (returnSidePanelType == SidePanelType.PILLAR_DETAIL) {
             boolean hoverBack = mouseX >= gradX && mouseX <= gradX + btnW && mouseY >= curY && mouseY <= curY + btnH;
             drawBeveledButton(poseStackOrGraphics, gradX, curY, btnW, btnH, hoverBack ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverBack, false, alpha);
-            Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "◀ Back to Pillar", gradX + btnW / 2, curY + 4, applyAlpha(hoverBack ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
+            drawCenteredText(poseStackOrGraphics, font, "◀ Back to Pillar", gradX + btnW / 2, curY + 4, applyAlpha(hoverBack ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
         }
     }
 
@@ -2433,8 +2392,8 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         } else {
             drawBeveledRedButton(poseStackOrGraphics, btnX, btnY, btnW, btnH, hover, alpha);
         }
-        int textCol = val ? (hover ? 0xFFFFFFFF : COLOR_TOGGLE_ON_TEXT) : (hover ? 0xFFFFFFFF : COLOR_TOGGLE_OFF_TEXT);
-        Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, val ? "ON" : "OFF", btnX + btnW / 2, btnY + 4, applyAlpha(textCol, alpha));
+        int textCol = val ? (hover ? (currentTheme.isLight() ? 0xFF14532D : 0xFFFFFFFF) : COLOR_TOGGLE_ON_TEXT) : (hover ? (currentTheme.isLight() ? 0xFF1E293B : 0xFFFFFFFF) : COLOR_TOGGLE_OFF_TEXT);
+        drawCenteredText(poseStackOrGraphics, font, val ? "ON" : "OFF", btnX + btnW / 2, btnY + 4, applyAlpha(textCol, alpha));
     }
 
     private void renderSideRowCycle(Object poseStackOrGraphics, Font font, int x, int y, int w, int h, String label, String value, int mouseX, int mouseY, float alpha) {
@@ -2447,7 +2406,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         int btnY = y + (h - btnH) / 2;
         boolean hover = mouseX >= btnX && mouseX <= btnX + btnW && mouseY >= btnY && mouseY <= btnY + btnH;
         drawBeveledButton(poseStackOrGraphics, btnX, btnY, btnW, btnH, hover ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hover, false, alpha);
-        Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, font.plainSubstrByWidth(value, btnW - 4), btnX + btnW / 2, btnY + 4, applyAlpha(hover ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
+        drawCenteredText(poseStackOrGraphics, font, font.plainSubstrByWidth(value, btnW - 4), btnX + btnW / 2, btnY + 4, applyAlpha(hover ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
     }
 
     private void renderSideRowCounter(Object poseStackOrGraphics, Font font, int x, int y, int w, int h, String label, String value, int mouseX, int mouseY, float alpha) {
@@ -2462,18 +2421,18 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
         boolean hoverMinus = mouseX >= counterX && mouseX <= counterX + stepW && mouseY >= counterY && mouseY <= counterY + counterH;
         drawBeveledButton(poseStackOrGraphics, counterX, counterY, stepW, counterH, hoverMinus ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverMinus, false, alpha);
-        Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "−", counterX + stepW / 2, counterY + 4, applyAlpha(COLOR_TEXT_WHITE, alpha));
+        drawCenteredText(poseStackOrGraphics, font, "−", counterX + stepW / 2, counterY + 4, applyAlpha(COLOR_TEXT_WHITE, alpha));
 
         int valX = counterX + stepW;
         int valW = counterW - stepW * 2;
         Services.PLATFORM.fill(poseStackOrGraphics, valX, counterY, valX + valW, counterY + counterH, applyAlpha(COLOR_SLOT_BG, alpha));
         drawBorder(poseStackOrGraphics, valX, counterY, valW, counterH, applyAlpha(COLOR_SLOT_BORDER, alpha));
-        Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, value, valX + valW / 2, counterY + 4, applyAlpha(COLOR_TEXT_WHITE, alpha));
+        drawCenteredText(poseStackOrGraphics, font, value, valX + valW / 2, counterY + 4, applyAlpha(COLOR_TEXT_WHITE, alpha));
 
         int plusX = counterX + counterW - stepW;
         boolean hoverPlus = mouseX >= plusX && mouseX <= plusX + stepW && mouseY >= counterY && mouseY <= counterY + counterH;
         drawBeveledButton(poseStackOrGraphics, plusX, counterY, stepW, counterH, hoverPlus ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverPlus, false, alpha);
-        Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "+", plusX + stepW / 2, counterY + 4, applyAlpha(COLOR_TEXT_WHITE, alpha));
+        drawCenteredText(poseStackOrGraphics, font, "+", plusX + stepW / 2, counterY + 4, applyAlpha(COLOR_TEXT_WHITE, alpha));
     }
 
     private void renderSideRowPalette(Object poseStackOrGraphics, Font font, int x, int y, int w, int h, List<String> colors, int maxColors, int mouseX, int mouseY, float alpha) {
@@ -2488,18 +2447,18 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
         boolean hoverMinus = mouseX >= counterX && mouseX <= counterX + stepW && mouseY >= counterY && mouseY <= counterY + counterH;
         drawBeveledButton(poseStackOrGraphics, counterX, counterY, stepW, counterH, hoverMinus ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverMinus, false, alpha);
-        Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "−", counterX + stepW / 2, counterY + 3, applyAlpha(COLOR_TEXT_WHITE, alpha));
+        drawCenteredText(poseStackOrGraphics, font, "−", counterX + stepW / 2, counterY + 3, applyAlpha(COLOR_TEXT_WHITE, alpha));
 
         int valX = counterX + stepW;
         int valW = counterW - stepW * 2;
         Services.PLATFORM.fill(poseStackOrGraphics, valX, counterY, valX + valW, counterY + counterH, applyAlpha(COLOR_SLOT_BG, alpha));
         drawBorder(poseStackOrGraphics, valX, counterY, valW, counterH, applyAlpha(COLOR_SLOT_BORDER, alpha));
-        Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, String.valueOf(maxColors), valX + valW / 2, counterY + 3, applyAlpha(COLOR_TEXT_WHITE, alpha));
+        drawCenteredText(poseStackOrGraphics, font, String.valueOf(maxColors), valX + valW / 2, counterY + 3, applyAlpha(COLOR_TEXT_WHITE, alpha));
 
         int plusX = counterX + counterW - stepW;
         boolean hoverPlus = mouseX >= plusX && mouseX <= plusX + stepW && mouseY >= counterY && mouseY <= counterY + counterH;
         drawBeveledButton(poseStackOrGraphics, plusX, counterY, stepW, counterH, hoverPlus ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverPlus, false, alpha);
-        Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "+", plusX + stepW / 2, counterY + 3, applyAlpha(COLOR_TEXT_WHITE, alpha));
+        drawCenteredText(poseStackOrGraphics, font, "+", plusX + stepW / 2, counterY + 3, applyAlpha(COLOR_TEXT_WHITE, alpha));
 
         int swSize = 13;
         int swGap = 4;
@@ -2704,8 +2663,8 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         } else {
             drawBeveledRedButton(poseStackOrGraphics, btnX, btnY, btnW, btnH, hoverBtn, alpha);
         }
-        int textCol = value ? (hoverBtn ? 0xFFFFFFFF : COLOR_TOGGLE_ON_TEXT) : (hoverBtn ? 0xFFFFFFFF : COLOR_TOGGLE_OFF_TEXT);
-        Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, value ? "ON" : "OFF", btnX + btnW / 2, btnY + 4, applyAlpha(textCol, alpha));
+        int textCol = value ? (hoverBtn ? (currentTheme.isLight() ? 0xFF14532D : 0xFFFFFFFF) : COLOR_TOGGLE_ON_TEXT) : (hoverBtn ? (currentTheme.isLight() ? 0xFF1E293B : 0xFFFFFFFF) : COLOR_TOGGLE_OFF_TEXT);
+        drawCenteredText(poseStackOrGraphics, font, value ? "ON" : "OFF", btnX + btnW / 2, btnY + 4, applyAlpha(textCol, alpha));
     }
 
     private void renderConfigRowCycle(Object poseStackOrGraphics, Font font, int x, int y, int w, int h, int clipY, int clipH, String label, String desc, String currentVal, int mouseX, int mouseY, float alpha) {
@@ -2719,7 +2678,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
         boolean hoverBtn = mouseX >= btnX && mouseX <= btnX + btnW && mouseY >= btnY && mouseY <= btnY + btnH;
         drawBeveledButton(poseStackOrGraphics, btnX, btnY, btnW, btnH, hoverBtn ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverBtn, false, alpha);
-        Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "‹ " + currentVal + " ›", btnX + btnW / 2, btnY + 3, applyAlpha(hoverBtn ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
+        drawCenteredText(poseStackOrGraphics, font, "‹ " + currentVal + " ›", btnX + btnW / 2, btnY + 3, applyAlpha(hoverBtn ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
     }
 
     private void renderConfigRowCounter(Object poseStackOrGraphics, Font font, int x, int y, int w, int h, int clipY, int clipH, String label, String desc, String valText, int mouseX, int mouseY, float alpha) {
@@ -2734,18 +2693,18 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
         boolean hoverMinus = mouseX >= counterX && mouseX <= counterX + stepBtnW && mouseY >= counterY && mouseY <= counterY + counterH;
         drawBeveledButton(poseStackOrGraphics, counterX, counterY, stepBtnW, counterH, hoverMinus ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverMinus, false, alpha);
-        Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "−", counterX + stepBtnW / 2, counterY + 4, applyAlpha(COLOR_TEXT_WHITE, alpha));
+        drawCenteredText(poseStackOrGraphics, font, "−", counterX + stepBtnW / 2, counterY + 4, applyAlpha(hoverMinus ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
 
         int valX = counterX + stepBtnW;
         int valW = counterW - stepBtnW * 2;
         Services.PLATFORM.fill(poseStackOrGraphics, valX, counterY, valX + valW, counterY + counterH, applyAlpha(COLOR_SLOT_BG, alpha));
         drawBorder(poseStackOrGraphics, valX, counterY, valW, counterH, applyAlpha(COLOR_SLOT_BORDER, alpha));
-        Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, valText, valX + valW / 2, counterY + 4, applyAlpha(COLOR_TEXT_WHITE, alpha));
+        drawCenteredText(poseStackOrGraphics, font, valText, valX + valW / 2, counterY + 4, applyAlpha(COLOR_TEXT_WHITE, alpha));
 
         int plusX = counterX + counterW - stepBtnW;
         boolean hoverPlus = mouseX >= plusX && mouseX <= plusX + stepBtnW && mouseY >= counterY && mouseY <= counterY + counterH;
         drawBeveledButton(poseStackOrGraphics, plusX, counterY, stepBtnW, counterH, hoverPlus ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverPlus, false, alpha);
-        Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "+", plusX + stepBtnW / 2, counterY + 4, applyAlpha(COLOR_TEXT_WHITE, alpha));
+        drawCenteredText(poseStackOrGraphics, font, "+", plusX + stepBtnW / 2, counterY + 4, applyAlpha(hoverPlus ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
     }
 
     private void renderConfigRowButton(Object poseStackOrGraphics, Font font, int x, int y, int w, int h, int clipY, int clipH, String label, String desc, String btnText, int mouseX, int mouseY, float alpha) {
@@ -2759,7 +2718,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
         boolean hoverBtn = mouseX >= btnX && mouseX <= btnX + btnW && mouseY >= btnY && mouseY <= btnY + btnH;
         drawBeveledButton(poseStackOrGraphics, btnX, btnY, btnW, btnH, hoverBtn ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverBtn, false, alpha);
-        Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, btnText, btnX + btnW / 2, btnY + 3, applyAlpha(hoverBtn ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
+        drawCenteredText(poseStackOrGraphics, font, btnText, btnX + btnW / 2, btnY + 3, applyAlpha(hoverBtn ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
     }
 
     private void renderConfigRowBadge(Object poseStackOrGraphics, Font font, int x, int y, int w, int h, int clipY, int clipH, String label, String desc, String badgeText, float alpha) {
@@ -2774,7 +2733,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
         Services.PLATFORM.fill(poseStackOrGraphics, badgeX, badgeY, badgeX + badgeW, badgeY + badgeH, applyAlpha(COLOR_SLOT_BG, alpha));
         drawBorder(poseStackOrGraphics, badgeX, badgeY, badgeW, badgeH, applyAlpha(COLOR_SLOT_BORDER, alpha));
-        Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, badgeText, badgeX + badgeW / 2, badgeY + 3, applyAlpha(COLOR_TEXT_SILVER, alpha));
+        drawCenteredText(poseStackOrGraphics, font, badgeText, badgeX + badgeW / 2, badgeY + 3, applyAlpha(COLOR_TEXT_SILVER, alpha));
     }
 
     private void renderConfigRowPalette(Object poseStackOrGraphics, Font font, int x, int y, int w, int h, int clipY, int clipH, String label, List<String> colors, int maxColors, int mouseX, int mouseY, float alpha) {
@@ -2789,18 +2748,18 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
         boolean hoverMinus = mouseX >= counterX && mouseX <= counterX + stepBtnW && mouseY >= counterY && mouseY <= counterY + counterH;
         drawBeveledButton(poseStackOrGraphics, counterX, counterY, stepBtnW, counterH, hoverMinus ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverMinus, false, alpha);
-        Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "−", counterX + stepBtnW / 2, counterY + 4, applyAlpha(COLOR_TEXT_WHITE, alpha));
+        drawCenteredText(poseStackOrGraphics, font, "−", counterX + stepBtnW / 2, counterY + 4, applyAlpha(hoverMinus ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
 
         int valX = counterX + stepBtnW;
         int valW = counterW - stepBtnW * 2;
         Services.PLATFORM.fill(poseStackOrGraphics, valX, counterY, valX + valW, counterY + counterH, applyAlpha(COLOR_SLOT_BG, alpha));
         drawBorder(poseStackOrGraphics, valX, counterY, valW, counterH, applyAlpha(COLOR_SLOT_BORDER, alpha));
-        Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, String.valueOf(maxColors), valX + valW / 2, counterY + 4, applyAlpha(COLOR_TEXT_WHITE, alpha));
+        drawCenteredText(poseStackOrGraphics, font, String.valueOf(maxColors), valX + valW / 2, counterY + 4, applyAlpha(COLOR_TEXT_WHITE, alpha));
 
         int plusX = counterX + counterW - stepBtnW;
         boolean hoverPlus = mouseX >= plusX && mouseX <= plusX + stepBtnW && mouseY >= counterY && mouseY <= counterY + counterH;
         drawBeveledButton(poseStackOrGraphics, plusX, counterY, stepBtnW, counterH, hoverPlus ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, hoverPlus, false, alpha);
-        Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "+", plusX + stepBtnW / 2, counterY + 4, applyAlpha(COLOR_TEXT_WHITE, alpha));
+        drawCenteredText(poseStackOrGraphics, font, "+", plusX + stepBtnW / 2, counterY + 4, applyAlpha(hoverPlus ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
 
         // Clickable Swatches: all 7 slots
         int swatchSize = 13;

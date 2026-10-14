@@ -3001,81 +3001,35 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
         int black = applyAlpha(COLOR_FRAME_BLACK, alpha);
         int shadow = applyAlpha(COLOR_BORDER_SHADOW, alpha);
-        int band = applyAlpha(COLOR_CHASSIS_BAND, alpha);
         int bShadow = applyAlpha(COLOR_BEVEL_SHADOW, alpha);
         int bHighlight = applyAlpha(COLOR_BEVEL_HIGHLIGHT, alpha);
 
-        // A. Seamless U-Shaped Bevel on the Main Panel (Cradling the bottom of the logo badge)
-        int padX = 4;
-        int padBottom = 5;
-        int uLeft = crestX - padX;
-        int uRight = crestX + crestW + padX - 1;
-        int uBottom = crestY + crestH + padBottom;
-
-        // 1. Recessed backing and dark interior fill under the crest on the main panel (starting at frameY + 4 to preserve top shelf)
-        Services.PLATFORM.fill(poseStackOrGraphics, uLeft, frameY + 4, uRight + 1, uBottom + 1, applyAlpha(COLOR_CHASSIS_BODY, alpha));
-        Services.PLATFORM.fill(poseStackOrGraphics, uLeft + 4, frameY + 4, uRight - 3, uBottom - 4, applyAlpha(COLOR_INNER_DARK, alpha));
-
-        // 2. Layer 0: 1px Black Border along the U (Left down, Bottom across, Right up)
-        Services.PLATFORM.fill(poseStackOrGraphics, uLeft, frameY + 4, uLeft + 1, uBottom + 1, black);
-        Services.PLATFORM.fill(poseStackOrGraphics, uLeft, uBottom, uRight + 1, uBottom + 1, black);
-        Services.PLATFORM.fill(poseStackOrGraphics, uRight, frameY + 4, uRight + 1, uBottom + 1, black);
-
-        // 3. Layer 1: 1px Metallic Gradient & Shadow along the U (EXACT SAME CONTINUOUS GRADIENT AS MAIN PANEL)
-        float tLeft = (float) (uLeft - frameX) / (float) Math.max(1, frameW - 3);
-        float tRight = (float) (uRight - frameX) / (float) Math.max(1, frameW - 3);
-        int cCornerLeft = lerpColor(COLOR_BORDER_GRADIENT_START, COLOR_BORDER_GRADIENT_END, tLeft);
-        int cCornerRight = lerpColor(COLOR_BORDER_GRADIENT_START, COLOR_BORDER_GRADIENT_END, tRight);
-
-        // U-Left vertical: turns 90° down from under the top band (uLeft + 1, frameY + 4) down to (uLeft + 1, uBottom - 1)
-        Services.PLATFORM.fill(poseStackOrGraphics, uLeft + 1, frameY + 4, uLeft + 2, uBottom, applyAlpha(cCornerLeft, alpha));
-
-        // U-Bottom horizontal shelf: turns 90° across from (uLeft + 1, uBottom - 1) to (uRight - 1, uBottom - 1)
-        int shelfW = (uRight - 1) - (uLeft + 1) + 1;
-        drawHorizontalGradientLine(poseStackOrGraphics, uLeft + 1, uBottom - 1, shelfW, cCornerLeft, cCornerRight, alpha);
-
-        // U-Right vertical: turns 90° up from (uRight - 1, uBottom - 1) up to (uRight - 1, frameY + 4)
-        Services.PLATFORM.fill(poseStackOrGraphics, uRight - 1, frameY + 4, uRight, uBottom, applyAlpha(cCornerRight, alpha));
-
-        // 4. Layer 2 & 3: Outer Chassis Band (offset 2 to 3) along the U (2 grayish lines)
-        for (int o = 2; o <= 3; o++) {
-            Services.PLATFORM.fill(poseStackOrGraphics, uLeft + o, frameY + 4, uLeft + o + 1, uBottom - o + 1, band);
-            Services.PLATFORM.fill(poseStackOrGraphics, uLeft + o, uBottom - o, uRight - o + 1, uBottom - o + 1, band);
-            Services.PLATFORM.fill(poseStackOrGraphics, uRight - o, frameY + 4, uRight - o + 1, uBottom - o + 1, band);
-        }
-
-        // 5. Layer 4: Stepped Bevel Shadow along bottom shelf
-        Services.PLATFORM.fill(poseStackOrGraphics, uLeft + 4, uBottom - 4, uRight - 3, uBottom - 3, bShadow);
-
-        // B. Top Center Crest Badge (Buildscape Logo Holder) - Clean, standalone, NO surrounding bevel in the air!
-        // 1. Solid Outer Chassis Body
+        // 1. Solid Outer Chassis Body Fill
         Services.PLATFORM.fill(poseStackOrGraphics, crestX, crestY, crestX + crestW, crestY + crestH, applyAlpha(COLOR_CHASSIS_BODY, alpha));
 
-        // 2. 1px Black Border Outline
+        // 2. 1px Black Border Outline (Single continuous 1px black line throughout)
         drawBorder(poseStackOrGraphics, crestX, crestY, crestW, crestH, black);
 
-        // 3. Top & Left Metallic Gradient Highlights
+        // 3. Layer 1: Outer metallic highlight (top & left) & shadow (bottom & right)
         drawHorizontalGradientLine(poseStackOrGraphics, crestX + 1, crestY + 1, crestW - 2, COLOR_BORDER_GRADIENT_START, COLOR_BORDER_GRADIENT_END, alpha);
         drawVerticalGradientLine(poseStackOrGraphics, crestX + 1, crestY + 1, crestH - 2, COLOR_BORDER_GRADIENT_START, COLOR_BORDER_SHADOW, alpha);
-
-        // 4. Bottom & Right Shadow
-        Services.PLATFORM.fill(poseStackOrGraphics, crestX + 1, crestY + crestH - 2, crestX + crestW - 1, crestY + crestH - 2, shadow);
+        Services.PLATFORM.fill(poseStackOrGraphics, crestX + 1, crestY + crestH - 2, crestX + crestW - 1, crestY + crestH - 1, shadow);
         Services.PLATFORM.fill(poseStackOrGraphics, crestX + crestW - 2, crestY + 1, crestX + crestW - 1, crestY + crestH - 1, shadow);
 
-        // 5. Inner Recessed Plate
-        int plateX = crestX + 3;
-        int plateY = crestY + 3;
-        int plateW = crestW - 6;
-        int plateH = crestH - 6;
+        // 4. Layer 3: Inner Recessed Plate with unified 4px border width on all sides
+        int plateX = crestX + 4;
+        int plateY = crestY + 4;
+        int plateW = crestW - 8;
+        int plateH = crestH - 8;
         Services.PLATFORM.fill(poseStackOrGraphics, plateX, plateY, plateX + plateW, plateY + plateH, applyAlpha(COLOR_INNER_DARK, alpha));
 
-        // Inner plate 1px subtle bevel
+        // Inner plate 1px subtle bevel (shadow top & left, highlight bottom & right)
         Services.PLATFORM.fill(poseStackOrGraphics, plateX, plateY, plateX + plateW, plateY + 1, bShadow);
         Services.PLATFORM.fill(poseStackOrGraphics, plateX, plateY, plateX + 1, plateY + plateH, bShadow);
         Services.PLATFORM.fill(poseStackOrGraphics, plateX, plateY + plateH - 1, plateX + plateW, plateY + plateH, bHighlight);
         Services.PLATFORM.fill(poseStackOrGraphics, plateX + plateW - 1, plateY, plateX + plateW, plateY + plateH, bHighlight);
 
-        // 6. Proportional Buildscape Logo Texture (Crisp 256x143 native scaling)
+        // 5. Proportional Buildscape Logo Texture (Crisp 256x143 native scaling)
         int maxLogoW = plateW - 6;
         int maxLogoH = plateH - 4;
         int logoH = Math.min(36, maxLogoH);

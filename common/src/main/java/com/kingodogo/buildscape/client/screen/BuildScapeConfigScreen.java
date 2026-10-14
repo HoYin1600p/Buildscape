@@ -1133,6 +1133,11 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         // 3. Render 1 Big Frame with expanded chassis gap & metallic gradient
         drawVaultHuntersFrame(poseStackOrGraphics, frameX, frameY, frameW, frameH, COLOR_PANEL_BG, true, alpha);
 
+        // 3b. Presets Side Tab (protruding drawer button on right chassis edge when closed)
+        if (selectedTabIndex == 0 && sidePanelProgress < 0.05f) {
+            drawPresetsSideTab(poseStackOrGraphics, font, frameRight, frameY + 36, effMouseX, effMouseY, alpha);
+        }
+
         // 4. Header Bar (kept exactly as placed rn, with top-left metallic gradient artifact)
         int headerH = 24;
         int headerX = panelX + 7;
@@ -1392,10 +1397,9 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
         int curY = y + catHeaderH + 4;
 
-        // Row 1: Sub-View Switcher + Presets Drawer Button
+        // Row 1: Sub-View Switcher (Display Items vs Display Tags)
         int row1H = 18;
-        int presetsBtnW = 56;
-        int subBtnW = (w - 22 - presetsBtnW) / 2;
+        int subBtnW = (w - 16) / 2;
         int subBtnH = 15;
         int subY = curY + 1;
 
@@ -1412,12 +1416,6 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         drawBeveledButton(poseStackOrGraphics, sub1X, subY, subBtnW, subBtnH, isSub1 ? COLOR_BTN_BG_ACTIVE : COLOR_BTN_BG, hoverSub1, isSub1, alpha);
         String sub1Label = "🏷 Display Tags (" + cachedActiveTags.size() + ")";
         drawCenteredText(poseStackOrGraphics, font, sub1Label, sub1X + subBtnW / 2, subY + 3, applyAlpha(isSub1 ? COLOR_TEXT_WHITE : COLOR_TEXT_MUTED, alpha));
-
-        int presetBtnX = sub1X + subBtnW + 6;
-        boolean isPresetsOpen = (sidePanelType == SidePanelType.PRESETS && (isSidePanelOpening || sidePanelProgress > 0.05f));
-        boolean hoverPreset = mouseX >= presetBtnX && mouseX <= presetBtnX + presetsBtnW && mouseY >= subY && mouseY <= subY + subBtnH;
-        drawBeveledButton(poseStackOrGraphics, presetBtnX, subY, presetsBtnW, subBtnH, isPresetsOpen ? COLOR_BTN_BG_ACTIVE : COLOR_BTN_BG, hoverPreset, isPresetsOpen, alpha);
-        drawCenteredText(poseStackOrGraphics, font, "▤ Presets", presetBtnX + presetsBtnW / 2, subY + 3, applyAlpha(isPresetsOpen ? COLOR_TEXT_WHITE : (hoverPreset ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER), alpha));
 
         curY += row1H + 2;
 
@@ -2488,6 +2486,49 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         }
     }
 
+    private void drawPresetsSideTab(Object poseStackOrGraphics, Font font, int frameRight, int tabY, int mouseX, int mouseY, float alpha) {
+        int tabW = 60;
+        int tabH = 22;
+        int tabX = frameRight - 2;
+
+        boolean hover = mouseX >= tabX && mouseX <= tabX + tabW + 6 && mouseY >= tabY && mouseY <= tabY + tabH;
+        int popOffset = hover ? 3 : 0;
+        int currentW = tabW + popOffset;
+
+        int black = applyAlpha(COLOR_FRAME_BLACK, alpha);
+        int shadow = applyAlpha(COLOR_BORDER_SHADOW, alpha);
+        int highlight = applyAlpha(COLOR_BORDER_GRADIENT_START, alpha);
+        int btnBg = applyAlpha(hover ? COLOR_BTN_BG_HOVER : COLOR_BTN_BG, alpha);
+
+        // Solid chassis backing
+        Services.PLATFORM.fill(poseStackOrGraphics, tabX, tabY, tabX + currentW, tabY + tabH, applyAlpha(COLOR_CHASSIS_BODY, alpha));
+
+        // 1px Black Border (Top, Right, Bottom - seamlessly attached on left to frame)
+        Services.PLATFORM.fill(poseStackOrGraphics, tabX, tabY, tabX + currentW, tabY + 1, black);
+        Services.PLATFORM.fill(poseStackOrGraphics, tabX, tabY + tabH - 1, tabX + currentW, tabY + tabH, black);
+        Services.PLATFORM.fill(poseStackOrGraphics, tabX + currentW - 1, tabY, tabX + currentW, tabY + tabH, black);
+
+        // Top highlight
+        Services.PLATFORM.fill(poseStackOrGraphics, tabX, tabY + 1, tabX + currentW - 1, tabY + 2, highlight);
+
+        // Right & Bottom shadow
+        Services.PLATFORM.fill(poseStackOrGraphics, tabX + currentW - 2, tabY + 1, tabX + currentW - 1, tabY + tabH - 1, shadow);
+        Services.PLATFORM.fill(poseStackOrGraphics, tabX, tabY + tabH - 2, tabX + currentW - 1, tabY + tabH - 1, shadow);
+
+        // Inner button fill
+        Services.PLATFORM.fill(poseStackOrGraphics, tabX, tabY + 2, tabX + currentW - 2, tabY + tabH - 2, btnBg);
+
+        // Label: "▤ Presets"
+        int textCol = hover ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER;
+        drawCenteredText(poseStackOrGraphics, font, "▤ Presets", tabX + (currentW / 2), tabY + 5, applyAlpha(textCol, alpha));
+
+        if (hover) {
+            deferredTooltip = Collections.singletonList(ComponentHelper.literal("Presets (Click to Expand)"));
+            deferredTooltipX = rawMouseX + 12;
+            deferredTooltipY = rawMouseY;
+        }
+    }
+
     private void renderSidePanelPillarDetail(Object poseStackOrGraphics, Font font, int x, int y, int w, int h, int mouseX, int mouseY, float alpha) {
         String activeId = selectedPillarDetailId != null ? selectedPillarDetailId : closingPillarDetailId;
         PillarIdManager.PillarData data = PillarIdManager.getClient().getPillarData(activeId);
@@ -3369,6 +3410,18 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
             }
         }
 
+        // 0b. Presets Side Tab Click (when Presets panel is closed, clicking the protruding side tab expands it)
+        if (selectedTabIndex == 0 && sidePanelProgress < 0.05f) {
+            int tabX = layout.frameRight - 2;
+            int tabY = frameY + 36;
+            int tabW = 66;
+            int tabH = 22;
+            if (mouseX >= tabX && mouseX <= tabX + tabW && mouseY >= tabY && mouseY <= tabY + tabH) {
+                openSidePanel(SidePanelType.PRESETS);
+                return true;
+            }
+        }
+
         int headerH = 24;
         int headerX = panelX + 7;
         int headerY = panelY + 7;
@@ -3463,10 +3516,9 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                 PillarParticleConfig cfg = PillarParticleConfig.get();
                 int curY = contentY + catHeaderH + 4;
 
-                // Row 1: Sub-View Switcher + Presets Drawer Button
+                // Row 1: Sub-View Switcher (Display Items vs Display Tags)
                 int row1H = 18;
-                int presetsBtnW = 56;
-                int subBtnW = (contentW - 22 - presetsBtnW) / 2;
+                int subBtnW = (contentW - 16) / 2;
                 int subBtnH = 15;
                 int subY = curY + 1;
 
@@ -3481,16 +3533,6 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                 if (mouseX >= sub1X && mouseX <= sub1X + subBtnW && mouseY >= subY && mouseY <= subY + subBtnH) {
                     itemsSubTab = 1;
                     scrollOffset = 0;
-                    return true;
-                }
-
-                int presetBtnX = sub1X + subBtnW + 6;
-                if (mouseX >= presetBtnX && mouseX <= presetBtnX + presetsBtnW && mouseY >= subY && mouseY <= subY + subBtnH) {
-                    if (sidePanelType == SidePanelType.PRESETS && (isSidePanelOpening || sidePanelProgress >= 0.99f)) {
-                        closeSidePanel();
-                    } else {
-                        openSidePanel(SidePanelType.PRESETS);
-                    }
                     return true;
                 }
 

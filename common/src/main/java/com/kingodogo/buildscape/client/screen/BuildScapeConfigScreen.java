@@ -67,41 +67,78 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
     private float openProgress = 0.0f;
     private float closeProgress = 1.0f;
 
-    // --- Palette Constants (Solid Opaque) ---
-    public static final int COLOR_OVERLAY = 0xD808080A;
-    public static final int COLOR_PANEL_BG = 0xFF141416;
-    public static final int COLOR_CHASSIS_BODY = 0xFF1E1E24;
-    public static final int COLOR_INNER_DARK = 0xFF0F0F12;
-    public static final int COLOR_HEADER_BG = 0xFF18181D;
+    // --- Active Theme Palette ---
+    public static ConfigThemes.Theme currentTheme = ConfigThemes.getCurrentTheme();
+
+    public static int COLOR_OVERLAY = currentTheme.colorOverlay;
+    public static int COLOR_PANEL_BG = currentTheme.colorPanelBg;
+    public static int COLOR_CHASSIS_BODY = currentTheme.colorChassisBody;
+    public static int COLOR_INNER_DARK = currentTheme.colorInnerDark;
+    public static int COLOR_HEADER_BG = currentTheme.colorHeaderBg;
 
     // Metallic Beveled Border Gradients (1px wide)
-    public static final int COLOR_FRAME_BLACK = 0xFF000000;
-    public static final int COLOR_BORDER_GRADIENT_START = 0xFF9E9EB0;
-    public static final int COLOR_BORDER_GRADIENT_END = 0xFF444450;
-    public static final int COLOR_BORDER_SHADOW = 0xFF181820;
+    public static int COLOR_FRAME_BLACK = currentTheme.colorFrameBlack;
+    public static int COLOR_BORDER_GRADIENT_START = currentTheme.colorBorderGradientStart;
+    public static int COLOR_BORDER_GRADIENT_END = currentTheme.colorBorderGradientEnd;
+    public static int COLOR_BORDER_SHADOW = currentTheme.colorBorderShadow;
 
     // Text & Accents
-    public static final int COLOR_TEXT_WHITE = 0xFFFFFFFF;
-    public static final int COLOR_TEXT_SILVER = 0xFFCCCCCC;
-    public static final int COLOR_TEXT_MUTED = 0xFF84848C;
+    public static int COLOR_TEXT_WHITE = currentTheme.colorTextWhite;
+    public static int COLOR_TEXT_SILVER = currentTheme.colorTextSilver;
+    public static int COLOR_TEXT_MUTED = currentTheme.colorTextMuted;
 
     // Interactive Widget Colors
-    public static final int COLOR_ROW_BG = 0xFF16161B;
-    public static final int COLOR_ROW_BG_HOVER = 0xFF202028;
-    public static final int COLOR_ROW_BORDER = 0xFF24242C;
-    public static final int COLOR_ROW_BORDER_HOVER = 0xFF4E4E5C;
+    public static int COLOR_ROW_BG = currentTheme.colorRowBg;
+    public static int COLOR_ROW_BG_HOVER = currentTheme.colorRowBgHover;
+    public static int COLOR_ROW_BORDER = currentTheme.colorRowBorder;
+    public static int COLOR_ROW_BORDER_HOVER = currentTheme.colorRowBorderHover;
 
-    public static final int COLOR_TOGGLE_ON_BG = 0xFF142E18;
-    public static final int COLOR_TOGGLE_ON_BORDER = 0xFF4ADE80;
-    public static final int COLOR_TOGGLE_ON_TEXT = 0xFF4ADE80;
+    public static int COLOR_TOGGLE_ON_BG = currentTheme.colorToggleOnBg;
+    public static int COLOR_TOGGLE_ON_BORDER = currentTheme.colorToggleOnBorder;
+    public static int COLOR_TOGGLE_ON_TEXT = currentTheme.colorToggleOnText;
 
-    public static final int COLOR_TOGGLE_OFF_BG = 0xFF1C1C20;
-    public static final int COLOR_TOGGLE_OFF_BORDER = 0xFF383842;
-    public static final int COLOR_TOGGLE_OFF_TEXT = 0xFF888890;
+    public static int COLOR_TOGGLE_OFF_BG = currentTheme.colorToggleOffBg;
+    public static int COLOR_TOGGLE_OFF_BORDER = currentTheme.colorToggleOffBorder;
+    public static int COLOR_TOGGLE_OFF_TEXT = currentTheme.colorToggleOffText;
 
-    public static final int COLOR_BTN_BG = 0xFF202028;
-    public static final int COLOR_BTN_BORDER = 0xFF3C3C48;
-    public static final int COLOR_BTN_BORDER_HOVER = 0xFF666678;
+    public static int COLOR_BTN_BG = currentTheme.colorBtnBg;
+    public static int COLOR_BTN_BORDER = currentTheme.colorBtnBorder;
+    public static int COLOR_BTN_BORDER_HOVER = currentTheme.colorBtnBorderHover;
+
+    public static void applyTheme(ConfigThemes.Theme theme) {
+        currentTheme = theme;
+        COLOR_OVERLAY = theme.colorOverlay;
+        COLOR_PANEL_BG = theme.colorPanelBg;
+        COLOR_CHASSIS_BODY = theme.colorChassisBody;
+        COLOR_INNER_DARK = theme.colorInnerDark;
+        COLOR_HEADER_BG = theme.colorHeaderBg;
+
+        COLOR_FRAME_BLACK = theme.colorFrameBlack;
+        COLOR_BORDER_GRADIENT_START = theme.colorBorderGradientStart;
+        COLOR_BORDER_GRADIENT_END = theme.colorBorderGradientEnd;
+        COLOR_BORDER_SHADOW = theme.colorBorderShadow;
+
+        COLOR_TEXT_WHITE = theme.colorTextWhite;
+        COLOR_TEXT_SILVER = theme.colorTextSilver;
+        COLOR_TEXT_MUTED = theme.colorTextMuted;
+
+        COLOR_ROW_BG = theme.colorRowBg;
+        COLOR_ROW_BG_HOVER = theme.colorRowBgHover;
+        COLOR_ROW_BORDER = theme.colorRowBorder;
+        COLOR_ROW_BORDER_HOVER = theme.colorRowBorderHover;
+
+        COLOR_TOGGLE_ON_BG = theme.colorToggleOnBg;
+        COLOR_TOGGLE_ON_BORDER = theme.colorToggleOnBorder;
+        COLOR_TOGGLE_ON_TEXT = theme.colorToggleOnText;
+
+        COLOR_TOGGLE_OFF_BG = theme.colorToggleOffBg;
+        COLOR_TOGGLE_OFF_BORDER = theme.colorToggleOffBorder;
+        COLOR_TOGGLE_OFF_TEXT = theme.colorToggleOffText;
+
+        COLOR_BTN_BG = theme.colorBtnBg;
+        COLOR_BTN_BORDER = theme.colorBtnBorder;
+        COLOR_BTN_BORDER_HOVER = theme.colorBtnBorderHover;
+    }
 
     // --- Sidenav Specification ---
     public static class NavItem {
@@ -898,15 +935,21 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         updateSidePanelAnimation();
         if (sidePanelProgress > 0.001f && sidePanelType != SidePanelType.NONE) {
             int frameRight = frameX + frameW;
-            int availRight = width - frameRight - 6;
+            int dockGap = 7;
+            int availRight = width - frameRight - dockGap - 4;
             int sidePanelTargetW = Math.max(180, Math.min(220, availRight > 100 ? availRight : 210));
             int sidePanelH = Math.min(264, frameH - 44);
             int sidePanelY = frameY + (frameH - sidePanelH) / 2;
-            int dockX = frameRight - 4;
-            int slideOffset = (int) ((1.0f - sidePanelProgress) * (sidePanelTargetW + 10));
+            int dockX = frameRight + dockGap;
+            int slideOffset = (int) ((1.0f - sidePanelProgress) * (sidePanelTargetW + dockGap + 10));
             int sidePanelX = dockX - slideOffset;
 
-            enableGuiScissor(poseStackOrGraphics, dockX, 0, Math.max(1, width - dockX), height);
+            // Mechanical connector bridges across the gap between main frame and side panel
+            if (sidePanelX > frameRight - 4) {
+                renderDockingBridges(poseStackOrGraphics, frameRight, sidePanelX, sidePanelY, sidePanelH, alpha);
+            }
+
+            enableGuiScissor(poseStackOrGraphics, frameRight, 0, Math.max(1, width - frameRight), height);
             renderSidePanel(poseStackOrGraphics, font, sidePanelX, sidePanelY, sidePanelTargetW, sidePanelH, mouseX, mouseY, alpha);
             disableGuiScissor(poseStackOrGraphics);
         }
@@ -1113,7 +1156,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         int count = switch (tabId) {
             case "particles" -> 11;
             case "world" -> 8;
-            case "system" -> 5;
+            case "system" -> 6;
             default -> 0;
         };
         return count * (rowH + gap) + 6;
@@ -1882,6 +1925,9 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
     private void renderSystemRows(Object poseStackOrGraphics, Font font, int x, int startY, int w, int h, int gap, int clipY, int clipH, int mouseX, int mouseY, float alpha) {
         int curY = startY;
 
+        renderConfigRowCycle(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "UI Theme", "Visual color palette for configuration interface", currentTheme.displayName, mouseX, mouseY, alpha);
+        curY += h + gap;
+
         renderConfigRowCycle(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Screen Animation", "Smooth UI transitions and animation speed", ANIM_SPEEDS[animSpeedIndex], mouseX, mouseY, alpha);
         curY += h + gap;
 
@@ -2048,25 +2094,26 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         drawBorder(poseStackOrGraphics, x + 8, y + 8, w - 16, h - 16, softGroove);
     }
 
-    // --- Connected Right Side Panel Frame (Docked Seamlessly to Main Frame) ---
+    // --- Connected Right Side Panel Frame ---
     private void drawConnectedSidePanelFrame(Object poseStackOrGraphics, int x, int y, int w, int h, int bgRgb, float alpha) {
         // 1. Outer Chassis Body Fill
         Services.PLATFORM.fill(poseStackOrGraphics, x, y, x + w, y + h, applyAlpha(COLOR_CHASSIS_BODY, alpha));
 
         int black = applyAlpha(COLOR_FRAME_BLACK, alpha);
 
-        // 2. Outermost 1px Black Border (top, right, bottom; left seam line)
+        // 2. Outermost 1px Black Border (all 4 sides)
         Services.PLATFORM.fill(poseStackOrGraphics, x, y, x + w, y + 1, black);
         Services.PLATFORM.fill(poseStackOrGraphics, x, y + h - 1, x + w, y + h, black);
         Services.PLATFORM.fill(poseStackOrGraphics, x + w - 1, y, x + w, y + h, black);
-        Services.PLATFORM.fill(poseStackOrGraphics, x, y, x + 1, y + h, applyAlpha(0xFF101014, alpha));
+        Services.PLATFORM.fill(poseStackOrGraphics, x, y, x + 1, y + h, black);
 
-        // 3. 1-Pixel Wide Metallic Gradient Highlight (Top) & Shadow (Bottom & Right)
+        // 3. 1-Pixel Wide Metallic Gradient Highlight (Top & Left) & Shadow (Bottom & Right)
         for (int i = 1; i < w - 1; i++) {
             float t = (float) (i - 1) / Math.max(1, w - 2);
             int col = lerpColor(COLOR_BORDER_GRADIENT_START, COLOR_BORDER_GRADIENT_END, t);
             Services.PLATFORM.fill(poseStackOrGraphics, x + i, y + 1, x + i + 1, y + 2, applyAlpha(col, alpha));
         }
+        Services.PLATFORM.fill(poseStackOrGraphics, x + 1, y + 1, x + 2, y + h - 1, applyAlpha(COLOR_BORDER_GRADIENT_START, alpha));
         int shadow = applyAlpha(COLOR_BORDER_SHADOW, alpha);
         Services.PLATFORM.fill(poseStackOrGraphics, x + 1, y + h - 2, x + w - 1, y + h - 2, shadow);
         Services.PLATFORM.fill(poseStackOrGraphics, x + w - 2, y + 1, x + w - 1, y + h - 1, shadow);
@@ -2076,42 +2123,57 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         Services.PLATFORM.fill(poseStackOrGraphics, x + 2, y + 2, x + w - 2, y + 3, band);
         Services.PLATFORM.fill(poseStackOrGraphics, x + 2, y + h - 3, x + w - 2, y + h - 2, band);
         Services.PLATFORM.fill(poseStackOrGraphics, x + w - 3, y + 2, x + w - 2, y + h - 2, band);
+        Services.PLATFORM.fill(poseStackOrGraphics, x + 2, y + 2, x + 3, y + h - 2, band);
 
-        // 5. Stepped Bevel Ridge & Groove at offset 5
+        // 5. Stepped Bevel Ridge & Groove at offset 4
         int bevelShadow = applyAlpha(0xFF0E0E12, alpha);
         int bevelHighlight = applyAlpha(0xFF383848, alpha);
         Services.PLATFORM.fill(poseStackOrGraphics, x + 4, y + 4, x + w - 4, y + 5, bevelShadow);
         Services.PLATFORM.fill(poseStackOrGraphics, x + 4, y + h - 5, x + w - 4, y + h - 4, bevelHighlight);
         Services.PLATFORM.fill(poseStackOrGraphics, x + w - 5, y + 4, x + w - 4, y + h - 4, bevelHighlight);
+        Services.PLATFORM.fill(poseStackOrGraphics, x + 4, y + 4, x + 5, y + h - 4, bevelShadow);
+    }
 
-        // 6. Mechanical docking hinges / brackets at the seam with rivet detailing
-        int hingeBg = applyAlpha(0xFF2E2E3A, alpha);
-        int hingeHighlight = applyAlpha(0xFF4A4A5C, alpha);
-        int rivetCol = applyAlpha(0xFF6E6E85, alpha);
-        int hingeH = 16;
-        int hingeW = 6;
-        int hingeY1 = y + 24;
-        int hingeY2 = y + h - 40;
+    private void renderDockingBridges(Object poseStackOrGraphics, int frameRight, int sidePanelX, int sidePanelY, int sidePanelH, float alpha) {
+        int bridgeLeft = frameRight - 2;
+        int bridgeRight = sidePanelX + 2;
+        if (bridgeRight <= bridgeLeft) return;
+        int bridgeW = bridgeRight - bridgeLeft;
+        int bridgeH = 12;
 
-        // Top Bracket
-        Services.PLATFORM.fill(poseStackOrGraphics, x - 3, hingeY1, x + hingeW, hingeY1 + hingeH, hingeBg);
-        Services.PLATFORM.fill(poseStackOrGraphics, x - 3, hingeY1, x + hingeW, hingeY1 + 1, hingeHighlight);
-        drawBorder(poseStackOrGraphics, x - 3, hingeY1, hingeW + 3, hingeH, black);
-        // Rivet dots
-        Services.PLATFORM.fill(poseStackOrGraphics, x - 1, hingeY1 + 4, x, hingeY1 + 6, rivetCol);
-        Services.PLATFORM.fill(poseStackOrGraphics, x - 1, hingeY1 + 10, x, hingeY1 + 12, rivetCol);
-        Services.PLATFORM.fill(poseStackOrGraphics, x + 3, hingeY1 + 4, x + 4, hingeY1 + 6, rivetCol);
-        Services.PLATFORM.fill(poseStackOrGraphics, x + 3, hingeY1 + 10, x + 4, hingeY1 + 12, rivetCol);
+        int bY1 = sidePanelY + 30;
+        int bY2 = sidePanelY + sidePanelH - 44;
 
-        // Bottom Bracket
-        Services.PLATFORM.fill(poseStackOrGraphics, x - 3, hingeY2, x + hingeW, hingeY2 + hingeH, hingeBg);
-        Services.PLATFORM.fill(poseStackOrGraphics, x - 3, hingeY2, x + hingeW, hingeY2 + 1, hingeHighlight);
-        drawBorder(poseStackOrGraphics, x - 3, hingeY2, hingeW + 3, hingeH, black);
-        // Rivet dots
-        Services.PLATFORM.fill(poseStackOrGraphics, x - 1, hingeY2 + 4, x, hingeY2 + 6, rivetCol);
-        Services.PLATFORM.fill(poseStackOrGraphics, x - 1, hingeY2 + 10, x, hingeY2 + 12, rivetCol);
-        Services.PLATFORM.fill(poseStackOrGraphics, x + 3, hingeY2 + 4, x + 4, hingeY2 + 6, rivetCol);
-        Services.PLATFORM.fill(poseStackOrGraphics, x + 3, hingeY2 + 10, x + 4, hingeY2 + 12, rivetCol);
+        int black = applyAlpha(COLOR_FRAME_BLACK, alpha);
+        int fill = applyAlpha(COLOR_CHASSIS_BODY, alpha);
+        int topHighlight = applyAlpha(COLOR_BORDER_GRADIENT_START, alpha);
+        int bottomShadow = applyAlpha(COLOR_BORDER_SHADOW, alpha);
+
+        // Top Connector Bridge
+        Services.PLATFORM.fill(poseStackOrGraphics, bridgeLeft, bY1, bridgeRight, bY1 + bridgeH, fill);
+        Services.PLATFORM.fill(poseStackOrGraphics, bridgeLeft, bY1, bridgeRight, bY1 + 1, topHighlight);
+        Services.PLATFORM.fill(poseStackOrGraphics, bridgeLeft, bY1 + bridgeH - 1, bridgeRight, bY1 + bridgeH, bottomShadow);
+        drawBorder(poseStackOrGraphics, bridgeLeft, bY1, bridgeW, bridgeH, black);
+
+        // Bottom Connector Bridge
+        Services.PLATFORM.fill(poseStackOrGraphics, bridgeLeft, bY2, bridgeRight, bY2 + bridgeH, fill);
+        Services.PLATFORM.fill(poseStackOrGraphics, bridgeLeft, bY2, bridgeRight, bY2 + 1, topHighlight);
+        Services.PLATFORM.fill(poseStackOrGraphics, bridgeLeft, bY2 + bridgeH - 1, bridgeRight, bY2 + bridgeH, bottomShadow);
+        drawBorder(poseStackOrGraphics, bridgeLeft, bY2, bridgeW, bridgeH, black);
+
+        // Central mounting pin / rivet if gap is visible (>= 4px)
+        int gapW = sidePanelX - frameRight;
+        if (gapW >= 4) {
+            int midX = (frameRight + sidePanelX) / 2;
+            int pinCol = applyAlpha(0xFF7E8496, alpha);
+            int pinSheen = applyAlpha(0xFFDDE0EC, alpha);
+
+            Services.PLATFORM.fill(poseStackOrGraphics, midX - 1, bY1 + 4, midX + 2, bY1 + 8, pinCol);
+            Services.PLATFORM.fill(poseStackOrGraphics, midX, bY1 + 5, midX + 1, bY1 + 7, pinSheen);
+
+            Services.PLATFORM.fill(poseStackOrGraphics, midX - 1, bY2 + 4, midX + 2, bY2 + 8, pinCol);
+            Services.PLATFORM.fill(poseStackOrGraphics, midX, bY2 + 5, midX + 1, bY2 + 7, pinSheen);
+        }
     }
 
     private void renderSidePanel(Object poseStackOrGraphics, Font font, int x, int y, int w, int h, int mouseX, int mouseY, float alpha) {
@@ -2156,15 +2218,6 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
         if (sidePanelType == SidePanelType.PILLAR_DETAIL) {
             renderSidePanelPillarDetail(poseStackOrGraphics, font, sContentX, sContentY, sContentW, sContentH, mouseX, mouseY, alpha);
-            if (sidePanelMaxScroll > 0) {
-                int trackH = sContentH - 8;
-                int trackY = sContentY + 4;
-                int trackX = sContentX + sContentW - 3;
-                int thumbH = Math.max(12, (int) ((sContentH / (float) (sContentH + sidePanelMaxScroll)) * trackH));
-                int thumbY = trackY + (int) ((sidePanelScrollOffset / (float) sidePanelMaxScroll) * (trackH - thumbH));
-                Services.PLATFORM.fill(poseStackOrGraphics, trackX, trackY, trackX + 2, trackY + trackH, applyAlpha(0xFF141418, alpha));
-                Services.PLATFORM.fill(poseStackOrGraphics, trackX, thumbY, trackX + 2, thumbY + thumbH, applyAlpha(0xFF4E4E60, alpha));
-            }
         } else if (sidePanelType == SidePanelType.COLOR_PICKER) {
             renderSidePanelColorPicker(poseStackOrGraphics, font, sContentX, sContentY, sContentW, sContentH, mouseX, mouseY, alpha);
         }
@@ -2181,14 +2234,10 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         drawBeveledComponent(poseStackOrGraphics, x, y, w, h, COLOR_INNER_DARK, alpha);
 
         PillarParticleConfig globalCfg = PillarParticleConfig.get();
-        int panelW = Math.min(width - 20, 560);
-        int panelX = (width - panelW) / 2;
-        int dockX = panelX - 5 + panelW + 10 - 4;
-        int scissorLeft = Math.max(dockX, x + 2);
-        int scissorW = Math.max(1, (x + w - 2) - scissorLeft);
-        enableGuiScissor(poseStackOrGraphics, scissorLeft, y + 2, scissorW, Math.max(1, h - 4));
+        sidePanelScrollOffset = 0;
+        sidePanelMaxScroll = 0;
 
-        int curY = y + 4 - sidePanelScrollOffset;
+        int curY = y + 4;
         int rowH = 22;
         int rowGap = 3;
         int rowX = x + 4;
@@ -2206,7 +2255,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         renderSideRowToggle(poseStackOrGraphics, font, rowX, curY, rowW, rowH, "Custom Pattern", usePat, mouseX, mouseY, alpha);
         curY += rowH + rowGap;
 
-        // Row 2: Trajectory Pattern Cycle
+        // Row 2: Particle Pattern Cycle
         String curPat = data.pattern != null && !data.pattern.isEmpty() ? data.pattern : "default";
         String patDisplay = curPat.substring(0, 1).toUpperCase() + curPat.substring(1);
         renderSideRowCycle(poseStackOrGraphics, font, rowX, curY, rowW, rowH, "Pattern", patDisplay, mouseX, mouseY, alpha);
@@ -2247,15 +2296,6 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         boolean hoverLoc = mouseX >= rowX && mouseX <= rowX + rowW && mouseY >= curY && mouseY <= curY + btnH;
         drawBeveledButton(poseStackOrGraphics, rowX, curY, rowW, btnH, hoverLoc ? 0xFF2A2A38 : COLOR_BTN_BG, hoverLoc, false, alpha);
         Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "⌖ Locate in World", rowX + rowW / 2, curY + 4, applyAlpha(hoverLoc ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
-        curY += btnH + rowGap;
-
-        disableGuiScissor(poseStackOrGraphics);
-        if (sidePanelProgress < 0.999f) {
-            enableGuiScissor(poseStackOrGraphics, dockX, 0, Math.max(1, width - dockX), height);
-        }
-
-        int totalH = (curY + sidePanelScrollOffset) - (y + 4);
-        sidePanelMaxScroll = Math.max(0, totalH - (h - 8));
     }
 
     private void renderSidePanelColorPicker(Object poseStackOrGraphics, Font font, int x, int y, int w, int h, int mouseX, int mouseY, float alpha) {
@@ -3393,24 +3433,32 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                 }
             }
             case "system" -> {
-                // Row 0: Screen Animation Cycle
+                // Row 0: UI Theme Cycle
+                if (checkCycleClick(mouseX, mouseY, x, curY, w, h, clipY, clipH)) {
+                    ConfigThemes.Theme next = ConfigThemes.cycleNextTheme();
+                    applyTheme(next);
+                    return true;
+                }
+                curY += h + gap;
+
+                // Row 1: Screen Animation Cycle
                 if (checkCycleClick(mouseX, mouseY, x, curY, w, h, clipY, clipH)) {
                     animSpeedIndex = (animSpeedIndex + 1) % ANIM_SPEEDS.length;
                     return true;
                 }
                 curY += h + gap;
 
-                // Row 1: Mod Version Badge (non-interactive)
+                // Row 2: Mod Version Badge (non-interactive)
                 curY += h + gap;
 
-                // Row 2: Auto Update Check Toggle
+                // Row 3: Auto Update Check Toggle
                 if (checkToggleClick(mouseX, mouseY, x, curY, w, h, clipY, clipH)) {
                     autoUpdateCheck = !autoUpdateCheck;
                     return true;
                 }
                 curY += h + gap;
 
-                // Row 3: Check for Updates Button
+                // Row 4: Check for Updates Button
                 if (checkButtonClick(mouseX, mouseY, x, curY, w, h, clipY, clipH, 86)) {
                     updateStatusText = "Up to date ✓";
                     return true;
@@ -4369,7 +4417,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
             int sidePanelH = Math.min(264, frameH - 44);
             int sidePanelY = frameY + (frameH - sidePanelH) / 2;
             int frameRight = frameX + frameW;
-            int dockX = frameRight - 4;
+            int dockX = frameRight + 7;
 
             if (mouseX >= dockX && mouseX <= width && mouseY >= sidePanelY && mouseY <= sidePanelY + sidePanelH) {
                 if (sidePanelMaxScroll > 0) {

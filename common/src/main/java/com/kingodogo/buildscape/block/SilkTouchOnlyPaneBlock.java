@@ -23,7 +23,11 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
-public class SilkTouchOnlyPaneBlock extends IronBarsBlock implements ICommonInteractable {
+public class SilkTouchOnlyPaneBlock extends IronBarsBlock implements ICommonInteractable, net.minecraft.world.level.block.BeaconBeamBlock {
+
+    /** Marks the block as a beam colour source for vanilla's scan (Fabric); the real colour is its map colour. */
+    @Override
+    public net.minecraft.world.item.DyeColor getColor() { return net.minecraft.world.item.DyeColor.WHITE; }
 
     public SilkTouchOnlyPaneBlock(BlockBehaviour.Properties properties) {
         super(properties);

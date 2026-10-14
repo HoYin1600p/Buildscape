@@ -9,6 +9,7 @@
     "EntityDataMixin",
     "BlockEntityDataMixin",
     "RecipeManagerMixin",
+    "BeaconBlockEntityColorMixin",
     "AdvancementCompletionMixin",
     "AnvilUpdateMixin",
     "BlockPlacementMixin",

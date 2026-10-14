@@ -171,7 +171,7 @@ public abstract class FrostRoseBlock extends BushBlock implements SinksOnFarmlan
     }
 
     private static void applyFreezeDamage(Level level, BlockPos pos, LivingEntity entity) {
-        com.kingodogo.buildscape.platform.Services.PLATFORM.hurtFreezeDamage(entity, 1.0F);
+        Services.PLATFORM.hurtGenericDamage(entity, 1.0F);
         Services.PLATFORM.playPowderSnowStep(level, pos);
         if (entity.canFreeze()) {
             entity.setTicksFrozen(Math.min(entity.getTicksFrozen() + 140, 300));

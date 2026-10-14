@@ -24,6 +24,10 @@ public class ConfigThemes {
         public final int colorBorderGradientEnd;
         public final int colorBorderShadow;
 
+        public final int colorChassisBand;
+        public final int colorBevelShadow;
+        public final int colorBevelHighlight;
+
         public final int colorTextWhite;
         public final int colorTextSilver;
         public final int colorTextMuted;
@@ -42,8 +46,14 @@ public class ConfigThemes {
         public final int colorToggleOffText;
 
         public final int colorBtnBg;
+        public final int colorBtnBgHover;
+        public final int colorBtnBgActive;
         public final int colorBtnBorder;
         public final int colorBtnBorderHover;
+
+        public final int colorSlotBg;
+        public final int colorSlotBgHover;
+        public final int colorSlotBorder;
 
         public final int colorAccent;
         public final int colorAccentGlow;
@@ -51,11 +61,13 @@ public class ConfigThemes {
         public Theme(String id, String displayName,
                      int colorOverlay, int colorPanelBg, int colorChassisBody, int colorInnerDark, int colorHeaderBg,
                      int colorFrameBlack, int colorBorderGradientStart, int colorBorderGradientEnd, int colorBorderShadow,
+                     int colorChassisBand, int colorBevelShadow, int colorBevelHighlight,
                      int colorTextWhite, int colorTextSilver, int colorTextMuted,
                      int colorRowBg, int colorRowBgHover, int colorRowBorder, int colorRowBorderHover,
                      int colorToggleOnBg, int colorToggleOnBorder, int colorToggleOnText,
                      int colorToggleOffBg, int colorToggleOffBorder, int colorToggleOffText,
-                     int colorBtnBg, int colorBtnBorder, int colorBtnBorderHover,
+                     int colorBtnBg, int colorBtnBgHover, int colorBtnBgActive, int colorBtnBorder, int colorBtnBorderHover,
+                     int colorSlotBg, int colorSlotBgHover, int colorSlotBorder,
                      int colorAccent, int colorAccentGlow) {
             this.id = id;
             this.displayName = displayName;
@@ -68,6 +80,9 @@ public class ConfigThemes {
             this.colorBorderGradientStart = colorBorderGradientStart;
             this.colorBorderGradientEnd = colorBorderGradientEnd;
             this.colorBorderShadow = colorBorderShadow;
+            this.colorChassisBand = colorChassisBand;
+            this.colorBevelShadow = colorBevelShadow;
+            this.colorBevelHighlight = colorBevelHighlight;
             this.colorTextWhite = colorTextWhite;
             this.colorTextSilver = colorTextSilver;
             this.colorTextMuted = colorTextMuted;
@@ -82,8 +97,13 @@ public class ConfigThemes {
             this.colorToggleOffBorder = colorToggleOffBorder;
             this.colorToggleOffText = colorToggleOffText;
             this.colorBtnBg = colorBtnBg;
+            this.colorBtnBgHover = colorBtnBgHover;
+            this.colorBtnBgActive = colorBtnBgActive;
             this.colorBtnBorder = colorBtnBorder;
             this.colorBtnBorderHover = colorBtnBorderHover;
+            this.colorSlotBg = colorSlotBg;
+            this.colorSlotBgHover = colorSlotBgHover;
+            this.colorSlotBorder = colorSlotBorder;
             this.colorAccent = colorAccent;
             this.colorAccentGlow = colorAccentGlow;
         }
@@ -100,6 +120,9 @@ public class ConfigThemes {
             0xFF9E9EB0, // borderGradientStart
             0xFF444450, // borderGradientEnd
             0xFF181820, // borderShadow
+            0xFF22222A, // chassisBand
+            0xFF0E0E12, // bevelShadow
+            0xFF383848, // bevelHighlight
             0xFFFFFFFF, // textWhite
             0xFFCCCCCC, // textSilver
             0xFF84848C, // textMuted
@@ -113,42 +136,55 @@ public class ConfigThemes {
             0xFF1C1C20, // toggleOffBg
             0xFF383842, // toggleOffBorder
             0xFF888890, // toggleOffText
-            0xFF202028, // btnBg
-            0xFF3C3C48, // btnBorder
+            0xFF1A1A22, // btnBg
+            0xFF262634, // btnBgHover
+            0xFF2E2E3E, // btnBgActive
+            0xFF383848, // btnBorder
             0xFF666678, // btnBorderHover
+            0xFF121215, // slotBg
+            0xFF22222A, // slotBgHover
+            0xFF262630, // slotBorder
             0xFF3CDFFF, // accent
             0x603CDFFF  // accentGlow
     );
 
     public static final Theme LIGHT = new Theme(
             "light", "Light",
-            0x90000000, // overlay
-            0xFFE6E8EE, // panelBg
-            0xFFD2D6E0, // chassisBody
-            0xFFF4F6FA, // innerDark
-            0xFFDBDFE8, // headerBg
-            0xFF3C404E, // frameBlack
+            0x60000000, // overlay
+            0xFFECEEF4, // panelBg
+            0xFFD8DCE6, // chassisBody
+            0xFFFFFFFF, // innerDark
+            0xFFE0E4EC, // headerBg
+            0xFF5A6072, // frameBlack
             0xFFFFFFFF, // borderGradientStart
-            0xFFB8BCD0, // borderGradientEnd
-            0xFF9EA2B4, // borderShadow
-            0xFF161820, // textWhite
-            0xFF3A3E4E, // textSilver
-            0xFF6A7084, // textMuted
-            0xFFEBEFF6, // rowBg
-            0xFFDFE4F0, // rowBgHover
-            0xFFC8CEDC, // rowBorder
-            0xFF9098B0, // rowBorderHover
+            0xFFB4BAC8, // borderGradientEnd
+            0xFF9AA0B0, // borderShadow
+            0xFFCCD1DC, // chassisBand
+            0xFFB4B9C6, // bevelShadow
+            0xFFFFFFFF, // bevelHighlight
+            0xFF1A1D24, // textWhite (crisp deep dark graphite text)
+            0xFF4A5160, // textSilver (readable secondary text)
+            0xFF747C8E, // textMuted (soft helper text)
+            0xFFF4F6FA, // rowBg
+            0xFFEAEFF8, // rowBgHover
+            0xFFD0D5E0, // rowBorder
+            0xFFA0A8B8, // rowBorderHover
             0xFFDCFCE7, // toggleOnBg
-            0xFF16A34A, // toggleOnBorder
+            0xFF22C55E, // toggleOnBorder
             0xFF15803D, // toggleOnText
-            0xFFE2E5EC, // toggleOffBg
-            0xFFA8AFC0, // toggleOffBorder
-            0xFF646C7E, // toggleOffText
-            0xFFE2E6EE, // btnBg
-            0xFFB4BAC8, // btnBorder
-            0xFF7E8698, // btnBorderHover
+            0xFFF0F2F6, // toggleOffBg
+            0xFFB8BFCF, // toggleOffBorder
+            0xFF6A7282, // toggleOffText
+            0xFFE6E9F0, // btnBg
+            0xFFF4F6FA, // btnBgHover
+            0xFFD6DBE6, // btnBgActive
+            0xFFB8BFCF, // btnBorder
+            0xFF808898, // btnBorderHover
+            0xFFF0F2F6, // slotBg
+            0xFFFFFFFF, // slotBgHover
+            0xFFD0D5E0, // slotBorder
             0xFF0284C7, // accent
-            0x600284C7  // accentGlow
+            0x400284C7  // accentGlow
     );
 
     private static final List<Theme> THEMES = Arrays.asList(DARK, LIGHT);

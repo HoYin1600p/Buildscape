@@ -2062,11 +2062,16 @@ public class PillarIdManager {
                 copy.createdTime = original.createdTime;
                 copy.modifiedTime = original.modifiedTime;
                 copy.pattern = original.pattern;
-                copy.pattern_speed = original.pattern_speed;
-                copy.pattern_spread = original.pattern_spread;
-                copy.pattern_intensity = original.pattern_intensity;
-                copy.max_particle_color = original.max_particle_color;
-                copy.use_pattern = original.use_pattern;
+                copy.pattern_speed = original.pattern_speed != null ? original.pattern_speed : original.patternSpeed;
+                copy.patternSpeed = copy.pattern_speed;
+                copy.pattern_spread = original.pattern_spread != null ? original.pattern_spread : original.patternSpread;
+                copy.patternSpread = copy.pattern_spread;
+                copy.pattern_intensity = original.pattern_intensity != null ? original.pattern_intensity : original.patternIntensity;
+                copy.patternIntensity = copy.pattern_intensity;
+                copy.max_particle_color = original.max_particle_color != null ? original.max_particle_color : original.maxParticleColor;
+                copy.maxParticleColor = copy.max_particle_color;
+                copy.use_pattern = original.use_pattern != null ? original.use_pattern : original.usePattern;
+                copy.usePattern = copy.use_pattern;
                 copy.displayedItem = original.displayedItem;
                 copy.pillarType = original.pillarType;
                 copy.facing = original.facing;
@@ -2100,6 +2105,16 @@ public class PillarIdManager {
         if (syncedData != null) {
             for (PillarData data : syncedData) {
                 if (data != null && data.id != null) {
+                    if (data.usePattern == null) data.usePattern = data.use_pattern;
+                    if (data.use_pattern == null) data.use_pattern = data.usePattern;
+                    if (data.patternSpeed == null) data.patternSpeed = data.pattern_speed;
+                    if (data.pattern_speed == null) data.pattern_speed = data.patternSpeed;
+                    if (data.patternSpread == null) data.patternSpread = data.pattern_spread;
+                    if (data.pattern_spread == null) data.pattern_spread = data.patternSpread;
+                    if (data.patternIntensity == null) data.patternIntensity = data.pattern_intensity;
+                    if (data.pattern_intensity == null) data.pattern_intensity = data.patternIntensity;
+                    if (data.maxParticleColor == null) data.maxParticleColor = data.max_particle_color;
+                    if (data.max_particle_color == null) data.max_particle_color = data.maxParticleColor;
                     pillarData.put(data.id, data);
                 }
             }

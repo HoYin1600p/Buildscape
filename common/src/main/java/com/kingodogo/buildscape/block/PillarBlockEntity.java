@@ -94,7 +94,7 @@ public class PillarBlockEntity extends DataBlockEntity implements Container {
         }
 
         String earlyPattern = be.getParticlePattern();
-        if (earlyPattern == null) {
+        if (earlyPattern == null || "default".equals(earlyPattern)) {
             earlyPattern = cfg.pattern;
         }
         if ("none".equals(earlyPattern)) {
@@ -104,10 +104,12 @@ public class PillarBlockEntity extends DataBlockEntity implements Container {
         be.lastParticleTick = time;
 
         int baseCount = cfg.particle_density;
+        boolean usePattern = be.getUsePattern() != null ? be.getUsePattern() : cfg.use_pattern;
+        double intensity = be.getPatternIntensity() != null ? be.getPatternIntensity() : cfg.pattern_intensity;
         int count = Math.max(
                 1,
-                cfg.use_pattern
-                        ? (int) Math.round(baseCount * cfg.pattern_intensity)
+                usePattern
+                        ? (int) Math.round(baseCount * intensity)
                         : baseCount
         );
 
@@ -134,7 +136,7 @@ public class PillarBlockEntity extends DataBlockEntity implements Container {
                 double centerZ
         ) {
             String pattern = be.getParticlePattern();
-            if (pattern == null) {
+            if (pattern == null || "default".equals(pattern)) {
                 pattern = cfg.pattern != null ? cfg.pattern : "ring";
             }
             boolean isSnowflake = "snowflake".equals(pattern);
@@ -276,14 +278,16 @@ public class PillarBlockEntity extends DataBlockEntity implements Container {
                 }
             }
         } else {
+            double pSpeed = be.patternSpeed != null ? be.patternSpeed : cfg.particle_speed;
+            double pSpread = be.patternSpread != null ? be.patternSpread : cfg.particle_spread;
             double rAngle = ((i * 2.0D * Math.PI) / count) + (time * 0.05D);
-            double rRadius = cfg.particle_spread * 0.8D;
+            double rRadius = pSpread * 0.8D;
             sx = Math.cos(rAngle) * rRadius;
-            sy = (rand.nextDouble() - 0.5D) * cfg.particle_spread * 0.3D;
+            sy = (rand.nextDouble() - 0.5D) * pSpread * 0.3D;
             sz = Math.sin(rAngle) * rRadius;
-            vx = Math.cos(rAngle + Math.PI / 2.0D) * cfg.particle_speed * 0.4D;
-            vy = cfg.particle_speed * 0.3D;
-            vz = Math.sin(rAngle + Math.PI / 2.0D) * cfg.particle_speed * 0.4D;
+            vx = Math.cos(rAngle + Math.PI / 2.0D) * pSpeed * 0.4D;
+            vy = pSpeed * 0.3D;
+            vz = Math.sin(rAngle + Math.PI / 2.0D) * pSpeed * 0.4D;
         }
 
         return new ParticleSpawnData(sx, sy, sz, vx, vy, vz, size);

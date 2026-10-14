@@ -18,6 +18,16 @@ public final class WanderingHomemakerTrades {
 
     public static List<MerchantOffer> getStandardTrades() {
         List<MerchantOffer> list = new ArrayList<>();
+        var sculkCatalyst = Services.PLATFORM.getItem(com.kingodogo.buildscape.util.CommonId.parse("minecraft:sculk_catalyst"));
+        if (sculkCatalyst == null || sculkCatalyst == Items.AIR) {
+            sculkCatalyst = ModItems.SCULK_CATALYST.get().asItem();
+        }
+        add(list, new ItemStack(Items.EMERALD, 1), new ItemStack(sculkCatalyst, 2), 3, 1, 0.05f);
+        add(list, new ItemStack(Items.EMERALD, 1), ModItems.MUFF_BLOCK.get().createStack(2), 4, 1, 0.05f);
+        add(list, new ItemStack(Items.EMERALD, 1), ModItems.CONFETTI_ITEM.get().createStack(32), 6, 1, 0.05f);
+        add(list, new ItemStack(Items.EMERALD, 1), ModItems.RESIN_CLUMP.get().createStack(16), 8, 1, 0.05f);
+        add(list, new ItemStack(Items.EMERALD, 1), ModItems.RESIN_BLOCK.get().createStack(16), 8, 1, 0.05f);
+        add(list, new ItemStack(Items.EMERALD, 1), ModItems.CREAKING_HEART.get().createStack(2), 2, 1, 0.05f);
         add(list, new ItemStack(Items.EMERALD, 1), ModItems.BOTTLE_OF_MIST.get().createStack(16), 4, 1, 0.05f);
         for (var color : net.minecraft.world.item.DyeColor.values()) {
             if (color == net.minecraft.world.item.DyeColor.WHITE) continue;

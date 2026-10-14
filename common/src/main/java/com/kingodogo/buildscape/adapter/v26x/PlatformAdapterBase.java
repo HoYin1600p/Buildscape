@@ -1510,6 +1510,13 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter, com.kingo
     }
 
     @Override
+    public void hurtGenericDamage(net.minecraft.world.entity.LivingEntity entity, float amount) {
+        if (entity != null) {
+            entity.hurt(entity.damageSources().generic(), amount);
+        }
+    }
+
+    @Override
     public void hurtFreezeDamage(net.minecraft.world.entity.LivingEntity entity, float amount) {
         if (entity != null) {
             entity.hurt(entity.damageSources().freeze(), amount);

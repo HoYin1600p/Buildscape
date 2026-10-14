@@ -917,7 +917,7 @@ public class BlockFactory implements IBlockFactory {
                 }
                 @Override
                 protected void affectNeighborsAfterRemoval(BlockState state, ServerLevel level, BlockPos pos, boolean isMoving) {
-                    onBlockRemoved(level, pos, state);
+                    // LevelChunkMixin runs cleanup before the old block entity is detached.
                     super.affectNeighborsAfterRemoval(state, level, pos, isMoving);
                 }
                 @Override
@@ -1686,6 +1686,7 @@ public class BlockFactory implements IBlockFactory {
                 @Override
                 protected BlockState updateShape(BlockState state, LevelReader level, ScheduledTickAccess tickAccess, BlockPos pos, Direction direction, BlockPos adjacentPos, BlockState adjacentState, RandomSource random) {
                     BlockState adjusted = onUpdateShape(state, direction, adjacentState, level, pos, adjacentPos);
+                    if (direction == Direction.DOWN) return adjusted;
                     return super.updateShape(adjusted, level, tickAccess, pos, direction, adjacentPos, adjacentState, random);
                 }
 
@@ -1902,8 +1903,10 @@ public class BlockFactory implements IBlockFactory {
                 }
                 @Override
                 protected BlockState updateShape(BlockState state, LevelReader level, ScheduledTickAccess tickAccess, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, RandomSource random) {
-                    if (!state.canSurvive(level, pos)) return Blocks.AIR.defaultBlockState();
-                    return onUpdateShape(state, direction, neighborState, level, pos, neighborPos);
+                    if (direction == Direction.DOWN) {
+                        return onUpdateShape(state, direction, neighborState, level, pos, neighborPos);
+                    }
+                    return super.updateShape(state, level, tickAccess, pos, direction, neighborPos, neighborState, random);
                 }
                 @Override
                 public boolean isValidBonemealTarget(LevelReader level, BlockPos pos, BlockState state, BonemealSource source) {

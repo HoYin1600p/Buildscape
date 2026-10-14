@@ -426,7 +426,7 @@ public final class ItemFrameParticleHandler {
 
     private static void spawnColoredItemFrameParticles(Level level, ColoredItemFrameEntity coloredFrame, String pattern, PillarParticleConfig cfg, long time) {
         Random rand = new Random();
-        Direction facing = coloredFrame.getDirection();
+        Direction facing = coloredFrame.getFrameDirection();
         Vec3 normal = new Vec3(facing.getStepX(), facing.getStepY(), facing.getStepZ());
 
         double centerX = coloredFrame.getX() + normal.x * 0.0625;
@@ -876,7 +876,7 @@ public final class ItemFrameParticleHandler {
 
             String dimension = PillarIdManager.getDimensionKey(level);
             BlockPos pos = frame.blockPosition();
-            Direction dir = frame.getDirection();
+            Direction dir = frame.getFrameDirection();
 
             String exactKey = PillarIdManager.get(level).positionKey(dimension, pos, dir);
             String idFromPos = PillarIdManager.get(level).getIdForPosition(exactKey);

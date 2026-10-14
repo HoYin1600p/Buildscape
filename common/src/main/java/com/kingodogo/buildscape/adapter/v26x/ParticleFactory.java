@@ -478,7 +478,7 @@ public final class ParticleFactory {
         );
 
         registerDirect(ModParticles.GEYSER.get(),
-            (type, level, x, y, z, dx, dy, dz, random) -> new NoRenderParticle(level, x, y, z, dx, dy, dz) {
+            (type, level, x, y, z, dx, dy, dz, random) -> new NoRenderParticle(level, x, y, z) {
                 private final int waterBlocks = type.getWaterBlocks();
                 {
                     this.lifetime = 20;

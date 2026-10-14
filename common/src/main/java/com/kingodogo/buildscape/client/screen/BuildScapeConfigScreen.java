@@ -131,14 +131,22 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
     // --- Presets & Items State ---
     private int selectedPresetIndex = 0;
-    private int itemsSubTab = 0; // 0 = Items Matrix, 1 = Registered Tags Panel
-    private int itemFilterMode = 0; // 0=All Items, 1=Inventory, 2=Configured
+    private int itemsSubTab = 0; // 0 = Display Items, 1 = Display Tags
+    private int itemFilterMode = 0; // 0=All Items, 1=Inventory, 2=Mod Toggles, 3=Active
     private int tagFilterMode = 0; // 0=All Tags, 1=Active Only, 2=Inventory Tags
     private String tagSearchFilter = "";
     private final String[] TAG_CATEGORY_CHIPS = {"All", "keys", "gems", "ores", "vault", "swords", "gear"};
     private int activeTagChipIndex = 0;
 
     private final List<Item> availableItems = new ArrayList<>();
+    private final List<String> availableModNamespaces = new ArrayList<>();
+    private int currentModIndex = 0;
+    private final List<Item> cachedInventoryItems = new ArrayList<>();
+    private final Set<Item> cachedActiveItems = new HashSet<>();
+    private final Set<String> cachedActiveTags = new HashSet<>();
+    private final List<Item> cachedFilteredItems = new ArrayList<>();
+    private boolean itemsListDirty = true;
+
     private final List<String> allRegisteredTags = new ArrayList<>();
     private final Map<String, Integer> tagItemCounts = new HashMap<>();
     private final Map<Item, ItemStack> itemStackCache = new HashMap<>();
@@ -195,17 +203,56 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
     }
 
     private void cacheAvailableItems() {
-        if (!availableItems.isEmpty()) return;
-        for (Item item : Services.PLATFORM.getAllItems()) {
-            if (item != null && item != Items.AIR) {
-                availableItems.add(item);
-            }
-        }
         if (availableItems.isEmpty()) {
-            for (int rawId = 1; rawId < 2500; rawId++) {
-                Item item = Services.PLATFORM.getItemByRawId(rawId);
+            for (Item item : Services.PLATFORM.getAllItems()) {
                 if (item != null && item != Items.AIR) {
                     availableItems.add(item);
+                }
+            }
+            if (availableItems.isEmpty()) {
+                for (int rawId = 1; rawId < 2500; rawId++) {
+                    Item item = Services.PLATFORM.getItemByRawId(rawId);
+                    if (item != null && item != Items.AIR) {
+                        availableItems.add(item);
+                    }
+                }
+            }
+            availableModNamespaces.clear();
+            Set<String> modSet = new LinkedHashSet<>();
+            modSet.add("minecraft");
+            modSet.add("buildscape");
+            for (Item item : availableItems) {
+                CommonId cid = Services.PLATFORM.getItemId(item);
+                if (cid != null && cid.getNamespace() != null && !cid.getNamespace().isEmpty()) {
+                    modSet.add(cid.getNamespace());
+                }
+            }
+            availableModNamespaces.addAll(modSet);
+        }
+        rebuildActiveItemsCache();
+        refreshInventoryItemsCache();
+        itemsListDirty = true;
+    }
+
+    private static String capitalize(String str) {
+        if (str == null || str.isEmpty()) return "";
+        return Character.toUpperCase(str.charAt(0)) + str.substring(1);
+    }
+
+    private void rebuildActiveItemsCache() {
+        cachedActiveItems.clear();
+        cachedActiveTags.clear();
+        PillarParticleConfig cfg = PillarParticleConfig.get();
+        for (String s : cfg.items) {
+            if (s.startsWith("#")) {
+                cachedActiveTags.add(s);
+            } else {
+                CommonId cid = CommonId.tryParse(s);
+                if (cid != null) {
+                    Item item = Services.PLATFORM.getItem(cid);
+                    if (item != null && item != Items.AIR) {
+                        cachedActiveItems.add(item);
+                    }
                 }
             }
         }
@@ -229,34 +276,62 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
     }
 
     private List<Item> getPlayerInventoryItems() {
-        Set<Item> set = new LinkedHashSet<>();
+        if (cachedInventoryItems.isEmpty()) {
+            refreshInventoryItemsCache();
+        }
+        return cachedInventoryItems;
+    }
+
+    private void refreshInventoryItemsCache() {
+        cachedInventoryItems.clear();
         Minecraft mc = Minecraft.getInstance();
         if (mc.player != null) {
+            Set<Item> set = new LinkedHashSet<>();
             for (int i = 0; i < mc.player.getInventory().getContainerSize(); i++) {
                 ItemStack stack = mc.player.getInventory().getItem(i);
                 if (!stack.isEmpty() && stack.getItem() != Items.AIR) {
                     set.add(stack.getItem());
                 }
             }
+            cachedInventoryItems.addAll(set);
         }
-        return new ArrayList<>(set);
     }
 
-    private List<Item> getConfiguredItemsList() {
-        List<Item> result = new ArrayList<>();
-        PillarParticleConfig cfg = PillarParticleConfig.get();
-        for (String idStr : cfg.items) {
-            if (!idStr.startsWith("#")) {
-                CommonId cid = CommonId.tryParse(idStr);
-                if (cid != null) {
-                    Item item = Services.PLATFORM.getItem(cid);
-                    if (item != null && item != Items.AIR) {
-                        result.add(item);
+    private List<Item> getFilteredItemsList() {
+        if (itemsListDirty) {
+            refreshFilteredItems();
+            itemsListDirty = false;
+        }
+        return cachedFilteredItems;
+    }
+
+    private void refreshFilteredItems() {
+        cachedFilteredItems.clear();
+        switch (itemFilterMode) {
+            case 0 -> {
+                cachedFilteredItems.addAll(availableItems);
+            }
+            case 1 -> {
+                refreshInventoryItemsCache();
+                cachedFilteredItems.addAll(cachedInventoryItems);
+            }
+            case 2 -> {
+                String mod = !availableModNamespaces.isEmpty() ? availableModNamespaces.get(currentModIndex) : "minecraft";
+                for (Item item : availableItems) {
+                    CommonId cid = Services.PLATFORM.getItemId(item);
+                    if (cid != null && cid.getNamespace().equalsIgnoreCase(mod)) {
+                        cachedFilteredItems.add(item);
+                    }
+                }
+            }
+            case 3 -> {
+                for (Item item : availableItems) {
+                    if (cachedActiveItems.contains(item)) {
+                        cachedFilteredItems.add(item);
                     }
                 }
             }
         }
-        return result;
     }
 
     private List<String> getFilteredTagsList() {
@@ -331,6 +406,10 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
         this.widgets.clear();
         this.tabWidgets.clear();
+
+        refreshInventoryItemsCache();
+        rebuildActiveItemsCache();
+        itemsListDirty = true;
 
         if (activeTab != null) {
             activeTab.init();
@@ -765,14 +844,6 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         return count * (rowH + gap) + 6;
     }
 
-    private List<Item> getFilteredItemsList() {
-        return switch (itemFilterMode) {
-            case 1 -> getPlayerInventoryItems();
-            case 2 -> getConfiguredItemsList();
-            default -> availableItems;
-        };
-    }
-
     // --- Tab 0: Items & Tags Dual Panel with Fixed Toolbars, Scissor Clipping & Beveled Slots ---
     private void renderItemAndTagsPanel(Object poseStackOrGraphics, Font font, int x, int y, int w, int h, int catHeaderH, int mouseX, int mouseY, float alpha) {
         PillarParticleConfig cfg = PillarParticleConfig.get();
@@ -831,14 +902,14 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         boolean isSub0 = (itemsSubTab == 0);
         boolean hoverSub0 = mouseX >= sub0X && mouseX <= sub0X + subBtnW && mouseY >= subY && mouseY <= subY + subBtnH;
         drawBeveledButton(poseStackOrGraphics, sub0X, subY, subBtnW, subBtnH, isSub0 ? 0xFF282834 : (hoverSub0 ? 0xFF202028 : 0xFF141418), hoverSub0, isSub0, alpha);
-        String sub0Label = "▦ Item Triggers (" + cfg.items.stream().filter(s -> !s.startsWith("#")).count() + ")";
+        String sub0Label = "▦ Display Items (" + cachedActiveItems.size() + ")";
         Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, sub0Label, sub0X + subBtnW / 2, subY + 3, applyAlpha(isSub0 ? COLOR_TEXT_WHITE : COLOR_TEXT_MUTED, alpha));
 
         int sub1X = sub0X + subBtnW + 6;
         boolean isSub1 = (itemsSubTab == 1);
         boolean hoverSub1 = mouseX >= sub1X && mouseX <= sub1X + subBtnW && mouseY >= subY && mouseY <= subY + subBtnH;
         drawBeveledButton(poseStackOrGraphics, sub1X, subY, subBtnW, subBtnH, isSub1 ? 0xFF282834 : (hoverSub1 ? 0xFF202028 : 0xFF141418), hoverSub1, isSub1, alpha);
-        String sub1Label = "🏷 Registered Tags Panel (" + cfg.items.stream().filter(s -> s.startsWith("#")).count() + ")";
+        String sub1Label = "🏷 Display Tags (" + cachedActiveTags.size() + ")";
         Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, sub1Label, sub1X + subBtnW / 2, subY + 3, applyAlpha(isSub1 ? COLOR_TEXT_WHITE : COLOR_TEXT_MUTED, alpha));
 
         curY += bar2H + 2;
@@ -846,11 +917,20 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         // Bar 3: Filter Bar (Fixed at top)
         int bar3H = 16;
         if (itemsSubTab == 0) {
-            String[] filterLabels = {"All Items (" + availableItems.size() + ")", "Inventory (" + getPlayerInventoryItems().size() + ")", "Active Only (" + getConfiguredItemsList().size() + ")"};
-            int pillW = (w - 20) / 3;
+            String currentMod = !availableModNamespaces.isEmpty() ? availableModNamespaces.get(currentModIndex) : "minecraft";
+            String modBtnText = (itemFilterMode == 2)
+                    ? (capitalize(currentMod) + " (" + getFilteredItemsList().size() + ")")
+                    : "Mod Toggles";
+            String[] filterLabels = {
+                    "All Items (" + availableItems.size() + ")",
+                    "Inventory (" + getPlayerInventoryItems().size() + ")",
+                    modBtnText,
+                    "Active (" + cachedActiveItems.size() + ")"
+            };
+            int pillW = (w - 24) / 4;
             int pillH = 13;
             int pillY = curY + 1;
-            for (int f = 0; f < 3; f++) {
+            for (int f = 0; f < 4; f++) {
                 int px = x + 6 + f * (pillW + 4);
                 boolean isF = (itemFilterMode == f);
                 boolean hoverPill = mouseX >= px && mouseX <= px + pillW && mouseY >= pillY && mouseY <= pillY + pillH;
@@ -905,21 +985,24 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
             enableGuiScissor(poseStackOrGraphics, x + 4, viewportY, w - 8, viewportH);
 
-            int startRow = Math.max(0, (int) (scrollOffset / step) - 1);
-            int endRow = Math.min(rows, (int) ((scrollOffset + viewportH) / step) + 2);
+            int startRow = Math.max(0, (int) (scrollOffset / step));
+            int endRow = Math.min(rows, (int) ((scrollOffset + viewportH) / step) + 1);
 
             for (int r = startRow; r < endRow; r++) {
                 for (int c = 0; c < cols; c++) {
                     int index = r * cols + c;
                     if (index >= itemsToDisplay.size()) break;
 
-                    Item item = itemsToDisplay.get(index);
                     int slotX = gridStartX + c * step;
                     int slotY = startY + r * step;
 
-                    CommonId cid = Services.PLATFORM.getItemId(item);
-                    String idStr = cid != null ? cid.toString() : "";
-                    boolean isSelected = cfg.items.contains(idStr);
+                    // Strict vertical culling: skip if entirely outside viewport
+                    if (slotY + slotSize < viewportY || slotY > viewportY + viewportH) {
+                        continue;
+                    }
+
+                    Item item = itemsToDisplay.get(index);
+                    boolean isSelected = cachedActiveItems.contains(item);
 
                     boolean hover = mouseX >= slotX && mouseX <= slotX + slotSize && mouseY >= slotY && mouseY <= slotY + slotSize &&
                             mouseY >= viewportY && mouseY <= viewportY + viewportH;
@@ -928,32 +1011,20 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                     Services.PLATFORM.fill(poseStackOrGraphics, slotX + 1, slotY + 1, slotX + slotSize - 1, slotY + slotSize - 1, applyAlpha(bg, alpha));
 
                     if (isSelected) {
-                        int emStart = hover ? 0xFF86EFAC : 0xFF4ADE80;
-                        int emEnd = hover ? 0xFF22C55E : 0xFF16A34A;
-                        int emShadow = applyAlpha(0xFF14532D, alpha);
-                        for (int si = 0; si < slotSize; si++) {
-                            int sc = lerpColor(emStart, emEnd, (float) si / slotSize);
-                            Services.PLATFORM.fill(poseStackOrGraphics, slotX + si, slotY, slotX + si + 1, slotY + 1, applyAlpha(sc, alpha));
-                        }
-                        for (int sj = 0; sj < slotSize; sj++) {
-                            int sc = lerpColor(emStart, emEnd, (float) sj / slotSize);
-                            Services.PLATFORM.fill(poseStackOrGraphics, slotX, slotY + sj, slotX + 1, slotY + sj + 1, applyAlpha(sc, alpha));
-                        }
-                        Services.PLATFORM.fill(poseStackOrGraphics, slotX, slotY + slotSize - 1, slotX + slotSize, slotY + slotSize, emShadow);
-                        Services.PLATFORM.fill(poseStackOrGraphics, slotX + slotSize - 1, slotY, slotX + slotSize, slotY + slotSize, emShadow);
-                        Services.PLATFORM.fill(poseStackOrGraphics, slotX + slotSize - 5, slotY + 1, slotX + slotSize - 1, slotY + 5, applyAlpha(0xFF4ADE80, alpha));
+                        int emTopLeft = applyAlpha(hover ? 0xFF86EFAC : 0xFF4ADE80, alpha);
+                        int emBottomRight = applyAlpha(0xFF14532D, alpha);
+                        Services.PLATFORM.fill(poseStackOrGraphics, slotX, slotY, slotX + slotSize, slotY + 1, emTopLeft);
+                        Services.PLATFORM.fill(poseStackOrGraphics, slotX, slotY + 1, slotX + 1, slotY + slotSize - 1, emTopLeft);
+                        Services.PLATFORM.fill(poseStackOrGraphics, slotX, slotY + slotSize - 1, slotX + slotSize, slotY + slotSize, emBottomRight);
+                        Services.PLATFORM.fill(poseStackOrGraphics, slotX + slotSize - 1, slotY + 1, slotX + slotSize, slotY + slotSize - 1, emBottomRight);
+                        Services.PLATFORM.fill(poseStackOrGraphics, slotX + slotSize - 4, slotY + 1, slotX + slotSize - 1, slotY + 4, applyAlpha(0xFF4ADE80, alpha));
                     } else if (hover) {
-                        for (int si = 0; si < slotSize; si++) {
-                            int sc = lerpColor(0xFFFFFFFF, 0xFF707080, (float) si / slotSize);
-                            Services.PLATFORM.fill(poseStackOrGraphics, slotX + si, slotY, slotX + si + 1, slotY + 1, applyAlpha(sc, alpha));
-                        }
-                        for (int sj = 0; sj < slotSize; sj++) {
-                            int sc = lerpColor(0xFFFFFFFF, 0xFF505060, (float) sj / slotSize);
-                            Services.PLATFORM.fill(poseStackOrGraphics, slotX, slotY + sj, slotX + 1, slotY + sj + 1, applyAlpha(sc, alpha));
-                        }
-                        int sh = applyAlpha(0xFF09090C, alpha);
-                        Services.PLATFORM.fill(poseStackOrGraphics, slotX, slotY + slotSize - 1, slotX + slotSize, slotY + slotSize, sh);
-                        Services.PLATFORM.fill(poseStackOrGraphics, slotX + slotSize - 1, slotY, slotX + slotSize, slotY + slotSize, sh);
+                        int hTopLeft = applyAlpha(0xFFE8ECEF, alpha);
+                        int hBottomRight = applyAlpha(0xFF0D1014, alpha);
+                        Services.PLATFORM.fill(poseStackOrGraphics, slotX, slotY, slotX + slotSize, slotY + 1, hTopLeft);
+                        Services.PLATFORM.fill(poseStackOrGraphics, slotX, slotY + 1, slotX + 1, slotY + slotSize - 1, hTopLeft);
+                        Services.PLATFORM.fill(poseStackOrGraphics, slotX, slotY + slotSize - 1, slotX + slotSize, slotY + slotSize, hBottomRight);
+                        Services.PLATFORM.fill(poseStackOrGraphics, slotX + slotSize - 1, slotY + 1, slotX + slotSize, slotY + slotSize - 1, hBottomRight);
                     } else {
                         int dark = applyAlpha(0xFF0A0A0D, alpha);
                         int light = applyAlpha(0xFF262630, alpha);
@@ -1883,7 +1954,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         int viewH = contentH - catHeaderH - 8;
 
         if (mouseX >= contentX && mouseX <= contentX + contentW && mouseY >= contentY && mouseY <= contentY + contentH) {
-            if (handleContentClick(mouseX, mouseY, contentX, contentY, contentW, contentH, catHeaderH)) {
+            if (handleContentClick(mouseX, mouseY, button, contentX, contentY, contentW, contentH, catHeaderH)) {
                 return true;
             }
         }
@@ -1895,7 +1966,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         return false;
     }
 
-    private boolean handleContentClick(double mouseX, double mouseY, int contentX, int contentY, int contentW, int contentH, int catHeaderH) {
+    private boolean handleContentClick(double mouseX, double mouseY, int button, int contentX, int contentY, int contentW, int contentH, int catHeaderH) {
         NavItem current = navItems.get(selectedTabIndex);
 
         switch (current.id) {
@@ -1927,6 +1998,8 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                         List<String> keys = presetsCfg.getPresetKeys();
                         if (selectedPresetIndex < keys.size()) {
                             presetsCfg.applyPreset(keys.get(selectedPresetIndex));
+                            rebuildActiveItemsCache();
+                            itemsListDirty = true;
                         }
                     }
                     return true;
@@ -1940,6 +2013,8 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                         if (selectedPresetIndex < keys.size()) {
                             String key = keys.get(selectedPresetIndex);
                             presetsCfg.savePreset(key, presets.get(selectedPresetIndex).name, new HashSet<>(cfg.items));
+                            rebuildActiveItemsCache();
+                            itemsListDirty = true;
                         }
                     }
                     return true;
@@ -1951,6 +2026,8 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                     String newKey = presetsCfg.generatePresetKey();
                     presetsCfg.savePreset(newKey, "Custom " + (presets.size()), new HashSet<>(cfg.items));
                     selectedPresetIndex = presetsCfg.getPresets().size() - 1;
+                    rebuildActiveItemsCache();
+                    itemsListDirty = true;
                     return true;
                 }
 
@@ -1958,12 +2035,14 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                 int defX = contentX + contentW - defW - 8;
                 if (mouseX >= defX && mouseX <= defX + defW && mouseY >= cycleY && mouseY <= cycleY + btnH) {
                     presetsCfg.applyPreset("default");
+                    rebuildActiveItemsCache();
+                    itemsListDirty = true;
                     return true;
                 }
 
                 curY += bar1H + 2;
 
-                // Bar 2: Sub-View Switcher
+                // Bar 2: Sub-View Switcher: [ ▦ Display Items ] vs [ 🏷 Display Tags ]
                 int bar2H = 18;
                 int subBtnW = (contentW - 18) / 2;
                 int subBtnH = 15;
@@ -1985,16 +2064,31 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
                 curY += bar2H + 2;
 
-                // Bar 3: Filter Bar
+                // Bar 3: Filter Bar (4 buttons: All Items, Inventory, Mod Toggles, Active)
                 int bar3H = 16;
                 if (itemsSubTab == 0) {
-                    int pillW = (contentW - 20) / 3;
+                    int pillW = (contentW - 24) / 4;
                     int pillH = 13;
                     int pillY = curY + 1;
-                    for (int f = 0; f < 3; f++) {
+                    for (int f = 0; f < 4; f++) {
                         int px = contentX + 6 + f * (pillW + 4);
                         if (mouseX >= px && mouseX <= px + pillW && mouseY >= pillY && mouseY <= pillY + pillH) {
-                            itemFilterMode = f;
+                            if (f == 2) {
+                                if (itemFilterMode == 2) {
+                                    if (!availableModNamespaces.isEmpty()) {
+                                        if (button == 1 || Services.PLATFORM.hasShiftDown()) {
+                                            currentModIndex = (currentModIndex - 1 + availableModNamespaces.size()) % availableModNamespaces.size();
+                                        } else {
+                                            currentModIndex = (currentModIndex + 1) % availableModNamespaces.size();
+                                        }
+                                    }
+                                } else {
+                                    itemFilterMode = 2;
+                                }
+                            } else {
+                                itemFilterMode = f;
+                            }
+                            itemsListDirty = true;
                             scrollOffset = 0;
                             return true;
                         }
@@ -2049,10 +2143,15 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                                         String idStr = cid.toString();
                                         if (cfg.items.contains(idStr)) {
                                             cfg.items.remove(idStr);
+                                            cachedActiveItems.remove(item);
                                         } else {
                                             cfg.items.add(idStr);
+                                            cachedActiveItems.add(item);
                                         }
                                         cfg.saveItemsToDisk();
+                                        if (itemFilterMode == 3) {
+                                            itemsListDirty = true;
+                                        }
                                     }
                                     return true;
                                 }
@@ -2074,8 +2173,10 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                                 String tagId = tagsToDisplay.get(ti);
                                 if (cfg.items.contains(tagId)) {
                                     cfg.items.remove(tagId);
+                                    cachedActiveTags.remove(tagId);
                                 } else {
                                     cfg.items.add(tagId);
+                                    cachedActiveTags.add(tagId);
                                 }
                                 cfg.saveItemsToDisk();
                                 return true;

@@ -21,11 +21,15 @@ public final class BuildscapeForge {
         var modBus = context.getModEventBus();
         com.kingodogo.buildscape.adapter.v121x.ExperienceFluids.installFactories(
                 () -> new com.kingodogo.buildscape.adapter.v121x.ExperienceFluids.Source() {
+                    @Override public boolean canConvertToSource(net.minecraft.world.level.material.FluidState state,
+                            net.minecraft.world.level.Level level, net.minecraft.core.BlockPos pos) { return false; }
                     @Override public net.minecraftforge.fluids.FluidType getFluidType() {
                         return net.minecraftforge.common.ForgeMod.WATER_TYPE.get();
                     }
                 },
                 () -> new com.kingodogo.buildscape.adapter.v121x.ExperienceFluids.Flowing() {
+                    @Override public boolean canConvertToSource(net.minecraft.world.level.material.FluidState state,
+                            net.minecraft.world.level.Level level, net.minecraft.core.BlockPos pos) { return false; }
                     @Override public net.minecraftforge.fluids.FluidType getFluidType() {
                         return net.minecraftforge.common.ForgeMod.WATER_TYPE.get();
                     }

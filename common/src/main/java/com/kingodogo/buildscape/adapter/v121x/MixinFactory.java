@@ -45,12 +45,7 @@ public class MixinFactory implements IMixinFactory {
             "com.kingodogo.buildscape.mixin.BuildscapeBlockStateCacheMixin",
             "com.kingodogo.buildscape.mixin.BuildscapeForgeRegistryMixin",
             "com.kingodogo.buildscape.mixin.BuildscapeModelBakeryMixin",
-            "com.kingodogo.buildscape.mixin.CreativeModeTabMixin",
-            "com.kingodogo.buildscape.mixin.RenderBuffersMixin",
-            "com.kingodogo.buildscape.mixin.ScreenMixin",
-            "com.kingodogo.buildscape.mixin.AdvancementWidgetMixin",
-            "com.kingodogo.buildscape.mixin.GeneralStatisticsListMixin",
-            "com.kingodogo.buildscape.mixin.GeneralStatisticsListEntryMixin"
+            "com.kingodogo.buildscape.mixin.RenderBuffersMixin"
     );
 
     @Override
@@ -172,6 +167,7 @@ public class MixinFactory implements IMixinFactory {
 
     @Override
     public void renderClippedBeaconBeam(BeaconBlockEntity blockEntity, float partialTicks, PoseStack poseStack, Object bufferSource, int combinedLight, int combinedOverlay) {
+        com.kingodogo.buildscape.adapter.v121x.client.ClientMixins.renderClippedBeaconBeam(blockEntity, partialTicks, poseStack, bufferSource, combinedLight, combinedOverlay);
     }
 
     @Override
@@ -180,10 +176,75 @@ public class MixinFactory implements IMixinFactory {
 
     @Override
     public void renderAnvilZeroCostLabel(Object anvilScreen, Object poseStack) {
+        com.kingodogo.buildscape.adapter.v121x.client.ClientMixins.renderAnvilZeroCostLabel(anvilScreen, poseStack);
+    }
+
+    @Override
+    public ItemStack cycleAdvancementIcon(Object node, Object displayObject) {
+        return com.kingodogo.buildscape.adapter.v121x.client.ClientMixins.cycleAdvancementIcon(node, displayObject);
+    }
+
+    @Override
+    public void sortGeneralStatsList(Object list, java.util.Comparator<?> originalComparator) {
+        com.kingodogo.buildscape.adapter.v121x.client.ClientMixins.sortGeneralStatsList(list, originalComparator);
+    }
+
+    @Override
+    public boolean renderStatsEntry(Object stat, Object graphics, int left, int top, int width) {
+        return com.kingodogo.buildscape.adapter.v121x.client.ClientMixins.renderStatsEntry(stat, graphics, left, top, width);
+    }
+
+    @Override
+    public List<Component> prepareCustomTooltipText(ItemStack stack, List<Component> text) {
+        return com.kingodogo.buildscape.adapter.v121x.client.ClientMixins.prepareCustomTooltipText(stack, text);
+    }
+
+    @Override
+    public void renderCustomScreenTooltip(Object graphics, List<?> components, int mouseX, int mouseY, ItemStack hoverStack, net.minecraft.client.gui.Font font) {
+        com.kingodogo.buildscape.adapter.v121x.client.ClientMixins.renderCustomScreenTooltip(graphics, components, mouseX, mouseY, font);
     }
 
     @Override
     public void arrangeCreativeTabs(CreativeModeTab tab, NonNullList<ItemStack> items) {
+        var key = BuiltInRegistries.CREATIVE_MODE_TAB.getKey(tab);
+        if (key == null || !key.getNamespace().equals("minecraft")
+                || !(key.getPath().equals("building_blocks") || key.getPath().equals("colored_blocks")
+                || key.getPath().equals("functional_blocks"))) return;
+        java.util.Map<net.minecraft.resources.ResourceLocation, ItemStack> byId = new java.util.HashMap<>();
+        for (ItemStack stack : items) byId.put(BuiltInRegistries.ITEM.getKey(stack.getItem()), stack);
+        // On 1.18.2 the vertical slabs of vanilla materials live in the vanilla tabs; here only the
+        // Buildscape tab holds them, so they are added to the vanilla tab that holds their anchor.
+        for (Item item : BuiltInRegistries.ITEM) {
+            var id = BuiltInRegistries.ITEM.getKey(item);
+            if (!id.getNamespace().equals("buildscape") || !id.getPath().endsWith("_vertical_slab") || byId.containsKey(id)) continue;
+            if (vanillaAnchor(byId, id) != null) byId.put(id, new ItemStack(item));
+        }
+        java.util.Map<ItemStack, ItemStack> insertAfter = new java.util.IdentityHashMap<>();
+        Set<ItemStack> moved = java.util.Collections.newSetFromMap(new java.util.IdentityHashMap<>());
+        for (java.util.Map.Entry<net.minecraft.resources.ResourceLocation, ItemStack> entry : byId.entrySet()) {
+            var id = entry.getKey();
+            if (!id.getNamespace().equals("buildscape") || !id.getPath().endsWith("_vertical_slab")) continue;
+            ItemStack anchor = vanillaAnchor(byId, id);
+            if (anchor != null) {
+                insertAfter.put(anchor, entry.getValue());
+                moved.add(entry.getValue());
+            }
+        }
+        NonNullList<ItemStack> ordered = NonNullList.create();
+        for (ItemStack stack : items) {
+            if (moved.contains(stack)) continue;
+            ordered.add(stack);
+            ItemStack following = insertAfter.get(stack);
+            if (following != null) ordered.add(following);
+        }
+        items.clear();
+        items.addAll(ordered);
+    }
+
+    private static ItemStack vanillaAnchor(java.util.Map<net.minecraft.resources.ResourceLocation, ItemStack> byId, net.minecraft.resources.ResourceLocation id) {
+        String base = id.getPath().substring(0, id.getPath().length() - "_vertical_slab".length());
+        ItemStack anchor = byId.get(net.minecraft.resources.ResourceLocation.withDefaultNamespace(base + "_slab"));
+        return anchor != null ? anchor : byId.get(net.minecraft.resources.ResourceLocation.withDefaultNamespace(base));
     }
 
     @Override

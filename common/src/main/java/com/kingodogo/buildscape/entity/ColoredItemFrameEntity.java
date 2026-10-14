@@ -44,7 +44,7 @@ public interface ColoredItemFrameEntity {
         return Services.PLATFORM.getEntityLevel(asEntity());
     }
 
-    Direction getDirection();
+    Direction getFrameDirection();
     String getColorVariant();
     void setColorVariant(String color);
     String getParticlePattern();

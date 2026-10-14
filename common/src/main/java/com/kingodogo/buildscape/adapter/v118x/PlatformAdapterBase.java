@@ -3129,6 +3129,11 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
         }
 
         @Override
+        public Direction getFrameDirection() {
+            return this.getDirection();
+        }
+
+        @Override
         public String getColorVariant() {
             return this.getEntityData().get(DATA_COLOR);
         }
@@ -3633,6 +3638,11 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
                     this.recalculateBoundingBox();
                 }
             }
+        }
+
+        @Override
+        public Direction getFrameDirection() {
+            return this.getDirection();
         }
 
         @Override

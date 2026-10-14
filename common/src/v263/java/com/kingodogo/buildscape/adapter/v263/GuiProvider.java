@@ -203,30 +203,6 @@ public final class GuiProvider {
         }
     }
 
-    public static Screen createGuiEditorScreen(Screen parent, String tabName, com.kingodogo.buildscape.client.screen.AbstractConfigTab sourceTab) {
-        try {
-            Class<?> clazz = Class.forName("com.kingodogo.buildscape.client.screen.GuiEditorScreen");
-            com.kingodogo.buildscape.client.screen.IScreenDelegate delegate =
-                    (com.kingodogo.buildscape.client.screen.IScreenDelegate) clazz.getConstructor(Screen.class, String.class, com.kingodogo.buildscape.client.screen.AbstractConfigTab.class).newInstance(parent, tabName, sourceTab);
-            return wrapScreen(com.kingodogo.buildscape.util.ComponentHelper.translatable("buildscape.gui.editor.title"), parent, delegate);
-        } catch (Throwable t) {
-            com.kingodogo.buildscape.BuildscapeCommon.LOGGER.warn("Failed to create Buildscape GUI editor screen", t);
-            return null;
-        }
-    }
-
-    public static Screen createInventoryItemSelectorScreen(Screen parent, com.kingodogo.buildscape.client.screen.PillarItemsConfigTab configTab) {
-        try {
-            Class<?> clazz = Class.forName("com.kingodogo.buildscape.client.screen.InventoryItemSelectorScreen");
-            com.kingodogo.buildscape.client.screen.IScreenDelegate delegate =
-                    (com.kingodogo.buildscape.client.screen.IScreenDelegate) clazz.getConstructor(Screen.class, com.kingodogo.buildscape.client.screen.PillarItemsConfigTab.class).newInstance(parent, configTab);
-            return wrapScreen(com.kingodogo.buildscape.util.ComponentHelper.translatable("buildscape.config.select_inventory"), parent, delegate);
-        } catch (Throwable t) {
-            com.kingodogo.buildscape.BuildscapeCommon.LOGGER.warn("Failed to create Buildscape inventory selector screen", t);
-            return null;
-        }
-    }
-
     public static void renderGuiItem(Object poseStackOrGraphics, net.minecraft.world.item.ItemStack stack, int x, int y) {
         if (poseStackOrGraphics instanceof net.minecraft.client.gui.GuiGraphicsExtractor extractor
                 && stack != null && !stack.isEmpty()) {

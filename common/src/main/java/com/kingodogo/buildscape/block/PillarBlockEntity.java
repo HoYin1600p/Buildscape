@@ -507,6 +507,20 @@ public class PillarBlockEntity extends DataBlockEntity {
     private static final int SYNC_INTERVAL = 100;
     private int syncTickCounter = 0;
 
+    @Override
+    public void setLevel(Level level) {
+        super.setLevel(level);
+        if (level != null && !level.isClientSide()) {
+            PillarIdManager manager = PillarIdManager.get(level);
+            try {
+                manager.load();
+                manager.registerPillar(this);
+            } catch (Exception e) {
+                // Main ignores a failed manager load here; the periodic sync retries later.
+            }
+        }
+    }
+
     public static void serverTick(Level level, BlockPos pos, BlockState state, PillarBlockEntity be) {
         be.syncTickCounter++;
         if (be.syncTickCounter >= SYNC_INTERVAL) {
@@ -683,7 +697,23 @@ public class PillarBlockEntity extends DataBlockEntity {
         this.particlePattern = pattern;
         this.setChanged();
         if (level != null && !level.isClientSide()) {
+            propagatePatternToStack(pattern);
+            updatePatternInConfig(pattern);
             level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
+        }
+    }
+
+    private void updatePatternInConfig(String pattern) {
+        if (level == null || level.isClientSide()) {
+            return;
+        }
+        PillarIdManager manager = PillarIdManager.get(level);
+        PillarIdManager.PillarData data = manager.getOrCreatePillarData(level, findStackBottom());
+        if (data != null) {
+            manager.syncPatternSettingsFromNBT(this, data);
+            data.pattern = pattern;
+            data.modifiedTime = System.currentTimeMillis();
+            manager.saveImmediate();
         }
     }
 

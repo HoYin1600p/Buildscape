@@ -3,10 +3,7 @@ package com.kingodogo.buildscape.client.screen;
 import java.util.Arrays;
 import java.util.List;
 
-/**
- * Modular GUI theme registry and helper for Buildscape configuration screens.
- * Enables cycling and adding additional UI color palettes (Dark, Light, etc.).
- */
+// Modular GUI theme registry and helper for Buildscape configuration screens.
 public class ConfigThemes {
 
     public static class Theme {

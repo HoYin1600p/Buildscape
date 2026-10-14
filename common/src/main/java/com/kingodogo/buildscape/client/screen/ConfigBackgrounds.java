@@ -6,7 +6,7 @@ import com.kingodogo.buildscape.platform.Services;
 import java.util.Arrays;
 import java.util.List;
 
-// Modular GUI background registry and drawing helper for Buildscape configuration screens.
+// Modular GUI background registry and pixel-art Minecraft backdrop renderer for Buildscape configuration screens.
 public class ConfigBackgrounds {
 
     @FunctionalInterface
@@ -32,14 +32,74 @@ public class ConfigBackgrounds {
         }
     }
 
+    // --- 16x16 Minecraft Item Sprite Matrices ---
+
+    // Authentic 16x16 Minecraft Sword Matrix (hilt bottom-left to tip top-right)
+    private static final int[][] SWORD_SPRITE = {
+            { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
+            { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 3, 1 },
+            { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 3, 2, 1 },
+            { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 3, 2, 1, 0 },
+            { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 3, 2, 1, 0, 0 },
+            { 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 3, 2, 1, 0, 0, 0 },
+            { 0, 0, 0, 0, 0, 0, 0, 0, 1, 3, 2, 1, 0, 0, 0, 0 },
+            { 0, 0, 0, 0, 0, 0, 0, 1, 3, 2, 1, 0, 0, 0, 0, 0 },
+            { 0, 0, 0, 0, 0, 0, 1, 3, 2, 1, 0, 0, 0, 0, 0, 0 },
+            { 0, 0, 0, 0, 0, 1, 3, 2, 1, 0, 0, 0, 0, 0, 0, 0 },
+            { 0, 0, 0, 0, 1, 5, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0 },
+            { 0, 0, 1, 4, 5, 5, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0 },
+            { 0, 1, 5, 4, 1, 6, 1, 1, 5, 1, 0, 0, 0, 0, 0, 0 },
+            { 0, 0, 1, 1, 6, 7, 1, 4, 1, 0, 0, 0, 0, 0, 0, 0 },
+            { 0, 1, 4, 6, 7, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+            { 1, 5, 4, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
+    };
+
+    // Authentic 16x16 Minecraft Pickaxe Matrix (handle bottom-left to curved head top-right)
+    private static final int[][] PICKAXE_SPRITE = {
+            { 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0 },
+            { 0, 0, 0, 0, 1, 1, 3, 3, 3, 3, 2, 2, 2, 1, 1, 0 },
+            { 0, 0, 0, 1, 3, 3, 2, 2, 2, 2, 2, 2, 1, 2, 3, 1 },
+            { 0, 0, 1, 3, 2, 1, 0, 0, 0, 0, 0, 1, 2, 2, 2, 1 },
+            { 0, 1, 3, 2, 1, 0, 0, 0, 0, 0, 1, 6, 1, 2, 2, 1 },
+            { 0, 1, 2, 1, 0, 0, 0, 0, 0, 1, 7, 6, 1, 1, 1, 0 },
+            { 1, 2, 1, 0, 0, 0, 0, 0, 1, 7, 6, 1, 0, 0, 0, 0 },
+            { 1, 1, 0, 0, 0, 0, 0, 1, 7, 6, 1, 0, 0, 0, 0, 0 },
+            { 0, 0, 0, 0, 0, 0, 1, 7, 6, 1, 0, 0, 0, 0, 0, 0 },
+            { 0, 0, 0, 0, 0, 1, 7, 6, 1, 0, 0, 0, 0, 0, 0, 0 },
+            { 0, 0, 0, 0, 1, 7, 6, 1, 0, 0, 0, 0, 0, 0, 0, 0 },
+            { 0, 0, 0, 1, 7, 6, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+            { 0, 0, 1, 7, 6, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+            { 0, 1, 7, 6, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+            { 1, 7, 6, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+            { 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
+    };
+
+    // 8x8 Creeper Mask: 1 = dark cutout, 0 = skin
+    private static final int[][] CREEPER_MASK = {
+            { 0, 0, 0, 0, 0, 0, 0, 0 },
+            { 0, 1, 1, 0, 0, 1, 1, 0 },
+            { 0, 1, 1, 0, 0, 1, 1, 0 },
+            { 0, 0, 0, 1, 1, 0, 0, 0 },
+            { 0, 0, 1, 1, 1, 1, 0, 0 },
+            { 0, 0, 1, 1, 1, 1, 0, 0 },
+            { 0, 0, 1, 0, 0, 1, 0, 0 },
+            { 0, 0, 0, 0, 0, 0, 0, 0 }
+    };
+
+    // Registered Backgrounds
     public static final Background NONE = new Background(
             "none", "None",
             (poseStackOrGraphics, x, y, width, height, alpha, theme) -> {}
     );
 
     public static final Background CREEPER = new Background(
-            "creeper", "Creeper",
+            "creeper", "Creeper Green",
             ConfigBackgrounds::drawCreeperBackground
+    );
+
+    public static final Background GOLDEN_CREEPER = new Background(
+            "golden_creeper", "Golden Creeper",
+            ConfigBackgrounds::drawGoldenCreeperBackground
     );
 
     public static final Background SWORDS = new Background(
@@ -58,13 +118,14 @@ public class ConfigBackgrounds {
     );
 
     public static final Background REDSTONE_CIRCUIT = new Background(
-            "redstone_circuit", "Redstone Circuit",
+            "redstone_circuit", "Redstone Logic",
             ConfigBackgrounds::drawRedstoneCircuitBackground
     );
 
     private static final List<Background> BACKGROUNDS = Arrays.asList(
             NONE,
             CREEPER,
+            GOLDEN_CREEPER,
             SWORDS,
             PICKAXE,
             NETHER_PORTAL,
@@ -104,6 +165,15 @@ public class ConfigBackgrounds {
         return bg;
     }
 
+    public static Background cyclePrevBackground() {
+        activeBackgroundIndex = (activeBackgroundIndex - 1 + BACKGROUNDS.size()) % BACKGROUNDS.size();
+        Background bg = getCurrentBackground();
+        try {
+            BuildscapeClientConfig.get().setUiBackground(bg.id);
+        } catch (Exception ignored) {}
+        return bg;
+    }
+
     public static void setBackgroundIndex(int index) {
         if (index >= 0 && index < BACKGROUNDS.size()) {
             activeBackgroundIndex = index;
@@ -135,20 +205,17 @@ public class ConfigBackgrounds {
     }
 
     // =========================================================================
-    // Background Renderers: Themed Geometric Shapes with Alpha-Safe Backdrop
+    // Background Renderers: Pixel-Art Minecraft Backdrops
     // =========================================================================
 
-    // 1. CREEPER: Iconic Creeper Face & Crest with multi-shade green gradients
+    // 1. CREEPER: Iconic Green Creeper Face & Emerald Wash
     public static void drawCreeperBackground(Object poseStackOrGraphics, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme) {
         if (width <= 0 || height <= 0 || alpha <= 0.001f) return;
 
         boolean light = theme != null && theme.isLight();
-
-        // Ambient green gradient wash
-        float washAlpha = light ? 0.08f : 0.14f;
+        float washAlpha = light ? 0.07f : 0.12f;
         drawVerticalGradientRect(poseStackOrGraphics, x, y, width, height, 0xFF0B2914, 0xFF166534, 0xFF061A0C, alpha * washAlpha);
 
-        // Center Creeper Head geometry
         int maxFaceW = Math.max(32, width - 24);
         int maxFaceH = Math.max(32, height - 24);
         int faceSize = Math.min(maxFaceW, maxFaceH);
@@ -161,27 +228,14 @@ public class ConfigBackgrounds {
         float headAlpha = light ? 0.16f : 0.22f;
         float cutoutAlpha = light ? 0.32f : 0.42f;
 
-        // Authentic green gradient skin palette per row (brighter on top, deeper at bottom)
         int[] rowGreenTop = { 0xFF22C55E, 0xFF16A34A, 0xFF15803D, 0xFF16A34A, 0xFF15803D, 0xFF14532D, 0xFF0F3D1E, 0xFF0B2E16 };
         int[] rowGreenAlt = { 0xFF4ADE80, 0xFF22C55E, 0xFF16A34A, 0xFF15803D, 0xFF16A34A, 0xFF15803D, 0xFF14532D, 0xFF0F3D1E };
-
-        // 8x8 Creeper mask: 1 = dark cutout, 0 = green skin
-        int[][] creeperMask = {
-                { 0, 0, 0, 0, 0, 0, 0, 0 },
-                { 0, 1, 1, 0, 0, 1, 1, 0 },
-                { 0, 1, 1, 0, 0, 1, 1, 0 },
-                { 0, 0, 0, 1, 1, 0, 0, 0 },
-                { 0, 0, 1, 1, 1, 1, 0, 0 },
-                { 0, 0, 1, 1, 1, 1, 0, 0 },
-                { 0, 0, 1, 0, 0, 1, 0, 0 },
-                { 0, 0, 0, 0, 0, 0, 0, 0 }
-        };
 
         for (int r = 0; r < 8; r++) {
             for (int c = 0; c < 8; c++) {
                 int cx = faceX + c * cellSize;
                 int cy = faceY + r * cellSize;
-                boolean isCutout = creeperMask[r][c] == 1;
+                boolean isCutout = CREEPER_MASK[r][c] == 1;
 
                 if (isCutout) {
                     int darkCol = light ? 0xFF0B2010 : 0xFF030D06;
@@ -193,183 +247,328 @@ public class ConfigBackgrounds {
             }
         }
 
-        // Head outer beveled highlight border
         int headBorder = light ? 0xFF15803D : 0xFF34D399;
-        drawBorder(poseStackOrGraphics, faceX - 1, faceY - 1, faceSize + 2, faceSize + 2, applyAlpha(headBorder, alpha * (light ? 0.22f : 0.30f)));
+        drawBorder(poseStackOrGraphics, faceX - 1, faceY - 1, faceSize + 2, faceSize + 2, applyAlpha(headBorder, alpha * (light ? 0.20f : 0.28f)));
 
-        // Flanking Chevron Brackets
+        // Flanking chevrons
         int chevH = faceSize / 2;
         int chevY = faceY + (faceSize - chevH) / 2;
-        int chevLeftX = faceX - 16;
-        int chevRightX = faceX + faceSize + 16;
-
-        if (chevLeftX > x + 8) {
-            drawChevron(poseStackOrGraphics, chevLeftX, chevY, 8, chevH, true, headBorder, alpha * headAlpha);
-        }
-        if (chevRightX + 8 < x + width - 8) {
-            drawChevron(poseStackOrGraphics, chevRightX, chevY, 8, chevH, false, headBorder, alpha * headAlpha);
-        }
+        if (faceX - 16 > x + 8) drawChevron(poseStackOrGraphics, faceX - 16, chevY, 8, chevH, true, headBorder, alpha * headAlpha);
+        if (faceX + faceSize + 24 < x + width) drawChevron(poseStackOrGraphics, faceX + faceSize + 16, chevY, 8, chevH, false, headBorder, alpha * headAlpha);
     }
 
-    // 2. CROSSED SWORDS: Heraldic crossed broadswords with faceted circular crest
+    // 2. GOLDEN CREEPER: Shimmering Gold Creeper Face & Warm Amber Wash
+    public static void drawGoldenCreeperBackground(Object poseStackOrGraphics, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme) {
+        if (width <= 0 || height <= 0 || alpha <= 0.001f) return;
+
+        boolean light = theme != null && theme.isLight();
+        float washAlpha = light ? 0.08f : 0.14f;
+        drawVerticalGradientRect(poseStackOrGraphics, x, y, width, height, 0xFF2B1D04, 0xFFB45309, 0xFF1C1202, alpha * washAlpha);
+
+        int maxFaceW = Math.max(32, width - 24);
+        int maxFaceH = Math.max(32, height - 24);
+        int faceSize = Math.min(maxFaceW, maxFaceH);
+        faceSize = Math.min(144, Math.max(48, (faceSize / 8) * 8));
+        int cellSize = faceSize / 8;
+
+        int faceX = x + (width - faceSize) / 2;
+        int faceY = y + (height - faceSize) / 2;
+
+        float headAlpha = light ? 0.18f : 0.25f;
+        float cutoutAlpha = light ? 0.35f : 0.45f;
+
+        // Radiant multi-tone golden skin shades
+        int[] rowGoldTop = { 0xFFFDE047, 0xFFFBBF24, 0xFFF59E0B, 0xFFFBBF24, 0xFFF59E0B, 0xFFD97706, 0xFFB45309, 0xFF92400E };
+        int[] rowGoldAlt = { 0xFFFEF08A, 0xFFFDE047, 0xFFFBBF24, 0xFFF59E0B, 0xFFD97706, 0xFFB45309, 0xFF92400E, 0xFF78350F };
+
+        for (int r = 0; r < 8; r++) {
+            for (int c = 0; c < 8; c++) {
+                int cx = faceX + c * cellSize;
+                int cy = faceY + r * cellSize;
+                boolean isCutout = CREEPER_MASK[r][c] == 1;
+
+                if (isCutout) {
+                    int darkCol = light ? 0xFF261804 : 0xFF140B02;
+                    Services.PLATFORM.fill(poseStackOrGraphics, cx, cy, cx + cellSize, cy + cellSize, applyAlpha(darkCol, alpha * cutoutAlpha));
+                } else {
+                    int goldCol = ((r + c) % 2 == 0) ? rowGoldTop[r] : rowGoldAlt[r];
+                    Services.PLATFORM.fill(poseStackOrGraphics, cx, cy, cx + cellSize, cy + cellSize, applyAlpha(goldCol, alpha * headAlpha));
+                }
+            }
+        }
+
+        int goldBorder = light ? 0xFFD97706 : 0xFFFDE047;
+        drawBorder(poseStackOrGraphics, faceX - 1, faceY - 1, faceSize + 2, faceSize + 2, applyAlpha(goldBorder, alpha * (light ? 0.25f : 0.32f)));
+
+        // Flanking golden chevrons
+        int chevH = faceSize / 2;
+        int chevY = faceY + (faceSize - chevH) / 2;
+        if (faceX - 16 > x + 8) drawChevron(poseStackOrGraphics, faceX - 16, chevY, 8, chevH, true, goldBorder, alpha * headAlpha);
+        if (faceX + faceSize + 24 < x + width) drawChevron(poseStackOrGraphics, faceX + faceSize + 16, chevY, 8, chevH, false, goldBorder, alpha * headAlpha);
+    }
+
+    // 3. CROSSED SWORDS: Authentic 16x16 Minecraft Diamond Swords crossed diagonally
     public static void drawCrossedSwordsBackground(Object poseStackOrGraphics, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme) {
         if (width <= 0 || height <= 0 || alpha <= 0.001f) return;
 
         boolean light = theme != null && theme.isLight();
-        int cx = x + width / 2;
-        int cy = y + height / 2;
+        float spriteAlpha = light ? 0.22f : 0.32f;
 
-        int span = Math.min(width, height) / 3;
-        span = Math.max(36, Math.min(84, span));
+        // Diamond Sword 16x16 palette
+        int[] palette = {
+                0x00000000, // 0: transparent
+                light ? 0xFF0369A1 : 0xFF0C4A6E, // 1: outline dark cyan
+                light ? 0xFF0284C7 : 0xFF38BDF8, // 2: diamond blade body
+                light ? 0xFF38BDF8 : 0xFFE0F2FE, // 3: bright diamond specular highlight
+                light ? 0xFF1E293B : 0xFF334155, // 4: guard dark outline
+                light ? 0xFFD97706 : 0xFFF59E0B, // 5: guard gold inlay
+                light ? 0xFF78350F : 0xFF92400E, // 6: wood grip
+                light ? 0xFF92400E : 0xFFD97706  // 7: light wood highlight
+        };
 
-        float emblemAlpha = light ? 0.18f : 0.26f;
-        int bladeCol = light ? 0xFF0284C7 : 0xFF38BDF8;
-        int guardCol = light ? 0xFF1E293B : 0xFF94A3B8;
+        // Determine pixel size: scale 16x16 sprite to fill ~120-160px
+        int targetSpan = Math.min(width - 24, height - 24);
+        int pixelSize = Math.max(3, Math.min(8, targetSpan / 18));
+        int spriteDim = 16 * pixelSize;
 
-        // Background circular halo ring
-        int ringR = span - 6;
-        drawOctagonRing(poseStackOrGraphics, cx, cy, ringR, 2, bladeCol, alpha * (emblemAlpha * 0.55f));
+        int cx = x + (width - spriteDim) / 2;
+        int cy = y + (height - spriteDim) / 2;
 
-        // Diagonal Sword 1: Top-Left to Bottom-Right
-        drawDiagonalBar(poseStackOrGraphics, cx - span, cy - span, cx + span, cy + span, 4, bladeCol, alpha * emblemAlpha);
-        // Guard 1
-        int g1x = cx + (int)(span * 0.45f);
-        int g1y = cy + (int)(span * 0.45f);
-        drawDiagonalBar(poseStackOrGraphics, g1x - 9, g1y + 9, g1x + 9, g1y - 9, 3, guardCol, alpha * emblemAlpha);
+        // Subtle diamond blue ambient ring behind intersection
+        int ringR = spriteDim / 2 + 4;
+        drawOctagonRing(poseStackOrGraphics, x + width / 2, y + height / 2, ringR, 2, palette[2], alpha * (spriteAlpha * 0.40f));
 
-        // Diagonal Sword 2: Top-Right to Bottom-Left
-        drawDiagonalBar(poseStackOrGraphics, cx + span, cy - span, cx - span, cy + span, 4, bladeCol, alpha * emblemAlpha);
-        // Guard 2
-        int g2x = cx - (int)(span * 0.45f);
-        int g2y = cy + (int)(span * 0.45f);
-        drawDiagonalBar(poseStackOrGraphics, g2x - 9, g2y - 9, g2x + 9, g2y + 9, 3, guardCol, alpha * emblemAlpha);
+        // Sword 1: Normal (pointing up-right)
+        drawPixelMatrix(poseStackOrGraphics, cx, cy, SWORD_SPRITE, palette, pixelSize, false, alpha * spriteAlpha);
 
-        // Center cross boss diamond
-        drawRotatedDiamond(poseStackOrGraphics, cx, cy, 7, guardCol, alpha * emblemAlpha * 1.2f);
+        // Sword 2: Horizontally Mirrored (pointing up-left)
+        drawPixelMatrix(poseStackOrGraphics, cx, cy, SWORD_SPRITE, palette, pixelSize, true, alpha * spriteAlpha);
     }
 
-    // 3. CROSSED PICKAXES: Miner's pickaxe emblem with central diamond prism
+    // 4. CROSSED PICKAXES: Authentic 16x16 Minecraft Diamond Pickaxes crossed symmetrically
     public static void drawPickaxeBackground(Object poseStackOrGraphics, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme) {
         if (width <= 0 || height <= 0 || alpha <= 0.001f) return;
 
         boolean light = theme != null && theme.isLight();
-        int cx = x + width / 2;
-        int cy = y + height / 2;
+        float spriteAlpha = light ? 0.22f : 0.32f;
 
-        int span = Math.min(width, height) / 3;
-        span = Math.max(36, Math.min(84, span));
+        // Diamond Pickaxe 16x16 palette
+        int[] palette = {
+                0x00000000, // 0: transparent
+                light ? 0xFF0369A1 : 0xFF0C4A6E, // 1: outline dark cyan
+                light ? 0xFF0284C7 : 0xFF38BDF8, // 2: diamond pickaxe body
+                light ? 0xFF38BDF8 : 0xFFE0F2FE, // 3: bright diamond specular highlight
+                light ? 0xFF1E293B : 0xFF334155, // 4: dark metal
+                light ? 0xFFD97706 : 0xFFF59E0B, // 5: gold highlight
+                light ? 0xFF78350F : 0xFF92400E, // 6: wood handle
+                light ? 0xFF92400E : 0xFFD97706  // 7: light wood highlight
+        };
 
-        float emblemAlpha = light ? 0.18f : 0.28f;
-        int shaftCol = light ? 0xFF78350F : 0xFFD97706;
-        int headCol = light ? 0xFF0284C7 : 0xFF22D3EE;
+        int targetSpan = Math.min(width - 24, height - 24);
+        int pixelSize = Math.max(3, Math.min(8, targetSpan / 18));
+        int spriteDim = 16 * pixelSize;
 
-        // Diagonal Handles
-        drawDiagonalBar(poseStackOrGraphics, cx - span, cy - span, cx + span, cy + span, 3, shaftCol, alpha * (emblemAlpha * 0.85f));
-        drawDiagonalBar(poseStackOrGraphics, cx + span, cy - span, cx - span, cy + span, 3, shaftCol, alpha * (emblemAlpha * 0.85f));
+        int cx = x + (width - spriteDim) / 2;
+        int cy = y + (height - spriteDim) / 2;
 
-        // Curved Pickaxe Head 1 at Top-Left
-        int h1x = cx - span;
-        int h1y = cy - span;
-        drawPickaxeHead(poseStackOrGraphics, h1x, h1y, true, headCol, alpha * emblemAlpha);
+        // Subtle amber/cyan ambient ring
+        int ringR = spriteDim / 2 + 4;
+        drawOctagonRing(poseStackOrGraphics, x + width / 2, y + height / 2, ringR, 2, palette[2], alpha * (spriteAlpha * 0.40f));
 
-        // Curved Pickaxe Head 2 at Top-Right
-        int h2x = cx + span;
-        int h2y = cy - span;
-        drawPickaxeHead(poseStackOrGraphics, h2x, h2y, false, headCol, alpha * emblemAlpha);
+        // Pickaxe 1: Normal
+        drawPixelMatrix(poseStackOrGraphics, cx, cy, PICKAXE_SPRITE, palette, pixelSize, false, alpha * spriteAlpha);
 
-        // Center faceted diamond gem
-        drawRotatedDiamond(poseStackOrGraphics, cx, cy, 8, headCol, alpha * emblemAlpha * 1.3f);
+        // Pickaxe 2: Mirrored
+        drawPixelMatrix(poseStackOrGraphics, cx, cy, PICKAXE_SPRITE, palette, pixelSize, true, alpha * spriteAlpha);
     }
 
-    // 4. NETHER PORTAL: Obsidian monolith frame with mystical dimensional gradient & floating particles
+    // 5. NETHER PORTAL: Authentic 4x5 Minecraft Obsidian Blocks Frame with Swirling Purple Portal Core
     public static void drawNetherPortalBackground(Object poseStackOrGraphics, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme) {
         if (width <= 0 || height <= 0 || alpha <= 0.001f) return;
 
         boolean light = theme != null && theme.isLight();
-        int cx = x + width / 2;
-        int cy = y + height / 2;
+        float portalAlpha = light ? 0.22f : 0.32f;
 
-        int pw = Math.max(48, Math.min(108, width / 3));
-        int ph = Math.max(68, Math.min(160, (int) (height * 0.72f)));
-        int px = cx - pw / 2;
-        int py = cy - ph / 2;
+        // Portal frame is 4 blocks wide x 5 blocks high (standard Minecraft portal)
+        int blockW = Math.max(16, Math.min(32, width / 7));
+        int blockH = blockW;
 
-        float portalAlpha = light ? 0.18f : 0.28f;
+        int portalW = blockW * 4;
+        int portalH = blockH * 5;
 
-        // Inner dimensional vortex vertical gradient
-        int topViolet = 0xFF3B0764;
-        int midMagenta = 0xFFA855F7;
-        int botMidnight = 0xFF1E0836;
-        drawVerticalGradientRect(poseStackOrGraphics, px + 5, py + 5, pw - 10, ph - 10, topViolet, midMagenta, botMidnight, alpha * portalAlpha);
+        int px = x + (width - portalW) / 2;
+        int py = y + (height - portalH) / 2;
 
-        // Floating geometric portal particles
-        int partCol = 0xFFE9D5FF;
-        int[] partOffsets = { 10, 18, 26, 40, 52, 68, 84, 96, 110 };
-        for (int i = 0; i < partOffsets.length; i++) {
-            int offY = partOffsets[i];
-            if (offY + 4 >= ph - 10) continue;
-            int offX = (int) ((Math.sin(i * 1.7) * 0.5 + 0.5) * (pw - 20)) + 6;
-            int sz = (i % 2 == 0) ? 3 : 2;
-            Services.PLATFORM.fill(poseStackOrGraphics, px + offX, py + offY, px + offX + sz, py + offY + sz, applyAlpha(partCol, alpha * portalAlpha * 1.4f));
+        // 1. Obsidian Block Palette (deep purple/black mottled blocks)
+        int[] obsShades = { 0xFF140C26, 0xFF1F1238, 0xFF2A164C, 0xFF0D061A, 0xFF1A0E30 };
+
+        // Draw 4x5 block grid (outer perimeter = obsidian, inner 2x3 = portal core)
+        for (int row = 0; row < 5; row++) {
+            for (int col = 0; col < 4; col++) {
+                boolean isFrame = (row == 0 || row == 4 || col == 0 || col == 3);
+                int bx = px + col * blockW;
+                int by = py + row * blockH;
+
+                if (isFrame) {
+                    // Obsidian block with authentic 4-quadrant pixel mottling
+                    int halfW = blockW / 2;
+                    int halfH = blockH / 2;
+                    int s1 = obsShades[(row * 4 + col) % obsShades.length];
+                    int s2 = obsShades[(row * 4 + col + 1) % obsShades.length];
+                    int s3 = obsShades[(row * 4 + col + 2) % obsShades.length];
+                    int s4 = obsShades[(row * 4 + col + 3) % obsShades.length];
+
+                    Services.PLATFORM.fill(poseStackOrGraphics, bx, by, bx + halfW, by + halfH, applyAlpha(s1, alpha * portalAlpha * 1.3f));
+                    Services.PLATFORM.fill(poseStackOrGraphics, bx + halfW, by, bx + blockW, by + halfH, applyAlpha(s2, alpha * portalAlpha * 1.3f));
+                    Services.PLATFORM.fill(poseStackOrGraphics, bx, by + halfH, bx + halfW, by + blockH, applyAlpha(s3, alpha * portalAlpha * 1.3f));
+                    Services.PLATFORM.fill(poseStackOrGraphics, bx + halfW, by + halfH, bx + blockW, by + blockH, applyAlpha(s4, alpha * portalAlpha * 1.3f));
+
+                    // 1px beveled block perimeter
+                    drawBorder(poseStackOrGraphics, bx, by, blockW, blockH, applyAlpha(0xFF3B1D66, alpha * portalAlpha * 0.9f));
+                }
+            }
         }
 
-        // Obsidian Frame (Outer 5px stepped border)
-        int obsOuter = light ? 0xFF0F0A1C : 0xFF140C26;
-        int obsBevel = light ? 0xFF281845 : 0xFF4C1D95;
+        // 2. Inner Portal Vortex (2 blocks wide x 3 blocks high)
+        int coreX = px + blockW;
+        int coreY = py + blockH;
+        int coreW = blockW * 2;
+        int coreH = blockH * 3;
 
-        // Top, Bottom, Left, Right 5px thick obsidian bars
-        Services.PLATFORM.fill(poseStackOrGraphics, px, py, px + pw, py + 5, applyAlpha(obsOuter, alpha * (portalAlpha * 1.2f)));
-        Services.PLATFORM.fill(poseStackOrGraphics, px, py + ph - 5, px + pw, py + ph, applyAlpha(obsOuter, alpha * (portalAlpha * 1.2f)));
-        Services.PLATFORM.fill(poseStackOrGraphics, px, py, px + 5, py + ph, applyAlpha(obsOuter, alpha * (portalAlpha * 1.2f)));
-        Services.PLATFORM.fill(poseStackOrGraphics, px + pw - 5, py, px + pw, py + ph, applyAlpha(obsOuter, alpha * (portalAlpha * 1.2f)));
+        // Mystical purple gradient core
+        int topViolet = 0xFF581C87;
+        int midMagenta = 0xFFA855F7;
+        int botMidnight = 0xFF2E1065;
+        drawVerticalGradientRect(poseStackOrGraphics, coreX, coreY, coreW, coreH, topViolet, midMagenta, botMidnight, alpha * portalAlpha);
 
-        // Specular inner edge lines
-        drawBorder(poseStackOrGraphics, px + 4, py + 4, pw - 8, ph - 8, applyAlpha(obsBevel, alpha * (portalAlpha * 1.5f)));
+        // Pixelated wavy portal columns
+        int colCount = 6;
+        int colW = Math.max(2, coreW / colCount);
+        int[] purpleSwirls = { 0xFF7E22CE, 0xFF9333EA, 0xFFA855F7, 0xFFC084FC, 0xFF9333EA, 0xFF6B21A8 };
+
+        for (int c = 0; c < colCount; c++) {
+            int cx = coreX + c * colW;
+            int curColW = (c == colCount - 1) ? (coreX + coreW - cx) : colW;
+            int colTint = purpleSwirls[c % purpleSwirls.length];
+
+            for (int r = 0; r < coreH; r += 4) {
+                int waveShift = (int) (Math.sin((r + c * 8) * 0.2) * 2);
+                int segH = Math.min(4, coreH - r);
+                Services.PLATFORM.fill(poseStackOrGraphics, cx + waveShift, coreY + r, cx + waveShift + curColW, coreY + r + segH, applyAlpha(colTint, alpha * portalAlpha * 0.45f));
+            }
+        }
+
+        // Floating glowing portal particles
+        int[] partOffsets = { 6, 14, 24, 38, 50, 64, 76, 92 };
+        for (int i = 0; i < partOffsets.length; i++) {
+            int offY = partOffsets[i];
+            if (offY + 4 >= coreH) continue;
+            int offX = (int) ((Math.sin(i * 1.9) * 0.5 + 0.5) * (coreW - 8)) + 4;
+            int sz = (i % 2 == 0) ? 3 : 2;
+            Services.PLATFORM.fill(poseStackOrGraphics, coreX + offX, coreY + offY, coreX + offX + sz, coreY + offY + sz, applyAlpha(0xFFE9D5FF, alpha * portalAlpha * 1.5f));
+        }
+
+        // Portal inner frame edge shadow
+        drawBorder(poseStackOrGraphics, coreX, coreY, coreW, coreH, applyAlpha(0xFF140C26, alpha * portalAlpha * 1.4f));
     }
 
-    // 5. REDSTONE CIRCUIT: Interlocking conduit traces with logic nodes & corner chamfers
+    // 6. REDSTONE LOGIC: Dappled Redstone Dust Tracks, Repeaters & Logic Gates
     public static void drawRedstoneCircuitBackground(Object poseStackOrGraphics, int x, int y, int width, int height, float alpha, ConfigThemes.Theme theme) {
         if (width <= 0 || height <= 0 || alpha <= 0.001f) return;
 
         boolean light = theme != null && theme.isLight();
-        float traceAlpha = light ? 0.16f : 0.25f;
+        float traceAlpha = light ? 0.20f : 0.30f;
 
-        int redBright = 0xFFEF4444;
-        int redDeep = 0xFF991B1B;
+        int redLit = 0xFFEF4444;
+        int redMid = 0xFFDC2626;
+        int redDark = 0xFF991B1B;
+        int stoneBase = light ? 0xFF94A3B8 : 0xFF475569;
+        int torchWood = 0xFF78350F;
 
-        int inset1 = 14;
-        int inset2 = 26;
+        int inset = 18;
+        int trackW = width - inset * 2;
+        int trackH = height - inset * 2;
 
-        // Outer conduit ring with corner cutouts
-        drawBorder(poseStackOrGraphics, x + inset1, y + inset1, width - inset1 * 2, height - inset1 * 2, applyAlpha(redDeep, alpha * traceAlpha));
-        drawBorder(poseStackOrGraphics, x + inset2, y + inset2, width - inset2 * 2, height - inset2 * 2, applyAlpha(redBright, alpha * (traceAlpha * 0.8f)));
+        // Perimeter Redstone Dust Line (dappled 3px wide wire)
+        drawRedstoneWire(poseStackOrGraphics, x + inset, y + inset, trackW, true, redLit, redMid, redDark, alpha * traceAlpha);
+        drawRedstoneWire(poseStackOrGraphics, x + inset, y + inset + trackH, trackW, true, redLit, redMid, redDark, alpha * traceAlpha);
+        drawRedstoneWire(poseStackOrGraphics, x + inset, y + inset, trackH, false, redLit, redMid, redDark, alpha * traceAlpha);
+        drawRedstoneWire(poseStackOrGraphics, x + inset + trackW, y + inset, trackH, false, redLit, redMid, redDark, alpha * traceAlpha);
 
-        // Cross-conduit connecting rays from outer to inner ring
         int cx = x + width / 2;
         int cy = y + height / 2;
 
-        Services.PLATFORM.fill(poseStackOrGraphics, cx - 1, y + inset1, cx + 1, y + inset2, applyAlpha(redBright, alpha * traceAlpha));
-        Services.PLATFORM.fill(poseStackOrGraphics, cx - 1, y + height - inset2, cx + 1, y + height - inset1, applyAlpha(redBright, alpha * traceAlpha));
-        Services.PLATFORM.fill(poseStackOrGraphics, x + inset1, cy - 1, x + inset2, cy + 1, applyAlpha(redBright, alpha * traceAlpha));
-        Services.PLATFORM.fill(poseStackOrGraphics, x + width - inset2, cy - 1, x + width - inset1, cy + 1, applyAlpha(redBright, alpha * traceAlpha));
+        // Cross Redstone Tracks connecting center
+        drawRedstoneWire(poseStackOrGraphics, cx - 1, y + inset, cy - (y + inset), false, redLit, redMid, redDark, alpha * traceAlpha);
+        drawRedstoneWire(poseStackOrGraphics, cx - 1, cy, (y + inset + trackH) - cy, false, redLit, redMid, redDark, alpha * traceAlpha);
+        drawRedstoneWire(poseStackOrGraphics, x + inset, cy - 1, cx - (x + inset), true, redLit, redMid, redDark, alpha * traceAlpha);
+        drawRedstoneWire(poseStackOrGraphics, cx, cy - 1, (x + inset + trackW) - cx, true, redLit, redMid, redDark, alpha * traceAlpha);
 
-        // Logic Diode / Comparator Diamond Nodes along the bus
-        drawRotatedDiamond(poseStackOrGraphics, cx, y + inset1, 4, redBright, alpha * traceAlpha * 1.4f);
-        drawRotatedDiamond(poseStackOrGraphics, cx, y + height - inset1, 4, redBright, alpha * traceAlpha * 1.4f);
-        drawRotatedDiamond(poseStackOrGraphics, x + inset1, cy, 4, redBright, alpha * traceAlpha * 1.4f);
-        drawRotatedDiamond(poseStackOrGraphics, x + width - inset1, cy, 4, redBright, alpha * traceAlpha * 1.4f);
+        // Center Minecraft Redstone Repeater Component
+        int repW = 34;
+        int repH = 22;
+        int repX = cx - repW / 2;
+        int repY = cy - repH / 2;
 
-        // Center glowing logic chip
-        int chipSize = 22;
-        int chipX = cx - chipSize / 2;
-        int chipY = cy - chipSize / 2;
-        drawBorder(poseStackOrGraphics, chipX, chipY, chipSize, chipSize, applyAlpha(redBright, alpha * traceAlpha * 1.3f));
-        drawRotatedDiamond(poseStackOrGraphics, cx, cy, 5, redBright, alpha * traceAlpha * 1.5f);
+        // Smooth stone slab base
+        Services.PLATFORM.fill(poseStackOrGraphics, repX, repY, repX + repW, repY + repH, applyAlpha(stoneBase, alpha * traceAlpha * 1.1f));
+        drawBorder(poseStackOrGraphics, repX, repY, repW, repH, applyAlpha(0xFF1E293B, alpha * traceAlpha * 1.3f));
+
+        // Two Redstone Torches on the Repeater (Stationary Lit Torch + Adjustable Slider Torch)
+        // Torch 1: Left
+        int t1x = repX + 8;
+        int t1y = repY + 6;
+        Services.PLATFORM.fill(poseStackOrGraphics, t1x, t1y + 4, t1x + 3, t1y + 10, applyAlpha(torchWood, alpha * traceAlpha * 1.5f));
+        Services.PLATFORM.fill(poseStackOrGraphics, t1x - 1, t1y, t1x + 4, t1y + 4, applyAlpha(redLit, alpha * traceAlpha * 1.8f));
+
+        // Torch 2: Right
+        int t2x = repX + repW - 11;
+        int t2y = repY + 6;
+        Services.PLATFORM.fill(poseStackOrGraphics, t2x, t2y + 4, t2x + 3, t2y + 10, applyAlpha(torchWood, alpha * traceAlpha * 1.5f));
+        Services.PLATFORM.fill(poseStackOrGraphics, t2x - 1, t2y, t2x + 4, t2y + 4, applyAlpha(redLit, alpha * traceAlpha * 1.8f));
+
+        // Redstone Dust Connection Arrow on Repeater Base
+        drawRotatedDiamond(poseStackOrGraphics, cx, cy, 3, redLit, alpha * traceAlpha * 1.6f);
     }
 
     // =========================================================================
-    // Geometric Drawing Primitives
+    // Drawing Helpers & Pixel Matrix Renderers
     // =========================================================================
+
+    public static void drawPixelMatrix(Object poseStackOrGraphics, int startX, int startY, int[][] matrix, int[] palette, int pixelSize, boolean mirrorH, float alpha) {
+        int rows = matrix.length;
+        int cols = matrix[0].length;
+        for (int r = 0; r < rows; r++) {
+            for (int c = 0; c < cols; c++) {
+                int colIdx = mirrorH ? (cols - 1 - c) : c;
+                int val = matrix[r][colIdx];
+                if (val <= 0 || val >= palette.length) continue;
+                int color = palette[val];
+                int px = startX + c * pixelSize;
+                int py = startY + r * pixelSize;
+                Services.PLATFORM.fill(poseStackOrGraphics, px, py, px + pixelSize, py + pixelSize, applyAlpha(color, alpha));
+            }
+        }
+    }
+
+    private static void drawRedstoneWire(Object poseStackOrGraphics, int x, int y, int length, boolean horizontal, int colLit, int colMid, int colDark, float alpha) {
+        int[] shades = { colLit, colMid, colDark, colMid, colLit };
+        int wireThickness = 3;
+
+        if (horizontal) {
+            for (int i = 0; i < length; i += 2) {
+                int col = shades[(i / 2) % shades.length];
+                int segW = Math.min(2, length - i);
+                Services.PLATFORM.fill(poseStackOrGraphics, x + i, y, x + i + segW, y + wireThickness, applyAlpha(col, alpha));
+            }
+        } else {
+            for (int j = 0; j < length; j += 2) {
+                int col = shades[(j / 2) % shades.length];
+                int segH = Math.min(2, length - j);
+                Services.PLATFORM.fill(poseStackOrGraphics, x, y + j, x + wireThickness, y + j + segH, applyAlpha(col, alpha));
+            }
+        }
+    }
 
     public static int applyAlpha(int argb, float alpha) {
         int a = (int) (((argb >> 24) & 0xFF) * Math.max(0.0f, Math.min(1.0f, alpha)));
@@ -419,21 +618,6 @@ public class ConfigBackgrounds {
         }
     }
 
-    public static void drawDiagonalBar(Object poseStackOrGraphics, int x1, int y1, int x2, int y2, int thickness, int color, float alpha) {
-        int steps = Math.max(Math.abs(x2 - x1), Math.abs(y2 - y1));
-        if (steps <= 0) return;
-
-        int c = applyAlpha(color, alpha);
-        int halfThick = thickness / 2;
-
-        for (int i = 0; i <= steps; i++) {
-            float t = (float) i / (float) steps;
-            int px = (int) Math.round(x1 + (x2 - x1) * t);
-            int py = (int) Math.round(y1 + (y2 - y1) * t);
-            Services.PLATFORM.fill(poseStackOrGraphics, px - halfThick, py - halfThick, px + halfThick + 1, py + halfThick + 1, c);
-        }
-    }
-
     public static void drawRotatedDiamond(Object poseStackOrGraphics, int cx, int cy, int radius, int color, float alpha) {
         int c = applyAlpha(color, alpha);
         for (int dy = -radius; dy <= radius; dy++) {
@@ -447,20 +631,11 @@ public class ConfigBackgrounds {
         int r = radius;
         int t = thickness;
 
-        // 8 symmetrical line segments forming an octagon
         int cornerOffset = (int) (r * 0.707f);
-        // Top and bottom horizontal segments
         Services.PLATFORM.fill(poseStackOrGraphics, cx - cornerOffset, cy - r, cx + cornerOffset, cy - r + t, c);
         Services.PLATFORM.fill(poseStackOrGraphics, cx - cornerOffset, cy + r - t, cx + cornerOffset, cy + r, c);
-        // Left and right vertical segments
         Services.PLATFORM.fill(poseStackOrGraphics, cx - r, cy - cornerOffset, cx - r + t, cy + cornerOffset, c);
         Services.PLATFORM.fill(poseStackOrGraphics, cx + r - t, cy - cornerOffset, cx + r, cy + cornerOffset, c);
-
-        // Diagonal connecting corners
-        drawDiagonalBar(poseStackOrGraphics, cx - r, cy - cornerOffset, cx - cornerOffset, cy - r, t, color, alpha);
-        drawDiagonalBar(poseStackOrGraphics, cx + cornerOffset, cy - r, cx + r, cy - cornerOffset, t, color, alpha);
-        drawDiagonalBar(poseStackOrGraphics, cx - r, cy + cornerOffset, cx - cornerOffset, cy + r, t, color, alpha);
-        drawDiagonalBar(poseStackOrGraphics, cx + cornerOffset, cy + r, cx + r, cy + cornerOffset, t, color, alpha);
     }
 
     public static void drawChevron(Object poseStackOrGraphics, int x, int y, int w, int h, boolean pointingLeft, int color, float alpha) {
@@ -474,19 +649,6 @@ public class ConfigBackgrounds {
             int px = (int) Math.round(tipX + (baseExtX - tipX) * frac);
             Services.PLATFORM.fill(poseStackOrGraphics, px, y + halfH - dy, px + 2, y + halfH - dy + 1, c);
             Services.PLATFORM.fill(poseStackOrGraphics, px, y + halfH + dy, px + 2, y + halfH + dy + 1, c);
-        }
-    }
-
-    public static void drawPickaxeHead(Object poseStackOrGraphics, int tipX, int tipY, boolean leftSided, int color, float alpha) {
-        int c = applyAlpha(color, alpha);
-        int span = 18;
-        int dir = leftSided ? -1 : 1;
-
-        // Crescent curve of the pickaxe head
-        for (int i = 0; i < span; i++) {
-            int px = tipX + dir * (i - span / 2);
-            int py = tipY + (int) Math.round(Math.pow((double) i / (span / 2) - 1.0, 2) * 5.0);
-            Services.PLATFORM.fill(poseStackOrGraphics, px - 1, py - 1, px + 2, py + 2, c);
         }
     }
 }

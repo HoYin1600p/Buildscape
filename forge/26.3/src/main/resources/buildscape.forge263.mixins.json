@@ -1,0 +1,9 @@
+{
+  "required": true,
+  "minVersion": "0.8.7",
+  "package": "com.kingodogo.buildscape.mixin.forge263",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": ["BlockEntityDataMixin", "TradeSetAccessor", "CauldronDispatcherInvoker"],
+  "client": ["SpecialModelRenderersAccessor", "WorldOverlaySubmissionMixin"],
+  "injectors": {"defaultRequire": 1}
+}

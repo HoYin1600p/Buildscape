@@ -200,6 +200,10 @@ public class HollowPipeBlock extends RotatedPillarBlock implements SimpleWaterlo
         if (stack.getItem() instanceof BucketItem && !(stack.getItem() instanceof MobBucketItem)) {
             return Services.PLATFORM.getBucketFluid(stack.getItem());
         }
+        // 1.21.x and later: the experience bucket is a drinkable item, not a BucketItem, but still pours experience.
+        if (stack.getItem() instanceof com.kingodogo.buildscape.item.ExperienceBucketItem) {
+            return com.kingodogo.buildscape.fluid.ModFluids.getStill();
+        }
         return Fluids.EMPTY;
     }
 

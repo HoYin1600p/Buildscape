@@ -485,7 +485,7 @@ public class PillarBlock extends Block implements EntityBlock, SimpleWaterlogged
 
         if (player.isShiftKeyDown()) {
             ItemStack displayed = pillarBE.getDisplayedItem();
-            boolean isSpawnEgg = !displayed.isEmpty() && displayed.getItem() instanceof SpawnEggItem;
+            boolean isSpawnEgg = !displayed.isEmpty() && Services.PLATFORM.isSpawnEgg(displayed);
 
             if (isSpawnEgg) {
                 pillarBE.rotateFacing();

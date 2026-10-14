@@ -329,7 +329,10 @@ public final class ModCommonEvents {
     }
 
     public static void onServerStarted(MinecraftServer server) {
-        PillarIdManager.get().load();
+        // The reference resets the per-world cache on server starting; neither loader port has that event, so do it here.
+        // The manager has no Forge server lookup either: it learns the running server from this call.
+        PillarIdManager.resetWorldCache();
+        PillarIdManager.get().load(server);
     }
 
     public static void onServerTick(MinecraftServer server) {

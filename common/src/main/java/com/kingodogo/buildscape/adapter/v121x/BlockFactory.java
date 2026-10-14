@@ -174,6 +174,7 @@ import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.phys.BlockHitResult;
+import javax.annotation.Nullable;
 import java.util.function.Supplier;
 public class BlockFactory implements IBlockFactory {
 
@@ -567,6 +568,10 @@ public class BlockFactory implements IBlockFactory {
         } else if (def.isSmokeVent()) {
             return new SmokeVentBlock(props) {
                 @Override
+                public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
+                    onAnimateTick(state, level, pos);
+                }
+                @Override
                 protected BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
                     return onUpdateShape(state, direction, neighborState, level, pos, neighborPos);
                 }
@@ -847,6 +852,8 @@ public class BlockFactory implements IBlockFactory {
         } else if (def.isPillar()) {
             return new PillarBlock(props) {
                 @Override
+                protected boolean propagatesSkylightDown(BlockState state, BlockGetter level, BlockPos pos) { return true; }
+                @Override
                 protected BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
                     if (state.getValue(PillarBlock.WATERLOGGED)) {
                         level.scheduleTick(pos, net.minecraft.world.level.material.Fluids.WATER, net.minecraft.world.level.material.Fluids.WATER.getTickDelay(level));
@@ -923,9 +930,25 @@ public class BlockFactory implements IBlockFactory {
                     super.neighborChanged(state, level, pos, block, fromPos, isMoving);
                     onNeighborUpdate(level, pos, state, block, fromPos, isMoving);
                 }
+                @Override
+                public boolean canPlaceLiquid(@Nullable Player player, BlockGetter level, BlockPos pos, BlockState state, Fluid fluid) {
+                    return canPlaceLiquid(level, pos, state, fluid);
+                }
+                @Override
+                public ItemStack pickupBlock(@Nullable Player player, LevelAccessor level, BlockPos pos, BlockState state) {
+                    return pickupBlock(level, pos, state);
+                }
             };
         } else if (def.isHollowPipe()) {
             return new HollowPipeBlock(props) {
+                @Override
+                public boolean canPlaceLiquid(@Nullable Player player, BlockGetter level, BlockPos pos, BlockState state, Fluid fluid) {
+                    return canPlaceLiquid(level, pos, state, fluid);
+                }
+                @Override
+                public ItemStack pickupBlock(@Nullable Player player, LevelAccessor level, BlockPos pos, BlockState state) {
+                    return pickupBlock(level, pos, state);
+                }
                 @Override
                 protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
                     return toItemInteractionResult(onInteract(level, pos, state, player, hand, hit));
@@ -1099,6 +1122,8 @@ public class BlockFactory implements IBlockFactory {
                 protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
                     return onInteract(level, pos, state, player, InteractionHand.MAIN_HAND, hit);
                 }
+                @Override
+                protected int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos) { return getAnalogOutput(state, level, pos); }
                 @Override
                 protected MapCodec<FestiveStockingBlock> codec() {
                     return MapCodec.<FestiveStockingBlock>unit(() -> this);
@@ -1350,6 +1375,9 @@ public class BlockFactory implements IBlockFactory {
             // Keep the reference catalog light function.
             if (tinted) props.dynamicShape();
             return new BigOrnamentBlock(props, tinted) {
+                public Integer getBeaconColorMultiplier(BlockState state, LevelReader level, BlockPos pos, BlockPos beaconPos) {
+                    return getBeaconColor(state, level, pos, beaconPos);
+                }
                 @Override
                 protected int getLightBlock(BlockState state, BlockGetter level, BlockPos pos) {
                     return isTinted() ? 0 : super.getLightBlock(state, level, pos);
@@ -1373,6 +1401,9 @@ public class BlockFactory implements IBlockFactory {
             // Keep the reference catalog light function.
             if (tinted) props.dynamicShape();
             return new OrnamentBlock(props, tinted) {
+                public Integer getBeaconColorMultiplier(BlockState state, LevelReader level, BlockPos pos, BlockPos beaconPos) {
+                    return getBeaconColor(state, level, pos, beaconPos);
+                }
                 @Override protected int getLightBlock(BlockState state, BlockGetter level, BlockPos pos) { return isTinted() ? 0 : super.getLightBlock(state, level, pos); }
                 @Override protected BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos pos, BlockPos neighborPos) { if (state.getValue(WATERLOGGED)) level.scheduleTick(pos, net.minecraft.world.level.material.Fluids.WATER, net.minecraft.world.level.material.Fluids.WATER.getTickDelay(level)); if (!canSurvive(state, level, pos) && level instanceof ServerLevel) level.scheduleTick(pos, this, 1); return super.updateShape(state, direction, neighborState, level, pos, neighborPos); }
                 @Override protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) { return toItemInteractionResult(onInteract(level, pos, state, player, hand, hit)); }

@@ -33,7 +33,14 @@ public class TrappedDecoratedPotBlockEntity extends DecoratedPotBlockEntity {
             if (com.kingodogo.buildscape.platform.Services.PLATFORM.isSpawnEgg(stored) && level instanceof ServerLevel serverLevel) {
                 com.kingodogo.buildscape.platform.Services.PLATFORM.spawnMobFromEgg(serverLevel, pos, stored);
             } else {
-                Containers.dropItemStack(level, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, stored);
+                if (com.kingodogo.buildscape.platform.Services.isVersionCluster("v121x")) {
+                    net.minecraft.world.entity.item.ItemEntity itemEntity = new net.minecraft.world.entity.item.ItemEntity(
+                            level, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, stored);
+                    itemEntity.setDefaultPickUpDelay();
+                    level.addFreshEntity(itemEntity);
+                } else {
+                    Containers.dropItemStack(level, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, stored);
+                }
             }
         }
     }

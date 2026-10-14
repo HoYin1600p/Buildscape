@@ -344,11 +344,11 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
     private void initNavItems() {
         navItems.clear();
-        navItems.add(new NavItem("items", "☵", "Items & Tags", "Configure activation triggers, tags, and presets"));
-        navItems.add(new NavItem("particles", "✦", "Particles", "Configure kinetic trajectory and emission mechanics"));
-        navItems.add(new NavItem("pillars", "▲", "Pillar IDs", "Manage and customize in-world synchronized pillar columns"));
-        navItems.add(new NavItem("world", "⚙", "World Settings", "Control world griefing, felling, and inventory mechanics"));
-        navItems.add(new NavItem("system", "ℹ", "System", "Engine architecture and client preferences"));
+        navItems.add(new NavItem("items", "☵", "Items & Tags", "Display items, tags, and presets"));
+        navItems.add(new NavItem("particles", "✦", "Particles", "Particle speed, patterns, and colors"));
+        navItems.add(new NavItem("pillars", "▲", "Pillar IDs", "List and customize placed pillar blocks"));
+        navItems.add(new NavItem("world", "⚙", "World Settings", "Griefing rules, tree felling, and stacking"));
+        navItems.add(new NavItem("system", "ℹ", "System", "Client preferences and mod updates"));
     }
 
     private void cacheAvailableItems() {
@@ -603,6 +603,15 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         rebuildActiveItemsCache();
         itemsListDirty = true;
         syncPillars();
+
+        int tabH = 26;
+        int tabGap = 3;
+        int panelH = Math.min(height - 16, 308);
+        int panelY = (height - panelH) / 2;
+        int headerH = 24;
+        int navY = panelY + 7 + headerH + 5;
+        int startY = navY + 4;
+        currentIndicatorY = targetNavIndicatorY = prevNavIndicatorY = startY + selectedTabIndex * (tabH + tabGap);
 
         if (activeTab != null) {
             activeTab.init();
@@ -925,32 +934,61 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         int startY = y + 4;
         String hoveredTooltip = null;
 
+        // Calculate animated gliding indicator Y
+        long now = System.currentTimeMillis();
+        long indElapsed = now - navIndicatorStartTime;
+        if (indElapsed < NAV_INDICATOR_ANIM_MS) {
+            float t = (float) indElapsed / NAV_INDICATOR_ANIM_MS;
+            float ease = 1.0f - (float) Math.pow(1.0f - t, 3);
+            currentIndicatorY = prevNavIndicatorY + (targetNavIndicatorY - prevNavIndicatorY) * ease;
+        } else {
+            currentIndicatorY = targetNavIndicatorY;
+        }
+
+        // 1. Draw base tab backgrounds (dark recessed fill)
+        for (int i = 0; i < navItems.size(); i++) {
+            int tabY = startY + i * (tabH + tabGap);
+            int tabW = w - 6;
+            int tabX = x + 3;
+            boolean hover = mouseX >= tabX && mouseX <= tabX + tabW && mouseY >= tabY && mouseY <= tabY + tabH;
+            int bg = hover ? 0xFF1C1C22 : 0xFF121215;
+            drawBeveledButton(poseStackOrGraphics, tabX, tabY, tabW, tabH, bg, hover, false, alpha);
+        }
+
+        // 2. Animated sliding selection pill
+        int indW = w - 6;
+        int indX = x + 3;
+        int indY = (int) Math.round(currentIndicatorY);
+        drawBeveledButton(poseStackOrGraphics, indX, indY, indW, tabH, 0xFF24242C, false, true, alpha);
+        // Glowing cyan/white left accent bar
+        Services.PLATFORM.fill(poseStackOrGraphics, indX, indY, indX + 2, indY + tabH, applyAlpha(0xFF3CDFFF, alpha));
+        // Top edge sheen
+        Services.PLATFORM.fill(poseStackOrGraphics, indX + 2, indY, indX + indW, indY + 1, applyAlpha(0x603CDFFF, alpha));
+
+        // 3. Draw icons and labels with proximity-based illumination
         for (int i = 0; i < navItems.size(); i++) {
             NavItem item = navItems.get(i);
             int tabY = startY + i * (tabH + tabGap);
             int tabW = w - 6;
             int tabX = x + 3;
 
-            boolean isSelected = (i == selectedTabIndex);
             boolean hover = mouseX >= tabX && mouseX <= tabX + tabW && mouseY >= tabY && mouseY <= tabY + tabH;
 
-            int bg = isSelected ? 0xFF24242C : (hover ? 0xFF1A1A20 : 0xFF131316);
-            drawBeveledButton(poseStackOrGraphics, tabX, tabY, tabW, tabH, bg, hover, isSelected, alpha);
-
-            if (isSelected) {
-                Services.PLATFORM.fill(poseStackOrGraphics, tabX, tabY, tabX + 2, tabY + tabH, applyAlpha(COLOR_TEXT_WHITE, alpha));
-            }
+            float dist = Math.abs(tabY - currentIndicatorY) / (float) (tabH + tabGap);
+            float selectWeight = Math.max(0.0f, 1.0f - dist * 1.5f);
 
             int iconCollapsedX = tabX + (tabW / 2) - (font.width(item.icon) / 2);
             int iconExpandedX = tabX + 6;
             int iconX = (int) Math.round(iconCollapsedX + (iconExpandedX - iconCollapsedX) * navAnimProgress);
 
-            int iconCol = isSelected ? COLOR_TEXT_WHITE : (hover ? COLOR_TEXT_SILVER : COLOR_TEXT_MUTED);
+            int baseIconCol = hover ? COLOR_TEXT_SILVER : COLOR_TEXT_MUTED;
+            int iconCol = lerpColor(baseIconCol, COLOR_TEXT_WHITE, selectWeight);
             drawText(poseStackOrGraphics, font, item.icon, iconX, tabY + 9, applyAlpha(iconCol, alpha));
 
             if (navAnimProgress > 0.15f) {
                 float textAlpha = alpha * Math.min(1.0f, (navAnimProgress - 0.15f) / 0.85f);
-                int textCol = isSelected ? COLOR_TEXT_WHITE : (hover ? COLOR_TEXT_SILVER : COLOR_TEXT_MUTED);
+                int baseTextCol = hover ? COLOR_TEXT_SILVER : COLOR_TEXT_MUTED;
+                int textCol = lerpColor(baseTextCol, COLOR_TEXT_WHITE, selectWeight);
                 drawText(poseStackOrGraphics, font, item.title, tabX + 20, tabY + 9, applyAlpha(textCol, textAlpha));
             } else if (hover) {
                 hoveredTooltip = item.title;
@@ -992,18 +1030,35 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         if (selectedTabIndex < 0 || selectedTabIndex >= navItems.size()) return;
         NavItem current = navItems.get(selectedTabIndex);
 
+        long now = System.currentTimeMillis();
+        float transProgress = 1.0f;
+        if (isTabTransitioning) {
+            long transElapsed = now - tabTransitionStartTime;
+            if (transElapsed < TAB_TRANSITION_ANIM_MS) {
+                float t = (float) transElapsed / TAB_TRANSITION_ANIM_MS;
+                transProgress = 1.0f - (float) Math.pow(1.0f - t, 3);
+            } else {
+                isTabTransitioning = false;
+            }
+        }
+
+        int slideDir = (selectedTabIndex >= prevTabIndex) ? 1 : -1;
+        int slideOffsetY = (int) Math.round((1.0f - transProgress) * 6 * slideDir);
+        float tabAlpha = alpha * Math.min(1.0f, 0.2f + 0.8f * transProgress);
+
         int catHeaderH = 22;
-        drawText(poseStackOrGraphics, font, current.icon + "  " + current.title.toUpperCase(), x + 8, y + 6, applyAlpha(COLOR_TEXT_WHITE, alpha));
-        drawText(poseStackOrGraphics, font, current.subtitle, x + 8 + font.width(current.icon + "  " + current.title.toUpperCase()) + 10, y + 7, applyAlpha(COLOR_TEXT_MUTED, alpha));
+        drawText(poseStackOrGraphics, font, current.icon + "  " + current.title.toUpperCase(), x + 8, y + 6, applyAlpha(COLOR_TEXT_WHITE, tabAlpha));
+        drawText(poseStackOrGraphics, font, current.subtitle, x + 8 + font.width(current.icon + "  " + current.title.toUpperCase()) + 10, y + 7, applyAlpha(COLOR_TEXT_MUTED, tabAlpha));
         drawGroove(poseStackOrGraphics, x + 2, y + catHeaderH, w - 4, true, alpha);
 
         if ("items".equals(current.id)) {
-            renderItemAndTagsPanel(poseStackOrGraphics, font, x, y, w, h, catHeaderH, mouseX, mouseY, alpha);
+            renderItemAndTagsPanel(poseStackOrGraphics, font, x, y + slideOffsetY, w, h, catHeaderH, mouseX, mouseY, tabAlpha);
         } else if ("pillars".equals(current.id)) {
-            renderPillarsPanel(poseStackOrGraphics, font, x, y, w, h, catHeaderH, mouseX, mouseY, alpha);
+            renderPillarsPanel(poseStackOrGraphics, font, x, y + slideOffsetY, w, h, catHeaderH, mouseX, mouseY, tabAlpha);
         } else {
-            int viewY = y + catHeaderH + 4;
+            int clipY = y + catHeaderH + 4;
             int viewH = h - catHeaderH - 8;
+            int viewY = clipY + slideOffsetY;
             int rowH = 26;
             int rowGap = 3;
 
@@ -1018,11 +1073,11 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
             int startY = viewY + 2 - (int) scrollOffset;
 
-            enableGuiScissor(poseStackOrGraphics, x + 4, viewY, w - 8, viewH);
+            enableGuiScissor(poseStackOrGraphics, x + 4, clipY, w - 8, viewH);
             switch (current.id) {
-                case "particles" -> renderParticleSettingsRows(poseStackOrGraphics, font, rowX, startY, rowW, rowH, rowGap, viewY, viewH, mouseX, mouseY, alpha);
-                case "world" -> renderWorldSettingsRows(poseStackOrGraphics, font, rowX, startY, rowW, rowH, rowGap, viewY, viewH, mouseX, mouseY, alpha);
-                case "system" -> renderSystemRows(poseStackOrGraphics, font, rowX, startY, rowW, rowH, rowGap, viewY, viewH, mouseX, mouseY, alpha);
+                case "particles" -> renderParticleSettingsRows(poseStackOrGraphics, font, rowX, startY, rowW, rowH, rowGap, clipY, viewH, mouseX, mouseY, tabAlpha);
+                case "world" -> renderWorldSettingsRows(poseStackOrGraphics, font, rowX, startY, rowW, rowH, rowGap, clipY, viewH, mouseX, mouseY, tabAlpha);
+                case "system" -> renderSystemRows(poseStackOrGraphics, font, rowX, startY, rowW, rowH, rowGap, clipY, viewH, mouseX, mouseY, tabAlpha);
             }
             disableGuiScissor(poseStackOrGraphics);
 
@@ -1030,10 +1085,10 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
             if (maxScroll > 0) {
                 int trackH = viewH;
                 int thumbH = Math.max(16, (int) ((viewH / (float) totalContentHeight) * trackH));
-                int thumbY = viewY + (int) ((scrollOffset / maxScroll) * (trackH - thumbH));
+                int thumbY = clipY + (int) ((scrollOffset / maxScroll) * (trackH - thumbH));
 
-                Services.PLATFORM.fill(poseStackOrGraphics, scrollbarTrackX, viewY, scrollbarTrackX + scrollbarW, viewY + trackH, applyAlpha(0xFF141418, alpha));
-                drawBeveledButton(poseStackOrGraphics, scrollbarTrackX, thumbY, scrollbarW, thumbH, 0xFF3E3E4C, false, false, alpha);
+                Services.PLATFORM.fill(poseStackOrGraphics, scrollbarTrackX, clipY, scrollbarTrackX + scrollbarW, clipY + trackH, applyAlpha(0xFF141418, tabAlpha));
+                drawBeveledButton(poseStackOrGraphics, scrollbarTrackX, thumbY, scrollbarW, thumbH, 0xFF3E3E4C, false, false, tabAlpha);
             }
         }
     }
@@ -1361,48 +1416,48 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         int curY = startY;
 
         // 1. Mode Toggle
-        renderConfigRowToggle(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Use Particle Pattern", "Enable kinetic geometric pattern particle solver", cfg.use_pattern, mouseX, mouseY, alpha);
+        renderConfigRowToggle(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Use Particle Pattern", "Enable animated particle patterns", cfg.use_pattern, mouseX, mouseY, alpha);
         curY += h + gap;
 
         // 2. Pattern Cycle
         String patternDisplay = cfg.pattern.substring(0, 1).toUpperCase() + cfg.pattern.substring(1);
-        renderConfigRowCycle(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Trajectory Pattern", "Current geometric particle animation pattern", patternDisplay, mouseX, mouseY, alpha);
+        renderConfigRowCycle(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Particle Pattern", "Select particle movement animation", patternDisplay, mouseX, mouseY, alpha);
         curY += h + gap;
 
         // 3. Pattern Speed
-        renderConfigRowCounter(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Pattern Speed", "Rotational velocity multiplier for animated patterns", String.format("%.2f", cfg.pattern_speed), mouseX, mouseY, alpha);
+        renderConfigRowCounter(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Pattern Speed", "Animation rotation and movement speed", String.format("%.2f", cfg.pattern_speed), mouseX, mouseY, alpha);
         curY += h + gap;
 
         // 4. Pattern Spread
-        renderConfigRowCounter(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Pattern Spread", "Dispersion radius factor for geometric patterns", String.format("%.2f", cfg.pattern_spread), mouseX, mouseY, alpha);
+        renderConfigRowCounter(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Pattern Spread", "Particle spread radius", String.format("%.2f", cfg.pattern_spread), mouseX, mouseY, alpha);
         curY += h + gap;
 
         // 5. Pattern Intensity
-        renderConfigRowCounter(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Pattern Intensity", "Impulse power multiplier for geometric patterns", String.format("%.1fx", cfg.pattern_intensity), mouseX, mouseY, alpha);
+        renderConfigRowCounter(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Pattern Intensity", "Particle spawn rate and density multiplier", String.format("%.1fx", cfg.pattern_intensity), mouseX, mouseY, alpha);
         curY += h + gap;
 
         // 6. Basic Particle Speed
-        renderConfigRowCounter(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Particle Speed", "Velocity magnitude for base pillar particles", String.format("%.2f", cfg.particle_speed), mouseX, mouseY, alpha);
+        renderConfigRowCounter(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Particle Speed", "Base vertical speed of particles", String.format("%.2f", cfg.particle_speed), mouseX, mouseY, alpha);
         curY += h + gap;
 
         // 7. Basic Particle Spread
-        renderConfigRowCounter(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Particle Spread", "Radial dispersion angle for base pillar particles", String.format("%.2f", cfg.particle_spread), mouseX, mouseY, alpha);
+        renderConfigRowCounter(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Particle Spread", "Base spread distance of particles", String.format("%.2f", cfg.particle_spread), mouseX, mouseY, alpha);
         curY += h + gap;
 
         // 8. Particle Lifetime
-        renderConfigRowCounter(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Particle Lifetime", "Duration in ticks before emitted particles despawn", cfg.particle_lifetime + " ticks", mouseX, mouseY, alpha);
+        renderConfigRowCounter(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Particle Lifetime", "Particle duration in ticks before fading", cfg.particle_lifetime + " ticks", mouseX, mouseY, alpha);
         curY += h + gap;
 
         // 9. Particle Density
-        renderConfigRowCounter(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Particle Density", "Quantity of particles emitted per pillar column", cfg.particle_density + "x", mouseX, mouseY, alpha);
+        renderConfigRowCounter(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Particle Density", "Particle count emitted per pillar", cfg.particle_density + "x", mouseX, mouseY, alpha);
         curY += h + gap;
 
         // 10. Swatches & Active Colors
-        renderConfigRowPalette(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Color Palette (Click to Drag & Pick)", cfg.particle_color, cfg.max_particle_color, mouseX, mouseY, alpha);
+        renderConfigRowPalette(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Particle Colors", cfg.particle_color, cfg.max_particle_color, mouseX, mouseY, alpha);
         curY += h + gap;
 
         // 11. Reset Colors Action
-        renderConfigRowButton(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Reset Palette", "Restore default hexadecimal color swatches", "↺ Reset Colors", mouseX, mouseY, alpha);
+        renderConfigRowButton(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Reset Colors", "Restore default particle colors", "↺ Reset Colors", mouseX, mouseY, alpha);
     }
 
     // --- Tab 2: Pillar IDs Panel (Authoritative in-world synchronized columns) ---
@@ -1734,28 +1789,28 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
         // Row 1: Use Custom Pattern Toggle (fallback to global use_pattern)
         boolean usePat = data.use_pattern != null ? data.use_pattern : globalCfg.use_pattern;
-        renderConfigRowToggle(poseStackOrGraphics, font, rowX, rY, rowW, rowH, viewportY, viewportH, "Use Custom Pattern", "Override global particle pattern for this specific pillar", usePat, mouseX, mouseY, alpha);
+        renderConfigRowToggle(poseStackOrGraphics, font, rowX, rY, rowW, rowH, viewportY, viewportH, "Use Custom Pattern", "Override global particle pattern for this pillar", usePat, mouseX, mouseY, alpha);
         rY += rowH + rowGap;
 
-        // Row 2: Trajectory Pattern Cycle (fallback to "default")
+        // Row 2: Particle Pattern Cycle (fallback to "default")
         String curPat = data.pattern != null && !data.pattern.isEmpty() ? data.pattern : "default";
         String patDisplay = curPat.substring(0, 1).toUpperCase() + curPat.substring(1);
-        renderConfigRowCycle(poseStackOrGraphics, font, rowX, rY, rowW, rowH, viewportY, viewportH, "Trajectory Pattern", "Geometric animation solver for this pillar", patDisplay, mouseX, mouseY, alpha);
+        renderConfigRowCycle(poseStackOrGraphics, font, rowX, rY, rowW, rowH, viewportY, viewportH, "Particle Pattern", "Select particle movement animation", patDisplay, mouseX, mouseY, alpha);
         rY += rowH + rowGap;
 
         // Row 3: Pattern Speed Counter (fallback to global pattern_speed)
         double speed = data.pattern_speed != null ? data.pattern_speed : globalCfg.pattern_speed;
-        renderConfigRowCounter(poseStackOrGraphics, font, rowX, rY, rowW, rowH, viewportY, viewportH, "Pattern Speed", "Rotational speed multiplier for this pillar", String.format("%.2f", speed), mouseX, mouseY, alpha);
+        renderConfigRowCounter(poseStackOrGraphics, font, rowX, rY, rowW, rowH, viewportY, viewportH, "Pattern Speed", "Animation rotation and movement speed", String.format("%.2f", speed), mouseX, mouseY, alpha);
         rY += rowH + rowGap;
 
         // Row 4: Pattern Spread Counter (fallback to global pattern_spread)
         double spread = data.pattern_spread != null ? data.pattern_spread : globalCfg.pattern_spread;
-        renderConfigRowCounter(poseStackOrGraphics, font, rowX, rY, rowW, rowH, viewportY, viewportH, "Pattern Spread", "Dispersion radius factor for this pillar", String.format("%.2f", spread), mouseX, mouseY, alpha);
+        renderConfigRowCounter(poseStackOrGraphics, font, rowX, rY, rowW, rowH, viewportY, viewportH, "Pattern Spread", "Particle spread radius", String.format("%.2f", spread), mouseX, mouseY, alpha);
         rY += rowH + rowGap;
 
         // Row 5: Pattern Intensity Counter (fallback to global pattern_intensity)
         double intensity = data.pattern_intensity != null ? data.pattern_intensity : globalCfg.pattern_intensity;
-        renderConfigRowCounter(poseStackOrGraphics, font, rowX, rY, rowW, rowH, viewportY, viewportH, "Pattern Intensity", "Impulse power multiplier for this pillar", String.format("%.1fx", intensity), mouseX, mouseY, alpha);
+        renderConfigRowCounter(poseStackOrGraphics, font, rowX, rY, rowW, rowH, viewportY, viewportH, "Pattern Intensity", "Particle spawn rate and density multiplier", String.format("%.1fx", intensity), mouseX, mouseY, alpha);
         rY += rowH + rowGap;
 
         // Row 6: Per-Pillar Color Palette (fallback to global particle_color & max_particle_color)
@@ -1764,11 +1819,11 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
             colors.add(PillarParticleConfig.DEFAULT_COLORS[Math.min(colors.size(), PillarParticleConfig.DEFAULT_COLORS.length - 1)]);
         }
         int maxColors = data.max_particle_color != null ? data.max_particle_color : (globalCfg.max_particle_color != 0 ? globalCfg.max_particle_color : Math.min(5, Math.max(1, colors.size())));
-        renderConfigRowPalette(poseStackOrGraphics, font, rowX, rY, rowW, rowH, viewportY, viewportH, "Pillar Colors (Click to Drag & Pick)", colors, maxColors, mouseX, mouseY, alpha);
+        renderConfigRowPalette(poseStackOrGraphics, font, rowX, rY, rowW, rowH, viewportY, viewportH, "Pillar Colors", colors, maxColors, mouseX, mouseY, alpha);
         rY += rowH + rowGap;
 
         // Row 7: Save & Sync Pillar Configuration
-        renderConfigRowButton(poseStackOrGraphics, font, rowX, rY, rowW, rowH, viewportY, viewportH, "Save Pillar Changes", "Send synchronized particle updates to server and clients", "✓ Save Pillar", mouseX, mouseY, alpha);
+        renderConfigRowButton(poseStackOrGraphics, font, rowX, rY, rowW, rowH, viewportY, viewportH, "Save Changes", "Save and sync pillar settings to server", "✓ Save", mouseX, mouseY, alpha);
 
         disableGuiScissor(poseStackOrGraphics);
 
@@ -1827,20 +1882,20 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
     private void renderSystemRows(Object poseStackOrGraphics, Font font, int x, int startY, int w, int h, int gap, int clipY, int clipH, int mouseX, int mouseY, float alpha) {
         int curY = startY;
 
-        renderConfigRowCycle(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Screen Animation", "UI opening & closing cubic transition velocity", ANIM_SPEEDS[animSpeedIndex], mouseX, mouseY, alpha);
+        renderConfigRowCycle(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Screen Animation", "Smooth UI transitions and animation speed", ANIM_SPEEDS[animSpeedIndex], mouseX, mouseY, alpha);
         curY += h + gap;
 
-        renderConfigRowBadge(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Buildscape Engine", "Unified cross-cluster mod compilation jar", "4.0.3", alpha);
+        renderConfigRowBadge(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Mod Version", "Currently installed Buildscape version", "4.0.3", alpha);
         curY += h + gap;
 
-        renderConfigRowBadge(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "VersionCluster Target", "Current active Minecraft engine platform", "v26x (NeoForge 26.2)", alpha);
+        renderConfigRowToggle(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Auto Update Check", "Automatically check for new versions on startup", autoUpdateCheck, mouseX, mouseY, alpha);
         curY += h + gap;
 
-        renderConfigRowBadge(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Common Neutral Core", "Direct loader neutrality and registry safety", "Enforced", alpha);
+        renderConfigRowButton(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Check for Updates", "Scan repository for latest mod releases", updateStatusText, mouseX, mouseY, alpha);
         curY += h + gap;
 
-        String opStatus = hasOpAccess() ? "OP Level 2+ (Full Access)" : "Standard (Client Settings)";
-        renderConfigRowBadge(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Operator Privileges", "Server GameRule authorization state", opStatus, alpha);
+        String opStatus = hasOpAccess() ? "OP (Full Access)" : "Player (Client Only)";
+        renderConfigRowBadge(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Permissions", "Permission level for editing server game rules", opStatus, alpha);
     }
 
     // --- Draggable Color Picker Modal (2D Saturation x Brightness + Hue Spectrum Slider) ---
@@ -2839,15 +2894,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
             int tabX = navX + 3;
             if (mouseX >= tabX && mouseX <= tabX + tabW && mouseY >= tabY && mouseY <= tabY + tabH) {
                 if (selectedTabIndex != i) {
-                    selectedTabIndex = i;
-                    scrollOffset = 0.0;
-                    selectedPillarDetailId = null;
-                    if (sidePanelType == SidePanelType.PILLAR_DETAIL) {
-                        closeSidePanel();
-                    }
-                    if ("pillars".equals(navItems.get(i).id)) {
-                        syncPillars();
-                    }
+                    selectTab(i);
                 }
                 return true;
             }
@@ -3346,8 +3393,26 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                 }
             }
             case "system" -> {
+                // Row 0: Screen Animation Cycle
                 if (checkCycleClick(mouseX, mouseY, x, curY, w, h, clipY, clipH)) {
                     animSpeedIndex = (animSpeedIndex + 1) % ANIM_SPEEDS.length;
+                    return true;
+                }
+                curY += h + gap;
+
+                // Row 1: Mod Version Badge (non-interactive)
+                curY += h + gap;
+
+                // Row 2: Auto Update Check Toggle
+                if (checkToggleClick(mouseX, mouseY, x, curY, w, h, clipY, clipH)) {
+                    autoUpdateCheck = !autoUpdateCheck;
+                    return true;
+                }
+                curY += h + gap;
+
+                // Row 3: Check for Updates Button
+                if (checkButtonClick(mouseX, mouseY, x, curY, w, h, clipY, clipH, 86)) {
+                    updateStatusText = "Up to date ✓";
                     return true;
                 }
             }

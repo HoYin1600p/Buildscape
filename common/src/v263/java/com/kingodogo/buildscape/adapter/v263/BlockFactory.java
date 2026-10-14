@@ -551,6 +551,10 @@ public class BlockFactory implements IBlockFactory {
                     return super.updateShape(state, level, tickAccess, pos, direction, adjacentPos, adjacentState, random);
                 }
                 @Override
+                protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, @Nullable Orientation orientation, boolean isMoving) {
+                    onNeighborUpdate(level, pos, state, block, pos, isMoving);
+                }
+                @Override
                 protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
                     return onInteract(level, pos, state, player, InteractionHand.MAIN_HAND, hit);
                 }
@@ -1469,7 +1473,7 @@ public class BlockFactory implements IBlockFactory {
                     if (state.getValue(WATERLOGGED)) {
                         scheduledTicks.scheduleTick(pos, net.minecraft.world.level.material.Fluids.WATER, net.minecraft.world.level.material.Fluids.WATER.getTickDelay(level));
                     }
-                    return GlowLightsBlock.updateGlowLightShape(state, direction, neighborState, level, neighborPos);
+                    return MulticolorGlowLightsBlock.updateMulticolorShape(state, direction, neighborState, level, neighborPos);
                 }
                 @Override
                 protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {

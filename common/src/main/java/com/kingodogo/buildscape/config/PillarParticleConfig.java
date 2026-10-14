@@ -71,6 +71,7 @@ public class PillarParticleConfig {
         this.particle_color.add("#E8FEFD");
         this.particle_color.add("#FF5C00");
         this.particle_color.add("#3CDFFF");
+        this.particle_color.add("#9B51E0");
     }
     public static void addConfigReloadCallback(Consumer<Boolean> callback) {
         CONFIG_RELOAD_CALLBACKS.add(callback);
@@ -195,7 +196,7 @@ public class PillarParticleConfig {
                 writer.write("  \"pattern_intensity\": 1.0,\n");
                 writer.write("  \n");
                 writer.write("  // Hexadecimal particle color palette (up to 7 colors)\n");
-                writer.write("  \"particle_color\": [\"#FFB81C\", \"#FFFFFF\", \"#FFFF00\", \"#E8FEFD\", \"#FF5C00\", \"#3CDFFF\"],\n");
+                writer.write("  \"particle_color\": [\"#FFB81C\", \"#FFFFFF\", \"#FFFF00\", \"#E8FEFD\", \"#FF5C00\", \"#3CDFFF\", \"#9B51E0\"],\n");
                 writer.write("  \n");
                 writer.write("  \"max_particle_color\": 3\n");
                 writer.write("}\n");
@@ -379,6 +380,7 @@ public class PillarParticleConfig {
             this.particle_color.add("#E8FEFD");
             this.particle_color.add("#FF5C00");
             this.particle_color.add("#3CDFFF");
+            this.particle_color.add("#9B51E0");
             this.max_particle_color = 3;
             lastLoadedProperties = file.lastModified();
             lastFileSizeProperties = file.length();

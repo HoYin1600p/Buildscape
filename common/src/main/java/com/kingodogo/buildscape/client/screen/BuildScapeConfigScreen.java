@@ -196,9 +196,42 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
     private boolean isSidePanelOpening = false;
     private boolean isSidePanelClosing = false;
     private long sidePanelAnimStartTime = 0L;
-    private static final int SIDE_PANEL_ANIM_MS = 220;
+    private static final int SIDE_PANEL_ANIM_MS = 260;
     private int sidePanelScrollOffset = 0;
     private int sidePanelMaxScroll = 0;
+
+    // Sidenav expansion animation
+    private float navAnimProgress = 1.0f; // 1.0 = expanded, 0.0 = collapsed
+    private boolean isNavAnimating = false;
+    private long navAnimStartTime = 0L;
+    private static final int NAV_ANIM_MS = 200;
+
+    public void toggleNavExpansion() {
+        navExpanded = !navExpanded;
+        isNavAnimating = true;
+        navAnimStartTime = System.currentTimeMillis() - (long) ((navExpanded ? navAnimProgress : (1.0f - navAnimProgress)) * NAV_ANIM_MS);
+    }
+
+    private void updateNavAnimation() {
+        if (!isNavAnimating) return;
+        long elapsed = System.currentTimeMillis() - navAnimStartTime;
+        float t = Math.min(1.0f, (float) elapsed / NAV_ANIM_MS);
+        float inv = 1.0f - t;
+        float eased = 1.0f - inv * inv * inv;
+        if (navExpanded) {
+            navAnimProgress = eased;
+            if (t >= 1.0f) {
+                navAnimProgress = 1.0f;
+                isNavAnimating = false;
+            }
+        } else {
+            navAnimProgress = 1.0f - eased;
+            if (t >= 1.0f) {
+                navAnimProgress = 0.0f;
+                isNavAnimating = false;
+            }
+        }
+    }
 
     public void openSidePanel(SidePanelType type) {
         if (sidePanelType == type && (isSidePanelOpening || sidePanelProgress >= 1.0f)) {
@@ -224,14 +257,15 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         long elapsed = System.currentTimeMillis() - sidePanelAnimStartTime;
         if (isSidePanelOpening) {
             float t = Math.min(1.0f, (float) elapsed / SIDE_PANEL_ANIM_MS);
-            sidePanelProgress = 1.0f - (float) Math.pow(1.0f - t, 3);
+            float inv = 1.0f - t;
+            sidePanelProgress = 1.0f - inv * inv * inv * inv;
             if (t >= 1.0f) {
                 sidePanelProgress = 1.0f;
                 isSidePanelOpening = false;
             }
         } else if (isSidePanelClosing) {
             float t = Math.min(1.0f, (float) elapsed / SIDE_PANEL_ANIM_MS);
-            sidePanelProgress = 1.0f - (float) Math.pow(t, 3);
+            sidePanelProgress = 1.0f - (t * t * t * t);
             if (t >= 1.0f) {
                 sidePanelProgress = 0.0f;
                 isSidePanelClosing = false;
@@ -3122,6 +3156,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                     cfg.particle_color.add("#E8FEFD");
                     cfg.particle_color.add("#FF5C00");
                     cfg.particle_color.add("#3CDFFF");
+                    cfg.particle_color.add("#9B51E0");
                     cfg.max_particle_color = 3;
                     cfg.saveProperties();
                     return true;

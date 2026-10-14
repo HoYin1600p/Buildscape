@@ -25,7 +25,11 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-public class BigOrnamentBlock extends Block implements SimpleWaterloggedBlock, ICommonInteractable {
+public class BigOrnamentBlock extends Block implements SimpleWaterloggedBlock, ICommonInteractable, net.minecraft.world.level.block.BeaconBeamBlock {
+
+    /** Marks the block as a beam colour source for vanilla's scan (Fabric); the real colour comes from {@link #getBeaconColor}. */
+    @Override
+    public net.minecraft.world.item.DyeColor getColor() { return net.minecraft.world.item.DyeColor.WHITE; }
 
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
     public static final BooleanProperty LIT = BlockStateProperties.LIT;

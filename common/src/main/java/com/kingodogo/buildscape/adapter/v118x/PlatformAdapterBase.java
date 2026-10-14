@@ -147,6 +147,8 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
             };
         }
         if (block instanceof net.minecraft.world.level.block.BedBlock) return new net.minecraft.world.item.BedItem(block, properties);
+        // The loader's item renderer hook (Forge render properties, Fabric builtin renderer) matches this class.
+        if (block != null && id.endsWith("copper_chest")) return new com.kingodogo.buildscape.item.CopperChestItem(block, properties);
         if (id.equals("mangrove_boat")) return new com.kingodogo.buildscape.item.MangroveBoatItem(properties.stacksTo(1));
         if (id.equals("mangrove_sign") || id.equals("bamboo_sign")) {
             Block wall = com.kingodogo.buildscape.block.ModBlocks.get(id.equals("mangrove_sign")
@@ -414,6 +416,36 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
     @Override
     public Entity createWanderingHomemakerEntity(Level level, boolean festive) {
         return festive ? new FestiveWanderingHomemakerEntityImpl(level) : new WanderingHomemakerEntityImpl(level);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public Item createHomemakerSpawnEggItem(Item.Properties properties, boolean festive) {
+        EntityType<? extends net.minecraft.world.entity.Mob> type =
+                (EntityType<? extends net.minecraft.world.entity.Mob>) (festive
+                        ? getFestiveWanderingHomemakerEntityType() : getWanderingHomemakerEntityType());
+        return new SpawnEggItem(type, festive ? 0x990000 : 0x5c3c24, festive ? 0x009900 : 0xe4b484, properties) {
+            @Override public int getColor(int tintIndex) { return -1; }
+
+            @Override
+            public void appendHoverText(ItemStack stack, @javax.annotation.Nullable Level level, List<Component> tooltip, net.minecraft.world.item.TooltipFlag flag) {
+                super.appendHoverText(stack, level, tooltip, flag);
+                tooltip.add(new TranslatableComponent("tooltip.buildscape." + (festive
+                        ? "festive_wandering_homemaker_spawn_egg" : "wandering_homemaker_spawn_egg") + ".spawn_info"));
+                if (level != null) {
+                    long remaining = com.kingodogo.buildscape.client.HomemakerCooldownTracker.cooldownEndTime
+                            - System.currentTimeMillis();
+                    if (remaining > 0) {
+                        long seconds = remaining / 1000;
+                        tooltip.add(new TranslatableComponent("tooltip.buildscape.wandering_homemaker_spawn_egg.cooldown_active",
+                                seconds / 60, seconds % 60).withStyle(net.minecraft.ChatFormatting.RED));
+                    } else {
+                        tooltip.add(new TranslatableComponent("tooltip.buildscape.wandering_homemaker_spawn_egg.cooldown_ready")
+                                .withStyle(net.minecraft.ChatFormatting.GREEN));
+                    }
+                }
+            }
+        };
     }
 
     @Override
@@ -2462,6 +2494,27 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
     }
 
     @Override
+    public void renderFillBox(com.mojang.blaze3d.vertex.PoseStack poseStack, Object bufferSource, double minX, double minY, double minZ, double maxX, double maxY, double maxZ, float r, float g, float b, float a) {
+        if (bufferSource instanceof net.minecraft.client.renderer.MultiBufferSource mbs) {
+            com.mojang.blaze3d.vertex.VertexConsumer buffer = mbs.getBuffer(net.minecraft.client.renderer.RenderType.lightning());
+            com.mojang.math.Matrix4f pose = poseStack.last().pose();
+            float x0 = (float) minX, y0 = (float) minY, z0 = (float) minZ, x1 = (float) maxX, y1 = (float) maxY, z1 = (float) maxZ;
+            float[][] quads = {
+                {x0, y0, z0, x1, y0, z0, x1, y0, z1, x0, y0, z1},
+                {x0, y1, z0, x0, y1, z1, x1, y1, z1, x1, y1, z0},
+                {x0, y0, z0, x0, y1, z0, x1, y1, z0, x1, y0, z0},
+                {x0, y0, z1, x1, y0, z1, x1, y1, z1, x0, y1, z1},
+                {x0, y0, z0, x0, y0, z1, x0, y1, z1, x0, y1, z0},
+                {x1, y0, z0, x1, y1, z0, x1, y1, z1, x1, y0, z1}};
+            for (float[] q : quads) {
+                for (int i = 0; i < 12; i += 3) {
+                    buffer.vertex(pose, q[i], q[i + 1], q[i + 2]).color(r, g, b, a).endVertex();
+                }
+            }
+        }
+    }
+
+    @Override
     public boolean isScreenOpen() {
         return net.minecraft.client.Minecraft.getInstance().screen != null;
     }
@@ -4256,5 +4309,30 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
         } catch (Exception ignored) {
         }
     }
-}
 
+    // Pillar and shelf display entities and item models (client-only code lives in ClientPillarEntities).
+    @Override
+    public net.minecraft.world.entity.Entity createArmorStandEntity(net.minecraft.world.level.Level level, double x, double y, double z) {
+        return com.kingodogo.buildscape.adapter.v118x.client.ClientPillarEntities.createArmorStand(level, x, y, z);
+    }
+
+    @Override
+    public Object getItemModel(net.minecraft.world.item.ItemStack stack, net.minecraft.world.level.Level level, int seed) {
+        return com.kingodogo.buildscape.adapter.v118x.client.ClientPillarEntities.getItemModel(stack, level, seed);
+    }
+
+    @Override
+    public boolean isGui3dModel(Object model) {
+        return com.kingodogo.buildscape.adapter.v118x.client.ClientPillarEntities.isGui3dModel(model);
+    }
+
+    @Override
+    public net.minecraft.world.entity.Entity createMobPillarEntity(net.minecraft.world.item.ItemStack egg, net.minecraft.world.level.Level level, net.minecraft.core.BlockPos pos, Object state) {
+        return com.kingodogo.buildscape.adapter.v118x.client.ClientPillarEntities.createMob(egg, level, pos, state);
+    }
+
+    @Override
+    public void applyMobState(net.minecraft.world.entity.Entity entity, Object state) {
+        com.kingodogo.buildscape.adapter.v118x.client.ClientPillarEntities.applyMobState(entity, state);
+    }
+}

@@ -20,6 +20,8 @@
     "EntityDataMixin",
     "BlockEntityDataMixin",
     "ItemStackSizeAccessor",
+    "ItemStackMaxSizeMixin",
+    "LivingEntityLadderMixin",
     "PoiMapAccessor",
     "RecipeManagerMixin",
     "BonemealMixin",

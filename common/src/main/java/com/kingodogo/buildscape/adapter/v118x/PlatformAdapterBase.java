@@ -1055,7 +1055,26 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
 
     @Override
     public int getDyeColorValue(DyeColor color) {
-        return color != null ? color.getFireworkColor() : 0xFFFFFF;
+        if (color == null) return 0xFFFFFF;
+        // The reference's glow light dye palette (not the vanilla firework colors).
+        return switch (color) {
+            case WHITE -> 0xE8FEFD;
+            case ORANGE -> 0xFF5C00;
+            case MAGENTA -> 0xFF00FF;
+            case LIGHT_BLUE -> 0x3CDFFF;
+            case YELLOW -> 0xFFFF00;
+            case LIME -> 0xBFFE00;
+            case PINK -> 0xF686B7;
+            case GRAY -> 0x232526;
+            case LIGHT_GRAY -> 0xB1B8C5;
+            case CYAN -> 0x00FFFF;
+            case PURPLE -> 0xAB87FF;
+            case BLUE -> 0x1919EA;
+            case BROWN -> 0x411900;
+            case GREEN -> 0x39FF14;
+            case RED -> 0xFF0000;
+            case BLACK -> 0x07010C;
+        };
     }
 
     @Override
@@ -1417,7 +1436,8 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
 
     @Override
     public boolean isSameItemSameComponents(ItemStack a, ItemStack b) {
-        return ItemStack.matches(a, b);
+        // The name and every caller mean the same item and tags regardless of count (ItemStack.matches also compares counts).
+        return ItemStack.isSameItemSameTags(a, b);
     }
 
     @Override

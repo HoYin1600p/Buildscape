@@ -118,6 +118,52 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         }
     }
 
+    // Sidenav indicator glide animation
+    private float prevNavIndicatorY = 0.0f;
+    private float targetNavIndicatorY = 0.0f;
+    private float currentIndicatorY = 0.0f;
+    private long navIndicatorStartTime = 0L;
+    private static final int NAV_INDICATOR_ANIM_MS = 220;
+
+    // Content area tab switch transition
+    private int prevTabIndex = 0;
+    private long tabTransitionStartTime = 0L;
+    private boolean isTabTransitioning = false;
+    private static final int TAB_TRANSITION_ANIM_MS = 180;
+
+    // System tab states (for Auto Update check & check now)
+    private boolean autoUpdateCheck = true;
+    private String updateStatusText = "Check Now";
+    private long lastUpdateCheckTime = 0L;
+
+    public void selectTab(int newIndex) {
+        if (newIndex < 0 || newIndex >= navItems.size() || selectedTabIndex == newIndex) {
+            return;
+        }
+        prevTabIndex = selectedTabIndex;
+        selectedTabIndex = newIndex;
+        scrollOffset = 0.0;
+        selectedPillarDetailId = null;
+        if (sidePanelType == SidePanelType.PILLAR_DETAIL) {
+            closeSidePanel();
+        }
+        if ("pillars".equals(navItems.get(newIndex).id)) {
+            syncPillars();
+        }
+        int tabH = 26;
+        int tabGap = 3;
+        int panelH = Math.min(height - 16, 308);
+        int panelY = (height - panelH) / 2;
+        int headerH = 24;
+        int navY = panelY + 7 + headerH + 5;
+        int startY = navY + 4;
+        prevNavIndicatorY = currentIndicatorY > 0.01f ? currentIndicatorY : (startY + prevTabIndex * (tabH + tabGap));
+        targetNavIndicatorY = startY + newIndex * (tabH + tabGap);
+        navIndicatorStartTime = System.currentTimeMillis();
+        tabTransitionStartTime = System.currentTimeMillis();
+        isTabTransitioning = true;
+    }
+
     private final List<NavItem> navItems = new ArrayList<>();
     private int selectedTabIndex = 0;
     private boolean navExpanded = true;

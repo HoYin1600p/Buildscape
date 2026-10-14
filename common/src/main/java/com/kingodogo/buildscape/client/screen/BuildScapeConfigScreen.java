@@ -3205,11 +3205,11 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         if (y < clipY || y + h > clipY + clipH) return;
         renderRowCardBase(poseStackOrGraphics, font, x, y, w, h, clipY, clipH, label, desc, mouseX, mouseY, alpha);
 
-        int cycleW = 96;
+        int cycleW = 126;
         int cycleH = 15;
         int cycleX = x + w - cycleW - 8;
         int cycleY = y + (h - cycleH) / 2;
-        int arrowW = 15;
+        int arrowW = 14;
 
         // 1. Left Arrow Button [ ‹ ]
         boolean hoverPrev = mouseX >= cycleX && mouseX <= cycleX + arrowW && mouseY >= cycleY && mouseY <= cycleY + cycleH;
@@ -4858,11 +4858,11 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
     private int checkCycleClick(double mouseX, double mouseY, int x, int y, int w, int h, int clipY, int clipH) {
         if (y < clipY || y + h > clipY + clipH) return 0;
-        int cycleW = 96;
+        int cycleW = 126;
         int cycleH = 15;
         int cycleX = x + w - cycleW - 8;
         int cycleY = y + (h - cycleH) / 2;
-        int arrowW = 15;
+        int arrowW = 14;
 
         if (mouseY >= cycleY && mouseY <= cycleY + cycleH) {
             // Left arrow button: go back

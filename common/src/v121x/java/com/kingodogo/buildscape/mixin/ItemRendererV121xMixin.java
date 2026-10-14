@@ -66,7 +66,8 @@ public abstract class ItemRendererV121xMixin {
     private static void buildscape$festiveCompassFoilBuffer(MultiBufferSource bufferSource, RenderType renderType, PoseStack.Pose pose, CallbackInfoReturnable<VertexConsumer> cir) {
         if (FestiveGlintHandler.isCurrentFestive()) {
             cir.setReturnValue(VertexMultiConsumer.create(
-                    new SheetedDecalTextureGenerator(bufferSource.getBuffer(FestiveRenderTypes.festiveGlint()), pose, 0.0078125F),
+                    // Main's festive texture uses the original unit-scale decal projection.
+                    new SheetedDecalTextureGenerator(bufferSource.getBuffer(FestiveRenderTypes.festiveGlint()), pose, 1.0F),
                     bufferSource.getBuffer(renderType)));
         }
     }

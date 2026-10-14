@@ -2218,14 +2218,22 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
         int black = applyAlpha(COLOR_FRAME_BLACK, alpha);
 
-        // 2. Outermost 1px Black Border
-        Services.PLATFORM.fill(poseStackOrGraphics, x, y, x + w, y + 1, black);
+        int crestW = 152;
+        int crestX = x + (w - crestW) / 2;
+        int padX = 4;
+        int uLeft = crestX - padX;
+        int uRight = crestX + crestW + padX;
+
+        // 2. Outermost 1px Black Border (Top left and right, connecting into U-bevel)
+        Services.PLATFORM.fill(poseStackOrGraphics, x, y, uLeft + 1, y + 1, black);
+        Services.PLATFORM.fill(poseStackOrGraphics, uRight, y, x + w, y + 1, black);
         Services.PLATFORM.fill(poseStackOrGraphics, x, y + h - 1, x + w, y + h, black);
         Services.PLATFORM.fill(poseStackOrGraphics, x, y, x + 1, y + h, black);
         Services.PLATFORM.fill(poseStackOrGraphics, x + w - 1, y, x + w, y + h, black);
 
         // 3. 1-Pixel Wide Metallic Gradient Highlight (Top & Left) & Deep Shadow (Bottom & Right)
-        drawHorizontalGradientLine(poseStackOrGraphics, x + 1, y + 1, w - 2, COLOR_BORDER_GRADIENT_START, COLOR_BORDER_GRADIENT_END, alpha);
+        drawHorizontalGradientLine(poseStackOrGraphics, x + 1, y + 1, uLeft - x - 1, COLOR_BORDER_GRADIENT_START, COLOR_BORDER_GRADIENT_END, alpha);
+        drawHorizontalGradientLine(poseStackOrGraphics, uRight + 1, y + 1, (x + w - 1) - (uRight + 1), COLOR_BORDER_GRADIENT_START, COLOR_BORDER_GRADIENT_END, alpha);
         drawVerticalGradientLine(poseStackOrGraphics, x + 1, y + 1, h - 2, COLOR_BORDER_GRADIENT_START, COLOR_BORDER_SHADOW, alpha);
 
         int shadow = applyAlpha(COLOR_BORDER_SHADOW, alpha);
@@ -2235,7 +2243,8 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         // 4. Outer Chassis Band (offset 2 to 3)
         int band = applyAlpha(COLOR_CHASSIS_BAND, alpha);
         for (int o = 2; o <= 3; o++) {
-            Services.PLATFORM.fill(poseStackOrGraphics, x + o, y + o, x + w - o, y + o + 1, band);
+            Services.PLATFORM.fill(poseStackOrGraphics, x + o, y + o, uLeft, y + o + 1, band);
+            Services.PLATFORM.fill(poseStackOrGraphics, uRight, y + o, x + w - o, y + o + 1, band);
             Services.PLATFORM.fill(poseStackOrGraphics, x + o, y + h - o - 1, x + w - o, y + h - o, band);
             Services.PLATFORM.fill(poseStackOrGraphics, x + o, y + o, x + o + 1, y + h - o, band);
             Services.PLATFORM.fill(poseStackOrGraphics, x + w - o - 1, y + o, x + w - o, y + h - o, band);
@@ -2245,7 +2254,8 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         int bevelShadow = applyAlpha(COLOR_BEVEL_SHADOW, alpha);
         int bevelHighlight = applyAlpha(COLOR_BEVEL_HIGHLIGHT, alpha);
         int o5 = 5;
-        Services.PLATFORM.fill(poseStackOrGraphics, x + o5, y + o5, x + w - o5, y + o5 + 1, bevelShadow);
+        Services.PLATFORM.fill(poseStackOrGraphics, x + o5, y + o5, uLeft, y + o5 + 1, bevelShadow);
+        Services.PLATFORM.fill(poseStackOrGraphics, uRight, y + o5, x + w - o5, y + o5 + 1, bevelShadow);
         Services.PLATFORM.fill(poseStackOrGraphics, x + o5, y + o5, x + o5 + 1, y + h - o5, bevelShadow);
         Services.PLATFORM.fill(poseStackOrGraphics, x + o5, y + h - o5 - 1, x + w - o5, y + h - o5, bevelHighlight);
         Services.PLATFORM.fill(poseStackOrGraphics, x + w - o5 - 1, y + o5, x + w - o5, y + h - o5, bevelHighlight);
@@ -2822,7 +2832,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         }
     }
 
-    // --- Top Center Crest Badge (Buildscape Logo Beveled Frame with Inner Bevel Cutout Socket) ---
+    // --- Top Center Crest Badge (Buildscape Logo Beveled Frame with Seamless U-Shaped Cradle) ---
     private static final CommonId LOGO_TEXTURE = CommonId.of("buildscape", "textures/gui/logo.png");
 
     private void drawTopCrestBadge(Object poseStackOrGraphics, Font font, int frameX, int frameY, int frameW, float alpha) {
@@ -2836,26 +2846,41 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         int bShadow = applyAlpha(COLOR_BEVEL_SHADOW, alpha);
         int bHighlight = applyAlpha(COLOR_BEVEL_HIGHLIGHT, alpha);
 
-        // A. Seamless Cutout Placement Socket with Inner Bevels
-        int sockPad = 3;
-        int sockX = crestX - sockPad;
-        int sockY = crestY - sockPad;
-        int sockW = crestW + sockPad * 2;
-        int sockH = crestH + sockPad * 2;
+        // A. Seamless U-Shaped Bevel on the Main Panel (Cradling the bottom of the logo badge)
+        int padX = 4;
+        int padBottom = 5;
+        int uLeft = crestX - padX;
+        int uRight = crestX + crestW + padX;
+        int uBottom = crestY + crestH + padBottom;
 
-        // Solid chassis backing behind the socket
-        Services.PLATFORM.fill(poseStackOrGraphics, sockX, sockY, sockX + sockW, sockY + sockH, applyAlpha(COLOR_CHASSIS_BODY, alpha));
-        // Cutout socket recessed fill
-        Services.PLATFORM.fill(poseStackOrGraphics, sockX + 1, sockY + 1, sockX + sockW - 1, sockY + sockH - 1, applyAlpha(COLOR_INNER_DARK, alpha));
-        // 1px black border around socket
-        drawBorder(poseStackOrGraphics, sockX, sockY, sockW, sockH, black);
-        // Inner bevels (top & left shadow, bottom & right highlight)
-        Services.PLATFORM.fill(poseStackOrGraphics, sockX + 1, sockY + 1, sockX + sockW - 1, sockY + 2, bShadow);
-        Services.PLATFORM.fill(poseStackOrGraphics, sockX + 1, sockY + 1, sockX + 2, sockY + sockH - 1, bShadow);
-        Services.PLATFORM.fill(poseStackOrGraphics, sockX + 1, sockY + sockH - 2, sockX + sockW - 1, sockY + sockH - 1, bHighlight);
-        Services.PLATFORM.fill(poseStackOrGraphics, sockX + sockW - 2, sockY + 1, sockX + sockW - 1, sockY + sockH - 1, bHighlight);
+        // 1. Recessed backing and dark interior fill under the crest on the main panel
+        Services.PLATFORM.fill(poseStackOrGraphics, uLeft, frameY, uRight, uBottom, applyAlpha(COLOR_CHASSIS_BODY, alpha));
+        Services.PLATFORM.fill(poseStackOrGraphics, uLeft + 1, frameY, uRight - 1, uBottom - 1, applyAlpha(COLOR_INNER_DARK, alpha));
 
-        // B. Logo Holder Badge
+        // 2. 1px Black Border along the U (Left down, Bottom across, Right up)
+        Services.PLATFORM.fill(poseStackOrGraphics, uLeft, frameY, uLeft + 1, uBottom + 1, black);
+        Services.PLATFORM.fill(poseStackOrGraphics, uLeft, uBottom, uRight + 1, uBottom + 1, black);
+        Services.PLATFORM.fill(poseStackOrGraphics, uRight, frameY, uRight + 1, uBottom + 1, black);
+
+        // 3. 1px Metallic Gradient & Shadow along the U (EXACT SAME AS MAIN PANEL BORDER GRADIENT)
+        drawVerticalGradientLine(poseStackOrGraphics, uLeft + 1, frameY, uBottom - frameY, COLOR_BORDER_GRADIENT_START, COLOR_BORDER_SHADOW, alpha);
+        drawHorizontalGradientLine(poseStackOrGraphics, uLeft + 1, uBottom - 1, uRight - uLeft - 1, COLOR_BORDER_GRADIENT_START, COLOR_BORDER_GRADIENT_END, alpha);
+        Services.PLATFORM.fill(poseStackOrGraphics, uRight - 1, frameY, uRight, uBottom - 1, shadow);
+
+        // 4. Outer Chassis Band (offset 2 to 3) along the U
+        int band = applyAlpha(COLOR_CHASSIS_BAND, alpha);
+        for (int o = 2; o <= 3; o++) {
+            Services.PLATFORM.fill(poseStackOrGraphics, uLeft + o, frameY, uLeft + o + 1, uBottom - o, band);
+            Services.PLATFORM.fill(poseStackOrGraphics, uLeft + o, uBottom - o, uRight - o + 1, uBottom - o + 1, band);
+            Services.PLATFORM.fill(poseStackOrGraphics, uRight - o, frameY, uRight - o + 1, uBottom - o, band);
+        }
+
+        // 5. Stepped Bevel Ridge & Groove along the U
+        Services.PLATFORM.fill(poseStackOrGraphics, uLeft + 4, frameY, uLeft + 5, uBottom - 4, bShadow);
+        Services.PLATFORM.fill(poseStackOrGraphics, uLeft + 4, uBottom - 5, uRight - 4, uBottom - 4, bHighlight);
+        Services.PLATFORM.fill(poseStackOrGraphics, uRight - 5, frameY, uRight - 4, uBottom - 4, bHighlight);
+
+        // B. Top Center Crest Badge (Buildscape Logo Holder) - Clean, standalone, NO surrounding bevel in the air!
         // 1. Solid Outer Chassis Body
         Services.PLATFORM.fill(poseStackOrGraphics, crestX, crestY, crestX + crestW, crestY + crestH, applyAlpha(COLOR_CHASSIS_BODY, alpha));
 

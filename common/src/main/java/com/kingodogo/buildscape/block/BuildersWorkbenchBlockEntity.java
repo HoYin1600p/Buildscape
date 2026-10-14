@@ -233,6 +233,13 @@ public class BuildersWorkbenchBlockEntity extends DataBlockEntity implements Men
     public boolean writeSolvedToPouch(ItemStack pouch) {
         List<ItemStack> solved = getSolvedItems();
         if (pouch.getItem() instanceof BuildersPouchItem) {
+            com.kingodogo.buildscape.item.BuildersPouchInventory inventory =
+                    new com.kingodogo.buildscape.item.BuildersPouchInventory(pouch);
+            for (int i = 0; i < solved.size(); i++) {
+                if (!inventory.getItem(i).isEmpty()) {
+                    return false;
+                }
+            }
             BuildersPouchItem.setFilters(pouch, solved);
             return true;
         }
@@ -249,6 +256,10 @@ public class BuildersWorkbenchBlockEntity extends DataBlockEntity implements Men
         return solved;
     }
     private boolean writeSolvedToShulker(ItemStack shulker, List<ItemStack> solved) {
+        Boolean exact = com.kingodogo.buildscape.platform.Services.PLATFORM.writeSolvedToShulker(shulker, solved);
+        if (exact != null) {
+            return exact;
+        }
         CompoundTag beTag = com.kingodogo.buildscape.platform.Services.PLATFORM.getCustomData(shulker, true);
         if (beTag == null) return false;
         List<String> savedFilters = com.kingodogo.buildscape.platform.Services.PLATFORM.getTagStringList(beTag, "GhostFilters");

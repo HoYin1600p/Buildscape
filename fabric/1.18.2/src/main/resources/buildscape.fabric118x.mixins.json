@@ -25,6 +25,7 @@
     "PoiMapAccessor",
     "RecipeManagerMixin",
     "BonemealMixin",
+    "BeaconBlockEntityColorMixin",
     "BlockExperienceMixin",
     "BucketFluidAccessor",
     "FlowerPotPlantsAccessor",

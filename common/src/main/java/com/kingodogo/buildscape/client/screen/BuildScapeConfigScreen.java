@@ -14,11 +14,13 @@ import com.kingodogo.buildscape.platform.Services;
 import com.kingodogo.buildscape.util.CommonId;
 import com.kingodogo.buildscape.util.ComponentHelper;
 import com.kingodogo.buildscape.world.ModGameRules;
+import com.kingodogo.buildscape.client.PillarMarkerManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
@@ -125,9 +127,18 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
     private double maxScroll = 0.0;
 
     // --- Particle Settings Options Arrays ---
-    private static final String[] PARTICLE_PATTERNS = {
+    private static final String[] GLOBAL_PARTICLE_PATTERNS = {
             "none", "ring", "beam", "spiral", "fountain", "pulse", "burst", "snowflake"
     };
+    private static final String[] PARTICLE_PATTERNS = {
+            "none", "default", "beam", "spiral", "fountain", "pulse", "ring", "burst", "snowflake"
+    };
+
+    // --- Pillar IDs State ---
+    private final Set<String> selectedPillarIds = new HashSet<>();
+    private long lastPillarRefreshCheck = 0L;
+    private long lastPillarRowClickTime = 0L;
+    private String lastPillarRowClickId = null;
 
     // --- Presets & Items State ---
     private int selectedPresetIndex = 0;
@@ -191,6 +202,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         initNavItems();
         cacheAvailableItems();
         loadRegisteredTags();
+        syncPillars();
     }
 
     private void initNavItems() {
@@ -386,6 +398,49 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         });
     }
 
+    private ItemStack getItemStackFromId(String idStr) {
+        ItemStack stack = getStackForIdentifier(idStr);
+        return stack != null ? stack : ItemStack.EMPTY;
+    }
+
+    private String formatDimensionName(String dimension) {
+        if (dimension == null || dimension.isEmpty()) {
+            return "Overworld";
+        }
+        String dim = dimension.toLowerCase();
+        if (dim.contains("overworld")) return "Overworld";
+        if (dim.contains("the_nether") || dim.contains("nether")) return "The Nether";
+        if (dim.contains("the_end") || dim.contains("end")) return "The End";
+        int idx = dim.lastIndexOf(':');
+        if (idx >= 0 && idx < dim.length() - 1) {
+            dim = dim.substring(idx + 1);
+        }
+        dim = dim.replace('_', ' ');
+        return capitalize(dim);
+    }
+
+    private void syncPillars() {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.getSingleplayerServer() != null) {
+            try {
+                for (var serverLevel : mc.getSingleplayerServer().getAllLevels()) {
+                    if (serverLevel != null) {
+                        PillarIdManager serverMgr = PillarIdManager.get(serverLevel);
+                        if (serverMgr != null) {
+                            serverMgr.checkAndReload();
+                            Map<String, PillarIdManager.PillarData> snapshot = serverMgr.copyDataSnapshot();
+                            if (!snapshot.isEmpty()) {
+                                PillarIdManager.getClient().replaceFromServerSync(snapshot.values());
+                            }
+                        }
+                    }
+                }
+            } catch (Exception ignored) {}
+        }
+        PillarIdManager.getClient().checkAndReload();
+        PacketFactory.sendToServer(new RequestPillarIdsPacket());
+    }
+
     @Override
     public void setWrapperScreen(Object screen) {
         if (screen instanceof Screen s) {
@@ -410,6 +465,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         refreshInventoryItemsCache();
         rebuildActiveItemsCache();
         itemsListDirty = true;
+        syncPillars();
 
         if (activeTab != null) {
             activeTab.init();
@@ -618,6 +674,15 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         float alpha = updateAnimations();
         if (alpha <= 0.001f) return;
 
+        // Auto-refresh pillar IDs periodically if on the pillars tab
+        if (selectedTabIndex < navItems.size() && "pillars".equals(navItems.get(selectedTabIndex).id)) {
+            long now = System.currentTimeMillis();
+            if (now - lastPillarRefreshCheck >= 1500L) {
+                lastPillarRefreshCheck = now;
+                syncPillars();
+            }
+        }
+
         Font font = Minecraft.getInstance().font;
 
         // 1. Full-screen dimmed backdrop
@@ -770,6 +835,8 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
         if ("items".equals(current.id)) {
             renderItemAndTagsPanel(poseStackOrGraphics, font, x, y, w, h, catHeaderH, mouseX, mouseY, alpha);
+        } else if ("pillars".equals(current.id)) {
+            renderPillarsPanel(poseStackOrGraphics, font, x, y, w, h, catHeaderH, mouseX, mouseY, alpha);
         } else {
             int viewY = y + catHeaderH + 4;
             int viewH = h - catHeaderH - 8;
@@ -790,13 +857,6 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
             enableGuiScissor(poseStackOrGraphics, x + 4, viewY, w - 8, viewH);
             switch (current.id) {
                 case "particles" -> renderParticleSettingsRows(poseStackOrGraphics, font, rowX, startY, rowW, rowH, rowGap, viewY, viewH, mouseX, mouseY, alpha);
-                case "pillars" -> {
-                    if (selectedPillarDetailId != null) {
-                        renderPillarDetailRows(poseStackOrGraphics, font, rowX, startY, rowW, rowH, rowGap, viewY, viewH, mouseX, mouseY, alpha);
-                    } else {
-                        renderPillarIdRows(poseStackOrGraphics, font, rowX, startY, rowW, rowH, rowGap, viewY, viewH, mouseX, mouseY, alpha);
-                    }
-                }
                 case "world" -> renderWorldSettingsRows(poseStackOrGraphics, font, rowX, startY, rowW, rowH, rowGap, viewY, viewH, mouseX, mouseY, alpha);
                 case "system" -> renderSystemRows(poseStackOrGraphics, font, rowX, startY, rowW, rowH, rowGap, viewY, viewH, mouseX, mouseY, alpha);
             }
@@ -831,12 +891,8 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                 return tags.size() * (tagRowH + tagRowGap) + 6;
             }
         }
-        if ("pillars".equals(tabId) && selectedPillarDetailId != null) {
-            return 8 * (rowH + gap) + 16;
-        }
         int count = switch (tabId) {
             case "particles" -> 11;
-            case "pillars" -> 3 + Math.max(1, PillarIdManager.getClient().getPillarCount());
             case "world" -> 8;
             case "system" -> 5;
             default -> 0;
@@ -1185,146 +1241,381 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         renderConfigRowButton(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Reset Palette", "Restore default hexadecimal color swatches", "↺ Reset Colors", mouseX, mouseY, alpha);
     }
 
-    // --- Tab 2: Pillar IDs List View ---
-    private void renderPillarIdRows(Object poseStackOrGraphics, Font font, int x, int startY, int w, int h, int gap, int clipY, int clipH, int mouseX, int mouseY, float alpha) {
-        int pillarCount = PillarIdManager.getClient().getPillarCount();
-        int curY = startY;
-
-        // Row 0: Synchronizer & Global Actions
-        if (curY >= clipY && curY + h <= clipY + clipH) {
-            renderRowCardBase(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Pillar Synchronizer", pillarCount + " authoritative pillar columns mapped in world", mouseX, mouseY, alpha);
-
-            int btnW = 76;
-            int btnH = 14;
-            int reloadX = x + w - (btnW * 2) - 12;
-            int reloadY = curY + (h - btnH) / 2;
-            boolean hoverReload = mouseX >= reloadX && mouseX <= reloadX + btnW && mouseY >= reloadY && mouseY <= reloadY + btnH;
-            Services.PLATFORM.fill(poseStackOrGraphics, reloadX, reloadY, reloadX + btnW, reloadY + btnH, applyAlpha(hoverReload ? 0xFF2E2E38 : COLOR_BTN_BG, alpha));
-            drawBorder(poseStackOrGraphics, reloadX, reloadY, btnW, btnH, applyAlpha(hoverReload ? COLOR_BTN_BORDER_HOVER : COLOR_BTN_BORDER, alpha));
-            Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "⟳ Sync", reloadX + btnW / 2, reloadY + 3, applyAlpha(hoverReload ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
-
-            int clearX = x + w - btnW - 6;
-            boolean hoverClear = mouseX >= clearX && mouseX <= clearX + btnW && mouseY >= reloadY && mouseY <= reloadY + btnH;
-            Services.PLATFORM.fill(poseStackOrGraphics, clearX, reloadY, clearX + btnW, reloadY + btnH, applyAlpha(hoverClear ? 0xFF3D1616 : COLOR_BTN_BG, alpha));
-            drawBorder(poseStackOrGraphics, clearX, reloadY, btnW, btnH, applyAlpha(hoverClear ? 0xFFE05050 : COLOR_BTN_BORDER, alpha));
-            Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "✕ Clear", clearX + btnW / 2, reloadY + 3, applyAlpha(hoverClear ? 0xFFFFFFFF : COLOR_TEXT_SILVER, alpha));
-        }
-        curY += h + gap;
-
-        // Row 1: Auto-snapping
-        renderConfigRowToggle(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Auto-Snapping Grid", "Snap pillar placement cursor to the nearest voxel grid node", autoSnappingEnabled, mouseX, mouseY, alpha);
-        curY += h + gap;
-
-        // Row 2: Strict collision
-        renderConfigRowToggle(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Strict Collision Check", "Prevent placing pillars overlapping with non-air blocks", strictBoundsCheck, mouseX, mouseY, alpha);
-        curY += h + gap;
-
-        // Rows 3+: Individual Pillar Rows with Customize & Remove Buttons
-        Collection<PillarIdManager.PillarData> pillars = PillarIdManager.getClient().getAllData();
-        if (pillars.isEmpty()) {
-            if (curY >= clipY && curY + h <= clipY + clipH) {
-                renderConfigRowBadge(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "No Pillars Registered", "Place pillar blocks in world to synchronize columns", "Empty", alpha);
-            }
+    // --- Tab 2: Pillar IDs Panel (Authoritative in-world synchronized columns) ---
+    private void renderPillarsPanel(Object poseStackOrGraphics, Font font, int x, int y, int w, int h, int catHeaderH, int mouseX, int mouseY, float alpha) {
+        if (selectedPillarDetailId != null) {
+            renderPillarDetailPanel(poseStackOrGraphics, font, x, y, w, h, catHeaderH, mouseX, mouseY, alpha);
         } else {
-            for (PillarIdManager.PillarData data : pillars) {
-                if (curY >= clipY && curY + h <= clipY + clipH) {
-                    String patternDesc = (data.pattern != null && !data.pattern.isEmpty()) ? " · Pattern: " + data.pattern : "";
-                    String desc = String.format("Pos: [%d, %d, %d]%s", data.x, data.y, data.z, patternDesc);
-                    renderRowCardBase(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Pillar: " + data.id, desc, mouseX, mouseY, alpha);
+            renderPillarTablePanel(poseStackOrGraphics, font, x, y, w, h, catHeaderH, mouseX, mouseY, alpha);
+        }
+    }
 
-                    // Customize Button
-                    int custW = 64;
-                    int btnH = 14;
-                    int custX = x + w - custW - 58;
-                    int custY = curY + (h - btnH) / 2;
-                    boolean hoverCust = mouseX >= custX && mouseX <= custX + custW && mouseY >= custY && mouseY <= custY + btnH;
-                    Services.PLATFORM.fill(poseStackOrGraphics, custX, custY, custX + custW, custY + btnH, applyAlpha(hoverCust ? 0xFF2A2A38 : COLOR_BTN_BG, alpha));
-                    drawBorder(poseStackOrGraphics, custX, custY, custW, btnH, applyAlpha(hoverCust ? COLOR_BTN_BORDER_HOVER : COLOR_BTN_BORDER, alpha));
-                    Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "✎ Customize", custX + custW / 2, custY + 3, applyAlpha(hoverCust ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
+    private void renderPillarTablePanel(Object poseStackOrGraphics, Font font, int x, int y, int w, int h, int catHeaderH, int mouseX, int mouseY, float alpha) {
+        PillarIdManager manager = PillarIdManager.getClient();
+        Collection<PillarIdManager.PillarData> pillars = manager.getAllData();
+        List<PillarIdManager.PillarData> pillarList = new ArrayList<>(pillars);
+        pillarList.sort(Comparator.comparing(d -> d.id != null ? d.id : ""));
 
-                    // Remove Button
-                    int removeW = 50;
-                    int removeX = x + w - removeW - 6;
-                    int removeY = custY;
-                    boolean hoverRem = mouseX >= removeX && mouseX <= removeX + removeW && mouseY >= removeY && mouseY <= removeY + btnH;
-                    Services.PLATFORM.fill(poseStackOrGraphics, removeX, removeY, removeX + removeW, removeY + btnH, applyAlpha(hoverRem ? 0xFF3D1616 : 0xFF241414, alpha));
-                    drawBorder(poseStackOrGraphics, removeX, removeY, removeW, btnH, applyAlpha(hoverRem ? 0xFFE05050 : 0xFF882828, alpha));
-                    Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "Remove", removeX + removeW / 2, removeY + 3, applyAlpha(hoverRem ? 0xFFFFFFFF : 0xFFE05050, alpha));
+        int curY = y + catHeaderH + 4;
+
+        // --- 1. Fixed Top Action Toolbar ---
+        int bar1H = 20;
+        int btnH = 14;
+        int barY = curY + (bar1H - btnH) / 2;
+
+        // [ ⟳ Reload ]
+        int relW = 60;
+        int relX = x + 6;
+        boolean hoverRel = mouseX >= relX && mouseX <= relX + relW && mouseY >= barY && mouseY <= barY + btnH;
+        drawBeveledButton(poseStackOrGraphics, relX, barY, relW, btnH, hoverRel ? 0xFF2C2C36 : COLOR_BTN_BG, hoverRel, false, alpha);
+        Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "⟳ Reload", relX + relW / 2, barY + 3, applyAlpha(hoverRel ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
+
+        // [ ✕ Remove Selected (<N>) ]
+        int selCount = selectedPillarIds.size();
+        int remSelW = 105;
+        int remSelX = relX + relW + 4;
+        boolean hasSel = selCount > 0;
+        boolean hoverRemSel = hasSel && mouseX >= remSelX && mouseX <= remSelX + remSelW && mouseY >= barY && mouseY <= barY + btnH;
+        int remSelBg = hasSel ? (hoverRemSel ? 0xFF3D1616 : 0xFF241414) : 0xFF141418;
+        drawBeveledButton(poseStackOrGraphics, remSelX, barY, remSelW, btnH, remSelBg, hoverRemSel, false, alpha);
+        String remSelLabel = hasSel ? ("✕ Remove (" + selCount + ")") : "✕ Remove Selected";
+        int remSelTextCol = hasSel ? (hoverRemSel ? 0xFFFFFFFF : 0xFFE05050) : COLOR_TEXT_MUTED;
+        Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, remSelLabel, remSelX + remSelW / 2, barY + 3, applyAlpha(remSelTextCol, alpha));
+
+        // [ ✕ Remove All ]
+        int remAllW = 75;
+        int remAllX = remSelX + remSelW + 4;
+        boolean hasAny = !pillarList.isEmpty();
+        boolean hoverRemAll = hasAny && mouseX >= remAllX && mouseX <= remAllX + remAllW && mouseY >= barY && mouseY <= barY + btnH;
+        int remAllBg = hasAny ? (hoverRemAll ? 0xFF3D1616 : 0xFF241414) : 0xFF141418;
+        drawBeveledButton(poseStackOrGraphics, remAllX, barY, remAllW, btnH, remAllBg, hoverRemAll, false, alpha);
+        int remAllTextCol = hasAny ? (hoverRemAll ? 0xFFFFFFFF : 0xFFE05050) : COLOR_TEXT_MUTED;
+        Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "✕ Remove All", remAllX + remAllW / 2, barY + 3, applyAlpha(remAllTextCol, alpha));
+
+        // [ ✓ Save ]
+        int saveW = 50;
+        int saveX = remAllX + remAllW + 4;
+        boolean hoverSave = mouseX >= saveX && mouseX <= saveX + saveW && mouseY >= barY && mouseY <= barY + btnH;
+        drawBeveledGreenButton(poseStackOrGraphics, saveX, barY, saveW, btnH, hoverSave, alpha);
+        Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "✓ Save", saveX + saveW / 2, barY + 3, applyAlpha(hoverSave ? 0xFFFFFFFF : COLOR_TOGGLE_ON_TEXT, alpha));
+
+        // Right Count Badge
+        String badgeText = pillarList.size() + (pillarList.size() == 1 ? " Pillar Placed" : " Pillars Placed");
+        int badgeW = font.width(badgeText) + 10;
+        int badgeX = x + w - badgeW - 6;
+        drawBeveledButton(poseStackOrGraphics, badgeX, barY, badgeW, btnH, 0xFF131317, false, false, alpha);
+        Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, badgeText, badgeX + badgeW / 2, barY + 3, applyAlpha(COLOR_TEXT_SILVER, alpha));
+
+        curY += bar1H + 2;
+
+        // --- 2. Fixed Table Column Headers ---
+        int headH = 16;
+        int scrollbarW = 4;
+        int scrollbarTrackX = x + w - scrollbarW - 5;
+        int availW = (scrollbarTrackX - 6) - (x + 6);
+        int colX = x + 6;
+
+        drawBeveledButton(poseStackOrGraphics, colX, curY, availW, headH, 0xFF181820, false, true, alpha);
+
+        int chkW = 16;
+        int iconColW = 38;
+        int colorsColW = 48;
+        int dimColW = 58;
+        int coordsColW = 72;
+        int actionsColW = 58;
+        int gap = 4;
+        int idColW = Math.max(65, availW - (chkW + iconColW + colorsColW + dimColW + coordsColW + actionsColW + (gap * 6)));
+
+        // Header Checkbox
+        boolean allChecked = hasAny && selectedPillarIds.size() == pillarList.size();
+        boolean someChecked = !selectedPillarIds.isEmpty() && !allChecked;
+        int chkBoxSize = 10;
+        int chkX = colX + (chkW - chkBoxSize) / 2;
+        int chkY = curY + (headH - chkBoxSize) / 2;
+        drawBeveledButton(poseStackOrGraphics, chkX, chkY, chkBoxSize, chkBoxSize, 0xFF121216, false, allChecked, alpha);
+        if (allChecked) {
+            Services.PLATFORM.fill(poseStackOrGraphics, chkX + 2, chkY + 2, chkX + chkBoxSize - 2, chkY + chkBoxSize - 2, applyAlpha(0xFF22C55E, alpha));
+        } else if (someChecked) {
+            Services.PLATFORM.fill(poseStackOrGraphics, chkX + 2, chkY + (chkBoxSize / 2) - 1, chkX + chkBoxSize - 2, chkY + (chkBoxSize / 2) + 1, applyAlpha(0xFF22C55E, alpha));
+        }
+
+        int curColX = colX + chkW + gap;
+
+        // ID Header
+        drawText(poseStackOrGraphics, font, "ID", curColX + 2, curY + 4, applyAlpha(COLOR_TEXT_SILVER, alpha));
+        curColX += idColW + gap;
+
+        // ITEM Header
+        Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "ITEM", curColX + iconColW / 2, curY + 4, applyAlpha(COLOR_TEXT_SILVER, alpha));
+        curColX += iconColW + gap;
+
+        // COLORS Header
+        Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "COLORS", curColX + colorsColW / 2, curY + 4, applyAlpha(COLOR_TEXT_SILVER, alpha));
+        curColX += colorsColW + gap;
+
+        // DIMENSION Header
+        Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "DIMENSION", curColX + dimColW / 2, curY + 4, applyAlpha(COLOR_TEXT_SILVER, alpha));
+        curColX += dimColW + gap;
+
+        // COORDINATES Header (X, Y, Z colored)
+        int cx = curColX + coordsColW / 2;
+        int coordLabelW = font.width("X  Y  Z");
+        int coordStartX = cx - coordLabelW / 2;
+        drawText(poseStackOrGraphics, font, "X", coordStartX, curY + 4, applyAlpha(0xFFFF5555, alpha));
+        drawText(poseStackOrGraphics, font, "Y", coordStartX + font.width("X  "), curY + 4, applyAlpha(0xFF5599FF, alpha));
+        drawText(poseStackOrGraphics, font, "Z", coordStartX + font.width("X  Y  "), curY + 4, applyAlpha(0xFF55FF55, alpha));
+        curColX += coordsColW + gap;
+
+        // ACTIONS Header
+        Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "ACTIONS", curColX + actionsColW / 2, curY + 4, applyAlpha(COLOR_TEXT_SILVER, alpha));
+
+        curY += headH + 3;
+
+        // --- 3. Scrollable Rows Viewport ---
+        int viewportY = curY;
+        int viewportH = (y + h - 6) - viewportY;
+
+        int rowH = 24;
+        int rowGap = 2;
+        int totalContentHeight = Math.max(1, pillarList.size()) * (rowH + rowGap) + 4;
+        maxScroll = Math.max(0, totalContentHeight - viewportH);
+        scrollOffset = Math.max(0, Math.min(maxScroll, scrollOffset));
+
+        int startY = viewportY + 2 - (int) scrollOffset;
+
+        enableGuiScissor(poseStackOrGraphics, x + 4, viewportY, w - 8, viewportH);
+
+        if (pillarList.isEmpty()) {
+            int emptyY = startY + 8;
+            drawBeveledButton(poseStackOrGraphics, colX, emptyY, availW, 36, 0xFF141418, false, false, alpha);
+            Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "No placed pillars found in world.", colX + availW / 2, emptyY + 8, applyAlpha(COLOR_TEXT_SILVER, alpha));
+            Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "Place and customize pillar columns to synchronize their IDs.", colX + availW / 2, emptyY + 20, applyAlpha(COLOR_TEXT_MUTED, alpha));
+        } else {
+            for (int r = 0; r < pillarList.size(); r++) {
+                PillarIdManager.PillarData data = pillarList.get(r);
+                int rowY = startY + r * (rowH + rowGap);
+                if (rowY + rowH < viewportY || rowY > viewportY + viewportH) continue;
+
+                boolean isSelected = selectedPillarIds.contains(data.id);
+                boolean hover = mouseX >= colX && mouseX <= colX + availW && mouseY >= rowY && mouseY <= rowY + rowH &&
+                        mouseY >= viewportY && mouseY <= viewportY + viewportH;
+
+                int rowBg = isSelected ? 0xFF16241A : (hover ? COLOR_ROW_BG_HOVER : COLOR_ROW_BG);
+                drawBeveledButton(poseStackOrGraphics, colX, rowY, availW, rowH, rowBg, hover, isSelected, alpha);
+
+                // Row Checkbox
+                int rChkX = colX + (chkW - chkBoxSize) / 2;
+                int rChkY = rowY + (rowH - chkBoxSize) / 2;
+                drawBeveledButton(poseStackOrGraphics, rChkX, rChkY, chkBoxSize, chkBoxSize, 0xFF121216, hover, isSelected, alpha);
+                if (isSelected) {
+                    Services.PLATFORM.fill(poseStackOrGraphics, rChkX + 2, rChkY + 2, rChkX + chkBoxSize - 2, rChkY + chkBoxSize - 2, applyAlpha(0xFF22C55E, alpha));
                 }
-                curY += h + gap;
+
+                int rcX = colX + chkW + gap;
+
+                // ID Column (clickable to open detail!)
+                String idText = data.id != null ? data.id : "unknown";
+                int idTextCol = hover ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER;
+                drawText(poseStackOrGraphics, font, font.plainSubstrByWidth(idText, idColW - 4), rcX + 2, rowY + 8, applyAlpha(idTextCol, alpha));
+                rcX += idColW + gap;
+
+                // ITEM Column (Pillar Type + Displayed Item icons side by side)
+                ItemStack pillarTypeStack = getItemStackFromId(data.pillarType);
+                ItemStack dispStack = getItemStackFromId(data.displayedItem);
+                int iconY = rowY + (rowH - 16) / 2;
+                int iconStartX = rcX + (iconColW - 36) / 2;
+
+                if (!pillarTypeStack.isEmpty() || !dispStack.isEmpty()) {
+                    if (!pillarTypeStack.isEmpty()) {
+                        Services.PLATFORM.renderGuiItem(poseStackOrGraphics, pillarTypeStack, iconStartX, iconY);
+                    }
+                    if (!dispStack.isEmpty()) {
+                        Services.PLATFORM.renderGuiItem(poseStackOrGraphics, dispStack, iconStartX + 18, iconY);
+                    }
+                } else {
+                    Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "—", rcX + iconColW / 2, rowY + 8, applyAlpha(COLOR_TEXT_MUTED, alpha));
+                }
+                rcX += iconColW + gap;
+
+                // COLORS Column (Mini swatches)
+                List<String> colors = (data.dyeColors != null && !data.dyeColors.isEmpty()) ? data.dyeColors : PillarParticleConfig.get().particle_color;
+                int numSwatches = Math.min(5, colors != null ? colors.size() : 0);
+                if (numSwatches > 0) {
+                    int swSize = 8;
+                    int swGap = 2;
+                    int totalSwW = numSwatches * swSize + (numSwatches - 1) * swGap;
+                    int swStartX = rcX + (colorsColW - totalSwW) / 2;
+                    int swY = rowY + (rowH - swSize) / 2;
+                    for (int s = 0; s < numSwatches; s++) {
+                        int swX = swStartX + s * (swSize + swGap);
+                        int colInt = 0xFFFFFFFF;
+                        try {
+                            String hex = colors.get(s).replace("#", "");
+                            colInt = 0xFF000000 | Integer.parseInt(hex, 16);
+                        } catch (Exception ignored) {}
+                        Services.PLATFORM.fill(poseStackOrGraphics, swX, swY, swX + swSize, swY + swSize, applyAlpha(colInt, alpha));
+                        drawBorder(poseStackOrGraphics, swX, swY, swSize, swSize, applyAlpha(0xFF000000, alpha));
+                    }
+                } else {
+                    Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "—", rcX + colorsColW / 2, rowY + 8, applyAlpha(COLOR_TEXT_MUTED, alpha));
+                }
+                rcX += colorsColW + gap;
+
+                // DIMENSION Column
+                String dimName = formatDimensionName(data.dimension);
+                Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, font.plainSubstrByWidth(dimName, dimColW - 2), rcX + dimColW / 2, rowY + 8, applyAlpha(COLOR_TEXT_MUTED, alpha));
+                rcX += dimColW + gap;
+
+                // COORDINATES Column (colored X, Y, Z)
+                String coordsStr = String.format("%d %d %d", data.x, data.y, data.z);
+                int coordTextW = font.width(coordsStr);
+                int cX = rcX + (coordsColW - coordTextW) / 2;
+                String xStr = String.valueOf(data.x);
+                String yStr = String.valueOf(data.y);
+                String zStr = String.valueOf(data.z);
+                drawText(poseStackOrGraphics, font, xStr, cX, rowY + 8, applyAlpha(0xFFFF5555, alpha));
+                int xW = font.width(xStr + " ");
+                drawText(poseStackOrGraphics, font, yStr, cX + xW, rowY + 8, applyAlpha(0xFF5599FF, alpha));
+                int yW = font.width(yStr + " ");
+                drawText(poseStackOrGraphics, font, zStr, cX + xW + yW, rowY + 8, applyAlpha(0xFF55FF55, alpha));
+                rcX += coordsColW + gap;
+
+                // ACTIONS Column ([ ✎ Edit ] and [ ✕ ])
+                int actH = 13;
+                int actY = rowY + (rowH - actH) / 2;
+
+                int editW = 34;
+                int editX = rcX + 2;
+                boolean hoverEdit = mouseX >= editX && mouseX <= editX + editW && mouseY >= actY && mouseY <= actY + actH;
+                drawBeveledButton(poseStackOrGraphics, editX, actY, editW, actH, hoverEdit ? 0xFF2C2C38 : COLOR_BTN_BG, hoverEdit, false, alpha);
+                Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "✎ Edit", editX + editW / 2, actY + 2, applyAlpha(hoverEdit ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
+
+                int delW = 16;
+                int delX = editX + editW + 4;
+                boolean hoverDel = mouseX >= delX && mouseX <= delX + delW && mouseY >= actY && mouseY <= actY + actH;
+                drawBeveledButton(poseStackOrGraphics, delX, actY, delW, actH, hoverDel ? 0xFF3D1616 : 0xFF241414, hoverDel, false, alpha);
+                Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "✕", delX + delW / 2, actY + 2, applyAlpha(hoverDel ? 0xFFFFFFFF : 0xFFE05050, alpha));
             }
+        }
+
+        disableGuiScissor(poseStackOrGraphics);
+
+        // Scrollbar
+        if (maxScroll > 0) {
+            int trackH = viewportH;
+            int thumbH = Math.max(16, (int) ((viewportH / (float) totalContentHeight) * trackH));
+            int thumbY = viewportY + (int) ((scrollOffset / maxScroll) * (trackH - thumbH));
+
+            Services.PLATFORM.fill(poseStackOrGraphics, scrollbarTrackX, viewportY, scrollbarTrackX + scrollbarW, viewportY + trackH, applyAlpha(0xFF141418, alpha));
+            drawBeveledButton(poseStackOrGraphics, scrollbarTrackX, thumbY, scrollbarW, thumbH, 0xFF3E3E4C, false, false, alpha);
         }
     }
 
     // --- Tab 2 (Detail): Per-Pillar Customization View ---
-    private void renderPillarDetailRows(Object poseStackOrGraphics, Font font, int x, int startY, int w, int h, int gap, int clipY, int clipH, int mouseX, int mouseY, float alpha) {
+    private void renderPillarDetailPanel(Object poseStackOrGraphics, Font font, int x, int y, int w, int h, int catHeaderH, int mouseX, int mouseY, float alpha) {
         PillarIdManager.PillarData data = PillarIdManager.getClient().getPillarData(selectedPillarDetailId);
         if (data == null) {
             selectedPillarDetailId = null;
             return;
         }
 
-        int curY = startY;
+        PillarParticleConfig globalCfg = PillarParticleConfig.get();
 
-        // Row 0: Back Button & Header Info
-        if (curY >= clipY && curY + h <= clipY + clipH) {
-            renderRowCardBase(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Pillar: " + data.id, String.format("Pos: [%d, %d, %d] · Dim: %s", data.x, data.y, data.z, data.dimension), mouseX, mouseY, alpha);
+        int curY = y + catHeaderH + 4;
 
-            int backW = 68;
-            int btnH = 14;
-            int backX = x + w - backW - 6;
-            int backY = curY + (h - btnH) / 2;
-            boolean hoverBack = mouseX >= backX && mouseX <= backX + backW && mouseY >= backY && mouseY <= backY + btnH;
-            Services.PLATFORM.fill(poseStackOrGraphics, backX, backY, backX + backW, backY + btnH, applyAlpha(hoverBack ? 0xFF2E2E38 : COLOR_BTN_BG, alpha));
-            drawBorder(poseStackOrGraphics, backX, backY, backW, btnH, applyAlpha(hoverBack ? COLOR_BTN_BORDER_HOVER : COLOR_BTN_BORDER, alpha));
-            Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "◀ Back", backX + backW / 2, backY + 3, applyAlpha(hoverBack ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
-        }
-        curY += h + gap;
+        // --- 1. Fixed Top Detail Header Bar ---
+        int bar1H = 20;
+        int btnH = 14;
+        int barY = curY + (bar1H - btnH) / 2;
 
-        // Row 1: Use Pattern Override
-        boolean usePat = data.use_pattern != null ? data.use_pattern : false;
-        renderConfigRowToggle(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Use Custom Pattern", "Override global particle pattern for this specific pillar", usePat, mouseX, mouseY, alpha);
-        curY += h + gap;
+        // [ ◀ Back ]
+        int backW = 54;
+        int backX = x + 6;
+        boolean hoverBack = mouseX >= backX && mouseX <= backX + backW && mouseY >= barY && mouseY <= barY + btnH;
+        drawBeveledButton(poseStackOrGraphics, backX, barY, backW, btnH, hoverBack ? 0xFF2C2C36 : COLOR_BTN_BG, hoverBack, false, alpha);
+        Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "◀ Back", backX + backW / 2, barY + 3, applyAlpha(hoverBack ? COLOR_TEXT_WHITE : COLOR_TEXT_SILVER, alpha));
 
-        // Row 2: Pattern Cycle
+        // Title: Pillar ID + coords badge
+        String titleText = "Pillar: " + data.id;
+        drawText(poseStackOrGraphics, font, titleText, backX + backW + 8, barY + 3, applyAlpha(COLOR_TEXT_WHITE, alpha));
+
+        String locText = String.format("[%s · %d, %d, %d]", formatDimensionName(data.dimension), data.x, data.y, data.z);
+        drawText(poseStackOrGraphics, font, locText, backX + backW + 8 + font.width(titleText) + 8, barY + 3, applyAlpha(COLOR_TEXT_MUTED, alpha));
+
+        // [ ✓ Save Pillar ]
+        int saveW = 82;
+        int saveX = x + w - saveW - 6;
+        boolean hoverSave = mouseX >= saveX && mouseX <= saveX + saveW && mouseY >= barY && mouseY <= barY + btnH;
+        drawBeveledGreenButton(poseStackOrGraphics, saveX, barY, saveW, btnH, hoverSave, alpha);
+        Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "✓ Save Pillar", saveX + saveW / 2, barY + 3, applyAlpha(hoverSave ? 0xFFFFFFFF : COLOR_TOGGLE_ON_TEXT, alpha));
+
+        curY += bar1H + 3;
+
+        // --- 2. Scrollable Detail Viewport ---
+        int viewportY = curY;
+        int viewportH = (y + h - 6) - viewportY;
+        int rowH = 26;
+        int rowGap = 3;
+
+        int scrollbarW = 4;
+        int scrollbarTrackX = x + w - scrollbarW - 5;
+        int rowW = (scrollbarTrackX - 6) - (x + 6);
+        int rowX = x + 6;
+
+        int totalContentHeight = 7 * (rowH + rowGap) + 8;
+        maxScroll = Math.max(0, totalContentHeight - viewportH);
+        scrollOffset = Math.max(0, Math.min(maxScroll, scrollOffset));
+
+        int startY = viewportY + 2 - (int) scrollOffset;
+        int rY = startY;
+
+        enableGuiScissor(poseStackOrGraphics, x + 4, viewportY, w - 8, viewportH);
+
+        // Row 1: Use Custom Pattern Toggle (fallback to global use_pattern)
+        boolean usePat = data.use_pattern != null ? data.use_pattern : globalCfg.use_pattern;
+        renderConfigRowToggle(poseStackOrGraphics, font, rowX, rY, rowW, rowH, viewportY, viewportH, "Use Custom Pattern", "Override global particle pattern for this specific pillar", usePat, mouseX, mouseY, alpha);
+        rY += rowH + rowGap;
+
+        // Row 2: Trajectory Pattern Cycle (fallback to "default")
         String curPat = data.pattern != null && !data.pattern.isEmpty() ? data.pattern : "default";
         String patDisplay = curPat.substring(0, 1).toUpperCase() + curPat.substring(1);
-        renderConfigRowCycle(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Trajectory Pattern", "Geometric animation solver for this pillar", patDisplay, mouseX, mouseY, alpha);
-        curY += h + gap;
+        renderConfigRowCycle(poseStackOrGraphics, font, rowX, rY, rowW, rowH, viewportY, viewportH, "Trajectory Pattern", "Geometric animation solver for this pillar", patDisplay, mouseX, mouseY, alpha);
+        rY += rowH + rowGap;
 
-        // Row 3: Pattern Speed
-        double speed = data.pattern_speed != null ? data.pattern_speed : PillarParticleConfig.get().pattern_speed;
-        renderConfigRowCounter(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Pattern Speed", "Rotational speed multiplier for this pillar", String.format("%.2f", speed), mouseX, mouseY, alpha);
-        curY += h + gap;
+        // Row 3: Pattern Speed Counter (fallback to global pattern_speed)
+        double speed = data.pattern_speed != null ? data.pattern_speed : globalCfg.pattern_speed;
+        renderConfigRowCounter(poseStackOrGraphics, font, rowX, rY, rowW, rowH, viewportY, viewportH, "Pattern Speed", "Rotational speed multiplier for this pillar", String.format("%.2f", speed), mouseX, mouseY, alpha);
+        rY += rowH + rowGap;
 
-        // Row 4: Pattern Spread
-        double spread = data.pattern_spread != null ? data.pattern_spread : PillarParticleConfig.get().pattern_spread;
-        renderConfigRowCounter(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Pattern Spread", "Dispersion radius factor for this pillar", String.format("%.2f", spread), mouseX, mouseY, alpha);
-        curY += h + gap;
+        // Row 4: Pattern Spread Counter (fallback to global pattern_spread)
+        double spread = data.pattern_spread != null ? data.pattern_spread : globalCfg.pattern_spread;
+        renderConfigRowCounter(poseStackOrGraphics, font, rowX, rY, rowW, rowH, viewportY, viewportH, "Pattern Spread", "Dispersion radius factor for this pillar", String.format("%.2f", spread), mouseX, mouseY, alpha);
+        rY += rowH + rowGap;
 
-        // Row 5: Pattern Intensity
-        double intensity = data.pattern_intensity != null ? data.pattern_intensity : PillarParticleConfig.get().pattern_intensity;
-        renderConfigRowCounter(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Pattern Intensity", "Impulse power multiplier for this pillar", String.format("%.1fx", intensity), mouseX, mouseY, alpha);
-        curY += h + gap;
+        // Row 5: Pattern Intensity Counter (fallback to global pattern_intensity)
+        double intensity = data.pattern_intensity != null ? data.pattern_intensity : globalCfg.pattern_intensity;
+        renderConfigRowCounter(poseStackOrGraphics, font, rowX, rY, rowW, rowH, viewportY, viewportH, "Pattern Intensity", "Impulse power multiplier for this pillar", String.format("%.1fx", intensity), mouseX, mouseY, alpha);
+        rY += rowH + rowGap;
 
-        // Row 6: Per-Pillar Color Palette Swatches
-        List<String> colors = data.dyeColors != null ? data.dyeColors : new ArrayList<>();
-        int maxColors = data.max_particle_color != null ? data.max_particle_color : Math.min(5, Math.max(1, colors.size()));
-        renderConfigRowPalette(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Pillar Colors (Click to Drag & Pick)", colors, maxColors, mouseX, mouseY, alpha);
-        curY += h + gap;
+        // Row 6: Per-Pillar Color Palette (fallback to global particle_color & max_particle_color)
+        List<String> colors = (data.dyeColors != null && !data.dyeColors.isEmpty()) ? data.dyeColors : new ArrayList<>(globalCfg.particle_color);
+        int maxColors = data.max_particle_color != null ? data.max_particle_color : (globalCfg.max_particle_color != 0 ? globalCfg.max_particle_color : Math.min(5, Math.max(1, colors.size())));
+        renderConfigRowPalette(poseStackOrGraphics, font, rowX, rY, rowW, rowH, viewportY, viewportH, "Pillar Colors (Click to Drag & Pick)", colors, maxColors, mouseX, mouseY, alpha);
+        rY += rowH + rowGap;
 
         // Row 7: Save & Sync Pillar Configuration
-        if (curY >= clipY && curY + h <= clipY + clipH) {
-            renderRowCardBase(poseStackOrGraphics, font, x, curY, w, h, clipY, clipH, "Save Pillar Changes", "Send synchronized particle updates to server and clients", mouseX, mouseY, alpha);
+        renderConfigRowButton(poseStackOrGraphics, font, rowX, rY, rowW, rowH, viewportY, viewportH, "Save Pillar Changes", "Send synchronized particle updates to server and clients", "✓ Save Pillar", mouseX, mouseY, alpha);
 
-            int saveW = 80;
-            int btnH = 14;
-            int saveX = x + w - saveW - 6;
-            int saveY = curY + (h - btnH) / 2;
-            boolean hoverSave = mouseX >= saveX && mouseX <= saveX + saveW && mouseY >= saveY && mouseY <= saveY + btnH;
-            Services.PLATFORM.fill(poseStackOrGraphics, saveX, saveY, saveX + saveW, saveY + btnH, applyAlpha(hoverSave ? 0xFF1C3C22 : COLOR_TOGGLE_ON_BG, alpha));
-            drawBorder(poseStackOrGraphics, saveX, saveY, saveW, btnH, applyAlpha(COLOR_TOGGLE_ON_BORDER, alpha));
-            Services.PLATFORM.drawCenteredString(poseStackOrGraphics, font, "✓ Save Pillar", saveX + saveW / 2, saveY + 3, applyAlpha(COLOR_TOGGLE_ON_TEXT, alpha));
+        disableGuiScissor(poseStackOrGraphics);
+
+        // Scrollbar
+        if (maxScroll > 0) {
+            int trackH = viewportH;
+            int thumbH = Math.max(16, (int) ((viewportH / (float) totalContentHeight) * trackH));
+            int thumbY = viewportY + (int) ((scrollOffset / maxScroll) * (trackH - thumbH));
+
+            Services.PLATFORM.fill(poseStackOrGraphics, scrollbarTrackX, viewportY, scrollbarTrackX + scrollbarW, viewportY + trackH, applyAlpha(0xFF141418, alpha));
+            drawBeveledButton(poseStackOrGraphics, scrollbarTrackX, thumbY, scrollbarW, thumbH, 0xFF3E3E4C, false, false, alpha);
         }
     }
 
@@ -1938,6 +2229,9 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                     selectedTabIndex = i;
                     scrollOffset = 0.0;
                     selectedPillarDetailId = null;
+                    if ("pillars".equals(navItems.get(i).id)) {
+                        syncPillars();
+                    }
                 }
                 return true;
             }
@@ -2185,6 +2479,9 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                     }
                 }
             }
+            case "pillars" -> {
+                return handlePillarsClick(mouseX, mouseY, button, contentX, contentY, contentW, contentH, catHeaderH);
+            }
             default -> {
                 int viewY = contentY + catHeaderH + 4;
                 int viewH = contentH - catHeaderH - 8;
@@ -2216,13 +2513,13 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                 // 2. Pattern Cycle
                 if (checkCycleClick(mouseX, mouseY, x, curY, w, h, clipY, clipH)) {
                     int pIndex = 0;
-                    for (int i = 0; i < PARTICLE_PATTERNS.length; i++) {
-                        if (PARTICLE_PATTERNS[i].equalsIgnoreCase(cfg.pattern)) {
+                    for (int i = 0; i < GLOBAL_PARTICLE_PATTERNS.length; i++) {
+                        if (GLOBAL_PARTICLE_PATTERNS[i].equalsIgnoreCase(cfg.pattern)) {
                             pIndex = i;
                             break;
                         }
                     }
-                    cfg.pattern = PARTICLE_PATTERNS[(pIndex + 1) % PARTICLE_PATTERNS.length];
+                    cfg.pattern = GLOBAL_PARTICLE_PATTERNS[(pIndex + 1) % GLOBAL_PARTICLE_PATTERNS.length];
                     cfg.saveProperties();
                     return true;
                 }
@@ -2353,201 +2650,6 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                     return true;
                 }
             }
-            case "pillars" -> {
-                if (selectedPillarDetailId != null) {
-                    PillarIdManager.PillarData data = PillarIdManager.getClient().getPillarData(selectedPillarDetailId);
-                    if (data == null) {
-                        selectedPillarDetailId = null;
-                        return false;
-                    }
-
-                    // Row 0: Back Button
-                    if (curY >= clipY && curY + h <= clipY + clipH) {
-                        int backW = 68;
-                        int btnH = 14;
-                        int backX = x + w - backW - 6;
-                        int backY = curY + (h - btnH) / 2;
-                        if (mouseX >= backX && mouseX <= backX + backW && mouseY >= backY && mouseY <= backY + btnH) {
-                            selectedPillarDetailId = null;
-                            return true;
-                        }
-                    }
-                    curY += h + gap;
-
-                    // Row 1: Use Pattern Override
-                    if (checkToggleClick(mouseX, mouseY, x, curY, w, h, clipY, clipH)) {
-                        data.use_pattern = data.use_pattern == null || !data.use_pattern;
-                        return true;
-                    }
-                    curY += h + gap;
-
-                    // Row 2: Pattern Cycle
-                    if (checkCycleClick(mouseX, mouseY, x, curY, w, h, clipY, clipH)) {
-                        int pIndex = 0;
-                        for (int i = 0; i < PARTICLE_PATTERNS.length; i++) {
-                            if (PARTICLE_PATTERNS[i].equalsIgnoreCase(data.pattern != null ? data.pattern : "default")) {
-                                pIndex = i;
-                                break;
-                            }
-                        }
-                        data.pattern = PARTICLE_PATTERNS[(pIndex + 1) % PARTICLE_PATTERNS.length];
-                        return true;
-                    }
-                    curY += h + gap;
-
-                    // Row 3: Pattern Speed
-                    int spdStep = checkCounterClick(mouseX, mouseY, x, curY, w, h, clipY, clipH);
-                    if (spdStep != 0) {
-                        double cur = data.pattern_speed != null ? data.pattern_speed : PillarParticleConfig.get().pattern_speed;
-                        data.pattern_speed = Math.max(0.01D, Math.min(0.50D, Math.round((cur + spdStep * 0.01D) * 100.0) / 100.0));
-                        return true;
-                    }
-                    curY += h + gap;
-
-                    // Row 4: Pattern Spread
-                    int sprStep = checkCounterClick(mouseX, mouseY, x, curY, w, h, clipY, clipH);
-                    if (sprStep != 0) {
-                        double cur = data.pattern_spread != null ? data.pattern_spread : PillarParticleConfig.get().pattern_spread;
-                        data.pattern_spread = Math.max(0.01D, Math.min(0.50D, Math.round((cur + sprStep * 0.01D) * 100.0) / 100.0));
-                        return true;
-                    }
-                    curY += h + gap;
-
-                    // Row 5: Pattern Intensity
-                    int intStep = checkCounterClick(mouseX, mouseY, x, curY, w, h, clipY, clipH);
-                    if (intStep != 0) {
-                        double cur = data.pattern_intensity != null ? data.pattern_intensity : PillarParticleConfig.get().pattern_intensity;
-                        data.pattern_intensity = Math.max(0.1D, Math.min(5.0D, Math.round((cur + intStep * 0.1D) * 10.0) / 10.0));
-                        return true;
-                    }
-                    curY += h + gap;
-
-                    // Row 6: Per-Pillar Color Palette
-                    if (curY >= clipY && curY + h <= clipY + clipH) {
-                        List<String> colors = data.dyeColors;
-                        int counterW = 60;
-                        int counterH = 14;
-                        int counterX = x + w - counterW - 8;
-                        int counterY = curY + (h - counterH) / 2;
-                        int stepBtnW = 12;
-
-                        if (mouseY >= counterY && mouseY <= counterY + counterH) {
-                            if (mouseX >= counterX && mouseX <= counterX + stepBtnW) {
-                                int curMax = data.max_particle_color != null ? data.max_particle_color : colors.size();
-                                data.max_particle_color = Math.max(1, curMax - 1);
-                                return true;
-                            } else if (mouseX >= counterX + counterW - stepBtnW && mouseX <= counterX + counterW) {
-                                int curMax = data.max_particle_color != null ? data.max_particle_color : colors.size();
-                                data.max_particle_color = Math.min(5, curMax + 1);
-                                return true;
-                            }
-                        }
-
-                        int swatchSize = 12;
-                        int swatchGap = 3;
-                        int swatchesTotalW = Math.min(5, colors.size()) * (swatchSize + swatchGap);
-                        int swatchStartX = counterX - swatchesTotalW - 8;
-                        int swatchY = curY + (h - swatchSize) / 2;
-
-                        for (int i = 0; i < Math.min(5, colors.size()); i++) {
-                            int swX = swatchStartX + i * (swatchSize + swatchGap);
-                            if (mouseX >= swX && mouseX <= swX + swatchSize && mouseY >= swatchY && mouseY <= swatchY + swatchSize) {
-                                editingColorIndex = i;
-                                isEditingPillarColor = true;
-                                editingPillarId = data.id;
-                                String hex = colors.get(i).replace("#", "");
-                                try {
-                                    int rgb = Integer.parseInt(hex, 16);
-                                    float[] hsb = new float[3];
-                                    rgbToHsb(rgb, hsb);
-                                    pickerHue = hsb[0];
-                                    pickerSat = hsb[1];
-                                    pickerBri = hsb[2];
-                                } catch (Exception ignored) {}
-                                showColorModal = true;
-                                return true;
-                            }
-                        }
-                    }
-                    curY += h + gap;
-
-                    // Row 7: Save Pillar Changes
-                    if (checkButtonClick(mouseX, mouseY, x, curY, w, h, clipY, clipH, 80)) {
-                        PacketFactory.sendToServer(new UpdatePillarDataPacket(
-                                data.id,
-                                data.pattern,
-                                data.use_pattern,
-                                data.pattern_speed,
-                                data.pattern_spread,
-                                data.pattern_intensity,
-                                data.max_particle_color,
-                                data.dyeColors
-                        ));
-                        PillarIdManager.getClient().save();
-                        selectedPillarDetailId = null;
-                        return true;
-                    }
-                } else {
-                    // Row 0: Reload & Clear
-                    if (curY >= clipY && curY + h <= clipY + clipH) {
-                        int btnW = 76;
-                        int btnH = 14;
-                        int reloadX = x + w - (btnW * 2) - 12;
-                        int reloadY = curY + (h - btnH) / 2;
-                        if (mouseX >= reloadX && mouseX <= reloadX + btnW && mouseY >= reloadY && mouseY <= reloadY + btnH) {
-                            PacketFactory.sendToServer(new RequestPillarIdsPacket());
-                            return true;
-                        }
-
-                        int clearX = x + w - btnW - 6;
-                        if (mouseX >= clearX && mouseX <= clearX + btnW && mouseY >= reloadY && mouseY <= reloadY + btnH) {
-                            PacketFactory.sendToServer(new UpdateAllPillarIdsPacket(new ArrayList<>()));
-                            return true;
-                        }
-                    }
-                    curY += h + gap;
-
-                    // Row 1: Auto-snapping
-                    if (checkToggleClick(mouseX, mouseY, x, curY, w, h, clipY, clipH)) {
-                        autoSnappingEnabled = !autoSnappingEnabled;
-                        return true;
-                    }
-                    curY += h + gap;
-
-                    // Row 2: Strict collision
-                    if (checkToggleClick(mouseX, mouseY, x, curY, w, h, clipY, clipH)) {
-                        strictBoundsCheck = !strictBoundsCheck;
-                        return true;
-                    }
-                    curY += h + gap;
-
-                    // Rows 3+: Individual Pillar Rows
-                    Collection<PillarIdManager.PillarData> pillars = PillarIdManager.getClient().getAllData();
-                    for (PillarIdManager.PillarData data : pillars) {
-                        if (curY >= clipY && curY + h <= clipY + clipH) {
-                            int custW = 64;
-                            int btnH = 14;
-                            int custX = x + w - custW - 58;
-                            int custY = curY + (h - btnH) / 2;
-
-                            // Customize click
-                            if (mouseX >= custX && mouseX <= custX + custW && mouseY >= custY && mouseY <= custY + btnH) {
-                                selectedPillarDetailId = data.id;
-                                return true;
-                            }
-
-                            // Remove click
-                            int removeW = 50;
-                            int removeX = x + w - removeW - 6;
-                            if (mouseX >= removeX && mouseX <= removeX + removeW && mouseY >= custY && mouseY <= custY + btnH) {
-                                PacketFactory.sendToServer(new RemovePillarPacket(Collections.singletonList(data.id)));
-                                return true;
-                            }
-                        }
-                        curY += h + gap;
-                    }
-                }
-            }
             case "world" -> {
                 UUID playerUuid = getPlayerUuid();
                 Level level = getLevel();
@@ -2634,6 +2736,364 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         return false;
     }
 
+    private boolean handlePillarsClick(double mouseX, double mouseY, int button, int contentX, int contentY, int contentW, int contentH, int catHeaderH) {
+        if (selectedPillarDetailId != null) {
+            return handlePillarDetailClick(mouseX, mouseY, button, contentX, contentY, contentW, contentH, catHeaderH);
+        } else {
+            return handlePillarTableClick(mouseX, mouseY, button, contentX, contentY, contentW, contentH, catHeaderH);
+        }
+    }
+
+    private boolean handlePillarTableClick(double mouseX, double mouseY, int button, int x, int y, int w, int h, int catHeaderH) {
+        List<PillarIdManager.PillarData> pillarList = new ArrayList<>(PillarIdManager.getClient().copyDataSnapshot().values());
+        pillarList.sort(Comparator.comparing(p -> p.id != null ? p.id : ""));
+
+        int curY = y + catHeaderH + 4;
+
+        // 1. Top Action Bar
+        int bar1H = 20;
+        int btnH = 14;
+        int barY = curY + (bar1H - btnH) / 2;
+
+        // [ ⟳ Reload ]
+        int relW = 60;
+        int relX = x + 6;
+        if (mouseX >= relX && mouseX <= relX + relW && mouseY >= barY && mouseY <= barY + btnH) {
+            syncPillars();
+            return true;
+        }
+
+        // [ ✕ Remove Selected (<N>) ]
+        int remSelW = 105;
+        int remSelX = relX + relW + 4;
+        if (!selectedPillarIds.isEmpty() && mouseX >= remSelX && mouseX <= remSelX + remSelW && mouseY >= barY && mouseY <= barY + btnH) {
+            for (String id : new ArrayList<>(selectedPillarIds)) {
+                PillarIdManager.getClient().removePillarData(id);
+                PacketFactory.sendToServer(new RemovePillarPacket(id));
+            }
+            selectedPillarIds.clear();
+            return true;
+        }
+
+        // [ ✕ Remove All ]
+        int remAllW = 75;
+        int remAllX = remSelX + remSelW + 4;
+        if (!pillarList.isEmpty() && mouseX >= remAllX && mouseX <= remAllX + remAllW && mouseY >= barY && mouseY <= barY + btnH) {
+            for (PillarIdManager.PillarData data : pillarList) {
+                if (data.id != null) {
+                    PillarIdManager.getClient().removePillarData(data.id);
+                    PacketFactory.sendToServer(new RemovePillarPacket(data.id));
+                }
+            }
+            selectedPillarIds.clear();
+            return true;
+        }
+
+        // [ ✓ Save ]
+        int saveW = 50;
+        int saveX = remAllX + remAllW + 4;
+        if (mouseX >= saveX && mouseX <= saveX + saveW && mouseY >= barY && mouseY <= barY + btnH) {
+            PillarIdManager.getClient().saveAllPillars();
+            PacketFactory.sendToServer(new UpdateAllPillarIdsPacket(PillarIdManager.getClient().copyDataSnapshot()));
+            return true;
+        }
+
+        curY += bar1H + 2;
+
+        // 2. Fixed Table Column Headers
+        int headH = 16;
+        int scrollbarW = 4;
+        int scrollbarTrackX = x + w - scrollbarW - 5;
+        int availW = (scrollbarTrackX - 6) - (x + 6);
+        int colX = x + 6;
+
+        int chkW = 16;
+        int iconColW = 38;
+        int colorsColW = 48;
+        int dimColW = 58;
+        int coordsColW = 72;
+        int actionsColW = 58;
+        int gap = 4;
+        int idColW = Math.max(65, availW - (chkW + iconColW + colorsColW + dimColW + coordsColW + actionsColW + (gap * 6)));
+
+        // Header Checkbox click
+        if (mouseX >= colX && mouseX <= colX + chkW && mouseY >= curY && mouseY <= curY + headH) {
+            if (!pillarList.isEmpty() && selectedPillarIds.size() == pillarList.size()) {
+                selectedPillarIds.clear();
+            } else {
+                selectedPillarIds.clear();
+                for (PillarIdManager.PillarData data : pillarList) {
+                    if (data.id != null) {
+                        selectedPillarIds.add(data.id);
+                    }
+                }
+            }
+            return true;
+        }
+
+        curY += headH + 3;
+
+        // 3. Scrollable Rows Viewport
+        int viewportY = curY;
+        int viewportH = (y + h - 6) - viewportY;
+        if (mouseY < viewportY || mouseY > viewportY + viewportH) {
+            return false;
+        }
+
+        int rowH = 24;
+        int rowGap = 2;
+        int startY = viewportY + 2 - (int) scrollOffset;
+
+        for (int r = 0; r < pillarList.size(); r++) {
+            PillarIdManager.PillarData data = pillarList.get(r);
+            int rowY = startY + r * (rowH + rowGap);
+            if (rowY + rowH < viewportY || rowY > viewportY + viewportH) continue;
+
+            if (mouseX >= colX && mouseX <= colX + availW && mouseY >= rowY && mouseY <= rowY + rowH) {
+                // Row Checkbox click
+                if (mouseX >= colX && mouseX <= colX + chkW) {
+                    if (selectedPillarIds.contains(data.id)) {
+                        selectedPillarIds.remove(data.id);
+                    } else {
+                        selectedPillarIds.add(data.id);
+                    }
+                    return true;
+                }
+
+                // ACTIONS column clicks:
+                int actH = 13;
+                int actY = rowY + (rowH - actH) / 2;
+                int rcX = colX + chkW + gap + idColW + gap + iconColW + gap + colorsColW + gap + dimColW + gap + coordsColW + gap;
+                int editW = 34;
+                int editX = rcX + 2;
+                int delW = 16;
+                int delX = editX + editW + 4;
+
+                if (mouseX >= editX && mouseX <= editX + editW && mouseY >= actY && mouseY <= actY + actH) {
+                    selectedPillarDetailId = data.id;
+                    scrollOffset = 0.0;
+                    return true;
+                }
+
+                if (mouseX >= delX && mouseX <= delX + delW && mouseY >= actY && mouseY <= actY + actH) {
+                    PillarIdManager.getClient().removePillarData(data.id);
+                    PacketFactory.sendToServer(new RemovePillarPacket(data.id));
+                    selectedPillarIds.remove(data.id);
+                    return true;
+                }
+
+                // Check ID column click:
+                int idX = colX + chkW + gap;
+                long now = System.currentTimeMillis();
+                boolean isDouble = data.id != null && data.id.equals(lastPillarRowClickId) && (now - lastPillarRowClickTime < 350);
+                lastPillarRowClickId = data.id;
+                lastPillarRowClickTime = now;
+
+                if (isDouble) {
+                    Minecraft mc = Minecraft.getInstance();
+                    if (mc.player != null && mc.level != null) {
+                        String curDim = Services.PLATFORM.getDimensionId(mc.level).toString();
+                        if (data.dimension != null && data.dimension.equals(curDim)) {
+                            BlockPos pillarPos = new BlockPos(data.x, data.y, data.z);
+                            PillarMarkerManager.get().markPillar(data.id, pillarPos, data.dimension);
+                            double dx = pillarPos.getX() - mc.player.getX();
+                            double dz = pillarPos.getZ() - mc.player.getZ();
+                            float yaw = (float) (Math.atan2(dz, dx) * 180.0 / Math.PI) - 90.0f;
+                            mc.player.setYRot(yaw);
+                            mc.player.setXRot(0.0f);
+                            this.onClose();
+                            return true;
+                        }
+                    }
+                }
+
+                if (mouseX >= idX && mouseX <= idX + idColW) {
+                    selectedPillarDetailId = data.id;
+                    scrollOffset = 0.0;
+                    return true;
+                }
+
+                // Clicking anywhere else on row toggles selection
+                if (selectedPillarIds.contains(data.id)) {
+                    selectedPillarIds.remove(data.id);
+                } else {
+                    selectedPillarIds.add(data.id);
+                }
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private boolean handlePillarDetailClick(double mouseX, double mouseY, int button, int x, int y, int w, int h, int catHeaderH) {
+        PillarIdManager.PillarData data = PillarIdManager.getClient().getPillarData(selectedPillarDetailId);
+        if (data == null) {
+            selectedPillarDetailId = null;
+            return false;
+        }
+
+        PillarParticleConfig globalCfg = PillarParticleConfig.get();
+        int curY = y + catHeaderH + 4;
+
+        // 1. Top Detail Header Bar
+        int bar1H = 20;
+        int btnH = 14;
+        int barY = curY + (bar1H - btnH) / 2;
+
+        // [ ◀ Back ]
+        int backW = 54;
+        int backX = x + 6;
+        if (mouseX >= backX && mouseX <= backX + backW && mouseY >= barY && mouseY <= barY + btnH) {
+            selectedPillarDetailId = null;
+            scrollOffset = 0.0;
+            return true;
+        }
+
+        // [ ✓ Save Pillar ]
+        int saveW = 82;
+        int saveX = x + w - saveW - 6;
+        if (mouseX >= saveX && mouseX <= saveX + saveW && mouseY >= barY && mouseY <= barY + btnH) {
+            PillarIdManager.getClient().saveAllPillars();
+            PacketFactory.sendToServer(new UpdatePillarDataPacket(data));
+            return true;
+        }
+
+        curY += bar1H + 3;
+
+        // 2. Scrollable Detail Viewport
+        int viewportY = curY;
+        int viewportH = (y + h - 6) - viewportY;
+        if (mouseY < viewportY || mouseY > viewportY + viewportH) {
+            return false;
+        }
+
+        int rowH = 26;
+        int rowGap = 3;
+        int scrollbarW = 4;
+        int scrollbarTrackX = x + w - scrollbarW - 5;
+        int rowW = (scrollbarTrackX - 6) - (x + 6);
+        int rowX = x + 6;
+
+        int startY = viewportY + 2 - (int) scrollOffset;
+        int rY = startY;
+
+        // Row 1: Use Custom Pattern Toggle
+        if (checkToggleClick(mouseX, mouseY, rowX, rY, rowW, rowH, viewportY, viewportH)) {
+            boolean cur = data.use_pattern != null ? data.use_pattern : globalCfg.use_pattern;
+            data.use_pattern = !cur;
+            PillarIdManager.getClient().updatePillarData(data);
+            PacketFactory.sendToServer(new UpdatePillarDataPacket(data));
+            return true;
+        }
+        rY += rowH + rowGap;
+
+        // Row 2: Trajectory Pattern Cycle
+        if (checkCycleClick(mouseX, mouseY, rowX, rY, rowW, rowH, viewportY, viewportH)) {
+            String curPat = data.pattern != null && !data.pattern.isEmpty() ? data.pattern : "default";
+            int idx = 0;
+            for (int i = 0; i < PARTICLE_PATTERNS.length; i++) {
+                if (PARTICLE_PATTERNS[i].equalsIgnoreCase(curPat)) {
+                    idx = i;
+                    break;
+                }
+            }
+            data.pattern = PARTICLE_PATTERNS[(idx + 1) % PARTICLE_PATTERNS.length];
+            PillarIdManager.getClient().updatePillarData(data);
+            PacketFactory.sendToServer(new UpdatePillarDataPacket(data));
+            return true;
+        }
+        rY += rowH + rowGap;
+
+        // Row 3: Pattern Speed Counter
+        int speedStep = checkCounterClick(mouseX, mouseY, rowX, rY, rowW, rowH, viewportY, viewportH);
+        if (speedStep != 0) {
+            double cur = data.pattern_speed != null ? data.pattern_speed : globalCfg.pattern_speed;
+            data.pattern_speed = Math.max(0.01D, Math.min(0.50D, Math.round((cur + speedStep * 0.01D) * 100.0) / 100.0));
+            PillarIdManager.getClient().updatePillarData(data);
+            PacketFactory.sendToServer(new UpdatePillarDataPacket(data));
+            return true;
+        }
+        rY += rowH + rowGap;
+
+        // Row 4: Pattern Spread Counter
+        int spreadStep = checkCounterClick(mouseX, mouseY, rowX, rY, rowW, rowH, viewportY, viewportH);
+        if (spreadStep != 0) {
+            double cur = data.pattern_spread != null ? data.pattern_spread : globalCfg.pattern_spread;
+            data.pattern_spread = Math.max(0.01D, Math.min(0.50D, Math.round((cur + spreadStep * 0.01D) * 100.0) / 100.0));
+            PillarIdManager.getClient().updatePillarData(data);
+            PacketFactory.sendToServer(new UpdatePillarDataPacket(data));
+            return true;
+        }
+        rY += rowH + rowGap;
+
+        // Row 5: Pattern Intensity Counter
+        int intStep = checkCounterClick(mouseX, mouseY, rowX, rY, rowW, rowH, viewportY, viewportH);
+        if (intStep != 0) {
+            double cur = data.pattern_intensity != null ? data.pattern_intensity : globalCfg.pattern_intensity;
+            data.pattern_intensity = Math.max(0.1D, Math.min(5.0D, Math.round((cur + intStep * 0.1D) * 10.0) / 10.0));
+            PillarIdManager.getClient().updatePillarData(data);
+            PacketFactory.sendToServer(new UpdatePillarDataPacket(data));
+            return true;
+        }
+        rY += rowH + rowGap;
+
+        // Row 6: Per-Pillar Color Palette
+        List<String> colors = (data.dyeColors != null && !data.dyeColors.isEmpty()) ? data.dyeColors : new ArrayList<>(globalCfg.particle_color);
+        int maxColors = data.max_particle_color != null ? data.max_particle_color : (globalCfg.max_particle_color != 0 ? globalCfg.max_particle_color : Math.min(5, Math.max(1, colors.size())));
+
+        int colorStep = checkCounterClick(mouseX, mouseY, rowX, rY, rowW, rowH, viewportY, viewportH);
+        if (colorStep != 0) {
+            data.max_particle_color = Math.max(1, Math.min(colors.size(), maxColors + colorStep));
+            if (data.dyeColors == null) {
+                data.dyeColors = new ArrayList<>(colors);
+            }
+            PillarIdManager.getClient().updatePillarData(data);
+            PacketFactory.sendToServer(new UpdatePillarDataPacket(data));
+            return true;
+        }
+
+        int swatchSize = 12;
+        int swatchGap = 3;
+        int counterW = 60;
+        int counterX = rowX + rowW - counterW - 8;
+        int swatchesTotalW = Math.min(7, colors.size()) * (swatchSize + swatchGap);
+        int swatchStartX = counterX - swatchesTotalW - 8;
+        int swatchY = rY + (rowH - swatchSize) / 2;
+
+        for (int i = 0; i < Math.min(7, colors.size()); i++) {
+            int swX = swatchStartX + i * (swatchSize + swatchGap);
+            if (mouseX >= swX && mouseX <= swX + swatchSize && mouseY >= swatchY && mouseY <= swatchY + swatchSize) {
+                editingColorIndex = i;
+                isEditingPillarColor = true;
+                editingPillarId = data.id;
+                String hex = colors.get(i).replace("#", "");
+                try {
+                    int rgb = Integer.parseInt(hex, 16);
+                    float[] hsb = new float[3];
+                    rgbToHsb(rgb, hsb);
+                    pickerHue = hsb[0];
+                    pickerSat = hsb[1];
+                    pickerBri = hsb[2];
+                } catch (Exception ignored) {}
+                showColorModal = true;
+                return true;
+            }
+        }
+        rY += rowH + rowGap;
+
+        // Row 7: Save Pillar Changes Button
+        Font font = Minecraft.getInstance().font;
+        int saveBtnW = font.width("✓ Save Pillar") + 16;
+        if (checkButtonClick(mouseX, mouseY, rowX, rY, rowW, rowH, viewportY, viewportH, saveBtnW)) {
+            PillarIdManager.getClient().saveAllPillars();
+            PacketFactory.sendToServer(new UpdatePillarDataPacket(data));
+            return true;
+        }
+
+        return false;
+    }
+
     private boolean handleColorModalClick(double mouseX, double mouseY) {
         int modalW = 340;
         int modalH = 196;
@@ -2711,11 +3171,16 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
             if (isEditingPillarColor && editingPillarId != null) {
                 PillarIdManager.PillarData data = PillarIdManager.getClient().getPillarData(editingPillarId);
                 if (data != null) {
+                    if (data.dyeColors == null) {
+                        data.dyeColors = new ArrayList<>(PillarParticleConfig.get().particle_color);
+                    }
                     if (editingColorIndex < data.dyeColors.size()) {
                         data.dyeColors.set(editingColorIndex, hexString);
                     } else {
                         data.dyeColors.add(hexString);
                     }
+                    PillarIdManager.getClient().updatePillarData(data);
+                    PacketFactory.sendToServer(new UpdatePillarDataPacket(data));
                 }
             } else {
                 PillarParticleConfig cfg = PillarParticleConfig.get();

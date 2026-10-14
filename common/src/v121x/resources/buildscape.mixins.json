@@ -48,12 +48,19 @@
   "client": [
     "AbstractContainerScreenMixin",
     "FireworkStarterMixin",
+    "ElytraLayerV121xMixin",
     "GlassJarRenderShapeMixin",
+    "HumanoidArmorLayerV121xMixin",
+    "ItemRendererV121xMixin",
     "PauseScreenMixin",
+    "RenderTypeArmorGlintV121xMixin",
+    "RenderCompositeStateV121xAccessor",
+    "RenderBuffersV121xMixin",
     "client.AdvancementsScreenMixin",
     "client.ClientTooltipComponentMixin",
     "client.FireworkRocketContextMixin",
     "client.FireworkStarterShapeV121xMixin",
+    "client.ParticleV121xAccessor",
     "client.SoundMuffMixin"
   ],
   "injectors": {

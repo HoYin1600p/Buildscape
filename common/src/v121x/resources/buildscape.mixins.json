@@ -28,6 +28,7 @@
     "IronBarsBlockMixin",
     "ItemCombinerMenuAccessor",
     "ItemDefaultsV121xMixin",
+    "FireworkStarItemV121xMixin",
     "ItemV121xMixin",
     "LavaFluidMixin",
     "LeavesBlockV121xMixin",

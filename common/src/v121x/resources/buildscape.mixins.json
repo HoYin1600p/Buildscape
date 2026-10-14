@@ -57,6 +57,12 @@
     "BeaconBlockEntityRendererMixin",
     "CreativeModeTabMixin",
     "FireworkStarterMixin",
+    "ElytraLayerV121xMixin",
+    "HumanoidArmorLayerV121xMixin",
+    "ItemRendererV121xMixin",
+    "RenderTypeArmorGlintV121xMixin",
+    "RenderCompositeStateV121xAccessor",
+    "RenderBuffersV121xMixin",
     "GeneralStatisticsListEntryMixin",
     "GeneralStatisticsListMixin",
     "GlassJarRenderShapeMixin",
@@ -69,6 +75,7 @@
     "client.ClientTooltipComponentMixin",
     "client.FireworkRocketContextMixin",
     "client.FireworkStarterShapeV121xMixin",
+    "client.ParticleV121xAccessor",
     "client.SoundMuffMixin"
   ],
   "injectors": {

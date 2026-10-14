@@ -364,6 +364,9 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         }
         prevTabIndex = selectedTabIndex;
         selectedTabIndex = newIndex;
+        try {
+            BuildscapeClientConfig.get().setLastActiveTab(newIndex);
+        } catch (Exception ignored) {}
         scrollOffset = 0.0;
         targetScrollOffset = 0.0;
         isDraggingScrollbar = false;
@@ -375,6 +378,10 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         } else {
             selectedPillarDetailId = null;
             closingPillarDetailId = null;
+        }
+
+        if (newIndex == 0 && BuildscapeClientConfig.get().isSidePanelExpanded()) {
+            openSidePanel(SidePanelType.PRESETS);
         }
 
         if ("pillars".equals(navItems.get(newIndex).id)) {
@@ -396,6 +403,11 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
     }
 
     public void openSidePanel(SidePanelType type) {
+        if (type == SidePanelType.PRESETS) {
+            try {
+                BuildscapeClientConfig.get().setSidePanelExpanded(true);
+            } catch (Exception ignored) {}
+        }
         if (sidePanelType == type && (isSidePanelOpening || sidePanelProgress >= 1.0f)) {
             return;
         }
@@ -476,13 +488,29 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
         this.openStartTime = System.currentTimeMillis();
         try {
-            String saved = BuildscapeClientConfig.get().getUiTheme();
-            applyTheme(ConfigThemes.getById(saved));
+            BuildscapeClientConfig cfg = BuildscapeClientConfig.get();
+            String savedTheme = cfg.getUiTheme();
+            applyTheme(ConfigThemes.getById(savedTheme));
+            ConfigBackgrounds.setBackgroundById(cfg.getUiBackground());
+            animSpeedIndex = Math.max(0, Math.min(ANIM_SPEEDS.length - 1, cfg.getAnimationSpeedIndex()));
+            int savedTab = cfg.getLastActiveTab();
+            if (savedTab >= 0 && savedTab < 5) {
+                this.selectedTabIndex = savedTab;
+            }
+            if (this.selectedTabIndex == 0 && cfg.isSidePanelExpanded()) {
+                this.sidePanelType = SidePanelType.PRESETS;
+                this.sidePanelProgress = 1.0f;
+                this.isSidePanelOpening = false;
+                this.isSidePanelClosing = false;
+            }
         } catch (Exception ignored) {}
         initNavItems();
         cacheAvailableItems();
         loadRegisteredTags();
         syncPillars();
+
+        // Asynchronously warm up PresetsConfig in the background to eliminate opening stutter
+        java.util.concurrent.CompletableFuture.runAsync(PresetsConfig::get);
     }
 
     private void initNavItems() {
@@ -3969,6 +3997,9 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                 int animStep = checkCycleClick(mouseX, mouseY, x, curY, w, h, clipY, clipH);
                 if (animStep != 0) {
                     animSpeedIndex = (animSpeedIndex + animStep + ANIM_SPEEDS.length) % ANIM_SPEEDS.length;
+                    try {
+                        BuildscapeClientConfig.get().setAnimationSpeedIndex(animSpeedIndex);
+                    } catch (Exception ignored) {}
                     return true;
                 }
                 curY += h + gap;
@@ -4483,6 +4514,11 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         int closeX = sHeadX + sHeadW - closeSize - 4;
         int closeY = sHeadY + 4;
         if (mouseX >= closeX && mouseX <= closeX + closeSize && mouseY >= closeY && mouseY <= closeY + closeSize) {
+            if (sidePanelType == SidePanelType.PRESETS) {
+                try {
+                    BuildscapeClientConfig.get().setSidePanelExpanded(false);
+                } catch (Exception ignored) {}
+            }
             closeSidePanel();
             return true;
         }

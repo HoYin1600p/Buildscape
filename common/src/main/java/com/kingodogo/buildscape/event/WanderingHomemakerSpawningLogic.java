@@ -32,11 +32,18 @@ public final class WanderingHomemakerSpawningLogic {
     }
 
     private static BlockCategory getCategory(Block block) {
-        if (block instanceof DecoratedPotBlock || block instanceof TrappedDecoratedPotBlock) return BlockCategory.DECORATED_POT;
+        if (block instanceof DecoratedPotBlock || block instanceof TrappedDecoratedPotBlock || isVanillaPotReplacement(block)) return BlockCategory.DECORATED_POT;
         if (block instanceof PillarBlock || block instanceof AshenKingPillarBlock) return BlockCategory.PILLAR;
         if (block instanceof StarBlock) return BlockCategory.STAR;
         if (block instanceof CushionBlock) return BlockCategory.CUSHION;
         return BlockCategory.NONE;
+    }
+
+    // 1.21.1 and 26.x drop Buildscape's plain decorated pot in favour of the vanilla one (ContentRemovalPolicy), so the
+    // vanilla pot has to keep counting for the Wandering Homemaker square as main's plain pot does.
+    private static boolean isVanillaPotReplacement(Block block) {
+        return (Services.isVersionCluster("v121x") || Services.isVersionCluster("v26x"))
+                && "block.minecraft.decorated_pot".equals(block.getDescriptionId());
     }
 
     private static final int[][] OFFSETS_1 = {{0, 0}, {1, 0}, {0, 1}, {1, 1}};

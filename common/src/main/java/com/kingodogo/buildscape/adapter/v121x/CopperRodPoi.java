@@ -1,7 +1,6 @@
 package com.kingodogo.buildscape.adapter.v121x;
 
 import com.google.common.collect.ImmutableSet;
-import com.kingodogo.buildscape.BuildscapeCommon;
 import com.kingodogo.buildscape.mixin.PoiTypeAccessor;
 import com.kingodogo.buildscape.mixin.PoiTypesAccessor;
 import net.minecraft.core.Holder;
@@ -10,6 +9,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.ai.village.poi.PoiType;
 import net.minecraft.world.entity.ai.village.poi.PoiTypes;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.HashSet;
@@ -27,6 +27,10 @@ public final class CopperRodPoi {
 
     public static synchronized void ensureRegistered() {
         if (registered) return;
+        for (String id : ROD_IDS) {
+            // Before the mod blocks exist (registry bootstrap) nothing can be registered yet; try again on a later lookup.
+            if (BuiltInRegistries.BLOCK.get(ResourceLocation.fromNamespaceAndPath("buildscape", id)) == Blocks.AIR) return;
+        }
         registered = true;
         Holder<PoiType> holder = BuiltInRegistries.POINT_OF_INTEREST_TYPE.getHolderOrThrow(PoiTypes.LIGHTNING_ROD);
         PoiTypeAccessor accessor = (PoiTypeAccessor) (Object) holder.value();
@@ -34,10 +38,6 @@ public final class CopperRodPoi {
         var byState = PoiTypesAccessor.getTypeByState();
         for (String id : ROD_IDS) {
             Block rod = BuiltInRegistries.BLOCK.get(ResourceLocation.fromNamespaceAndPath("buildscape", id));
-            if (rod == net.minecraft.world.level.block.Blocks.AIR) {
-                BuildscapeCommon.LOGGER.warn("Copper rod {} is not registered; it will not join the lightning rod POI", id);
-                continue;
-            }
             for (BlockState state : rod.getStateDefinition().getPossibleStates()) {
                 byState.put(state, holder);
                 states.add(state);

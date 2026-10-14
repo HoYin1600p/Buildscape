@@ -726,29 +726,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
 
     // --- Adaptive GUI Scaling Engine ---
     public float getGuiUiScale() {
-        Minecraft mc = Minecraft.getInstance();
-        if (mc.getWindow() == null) return 1.0f;
-        double guiScale = mc.getWindow().getGuiScale();
-
-        // If the logical screen is large enough to fit both the main panel and side panel, keep 1:1
-        float minRequiredW = 820.0f;
-        float minRequiredH = 340.0f;
-        if (width >= minRequiredW && height >= minRequiredH) {
-            return 1.0f;
-        }
-
-        // Viewport too cramped (e.g. GUI Scale 3/4 on 1080p, or small windowed displays)
-        float scale = 1.0f;
-        if (guiScale > 2.0) {
-            scale = (float) (2.0 / guiScale);
-        }
-        float effW = width / scale;
-        float effH = height / scale;
-        if (effW < minRequiredW || effH < minRequiredH) {
-            float fitScale = Math.min(width / minRequiredW, height / minRequiredH);
-            scale = Math.min(scale, fitScale);
-        }
-        return Math.max(0.25f, Math.min(1.0f, scale));
+        return 1.0f;
     }
 
     public int getEffectiveWidth() {
@@ -1016,7 +994,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
             int sidePanelTargetW = Math.max(180, Math.min(220, availRight > 100 ? availRight : 210));
             int sidePanelH = Math.min(264, frameH - 44);
             int sidePanelY = frameY + (frameH - sidePanelH) / 2;
-            int dockX = frameRight - 2;
+            int dockX = Math.min(frameRight - 2, effW - sidePanelTargetW - 4);
             int slideOffset = (int) ((1.0f - sidePanelProgress) * (sidePanelTargetW + 10));
             int sidePanelX = dockX - slideOffset;
 
@@ -3098,7 +3076,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
             int sidePanelTargetW = Math.max(180, Math.min(220, availRight > 100 ? availRight : 210));
             int sidePanelH = Math.min(264, frameH - 44);
             int sidePanelY = frameY + (frameH - sidePanelH) / 2;
-            int dockX = frameRight - 2;
+            int dockX = Math.min(frameRight - 2, effW - sidePanelTargetW - 4);
             int slideOffset = (int) ((1.0f - sidePanelProgress) * (sidePanelTargetW + 10));
             int sidePanelX = dockX - slideOffset;
 
@@ -4573,7 +4551,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
             int sidePanelTargetW = Math.max(180, Math.min(220, availRight > 100 ? availRight : 210));
             int sidePanelH = Math.min(264, frameH - 44);
             int sidePanelY = frameY + (frameH - sidePanelH) / 2;
-            int dockX = frameRight - 4;
+            int dockX = Math.min(frameRight - 4, effW - sidePanelTargetW - 4);
             int slideOffset = (int) ((1.0f - sidePanelProgress) * (sidePanelTargetW + 10));
             int sidePanelX = dockX - slideOffset;
 
@@ -4664,7 +4642,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
             int sidePanelTargetW = Math.max(180, Math.min(220, availRight > 100 ? availRight : 210));
             int sidePanelH = Math.min(264, frameH - 44);
             int sidePanelY = frameY + (frameH - sidePanelH) / 2;
-            int dockX = frameRight - 2;
+            int dockX = Math.min(frameRight - 2, effW - sidePanelTargetW - 4);
             int slideOffset = (int) ((1.0f - sidePanelProgress) * (sidePanelTargetW + 10));
             int sidePanelX = dockX - slideOffset;
 

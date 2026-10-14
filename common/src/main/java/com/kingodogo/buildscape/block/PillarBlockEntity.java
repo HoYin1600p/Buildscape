@@ -813,6 +813,7 @@ public class PillarBlockEntity extends DataBlockEntity {
         setChanged();
         if (level != null && !level.isClientSide()) {
             level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
+            recordDisplayedItemInManager(item);
         }
     }
 
@@ -822,6 +823,23 @@ public class PillarBlockEntity extends DataBlockEntity {
         setChanged();
         if (level != null && !level.isClientSide()) {
             level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
+            recordDisplayedItemInManager(item);
+        }
+    }
+
+    /** The reference records the displayed item in the pillar ID manager, creating the stack's ID when it has none. */
+    private void recordDisplayedItemInManager(ItemStack item) {
+        PillarIdManager manager = PillarIdManager.get(level);
+        String itemId = item.isEmpty() ? null : Services.PLATFORM.getItemId(item.getItem()).toString();
+        if (this.pillarId != null) {
+            manager.updateDisplayedItem(this.pillarId, itemId);
+        } else {
+            String stackId = getStackPillarId();
+            if (stackId != null) {
+                manager.updateDisplayedItem(stackId, itemId);
+            } else if (!item.isEmpty()) {
+                manager.updateDisplayedItemByPosition(level, worldPosition, itemId);
+            }
         }
     }
 

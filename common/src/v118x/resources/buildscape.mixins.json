@@ -58,6 +58,7 @@
                    "ParticleV118xAccessor",
                    "RenderCompositeStateV118xAccessor",
                    "ScreenV118xInvoker",
+                   "AbstractWidgetBoundsMixin",
                    "SpriteV118xAccessor",
                    "BuildscapeBlockModelMixin",
                    "BuildscapeBlockStateCacheMixin",

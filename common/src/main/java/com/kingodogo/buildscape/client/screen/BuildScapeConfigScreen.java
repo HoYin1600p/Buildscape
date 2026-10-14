@@ -909,7 +909,12 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
             if (elapsed >= 1.0f) {
                 closeProgress = 0.0f;
                 isClosing = false;
-                Services.PLATFORM.openScreen(parent);
+                if (closeToWorld) {
+                    closeToWorld = false;
+                    Services.PLATFORM.openScreen(null);
+                } else {
+                    Services.PLATFORM.openScreen(parent);
+                }
                 return 0.0f;
             } else {
                 closeProgress = 1.0f - easeOutCubic(elapsed);
@@ -927,11 +932,18 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
         return isClosing ? closeProgress : openProgress;
     }
 
+    private boolean closeToWorld = false;
+
     public void startClosing() {
+        startClosing(false);
+    }
+
+    public void startClosing(boolean toWorld) {
         if (isClosing) return;
-        isClosing = true;
-        isOpening = false;
-        closeStartTime = System.currentTimeMillis();
+        this.closeToWorld = toWorld;
+        this.isClosing = true;
+        this.isOpening = false;
+        this.closeStartTime = System.currentTimeMillis();
     }
 
     private static int applyAlpha(int argb, float factor) {
@@ -2833,7 +2845,7 @@ public class BuildScapeConfigScreen implements IScreenDelegate {
                 if (sidePanelProgress > 0.001f && sidePanelType != SidePanelType.NONE) {
                     closeSidePanel();
                 }
-                startClosing();
+                startClosing(true);
             }
         }
     }

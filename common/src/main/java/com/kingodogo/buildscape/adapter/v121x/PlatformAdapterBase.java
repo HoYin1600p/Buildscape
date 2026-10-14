@@ -1908,9 +1908,15 @@ public abstract class PlatformAdapterBase implements IPlatformAdapter {
 
     @Override
     public Item createExperienceBucketItem(Item.Properties properties) {
-        return new com.kingodogo.buildscape.item.ExperienceBucketItem(properties) {
+        return new BucketItem(ExperienceFluids.still(), properties.stacksTo(1).craftRemainder(Items.BUCKET)) {
             @Override
             public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+                if (!player.isShiftKeyDown()) {
+                    InteractionResultHolder<ItemStack> placementResult = super.use(level, player, hand);
+                    if (placementResult.getResult() != InteractionResult.PASS) {
+                        return placementResult;
+                    }
+                }
                 player.startUsingItem(hand);
                 return InteractionResultHolder.consume(player.getItemInHand(hand));
             }

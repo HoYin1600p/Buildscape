@@ -582,6 +582,10 @@ public class BlockFactory implements IBlockFactory {
                     return super.updateShape(state, level, tickAccess, pos, direction, adjacentPos, adjacentState, random);
                 }
                 @Override
+                protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, @Nullable Orientation orientation, boolean isMoving) {
+                    onNeighborUpdate(level, pos, state, block, pos, isMoving);
+                }
+                @Override
                 protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
                     return onInteract(level, pos, state, player, InteractionHand.MAIN_HAND, hit);
                 }

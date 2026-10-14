@@ -351,6 +351,8 @@ public class BlockFactory implements IBlockFactory {
             case "SaplingBlock": {
                 net.minecraft.world.level.block.grower.AbstractTreeGrower grower = def.getId().equals("cherry_sapling")
                         ? new com.kingodogo.buildscape.worldgen.CherryTreeGrower()
+                        : def.getId().equals("poplar_sapling")
+                        ? new com.kingodogo.buildscape.worldgen.PoplarTreeGrower()
                         : new com.kingodogo.buildscape.worldgen.PaleOakTreeGrower();
                 return new net.minecraft.world.level.block.SaplingBlock(grower, props) {};
             }

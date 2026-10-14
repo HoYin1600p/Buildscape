@@ -11,8 +11,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.List;
-
 @Mixin(value = BeaconRenderer.class, priority = 900)
 public class BeaconBlockEntityRendererMixin {
 
@@ -21,26 +19,22 @@ public class BeaconBlockEntityRendererMixin {
             at = @At("HEAD"),
             cancellable = true
     )
-    private void buildscape$renderClippedBeam(BeaconBlockEntity blockEntity, float partialTicks, PoseStack poseStack,
-            MultiBufferSource bufferSource, int combinedLight, int combinedOverlay, CallbackInfo callback) {
+    private void buildscape$renderClippedBeam(
+            BeaconBlockEntity blockEntity,
+            float partialTicks,
+            PoseStack poseStack,
+            MultiBufferSource bufferSource,
+            int combinedLight,
+            int combinedOverlay,
+            CallbackInfo callback
+    ) {
         int cutoff = BeaconScanContext.confirmedHeight(blockEntity.getLevel(), blockEntity.getBlockPos());
         if (cutoff >= BeaconBeamScanState.UNLIMITED) {
             return;
         }
 
-        long gameTime = blockEntity.getLevel().getGameTime();
-        List<BeaconBlockEntity.BeaconBeamSection> sections = blockEntity.getBeamSections();
-        int yOffset = 0;
-        for (BeaconBlockEntity.BeaconBeamSection section : sections) {
-            int remaining = cutoff - yOffset;
-            if (remaining <= 0) {
-                break;
-            }
-            int sectionHeight = section.getHeight();
-            BeaconRendererInvoker.invokeRenderBeaconBeam(poseStack, bufferSource, partialTicks, gameTime, yOffset,
-                    Math.min(sectionHeight, remaining), section.getColor());
-            yOffset += sectionHeight;
-        }
+        com.kingodogo.buildscape.mixinsupport.MixinFactory.renderClippedBeaconBeam(
+                blockEntity, partialTicks, poseStack, bufferSource, combinedLight, combinedOverlay);
         callback.cancel();
     }
 }
